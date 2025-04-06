@@ -2,7 +2,7 @@ import { TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 
 export const amecConfig: TypeOrmModuleAsyncOptions = {
-  name: 'AMEC',
+  name: 'amecConnection',
   imports: [],
   inject: [ConfigService],
   useFactory: async (config: ConfigService) => ({
@@ -13,6 +13,6 @@ export const amecConfig: TypeOrmModuleAsyncOptions = {
     password: config.get('AMEC_PASSWORD'),
     database: config.get('AMEC_DATABASE'),
     entities: [__dirname + '/../amec/**/*.entity{.ts,.js}'],
-    synchronize: true,
+    synchronize: false,
   }),
 };

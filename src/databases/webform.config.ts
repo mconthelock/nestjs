@@ -2,7 +2,7 @@ import { TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 
 export const webformConfig: TypeOrmModuleAsyncOptions = {
-  name: 'AMEC',
+  name: 'webformConnection',
   imports: [],
   inject: [ConfigService],
   useFactory: async (config: ConfigService) => ({

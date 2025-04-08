@@ -1,1 +1,1 @@
-export class Pdepartment {}
+export class Department {}

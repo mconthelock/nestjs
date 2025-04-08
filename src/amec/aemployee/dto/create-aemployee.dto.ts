@@ -1,5 +1,7 @@
+import { IsString, IsNumber, IsOptional } from 'class-validator';
 export class CreateAemployeeDto {
-  semplno: string;
+  @IsString()
+  readonly semplno: string;
   sdivcode?: string;
   sdepcode?: string;
   sseccode?: string;

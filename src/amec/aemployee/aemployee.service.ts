@@ -19,7 +19,7 @@ export class AemployeeService {
   }
 
   findAll() {
-    return `This action returns all aemployee`;
+    return this.aemployeeRepository.find();
   }
 
   findOne(id: number) {

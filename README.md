@@ -26,6 +26,8 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+-- This is Backend project on my mac
+
 ## Project setup
 
 ```bash

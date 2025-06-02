@@ -13,7 +13,7 @@ import { AuthService } from './auth.service';
     AemployeeModule,
     PassportModule,
     JwtModule.register({
-      secret: 'YOUR_SECRET_KEY',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '60m' },
     }),
   ],

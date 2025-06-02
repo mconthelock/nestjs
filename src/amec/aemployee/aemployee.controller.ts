@@ -27,7 +27,7 @@ export class AemployeeController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.aemployeeService.findOne(+id);
+    return this.aemployeeService.findOneById('1');
   }
 
   @Patch(':id')

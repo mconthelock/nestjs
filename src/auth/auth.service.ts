@@ -11,15 +11,14 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, pass: string): Promise<any> {
+  async validateUser(username: string, pass: string) {
     const user = await this.AemployeeService.findOneById(username);
-
     if (user) {
-      const isMatch = await bcrypt.compare(pass, user.spassword);
-      if (isMatch) {
-        const { spassword, ...result } = user;
-        return result;
-      }
+      //   const isMatch = await bcrypt.compare(pass, user.spassword);
+      //   if (isMatch) {
+      //const { spassword, ...result } = user;
+      return user;
+      //   }
     }
     return null;
   }
@@ -32,7 +31,7 @@ export class AuthService {
     };
     return {
       access_token: this.jwtService.sign(payload),
-      expiresIn: 3600,
+      // expiresIn: 3600,
       // user: { // อาจจะส่งข้อมูลผู้ใช้บางส่วนกลับไปด้วย
       //   id: user.id,
       //   username: user.username,

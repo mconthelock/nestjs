@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto } from './dto/login.dto'; // สร้าง DTO สำหรับข้อมูล login
 
 @Controller('auth')
 export class AuthController {
@@ -27,5 +27,3 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 }
-
-//22017 >> 92215

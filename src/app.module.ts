@@ -13,9 +13,8 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true, // ทำให้สามารถใช้ได้ทั้งโปรเจกต์โดยไม่ต้อง import ซ้ำ
     }),
     TypeOrmModule.forRootAsync(amecConfig),
-    // TypeOrmModule.forRootAsync(webformConfig),
+    AuthModule,
     AmecModule,
-    // AuthModule,
   ],
 })
 export class AppModule {}

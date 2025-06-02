@@ -5,6 +5,7 @@ import amecConfig from './databases/amec.config';
 import { webformConfig } from './databases/webform.config';
 
 import { AmecModule } from './amec/amec.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AmecModule } from './amec/amec.module';
     TypeOrmModule.forRootAsync(amecConfig),
     // TypeOrmModule.forRootAsync(webformConfig),
     AmecModule,
+    // AuthModule,
   ],
 })
 export class AppModule {}

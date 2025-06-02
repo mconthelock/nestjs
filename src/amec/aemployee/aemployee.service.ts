@@ -26,6 +26,13 @@ export class AemployeeService {
     return `This action returns a #${id} aemployee`;
   }
 
+  async findOneById(id: string) {
+    const user = await this.aemployeeRepository.findOne({
+      where: { sempno: id },
+    });
+    return user || undefined;
+  }
+
   update(id: number, updateAemployeeDto: UpdateAemployeeDto) {
     return `This action updates a #${id} aemployee`;
   }

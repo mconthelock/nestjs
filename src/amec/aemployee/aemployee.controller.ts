@@ -27,19 +27,11 @@ export class AemployeeController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.aemployeeService.findOneById('1');
+    return this.aemployeeService.findOne(id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateAemployeeDto: UpdateAemployeeDto,
-  ) {
-    return this.aemployeeService.update(+id, updateAemployeeDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.aemployeeService.remove(+id);
+  @Get(':id')
+  findOneBySLogin(@Param('id') id: string) {
+    return this.aemployeeService.findOneBySLogin(id);
   }
 }

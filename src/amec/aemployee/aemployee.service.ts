@@ -22,16 +22,27 @@ export class AemployeeService {
     return this.aemployeeRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} aemployee`;
-  }
-
-  async findOneById(id: string) {
+  async findOne(id: string) {
     const user = await this.aemployeeRepository.findOne({
-      where: { sempno: '12069' },
+      where: { sempno: id },
     });
     return user;
-    //return this.aemployeeRepository.find();
+  }
+
+  async findOneBySLogin(id: string) {
+    const user = await this.aemployeeRepository.findOne({
+      where: { sempno: id },
+      select: [
+        'sempno',
+        'sname',
+        'sdivcode',
+        'sdepcode',
+        'sseccode',
+        'sposcode',
+        'spassword1',
+      ],
+    });
+    return user;
   }
 
   update(id: number, updateAemployeeDto: UpdateAemployeeDto) {

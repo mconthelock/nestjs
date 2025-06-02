@@ -21,9 +21,6 @@ export class AuthController {
   @UseGuards(AuthGuard('local')) // 'local' อ้างถึง LocalStrategy ที่เราสร้าง
   @Post('login')
   async login(@Request() req, @Body() loginDto: LoginDto) {
-    // loginDto เป็น optional ถ้าคุณใช้เฉพาะ req.user
-    // req.user จะถูก populate โดย LocalStrategy.validate()
-    // loginDto ใช้เพื่อให้ Swagger/OpenAPI รู้จัก request body และสำหรับการ validation (ถ้ามี)
     return this.authService.login(req.user);
   }
 }

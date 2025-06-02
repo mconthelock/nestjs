@@ -2,7 +2,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AemployeeService } from '../amec/aemployee/aemployee.service';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -12,13 +12,13 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, pass: string) {
-    const user = await this.AemployeeService.findOneById(username);
+    const user = await this.AemployeeService.findOneBySLogin(username);
     if (user) {
-      //   const isMatch = await bcrypt.compare(pass, user.spassword);
-      //   if (isMatch) {
-      //const { spassword, ...result } = user;
-      return user;
-      //   }
+      const md5Hash = crypto.createHash('md5').update(pass).digest('hex');
+      if (md5Hash == user.spassword1) {
+        const { spassword1, ...result } = user;
+        return result;
+      }
     }
     return null;
   }
@@ -26,17 +26,13 @@ export class AuthService {
   async login(user: any) {
     const payload = {
       username: user.sempno,
-      sub: user.sempno, // 'sub' (subject) เป็น claim มาตรฐานของ JWT สำหรับ user ID
+      sub: user,
       // roles: user.roles // ตัวอย่าง: เพิ่ม roles หากผู้ใช้ของคุณมี roles
     };
     return {
       access_token: this.jwtService.sign(payload),
+      //   user: user,
       // expiresIn: 3600,
-      // user: { // อาจจะส่งข้อมูลผู้ใช้บางส่วนกลับไปด้วย
-      //   id: user.id,
-      //   username: user.username,
-      //   roles: user.roles
-      // }
     };
   }
 }

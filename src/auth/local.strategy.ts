@@ -8,8 +8,8 @@ import { AuthService } from './auth.service'; // AuthService ของคุณ�
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
     super({
-      usernameField: 'username', // หรือ 'email' ขึ้นอยู่กับตาราง User ของคุณ
-      // passwordField: 'password' // นี่คือค่า default
+      usernameField: 'username',
+      passwordField: 'password',
     });
   }
 
@@ -18,6 +18,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException('ข้อมูลการเข้าสู่ระบบไม่ถูกต้อง');
     }
-    return user; // object ผู้ใช้นี้จะถูกใส่ใน req.user ใน route handler ของ login
+    // object ผู้ใช้นี้จะถูกใส่ใน req.user ใน route handler ของ login
+    return user;
   }
 }

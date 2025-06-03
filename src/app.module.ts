@@ -5,7 +5,7 @@ import amecConfig from './databases/amec.config';
 
 import { AmecModule } from './amec/amec.module';
 import { AuthModule } from './auth/auth.module';
-import { JobOrderModule } from './job-order/job-order.module';
+// import { JobOrderModule } from './job-order/job-order.module';
 
 @Module({
   imports: [
@@ -15,7 +15,7 @@ import { JobOrderModule } from './job-order/job-order.module';
     TypeOrmModule.forRootAsync(amecConfig),
     AuthModule,
     AmecModule,
-    JobOrderModule,
+    // JobOrderModule,
   ],
 })
 export class AppModule {}

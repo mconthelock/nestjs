@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import * as compression from 'compression';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 
 async function bootstrap() {
@@ -21,8 +22,23 @@ async function bootstrap() {
       },
     }),
   );
+  // เปิดใช้งาน Compression Middleware
+  app.use(
+    compression({
+      level: 6, // ตั้งค่าระดับการบีบอัด (0-9, 9 คือสูงสุด)
+      threshold: 100 * 1024, // บีบอัดเฉพาะ response ที่มีขนาดใหญ่กว่า 100KB
+      filter: (req, res) => {
+        if (req.headers['x-no-compression']) {
+          // ไม่ต้องบีบอัดถ้ามี header 'x-no-compression'
+          return false;
+        }
+        // บีบอัดตามเงื่อนไข default ของ library
+        return compression.filter(req, res);
+      },
+    }),
+  );
 
   await app.listen(process.env.PORT ?? 3000);
-  console.log(`Server is running on port ${process.env.PORT}`);
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

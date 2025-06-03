@@ -11,10 +11,10 @@ export class VJobOrder {
   @ViewColumn()
   department: string;
 
-  @ViewColumn({ nullable: true })
+  @ViewColumn({})
   location?: string;
 
-  @ViewColumn({ nullable: true })
+  @ViewColumn({})
   salary?: number;
 
   @ViewColumn()

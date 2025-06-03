@@ -15,8 +15,6 @@ export class AuthService {
     const user = await this.UsersService.findEmp(username);
     if (user) {
       const md5Hash = crypto.createHash('md5').update(pass).digest('hex');
-      console.log(pass, md5Hash, user.spassword1);
-
       if (md5Hash == user.spassword1) {
         const { spassword1, ...result } = user;
         return result;

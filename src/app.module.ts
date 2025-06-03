@@ -5,7 +5,7 @@ import amecConfig from './databases/amec.config';
 
 import { AmecModule } from './amec/amec.module';
 import { AuthModule } from './auth/auth.module';
-import { JobOrderModule } from './job-order/job-order.module';
+import { JobOrderModule } from './joborder/joborder.module';
 
 @Module({
   imports: [

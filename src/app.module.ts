@@ -6,6 +6,11 @@ import amecConfig from './databases/amec.config';
 import { AmecModule } from './amec/amec.module';
 import { AuthModule } from './auth/auth.module';
 import { JobOrderModule } from './job-order/job-order.module';
+import { ApplicationModule } from './docinv/application/application.module';
+import { AppsmenuModule } from './docinv/appsmenu/appsmenu.module';
+import { AppsusersModule } from './docinv/appsusers/appsusers.module';
+import { AppsgroupsModule } from './docinv/appsgroups/appsgroups.module';
+import { AppsusersgroupsModule } from './docinv/appsusersgroups/appsusersgroups.module';
 
 @Module({
   imports: [
@@ -16,6 +21,11 @@ import { JobOrderModule } from './job-order/job-order.module';
     AuthModule,
     AmecModule,
     JobOrderModule,
+    ApplicationModule,
+    AppsmenuModule,
+    AppsusersModule,
+    AppsgroupsModule,
+    AppsusersgroupsModule,
   ],
 })
 export class AppModule {}

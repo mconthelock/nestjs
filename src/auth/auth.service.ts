@@ -11,7 +11,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, pass: string) {
+  async validateUser(username: string, pass: string, apps: number) {
     const user = await this.UsersService.findEmp(username);
     if (user) {
       const md5Hash = crypto.createHash('md5').update(pass).digest('hex');

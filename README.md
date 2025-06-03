@@ -2,24 +2,6 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-## Description
-
-# AMEC DATABASE
-
-AMEC_HOST=localhost
-AMEC_PORT=3306
-AMEC_USER=root
-AMEC_PASSWORD=root
-AMEC_DATABASE=AMEC
-
-# WEBFORM DATABASE
-
-WEBFORM_HOST=localhost
-WEBFORM_PORT=3306
-WEBFORM_USER=root
-WEBFORM_PASSWORD=root
-WEBFORM_DATABASE=WEBFORM
-
 ## Project setup
 
 ```bash

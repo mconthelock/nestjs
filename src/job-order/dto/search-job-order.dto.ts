@@ -1,3 +1,4 @@
+
 export class SearchJobOrderDto {
     readonly ORDTYPE?: string;
     readonly PRJ_NO?: string;

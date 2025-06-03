@@ -21,6 +21,8 @@ export class JobOrderController {
 
   @Post('search')
   async search(@Body() dto: SearchJobOrderDto) {
+    console.log('dto', dto.PRNO);
+
     // dto จะเก็บค่าที่ client post มา (body) เช่น { keyword: "แจ๊บ", date: "2024-06-03" }
     return this.jobOrderService.search(dto);
   }

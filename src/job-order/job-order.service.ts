@@ -28,6 +28,9 @@ export class JobOrderService {
     const { ORDTYPE, PRJ_NO, MFGNO, BUYEREMPNO, BUYERNAME, PRNO, PRDATE, PONO, PODATE, LINENO, VENDCODE, ITEM, DRAWING, INVOICE, DUEDATE } = dto;
     const query = this.jobOrderRepository.createQueryBuilder('jobOrder');
 
+    console.log(PRNO);
+    
+
     if (ORDTYPE) {
       query.andWhere('jobOrder.ORDTYPE = :ORDTYPE', { ORDTYPE });
     }

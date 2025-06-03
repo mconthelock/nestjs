@@ -1,12 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AemployeeService } from './aemployee.service';
 import { CreateAemployeeDto } from './dto/create-aemployee.dto';
 import { UpdateAemployeeDto } from './dto/update-aemployee.dto';
@@ -21,6 +14,7 @@ export class AemployeeController {
   }
 
   @Get()
+  @UseGuards(AuthGuard('jwt'))
   findAll() {
     return this.aemployeeService.findAll();
   }

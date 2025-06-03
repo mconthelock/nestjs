@@ -2,7 +2,7 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from './auth.service'; // AuthService ของคุณจะจัดการการตรวจสอบรหัสผ่าน
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -16,9 +16,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validate(username: string, pass: string): Promise<any> {
     const user = await this.authService.validateUser(username, pass);
     if (!user) {
-      throw new UnauthorizedException('ข้อมูลการเข้าสู่ระบบไม่ถูกต้อง');
+      throw new UnauthorizedException('You nave no authorization--');
     }
-    // object ผู้ใช้นี้จะถูกใส่ใน req.user ใน route handler ของ login
     return user;
   }
 }

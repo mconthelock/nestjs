@@ -8,6 +8,14 @@ export class VJobOrder {
   URGENT: string | null;
   @ViewColumn()
   MAPPIC: string | null;
+  department: string;
+
+  @ViewColumn({})
+  location?: string;
+
+  @ViewColumn({})
+  salary?: number;
+
   @ViewColumn()
   SERIES: string | null;
   @ViewColumn()

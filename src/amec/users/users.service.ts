@@ -11,7 +11,9 @@ export class UsersService {
   ) {}
 
   findEmp(empno: string) {
-    return this.userRepository.findOne({ where: { sempno: empno } });
+    return this.userRepository.findOne({
+      where: { sempno: empno },
+    });
   }
 
   findByDiv(div: string) {

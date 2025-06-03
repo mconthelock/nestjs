@@ -1,100 +1,85 @@
 import { ViewColumn, ViewEntity } from 'typeorm';
 
-@ViewEntity({ name: 'JOB_ORDER' })
+@ViewEntity({ name: 'AMECMFG.JOB_ORDER' })
 export class VJobOrder {
   @ViewColumn()
-  id: number;
-
+  ORDTYPE: string | null;
   @ViewColumn()
-  jobTitle: string;
-
+  URGENT: string | null;
   @ViewColumn()
-  department: string;
-
-  @ViewColumn({ nullable: true })
-  location?: string;
-
-  @ViewColumn({ nullable: true })
-  salary?: number;
-
+  MAPPIC: string | null;
   @ViewColumn()
-  ORDTYPE;
+  SERIES: string | null;
   @ViewColumn()
-  URGENT;
+  AGENT: string | null;
   @ViewColumn()
-  MAPPIC;
+  PRJ_NO: string | null;
   @ViewColumn()
-  SERIES;
+  MFGNO: string | null;
   @ViewColumn()
-  AGENT;
+  ELV_NO: string | null;
   @ViewColumn()
-  PRJ_NO;
+  OPERATION: string | null;
   @ViewColumn()
-  MFGNO;
+  REQ: string | null;
   @ViewColumn()
-  ELV_NO;
+  CUST_RQS: Date | null;
   @ViewColumn()
-  OPERATION;
+  DESSCH: Date | null;
   @ViewColumn()
-  REQ;
+  PRODSCH: Date | null;
   @ViewColumn()
-  CUST_RQS;
+  DESPROD: string | null;
   @ViewColumn()
-  DESSCH;
+  DESBMDATE: Date | null;
   @ViewColumn()
-  PRODSCH;
+  MFGBMDATE: Date | null;
   @ViewColumn()
-  DESPROD;
+  EXPSHIP: Date | null;
   @ViewColumn()
-  DESBMDATE;
+  DUMMYCAR_NO: string | null;
   @ViewColumn()
-  MFGBMDATE;
+  DUMMY_PRDN: string | null;
   @ViewColumn()
-  EXPSHIP;
+  DUMMY_ITEM: string | null;
   @ViewColumn()
-  DUMMYCAR_NO;
+  BUYERCODE: string | null;
   @ViewColumn()
-  DUMMY_PRDN;
+  BUYEREMPNO: string | null;
   @ViewColumn()
-  DUMMY_ITEM;
+  BUYERNAME: string | null;
   @ViewColumn()
-  BUYERCODE;
+  PRNO: Number | null;
   @ViewColumn()
-  BUYEREMPNO;
+  LINENO: Number | null;
   @ViewColumn()
-  BUYERNAME;
+  PRDATE: Number | null;
   @ViewColumn()
-  PRNO;
+  PONO: Number | null;
   @ViewColumn()
-  LINENO;
+  PODATE: Number | null;
   @ViewColumn()
-  PRDATE;
+  VENDCODE: Number | null;
   @ViewColumn()
-  PONO;
+  ITEM: string | null;
   @ViewColumn()
-  PODATE;
+  PARTNAME: string | null;
   @ViewColumn()
-  VENDCODE;
+  DRAWING: string | null;
   @ViewColumn()
-  ITEM;
+  REMARK: string | null;
   @ViewColumn()
-  PARTNAME;
+  REQUESTED_QTY: Number | null;
   @ViewColumn()
-  DRAWING;
+  ORDERED_QTY: Number | null;
   @ViewColumn()
-  REMARK;
+  RECIEVE_QTY: Number | null;
   @ViewColumn()
-  REQUESTED_QTY;
+  DUEDATE: Number | null;
   @ViewColumn()
-  ORDERED_QTY;
+  QTY: Number | null;
   @ViewColumn()
-  RECIEVE_QTY;
+  ACTUALETA_AMEC: Number | null;
   @ViewColumn()
-  DUEDATE;
-  @ViewColumn()
-  QTY;
-  @ViewColumn()
-  ACTUALETA_AMEC;
-  @ViewColumn()
-  INVOICE;
+  INVOICE: string | null;
 }

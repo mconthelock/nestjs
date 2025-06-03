@@ -16,7 +16,10 @@ if (process.env.HOST == 'AMEC') {
       password: process.env.AMEC_PASSWORD, //config.get('AMEC_PASSWORD'),
       //connectString: `${config.get('AMEC_HOST')}:${config.get('AMEC_PORT')}/${config.get('AMEC_SERVICE')}`,
       connectString: `${process.env.AMEC_HOST}:${process.env.AMEC_PORT}/${process.env.AMEC_SERVICE}`,
-      entities: [__dirname + '/../amec/**/*.entity{.ts,.js}'],
+      entities: [
+        __dirname + '/../**/**/*.entity{.ts,.js}',
+
+      ],
       synchronize: false,
     }),
   };

@@ -2,33 +2,26 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { JobOrderService } from './job-order.service';
 import { CreateJobOrderDto } from './dto/create-job-order.dto';
 import { UpdateJobOrderDto } from './dto/update-job-order.dto';
+import { SearchJobOrderDto } from './dto/search-job-order.dto';
 
 @Controller('job-order')
 export class JobOrderController {
   constructor(private readonly jobOrderService: JobOrderService) {}
 
-  @Post()
-  create(@Body() createJobOrderDto: CreateJobOrderDto) {
-    return this.jobOrderService.create(createJobOrderDto);
-  }
-
+ 
   @Get()
   findAll() {
     return this.jobOrderService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.jobOrderService.findOne(+id);
+  @Get(':PRNO')
+  findOne(@Param('PRNO') PRNO: number) {
+    return this.jobOrderService.findOne(PRNO);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateJobOrderDto: UpdateJobOrderDto) {
-    return this.jobOrderService.update(+id, updateJobOrderDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.jobOrderService.remove(+id);
+  @Post('search')
+  async search(@Body() dto: SearchJobOrderDto) {
+    // dto จะเก็บค่าที่ client post มา (body) เช่น { keyword: "แจ๊บ", date: "2024-06-03" }
+    return this.jobOrderService.search(dto);
   }
 }

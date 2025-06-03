@@ -1,7 +1,7 @@
 import { ViewColumn, ViewEntity } from 'typeorm';
 
 @ViewEntity({ name: 'AMECMFG.JOB_ORDER' })
-export class VJobOrder {
+export class VOrderList {
   @ViewColumn()
   ORDTYPE: string | null;
   @ViewColumn()

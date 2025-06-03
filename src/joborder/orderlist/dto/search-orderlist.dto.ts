@@ -1,5 +1,5 @@
 
-export class SearchJobOrderDto {
+export class SearchOrderListDto {
     readonly ORDTYPE?: string;
     readonly PRJ_NO?: string;
     readonly MFGNO?: string;

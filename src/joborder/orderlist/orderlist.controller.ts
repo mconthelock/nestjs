@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { OrderListService } from './orderlist.service';
-import { CreateOrderListDto } from './dto/create-orderlist.dto';
-import { UpdateOrderListDto } from './dto/update-orderlistr.dto';
 import { SearchOrderListDto } from './dto/search-orderlist.dto';
 
 @Controller('joborder')
@@ -20,10 +19,15 @@ export class OrderListController {
   }
 
   @Post('search')
+  // ถ้าไม่ใช้ @UseGuards จะไม่ต้อง login ก็ได้ แต่จะไม่มีการตรวจสอบสิทธิ์
+  @UseGuards(AuthGuard('jwt')) // ต้อง login เพื่อได้ cookie ถึงจะมีสิทธิ์เรียกใช้
   async search(@Body() dto: SearchOrderListDto) {
-    console.log('dto', dto.PRNO);
-
     // dto จะเก็บค่าที่ client post มา (body) เช่น { keyword: "แจ๊บ", date: "2024-06-03" }
-    return this.OrderListService.search(dto);
+    if(dto.search || dto.limit || dto.page) {
+      // ถ้า client ส่ง search, limit, page มา จะต้องมีการจัดการ pagination และ search
+        return this.OrderListService.serversite(dto);
+    }else{
+        return this.OrderListService.search(dto);
+    }
   }
 }

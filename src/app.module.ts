@@ -5,11 +5,7 @@ import amecConfig from './databases/amec.config';
 
 import { AmecModule } from './amec/amec.module';
 import { AuthModule } from './auth/auth.module';
-import { ApplicationModule } from './docinv/application/application.module';
-import { AppsmenuModule } from './docinv/appsmenu/appsmenu.module';
-import { AppsusersModule } from './docinv/appsusers/appsusers.module';
-import { AppsgroupsModule } from './docinv/appsgroups/appsgroups.module';
-import { AppsusersgroupsModule } from './docinv/appsusersgroups/appsusersgroups.module';
+import { DocinvModule } from './docinv/docinv.module';
 import { JobOrderModule } from './joborder/joborder.module';
 
 @Module({
@@ -20,12 +16,8 @@ import { JobOrderModule } from './joborder/joborder.module';
     TypeOrmModule.forRootAsync(amecConfig),
     AuthModule,
     AmecModule,
+    DocinvModule,
     JobOrderModule,
-    ApplicationModule,
-    AppsmenuModule,
-    AppsusersModule,
-    AppsgroupsModule,
-    AppsusersgroupsModule,
   ],
 })
 export class AppModule {}

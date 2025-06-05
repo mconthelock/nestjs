@@ -1,6 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsOptional, IsString, IsNumber } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsArray } from 'class-validator';
 export class SearchOrderListDto {
+    @IsOptional()
+    @IsArray()
+    @IsString({ each: true })
+    fields?: string[];
+
     @IsOptional()
     @Type(() => Number)
     @IsNumber()

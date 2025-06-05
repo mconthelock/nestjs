@@ -1,16 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ApplicationService } from './application.service';
+
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
 
-@Controller('application')
+@Controller('docinv/application')
 export class ApplicationController {
   constructor(private readonly applicationService: ApplicationService) {}
-
-  @Post()
-  create(@Body() createApplicationDto: CreateApplicationDto) {
-    return this.applicationService.create(createApplicationDto);
-  }
 
   @Get()
   findAll() {
@@ -18,12 +22,20 @@ export class ApplicationController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.applicationService.findOne(+id);
   }
 
+  @Post()
+  create(@Body() createApplicationDto: CreateApplicationDto) {
+    return this.applicationService.create(createApplicationDto);
+  }
+
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateApplicationDto: UpdateApplicationDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateApplicationDto: UpdateApplicationDto,
+  ) {
     return this.applicationService.update(+id, updateApplicationDto);
   }
 

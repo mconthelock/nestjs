@@ -4,6 +4,7 @@ import { AppsmenuModule } from './appsmenu/appsmenu.module';
 import { AppsusersModule } from './appsusers/appsusers.module';
 import { AppsgroupsModule } from './appsgroups/appsgroups.module';
 import { AppsusersgroupsModule } from './appsusersgroups/appsusersgroups.module';
+import { AppsmenuusersModule } from './appsmenuusers/appsmenuusers.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { AppsusersgroupsModule } from './appsusersgroups/appsusersgroups.module'
     AppsusersModule,
     AppsgroupsModule,
     AppsusersgroupsModule,
+    AppsmenuusersModule,
   ],
 })
 export class DocinvModule {}

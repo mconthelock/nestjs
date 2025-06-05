@@ -14,6 +14,8 @@ export class OrderListService {
     private readonly OrderListRepository: Repository<VOrderList>,
   ) {}
 
+  private readonly allowFields = ["ORDTYPE","URGENT","MAPPIC","SERIES","AGENT","PRJ_NO","MFGNO","ELV_NO","OPERATION","REQ","CUST_RQS","DESSCH","PRODSCH","DESPROD","DESBMDATE","MFGBMDATE","EXPSHIP","DUMMYCAR_NO","DUMMY_PRDN","DUMMY_ITEM","BUYERCODE","BUYEREMPNO","BUYERNAME","PRNO","LINENO","PRDATE","PONO","PODATE","VENDCODE","ITEM","PARTNAME","DRAWING","REMARK","REQUESTED_QTY","ORDERED_QTY","RECIEVE_QTY","DUEDATE","QTY","ACTUALETA_AMEC","INVOICE"];
+
   findAll() {
     return this.OrderListRepository.find();
   }
@@ -50,11 +52,17 @@ export class OrderListService {
   }
 
   async serversite(dto: SearchOrderListDto) {
-    const { search = '', limit = 10, page = 1 } = dto;
+    const { search = '', limit = 10, page = 1, fields = [] } = dto;
+    
     const query = this.OrderListRepository.createQueryBuilder('OrderList');
+
+    if (fields.length > 0) {
+        const safeFields = fields.filter(f => this.allowFields.includes(f));
+        query.select(safeFields.map(f => `OrderList.${f}`));
+    }
     if (search) {
         query.andWhere(
-            'TO_CHAR(OrderList.PRNO) LIKE :search',
+            'TO_CHAR(OrderList.PRNO) LIKE :search OR MFGNO LIKE :search', 
             { search: `%${search}%` },
         );
     } 

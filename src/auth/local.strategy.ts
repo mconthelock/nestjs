@@ -10,13 +10,15 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     super({
       usernameField: 'username',
       passwordField: 'password',
+      passReqToCallback: true, // enables access to req in validate
     });
   }
 
-  async validate(username: string, pass: string): Promise<any> {
-    const user = await this.authService.validateUser(username, pass, 2);
+  async validate(req: Request, username: string, pass: string): Promise<any> {
+    const appid = (req.body as any).appid;
+    const user = await this.authService.validateUser(username, pass, appid);
     if (!user) {
-      throw new UnauthorizedException('You nave no authorization--');
+      throw new UnauthorizedException('You nave no authorization');
     }
     return user;
   }

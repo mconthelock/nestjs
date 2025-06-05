@@ -1,11 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { AppsgroupsService } from './appsgroups.service';
 import { CreateAppsgroupDto } from './dto/create-appsgroup.dto';
 import { UpdateAppsgroupDto } from './dto/update-appsgroup.dto';
 
-@Controller('appsgroups')
+@Controller('docinv/appsgroups')
 export class AppsgroupsController {
   constructor(private readonly appsgroupsService: AppsgroupsService) {}
+
+  @Get(':id/:apps')
+  findOne(@Param('id') id: string, @Param('apps') apps: string) {
+    return this.appsgroupsService.findGroup(+id, +apps);
+  }
 
   @Post()
   create(@Body() createAppsgroupDto: CreateAppsgroupDto) {
@@ -17,13 +30,11 @@ export class AppsgroupsController {
     return this.appsgroupsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.appsgroupsService.findOne(+id);
-  }
-
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAppsgroupDto: UpdateAppsgroupDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateAppsgroupDto: UpdateAppsgroupDto,
+  ) {
     return this.appsgroupsService.update(+id, updateAppsgroupDto);
   }
 

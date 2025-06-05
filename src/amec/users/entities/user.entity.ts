@@ -2,39 +2,39 @@ import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity('AMECUSERALL')
 export class User {
-  @PrimaryColumn({ name: 'SEMPNO', type: 'varchar', length: 5 })
-  sempno: string;
+  @PrimaryColumn()
+  SEMPNO: string;
 
-  @Column({ name: 'SNAME', type: 'varchar', length: 50 })
-  sname: string;
+  @Column()
+  SNAME: string;
 
-  @Column({ name: 'SSEC', type: 'varchar', length: 100 })
-  ssec: string;
+  @Column()
+  SRECMAIL: string;
 
-  @Column({ name: 'SDEPT', type: 'varchar', length: 100 })
-  sdept: string;
+  @Column()
+  SSECCODE: string;
 
-  @Column({ name: 'SDIV', type: 'varchar', length: 100 })
-  sdiv: string;
+  @Column()
+  SSEC: string;
 
-  @Column({ name: 'SSECCODE', type: 'varchar', length: 6 })
-  sseccode: string;
+  @Column()
+  SDEPCODE: string;
 
-  @Column({ name: 'SDEPCODE', type: 'varchar', length: 6 })
-  sdepcode: string;
+  @Column()
+  SDEPT: string;
 
-  @Column({ name: 'SDIVCODE', type: 'varchar', length: 6 })
-  sdivcode: string;
+  @Column()
+  SDIVCODE: string;
 
-  @Column({ name: 'SRECMAIL', type: 'varchar', length: 120 })
-  srecmail: string;
+  @Column()
+  SDIV: string;
 
-  @Column({ name: 'SPOSCODE', type: 'varchar', length: 2 })
-  sposcode: string;
+  @Column()
+  SPOSCODE: string;
 
-  @Column({ name: 'SPOSNAME', type: 'varchar', length: 100 })
-  sposname: string;
+  @Column()
+  SPOSNAME: string;
 
-  @Column({ name: 'SPASSWORD1', type: 'varchar', length: 132 })
-  spassword1: string;
+  @Column()
+  SPASSWORD1: string;
 }

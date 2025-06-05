@@ -12,12 +12,12 @@ export class ApplicationService {
     private readonly appRepository: Repository<Application>,
   ) {}
 
-  findAll() {
-    return this.appRepository.find();
+  getAppsByID(id: number) {
+    return this.appRepository.findOne({ where: { APP_ID: id } });
   }
 
-  findOne(id: number) {
-    return this.appRepository.findOne({ where: { APP_ID: id } });
+  findAll() {
+    return this.appRepository.find();
   }
 
   create(createApplicationDto: CreateApplicationDto) {

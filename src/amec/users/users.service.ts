@@ -12,23 +12,23 @@ export class UsersService {
 
   findEmp(empno: string) {
     return this.userRepository.findOne({
-      where: { sempno: empno },
+      where: { SEMPNO: empno },
     });
   }
 
   findByDiv(div: string) {
-    return this.userRepository.find({ where: { sdivcode: div } });
+    return this.userRepository.find({ where: { SDIVCODE: div } });
   }
 
   findByDept(dep: string) {
-    return this.userRepository.find({ where: { sdepcode: dep } });
+    return this.userRepository.find({ where: { SDEPCODE: dep } });
   }
 
   findBySec(sec: string) {
-    return this.userRepository.find({ where: { sseccode: sec } });
+    return this.userRepository.find({ where: { SSECCODE: sec } });
   }
 
   findByPos(pos: string) {
-    return this.userRepository.find({ where: { sposcode: pos } });
+    return this.userRepository.find({ where: { SPOSCODE: pos } });
   }
 }

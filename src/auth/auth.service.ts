@@ -1,15 +1,15 @@
 // src/auth/auth.service.ts
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as crypto from 'crypto';
 import { UsersService } from '../amec/users/users.service';
-import { ApplicationService } from '../docinv/application/application.service';
+import { AppsusersService } from '../docinv/appsusers/appsusers.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private UsersService: UsersService,
-    private ApplicationService: ApplicationService,
+    private Appsuser: AppsusersService,
     private jwtService: JwtService,
   ) {}
 
@@ -18,13 +18,8 @@ export class AuthService {
     if (!user) return null;
 
     const md5Hash = crypto.createHash('md5').update(pass).digest('hex');
-    if (md5Hash != user.spassword1) return null;
-
-    const { spassword1, ...result } = user;
-
-    const application = await this.ApplicationService.findOne(apps);
-    if (!application) return null;
-    return result;
+    if (md5Hash != user.SPASSWORD1) return null;
+    return await this.Appsuser.verifyLogin(username, apps);
   }
 
   async login(user: any) {
@@ -33,8 +28,7 @@ export class AuthService {
       sub: user.sempno,
     };
     return {
-      access_token: this.jwtService.sign(payload),
-      // expiresIn: 3600,
+      access_token: this.jwtService.sign(payload), //expiresIn: 3600,
     };
   }
 }

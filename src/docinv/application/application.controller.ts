@@ -23,7 +23,7 @@ export class ApplicationController {
 
   @Get(':id')
   findOne(@Param('id') id: number) {
-    return this.applicationService.findOne(+id);
+    return this.applicationService.getAppsByID(+id);
   }
 
   @Post()

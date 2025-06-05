@@ -1,34 +1,43 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Param,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Delete,
+} from '@nestjs/common';
 import { AppsusersService } from './appsusers.service';
-import { CreateAppsuserDto } from './dto/create-appsuser.dto';
-import { UpdateAppsuserDto } from './dto/update-appsuser.dto';
 
-@Controller('appsusers')
+// import { CreateAppsuserDto } from './dto/create-appsuser.dto';
+// import { UpdateAppsuserDto } from './dto/update-appsuser.dto';
+
+@Controller('docinv/appsusers')
 export class AppsusersController {
-  constructor(private readonly appsusersService: AppsusersService) {}
+  constructor(private readonly users: AppsusersService) {}
 
-  @Post()
-  create(@Body() createAppsuserDto: CreateAppsuserDto) {
-    return this.appsusersService.create(createAppsuserDto);
-  }
+  //User For Login page
+  //   @Get(':id/:pgm')
+  //   async findOne(@Param('id') id: string, @Param('pgm') pgm: number) {
+  //     const app = await this.apps.findOne(pgm);
+  //     console.log(app);
 
-  @Get()
-  findAll() {
-    return this.appsusersService.findAll();
-  }
+  //     if (!app) return null;
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.appsusersService.findOne(+id);
-  }
+  //   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAppsuserDto: UpdateAppsuserDto) {
-    return this.appsusersService.update(+id, updateAppsuserDto);
-  }
+  //   @Post()
+  //   create(@Body() createAppsuserDto: CreateAppsuserDto) {
+  //     return this.appsusersService.create(createAppsuserDto);
+  //   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.appsusersService.remove(+id);
-  }
+  //   @Patch(':id')
+  //   update(@Param('id') id: string, @Body() updateAppsuserDto: UpdateAppsuserDto) {
+  //     return this.appsusersService.update(+id, updateAppsuserDto);
+  //   }
+
+  //   @Delete(':id')
+  //   remove(@Param('id') id: string) {
+  //     return this.appsusersService.remove(+id);
+  //   }
 }

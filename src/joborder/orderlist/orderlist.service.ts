@@ -113,7 +113,8 @@ export class OrderListService {
 
     return await query.getManyAndCount().then(([data, count]) => ({
       data,
-      count,
+      recordsTotal: count,
+      recordsFiltered: count, // ในกรณีนี้ เราจะใช้จำนวนทั้งหมดเป็น recordsFiltered
       page,
       limit,
     }));

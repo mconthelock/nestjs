@@ -19,6 +19,12 @@ export class VOrderList {
   
   @ViewColumn()
   PRJ_NO: string | null;
+
+  @ViewColumn()
+  PRJ_NAME: string | null;
+
+  @ViewColumn()
+  COUNTRY: string | null;
   
   @ViewColumn()
   MFGNO: string | null;

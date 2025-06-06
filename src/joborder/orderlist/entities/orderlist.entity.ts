@@ -1,6 +1,6 @@
-import { ViewColumn, ViewEntity } from 'typeorm';
+import { View, ViewColumn, ViewEntity } from 'typeorm';
 
-@ViewEntity({ name: 'AMECMFG.JOB_ORDER' })
+@ViewEntity({ name: 'AMECMFG.MV_JOB_ORDER' })
 export class VOrderList {
   @ViewColumn()
   ORDTYPE: string | null;
@@ -46,6 +46,9 @@ export class VOrderList {
   
   @ViewColumn()
   DESBMDATE: Date | null;
+
+  @ViewColumn()
+  MFG_SCHEDULE: string | null;
   
   @ViewColumn()
   MFGBMDATE: Date | null;

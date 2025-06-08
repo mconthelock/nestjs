@@ -2,8 +2,8 @@ import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity('AEMPLOYEE')
 export class AEmployee {
-  @PrimaryColumn({ name: 'SEMPLNO', type: 'varchar', length: 12 })
-  semplno: string;
+  @PrimaryColumn({ name: 'SEMPNO', type: 'varchar', length: 12 })
+  sempno: string;
 
   @Column({ name: 'SDIVCODE', type: 'varchar', length: 6, nullable: true })
   sdivcode: string;

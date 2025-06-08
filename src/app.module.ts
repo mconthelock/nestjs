@@ -2,18 +2,22 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import amecConfig from './databases/amec.config';
-import { webformConfig } from './databases/webform.config';
 
 import { AmecModule } from './amec/amec.module';
+import { AuthModule } from './auth/auth.module';
+import { DocinvModule } from './docinv/docinv.module';
+import { JobOrderModule } from './joborder/joborder.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // ทำให้สามารถใช้ได้ทั้งโปรเจกต์โดยไม่ต้อง import ซ้ำ
+      isGlobal: true, // Comment
     }),
     TypeOrmModule.forRootAsync(amecConfig),
-    // TypeOrmModule.forRootAsync(webformConfig),
+    AuthModule,
     AmecModule,
+    DocinvModule,
+    JobOrderModule,
   ],
 })
 export class AppModule {}

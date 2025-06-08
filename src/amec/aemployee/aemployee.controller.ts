@@ -1,12 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AemployeeService } from './aemployee.service';
 import { CreateAemployeeDto } from './dto/create-aemployee.dto';
 import { UpdateAemployeeDto } from './dto/update-aemployee.dto';
@@ -21,25 +14,18 @@ export class AemployeeController {
   }
 
   @Get()
+  @UseGuards(AuthGuard('jwt'))
   findAll() {
     return this.aemployeeService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.aemployeeService.findOne(+id);
+    return this.aemployeeService.findOne(id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateAemployeeDto: UpdateAemployeeDto,
-  ) {
-    return this.aemployeeService.update(+id, updateAemployeeDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.aemployeeService.remove(+id);
+  @Get(':id')
+  findOneBySLogin(@Param('id') id: string) {
+    return this.aemployeeService.findOneBySLogin(id);
   }
 }

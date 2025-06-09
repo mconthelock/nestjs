@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsOptional, IsString, IsNumber, IsArray } from 'class-validator';
 export class SearchOrderListDto {
     @IsOptional()

@@ -1,0 +1,17 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
+import { F001kpService } from './f001kp.service';
+import { CreateF001kpDto } from './dto/create-f001kp.dto';
+import { UpdateF001kpDto } from './dto/update-f001kp.dto';
+
+@Controller('f001kp')
+export class F001kpController {
+  constructor(private readonly f001kpService: F001kpService) {}
+}

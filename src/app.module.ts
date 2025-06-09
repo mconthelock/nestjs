@@ -7,6 +7,7 @@ import { AmecModule } from './amec/amec.module';
 import { AuthModule } from './auth/auth.module';
 import { DocinvModule } from './docinv/docinv.module';
 import { JobOrderModule } from './joborder/joborder.module';
+import { NewsModule } from './gpreport/news/news.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { JobOrderModule } from './joborder/joborder.module';
     AmecModule,
     DocinvModule,
     JobOrderModule,
+    NewsModule,
   ],
 })
 export class AppModule {}

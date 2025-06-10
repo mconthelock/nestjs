@@ -42,6 +42,9 @@ export class Appsmenu {
   @Column()
   MENU_ICON: string;
 
+  @OneToMany(() => Appsmenu, (menu) => menu.MENU_TOP)
+  children: Appsmenu[];
+
   @OneToMany(() => Appsmenuuser, (detail) => detail.MENU_ID)
   menuGroup: Appsmenuuser[];
 }

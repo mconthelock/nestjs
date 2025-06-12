@@ -86,5 +86,4 @@ export class SearchOrderListDto {
     @Type(() => Number)
     @IsNumber()
     readonly DUEDATE?: number;
-
 }

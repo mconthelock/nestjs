@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Appsmenuuser } from './entities/appsmenuuser.entity';
-import { Appsmenu } from '../appsmenu/entities/appsmenu.entity';
+// import { Appsmenu } from '../appsmenu/entities/appsmenu.entity';
 
 @Injectable()
 export class AppsmenuusersService {
@@ -10,8 +10,8 @@ export class AppsmenuusersService {
     @InjectRepository(Appsmenuuser, 'amecConnection')
     private readonly repo: Repository<Appsmenuuser>,
 
-    @InjectRepository(Appsmenu, 'amecConnection')
-    private readonly menu: Repository<Appsmenu>,
+    // @InjectRepository(Appsmenu, 'amecConnection')
+    // private readonly menu: Repository<Appsmenu>,
   ) {}
 
   getByGroup(program: number, group: number) {

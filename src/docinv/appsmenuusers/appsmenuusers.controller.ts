@@ -5,8 +5,8 @@ import { AppsmenuusersService } from './appsmenuusers.service';
 export class AppsmenuusersController {
   constructor(private readonly appsmenuusersService: AppsmenuusersService) {}
 
-  @Get('program/:pgm/group/:group')
-  getByGroup(@Param('pgm') pgm: number, @Param('group') group: number) {
-    return this.appsmenuusersService.getByGroup(+pgm, +group);
+  @Get('program/:pgm/user/:group')
+  getGroup(@Param('pgm') pgm: number, @Param('user') group: number) {
+    return this.appsmenuusersService.getUserMenu(+pgm, +group);
   }
 }

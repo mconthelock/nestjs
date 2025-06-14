@@ -1,62 +1,52 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+//Service
 import { UsersService } from '../../amec/users/users.service';
 import { ApplicationService } from '../application/application.service';
+import { AppsgroupsService } from '../appsgroups/appsgroups.service';
+
 import { Appsuser } from './entities/appsuser.entity';
-// import { CreateAppsuserDto } from './dto/create-appsuser.dto';
-// import { UpdateAppsuserDto } from './dto/update-appsuser.dto';
 
 @Injectable()
 export class AppsusersService {
   constructor(
     @InjectRepository(Appsuser, 'amecConnection')
-    private readonly repo: Repository<Appsuser>,
+    private readonly appuser: Repository<Appsuser>,
     private readonly emps: UsersService,
     private readonly apps: ApplicationService,
+    private readonly grps: AppsgroupsService,
   ) {}
 
   async verifyLogin(useremp: string, program: number) {
     const application = await this.apps.getAppsByID(program);
     if (!application) return null;
-    const user = await this.repo.findOne({
+    const user = await this.appuser.findOne({
       where: { USERS_ID: useremp, PROGRAM: program },
+      relations: ['appsgroups'],
     });
-    //Need register apps
     if (!user && application.APP_LOGIN == '1') return null;
+
+    const usergroup = !user ? 0 : user.USERS_GROUP;
+    const group = await this.grps.findGroup(usergroup, program);
+
+    if (group == null || group.GROUP_STATUS != 1) return null;
     const emp = await this.emps.findEmp(useremp);
-    const result = {
-      appid: application.APP_ID,
-      appname: application.APP_NAME,
-      group: !user ? 0 : user.USERS_GROUP,
-      userid: emp.SEMPNO,
-      username: emp.SNAME,
-      useremail: emp.SRECMAIL,
-      usersseccode: emp.SSECCODE,
-      userssec: emp.SSEC,
-      usersdepcode: emp.SDEPCODE,
-      usersdept: emp.SDEPT,
-      usersdivcode: emp.SDIVCODE,
-      usersdiv: emp.SDIV,
-      usersposcode: emp.SPOSCODE,
-      usersposname: emp.SPOSNAME,
+    if (!emp || emp.CSTATUS == '0') return null;
+
+    const appuser = {
+      SEMPNO: emp.SEMPNO,
+      SNAME: emp.SNAME,
+      SRECMAIL: emp.SRECMAIL,
+      SSECCODE: emp.SSECCODE,
+      SSEC: emp.SSEC,
+      SDEPCODE: emp.SDEPCODE,
+      SDEPT: emp.SDEPT,
+      SDIVCODE: emp.SDIVCODE,
+      SDIV: emp.SDIV,
+      SPOSCODE: emp.SPOSCODE,
+      SPOSNAME: emp.SPOSNAME,
     };
-    return result;
+    return { application, appuser, group };
   }
-
-  //   create(createAppsuserDto: CreateAppsuserDto) {
-  //     return 'This action adds a new appsuser';
-  //   }
-
-  //   findAll() {
-  //     return `This action returns all appsusers`;
-  //   }
-
-  //   update(id: number, updateAppsuserDto: UpdateAppsuserDto) {
-  //     return `This action updates a #${id} appsuser`;
-  //   }
-
-  //   remove(id: number) {
-  //     return `This action removes a #${id} appsuser`;
-  //   }
 }

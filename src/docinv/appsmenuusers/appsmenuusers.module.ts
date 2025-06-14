@@ -8,5 +8,6 @@ import { Appsmenuuser } from './entities/appsmenuuser.entity';
   imports: [TypeOrmModule.forFeature([Appsmenuuser], 'amecConnection')],
   controllers: [AppsmenuusersController],
   providers: [AppsmenuusersService],
+  exports: [AppsmenuusersService],
 })
 export class AppsmenuusersModule {}

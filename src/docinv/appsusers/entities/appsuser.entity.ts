@@ -1,4 +1,5 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Appsgroup } from '../../appsgroups/entities/appsgroup.entity';
 
 @Entity('APP_USERS')
 export class Appsuser {
@@ -22,4 +23,11 @@ export class Appsuser {
 
   @Column()
   APP_LASTLOGIN: string;
+
+  @ManyToOne(() => Appsgroup, (group) => group.appsuser)
+  @JoinColumn([
+    { name: 'USERS_GROUP', referencedColumnName: 'GROUP_ID' },
+    { name: 'PROGRAM', referencedColumnName: 'PROGRAM' },
+  ])
+  appsgroups: Appsgroup[];
 }

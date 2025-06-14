@@ -37,4 +37,7 @@ export class User {
 
   @Column()
   SPASSWORD1: string;
+
+  @Column()
+  CSTATUS: string;
 }

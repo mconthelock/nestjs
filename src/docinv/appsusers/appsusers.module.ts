@@ -6,12 +6,14 @@ import { Appsuser } from './entities/appsuser.entity';
 
 import { ApplicationModule } from '../application/application.module';
 import { UsersModule } from '../../amec/users/users.module';
+import { AppsgroupsModule } from '../appsgroups/appsgroups.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Appsuser], 'amecConnection'),
-    ApplicationModule,
     UsersModule,
+    ApplicationModule,
+    AppsgroupsModule,
   ],
   controllers: [AppsusersController],
   providers: [AppsusersService],

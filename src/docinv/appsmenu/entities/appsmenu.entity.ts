@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
 import { Appsmenuuser } from '../../appsmenuusers/entities/appsmenuuser.entity';
 
 @Entity('APP_MENU')
@@ -41,9 +41,6 @@ export class Appsmenu {
 
   @Column()
   MENU_ICON: string;
-
-  @OneToMany(() => Appsmenu, (menu) => menu.MENU_TOP)
-  children: Appsmenu[];
 
   @OneToMany(() => Appsmenuuser, (detail) => detail.MENU_ID)
   menuGroup: Appsmenuuser[];

@@ -5,6 +5,7 @@ import * as crypto from 'crypto';
 import { UsersService } from '../amec/users/users.service';
 import { AppsusersService } from '../docinv/appsusers/appsusers.service';
 import { AppsmenuusersService } from '../docinv/appsmenuusers/appsmenuusers.service';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -44,7 +45,7 @@ export class AuthService {
     const menulist = await this.Appsmenu.getUserMenu(program, group);
     let mainmenu = [];
     menulist.find((val) => {
-      if (val.Appsmenu.MENU_TYPE == 1) {
+      if (val.Appsmenu != null && val.Appsmenu.MENU_TYPE == 1) {
         mainmenu.push(val.Appsmenu);
       }
     });

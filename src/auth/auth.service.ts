@@ -39,12 +39,12 @@ export class AuthService {
       throw new UnauthorizedException('You nave no authorization');
     }
 
-    const md5Hash = crypto.createHash('md5').update(pass).digest('hex');
-    if (md5Hash != user.SPASSWORD1) {
-      log.logmsg = 'Password is mismatch';
-      this.logs.create(log);
-      throw new UnauthorizedException('You nave no authorization');
-    }
+    // const md5Hash = crypto.createHash('md5').update(pass).digest('hex');
+    // if (md5Hash != user.SPASSWORD1) {
+    //   log.logmsg = 'Password is mismatch';
+    //   this.logs.create(log);
+    //   throw new UnauthorizedException('You nave no authorization');
+    // }
     const validUser = await this.Appsuser.verifyLogin(username, apps);
     if (!validUser) {
       log.logmsg = 'User has no permission';

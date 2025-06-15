@@ -51,7 +51,7 @@ export class AuthController {
       response.cookie(payload.location, encrypt, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'none',
+        sameSite: 'strict',
         expires: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now
       });
 

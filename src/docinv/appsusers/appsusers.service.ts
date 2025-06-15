@@ -40,7 +40,7 @@ export class AppsusersService {
     const group = await this.grps.findGroup(usergroup, program);
 
     if (group == null || group.GROUP_STATUS != 1) return null;
-    const emp = await this.emps.findEmp(useremp);
+    /*const emp = await this.emps.findEmp(useremp);
     if (!emp || emp.CSTATUS == '0') return null;
 
     const appuser = {
@@ -55,7 +55,7 @@ export class AppsusersService {
       SDIV: emp.SDIV,
       SPOSCODE: emp.SPOSCODE,
       SPOSNAME: emp.SPOSNAME,
-    };
-    return { application, appuser, group };
+    };*/
+    return { application, group };
   }
 }

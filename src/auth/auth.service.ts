@@ -55,15 +55,29 @@ export class AuthService {
     log.logstatus = 1;
     log.logmsg = 'Logging in successful';
     this.logs.create(log);
+
+    const appuser = {
+      SEMPNO: user.SEMPNO,
+      SNAME: user.SNAME,
+      SRECMAIL: user.SRECMAIL,
+      SSECCODE: user.SSECCODE,
+      SSEC: user.SSEC,
+      SDEPCODE: user.SDEPCODE,
+      SDEPT: user.SDEPT,
+      SDIVCODE: user.SDIVCODE,
+      SDIV: user.SDIV,
+      SPOSCODE: user.SPOSCODE,
+      SPOSNAME: user.SPOSNAME,
+    };
     return {
       payload: {
-        users: validUser.appuser.SEMPNO,
+        users: user.SEMPNO,
         group: validUser.group.GROUP_ID,
         apps: validUser.application.APP_ID,
         location: validUser.application.APP_LOCATION,
       },
       apps: validUser.application,
-      appuser: validUser.appuser,
+      appuser: appuser,
       appgroup: validUser.group,
       auth: auth,
     };

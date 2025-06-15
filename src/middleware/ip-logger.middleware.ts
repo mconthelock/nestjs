@@ -7,12 +7,9 @@ export class IpLoggerMiddleware implements NestMiddleware {
     const ip =
       req.headers['x-forwarded-for']?.toString().split(',')[0] ||
       req.socket.remoteAddress;
-
     const route = `${req.method} ${req.originalUrl}`;
-
+    (req as any).clientIp = ip;
     console.log(`[IP Logger] ${ip} - ${route}`);
-
-    // คุณสามารถเก็บลง database หรือไฟล์ log แทน console.log ได้เช่นกัน
     next();
   }
 }

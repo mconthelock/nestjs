@@ -7,6 +7,7 @@ import { LocalStrategy } from './local.strategy';
 import { UsersModule } from '../amec/users/users.module';
 import { AppsusersModule } from '../docinv/appsusers/appsusers.module';
 import { AppsmenuusersModule } from '../docinv/appsmenuusers/appsmenuusers.module';
+import { AccesslogModule } from '../docinv/accesslog/accesslog.module';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -16,6 +17,7 @@ import { AuthService } from './auth.service';
     UsersModule,
     AppsusersModule,
     AppsmenuusersModule,
+    AccesslogModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

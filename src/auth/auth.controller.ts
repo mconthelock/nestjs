@@ -55,18 +55,6 @@ export class AuthController {
         expires: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now
       });
 
-      //   const jwtCookie = response.getHeader('Set-Cookie');
-      //   console.log('JWT Cookie:', jwtCookie);
-      //   const decryptedBytes = CryptoJS.AES.decrypt(
-      //     `U2FsdGVkX1/VALeDtJWJcwlKpwyfsJRnnjXjf0qxAGg=`,
-      //     payload.location,
-      //   );
-      //   console.log(
-      //     'log',
-      //     `${payload.apps}-${payload.users}`,
-      //     decryptedBytes.toString(CryptoJS.enc.Utf8),
-      //   );
-
       return { apps, appuser, appgroup, auth };
     } else {
       throw new UnauthorizedException('ไม่สามารถสร้าง token ได้');

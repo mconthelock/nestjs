@@ -27,7 +27,7 @@ async function bootstrap() {
 
   app.use(compression());
   app.use(cookieParser());
-  app.set('trust proxy', true); // ✅ จะไม่ error อีกแล้ว
+  app.set('trust proxy', true);
   app.use(new IpLoggerMiddleware().use);
 
   await app.listen(process.env.PORT ?? 3000);

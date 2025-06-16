@@ -14,6 +14,7 @@ export class AppsmenuusersService {
     return this.repo.find({
       where: { USERS_GROUP: group, PROGRAM: program },
       relations: ['Appsmenu'],
+      order: { Appsmenu: { MENU_SEQ: 'ASC' } }, 
     });
   }
 }

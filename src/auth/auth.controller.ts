@@ -51,7 +51,7 @@ export class AuthController {
         {
           httpOnly: true,
           //secure: process.env.NODE_ENV === 'production',
-          //sameSite: 'Lax',
+          //   sameSite: 'lax',
           expires: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now
         },
       );

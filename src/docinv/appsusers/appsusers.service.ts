@@ -5,8 +5,16 @@ import { Repository } from 'typeorm';
 import { UsersService } from '../../amec/users/users.service';
 import { ApplicationService } from '../application/application.service';
 import { AppsgroupsService } from '../appsgroups/appsgroups.service';
-
+import { AccesslogService } from '../accesslog/accesslog.service';
 import { Appsuser } from './entities/appsuser.entity';
+
+interface logData {
+  loguser: string;
+  logip: string;
+  logstatus: number;
+  logprogram: number;
+  logmsg: string;
+}
 
 @Injectable()
 export class AppsusersService {
@@ -16,6 +24,7 @@ export class AppsusersService {
     private readonly emps: UsersService,
     private readonly apps: ApplicationService,
     private readonly grps: AppsgroupsService,
+    private readonly log: AccesslogService,
   ) {}
 
   async verifyLogin(useremp: string, program: number) {
@@ -31,7 +40,7 @@ export class AppsusersService {
     const group = await this.grps.findGroup(usergroup, program);
 
     if (group == null || group.GROUP_STATUS != 1) return null;
-    const emp = await this.emps.findEmp(useremp);
+    /*const emp = await this.emps.findEmp(useremp);
     if (!emp || emp.CSTATUS == '0') return null;
 
     const appuser = {
@@ -46,7 +55,7 @@ export class AppsusersService {
       SDIV: emp.SDIV,
       SPOSCODE: emp.SPOSCODE,
       SPOSNAME: emp.SPOSNAME,
-    };
-    return { application, appuser, group };
+    };*/
+    return { application, group };
   }
 }

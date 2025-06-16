@@ -40,4 +40,10 @@ export class User {
 
   @Column()
   CSTATUS: string;
+
+  @Column()
+  MEMEML: string;
+
+  @Column()
+  STNAME: string;
 }

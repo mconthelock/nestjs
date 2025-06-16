@@ -37,7 +37,7 @@ export class AuthController {
 
       //Create Cookie for JWT Guards
       response.cookie(process.env.JWT_COOKIE_NAME, loginResult.access_token, {
-        httpOnly: true,
+        // httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
       });
@@ -49,7 +49,7 @@ export class AuthController {
         payload.location,
       ).toString();
       response.cookie(payload.location, encrypt, {
-        httpOnly: true,
+        // httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
         expires: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now

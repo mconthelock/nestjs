@@ -27,7 +27,7 @@ export class OrderListService {
      */
     async orderlist(dto: SearchOrderListDto) {
         const query = this.setQuery(dto);
-        logQuery(query);
+        // logQuery(query);
         const data = await query.getRawMany();
         return mapAliasesToFields(data);
         // return await query.getMany();
@@ -63,7 +63,7 @@ export class OrderListService {
         const count = await qCount.getCount();
         
         query.limit(limit).offset((page - 1) * limit);
-        logQuery(query);
+        // logQuery(query);
         const data = await query.getRawMany();
         return {
             data: mapAliasesToFields(data),
@@ -76,7 +76,7 @@ export class OrderListService {
 
     async confirm(dto: SearchOrderListDto) {
         const query = this.setQuery(dto);
-        logQuery(query);
+        // logQuery(query);
         query.andWhere('J.JOP_PUR_STATUS = :status', { status: 0 }); // 0 = ยังไม่ confirm
         const data = await query.getRawMany();
         return mapAliasesToFields(data);
@@ -84,7 +84,7 @@ export class OrderListService {
 
     async shipment(dto: SearchOrderListDto) {
         const query = this.setQuery(dto);
-        logQuery(query);
+        // logQuery(query);
         query.andWhere('O.REQUESTED_QTY != O.RECIEVE_QTY'); // เงื่อนไขนี้จะเลือกเฉพาะรายการที่ยังไม่ได้รับสินค้าครบตามจำนวนที่สั่ง
         const data = await query.getRawMany();
         return mapAliasesToFields(data);

@@ -56,6 +56,13 @@ export class AuthService {
     log.logmsg = 'Logging in successful';
     this.logs.create(log);
 
+    
+    // ดึงรูปภาพพนักงาน
+    const response = await fetch(`http://webflow/images/emp/${user.SEMPNO}.jpg`);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`;
+
     const appuser = {
       SEMPNO: user.SEMPNO,
       SNAME: user.SNAME,
@@ -68,6 +75,9 @@ export class AuthService {
       SDIV: user.SDIV,
       SPOSCODE: user.SPOSCODE,
       SPOSNAME: user.SPOSNAME,
+      STNAME: user.STNAME,
+      MEMEML: user.MEMEML,
+      image: imageUrl
     };
     return {
       payload: {
@@ -88,16 +98,32 @@ export class AuthService {
     let mainmenu = [];
     menulist.find((val) => {
       if (val.Appsmenu != null && val.Appsmenu.MENU_TYPE == 1) {
-        mainmenu.push(val.Appsmenu);
+        mainmenu.push({
+            menu_id: val.Appsmenu.MENU_ID,
+            menu_name: val.Appsmenu.MENU_DISPLAY,
+            menu_class: val.Appsmenu.MENU_CLASS,
+            menu_top: val.Appsmenu.MENU_TOP,
+            menu_link: val.Appsmenu.MENU_LINK,
+            menu_icon: val.Appsmenu.MENU_ICON,
+        });
       }
     });
     mainmenu.find((val) => {
       menulist.map((mn) => {
-        if (mn.Appsmenu.MENU_TOP == val.MENU_ID && mn.Appsmenu.MENU_TYPE == 2) {
+        if (mn.Appsmenu.MENU_TOP == val.menu_id && mn.Appsmenu.MENU_TYPE == 2) {
           if (!val.submenu) {
             val.submenu = [];
           }
-          val.submenu.push(mn.Appsmenu);
+          val.submenu.push(
+            {
+                menu_id: mn.Appsmenu.MENU_ID,
+                menu_name: mn.Appsmenu.MENU_DISPLAY,
+                menu_class: mn.Appsmenu.MENU_CLASS,
+                menu_top: mn.Appsmenu.MENU_TOP,
+                menu_link: mn.Appsmenu.MENU_LINK,
+                menu_icon: mn.Appsmenu.MENU_ICON,
+            }
+          );
         }
       });
     });

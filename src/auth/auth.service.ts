@@ -93,7 +93,7 @@ export class AuthService {
     });
     mainmenu.find((val) => {
       menulist.map((mn) => {
-        if (mn.Appsmenu.MENU_TOP == val.MENU_ID && mn.Appsmenu.MENU_TYPE == 2) {
+        if (mn.Appsmenu.MENU_TOP == val.menu_id && mn.Appsmenu.MENU_TYPE == 2) {
           if (!val.submenu) {
             val.submenu = [];
           }

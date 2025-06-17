@@ -68,7 +68,7 @@ export class AuthService {
     log.logmsg = 'Logging in successful';
     this.logs.create(log);
 
-    const appuser = this.setuser(user);
+    const appuser = this.setUser(user);
     return {
       payload: {
         users: user.SEMPNO,
@@ -137,7 +137,7 @@ export class AuthService {
     log.logmsg = 'Logging in successful';
     this.logs.create(log);
 
-    const appuser = this.setuser(user);
+    const appuser = this.setUser(user);
     return {
       payload: {
         users: user.SEMPNO,
@@ -152,7 +152,13 @@ export class AuthService {
     };
   }
 
-  setuser(user) {
+  async setUser(user) {
+    const response = await fetch(
+      `http://webflow/images/emp/${user.SEMPNO}.jpg`,
+    );
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`;
     return {
       SEMPNO: user.SEMPNO,
       SNAME: user.SNAME,
@@ -165,6 +171,9 @@ export class AuthService {
       SDIV: user.SDIV,
       SPOSCODE: user.SPOSCODE,
       SPOSNAME: user.SPOSNAME,
+      STNAME: user.STNAME,
+      MEMEML: user.MEMEML,
+      image: imageUrl,
     };
   }
 }

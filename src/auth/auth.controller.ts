@@ -29,7 +29,7 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const res = await this.loginResult(req.user, response);
+    const res = await this.loginResults(req.user, response);
     return res;
   }
 
@@ -45,11 +45,11 @@ export class AuthController {
       direct.appid,
       ip,
     );
-    const res = await this.loginResult(loginResult, response);
+    const res = await this.loginResults(loginResult, response);
     return res;
   }
 
-  async loginResult(result: any, response: Response) {
+  async loginResults(result: any, response: Response) {
     const loginResult = await this.authService.login(result);
     if (loginResult && loginResult.access_token) {
       const apps = loginResult.info.apps;

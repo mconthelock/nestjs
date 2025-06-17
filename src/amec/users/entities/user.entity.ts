@@ -43,8 +43,6 @@ export class User {
 
   @Column()
   SEMPENCODE: string;
-}
-
 
   @Column()
   MEMEML: string;

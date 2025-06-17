@@ -25,6 +25,17 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  async login(user: any) {
+    const payload = {
+      user: user.payload,
+      sub: user.sempno,
+    };
+    return {
+      access_token: this.jwtService.sign(payload), //expiresIn: 3600,
+      info: user,
+    };
+  }
+
   async validateUser(username: string, pass: string, apps: number, ip: string) {
     const log: logData = {
       loguser: username,
@@ -45,6 +56,7 @@ export class AuthService {
     //   this.logs.create(log);
     //   throw new UnauthorizedException('You nave no authorization');
     // }
+
     const validUser = await this.Appsuser.verifyLogin(username, apps);
     if (!validUser) {
       log.logmsg = 'User has no permission';
@@ -56,19 +68,7 @@ export class AuthService {
     log.logmsg = 'Logging in successful';
     this.logs.create(log);
 
-    const appuser = {
-      SEMPNO: user.SEMPNO,
-      SNAME: user.SNAME,
-      SRECMAIL: user.SRECMAIL,
-      SSECCODE: user.SSECCODE,
-      SSEC: user.SSEC,
-      SDEPCODE: user.SDEPCODE,
-      SDEPT: user.SDEPT,
-      SDIVCODE: user.SDIVCODE,
-      SDIV: user.SDIV,
-      SPOSCODE: user.SPOSCODE,
-      SPOSNAME: user.SPOSNAME,
-    };
+    const appuser = this.setuser(user);
     return {
       payload: {
         users: user.SEMPNO,
@@ -104,14 +104,67 @@ export class AuthService {
     return mainmenu;
   }
 
-  async login(user: any) {
-    const payload = {
-      user: user.payloadr,
-      sub: user.sempno,
+  async directLogin(username: string, apps: number, ip: string) {
+    const log: logData = {
+      loguser: username,
+      logip: ip,
+      logstatus: 0,
+      logprogram: apps,
+      logmsg: 'Username is not found',
     };
+    const user = await this.UsersService.findEmpEncode(username);
+    if (!user) {
+      log.loguser = null;
+      this.logs.create(log);
+      throw new UnauthorizedException('You nave no authorization');
+    }
+
+    log.loguser = user.SEMPNO;
+    if (user.CSTATUS == '0') {
+      this.logs.create(log);
+      throw new UnauthorizedException('You nave no authorization');
+    }
+
+    const validUser = await this.Appsuser.verifyLogin(user.SEMPNO, apps);
+    if (!validUser) {
+      log.logmsg = 'User has no permission';
+      this.logs.create(log);
+      throw new UnauthorizedException('You nave no authorization');
+    }
+
+    const auth = await this.getAuthenlist(apps, validUser.group.GROUP_ID);
+    log.logstatus = 1;
+    log.logmsg = 'Logging in successful';
+    this.logs.create(log);
+
+    const appuser = this.setuser(user);
     return {
-      access_token: this.jwtService.sign(payload), //expiresIn: 3600,
-      info: user,
+      payload: {
+        users: user.SEMPNO,
+        group: validUser.group.GROUP_ID,
+        apps: validUser.application.APP_ID,
+        location: validUser.application.APP_LOCATION,
+      },
+      apps: validUser.application,
+      appuser: appuser,
+      appgroup: validUser.group,
+      auth: auth,
+    };
+  }
+
+  setuser(user) {
+    return {
+      SEMPNO: user.SEMPNO,
+      SNAME: user.SNAME,
+      SRECMAIL: user.SRECMAIL,
+      SSECCODE: user.SSECCODE,
+      SSEC: user.SSEC,
+      SDEPCODE: user.SDEPCODE,
+      SDEPT: user.SDEPT,
+      SDIVCODE: user.SDIVCODE,
+      SDIV: user.SDIV,
+      SPOSCODE: user.SPOSCODE,
+      SPOSNAME: user.SPOSNAME,
     };
   }
 }

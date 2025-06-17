@@ -40,4 +40,7 @@ export class User {
 
   @Column()
   CSTATUS: string;
+
+  @Column()
+  SEMPENCODE: string;
 }

@@ -105,7 +105,7 @@ export class AuthService {
             menu_top: val.Appsmenu.MENU_TOP,
             menu_link: val.Appsmenu.MENU_LINK,
             menu_icon: val.Appsmenu.MENU_ICON,
-            menu_tname: val.Appsmenu.MENU_TNAME,
+            menu_tname: val.Appsmenu.MENU_TNAME
         });
       }
     });

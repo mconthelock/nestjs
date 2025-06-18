@@ -42,6 +42,9 @@ export class User {
   CSTATUS: string;
 
   @Column()
+  SEMPENCODE: string;
+
+  @Column()
   MEMEML: string;
 
   @Column()

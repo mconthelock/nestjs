@@ -40,22 +40,13 @@ export class AppsusersService {
     const group = await this.grps.findGroup(usergroup, program);
 
     if (group == null || group.GROUP_STATUS != 1) return null;
-    /*const emp = await this.emps.findEmp(useremp);
-    if (!emp || emp.CSTATUS == '0') return null;
-
-    const appuser = {
-      SEMPNO: emp.SEMPNO,
-      SNAME: emp.SNAME,
-      SRECMAIL: emp.SRECMAIL,
-      SSECCODE: emp.SSECCODE,
-      SSEC: emp.SSEC,
-      SDEPCODE: emp.SDEPCODE,
-      SDEPT: emp.SDEPT,
-      SDIVCODE: emp.SDIVCODE,
-      SDIV: emp.SDIV,
-      SPOSCODE: emp.SPOSCODE,
-      SPOSNAME: emp.SPOSNAME,
-    };*/
     return { application, group };
+  }
+
+  async getUserApp(user: string) {
+    return await this.appuser.find({
+      where: { USERS_ID: user },
+      relations: ['application'],
+    });
   }
 }

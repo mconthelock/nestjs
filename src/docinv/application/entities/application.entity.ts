@@ -1,4 +1,6 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany, JoinColumn } from 'typeorm';
+import { Appsuser } from '../../appsusers/entities/appsuser.entity';
+
 @Entity('APPLICATION')
 export class Application {
   @PrimaryColumn()
@@ -57,4 +59,17 @@ export class Application {
 
   @Column()
   APP_LOGIN: string;
+
+  @Column()
+  APP_COLOR: string;
+
+  @Column()
+  APP_ICON: string;
+
+  @Column()
+  APP_LABEL: string;
+
+  @OneToMany(() => Appsuser, (user) => user.application)
+  @JoinColumn([{ name: 'APP_ID', referencedColumnName: 'PROGRAM' }])
+  appsuser: Appsuser[];
 }

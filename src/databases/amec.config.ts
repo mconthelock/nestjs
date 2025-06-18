@@ -21,6 +21,7 @@ if (process.env.HOST == 'AMEC') {
         __dirname + '/../**/**/**/*.entity{.ts,.js}',
       ],
       synchronize: false,
+      logging: ['query', 'error'],
     }),
   };
 } else {

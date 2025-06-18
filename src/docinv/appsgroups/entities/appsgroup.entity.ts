@@ -35,9 +35,9 @@ export class Appsgroup {
   UPDATE_DATE: string;
 
   @OneToMany(() => Appsuser, (user) => user.appsgroups)
-  @JoinColumn([
+  /*@JoinColumn([
     { name: 'GROUP_ID', referencedColumnName: 'USERS_GROUP' },
     { name: 'PROGRAM', referencedColumnName: 'PROGRAM' },
-  ])
+  ])*/
   appsuser: Appsuser[];
 }

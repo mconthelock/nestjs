@@ -4,6 +4,7 @@ import {
   Request,
   Post,
   Get,
+  Param,
   UseGuards,
   Body,
   Res,
@@ -17,6 +18,7 @@ import { LoginDto } from './dto/login.dto';
 import { directLoginDto } from './dto/direct.dto';
 import { Response } from 'express';
 import * as CryptoJS from 'crypto-js';
+import * as bcrypt from 'bcrypt';
 
 @Controller('auth')
 export class AuthController {
@@ -81,5 +83,12 @@ export class AuthController {
     } else {
       throw new UnauthorizedException('ไม่สามารถสร้าง token ได้');
     }
+  }
+
+  @Get('me/:pass')
+  async test(@Param('pass') pass: string) {
+    const hashedPassword = await bcrypt.hash(pass, 10);
+    console.log('Hashed password:', hashedPassword);
+    return pass;
   }
 }

@@ -68,7 +68,7 @@ export class AuthService {
     log.logmsg = 'Logging in successful';
     this.logs.create(log);
 
-    const appuser = this.setUser(user);
+    const appuser = await this.setUser(user);
     return {
       payload: {
         users: user.SEMPNO,
@@ -137,7 +137,7 @@ export class AuthService {
     log.logmsg = 'Logging in successful';
     this.logs.create(log);
 
-    const appuser = this.setUser(user);
+    const appuser = await this.setUser(user);
     return {
       payload: {
         users: user.SEMPNO,

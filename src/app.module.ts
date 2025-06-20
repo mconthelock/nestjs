@@ -11,6 +11,9 @@ import { NewsModule } from './gpreport/news/news.module';
 import { F001kpModule } from './as400/shopf/f001kp/f001kp.module';
 import { F002kpModule } from './as400/shopf/f002kp/f002kp.module';
 import { F003kpModule } from './as400/shopf/f003kp/f003kp.module';
+import { PisModule } from './pis/pis.module';
+
+import { PisGateway } from './pis/pis.gateway';
 
 @Module({
   imports: [
@@ -26,6 +29,8 @@ import { F003kpModule } from './as400/shopf/f003kp/f003kp.module';
     F001kpModule,
     F002kpModule,
     F003kpModule,
+    PisModule,
   ],
+  providers: [PisGateway],
 })
 export class AppModule {}

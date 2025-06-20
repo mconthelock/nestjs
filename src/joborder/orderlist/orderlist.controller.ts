@@ -32,4 +32,19 @@ export class OrderListController {
     async shipment(@Body() dto: SearchOrderListDto) {
         return this.OrderListService.shipment(dto);
     }
+
+    // Task หนัก: Loop ใหญ่ที่ block Event Loop
+    @Get('heavy')
+    async heavyTask() {
+        const start = Date.now();
+        let sum = 0;
+        
+        // วน loop ไปเรื่อย ๆ จนกว่าจะครบ 10 วินาที
+        while (Date.now() - start < 10_000) {
+            for (let i = 0; i < 1e5; i++) {
+            sum += i;
+            }
+        }
+    }
+
 }

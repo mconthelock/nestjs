@@ -15,11 +15,9 @@ export class UsersController {
   @Get('/image/:id')
   async findImage(@Param('id') id: string) {
     const response = await fetch(`http://webflow/images/emp/${id}.jpg`);
-
     if (response.status !== 200) {
       throw new NotFoundException('Data not found');
     }
-
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`;

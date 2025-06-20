@@ -47,7 +47,7 @@ export class AppsusersService {
     console.log(user);
     return await this.appuser.find({
       where: { USERS_ID: user },
-      relations: ['application'],
+      relations: ['application', 'appsgroups'],
     });
   }
 }

@@ -84,11 +84,4 @@ export class AuthController {
       throw new UnauthorizedException('ไม่สามารถสร้าง token ได้');
     }
   }
-
-  @Get('me/:pass')
-  async test(@Param('pass') pass: string) {
-    const hashedPassword = await bcrypt.hash(pass, 10);
-    console.log('Hashed password:', hashedPassword);
-    return pass;
-  }
 }

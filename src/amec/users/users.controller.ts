@@ -11,4 +11,13 @@ export class UsersController {
   findEmp(@Param('id') id: string) {
     return this.usersService.findEmp(id);
   }
+
+  @Get('/image/:id')
+  async findImage(@Param('id') id: string) {
+    const response = await fetch(`http://webflow/images/emp/${id}.jpg`);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`;
+    return imageUrl;
+  }
 }

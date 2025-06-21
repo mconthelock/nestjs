@@ -4,10 +4,9 @@ import {
   MessageBody,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { PisService } from './pis.service';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway()
+@WebSocketGateway({ namespace: '/api/pis/' })
 export class PisGateway {
   @WebSocketServer()
   server: Server;

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway({ namespace: '/api/pis/' })
+@WebSocketGateway({ namespace: '/api/pis' })
 export class PisGateway {
   @WebSocketServer()
   server: Server;

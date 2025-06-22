@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, NotFoundException } from '@nestjs/common';
 import { UsersService } from './users.service';
 // import { CreateUserDto } from './dto/create-user.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
@@ -10,5 +10,17 @@ export class UsersController {
   @Get(':id')
   findEmp(@Param('id') id: string) {
     return this.usersService.findEmp(id);
+  }
+
+  @Get('/image/:id')
+  async findImage(@Param('id') id: string) {
+    const response = await fetch(`http://webflow/images/emp/${id}.jpg`);
+    if (response.status !== 200) {
+      throw new NotFoundException('Data not found');
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`;
+    return imageUrl;
   }
 }

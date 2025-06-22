@@ -16,6 +16,12 @@ export class UsersService {
     });
   }
 
+  findEmpEncode(empno: string) {
+    return this.userRepository.findOne({
+      where: { SEMPENCODE: empno },
+    });
+  }
+
   findByDiv(div: string) {
     return this.userRepository.find({ where: { SDIVCODE: div } });
   }

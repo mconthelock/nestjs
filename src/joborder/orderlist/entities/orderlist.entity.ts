@@ -1,5 +1,6 @@
 import { View, ViewColumn, ViewEntity } from 'typeorm';
 
+// @ViewEntity({ name: 'AMECMFG.JOB_ORDER' })
 @ViewEntity({ name: 'AMECMFG.MV_JOB_ORDER' })
 export class VOrderList {
   @ViewColumn()

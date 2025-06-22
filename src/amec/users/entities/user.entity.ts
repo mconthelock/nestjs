@@ -37,4 +37,16 @@ export class User {
 
   @Column()
   SPASSWORD1: string;
+
+  @Column()
+  CSTATUS: string;
+
+  @Column()
+  SEMPENCODE: string;
+
+  @Column()
+  MEMEML: string;
+
+  @Column()
+  STNAME: string;
 }

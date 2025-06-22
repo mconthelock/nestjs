@@ -1,4 +1,12 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
+import { Appsuser } from '../../appsusers/entities/appsuser.entity';
 
 @Entity('APP_USERS_GROUP')
 export class Appsgroup {
@@ -9,7 +17,7 @@ export class Appsgroup {
   GROUP_DESC: string;
 
   @Column()
-  GROUP_STATUS: string;
+  GROUP_STATUS: number;
 
   @PrimaryColumn()
   PROGRAM: number;
@@ -25,4 +33,11 @@ export class Appsgroup {
 
   @Column()
   UPDATE_DATE: string;
+
+  @OneToMany(() => Appsuser, (user) => user.appsgroups)
+  /*@JoinColumn([
+    { name: 'GROUP_ID', referencedColumnName: 'USERS_GROUP' },
+    { name: 'PROGRAM', referencedColumnName: 'PROGRAM' },
+  ])*/
+  appsuser: Appsuser[];
 }

@@ -5,13 +5,13 @@ import {
   OnGatewayDisconnect,
   OnGatewayConnection,
   ConnectedSocket,
+  WebSocketServer
 } from '@nestjs/websockets';
 // import { LockPisService } from './lock-pis.service';
-import { Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 import { Injectable, Logger } from '@nestjs/common';
 import { UsersService } from '../amec/users/users.service';
 // import { CreateLockPiDto } from './dto/create-lock-pi.dto';
-// import { UpdateLockPiDto } from './dto/update-lock-pi.dto';
 
 @WebSocketGateway({ namespace: '/lockpis' })
 // export class LockPisGateway {
@@ -46,11 +46,24 @@ import { UsersService } from '../amec/users/users.service';
 export class LockPisGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
-    constructor(private readonly UsersService: UsersService) {}
+  @WebSocketServer()
+  server: Server;
+
+  constructor(private readonly UsersService: UsersService) {}
   private lockedItems = new Map<string, string>(); // itemId => socketId
   private socketLocks = new Map<string, Set<string>>(); // socketId => Set<itemId>
   private owner = new Map<string, Set<string>>(); // owner => socketId (เจ้าของไอเท็ม)
   private logger = new Logger('LockPisGateway'); // เขียน log ด้วยชื่อ LockPis
+
+
+//   onModuleInit() {
+//     this.server.on('connection', (socket) => {
+//       console.log('Client connected @ /lockpis:', socket.id);
+//       console.log('Connected');
+//     });
+//     // this.server.emit('test', { message: 'PisGateway is ready' });
+//   }
+
 
   // เมื่อ connect เข้ามา
   handleConnection(client: Socket) {
@@ -94,7 +107,7 @@ export class LockPisGateway
 
   @SubscribeMessage('lock_item')
   async handleLockItem(
-    @MessageBody() data: { itemId: string, order: string },
+    @MessageBody() data: { itemId: string; order: string },
     @ConnectedSocket() client: Socket,
   ) {
     const { itemId, order } = data;
@@ -105,20 +118,20 @@ export class LockPisGateway
       this.lockedItems.has(key) && // ถ้าไอเท็มถูกล็อกอยู่แล้ว
       this.lockedItems.get(key) !== client.id // ถ้าไอเท็มถูกล็อกโดยคนอื่น
     ) {
-        
       client.emit('lock_status', {
         itemId,
         order,
         status: false,
         // owner: this.getOwnerByItem(key), // หาว่าใครเป็นเจ้าของไอเท็มนี้
-        user: await this.UsersService.findEmp(this.getOwnerByItem(key))
+        user: await this.UsersService.findEmp(this.getOwnerByItem(key)),
       });
       return;
     }
 
     this.lockedItems.set(key, client.id); // เก็บว่าไอเท็มนี้ถูกล็อกโดย client.id
 
-    if (!this.socketLocks.has(client.id)) { // ถ้า client.id ยังไม่มีใน socketLocks
+    if (!this.socketLocks.has(client.id)) {
+      // ถ้า client.id ยังไม่มีใน socketLocks
       this.socketLocks.set(client.id, new Set()); // สร้าง Set ใหม่
     }
     this.socketLocks.get(client.id).add(key); // เก็บ itemId ใน Set ของ client.id
@@ -127,20 +140,21 @@ export class LockPisGateway
       itemId,
       order,
       status: true,
-    //   owner: client.data.empno,
-      user:  await this.UsersService.findEmp(client.data.empno)
+      //   owner: client.data.empno,
+      user: await this.UsersService.findEmp(client.data.empno),
     });
   }
 
   @SubscribeMessage('unlock_item')
   handleUnlockItem(
-    @MessageBody() data: { itemId: string, order: string },
+    @MessageBody() data: { itemId: string; order: string },
     @ConnectedSocket() client: Socket,
   ) {
     const { itemId, order } = data;
     const key = `${itemId}::${order}`;
 
-    if (this.lockedItems.get(key) === client.id) { // ถ้าไอเท็มถูกล็อกโดย client.id
+    if (this.lockedItems.get(key) === client.id) {
+      // ถ้าไอเท็มถูกล็อกโดย client.id
       // ปลดล็อกไอเท็ม
       this.lockedItems.delete(key); // ลบไอเท็มออกจาก lockedItems
       this.socketLocks.get(client.id)?.delete(key); // ลบไอเท็มออกจาก Set ของ client.id

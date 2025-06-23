@@ -8,11 +8,17 @@ import { NestExpressApplication } from '@nestjs/platform-express'; // ✅ ต้
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: ['error', 'warn'],
+    logger: ['error', 'warn', 'debug'],
   });
 
   app.enableCors({
-    origin: 'https://amecwebtest.mitsubishielevatorasia.co.th',
+    origin: [
+      'https://amecwebtest.mitsubishielevatorasia.co.th',
+      'https://amecwebtest1.mitsubishielevatorasia.co.th',
+      'https://amecweb.mitsubishielevatorasia.co.th',
+      'https://amecweb1.mitsubishielevatorasia.co.th',
+      'https://amecweb2.mitsubishielevatorasia.co.th',
+    ],
     credentials: true,
   });
 

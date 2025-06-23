@@ -28,7 +28,6 @@ import { PisModule } from './pis/pis.module';
     F002kpModule,
     F003kpModule,
     PisModule,
-    PisModule,
   ],
 })
 export class AppModule {}

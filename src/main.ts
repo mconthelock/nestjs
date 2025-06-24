@@ -18,6 +18,8 @@ async function bootstrap() {
       'https://amecweb.mitsubishielevatorasia.co.th',
       'https://amecweb1.mitsubishielevatorasia.co.th',
       'https://amecweb2.mitsubishielevatorasia.co.th',
+      'https://amecweb4.mitsubishielevatorasia.co.th',
+      'http://webflow.mitsubishielevatorasia.co.th',
     ],
     credentials: true,
   });

@@ -100,4 +100,9 @@ export class AuthController {
     const decryptedBytes = CryptoJS.AES.decrypt(encrypt.text, encrypt.key);
     return decryptedBytes.toString(CryptoJS.enc.Utf8);
   }
+
+  @Post('encryptMD5/:txt')
+  encryptTextMD5(@Param('txt') txt: string) {
+    return CryptoJS.MD5(txt).toString();
+  }
 }

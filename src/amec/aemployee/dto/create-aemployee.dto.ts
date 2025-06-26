@@ -1,5 +1,8 @@
 import { IsString, IsNumber, IsOptional } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+
 export class CreateAemployeeDto {
+  @ApiProperty({ example: 'john.doe@example.com' })
   @IsString()
   readonly sempno: string;
   sdivcode?: string;

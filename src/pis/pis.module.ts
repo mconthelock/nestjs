@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
-import { PisService } from './pis.service';
-import { PisGateway } from './pis.gateway';
-
+import { LockPisModule } from './lock-pis/lock-pis.module';
 @Module({
-  providers: [PisGateway, PisService],
+  imports: [LockPisModule],
+  providers: [],
 })
 export class PisModule {}

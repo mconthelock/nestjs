@@ -5,12 +5,12 @@ import {
   OnGatewayDisconnect,
   OnGatewayConnection,
   ConnectedSocket,
-  WebSocketServer
+  WebSocketServer,
 } from '@nestjs/websockets';
 // import { LockPisService } from './lock-pis.service';
 import { Socket, Server } from 'socket.io';
 import { Injectable, Logger } from '@nestjs/common';
-import { UsersService } from '../amec/users/users.service';
+import { UsersService } from '../../amec/users/users.service';
 // import { CreateLockPiDto } from './dto/create-lock-pi.dto';
 
 @WebSocketGateway({ namespace: '/lockpis' })
@@ -55,15 +55,13 @@ export class LockPisGateway
   private owner = new Map<string, Set<string>>(); // owner => socketId (เจ้าของไอเท็ม)
   private logger = new Logger('LockPisGateway'); // เขียน log ด้วยชื่อ LockPis
 
-
-//   onModuleInit() {
-//     this.server.on('connection', (socket) => {
-//       console.log('Client connected @ /lockpis:', socket.id);
-//       console.log('Connected');
-//     });
-//     // this.server.emit('test', { message: 'PisGateway is ready' });
-//   }
-
+  //   onModuleInit() {
+  //     this.server.on('connection', (socket) => {
+  //       console.log('Client connected @ /lockpis:', socket.id);
+  //       console.log('Connected');
+  //     });
+  //     // this.server.emit('test', { message: 'PisGateway is ready' });
+  //   }
 
   // เมื่อ connect เข้ามา
   handleConnection(client: Socket) {

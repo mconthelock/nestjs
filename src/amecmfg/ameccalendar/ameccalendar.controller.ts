@@ -6,6 +6,7 @@ interface rangeObj {
   sdate: number;
   edate: number;
 }
+
 @ApiTags('calendar')
 @Controller('calendar')
 export class AmeccalendarController {

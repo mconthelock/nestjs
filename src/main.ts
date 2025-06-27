@@ -51,13 +51,16 @@ async function bootstrap() {
     .setTitle('AMEC API')
     .setDescription('API documentation for AMEC API')
     .setVersion(process.env.VERSION)
+    //.addTag('Auth', 'ใช้สำหรับจัดการการเข้าสู่ระบบและระบบยืนยันตัวตน')
+    .addTag('IS-DEV', 'Manage a IS-DEV Request')
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   //SwaggerModule.setup('apidocs', app, document);
   app.use(
-    '/reference',
+    '/apidocs',
     apiReference({
       content: document,
+      theme: 'bluePlanet',
     }),
   );
 

@@ -10,7 +10,9 @@ import {
 import { PdepartmentService } from './pdepartment.service';
 import { CreatePdepartmentDto } from './dto/create-pdepartment.dto';
 import { UpdatePdepartmentDto } from './dto/update-pdepartment.dto';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('amec/department')
 export class PdepartmentController {
   constructor(private readonly pdepartmentService: PdepartmentService) {}

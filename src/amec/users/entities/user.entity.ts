@@ -1,4 +1,5 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Form } from '../../../webform/form/entities/form.entity';
 
 @Entity('AMECUSERALL')
 export class User {
@@ -49,4 +50,8 @@ export class User {
 
   @Column()
   STNAME: string;
+
+  @OneToOne(() => Form, (form) => form.VINPUTER)
+  @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'VINPUTER' })
+  creator: User;
 }

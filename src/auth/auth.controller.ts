@@ -19,12 +19,14 @@ import { directLoginDto } from './dto/direct.dto';
 import { Response } from 'express';
 import * as CryptoJS from 'crypto-js';
 import * as bcrypt from 'bcrypt';
+import { ApiTags, ApiOperation, ApiExcludeEndpoint } from '@nestjs/swagger';
 
 interface encryptObj {
   text: string;
   key: string;
 }
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -91,18 +93,15 @@ export class AuthController {
   }
 
   @Post('encrypt')
+  @ApiExcludeEndpoint()
   encryptText(@Body() encrypt: encryptObj) {
     return CryptoJS.AES.encrypt(encrypt.text, encrypt.key).toString();
   }
 
   @Post('decrypt')
+  @ApiExcludeEndpoint()
   decryptText(@Body() encrypt: encryptObj) {
     const decryptedBytes = CryptoJS.AES.decrypt(encrypt.text, encrypt.key);
     return decryptedBytes.toString(CryptoJS.enc.Utf8);
-  }
-
-  @Post('encryptMD5/:txt')
-  encryptTextMD5(@Param('txt') txt: string) {
-    return CryptoJS.MD5(txt).toString();
   }
 }

@@ -1,8 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { F002kpService } from './f002kp.service';
 import { CreateF002kpDto } from './dto/create-f002kp.dto';
 import { UpdateF002kpDto } from './dto/update-f002kp.dto';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('f002kp')
 export class F002kpController {
   constructor(private readonly f002kpService: F002kpService) {}

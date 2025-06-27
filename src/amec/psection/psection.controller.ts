@@ -10,7 +10,9 @@ import {
 import { PsectionService } from './psection.service';
 import { CreatePsectionDto } from './dto/create-psection.dto';
 import { UpdatePsectionDto } from './dto/update-psection.dto';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('amec/section')
 export class PsectionController {
   constructor(private readonly psectionService: PsectionService) {}

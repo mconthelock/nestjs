@@ -10,7 +10,9 @@ import {
 import { PdivisionService } from './pdivision.service';
 import { CreatePdivisionDto } from './dto/create-pdivision.dto';
 import { UpdatePdivisionDto } from './dto/update-pdivision.dto';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('amec/division')
 export class PdivisionController {
   constructor(private readonly pdivisionService: PdivisionService) {}

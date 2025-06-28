@@ -19,7 +19,9 @@ export class IsForm1Service {
         planfrm: {
           form: true,
         },
-        workpic: true,
+        workpic: {
+          developer: true,
+        },
       },
     });
   }

@@ -1,5 +1,13 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToOne,
+} from 'typeorm';
 import { Workplan } from '../../workplan/entities/workplan.entity';
+import { User } from '../../../amec/users/entities/user.entity';
 
 @Entity('WORK_PIC')
 export class Workpic {
@@ -33,4 +41,8 @@ export class Workpic {
   @ManyToOne(() => Workplan, (plan) => plan.workpic)
   @JoinColumn([{ name: 'PROJECT', referencedColumnName: 'PLANID' }])
   workplan: Workplan;
+
+  @OneToOne(() => User, (user) => user.dev)
+  @JoinColumn([{ name: 'PIC_ID', referencedColumnName: 'SEMPNO' }])
+  developer: User;
 }

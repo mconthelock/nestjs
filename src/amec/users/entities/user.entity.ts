@@ -1,5 +1,6 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 import { Form } from '../../../webform/form/entities/form.entity';
+import { Workpic } from '../../../docinv/workpic/entities/workpic.entity';
 
 @Entity('AMECUSERALL')
 export class User {
@@ -54,4 +55,8 @@ export class User {
   @OneToOne(() => Form, (form) => form.VINPUTER)
   @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'VINPUTER' })
   creator: User;
+
+  @OneToOne(() => Workpic, (dev) => dev.developer)
+  @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'PIC_ID' })
+  dev: Workpic;
 }

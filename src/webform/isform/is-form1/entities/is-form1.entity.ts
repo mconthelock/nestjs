@@ -1,10 +1,11 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Workplan } from '../../../../docinv/workplan/entities/workplan.entity';
 import { Form } from 'src/webform/form/entities/form.entity';
 
-@Entity('ISDEVFORM')
-export class IsDev {
+@Entity('WORK_PLAN_FRM')
+export class IsForm1 {
   @PrimaryColumn()
-  NFRMNO: number;
+  NFRMNO: string;
 
   @PrimaryColumn()
   VORGNO: string;
@@ -16,51 +17,15 @@ export class IsDev {
   CYEAR2: string;
 
   @PrimaryColumn()
-  NRUNNO: number;
+  NRUNNO: string;
 
   @Column()
-  CTYDEVNO: string;
+  PLANID: string;
 
   @Column()
-  CTYSYSNO: string;
+  EFFP: string;
 
-  @Column()
-  VDETAIL: string;
-
-  @Column()
-  VCHGREQ: string;
-
-  @Column()
-  VSYSNAME: string;
-
-  @Column()
-  DUSEREXP: Date;
-
-  @Column()
-  DADATE: Date;
-
-  @Column()
-  DAEDATE: Date;
-
-  @Column()
-  DPDATE: Date;
-
-  @Column()
-  DPEDATE: Date;
-
-  @Column()
-  CTYMH: string;
-
-  @Column()
-  CITGC: string;
-
-  @Column()
-  NESTTIME: number;
-
-  @Column()
-  NACTTIME: number;
-
-  @OneToOne(() => Form, (form) => form.isdev)
+  @OneToOne(() => Form, (form) => form.form1)
   @JoinColumn([
     { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
     { name: 'VORGNO', referencedColumnName: 'VORGNO' },
@@ -69,4 +34,8 @@ export class IsDev {
     { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
   ])
   form: Form;
+
+  @OneToOne(() => Workplan, (plan) => plan.planfrm)
+  @JoinColumn([{ name: 'PLANID', referencedColumnName: 'PLANID' }])
+  workplan: Workplan;
 }

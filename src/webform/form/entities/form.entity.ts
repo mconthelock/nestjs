@@ -9,6 +9,7 @@ import {
 import { Flow } from '../../flow/entities/flow.entity';
 import { User } from '../../../amec/users/entities/user.entity';
 import { IsDev } from '../../isform/is-dev/entities/is-dev.entity';
+import { IsForm1 } from '../../isform/is-form1/entities/is-form1.entity';
 
 @Entity('FORM')
 export class Form {
@@ -73,5 +74,15 @@ export class Form {
     { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
     { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
   ])
-  devform: IsDev;
+  isdev: IsDev;
+
+  @OneToOne(() => IsForm1, (form1) => form1.form)
+  @JoinColumn([
+    { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+    { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+    { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+    { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+    { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+  ])
+  form1: IsForm1;
 }

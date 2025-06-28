@@ -9,10 +9,10 @@ import { AmecMfgModule } from './amecmfg/amecmfg.module';
 import { DocinvModule } from './docinv/docinv.module';
 import { gpreportModule } from './gpreport/gpreport.module';
 import { AS400Module } from './as400/as400.module';
+import { WebformModule } from './webform/webform.module';
 
 import { JobOrderModule } from './joborder/joborder.module';
 import { PisModule } from './pis/pis.module';
-import { WebformModule } from './webform/webform.module';
 
 @Module({
   imports: [
@@ -27,10 +27,10 @@ import { WebformModule } from './webform/webform.module';
     DocinvModule,
     gpreportModule,
     AS400Module,
+    WebformModule,
     //JB 🤴
     JobOrderModule,
     PisModule,
-    WebformModule,
   ],
 })
 export class AppModule {}

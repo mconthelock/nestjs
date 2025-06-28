@@ -7,6 +7,13 @@ import { FormmstModule } from './formmst/formmst.module';
 import { GpOtModule } from './gpform/gp-ot/gp-ot.module';
 
 @Module({
-  imports: [ISFormModule, FormModule, FlowModule, FlowmstModule, FormmstModule, GpOtModule],
+  imports: [
+    ISFormModule,
+    FormModule,
+    FlowModule,
+    FlowmstModule,
+    FormmstModule,
+    GpOtModule,
+  ],
 })
 export class WebformModule {}

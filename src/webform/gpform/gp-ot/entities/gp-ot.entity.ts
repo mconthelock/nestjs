@@ -1,1 +1,19 @@
-export class GpOt {}
+export class GpOt {
+  NFRMNO;
+  VORGNO;
+  CYEAR;
+  CYEAR2;
+  NRUNNO;
+  EMPNO;
+  WORKDATE;
+  TIMEIN;
+  TIMEOUT;
+  OTJOB;
+  WKTYPENO;
+  REMARK;
+  FORSECCODE;
+  VFILENAME;
+  OT3;
+  SPECIAL;
+  SPECIAL_REASON;
+}

@@ -50,12 +50,12 @@ export class AuthService {
       throw new UnauthorizedException('You nave no authorization');
     }
 
-    // const md5Hash = crypto.createHash('md5').update(pass).digest('hex');
-    // if (md5Hash != user.SPASSWORD1) {
-    //   log.logmsg = 'Password is mismatch';
-    //   this.logs.create(log);
-    //   throw new UnauthorizedException('You nave no authorization');
-    // }
+    const md5Hash = crypto.createHash('md5').update(pass).digest('hex');
+    if (md5Hash != user.SPASSWORD1 && process.env.STATE == 'production') {
+      log.logmsg = 'Password is mismatch';
+      this.logs.create(log);
+      throw new UnauthorizedException('You nave no authorization');
+    }
 
     const validUser = await this.Appsuser.verifyLogin(username, apps);
     if (!validUser) {
@@ -89,13 +89,13 @@ export class AuthService {
     menulist.find((val) => {
       if (val.Appsmenu != null && val.Appsmenu.MENU_TYPE == 1) {
         mainmenu.push({
-            menu_id: val.Appsmenu.MENU_ID,
-            menu_name: val.Appsmenu.MENU_DISPLAY,
-            menu_class: val.Appsmenu.MENU_CLASS,
-            menu_top: val.Appsmenu.MENU_TOP,
-            menu_link: val.Appsmenu.MENU_LINK,
-            menu_icon: val.Appsmenu.MENU_ICON,
-            menu_tname: val.Appsmenu.MENU_TNAME
+          menu_id: val.Appsmenu.MENU_ID,
+          menu_name: val.Appsmenu.MENU_DISPLAY,
+          menu_class: val.Appsmenu.MENU_CLASS,
+          menu_top: val.Appsmenu.MENU_TOP,
+          menu_link: val.Appsmenu.MENU_LINK,
+          menu_icon: val.Appsmenu.MENU_ICON,
+          menu_tname: val.Appsmenu.MENU_TNAME,
         });
       }
     });
@@ -106,13 +106,13 @@ export class AuthService {
             val.submenu = [];
           }
           val.submenu.push({
-                menu_id: mn.Appsmenu.MENU_ID,
-                menu_name: mn.Appsmenu.MENU_DISPLAY,
-                menu_class: mn.Appsmenu.MENU_CLASS,
-                menu_top: mn.Appsmenu.MENU_TOP,
-                menu_link: mn.Appsmenu.MENU_LINK,
-                menu_icon: mn.Appsmenu.MENU_ICON,
-                menu_tname: mn.Appsmenu.MENU_TNAME
+            menu_id: mn.Appsmenu.MENU_ID,
+            menu_name: mn.Appsmenu.MENU_DISPLAY,
+            menu_class: mn.Appsmenu.MENU_CLASS,
+            menu_top: mn.Appsmenu.MENU_TOP,
+            menu_link: mn.Appsmenu.MENU_LINK,
+            menu_icon: mn.Appsmenu.MENU_ICON,
+            menu_tname: mn.Appsmenu.MENU_TNAME,
           });
         }
       });

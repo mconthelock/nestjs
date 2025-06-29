@@ -1,1 +1,16 @@
-export class IsMo {}
+export class IsMo {
+  NFRMNO;
+  VORGNO;
+  CYEAR;
+  CYEAR2;
+  NRUNNO;
+  VTITLE;
+  NISOPRNO;
+  VEQPREQ;
+  DUSEREXP;
+  VDETAIL;
+  DADATE;
+  DAEDATE;
+  DPDATE;
+  DPEDATE;
+}

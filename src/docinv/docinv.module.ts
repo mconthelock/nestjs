@@ -6,6 +6,8 @@ import { AppsgroupsModule } from './appsgroups/appsgroups.module';
 import { AppsusersgroupsModule } from './appsusersgroups/appsusersgroups.module';
 import { AppsmenuusersModule } from './appsmenuusers/appsmenuusers.module';
 import { AccesslogModule } from './accesslog/accesslog.module';
+import { WorkplanModule } from './workplan/workplan.module';
+import { WorkpicModule } from './workpic/workpic.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { AccesslogModule } from './accesslog/accesslog.module';
     AppsusersgroupsModule,
     AppsmenuusersModule,
     AccesslogModule,
+    WorkplanModule,
+    WorkpicModule,
   ],
 })
 export class DocinvModule {}

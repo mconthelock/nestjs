@@ -2,8 +2,9 @@ import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AemployeeService } from './aemployee.service';
 import { CreateAemployeeDto } from './dto/create-aemployee.dto';
-import { UpdateAemployeeDto } from './dto/update-aemployee.dto';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('amec/employee')
 export class AemployeeController {
   constructor(private readonly aemployeeService: AemployeeService) {}

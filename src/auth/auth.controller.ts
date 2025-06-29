@@ -19,7 +19,14 @@ import { directLoginDto } from './dto/direct.dto';
 import { Response } from 'express';
 import * as CryptoJS from 'crypto-js';
 import * as bcrypt from 'bcrypt';
+import { ApiTags, ApiOperation, ApiExcludeEndpoint } from '@nestjs/swagger';
 
+interface encryptObj {
+  text: string;
+  key: string;
+}
+
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -83,5 +90,18 @@ export class AuthController {
     } else {
       throw new UnauthorizedException('ไม่สามารถสร้าง token ได้');
     }
+  }
+
+  @Post('encrypt')
+  @ApiExcludeEndpoint()
+  encryptText(@Body() encrypt: encryptObj) {
+    return CryptoJS.AES.encrypt(encrypt.text, encrypt.key).toString();
+  }
+
+  @Post('decrypt')
+  @ApiExcludeEndpoint()
+  decryptText(@Body() encrypt: encryptObj) {
+    const decryptedBytes = CryptoJS.AES.decrypt(encrypt.text, encrypt.key);
+    return decryptedBytes.toString(CryptoJS.enc.Utf8);
   }
 }

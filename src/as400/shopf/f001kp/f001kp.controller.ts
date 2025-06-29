@@ -10,7 +10,9 @@ import {
 import { F001kpService } from './f001kp.service';
 import { CreateF001kpDto } from './dto/create-f001kp.dto';
 import { UpdateF001kpDto } from './dto/update-f001kp.dto';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('f001kp')
 export class F001kpController {
   constructor(private readonly f001kpService: F001kpService) {}

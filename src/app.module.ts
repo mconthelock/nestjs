@@ -3,32 +3,34 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import amecConfig from './databases/amec.config';
 
-import { AmecModule } from './amec/amec.module';
 import { AuthModule } from './auth/auth.module';
+import { AmecModule } from './amec/amec.module';
+import { AmecMfgModule } from './amecmfg/amecmfg.module';
 import { DocinvModule } from './docinv/docinv.module';
+import { gpreportModule } from './gpreport/gpreport.module';
+import { AS400Module } from './as400/as400.module';
+import { WebformModule } from './webform/webform.module';
+
 import { JobOrderModule } from './joborder/joborder.module';
-import { NewsModule } from './gpreport/news/news.module';
-import { F001kpModule } from './as400/shopf/f001kp/f001kp.module';
-import { F002kpModule } from './as400/shopf/f002kp/f002kp.module';
-import { F003kpModule } from './as400/shopf/f003kp/f003kp.module';
 import { PisModule } from './pis/pis.module';
 import { InquiriesModule } from './spprogram/inquiries/inquiries.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Comment
+      isGlobal: true,
     }),
     TypeOrmModule.forRootAsync(amecConfig),
+    //BB8 💣
     AuthModule,
     AmecModule,
+    AmecMfgModule,
     DocinvModule,
+    gpreportModule,
+    AS400Module,
+    WebformModule,
+    //JB 🤴
     JobOrderModule,
-    NewsModule,
-    F001kpModule,
-    F002kpModule,
-    F003kpModule,
-    PisModule,
     PisModule,
     InquiriesModule,
   ],

@@ -12,6 +12,7 @@ import { F001kpModule } from './as400/shopf/f001kp/f001kp.module';
 import { F002kpModule } from './as400/shopf/f002kp/f002kp.module';
 import { F003kpModule } from './as400/shopf/f003kp/f003kp.module';
 import { PisModule } from './pis/pis.module';
+import { InquiriesModule } from './spprogram/inquiries/inquiries.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PisModule } from './pis/pis.module';
     F003kpModule,
     PisModule,
     PisModule,
+    InquiriesModule,
   ],
 })
 export class AppModule {}

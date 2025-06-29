@@ -12,13 +12,13 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: [
-      'https://amecwebtest.mitsubishielevatorasia.co.th',
-      'https://amecwebtest1.mitsubishielevatorasia.co.th',
-      'https://amecweb.mitsubishielevatorasia.co.th',
-      'https://amecweb1.mitsubishielevatorasia.co.th',
-      'https://amecweb2.mitsubishielevatorasia.co.th',
-    ],
+    // origin: [
+    //   'https://amecwebtest.mitsubishielevatorasia.co.th',
+    //   'https://amecwebtest1.mitsubishielevatorasia.co.th',
+    //   'https://amecweb.mitsubishielevatorasia.co.th',
+    //   'https://amecweb1.mitsubishielevatorasia.co.th',
+    //   'https://amecweb2.mitsubishielevatorasia.co.th',
+    // ],
     credentials: true,
   });
 

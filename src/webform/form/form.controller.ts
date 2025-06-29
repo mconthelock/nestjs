@@ -28,4 +28,36 @@ export class FormController {
   ) {
     return this.formService.findOne(+fno, orgno, cyear, cyear2, +nrunno);
   }
+
+  @Get('waitforapprove/:empno')
+  @ApiOperation({
+    summary: 'ตึงข้อมูลจากตาราง Form',
+  })
+  waitforapprove(@Param('empno') empno: string) {
+    return empno;
+  }
+
+  @Get('mine/:empno')
+  @ApiOperation({
+    summary: 'ตึงข้อมูลจากตาราง Form',
+  })
+  mine(@Param('empno') empno: string) {
+    return empno;
+  }
+
+  @Get('finish/:empno')
+  @ApiOperation({
+    summary: 'ตึงข้อมูลจากตาราง Form',
+  })
+  finish(@Param('empno') empno: string) {
+    return empno;
+  }
+
+  @Get('underprepare/:empno')
+  @ApiOperation({
+    summary: 'ตึงข้อมูลจากตาราง Form',
+  })
+  underprepare(@Param('empno') empno: string) {
+    return empno;
+  }
 }

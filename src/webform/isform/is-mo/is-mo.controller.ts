@@ -1,34 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { IsMoService } from './is-mo.service';
-import { CreateIsMoDto } from './dto/create-is-mo.dto';
-import { UpdateIsMoDto } from './dto/update-is-mo.dto';
 
+@ApiTags('IS-MO')
 @Controller('is-mo')
 export class IsMoController {
-  constructor(private readonly isMoService: IsMoService) {}
+  constructor(private readonly ismo: IsMoService) {}
 
-  @Post()
-  create(@Body() createIsMoDto: CreateIsMoDto) {
-    return this.isMoService.create(createIsMoDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.isMoService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.isMoService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateIsMoDto: UpdateIsMoDto) {
-    return this.isMoService.update(+id, updateIsMoDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.isMoService.remove(+id);
+  @Get('/year/:year')
+  @ApiOperation({
+    summary: 'Get by Year',
+    description:
+      'Get all IS-DEV Form that request in specific Year, Data including Form/IS-DEV/Requestor (Exclude flow Data)',
+  })
+  findByYear(@Param('year') year: string) {
+    //return this.dev.findByYear(year);
+    return '';
   }
 }

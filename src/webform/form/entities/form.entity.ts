@@ -8,8 +8,15 @@ import {
 } from 'typeorm';
 import { Flow } from '../../flow/entities/flow.entity';
 import { User } from '../../../amec/users/entities/user.entity';
+import { Formmst } from '../../formmst/entities/formmst.entity';
+
+//IS Form
 import { IsDev } from '../../isform/is-dev/entities/is-dev.entity';
 import { IsForm1 } from '../../isform/is-form1/entities/is-form1.entity';
+import { IsMo } from '../../isform/is-mo/entities/is-mo.entity';
+
+//GP Form
+import { GpOt } from './../../gpform/gp-ot/entities/gp-ot.entity';
 
 @Entity('FORM')
 export class Form {
@@ -52,6 +59,18 @@ export class Form {
   @Column()
   VREMOTE: string;
 
+  @OneToOne(() => User, (user) => user.SEMPNO)
+  @JoinColumn({ name: 'VINPUTER', referencedColumnName: 'SEMPNO' })
+  creator: User;
+
+  @OneToOne(() => Formmst, (mst) => mst.form)
+  @JoinColumn([
+    { name: 'NFRMNO', referencedColumnName: 'NNO' },
+    { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+    { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+  ])
+  formmst: Formmst;
+
   @OneToMany(() => Flow, (flow) => flow.form)
   @JoinColumn([
     { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
@@ -62,10 +81,7 @@ export class Form {
   ])
   flow: Flow[];
 
-  @OneToOne(() => User, (user) => user.SEMPNO)
-  @JoinColumn({ name: 'VINPUTER', referencedColumnName: 'SEMPNO' })
-  creator: User;
-
+  //IS Form
   @OneToOne(() => IsDev, (isdev) => isdev.form)
   @JoinColumn([
     { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
@@ -85,4 +101,25 @@ export class Form {
     { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
   ])
   form1: IsForm1;
+
+  @OneToOne(() => IsMo, (formmo) => formmo.form)
+  @JoinColumn([
+    { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+    { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+    { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+    { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+    { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+  ])
+  formmo: IsMo;
+
+  //GP Form
+  @OneToOne(() => GpOt, (formot) => formot.form)
+  @JoinColumn([
+    { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+    { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+    { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+    { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+    { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+  ])
+  formot: GpOt;
 }

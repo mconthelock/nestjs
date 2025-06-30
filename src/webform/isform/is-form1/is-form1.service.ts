@@ -20,7 +20,7 @@ export class IsForm1Service {
 
   async findByYear(year: string) {
     return this.plan.find({
-      where: { PLANYEAR: year },
+      where: { PLANYEAR: year, CATEGORY: '1' },
       relations: {
         planfrm: {
           form: true,
@@ -62,6 +62,21 @@ export class IsForm1Service {
           developer: true,
         },
       },
+    });
+  }
+
+  async findRPA(year: string) {
+    return this.plan.find({
+      where: { PLANYEAR: year, CATEGORY: '2' },
+      relations: {
+        planfrm: {
+          form: true,
+        },
+        workpic: {
+          developer: true,
+        },
+      },
+      cache: true,
     });
   }
 }

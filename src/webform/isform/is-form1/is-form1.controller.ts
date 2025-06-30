@@ -38,4 +38,14 @@ export class IsForm1Controller {
   findByStatus(@Param('status') status: number) {
     return this.form1.findByStatus(status);
   }
+
+  @Get('/year/:year/rpa')
+  @ApiOperation({
+    summary: 'Get by year',
+    description:
+      'Get all annula plan that request in specific Year, Data including Work Plan/DEV/Requestor (Exclude flow Data)',
+  })
+  findRPA(@Param('year') year: string) {
+    return this.form1.findRPA(year);
+  }
 }

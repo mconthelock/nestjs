@@ -13,7 +13,6 @@ import { WebformModule } from './webform/webform.module';
 
 import { JobOrderModule } from './joborder/joborder.module';
 import { PisModule } from './pis/pis.module';
-import { InquiriesModule } from './spprogram/inquiries/inquiries.module';
 
 @Module({
   imports: [
@@ -32,7 +31,6 @@ import { InquiriesModule } from './spprogram/inquiries/inquiries.module';
     //JB 🤴
     JobOrderModule,
     PisModule,
-    InquiriesModule,
   ],
 })
 export class AppModule {}

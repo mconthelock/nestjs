@@ -28,11 +28,11 @@ export class IsDevService {
       if (Array.isArray(isdev.form.flow)) {
         const manager = isdev.form.flow.find((f) => f.CSTEPNO === '10');
         const pic = isdev.form.flow.find((f) => f.CSTEPNEXTNO === '00');
-
-        console.log(manager);
+        const running = isdev.form.flow.find((f) => f.CSTEPST === '3');
 
         isdev.form = { ...isdev.form, ...{ manager } };
         isdev.form = { ...isdev.form, ...{ pic } };
+        isdev.form = { ...isdev.form, ...{ running } };
         delete isdev.form.flow;
       }
       return isdev;

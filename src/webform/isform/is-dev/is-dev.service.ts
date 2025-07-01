@@ -40,7 +40,7 @@ export class IsDevService {
   }
 
   async findById(year, id) {
-    return await this.isdev.find({
+    return await this.isdev.findOne({
       where: { CYEAR2: year, NRUNNO: id },
       relations: {
         form: {

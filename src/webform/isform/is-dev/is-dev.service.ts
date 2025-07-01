@@ -38,4 +38,16 @@ export class IsDevService {
       return isdev;
     });
   }
+
+  async findById(year, id) {
+    return await this.isdev.find({
+      where: { CYEAR2: year, NRUNNO: id },
+      relations: {
+        form: {
+          flow: true,
+          creator: true,
+        },
+      },
+    });
+  }
 }

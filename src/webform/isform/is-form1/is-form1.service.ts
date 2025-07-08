@@ -79,4 +79,19 @@ export class IsForm1Service {
       cache: true,
     });
   }
+
+  async findOne(id: number) {
+    return this.plan.findOne({
+      where: { PLANID: id },
+      relations: {
+        planfrm: {
+          form: true,
+        },
+        workpic: {
+          developer: true,
+        },
+      },
+      cache: true,
+    });
+  }
 }

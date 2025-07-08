@@ -48,4 +48,14 @@ export class IsForm1Controller {
   findRPA(@Param('year') year: string) {
     return this.form1.findRPA(year);
   }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Get by Plan ID',
+    description:
+      'Get all annula plan that request in specific Year, Data including Work Plan/DEV/Requestor (Exclude flow Data)',
+  })
+  findOne(@Param('id') id: number) {
+    return this.form1.findOne(id);
+  }
 }

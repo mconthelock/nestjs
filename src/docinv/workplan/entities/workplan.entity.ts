@@ -12,7 +12,7 @@ import { Workpic } from '../../../docinv/workpic/entities/workpic.entity';
 @Entity('WORK_PLAN')
 export class Workplan {
   @PrimaryColumn()
-  PLANID: string;
+  PLANID: number;
 
   @Column()
   PLANYEAR: string;

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { searchDto } from './dto/search-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -22,19 +23,7 @@ export class UsersService {
     });
   }
 
-  findByDiv(div: string) {
-    return this.userRepository.find({ where: { SDIVCODE: div } });
-  }
-
-  findByDept(dep: string) {
-    return this.userRepository.find({ where: { SDEPCODE: dep } });
-  }
-
-  findBySec(sec: string) {
-    return this.userRepository.find({ where: { SSECCODE: sec } });
-  }
-
-  findByPos(pos: string) {
-    return this.userRepository.find({ where: { SPOSCODE: pos } });
+  search() {
+    return this.userRepository.find();
   }
 }

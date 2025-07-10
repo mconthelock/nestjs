@@ -13,6 +13,7 @@ import { WebformModule } from './webform/webform.module';
 
 import { JobOrderModule } from './joborder/joborder.module';
 import { PisModule } from './pis/pis.module';
+import { HeaderModule } from './idtag/header/header.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { PisModule } from './pis/pis.module';
     //JB 🤴
     JobOrderModule,
     PisModule,
+    HeaderModule,
   ],
 })
 export class AppModule {}

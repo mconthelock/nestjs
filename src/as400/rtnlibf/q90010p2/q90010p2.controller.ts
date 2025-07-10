@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { Q90010p2Service } from './q90010p2.service';
 import { CreateQ90010p2Dto } from './dto/create-q90010p2.dto';
 import { UpdateQ90010p2Dto } from './dto/update-q90010p2.dto';
@@ -23,7 +31,10 @@ export class Q90010p2Controller {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateQ90010p2Dto: UpdateQ90010p2Dto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateQ90010p2Dto: UpdateQ90010p2Dto,
+  ) {
     return this.q90010p2Service.update(+id, updateQ90010p2Dto);
   }
 

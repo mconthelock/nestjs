@@ -1,26 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { CreateF001kpDto } from './dto/create-f001kp.dto';
-import { UpdateF001kpDto } from './dto/update-f001kp.dto';
-
+import { ConectionService } from '../../conection/conection.service';
 @Injectable()
 export class F001kpService {
-  create(createF001kpDto: CreateF001kpDto) {
-    return 'This action adds a new f001kp';
-  }
+  constructor(private conn: ConectionService) {}
 
-  findAll() {
-    return `This action returns all f001kp`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} f001kp`;
-  }
-
-  update(id: number, updateF001kpDto: UpdateF001kpDto) {
-    return `This action updates a #${id} f001kp`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} f001kp`;
+  async findOne() {
+    const result = await this.conn.runQuery(
+      `SELECT * FROM RTNLIBF.Q90010P2 Q9 JOIN SHOPF.F003KP F3 ON Q9ORD = F3.F03R02 WHERE Q9PP = 20250710`,
+    );
+    return result;
+    // FETCH FIRST 10 ROWS ONLY
   }
 }

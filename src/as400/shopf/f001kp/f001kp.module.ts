@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConectionModule } from '../../conection/conection.module';
 import { F001kpService } from './f001kp.service';
 import { F001kpController } from './f001kp.controller';
-import { F001KP } from './entities/f001kp.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([F001KP], 'amecConnection')],
+  imports: [ConectionModule],
   controllers: [F001kpController],
   providers: [F001kpService],
 })

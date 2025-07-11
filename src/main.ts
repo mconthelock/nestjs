@@ -7,12 +7,15 @@ import { IpLoggerMiddleware } from './middleware/ip-logger.middleware';
 import { NestExpressApplication } from '@nestjs/platform-express'; // ✅ ต้องเพิ่ม
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
+import * as oracledb from 'oracledb';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ['error', 'warn', 'debug'],
   });
-
+console.log('ORACLE POOL CONFIG', oracledb.poolMax, oracledb.poolMin, oracledb.queueTimeout, oracledb.queueMax);
+const pool = await oracledb.getPool();
+console.log(pool.poolMax, pool.poolMin, pool.queueTimeout, pool.queueMax);
   app.enableCors({
     origin: [
       'https://amecwebtest.mitsubishielevatorasia.co.th',

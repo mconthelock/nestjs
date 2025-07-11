@@ -1,6 +1,7 @@
-import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Form } from '../../../webform/form/entities/form.entity';
 import { Workpic } from '../../../docinv/workpic/entities/workpic.entity';
+import { SetRequestDate } from 'src/joborder/set-request-date/entities/set-request-date.entity';
 
 @Entity('AMECUSERALL')
 export class User {
@@ -59,4 +60,10 @@ export class User {
   @OneToOne(() => Workpic, (dev) => dev.developer)
   @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'PIC_ID' })
   dev: Workpic;
+
+  @OneToMany(() => SetRequestDate, (req) => req.JOP_MAR_REQUEST)
+    marRequest: SetRequestDate []
+
+  @OneToMany(() => SetRequestDate, (req) => req.JOP_PUR_CONFIRM)
+    purConfirm: SetRequestDate []
 }

@@ -19,4 +19,13 @@ export class AmeccalendarController {
   getcalendarrange(@Body() req: rangeObj) {
     return this.calc.listCalendar(req.sdate, req.edate);
   }
+
+  @Post('addBusinessDays')
+  @ApiOperation({
+    summary: 'Add Business Days to a given date',
+  })
+  addBusinessDays(@Body() req: { startDate: number | string | Date; days: number }) {
+    return this.calc.addBusinessDays(req.startDate, req.days);
+  }
+
 }

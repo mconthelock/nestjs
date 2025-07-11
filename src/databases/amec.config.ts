@@ -22,6 +22,12 @@ if (process.env.HOST == 'AMEC') {
       ],
       synchronize: false,
       logging: ['query', 'error'],
+      extra: {
+        poolMax: 100,
+        poolMin: 5,
+        queueTimeout: 60000,
+        queueMax: 1000,
+      },
     }),
   };
 } else {

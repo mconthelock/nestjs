@@ -1,6 +1,58 @@
 import { Transform, Type } from 'class-transformer';
-import { IsOptional, IsString, IsNumber, IsArray } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsArray, IsBoolean } from 'class-validator';
 export class SearchOrderListDto {
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber()
+    // TURNOVER_STATUS?: number;
+    readonly TURNOVER_STATUS?: number;
+
+    @IsOptional()
+    @IsString()
+    readonly AGENT?: string;
+
+    @IsOptional()
+    @IsString()
+    readonly SERIES?: string;
+
+    @IsOptional()
+    @IsString()
+    readonly SDESSCH?: string;
+
+    @IsOptional()
+    @IsString()
+    readonly EDESSCH?: string;
+
+    @IsOptional()
+    @IsString()
+    readonly SPRODSCH?: string;
+
+    @IsOptional()
+    @IsString()
+    readonly EPRODSCH?: string;
+    
+    @IsOptional()
+    @IsString()
+    readonly SDESBMDATE?: string;
+
+    @IsOptional()
+    @IsString()
+    readonly EDESBMDATE?: string;
+
+    @IsOptional()
+    @IsString()
+    readonly SMFGBMDATE?: string;
+
+    @IsOptional()
+    @IsString()
+    readonly EMFGBMDATE?: string;
+
+    @IsOptional()
+    @IsBoolean()
+    @Type(() => Boolean)  
+    readonly distinct?: boolean;
+
+
     @IsOptional()
     @IsArray()
     @IsString({ each: true })

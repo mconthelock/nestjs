@@ -62,6 +62,9 @@ export class VOrderList {
   
   @ViewColumn()
   EXPSHIP: Date | null;
+
+  @ViewColumn()
+  TURNOVER_STATUS : Number | null;
   
   @ViewColumn()
   DUMMYCAR_NO: string | null;

@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { HeaderService } from './header.service';
 import { HeaderController } from './header.controller';
-
-import { F001KP } from 'src/as400/shopf/f001kp/entities/f001kp.entity';
+import { M008kpModule } from '../../as400/rtnlibf/m008kp/m008kp.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([F001KP], 'amecConnection')],
+  imports: [M008kpModule],
   providers: [HeaderService],
   controllers: [HeaderController],
 })

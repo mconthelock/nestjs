@@ -1,7 +1,7 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
-import { M008kp } from '../';
+import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import { M008kp } from '../../m008kp/entities/m008kp.entity';
 
-@Entity('Q90010P2')
+@Entity('AMECMFG.Q90010P2')
 export class Q90010p2 {
   @Column()
   Q9SCD: string;
@@ -57,7 +57,7 @@ export class Q90010p2 {
   @Column()
   Q9GOD: string;
 
-  @OneToOne(() => M008kp, (m008) => m8.bmdate)
+  @OneToOne(() => M008kp, (m8) => m8.bmdate)
   @JoinColumn([{ name: 'Q9ORD', referencedColumnName: 'M8K03' }])
   bmorder: M008kp;
 }

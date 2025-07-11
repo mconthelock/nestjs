@@ -7,6 +7,13 @@ import { Q90010p2Module } from './rtnlibf/q90010p2/q90010p2.module';
 import { M008kpModule } from './rtnlibf/m008kp/m008kp.module';
 
 @Module({
-  imports: [F001kpModule, F002kpModule, F003kpModule, ConectionModule, Q90010p2Module, M008kpModule],
+  imports: [
+    ConectionModule,
+    F001kpModule,
+    F002kpModule,
+    F003kpModule,
+    Q90010p2Module,
+    M008kpModule,
+  ],
 })
 export class AS400Module {}

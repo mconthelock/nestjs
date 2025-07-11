@@ -1,12 +1,12 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
-import { M008kp } from '../../m008kp/entities/m008kp.entity';
+import { M008KP } from '../../m008kp/entities/m008kp.entity';
 
 @Entity('AMECMFG.Q90010P2')
-export class Q90010p2 {
-  @Column()
+export class Q90010P2 {
+  @PrimaryColumn()
   Q9SCD: string;
 
-  @Column()
+  @PrimaryColumn()
   Q9ORD: string;
 
   @Column()
@@ -25,7 +25,7 @@ export class Q90010p2 {
   Q9CAL: string;
 
   @Column()
-  Q9DESs: string;
+  Q9DES: string;
 
   @Column()
   Q9PP: string;
@@ -57,7 +57,7 @@ export class Q90010p2 {
   @Column()
   Q9GOD: string;
 
-  @OneToOne(() => M008kp, (m8) => m8.bmdate)
+  @OneToOne(() => M008KP, (m8) => m8.M8K03)
   @JoinColumn([{ name: 'Q9ORD', referencedColumnName: 'M8K03' }])
-  bmorder: M008kp;
+  bmorder: M008KP;
 }

@@ -1,14 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Repository,
-  Between,
-  Equal,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-} from 'typeorm';
-
-// import { IsForm1 } from './entities/is-form1.entity';
+import { Repository, Between, Equal } from 'typeorm';
 import { Workplan } from '../../../docinv/workplan/entities/workplan.entity';
 
 @Injectable()
@@ -67,7 +59,22 @@ export class IsForm1Service {
 
   async findRPA(year: string) {
     return this.plan.find({
-      where: { PLANYEAR: year, CATEGORY: '2' },
+      where: { PLANYEAR: year, CATEGORY: '4' },
+      relations: {
+        planfrm: {
+          form: true,
+        },
+        workpic: {
+          developer: true,
+        },
+      },
+      cache: true,
+    });
+  }
+
+  async findOne(id: number) {
+    return this.plan.findOne({
+      where: { PLANID: id },
       relations: {
         planfrm: {
           form: true,

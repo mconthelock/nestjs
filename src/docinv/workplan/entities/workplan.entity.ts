@@ -7,12 +7,16 @@ import {
   OneToMany,
 } from 'typeorm';
 import { IsForm1 } from '../../../webform/isform/is-form1/entities/is-form1.entity';
+import { IsForm3 } from '../../../webform/isform/is-form3/entities/is-form3.entity';
+import { IsForm4 } from '../../../webform/isform/is-form4/entities/is-form4.entity';
 import { Workpic } from '../../../docinv/workpic/entities/workpic.entity';
+import { Specification } from '../../../docinv/specification/entities/specification.entity';
+import { Release } from '../../../docinv/release/entities/release.entity';
 
 @Entity('WORK_PLAN')
 export class Workplan {
   @PrimaryColumn()
-  PLANID: string;
+  PLANID: number;
 
   @Column()
   PLANYEAR: string;
@@ -92,11 +96,27 @@ export class Workplan {
   @Column()
   REF_ID: string;
 
+  @OneToMany(() => Workpic, (pic) => pic.workplan)
+  @JoinColumn([{ name: 'PLANID', referencedColumnName: 'PROJECT' }])
+  workpic: Workpic[];
+
   @OneToOne(() => IsForm1, (frm) => frm.workplan)
   @JoinColumn([{ name: 'PLANID', referencedColumnName: 'PLANID' }])
   planfrm: IsForm1;
 
-  @OneToMany(() => Workpic, (pic) => pic.workplan)
-  @JoinColumn([{ name: 'PLANID', referencedColumnName: 'PROJECT' }])
-  workpic: Workpic[];
+  @OneToOne(() => IsForm3, (frm) => frm.workplan)
+  @JoinColumn([{ name: 'PLANID', referencedColumnName: 'PLAN_ID' }])
+  form3: IsForm3;
+
+  @OneToOne(() => IsForm4, (frm) => frm.workplan)
+  @JoinColumn([{ name: 'PLANID', referencedColumnName: 'PLANID' }])
+  form4: IsForm4;
+
+  @OneToMany(() => Specification, (frm) => frm.workplan)
+  @JoinColumn([{ name: 'PLANID', referencedColumnName: 'PLANID' }])
+  spec: Specification;
+
+  @OneToMany(() => Release, (frm) => frm.workplan)
+  @JoinColumn([{ name: 'PLANID', referencedColumnName: 'PLANID' }])
+  release: Release;
 }

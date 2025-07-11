@@ -13,6 +13,8 @@ import { Formmst } from '../../formmst/entities/formmst.entity';
 //IS Form
 import { IsDev } from '../../isform/is-dev/entities/is-dev.entity';
 import { IsForm1 } from '../../isform/is-form1/entities/is-form1.entity';
+import { IsForm3 } from '../../isform/is-form3/entities/is-form3.entity';
+import { IsForm4 } from '../../isform/is-form4/entities/is-form4.entity';
 import { IsMo } from '../../isform/is-mo/entities/is-mo.entity';
 
 //GP Form
@@ -101,6 +103,26 @@ export class Form {
     { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
   ])
   form1: IsForm1;
+
+  @OneToOne(() => IsForm3, (form3) => form3.form)
+  @JoinColumn([
+    { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+    { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+    { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+    { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+    { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+  ])
+  form3: IsForm3;
+
+  @OneToOne(() => IsForm4, (form4) => form4.form)
+  @JoinColumn([
+    { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+    { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+    { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+    { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+    { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+  ])
+  form4: IsForm4;
 
   @OneToOne(() => IsMo, (formmo) => formmo.form)
   @JoinColumn([

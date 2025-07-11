@@ -1,7 +1,13 @@
-import { Controller, Get, Param, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  NotFoundException,
+  Post,
+  Body,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
-// import { CreateUserDto } from './dto/create-user.dto';
-// import { UpdateUserDto } from './dto/update-user.dto';
+import { searchDto } from './dto/search-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -12,7 +18,7 @@ export class UsersController {
     return this.usersService.findEmp(id);
   }
 
-  @Get('/image/:id')
+  @Get('image/:id')
   async findImage(@Param('id') id: string) {
     const response = await fetch(`http://webflow/images/emp/${id}.jpg`);
     if (response.status !== 200) {
@@ -22,5 +28,17 @@ export class UsersController {
     const buffer = Buffer.from(arrayBuffer);
     const imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`;
     return imageUrl;
+  }
+
+  @Post('search')
+  async search(@Body() searchDto: searchDto) {
+    const data = await this.usersService.search();
+    const filtered = data.filter((val) => {
+      return Object.entries(searchDto).every(([key, value]) => {
+        return val[key] == value;
+      });
+    });
+
+    return filtered;
   }
 }

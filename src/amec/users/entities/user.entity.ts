@@ -1,7 +1,15 @@
-import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { Form } from '../../../webform/form/entities/form.entity';
 import { Workpic } from '../../../docinv/workpic/entities/workpic.entity';
 import { SetRequestDate } from 'src/joborder/set-request-date/entities/set-request-date.entity';
+import { EscsUser } from 'src/escs/user/entities/user.entity';
 
 @Entity('AMECUSERALL')
 export class User {
@@ -62,8 +70,11 @@ export class User {
   dev: Workpic;
 
   @OneToMany(() => SetRequestDate, (req) => req.JOP_MAR_REQUEST)
-    marRequest: SetRequestDate []
+  marRequest: SetRequestDate[];
 
   @OneToMany(() => SetRequestDate, (req) => req.JOP_PUR_CONFIRM)
-    purConfirm: SetRequestDate []
+  purConfirm: SetRequestDate[];
+
+  @OneToOne(() => EscsUser, (escsUser) => escsUser.user)
+  escsUser: EscsUser;
 }

@@ -10,10 +10,11 @@ import { DocinvModule } from './docinv/docinv.module';
 import { gpreportModule } from './gpreport/gpreport.module';
 import { AS400Module } from './as400/as400.module';
 import { WebformModule } from './webform/webform.module';
+import { HeaderModule } from './idtag/header/header.module';
 
 import { JobOrderModule } from './joborder/joborder.module';
 import { PisModule } from './pis/pis.module';
-import { HeaderModule } from './idtag/header/header.module';
+import { ESCSModule } from './escs/escs.module';
 
 @Module({
   imports: [
@@ -29,10 +30,11 @@ import { HeaderModule } from './idtag/header/header.module';
     gpreportModule,
     AS400Module,
     WebformModule,
+    HeaderModule,
     //JB 🤴
     JobOrderModule,
     PisModule,
-    HeaderModule,
+    ESCSModule
   ],
 })
 export class AppModule {}

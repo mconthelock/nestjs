@@ -1,0 +1,47 @@
+import { Injectable } from '@nestjs/common';
+import { Repository, DataSource } from 'typeorm';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { Item } from './entities/item.entity';
+import { SearchDto } from './dto/search.dto';
+
+@Injectable()
+export class ItemService {
+  constructor(
+    @InjectRepository(Item, 'amecConnection')
+    private itemRepo: Repository<Item>,
+  ) {}
+
+  getItemAll() {
+    return this.itemRepo.find({
+        order: {
+            IT_NO: 'ASC',
+        },
+    });
+  }
+
+  getItemByItem(item: string) {
+    return this.itemRepo.findOne({
+      where: { IT_NO: item },
+      order: {
+        IT_NO: 'ASC',
+      },
+    });
+  }
+
+  getItem(searchDto: SearchDto) {
+    const { IT_NO, IT_USERUPDATE, IT_STATUS, SEC_ID, IT_QCDATE, IT_MFGDATE } = searchDto;
+    return this.itemRepo.find({
+      where: [
+        { IT_NO ,
+         IT_USERUPDATE ,
+         IT_STATUS ,
+         SEC_ID ,
+         IT_QCDATE ,
+         IT_MFGDATE },
+      ],
+      order: {
+        IT_NO: 'ASC',
+      },
+    });
+  }
+}

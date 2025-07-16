@@ -3,18 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import amecConfig from './databases/amec.config';
 
-// import { AuthModule } from './auth/auth.module';
-// import { AmecModule } from './amec/amec.module';
-// import { AmecMfgModule } from './amecmfg/amecmfg.module';
-// import { DocinvModule } from './docinv/docinv.module';
-// import { gpreportModule } from './gpreport/gpreport.module';
-// import { AS400Module } from './as400/as400.module';
-// import { WebformModule } from './webform/webform.module';
-import { SpModule } from './spprogram/sp.module';
-
-// import { JobOrderModule } from './joborder/joborder.module';
-// import { PisModule } from './pis/pis.module';
-// import { HeaderModule } from './idtag/header/header.module';
 import { AuthModule } from './auth/auth.module';
 import { AmecModule } from './amec/amec.module';
 import { AmecMfgModule } from './amecmfg/amecmfg.module';
@@ -23,6 +11,7 @@ import { gpreportModule } from './gpreport/gpreport.module';
 import { AS400Module } from './as400/as400.module';
 import { WebformModule } from './webform/webform.module';
 import { HeaderModule } from './idtag/header/header.module';
+import { SpModule } from './spprogram/sp.module';
 
 import { JobOrderModule } from './joborder/joborder.module';
 import { PisModule } from './pis/pis.module';
@@ -35,14 +24,6 @@ import { ESCSModule } from './escs/escs.module';
     }),
     TypeOrmModule.forRootAsync(amecConfig),
     //BB8 💣
-    //AuthModule,
-    // AmecModule,
-    // AmecMfgModule,
-    // DocinvModule,
-    // gpreportModule,
-    // AS400Module,
-    // WebformModule,
-    SpModule,
     AuthModule,
     AmecModule,
     AmecMfgModule,
@@ -51,10 +32,9 @@ import { ESCSModule } from './escs/escs.module';
     AS400Module,
     WebformModule,
     HeaderModule,
+    SpModule,
+
     //JB 🤴
-    // JobOrderModule,
-    // PisModule,
-    // HeaderModule,
     JobOrderModule,
     PisModule,
     ESCSModule,

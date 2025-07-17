@@ -1,11 +1,4 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  OneToOne,
-  JoinColumn,
-  OneToMany,
-} from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('AFT_SYSDOC')
 export class Aftsysdoc {
@@ -23,4 +16,9 @@ export class Aftsysdoc {
 
   @Column()
   F009: string;
+
+  // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
+  // ตัวอย่าง:
+  // @ManyToOne(() => User, user => user.posts)
+  // user: User;
 }

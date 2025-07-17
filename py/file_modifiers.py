@@ -55,7 +55,7 @@ def modify_module_file(module_path, entity_name_pascal, entity_name_kebab):
             imports_match = re.search(r'imports:\s*\[([\s\S]*?)\]', module_config)
             if imports_match:
                 current_imports = imports_match.group(1)
-                typeorm_feature_line = f"TypeOrmModule.forFeature([{entity_name_pascal}])"
+                typeorm_feature_line = f"TypeOrmModule.forFeature([{entity_name_pascal}], 'amecConnection')"
 
                 if typeorm_feature_line not in current_imports:
                     # ตรวจสอบว่ามี imports อื่นๆ อยู่แล้วหรือไม่
@@ -69,7 +69,7 @@ def modify_module_file(module_path, entity_name_pascal, entity_name_kebab):
                     print(f"  - TypeOrmModule.forFeature([{entity_name_pascal}]) มีอยู่ใน {module_path} แล้ว ไม่ต้องเพิ่มซ้ำ")
             else:
                 # ถ้าไม่มี imports array ให้เพิ่มเข้าไป
-                new_imports_block = f"imports: [\n    TypeOrmModule.forFeature([{entity_name_pascal}])\n  ],"
+                new_imports_block = f"imports: [\n    TypeOrmModule.forFeature([{entity_name_pascal}], 'amecConnection')\n  ],"
 
                 # แทรก new_imports_block ก่อน providers
                 if "providers:" in module_config:
@@ -127,7 +127,7 @@ def modify_service_file(service_path, entity_name_pascal, entity_name_kebab):
             if "constructor(" not in content:
                 # ถ้าไม่มี constructor ให้เพิ่มเข้าไป
                 constructor_to_add = f"""  constructor(
-    @InjectRepository({entity_name_pascal})
+    @InjectRepository({entity_name_pascal}, 'amecConnection')
     private readonly {entity_name_kebab}Repository: Repository<{entity_name_pascal}>,
   ) {{}}"""
                 content = content.replace(f"export class {service_class_name}Service {{",
@@ -136,23 +136,40 @@ def modify_service_file(service_path, entity_name_pascal, entity_name_kebab):
                 # ถ้ามี constructor อยู่แล้ว ให้ตรวจสอบว่ามี Repository inject อยู่แล้วหรือไม่
                 if f"private readonly {entity_name_kebab}Repository: Repository<{entity_name_pascal}>," not in content:
                     # แทรก parameter เข้าไปใน constructor เดิม
-                    content = re.sub(r'constructor\s*\(([\s\S]*?)\)',
-                                     rf'constructor(\1\n    @InjectRepository({entity_name_pascal})\n    private readonly {entity_name_kebab}Repository: Repository<{entity_name_pascal}>,)',
+                    # ใช้ re.sub เพื่อแทรก parameter เข้าไปใน constructor ที่มีอยู่แล้ว
+                    content = re.sub(r'(constructor\s*\()([\s\S]*?)(\)\s*\{)',
+                                     rf'\1\2\n    @InjectRepository({entity_name_pascal})\n    private readonly {entity_name_kebab}Repository: Repository<{entity_name_pascal}>,\3',
                                      content, 1)
                 else:
                     print(f"  - Repository สำหรับ {entity_name_pascal} มีอยู่ใน {service_path} แล้ว ไม่ต้องเพิ่มซ้ำ")
 
-        # แก้ไขเมธอด findAll(), findOne(), update(), remove() ให้ใช้ Repository
-        content = re.sub(r'create\((create\w+Dto: Create\w+Dto)\)\s*\{\s*return \'This action adds a new \w+\';\s*\}',
-                         r'create(createDto: Create\w+Dto) {\n    return this.' + entity_name_kebab + r'Repository.save(createDto);\n  }', content)
-        content = re.sub(r'findAll\(\)\s*\{\s*return \'This action returns all \w+\';\s*\}',
-                         r'findAll() {\n    return this.' + entity_name_kebab + r'Repository.find();\n  }', content)
-        content = re.sub(r'findOne\(id: number\)\s*\{\s*return `This action returns a #${id} \w+`;\s*\}',
-                         r'findOne(id: number) {\n    return this.' + entity_name_kebab + r'Repository.findOneBy({ id });\n  }', content)
-        content = re.sub(r'update\(id: number, update\w+Dto: Update\w+Dto\)\s*\{\s*return `This action updates a #${id} \w+`;\s*\}',
-                         r'update(id: number, updateDto: Update\w+Dto) {\n    return this.' + entity_name_kebab + r'Repository.update(id, updateDto);\n  }', content)
-        content = re.sub(r'remove\(id: number\)\s*\{\s*return `This action removes a #${id} \w+`;\s*\}',
-                         r'remove(id: number) {\n    return this.' + entity_name_kebab + r'Repository.delete(id);\n  }', content)
+        # แก้ไขเมธอด create(), findAll(), findOne(), update(), remove() ให้ใช้ Repository
+        # ใช้ regex ที่จับกลุ่มตัวแปร DTO และชนิด DTO เพื่อนำไปใช้ใน replacement string
+
+        # แก้ไขเมธอด create
+        create_pattern = r'create\((\w+Dto):\s*(Create\w+Dto)\)\s*\{\s*return\s*\'This action adds a new \w+\';\s*\}'
+        create_replacement = r'create(\1: \2) {\n    return this.' + entity_name_kebab + r'Repository.save(\1);\n  }'
+        content = re.sub(create_pattern, create_replacement, content)
+
+        # แก้ไขเมธอด findAll
+        findAll_pattern = r'findAll\(\)\s*\{\s*return\s*\'This action returns all \w+\';\s*\}'
+        findAll_replacement = r'findAll() {\n    return this.' + entity_name_kebab + r'Repository.find();\n  }'
+        content = re.sub(findAll_pattern, findAll_replacement, content)
+
+        # แก้ไขเมธอด findOne
+        findOne_pattern = r'findOne\(id:\s*number\)\s*\{\s*return\s*`This action returns a #${id} \w+`;\s*\}'
+        findOne_replacement = r'findOne(id: number) {\n    return this.' + entity_name_kebab + r'Repository.findOneBy({ id });\n  }'
+        content = re.sub(findOne_pattern, findOne_replacement, content)
+
+        # แก้ไขเมธอด update
+        update_pattern = r'update\(id:\s*number,\s*(\w+Dto):\s*(Update\w+Dto)\)\s*\{\s*return\s*`This action updates a #${id} \w+`;\s*\}'
+        update_replacement = r'update(id: number, \1: \2) {\n    return this.' + entity_name_kebab + r'Repository.update(id, \1);\n  }'
+        content = re.sub(update_pattern, update_replacement, content)
+
+        # แก้ไขเมธอด remove
+        remove_pattern = r'remove\(id:\s*number\)\s*\{\s*return\s*`This action removes a #${id} \w+`;\s*\}'
+        remove_replacement = r'remove(id: number) {\n    return this.' + entity_name_kebab + r'Repository.delete(id);\n  }'
+        content = re.sub(remove_pattern, remove_replacement, content)
 
         with open(service_path, 'w', encoding='utf-8') as f:
             f.write(content)
@@ -172,6 +189,7 @@ def modify_controller_file(controller_path, entity_name_pascal, entity_name_keba
             content = f.read()
 
         # แก้ไข return value ของเมธอดต่างๆ
+        # ปรับ regex ใน controller ให้สอดคล้องกับการเปลี่ยนชื่อ parameter ใน service
         content = re.sub(r'return this\.(\w+Service)\.create\(create\w+Dto\);',
                          r'return this.\1.create(createDto);', content)
         content = re.sub(r'return this\.(\w+Service)\.findAll\(\);',

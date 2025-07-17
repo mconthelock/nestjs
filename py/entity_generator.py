@@ -124,8 +124,8 @@ def create_entity_file(entity_dir, entity_name_pascal, entity_name_kebab, sql_fo
                         if "PrimaryColumn" not in entity_imports:
                             entity_imports.append("PrimaryColumn")
                         entity_columns_code += f"""
-  @PrimaryColumn({col['column_options']})
-  {col['name'].lower()}: {col['type_ts']};
+  @PrimaryColumn()
+  {col['name'].upper()}: {col['type_ts']};
 """
                         primary_column_added = True
                         primary_key_found_in_sql = True

@@ -1,14 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Aftsysdoc } from './entities/aftsysdoc.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateAftsysdocDto } from './dto/create-aftsysdoc.dto';
-import { UpdateAftsysdocDto } from './dto/update-aftsysdoc.dto';
-import { Aftsysdoc } from './entities/aftsysdoc.entity';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AftsysdocService {
   constructor(
     @InjectRepository(Aftsysdoc, 'amecConnection')
-    private readonly aft: Repository<Aftsysdoc>,
+    private readonly aftsysdocRepository: Repository<Aftsysdoc>,
   ) {}
 }

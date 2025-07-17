@@ -12,6 +12,7 @@ import amecConfig from './databases/amec.config';
 // import { WebformModule } from './webform/webform.module';
 // import { HeaderModule } from './idtag/header/header.module';
 import { SpModule } from './spprogram/sp.module';
+import { MktModule } from './marketing/mkt.module';
 
 // import { JobOrderModule } from './joborder/joborder.module';
 // import { PisModule } from './pis/pis.module';
@@ -33,6 +34,7 @@ import { SpModule } from './spprogram/sp.module';
     // WebformModule,
     // HeaderModule,
     SpModule,
+    MktModule,
 
     //JB 🤴
     // JobOrderModule,

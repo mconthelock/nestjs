@@ -1,26 +1,22 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Between } from 'typeorm';
 import { CreateCurrencyDto } from './dto/create-currency.dto';
 import { UpdateCurrencyDto } from './dto/update-currency.dto';
+import { Currency } from './entities/currency.entity';
 
 @Injectable()
 export class CurrencyService {
-  create(createCurrencyDto: CreateCurrencyDto) {
-    return 'This action adds a new currency';
-  }
+  constructor(
+    @InjectRepository(Currency, 'amecConnection')
+    private readonly curr: Repository<Currency>,
+  ) {}
 
   findAll() {
-    return `This action returns all currency`;
+    return this.curr.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} currency`;
-  }
-
-  update(id: number, updateCurrencyDto: UpdateCurrencyDto) {
-    return `This action updates a #${id} currency`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} currency`;
+  findPeriod(year: string, period: string) {
+    return this.curr.find({ where: { CURR_YEAR: year, CURR_PERIOD: period } });
   }
 }

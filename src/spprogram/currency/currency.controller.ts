@@ -1,34 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CurrencyService } from './currency.service';
 import { CreateCurrencyDto } from './dto/create-currency.dto';
 import { UpdateCurrencyDto } from './dto/update-currency.dto';
 
-@Controller('currency')
+@Controller('sp/currency')
 export class CurrencyController {
-  constructor(private readonly currencyService: CurrencyService) {}
-
-  @Post()
-  create(@Body() createCurrencyDto: CreateCurrencyDto) {
-    return this.currencyService.create(createCurrencyDto);
-  }
+  constructor(private readonly curr: CurrencyService) {}
 
   @Get()
   findAll() {
-    return this.currencyService.findAll();
+    return this.curr.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.currencyService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCurrencyDto: UpdateCurrencyDto) {
-    return this.currencyService.update(+id, updateCurrencyDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.currencyService.remove(+id);
+  @Get('period/:year/:period')
+  findPeriod(@Param('year') year: string, @Param('period') period: string) {
+    return this.curr.findPeriod(year, period);
   }
 }

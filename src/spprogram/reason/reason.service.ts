@@ -1,26 +1,14 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Between } from 'typeorm';
 import { CreateReasonDto } from './dto/create-reason.dto';
 import { UpdateReasonDto } from './dto/update-reason.dto';
+import { Reason } from './entities/reason.entity';
 
 @Injectable()
 export class ReasonService {
-  create(createReasonDto: CreateReasonDto) {
-    return 'This action adds a new reason';
-  }
-
-  findAll() {
-    return `This action returns all reason`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} reason`;
-  }
-
-  update(id: number, updateReasonDto: UpdateReasonDto) {
-    return `This action updates a #${id} reason`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} reason`;
-  }
+  constructor(
+    @InjectRepository(Reason, 'amecConnection')
+    private readonly reason: Repository<Reason>,
+  ) {}
 }

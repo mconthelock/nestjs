@@ -12,6 +12,18 @@ import { RatioModule } from './ratio/ratio.module';
 import { ShipmentModule } from './shipment/shipment.module';
 
 @Module({
-  imports: [InquiryModule, InquiryGroupModule, InquiryDetailModule, InquiryControlModule, AttachmentModule, TermModule, QuotationTypeModule, ReasonModule, CurrencyModule, RatioModule, ShipmentModule],
+  imports: [
+    InquiryModule,
+    InquiryGroupModule,
+    InquiryDetailModule,
+    InquiryControlModule,
+    AttachmentModule,
+    TermModule,
+    QuotationTypeModule,
+    ReasonModule,
+    CurrencyModule,
+    RatioModule,
+    ShipmentModule,
+  ],
 })
 export class SpModule {}

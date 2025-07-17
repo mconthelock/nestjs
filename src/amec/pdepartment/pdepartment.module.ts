@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PdepartmentService } from './pdepartment.service';
 import { PdepartmentController } from './pdepartment.controller';
-import { DepartmentSchema } from './entities/pdepartment.schema';
+import { Pdepartment } from './entities/pdepartment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([DepartmentSchema], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([Pdepartment], 'amecConnection')],
   controllers: [PdepartmentController],
   providers: [PdepartmentService],
 })

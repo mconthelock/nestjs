@@ -89,10 +89,10 @@ export class UserService {
     }else{
         select = this.allowFields;
     }
-    console.log('Selected fields:', select);
+    // console.log('Selected fields:', select);
     
     select.forEach((f)=>{
-        console.log('Field:', f);
+        // console.log('Field:', f);
         
         if (this.user.includes(f)) {
             query.addSelect(`B.${f}`, f);

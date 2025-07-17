@@ -8,40 +8,26 @@ import {
   Delete,
 } from '@nestjs/common';
 import { PdepartmentService } from './pdepartment.service';
-import { CreatePdepartmentDto } from './dto/create-pdepartment.dto';
-import { UpdatePdepartmentDto } from './dto/update-pdepartment.dto';
-import { ApiExcludeController } from '@nestjs/swagger';
+import { SearchDto } from './dto/search.dto';
 
-@ApiExcludeController()
 @Controller('amec/department')
 export class PdepartmentController {
   constructor(private readonly pdepartmentService: PdepartmentService) {}
 
-  @Post()
-  create(@Body() createPdepartmentDto: CreatePdepartmentDto) {
-    return this.pdepartmentService.create(createPdepartmentDto);
+ @Get()
+  getDepartmentAll() {
+    return this.pdepartmentService.getDepartmentAll();
   }
 
-  @Get()
-  findAll() {
-    return this.pdepartmentService.findAll();
+  @Get(':code')
+  getDepartmentByCode(@Param('code') code: string) {
+    return this.pdepartmentService.getDepartmentByCode(code);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pdepartmentService.findOne(+id);
+  @Post('getDepartment')
+  async getDepartment(@Body() searchDto: SearchDto) {
+    return this.pdepartmentService.getDepartment(searchDto);
   }
+  
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updatePdepartmentDto: UpdatePdepartmentDto,
-  ) {
-    return this.pdepartmentService.update(+id, updatePdepartmentDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pdepartmentService.remove(+id);
-  }
 }

@@ -1,26 +1,58 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePdivisionDto } from './dto/create-pdivision.dto';
-import { UpdatePdivisionDto } from './dto/update-pdivision.dto';
+import { Repository, DataSource } from 'typeorm';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { Pdivision } from '../pdivision/entities/pdivision.entity';
+import { SearchDto } from './dto/search.dto';
+import { getSafeFields } from '../../utils/Fields';
 
 @Injectable()
 export class PdivisionService {
-  create(createPdivisionDto: CreatePdivisionDto) {
-    return 'This action adds a new pdivision';
+  constructor(
+    @InjectRepository(Pdivision, 'amecConnection')
+    private divisionRepo: Repository<Pdivision>,
+    @InjectDataSource('amecConnection')
+    private dataSource: DataSource,
+  ) {}
+
+  private division = this.dataSource
+    .getMetadata(Pdivision)
+    .columns.map((c) => c.propertyName);
+  private allowFields = [...this.division];
+
+  getDivisionAll() {
+    return this.divisionRepo.find({
+      order: {
+        SDIVCODE: 'ASC',
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all pdivision`;
+  getDivisionByCode(id: string) {
+    return this.divisionRepo.findOne({
+      where: { SDIVCODE: id },
+      order: {
+        SDIVCODE: 'ASC',
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} pdivision`;
-  }
+  getDivision(searchDto: SearchDto) {
+    const { SDIVCODE, fields = [] } = searchDto;
+    const query = this.dataSource.createQueryBuilder().from('PDIVISION', 'A');
 
-  update(id: number, updatePdivisionDto: UpdatePdivisionDto) {
-    return `This action updates a #${id} pdivision`;
-  }
+    if (SDIVCODE) query.andWhere('A.SDIVCODE = :SDIVCODE', { SDIVCODE });
 
-  remove(id: number) {
-    return `This action removes a #${id} pdivision`;
+    let select = [];
+    if (fields.length > 0) {
+      select = getSafeFields(fields, this.allowFields);
+    } else {
+      select = this.allowFields;
+    }
+
+    select.forEach((f) => {
+      query.addSelect(`A.${f}`, f);
+    });
+    query.andWhere('A.SDIVISION NOT LIKE :division', { division: '%Cancel%' });
+    return query.getRawMany();
   }
 }

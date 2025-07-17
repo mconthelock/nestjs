@@ -8,40 +8,24 @@ import {
   Delete,
 } from '@nestjs/common';
 import { PsectionService } from './psection.service';
-import { CreatePsectionDto } from './dto/create-psection.dto';
-import { UpdatePsectionDto } from './dto/update-psection.dto';
-import { ApiExcludeController } from '@nestjs/swagger';
+import { SearchDto } from './dto/search.dto';
 
-@ApiExcludeController()
 @Controller('amec/section')
 export class PsectionController {
   constructor(private readonly psectionService: PsectionService) {}
 
-  @Post()
-  create(@Body() createPsectionDto: CreatePsectionDto) {
-    return this.psectionService.create(createPsectionDto);
-  }
-
   @Get()
-  findAll() {
-    return this.psectionService.findAll();
+  getSectionAll() {
+    return this.psectionService.getSectionAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.psectionService.findOne(+id);
+  @Get(':code')
+  getSectionByCode(@Param('code') code: string) {
+    return this.psectionService.getSectionByCode(code);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updatePsectionDto: UpdatePsectionDto,
-  ) {
-    return this.psectionService.update(+id, updatePsectionDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.psectionService.remove(+id);
+  @Post('getSection')
+  async getSection(@Body() searchDto: SearchDto) {
+    return this.psectionService.getSection(searchDto);
   }
 }

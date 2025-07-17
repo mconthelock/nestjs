@@ -1,2 +1,16 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-export class Pdivision {}
+import { Entity, Column, PrimaryColumn} from 'typeorm';
+    
+@Entity('PDIVISION')
+export class Pdivision {
+    
+  @PrimaryColumn()
+  SDIVCODE: string;
+
+  @Column()
+  SDIVISION: string;
+
+  @Column()
+  SDIV: string;
+
+
+}

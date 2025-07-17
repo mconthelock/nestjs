@@ -1,0 +1,5 @@
+Create table AGENT_COUNTRY (
+    CTCODE VARCHAR(8),
+    AGENT VARCHAR(5),
+    STATUS VARCHAR(10)
+)

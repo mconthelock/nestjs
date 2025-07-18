@@ -11,7 +11,9 @@ import { gpreportModule } from './gpreport/gpreport.module';
 import { AS400Module } from './as400/as400.module';
 import { WebformModule } from './webform/webform.module';
 import { HeaderModule } from './idtag/header/header.module';
-// import { SpModule } from './spprogram/sp.module';
+
+import { SpModule } from './spprogram/sp.module';
+import { MktModule } from './marketing/mkt.module';
 
 import { JobOrderModule } from './joborder/joborder.module';
 import { PisModule } from './pis/pis.module';
@@ -33,7 +35,8 @@ import { DetailModule } from './idtag/detail/detail.module';
     AS400Module,
     WebformModule,
     HeaderModule,
-    // SpModule,
+    SpModule,
+    MktModule,
 
     //JB 🤴
     JobOrderModule,

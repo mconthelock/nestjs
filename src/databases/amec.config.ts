@@ -35,11 +35,11 @@ if (process.env.HOST == 'AMEC') {
     inject: [ConfigService],
     useFactory: async (config: ConfigService) => ({
       type: 'mysql',
-      host: process.env.AMEC_HOST,
-      port: parseInt(process.env.AMEC_PORT as string, 10),
-      username: process.env.AMEC_USER,
-      password: process.env.AMEC_PASSWORD,
-      database: process.env.AMEC_DATABASE,
+      host: process.env.HOME_HOST,
+      port: parseInt(process.env.HOME_PORT as string, 10),
+      username: process.env.HOME_USER,
+      password: process.env.HOME_PASSWORD,
+      database: process.env.HOME_DATABASE,
       entities: [
         __dirname + '/../**/**/*.entity{.ts,.js}',
         __dirname + '/../**/**/**/*.entity{.ts,.js}',

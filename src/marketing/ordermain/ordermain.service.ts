@@ -1,26 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOrdermainDto } from './dto/create-ordermain.dto';
-import { UpdateOrdermainDto } from './dto/update-ordermain.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Between, Raw } from 'typeorm';
+import { SearchOrdermainDto } from './dto/search-ordermain.dto';
+import { Ordermain } from './entities/ordermain.entity';
 
 @Injectable()
 export class OrdermainService {
-  create(createOrdermainDto: CreateOrdermainDto) {
-    return 'This action adds a new ordermain';
-  }
+  constructor(
+    @InjectRepository(Ordermain, 'amecConnection')
+    private readonly ords: Repository<Ordermain>,
+  ) {}
 
-  findAll() {
-    return `This action returns all ordermain`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} ordermain`;
-  }
-
-  update(id: number, updateOrdermainDto: UpdateOrdermainDto) {
-    return `This action updates a #${id} ordermain`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} ordermain`;
+  async search(req: SearchOrdermainDto) {
+    const where = {};
+    if (req.SERIES) where['SERIES'] = req.SERIES;
+    if (req.AGENT) where['AGENT'] = req.AGENT;
+    if (req.PRJ_NO) where['PRJ_NO'] = req.PRJ_NO;
+    if (req.ORDER_NO) where['ORDER_NO'] = req.ORDER_NO;
+    if (req.CAR_NO) {
+      const trimmedCarNo = req.CAR_NO.trim(); // Trim ค่าจาก input ด้วย
+      where['CAR_NO'] = Raw(
+        (columnAlias) => `TRIM(${columnAlias}) = :trimmedCarNo`,
+        { trimmedCarNo },
+      );
+    }
+    return await this.ords.find({ where: where });
   }
 }

@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 
-@Entity('TMAINTAINTYPE')
+@Entity('TMARKET_TEMP')
 export class Ordermain {
   @Column()
   SERIES: string;

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { InquiryModule } from './inquiry/inquiry.module';
+// import { InquiryModule } from './inquiry/inquiry.module';
 import { InquiryGroupModule } from './inquiry-group/inquiry-group.module';
 import { InquiryDetailModule } from './inquiry-detail/inquiry-detail.module';
 import { InquiryControlModule } from './inquiry-control/inquiry-control.module';
@@ -13,7 +13,7 @@ import { ShipmentModule } from './shipment/shipment.module';
 
 @Module({
   imports: [
-    InquiryModule,
+    // InquiryModule,
     InquiryGroupModule,
     InquiryDetailModule,
     InquiryControlModule,

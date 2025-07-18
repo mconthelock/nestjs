@@ -8,8 +8,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { ShipmentService } from './shipment.service';
-import { CreateShipmentDto } from './dto/create-shipment.dto';
-import { UpdateShipmentDto } from './dto/update-shipment.dto';
 
 @Controller('shipment')
 export class ShipmentController {

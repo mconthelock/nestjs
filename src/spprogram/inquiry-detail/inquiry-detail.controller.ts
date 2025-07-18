@@ -8,8 +8,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { InquiryDetailService } from './inquiry-detail.service';
-import { CreateInquiryDetailDto } from './dto/create-inquiry-detail.dto';
-import { UpdateInquiryDetailDto } from './dto/update-inquiry-detail.dto';
 
 @Controller('sp/detail')
 export class InquiryDetailController {

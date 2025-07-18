@@ -8,8 +8,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { AttachmentService } from './attachment.service';
-import { CreateAttachmentDto } from './dto/create-attachment.dto';
-import { UpdateAttachmentDto } from './dto/update-attachment.dto';
 
 @Controller('attachment')
 export class AttachmentController {

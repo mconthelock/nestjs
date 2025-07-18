@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
-import { CreateInquiryDetailDto } from './dto/create-inquiry-detail.dto';
-import { UpdateInquiryDetailDto } from './dto/update-inquiry-detail.dto';
 import { InquiryDetail } from './entities/inquiry-detail.entity';
 
 @Injectable()

@@ -8,8 +8,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { ReasonService } from './reason.service';
-import { CreateReasonDto } from './dto/create-reason.dto';
-import { UpdateReasonDto } from './dto/update-reason.dto';
 
 @Controller('reason')
 export class ReasonController {

@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { M008KP } from '../../../rtnlibf/m008kp/entities/m008kp.entity';
 import { F002KP } from '../../f002kp/entities/f002kp.entity';
-// import { F003KP } from '../../f003kp/entities/f003kp.entity';
+import { F003KP } from '../../f003kp/entities/f003kp.entity';
 
 @Entity('AMECMFG.F001KP')
 export class F001KP {
@@ -79,4 +79,8 @@ export class F001KP {
   @OneToMany(() => F002KP, (f2) => f2.tags)
   @JoinColumn([{ name: 'F01R01', referencedColumnName: 'F02R01' }])
   process: F002KP[];
+
+  @OneToMany(() => F003KP, (f3) => f3.tags)
+  @JoinColumn([{ name: 'F01R01', referencedColumnName: 'F03R01' }])
+  detail: F003KP[];
 }

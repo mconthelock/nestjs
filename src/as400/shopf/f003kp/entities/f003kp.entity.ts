@@ -15,7 +15,7 @@ export class F003KP {
   @Column()
   F03R04: string;
 
-  //   @ManyToOne(() => F001KP, (f01data) => f01data.F01R01)
-  //   @JoinColumn({ name: 'MENU_ID' })
-  //   F001KP: F001KP;
+  @ManyToOne(() => F001KP, (f1) => f1.detail)
+  @JoinColumn([{ name: 'F03R01', referencedColumnName: 'F01R01' }])
+  tags: F001KP;
 }

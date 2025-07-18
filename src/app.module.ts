@@ -16,6 +16,7 @@ import { HeaderModule } from './idtag/header/header.module';
 import { JobOrderModule } from './joborder/joborder.module';
 import { PisModule } from './pis/pis.module';
 import { ESCSModule } from './escs/escs.module';
+import { DetailModule } from './idtag/detail/detail.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { ESCSModule } from './escs/escs.module';
     JobOrderModule,
     PisModule,
     ESCSModule,
+    DetailModule,
   ],
 })
 export class AppModule {}

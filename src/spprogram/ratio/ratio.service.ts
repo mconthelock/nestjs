@@ -9,4 +9,8 @@ export class RatioService {
     @InjectRepository(Ratio, 'amecConnection')
     private readonly ratio: Repository<Ratio>,
   ) {}
+
+  findAll() {
+    return this.ratio.find({ relations: ['quoText'] });
+  }
 }

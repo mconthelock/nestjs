@@ -31,6 +31,7 @@ async function bootstrap() {
       'http://amecweb2.mitsubishielevatorasia.co.th',
       'http://amecweb4.mitsubishielevatorasia.co.th',
       'http://webflow.mitsubishielevatorasia.co.th',
+      'http://localhost:8080',
     ],
     credentials: true,
   });

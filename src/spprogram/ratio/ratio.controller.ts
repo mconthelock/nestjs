@@ -9,7 +9,12 @@ import {
 } from '@nestjs/common';
 import { RatioService } from './ratio.service';
 
-@Controller('ratio')
+@Controller('sp/priceratio')
 export class RatioController {
-  constructor(private readonly ratioService: RatioService) {}
+  constructor(private readonly ratio: RatioService) {}
+
+  @Get()
+  findAll() {
+    return this.ratio.findAll();
+  }
 }

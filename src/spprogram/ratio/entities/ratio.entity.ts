@@ -1,11 +1,5 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  OneToOne,
-  JoinColumn,
-  OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, JoinColumn, ManyToOne } from 'typeorm';
+import { QuotationType } from '../../quotation-type/entities/quotation-type.entity';
 
 @Entity('SP_PRICE_RATIO')
 export class Ratio {
@@ -44,4 +38,8 @@ export class Ratio {
 
   @Column()
   STATUS: string;
+
+  @ManyToOne(() => QuotationType, (q) => q.ratio)
+  @JoinColumn({ name: 'QUOTATION', referencedColumnName: 'QUOTYPE_ID' })
+  quoText: QuotationType;
 }

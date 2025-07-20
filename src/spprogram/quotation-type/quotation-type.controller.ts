@@ -8,6 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { QuotationTypeService } from './quotation-type.service';
+import { createDto } from './dto/create.dto';
 
 @Controller('sp/quotationtype')
 export class QuotationTypeController {
@@ -20,6 +21,11 @@ export class QuotationTypeController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.quotype.findOne(id);
+  }
+
+  @Post('create')
+  create(@Body() createDto: createDto) {
+    return this.quotype.create(createDto);
   }
 
   //   @Post()

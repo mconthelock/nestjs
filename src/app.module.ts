@@ -32,7 +32,7 @@ import { DetailModule } from './idtag/detail/detail.module';
     AmecMfgModule,
     DocinvModule,
     gpreportModule,
-    AS400Module,
+    //AS400Module,
     WebformModule,
     HeaderModule,
     SpModule,

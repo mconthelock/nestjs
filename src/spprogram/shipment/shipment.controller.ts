@@ -9,7 +9,12 @@ import {
 } from '@nestjs/common';
 import { ShipmentService } from './shipment.service';
 
-@Controller('shipment')
+@Controller('sp/shipment')
 export class ShipmentController {
-  constructor(private readonly shipmentService: ShipmentService) {}
+  constructor(private readonly ship: ShipmentService) {}
+
+  @Get()
+  findAll() {
+    return this.ship.findAll();
+  }
 }

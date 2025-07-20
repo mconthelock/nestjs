@@ -9,4 +9,8 @@ export class TermService {
     @InjectRepository(Term, 'amecConnection')
     private readonly term: Repository<Term>,
   ) {}
+
+  findAll() {
+    return this.term.find();
+  }
 }

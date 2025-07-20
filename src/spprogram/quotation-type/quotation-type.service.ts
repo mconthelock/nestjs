@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 
 import { QuotationType } from './entities/quotation-type.entity';
+import { createDto } from './dto/create.dto';
 
 @Injectable()
 export class QuotationTypeService {
@@ -17,5 +18,11 @@ export class QuotationTypeService {
 
   findOne(id: string) {
     return this.quotype.findOne({ where: { QUOTYPE_ID: id } });
+  }
+
+  async create(createDto: createDto) {
+    const quotype = this.quotype.create(createDto);
+    const res = await this.quotype.save(quotype);
+    return this.quotype.findOne({ where: res });
   }
 }

@@ -10,7 +10,7 @@ export class QuotationType {
   QUOTYPE_DESC: string;
 
   @Column()
-  QUOTYPE_STATUS: string;
+  QUOTYPE_STATUS: number;
 
   @Column()
   QUOTYPE_CUR: string;

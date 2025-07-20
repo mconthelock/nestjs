@@ -1,15 +1,12 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { TermService } from './term.service';
 
-@Controller('term')
+@Controller('sp/term')
 export class TermController {
-  constructor(private readonly termService: TermService) {}
+  constructor(private readonly term: TermService) {}
+
+  @Get()
+  findAll() {
+    return this.term.findAll();
+  }
 }

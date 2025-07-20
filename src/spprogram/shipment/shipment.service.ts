@@ -9,4 +9,8 @@ export class ShipmentService {
     @InjectRepository(Shipment, 'amecConnection')
     private readonly ship: Repository<Shipment>,
   ) {}
+
+  findAll() {
+    return this.ship.find();
+  }
 }

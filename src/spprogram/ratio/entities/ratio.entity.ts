@@ -4,7 +4,7 @@ import { QuotationType } from '../../quotation-type/entities/quotation-type.enti
 @Entity('SP_PRICE_RATIO')
 export class Ratio {
   @PrimaryColumn()
-  ID: string;
+  ID: number;
 
   @Column()
   TRADER: string;
@@ -13,31 +13,36 @@ export class Ratio {
   SUPPLIER: string;
 
   @Column()
-  QUOTATION: string;
+  QUOTATION: number;
+
+  @Column({
+    name: 'FORMULA',
+    type: 'decimal',
+    precision: 7,
+    scale: 3,
+  })
+  FORMULA: number;
 
   @Column()
-  FORMULA: string;
+  FREIGHT_SEA: number;
 
   @Column()
-  FREIGHT_SEA: string;
+  FREIGHT_AIR: number;
 
   @Column()
-  FREIGHT_AIR: string;
-
-  @Column()
-  FREIGHT_COURIER: string;
+  FREIGHT_COURIER: number;
 
   @Column()
   UPDATE_BY: string;
 
   @Column()
-  UPDATE_AT: string;
+  UPDATE_AT: Date;
 
   @Column()
   CURRENCY: string;
 
   @Column()
-  STATUS: string;
+  STATUS: number;
 
   @ManyToOne(() => QuotationType, (q) => q.ratio)
   @JoinColumn({ name: 'QUOTATION', referencedColumnName: 'QUOTYPE_ID' })

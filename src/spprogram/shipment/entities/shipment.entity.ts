@@ -10,10 +10,10 @@ import {
 @Entity('SP_SHIPMENT')
 export class Shipment {
   @PrimaryColumn()
-  SHIPMENT_ID: string;
+  SHIPMENT_ID: number;
 
   @Column()
-  SHIPMENT_VALUE: string;
+  SHIPMENT_VALUE: number;
 
   @Column()
   SHIPMENT_DESC: string;

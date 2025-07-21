@@ -53,4 +53,7 @@ export class Ordermain {
 
   @PrimaryColumn()
   REVISION_EDIT: string;
+
+  @Column()
+  AMEC_SCHDL: Date;
 }

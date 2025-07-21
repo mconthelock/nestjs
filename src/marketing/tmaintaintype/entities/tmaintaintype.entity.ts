@@ -1,16 +1,9 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  OneToOne,
-  JoinColumn,
-  OneToMany,
-} from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('TMAINTAINTYPE')
 export class Tmaintaintype {
   @PrimaryColumn()
-  ID: string;
+  ID: number;
 
   @Column()
   ABBREVIATION: string;
@@ -34,10 +27,10 @@ export class Tmaintaintype {
   PREASSY: string;
 
   @Column()
-  CAPAMIN: string;
+  CAPAMIN: number;
 
   @Column()
-  CAPAMAX: string;
+  CAPAMAX: number;
 
   @Column()
   SPEDVALUE: string;
@@ -55,8 +48,13 @@ export class Tmaintaintype {
   GROUPMAIL: string;
 
   @Column()
-  BYPASSMODEL: string;
+  BYPASSMODEL: number;
 
   @Column()
-  MODERNIZE: string;
+  MODERNIZE: number;
+
+  // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
+  // ตัวอย่าง:
+  // @ManyToOne(() => User, user => user.posts)
+  // user: User;
 }

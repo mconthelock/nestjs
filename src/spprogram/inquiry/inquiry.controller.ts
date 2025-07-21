@@ -1,7 +1,13 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { InquiryService } from './inquiry.service';
+import { searchDto } from './dto/search.dto';
 
-@Controller('inquiry')
+@Controller('sp/inquiry')
 export class InquiryController {
-  constructor(private readonly inquiryService: InquiryService) {}
+  constructor(private readonly inq: InquiryService) {}
+
+  @Post('search')
+  async search(@Body() searchDto: searchDto) {
+    return await this.inq.search(searchDto);
+  }
 }

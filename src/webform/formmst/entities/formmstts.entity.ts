@@ -1,8 +1,8 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 import { Form } from './../../form/entities/form.entity';
 
-@Entity('FORMMST')
-export class Formmst {
+@Entity('FORMMSTTS')
+export class Formmstts {
   @PrimaryColumn()
   NNO: string;
 

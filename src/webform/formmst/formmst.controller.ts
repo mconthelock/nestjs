@@ -1,34 +1,34 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Req,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
+import { Request } from 'express';
 import { FormmstService } from './formmst.service';
-import { CreateFormmstDto } from './dto/create-formmst.dto';
-import { UpdateFormmstDto } from './dto/update-formmst.dto';
+import { SearchDto } from './dto/search.dto';
 
 @Controller('formmst')
 export class FormmstController {
   constructor(private readonly formmstService: FormmstService) {}
 
-  @Post()
-  create(@Body() createFormmstDto: CreateFormmstDto) {
-    return this.formmstService.create(createFormmstDto);
-  }
-
   @Get()
-  findAll() {
-    return this.formmstService.findAll();
+  getFormMasterAll(@Req() req: Request) {
+    return this.formmstService.getFormMasterAll(req.headers.host);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.formmstService.findOne(+id);
+  @Get(':vaname')
+  getFormMasterByVaname(@Param('vaname') vaname: string, @Req() req: Request) {
+    return this.formmstService.getFormMasterByVaname(vaname, req.headers.host);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFormmstDto: UpdateFormmstDto) {
-    return this.formmstService.update(+id, updateFormmstDto);
-  }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.formmstService.remove(+id);
+  @Post('getFormmst')
+  async getFormmst(@Body() searchDto: SearchDto, @Req() req: Request) {
+    return this.formmstService.getFormmst(searchDto, req.headers.host);
   }
 }

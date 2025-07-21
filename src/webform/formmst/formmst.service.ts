@@ -1,26 +1,60 @@
 import { Injectable } from '@nestjs/common';
-import { CreateFormmstDto } from './dto/create-formmst.dto';
-import { UpdateFormmstDto } from './dto/update-formmst.dto';
+import { Repository, DataSource } from 'typeorm';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { Formmst } from './entities/formmst.entity';
+import { Formmstts } from './entities/formmstts.entity';
+import { SearchDto } from './dto/search.dto';
+import { getSafeFields } from '../../utils/Fields';
+import { setRepo } from '../../utils/repo';
 
 @Injectable()
 export class FormmstService {
-  create(createFormmstDto: CreateFormmstDto) {
-    return 'This action adds a new formmst';
+  constructor(
+    @InjectRepository(Formmst, 'amecConnection')
+    private formmstRepo: Repository<Formmst>,
+    @InjectRepository(Formmstts, 'amecConnection')
+    private formmsttsRepo: Repository<Formmstts>,
+    @InjectDataSource('amecConnection')
+    private dataSource: DataSource,
+  ) {}
+
+  private formmst = this.dataSource
+    .getMetadata(Formmst)
+    .columns.map((c) => c.propertyName);
+  private allowFields = [...this.formmst];
+
+  getFormMasterAll(host: string) {
+    const repo = setRepo(this.formmstRepo, this.formmsttsRepo, host);
+    return repo.find();
   }
 
-  findAll() {
-    return `This action returns all formmst`;
+  getFormMasterByVaname(vaname: string, host: string) {
+    const repo = setRepo(this.formmstRepo, this.formmsttsRepo, host);
+    return repo.findOne({
+      where: { VANAME: vaname },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} formmst`;
-  }
+  getFormmst(searchDto: SearchDto, host: string) {
+    const repo = setRepo(this.formmstRepo, this.formmsttsRepo, host);
+    const { NNO, VORGNO, CYEAR, VANAME, fields = [] } = searchDto;
+    const query = repo.createQueryBuilder('A');
 
-  update(id: number, updateFormmstDto: UpdateFormmstDto) {
-    return `This action updates a #${id} formmst`;
-  }
+    if (NNO) query.andWhere('A.NNO = :NNO', { NNO });
+    if (VORGNO) query.andWhere('A.VORGNO = :VORGNO', { VORGNO });
+    if (CYEAR) query.andWhere('A.CYEAR = :CYEAR', { CYEAR });
+    if (VANAME) query.andWhere('A.VANAME = :VANAME', { VANAME });
 
-  remove(id: number) {
-    return `This action removes a #${id} formmst`;
+    let select = [];
+    if (fields.length > 0) {
+      select = getSafeFields(fields, this.allowFields);
+    } else {
+      select = this.allowFields;
+    }
+    query.select([]); // ล้าง select เดิมก่อน
+    select.forEach((f) => {
+      query.addSelect(`A.${f}`, f);
+    });
+    return query.getRawMany();
   }
 }

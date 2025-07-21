@@ -11,11 +11,14 @@ import { gpreportModule } from './gpreport/gpreport.module';
 import { AS400Module } from './as400/as400.module';
 import { WebformModule } from './webform/webform.module';
 import { HeaderModule } from './idtag/header/header.module';
-// import { SpModule } from './spprogram/sp.module';
+
+import { SpModule } from './spprogram/sp.module';
+import { MktModule } from './marketing/mkt.module';
 
 import { JobOrderModule } from './joborder/joborder.module';
 import { PisModule } from './pis/pis.module';
 import { ESCSModule } from './escs/escs.module';
+import { DetailModule } from './idtag/detail/detail.module';
 
 @Module({
   imports: [
@@ -29,15 +32,17 @@ import { ESCSModule } from './escs/escs.module';
     AmecMfgModule,
     DocinvModule,
     gpreportModule,
-    AS400Module,
+    //AS400Module,
     WebformModule,
     HeaderModule,
-    // SpModule,
+    SpModule,
+    MktModule,
 
     //JB 🤴
     JobOrderModule,
     PisModule,
     ESCSModule,
+    DetailModule,
   ],
 })
 export class AppModule {}

@@ -9,5 +9,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [TypeOrmModule.forFeature([Formmst, Formmstts], 'amecConnection')],
   controllers: [FormmstController],
   providers: [FormmstService],
+  exports: [FormmstService],
 })
 export class FormmstModule {}

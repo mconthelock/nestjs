@@ -3,7 +3,7 @@ import { Repository, DataSource } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Formmst } from './entities/formmst.entity';
 import { Formmstts } from './entities/formmstts.entity';
-import { SearchDto } from './dto/search.dto';
+import { SearchFormmstDto } from './dto/searchFormmst.dto';
 import { getSafeFields } from '../../utils/Fields';
 import { setRepo } from '../../utils/repo';
 
@@ -35,7 +35,7 @@ export class FormmstService {
     });
   }
 
-  getFormmst(searchDto: SearchDto, host: string) {
+  getFormmst(searchDto: SearchFormmstDto, host: string) {
     const repo = setRepo(this.formmstRepo, this.formmsttsRepo, host);
     const { NNO, VORGNO, CYEAR, VANAME, fields = [] } = searchDto;
     const query = repo.createQueryBuilder('A');

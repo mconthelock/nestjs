@@ -22,7 +22,7 @@ export class SetRequestDateController {
     try {
         // throw new Error('This is a test error'); // ทดสอบการโยนข้อผิดพลาด
       const result = await this.setRequestDateService.upsert(upsertDto);
-      result.record.DeadLinePUR = await this.amecCalendarService.addBusinessDays(result.record.JOP_MAR_INPUT_DATE, 7);
+      result.record.DeadLinePUR = await this.amecCalendarService.addWorkDays(result.record.JOP_MAR_INPUT_DATE, 7);
       return {
         message: 'Data saved successfully',
         data: result.record,

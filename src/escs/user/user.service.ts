@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository, DataSource } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { EscsUser } from './entities/user.entity';
-import { SearchDto } from './dto/search.dto';
+import { SearchEscsUserDto } from './dto/search-escs-user.dto';
 import { getSelectNestedFields, getSafeFields } from '../../utils/Fields';
 
 @Injectable()
@@ -68,7 +68,7 @@ export class UserService {
     });
   }
 
-  getUser(searchDto: SearchDto) {
+  getUser(searchDto: SearchEscsUserDto) {
     const { USR_ID, USR_NO, GRP_ID, USR_STATUS, SEC_ID, fields = [] } = searchDto;
     const query = this.dataSource.createQueryBuilder().from('ESCS_USERS','A');
 

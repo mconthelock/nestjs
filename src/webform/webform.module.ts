@@ -5,6 +5,7 @@ import { ISFormModule } from './isform/isform.module';
 import { FlowmstModule } from './flowmst/flowmst.module';
 import { FormmstModule } from './formmst/formmst.module';
 import { GpOtModule } from './gpform/gp-ot/gp-ot.module';
+import { QAFormModule } from './qaform/qaform.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { GpOtModule } from './gpform/gp-ot/gp-ot.module';
     FlowmstModule,
     FormmstModule,
     GpOtModule,
+    QAFormModule
   ],
 })
 export class WebformModule {}

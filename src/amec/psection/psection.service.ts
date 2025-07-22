@@ -4,7 +4,7 @@ import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Psection } from '../psection/entities/psection.entity';
 import { Pdepartment } from '../pdepartment/entities/pdepartment.entity';
 import { Pdivision } from '../pdivision/entities/pdivision.entity';
-import { SearchDto } from './dto/search.dto';
+import { SearchSectionDto } from './dto/search-section.dto';
 import { getSafeFields } from '../../utils/Fields';
 
 @Injectable()
@@ -44,7 +44,7 @@ export class PsectionService {
     });
   }
 
-  getSection(searchDto: SearchDto) {
+  getSection(searchDto: SearchSectionDto) {
     const { SSECCODE, SDEPCODE, SDIVCODE, fields = [] } = searchDto;
     const query = this.dataSource.createQueryBuilder().from('PDIVISION', 'A');
 

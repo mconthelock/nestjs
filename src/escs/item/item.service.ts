@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository, DataSource } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Item } from './entities/item.entity';
-import { SearchDto } from './dto/search.dto';
+import { SearchEscsItemDto } from './dto/search-escs-item.dto';
 
 @Injectable()
 export class ItemService {
@@ -28,7 +28,7 @@ export class ItemService {
     });
   }
 
-  getItem(searchDto: SearchDto) {
+  getItem(searchDto: SearchEscsItemDto) {
     const { IT_NO, IT_USERUPDATE, IT_STATUS, SEC_ID, IT_QCDATE, IT_MFGDATE } = searchDto;
     return this.itemRepo.find({
       where: [

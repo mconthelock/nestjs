@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository, DataSource } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Pdivision } from '../pdivision/entities/pdivision.entity';
-import { SearchDto } from './dto/search.dto';
+import { SearchDivisionDto } from './dto/search-division.dto';
 import { getSafeFields } from '../../utils/Fields';
 
 @Injectable()
@@ -36,7 +36,7 @@ export class PdivisionService {
     });
   }
 
-  getDivision(searchDto: SearchDto) {
+  getDivision(searchDto: SearchDivisionDto) {
     const { SDIVCODE, fields = [] } = searchDto;
     const query = this.dataSource.createQueryBuilder().from('PDIVISION', 'A');
 

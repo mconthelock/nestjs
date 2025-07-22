@@ -4,6 +4,9 @@ import { Repository } from 'typeorm';
 import { Form } from './entities/form.entity';
 import { Flow } from './../flow/entities/flow.entity';
 
+import { getFormnoDto } from 'src/webform/form/dto/get-formno.dto';
+import { FormmstService } from '../formmst/formmst.service';
+
 @Injectable()
 export class FormService {
   constructor(
@@ -12,6 +15,8 @@ export class FormService {
 
     @InjectRepository(Flow, 'amecConnection')
     private readonly flow: Repository<Flow>,
+
+    private readonly formmstService: FormmstService,
   ) {}
 
   findOne(fno, orgno, cyear, cyear2, nrunno) {
@@ -46,5 +51,16 @@ export class FormService {
 
   mine(empno) {
     return true;
+  }
+
+  async getFormno(dto: getFormnoDto, host: string): Promise<string> {
+    const form = await this.formmstService.getFormmst(dto, host);
+    console.log(form);
+    // เอาเลขปี 2 หลักสุดท้าย
+    const year2 = dto.CYEAR2.substring(2, 4); // ถ้า "2024" ได้ "24"
+
+    // เติมเลข running 6 หลัก (ถ้าเป็นเลข integer ให้แปลงเป็น string ก่อน)
+    const runNo = String(dto.NRUNNO).padStart(6, '0'); // เช่น 1 => "000001"
+    return `${form[0].VANAME}${year2}-${runNo}`;
   }
 }

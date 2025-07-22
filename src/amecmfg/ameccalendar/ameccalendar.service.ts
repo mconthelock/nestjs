@@ -21,7 +21,7 @@ export class AmeccalendarService {
     });
   }
 
-  async addBusinessDays(
+  async addWorkDays(
     startDate: number | string | Date,
     days: number,
   ): Promise<Number> {

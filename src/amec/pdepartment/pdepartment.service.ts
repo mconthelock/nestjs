@@ -3,7 +3,7 @@ import { Repository, DataSource } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Pdepartment } from '../pdepartment/entities/pdepartment.entity';
 import { Pdivision } from '../pdivision/entities/pdivision.entity';
-import { SearchDto } from './dto/search.dto';
+import { SearchDepartmentDto } from './dto/search-department.dto';
 import { getSafeFields } from '../../utils/Fields';
 
 @Injectable()
@@ -40,7 +40,7 @@ export class PdepartmentService {
     });
   }
 
-  getDepartment(searchDto: SearchDto) {
+  getDepartment(searchDto: SearchDepartmentDto) {
     const { SDEPCODE, SDIVCODE, fields = [] } = searchDto;
     const query = this.dataSource.createQueryBuilder().from('PDIVISION', 'A');
 

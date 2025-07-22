@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
-import { Form } from './../../form/entities/form.entity';
+import { Formts } from './../../form/entities/formts.entity';
 
 @Entity('FORMMSTTS')
 export class Formmstts {
@@ -45,11 +45,11 @@ export class Formmstts {
   @Column()
   CSTATUS: string;
 
-  @OneToOne(() => Form, (form) => form.formmst)
+  @OneToOne(() => Formts, (form) => form.formmst)
   @JoinColumn([
     { name: 'NNO', referencedColumnName: 'NFRMNO' },
     { name: 'VORGNO', referencedColumnName: 'VORGNO' },
     { name: 'CYEAR', referencedColumnName: 'CYEAR' },
   ])
-  form: Form;
+  form: Formts;
 }

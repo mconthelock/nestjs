@@ -68,7 +68,7 @@ export class FormController {
     return empno;
   }
 
-  @Post('getformno')
+  @Post('getFormno')
   @ApiOperation({
     summary: 'Get Formno',
   })
@@ -84,7 +84,7 @@ export class FormController {
     return this.formService.getFormno(dto, req.headers.host);
   }
 
-  
+
 
 
 }

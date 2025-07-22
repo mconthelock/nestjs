@@ -7,7 +7,7 @@ export class getExtDataDto {
   //   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  readonly NNO: number;
+  readonly NFRMNO: number;
 
   @ApiProperty({ example: '050601' })
   //   @IsOptional()
@@ -24,12 +24,13 @@ export class getExtDataDto {
   @IsString()
   readonly CYEAR2: string;
 
-  @ApiProperty({ example: 1 })
+  @ApiProperty({ example: 10 })
   //   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   readonly NRUNNO: number;
 
+  @ApiProperty({ example: '08375' })
   @IsString()
   readonly APV: string;
 }

@@ -11,6 +11,6 @@ export class ShipmentService {
   ) {}
 
   findAll() {
-    return this.ship.find();
+    return this.ship.find({ order: { SHIPMENT_VALUE: 'ASC' } });
   }
 }

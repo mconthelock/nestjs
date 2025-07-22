@@ -1,7 +1,12 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AgentService } from './agent.service';
 
-@Controller('agent')
+@Controller('mkt/agent')
 export class AgentController {
-  constructor(private readonly agentService: AgentService) {}
+  constructor(private readonly agent: AgentService) {}
+
+  @Get()
+  findAll() {
+    return this.agent.findAll();
+  }
 }

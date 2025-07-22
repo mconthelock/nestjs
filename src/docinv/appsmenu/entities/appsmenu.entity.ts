@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany, JoinColumn } from 'typeorm';
 import { Appsmenuuser } from '../../appsmenuusers/entities/appsmenuuser.entity';
 
 @Entity('APP_MENU')

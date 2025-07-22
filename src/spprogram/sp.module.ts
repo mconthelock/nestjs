@@ -11,6 +11,7 @@ import { CurrencyModule } from './currency/currency.module';
 import { RatioModule } from './ratio/ratio.module';
 import { ShipmentModule } from './shipment/shipment.module';
 import { InquiryModule } from './inquiry/inquiry.module';
+import { MethodModule } from './method/method.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { InquiryModule } from './inquiry/inquiry.module';
     RatioModule,
     ShipmentModule,
     InquiryModule,
+    MethodModule,
   ],
 })
 export class SpModule {}

@@ -9,4 +9,10 @@ export class ReasonService {
     @InjectRepository(Reason, 'amecConnection')
     private readonly reason: Repository<Reason>,
   ) {}
+
+  findAll() {
+    return this.reason.find({
+      order: { REASON_CODE: 'ASC', REASON_ID: 'ASC' },
+    });
+  }
 }

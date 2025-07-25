@@ -281,6 +281,19 @@ export class SetRequestDateService {
             },
           )
           .getRawMany();
+      } else if (!REVISION && MFGNO) {
+        latest = await this.setRequestDateRepository
+          .createQueryBuilder('A')
+          .select(
+            'MAX(A.JOP_REVISION) AS JOP_REVISION, A.JOP_MFGNO, A.JOP_PONO, A.JOP_LINENO',
+          )
+          .where('A.JOP_MFGNO = :mfgno AND A.JOP_PONO = :pono AND A.JOP_LINENO = :lineno', {
+            mfgno: MFGNO,
+            pono: PONO,
+            lineno: LINENO,
+          })
+          .groupBy('A.JOP_MFGNO, A.JOP_PONO, A.JOP_LINENO')
+          .getRawMany();
       } else {
         latest = [
           {

@@ -1,34 +1,28 @@
 import { Type } from 'class-transformer';
-import { IsOptional, IsString, IsNumber, IsDateString } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsDateString,
+  IsNotEmpty,
+} from 'class-validator';
 export class UpsertSetRequestDateDto {
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  REVISION: number;
-
-  @IsOptional()
+    
+  @IsNotEmpty()
   @IsString()
   MFGNO: string;
 
-  @IsOptional()
-  @IsString()
-  RQS: string;
-    
-  @IsOptional()
+  @IsNotEmpty()
   @Type(() => Number)
   @IsNumber()
   PONO: number;
 
-  @IsOptional()
+  @IsNotEmpty()
   @Type(() => Number)
   @IsNumber()
   LINENO: number;
 
-  @IsOptional()
-  @IsString()
-  PUR_STATUS: string;
-
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   REQUESTDATE: string;
 
@@ -36,53 +30,7 @@ export class UpsertSetRequestDateDto {
   @IsString()
   REMARK: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   ACTION_BY: string;
-
-  @IsOptional()
-  @IsString()
-  ACTION_DATE: string;
-
-  //   @IsOptional()
-  //   @Type(() => Number)
-  //   @IsNumber()
-  //   JOP_PONO: number;
-
-  //   @IsOptional()
-  //   @Type(() => Number)
-  //   @IsNumber()
-  //   JOP_LINENO: number;
-
-  //   @IsOptional()
-  //   @IsString()
-  //   JOP_PUR_STATUS: string;
-
-  //   @IsOptional()
-  //   @IsString()
-  //   JOP_REQUESTDATE: string;
-
-  //   //   @IsOptional()
-  //   //   @IsString()
-  //   //   JOP_USERCREATE: string;
-
-  //   //   @IsOptional()
-  //   //   @IsDateString()
-  //   //   JOP_CREATEDATE: string;
-
-  //   //   @IsOptional()
-  //   //   @IsString()
-  //   //   JOP_USERUPDATE: string;
-
-  //   //   @IsOptional()
-  //   //   @IsDateString()
-  //   //   JOP_UPDATEDATE: string;
-
-  //   @IsOptional()
-  //   @IsString()
-  //   ACTION_BY: string;
-
-  //   @IsOptional()
-  //   @IsString()
-  //   ACTION_DATE: string;
 }

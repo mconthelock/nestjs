@@ -5,7 +5,7 @@ import { ItemarrnglstService } from './itemarrnglst.service';
 export class ItemarrnglstController {
   constructor(private readonly items: ItemarrnglstService) {}
 
-  @Get(':ordno/:item')
+  @Get('item/:ordno/:item')
   async findOrders(@Param('ordno') ordno: string, @Param('item') item: string) {
     const data = await this.items.findOrders(ordno, item);
     const rows = [];

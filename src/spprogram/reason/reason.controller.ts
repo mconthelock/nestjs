@@ -1,15 +1,12 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ReasonService } from './reason.service';
 
-@Controller('reason')
+@Controller('sp/reason')
 export class ReasonController {
-  constructor(private readonly reasonService: ReasonService) {}
+  constructor(private readonly reason: ReasonService) {}
+
+  @Get()
+  findAll() {
+    return this.reason.findAll();
+  }
 }

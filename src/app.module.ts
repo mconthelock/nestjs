@@ -19,6 +19,7 @@ import { JobOrderModule } from './joborder/joborder.module';
 import { PisModule } from './pis/pis.module';
 import { ESCSModule } from './escs/escs.module';
 import { DetailModule } from './idtag/detail/detail.module';
+import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { DetailModule } from './idtag/detail/detail.module';
     PisModule,
     ESCSModule,
     DetailModule,
+    ItemarrnglstModule,
   ],
 })
 export class AppModule {}

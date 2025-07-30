@@ -33,12 +33,11 @@ import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
     AmecMfgModule,
     DocinvModule,
     gpreportModule,
-    //AS400Module,
     WebformModule,
     HeaderModule,
     SpModule,
     MktModule,
-
+    AS400Module,
     //JB 🤴
     JobOrderModule,
     PisModule,

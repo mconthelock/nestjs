@@ -1,11 +1,5 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  OneToOne,
-  JoinColumn,
-  OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryColumn, JoinColumn, Column, ManyToOne } from 'typeorm';
+import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 
 @Entity('SP_INQUIRY_GROUP')
 export class InquiryGroup {
@@ -53,4 +47,8 @@ export class InquiryGroup {
 
   @Column()
   IS_MAIL: string;
+
+  @ManyToOne(() => Inquiry, (inquiry) => inquiry.inqgroup)
+  @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'INQ_ID' })
+  inqs: Inquiry;
 }

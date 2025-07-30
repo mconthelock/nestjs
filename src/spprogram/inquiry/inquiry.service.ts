@@ -1,8 +1,10 @@
-import { Inquiry } from './entities/inquiry.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { searchDto } from './dto/search.dto';
+import { createDto } from './dto/create-inquiry.dto';
+
+import { Inquiry } from './entities/inquiry.entity';
 
 @Injectable()
 export class InquiryService {
@@ -18,6 +20,13 @@ export class InquiryService {
         ...searchDto,
         ...q,
       },
+      order: { INQ_ID: 'DESC' },
+      relations: ['inqgroup'],
     });
+  }
+
+  async create(createDto: createDto) {
+    const inquiry = this.inq.create(createDto);
+    return await this.inq.save(inquiry);
   }
 }

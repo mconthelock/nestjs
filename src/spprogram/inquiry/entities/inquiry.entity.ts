@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, JoinColumn, OneToMany } from 'typeorm';
+import { InquiryGroup } from '../../inquiry-group/entities/inquiry-group.entity';
 
 @Entity('SP_INQUIRY')
 export class Inquiry {
@@ -175,6 +176,7 @@ export class Inquiry {
 
   // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
   // ตัวอย่าง:
-  // @ManyToOne(() => User, user => user.posts)
-  // user: User;
+  @OneToMany(() => InquiryGroup, (group) => group.inqs)
+  @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'INQ_ID' })
+  inqgroup: InquiryGroup;
 }

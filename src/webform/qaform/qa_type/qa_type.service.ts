@@ -1,26 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { CreateQaTypeDto } from './dto/create-qa_type.dto';
-import { UpdateQaTypeDto } from './dto/update-qa_type.dto';
+import { Repository, DataSource } from 'typeorm';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { QaType } from './entities/qa_type.entity';
 
 @Injectable()
 export class QaTypeService {
-  create(createQaTypeDto: CreateQaTypeDto) {
-    return 'This action adds a new qaType';
+  constructor(
+    @InjectRepository(QaType, 'webformConnection')
+    private qatypeRepo: Repository<QaType>,
+    @InjectDataSource('webformConnection')
+    private dataSource: DataSource,
+  ) {}
+
+  getQaTypeAll() {
+    return this.qatypeRepo.find();
   }
 
-  findAll() {
-    return `This action returns all qaType`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} qaType`;
-  }
-
-  update(id: number, updateQaTypeDto: UpdateQaTypeDto) {
-    return `This action updates a #${id} qaType`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} qaType`;
+  getQaTypeByCode(code: string) {
+    return this.qatypeRepo.findOne({ where: { QAT_CODE: code } });
   }
 }

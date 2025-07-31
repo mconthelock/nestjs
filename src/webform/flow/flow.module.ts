@@ -9,5 +9,6 @@ import { Flowts } from './entities/flowts.entity';
   imports: [TypeOrmModule.forFeature([Flow, Flowts], 'amecConnection')],
   controllers: [FlowController],
   providers: [FlowService],
+  exports: [FlowService],
 })
 export class FlowModule {}

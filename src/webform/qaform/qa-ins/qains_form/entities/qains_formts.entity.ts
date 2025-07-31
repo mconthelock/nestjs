@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 
 @Entity('QAINS_FORMTS')
-export class QainsForm {
+export class QainsFormts {
     @PrimaryColumn()
     NFRMNO: number;
 

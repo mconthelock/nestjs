@@ -5,7 +5,9 @@ import {
   NotFoundException,
   Post,
   Body,
+  Req
 } from '@nestjs/common';
+import { Request } from 'express';
 import { UsersService } from './users.service';
 import { searchDto } from './dto/search-user.dto';
 
@@ -14,8 +16,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get(':id')
-  findEmp(@Param('id') id: string) {
-    return this.usersService.findEmp(id);
+  findEmp(@Param('id') id: string, @Req() req: Request) {
+    return this.usersService.findEmp(id, req.headers.host);
   }
 
   @Get('image/:id')
@@ -31,8 +33,8 @@ export class UsersController {
   }
 
   @Post('search')
-  async search(@Body() searchDto: searchDto) {
-    const data = await this.usersService.search();
+  async search(@Body() searchDto: searchDto, @Req() req: Request) {
+    const data = await this.usersService.search(req.headers.host);
     const filtered = data.filter((val) => {
       return Object.entries(searchDto).every(([key, value]) => {
         return val[key] == value;

@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity('QAINS_OPERATOR_AUDITORTS')
-export class QainsOperatorAuditor {
+export class QainsOperatorAuditorts {
     @PrimaryColumn()
     CYEAR2:string;
 

@@ -7,7 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Flowts } from '../../flow/entities/flowts.entity';
-import { User } from '../../../amec/users/entities/user.entity';
+import { Userts } from '../../../amec/users/entities/userts.entity';
 import { Formmstts } from '../../formmst/entities/formmstts.entity';
 
 //IS Form
@@ -61,9 +61,9 @@ export class Formts {
   @Column()
   VREMOTE: string;
 
-  @OneToOne(() => User, (user) => user.SEMPNO)
+  @OneToOne(() => Userts, (user) => user.SEMPNO)
   @JoinColumn({ name: 'VINPUTER', referencedColumnName: 'SEMPNO' })
-  creator: User;
+  creator: Userts;
 
   @OneToOne(() => Formmstts, (mst) => mst.form)
   @JoinColumn([

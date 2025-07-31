@@ -11,16 +11,15 @@ import {
 import { Request } from 'express';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { FormService } from './form.service';
-import { FormmstService } from '../formmst/formmst.service';
 import { getFormnoDto } from './dto/get-formno.dto';
+import { CreateFormDto } from './dto/create-form.dto';
+import { UpdateFormDto } from './dto/update-form.dto';
+import { getClientIP } from 'src/common/helpers/ip';
 
 @ApiTags('Form')
 @Controller('form')
 export class FormController {
-  constructor(
-    private readonly formService: FormService,
-    private readonly formmstService: FormmstService,
-  ) {}
+  constructor(private readonly formService: FormService) {}
 
   @Get(':fno/:orgno/:cyear/:cyear2/:nrunno')
   @ApiOperation({
@@ -73,18 +72,51 @@ export class FormController {
     summary: 'Get Formno',
   })
   async getFormno(@Body() dto: getFormnoDto, @Req() req: Request) {
-    // const form = await this.formmstService.getFormmst(dto, req.headers.host);
-    // console.log(form);
-    // // เอาเลขปี 2 หลักสุดท้าย
-    // const year2 = dto.CYEAR2.substring(2, 4); // ถ้า "2024" ได้ "24"
-
-    // // เติมเลข running 6 หลัก (ถ้าเป็นเลข integer ให้แปลงเป็น string ก่อน)
-    // const runNo = String(dto.NRUNNO).padStart(6, '0'); // เช่น 1 => "000001"
-    // return `${form[0].VANAME}${year2}-${runNo}`;
     return this.formService.getFormno(dto, req.headers.host);
   }
 
+  @Post('createForm')
+  @ApiOperation({
+    summary: 'Create Form',
+  })
+  create(@Body() dto: CreateFormDto, @Req() req: Request) {
+    const ip = getClientIP(req);
+    return this.formService.create(dto, req.headers.host, ip);
+  }
 
+  @Patch('updateForm')
+  async updateForm(
+    @Body() dto: UpdateFormDto,
+    @Req() req: Request,
+  ): Promise<{ message: string; status: boolean }> {
+    try {
+      const result = await this.formService.updateForm(dto, req.headers.host);
+      return {
+        message: result
+          ? 'Form updated successfully'
+          : 'Failed to update form',
+        status: result,
+      };
+    } catch (error) {
+      throw error; // โยนข้อผิดพลาดกลับไปให้ NestJS จัดการ
+    }
+  }
 
-
+  @Delete('deleteForm')
+  async deleteForm(
+    @Body() dto: UpdateFormDto,
+    @Req() req: Request,
+  ): Promise<{ message: string; status: boolean }> {
+    try {
+      const result = await this.formService.deleteFlowAndForm(dto, req.headers.host);
+      return {
+        message: result
+          ? 'Form deleted successfully'
+          : 'Failed to delete form',
+        status: result,
+      };
+    } catch (error) {
+      throw error; // โยนข้อผิดพลาดกลับไปให้ NestJS จัดการ
+    }
+  }
 }

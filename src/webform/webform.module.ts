@@ -6,6 +6,10 @@ import { FlowmstModule } from './flowmst/flowmst.module';
 import { FormmstModule } from './formmst/formmst.module';
 import { GpOtModule } from './gpform/gp-ot/gp-ot.module';
 import { QAFormModule } from './qaform/qaform.module';
+import { OrgposModule } from './orgpos/orgpos.module';
+import { OrgTreeModule } from './org-tree/org-tree.module';
+import { SequenceOrgModule } from './sequence-org/sequence-org.module';
+import { RepModule } from './rep/rep.module';
 
 @Module({
   imports: [
@@ -15,7 +19,11 @@ import { QAFormModule } from './qaform/qaform.module';
     FlowmstModule,
     FormmstModule,
     GpOtModule,
-    QAFormModule
+    QAFormModule,
+    OrgposModule,
+    OrgTreeModule,
+    SequenceOrgModule,
+    RepModule
   ],
 })
 export class WebformModule {}

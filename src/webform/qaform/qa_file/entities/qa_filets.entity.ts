@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity('QA_FILETS')
-export class QaFile {
+export class QaFilets {
   @PrimaryColumn()
   NFRMNO: number;
 

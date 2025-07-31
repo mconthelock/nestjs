@@ -1,34 +1,43 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Req
+} from '@nestjs/common';
+import { Request } from 'express';
 import { FlowmstService } from './flowmst.service';
-import { CreateFlowmstDto } from './dto/create-flowmst.dto';
-import { UpdateFlowmstDto } from './dto/update-flowmst.dto';
+import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 
+@ApiTags('Flow master')
 @Controller('flowmst')
 export class FlowmstController {
   constructor(private readonly flowmstService: FlowmstService) {}
 
-  @Post()
-  create(@Body() createFlowmstDto: CreateFlowmstDto) {
-    return this.flowmstService.create(createFlowmstDto);
-  }
-
   @Get()
-  findAll() {
-    return this.flowmstService.findAll();
+  @ApiOperation({
+    summary: 'Get all flow masters',
+  })
+  getFlowMasterAll(@Req() req: Request) {
+    return this.flowmstService.getFlowMasterAll(req.headers.host);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.flowmstService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFlowmstDto: UpdateFlowmstDto) {
-    return this.flowmstService.update(+id, updateFlowmstDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.flowmstService.remove(+id);
+  @Get(':NFRMNO/:VORGNO/:CYEAR')
+  @ApiOperation({
+    summary: 'Get flow master by NFRMNO, VORGNO, and CYEAR',
+  })
+  @ApiParam({ name: 'NFRMNO', example: 13, required: true })
+  @ApiParam({ name: 'VORGNO', example: '000101', required: true })
+  @ApiParam({ name: 'CYEAR', example: '25', required: true })
+  getFlowMaster(
+    @Param('NFRMNO') NFRMNO: number,
+    @Param('VORGNO') VORGNO: string,
+    @Param('CYEAR') CYEAR: string,
+    @Req() req: Request
+  ) {
+    return this.flowmstService.getFlowMaster(NFRMNO, VORGNO, CYEAR, req.headers.host);
   }
 }

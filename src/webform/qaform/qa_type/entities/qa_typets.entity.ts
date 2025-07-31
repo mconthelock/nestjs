@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity('QA_TYPETS')
-export class QaType {
+export class QaTypets {
   @PrimaryColumn()
   QAT_CODE: string;
 

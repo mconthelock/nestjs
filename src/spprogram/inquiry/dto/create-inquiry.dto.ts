@@ -93,5 +93,5 @@ export class createDto {
 
   @IsString()
   @IsOptional()
-  INQ_PKC;
+  INQ_PKC: string;
 }

@@ -1,10 +1,10 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
+import { Inquiry } from './entities/inquiry.entity';
+
 import { searchDto } from './dto/search.dto';
 import { createDto } from './dto/create-inquiry.dto';
-
-import { Inquiry } from './entities/inquiry.entity';
 
 @Injectable()
 export class InquiryService {
@@ -13,7 +13,7 @@ export class InquiryService {
     private readonly inq: Repository<Inquiry>,
   ) {}
 
-  search(searchDto: searchDto) {
+  async search(searchDto: searchDto) {
     const q = { INQ_LATEST: 1 };
     return this.inq.find({
       where: {
@@ -27,6 +27,9 @@ export class InquiryService {
 
   async create(createDto: createDto) {
     const inquiry = this.inq.create(createDto);
-    return await this.inq.save(inquiry);
+    const data = await this.inq.save(inquiry);
+    return this.inq.findOne({
+      where: { INQ_NO: data.INQ_NO, INQ_LATEST: 1 },
+    });
   }
 }

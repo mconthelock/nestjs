@@ -10,16 +10,16 @@ import {
 @Entity('SP_INQUIRY_DETAIL')
 export class InquiryDetail {
   @PrimaryColumn()
-  INQD_ID: string;
+  INQD_ID: number;
 
   @Column()
-  INQG_GROUP: string;
+  INQG_GROUP: number;
 
   @Column()
-  INQD_SEQ: string;
+  INQD_SEQ: number;
 
   @Column()
-  INQD_RUNNO: string;
+  INQD_RUNNO: number;
 
   @Column()
   INQD_MFGORDER: string;
@@ -40,7 +40,7 @@ export class InquiryDetail {
   INQD_VARIABLE: string;
 
   @Column()
-  INQD_QTY: string;
+  INQD_QTY: number;
 
   @Column()
   INQD_UM: string;
@@ -49,25 +49,25 @@ export class InquiryDetail {
   INQD_SUPPLIER: string;
 
   @Column()
-  INQD_SENDPART: string;
+  INQD_SENDPART: number;
 
   @Column()
-  INQD_UNREPLY: string;
+  INQD_UNREPLY: number;
 
   @Column()
-  INQD_FC_COST: string;
+  INQD_FC_COST: number;
 
   @Column()
-  INQD_TC_COST: string;
+  INQD_TC_COST: number;
 
   @Column()
-  INQD_UNIT_PRICE: string;
+  INQD_UNIT_PRICE: number;
 
   @Column()
-  INQD_FC_BASE: string;
+  INQD_FC_BASE: number;
 
   @Column()
-  INQD_TC_BASE: string;
+  INQD_TC_BASE: number;
 
   @Column()
   INQD_MAR_REMARK: string;
@@ -79,7 +79,7 @@ export class InquiryDetail {
   INQD_FIN_REMARK: string;
 
   @Column()
-  INQD_LATEST: string;
+  INQD_LATEST: number;
 
   @Column()
   INQD_OWNER: string;
@@ -106,10 +106,10 @@ export class InquiryDetail {
   INQD_OWNER_GROUP: string;
 
   @Column()
-  ITEMID: string;
+  ITEMID: number;
 
   @Column()
-  INQID: string;
+  INQID: number;
 
   @Column()
   TEST_FLAG: string;
@@ -121,11 +121,11 @@ export class InquiryDetail {
   AUTO_ADD: string;
 
   @Column()
-  INQD_PREV: string;
+  INQD_PREV: number;
 
   @Column()
   UPDATE_CODE: string;
 
   @Column()
-  INQD_EXRATE: string;
+  INQD_EXRATE: number;
 }

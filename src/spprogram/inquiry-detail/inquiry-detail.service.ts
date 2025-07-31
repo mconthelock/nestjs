@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InquiryDetail } from './entities/inquiry-detail.entity';
+import { createDto } from './dto/create.dto';
 
 @Injectable()
 export class InquiryDetailService {
@@ -10,7 +11,8 @@ export class InquiryDetailService {
     private readonly detail: Repository<InquiryDetail>,
   ) {}
 
-  findDetail(id) {
-    return this.detail.find({ where: { INQD_ID: id } });
+  create(createDto: createDto) {
+    const inquiryDetail = this.detail.create(createDto);
+    return this.detail.save(inquiryDetail);
   }
 }

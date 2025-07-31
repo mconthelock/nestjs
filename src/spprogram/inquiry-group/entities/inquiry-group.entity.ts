@@ -4,13 +4,13 @@ import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 @Entity('SP_INQUIRY_GROUP')
 export class InquiryGroup {
   @PrimaryColumn()
-  INQG_ID: string;
+  INQG_ID: number;
 
   @Column()
-  INQ_ID: string;
+  INQ_ID: number;
 
   @Column()
-  INQG_GROUP: string;
+  INQG_GROUP: number;
 
   @Column()
   INQG_REV: string;
@@ -28,22 +28,22 @@ export class InquiryGroup {
   INQG_CLASS: string;
 
   @Column()
-  INQG_ASG_DATE: string;
+  INQG_ASG_DATE: Date;
 
   @Column()
-  INQG_DES_DATE: string;
+  INQG_DES_DATE: Date;
 
   @Column()
-  INQG_CHK_DATE: string;
+  INQG_CHK_DATE: Date;
 
   @Column()
   INQG_DES_REASON: string;
 
   @Column()
-  INQG_STATUS: string;
+  INQG_STATUS: number;
 
   @Column()
-  INQG_LATEST: string;
+  INQG_LATEST: number;
 
   @Column()
   IS_MAIL: string;

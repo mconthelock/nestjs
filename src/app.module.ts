@@ -21,30 +21,30 @@ import { ESCSModule } from './escs/escs.module';
 import { DetailModule } from './idtag/detail/detail.module';
 import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync(amecConfig),
+    // TypeOrmModule.forRootAsync(webformConfig),
     //BB8 💣
-    AuthModule,
-    AmecModule,
-    AmecMfgModule,
-    DocinvModule,
-    gpreportModule,
-    WebformModule,
-    HeaderModule,
+    // AuthModule,
+    // AmecModule,
+    // AmecMfgModule,
+    // DocinvModule,
+    // gpreportModule,
+    // WebformModule,
+    // HeaderModule,
     SpModule,
     MktModule,
-    AS400Module,
+    // AS400Module,
     //JB 🤴
-    JobOrderModule,
-    PisModule,
-    ESCSModule,
-    DetailModule,
-    ItemarrnglstModule,
+    // JobOrderModule,
+    // PisModule,
+    // ESCSModule,
+    // DetailModule,
+    // ItemarrnglstModule,
   ],
 })
 export class AppModule {}

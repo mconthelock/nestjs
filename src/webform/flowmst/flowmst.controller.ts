@@ -21,8 +21,8 @@ export class FlowmstController {
   @ApiOperation({
     summary: 'Get all flow masters',
   })
-  getFlowMasterAll(@Req() req: Request) {
-    return this.flowmstService.getFlowMasterAll(req.headers.host);
+  getFlowMasterAll() {
+    return this.flowmstService.getFlowMasterAll();
   }
 
   @Get(':NFRMNO/:VORGNO/:CYEAR')
@@ -35,9 +35,8 @@ export class FlowmstController {
   getFlowMaster(
     @Param('NFRMNO') NFRMNO: number,
     @Param('VORGNO') VORGNO: string,
-    @Param('CYEAR') CYEAR: string,
-    @Req() req: Request
+    @Param('CYEAR') CYEAR: string
   ) {
-    return this.flowmstService.getFlowMaster(NFRMNO, VORGNO, CYEAR, req.headers.host);
+    return this.flowmstService.getFlowMaster(NFRMNO, VORGNO, CYEAR);
   }
 }

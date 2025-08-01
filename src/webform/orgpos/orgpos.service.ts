@@ -9,9 +9,9 @@ import { Orgpos } from './entities/orgpos.entity';
 @Injectable()
 export class OrgposService {
   constructor(
-    @InjectRepository(Orgpos, 'webformConnection')
+    @InjectRepository(Orgpos, 'amecConnection')
     private readonly orgpos: Repository<Orgpos>,
-    @InjectDataSource('webformConnection')
+    @InjectDataSource('amecConnection')
     private dataSource: DataSource,
   ) {}
   create(createOrgpoDto: CreateOrgpoDto) {

@@ -16,8 +16,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get(':id')
-  findEmp(@Param('id') id: string, @Req() req: Request) {
-    return this.usersService.findEmp(id, req.headers.host);
+  findEmp(@Param('id') id: string) {
+    return this.usersService.findEmp(id);
   }
 
   @Get('image/:id')
@@ -33,8 +33,8 @@ export class UsersController {
   }
 
   @Post('search')
-  async search(@Body() searchDto: searchDto, @Req() req: Request) {
-    const data = await this.usersService.search(req.headers.host);
+  async search(@Body() searchDto: searchDto) {
+    const data = await this.usersService.search();
     const filtered = data.filter((val) => {
       return Object.entries(searchDto).every(([key, value]) => {
         return val[key] == value;

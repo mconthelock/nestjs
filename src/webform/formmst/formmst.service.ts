@@ -2,18 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Repository, DataSource } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Formmst } from './entities/formmst.entity';
-import { Formmstts } from './entities/formmstts.entity';
 import { SearchFormmstDto } from './dto/searchFormmst.dto';
 import { getSafeFields } from '../../utils/Fields';
-import { setRepo } from '../../utils/repo';
 
 @Injectable()
 export class FormmstService {
   constructor(
     @InjectRepository(Formmst, 'amecConnection')
     private formmstRepo: Repository<Formmst>,
-    @InjectRepository(Formmstts, 'amecConnection')
-    private formmsttsRepo: Repository<Formmstts>,
     @InjectDataSource('amecConnection')
     private dataSource: DataSource,
   ) {}
@@ -23,22 +19,19 @@ export class FormmstService {
     .columns.map((c) => c.propertyName);
   private allowFields = [...this.formmst];
 
-  getFormMasterAll(host: string) {
-    const repo = setRepo(this.formmstRepo, this.formmsttsRepo, host);
-    return repo.find();
+  getFormMasterAll() {
+    return this.formmstRepo.find();
   }
 
-  getFormMasterByVaname(vaname: string, host: string) {
-    const repo = setRepo(this.formmstRepo, this.formmsttsRepo, host);
-    return repo.findOne({
+  getFormMasterByVaname(vaname: string) {
+    return this.formmstRepo.findOne({
       where: { VANAME: vaname },
     });
   }
 
-  getFormmst(searchDto: SearchFormmstDto, host: string) {
-    const repo = setRepo(this.formmstRepo, this.formmsttsRepo, host);
+  getFormmst(searchDto: SearchFormmstDto) {
     const { NNO, VORGNO, CYEAR, VANAME, fields = [] } = searchDto;
-    const query = repo.createQueryBuilder('A');
+    const query = this.formmstRepo.createQueryBuilder('A');
 
     if (NNO) query.andWhere('A.NNO = :NNO', { NNO });
     if (VORGNO) query.andWhere('A.VORGNO = :VORGNO', { VORGNO });

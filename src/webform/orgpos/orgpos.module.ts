@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Orgpos } from './entities/orgpos.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Orgpos], 'webformConnection')],
+  imports: [TypeOrmModule.forFeature([Orgpos], 'amecConnection')],
   controllers: [OrgposController],
   providers: [OrgposService],
   exports: [OrgposService],

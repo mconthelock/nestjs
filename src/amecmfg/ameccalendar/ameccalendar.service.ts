@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, Between, DataSource } from 'typeorm';
-
 import { Ameccalendar } from './entities/ameccalendar.entity';
-import { parse } from 'path';
 
 @Injectable()
 export class AmeccalendarService {

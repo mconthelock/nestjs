@@ -9,10 +9,10 @@ import { Repository, DataSource } from 'typeorm';
 @Injectable()
 export class RepService {
   constructor(
-    @InjectRepository(Rep, 'webformConnection')
+    @InjectRepository(Rep, 'amecConnection')
     private readonly repRepo: Repository<Rep>,
 
-    @InjectDataSource('webformConnection')
+    @InjectDataSource('amecConnection')
     private dataSource: DataSource,
   ) {}
   create(createRepDto: CreateRepDto) {

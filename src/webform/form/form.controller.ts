@@ -71,8 +71,8 @@ export class FormController {
   @ApiOperation({
     summary: 'Get Formno',
   })
-  async getFormno(@Body() dto: getFormnoDto, @Req() req: Request) {
-    return this.formService.getFormno(dto, req.headers.host);
+  async getFormno(@Body() dto: getFormnoDto) {
+    return this.formService.getFormno(dto);
   }
 
   @Post('createForm')
@@ -81,16 +81,15 @@ export class FormController {
   })
   create(@Body() dto: CreateFormDto, @Req() req: Request) {
     const ip = getClientIP(req);
-    return this.formService.create(dto, req.headers.host, ip);
+    return this.formService.create(dto, ip);
   }
 
   @Patch('updateForm')
   async updateForm(
-    @Body() dto: UpdateFormDto,
-    @Req() req: Request,
+    @Body() dto: UpdateFormDto
   ): Promise<{ message: string; status: boolean }> {
     try {
-      const result = await this.formService.updateForm(dto, req.headers.host);
+      const result = await this.formService.updateForm(dto);
       return {
         message: result
           ? 'Form updated successfully'
@@ -104,11 +103,10 @@ export class FormController {
 
   @Delete('deleteForm')
   async deleteForm(
-    @Body() dto: UpdateFormDto,
-    @Req() req: Request,
+    @Body() dto: UpdateFormDto
   ): Promise<{ message: string; status: boolean }> {
     try {
-      const result = await this.formService.deleteFlowAndForm(dto, req.headers.host);
+      const result = await this.formService.deleteFlowAndForm(dto);
       return {
         message: result
           ? 'Form deleted successfully'

@@ -3,46 +3,46 @@ import { Entity, PrimaryColumn, Column } from 'typeorm';
 @Entity('FLOWMST')
 export class Flowmst {
   @PrimaryColumn()
-  NFRMNO: number
+  NFRMNO: number;
   
   @PrimaryColumn()
-  VORGNO: string
+  VORGNO: string;
   
   @PrimaryColumn()
-  CYEAR: string
+  CYEAR: string;
   
   @PrimaryColumn()
-  CSTEPNO: string
+  CSTEPNO: string;
   
   @PrimaryColumn()
-  CSTEPNEXTNO: string
+  CSTEPNEXTNO: string;
   
   @Column()
-  VPOSNO: string
+  VPOSNO: string;
   
   @PrimaryColumn()
-  VAPVNO: string
+  VAPVNO: string;
   
   @Column()
-  VAPVORGNO: string
+  VAPVORGNO: string;
   
   @Column()
-  VURL: string
+  VURL: string;
   
   @Column({default: '0'})
-  CSTART: string
+  CSTART: string;
   
   @Column()
-  CTYPE: string
+  CTYPE: string;
   
   @Column()
-  CEXTDATA: string
+  CEXTDATA: string;
   
   @Column({default: '1'})
-  CAPVTYPE: string
+  CAPVTYPE: string;
   
   @Column({default: '1'})
-  CREJTYPE: string
+  CREJTYPE: string;
   
   @Column({default: '0'})
   CAPPLYALL: string;

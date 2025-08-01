@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { Form } from './entities/form.entity';
-import { Formts } from './entities/formts.entity';
 import { Flow } from './../flow/entities/flow.entity';
 
 import { getFormnoDto } from 'src/webform/form/dto/get-formno.dto';
@@ -10,7 +9,6 @@ import { FormmstService } from '../formmst/formmst.service';
 
 import { CreateFormDto } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
-import { setRepo } from 'src/utils/repo';
 
 import { FlowmstService } from 'src/webform/flowmst/flowmst.service';
 import { UsersService } from 'src/amec/users/users.service';
@@ -25,8 +23,6 @@ export class FormService {
   constructor(
     @InjectRepository(Form, 'amecConnection')
     private readonly form: Repository<Form>,
-    @InjectRepository(Formts, 'amecConnection')
-    private readonly formts: Repository<Formts>,
 
     @InjectRepository(Flow, 'amecConnection')
     private readonly flow: Repository<Flow>,
@@ -105,8 +101,8 @@ export class FormService {
     return true;
   }
 
-  async getFormno(dto: getFormnoDto, host: string): Promise<string> {
-    const form = await this.formmstService.getFormmst(dto, host);
+  async getFormno(dto: getFormnoDto): Promise<string> {
+    const form = await this.formmstService.getFormmst(dto);
     console.log(form);
     // เอาเลขปี 2 หลักสุดท้าย
     const year2 = dto.CYEAR2.substring(2, 4); // ถ้า "2024" ได้ "24"
@@ -116,15 +112,13 @@ export class FormService {
     return `${form[0].VANAME}${year2}-${runNo}`;
   }
 
-  async create(dto: CreateFormDto, host: string, ip: string) {
+  async create(dto: CreateFormDto, ip: string) {
     this.queryRunner = this.dataSource.createQueryRunner();
     try {
       await this.queryRunner.connect();
       await this.queryRunner.startTransaction();
 
       this.ip = ip;
-      this.host = host;
-      this.repo = setRepo(this.form, this.formts, host);
       this.empno = dto.REQBY;
       this.inputempno = dto.INPUTBY;
       this.remark = dto.REMARK;
@@ -145,7 +139,6 @@ export class FormService {
           this.nfrmno,
           this.vorgno,
           this.cyear,
-          this.host,
         );
         console.log('flowMaster : ', flowMaster);
         await this.setOrganize();
@@ -166,7 +159,7 @@ export class FormService {
               this.CSTEPSTDX--;
               await this.getRepresent(row.VAPVNO);
               const flow = this.setFlow(row);
-              await this.flowService.insertFlow(flow, this.host, this.queryRunner);
+              await this.flowService.insertFlow(flow, this.queryRunner);
               break;
             default:
               break;
@@ -192,7 +185,6 @@ export class FormService {
 
         const first = await this.flowService.getFlow(
           this.query,
-          this.host,
           this.queryRunner,
         );
         console.log('first : ', first);
@@ -205,7 +197,6 @@ export class FormService {
         this.query.CSTEPST = '0';
         const notuse = await this.flowService.getFlow(
           this.query,
-          this.host,
           this.queryRunner,
         );
         for (const row of notuse) {
@@ -264,7 +255,7 @@ export class FormService {
   }
 
   getFormNextRunNo() {
-    return this.repo.find({
+    return this.form.find({
       where: this.query,
       order: {
         NRUNNO: 'DESC',
@@ -281,7 +272,7 @@ export class FormService {
       VORGNO: this.vorgno,
       CYEAR: this.cyear,
     };
-    const formmst = await this.formmstService.getFormmst(condition, this.host);
+    const formmst = await this.formmstService.getFormmst(condition);
     // console.log('formmst : ', formmst);
 
     const today = new Date();
@@ -312,7 +303,7 @@ export class FormService {
   async insertForm(formData: any): Promise<boolean> {
     // console.log('insert form data : ', formData);
     try {
-      await this.queryRunner.manager.save(this.repo.target, formData);
+      await this.queryRunner.manager.save(Form, formData);
       return true;
     } catch (error) {
       console.error('Error inserting form:', error);
@@ -371,14 +362,14 @@ export class FormService {
         this.CSTEPST = this.CSTEPSTDX <= 1 ? 1 : this.CSTEPSTDX - 1;
         this.CSTEPSTDX--;
         const flow = this.setFlow(data);
-        await this.flowService.insertFlow(flow, this.host, this.queryRunner);
+        await this.flowService.insertFlow(flow, this.queryRunner);
       }
     } else {
       this.VAPVNO = this.empno;
       await this.getRepresent(this.empno);
       this.CSTEPST = 0;
       const flow = this.setFlow(data);
-      await this.flowService.insertFlow(flow, this.host, this.queryRunner);
+      await this.flowService.insertFlow(flow, this.queryRunner);
     }
   }
 
@@ -395,14 +386,14 @@ export class FormService {
         this.CSTEPST = this.CSTEPSTDX <= 1 ? 1 : this.CSTEPSTDX - 1;
         this.CSTEPSTDX--;
         const flow = this.setFlow(data);
-        await this.flowService.insertFlow(flow, this.host, this.queryRunner);
+        await this.flowService.insertFlow(flow, this.queryRunner);
       }
     } else {
       await this.getRepresent(this.empno);
       this.VAPVNO = this.empno;
       this.CSTEPST = 0;
       const flow = this.setFlow(data);
-      await this.flowService.insertFlow(flow, this.host, this.queryRunner);
+      await this.flowService.insertFlow(flow, this.queryRunner);
     }
   }
 
@@ -477,7 +468,7 @@ export class FormService {
       VURL: data.length == 0 ? '' : data[0].VURL,
       VREMARK: this.remark,
     };
-    await this.flowService.insertFlow(flow, this.host, this.queryRunner);
+    await this.flowService.insertFlow(flow, this.queryRunner);
   }
 
   async managerStep() {
@@ -492,7 +483,6 @@ export class FormService {
     };
     const nextstep = await this.flowService.getFlow(
       query,
-      this.host,
       this.queryRunner,
     );
 
@@ -501,7 +491,7 @@ export class FormService {
       VORGNO: this.vorgno,
       CYEAR: this.cyear,
     };
-    const url = await this.formmstService.getFormmst(query2, this.host);
+    const url = await this.formmstService.getFormmst(query2);
     if (manager.length > 0) {
       await this.getRepresent(manager[0].HEADNO);
       //   const repManager = await this.getRepresent(manager[0].HEADNO);
@@ -534,7 +524,7 @@ export class FormService {
         VURL: url[0].VFORMPAGE,
         VREMARK: null,
       };
-      await this.flowService.insertFlow(flow, this.host, this.queryRunner);
+      await this.flowService.insertFlow(flow, this.queryRunner);
 
       //Update creater flow for set next step to manager
       const query3 = {
@@ -548,7 +538,7 @@ export class FormService {
         },
         CSTEPNEXTNO: '-1',
       };
-      this.flowService.updateFlow(query3, this.host, this.queryRunner);
+      this.flowService.updateFlow(query3, this.queryRunner);
 
       //Update other flow that step is not 1 for set next to after manager's step
       const query4 = {
@@ -558,12 +548,12 @@ export class FormService {
         CYEAR2: this.cyear2,
         NRUNNO: this.nrunno,
       };
-      this.flowService.reAlignFlow(query4, this.host, this.queryRunner);
+      this.flowService.reAlignFlow(query4, this.queryRunner);
     }
   }
 
   async deleteFlowStep(data: any) {
-    await this.flowService.deleteFlow(this.query, this.host, this.queryRunner);
+    await this.flowService.deleteFlow(this.query, this.queryRunner);
     if (this.query && 'CSTEPST' in this.query) {
       delete this.query['CSTEPST'];
     }
@@ -571,7 +561,6 @@ export class FormService {
     this.query.NRUNNO = this.nrunno;
     await this.flowService.updateFlow(
       { condition: this.query, CSTEPNEXTNO: data.CSTEPNEXTNO },
-      this.host,
       this.queryRunner,
     );
     if (data.CSTART == '1') {
@@ -581,7 +570,6 @@ export class FormService {
       this.query.CSTEPNO = data.CSTEPNEXTNO;
       await this.flowService.updateFlow(
         { condition: this.query, CSTART: '1' },
-        this.host,
         this.queryRunner,
       );
     }
@@ -597,7 +585,6 @@ export class FormService {
     };
     await this.updateForm(
       { condition: formDraft, CST: draft },
-      this.host,
       this.queryRunner,
     );
     for (let i = 2; i <= 5; i++) {
@@ -611,7 +598,6 @@ export class FormService {
       };
       this.flowService.updateFlow(
         { condition: formDraft, ...data },
-        this.host,
         this.queryRunner,
       );
     }
@@ -619,7 +605,6 @@ export class FormService {
 
   async updateForm(
     dto: UpdateFormDto,
-    host: string,
     queryRunner?: QueryRunner,
   ): Promise<boolean> {
     let localRunner: QueryRunner | undefined;
@@ -631,9 +616,8 @@ export class FormService {
         await localRunner.startTransaction();
       }
       const { condition, ...data } = dto;
-      const repo = this.repo || setRepo(this.form, this.formts, host);
-      const runner = this.queryRunner || localRunner!;
-      await runner.manager.getRepository(repo.target).update(condition, data);
+      const runner = queryRunner || localRunner!;
+      await runner.manager.getRepository(Form).update(condition, data);
 
       if (localRunner) await localRunner.commitTransaction();
       return true;
@@ -647,7 +631,6 @@ export class FormService {
 
   async deleteForm(
     dto: UpdateFormDto,
-    host: string,
     queryRunner?: QueryRunner,
   ): Promise<boolean> {
     let localRunner: QueryRunner | undefined;
@@ -659,8 +642,7 @@ export class FormService {
       }
       const runner = queryRunner || localRunner!;
       //   const { condition, ...data } = dto;
-      const repo = this.repo || setRepo(this.form, this.formts, host);
-      await runner.manager.getRepository(repo.target).delete(dto);
+      await runner.manager.getRepository(Form).delete(dto);
 
       if (localRunner) await localRunner.commitTransaction();
       return true;
@@ -672,7 +654,7 @@ export class FormService {
     }
   }
 
-  async deleteFlowAndForm(dto: UpdateFormDto, host: string): Promise<boolean> {
+  async deleteFlowAndForm(dto: UpdateFormDto): Promise<boolean> {
     const queryRunner = this.dataSource.createQueryRunner();
     console.log('delete flow and form data : ', dto);
 
@@ -687,8 +669,8 @@ export class FormService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
       // Delete form data
-      await this.flowService.deleteFlow(condition, host, queryRunner);
-      await this.deleteForm(condition, host, queryRunner);
+      await this.flowService.deleteFlow(condition, queryRunner);
+      await this.deleteForm(condition, queryRunner);
 
       await queryRunner.commitTransaction();
       return true;

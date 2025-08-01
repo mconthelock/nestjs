@@ -3,33 +3,27 @@ import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
 
 import { Flow } from './entities/flow.entity';
-import { Flowts } from './entities/flowts.entity';
 
 import { getExtDataDto } from './dto/get-Extdata.dto';
 import { SearchFlowDto } from './dto/search-flow.dto';
-import { setRepo } from 'src/utils/repo';
 import { CreateFlowDto } from './dto/create-flow.dto';
 import { UpdateFlowDto } from './dto/update-flow.dto';
-import { Query } from 'mysql2/typings/mysql/lib/protocol/sequences/Query';
 
 @Injectable()
 export class FlowService {
   constructor(
     @InjectRepository(Flow, 'amecConnection')
     private readonly flowRepo: Repository<Flow>,
-    @InjectRepository(Flowts, 'amecConnection')
-    private readonly flowtsRepo: Repository<Flowts>,
 
     @InjectDataSource('amecConnection')
     private dataSource: DataSource,
   ) {}
   private readonly STEP_READY = '3';
 
-  getExtData(dto: getExtDataDto, host: string) {
-    const repo = setRepo(this.flowRepo, this.flowtsRepo, host);
+  getExtData(dto: getExtDataDto) {
     const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, APV } = dto;
 
-    return repo
+    return this.flowRepo
       .createQueryBuilder('f')
       .select('CEXTDATA')
       .where('f.NFRMNO = :NFRMNO', { NFRMNO })
@@ -44,10 +38,8 @@ export class FlowService {
 
   async insertFlow(
     dto: CreateFlowDto,
-    host: string,
     queryRunner?: QueryRunner,
   ): Promise<boolean> {
-    const repo = setRepo(this.flowRepo, this.flowtsRepo, host);
     // console.log('insert flow data : ', dto);
     let localRunner: QueryRunner | undefined;
     try {
@@ -57,7 +49,7 @@ export class FlowService {
         await localRunner.startTransaction();
       }
       const runner = queryRunner || localRunner!;
-      await runner.manager.save(repo.target, dto);
+      await runner.manager.save(Flow, dto);
       if (localRunner) await localRunner.commitTransaction();
       //   await this.repo.save(formData);
     //   console.log('-----------------Flow inserted successfully------------------');
@@ -73,26 +65,23 @@ export class FlowService {
     }
   }
 
-  getFlow(dto: SearchFlowDto, host: string, queryRunner?: QueryRunner) {
-    const repo = setRepo(this.flowRepo, this.flowtsRepo, host);
+  getFlow(dto: SearchFlowDto, queryRunner?: QueryRunner) {
     // console.log('get flow data : ', dto);
     if (queryRunner) {
-      return queryRunner.manager.getRepository(repo.target).find({
+      return queryRunner.manager.getRepository(Flow).find({
         where: dto,
       });
     }
     
-    return repo.find({
+    return this.flowRepo.find({
       where: dto,
     });
   }
 
   async updateFlow(
     dto: UpdateFlowDto,
-    host: string,
     queryRunner?: QueryRunner,
   ): Promise<boolean> {
-    const repo = setRepo(this.flowRepo, this.flowtsRepo, host);
     let localRunner: QueryRunner | undefined;
     try {
       if (!queryRunner) {
@@ -104,7 +93,7 @@ export class FlowService {
       const { condition, ...data } = dto;
 
       // await queryRunner.manager.save(repo.target, dto);
-      await runner.manager.getRepository(repo.target).update(condition, data);
+      await runner.manager.getRepository(Flow).update(condition, data);
 
       if (localRunner) await localRunner.commitTransaction();
       return true;
@@ -120,10 +109,8 @@ export class FlowService {
 
   async reAlignFlow(
     dto: UpdateFlowDto,
-    host: string,
     queryRunner?: QueryRunner,
   ): Promise<boolean> {
-    const repo = setRepo(this.flowRepo, this.flowtsRepo, host);
     let localRunner: QueryRunner | undefined;
     try {
       if (!queryRunner) {
@@ -134,7 +121,7 @@ export class FlowService {
       const runner = queryRunner || localRunner!;
 
       await runner.manager
-        .getRepository(repo.target)
+        .getRepository(Flow)
         .createQueryBuilder()
         .update()
         .set({ CSTEPST: () => 'CSTEPST - 1' })
@@ -157,10 +144,8 @@ export class FlowService {
 
   async deleteFlow(
     dto: UpdateFlowDto,
-    host: string,
     queryRunner?: QueryRunner,
   ): Promise<boolean> {
-    const repo = setRepo(this.flowRepo, this.flowtsRepo, host);
     let localRunner: QueryRunner | undefined;
     console.log('delete flow data : ', dto);
     
@@ -171,7 +156,7 @@ export class FlowService {
         await localRunner.startTransaction();
       }
       const runner = queryRunner || localRunner!;
-      await runner.manager.getRepository(repo.target).delete(dto);
+      await runner.manager.getRepository(Flow).delete(dto);
 
       if (localRunner) await localRunner.commitTransaction();
       return true;

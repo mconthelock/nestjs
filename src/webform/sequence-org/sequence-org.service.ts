@@ -8,10 +8,10 @@ import { SequenceOrg } from './entities/sequence-org.entity';
 @Injectable()
 export class SequenceOrgService {
   constructor(
-    @InjectRepository(SequenceOrg, 'webformConnection')
+    @InjectRepository(SequenceOrg, 'amecConnection')
     private readonly seqRepo: Repository<SequenceOrg>,
 
-    @InjectDataSource('webformConnection')
+    @InjectDataSource('amecConnection')
     private dataSource: DataSource,
   ) {}
   create(createSequenceOrgDto: CreateSequenceOrgDto) {
@@ -40,7 +40,7 @@ export class SequenceOrgService {
       .select('seq.HEADNO', 'HEADNO')
       .where('seq.EMPNO = :empno', { empno })
       .andWhere(
-        'seq.SPOSCODE = (select SPOSCODE from amec.aEmployee where sEmpNo = :empno2)',
+        'seq.SPOSCODE = (select SPOSCODE from AEMPLOYEE where sEmpNo = :empno2)',
         { empno2: empno },
       )
       .orderBy('seq.CCO', 'ASC')

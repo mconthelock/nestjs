@@ -24,27 +24,22 @@ export class FlowController {
 
   @Post('getExtData')
   @ApiOperation({ summary: 'Get ext data' })
-  getFormno(@Body() dto: getExtDataDto, @Req() req: Request) {
-    return this.flowService.getExtData(dto, req.headers.host);
+  getFormno(@Body() dto: getExtDataDto) {
+    return this.flowService.getExtData(dto);
   }
 
   @Post('search')
   @ApiOperation({ summary: 'Search flow data' })
-  getFlow(@Body() dto: SearchFlowDto, @Req() req: Request) {
-    return this.flowService.getFlow(dto, req.headers.host);
+  getFlow(@Body() dto: SearchFlowDto) {
+    return this.flowService.getFlow(dto);
   }
 
   @Patch('updateFlow')
   async updateFlow(
     @Body() dto: UpdateFlowDto,
-    @Req() req: Request,
   ): Promise<{ message: string; status: boolean }> {
     try {
-      
-      const result = await this.flowService.updateFlow(
-        dto,
-        req.headers.host,
-      );
+      const result = await this.flowService.updateFlow(dto);
       return {
         message: result ? 'Flow updated successfully' : 'Failed to update flow',
         status: result,
@@ -57,13 +52,9 @@ export class FlowController {
   @Patch('realignFlow')
   async realignFlow(
     @Body() dto: UpdateFlowDto,
-    @Req() req: Request,
   ): Promise<{ message: string; status: boolean }> {
     try {
-      const result = await this.flowService.reAlignFlow(
-        dto,
-        req.headers.host,
-      );
+      const result = await this.flowService.reAlignFlow(dto);
       return {
         message: result
           ? 'Flow realigned successfully'
@@ -78,17 +69,11 @@ export class FlowController {
   @Delete('deleteFlow')
   async deleteFlow(
     @Body() dto: UpdateFlowDto,
-    @Req() req: Request,
   ): Promise<{ message: string; status: boolean }> {
     try {
-      const result = await this.flowService.deleteFlow(
-        dto,
-        req.headers.host,
-      );
+      const result = await this.flowService.deleteFlow(dto);
       return {
-        message: result
-          ? 'Flow deleted successfully'
-          : 'Failed to delete flow',
+        message: result ? 'Flow deleted successfully' : 'Failed to delete flow',
         status: result,
       };
     } catch (error) {

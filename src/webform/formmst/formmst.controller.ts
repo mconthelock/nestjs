@@ -22,8 +22,8 @@ export class FormmstController {
   @ApiOperation({
     summary: 'getFormMasterAll',
   })
-  getFormMasterAll(@Req() req: Request) {
-    return this.formmstService.getFormMasterAll(req.headers.host);
+  getFormMasterAll() {
+    return this.formmstService.getFormMasterAll();
   }
 
   @Get(':vaname')
@@ -31,15 +31,15 @@ export class FormmstController {
     summary: 'getFormMasterByVaname',
   })
   @ApiParam({ name: 'vaname', example: 'IS-TID', required: true })
-  getFormMasterByVaname(@Param('vaname') vaname: string, @Req() req: Request) {
-    return this.formmstService.getFormMasterByVaname(vaname, req.headers.host);
+  getFormMasterByVaname(@Param('vaname') vaname: string) {
+    return this.formmstService.getFormMasterByVaname(vaname);
   }
 
   @Post('getFormmst')
   @ApiOperation({
     summary: 'getFormmst',
   })
-  async getFormmst(@Body() searchDto: SearchFormmstDto, @Req() req: Request) {
-    return this.formmstService.getFormmst(searchDto, req.headers.host);
+  async getFormmst(@Body() searchDto: SearchFormmstDto) {
+    return this.formmstService.getFormmst(searchDto);
   }
 }

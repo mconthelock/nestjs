@@ -5,7 +5,7 @@ import { SequenceOrg } from './entities/sequence-org.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SequenceOrg], 'webformConnection')],
+  imports: [TypeOrmModule.forFeature([SequenceOrg], 'amecConnection')],
   controllers: [SequenceOrgController],
   providers: [SequenceOrgService],
   exports: [SequenceOrgService],

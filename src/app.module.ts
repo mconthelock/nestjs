@@ -21,7 +21,6 @@ import { ESCSModule } from './escs/escs.module';
 import { DetailModule } from './idtag/detail/detail.module';
 import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
 
-import webformConfig from './databases/webform.config';
 
 @Module({
   imports: [
@@ -29,7 +28,6 @@ import webformConfig from './databases/webform.config';
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync(amecConfig),
-    TypeOrmModule.forRootAsync(webformConfig),
     //BB8 💣
     AuthModule,
     AmecModule,

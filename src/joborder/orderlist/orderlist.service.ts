@@ -6,6 +6,10 @@ import { SetRequestDate } from '../set-request-date/entities/set-request-date.en
 import { SearchOrderListDto } from './dto/search-orderlist.dto';
 import { getSafeFields, mapAliasesToFields } from 'src/utils/Fields';
 
+import { numberToAlphabetRevision } from 'src/utils/format';
+import { JopMarReqService } from '../jop-mar-req/jop-mar-req.service';
+import { JopPurConfService } from '../jop-pur-conf/jop-pur-conf.service';
+
 @Injectable()
 export class OrderListService {
     constructor(
@@ -14,19 +18,21 @@ export class OrderListService {
         @InjectRepository(SetRequestDate, 'amecConnection')
         private readonly SetRequestDateRepository: Repository<SetRequestDate>,
         @InjectDataSource('amecConnection')
-        private dataSource: DataSource
+        private dataSource: DataSource,
+        private readonly JopMarReqService: JopMarReqService,
+        private readonly JopPurConfService: JopPurConfService,
     ) {}
 
     private readonly JOBORDER = this.OrderListRepository.metadata.columns.map(c => c.propertyName);
     private readonly JOP_REQ  = this.SetRequestDateRepository.metadata.columns.map(c => c.propertyName);
+    private readonly JOP_MAR_REQ = this.dataSource.getMetadata('JOP_MAR_REQ').columns.map(c => c.propertyName);
+    private readonly JOP_PUR_CONF = this.dataSource.getMetadata('JOP_PUR_CONF').columns.map(c => c.propertyName);
     
+    private readonly allowFields = [...this.JOBORDER, 'MAR_INPUTNAME', 'PUR_INPUTNAME', 'DeadLinePUR'];
     
     // private readonly JOP_REQ  = this.dataSource.getMetadata(SetRequestDate).columns.map(c => c.propertyName);
-    private readonly allowFields = [...this.JOBORDER, ...this.JOP_REQ, 'MAR_INPUTNAME', 'PUR_INPUTNAME', 'DeadLinePUR'];
+    // private readonly allowFields = [...this.JOBORDER, ...this.JOP_REQ, 'MAR_INPUTNAME', 'PUR_INPUTNAME', 'DeadLinePUR'];
 
-    // private readonly allowFields = ["ORDTYPE","URGENT","MAPPIC","SERIES","AGENT","PRJ_NO", "PRJ_NAME", "COUNTRY","MFGNO","ELV_NO","OPERATION","REQ","CUST_RQS","DESSCH","PRODSCH","DESPROD","DESBMDATE","MFG_SCHEDULE","MFGBMDATE","EXPSHIP","DUMMYCAR_NO","DUMMY_PRDN","DUMMY_ITEM","BUYERCODE","BUYEREMPNO","BUYERNAME","PRNO","LINENO","PRDATE","PONO","PODATE","VENDCODE","ITEM","PARTNAME","DRAWING","REMARK","REQUESTED_QTY","ORDERED_QTY","RECIEVE_QTY","DUEDATE","QTY","ACTUALETA_AMEC","INVOICE", 'JOP_REVISION', 'JOP_MFGNO', 'JOP_PONO', 'JOP_LINENO', "JOP_PUR_STATUS", 'JOP_MAR_REQUEST', "JOP_MAR_REQUEST_DATE", 'JOP_MAR_INPUT_DATE', 'JOP_MAR_REMARK', 'JOP_PUR_CONFIRM', 'JOP_PUR_CONFIRM_DATE', 'JOP_PUR_INPUT_DATE', 'JOP_PUR_REMARK'];
-
-    // private JOP_REQFeild = ['JOP_REVISION', 'JOP_MFGNO', 'JOP_PONO', 'JOP_LINENO', "JOP_PUR_STATUS", 'JOP_MAR_REQUEST', "JOP_MAR_REQUEST_DATE", 'JOP_MAR_INPUT_DATE', 'JOP_MAR_REMARK', 'JOP_PUR_CONFIRM', 'JOP_PUR_CONFIRM_DATE', 'JOP_PUR_INPUT_DATE', 'JOP_PUR_REMARK'];
     
     private readonly numberFields = ["REQUESTED_QTY" ,"ORDERED_QTY" ,"RECIEVE_QTY" ,"QTY" ,"ACTUALETA_AMEC" ,"LINENO" ,"VENDCODE" ,"PRNO" ,"PRDATE" ,"PONO" ,"PODATE" ,"DUEDATE", , 'JOP_REVISION', 'JOP_PONO', 'JOP_LINENO', 'JOP_PUR_STATUS', 'TURNOVER_STATUS'];
 
@@ -80,7 +86,7 @@ export class OrderListService {
         const data = await query.getRawMany();
         return {
             // data: mapAliasesToFields(data),
-            data: data,
+            data: await this.getRevisionHistory(data),
             recordsTotal: count, // key ที่ dataTable ต้องการ
             recordsFiltered: count, // key ที่ dataTable ต้องการ
             page,
@@ -167,7 +173,7 @@ export class OrderListService {
         // })));
 
         const query = this.setQueryNew(dto);
-        return query.getRawMany();
+        return await this.getRevisionHistory(await query.getRawMany());
     }
 
     
@@ -176,7 +182,7 @@ export class OrderListService {
         // logQuery(query);
         query.andWhere('J.JOP_PUR_STATUS = :status', { status: 0 }); // 0 = ยังไม่ confirm
         const data = await query.getRawMany();
-        return data;
+        return await this.getRevisionHistory(data);
         // return mapAliasesToFields(data);
     }
 
@@ -185,7 +191,7 @@ export class OrderListService {
         // logQuery(query);
         query.andWhere('O.REQUESTED_QTY != O.RECIEVE_QTY'); // เงื่อนไขนี้จะเลือกเฉพาะรายการที่ยังไม่ได้รับสินค้าครบตามจำนวนที่สั่ง
         const data = await query.getRawMany();
-        return data;
+        return await this.getRevisionHistory(data);
         // return mapAliasesToFields(data);
     }
 
@@ -234,6 +240,7 @@ export class OrderListService {
         if (type === 'count') {
             return query;
         } else if (type === 'data') {
+            query.select('JOP_MFGNO, JOP_PONO, JOP_LINENO, JOP_MAR_REVISION, JOP_PUR_STATUS, JOP_MAR_REQUEST, JOP_MAR_REQUEST_DATE, JOP_MAR_INPUT_DATE, JOP_MAR_REMARK, JOP_PUR_REVISION, JOP_PUR_CONFIRM, JOP_PUR_CONFIRM_DATE, JOP_PUR_INPUT_DATE, JOP_PUR_REMARK');
             let select = [];
             if (fields.length > 0) {
                 select = getSafeFields(fields, this.allowFields);
@@ -241,9 +248,9 @@ export class OrderListService {
                 select = this.allowFields;
             }
             select.forEach((f)=>{
-                if (this.JOP_REQ.includes(f)) {
-                    query.addSelect(`J.${f}`, f);
-                } else if ('MAR_INPUTNAME' === f) {
+                // if (this.JOP_REQ.includes(f)) {
+                //     query.addSelect(`J.${f}`, f);
+                if ('MAR_INPUTNAME' === f) {
                     query.addSelect('U.SNAME', 'MAR_INPUTNAME');
                 } else if ('PUR_INPUTNAME' === f) {
                     query.addSelect('I.SNAME', 'PUR_INPUTNAME');
@@ -258,28 +265,121 @@ export class OrderListService {
             })
             // query.leftJoinAndSelect('JOP_REQ', 'J', 'O.PRNO = J.JOP_PONO and O.LINENO = J.JOP_LINENO'); // จะ join และ select ให้ทั้งหมด
             // query.leftJoin('JOP_REQ', 'J', 'O.PRNO = J.JOP_PONO and O.LINENO = J.JOP_LINENO and O.MFGNO = J.JOP_MFGNO'); //  join อย่างเดียวหากอยากได้ column ไหนต้อง select เอง
+            
+            // ของ JOP_REQ ก่อนแยกตาราง
+            // query.leftJoin(
+            //     qb => qb
+            //         .subQuery()
+            //         .select("X.*")
+            //         .from('JOP_REQ', 'X')
+            //         .innerJoin(
+            //             qb => qb
+            //                 .subQuery()
+            //                 .select('JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION')
+            //                 .from('JOP_REQ', 'J')
+            //                 .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
+            //                 'Y', // alias for subquery
+            //                 'X.JOP_MFGNO = Y.JOP_MFGNO AND X.JOP_PONO = Y.JOP_PONO AND X.JOP_LINENO = Y.JOP_LINENO AND Y.LAST_REVISION = X.JOP_REVISION'
+            //         ),
+            //         'J', // alias for subquery
+            //         'O.PRNO = J.JOP_PONO and O.LINENO = J.JOP_LINENO and O.MFGNO = J.JOP_MFGNO'
+            // ); //  join อย่างเดียวหากอยากได้ column ไหนต้อง select เอง
+
+            // หลังแยกตาราง
             query.leftJoin(
                 qb => qb
                     .subQuery()
-                    .select("X.*")
-                    .from('JOP_REQ', 'X')
-                    .innerJoin(
+                    .select("X.JOP_MFGNO, X.JOP_PONO, X.JOP_LINENO, X.LAST_REVISION AS JOP_MAR_REVISION, JOP_PUR_STATUS, JOP_MAR_REQUEST, JOP_MAR_REQUEST_DATE, JOP_MAR_INPUT_DATE, JOP_MAR_REMARK, Y.LAST_REVISION AS JOP_PUR_REVISION, JOP_PUR_CONFIRM, JOP_PUR_CONFIRM_DATE, JOP_PUR_INPUT_DATE, JOP_PUR_REMARK")
+                    .from(
                         qb => qb
                             .subQuery()
-                            .select('JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION')
-                            .from('JOP_REQ', 'J')
-                            .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
-                            'Y', // alias for subquery
-                            'X.JOP_MFGNO = Y.JOP_MFGNO AND X.JOP_PONO = Y.JOP_PONO AND X.JOP_LINENO = Y.JOP_LINENO AND Y.LAST_REVISION = X.JOP_REVISION'
-                    ),
-                    'J', // alias for subquery
+                            .select('A.JOP_MFGNO, A.JOP_PONO, A.JOP_LINENO, LAST_REVISION, JOP_PUR_STATUS, JOP_MAR_REQUEST, JOP_MAR_REQUEST_DATE, JOP_MAR_INPUT_DATE, JOP_MAR_REMARK')
+                            .from('JOP_MAR_REQ', 'A')
+                            .innerJoin(
+                                qb => qb
+                                    .subQuery()
+                                    .select('JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION')
+                                    .from('JOP_MAR_REQ', 'MAR')
+                                    .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
+                                    'B',
+                                    'A.JOP_MFGNO = B.JOP_MFGNO AND A.JOP_PONO = B.JOP_PONO AND A.JOP_LINENO = B.JOP_LINENO AND B.LAST_REVISION = A.JOP_REVISION'
+                            ),
+                            'X',
+                    )
+                    .leftJoin(
+                        qb => qb
+                            .subQuery()
+                            .select('C.JOP_MFGNO, C.JOP_PONO, C.JOP_LINENO, LAST_REVISION, JOP_PUR_CONFIRM, JOP_PUR_CONFIRM_DATE, JOP_PUR_INPUT_DATE, JOP_PUR_REMARK')
+                            .from('JOP_PUR_CONF', 'C')
+                            .innerJoin(
+                                qb => qb
+                                    .subQuery()
+                                    .select('JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION')
+                                    .from('JOP_PUR_CONF', 'PUR')
+                                    .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
+                                    'D',
+                                    'C.JOP_MFGNO = D.JOP_MFGNO AND C.JOP_PONO = D.JOP_PONO AND C.JOP_LINENO = D.JOP_LINENO AND D.LAST_REVISION = C.JOP_REVISION'
+                            ),
+                            'Y',
+                            'X.JOP_MFGNO = Y.JOP_MFGNO AND X.JOP_PONO = Y.JOP_PONO AND X.JOP_LINENO = Y.JOP_LINENO'
+                    )
+                    ,'J',
                     'O.PRNO = J.JOP_PONO and O.LINENO = J.JOP_LINENO and O.MFGNO = J.JOP_MFGNO'
-            ); //  join อย่างเดียวหากอยากได้ column ไหนต้อง select เอง
+            );
+            // query.leftJoin('AMECUSERALL', 'U', 'J.JOP_MAR_REQUEST = U.SEMPNO');
+            // query.leftJoin('AMECUSERALL', 'I', 'J.JOP_PUR_CONFIRM = I.SEMPNO');
             query.leftJoin('AMECUSERALL', 'U', 'J.JOP_MAR_REQUEST = U.SEMPNO');
             query.leftJoin('AMECUSERALL', 'I', 'J.JOP_PUR_CONFIRM = I.SEMPNO');
             return query;
         }
     }
+
+
+    async getRevisionHistory(list: any[]): Promise<any[]> {
+        for (const l of list) {
+          // console.log(l.JOP_MFGNO);
+          // l.REVISION = [];
+          if (l.JOP_MAR_REVISION) {
+            const revision = await this.JopMarReqService.getRevisionHistory(
+              l.JOP_MFGNO,
+              l.JOP_PONO,
+              l.JOP_LINENO,
+            );
+            l.MAR_REVISION = revision.map((r) => {
+              r.JOP_REVISION_TEXT = numberToAlphabetRevision(r.JOP_REVISION);
+              return {
+                REVISION: r.JOP_REVISION,
+                REVISION_TEXT: r.JOP_REVISION_TEXT,
+                ACTION_BY: r.JOP_MAR_REQUEST,
+                DATE: r.JOP_MAR_REQUEST_DATE,
+                REMARK: r.JOP_MAR_REMARK,
+                INPUT_DATE: r.JOP_MAR_INPUT_DATE,
+                NAME: r.marRequest.SNAME,
+              };
+            });
+          }
+          if (l.JOP_PUR_REVISION) {
+            const purRevision = await this.JopPurConfService.getRevisionHistory(
+              l.JOP_MFGNO,
+              l.JOP_PONO,
+              l.JOP_LINENO,
+            );
+            l.PUR_REVISION = purRevision.map((r) => {
+              r.JOP_REVISION_TEXT = numberToAlphabetRevision(r.JOP_REVISION);
+              return {
+                REVISION: r.JOP_REVISION,
+                REVISION_TEXT: r.JOP_REVISION_TEXT,
+                ACTION_BY: r.JOP_PUR_CONFIRM,
+                DATE: r.JOP_PUR_CONFIRM_DATE,
+                REMARK: r.JOP_PUR_REMARK,
+                INPUT_DATE: r.JOP_PUR_INPUT_DATE,
+                NAME: r.purConfirm.SNAME,
+              };
+            });
+          }
+        }
+        return list;
+      }
 }
 
 

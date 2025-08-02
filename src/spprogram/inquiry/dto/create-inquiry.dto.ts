@@ -4,6 +4,7 @@ import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
 export class createDto {
   @IsNumber()
   @IsOptional()
+  @Type(() => Number)
   INQ_ID: number;
 
   @IsString()

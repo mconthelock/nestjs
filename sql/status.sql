@@ -1,0 +1,7 @@
+create table SP_STATUS (
+    STATUS_ID	int,
+    STATUS_ACTION	VARCHAR(50),
+    STATUS_DESC	VARCHAR(50),
+    STATUS_TYPE	int,
+    PRIMARY KEY(STATUS_ID)
+)

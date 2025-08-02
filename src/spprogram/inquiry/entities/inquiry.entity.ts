@@ -1,5 +1,13 @@
-import { Column, Entity, PrimaryColumn, JoinColumn, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryColumn,
+  JoinColumn,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
 import { InquiryGroup } from '../../inquiry-group/entities/inquiry-group.entity';
+import { Status } from '../../status/entities/status.entity';
 
 @Entity('SP_INQUIRY')
 export class Inquiry {
@@ -179,4 +187,8 @@ export class Inquiry {
   @OneToMany(() => InquiryGroup, (group) => group.inqs)
   @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'INQ_ID' })
   inqgroup: InquiryGroup;
+
+  @ManyToOne(() => Status, (status) => status.inqs)
+  @JoinColumn({ name: 'INQ_STATUS', referencedColumnName: 'STATUS_ID' })
+  status: Status;
 }

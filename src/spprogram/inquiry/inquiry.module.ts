@@ -4,11 +4,14 @@ import { InquiryService } from './inquiry.service';
 import { Inquiry } from './entities/inquiry.entity';
 import { InquiryController } from './inquiry.controller';
 
+import { HistoryModule } from '../history/history.module';
+
 @Module({
-  controllers: [InquiryController],
   imports: [
-    TypeOrmModule.forFeature([Inquiry], 'amecConnection')
+    TypeOrmModule.forFeature([Inquiry], 'amecConnection'),
+    HistoryModule,
   ],
+  controllers: [InquiryController],
   providers: [InquiryService],
 })
 export class InquiryModule {}

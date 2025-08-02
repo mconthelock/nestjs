@@ -24,6 +24,8 @@ export class AmeccalendarService {
     days: number,
   ): Promise<Number> {
     startDate = this.transformDate(startDate);
+    // console.log(`Adding ${days} work days to start date: ${startDate}`);
+    
     const result = await this.dataSource.query(
       `SELECT ADD_BUSINESS_DAYS(:1,:2) AS NEXT_DATE FROM DUAL`,
       [startDate, days],

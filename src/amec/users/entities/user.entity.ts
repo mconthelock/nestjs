@@ -9,6 +9,8 @@ import {
 import { Form } from '../../../webform/form/entities/form.entity';
 import { Workpic } from '../../../docinv/workpic/entities/workpic.entity';
 import { SetRequestDate } from 'src/joborder/set-request-date/entities/set-request-date.entity';
+import { JopMarReq } from 'src/joborder/jop-mar-req/entities/jop-mar-req.entity';
+import { JopPurConf } from 'src/joborder/jop-pur-conf/entities/jop-pur-conf.entity';
 import { EscsUser } from 'src/escs/user/entities/user.entity';
 
 @Entity('AMECUSERALL')
@@ -74,6 +76,12 @@ export class User {
 
   @OneToMany(() => SetRequestDate, (req) => req.JOP_PUR_CONFIRM)
   purConfirm: SetRequestDate[];
+
+  @OneToMany(() => JopMarReq, (req) => req.marRequest)
+  jopMarReq: JopMarReq[];
+  
+  @OneToMany(() => JopPurConf, (req) => req.purConfirm)
+  jopPurConf: JopPurConf[];
 
   @OneToOne(() => EscsUser, (escsUser) => escsUser.user)
   escsUser: EscsUser;

@@ -8,7 +8,7 @@ import { AmeccalendarService } from '../../amecmfg/ameccalendar/ameccalendar.ser
 import { ApiTags, ApiOperation, ApiExcludeEndpoint } from '@nestjs/swagger';
 
 // @UseGuards(AuthGuard('jwt'))
-@Controller('joborder/request')
+@Controller('joborder/requestOld')
 export class SetRequestDateController {
   constructor(
     private readonly setRequestDateService: SetRequestDateService,

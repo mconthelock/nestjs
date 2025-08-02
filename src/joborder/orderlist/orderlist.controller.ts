@@ -34,6 +34,7 @@ export class OrderListController {
   async orderlistNew(@Body() dto: SearchOrderListDto) {
     // dto จะเก็บค่าที่ client post มา (body) เช่น { PRNO: "41250732", "MFGNO" : "EXIO18012" }
     const orderList = await this.OrderListService.orderlistNew(dto);
+    return orderList;
     // ----------------- 1 parallel
     // const limit = pLimit(5); // ควบคุมให้รันพร้อมกันไม่เกิน 5
     // const list = await Promise.all(orderList.map(l =>

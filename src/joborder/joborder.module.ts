@@ -9,7 +9,7 @@ import { JopPurConfModule } from './jop-pur-conf/jop-pur-conf.module';
     OrderListModule,
     SetRequestDateModule,
     JopMarReqModule,
-    JopPurConfModule
+    JopPurConfModule,
   ],
 })
 export class JobOrderModule {}

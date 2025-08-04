@@ -91,8 +91,12 @@ export class JopMarReqService {
     mfgno: string,
     pono: number,
     lineno: number,
+    queryRunner?: QueryRunner,
   ): Promise<JopMarReq | null> {
-    return await this.dataSource.getRepository(JopMarReq).findOne({
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(JopMarReq)
+      : this.reqRepo;
+    return await repo.findOne({
       where: {
         JOP_MFGNO: mfgno,
         JOP_PONO: pono,
@@ -145,5 +149,49 @@ export class JopMarReqService {
         // 'purConfirm.SNAME',
       ])
       .getMany();
+  }
+
+  async update(dto: UpdateJopMarReqDto, queryRunner?: QueryRunner) {
+    const { MFGNO, PONO, LINENO, ...updateData } = dto;
+    let localRunner: QueryRunner | undefined;
+    try {
+      if (!queryRunner) {
+        localRunner = this.dataSource.createQueryRunner();
+        await localRunner.connect();
+        await localRunner.startTransaction();
+      }
+      const runner = queryRunner || localRunner!;
+      
+      const record = await this.findLatestRevision(
+        MFGNO,
+        PONO,
+        LINENO,
+        runner,
+      );
+
+      console.log('Record found:', record);
+      
+
+      if (!record) {
+        throw new InternalServerErrorException('Record not found');
+      }
+      Object.assign(record, updateData);
+      const result = await runner.manager.save(record);
+
+      console.log('Update result:', result);
+      
+
+      if (localRunner) await localRunner.commitTransaction();
+      return {
+        message: 'Update successful',
+        data: result,
+        status: true,
+      };
+    } catch (error) {
+      if (localRunner) await localRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      if (localRunner) await localRunner.release();
+    }
   }
 }

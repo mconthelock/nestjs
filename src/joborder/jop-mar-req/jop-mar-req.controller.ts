@@ -22,4 +22,11 @@ export class JopMarReqController {
       return await this.jopMarReqService.create(dto);
   }
 
+  @Patch('update')
+  async update(
+    @Body() dto: UpdateJopMarReqDto,
+  ) {
+    return await this.jopMarReqService.update(dto);
+  }
+
 }

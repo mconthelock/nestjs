@@ -5,12 +5,13 @@ import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { CreateJopPurConfDto } from './dto/create-jop-pur-conf.dto';
 import { UpdateJopPurConfDto } from './dto/update-jop-pur-conf.dto';
 
-
-
 import { JopPurConf } from './entities/jop-pur-conf.entity';
 import { numberToAlphabetRevision } from 'src/utils/format';
 
 import { AmeccalendarService } from 'src/amecmfg/ameccalendar/ameccalendar.service';
+import { JopMarReqService } from '../jop-mar-req/jop-mar-req.service';
+
+import { UpdateJopMarReqDto } from '../jop-mar-req/dto/update-jop-mar-req.dto';
 
 @Injectable()
 export class JopPurConfService {
@@ -21,6 +22,7 @@ export class JopPurConfService {
         private dataSource: DataSource,
     
         private readonly amecCalendarService: AmeccalendarService,
+        private readonly jopMarReqService: JopMarReqService,
       ) {}
     
 
@@ -39,8 +41,8 @@ export class JopPurConfService {
             JOP_PONO: PONO,
             JOP_LINENO: LINENO,
             JOP_PUR_CONFIRM: updateData.ACTION_BY,
-            JOP_PUR_CONFIRM_DATE: updateData.REQUESTDATE
-              ? new Date(updateData.REQUESTDATE + ' 00:00:00')
+            JOP_PUR_CONFIRM_DATE: updateData.CONFIRMDATE
+              ? new Date(updateData.CONFIRMDATE + ' 00:00:00')
               : null,
             JOP_PUR_REMARK: updateData.REMARK || null,
             JOP_PUR_INPUT_DATE: new Date(), // ใช้เวลาปัจจุบันเป็นวันที่ป้อนข้อมูล
@@ -55,11 +57,18 @@ export class JopPurConfService {
             const newRecord = queryRunner.manager.create(JopPurConf, dataToSave); // ต้องแปลง plain object เป็น entity object ก่อนบันทึกเสมอ
             result = await queryRunner.manager.save(newRecord);
           }
-          result.DeadLinePUR = await this.amecCalendarService.addWorkDays(result.JOP_MAR_INPUT_DATE, 7);
           const revision = await this.getRevisionHistory(MFGNO, PONO, LINENO, queryRunner); // ค้นหา Revision History ทั้งหมดหลังจากบันทึกใหม่
-          await queryRunner.commitTransaction();
-          return {
-            message: 'Request date set successfully',
+          const updatePurStatus = await this.jopMarReqService.update({
+            MFGNO,
+            PONO,
+            LINENO,
+            JOP_PUR_STATUS: 1
+          } as UpdateJopMarReqDto,
+          queryRunner,
+        );
+        await queryRunner.commitTransaction();
+        return {
+          message: 'Request date set successfully',
             data: result,
             status: true,
             rev: revision.map((r) => {

@@ -24,7 +24,7 @@ export class CreateJopPurConfDto {
     
     @IsNotEmpty()
     @IsString()
-    REQUESTDATE: string;
+    CONFIRMDATE: string;
     
     @IsOptional()
     @IsString()

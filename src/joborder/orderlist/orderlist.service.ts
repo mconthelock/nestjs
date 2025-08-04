@@ -255,7 +255,7 @@ export class OrderListService {
                 } else if ('PUR_INPUTNAME' === f) {
                     query.addSelect('I.SNAME', 'PUR_INPUTNAME');
                 } else if ('DeadLinePUR' === f) {
-                    query.addSelect("ADD_BUSINESS_DAYS(TO_NUMBER(TO_CHAR(J.JOP_MAR_INPUT_DATE, 'YYYYMMDD')),7)", 'DeadLinePUR'); // เพื่อให้ได้ DeadLinePUR
+                    query.addSelect("ADD_WORK_DAYS(TO_NUMBER(TO_CHAR(J.JOP_MAR_INPUT_DATE, 'YYYYMMDD')),7)", 'DeadLinePUR'); // เพื่อให้ได้ DeadLinePUR
                 } else if ('PRJ_NO' === f) {
                     query.addSelect('O.PRJ_NO', 'PRJ_NO');
                     query.orderBy('O.PRJ_NO','ASC')

@@ -196,10 +196,12 @@ export class OrderListService {
     }
 
     private setQueryNew(dto: SearchOrderListDto, type: string = 'data') {
-        const { fields = [], ORDTYPE, PRJ_NO, MFGNO, BUYEREMPNO, BUYERNAME, PRNO, PRDATE, PONO, PODATE, LINENO, VENDCODE, ITEM, DRAWING, INVOICE, DUEDATE, TURNOVER_STATUS, AGENT, SERIES, SDESSCH, SPRODSCH, SDESBMDATE, SMFGBMDATE, EDESSCH, EPRODSCH, EDESBMDATE, EMFGBMDATE, distinct } = dto;
+        const { fields = [], ORDTYPE, PRJ_NO, MFGNO, BUYEREMPNO, BUYERNAME, PRNO, PRDATE, PONO, PODATE, LINENO, VENDCODE, ITEM, DRAWING, PARTNAME, INVOICE, DUEDATE, TURNOVER_STATUS, AGENT, SERIES, SDESSCH, SPRODSCH, SDESBMDATE, SMFGBMDATE, EDESSCH, EPRODSCH, EDESBMDATE, EMFGBMDATE, distinct, orderby, orderbyDirection } = dto;
 
         const query = this.dataSource.createQueryBuilder().from('MV_JOB_ORDER','O');
         query.distinct(distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
+
+        if(orderby) query.orderBy(orderby, orderbyDirection)
 
         // optional
         if (ORDTYPE)    query.andWhere('O.ORDTYPE = :ORDTYPE', { ORDTYPE });
@@ -214,6 +216,7 @@ export class OrderListService {
         if (VENDCODE)   query.andWhere('O.VENDCODE = :VENDCODE', { VENDCODE });
         if (ITEM)       query.andWhere('O.ITEM LIKE :ITEM', { ITEM: `%${ITEM}%` });
         if (DRAWING)    query.andWhere('O.DRAWING LIKE :DRAWING', { DRAWING: `%${DRAWING}%` });
+        if (PARTNAME)   query.andWhere('O.PARTNAME LIKE :PARTNAME', { PARTNAME: `%${PARTNAME}%` });
         if (INVOICE)    query.andWhere('O.INVOICE LIKE :INVOICE', { INVOICE: `%${INVOICE}%` });
         if (DUEDATE)    query.andWhere('O.DUEDATE = :DUEDATE', { DUEDATE });
 
@@ -240,12 +243,13 @@ export class OrderListService {
         if (type === 'count') {
             return query;
         } else if (type === 'data') {
-            query.select('JOP_MFGNO, JOP_PONO, JOP_LINENO, JOP_MAR_REVISION, JOP_PUR_STATUS, JOP_MAR_REQUEST, JOP_MAR_REQUEST_DATE, JOP_MAR_INPUT_DATE, JOP_MAR_REMARK, JOP_PUR_REVISION, JOP_PUR_CONFIRM, JOP_PUR_CONFIRM_DATE, JOP_PUR_INPUT_DATE, JOP_PUR_REMARK');
+            
             let select = [];
             if (fields.length > 0) {
                 select = getSafeFields(fields, this.allowFields);
             }else{
                 select = this.allowFields;
+                query.select('JOP_MFGNO, JOP_PONO, JOP_LINENO, JOP_MAR_REVISION, JOP_PUR_STATUS, JOP_MAR_REQUEST, JOP_MAR_REQUEST_DATE, JOP_MAR_INPUT_DATE, JOP_MAR_REMARK, JOP_PUR_REVISION, JOP_PUR_CONFIRM, JOP_PUR_CONFIRM_DATE, JOP_PUR_INPUT_DATE, JOP_PUR_REMARK');
             }
             select.forEach((f)=>{
                 // if (this.JOP_REQ.includes(f)) {

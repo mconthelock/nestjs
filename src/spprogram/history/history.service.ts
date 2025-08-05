@@ -20,7 +20,7 @@ export class HistoryService {
   async findOne(no: string) {
     return await this.history.find({
       where: { INQ_NO: no },
-      relations: ['users'],
+      relations: ['users', 'status'],
       order: { INQH_DATE: 'DESC' },
     });
   }

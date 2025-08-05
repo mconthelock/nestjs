@@ -1,5 +1,5 @@
 import { Transform, Type } from 'class-transformer';
-import { IsOptional, IsString, IsNumber, IsArray, IsBoolean } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsArray, IsBoolean, IsIn } from 'class-validator';
 export class SearchOrderListDto {
     @IsOptional()
     @Type(() => Number)
@@ -135,7 +135,20 @@ export class SearchOrderListDto {
     readonly INVOICE?: string;
 
     @IsOptional()
+    @IsString()
+    readonly PARTNAME?: string;
+
+    @IsOptional()
     @Type(() => Number)
     @IsNumber()
     readonly DUEDATE?: number;
+
+    @IsOptional()
+    @IsString()
+    readonly orderby?: string;
+
+    @IsOptional()
+    @IsString()
+    @IsIn(['ASC', 'DESC'])
+    readonly orderbyDirection?: 'ASC' | 'DESC';
 }

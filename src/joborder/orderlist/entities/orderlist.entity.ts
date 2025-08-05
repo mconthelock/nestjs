@@ -101,6 +101,9 @@ export class VOrderList {
   
   @ViewColumn()
   VENDCODE: Number | null;
+
+  @ViewColumn()
+  VENDNAME: Number | null;
   
   @ViewColumn()
   ITEM: string | null;

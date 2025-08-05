@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryColumn, OneToMany, JoinColumn } from 'typeorm';
 import { Inquiry } from '../../inquiry/entities/inquiry.entity';
+import { History } from '../../history/entities/history.entity';
 
 @Entity('SP_STATUS')
 export class Status {
@@ -23,4 +24,8 @@ export class Status {
   @OneToMany(() => Inquiry, (inq) => inq.status)
   @JoinColumn({ name: 'STATUS_ID', referencedColumnName: 'INQ_STATUS' })
   inqs: Inquiry;
+
+  @OneToMany(() => History, (st) => st.status)
+  @JoinColumn({ name: 'STATUS_ID', referencedColumnName: 'INQH_ACTION' })
+  action: History;
 }

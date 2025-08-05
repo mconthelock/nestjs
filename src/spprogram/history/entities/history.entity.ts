@@ -1,5 +1,4 @@
 import { Column, Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { SpUser } from 'src/spprogram/users/users.entity';
 
 @Entity('SP_INQUIRY_HISTORY')
 export class History {
@@ -23,8 +22,4 @@ export class History {
 
   @Column()
   INQH_REMARK: string;
-
-  @ManyToOne(() => SpUser, (usr) => usr.history)
-  @JoinColumn({ name: 'INQH_USER', referencedColumnName: 'SEMPNO' })
-  users: SpUser;
 }

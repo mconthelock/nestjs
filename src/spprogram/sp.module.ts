@@ -13,7 +13,6 @@ import { MethodModule } from './method/method.module';
 import { AttachmentsModule } from './attachments/attachments.module';
 import { HistoryModule } from './history/history.module';
 import { StatusModule } from './status/status.module';
-// import { SpusersModule } from './spusers/spusers.module';
 
 @Module({
   imports: [
@@ -31,7 +30,6 @@ import { StatusModule } from './status/status.module';
     AttachmentsModule,
     HistoryModule,
     StatusModule,
-    // SpusersModule,
   ],
 })
 export class SpModule {}

@@ -11,8 +11,8 @@ export class InquiryDetailService {
     private readonly detail: Repository<InquiryDetail>,
   ) {}
 
-  create(createDto: createDto) {
-    const inquiryDetail = this.detail.create(createDto);
-    return this.detail.save(inquiryDetail);
+  async create(createDto: createDto) {
+    const inquiryDetail = await this.detail.create(createDto);
+    return await this.detail.save(inquiryDetail);
   }
 }

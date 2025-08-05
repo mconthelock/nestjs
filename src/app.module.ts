@@ -20,8 +20,7 @@ import { PisModule } from './pis/pis.module';
 import { ESCSModule } from './escs/escs.module';
 import { DetailModule } from './idtag/detail/detail.module';
 import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
-
-import webformConfig from './databases/webform.config';
+// import webformConfig from './databases/webform.config';
 
 @Module({
   imports: [

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-// import { InquiryModule } from './inquiry/inquiry.module';
+import { InquiryModule } from './inquiry/inquiry.module';
 import { InquiryGroupModule } from './inquiry-group/inquiry-group.module';
 import { InquiryDetailModule } from './inquiry-detail/inquiry-detail.module';
 import { InquiryControlModule } from './inquiry-control/inquiry-control.module';
@@ -9,15 +9,15 @@ import { ReasonModule } from './reason/reason.module';
 import { CurrencyModule } from './currency/currency.module';
 import { RatioModule } from './ratio/ratio.module';
 import { ShipmentModule } from './shipment/shipment.module';
-import { InquiryModule } from './inquiry/inquiry.module';
 import { MethodModule } from './method/method.module';
 import { AttachmentsModule } from './attachments/attachments.module';
 import { HistoryModule } from './history/history.module';
 import { StatusModule } from './status/status.module';
+// import { SpusersModule } from './spusers/spusers.module';
 
 @Module({
   imports: [
-    // InquiryModule,
+    InquiryModule,
     InquiryGroupModule,
     InquiryDetailModule,
     InquiryControlModule,
@@ -27,11 +27,11 @@ import { StatusModule } from './status/status.module';
     CurrencyModule,
     RatioModule,
     ShipmentModule,
-    InquiryModule,
     MethodModule,
     AttachmentsModule,
     HistoryModule,
     StatusModule,
+    // SpusersModule,
   ],
 })
 export class SpModule {}

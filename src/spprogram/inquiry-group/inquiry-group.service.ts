@@ -22,8 +22,13 @@ export class InquiryGroupService {
     });
   }
 
+  async find(id: number) {
+    return await this.group.find({ where: { INQ_ID: id, INQG_LATEST: 1 } });
+  }
+
   async create(createDto: createDto) {
-    const inquiryGroup = this.group.create(createDto);
-    return this.group.save(inquiryGroup);
+    const inquiryGroup = await this.group.create(createDto);
+    const res = await this.group.save(inquiryGroup);
+    return await this.group.find({ where: { INQ_ID: createDto.INQ_ID } });
   }
 }

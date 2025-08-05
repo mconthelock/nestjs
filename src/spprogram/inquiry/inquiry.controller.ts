@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get } from '@nestjs/common';
 import { InquiryService } from './inquiry.service';
 import { searchDto } from './dto/search.dto';
 import { createDto } from './dto/create-inquiry.dto';
@@ -13,7 +13,13 @@ export class InquiryController {
   }
 
   @Post('create')
-  async create(@Body() createInquiryDto: any) {
-    return await this.inq.create(createInquiryDto);
+  async create(@Body() req: any) {
+    const data = await this.inq.create(req.header, req.details);
+    //return await this.inq.create(createInquiryDto);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: number) {
+    return this.inq.findOne(id);
   }
 }

@@ -5,7 +5,7 @@ import {
   NotFoundException,
   Post,
   Body,
-  Req
+  Req,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { UsersService } from './users.service';
@@ -17,7 +17,8 @@ export class UsersController {
 
   @Get(':id')
   findEmp(@Param('id') id: string, @Req() req: Request) {
-    return this.usersService.findEmp(id, req.headers.host);
+    // return this.usersService.findEmp(id, req.headers.host);
+    return null;
   }
 
   @Get('image/:id')
@@ -34,13 +35,14 @@ export class UsersController {
 
   @Post('search')
   async search(@Body() searchDto: searchDto, @Req() req: Request) {
-    const data = await this.usersService.search(req.headers.host);
-    const filtered = data.filter((val) => {
-      return Object.entries(searchDto).every(([key, value]) => {
-        return val[key] == value;
-      });
-    });
+    // const data = await this.usersService.search(req.headers.host);
+    // const filtered = data.filter((val) => {
+    //   return Object.entries(searchDto).every(([key, value]) => {
+    //     return val[key] == value;
+    //   });
+    // });
 
-    return filtered;
+    // return filtered;
+    return null;
   }
 }

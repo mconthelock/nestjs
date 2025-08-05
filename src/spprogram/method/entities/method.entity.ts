@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, JoinColumn, OneToMany } from 'typeorm';
+import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 
 @Entity('SP_METHOD')
 export class Method {
@@ -15,4 +16,11 @@ export class Method {
   // ตัวอย่าง:
   // @ManyToOne(() => User, user => user.posts)
   // user: User;
+
+  @OneToMany(() => Inquiry, (inq) => inq.method)
+  @JoinColumn({
+    name: 'METHOD_ID',
+    referencedColumnName: 'INQ_DELIVERY_METHOD',
+  })
+  inqs: Inquiry;
 }

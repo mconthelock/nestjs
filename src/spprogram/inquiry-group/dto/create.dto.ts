@@ -5,7 +5,7 @@ export class createDto {
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  INQG_ID: number;
+  INQG_ID?: number;
 
   @IsNumber()
   @IsOptional()
@@ -23,35 +23,35 @@ export class createDto {
 
   @IsString()
   @IsOptional()
-  INQG_ASG: string;
+  INQG_ASG?: string;
 
   @IsString()
   @IsOptional()
-  INQG_DES: string;
+  INQG_DES?: string;
 
   @IsString()
   @IsOptional()
-  INQG_CHK: string;
+  INQG_CHK?: string;
 
   @IsString()
   @IsOptional()
-  INQG_CLASS: string;
+  INQG_CLASS?: string;
 
   @IsOptional()
   @Type(() => Date)
-  INQG_ASG_DATE: Date;
+  INQG_ASG_DATE?: Date;
 
   @IsOptional()
   @Type(() => Date)
-  INQG_DES_DATE: Date;
+  INQG_DES_DATE?: Date;
 
   @IsOptional()
   @Type(() => Date)
-  INQG_CHK_DATE: Date;
+  INQG_CHK_DATE?: Date;
 
   @IsString()
   @IsOptional()
-  INQG_DES_REASON: string;
+  INQG_DES_REASON?: string;
 
   @IsNumber()
   @IsOptional()
@@ -65,5 +65,5 @@ export class createDto {
 
   @IsString()
   @IsOptional()
-  IS_MAIL: string;
+  IS_MAIL?: string;
 }

@@ -6,6 +6,7 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
+import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 
 @Entity('SP_DELIVERY_TERM')
 export class Term {
@@ -17,4 +18,11 @@ export class Term {
 
   @Column()
   TERM_STATUS: string;
+
+  @OneToMany(() => Inquiry, (inq) => inq.term)
+  @JoinColumn({
+    name: 'TERM_ID',
+    referencedColumnName: 'INQ_DELIVERY_TERM',
+  })
+  inqs: Inquiry;
 }

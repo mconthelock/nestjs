@@ -5,7 +5,7 @@ import {
   NotFoundException,
   Post,
   Body,
-  Req
+  Req,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { UsersService } from './users.service';

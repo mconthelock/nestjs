@@ -8,5 +8,6 @@ import { InquiryDetail } from './entities/inquiry-detail.entity';
   imports: [TypeOrmModule.forFeature([InquiryDetail], 'amecConnection')],
   controllers: [InquiryDetailController],
   providers: [InquiryDetailService],
+  exports: [InquiryDetailService],
 })
 export class InquiryDetailModule {}

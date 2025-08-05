@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { History } from './entities/history.entity';
 import { createDto } from './dto/create.dto';
+
+import { History } from './entities/history.entity';
 
 @Injectable()
 export class HistoryService {
@@ -11,14 +12,15 @@ export class HistoryService {
     private readonly history: Repository<History>,
   ) {}
 
-  create(createDto: createDto) {
-    const history = this.history.create(createDto);
-    return this.history.save(history);
+  async create(createDto: createDto) {
+    const history = await this.history.create(createDto);
+    return await this.history.save(history);
   }
 
-  findOne(no: string) {
-    return this.history.find({
+  async findOne(no: string) {
+    return await this.history.find({
       where: { INQ_NO: no },
+      relations: ['users'],
       order: { INQH_DATE: 'DESC' },
     });
   }

@@ -7,7 +7,12 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { InquiryGroup } from '../../inquiry-group/entities/inquiry-group.entity';
+import { InquiryDetail } from '../../inquiry-detail/entities/inquiry-detail.entity';
 import { Status } from '../../status/entities/status.entity';
+import { QuotationType } from '../../quotation-type/entities/quotation-type.entity';
+import { Method } from '../../method/entities/method.entity';
+import { Term } from '../../term/entities/term.entity';
+import { Shipment } from '../../shipment/entities/shipment.entity';
 
 @Entity('SP_INQUIRY')
 export class Inquiry {
@@ -188,7 +193,33 @@ export class Inquiry {
   @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'INQ_ID' })
   inqgroup: InquiryGroup;
 
+  @OneToMany(() => InquiryDetail, (detail) => detail.inqs)
+  @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'INQID' })
+  details: InquiryDetail;
+
   @ManyToOne(() => Status, (status) => status.inqs)
   @JoinColumn({ name: 'INQ_STATUS', referencedColumnName: 'STATUS_ID' })
   status: Status;
+
+  @ManyToOne(() => QuotationType, (type) => type.inqs)
+  @JoinColumn({
+    name: 'INQ_QUOTATION_TYPE',
+    referencedColumnName: 'QUOTYPE_ID',
+  })
+  quotype: QuotationType;
+
+  @ManyToOne(() => Method, (md) => md.inqs)
+  @JoinColumn({
+    name: 'INQ_DELIVERY_METHOD',
+    referencedColumnName: 'METHOD_ID',
+  })
+  method: Method;
+
+  @ManyToOne(() => Term, (tm) => tm.inqs)
+  @JoinColumn({ name: 'INQ_DELIVERY_TERM', referencedColumnName: 'TERM_ID' })
+  term: Term;
+
+  @ManyToOne(() => Shipment, (ship) => ship.inqs)
+  @JoinColumn({ name: 'INQ_SHIPMENT', referencedColumnName: 'SHIPMENT_ID' })
+  shipment: Shipment;
 }

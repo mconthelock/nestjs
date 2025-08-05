@@ -8,5 +8,6 @@ import { InquiryGroup } from './entities/inquiry-group.entity';
   imports: [TypeOrmModule.forFeature([InquiryGroup], 'amecConnection')],
   controllers: [InquiryGroupController],
   providers: [InquiryGroupService],
+  exports: [InquiryGroupService],
 })
 export class InquiryGroupModule {}

@@ -11,41 +11,36 @@ import { gpreportModule } from './gpreport/gpreport.module';
 import { AS400Module } from './as400/as400.module';
 import { WebformModule } from './webform/webform.module';
 import { HeaderModule } from './idtag/header/header.module';
-
 import { SpModule } from './spprogram/sp.module';
 import { MktModule } from './marketing/mkt.module';
-
 import { JobOrderModule } from './joborder/joborder.module';
 import { PisModule } from './pis/pis.module';
 import { ESCSModule } from './escs/escs.module';
 import { DetailModule } from './idtag/detail/detail.module';
 import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
-// import webformConfig from './databases/webform.config';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync(amecConfig),
-    // TypeOrmModule.forRootAsync(webformConfig),
     //BB8 💣
-    // AuthModule,
-    // AmecModule,
-    // AmecMfgModule,
-    // DocinvModule,
-    // gpreportModule,
-    // WebformModule,
-    // HeaderModule,
+    AuthModule,
+    AmecModule,
+    AmecMfgModule,
+    DocinvModule,
+    gpreportModule,
+    WebformModule,
+    HeaderModule,
     SpModule,
     MktModule,
-    // AS400Module,
+    AS400Module,
     //JB 🤴
-    // JobOrderModule,
-    // PisModule,
-    // ESCSModule,
-    // DetailModule,
-    // ItemarrnglstModule,
+    JobOrderModule,
+    PisModule,
+    ESCSModule,
+    DetailModule,
+    ItemarrnglstModule,
   ],
 })
 export class AppModule {}

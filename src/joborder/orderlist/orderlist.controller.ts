@@ -94,6 +94,7 @@ export class OrderListController {
   async confirm(@Body() dto: SearchOrderListDto) {
     // return this.OrderListService.confirm(dto);
     const orderList = await this.OrderListService.confirm(dto);
+    return orderList;
     const list = await this.getRevisionHistory(orderList);
     return list;
   }
@@ -103,6 +104,7 @@ export class OrderListController {
   async shipment(@Body() dto: SearchOrderListDto) {
     // return this.OrderListService.shipment(dto);
     const orderList = await this.OrderListService.shipment(dto);
+    return orderList;
     const list = await this.getRevisionHistory(orderList);
     return list;
   }

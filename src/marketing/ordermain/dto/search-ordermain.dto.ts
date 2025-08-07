@@ -35,4 +35,8 @@ export class SearchOrdermainDto {
   @IsOptional()
   @IsString()
   CAR_NO: string;
+
+  @IsOptional()
+  @IsString()
+  SMFGNO: string;
 }

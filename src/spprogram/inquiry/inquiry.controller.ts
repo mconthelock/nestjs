@@ -15,7 +15,7 @@ export class InquiryController {
   @Post('create')
   async create(@Body() req: any) {
     const data = await this.inq.create(req.header, req.details);
-    //return await this.inq.create(createInquiryDto);
+    return await this.inq.findByNumber(req.header.INQ_NO);
   }
 
   @Get(':id')

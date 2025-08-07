@@ -53,6 +53,21 @@ export class InquiryService {
     });
   }
 
+  async findByNumber(no: string) {
+    return this.inq.findOne({
+      where: { INQ_NO: no, INQ_LATEST: 1 },
+      relations: {
+        inqgroup: true,
+        details: true,
+        status: true,
+        quotype: true,
+        method: true,
+        term: true,
+        shipment: true,
+      },
+    });
+  }
+
   async search(searchDto: searchDto) {
     const q = { INQ_LATEST: 1 };
     return this.inq.find({

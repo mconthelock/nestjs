@@ -25,6 +25,13 @@ export class OrdermainService {
         { trimmedCarNo },
       );
     }
+
+    if (req.SMFGNO) {
+      const trimmedMfgNo = req.SMFGNO.trim();
+      where['MFGNO'] = Raw((columnAlias) => `MFGNO LIKE '%${trimmedMfgNo}%'`, {
+        trimmedMfgNo,
+      });
+    }
     return await this.ords.find({ where: where });
   }
 }

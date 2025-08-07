@@ -196,7 +196,7 @@ export class OrderListService {
     }
 
     private setQueryNew(dto: SearchOrderListDto, type: string = 'data') {
-        const { fields = [], ORDTYPE, PRJ_NO, MFGNO, BUYEREMPNO, BUYERNAME, PRNO, PRDATE, PONO, PODATE, LINENO, VENDCODE, ITEM, DRAWING, PARTNAME, INVOICE, DUEDATE, TURNOVER_STATUS, AGENT, SERIES, SDESSCH, SPRODSCH, SDESBMDATE, SMFGBMDATE, EDESSCH, EPRODSCH, EDESBMDATE, EMFGBMDATE, distinct, orderby, orderbyDirection, JOP_PUR_STATUS } = dto;
+        const { fields = [], ORDTYPE, PRJ_NO, MFGNO, BUYEREMPNO, BUYERNAME, PRNO, PRDATE, PONO, PODATE, LINENO, VENDCODE, ITEM, DRAWING, PARTNAME, INVOICE, DUEDATE, TURNOVER_STATUS, AGENT, SERIES, SDESSCH, SPRODSCH, SDESBMDATE, SMFGBMDATE, EDESSCH, EPRODSCH, EDESBMDATE, EMFGBMDATE, distinct, orderby, orderbyDirection, JOP_PUR_STATUS, JOP_PUR_INPUT_DATE } = dto;
 
         const query = this.dataSource.createQueryBuilder().from('MV_JOB_ORDER','O');
         query.distinct(distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
@@ -236,6 +236,10 @@ export class OrderListService {
         }
         if (SMFGBMDATE && EMFGBMDATE) {
             query.andWhere(`O.MFGBMDATE >= TO_DATE(:SMFGBMDATE, 'YYYY-MM-DD') AND O.MFGBMDATE <= TO_DATE(:EMFGBMDATE, 'YYYY-MM-DD')` , { SMFGBMDATE, EMFGBMDATE });
+        }
+
+        if (JOP_PUR_INPUT_DATE) {
+            query.andWhere(`TRUNC(J.JOP_PUR_INPUT_DATE) = TO_DATE(:JOP_PUR_INPUT_DATE, 'YYYY-MM-DD')` , { JOP_PUR_INPUT_DATE });
         }
 
         // all order, pending confirm, pending shipment

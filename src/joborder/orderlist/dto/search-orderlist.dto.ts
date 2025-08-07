@@ -156,4 +156,8 @@ export class SearchOrderListDto {
     @Type(() => Number)
     @IsNumber()
     readonly JOP_PUR_STATUS?: number;
+
+    @IsOptional()
+    @IsString()
+    readonly JOP_PUR_INPUT_DATE?: string;
 }

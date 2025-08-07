@@ -196,7 +196,7 @@ export class OrderListService {
     }
 
     private setQueryNew(dto: SearchOrderListDto, type: string = 'data') {
-        const { fields = [], ORDTYPE, PRJ_NO, MFGNO, BUYEREMPNO, BUYERNAME, PRNO, PRDATE, PONO, PODATE, LINENO, VENDCODE, ITEM, DRAWING, PARTNAME, INVOICE, DUEDATE, TURNOVER_STATUS, AGENT, SERIES, SDESSCH, SPRODSCH, SDESBMDATE, SMFGBMDATE, EDESSCH, EPRODSCH, EDESBMDATE, EMFGBMDATE, distinct, orderby, orderbyDirection } = dto;
+        const { fields = [], ORDTYPE, PRJ_NO, MFGNO, BUYEREMPNO, BUYERNAME, PRNO, PRDATE, PONO, PODATE, LINENO, VENDCODE, ITEM, DRAWING, PARTNAME, INVOICE, DUEDATE, TURNOVER_STATUS, AGENT, SERIES, SDESSCH, SPRODSCH, SDESBMDATE, SMFGBMDATE, EDESSCH, EPRODSCH, EDESBMDATE, EMFGBMDATE, distinct, orderby, orderbyDirection, JOP_PUR_STATUS } = dto;
 
         const query = this.dataSource.createQueryBuilder().from('MV_JOB_ORDER','O');
         query.distinct(distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
@@ -219,6 +219,7 @@ export class OrderListService {
         if (PARTNAME)   query.andWhere('O.PARTNAME LIKE :PARTNAME', { PARTNAME: `%${PARTNAME}%` });
         if (INVOICE)    query.andWhere('O.INVOICE LIKE :INVOICE', { INVOICE: `%${INVOICE}%` });
         if (DUEDATE)    query.andWhere('O.DUEDATE = :DUEDATE', { DUEDATE });
+        if (JOP_PUR_STATUS >= 0)    query.andWhere('J.JOP_PUR_STATUS = :JOP_PUR_STATUS', { JOP_PUR_STATUS });
 
         // search report 
         if (PRJ_NO)     query.andWhere('O.PRJ_NO LIKE :PRJ_NO', { PRJ_NO: `%${PRJ_NO}%` });

@@ -151,4 +151,9 @@ export class SearchOrderListDto {
     @IsString()
     @IsIn(['ASC', 'DESC'])
     readonly orderbyDirection?: 'ASC' | 'DESC';
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber()
+    readonly JOP_PUR_STATUS?: number;
 }

@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MulterModule } from '@nestjs/platform-express';
 import { AttachmentsService } from './attachments.service';
 import { Attachments } from './entities/attachments.entity';
-import { AttachmentsController } from './attachments.controller';
+import { AttachmentsController } from '.controller';
 
 @Module({
   controllers: [AttachmentsController],
-  imports: [
-    TypeOrmModule.forFeature([Attachments], 'amecConnection')
-  ],
+  imports: [TypeOrmModule.forFeature([Attachments], 'amecConnection')],
   providers: [AttachmentsService],
 })
 export class AttachmentsModule {}
+b;

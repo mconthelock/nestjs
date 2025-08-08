@@ -219,7 +219,13 @@ export class OrderListService {
         if (PARTNAME)   query.andWhere('O.PARTNAME LIKE :PARTNAME', { PARTNAME: `%${PARTNAME}%` });
         if (INVOICE)    query.andWhere('O.INVOICE LIKE :INVOICE', { INVOICE: `%${INVOICE}%` });
         if (DUEDATE)    query.andWhere('O.DUEDATE = :DUEDATE', { DUEDATE });
-        if (JOP_PUR_STATUS >= 0)    query.andWhere('J.JOP_PUR_STATUS = :JOP_PUR_STATUS', { JOP_PUR_STATUS });
+        if (JOP_PUR_STATUS == 2){
+            query.andWhere('J.JOP_PUR_STATUS IS NOT NULL');
+        } else if (JOP_PUR_STATUS == 3) {
+            query.andWhere('J.JOP_PUR_STATUS IS NULL');
+        } else if (JOP_PUR_STATUS >= 0) {
+            query.andWhere('J.JOP_PUR_STATUS = :JOP_PUR_STATUS', { JOP_PUR_STATUS });
+        }   
 
         // search report 
         if (PRJ_NO)     query.andWhere('O.PRJ_NO LIKE :PRJ_NO', { PRJ_NO: `%${PRJ_NO}%` });

@@ -3,12 +3,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
 import { AttachmentsService } from './attachments.service';
 import { Attachments } from './entities/attachments.entity';
-import { AttachmentsController } from '.controller';
+import { AttachmentsController } from './attachments.controller';
 
 @Module({
+  imports: [
+    TypeOrmModule.forFeature([Attachments], 'amecConnection'),
+    MulterModule.register({ dest: './uploads' }),
+  ],
   controllers: [AttachmentsController],
-  imports: [TypeOrmModule.forFeature([Attachments], 'amecConnection')],
   providers: [AttachmentsService],
 })
 export class AttachmentsModule {}
-b;

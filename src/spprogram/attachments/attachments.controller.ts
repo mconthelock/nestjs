@@ -77,7 +77,7 @@ export class AttachmentsController {
         FILE_NAME: file.filename,
         FILE_ORIGINAL_NAME: file.originalname,
         FILE_SIZE: file.size,
-        FILE_TYPE: file.mimetype,
+        FILE_TYPE: extname(file.filename),
         FILE_STATUS: 1,
         FILE_OWNER: 'MAR',
         FILE_MAR_READ: 0,

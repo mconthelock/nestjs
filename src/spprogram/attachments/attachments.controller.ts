@@ -1,6 +1,8 @@
 import {
   Controller,
   Post,
+  Get,
+  Param,
   UseInterceptors,
   UploadedFiles,
   BadRequestException,
@@ -89,8 +91,6 @@ export class AttachmentsController {
     });
 
     // files จะเป็น array ของไฟล์ที่ถูกอัปโหลด
-    console.log('Files uploaded:', files);
-    console.log('Additional data:', body);
     const uploadedFileDetails = files.map((file) => ({
       filename: file.filename,
       path: file.path,
@@ -102,15 +102,9 @@ export class AttachmentsController {
       data: body,
     };
   }
-}
 
-const allowedMimeTypes = [
-  'image/*',
-  'application/acad',
-  'image/vnd.dwg',
-  'application/pdf',
-  'application/msword',
-  'application/vnd.ms-excel',
-  'application/vnd.ms-powerpoint',
-  'application/vnd.openxmlformats-officedocument.*',
-];
+  @Post('search')
+  async findInqno(@Body() searchDto: any) {
+    return await this.atth.findInqno(searchDto);
+  }
+}

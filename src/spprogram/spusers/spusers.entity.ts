@@ -1,6 +1,7 @@
 import { Entity, OneToMany, JoinColumn } from 'typeorm';
 import { User } from 'src/amec/users/entities/user.entity';
 import { History } from 'src/spprogram/history/entities/history.entity';
+import { Inquiry } from 'src/spprogram/inquiry/entities/inquiry.entity';
 
 @Entity('AMECUSERALL')
 export class SpUser extends User {

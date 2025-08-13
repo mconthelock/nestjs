@@ -6,7 +6,7 @@ import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper'
 import { ApiTags, ApiExcludeEndpoint } from '@nestjs/swagger';
 
 @ApiTags('QA-INS Form')
-@Controller('qains-form')
+@Controller('qaform/qa-ins')
 export class QainsFormController {
   constructor(private readonly qainsFormService: QainsFormService) {}
 
@@ -14,17 +14,12 @@ export class QainsFormController {
 
   @ApiExcludeEndpoint()
   @Post('request')
-  @UseInterceptors(getFileUploadInterceptor('file'))
-  uploadUserFile(
-    @UploadedFiles() file: Express.Multer.File,
-    @Body() dto: CreateQainsFormDto   // รับข้อมูลอื่น ๆ ทั้งหมดเป็น object
+  @UseInterceptors(getFileUploadInterceptor('files', true, 20))
+  async uploadUserFile(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() dto: CreateQainsFormDto 
   ) {
-    
-    // const formno = getformno(dto.NFRMNO, dto.VORGNO, dto.CYEAR, dto.CYEAR2, dto.NRUNNO) || '';
-    // return {
-    //   formno,
-    //   file,
-    // };
+    return this.qainsFormService.create(dto, files, this.path);
   }
 
  

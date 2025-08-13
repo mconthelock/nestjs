@@ -1,28 +1,24 @@
-
 import { Type } from 'class-transformer';
 import { IsOptional, IsString, IsNumber, IsDateString } from 'class-validator';
 export class CreateQainsFormDto {
-//   @IsOptional()
+  //   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   NFRMNO: number;
 
-//   @IsOptional()
+  //   @IsOptional()
   @IsString()
   VORGNO: string;
 
-//   @IsOptional()
+  //   @IsOptional()
   @IsString()
   CYEAR: string;
 
-//   @IsOptional()
   @IsString()
-  CYEAR2: string;
+  REQUESTER: string;
 
-//   @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  NRUNNO: number;
+  @IsString()
+  CREATEBY: string;
 
   @IsOptional()
   @IsString()

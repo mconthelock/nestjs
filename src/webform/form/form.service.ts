@@ -39,9 +39,7 @@ export class FormService {
     private readonly sequenceOrgService: SequenceOrgService,
   ) {}
 
-  private repo: Repository<any>;
-  private host:string;
-  private ip:string;
+  private ip: string;
 
   private nfrmno: number;
   private vorgno: string;
@@ -65,7 +63,7 @@ export class FormService {
   private CSTEPST: number;
   private CSTEPSTDX: number;
 
-  private queryRunner: QueryRunner;
+  //   private queryRunner: QueryRunner;
 
   findOne(fno, orgno, cyear, cyear2, nrunno) {
     return this.form.find({
@@ -112,54 +110,72 @@ export class FormService {
     return `${form[0].VANAME}${year2}-${runNo}`;
   }
 
-  async create(dto: CreateFormDto, ip: string) {
-    this.queryRunner = this.dataSource.createQueryRunner();
+  async create(dto: CreateFormDto, ip: string, queryRunner?: QueryRunner) {
+    let localRunner: QueryRunner | undefined;
+    // this.queryRunner = this.dataSource.createQueryRunner();
     try {
-      await this.queryRunner.connect();
-      await this.queryRunner.startTransaction();
+      if (!queryRunner) {
+        localRunner = this.dataSource.createQueryRunner();
+        await localRunner.connect();
+        await localRunner.startTransaction();
+      }
+      const runner = queryRunner || localRunner!;
+      //   await this.queryRunner.connect();
+      //   await this.queryRunner.startTransaction();
 
-      this.ip = ip;
-      this.empno = dto.REQBY;
-      this.inputempno = dto.INPUTBY;
-      this.remark = dto.REMARK;
-      this.nfrmno = dto.NFRMNO;
-      this.vorgno = dto.VORGNO;
-      this.cyear = dto.CYEAR;
-      this.CSTEPSTDX = 4;
+    //   this.ip = ip;
+    //   this.empno = dto.REQBY;
+    //   this.inputempno = dto.INPUTBY;
+    //   this.remark = dto.REMARK;
+    //   this.nfrmno = dto.NFRMNO;
+    //   this.vorgno = dto.VORGNO;
+    //   this.cyear = dto.CYEAR;
+    //   this.CSTEPSTDX = 4;
+      const context: any = {
+        ip: ip,
+        empno: dto.REQBY,
+        inputempno: dto.INPUTBY,
+        remark: dto.REMARK,
+        nfrmno: dto.NFRMNO,
+        vorgno: dto.VORGNO,
+        cyear: dto.CYEAR,
+        cyear2: new Date().getFullYear().toString(),
+        CSTEPSTDX: 4,
+      }
 
-      this.setQuery();
-      await this.setFormNo();
-      const formData = await this.setFormValue();
+      this.setQuery(context);
+      await this.setFormNo(context);
+      const formData = await this.setFormValue(context);
       //   console.log('formData : ', formData);
 
-      if (await this.insertForm(formData)) {
+      if (await this.insertForm(formData, runner)) {
         console.log('Form inserted successfully');
-        this.flag = 0;
+        context.flag = 0;
         const flowMaster = await this.flowmstService.getFlowMaster(
-          this.nfrmno,
-          this.vorgno,
-          this.cyear,
+          context.nfrmno,
+          context.vorgno,
+          context.cyear,
         );
         console.log('flowMaster : ', flowMaster);
-        await this.setOrganize();
+        await this.setOrganize(context);
         //   flowMaster.forEach(async (row: any) => {
         for (const row of flowMaster) {
           //   console.log('row : ', row.VPOSNO);
 
           switch (row.CTYPE) {
             case '1':
-              await this.addFlow1(row);
+              await this.addFlow1(row, context, runner);
               break;
             case '2':
-              await this.addFlow2(row);
+              await this.addFlow2(row, context, runner);
               break;
             case '3':
-              this.VAPVNO = row.VAPVNO;
-              this.CSTEPST = this.CSTEPSTDX <= 1 ? 1 : this.CSTEPSTDX - 1;
-              this.CSTEPSTDX--;
-              await this.getRepresent(row.VAPVNO);
-              const flow = this.setFlow(row);
-              await this.flowService.insertFlow(flow, this.queryRunner);
+              context.VAPVNO = row.VAPVNO;
+              context.CSTEPST = context.CSTEPSTDX <= 1 ? 1 : context.CSTEPSTDX - 1;
+              context.CSTEPSTDX--;
+              await this.getRepresent(row.VAPVNO, context);
+              const flow = this.setFlow(row, context);
+              await this.flowService.insertFlow(flow, runner);
               break;
             default:
               break;
@@ -167,48 +183,33 @@ export class FormService {
         }
         // add first step
         // Unset CSTEPST from this.query if it exists
-        if (this.query && 'CSTEPST' in this.query) {
-          delete this.query['CSTEPST'];
+        if (context.query && 'CSTEPST' in context.query) {
+          delete context.query['CSTEPST'];
         }
-        this.query.CSTEPST = '3';
-        this.query.NRUNNO = this.nrunno;
-        // console.log('------------------------------------------------');
-        // console.log(await this.flowService.getFlow({
-        //     NFRMNO: this.nfrmno,
-        //     VORGNO: this.vorgno,
-        //     CYEAR: this.cyear,
-        //     CYEAR2: this.cyear2,
-        //     NRUNNO: this.nrunno,
-        // }, this.host, this.queryRunner));
+        context.query.CSTEPST = '3';
+        context.query.NRUNNO = context.nrunno;
 
-        // console.log('test query : ', this.query);
-
-        const first = await this.flowService.getFlow(
-          this.query,
-          this.queryRunner,
-        );
+        const first = await this.flowService.getFlow(context.query, runner);
         console.log('first : ', first);
-        await this.firstflow(first);
+        await this.firstflow(first, context, runner);
         // add manager
-        if (this.flag == 1) {
-          this.managerStep();
+        if (context.flag == 1) {
+          this.managerStep(context, runner);
         }
 
-        this.query.CSTEPST = '0';
-        const notuse = await this.flowService.getFlow(
-          this.query,
-          this.queryRunner,
-        );
+        context.query.CSTEPST = '0';
+        const notuse = await this.flowService.getFlow(context.query, runner);
         for (const row of notuse) {
-          await this.deleteFlowStep(row);
+          await this.deleteFlowStep(row, context, runner);
         }
 
         //Draft form
         if (dto.DRAFT) {
-          await this.saveDraft(dto.DRAFT);
+          await this.saveDraft(dto.DRAFT, context, runner);
         }
 
-        await this.queryRunner.commitTransaction();
+        // await this.queryRunner.commitTransaction();
+        if (localRunner) await localRunner.commitTransaction();
         return {
           status: true,
           message: 'Insert form successful',
@@ -221,42 +222,51 @@ export class FormService {
         throw new Error('Failed to insert form'); // Throw an error to trigger rollback
       }
     } catch (error) {
-      await this.queryRunner.rollbackTransaction();
+      //   await this.queryRunner.rollbackTransaction();
+      if (localRunner) await localRunner.rollbackTransaction();
       return { status: false, message: 'Error: ' + error.message };
     } finally {
-      await this.queryRunner.release();
+      //   await this.queryRunner.release();
+      if (localRunner) await localRunner.release();
     }
 
     // return this.form.save(dto);
   }
 
-  setQuery() {
+  setQuery(context: any) {
     console.log('set query');
 
-    this.query = {
-      NFRMNO: this.nfrmno,
-      VORGNO: this.vorgno,
-      CYEAR: this.cyear,
-      CYEAR2: this.cyear2,
-      // CYEAR2: new Date().getFullYear().toString(),
+    context.query = {
+      NFRMNO: context.nfrmno,
+      VORGNO: context.vorgno,
+      CYEAR: context.cyear,
+      CYEAR2: context.cyear2,
     };
+
+    // this.query = {
+    //   NFRMNO: this.nfrmno,
+    //   VORGNO: this.vorgno,
+    //   CYEAR: this.cyear,
+    //   CYEAR2: this.cyear2,
+    //   // CYEAR2: new Date().getFullYear().toString(),
+    // };
   }
 
-  async setFormNo() {
+  async setFormNo(context: any) {
     console.log('set form no');
 
-    const form = await this.getFormNextRunNo();
+    const form = await this.getFormNextRunNo(context);
     if (form.length > 0) {
-      this.nrunno = form[0].NRUNNO + 1;
+      context.nrunno = form[0].NRUNNO + 1;
     } else {
-      this.nrunno = 1;
+      context.nrunno = 1;
     }
-    console.log('nrunno : ', this.nrunno);
+    console.log('nrunno : ', context.nrunno);
   }
 
-  getFormNextRunNo() {
+  getFormNextRunNo(context: any) {
     return this.form.find({
-      where: this.query,
+      where: context.query,
       order: {
         NRUNNO: 'DESC',
       },
@@ -264,13 +274,13 @@ export class FormService {
     });
   }
 
-  async setFormValue() {
+  async setFormValue(context: any) {
     console.log('set form value');
 
     const condition = {
-      NNO: this.nfrmno,
-      VORGNO: this.vorgno,
-      CYEAR: this.cyear,
+      NNO: context.nfrmno,
+      VORGNO: context.vorgno,
+      CYEAR: context.cyear,
     };
     const formmst = await this.formmstService.getFormmst(condition);
     // console.log('formmst : ', formmst);
@@ -284,96 +294,78 @@ export class FormService {
     );
 
     return {
-      NFRMNO: this.nfrmno,
-      VORGNO: this.vorgno,
-      CYEAR: this.cyear,
-      CYEAR2: this.cyear2,
-      NRUNNO: this.nrunno,
-      VREQNO: this.empno,
-      VINPUTER: this.inputempno == '' ? this.empno : this.inputempno,
-      VREMARK: this.remark,
+      NFRMNO: context.nfrmno,
+      VORGNO: context.vorgno,
+      CYEAR: context.cyear,
+      CYEAR2: context.cyear2,
+      NRUNNO: context.nrunno,
+      VREQNO: context.empno,
+      VINPUTER: context.inputempno == '' ? context.empno : context.inputempno,
+      VREMARK: context.remark,
       DREQDATE: formDateWithZeroTime,
       CREQTIME: new Date().toTimeString().split(' ')[0], // HH:MM:SS
       CST: 1,
       VFORMPAGE: formmst[0].VFORMPAGE,
-      VREMOTE: this.ip,
+      VREMOTE: context.ip,
     };
   }
 
-  async insertForm(formData: any): Promise<boolean> {
-    // console.log('insert form data : ', formData);
+  async insertForm(formData: any, queryRunner: QueryRunner): Promise<boolean> {
     try {
-      await this.queryRunner.manager.save(Form, formData);
+      await queryRunner.manager.save(Form, formData);
       return true;
     } catch (error) {
       console.error('Error inserting form:', error);
-    //   return false;
       throw error;
     }
-    // const queryRunner = this.dataSource.createQueryRunner();
-    // try {
-    //   await queryRunner.connect();
-    //   await queryRunner.startTransaction();
-    //   await queryRunner.manager.save(this.repo.target, formData);
-    //   await queryRunner.commitTransaction();
-    //   //   await this.repo.save(formData);
-    //   return true;
-    // } catch (error) {
-    //   console.error('Error inserting form:', error);
-    //   console.log(error);
-    //   await queryRunner.rollbackTransaction();
-    //   return false;
-    // } finally {
-    //   await queryRunner.release();
-    // }
   }
 
-  async setOrganize() {
-    const user = await this.usersService.findEmp(this.empno);
+  async setOrganize(context: any) {
+    const user = await this.usersService.findEmp(context.empno);
     // console.log('user : ', user);
 
-    this.emppos = user.SPOSCODE;
+    context.emppos = user.SPOSCODE;
     if (user.SSECCODE == '00') {
       if (user.SDEPCODE == '00') {
-        this.orgno = user.SDIVCODE;
+        context.orgno = user.SDIVCODE;
       } else {
-        this.orgno = user.SDEPCODE;
+        context.orgno = user.SDEPCODE;
       }
     } else {
-      this.orgno = user.SSECCODE;
+      context.orgno = user.SSECCODE;
     }
-    console.log('position : ', this.emppos);
-    console.log('orgno : ', this.orgno);
+    console.log('position : ', context.emppos);
+    console.log('orgno : ', context.orgno);
   }
 
-  async addFlow1(data: any) {
+  async addFlow1(data: any, context: any, queryRunner: QueryRunner) {
     const val = await this.orgTreeService.getOrgTree(
-      this.orgno,
+      context.orgno,
       data.VPOSNO,
-      this.empno,
-      this.emppos,
+      context.empno,
+      context.emppos,
     );
-    this.flag = 1;
+    context.flag = 1;
     if (val.length > 0) {
-      this.flag = 2;
+      context.flag = 2;
       for (const row of val) {
-        await this.getRepresent(row.VEMPNO);
-        this.VAPVNO = row.VEMPNO;
-        this.CSTEPST = this.CSTEPSTDX <= 1 ? 1 : this.CSTEPSTDX - 1;
-        this.CSTEPSTDX--;
-        const flow = this.setFlow(data);
-        await this.flowService.insertFlow(flow, this.queryRunner);
+        await this.getRepresent(row.VEMPNO, context);
+        context.VAPVNO = row.VEMPNO;
+        context.CSTEPST = context.CSTEPSTDX <= 1 ? 1 : context.CSTEPSTDX - 1;
+        context.CSTEPSTDX--;
+        const flow = this.setFlow(data, context);
+        await this.flowService.insertFlow(flow, queryRunner);
       }
     } else {
-      this.VAPVNO = this.empno;
-      await this.getRepresent(this.empno);
-      this.CSTEPST = 0;
-      const flow = this.setFlow(data);
-      await this.flowService.insertFlow(flow, this.queryRunner);
+      context.VAPVNO = context.empno;
+      await this.getRepresent(context.empno, context);
+      context.CSTEPST = 0;
+      const flow = this.setFlow(data, context);
+      await this.flowService.insertFlow(flow, queryRunner);
     }
   }
 
-  async addFlow2(data: any) {
+  async addFlow2(data: any, context: any, queryRunner: QueryRunner) {
     const val = await this.orgPosService.getOrgPos({
       VPOSNO: data.VPOSNO,
       VORGNO: data.VAPVORGNO,
@@ -381,51 +373,51 @@ export class FormService {
     // console.log('add flow2 val : ', val);
     if (val.length > 0) {
       for (const row of val) {
-        await this.getRepresent(row.VEMPNO);
-        this.VAPVNO = row.VEMPNO;
-        this.CSTEPST = this.CSTEPSTDX <= 1 ? 1 : this.CSTEPSTDX - 1;
-        this.CSTEPSTDX--;
-        const flow = this.setFlow(data);
-        await this.flowService.insertFlow(flow, this.queryRunner);
+        await this.getRepresent(row.VEMPNO, context);
+        context.VAPVNO = row.VEMPNO;
+        context.CSTEPST = context.CSTEPSTDX <= 1 ? 1 : context.CSTEPSTDX - 1;
+        context.CSTEPSTDX--;
+        const flow = this.setFlow(data, context);
+        await this.flowService.insertFlow(flow, queryRunner);
       }
     } else {
-      await this.getRepresent(this.empno);
-      this.VAPVNO = this.empno;
-      this.CSTEPST = 0;
-      const flow = this.setFlow(data);
-      await this.flowService.insertFlow(flow, this.queryRunner);
+      await this.getRepresent(context.empno, context);
+      context.VAPVNO = context.empno;
+      context.CSTEPST = 0;
+      const flow = this.setFlow(data, context);
+      await this.flowService.insertFlow(flow, queryRunner);
     }
   }
 
-  async getRepresent(empno: string) {
+  async getRepresent(empno: string, context: any) {
     const condition = {
-      NFRMNO: this.nfrmno,
-      VORGNO: this.vorgno,
-      CYEAR: this.cyear,
+      NFRMNO: context.nfrmno,
+      VORGNO: context.vorgno,
+      CYEAR: context.cyear,
       VEMPNO: empno,
     };
     const data = await this.repService.getRep(condition);
-    this.represent = empno;
+    context.represent = empno;
     if (Array.isArray(data) && data.length > 0 && data[0]?.VREPNO !== '') {
-      this.represent = data[0].VREPNO;
+      context.represent = data[0].VREPNO;
     }
-    console.log('represent : ', this.represent);
+    console.log('represent : ', context.represent);
   }
 
-  setFlow(data: any) {
+  setFlow(data: any, context: any) {
     return {
-      NFRMNO: this.nfrmno,
-      VORGNO: this.vorgno,
-      CYEAR: this.cyear,
-      CYEAR2: this.cyear2,
-      NRUNNO: this.nrunno,
+      NFRMNO: context.nfrmno,
+      VORGNO: context.vorgno,
+      CYEAR: context.cyear,
+      CYEAR2: context.cyear2,
+      NRUNNO: context.nrunno,
       CSTEPNO: data.CSTEPNO,
       CSTEPNEXTNO: data.CSTEPNEXTNO,
-      CSTEPST: this.CSTEPST.toString(),
+      CSTEPST: context.CSTEPST.toString(),
       CSTART: '0',
       VPOSNO: data.VPOSNO,
-      VAPVNO: this.VAPVNO,
-      VREPNO: this.represent,
+      VAPVNO: context.VAPVNO,
+      VREPNO: context.represent,
       CAPVSTNO: '0',
       CTYPE: data.CTYPE,
       VURL: data.VURL,
@@ -436,7 +428,7 @@ export class FormService {
     };
   }
 
-  async firstflow(data: any) {
+  async firstflow(data: any, context:any, queryRunner: QueryRunner) {
     const today = new Date();
     // Set formDate to current date with time 00:00:00
     const formDateWithZeroTime = new Date(
@@ -445,20 +437,20 @@ export class FormService {
       today.getDate(),
     );
     const flow = {
-      NFRMNO: this.nfrmno,
-      VORGNO: this.vorgno,
-      CYEAR: this.cyear,
-      CYEAR2: this.cyear2,
-      NRUNNO: this.nrunno,
+      NFRMNO: context.nfrmno,
+      VORGNO: context.vorgno,
+      CYEAR: context.cyear,
+      CYEAR2: context.cyear2,
+      NRUNNO: context.nrunno,
       CSTEPNO: '--',
       CSTEPNEXTNO: data.length == 0 ? '00' : data[0].CSTEPNO,
       CSTART: '1',
       CSTEPST: '5',
       CTYPE: '0',
-      VPOSNO: this.emppos,
-      VAPVNO: this.empno,
-      VREPNO: this.empno,
-      VREALAPV: this.empno,
+      VPOSNO: context.emppos,
+      VAPVNO: context.empno,
+      VREPNO: context.empno,
+      VREALAPV: context.empno,
       CAPVSTNO: '1',
       DAPVDATE: formDateWithZeroTime,
       CAPVTIME: new Date().toTimeString().split(' ')[0],
@@ -466,34 +458,31 @@ export class FormService {
       CREJTYPE: '1',
       CAPPLYALL: data.length == 0 ? '1' : data[0].CAPPLYALL,
       VURL: data.length == 0 ? '' : data[0].VURL,
-      VREMARK: this.remark,
+      VREMARK: context.remark,
     };
-    await this.flowService.insertFlow(flow, this.queryRunner);
+    await this.flowService.insertFlow(flow, queryRunner);
   }
 
-  async managerStep() {
-    const manager = await this.sequenceOrgService.getManager(this.empno);
+  async managerStep(context: any, queryRunner: QueryRunner) {
+    const manager = await this.sequenceOrgService.getManager(context.empno);
     const query = {
-      NFRMNO: this.nfrmno,
-      VORGNO: this.vorgno,
-      CYEAR: this.cyear,
-      CYEAR2: this.cyear2,
-      NRUNNO: this.nrunno,
+      NFRMNO: context.nfrmno,
+      VORGNO: context.vorgno,
+      CYEAR: context.cyear,
+      CYEAR2: context.cyear2,
+      NRUNNO: context.nrunno,
       CSTART: '1',
     };
-    const nextstep = await this.flowService.getFlow(
-      query,
-      this.queryRunner,
-    );
+    const nextstep = await this.flowService.getFlow(query, queryRunner);
 
     const query2 = {
-      NNO: this.nfrmno,
-      VORGNO: this.vorgno,
-      CYEAR: this.cyear,
+      NNO: context.nfrmno,
+      VORGNO: context.vorgno,
+      CYEAR: context.cyear,
     };
     const url = await this.formmstService.getFormmst(query2);
     if (manager.length > 0) {
-      await this.getRepresent(manager[0].HEADNO);
+      await this.getRepresent(manager[0].HEADNO, context);
       //   const repManager = await this.getRepresent(manager[0].HEADNO);
       //   if (!repManager) {
       //     repno = manager[0].HEADNO;
@@ -501,11 +490,11 @@ export class FormService {
       //     repno = this.represent;
       //   }
       const flow = {
-        NFRMNO: this.nfrmno,
-        VORGNO: this.vorgno,
-        CYEAR: this.cyear,
-        CYEAR2: this.cyear2,
-        NRUNNO: this.nrunno,
+        NFRMNO: context.nfrmno,
+        VORGNO: context.vorgno,
+        CYEAR: context.cyear,
+        CYEAR2: context.cyear2,
+        NRUNNO: context.nrunno,
         CSTEPNO: '-1',
         CSTEPNEXTNO: nextstep.length == 0 ? '00' : nextstep[0].CSTEPNEXTNO,
         CSTART: '0',
@@ -513,7 +502,7 @@ export class FormService {
         CTYPE: '0',
         VPOSNO: null,
         VAPVNO: manager[0].HEADNO,
-        VREPNO: this.represent,
+        VREPNO: context.represent,
         VREALAPV: null,
         CAPVSTNO: '0',
         CAPVTIME: null,
@@ -524,68 +513,68 @@ export class FormService {
         VURL: url[0].VFORMPAGE,
         VREMARK: null,
       };
-      await this.flowService.insertFlow(flow, this.queryRunner);
+      await this.flowService.insertFlow(flow, queryRunner);
 
       //Update creater flow for set next step to manager
       const query3 = {
         condition: {
-          NFRMNO: this.nfrmno,
-          VORGNO: this.vorgno,
-          CYEAR: this.cyear,
-          CYEAR2: this.cyear2,
-          NRUNNO: this.nrunno,
+          NFRMNO: context.nfrmno,
+          VORGNO: context.vorgno,
+          CYEAR: context.cyear,
+          CYEAR2: context.cyear2,
+          NRUNNO: context.nrunno,
           CSTART: '1',
         },
         CSTEPNEXTNO: '-1',
       };
-      this.flowService.updateFlow(query3, this.queryRunner);
+      this.flowService.updateFlow(query3, queryRunner);
 
       //Update other flow that step is not 1 for set next to after manager's step
       const query4 = {
-        NFRMNO: this.nfrmno,
-        VORGNO: this.vorgno,
-        CYEAR: this.cyear,
-        CYEAR2: this.cyear2,
-        NRUNNO: this.nrunno,
+        NFRMNO: context.nfrmno,
+        VORGNO: context.vorgno,
+        CYEAR: context.cyear,
+        CYEAR2: context.cyear2,
+        NRUNNO: context.nrunno,
       };
-      this.flowService.reAlignFlow(query4, this.queryRunner);
+      this.flowService.reAlignFlow(query4, queryRunner);
     }
   }
 
-  async deleteFlowStep(data: any) {
-    await this.flowService.deleteFlow(this.query, this.queryRunner);
-    if (this.query && 'CSTEPST' in this.query) {
-      delete this.query['CSTEPST'];
+  async deleteFlowStep(data: any, context:any, queryRunner: QueryRunner) {
+    await this.flowService.deleteFlow(context.query, queryRunner);
+    if (context.query && 'CSTEPST' in context.query) {
+      delete context.query['CSTEPST'];
     }
-    this.query.CSTEPNEXTNO = data.CSTEPNO;
-    this.query.NRUNNO = this.nrunno;
+    context.query.CSTEPNEXTNO = data.CSTEPNO;
+    context.query.NRUNNO = context.nrunno;
     await this.flowService.updateFlow(
-      { condition: this.query, CSTEPNEXTNO: data.CSTEPNEXTNO },
-      this.queryRunner,
+      { condition: context.query, CSTEPNEXTNO: data.CSTEPNEXTNO },
+      queryRunner,
     );
     if (data.CSTART == '1') {
-      if (this.query && 'CSTEPNEXTNO' in this.query) {
-        delete this.query['CSTEPNEXTNO'];
+      if (context.query && 'CSTEPNEXTNO' in context.query) {
+        delete context.query['CSTEPNEXTNO'];
       }
-      this.query.CSTEPNO = data.CSTEPNEXTNO;
+      context.query.CSTEPNO = data.CSTEPNEXTNO;
       await this.flowService.updateFlow(
-        { condition: this.query, CSTART: '1' },
-        this.queryRunner,
+        { condition: context.query, CSTART: '1' },
+        queryRunner,
       );
     }
   }
 
-  async saveDraft(draft: string) {
+  async saveDraft(draft: string, context: any, queryRunner: QueryRunner) {
     const formDraft: any = {
-      NFRMNO: this.nfrmno,
-      VORGNO: this.vorgno,
-      CYEAR: this.cyear,
-      CYEAR2: this.cyear2,
-      NRUNNO: this.nrunno,
+      NFRMNO: context.nfrmno,
+      VORGNO: context.vorgno,
+      CYEAR: context.cyear,
+      CYEAR2: context.cyear2,
+      NRUNNO: context.nrunno,
     };
     await this.updateForm(
       { condition: formDraft, CST: draft },
-      this.queryRunner,
+      queryRunner,
     );
     for (let i = 2; i <= 5; i++) {
       formDraft.CSTEPST = i.toString();
@@ -598,7 +587,7 @@ export class FormService {
       };
       this.flowService.updateFlow(
         { condition: formDraft, ...data },
-        this.queryRunner,
+        queryRunner,
       );
     }
   }

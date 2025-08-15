@@ -9,6 +9,9 @@ export class Attachments {
   FILE_NAME: string;
 
   @Column()
+  FILE_ID: number;
+
+  @Column()
   FILE_ORIGINAL_NAME: string;
 
   @Column()

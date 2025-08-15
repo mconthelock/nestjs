@@ -7,11 +7,13 @@ import {
   UploadedFiles,
   BadRequestException,
   Body,
+  Res,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import * as fs from 'fs';
+import { Response } from 'express';
 import { AttachmentsService } from './attachments.service';
 import { createAttDto } from './dto/create.dto';
 
@@ -106,5 +108,41 @@ export class AttachmentsController {
   @Post('search')
   async findInqno(@Body() searchDto: any) {
     return await this.atth.findInqno(searchDto);
+  }
+
+  @Get('download/:id')
+  async downloadFile(@Param('id') id: number, @Res() res: Response) {
+    const file = await this.atth.findOne(id);
+    if (!file) {
+      throw new BadRequestException('File not found');
+    }
+
+    const filePath = `${process.env.SP_FILE_PATH}/${file.INQ_NO}/${file.FILE_NAME}`;
+    if (!fs.existsSync(filePath)) {
+      throw new BadRequestException('File not found on disk');
+    }
+
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=${file.FILE_ORIGINAL_NAME}`,
+    );
+    res.setHeader('Content-Type', 'application/octet-stream');
+    return res.sendFile(filePath);
+  }
+
+  @Post('export/template')
+  async exportTemplate(@Body() body: any, @Res() res: Response) {
+    const filePath = `${process.env.SP_FILE_PATH}template/${body.name}`;
+    if (!fs.existsSync(filePath)) {
+      throw new BadRequestException('File not found on disk');
+    }
+
+    const fileContent = fs.readFileSync(filePath);
+    const base64String = fileContent.toString('base64');
+
+    return res.json({
+      filename: body.name,
+      content: base64String,
+    });
   }
 }

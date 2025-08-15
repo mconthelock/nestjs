@@ -1,13 +1,14 @@
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import * as oracledb from 'oracledb'; // ต้อง import oracledb เพื่อกำหนดชนิดข้อมูลของ parameter
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Inquiry } from './entities/inquiry.entity';
 import { InquiryGroup } from '../inquiry-group/entities/inquiry-group.entity';
 import { InquiryDetail } from '../inquiry-detail/entities/inquiry-detail.entity';
 import { History } from '../history/entities/history.entity';
 
 import { searchDto } from './dto/search.dto';
-import { createDto } from './dto/create-inquiry.dto';
+import { createInqDto } from './dto/create-inquiry.dto';
 
 interface group {
   INQ_ID: number;
@@ -73,18 +74,18 @@ export class InquiryService {
         ...q,
       },
       order: { INQ_ID: 'DESC' },
-      relations: ['inqgroup', 'status'],
+      relations: ['inqgroup', 'status', 'maruser'],
     });
   }
 
-  async create(createDto: createDto, details: any[]) {
+  async create(createInqDto: createInqDto, details: any[]) {
     const runner = this.ds.createQueryRunner();
     await runner.connect();
     await runner.startTransaction();
     try {
-      await runner.manager.save(Inquiry, createDto);
+      await runner.manager.save(Inquiry, createInqDto);
       const inquiry = await runner.manager.findOne(Inquiry, {
-        where: { INQ_NO: createDto.INQ_NO, INQ_LATEST: 1 },
+        where: { INQ_NO: createInqDto.INQ_NO, INQ_LATEST: 1 },
       });
 
       const items = details.map((el) => {
@@ -127,9 +128,9 @@ export class InquiryService {
       const newDetails = await Promise.all(detailPromises);
       await runner.manager.save(InquiryDetail, newDetails);
       const log = runner.manager.create(History, {
-        INQ_NO: createDto.INQ_NO,
-        INQ_REV: createDto.INQ_REV,
-        INQH_USER: createDto.INQ_MAR_PIC,
+        INQ_NO: createInqDto.INQ_NO,
+        INQ_REV: createInqDto.INQ_REV,
+        INQH_USER: createInqDto.INQ_MAR_PIC,
         INQH_ACTION: 1,
         INQH_REMARK: null,
       });
@@ -141,5 +142,30 @@ export class InquiryService {
     } finally {
       await runner.release();
     }
+  }
+
+  async delete(searchDto: searchDto) {
+    const params = [
+      searchDto.INQ_ID,
+      searchDto.INQ_MAR_PIC,
+      searchDto.INQ_MAR_REMARK,
+      { dir: oracledb.BIND_OUT, type: oracledb.STRING },
+    ];
+    const sql = `
+      BEGIN
+        INQUIRY_DELETE@SPSYS(
+            P_ID => :1,
+            P_USER => :2,
+            P_REMARK=> :3,
+            P_RESULT => :4
+        );
+      END;`;
+    const result = await this.ds.query(sql, params);
+    if (result[0] == null) {
+      throw new NotFoundException(
+        `Inquiry with ID (${searchDto.INQ_ID}) not found.`,
+      );
+    }
+    return { status: true, title: result[0] };
   }
 }

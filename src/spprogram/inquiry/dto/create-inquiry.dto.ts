@@ -1,9 +1,9 @@
 import { Type } from 'class-transformer';
 import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
 
-export class createDto {
+export class createInqDto {
   @IsNumber()
-  @IsOptional()
+  //@IsOptional()
   @Type(() => Number)
   INQ_ID: number;
 
@@ -95,4 +95,8 @@ export class createDto {
   @IsString()
   @IsOptional()
   INQ_PKC: string;
+
+  @IsString()
+  @IsOptional()
+  INQ_MAR_REMARK: string;
 }

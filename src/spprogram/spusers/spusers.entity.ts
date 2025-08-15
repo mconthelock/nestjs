@@ -8,4 +8,8 @@ export class SpUser extends User {
   @OneToMany(() => History, (inq) => inq.users)
   @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'INQH_USER' })
   sphistory: History;
+
+  @OneToMany(() => Inquiry, (inq) => inq.maruser)
+  @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'INQ_MAR_PIC' })
+  inqs: Inquiry;
 }

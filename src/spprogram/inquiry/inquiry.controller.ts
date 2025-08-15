@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Param, Get } from '@nestjs/common';
 import { InquiryService } from './inquiry.service';
+import { createInqDto } from './dto/create-inquiry.dto';
 import { searchDto } from './dto/search.dto';
-import { createDto } from './dto/create-inquiry.dto';
 
 @Controller('sp/inquiry')
 export class InquiryController {
@@ -21,5 +21,10 @@ export class InquiryController {
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.inq.findOne(id);
+  }
+
+  @Post('delete')
+  async delete(@Body() searchDto: searchDto) {
+    return await this.inq.delete(searchDto);
   }
 }

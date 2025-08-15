@@ -13,7 +13,7 @@ if (process.env.HOST == 'AMEC') {
       type: 'oracle',
       username: process.env.AMEC_USER,
       password: process.env.AMEC_PASSWORD,
-      connectString: `${process.env.AMEC_HOST}:${process.env.AMEC_PORT}/${process.env.AMEC_SERVICE}`,
+      connectString: `${process.env.AMEC_HOST}:${process.env.AMEC_PORT}/${process.env.AMEC_SERVICE}?expire_time=5`,
       entities: [
         __dirname + '/../**/**/*.entity{.ts,.js}',
         __dirname + '/../**/**/**/*.entity{.ts,.js}',
@@ -25,6 +25,11 @@ if (process.env.HOST == 'AMEC') {
         poolMin: 5,
         queueTimeout: 60000,
         queueMax: 1000,
+        enableTCPSKeepAlive: true,
+        poolIncrement: 1,
+        poolTimeout: 300, // วินาที
+        poolPingInterval: 60, // วินาที
+        stmtCacheSize: 50,
       },
     }),
   };
@@ -49,4 +54,3 @@ if (process.env.HOST == 'AMEC') {
   };
 }
 export default amecConfig;
-

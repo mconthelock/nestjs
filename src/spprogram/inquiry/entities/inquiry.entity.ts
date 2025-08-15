@@ -13,6 +13,7 @@ import { QuotationType } from '../../quotation-type/entities/quotation-type.enti
 import { Method } from '../../method/entities/method.entity';
 import { Term } from '../../term/entities/term.entity';
 import { Shipment } from '../../shipment/entities/shipment.entity';
+import { SpUser } from 'src/spprogram/spusers/spusers.entity';
 
 @Entity('SP_INQUIRY')
 export class Inquiry {
@@ -222,4 +223,8 @@ export class Inquiry {
   @ManyToOne(() => Shipment, (ship) => ship.inqs)
   @JoinColumn({ name: 'INQ_SHIPMENT', referencedColumnName: 'SHIPMENT_ID' })
   shipment: Shipment;
+
+  @ManyToOne(() => SpUser, (user) => user.inqs)
+  @JoinColumn({ name: 'INQ_MAR_PIC', referencedColumnName: 'SEMPNO' })
+  maruser: SpUser;
 }

@@ -6,7 +6,7 @@ import {
   IsArray,
   IsDateString,
 } from 'class-validator';
-export class CreateQainsFormDto {
+export class SearchQainsOADto {
   @Type(() => Number)
   @IsNumber()
   NFRMNO: number;
@@ -18,30 +18,22 @@ export class CreateQainsFormDto {
   CYEAR: string;
 
   @IsString()
-  REQUESTER: string;
+  CYEAR2: string;
 
-  @IsString()
-  CREATEBY: string;
-
-  @IsOptional()
-  @IsString()
-  REMARK?: string;
-
-  @IsOptional()
-  @IsString()
-  QA_ITEM?: string;
+  @Type(() => Number)
+  @IsNumber()
+  NRUNNO: number;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  QA_INCHARGE_SECTION?: number;
+  QOA_SEQ?: number;
 
   @IsOptional()
   @IsString()
-  QA_INCHARGE_EMPNO?: string;
+  QOA_EMPNO?: string;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  OPERATOR?: string[];
+  @IsString()
+  QOA_TYPECODE?: string;
 }

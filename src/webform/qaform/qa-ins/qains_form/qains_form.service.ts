@@ -2,8 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { CreateQainsFormDto } from './dto/create-qains_form.dto';
-import { moveFileFromMulter } from 'src/utils/files';
+import { moveFileFromMulter, deleteFile } from 'src/utils/files';
 import { QainsForm } from '../qains_form/entities/qains_form.entity';
+import { FormService } from 'src/webform/form/form.service';
+import { QainsOAService } from '../qains_operator_auditor/qains_operator_auditor.service';
+import { QaFileService } from '../../qa_file/qa_file.service';
 
 @Injectable()
 export class QainsFormService {
@@ -12,28 +15,99 @@ export class QainsFormService {
     private readonly qaformRepo: Repository<QainsForm>,
     @InjectDataSource('amecConnection')
     private dataSource: DataSource,
+
+    private readonly formService: FormService,
+    private readonly QainsOAService: QainsOAService,
+    private readonly QaFileService: QaFileService,
   ) {}
 
-  async create(
+  async createQainsForm(
     dto: CreateQainsFormDto,
     files: Express.Multer.File[],
+    ip: string,
     path: string,
   ) {
     const queryRunner = this.dataSource.createQueryRunner();
+    const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      
-      const moveFile = await Promise.all(
-        files.map((file) => {
-          return { files: moveFileFromMulter(file, path) };
-        }),
+      const createForm = await this.formService.create(
+        {
+          NFRMNO: dto.NFRMNO,
+          VORGNO: dto.VORGNO,
+          CYEAR: dto.CYEAR,
+          REQBY: dto.REQUESTER,
+          INPUTBY: dto.CREATEBY,
+          REMARK: dto.REMARK,
+        },
+        ip,
+        queryRunner,
       );
 
-      return { message: 'Upload success', files: moveFile, data: dto };
+      if (!createForm.status) {
+        throw new Error(createForm.message);
+      }
+
+      const form = {
+        NFRMNO: dto.NFRMNO,
+        VORGNO: dto.VORGNO,
+        CYEAR: dto.CYEAR,
+        CYEAR2: createForm.data.CYEAR2,
+        NRUNNO: createForm.data.NRUNNO,
+      };
+
+      await queryRunner.manager.save(QainsForm, {
+        ...form,
+        QA_ITEM: dto.QA_ITEM,
+        QA_INCHARGE_SECTION: dto.QA_INCHARGE_SECTION,
+        QA_INCHARGE_EMPNO: dto.QA_INCHARGE_EMPNO,
+      });
+
+      for (const e of dto.OPERATOR) {
+        await this.QainsOAService.createQainsOA(
+          { ...form, QOA_TYPECODE: 'ESO', QOA_EMPNO: e },
+          queryRunner,
+        );
+      }
+
+      const formNo = await this.formService.getFormno(form); // Get the form number
+      const destination = path + '/' + formNo; // Get the destination path
+      for (const file of files) {
+        console.log('file: ', file);
+        const moved = await moveFileFromMulter(file, destination);
+        movedTargets.push(moved.path);
+        // 2) บันทึก DB (ใช้ชื่อไฟล์ที่ "ปลายทางจริง" เพื่อความตรงกัน)
+        await this.QaFileService.createQaFile(
+          {
+            ...form,
+            FILE_TYPECODE: 'ESF',
+            FILE_TYPENO: 1,
+            FILE_ONAME: file.originalname, // ชื่อเดิมฝั่ง client
+            FILE_FNAME: moved.newName, // ชื่อไฟล์ที่ใช้เก็บจริง
+            FILE_USERCREATE: dto.REQUESTER,
+            FILE_PATH: destination, // โฟลเดอร์ปลายทาง
+          },
+          queryRunner,
+        );
+      }
+
+      await queryRunner.commitTransaction();
+
+      return {
+        status: true,
+        message: 'Request successful',
+        // files: moveFile,
+        data: dto,
+      };
     } catch (error) {
       await queryRunner.rollbackTransaction();
+
+      await Promise.allSettled([
+        ...movedTargets.map((p) => deleteFile(p)), // - ลบไฟล์ที่ "ปลายทาง" ทั้งหมดที่ย้ายสำเร็จไปแล้ว (กัน orphan file)
+        ...files.map((f) => deleteFile(f.path)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
+      ]);
       return { status: false, message: 'Error: ' + error.message };
     } finally {
       await queryRunner.release();

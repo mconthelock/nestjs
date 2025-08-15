@@ -14,24 +14,9 @@ export class SequenceOrgService {
     @InjectDataSource('amecConnection')
     private dataSource: DataSource,
   ) {}
-  create(createSequenceOrgDto: CreateSequenceOrgDto) {
-    return 'This action adds a new sequenceOrg';
-  }
 
   findAll() {
     return this.seqRepo.find();
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} sequenceOrg`;
-  }
-
-  update(id: number, updateSequenceOrgDto: UpdateSequenceOrgDto) {
-    return `This action updates a #${id} sequenceOrg`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} sequenceOrg`;
   }
 
   async getManager(empno: string) {
@@ -45,5 +30,18 @@ export class SequenceOrgService {
       )
       .orderBy('seq.CCO', 'ASC')
       .getRawMany();
+  }
+
+  async getSubordinates(empno: string) {
+    const sql = `
+         SELECT DISTINCT B.* FROM 
+            (
+                SELECT * FROM SEQUENCEORG
+                START WITH HEADNO = :1 CONNECT BY PRIOR EMPNO = HEADNO AND PRIOR CCO = CCO1
+            ) A
+            JOIN AMECUSERALL B ON A.EMPNO = B.SEMPNO
+            WHERE B.SEMPNO != :2  AND B.CSTATUS = 1
+        `;
+    return await this.dataSource.query(sql, [empno, empno]);
   }
 }

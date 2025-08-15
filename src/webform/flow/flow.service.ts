@@ -52,28 +52,25 @@ export class FlowService {
       await runner.manager.save(Flow, dto);
       if (localRunner) await localRunner.commitTransaction();
       //   await this.repo.save(formData);
-    //   console.log('-----------------Flow inserted successfully------------------');
-      
+      //   console.log('-----------------Flow inserted successfully------------------');
+
       return true;
     } catch (error) {
       console.error('Error inserting flow:', error);
       if (localRunner) await localRunner.rollbackTransaction();
       throw error;
-    //   return false;
+      //   return false;
     } finally {
       if (localRunner) await localRunner.release();
     }
   }
 
   getFlow(dto: SearchFlowDto, queryRunner?: QueryRunner) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(Flow)
+      : this.flowRepo;
     // console.log('get flow data : ', dto);
-    if (queryRunner) {
-      return queryRunner.manager.getRepository(Flow).find({
-        where: dto,
-      });
-    }
-    
-    return this.flowRepo.find({
+    return repo.find({
       where: dto,
     });
   }
@@ -136,7 +133,7 @@ export class FlowService {
       console.error('Error re-aligning flow:', error);
       if (localRunner) await localRunner.rollbackTransaction();
       throw error;
-    //   return false;
+      //   return false;
     } finally {
       if (localRunner) await localRunner.release();
     }
@@ -148,7 +145,7 @@ export class FlowService {
   ): Promise<boolean> {
     let localRunner: QueryRunner | undefined;
     console.log('delete flow data : ', dto);
-    
+
     try {
       if (!queryRunner) {
         localRunner = this.dataSource.createQueryRunner();
@@ -164,7 +161,7 @@ export class FlowService {
       console.error('Error deleting flow:', error);
       if (localRunner) await localRunner.rollbackTransaction();
       throw error;
-    //   return false;
+      //   return false;
     } finally {
       if (localRunner) await localRunner.release();
     }

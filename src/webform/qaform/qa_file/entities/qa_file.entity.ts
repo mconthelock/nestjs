@@ -17,7 +17,13 @@ export class QaFile {
   @PrimaryColumn()
   NRUNNO: number;
 
-  @Column()
+  @PrimaryColumn()
+  FILE_TYPECODE: string;
+
+  @PrimaryColumn()
+  FILE_TYPENO: number;
+
+  @PrimaryColumn()
   FILE_ID: number;
 
   @Column()
@@ -37,12 +43,6 @@ export class QaFile {
 
   @Column()
   FILE_DATEUPDATE: Date;
-
-  @Column()
-  FILE_TYPECODE: string;
-
-  @Column()
-  FILE_TYPENO: number;
 
   @Column()
   FILE_STATUS: number;

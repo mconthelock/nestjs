@@ -1,9 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { QainsFormService } from './qains_form.service';
 import { CreateQainsFormDto } from './dto/create-qains_form.dto';
+import { Request } from 'express';
 
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { ApiTags, ApiExcludeEndpoint } from '@nestjs/swagger';
+
+import { getClientIP } from 'src/common/helpers/ip';
 
 @ApiTags('QA-INS Form')
 @Controller('qaform/qa-ins')
@@ -17,9 +20,11 @@ export class QainsFormController {
   @UseInterceptors(getFileUploadInterceptor('files', true, 20))
   async uploadUserFile(
     @UploadedFiles() files: Express.Multer.File[],
-    @Body() dto: CreateQainsFormDto 
+    @Body() dto: CreateQainsFormDto ,
+    @Req() req: Request
   ) {
-    return this.qainsFormService.create(dto, files, this.path);
+    const ip = getClientIP(req);
+    return this.qainsFormService.createQainsForm(dto, files, ip, this.path);
   }
 
  

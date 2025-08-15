@@ -6,7 +6,7 @@ import {
   IsArray,
   IsDateString,
 } from 'class-validator';
-export class CreateQaFileDto {
+export class SearchQaFileDto {
   @Type(() => Number)
   @IsNumber()
   NFRMNO: number;
@@ -31,15 +31,33 @@ export class CreateQaFileDto {
   @IsNumber()
   FILE_TYPENO: number;
 
-  @IsString()
-  FILE_ONAME: string;
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  FILE_ID?: number;
 
+  @IsOptional()
   @IsString()
-  FILE_FNAME: string;
+  FILE_ONAME?: string;
 
+  @IsOptional()
   @IsString()
-  FILE_USERCREATE: string;
+  FILE_FNAME?: string;
 
+  @IsOptional()
   @IsString()
-  FILE_PATH: string;
+  FILE_USERCREATE?: string;
+
+  @IsOptional()
+  @IsString()
+  FILE_USERUPDATE?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  FILE_STATUS?: number;
+
+  @IsOptional()
+  @IsString()
+  FILE_PATH?: string;
 }

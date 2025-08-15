@@ -18,6 +18,26 @@ import { FlowService } from 'src/webform/flow/flow.service';
 import { OrgposService } from 'src/webform/orgpos/orgpos.service';
 import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
 
+interface FormContext {
+  ip: string;
+  empno: string;
+  inputempno: string;
+  remark: string;
+  nfrmno: number;
+  vorgno: string;
+  cyear: string;
+  cyear2: string;
+  CSTEPSTDX: number;
+  flag?: number;
+  nrunno?: number;
+  emppos?: string;
+  orgno?: string;
+  represent?: string;
+  VAPVNO?: string;
+  CSTEPST?: number;
+  query?: any;
+}
+
 @Injectable()
 export class FormService {
   constructor(
@@ -38,32 +58,6 @@ export class FormService {
     private readonly orgPosService: OrgposService,
     private readonly sequenceOrgService: SequenceOrgService,
   ) {}
-
-  private ip: string;
-
-  private nfrmno: number;
-  private vorgno: string;
-  private cyear: string;
-  private cyear2 = new Date().getFullYear().toString(); // ปีปัจจุบัน
-  private empno: string;
-  private inputempno: string;
-  private remark: string;
-
-  private nrunno: number;
-  private query: any;
-  private flag: number;
-
-  //user info
-  private orgno: string;
-  private emppos: string;
-  private represent: string;
-  //Flow org. info
-  private VAPVNO: string;
-  private CAPVSTNO: string;
-  private CSTEPST: number;
-  private CSTEPSTDX: number;
-
-  //   private queryRunner: QueryRunner;
 
   findOne(fno, orgno, cyear, cyear2, nrunno) {
     return this.form.find({
@@ -112,7 +106,6 @@ export class FormService {
 
   async create(dto: CreateFormDto, ip: string, queryRunner?: QueryRunner) {
     let localRunner: QueryRunner | undefined;
-    // this.queryRunner = this.dataSource.createQueryRunner();
     try {
       if (!queryRunner) {
         localRunner = this.dataSource.createQueryRunner();
@@ -120,18 +113,8 @@ export class FormService {
         await localRunner.startTransaction();
       }
       const runner = queryRunner || localRunner!;
-      //   await this.queryRunner.connect();
-      //   await this.queryRunner.startTransaction();
 
-    //   this.ip = ip;
-    //   this.empno = dto.REQBY;
-    //   this.inputempno = dto.INPUTBY;
-    //   this.remark = dto.REMARK;
-    //   this.nfrmno = dto.NFRMNO;
-    //   this.vorgno = dto.VORGNO;
-    //   this.cyear = dto.CYEAR;
-    //   this.CSTEPSTDX = 4;
-      const context: any = {
+      const context: FormContext = {
         ip: ip,
         empno: dto.REQBY,
         inputempno: dto.INPUTBY,
@@ -194,7 +177,7 @@ export class FormService {
         await this.firstflow(first, context, runner);
         // add manager
         if (context.flag == 1) {
-          this.managerStep(context, runner);
+          await this.managerStep(context, runner);
         }
 
         context.query.CSTEPST = '0';
@@ -233,26 +216,17 @@ export class FormService {
     // return this.form.save(dto);
   }
 
-  setQuery(context: any) {
+  setQuery(context: FormContext) {
     console.log('set query');
-
     context.query = {
       NFRMNO: context.nfrmno,
       VORGNO: context.vorgno,
       CYEAR: context.cyear,
       CYEAR2: context.cyear2,
     };
-
-    // this.query = {
-    //   NFRMNO: this.nfrmno,
-    //   VORGNO: this.vorgno,
-    //   CYEAR: this.cyear,
-    //   CYEAR2: this.cyear2,
-    //   // CYEAR2: new Date().getFullYear().toString(),
-    // };
   }
 
-  async setFormNo(context: any) {
+  async setFormNo(context: FormContext) {
     console.log('set form no');
 
     const form = await this.getFormNextRunNo(context);
@@ -264,7 +238,7 @@ export class FormService {
     console.log('nrunno : ', context.nrunno);
   }
 
-  getFormNextRunNo(context: any) {
+  getFormNextRunNo(context: FormContext) {
     return this.form.find({
       where: context.query,
       order: {
@@ -274,7 +248,7 @@ export class FormService {
     });
   }
 
-  async setFormValue(context: any) {
+  async setFormValue(context: FormContext) {
     console.log('set form value');
 
     const condition = {
@@ -320,7 +294,7 @@ export class FormService {
     }
   }
 
-  async setOrganize(context: any) {
+  async setOrganize(context: FormContext) {
     const user = await this.usersService.findEmp(context.empno);
     // console.log('user : ', user);
 
@@ -338,7 +312,7 @@ export class FormService {
     console.log('orgno : ', context.orgno);
   }
 
-  async addFlow1(data: any, context: any, queryRunner: QueryRunner) {
+  async addFlow1(data: any, context: FormContext, queryRunner: QueryRunner) {
     const val = await this.orgTreeService.getOrgTree(
       context.orgno,
       data.VPOSNO,
@@ -365,7 +339,7 @@ export class FormService {
     }
   }
 
-  async addFlow2(data: any, context: any, queryRunner: QueryRunner) {
+  async addFlow2(data: any, context: FormContext, queryRunner: QueryRunner) {
     const val = await this.orgPosService.getOrgPos({
       VPOSNO: data.VPOSNO,
       VORGNO: data.VAPVORGNO,
@@ -389,7 +363,7 @@ export class FormService {
     }
   }
 
-  async getRepresent(empno: string, context: any) {
+  async getRepresent(empno: string, context: FormContext) {
     const condition = {
       NFRMNO: context.nfrmno,
       VORGNO: context.vorgno,
@@ -404,7 +378,7 @@ export class FormService {
     console.log('represent : ', context.represent);
   }
 
-  setFlow(data: any, context: any) {
+  setFlow(data: any, context: FormContext) {
     return {
       NFRMNO: context.nfrmno,
       VORGNO: context.vorgno,
@@ -428,7 +402,7 @@ export class FormService {
     };
   }
 
-  async firstflow(data: any, context:any, queryRunner: QueryRunner) {
+  async firstflow(data: any, context: FormContext, queryRunner: QueryRunner) {
     const today = new Date();
     // Set formDate to current date with time 00:00:00
     const formDateWithZeroTime = new Date(
@@ -463,7 +437,7 @@ export class FormService {
     await this.flowService.insertFlow(flow, queryRunner);
   }
 
-  async managerStep(context: any, queryRunner: QueryRunner) {
+  async managerStep(context: FormContext, queryRunner: QueryRunner) {
     const manager = await this.sequenceOrgService.getManager(context.empno);
     const query = {
       NFRMNO: context.nfrmno,
@@ -541,7 +515,7 @@ export class FormService {
     }
   }
 
-  async deleteFlowStep(data: any, context:any, queryRunner: QueryRunner) {
+  async deleteFlowStep(data: any, context: FormContext, queryRunner: QueryRunner) {
     await this.flowService.deleteFlow(context.query, queryRunner);
     if (context.query && 'CSTEPST' in context.query) {
       delete context.query['CSTEPST'];
@@ -564,7 +538,7 @@ export class FormService {
     }
   }
 
-  async saveDraft(draft: string, context: any, queryRunner: QueryRunner) {
+  async saveDraft(draft: string, context: FormContext, queryRunner: QueryRunner) {
     const formDraft: any = {
       NFRMNO: context.nfrmno,
       VORGNO: context.vorgno,

@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
-import { QainsOperatorAuditorService } from './qains_operator_auditor.service';
-import { QainsOperatorAuditorController } from './qains_operator_auditor.controller';
+import { QainsOAService } from './qains_operator_auditor.service';
+import { QainsOAController } from './qains_operator_auditor.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { QainsOA } from './entities/qains_operator_auditor.entity';
 
 @Module({
-  controllers: [QainsOperatorAuditorController],
-  providers: [QainsOperatorAuditorService],
+  imports: [TypeOrmModule.forFeature([QainsOA], 'amecConnection')],
+  controllers: [QainsOAController],
+  providers: [QainsOAService],
+  exports: [QainsOAService],
 })
-export class QainsOperatorAuditorModule {}
+export class QainsOAModule {}

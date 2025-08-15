@@ -27,5 +27,6 @@ import { SequenceOrgModule } from '../sequence-org/sequence-org.module';
   ],
   controllers: [FormController],
   providers: [FormService],
+  exports: [FormService]
 })
 export class FormModule {}

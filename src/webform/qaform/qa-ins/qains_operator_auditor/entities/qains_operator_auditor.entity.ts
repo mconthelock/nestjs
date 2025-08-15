@@ -1,25 +1,28 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity('QAINS_OPERATOR_AUDITOR')
-export class QainsOperatorAuditor {
-    @PrimaryColumn()
-    CYEAR2:string;
+export class QainsOA {
+  @PrimaryColumn()
+  NFRMNO: number;
 
-    @PrimaryColumn()
-    NRUNNO:string;
+  @PrimaryColumn()
+  VORGNO: string;
 
-    @PrimaryColumn()
-    QOA_SEQ:string;
+  @PrimaryColumn()
+  CYEAR: string;
 
-    @Column()
-    QOA_EMPNO:string;
+  @PrimaryColumn()
+  CYEAR2: string;
 
-    @Column()
-    QOA_EMPNAME:string;
+  @PrimaryColumn()
+  NRUNNO: number;
 
-    @Column()
-    QOA_TYPECODE:string;
+  @PrimaryColumn()
+  QOA_SEQ: number;
 
-    @Column()
-    QOA_TYPENO:string;
+  @PrimaryColumn()
+  QOA_TYPECODE: string;
+  
+  @Column()
+  QOA_EMPNO: string;
 }

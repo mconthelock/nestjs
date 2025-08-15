@@ -1,34 +1,20 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { QainsOperatorAuditorService } from './qains_operator_auditor.service';
-import { CreateQainsOperatorAuditorDto } from './dto/create-qains_operator_auditor.dto';
-import { UpdateQainsOperatorAuditorDto } from './dto/update-qains_operator_auditor.dto';
+import { QainsOAService } from './qains_operator_auditor.service';
+import { CreateQainsOADto} from './dto/create-qains_operator_auditor.dto';
+import { UpdateQainsOADto } from './dto/update-qains_operator_auditor.dto';
+import { SearchQainsOADto } from './dto/search-qains_operator_auditor.dto';
 
-@Controller('qains-operator-auditor')
-export class QainsOperatorAuditorController {
-  constructor(private readonly qainsOperatorAuditorService: QainsOperatorAuditorService) {}
+@Controller('qaform/qa-ins/OA')
+export class QainsOAController {
+  constructor(private readonly QainsOAService: QainsOAService) {}
 
-  @Post()
-  create(@Body() createQainsOperatorAuditorDto: CreateQainsOperatorAuditorDto) {
-    return this.qainsOperatorAuditorService.create(createQainsOperatorAuditorDto);
+  @Post('/insert')
+  async createQainsOA(@Body() dto: CreateQainsOADto) {
+    return this.QainsOAService.createQainsOA(dto);
   }
 
-  @Get()
-  findAll() {
-    return this.qainsOperatorAuditorService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.qainsOperatorAuditorService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateQainsOperatorAuditorDto: UpdateQainsOperatorAuditorDto) {
-    return this.qainsOperatorAuditorService.update(+id, updateQainsOperatorAuditorDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.qainsOperatorAuditorService.remove(+id);
+  @Post('/search')
+  async searchQainsOA(@Body() dto: SearchQainsOADto) {
+    return this.QainsOAService.searchQainsOA(dto);
   }
 }

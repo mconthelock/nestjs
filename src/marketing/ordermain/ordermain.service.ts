@@ -10,7 +10,7 @@ export class OrdermainService {
     @InjectRepository(Ordermain, 'amecConnection')
     private readonly ords: Repository<Ordermain>,
     @InjectDataSource('amecConnection')
-    private readonly ds: DataSource
+    private readonly ds: DataSource,
   ) {}
 
   async search(req: SearchOrdermainDto) {
@@ -39,15 +39,16 @@ export class OrdermainService {
   async sproj(req: SearchOrdermainDto) {
     const where = {};
     if (req.PRJ_NO) where['PRJ_NO'] = req.PRJ_NO;
-    return await this.ds.createQueryBuilder()
-    .from('TMARKET_TEMP', 'A')
-    .leftJoin('TMAINTAINTYPE', 'B', 'SERIES = ABBREVIATION')
-    .select('prj_no, prj_name, spec, DETAIL AS MODEL ')
-    .addSelect(' max(cust_rqs) ', 'EXPPLAN')
-    .addSelect(' sum(QTY)', 'TOTUNIT')
-    .where("PRJ_NO = :req", {req:req.PRJ_NO})
-    .andWhere("revision_code <> 'D'")
-    .groupBy('PRJ_NO , PRJ_NAME , SPEC , DETAIL')
-    .getRawMany();
+    return await this.ds
+      .createQueryBuilder()
+      .from('TMARKET_TEMP', 'A')
+      .leftJoin('TMAINTAINTYPE', 'B', 'SERIES = ABBREVIATION')
+      .select('prj_no, prj_name, spec, DETAIL AS MODEL ')
+      .addSelect(' max(cust_rqs) ', 'EXPPLAN')
+      .addSelect(' sum(QTY)', 'TOTUNIT')
+      .where('PRJ_NO = :req', { req: req.PRJ_NO })
+      .andWhere("revision_code <> 'D'")
+      .groupBy('PRJ_NO , PRJ_NAME , SPEC , DETAIL')
+      .getRawMany();
   }
 }

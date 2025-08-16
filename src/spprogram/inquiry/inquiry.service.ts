@@ -41,7 +41,7 @@ export class InquiryService {
       where: { INQ_ID: id },
       relations: {
         inqgroup: true,
-        details: true,
+        details: { logs: true },
         status: true,
         quotype: true,
         method: true,
@@ -56,7 +56,7 @@ export class InquiryService {
       where: { INQ_NO: no, INQ_LATEST: 1 },
       relations: {
         inqgroup: true,
-        details: true,
+        details: { logs: true },
         status: true,
         quotype: true,
         method: true,

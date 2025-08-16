@@ -1,7 +1,6 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateOrdermainDto } from './create-ordermain.dto';
-import { Type } from 'class-transformer';
 import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import { CreateOrdermainDto } from './create-ordermain.dto';
 
 export class SearchOrdermainDto {
   @IsOptional()

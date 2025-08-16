@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 import { InquiryGroup } from '../../inquiry-group/entities/inquiry-group.entity';
+import { InquiryLog } from '../../inquiry-log/entities/inquiry-log.entity';
 
 @Entity('SP_INQUIRY_DETAIL')
 export class InquiryDetail {
@@ -139,4 +140,8 @@ export class InquiryDetail {
   @ManyToOne(() => InquiryGroup, (group) => group.details)
   @JoinColumn({ name: 'INQG_GROUP', referencedColumnName: 'INQG_ID' })
   inqgroup: InquiryGroup;
+
+  @OneToMany(() => InquiryLog, (logs) => logs.details)
+  @JoinColumn({ name: 'INQD_ID', referencedColumnName: 'INQD_ID' })
+  logs: InquiryLog;
 }

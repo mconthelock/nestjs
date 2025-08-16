@@ -1,26 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOrderpartDto } from './dto/create-orderpart.dto';
-import { UpdateOrderpartDto } from './dto/update-orderpart.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Raw } from 'typeorm';
+import { SearchOrderpartDto } from './dto/search-orderpart.dto';
+import { Orderpart } from './entities/orderpart.entity';
 
 @Injectable()
 export class OrderpartsService {
-  create(createOrderpartDto: CreateOrderpartDto) {
-    return 'This action adds a new orderpart';
-  }
+  constructor(
+    @InjectRepository(Orderpart, 'amecConnection')
+    private readonly ords: Repository<Orderpart>,
+  ) {}
 
-  findAll() {
-    return `This action returns all orderparts`;
-  }
+  async search(req: SearchOrderpartDto) {
+    const where = {};
+    if (req.SERIES) where['SERIES'] = req.SERIES;
+    if (req.AGENT) where['AGENT'] = req.AGENT;
+    if (req.PRJ_NO) where['PRJ_NO'] = req.PRJ_NO;
+    if (req.ORDER_NO) where['ORDER_NO'] = req.ORDER_NO;
+    if (req.MFGNO) where['MFGNO'] = req.MFGNO;
+    if (req.CAR_NO) {
+      const trimmedCarNo = req.CAR_NO.trim(); // Trim ค่าจาก input ด้วย
+      where['CAR_NO'] = Raw(
+        (columnAlias) => `TRIM(${columnAlias}) = :trimmedCarNo`,
+        { trimmedCarNo },
+      );
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} orderpart`;
-  }
-
-  update(id: number, updateOrderpartDto: UpdateOrderpartDto) {
-    return `This action updates a #${id} orderpart`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} orderpart`;
+    if (req.SMFGNO) {
+      const trimmedMfgNo = req.SMFGNO.trim();
+      where['MFGNO'] = Raw((columnAlias) => `MFGNO LIKE '%${trimmedMfgNo}%'`, {
+        trimmedMfgNo,
+      });
+    }
+    return await this.ords.find({ where: where });
   }
 }

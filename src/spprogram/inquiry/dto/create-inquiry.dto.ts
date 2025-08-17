@@ -3,24 +3,20 @@ import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
 
 export class createInqDto {
   @IsNumber()
-  //@IsOptional()
+  @IsOptional()
   @Type(() => Number)
   INQ_ID: number;
 
   @IsString()
-  @IsOptional()
   INQ_NO: string;
 
   @IsString()
-  @IsOptional()
   INQ_REV: string;
 
   @IsNumber()
-  @IsOptional()
   INQ_STATUS: number;
 
   @IsDate()
-  @IsOptional()
   @Type(() => Date)
   INQ_DATE: Date;
 
@@ -37,7 +33,6 @@ export class createInqDto {
   INQ_COUNTRY: string;
 
   @IsString()
-  @IsOptional()
   INQ_TYPE: string;
 
   @IsString()
@@ -90,13 +85,5 @@ export class createInqDto {
 
   @IsString()
   @IsOptional()
-  INQ_FIN_PIC: string;
-
-  @IsString()
-  @IsOptional()
   INQ_PKC: string;
-
-  @IsString()
-  @IsOptional()
-  INQ_MAR_REMARK: string;
 }

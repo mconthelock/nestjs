@@ -1,4 +1,4 @@
-create table DS_CUSTOMER (
+create table CUSTOMER (
     CUS_ID	INT,
     CUS_NAME	VARCHAR,
     CUS_DISPLAY	VARCHAR,

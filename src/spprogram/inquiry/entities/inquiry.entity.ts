@@ -81,45 +81,6 @@ export class Inquiry {
   INQ_MAR_PIC: string;
 
   @Column()
-  INQ_FIN_PIC: string;
-
-  @Column()
-  INQ_PKC_PIC: string;
-
-  @Column()
-  INQ_MAR_SENT: Date;
-
-  @Column()
-  INQ_MRE_RECV: Date;
-
-  @Column()
-  INQ_MRE_FINISH: Date;
-
-  @Column()
-  INQ_PKC_FINISH: Date;
-
-  @Column()
-  INQ_BM_DATE: Date;
-
-  @Column()
-  INQ_FIN_RECV: Date;
-
-  @Column()
-  INQ_FIN_FINISH: Date;
-
-  @Column()
-  INQ_FINISH: Date;
-
-  @Column()
-  INQ_MAR_REMARK: string;
-
-  @Column()
-  INQ_DES_REMARK: string;
-
-  @Column()
-  INQ_FIN_REMARK: string;
-
-  @Column()
   CREATE_AT: Date;
 
   @Column()
@@ -160,15 +121,6 @@ export class Inquiry {
 
   @Column()
   INQ_CUSTRQS: Date;
-
-  @Column()
-  INQ_FIN_CHK: string;
-
-  @Column()
-  INQ_FIN_CONFIRM: Date;
-
-  @Column()
-  INQ_COMPARE_DATE: Date;
 
   @Column()
   INQ_CUSTOMER: number;

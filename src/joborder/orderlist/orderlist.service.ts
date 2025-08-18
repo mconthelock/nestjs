@@ -196,7 +196,7 @@ export class OrderListService {
     }
 
     private setQueryNew(dto: SearchOrderListDto, type: string = 'data') {
-        const { fields = [], ORDTYPE, PRJ_NO, MFGNO, BUYEREMPNO, BUYERNAME, PRNO, PRDATE, PONO, PODATE, LINENO, VENDCODE, ITEM, DRAWING, PARTNAME, INVOICE, DUEDATE, TURNOVER_STATUS, AGENT, SERIES, SDESSCH, SPRODSCH, SDESBMDATE, SMFGBMDATE, EDESSCH, EPRODSCH, EDESBMDATE, EMFGBMDATE, distinct, orderby, orderbyDirection, JOP_PUR_STATUS, JOP_PUR_INPUT_DATE } = dto;
+        const { fields = [], ORDTYPE, PRJ_NO, MFGNO, BUYEREMPNO, BUYERNAME, PRNO, PRDATE, PONO, PODATE, LINENO, VENDCODE, ITEM, DRAWING, PARTNAME, INVOICE, DUEDATE, TURNOVER_STATUS, AGENT, SERIES, SDESSCH, SPRODSCH, SDESBMDATE, SMFGBMDATE, EDESSCH, EPRODSCH, EDESBMDATE, EMFGBMDATE, distinct, orderby, orderbyDirection, JOP_PUR_STATUS, JOP_PUR_INPUT_DATE, JOP_MAR_REQUEST, JOP_PUR_CONFIRM } = dto;
 
         const query = this.dataSource.createQueryBuilder().from('MV_JOB_ORDER','O');
         query.distinct(distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
@@ -219,6 +219,8 @@ export class OrderListService {
         if (PARTNAME)   query.andWhere('O.PARTNAME LIKE :PARTNAME', { PARTNAME: `%${PARTNAME}%` });
         if (INVOICE)    query.andWhere('O.INVOICE LIKE :INVOICE', { INVOICE: `%${INVOICE}%` });
         if (DUEDATE)    query.andWhere('O.DUEDATE = :DUEDATE', { DUEDATE });
+        if (JOP_MAR_REQUEST)    query.andWhere('J.JOP_MAR_REQUEST = :JOP_MAR_REQUEST', { JOP_MAR_REQUEST });
+        if (JOP_PUR_CONFIRM)    query.andWhere('J.JOP_PUR_CONFIRM = :JOP_PUR_CONFIRM', { JOP_PUR_CONFIRM });
         if (JOP_PUR_STATUS == 2){
             query.andWhere('J.JOP_PUR_STATUS IS NOT NULL');
         } else if (JOP_PUR_STATUS == 3) {

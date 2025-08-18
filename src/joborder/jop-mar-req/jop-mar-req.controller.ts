@@ -10,6 +10,7 @@ import {
 import { JopMarReqService } from './jop-mar-req.service';
 import { CreateJopMarReqDto } from './dto/create-jop-mar-req.dto';
 import { UpdateJopMarReqDto } from './dto/update-jop-mar-req.dto';
+import { SearchJopMarReqDto } from './dto/search-jop-mar-req.dto';
 
 @Controller('joborder/request')
 export class JopMarReqController {
@@ -27,6 +28,11 @@ export class JopMarReqController {
     @Body() dto: UpdateJopMarReqDto,
   ) {
     return await this.jopMarReqService.update(dto);
+  }
+
+  @Post('search')
+  async search(@Body() dto: SearchJopMarReqDto) {
+      return await this.jopMarReqService.search(dto);
   }
 
 }

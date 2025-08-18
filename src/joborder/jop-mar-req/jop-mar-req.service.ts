@@ -4,11 +4,13 @@ import { Repository, DataSource, QueryRunner } from 'typeorm';
 
 import { CreateJopMarReqDto } from './dto/create-jop-mar-req.dto';
 import { UpdateJopMarReqDto } from './dto/update-jop-mar-req.dto';
+import { SearchJopMarReqDto } from './dto/search-jop-mar-req.dto';
 
 import { JopMarReq } from './entities/jop-mar-req.entity';
 import { numberToAlphabetRevision } from 'src/utils/format';
 
 import { AmeccalendarService } from 'src/amecmfg/ameccalendar/ameccalendar.service';
+import { getSafeFields } from 'src/utils/Fields';
 
 @Injectable()
 export class JopMarReqService {
@@ -20,6 +22,14 @@ export class JopMarReqService {
 
     private readonly amecCalendarService: AmeccalendarService,
   ) {}
+
+  private readonly JOP_MAR_REQ = this.dataSource
+    .getMetadata('JOP_MAR_REQ')
+    .columns.map((c) => c.propertyName);
+  private readonly AMECUSERALL = this.dataSource
+    .getMetadata('AMECUSERALL')
+    .columns.map((c) => c.propertyName);
+  private readonly allowFields = [...this.JOP_MAR_REQ, ...this.AMECUSERALL];
 
   async create(dto: CreateJopMarReqDto) {
     const { MFGNO, PONO, LINENO, ...updateData } = dto;
@@ -161,16 +171,10 @@ export class JopMarReqService {
         await localRunner.startTransaction();
       }
       const runner = queryRunner || localRunner!;
-      
-      const record = await this.findLatestRevision(
-        MFGNO,
-        PONO,
-        LINENO,
-        runner,
-      );
+
+      const record = await this.findLatestRevision(MFGNO, PONO, LINENO, runner);
 
       console.log('Record found:', record);
-      
 
       if (!record) {
         throw new InternalServerErrorException('Record not found');
@@ -179,7 +183,6 @@ export class JopMarReqService {
       const result = await runner.manager.save(record);
 
       console.log('Update result:', result);
-      
 
       if (localRunner) await localRunner.commitTransaction();
       return {
@@ -193,5 +196,98 @@ export class JopMarReqService {
     } finally {
       if (localRunner) await localRunner.release();
     }
+  }
+
+  async search(dto: SearchJopMarReqDto, queryRunner?: QueryRunner) {
+    const fields = dto.fields || [];
+    const repo = queryRunner ? queryRunner.manager : this.dataSource;
+    const query = repo
+      .createQueryBuilder()
+      .from('JOP_MAR_REQ', 'A')
+      .innerJoin(
+        (qb) =>
+          qb
+            .subQuery()
+            .select(
+              'JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION',
+            )
+            .from('JOP_MAR_REQ', 'MAR')
+            .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
+        'B',
+        'A.JOP_MFGNO = B.JOP_MFGNO AND A.JOP_PONO = B.JOP_PONO AND A.JOP_LINENO = B.JOP_LINENO AND B.LAST_REVISION = A.JOP_REVISION',
+      )
+      .innerJoin('AMECUSERALL', 'U', 'A.JOP_MAR_REQUEST = U.SEMPNO');
+    query.distinct(dto.distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
+    let select = [];
+    if (fields.length > 0) {
+      select = getSafeFields(fields, this.allowFields);
+    } else {
+      select = this.allowFields;
+    }
+    select.forEach((f) => {
+      if (this.AMECUSERALL.includes(f)) {
+        query.addSelect(`U.${f}`, f);
+      } else {
+        query.addSelect(`A.${f}`, f);
+      }
+    });
+
+    if (dto.orderby) query.orderBy(dto.orderby, dto.orderbyDirection);
+
+    if (dto.JOP_REVISION)
+      query.andWhere('A.JOP_REVISION = :revision', {
+        revision: dto.JOP_REVISION,
+      });
+    if (dto.JOP_MFGNO)
+      query.andWhere('A.JOP_MFGNO = :mfgno', { mfgno: dto.JOP_MFGNO });
+    if (dto.JOP_PONO)
+      query.andWhere('A.JOP_PONO = :pono', { pono: dto.JOP_PONO });
+    if (dto.JOP_LINENO)
+      query.andWhere('A.JOP_LINENO = :lineno', { lineno: dto.JOP_LINENO });
+    if (dto.JOP_PUR_STATUS)
+      query.andWhere('A.JOP_PUR_STATUS = :purStatus', {
+        purStatus: dto.JOP_PUR_STATUS,
+      });
+    if (dto.JOP_MAR_REQUEST)
+      query.andWhere('A.JOP_MAR_REQUEST = :marRequest', {
+        marRequest: dto.JOP_MAR_REQUEST,
+      });
+    if (dto.JOP_MAR_REQUEST_DATE) {
+      query.andWhere(
+        `TRUNC(A.JOP_MAR_REQUEST_DATE) = TO_DATE(:JOP_MAR_REQUEST_DATE, 'YYYY-MM-DD')`,
+        { JOP_MAR_REQUEST_DATE: dto.JOP_MAR_REQUEST_DATE },
+      );
+    }
+    if (dto.JOP_MAR_INPUT_DATE) {
+      query.andWhere(
+        `TRUNC(A.JOP_MAR_INPUT_DATE) = TO_DATE(:JOP_MAR_INPUT_DATE, 'YYYY-MM-DD')`,
+        { JOP_MAR_INPUT_DATE: dto.JOP_MAR_INPUT_DATE },
+      );
+    }
+    if (dto.SREQDATE) {
+      query.andWhere(
+        `A.JOP_MAR_INPUT_DATE >= TO_DATE(:SREQDATE, 'YYYY-MM-DD')`,
+        { SREQDATE: dto.SREQDATE },
+      );
+    }
+    if (dto.EREQDATE) {
+      query.andWhere(
+        `A.JOP_MAR_INPUT_DATE <= TO_DATE(:EREQDATE, 'YYYY-MM-DD')`,
+        { EREQDATE: dto.EREQDATE },
+      );
+    }
+    if (dto.SINPUTDATE) {
+      query.andWhere(
+        `A.JOP_MAR_INPUT_DATE >= TO_DATE(:SINPUTDATE, 'YYYY-MM-DD')`,
+        { SINPUTDATE: dto.SINPUTDATE },
+      );
+    }
+    if (dto.EINPUTDATE) {
+      query.andWhere(
+        `A.JOP_MAR_INPUT_DATE <= TO_DATE(:EINPUTDATE, 'YYYY-MM-DD')`,
+        { EINPUTDATE: dto.EINPUTDATE },
+      );
+    }
+    return await query.getRawMany();
   }
 }

@@ -160,4 +160,12 @@ export class SearchOrderListDto {
     @IsOptional()
     @IsString()
     readonly JOP_PUR_INPUT_DATE?: string;
+
+    @IsOptional()
+    @IsString()
+    readonly JOP_PUR_CONFIRM?: string;
+    
+    @IsOptional()
+    @IsString()
+    readonly JOP_MAR_REQUEST?: string;
 }

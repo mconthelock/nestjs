@@ -1,6 +1,9 @@
 import { TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import * as dotenv from 'dotenv';
+import { Logger } from 'winston';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { TypeOrmWinstonLogger } from '../common/logger/typeorm-winston.logger';
 
 dotenv.config();
 let amecConfig: TypeOrmModuleAsyncOptions;
@@ -8,8 +11,8 @@ if (process.env.HOST == 'AMEC') {
   amecConfig = {
     name: 'amecConnection',
     imports: [],
-    inject: [ConfigService],
-    useFactory: async (config: ConfigService) => ({
+    inject: [ConfigService, WINSTON_MODULE_PROVIDER],
+    useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
       type: 'oracle',
       username: process.env.AMEC_USER,
       password: process.env.AMEC_PASSWORD,
@@ -19,7 +22,8 @@ if (process.env.HOST == 'AMEC') {
         __dirname + '/../**/**/**/*.entity{.ts,.js}',
       ],
       synchronize: false,
-      logging: ['query', 'error'],
+      logging: ['error'],
+      logger: new TypeOrmWinstonLogger(winstonLogger),
       extra: {
         poolMax: 100,
         poolMin: 5,

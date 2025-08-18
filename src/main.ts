@@ -10,13 +10,20 @@ import { apiReference } from '@scalar/nestjs-api-reference';
 import { promises as fs } from 'fs';
 // import * as oracledb from 'oracledb';
 
+// Log management
+import { WinstonModule, WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { RequestIdMiddleware } from './middleware/request-id.middleware';
+import { RequestContextMiddleware } from './middleware/request-context.middleware';
+import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
+import { AllExceptionsFilter } from './common/logger/http-exception.filter';
+// import * as oracledb from 'oracledb';
 async function bootstrap() {
-    // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์
+  // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์
   const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
   await fs.mkdir(uploadPath, { recursive: true });
-  
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: ['error', 'warn', 'debug'],
+    logger: [],
   });
   // console.log('ORACLE POOL CONFIG', oracledb.poolMax, oracledb.poolMin, oracledb.queueTimeout, oracledb.queueMax);
   // const pool = await oracledb.getPool();
@@ -45,7 +52,7 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true, // ใช้ class-transformer (@Type)
       whitelist: true, // ตัดฟิลด์ที่ไม่ได้ประกาศใน DTO ทิ้ง
-    //   forbidNonWhitelisted: true,   // ถ้ามีฟิลด์แปลก → โยน 400 แทนการตัดทิ้ง
+      //   forbidNonWhitelisted: true,   // ถ้ามีฟิลด์แปลก → โยน 400 แทนการตัดทิ้ง
       exceptionFactory: (errors) =>
         new BadRequestException(errors.map((e) => e.constraints)),
     }),
@@ -55,6 +62,13 @@ async function bootstrap() {
   app.use(cookieParser());
   app.set('trust proxy', true);
   app.use(new IpLoggerMiddleware().use);
+  app.use(new RequestIdMiddleware().use);
+  app.use(new RequestContextMiddleware().use);
+
+  // Global Interceptor สำหรับ log request และ Exception Filter สำหรับ log error
+  const logger = app.get(WINSTON_MODULE_PROVIDER);
+  app.useGlobalFilters(new AllExceptionsFilter(logger));
+  app.useGlobalInterceptors(app.get(HttpLoggingInterceptor));
 
   // สร้าง config สำหรับ Swagger
   const swaggerConfig = new DocumentBuilder()

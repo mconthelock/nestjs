@@ -2,6 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import amecConfig from './databases/amec.config';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
+import { winstonConfig, devLoggerConfig } from './common/logger/winston.config';
+import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
 
 // import { AuthModule } from './auth/auth.module';
 // import { AmecModule } from './amec/amec.module';
@@ -47,5 +51,6 @@ import { MailModule } from './mail/mail.module';
     ItemarrnglstModule,
     MailModule,
   ],
+  providers: [HttpLoggingInterceptor],
 })
 export class AppModule {}

@@ -2,6 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import amecConfig from './databases/amec.config';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
+import { winstonConfig, devLoggerConfig } from './common/logger/winston.config';
+import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
 
 // import { AuthModule } from './auth/auth.module';
 // import { AmecModule } from './amec/amec.module';
@@ -18,6 +22,9 @@ import { MktModule } from './marketing/mkt.module';
 // import { ESCSModule } from './escs/escs.module';
 // import { DetailModule } from './idtag/detail/detail.module';
 // import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
+
+const logConfig =
+  process.env.STATE === 'development' ? devLoggerConfig : winstonConfig;
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -41,6 +48,10 @@ import { MktModule } from './marketing/mkt.module';
     // ESCSModule,
     // DetailModule,
     // ItemarrnglstModule,
+
+    //Logging Config
+    WinstonModule.forRoot(logConfig),
   ],
+  providers: [HttpLoggingInterceptor],
 })
 export class AppModule {}

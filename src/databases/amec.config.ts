@@ -35,6 +35,7 @@ if (process.env.HOST == 'AMEC') {
         poolPingInterval: 60, // วินาที
         stmtCacheSize: 50,
       },
+      //   relationLoadStrategy: 'query',
     }),
   };
 } else {

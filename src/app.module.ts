@@ -22,6 +22,7 @@ import { MktModule } from './marketing/mkt.module';
 // import { ESCSModule } from './escs/escs.module';
 // import { DetailModule } from './idtag/detail/detail.module';
 // import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
+import { LoggerModule } from './logger/logger.module';
 
 const logConfig =
   process.env.STATE === 'development' ? devLoggerConfig : winstonConfig;
@@ -51,6 +52,7 @@ const logConfig =
 
     //Logging Config
     WinstonModule.forRoot(logConfig),
+    LoggerModule,
   ],
   providers: [HttpLoggingInterceptor],
 })

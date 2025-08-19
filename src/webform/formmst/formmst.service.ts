@@ -3,7 +3,7 @@ import { Repository, DataSource } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Formmst } from './entities/formmst.entity';
 import { SearchFormmstDto } from './dto/searchFormmst.dto';
-import { getSafeFields } from '../../utils/Fields';
+import { getSafeFields } from '../../common/utils/Fields.utils';
 
 @Injectable()
 export class FormmstService {

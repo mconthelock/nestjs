@@ -1,34 +1,59 @@
-import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  OneToMany,
+  JoinColumn,
+  OneToOne,
+} from 'typeorm';
+import { QainsOA } from '../../qains_operator_auditor/entities/qains_operator_auditor.entity';
+import { QaFile } from '../../../qa_file/entities/qa_file.entity';
+import { User } from '../../entities-dummy/user.entity';
+import { UserSection } from '../../entities-dummy/user_section.entity';
 
 @Entity('QAINS_FORM')
 export class QainsForm {
-    @PrimaryColumn()
-    NFRMNO: number;
+  @PrimaryColumn()
+  NFRMNO: number;
 
-    @PrimaryColumn()
-    VORGNO: string;
+  @PrimaryColumn()
+  VORGNO: string;
 
-    @PrimaryColumn()
-    CYEAR: string;
+  @PrimaryColumn()
+  CYEAR: string;
 
-    @PrimaryColumn()
-    CYEAR2: string;
+  @PrimaryColumn()
+  CYEAR2: string;
 
-    @PrimaryColumn()
-    NRUNNO: number;
+  @PrimaryColumn()
+  NRUNNO: number;
 
-    @Column()
-    QA_ITEM: string;
+  @Column()
+  QA_ITEM: string;
 
-    @Column()
-    QA_INCHARGE_SECTION: number;
+  @Column()
+  QA_INCHARGE_SECTION: number;
 
-    @Column()
-    QA_INCHARGE_EMPNO: string;
+  @Column()
+  QA_INCHARGE_EMPNO: string;
 
-    @Column()
-    QA_TRAINING_DATE: Date;
+  @Column()
+  QA_TRAINING_DATE: Date;
 
-    @Column()
-    QA_OJT_DATE: Date;
+  @Column()
+  QA_OJT_DATE: Date;
+
+  @OneToMany(() => QainsOA, (qainsOA) => qainsOA.QAINSFORM)
+  QA_AUD_OPT: QainsOA[];
+
+  @OneToMany(() => QaFile, (qaFile) => qaFile.QAINSFORM)
+  QA_FILES: QaFile[];
+
+  @OneToOne(() => User, (u) => u.INCHARGE)
+  @JoinColumn({ name: 'QA_INCHARGE_EMPNO', referencedColumnName: 'SEMPNO' })
+  QA_INCHARGE_INFO: User | null;
+
+  @OneToOne(() => UserSection, (u) => u.QAINS)
+  @JoinColumn({ name: 'QA_INCHARGE_SECTION', referencedColumnName: 'SEC_ID' })
+  QA_INCHARGE_SECTION_INFO: UserSection | null;
 }

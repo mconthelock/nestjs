@@ -9,10 +9,13 @@ import { FormModule } from 'src/webform/form/form.module';
 import { QainsOAModule } from '../qains_operator_auditor/qains_operator_auditor.module';
 import { QaFileModule } from '../../qa_file/qa_file.module';
 
+import { FlowModule } from 'src/webform/flow/flow.module';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([QainsForm, Form], 'amecConnection'),
     FormModule,
+    FlowModule,
     QainsOAModule,
     QaFileModule
   ],

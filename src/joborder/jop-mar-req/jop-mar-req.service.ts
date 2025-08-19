@@ -7,7 +7,7 @@ import { UpdateJopMarReqDto } from './dto/update-jop-mar-req.dto';
 import { SearchJopMarReqDto } from './dto/search-jop-mar-req.dto';
 
 import { JopMarReq } from './entities/jop-mar-req.entity';
-import { numberToAlphabetRevision } from 'src/utils/format';
+import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
 
 import { AmeccalendarService } from 'src/amecmfg/ameccalendar/ameccalendar.service';
 import { getSafeFields } from 'src/utils/Fields';

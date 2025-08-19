@@ -7,9 +7,14 @@ import { IpLoggerMiddleware } from './middleware/ip-logger.middleware';
 import { NestExpressApplication } from '@nestjs/platform-express'; // ✅ ต้องเพิ่ม
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
+import { promises as fs } from 'fs';
 // import * as oracledb from 'oracledb';
 
 async function bootstrap() {
+    // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์
+  const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
+  await fs.mkdir(uploadPath, { recursive: true });
+  
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ['error', 'warn', 'debug'],
   });

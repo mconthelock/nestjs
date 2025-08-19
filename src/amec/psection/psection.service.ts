@@ -5,7 +5,7 @@ import { Psection } from '../psection/entities/psection.entity';
 import { Pdepartment } from '../pdepartment/entities/pdepartment.entity';
 import { Pdivision } from '../pdivision/entities/pdivision.entity';
 import { SearchSectionDto } from './dto/search-section.dto';
-import { getSafeFields } from '../../utils/Fields';
+import { getSafeFields } from '../../common/utils/Fields.utils';
 
 @Injectable()
 export class PsectionService {

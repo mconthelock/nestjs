@@ -4,7 +4,7 @@ import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Pdepartment } from '../pdepartment/entities/pdepartment.entity';
 import { Pdivision } from '../pdivision/entities/pdivision.entity';
 import { SearchDepartmentDto } from './dto/search-department.dto';
-import { getSafeFields } from '../../utils/Fields';
+import { getSafeFields } from '../../common/utils/Fields.utils';
 
 @Injectable()
 export class PdepartmentService {

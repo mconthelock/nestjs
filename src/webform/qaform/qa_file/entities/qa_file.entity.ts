@@ -1,4 +1,6 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { QainsForm } from '../../qa-ins/qains_form/entities/qains_form.entity';
+import { QaType } from '../../qa_type/entities/qa_type.entity';
 
 @Entity('QA_FILE')
 export class QaFile {
@@ -49,4 +51,17 @@ export class QaFile {
 
   @Column()
   FILE_PATH: string;
+
+  @ManyToOne(() => QainsForm, (form) => form.QA_FILES)
+  @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+  @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
+  @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
+  @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+  @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+  QAINSFORM: QainsForm | null;
+
+  @ManyToOne(() => QaType, (t) => t.FILE_TYPE)
+  @JoinColumn({ name: 'FILE_TYPECODE', referencedColumnName: 'QAT_CODE' })
+  @JoinColumn({ name: 'FILE_TYPENO', referencedColumnName: 'QAT_NO' })
+  TYPE: QaType | null;
 }

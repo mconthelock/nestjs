@@ -14,7 +14,7 @@ import { FormService } from './form.service';
 import { getFormnoDto } from './dto/get-formno.dto';
 import { CreateFormDto } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
-import { getClientIP } from 'src/common/helpers/ip';
+import { getClientIP } from 'src/common/utils/ip.utils';
 
 @ApiTags('Form')
 @Controller('form')

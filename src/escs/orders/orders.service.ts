@@ -5,7 +5,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { SearchOrderDto } from './dto/search-orders.dto';
 import { Orders } from './entities/order.entity';
-import { logQuery } from 'src/utils/debug';
+import { logQuery } from 'src/common/utils/debug.utils';
 
 @Injectable()
 export class OrdersService {

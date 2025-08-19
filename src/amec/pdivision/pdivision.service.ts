@@ -3,7 +3,7 @@ import { Repository, DataSource } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Pdivision } from '../pdivision/entities/pdivision.entity';
 import { SearchDivisionDto } from './dto/search-division.dto';
-import { getSafeFields } from '../../utils/Fields';
+import { getSafeFields } from '../../common/utils/Fields.utils';
 
 @Injectable()
 export class PdivisionService {

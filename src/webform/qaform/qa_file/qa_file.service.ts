@@ -5,7 +5,7 @@ import { CreateQaFileDto } from './dto/create-qa_file.dto';
 import { UpdateQaFileDto } from './dto/update-qa_file.dto';
 import { SearchQaFileDto } from './dto/search-qa_file.dto';
 import { QaFile } from './entities/qa_file.entity';
-import { moveFileFromMulter } from 'src/utils/files';
+import { moveFileFromMulter } from 'src/common/utils/files.utils';
 
 @Injectable()
 export class QaFileService {

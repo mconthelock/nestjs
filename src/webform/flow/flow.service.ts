@@ -9,6 +9,8 @@ import { SearchFlowDto } from './dto/search-flow.dto';
 import { CreateFlowDto } from './dto/create-flow.dto';
 import { UpdateFlowDto } from './dto/update-flow.dto';
 
+import { RepService } from '../rep/rep.service';
+
 @Injectable()
 export class FlowService {
   constructor(
@@ -17,6 +19,7 @@ export class FlowService {
 
     @InjectDataSource('amecConnection')
     private dataSource: DataSource,
+    private readonly repService: RepService,
   ) {}
   private readonly STEP_READY = '3';
 
@@ -88,6 +91,15 @@ export class FlowService {
       }
       const runner = queryRunner || localRunner!;
       const { condition, ...data } = dto;
+
+      if (data.VREPNO) {
+        data.VREPNO = await this.repService.getRepresent({
+          NFRMNO: condition.NFRMNO,
+          VORGNO: condition.VORGNO,
+          CYEAR: condition.CYEAR,
+          VEMPNO: data.VREPNO,
+        }, runner);
+      }
 
       // await queryRunner.manager.save(repo.target, dto);
       await runner.manager.getRepository(Flow).update(condition, data);

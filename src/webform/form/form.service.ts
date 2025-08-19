@@ -156,7 +156,7 @@ export class FormService {
               context.VAPVNO = row.VAPVNO;
               context.CSTEPST = context.CSTEPSTDX <= 1 ? 1 : context.CSTEPSTDX - 1;
               context.CSTEPSTDX--;
-              await this.getRepresent(row.VAPVNO, context);
+              await this.getRepresent(row.VAPVNO, context, runner);
               const flow = this.setFlow(row, context);
               await this.flowService.insertFlow(flow, runner);
               break;
@@ -323,7 +323,7 @@ export class FormService {
     if (val.length > 0) {
       context.flag = 2;
       for (const row of val) {
-        await this.getRepresent(row.VEMPNO, context);
+        await this.getRepresent(row.VEMPNO, context, queryRunner);
         context.VAPVNO = row.VEMPNO;
         context.CSTEPST = context.CSTEPSTDX <= 1 ? 1 : context.CSTEPSTDX - 1;
         context.CSTEPSTDX--;
@@ -332,7 +332,7 @@ export class FormService {
       }
     } else {
       context.VAPVNO = context.empno;
-      await this.getRepresent(context.empno, context);
+      await this.getRepresent(context.empno, context, queryRunner);
       context.CSTEPST = 0;
       const flow = this.setFlow(data, context);
       await this.flowService.insertFlow(flow, queryRunner);
@@ -347,7 +347,7 @@ export class FormService {
     // console.log('add flow2 val : ', val);
     if (val.length > 0) {
       for (const row of val) {
-        await this.getRepresent(row.VEMPNO, context);
+        await this.getRepresent(row.VEMPNO, context, queryRunner);
         context.VAPVNO = row.VEMPNO;
         context.CSTEPST = context.CSTEPSTDX <= 1 ? 1 : context.CSTEPSTDX - 1;
         context.CSTEPSTDX--;
@@ -355,7 +355,7 @@ export class FormService {
         await this.flowService.insertFlow(flow, queryRunner);
       }
     } else {
-      await this.getRepresent(context.empno, context);
+      await this.getRepresent(context.empno, context, queryRunner);
       context.VAPVNO = context.empno;
       context.CSTEPST = 0;
       const flow = this.setFlow(data, context);
@@ -363,19 +363,20 @@ export class FormService {
     }
   }
 
-  async getRepresent(empno: string, context: FormContext) {
+  async getRepresent(empno: string, context: FormContext, queryRunner?: QueryRunner) {
     const condition = {
       NFRMNO: context.nfrmno,
       VORGNO: context.vorgno,
       CYEAR: context.cyear,
       VEMPNO: empno,
     };
-    const data = await this.repService.getRep(condition);
-    context.represent = empno;
-    if (Array.isArray(data) && data.length > 0 && data[0]?.VREPNO !== '') {
-      context.represent = data[0].VREPNO;
-    }
-    console.log('represent : ', context.represent);
+    context.represent = await this.repService.getRepresent(condition, queryRunner);
+    // const data = await this.repService.getRep(condition);
+    // context.represent = empno;
+    // if (Array.isArray(data) && data.length > 0 && data[0]?.VREPNO !== '') {
+    //   context.represent = data[0].VREPNO;
+    // }
+    // console.log('represent : ', context.represent);
   }
 
   setFlow(data: any, context: FormContext) {
@@ -456,7 +457,7 @@ export class FormService {
     };
     const url = await this.formmstService.getFormmst(query2);
     if (manager.length > 0) {
-      await this.getRepresent(manager[0].HEADNO, context);
+      await this.getRepresent(manager[0].HEADNO, context, queryRunner);
       //   const repManager = await this.getRepresent(manager[0].HEADNO);
       //   if (!repManager) {
       //     repno = manager[0].HEADNO;

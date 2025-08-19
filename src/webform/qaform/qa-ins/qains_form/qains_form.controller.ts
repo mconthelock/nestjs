@@ -6,7 +6,15 @@ import { Request } from 'express';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { ApiTags, ApiExcludeEndpoint } from '@nestjs/swagger';
 
-import { getClientIP } from 'src/common/helpers/ip';
+import { getClientIP } from 'src/common/utils/ip.utils';
+
+interface form{
+    NFRMNO: number;
+    VORGNO: string;
+    CYEAR: string;
+    CYEAR2: string;
+    NRUNNO: number;
+}
 
 @ApiTags('QA-INS Form')
 @Controller('qaform/qa-ins')
@@ -27,5 +35,8 @@ export class QainsFormController {
     return this.qainsFormService.createQainsForm(dto, files, ip, this.path);
   }
 
- 
+  @Post('getFormData')
+  async getFormData(@Body() form: form) {
+    return await this.qainsFormService.getFormData(form);
+  }
 }

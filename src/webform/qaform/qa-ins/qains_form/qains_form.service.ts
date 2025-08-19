@@ -2,11 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { CreateQainsFormDto } from './dto/create-qains_form.dto';
-import { moveFileFromMulter, deleteFile } from 'src/utils/files';
+import { moveFileFromMulter, deleteFile } from 'src/common/utils/files.utils';
 import { QainsForm } from '../qains_form/entities/qains_form.entity';
 import { FormService } from 'src/webform/form/form.service';
 import { QainsOAService } from '../qains_operator_auditor/qains_operator_auditor.service';
 import { QaFileService } from '../../qa_file/qa_file.service';
+import { FlowService } from 'src/webform/flow/flow.service';
+
+interface form {
+  NFRMNO: number;
+  VORGNO: string;
+  CYEAR: string;
+  CYEAR2: string;
+  NRUNNO: number;
+}
 
 @Injectable()
 export class QainsFormService {
@@ -17,6 +26,7 @@ export class QainsFormService {
     private dataSource: DataSource,
 
     private readonly formService: FormService,
+    private readonly flowService: FlowService,
     private readonly QainsOAService: QainsOAService,
     private readonly QaFileService: QaFileService,
   ) {}
@@ -57,6 +67,39 @@ export class QainsFormService {
         CYEAR2: createForm.data.CYEAR2,
         NRUNNO: createForm.data.NRUNNO,
       };
+
+      // update flow incharge1
+      const condIncharge1 = {
+        condition: {
+          ...form,
+          CEXTDATA: '01',
+        },
+        VAPVNO: dto.QA_INCHARGE_EMPNO,
+        VREPNO: dto.QA_INCHARGE_EMPNO,
+      };
+      this.flowService.updateFlow(condIncharge1, queryRunner);
+
+      // update flow incharge2
+      const condIncharge2 = {
+        condition: {
+          ...form,
+          CEXTDATA: '02',
+        },
+        VAPVNO: dto.QA_INCHARGE_EMPNO,
+        VREPNO: dto.QA_INCHARGE_EMPNO,
+      };
+      this.flowService.updateFlow(condIncharge2, queryRunner);
+
+      // update flow req foreman
+      const condForeman = {
+        condition: {
+          ...form,
+          CEXTDATA: '05',
+        },
+        VAPVNO: dto.REQUESTER,
+        VREPNO: dto.REQUESTER,
+      };
+      this.flowService.updateFlow(condForeman, queryRunner);
 
       await queryRunner.manager.save(QainsForm, {
         ...form,
@@ -112,5 +155,26 @@ export class QainsFormService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async getFormData(form: form, queryRunner?: QueryRunner) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(QainsForm)
+      : this.qaformRepo;
+
+    return repo.findOne({
+      where: {
+        NFRMNO: form.NFRMNO,
+        VORGNO: form.VORGNO,
+        CYEAR: form.CYEAR,
+        CYEAR2: form.CYEAR2,
+        NRUNNO: form.NRUNNO,
+      },
+      relations: ['QA_AUD_OPT', 'QA_AUD_OPT.TYPE', 'QA_AUD_OPT.QOA_EMPNO_INFO', 'QA_FILES', 'QA_FILES.TYPE', 'QA_INCHARGE_INFO', 'QA_INCHARGE_SECTION_INFO'],
+      order: {
+        QA_AUD_OPT: { QOA_SEQ: 'ASC' }, // แทน ORDER BY ใน subquery เดิม
+        QA_FILES: { FILE_ID: 'ASC' },
+      },
+    });
   }
 }

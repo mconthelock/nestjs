@@ -4,9 +4,9 @@ import { Repository, DataSource  } from 'typeorm';
 import { VOrderList } from './entities/orderlist.entity';
 import { SetRequestDate } from '../set-request-date/entities/set-request-date.entity';
 import { SearchOrderListDto } from './dto/search-orderlist.dto';
-import { getSafeFields, mapAliasesToFields } from 'src/utils/Fields';
+import { getSafeFields, mapAliasesToFields } from 'src/common/utils/Fields.utils';
 
-import { numberToAlphabetRevision } from 'src/utils/format';
+import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
 import { JopMarReqService } from '../jop-mar-req/jop-mar-req.service';
 import { JopPurConfService } from '../jop-pur-conf/jop-pur-conf.service';
 

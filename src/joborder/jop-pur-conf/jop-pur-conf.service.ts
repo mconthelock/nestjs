@@ -6,7 +6,7 @@ import { CreateJopPurConfDto } from './dto/create-jop-pur-conf.dto';
 import { UpdateJopPurConfDto } from './dto/update-jop-pur-conf.dto';
 
 import { JopPurConf } from './entities/jop-pur-conf.entity';
-import { numberToAlphabetRevision } from 'src/utils/format';
+import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
 
 import { AmeccalendarService } from 'src/amecmfg/ameccalendar/ameccalendar.service';
 import { JopMarReqService } from '../jop-mar-req/jop-mar-req.service';

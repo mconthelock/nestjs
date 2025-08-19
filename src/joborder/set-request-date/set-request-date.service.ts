@@ -4,7 +4,7 @@ import { Repository, DataSource } from 'typeorm';
 import { SetRequestDate } from './entities/set-request-date.entity';
 import { UpsertSetRequestDateDto } from './dto/create-set-request-date.dto';
 import { UpdateSetRequestDateDto } from './dto/update-set-request-date.dto';
-import { numberToAlphabetRevision } from 'src/utils/format';
+import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
 
 // กำหนด Interface สำหรับผลลัพธ์ที่คืนกลับไป
 interface Result {

@@ -4,7 +4,14 @@ import { UpdateRepDto } from './dto/update-rep.dto';
 import { SearchRepDto } from './dto/search-rep.dto';
 import { Rep } from './entities/rep.entity';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, QueryRunner } from 'typeorm';
+
+interface represent {
+  NFRMNO: number;
+  VORGNO: string;
+  CYEAR: string;
+  VEMPNO: string;
+}
 
 @Injectable()
 export class RepService {
@@ -35,7 +42,21 @@ export class RepService {
     return `This action removes a #${id} rep`;
   }
 
-  getRep(dto: SearchRepDto) {
-    return this.repRepo.find({ where: dto });
+  getRep(dto: SearchRepDto, queryRunner?: QueryRunner) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(Rep)
+      : this.repRepo;
+    return repo.find({ where: dto });
+  }
+
+  async getRepresent(dto: represent, queryRunner?: QueryRunner) {
+    const data = queryRunner
+      ? await this.getRep(dto, queryRunner)
+      : await this.getRep(dto);
+    let represent = dto.VEMPNO;
+    if (Array.isArray(data) && data.length > 0 && data[0]?.VREPNO !== '') {
+      represent = data[0].VREPNO;
+    }
+    return represent;
   }
 }

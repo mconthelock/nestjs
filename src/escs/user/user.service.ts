@@ -3,7 +3,7 @@ import { Repository, DataSource } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { EscsUser } from './entities/user.entity';
 import { SearchEscsUserDto } from './dto/search-escs-user.dto';
-import { getSelectNestedFields, getSafeFields } from '../../utils/Fields';
+import { getSelectNestedFields, getSafeFields } from '../../common/utils/Fields.utils';
 
 @Injectable()
 export class UserService {

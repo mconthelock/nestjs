@@ -1,4 +1,5 @@
 import * as winston from 'winston';
+import chalk from 'chalk';
 // import DailyRotateFile from 'winston-daily-rotate-file';
 import { requestNamespace } from '../../middleware/request-id.middleware';
 
@@ -11,8 +12,39 @@ const addRequestId = winston.format((info) => {
   return info;
 });
 
+const ignoreTypeOrmEntities = winston.format((info) => {
+  if (
+    typeof info.message === 'string' &&
+    info.message.includes('All classes found using provided glob pattern')
+  ) {
+    return false; // ❌ ตัด log นี้ทิ้ง
+  }
+  return info;
+});
+
+const colors = {
+  error: 'red',
+  warn: 'yellow',
+  info: 'green',
+  http: 'magenta',
+  debug: 'cyan',
+};
+
+const keyColors = {
+  context: chalk.cyan,
+  statusCode: chalk.magenta,
+  method: chalk.yellow,
+  url: chalk.greenBright,
+  ip: chalk.blue,
+  userAgent: chalk.gray,
+  userId: chalk.whiteBright,
+  stack: chalk.redBright,
+};
+winston.addColors(colors);
+
 export const winstonConfig = {
   format: winston.format.combine(
+    ignoreTypeOrmEntities(),
     winston.format.timestamp(),
     addRequestId(),
     winston.format.json(),
@@ -53,6 +85,7 @@ export const winstonConfig = {
 
 export const devLoggerConfig = {
   format: winston.format.combine(
+    ignoreTypeOrmEntities(),
     winston.format.timestamp(),
     addRequestId(),
     winston.format.json(),
@@ -67,39 +100,60 @@ export const devLoggerConfig = {
         addRequestId(),
         winston.format.printf(
           ({ level, message, timestamp, requestId, ...meta }) => {
-            // return `[${timestamp}] [${level}]${
-            //   context ? ' [' + context + ']' : ''
-            // } ${message} ${stack ? '\n' + stack : ''}`;
-            return `[${timestamp}] [${level}] [req:${requestId || '-'}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
+            return `[${timestamp}] [${level}][req:${chalk.yellow(requestId || '-')}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
+            // let obj = message;
+            // if (typeof message === 'string') {
+            //   try {
+            //     obj = JSON.parse(message);
+            //   } catch {
+            //     output += ` ${message}`;
+            //   }
+            // }
+
+            // if (obj && typeof obj === 'object') {
+            //     const objAny = obj as any;
+            //   for (const [key, value] of Object.entries(objAny)) {
+            //     if (key === 'stack') continue;
+            //     const colorFn = keyColors[key] || ((txt) => txt);
+            //     output += ` ${colorFn(`${key}: ${value}`)}`;
+            //   }
+            //   if (objAny.stack) {
+            //      output += `\n${keyColors.stack(objAny.stack)}`;
+            //   }
+            // } else {
+            //   output += ` ${message}`;
+            // }
+            // return output;
+            //return `[${timestamp}] [${level}] [req:${requestId || '-'}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
           },
         ),
       ),
     }),
 
     // ✅ เก็บ error แยกไฟล์
-    new DailyRotateFile({
-      dirname: 'logs/dev/',
-      filename: 'error-%DATE%.log',
-      datePattern: 'YYYY-MM-DD',
-      zippedArchive: true,
-      maxSize: '20m',
-      maxFiles: '30d',
-      level: 'error',
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        addRequestId(),
-        winston.format.json(),
-      ),
-    }),
+    // new DailyRotateFile({
+    //   dirname: 'logs/dev/',
+    //   filename: 'error-%DATE%.log',
+    //   datePattern: 'YYYY-MM-DD',
+    //   zippedArchive: true,
+    //   maxSize: '20m',
+    //   maxFiles: '30d',
+    //   level: 'error',
+    //   format: winston.format.combine(
+    //     winston.format.timestamp(),
+    //     addRequestId(),
+    //     winston.format.json(),
+    //   ),
+    // }),
 
     // ✅ เก็บทุก log ลงไฟล์ (เผื่อ trace ย้อนหลัง)
     new DailyRotateFile({
       dirname: 'logs/dev/',
       filename: 'logs-%DATE%.log',
       datePattern: 'YYYY-MM-DD',
-      //   zippedArchive: true,
-      //   maxSize: '20m',
-      //   maxFiles: '30d',
+      zippedArchive: true,
+      maxSize: '20m',
+      maxFiles: '30d',
       level: 'debug',
       format: winston.format.combine(
         winston.format.timestamp(),

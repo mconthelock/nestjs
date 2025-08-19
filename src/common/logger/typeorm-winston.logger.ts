@@ -2,83 +2,19 @@
 import { Logger as TypeOrmLogger, QueryRunner } from 'typeorm';
 import { Logger } from 'winston';
 import chalk from 'chalk';
+import { normalizeSqlAliases, extractSubqueries } from './transform-sql';
 
 export class TypeOrmWinstonLogger implements TypeOrmLogger {
   constructor(private readonly logger: Logger) {}
 
   logQuery(query: string, parameters?: any[], queryRunner?: QueryRunner) {
-    const replaceHashTableAliases = (sql: string): string => {
-      const tableAliasMap = new Map<string, string>();
-      let aliasCounter = 1;
-      // Regex หาชื่อ table + alias
-      const tableAliasRegex = /\b(FROM|JOIN)\s+"[^"]+"\s+"([^"]+)"/gi;
-      sql = sql.replace(tableAliasRegex, (_match, joinType, tableAlias) => {
-        if (!tableAliasMap.has(tableAlias)) {
-          tableAliasMap.set(tableAlias, `T${aliasCounter++}`);
-        }
-        const newAlias = tableAliasMap.get(tableAlias)!;
-        return `${joinType} "${newAlias}"`;
-      });
-
-      // Replace column references ตาม table alias ใหม่
-      tableAliasMap.forEach((newAlias, oldAlias) => {
-        // กรณี "Inquiry".INQ_ID → "T1".INQ_ID
-        const columnRegex = new RegExp(`"${oldAlias}"\\.`, 'g');
-        sql = sql.replace(columnRegex, `"${newAlias}".`);
-      });
-
-      return sql;
-    };
-
-    const replaceHashColumnAliases = (sql: string): string => {
-      let colCounter = 1;
-      const hashColumnMap = new Map<string, string>();
-      const hashAliasRegex = /\bAS\s+"?([0-9a-f]{8,})"?/gi;
-      sql = sql.replace(hashAliasRegex, (_match, alias) => {
-        if (!hashColumnMap.has(alias)) {
-          hashColumnMap.set(alias, `c${colCounter++}`);
-        }
-        return `AS "${hashColumnMap.get(alias)}"`;
-      });
-
-      hashColumnMap.forEach((newAlias, oldAlias) => {
-        // กรณีถูกเรียกใช้แบบ "0681241698b5f1ea6b3b562087efa". หรือ 0681241698b5f1ea6b3b562087efa.
-        const refRegex = new RegExp(`"${oldAlias}"`, 'g');
-        sql = sql.replace(refRegex, `"${newAlias}"`);
-      });
-
-      return sql;
-    };
-
-    const normalizeSqlAliases = (sql: string): string => {
-      const tableAliasMap = new Map<string, string>();
-      let tableCounter = 1;
-
-      // 1️⃣ Replace table alias เป็น T1,T2...
-      const tableAliasRegex = /\b(FROM|JOIN)\s+"[^"]+"\s+"([^"]+)"/gi;
-      sql = sql.replace(tableAliasRegex, (_match, joinType, tableAlias) => {
-        if (!tableAliasMap.has(tableAlias)) {
-          tableAliasMap.set(tableAlias, `T${tableCounter++}`);
-        }
-        const newAlias = tableAliasMap.get(tableAlias)!;
-        return `${joinType} "${newAlias}"`;
-      });
-
-      // 2️⃣ Replace column alias เป็น tableAlias+columnName
-      const columnAliasRegex = /"([^"]+)"\."([^"]+)"\s+AS\s+"?([^",\s]+)"?/gi;
-      sql = sql.replace(columnAliasRegex, (_match, table, column, alias) => {
-        const newTable = tableAliasMap.get(table) || table;
-        const newAlias = `${newTable}${column}`;
-        return `"${newTable}"."${column}" AS "${newAlias}"`;
-      });
-
-      return sql;
-    };
-
     let sql = query.trim();
-    //sql = replaceHashTableAliases(sql);
-    // sql = normalizeSqlAliases(sql);
-    // sql = replaceHashColumnAliases(sql);
+    const subqueries = extractSubqueries(sql);
+    for (let sub of subqueries) {
+      let newInner = normalizeSqlAliases(sub.inner);
+      sql = sql.replace(sub.full, `(${newInner})`);
+    }
+    sql = normalizeSqlAliases(sql);
 
     // Highlight main SQL keyword
     sql = sql.replace(
@@ -88,21 +24,21 @@ export class TypeOrmWinstonLogger implements TypeOrmLogger {
 
     // Highlight table names (FROM/INTO/UPDATE/JOIN)
     sql = sql.replace(
-      /\b(FROM|INTO|UPDATE|JOIN)\s+("[^"]+"|\S+)/gi,
+      /\b(FROM|INTO|UPDATE|JOIN|LEFT JOIN|DISTINCT)\s+("[^"]+"|\S+)/gi,
       (_, keyword, table) =>
-        `${chalk.blueBright(keyword)} ${chalk.magentaBright(table)}`,
+        `${chalk.white.bgBlue(keyword)} ${chalk.hex('#000000').bgMagentaBright(table)}`,
     );
 
     // Highlight columns (quoted schema/table + column)
     sql = sql.replace(
       /("[^"]+"\.)?"?([a-zA-Z0-9_]+)"?(?=\s*(=|,|\sAS))/g,
-      (_, prefix, col) => chalk.gray(`${prefix || ''}${col}`),
+      (_, prefix, col) => chalk.whiteBright(`${prefix || ''}${col}`),
     );
 
     // Highlight alias (AS "xxx" or AS xxx)
     sql = sql.replace(
       /\bAS\s+("[^"]+"|[a-zA-Z0-9_]+)/gi,
-      (_, alias) => `AS ${chalk.dim(alias)}`,
+      (_, alias) => `AS ${chalk.yellowBright(alias)}`,
     );
 
     // Highlight keywords WHERE, SET, VALUES, AND, OR

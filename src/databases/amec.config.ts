@@ -31,11 +31,10 @@ if (process.env.HOST == 'AMEC') {
         queueMax: 1000,
         enableTCPSKeepAlive: true,
         poolIncrement: 1,
-        poolTimeout: 300, // วินาที
-        poolPingInterval: 60, // วินาที
+        poolTimeout: 300,
+        poolPingInterval: 60,
         stmtCacheSize: 50,
       },
-      //   relationLoadStrategy: 'query',
     }),
   };
 } else {

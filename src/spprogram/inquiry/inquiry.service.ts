@@ -6,6 +6,7 @@ import { Inquiry } from './entities/inquiry.entity';
 import { InquiryGroup } from '../inquiry-group/entities/inquiry-group.entity';
 import { InquiryDetail } from '../inquiry-detail/entities/inquiry-detail.entity';
 import { History } from '../history/entities/history.entity';
+import { Timeline } from '../timeline/entities/timeline.entity';
 
 import { searchDto } from './dto/search.dto';
 import { createInqDto } from './dto/create-inquiry.dto';
@@ -86,6 +87,12 @@ export class InquiryService {
       await runner.manager.save(Inquiry, createInqDto);
       const inquiry = await runner.manager.findOne(Inquiry, {
         where: { INQ_NO: createInqDto.INQ_NO, INQ_LATEST: 1 },
+      });
+
+      await runner.manager.save(Timeline, {
+        INQ_ID: inquiry.INQ_ID,
+        MAR_USER: inquiry.INQ_MAR_PIC,
+        MAR_SEND: new Date(),
       });
 
       const items = details.map((el) => {

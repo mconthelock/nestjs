@@ -17,7 +17,7 @@ const ignoreTypeOrmEntities = winston.format((info) => {
     typeof info.message === 'string' &&
     info.message.includes('All classes found using provided glob pattern')
   ) {
-    return false; // ❌ ตัด log นี้ทิ้ง
+    return false;
   }
   return info;
 });
@@ -52,14 +52,25 @@ export const winstonConfig = {
   transports: [
     new winston.transports.Console({
       format: winston.format.combine(
-        winston.format.colorize(),
         winston.format.timestamp(),
         addRequestId(),
         winston.format.printf(
           ({ level, message, timestamp, requestId, ...meta }) => {
-            return `[${timestamp}] [${level}] [req:${requestId || '-'}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
+            if (level !== 'error')
+              return `[${chalk.gray(timestamp)}] [${level}][req:${chalk.yellow(requestId || '-')}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
+            else {
+              let output = `[${chalk.gray(timestamp)}] [${level}][req:${chalk.yellow(requestId || '-')}]`;
+              const msg = `${message}`.replace('[object Object]', '');
+              output += `\n${chalk.yellow(msg)}`;
+              for (const [key, value] of Object.entries(meta)) {
+                const colorFn = keyColors[key] || ((txt) => txt);
+                output += `\n${chalk.yellow(key + ':')} ${colorFn(value)}`;
+              }
+              return `${output}`;
+            }
           },
         ),
+        winston.format.colorize({ all: true }),
       ),
     }),
     new DailyRotateFile({
@@ -68,7 +79,7 @@ export const winstonConfig = {
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
       maxSize: '20m',
-      maxFiles: '30d', // เก็บย้อนหลัง 30 วัน
+      maxFiles: '30d',
       level: 'info',
     }),
     new DailyRotateFile({
@@ -95,38 +106,24 @@ export const devLoggerConfig = {
     new winston.transports.Console({
       level: 'debug',
       format: winston.format.combine(
-        winston.format.colorize({ all: true }),
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         addRequestId(),
         winston.format.printf(
           ({ level, message, timestamp, requestId, ...meta }) => {
-            return `[${timestamp}] [${level}][req:${chalk.yellow(requestId || '-')}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
-            // let obj = message;
-            // if (typeof message === 'string') {
-            //   try {
-            //     obj = JSON.parse(message);
-            //   } catch {
-            //     output += ` ${message}`;
-            //   }
-            // }
-
-            // if (obj && typeof obj === 'object') {
-            //     const objAny = obj as any;
-            //   for (const [key, value] of Object.entries(objAny)) {
-            //     if (key === 'stack') continue;
-            //     const colorFn = keyColors[key] || ((txt) => txt);
-            //     output += ` ${colorFn(`${key}: ${value}`)}`;
-            //   }
-            //   if (objAny.stack) {
-            //      output += `\n${keyColors.stack(objAny.stack)}`;
-            //   }
-            // } else {
-            //   output += ` ${message}`;
-            // }
-            // return output;
-            //return `[${timestamp}] [${level}] [req:${requestId || '-'}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
+            if (level !== 'error')
+              return `[${chalk.gray(timestamp)}] [${level}][req:${chalk.yellow(requestId || '-')}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
+            else {
+              let output = `[${chalk.gray(timestamp)}] [${level}][req:${chalk.yellow(requestId || '-')}]`;
+              output += `\n${message}`.replace('[object Object]', '');
+              for (const [key, value] of Object.entries(meta)) {
+                const colorFn = keyColors[key] || ((txt) => txt);
+                output += `\n${chalk.yellow(key + ':')} ${colorFn(value)}`;
+              }
+              return `${output}`;
+            }
           },
         ),
+        winston.format.colorize({ all: true }),
       ),
     }),
 

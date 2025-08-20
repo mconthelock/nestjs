@@ -1,4 +1,6 @@
-import { join } from 'path';
+import { BadRequestException } from '@nestjs/common';
+import { join, normalize } from 'path';
+import * as mime from 'mime-types';
 import { promises as fs } from 'fs';
 // import { existsSync, mkdirSync, renameSync } from 'fs';
 // /**
@@ -64,4 +66,48 @@ export async function deleteFile(path: string) {
 
 export async function cleanupTmp(files: Express.Multer.File[]) {
   await Promise.allSettled(files.map((f) => deleteFile(f.path)));
+}
+
+// ฟังก์ชันนี้รับชื่อไฟล์ (name) แล้วคืนค่า MIME type ที่เหมาะสม
+export function getMimeType(name: string) {
+  // ใช้ mime.lookup เพื่อตรวจสอบ MIME type จากชื่อไฟล์
+  // ถ้าไม่พบ จะคืนค่า 'application/octet-stream' (ค่ามาตรฐานสำหรับไฟล์ทั่วไป)
+  return mime.lookup(name) || 'application/octet-stream';
+}
+
+/**
+ * สร้างค่า Content-Disposition header สำหรับการตอบกลับไฟล์
+ *
+ * @param oname - ชื่อไฟล์ต้นฉบับที่ต้องการแนบใน header
+ * @param mode - โหมดการแสดงไฟล์: 'open' สำหรับ inline หรือ 'download' สำหรับ attachment
+ * @returns สตริง Content-Disposition ที่เหมาะสมกับชื่อไฟล์และโหมดที่เลือก
+ */
+export function buildContentDisposition(
+  oname: string,
+  mode: 'open' | 'download',
+) {
+  const encoded = encodeURIComponent(oname).replace(/['()]/g, escape);
+  const type = mode === 'download' ? 'attachment' : 'inline';
+  return `${type}; filename="${oname}"; filename*=UTF-8''${encoded}`;
+}
+
+/**
+ * รวม path อย่างปลอดภัยเพื่อป้องกัน path traversal (เช่น ../)
+ *
+ * @param baseDir โฟลเดอร์หลักที่อนุญาตให้เข้าถึง
+ * @param fileName ชื่อไฟล์หรือ path ย่อยที่ต้องการรวมกับ baseDir
+ * @returns path ที่รวมแล้วและผ่านการตรวจสอบความปลอดภัย
+ * @throws BadRequestException หาก path ที่รวมแล้วไม่ได้อยู่ใน baseDir
+ */
+export function safeJoin(baseDir: string, fileName: string) {
+  // รวม path อย่างปลอดภัย ป้องกัน path traversal (เช่น ../)
+  // baseDir: โฟลเดอร์หลักที่อนุญาต
+  // fileName: ชื่อไฟล์หรือ path ย่อยที่ต้องการรวม
+  const base = normalize(baseDir);
+  const full = normalize(join(baseDir, fileName));
+  if (!full.startsWith(base)) {
+    // ถ้า path ที่รวมแล้วไม่ได้อยู่ใน baseDir ให้ throw error
+    throw new BadRequestException('Invalid path');
+  }
+  return full;
 }

@@ -18,6 +18,7 @@ import { PisModule } from './pis/pis.module';
 import { ESCSModule } from './escs/escs.module';
 import { DetailModule } from './idtag/detail/detail.module';
 import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
+import { FilesModule } from './file/file.module'
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -37,8 +38,10 @@ import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
     AS400Module,
     //JB 🤴
     JobOrderModule,
-    PisModule,
+    FilesModule,
     ESCSModule,
+    ///
+    PisModule,
     DetailModule,
     ItemarrnglstModule,
   ],

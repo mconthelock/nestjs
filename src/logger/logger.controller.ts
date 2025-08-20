@@ -1,17 +1,19 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Inject } from '@nestjs/common';
+import { LoggerService } from './logger.service';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as glob from 'glob';
 
 @Controller('logger')
 export class LoggerController {
-  private logDir = path.join(process.cwd(), 'logs/dev');
+  constructor(private readonly logger: LoggerService) {}
 
+  private logDir = path.join(process.cwd(), 'logs/dev');
   @Get()
   async getLogs(@Query('date') date?: string) {
     // ถ้า user ไม่ใส่ date => ดึงไฟล์ล่าสุด
     const filename = date
-      ? `app-${date}.log`
+      ? `logs-${date}.log`
       : fs.readdirSync(this.logDir).sort().reverse()[0]; // ล่าสุด
 
     const filePath = path.join(this.logDir, filename);
@@ -64,5 +66,10 @@ export class LoggerController {
     }
 
     return logs;
+  }
+
+  @Get('health')
+  async healthCheck() {
+    return this.logger.check();
   }
 }

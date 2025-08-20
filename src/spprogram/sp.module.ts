@@ -18,6 +18,7 @@ import { StatusModule } from './status/status.module';
 import { SpUser } from './spusers/spusers.entity';
 import { CustomerModule } from './customer/customer.module';
 import { InquiryLogModule } from './inquiry-log/inquiry-log.module';
+import { TimelineModule } from './timeline/timeline.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { InquiryLogModule } from './inquiry-log/inquiry-log.module';
     StatusModule,
     CustomerModule,
     InquiryLogModule,
+    TimelineModule,
   ],
 })
 export class SpModule {}

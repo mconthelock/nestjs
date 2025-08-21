@@ -24,6 +24,8 @@ if (process.env.HOST == 'AMEC') {
       synchronize: false,
       logging: ['error'],
       logger: new TypeOrmWinstonLogger(winstonLogger),
+      retryAttempts: 5,
+      retryDelay: 2000,
       extra: {
         poolMax: 100,
         poolMin: 5,

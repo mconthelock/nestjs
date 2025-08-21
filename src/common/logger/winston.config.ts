@@ -1,4 +1,5 @@
 import * as winston from 'winston';
+import stripAnsi from 'strip-ansi'; // npm i strip-ansi
 import chalk from 'chalk';
 // import DailyRotateFile from 'winston-daily-rotate-file';
 import { requestNamespace } from '../../middleware/request-id.middleware';
@@ -29,6 +30,28 @@ const colors = {
   http: 'magenta',
   debug: 'cyan',
 };
+
+const stripColors = winston.format((info) => {
+  if (typeof info.message === 'string') {
+    info.message = stripAnsi(info.message);
+  }
+  if (typeof info.level === 'string') {
+    info.level = stripAnsi(info.level);
+  }
+  return info;
+});
+
+// format filter skip query SELECT
+const skipSelectQuery = winston.format((info) => {
+  // ตรวจสอบว่า message มีคำว่า SELECT (กรณี TypeORM log query)
+  if (
+    typeof info.message === 'string' &&
+    /^SELECT/i.test(info.message.trim())
+  ) {
+    return false; // return false = skip log
+  }
+  return info;
+});
 
 const keyColors = {
   context: chalk.cyan,
@@ -153,7 +176,10 @@ export const devLoggerConfig = {
       maxFiles: '30d',
       level: 'debug',
       format: winston.format.combine(
+        stripColors(),
+        skipSelectQuery(),
         winston.format.timestamp(),
+        winston.format.uncolorize(),
         addRequestId(),
         winston.format.json(),
       ),

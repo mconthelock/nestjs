@@ -53,7 +53,7 @@ export class TypeOrmWinstonLogger implements TypeOrmLogger {
         ? chalk.hex('#FFA500')(` -- Parameters: ${JSON.stringify(parameters)}`) // สีส้ม
         : '';
 
-    this.logger.debug(`${sql}${paramText}`);
+    this.logger.debug(`[QUERY] ${sql}${paramText}`);
   }
 
   logQueryError(

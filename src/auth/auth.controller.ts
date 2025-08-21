@@ -70,7 +70,7 @@ export class AuthController {
       response.cookie(process.env.JWT_COOKIE_NAME, loginResult.access_token, {
         //httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        // sameSite: 'strict',
       });
 
       //Create Cookie for Signin Page
@@ -82,7 +82,7 @@ export class AuthController {
       response.cookie(payload.location, encrypt, {
         //httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        // sameSite: 'none',
         expires: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes from now
       });
 

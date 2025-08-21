@@ -38,7 +38,6 @@ interface FormContext {
   query?: any;
 }
 
-
 interface form {
   NFRMNO: number;
   VORGNO: string;
@@ -133,7 +132,7 @@ export class FormService {
         cyear: dto.CYEAR,
         cyear2: new Date().getFullYear().toString(),
         CSTEPSTDX: 4,
-      }
+      };
 
       this.setQuery(context);
       await this.setFormNo(context);
@@ -163,7 +162,8 @@ export class FormService {
               break;
             case '3':
               context.VAPVNO = row.VAPVNO;
-              context.CSTEPST = context.CSTEPSTDX <= 1 ? 1 : context.CSTEPSTDX - 1;
+              context.CSTEPST =
+                context.CSTEPSTDX <= 1 ? 1 : context.CSTEPSTDX - 1;
               context.CSTEPSTDX--;
               await this.getRepresent(row.VAPVNO, context, runner);
               const flow = this.setFlow(row, context);
@@ -372,14 +372,21 @@ export class FormService {
     }
   }
 
-  async getRepresent(empno: string, context: FormContext, queryRunner?: QueryRunner) {
+  async getRepresent(
+    empno: string,
+    context: FormContext,
+    queryRunner?: QueryRunner,
+  ) {
     const condition = {
       NFRMNO: context.nfrmno,
       VORGNO: context.vorgno,
       CYEAR: context.cyear,
       VEMPNO: empno,
     };
-    context.represent = await this.repService.getRepresent(condition, queryRunner);
+    context.represent = await this.repService.getRepresent(
+      condition,
+      queryRunner,
+    );
     // const data = await this.repService.getRep(condition);
     // context.represent = empno;
     // if (Array.isArray(data) && data.length > 0 && data[0]?.VREPNO !== '') {
@@ -525,7 +532,11 @@ export class FormService {
     }
   }
 
-  async deleteFlowStep(data: any, context: FormContext, queryRunner: QueryRunner) {
+  async deleteFlowStep(
+    data: any,
+    context: FormContext,
+    queryRunner: QueryRunner,
+  ) {
     await this.flowService.deleteFlow(context.query, queryRunner);
     if (context.query && 'CSTEPST' in context.query) {
       delete context.query['CSTEPST'];
@@ -548,7 +559,11 @@ export class FormService {
     }
   }
 
-  async saveDraft(draft: string, context: FormContext, queryRunner: QueryRunner) {
+  async saveDraft(
+    draft: string,
+    context: FormContext,
+    queryRunner: QueryRunner,
+  ) {
     const formDraft: any = {
       NFRMNO: context.nfrmno,
       VORGNO: context.vorgno,
@@ -556,10 +571,7 @@ export class FormService {
       CYEAR2: context.cyear2,
       NRUNNO: context.nrunno,
     };
-    await this.updateForm(
-      { condition: formDraft, CST: draft },
-      queryRunner,
-    );
+    await this.updateForm({ condition: formDraft, CST: draft }, queryRunner);
     for (let i = 2; i <= 5; i++) {
       formDraft.CSTEPST = i.toString();
       const data: any = {
@@ -656,19 +668,67 @@ export class FormService {
   }
 
   async getCst(form: form, queryRunner?: QueryRunner) {
-    const repo = queryRunner ? queryRunner.manager.getRepository(Form) : this.form;
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(Form)
+      : this.form;
     const cst = await repo.findOne({
-        where: {
-            NFRMNO: form.NFRMNO,
-            VORGNO: form.VORGNO,
-            CYEAR: form.CYEAR,
-            CYEAR2: form.CYEAR2,
-            NRUNNO: form.NRUNNO
-        },
-        select: {
-            CST: true
-        }
-    })
+      where: {
+        NFRMNO: form.NFRMNO,
+        VORGNO: form.VORGNO,
+        CYEAR: form.CYEAR,
+        CYEAR2: form.CYEAR2,
+        NRUNNO: form.NRUNNO,
+      },
+      select: {
+        CST: true,
+      },
+    });
     return cst;
+  }
+
+  async getFormDetail(form: form) {
+    // const formDetail = await this.form.findOne({
+    //   where: {
+    //     NFRMNO: form.NFRMNO,
+    //     VORGNO: form.VORGNO,
+    //     CYEAR: form.CYEAR,
+    //     CYEAR2: form.CYEAR2,
+    //     NRUNNO: form.NRUNNO,
+    //   },
+    // });
+    const formDetail = await this.dataSource
+      .createQueryBuilder()
+      .select('F.*, A.SNAME AS VINPUTNAME, B.SNAME AS VREQNAME')
+      .from('FORM', 'F')
+      .innerJoin('AMECUSERALL', 'A', 'A.SEMPNO = F.VINPUTER')
+      .innerJoin('AMECUSERALL', 'B', 'B.SEMPNO = F.VREQNO')
+      .where('F.NFRMNO = :NFRMNO', { NFRMNO: form.NFRMNO })
+      .andWhere('F.VORGNO = :VORGNO', { VORGNO: form.VORGNO })
+      .andWhere('F.CYEAR = :CYEAR', { CYEAR: form.CYEAR })
+      .andWhere('F.CYEAR2 = :CYEAR2', { CYEAR2: form.CYEAR2 })
+      .andWhere('F.NRUNNO = :NRUNNO', { NRUNNO: form.NRUNNO })
+      .getRawOne();
+    return {
+      ...formDetail,
+      link: await this.createLink(form),
+      FORMNO: await this.getFormno(form),
+    };
+  }
+
+  async createLink(form: form) {
+    let link = '';
+    const frmmst = await this.formmstService.getFormmst({
+      NNO: form.NFRMNO,
+      VORGNO: form.VORGNO,
+      CYEAR: form.CYEAR,
+    });
+    if (frmmst.length > 0) {
+      const frmmstDetail = frmmst[0];
+      link = frmmstDetail.VFORMPAGE.includes('amecweb')
+        ? frmmstDetail.VFORMPAGE
+        : `${process.env.APP_WEBFLOW}/${frmmstDetail.VFORMPAGE}`;
+      link += `?no=${form.NFRMNO}&orgNo=${form.VORGNO}&y=${form.CYEAR}&y2=${form.CYEAR2}&runNo=${form.NRUNNO}&empno=`;
+    }
+    return link;
   }
 }

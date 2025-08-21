@@ -16,6 +16,14 @@ import { CreateFormDto } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
 import { getClientIP } from 'src/common/utils/ip.utils';
 
+interface form {
+  NFRMNO: number;
+  VORGNO: string;
+  CYEAR: string;
+  CYEAR2: string;
+  NRUNNO: number;
+}
+
 @ApiTags('Form')
 @Controller('form')
 export class FormController {
@@ -116,5 +124,10 @@ export class FormController {
     } catch (error) {
       throw error; // โยนข้อผิดพลาดกลับไปให้ NestJS จัดการ
     }
+  }
+
+  @Post('getFormDetail')
+  async getFormDetail(@Body() form: form){
+    return this.formService.getFormDetail(form);
   }
 }

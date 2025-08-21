@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef  } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FormService } from './form.service';
 import { FormController } from './form.controller';
@@ -21,7 +21,7 @@ import { SequenceOrgModule } from '../sequence-org/sequence-org.module';
     FlowmstModule,
     OrgTreeModule,
     RepModule,
-    FlowModule,
+    forwardRef(() => FlowModule),
     OrgposModule,
     SequenceOrgModule,
   ],

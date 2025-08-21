@@ -17,6 +17,14 @@ import { getExtDataDto } from './dto/get-Extdata.dto';
 import { SearchFlowDto } from './dto/search-flow.dto';
 import { UpdateFlowDto } from './dto/update-flow.dto';
 
+interface form{
+    NFRMNO: number;
+    VORGNO: string;
+    CYEAR: string;
+    CYEAR2: string;
+    NRUNNO: number;
+}
+
 @ApiTags('Flow')
 @Controller('flow')
 export class FlowController {
@@ -79,5 +87,15 @@ export class FlowController {
     } catch (error) {
       throw error; // โยนข้อผิดพลาดกลับไปให้ NestJS จัดการ
     }
+  }
+
+  @Post('showflow')
+  async showFlow(@Body() form: form, @Req() req: Request) {
+      return await this.flowService.showFlow(form, req.headers.host);
+  }
+
+  @Post('getFlowTree')
+  async getFlowTree(@Body() form: form) {
+      return await this.flowService.getFlowTree(form);
   }
 }

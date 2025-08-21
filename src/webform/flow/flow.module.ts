@@ -1,12 +1,17 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FlowService } from './flow.service';
 import { FlowController } from './flow.controller';
 import { Flow } from './entities/flow.entity';
 import { RepModule } from '../rep/rep.module';
+import { FormModule } from '../form/form.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Flow], 'amecConnection'), RepModule],
+  imports: [
+    TypeOrmModule.forFeature([Flow], 'amecConnection'),
+    RepModule,
+    forwardRef(() => FormModule),
+  ],
   controllers: [FlowController],
   providers: [FlowService],
   exports: [FlowService],

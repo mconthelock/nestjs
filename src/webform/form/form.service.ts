@@ -38,6 +38,15 @@ interface FormContext {
   query?: any;
 }
 
+
+interface form {
+  NFRMNO: number;
+  VORGNO: string;
+  CYEAR: string;
+  CYEAR2: string;
+  NRUNNO: number;
+}
+
 @Injectable()
 export class FormService {
   constructor(
@@ -644,5 +653,22 @@ export class FormService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async getCst(form: form, queryRunner?: QueryRunner) {
+    const repo = queryRunner ? queryRunner.manager.getRepository(Form) : this.form;
+    const cst = await repo.findOne({
+        where: {
+            NFRMNO: form.NFRMNO,
+            VORGNO: form.VORGNO,
+            CYEAR: form.CYEAR,
+            CYEAR2: form.CYEAR2,
+            NRUNNO: form.NRUNNO
+        },
+        select: {
+            CST: true
+        }
+    })
+    return cst;
   }
 }

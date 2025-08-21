@@ -111,3 +111,32 @@ export function safeJoin(baseDir: string, fileName: string) {
   }
   return full;
 }
+
+export async function joinPaths(path1: string, path2: string): Promise<string> {
+  return join(path1, path2);
+}
+
+export async function getBase64Image(filePath: string): Promise<string> {
+  try {
+    const data = await fs.readFile(filePath);
+    const mimetype = getMimeType(filePath);
+    return `data:${mimetype};base64,${data.toString('base64')}`;
+  } catch (err) {
+    console.error(`File not found: ${filePath}`);
+    return '';
+  }
+}
+
+export async function getBase64ImageFromUrl(url: string): Promise<string> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+
+    const contentType = res.headers.get('content-type') || 'application/octet-stream';
+    const buffer = Buffer.from(await res.arrayBuffer());
+    return `data:${contentType};base64,${buffer.toString('base64')}`;
+  } catch (err) {
+    console.error(`Failed to fetch image: ${url}`, err);
+    return '';
+  }
+}

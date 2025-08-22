@@ -4,7 +4,6 @@ import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { Form } from './entities/form.entity';
 import { Flow } from './../flow/entities/flow.entity';
 
-import { getFormnoDto } from 'src/webform/form/dto/get-formno.dto';
 import { FormmstService } from '../formmst/formmst.service';
 
 import { CreateFormDto } from './dto/create-form.dto';
@@ -17,6 +16,8 @@ import { RepService } from 'src/webform/rep/rep.service';
 import { FlowService } from 'src/webform/flow/flow.service';
 import { OrgposService } from 'src/webform/orgpos/orgpos.service';
 import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
+import { FormDto } from './dto/form.dto';
+import { getModeDto } from './dto/get-mode.dto';
 
 interface FormContext {
   ip: string;
@@ -36,14 +37,6 @@ interface FormContext {
   VAPVNO?: string;
   CSTEPST?: number;
   query?: any;
-}
-
-interface form {
-  NFRMNO: number;
-  VORGNO: string;
-  CYEAR: string;
-  CYEAR2: string;
-  NRUNNO: number;
 }
 
 @Injectable()
@@ -66,6 +59,10 @@ export class FormService {
     private readonly orgPosService: OrgposService,
     private readonly sequenceOrgService: SequenceOrgService,
   ) {}
+
+  private readonly mode_add = "1";
+  private readonly mode_edit = "2";
+  private readonly mode_view = "3";
 
   findOne(fno, orgno, cyear, cyear2, nrunno) {
     return this.form.find({
@@ -101,8 +98,12 @@ export class FormService {
     return true;
   }
 
-  async getFormno(dto: getFormnoDto): Promise<string> {
-    const form = await this.formmstService.getFormmst(dto);
+  async getFormno(dto: FormDto): Promise<string> {
+    const form = await this.formmstService.getFormmst({
+        NNO: dto.NFRMNO,
+        VORGNO: dto.VORGNO,
+        CYEAR: dto.CYEAR
+    });
     console.log(form);
     // เอาเลขปี 2 หลักสุดท้าย
     const year2 = dto.CYEAR2.substring(2, 4); // ถ้า "2024" ได้ "24"
@@ -667,7 +668,7 @@ export class FormService {
     }
   }
 
-  async getCst(form: form, queryRunner?: QueryRunner) {
+  async getCst(form: FormDto, queryRunner?: QueryRunner) {
     const repo = queryRunner
       ? queryRunner.manager.getRepository(Form)
       : this.form;
@@ -686,7 +687,7 @@ export class FormService {
     return cst;
   }
 
-  async getFormDetail(form: form) {
+  async getFormDetail(form: FormDto) {
     // const formDetail = await this.form.findOne({
     //   where: {
     //     NFRMNO: form.NFRMNO,
@@ -715,7 +716,7 @@ export class FormService {
     };
   }
 
-  async createLink(form: form) {
+  async createLink(form: FormDto) {
     let link = '';
     const frmmst = await this.formmstService.getFormmst({
       NNO: form.NFRMNO,
@@ -730,5 +731,14 @@ export class FormService {
       link += `?no=${form.NFRMNO}&orgNo=${form.VORGNO}&y=${form.CYEAR}&y2=${form.CYEAR2}&runNo=${form.NRUNNO}&empno=`;
     }
     return link;
+  }
+
+  async getMode(form: getModeDto){
+    const frm = await this.findOne(form.NFRMNO, form.VORGNO, form.CYEAR, form.CYEAR2, form.NRUNNO);
+    if (frm.length == 0) {
+      return this.mode_add;
+    }
+    const flow = await this.flowService.getEmpFlowStepReady(form);
+    return flow.length > 0 ? this.mode_edit : this.mode_view;
   }
 }

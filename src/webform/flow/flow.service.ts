@@ -4,7 +4,6 @@ import { Repository, DataSource, QueryRunner } from 'typeorm';
 
 import { Flow } from './entities/flow.entity';
 
-import { getExtDataDto } from './dto/get-Extdata.dto';
 import { SearchFlowDto } from './dto/search-flow.dto';
 import { CreateFlowDto } from './dto/create-flow.dto';
 import { UpdateFlowDto } from './dto/update-flow.dto';
@@ -18,14 +17,8 @@ import {
   joinPaths,
 } from 'src/common/utils/files.utils';
 import { formatDate } from 'src/common/utils/dayjs.utils';
-
-interface form {
-  NFRMNO: number;
-  VORGNO: string;
-  CYEAR: string;
-  CYEAR2: string;
-  NRUNNO: number;
-}
+import { getModeDto } from '../form/dto/get-mode.dto';
+import { FormDto } from '../form/dto/form.dto';
 
 @Injectable()
 export class FlowService {
@@ -39,29 +32,36 @@ export class FlowService {
     @Inject(forwardRef(() => FormService))
     private readonly formService: FormService,
   ) {}
+
+  private readonly APV_TYPE_SINGLE = '1';
+  private readonly APV_TYPE_MULTIPLE_CAN = '2';
+  private readonly APV_TYPE_MULTIPLE_CO = '3';
+  private readonly APV_TYPE_MULTIPLE = '3';
+  private readonly APPLY_ALL_NONE = '0';
+  private readonly APPLY_ALL_APV = '1';
+  private readonly APPLY_ALL_REJ = '2';
+  private readonly APPLY_ALL_BOTH = '3';
+  private readonly APV_NONE = '0';
+  private readonly APV_APPROVE = '1';
+  private readonly APV_REJECT = '2';
+  private readonly APV_UNKNOWN = '3';
+  private readonly APV_RETURN = '4';
+  private readonly STEP_NOT_USE = '0';
+  private readonly STEP_USE = '1';
+  private readonly STEP_NORMAL = '1';
+  private readonly STEP_WAIT = '2';
   private readonly STEP_READY = '3';
-
-  private readonly prepare = '0';
-  private readonly onGoing = '1';
-  private readonly running = '1';
-  private readonly approve = '2';
-  private readonly reject = '3';
-
-  getExtData(dto: getExtDataDto) {
-    const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, APV } = dto;
-
-    return this.flowRepo
-      .createQueryBuilder('f')
-      .select('CEXTDATA')
-      .where('f.NFRMNO = :NFRMNO', { NFRMNO })
-      .andWhere('f.VORGNO = :VORGNO', { VORGNO })
-      .andWhere('f.CYEAR = :CYEAR', { CYEAR })
-      .andWhere('f.CYEAR2 = :CYEAR2', { CYEAR2 })
-      .andWhere('f.NRUNNO = :NRUNNO', { NRUNNO })
-      .andWhere('(f.VAPVNO = :APV OR f.VREPNO = :REP)', { APV, REP: APV })
-      .andWhere('f.CSTEPST = :STEP_READY', { STEP_READY: '3' })
-      .getRawMany();
-  }
+  private readonly STEP_PASS = '4';
+  private readonly STEP_APPROVE = '5';
+  private readonly STEP_REJECT = '6';
+  private readonly STEP_SKIP = '7';
+  private readonly STEP_DIE = '8';
+  private readonly STEP_RETURN = '9';
+  private readonly FLOW_PREPARE = '0';
+  private readonly FLOW_ON_GOING = '1';
+  private readonly FLOW_RUNNING = '1';
+  private readonly FLOW_APPROVE = '2';
+  private readonly FLOW_REJECT = '3';
 
   async insertFlow(
     dto: CreateFlowDto,
@@ -206,7 +206,7 @@ export class FlowService {
     }
   }
 
-  async showFlow(form: form, host: string, queryRunner?: QueryRunner) {
+  async showFlow(form: FormDto, host: string, queryRunner?: QueryRunner) {
     const flowData = await this.getFlowTree(form, queryRunner);
     const html = await this.generateHtml(flowData, form, host);
     return {
@@ -216,7 +216,7 @@ export class FlowService {
     };
   }
 
-  async getFlowTree(form: form, queryRunner?: QueryRunner) {
+  async getFlowTree(form: FormDto, queryRunner?: QueryRunner) {
     const dataSource = queryRunner ? queryRunner : this.dataSource;
     const sql = `
     SELECT DISTINCT LEVEL, CSTEPNO, CSTEPST, VAPVNO, NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, SNAME, VNAME, DAPVDATE, CAPVTIME, VREMARK,  VREPNO, VREALAPV 
@@ -239,7 +239,7 @@ export class FlowService {
     ]);
   }
 
-  async generateHtml(flowData: any, form: form, host: string) {
+  async generateHtml(flowData: any, form: FormDto, host: string) {
     const webflow = checkHostTest(host)
       ? 'http://webflow.mitsubishielevatorasia.co.th/formtest/'
       : 'http://webflow.mitsubishielevatorasia.co.th/form/';
@@ -332,7 +332,7 @@ export class FlowService {
     return html;
   }
 
-  async getFlowStatusName(form: form) {
+  async getFlowStatusName(form: FormDto) {
     const formcst = await this.formService.getCst(form);
     const status = formcst.CST;
     console.log('status : ', status);
@@ -340,21 +340,21 @@ export class FlowService {
     let html = '';
     const msg = '<font color="#000000">Status: </font>';
     switch (status) {
-      case this.running:
+      case this.FLOW_RUNNING:
         html =
           msg +
           '&nbsp;<font color="#' +
           this.flowStatusColor(status) +
           '">Running</font>';
         break;
-      case this.approve:
+      case this.FLOW_APPROVE:
         html =
           msg +
           '&nbsp;<font color="#' +
           this.flowStatusColor(status) +
           '">Approve</font>';
         break;
-      case this.reject:
+      case this.FLOW_REJECT:
         html =
           msg +
           '&nbsp;<font color="#' +
@@ -375,16 +375,88 @@ export class FlowService {
   flowStatusColor(status: string) {
     let color = '';
     switch (status) {
-      case this.running:
+      case this.FLOW_RUNNING:
         color = '0000FF';
         break;
-      case this.reject:
+      case this.FLOW_REJECT:
         color = 'FF0000';
         break;
-      case this.approve:
+      case this.FLOW_APPROVE:
         color = '009900';
         break;
     }
     return color;
+  }
+
+  async getEmpFlowStepReady(form: getModeDto, queryRunner?: QueryRunner) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(Flow)
+      : this.flowRepo;
+    return await repo
+      .createQueryBuilder('f')
+      .where('f.NFRMNO = :nfrmno', { nfrmno: form.NFRMNO })
+      .andWhere('f.VORGNO = :vorgno', { vorgno: form.VORGNO })
+      .andWhere('f.CYEAR = :cyear', { cyear: form.CYEAR })
+      .andWhere('f.CYEAR2 = :cyear2', { cyear2: form.CYEAR2 })
+      .andWhere('f.NRUNNO = :nrunno', { nrunno: form.NRUNNO })
+      .andWhere('(f.VAPVNO = :vapvno OR f.VREPNO = :vap)', {
+        vap: form.EMPNO,
+        vapvno: form.EMPNO,
+      })
+      .andWhere('f.CSTEPST = :step', { step: this.STEP_READY })
+      .getMany();
+  }
+
+  async checkReturnb(dto: getModeDto, queryRunner?: QueryRunner) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(Flow)
+      : this.flowRepo;
+    const flow = await this.getEmpFlowStepReady(dto);
+    if (flow.length === 0) {
+      return false;
+    }
+    const cstep = flow[0].CSTEPNEXTNO;
+    const res = await repo
+      .createQueryBuilder('f')
+      .where('f.NFRMNO = :nfrmno', { nfrmno: dto.NFRMNO })
+      .andWhere('f.VORGNO = :vorgno', { vorgno: dto.VORGNO })
+      .andWhere('f.CYEAR = :cyear', { cyear: dto.CYEAR })
+      .andWhere('f.CYEAR2 = :cyear2', { cyear2: dto.CYEAR2 })
+      .andWhere('f.NRUNNO = :nrunno', { nrunno: dto.NRUNNO })
+      .andWhere('f.CSTEPNO = :step', { step: cstep })
+      .andWhere('VREMOTE IS NOT NULL')
+      .getMany();
+    return res.length > 0;
+  }
+
+  async checkReturn(form: getModeDto, queryRunner?: QueryRunner) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(Flow)
+      : this.flowRepo;
+    const res = await repo
+      .createQueryBuilder('f')
+      .where('f.NFRMNO = :nfrmno', { nfrmno: form.NFRMNO })
+      .andWhere('f.VORGNO = :vorgno', { vorgno: form.VORGNO })
+      .andWhere('f.CYEAR = :cyear', { cyear: form.CYEAR })
+      .andWhere('f.CYEAR2 = :cyear2', { cyear2: form.CYEAR2 })
+      .andWhere('f.NRUNNO = :nrunno', { nrunno: form.NRUNNO })
+      .andWhere('(f.VAPVNO = :vapvno OR f.VREPNO = :vap)', {
+        vap: form.EMPNO,
+        vapvno: form.EMPNO,
+      })
+      .andWhere("f.CSTEPNO = '--'")
+      .andWhere('f.CSTEPST = :step', { step: this.STEP_READY })
+      .getMany();
+    return res.length > 0;
+  }
+
+  async getExtData(dto: getModeDto) {
+    console.log(dto);
+    
+    const flow = await this.getEmpFlowStepReady(dto);
+    if (flow.length === 0) {
+      return '';
+    }
+    return flow[0].CEXTDATA;
   }
 }

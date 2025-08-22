@@ -8,14 +8,8 @@ import { FormService } from 'src/webform/form/form.service';
 import { QainsOAService } from '../qains_operator_auditor/qains_operator_auditor.service';
 import { QaFileService } from '../../qa_file/qa_file.service';
 import { FlowService } from 'src/webform/flow/flow.service';
-
-interface form {
-  NFRMNO: number;
-  VORGNO: string;
-  CYEAR: string;
-  CYEAR2: string;
-  NRUNNO: number;
-}
+import { SearchQainsFormDto } from './dto/search-qains_form.dto';
+import { QainsFormDto } from './dto/qains_form.dto';
 
 @Injectable()
 export class QainsFormService {
@@ -157,18 +151,42 @@ export class QainsFormService {
     }
   }
 
-  async getFormData(form: form, queryRunner?: QueryRunner) {
+  async getFormData(dto: QainsFormDto, queryRunner?: QueryRunner) {
     const repo = queryRunner
       ? queryRunner.manager.getRepository(QainsForm)
       : this.qaformRepo;
 
     return repo.findOne({
       where: {
-        NFRMNO: form.NFRMNO,
-        VORGNO: form.VORGNO,
-        CYEAR: form.CYEAR,
-        CYEAR2: form.CYEAR2,
-        NRUNNO: form.NRUNNO,
+        NFRMNO: dto.NFRMNO,
+        VORGNO: dto.VORGNO,
+        CYEAR: dto.CYEAR,
+        CYEAR2: dto.CYEAR2,
+        NRUNNO: dto.NRUNNO,
+      },
+      relations: ['QA_AUD_OPT', 'QA_AUD_OPT.TYPE', 'QA_AUD_OPT.QOA_EMPNO_INFO', 'QA_FILES', 'QA_FILES.TYPE', 'QA_INCHARGE_INFO', 'QA_INCHARGE_SECTION_INFO'],
+      order: {
+        QA_AUD_OPT: { QOA_SEQ: 'ASC' }, // แทน ORDER BY ใน subquery เดิม
+        QA_FILES: { FILE_ID: 'ASC' },
+      },
+    });
+  }
+
+   async search(dto: SearchQainsFormDto, queryRunner?: QueryRunner) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(QainsForm)
+      : this.qaformRepo;
+
+    return repo.find({
+      where: {
+        NFRMNO: dto.NFRMNO,
+        VORGNO: dto.VORGNO,
+        CYEAR: dto.CYEAR,
+        CYEAR2: dto.CYEAR2,
+        NRUNNO: dto.NRUNNO,
+        QA_ITEM: dto.QA_ITEM,
+        QA_INCHARGE_SECTION: dto.QA_INCHARGE_SECTION,
+        QA_INCHARGE_EMPNO: dto.QA_INCHARGE_EMPNO,
       },
       relations: ['QA_AUD_OPT', 'QA_AUD_OPT.TYPE', 'QA_AUD_OPT.QOA_EMPNO_INFO', 'QA_FILES', 'QA_FILES.TYPE', 'QA_INCHARGE_INFO', 'QA_INCHARGE_SECTION_INFO'],
       order: {

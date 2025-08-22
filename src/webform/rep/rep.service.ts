@@ -6,12 +6,6 @@ import { Rep } from './entities/rep.entity';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
 
-interface represent {
-  NFRMNO: number;
-  VORGNO: string;
-  CYEAR: string;
-  VEMPNO: string;
-}
 
 @Injectable()
 export class RepService {
@@ -49,7 +43,7 @@ export class RepService {
     return repo.find({ where: dto });
   }
 
-  async getRepresent(dto: represent, queryRunner?: QueryRunner) {
+  async getRepresent(dto: SearchRepDto, queryRunner?: QueryRunner) {
     const data = queryRunner
       ? await this.getRep(dto, queryRunner)
       : await this.getRep(dto);

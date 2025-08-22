@@ -43,8 +43,9 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true,
-      whitelist: true,
+      transform: true, // ใช้ class-transformer (@Type)
+      whitelist: true, // ตัดฟิลด์ที่ไม่ได้ประกาศใน DTO ทิ้ง
+    //   forbidNonWhitelisted: true,   // ถ้ามีฟิลด์แปลก → โยน 400 แทนการตัดทิ้ง
       exceptionFactory: (errors) =>
         new BadRequestException(errors.map((e) => e.constraints)),
     }),

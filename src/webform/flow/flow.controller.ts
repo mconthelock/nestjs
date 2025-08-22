@@ -13,17 +13,10 @@ import { Request } from 'express';
 
 import { FlowService } from './flow.service';
 
-import { getExtDataDto } from './dto/get-Extdata.dto';
 import { SearchFlowDto } from './dto/search-flow.dto';
 import { UpdateFlowDto } from './dto/update-flow.dto';
-
-interface form{
-    NFRMNO: number;
-    VORGNO: string;
-    CYEAR: string;
-    CYEAR2: string;
-    NRUNNO: number;
-}
+import { FormDto } from '../form/dto/form.dto';
+import { getModeDto } from '../form/dto/get-mode.dto';
 
 @ApiTags('Flow')
 @Controller('flow')
@@ -32,7 +25,7 @@ export class FlowController {
 
   @Post('getExtData')
   @ApiOperation({ summary: 'Get ext data' })
-  getFormno(@Body() dto: getExtDataDto) {
+  async getExtData(@Body() dto: getModeDto) {
     return this.flowService.getExtData(dto);
   }
 
@@ -90,12 +83,27 @@ export class FlowController {
   }
 
   @Post('showflow')
-  async showFlow(@Body() form: form, @Req() req: Request) {
-      return await this.flowService.showFlow(form, req.headers.host);
+  async showFlow(@Body() form: FormDto, @Req() req: Request) {
+    return await this.flowService.showFlow(form, req.headers.host);
   }
 
   @Post('getFlowTree')
-  async getFlowTree(@Body() form: form) {
-      return await this.flowService.getFlowTree(form);
+  async getFlowTree(@Body() form: FormDto) {
+    return await this.flowService.getFlowTree(form);
+  }
+
+  @Post('getEmpFlowStepReady')
+  async getEmpFlowStepReady(@Body() form: getModeDto) {
+    return await this.flowService.getEmpFlowStepReady(form);
+  }
+
+  @Post('checkReturn')
+  async checkReturn(@Body() dto: getModeDto) {
+    return await this.flowService.checkReturn(dto);
+  }
+
+  @Post('checkReturnb')
+  async checkReturnb(@Body() dto: getModeDto) {
+    return await this.flowService.checkReturnb(dto);
   }
 }

@@ -16,7 +16,7 @@ import { FlowService } from './flow.service';
 import { SearchFlowDto } from './dto/search-flow.dto';
 import { UpdateFlowDto } from './dto/update-flow.dto';
 import { FormDto } from '../form/dto/form.dto';
-import { getModeDto } from '../form/dto/get-mode.dto';
+import { empnoFormDto } from '../form/dto/empno-form.dto';
 
 @ApiTags('Flow')
 @Controller('flow')
@@ -25,7 +25,7 @@ export class FlowController {
 
   @Post('getExtData')
   @ApiOperation({ summary: 'Get ext data' })
-  async getExtData(@Body() dto: getModeDto) {
+  async getExtData(@Body() dto: empnoFormDto) {
     return this.flowService.getExtData(dto);
   }
 
@@ -93,17 +93,17 @@ export class FlowController {
   }
 
   @Post('getEmpFlowStepReady')
-  async getEmpFlowStepReady(@Body() form: getModeDto) {
+  async getEmpFlowStepReady(@Body() form: empnoFormDto) {
     return await this.flowService.getEmpFlowStepReady(form);
   }
 
   @Post('checkReturn')
-  async checkReturn(@Body() dto: getModeDto) {
+  async checkReturn(@Body() dto: empnoFormDto) {
     return await this.flowService.checkReturn(dto);
   }
 
   @Post('checkReturnb')
-  async checkReturnb(@Body() dto: getModeDto) {
+  async checkReturnb(@Body() dto: empnoFormDto) {
     return await this.flowService.checkReturnb(dto);
   }
 }

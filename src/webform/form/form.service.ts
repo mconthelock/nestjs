@@ -17,7 +17,7 @@ import { FlowService } from 'src/webform/flow/flow.service';
 import { OrgposService } from 'src/webform/orgpos/orgpos.service';
 import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
 import { FormDto } from './dto/form.dto';
-import { getModeDto } from './dto/get-mode.dto';
+import { empnoFormDto } from './dto/empno-form.dto';
 
 interface FormContext {
   ip: string;
@@ -733,7 +733,7 @@ export class FormService {
     return link;
   }
 
-  async getMode(form: getModeDto){
+  async getMode(form: empnoFormDto){
     const frm = await this.findOne(form.NFRMNO, form.VORGNO, form.CYEAR, form.CYEAR2, form.NRUNNO);
     if (frm.length == 0) {
       return this.mode_add;

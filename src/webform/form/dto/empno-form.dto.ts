@@ -3,7 +3,7 @@ import { Type } from 'class-transformer';
 import { ApiProperty, PickType, PartialType } from '@nestjs/swagger';
 import { FormDto } from './form.dto';
 
-export class getModeDto extends PickType(FormDto, [
+export class empnoFormDto extends PickType(FormDto, [
   'NFRMNO', 'VORGNO', 'CYEAR', 'CYEAR2', 'NRUNNO',
 ] as const) {
   @IsNotEmpty()

@@ -15,7 +15,7 @@ import { CreateFormDto } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { FormDto } from './dto/form.dto';
-import { getModeDto } from './dto/get-mode.dto';
+import { empnoFormDto } from './dto/empno-form.dto';
 
 
 @ApiTags('Form')
@@ -126,7 +126,7 @@ export class FormController {
   }
 
   @Post('getMode')
-  async getMode(@Body() form: getModeDto){
+  async getMode(@Body() form: empnoFormDto){
     return this.formService.getMode(form);
   }
 }

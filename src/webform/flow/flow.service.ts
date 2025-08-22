@@ -17,7 +17,7 @@ import {
   joinPaths,
 } from 'src/common/utils/files.utils';
 import { formatDate } from 'src/common/utils/dayjs.utils';
-import { getModeDto } from '../form/dto/get-mode.dto';
+import { empnoFormDto } from '../form/dto/empno-form.dto';
 import { FormDto } from '../form/dto/form.dto';
 
 @Injectable()
@@ -388,7 +388,7 @@ export class FlowService {
     return color;
   }
 
-  async getEmpFlowStepReady(form: getModeDto, queryRunner?: QueryRunner) {
+  async getEmpFlowStepReady(form: empnoFormDto, queryRunner?: QueryRunner) {
     const repo = queryRunner
       ? queryRunner.manager.getRepository(Flow)
       : this.flowRepo;
@@ -407,7 +407,7 @@ export class FlowService {
       .getMany();
   }
 
-  async checkReturnb(dto: getModeDto, queryRunner?: QueryRunner) {
+  async checkReturnb(dto: empnoFormDto, queryRunner?: QueryRunner) {
     const repo = queryRunner
       ? queryRunner.manager.getRepository(Flow)
       : this.flowRepo;
@@ -429,7 +429,7 @@ export class FlowService {
     return res.length > 0;
   }
 
-  async checkReturn(form: getModeDto, queryRunner?: QueryRunner) {
+  async checkReturn(form: empnoFormDto, queryRunner?: QueryRunner) {
     const repo = queryRunner
       ? queryRunner.manager.getRepository(Flow)
       : this.flowRepo;
@@ -450,7 +450,7 @@ export class FlowService {
     return res.length > 0;
   }
 
-  async getExtData(dto: getModeDto) {
+  async getExtData(dto: empnoFormDto) {
     console.log(dto);
     
     const flow = await this.getEmpFlowStepReady(dto);

@@ -9,13 +9,13 @@ import { winstonConfig, devLoggerConfig } from './common/logger/winston.config';
 import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
 
 import { AuthModule } from './auth/auth.module';
-import { AmecModule } from './amec/amec.module';
-import { AmecMfgModule } from './amecmfg/amecmfg.module';
-import { DocinvModule } from './docinv/docinv.module';
-import { gpreportModule } from './gpreport/gpreport.module';
-import { AS400Module } from './as400/as400.module';
-import { WebformModule } from './webform/webform.module';
-import { HeaderModule } from './idtag/header/header.module';
+// import { AmecModule } from './amec/amec.module';
+// import { AmecMfgModule } from './amecmfg/amecmfg.module';
+// import { DocinvModule } from './docinv/docinv.module';
+// import { gpreportModule } from './gpreport/gpreport.module';
+// import { AS400Module } from './as400/as400.module';
+// import { WebformModule } from './webform/webform.module';
+// import { HeaderModule } from './idtag/header/header.module';
 import { SpModule } from './spprogram/sp.module';
 import { MktModule } from './marketing/mkt.module';
 import { JobOrderModule } from './joborder/joborder.module';
@@ -37,15 +37,15 @@ const logConfig =
     TypeOrmModule.forRootAsync(amecConfig),
     //BB8 💣
     AuthModule,
-    AmecModule,
-    AmecMfgModule,
+    // AmecModule,
+    // AmecMfgModule,
     DocinvModule,
-    gpreportModule,
-    WebformModule,
-    HeaderModule,
+    // gpreportModule,
+    // WebformModule,
+    // HeaderModule,
     SpModule,
     MktModule,
-    AS400Module,
+    // AS400Module,
     //JB 🤴
     JobOrderModule,
     FilesModule,

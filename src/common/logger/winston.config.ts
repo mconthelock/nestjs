@@ -5,10 +5,30 @@ import chalk from 'chalk';
 import { requestNamespace } from '../../middleware/request-id.middleware';
 
 const DailyRotateFile = require('winston-daily-rotate-file');
+
 const addRequestId = winston.format((info) => {
   const requestId = requestNamespace.get('requestId');
   if (requestId) {
     info.requestId = requestId;
+  }
+  return info;
+});
+
+const colors = {
+  error: 'red',
+  warn: 'yellow',
+  info: 'green',
+  http: 'magenta',
+  debug: 'cyan',
+};
+winston.addColors(colors);
+
+const stripColors = winston.format((info) => {
+  if (typeof info.message === 'string') {
+    info.message = stripAnsi(info.message);
+  }
+  if (typeof info.level === 'string') {
+    info.level = stripAnsi(info.level);
   }
   return info;
 });
@@ -23,33 +43,19 @@ const ignoreTypeOrmEntities = winston.format((info) => {
   return info;
 });
 
-const colors = {
-  error: 'red',
-  warn: 'yellow',
-  info: 'green',
-  http: 'magenta',
-  debug: 'cyan',
-};
-
-const stripColors = winston.format((info) => {
-  if (typeof info.message === 'string') {
-    info.message = stripAnsi(info.message);
-  }
-  if (typeof info.level === 'string') {
-    info.level = stripAnsi(info.level);
+// format filter skip query SELECT
+// ตรวจสอบว่า message มีคำว่า SELECT (กรณี TypeORM log query)
+const skipSelectQuery = winston.format((info) => {
+  if (
+    typeof info.message === 'string' &&
+    /^\[QUERY] S/i.test(info.message.trim().replace(/^"|"$/g, ''))
+  ) {
+    return false;
   }
   return info;
 });
 
-// format filter skip query SELECT
-const skipSelectQuery = winston.format((info) => {
-  // ตรวจสอบว่า message มีคำว่า SELECT (กรณี TypeORM log query)
-  if (
-    typeof info.message === 'string' &&
-    /^SELECT/i.test(info.message.trim())
-  ) {
-    return false; // return false = skip log
-  }
+const showSelectQuery = winston.format((info) => {
   return info;
 });
 
@@ -63,20 +69,20 @@ const keyColors = {
   userId: chalk.whiteBright,
   stack: chalk.redBright,
 };
-winston.addColors(colors);
 
 export const winstonConfig = {
-  format: winston.format.combine(
-    ignoreTypeOrmEntities(),
-    winston.format.timestamp(),
-    addRequestId(),
-    winston.format.json(),
-  ),
+  //   format: winston.format.combine(
+  //     ignoreTypeOrmEntities(),
+  //     winston.format.timestamp(),
+  //     addRequestId(),
+  //     winston.format.json(),
+  //   ),
   transports: [
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.timestamp(),
         addRequestId(),
+        ignoreTypeOrmEntities(),
         winston.format.printf(
           ({ level, message, timestamp, requestId, ...meta }) => {
             if (level !== 'error')
@@ -118,19 +124,13 @@ export const winstonConfig = {
 };
 
 export const devLoggerConfig = {
-  format: winston.format.combine(
-    ignoreTypeOrmEntities(),
-    winston.format.timestamp(),
-    addRequestId(),
-    winston.format.json(),
-  ),
   transports: [
-    // ✅ แสดงใน Console (อ่านง่าย, มีสี, มี stack trace)
     new winston.transports.Console({
       level: 'debug',
       format: winston.format.combine(
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         addRequestId(),
+        ignoreTypeOrmEntities(),
         winston.format.printf(
           ({ level, message, timestamp, requestId, ...meta }) => {
             if (level !== 'error')
@@ -150,6 +150,25 @@ export const devLoggerConfig = {
       ),
     }),
 
+    new DailyRotateFile({
+      dirname: 'logs/dev/',
+      filename: 'logs-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      zippedArchive: true,
+      maxSize: '20m',
+      maxFiles: '30d',
+      level: 'debug',
+      format: winston.format.combine(
+        stripColors(),
+        ignoreTypeOrmEntities(),
+        // skipSelectQuery(),
+        addRequestId(),
+        winston.format.timestamp(),
+        winston.format.uncolorize(),
+        winston.format.json(),
+      ),
+    }),
+
     // ✅ เก็บ error แยกไฟล์
     // new DailyRotateFile({
     //   dirname: 'logs/dev/',
@@ -165,24 +184,5 @@ export const devLoggerConfig = {
     //     winston.format.json(),
     //   ),
     // }),
-
-    // ✅ เก็บทุก log ลงไฟล์ (เผื่อ trace ย้อนหลัง)
-    new DailyRotateFile({
-      dirname: 'logs/dev/',
-      filename: 'logs-%DATE%.log',
-      datePattern: 'YYYY-MM-DD',
-      zippedArchive: true,
-      maxSize: '20m',
-      maxFiles: '30d',
-      level: 'debug',
-      format: winston.format.combine(
-        stripColors(),
-        skipSelectQuery(),
-        winston.format.timestamp(),
-        winston.format.uncolorize(),
-        addRequestId(),
-        winston.format.json(),
-      ),
-    }),
   ],
 };

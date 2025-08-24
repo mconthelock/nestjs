@@ -1,5 +1,3 @@
-REM INSERTING into APP_MENU
-SET DEFINE OFF;
 Insert into APP_MENU (MENU_ID,MENU_DISPLAY,MENU_CLASS,MENU_TYPE,MENU_TOP,MENU_SEQ,MENU_LINK,MENU_REMARK,MENU_PROGRAM,MENU_NO,MENU_STATUS,MENU_TNAME,MENU_ICON) values (8,'Investment Report','navmenu-report',2,7,2,'investment','Investment Report',4,8,1,null,null);
 Insert into APP_MENU (MENU_ID,MENU_DISPLAY,MENU_CLASS,MENU_TYPE,MENU_TOP,MENU_SEQ,MENU_LINK,MENU_REMARK,MENU_PROGRAM,MENU_NO,MENU_STATUS,MENU_TNAME,MENU_ICON) values (9,'Actual Purchase order','navmenu-report',2,7,1,'investment/actual','Actual Purchase order',4,9,1,null,null);
 Insert into APP_MENU (MENU_ID,MENU_DISPLAY,MENU_CLASS,MENU_TYPE,MENU_TOP,MENU_SEQ,MENU_LINK,MENU_REMARK,MENU_PROGRAM,MENU_NO,MENU_STATUS,MENU_TNAME,MENU_ICON) values (10,'Visualize Data','nav-chart',1,10,30,null,'Visualize Data',4,10,1,null,null);

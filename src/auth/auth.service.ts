@@ -47,21 +47,21 @@ export class AuthService {
     const user = await this.UsersService.findEmp(username);
     if (!user || user.CSTATUS == '0') {
       this.logs.create(log);
-      throw new UnauthorizedException('You nave no authorization');
+      throw new UnauthorizedException('You nave no authorization 1');
     }
 
     const md5Hash = crypto.createHash('md5').update(pass).digest('hex');
     if (md5Hash != user.SPASSWORD1 && process.env.STATE == 'production') {
       log.logmsg = 'Password is mismatch';
       this.logs.create(log);
-      throw new UnauthorizedException('You nave no authorization');
+      throw new UnauthorizedException('You nave no authorization 2');
     }
 
     const validUser = await this.Appsuser.verifyLogin(username, apps);
     if (!validUser) {
       log.logmsg = 'User has no permission';
       this.logs.create(log);
-      throw new UnauthorizedException('You nave no authorization');
+      throw new UnauthorizedException('You nave no authorization 3');
     }
     const auth = await this.getAuthenlist(apps, validUser.group.GROUP_ID);
     log.logstatus = 1;
@@ -169,12 +169,15 @@ export class AuthService {
   }
 
   async setUser(user) {
-    const response = await fetch(
-      `http://webflow/images/emp/${user.SEMPNO}.jpg`,
-    );
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`;
+    let imageUrl = ``;
+    try {
+      const response = await fetch(
+        `http://webflow/images/emp/${user.SEMPNO}.jpg`,
+      );
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`;
+    } catch (error) {}
     return {
       SEMPNO: user.SEMPNO,
       SNAME: user.SNAME,

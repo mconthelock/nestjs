@@ -69,6 +69,9 @@ export class Application {
   @Column()
   APP_LABEL: string;
 
+  @Column()
+  APP_POSTER: string;
+
   @Column({ name: 'APP_ID' })
   PROGRAM: number;
 

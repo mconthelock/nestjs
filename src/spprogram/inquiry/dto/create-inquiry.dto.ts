@@ -1,26 +1,22 @@
 import { Type } from 'class-transformer';
 import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
 
-export class createDto {
+export class createInqDto {
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
   INQ_ID: number;
 
   @IsString()
-  @IsOptional()
   INQ_NO: string;
 
   @IsString()
-  @IsOptional()
   INQ_REV: string;
 
   @IsNumber()
-  @IsOptional()
   INQ_STATUS: number;
 
   @IsDate()
-  @IsOptional()
   @Type(() => Date)
   INQ_DATE: Date;
 
@@ -37,7 +33,6 @@ export class createDto {
   INQ_COUNTRY: string;
 
   @IsString()
-  @IsOptional()
   INQ_TYPE: string;
 
   @IsString()
@@ -87,10 +82,6 @@ export class createDto {
   @IsString()
   @IsOptional()
   INQ_MAR_PIC: string;
-
-  @IsString()
-  @IsOptional()
-  INQ_FIN_PIC: string;
 
   @IsString()
   @IsOptional()

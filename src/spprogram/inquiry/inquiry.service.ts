@@ -1,13 +1,15 @@
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import * as oracledb from 'oracledb'; // ต้อง import oracledb เพื่อกำหนดชนิดข้อมูลของ parameter
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Inquiry } from './entities/inquiry.entity';
-import { InquiryGroupService } from '../inquiry-group/inquiry-group.service';
-import { InquiryDetailService } from '../inquiry-detail/inquiry-detail.service';
-import { HistoryService } from '../history/history.service';
+import { InquiryGroup } from '../inquiry-group/entities/inquiry-group.entity';
+import { InquiryDetail } from '../inquiry-detail/entities/inquiry-detail.entity';
+import { History } from '../history/entities/history.entity';
+import { Timeline } from '../timeline/entities/timeline.entity';
 
 import { searchDto } from './dto/search.dto';
-import { createDto } from './dto/create-inquiry.dto';
+import { createInqDto } from './dto/create-inquiry.dto';
 
 interface group {
   INQ_ID: number;
@@ -33,9 +35,6 @@ export class InquiryService {
 
     @InjectRepository(Inquiry, 'amecConnection')
     private readonly inq: Repository<Inquiry>,
-    private inqgrp: InquiryGroupService,
-    private inqdt: InquiryDetailService,
-    private history: HistoryService,
   ) {}
 
   async findOne(id: number) {
@@ -43,7 +42,22 @@ export class InquiryService {
       where: { INQ_ID: id },
       relations: {
         inqgroup: true,
-        details: true,
+        details: { logs: true },
+        status: true,
+        quotype: true,
+        method: true,
+        term: true,
+        shipment: true,
+      },
+    });
+  }
+
+  async findByNumber(no: string) {
+    return this.inq.findOne({
+      where: { INQ_NO: no, INQ_LATEST: 1 },
+      relations: {
+        inqgroup: true,
+        details: { logs: true },
         status: true,
         quotype: true,
         method: true,
@@ -61,54 +75,72 @@ export class InquiryService {
         ...q,
       },
       order: { INQ_ID: 'DESC' },
-      relations: ['inqgroup', 'status'],
+      relations: ['inqgroup', 'status', 'maruser'],
     });
   }
 
-  async create(createDto: createDto, details: any[]) {
+  async create(createInqDto: createInqDto, details: any[]) {
     const runner = this.ds.createQueryRunner();
     await runner.connect();
     await runner.startTransaction();
     try {
-      const inq = await this.inq.create(createDto);
-      const inqdb = await this.inq.save(inq);
-      const inqdata = await this.inq.findOne({
-        where: { INQ_NO: inq.INQ_NO, INQ_LATEST: 1 },
+      await runner.manager.save(Inquiry, createInqDto);
+      const inquiry = await runner.manager.findOne(Inquiry, {
+        where: { INQ_NO: createInqDto.INQ_NO, INQ_LATEST: 1 },
       });
 
-      const items = details.map((el) => Math.floor(el.INQD_ITEM / 100));
+      await runner.manager.save(Timeline, {
+        INQ_ID: inquiry.INQ_ID,
+        MAR_USER: inquiry.INQ_MAR_PIC,
+        MAR_SEND: new Date(),
+      });
+
+      const items = details.map((el) => {
+        const itemVal = Math.floor(el.INQD_ITEM / 100);
+        if (itemVal === 5) return 2;
+        if (itemVal >= 6) return 6;
+        return itemVal;
+      });
       const groups: number[] = [...new Set(items)];
-      for (let i = 0; i < groups.length; i++) {
-        const group: group = {
-          INQ_ID: inqdata.INQ_ID,
-          INQG_STATUS: inqdata.INQ_STATUS,
+      const newGroups = groups.map((groupVal) =>
+        runner.manager.create(InquiryGroup, {
+          INQ_ID: inquiry.INQ_ID,
+          INQG_STATUS: inquiry.INQ_STATUS,
           INQG_REV: '*',
-          INQG_GROUP: groups[i],
+          INQG_GROUP: groupVal,
           INQG_LATEST: 1,
-        };
-        await this.inqgrp.create(group);
-      }
-      const groupsid = await this.inqgrp.find(inqdata.INQ_ID);
-      details.forEach(async (el, d) => {
-        const item = Math.floor(el.INQD_ITEM / 100);
-        const grp_id = groupsid.find((val) => val.INQG_GROUP == item);
-        const data = {
+        }),
+      );
+
+      await runner.manager.save(InquiryGroup, newGroups);
+      const savedGroups = await runner.manager.find(InquiryGroup, {
+        where: { INQ_ID: inquiry.INQ_ID },
+      });
+      const detailPromises = details.map((el, d) => {
+        let item = Math.floor(el.INQD_ITEM / 100);
+        if (item === 5) item = 2;
+        if (item >= 6) item = 6;
+        const grp_id_obj = savedGroups.find((val) => val.INQG_GROUP === item);
+
+        const detail = runner.manager.create(InquiryDetail, {
           ...el,
-          INQID: inqdata.INQ_ID,
-          INQG_GROUP: grp_id.INQG_ID,
+          INQID: inquiry.INQ_ID,
+          INQG_GROUP: grp_id_obj.INQG_ID,
           INQD_LATEST: 1,
           INQD_RUNNO: d + 1,
-        };
-        await this.inqdt.create(data);
+        });
+        return detail;
       });
-      const log: logs = {
-        INQ_NO: createDto.INQ_NO,
-        INQ_REV: createDto.INQ_REV,
-        INQH_USER: createDto.INQ_MAR_PIC,
+      const newDetails = await Promise.all(detailPromises);
+      await runner.manager.save(InquiryDetail, newDetails);
+      const log = runner.manager.create(History, {
+        INQ_NO: createInqDto.INQ_NO,
+        INQ_REV: createInqDto.INQ_REV,
+        INQH_USER: createInqDto.INQ_MAR_PIC,
         INQH_ACTION: 1,
         INQH_REMARK: null,
-      };
-      await this.history.create(log);
+      });
+      await runner.manager.save(History, log);
       await runner.commitTransaction();
     } catch (err) {
       await runner.rollbackTransaction();
@@ -116,5 +148,30 @@ export class InquiryService {
     } finally {
       await runner.release();
     }
+  }
+
+  async delete(searchDto: searchDto) {
+    const params = [
+      searchDto.INQ_ID,
+      searchDto.INQ_MAR_PIC,
+      searchDto.INQ_MAR_REMARK,
+      { dir: oracledb.BIND_OUT, type: oracledb.STRING },
+    ];
+    const sql = `
+      BEGIN
+        INQUIRY_DELETE@SPSYS(
+            P_ID => :1,
+            P_USER => :2,
+            P_REMARK=> :3,
+            P_RESULT => :4
+        );
+      END;`;
+    const result = await this.ds.query(sql, params);
+    if (result[0] == null) {
+      throw new NotFoundException(
+        `Inquiry with ID (${searchDto.INQ_ID}) not found.`,
+      );
+    }
+    return { status: true, title: result[0] };
   }
 }

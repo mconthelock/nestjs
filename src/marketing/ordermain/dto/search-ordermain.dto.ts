@@ -1,7 +1,6 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateOrdermainDto } from './create-ordermain.dto';
-import { Type } from 'class-transformer';
 import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import { CreateOrdermainDto } from './create-ordermain.dto';
 
 export class SearchOrdermainDto {
   @IsOptional()
@@ -35,4 +34,8 @@ export class SearchOrdermainDto {
   @IsOptional()
   @IsString()
   CAR_NO: string;
+
+  @IsOptional()
+  @IsString()
+  SMFGNO: string;
 }

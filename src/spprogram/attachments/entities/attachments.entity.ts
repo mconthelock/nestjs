@@ -1,12 +1,15 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('SP_ATTACHED')
 export class Attachments {
-  @PrimaryGeneratedColumn()
-  id: number; // หากไม่พบ Primary Key ใน SQL จะใช้ id เป็น PrimaryGeneratedColumn เริ่มต้น
+  @PrimaryColumn()
+  INQ_NO: string;
+
+  @PrimaryColumn()
+  FILE_NAME: string;
 
   @Column()
-  INQ_NO: string;
+  FILE_ID: number;
 
   @Column()
   FILE_ORIGINAL_NAME: string;

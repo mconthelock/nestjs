@@ -13,6 +13,7 @@ import { QuotationType } from '../../quotation-type/entities/quotation-type.enti
 import { Method } from '../../method/entities/method.entity';
 import { Term } from '../../term/entities/term.entity';
 import { Shipment } from '../../shipment/entities/shipment.entity';
+import { SpUser } from 'src/spprogram/spusers/spusers.entity';
 
 @Entity('SP_INQUIRY')
 export class Inquiry {
@@ -80,45 +81,6 @@ export class Inquiry {
   INQ_MAR_PIC: string;
 
   @Column()
-  INQ_FIN_PIC: string;
-
-  @Column()
-  INQ_PKC_PIC: string;
-
-  @Column()
-  INQ_MAR_SENT: Date;
-
-  @Column()
-  INQ_MRE_RECV: Date;
-
-  @Column()
-  INQ_MRE_FINISH: Date;
-
-  @Column()
-  INQ_PKC_FINISH: Date;
-
-  @Column()
-  INQ_BM_DATE: Date;
-
-  @Column()
-  INQ_FIN_RECV: Date;
-
-  @Column()
-  INQ_FIN_FINISH: Date;
-
-  @Column()
-  INQ_FINISH: Date;
-
-  @Column()
-  INQ_MAR_REMARK: string;
-
-  @Column()
-  INQ_DES_REMARK: string;
-
-  @Column()
-  INQ_FIN_REMARK: string;
-
-  @Column()
   CREATE_AT: Date;
 
   @Column()
@@ -159,15 +121,6 @@ export class Inquiry {
 
   @Column()
   INQ_CUSTRQS: Date;
-
-  @Column()
-  INQ_FIN_CHK: string;
-
-  @Column()
-  INQ_FIN_CONFIRM: Date;
-
-  @Column()
-  INQ_COMPARE_DATE: Date;
 
   @Column()
   INQ_CUSTOMER: number;
@@ -222,4 +175,8 @@ export class Inquiry {
   @ManyToOne(() => Shipment, (ship) => ship.inqs)
   @JoinColumn({ name: 'INQ_SHIPMENT', referencedColumnName: 'SHIPMENT_ID' })
   shipment: Shipment;
+
+  @ManyToOne(() => SpUser, (user) => user.inqs)
+  @JoinColumn({ name: 'INQ_MAR_PIC', referencedColumnName: 'SEMPNO' })
+  maruser: SpUser;
 }

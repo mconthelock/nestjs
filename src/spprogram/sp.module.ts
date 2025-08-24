@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { InquiryModule } from './inquiry/inquiry.module';
 import { InquiryGroupModule } from './inquiry-group/inquiry-group.module';
 import { InquiryDetailModule } from './inquiry-detail/inquiry-detail.module';
@@ -13,9 +15,14 @@ import { MethodModule } from './method/method.module';
 import { AttachmentsModule } from './attachments/attachments.module';
 import { HistoryModule } from './history/history.module';
 import { StatusModule } from './status/status.module';
+import { SpUser } from './spusers/spusers.entity';
+import { CustomerModule } from './customer/customer.module';
+import { InquiryLogModule } from './inquiry-log/inquiry-log.module';
+import { TimelineModule } from './timeline/timeline.module';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([SpUser], 'amecConnection'),
     InquiryModule,
     InquiryGroupModule,
     InquiryDetailModule,
@@ -30,6 +37,9 @@ import { StatusModule } from './status/status.module';
     AttachmentsModule,
     HistoryModule,
     StatusModule,
+    CustomerModule,
+    InquiryLogModule,
+    TimelineModule,
   ],
 })
 export class SpModule {}

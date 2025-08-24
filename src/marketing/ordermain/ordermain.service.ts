@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, Raw } from 'typeorm';
+import { Repository, Raw } from 'typeorm';
 import { SearchOrdermainDto } from './dto/search-ordermain.dto';
 import { Ordermain } from './entities/ordermain.entity';
 
@@ -24,6 +24,13 @@ export class OrdermainService {
         (columnAlias) => `TRIM(${columnAlias}) = :trimmedCarNo`,
         { trimmedCarNo },
       );
+    }
+
+    if (req.SMFGNO) {
+      const trimmedMfgNo = req.SMFGNO.trim();
+      where['MFGNO'] = Raw((columnAlias) => `MFGNO LIKE '%${trimmedMfgNo}%'`, {
+        trimmedMfgNo,
+      });
     }
     return await this.ords.find({ where: where });
   }

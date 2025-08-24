@@ -18,7 +18,11 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "copy": "xcopy D:\\project\\backend\\dist \\\\172.21.255.188\\amecweb\\wwwroot\\development\\backend\\dist /E /I /Y"
+    "copy": "xcopy D:\\project\\backend\\dist \\\\172.21.255.188\\amecweb\\wwwroot\\development\\backend\\dist /E /I /Y",
+    "typeorm": "typeorm --dataSource src/common/databases/data-source.ts",
+    "migration:create": "npm run typeorm -- migration:create -n",
+    "migration:run": "npm run typeorm -- migration:run",
+    "migration:revert": "npm run typeorm -- migration:revert"
   },
   "dependencies": {
     "@nestjs/apollo": "^13.1.0",
@@ -50,7 +54,7 @@
     "ibm_db": "^3.3.2",
     "ioredis": "^5.6.1",
     "multer": "^2.0.2",
-    "mysql2": "^3.14.0",
+    "mysql2": "^3.14.3",
     "nest-winston": "^1.10.2",
     "node-sql-parser": "^5.3.11",
     "odbc": "^2.4.9",
@@ -64,7 +68,7 @@
     "socket.io-redis": "^5.4.0",
     "strip-ansi": "^7.1.0",
     "swagger-ui-express": "^5.0.1",
-    "typeorm": "^0.3.22",
+    "typeorm": "^0.3.26",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0"
   },

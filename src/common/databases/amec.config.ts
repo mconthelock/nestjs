@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import * as dotenv from 'dotenv';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { TypeOrmWinstonLogger } from '../common/logger/typeorm-winston.logger';
+import { TypeOrmWinstonLogger } from '../logger/typeorm-winston.logger';
 
 dotenv.config();
 let amecConfig: TypeOrmModuleAsyncOptions;
@@ -18,8 +18,8 @@ if (process.env.HOST == 'AMEC') {
       password: process.env.AMEC_PASSWORD,
       connectString: `${process.env.AMEC_HOST}:${process.env.AMEC_PORT}/${process.env.AMEC_SERVICE}?expire_time=5`,
       entities: [
-        __dirname + '/../**/**/*.entity{.ts,.js}',
-        __dirname + '/../**/**/**/*.entity{.ts,.js}',
+        __dirname + '/../../**/**/*.entity{.ts,.js}',
+        __dirname + '/../../**/**/**/*.entity{.ts,.js}',
       ],
       synchronize: false,
       logging: ['error'],
@@ -52,8 +52,8 @@ if (process.env.HOST == 'AMEC') {
       password: process.env.HOME_PASSWORD,
       database: process.env.HOME_DATABASE,
       entities: [
-        __dirname + '/../**/**/*.entity{.ts,.js}',
-        __dirname + '/../**/**/**/*.entity{.ts,.js}',
+        __dirname + '/../../**/**/*.entity{.ts,.js}',
+        __dirname + '/../../**/**/**/*.entity{.ts,.js}',
       ],
       synchronize: false,
     }),

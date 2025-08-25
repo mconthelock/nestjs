@@ -1,24 +1,28 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
-import { Repository, DataSource, QueryRunner } from 'typeorm';
+import { Repository, DataSource, QueryRunner, In } from 'typeorm';
 
 import { Flow } from './entities/flow.entity';
 
 import { SearchFlowDto } from './dto/search-flow.dto';
 import { CreateFlowDto } from './dto/create-flow.dto';
 import { UpdateFlowDto } from './dto/update-flow.dto';
+import { empnoFormDto } from '../form/dto/empno-form.dto';
+import { FormDto } from '../form/dto/form.dto';
+import { doactionFlowDto } from './dto/doaction-flow.dto';
 
 import { RepService } from '../rep/rep.service';
 import { FormService } from '../form/form.service';
+import { UsersService } from 'src/amec/users/users.service';
 import { checkHostTest } from 'src/common/helpers/repo.helper';
+
 import {
   getBase64Image,
   getBase64ImageFromUrl,
   joinPaths,
 } from 'src/common/utils/files.utils';
-import { formatDate } from 'src/common/utils/dayjs.utils';
-import { empnoFormDto } from '../form/dto/empno-form.dto';
-import { FormDto } from '../form/dto/form.dto';
+import { formatDate, now } from 'src/common/utils/dayjs.utils';
+import { getSafeFields } from 'src/common/utils/Fields.utils';
 
 @Injectable()
 export class FlowService {
@@ -31,6 +35,7 @@ export class FlowService {
     private readonly repService: RepService,
     @Inject(forwardRef(() => FormService))
     private readonly formService: FormService,
+    private readonly usersService: UsersService,
   ) {}
 
   private readonly APV_TYPE_SINGLE = '1';
@@ -62,6 +67,10 @@ export class FlowService {
   private readonly FLOW_RUNNING = '1';
   private readonly FLOW_APPROVE = '2';
   private readonly FLOW_REJECT = '3';
+
+  private readonly FLOW_FIELDS = this.flowRepo.metadata.columns.map(
+    (c) => c.propertyName,
+  );
 
   async insertFlow(
     dto: CreateFlowDto,
@@ -97,9 +106,38 @@ export class FlowService {
       ? queryRunner.manager.getRepository(Flow)
       : this.flowRepo;
     // console.log('get flow data : ', dto);
-    return repo.find({
-      where: dto,
-    });
+    // const where: any = {};
+    // for (const key in dto) {
+    //   if (['CAPVSTNO'].includes(key)) {
+    //     where[key] = Array.isArray(dto[key]) ? In(dto[key]) : dto[key];
+    //   } else {
+    //     where[key] = dto[key];
+    //   }
+    // }
+    // return repo.find({
+    //   where: where,
+    // });
+    const query = repo
+      .createQueryBuilder('flow')
+      .distinct(dto.distinct == true); // เปิด distinct
+
+    for (const key in dto) {
+      if (dto[key] == null || key == 'distinct') continue;
+
+      if (key === 'CAPVSTNO') {
+        if (Array.isArray(dto[key])) {
+          query.andWhere(`flow.${key} IN (:...${key})`, { [key]: dto[key] });
+        } else {
+          query.andWhere(`flow.${key} = :${key}`, { [key]: dto[key] });
+        }
+      } else if (key === 'fields') {
+        const select = getSafeFields(dto.fields, this.FLOW_FIELDS);
+        select.length > 0 && query.select(select.map((f) => `flow.${f}`));
+      } else {
+        query.andWhere(`flow.${key} = :${key}`, { [key]: dto[key] });
+      }
+    }
+    return query.getMany();
   }
 
   async updateFlow(
@@ -452,11 +490,609 @@ export class FlowService {
 
   async getExtData(dto: empnoFormDto) {
     console.log(dto);
-    
+
     const flow = await this.getEmpFlowStepReady(dto);
     if (flow.length === 0) {
       return '';
     }
     return flow[0].CEXTDATA;
+  }
+
+  async doAction(
+    dto: doactionFlowDto,
+    ip: string,
+    queryRunner?: QueryRunner,
+  ): Promise<{
+    status: boolean;
+    message: string;
+  }> {
+    let localRunner: QueryRunner | undefined,
+      whatAction: string,
+      stepAction: string,
+      sql: string,
+      params: any,
+      //   apvClause: string = '',
+      updateFlow: boolean;
+    try {
+      if (!queryRunner) {
+        localRunner = this.dataSource.createQueryRunner();
+        await localRunner.connect();
+        await localRunner.startTransaction();
+      }
+      const runner = queryRunner || localRunner!;
+
+      const {
+        NFRMNO,
+        VORGNO,
+        CYEAR,
+        CYEAR2,
+        NRUNNO,
+        ACTION,
+        EMPNO,
+        REMARK = '',
+      } = dto;
+      const form = {
+        NFRMNO: NFRMNO,
+        VORGNO: VORGNO,
+        CYEAR: CYEAR,
+        CYEAR2: CYEAR2,
+        NRUNNO: NRUNNO,
+      };
+      //   const stepNext = await this.getStepNext(form, runner);
+      //   const flowTree = await this.getFlowTree(form, runner);
+      //   for (const step of flowTree) {
+      //     if (
+      //       step.CSTEPST == this.STEP_WAIT ||
+      //       step.CSTEPST == this.STEP_NORMAL
+      //     ) {
+      //       stepNext = step.CSTEPNO;
+      //       break;
+      //     }
+      //   }
+      // CHECK USER INFO
+      const userInfo = await this.usersService.findEmp(dto.EMPNO);
+      if (!userInfo) {
+        throw new Error('User not found');
+      }
+      // CHECK STEP STATUS
+      const checkStep = await this.getEmpFlowStepReady(dto, runner);
+      if (checkStep.length === 0) {
+        throw new Error('Ready step not found!');
+      }
+      const flow = checkStep[0];
+      //   // SET ACTION
+      //   switch (ACTION) {
+      //     case 'approve':
+      //       whatAction = this.APV_APPROVE;
+      //       stepAction = this.STEP_APPROVE;
+      //       break;
+      //     case 'reject':
+      //       whatAction = this.APV_REJECT;
+      //       stepAction = this.STEP_REJECT;
+      //       break;
+      //     case 'return':
+      //       whatAction = this.APV_NONE;
+      //       stepAction = this.STEP_READY;
+      //       break;
+      //     case 'returnp':
+      //       whatAction = this.APV_NONE;
+      //       stepAction = this.STEP_READY;
+      //       break;
+      //     case 'returnb':
+      //       whatAction = this.APV_NONE;
+      //       stepAction = this.STEP_READY;
+      //       break;
+      //     default:
+      //       throw new Error('Invalid action!');
+      //   }
+
+      params = {
+        ...form,
+        DAPVDATE: now(),
+        CAPVTIME: now('hh:mm:ss'),
+        VREMARK: REMARK,
+        VREMOTE: ip,
+        VREALAPV: EMPNO,
+        CAPVSTNO: this.APV_NONE,
+      };
+
+      //UPDATE ALL STEP
+      switch (ACTION) {
+        case 'approve':
+          whatAction = this.APV_APPROVE;
+          stepAction = this.STEP_APPROVE;
+          await this.doactionUpdateFlow(
+            flow,
+            { ...params, whatAction, stepAction },
+            runner,
+          );
+          const checkNextStep = await this.getFlow(
+            { ...form, CAPVSTNO: this.APV_NONE, CSTEPNO: flow.CSTEPNO },
+            runner,
+          );
+          const updateNextStep = checkNextStep.length == 0 ? true : false;
+          if (updateNextStep) {
+            //FIND NEXT STEP
+            // flowTree = await this.getFlowTree(form, runner);
+            // for (const step of flowTree) {
+            //   if (
+            //     step.CSTEPST == this.STEP_WAIT ||
+            //     step.CSTEPST == this.STEP_NORMAL
+            //   ) {
+            //     stepNext = step.CSTEPNO;
+            //     break;
+            //   }
+            // }
+            //UPDATE STEP NEXT STATUS
+            // sql =
+            //   'UPDATE FLOW SET CAPVSTNO = :apvNone, CSTEPST = :stepReady where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO  and CSTEPNO = :stepNext and CSTEPST in (:stepNormal, :stepWait)';
+            // params = {
+            //   ...form,
+            //   apvNone: this.APV_NONE,
+            //   stepReady: this.STEP_READY,
+            //   stepNext: stepNext,
+            //   stepNormal: this.STEP_NORMAL,
+            //   stepWait: this.STEP_WAIT,
+            // };
+            // await this.updateFlowbySql(sql, params, runner);
+            // //UPDATE NEXT NEXT STEP (WAIT)
+            // sql =
+            //   'update flow set CAPVSTNO = :apvNone , CSTEPST = :stepWait where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CSTEPNO in (select CSTEPNEXTNO from flow where NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno and CSTEPNO = :stepNext) and CSTEPST = :stepNormal and CAPVSTNO = :apvNone2';
+            // params = {
+            //   ...form,
+            //   apvNone: this.APV_NONE,
+            //   apvNone2: this.APV_NONE,
+            //   stepWait: this.STEP_WAIT,
+            //   frm: NFRMNO,
+            //   org: VORGNO,
+            //   y: CYEAR,
+            //   y2: CYEAR2,
+            //   runno: NRUNNO,
+            //   stepNext: stepNext,
+            //   stepNormal: this.STEP_NORMAL,
+            // };
+            // await this.updateFlowbySql(sql, params, runner);
+            await this.updateStepNextStatus(form, runner);
+            await this.updateNextStepWait(form, runner);
+            // this.sendMailToApprover(form); // send email to approver
+          }
+          break;
+        case 'reject':
+          whatAction = this.APV_REJECT;
+          stepAction = this.STEP_REJECT;
+          await this.doactionUpdateFlow(
+            flow,
+            { ...params, whatAction, stepAction },
+            runner,
+          );
+          //Check for updating flow status
+          if (flow.CAPVTYPE == this.APV_TYPE_MULTIPLE_CO) {
+            const checkUpdate = await this.getFlow(
+              {
+                ...form,
+                CAPVSTNO: [this.APV_NONE, this.APV_APPROVE],
+                CSTEPNO: flow.CSTEPNO,
+              },
+              runner,
+            );
+            updateFlow = checkUpdate.length == 0 ? true : false;
+          } else {
+            updateFlow = true;
+          }
+          //Start updating flow status
+          if (updateFlow) {
+            //UPDATE SINGLE STEP
+            sql =
+              'update flow set CAPVSTNO = :apvReject, CSTEPST = :stepSkip where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CAPVSTNO = :apvNone and CSTEPST in (:stepNormal, :stepWait, :stepReady)';
+            params = {
+              ...form,
+              apvReject: this.APV_REJECT,
+              stepSkip: this.STEP_SKIP,
+              apvNone: this.APV_NONE,
+              stepNormal: this.STEP_NORMAL,
+              stepWait: this.STEP_WAIT,
+              stepReady: this.STEP_READY,
+            };
+            await this.updateFlowbySql(sql, params, runner);
+          } else {
+            //UPDATE STEP NEXT STATUS
+            // sql =
+            //   'update flow set CAPVSTNO = :apvNone, CSTEPST = :stepReady where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO AND CSTEPNO = :stepNext AND CSTEPST in (:stepNormal, :stepWait) ';
+            // params = {
+            //   ...form,
+            //   apvNone: this.APV_NONE,
+            //   stepReady: this.STEP_READY,
+            //   stepNext: stepNext,
+            //   stepNormal: this.STEP_NORMAL,
+            //   stepWait: this.STEP_WAIT,
+            // };
+            // await this.updateFlowbySql(sql, params, runner);
+            //UPDATE NEXT NEXT STEP (WAIT)
+            // sql =
+            //   'update flow set CAPVSTNO = :apvNone, CSTEPST = :stepWait where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CSTEPNO in (select cStepNextNo from flow where NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno and CSTEPNO = :stepNext) and CSTEPST = :stepNormal and CAPVSTNO = :apvNone2';
+            // params = {
+            //   ...form,
+            //   apvNone: this.APV_NONE,
+            //   apvNone2: this.APV_NONE,
+            //   stepWait: this.STEP_WAIT,
+            //   frm: NFRMNO,
+            //   org: VORGNO,
+            //   y: CYEAR,
+            //   y2: CYEAR2,
+            //   runno: NRUNNO,
+            //   stepNext: stepNext,
+            //   stepNormal: this.STEP_NORMAL,
+            // };
+            // await this.updateFlowbySql(sql, params, runner);
+            await this.updateStepNextStatus(form, runner);
+            await this.updateNextStepWait(form, runner);
+          }
+          break;
+        case 'return':
+          whatAction = this.APV_NONE;
+          stepAction = this.STEP_READY;
+          await this.doactionUpdateFlow(
+            flow,
+            { ...params, whatAction, stepAction },
+            runner,
+          );
+          await this.updateStepWaitToNormal(form, runner);
+          await this.updateStepReadyToWait(form, runner);
+          await this.updateStepReqToReady(form, runner);
+          break;
+        case 'returnp':
+          whatAction = this.APV_NONE;
+          stepAction = this.STEP_READY;
+          await this.doactionUpdateFlow(
+            flow,
+            { ...params, whatAction, stepAction },
+            runner,
+          );
+          await this.updateAllStepToNormal(form, runner);
+          await this.updateStepReqToReady(form, runner);
+          await this.updateStepReqNextToWait(form, runner);
+          break;
+        case 'returnb':
+          whatAction = this.APV_NONE;
+          stepAction = this.STEP_READY;
+          await this.doactionUpdateFlow(
+            flow,
+            { ...params, whatAction, stepAction },
+            runner,
+          );
+          await this.updateStepWaitToNormal(form, runner);
+          await this.updateStepReadyToWait(form, runner);
+          await this.updateStepReqToReadyB(form, runner);
+          break;
+        default:
+          throw new Error('Invalid action!');
+      }
+
+      await this.updateFlowStatus(form, runner);
+
+      if (localRunner) await localRunner.commitTransaction();
+      return {
+        status: true,
+        message: 'Do action success!',
+      };
+    } catch (error) {
+      if (localRunner) {
+        await localRunner.rollbackTransaction();
+        return {
+          status: false,
+          message: 'Do action Error: ' + error.message,
+        };
+      } else {
+        throw new Error('Do action Error: ' + error.message);
+      }
+    } finally {
+      if (localRunner) await localRunner.release();
+    }
+  }
+
+  async doactionUpdateFlow(flow: any, params: any, runner: QueryRunner) {
+    // UPDATE APPROVAL STATUS
+    let apvClause: string = '';
+    params.stepNo = flow.CSTEPNO;
+    if (flow.CAPVTYPE == this.APV_TYPE_SINGLE && flow.CAPPLYALL == '0') {
+      apvClause = `and CSTEPNO = :stepNo`;
+    } else if (
+      flow.CAPVTYPE == this.APV_TYPE_SINGLE &&
+      (flow.CAPPLYALL == this.APPLY_ALL_APV ||
+        flow.CAPPLYALL == this.APPLY_ALL_REJ ||
+        flow.CAPPLYALL == this.APPLY_ALL_BOTH)
+    ) {
+      apvClause = `and (CSTEPNO = :stepNo or (VAPVNO = :apv1 or VREPNO = :rep1))`;
+      params = {
+        ...params,
+        apv1: params.VREALAPV,
+        rep1: params.VREALAPV,
+      };
+    } else if (
+      flow.CAPVTYPE == this.APV_TYPE_MULTIPLE_CO &&
+      flow.CAPPLYALL == '0'
+    ) {
+      apvClause = `and ((VAPVNO = :apv1 or VREPNO = :rep1) and CSTEPNO = :stepNo)`;
+      params = {
+        ...params,
+        apv1: params.VREALAPV,
+        rep1: params.VREALAPV,
+      };
+    } else if (
+      flow.CAPVTYPE == this.APV_TYPE_MULTIPLE_CO &&
+      (flow.CAPPLYALL == this.APPLY_ALL_APV ||
+        flow.CAPPLYALL == this.APPLY_ALL_BOTH)
+    ) {
+      apvClause = `and ((VAPVNO = :apv1 or VREPNO = :rep1) or (CSTEPNO = :stepNo and (VAPVNO = :apv2 or VREPNO = :rep2)))`;
+      params = {
+        ...params,
+        apv1: params.VREALAPV,
+        rep1: params.VREALAPV,
+        apv2: params.VREALAPV,
+        rep2: params.VREALAPV,
+      };
+    }
+    const sql = `UPDATE FLOW SET CAPVSTNO = :whatAction, CSTEPST = :stepAction, DAPVDATE = TO_DATE(:DAPVDATE, 'YYYY-MM-DD'), CAPVTIME = :CAPVTIME, VREMARK = :VREMARK, VREMOTE = :VREMOTE, VREALAPV = :VREALAPV WHERE NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO AND CAPVSTNO = :CAPVSTNO ${apvClause}`;
+
+    console.log(sql);
+    console.log(params);
+    //   return;
+    await this.updateFlowbySql(sql, params, runner);
+  }
+
+  async updateFlowbySql(
+    sql: string,
+    params: any,
+    queryRunner?: QueryRunner,
+    message?: string,
+  ): Promise<{ status: boolean; updated?: number; message: string }> {
+    let localRunner: QueryRunner | undefined;
+    let msg = message || 'Update Flow ';
+    try {
+      if (!queryRunner) {
+        localRunner = this.dataSource.createQueryRunner();
+        await localRunner.connect();
+        await localRunner.startTransaction();
+      }
+      const runner = queryRunner || localRunner!;
+      const res = await runner.manager.query(sql, params);
+      if (localRunner) await localRunner.commitTransaction();
+
+      if (!res) {
+        throw new Error('No rows updated');
+      }
+    } catch (error) {
+      //   if (localRunner) await localRunner.rollbackTransaction();
+      //   throw error;
+      if (localRunner) {
+        await localRunner.rollbackTransaction();
+        return {
+          status: false,
+          message: msg + error.message,
+        };
+      } else {
+        throw new Error(msg + error.message);
+      }
+    } finally {
+      if (localRunner) await localRunner.release();
+    }
+  }
+
+  async getStepNext(form: FormDto, queryRunner?: QueryRunner) {
+    const flowTree = (await this.getFlowTree(form, queryRunner)) ?? [];
+    for (const step of flowTree) {
+      if (step.CSTEPST == this.STEP_WAIT || step.CSTEPST == this.STEP_NORMAL) {
+        return step.CSTEPNO;
+      }
+    }
+    return '';
+  }
+
+  async updateFlowStatus(form: FormDto, queryRunner?: QueryRunner) {
+    let flowStatus: string = '';
+    //FIND UNFINISH STEP
+    if (!(await this.checkUnfinishedFlow(form, queryRunner))) {
+      //FIND REJECT STEP
+      const reject = await this.getFlow(
+        {
+          distinct: true,
+          fields: ['CSTEPNO', 'VAPVNO', 'CAPVTYPE'],
+          ...form,
+          CAPVSTNO: this.APV_REJECT,
+        },
+        queryRunner,
+      );
+      if (reject.length == 0) {
+        flowStatus = this.FLOW_APPROVE;
+      } else {
+        for (const step of reject) {
+          if (step.CAPVTYPE == this.APV_TYPE_SINGLE) {
+            flowStatus = this.FLOW_REJECT;
+            break;
+          } else {
+            const stepApv = await this.getFlow({
+              distinct: true,
+              fields: ['CSTEPNO'],
+              ...form,
+              CSTEPNO: step.CSTEPNO,
+              CAPVSTNO: this.APV_APPROVE,
+            });
+            if (stepApv.length > 0) {
+              flowStatus = this.FLOW_REJECT;
+              break;
+            } else {
+              flowStatus = this.FLOW_APPROVE;
+            }
+          }
+        }
+      }
+      // UPDATE FLOW STATUS
+      this.formService.updateForm({ ...form, CST: flowStatus }, queryRunner);
+    }
+  }
+
+  async checkUnfinishedFlow(
+    form: FormDto,
+    queryRunner?: QueryRunner,
+  ): Promise<boolean> {
+    const res = await this.getFlow(
+      {
+        ...form,
+        CAPVSTNO: this.APV_NONE,
+      },
+      queryRunner,
+    );
+    return res.length > 0;
+  }
+
+  async updateStepNextStatus(form: FormDto, queryRunner?: QueryRunner) {
+    const sql =
+      'update flow set CAPVSTNO = :apvNone, CSTEPST = :stepReady where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO AND CSTEPNO = :stepNext AND CSTEPST in (:stepNormal, :stepWait) ';
+    const params = {
+      ...form,
+      apvNone: this.APV_NONE,
+      stepReady: this.STEP_READY,
+      stepNext: await this.getStepNext(form, queryRunner),
+      stepNormal: this.STEP_NORMAL,
+      stepWait: this.STEP_WAIT,
+    };
+    return await this.updateFlowbySql(
+      sql,
+      params,
+      queryRunner,
+      'Update Step Next Status',
+    );
+  }
+
+  async updateNextStepWait(form: FormDto, queryRunner?: QueryRunner) {
+    const sql =
+      'update flow set CAPVSTNO = :apvNone, CSTEPST = :stepWait where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CSTEPNO in (select cStepNextNo from flow where NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno and CSTEPNO = :stepNext) and CSTEPST = :stepNormal and CAPVSTNO = :apvNone2';
+    const params = {
+      ...form,
+      frm: form.NFRMNO,
+      org: form.VORGNO,
+      y: form.CYEAR,
+      y2: form.CYEAR2,
+      runno: form.NRUNNO,
+      apvNone: this.APV_NONE,
+      apvNone2: this.APV_NONE,
+      stepWait: this.STEP_WAIT,
+      stepNormal: this.STEP_NORMAL,
+      stepNext: await this.getStepNext(form, queryRunner),
+    };
+    return await this.updateFlowbySql(
+      sql,
+      params,
+      queryRunner,
+      'Update Next Step Wait',
+    );
+  }
+
+  async updateStepWaitToNormal(form: FormDto, queryRunner?: QueryRunner) {
+    const sql =
+      "update flow set CSTEPST = :stepNormal, VREALAPV = '' , CAPVSTNO = :apvNone, DAPVDATE = '' , CAPVTIME = '' where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CSTEPST = :stepWait ";
+    const params = {
+      ...form,
+      stepNormal: this.STEP_NORMAL,
+      apvNone: this.APV_NONE,
+      stepWait: this.STEP_WAIT,
+    };
+    return await this.updateFlowbySql(
+      sql,
+      params,
+      queryRunner,
+      'Update Step Wait To Step Normal',
+    );
+  }
+
+  async updateStepReadyToWait(form: FormDto, queryRunner?: QueryRunner) {
+    const sql =
+      "update flow set CSTEPST = :stepWait, VREALAPV = '' , CAPVSTNO = :apvNone, DAPVDATE = '' , CAPVTIME = '' where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CSTEPST = :stepReady ";
+    const params = {
+      ...form,
+      stepWait: this.STEP_WAIT,
+      apvNone: this.APV_NONE,
+      stepReady: this.STEP_READY,
+    };
+    return await this.updateFlowbySql(
+      sql,
+      params,
+      queryRunner,
+      'Update Step Ready To Step Wait',
+    );
+  }
+
+  async updateStepReqToReady(form: FormDto, queryRunner?: QueryRunner) {
+    const sql =
+      "update flow set CSTEPST = :stepReady, VREALAPV = '' , CAPVSTNO = :apvNone, DAPVDATE = '' , CAPVTIME = '' where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and cStart = '1' ";
+    const params = {
+      ...form,
+      stepReady: this.STEP_READY,
+      apvNone: this.APV_NONE,
+    };
+    return await this.updateFlowbySql(
+      sql,
+      params,
+      queryRunner,
+      'Update Step Request To Step Ready',
+    );
+  }
+
+  async updateStepReqToReadyB(form: FormDto, queryRunner?: QueryRunner) {
+    const sql =
+      "update flow set CSTEPST = :stepReady, VREALAPV = '' , CAPVSTNO = :apvNone, DAPVDATE = '' , CAPVTIME = '' where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and cstepnextno in (select cstepno from flow where NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno and cstepst = :stepWait)";
+    const params = {
+      ...form,
+      frm: form.NFRMNO,
+      org: form.VORGNO,
+      y: form.CYEAR,
+      y2: form.CYEAR2,
+      runno: form.NRUNNO,
+      stepReady: this.STEP_READY,
+      apvNone: this.APV_NONE,
+    };
+    return await this.updateFlowbySql(
+      sql,
+      params,
+      queryRunner,
+      'Update Step Request To Step Ready(Returnb)',
+    );
+  }
+
+  async updateAllStepToNormal(form: FormDto, queryRunner?: QueryRunner) {
+    const sql =
+      "update flow set CSTEPST = :stepNormal, VREALAPV = '' , CAPVSTNO = :apvNone, DAPVDATE = '' , CAPVTIME = '' where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and cStart <> '1' ";
+    const params = {
+      ...form,
+      stepNormal: this.STEP_NORMAL,
+      apvNone: this.APV_NONE,
+    };
+    return await this.updateFlowbySql(
+      sql,
+      params,
+      queryRunner,
+      'Update All Step To Step Normal',
+    );
+  }
+
+  async updateStepReqNextToWait(form: FormDto, queryRunner?: QueryRunner) {
+    const sql =
+      "update flow set CSTEPST = :stepWait, VREALAPV = '' , CAPVSTNO = :apvNone, DAPVDATE = '' , CAPVTIME = '' where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CSTEPNO = (select CSTEPNEXTNO from flow where NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno and CSTART = '1')";
+    const params = {
+      ...form,
+      frm: form.NFRMNO,
+      org: form.VORGNO,
+      y: form.CYEAR,
+      y2: form.CYEAR2,
+      runno: form.NRUNNO,
+      stepWait: this.STEP_WAIT,
+      apvNone: this.APV_NONE,
+    };
+    return await this.updateFlowbySql(
+      sql,
+      params,
+      queryRunner,
+      'Update Step Request Next To Step Wait',
+    );
   }
 }

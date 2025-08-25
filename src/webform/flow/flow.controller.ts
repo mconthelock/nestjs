@@ -8,7 +8,7 @@ import {
   Delete,
   Req,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiExcludeEndpoint} from '@nestjs/swagger';
 import { Request } from 'express';
 
 import { FlowService } from './flow.service';
@@ -17,6 +17,8 @@ import { SearchFlowDto } from './dto/search-flow.dto';
 import { UpdateFlowDto } from './dto/update-flow.dto';
 import { FormDto } from '../form/dto/form.dto';
 import { empnoFormDto } from '../form/dto/empno-form.dto';
+import { doactionFlowDto } from './dto/doaction-flow.dto';
+import { getClientIP } from 'src/common/utils/ip.utils';
 
 @ApiTags('Flow')
 @Controller('flow')
@@ -105,5 +107,17 @@ export class FlowController {
   @Post('checkReturnb')
   async checkReturnb(@Body() dto: empnoFormDto) {
     return await this.flowService.checkReturnb(dto);
+  }
+
+  @Post('doaction')
+  async doAction(@Body() dto: doactionFlowDto, @Req() req: Request) {
+     const ip = getClientIP(req);
+    return await this.flowService.doAction(dto, ip);
+  }
+
+  @ApiExcludeEndpoint()
+  @Post('checkUnfinishedFlow')
+  async checkUnfinishedFlow(@Body() form: FormDto) {
+    return await this.flowService.checkUnfinishedFlow(form);
   }
 }

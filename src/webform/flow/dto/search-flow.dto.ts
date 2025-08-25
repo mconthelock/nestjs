@@ -1,5 +1,5 @@
-import { IsOptional, IsString, IsNumber, IsArray } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsOptional, IsString, IsNumber, IsArray, IsBoolean } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SearchFlowDto {
@@ -54,4 +54,18 @@ export class SearchFlowDto {
   @IsOptional()
   @IsString()
   readonly CSTEPST?: string;
+
+  @ApiProperty({ example: '0' })
+  @IsOptional()
+  readonly CAPVSTNO?: string | string[];
+
+  @IsOptional()
+  @IsBoolean()
+  @Type(() => Boolean)
+  readonly distinct?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  fields?: string[];
 }

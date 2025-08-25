@@ -17,3 +17,7 @@ export function formatDate(date: string | Date | number, format: string = 'YYYY-
     }
     return dayjs(date).format(format);
 }
+
+export function now(format: string = 'YYYY-MM-DD'): string {
+    return dayjs().format(format);
+}

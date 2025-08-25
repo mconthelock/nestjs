@@ -94,10 +94,6 @@ export class FormService {
       .getMany();
   }
 
-  mine(empno) {
-    return true;
-  }
-
   async getFormno(dto: FormDto): Promise<string> {
     const form = await this.formmstService.getFormmst({
         NNO: dto.NFRMNO,
@@ -217,7 +213,7 @@ export class FormService {
     } catch (error) {
       //   await this.queryRunner.rollbackTransaction();
       if (localRunner) await localRunner.rollbackTransaction();
-      return { status: false, message: 'Error: ' + error.message };
+      return { status: false, message: error.message };
     } finally {
       //   await this.queryRunner.release();
       if (localRunner) await localRunner.release();

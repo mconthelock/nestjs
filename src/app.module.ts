@@ -19,6 +19,7 @@ import { ESCSModule } from './escs/escs.module';
 import { DetailModule } from './idtag/detail/detail.module';
 import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
 import { FilesModule } from './file/file.module'
+import { MailModule } from './mail/mail.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -44,6 +45,7 @@ import { FilesModule } from './file/file.module'
     PisModule,
     DetailModule,
     ItemarrnglstModule,
+    MailModule,
   ],
 })
 export class AppModule {}

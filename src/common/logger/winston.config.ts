@@ -55,10 +55,6 @@ const skipSelectQuery = winston.format((info) => {
   return info;
 });
 
-const showSelectQuery = winston.format((info) => {
-  return info;
-});
-
 const keyColors = {
   context: chalk.cyan,
   statusCode: chalk.magenta,
@@ -71,12 +67,12 @@ const keyColors = {
 };
 
 export const winstonConfig = {
-  //   format: winston.format.combine(
-  //     ignoreTypeOrmEntities(),
-  //     winston.format.timestamp(),
-  //     addRequestId(),
-  //     winston.format.json(),
-  //   ),
+  format: winston.format.combine(
+    ignoreTypeOrmEntities(),
+    winston.format.timestamp(),
+    addRequestId(),
+    winston.format.json(),
+  ),
   transports: [
     new winston.transports.Console({
       format: winston.format.combine(
@@ -124,6 +120,12 @@ export const winstonConfig = {
 };
 
 export const devLoggerConfig = {
+  format: winston.format.combine(
+    ignoreTypeOrmEntities(),
+    winston.format.timestamp(),
+    addRequestId(),
+    winston.format.json(),
+  ),
   transports: [
     new winston.transports.Console({
       level: 'debug',

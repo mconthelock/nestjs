@@ -244,6 +244,8 @@ export class FlowService {
     }
   }
 
+  //---------------------------- Show flow Start --------------------------------
+
   async showFlow(form: FormDto, host: string, queryRunner?: QueryRunner) {
     const flowData = await this.getFlowTree(form, queryRunner);
     const html = await this.generateHtml(flowData, form, host);
@@ -426,6 +428,8 @@ export class FlowService {
     return color;
   }
 
+  //---------------------------- Show flow End --------------------------------
+
   async getEmpFlowStepReady(form: empnoFormDto, queryRunner?: QueryRunner) {
     const repo = queryRunner
       ? queryRunner.manager.getRepository(Flow)
@@ -498,6 +502,7 @@ export class FlowService {
     return flow[0].CEXTDATA;
   }
 
+  //------------------------------ Do action Start ------------------------------
   async doAction(
     dto: doactionFlowDto,
     ip: string,
@@ -538,17 +543,6 @@ export class FlowService {
         CYEAR2: CYEAR2,
         NRUNNO: NRUNNO,
       };
-      //   const stepNext = await this.getStepNext(form, runner);
-      //   const flowTree = await this.getFlowTree(form, runner);
-      //   for (const step of flowTree) {
-      //     if (
-      //       step.CSTEPST == this.STEP_WAIT ||
-      //       step.CSTEPST == this.STEP_NORMAL
-      //     ) {
-      //       stepNext = step.CSTEPNO;
-      //       break;
-      //     }
-      //   }
       // CHECK USER INFO
       const userInfo = await this.usersService.findEmp(dto.EMPNO);
       if (!userInfo) {
@@ -560,32 +554,6 @@ export class FlowService {
         throw new Error('Ready step not found!');
       }
       const flow = checkStep[0];
-      //   // SET ACTION
-      //   switch (ACTION) {
-      //     case 'approve':
-      //       whatAction = this.APV_APPROVE;
-      //       stepAction = this.STEP_APPROVE;
-      //       break;
-      //     case 'reject':
-      //       whatAction = this.APV_REJECT;
-      //       stepAction = this.STEP_REJECT;
-      //       break;
-      //     case 'return':
-      //       whatAction = this.APV_NONE;
-      //       stepAction = this.STEP_READY;
-      //       break;
-      //     case 'returnp':
-      //       whatAction = this.APV_NONE;
-      //       stepAction = this.STEP_READY;
-      //       break;
-      //     case 'returnb':
-      //       whatAction = this.APV_NONE;
-      //       stepAction = this.STEP_READY;
-      //       break;
-      //     default:
-      //       throw new Error('Invalid action!');
-      //   }
-
       params = {
         ...form,
         DAPVDATE: now(),
@@ -612,47 +580,9 @@ export class FlowService {
           );
           const updateNextStep = checkNextStep.length == 0 ? true : false;
           if (updateNextStep) {
-            //FIND NEXT STEP
-            // flowTree = await this.getFlowTree(form, runner);
-            // for (const step of flowTree) {
-            //   if (
-            //     step.CSTEPST == this.STEP_WAIT ||
-            //     step.CSTEPST == this.STEP_NORMAL
-            //   ) {
-            //     stepNext = step.CSTEPNO;
-            //     break;
-            //   }
-            // }
             //UPDATE STEP NEXT STATUS
-            // sql =
-            //   'UPDATE FLOW SET CAPVSTNO = :apvNone, CSTEPST = :stepReady where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO  and CSTEPNO = :stepNext and CSTEPST in (:stepNormal, :stepWait)';
-            // params = {
-            //   ...form,
-            //   apvNone: this.APV_NONE,
-            //   stepReady: this.STEP_READY,
-            //   stepNext: stepNext,
-            //   stepNormal: this.STEP_NORMAL,
-            //   stepWait: this.STEP_WAIT,
-            // };
-            // await this.updateFlowbySql(sql, params, runner);
-            // //UPDATE NEXT NEXT STEP (WAIT)
-            // sql =
-            //   'update flow set CAPVSTNO = :apvNone , CSTEPST = :stepWait where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CSTEPNO in (select CSTEPNEXTNO from flow where NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno and CSTEPNO = :stepNext) and CSTEPST = :stepNormal and CAPVSTNO = :apvNone2';
-            // params = {
-            //   ...form,
-            //   apvNone: this.APV_NONE,
-            //   apvNone2: this.APV_NONE,
-            //   stepWait: this.STEP_WAIT,
-            //   frm: NFRMNO,
-            //   org: VORGNO,
-            //   y: CYEAR,
-            //   y2: CYEAR2,
-            //   runno: NRUNNO,
-            //   stepNext: stepNext,
-            //   stepNormal: this.STEP_NORMAL,
-            // };
-            // await this.updateFlowbySql(sql, params, runner);
             await this.updateStepNextStatus(form, runner);
+            //UPDATE NEXT NEXT STEP (WAIT)
             await this.updateNextStepWait(form, runner);
             // this.sendMailToApprover(form); // send email to approver
           }
@@ -682,49 +612,11 @@ export class FlowService {
           //Start updating flow status
           if (updateFlow) {
             //UPDATE SINGLE STEP
-            sql =
-              'update flow set CAPVSTNO = :apvReject, CSTEPST = :stepSkip where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CAPVSTNO = :apvNone and CSTEPST in (:stepNormal, :stepWait, :stepReady)';
-            params = {
-              ...form,
-              apvReject: this.APV_REJECT,
-              stepSkip: this.STEP_SKIP,
-              apvNone: this.APV_NONE,
-              stepNormal: this.STEP_NORMAL,
-              stepWait: this.STEP_WAIT,
-              stepReady: this.STEP_READY,
-            };
-            await this.updateFlowbySql(sql, params, runner);
+            await this.updateSingleStep(form, runner);
           } else {
             //UPDATE STEP NEXT STATUS
-            // sql =
-            //   'update flow set CAPVSTNO = :apvNone, CSTEPST = :stepReady where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO AND CSTEPNO = :stepNext AND CSTEPST in (:stepNormal, :stepWait) ';
-            // params = {
-            //   ...form,
-            //   apvNone: this.APV_NONE,
-            //   stepReady: this.STEP_READY,
-            //   stepNext: stepNext,
-            //   stepNormal: this.STEP_NORMAL,
-            //   stepWait: this.STEP_WAIT,
-            // };
-            // await this.updateFlowbySql(sql, params, runner);
-            //UPDATE NEXT NEXT STEP (WAIT)
-            // sql =
-            //   'update flow set CAPVSTNO = :apvNone, CSTEPST = :stepWait where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CSTEPNO in (select cStepNextNo from flow where NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno and CSTEPNO = :stepNext) and CSTEPST = :stepNormal and CAPVSTNO = :apvNone2';
-            // params = {
-            //   ...form,
-            //   apvNone: this.APV_NONE,
-            //   apvNone2: this.APV_NONE,
-            //   stepWait: this.STEP_WAIT,
-            //   frm: NFRMNO,
-            //   org: VORGNO,
-            //   y: CYEAR,
-            //   y2: CYEAR2,
-            //   runno: NRUNNO,
-            //   stepNext: stepNext,
-            //   stepNormal: this.STEP_NORMAL,
-            // };
-            // await this.updateFlowbySql(sql, params, runner);
             await this.updateStepNextStatus(form, runner);
+            //UPDATE NEXT NEXT STEP (WAIT)
             await this.updateNextStepWait(form, runner);
           }
           break;
@@ -768,7 +660,7 @@ export class FlowService {
           throw new Error('Invalid action!');
       }
 
-      await this.updateFlowStatus(form, runner);
+      await this.updateFromStatus(form, runner);
 
       if (localRunner) await localRunner.commitTransaction();
       return {
@@ -833,10 +725,6 @@ export class FlowService {
       };
     }
     const sql = `UPDATE FLOW SET CAPVSTNO = :whatAction, CSTEPST = :stepAction, DAPVDATE = TO_DATE(:DAPVDATE, 'YYYY-MM-DD'), CAPVTIME = :CAPVTIME, VREMARK = :VREMARK, VREMOTE = :VREMOTE, VREALAPV = :VREALAPV WHERE NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO AND CAPVSTNO = :CAPVSTNO ${apvClause}`;
-
-    console.log(sql);
-    console.log(params);
-    //   return;
     await this.updateFlowbySql(sql, params, runner);
   }
 
@@ -888,7 +776,7 @@ export class FlowService {
     return '';
   }
 
-  async updateFlowStatus(form: FormDto, queryRunner?: QueryRunner) {
+  async updateFromStatus(form: FormDto, queryRunner?: QueryRunner) {
     let flowStatus: string = '';
     //FIND UNFINISH STEP
     if (!(await this.checkUnfinishedFlow(form, queryRunner))) {
@@ -927,7 +815,7 @@ export class FlowService {
         }
       }
       // UPDATE FLOW STATUS
-      this.formService.updateForm({ ...form, CST: flowStatus }, queryRunner);
+      this.formService.updateForm({ condition: form, CST: flowStatus }, queryRunner);
     }
   }
 
@@ -943,6 +831,21 @@ export class FlowService {
       queryRunner,
     );
     return res.length > 0;
+  }
+
+  async updateSingleStep(form: FormDto, queryRunner?: QueryRunner) {
+    const sql =
+      'update flow set CAPVSTNO = :apvReject, CSTEPST = :stepSkip where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CAPVSTNO = :apvNone and CSTEPST in (:stepNormal, :stepWait, :stepReady)';
+    const params = {
+      ...form,
+      apvReject: this.APV_REJECT,
+      stepSkip: this.STEP_SKIP,
+      apvNone: this.APV_NONE,
+      stepNormal: this.STEP_NORMAL,
+      stepWait: this.STEP_WAIT,
+      stepReady: this.STEP_READY,
+    };
+    await this.updateFlowbySql(sql, params, queryRunner, 'Update Single Step');
   }
 
   async updateStepNextStatus(form: FormDto, queryRunner?: QueryRunner) {
@@ -1095,4 +998,6 @@ export class FlowService {
       'Update Step Request Next To Step Wait',
     );
   }
+
+  //------------------------------- Do action End ---------------------------------
 }

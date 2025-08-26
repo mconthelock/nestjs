@@ -13,7 +13,9 @@ import { doactionFlowDto } from './dto/doaction-flow.dto';
 
 import { RepService } from '../rep/rep.service';
 import { FormService } from '../form/form.service';
+import { FormmstService } from '../formmst/formmst.service';
 import { UsersService } from 'src/amec/users/users.service';
+import { MailService } from 'src/mail/mail.service';
 import { checkHostTest } from 'src/common/helpers/repo.helper';
 
 import {
@@ -36,6 +38,8 @@ export class FlowService {
     @Inject(forwardRef(() => FormService))
     private readonly formService: FormService,
     private readonly usersService: UsersService,
+    private readonly formmstService: FormmstService,
+    private readonly mailService: MailService,
   ) {}
 
   private readonly APV_TYPE_SINGLE = '1';
@@ -584,7 +588,7 @@ export class FlowService {
             await this.updateStepNextStatus(form, runner);
             //UPDATE NEXT NEXT STEP (WAIT)
             await this.updateNextStepWait(form, runner);
-            // this.sendMailToApprover(form); // send email to approver
+            await this.sendMailToApprover(form, runner); // send email to approver
           }
           break;
         case 'reject':
@@ -725,15 +729,15 @@ export class FlowService {
       };
     }
     const sql = `UPDATE FLOW SET CAPVSTNO = :whatAction, CSTEPST = :stepAction, DAPVDATE = TO_DATE(:DAPVDATE, 'YYYY-MM-DD'), CAPVTIME = :CAPVTIME, VREMARK = :VREMARK, VREMOTE = :VREMOTE, VREALAPV = :VREALAPV WHERE NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO AND CAPVSTNO = :CAPVSTNO ${apvClause}`;
-    await this.updateFlowbySql(sql, params, runner);
+    await this.execSql(sql, params, runner);
   }
 
-  async updateFlowbySql(
+  async execSql(
     sql: string,
     params: any,
     queryRunner?: QueryRunner,
     message?: string,
-  ): Promise<{ status: boolean; updated?: number; message: string }> {
+  ): Promise<{ status: boolean; result?: any; message: string }> {
     let localRunner: QueryRunner | undefined;
     let msg = message || 'Update Flow ';
     try {
@@ -748,6 +752,8 @@ export class FlowService {
 
       if (!res) {
         throw new Error('No rows updated');
+      } else {
+        return { status: true, result: res, message: msg + 'success' };
       }
     } catch (error) {
       //   if (localRunner) await localRunner.rollbackTransaction();
@@ -798,13 +804,16 @@ export class FlowService {
             flowStatus = this.FLOW_REJECT;
             break;
           } else {
-            const stepApv = await this.getFlow({
-              distinct: true,
-              fields: ['CSTEPNO'],
-              ...form,
-              CSTEPNO: step.CSTEPNO,
-              CAPVSTNO: this.APV_APPROVE,
-            });
+            const stepApv = await this.getFlow(
+              {
+                distinct: true,
+                fields: ['CSTEPNO'],
+                ...form,
+                CSTEPNO: step.CSTEPNO,
+                CAPVSTNO: this.APV_APPROVE,
+              },
+              queryRunner,
+            );
             if (stepApv.length > 0) {
               flowStatus = this.FLOW_REJECT;
               break;
@@ -815,7 +824,10 @@ export class FlowService {
         }
       }
       // UPDATE FLOW STATUS
-      this.formService.updateForm({ condition: form, CST: flowStatus }, queryRunner);
+      await this.formService.updateForm(
+        { condition: form, CST: flowStatus },
+        queryRunner,
+      );
     }
   }
 
@@ -845,7 +857,7 @@ export class FlowService {
       stepWait: this.STEP_WAIT,
       stepReady: this.STEP_READY,
     };
-    await this.updateFlowbySql(sql, params, queryRunner, 'Update Single Step');
+    return await this.execSql(sql, params, queryRunner, 'Update Single Step');
   }
 
   async updateStepNextStatus(form: FormDto, queryRunner?: QueryRunner) {
@@ -859,7 +871,7 @@ export class FlowService {
       stepNormal: this.STEP_NORMAL,
       stepWait: this.STEP_WAIT,
     };
-    return await this.updateFlowbySql(
+    return await this.execSql(
       sql,
       params,
       queryRunner,
@@ -883,7 +895,7 @@ export class FlowService {
       stepNormal: this.STEP_NORMAL,
       stepNext: await this.getStepNext(form, queryRunner),
     };
-    return await this.updateFlowbySql(
+    return await this.execSql(
       sql,
       params,
       queryRunner,
@@ -900,7 +912,7 @@ export class FlowService {
       apvNone: this.APV_NONE,
       stepWait: this.STEP_WAIT,
     };
-    return await this.updateFlowbySql(
+    return await this.execSql(
       sql,
       params,
       queryRunner,
@@ -917,7 +929,7 @@ export class FlowService {
       apvNone: this.APV_NONE,
       stepReady: this.STEP_READY,
     };
-    return await this.updateFlowbySql(
+    return await this.execSql(
       sql,
       params,
       queryRunner,
@@ -933,7 +945,7 @@ export class FlowService {
       stepReady: this.STEP_READY,
       apvNone: this.APV_NONE,
     };
-    return await this.updateFlowbySql(
+    return await this.execSql(
       sql,
       params,
       queryRunner,
@@ -953,8 +965,9 @@ export class FlowService {
       runno: form.NRUNNO,
       stepReady: this.STEP_READY,
       apvNone: this.APV_NONE,
+      stepWait: this.STEP_WAIT,
     };
-    return await this.updateFlowbySql(
+    return await this.execSql(
       sql,
       params,
       queryRunner,
@@ -970,7 +983,7 @@ export class FlowService {
       stepNormal: this.STEP_NORMAL,
       apvNone: this.APV_NONE,
     };
-    return await this.updateFlowbySql(
+    return await this.execSql(
       sql,
       params,
       queryRunner,
@@ -991,12 +1004,69 @@ export class FlowService {
       stepWait: this.STEP_WAIT,
       apvNone: this.APV_NONE,
     };
-    return await this.updateFlowbySql(
+    return await this.execSql(
       sql,
       params,
       queryRunner,
       'Update Step Request Next To Step Wait',
     );
+  }
+
+  async sendMailToApprover(form: FormDto, queryRunner?: QueryRunner) {
+    const res = await this.getNameReq(form, queryRunner);
+    if (res.result.length > 0) {
+      const req = res.result[0];
+      const frmmst = await this.formmstService.getFormmst(
+        { NNO: form.NFRMNO, VORGNO: form.VORGNO, CYEAR: form.CYEAR },
+        queryRunner,
+      );
+      const formNumber = await this.formService.getFormno(form, queryRunner);
+      const subject = `E-Form ${formNumber} from ${req.SNAME}`;
+      const listApv = await this.getEmailApvNext(form, queryRunner);
+      let html = `Please approve/reject ${frmmst[0].VNAME} From:${req.SNAME}<br/>`;
+      html += '1. Get into http://webflow/form<br/>';
+      html += "2. select 'Electronic forms'<br/>";
+      html += "3. select 'Waiting for approval'<br/>";
+      if (listApv.result.length > 0) {
+        for (const list of listApv.result) {
+          console.log(list.VEMAIL);
+
+          this.mailService.sendMail({
+            from: 'webflow_admin@MitsubishiElevatorAsia.co.th',
+            // to: list.VEMAIL,
+            to: process.env.MAIL_ADMIN,
+            subject,
+            html,
+          });
+        }
+      }
+    }
+  }
+
+  async getNameReq(form: FormDto, queryRunner?: QueryRunner) {
+    const sql =
+      'select a.SNAME as SNAME , a.SRECMAIL as SRECMAIL from form f , aemployee a where a.SEMPNO = f.VREQNO and NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO';
+    return await this.execSql(sql, form, queryRunner);
+  }
+
+  async getEmailApvNext(form: FormDto, queryRunner?: QueryRunner) {
+    const sql = `select distinct VEMAIL from emailAck where NFRMNO = :NFRMNO and VORGNO = :VORGNO and CYEAR = :CYEAR and VEMPNO in (select VAPVNO as APPROVER from flow where NFRMNO = :frmno and VORGNO = :orgno and CYEAR = :y and CYEAR2 = :y2 and NRUNNO = :runno and CSTEPST = '3' union select VREPNO from flow where NFRMNO = :frmno2 and VORGNO = :orgno2 and CYEAR = :cy and CYEAR2 = :cy2 and NRUNNO = :runno2 and CSTEPST = '3') and CSTNO = '1'`;
+    const params = {
+      NFRMNO: form.NFRMNO,
+      VORGNO: form.VORGNO,
+      CYEAR: form.CYEAR,
+      frmno: form.NFRMNO,
+      orgno: form.VORGNO,
+      y: form.CYEAR,
+      y2: form.CYEAR2,
+      runno: form.NRUNNO,
+      frmno2: form.NFRMNO,
+      orgno2: form.VORGNO,
+      cy: form.CYEAR,
+      cy2: form.CYEAR2,
+      runno2: form.NRUNNO,
+    };
+    return await this.execSql(sql, params, queryRunner);
   }
 
   //------------------------------- Do action End ---------------------------------

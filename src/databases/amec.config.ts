@@ -25,6 +25,8 @@ if (process.env.HOST == 'AMEC') {
         poolMin: 5,
         queueTimeout: 60000,
         queueMax: 1000,
+        poolPingInterval: 60, // ping ทุก 60s กัน idle
+        stmtCacheSize: 50,
       },
     }),
   };
@@ -49,4 +51,3 @@ if (process.env.HOST == 'AMEC') {
   };
 }
 export default amecConfig;
-

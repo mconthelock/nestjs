@@ -40,6 +40,6 @@ export class FormmstController {
     summary: 'getFormmst',
   })
   async getFormmst(@Body() searchDto: SearchFormmstDto) {
-    return this.formmstService.getFormmst(searchDto);
+    return await this.formmstService.getFormmst(searchDto);
   }
 }

@@ -6,12 +6,16 @@ import { Flow } from './entities/flow.entity';
 import { RepModule } from '../rep/rep.module';
 import { FormModule } from '../form/form.module';
 import { UsersModule } from 'src/amec/users/users.module';
+import { FormmstModule } from '../formmst/formmst.module';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Flow], 'amecConnection'),
     RepModule,
+    MailModule,
     forwardRef(() => FormModule),
+    FormmstModule,
     UsersModule
   ],
   controllers: [FlowController],

@@ -94,12 +94,12 @@ export class FormService {
       .getMany();
   }
 
-  async getFormno(dto: FormDto): Promise<string> {
+  async getFormno(dto: FormDto, queryRunner?: QueryRunner): Promise<string> {
     const form = await this.formmstService.getFormmst({
         NNO: dto.NFRMNO,
         VORGNO: dto.VORGNO,
         CYEAR: dto.CYEAR
-    });
+    }, queryRunner);
     console.log(form);
     // เอาเลขปี 2 หลักสุดท้าย
     const year2 = dto.CYEAR2.substring(2, 4); // ถ้า "2024" ได้ "24"

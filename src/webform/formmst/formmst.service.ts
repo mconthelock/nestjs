@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Formmst } from './entities/formmst.entity';
 import { SearchFormmstDto } from './dto/searchFormmst.dto';
@@ -29,9 +29,10 @@ export class FormmstService {
     });
   }
 
-  getFormmst(searchDto: SearchFormmstDto) {
+  async getFormmst(searchDto: SearchFormmstDto, queryRunner?: QueryRunner) {
+    const repo = queryRunner ? queryRunner.manager.getRepository(Formmst) : this.formmstRepo;
     const { NNO, VORGNO, CYEAR, VANAME, fields = [] } = searchDto;
-    const query = this.formmstRepo.createQueryBuilder('A');
+    const query = repo.createQueryBuilder('A');
 
     if (NNO) query.andWhere('A.NNO = :NNO', { NNO });
     if (VORGNO) query.andWhere('A.VORGNO = :VORGNO', { VORGNO });

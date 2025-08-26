@@ -5,7 +5,7 @@ import { Item } from './entities/item.entity';
 import { SearchEscsItemDto } from './dto/search-escs-item.dto';
 
 @Injectable()
-export class ItemService {
+export class ESCSItemService {
   constructor(
     @InjectRepository(Item, 'amecConnection')
     private itemRepo: Repository<Item>,

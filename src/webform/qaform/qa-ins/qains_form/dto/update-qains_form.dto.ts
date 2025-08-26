@@ -1,4 +1,18 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateQainsFormDto } from './create-qains_form.dto';
 
-export class UpdateQainsFormDto extends PartialType(CreateQainsFormDto) {}
+import { CreateQainsFormDto } from './create-qains_form.dto';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { PickType, PartialType, IntersectionType } from '@nestjs/swagger';
+import { FormDto } from 'src/webform/form/dto/form.dto';
+
+export class UpdateQainsFormDto extends IntersectionType(
+    PartialType(CreateQainsFormDto),
+    PickType(FormDto, ['CYEAR2', 'NRUNNO'] as const)
+) {
+  @IsOptional()
+  @IsString()
+  QA_TRAINING_DATE?: string;
+
+  @IsOptional()
+  @IsString()
+  QA_OJT_DATE?: string;
+}

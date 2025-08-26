@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { CreateOrgTreeDto } from './dto/create-org-tree.dto';
 import { UpdateOrgTreeDto } from './dto/update-org-tree.dto';
@@ -30,7 +30,10 @@ export class OrgTreeService {
     return `This action removes a #${id} orgTree`;
   }
 
-  async getOrgTree(orgno: string, vposno: string, empno: string, emppos: string) {
+  async getOrgTree(orgno: string, vposno: string, empno: string, emppos: string, queryRunner?: QueryRunner) {
+    const repo = queryRunner
+      ? queryRunner.manager
+      : this.dataSource;
     const sql = `
         SELECT *
         FROM ORGPOS
@@ -51,7 +54,7 @@ export class OrgTreeService {
             AND PRIOR sPosCode1 = sPosCode
         )
     `;
-    const res = await this.dataSource.query(sql, [orgno, vposno, empno, emppos]);
+    const res = await repo.query(sql, [orgno, vposno, empno, emppos]);
     return res;
   }
 }

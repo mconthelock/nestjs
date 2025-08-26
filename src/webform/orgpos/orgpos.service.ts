@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { CreateOrgpoDto } from './dto/create-orgpo.dto';
 import { UpdateOrgpoDto } from './dto/update-orgpo.dto';
@@ -34,8 +34,9 @@ export class OrgposService {
     return `This action removes a #${id} orgpo`;
   }
 
-  async getOrgPos(dto: SearchOrgpoDto) {
-    return this.orgpos.find({
+  async getOrgPos(dto: SearchOrgpoDto, queryRunner?: QueryRunner) {
+    const repo = queryRunner ? queryRunner.manager.getRepository(Orgpos) : this.orgpos;
+    return repo.find({
       where: dto,
       order: {
         VEMPNO: 'ASC',

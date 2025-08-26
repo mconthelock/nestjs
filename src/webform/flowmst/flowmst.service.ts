@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Flowmst } from './entities/flowmst.entity';
 
@@ -17,8 +17,12 @@ export class FlowmstService {
   async getFlowMaster(
     NFRMNO: number,
     VORGNO: string,
-    CYEAR: string
+    CYEAR: string,
+    queryRunner?: QueryRunner,
   ) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(Flowmst)
+      : this.flowmstRepo;
     const sql = `
         SELECT TO_CHAR(NFRMNO) AS NFRMNO, A.*
         FROM FLOWMST A
@@ -31,7 +35,7 @@ export class FlowmstService {
             AND cYear = :6
             AND cStepNo = PRIOR cStepNextNo
         `;
-    return await this.flowmstRepo.query(
+    return await repo.query(
       sql,
       [NFRMNO, VORGNO, CYEAR, NFRMNO, VORGNO, CYEAR]
     );

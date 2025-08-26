@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { OrdersService } from './orders.service';
+import { ESCSOrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { SearchOrderDto } from './dto/search-orders.dto';
 
 @Controller('escs/orders')
-export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+export class ESCSOrdersController {
+  constructor(private readonly ordersService: ESCSOrdersService) {}
 
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {

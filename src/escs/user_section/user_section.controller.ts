@@ -7,14 +7,14 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { UserSectionService } from './user_section.service';
+import { ESCSUserSectionService } from './user_section.service';
 import { SearchEscsUserSectionDto } from './dto/search-escs-usersection.dto';
 import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 
 @ApiTags('ESCS User Section')
 @Controller('escs/userSection')
-export class UserSectionController {
-  constructor(private readonly userSectionService: UserSectionService) {}
+export class ESCSUserSectionController {
+  constructor(private readonly userSectionService: ESCSUserSectionService) {}
 
   @Get()
   @ApiOperation({

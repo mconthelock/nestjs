@@ -1,4 +1,9 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  forwardRef,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner, In } from 'typeorm';
 
@@ -98,8 +103,7 @@ export class FlowService {
     } catch (error) {
       console.error('Error inserting flow:', error);
       if (localRunner) await localRunner.rollbackTransaction();
-      throw error;
-      //   return false;
+      throw new InternalServerErrorException('Insert flow Error: ' + error.message);
     } finally {
       if (localRunner) await localRunner.release();
     }
@@ -178,8 +182,7 @@ export class FlowService {
     } catch (error) {
       console.error('Error update flow:', error);
       if (localRunner) await localRunner.rollbackTransaction();
-      throw error;
-      //   return false;
+      throw new InternalServerErrorException('Update flow Error: ' + error.message);
     } finally {
       if (localRunner) await localRunner.release();
     }
@@ -213,8 +216,7 @@ export class FlowService {
     } catch (error) {
       console.error('Error re-aligning flow:', error);
       if (localRunner) await localRunner.rollbackTransaction();
-      throw error;
-      //   return false;
+      throw new InternalServerErrorException('Re-align flow Error: ' + error.message);
     } finally {
       if (localRunner) await localRunner.release();
     }
@@ -241,7 +243,9 @@ export class FlowService {
     } catch (error) {
       console.error('Error deleting flow:', error);
       if (localRunner) await localRunner.rollbackTransaction();
-      throw error;
+      throw new InternalServerErrorException(
+        'Delete flow Error: ' + error.message,
+      );
       //   return false;
     } finally {
       if (localRunner) await localRunner.release();
@@ -550,12 +554,12 @@ export class FlowService {
       // CHECK USER INFO
       const userInfo = await this.usersService.findEmp(dto.EMPNO);
       if (!userInfo) {
-        throw new Error('User not found');
+        throw new InternalServerErrorException('User not found');
       }
       // CHECK STEP STATUS
       const checkStep = await this.getEmpFlowStepReady(dto, runner);
       if (checkStep.length === 0) {
-        throw new Error('Ready step not found!');
+        throw new InternalServerErrorException('Ready step not found!');
       }
       const flow = checkStep[0];
       params = {
@@ -661,7 +665,7 @@ export class FlowService {
           await this.updateStepReqToReadyB(form, runner);
           break;
         default:
-          throw new Error('Invalid action!');
+          throw new InternalServerErrorException('Invalid action!');
       }
 
       await this.updateFromStatus(form, runner);
@@ -674,13 +678,10 @@ export class FlowService {
     } catch (error) {
       if (localRunner) {
         await localRunner.rollbackTransaction();
-        return {
-          status: false,
-          message: 'Do action Error: ' + error.message,
-        };
-      } else {
-        throw new Error('Do action Error: ' + error.message);
       }
+      throw new InternalServerErrorException(
+        'Do action Error: ' + error.message,
+      );
     } finally {
       if (localRunner) await localRunner.release();
     }
@@ -751,22 +752,15 @@ export class FlowService {
       if (localRunner) await localRunner.commitTransaction();
 
       if (!res) {
-        throw new Error('No rows updated');
+        throw new InternalServerErrorException('No rows updated');
       } else {
         return { status: true, result: res, message: msg + 'success' };
       }
     } catch (error) {
-      //   if (localRunner) await localRunner.rollbackTransaction();
-      //   throw error;
       if (localRunner) {
         await localRunner.rollbackTransaction();
-        return {
-          status: false,
-          message: msg + error.message,
-        };
-      } else {
-        throw new Error(msg + error.message);
       }
+      throw new InternalServerErrorException(msg + error.message);
     } finally {
       if (localRunner) await localRunner.release();
     }
@@ -1064,7 +1058,7 @@ export class FlowService {
       orgno2: form.VORGNO,
       cy: form.CYEAR,
       cy2: form.CYEAR2,
-      runno2: form.NRUNNO,
+        runno2: form.NRUNNO,
     };
     return await this.execSql(sql, params, queryRunner);
   }

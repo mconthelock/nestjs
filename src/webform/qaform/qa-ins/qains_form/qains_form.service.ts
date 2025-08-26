@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { CreateQainsFormDto } from './dto/create-qains_form.dto';
@@ -8,8 +8,12 @@ import { FormService } from 'src/webform/form/form.service';
 import { QainsOAService } from '../qains_operator_auditor/qains_operator_auditor.service';
 import { QaFileService } from '../../qa_file/qa_file.service';
 import { FlowService } from 'src/webform/flow/flow.service';
+import { UsersService } from 'src/amec/users/users.service';
+import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
 import { SearchQainsFormDto } from './dto/search-qains_form.dto';
-import { QainsFormDto } from './dto/qains_form.dto';
+import { FormDto } from 'src/webform/form/dto/form.dto';
+import { QcConfQainsFormDto } from './dto/qcConfirm-qains_form.dto';
+import { UpdateQainsFormDto } from './dto/update-qains_form.dto';
 
 @Injectable()
 export class QainsFormService {
@@ -23,6 +27,8 @@ export class QainsFormService {
     private readonly flowService: FlowService,
     private readonly QainsOAService: QainsOAService,
     private readonly QaFileService: QaFileService,
+    private readonly sequenceOrgService: SequenceOrgService,
+    private readonly usersService: UsersService,
   ) {}
 
   async createQainsForm(
@@ -51,7 +57,7 @@ export class QainsFormService {
       );
 
       if (!createForm.status) {
-        throw new Error(createForm.message);
+        throw new InternalServerErrorException(createForm.message);
       }
 
       const form = {
@@ -151,7 +157,7 @@ export class QainsFormService {
     }
   }
 
-  async getFormData(dto: QainsFormDto, queryRunner?: QueryRunner) {
+  async getFormData(dto: FormDto, queryRunner?: QueryRunner) {
     const repo = queryRunner
       ? queryRunner.manager.getRepository(QainsForm)
       : this.qaformRepo;
@@ -164,7 +170,15 @@ export class QainsFormService {
         CYEAR2: dto.CYEAR2,
         NRUNNO: dto.NRUNNO,
       },
-      relations: ['QA_AUD_OPT', 'QA_AUD_OPT.TYPE', 'QA_AUD_OPT.QOA_EMPNO_INFO', 'QA_FILES', 'QA_FILES.TYPE', 'QA_INCHARGE_INFO', 'QA_INCHARGE_SECTION_INFO'],
+      relations: [
+        'QA_AUD_OPT',
+        'QA_AUD_OPT.TYPE',
+        'QA_AUD_OPT.QOA_EMPNO_INFO',
+        'QA_FILES',
+        'QA_FILES.TYPE',
+        'QA_INCHARGE_INFO',
+        'QA_INCHARGE_SECTION_INFO',
+      ],
       order: {
         QA_AUD_OPT: { QOA_SEQ: 'ASC' }, // แทน ORDER BY ใน subquery เดิม
         QA_FILES: { FILE_ID: 'ASC' },
@@ -172,7 +186,7 @@ export class QainsFormService {
     });
   }
 
-   async search(dto: SearchQainsFormDto, queryRunner?: QueryRunner) {
+  async search(dto: SearchQainsFormDto, queryRunner?: QueryRunner) {
     const repo = queryRunner
       ? queryRunner.manager.getRepository(QainsForm)
       : this.qaformRepo;
@@ -188,11 +202,119 @@ export class QainsFormService {
         QA_INCHARGE_SECTION: dto.QA_INCHARGE_SECTION,
         QA_INCHARGE_EMPNO: dto.QA_INCHARGE_EMPNO,
       },
-      relations: ['QA_AUD_OPT', 'QA_AUD_OPT.TYPE', 'QA_AUD_OPT.QOA_EMPNO_INFO', 'QA_FILES', 'QA_FILES.TYPE', 'QA_INCHARGE_INFO', 'QA_INCHARGE_SECTION_INFO'],
+      relations: [
+        'QA_AUD_OPT',
+        'QA_AUD_OPT.TYPE',
+        'QA_AUD_OPT.QOA_EMPNO_INFO',
+        'QA_FILES',
+        'QA_FILES.TYPE',
+        'QA_INCHARGE_INFO',
+        'QA_INCHARGE_SECTION_INFO',
+      ],
       order: {
         QA_AUD_OPT: { QOA_SEQ: 'ASC' }, // แทน ORDER BY ใน subquery เดิม
         QA_FILES: { FILE_ID: 'ASC' },
       },
     });
+  }
+
+  async update(dto: UpdateQainsFormDto, queryRunner?: QueryRunner) {
+    let localRunner: QueryRunner | undefined;
+    try {
+      if (!queryRunner) {
+        localRunner = this.dataSource.createQueryRunner();
+        await localRunner.connect();
+        await localRunner.startTransaction();
+      }
+      const runner = queryRunner || localRunner!;
+      const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, ...data } = dto;
+      const condition = { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO };
+
+      const res = await runner.manager
+        .getRepository(QainsForm)
+        .update(condition, data);
+
+      if (localRunner) await localRunner.commitTransaction();
+      if (!res) {
+        throw new InternalServerErrorException('No rows updated');
+      } else {
+        return { status: true, result: res, message: 'success' };
+      }
+    } catch (error) {
+      if (localRunner) {
+        await localRunner.rollbackTransaction();
+        return {
+          status: false,
+          message: error.message,
+        };
+      } else {
+        throw new InternalServerErrorException(error.message);
+      }
+    } finally {
+      if (localRunner) await localRunner.release();
+    }
+  }
+
+  async qcConfirm(dto: QcConfQainsFormDto, ip: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      const form: FormDto = {
+        NFRMNO: dto.NFRMNO,
+        VORGNO: dto.VORGNO,
+        CYEAR: dto.CYEAR,
+        CYEAR2: dto.CYEAR2,
+        NRUNNO: dto.NRUNNO,
+      };
+      // update flow qc foreman
+      const condForeman = {
+        condition: {
+          ...form,
+          CEXTDATA: '03',
+        },
+        VAPVNO: dto.QCFOREMAN,
+        VREPNO: dto.QCFOREMAN,
+      };
+      this.flowService.updateFlow(condForeman, queryRunner);
+
+      // update flow qc sem
+      const foreman = await this.usersService.findEmp(dto.QCFOREMAN, queryRunner);
+      const qcsem = await this.sequenceOrgService.search({SPOSCODE: '30', VORGNO:foreman.SSECCODE}, queryRunner);
+      if(qcsem.length > 0){
+        const condSem = {
+          condition: {
+            ...form,
+            CEXTDATA: '04',
+          },
+          VAPVNO: qcsem[0].EMPNO,
+          VREPNO: qcsem[0].EMPNO,
+        };
+        this.flowService.updateFlow(condSem, queryRunner);
+      }
+      // update ojt date and training date
+      await this.update({...form, QA_TRAINING_DATE: dto.TRAINING_DATE, QA_OJT_DATE: dto.OJTDATE}, queryRunner);
+
+      // insert auditor
+      for (const e of dto.AUDITOR) {
+        await this.QainsOAService.createQainsOA(
+          { ...form, QOA_TYPECODE: 'ESA', QOA_EMPNO: e },
+          queryRunner,
+        );
+      }
+      // do action
+      await this.flowService.doAction({ ...form, REMARK: dto.REMARK, ACTION: dto.ACTION, EMPNO: dto.EMPNO}, ip, queryRunner);
+      await queryRunner.commitTransaction();
+      return {
+        status: true,
+        message: 'Action successful',
+        data: dto,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException(error.message);
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

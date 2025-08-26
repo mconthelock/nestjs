@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { Form } from './entities/form.entity';
@@ -60,9 +60,9 @@ export class FormService {
     private readonly sequenceOrgService: SequenceOrgService,
   ) {}
 
-  private readonly mode_add = "1";
-  private readonly mode_edit = "2";
-  private readonly mode_view = "3";
+  private readonly mode_add = '1';
+  private readonly mode_edit = '2';
+  private readonly mode_view = '3';
 
   findOne(fno, orgno, cyear, cyear2, nrunno) {
     return this.form.find({
@@ -95,11 +95,14 @@ export class FormService {
   }
 
   async getFormno(dto: FormDto, queryRunner?: QueryRunner): Promise<string> {
-    const form = await this.formmstService.getFormmst({
+    const form = await this.formmstService.getFormmst(
+      {
         NNO: dto.NFRMNO,
         VORGNO: dto.VORGNO,
-        CYEAR: dto.CYEAR
-    }, queryRunner);
+        CYEAR: dto.CYEAR,
+      },
+      queryRunner,
+    );
     console.log(form);
     // เอาเลขปี 2 หลักสุดท้าย
     const year2 = dto.CYEAR2.substring(2, 4); // ถ้า "2024" ได้ "24"
@@ -132,8 +135,8 @@ export class FormService {
       };
 
       this.setQuery(context);
-      await this.setFormNo(context);
-      const formData = await this.setFormValue(context);
+      await this.setFormNo(context, runner);
+      const formData = await this.setFormValue(context, runner);
       //   console.log('formData : ', formData);
 
       if (await this.insertForm(formData, runner)) {
@@ -143,9 +146,10 @@ export class FormService {
           context.nfrmno,
           context.vorgno,
           context.cyear,
+          runner,
         );
         console.log('flowMaster : ', flowMaster);
-        await this.setOrganize(context);
+        await this.setOrganize(context, runner);
         //   flowMaster.forEach(async (row: any) => {
         for (const row of flowMaster) {
           //   console.log('row : ', row.VPOSNO);
@@ -208,12 +212,12 @@ export class FormService {
         // await this.queryRunner.commitTransaction();
         // console.log('Failed to insert form');
         // return { status: false, message: `Can't insert this form` };
-        throw new Error('Failed to insert form'); // Throw an error to trigger rollback
+        throw new InternalServerErrorException('Failed to insert form'); // Throw an error to trigger rollback
       }
     } catch (error) {
       //   await this.queryRunner.rollbackTransaction();
       if (localRunner) await localRunner.rollbackTransaction();
-      return { status: false, message: error.message };
+      throw new InternalServerErrorException(error.message);
     } finally {
       //   await this.queryRunner.release();
       if (localRunner) await localRunner.release();
@@ -232,10 +236,10 @@ export class FormService {
     };
   }
 
-  async setFormNo(context: FormContext) {
+  async setFormNo(context: FormContext, queryRunner?: QueryRunner) {
     console.log('set form no');
 
-    const form = await this.getFormNextRunNo(context);
+    const form = await this.getFormNextRunNo(context, queryRunner);
     if (form.length > 0) {
       context.nrunno = form[0].NRUNNO + 1;
     } else {
@@ -244,8 +248,9 @@ export class FormService {
     console.log('nrunno : ', context.nrunno);
   }
 
-  getFormNextRunNo(context: FormContext) {
-    return this.form.find({
+  getFormNextRunNo(context: FormContext, queryRunner?: QueryRunner) {
+    const repo = queryRunner ? queryRunner.manager.getRepository(Form) : this.form;
+    return repo.find({
       where: context.query,
       order: {
         NRUNNO: 'DESC',
@@ -254,7 +259,7 @@ export class FormService {
     });
   }
 
-  async setFormValue(context: FormContext) {
+  async setFormValue(context: FormContext, queryRunner: QueryRunner) {
     console.log('set form value');
 
     const condition = {
@@ -262,7 +267,10 @@ export class FormService {
       VORGNO: context.vorgno,
       CYEAR: context.cyear,
     };
-    const formmst = await this.formmstService.getFormmst(condition);
+    const formmst = await this.formmstService.getFormmst(
+      condition,
+      queryRunner,
+    );
     // console.log('formmst : ', formmst);
 
     const today = new Date();
@@ -300,8 +308,8 @@ export class FormService {
     }
   }
 
-  async setOrganize(context: FormContext) {
-    const user = await this.usersService.findEmp(context.empno);
+  async setOrganize(context: FormContext, queryRunner: QueryRunner) {
+    const user = await this.usersService.findEmp(context.empno, queryRunner);
     // console.log('user : ', user);
 
     context.emppos = user.SPOSCODE;
@@ -324,6 +332,7 @@ export class FormService {
       data.VPOSNO,
       context.empno,
       context.emppos,
+      queryRunner,
     );
     context.flag = 1;
     if (val.length > 0) {
@@ -346,10 +355,13 @@ export class FormService {
   }
 
   async addFlow2(data: any, context: FormContext, queryRunner: QueryRunner) {
-    const val = await this.orgPosService.getOrgPos({
-      VPOSNO: data.VPOSNO,
-      VORGNO: data.VAPVORGNO,
-    });
+    const val = await this.orgPosService.getOrgPos(
+      {
+        VPOSNO: data.VPOSNO,
+        VORGNO: data.VAPVORGNO,
+      },
+      queryRunner,
+    );
     // console.log('add flow2 val : ', val);
     if (val.length > 0) {
       for (const row of val) {
@@ -452,7 +464,10 @@ export class FormService {
   }
 
   async managerStep(context: FormContext, queryRunner: QueryRunner) {
-    const manager = await this.sequenceOrgService.getManager(context.empno);
+    const manager = await this.sequenceOrgService.getManager(
+      context.empno,
+      queryRunner,
+    );
     const query = {
       NFRMNO: context.nfrmno,
       VORGNO: context.vorgno,
@@ -468,7 +483,7 @@ export class FormService {
       VORGNO: context.vorgno,
       CYEAR: context.cyear,
     };
-    const url = await this.formmstService.getFormmst(query2);
+    const url = await this.formmstService.getFormmst(query2, queryRunner);
     if (manager.length > 0) {
       await this.getRepresent(manager[0].HEADNO, context, queryRunner);
       //   const repManager = await this.getRepresent(manager[0].HEADNO);
@@ -729,8 +744,14 @@ export class FormService {
     return link;
   }
 
-  async getMode(form: empnoFormDto){
-    const frm = await this.findOne(form.NFRMNO, form.VORGNO, form.CYEAR, form.CYEAR2, form.NRUNNO);
+  async getMode(form: empnoFormDto) {
+    const frm = await this.findOne(
+      form.NFRMNO,
+      form.VORGNO,
+      form.CYEAR,
+      form.CYEAR2,
+      form.NRUNNO,
+    );
     if (frm.length == 0) {
       return this.mode_add;
     }

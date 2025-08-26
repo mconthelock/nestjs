@@ -8,7 +8,7 @@ import { Orders } from './entities/order.entity';
 import { logQuery } from 'src/common/utils/debug.utils';
 
 @Injectable()
-export class OrdersService {
+export class ESCSOrdersService {
   constructor(
     @InjectRepository(Orders, 'amecConnection')
     private ordersRepo: Repository<Orders>,

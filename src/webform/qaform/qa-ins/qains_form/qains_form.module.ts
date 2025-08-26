@@ -10,6 +10,8 @@ import { QainsOAModule } from '../qains_operator_auditor/qains_operator_auditor.
 import { QaFileModule } from '../../qa_file/qa_file.module';
 
 import { FlowModule } from 'src/webform/flow/flow.module';
+import { SequenceOrgModule } from 'src/webform/sequence-org/sequence-org.module';
+import { UsersModule } from 'src/amec/users/users.module';
 
 @Module({
   imports: [
@@ -17,7 +19,9 @@ import { FlowModule } from 'src/webform/flow/flow.module';
     FormModule,
     FlowModule,
     QainsOAModule,
-    QaFileModule
+    QaFileModule,
+    SequenceOrgModule,
+    UsersModule
   ],
   controllers: [QainsFormController],
   providers: [QainsFormService],

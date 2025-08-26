@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { UserSectionService } from './user_section.service';
-import { UserSectionController } from './user_section.controller';
+import { ESCSUserSectionService } from './user_section.service';
+import { ESCSUserSectionController } from './user_section.controller';
 import { UserSection } from './entities/user_section.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UserSection], 'amecConnection')],
-  controllers: [UserSectionController],
-  providers: [UserSectionService],
+  controllers: [ESCSUserSectionController],
+  providers: [ESCSUserSectionService],
 })
-export class UserSectionModule {}
+export class ESCSUserSectionModule {}

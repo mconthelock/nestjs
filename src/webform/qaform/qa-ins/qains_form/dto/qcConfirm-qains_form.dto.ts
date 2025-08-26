@@ -8,39 +8,33 @@ import {
   IsDateString,
   IsNotEmpty,
 } from 'class-validator';
-import { FormDto } from 'src/webform/form/dto/form.dto';
-export class CreateQainsFormDto extends PickType(FormDto, [
+import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+    
+export class QcConfQainsFormDto extends PickType(doactionFlowDto, [
   'NFRMNO',
   'VORGNO',
   'CYEAR',
+  'CYEAR2',
+  'NRUNNO',
+  'REMARK',
+  'ACTION',
+  'EMPNO'
 ] as const) {
-  @IsNotEmpty()
-  @IsString()
-  REQUESTER: string;
 
   @IsNotEmpty()
   @IsString()
-  CREATEBY: string;
-
-  @IsOptional()
-  @IsString()
-  REMARK?: string;
+  TRAINING_DATE: string;
 
   @IsNotEmpty()
   @IsString()
-  QA_ITEM: string;
-
-  @IsNotEmpty()
-  @Type(() => Number)
-  @IsNumber()
-  QA_INCHARGE_SECTION: number;
-
+  OJTDATE: string;
+  
   @IsNotEmpty()
   @IsString()
-  QA_INCHARGE_EMPNO: string;
+  QCFOREMAN: string;
 
   @IsNotEmpty()
   @IsArray()
   @IsString({ each: true })
-  OPERATOR: string[];
+  AUDITOR: string[];
 }

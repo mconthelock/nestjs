@@ -10,6 +10,7 @@ import {
 import { SequenceOrgService } from './sequence-org.service';
 import { CreateSequenceOrgDto } from './dto/create-sequence-org.dto';
 import { UpdateSequenceOrgDto } from './dto/update-sequence-org.dto';
+import { SearchSequenceOrgDto } from './dto/search-sequence-org.dto';
 
 @Controller('sequence-org')
 export class SequenceOrgController {
@@ -29,4 +30,10 @@ export class SequenceOrgController {
   findSubordinates(@Param('empno') empno: string) {
     return this.sequenceOrgService.getSubordinates(empno);
   }
+
+  @Post('search')
+  search(@Body() searchDto: SearchSequenceOrgDto) {
+    return this.sequenceOrgService.search(searchDto);
+  }
+
 }

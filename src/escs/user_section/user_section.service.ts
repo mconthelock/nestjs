@@ -5,7 +5,7 @@ import { UserSection } from './entities/user_section.entity';
 import { SearchEscsUserSectionDto } from './dto/search-escs-usersection.dto';
 
 @Injectable()
-export class UserSectionService {
+export class ESCSUserSectionService {
   constructor(
     @InjectRepository(UserSection, 'amecConnection')
     private userSectionRepo: Repository<UserSection>,

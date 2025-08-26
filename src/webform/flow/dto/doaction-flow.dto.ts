@@ -7,7 +7,7 @@ export class doactionFlowDto extends PickType(FormDto, [
 ] as const) {
   @IsNotEmpty()
   @IsString()
-  ACTION?: string;
+  ACTION: string;
 
   @IsNotEmpty()
   @IsString()

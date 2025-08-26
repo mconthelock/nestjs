@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 
 import { User } from './entities/user.entity';
 
@@ -11,8 +11,11 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  findEmp(empno: string) {
-    return this.userRepository.findOne({
+  findEmp(empno: string, queryRunner?: QueryRunner) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(User)
+      : this.userRepository;
+    return repo.findOne({
       where: { SEMPNO: empno },
     });
   }

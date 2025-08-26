@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { CreateSequenceOrgDto } from './dto/create-sequence-org.dto';
 import { UpdateSequenceOrgDto } from './dto/update-sequence-org.dto';
 import { SequenceOrg } from './entities/sequence-org.entity';
+import { SearchSequenceOrgDto } from './dto/search-sequence-org.dto';
 
 @Injectable()
 export class SequenceOrgService {
@@ -19,8 +20,11 @@ export class SequenceOrgService {
     return this.seqRepo.find();
   }
 
-  async getManager(empno: string) {
-    return this.seqRepo
+  async getManager(empno: string, queryRunner?: QueryRunner) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(SequenceOrg)
+      : this.seqRepo;
+    return repo
       .createQueryBuilder('seq')
       .select('seq.HEADNO', 'HEADNO')
       .where('seq.EMPNO = :empno', { empno })
@@ -43,5 +47,12 @@ export class SequenceOrgService {
             WHERE B.SEMPNO != :2  AND B.CSTATUS = 1
         `;
     return await this.dataSource.query(sql, [empno, empno]);
+  }
+
+  async search(dto: SearchSequenceOrgDto, queryRunner?: QueryRunner): Promise<SequenceOrg[]> {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(SequenceOrg)
+      : this.seqRepo;
+    return await repo.find({ where: dto });
   }
 }

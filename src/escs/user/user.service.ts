@@ -6,7 +6,7 @@ import { SearchEscsUserDto } from './dto/search-escs-user.dto';
 import { getSelectNestedFields, getSafeFields } from '../../common/utils/Fields.utils';
 
 @Injectable()
-export class UserService {
+export class ESCSUserService {
   constructor(
     @InjectRepository(EscsUser, 'amecConnection')
     private userRepo: Repository<EscsUser>,

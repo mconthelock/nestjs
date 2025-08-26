@@ -7,14 +7,14 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { ItemService } from './item.service';
+import { ESCSItemService } from './item.service';
 import { SearchEscsItemDto } from './dto/search-escs-item.dto';
 import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 
 @ApiTags('ESCS Item')
 @Controller('escs/item')
-export class ItemController {
-  constructor(private readonly itemService: ItemService) {}
+export class ESCSItemController {
+  constructor(private readonly itemService: ESCSItemService) {}
 
   @Get()
   @ApiOperation({

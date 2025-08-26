@@ -7,14 +7,14 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { UserService } from './user.service';
+import { ESCSUserService } from './user.service';
 import { SearchEscsUserDto } from './dto/search-escs-user.dto';
 import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 
 @ApiTags('ESCS User')
 @Controller('escs/user')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+export class ESCSUserController {
+  constructor(private readonly userService: ESCSUserService) {}
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   getUserAll() {

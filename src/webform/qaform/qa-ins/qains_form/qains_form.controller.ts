@@ -2,13 +2,15 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UploadedFiles, 
 import { QainsFormService } from './qains_form.service';
 import { CreateQainsFormDto } from './dto/create-qains_form.dto';
 import { SearchQainsFormDto } from './dto/search-qains_form.dto';
-import { QainsFormDto } from './dto/qains_form.dto';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 import { Request } from 'express';
 
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { ApiTags, ApiExcludeEndpoint } from '@nestjs/swagger';
 
 import { getClientIP } from 'src/common/utils/ip.utils';
+import { QcConfQainsFormDto } from './dto/qcConfirm-qains_form.dto';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('QA-INS Form')
 @Controller('qaform/qa-ins')
@@ -30,12 +32,19 @@ export class QainsFormController {
   }
 
   @Post('getFormData')
-  async getFormData(@Body() dto: QainsFormDto) {
+  async getFormData(@Body() dto: FormDto) {
     return await this.qainsFormService.getFormData(dto);
   }
 
   @Post('search')
   async search(@Body() dto: SearchQainsFormDto) {
     return await this.qainsFormService.search(dto);
+  }
+
+  @Post('qcConfirm')
+  @UseInterceptors(AnyFilesInterceptor())
+  async qcConfirm(@Body() dto: QcConfQainsFormDto, @Req() req: Request) {
+    const ip = getClientIP(req);
+    return await this.qainsFormService.qcConfirm(dto, ip);
   }
 }

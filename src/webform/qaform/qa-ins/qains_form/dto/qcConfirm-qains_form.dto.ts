@@ -1,5 +1,5 @@
 import { PickType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsOptional,
   IsString,
@@ -34,6 +34,9 @@ export class QcConfQainsFormDto extends PickType(doactionFlowDto, [
   QCFOREMAN: string;
 
   @IsNotEmpty()
+  @Transform(({ value }) => 
+    Array.isArray(value) ? value : [value] // ถ้าเป็น string เดี่ยว → wrap array
+  )
   @IsArray()
   @IsString({ each: true })
   AUDITOR: string[];

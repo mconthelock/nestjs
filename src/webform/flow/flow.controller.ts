@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiExcludeEndpoint} from '@nestjs/swagger';
 import { Request } from 'express';
@@ -19,6 +20,7 @@ import { FormDto } from '../form/dto/form.dto';
 import { empnoFormDto } from '../form/dto/empno-form.dto';
 import { doactionFlowDto } from './dto/doaction-flow.dto';
 import { getClientIP } from 'src/common/utils/ip.utils';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Flow')
 @Controller('flow')
@@ -110,6 +112,7 @@ export class FlowController {
   }
 
   @Post('doaction')
+  @UseInterceptors(AnyFilesInterceptor())
   async doAction(@Body() dto: doactionFlowDto, @Req() req: Request) {
      const ip = getClientIP(req);
     return await this.flowService.doAction(dto, ip);

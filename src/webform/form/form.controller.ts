@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
@@ -16,6 +17,7 @@ import { UpdateFormDto } from './dto/update-form.dto';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { FormDto } from './dto/form.dto';
 import { empnoFormDto } from './dto/empno-form.dto';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
 
 @ApiTags('Form')
@@ -81,6 +83,7 @@ export class FormController {
   @ApiOperation({
     summary: 'Create Form',
   })
+  @UseInterceptors(AnyFilesInterceptor())
   create(@Body() dto: CreateFormDto, @Req() req: Request) {
     const ip = getClientIP(req);
     return this.formService.create(dto, ip);
@@ -104,6 +107,7 @@ export class FormController {
   }
 
   @Delete('deleteForm')
+  @UseInterceptors(AnyFilesInterceptor())
   async deleteForm(
     @Body() dto: UpdateFormDto
   ): Promise<{ message: string; status: boolean }> {

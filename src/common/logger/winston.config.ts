@@ -161,7 +161,7 @@ export const devLoggerConfig = {
       maxFiles: '30d',
       level: 'debug',
       format: winston.format.combine(
-        stripColors(),
+        // stripColors(),
         ignoreTypeOrmEntities(),
         // skipSelectQuery(),
         addRequestId(),

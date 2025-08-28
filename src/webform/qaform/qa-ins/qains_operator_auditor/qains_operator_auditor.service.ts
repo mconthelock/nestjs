@@ -84,4 +84,11 @@ export class QainsOAService {
   async searchQainsOA(dto: SearchQainsOADto) {
     return this.qainsOARepo.find({ where: dto });
   }
+
+  async delete(dto: CreateQainsOADto, queryRunner?: QueryRunner) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(QainsOA)
+      : this.qainsOARepo;
+    return repo.delete(dto);
+  }
 }

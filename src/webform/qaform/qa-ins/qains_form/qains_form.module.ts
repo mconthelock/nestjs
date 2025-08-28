@@ -12,6 +12,8 @@ import { QaFileModule } from '../../qa_file/qa_file.module';
 import { FlowModule } from 'src/webform/flow/flow.module';
 import { SequenceOrgModule } from 'src/webform/sequence-org/sequence-org.module';
 import { UsersModule } from 'src/amec/users/users.module';
+import { MailModule } from 'src/mail/mail.module';
+import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
 
 @Module({
   imports: [
@@ -21,7 +23,9 @@ import { UsersModule } from 'src/amec/users/users.module';
     QainsOAModule,
     QaFileModule,
     SequenceOrgModule,
-    UsersModule
+    UsersModule, 
+    MailModule,
+    OrgposModule
   ],
   controllers: [QainsFormController],
   providers: [QainsFormService],

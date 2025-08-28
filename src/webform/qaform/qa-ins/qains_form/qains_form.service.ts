@@ -9,11 +9,14 @@ import { QainsOAService } from '../qains_operator_auditor/qains_operator_auditor
 import { QaFileService } from '../../qa_file/qa_file.service';
 import { FlowService } from 'src/webform/flow/flow.service';
 import { UsersService } from 'src/amec/users/users.service';
+import { MailService } from 'src/mail/mail.service';
 import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
 import { SearchQainsFormDto } from './dto/search-qains_form.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { QcConfQainsFormDto } from './dto/qcConfirm-qains_form.dto';
 import { UpdateQainsFormDto } from './dto/update-qains_form.dto';
+import { OrgposService } from 'src/webform/orgpos/orgpos.service';
+import { formatDate } from 'src/common/utils/dayjs.utils';
 
 @Injectable()
 export class QainsFormService {
@@ -29,6 +32,8 @@ export class QainsFormService {
     private readonly QaFileService: QaFileService,
     private readonly sequenceOrgService: SequenceOrgService,
     private readonly usersService: UsersService,
+    private readonly mailService: MailService,
+    private readonly orgposService: OrgposService,
   ) {}
 
   async createQainsForm(
@@ -267,6 +272,8 @@ export class QainsFormService {
         CYEAR2: dto.CYEAR2,
         NRUNNO: dto.NRUNNO,
       };
+      //   await this.sendmailToReqManager(form, queryRunner);
+      //   return;
       // update flow qc foreman
       const condForeman = {
         condition: {
@@ -279,21 +286,47 @@ export class QainsFormService {
       this.flowService.updateFlow(condForeman, queryRunner);
 
       // update flow qc sem
-      const foreman = await this.usersService.findEmp(dto.QCFOREMAN, queryRunner);
-      const qcsem = await this.sequenceOrgService.search({SPOSCODE: '30', VORGNO:foreman.SSECCODE}, queryRunner);
-      if(qcsem.length > 0){
+      const foreman = await this.usersService.findEmp(
+        dto.QCFOREMAN,
+        queryRunner,
+      );
+      const qcsem = await this.orgposService.getOrgPos(
+        {
+          VPOSNO: '30',
+          VORGNO: foreman.SSECCODE,
+        },
+        queryRunner,
+      );
+      //   const qcsem = await this.sequenceOrgService.search(
+      //     { SPOSCODE: '30', VORGNO: foreman.SSECCODE },
+      //     queryRunner,
+      //   );
+      if (qcsem.length > 0) {
         const condSem = {
           condition: {
             ...form,
             CEXTDATA: '04',
           },
-          VAPVNO: qcsem[0].EMPNO,
-          VREPNO: qcsem[0].EMPNO,
+          VAPVNO: qcsem[0].VEMPNO,
+          VREPNO: qcsem[0].VEMPNO,
         };
         this.flowService.updateFlow(condSem, queryRunner);
       }
       // update ojt date and training date
-      await this.update({...form, QA_TRAINING_DATE: dto.TRAINING_DATE, QA_OJT_DATE: dto.OJTDATE}, queryRunner);
+      await this.update(
+        {
+          ...form,
+          QA_TRAINING_DATE: dto.TRAINING_DATE,
+          QA_OJT_DATE: dto.OJTDATE,
+        },
+        queryRunner,
+      );
+
+      // clear
+      await this.QainsOAService.delete(
+        { ...form, QOA_TYPECODE: 'ESA' },
+        queryRunner,
+      );
 
       // insert auditor
       for (const e of dto.AUDITOR) {
@@ -303,7 +336,13 @@ export class QainsFormService {
         );
       }
       // do action
-      await this.flowService.doAction({ ...form, REMARK: dto.REMARK, ACTION: dto.ACTION, EMPNO: dto.EMPNO}, ip, queryRunner);
+      await this.flowService.doAction(
+        { ...form, REMARK: dto.REMARK, ACTION: dto.ACTION, EMPNO: dto.EMPNO },
+        ip,
+        queryRunner,
+      );
+      // auto mail
+      await this.sendmailToReqManager(form, queryRunner);
       await queryRunner.commitTransaction();
       return {
         status: true,
@@ -315,6 +354,81 @@ export class QainsFormService {
       throw new InternalServerErrorException(error.message);
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async sendmailToReqManager(form: FormDto, queryRunner?: QueryRunner) {
+    const data = await this.getFormData(form, queryRunner);
+    const item = data.QA_ITEM;
+    let html = `<div style="font-size:14px; color:#000;">`;
+    const seccode = [
+      ...new Set(
+        data.QA_AUD_OPT.filter((o) => o.QOA_TYPECODE == 'ESO').map(
+          (o) => o.QOA_EMPNO_INFO.SSECCODE,
+        ),
+      ),
+    ];
+    console.log(seccode);
+
+    for (const sec of seccode) {
+      const semEmpno = await this.orgposService.getOrgPos(
+        {
+          VPOSNO: '30',
+          VORGNO: sec,
+        },
+        queryRunner,
+      );
+      const semInfo = await this.usersService.findEmp(semEmpno[0].VEMPNO);
+      html += `<b>Dear ${semInfo.SNAME}</b>
+        <p>
+            I'm writing to arrange a time for 
+            <span style="font-weight:bold; color:#0000FF;">
+                quality built in for item ${item} on ${data.QA_OJT_DATE ? formatDate(data.QA_OJT_DATE, 'DD-MMM-YY') : '-'} ${data.QA_OJT_DATE ? formatDate(data.QA_OJT_DATE, 'HH:mm') : '00:00'} 
+            </span>.
+            <br>
+            Please prepare part orders for quality built in.
+        </p>
+
+        <table cellpadding="6" cellspacing="0" border="1" 
+        style="border: 1px solid #aaa; width: 100%; padding: 0px; font-size: 0.85em;">
+            <thead>
+                <tr style="background:#fce4ec; text-align:left; padding: 10px 0px;">
+                <th style="border:1px solid #ccc;">No.</th>
+                <th style="border:1px solid #ccc;">Emp. Code</th>
+                <th style="border:1px solid #ccc;">Name - Surname</th>
+                <th style="border:1px solid #ccc;">Item</th>
+                <th style="border:1px solid #ccc;">Sec.</th>
+                </tr>
+            </thead>
+            <tbody>`;
+      let no = 1;
+      for (const operator of data.QA_AUD_OPT) {
+        if (operator.QOA_EMPNO_INFO.SSECCODE === sec) {
+          html += `<tr style="background-color: #fff;padding: 10px; 5px;>
+          <td style="border:1px solid #ccc; text-align:center;">${no}</td>
+          <td style="border:1px solid #ccc; text-align:center;">${operator.QOA_EMPNO}</td>
+          <td style="border:1px solid #ccc; text-align:center;">${operator.QOA_EMPNO_INFO.SNAME}</td>
+          <td style="border:1px solid #ccc; text-align:center;">${item}</td>
+          <td style="border:1px solid #ccc; text-align:center;">${operator.QOA_EMPNO_INFO.SSEC}</td>
+          </tr>
+            `;
+          no++;
+        }
+      }
+      html += `</tbody>
+            </table>
+            <p>
+                Best regards,<br>
+                IS Department.<br>
+                Auto Send mail System.
+            </p>
+        </div>`;
+      await this.mailService.sendMail({
+        // to: semInfo.SRECMAIL,
+        from: 'webflow_admin@mitsubishielevatorasia.co.th',
+        subject: `Quality built in item ${item}`,
+        html: html,
+      });
     }
   }
 }

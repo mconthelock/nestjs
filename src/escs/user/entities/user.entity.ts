@@ -1,5 +1,6 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../../../amec/users/entities/user.entity';
+import { AuditReportRevision } from 'src/escs/audit_report_revision/entities/audit_report_revision.entity';
 @Entity('ESCS_USERS')
 export class EscsUser {
   @PrimaryColumn()
@@ -41,4 +42,7 @@ export class EscsUser {
   @OneToOne(() => User, (user) => user.escsUser)
   @JoinColumn({ name: 'USR_NO', referencedColumnName: 'SEMPNO' })
   user: User;
+
+  @OneToOne(() => AuditReportRevision, (user) => user.ARR_INCHARGE_INFO)
+  auditRev: AuditReportRevision;
 }

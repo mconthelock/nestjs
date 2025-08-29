@@ -8,7 +8,7 @@ import { createAttDto } from './dto/create.dto';
 @Injectable()
 export class AttachmentsService {
   constructor(
-    @InjectRepository(Attachments, 'spsysConnection')
+    @InjectRepository(Attachments, 'amecConnection')
     private readonly att: Repository<Attachments>,
   ) {}
 

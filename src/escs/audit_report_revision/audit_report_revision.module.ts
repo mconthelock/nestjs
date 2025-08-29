@@ -5,8 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuditReportRevision } from './entities/audit_report_revision.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([AuditReportRevision], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([AuditReportRevision], 'amecConnection')],
   controllers: [ESCSARRController],
   providers: [ESCSARRService],
+  exports: [ESCSARRService],
 })
 export class ESCSARRModule {}

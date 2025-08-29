@@ -9,7 +9,7 @@ export class ESCSARRController {
   constructor(private readonly ESCSARRService: ESCSARRService) {}
 
   @Post('search')
-  async getRevision(@Body() dto: SearchESCSARRDto ) {
-    return this.ESCSARRService.getRevision(dto);
+  async getAuditReportRevision(@Body() dto: SearchESCSARRDto ) {
+    return this.ESCSARRService.getAuditReportRevision(dto);
   }
 }

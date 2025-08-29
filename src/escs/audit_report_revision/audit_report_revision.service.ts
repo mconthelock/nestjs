@@ -13,8 +13,31 @@ export class ESCSARRService {
     private auditRepo: Repository<AuditReportRevision>,
   ) {}
 
-  async getRevision(dto: SearchESCSARRDto, queryRunner?: QueryRunner) {
-    const repo = queryRunner ? queryRunner.manager.getRepository(AuditReportRevision) : this.auditRepo;
-    return repo.find({where: dto, order: { ARR_REV: 'ASC' }, relations: ['ARR_INCHARGE_INFO']});
+  async getAuditReportRevision(
+    dto: SearchESCSARRDto,
+    queryRunner?: QueryRunner,
+  ) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(AuditReportRevision)
+      : this.auditRepo;
+    return repo.find({
+      where: dto,
+      order: { ARR_REV: 'ASC' },
+      relations: ['ARR_INCHARGE_INFO'],
+    });
+  }
+
+  async findLatestRevision(
+    queryRunner?: QueryRunner,
+  ): Promise<AuditReportRevision | null> {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(AuditReportRevision)
+      : this.auditRepo;
+    return await repo.findOne({
+      where: {},
+      order: {
+        ARR_REV: 'DESC',
+      },
+    });
   }
 }

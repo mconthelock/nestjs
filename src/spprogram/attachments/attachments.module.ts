@@ -7,7 +7,7 @@ import { AttachmentsController } from './attachments.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Attachments], 'spsysConnection'),
+    TypeOrmModule.forFeature([Attachments], 'amecConnection'),
     MulterModule.register({ dest: './uploads' }),
   ],
   controllers: [AttachmentsController],

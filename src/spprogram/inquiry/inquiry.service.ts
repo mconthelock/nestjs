@@ -121,7 +121,6 @@ export class InquiryService {
         if (item === 5) item = 2;
         if (item >= 6) item = 6;
         const grp_id_obj = savedGroups.find((val) => val.INQG_GROUP === item);
-
         const detail = runner.manager.create(InquiryDetail, {
           ...el,
           INQID: inquiry.INQ_ID,

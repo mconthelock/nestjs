@@ -8,7 +8,7 @@ import { findOneDto } from './dto/findone.dto';
 @Injectable()
 export class RatioService {
   constructor(
-    @InjectRepository(Ratio, 'amecConnection')
+    @InjectRepository(Ratio, 'spsysConnection')
     private readonly ratio: Repository<Ratio>,
   ) {}
 

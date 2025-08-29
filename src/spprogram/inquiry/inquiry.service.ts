@@ -30,10 +30,10 @@ interface logs {
 @Injectable()
 export class InquiryService {
   constructor(
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('spsysConnection')
     private ds: DataSource,
 
-    @InjectRepository(Inquiry, 'amecConnection')
+    @InjectRepository(Inquiry, 'spsysConnection')
     private readonly inq: Repository<Inquiry>,
   ) {}
 

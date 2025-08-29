@@ -6,9 +6,7 @@ import { StatusController } from './status.controller';
 
 @Module({
   controllers: [StatusController],
-  imports: [
-    TypeOrmModule.forFeature([Status], 'amecConnection')
-  ],
+  imports: [TypeOrmModule.forFeature([Status], 'spsysConnection')],
   providers: [StatusService],
 })
 export class StatusModule {}

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import amecConfig from './common/databases/amec.config';
+import spsysConfig from './common/databases/spsys.config';
 
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
@@ -35,6 +36,7 @@ const logConfig =
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync(amecConfig),
+    TypeOrmModule.forRootAsync(spsysConfig),
     //BB8 💣
     AuthModule,
     // AmecModule,

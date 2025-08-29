@@ -6,7 +6,7 @@ import { Term } from './entities/term.entity';
 @Injectable()
 export class TermService {
   constructor(
-    @InjectRepository(Term, 'amecConnection')
+    @InjectRepository(Term, 'spsysConnection')
     private readonly term: Repository<Term>,
   ) {}
 

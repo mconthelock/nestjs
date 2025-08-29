@@ -8,7 +8,7 @@ import { searchDto } from './dto/search.dto';
 @Injectable()
 export class InquiryGroupService {
   constructor(
-    @InjectRepository(InquiryGroup, 'amecConnection')
+    @InjectRepository(InquiryGroup, 'spsysConnection')
     private readonly group: Repository<InquiryGroup>,
   ) {}
 

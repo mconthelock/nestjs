@@ -7,7 +7,7 @@ import { createDto } from './dto/create.dto';
 @Injectable()
 export class InquiryDetailService {
   constructor(
-    @InjectRepository(InquiryDetail, 'amecConnection')
+    @InjectRepository(InquiryDetail, 'spsysConnection')
     private readonly detail: Repository<InquiryDetail>,
   ) {}
 

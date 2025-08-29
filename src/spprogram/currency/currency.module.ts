@@ -5,7 +5,7 @@ import { CurrencyController } from './currency.controller';
 import { Currency } from './entities/currency.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Currency], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([Currency], 'spsysConnection')],
   controllers: [CurrencyController],
   providers: [CurrencyService],
 })

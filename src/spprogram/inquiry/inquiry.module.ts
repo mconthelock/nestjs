@@ -10,7 +10,7 @@ import { HistoryModule } from '../history/history.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Inquiry], 'amecConnection'),
+    TypeOrmModule.forFeature([Inquiry], 'spsysConnection'),
     InquiryGroupModule,
     InquiryDetailModule,
     HistoryModule,

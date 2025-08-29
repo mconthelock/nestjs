@@ -8,7 +8,7 @@ import { History } from './entities/history.entity';
 @Injectable()
 export class HistoryService {
   constructor(
-    @InjectRepository(History, 'amecConnection')
+    @InjectRepository(History, 'spsysConnection')
     private readonly history: Repository<History>,
   ) {}
 

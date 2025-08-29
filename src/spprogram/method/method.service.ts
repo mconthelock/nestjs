@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class MethodService {
   constructor(
-    @InjectRepository(Method, 'amecConnection')
+    @InjectRepository(Method, 'spsysConnection')
     private readonly methodRepository: Repository<Method>,
   ) {}
 

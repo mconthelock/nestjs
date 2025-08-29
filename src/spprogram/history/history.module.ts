@@ -6,7 +6,7 @@ import { HistoryController } from './history.controller';
 
 @Module({
   controllers: [HistoryController],
-  imports: [TypeOrmModule.forFeature([History], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([History], 'spsysConnection')],
   providers: [HistoryService],
   exports: [HistoryService],
 })

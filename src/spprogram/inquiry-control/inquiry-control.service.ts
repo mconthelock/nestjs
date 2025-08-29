@@ -6,7 +6,7 @@ import { InquiryControl } from './entities/inquiry-control.entity';
 @Injectable()
 export class InquiryControlService {
   constructor(
-    @InjectRepository(InquiryControl, 'amecConnection')
+    @InjectRepository(InquiryControl, 'spsysConnection')
     private readonly ctrl: Repository<InquiryControl>,
   ) {}
 

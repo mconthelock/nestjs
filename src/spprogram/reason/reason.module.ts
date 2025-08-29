@@ -5,7 +5,7 @@ import { ReasonController } from './reason.controller';
 import { Reason } from './entities/reason.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Reason], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([Reason], 'spsysConnection')],
   controllers: [ReasonController],
   providers: [ReasonService],
 })

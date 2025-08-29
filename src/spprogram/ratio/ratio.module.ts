@@ -5,7 +5,7 @@ import { RatioController } from './ratio.controller';
 import { Ratio } from './entities/ratio.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Ratio], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([Ratio], 'spsysConnection')],
   controllers: [RatioController],
   providers: [RatioService],
 })

@@ -6,7 +6,7 @@ import { Shipment } from './entities/shipment.entity';
 @Injectable()
 export class ShipmentService {
   constructor(
-    @InjectRepository(Shipment, 'amecConnection')
+    @InjectRepository(Shipment, 'spsysConnection')
     private readonly ship: Repository<Shipment>,
   ) {}
 

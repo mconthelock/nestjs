@@ -5,7 +5,7 @@ import { ShipmentController } from './shipment.controller';
 import { Shipment } from './entities/shipment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Shipment], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([Shipment], 'spsysConnection')],
   controllers: [ShipmentController],
   providers: [ShipmentService],
 })

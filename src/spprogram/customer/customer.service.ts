@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class CustomerService {
   constructor(
-    @InjectRepository(Customer, 'amecConnection')
+    @InjectRepository(Customer, 'spsysConnection')
     private readonly cus: Repository<Customer>,
   ) {}
 

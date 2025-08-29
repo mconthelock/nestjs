@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class TimelineService {
   constructor(
-    @InjectRepository(Timeline, 'amecConnection')
+    @InjectRepository(Timeline, 'spsysConnection')
     private readonly timelineRepository: Repository<Timeline>,
   ) {}
 }

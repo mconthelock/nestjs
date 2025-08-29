@@ -6,7 +6,7 @@ import { Reason } from './entities/reason.entity';
 @Injectable()
 export class ReasonService {
   constructor(
-    @InjectRepository(Reason, 'amecConnection')
+    @InjectRepository(Reason, 'spsysConnection')
     private readonly reason: Repository<Reason>,
   ) {}
 

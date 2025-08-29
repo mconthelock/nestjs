@@ -6,9 +6,7 @@ import { MethodController } from './method.controller';
 
 @Module({
   controllers: [MethodController],
-  imports: [
-    TypeOrmModule.forFeature([Method], 'amecConnection')
-  ],
+  imports: [TypeOrmModule.forFeature([Method], 'spsysConnection')],
   providers: [MethodService],
 })
 export class MethodModule {}

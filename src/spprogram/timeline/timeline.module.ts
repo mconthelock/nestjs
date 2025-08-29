@@ -6,9 +6,7 @@ import { TimelineController } from './timeline.controller';
 
 @Module({
   controllers: [TimelineController],
-  imports: [
-    TypeOrmModule.forFeature([Timeline], 'amecConnection')
-  ],
+  imports: [TypeOrmModule.forFeature([Timeline], 'spsysConnection')],
   providers: [TimelineService],
 })
 export class TimelineModule {}

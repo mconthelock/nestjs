@@ -5,7 +5,7 @@ import { InquiryDetailController } from './inquiry-detail.controller';
 import { InquiryDetail } from './entities/inquiry-detail.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([InquiryDetail], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([InquiryDetail], 'spsysConnection')],
   controllers: [InquiryDetailController],
   providers: [InquiryDetailService],
   exports: [InquiryDetailService],

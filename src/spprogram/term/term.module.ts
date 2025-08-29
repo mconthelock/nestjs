@@ -5,7 +5,7 @@ import { TermController } from './term.controller';
 import { Term } from './entities/term.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Term], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([Term], 'spsysConnection')],
   controllers: [TermController],
   providers: [TermService],
 })

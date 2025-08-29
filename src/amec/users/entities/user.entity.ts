@@ -57,8 +57,8 @@ export class User {
   @Column()
   SEMPENCODE: string;
 
-  @Column()
-  MEMEML: string;
+  //   @Column()
+  //   MEMEML: string;
 
   @Column()
   STNAME: string;
@@ -79,7 +79,7 @@ export class User {
 
   @OneToMany(() => JopMarReq, (req) => req.marRequest)
   jopMarReq: JopMarReq[];
-  
+
   @OneToMany(() => JopPurConf, (req) => req.purConfirm)
   jopPurConf: JopPurConf[];
 

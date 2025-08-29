@@ -8,7 +8,7 @@ import { createDto } from './dto/create.dto';
 @Injectable()
 export class QuotationTypeService {
   constructor(
-    @InjectRepository(QuotationType, 'amecConnection')
+    @InjectRepository(QuotationType, 'spsysConnection')
     private readonly quotype: Repository<QuotationType>,
   ) {}
 

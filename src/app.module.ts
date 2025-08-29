@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import amecConfig from './common/databases/amec.config';
+import spsysConfig from './common/databases/spsys.config';
 
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
@@ -22,7 +23,7 @@ import { MktModule } from './marketing/mkt.module';
 // import { PisModule } from './pis/pis.module';
 // import { ESCSModule } from './escs/escs.module';
 // import { DetailModule } from './idtag/detail/detail.module';
-// import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
+import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
 import { LoggerModule } from './logger/logger.module';
 
 const logConfig =
@@ -33,6 +34,7 @@ const logConfig =
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync(amecConfig),
+    TypeOrmModule.forRootAsync(spsysConfig),
     //BB8 💣
     AuthModule,
     // AmecModule,
@@ -49,7 +51,7 @@ const logConfig =
     // PisModule,
     // ESCSModule,
     // DetailModule,
-    // ItemarrnglstModule,
+    ItemarrnglstModule,
 
     //Logging Config
     WinstonModule.forRoot(logConfig),

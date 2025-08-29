@@ -5,7 +5,7 @@ import { InquiryGroupController } from './inquiry-group.controller';
 import { InquiryGroup } from './entities/inquiry-group.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([InquiryGroup], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([InquiryGroup], 'spsysConnection')],
   controllers: [InquiryGroupController],
   providers: [InquiryGroupService],
   exports: [InquiryGroupService],

@@ -6,9 +6,7 @@ import { InquiryLogController } from './inquiry-log.controller';
 
 @Module({
   controllers: [InquiryLogController],
-  imports: [
-    TypeOrmModule.forFeature([InquiryLog], 'amecConnection')
-  ],
+  imports: [TypeOrmModule.forFeature([InquiryLog], 'spsysConnection')],
   providers: [InquiryLogService],
 })
 export class InquiryLogModule {}

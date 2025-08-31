@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 //Service
@@ -7,6 +7,8 @@ import { ApplicationService } from '../application/application.service';
 import { AppsgroupsService } from '../appsgroups/appsgroups.service';
 import { AccesslogService } from '../accesslog/accesslog.service';
 import { Appsuser } from './entities/appsuser.entity';
+
+import { CreateAppsuserDto } from './dto/create-appsuser.dto';
 
 interface logData {
   loguser: string;
@@ -48,5 +50,31 @@ export class AppsusersService {
       where: { USERS_ID: user },
       relations: ['application', 'appsgroups'],
     });
+  }
+
+  async getAllUserApp(id: number) {
+    return this.appuser.find({
+      where: { PROGRAM: id },
+      relations: ['appsgroups'],
+      order: { USERS_GROUP: 'asc' },
+    });
+  }
+
+  async create(data: CreateAppsuserDto) {
+    const user = this.appuser.create(data);
+    return this.appuser.save(user);
+  }
+
+  async update(app: number, id: string, data: CreateAppsuserDto) {
+    const list = await this.appuser.findOneBy({ USERS_ID: id, PROGRAM: app });
+    if (!list) {
+      throw new NotFoundException(`User ${id} is not found`);
+    }
+    Object.assign(list, data);
+    return await this.appuser.save(list);
+  }
+
+  async remove(app: number, id: string) {
+    return this.appuser.delete({ USERS_ID: id, PROGRAM: app });
   }
 }

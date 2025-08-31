@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Application } from './entities/application.entity';
@@ -9,26 +9,28 @@ import { UpdateApplicationDto } from './dto/update-application.dto';
 export class ApplicationService {
   constructor(
     @InjectRepository(Application, 'amecConnection')
-    private readonly appRepository: Repository<Application>,
+    private readonly apps: Repository<Application>,
   ) {}
 
   getAppsByID(id: number) {
-    return this.appRepository.findOne({ where: { APP_ID: id } });
+    return this.apps.findOne({ where: { APP_ID: id } });
   }
 
   findAll() {
-    return this.appRepository.find();
+    return this.apps.find();
   }
 
-  create(createApplicationDto: CreateApplicationDto) {
-    return 'This action adds a new application';
+  create(data: CreateApplicationDto) {
+    const app = this.apps.create(data);
+    return this.apps.save(app);
   }
 
-  update(id: number, updateApplicationDto: UpdateApplicationDto) {
-    return `This action updates a #${id} application`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} application`;
+  async update(id: number, updateApplicationDto: UpdateApplicationDto) {
+    const app = await this.apps.findOneBy({ APP_ID: id });
+    if (!app) {
+      throw new NotFoundException(`Application with id ${id} not found`);
+    }
+    Object.assign(app, updateApplicationDto);
+    return await this.apps.save(app);
   }
 }

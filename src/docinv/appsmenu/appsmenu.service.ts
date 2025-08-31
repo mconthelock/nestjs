@@ -1,4 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { Appsmenu } from './entities/appsmenu.entity';
+import { CreateAppsmenuDto } from './dto/create-appsmenu.dto';
 
 @Injectable()
-export class AppsmenuService {}
+export class AppsmenuService {
+  constructor(
+    @InjectRepository(Appsmenu, 'amecConnection')
+    private readonly menu: Repository<Appsmenu>,
+  ) {}
+
+  async findAppMenu(id: number) {
+    return this.menu.find({
+      where: { MENU_PROGRAM: id },
+      order: { MENU_TOP: 'asc', MENU_TYPE: 'asc', MENU_SEQ: 'asc' },
+    });
+  }
+  async create(data: CreateAppsmenuDto) {
+    const list = this.menu.create(data);
+    return this.menu.save(list);
+  }
+
+  async update(id: number, data: CreateAppsmenuDto) {
+    const list = await this.menu.findOneBy({ MENU_ID: id });
+    if (!list) {
+      throw new NotFoundException(`Menu with id ${id} not found`);
+    }
+    Object.assign(list, data);
+    return await this.menu.save(list);
+  }
+
+  async remove(id: number) {
+    return this.menu.delete({ MENU_ID: id });
+  }
+}

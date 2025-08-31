@@ -32,12 +32,12 @@ export class Appsgroup {
   GROUP_HOME: string;
 
   @Column()
-  UPDATE_DATE: string;
+  UPDATE_DATE: Date;
 
   @OneToMany(() => Appsuser, (user) => user.appsgroups)
-  /*@JoinColumn([
+  @JoinColumn([
     { name: 'GROUP_ID', referencedColumnName: 'USERS_GROUP' },
     { name: 'PROGRAM', referencedColumnName: 'PROGRAM' },
-  ])*/
+  ])
   appsuser: Appsuser[];
 }

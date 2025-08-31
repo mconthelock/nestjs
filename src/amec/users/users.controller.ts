@@ -10,6 +10,8 @@ import {
 import { Request } from 'express';
 import { UsersService } from './users.service';
 import { searchDto } from './dto/search-user.dto';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Controller('users')
 export class UsersController {
@@ -22,14 +24,21 @@ export class UsersController {
 
   @Get('image/:id')
   async findImage(@Param('id') id: string) {
-    const response = await fetch(`http://webflow/images/emp/${id}.jpg`);
-    if (response.status !== 200) {
-      throw new NotFoundException('Data not found');
+    try {
+      const response = await fetch(`http://webflow/images/emp/${id}.jpg`);
+      if (response.status !== 200) {
+        throw new NotFoundException('Data not found');
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`;
+      return imageUrl;
+    } catch (error) {
+      const filePath = path.join(process.cwd(), 'public', 'Untitled.png');
+      const fileBuffer = fs.readFileSync(filePath);
+      const base64 = fileBuffer.toString('base64');
+      return `data:image/png;base64,${base64}`;
     }
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`;
-    return imageUrl;
   }
 
   @Post('search')

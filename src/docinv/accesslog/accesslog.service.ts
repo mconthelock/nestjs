@@ -8,7 +8,7 @@ import { CreateAccesslogDto } from './dto/create-accesslog.dto';
 @Injectable()
 export class AccesslogService {
   constructor(
-    @InjectRepository(Accesslog, 'amecConnection')
+    @InjectRepository(Accesslog, 'docinvConnection')
     private readonly log: Repository<Accesslog>,
   ) {}
 

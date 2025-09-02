@@ -5,7 +5,7 @@ import { AppsgroupsController } from './appsgroups.controller';
 import { Appsgroup } from './entities/appsgroup.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Appsgroup], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([Appsgroup], 'docinvConnection')],
   controllers: [AppsgroupsController],
   providers: [AppsgroupsService],
   exports: [AppsgroupsService],

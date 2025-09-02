@@ -8,7 +8,7 @@ import { WorkplanDoc } from './entities/workplan-doc.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Workplan, WorkplanDoc], 'amecConnection'),
+    TypeOrmModule.forFeature([Workplan, WorkplanDoc], 'docinvConnection'),
   ],
   controllers: [WorkplanController],
   providers: [WorkplanService],

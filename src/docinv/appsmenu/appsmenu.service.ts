@@ -8,7 +8,7 @@ import { CreateAppsmenuDto } from './dto/create-appsmenu.dto';
 @Injectable()
 export class AppsmenuService {
   constructor(
-    @InjectRepository(Appsmenu, 'amecConnection')
+    @InjectRepository(Appsmenu, 'docinvConnection')
     private readonly menu: Repository<Appsmenu>,
   ) {}
 

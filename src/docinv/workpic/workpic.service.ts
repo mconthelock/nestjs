@@ -6,7 +6,7 @@ import { Workpic } from './entities/workpic.entity';
 @Injectable()
 export class WorkpicService {
   constructor(
-    @InjectRepository(Workpic, 'amecConnection')
+    @InjectRepository(Workpic, 'docinvConnection')
     private readonly pic: Repository<Workpic>,
   ) {}
 }

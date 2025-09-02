@@ -1039,7 +1039,7 @@ export class FlowService {
 
   async getNameReq(form: FormDto, queryRunner?: QueryRunner) {
     const sql =
-      'select a.SNAME as SNAME , a.SRECMAIL as SRECMAIL from form f , aemployee a where a.SEMPNO = f.VREQNO and NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO';
+      'select a.SNAME as SNAME , a.SRECMAIL as SRECMAIL from form f , amecuserall a where a.SEMPNO = f.VREQNO and NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO';
     return await this.execSql(sql, form, queryRunner);
   }
 

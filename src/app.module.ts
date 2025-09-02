@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import amecConfig from './common/databases/amec.config';
+//import amecConfig from './common/databases/amec.config';
 import spsysConfig from './common/databases/spsys.config';
 import docinvConfig from './common/databases/docinv.config';
+import webformConfig from './common/databases/webform.config';
 
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
@@ -34,27 +35,27 @@ const logConfig =
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRootAsync(amecConfig),
+    // TypeOrmModule.forRootAsync(amecConfig),
     TypeOrmModule.forRootAsync(spsysConfig),
     TypeOrmModule.forRootAsync(docinvConfig),
+    TypeOrmModule.forRootAsync(webformConfig),
     //BB8 💣
     AuthModule,
     // AmecModule,
     // AmecMfgModule,
     DocinvModule,
-    gpreportModule,
+    //gpreportModule,
     // WebformModule,
     // HeaderModule,
     SpModule,
-    MktModule,
+    //MktModule,
     // AS400Module,
     //JB 🤴
     // JobOrderModule,
     // PisModule,
     // ESCSModule,
     // DetailModule,
-    ItemarrnglstModule,
-
+    //ItemarrnglstModule,
     //Logging Config
     WinstonModule.forRoot(logConfig),
     LoggerModule,

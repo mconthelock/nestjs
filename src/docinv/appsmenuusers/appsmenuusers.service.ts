@@ -6,7 +6,7 @@ import { Appsmenuuser } from './entities/appsmenuuser.entity';
 @Injectable()
 export class AppsmenuusersService {
   constructor(
-    @InjectRepository(Appsmenuuser, 'docinvConnection')
+    @InjectRepository(Appsmenuuser, 'amecConnection')
     private readonly repo: Repository<Appsmenuuser>,
   ) {}
 
@@ -14,7 +14,7 @@ export class AppsmenuusersService {
     return this.repo.find({
       where: { USERS_GROUP: group, PROGRAM: program },
       relations: ['Appsmenu'],
-      order: { Appsmenu: { MENU_SEQ: 'ASC' } },
+      order: { Appsmenu: { MENU_SEQ: 'ASC' } }, 
     });
   }
 }

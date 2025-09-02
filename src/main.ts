@@ -4,7 +4,7 @@ import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
 import { IpLoggerMiddleware } from './middleware/ip-logger.middleware';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import { NestExpressApplication } from '@nestjs/platform-express'; // ✅ ต้องเพิ่ม
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
 
@@ -14,18 +14,12 @@ import { RequestIdMiddleware } from './middleware/request-id.middleware';
 import { RequestContextMiddleware } from './middleware/request-context.middleware';
 import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
 import { AllExceptionsFilter } from './common/logger/http-exception.filter';
-import * as oracledb from 'oracledb';
+// import * as oracledb from 'oracledb';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: [],
   });
-  console.log(
-    'ORACLE POOL CONFIG',
-    oracledb.poolMax,
-    oracledb.poolMin,
-    oracledb.queueTimeout,
-    oracledb.queueMax,
-  );
+  // console.log('ORACLE POOL CONFIG', oracledb.poolMax, oracledb.poolMin, oracledb.queueTimeout, oracledb.queueMax);
   // const pool = await oracledb.getPool();
   // console.log(pool.poolMax, pool.poolMin, pool.queueTimeout, pool.queueMax);
   app.enableCors({
@@ -65,9 +59,9 @@ async function bootstrap() {
   app.use(new RequestContextMiddleware().use);
 
   // Global Interceptor สำหรับ log request และ Exception Filter สำหรับ log error
-  //   const logger = app.get(WINSTON_MODULE_PROVIDER);
-  //   app.useGlobalFilters(new AllExceptionsFilter(logger));
-  //   app.useGlobalInterceptors(app.get(HttpLoggingInterceptor));
+  const logger = app.get(WINSTON_MODULE_PROVIDER);
+  app.useGlobalFilters(new AllExceptionsFilter(logger));
+  app.useGlobalInterceptors(app.get(HttpLoggingInterceptor));
 
   // สร้าง config สำหรับ Swagger
   const swaggerConfig = new DocumentBuilder()

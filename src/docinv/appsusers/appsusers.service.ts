@@ -21,7 +21,7 @@ interface logData {
 @Injectable()
 export class AppsusersService {
   constructor(
-    @InjectRepository(Appsuser, 'docinvConnection')
+    @InjectRepository(Appsuser, 'amecConnection')
     private readonly appuser: Repository<Appsuser>,
     private readonly emps: UsersService,
     private readonly apps: ApplicationService,

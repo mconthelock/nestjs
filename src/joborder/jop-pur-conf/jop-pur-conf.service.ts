@@ -13,7 +13,7 @@ import { JopMarReqService } from '../jop-mar-req/jop-mar-req.service';
 
 import { UpdateJopMarReqDto } from '../jop-mar-req/dto/update-jop-mar-req.dto';
 import { SearchJopPurConfDto } from './dto/search-jop-pur-conf.dto';
-import { getSafeFields } from 'src/utils/Fields';
+import { getSafeFields } from 'src/common/utils/Fields.utils';
 
 @Injectable()
 export class JopPurConfService {

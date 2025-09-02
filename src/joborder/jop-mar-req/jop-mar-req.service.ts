@@ -10,7 +10,7 @@ import { JopMarReq } from './entities/jop-mar-req.entity';
 import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
 
 import { AmeccalendarService } from 'src/amecmfg/ameccalendar/ameccalendar.service';
-import { getSafeFields } from 'src/utils/Fields';
+import { getSafeFields } from 'src/common/utils/Fields.utils';
 
 @Injectable()
 export class JopMarReqService {

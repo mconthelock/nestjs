@@ -5,7 +5,7 @@ import { AccesslogController } from './accesslog.controller';
 import { Accesslog } from './entities/accesslog.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Accesslog], 'docinvConnection')],
+  imports: [TypeOrmModule.forFeature([Accesslog], 'amecConnection')],
   controllers: [AccesslogController],
   providers: [AccesslogService],
   exports: [AccesslogService],

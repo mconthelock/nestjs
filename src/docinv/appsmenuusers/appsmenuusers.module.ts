@@ -5,7 +5,7 @@ import { AppsmenuusersController } from './appsmenuusers.controller';
 import { Appsmenuuser } from './entities/appsmenuuser.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Appsmenuuser], 'docinvConnection')],
+  imports: [TypeOrmModule.forFeature([Appsmenuuser], 'amecConnection')],
   controllers: [AppsmenuusersController],
   providers: [AppsmenuusersService],
   exports: [AppsmenuusersService],

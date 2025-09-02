@@ -6,7 +6,7 @@ import { ReleaseController } from './release.controller';
 import { Release } from './entities/release.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Release], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([Release], 'docinvConnection')],
   controllers: [ReleaseController],
   providers: [ReleaseService],
 })

@@ -4,7 +4,7 @@ import { SpecificationService } from './specification.service';
 import { SpecificationController } from './specification.controller';
 import { Specification } from './entities/specification.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([Specification], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([Specification], 'docinvConnection')],
   controllers: [SpecificationController],
   providers: [SpecificationService],
 })

@@ -8,7 +8,7 @@ import { UpdateApplicationDto } from './dto/update-application.dto';
 @Injectable()
 export class ApplicationService {
   constructor(
-    @InjectRepository(Application, 'amecConnection')
+    @InjectRepository(Application, 'docinvConnection')
     private readonly apps: Repository<Application>,
   ) {}
 

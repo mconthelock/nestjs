@@ -5,7 +5,7 @@ import { ApplicationController } from './application.controller';
 import { Application } from './entities/application.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Application], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([Application], 'docinvConnection')],
   controllers: [ApplicationController],
   providers: [ApplicationService],
   exports: [ApplicationService],

@@ -9,10 +9,10 @@ import { WorkplanDoc } from './entities/workplan-doc.entity';
 @Injectable()
 export class WorkplanService {
   constructor(
-    @InjectRepository(Workplan, 'amecConnection')
+    @InjectRepository(Workplan, 'docinvConnection')
     private readonly workplan: Repository<Workplan>,
 
-    @InjectRepository(WorkplanDoc, 'amecConnection')
+    @InjectRepository(WorkplanDoc, 'docinvConnection')
     private readonly docs: Repository<WorkplanDoc>,
   ) {}
 

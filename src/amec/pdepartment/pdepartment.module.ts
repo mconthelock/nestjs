@@ -5,7 +5,7 @@ import { PdepartmentController } from './pdepartment.controller';
 import { Pdepartment } from './entities/pdepartment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Pdepartment], 'webformConnection')],
+  imports: [TypeOrmModule.forFeature([Pdepartment], 'amecConnection')],
   controllers: [PdepartmentController],
   providers: [PdepartmentService],
 })

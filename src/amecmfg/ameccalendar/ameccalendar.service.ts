@@ -6,9 +6,9 @@ import { Ameccalendar } from './entities/ameccalendar.entity';
 @Injectable()
 export class AmeccalendarService {
   constructor(
-    @InjectRepository(Ameccalendar, 'webformConnection')
+    @InjectRepository(Ameccalendar, 'amecConnection')
     private readonly calendar: Repository<Ameccalendar>,
-    @InjectDataSource('webformConnection')
+    @InjectDataSource('amecConnection')
     private dataSource: DataSource,
   ) {}
 
@@ -25,7 +25,7 @@ export class AmeccalendarService {
   ): Promise<Number> {
     startDate = this.transformDate(startDate);
     // console.log(`Adding ${days} work days to start date: ${startDate}`);
-
+    
     const result = await this.dataSource.query(
       `SELECT ADD_WORK_DAYS(:1,:2) AS NEXT_DATE FROM DUAL`,
       [startDate, days],

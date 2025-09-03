@@ -8,9 +8,9 @@ import { getSafeFields } from '../../common/utils/Fields.utils';
 @Injectable()
 export class PdivisionService {
   constructor(
-    @InjectRepository(Pdivision, 'amecConnection')
+    @InjectRepository(Pdivision, 'webformConnection')
     private divisionRepo: Repository<Pdivision>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('webformConnection')
     private dataSource: DataSource,
   ) {}
 

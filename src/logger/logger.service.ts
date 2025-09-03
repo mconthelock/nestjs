@@ -5,7 +5,7 @@ import { DataSource } from 'typeorm';
 @Injectable()
 export class LoggerService implements OnModuleInit {
   constructor(
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('webformConnection')
     private readonly dataSource: DataSource,
   ) {}
   async check(): Promise<{ status: string; message?: string }> {

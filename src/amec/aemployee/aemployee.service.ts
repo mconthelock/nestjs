@@ -8,7 +8,7 @@ import { UpdateAemployeeDto } from './dto/update-aemployee.dto';
 @Injectable()
 export class AemployeeService {
   constructor(
-    @InjectRepository(AEmployee, 'amecConnection')
+    @InjectRepository(AEmployee, 'webformConnection')
     private readonly aemployeeRepository: Repository<AEmployee>,
   ) {}
 

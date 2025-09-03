@@ -137,5 +137,11 @@ export class VOrderList {
   
   @ViewColumn()
   INVOICE: string | null;
+
+  @ViewColumn()
+  C_DBP: string | null;
+
+  @ViewColumn()
+  REGISDATE: Date | null;
   
 }

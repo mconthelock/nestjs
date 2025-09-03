@@ -159,7 +159,7 @@ export class InquiryService {
     ];
     const sql = `
       BEGIN
-        INQUIRY_DELETE@SPSYS(
+        INQUIRY_DELETE(
             P_ID => :1,
             P_USER => :2,
             P_REMARK=> :3,

@@ -27,6 +27,7 @@ if (process.env.HOST == 'AMEC') {
       retryAttempts: 5,
       retryDelay: 2000,
       extra: {
+        keepAlive: true,
         poolMax: 100,
         poolMin: 5,
         queueTimeout: 60000,

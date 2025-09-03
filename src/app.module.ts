@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-//import amecConfig from './common/databases/amec.config';
+import amecConfig from './common/databases/amec.config';
 import spsysConfig from './common/databases/spsys.config';
 import docinvConfig from './common/databases/docinv.config';
 import webformConfig from './common/databases/webform.config';

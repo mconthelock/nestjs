@@ -10,9 +10,9 @@ import { getSafeFields } from '../../utils/Fields';
 @Injectable()
 export class PsectionService {
   constructor(
-    @InjectRepository(Psection, 'amecConnection')
+    @InjectRepository(Psection, 'webformConnection')
     private sectionRepo: Repository<Psection>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('webformConnection')
     private dataSource: DataSource,
   ) {}
 

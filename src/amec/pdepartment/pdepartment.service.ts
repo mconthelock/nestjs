@@ -9,9 +9,9 @@ import { getSafeFields } from '../../utils/Fields';
 @Injectable()
 export class PdepartmentService {
   constructor(
-    @InjectRepository(Pdepartment, 'amecConnection')
+    @InjectRepository(Pdepartment, 'webformConnection')
     private sectionRepo: Repository<Pdepartment>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('webformConnection')
     private dataSource: DataSource,
   ) {}
 
@@ -67,7 +67,9 @@ export class PdepartmentService {
       'SUBSTR(SDIVCODE, 0, 2) = SUBSTR(SDEPCODE, 0, 2)',
     );
     query
-      .andWhere('B.SDEPARTMENT NOT LIKE :department', { department: '%Cancel%' })
+      .andWhere('B.SDEPARTMENT NOT LIKE :department', {
+        department: '%Cancel%',
+      })
       .andWhere('B.SDEPCODE != :departmentCode', { departmentCode: '00' });
     return query.getRawMany();
   }

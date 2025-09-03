@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Pdivision } from './entities/pdivision.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Pdivision], 'webformConnection')],
+  imports: [TypeOrmModule.forFeature([Pdivision], 'amecConnection')],
   controllers: [PdivisionController],
   providers: [PdivisionService],
 })

@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Psection } from './entities/psection.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Psection], 'webformConnection')],
+  imports: [TypeOrmModule.forFeature([Psection], 'amecConnection')],
   controllers: [PsectionController],
   providers: [PsectionService],
 })

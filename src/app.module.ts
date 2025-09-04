@@ -57,9 +57,9 @@ const logConfig =
     // DetailModule,
     ItemarrnglstModule,
     //Logging Config
-    WinstonModule.forRoot(logConfig),
+    //WinstonModule.forRoot(logConfig),
     LoggerModule,
   ],
-  providers: [HttpLoggingInterceptor],
+  //   providers: [HttpLoggingInterceptor],
 })
 export class AppModule {}

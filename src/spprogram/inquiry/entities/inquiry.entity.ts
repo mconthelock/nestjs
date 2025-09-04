@@ -80,10 +80,14 @@ export class Inquiry {
   @Column()
   INQ_MAR_PIC: string;
 
-  @Column()
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   CREATE_AT: Date;
 
-  @Column()
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
   UPDATE_AT: Date;
 
   @Column()

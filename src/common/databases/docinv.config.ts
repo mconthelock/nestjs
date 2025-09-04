@@ -11,8 +11,10 @@ if (process.env.HOST == 'AMEC') {
   docinvConfig = {
     name: 'docinvConnection',
     imports: [],
-    inject: [ConfigService, WINSTON_MODULE_PROVIDER],
-    useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
+    // inject: [ConfigService, WINSTON_MODULE_PROVIDER],
+    // useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
+    inject: [ConfigService],
+    useFactory: async (config: ConfigService) => ({
       type: 'oracle',
       username: process.env.DOCINV_USER,
       password: process.env.DOCINV_PASSWORD,
@@ -24,7 +26,7 @@ if (process.env.HOST == 'AMEC') {
       ],
       synchronize: false,
       logging: ['error'],
-      logger: new TypeOrmWinstonLogger(winstonLogger),
+      //logger: new TypeOrmWinstonLogger(winstonLogger),
       retryAttempts: 5,
       retryDelay: 2000,
       extra: {

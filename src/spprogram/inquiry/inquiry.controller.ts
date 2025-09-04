@@ -14,7 +14,18 @@ export class InquiryController {
 
   @Post('create')
   async create(@Body() req: any) {
-    const data = await this.inq.create(req.header, req.details);
+    const data = await this.inq.create(req.header, req.details, req.users);
+    return await this.inq.findByNumber(req.header.INQ_NO);
+  }
+
+  @Post('update')
+  async update(@Body() req: any) {
+    const data = await this.inq.update(
+      req.header,
+      req.details,
+      req.deleteLine,
+      req.deleteFile,
+    );
     return await this.inq.findByNumber(req.header.INQ_NO);
   }
 

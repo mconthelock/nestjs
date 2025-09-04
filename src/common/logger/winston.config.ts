@@ -3,7 +3,6 @@ import stripAnsi from 'strip-ansi'; // npm i strip-ansi
 import chalk from 'chalk';
 // import DailyRotateFile from 'winston-daily-rotate-file';
 import { requestNamespace } from '../../middleware/request-id.middleware';
-
 const DailyRotateFile = require('winston-daily-rotate-file');
 
 const addRequestId = winston.format((info) => {

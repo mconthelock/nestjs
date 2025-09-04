@@ -17,7 +17,7 @@ import { AllExceptionsFilter } from './common/logger/http-exception.filter';
 // import * as oracledb from 'oracledb';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: [],
+    logger: ['debug'],
   });
   // console.log('ORACLE POOL CONFIG', oracledb.poolMax, oracledb.poolMin, oracledb.queueTimeout, oracledb.queueMax);
   // const pool = await oracledb.getPool();
@@ -56,12 +56,12 @@ async function bootstrap() {
   app.set('trust proxy', true);
   app.use(new IpLoggerMiddleware().use);
   app.use(new RequestIdMiddleware().use);
-  app.use(new RequestContextMiddleware().use);
+  //   app.use(new RequestContextMiddleware().use);
 
   // Global Interceptor สำหรับ log request และ Exception Filter สำหรับ log error
-  const logger = app.get(WINSTON_MODULE_PROVIDER);
-  app.useGlobalFilters(new AllExceptionsFilter(logger));
-  app.useGlobalInterceptors(app.get(HttpLoggingInterceptor));
+  //   const logger = app.get(WINSTON_MODULE_PROVIDER);
+  //   app.useGlobalFilters(new AllExceptionsFilter(logger));
+  //   app.useGlobalInterceptors(app.get(HttpLoggingInterceptor));
 
   // สร้าง config สำหรับ Swagger
   const swaggerConfig = new DocumentBuilder()

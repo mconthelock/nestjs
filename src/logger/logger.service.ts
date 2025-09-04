@@ -6,17 +6,22 @@ import { DataSource } from 'typeorm';
 export class LoggerService implements OnModuleInit {
   constructor(
     @InjectDataSource('docinvConnection')
-    private readonly dataSource: DataSource,
+    private readonly docinvDs: DataSource,
 
     @InjectDataSource('spsysConnection')
     private readonly spsysDs: DataSource,
+
+    @InjectDataSource('webformConnection')
+    private readonly webformDs: DataSource,
   ) {}
 
   async check(): Promise<{ status: string; message?: string }> {
-    const queryRunner = this.dataSource.createQueryRunner();
+    const queryRunner = this.docinvDs.createQueryRunner();
     try {
       queryRunner.connection.logger.logQuery = () => {};
-      await queryRunner.query('SELECT 1 FROM DUAL');
+      await queryRunner.query(
+        `SELECT 'docinv' FROM A002MP@DATACENTER WHERE ROWNUM = 1`,
+      );
       return { status: 'ok' };
     } catch (error) {
       console.log(`Error: ${error.message}`);
@@ -29,7 +34,19 @@ export class LoggerService implements OnModuleInit {
   async checkSp(): Promise<{ status: string; message?: string }> {
     const queryRunner = this.spsysDs.createQueryRunner();
     try {
-      queryRunner.query('SELECT 1 FROM A002MP@AMECDC WHERE ROWNUM = 1');
+      queryRunner.query(`SELECT 'spsys' FROM A002MP@AMECDC WHERE ROWNUM = 1`);
+    } catch (error) {
+      console.log(`Error: ${error.message}`);
+      return { status: 'error', message: error.message };
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async checkWebform(): Promise<{ status: string; message?: string }> {
+    const queryRunner = this.webformDs.createQueryRunner();
+    try {
+      queryRunner.query(`SELECT 'webform' FROM A002MP@AMECDC WHERE ROWNUM = 1`);
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };
@@ -40,11 +57,12 @@ export class LoggerService implements OnModuleInit {
 
   // run loop หลัง module init
   onModuleInit() {
-    // check ทุก 30 วินาที
+    // check ทุก 14 นาที เพื่อให้ DBLINK reconnect ใหม่ เพราะ AMECMFG reject connect ทุก 15 นาที
     setInterval(() => {
       console.log('Running check connection.');
       this.check();
       this.checkSp();
-    }, 300_000);
+      this.checkWebform();
+    }, 600_000);
   }
 }

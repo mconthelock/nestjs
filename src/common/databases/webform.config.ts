@@ -11,8 +11,10 @@ if (process.env.HOST == 'AMEC') {
   webformConfig = {
     name: 'webformConnection',
     imports: [],
-    inject: [ConfigService, WINSTON_MODULE_PROVIDER],
-    useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
+    // inject: [ConfigService, WINSTON_MODULE_PROVIDER],
+    // useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
+    inject: [ConfigService],
+    useFactory: async (config: ConfigService) => ({
       type: 'oracle',
       username: process.env.WEBFORM_USER,
       password: process.env.WEBFORM_PASSWORD,
@@ -24,7 +26,7 @@ if (process.env.HOST == 'AMEC') {
       ],
       synchronize: false,
       logging: ['error'],
-      logger: new TypeOrmWinstonLogger(winstonLogger),
+      //logger: new TypeOrmWinstonLogger(winstonLogger),
       retryAttempts: 5,
       retryDelay: 2000,
       extra: {

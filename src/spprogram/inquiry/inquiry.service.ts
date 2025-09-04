@@ -79,7 +79,7 @@ export class InquiryService {
     });
   }
 
-  async create(createInqDto: createInqDto, details: any[]) {
+  async create(createInqDto: createInqDto, details: any[], users: any[]) {
     const runner = this.ds.createQueryRunner();
     await runner.connect();
     await runner.startTransaction();
@@ -124,10 +124,15 @@ export class InquiryService {
 
         const detail = runner.manager.create(InquiryDetail, {
           ...el,
+          INQD_RUNNO: d + 1,
           INQID: inquiry.INQ_ID,
           INQG_GROUP: grp_id_obj.INQG_ID,
           INQD_LATEST: 1,
-          INQD_RUNNO: d + 1,
+          INQD_OWNER: '',
+          CREATE_AT: new Date(),
+          CREATE_BY: '',
+          UPDATE_AT: new Date(),
+          UPDATE_BY: '',
         });
         return detail;
       });
@@ -173,5 +178,35 @@ export class InquiryService {
       );
     }
     return { status: true, title: result[0] };
+  }
+
+  async update(
+    header: createInqDto,
+    details: any[],
+    deleteLine: any[],
+    deleteFile: any[],
+  ) {
+    const runner = this.ds.createQueryRunner();
+    await runner.connect();
+    await runner.startTransaction();
+    try {
+      const inquiry = await runner.manager.findOne(Inquiry, {
+        where: { INQ_NO: header.INQ_NO, INQ_LATEST: 1 },
+      });
+
+      if (header.INQ_REV != inquiry.INQ_REV) {
+        details.forEach((el) => {
+          el.INQD_PREV = el.INQD_ID;
+          delete el.INQD_ID;
+        });
+        console.log(details);
+        //this.create(header, details);
+      }
+    } catch (err) {
+      await runner.rollbackTransaction();
+      throw err;
+    } finally {
+      await runner.release();
+    }
   }
 }

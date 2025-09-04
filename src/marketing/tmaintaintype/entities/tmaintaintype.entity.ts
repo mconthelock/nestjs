@@ -1,5 +1,8 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
-
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import
+{
+  Ordermain
+} from '../../ordermain/entities/ordermain.entity'; 
 @Entity('TMAINTAINTYPE')
 export class Tmaintaintype {
   @PrimaryColumn()
@@ -57,4 +60,7 @@ export class Tmaintaintype {
   // ตัวอย่าง:
   // @ManyToOne(() => User, user => user.posts)
   // user: User;
+  @OneToOne(() => Ordermain, (ord) => ord.orderseries)
+  @JoinColumn({ name: 'ABBREVIATION', referencedColumnName: 'SERIES' })
+  seriestype: Ordermain;
 }

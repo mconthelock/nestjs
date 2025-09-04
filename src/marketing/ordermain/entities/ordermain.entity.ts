@@ -6,6 +6,10 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
+import
+{
+  Tmaintaintype
+} from '../../tmaintaintype/entities/tmaintaintype.entity'; 
 
 @Entity('TMARKET_TEMP')
 export class Ordermain {
@@ -56,4 +60,8 @@ export class Ordermain {
 
   @Column()
   AMEC_SCHDL: Date;
+
+  @OneToOne(() => Tmaintaintype, (ord) => ord.seriestype)
+  @JoinColumn({ name: 'SERIES', referencedColumnName: 'ABBREVIATION' })
+  orderseries: Tmaintaintype;
 }

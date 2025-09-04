@@ -20,4 +20,8 @@ export class OrdermainController {
   search(@Body() req: SearchOrdermainDto) {
     return this.ords.search(req);
   }
+  @Post('sproj')
+  sproj(@Body() req: SearchOrdermainDto) {
+    return this.ords.sproj(req);
+  }
 }

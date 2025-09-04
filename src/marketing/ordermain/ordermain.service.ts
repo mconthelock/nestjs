@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, Raw } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { Repository, Between, Raw, DataSource } from 'typeorm';
 import { SearchOrdermainDto } from './dto/search-ordermain.dto';
 import { Ordermain } from './entities/ordermain.entity';
 
@@ -9,6 +9,8 @@ export class OrdermainService {
   constructor(
     @InjectRepository(Ordermain, 'amecConnection')
     private readonly ords: Repository<Ordermain>,
+    @InjectDataSource('amecConnection')
+    private readonly ds: DataSource
   ) {}
 
   async search(req: SearchOrdermainDto) {
@@ -26,5 +28,19 @@ export class OrdermainService {
       );
     }
     return await this.ords.find({ where: where });
+  }
+  async sproj(req: SearchOrdermainDto) {
+    const where = {};
+    if (req.PRJ_NO) where['PRJ_NO'] = req.PRJ_NO;
+    return await this.ds.createQueryBuilder()
+    .from('TMARKET_TEMP', 'A')
+    .leftJoin('TMAINTAINTYPE', 'B', 'SERIES = ABBREVIATION')
+    .select('prj_no, prj_name, spec, DETAIL AS MODEL ')
+    .addSelect(' max(cust_rqs) ', 'EXPPLAN')
+    .addSelect(' sum(QTY)', 'TOTUNIT')
+    .where("PRJ_NO = :req", {req:req.PRJ_NO})
+    .andWhere("revision_code <> 'D'")
+    .groupBy('PRJ_NO , PRJ_NAME , SPEC , DETAIL')
+    .getRawMany();
   }
 }

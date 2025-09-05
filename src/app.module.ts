@@ -17,19 +17,19 @@ import { RequestIdMiddleware } from './middleware/request-id.middleware';
 import { RequestContextMiddleware } from './middleware/request-context.middleware';
 
 import { AuthModule } from './auth/auth.module';
-// import { AmecModule } from './amec/amec.module';
-// import { AmecMfgModule } from './amecmfg/amecmfg.module';
+import { AmecMfgModule } from './amecmfg/amecmfg.module';
+import { AmecModule } from './amec/amec.module';
 import { DocinvModule } from './docinv/docinv.module';
 import { gpreportModule } from './gpreport/gpreport.module';
-// import { AS400Module } from './as400/as400.module';
-// import { WebformModule } from './webform/webform.module';
-// import { HeaderModule } from './idtag/header/header.module';
+import { AS400Module } from './as400/as400.module';
+import { WebformModule } from './webform/webform.module';
+import { HeaderModule } from './idtag/header/header.module';
 import { SpModule } from './spprogram/sp.module';
 import { MktModule } from './marketing/mkt.module';
-// import { JobOrderModule } from './joborder/joborder.module';
-// import { PisModule } from './pis/pis.module';
-// import { ESCSModule } from './escs/escs.module';
-// import { DetailModule } from './idtag/detail/detail.module';
+import { JobOrderModule } from './joborder/joborder.module';
+import { PisModule } from './pis/pis.module';
+import { ESCSModule } from './escs/escs.module';
+import { DetailModule } from './idtag/detail/detail.module';
 import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
 import { FilesModule } from './file/file.module';
 import { MailModule } from './mail/mail.module';
@@ -46,15 +46,15 @@ import { LoggerModule } from './logger/logger.module';
     TypeOrmModule.forRootAsync(webformConfig),
     //BB8 💣
     AuthModule,
-    // AmecModule,
-    // AmecMfgModule,
+    AmecModule,
+    AmecMfgModule,
     DocinvModule,
     gpreportModule,
-    // WebformModule,
-    // HeaderModule,
+    WebformModule,
+    HeaderModule,
     SpModule,
     MktModule,
-    // AS400Module,
+    AS400Module,
     //JB 🤴
     JobOrderModule,
     FilesModule,

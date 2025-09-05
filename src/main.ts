@@ -16,6 +16,12 @@ import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor
 import { AllExceptionsFilter } from './common/logger/http-exception.filter';
 import { winstonConfig } from './common/logger/winston.config';
 
+// Log management
+import { WinstonModule, WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
+import { AllExceptionsFilter } from './common/logger/http-exception.filter';
+import { winstonConfig } from './common/logger/winston.config';
+
 async function bootstrap() {
   // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์
   const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;

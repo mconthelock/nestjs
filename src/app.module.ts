@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import amecConfig from './common/databases/amec.config';
@@ -6,10 +6,15 @@ import spsysConfig from './common/databases/spsys.config';
 import docinvConfig from './common/databases/docinv.config';
 import webformConfig from './common/databases/webform.config';
 
-import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
-import { winstonConfig, devLoggerConfig } from './common/logger/winston.config';
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from './common/logger/winston.config';
 import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
+
+//Middleware
+import { IpLoggerMiddleware } from './middleware/ip-logger.middleware';
+import { RequestIdMiddleware } from './middleware/request-id.middleware';
+import { RequestContextMiddleware } from './middleware/request-context.middleware';
 
 import { AuthModule } from './auth/auth.module';
 // import { AmecModule } from './amec/amec.module';
@@ -30,8 +35,6 @@ import { FilesModule } from './file/file.module';
 import { MailModule } from './mail/mail.module';
 import { LoggerModule } from './logger/logger.module';
 
-const logConfig =
-  process.env.STATE === 'development' ? devLoggerConfig : winstonConfig;
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -67,9 +70,13 @@ const logConfig =
     ItemarrnglstModule,
 
     //Logging Config
-    //WinstonModule.forRoot(logConfig),
+    WinstonModule.forRoot(winstonConfig),
     LoggerModule,
   ],
-  //   providers: [HttpLoggingInterceptor],
+  providers: [HttpLoggingInterceptor],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestIdMiddleware).forRoutes('*');
+  }
+}

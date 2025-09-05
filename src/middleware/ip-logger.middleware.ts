@@ -9,7 +9,6 @@ export class IpLoggerMiddleware implements NestMiddleware {
       req.socket.remoteAddress;
     const route = `${req.method} ${req.originalUrl}`;
     (req as any).clientIp = ip;
-    //console.log(`[IP Logger] ${ip} - ${route}`);
     next();
   }
 }

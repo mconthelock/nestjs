@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
-import { IpLoggerMiddleware } from './middleware/ip-logger.middleware';
+
 import { NestExpressApplication } from '@nestjs/platform-express'; // ✅ ต้องเพิ่ม
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
@@ -12,22 +12,19 @@ import { promises as fs } from 'fs';
 
 // Log management
 import { WinstonModule, WINSTON_MODULE_PROVIDER } from 'nest-winston';
-import { RequestIdMiddleware } from './middleware/request-id.middleware';
-import { RequestContextMiddleware } from './middleware/request-context.middleware';
+
 import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
 import { AllExceptionsFilter } from './common/logger/http-exception.filter';
-// import * as oracledb from 'oracledb';
+import { winstonConfig } from './common/logger/winston.config';
+
 async function bootstrap() {
   // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์
   const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
   await fs.mkdir(uploadPath, { recursive: true });
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: ['debug'],
+    logger: WinstonModule.createLogger(winstonConfig),
   });
-  // console.log('ORACLE POOL CONFIG', oracledb.poolMax, oracledb.poolMin, oracledb.queueTimeout, oracledb.queueMax);
-  // const pool = await oracledb.getPool();
-  // console.log(pool.poolMax, pool.poolMin, pool.queueTimeout, pool.queueMax);
   app.enableCors({
     origin: [
       'https://amecwebtest.mitsubishielevatorasia.co.th',
@@ -61,14 +58,31 @@ async function bootstrap() {
   app.use(compression());
   app.use(cookieParser());
   app.set('trust proxy', true);
-  app.use(new IpLoggerMiddleware().use);
-  app.use(new RequestIdMiddleware().use);
-  //   app.use(new RequestContextMiddleware().use);
 
   // Global Interceptor สำหรับ log request และ Exception Filter สำหรับ log error
-  //   const logger = app.get(WINSTON_MODULE_PROVIDER);
-  //   app.useGlobalFilters(new AllExceptionsFilter(logger));
-  //   app.useGlobalInterceptors(app.get(HttpLoggingInterceptor));
+  const logger = app.get(WINSTON_MODULE_PROVIDER);
+  app.useLogger({
+    log: (message, context) => {
+      console.log(context);
+      if (
+        ![
+          'RouterExplorer',
+          'NestApplication',
+          'InstanceLoader',
+          'NestFactory',
+        ].includes(context)
+      ) {
+        console.log(context);
+        logger.info(message, { context });
+      }
+    },
+    error: (msg, trace, ctx) => logger.error(msg, { trace, context: ctx }),
+    warn: (msg, ctx) => logger.warn(msg, { context: ctx }),
+    debug: (msg, ctx) => logger.debug(msg, { context: ctx }),
+    verbose: (msg, ctx) => logger.verbose(msg, { context: ctx }),
+  });
+  app.useGlobalInterceptors(app.get(HttpLoggingInterceptor));
+  app.useGlobalFilters(new AllExceptionsFilter(logger));
 
   // สร้าง config สำหรับ Swagger
   const swaggerConfig = new DocumentBuilder()

@@ -10,14 +10,13 @@ import { apiReference } from '@scalar/nestjs-api-reference';
 
 // Log management
 import { WinstonModule, WINSTON_MODULE_PROVIDER } from 'nest-winston';
-
 import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
 import { AllExceptionsFilter } from './common/logger/http-exception.filter';
 import { winstonConfig } from './common/logger/winston.config';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: WinstonModule.createLogger(winstonConfig),
+    logger: false,
   });
   app.enableCors({
     origin: [
@@ -54,26 +53,6 @@ async function bootstrap() {
 
   // Global Interceptor สำหรับ log request และ Exception Filter สำหรับ log error
   const logger = app.get(WINSTON_MODULE_PROVIDER);
-  app.useLogger({
-    log: (message, context) => {
-      console.log(context);
-      if (
-        ![
-          'RouterExplorer',
-          'NestApplication',
-          'InstanceLoader',
-          'NestFactory',
-        ].includes(context)
-      ) {
-        console.log(context);
-        logger.info(message, { context });
-      }
-    },
-    error: (msg, trace, ctx) => logger.error(msg, { trace, context: ctx }),
-    warn: (msg, ctx) => logger.warn(msg, { context: ctx }),
-    debug: (msg, ctx) => logger.debug(msg, { context: ctx }),
-    verbose: (msg, ctx) => logger.verbose(msg, { context: ctx }),
-  });
   app.useGlobalInterceptors(app.get(HttpLoggingInterceptor));
   app.useGlobalFilters(new AllExceptionsFilter(logger));
 

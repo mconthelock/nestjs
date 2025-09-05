@@ -11,10 +11,10 @@ if (process.env.HOST == 'AMEC') {
   amecConfig = {
     name: 'amecConnection',
     imports: [],
-    // inject: [ConfigService, WINSTON_MODULE_PROVIDER],
-    // useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
-    inject: [ConfigService],
-    useFactory: async (config: ConfigService) => ({
+    inject: [ConfigService, WINSTON_MODULE_PROVIDER],
+    useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
+      // inject: [ConfigService],
+      // useFactory: async (config: ConfigService) => ({
       type: 'oracle',
       username: process.env.AMEC_USER,
       password: process.env.AMEC_PASSWORD,
@@ -24,8 +24,8 @@ if (process.env.HOST == 'AMEC') {
         __dirname + '/../../**/**/**/*.entity{.ts,.js}',
       ],
       synchronize: false,
-      logging: ['error'],
-      //logger: new TypeOrmWinstonLogger(winstonLogger),
+      //   logging: ['error'],
+      logger: new TypeOrmWinstonLogger(winstonLogger),
       //logger: true,
       retryAttempts: 5,
       retryDelay: 2000,

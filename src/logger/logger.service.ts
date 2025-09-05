@@ -13,6 +13,9 @@ export class LoggerService implements OnModuleInit {
 
     @InjectDataSource('webformConnection')
     private readonly webformDs: DataSource,
+
+    @InjectDataSource('amecConnection')
+    private readonly amecDs: DataSource,
   ) {}
 
   async check(): Promise<{ status: string; message?: string }> {
@@ -31,9 +34,10 @@ export class LoggerService implements OnModuleInit {
     }
   }
 
-  async checkSp(): Promise<{ status: string; message?: string }> {
+  async checkSpsys(): Promise<{ status: string; message?: string }> {
     const queryRunner = this.spsysDs.createQueryRunner();
     try {
+      queryRunner.connection.logger.logQuery = () => {};
       queryRunner.query(`SELECT 'spsys' FROM A002MP@AMECDC WHERE ROWNUM = 1`);
     } catch (error) {
       console.log(`Error: ${error.message}`);
@@ -46,7 +50,23 @@ export class LoggerService implements OnModuleInit {
   async checkWebform(): Promise<{ status: string; message?: string }> {
     const queryRunner = this.webformDs.createQueryRunner();
     try {
+      queryRunner.connection.logger.logQuery = () => {};
       queryRunner.query(`SELECT 'webform' FROM A002MP@AMECDC WHERE ROWNUM = 1`);
+    } catch (error) {
+      console.log(`Error: ${error.message}`);
+      return { status: 'error', message: error.message };
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async checkIds(): Promise<{ status: string; message?: string }> {
+    const queryRunner = this.amecDs.createQueryRunner();
+    try {
+      queryRunner.connection.logger.logQuery = () => {};
+      queryRunner.query(
+        `SELECT 'ids' FROM RTNLIBF_A002MP@DAILYIDS WHERE ROWNUM = 1`,
+      );
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };
@@ -61,8 +81,9 @@ export class LoggerService implements OnModuleInit {
     setInterval(() => {
       console.log('Running check connection.');
       this.check();
-      this.checkSp();
+      this.checkSpsys();
       this.checkWebform();
+      this.checkIds();
     }, 600_000);
   }
 }

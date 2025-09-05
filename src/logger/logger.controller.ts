@@ -8,8 +8,8 @@ import * as glob from 'glob';
 export class LoggerController {
   constructor(private readonly logger: LoggerService) {}
 
-  private logDir = path.join(process.cwd(), 'logs/dev');
-  @Get()
+  private logDir = path.join(process.cwd(), 'logs');
+  @Get('daily')
   async getLogs(@Query('date') date?: string) {
     // ถ้า user ไม่ใส่ date => ดึงไฟล์ล่าสุด
     const filename = date
@@ -43,13 +43,13 @@ export class LoggerController {
     @Query('year') year: string,
     @Query('month') month: string,
   ) {
-    const pattern = path.join(
-      this.logDir,
-      `logs-${year}-${month.padStart(2, '0')}-*.log`,
-    );
+    const pattern = path
+      .join(this.logDir, `logs-${year}-${month.padStart(2, '0')}-*.log`)
+      .replace(/\\/g, '/');
 
     // หาไฟล์ทุกวันในเดือน
     const files = glob.sync(pattern);
+    console.log(pattern);
 
     let logs: any[] = [];
 

@@ -5,7 +5,7 @@ import { NewsController } from './news.controller';
 import { News } from './entities/news.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([News], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([News], 'docinvConnection')],
   controllers: [NewsController],
   providers: [NewsService],
 })

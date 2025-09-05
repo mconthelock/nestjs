@@ -79,7 +79,7 @@ export class InquiryService {
     });
   }
 
-  async create(createInqDto: createInqDto, details: any[], users: any[]) {
+  async create(createInqDto: createInqDto, details: any[]) {
     const runner = this.ds.createQueryRunner();
     await runner.connect();
     await runner.startTransaction();
@@ -121,18 +121,14 @@ export class InquiryService {
         if (item === 5) item = 2;
         if (item >= 6) item = 6;
         const grp_id_obj = savedGroups.find((val) => val.INQG_GROUP === item);
-
         const detail = runner.manager.create(InquiryDetail, {
           ...el,
           INQD_RUNNO: d + 1,
           INQID: inquiry.INQ_ID,
           INQG_GROUP: grp_id_obj.INQG_ID,
           INQD_LATEST: 1,
-          INQD_OWNER: '',
           CREATE_AT: new Date(),
-          CREATE_BY: '',
           UPDATE_AT: new Date(),
-          UPDATE_BY: '',
         });
         return detail;
       });

@@ -17,6 +17,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validate(req: Request, username: string, pass: string): Promise<any> {
     const appid = (req.body as any).appid;
     const ip = String((req as any).clientIp);
+    console.log(req);
+
     const user = await this.authService.validateUser(username, pass, appid, ip);
     if (!user) {
       throw new UnauthorizedException('You nave no authorization');

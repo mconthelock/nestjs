@@ -73,7 +73,7 @@ export const winstonConfig = {
   ),
   transports: [
     new winston.transports.Console({
-      level: 'debug',
+      level: process.env.LOGGER_CONSOLE,
       format: winston.format.combine(
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         addRequestId(),
@@ -104,7 +104,7 @@ export const winstonConfig = {
       zippedArchive: true,
       maxSize: '20m',
       maxFiles: '30d',
-      level: 'debug',
+      level: process.env.LOGGER_FILE,
       format: winston.format.combine(
         stripColors(),
         ignoreTypeOrmEntities(),
@@ -124,7 +124,7 @@ export const winstonConfig = {
       zippedArchive: true,
       maxSize: '20m',
       maxFiles: '30d',
-      level: 'error',
+      level: process.env.LOGGER_ERROR,
       format: winston.format.combine(
         winston.format.timestamp(),
         addRequestId(),

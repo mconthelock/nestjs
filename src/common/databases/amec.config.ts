@@ -24,9 +24,7 @@ if (process.env.HOST == 'AMEC') {
         __dirname + '/../../**/**/**/*.entity{.ts,.js}',
       ],
       synchronize: false,
-      //   logging: ['error'],
       logger: new TypeOrmWinstonLogger(winstonLogger),
-      //logger: true,
       retryAttempts: 5,
       retryDelay: 2000,
       extra: {

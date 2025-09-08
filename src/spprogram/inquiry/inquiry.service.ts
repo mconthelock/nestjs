@@ -79,18 +79,19 @@ export class InquiryService {
     });
   }
 
-  async create(createInqDto: createInqDto, details: any[]) {
+  async create(dto: createInqDto, details: any[]) {
     const runner = this.ds.createQueryRunner();
     await runner.connect();
     await runner.startTransaction();
     try {
-      await runner.manager.save(Inquiry, createInqDto);
+      await runner.manager.save(Inquiry, dto);
       const inquiry = await runner.manager.findOne(Inquiry, {
-        where: { INQ_NO: createInqDto.INQ_NO, INQ_LATEST: 1 },
+        where: { INQ_NO: dto.INQ_NO, INQ_LATEST: 1 },
       });
 
       await runner.manager.save(Timeline, {
-        INQ_ID: inquiry.INQ_ID,
+        INQ_NO: inquiry.INQ_NO,
+        INQ_REV: inquiry.INQ_REV,
         MAR_USER: inquiry.INQ_MAR_PIC,
         MAR_SEND: new Date(),
       });
@@ -135,11 +136,11 @@ export class InquiryService {
       const newDetails = await Promise.all(detailPromises);
       await runner.manager.save(InquiryDetail, newDetails);
       const log = runner.manager.create(History, {
-        INQ_NO: createInqDto.INQ_NO,
-        INQ_REV: createInqDto.INQ_REV,
-        INQH_USER: createInqDto.INQ_MAR_PIC,
-        INQH_ACTION: 1,
-        INQH_REMARK: null,
+        INQ_NO: dto.INQ_NO,
+        INQ_REV: dto.INQ_REV,
+        INQH_USER: dto.INQ_MAR_PIC,
+        INQH_ACTION: dto.INQ_REV == '*' ? 1 : 3,
+        INQH_REMARK: null, //dto.INQ_REMARK,
       });
       await runner.manager.save(History, log);
       await runner.commitTransaction();
@@ -149,6 +150,77 @@ export class InquiryService {
     } finally {
       await runner.release();
     }
+  }
+
+  async update(
+    header: createInqDto,
+    details: any[],
+    deleteLine: any[],
+    deleteFile: any[],
+  ) {
+    const runner = this.ds.createQueryRunner();
+    await runner.connect();
+    await runner.startTransaction();
+    try {
+      const inquiry = await runner.manager.findOne(Inquiry, {
+        where: { INQ_NO: header.INQ_NO, INQ_LATEST: 1 },
+      });
+
+      if (header.INQ_REV != inquiry.INQ_REV) {
+        const inqid = inquiry.INQ_ID;
+        await this.reviseRevision(runner, header, details, inqid);
+      }
+
+      //   const newinq = await runner.manager.findOne(Inquiry, {
+      //     where: { INQ_NO: inquiry.INQ_NO, INQ_LATEST: 1 },
+      //   });
+
+      //   const remark = header.INQ_REMARK;
+      //   delete header.INQ_REMARK;
+      //   Object.assign(newinq, header);
+      //   console.log(newinq);
+
+      //await runner.manager.update(Inquiry, { INQ_ID: newinq.INQ_ID }, newinq);
+
+      /*const newdetail = await runner.manager.find(InquiryDetail, {
+        where: { INQID: newinq.INQ_ID, INQD_LATEST: 1 },
+      });
+
+      console.log(newdetail);
+      */
+      /*newdetail.map(async (el) => {
+        const values = details.find((v) => el.INQD_PREV == v.INQD_ID);
+        delete values.INQID;
+        delete values.INQG_GROUP;
+        Object.assign(el, values);
+        await runner.manager.update(InquiryDetail, { INQD_ID: el.INQD_ID }, el);
+      });*/
+
+      await runner.commitTransaction();
+    } catch (err) {
+      await runner.rollbackTransaction();
+      throw err;
+    } finally {
+      await runner.release();
+    }
+  }
+
+  async reviseRevision(runner, header, details, inqid) {
+    details.forEach((el) => {
+      el.INQD_PREV = el.INQD_ID;
+    });
+    await this.create(header, details);
+    await runner.manager.update(Inquiry, { INQ_ID: inqid }, { INQ_LATEST: 0 });
+    await runner.manager.update(
+      InquiryGroup,
+      { INQ_ID: inqid },
+      { INQG_LATEST: 0 },
+    );
+    await runner.manager.update(
+      InquiryDetail,
+      { INQID: inqid },
+      { INQD_LATEST: 0 },
+    );
   }
 
   async delete(searchDto: searchDto) {
@@ -174,35 +246,5 @@ export class InquiryService {
       );
     }
     return { status: true, title: result[0] };
-  }
-
-  async update(
-    header: createInqDto,
-    details: any[],
-    deleteLine: any[],
-    deleteFile: any[],
-  ) {
-    const runner = this.ds.createQueryRunner();
-    await runner.connect();
-    await runner.startTransaction();
-    try {
-      const inquiry = await runner.manager.findOne(Inquiry, {
-        where: { INQ_NO: header.INQ_NO, INQ_LATEST: 1 },
-      });
-
-      if (header.INQ_REV != inquiry.INQ_REV) {
-        details.forEach((el) => {
-          el.INQD_PREV = el.INQD_ID;
-          delete el.INQD_ID;
-        });
-        console.log(details);
-        //this.create(header, details);
-      }
-    } catch (err) {
-      await runner.rollbackTransaction();
-      throw err;
-    } finally {
-      await runner.release();
-    }
   }
 }

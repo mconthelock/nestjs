@@ -3,7 +3,10 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 @Entity('SP_INQUIRY_TIMELINE')
 export class Timeline {
   @PrimaryColumn()
-  INQ_ID: number;
+  INQ_NO: string;
+
+  @PrimaryColumn()
+  INQ_REV: string;
 
   @Column()
   MAR_USER: string;

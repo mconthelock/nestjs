@@ -21,7 +21,7 @@ export class LoggerService implements OnModuleInit {
   async check(): Promise<{ status: string; message?: string }> {
     const queryRunner = this.docinvDs.createQueryRunner();
     try {
-      queryRunner.connection.logger.logQuery = () => {};
+      //   queryRunner.connection.logger.logQuery = () => {};
       await queryRunner.query(
         `SELECT 'docinv' FROM A002MP@DATACENTER WHERE ROWNUM = 1`,
       );
@@ -37,7 +37,7 @@ export class LoggerService implements OnModuleInit {
   async checkSpsys(): Promise<{ status: string; message?: string }> {
     const queryRunner = this.spsysDs.createQueryRunner();
     try {
-      queryRunner.connection.logger.logQuery = () => {};
+      //   queryRunner.connection.logger.logQuery = () => {};
       queryRunner.query(`SELECT 'spsys' FROM A002MP@AMECDC WHERE ROWNUM = 1`);
     } catch (error) {
       console.log(`Error: ${error.message}`);
@@ -50,7 +50,7 @@ export class LoggerService implements OnModuleInit {
   async checkWebform(): Promise<{ status: string; message?: string }> {
     const queryRunner = this.webformDs.createQueryRunner();
     try {
-      queryRunner.connection.logger.logQuery = () => {};
+      //   queryRunner.connection.logger.logQuery = () => {};
       queryRunner.query(`SELECT 'webform' FROM A002MP@AMECDC WHERE ROWNUM = 1`);
     } catch (error) {
       console.log(`Error: ${error.message}`);
@@ -63,7 +63,7 @@ export class LoggerService implements OnModuleInit {
   async checkIds(): Promise<{ status: string; message?: string }> {
     const queryRunner = this.amecDs.createQueryRunner();
     try {
-      queryRunner.connection.logger.logQuery = () => {};
+      //   queryRunner.connection.logger.logQuery = () => {};
       queryRunner.query(
         `SELECT 'ids' FROM RTNLIBF_A002MP@DAILYIDS WHERE ROWNUM = 1`,
       );

@@ -86,4 +86,18 @@ export class createInqDto {
   @IsString()
   @IsOptional()
   INQ_PKC: string;
+
+  @IsString()
+  @IsOptional()
+  INQ_REMARK: string;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  CREATE_AT: Date;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  UPDATE_AT: Date;
 }

@@ -20,4 +20,7 @@ export class AuditReportMaster {
 
     @Column()
 	ARM_STATUS:number;
+
+    @Column()
+    ARM_SCORE?:number;
 }

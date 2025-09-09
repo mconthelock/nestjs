@@ -56,7 +56,7 @@ import { AutomationModule } from './automation/automation.module';
     HeaderModule,
     SpModule,
     MktModule,
-    AS400Module,
+    //AS400Module,
     //JB 🤴
     JobOrderModule,
     FilesModule,
@@ -73,7 +73,7 @@ import { AutomationModule } from './automation/automation.module';
 
     //Logging Config
     WinstonModule.forRoot(winstonConfig),
-    LoggerModule,
+    //LoggerModule,
     AutomationModule,
   ],
   providers: [HttpLoggingInterceptor],

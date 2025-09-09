@@ -3,6 +3,11 @@ import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
 
 export class createDto {
   @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  INQD_ID: number;
+
+  @IsNumber()
   @Type(() => Number)
   INQG_GROUP: number;
 
@@ -106,17 +111,19 @@ export class createDto {
   @IsOptional()
   INQD_OWNER: string;
 
-  @IsString()
+  @IsDate()
   @IsOptional()
-  CREATE_AT: string;
+  @Type(() => Date)
+  CREATE_AT: Date;
 
   @IsString()
   @IsOptional()
   CREATE_BY: string;
 
-  @IsString()
+  @IsDate()
   @IsOptional()
-  UPDATE_AT: string;
+  @Type(() => Date)
+  UPDATE_AT: Date;
 
   @IsString()
   @IsOptional()

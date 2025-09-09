@@ -35,6 +35,8 @@ import { FilesModule } from './file/file.module';
 import { MailModule } from './mail/mail.module';
 import { LoggerModule } from './logger/logger.module';
 
+import { AutomationModule } from './automation/automation.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -72,6 +74,7 @@ import { LoggerModule } from './logger/logger.module';
     //Logging Config
     WinstonModule.forRoot(winstonConfig),
     LoggerModule,
+    AutomationModule,
   ],
   providers: [HttpLoggingInterceptor],
 })

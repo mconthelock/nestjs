@@ -10,6 +10,7 @@ import { Timeline } from '../timeline/entities/timeline.entity';
 
 import { searchDto } from './dto/search.dto';
 import { createInqDto } from './dto/create-inquiry.dto';
+import { createDto as dtDto } from '../inquiry-detail/dto/create.dto';
 
 interface group {
   INQ_ID: number;
@@ -117,6 +118,7 @@ export class InquiryService {
       const savedGroups = await runner.manager.find(InquiryGroup, {
         where: { INQ_ID: inquiry.INQ_ID },
       });
+
       const detailPromises = details.map((el, d) => {
         let item = Math.floor(el.INQD_ITEM / 100);
         if (item === 5) item = 2;
@@ -133,6 +135,7 @@ export class InquiryService {
         });
         return detail;
       });
+
       const newDetails = await Promise.all(detailPromises);
       await runner.manager.save(InquiryDetail, newDetails);
       const log = runner.manager.create(History, {
@@ -140,7 +143,7 @@ export class InquiryService {
         INQ_REV: dto.INQ_REV,
         INQH_USER: dto.INQ_MAR_PIC,
         INQH_ACTION: dto.INQ_REV == '*' ? 1 : 3,
-        INQH_REMARK: null, //dto.INQ_REMARK,
+        INQH_REMARK: dto.INQ_REMARK,
       });
       await runner.manager.save(History, log);
       await runner.commitTransaction();
@@ -166,36 +169,85 @@ export class InquiryService {
         where: { INQ_NO: header.INQ_NO, INQ_LATEST: 1 },
       });
 
+      let inqid = inquiry.INQ_ID;
       if (header.INQ_REV != inquiry.INQ_REV) {
-        const inqid = inquiry.INQ_ID;
-        await this.reviseRevision(runner, header, details, inqid);
+        delete inquiry.INQ_ID;
+        Object.assign(inquiry, header);
+        inqid = await this.dupplicate(runner, inquiry, details, inqid);
+      } else {
+        const remark = header.INQ_REMARK;
+        delete header.INQ_REMARK;
+        Object.assign(inquiry, header);
+        await runner.manager.update(Inquiry, { INQ_ID: inqid }, inquiry);
+        for (const el of details) {
+          const dbdetail = await runner.manager.findOne(InquiryDetail, {
+            where: { INQD_ID: el.INQD_ID },
+          });
+
+          if (dbdetail) {
+            const dto: dtDto = Object.assign({} as dtDto, dbdetail);
+            Object.assign(dto, el);
+            await runner.manager.update(
+              InquiryDetail,
+              { INQD_ID: el.INQD_ID },
+              dto,
+            );
+          } else {
+            let item = Math.floor(el.INQD_ITEM / 100);
+            if (item === 5) item = 2;
+            if (item >= 6) item = 6;
+            //Check ว่ามี Group นี้ แล้วยัง
+            const group = await runner.manager.findOne(InquiryGroup, {
+              where: {
+                INQ_ID: inquiry.INQ_ID,
+                INQG_GROUP: item,
+                INQG_LATEST: 1,
+              },
+            });
+
+            let groupid;
+            if (!group) {
+              await runner.manager.save(InquiryGroup, {
+                INQ_ID: inquiry.INQ_ID,
+                INQG_STATUS: inquiry.INQ_STATUS,
+                INQG_REV: '*',
+                INQG_GROUP: item,
+                INQG_LATEST: 1,
+              });
+              const savedGroups = await runner.manager.findOne(InquiryGroup, {
+                where: { INQ_ID: inquiry.INQ_ID, INQG_GROUP: item },
+              });
+
+              groupid = savedGroups.INQG_ID;
+            } else {
+              groupid = group.INQG_ID;
+            }
+
+            el.CREATE_AT = new Date();
+            el.CREATE_BY = header.UPDATE_BY;
+            el.UPDATE_AT = new Date();
+            el.UPDATE_BY = header.UPDATE_BY;
+            el.INQG_GROUP = groupid;
+            el.INQID = inquiry.INQ_ID;
+            const dto: dtDto = Object.assign({} as dtDto, el);
+
+            console.log(el);
+            await runner.manager.save(InquiryDetail, dto);
+          }
+        }
+
+        if (deleteLine !== undefined) {
+          for (const del of deleteLine) {
+            await runner.manager.update(
+              InquiryDetail,
+              { INQD_ID: del },
+              { INQD_LATEST: 0 },
+            );
+          }
+          //Remove some group that not avialable in detail
+          await this.removeGroups(runner, inqid);
+        }
       }
-
-      //   const newinq = await runner.manager.findOne(Inquiry, {
-      //     where: { INQ_NO: inquiry.INQ_NO, INQ_LATEST: 1 },
-      //   });
-
-      //   const remark = header.INQ_REMARK;
-      //   delete header.INQ_REMARK;
-      //   Object.assign(newinq, header);
-      //   console.log(newinq);
-
-      //await runner.manager.update(Inquiry, { INQ_ID: newinq.INQ_ID }, newinq);
-
-      /*const newdetail = await runner.manager.find(InquiryDetail, {
-        where: { INQID: newinq.INQ_ID, INQD_LATEST: 1 },
-      });
-
-      console.log(newdetail);
-      */
-      /*newdetail.map(async (el) => {
-        const values = details.find((v) => el.INQD_PREV == v.INQD_ID);
-        delete values.INQID;
-        delete values.INQG_GROUP;
-        Object.assign(el, values);
-        await runner.manager.update(InquiryDetail, { INQD_ID: el.INQD_ID }, el);
-      });*/
-
       await runner.commitTransaction();
     } catch (err) {
       await runner.rollbackTransaction();
@@ -205,22 +257,51 @@ export class InquiryService {
     }
   }
 
-  async reviseRevision(runner, header, details, inqid) {
-    details.forEach((el) => {
-      el.INQD_PREV = el.INQD_ID;
+  async dupplicate(runner, data, values, id) {
+    const header = data;
+    const dbdetail = await runner.manager.find(InquiryDetail, {
+      where: { INQID: data.INQ_ID, INQD_LATEST: 1 },
     });
-    await this.create(header, details);
-    await runner.manager.update(Inquiry, { INQ_ID: inqid }, { INQ_LATEST: 0 });
+    values.forEach((el) => {
+      //console.log(el);
+      const val = dbdetail.find((db) => el.INQD_ID == db.INQD_ID);
+      if (val !== undefined) Object.assign(val, el);
+      el.INQD_PREV = el.INQD_ID;
+      el.CREATE_AT = new Date(data.UPDATE_AT);
+      el.CREATE_BY = data.UPDATE_BY;
+      el.UPDATE_AT = new Date(data.UPDATE_AT);
+      el.UPDATE_BY = data.UPDATE_BY;
+      delete el.INQD_ID;
+      delete el.INQG_GROUP;
+      delete el.INQID;
+    });
+    await this.create(header, values);
+    await runner.manager.update(Inquiry, { INQ_ID: id }, { INQ_LATEST: 0 });
     await runner.manager.update(
       InquiryGroup,
-      { INQ_ID: inqid },
+      { INQ_ID: id },
       { INQG_LATEST: 0 },
     );
     await runner.manager.update(
       InquiryDetail,
-      { INQID: inqid },
+      { INQID: id },
       { INQD_LATEST: 0 },
     );
+    return 0;
+  }
+
+  async removeGroups(runner, id) {
+    const details = await runner.manager.find(InquiryDetail, {
+      where: { INQID: id, INQD_LATEST: 1 },
+    });
+    const groups = [...new Set(details.map((d) => d.INQG_GROUP))];
+    await runner.manager
+      .createQueryBuilder()
+      .update(InquiryGroup)
+      .set({ INQG_LATEST: 0 })
+      .where('INQ_ID = :id', { id })
+      .andWhere('INQG_ID NOT IN (:...groups)', { groups })
+      .execute();
   }
 
   async delete(searchDto: searchDto) {

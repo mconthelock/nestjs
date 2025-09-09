@@ -96,8 +96,16 @@ export class createInqDto {
   @Type(() => Date)
   CREATE_AT: Date;
 
+  @IsString()
+  @IsOptional()
+  CREATE_BY: string;
+
   @IsDate()
   @IsOptional()
   @Type(() => Date)
   UPDATE_AT: Date;
+
+  @IsString()
+  @IsOptional()
+  UPDATE_BY: string;
 }

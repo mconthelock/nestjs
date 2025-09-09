@@ -89,13 +89,13 @@ export class InquiryDetail {
   INQD_OWNER: string;
 
   @Column()
-  CREATE_AT: string;
+  CREATE_AT: Date;
 
   @Column()
   CREATE_BY: string;
 
   @Column()
-  UPDATE_AT: string;
+  UPDATE_AT: Date;
 
   @Column()
   UPDATE_BY: string;

@@ -3,12 +3,9 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { CreateESCSARMDto } from './create-audit_report_master.dto';
 import { Type } from 'class-transformer';
 
-export class SearchESCSARMDto extends IntersectionType(
-  PartialType(CreateESCSARMDto),
-  PickType(CreateESCSARMDto, ['ARM_REV', 'ARM_NO', 'ARM_SEQ', 'ARM_TYPE']),
-) {
+export class SearchESCSARMDto extends PartialType(CreateESCSARMDto) {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  ARM_STATUS: number;
+  ARM_STATUS?: number;
 }

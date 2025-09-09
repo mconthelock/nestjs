@@ -23,6 +23,7 @@ if (process.env.HOST == 'AMEC') {
       extra: {
         poolMax: 100,
         poolMin: 5,
+        poolTimeout: 120,
         queueTimeout: 60000,
         queueMax: 1000,
         poolPingInterval: 60, // ping ทุก 60s กัน idle

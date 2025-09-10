@@ -29,7 +29,7 @@ export class ESCSARMService {
     console.log(rev);
 
     return await repo.createQueryBuilder()
-      .select('ARM_REV, ARM_NO, ARM_SEQ, ARM_DETAIL, ARM_TYPE, ARM_STATUS, ARM_SCORE')
+      .select('ARM_REV, ARM_NO, ARM_SEQ, ARM_DETAIL, ARM_TYPE, ARM_STATUS, ARM_FACTOR, ARM_MAXSCORE')
       .from(AuditReportMaster, 'A')
       .where('ARM_REV <= :rev', { rev })
       .orderBy('ARM_NO, ARM_SEQ', 'ASC')
@@ -120,7 +120,7 @@ export class ESCSARMService {
           }
         }
       }
-    //   throw new Error('test error');
+      throw new Error('test error');
       if (localRunner) await localRunner.commitTransaction();
       return {
         status: true,
@@ -135,14 +135,15 @@ export class ESCSARMService {
   }
 
   async setData(dto: DataESCSARMDto, revision: number) {
-    const { rev, detail, type, status, topic, new_topic, seq, new_seq, score } = dto;
+    const { rev, detail, type, status, topic, new_topic, seq, new_seq, factor, maxScore } = dto;
     if (type == 'new') {
       return {
         ARM_REV: revision,
         ARM_NO: new_topic || topic,
         ARM_SEQ: new_seq || seq,
         ARM_DETAIL: detail,
-        ARM_SCORE: score || 0,
+        ARM_FACTOR: factor || 0,
+        ARM_MAXSCORE: maxScore || 3
     };
 } else if (type == 'edit') {
     return {
@@ -151,7 +152,8 @@ export class ESCSARMService {
         ARM_SEQ: new_seq || seq,
         ARM_STATUS: status,
         ARM_DETAIL: detail,
-        ARM_SCORE: score || 0,
+        ARM_FACTOR: factor || 0,
+        ARM_MAXSCORE: maxScore || 3
       };
     } else if (type == 'del') {
       return {

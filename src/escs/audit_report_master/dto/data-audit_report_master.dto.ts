@@ -42,7 +42,12 @@ export class DataESCSARMDto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  score?: number;
+  factor?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  maxScore?: number;
 
   @IsNotEmpty()
   @IsString()

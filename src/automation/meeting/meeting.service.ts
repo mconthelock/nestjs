@@ -186,15 +186,21 @@ export class MeetingService {
   }
 
   async messages(page, data) {
-    const bodytag = page.locator('div.allowTextSelection p');
-    const subjectTag = page.locator(
-      'input[placeholder="Add a title for the event"]',
-    );
-    await subjectTag.fill(data.subject);
-    await bodytag.evaluate((el) => {
-      el.innerHTML = data.message;
-    });
-    await this.snap(page, `message-email.png`);
+    try{
+        const bodytag = page.locator('div.allowTextSelection p');
+        const subjectTag = page.locator(
+            'input[placeholder="Add a title for the event"]',
+        );
+        await subjectTag.fill(data.subject);
+        
+        await bodytag.evaluate((el, message) => {
+            el.innerHTML = message;
+        }, data.message);
+        await this.snap(page, `message-email.png`);
+    }catch(err){
+        console.log(err);
+        throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
   }
 
   async snap(page, name) {

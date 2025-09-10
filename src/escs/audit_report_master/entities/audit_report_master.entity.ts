@@ -22,5 +22,8 @@ export class AuditReportMaster {
 	ARM_STATUS:number;
 
     @Column()
-    ARM_SCORE?:number;
+    ARM_FACTOR?:number;
+
+    @Column()
+    ARM_MAXSCORE?:number;
 }

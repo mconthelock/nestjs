@@ -114,11 +114,15 @@ export class FormService {
 
   async create(dto: CreateFormDto, ip: string, queryRunner?: QueryRunner) {
     let localRunner: QueryRunner | undefined;
+    let didConnect = false;
+    let didStartTx = false;
     try {
       if (!queryRunner) {
         localRunner = this.dataSource.createQueryRunner();
         await localRunner.connect();
+        didConnect = true;
         await localRunner.startTransaction();
+        didStartTx = true;
       }
       const runner = queryRunner || localRunner!;
 
@@ -202,7 +206,10 @@ export class FormService {
         }
 
         // await this.queryRunner.commitTransaction();
-        if (localRunner) await localRunner.commitTransaction();
+        // if (localRunner) await localRunner.commitTransaction();
+        if (localRunner && didStartTx && runner.isTransactionActive) {
+          await localRunner.commitTransaction();
+        }
         return {
           status: true,
           message: 'Insert form successful',
@@ -216,11 +223,21 @@ export class FormService {
       }
     } catch (error) {
       //   await this.queryRunner.rollbackTransaction();
-      if (localRunner) await localRunner.rollbackTransaction();
+      if (localRunner && didStartTx && localRunner.isTransactionActive) {
+        try {
+          await localRunner.rollbackTransaction();
+        } catch {}
+      }
+      //   if (localRunner) await localRunner.rollbackTransaction();
       throw new InternalServerErrorException(error.message);
     } finally {
       //   await this.queryRunner.release();
-      if (localRunner) await localRunner.release();
+      if (localRunner && didConnect) {
+        try {
+          await localRunner.release();
+        } catch {}
+      }
+      //   if (localRunner) await localRunner.release();
     }
 
     // return this.form.save(dto);
@@ -249,7 +266,9 @@ export class FormService {
   }
 
   getFormNextRunNo(context: FormContext, queryRunner?: QueryRunner) {
-    const repo = queryRunner ? queryRunner.manager.getRepository(Form) : this.form;
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(Form)
+      : this.form;
     return repo.find({
       where: context.query,
       order: {

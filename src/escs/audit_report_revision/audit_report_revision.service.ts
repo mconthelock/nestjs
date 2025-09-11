@@ -31,22 +31,28 @@ export class ESCSARRService {
   }
 
   async findLatestRevision(
+    secid: number,
     queryRunner?: QueryRunner,
   ): Promise<AuditReportRevision | null> {
     const repo = queryRunner
       ? queryRunner.manager.getRepository(AuditReportRevision)
       : this.auditRepo;
     return await repo.findOne({
-      where: {},
+      where: {
+        ARR_SECID: secid,
+      },
       order: {
         ARR_REV: 'DESC',
       },
     });
   }
 
-  async getNextRevision(queryRunner?: QueryRunner): Promise<number> {
-    const lastRevision = await this.findLatestRevision(queryRunner);
-    return lastRevision ? lastRevision.ARR_REV + 1 : 1;
+  async getNextRevision(
+    secid: number,
+    queryRunner?: QueryRunner,
+  ): Promise<number> {
+    const lastRevision = await this.findLatestRevision(secid, queryRunner);
+    return lastRevision ? lastRevision.ARR_REV + 1 : 0;
   }
 
   async create(dto: CreateESCSARRDto, queryRunner?: QueryRunner) {
@@ -58,7 +64,7 @@ export class ESCSARRService {
         await localRunner.startTransaction();
       }
       const runner = queryRunner || localRunner!;
-      const revision = await this.getNextRevision(runner);
+      const revision = await this.getNextRevision(dto.ARR_SECID, runner);
       const data = {
         ARR_REV: revision,
         ARR_REV_TEXT: numberToAlphabetRevision(revision),

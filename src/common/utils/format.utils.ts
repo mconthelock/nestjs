@@ -1,5 +1,5 @@
 export function numberToAlphabetRevision(revision: number): string {
-    if (revision <= 0) return '';
+    if (revision <= 0) return '*';
     let result = '';
     let num = revision;
     while (num > 0) {

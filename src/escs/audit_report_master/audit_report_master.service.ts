@@ -26,10 +26,6 @@ export class ESCSARMService {
 
   async getAuditReportMaster(dto: SearchESCSARMDto, queryRunner?: QueryRunner) {
     const repo = queryRunner ? queryRunner.manager : this.dataSource;
-    const lastRevision = await this.escsArrService.findLatestRevision(
-      dto.ARM_SECID,
-      queryRunner,
-    );
     const query = repo
       .createQueryBuilder()
       .from(AuditReportMaster, 'A')
@@ -65,6 +61,12 @@ export class ESCSARMService {
       }
       const { topic, list, incharge, reason, secid } = dto;
       const runner = queryRunner || localRunner!;
+      const currentData = await this.getAuditReportMaster(
+        { ARM_SECID: secid },
+        runner,
+      );
+      console.log('currentData', currentData);
+
       const revision = await this.escsArrService.create(
         {
           ARR_SECID: secid,
@@ -73,10 +75,9 @@ export class ESCSARMService {
         },
         runner,
       );
-      const currentData = await this.getAuditReportMaster(
-        { ARM_SECID: secid },
-        runner,
-      );
+      
+      console.log('revision', revision);
+      
       for (const row of currentData) {
         await this.escsArhService.create(
           {

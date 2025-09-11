@@ -19,6 +19,8 @@ import { SpUser } from './spusers/spusers.entity';
 import { CustomerModule } from './customer/customer.module';
 import { InquiryLogModule } from './inquiry-log/inquiry-log.module';
 import { TimelineModule } from './timeline/timeline.module';
+import { ItemsModule } from './items/items.module';
+import { PricelistModule } from './pricelist/pricelist.module';
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { TimelineModule } from './timeline/timeline.module';
     CustomerModule,
     InquiryLogModule,
     TimelineModule,
+    ItemsModule,
+    PricelistModule,
   ],
 })
 export class SpModule {}

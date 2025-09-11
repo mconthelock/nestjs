@@ -73,7 +73,7 @@ import { AutomationModule } from './automation/automation.module';
 
     //Logging Config
     WinstonModule.forRoot(winstonConfig),
-    //LoggerModule,
+    LoggerModule,
     AutomationModule,
   ],
   providers: [HttpLoggingInterceptor],

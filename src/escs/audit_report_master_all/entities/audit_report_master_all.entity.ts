@@ -1,6 +1,6 @@
 import { Column, Entity, ViewColumn, ViewEntity } from "typeorm";
 
-@ViewEntity('AUDIT_REPORT_MASTER')
+@ViewEntity('AUDIT_REPORT_MASTER_ALL')
 export class AuditReportMasterAll {
 
     @ViewColumn()

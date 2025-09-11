@@ -30,8 +30,6 @@ export class OrdermainService {
     return await this.ords.find({ where: where });
   }
   async sproj(req: SearchOrdermainDto) {
-    const where = {};
-    if (req.PRJ_NO) where['PRJ_NO'] = req.PRJ_NO;
     return await this.ds.createQueryBuilder()
     .from('TMARKET_TEMP', 'A')
     .leftJoin('TMAINTAINTYPE', 'B', 'SERIES = ABBREVIATION')

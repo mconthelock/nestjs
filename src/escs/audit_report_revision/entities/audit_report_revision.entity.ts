@@ -4,6 +4,9 @@ import { EscsUser } from 'src/escs/user/entities/user.entity';
 @Entity('AUDIT_REPORT_REVISION')
 export class AuditReportRevision {
   @PrimaryColumn()
+  ARR_SECID: number;
+  
+  @PrimaryColumn()
   ARR_REV: number;
 
   @Column()

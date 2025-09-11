@@ -15,6 +15,11 @@ export class SaveESCSARMDto {
   @IsNotEmpty()
   @Type(() => Number)
   @IsNumber()
+  secid: number;
+
+  @IsNotEmpty()
+  @Type(() => Number)
+  @IsNumber()
   incharge: number;
 
   @IsArray()

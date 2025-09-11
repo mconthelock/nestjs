@@ -5,6 +5,8 @@ import { ESCSUserModule } from './user/user.module';
 import { ESCSOrdersModule } from './orders/orders.module';
 import { ESCSARMModule } from './audit_report_master/audit_report_master.module';
 import { ESCSARRModule } from './audit_report_revision/audit_report_revision.module';
+import { ESCSARHModule } from './audit_report_history/audit_report_history.module';
+import { ESCSARMAModule } from './audit_report_master_all/audit_report_master_all.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { ESCSARRModule } from './audit_report_revision/audit_report_revision.mod
     ESCSOrdersModule,
     ESCSARMModule,
     ESCSARRModule,
+    ESCSARHModule,
+    ESCSARMAModule,
   ],
 })
 export class ESCSModule {}

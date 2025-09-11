@@ -4,6 +4,9 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
 export class AuditReportMaster {
 
     @PrimaryColumn()
+    ARM_SECID:number;	
+    
+    @PrimaryColumn()
     ARM_REV:number;	
     
     @PrimaryColumn()

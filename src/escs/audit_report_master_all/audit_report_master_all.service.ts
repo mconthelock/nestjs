@@ -15,27 +15,30 @@ export class ESCSARMAService {
     private readonly escsArrService: ESCSARRService,
   ) {}
 
-  async getAuditReportMaster(
-    dto: SearchESCSARMDto,
-    queryRunner?: QueryRunner,
-  ) {
+  async getAuditReportMaster(dto: SearchESCSARMDto, queryRunner?: QueryRunner) {
     const repo = queryRunner ? queryRunner.manager : this.dataSource;
-    const lastRevision =
-      await this.escsArrService.findLatestRevision(queryRunner);
-    const rev = dto.ARM_REV ?? lastRevision.ARR_REV;
+
     const query = repo
       .createQueryBuilder()
       .from(AuditReportMasterAll, 'A')
       .orderBy('ARM_NO, ARM_SEQ', 'ASC');
 
-    if (dto.ARM_NO !== undefined) {
-      query.andWhere('ARM_REV = :rev', { rev });
+    if (dto.ARM_REV !== undefined) {
+      query.andWhere('ARM_REV = :rev', { rev: dto.ARM_REV });
+    } else {
+      const lastRevision = await this.escsArrService.findLatestRevision(
+        dto.ARM_SECID,
+        queryRunner,
+      );
+      if (lastRevision != null) {
+        query.andWhere('ARM_REV = :rev', { rev: lastRevision.ARR_REV });
+      }
     }
     if (dto.ARM_STATUS !== undefined) {
       query.andWhere('ARM_STATUS = :status', { status: dto.ARM_STATUS });
     }
-    if( dto.ARM_SECID !== undefined){
-        query.andWhere('ARM_SECID = :secid', { secid: dto.ARM_SECID });
+    if (dto.ARM_SECID !== undefined) {
+      query.andWhere('ARM_SECID = :secid', { secid: dto.ARM_SECID });
     }
     return await query.getRawMany();
   }

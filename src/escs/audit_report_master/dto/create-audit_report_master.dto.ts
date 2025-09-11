@@ -5,6 +5,11 @@ export class CreateESCSARMDto {
   @IsNotEmpty()
   @Type(() => Number)
   @IsNumber()
+  ARM_SECID: number;
+  
+  @IsNotEmpty()
+  @Type(() => Number)
+  @IsNumber()
   ARM_REV: number;
 
   @IsNotEmpty()

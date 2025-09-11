@@ -14,6 +14,11 @@ export class CreateESCSARRDto {
   @IsNotEmpty()
   @Type(() => Number)
   @IsNumber()
+  ARR_SECID: number;
+
+  @IsNotEmpty()
+  @Type(() => Number)
+  @IsNumber()
   ARR_INCHARGE: number;
 
   @IsNotEmpty()

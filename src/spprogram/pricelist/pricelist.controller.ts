@@ -1,7 +1,12 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { PricelistService } from './pricelist.service';
 
-@Controller('pricelist')
+@Controller('sp/pricelist')
 export class PricelistController {
-  constructor(private readonly pricelistService: PricelistService) {}
+  constructor(private readonly price: PricelistService) {}
+
+  @Post('search')
+  search(@Body() data: any[]) {
+    return this.price.findAll();
+  }
 }

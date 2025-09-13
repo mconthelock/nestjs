@@ -72,6 +72,12 @@ export class Application {
   @Column()
   APP_POSTER: string;
 
+  @Column()
+  APP_LICENSE: string;
+
+  @Column()
+  APP_LICENSE_LINK: string;
+
   @OneToMany(() => Appsuser, (user) => user.application)
   @JoinColumn([{ name: 'APP_ID', referencedColumnName: 'PROGRAM' }])
   appsuser: Appsuser[];

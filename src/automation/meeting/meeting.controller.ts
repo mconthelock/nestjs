@@ -4,6 +4,7 @@ import {
   Body,
   HttpException,
   HttpStatus,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { MeetingService } from './meeting.service';
 
@@ -47,7 +48,7 @@ export class MeetingController {
       await page.waitForLoadState('networkidle');
       await this.meeting.logout(page);
     } catch (err) {
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+      throw new InternalServerErrorException(err);
     }
   }
 

@@ -24,4 +24,9 @@ export class CreateESCSARRDto {
   @IsNotEmpty()
   @IsString()
   ARR_REASON: string;
+
+  @IsNotEmpty()
+  @Type(() => Number)
+  @IsNumber()
+  ARR_TOTAL: number;
 }

@@ -59,7 +59,7 @@ export class ESCSARMService {
         await localRunner.connect();
         await localRunner.startTransaction();
       }
-      const { topic, list, incharge, reason, secid } = dto;
+      const { topic, list, incharge, reason, secid, total } = dto;
       const runner = queryRunner || localRunner!;
       const currentData = await this.getAuditReportMaster(
         { ARM_SECID: secid },
@@ -72,6 +72,7 @@ export class ESCSARMService {
           ARR_SECID: secid,
           ARR_INCHARGE: incharge,
           ARR_REASON: reason,
+          ARR_TOTAL: total
         },
         runner,
       );

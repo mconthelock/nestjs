@@ -21,6 +21,9 @@ export class AuditReportRevision {
   @Column()
   ARR_REASON: string;
 
+  @Column()
+  ARR_TOTAL: number;
+
   @OneToOne(() => EscsUser, (u) => u.auditRev)
   @JoinColumn({ name: 'ARR_INCHARGE', referencedColumnName: 'USR_ID' })
   ARR_INCHARGE_INFO: EscsUser | null;

@@ -11,8 +11,8 @@ export class LoggerService implements OnModuleInit {
     @InjectDataSource('spsysConnection')
     private readonly spsysDs: DataSource,
 
-    @InjectDataSource('webformConnection')
-    private readonly webformDs: DataSource,
+    // @InjectDataSource('webformConnection')
+    // private readonly webformDs: DataSource,
 
     @InjectDataSource('amecConnection')
     private readonly amecDs: DataSource,
@@ -47,18 +47,18 @@ export class LoggerService implements OnModuleInit {
     }
   }
 
-  async checkWebform(): Promise<{ status: string; message?: string }> {
-    const queryRunner = this.webformDs.createQueryRunner();
-    try {
-      //   queryRunner.connection.logger.logQuery = () => {};
-      queryRunner.query(`SELECT 'webform' FROM A002MP@AMECDC WHERE ROWNUM = 1`);
-    } catch (error) {
-      console.log(`Error: ${error.message}`);
-      return { status: 'error', message: error.message };
-    } finally {
-      await queryRunner.release();
-    }
-  }
+//   async checkWebform(): Promise<{ status: string; message?: string }> {
+//     const queryRunner = this.webformDs.createQueryRunner();
+//     try {
+//       //   queryRunner.connection.logger.logQuery = () => {};
+//       queryRunner.query(`SELECT 'webform' FROM A002MP@AMECDC WHERE ROWNUM = 1`);
+//     } catch (error) {
+//       console.log(`Error: ${error.message}`);
+//       return { status: 'error', message: error.message };
+//     } finally {
+//       await queryRunner.release();
+//     }
+//   }
 
   async checkIds(): Promise<{ status: string; message?: string }> {
     const queryRunner = this.amecDs.createQueryRunner();
@@ -82,7 +82,7 @@ export class LoggerService implements OnModuleInit {
       console.log('Running check connection.');
       this.check();
       this.checkSpsys();
-      this.checkWebform();
+    //   this.checkWebform();
       this.checkIds();
     }, 600_000);
   }

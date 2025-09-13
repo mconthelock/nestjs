@@ -45,7 +45,7 @@ import { AutomationModule } from './automation/automation.module';
     TypeOrmModule.forRootAsync(amecConfig),
     TypeOrmModule.forRootAsync(spsysConfig),
     TypeOrmModule.forRootAsync(docinvConfig),
-    TypeOrmModule.forRootAsync(webformConfig),
+    // TypeOrmModule.forRootAsync(webformConfig),
     //BB8 💣
     AuthModule,
     AmecModule,

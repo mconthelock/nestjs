@@ -5,7 +5,7 @@ import { UsersController } from './users.controller';
 import { User } from './entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User], 'webformConnection')],
+  imports: [TypeOrmModule.forFeature([User], 'amecConnection')],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],

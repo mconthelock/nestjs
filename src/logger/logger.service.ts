@@ -79,11 +79,13 @@ export class LoggerService implements OnModuleInit {
   onModuleInit() {
     // check ทุก 14 นาที เพื่อให้ DBLINK reconnect ใหม่ เพราะ AMECMFG reject connect ทุก 15 นาที
     setInterval(() => {
-      console.log('Running check connection.');
-      this.check();
-      this.checkSpsys();
-      this.checkWebform();
-      this.checkIds();
+      if (process.env.HOST == 'AMEC') {
+        console.log('Running check connection.');
+        this.check();
+        this.checkSpsys();
+        this.checkWebform();
+        this.checkIds();
+      }
     }, 600_000);
   }
 }

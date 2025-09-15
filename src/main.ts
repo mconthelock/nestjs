@@ -15,6 +15,7 @@ import { WinstonModule, WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
 import { AllExceptionsFilter } from './common/logger/http-exception.filter';
 import { winstonConfig } from './common/logger/winston.config';
+import { SocketIoAdapter } from './common/ws/socket-io.adapter';
 
 async function bootstrap() {
   // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์
@@ -24,25 +25,46 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: false,
   });
+//   app.enableCors({
+//     origin: [
+//       'https://amecwebtest.mitsubishielevatorasia.co.th',
+//       'https://amecwebtest1.mitsubishielevatorasia.co.th',
+//       'https://amecweb.mitsubishielevatorasia.co.th',
+//       'https://amecweb1.mitsubishielevatorasia.co.th',
+//       'https://amecweb2.mitsubishielevatorasia.co.th',
+//       'https://amecweb4.mitsubishielevatorasia.co.th',
+//       'http://amecwebtest.mitsubishielevatorasia.co.th',
+//       'http://amecwebtest1.mitsubishielevatorasia.co.th',
+//       'http://amecweb.mitsubishielevatorasia.co.th',
+//       'http://amecweb1.mitsubishielevatorasia.co.th',
+//       'http://amecweb2.mitsubishielevatorasia.co.th',
+//       'http://amecweb4.mitsubishielevatorasia.co.th',
+//       'http://webflow.mitsubishielevatorasia.co.th',
+//       'http://localhost:8080',
+//     ],
+//     credentials: true,
+//   });
   app.enableCors({
-    origin: [
-      'https://amecwebtest.mitsubishielevatorasia.co.th',
-      'https://amecwebtest1.mitsubishielevatorasia.co.th',
-      'https://amecweb.mitsubishielevatorasia.co.th',
-      'https://amecweb1.mitsubishielevatorasia.co.th',
-      'https://amecweb2.mitsubishielevatorasia.co.th',
-      'https://amecweb4.mitsubishielevatorasia.co.th',
-      'http://amecwebtest.mitsubishielevatorasia.co.th',
-      'http://amecwebtest1.mitsubishielevatorasia.co.th',
-      'http://amecweb.mitsubishielevatorasia.co.th',
-      'http://amecweb1.mitsubishielevatorasia.co.th',
-      'http://amecweb2.mitsubishielevatorasia.co.th',
-      'http://amecweb4.mitsubishielevatorasia.co.th',
-      'http://webflow.mitsubishielevatorasia.co.th',
-      'http://localhost:8080',
-    ],
+    origin: (origin, cb) => {
+      // ถ้าขี้เกียจแยก logic จะใช้เหมือน isAllowedOrigin ก็ได้
+      if (!origin) return cb(null, true);
+      try {
+        const u = new URL(origin);
+        const host = u.hostname.toLowerCase();
+        if (
+          host === 'mitsubishielevatorasia.co.th' ||
+          host.endsWith('.mitsubishielevatorasia.co.th') ||
+          host === 'localhost' ||
+          host === '127.0.0.1'
+        ) return cb(null, true);
+      } catch {}
+      cb(new Error('HTTP CORS blocked'), false);
+    },
     credentials: true,
   });
+
+  // 🔗 ตั้ง WS adapter กลาง—ครอบทุก @WebSocketGateway
+  app.useWebSocketAdapter(new SocketIoAdapter(app));
 
   app.useGlobalPipes(
     new ValidationPipe({

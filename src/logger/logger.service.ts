@@ -83,7 +83,7 @@ export class LoggerService implements OnModuleInit {
         console.log('Running check connection.');
         this.check();
         this.checkSpsys();
-        this.checkWebform();
+        //this.checkWebform();
         this.checkIds();
       }
     }, 600_000);

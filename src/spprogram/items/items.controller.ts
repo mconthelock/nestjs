@@ -14,7 +14,7 @@ export class ItemsController {
 
   @Post('finitem')
   findFinItems(@Body() data: searchItemsDto) {
-    data.CATEGORY = 31;
+    data.CATEGORY = 99;
     return this.items.findAll(data);
   }
 }

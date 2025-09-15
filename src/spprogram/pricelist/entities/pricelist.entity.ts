@@ -21,13 +21,13 @@ export class Pricelist {
   @Column()
   INQUIRY: number;
 
-  @Column()
+  @Column('decimal', { precision: 10, scale: 2 })
   FCCOST: number;
 
-  @Column()
+  @Column('decimal', { precision: 10, scale: 2 })
   FCBASE: number;
 
-  @Column()
+  @Column('decimal', { precision: 10, scale: 2 })
   TCCOST: number;
 
   @Column()

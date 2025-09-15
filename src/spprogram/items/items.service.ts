@@ -183,23 +183,23 @@ export class ItemsService {
   async compareVariable(data, obj2) {
     let obj1 = [];
     for (const item of data) {
-      const variable = await this.validateVariable(item.ITEM_VARIABLE);
+      const variable = await this.validateVariable(
+        item.ITEM_VARIABLE == null ? '' : item.ITEM_VARIABLE,
+      );
       obj1.push({ item, variable: variable.parsedData });
     }
 
+    let res = [];
+    let check = true;
     for (const obj of obj1) {
       if (Object.keys(obj.variable).length !== Object.keys(obj2).length)
-        return false;
+        check = false;
       for (const key in obj.variable) {
-        console.log(obj.variable[key], obj2[key]);
-
-        if (obj.variable[key] !== obj2[key]) continue;
-        console.log('xxx');
-
-        return obj.item;
+        if (obj.variable[key] !== obj2[key]) check = false;
       }
+      if (check) res.push(obj.item);
+      check = true;
     }
-
-    //console.log(res);
+    return res;
   }
 }

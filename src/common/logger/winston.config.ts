@@ -64,6 +64,11 @@ const keyColors = {
   stack: chalk.redBright,
 };
 
+const skipError = winston.format((info) => {
+  if (info.level === 'error') return false;
+  return info;
+});
+
 export const winstonConfig = {
   format: winston.format.combine(
     ignoreTypeOrmEntities(),
@@ -106,6 +111,7 @@ export const winstonConfig = {
       maxFiles: '30d',
       level: process.env.LOGGER_FILE,
       format: winston.format.combine(
+        skipError(),
         stripColors(),
         ignoreTypeOrmEntities(),
         // skipSelectQuery(),

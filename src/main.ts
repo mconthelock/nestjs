@@ -23,8 +23,11 @@ async function bootstrap() {
   await fs.mkdir(uploadPath, { recursive: true });
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: false,
+    logger: WinstonModule.createLogger(winstonConfig),
   });
+
+  
+  
 //   app.enableCors({
 //     origin: [
 //       'https://amecwebtest.mitsubishielevatorasia.co.th',

@@ -67,9 +67,4 @@ export class LoggerController {
 
     return logs;
   }
-
-  @Get('health')
-  async healthCheck() {
-    return this.logger.check();
-  }
 }

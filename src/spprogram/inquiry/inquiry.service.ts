@@ -230,8 +230,6 @@ export class InquiryService {
             el.INQG_GROUP = groupid;
             el.INQID = inquiry.INQ_ID;
             const dto: dtDto = Object.assign({} as dtDto, el);
-
-            console.log(el);
             await runner.manager.save(InquiryDetail, dto);
           }
         }
@@ -246,6 +244,41 @@ export class InquiryService {
           }
           //Remove some group that not avialable in detail
           await this.removeGroups(runner, inqid);
+        }
+
+        //Final line and groups
+        const final_group = await runner.manager.find(InquiryGroup, {
+          where: { INQ_ID: inqid, INQG_LATEST: 1 },
+        });
+        const final_detail = await runner.manager.find(InquiryDetail, {
+          where: { INQID: inqid, INQD_LATEST: 1 },
+        });
+
+        const final_group_id = [];
+        for (const dt of final_detail) {
+          let item = Math.floor(parseInt(dt.INQD_ITEM) / 100);
+          if (item === 5) item = 2;
+          if (item >= 6) item = 6;
+          const val = final_group.find((fg) => fg.INQG_GROUP == item);
+          if (val !== undefined) {
+            await runner.manager.update(
+              InquiryDetail,
+              { INQD_ID: dt.INQD_ID },
+              { INQG_GROUP: val.INQG_ID },
+            );
+            final_group_id.push(val.INQG_ID);
+          }
+        }
+
+        //Delete final group that not have any detail
+        for (const fg of final_group) {
+          if (!final_group_id.includes(fg.INQG_ID)) {
+            await runner.manager.update(
+              InquiryGroup,
+              { INQG_ID: fg.INQG_ID },
+              { INQG_LATEST: 0 },
+            );
+          }
         }
       }
       await runner.commitTransaction();

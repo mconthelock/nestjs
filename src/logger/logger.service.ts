@@ -18,13 +18,10 @@ export class LoggerService implements OnModuleInit {
     private readonly amecDs: DataSource,
   ) {}
 
-  async check(): Promise<{ status: string; message?: string }> {
+  async checkDocinv(): Promise<{ status: string; message?: string }> {
     const queryRunner = this.docinvDs.createQueryRunner();
     try {
-      //   queryRunner.connection.logger.logQuery = () => {};
-      await queryRunner.query(
-        `SELECT 'docinv' FROM A002MP@DATACENTER WHERE ROWNUM = 1`,
-      );
+      await queryRunner.query(`SELECT 'DOCINV', sysdate FROM dual@DATACENTER`);
       return { status: 'ok' };
     } catch (error) {
       console.log(`Error: ${error.message}`);
@@ -37,8 +34,7 @@ export class LoggerService implements OnModuleInit {
   async checkSpsys(): Promise<{ status: string; message?: string }> {
     const queryRunner = this.spsysDs.createQueryRunner();
     try {
-      //   queryRunner.connection.logger.logQuery = () => {};
-      queryRunner.query(`SELECT 'spsys' FROM A002MP@AMECDC WHERE ROWNUM = 1`);
+      await queryRunner.query(`SELECT 'SPSYS', sysdate FROM dual@AMECDC`);
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };
@@ -50,8 +46,7 @@ export class LoggerService implements OnModuleInit {
   async checkWebform(): Promise<{ status: string; message?: string }> {
     const queryRunner = this.webformDs.createQueryRunner();
     try {
-      //   queryRunner.connection.logger.logQuery = () => {};
-      queryRunner.query(`SELECT 'webform' FROM A002MP@AMECDC WHERE ROWNUM = 1`);
+      await queryRunner.query(`SELECT 'WEBFORM', sysdate FROM dual@AMECDC`);
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };
@@ -63,10 +58,7 @@ export class LoggerService implements OnModuleInit {
   async checkIds(): Promise<{ status: string; message?: string }> {
     const queryRunner = this.amecDs.createQueryRunner();
     try {
-      //   queryRunner.connection.logger.logQuery = () => {};
-      queryRunner.query(
-        `SELECT 'ids' FROM RTNLIBF_A002MP@DAILYIDS WHERE ROWNUM = 1`,
-      );
+      await queryRunner.query(`SELECT 'DAILYIDS', sysdate FROM dual@DAILYIDS`);
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };
@@ -75,14 +67,11 @@ export class LoggerService implements OnModuleInit {
     }
   }
 
-  // run loop หลัง module init
   onModuleInit() {
-    // check ทุก 14 นาที เพื่อให้ DBLINK reconnect ใหม่ เพราะ AMECMFG reject connect ทุก 15 นาที
     setInterval(() => {
-      console.log(process.env.HOST);
       if (process.env.HOST == 'AMEC') {
         console.log('Running check connection.');
-        this.check();
+        this.checkDocinv();
         this.checkSpsys();
         this.checkWebform();
         this.checkIds();

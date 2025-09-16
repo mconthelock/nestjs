@@ -1,5 +1,5 @@
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
-import { Repository, DataSource, QueryRunner } from 'typeorm';
+import { Repository, DataSource, QueryRunner, Raw } from 'typeorm';
 import * as oracledb from 'oracledb'; // ต้อง import oracledb เพื่อกำหนดชนิดข้อมูลของ parameter
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Inquiry } from './entities/inquiry.entity';
@@ -11,6 +11,7 @@ import { Timeline } from '../timeline/entities/timeline.entity';
 import { searchDto } from './dto/search.dto';
 import { createInqDto } from './dto/create-inquiry.dto';
 import { createDto as dtDto } from '../inquiry-detail/dto/create.dto';
+import { updateTimelineDto } from '../timeline/dto/update-dto';
 
 interface group {
   INQ_ID: number;
@@ -48,6 +49,7 @@ export class InquiryService {
         quotype: true,
         method: true,
         term: true,
+        timeline: true,
         shipment: true,
       },
     });
@@ -69,14 +71,42 @@ export class InquiryService {
   }
 
   async search(searchDto: searchDto) {
-    const q = { INQ_LATEST: 1 };
+    const where = { INQ_LATEST: 1 };
+    for (const key in searchDto) {
+      const parts = key.split('_');
+      switch (parts[0]) {
+        case 'LIKE':
+          const like = key.replace('LIKE_', '').trim();
+          where[like] = Raw((inq) => `TRIM(${inq}) like  :inq`, {
+            inq: `%${searchDto[key].trim()}%`,
+          });
+          break;
+        case 'LE':
+          const le = key.replace('LE_', '').trim();
+          where[le] = Raw((inq) => `${inq} <=  :inq`, {
+            inq: `${searchDto[key]}`,
+          });
+          break;
+        case 'GE':
+          const ge = key.replace('GE_', '').trim();
+          where[ge] = Raw((inq) => `${inq} >=  :inq`, {
+            inq: `${searchDto[key]}`,
+          });
+          break;
+        default:
+          where[key] = searchDto[key];
+          break;
+      }
+    }
     return this.inq.find({
-      where: {
-        ...searchDto,
-        ...q,
-      },
+      where: where,
       order: { INQ_ID: 'DESC' },
-      relations: ['inqgroup', 'status', 'maruser'],
+      relations: {
+        inqgroup: true,
+        status: true,
+        maruser: true,
+        timeline: true,
+      },
     });
   }
 
@@ -160,6 +190,7 @@ export class InquiryService {
     details: any[],
     deleteLine: any[],
     deleteFile: any[],
+    timelinedata?: updateTimelineDto,
   ) {
     const runner = this.ds.createQueryRunner();
     await runner.connect();
@@ -217,7 +248,6 @@ export class InquiryService {
               const savedGroups = await runner.manager.findOne(InquiryGroup, {
                 where: { INQ_ID: inquiry.INQ_ID, INQG_GROUP: item },
               });
-
               groupid = savedGroups.INQG_ID;
             } else {
               groupid = group.INQG_ID;
@@ -277,6 +307,20 @@ export class InquiryService {
               InquiryGroup,
               { INQG_ID: fg.INQG_ID },
               { INQG_LATEST: 0 },
+            );
+          }
+        }
+
+        if (timelinedata !== undefined) {
+          const timeline = await runner.manager.findOne(Timeline, {
+            where: { INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV },
+          });
+          if (timeline !== undefined) {
+            Object.assign(timeline, timelinedata);
+            await runner.manager.update(
+              Timeline,
+              { INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV },
+              timeline,
             );
           }
         }

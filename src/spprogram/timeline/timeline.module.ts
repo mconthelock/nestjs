@@ -5,8 +5,8 @@ import { Timeline } from './entities/timeline.entity';
 import { TimelineController } from './timeline.controller';
 
 @Module({
-  controllers: [TimelineController],
   imports: [TypeOrmModule.forFeature([Timeline], 'spsysConnection')],
+  controllers: [TimelineController],
   providers: [TimelineService],
 })
 export class TimelineModule {}

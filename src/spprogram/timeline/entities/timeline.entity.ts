@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 
 @Entity('SP_INQUIRY_TIMELINE')
 export class Timeline {
@@ -86,8 +87,19 @@ export class Timeline {
   @Column()
   QT_CONFIRM: Date;
 
+  @Column()
+  BYPASS_SE: string;
+
+  @Column()
+  BYPASS_DE: string;
+
+  @Column()
+  SALE_CLASS: string;
+
   // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
   // ตัวอย่าง:
-  // @ManyToOne(() => User, user => user.posts)
-  // user: User;
+  @OneToOne(() => Inquiry, (inqs) => inqs.timeline)
+  @JoinColumn({ name: 'INQ_NO', referencedColumnName: 'INQ_NO' })
+  @JoinColumn({ name: 'INQ_REV', referencedColumnName: 'INQ_REV' })
+  inqs: Inquiry;
 }

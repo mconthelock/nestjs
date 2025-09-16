@@ -25,6 +25,7 @@ export class InquiryController {
       req.details,
       req.deleteLine,
       req.deleteFile,
+      req.timelinedata || undefined,
     );
     return await this.inq.findByNumber(req.header.INQ_NO);
   }

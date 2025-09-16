@@ -21,7 +21,6 @@ async function bootstrap() {
   // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์
   const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
   await fs.mkdir(uploadPath, { recursive: true });
-  console.log('Process TZ:', process.env.TZ);
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: WinstonModule.createLogger(winstonConfig),
   });

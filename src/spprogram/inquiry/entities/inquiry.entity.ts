@@ -5,6 +5,7 @@ import {
   JoinColumn,
   OneToMany,
   ManyToOne,
+  OneToOne,
 } from 'typeorm';
 import { InquiryGroup } from '../../inquiry-group/entities/inquiry-group.entity';
 import { InquiryDetail } from '../../inquiry-detail/entities/inquiry-detail.entity';
@@ -13,6 +14,7 @@ import { QuotationType } from '../../quotation-type/entities/quotation-type.enti
 import { Method } from '../../method/entities/method.entity';
 import { Term } from '../../term/entities/term.entity';
 import { Shipment } from '../../shipment/entities/shipment.entity';
+import { Timeline } from '../../timeline/entities/timeline.entity';
 import { SpUser } from 'src/spprogram/spusers/spusers.entity';
 
 @Entity('SP_INQUIRY')
@@ -183,4 +185,9 @@ export class Inquiry {
   @ManyToOne(() => SpUser, (user) => user.inqs)
   @JoinColumn({ name: 'INQ_MAR_PIC', referencedColumnName: 'SEMPNO' })
   maruser: SpUser;
+
+  @OneToOne(() => Timeline, (times) => times.inqs)
+  @JoinColumn({ name: 'INQ_NO', referencedColumnName: 'INQ_NO' })
+  @JoinColumn({ name: 'INQ_REV', referencedColumnName: 'INQ_REV' })
+  timeline: Timeline;
 }

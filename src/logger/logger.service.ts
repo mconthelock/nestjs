@@ -21,7 +21,7 @@ export class LoggerService implements OnModuleInit {
   async checkDocinv(): Promise<{ status: string; message?: string }> {
     try {
       await this.docinvDs.query(
-        `SELECT 'DOCINV', sysdate FROM dual@DATACENTER`,
+        `SELECT 'DOCINV', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS')  FROM A001MP@DATACENTER`,
       );
       return { status: 'ok' };
     } catch (error) {
@@ -32,7 +32,9 @@ export class LoggerService implements OnModuleInit {
 
   async checkSpsys(): Promise<{ status: string; message?: string }> {
     try {
-      await this.spsysDs.query(`SELECT 'SPSYS', sysdate FROM dual@AMECDC`);
+      await this.spsysDs.query(
+        `SELECT 'SPSYS', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@AMECDC`,
+      );
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };
@@ -41,7 +43,9 @@ export class LoggerService implements OnModuleInit {
 
   async checkWebform(): Promise<{ status: string; message?: string }> {
     try {
-      await this.webformDs.query(`SELECT 'WEBFORM', sysdate FROM dual@AMECDC`);
+      await this.webformDs.query(
+        `SELECT 'WEBFORM', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@AMECDC`,
+      );
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };
@@ -50,7 +54,9 @@ export class LoggerService implements OnModuleInit {
 
   async checkIds(): Promise<{ status: string; message?: string }> {
     try {
-      await this.amecDs.query(`SELECT 'DAILYIDS', sysdate FROM dual@DAILYIDS`);
+      await this.amecDs.query(
+        `SELECT 'DAILYIDS', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@DAILYIDS`,
+      );
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };

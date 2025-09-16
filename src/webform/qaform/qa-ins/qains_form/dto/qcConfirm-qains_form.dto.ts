@@ -34,6 +34,11 @@ export class QcConfQainsFormDto extends PickType(doactionFlowDto, [
   QCFOREMAN: string;
 
   @IsNotEmpty()
+  @Type(() => Number)
+  @IsNumber()
+  QA_REV: number;
+
+  @IsNotEmpty()
   @Transform(({ value }) => 
     Array.isArray(value) ? value : [value] // ถ้าเป็น string เดี่ยว → wrap array
   )

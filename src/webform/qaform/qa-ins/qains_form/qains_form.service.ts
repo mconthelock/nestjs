@@ -183,6 +183,7 @@ export class QainsFormService {
         'QA_FILES.TYPE',
         'QA_INCHARGE_INFO',
         'QA_INCHARGE_SECTION_INFO',
+        'QA_REV_INFO'
       ],
       order: {
         QA_AUD_OPT: { QOA_SEQ: 'ASC' }, // แทน ORDER BY ใน subquery เดิม
@@ -318,6 +319,7 @@ export class QainsFormService {
           ...form,
           QA_TRAINING_DATE: dto.TRAINING_DATE,
           QA_OJT_DATE: dto.OJTDATE,
+          QA_REV: dto.QA_REV,
         },
         queryRunner,
       );

@@ -10,6 +10,7 @@ import { QainsOA } from '../../qains_operator_auditor/entities/qains_operator_au
 import { QaFile } from '../../../qa_file/entities/qa_file.entity';
 import { User } from '../../entities-dummy/user.entity';
 import { UserSection } from '../../entities-dummy/user_section.entity';
+import { AuditReportRevision } from 'src/escs/audit_report_revision/entities/audit_report_revision.entity';
 
 @Entity('QAINS_FORM')
 export class QainsForm {
@@ -30,6 +31,9 @@ export class QainsForm {
 
   @Column()
   QA_ITEM: string;
+
+  @Column()
+  QA_REV: number;
 
   @Column()
   QA_INCHARGE_SECTION: number;
@@ -56,4 +60,9 @@ export class QainsForm {
   @OneToOne(() => UserSection, (u) => u.QAINS)
   @JoinColumn({ name: 'QA_INCHARGE_SECTION', referencedColumnName: 'SEC_ID' })
   QA_INCHARGE_SECTION_INFO: UserSection | null;
+
+  @OneToOne(() => AuditReportRevision, (q) => q.QAINSREV)
+  @JoinColumn({ name: 'QA_REV', referencedColumnName: 'ARR_REV' })
+  @JoinColumn({ name: 'QA_INCHARGE_SECTION', referencedColumnName: 'ARR_SECID' })
+  QA_REV_INFO: AuditReportRevision | null;
 }

@@ -1,8 +1,9 @@
 
 import { CreateQainsFormDto } from './create-qains_form.dto';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { PickType, PartialType, IntersectionType } from '@nestjs/swagger';
 import { FormDto } from 'src/webform/form/dto/form.dto';
+import { Type } from 'class-transformer';
 
 export class UpdateQainsFormDto extends IntersectionType(
     PartialType(CreateQainsFormDto),
@@ -15,4 +16,9 @@ export class UpdateQainsFormDto extends IntersectionType(
   @IsOptional()
   @IsString()
   QA_OJT_DATE?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  QA_REV?: number;
 }

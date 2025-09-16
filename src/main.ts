@@ -21,32 +21,30 @@ async function bootstrap() {
   // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์
   const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
   await fs.mkdir(uploadPath, { recursive: true });
-
+  console.log('Process TZ:', process.env.TZ);
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: WinstonModule.createLogger(winstonConfig),
   });
 
-  
-  
-//   app.enableCors({
-//     origin: [
-//       'https://amecwebtest.mitsubishielevatorasia.co.th',
-//       'https://amecwebtest1.mitsubishielevatorasia.co.th',
-//       'https://amecweb.mitsubishielevatorasia.co.th',
-//       'https://amecweb1.mitsubishielevatorasia.co.th',
-//       'https://amecweb2.mitsubishielevatorasia.co.th',
-//       'https://amecweb4.mitsubishielevatorasia.co.th',
-//       'http://amecwebtest.mitsubishielevatorasia.co.th',
-//       'http://amecwebtest1.mitsubishielevatorasia.co.th',
-//       'http://amecweb.mitsubishielevatorasia.co.th',
-//       'http://amecweb1.mitsubishielevatorasia.co.th',
-//       'http://amecweb2.mitsubishielevatorasia.co.th',
-//       'http://amecweb4.mitsubishielevatorasia.co.th',
-//       'http://webflow.mitsubishielevatorasia.co.th',
-//       'http://localhost:8080',
-//     ],
-//     credentials: true,
-//   });
+  //   app.enableCors({
+  //     origin: [
+  //       'https://amecwebtest.mitsubishielevatorasia.co.th',
+  //       'https://amecwebtest1.mitsubishielevatorasia.co.th',
+  //       'https://amecweb.mitsubishielevatorasia.co.th',
+  //       'https://amecweb1.mitsubishielevatorasia.co.th',
+  //       'https://amecweb2.mitsubishielevatorasia.co.th',
+  //       'https://amecweb4.mitsubishielevatorasia.co.th',
+  //       'http://amecwebtest.mitsubishielevatorasia.co.th',
+  //       'http://amecwebtest1.mitsubishielevatorasia.co.th',
+  //       'http://amecweb.mitsubishielevatorasia.co.th',
+  //       'http://amecweb1.mitsubishielevatorasia.co.th',
+  //       'http://amecweb2.mitsubishielevatorasia.co.th',
+  //       'http://amecweb4.mitsubishielevatorasia.co.th',
+  //       'http://webflow.mitsubishielevatorasia.co.th',
+  //       'http://localhost:8080',
+  //     ],
+  //     credentials: true,
+  //   });
   app.enableCors({
     origin: (origin, cb) => {
       // ถ้าขี้เกียจแยก logic จะใช้เหมือน isAllowedOrigin ก็ได้
@@ -59,7 +57,8 @@ async function bootstrap() {
           host.endsWith('.mitsubishielevatorasia.co.th') ||
           host === 'localhost' ||
           host === '127.0.0.1'
-        ) return cb(null, true);
+        )
+          return cb(null, true);
       } catch {}
       cb(new Error('HTTP CORS blocked'), false);
     },

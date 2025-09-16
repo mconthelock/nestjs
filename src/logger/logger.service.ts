@@ -19,51 +19,41 @@ export class LoggerService implements OnModuleInit {
   ) {}
 
   async checkDocinv(): Promise<{ status: string; message?: string }> {
-    const queryRunner = this.docinvDs.createQueryRunner();
     try {
-      await queryRunner.query(`SELECT 'DOCINV', sysdate FROM dual@DATACENTER`);
+      await this.docinvDs.query(
+        `SELECT 'DOCINV', sysdate FROM dual@DATACENTER`,
+      );
       return { status: 'ok' };
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };
-    } finally {
-      await queryRunner.release();
     }
   }
 
   async checkSpsys(): Promise<{ status: string; message?: string }> {
-    const queryRunner = this.spsysDs.createQueryRunner();
     try {
-      await queryRunner.query(`SELECT 'SPSYS', sysdate FROM dual@AMECDC`);
+      await this.spsysDs.query(`SELECT 'SPSYS', sysdate FROM dual@AMECDC`);
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };
-    } finally {
-      await queryRunner.release();
     }
   }
 
   async checkWebform(): Promise<{ status: string; message?: string }> {
-    const queryRunner = this.webformDs.createQueryRunner();
     try {
-      await queryRunner.query(`SELECT 'WEBFORM', sysdate FROM dual@AMECDC`);
+      await this.webformDs.query(`SELECT 'WEBFORM', sysdate FROM dual@AMECDC`);
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };
-    } finally {
-      await queryRunner.release();
     }
   }
 
   async checkIds(): Promise<{ status: string; message?: string }> {
-    const queryRunner = this.amecDs.createQueryRunner();
     try {
-      await queryRunner.query(`SELECT 'DAILYIDS', sysdate FROM dual@DAILYIDS`);
+      await this.amecDs.query(`SELECT 'DAILYIDS', sysdate FROM dual@DAILYIDS`);
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };
-    } finally {
-      await queryRunner.release();
     }
   }
 

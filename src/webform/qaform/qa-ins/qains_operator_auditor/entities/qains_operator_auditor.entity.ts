@@ -29,6 +29,18 @@ export class QainsOA {
   @Column()
   QOA_EMPNO: string;
 
+  @Column()
+  QOA_AUDIT: number;
+
+  @Column()
+  QOA_RESULT: number;
+  
+  @Column()
+  QOA_SCORE: number;
+
+  @Column()
+  QOA_GRADE: number;
+
   @ManyToOne(() => QainsForm, (form) => form.QA_AUD_OPT)
   @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
   @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })

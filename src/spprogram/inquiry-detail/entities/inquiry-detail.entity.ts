@@ -19,7 +19,7 @@ export class InquiryDetail {
   @Column()
   INQG_GROUP: number;
 
-  @Column()
+  @Column('decimal', { precision: 10, scale: 2 })
   INQD_SEQ: number;
 
   @Column()

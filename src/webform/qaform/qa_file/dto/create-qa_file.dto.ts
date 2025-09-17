@@ -27,9 +27,6 @@ export class CreateQaFileDto {
   @IsString()
   FILE_TYPECODE: string;
 
-  @Type(() => Number)
-  @IsNumber()
-  FILE_TYPENO: number;
 
   @IsString()
   FILE_ONAME: string;

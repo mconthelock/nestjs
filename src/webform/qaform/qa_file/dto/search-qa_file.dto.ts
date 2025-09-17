@@ -27,9 +27,6 @@ export class SearchQaFileDto {
   @IsString()
   FILE_TYPECODE: string;
 
-  @Type(() => Number)
-  @IsNumber()
-  FILE_TYPENO: number;
 
   @IsOptional()
   @Type(() => Number)

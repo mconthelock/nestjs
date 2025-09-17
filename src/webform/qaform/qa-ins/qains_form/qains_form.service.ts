@@ -131,7 +131,6 @@ export class QainsFormService {
           {
             ...form,
             FILE_TYPECODE: 'ESF',
-            FILE_TYPENO: 1,
             FILE_ONAME: file.originalname, // ชื่อเดิมฝั่ง client
             FILE_FNAME: moved.newName, // ชื่อไฟล์ที่ใช้เก็บจริง
             FILE_USERCREATE: dto.REQUESTER,
@@ -179,11 +178,13 @@ export class QainsFormService {
         'QA_AUD_OPT',
         'QA_AUD_OPT.TYPE',
         'QA_AUD_OPT.QOA_EMPNO_INFO',
+        'QA_AUD_OPT.QA_AUDIT',
         'QA_FILES',
         'QA_FILES.TYPE',
         'QA_INCHARGE_INFO',
         'QA_INCHARGE_SECTION_INFO',
-        'QA_REV_INFO'
+        'QA_REV_INFO',
+        'QA_MASTER'
       ],
       order: {
         QA_AUD_OPT: { QOA_SEQ: 'ASC' }, // แทน ORDER BY ใน subquery เดิม

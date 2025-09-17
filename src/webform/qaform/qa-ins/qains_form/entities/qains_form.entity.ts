@@ -11,6 +11,7 @@ import { QaFile } from '../../../qa_file/entities/qa_file.entity';
 import { User } from '../../entities-dummy/user.entity';
 import { UserSection } from '../../entities-dummy/user_section.entity';
 import { AuditReportRevision } from 'src/escs/audit_report_revision/entities/audit_report_revision.entity';
+import { AuditReportMasterAll } from 'src/escs/audit_report_master_all/entities/audit_report_master_all.entity';
 
 @Entity('QAINS_FORM')
 export class QainsForm {
@@ -65,4 +66,9 @@ export class QainsForm {
   @JoinColumn({ name: 'QA_REV', referencedColumnName: 'ARR_REV' })
   @JoinColumn({ name: 'QA_INCHARGE_SECTION', referencedColumnName: 'ARR_SECID' })
   QA_REV_INFO: AuditReportRevision | null;
+
+  @OneToMany(() => AuditReportMasterAll, (a) => a.QAINS_MASTER)
+  @JoinColumn({ name: 'QA_INCHARGE_SECTION', referencedColumnName: 'ARM_SECID' })
+  @JoinColumn({ name: 'QA_REV', referencedColumnName: 'ARM_REV' })
+  QA_MASTER: AuditReportMasterAll[] | null;
 }

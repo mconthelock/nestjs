@@ -20,7 +20,14 @@ export class AppsmenuService {
   }
   async create(data: CreateAppsmenuDto) {
     const list = this.menu.create(data);
-    return this.menu.save(list);
+    const result = await this.menu.save(list);
+    if (data.MENU_TYPE === 1) {
+      await this.menu.update(
+        { MENU_ID: result.MENU_ID },
+        { MENU_TOP: result.MENU_ID },
+      );
+    }
+    return result;
   }
 
   async update(id: number, data: CreateAppsmenuDto) {

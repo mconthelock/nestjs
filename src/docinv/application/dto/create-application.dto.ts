@@ -100,4 +100,12 @@ export class CreateApplicationDto {
   @IsString()
   @IsOptional()
   APP_POSTER?: string;
+
+  @IsString()
+  @IsOptional()
+  APP_LICENSE?: string;
+
+  @IsString()
+  @IsOptional()
+  APP_LICENSE_LINK?: string;
 }

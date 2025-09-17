@@ -1,9 +1,15 @@
-import { Entity, PrimaryColumn, Column, OneToMany, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { Appsuser } from '../../appsusers/entities/appsuser.entity';
 
 @Entity('APPLICATION')
 export class Application {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   APP_ID: number;
 
   @Column()

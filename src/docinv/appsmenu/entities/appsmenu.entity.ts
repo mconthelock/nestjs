@@ -1,9 +1,15 @@
-import { Entity, PrimaryColumn, Column, OneToMany, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { Appsmenuuser } from '../../appsmenuusers/entities/appsmenuuser.entity';
 
 @Entity('APP_MENU')
 export class Appsmenu {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   MENU_ID: number;
 
   @Column()

@@ -31,4 +31,28 @@ export class CreateQainsOADto {
   @IsOptional()
   @IsString()
   QOA_TYPECODE?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  QOA_SEQ?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  QOA_AUDIT?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  QOA_RESULT?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  QOA_SCORE?: number;
+
+  @IsOptional()
+  @IsString()
+  QOA_GRADE?: string;
 }

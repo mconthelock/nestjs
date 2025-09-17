@@ -40,7 +40,7 @@ export class QainsOA {
   QOA_SCORE: number;
 
   @Column()
-  QOA_GRADE: number;
+  QOA_GRADE: string;
 
   @ManyToOne(() => QainsForm, (form) => form.QA_AUD_OPT)
   @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })

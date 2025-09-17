@@ -24,10 +24,10 @@ export class QainsAudit {
   @PrimaryColumn()
   QAA_AUDIT_SEQ: number;
 
-  @Column()
+  @PrimaryColumn()
   QAA_TOPIC: number;
 
-  @Column()
+  @PrimaryColumn()
   QAA_SEQ: number;
 
   @Column()

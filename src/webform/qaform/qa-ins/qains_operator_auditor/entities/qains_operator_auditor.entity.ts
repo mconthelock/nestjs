@@ -1,7 +1,8 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, OneToOne, OneToMany } from 'typeorm';
 import { QainsForm } from '../../qains_form/entities/qains_form.entity';
 import { QaType } from 'src/webform/qaform/qa_type/entities/qa_type.entity';
 import { User } from '../../entities-dummy/user.entity';
+import { QainsAudit } from '../../qains_audit/entities/qains_audit.entity';
 
 @Entity('QAINS_OPERATOR_AUDITOR')
 export class QainsOA {
@@ -56,4 +57,7 @@ export class QainsOA {
   @OneToOne(() => User, (user) => user.QAINSOA)
   @JoinColumn({ name: 'QOA_EMPNO', referencedColumnName: 'SEMPNO' })
   QOA_EMPNO_INFO: User | null;
+
+  @OneToMany(() => QainsAudit, (audit) => audit.form)
+  QA_AUDIT: QainsAudit[];
 }

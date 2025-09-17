@@ -1,4 +1,5 @@
-import { Column, Entity, ViewColumn, ViewEntity } from "typeorm";
+import { QainsForm } from "src/webform/qaform/qa-ins/qains_form/entities/qains_form.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, ViewColumn, ViewEntity } from "typeorm";
 
 @ViewEntity('AUDIT_REPORT_MASTER_ALL')
 export class AuditReportMasterAll {
@@ -29,4 +30,10 @@ export class AuditReportMasterAll {
 
     @ViewColumn()
     ARM_MAXSCORE?:number;
+
+    @ManyToOne(() => QainsForm, (q) => q.QA_MASTER)
+    @JoinColumn({ name: 'ARM_SECID', referencedColumnName: 'QA_INCHARGE_SECTION' })
+    @JoinColumn({ name: 'ARM_REV', referencedColumnName: 'QA_REV' })
+    QAINS_MASTER: QainsForm | null;
+
 }

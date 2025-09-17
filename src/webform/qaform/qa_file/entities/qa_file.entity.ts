@@ -23,9 +23,6 @@ export class QaFile {
   FILE_TYPECODE: string;
 
   @PrimaryColumn()
-  FILE_TYPENO: number;
-
-  @PrimaryColumn()
   FILE_ID: number;
 
   @Column()
@@ -62,6 +59,5 @@ export class QaFile {
 
   @ManyToOne(() => QaType, (t) => t.FILE_TYPE)
   @JoinColumn({ name: 'FILE_TYPECODE', referencedColumnName: 'QAT_CODE' })
-  @JoinColumn({ name: 'FILE_TYPENO', referencedColumnName: 'QAT_NO' })
   TYPE: QaType | null;
 }

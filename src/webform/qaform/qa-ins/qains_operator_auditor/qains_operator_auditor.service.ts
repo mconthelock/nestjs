@@ -34,7 +34,7 @@ export class QainsOAService {
       };
       const maxSeq = await this.setSeq(condition, runner);
 
-      console.log('maxSeq',maxSeq);
+      console.log('maxSeq', maxSeq);
       const data = {
         ...condition,
         QOA_SEQ: maxSeq,
@@ -82,7 +82,7 @@ export class QainsOAService {
   }
 
   async searchQainsOA(dto: SearchQainsOADto) {
-    return this.qainsOARepo.find({ where: dto });
+    return this.qainsOARepo.find({ where: dto, relations: ['QA_AUDIT', 'TYPE', 'QOA_EMPNO_INFO', 'QAINSFORM'] });
   }
 
   async delete(dto: CreateQainsOADto, queryRunner?: QueryRunner) {

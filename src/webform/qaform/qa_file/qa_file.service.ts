@@ -32,7 +32,6 @@ export class QaFileService {
         CYEAR2: dto.CYEAR2,
         NRUNNO: dto.NRUNNO,
         FILE_TYPECODE: dto.FILE_TYPECODE,
-        FILE_TYPENO: dto.FILE_TYPENO,
       };
 
       const id = await this.setId(condition, runner);

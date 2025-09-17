@@ -133,6 +133,9 @@ export class InquiryDetail {
   @Column()
   INQD_EXRATE: number;
 
+  @Column()
+  INQD_DE: string;
+
   @ManyToOne(() => Inquiry, (inq) => inq.details)
   @JoinColumn({ name: 'INQID', referencedColumnName: 'INQ_ID' })
   inqs: Inquiry;

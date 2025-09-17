@@ -176,4 +176,8 @@ export class createDto {
   @IsOptional()
   @Type(() => Number)
   INQD_EXRATE: number;
+
+  @IsString()
+  @IsOptional()
+  INQD_DE: string;
 }

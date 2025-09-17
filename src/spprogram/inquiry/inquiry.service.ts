@@ -191,6 +191,7 @@ export class InquiryService {
     deleteLine: any[],
     deleteFile: any[],
     timelinedata?: updateTimelineDto,
+    history?: logs,
   ) {
     const runner = this.ds.createQueryRunner();
     await runner.connect();
@@ -324,6 +325,9 @@ export class InquiryService {
             );
           }
         }
+
+        const log = runner.manager.create(History, history);
+        await runner.manager.save(History, log);
       }
       await runner.commitTransaction();
     } catch (err) {

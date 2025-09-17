@@ -55,9 +55,9 @@ export class LoggerService implements OnModuleInit {
 
   async checkIds(): Promise<{ status: string; message?: string }> {
     try {
-      let sql = `SELECT 'WEBFORM', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@DATACENTER`;
+      let sql = `SELECT 'IDS', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@DAILYIDS`;
       if (process.env.STATE == 'development')
-        sql = `SELECT 'WEBFORM', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@AMECDC`;
+        sql = `SELECT 'IDS', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@DAILYIDS`;
       await this.amecDs.query(sql);
     } catch (error) {
       console.log(`Error: ${error.message}`);

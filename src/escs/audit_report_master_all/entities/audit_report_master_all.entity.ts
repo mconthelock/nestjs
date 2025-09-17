@@ -34,6 +34,6 @@ export class AuditReportMasterAll {
     @ManyToOne(() => QainsForm, (q) => q.QA_MASTER)
     @JoinColumn({ name: 'ARM_SECID', referencedColumnName: 'QA_INCHARGE_SECTION' })
     @JoinColumn({ name: 'ARM_REV', referencedColumnName: 'QA_REV' })
-    QAINS_MASTER: QainsForm | null;
+    QAINS_FORM: QainsForm | null;
 
 }

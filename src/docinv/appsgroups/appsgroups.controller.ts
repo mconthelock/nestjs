@@ -23,10 +23,11 @@ export class AppsgroupsController {
   async create(@Body() data: CreateAppsgroupDto) {
     const group = await this.gps.findAll(data.PROGRAM);
     let id = 0;
-    if (group) {
+    if (group.length > 0) {
       const maxId = Math.max(...group.map((item) => item.GROUP_ID));
       id = maxId + 1;
     }
+
     data = { ...data, GROUP_ID: id };
     return this.gps.create(data);
   }

@@ -43,9 +43,10 @@ export class LoggerService implements OnModuleInit {
 
   async checkWebform(): Promise<{ status: string; message?: string }> {
     try {
-      await this.webformDs.query(
-        `SELECT 'WEBFORM', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@AMECDC`,
-      );
+      let sql = `SELECT 'WEBFORM', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@DATACENTER`;
+      if (process.env.STATE == 'development')
+        sql = `SELECT 'WEBFORM', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@AMECDC`;
+      await this.webformDs.query(sql);
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };
@@ -54,9 +55,10 @@ export class LoggerService implements OnModuleInit {
 
   async checkIds(): Promise<{ status: string; message?: string }> {
     try {
-      await this.amecDs.query(
-        `SELECT 'DAILYIDS', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@DAILYIDS`,
-      );
+      let sql = `SELECT 'WEBFORM', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@DATACENTER`;
+      if (process.env.STATE == 'development')
+        sql = `SELECT 'WEBFORM', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@AMECDC`;
+      await this.amecDs.query(sql);
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };

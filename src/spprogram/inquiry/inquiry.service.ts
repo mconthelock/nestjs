@@ -203,9 +203,9 @@ export class InquiryService {
 
       let inqid = inquiry.INQ_ID;
       if (header.INQ_REV != inquiry.INQ_REV) {
-        delete inquiry.INQ_ID;
-        Object.assign(inquiry, header);
-        inqid = await this.dupplicate(runner, inquiry, details, inqid);
+        //delete inquiry.INQ_ID;
+        //Object.assign(inquiry, header);
+        //inqid = await this.dupplicate(runner, inquiry, details, inqid);
       } else {
         const remark = header.INQ_REMARK;
         delete header.INQ_REMARK;
@@ -338,37 +338,70 @@ export class InquiryService {
     }
   }
 
-  async dupplicate(runner, data, values, id) {
-    const header = data;
-    const dbdetail = await runner.manager.find(InquiryDetail, {
-      where: { INQID: data.INQ_ID, INQD_LATEST: 1 },
+  async revise(id) {
+    const inquiry = await this.inq.findOne({
+      where: { INQ_ID: id, INQ_LATEST: 1 },
     });
-    values.forEach((el) => {
-      //console.log(el);
-      const val = dbdetail.find((db) => el.INQD_ID == db.INQD_ID);
-      if (val !== undefined) Object.assign(val, el);
-      el.INQD_PREV = el.INQD_ID;
-      el.CREATE_AT = new Date(data.UPDATE_AT);
-      el.CREATE_BY = data.UPDATE_BY;
-      el.UPDATE_AT = new Date(data.UPDATE_AT);
-      el.UPDATE_BY = data.UPDATE_BY;
-      delete el.INQD_ID;
-      delete el.INQG_GROUP;
-      delete el.INQID;
+    delete inquiry.INQ_ID;
+    Object.assign(inquiry, {
+      INQ_REV: this.revision_code(inquiry.INQ_REV),
+      INQ_LATEST: 1,
     });
-    await this.create(header, values);
-    await runner.manager.update(Inquiry, { INQ_ID: id }, { INQ_LATEST: 0 });
-    await runner.manager.update(
-      InquiryGroup,
-      { INQ_ID: id },
-      { INQG_LATEST: 0 },
-    );
-    await runner.manager.update(
-      InquiryDetail,
-      { INQID: id },
-      { INQD_LATEST: 0 },
-    );
-    return 0;
+
+    const newinq = await this.inq.save(inquiry);
+    return newinq;
+    // const runner = this.ds.createQueryRunner();
+
+    // const header = data;
+    // const dbdetail = await runner.manager.find(InquiryDetail, {
+    //   where: { INQID: data.INQ_ID, INQD_LATEST: 1 },
+    // });
+    // values.forEach((el) => {
+    //   //console.log(el);
+    //   const val = dbdetail.find((db) => el.INQD_ID == db.INQD_ID);
+    //   if (val !== undefined) Object.assign(val, el);
+    //   el.INQD_PREV = el.INQD_ID;
+    //   el.CREATE_AT = new Date(data.UPDATE_AT);
+    //   el.CREATE_BY = data.UPDATE_BY;
+    //   el.UPDATE_AT = new Date(data.UPDATE_AT);
+    //   el.UPDATE_BY = data.UPDATE_BY;
+    //   delete el.INQD_ID;
+    //   delete el.INQG_GROUP;
+    //   delete el.INQID;
+    // });
+    // await this.create(header, values);
+    // await runner.manager.update(Inquiry, { INQ_ID: id }, { INQ_LATEST: 0 });
+    // await runner.manager.update(
+    //   InquiryGroup,
+    //   { INQ_ID: id },
+    //   { INQG_LATEST: 0 },
+    // );
+    // await runner.manager.update(
+    //   InquiryDetail,
+    //   { INQID: id },
+    //   { INQD_LATEST: 0 },
+    // );
+    // return 0;
+  }
+
+  async revision_code(current) {
+    if (current === '*') return 'A';
+    const recursive = (val) => {
+      if (/^[A-Z]$/.test(val)) {
+        if (val === 'Z') {
+          return 'A';
+        }
+        return String.fromCharCode(val.charCodeAt(0) + 1);
+      }
+      return val;
+    };
+    let chars = current.split('');
+    let nb = chars.length - 1;
+    for (var i = nb; i >= 0; i--) {
+      chars[i] = recursive(chars[i]);
+      if (chars[i] != 'A') break;
+    }
+    return chars.join('');
   }
 
   async removeGroups(runner, id) {

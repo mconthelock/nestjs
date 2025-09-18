@@ -72,7 +72,7 @@ export class LockPisGateway
     }
 
     client.data.empno = empno; // เก็บ empno ใน data ของ client
-    this.logger.debug(`CONNECT: ${empno} (${client.id})`);
+    this.logger.log(`CONNECT: ${empno} (${client.id})`);
 
     if (!this.owner.has(empno)) this.owner.set(empno, new Set()); // สร้าง Set ใหม่ถ้า empno ยังไม่มี
     this.owner.get(empno).add(client.id); // เก็บ client.id ใน Set ของ empno

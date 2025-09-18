@@ -1,7 +1,7 @@
 import {
   Column,
   Entity,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   JoinColumn,
   OneToMany,
   ManyToOne,
@@ -19,7 +19,7 @@ import { SpUser } from 'src/spprogram/spusers/spusers.entity';
 
 @Entity('SP_INQUIRY')
 export class Inquiry {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   INQ_ID: number;
 
   @Column()

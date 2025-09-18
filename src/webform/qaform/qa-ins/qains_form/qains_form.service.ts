@@ -189,6 +189,7 @@ export class QainsFormService {
       order: {
         QA_AUD_OPT: { QOA_SEQ: 'ASC' }, // แทน ORDER BY ใน subquery เดิม
         QA_FILES: { FILE_ID: 'ASC' },
+        QA_MASTER: { ARM_NO: 'ASC', ARM_SEQ: 'ASC' },
       },
     });
   }

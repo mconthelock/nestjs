@@ -49,19 +49,22 @@ export class QainsAuditService {
       }
 
       // update QainsOA
-      if (!dto.draft) {
-        await this.qainsOAService.update({
+      //   if (!dto.draft) {
+      await this.qainsOAService.update(
+        {
           ...form,
           QOA_TYPECODE: 'ESO',
           QOA_SEQ: dto.auditSeq,
-          QOA_AUDIT: 1,
+          QOA_AUDIT: dto.draft ? 2 : 1,
           QOA_RESULT: dto.res,
           QOA_SCORE: dto.score,
           QOA_GRADE: dto.grade,
-        }, queryRunner);
-      }
+        },
+        queryRunner,
+      );
+      //   }
       await queryRunner.commitTransaction();
-      return dto;
+      return { status: true, message: 'Save audit successfully' };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

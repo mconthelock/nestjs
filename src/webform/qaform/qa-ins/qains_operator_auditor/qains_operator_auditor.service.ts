@@ -85,6 +85,9 @@ export class QainsOAService {
     return this.qainsOARepo.find({
       where: dto,
       relations: ['QA_AUDIT', 'TYPE', 'QOA_EMPNO_INFO', 'QAINSFORM'],
+      order: {
+        QOA_SEQ: 'ASC',
+      }
     });
   }
 

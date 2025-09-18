@@ -68,7 +68,5 @@ export class QainsForm {
   QA_REV_INFO: AuditReportRevision | null;
 
   @OneToMany(() => AuditReportMasterAll, (a) => a.QAINS_FORM)
-  @JoinColumn({ name: 'QA_INCHARGE_SECTION', referencedColumnName: 'ARM_SECID' })
-  @JoinColumn({ name: 'QA_REV', referencedColumnName: 'ARM_REV' })
   QA_MASTER: AuditReportMasterAll[] | null;
 }

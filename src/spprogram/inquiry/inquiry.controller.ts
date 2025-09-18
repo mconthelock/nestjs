@@ -31,6 +31,11 @@ export class InquiryController {
     return await this.inq.findByNumber(req.header.INQ_NO);
   }
 
+  @Post('revise')
+  async revise(@Body() req: any) {
+    return await this.inq.revise(req.id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.inq.findOne(id);

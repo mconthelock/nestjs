@@ -72,43 +72,42 @@ export class InquiryService {
   }
 
   async search(searchDto: searchDto) {
-    const where = { INQ_LATEST: 1 };
+    const qb = this.inq.createQueryBuilder('inq');
+    qb.where('inq.INQ_LATEST = 1');
     for (const key in searchDto) {
       const parts = key.split('_');
       switch (parts[0]) {
         case 'LIKE':
           const like = key.replace('LIKE_', '').trim();
-          where[like] = Raw((inq) => `TRIM(${inq}) like  :inq`, {
-            inq: `%${searchDto[key].trim()}%`,
+          qb.andWhere(`TRIM(inq.${like}) LIKE :${like}_like`, {
+            [`${like}_like`]: `%${searchDto[key].trim()}%`,
           });
           break;
         case 'LE':
           const le = key.replace('LE_', '').trim();
-          where[le] = Raw((inq) => `${inq} <=  :inq`, {
-            inq: `${searchDto[key]}`,
+          qb.andWhere(`inq.${le} <= :${le}_le`, {
+            [`${le}_le`]: searchDto[key],
           });
           break;
         case 'GE':
           const ge = key.replace('GE_', '').trim();
-          where[ge] = Raw((inq) => `${inq} >=  :inq`, {
-            inq: `${searchDto[key]}`,
+          qb.andWhere(`inq.${ge} >= :${ge}_ge`, {
+            [`${ge}_ge`]: searchDto[key],
           });
           break;
         default:
-          where[key] = searchDto[key];
+          qb.andWhere(`inq.${key} = :${key}`, { [key]: searchDto[key] });
           break;
       }
     }
-    return this.inq.find({
-      where: where,
-      order: { INQ_ID: 'DESC' },
-      relations: {
-        inqgroup: true,
-        status: true,
-        maruser: true,
-        timeline: true,
-      },
-    });
+
+    qb.orderBy('inq.INQ_ID', 'DESC')
+      .leftJoinAndSelect('inq.inqgroup', 'inqgroup')
+      .leftJoinAndSelect('inq.status', 'status')
+      .leftJoinAndSelect('inq.maruser', 'maruser')
+      .leftJoinAndSelect('inq.timeline', 'timeline');
+
+    return qb.getMany();
   }
 
   async create(dto: createInqDto, details: any[]) {
@@ -239,50 +238,50 @@ export class InquiryService {
           where: dt_id,
         });
 
+        //Check group
+        let group_id;
+        let item = Math.floor(parseInt(dt.INQD_ITEM) / 100);
+        if (item === 5) item = 2;
+        if (item >= 6) item = 6;
+        const group = await runner.manager.findOne(InquiryGroup, {
+          where: {
+            INQ_ID: inquiry.INQ_ID,
+            INQG_GROUP: item,
+            INQG_LATEST: 1,
+          },
+        });
+
+        if (!group) {
+          await runner.manager.save(InquiryGroup, {
+            INQ_ID: inquiry.INQ_ID,
+            INQG_STATUS: inquiry.INQ_STATUS,
+            INQG_REV: '*',
+            INQG_GROUP: item,
+            INQG_LATEST: 1,
+          });
+          const savedGroups = await runner.manager.findOne(InquiryGroup, {
+            where: { INQ_ID: inquiry.INQ_ID, INQG_GROUP: item },
+          });
+          group_id = savedGroups.INQG_ID;
+        } else {
+          group_id = group.INQG_ID;
+        }
+
+        dt.UPDATE_AT = new Date();
+        dt.UPDATE_BY = header.UPDATE_BY;
+        dt.INQG_GROUP = group_id;
+        dt.INQID = inquiry.INQ_ID;
         if (db_detail) {
           const dto: dtDto = Object.assign({} as dtDto, db_detail);
           Object.assign(dto, dt);
           delete dto.INQD_ID;
           delete dto.INQID;
           delete dto.INQD_PREV;
-          delete dto.INQG_GROUP;
           await runner.manager.update(InquiryDetail, dt_id, dto);
         } else {
-          let item = Math.floor(parseInt(dt.INQD_ITEM) / 100);
-          if (item === 5) item = 2;
-          if (item >= 6) item = 6;
-          const group = await runner.manager.findOne(InquiryGroup, {
-            where: {
-              INQ_ID: inquiry.INQ_ID,
-              INQG_GROUP: item,
-              INQG_LATEST: 1,
-            },
-          });
-
-          let group_id;
-          if (!group) {
-            await runner.manager.save(InquiryGroup, {
-              INQ_ID: inquiry.INQ_ID,
-              INQG_STATUS: inquiry.INQ_STATUS,
-              INQG_REV: '*',
-              INQG_GROUP: item,
-              INQG_LATEST: 1,
-            });
-            const savedGroups = await runner.manager.findOne(InquiryGroup, {
-              where: { INQ_ID: inquiry.INQ_ID, INQG_GROUP: item },
-            });
-            group_id = savedGroups.INQG_ID;
-          } else {
-            group_id = group.INQG_ID;
-          }
-
           //Create new detail
           dt.CREATE_AT = new Date();
           dt.CREATE_BY = header.UPDATE_BY;
-          dt.UPDATE_AT = new Date();
-          dt.UPDATE_BY = header.UPDATE_BY;
-          dt.INQG_GROUP = group_id;
-          dt.INQID = inquiry.INQ_ID;
           const dto: dtDto = Object.assign({} as dtDto, dt);
           await runner.manager.save(InquiryDetail, dto);
         }

@@ -36,6 +36,7 @@ import { MailModule } from './mail/mail.module';
 import { LoggerModule } from './logger/logger.module';
 
 import { AutomationModule } from './automation/automation.module';
+import { ItemsCustomerModule } from './sp/items-customer/items-customer.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { AutomationModule } from './automation/automation.module';
     WinstonModule.forRoot(winstonConfig),
     LoggerModule,
     AutomationModule,
+    ItemsCustomerModule,
   ],
   providers: [HttpLoggingInterceptor],
 })

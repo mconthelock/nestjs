@@ -11,6 +11,6 @@ export class PricelistService {
   ) {}
 
   async findAll() {
-    return this.price.find();
+    return this.price.find({ relations: ['itemdesc'] });
   }
 }

@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('DS_CUSTER_ITEM')
+@Entity('DS_CUSTOMER_ITEM')
 export class ItemsCustomer {
   @PrimaryGeneratedColumn()
   id: number; // หากไม่พบ Primary Key ใน SQL จะใช้ id เป็น PrimaryGeneratedColumn เริ่มต้น

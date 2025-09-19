@@ -5,10 +5,8 @@ import { ItemsCustomer } from './entities/items-customer.entity';
 import { ItemsCustomerController } from './items-customer.controller';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([ItemsCustomer], 'spsysConnection')],
   controllers: [ItemsCustomerController],
-  imports: [
-    TypeOrmModule.forFeature([ItemsCustomer], 'amecConnection')
-  ],
   providers: [ItemsCustomerService],
 })
 export class ItemsCustomerModule {}

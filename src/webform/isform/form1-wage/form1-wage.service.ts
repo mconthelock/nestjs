@@ -9,4 +9,8 @@ export class Form1WageService {
     @InjectRepository(Form1Wage, 'webformConnection')
     private readonly wage: Repository<Form1Wage>,
   ) {}
+
+  findAll() {
+    return this.wage.find({ relations: ['pposition'] });
+  }
 }

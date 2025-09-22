@@ -55,4 +55,12 @@ export class CreateQainsOADto {
   @IsOptional()
   @IsString()
   QOA_GRADE?: string;
+
+  @IsOptional()
+  @IsString()
+  QOA_AUDIT_RESULT?: string;
+
+  @IsOptional()
+  @IsString()
+  QOA_IMPROVMENT_ACTIVITY?: string;
 }

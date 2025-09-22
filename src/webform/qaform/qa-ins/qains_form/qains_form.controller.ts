@@ -17,7 +17,7 @@ import { AnyFilesInterceptor } from '@nestjs/platform-express';
 export class QainsFormController {
   constructor(private readonly qainsFormService: QainsFormService) {}
 
-  private readonly path = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/Form/QA/QAINS/`;
+  private readonly path = `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/QA/QAINS/`;
 
   @ApiExcludeEndpoint()
   @Post('request')

@@ -179,6 +179,7 @@ export class QainsFormService {
         'QA_AUD_OPT.TYPE',
         'QA_AUD_OPT.QOA_EMPNO_INFO',
         'QA_AUD_OPT.QA_AUDIT',
+        'QA_AUD_OPT.QA_FILES',
         'QA_FILES',
         'QA_FILES.TYPE',
         'QA_INCHARGE_INFO',

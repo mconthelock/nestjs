@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Query, Res, Post, Body } from '@nestjs/common';
 import { Response } from 'express';
 import { FileService } from 'src/common/services/file.service';
+import { getBase64Image } from 'src/common/utils/files.utils';
 
 interface Args {
   baseDir: string;
@@ -20,5 +21,10 @@ export class FilesController {
       originalName: args.originalName,
       mode: args.mode,
     });
+  }
+
+  @Post('getBase64Image')
+  async getImage(@Body() data: { path: string}) {
+      return getBase64Image(data.path);
   }
 }

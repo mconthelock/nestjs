@@ -154,6 +154,8 @@ export class QainsOAService {
         QOA_RESULT: dto.QOA_RESULT,
         QOA_SCORE: dto.QOA_SCORE,
         QOA_GRADE: dto.QOA_GRADE,
+        QOA_AUDIT_RESULT: dto.QOA_AUDIT_RESULT,
+        QOA_IMPROVMENT_ACTIVITY: dto.QOA_IMPROVMENT_ACTIVITY,
       }
 
       await runner.manager.update(QainsOA, condition, data);

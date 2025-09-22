@@ -9,4 +9,9 @@ export class PricelistController {
   search(@Body() data: any[]) {
     return this.price.findAll();
   }
+
+  @Post('customer')
+  findCustomer(@Body() data: any[]) {
+    return this.price.findCustomer(data);
+  }
 }

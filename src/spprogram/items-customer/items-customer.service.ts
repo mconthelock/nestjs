@@ -9,4 +9,8 @@ export class ItemsCustomerService {
     @InjectRepository(ItemsCustomer, 'spsysConnection')
     private readonly itemscus: Repository<ItemsCustomer>,
   ) {}
+
+  findAll(data: any) {
+    return this.itemscus.find({ relations: ['prices'] });
+  }
 }

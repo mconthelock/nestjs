@@ -8,5 +8,6 @@ import { ItemsCustomerController } from './items-customer.controller';
   imports: [TypeOrmModule.forFeature([ItemsCustomer], 'spsysConnection')],
   controllers: [ItemsCustomerController],
   providers: [ItemsCustomerService],
+  exports: [ItemsCustomerService],
 })
 export class ItemsCustomerModule {}

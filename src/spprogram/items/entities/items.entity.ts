@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryColumn, JoinColumn, OneToMany } from 'typeorm';
 import { Pricelist } from '../../pricelist/entities/pricelist.entity';
+import { ItemsCustomer } from '../../items-customer/entities/items-customer.entity';
 
 @Entity('DS_ITEM')
 export class Items {
@@ -68,6 +69,8 @@ export class Items {
   UPDATE_BY: string;
 
   @OneToMany(() => Pricelist, (prs) => prs.itemdesc)
-  @JoinColumn({ name: 'ITEM_ID', referencedColumnName: 'ITEM' })
-  prices: Pricelist;
+  prices: Pricelist[];
+
+  @OneToMany(() => ItemsCustomer, (prs) => prs.itemdesc)
+  customers: ItemsCustomer[];
 }

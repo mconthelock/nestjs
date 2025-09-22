@@ -1,5 +1,5 @@
 import { PickType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsNotEmpty,
@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
-export class CreateQainsAuditDto  extends PickType(FormDto, [
+export class CreateQainsAuditDto extends PickType(FormDto, [
   'NFRMNO',
   'VORGNO',
   'CYEAR',
@@ -85,4 +85,22 @@ export class saveQainsAuditDto extends PickType(FormDto, [
   @IsNotEmpty()
   @IsString()
   typecode: string;
+
+  @IsOptional()
+  @IsString()
+  auditResult?: string;
+
+  @IsOptional()
+  @IsString()
+  auditActivity?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  @Type(() => Number) 
+  delImageIds?: number[];
+
+  @IsOptional()
+  @IsString()
+  actionBy?: string;
 }

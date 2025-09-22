@@ -3,6 +3,7 @@ import { QainsForm } from '../../qains_form/entities/qains_form.entity';
 import { QaType } from 'src/webform/qaform/qa_type/entities/qa_type.entity';
 import { User } from '../../entities-dummy/user.entity';
 import { QainsAudit } from '../../qains_audit/entities/qains_audit.entity';
+import { QaFile } from 'src/webform/qaform/qa_file/entities/qa_file.entity';
 
 @Entity('QAINS_OPERATOR_AUDITOR')
 export class QainsOA {
@@ -42,6 +43,12 @@ export class QainsOA {
   @Column()
   QOA_GRADE: string;
 
+  @Column()
+  QOA_AUDIT_RESULT: string;
+
+  @Column()
+  QOA_IMPROVMENT_ACTIVITY: string;
+
   @ManyToOne(() => QainsForm, (form) => form.QA_AUD_OPT)
   @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
   @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
@@ -60,4 +67,7 @@ export class QainsOA {
 
   @OneToMany(() => QainsAudit, (audit) => audit.form)
   QA_AUDIT: QainsAudit[];
+
+  @OneToMany(() => QaFile, (file) => file.QAINSOA)
+  QA_FILES: QaFile[];
 }

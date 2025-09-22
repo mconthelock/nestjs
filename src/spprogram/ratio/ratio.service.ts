@@ -63,4 +63,26 @@ export class RatioService {
       relations: ['quoText'],
     });
   }
+
+  // เพิ่ม method สำหรับค้นหา ratio ที่มี TRADER = 'Direct' และ SUPPLIER = 'AMEC'
+  findDirectAmec() {
+    return this.ratio.find({
+      where: {
+        TRADER: 'Direct',
+        SUPPLIER: 'AMEC',
+      },
+      relations: ['quoText', 'direct'],
+    });
+  }
+
+  // หรือค้นหาด้วย query builder สำหรับ join ที่ซับซ้อนกว่า
+  async findWithDirectAmecCondition() {
+    return this.ratio
+      .createQueryBuilder('ratio')
+      .leftJoinAndSelect('ratio.quoText', 'quoText')
+      .leftJoinAndSelect('ratio.direct', 'direct')
+      .where('ratio.TRADER = :trader', { trader: 'Direct' })
+      .andWhere('ratio.SUPPLIER = :supplier', { supplier: 'AMEC' })
+      .getMany();
+  }
 }

@@ -20,10 +20,11 @@ export class PricelistService {
 
   async findCustomer(data: any) {
     return this.itemscus.find({
-      relations: ['itemdesc', 'itemdesc.prices'],
+      relations: ['itemdesc', 'itemdesc.prices', 'customer', 'customer.rate'],
       where: {
         ...data,
         itemdesc: {
+          ITEM_STATUS: 1,
           prices: {
             LATEST: 1,
           },

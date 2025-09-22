@@ -72,5 +72,5 @@ export class Items {
   prices: Pricelist[];
 
   @OneToMany(() => ItemsCustomer, (prs) => prs.itemdesc)
-  customers: ItemsCustomer[];
+  itemscustomer: ItemsCustomer[];
 }

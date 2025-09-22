@@ -1,4 +1,13 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
+import { ItemsCustomer } from '../../items-customer/entities/items-customer.entity';
+import { Ratio } from '../../ratio/entities/ratio.entity';
 
 @Entity('CUSTOMER')
 export class Customer {
@@ -44,8 +53,11 @@ export class Customer {
   @Column()
   CUS_ADJUST: number;
 
-  // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
-  // ตัวอย่าง:
-  // @ManyToOne(() => User, user => user.posts)
-  // user: User;
+  @OneToMany(() => ItemsCustomer, (item) => item.customer)
+  @JoinColumn({ name: 'CUS_ID', referencedColumnName: 'CUSTOMER_ID' })
+  items: ItemsCustomer;
+
+  @OneToOne(() => Ratio, (item) => item.direct)
+  @JoinColumn({ name: 'CUS_QUOTATION', referencedColumnName: 'QUOTATION' })
+  rate: Ratio;
 }

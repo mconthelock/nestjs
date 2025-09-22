@@ -22,7 +22,8 @@ async function bootstrap() {
   const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
   await fs.mkdir(uploadPath, { recursive: true });
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: WinstonModule.createLogger(winstonConfig),
+    // logger: WinstonModule.createLogger(winstonConfig),
+    logger: false,
   });
 
   //   app.enableCors({

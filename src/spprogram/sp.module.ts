@@ -22,6 +22,7 @@ import { TimelineModule } from './timeline/timeline.module';
 import { ItemsModule } from './items/items.module';
 import { PricelistModule } from './pricelist/pricelist.module';
 import { ItemsCustomerModule } from './items-customer/items-customer.module';
+import { QuotationModule } from './quotation/quotation.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { ItemsCustomerModule } from './items-customer/items-customer.module';
     ItemsModule,
     PricelistModule,
     ItemsCustomerModule,
+    QuotationModule,
   ],
 })
 export class SpModule {}

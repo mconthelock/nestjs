@@ -52,6 +52,7 @@ export class InquiryService {
         term: true,
         timeline: true,
         shipment: true,
+        quotation: true,
       },
     });
   }

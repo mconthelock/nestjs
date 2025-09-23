@@ -58,19 +58,19 @@ export class InquiryDetail {
   @Column()
   INQD_UNREPLY: number;
 
-  @Column()
+  @Column('decimal', { precision: 10, scale: 2 })
   INQD_FC_COST: number;
 
-  @Column()
+  @Column('decimal', { precision: 10, scale: 2 })
   INQD_TC_COST: number;
 
-  @Column()
+  @Column('decimal', { precision: 10, scale: 2 })
   INQD_UNIT_PRICE: number;
 
-  @Column()
+  @Column('decimal', { precision: 10, scale: 2 })
   INQD_FC_BASE: number;
 
-  @Column()
+  @Column('decimal', { precision: 10, scale: 2 })
   INQD_TC_BASE: number;
 
   @Column()

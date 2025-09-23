@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 
 @Entity('SP_QUOTATION')
 export class Quotation {
@@ -50,11 +57,10 @@ export class Quotation {
   @Column()
   QUO_NOTE: string;
 
-  @Column()
+  @Column({ default: 1 })
   QUO_LATEST: number;
 
-  // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
-  // ตัวอย่าง:
-  // @ManyToOne(() => User, user => user.posts)
-  // user: User;
+  @OneToOne(() => Inquiry, (quo) => quo.quotation)
+  @JoinColumn({ name: 'QUO_INQ', referencedColumnName: 'INQ_ID' })
+  inqs: Inquiry;
 }

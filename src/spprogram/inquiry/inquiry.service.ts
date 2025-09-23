@@ -105,7 +105,8 @@ export class InquiryService {
       .leftJoinAndSelect('inq.inqgroup', 'inqgroup')
       .leftJoinAndSelect('inq.status', 'status')
       .leftJoinAndSelect('inq.maruser', 'maruser')
-      .leftJoinAndSelect('inq.timeline', 'timeline');
+      .leftJoinAndSelect('inq.timeline', 'timeline')
+      .leftJoinAndSelect('inq.quotation', 'quotation');
 
     return qb.getMany();
   }

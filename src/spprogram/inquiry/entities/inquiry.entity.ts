@@ -16,6 +16,7 @@ import { Term } from '../../term/entities/term.entity';
 import { Shipment } from '../../shipment/entities/shipment.entity';
 import { Timeline } from '../../timeline/entities/timeline.entity';
 import { SpUser } from 'src/spprogram/spusers/spusers.entity';
+import { Quotation } from '../../quotation/entities/quotation.entity';
 
 @Entity('SP_INQUIRY')
 export class Inquiry {
@@ -190,4 +191,8 @@ export class Inquiry {
   @JoinColumn({ name: 'INQ_NO', referencedColumnName: 'INQ_NO' })
   @JoinColumn({ name: 'INQ_REV', referencedColumnName: 'INQ_REV' })
   timeline: Timeline;
+
+  @OneToOne(() => Quotation, (quo) => quo.inqs)
+  @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'QUO_INQ' })
+  quotation: Quotation;
 }

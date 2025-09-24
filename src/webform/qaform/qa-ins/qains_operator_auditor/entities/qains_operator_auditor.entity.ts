@@ -38,7 +38,7 @@ export class QainsOA {
   QOA_RESULT: number;
   
   @Column()
-  QOA_SCORE: number;
+  QOA_PERCENT: number;
 
   @Column()
   QOA_GRADE: string;

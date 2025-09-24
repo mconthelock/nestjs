@@ -2,6 +2,7 @@ import { PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
+  IsBoolean,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -59,9 +60,9 @@ export class saveQainsAuditDto extends PickType(FormDto, [
   data: CreateQainsAuditDto[];
 
   @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  draft?: number;
+  @Type(() => Boolean)
+  @IsBoolean()
+  draft?: boolean;
 
   @IsOptional()
   @Type(() => Number)
@@ -71,7 +72,7 @@ export class saveQainsAuditDto extends PickType(FormDto, [
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  score?: number;
+  percent?: number;
 
   @IsOptional()
   @IsString()

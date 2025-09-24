@@ -17,4 +17,60 @@ export class searchDto extends PartialType(createInqDto) {
   @IsOptional()
   @Type(() => Number)
   GE_INQ_STATUS: number;
+
+  @IsString()
+  @IsOptional()
+  LIKE_INQ_NO: string;
+
+  @IsString()
+  @IsOptional()
+  LIKE_INQ_PRJNO: string;
+
+  @IsString()
+  @IsOptional()
+  LIKE_INQ_PRJNAME: string;
+
+  @IsString()
+  @IsOptional()
+  LIKE_INQ_SHOPORDER: string;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  GE_INQ_DATE: Date;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  LE_INQ_DATE: Date;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  'timeline.GE_MAR_SEND': Date;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  'timeline.LE_MAR_SEND': Date;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  'quotation.GE_QUO_DATE': Date;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  'quotation.LE_QUO_DATE': Date;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  'quotation.GE_QUO_VALIDITY': Date;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  'quotation.LE_QUO_VALIDITY': Date;
 }

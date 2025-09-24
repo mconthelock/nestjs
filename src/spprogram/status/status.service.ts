@@ -7,6 +7,10 @@ import { Injectable } from '@nestjs/common';
 export class StatusService {
   constructor(
     @InjectRepository(Status, 'spsysConnection')
-    private readonly statusRepository: Repository<Status>,
+    private readonly status: Repository<Status>,
   ) {}
+
+  findAll() {
+    return this.status.find();
+  }
 }

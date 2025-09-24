@@ -76,28 +76,40 @@ export class InquiryService {
     const qb = this.inq.createQueryBuilder('inq');
     qb.where('inq.INQ_LATEST = 1');
     for (const key in searchDto) {
+      let operator = '';
+      let alias = '';
+
       const parts = key.split('_');
-      switch (parts[0]) {
+      const subParts = parts[0].split('.');
+      if (subParts.length > 1) {
+        alias = subParts[0];
+        operator = subParts[1];
+      } else {
+        operator = parts[0];
+        alias = 'inq';
+      }
+
+      switch (operator) {
         case 'LIKE':
-          const like = key.replace('LIKE_', '').trim();
-          qb.andWhere(`TRIM(inq.${like}) LIKE :${like}_like`, {
+          const like = key.replace(`${parts[0]}_`, '').trim();
+          qb.andWhere(`TRIM(${alias}.${like}) LIKE :${like}_like`, {
             [`${like}_like`]: `%${searchDto[key].trim()}%`,
           });
           break;
         case 'LE':
-          const le = key.replace('LE_', '').trim();
-          qb.andWhere(`inq.${le} <= :${le}_le`, {
+          const le = key.replace(`${parts[0]}_`, '').trim();
+          qb.andWhere(`${alias}.${le} <= :${le}_le`, {
             [`${le}_le`]: searchDto[key],
           });
           break;
         case 'GE':
-          const ge = key.replace('GE_', '').trim();
-          qb.andWhere(`inq.${ge} >= :${ge}_ge`, {
+          const ge = key.replace(`${parts[0]}_`, '').trim();
+          qb.andWhere(`${alias}.${ge} >= :${ge}_ge`, {
             [`${ge}_ge`]: searchDto[key],
           });
           break;
         default:
-          qb.andWhere(`inq.${key} = :${key}`, { [key]: searchDto[key] });
+          qb.andWhere(`${alias}.${key} = :${key}`, { [key]: searchDto[key] });
           break;
       }
     }

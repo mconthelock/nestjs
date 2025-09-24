@@ -12,6 +12,7 @@ import { User } from '../../entities-dummy/user.entity';
 import { UserSection } from '../../entities-dummy/user_section.entity';
 import { AuditReportRevision } from 'src/escs/audit_report_revision/entities/audit_report_revision.entity';
 import { AuditReportMasterAll } from 'src/escs/audit_report_master_all/entities/audit_report_master_all.entity';
+import { ESCSItemStation } from '../../entities-dummy/item-station.entity';
 
 @Entity('QAINS_FORM')
 export class QainsForm {
@@ -69,4 +70,7 @@ export class QainsForm {
 
   @OneToMany(() => AuditReportMasterAll, (a) => a.QAINS_FORM)
   QA_MASTER: AuditReportMasterAll[] | null;
+
+  @OneToMany(() => ESCSItemStation, (i) => i.QAINSFORM)
+  ITEM_STATION: ESCSItemStation[] | null;
 }

@@ -8,7 +8,7 @@ import { SearchESCSARRDto } from './dto/search-audit_report_revision.dto';
 export class ESCSARRController {
   constructor(private readonly ESCSARRService: ESCSARRService) {}
 
-  @Post('search')
+  @Post('getAuditReportRevision')
   async getAuditReportRevision(@Body() dto: SearchESCSARRDto ) {
     return this.ESCSARRService.getAuditReportRevision(dto);
   }

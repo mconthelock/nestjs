@@ -49,6 +49,9 @@ export class QainsOA {
   @Column()
   QOA_IMPROVMENT_ACTIVITY: string;
 
+  @Column()
+  QOA_STATION: string;
+
   @ManyToOne(() => QainsForm, (form) => form.QA_AUD_OPT)
   @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
   @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })

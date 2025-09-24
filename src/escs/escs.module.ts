@@ -7,6 +7,7 @@ import { ESCSARMModule } from './audit_report_master/audit_report_master.module'
 import { ESCSARRModule } from './audit_report_revision/audit_report_revision.module';
 import { ESCSARHModule } from './audit_report_history/audit_report_history.module';
 import { ESCSARMAModule } from './audit_report_master_all/audit_report_master_all.module';
+import { ESCSItemStationModule } from './item-station/item-station.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ESCSARMAModule } from './audit_report_master_all/audit_report_master_al
     ESCSARRModule,
     ESCSARHModule,
     ESCSARMAModule,
+    ESCSItemStationModule,
   ],
 })
 export class ESCSModule {}

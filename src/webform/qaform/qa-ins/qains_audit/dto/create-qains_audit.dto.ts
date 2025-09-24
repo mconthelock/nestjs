@@ -60,7 +60,12 @@ export class saveQainsAuditDto extends PickType(FormDto, [
   data: CreateQainsAuditDto[];
 
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(({ value }) => {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'number') return value === 1;
+    if (typeof value === 'string') return value.toLowerCase() === 'true';
+    return false;
+  })
   @IsBoolean()
   draft?: boolean;
 
@@ -98,10 +103,14 @@ export class saveQainsAuditDto extends PickType(FormDto, [
   @IsOptional()
   @IsArray()
   @IsNumber({}, { each: true })
-  @Type(() => Number) 
+  @Type(() => Number)
   delImageIds?: number[];
 
   @IsOptional()
   @IsString()
   actionBy?: string;
+
+  @IsOptional()
+  @IsString()
+  station?: string;
 }

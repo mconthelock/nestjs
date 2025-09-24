@@ -81,22 +81,42 @@ export class QainsOAService {
     });
   }
 
-  async searchQainsOA(dto: SearchQainsOADto) {
-    return this.qainsOARepo.find({
+  async searchQainsOA(dto: SearchQainsOADto, queryRunner?: QueryRunner) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(QainsOA)
+      : this.qainsOARepo;
+    return repo.find({
       where: dto,
-      relations: ['QA_AUDIT', 'TYPE', 'QOA_EMPNO_INFO', 'QAINSFORM'],
+      relations: [
+        'QA_AUDIT',
+        'QOA_EMPNO_INFO',
+        'QA_FILES'
+        // 'TYPE',
+        // , 'QAINSFORM'
+      ],
       order: {
         QOA_SEQ: 'ASC',
-      }
+      },
     });
   }
 
-//   async delete(dto: CreateQainsOADto, queryRunner?: QueryRunner) {
-//     const repo = queryRunner
-//       ? queryRunner.manager.getRepository(QainsOA)
-//       : this.qainsOARepo;
-//     return repo.delete(dto);
-//   }
+  async findOne(dto: SearchQainsOADto, queryRunner?: QueryRunner) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(QainsOA)
+      : this.qainsOARepo;
+    return repo.findOne({
+      where: dto,
+      relations: [
+        'QA_AUDIT',
+        'QOA_EMPNO_INFO',
+        'QA_FILES'
+        // 'TYPE',
+      ],
+      order: {
+        QOA_SEQ: 'ASC',
+      },
+    });
+  }
 
   async delete(dto: CreateQainsOADto, queryRunner?: QueryRunner) {
     let localRunner: QueryRunner | undefined;
@@ -115,7 +135,10 @@ export class QainsOAService {
       await runner.manager.delete(QainsOA, dto);
       if (localRunner && didStartTx && runner.isTransactionActive)
         await localRunner.commitTransaction();
-      return { status: true, message: 'Delete Qains operator and auditor Successfully' };
+      return {
+        status: true,
+        message: 'Delete Qains operator and auditor Successfully',
+      };
     } catch (error) {
       if (localRunner && didStartTx && localRunner.isTransactionActive)
         await localRunner.rollbackTransaction();
@@ -141,13 +164,13 @@ export class QainsOAService {
 
       const condition = {
         NFRMNO: dto.NFRMNO,
-        VORGNO:dto.VORGNO,
+        VORGNO: dto.VORGNO,
         CYEAR: dto.CYEAR,
         CYEAR2: dto.CYEAR2,
         NRUNNO: dto.NRUNNO,
         QOA_TYPECODE: dto.QOA_TYPECODE,
         QOA_SEQ: dto.QOA_SEQ,
-      }
+      };
 
       const data = {
         QOA_AUDIT: dto.QOA_AUDIT,
@@ -156,12 +179,16 @@ export class QainsOAService {
         QOA_GRADE: dto.QOA_GRADE,
         QOA_AUDIT_RESULT: dto.QOA_AUDIT_RESULT,
         QOA_IMPROVMENT_ACTIVITY: dto.QOA_IMPROVMENT_ACTIVITY,
-      }
+        QOA_STATION: dto.QOA_STATION,
+      };
 
       await runner.manager.update(QainsOA, condition, data);
       if (localRunner && didStartTx && runner.isTransactionActive)
         await localRunner.commitTransaction();
-      return { status: true, message: 'Update Qains operator and auditor Successfully' };
+      return {
+        status: true,
+        message: 'Update Qains operator and auditor Successfully',
+      };
     } catch (error) {
       if (localRunner && didStartTx && localRunner.isTransactionActive)
         await localRunner.rollbackTransaction();

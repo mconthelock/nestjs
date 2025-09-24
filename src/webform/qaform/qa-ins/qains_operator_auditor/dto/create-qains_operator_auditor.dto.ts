@@ -50,7 +50,7 @@ export class CreateQainsOADto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  QOA_SCORE?: number;
+  QOA_PERCENT?: number;
 
   @IsOptional()
   @IsString()

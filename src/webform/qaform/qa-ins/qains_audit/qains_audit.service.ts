@@ -67,7 +67,7 @@ export class QainsAuditService {
           QOA_SEQ: dto.auditSeq,
           QOA_AUDIT: dto.draft ? 2 : 1,
           QOA_RESULT: dto.res,
-          QOA_SCORE: dto.score,
+          QOA_PERCENT: dto.percent,
           QOA_GRADE: dto.grade,
           QOA_AUDIT_RESULT: dto.auditResult,
           QOA_IMPROVMENT_ACTIVITY: dto.auditActivity,

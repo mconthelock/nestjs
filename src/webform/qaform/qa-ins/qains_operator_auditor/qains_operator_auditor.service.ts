@@ -152,7 +152,7 @@ export class QainsOAService {
       const data = {
         QOA_AUDIT: dto.QOA_AUDIT,
         QOA_RESULT: dto.QOA_RESULT,
-        QOA_SCORE: dto.QOA_SCORE,
+        QOA_PERCENT: dto.QOA_PERCENT,
         QOA_GRADE: dto.QOA_GRADE,
         QOA_AUDIT_RESULT: dto.QOA_AUDIT_RESULT,
         QOA_IMPROVMENT_ACTIVITY: dto.QOA_IMPROVMENT_ACTIVITY,

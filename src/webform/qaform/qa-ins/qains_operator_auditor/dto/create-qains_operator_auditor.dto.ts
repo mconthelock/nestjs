@@ -63,4 +63,10 @@ export class CreateQainsOADto {
   @IsOptional()
   @IsString()
   QOA_IMPROVMENT_ACTIVITY?: string;
+
+  @IsOptional()
+  @IsString()
+  QOA_STATION?: string;
+
+
 }

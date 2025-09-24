@@ -123,7 +123,7 @@ export class QainsFormService {
       const formNo = await this.formService.getFormno(form); // Get the form number
       const destination = path + '/' + formNo; // Get the destination path
       for (const file of files) {
-        console.log('file: ', file);
+        // console.log('file: ', file);
         const moved = await moveFileFromMulter(file, destination);
         movedTargets.push(moved.path);
         // 2) บันทึก DB (ใช้ชื่อไฟล์ที่ "ปลายทางจริง" เพื่อความตรงกัน)
@@ -175,23 +175,24 @@ export class QainsFormService {
         NRUNNO: dto.NRUNNO,
       },
       relations: [
-        'QA_AUD_OPT',
-        'QA_AUD_OPT.TYPE',
-        'QA_AUD_OPT.QOA_EMPNO_INFO',
-        'QA_AUD_OPT.QA_AUDIT',
-        'QA_AUD_OPT.QA_FILES',
-        'QA_FILES',
-        'QA_FILES.TYPE',
+        // 'QA_AUD_OPT',
+        // 'QA_AUD_OPT.TYPE',
+        // 'QA_AUD_OPT.QOA_EMPNO_INFO',
+        // 'QA_AUD_OPT.QA_AUDIT',
+        // 'QA_AUD_OPT.QA_FILES',
+        // 'QA_FILES',
+        // 'QA_FILES.TYPE',
         'QA_INCHARGE_INFO',
         'QA_INCHARGE_SECTION_INFO',
         'QA_REV_INFO',
-        'QA_MASTER'
+        // 'QA_MASTER',
+        // 'ITEM_STATION'
       ],
-      order: {
-        QA_AUD_OPT: { QOA_SEQ: 'ASC' }, // แทน ORDER BY ใน subquery เดิม
-        QA_FILES: { FILE_ID: 'ASC' },
-        QA_MASTER: { ARM_NO: 'ASC', ARM_SEQ: 'ASC' },
-      },
+    //   order: {
+        // QA_AUD_OPT: { QOA_SEQ: 'ASC' }, // แทน ORDER BY ใน subquery เดิม
+        // QA_FILES: { FILE_ID: 'ASC' },
+        // QA_MASTER: { ARM_NO: 'ASC', ARM_SEQ: 'ASC' },
+    //   },
     });
   }
 
@@ -364,16 +365,20 @@ export class QainsFormService {
 
   async sendmailToReqManager(form: FormDto, queryRunner?: QueryRunner) {
     const data = await this.getFormData(form, queryRunner);
+    const operator = await this.QainsOAService.searchQainsOA(
+      { ...form, QOA_TYPECODE: 'ESO' },
+      queryRunner,
+    );
     const item = data.QA_ITEM;
     let html = `<div style="font-size:14px; color:#000;">`;
     const seccode = [
       ...new Set(
-        data.QA_AUD_OPT.filter((o) => o.QOA_TYPECODE == 'ESO').map(
+        operator.map(
           (o) => o.QOA_EMPNO_INFO.SSECCODE,
         ),
       ),
     ];
-    console.log(seccode);
+    // console.log(seccode);
 
     for (const sec of seccode) {
       const semEmpno = await this.orgposService.getOrgPos(
@@ -384,6 +389,8 @@ export class QainsFormService {
         queryRunner,
       );
       const semInfo = await this.usersService.findEmp(semEmpno[0].VEMPNO);
+      console.log('semInfo', semInfo);
+      
       html += `<b>Dear ${semInfo.SNAME}</b>
         <p>
             I'm writing to arrange a time for 
@@ -407,14 +414,14 @@ export class QainsFormService {
             </thead>
             <tbody>`;
       let no = 1;
-      for (const operator of data.QA_AUD_OPT) {
-        if (operator.QOA_EMPNO_INFO.SSECCODE === sec) {
+      for (const o of operator) {
+        if (o.QOA_EMPNO_INFO.SSECCODE === sec) {
           html += `<tr style="background-color: #fff;padding: 10px; 5px;>
           <td style="border:1px solid #ccc; text-align:center;">${no}</td>
-          <td style="border:1px solid #ccc; text-align:center;">${operator.QOA_EMPNO}</td>
-          <td style="border:1px solid #ccc; text-align:center;">${operator.QOA_EMPNO_INFO.SNAME}</td>
+          <td style="border:1px solid #ccc; text-align:center;">${o.QOA_EMPNO}</td>
+          <td style="border:1px solid #ccc; text-align:center;">${o.QOA_EMPNO_INFO.SNAME}</td>
           <td style="border:1px solid #ccc; text-align:center;">${item}</td>
-          <td style="border:1px solid #ccc; text-align:center;">${operator.QOA_EMPNO_INFO.SSEC}</td>
+          <td style="border:1px solid #ccc; text-align:center;">${o.QOA_EMPNO_INFO.SSEC}</td>
           </tr>
             `;
           no++;

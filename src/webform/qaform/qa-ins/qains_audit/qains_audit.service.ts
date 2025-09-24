@@ -60,17 +60,20 @@ export class QainsAuditService {
 
       // update QainsOA
       //   if (!dto.draft) {
+      console.log('draft', dto.draft, dto.draft ? 2: 1);
+      
       await this.qainsOAService.update(
         {
           ...form,
           QOA_TYPECODE: dto.typecode,
           QOA_SEQ: dto.auditSeq,
-          QOA_AUDIT: dto.draft ? 2 : 1,
-          QOA_RESULT: dto.res,
-          QOA_PERCENT: dto.percent,
-          QOA_GRADE: dto.grade,
+          QOA_AUDIT: dto.draft == true ? 2 : 1,
+          QOA_RESULT: dto.res ?? null,
+          QOA_PERCENT: dto.percent ?? null,
+          QOA_GRADE: dto.grade ?? null,
           QOA_AUDIT_RESULT: dto.auditResult,
           QOA_IMPROVMENT_ACTIVITY: dto.auditActivity,
+          QOA_STATION: dto.station ?? null,
         },
         queryRunner,
       );

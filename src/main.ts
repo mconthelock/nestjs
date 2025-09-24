@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
+import * as bodyParser from 'body-parser';
 import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
 
@@ -80,6 +81,14 @@ async function bootstrap() {
 
   app.use(compression());
   app.use(cookieParser());
+  app.use(bodyParser.json({ limit: '50mb' }));
+  app.use(
+    bodyParser.urlencoded({
+      limit: '50mb',
+      extended: true,
+      parameterLimit: 50000,
+    }),
+  );
   app.set('trust proxy', true);
 
   // Global Interceptor สำหรับ log request และ Exception Filter สำหรับ log error

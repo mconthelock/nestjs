@@ -96,6 +96,10 @@ export class InquiryService {
             [`${like}_like`]: `%${searchDto[key].trim()}%`,
           });
           break;
+        case 'ISNULL':
+          const isnull = key.replace(`${parts[0]}_`, '').trim();
+          qb.andWhere(`${alias}.${isnull} IS NULL`);
+          break;
         case 'LE':
           const le = key.replace(`${parts[0]}_`, '').trim();
           qb.andWhere(`${alias}.${le} <= :${le}_le`, {

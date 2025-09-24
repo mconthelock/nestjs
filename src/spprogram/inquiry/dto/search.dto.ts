@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsDate,
+  IsNumber,
+  IsBoolean,
+} from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 import { createInqDto } from './create-inquiry.dto';
 
@@ -73,4 +79,9 @@ export class searchDto extends PartialType(createInqDto) {
   @IsOptional()
   @Type(() => Date)
   'quotation.LE_QUO_VALIDITY': Date;
+
+  @IsBoolean()
+  @IsOptional()
+  @Type(() => Boolean)
+  'timeline.ISNULL_BM_COFIRM': boolean;
 }

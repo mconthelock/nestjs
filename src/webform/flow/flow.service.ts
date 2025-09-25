@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  Inject,
-  forwardRef,
-} from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner, In } from 'typeorm';
 
@@ -242,9 +238,7 @@ export class FlowService {
     } catch (error) {
       console.error('Error deleting flow:', error);
       if (localRunner) await localRunner.rollbackTransaction();
-      throw new Error(
-        'Delete flow Error: ' + error.message,
-      );
+      throw new Error('Delete flow Error: ' + error.message);
       //   return false;
     } finally {
       if (localRunner) await localRunner.release();
@@ -266,7 +260,7 @@ export class FlowService {
   async getFlowTree(form: FormDto, queryRunner?: QueryRunner) {
     const dataSource = queryRunner ? queryRunner : this.dataSource;
     const sql = `
-    SELECT DISTINCT LEVEL, CSTEPNO, CSTEPST, VAPVNO, NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, SNAME, VNAME, DAPVDATE, CAPVTIME, VREMARK,  VREPNO, VREALAPV 
+    SELECT DISTINCT LEVEL, CSTEPNO, CSTEPNEXTNO, CSTEPST, VAPVNO, NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, SNAME, VNAME, DAPVDATE, CAPVTIME, VREMARK,  VREPNO, VREALAPV 
     FROM FLOW, AMECUSERALL, stepmst  WHERE  FLOW.VAPVNO = SEMPNO and flow.CSTEPNO = cno 
     start with CSTART = '1' and 
     NFRMNO = :1 and VORGNO = :2 and CYEAR = :3 
@@ -585,13 +579,25 @@ export class FlowService {
             { ...form, CAPVSTNO: this.APV_NONE, CSTEPNO: flow.CSTEPNO },
             runner,
           );
+          //   console.log('check next step : ', checkNextStep);
+          //   throw Error('test');
+
           const updateNextStep = checkNextStep.length == 0 ? true : false;
           if (updateNextStep) {
-            const stepNext = await this.getStepNext(form, runner);
+            const stepNext:
+              | ''
+              | {
+                  stepno: string;
+                  stepNextNo: string;
+                } = await this.getStepNext(form, runner);
+            console.log('step next : ', stepNext);
+            if (!stepNext) break;
             //UPDATE STEP NEXT STATUS
-            await this.updateStepNextStatus(form, stepNext, runner);
+            await this.updateStepNextStatus(form, stepNext.stepno, runner);
             //UPDATE NEXT NEXT STEP (WAIT)
-            await this.updateNextStepWait(form, stepNext, runner);
+            if (stepNext.stepNextNo != '00') {
+              await this.updateNextStepWait(form, stepNext.stepno, runner);
+            }
             await this.sendMailToApprover(form, runner); // send email to approver
           }
           break;
@@ -617,16 +623,25 @@ export class FlowService {
           } else {
             updateFlow = true;
           }
+          const stepNext:
+            | ''
+            | {
+                stepno: string;
+                stepNextNo: string;
+              } = await this.getStepNext(form, runner);
+          if (!stepNext) break;
           //Start updating flow status
           if (updateFlow) {
             //UPDATE SINGLE STEP
             await this.updateSingleStep(form, runner);
           } else {
-            const stepNext = await this.getStepNext(form, runner);
             //UPDATE STEP NEXT STATUS
-            await this.updateStepNextStatus(form, stepNext, runner);
+            await this.updateStepNextStatus(form, stepNext.stepno, runner);
             //UPDATE NEXT NEXT STEP (WAIT)
-            await this.updateNextStepWait(form, stepNext, runner);
+            if (stepNext.stepNextNo != '00') {
+              await this.updateNextStepWait(form, stepNext.stepno, runner);
+            }
+            throw new Error('test');
           }
           break;
         case 'return':
@@ -680,9 +695,7 @@ export class FlowService {
       if (localRunner) {
         await localRunner.rollbackTransaction();
       }
-      throw new Error(
-        'Do action Error: ' + error.message,
-      );
+      throw new Error('Do action Error: ' + error.message);
     } finally {
       if (localRunner) await localRunner.release();
     }
@@ -749,11 +762,12 @@ export class FlowService {
         await localRunner.startTransaction();
       }
       const runner = queryRunner || localRunner!;
+
       const res = await runner.manager.query(sql, params);
       if (localRunner) await localRunner.commitTransaction();
 
       if (!res) {
-        throw new Error('No rows updated');
+        throw new Error(', No rows updated');
       } else {
         return { status: true, result: res, message: msg + 'success' };
       }
@@ -771,7 +785,7 @@ export class FlowService {
     const flowTree = (await this.getFlowTree(form, queryRunner)) ?? [];
     for (const step of flowTree) {
       if (step.CSTEPST == this.STEP_WAIT || step.CSTEPST == this.STEP_NORMAL) {
-        return step.CSTEPNO;
+        return { stepno: step.CSTEPNO, stepNextNo: step.CSTEPNEXTNO };
       }
     }
     return '';
@@ -855,7 +869,11 @@ export class FlowService {
     return await this.execSql(sql, params, queryRunner, 'Update Single Step');
   }
 
-  async updateStepNextStatus(form: FormDto, stepNext?: string, queryRunner?: QueryRunner) {
+  async updateStepNextStatus(
+    form: FormDto,
+    stepNext: string,
+    queryRunner?: QueryRunner,
+  ) {
     const sql =
       'update flow set CAPVSTNO = :apvNone, CSTEPST = :stepReady where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO AND CSTEPNO = :stepNext AND CSTEPST in (:stepNormal, :stepWait) ';
     const params = {
@@ -874,7 +892,11 @@ export class FlowService {
     );
   }
 
-  async updateNextStepWait(form: FormDto, stepNext?: string, queryRunner?: QueryRunner) {
+  async updateNextStepWait(
+    form: FormDto,
+    stepNext: string,
+    queryRunner?: QueryRunner,
+  ) {
     const sql =
       'update flow set CAPVSTNO = :apvNone, CSTEPST = :stepWait where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CSTEPNO in (select cStepNextNo from flow where NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno and CSTEPNO = :stepNext) and CSTEPST = :stepNormal and CAPVSTNO = :apvNone2';
     const params = {
@@ -1059,7 +1081,7 @@ export class FlowService {
       orgno2: form.VORGNO,
       cy: form.CYEAR,
       cy2: form.CYEAR2,
-        runno2: form.NRUNNO,
+      runno2: form.NRUNNO,
     };
     return await this.execSql(sql, params, queryRunner);
   }

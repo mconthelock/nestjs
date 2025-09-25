@@ -17,6 +17,7 @@ import { QcConfQainsFormDto } from './dto/qcConfirm-qains_form.dto';
 import { UpdateQainsFormDto } from './dto/update-qains_form.dto';
 import { OrgposService } from 'src/webform/orgpos/orgpos.service';
 import { formatDate } from 'src/common/utils/dayjs.utils';
+import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 
 @Injectable()
 export class QainsFormService {
@@ -440,17 +441,16 @@ export class QainsFormService {
     }
   }
 
-  async lastSubmit(dto: QcConfQainsFormDto, ip: string) {
+  async lastApprove(dto: doactionFlowDto, ip: string) {
     const queryRunner = this.dataSource.createQueryRunner();
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
       // Your business logic here
-        throw new Error('Test error in lastSubmit');
       await queryRunner.commitTransaction();
       return {
-        status: true,
+        status: false,
         message: 'Action successful',
         data: dto,
       };

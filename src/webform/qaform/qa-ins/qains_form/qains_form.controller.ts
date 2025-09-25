@@ -11,6 +11,7 @@ import { ApiTags, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { QcConfQainsFormDto } from './dto/qcConfirm-qains_form.dto';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 
 @ApiTags('QA-INS Form')
 @Controller('qaform/qa-ins')
@@ -48,10 +49,10 @@ export class QainsFormController {
     return await this.qainsFormService.qcConfirm(dto, ip);
   }
 
-  @Post('lastSubmit')
+  @Post('lastApprove')
   @UseInterceptors(AnyFilesInterceptor())
-  async lastSubmit(@Body() dto: QcConfQainsFormDto, @Req() req: Request) {
+  async lastApprove(@Body() dto: doactionFlowDto, @Req() req: Request) {
     const ip = getClientIP(req);
-    return await this.qainsFormService.lastSubmit(dto, ip);
+    return await this.qainsFormService.lastApprove(dto, ip);
   }
 }

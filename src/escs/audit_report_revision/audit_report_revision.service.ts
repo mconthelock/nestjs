@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateESCSARRDto } from './dto/create-audit_report_revision.dto';
 import { UpdateESCSARRDto } from './dto/update-audit_report_revision.dto';
 import { SearchESCSARRDto } from './dto/search-audit_report_revision.dto';
@@ -80,7 +80,7 @@ export class ESCSARRService {
       };
     } catch (error) {
       if (localRunner) await localRunner.rollbackTransaction();
-      throw new InternalServerErrorException(
+      throw new Error(
         'Insert revision Error: ' + error.message,
       );
     } finally {

@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateESCSARHDto } from './dto/create-audit_report_history.dto';
 import { UpdateESCSARHDto } from './dto/update-audit_report_history.dto';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
@@ -37,7 +37,7 @@ export class ESCSARHService {
     } catch (error) {
       if (localRunner && didStartTx && localRunner.isTransactionActive)
         await localRunner.rollbackTransaction();
-      throw new InternalServerErrorException(error.message);
+      throw new Error(error.message);
     } finally {
       if (localRunner && didConnect) await localRunner.release();
     }

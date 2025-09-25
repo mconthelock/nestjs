@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { SetRequestDate } from './entities/set-request-date.entity';
@@ -61,7 +61,7 @@ export class SetRequestDateService {
   //     } catch (error) {
   //         // ดักจับข้อผิดพลาดที่อาจเกิดขึ้นระหว่างการบันทึกฐานข้อมูล
   //         console.error(`Error during upsert for PONO: ${JOP_PONO}, LINENO: ${JOP_LINENO}`, error);
-  //         throw new InternalServerErrorException('Error occurred while saving data'); // โยน exception กลับไป
+  //         throw new Error('Error occurred while saving data'); // โยน exception กลับไป
   //     }
 
   //     // if (existingRecord) {
@@ -144,9 +144,8 @@ export class SetRequestDateService {
       };
     } catch (err) {
       await queryRunner.rollbackTransaction();
-      throw new InternalServerErrorException(
-        err,
-        'Error occurred while saving data',
+      throw new Error(
+        err.message || 'Error occurred while saving data',
       );
     } finally {
       await queryRunner.release();
@@ -334,8 +333,8 @@ export class SetRequestDateService {
       console.log(error);
 
       await queryRunner.rollbackTransaction();
-      throw new InternalServerErrorException(
-        error,
+      throw new Error(
+        error.message ||
         'Error occurred while saving data',
       );
     } finally {
@@ -380,7 +379,7 @@ export class SetRequestDateService {
   //         return { record: result, status: existingRecord ? 200 : 201 };
   //     } catch (err) {
   //         await queryRunner.rollbackTransaction();
-  //         throw new InternalServerErrorException(err, 'Error occurred while saving data');
+  //         throw new Error(err, 'Error occurred while saving data');
   //     } finally {
   //         await queryRunner.release();
   //     }

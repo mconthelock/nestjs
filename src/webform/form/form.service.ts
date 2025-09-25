@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { Form } from './entities/form.entity';
@@ -219,7 +219,7 @@ export class FormService {
         // await this.queryRunner.commitTransaction();
         // console.log('Failed to insert form');
         // return { status: false, message: `Can't insert this form` };
-        throw new InternalServerErrorException('Failed to insert form'); // Throw an error to trigger rollback
+        throw new Error('Failed to insert form'); // Throw an error to trigger rollback
       }
     } catch (error) {
       //   await this.queryRunner.rollbackTransaction();
@@ -229,7 +229,7 @@ export class FormService {
         } catch {}
       }
       //   if (localRunner) await localRunner.rollbackTransaction();
-      throw new InternalServerErrorException(error.message);
+      throw new Error(error.message);
     } finally {
       //   await this.queryRunner.release();
       if (localRunner && didConnect) {

@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateESCSARMDto } from './dto/create-audit_report_master.dto';
 import { UpdateESCSARMDto } from './dto/update-audit_report_master.dto';
 import { SearchESCSARMDto } from './dto/search-audit_report_master.dto';
@@ -182,7 +182,7 @@ export class ESCSARMService {
       };
     } catch (error) {
       if (localRunner) await localRunner.rollbackTransaction();
-      throw new InternalServerErrorException('Error: ' + error.message);
+      throw new Error('Error: ' + error.message);
     } finally {
       if (localRunner) await localRunner.release();
     }
@@ -255,7 +255,7 @@ export class ESCSARMService {
     } catch (error) {
       if (localRunner && didStartTx && localRunner.isTransactionActive)
         await localRunner.rollbackTransaction();
-      throw new InternalServerErrorException(
+      throw new Error(
         'Insert master Error: ' + error.message,
       );
     } finally {
@@ -285,7 +285,7 @@ export class ESCSARMService {
     } catch (error) {
       if (localRunner && didStartTx && localRunner.isTransactionActive)
         await localRunner.rollbackTransaction();
-      throw new InternalServerErrorException(
+      throw new Error(
         'Update master Error: ' + error.message,
       );
     } finally {
@@ -318,7 +318,7 @@ export class ESCSARMService {
     } catch (error) {
       if (localRunner && didStartTx && localRunner.isTransactionActive)
         await localRunner.rollbackTransaction();
-      throw new InternalServerErrorException(
+      throw new Error(
         'Delete master Error: ' + error.message,
       );
     } finally {

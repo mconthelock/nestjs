@@ -99,7 +99,7 @@ export class QainsFormService {
       const condForeman = {
         condition: {
           ...form,
-          CEXTDATA: '05',
+          CEXTDATA: '03',
         },
         VAPVNO: dto.REQUESTER,
         VREPNO: dto.REQUESTER,
@@ -283,7 +283,7 @@ export class QainsFormService {
       const condForeman = {
         condition: {
           ...form,
-          CEXTDATA: '03',
+          CEXTDATA: '05',
         },
         VAPVNO: dto.QCFOREMAN,
         VREPNO: dto.QCFOREMAN,
@@ -310,7 +310,7 @@ export class QainsFormService {
         const condSem = {
           condition: {
             ...form,
-            CEXTDATA: '04',
+            CEXTDATA: '06',
           },
           VAPVNO: qcsem[0].VEMPNO,
           VREPNO: qcsem[0].VEMPNO,

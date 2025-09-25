@@ -47,4 +47,11 @@ export class QainsFormController {
     const ip = getClientIP(req);
     return await this.qainsFormService.qcConfirm(dto, ip);
   }
+
+  @Post('lastSubmit')
+  @UseInterceptors(AnyFilesInterceptor())
+  async lastSubmit(@Body() dto: QcConfQainsFormDto, @Req() req: Request) {
+    const ip = getClientIP(req);
+    return await this.qainsFormService.lastSubmit(dto, ip);
+  }
 }

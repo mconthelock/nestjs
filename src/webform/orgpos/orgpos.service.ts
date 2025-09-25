@@ -14,30 +14,14 @@ export class OrgposService {
     @InjectDataSource('amecConnection')
     private dataSource: DataSource,
   ) {}
-  create(createOrgpoDto: CreateOrgpoDto) {
-    return 'This action adds a new orgpo';
-  }
-
-  findAll() {
-    return `This action returns all orgpos`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} orgpo`;
-  }
-
-  update(id: number, updateOrgpoDto: UpdateOrgpoDto) {
-    return `This action updates a #${id} orgpo`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} orgpo`;
-  }
 
   async getOrgPos(dto: SearchOrgpoDto, queryRunner?: QueryRunner) {
+    console.log(dto);
+    
     const repo = queryRunner ? queryRunner.manager.getRepository(Orgpos) : this.orgpos;
     return repo.find({
       where: dto,
+      relations: ['EMPINFO'],
       order: {
         VEMPNO: 'ASC',
       },

@@ -12,6 +12,7 @@ import { SetRequestDate } from 'src/joborder/set-request-date/entities/set-reque
 import { JopMarReq } from 'src/joborder/jop-mar-req/entities/jop-mar-req.entity';
 import { JopPurConf } from 'src/joborder/jop-pur-conf/entities/jop-pur-conf.entity';
 import { EscsUser } from 'src/escs/user/entities/user.entity';
+import { Orgpos } from 'src/webform/orgpos/entities/orgpos.entity';
 
 @Entity('AMECUSERALL')
 export class User {
@@ -85,4 +86,10 @@ export class User {
 
   @OneToOne(() => EscsUser, (escsUser) => escsUser.user)
   escsUser: EscsUser;
+
+  @OneToOne(() => Orgpos, (o) => o.EMPINFO)
+  @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'VEMPNO' })
+  orgpos: Orgpos;
+
+  
 }

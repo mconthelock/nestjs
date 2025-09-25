@@ -62,7 +62,7 @@ export class QainsFormService {
       );
 
       if (!createForm.status) {
-        throw new InternalServerErrorException(createForm.message);
+        throw new Error(createForm.message);
       }
 
       const form = {
@@ -188,11 +188,11 @@ export class QainsFormService {
         // 'QA_MASTER',
         // 'ITEM_STATION'
       ],
-    //   order: {
-        // QA_AUD_OPT: { QOA_SEQ: 'ASC' }, // แทน ORDER BY ใน subquery เดิม
-        // QA_FILES: { FILE_ID: 'ASC' },
-        // QA_MASTER: { ARM_NO: 'ASC', ARM_SEQ: 'ASC' },
-    //   },
+      //   order: {
+      // QA_AUD_OPT: { QOA_SEQ: 'ASC' }, // แทน ORDER BY ใน subquery เดิม
+      // QA_FILES: { FILE_ID: 'ASC' },
+      // QA_MASTER: { ARM_NO: 'ASC', ARM_SEQ: 'ASC' },
+      //   },
     });
   }
 
@@ -246,7 +246,7 @@ export class QainsFormService {
 
       if (localRunner) await localRunner.commitTransaction();
       if (!res) {
-        throw new InternalServerErrorException('No rows updated');
+        throw new Error('No rows updated');
       } else {
         return { status: true, result: res, message: 'success' };
       }
@@ -258,7 +258,7 @@ export class QainsFormService {
           message: error.message,
         };
       } else {
-        throw new InternalServerErrorException(error.message);
+        throw new Error(error.message);
       }
     } finally {
       if (localRunner) await localRunner.release();
@@ -357,7 +357,7 @@ export class QainsFormService {
       };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      throw new InternalServerErrorException(error.message);
+      throw new Error(error.message);
     } finally {
       await queryRunner.release();
     }
@@ -372,11 +372,7 @@ export class QainsFormService {
     const item = data.QA_ITEM;
     let html = `<div style="font-size:14px; color:#000;">`;
     const seccode = [
-      ...new Set(
-        operator.map(
-          (o) => o.QOA_EMPNO_INFO.SSECCODE,
-        ),
-      ),
+      ...new Set(operator.map((o) => o.QOA_EMPNO_INFO.SSECCODE)),
     ];
     // console.log(seccode);
 
@@ -390,7 +386,7 @@ export class QainsFormService {
       );
       const semInfo = await this.usersService.findEmp(semEmpno[0].VEMPNO);
       console.log('semInfo', semInfo);
-      
+
       html += `<b>Dear ${semInfo.SNAME}</b>
         <p>
             I'm writing to arrange a time for 
@@ -441,6 +437,28 @@ export class QainsFormService {
         subject: `Quality built in item ${item}`,
         html: html,
       });
+    }
+  }
+
+  async lastSubmit(dto: QcConfQainsFormDto, ip: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      // Your business logic here
+        throw new Error('Test error in lastSubmit');
+      await queryRunner.commitTransaction();
+      return {
+        status: true,
+        message: 'Action successful',
+        data: dto,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new Error(error.message);
+    } finally {
+      await queryRunner.release();
     }
   }
 }

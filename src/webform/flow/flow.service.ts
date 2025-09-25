@@ -587,10 +587,11 @@ export class FlowService {
           );
           const updateNextStep = checkNextStep.length == 0 ? true : false;
           if (updateNextStep) {
+            const stepNext = await this.getStepNext(form, runner);
             //UPDATE STEP NEXT STATUS
-            await this.updateStepNextStatus(form, runner);
+            await this.updateStepNextStatus(form, stepNext, runner);
             //UPDATE NEXT NEXT STEP (WAIT)
-            await this.updateNextStepWait(form, runner);
+            await this.updateNextStepWait(form, stepNext, runner);
             await this.sendMailToApprover(form, runner); // send email to approver
           }
           break;
@@ -621,10 +622,11 @@ export class FlowService {
             //UPDATE SINGLE STEP
             await this.updateSingleStep(form, runner);
           } else {
+            const stepNext = await this.getStepNext(form, runner);
             //UPDATE STEP NEXT STATUS
-            await this.updateStepNextStatus(form, runner);
+            await this.updateStepNextStatus(form, stepNext, runner);
             //UPDATE NEXT NEXT STEP (WAIT)
-            await this.updateNextStepWait(form, runner);
+            await this.updateNextStepWait(form, stepNext, runner);
           }
           break;
         case 'return':
@@ -853,14 +855,14 @@ export class FlowService {
     return await this.execSql(sql, params, queryRunner, 'Update Single Step');
   }
 
-  async updateStepNextStatus(form: FormDto, queryRunner?: QueryRunner) {
+  async updateStepNextStatus(form: FormDto, stepNext: string, queryRunner?: QueryRunner) {
     const sql =
       'update flow set CAPVSTNO = :apvNone, CSTEPST = :stepReady where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO AND CSTEPNO = :stepNext AND CSTEPST in (:stepNormal, :stepWait) ';
     const params = {
       ...form,
       apvNone: this.APV_NONE,
       stepReady: this.STEP_READY,
-      stepNext: await this.getStepNext(form, queryRunner),
+      stepNext: stepNext,
       stepNormal: this.STEP_NORMAL,
       stepWait: this.STEP_WAIT,
     };
@@ -872,7 +874,7 @@ export class FlowService {
     );
   }
 
-  async updateNextStepWait(form: FormDto, queryRunner?: QueryRunner) {
+  async updateNextStepWait(form: FormDto, stepNext: string, queryRunner?: QueryRunner) {
     const sql =
       'update flow set CAPVSTNO = :apvNone, CSTEPST = :stepWait where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CSTEPNO in (select cStepNextNo from flow where NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno and CSTEPNO = :stepNext) and CSTEPST = :stepNormal and CAPVSTNO = :apvNone2';
     const params = {
@@ -886,7 +888,7 @@ export class FlowService {
       apvNone2: this.APV_NONE,
       stepWait: this.STEP_WAIT,
       stepNormal: this.STEP_NORMAL,
-      stepNext: await this.getStepNext(form, queryRunner),
+      stepNext: stepNext,
     };
     return await this.execSql(
       sql,

@@ -23,7 +23,7 @@ export class SetRequestDateController {
   ): Promise<{ message: string; data: SetRequestDate; status: number, rev?: SetRequestDate[] }> {
     // เปลี่ยนชนิดการคืนค่าเป็น void หรือ Response object
     try {
-        // throw new InternalServerErrorException('This is a test error'); // ทดสอบการโยนข้อผิดพลาด
+        // throw new Error('This is a test error'); // ทดสอบการโยนข้อผิดพลาด
       const result = await this.setRequestDateService.setRequestDate(upsertDto);
       result.record.DeadLinePUR = await this.amecCalendarService.addWorkDays(result.record.JOP_MAR_INPUT_DATE, 7);
       return {

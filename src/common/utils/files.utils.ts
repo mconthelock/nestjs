@@ -1,4 +1,4 @@
-import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { join, normalize } from 'path';
 import * as mime from 'mime-types';
 import { promises as fs } from 'fs';
@@ -130,7 +130,7 @@ export async function getBase64Image(filePath: string): Promise<string> {
 export async function getBase64ImageFromUrl(url: string): Promise<string> {
   try {
     const res = await fetch(url);
-    if (!res.ok) throw new InternalServerErrorException(`HTTP ${res.status} ${res.statusText}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
 
     const contentType = res.headers.get('content-type') || 'application/octet-stream';
     const buffer = Buffer.from(await res.arrayBuffer());

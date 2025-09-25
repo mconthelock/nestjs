@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
 
@@ -177,7 +177,7 @@ export class JopMarReqService {
       console.log('Record found:', record);
 
       if (!record) {
-        throw new InternalServerErrorException('Record not found');
+        throw new Error('Record not found');
       }
       Object.assign(record, updateData);
       const result = await runner.manager.save(record);

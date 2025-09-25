@@ -12,22 +12,22 @@ export class FormDto {
   @IsNotEmpty()
   @Type(() => Number)
   @IsNumber()
-  readonly NFRMNO: number;
+  NFRMNO: number;
 
   @IsNotEmpty()
   @IsString()
-  readonly VORGNO: string;
+  VORGNO: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly CYEAR: string;
+  CYEAR: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly CYEAR2: string;
+  CYEAR2: string;
 
   @IsNotEmpty()
   @Type(() => Number)
   @IsNumber()
-  readonly NRUNNO: number;
+  NRUNNO: number;
 }

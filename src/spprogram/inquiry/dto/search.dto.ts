@@ -83,5 +83,10 @@ export class searchDto extends PartialType(createInqDto) {
   @IsBoolean()
   @IsOptional()
   @Type(() => Boolean)
-  'timeline.ISNULL_BM_COFIRM': boolean;
+  'timeline.ISNULL_BM_CONFIRM': boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  @Type(() => Boolean)
+  'needDetail': boolean;
 }

@@ -76,10 +76,14 @@ export class InquiryService {
   async search(searchDto: searchDto) {
     const qb = this.inq.createQueryBuilder('inq');
     qb.where('inq.INQ_LATEST = 1');
+    if (searchDto.needDetail === true) {
+      qb.leftJoinAndSelect('inq.details', 'details');
+      delete searchDto.needDetail;
+    }
+
     for (const key in searchDto) {
       let operator = '';
       let alias = '';
-
       const parts = key.split('_');
       const subParts = parts[0].split('.');
       if (subParts.length > 1) {
@@ -125,7 +129,6 @@ export class InquiryService {
       .leftJoinAndSelect('inq.maruser', 'maruser')
       .leftJoinAndSelect('inq.timeline', 'timeline')
       .leftJoinAndSelect('inq.quotation', 'quotation');
-
     return qb.getMany();
   }
 

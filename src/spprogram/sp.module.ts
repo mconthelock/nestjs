@@ -24,6 +24,7 @@ import { PricelistModule } from './pricelist/pricelist.module';
 import { ItemsCustomerModule } from './items-customer/items-customer.module';
 import { QuotationModule } from './quotation/quotation.module';
 import { WeightModule } from './weight/weight.module';
+import { DesignerModule } from './designer/designer.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { WeightModule } from './weight/weight.module';
     ItemsCustomerModule,
     QuotationModule,
     WeightModule,
+    DesignerModule,
   ],
 })
 export class SpModule {}

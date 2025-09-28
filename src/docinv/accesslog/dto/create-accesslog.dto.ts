@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsDate,
+  IsOptional,
+} from 'class-validator';
 export class CreateAccesslogDto {
   @IsString()
   @IsNotEmpty()
@@ -18,4 +24,9 @@ export class CreateAccesslogDto {
 
   @IsString()
   logmsg: string;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  logdate?: Date;
 }

@@ -1,7 +1,12 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { AccesslogService } from './accesslog.service';
 
-@Controller('accesslog')
+@Controller('docinv/applogs')
 export class AccesslogController {
-  constructor(private readonly accesslogService: AccesslogService) {}
+  constructor(private readonly logs: AccesslogService) {}
+
+  @Get('login/:id')
+  async getLoginLogs(@Param('id') id: number) {
+    return this.logs.getLoginLogs(id);
+  }
 }

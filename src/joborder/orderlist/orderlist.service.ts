@@ -378,7 +378,7 @@ export class OrderListService {
                 DATE: r.JOP_MAR_REQUEST_DATE,
                 REMARK: r.JOP_MAR_REMARK,
                 INPUT_DATE: r.JOP_MAR_INPUT_DATE,
-                NAME: r.marRequest.SNAME,
+                NAME: r.marRequest?.SNAME ?? '',
               };
             });
           }
@@ -397,7 +397,7 @@ export class OrderListService {
                 DATE: r.JOP_PUR_CONFIRM_DATE,
                 REMARK: r.JOP_PUR_REMARK,
                 INPUT_DATE: r.JOP_PUR_INPUT_DATE,
-                NAME: r.purConfirm.SNAME,
+                NAME: r.purConfirm?.SNAME ?? '',
               };
             });
           }

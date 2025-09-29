@@ -40,7 +40,7 @@ export class Timeline {
   DE_CONFIRM: Date;
 
   @Column()
-  BM_COFIRM: Date;
+  BM_CONFIRM: Date;
 
   @Column()
   PKC_USER: string;

@@ -14,6 +14,7 @@ export class createInqDto {
   INQ_REV: string;
 
   @IsNumber()
+  @Type(() => Number)
   INQ_STATUS: number;
 
   @IsDate()
@@ -65,18 +66,22 @@ export class createInqDto {
 
   @IsNumber()
   @IsOptional()
+  @Type(() => Number)
   INQ_QUOTATION_TYPE: number;
 
   @IsNumber()
   @IsOptional()
+  @Type(() => Number)
   INQ_DELIVERY_TERM: number;
 
   @IsNumber()
   @IsOptional()
+  @Type(() => Number)
   INQ_DELIVERY_METHOD: number;
 
   @IsNumber()
   @IsOptional()
+  @Type(() => Number)
   INQ_SHIPMENT: number;
 
   @IsString()

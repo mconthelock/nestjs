@@ -13,6 +13,8 @@ import { JopMarReq } from 'src/joborder/jop-mar-req/entities/jop-mar-req.entity'
 import { JopPurConf } from 'src/joborder/jop-pur-conf/entities/jop-pur-conf.entity';
 import { EscsUser } from 'src/escs/user/entities/user.entity';
 import { Orgpos } from 'src/webform/orgpos/entities/orgpos.entity';
+import { Accesslog } from 'src/docinv/accesslog/entities/accesslog.entity';
+import { Designer } from 'src/spprogram/designer/entities/designer.entity';
 
 @Entity('AMECUSERALL')
 export class User {
@@ -90,4 +92,12 @@ export class User {
   @OneToOne(() => Orgpos, (o) => o.EMPINFO)
   @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'VEMPNO' })
   orgpos: Orgpos;
+
+  @OneToMany(() => Accesslog, (log) => log.users)
+  @JoinColumn([{ name: 'SEMPNO', referencedColumnName: 'LOG_USER' }])
+  loginlogs: Accesslog[];
+
+  @OneToOne(() => Designer, (des) => des.user)
+  @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'DES_USER' })
+  spdesigner: Designer;
 }

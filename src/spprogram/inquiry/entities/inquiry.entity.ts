@@ -17,6 +17,7 @@ import { Shipment } from '../../shipment/entities/shipment.entity';
 import { Timeline } from '../../timeline/entities/timeline.entity';
 import { SpUser } from 'src/spprogram/spusers/spusers.entity';
 import { Quotation } from '../../quotation/entities/quotation.entity';
+import { Weight } from '../../weight/entities/weight.entity';
 
 @Entity('SP_INQUIRY')
 export class Inquiry {
@@ -195,4 +196,8 @@ export class Inquiry {
   @OneToOne(() => Quotation, (quo) => quo.inqs)
   @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'QUO_INQ' })
   quotation: Quotation;
+
+  @OneToMany(() => Weight, (inq) => inq.inqs)
+  @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'INQ_ID' })
+  weight: Weight;
 }

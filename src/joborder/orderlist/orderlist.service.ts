@@ -201,7 +201,11 @@ export class OrderListService {
         const query = this.dataSource.createQueryBuilder().from('MV_JOB_ORDER','O');
         query.distinct(distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
 
-        if(orderby) query.orderBy(orderby, orderbyDirection)
+        if(orderby){
+            query.orderBy(orderby, orderbyDirection)
+        }else{
+            query.orderBy('O.PRJ_NO','ASC')
+        }
 
         // optional
         if (ORDTYPE)    query.andWhere('O.ORDTYPE = :ORDTYPE', { ORDTYPE });
@@ -279,7 +283,6 @@ export class OrderListService {
                     query.addSelect("ADD_WORK_DAYS(TO_NUMBER(TO_CHAR(J.JOP_MAR_INPUT_DATE, 'YYYYMMDD')),7)", 'DeadLinePUR'); // เพื่อให้ได้ DeadLinePUR
                 } else if ('PRJ_NO' === f) {
                     query.addSelect('O.PRJ_NO', 'PRJ_NO');
-                    query.orderBy('O.PRJ_NO','ASC')
                 } else {
                     query.addSelect(`O.${f}`, f);
                 }
@@ -375,7 +378,7 @@ export class OrderListService {
                 DATE: r.JOP_MAR_REQUEST_DATE,
                 REMARK: r.JOP_MAR_REMARK,
                 INPUT_DATE: r.JOP_MAR_INPUT_DATE,
-                NAME: r.marRequest.SNAME,
+                NAME: r.marRequest?.SNAME ?? '',
               };
             });
           }
@@ -394,7 +397,7 @@ export class OrderListService {
                 DATE: r.JOP_PUR_CONFIRM_DATE,
                 REMARK: r.JOP_PUR_REMARK,
                 INPUT_DATE: r.JOP_PUR_INPUT_DATE,
-                NAME: r.purConfirm.SNAME,
+                NAME: r.purConfirm?.SNAME ?? '',
               };
             });
           }

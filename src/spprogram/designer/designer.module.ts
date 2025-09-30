@@ -5,10 +5,8 @@ import { Designer } from './entities/designer.entity';
 import { DesignerController } from './designer.controller';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([Designer], 'spsysConnection')],
   controllers: [DesignerController],
-  imports: [
-    TypeOrmModule.forFeature([Designer], 'amecConnection')
-  ],
   providers: [DesignerService],
 })
 export class DesignerModule {}

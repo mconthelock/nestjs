@@ -12,6 +12,7 @@ import { Attachments } from '../attachments/entities/attachments.entity';
 import { searchDto } from './dto/search.dto';
 import { createInqDto } from './dto/create-inquiry.dto';
 import { createDto as dtDto } from '../inquiry-detail/dto/create.dto';
+import { createTimelineDto } from '../timeline/dto/create-dto';
 import { updateTimelineDto } from '../timeline/dto/update-dto';
 
 interface group {
@@ -132,22 +133,27 @@ export class InquiryService {
     return qb.getMany();
   }
 
-  async create(dto: createInqDto, details: any[]) {
+  async create(
+    dto: createInqDto,
+    details: any[],
+    timelinedata?: createTimelineDto,
+    history?: logs,
+  ) {
     const runner = this.ds.createQueryRunner();
     await runner.connect();
     await runner.startTransaction();
     try {
-      await runner.manager.save(Inquiry, dto);
-      const inquiry = await runner.manager.findOne(Inquiry, {
-        where: { INQ_NO: dto.INQ_NO, INQ_LATEST: 1 },
-      });
-
-      await runner.manager.save(Timeline, {
-        INQ_NO: inquiry.INQ_NO,
-        INQ_REV: inquiry.INQ_REV,
-        MAR_USER: inquiry.INQ_MAR_PIC,
-        MAR_SEND: new Date(),
-      });
+      const inquiry = await runner.manager.save(Inquiry, dto);
+      //   const inquiry = await runner.manager.findOne(Inquiry, {
+      //     where: { INQ_NO: dto.INQ_NO, INQ_LATEST: 1 },
+      //   });
+      await runner.manager.save(Timeline, timelinedata);
+      //   await runner.manager.save(Timeline, {
+      //     INQ_NO: inquiry.INQ_NO,
+      //     INQ_REV: inquiry.INQ_REV,
+      //     MAR_USER: inquiry.INQ_MAR_PIC,
+      //     MAR_SEND: new Date(),
+      //   });
 
       const items = details.map((el) => {
         const itemVal = Math.floor(el.INQD_ITEM / 100);
@@ -187,17 +193,16 @@ export class InquiryService {
         });
         return detail;
       });
-
       const newDetails = await Promise.all(detailPromises);
       await runner.manager.save(InquiryDetail, newDetails);
-      const log = runner.manager.create(History, {
+      /*const log = runner.manager.create(History, {
         INQ_NO: dto.INQ_NO,
         INQ_REV: dto.INQ_REV,
         INQH_USER: dto.INQ_MAR_PIC,
         INQH_ACTION: dto.INQ_REV == '*' ? 1 : 3,
         INQH_REMARK: dto.INQ_REMARK,
-      });
-      await runner.manager.save(History, log);
+      });*/
+      await runner.manager.save(History, history);
       await runner.commitTransaction();
     } catch (err) {
       await runner.rollbackTransaction();

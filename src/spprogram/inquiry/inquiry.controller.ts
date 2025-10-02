@@ -14,7 +14,12 @@ export class InquiryController {
 
   @Post('create')
   async create(@Body() req: any) {
-    const data = await this.inq.create(req.header, req.details);
+    const data = await this.inq.create(
+      req.header,
+      req.details,
+      req.timelinedata || undefined,
+      req.history || undefined,
+    );
     return await this.inq.findByNumber(req.header.INQ_NO);
   }
 

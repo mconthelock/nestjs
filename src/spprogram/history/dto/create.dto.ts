@@ -3,15 +3,16 @@ import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
 
 export class createDto {
   @IsString()
-  @IsOptional()
   INQ_NO: string;
 
   @IsString()
-  @IsOptional()
   INQ_REV: string;
 
+  @IsDate()
+  @Type(() => Date)
+  INQH_DATE: Date;
+
   @IsString()
-  @IsOptional()
   INQH_USER: string;
 
   @IsNumber()

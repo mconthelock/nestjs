@@ -5,13 +5,14 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 import { InquiryDetail } from '../../inquiry-detail/entities/inquiry-detail.entity';
 
 @Entity('SP_INQUIRY_GROUP')
 export class InquiryGroup {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   INQG_ID: number;
 
   @Column()

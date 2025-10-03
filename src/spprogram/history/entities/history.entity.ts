@@ -5,22 +5,22 @@ import { Status } from 'src/spprogram/status/entities/status.entity';
 @Entity('SP_INQUIRY_HISTORY')
 export class History {
   @PrimaryColumn()
-  INQH_DATE: Date;
-
-  @Column()
   INQ_NO: string;
 
-  @Column()
+  @PrimaryColumn()
   INQ_REV: string;
 
-  @Column()
+  @PrimaryColumn()
   INQH_USER: string;
 
-  @Column()
+  @PrimaryColumn()
   INQH_ACTION: number;
 
   @Column()
   INQH_LATEST: number;
+
+  @PrimaryColumn()
+  INQH_DATE: Date;
 
   @Column()
   INQH_REMARK: string;

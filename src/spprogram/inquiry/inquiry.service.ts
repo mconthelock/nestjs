@@ -14,22 +14,7 @@ import { createInqDto } from './dto/create-inquiry.dto';
 import { createDto as dtDto } from '../inquiry-detail/dto/create.dto';
 import { createTimelineDto } from '../timeline/dto/create-dto';
 import { updateTimelineDto } from '../timeline/dto/update-dto';
-
-interface group {
-  INQ_ID: number;
-  INQG_GROUP: number;
-  INQG_REV: string;
-  INQG_STATUS: number;
-  INQG_LATEST: number;
-}
-
-interface logs {
-  INQ_NO: string;
-  INQ_REV: string;
-  INQH_USER: string;
-  INQH_ACTION: number;
-  INQH_REMARK: string;
-}
+import { createHistoryDto } from '../history/dto/create.dto';
 
 @Injectable()
 export class InquiryService {
@@ -137,24 +122,14 @@ export class InquiryService {
     dto: createInqDto,
     details: any[],
     timelinedata?: createTimelineDto,
-    history?: logs,
+    history?: createHistoryDto,
   ) {
     const runner = this.ds.createQueryRunner();
     await runner.connect();
     await runner.startTransaction();
     try {
       const inquiry = await runner.manager.save(Inquiry, dto);
-      //   const inquiry = await runner.manager.findOne(Inquiry, {
-      //     where: { INQ_NO: dto.INQ_NO, INQ_LATEST: 1 },
-      //   });
       await runner.manager.save(Timeline, timelinedata);
-      //   await runner.manager.save(Timeline, {
-      //     INQ_NO: inquiry.INQ_NO,
-      //     INQ_REV: inquiry.INQ_REV,
-      //     MAR_USER: inquiry.INQ_MAR_PIC,
-      //     MAR_SEND: new Date(),
-      //   });
-
       const items = details.map((el) => {
         const itemVal = Math.floor(el.INQD_ITEM / 100);
         if (itemVal === 5) return 2;
@@ -165,8 +140,8 @@ export class InquiryService {
       const newGroups = groups.map((groupVal) =>
         runner.manager.create(InquiryGroup, {
           INQ_ID: inquiry.INQ_ID,
-          INQG_STATUS: inquiry.INQ_STATUS,
           INQG_REV: '*',
+          INQG_STATUS: 0,
           INQG_GROUP: groupVal,
           INQG_LATEST: 1,
         }),
@@ -184,10 +159,10 @@ export class InquiryService {
         const grp_id_obj = savedGroups.find((val) => val.INQG_GROUP === item);
         const detail = runner.manager.create(InquiryDetail, {
           ...el,
-          INQD_RUNNO: d + 1,
-          INQID: inquiry.INQ_ID,
           INQG_GROUP: grp_id_obj.INQG_ID,
+          INQD_RUNNO: d + 1,
           INQD_LATEST: 1,
+          INQID: inquiry.INQ_ID,
           CREATE_AT: new Date(),
           UPDATE_AT: new Date(),
         });
@@ -195,14 +170,14 @@ export class InquiryService {
       });
       const newDetails = await Promise.all(detailPromises);
       await runner.manager.save(InquiryDetail, newDetails);
-      /*const log = runner.manager.create(History, {
-        INQ_NO: dto.INQ_NO,
-        INQ_REV: dto.INQ_REV,
-        INQH_USER: dto.INQ_MAR_PIC,
-        INQH_ACTION: dto.INQ_REV == '*' ? 1 : 3,
-        INQH_REMARK: dto.INQ_REMARK,
-      });*/
-      await runner.manager.save(History, history);
+      const log = await runner.manager.create(History, {
+        ...history,
+        INQH_LATEST: 1,
+        INQH_ACTION: 0,
+      });
+      console.log(log);
+
+      //   await runner.manager.save(History, log);
       await runner.commitTransaction();
     } catch (err) {
       await runner.rollbackTransaction();
@@ -218,7 +193,7 @@ export class InquiryService {
     deleteLine: any[],
     deleteFile: any[],
     timelinedata?: updateTimelineDto,
-    history?: logs,
+    history?: createHistoryDto,
   ) {
     const runner = this.ds.createQueryRunner();
     await runner.connect();
@@ -301,7 +276,7 @@ export class InquiryService {
         if (db_detail) {
           const dto: dtDto = Object.assign({} as dtDto, db_detail);
           Object.assign(dto, dt);
-          delete dto.INQD_ID;
+          //   delete dto.INQD_ID;
           delete dto.INQID;
           delete dto.INQD_PREV;
           await runner.manager.update(InquiryDetail, dt_id, dto);

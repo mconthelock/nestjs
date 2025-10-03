@@ -2,10 +2,10 @@ import { Type } from 'class-transformer';
 import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
 
 export class createDto {
-  @IsNumber()
-  @IsOptional()
-  @Type(() => Number)
-  INQD_ID: number;
+  //   @IsNumber()
+  //   @IsOptional()
+  //   @Type(() => Number)
+  //   INQD_ID: number;
 
   @IsNumber()
   @Type(() => Number)

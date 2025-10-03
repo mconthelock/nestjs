@@ -14,6 +14,7 @@ import { SequenceOrgModule } from 'src/webform/sequence-org/sequence-org.module'
 import { UsersModule } from 'src/amec/users/users.module';
 import { MailModule } from 'src/mail/mail.module';
 import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
+import { ESCSUserModule } from 'src/escs/user/user.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
     SequenceOrgModule,
     UsersModule, 
     MailModule,
-    OrgposModule
+    OrgposModule,
+    ESCSUserModule
   ],
   controllers: [QainsFormController],
   providers: [QainsFormService],

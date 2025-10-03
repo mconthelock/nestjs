@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { EscsUser } from './entities/user.entity';
 import { SearchEscsUserDto } from './dto/search-escs-user.dto';
-import { getSelectNestedFields, getSafeFields } from '../../common/utils/Fields.utils';
+import {
+  getSelectNestedFields,
+  getSafeFields,
+} from '../../common/utils/Fields.utils';
+import { CreateEscsUserDto } from './dto/create-escs-user.dto';
 
 @Injectable()
 export class ESCSUserService {
@@ -11,45 +15,16 @@ export class ESCSUserService {
     @InjectRepository(EscsUser, 'amecConnection')
     private userRepo: Repository<EscsUser>,
     @InjectDataSource('amecConnection')
-    private dataSource: DataSource
+    private dataSource: DataSource,
   ) {}
 
-//   private selectfields = {
-//         USR_ID: true,
-//         USR_NO: true,
-//         USR_NAME: true,
-//         USR_EMAIL: true,
-//         USR_REGISTDATE: true,
-//         USR_USERUPDATE: true,
-//         USR_DATEUPDATE: true,
-//         GRP_ID: true,
-//         USR_STATUS: true,
-//         SEC_ID: true,
-//         user: {
-//           SEMPNO: true,
-//           SNAME: true,
-//           SRECMAIL: true,
-//           SSECCODE: true,
-//           SSEC: true,
-//           SDEPCODE: true,
-//           SDEPT: true,
-//           SDIVCODE: true,
-//           SDIV: true,
-//           SPOSCODE: true,
-//           SPOSNAME: true,
-//           SPASSWORD1: true,
-//           CSTATUS: true,
-//           SEMPENCODE: true,
-//           MEMEML: true,
-//           STNAME: true,
-//         }
-//     };
-
-  private escs = this.dataSource.getMetadata(EscsUser).columns.map(c => c.propertyName);
-  private user = this.dataSource.getMetadata('AMECUSERALL').columns.map(c => c.propertyName);
+  private escs = this.dataSource
+    .getMetadata(EscsUser)
+    .columns.map((c) => c.propertyName);
+  private user = this.dataSource
+    .getMetadata('AMECUSERALL')
+    .columns.map((c) => c.propertyName);
   private allowFields = [...this.escs, ...this.user];
-
-
 
   getUserAll() {
     return this.userRepo.find({
@@ -68,53 +43,70 @@ export class ESCSUserService {
     });
   }
 
-  getUser(searchDto: SearchEscsUserDto) {
-    const { USR_ID, USR_NO, GRP_ID, USR_STATUS, SEC_ID, fields = [] } = searchDto;
-    const query = this.dataSource.createQueryBuilder().from('ESCS_USERS','A');
+  getUser(searchDto: SearchEscsUserDto, queryRunner?: QueryRunner) {
+    const {
+      USR_ID,
+      USR_NO,
+      GRP_ID,
+      USR_STATUS,
+      SEC_ID,
+      fields = [],
+    } = searchDto;
+    const repo = queryRunner ? queryRunner.manager : this.dataSource;
+    const query = repo.createQueryBuilder().from('ESCS_USERS', 'A');
 
-    // console.log('escs:', this.escs);
-    // console.log('user:', this.user);
-    // console.log('allowFields:', this.allowFields);
-    
-
-    if( USR_ID) query.andWhere('A.USR_ID = :USR_ID', { USR_ID });
-    if( USR_NO) query.andWhere('A.USR_NO = :USR_NO', { USR_NO });
-    if( GRP_ID) query.andWhere('A.GRP_ID = :GRP_ID', { GRP_ID });
-    if( USR_STATUS) query.andWhere('A.USR_STATUS = :USR_STATUS', { USR_STATUS });
-    if( SEC_ID) query.andWhere('A.SEC_ID = :SEC_ID', { SEC_ID });
+    if (USR_ID) query.andWhere('A.USR_ID = :USR_ID', { USR_ID });
+    if (USR_NO) query.andWhere('A.USR_NO = :USR_NO', { USR_NO });
+    if (GRP_ID) query.andWhere('A.GRP_ID = :GRP_ID', { GRP_ID });
+    if (USR_STATUS)
+      query.andWhere('A.USR_STATUS = :USR_STATUS', { USR_STATUS });
+    if (SEC_ID) query.andWhere('A.SEC_ID = :SEC_ID', { SEC_ID });
 
     let select = [];
     if (fields.length > 0) {
-        select = getSafeFields(fields, this.allowFields);
-    }else{
-        select = this.allowFields;
+      select = getSafeFields(fields, this.allowFields);
+    } else {
+      select = this.allowFields;
     }
-    // console.log('Selected fields:', select);
-    
-    select.forEach((f)=>{
-        // console.log('Field:', f);
-        
-        if (this.user.includes(f)) {
-            query.addSelect(`B.${f}`, f);
-        } else {
-            query.addSelect(`A.${f}`, f);
-        }
+
+    select.forEach((f) => {
+      if (this.user.includes(f)) {
+        query.addSelect(`B.${f}`, f);
+      } else {
+        query.addSelect(`A.${f}`, f);
+      }
     });
-    query.leftJoin('AMECUSERALL', 'B', "A.USR_NO = B.SEMPNO");
+    query.leftJoin('AMECUSERALL', 'B', 'A.USR_NO = B.SEMPNO');
     return query.getRawMany();
-
-
-    // const selected = getSelectNestedFields(fields, this.selectfields);
-    // console.log('Selected fields:', selected);
-    
-    // return this.userRepo.find({
-    //   where: [{ USR_ID, USR_NO, GRP_ID, USR_STATUS, SEC_ID }],
-    //   order: {
-    //     USR_ID: 'ASC',
-    //   },
-    //   relations: ['user'],
-    //   select: selected,
-    // });
   }
-  
+
+  async addUser(dto: CreateEscsUserDto, queryRunner?: QueryRunner) {
+    let localRunner: QueryRunner | undefined;
+    let didConnect = false;
+    let didStartTx = false;
+    try {
+      if (!queryRunner) {
+        localRunner = this.dataSource.createQueryRunner();
+        await localRunner.connect();
+        didConnect = true;
+        await localRunner.startTransaction();
+        didStartTx = true;
+      }
+      const runner = queryRunner || localRunner!;
+
+      await runner.manager.insert(EscsUser, dto);
+      if (localRunner && didStartTx && runner.isTransactionActive)
+        await localRunner.commitTransaction();
+      return {
+        status: true,
+        message: 'Insert user Successfully',
+      };
+    } catch (error) {
+      if (localRunner && didStartTx && localRunner.isTransactionActive)
+        await localRunner.rollbackTransaction();
+      throw new Error('Insert user ' + error.message);
+    } finally {
+      if (localRunner && didConnect) await localRunner.release();
+    }
+  }
 }

@@ -18,6 +18,7 @@ import { UpdateQainsFormDto } from './dto/update-qains_form.dto';
 import { OrgposService } from 'src/webform/orgpos/orgpos.service';
 import { formatDate } from 'src/common/utils/dayjs.utils';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+import { ESCSUserService } from 'src/escs/user/user.service';
 
 @Injectable()
 export class QainsFormService {
@@ -35,6 +36,7 @@ export class QainsFormService {
     private readonly usersService: UsersService,
     private readonly mailService: MailService,
     private readonly orgposService: OrgposService,
+    private readonly escsUserService: ESCSUserService,
   ) {}
 
   async createQainsForm(
@@ -447,7 +449,55 @@ export class QainsFormService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      // Your business logic here
+      const form: FormDto = {
+        NFRMNO: dto.NFRMNO,
+        VORGNO: dto.VORGNO,
+        CYEAR: dto.CYEAR,
+        CYEAR2: dto.CYEAR2,
+        NRUNNO: dto.NRUNNO,
+      };
+
+      // Get form data
+      const formData = await this.getFormData(form, queryRunner);
+
+      const secid = formData.QA_INCHARGE_SECTION;
+
+      // search operator
+      const operator = await this.QainsOAService.searchQainsOA(
+        { ...form, QOA_TYPECODE: 'ESO' },
+        queryRunner,
+      );
+
+      const pass = operator.filter((o) => o.QOA_RESULT == 1);
+      const notPass = operator.filter((o) => o.QOA_RESULT == 0);
+      console.log('pass', pass);
+      console.log('notPass', notPass);
+
+      if (pass.length != 0) {
+        for (const p of pass) {
+          const checkUser = await this.escsUserService.getUser(
+            { USR_NO: p.QOA_EMPNO },
+            queryRunner,
+          );
+          console.log('checkUser', checkUser);
+          if (checkUser.length == 0) {
+            // add user
+            await this.escsUserService.addUser(
+              {
+                USR_NO: p.QOA_EMPNO,
+                USR_NAME: p.QOA_EMPNO_INFO.SNAME,
+                USR_EMAIL: p.QOA_EMPNO_INFO.SRECMAIL,
+                GRP_ID: 1, // user group INSPECTOR
+                SEC_ID: secid,
+              },
+              queryRunner,
+            );
+          }
+          // add user item in escs
+        }
+      }
+      throw new Error('test rollback');
+
       await queryRunner.commitTransaction();
       return {
         status: false,

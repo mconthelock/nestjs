@@ -31,7 +31,7 @@ export class CreateEscsUserDto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  USR_USERUPDATE?: number = 0;
+  USR_USERUPDATE?: number;
 
   @ApiProperty({ example: 4 })
   @IsNotEmpty()

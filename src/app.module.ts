@@ -20,6 +20,7 @@ import { DetailModule } from './idtag/detail/detail.module';
 import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
 import { FilesModule } from './file/file.module'
 import { MailModule } from './mail/mail.module';
+import { PDFModule } from './pdf/pdf.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -41,6 +42,7 @@ import { MailModule } from './mail/mail.module';
     JobOrderModule,
     FilesModule,
     ESCSModule,
+    PDFModule,
     ///
     PisModule,
     DetailModule,

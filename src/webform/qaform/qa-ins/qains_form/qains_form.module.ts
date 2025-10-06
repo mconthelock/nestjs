@@ -15,6 +15,10 @@ import { UsersModule } from 'src/amec/users/users.module';
 import { MailModule } from 'src/mail/mail.module';
 import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
 import { ESCSUserModule } from 'src/escs/user/user.module';
+import { ESCSUserItemModule } from 'src/escs/user-item/user-item.module';
+import { ESCSItemStationModule } from 'src/escs/item-station/item-station.module';
+import { ESCSUserItemStationModule } from 'src/escs/user-item-station/user-item-station.module';
+import { PDFModule } from 'src/pdf/pdf.module';
 
 @Module({
   imports: [
@@ -27,7 +31,11 @@ import { ESCSUserModule } from 'src/escs/user/user.module';
     UsersModule, 
     MailModule,
     OrgposModule,
-    ESCSUserModule
+    ESCSUserModule,
+    ESCSUserItemModule,
+    ESCSItemStationModule,
+    ESCSUserItemStationModule,
+    PDFModule
   ],
   controllers: [QainsFormController],
   providers: [QainsFormService],

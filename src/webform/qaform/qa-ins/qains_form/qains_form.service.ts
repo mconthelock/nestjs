@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { CreateQainsFormDto } from './dto/create-qains_form.dto';
-import { moveFileFromMulter, deleteFile } from 'src/common/utils/files.utils';
+import {
+  moveFileFromMulter,
+  deleteFile,
+  joinPaths,
+} from 'src/common/utils/files.utils';
 import { QainsForm } from '../qains_form/entities/qains_form.entity';
 import { FormService } from 'src/webform/form/form.service';
 import { QainsOAService } from '../qains_operator_auditor/qains_operator_auditor.service';
@@ -16,9 +20,13 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 import { QcConfQainsFormDto } from './dto/qcConfirm-qains_form.dto';
 import { UpdateQainsFormDto } from './dto/update-qains_form.dto';
 import { OrgposService } from 'src/webform/orgpos/orgpos.service';
-import { formatDate } from 'src/common/utils/dayjs.utils';
+import { formatDate, now } from 'src/common/utils/dayjs.utils';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 import { ESCSUserService } from 'src/escs/user/user.service';
+import { ESCSUserItemService } from 'src/escs/user-item/user-item.service';
+import { ESCSItemStationService } from 'src/escs/item-station/item-station.service';
+import { ESCSUserItemStationService } from 'src/escs/user-item-station/user-item-station.service';
+import { PDFService } from 'src/pdf/pdf.service';
 
 @Injectable()
 export class QainsFormService {
@@ -37,6 +45,10 @@ export class QainsFormService {
     private readonly mailService: MailService,
     private readonly orgposService: OrgposService,
     private readonly escsUserService: ESCSUserService,
+    private readonly escsUserItemService: ESCSUserItemService,
+    private readonly escsItemStationService: ESCSItemStationService,
+    private readonly escsUserItemStationService: ESCSUserItemStationService,
+    private readonly PDFService: PDFService,
   ) {}
 
   async createQainsForm(
@@ -475,6 +487,8 @@ export class QainsFormService {
 
       if (pass.length != 0) {
         for (const p of pass) {
+          const stationList = [];
+          const savePath = `${process.env.AMEC_FILE_PATH}${process.env.STATE}/escs/user/${p.QOA_EMPNO}/`;
           const checkUser = await this.escsUserService.getUser(
             { USR_NO: p.QOA_EMPNO },
             queryRunner,
@@ -489,14 +503,55 @@ export class QainsFormService {
                 USR_EMAIL: p.QOA_EMPNO_INFO.SRECMAIL,
                 GRP_ID: 1, // user group INSPECTOR
                 SEC_ID: secid,
+                USR_USERUPDATE: 0,
               },
               queryRunner,
             );
           }
           // add user item in escs
+          await this.escsUserItemService.addUserItem(
+            {
+              USR_NO: p.QOA_EMPNO,
+              IT_NO: formData.QA_ITEM,
+            },
+            queryRunner,
+          );
+
+          // add user item station in escs
+          if (p.QOA_STATION) {
+            const station = p.QOA_STATION.split('|');
+            for (const s of station) {
+              const stationNo = parseInt(s);
+              const stationData =
+                await this.escsItemStationService.searchItemStation(
+                  { ITS_NO: stationNo },
+                  queryRunner,
+                );
+              const stationName =
+                stationData.length > 0 ? stationData[0].ITS_STATION_NAME : '';
+              await this.escsUserItemStationService.addUserItemStation(
+                {
+                  US_USER: p.QOA_EMPNO,
+                  US_ITEM: formData.QA_ITEM,
+                  US_STATION: stationName,
+                  US_STATION_NO: stationNo,
+                },
+                queryRunner,
+              );
+              stationList.push({ stationNo, stationName });
+            }
+          }
+          // create pdf file
+          const { fileName, filePath } = await this.createPDF(
+            savePath,
+            formData.QA_ITEM,
+            stationList,
+          );
+
+          // add user file in escs
         }
       }
-      throw new Error('test rollback');
+      //   throw new Error('test rollback');
 
       await queryRunner.commitTransaction();
       return {
@@ -510,5 +565,136 @@ export class QainsFormService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async createPDF(
+    savePath: string,
+    item: string,
+    stations?: { stationNo: number; stationName: string }[],
+  ): Promise<{ fileName: string; filePath: string }> {
+    const fileName = `${now('YYYYMMDD_HHmmss')}_${Math.floor(Math.random() * 9000) + 1000}_${item}_authorize.pdf`;
+    let list = '',
+      checked = '';
+    if (stations && stations.length > 0) {
+      for (const [index, s] of stations.entries()) {
+        list += `<li>4.${index + 1} ${item}  ${s.stationName}</li>`;
+        checked += `<p><i class="icofont-ui-check text-xl text-green-600"></i></p>`;
+      }
+    } else {
+      list += `<li>4.1 ${item}  - </li>`;
+      checked += `<p><i class="icofont-ui-check text-xl text-green-600"></i></p>`;
+    }
+    let html = `
+    <!doctype html>
+    <html lang="th">
+        <head>
+            <meta charset="utf-8"/>
+            <meta name="viewport" content="width=device-width,initial-scale=1"/>
+            <link rel="stylesheet" href="${process.env.APP_HOST}/form/assets/dist/css/v1.0.1.min.css">
+            <link rel="stylesheet" href="${process.env.APP_HOST}/cdn/icofont/icofont.min.css">
+            <style>
+                html, body {
+                    background: #fff !important;
+                }
+                table td {
+                    border: 2px solid #000;
+                }
+            </style>
+        </head>
+        <body>
+            <table class="table">
+                <tbody>
+                    <tr class="bg-gray-300">
+                        <td colspan="4" class="text-center font-bold text-xl">Evaluation and recognition for Authorized Inspector</td>
+                    </tr>
+                    <tr class="bg-gray-300">
+                        <td colspan="4" class="text-center font-bold text-xl">(In case of MFG operator Self inspection)</td>
+                    </tr>
+                    <tr class="bg-gray-300">
+                        <td rowspan="2" class="text-center font-bold text-xl">Items Education/Training</td>
+                        <td colspan="3" class="text-center font-bold">Result of Evaluation</td>
+                    </tr>
+                    <tr class="bg-gray-300">
+                        <td class="text-center font-bold">GOOD</td>
+                        <td class="text-center font-bold">PASS</td>
+                        <td class="text-center font-bold">FAIL</td>
+                    </tr>
+                    <tr class="">
+                        <td>
+                            <div class="flex gap-2">
+                                <span>1.</span>
+                                <ul>
+                                    <li>Manufacturing Process</li>
+                                    <li>Inspection Process</li>
+                                    <li>Calibration System</li>
+                                </ul>
+                            </div>
+                        </td>
+                        <td class=""></td>
+                        <td class="text-center">
+                            <p><i class="icofont-ui-check text-xl text-green-600"></i></p>
+                            <p><i class="icofont-ui-check text-xl text-green-600"></i></p>
+                            <p><i class="icofont-ui-check text-xl text-green-600"></i></p>
+                        </td>
+                        <td class=""></td>
+                    </tr>
+                    <tr class="">
+                        <td>
+                            <div class="flex gap-2">
+                                <span>2.</span>
+                                <ul>
+                                    <li>How to read drawing</li>
+                                </ul>
+                            </div>
+                        </td>
+                        <td class=""></td>
+                        <td class="text-center">
+                            <p><i class="icofont-ui-check text-xl text-green-600"></i></p>
+                        </td>
+                        <td class=""></td>
+                    </tr>
+                    <tr class="">
+                        <td>
+                            <div class="flex gap-2">
+                                <span>3.</span>
+                                <ul>
+                                    <li>Elevator Parts and Escalator Parts</li>
+                                </ul>
+                            </div>
+                        </td>
+                        <td class=""></td>
+                        <td class="text-center">
+                            <p><i class="icofont-ui-check text-xl text-green-600"></i></p>
+                        </td>
+                        <td class=""></td>
+                    </tr>
+                    <tr class="">
+                        <td>
+                            <div class="flex gap-2">
+                                <span>4.</span>
+                                <ul>
+                                    <li>Specified Jobs(OJT)</li>
+                                    ${list}
+                                </ul>
+                            </div>
+                        </td>
+                        <td class=""></td>
+                        <td class="text-center">
+                            ${checked}
+                        </td>
+                        <td class=""></td>
+                    </tr>
+                </tbody>
+            </table>
+        </body>
+    </html>`;
+    this.PDFService.generatePDF({
+      html: html,
+      options: {
+        path: await joinPaths(savePath, fileName),
+        printBackground: true,
+      },
+    });
+    return { fileName, filePath: savePath };
   }
 }

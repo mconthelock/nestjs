@@ -11,6 +11,7 @@ import { Attachments } from '../attachments/entities/attachments.entity';
 
 import { searchDto } from './dto/search.dto';
 import { createInqDto } from './dto/create-inquiry.dto';
+import { updateInqDto } from './dto/update-inquiry.dto';
 import { createDto as dtDto } from '../inquiry-detail/dto/create.dto';
 import { createTimelineDto } from '../timeline/dto/create-dto';
 import { updateTimelineDto } from '../timeline/dto/update-dto';
@@ -170,14 +171,7 @@ export class InquiryService {
       });
       const newDetails = await Promise.all(detailPromises);
       await runner.manager.save(InquiryDetail, newDetails);
-      const log = await runner.manager.create(History, {
-        ...history,
-        INQH_LATEST: 1,
-        INQH_ACTION: 0,
-      });
-      console.log(log);
-
-      //   await runner.manager.save(History, log);
+      await runner.manager.insert(History, history);
       await runner.commitTransaction();
     } catch (err) {
       await runner.rollbackTransaction();
@@ -188,7 +182,7 @@ export class InquiryService {
   }
 
   async update(
-    header: createInqDto,
+    header: updateInqDto,
     details: any[],
     deleteLine: any[],
     deleteFile: any[],
@@ -209,7 +203,7 @@ export class InquiryService {
       }
 
       //Update inquiry
-      const remark = header.INQ_REMARK;
+      //const remark = header.INQ_REMARK;
       delete header.INQ_REMARK;
       delete header.INQ_ID;
       Object.assign(inquiry, header);
@@ -276,7 +270,7 @@ export class InquiryService {
         if (db_detail) {
           const dto: dtDto = Object.assign({} as dtDto, db_detail);
           Object.assign(dto, dt);
-          //   delete dto.INQD_ID;
+          delete dto.INQD_ID;
           delete dto.INQID;
           delete dto.INQD_PREV;
           await runner.manager.update(InquiryDetail, dt_id, dto);
@@ -330,10 +324,7 @@ export class InquiryService {
           );
         }
       }
-
-      const log = runner.manager.create(History, history);
-      await runner.manager.save(History, log);
-
+      runner.manager.insert(History, history);
       await runner.commitTransaction();
     } catch (err) {
       await runner.rollbackTransaction();

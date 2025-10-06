@@ -15,13 +15,14 @@ export class createHistoryDto {
   @Type(() => Number)
   INQH_ACTION: number;
 
-  @IsNumber()
-  @Type(() => Number)
-  INQH_LATEST: number;
-
+  @IsOptional()
   @IsDate()
   @Type(() => Date)
   INQH_DATE: Date;
+
+  @IsNumber()
+  @Type(() => Number)
+  INQH_LATEST: number;
 
   @IsString()
   @IsOptional()

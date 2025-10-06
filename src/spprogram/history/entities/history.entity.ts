@@ -16,11 +16,11 @@ export class History {
   @PrimaryColumn()
   INQH_ACTION: number;
 
-  @Column()
-  INQH_LATEST: number;
-
-  @PrimaryColumn()
+  @Column({ default: () => 'sysdate' })
   INQH_DATE: Date;
+
+  @Column({ default: () => 1 })
+  INQH_LATEST: number;
 
   @Column()
   INQH_REMARK: string;

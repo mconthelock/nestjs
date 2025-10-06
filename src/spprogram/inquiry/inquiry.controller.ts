@@ -2,6 +2,7 @@ import { Controller, Post, Body, Param, Get } from '@nestjs/common';
 import { InquiryService } from './inquiry.service';
 import { createInqDto } from './dto/create-inquiry.dto';
 import { searchDto } from './dto/search.dto';
+import { createHistoryDto } from '../history/dto/create.dto';
 
 @Controller('sp/inquiry')
 export class InquiryController {

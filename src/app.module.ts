@@ -37,6 +37,7 @@ import { LoggerModule } from './logger/logger.module';
 
 import { AutomationModule } from './automation/automation.module';
 
+import { PDFModule } from './pdf/pdf.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -61,6 +62,7 @@ import { AutomationModule } from './automation/automation.module';
     JobOrderModule,
     FilesModule,
     ESCSModule,
+    PDFModule,
     ///
     PisModule,
     DetailModule,

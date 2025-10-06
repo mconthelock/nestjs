@@ -46,6 +46,15 @@ export class UsersController {
     const data = await this.usersService.search();
     const filtered = data.filter((val) => {
       return Object.entries(searchDto).every(([key, value]) => {
+        if(value[0] === '<'){
+            return val[key] < value.slice(1);
+        }
+        if(value[0] === '>'){
+            return val[key] > value.slice(1);
+        }
+        if(value[0] === '!'){
+            return val[key] != value.slice(1);
+        }
         return val[key] == value;
       });
     });

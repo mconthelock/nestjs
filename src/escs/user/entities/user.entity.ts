@@ -15,25 +15,19 @@ export class EscsUser {
   @Column()
   USR_EMAIL: string;
 
-  @Column({
-    type: 'date',
-    default: () => 'SYSDATE',
-  })
+  @Column({ type: 'date', insert: false, update: false })
   USR_REGISTDATE: Date;
 
   @Column()
   USR_USERUPDATE: number;
 
-  @Column({
-    type: 'date',
-    default: () => 'SYSDATE',
-  })
+  @Column({ type: 'date', insert: false, update: false })
   USR_DATEUPDATE: Date;
 
   @Column()
   GRP_ID: number;
 
-  @Column({ default: 1 })
+  @Column({ type: 'number', insert: false, update: false })
   USR_STATUS: number;
 
   @Column()

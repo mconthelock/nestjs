@@ -51,4 +51,9 @@ export class InquiryController {
   async delete(@Body() searchDto: searchDto) {
     return await this.inq.delete(searchDto);
   }
+
+  @Post('report')
+  async report(@Body() searchDto: searchDto) {
+    return await this.inq.report(searchDto);
+  }
 }

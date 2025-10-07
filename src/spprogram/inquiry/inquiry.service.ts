@@ -119,6 +119,67 @@ export class InquiryService {
     return qb.getMany();
   }
 
+  async report(searchDto: searchDto) {
+    const qb = this.inq.createQueryBuilder('inq');
+    qb.where('inq.INQ_LATEST = 1');
+    if (searchDto.needDetail === true) {
+      qb.leftJoinAndSelect('inq.details', 'details');
+      delete searchDto.needDetail;
+    }
+
+    for (const key in searchDto) {
+      let operator = '';
+      let alias = '';
+      const parts = key.split('_');
+      const subParts = parts[0].split('.');
+      if (subParts.length > 1) {
+        alias = subParts[0];
+        operator = subParts[1];
+      } else {
+        operator = parts[0];
+        alias = 'inq';
+      }
+
+      switch (operator) {
+        case 'LIKE':
+          const like = key.replace(`${parts[0]}_`, '').trim();
+          qb.andWhere(`TRIM(${alias}.${like}) LIKE :${like}_like`, {
+            [`${like}_like`]: `%${searchDto[key].trim()}%`,
+          });
+          break;
+        case 'ISNULL':
+          const isnull = key.replace(`${parts[0]}_`, '').trim();
+          qb.andWhere(`${alias}.${isnull} IS NULL`);
+          break;
+        case 'LE':
+          const le = key.replace(`${parts[0]}_`, '').trim();
+          qb.andWhere(`${alias}.${le} <= :${le}_le`, {
+            [`${le}_le`]: searchDto[key],
+          });
+          break;
+        case 'GE':
+          const ge = key.replace(`${parts[0]}_`, '').trim();
+          qb.andWhere(`${alias}.${ge} >= :${ge}_ge`, {
+            [`${ge}_ge`]: searchDto[key],
+          });
+          break;
+        default:
+          qb.andWhere(`${alias}.${key} = :${key}`, { [key]: searchDto[key] });
+          break;
+      }
+    }
+
+    qb.orderBy('inq.INQ_ID', 'DESC')
+      .leftJoinAndSelect('inq.inqgroup', 'inqgroup')
+      .leftJoinAndSelect('inq.status', 'status')
+      .leftJoinAndSelect('inq.shipment', 'shipment')
+      .leftJoinAndSelect('inq.maruser', 'maruser')
+      .leftJoinAndSelect('inq.timeline', 'timeline')
+      .leftJoinAndSelect('inq.quotation', 'quotation')
+      .leftJoinAndSelect('inq.details', 'details');
+    return qb.getMany();
+  }
+
   async create(
     dto: createInqDto,
     details: any[],

@@ -29,6 +29,7 @@ import { ESCSUserItemStationService } from 'src/escs/user-item-station/user-item
 import { PDFService } from 'src/pdf/pdf.service';
 import { User } from '../entities-dummy/user.entity';
 import { ESCSUserFileService } from 'src/escs/user-file/user-file.service';
+import { ESCSUserAuthorizeService } from 'src/escs/user-authorize/user-authorize.service';
 
 @Injectable()
 export class QainsFormService {
@@ -52,6 +53,7 @@ export class QainsFormService {
     private readonly escsUserItemStationService: ESCSUserItemStationService,
     private readonly PDFService: PDFService,
     private readonly escsUserFileService: ESCSUserFileService,
+    private readonly escsUserAuthorizeService: ESCSUserAuthorizeService,
   ) {}
 
   async createQainsForm(
@@ -559,15 +561,32 @@ export class QainsFormService {
             UF_STATION: 0,
             UF_USR_NO: p.QOA_EMPNO,
           });
-          await this.escsUserFileService.addUserFile({
-            UF_ITEM: formData.QA_ITEM,
-            UF_STATION: 0,
-            UF_USR_NO: p.QOA_EMPNO,
-            UF_ID: id,
-            UF_ONAME: `${formData.QA_ITEM}_authorize.pdf`,
-            UF_FNAME: fileName,
-            UF_PATH: filePath,
-          });
+          await this.escsUserFileService.addUserFile(
+            {
+              UF_ITEM: formData.QA_ITEM,
+              UF_STATION: 0,
+              UF_USR_NO: p.QOA_EMPNO,
+              UF_ID: id,
+              UF_ONAME: `${formData.QA_ITEM}_authorize.pdf`,
+              UF_FNAME: fileName,
+              UF_PATH: filePath,
+            },
+            queryRunner,
+          );
+          // insert authorize score
+          await this.escsUserAuthorizeService.addUserAuth(
+            {
+              UA_ITEM: formData.QA_ITEM,
+              UA_STATION: 0,
+              UA_USR_NO: p.QOA_EMPNO,
+              UA_SCORE: p.QOA_SCORE,
+              UA_GRADE: p.QOA_GRADE,
+              UA_PERCENT: p.QOA_PERCENT,
+              UA_TOTAL: formData.QA_REV_INFO.ARR_TOTAL,
+              UA_REV: formData.QA_REV,
+            },
+            queryRunner,
+          );
 
           // add user file station in escs
           if (stationList.length > 0) {
@@ -577,19 +596,36 @@ export class QainsFormService {
                 UF_STATION: s.stationNo,
                 UF_USR_NO: p.QOA_EMPNO,
               });
-              await this.escsUserFileService.addUserFile({
-                UF_ITEM: formData.QA_ITEM,
-                UF_STATION: s.stationNo,
-                UF_USR_NO: p.QOA_EMPNO,
-                UF_ID: id,
-                UF_ONAME: `${formData.QA_ITEM}_${s.stationName}_authorize.pdf`,
-                UF_FNAME: fileName,
-                UF_PATH: filePath,
-              });
+              await this.escsUserFileService.addUserFile(
+                {
+                  UF_ITEM: formData.QA_ITEM,
+                  UF_STATION: s.stationNo,
+                  UF_USR_NO: p.QOA_EMPNO,
+                  UF_ID: id,
+                  UF_ONAME: `${formData.QA_ITEM}_${s.stationName}_authorize.pdf`,
+                  UF_FNAME: fileName,
+                  UF_PATH: filePath,
+                },
+                queryRunner,
+              );
+
+              // insert authorize score
+              await this.escsUserAuthorizeService.addUserAuth(
+                {
+                  UA_ITEM: formData.QA_ITEM,
+                  UA_STATION: s.stationNo,
+                  UA_USR_NO: p.QOA_EMPNO,
+                  UA_SCORE: p.QOA_SCORE,
+                  UA_GRADE: p.QOA_GRADE,
+                  UA_PERCENT: p.QOA_PERCENT,
+                  UA_TOTAL: formData.QA_REV_INFO.ARR_TOTAL,
+                  UA_REV: formData.QA_REV,
+                },
+                queryRunner,
+              );
             }
           }
         }
-        // insert authorize score
       }
       // throw new Error('test rollback');
 
@@ -615,7 +651,7 @@ export class QainsFormService {
     stations?: { stationNo: number; stationName: string }[],
   ): Promise<{ fileName: string; filePath: string }> {
     const fileName = `${now('YYYYMMDD_HHmmss')}_${Math.floor(Math.random() * 9000) + 1000}_${formData.QA_ITEM}_authorize.pdf`;
-    let  trItem = '',
+    let trItem = '',
       tableOperator = '',
       stampQcFr = '',
       stampMfgSem = '',
@@ -624,10 +660,10 @@ export class QainsFormService {
     var listItem = `<li>4.1 ${formData.QA_ITEM}</li>`;
     if (stations && stations.length > 0) {
       for (const [index, s] of stations.entries()) {
-        if(index == 0){
-            listItem = `<li>4.${index + 1} ${formData.QA_ITEM},  ${s.stationName}</li>`;
-        }else{
-            trItem += `<tr class="">
+        if (index == 0) {
+          listItem = `<li>4.${index + 1} ${formData.QA_ITEM},  ${s.stationName}</li>`;
+        } else {
+          trItem += `<tr class="">
                         <td>
                             <ul>
                                 <li class="ml-4"> 4.${index + 1} ${formData.QA_ITEM},  ${s.stationName}</li>
@@ -638,7 +674,7 @@ export class QainsFormService {
                             <i class="icofont-ui-check text-green-600"></i>
                         </td>
                         <td class=""></td>
-                    </tr>`
+                    </tr>`;
         }
       }
     }
@@ -866,12 +902,12 @@ export class QainsFormService {
       options: {
         path: await joinPaths(savePath, fileName),
         printBackground: true,
-        margin:  {
-        top: '15mm',
-        right: '15mm',
-        bottom: '15mm',
-        left: '15mm',
-      },
+        margin: {
+          top: '15mm',
+          right: '15mm',
+          bottom: '15mm',
+          left: '15mm',
+        },
       },
     });
     return { fileName, filePath: savePath };

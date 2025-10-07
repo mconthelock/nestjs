@@ -46,6 +46,11 @@ export class CreateQainsOADto {
   @Type(() => Number)
   @IsNumber()
   QOA_RESULT?: number;
+  
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  QOA_SCORE?: number;
 
   @IsOptional()
   @Type(() => Number)

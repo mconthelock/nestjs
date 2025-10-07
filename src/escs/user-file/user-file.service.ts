@@ -9,7 +9,7 @@ import { ESCSUserFile } from './entities/user-file.entity';
 export class ESCSUserFileService {
    constructor(
       @InjectRepository(ESCSUserFile, 'amecConnection')
-      private userItemRepo: Repository<ESCSUserFile>,
+      private userFileRepo: Repository<ESCSUserFile>,
       @InjectDataSource('amecConnection')
       private dataSource: DataSource,
     ) {}
@@ -33,19 +33,19 @@ export class ESCSUserFileService {
           await localRunner.commitTransaction();
         return {
           status: true,
-          message: 'Insert user item Successfully',
+          message: 'Insert user file Successfully',
         };
       } catch (error) {
         if (localRunner && didStartTx && localRunner.isTransactionActive)
           await localRunner.rollbackTransaction();
-        throw new Error('Insert user item ' + error.message);
+        throw new Error('Insert user file ' + error.message);
       } finally {
         if (localRunner && didConnect) await localRunner.release();
       }
     }
 
     async newId(dto: ESCSUpdateUserFileDto): Promise<number> {
-      const result = await this.userItemRepo.createQueryBuilder()
+      const result = await this.userFileRepo.createQueryBuilder()
         .select("MAX(UF_ID)", "max")
         .where("UF_USR_NO = :user", { user: dto.UF_USR_NO })
         .andWhere("UF_ITEM = :item", { item: dto.UF_ITEM })

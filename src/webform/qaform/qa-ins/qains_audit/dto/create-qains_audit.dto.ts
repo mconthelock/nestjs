@@ -80,6 +80,11 @@ export class saveQainsAuditDto extends PickType(FormDto, [
   percent?: number;
 
   @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  score?: number;
+
+  @IsOptional()
   @IsString()
   grade?: string;
 

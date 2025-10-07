@@ -180,6 +180,7 @@ export class QainsOAService {
         QOA_AUDIT_RESULT: dto.QOA_AUDIT_RESULT,
         QOA_IMPROVMENT_ACTIVITY: dto.QOA_IMPROVMENT_ACTIVITY,
         QOA_STATION: dto.QOA_STATION,
+        QOA_SCORE: dto.QOA_SCORE,
       };
 
       await runner.manager.update(QainsOA, condition, data);

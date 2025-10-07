@@ -37,8 +37,15 @@ export class QainsOA {
   @Column()
   QOA_RESULT: number;
   
-  @Column()
+  @Column({
+  type: 'number',      // สำหรับ Oracle
+  precision: 5,        // เช่น 999.99 = 5 หลัก
+  scale: 2,            // เก็บทศนิยม 2 ตำแหน่ง
+})
   QOA_PERCENT: number;
+  
+  @Column()
+  QOA_SCORE: number;
 
   @Column()
   QOA_GRADE: string;

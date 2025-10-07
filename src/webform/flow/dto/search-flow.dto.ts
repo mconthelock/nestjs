@@ -1,4 +1,10 @@
-import { IsOptional, IsString, IsNumber, IsArray, IsBoolean } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsArray,
+  IsBoolean,
+} from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -7,62 +13,62 @@ export class SearchFlowDto {
   //   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  readonly NFRMNO: number;
+  NFRMNO: number;
 
   @ApiProperty({ example: '050601' })
   //   @IsOptional()
   @IsString()
-  readonly VORGNO: string;
+  VORGNO: string;
 
   @ApiProperty({ example: '25' })
   //   @IsOptional()
   @IsString()
-  readonly CYEAR: string;
+  CYEAR: string;
 
   @ApiProperty({ example: '2025' })
   //   @IsOptional()
   @IsString()
-  readonly CYEAR2: string;
+  CYEAR2: string;
 
   @ApiProperty({ example: 10 })
   //   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  readonly NRUNNO: number;
+  NRUNNO: number;
 
   @ApiProperty({ example: '08375' })
   @IsOptional()
   @IsString()
-  readonly VAPVNO?: string;
+  VAPVNO?: string;
 
   @ApiProperty({ example: '06' })
   @IsOptional()
   @IsString()
-  readonly CSTEPNO?: string;
+  CSTEPNO?: string;
 
   @ApiProperty({ example: '06' })
   @IsOptional()
   @IsString()
-  readonly CSTEPNEXTNO?: string;
+  CSTEPNEXTNO?: string;
 
   @ApiProperty({ example: '1' })
   @IsOptional()
   @IsString()
-  readonly CSTART?: string;
+  CSTART?: string;
 
   @ApiProperty({ example: '3' })
   @IsOptional()
   @IsString()
-  readonly CSTEPST?: string;
+  CSTEPST?: string;
 
   @ApiProperty({ example: '0' })
   @IsOptional()
-  readonly CAPVSTNO?: string | string[];
+  CAPVSTNO?: string | string[];
 
   @IsOptional()
   @IsBoolean()
   @Type(() => Boolean)
-  readonly distinct?: boolean;
+  distinct?: boolean;
 
   @IsOptional()
   @IsArray()

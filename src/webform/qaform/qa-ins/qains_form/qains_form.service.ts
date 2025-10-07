@@ -625,6 +625,12 @@ export class QainsFormService {
           }
         }
       }
+      // do action
+      await this.flowService.doAction(
+        { ...form, REMARK: dto.REMARK, ACTION: dto.ACTION, EMPNO: dto.EMPNO },
+        ip,
+        queryRunner,
+      );
 
       // send mail
       await this.sendMailAuthurize(formData, pass);
@@ -999,8 +1005,8 @@ export class QainsFormService {
     </body>
     </html>`;
     await this.mailService.sendMail({
-    //   to: to,
-    //   cc: cc,
+      //   to: to,
+      //   cc: cc,
       from: 'webflow_admin@mitsubishielevatorasia.co.th',
       subject: `แจ้ง Login การเข้าใช้งานโปรแกรม E-Check Sheet สำหรับ Item ${data.QA_ITEM}`,
       html: html,

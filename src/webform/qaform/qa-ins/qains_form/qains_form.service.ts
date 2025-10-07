@@ -8,6 +8,8 @@ import {
   joinPaths,
 } from 'src/common/utils/files.utils';
 import { QainsForm } from '../qains_form/entities/qains_form.entity';
+import { User } from '../entities-dummy/user.entity';
+
 import { FormService } from 'src/webform/form/form.service';
 import { QainsOAService } from '../qains_operator_auditor/qains_operator_auditor.service';
 import { QaFileService } from '../../qa_file/qa_file.service';
@@ -15,21 +17,22 @@ import { FlowService } from 'src/webform/flow/flow.service';
 import { UsersService } from 'src/amec/users/users.service';
 import { MailService } from 'src/mail/mail.service';
 import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
-import { SearchQainsFormDto } from './dto/search-qains_form.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
-import { QcConfQainsFormDto } from './dto/qcConfirm-qains_form.dto';
-import { UpdateQainsFormDto } from './dto/update-qains_form.dto';
 import { OrgposService } from 'src/webform/orgpos/orgpos.service';
-import { formatDate, now } from 'src/common/utils/dayjs.utils';
-import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 import { ESCSUserService } from 'src/escs/user/user.service';
 import { ESCSUserItemService } from 'src/escs/user-item/user-item.service';
 import { ESCSItemStationService } from 'src/escs/item-station/item-station.service';
 import { ESCSUserItemStationService } from 'src/escs/user-item-station/user-item-station.service';
 import { PDFService } from 'src/pdf/pdf.service';
-import { User } from '../entities-dummy/user.entity';
 import { ESCSUserFileService } from 'src/escs/user-file/user-file.service';
 import { ESCSUserAuthorizeService } from 'src/escs/user-authorize/user-authorize.service';
+
+import { SearchQainsFormDto } from './dto/search-qains_form.dto';
+import { FormDto } from 'src/webform/form/dto/form.dto';
+import { QcConfQainsFormDto } from './dto/qcConfirm-qains_form.dto';
+import { UpdateQainsFormDto } from './dto/update-qains_form.dto';
+import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+
+import { formatDate, now } from 'src/common/utils/dayjs.utils';
 
 @Injectable()
 export class QainsFormService {
@@ -143,7 +146,6 @@ export class QainsFormService {
       const formNo = await this.formService.getFormno(form); // Get the form number
       const destination = path + '/' + formNo; // Get the destination path
       for (const file of files) {
-        // console.log('file: ', file);
         const moved = await moveFileFromMulter(file, destination);
         movedTargets.push(moved.path);
         // 2) บันทึก DB (ใช้ชื่อไฟล์ที่ "ปลายทางจริง" เพื่อความตรงกัน)
@@ -394,7 +396,6 @@ export class QainsFormService {
     const seccode = [
       ...new Set(operator.map((o) => o.QOA_EMPNO_INFO.SSECCODE)),
     ];
-    // console.log(seccode);
 
     for (const sec of seccode) {
       const semEmpno = await this.orgposService.getOrgPos(
@@ -405,7 +406,6 @@ export class QainsFormService {
         queryRunner,
       );
       const semInfo = await this.usersService.findEmp(semEmpno[0].VEMPNO);
-      console.log('semInfo', semInfo);
 
       html += `<b>Dear ${semInfo.SNAME}</b>
         <p>
@@ -487,8 +487,6 @@ export class QainsFormService {
 
       const pass = operator.filter((o) => o.QOA_RESULT == 1);
       const notPass = operator.filter((o) => o.QOA_RESULT == 0);
-      console.log('pass', pass);
-      console.log('notPass', notPass);
 
       if (pass.length != 0) {
         for (const p of pass) {
@@ -498,7 +496,7 @@ export class QainsFormService {
             { USR_NO: p.QOA_EMPNO },
             queryRunner,
           );
-          console.log('checkUser', checkUser);
+
           if (checkUser.length == 0) {
             // add user
             await this.escsUserService.addUser(
@@ -627,7 +625,9 @@ export class QainsFormService {
           }
         }
       }
-      // throw new Error('test rollback');
+
+      // send mail
+      await this.sendMailAuthurize(formData, pass);
 
       await queryRunner.commitTransaction();
       return {
@@ -744,7 +744,6 @@ export class QainsFormService {
       CYEAR2: formData.CYEAR2,
       NRUNNO: formData.NRUNNO,
     });
-    console.log('flow', flow);
 
     for (const f of flow) {
       switch (f.CEXTDATA) {
@@ -911,5 +910,100 @@ export class QainsFormService {
       },
     });
     return { fileName, filePath: savePath };
+  }
+
+  async sendMailAuthurize(data: QainsForm, pass: any) {
+    if (pass.length == 0) return;
+    let to = [];
+    let cc = [];
+
+    // get flow
+    const flow = await this.flowService.getFlow({
+      NFRMNO: data.NFRMNO,
+      VORGNO: data.VORGNO,
+      CYEAR: data.CYEAR,
+      CYEAR2: data.CYEAR2,
+      NRUNNO: data.NRUNNO,
+    });
+
+    // set mail to and cc
+    for (const f of flow) {
+      const semInfo = await this.usersService.findEmp(f.VREALAPV);
+      switch (f.CEXTDATA) {
+        case null:
+        case '':
+          to.push(semInfo.SRECMAIL);
+          break;
+        default:
+          if (!cc.includes(semInfo.SRECMAIL)) cc.push(semInfo.SRECMAIL);
+          break;
+      }
+    }
+
+    // set mail list
+    let list = '';
+    for (const [index, p] of pass.entries()) {
+      list += `<tr>
+            <td>${index + 1}</td>
+            <td>${p.QOA_EMPNO}</td>
+            <td>${p.QOA_EMPNO_INFO.SEMPPRE}${p.QOA_EMPNO_INFO.SNAME}</td>
+        </tr>`;
+    }
+
+    let html = `<!DOCTYPE html>
+    <html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<style type="text/css">
+            body{
+                font-size:20px !important;
+            }
+            table {
+                width: fit-content;
+                border-collapse: collapse;
+            }
+            th{
+                background-color:yellow;
+            }
+            th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <p>เนื่องจากพนักงานได้สอบผ่านการประเมิณใน Item ${data.QA_ITEM} ดังนั้นพนักงานสามารถเข้าใช้โปรแกรม E-Check Sheet ได้</p>
+            <p style="font-weight: bold;">*** พนักงานสามารถเข้าใช้โปรแกรมด้วยรหัสของพนักงาน (รหัสเดียวกับ Webflow) ***</p>
+            <table>
+                <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>EMPNO.</th>
+                    <th>NAME.</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${list}
+            </tbody>
+        </table>
+        <p>- ในกรณีที่พนักงานจำรหัสผ่านไม่ได้ ให้กดลืม Password ของ Webflow และใส่รหัสพนักงาน จากนั้นจะมี e-mail แจ้งไปที่หัวหน้างานต้นสังกัด</p>
+        <p>- ในกรณีที่พนักงานไม่สามารถเข้าใช้งานโปรแกรมได้ กรุณาติดต่อผู้ดูแลระบบ Tel.2038</p>
+        <p>
+            Best regards,<br>
+            IS Department.<br>
+            Auto Send mail System.
+        </p>
+    </div>
+    </body>
+    </html>`;
+    await this.mailService.sendMail({
+    //   to: to,
+    //   cc: cc,
+      from: 'webflow_admin@mitsubishielevatorasia.co.th',
+      subject: `แจ้ง Login การเข้าใช้งานโปรแกรม E-Check Sheet สำหรับ Item ${data.QA_ITEM}`,
+      html: html,
+    });
   }
 }

@@ -15,6 +15,9 @@ export class User {
   SEMPNO: string;
 
   @Column()
+  SEMPPRE: string;
+  
+  @Column()
   SNAME: string;
 
   @Column()

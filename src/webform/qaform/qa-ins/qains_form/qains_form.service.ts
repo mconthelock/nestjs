@@ -28,6 +28,7 @@ import { ESCSItemStationService } from 'src/escs/item-station/item-station.servi
 import { ESCSUserItemStationService } from 'src/escs/user-item-station/user-item-station.service';
 import { PDFService } from 'src/pdf/pdf.service';
 import { User } from '../entities-dummy/user.entity';
+import { ESCSUserFileService } from 'src/escs/user-file/user-file.service';
 
 @Injectable()
 export class QainsFormService {
@@ -50,6 +51,7 @@ export class QainsFormService {
     private readonly escsItemStationService: ESCSItemStationService,
     private readonly escsUserItemStationService: ESCSUserItemStationService,
     private readonly PDFService: PDFService,
+    private readonly escsUserFileService: ESCSUserFileService,
   ) {}
 
   async createQainsForm(
@@ -545,15 +547,51 @@ export class QainsFormService {
           // create pdf file
           const { fileName, filePath } = await this.createPDF(
             savePath,
-            formData.QA_ITEM,
+            formData,
+            dto.EMPNO,
             p.QOA_EMPNO_INFO,
             stationList,
           );
 
           // add user file in escs
+          const id = await this.escsUserFileService.newId({
+            UF_ITEM: formData.QA_ITEM,
+            UF_STATION: 0,
+            UF_USR_NO: p.QOA_EMPNO,
+          });
+          await this.escsUserFileService.addUserFile({
+            UF_ITEM: formData.QA_ITEM,
+            UF_STATION: 0,
+            UF_USR_NO: p.QOA_EMPNO,
+            UF_ID: id,
+            UF_ONAME: `${formData.QA_ITEM}_authorize.pdf`,
+            UF_FNAME: fileName,
+            UF_PATH: filePath,
+          });
+
+          // add user file station in escs
+          if (stationList.length > 0) {
+            for (const s of stationList) {
+              const id = await this.escsUserFileService.newId({
+                UF_ITEM: formData.QA_ITEM,
+                UF_STATION: s.stationNo,
+                UF_USR_NO: p.QOA_EMPNO,
+              });
+              await this.escsUserFileService.addUserFile({
+                UF_ITEM: formData.QA_ITEM,
+                UF_STATION: s.stationNo,
+                UF_USR_NO: p.QOA_EMPNO,
+                UF_ID: id,
+                UF_ONAME: `${formData.QA_ITEM}_${s.stationName}_authorize.pdf`,
+                UF_FNAME: fileName,
+                UF_PATH: filePath,
+              });
+            }
+          }
         }
+        // insert authorize score
       }
-      //   throw new Error('test rollback');
+      // throw new Error('test rollback');
 
       await queryRunner.commitTransaction();
       return {
@@ -571,65 +609,122 @@ export class QainsFormService {
 
   async createPDF(
     savePath: string,
-    item: string,
+    formData: QainsForm,
+    realApv: string,
     empInfo?: User,
     stations?: { stationNo: number; stationName: string }[],
   ): Promise<{ fileName: string; filePath: string }> {
-    const fileName = `${now('YYYYMMDD_HHmmss')}_${Math.floor(Math.random() * 9000) + 1000}_${item}_authorize.pdf`;
-    let list = '',
-      checked = '',
-      empList = '';
+    const fileName = `${now('YYYYMMDD_HHmmss')}_${Math.floor(Math.random() * 9000) + 1000}_${formData.QA_ITEM}_authorize.pdf`;
+    let  trItem = '',
+      tableOperator = '',
+      stampQcFr = '',
+      stampMfgSem = '',
+      stampMfgFr = '';
+    // set list and checked
+    var listItem = `<li>4.1 ${formData.QA_ITEM}</li>`;
     if (stations && stations.length > 0) {
       for (const [index, s] of stations.entries()) {
-        list += `<li>4.${index + 1} ${item}  ${s.stationName}</li>`;
-        checked += `<p><i class="icofont-ui-check text-xl text-green-600"></i></p>`;
+        if(index == 0){
+            listItem = `<li>4.${index + 1} ${formData.QA_ITEM},  ${s.stationName}</li>`;
+        }else{
+            trItem += `<tr class="">
+                        <td>
+                            <ul>
+                                <li class="ml-4"> 4.${index + 1} ${formData.QA_ITEM},  ${s.stationName}</li>
+                            </ul>
+                        </td>
+                        <td class=""></td>
+                        <td class="text-center">
+                            <i class="icofont-ui-check text-green-600"></i>
+                        </td>
+                        <td class=""></td>
+                    </tr>`
+        }
       }
-    } else {
-      list += `<li>4.1 ${item}  - </li>`;
-      checked += `<p><i class="icofont-ui-check text-xl text-green-600"></i></p>`;
-    }
-    if (empInfo) {
-      empList = `<tr>
-        <td>1</td>
-        <td>${empInfo.SEMPPRT} ${empInfo.STNAME}</td>
-        <td>${empInfo.STARTDATE ? formatDate(empInfo.STARTDATE, 'DD/MMM/YY') : '-'}</td>
-        <td>${empInfo.SEMPNO}</td>
-        <td rowspan="1">
-            <div class="flex flex-col items-start gap-2 ml-auto">
-                    <label class="label">
-                            <input type="checkbox" class="checkbox"/>
-                            <span class="label-text ml-2">For Receiving Inspection</span>
-                    </label>
-                    <label class="label">
-                            <input type="checkbox" class="checkbox"/>
-                            <span class="label-text ml-2">For Inprocess Inspection</span>
-                    </label>
-                    <label class="label">
-                            <input type="checkbox" class="checkbox" checked/>
-                            <span class="label-text ml-2">For Final Inspection</span>
-                    </label>
-                    <label class="label">
-                            <input type="checkbox" class="checkbox" checked/>
-                            <span class="label-text ml-2">Pass</span>
-                    </label>
-                    <label class="label">
-                            <input type="checkbox" class="checkbox"/>
-                            <span class="label-text ml-2">Pending for Re-OJT</span>
-                    </label>
-                    <label class="label">
-                            <input type="checkbox" class="checkbox"/>
-                            <span class="label-text ml-2">Termination</span>
-                    </label>
-                    <label class="label">
-                            <input type="checkbox" class="checkbox"/>
-                            <span class="label-text ml-2">Others.....</span>
-                    </label>
-                </div>
-        </td>
-        </tr>`;
     }
 
-    let html = `
+    // set operator List
+    if (empInfo) {
+      tableOperator = `
+      <table class="table table-sm mt-8" id="table2">
+                <thead>
+                    <tr>
+                        <th class="text-sm">No</th>
+                        <th class="text-sm">Name</th>
+                        <th class="text-sm">Started Working Date</th>
+                        <th class="text-sm">ID Card</th>
+                        <th class="text-sm">Authorized Inspector Conclusion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td class="text-nowrap">${empInfo.SEMPPRE} ${empInfo.SNAME}</td>
+                        <td class="text-center">${formatDate(formData.QA_OJT_DATE, 'DD-MMM-YY') ?? '-'}</td>
+                        <td class="text-center">${empInfo.SEMPNO}</td>
+                        <td rowspan="1">
+                            <div class="flex flex-col items-start gap-2 ml-auto">
+                                    <label class="label">
+                                            <input type="checkbox" class="checkbox"/>
+                                            <span class="label-text ml-2">For Receiving Inspection</span>
+                                    </label>
+                                    <label class="label">
+                                            <input type="checkbox" class="checkbox"/>
+                                            <span class="label-text ml-2">For Inprocess Inspection</span>
+                                    </label>
+                                    <label class="label">
+                                            <input type="checkbox" class="checkbox" checked/>
+                                            <span class="label-text ml-2">For Final Inspection</span>
+                                    </label>
+                                    <label class="label">
+                                            <input type="checkbox" class="checkbox" checked/>
+                                            <span class="label-text ml-2">Pass</span>
+                                    </label>
+                                    <label class="label">
+                                            <input type="checkbox" class="checkbox"/>
+                                            <span class="label-text ml-2">Pending for Re-OJT</span>
+                                    </label>
+                                    <label class="label">
+                                            <input type="checkbox" class="checkbox"/>
+                                            <span class="label-text ml-2">Termination</span>
+                                    </label>
+                                    <label class="label">
+                                            <input type="checkbox" class="checkbox"/>
+                                            <span class="label-text ml-2">Others.....</span>
+                                    </label>
+                                </div>
+                        </td>
+                        </tr>
+                </tbody>
+            </table>
+      `;
+    }
+
+    // set stamp
+    const flow = await this.flowService.getFlow({
+      NFRMNO: formData.NFRMNO,
+      VORGNO: formData.VORGNO,
+      CYEAR: formData.CYEAR,
+      CYEAR2: formData.CYEAR2,
+      NRUNNO: formData.NRUNNO,
+    });
+    console.log('flow', flow);
+
+    for (const f of flow) {
+      switch (f.CEXTDATA) {
+        case '03':
+          stampMfgFr = `<p>${f.VREALAPV}</p><p>${formatDate(f.DAPVDATE, 'DD-MMM-YY')}</p>`;
+          break;
+        case '04':
+          stampMfgSem = `<p>${f.VREALAPV}</p><p>${formatDate(f.DAPVDATE, 'DD-MMM-YY')}</p>`;
+          break;
+        case '05':
+          stampQcFr = `<p>${f.VREALAPV}</p><p>${formatDate(f.DAPVDATE, 'DD-MMM-YY')}</p>`;
+          break;
+      }
+    }
+
+    const html = `
     <!doctype html>
     <html lang="th">
         <head>
@@ -642,17 +737,20 @@ export class QainsFormService {
                     background: #fff !important;
                 }
                 #table1 td {
-                    border: 2px solid #000;
+                    border: 1px solid #000;
                 }
                 #table2 td {
                     border: 0;
                     vertical-align: top;
                 }
+                #stamp td, #stamp th {
+                    border: 1px solid #000;
+                }
 
             </style>
         </head>
         <body>
-            <table class="table" id="table1">
+            <table class="table table-sm" id="table1">
                 <tbody>
                     <tr class="bg-gray-300">
                         <td colspan="4" class="text-center font-bold text-xl">Evaluation and recognition for Authorized Inspector</td>
@@ -682,9 +780,9 @@ export class QainsFormService {
                         </td>
                         <td class=""></td>
                         <td class="text-center">
-                            <p><i class="icofont-ui-check text-xl text-green-600"></i></p>
-                            <p><i class="icofont-ui-check text-xl text-green-600"></i></p>
-                            <p><i class="icofont-ui-check text-xl text-green-600"></i></p>
+                            <p><i class="icofont-ui-check text-green-600"></i></p>
+                            <p><i class="icofont-ui-check text-green-600"></i></p>
+                            <p><i class="icofont-ui-check text-green-600"></i></p>
                         </td>
                         <td class=""></td>
                     </tr>
@@ -699,7 +797,7 @@ export class QainsFormService {
                         </td>
                         <td class=""></td>
                         <td class="text-center">
-                            <p><i class="icofont-ui-check text-xl text-green-600"></i></p>
+                            <p><i class="icofont-ui-check text-green-600"></i></p>
                         </td>
                         <td class=""></td>
                     </tr>
@@ -714,7 +812,7 @@ export class QainsFormService {
                         </td>
                         <td class=""></td>
                         <td class="text-center">
-                            <p><i class="icofont-ui-check text-xl text-green-600"></i></p>
+                            <p><i class="icofont-ui-check text-green-600"></i></p>
                         </td>
                         <td class=""></td>
                     </tr>
@@ -723,34 +821,44 @@ export class QainsFormService {
                             <div class="flex gap-2">
                                 <span>4.</span>
                                 <ul>
-                                    <li>Specified Jobs(OJT)</li>
-                                    ${list}
+                                    <li class="mb-2">Specified Jobs(OJT)</li>
+                                    ${listItem}
                                 </ul>
                             </div>
                         </td>
                         <td class=""></td>
                         <td class="text-center">
-                            ${checked}
+                            <i class="icofont-ui-check text-green-600"></i>
                         </td>
                         <td class=""></td>
                     </tr>
+                    ${trItem}
                 </tbody>
             </table>
-            <table class="table table-sm mt-8" id="table2">
+            ${tableOperator}
+            <span class="mt-4 text-base text-sm text-gray-500">Note: Evaluation/Recognition shall be done by interview or OJT condition</span>
+            <table id="stamp" class="table table-sm w-1/2 ml-auto text-sm">
                 <thead>
                     <tr>
-                        <th>No</th>
-                        <th>Name</th>
-                        <th>Started Working Date</th>
-                        <th>ID Card</th>
-                        <th>Authorized Inspector Conclusion</th>
+                        <th class="text-center">QC SEM</th>
+                        <th class="text-center">QC F/L</th>
+                        <th class="text-center">MFG SEM</th>
+                        <th class="text-center">MFG F/L</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${empList}
+                    <tr>
+                        <td class="text-center">
+                            <p>${realApv}</p>
+                            <p>${now('DD-MM-YY')}</p>
+                        </td>
+                        <td class="text-center">${stampQcFr}</td>
+                        <td class="text-center">${stampMfgSem}</td>
+                        <td class="text-center">${stampMfgFr}</td>
+                    </tr>
                 </tbody>
             </table>
-            <span class="mt-4 text-base text-sm text-gray-500">Note: Evaluation/Recognition shall be done by interview or OJT condition</span>
+            <span class="block text-sm font-bold w-full text-center mt-5"> QA_QP-K002-C (5 OF 6)</span>
         </body>
     </html>`;
     this.PDFService.generatePDF({
@@ -758,6 +866,12 @@ export class QainsFormService {
       options: {
         path: await joinPaths(savePath, fileName),
         printBackground: true,
+        margin:  {
+        top: '15mm',
+        right: '15mm',
+        bottom: '15mm',
+        left: '15mm',
+      },
       },
     });
     return { fileName, filePath: savePath };

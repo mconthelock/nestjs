@@ -1,26 +1,56 @@
 import { Injectable } from '@nestjs/common';
 import { ESCSCreateUserFileDto } from './dto/create-user-file.dto';
 import { ESCSUpdateUserFileDto } from './dto/update-user-file.dto';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { ESCSUserFile } from './entities/user-file.entity';
 
 @Injectable()
 export class ESCSUserFileService {
-  create(createUserFileDto: ESCSCreateUserFileDto) {
-    return 'This action adds a new userFile';
-  }
+   constructor(
+      @InjectRepository(ESCSUserFile, 'amecConnection')
+      private userItemRepo: Repository<ESCSUserFile>,
+      @InjectDataSource('amecConnection')
+      private dataSource: DataSource,
+    ) {}
+  
+    async addUserFile(dto: ESCSCreateUserFileDto, queryRunner?: QueryRunner) {
+      let localRunner: QueryRunner | undefined;
+      let didConnect = false;
+      let didStartTx = false;
+      try {
+        if (!queryRunner) {
+          localRunner = this.dataSource.createQueryRunner();
+          await localRunner.connect();
+          didConnect = true;
+          await localRunner.startTransaction();
+          didStartTx = true;
+        }
+        const runner = queryRunner || localRunner!;
+  
+        await runner.manager.insert(ESCSUserFile, dto);
+        if (localRunner && didStartTx && runner.isTransactionActive)
+          await localRunner.commitTransaction();
+        return {
+          status: true,
+          message: 'Insert user item Successfully',
+        };
+      } catch (error) {
+        if (localRunner && didStartTx && localRunner.isTransactionActive)
+          await localRunner.rollbackTransaction();
+        throw new Error('Insert user item ' + error.message);
+      } finally {
+        if (localRunner && didConnect) await localRunner.release();
+      }
+    }
 
-  findAll() {
-    return `This action returns all userFile`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} userFile`;
-  }
-
-  update(id: number, updateUserFileDto: ESCSUpdateUserFileDto) {
-    return `This action updates a #${id} userFile`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} userFile`;
-  }
+    async newId(dto: ESCSUpdateUserFileDto): Promise<number> {
+      const result = await this.userItemRepo.createQueryBuilder()
+        .select("MAX(UF_ID)", "max")
+        .where("UF_USR_NO = :user", { user: dto.UF_USR_NO })
+        .andWhere("UF_ITEM = :item", { item: dto.UF_ITEM })
+        .andWhere("UF_STATION = :station", { station: dto.UF_STATION })
+        .getRawOne();
+      return result.max + 1;
+    }
 }

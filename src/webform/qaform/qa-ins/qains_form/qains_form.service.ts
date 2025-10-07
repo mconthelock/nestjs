@@ -631,7 +631,7 @@ export class QainsFormService {
 
       await queryRunner.commitTransaction();
       return {
-        status: false,
+        status: true,
         message: 'Action successful',
         data: dto,
       };

@@ -27,6 +27,7 @@ import { ESCSUserItemService } from 'src/escs/user-item/user-item.service';
 import { ESCSItemStationService } from 'src/escs/item-station/item-station.service';
 import { ESCSUserItemStationService } from 'src/escs/user-item-station/user-item-station.service';
 import { PDFService } from 'src/pdf/pdf.service';
+import { User } from '../entities-dummy/user.entity';
 
 @Injectable()
 export class QainsFormService {
@@ -545,6 +546,7 @@ export class QainsFormService {
           const { fileName, filePath } = await this.createPDF(
             savePath,
             formData.QA_ITEM,
+            p.QOA_EMPNO_INFO,
             stationList,
           );
 
@@ -570,11 +572,13 @@ export class QainsFormService {
   async createPDF(
     savePath: string,
     item: string,
+    empInfo?: User,
     stations?: { stationNo: number; stationName: string }[],
   ): Promise<{ fileName: string; filePath: string }> {
     const fileName = `${now('YYYYMMDD_HHmmss')}_${Math.floor(Math.random() * 9000) + 1000}_${item}_authorize.pdf`;
     let list = '',
-      checked = '';
+      checked = '',
+      empList = '';
     if (stations && stations.length > 0) {
       for (const [index, s] of stations.entries()) {
         list += `<li>4.${index + 1} ${item}  ${s.stationName}</li>`;
@@ -584,6 +588,47 @@ export class QainsFormService {
       list += `<li>4.1 ${item}  - </li>`;
       checked += `<p><i class="icofont-ui-check text-xl text-green-600"></i></p>`;
     }
+    if (empInfo) {
+      empList = `<tr>
+        <td>1</td>
+        <td>${empInfo.SEMPPRT} ${empInfo.STNAME}</td>
+        <td>${empInfo.STARTDATE ? formatDate(empInfo.STARTDATE, 'DD/MMM/YY') : '-'}</td>
+        <td>${empInfo.SEMPNO}</td>
+        <td rowspan="1">
+            <div class="flex flex-col items-start gap-2 ml-auto">
+                    <label class="label">
+                            <input type="checkbox" class="checkbox"/>
+                            <span class="label-text ml-2">For Receiving Inspection</span>
+                    </label>
+                    <label class="label">
+                            <input type="checkbox" class="checkbox"/>
+                            <span class="label-text ml-2">For Inprocess Inspection</span>
+                    </label>
+                    <label class="label">
+                            <input type="checkbox" class="checkbox" checked/>
+                            <span class="label-text ml-2">For Final Inspection</span>
+                    </label>
+                    <label class="label">
+                            <input type="checkbox" class="checkbox" checked/>
+                            <span class="label-text ml-2">Pass</span>
+                    </label>
+                    <label class="label">
+                            <input type="checkbox" class="checkbox"/>
+                            <span class="label-text ml-2">Pending for Re-OJT</span>
+                    </label>
+                    <label class="label">
+                            <input type="checkbox" class="checkbox"/>
+                            <span class="label-text ml-2">Termination</span>
+                    </label>
+                    <label class="label">
+                            <input type="checkbox" class="checkbox"/>
+                            <span class="label-text ml-2">Others.....</span>
+                    </label>
+                </div>
+        </td>
+        </tr>`;
+    }
+
     let html = `
     <!doctype html>
     <html lang="th">
@@ -596,13 +641,18 @@ export class QainsFormService {
                 html, body {
                     background: #fff !important;
                 }
-                table td {
+                #table1 td {
                     border: 2px solid #000;
                 }
+                #table2 td {
+                    border: 0;
+                    vertical-align: top;
+                }
+
             </style>
         </head>
         <body>
-            <table class="table">
+            <table class="table" id="table1">
                 <tbody>
                     <tr class="bg-gray-300">
                         <td colspan="4" class="text-center font-bold text-xl">Evaluation and recognition for Authorized Inspector</td>
@@ -686,6 +736,21 @@ export class QainsFormService {
                     </tr>
                 </tbody>
             </table>
+            <table class="table table-sm mt-8" id="table2">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Name</th>
+                        <th>Started Working Date</th>
+                        <th>ID Card</th>
+                        <th>Authorized Inspector Conclusion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${empList}
+                </tbody>
+            </table>
+            <span class="mt-4 text-base text-sm text-gray-500">Note: Evaluation/Recognition shall be done by interview or OJT condition</span>
         </body>
     </html>`;
     this.PDFService.generatePDF({

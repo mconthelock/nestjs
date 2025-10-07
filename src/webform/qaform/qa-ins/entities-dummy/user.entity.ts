@@ -51,7 +51,13 @@ export class User {
   MEMEML: string;
 
   @Column()
+  SEMPPRT: string;
+
+  @Column()
   STNAME: string;
+
+  @Column()
+  STARTDATE: Date;
 
   @OneToOne(() => QainsOA, (q) => q.QOA_EMPNO)
   QAINSOA: QainsOA;

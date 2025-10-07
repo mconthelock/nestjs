@@ -74,6 +74,7 @@ export class QainsAuditService {
           QOA_AUDIT_RESULT: dto.auditResult,
           QOA_IMPROVMENT_ACTIVITY: dto.auditActivity,
           QOA_STATION: dto.station ?? null,
+          QOA_SCORE: dto.score ?? null,
         },
         queryRunner,
       );

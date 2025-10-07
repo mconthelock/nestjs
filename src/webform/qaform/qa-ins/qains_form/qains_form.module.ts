@@ -20,6 +20,7 @@ import { ESCSItemStationModule } from 'src/escs/item-station/item-station.module
 import { ESCSUserItemStationModule } from 'src/escs/user-item-station/user-item-station.module';
 import { PDFModule } from 'src/pdf/pdf.module';
 import { ESCSUserFileModule } from 'src/escs/user-file/user-file.module';
+import { ESCSUserAuthorizeModule } from 'src/escs/user-authorize/user-authorize.module';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { ESCSUserFileModule } from 'src/escs/user-file/user-file.module';
     ESCSItemStationModule,
     ESCSUserItemStationModule,
     PDFModule,
-    ESCSUserFileModule
+    ESCSUserFileModule,
+    ESCSUserAuthorizeModule
   ],
   controllers: [QainsFormController],
   providers: [QainsFormService],

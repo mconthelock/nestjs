@@ -17,5 +17,11 @@ export class ESCSCreateUserAuthorizeDto {
   UA_GRADE: string;
 
   @IsNotEmpty()
-  UA_RESULT: number;
+  UA_TOTAL: number;
+  
+  @IsNotEmpty()
+  UA_PERCENT: number;
+
+  @IsNotEmpty()
+  UA_REV: number;
 }

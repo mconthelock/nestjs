@@ -18,7 +18,13 @@ export class ESCSUserAuthorize {
   UA_GRADE: string;
 
   @Column()
-  UA_RESULT: number;
+  UA_TOTAL: number;
+
+  @Column()
+  UA_PERCENT: number;
+
+  @Column()
+  UA_REV: number;
 
   @Column()
   UA_CREATEDATE: Date;

@@ -1,8 +1,7 @@
 import { Controller, Post, Body, Param, Get } from '@nestjs/common';
 import { InquiryService } from './inquiry.service';
-import { createInqDto } from './dto/create-inquiry.dto';
 import { searchDto } from './dto/search.dto';
-import { createHistoryDto } from '../history/dto/create.dto';
+import { inqDataDto } from './dto/update-data.dto';
 
 @Controller('sp/inquiry')
 export class InquiryController {
@@ -25,15 +24,16 @@ export class InquiryController {
   }
 
   @Post('update')
-  async update(@Body() req: any) {
+  async update(@Body() req: inqDataDto) {
     const data = await this.inq.update(
       req.header,
-      req.details,
-      req.deleteLine,
-      req.deleteFile,
-      req.timelinedata || undefined,
-      req.history || undefined,
+      req.details || [],
+      req.deleteLine || [],
+      req.deleteFile || [],
+      req.timelinedata,
+      req.history,
     );
+
     return await this.inq.findByNumber(req.header.INQ_NO);
   }
 

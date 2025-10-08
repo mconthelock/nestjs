@@ -56,6 +56,8 @@ export class InquiryService {
         method: true,
         term: true,
         shipment: true,
+        maruser: true,
+        timeline: true,
       },
     });
   }

@@ -3,7 +3,7 @@ import { ESCSUserFileService } from './user-file.service';
 import { ESCSCreateUserFileDto } from './dto/create-user-file.dto';
 import { ESCSUpdateUserFileDto } from './dto/update-user-file.dto';
 
-@Controller('user-file')
+@Controller('escs/user-file')
 export class ESCSUserFileController {
   constructor(private readonly userFileService: ESCSUserFileService) {}
   

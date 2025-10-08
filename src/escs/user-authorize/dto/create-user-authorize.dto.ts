@@ -18,10 +18,16 @@ export class ESCSCreateUserAuthorizeDto {
 
   @IsNotEmpty()
   UA_TOTAL: number;
-  
+
   @IsNotEmpty()
   UA_PERCENT: number;
 
   @IsNotEmpty()
   UA_REV: number;
+
+  @IsNotEmpty()
+  UA_TEST_BY: string;
+
+  @IsNotEmpty()
+  UA_TEST_DATE: Date;
 }

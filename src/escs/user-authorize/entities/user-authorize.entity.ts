@@ -28,4 +28,13 @@ export class ESCSUserAuthorize {
 
   @Column()
   UA_CREATEDATE: Date;
+
+  @Column()
+  UA_TEST_BY: string;
+
+  @Column()
+  UA_TEST_DATE: Date;
+
+  @Column()
+  UA_TR: number;
 }

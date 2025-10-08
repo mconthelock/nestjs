@@ -582,6 +582,8 @@ export class QainsFormService {
               UA_PERCENT: p.QOA_PERCENT,
               UA_TOTAL: formData.QA_REV_INFO.ARR_TOTAL,
               UA_REV: formData.QA_REV,
+              UA_TEST_BY: formData.QA_INCHARGE_EMPNO,
+              UA_TEST_DATE: formData.QA_OJT_DATE,
             },
             queryRunner,
           );
@@ -618,6 +620,8 @@ export class QainsFormService {
                   UA_PERCENT: p.QOA_PERCENT,
                   UA_TOTAL: formData.QA_REV_INFO.ARR_TOTAL,
                   UA_REV: formData.QA_REV,
+                  UA_TEST_BY: formData.QA_INCHARGE_EMPNO,
+                  UA_TEST_DATE: formData.QA_OJT_DATE,
                 },
                 queryRunner,
               );

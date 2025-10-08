@@ -12,6 +12,7 @@ import { ESCSUserItemModule } from './user-item/user-item.module';
 import { ESCSUserItemStationModule } from './user-item-station/user-item-station.module';
 import { ESCSUserFileModule } from './user-file/user-file.module';
 import { ESCSUserAuthorizeModule } from './user-authorize/user-authorize.module';
+import { ESCSUserAuthorizeViewModule } from './user-authorize-view/user-authorize-view.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ESCSUserAuthorizeModule } from './user-authorize/user-authorize.module'
     ESCSUserItemStationModule,
     ESCSUserFileModule,
     ESCSUserAuthorizeModule,
+    ESCSUserAuthorizeViewModule,
   ],
 })
 export class ESCSModule {}

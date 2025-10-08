@@ -3,7 +3,7 @@ import { ESCSUserAuthorizeService } from './user-authorize.service';
 import { ESCSCreateUserAuthorizeDto } from './dto/create-user-authorize.dto';
 import { ESCSUpdateUserAuthorizeDto } from './dto/update-user-authorize.dto';
 
-@Controller('user-authorize')
+@Controller('escs/user-authorize')
 export class ESCSUserAuthorizeController {
   constructor(private readonly userAuthorizeService: ESCSUserAuthorizeService) {}
 

@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { ESCSUserAuthorizeView } from 'src/escs/user-authorize-view/entities/user-authorize-view.entity';
+import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
 
 @Entity('ESCS_ITEM_STATION')
 export class ESCSItemStation {
@@ -16,4 +17,7 @@ export class ESCSItemStation {
 
   @Column()
   ITS_DATEUPDATE: Date;
+
+  @OneToOne(() => ESCSUserAuthorizeView, (s) => s.STATION)
+  AUTHORIZE_VIEW: ESCSUserAuthorizeView;
 }

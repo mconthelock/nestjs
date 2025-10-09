@@ -1,4 +1,13 @@
-import { Column, Entity, PrimaryColumn, ViewColumn, ViewEntity } from 'typeorm';
+import { ESCSItemStation } from '../../item-station/entities/item-station.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryColumn,
+  ViewColumn,
+  ViewEntity,
+} from 'typeorm';
 
 @ViewEntity('ESCS_USERS_AUTHORIZE_VIEW')
 export class ESCSUserAuthorizeView {
@@ -64,4 +73,9 @@ export class ESCSUserAuthorizeView {
 
   @ViewColumn()
   SDIVCODE: string;
+
+  @OneToOne(() => ESCSItemStation, (s) => s.AUTHORIZE_VIEW)
+  @JoinColumn({ name: 'IT_NO', referencedColumnName: 'ITS_ITEM' })
+  @JoinColumn({ name: 'STATION_NO', referencedColumnName: 'ITS_NO' })
+  STATION: ESCSItemStation;
 }

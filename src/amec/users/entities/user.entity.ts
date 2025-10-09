@@ -22,6 +22,9 @@ export class User {
   SEMPNO: string;
 
   @Column()
+  SEMPPRE: string;
+
+  @Column()
   SNAME: string;
 
   @Column()
@@ -52,6 +55,9 @@ export class User {
   SPOSNAME: string;
 
   @Column()
+  SPOSITION: string;
+
+  @Column()
   SPASSWORD1: string;
 
   @Column()
@@ -64,7 +70,13 @@ export class User {
   MEMEML: string;
 
   @Column()
+  SEMPPRT: string;
+
+  @Column()
   STNAME: string;
+
+  @Column()
+  STARTDATE: Date;
 
   @OneToOne(() => Form, (form) => form.VINPUTER)
   @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'VINPUTER' })

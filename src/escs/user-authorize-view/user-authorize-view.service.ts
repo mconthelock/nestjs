@@ -20,6 +20,16 @@ export class ESCSUserAuthorizeViewService {
     const repo = queryRunner
       ? queryRunner.manager.getRepository(ESCSUserAuthorizeView)
       : this.userAuthRepo;
-    return repo.find({ where: dto });
+    return repo.find({
+      where: dto,
+      relations: {
+        STATION: true,
+      },
+      order: {
+        USR_NO: 'ASC',
+        IT_NO: 'ASC',
+        STATION_NO: 'ASC',
+      }
+    });
   }
 }

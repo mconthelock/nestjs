@@ -16,7 +16,7 @@ export class User {
 
   @Column()
   SEMPPRE: string;
-  
+
   @Column()
   SNAME: string;
 
@@ -48,7 +48,16 @@ export class User {
   SPOSNAME: string;
 
   @Column()
+  SPOSITION: string;
+
+  @Column()
+  SPASSWORD1: string;
+
+  @Column()
   CSTATUS: string;
+
+  @Column()
+  SEMPENCODE: string;
 
   @Column()
   MEMEML: string;

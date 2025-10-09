@@ -20,6 +20,9 @@ export class User {
   SEMPNO: string;
 
   @Column()
+  SEMPPRE: string;
+
+  @Column()
   SNAME: string;
 
   @Column()
@@ -50,6 +53,9 @@ export class User {
   SPOSNAME: string;
 
   @Column()
+  SPOSITION: string;
+
+  @Column()
   SPASSWORD1: string;
 
   @Column()
@@ -62,7 +68,13 @@ export class User {
   MEMEML: string;
 
   @Column()
+  SEMPPRT: string;
+
+  @Column()
   STNAME: string;
+
+  @Column()
+  STARTDATE: Date;
 
   @OneToOne(() => Form, (form) => form.VINPUTER)
   @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'VINPUTER' })
@@ -80,7 +92,7 @@ export class User {
 
   @OneToMany(() => JopMarReq, (req) => req.marRequest)
   jopMarReq: JopMarReq[];
-  
+
   @OneToMany(() => JopPurConf, (req) => req.purConfirm)
   jopPurConf: JopPurConf[];
 
@@ -90,6 +102,4 @@ export class User {
   @OneToOne(() => Orgpos, (o) => o.EMPINFO)
   @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'VEMPNO' })
   orgpos: Orgpos;
-
-  
 }

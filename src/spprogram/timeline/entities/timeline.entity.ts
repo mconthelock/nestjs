@@ -22,7 +22,7 @@ export class Timeline {
   SG_READ: Date;
 
   @Column()
-  SG_CONFIIRM: Date;
+  SG_CONFIRM: Date;
 
   @Column()
   SE_USER: string;
@@ -31,7 +31,7 @@ export class Timeline {
   SE_READ: Date;
 
   @Column()
-  SE_CONFIIRM: Date;
+  SE_CONFIRM: Date;
 
   @Column()
   DE_READ: Date;

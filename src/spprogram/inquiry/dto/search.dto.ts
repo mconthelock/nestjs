@@ -60,6 +60,30 @@ export class searchDto extends PartialType(createInqDto) {
   @Type(() => Date)
   'timeline.LE_MAR_SEND': Date;
 
+  @IsString()
+  @IsOptional()
+  'timeline.SE_USER': string;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  'timeline.GE_SG_READ': Date;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  'timeline.LE_SG_READ': Date;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  'timeline.GE_SE_CONFIRM': Date;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  'timeline.LE_SE_CONFIRM': Date;
+
   @IsDate()
   @IsOptional()
   @Type(() => Date)
@@ -89,4 +113,9 @@ export class searchDto extends PartialType(createInqDto) {
   @IsOptional()
   @Type(() => Boolean)
   'needDetail': boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  @Type(() => Boolean)
+  'INQ_ORDER_TYPE': boolean;
 }

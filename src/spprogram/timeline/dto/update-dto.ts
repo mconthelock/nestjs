@@ -16,7 +16,7 @@ export class updateTimelineDto extends PartialType(createTimelineDto) {
   @IsDate()
   @IsOptional()
   @Type(() => Date)
-  SG_CONFIIRM: Date;
+  SG_CONFIRM: Date;
 
   @IsString()
   @IsOptional()
@@ -30,7 +30,7 @@ export class updateTimelineDto extends PartialType(createTimelineDto) {
   @IsDate()
   @IsOptional()
   @Type(() => Date)
-  SE_CONFIIRM: Date;
+  SE_CONFIRM: Date;
 
   @IsDate()
   @IsOptional()

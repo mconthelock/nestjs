@@ -1018,8 +1018,8 @@ export class FlowService {
         for (const list of listApv.result) {
           this.mailService.sendMail({
             from: 'webflow_admin@MitsubishiElevatorAsia.co.th',
-            // to: list.VEMAIL,
-            to: process.env.MAIL_ADMIN,
+            to: list.VEMAIL,
+            // to: process.env.MAIL_ADMIN,
             subject,
             html,
           });

@@ -168,7 +168,6 @@ export class QainsFormService {
       return {
         status: true,
         message: 'Request successful',
-        // files: moveFile,
         data: dto,
       };
     } catch (error) {
@@ -198,25 +197,11 @@ export class QainsFormService {
         NRUNNO: dto.NRUNNO,
       },
       relations: [
-        // 'QA_AUD_OPT',
-        // 'QA_AUD_OPT.TYPE',
-        // 'QA_AUD_OPT.QOA_EMPNO_INFO',
-        // 'QA_AUD_OPT.QA_AUDIT',
-        // 'QA_AUD_OPT.QA_FILES',
-        // 'QA_FILES',
-        // 'QA_FILES.TYPE',
         'QA_INCHARGE_INFO',
         'QA_INCHARGE_SECTION_INFO',
         'QA_REV_INFO',
         'FORM',
-        // 'QA_MASTER',
-        // 'ITEM_STATION'
       ],
-      //   order: {
-      // QA_AUD_OPT: { QOA_SEQ: 'ASC' }, // แทน ORDER BY ใน subquery เดิม
-      // QA_FILES: { FILE_ID: 'ASC' },
-      // QA_MASTER: { ARM_NO: 'ASC', ARM_SEQ: 'ASC' },
-      //   },
     });
   }
 
@@ -384,8 +369,6 @@ export class QainsFormService {
         CYEAR2: dto.CYEAR2,
         NRUNNO: dto.NRUNNO,
       };
-      //   await this.sendmailToReqManager(form, queryRunner);
-      //   return;
       // update flow qc foreman
       const condForeman = {
         condition: {
@@ -409,10 +392,6 @@ export class QainsFormService {
         },
         queryRunner,
       );
-      //   const qcsem = await this.sequenceOrgService.search(
-      //     { SPOSCODE: '30', VORGNO: foreman.SSECCODE },
-      //     queryRunner,
-      //   );
       if (qcsem.length > 0) {
         const condSem = {
           condition: {
@@ -537,7 +516,7 @@ export class QainsFormService {
             </p>
         </div>`;
       await this.mailService.sendMail({
-        // to: semInfo.SRECMAIL,
+        to: semInfo.SRECMAIL,
         from: 'webflow_admin@mitsubishielevatorasia.co.th',
         subject: `Quality built in item ${item}`,
         html: html,
@@ -1094,8 +1073,8 @@ export class QainsFormService {
     </body>
     </html>`;
     await this.mailService.sendMail({
-      //   to: to,
-      //   cc: cc,
+      to: to,
+      cc: cc,
       from: 'webflow_admin@mitsubishielevatorasia.co.th',
       subject: `แจ้ง Login การเข้าใช้งานโปรแกรม E-Check Sheet สำหรับ Item ${data.QA_ITEM}`,
       html: html,

@@ -105,15 +105,20 @@ export class QaFileService {
       }
       const runner = queryRunner || localRunner!;
 
-      await runner.manager.delete(QaFile, {
+      const condition = {
         NFRMNO: dto.NFRMNO,
         VORGNO: dto.VORGNO,
         CYEAR: dto.CYEAR,
         CYEAR2: dto.CYEAR2,
         NRUNNO: dto.NRUNNO,
         FILE_TYPECODE: dto.FILE_TYPECODE,
-        FILE_ID: dto.FILE_ID,
-      });
+      };
+      if (dto.FILE_ID !== undefined) condition['FILE_ID'] = dto.FILE_ID;
+
+      await runner.manager.delete(
+        QaFile,
+        condition,
+      );
       if (localRunner && didStartTx && runner.isTransactionActive)
         await localRunner.commitTransaction();
       return { status: true, message: 'Delete master Successfully' };
@@ -149,7 +154,6 @@ export class QaFileService {
       take: 1,
     });
   }
-  
 
   async moveAndInsertFiles(d: {
     files: Express.Multer.File[];

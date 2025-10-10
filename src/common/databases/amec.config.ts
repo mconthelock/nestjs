@@ -31,6 +31,7 @@ if (process.env.HOST == 'AMEC') {
         keepAlive: true,
         poolMax: 100,
         poolMin: 5,
+        poolTimeout: 120,
         queueTimeout: 60000,
         queueMax: 1000,
         enableTCPSKeepAlive: true,

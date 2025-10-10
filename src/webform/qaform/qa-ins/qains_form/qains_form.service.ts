@@ -207,6 +207,7 @@ export class QainsFormService {
         'QA_INCHARGE_INFO',
         'QA_INCHARGE_SECTION_INFO',
         'QA_REV_INFO',
+        'FORM'
         // 'QA_MASTER',
         // 'ITEM_STATION'
       ],

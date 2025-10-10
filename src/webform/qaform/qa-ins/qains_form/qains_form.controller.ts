@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Req,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common';
 import { QainsFormService } from './qains_form.service';
 import { CreateQainsFormDto } from './dto/create-qains_form.dto';
 import { SearchQainsFormDto } from './dto/search-qains_form.dto';
@@ -12,6 +23,7 @@ import { getClientIP } from 'src/common/utils/ip.utils';
 import { QcConfQainsFormDto } from './dto/qcConfirm-qains_form.dto';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+import { ReturnQainsFormDto } from './dto/return-qains_form.dot';
 
 @ApiTags('QA-INS Form')
 @Controller('qaform/qa-ins')
@@ -25,8 +37,8 @@ export class QainsFormController {
   @UseInterceptors(getFileUploadInterceptor('files', true, 20))
   async uploadUserFile(
     @UploadedFiles() files: Express.Multer.File[],
-    @Body() dto: CreateQainsFormDto ,
-    @Req() req: Request
+    @Body() dto: CreateQainsFormDto,
+    @Req() req: Request,
   ) {
     const ip = getClientIP(req);
     return this.qainsFormService.createQainsForm(dto, files, ip, this.path);
@@ -54,5 +66,16 @@ export class QainsFormController {
   async lastApprove(@Body() dto: doactionFlowDto, @Req() req: Request) {
     const ip = getClientIP(req);
     return await this.qainsFormService.lastApprove(dto, ip);
+  }
+
+  @Post('returnApproval')
+  @UseInterceptors(getFileUploadInterceptor('files', true, 20))
+  async returnApproval(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() dto: ReturnQainsFormDto,
+    @Req() req: Request,
+  ) {
+    const ip = getClientIP(req);
+    return await this.qainsFormService.returnApproval(dto, files, ip, this.path);
   }
 }

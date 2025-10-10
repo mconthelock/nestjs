@@ -33,6 +33,7 @@ import { UpdateQainsFormDto } from './dto/update-qains_form.dto';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 
 import { formatDate, now } from 'src/common/utils/dayjs.utils';
+import { ReturnQainsFormDto } from './dto/return-qains_form.dot';
 
 @Injectable()
 export class QainsFormService {
@@ -207,7 +208,7 @@ export class QainsFormService {
         'QA_INCHARGE_INFO',
         'QA_INCHARGE_SECTION_INFO',
         'QA_REV_INFO',
-        'FORM'
+        'FORM',
         // 'QA_MASTER',
         // 'ITEM_STATION'
       ],
@@ -285,6 +286,89 @@ export class QainsFormService {
       }
     } finally {
       if (localRunner) await localRunner.release();
+    }
+  }
+
+  async returnApproval(
+    dto: ReturnQainsFormDto,
+    files: Express.Multer.File[],
+    ip: string,
+    path: string,
+  ) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      const form: FormDto = {
+        NFRMNO: dto.NFRMNO,
+        VORGNO: dto.VORGNO,
+        CYEAR: dto.CYEAR,
+        CYEAR2: dto.CYEAR2,
+        NRUNNO: dto.NRUNNO,
+      };
+
+      // clear
+      await this.QainsOAService.delete(
+        { ...form, QOA_TYPECODE: 'ESO' },
+        queryRunner,
+      );
+
+      // clear files
+      await this.QaFileService.delete({
+        ...form,
+        FILE_TYPECODE: 'ESF',
+      });
+
+      // insert operator
+      for (const e of dto.OPERATOR) {
+        await this.QainsOAService.createQainsOA(
+          { ...form, QOA_TYPECODE: 'ESO', QOA_EMPNO: e },
+          queryRunner,
+        );
+      }
+
+      await queryRunner.manager.save(QainsForm, {
+        ...form,
+        QA_ITEM: dto.QA_ITEM,
+        QA_INCHARGE_SECTION: dto.QA_INCHARGE_SECTION,
+        QA_INCHARGE_EMPNO: dto.QA_INCHARGE_EMPNO,
+      });
+
+      const formNo = await this.formService.getFormno(form); // Get the form number
+      const destination = path + '/' + formNo; // Get the destination path
+      for (const file of files) {
+        const moved = await moveFileFromMulter(file, destination);
+        movedTargets.push(moved.path);
+        await this.QaFileService.createQaFile(
+          {
+            ...form,
+            FILE_TYPECODE: 'ESF',
+            FILE_ONAME: file.originalname, // ชื่อเดิมฝั่ง client
+            FILE_FNAME: moved.newName, // ชื่อไฟล์ที่ใช้เก็บจริง
+            FILE_USERCREATE: dto.EMPNO,
+            FILE_PATH: destination, // โฟลเดอร์ปลายทาง
+          },
+          queryRunner,
+        );
+      }
+      // do action
+      await this.flowService.doAction(
+        { ...form, REMARK: dto.REMARK, ACTION: dto.ACTION, EMPNO: dto.EMPNO },
+        ip,
+        queryRunner,
+      );
+      await queryRunner.commitTransaction();
+      return {
+        status: true,
+        message: 'Action successful',
+        data: dto,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new Error(error.message);
+    } finally {
+      await queryRunner.release();
     }
   }
 

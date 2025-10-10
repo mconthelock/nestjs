@@ -19,6 +19,7 @@ import { IsMo } from '../../isform/is-mo/entities/is-mo.entity';
 
 //GP Form
 import { GpOt } from './../../gpform/gp-ot/entities/gp-ot.entity';
+import { QainsForm } from 'src/webform/qaform/qa-ins/qains_form/entities/qains_form.entity';
 
 @Entity('FORM')
 export class Form {
@@ -144,4 +145,7 @@ export class Form {
     { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
   ])
   formot: GpOt;
+
+  @OneToOne(() => QainsForm, (f) => f.FORM)
+  QA_INSFORM: QainsForm | null;
 }

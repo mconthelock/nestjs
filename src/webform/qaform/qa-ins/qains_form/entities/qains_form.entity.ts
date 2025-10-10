@@ -13,6 +13,7 @@ import { UserSection } from '../../entities-dummy/user_section.entity';
 import { AuditReportRevision } from 'src/escs/audit_report_revision/entities/audit_report_revision.entity';
 import { AuditReportMasterAll } from 'src/escs/audit_report_master_all/entities/audit_report_master_all.entity';
 import { ESCSItemStation } from '../../entities-dummy/item-station.entity';
+import { Form } from 'src/webform/form/entities/form.entity';
 
 @Entity('QAINS_FORM')
 export class QainsForm {
@@ -65,7 +66,10 @@ export class QainsForm {
 
   @OneToOne(() => AuditReportRevision, (q) => q.QAINSREV)
   @JoinColumn({ name: 'QA_REV', referencedColumnName: 'ARR_REV' })
-  @JoinColumn({ name: 'QA_INCHARGE_SECTION', referencedColumnName: 'ARR_SECID' })
+  @JoinColumn({
+    name: 'QA_INCHARGE_SECTION',
+    referencedColumnName: 'ARR_SECID',
+  })
   QA_REV_INFO: AuditReportRevision | null;
 
   @OneToMany(() => AuditReportMasterAll, (a) => a.QAINS_FORM)
@@ -73,4 +77,12 @@ export class QainsForm {
 
   @OneToMany(() => ESCSItemStation, (i) => i.QAINSFORM)
   ITEM_STATION: ESCSItemStation[] | null;
+
+  @OneToOne(() => Form, (form) => form.QA_INSFORM)
+  @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+  @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
+  @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
+  @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+  @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+  FORM: Form | null;
 }

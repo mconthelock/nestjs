@@ -80,7 +80,6 @@ export class FlowService {
     dto: CreateFlowDto,
     queryRunner?: QueryRunner,
   ): Promise<boolean> {
-    // console.log('insert flow data : ', dto);
     let localRunner: QueryRunner | undefined;
     try {
       if (!queryRunner) {
@@ -91,12 +90,8 @@ export class FlowService {
       const runner = queryRunner || localRunner!;
       await runner.manager.save(Flow, dto);
       if (localRunner) await localRunner.commitTransaction();
-      //   await this.repo.save(formData);
-      //   console.log('-----------------Flow inserted successfully------------------');
-
       return true;
     } catch (error) {
-      console.error('Error inserting flow:', error);
       if (localRunner) await localRunner.rollbackTransaction();
       throw new Error('Insert flow Error: ' + error.message);
     } finally {
@@ -108,18 +103,6 @@ export class FlowService {
     const repo = queryRunner
       ? queryRunner.manager.getRepository(Flow)
       : this.flowRepo;
-    // console.log('get flow data : ', dto);
-    // const where: any = {};
-    // for (const key in dto) {
-    //   if (['CAPVSTNO'].includes(key)) {
-    //     where[key] = Array.isArray(dto[key]) ? In(dto[key]) : dto[key];
-    //   } else {
-    //     where[key] = dto[key];
-    //   }
-    // }
-    // return repo.find({
-    //   where: where,
-    // });
     const query = repo
       .createQueryBuilder('flow')
       .distinct(dto.distinct == true); // เปิด distinct
@@ -175,7 +158,6 @@ export class FlowService {
       if (localRunner) await localRunner.commitTransaction();
       return true;
     } catch (error) {
-      console.error('Error update flow:', error);
       if (localRunner) await localRunner.rollbackTransaction();
       throw new Error('Update flow Error: ' + error.message);
     } finally {
@@ -209,7 +191,6 @@ export class FlowService {
       if (localRunner) await localRunner.commitTransaction();
       return true;
     } catch (error) {
-      console.error('Error re-aligning flow:', error);
       if (localRunner) await localRunner.rollbackTransaction();
       throw new Error('Re-align flow Error: ' + error.message);
     } finally {
@@ -222,8 +203,6 @@ export class FlowService {
     queryRunner?: QueryRunner,
   ): Promise<boolean> {
     let localRunner: QueryRunner | undefined;
-    console.log('delete flow data : ', dto);
-
     try {
       if (!queryRunner) {
         localRunner = this.dataSource.createQueryRunner();
@@ -236,7 +215,6 @@ export class FlowService {
       if (localRunner) await localRunner.commitTransaction();
       return true;
     } catch (error) {
-      console.error('Error deleting flow:', error);
       if (localRunner) await localRunner.rollbackTransaction();
       throw new Error('Delete flow Error: ' + error.message);
       //   return false;
@@ -376,8 +354,6 @@ export class FlowService {
   async getFlowStatusName(form: FormDto) {
     const formcst = await this.formService.getCst(form);
     const status = formcst.CST;
-    console.log('status : ', status);
-
     let html = '';
     const msg = '<font color="#000000">Status: </font>';
     switch (status) {
@@ -494,8 +470,6 @@ export class FlowService {
   }
 
   async getExtData(dto: empnoFormDto) {
-    console.log(dto);
-
     const flow = await this.getEmpFlowStepReady(dto);
     if (flow.length === 0) {
       return '';
@@ -579,9 +553,6 @@ export class FlowService {
             { ...form, CAPVSTNO: this.APV_NONE, CSTEPNO: flow.CSTEPNO },
             runner,
           );
-          //   console.log('check next step : ', checkNextStep);
-          //   throw Error('test');
-
           const updateNextStep = checkNextStep.length == 0 ? true : false;
           if (updateNextStep) {
             const stepNext:
@@ -590,7 +561,6 @@ export class FlowService {
                   stepno: string;
                   stepNextNo: string;
                 } = await this.getStepNext(form, runner);
-            console.log('step next : ', stepNext);
             if (!stepNext) break;
             //UPDATE STEP NEXT STATUS
             await this.updateStepNextStatus(form, stepNext.stepno, runner);
@@ -1046,8 +1016,6 @@ export class FlowService {
       html += "3. select 'Waiting for approval'<br/>";
       if (listApv.result.length > 0) {
         for (const list of listApv.result) {
-          console.log(list.VEMAIL);
-
           this.mailService.sendMail({
             from: 'webflow_admin@MitsubishiElevatorAsia.co.th',
             // to: list.VEMAIL,

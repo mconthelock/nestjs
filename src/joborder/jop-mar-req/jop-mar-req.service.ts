@@ -129,7 +129,6 @@ export class JopMarReqService {
       repo = queryRunner.manager.getRepository(JopMarReq);
     } else {
       repo = this.reqRepo;
-      //   repo = this.dataSource.getRepository(JopMarReq);
     }
     return await repo
       .createQueryBuilder('jop')
@@ -142,21 +141,14 @@ export class JopMarReqService {
       )
       .orderBy('jop.JOP_REVISION', 'ASC')
       .leftJoinAndSelect('jop.marRequest', 'marRequest')
-      //   .leftJoinAndSelect('jop.purConfirm', 'purConfirm')
       .select([
         'jop.JOP_REVISION',
         'jop.JOP_MAR_REQUEST',
         'jop.JOP_MAR_REQUEST_DATE',
         'jop.JOP_MAR_INPUT_DATE',
         'jop.JOP_MAR_REMARK',
-        // 'jop.JOP_PUR_CONFIRM',
-        // 'jop.JOP_PUR_CONFIRM_DATE',
-        // 'jop.JOP_PUR_INPUT_DATE',
-        // 'jop.JOP_PUR_REMARK',
         'marRequest.SEMPNO',
         'marRequest.SNAME',
-        // 'purConfirm.SEMPNO',
-        // 'purConfirm.SNAME',
       ])
       .getMany();
   }
@@ -171,19 +163,12 @@ export class JopMarReqService {
         await localRunner.startTransaction();
       }
       const runner = queryRunner || localRunner!;
-
       const record = await this.findLatestRevision(MFGNO, PONO, LINENO, runner);
-
-      console.log('Record found:', record);
-
       if (!record) {
         throw new Error('Record not found');
       }
       Object.assign(record, updateData);
       const result = await runner.manager.save(record);
-
-      console.log('Update result:', result);
-
       if (localRunner) await localRunner.commitTransaction();
       return {
         message: 'Update successful',

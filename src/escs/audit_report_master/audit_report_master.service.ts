@@ -65,8 +65,6 @@ export class ESCSARMService {
         { ARM_SECID: secid },
         runner,
       );
-      console.log('currentData', currentData);
-
       const revision = await this.escsArrService.create(
         {
           ARR_SECID: secid,
@@ -76,9 +74,6 @@ export class ESCSARMService {
         },
         runner,
       );
-      
-      console.log('revision', revision);
-      
       for (const row of currentData) {
         await this.escsArhService.create(
           {
@@ -103,18 +98,8 @@ export class ESCSARMService {
           data.ARM_SEQ = 0;
           data.ARM_SECID = secid;
           if (t.type == 'del') {
-            console.log('delete topic ', data);
             await this.delete(data, runner);
           } else if (t.type == 'edit') {
-            console.log('update topic ', {
-              ...data,
-              condition: {
-                ARM_REV: t.rev,
-                ARM_NO: t.topic,
-                ARM_SEQ: 0,
-                ARM_TYPE: 'H',
-              },
-            });
             await this.update(
               {
                 ...data,
@@ -128,7 +113,6 @@ export class ESCSARMService {
               runner,
             );
           } else {
-            console.log('insert topic', data);
             await this.create(data, runner);
           }
         }
@@ -139,19 +123,8 @@ export class ESCSARMService {
           data.ARM_TYPE = 'D';
           data.ARM_SECID = secid;
           if (l.type == 'del') {
-            console.log('delete detail', data);
             await this.delete(data, runner);
           } else if (l.type == 'edit') {
-            console.log('update detail ', {
-              ...data,
-              condition: {
-                ARM_REV: l.rev,
-                ARM_NO: l.topic,
-                ARM_SEQ: l.seq,
-                ARM_TYPE: 'D',
-              },
-            });
-
             await this.update(
               {
                 ...data,
@@ -165,7 +138,6 @@ export class ESCSARMService {
               runner,
             );
           } else {
-            console.log('insert detail', data);
             await this.create(data, runner);
           }
         }
@@ -174,7 +146,6 @@ export class ESCSARMService {
         { ARM_REV: revision.revision, condition: { ARM_SECID: secid } },
         runner,
       );
-      //   throw new Error('test error');
       if (localRunner) await localRunner.commitTransaction();
       return {
         status: true,
@@ -189,8 +160,6 @@ export class ESCSARMService {
   }
 
   async setData(dto: DataESCSARMDto, revision: number) {
-    console.log('dto', dto);
-
     const {
       rev,
       detail,
@@ -292,6 +261,7 @@ export class ESCSARMService {
       if (localRunner && didConnect) await localRunner.release();
     }
   }
+
   async delete(dto: UpdateESCSARMDto, queryRunner?: QueryRunner) {
     let localRunner: QueryRunner | undefined;
     let didConnect = false;

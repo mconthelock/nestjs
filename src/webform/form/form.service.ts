@@ -103,7 +103,6 @@ export class FormService {
       },
       queryRunner,
     );
-    console.log(form);
     // เอาเลขปี 2 หลักสุดท้าย
     const year2 = dto.CYEAR2.substring(2, 4); // ถ้า "2024" ได้ "24"
 
@@ -141,10 +140,7 @@ export class FormService {
       this.setQuery(context);
       await this.setFormNo(context, runner);
       const formData = await this.setFormValue(context, runner);
-      //   console.log('formData : ', formData);
-
       if (await this.insertForm(formData, runner)) {
-        console.log('Form inserted successfully');
         context.flag = 0;
         const flowMaster = await this.flowmstService.getFlowMaster(
           context.nfrmno,
@@ -152,11 +148,9 @@ export class FormService {
           context.cyear,
           runner,
         );
-        console.log('flowMaster : ', flowMaster);
         await this.setOrganize(context, runner);
         //   flowMaster.forEach(async (row: any) => {
         for (const row of flowMaster) {
-          //   console.log('row : ', row.VPOSNO);
 
           switch (row.CTYPE) {
             case '1':
@@ -187,13 +181,11 @@ export class FormService {
         context.query.NRUNNO = context.nrunno;
 
         const first = await this.flowService.getFlow(context.query, runner);
-        console.log('first : ', first);
         await this.firstflow(first, context, runner);
         // add manager
         if (context.flag == 1) {
           await this.managerStep(context, runner);
         }
-
         context.query.CSTEPST = '0';
         const notuse = await this.flowService.getFlow(context.query, runner);
         for (const row of notuse) {
@@ -204,9 +196,6 @@ export class FormService {
         if (dto.DRAFT) {
           await this.saveDraft(dto.DRAFT, context, runner);
         }
-
-        // await this.queryRunner.commitTransaction();
-        // if (localRunner) await localRunner.commitTransaction();
         if (localRunner && didStartTx && runner.isTransactionActive) {
           await localRunner.commitTransaction();
         }
@@ -216,35 +205,25 @@ export class FormService {
           data: formData,
         };
       } else {
-        // await this.queryRunner.commitTransaction();
-        // console.log('Failed to insert form');
-        // return { status: false, message: `Can't insert this form` };
         throw new Error('Failed to insert form'); // Throw an error to trigger rollback
       }
     } catch (error) {
-      //   await this.queryRunner.rollbackTransaction();
       if (localRunner && didStartTx && localRunner.isTransactionActive) {
         try {
           await localRunner.rollbackTransaction();
         } catch {}
       }
-      //   if (localRunner) await localRunner.rollbackTransaction();
       throw new Error(error.message);
     } finally {
-      //   await this.queryRunner.release();
       if (localRunner && didConnect) {
         try {
           await localRunner.release();
         } catch {}
       }
-      //   if (localRunner) await localRunner.release();
     }
-
-    // return this.form.save(dto);
   }
 
   setQuery(context: FormContext) {
-    console.log('set query');
     context.query = {
       NFRMNO: context.nfrmno,
       VORGNO: context.vorgno,
@@ -254,15 +233,12 @@ export class FormService {
   }
 
   async setFormNo(context: FormContext, queryRunner?: QueryRunner) {
-    console.log('set form no');
-
     const form = await this.getFormNextRunNo(context, queryRunner);
     if (form.length > 0) {
       context.nrunno = form[0].NRUNNO + 1;
     } else {
       context.nrunno = 1;
     }
-    console.log('nrunno : ', context.nrunno);
   }
 
   getFormNextRunNo(context: FormContext, queryRunner?: QueryRunner) {
@@ -279,7 +255,6 @@ export class FormService {
   }
 
   async setFormValue(context: FormContext, queryRunner: QueryRunner) {
-    console.log('set form value');
 
     const condition = {
       NNO: context.nfrmno,
@@ -290,8 +265,6 @@ export class FormService {
       condition,
       queryRunner,
     );
-    // console.log('formmst : ', formmst);
-
     const today = new Date();
     // Set formDate to current date with time 00:00:00
     const formDateWithZeroTime = new Date(
@@ -322,15 +295,12 @@ export class FormService {
       await queryRunner.manager.save(Form, formData);
       return true;
     } catch (error) {
-      console.error('Error inserting form:', error);
       throw error;
     }
   }
 
   async setOrganize(context: FormContext, queryRunner: QueryRunner) {
     const user = await this.usersService.findEmp(context.empno, queryRunner);
-    // console.log('user : ', user);
-
     context.emppos = user.SPOSCODE;
     if (user.SSECCODE == '00') {
       if (user.SDEPCODE == '00') {
@@ -341,8 +311,6 @@ export class FormService {
     } else {
       context.orgno = user.SSECCODE;
     }
-    console.log('position : ', context.emppos);
-    console.log('orgno : ', context.orgno);
   }
 
   async addFlow1(data: any, context: FormContext, queryRunner: QueryRunner) {
@@ -381,7 +349,6 @@ export class FormService {
       },
       queryRunner,
     );
-    // console.log('add flow2 val : ', val);
     if (val.length > 0) {
       for (const row of val) {
         await this.getRepresent(row.VEMPNO, context, queryRunner);
@@ -415,12 +382,6 @@ export class FormService {
       condition,
       queryRunner,
     );
-    // const data = await this.repService.getRep(condition);
-    // context.represent = empno;
-    // if (Array.isArray(data) && data.length > 0 && data[0]?.VREPNO !== '') {
-    //   context.represent = data[0].VREPNO;
-    // }
-    // console.log('represent : ', context.represent);
   }
 
   setFlow(data: any, context: FormContext) {
@@ -505,12 +466,6 @@ export class FormService {
     const url = await this.formmstService.getFormmst(query2, queryRunner);
     if (manager.length > 0) {
       await this.getRepresent(manager[0].HEADNO, context, queryRunner);
-      //   const repManager = await this.getRepresent(manager[0].HEADNO);
-      //   if (!repManager) {
-      //     repno = manager[0].HEADNO;
-      //   } else {
-      //     repno = this.represent;
-      //   }
       const flow = {
         NFRMNO: context.nfrmno,
         VORGNO: context.vorgno,
@@ -657,7 +612,6 @@ export class FormService {
         await localRunner.startTransaction();
       }
       const runner = queryRunner || localRunner!;
-      //   const { condition, ...data } = dto;
       await runner.manager.getRepository(Form).delete(dto);
 
       if (localRunner) await localRunner.commitTransaction();
@@ -672,8 +626,6 @@ export class FormService {
 
   async deleteFlowAndForm(dto: UpdateFormDto): Promise<boolean> {
     const queryRunner = this.dataSource.createQueryRunner();
-    console.log('delete flow and form data : ', dto);
-
     try {
       const condition = {
         NFRMNO: dto.NFRMNO,
@@ -718,15 +670,6 @@ export class FormService {
   }
 
   async getFormDetail(form: FormDto) {
-    // const formDetail = await this.form.findOne({
-    //   where: {
-    //     NFRMNO: form.NFRMNO,
-    //     VORGNO: form.VORGNO,
-    //     CYEAR: form.CYEAR,
-    //     CYEAR2: form.CYEAR2,
-    //     NRUNNO: form.NRUNNO,
-    //   },
-    // });
     const formDetail = await this.dataSource
       .createQueryBuilder()
       .select('F.*, A.SNAME AS VINPUTNAME, B.SNAME AS VREQNAME')

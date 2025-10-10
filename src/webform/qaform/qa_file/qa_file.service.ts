@@ -58,7 +58,6 @@ export class QaFileService {
         await localRunner.startTransaction();
       }
       const runner = queryRunner || localRunner!;
-
       const condition = {
         NFRMNO: dto.NFRMNO,
         VORGNO: dto.VORGNO,
@@ -67,10 +66,7 @@ export class QaFileService {
         NRUNNO: dto.NRUNNO,
         FILE_TYPECODE: dto.FILE_TYPECODE,
       };
-
       const id = await this.setId(condition, runner);
-      console.log('id', id);
-
       const data = {
         ...dto,
         FILE_ID: id,
@@ -104,7 +100,6 @@ export class QaFileService {
         didStartTx = true;
       }
       const runner = queryRunner || localRunner!;
-
       const condition = {
         NFRMNO: dto.NFRMNO,
         VORGNO: dto.VORGNO,
@@ -170,7 +165,6 @@ export class QaFileService {
     const destination = d.folder ? await joinPaths(d.path, d.folder) : d.path; // Get the destination path
     const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
     for (const file of d.files) {
-      console.log('file: ', file);
       const moved = await moveFileFromMulter(file, destination);
       movedTargets.push(moved.path);
       await this.createQaFile(

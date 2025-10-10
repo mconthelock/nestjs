@@ -16,8 +16,6 @@ export class OrgposService {
   ) {}
 
   async getOrgPos(dto: SearchOrgpoDto, queryRunner?: QueryRunner) {
-    console.log(dto);
-    
     const repo = queryRunner ? queryRunner.manager.getRepository(Orgpos) : this.orgpos;
     return repo.find({
       where: dto,

@@ -117,8 +117,6 @@ export class ItemsService {
       inputString = inputString.slice(0, -1);
     }
     let cleanedString = inputString.replace(/\s/g, '');
-    //console.log(cleanedString);
-
     const pairRegex = /([^=,]{1,3})=((?:[^,]+|,(?![^=,]{1,3}=))+)/g;
     let isValid = true;
     const errors = [];

@@ -11,7 +11,6 @@ import { QainsOAService } from '../qains_operator_auditor/qains_operator_auditor
 import { FormService } from 'src/webform/form/form.service';
 import { QaFileService } from '../../qa_file/qa_file.service';
 import { deleteFile, joinPaths } from 'src/common/utils/files.utils';
-import { throwError } from 'rxjs';
 
 @Injectable()
 export class QainsAuditService {
@@ -59,9 +58,6 @@ export class QainsAuditService {
       }
 
       // update QainsOA
-      //   if (!dto.draft) {
-      console.log('draft', dto.draft, dto.draft ? 2: 1);
-      
       await this.qainsOAService.update(
         {
           ...form,
@@ -78,8 +74,6 @@ export class QainsAuditService {
         },
         queryRunner,
       );
-      //   }
-
       // delete old files
       if (dto.delImageIds) {
         for (const id of dto.delImageIds) {
@@ -97,7 +91,6 @@ export class QainsAuditService {
           });
         }
       }
-
       // move files
       const formNo = await this.formService.getFormno(form); // Get the form number
       movedTargets = await this.qafileService.moveAndInsertFiles({
@@ -111,10 +104,6 @@ export class QainsAuditService {
         ext2: dto.typecode,
         queryRunner,
       });
-      console.log('files', files);
-
-      console.log('movedTargets', movedTargets);
-
       await queryRunner.commitTransaction();
       return { status: true, message: 'Save audit successfully' };
     } catch (error) {
@@ -162,8 +151,6 @@ export class QainsAuditService {
   }
 
   async delete(dto: UpdateQainsAuditDto, queryRunner?: QueryRunner) {
-    console.log(dto);
-
     let localRunner: QueryRunner | undefined;
     let didConnect = false;
     let didStartTx = false;
@@ -185,8 +172,6 @@ export class QainsAuditService {
         NRUNNO: dto.NRUNNO,
         QAA_TYPECODE: dto.QAA_TYPECODE,
         QAA_AUDIT_SEQ: dto.QAA_AUDIT_SEQ,
-        // QAA_TOPIC: dto.QAA_TOPIC,
-        // QAA_SEQ: dto.QAA_SEQ,
       });
       if (localRunner && didStartTx && runner.isTransactionActive)
         await localRunner.commitTransaction();

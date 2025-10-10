@@ -33,8 +33,6 @@ export class QainsOAService {
         QOA_TYPECODE: dto.QOA_TYPECODE,
       };
       const maxSeq = await this.setSeq(condition, runner);
-
-      console.log('maxSeq', maxSeq);
       const data = {
         ...condition,
         QOA_SEQ: maxSeq,
@@ -91,8 +89,6 @@ export class QainsOAService {
         'QA_AUDIT',
         'QOA_EMPNO_INFO',
         'QA_FILES'
-        // 'TYPE',
-        // , 'QAINSFORM'
       ],
       order: {
         QOA_SEQ: 'ASC',
@@ -110,7 +106,6 @@ export class QainsOAService {
         'QA_AUDIT',
         'QOA_EMPNO_INFO',
         'QA_FILES'
-        // 'TYPE',
       ],
       order: {
         QOA_SEQ: 'ASC',

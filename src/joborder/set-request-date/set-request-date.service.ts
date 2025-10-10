@@ -22,65 +22,6 @@ export class SetRequestDateService {
     private dataSource: DataSource,
   ) {}
 
-  // หากเป็น table อยู่ใน database ที่ connect กับ amecConnection สามารถใช้ repository ได้เลยหาก link มาต้องไปใช้ queryRunner ตามด้านล่าง
-  //   // เมธอดสำหรับทำ Upsert (เช็คแล้วสร้างหรือแก้ไข)
-  //   async upsert(upsertDto: UpsertSetRequestDateDto): Promise<Result> {
-  //     const { JOP_PONO, JOP_LINENO, ...updateData } = upsertDto; // แยก PONO, LINENO ออกจากข้อมูลที่จะอัปเดต
-
-  //     // ค้นหาว่ามี Record นี้อยู่แล้วหรือไม่ โดยใช้ Composite Primary Key
-  //     const existingRecord = await this.setRequestDateRepository.findOneBy({
-  //         JOP_PONO,
-  //         JOP_LINENO,
-  //     });
-
-  //     // เตรียมข้อมูลสำหรับบันทึก/อัปเดต โดยแปลง string วันที่ให้เป็น Date object
-  //     const dataToSave: Partial<SetRequestDate> = {
-  //         JOP_PONO,
-  //         JOP_LINENO,
-  //         JOP_REQUESTDATE: updateData.JOP_REQUESTDATE ? new Date(updateData.JOP_REQUESTDATE+' 00:00:00') : null,
-  //     };
-
-  //     try {
-  //         if (existingRecord) {
-  //             // ถ้ามี Record อยู่แล้ว: ทำการอัปเดต
-  //             dataToSave.JOP_USERUPDATE = updateData.ACTION_BY; // ใช้ ACTION_BY เป็นผู้สร้าง
-  //             dataToSave.JOP_UPDATEDATE = updateData.ACTION_DATE ? new Date(updateData.ACTION_DATE) : null;
-  //             console.log(`Updating record with PONO: ${JOP_PONO}, LINENO: ${JOP_LINENO}`);
-  //             // ใช้ Object.assign เพื่อรวมข้อมูลเก่ากับข้อมูลใหม่
-  //             Object.assign(existingRecord, dataToSave);
-  //             const updatedRecord = await this.setRequestDateRepository.save(existingRecord);
-  //             return { record: updatedRecord, status: 200 }; // คืนค่าสถานะ updated
-  //         } else {
-  //             // ถ้ายังไม่มี Record: ทำการสร้างใหม่
-  //             dataToSave.JOP_USERCREATE = updateData.ACTION_BY; // ใช้ ACTION_BY เป็นผู้สร้าง
-  //             console.log(`Creating new record with PONO: ${JOP_PONO}, LINENO: ${JOP_LINENO}`);
-  //             const newRecord = this.setRequestDateRepository.create(dataToSave);
-  //             const savedRecord = await this.setRequestDateRepository.save(newRecord);
-  //             return { record: savedRecord, status: 201 }; // คืนค่าสถานะ created
-  //         }
-  //     } catch (error) {
-  //         // ดักจับข้อผิดพลาดที่อาจเกิดขึ้นระหว่างการบันทึกฐานข้อมูล
-  //         console.error(`Error during upsert for PONO: ${JOP_PONO}, LINENO: ${JOP_LINENO}`, error);
-  //         throw new Error('Error occurred while saving data'); // โยน exception กลับไป
-  //     }
-
-  //     // if (existingRecord) {
-  //     //   // ถ้ามี Record อยู่แล้ว: ทำการอัปเดต
-  //     //   dataToSave.JOP_USERUPDATE = updateData.ACTION_BY; // ใช้ ACTION_BY เป็นผู้สร้าง
-  //     //   dataToSave.JOP_UPDATEDATE = updateData.ACTION_DATE ? new Date(updateData.ACTION_DATE) : null;
-  //     //   console.log(`Updating record with PONO: ${JOP_PONO}, LINENO: ${JOP_LINENO}`);
-  //     //   // ใช้ Object.assign เพื่อรวมข้อมูลเก่ากับข้อมูลใหม่
-  //     //   Object.assign(existingRecord, dataToSave);
-  //     //   return this.setRequestDateRepository.save(existingRecord);
-  //     // } else {
-  //     //   // ถ้ายังไม่มี Record: ทำการสร้างใหม่
-  //     //   dataToSave.JOP_USERCREATE = updateData.ACTION_BY; // ใช้ ACTION_BY เป็นผู้สร้าง
-  //     //   console.log(`Creating new record with PONO: ${JOP_PONO}, LINENO: ${JOP_LINENO}`);
-  //     //   const newRecord = this.setRequestDateRepository.create(dataToSave);
-  //     //   return this.setRequestDateRepository.save(newRecord);
-  //     // }
-
-  //   }
   async setRequestDate(upsertDto: UpsertSetRequestDateDto): Promise<Result> {
     const { MFGNO, PONO, LINENO, ...updateData } = upsertDto;
     const queryRunner = this.dataSource.createQueryRunner();
@@ -88,21 +29,6 @@ export class SetRequestDateService {
       const latest = await this.findLatestRevision(MFGNO, PONO, LINENO);
       await queryRunner.connect();
       await queryRunner.startTransaction();
-      // ต้อง set isolation level ที่นี่ "ทันทีหลัง startTransaction"
-      // await queryRunner.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
-
-      // ต่อจากนี้ใช้ queryRunner.manager แทน repository เดิม
-      // หา record
-      // const existingRecord = await queryRunner.manager.findOne(SetRequestDate, {
-      //     where: {
-      //         JOP_MFGNO: MFGNO,
-      //         JOP_PONO: PONO,
-      //         JOP_LINENO: LINENO
-      //     },
-      //     order: {
-      //         JOP_REVISION: 'DESC',
-      //     }
-      // });
 
       // เตรียมข้อมูล
       const dataToSave: Partial<SetRequestDate> = {
@@ -116,9 +42,6 @@ export class SetRequestDateService {
         JOP_MAR_REMARK: updateData.REMARK || null,
         JOP_MAR_INPUT_DATE: new Date(), // ใช้เวลาปัจจุบันเป็นวันที่ป้อนข้อมูล
       };
-
-      console.log(latest);
-
       let result = null;
       if (latest) {
         latest.JOP_REVISION += 1; // เพิ่ม Revision ขึ้น 1
@@ -175,37 +98,6 @@ export class SetRequestDateService {
     pono: number,
     lineno: number,
   ): Promise<SetRequestDate[]> {
-    // return await this.dataSource.getRepository(SetRequestDate).find({
-    //     where: {
-    //         JOP_MFGNO: mfgno,
-    //         JOP_PONO: pono,
-    //         JOP_LINENO: lineno,
-
-    //     },
-    //     order: {
-    //         JOP_REVISION: 'ASC',
-    //     },
-    //     relations: ['marRequest', 'purConfirm'], // ถ้าต้องการดึงข้อมูลผู้สร้างและผู้ยืนยันด้วย
-    //     select: {
-    //         JOP_REVISION: true,
-    //         JOP_MAR_REQUEST: true,
-    //         JOP_MAR_REQUEST_DATE: true,
-    //         JOP_MAR_INPUT_DATE: true,
-    //         JOP_MAR_REMARK: true,
-    //         JOP_PUR_CONFIRM: true,
-    //         JOP_PUR_CONFIRM_DATE: true,
-    //         JOP_PUR_INPUT_DATE: true,
-    //         JOP_PUR_REMARK: true,
-    //         marRequest: {
-    //             SEMPNO: true,
-    //             SNAME: true,
-    //         },
-    //         purConfirm: {
-    //             SEMPNO: true,
-    //             SNAME: true,
-    //         },
-    //     }
-    // });
     const repo = this.dataSource.getRepository(SetRequestDate);
     return await repo
       .createQueryBuilder('jop')
@@ -303,7 +195,6 @@ export class SetRequestDateService {
           },
         ];
       }
-      console.log('last 1 : ', latest);
 
       await queryRunner.connect();
       await queryRunner.startTransaction();
@@ -323,15 +214,12 @@ export class SetRequestDateService {
           JOP_PUR_INPUT_DATE: new Date(), // ใช้เวลาปัจจุบันเป็นวันที่ป้อนข้อมูล
         }),
       );
-      console.log('data : ', data);
 
       const result = await queryRunner.manager.save(SetRequestDate, data);
 
       await queryRunner.commitTransaction();
       return { record: result, status: 200 };
     } catch (error) {
-      console.log(error);
-
       await queryRunner.rollbackTransaction();
       throw new Error(
         error.message ||
@@ -341,47 +229,4 @@ export class SetRequestDateService {
       await queryRunner.release();
     }
   }
-
-  // async upsert(upsertDto: UpsertSetRequestDateDto): Promise<Result> {
-  //     const queryRunner = this.dataSource.createQueryRunner();
-  //     await queryRunner.connect();
-  //     await queryRunner.startTransaction();
-  //     try {
-  //         // // ต้อง set isolation level ที่นี่ "ทันทีหลัง startTransaction"
-  //         // await queryRunner.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
-
-  //         // ต่อจากนี้ใช้ queryRunner.manager แทน repository เดิม
-  //         // หา record
-  //         const { JOP_PONO, JOP_LINENO, ...updateData } = upsertDto;
-  //         const existingRecord = await queryRunner.manager.findOne(SetRequestDate, {
-  //             where: { JOP_PONO, JOP_LINENO },
-  //         });
-
-  //         // เตรียมข้อมูล
-  //         const dataToSave: Partial<SetRequestDate> = {
-  //             JOP_PONO,
-  //             JOP_LINENO,
-  //             JOP_REQUESTDATE: updateData.JOP_REQUESTDATE ? new Date(updateData.JOP_REQUESTDATE+' 00:00:00') : null,
-  //         };
-
-  //         let result = null;
-  //         if (existingRecord) {
-  //             dataToSave.JOP_USERUPDATE = updateData.ACTION_BY;
-  //             dataToSave.JOP_UPDATEDATE = updateData.ACTION_DATE ? new Date(updateData.ACTION_DATE) : null;
-  //             Object.assign(existingRecord, dataToSave);
-  //             result = await queryRunner.manager.save(existingRecord);
-  //         } else {
-  //             dataToSave.JOP_USERCREATE = updateData.ACTION_BY;
-  //             const newRecord = queryRunner.manager.create(SetRequestDate, dataToSave);
-  //             result = await queryRunner.manager.save(newRecord);
-  //         }
-  //         await queryRunner.commitTransaction();
-  //         return { record: result, status: existingRecord ? 200 : 201 };
-  //     } catch (err) {
-  //         await queryRunner.rollbackTransaction();
-  //         throw new Error(err, 'Error occurred while saving data');
-  //     } finally {
-  //         await queryRunner.release();
-  //     }
-  // }
 }

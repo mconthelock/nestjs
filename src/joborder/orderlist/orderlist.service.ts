@@ -29,11 +29,6 @@ export class OrderListService {
     private readonly JOP_PUR_CONF = this.dataSource.getMetadata('JOP_PUR_CONF').columns.map(c => c.propertyName);
     
     private readonly allowFields = [...this.JOBORDER, 'MAR_INPUTNAME', 'PUR_INPUTNAME', 'DeadLinePUR'];
-    
-    // private readonly JOP_REQ  = this.dataSource.getMetadata(SetRequestDate).columns.map(c => c.propertyName);
-    // private readonly allowFields = [...this.JOBORDER, ...this.JOP_REQ, 'MAR_INPUTNAME', 'PUR_INPUTNAME', 'DeadLinePUR'];
-
-    
     private readonly numberFields = ["REQUESTED_QTY" ,"ORDERED_QTY" ,"RECIEVE_QTY" ,"QTY" ,"ACTUALETA_AMEC" ,"LINENO" ,"VENDCODE" ,"PRNO" ,"PRDATE" ,"PONO" ,"PODATE" ,"DUEDATE", , 'JOP_REVISION', 'JOP_PONO', 'JOP_LINENO', 'JOP_PUR_STATUS', 'TURNOVER_STATUS'];
 
     private readonly dataFields = ["CUST_RQS", "DESSCH", "PRODSCH", "DESBMDATE", "MFGBMDATE", "EXPSHIP", 'JOP_MAR_REQUEST_DATE', 'JOP_MAR_INPUT_DATE', 'JOP_PUR_CONFIRM_DATE', 'JOP_PUR_INPUT_DATE'];
@@ -160,18 +155,6 @@ export class OrderListService {
      * @returns 
      */
     async orderlistNew(dto: SearchOrderListDto) {
-        // console.log('JOP_REQ', this.JOP_REQ);
-        // console.log('allowFields', this.allowFields);
-        
-        // const jobOrder = this.OrderListRepository.metadata.columns.map(c => c.propertyName);
-        // const jopReq = this.dataSource.getMetadata(SetRequestDate).columns.map(c => c.propertyName);
-        // console.log('merge', [...jobOrder, ...jopReq]);
-        // console.log('test2',this.OrderListRepository.metadata.columns.map(c => ({
-        //     name: c.propertyName, // ชื่อ property (field ใน entity)
-        //     type: c.type,         // type ที่กำหนดใน entity @ViewColumn({ type: 'varchar2' }) // หรือ 'varchar', 'nvarchar', ตาม type DB
-        //     dbName: c.databaseName // ชื่อจริงใน database (optional)
-        // })));
-
         const query = this.setQueryNew(dto);
         return await this.getRevisionHistory(await query.getRawMany());
     }
@@ -273,8 +256,6 @@ export class OrderListService {
                 query.select('JOP_MFGNO, JOP_PONO, JOP_LINENO, JOP_MAR_REVISION, JOP_PUR_STATUS, JOP_MAR_REQUEST, JOP_MAR_REQUEST_DATE, JOP_MAR_INPUT_DATE, JOP_MAR_REMARK, JOP_PUR_REVISION, JOP_PUR_CONFIRM, JOP_PUR_CONFIRM_DATE, JOP_PUR_INPUT_DATE, JOP_PUR_REMARK');
             }
             select.forEach((f)=>{
-                // if (this.JOP_REQ.includes(f)) {
-                //     query.addSelect(`J.${f}`, f);
                 if ('MAR_INPUTNAME' === f) {
                     query.addSelect('U.SNAME', 'MAR_INPUTNAME');
                 } else if ('PUR_INPUTNAME' === f) {
@@ -287,27 +268,6 @@ export class OrderListService {
                     query.addSelect(`O.${f}`, f);
                 }
             })
-            // query.leftJoinAndSelect('JOP_REQ', 'J', 'O.PRNO = J.JOP_PONO and O.LINENO = J.JOP_LINENO'); // จะ join และ select ให้ทั้งหมด
-            // query.leftJoin('JOP_REQ', 'J', 'O.PRNO = J.JOP_PONO and O.LINENO = J.JOP_LINENO and O.MFGNO = J.JOP_MFGNO'); //  join อย่างเดียวหากอยากได้ column ไหนต้อง select เอง
-            
-            // ของ JOP_REQ ก่อนแยกตาราง
-            // query.leftJoin(
-            //     qb => qb
-            //         .subQuery()
-            //         .select("X.*")
-            //         .from('JOP_REQ', 'X')
-            //         .innerJoin(
-            //             qb => qb
-            //                 .subQuery()
-            //                 .select('JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION')
-            //                 .from('JOP_REQ', 'J')
-            //                 .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
-            //                 'Y', // alias for subquery
-            //                 'X.JOP_MFGNO = Y.JOP_MFGNO AND X.JOP_PONO = Y.JOP_PONO AND X.JOP_LINENO = Y.JOP_LINENO AND Y.LAST_REVISION = X.JOP_REVISION'
-            //         ),
-            //         'J', // alias for subquery
-            //         'O.PRNO = J.JOP_PONO and O.LINENO = J.JOP_LINENO and O.MFGNO = J.JOP_MFGNO'
-            // ); //  join อย่างเดียวหากอยากได้ column ไหนต้อง select เอง
 
             // หลังแยกตาราง
             query.leftJoin(
@@ -350,8 +310,6 @@ export class OrderListService {
                     ,'J',
                     'O.PRNO = J.JOP_PONO and O.LINENO = J.JOP_LINENO and O.MFGNO = J.JOP_MFGNO'
             );
-            // query.leftJoin('AMECUSERALL', 'U', 'J.JOP_MAR_REQUEST = U.SEMPNO');
-            // query.leftJoin('AMECUSERALL', 'I', 'J.JOP_PUR_CONFIRM = I.SEMPNO');
             query.leftJoin('AMECUSERALL', 'U', 'J.JOP_MAR_REQUEST = U.SEMPNO');
             query.leftJoin('AMECUSERALL', 'I', 'J.JOP_PUR_CONFIRM = I.SEMPNO');
             return query;
@@ -361,8 +319,6 @@ export class OrderListService {
 
     async getRevisionHistory(list: any[]): Promise<any[]> {
         for (const l of list) {
-          // console.log(l.JOP_MFGNO);
-          // l.REVISION = [];
           if (l.JOP_MAR_REVISION) {
             const revision = await this.JopMarReqService.getRevisionHistory(
               l.JOP_MFGNO,

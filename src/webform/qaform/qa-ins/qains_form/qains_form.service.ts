@@ -769,7 +769,7 @@ export class QainsFormService {
                 <tbody>
                     <tr>
                         <td>1</td>
-                        <td class="text-nowrap">${empInfo.SEMPPRE} ${empInfo.SNAME}</td>
+                        <td class="">${empInfo.SEMPPRE} ${empInfo.SNAME}</td>
                         <td class="text-center">${formatDate(formData.QA_OJT_DATE, 'DD-MMM-YY') ?? '-'}</td>
                         <td class="text-center">${empInfo.SEMPNO}</td>
                         <td rowspan="1">

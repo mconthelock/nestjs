@@ -311,7 +311,7 @@ export class FlowService {
 
       if (step.VREMARK) {
         remark =
-          '<button  style="background-color:#efefef; padding:3px; border:solid 1px #767676; border-radius:5px; color:#000;"  onclick="javascript:var winRem = window.open(\'' +
+          '<button type="button" style="background-color:#efefef; padding:3px; border:solid 1px #767676; border-radius:5px; color:#000;"  onclick="javascript:var winRem = window.open(\'' +
           webflow +
           'showRem.asp?uid=' +
           step.VAPVNO +

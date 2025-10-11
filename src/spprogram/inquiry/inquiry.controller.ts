@@ -52,8 +52,9 @@ export class InquiryController {
     return await this.inq.delete(searchDto);
   }
 
-  //   @Post('report')
-  //   async report(@Body() searchDto: searchDto) {
-  //     return await this.inq.report(searchDto);
-  //   }
+  @Post('update_status/:id')
+  async updatestatus(@Body() req: inqDataDto, @Param('id') id: number) {
+    await this.inq.updatestatus(id, req.header.INQ_STATUS, req.history);
+    return await this.inq.findByNumber(req.header.INQ_NO);
+  }
 }

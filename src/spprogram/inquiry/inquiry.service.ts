@@ -41,6 +41,7 @@ export class InquiryService {
         shipment: true,
         quotation: true,
         weight: true,
+        maruser: true,
       },
     });
   }
@@ -508,5 +509,30 @@ export class InquiryService {
       );
     }
     return { status: true, title: result[0] };
+  }
+
+  async updatestatus(id: number, status: number, history?: createHistoryDto) {
+    const runner = this.ds.createQueryRunner();
+    await runner.connect();
+    await runner.startTransaction();
+    try {
+      let inquiry = await runner.manager.findOne(Inquiry, {
+        where: { INQ_ID: id },
+      });
+      await runner.manager.update(
+        Inquiry,
+        { INQ_ID: id },
+        { INQ_STATUS: status },
+      );
+      if (history) {
+        await runner.manager.insert(History, history);
+      }
+      await runner.commitTransaction();
+    } catch (err) {
+      await runner.rollbackTransaction();
+      throw err;
+    } finally {
+      await runner.release();
+    }
   }
 }

@@ -331,6 +331,9 @@ export class InquiryService {
             { INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV },
             timeline,
           );
+          console.log('Update Timeline');
+          console.log({ INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV });
+          console.log(timeline);
         }
       }
       runner.manager.insert(History, history);
@@ -404,7 +407,6 @@ export class InquiryService {
         INQ_NO: newinq.INQ_NO,
         INQ_REV: newinq.INQ_REV,
         MAR_USER: newinq.INQ_MAR_PIC,
-        MAR_SEND: new Date(),
       });
       await runner.manager.save(Timeline, timeline);
       console.log('Inserted Inquiry Timeline');

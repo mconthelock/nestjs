@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { join, normalize } from 'path';
 import * as mime from 'mime-types';
 import { promises as fs } from 'fs';
+import * as contentDisposition from 'content-disposition';
 // import { existsSync, mkdirSync, renameSync } from 'fs';
 // /**
 //  * Moves a file from source to destination.
@@ -86,9 +87,10 @@ export function buildContentDisposition(
   oname: string,
   mode: 'open' | 'download',
 ) {
-  const encoded = encodeURIComponent(oname).replace(/['()]/g, escape);
+//   const encoded = encodeURIComponent(oname).replace(/['()]/g, escape);
   const type = mode === 'download' ? 'attachment' : 'inline';
-  return `${type}; filename="${oname}"; filename*=UTF-8''${encoded}`;
+//   return `${type}; filename="${oname}"; filename*=UTF-8''${encoded}`;
+return contentDisposition(oname, { type });
 }
 
 /**

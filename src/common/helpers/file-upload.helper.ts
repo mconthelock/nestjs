@@ -15,6 +15,8 @@ export function getFileUploadInterceptor(
   const storage = diskStorage({
     destination: `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`,
     filename: (req, file, cb) => {
+      // ✅ แปลงชื่อก่อนใช้งานทุกครั้ง
+      file.originalname = fixName(file.originalname);
       const uniqueName =
         Date.now() +
         '-' +
@@ -30,5 +32,13 @@ export function getFileUploadInterceptor(
     return FilesInterceptor(field, maxCount, { storage });
   } else {
     return FileInterceptor(field, { storage });
+  }
+}
+
+function fixName(name: string) {
+  try {
+    return Buffer.from(name, 'latin1').toString('utf8');
+  } catch {
+    return name;
   }
 }

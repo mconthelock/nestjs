@@ -12,4 +12,7 @@ export class UserSection {
 
   @Column()
   INCHARGE: string;
+
+  @Column()
+  SSECCODE: string;
 }

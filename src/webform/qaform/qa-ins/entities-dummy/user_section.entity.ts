@@ -14,6 +14,9 @@ export class UserSection {
   @Column()
   INCHARGE: string;
 
+  @Column()
+  SSECCODE: string;
+
   @OneToOne(() => QainsForm, (q) => q.QA_INCHARGE_SECTION_INFO)
   QAINS: QainsForm;
 }

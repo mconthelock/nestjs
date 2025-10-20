@@ -1,12 +1,15 @@
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
+//Database Configs
 import amecConfig from './common/databases/amec.config';
 import spsysConfig from './common/databases/spsys.config';
 import docinvConfig from './common/databases/docinv.config';
 import webformConfig from './common/databases/webform.config';
+import invoiceConfig from './common/databases/invoice.config';
 
-import * as winston from 'winston';
+//Winston Logger
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from './common/logger/winston.config';
 import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
@@ -16,6 +19,7 @@ import { IpLoggerMiddleware } from './middleware/ip-logger.middleware';
 import { RequestIdMiddleware } from './middleware/request-id.middleware';
 import { RequestContextMiddleware } from './middleware/request-context.middleware';
 
+//Master Modules
 import { AuthModule } from './auth/auth.module';
 import { AmecMfgModule } from './amecmfg/amecmfg.module';
 import { AmecModule } from './amec/amec.module';
@@ -34,10 +38,11 @@ import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
 import { FilesModule } from './file/file.module';
 import { MailModule } from './mail/mail.module';
 import { LoggerModule } from './logger/logger.module';
-
 import { AutomationModule } from './automation/automation.module';
-
 import { PDFModule } from './pdf/pdf.module';
+import { HradminModule } from './hradmin/hradmin.module';
+import { InvoiceModule } from './invoice/invoice.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -47,6 +52,9 @@ import { PDFModule } from './pdf/pdf.module';
     TypeOrmModule.forRootAsync(spsysConfig),
     TypeOrmModule.forRootAsync(docinvConfig),
     TypeOrmModule.forRootAsync(webformConfig),
+    TypeOrmModule.forRootAsync(invoiceConfig),
+    //Logging Config
+    WinstonModule.forRoot(winstonConfig),
     //BB8 💣
     AuthModule,
     AmecModule,
@@ -54,29 +62,25 @@ import { PDFModule } from './pdf/pdf.module';
     DocinvModule,
     gpreportModule,
     WebformModule,
-    HeaderModule,
     SpModule,
     MktModule,
+    ItemarrnglstModule,
+    HeaderModule,
+    DetailModule,
     //AS400Module,
+    AutomationModule,
+    HradminModule,
+    LoggerModule,
     //JB 🤴
     JobOrderModule,
     FilesModule,
     ESCSModule,
     PDFModule,
-    ///
     PisModule,
-    DetailModule,
-    ItemarrnglstModule,
     MailModule,
     PisModule,
     ESCSModule,
-    DetailModule,
-    ItemarrnglstModule,
-
-    //Logging Config
-    WinstonModule.forRoot(winstonConfig),
-    LoggerModule,
-    AutomationModule,
+    InvoiceModule,
   ],
   providers: [HttpLoggingInterceptor],
 })

@@ -77,6 +77,7 @@ export class ESCSUserService {
       }
     });
     query.leftJoin('AMECUSERALL', 'B', 'A.USR_NO = B.SEMPNO');
+    query.where('B.CSTATUS = 1');
     query.orderBy('A.USR_NO', 'ASC');
     return query.getRawMany();
   }

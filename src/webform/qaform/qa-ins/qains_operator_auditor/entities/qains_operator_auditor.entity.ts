@@ -1,4 +1,12 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, OneToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToOne,
+  OneToMany,
+} from 'typeorm';
 import { QainsForm } from '../../qains_form/entities/qains_form.entity';
 import { QaType } from 'src/webform/qaform/qa_type/entities/qa_type.entity';
 import { User } from '../../entities-dummy/user.entity';
@@ -36,14 +44,14 @@ export class QainsOA {
 
   @Column()
   QOA_RESULT: number;
-  
-  @Column({
-  type: 'number',      // สำหรับ Oracle
-  precision: 5,        // เช่น 999.99 = 5 หลัก
-  scale: 2,            // เก็บทศนิยม 2 ตำแหน่ง
-})
+
+  @Column('decimal', {
+    // สำหรับ Oracle
+    precision: 5, // เช่น 999.99 = 5 หลัก
+    scale: 2, // เก็บทศนิยม 2 ตำแหน่ง
+  })
   QOA_PERCENT: number;
-  
+
   @Column()
   QOA_SCORE: number;
 

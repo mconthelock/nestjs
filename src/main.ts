@@ -24,7 +24,7 @@ async function bootstrap() {
   await fs.mkdir(uploadPath, { recursive: true });
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     // logger: WinstonModule.createLogger(winstonConfig),
-    // logger: false,
+    logger: false,
   });
 
   //   app.enableCors({
@@ -58,8 +58,11 @@ async function bootstrap() {
           host.endsWith('.mitsubishielevatorasia.co.th') ||
           host === 'localhost' ||
           host === '127.0.0.1'
-        )
+        ) {
+          console.log('Pass');
+
           return cb(null, true);
+        }
       } catch {}
       cb(new Error('HTTP CORS blocked'), false);
     },

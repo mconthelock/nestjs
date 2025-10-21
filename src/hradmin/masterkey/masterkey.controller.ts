@@ -32,7 +32,7 @@ export class MasterkeyController {
       throw new UnauthorizedException('You nave no authorization 2');
 
     //Create Cookie for JWT Guards
-    response.cookie(`hrmaster`, isValid, {
+    response.cookie(`hrmaster`, this.keys.encrypt(isValid), {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
     });

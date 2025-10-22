@@ -7,12 +7,11 @@ import { UsersService } from '../amec/users/users.service';
 
 const cookieExtractor = (req: Request): string | null => {
   let token = null;
-  console.log(req.rawHeaders);
-
   if (req && req.cookies) {
     token = req.cookies[process.env.JWT_COOKIE_NAME];
   }
-  console.log('Token extracted from cookie:', token);
+  //console.log(req.rawHeaders);
+  //console.log('Token extracted from cookie:', token);
   return token;
 };
 

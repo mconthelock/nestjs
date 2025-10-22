@@ -68,8 +68,11 @@ export class MasterkeyService {
       where: { KEY_OWNER: user },
     });
     const pinCode = this.decrypt(decryptedPin[0].KEY_CODE);
-    if (pinCode.split(':')[1] == pin) {
-      return `${pinCode.split(':')[0]}:${pinCode.split(':')[1]}`;
+    const pinnumber = pinCode.split(':')[1];
+    if (pinnumber == pin) {
+      const pinUser = pinCode.split(':')[0];
+      const pinKey = pinCode.split(':')[2];
+      return `${pinUser}:${pinnumber}:${pinKey}`;
     }
     return false;
   }

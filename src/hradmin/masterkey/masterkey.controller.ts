@@ -24,6 +24,10 @@ export class MasterkeyController {
     @Body() body: { pin: string },
     @Res({ passthrough: true }) response: Response,
   ) {
+    const key1 =
+      'SYSTEM:000000:6C6574207468656D206561742063616B65:11002525:hradmin:HRrb,rN.sPj';
+    console.log(this.keys.encrypt(key1));
+
     const { users, group, apps } = req.user.user;
     if (!(group === 2 && apps === 20))
       throw new UnauthorizedException('You nave no authorization 1');
@@ -36,6 +40,22 @@ export class MasterkeyController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
     });
+    return;
+  }
+
+  @Post('create')
+  create() {
+    const key1 =
+      'SYSTEM:000000:6C6574207468656D206561742063616B65:11002525:hradmin:HRrb,rN.sPj';
+    console.log(this.keys.encrypt(key1));
+    return;
+  }
+
+  @Post('update')
+  update() {
+    const key1 =
+      'SYSTEM:000000:6C6574207468656D206561742063616B65:11002525:hradmin:HRrb,rN.sPj';
+    console.log(this.keys.encrypt(key1));
     return;
   }
 }

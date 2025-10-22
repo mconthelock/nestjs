@@ -1,7 +1,7 @@
 import { Masterkey } from './entities/masterkey.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -61,5 +61,16 @@ export class MasterkeyService {
     let decrypted = decipher.update(encryptedBuffer);
     decrypted = Buffer.concat([decrypted, decipher.final()]);
     return decrypted.toString();
+  }
+
+  async verify(user: string, pin: string) {
+    const decryptedPin = await this.masterkeyRepository.find({
+      where: { KEY_OWNER: user },
+    });
+    const pinCode = this.decrypt(decryptedPin[0].KEY_CODE);
+    if (pinCode.split(':')[1] == pin) {
+      return `${pinCode.split(':')[0]}:${pinCode.split(':')[1]}`;
+    }
+    return false;
   }
 }

@@ -7,7 +7,6 @@ import { ApplicationService } from '../application/application.service';
 import { AppsgroupsService } from '../appsgroups/appsgroups.service';
 import { AccesslogService } from '../accesslog/accesslog.service';
 import { Appsuser } from './entities/appsuser.entity';
-
 import { CreateAppsuserDto } from './dto/create-appsuser.dto';
 
 interface logData {
@@ -55,7 +54,7 @@ export class AppsusersService {
   async getAllUserApp(id: number) {
     return this.appuser.find({
       where: { PROGRAM: id },
-      relations: ['appsgroups'],
+      relations: ['appsgroups', 'employee'],
       order: { USERS_GROUP: 'asc' },
     });
   }

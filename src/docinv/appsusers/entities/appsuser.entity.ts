@@ -1,6 +1,7 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Appsgroup } from '../../appsgroups/entities/appsgroup.entity';
 import { Application } from '../../application/entities/application.entity';
+import { User } from '../../../amec/users/entities/user.entity';
 
 @Entity('APP_USERS')
 export class Appsuser {
@@ -35,4 +36,8 @@ export class Appsuser {
     { name: 'PROGRAM', referencedColumnName: 'PROGRAM' },
   ])
   appsgroups: Appsgroup;
+
+  @ManyToOne(() => User, (u) => u.appemp)
+  @JoinColumn([{ name: 'USERS_ID', referencedColumnName: 'SEMPNO' }])
+  employee: User;
 }

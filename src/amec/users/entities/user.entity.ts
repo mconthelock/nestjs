@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Form } from '../../../webform/form/entities/form.entity';
+import { Appsuser } from '../../../docinv/appsusers/entities/appsuser.entity';
 import { Workpic } from '../../../docinv/workpic/entities/workpic.entity';
 import { SetRequestDate } from 'src/joborder/set-request-date/entities/set-request-date.entity';
 import { JopMarReq } from 'src/joborder/jop-mar-req/entities/jop-mar-req.entity';
@@ -85,10 +86,16 @@ export class User {
   @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'VINPUTER' })
   creator: User;
 
+  //Docinv
   @OneToOne(() => Workpic, (dev) => dev.developer)
   @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'PIC_ID' })
   dev: Workpic;
 
+  @OneToOne(() => Appsuser, (emp) => emp.employee)
+  @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'USERS_ID' })
+  appemp: Workpic;
+
+  //Joborder
   @OneToMany(() => SetRequestDate, (req) => req.JOP_MAR_REQUEST)
   marRequest: SetRequestDate[];
 

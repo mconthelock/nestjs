@@ -151,7 +151,6 @@ export class FormService {
         await this.setOrganize(context, runner);
         //   flowMaster.forEach(async (row: any) => {
         for (const row of flowMaster) {
-
           switch (row.CTYPE) {
             case '1':
               await this.addFlow1(row, context, runner);
@@ -255,7 +254,6 @@ export class FormService {
   }
 
   async setFormValue(context: FormContext, queryRunner: QueryRunner) {
-
     const condition = {
       NNO: context.nfrmno,
       VORGNO: context.vorgno,
@@ -698,9 +696,13 @@ export class FormService {
     });
     if (frmmst.length > 0) {
       const frmmstDetail = frmmst[0];
+      let slash = '';
+      if (!frmmstDetail.VFORMPAGE.startsWith('/')) {
+        slash = '/';
+      }
       link = frmmstDetail.VFORMPAGE.includes('amecweb')
         ? frmmstDetail.VFORMPAGE
-        : `${process.env.APP_WEBFLOW}/${frmmstDetail.VFORMPAGE}`;
+        : `${process.env.APP_WEBFLOW}${slash}${frmmstDetail.VFORMPAGE}`;
       link += `?no=${form.NFRMNO}&orgNo=${form.VORGNO}&y=${form.CYEAR}&y2=${form.CYEAR2}&runNo=${form.NRUNNO}&empno=`;
     }
     return link;
@@ -719,5 +721,67 @@ export class FormService {
     }
     const flow = await this.flowService.getEmpFlowStepReady(form);
     return flow.length > 0 ? this.mode_edit : this.mode_view;
+  }
+
+  /**
+   * Get request number from form data
+   * @param string $reqNo e.g. ST-INP24-000001
+   */
+  async getRequestNo(reqNo: string) {
+    const form = await this.crackRequestNo(reqNo);
+    const res  = {status: 0, data: []}
+    if (form.length > 0) {
+      for (const f of form) {
+        const formData = await this.getFormData(f);
+        if (formData) {
+            formData.LINK = await this.createLink(f);
+            res.status = 1;
+            res.data.push(formData);
+        }
+      }
+    }
+    return res;
+  }
+
+  async getFormData(form: FormDto, queryRunner?: QueryRunner) {
+    const repo = queryRunner ? queryRunner.manager : this.dataSource;
+    return await repo
+      .createQueryBuilder()
+      .select(
+        "C.VANAME || SUBSTR(F.CYEAR2,3,2) || '-' || LPAD(F.NRUNNO , 6, '0') AS FORMNO, F.*, A.SNAME AS VREQNAME, B.SNAME AS VINPUTNAME",
+      )
+      .from('FORM', 'F')
+      .innerJoin('AMECUSERALL', 'A', 'A.SEMPNO = F.VREQNO')
+      .innerJoin('AMECUSERALL', 'B', 'B.SEMPNO = F.VINPUTER')
+      .innerJoin(
+        'FORMMST',
+        'C',
+        'C.NNO = F.NFRMNO AND C.VORGNO = F.VORGNO AND C.CYEAR = F.CYEAR',
+      )
+      .where('F.NFRMNO = :NFRMNO', { NFRMNO: form.NFRMNO })
+      .andWhere('F.VORGNO = :VORGNO', { VORGNO: form.VORGNO })
+      .andWhere('F.CYEAR = :CYEAR', { CYEAR: form.CYEAR })
+      .andWhere('F.CYEAR2 = :CYEAR2', { CYEAR2: form.CYEAR2 })
+      .andWhere('F.NRUNNO = :NRUNNO', { NRUNNO: form.NRUNNO })
+      .getRawOne();
+  }
+
+  async crackRequestNo(reqNo: string) {
+    const split = reqNo.split('-');
+    const vaname = split[0] + '-' + split[1].replace(/[0-9]/g, '');
+    const formMst = await this.formmstService.getFormMasterByVanameAll(vaname);
+    var res = [];
+    if (formMst) {
+      formMst.forEach((f) => {
+        res.push({
+          NFRMNO: f.NNO,
+          VORGNO: f.VORGNO,
+          CYEAR: f.CYEAR,
+          CYEAR2: '20' + split[1].replace(/[a-zA-Z]/g, ''),
+          NRUNNO: parseInt(split[2]),
+        });
+      });
+    }
+    return res;
   }
 }

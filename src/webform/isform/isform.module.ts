@@ -7,8 +7,9 @@ import { IsForm4Module } from './is-form4/is-form4.module';
 import { Form1ObjectiveModule } from './form1-objective/form1-objective.module';
 import { Form1WageModule } from './form1-wage/form1-wage.module';
 import { CrdevicemstModule } from './crdevicemst/crdevicemst.module';
+import { IsTidModule } from './is-tid/is-tid.module';
 
 @Module({
-  imports: [IsDevModule, IsForm3Module, IsMoModule, IsForm1Module, IsForm4Module, Form1ObjectiveModule, Form1WageModule, CrdevicemstModule],
+  imports: [IsDevModule, IsForm3Module, IsMoModule, IsForm1Module, IsForm4Module, Form1ObjectiveModule, Form1WageModule, CrdevicemstModule, IsTidModule],
 })
 export class ISFormModule {}

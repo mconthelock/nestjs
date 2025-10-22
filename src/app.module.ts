@@ -42,6 +42,8 @@ import { AutomationModule } from './automation/automation.module';
 import { PDFModule } from './pdf/pdf.module';
 import { HradminModule } from './hradmin/hradmin.module';
 import { InvoiceModule } from './invoice/invoice.module';
+import { SpecialuserModule } from './itgc/specialuser/specialuser.module';
+import auditConfig from './common/databases/auditDB.config';
 
 @Module({
   imports: [
@@ -53,6 +55,7 @@ import { InvoiceModule } from './invoice/invoice.module';
     TypeOrmModule.forRootAsync(docinvConfig),
     TypeOrmModule.forRootAsync(webformConfig),
     TypeOrmModule.forRootAsync(invoiceConfig),
+    TypeOrmModule.forRootAsync(auditConfig),
     //Logging Config
     WinstonModule.forRoot(winstonConfig),
     //BB8 💣
@@ -81,6 +84,7 @@ import { InvoiceModule } from './invoice/invoice.module';
     PisModule,
     ESCSModule,
     InvoiceModule,
+    SpecialuserModule,
   ],
   providers: [HttpLoggingInterceptor],
 })

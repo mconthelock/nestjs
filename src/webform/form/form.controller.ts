@@ -133,4 +133,9 @@ export class FormController {
   async getMode(@Body() form: empnoFormDto){
     return this.formService.getMode(form);
   }
+
+  @Post('getRequestNo')
+  async getRequestNo(@Body('reqNo') reqNo: string){
+    return this.formService.getRequestNo(reqNo);
+  }
 }

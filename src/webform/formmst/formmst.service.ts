@@ -29,6 +29,12 @@ export class FormmstService {
     });
   }
 
+  getFormMasterByVanameAll(vaname: string){
+    return this.formmstRepo.find({
+      where: { VANAME: vaname },
+    });
+  }
+
   async getFormmst(searchDto: SearchFormmstDto, queryRunner?: QueryRunner) {
     const repo = queryRunner ? queryRunner.manager.getRepository(Formmst) : this.formmstRepo;
     const { NNO, VORGNO, CYEAR, VANAME, fields = [] } = searchDto;

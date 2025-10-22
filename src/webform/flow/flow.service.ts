@@ -276,7 +276,7 @@ export class FlowService {
       '',
     ];
     let html = `
-    <div style="display:flex; overflow:scroll;">
+    <div style="display:flex; overflow:auto;">
         <div style="margin-left:auto; margin-right:auto;">
         <table style="width: 100%; padding:15px; border:solid 1px #000;  margin-left: auto; margin-right: auto; border-collapse: collapse;font-size: 0.8rem;">
             <thead style="background: #aaccee; color: #323232;">

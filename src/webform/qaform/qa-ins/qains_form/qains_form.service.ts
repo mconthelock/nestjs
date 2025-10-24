@@ -33,7 +33,11 @@ import { UpdateQainsFormDto } from './dto/update-qains_form.dto';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 
 import { formatDate, now } from 'src/common/utils/dayjs.utils';
-import { ReturnQainsFormDto } from './dto/return-qains_form.dot';
+import {
+  ReturnQainsFormDto,
+  setInchargeQainsFormDto,
+} from './dto/return-qains_form.dot';
+import { ESCSUserSectionService } from 'src/escs/user_section/user_section.service';
 
 @Injectable()
 export class QainsFormService {
@@ -58,6 +62,7 @@ export class QainsFormService {
     private readonly PDFService: PDFService,
     private readonly escsUserFileService: ESCSUserFileService,
     private readonly escsUserAuthorizeService: ESCSUserAuthorizeService,
+    private readonly escsUserSectionService: ESCSUserSectionService,
   ) {}
 
   async createQainsForm(
@@ -97,44 +102,71 @@ export class QainsFormService {
         NRUNNO: createForm.data.NRUNNO,
       };
 
-      // update flow incharge1
-      const condIncharge1 = {
-        condition: {
-          ...form,
-          CEXTDATA: '01',
-        },
-        VAPVNO: dto.QA_INCHARGE_EMPNO,
-        VREPNO: dto.QA_INCHARGE_EMPNO,
-      };
-      this.flowService.updateFlow(condIncharge1, queryRunner);
+      //   // update flow incharge1
+      //   const condIncharge1 = {
+      //     condition: {
+      //       ...form,
+      //       CEXTDATA: '01',
+      //     },
+      //     VAPVNO: dto.QA_INCHARGE_EMPNO,
+      //     VREPNO: dto.QA_INCHARGE_EMPNO,
+      //   };
+      //   this.flowService.updateFlow(condIncharge1, queryRunner);
 
-      // update flow incharge2
-      const condIncharge2 = {
-        condition: {
-          ...form,
-          CEXTDATA: '02',
-        },
-        VAPVNO: dto.QA_INCHARGE_EMPNO,
-        VREPNO: dto.QA_INCHARGE_EMPNO,
+      //   // update flow incharge2
+      //   const condIncharge2 = {
+      //     condition: {
+      //       ...form,
+      //       CEXTDATA: '02',
+      //     },
+      //     VAPVNO: dto.QA_INCHARGE_EMPNO,
+      //     VREPNO: dto.QA_INCHARGE_EMPNO,
+      //   };
+      //   this.flowService.updateFlow(condIncharge2, queryRunner);
+
+      const condSetFlow = {
+        ...form,
+        CEXTDATA: '00',
       };
-      this.flowService.updateFlow(condIncharge2, queryRunner);
+      // update flow qc sem
+      const secData = await this.escsUserSectionService.getUserSecByID(
+        dto.QA_INCHARGE_SECTION,
+      );
+      const qcsem = await this.orgposService.getOrgPos(
+        {
+          VPOSNO: '30',
+          VORGNO: secData.SSECCODE,
+        },
+        queryRunner,
+      );
+      if (qcsem.length > 0) {
+        await this.setFlow(
+          condSetFlow,
+          qcsem[0].VEMPNO,
+          qcsem[0].VEMPNO,
+          queryRunner,
+        );
+        await this.setFlow(
+          { ...condSetFlow, CEXTDATA: '06' },
+          qcsem[0].VEMPNO,
+          qcsem[0].VEMPNO,
+          queryRunner,
+        );
+      }
 
       // update flow req foreman
-      const condForeman = {
-        condition: {
-          ...form,
-          CEXTDATA: '03',
-        },
-        VAPVNO: dto.REQUESTER,
-        VREPNO: dto.REQUESTER,
-      };
-      this.flowService.updateFlow(condForeman, queryRunner);
+      await this.setFlow(
+        { ...condSetFlow, CEXTDATA: '03' },
+        dto.REQUESTER,
+        dto.REQUESTER,
+        queryRunner,
+      );
 
       await queryRunner.manager.save(QainsForm, {
         ...form,
         QA_ITEM: dto.QA_ITEM,
         QA_INCHARGE_SECTION: dto.QA_INCHARGE_SECTION,
-        QA_INCHARGE_EMPNO: dto.QA_INCHARGE_EMPNO,
+        // QA_INCHARGE_EMPNO: dto.QA_INCHARGE_EMPNO,
       });
 
       for (const e of dto.OPERATOR) {
@@ -177,6 +209,84 @@ export class QainsFormService {
         ...movedTargets.map((p) => deleteFile(p)), // - ลบไฟล์ที่ "ปลายทาง" ทั้งหมดที่ย้ายสำเร็จไปแล้ว (กัน orphan file)
         ...files.map((f) => deleteFile(f.path)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
       ]);
+      return { status: false, message: 'Error: ' + error.message };
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async setFlow(
+    condition: any,
+    apv: string,
+    rep: string,
+    queryRunner?: QueryRunner,
+  ) {
+    const cond = {
+      condition: condition,
+      VAPVNO: apv,
+      VREPNO: rep,
+    };
+    await this.flowService.updateFlow(cond, queryRunner);
+  }
+
+  async setIncharge(dto: setInchargeQainsFormDto, ip: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      const form: FormDto = {
+        NFRMNO: dto.NFRMNO,
+        VORGNO: dto.VORGNO,
+        CYEAR: dto.CYEAR,
+        CYEAR2: dto.CYEAR2,
+        NRUNNO: dto.NRUNNO,
+      };
+
+      // update flow incharge1
+      const condSetFlow = {
+        ...form,
+        CEXTDATA: '01',
+      };
+      await this.setFlow(
+        condSetFlow,
+        dto.QA_INCHARGE_EMPNO,
+        dto.QA_INCHARGE_EMPNO,
+        queryRunner,
+      );
+      // update flow incharge2
+      await this.setFlow(
+        { ...condSetFlow, CEXTDATA: '02' },
+        dto.QA_INCHARGE_EMPNO,
+        dto.QA_INCHARGE_EMPNO,
+        queryRunner,
+      );
+
+      // update ojt date and training date
+      await this.update(
+        {
+          ...form,
+          QA_INCHARGE_EMPNO: dto.QA_INCHARGE_EMPNO,
+        },
+        queryRunner,
+      );
+
+      await queryRunner.commitTransaction();
+
+      // do action
+      await this.flowService.doAction(
+        { ...form, REMARK: dto.REMARK, ACTION: dto.ACTION, EMPNO: dto.EMPNO },
+        ip,
+        queryRunner,
+      );
+
+      return {
+        status: true,
+        message: 'Set incharge successful',
+        data: dto,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+
       return { status: false, message: 'Error: ' + error.message };
     } finally {
       await queryRunner.release();
@@ -312,12 +422,41 @@ export class QainsFormService {
           queryRunner,
         );
       }
+      // update flow qc sem
+      const condSetFlow = {
+        ...form,
+        CEXTDATA: '00',
+      };
+      const secData = await this.escsUserSectionService.getUserSecByID(
+        dto.QA_INCHARGE_SECTION,
+      );
+      const qcsem = await this.orgposService.getOrgPos(
+        {
+          VPOSNO: '30',
+          VORGNO: secData.SSECCODE,
+        },
+        queryRunner,
+      );
+      if (qcsem.length > 0) {
+        await this.setFlow(
+          condSetFlow,
+          qcsem[0].VEMPNO,
+          qcsem[0].VEMPNO,
+          queryRunner,
+        );
+        await this.setFlow(
+          { ...condSetFlow, CEXTDATA: '06' },
+          qcsem[0].VEMPNO,
+          qcsem[0].VEMPNO,
+          queryRunner,
+        );
+      }
 
       await queryRunner.manager.save(QainsForm, {
         ...form,
         QA_ITEM: dto.QA_ITEM,
         QA_INCHARGE_SECTION: dto.QA_INCHARGE_SECTION,
-        QA_INCHARGE_EMPNO: dto.QA_INCHARGE_EMPNO,
+        // QA_INCHARGE_EMPNO: dto.QA_INCHARGE_EMPNO,
       });
 
       const formNo = await this.formService.getFormno(form); // Get the form number
@@ -338,7 +477,6 @@ export class QainsFormService {
         );
       }
 
-      
       // do action
       await this.flowService.doAction(
         { ...form, REMARK: dto.REMARK, ACTION: dto.ACTION, EMPNO: dto.EMPNO },
@@ -371,22 +509,26 @@ export class QainsFormService {
         CYEAR2: dto.CYEAR2,
         NRUNNO: dto.NRUNNO,
       };
+      var fr = dto.QCFOREMAN;
+      var ld = dto.QCLEADER;
+      if (!fr) {
+        fr = ld;
+      } else if (!ld) {
+        ld = fr;
+      }
       // update flow qc foreman
       const condForeman = {
         condition: {
           ...form,
           CEXTDATA: '05',
         },
-        VAPVNO: dto.QCFOREMAN,
-        VREPNO: dto.QCFOREMAN,
+        VAPVNO: fr,
+        VREPNO: ld,
       };
-      this.flowService.updateFlow(condForeman, queryRunner);
+      await this.flowService.updateFlow(condForeman, queryRunner);
 
       // update flow qc sem
-      const foreman = await this.usersService.findEmp(
-        dto.QCFOREMAN,
-        queryRunner,
-      );
+      const foreman = await this.usersService.findEmp(fr, queryRunner);
       const qcsem = await this.orgposService.getOrgPos(
         {
           VPOSNO: '30',
@@ -403,7 +545,7 @@ export class QainsFormService {
           VAPVNO: qcsem[0].VEMPNO,
           VREPNO: qcsem[0].VEMPNO,
         };
-        this.flowService.updateFlow(condSem, queryRunner);
+        await this.flowService.updateFlow(condSem, queryRunner);
       }
       // update ojt date and training date
       await this.update(
@@ -620,17 +762,17 @@ export class QainsFormService {
           );
 
           // add user file in escs
-          const id = await this.escsUserFileService.newId({
-            UF_ITEM: formData.QA_ITEM,
-            UF_STATION: 0,
-            UF_USR_NO: p.QOA_EMPNO,
-          });
+          //   const id = await this.escsUserFileService.newId({
+          //     UF_ITEM: formData.QA_ITEM,
+          //     UF_STATION: 0,
+          //     UF_USR_NO: p.QOA_EMPNO,
+          //   });
           await this.escsUserFileService.addUserFile(
             {
               UF_ITEM: formData.QA_ITEM,
               UF_STATION: 0,
               UF_USR_NO: p.QOA_EMPNO,
-              UF_ID: id,
+              //   UF_ID: id,
               UF_ONAME: `${formData.QA_ITEM}_authorize.pdf`,
               UF_FNAME: fileName,
               UF_PATH: filePath,
@@ -680,6 +822,53 @@ export class QainsFormService {
                 {
                   UA_ITEM: formData.QA_ITEM,
                   UA_STATION: s.stationNo,
+                  UA_USR_NO: p.QOA_EMPNO,
+                  UA_SCORE: p.QOA_SCORE,
+                  UA_GRADE: p.QOA_GRADE,
+                  UA_PERCENT: p.QOA_PERCENT,
+                  UA_TOTAL: formData.QA_REV_INFO.ARR_TOTAL,
+                  UA_REV: formData.QA_REV,
+                  UA_TEST_BY: formData.QA_INCHARGE_EMPNO,
+                  UA_TEST_DATE: formData.QA_OJT_DATE,
+                },
+                queryRunner,
+              );
+            }
+          }
+        }
+      }
+
+      // not pass
+      if (notPass.length > 0) {
+        for (const p of notPass) {
+            // insert authorize score
+          await this.escsUserAuthorizeService.addUserAuth(
+            {
+              UA_ITEM: formData.QA_ITEM,
+              UA_STATION: 0,
+              UA_USR_NO: p.QOA_EMPNO,
+              UA_SCORE: p.QOA_SCORE,
+              UA_GRADE: p.QOA_GRADE,
+              UA_PERCENT: p.QOA_PERCENT,
+              UA_TOTAL: formData.QA_REV_INFO.ARR_TOTAL,
+              UA_REV: formData.QA_REV,
+              UA_TEST_BY: formData.QA_INCHARGE_EMPNO,
+              UA_TEST_DATE: formData.QA_OJT_DATE,
+            },
+            queryRunner,
+          );
+          const stationList = [];
+
+          // add user item station in escs
+          if (p.QOA_STATION) {
+            const station = p.QOA_STATION.split('|');
+            for (const s of station) {
+              const stationNo = parseInt(s);
+              // insert authorize score
+              await this.escsUserAuthorizeService.addUserAuth(
+                {
+                  UA_ITEM: formData.QA_ITEM,
+                  UA_STATION: stationNo,
                   UA_USR_NO: p.QOA_EMPNO,
                   UA_SCORE: p.QOA_SCORE,
                   UA_GRADE: p.QOA_GRADE,
@@ -972,7 +1161,7 @@ export class QainsFormService {
             <span class="block text-sm font-bold w-full text-center mt-5"> QA_QP-K002-C (5 OF 6)</span>
         </body>
     </html>`;
-    this.PDFService.generatePDF({
+    await this.PDFService.generatePDF({
       html: html,
       options: {
         path: await joinPaths(savePath, fileName),

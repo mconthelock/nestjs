@@ -140,13 +140,13 @@ export class FlowService {
       const runner = queryRunner || localRunner!;
       const { condition, ...data } = dto;
 
-      if (data.VREPNO) {
+      if (data.VAPVNO && !data.VREPNO) {
         data.VREPNO = await this.repService.getRepresent(
           {
             NFRMNO: condition.NFRMNO,
             VORGNO: condition.VORGNO,
             CYEAR: condition.CYEAR,
-            VEMPNO: data.VREPNO,
+            VEMPNO: data.VAPVNO,
           },
           runner,
         );

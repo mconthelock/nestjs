@@ -21,6 +21,7 @@ import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper'
 export class QainsAuditController {
   constructor(private readonly qainsAuditService: QainsAuditService) {}
   private readonly path = `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/QA/QAINS/`;
+  
   @Post('saveAudit')
   @UseInterceptors(getFileUploadInterceptor('files', true, 20))
   async saveAudit(

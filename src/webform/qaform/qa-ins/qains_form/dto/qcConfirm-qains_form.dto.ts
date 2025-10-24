@@ -29,9 +29,13 @@ export class QcConfQainsFormDto extends PickType(doactionFlowDto, [
   @IsString()
   OJTDATE: string;
   
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  QCFOREMAN: string;
+  QCFOREMAN?: string;
+
+  @IsOptional()
+  @IsString()
+  QCLEADER?: string;
 
   @IsNotEmpty()
   @Type(() => Number)

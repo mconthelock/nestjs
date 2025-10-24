@@ -15,10 +15,10 @@ export class ESCSCreateUserFileDto {
   @IsString()
   UF_USR_NO: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  UF_ID: number;
+  UF_ID?: number;
 
   @IsNotEmpty()
   @IsString()

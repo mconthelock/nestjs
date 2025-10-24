@@ -20,9 +20,9 @@ export class ReturnQainsFormDto extends PartialType(doactionFlowDto) {
   @IsNumber()
   QA_INCHARGE_SECTION: number;
 
-  @IsNotEmpty()
-  @IsString()
-  QA_INCHARGE_EMPNO: string;
+//   @IsNotEmpty()
+//   @IsString()
+//   QA_INCHARGE_EMPNO: string;
 
   @IsNotEmpty()
   @Transform(
@@ -31,4 +31,10 @@ export class ReturnQainsFormDto extends PartialType(doactionFlowDto) {
   @IsArray()
   @IsString({ each: true })
   OPERATOR: string[];
+}
+
+export class setInchargeQainsFormDto extends PartialType(doactionFlowDto) {
+    @IsNotEmpty()
+    @IsString()
+    QA_INCHARGE_EMPNO: string;
 }

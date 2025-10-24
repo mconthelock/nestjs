@@ -8,5 +8,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [TypeOrmModule.forFeature([UserSection], 'amecConnection')],
   controllers: [ESCSUserSectionController],
   providers: [ESCSUserSectionService],
+  exports: [ESCSUserSectionService],
 })
 export class ESCSUserSectionModule {}

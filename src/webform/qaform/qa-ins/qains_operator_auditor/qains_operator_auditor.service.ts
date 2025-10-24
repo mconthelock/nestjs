@@ -5,6 +5,7 @@ import { CreateQainsOADto } from './dto/create-qains_operator_auditor.dto';
 import { SearchQainsOADto } from './dto/search-qains_operator_auditor.dto';
 import { UpdateQainsOADto } from './dto/update-qains_operator_auditor.dto';
 import { QainsOA } from './entities/qains_operator_auditor.entity';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Injectable()
 export class QainsOAService {
@@ -193,4 +194,20 @@ export class QainsOAService {
       if (localRunner && didConnect) await localRunner.release();
     }
   }
+
+  async checkAuditSuccess(dto: FormDto, queryRunner?: QueryRunner) {
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(QainsOA)
+      : this.qainsOARepo;
+    const count = await repo.createQueryBuilder('A')
+    .select("CASE WHEN SUM(CASE WHEN QOA_AUDIT = 1 THEN 1 ELSE 0 END) = COUNT(*) THEN 1 ELSE 0 END AS RES")
+    .where("A.NFRMNO = :NFRMNO", { NFRMNO: dto.NFRMNO })
+    .andWhere("A.VORGNO = :VORGNO", { VORGNO: dto.VORGNO })
+    .andWhere("A.CYEAR = :CYEAR", { CYEAR: dto.CYEAR })
+    .andWhere("A.CYEAR2 = :CYEAR2", { CYEAR2: dto.CYEAR2 })
+    .andWhere("A.NRUNNO = :NRUNNO", { NRUNNO: dto.NRUNNO })
+    .andWhere("A.QOA_TYPECODE = :QOA_TYPECODE", { QOA_TYPECODE: 'ESO' })
+    .getRawOne();
+    return count.RES;
+}
 }

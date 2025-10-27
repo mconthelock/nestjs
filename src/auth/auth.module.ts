@@ -2,8 +2,11 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigService, ConfigModule } from '@nestjs/config';
-import { JwtStrategy } from './jwt.strategy';
+
 import { LocalStrategy } from './local.strategy';
+import { JwtStrategy } from './jwt.strategy';
+import { KeyStrategy } from './key.strategy';
+
 import { UsersModule } from '../amec/users/users.module';
 import { AppsusersModule } from '../docinv/appsusers/appsusers.module';
 import { AppsmenuusersModule } from '../docinv/appsmenuusers/appsmenuusers.module';
@@ -28,8 +31,8 @@ import { AuthService } from './auth.service';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, JwtStrategy, LocalStrategy],
+  providers: [AuthService, JwtStrategy, LocalStrategy, KeyStrategy],
   controllers: [AuthController],
-  //exports: [AuthService],
+  exports: [JwtModule],
 })
 export class AuthModule {}

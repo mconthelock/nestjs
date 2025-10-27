@@ -8,7 +8,7 @@ import { DatabaseService } from '../shared/database.service';
 import * as oracledb from 'oracledb';
 
 @Injectable()
-export class TwidocService {
+export class PromoteService {
   constructor(private dbService: DatabaseService) {}
 
   async findAll(credentials: any, body: any) {
@@ -24,13 +24,13 @@ export class TwidocService {
 
       const result = await conn.execute(
         `DECLARE v_cursor SYS_REFCURSOR;
-        BEGIN
-            TWI50(:KEYVALUE, :NYEAR, :EMTYPE, v_cursor);
-            :result := v_cursor;
-        END;`,
+          BEGIN
+              PROMOTE(:KEYVALUE, :EFFDATE, :EMTYPE, v_cursor);
+              :result := v_cursor;
+          END;`,
         {
           KEYVALUE: passkey,
-          NYEAR: body.year,
+          EFFDATE: body.period,
           EMTYPE: body.type,
           result: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
         },
@@ -66,14 +66,14 @@ export class TwidocService {
         await this.dbService.getHrAdminCredentials(credentials);
       const result = await conn.execute(
         `DECLARE v_cursor SYS_REFCURSOR;
-        BEGIN
-            TWIEMPLOYEE(:KEYVALUE, :NYEAR, :EMPID, v_cursor);
-            :result := v_cursor;
-        END;`,
+          BEGIN
+              PROMOTEEMPLOYEE(:KEYVALUE, :EFFDATE, :EMPNO, v_cursor);
+              :result := v_cursor;
+          END;`,
         {
           KEYVALUE: passkey,
-          NYEAR: body.year,
-          EMPID: body.empno,
+          EFFDATE: body.period,
+          EMPNO: body.empno,
           result: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
         },
         { outFormat: oracledb.OUT_FORMAT_OBJECT },
@@ -82,41 +82,6 @@ export class TwidocService {
       const rows = await resultSet.getRow();
       await resultSet.close();
       return rows;
-    } catch (error) {
-      console.error('Error fetching Twi 50 data:', error);
-      throw new InternalServerErrorException('Failed to fetch Twi 50 data.');
-    } finally {
-      await this.dbService.closeConnection(hrAdminDataSource, conn);
-    }
-  }
-
-  async adjust(credentials: any, body: any) {
-    let hrAdminDataSource: DataSource;
-    let conn: oracledb.Connection;
-    try {
-      const connection = await this.dbService.createConnection(credentials);
-      hrAdminDataSource = connection.hrAdminDataSource;
-      conn = connection.conn;
-
-      // Add your query logic here
-      const { admin } = await this.dbService.getHrAdminCredentials(credentials);
-      const result = await conn.execute(
-        `UPDATE MHEPAYTWI
-          SET TWIADDINCOME = :income, TWIADDTAX= :tax, TWIADDUSER = :admin, TWIADDUPDATE = SYSDATE
-          WHERE TWIEMPCOD = :empno AND TWIYEAR = :year`,
-        {
-          empno: body.empno,
-          year: body.year,
-          income: body.income,
-          tax: body.tax,
-          admin: admin,
-        },
-        {
-          autoCommit: true,
-        },
-      );
-      return result;
-      //   return null;
     } catch (error) {
       console.error('Error fetching Twi 50 data:', error);
       throw new InternalServerErrorException('Failed to fetch Twi 50 data.');

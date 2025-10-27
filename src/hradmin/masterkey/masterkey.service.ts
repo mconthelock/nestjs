@@ -2,6 +2,7 @@ import { Masterkey } from './entities/masterkey.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class MasterkeyService {
   constructor(
     @InjectRepository(Masterkey, 'amecConnection')
     private readonly masterkeyRepository: Repository<Masterkey>,
+    private jwtService: JwtService,
   ) {
     if (!this.keyHex || !this.ivHex) {
       throw new Error(
@@ -67,13 +69,21 @@ export class MasterkeyService {
     const decryptedPin = await this.masterkeyRepository.find({
       where: { KEY_OWNER: user },
     });
-    const pinCode = this.decrypt(decryptedPin[0].KEY_CODE);
-    const pinnumber = pinCode.split(':')[1];
+    const pinkey = this.decrypt(decryptedPin[0].KEY_CODE);
+    const pinnumber = pinkey.split(':')[1];
     if (pinnumber == pin) {
-      const pinUser = pinCode.split(':')[0];
-      const pinKey = pinCode.split(':')[2];
-      return `${pinUser}:${pinnumber}:${pinKey}`;
+      const pinUser = pinkey.split(':')[0];
+      const pinKey = pinkey.split(':')[2];
+      const payload = {
+        user: this.encrypt(`${pinUser}:${pinnumber}:${pinKey}`),
+        sub: pinUser,
+      };
+      return this.jwtService.sign(payload);
     }
     return false;
+  }
+
+  async findAll() {
+    return this.masterkeyRepository.find();
   }
 }

@@ -47,7 +47,10 @@ export class ESCSOrdersService {
     const data = await query.getMany();
 
     if (data.length > 0) {
-      return { status: true, data };
+      return { status: true, data: data.filter((item) => {
+        const checked = item.ORD_ITEM.match(/([S])$/);
+        if(checked) return item;
+      }) };
     } else {
       return { status: false };
     }

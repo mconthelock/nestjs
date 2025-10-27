@@ -27,6 +27,7 @@ export class ESCSUserFileService {
           didStartTx = true;
         }
         const runner = queryRunner || localRunner!;
+        dto.UF_ID = await this.newId(dto);
   
         await runner.manager.insert(ESCSUserFile, dto);
         if (localRunner && didStartTx && runner.isTransactionActive)

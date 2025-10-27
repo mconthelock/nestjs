@@ -23,7 +23,7 @@ import { getClientIP } from 'src/common/utils/ip.utils';
 import { QcConfQainsFormDto } from './dto/qcConfirm-qains_form.dto';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
-import { ReturnQainsFormDto } from './dto/return-qains_form.dot';
+import { ReturnQainsFormDto, setInchargeQainsFormDto } from './dto/return-qains_form.dot';
 
 @ApiTags('QA-INS Form')
 @Controller('qaform/qa-ins')
@@ -42,6 +42,13 @@ export class QainsFormController {
   ) {
     const ip = getClientIP(req);
     return this.qainsFormService.createQainsForm(dto, files, ip, this.path);
+  }
+
+  @Post('setIncharge')
+  @UseInterceptors(AnyFilesInterceptor())
+  async setIncharge(@Body() dto: setInchargeQainsFormDto, @Req() req: Request) {
+    const ip = getClientIP(req);
+    return await this.qainsFormService.setIncharge(dto, ip);
   }
 
   @Post('getFormData')
@@ -76,6 +83,11 @@ export class QainsFormController {
     @Req() req: Request,
   ) {
     const ip = getClientIP(req);
-    return await this.qainsFormService.returnApproval(dto, files, ip, this.path);
+    return await this.qainsFormService.returnApproval(
+      dto,
+      files,
+      ip,
+      this.path,
+    );
   }
 }

@@ -35,9 +35,9 @@ export class CreateQainsFormDto extends PickType(FormDto, [
   @IsNumber()
   QA_INCHARGE_SECTION: number;
 
-  @IsNotEmpty()
-  @IsString()
-  QA_INCHARGE_EMPNO: string;
+//   @IsNotEmpty()
+//   @IsString()
+//   QA_INCHARGE_EMPNO: string;
 
   @IsNotEmpty()
   @Transform(

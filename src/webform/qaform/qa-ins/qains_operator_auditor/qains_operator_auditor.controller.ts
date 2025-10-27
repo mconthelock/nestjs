@@ -30,4 +30,9 @@ export class QainsOAController {
   async findOne(@Body() dto: SearchQainsOADto) {
     return this.QainsOAService.findOne(dto);
   }
+
+  @Post('checkAuditSuccess')
+  async checkAuditSuccess(@Body() dto: SearchQainsOADto) {
+    return this.QainsOAService.checkAuditSuccess(dto);
+  }
 }

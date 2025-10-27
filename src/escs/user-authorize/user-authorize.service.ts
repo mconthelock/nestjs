@@ -31,7 +31,7 @@ export class ESCSUserAuthorizeService {
       }
       const runner = queryRunner || localRunner!;
 
-      await runner.manager.insert(ESCSUserAuthorize, dto);
+      await runner.manager.save(ESCSUserAuthorize, dto);
       if (localRunner && didStartTx && runner.isTransactionActive)
         await localRunner.commitTransaction();
       return {

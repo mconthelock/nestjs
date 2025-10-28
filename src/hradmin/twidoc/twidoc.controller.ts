@@ -1,4 +1,11 @@
-import { Body, Controller, Post, UseGuards, Request } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  Request,
+  Get,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { TwidocService } from './twidoc.service';
 
@@ -22,5 +29,13 @@ export class TwidocController {
   @UseGuards(AuthGuard('key'))
   adjust(@Request() req, @Body() body: any) {
     return this.docs.adjust(req.user.user, body);
+  }
+
+  @Post('create-pdf')
+  @UseGuards(AuthGuard('key'))
+  async createPdf(@Request() req, @Body() body: any) {
+    const data = await this.docs.findById(req.user.user, body);
+    this.docs.createFile(data);
+    return null;
   }
 }

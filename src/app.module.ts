@@ -43,7 +43,12 @@ import { PDFModule } from './pdf/pdf.module';
 import { HradminModule } from './hradmin/hradmin.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { SpecialuserModule } from './itgc/specialuser/specialuser.module';
+import { MatrixItemMasterModule } from './ids/matrix/matrix-item-master/matrix-item-master.module';
+import { MatrixSectionModule } from './ids/matrix/matrix-section/matrix-section.module';
+import { MatrixEffectItemModule } from './ids/matrix/matrix-effect-item/matrix-effect-item.module';
+import { MatrixEffectViewModule } from './ids/matrix/matrix-effect-view/matrix-effect-view.module';
 import auditConfig from './common/databases/auditDB.config';
+import idsConfig from './common/databases/dailyids.config';
 
 @Module({
   imports: [
@@ -56,6 +61,7 @@ import auditConfig from './common/databases/auditDB.config';
     TypeOrmModule.forRootAsync(webformConfig),
     TypeOrmModule.forRootAsync(invoiceConfig),
     TypeOrmModule.forRootAsync(auditConfig),
+    TypeOrmModule.forRootAsync(idsConfig),
     //Logging Config
     WinstonModule.forRoot(winstonConfig),
     //BB8 💣
@@ -85,6 +91,10 @@ import auditConfig from './common/databases/auditDB.config';
     ESCSModule,
     InvoiceModule,
     SpecialuserModule,
+    MatrixItemMasterModule,
+    MatrixSectionModule,
+    MatrixEffectItemModule,
+    MatrixEffectViewModule,
   ],
   providers: [HttpLoggingInterceptor],
 })

@@ -55,6 +55,8 @@ export class ESCSUserService {
     const repo = queryRunner ? queryRunner.manager : this.dataSource;
     const query = repo.createQueryBuilder().from('ESCS_USERS', 'A');
 
+    console.log(USR_NO);
+    
     if (USR_ID) query.andWhere('A.USR_ID = :USR_ID', { USR_ID });
     if (USR_NO) query.andWhere('A.USR_NO = :USR_NO', { USR_NO });
     if (GRP_ID) query.andWhere('A.GRP_ID = :GRP_ID', { GRP_ID });
@@ -77,7 +79,7 @@ export class ESCSUserService {
       }
     });
     query.leftJoin('AMECUSERALL', 'B', 'A.USR_NO = B.SEMPNO');
-    query.where('B.CSTATUS = 1');
+    query.andWhere('B.CSTATUS = 1');
     query.orderBy('A.USR_NO', 'ASC');
     return query.getRawMany();
   }

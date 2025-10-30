@@ -16,8 +16,8 @@ export class MasterkeyService {
   private readonly iv: Buffer;
 
   constructor(
-    @InjectRepository(Masterkey, 'amecConnection')
-    private readonly masterkeyRepository: Repository<Masterkey>,
+    // @InjectRepository(Masterkey, 'amecConnection')
+    // private readonly masterkeyRepository: Repository<Masterkey>,
     private jwtService: JwtService,
   ) {
     if (!this.keyHex || !this.ivHex) {
@@ -66,25 +66,26 @@ export class MasterkeyService {
   }
 
   async verify(user: string, pin: string) {
-    const decryptedPin = await this.masterkeyRepository.find({
-      where: { KEY_OWNER: user },
-    });
-    const pinkey = this.decrypt(decryptedPin[0].KEY_CODE);
-    const pinnumber = pinkey.split(':')[1];
-    if (pinnumber == pin) {
-      const pinUser = pinkey.split(':')[0];
-      const pinKey = pinkey.split(':')[2];
-      const pdfkey = pinkey.split(':')[3];
-      const payload = {
-        user: this.encrypt(`${pinUser}:${pinnumber}:${pinKey}:${pdfkey}`),
-        sub: pinUser,
-      };
-      return this.jwtService.sign(payload);
-    }
+    //const keys =
+    // const decryptedPin = await this.masterkeyRepository.find({
+    //   where: { KEY_OWNER: user },
+    // });
+    // const pinkey = this.decrypt(decryptedPin[0].KEY_CODE);
+    // const pinnumber = pinkey.split(':')[1];
+    // if (pinnumber == pin) {
+    //   const pinUser = pinkey.split(':')[0];
+    //   const pinKey = pinkey.split(':')[2];
+    //   const pdfkey = pinkey.split(':')[3];
+    //   const payload = {
+    //     user: this.encrypt(`${pinUser}:${pinnumber}:${pinKey}:${pdfkey}`),
+    //     sub: pinUser,
+    //   };
+    //   return this.jwtService.sign(payload);
+    // }
     return false;
   }
 
   async findAll() {
-    return this.masterkeyRepository.find();
+    //return this.masterkeyRepository.find();
   }
 }

@@ -7,7 +7,7 @@ import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Masterkey], 'amecConnection'),
+    // TypeOrmModule.forFeature([Masterkey], 'amecConnection'),
     AuthModule,
   ],
   controllers: [MasterkeyController],

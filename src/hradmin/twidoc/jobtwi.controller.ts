@@ -12,25 +12,25 @@ export class JobTwiController {
     private readonly keys: MasterkeyService,
   ) {}
 
-  @Post('run-twidoc-report')
-  async runTwiReport(@Body() body: any) {
-    const keys = await this.keys.findAll();
-    const key = keys.find((k: Masterkey) => k.KEY_OWNER === 'DUMMY')?.KEY_CODE;
-    const data = await this.docs.findAll(key, {
-      year: body.year,
-      type: body.type,
-    });
-    return data;
-  }
+  //   @Post('run-twidoc-report')
+  //   async runTwiReport(@Body() body: any) {
+  //     const keys = await this.keys.findAll();
+  //     const key = keys.find((k: Masterkey) => k.KEY_OWNER === 'DUMMY')?.KEY_CODE;
+  //     const data = await this.docs.findAll(key, {
+  //       year: body.year,
+  //       type: body.type,
+  //     });
+  //     return data;
+  //   }
 
-  @Post('run-twidoc-report-emp')
-  async runTwiReportEmp(@Body() body: any) {
-    const keys = await this.keys.findAll();
-    const key = keys.find((k: Masterkey) => k.KEY_OWNER === 'DUMMY')?.KEY_CODE;
-    const data = await this.docs.findById(key, {
-      year: body.year,
-      empno: body.empno,
-    });
-    return data;
-  }
+  //   @Post('run-twidoc-report-emp')
+  //   async runTwiReportEmp(@Body() body: any) {
+  //     const keys = await this.keys.findAll();
+  //     const key = keys.find((k: Masterkey) => k.KEY_OWNER === 'DUMMY')?.KEY_CODE;
+  //     const data = await this.docs.findById(key, {
+  //       year: body.year,
+  //       empno: body.empno,
+  //     });
+  //     return data;
+  //   }
 }

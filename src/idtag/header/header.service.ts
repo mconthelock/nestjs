@@ -11,9 +11,13 @@ export class HeaderService {
     private readonly m08: Repository<M008KP>,
   ) {}
 
-  async findBySchd(schd: string, schdp: string) {
+  async findBySchd(schd: string, schdp?: string) {
+    const where: any = {};
+    if (schd) where.M8K01 = schd;
+    if (schdp) where.M8K02 = schdp;
+
     return this.m08.find({
-      where: { M8K01: schd, M8K02: schdp },
+      where: { ...where },
       relations: {
         bmdate: true,
         tags: { process: true },

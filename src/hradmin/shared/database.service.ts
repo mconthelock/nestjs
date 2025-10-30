@@ -23,6 +23,11 @@ export class DatabaseService {
     // private keys: MasterkeyService,
   ) {}
 
+  async getMasterKey() {
+    const masterKeyRepo = this.ds.getRepository(Masterkey);
+    return await masterKeyRepo.find();
+  }
+
   //: Promise<{ user: string; pass: string; passkey?: string; admin?: string }>
   async getHrAdminCredentials(credentials: string) {
     try {

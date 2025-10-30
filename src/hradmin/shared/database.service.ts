@@ -5,7 +5,7 @@ import * as oracledb from 'oracledb';
 import * as crypto from 'crypto';
 
 // import { MasterkeyService } from '../masterkey/masterkey.service';
-import { Masterkey } from '../masterkey/entities/masterkey.entity';
+// import { Masterkey } from '../masterkey/entities/masterkey.entity';
 
 @Injectable()
 export class DatabaseService {
@@ -24,8 +24,8 @@ export class DatabaseService {
   ) {}
 
   async getMasterKey() {
-    const masterKeyRepo = this.ds.getRepository(Masterkey);
-    return await masterKeyRepo.find();
+    // const masterKeyRepo = this.ds.getRepository(Masterkey);
+    // return await masterKeyRepo.find();
   }
 
   //: Promise<{ user: string; pass: string; passkey?: string; admin?: string }>
@@ -58,7 +58,6 @@ export class DatabaseService {
   async createConnection(credentials: any) {
     const { user, pass } = await this.getHrAdminCredentials(credentials);
     const cfg = this.ds.options as any;
-
     const hrAdminDataSource = new DataSource({
       type: cfg.type,
       connectString: cfg.connectString,

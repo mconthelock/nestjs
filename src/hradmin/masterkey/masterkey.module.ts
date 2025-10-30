@@ -1,17 +1,13 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { MasterkeyService } from './masterkey.service';
-import { Masterkey } from './entities/masterkey.entity';
 import { MasterkeyController } from './masterkey.controller';
 import { AuthModule } from 'src/auth/auth.module';
+import { DatabaseService } from '../shared/database.service';
 
 @Module({
-  imports: [
-    // TypeOrmModule.forFeature([Masterkey], 'amecConnection'),
-    AuthModule,
-  ],
+  imports: [AuthModule],
   controllers: [MasterkeyController],
-  providers: [MasterkeyService],
+  providers: [MasterkeyService, DatabaseService],
   exports: [MasterkeyService],
 })
 export class MasterkeyModule {}

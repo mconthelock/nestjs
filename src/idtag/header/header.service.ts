@@ -15,9 +15,18 @@ export class HeaderService {
     const where: any = {};
     if (schd) where.M8K01 = schd;
     if (schdp) where.M8K02 = schdp;
-
     return this.m08.find({
       where: { ...where },
+      relations: {
+        bmdate: true,
+        tags: { process: true },
+      },
+    });
+  }
+
+  async findByBMDate(date: string) {
+    return this.m08.find({
+      where: { bmdate: { Q9PP: date } },
       relations: {
         bmdate: true,
         tags: { process: true },

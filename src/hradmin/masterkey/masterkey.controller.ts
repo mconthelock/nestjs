@@ -11,11 +11,11 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
-import { MasterkeyService } from './masterkey.service';
+// import { MasterkeyService } from './masterkey.service';
 
 @Controller('hradmin/masterkey')
 export class MasterkeyController {
-  constructor(private readonly keys: MasterkeyService) {}
+  //   constructor(private readonly keys: MasterkeyService) {}
 
   @Post('verified')
   @UseGuards(AuthGuard('jwt'))
@@ -24,18 +24,18 @@ export class MasterkeyController {
     @Body() body: { pin: string },
     @Res({ passthrough: true }) response: Response,
   ) {
-    const { users, group, apps } = req.user.user;
-    if (!(group === 2 && apps === 20))
-      throw new UnauthorizedException('You nave no authorization 1');
-    const isValid = await this.keys.verify(users, body.pin);
-    if (!isValid)
-      throw new UnauthorizedException('You nave no authorization 2');
+    // const { users, group, apps } = req.user.user;
+    // if (!(group === 2 && apps === 20))
+    //   throw new UnauthorizedException('You nave no authorization 1');
+    // const isValid = await this.keys.verify(users, body.pin);
+    // if (!isValid)
+    //   throw new UnauthorizedException('You nave no authorization 2');
 
-    //Create Cookie for Key Guards
-    response.cookie(`hrmaster`, isValid, {
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-    });
+    // //Create Cookie for Key Guards
+    // response.cookie(`hrmaster`, isValid, {
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: 'strict',
+    // });
     return;
   }
 
@@ -55,12 +55,12 @@ export class MasterkeyController {
   //     return;
   //   }
 
-  @Get('all')
-  @UseGuards(AuthGuard('jwt'))
-  findAll(@Request() req) {
-    const { users, group, apps } = req.user.user;
-    if (!(group === 2 && apps === 20))
-      throw new UnauthorizedException('You nave no authorization 1');
-    return this.keys.findAll();
-  }
+  //   @Get('all')
+  //   @UseGuards(AuthGuard('jwt'))
+  //   findAll(@Request() req) {
+  //     const { users, group, apps } = req.user.user;
+  //     if (!(group === 2 && apps === 20))
+  //       throw new UnauthorizedException('You nave no authorization 1');
+  //     return this.keys.findAll();
+  //   }
 }

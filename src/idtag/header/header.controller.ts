@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { HeaderService } from './header.service';
 
@@ -7,9 +7,14 @@ import { HeaderService } from './header.service';
 export class HeaderController {
   constructor(private readonly tag: HeaderService) {}
 
-  @Get('schd/:schd/:schdp')
-  findBySchd(@Param('schd') schd: string, @Param('schdp') schdp: string) {
-    return this.tag.findBySchd(schd, schdp);
+  @Post('schd')
+  findBySchd(@Body() body: { schd: string; schdp?: string }) {
+    return this.tag.findBySchd(body.schd, body.schdp);
+  }
+
+  @Get('bmdate/:date')
+  findByBMDate(@Param('date') date: string) {
+    return this.tag.findByBMDate(date);
   }
 
   @Get('all')

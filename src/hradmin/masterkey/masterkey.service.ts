@@ -74,8 +74,9 @@ export class MasterkeyService {
     if (pinnumber == pin) {
       const pinUser = pinkey.split(':')[0];
       const pinKey = pinkey.split(':')[2];
+      const pdfkey = pinkey.split(':')[3];
       const payload = {
-        user: this.encrypt(`${pinUser}:${pinnumber}:${pinKey}`),
+        user: this.encrypt(`${pinUser}:${pinnumber}:${pinKey}:${pdfkey}`),
         sub: pinUser,
       };
       return this.jwtService.sign(payload);

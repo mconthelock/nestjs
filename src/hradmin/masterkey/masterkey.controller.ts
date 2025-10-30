@@ -39,21 +39,21 @@ export class MasterkeyController {
     return;
   }
 
-  @Post('create')
-  create() {
-    const key1 =
-      'Jobschedule:757575:6C6574207468656D206561742063616B65:11002525:hradmin:HRrb,rN.sPj';
-    console.log(this.keys.encrypt(key1));
-    return;
-  }
+  //   @Post('create')
+  //   create() {
+  //     const key1 =
+  //       'Jobschedule:757575:6C6574207468656D206561742063616B65:11002525:hradmin:HRrb,rN.sPj';
+  //     console.log(this.keys.encrypt(key1));
+  //     return;
+  //   }
 
-  @Post('update')
-  update() {
-    const key1 =
-      'SYSTEM:000000:6C6574207468656D206561742063616B65:11002525:hradmin:HRrb,rN.sPj';
-    console.log(this.keys.encrypt(key1));
-    return;
-  }
+  //   @Post('update')
+  //   update() {
+  //     const key1 =
+  //       'SYSTEM:000000:6C6574207468656D206561742063616B65:11002525:hradmin:HRrb,rN.sPj';
+  //     console.log(this.keys.encrypt(key1));
+  //     return;
+  //   }
 
   @Get('all')
   @UseGuards(AuthGuard('jwt'))

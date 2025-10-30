@@ -4,29 +4,26 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { PDFDocument, rgb } from 'pdf-lib';
-import { spawn } from 'child_process';
+import { PDFDocument } from 'pdf-lib';
+import * as ExcelJS from 'exceljs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { exec } from 'child_process';
-import * as util from 'util';
 import * as dayjs from 'dayjs';
 import 'dayjs/locale/th';
 import {
   convertNumberToBahtText,
   digitsNumber,
   intVal,
-} from '../../common/helpers//baht-text.helper';
+} from '../../common/helpers/baht-text.helper';
 import {
   drawGrid,
   writeLineBox,
   protectedFile,
 } from '../../common/helpers/file-pdf.helper';
+import { cloneRows } from '../../common/helpers/file-excel.helper';
 import { DatabaseService } from '../shared/database.service';
 import * as oracledb from 'oracledb';
-
 const fontkit = require('@pdf-lib/fontkit');
-const execPromise = util.promisify(exec);
 
 @Injectable()
 export class TwidocService {
@@ -195,30 +192,11 @@ export class TwidocService {
         output_path: this.output_path,
         input: `_${data.EMPCOD}.pdf`,
         output: `${data.EMPCOD}.pdf`,
+        userpassword: data.PSNBDT,
+        adminpassword: data.passkey,
+        delete_input: true,
       });
-
-      //   let winPath = this.output_path.replace(/\//g, '\\');
-      //   if (!winPath.startsWith('\\\\')) {
-      //     winPath = '\\\\' + winPath.replace(/^\\+/, '');
-      //   }
-
-      //   const inputFile = path.join(winPath, 'output.pdf'); // ไฟล์เดิม
-      //   const outputFile = path.join(winPath, 'output1.pdf'); // ไฟล์ใหม่
-      // spawn qpdf
-      //   const child = spawn('qpdf', [
-      //     '--encrypt',
-      //     '1234', // user password
-      //     '5678', // owner password
-      //     '256',
-      //     '--print=full',
-      //     '--modify=none',
-      //     '--', // <-- ต้องมี
-      //     inputFile,
-      //     outputFile,
-      //   ]);
-      //   child.stdout.on('data', (data) => console.log(`stdout: ${data}`));
-      //   child.stderr.on('data', (data) => console.error(`stderr: ${data}`));
-      //   child.on('close', (code) => console.log(`qpdf exited with code ${code}`));
+      return output;
     } catch (error) {
       console.error('Error filling PDF template:', error);
       throw new Error('Failed to fill PDF template');
@@ -244,17 +222,14 @@ export class TwidocService {
         const month = data.TWIEND == 13 ? 12 : data.TWIEND;
         const lastmonth = dayjs().month(month - 1).format('MMM');
         const periodText = data.TWIEND == 1 ? `ม.ค.` : `ม.ค. - ${lastmonth}`;
-
         writeLineBox({...lineOption, text: data.SEQ_NO.toString(), boxX: 505, boxY: 50, boxWidth: 50, boxHeight: 10, align: 'center'});
         writeLineBox({...lineOption, text: data.EMPNMT, boxX: 60, boxY: 163, boxWidth: 200, boxHeight: 15, align: 'left'});
         writeLineBox({...lineOption, text: this.formatPNID(data.PSNIDN), boxX: 450, boxY: 148, boxWidth: 120, boxHeight: 15, align: 'left'});
         writeLineBox({...lineOption, text: this.formatPNID(data.PSNIDN), boxX: 450, boxY: 165, boxWidth: 120, boxHeight: 15, align: 'left'});
         writeLineBox({...lineOption, text: data.EMPADDR, boxX: 60, boxY: 195, boxWidth: 400, boxHeight: 15, align: 'left'});
         writeLineBox({...lineOption, text: data.SEQ_NO.toString(), boxX: 70, boxY: 222, boxWidth: 60, boxHeight: 15, align: 'center'});
-
         writeLineBox({...lineOption, text: periodText, boxX: 365, boxY: 293, boxWidth: 65, boxHeight: 10, align: 'center'});
         writeLineBox({...lineOption, text: (data.TWIYEAR+543).toString(), boxX: 365, boxY: 303, boxWidth: 65, boxHeight: 10, align: 'center'});
-
         writeLineBox({...lineOption, text: digitsNumber(data.TWIINCOME,2), boxX: 432, boxY: 293, boxWidth: 64, boxHeight: 10, align: 'right'});
         writeLineBox({...lineOption, text: digitsNumber(data.TWITAX,2), boxX: 500, boxY: 293, boxWidth: 63, boxHeight: 10, align: 'right'});
 
@@ -262,6 +237,7 @@ export class TwidocService {
             writeLineBox({...lineOption, text: digitsNumber(data.TWIADDINCOME,2), boxX: 432, boxY: 560, boxWidth: 64, boxHeight: 10, align: 'right'});
             writeLineBox({...lineOption, text: digitsNumber(data.TWIADDTAX,2), boxX: 500, boxY: 560, boxWidth: 63, boxHeight: 10, align: 'right'});
         }
+
         const totalIncome = intVal(data.TWIINCOME) + intVal(data.TWIADDINCOME);
         const totalTax = intVal(data.TWITAX) + intVal(data.TWIADDTAX);
         writeLineBox({...lineOption, text: digitsNumber(totalIncome,2), boxX: 432, boxY: 580, boxWidth: 64, boxHeight: 10, align: 'right'});
@@ -273,8 +249,6 @@ export class TwidocService {
         writeLineBox({...lineOption, text: digitsNumber(data.TWISSO,2), boxX: 240, boxY: 640, boxWidth: 83, boxHeight: 10, align: 'right'});
         writeLineBox({...lineOption, text: this.formatPNID(data.PSNIDN), boxX: 373, boxY: 655, boxWidth: 140, boxHeight: 10, align: 'center'});
 
-        //const today = moment();
-        //const dateText = `${today.date()} ${today.format('MMMM')} ${today.year() + 543}`;
         dayjs.locale('th');
         const date = dayjs();
         writeLineBox({...lineOption, text: `${date.format('DD')} ${date.format('MMMM')} ${date.year() + 543}`, boxX: 180, boxY: 732, boxWidth: 130, boxHeight: 10, align: 'center'});
@@ -292,5 +266,43 @@ export class TwidocService {
     return inputString.replace(formatRegex, '$1 $2 $3 $4 $5');
   }
 
-  private async protectedFile() {}
+  async createExcel(data: any) {
+    const templatePath = path.resolve(
+      process.cwd(),
+      'public/export/twidoc.xlsx',
+    );
+    try {
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.readFile(templatePath);
+      const sheet = workbook.getWorksheet(1);
+      data.sort((a, b) => a.SEQ_NO - b.SEQ_NO);
+      for (const [index, row] of data.entries()) {
+        const sourceStyleRow = index % 2 === 0 ? 2 : 3;
+        if (index > 1) {
+          await cloneRows(sheet, sourceStyleRow, sheet.lastRow.number + 1);
+        }
+        sheet.getCell(index + 2, 1).value = row.TWIYEAR;
+        sheet.getCell(index + 2, 2).value = row.SEQ_NO;
+        sheet.getCell(index + 2, 3).value = row.EMPCOD;
+        sheet.getCell(index + 2, 4).value = row.EMPNMT;
+        sheet.getCell(index + 2, 5).value = row.SPOSITION;
+        sheet.getCell(index + 2, 6).value = row.SDIV;
+        sheet.getCell(index + 2, 7).value = row.SDEPT;
+        sheet.getCell(index + 2, 8).value = row.SSEC;
+        sheet.getCell(index + 2, 9).value =
+          intVal(row.TWIINCOME) + intVal(row.TWIADDINCOME);
+        sheet.getCell(index + 2, 10).value =
+          intVal(row.TWITAX) + intVal(row.TWIADDTAX);
+        sheet.getCell(index + 2, 11).value = intVal(row.TWIPVF);
+        sheet.getCell(index + 2, 12).value = intVal(row.TWISSO);
+      }
+      const buffer = await workbook.xlsx.writeBuffer();
+      return buffer;
+    } catch (error) {
+      console.error('Error reading Excel template:', error);
+      throw new InternalServerErrorException(
+        'Invalid template: Missing "Data" sheet.',
+      );
+    }
+  }
 }

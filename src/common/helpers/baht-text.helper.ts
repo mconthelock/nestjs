@@ -101,5 +101,5 @@ export const digitsNumber = function (n, digit) {
     ? 0
     : str[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
   var num2 = str[1] === undefined ? '00' : str[1];
-  return num1 + '.' + num2;
+  return digit == 0 ? num1 : num1 + '.' + num2;
 };

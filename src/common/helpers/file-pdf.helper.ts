@@ -48,8 +48,8 @@ export async function protectedFile(opt) {
   // prettier-ignore
   const child = spawn('qpdf', [
     '--encrypt',
-    '1234', // user password
-    '5678', // owner password
+    `${opt.userpassword}`, // user password
+    `${opt.adminpassword}`, // owner password
     '256',
     '--print=full',
     '--modify=none',
@@ -59,7 +59,13 @@ export async function protectedFile(opt) {
   ]);
   child.stdout.on('data', (data) => console.log(`stdout: ${data}`));
   child.stderr.on('data', (data) => console.error(`stderr: ${data}`));
-  child.on('close', (code) => console.log(`qpdf exited with code ${code}`));
+  child.on('close', async (code) => {
+    if (opt.delete_input) {
+      await fs.unlink(input);
+    }
+    console.log(`qpdf exited with code ${code}`);
+  });
+  return;
 }
 
 export async function drawGrid(pdfpage, spacing = 50, labelSpacing = 50) {

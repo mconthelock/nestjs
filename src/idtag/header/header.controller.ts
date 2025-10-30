@@ -8,11 +8,13 @@ export class HeaderController {
   constructor(private readonly tag: HeaderService) {}
 
   @Get('schd/:schd/:schdp')
-  @ApiOperation({
-    summary: 'Get AMEC Calendar by specify Start date and End date',
-  })
   findBySchd(@Param('schd') schd: string, @Param('schdp') schdp: string) {
     return this.tag.findBySchd(schd, schdp);
+  }
+
+  @Get('all')
+  findAll() {
+    return this.tag.findAll();
   }
 
   @Get('shop/:schd/:schdp/:shop')

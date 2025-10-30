@@ -20,4 +20,13 @@ export class HeaderService {
       },
     });
   }
+
+  async findAll() {
+    return this.m08.find({
+      relations: {
+        bmdate: true,
+        tags: { process: true },
+      },
+    });
+  }
 }

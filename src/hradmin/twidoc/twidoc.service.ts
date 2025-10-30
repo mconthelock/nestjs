@@ -267,10 +267,8 @@ export class TwidocService {
   }
 
   async createExcel(data: any) {
-    const templatePath = path.resolve(
-      process.cwd(),
-      'public/export/twidoc.xlsx',
-    );
+    // prettier-ignore
+    const templatePath = path.resolve(process.cwd(),'public/export/twidoc.xlsx');
     try {
       const workbook = new ExcelJS.Workbook();
       await workbook.xlsx.readFile(templatePath);

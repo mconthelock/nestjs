@@ -6,7 +6,7 @@ import { Flow } from './entities/flow.entity';
 
 import { SearchFlowDto } from './dto/search-flow.dto';
 import { CreateFlowDto } from './dto/create-flow.dto';
-import { UpdateFlowDto } from './dto/update-flow.dto';
+import { DeleteFlowStepDto, UpdateFlowDto } from './dto/update-flow.dto';
 import { empnoFormDto } from '../form/dto/empno-form.dto';
 import { FormDto } from '../form/dto/form.dto';
 import { doactionFlowDto } from './dto/doaction-flow.dto';
@@ -223,10 +223,85 @@ export class FlowService {
     }
   }
 
+  async deleteFlowStep(
+    dto: DeleteFlowStepDto,
+    queryRunner?: QueryRunner,
+  ): Promise<{ status: boolean; message: string }> {
+    let localRunner: QueryRunner | undefined;
+    let didConnect = false;
+    let didStartTx = false;
+    try {
+      if (!queryRunner) {
+        localRunner = this.dataSource.createQueryRunner();
+        await localRunner.connect();
+        didConnect = true;
+        await localRunner.startTransaction();
+        didStartTx = true;
+      }
+      const runner = queryRunner || localRunner!;
+
+      const form = {
+        NFRMNO: dto.NFRMNO,
+        VORGNO: dto.VORGNO,
+        CYEAR: dto.CYEAR,
+        CYEAR2: dto.CYEAR2,
+        NRUNNO: dto.NRUNNO,
+      };
+
+      var flowStart = false;
+
+      const flow = await this.getFlow({...form, CSTEPNO: dto.CSTEPNO}, runner);
+      if (flow.length === 0) {
+        throw new Error('Flow step not found');
+      }
+
+      // prettier-ignore
+      for (const step of flow) {
+        if (step.CSTART == '1') {
+          flowStart = true;
+        }
+        // Update previous step
+        await this.updateFlow(
+          { condition: {...form, CSTEPNEXTNO: step.CSTEPNO}, CSTEPNEXTNO: step.CSTEPNEXTNO },
+          runner,
+        );
+        if (flowStart) {
+          await this.updateFlow(
+            { condition: {...form, CSTEPNO: step.CSTEPNEXTNO}, CSTART: '1' },
+            runner,
+          );
+        }
+        const stepReady = await this.getFlow({...form, CSTEPST: this.STEP_READY}, runner);
+        await this.updateFlow(
+            { condition: {...form, CSTEPNO: stepReady[0].CSTEPNEXTNO}, CSTEPST: '2' },
+            runner,
+        );
+        await this.deleteFlow(dto, runner);
+    }
+    //   throw new Error('Not implemented delete flow step logic');
+
+      if (localRunner && didStartTx && runner.isTransactionActive)
+        await localRunner.commitTransaction();
+      return {
+        status: true,
+        message: 'Delete Flow Step Successfully',
+      };
+    } catch (error) {
+      if (localRunner && didStartTx && localRunner.isTransactionActive)
+        await localRunner.rollbackTransaction();
+      throw new Error('Delete Flow Step Error: ' + error.message);
+    } finally {
+      if (localRunner && didConnect) await localRunner.release();
+    }
+  }
+
   //---------------------------- Show flow Start --------------------------------
 
   async showFlow(form: FormDto, host: string, queryRunner?: QueryRunner) {
     const flowData = await this.getFlowTree(form, queryRunner);
+    if( flowData.length === 0 ) {
+        throw new Error('Flow data not found');
+    }
     const html = await this.generateHtml(flowData, form, host);
     return {
       status: true,
@@ -880,7 +955,7 @@ export class FlowService {
       apvNone2: this.APV_NONE,
       stepWait: this.STEP_WAIT,
       stepNormal: this.STEP_NORMAL,
-      stepNext: stepNext
+      stepNext: stepNext,
     };
     return await this.execSql(
       sql,

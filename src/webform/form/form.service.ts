@@ -188,7 +188,8 @@ export class FormService {
         context.query.CSTEPST = '0';
         const notuse = await this.flowService.getFlow(context.query, runner);
         for (const row of notuse) {
-          await this.deleteFlowStep(row, context, runner);
+        //   await this.deleteFlowStep(row, context, runner);
+            await this.flowService.deleteFlowStep(row, runner);
         }
 
         //Draft form
@@ -319,7 +320,7 @@ export class FormService {
       context.emppos,
       queryRunner,
     );
-    context.flag = 1;
+    // context.flag = 1;
     if (val.length > 0) {
       context.flag = 2;
       for (const row of val) {
@@ -516,32 +517,32 @@ export class FormService {
     }
   }
 
-  async deleteFlowStep(
-    data: any,
-    context: FormContext,
-    queryRunner: QueryRunner,
-  ) {
-    await this.flowService.deleteFlow(context.query, queryRunner);
-    if (context.query && 'CSTEPST' in context.query) {
-      delete context.query['CSTEPST'];
-    }
-    context.query.CSTEPNEXTNO = data.CSTEPNO;
-    context.query.NRUNNO = context.nrunno;
-    await this.flowService.updateFlow(
-      { condition: context.query, CSTEPNEXTNO: data.CSTEPNEXTNO },
-      queryRunner,
-    );
-    if (data.CSTART == '1') {
-      if (context.query && 'CSTEPNEXTNO' in context.query) {
-        delete context.query['CSTEPNEXTNO'];
-      }
-      context.query.CSTEPNO = data.CSTEPNEXTNO;
-      await this.flowService.updateFlow(
-        { condition: context.query, CSTART: '1' },
-        queryRunner,
-      );
-    }
-  }
+//   async deleteFlowStep(
+//     data: any,
+//     context: FormContext,
+//     queryRunner: QueryRunner,
+//   ) {
+//     await this.flowService.deleteFlow(context.query, queryRunner);
+//     if (context.query && 'CSTEPST' in context.query) {
+//       delete context.query['CSTEPST'];
+//     }
+//     context.query.CSTEPNEXTNO = data.CSTEPNO;
+//     context.query.NRUNNO = context.nrunno;
+//     await this.flowService.updateFlow(
+//       { condition: context.query, CSTEPNEXTNO: data.CSTEPNEXTNO },
+//       queryRunner,
+//     );
+//     if (data.CSTART == '1') {
+//       if (context.query && 'CSTEPNEXTNO' in context.query) {
+//         delete context.query['CSTEPNEXTNO'];
+//       }
+//       context.query.CSTEPNO = data.CSTEPNEXTNO;
+//       await this.flowService.updateFlow(
+//         { condition: context.query, CSTART: '1' },
+//         queryRunner,
+//       );
+//     }
+//   }
 
   async saveDraft(
     draft: string,

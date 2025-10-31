@@ -47,8 +47,9 @@ export class RepService {
     const data = queryRunner
       ? await this.getRep(dto, queryRunner)
       : await this.getRep(dto);
+      
     let represent = dto.VEMPNO;
-    if (Array.isArray(data) && data.length > 0 && data[0]?.VREPNO !== '') {
+    if (Array.isArray(data) && data.length > 0 && data[0]?.VREPNO) {
       represent = data[0].VREPNO;
     }
     return represent;

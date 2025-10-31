@@ -24,7 +24,7 @@ export class MatrixItemMasterService {
         SECID: dto.SECID,
         TITLE: dto.TITLE,
       },
-      relations: ['EFFECT'],
+      relations: ['EFFECT', 'SECTION'],
     });
   }
 

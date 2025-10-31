@@ -7,6 +7,7 @@ import { Q90010p2Module } from './rtnlibf/q90010p2/q90010p2.module';
 import { M008kpModule } from './rtnlibf/m008kp/m008kp.module';
 import { Q141kpModule } from './rtnlibf/q141kp/q141kp.module';
 import { T016kpModule } from './rtnlibf/t016kp/t016kp.module';
+import { IdtagModule } from './shopf/idtag/idtag.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { T016kpModule } from './rtnlibf/t016kp/t016kp.module';
     M008kpModule,
     Q141kpModule,
     T016kpModule,
+    IdtagModule, //Include F001+F002+F003, M008KP + Q90010P2 combined module
   ],
 })
 export class AS400Module {}

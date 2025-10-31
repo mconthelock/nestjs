@@ -18,8 +18,8 @@ import {
 } from '../../common/helpers/file-pdf.helper';
 import { cloneRows } from 'src/common/helpers/file-excel.helper';
 import { DatabaseService } from '../shared/database.service';
-import * as oracledb from 'oracledb';
 const fontkit = require('@pdf-lib/fontkit');
+import * as oracledb from 'oracledb';
 
 @Injectable()
 export class PromoteService {
@@ -38,10 +38,6 @@ export class PromoteService {
       const connection = await this.dbService.createConnection(credentials);
       hrAdminDataSource = connection.hrAdminDataSource;
       conn = connection.conn;
-
-      const { passkey } =
-        await this.dbService.getHrAdminCredentials(credentials);
-
       const result = await conn.execute(
         `DECLARE v_cursor SYS_REFCURSOR;
           BEGIN
@@ -49,7 +45,7 @@ export class PromoteService {
               :result := v_cursor;
           END;`,
         {
-          KEYVALUE: passkey,
+          KEYVALUE: connection.passcode,
           EFFDATE: body.period,
           EMTYPE: body.type,
           result: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
@@ -66,8 +62,8 @@ export class PromoteService {
           'Invalid credentials for sensitive data access.',
         );
       }
-      console.error('Error fetching Twi 50 data:', error);
-      throw new InternalServerErrorException('Failed to fetch Twi 50 data.');
+      console.error('Error fetching Promotion data:', error);
+      throw new InternalServerErrorException('Failed to fetch Promotion data.');
     } finally {
       await this.dbService.closeConnection(hrAdminDataSource, conn);
     }
@@ -80,10 +76,6 @@ export class PromoteService {
       const connection = await this.dbService.createConnection(credentials);
       hrAdminDataSource = connection.hrAdminDataSource;
       conn = connection.conn;
-
-      // Add your query logic here
-      const { passkey } =
-        await this.dbService.getHrAdminCredentials(credentials);
       const result = await conn.execute(
         `DECLARE v_cursor SYS_REFCURSOR;
           BEGIN
@@ -91,7 +83,7 @@ export class PromoteService {
               :result := v_cursor;
           END;`,
         {
-          KEYVALUE: passkey,
+          KEYVALUE: connection.passcode,
           EFFDATE: body.period,
           EMPNO: body.empno,
           result: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },

@@ -10,12 +10,14 @@ import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { TwidocService } from './twidoc.service';
 import { MasterkeyService } from '../masterkey/masterkey.service';
+import { DatabaseService } from '../shared/database.service';
 
 @Controller('hradmin/twidoc')
 export class TwidocController {
   constructor(
     private readonly docs: TwidocService,
     private keys: MasterkeyService,
+    private dbService: DatabaseService,
   ) {}
 
   @Post('all')
@@ -44,7 +46,7 @@ export class TwidocController {
   @UseGuards(AuthGuard('key'))
   async createPdf(@Request() req, @Body() body: any) {
     const data = await this.docs.findById(req.user.user, body);
-    const key = await this.keys.decrypt(req.user.user);
+    const key = await this.dbService.decrypt(req.user.user);
     const pdfkey = key.split(':')[3];
     let passkey = pdfkey;
     if (data.EMPPOSITION !== 'MP')

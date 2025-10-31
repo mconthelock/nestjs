@@ -3,9 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import * as oracledb from 'oracledb';
 import * as crypto from 'crypto';
-
-// import { MasterkeyService } from '../masterkey/masterkey.service';
-// import { Masterkey } from '../masterkey/entities/masterkey.entity';
+import { Masterkey } from '../masterkey/entities/masterkey.entity';
 
 @Injectable()
 export class DatabaseService {
@@ -21,31 +19,52 @@ export class DatabaseService {
     @InjectDataSource('amecConnection')
     private ds: DataSource,
     // private keys: MasterkeyService,
-  ) {}
+  ) {
+    if (!this.keyHex || !this.ivHex) {
+      throw new Error(
+        'MASTER_DECRYPTION_KEY and MASTER_DECRYPTION_IV must be set in .env',
+      );
+    }
+
+    this.key = Buffer.from(this.keyHex, 'hex');
+    this.iv = Buffer.from(this.ivHex, 'hex');
+
+    if (this.key.length !== 32) {
+      throw new Error(
+        'MASTER_DECRYPTION_KEY must be a 64-character hex string (32 bytes)',
+      );
+    }
+    if (this.iv.length !== 16) {
+      // <-- IV ต้องยาว 16 bytes
+      throw new Error(
+        'MASTER_DECRYPTION_IV must be a 32-character hex string (16 bytes)',
+      );
+    }
+  }
 
   async getMasterKey() {
-    // const masterKeyRepo = this.ds.getRepository(Masterkey);
-    // return await masterKeyRepo.find();
+    const masterKeyRepo = this.ds.getRepository(Masterkey);
+    return await masterKeyRepo.find();
   }
 
   //: Promise<{ user: string; pass: string; passkey?: string; admin?: string }>
   async getHrAdminCredentials(credentials: string) {
     try {
-      //   const decryptedCreds = this.decrypt(credentials);
-      //   const code = decryptedCreds.split(':');
-      //   const masterKeyRepo = this.ds.getRepository(Masterkey);
-      //   const credential = await masterKeyRepo.findOneBy({
-      //     KEY_OWNER: pinnumber[0],
-      //   });
-      //   if (!credential) {
-      //     throw new Error('Master key "HRADMIN_CREDS" not found.');
-      //   }
-      //   const credentialsDecrypted = this.decrypt(credential.KEY_CODE);
-      //   const user = credentialsDecrypted.split(':')[4];
-      //   const pass = credentialsDecrypted.split(':')[5];
-      //   const passkey = credentialsDecrypted.split(':')[2];
-      //   const admin = credentialsDecrypted.split(':')[0];
-      return { user: null, pass: null, passkey: null, admin: null };
+      const decryptedCreds = this.decrypt(credentials);
+      const [pinuser] = decryptedCreds.split(':');
+      const masterKeyRepo = await this.getMasterKey();
+      const credential = await masterKeyRepo.find(
+        (k) => k.KEY_OWNER === pinuser,
+      ).KEY_CODE;
+
+      if (!credential) {
+        throw new Error('Master key "HRADMIN_CREDS" not found.');
+      }
+
+      const decryptedCredsMaster = this.decrypt(credential);
+      const [user, pinpass, passcode, pdfpass, admin, password] =
+        decryptedCredsMaster.split(':');
+      return { user, pinpass, passcode, pdfpass, admin, password };
     } catch (error) {
       console.error('Failed to get or decrypt HR admin credentials:', error);
       throw new InternalServerErrorException(
@@ -56,25 +75,24 @@ export class DatabaseService {
 
   //: Promise<{ hrAdminDataSource: DataSource; conn: oracledb.Connection }>
   async createConnection(credentials: any) {
-    const { user, pass } = await this.getHrAdminCredentials(credentials);
+    const { admin, password, passcode } =
+      await this.getHrAdminCredentials(credentials);
     const cfg = this.ds.options as any;
     const hrAdminDataSource = new DataSource({
       type: cfg.type,
       connectString: cfg.connectString,
       extra: cfg.extra,
-      username: user,
-      password: pass,
+      username: admin,
+      password: password,
     });
-
     await hrAdminDataSource.initialize();
-
     const conn = await oracledb.getConnection({
-      user,
-      password: pass,
+      user: admin,
+      password: password,
       connectString: cfg.connectString,
     });
 
-    return { hrAdminDataSource, conn };
+    return { hrAdminDataSource, conn, passcode };
   }
 
   async closeConnection(

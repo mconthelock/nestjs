@@ -43,7 +43,7 @@ export class TwidocService {
       hrAdminDataSource = connection.hrAdminDataSource;
       conn = connection.conn;
 
-      const { passkey } =
+      const { passcode } =
         await this.dbService.getHrAdminCredentials(credentials);
 
       const result = await conn.execute(
@@ -53,7 +53,7 @@ export class TwidocService {
             :result := v_cursor;
         END;`,
         {
-          KEYVALUE: passkey,
+          KEYVALUE: passcode,
           NYEAR: body.year,
           EMTYPE: body.type,
           result: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
@@ -86,7 +86,7 @@ export class TwidocService {
       conn = connection.conn;
 
       // Add your query logic here
-      const { passkey } =
+      const { passcode } =
         await this.dbService.getHrAdminCredentials(credentials);
       const result = await conn.execute(
         `DECLARE v_cursor SYS_REFCURSOR;
@@ -95,7 +95,7 @@ export class TwidocService {
             :result := v_cursor;
         END;`,
         {
-          KEYVALUE: passkey,
+          KEYVALUE: passcode,
           NYEAR: body.year,
           EMPID: body.empno,
           result: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },

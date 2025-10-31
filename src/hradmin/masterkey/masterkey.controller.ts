@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Param,
   Post,
   UseGuards,
   Request,
@@ -11,11 +10,11 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
-// import { MasterkeyService } from './masterkey.service';
+import { MasterkeyService } from './masterkey.service';
 
 @Controller('hradmin/masterkey')
 export class MasterkeyController {
-  //   constructor(private readonly keys: MasterkeyService) {}
+  constructor(private readonly keys: MasterkeyService) {}
 
   @Post('verified')
   @UseGuards(AuthGuard('jwt'))
@@ -24,43 +23,55 @@ export class MasterkeyController {
     @Body() body: { pin: string },
     @Res({ passthrough: true }) response: Response,
   ) {
-    // const { users, group, apps } = req.user.user;
-    // if (!(group === 2 && apps === 20))
-    //   throw new UnauthorizedException('You nave no authorization 1');
-    // const isValid = await this.keys.verify(users, body.pin);
-    // if (!isValid)
-    //   throw new UnauthorizedException('You nave no authorization 2');
+    const { users, group, apps } = req.user.user;
+    if (!(group === 2 && apps === 20))
+      throw new UnauthorizedException('You nave no authorization 1');
+    const isValid = await this.keys.verify(users, body.pin);
+    if (!isValid)
+      throw new UnauthorizedException('You nave no authorization 2');
 
-    // //Create Cookie for Key Guards
-    // response.cookie(`hrmaster`, isValid, {
-    //   secure: process.env.NODE_ENV === 'production',
-    //   sameSite: 'strict',
-    // });
+    //Create Cookie for Key Guards
+    response.cookie(process.env.KEY_COOKIE_NAME, isValid, {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
     return;
   }
 
-  //   @Post('create')
-  //   create() {
-  //     const key1 =
-  //       'Jobschedule:757575:6C6574207468656D206561742063616B65:11002525:hradmin:HRrb,rN.sPj';
-  //     console.log(this.keys.encrypt(key1));
-  //     return;
-  //   }
+  @Get('all')
+  @UseGuards(AuthGuard('jwt'))
+  async findAll(@Request() req) {
+    const { users, group, apps } = req.user.user;
+    if (!(group === 2 && apps === 20))
+      throw new UnauthorizedException('You nave no authorization 1');
+    const data = await this.keys.findAll();
+    return data.map((item) => {
+      const { KEY_CODE, ...rest } = item;
+      return rest;
+    });
+  }
 
-  //   @Post('update')
-  //   update() {
-  //     const key1 =
-  //       'SYSTEM:000000:6C6574207468656D206561742063616B65:11002525:hradmin:HRrb,rN.sPj';
-  //     console.log(this.keys.encrypt(key1));
-  //     return;
-  //   }
+  @Post('update')
+  @UseGuards(AuthGuard('jwt'))
+  async update(@Request() req, @Body() body: { pin: string; newpin: string }) {
+    const { users, group, apps } = req.user.user;
+    if (!(group === 2 && apps === 20))
+      throw new UnauthorizedException('You nave no authorization 1');
 
-  //   @Get('all')
-  //   @UseGuards(AuthGuard('jwt'))
-  //   findAll(@Request() req) {
-  //     const { users, group, apps } = req.user.user;
-  //     if (!(group === 2 && apps === 20))
-  //       throw new UnauthorizedException('You nave no authorization 1');
-  //     return this.keys.findAll();
-  //   }
+    const isValid = await this.keys.verify(users, body.pin);
+    if (!isValid)
+      throw new UnauthorizedException('You nave no authorization 2');
+
+    return await this.keys.updateMasterKey(isValid, users, body.newpin);
+  }
+
+  @Post('create')
+  @UseGuards(AuthGuard('key'))
+  async create(@Request() req, @Body() body: { empno: string; type: string }) {
+    return await this.keys.createMasterKey(
+      req.user.user,
+      body.empno,
+      body.type,
+    );
+  }
 }

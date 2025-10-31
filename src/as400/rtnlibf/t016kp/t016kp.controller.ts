@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { T016kpService } from './t016kp.service';
 
-@Controller('t016kp')
+@Controller('as400/t060kp')
 export class T016kpController {
   constructor(private readonly t01: T016kpService) {}
 

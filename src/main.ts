@@ -23,29 +23,9 @@ async function bootstrap() {
   const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
   await fs.mkdir(uploadPath, { recursive: true });
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    // logger: WinstonModule.createLogger(winstonConfig),
-    // logger: false,
+    logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
   });
 
-  //   app.enableCors({
-  //     origin: [
-  //       'https://amecwebtest.mitsubishielevatorasia.co.th',
-  //       'https://amecwebtest1.mitsubishielevatorasia.co.th',
-  //       'https://amecweb.mitsubishielevatorasia.co.th',
-  //       'https://amecweb1.mitsubishielevatorasia.co.th',
-  //       'https://amecweb2.mitsubishielevatorasia.co.th',
-  //       'https://amecweb4.mitsubishielevatorasia.co.th',
-  //       'http://amecwebtest.mitsubishielevatorasia.co.th',
-  //       'http://amecwebtest1.mitsubishielevatorasia.co.th',
-  //       'http://amecweb.mitsubishielevatorasia.co.th',
-  //       'http://amecweb1.mitsubishielevatorasia.co.th',
-  //       'http://amecweb2.mitsubishielevatorasia.co.th',
-  //       'http://amecweb4.mitsubishielevatorasia.co.th',
-  //       'http://webflow.mitsubishielevatorasia.co.th',
-  //       'http://localhost:8080',
-  //     ],
-  //     credentials: true,
-  //   });
   app.enableCors({
     origin: (origin, cb) => {
       // ถ้าขี้เกียจแยก logic จะใช้เหมือน isAllowedOrigin ก็ได้
@@ -71,7 +51,6 @@ async function bootstrap() {
 
   // 🔗 ตั้ง WS adapter กลาง—ครอบทุก @WebSocketGateway
   app.useWebSocketAdapter(new SocketIoAdapter(app));
-
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true, // ใช้ class-transformer (@Type)

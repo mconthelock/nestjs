@@ -1,91 +1,115 @@
-import { Masterkey } from './entities/masterkey.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as crypto from 'crypto';
+import { DatabaseService } from '../shared/database.service';
+import { DataSource } from 'typeorm';
+import * as oracledb from 'oracledb';
 
 @Injectable()
 export class MasterkeyService {
-  private readonly algorithm = 'aes-256-cbc';
-  private readonly keyHex = process.env.MASTER_DECRYPTION_KEY;
-  private readonly ivHex = process.env.MASTER_DECRYPTION_IV;
-
-  // ตัวแปร 2 ตัวนี้ต้องเป็น Buffer
-  private readonly key: Buffer;
-  private readonly iv: Buffer;
-
   constructor(
-    // @InjectRepository(Masterkey, 'amecConnection')
-    // private readonly masterkeyRepository: Repository<Masterkey>,
     private jwtService: JwtService,
-  ) {
-    if (!this.keyHex || !this.ivHex) {
-      throw new Error(
-        'MASTER_DECRYPTION_KEY and MASTER_DECRYPTION_IV must be set in .env',
-      );
-    }
-
-    this.key = Buffer.from(this.keyHex, 'hex');
-    this.iv = Buffer.from(this.ivHex, 'hex');
-
-    if (this.key.length !== 32) {
-      throw new Error(
-        'MASTER_DECRYPTION_KEY must be a 64-character hex string (32 bytes)',
-      );
-    }
-    if (this.iv.length !== 16) {
-      // <-- IV ต้องยาว 16 bytes
-      throw new Error(
-        'MASTER_DECRYPTION_IV must be a 32-character hex string (16 bytes)',
-      );
-    }
-  }
-
-  encrypt(text: string): string {
-    const cipher = crypto.createCipheriv(
-      this.algorithm,
-      Buffer.from(this.key),
-      Buffer.from(this.iv),
-    );
-    let encrypted = cipher.update(text);
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-    return encrypted.toString('hex');
-  }
-
-  decrypt(encryptedText: string): string {
-    const encryptedBuffer = Buffer.from(encryptedText, 'hex');
-    const decipher = crypto.createDecipheriv(
-      this.algorithm,
-      Buffer.from(this.key),
-      Buffer.from(this.iv),
-    );
-    let decrypted = decipher.update(encryptedBuffer);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-    return decrypted.toString();
-  }
+    private dbService: DatabaseService,
+  ) {}
 
   async verify(user: string, pin: string) {
-    //const keys =
-    // const decryptedPin = await this.masterkeyRepository.find({
-    //   where: { KEY_OWNER: user },
-    // });
-    // const pinkey = this.decrypt(decryptedPin[0].KEY_CODE);
-    // const pinnumber = pinkey.split(':')[1];
-    // if (pinnumber == pin) {
-    //   const pinUser = pinkey.split(':')[0];
-    //   const pinKey = pinkey.split(':')[2];
-    //   const pdfkey = pinkey.split(':')[3];
-    //   const payload = {
-    //     user: this.encrypt(`${pinUser}:${pinnumber}:${pinKey}:${pdfkey}`),
-    //     sub: pinUser,
-    //   };
-    //   return this.jwtService.sign(payload);
-    // }
+    const keys = await this.dbService.getMasterKey();
+    const decryptedPin = await keys.find((k) => k.KEY_OWNER === user);
+    if (!decryptedPin) return false;
+
+    const users = this.dbService.decrypt(decryptedPin.KEY_CODE);
+    const [pinuser, pinpasskey, pincode, pdfkey] = users.split(':');
+    if (pinpasskey == pin) {
+      const payload = {
+        user: this.dbService.encrypt(
+          `${pinuser}:${pinpasskey}:${pincode}:${pdfkey}`,
+        ),
+        sub: user,
+      };
+      return this.jwtService.sign(payload);
+    }
     return false;
   }
 
   async findAll() {
-    //return this.masterkeyRepository.find();
+    return this.dbService.getMasterKey();
+  }
+
+  async updateMasterKey(cer: string, user: string, newpin: string) {
+    const credentials = this.jwtService.verify(cer, {
+      secret: process.env.JWT_SECRET,
+    });
+
+    const code = await this.dbService.getMasterKey();
+    const decryptedPin = await code.find((k) => k.KEY_OWNER === user);
+    if (!decryptedPin) return false;
+
+    const users = this.dbService.decrypt(decryptedPin.KEY_CODE);
+    const [pinuser, pinpasskey, pincode, pdfkey, admin, pwd] = users.split(':');
+    const newCredentials = this.dbService.encrypt(
+      `${pinuser}:${newpin}:${pincode}:${pdfkey}:${admin}:${pwd}`,
+    );
+
+    let hrAdminDataSource: DataSource;
+    let conn: oracledb.Connection;
+    try {
+      const connection = await this.dbService.createConnection(
+        credentials.user,
+      );
+      hrAdminDataSource = connection.hrAdminDataSource;
+      conn = connection.conn;
+      const result = await conn.execute(
+        `UPDATE MASTERKEY
+        SET KEY_CODE = :KEY_CODE, KEY_EXPIRE = SYSDATE + 180
+        WHERE KEY_OWNER = :KEY_OWNER`,
+        {
+          KEY_CODE: newCredentials,
+          KEY_OWNER: credentials.sub,
+        },
+      );
+      await conn.commit();
+      return result;
+    } catch (error) {
+      console.error('Error fetching Master data:', error);
+      throw new InternalServerErrorException('Failed to fetch Master data.');
+    } finally {
+      await this.dbService.closeConnection(hrAdminDataSource, conn);
+    }
+  }
+
+  async createMasterKey(credentials: any, empno: string, type: string) {
+    let hrAdminDataSource: DataSource;
+    let conn: oracledb.Connection;
+    try {
+      const connection = await this.dbService.createConnection(credentials);
+      hrAdminDataSource = connection.hrAdminDataSource;
+      conn = connection.conn;
+
+      const code = await this.dbService.getMasterKey();
+      const decryptedPin = await code.find((k) => k.KEY_OWNER === 'SYSTEM');
+      if (!decryptedPin) return false;
+
+      const users = this.dbService.decrypt(decryptedPin.KEY_CODE);
+      const [pinuser, pinpasskey, pincode, pdfkey, admin, pwd] =
+        users.split(':');
+      const newCredentials = this.dbService.encrypt(
+        `${empno}:000000:${pincode}:${pdfkey}:${admin}:${pwd}`,
+      );
+
+      const result = await conn.execute(
+        `INSERT INTO MASTERKEY VALUES (:KEY_OWNER, :KEY_CODE, :KEY_ROLE, SYSDATE -1)`,
+        {
+          KEY_OWNER: empno,
+          KEY_CODE: newCredentials,
+          KEY_ROLE: type,
+        },
+      );
+      await conn.commit();
+      return result;
+    } catch (error) {
+      console.error('Error fetching Master data:', error);
+      throw new InternalServerErrorException('Failed to fetch Master data.');
+    } finally {
+      await this.dbService.closeConnection(hrAdminDataSource, conn);
+    }
   }
 }

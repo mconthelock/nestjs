@@ -76,7 +76,7 @@ import idsConfig from './common/databases/dailyids.config';
     ItemarrnglstModule,
     HeaderModule,
     DetailModule,
-    //AS400Module,
+    AS400Module,
     AutomationModule,
     HradminModule,
     LoggerModule,

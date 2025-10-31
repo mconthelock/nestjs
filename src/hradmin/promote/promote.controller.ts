@@ -10,12 +10,14 @@ import { Response } from 'express';
 import { PromoteService } from './promote.service';
 import { AuthGuard } from '@nestjs/passport';
 import { MasterkeyService } from '../masterkey/masterkey.service';
+import { DatabaseService } from '../shared/database.service';
 
 @Controller('hradmin/promote')
 export class PromoteController {
   constructor(
     private readonly docs: PromoteService,
     private keys: MasterkeyService,
+    private dbService: DatabaseService,
   ) {}
 
   @Post('all')
@@ -52,7 +54,7 @@ export class PromoteController {
   @UseGuards(AuthGuard('key'))
   async createPdf(@Request() req, @Body() body: any) {
     const data = await this.docs.findById(req.user.user, body);
-    const key = await this.keys.decrypt(req.user.user);
+    const key = await this.dbService.decrypt(req.user.user);
     const pdfkey = key.split(':')[3];
     let passkey = pdfkey;
     if (data.ASETYP !== 'MP')

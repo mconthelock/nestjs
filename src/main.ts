@@ -12,7 +12,10 @@ import { promises as fs } from 'fs';
 // import * as oracledb from 'oracledb';
 
 // Log management
-import { WinstonModule, WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import {
+  WINSTON_MODULE_PROVIDER,
+  WINSTON_MODULE_NEST_PROVIDER,
+} from 'nest-winston';
 import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
 import { AllExceptionsFilter } from './common/logger/http-exception.filter';
 import { winstonConfig } from './common/logger/winston.config';
@@ -28,7 +31,6 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, cb) => {
-      // ถ้าขี้เกียจแยก logic จะใช้เหมือน isAllowedOrigin ก็ได้
       if (!origin) return cb(null, true);
       try {
         const u = new URL(origin);
@@ -53,7 +55,7 @@ async function bootstrap() {
   app.useWebSocketAdapter(new SocketIoAdapter(app));
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true, // ใช้ class-transformer (@Type)
+      transform: true,
       whitelist: true, // ตัดฟิลด์ที่ไม่ได้ประกาศใน DTO ทิ้ง
       //   forbidNonWhitelisted: true,   // ถ้ามีฟิลด์แปลก → โยน 400 แทนการตัดทิ้ง
       exceptionFactory: (errors) =>

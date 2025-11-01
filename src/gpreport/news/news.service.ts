@@ -6,7 +6,7 @@ import { News } from './entities/news.entity';
 @Injectable()
 export class NewsService {
   constructor(
-    @InjectRepository(News, 'docinvConnection')
+    @InjectRepository(News, 'gpreportConnection')
     private readonly repo: Repository<News>,
   ) {}
 

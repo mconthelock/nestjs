@@ -8,6 +8,7 @@ import spsysConfig from './common/databases/spsys.config';
 import docinvConfig from './common/databases/docinv.config';
 import webformConfig from './common/databases/webform.config';
 import invoiceConfig from './common/databases/invoice.config';
+import gpreportConfig from './common/databases/gpreport.config';
 
 //Winston Logger
 import { WinstonModule } from 'nest-winston';

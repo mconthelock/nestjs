@@ -6,10 +6,10 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { TypeOrmWinstonLogger } from '../logger/typeorm-winston.logger';
 
 dotenv.config();
-let spsysConfig: TypeOrmModuleAsyncOptions;
+let gpreportConfig: TypeOrmModuleAsyncOptions;
 if (process.env.HOST == 'AMEC') {
-  spsysConfig = {
-    name: 'spsysConnection',
+  gpreportConfig = {
+    name: 'gpreportConnection',
     imports: [],
     inject: [ConfigService, WINSTON_MODULE_PROVIDER],
     useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
@@ -43,8 +43,8 @@ if (process.env.HOST == 'AMEC') {
     }),
   };
 } else {
-  spsysConfig = {
-    name: 'spsysConnection',
+  gpreportConfig = {
+    name: 'gpreportConnection',
     imports: [],
     inject: [ConfigService],
     useFactory: async (config: ConfigService) => ({
@@ -53,7 +53,7 @@ if (process.env.HOST == 'AMEC') {
       port: parseInt(process.env.HOME_PORT as string, 10),
       username: process.env.HOME_USER,
       password: process.env.HOME_PASSWORD,
-      database: process.env.SPSYS_DATABASE,
+      database: process.env.GPREPORT_DATABASE,
       entities: [
         __dirname + '/../../**/**/*.entity{.ts,.js}',
         __dirname + '/../../**/**/**/*.entity{.ts,.js}',
@@ -62,4 +62,4 @@ if (process.env.HOST == 'AMEC') {
     }),
   };
 }
-export default spsysConfig;
+export default gpreportConfig;

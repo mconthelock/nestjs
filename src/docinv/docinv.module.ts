@@ -10,6 +10,10 @@ import { WorkplanModule } from './workplan/workplan.module';
 import { WorkpicModule } from './workpic/workpic.module';
 import { SpecificationModule } from './specification/specification.module';
 import { ReleaseModule } from './release/release.module';
+import { ProgramModule } from './program/program.module';
+import { ModulesModule } from './modules/modules.module';
+import { RevisionModule } from './revision/revision.module';
+import { SourceModule } from './source/source.module';
 
 @Module({
   imports: [
@@ -24,6 +28,10 @@ import { ReleaseModule } from './release/release.module';
     WorkpicModule,
     SpecificationModule,
     ReleaseModule,
+    ProgramModule,
+    ModulesModule,
+    RevisionModule,
+    SourceModule,
   ],
 })
 export class DocinvModule {}

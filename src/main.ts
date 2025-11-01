@@ -9,16 +9,11 @@ import { NestExpressApplication } from '@nestjs/platform-express'; // ✅ ต้
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import { promises as fs } from 'fs';
-// import * as oracledb from 'oracledb';
 
 // Log management
-import {
-  WINSTON_MODULE_PROVIDER,
-  WINSTON_MODULE_NEST_PROVIDER,
-} from 'nest-winston';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
 import { AllExceptionsFilter } from './common/logger/http-exception.filter';
-import { winstonConfig } from './common/logger/winston.config';
 import { SocketIoAdapter } from './common/ws/socket-io.adapter';
 
 async function bootstrap() {
@@ -26,7 +21,7 @@ async function bootstrap() {
   const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
   await fs.mkdir(uploadPath, { recursive: true });
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
+    //logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
   });
 
   app.enableCors({

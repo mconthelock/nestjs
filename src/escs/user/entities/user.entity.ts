@@ -27,7 +27,7 @@ export class EscsUser {
   @Column()
   GRP_ID: number;
 
-  @Column({ type: 'number', insert: false, update: false })
+  @Column()
   USR_STATUS: number;
 
   @Column()

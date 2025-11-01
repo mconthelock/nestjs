@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { M008KP } from 'src/as400/rtnlibf/m008kp/entities/m008kp.entity';
 import { Repository } from 'typeorm';
 
-import { M008KP } from '../../as400/rtnlibf/m008kp/entities/m008kp.entity';
-
 @Injectable()
-export class HeaderService {
+export class IdtagService {
   constructor(
     @InjectRepository(M008KP, 'amecConnection')
     private readonly m08: Repository<M008KP>,

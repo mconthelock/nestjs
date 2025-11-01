@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { HeaderService } from './header.service';
+import { IdtagService } from './idtag.service';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('AS400 - ID Tag')
 @Controller('idtag')
-export class HeaderController {
-  constructor(private readonly tag: HeaderService) {}
+export class IdtagController {
+  constructor(private readonly tag: IdtagService) {}
 
   @Post('schd')
   findBySchd(@Body() body: { schd: string; schdp?: string }) {

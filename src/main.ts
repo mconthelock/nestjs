@@ -9,13 +9,11 @@ import { NestExpressApplication } from '@nestjs/platform-express'; // ✅ ต้
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import { promises as fs } from 'fs';
-// import * as oracledb from 'oracledb';
 
 // Log management
-import { WinstonModule, WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
 import { AllExceptionsFilter } from './common/logger/http-exception.filter';
-import { winstonConfig } from './common/logger/winston.config';
 import { SocketIoAdapter } from './common/ws/socket-io.adapter';
 
 async function bootstrap() {
@@ -23,12 +21,11 @@ async function bootstrap() {
   const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
   await fs.mkdir(uploadPath, { recursive: true });
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
+    //logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
   });
 
   app.enableCors({
     origin: (origin, cb) => {
-      // ถ้าขี้เกียจแยก logic จะใช้เหมือน isAllowedOrigin ก็ได้
       if (!origin) return cb(null, true);
       try {
         const u = new URL(origin);
@@ -53,7 +50,7 @@ async function bootstrap() {
   app.useWebSocketAdapter(new SocketIoAdapter(app));
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true, // ใช้ class-transformer (@Type)
+      transform: true,
       whitelist: true, // ตัดฟิลด์ที่ไม่ได้ประกาศใน DTO ทิ้ง
       //   forbidNonWhitelisted: true,   // ถ้ามีฟิลด์แปลก → โยน 400 แทนการตัดทิ้ง
       exceptionFactory: (errors) =>

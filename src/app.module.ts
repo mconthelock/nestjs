@@ -8,6 +8,9 @@ import spsysConfig from './common/databases/spsys.config';
 import docinvConfig from './common/databases/docinv.config';
 import webformConfig from './common/databases/webform.config';
 import invoiceConfig from './common/databases/invoice.config';
+import gpreportConfig from './common/databases/gpreport.config';
+import auditConfig from './common/databases/auditDB.config';
+import idsConfig from './common/databases/dailyids.config';
 
 //Winston Logger
 import { WinstonModule } from 'nest-winston';
@@ -25,16 +28,11 @@ import { AmecMfgModule } from './amecmfg/amecmfg.module';
 import { AmecModule } from './amec/amec.module';
 import { DocinvModule } from './docinv/docinv.module';
 import { gpreportModule } from './gpreport/gpreport.module';
-import { AS400Module } from './as400/as400.module';
 import { WebformModule } from './webform/webform.module';
-import { HeaderModule } from './idtag/header/header.module';
 import { SpModule } from './spprogram/sp.module';
 import { MktModule } from './marketing/mkt.module';
 import { JobOrderModule } from './joborder/joborder.module';
-import { PisModule } from './pis/pis.module';
 import { ESCSModule } from './escs/escs.module';
-import { DetailModule } from './idtag/detail/detail.module';
-import { ItemarrnglstModule } from './elmes/itemarrnglst/itemarrnglst.module';
 import { FilesModule } from './file/file.module';
 import { MailModule } from './mail/mail.module';
 import { LoggerModule } from './logger/logger.module';
@@ -42,13 +40,10 @@ import { AutomationModule } from './automation/automation.module';
 import { PDFModule } from './pdf/pdf.module';
 import { HradminModule } from './hradmin/hradmin.module';
 import { InvoiceModule } from './invoice/invoice.module';
-import { SpecialuserModule } from './itgc/specialuser/specialuser.module';
-import { MatrixItemMasterModule } from './ids/matrix/matrix-item-master/matrix-item-master.module';
-import { MatrixSectionModule } from './ids/matrix/matrix-section/matrix-section.module';
-import { MatrixEffectItemModule } from './ids/matrix/matrix-effect-item/matrix-effect-item.module';
-import { MatrixEffectViewModule } from './ids/matrix/matrix-effect-view/matrix-effect-view.module';
-import auditConfig from './common/databases/auditDB.config';
-import idsConfig from './common/databases/dailyids.config';
+import { IdsModule } from './ids/ids.module';
+import { ElmesModule } from './elmes/elmes.module';
+import { ItgcModule } from './itgc/itgc.module';
+import { AS400Module } from './as400/as400.module';
 
 @Module({
   imports: [
@@ -62,6 +57,7 @@ import idsConfig from './common/databases/dailyids.config';
     TypeOrmModule.forRootAsync(invoiceConfig),
     TypeOrmModule.forRootAsync(auditConfig),
     TypeOrmModule.forRootAsync(idsConfig),
+    TypeOrmModule.forRootAsync(gpreportConfig),
     //Logging Config
     WinstonModule.forRoot(winstonConfig),
     //BB8 💣
@@ -73,10 +69,8 @@ import idsConfig from './common/databases/dailyids.config';
     WebformModule,
     SpModule,
     MktModule,
-    ItemarrnglstModule,
-    HeaderModule,
-    DetailModule,
-    AS400Module,
+    ElmesModule,
+    //AS400Module,
     AutomationModule,
     HradminModule,
     LoggerModule,
@@ -85,16 +79,11 @@ import idsConfig from './common/databases/dailyids.config';
     FilesModule,
     ESCSModule,
     PDFModule,
-    PisModule,
     MailModule,
-    PisModule,
     ESCSModule,
     InvoiceModule,
-    SpecialuserModule,
-    MatrixItemMasterModule,
-    MatrixSectionModule,
-    MatrixEffectItemModule,
-    MatrixEffectViewModule,
+    IdsModule,
+    ItgcModule,
   ],
   providers: [HttpLoggingInterceptor],
 })

@@ -19,9 +19,7 @@ if (process.env.HOST == 'AMEC') {
       username: process.env.IDS_USER,
       password: process.env.IDS_PASSWORD,
       connectString: `${process.env.IDS_HOST}:${process.env.IDS_PORT}/${process.env.IDS_SERVICE}?expire_time=5`,
-      entities: [
-        __dirname + '/../../ids/**/*.entity{.ts,.js}',
-      ],
+      entities: [__dirname + '/../../ids/**/*.entity{.ts,.js}'],
       synchronize: false,
       logger: new TypeOrmWinstonLogger(winstonLogger),
       retryAttempts: 5,
@@ -51,7 +49,7 @@ if (process.env.HOST == 'AMEC') {
       port: parseInt(process.env.HOME_PORT as string, 10),
       username: process.env.HOME_USER,
       password: process.env.HOME_PASSWORD,
-      database: process.env.HOME_DATABASE,
+      database: process.env.GPREPORT_DATABASE,
       entities: [
         __dirname + '/../../**/**/*.entity{.ts,.js}',
         __dirname + '/../../**/**/**/*.entity{.ts,.js}',

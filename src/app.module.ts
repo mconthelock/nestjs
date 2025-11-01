@@ -28,7 +28,6 @@ import { AmecMfgModule } from './amecmfg/amecmfg.module';
 import { AmecModule } from './amec/amec.module';
 import { DocinvModule } from './docinv/docinv.module';
 import { gpreportModule } from './gpreport/gpreport.module';
-import { AS400Module } from './as400/as400.module';
 import { WebformModule } from './webform/webform.module';
 import { SpModule } from './spprogram/sp.module';
 import { MktModule } from './marketing/mkt.module';
@@ -41,12 +40,10 @@ import { AutomationModule } from './automation/automation.module';
 import { PDFModule } from './pdf/pdf.module';
 import { HradminModule } from './hradmin/hradmin.module';
 import { InvoiceModule } from './invoice/invoice.module';
-import { SpecialuserModule } from './itgc/specialuser/specialuser.module';
-import { MatrixItemMasterModule } from './ids/matrix/matrix-item-master/matrix-item-master.module';
-import { MatrixSectionModule } from './ids/matrix/matrix-section/matrix-section.module';
-import { MatrixEffectItemModule } from './ids/matrix/matrix-effect-item/matrix-effect-item.module';
-import { MatrixEffectViewModule } from './ids/matrix/matrix-effect-view/matrix-effect-view.module';
+import { IdsModule } from './ids/ids.module';
 import { ElmesModule } from './elmes/elmes.module';
+import { ItgcModule } from './itgc/itgc.module';
+import { AS400Module } from './as400/as400.module';
 
 @Module({
   imports: [
@@ -85,11 +82,8 @@ import { ElmesModule } from './elmes/elmes.module';
     MailModule,
     ESCSModule,
     InvoiceModule,
-    SpecialuserModule,
-    MatrixItemMasterModule,
-    MatrixSectionModule,
-    MatrixEffectItemModule,
-    MatrixEffectViewModule,
+    IdsModule,
+    ItgcModule,
   ],
   providers: [HttpLoggingInterceptor],
 })

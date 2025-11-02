@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { SpecialuserService } from './specialuser.service';
 import { CreateSpecialuserDto } from './dto/create-specialuser.dto';
 import { UpdateSpecialuserDto } from './dto/update-specialuser.dto';
@@ -11,7 +19,7 @@ export class SpecialuserController {
   async getServerName() {
     return this.specialuserService.getServerName();
   }
-  
+
   @Get('getUserLogin')
   async getUserLogin() {
     return this.specialuserService.getUserLogin();
@@ -22,4 +30,8 @@ export class SpecialuserController {
     return this.specialuserService.getController();
   }
 
+  @Get('all')
+  async getAll() {
+    return this.specialuserService.getAll();
+  }
 }

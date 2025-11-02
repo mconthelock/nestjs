@@ -8,5 +8,6 @@ import { Specialuser } from './entities/specialuser.entity';
   imports: [TypeOrmModule.forFeature([Specialuser], 'auditConnection')],
   controllers: [SpecialuserController],
   providers: [SpecialuserService],
+  exports: [SpecialuserService],
 })
 export class SpecialuserModule {}

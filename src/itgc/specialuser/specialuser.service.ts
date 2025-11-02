@@ -23,22 +23,26 @@ export class SpecialuserService {
 
   async getUserLogin() {
     return this.spuRepo.find({
-        where: {
-            AUTH_CLASS: 'General',
-            USER_TYPE1: 'Temporary',
-            USER_TYPE2: 'Human',
-            ACTIVE_STATUS: 1
-        }
+      where: {
+        AUTH_CLASS: 'General',
+        USER_TYPE1: 'Temporary',
+        USER_TYPE2: 'Human',
+        ACTIVE_STATUS: 1,
+      },
     });
   }
 
   async getController() {
     return this.spuRepo.find({
-        where: {
-            AUTH_CLASS: 'Almighty',
-            USER_TYPE2: 'Human',
-            ACTIVE_STATUS: 1
-        }
+      where: {
+        AUTH_CLASS: 'Almighty',
+        USER_TYPE2: 'Human',
+        ACTIVE_STATUS: 1,
+      },
     });
+  }
+
+  async getAll() {
+    return this.spuRepo.find();
   }
 }

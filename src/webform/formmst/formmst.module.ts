@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { FormmstService } from './formmst.service';
 import { FormmstController } from './formmst.controller';
 import { Formmst } from './entities/formmst.entity';
-import { TypeOrmModule } from '@nestjs/typeorm'; 
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Formmst], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([Formmst], 'webformConnection')],
   controllers: [FormmstController],
   providers: [FormmstService],
   exports: [FormmstService],

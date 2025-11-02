@@ -8,7 +8,7 @@ import { getSafeFields } from '../../common/utils/Fields.utils';
 @Injectable()
 export class FormmstService {
   constructor(
-    @InjectRepository(Formmst, 'amecConnection')
+    @InjectRepository(Formmst, 'webformConnection')
     private formmstRepo: Repository<Formmst>,
     @InjectDataSource('amecConnection')
     private dataSource: DataSource,
@@ -29,14 +29,16 @@ export class FormmstService {
     });
   }
 
-  getFormMasterByVanameAll(vaname: string){
+  getFormMasterByVanameAll(vaname: string) {
     return this.formmstRepo.find({
       where: { VANAME: vaname },
     });
   }
 
   async getFormmst(searchDto: SearchFormmstDto, queryRunner?: QueryRunner) {
-    const repo = queryRunner ? queryRunner.manager.getRepository(Formmst) : this.formmstRepo;
+    const repo = queryRunner
+      ? queryRunner.manager.getRepository(Formmst)
+      : this.formmstRepo;
     const { NNO, VORGNO, CYEAR, VANAME, fields = [] } = searchDto;
     const query = repo.createQueryBuilder('A');
 

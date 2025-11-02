@@ -53,7 +53,7 @@ if (process.env.HOST == 'AMEC') {
       port: parseInt(process.env.HOME_PORT as string, 10),
       username: process.env.HOME_USER,
       password: process.env.HOME_PASSWORD,
-      database: process.env.GPREPORT_DATABASE,
+      database: process.env.AUD_DATABASE,
       entities: [
         __dirname + '/../../**/**/*.entity{.ts,.js}',
         __dirname + '/../../**/**/**/*.entity{.ts,.js}',

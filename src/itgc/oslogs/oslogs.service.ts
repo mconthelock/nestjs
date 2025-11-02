@@ -83,6 +83,14 @@ export class OslogsService {
             !knownLogins.some((user) => user.USER_LOGIN === log.LOG_USER),
         );
       default:
+        if (server == 'AS400') {
+          const as400Logins = osusers.filter(
+            (user) => user.SERVER_NAME == server && user.CATEGORY == 'OS',
+          );
+          return results.filter((log) =>
+            as400Logins.some((user) => user.USER_LOGIN === log.LOG_USER),
+          );
+        }
         return results;
     }
   }

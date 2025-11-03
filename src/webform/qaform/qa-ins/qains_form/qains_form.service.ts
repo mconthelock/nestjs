@@ -91,7 +91,7 @@ export class QainsFormService {
       );
 
       if (!createForm.status) {
-        throw new Error(createForm.message);
+        throw new Error(createForm.message.message);
       }
 
       const form = {

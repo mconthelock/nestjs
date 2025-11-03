@@ -201,7 +201,16 @@ export class FormService {
         }
         return {
           status: true,
-          message: 'Insert form successful',
+          message: {
+            message: 'Insert form successful',
+            runno: context.nrunno,
+            empno: context.empno,
+            formtype: context.nfrmno,
+            owner: context.vorgno,
+            cyear: context.cyear,
+            cyear2: context.cyear2,
+            next_approve: first.length > 0 ? first[0].VAPVNO : '',
+          },
           data: formData,
         };
       } else {

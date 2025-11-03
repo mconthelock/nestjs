@@ -110,10 +110,11 @@ export class FormController {
   @UseInterceptors(AnyFilesInterceptor())
   async deleteForm(
     @Body() dto: UpdateFormDto
-  ): Promise<{ message: string; status: boolean }> {
+  ): Promise<{ form: UpdateFormDto, message: string; status: boolean }> {
     try {
       const result = await this.formService.deleteFlowAndForm(dto);
       return {
+        form: dto,
         message: result
           ? 'Form deleted successfully'
           : 'Failed to delete form',

@@ -265,12 +265,14 @@ export class FlowService {
           { condition: {...form, CSTEPNEXTNO: step.CSTEPNO}, CSTEPNEXTNO: step.CSTEPNEXTNO },
           runner,
         );
+        // Update start step
         if (flowStart) {
           await this.updateFlow(
             { condition: {...form, CSTEPNO: step.CSTEPNEXTNO}, CSTART: '1' },
             runner,
           );
         }
+        // Update next step
         const stepReady = await this.getFlow({...form, CSTEPST: this.STEP_READY}, runner);
         await this.updateFlow(
             { condition: {...form, CSTEPNO: stepReady[0].CSTEPNEXTNO}, CSTEPST: '2' },
@@ -278,7 +280,6 @@ export class FlowService {
         );
         await this.deleteFlow(dto, runner);
     }
-    //   throw new Error('Not implemented delete flow step logic');
 
       if (localRunner && didStartTx && runner.isTransactionActive)
         await localRunner.commitTransaction();

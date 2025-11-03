@@ -9,6 +9,6 @@ export function setRepo(repoProd: any, repoTest: any, host: string) {
   }
 }
 
-export function checkHostTest(host: string) {
-  return host.includes('development');
+export function checkHostTest(STATE: string) {
+  return STATE.includes('development');
 }

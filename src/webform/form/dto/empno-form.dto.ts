@@ -6,7 +6,7 @@ import { FormDto } from './form.dto';
 export class empnoFormDto extends PickType(FormDto, [
   'NFRMNO', 'VORGNO', 'CYEAR', 'CYEAR2', 'NRUNNO',
 ] as const) {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   readonly EMPNO: string;
 }

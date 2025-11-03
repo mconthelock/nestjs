@@ -547,7 +547,7 @@ export class FlowService {
 
   async getExtData(dto: empnoFormDto) {
     const flow = await this.getEmpFlowStepReady(dto);
-    if (flow.length === 0) {
+    if (flow.length === 0 || dto.EMPNO == null || dto.EMPNO == '') {
       return '';
     }
     return flow[0].CEXTDATA;

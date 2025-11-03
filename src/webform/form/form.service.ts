@@ -729,6 +729,9 @@ export class FormService {
     if (frm.length == 0) {
       return this.mode_add;
     }
+    if(form.EMPNO == null || form.EMPNO == '') {
+        return this.mode_view;
+    }
     const flow = await this.flowService.getEmpFlowStepReady(form);
     return flow.length > 0 ? this.mode_edit : this.mode_view;
   }

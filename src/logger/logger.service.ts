@@ -16,6 +16,9 @@ export class LoggerService implements OnModuleInit {
 
     @InjectDataSource('amecConnection')
     private readonly amecDs: DataSource,
+
+    @InjectDataSource('idsConnection')
+    private readonly idsDs: DataSource,
   ) {}
 
   async checkDocinv(): Promise<{ status: string; message?: string }> {
@@ -65,6 +68,18 @@ export class LoggerService implements OnModuleInit {
     }
   }
 
+  async checkdailyIDS(): Promise<{ status: string; message?: string }> {
+    try {
+      let sql = `SELECT 'IDS', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@DATACENTER`;
+      if (process.env.STATE == 'development')
+        sql = `SELECT 'IDS', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@AMECDC`;
+      await this.amecDs.query(sql);
+    } catch (error) {
+      console.log(`Error: ${error.message}`);
+      return { status: 'error', message: error.message };
+    }
+  }
+
   onModuleInit() {
     setInterval(() => {
       if (process.env.HOST == 'AMEC') {
@@ -73,6 +88,7 @@ export class LoggerService implements OnModuleInit {
         this.checkSpsys();
         this.checkWebform();
         this.checkIds();
+        this.checkdailyIDS();
       }
     }, 600_000);
   }

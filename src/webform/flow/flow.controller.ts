@@ -87,10 +87,8 @@ export class FlowController {
   }
 
   @Post('showflow')
-  async showFlow(@Body() form: FormDto, @Req() req: Request) {
-    console.log('Host in showflow: ', req.headers.host);
-    
-    return await this.flowService.showFlow(form, req.headers.host);
+  async showFlow(@Body() form: FormDto) {
+    return await this.flowService.showFlow(form);
   }
 
   @Post('getFlowTree')

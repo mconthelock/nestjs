@@ -10,5 +10,5 @@ export function setRepo(repoProd: any, repoTest: any, host: string) {
 }
 
 export function checkHostTest(host: string) {
-  return host.includes('localhost') || host.includes('amecwebtest');
+  return host.includes('development');
 }

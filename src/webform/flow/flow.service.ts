@@ -298,12 +298,12 @@ export class FlowService {
 
   //---------------------------- Show flow Start --------------------------------
 
-  async showFlow(form: FormDto, host: string, queryRunner?: QueryRunner) {
+  async showFlow(form: FormDto, queryRunner?: QueryRunner) {
     const flowData = await this.getFlowTree(form, queryRunner);
     if( flowData.length === 0 ) {
         throw new Error('Flow data not found');
     }
-    const html = await this.generateHtml(flowData, form, host);
+    const html = await this.generateHtml(flowData, form);
     return {
       status: true,
       html: html,
@@ -334,8 +334,8 @@ export class FlowService {
     ]);
   }
 
-  async generateHtml(flowData: any, form: FormDto, host: string) {
-    const webflow = checkHostTest(host)
+  async generateHtml(flowData: any, form: FormDto) {
+    const webflow = checkHostTest(process.env.STATE)
       ? 'http://webflow.mitsubishielevatorasia.co.th/formtest/'
       : 'http://webflow.mitsubishielevatorasia.co.th/form/';
     const status = [

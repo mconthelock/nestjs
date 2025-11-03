@@ -62,8 +62,7 @@ export class MasterkeyController {
       throw new UnauthorizedException('You nave no authorization');
 
     const isValid = await this.keys.verify(users, body.pin);
-    if (!isValid || isValid.status === 'expired')
-      throw new UnauthorizedException('You nave no authorization');
+    if (!isValid) throw new UnauthorizedException('You nave no authorization');
 
     return await this.keys.updateMasterKey(isValid.token, users, body.newpin);
   }

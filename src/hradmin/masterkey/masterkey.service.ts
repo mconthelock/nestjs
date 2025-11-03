@@ -15,21 +15,19 @@ export class MasterkeyService {
     const keys = await this.dbService.getMasterKey();
     const decryptedPin = await keys.find((k) => k.KEY_OWNER === user);
     if (!decryptedPin) return false;
-
     const users = this.dbService.decrypt(decryptedPin.KEY_CODE);
     const [pinuser, pinpasskey, pincode, pdfkey] = users.split(':');
     if (pinpasskey == pin) {
-      if (decryptedPin.KEY_EXPIRE < new Date()) {
-        return { status: 'expired' };
-      }
-
       const payload = {
         user: this.dbService.encrypt(
           `${pinuser}:${pinpasskey}:${pincode}:${pdfkey}`,
         ),
         sub: user,
       };
-      return { status: true, token: this.jwtService.sign(payload) };
+      const token = this.jwtService.sign(payload);
+      if (decryptedPin.KEY_EXPIRE < new Date())
+        return { status: 'expired', token };
+      return { status: true, token };
     }
     return false;
   }

@@ -25,13 +25,16 @@ export class MasterkeyController {
   ) {
     const { users, group, apps } = req.user.user;
     if (!(group === 2 && apps === 20))
-      throw new UnauthorizedException('You nave no authorization 1');
-    const isValid = await this.keys.verify(users, body.pin);
-    if (!isValid)
-      throw new UnauthorizedException('You nave no authorization 2');
+      throw new UnauthorizedException('You nave no authorization');
 
+    const isValid = await this.keys.verify(users, body.pin);
+    if (!isValid) throw new UnauthorizedException('You nave no authorization');
+
+    if (isValid.status === 'expired') {
+      return { status: 'expired' };
+    }
     //Create Cookie for Key Guards
-    response.cookie(process.env.KEY_COOKIE_NAME, isValid, {
+    response.cookie(process.env.KEY_COOKIE_NAME, isValid.token, {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
     });
@@ -43,7 +46,7 @@ export class MasterkeyController {
   async findAll(@Request() req) {
     const { users, group, apps } = req.user.user;
     if (!(group === 2 && apps === 20))
-      throw new UnauthorizedException('You nave no authorization 1');
+      throw new UnauthorizedException('You nave no authorization');
     const data = await this.keys.findAll();
     return data.map((item) => {
       const { KEY_CODE, ...rest } = item;
@@ -56,13 +59,13 @@ export class MasterkeyController {
   async update(@Request() req, @Body() body: { pin: string; newpin: string }) {
     const { users, group, apps } = req.user.user;
     if (!(group === 2 && apps === 20))
-      throw new UnauthorizedException('You nave no authorization 1');
+      throw new UnauthorizedException('You nave no authorization');
 
     const isValid = await this.keys.verify(users, body.pin);
-    if (!isValid)
-      throw new UnauthorizedException('You nave no authorization 2');
+    if (!isValid || isValid.status === 'expired')
+      throw new UnauthorizedException('You nave no authorization');
 
-    return await this.keys.updateMasterKey(isValid, users, body.newpin);
+    return await this.keys.updateMasterKey(isValid.token, users, body.newpin);
   }
 
   @Post('create')

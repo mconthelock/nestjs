@@ -25,6 +25,7 @@ import {
 } from 'src/common/utils/files.utils';
 import { formatDate, now } from 'src/common/utils/dayjs.utils';
 import { getSafeFields } from 'src/common/utils/Fields.utils';
+import { showFlowDto } from './dto/show-flow.dto';
 
 @Injectable()
 export class FlowService {
@@ -298,12 +299,19 @@ export class FlowService {
 
   //---------------------------- Show flow Start --------------------------------
 
-  async showFlow(form: FormDto, queryRunner?: QueryRunner) {
+  async showFlow(dto: showFlowDto, queryRunner?: QueryRunner) {
+    const form = {
+      NFRMNO: dto.NFRMNO,
+      VORGNO: dto.VORGNO,
+      CYEAR: dto.CYEAR,
+      CYEAR2: dto.CYEAR2,
+      NRUNNO: dto.NRUNNO,
+    };
     const flowData = await this.getFlowTree(form, queryRunner);
     if( flowData.length === 0 ) {
         throw new Error('Flow data not found');
     }
-    const html = await this.generateHtml(flowData, form);
+    const html = await this.generateHtml(flowData, dto);
     return {
       status: true,
       html: html,
@@ -334,7 +342,7 @@ export class FlowService {
     ]);
   }
 
-  async generateHtml(flowData: any, form: FormDto) {
+  async generateHtml(flowData: any, form: showFlowDto) {
     const webflow = checkHostTest(process.env.STATE)
       ? 'http://webflow.mitsubishielevatorasia.co.th/formtest/'
       : 'http://webflow.mitsubishielevatorasia.co.th/form/';
@@ -351,6 +359,9 @@ export class FlowService {
       await getBase64ImageFromUrl(webflow + 'imgs/stepstatus/stepdie.gif'),
       '',
     ];
+    const showStep = form.showStep ? '' : 'display:none;';
+    console.log('show step : ', showStep, form.showStep);
+    
     let html = `
     <div style="display:flex; overflow:auto;">
         <div style="margin-left:auto; margin-right:auto;">
@@ -361,7 +372,7 @@ export class FlowService {
             <tbody style="background: #fffff0; color: #626262;">
             <tr>
                 <th style="border: 1px solid blue; padding: 5px 8px;"></th>
-                <th style="border: 1px solid blue; padding: 5px 8px; display:none;">Step</th>
+                <th style="border: 1px solid blue; padding: 5px 8px; ${showStep}">Step</th>
                 <th style="border: 1px solid blue; padding: 5px 8px;">Emp-no</th>
                 <th style="border: 1px solid blue; padding: 5px 8px;">Emp-name</th>
                 <th style="border: 1px solid blue; padding: 5px 8px;">Date</th>
@@ -408,7 +419,7 @@ export class FlowService {
 
       html += `<tr>
             <td style="border: 1px solid blue;"><img style="width:23px;"  src="${status[step.CSTEPST]}"/></td>
-            <td style="border: 1px solid blue; padding: 5px 8px; white-space: nowrap; display:none;">${step.VNAME}</td>
+            <td style="border: 1px solid blue; padding: 5px 8px; white-space: nowrap; ${showStep}">${step.VNAME}</td>
             <td style="border: 1px solid blue; padding: 5px 8px; white-space: nowrap;text-align: center; color:blue;">${apv}</td>
             <td style="border: 1px solid blue; padding: 5px 8px; white-space: nowrap;">${step.SNAME}</td>
             <td style="border: 1px solid blue; padding: 5px 8px; white-space: nowrap;">${formatDate(step.DAPVDATE, 'DD-MMM-YY') || ''}</td>

@@ -73,7 +73,7 @@ export class LoggerService implements OnModuleInit {
       let sql = `SELECT 'IDS', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@DATACENTER`;
       if (process.env.STATE == 'development')
         sql = `SELECT 'IDS', TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM A001MP@AMECDC`;
-      await this.amecDs.query(sql);
+      await this.idsDs.query(sql);
     } catch (error) {
       console.log(`Error: ${error.message}`);
       return { status: 'error', message: error.message };

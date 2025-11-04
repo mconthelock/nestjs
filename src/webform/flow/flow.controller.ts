@@ -21,6 +21,7 @@ import { empnoFormDto } from '../form/dto/empno-form.dto';
 import { doactionFlowDto } from './dto/doaction-flow.dto';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { showFlowDto } from './dto/show-flow.dto';
 
 @ApiTags('Flow')
 @Controller('flow')
@@ -87,8 +88,8 @@ export class FlowController {
   }
 
   @Post('showflow')
-  async showFlow(@Body() form: FormDto) {
-    return await this.flowService.showFlow(form);
+  async showFlow(@Body() dto: showFlowDto) {
+    return await this.flowService.showFlow(dto);
   }
 
   @Post('getFlowTree')

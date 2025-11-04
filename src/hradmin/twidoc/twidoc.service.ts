@@ -196,7 +196,7 @@ export class TwidocService {
         adminpassword: data.passkey,
         delete_input: true,
       });
-      return output;
+      return path.join(this.output_path, `${data.EMPCOD}.pdf`);
     } catch (error) {
       console.error('Error filling PDF template:', error);
       throw new Error('Failed to fill PDF template');

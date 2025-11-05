@@ -114,8 +114,11 @@ export class PromoteService {
         'Salary Adjustment Letter.pdf',
       );
       let dir = libs.find((e) => e.id == data.ASETYP).path;
+      let effdate = dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
+        .locale('en')
+        .format('YYYY MMMM');
       if (!dir) dir = 'Non-Manager';
-      this.output_path = `${process.env.GP_FILE_PATH}/${dir}/Salary Adjustment Letter (หนังสือแจ้งปรับ)/${data.ASEFDT}/`;
+      this.output_path = `${process.env.GP_FILE_PATH}/${dir}/Salary Adjustment Letter (หนังสือแจ้งปรับ)/${effdate}/`;
       const fontPath = path.join(process.cwd(), 'public/fonts/THSarabun.ttf');
       const [existingPdfBytes, fontBytes] = await Promise.all([
         fs.readFile(templatePath),
@@ -142,7 +145,12 @@ export class PromoteService {
         adminpassword: data.passkey,
         delete_input: true,
       });
-      return output;
+      return {
+        dir,
+        year: effdate,
+        empno: data.ASECOD,
+        file: path.join(this.output_path, `${data.EMPCOD}.pdf`),
+      };
     } catch (error) {
       console.error('Error filling PDF template:', error);
       throw new Error('Failed to fill PDF template');

@@ -4,7 +4,6 @@ import { MatrixItemMasterService } from './matrix-item-master.service';
 // prettier-ignore
 import { CreateMatrixItemMasterDto, MigrationMatrixItemMasterDto } from './dto/create-matrix-item-master.dto';
 import { UpdateMatrixItemMasterDto } from './dto/update-matrix-item-master.dto';
-
 @Controller('matrix/master')
 export class MatrixItemMasterController {
   constructor(private readonly mtm: MatrixItemMasterService) {}
@@ -17,5 +16,20 @@ export class MatrixItemMasterController {
   @Post('getMaster')
   async getMaster(@Body() dto: UpdateMatrixItemMasterDto) {
     return await this.mtm.getMaster(dto);
+  }
+
+  @Post('insert')
+  async insert(@Body() dto: CreateMatrixItemMasterDto) {
+    return await this.mtm.insert(dto);
+  }
+
+  @Patch('update')
+  async update(@Body() dto: UpdateMatrixItemMasterDto) {
+    return await this.mtm.update(dto);
+  }
+
+  @Delete('delete/:id')
+  async delete(@Param('id') id: string) {
+    return await this.mtm.delete(+id);
   }
 }

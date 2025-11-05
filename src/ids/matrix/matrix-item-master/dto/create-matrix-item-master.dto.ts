@@ -3,6 +3,7 @@ import {
   IsArray,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -20,6 +21,11 @@ export class CreateMatrixItemMasterDto {
   @Type(() => Number)
   @IsNumber()
   SECID: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  STATUS?: number;
 }
 
 export class MigrationMatrixItemMasterDto {

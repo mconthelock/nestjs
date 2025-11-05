@@ -10,14 +10,14 @@ const dayjs = (dayjsModule as any).default ?? (dayjsModule as any);
  * @param {string} format 
  * @returns {string}
  */
-export function formatDate(date: string | Date | number, format: string = 'YYYY-MM-DD'): string {
+export function formatDate(date: string | Date | number, format: string = 'YYYY-MM-DD', locale: string = 'en'): string {
     if (!date) return '';
     if (typeof date === 'number') {
         return dayjs(String(date), "YYYYMMDD").format(format);
     }
-    return dayjs(date).format(format);
+    return dayjs(date).locale(locale).format(format);
 }
 
-export function now(format: string = 'YYYY-MM-DD'): string {
-    return dayjs().format(format);
+export function now(format: string = 'YYYY-MM-DD', locale: string = 'en'): string {
+    return dayjs().locale(locale).format(format);
 }

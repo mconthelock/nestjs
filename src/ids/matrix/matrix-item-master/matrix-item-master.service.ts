@@ -80,4 +80,63 @@ export class MatrixItemMasterService {
       if (localRunner && didConnect) await localRunner.release();
     }
   }
+
+  async update(dto: UpdateMatrixItemMasterDto, queryRunner?: QueryRunner) {
+    let localRunner: QueryRunner | undefined;
+    let didConnect = false;
+    let didStartTx = false;
+    try {
+      if (!queryRunner) {
+        localRunner = this.dataSource.createQueryRunner();
+        await localRunner.connect();
+        didConnect = true;
+        await localRunner.startTransaction();
+        didStartTx = true;
+      }
+      const runner = queryRunner || localRunner!;
+      const {ID, ...updateData} = dto;
+      await runner.manager.update(MatrixItemMaster, ID, updateData);
+      if (localRunner && didStartTx && runner.isTransactionActive)
+        await localRunner.commitTransaction();
+      return {
+        status: true,
+        message: 'Update Matrix Item Master Successfully',
+      };
+    } catch (error) {
+      if (localRunner && didStartTx && localRunner.isTransactionActive)
+        await localRunner.rollbackTransaction();
+      throw new Error('Update Matrix Item Master Error: ' + error.message);
+    } finally {
+      if (localRunner && didConnect) await localRunner.release();
+    }
+  }
+
+  async delete(ID: number, queryRunner?: QueryRunner) {
+    let localRunner: QueryRunner | undefined;
+    let didConnect = false;
+    let didStartTx = false;
+    try {
+      if (!queryRunner) {
+        localRunner = this.dataSource.createQueryRunner();
+        await localRunner.connect();
+        didConnect = true;
+        await localRunner.startTransaction();
+        didStartTx = true;
+      }
+      const runner = queryRunner || localRunner!;
+      await runner.manager.delete(MatrixItemMaster, ID);
+      if (localRunner && didStartTx && runner.isTransactionActive)
+        await localRunner.commitTransaction();
+      return {
+        status: true,
+        message: 'Delete Matrix Item Master Successfully',
+      };
+    } catch (error) {
+      if (localRunner && didStartTx && localRunner.isTransactionActive)
+        await localRunner.rollbackTransaction();
+      throw new Error('Delete Matrix Item Master Error: ' + error.message);
+    } finally {
+      if (localRunner && didConnect) await localRunner.release();
+    }
+  }
 }

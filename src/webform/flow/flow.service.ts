@@ -626,7 +626,7 @@ export class FlowService {
       params = {
         ...form,
         DAPVDATE: now(),
-        CAPVTIME: now('hh:mm:ss'),
+        CAPVTIME: now('HH:mm:ss'),
         VREMARK: REMARK,
         VREMOTE: ip,
         VREALAPV: EMPNO,

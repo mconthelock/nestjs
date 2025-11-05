@@ -251,7 +251,10 @@ export class FlowService {
 
       var flowStart = false;
 
-      const flow = await this.getFlow({...form, CSTEPNO: dto.CSTEPNO}, runner);
+      const flow = await this.getFlow(
+        { ...form, CSTEPNO: dto.CSTEPNO },
+        runner,
+      );
       if (flow.length === 0) {
         throw new Error('Flow step not found');
       }
@@ -279,8 +282,12 @@ export class FlowService {
             { condition: {...form, CSTEPNO: stepReady[0].CSTEPNEXTNO}, CSTEPST: '2' },
             runner,
         );
-        await this.deleteFlow(dto, runner);
-    }
+        const condition = {
+            ...form,
+            CSTEPNO: step.CSTEPNO,
+        }
+        await this.deleteFlow(condition, runner);
+      }
 
       if (localRunner && didStartTx && runner.isTransactionActive)
         await localRunner.commitTransaction();
@@ -308,8 +315,8 @@ export class FlowService {
       NRUNNO: dto.NRUNNO,
     };
     const flowData = await this.getFlowTree(form, queryRunner);
-    if( flowData.length === 0 ) {
-        throw new Error('Flow data not found');
+    if (flowData.length === 0) {
+      throw new Error('Flow data not found');
     }
     const html = await this.generateHtml(flowData, dto);
     return {
@@ -361,7 +368,7 @@ export class FlowService {
     ];
     const showStep = form.showStep ? '' : 'display:none;';
     console.log('show step : ', showStep, form.showStep);
-    
+
     let html = `
     <div style="display:flex; overflow:auto;">
         <div style="margin-left:auto; margin-right:auto;">

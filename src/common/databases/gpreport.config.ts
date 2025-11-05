@@ -16,9 +16,9 @@ if (process.env.HOST == 'AMEC') {
       // inject: [ConfigService],
       // useFactory: async (config: ConfigService) => ({
       type: 'oracle',
-      username: process.env.SP_USER,
-      password: process.env.SP_PASSWORD,
-      connectString: `${process.env.SP_HOST}:${process.env.SP_PORT}/${process.env.SP_SERVICE}?expire_time=5`,
+      username: process.env.GP_USER,
+      password: process.env.GP_PASSWORD,
+      connectString: `${process.env.GP_HOST}:${process.env.GP_PORT}/${process.env.GP_SERVICE}?expire_time=5`,
       entities: [
         __dirname + '/../../**/**/*.entity{.ts,.js}',
         __dirname + '/../../**/**/**/*.entity{.ts,.js}',

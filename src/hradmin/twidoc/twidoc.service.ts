@@ -123,7 +123,7 @@ export class TwidocService {
       conn = connection.conn;
 
       // Add your query logic here
-      const { admin } = await this.dbService.getHrAdminCredentials(credentials);
+      const { user } = await this.dbService.getHrAdminCredentials(credentials);
       const result = await conn.execute(
         `UPDATE MHEPAYTWI
           SET TWIADDINCOME = :income, TWIADDTAX= :tax, TWIADDUSER = :admin, TWIADDUPDATE = SYSDATE
@@ -133,7 +133,7 @@ export class TwidocService {
           year: body.year,
           income: body.income,
           tax: body.tax,
-          admin: admin,
+          admin: user,
         },
         {
           autoCommit: true,

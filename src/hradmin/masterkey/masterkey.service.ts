@@ -114,4 +114,52 @@ export class MasterkeyService {
       await this.dbService.closeConnection(hrAdminDataSource, conn);
     }
   }
+
+  async updateRole(credentials: any, newRole: string, empno: string) {
+    let hrAdminDataSource: DataSource;
+    let conn: oracledb.Connection;
+    try {
+      const connection = await this.dbService.createConnection(credentials);
+      hrAdminDataSource = connection.hrAdminDataSource;
+      conn = connection.conn;
+      const result = await conn.execute(
+        `UPDATE MASTERKEY SET KEY_ROLE = :KEY_ROLE WHERE KEY_OWNER = :KEY_OWNER`,
+        {
+          KEY_ROLE: newRole,
+          KEY_OWNER: empno,
+        },
+      );
+      await conn.commit();
+      return result;
+    } catch (error) {
+      console.error('Error fetching Master data:', error);
+      throw new InternalServerErrorException('Failed to fetch Master data.');
+    } finally {
+      await this.dbService.closeConnection(hrAdminDataSource, conn);
+    }
+  }
+
+  async deleteMasterKey(credentials: any, empno: string) {
+    let hrAdminDataSource: DataSource;
+    let conn: oracledb.Connection;
+    try {
+      const connection = await this.dbService.createConnection(credentials);
+      hrAdminDataSource = connection.hrAdminDataSource;
+      conn = connection.conn;
+
+      const result = await conn.execute(
+        `DELETE FROM MASTERKEY WHERE KEY_OWNER = :KEY_OWNER`,
+        {
+          KEY_OWNER: empno,
+        },
+      );
+      await conn.commit();
+      return result;
+    } catch (error) {
+      console.error('Error fetching Master data:', error);
+      throw new InternalServerErrorException('Failed to fetch Master data.');
+    } finally {
+      await this.dbService.closeConnection(hrAdminDataSource, conn);
+    }
+  }
 }

@@ -76,4 +76,19 @@ export class MasterkeyController {
       body.type,
     );
   }
+
+  @Post('role')
+  @UseGuards(AuthGuard('key'))
+  async updateRole(
+    @Request() req,
+    @Body() body: { newRole: string; empno: string },
+  ) {
+    return await this.keys.updateRole(req.user.user, body.newRole, body.empno);
+  }
+
+  @Post('delete')
+  @UseGuards(AuthGuard('key'))
+  async delete(@Request() req, @Body() body: { empno: string }) {
+    return await this.keys.deleteMasterKey(req.user.user, body.empno);
+  }
 }

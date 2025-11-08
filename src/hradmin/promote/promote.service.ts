@@ -159,7 +159,7 @@ export class PromoteService {
           .locale('en')
           .format('MMMM YYYY'),
         effdate: data.ASEFDT,
-        file: path.join(this.output_path, `${data.EMPCOD}.pdf`),
+        file: path.join(this.output_path, `${data.ASECOD}.pdf`),
       };
     } catch (error) {
       console.error('Error filling PDF template:', error);

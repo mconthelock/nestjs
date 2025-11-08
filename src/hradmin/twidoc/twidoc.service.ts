@@ -200,6 +200,8 @@ export class TwidocService {
         dir,
         year: data.TWIYEAR,
         empno: data.EMPCOD,
+        empname: data.EMPNMT,
+        empengname: data.SNAME,
         file: path.join(this.output_path, `${data.EMPCOD}.pdf`),
       };
     } catch (error) {

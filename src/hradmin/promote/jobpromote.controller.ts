@@ -1,20 +1,20 @@
 import { Controller, UseGuards, Post, Body } from '@nestjs/common';
 import { ApiKeyGuard } from '../../auth/job.strategy';
-import { TwidocService } from './twidoc.service';
+import { PromoteService } from './promote.service';
 import { MasterkeyService } from '../masterkey/masterkey.service';
-import { Masterkey } from '../masterkey/entities/masterkey.entity';
 import { DatabaseService } from '../shared/database.service';
+import { Masterkey } from '../masterkey/entities/masterkey.entity';
 
-@Controller('hradmin/job/twi')
+@Controller('hradmin/job/promote')
 @UseGuards(ApiKeyGuard)
-export class JobTwiController {
+export class JobpromoteController {
   constructor(
-    private readonly docs: TwidocService,
+    private readonly docs: PromoteService,
     private readonly keys: MasterkeyService,
     private readonly dbService: DatabaseService,
   ) {}
 
-  @Post('run-twidoc-file')
+  @Post('run-promotedoc-file')
   async runTwiReport(@Body() body: any) {
     const keys = await this.keys.findAll();
     const key = keys.find((k: Masterkey) => k.KEY_OWNER === 'DUMMY')?.KEY_CODE;
@@ -27,6 +27,7 @@ export class JobTwiController {
     const data = await this.docs.findAll(key, {
       year: body.year,
       type: body.type,
+      cycle: body.cycle,
     });
     const results = [];
     for (const item of data) {

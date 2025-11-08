@@ -41,12 +41,13 @@ export class PromoteService {
       const result = await conn.execute(
         `DECLARE v_cursor SYS_REFCURSOR;
           BEGIN
-              PROMOTE(:KEYVALUE, :EFFDATE, :EMTYPE, v_cursor);
+              PROMOTE(:KEYVALUE, :FYEAR, :EMPCYCL, :EMTYPE, v_cursor);
               :result := v_cursor;
           END;`,
         {
           KEYVALUE: connection.passcode,
-          EFFDATE: body.period,
+          FYEAR: body.year,
+          EMPCYCL: body.cycle,
           EMTYPE: body.type,
           result: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
         },
@@ -149,6 +150,15 @@ export class PromoteService {
         dir,
         year: effdate,
         empno: data.ASECOD,
+        empname: data.SEMPPRT + data.STNAME,
+        empperiod: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
+          .locale('th')
+          .format('MMMM YYYY'),
+        empengname: data.SEMPPRE + data.SNAME,
+        empengperiod: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
+          .locale('en')
+          .format('MMMM YYYY'),
+        effdate: data.ASEFDT,
         file: path.join(this.output_path, `${data.EMPCOD}.pdf`),
       };
     } catch (error) {

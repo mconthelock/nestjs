@@ -9,3 +9,5 @@ export class UpdateMatrixItemMasterDto extends PartialType(CreateMatrixItemMaste
     @IsNumber()
     ID: number;
 }
+
+export class getMatrixItemMasterDto  extends PartialType(CreateMatrixItemMasterDto) {}

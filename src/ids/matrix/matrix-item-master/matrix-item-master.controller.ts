@@ -3,7 +3,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { MatrixItemMasterService } from './matrix-item-master.service';
 // prettier-ignore
 import { CreateMatrixItemMasterDto, MigrationMatrixItemMasterDto } from './dto/create-matrix-item-master.dto';
-import { UpdateMatrixItemMasterDto } from './dto/update-matrix-item-master.dto';
+import { getMatrixItemMasterDto, UpdateMatrixItemMasterDto } from './dto/update-matrix-item-master.dto';
 @Controller('matrix/master')
 export class MatrixItemMasterController {
   constructor(private readonly mtm: MatrixItemMasterService) {}
@@ -14,7 +14,7 @@ export class MatrixItemMasterController {
   }
 
   @Post('getMaster')
-  async getMaster(@Body() dto: UpdateMatrixItemMasterDto) {
+  async getMaster(@Body() dto: getMatrixItemMasterDto) {
     return await this.mtm.getMaster(dto);
   }
 

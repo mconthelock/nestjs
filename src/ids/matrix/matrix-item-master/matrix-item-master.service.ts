@@ -3,7 +3,7 @@ import {
   CreateMatrixItemMasterDto,
   MigrationMatrixItemMasterDto,
 } from './dto/create-matrix-item-master.dto';
-import { UpdateMatrixItemMasterDto } from './dto/update-matrix-item-master.dto';
+import { getMatrixItemMasterDto, UpdateMatrixItemMasterDto } from './dto/update-matrix-item-master.dto';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { MatrixItemMaster } from './entities/matrix-item-master.entity';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
@@ -17,7 +17,7 @@ export class MatrixItemMasterService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async getMaster(dto: UpdateMatrixItemMasterDto) {
+  async getMaster(dto: getMatrixItemMasterDto) {
     return await this.mtxRepo.find({
       where: {
         ITEMNO: dto.ITEMNO,

@@ -367,7 +367,6 @@ export class FlowService {
       '',
     ];
     const showStep = form.showStep ? '' : 'display:none;';
-    console.log('show step : ', showStep, form.showStep);
 
     let html = `
     <div style="display:flex; overflow:auto;">

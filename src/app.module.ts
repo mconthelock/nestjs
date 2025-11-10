@@ -44,6 +44,7 @@ import { IdsModule } from './ids/ids.module';
 import { ElmesModule } from './elmes/elmes.module';
 import { ItgcModule } from './itgc/itgc.module';
 import { AS400Module } from './as400/as400.module';
+import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemical-section.module';
 
 @Module({
   imports: [
@@ -84,6 +85,7 @@ import { AS400Module } from './as400/as400.module';
     InvoiceModule,
     IdsModule,
     ItgcModule,
+    ChemicalSectionModule,
   ],
   providers: [HttpLoggingInterceptor],
 })

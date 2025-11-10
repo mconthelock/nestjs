@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Scheduler } from './entities/scheduler.entity';
 import { createSchdDto } from './dto/create.dto';
 import { updateSchdDto } from './dto/update.dto';
+import { searchSchdDto } from './dto/search.dto';
 
 @Injectable()
 export class SchedulerService {
@@ -13,8 +14,12 @@ export class SchedulerService {
     private readonly schd: Repository<Scheduler>,
   ) {}
 
-  async findAll(): Promise<Scheduler[]> {
+  async findAll() {
     return this.schd.find();
+  }
+
+  async search(data: searchSchdDto) {
+    return this.schd.find({ where: data });
   }
 
   async create(data: createSchdDto) {

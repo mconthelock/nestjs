@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { SchedulerService } from './scheduler.service';
 import { createSchdDto } from './dto/create.dto';
 import { updateSchdDto } from './dto/update.dto';
+import { searchSchdDto } from './dto/search.dto';
 
 @Controller('hradmin/scheduler')
 export class SchedulerController {
@@ -10,6 +11,11 @@ export class SchedulerController {
   @Get()
   findAll() {
     return this.schd.findAll();
+  }
+
+  @Post('search')
+  search(@Body() data: searchSchdDto) {
+    return this.schd.search(data);
   }
 
   @Post('create')

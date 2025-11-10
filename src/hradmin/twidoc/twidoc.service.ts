@@ -201,7 +201,7 @@ export class TwidocService {
         empno: data.EMPCOD,
         mail: data.MEMEML,
         th_name: data.EMPNMT,
-        th_period: data.TWIYEAR + 243,
+        th_period: data.TWIYEAR + 543,
         en_name: data.SNAME,
         en_period: data.TWIYEAR,
         file: path.join(this.output_path, `${data.EMPCOD}.pdf`),

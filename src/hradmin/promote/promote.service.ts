@@ -148,17 +148,16 @@ export class PromoteService {
       });
       return {
         dir,
-        year: effdate,
         empno: data.ASECOD,
-        empname: data.SEMPPRT + data.STNAME,
-        empperiod: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
+        mail: data.MEMEML,
+        th_name: data.SEMPPRT + data.STNAME,
+        th_period: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
           .locale('th')
           .format('MMMM YYYY'),
-        empengname: data.SEMPPRE + data.SNAME,
-        empengperiod: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
+        en_name: data.SEMPPRE + data.SNAME,
+        en_period: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
           .locale('en')
           .format('MMMM YYYY'),
-        effdate: data.ASEFDT,
         file: path.join(this.output_path, `${data.ASECOD}.pdf`),
       };
     } catch (error) {

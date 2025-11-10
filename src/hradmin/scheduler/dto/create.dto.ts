@@ -16,7 +16,6 @@ export class createSchdDto {
   STARTDATE: Date;
 
   @Type(() => Date)
-  @IsString()
   @IsDate()
   @IsOptional()
   FINISHDATE: Date;

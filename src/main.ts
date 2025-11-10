@@ -36,8 +36,6 @@ async function bootstrap() {
           host === 'localhost' ||
           host === '127.0.0.1'
         ) {
-          console.log('Pass');
-
           return cb(null, true);
         }
       } catch {}

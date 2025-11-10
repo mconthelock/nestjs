@@ -198,10 +198,12 @@ export class TwidocService {
       });
       return {
         dir,
-        year: data.TWIYEAR,
         empno: data.EMPCOD,
-        empname: data.EMPNMT,
-        empengname: data.SNAME,
+        mail: data.MEMEML,
+        th_name: data.EMPNMT,
+        th_period: data.TWIYEAR + 543,
+        en_name: data.SNAME,
+        en_period: data.TWIYEAR,
         file: path.join(this.output_path, `${data.EMPCOD}.pdf`),
       };
     } catch (error) {

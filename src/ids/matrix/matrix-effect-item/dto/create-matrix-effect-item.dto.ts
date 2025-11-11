@@ -1,3 +1,4 @@
+import { PickType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -29,4 +30,10 @@ export class MigrationMatrixItemEffectDto {
   @ValidateNested({ each: true })
   @Type(() => CreateMatrixEffectItemDto)
   data: CreateMatrixEffectItemDto[];
+}
+
+export class DeleteMatrixEffectItemDto extends PickType(
+  CreateMatrixEffectItemDto,
+  ['ITEM_ID', 'EFFECT_ID'] as const,
+) {
 }

@@ -5,13 +5,14 @@ import {
   OneToMany,
   OneToOne,
   PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { MatrixEffectItem } from '../../matrix-effect-item/entities/matrix-effect-item.entity';
 import { MatrixSection } from '../../matrix-section/entities/matrix-section.entity';
 
 @Entity('MATRIX_ITEM_MASTER')
 export class MatrixItemMaster {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   ID: number;
 
   @Column()
@@ -21,13 +22,22 @@ export class MatrixItemMaster {
   TITLE: string;
 
   @Column()
-  DATECREATE: Date;
-
-  @Column()
   STATUS: number;
 
   @Column()
   SECID: number;
+
+  @Column()
+  USERCREATE: string;
+
+  @Column()
+  DATECREATE: Date;
+
+  @Column()
+  USERUPDATE: string;
+  
+  @Column()
+  DATEUPDATE: Date;
 
   @OneToMany(() => MatrixEffectItem, (e) => e.MASTER)
   EFFECT: MatrixEffectItem[];

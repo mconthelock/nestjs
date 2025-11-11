@@ -3,10 +3,14 @@ import {
   CreateMatrixItemMasterDto,
   MigrationMatrixItemMasterDto,
 } from './dto/create-matrix-item-master.dto';
-import { getMatrixItemMasterDto, UpdateMatrixItemMasterDto } from './dto/update-matrix-item-master.dto';
+import {
+  getMatrixItemMasterDto,
+  UpdateMatrixItemMasterDto,
+} from './dto/update-matrix-item-master.dto';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { MatrixItemMaster } from './entities/matrix-item-master.entity';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { now } from 'src/common/utils/dayjs.utils';
 
 @Injectable()
 export class MatrixItemMasterService {
@@ -19,6 +23,18 @@ export class MatrixItemMasterService {
 
   async getMaster(dto: getMatrixItemMasterDto) {
     return await this.mtxRepo.find({
+      where: {
+        ID: dto.ID,
+        ITEMNO: dto.ITEMNO,
+        SECID: dto.SECID,
+        TITLE: dto.TITLE,
+      },
+      relations: ['EFFECT', 'SECTION'],
+    });
+  }
+
+  async getMasterOne(dto: getMatrixItemMasterDto) {
+    return await this.mtxRepo.findOne({
       where: {
         ID: dto.ID,
         ITEMNO: dto.ITEMNO,
@@ -66,12 +82,12 @@ export class MatrixItemMasterService {
       }
       const runner = queryRunner || localRunner!;
 
-      await runner.manager.insert(MatrixItemMaster, dto);
+      const res = await runner.manager.save(MatrixItemMaster, dto);
       if (localRunner && didStartTx && runner.isTransactionActive)
         await localRunner.commitTransaction();
       return {
         status: true,
-        data: dto,
+        data: await this.getMasterOne({ ID: res.ID }),
         message: 'Insert Matrix Item Master Successfully',
       };
     } catch (error) {
@@ -96,13 +112,13 @@ export class MatrixItemMasterService {
         didStartTx = true;
       }
       const runner = queryRunner || localRunner!;
-      const {ID, ...updateData} = dto;
-      await runner.manager.update(MatrixItemMaster, ID, updateData);
+      const { ID, ...updateData } = dto;
+      await runner.manager.update(MatrixItemMaster, ID, {...updateData, DATEUPDATE: now('YYYY-MM-DD HH:mm:ss')});
       if (localRunner && didStartTx && runner.isTransactionActive)
         await localRunner.commitTransaction();
       return {
         status: true,
-        data: dto,
+        data: await this.getMasterOne({ ID: ID }),
         message: 'Update Matrix Item Master Successfully',
       };
     } catch (error) {

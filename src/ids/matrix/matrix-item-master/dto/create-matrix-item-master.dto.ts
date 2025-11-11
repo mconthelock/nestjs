@@ -22,6 +22,10 @@ export class CreateMatrixItemMasterDto {
   @IsNumber()
   SECID: number;
 
+  @IsNotEmpty()
+  @IsString()
+  USERCREATE: string;
+
   @IsOptional()
   @Type(() => Number)
   @IsNumber()

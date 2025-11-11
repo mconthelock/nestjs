@@ -20,6 +20,7 @@ export class MatrixItemMasterService {
   async getMaster(dto: getMatrixItemMasterDto) {
     return await this.mtxRepo.find({
       where: {
+        ID: dto.ID,
         ITEMNO: dto.ITEMNO,
         SECID: dto.SECID,
         TITLE: dto.TITLE,
@@ -70,6 +71,7 @@ export class MatrixItemMasterService {
         await localRunner.commitTransaction();
       return {
         status: true,
+        data: dto,
         message: 'Insert Matrix Item Master Successfully',
       };
     } catch (error) {
@@ -100,6 +102,7 @@ export class MatrixItemMasterService {
         await localRunner.commitTransaction();
       return {
         status: true,
+        data: dto,
         message: 'Update Matrix Item Master Successfully',
       };
     } catch (error) {

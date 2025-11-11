@@ -17,4 +17,8 @@ export class doactionFlowDto extends PickType(FormDto, [
   @IsString()
   REMARK?: string;
 
+  @IsOptional()
+  @IsString()
+  CEXTDATA?: string;
+
 }

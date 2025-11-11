@@ -329,7 +329,7 @@ export class FlowService {
   async getFlowTree(form: FormDto, queryRunner?: QueryRunner) {
     const dataSource = queryRunner ? queryRunner : this.dataSource;
     const sql = `
-    SELECT DISTINCT LEVEL, CSTEPNO, CSTEPNEXTNO, CSTEPST, VAPVNO, NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, SNAME, VNAME, DAPVDATE, CAPVTIME, VREMARK,  VREPNO, VREALAPV 
+    SELECT DISTINCT LEVEL, CSTEPNO, CSTEPNEXTNO, CSTEPST, CEXTDATA, VAPVNO, NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, SNAME, VNAME, DAPVDATE, CAPVTIME, VREMARK,  VREPNO, VREALAPV 
     FROM FLOW, AMECUSERALL, stepmst  WHERE  FLOW.VAPVNO = SEMPNO and flow.CSTEPNO = cno 
     start with CSTART = '1' and 
     NFRMNO = :1 and VORGNO = :2 and CYEAR = :3 
@@ -618,6 +618,7 @@ export class FlowService {
       }
       // CHECK STEP STATUS
       const checkStep = await this.getEmpFlowStepReady(dto, runner);
+      
       if (checkStep.length === 0) {
         throw new Error('Ready step not found!');
       }
@@ -742,6 +743,14 @@ export class FlowService {
           await this.updateStepWaitToNormal(form, runner);
           await this.updateStepReadyToWait(form, runner);
           await this.updateStepReqToReadyB(form, runner);
+          break;
+        case 'returnE':
+          if(!dto.CEXTDATA){
+            throw new Error('CEXTDATA is required for returnE action');
+          }
+          await this.updateStepNextExeToNormal(form, dto.CEXTDATA, runner);
+          await this.updateStepExeToReady(form, dto.CEXTDATA, runner);
+          await this.updateStepNextExeToWait(form, dto.CEXTDATA, runner);
           break;
         default:
           throw new Error('Invalid action!');
@@ -1091,6 +1100,78 @@ export class FlowService {
       'Update Step Request Next To Step Wait',
     );
   }
+
+  async updateStepExeToReady(
+    form: FormDto,
+    cextdata: string,
+    queryRunner?: QueryRunner,
+  ) {
+    const sql =
+      "update flow set CSTEPST = :stepReady, VREALAPV = '' , CAPVSTNO = :apvNone, DAPVDATE = '' , CAPVTIME = '' where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CEXTDATA = :cextdata";
+
+    const params = {
+      ...form,
+      cextdata: cextdata,
+      stepReady: this.STEP_READY,
+      apvNone: this.APV_NONE,
+    };
+    
+    return await this.execSql(
+      sql,
+      params,
+      queryRunner,
+      'Update Step Exedata To Step Ready(ReturnE)',
+    );
+  }
+
+  async updateStepNextExeToNormal(
+    form: FormDto,
+    cextdata: string,
+    queryRunner?: QueryRunner,
+  ) {
+    const sql =
+      "UPDATE FLOW f SET f.CSTEPST = :stepNormal, f.VREALAPV = '', f.CAPVSTNO = :apvNone, f.DAPVDATE = '', f.CAPVTIME = '' WHERE (f.NFRMNO, f.VORGNO, f.CYEAR, f.CYEAR2, f.NRUNNO, f.CSTEPNO, f.CEXTDATA) IN (SELECT NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, CSTEPNO, CEXTDATA FROM FLOW START WITH  CEXTDATA = :cextdata AND NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO CONNECT BY NFRMNO = PRIOR NFRMNO AND VORGNO = PRIOR VORGNO AND CYEAR = PRIOR CYEAR AND CYEAR2 = PRIOR CYEAR2 AND NRUNNO = PRIOR NRUNNO AND CSTEPNO = PRIOR CSTEPNEXTNO)";
+    const params = {
+      ...form,
+      cextdata: cextdata,
+      stepNormal: this.STEP_NORMAL,
+      apvNone: this.APV_NONE,
+    };
+
+    return await this.execSql(
+      sql,
+      params,
+      queryRunner,
+      'Update Step Next Exe To Step Normal',
+    );
+  }
+
+  async updateStepNextExeToWait(
+    form: FormDto,
+    cextdata: string,
+    queryRunner?: QueryRunner,
+  ) {
+    const sql =
+      "UPDATE FLOW f SET f.CSTEPST = :stepWait, f.VREALAPV = '', f.CAPVSTNO = :apvNone, f.DAPVDATE = '', f.CAPVTIME = '' WHERE NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CSTEPNO = (select CSTEPNEXTNO from flow where NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno and CEXTDATA = :cextdata)";
+    const params = {
+      ...form,
+      frm: form.NFRMNO,
+      org: form.VORGNO,
+      y: form.CYEAR,
+      y2: form.CYEAR2,
+      runno: form.NRUNNO,
+      cextdata: cextdata,
+      stepWait: this.STEP_WAIT,
+      apvNone: this.APV_NONE,
+    };
+    return await this.execSql(
+      sql,
+      params,
+      queryRunner,
+      'Update Step Next Exe To Step Wait',
+    );
+  }
+
 
   async sendMailToApprover(form: FormDto, queryRunner?: QueryRunner) {
     const res = await this.getNameReq(form, queryRunner);

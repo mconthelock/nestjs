@@ -11,6 +11,7 @@ import invoiceConfig from './common/databases/invoice.config';
 import gpreportConfig from './common/databases/gpreport.config';
 import auditConfig from './common/databases/auditDB.config';
 import idsConfig from './common/databases/dailyids.config';
+import packingConfig from './common/databases/packingsys.config';
 
 //Winston Logger
 import { WinstonModule } from 'nest-winston';
@@ -59,6 +60,7 @@ import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemic
     TypeOrmModule.forRootAsync(auditConfig),
     TypeOrmModule.forRootAsync(idsConfig),
     TypeOrmModule.forRootAsync(gpreportConfig),
+    TypeOrmModule.forRootAsync(packingConfig),
     //Logging Config
     WinstonModule.forRoot(winstonConfig),
     //BB8 💣

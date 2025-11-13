@@ -10,13 +10,13 @@ export class AuthService {
     private readonly loginRepo: Repository<Login>,
   ) {}
 
-  async validateUser(uid: string): Promise<{ status: string; user?: Login }> {
-    const user = await this.loginRepo.findOne({ where: { uid, mrkdel: false } });
+  async validateUser(uid: string): Promise<{ status: 'success' | 'error'; message: string; user: Login | null }> {
+    const user = await this.loginRepo.findOne({ 
+      where: { uid } 
+    });
 
-    if (!user) {
-      return { status: 'User not found' };
-    }
-
-    return { status: '0', user }; // '0' คือ login success
+    return user
+      ? { status: 'success', message: 'Login success', user }
+      : { status: 'error', message: 'User not found', user: null };
   }
 }

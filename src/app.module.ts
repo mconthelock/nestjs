@@ -45,6 +45,7 @@ import { IdsModule } from './ids/ids.module';
 import { ElmesModule } from './elmes/elmes.module';
 import { ItgcModule } from './itgc/itgc.module';
 import { AS400Module } from './as400/as400.module';
+import { PACKINGModule } from './packing/packing.module'
 import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemical-section.module';
 
 @Module({
@@ -83,7 +84,7 @@ import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemic
     ESCSModule,
     PDFModule,
     MailModule,
-    ESCSModule,
+    PACKINGModule,
     InvoiceModule,
     IdsModule,
     ItgcModule,

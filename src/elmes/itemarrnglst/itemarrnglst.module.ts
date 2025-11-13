@@ -6,7 +6,7 @@ import { ItemarrnglstController } from './itemarrnglst.controller';
 
 @Module({
   controllers: [ItemarrnglstController],
-  imports: [TypeOrmModule.forFeature([Itemarrnglst], 'spsysConnection')],
+  imports: [TypeOrmModule.forFeature([Itemarrnglst], 'elmesConnection')],
   providers: [ItemarrnglstService],
 })
 export class ItemarrnglstModule {}

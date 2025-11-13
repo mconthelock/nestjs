@@ -1,7 +1,8 @@
-import { Controller, Post, Body, Param, Get } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get, UseGuards } from '@nestjs/common';
 import { InquiryService } from './inquiry.service';
 import { searchDto } from './dto/search.dto';
 import { inqDataDto } from './dto/update-data.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('sp/inquiry')
 export class InquiryController {
@@ -42,7 +43,7 @@ export class InquiryController {
     return await this.inq.revise(req.id);
   }
 
-  @Get(':id')
+  @Get('find/:id')
   findOne(@Param('id') id: number) {
     return this.inq.findOne(id);
   }
@@ -56,5 +57,11 @@ export class InquiryController {
   async updatestatus(@Body() req: inqDataDto, @Param('id') id: number) {
     await this.inq.updatestatus(id, req.header.INQ_STATUS, req.history);
     return await this.inq.findByNumber(req.header.INQ_NO);
+  }
+
+  @Get('designprocess')
+  @UseGuards(AuthGuard('jwt'))
+  async designProcess() {
+    return this.inq.designProcess();
   }
 }

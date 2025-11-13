@@ -537,4 +537,10 @@ export class InquiryService {
       await runner.release();
     }
   }
+
+  async designProcess() {
+    const query = `SELECT * FROM DESIGN_PROCESS`;
+    const result = await this.ds.query(query);
+    return result;
+  }
 }

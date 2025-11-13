@@ -12,6 +12,7 @@ import gpreportConfig from './common/databases/gpreport.config';
 import auditConfig from './common/databases/auditDB.config';
 import idsConfig from './common/databases/dailyids.config';
 import packingConfig from './common/databases/packingsys.config';
+import elmesConfig from './common/databases/elmes.config';
 
 //Winston Logger
 import { WinstonModule } from 'nest-winston';
@@ -45,7 +46,7 @@ import { IdsModule } from './ids/ids.module';
 import { ElmesModule } from './elmes/elmes.module';
 import { ItgcModule } from './itgc/itgc.module';
 import { AS400Module } from './as400/as400.module';
-import { PACKINGModule } from './packing/packing.module'
+import { PACKINGModule } from './packing/packing.module';
 import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemical-section.module';
 
 @Module({
@@ -62,6 +63,7 @@ import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemic
     TypeOrmModule.forRootAsync(idsConfig),
     TypeOrmModule.forRootAsync(gpreportConfig),
     TypeOrmModule.forRootAsync(packingConfig),
+    TypeOrmModule.forRootAsync(elmesConfig),
     //Logging Config
     WinstonModule.forRoot(winstonConfig),
     //BB8 💣

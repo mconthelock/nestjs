@@ -748,6 +748,13 @@ export class FlowService {
           if(!dto.CEXTDATA){
             throw new Error('CEXTDATA is required for returnE action');
           }
+          whatAction = this.APV_NONE;
+          stepAction = this.STEP_READY;
+          await this.doactionUpdateFlow(
+            flow,
+            { ...params, whatAction, stepAction },
+            runner,
+          );
           await this.updateStepNextExeToNormal(form, dto.CEXTDATA, runner);
           await this.updateStepExeToReady(form, dto.CEXTDATA, runner);
           await this.updateStepNextExeToWait(form, dto.CEXTDATA, runner);

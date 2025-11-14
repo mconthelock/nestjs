@@ -7,6 +7,7 @@ import { ISOLog } from './entities/iso.entity';
 import { SCMLog } from './entities/scm.entity';
 import { AS400Log } from './entities/as400.entity';
 import { searchApplogs } from './dto/search.dto';
+import { formatDate } from 'src/common/utils/dayjs.utils';
 
 @Injectable()
 export class ApplogsService {
@@ -42,18 +43,22 @@ export class ApplogsService {
     }
 
     if (startDate) {
-      queryBuilder.andWhere('logs.LOG_DATE >= :startDate', { startDate });
+      queryBuilder.andWhere('windows.LOG_DATE >= :startDate', {
+        startDate: formatDate(startDate),
+      });
     }
 
     if (endDate) {
-      queryBuilder.andWhere('logs.LOG_DATE <= :endDate', { endDate });
+      queryBuilder.andWhere('windows.LOG_DATE <= :endDate', {
+        endDate: formatDate(endDate),
+      });
     }
 
     if (status) {
       queryBuilder.andWhere('logs.LOG_LOGIN_STATUS = :status', { status });
     }
 
-    const results = await queryBuilder.getMany();
+    const results = await queryBuilder.getRawMany();
     const appusers = await this.users.getAll();
     if (users == '2') {
       const appname = ['Invoice', 'Marketing'].includes(server)

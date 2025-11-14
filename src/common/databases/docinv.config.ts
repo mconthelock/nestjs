@@ -31,8 +31,8 @@ if (process.env.HOST == 'AMEC') {
       retryDelay: 2000,
       extra: {
         keepAlive: true,
-        poolMax: 100,
-        poolMin: 5,
+        poolMax: process.env.DB_POOL_MAX || 10,
+        poolMin: process.env.DB_POOL_MIN || 1,
         queueTimeout: 60000,
         queueMax: 1000,
         enableTCPSKeepAlive: true,

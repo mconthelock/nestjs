@@ -9,6 +9,7 @@ import { ISOLog } from './entities/iso.entity';
 import { LnLog } from './entities/ln.entity';
 import { SCMLog } from './entities/scm.entity';
 import { Windows } from '../oslogs/entities/windows.entity';
+import { formatDate } from 'src/common/utils/dayjs.utils';
 
 @Injectable()
 export class DblogsService {
@@ -48,15 +49,22 @@ export class DblogsService {
         queryBuilder = this.iso.createQueryBuilder('logs');
     }
 
+    queryBuilder.select(
+      'LOG_DATE, LOG_TIME, LOG_SERVER, LOG_USER, LOG_DOMAIN, LOG_HOST, LOG_IP, LOG_MSG',
+    );
+
     if (startDate) {
-      queryBuilder.andWhere('logs.LOG_DATE >= :startDate', { startDate });
+      queryBuilder.andWhere('windows.LOG_DATE >= :startDate', {
+        startDate: formatDate(startDate),
+      });
     }
 
     if (endDate) {
-      queryBuilder.andWhere('logs.LOG_DATE <= :endDate', { endDate });
+      queryBuilder.andWhere('windows.LOG_DATE <= :endDate', {
+        endDate: formatDate(endDate),
+      });
     }
-    const results = await queryBuilder.getMany();
-
+    const results = await queryBuilder.getRawMany();
     const dbusers = await this.users.getAll();
     switch (users) {
       case '2':

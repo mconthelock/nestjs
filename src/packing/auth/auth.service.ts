@@ -2,6 +2,8 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Login } from './entities/login.entity';
+import { PackLoginResponseDto } from './dto/pack-login-response.dto';
+import { PackUserInfoDto } from './dto/pack-user-info.dto';
 
 @Injectable()
 export class AuthService {
@@ -11,32 +13,46 @@ export class AuthService {
   ) {}
 
   /**
-   * Check user login
+   * Check user login via ValidatePackAuth stored procedure
    * @author  Mr.Pathanapong Sokpukeaw
-   * @since   2025-11-12
-   * @param   string uid Employee ID
-   * @param   string ip IP Address
-   * @return  Promise
+   * @since   2025-11-13
+   * @param   {string} uid Employee barcode/ID
+   * @param   {string} ip Client IP address
+   * @return  {Promise<PackLoginResponseDto>} Login result with status, message, and user info
    */
-  async validateUser(uid: string, ip: string): Promise<{ status: 'success' | 'error'; message: string; user: Login | null }> {
-    const numEmp = Number(uid);
-    if (isNaN(numEmp)) {
-      return { status: 'error', message: 'Invalid user format', user: null };
-    }
+  async validateUser(uid: string, ip: string): Promise<PackLoginResponseDto> {
+    try {
+      const empCode = Number(uid);
+      if (isNaN(empCode)) {
+        return { status: 'error', message: 'รูปแบบรหัสพนักงานไม่ถูกต้อง', user: null };
+      }
 
-    const empno = this.decodeID(numEmp);
-    const user = await this.loginRepo.findOne({ where: { uid: empno } });
-    return user
-      ? { status: 'success', message: 'Login success', user }
-      : { status: 'error', message: 'User not found', user: null };
+      const sessionId = `sess-${Date.now()}`;
+      const empNo  = this.decodeID(empCode);
+      const result = await this.loginRepo.query(
+        `EXEC ValidatePackAuth @empid = @0, @ip = @1, @sessid = @2`,
+        [empNo, ip, sessionId],
+      );
+
+      const row = result[0];
+      if (row.errcode === '0') {
+        const [userId, userName, useLocaltb] = row.errormsg.split('-');
+        const user: PackUserInfoDto = { userId, userName, useLocaltb };
+        return { status: 'success', message: 'Login success', user };
+      } else {
+        return { status: 'error', message: row.errormsg, user: null };
+      }
+    } catch (error) {
+      throw new InternalServerErrorException('Database error: ' + error.message);
+    }
   }
 
-  /**
-   * Decode Barcode Employee ID
+   /**
+   * Decode Employee ID from barcode
    * @author  Mr.Pathanapong Sokpukeaw
-   * @since   2025-11-12
-   * @param   number uid Barcode Employee ID
-   * @return  string Decoded Employee ID (5 digits)
+   * @since   2025-11-13
+   * @param   {number} uid Barcode Employee ID
+   * @return  {string} Decoded Employee ID (5 digits)
    */
   decodeID(uid: number): string {
     const empno = Math.floor(uid / 4) - 92;

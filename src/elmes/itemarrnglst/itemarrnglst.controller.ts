@@ -1,6 +1,7 @@
 import { Controller, Param, Get, Post, Body, UseGuards } from '@nestjs/common';
 import { ItemarrnglstService } from './itemarrnglst.service';
 import { AuthGuard } from '@nestjs/passport';
+import { SearchElmesItemarrnglstDto } from './dto/search.dto';
 
 @Controller('elmes/gplitem')
 export class ItemarrnglstController {
@@ -20,8 +21,15 @@ export class ItemarrnglstController {
 
   @Post('search')
   @UseGuards(AuthGuard('jwt'))
-  async search(@Body() body: any) {
-    const data = await this.items.search(body.ordno, body.item);
-    return data;
+  async search(@Body() body: SearchElmesItemarrnglstDto) {
+    try {
+      const data = await this.items.search(body.ordno);
+      if (!body.item) return data;
+      const result = data.filter((item) => item.ITEMNO === body.item);
+      return result;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 }

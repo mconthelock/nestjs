@@ -49,7 +49,7 @@ export class ItemarrnglstService {
     return rows;
   }
 
-  async search(ordno: string, item: string) {
+  async search(ordno: string) {
     const query = `
             SELECT * FROM M12023_ITEMARRNGLST_APP A WHERE A.ORDERNO = :1
             UNION

@@ -5,7 +5,7 @@ import { IsDevController } from './is-dev.controller';
 import { IsDev } from './entities/is-dev.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([IsDev], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([IsDev], 'webformConnection')],
   controllers: [IsDevController],
   providers: [IsDevService],
 })

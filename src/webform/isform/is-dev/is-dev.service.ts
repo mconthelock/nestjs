@@ -1,15 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-
 import { IsDev } from './entities/is-dev.entity';
 
 @Injectable()
 export class IsDevService {
   constructor(
-    @InjectRepository(IsDev, 'amecConnection')
+    @InjectRepository(IsDev, 'webformConnection')
     private readonly isdev: Repository<IsDev>,
   ) {}
+
+  async search(year: string, keyword: string) {
+    const results = await this.isdev
+      .createQueryBuilder('isdev')
+      .leftJoinAndSelect('isdev.form', 'form')
+      .where('isdev.CYEAR2 = :year', { year })
+      .where('isdev.VDETAIL LIKE :keyword OR isdev.VSYSNAME LIKE :keyword', {
+        keyword: `%${keyword}%`,
+      })
+      .orderBy('isdev.NRUNNO', 'ASC')
+      .getMany();
+    return results;
+  }
 
   async findByYear(year) {
     const results = await this.isdev.find({

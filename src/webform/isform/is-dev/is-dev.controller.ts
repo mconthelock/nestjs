@@ -1,11 +1,18 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { IsDevService } from './is-dev.service';
+import { SearchIsDevDto } from './dto/search-is-dev.dto';
 
 @ApiTags('IS-DEV')
 @Controller('form/is/is-dev')
 export class IsDevController {
   constructor(private readonly dev: IsDevService) {}
+
+  @Post('/search')
+  async search(@Body() searchDto: SearchIsDevDto) {
+    const year = '2014';
+    return this.dev.search(year, searchDto.keyword);
+  }
 
   @Get('/year/:year')
   @ApiOperation({

@@ -1,4 +1,4 @@
-import { Module, forwardRef  } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FormService } from './form.service';
 import { FormController } from './form.controller';
@@ -15,7 +15,7 @@ import { SequenceOrgModule } from '../sequence-org/sequence-org.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Form, Flow], 'amecConnection'),
+    TypeOrmModule.forFeature([Form, Flow], 'webformConnection'),
     FormmstModule,
     UsersModule,
     FlowmstModule,
@@ -27,6 +27,6 @@ import { SequenceOrgModule } from '../sequence-org/sequence-org.module';
   ],
   controllers: [FormController],
   providers: [FormService],
-  exports: [FormService]
+  exports: [FormService],
 })
 export class FormModule {}

@@ -129,17 +129,4 @@ export class FlowController {
   async checkUnfinishedFlow(@Body() form: FormDto) {
     return await this.flowService.checkUnfinishedFlow(form);
   }
-
-  @Get('waitforapprove/:empno')
-  @ApiOperation({
-    summary: 'Count pending flows for a given empno',
-  })
-  @ApiParam({
-    name: 'empno',
-    description: 'Employee number to count pending flows for',
-    type: String,
-  })
-  async countPending(@Param('empno') empno: string) {
-    return this.flowService.countFlow({ VREPNO: empno, CSTEPST: '3' });
-  }
 }

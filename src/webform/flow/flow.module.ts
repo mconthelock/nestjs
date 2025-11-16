@@ -11,12 +11,12 @@ import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Flow], 'amecConnection'),
+    TypeOrmModule.forFeature([Flow], 'webformConnection'),
     RepModule,
     MailModule,
     forwardRef(() => FormModule),
     FormmstModule,
-    UsersModule
+    UsersModule,
   ],
   controllers: [FlowController],
   providers: [FlowService],

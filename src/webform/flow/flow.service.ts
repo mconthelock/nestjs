@@ -26,15 +26,16 @@ import {
 import { formatDate, now } from 'src/common/utils/dayjs.utils';
 import { getSafeFields } from 'src/common/utils/Fields.utils';
 import { showFlowDto } from './dto/show-flow.dto';
+import { count } from 'console';
 import { min } from 'class-validator';
 
 @Injectable()
 export class FlowService {
   constructor(
-    @InjectRepository(Flow, 'amecConnection')
+    @InjectRepository(Flow, 'webformConnection')
     private readonly flowRepo: Repository<Flow>,
 
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('webformConnection')
     private dataSource: DataSource,
     private readonly repService: RepService,
     @Inject(forwardRef(() => FormService))
@@ -1235,20 +1236,4 @@ export class FlowService {
     return await this.execSql(sql, params, queryRunner);
   }
   //------------------------------- Do action End ---------------------------------
-
-  //------------------------------- Count Flow ------------------------------------
-  async countFlow(query: any) {
-    const result = await this.flowRepo.find({
-      where: query,
-      relations: ['form'],
-    });
-    return {
-      count: result.length,
-      minDate: result.reduce(
-        (min, p) => (p.form.DREQDATE < min ? p.form.DREQDATE : min),
-        result[0]?.form.DREQDATE,
-      ),
-    };
-  }
-  //------------------------------- Count Flow End ---------------------------------
 }

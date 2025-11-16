@@ -42,13 +42,13 @@ interface FormContext {
 @Injectable()
 export class FormService {
   constructor(
-    @InjectRepository(Form, 'amecConnection')
+    @InjectRepository(Form, 'webformConnection')
     private readonly form: Repository<Form>,
 
-    @InjectRepository(Flow, 'amecConnection')
+    @InjectRepository(Flow, 'webformConnection')
     private readonly flow: Repository<Flow>,
 
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('webformConnection')
     private dataSource: DataSource,
     private readonly formmstService: FormmstService,
     private readonly flowmstService: FlowmstService,
@@ -78,6 +78,22 @@ export class FormService {
         creator: true,
       },
     });
+  }
+
+  async countForm(query: any) {
+    const qb = this.flow
+      .createQueryBuilder('f')
+      .leftJoinAndSelect('f.form', 'form');
+
+    // Add WHERE conditions dynamically based on query object
+    Object.keys(query).forEach((key, index) => {
+      if (index === 0) {
+        qb.where(`${key} = :${key}`, { [key]: query[key] });
+      } else {
+        qb.andWhere(`${key} = :${key}`, { [key]: query[key] });
+      }
+    });
+    return qb.getCount();
   }
 
   waitforapprove(empno) {

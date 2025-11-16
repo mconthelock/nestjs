@@ -38,6 +38,11 @@ export class FormController {
     return this.formService.findOne(+fno, orgno, cyear, cyear2, +nrunno);
   }
 
+  @Get('count/waitforapprove/:empno')
+  countwaitforapprove(@Param('empno') empno: string) {
+    return this.formService.countForm({ VREPNO: empno, CSTEPST: '3' });
+  }
+
   @Get('waitforapprove/:empno')
   @ApiOperation({
     summary: 'Get forms status running and flow step as "wait for approve"',

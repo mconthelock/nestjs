@@ -93,13 +93,23 @@ export class FormService {
         : '1=1',
       flow || {},
     );
+
     if (Object.keys(form || {}).length > 0) {
-      qb.where(
-        Object.keys(form)
-          .map((key) => `form.${key} = :${key}`)
-          .join(' AND '),
-        form,
-      );
+      Object.entries(form).forEach(([key, value]) => {
+        if (typeof value === 'string' && /^(>|<|>=|<=|!=)\s*/.test(value)) {
+          const match = value.match(/^(>|<|>=|<=|!=)\s*(.+)$/);
+          if (match) {
+            const [, operator, actualValue] = match;
+            qb.andWhere(`form.${key} ${operator} :form_${key}`, {
+              [`form_${key}`]: actualValue,
+            });
+          }
+        } else {
+          qb.andWhere(`form.${key} = :form_${key}`, {
+            [`form_${key}`]: value,
+          });
+        }
+      });
     }
 
     //return qb.getRawMany();
@@ -120,7 +130,7 @@ export class FormService {
       if (!obj || Object.keys(obj).length === 0) return;
 
       Object.entries(obj).forEach(([key, value]) => {
-        if (typeof value === 'string' && /^(>|<|!=)\s/.test(value)) {
+        if (typeof value === 'string' && /^(>|<|>=|<=|!=)\s*/.test(value)) {
           const [operator, actualValue] = value.split(' ');
           qb.andWhere(`${alias}.${key} ${operator} :${alias}_${key}`, {
             [`${alias}_${key}`]: actualValue,
@@ -132,10 +142,8 @@ export class FormService {
         }
       });
     };
-
     addConditions(flow, 'flow');
     addConditions(form, 'form');
-
     const [count, minDateResult] = await Promise.all([
       qb.getCount(),
       qb.clone().select('MIN(form.DREQDATE)', 'minDate').getRawOne(),

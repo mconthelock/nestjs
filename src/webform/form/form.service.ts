@@ -18,6 +18,8 @@ import { OrgposService } from 'src/webform/orgpos/orgpos.service';
 import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
 import { FormDto } from './dto/form.dto';
 import { empnoFormDto } from './dto/empno-form.dto';
+import { minDate } from 'class-validator';
+import { count } from 'console';
 
 interface FormContext {
   ip: string;
@@ -80,20 +82,66 @@ export class FormService {
     });
   }
 
-  async countForm(query: any) {
-    const qb = this.flow
-      .createQueryBuilder('f')
-      .leftJoinAndSelect('f.form', 'form');
+  async countForm({ flow, form }: any) {
+    const qb = this.form.createQueryBuilder('form').leftJoin(
+      'form.flow',
+      'flow',
+      Object.keys(flow || {}).length > 0
+        ? Object.keys(flow)
+            .map((key) => `flow.${key} = :${key}`)
+            .join(' AND ')
+        : '1=1',
+      flow || {},
+    );
+    if (Object.keys(form || {}).length > 0) {
+      qb.where(
+        Object.keys(form)
+          .map((key) => `form.${key} = :${key}`)
+          .join(' AND '),
+        form,
+      );
+    }
 
-    // Add WHERE conditions dynamically based on query object
-    Object.keys(query).forEach((key, index) => {
-      if (index === 0) {
-        qb.where(`${key} = :${key}`, { [key]: query[key] });
-      } else {
-        qb.andWhere(`${key} = :${key}`, { [key]: query[key] });
-      }
-    });
-    return qb.getCount();
+    //return qb.getRawMany();
+    const count = await qb.getCount();
+    const minDateResult = await qb
+      .clone()
+      .select('MIN(form.DREQDATE)', 'minDate')
+      .getRawOne();
+    return { count: count, minDate: minDateResult?.minDate };
+  }
+
+  async countFlow({ flow, form }: any) {
+    const qb = this.flow
+      .createQueryBuilder('flow')
+      .leftJoin('flow.form', 'form');
+
+    const addConditions = (obj: any, alias: string) => {
+      if (!obj || Object.keys(obj).length === 0) return;
+
+      Object.entries(obj).forEach(([key, value]) => {
+        if (typeof value === 'string' && /^(>|<|!=)\s/.test(value)) {
+          const [operator, actualValue] = value.split(' ');
+          qb.andWhere(`${alias}.${key} ${operator} :${alias}_${key}`, {
+            [`${alias}_${key}`]: actualValue,
+          });
+        } else {
+          qb.andWhere(`${alias}.${key} = :${alias}_${key}`, {
+            [`${alias}_${key}`]: value,
+          });
+        }
+      });
+    };
+
+    addConditions(flow, 'flow');
+    addConditions(form, 'form');
+
+    const [count, minDateResult] = await Promise.all([
+      qb.getCount(),
+      qb.clone().select('MIN(form.DREQDATE)', 'minDate').getRawOne(),
+    ]);
+
+    return { count, minDate: minDateResult?.minDate };
   }
 
   waitforapprove(empno) {

@@ -40,7 +40,44 @@ export class FormController {
 
   @Get('count/waitforapprove/:empno')
   countwaitforapprove(@Param('empno') empno: string) {
-    return this.formService.countForm({ VREPNO: empno, CSTEPST: '3' });
+    return this.formService.countFlow({
+      flow: { VREPNO: empno, CSTEPST: '3' },
+    });
+  }
+
+  @Get('count/coming/:empno')
+  countcoming(@Param('empno') empno: string) {
+    return this.formService.countFlow({
+      flow: { VREPNO: empno, CSTEPST: '2' },
+    });
+  }
+
+  @Get('count/approved/:empno/:year')
+  countapproved(@Param('empno') empno: string, @Param('year') year: string) {
+    return this.formService.countFlow({
+      flow: { VREALAPV: empno, CSTEPST: '> 3' },
+      //   form: { CYEAR2: year },
+    });
+  }
+
+  @Get('count/underprepare/:empno')
+  countunderprepare(@Param('empno') empno: string) {
+    return this.formService.countForm({
+      form: { VINPUTER: empno, CST: '0' },
+      flow: { CSTEPNO: '--' },
+    });
+  }
+
+  @Get('count/mine/:empno')
+  async countmine(@Param('empno') empno: string) {
+    const result = await this.formService.countForm({
+      flow: { CSTEPNO: '--' },
+      form: { VINPUTER: empno, CST: '1' },
+    });
+    const count = Array.isArray(result) ? result.length : 0;
+    console.log('Count of mine forms:', count);
+
+    return result;
   }
 
   @Get('waitforapprove/:empno')

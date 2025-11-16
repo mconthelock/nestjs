@@ -45,10 +45,34 @@ export class AppsusersService {
   }
 
   async getUserApp(user: string) {
-    return await this.appuser.find({
+    const authenapps = await this.appuser.find({
       where: { USERS_ID: user },
       relations: ['application', 'appsgroups'],
     });
+    const allapp = await this.apps.findAll();
+    const noneAuthenapps = allapp.filter(
+      (app) =>
+        app.APP_LOGIN == '0' &&
+        !authenapps.some(
+          (authApp) => authApp.application.APP_ID === app.APP_ID,
+        ),
+    );
+
+    const noneAuthenWithGroups = await Promise.all(
+      noneAuthenapps.map(async (app) => {
+        const group = await this.grps.findGroup(0, app.APP_ID);
+        return {
+          application: app,
+          appsgroups: group,
+          USERS_ID: user,
+          PROGRAM: app.APP_ID,
+          USERS_GROUP: 0,
+        };
+      }),
+    );
+
+    const mergedApps = [...authenapps, ...noneAuthenWithGroups];
+    return mergedApps;
   }
 
   async getAllUserApp(id: number) {

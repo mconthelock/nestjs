@@ -94,6 +94,48 @@ export class FormService {
       .getMany();
   }
 
+  underprepare(empno) {
+    return this.flow
+      .createQueryBuilder('flow')
+      .leftJoinAndSelect('flow.form', 'form')
+      .leftJoinAndSelect('form.formmst', 'formmst')
+      .leftJoinAndSelect('form.flow', 'form_flow') // relation ใน entity ต้องตั้งชื่อถูก
+      .where(
+        '(flow.CSTEPST = :step AND flow.VAPVNO = :empno) OR (flow.CSTEPST = :step AND flow.VREPNO = :empno)',
+        { step: '3', empno },
+      )
+      .andWhere('flow.CSTEPNO = form_flow.CSTEPNEXTNO')
+      .getMany();
+  }
+
+  mine(empno) {
+    return this.flow
+      .createQueryBuilder('flow')
+      .leftJoinAndSelect('flow.form', 'form')
+      .leftJoinAndSelect('form.formmst', 'formmst')
+      .leftJoinAndSelect('form.flow', 'form_flow') // relation ใน entity ต้องตั้งชื่อถูก
+      .where(
+        '(flow.CSTEPST = :step AND flow.VAPVNO = :empno) OR (flow.CSTEPST = :step AND flow.VREPNO = :empno)',
+        { step: '3', empno },
+      )
+      .andWhere('flow.CSTEPNO = form_flow.CSTEPNEXTNO')
+      .getMany();
+  }
+
+  finish(empno, year) {
+    return this.flow
+      .createQueryBuilder('flow')
+      .leftJoinAndSelect('flow.form', 'form')
+      .leftJoinAndSelect('form.formmst', 'formmst')
+      .leftJoinAndSelect('form.flow', 'form_flow') // relation ใน entity ต้องตั้งชื่อถูก
+      .where(
+        '(flow.CSTEPST = :step AND flow.VAPVNO = :empno) OR (flow.CSTEPST = :step AND flow.VREPNO = :empno)',
+        { step: '3', empno },
+      )
+      .andWhere('flow.CSTEPNO = form_flow.CSTEPNEXTNO')
+      .getMany();
+  }
+
   async getFormno(dto: FormDto, queryRunner?: QueryRunner): Promise<string> {
     const form = await this.formmstService.getFormmst(
       {
@@ -188,8 +230,8 @@ export class FormService {
         context.query.CSTEPST = '0';
         const notuse = await this.flowService.getFlow(context.query, runner);
         for (const row of notuse) {
-        //   await this.deleteFlowStep(row, context, runner);
-            await this.flowService.deleteFlowStep(row, runner);
+          //   await this.deleteFlowStep(row, context, runner);
+          await this.flowService.deleteFlowStep(row, runner);
         }
 
         //Draft form
@@ -526,32 +568,32 @@ export class FormService {
     }
   }
 
-//   async deleteFlowStep(
-//     data: any,
-//     context: FormContext,
-//     queryRunner: QueryRunner,
-//   ) {
-//     await this.flowService.deleteFlow(context.query, queryRunner);
-//     if (context.query && 'CSTEPST' in context.query) {
-//       delete context.query['CSTEPST'];
-//     }
-//     context.query.CSTEPNEXTNO = data.CSTEPNO;
-//     context.query.NRUNNO = context.nrunno;
-//     await this.flowService.updateFlow(
-//       { condition: context.query, CSTEPNEXTNO: data.CSTEPNEXTNO },
-//       queryRunner,
-//     );
-//     if (data.CSTART == '1') {
-//       if (context.query && 'CSTEPNEXTNO' in context.query) {
-//         delete context.query['CSTEPNEXTNO'];
-//       }
-//       context.query.CSTEPNO = data.CSTEPNEXTNO;
-//       await this.flowService.updateFlow(
-//         { condition: context.query, CSTART: '1' },
-//         queryRunner,
-//       );
-//     }
-//   }
+  //   async deleteFlowStep(
+  //     data: any,
+  //     context: FormContext,
+  //     queryRunner: QueryRunner,
+  //   ) {
+  //     await this.flowService.deleteFlow(context.query, queryRunner);
+  //     if (context.query && 'CSTEPST' in context.query) {
+  //       delete context.query['CSTEPST'];
+  //     }
+  //     context.query.CSTEPNEXTNO = data.CSTEPNO;
+  //     context.query.NRUNNO = context.nrunno;
+  //     await this.flowService.updateFlow(
+  //       { condition: context.query, CSTEPNEXTNO: data.CSTEPNEXTNO },
+  //       queryRunner,
+  //     );
+  //     if (data.CSTART == '1') {
+  //       if (context.query && 'CSTEPNEXTNO' in context.query) {
+  //         delete context.query['CSTEPNEXTNO'];
+  //       }
+  //       context.query.CSTEPNO = data.CSTEPNEXTNO;
+  //       await this.flowService.updateFlow(
+  //         { condition: context.query, CSTART: '1' },
+  //         queryRunner,
+  //       );
+  //     }
+  //   }
 
   async saveDraft(
     draft: string,
@@ -729,8 +771,8 @@ export class FormService {
     if (frm.length == 0) {
       return this.mode_add;
     }
-    if(form.EMPNO == null || form.EMPNO == '') {
-        return this.mode_view;
+    if (form.EMPNO == null || form.EMPNO == '') {
+      return this.mode_view;
     }
     const flow = await this.flowService.getEmpFlowStepReady(form);
     return flow.length > 0 ? this.mode_edit : this.mode_view;
@@ -742,14 +784,14 @@ export class FormService {
    */
   async getRequestNo(reqNo: string) {
     const form = await this.crackRequestNo(reqNo);
-    const res  = {status: 0, data: []}
+    const res = { status: 0, data: [] };
     if (form.length > 0) {
       for (const f of form) {
         const formData = await this.getFormData(f);
         if (formData) {
-            formData.LINK = await this.createLink(f);
-            res.status = 1;
-            res.data.push(formData);
+          formData.LINK = await this.createLink(f);
+          res.status = 1;
+          res.data.push(formData);
         }
       }
     }

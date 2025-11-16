@@ -19,7 +19,6 @@ import { FormDto } from './dto/form.dto';
 import { empnoFormDto } from './dto/empno-form.dto';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
-
 @ApiTags('Form')
 @Controller('form')
 export class FormController {
@@ -41,34 +40,34 @@ export class FormController {
 
   @Get('waitforapprove/:empno')
   @ApiOperation({
-    summary: 'ตึงข้อมูลจากตาราง Form',
+    summary: 'Get forms status running and flow step as "wait for approve"',
   })
   waitforapprove(@Param('empno') empno: string) {
-    return empno;
+    return this.formService.waitforapprove(empno);
   }
 
   @Get('mine/:empno')
   @ApiOperation({
-    summary: 'ตึงข้อมูลจากตาราง Form',
+    summary: 'Get forms status running and have empno as requester',
   })
   mine(@Param('empno') empno: string) {
-    return empno;
+    return this.formService.mine(empno);
   }
 
-  @Get('finish/:empno')
+  @Get('finish/:empno/:year')
   @ApiOperation({
-    summary: 'ตึงข้อมูลจากตาราง Form',
+    summary: 'Get forms status finished and have empno as requester',
   })
-  finish(@Param('empno') empno: string) {
-    return empno;
+  finish(@Param('empno') empno: string, @Param('year') year: string) {
+    return this.formService.finish(empno, year);
   }
 
   @Get('underprepare/:empno')
   @ApiOperation({
-    summary: 'ตึงข้อมูลจากตาราง Form',
+    summary: 'Get forms status under preparation and have empno as requester',
   })
   underprepare(@Param('empno') empno: string) {
-    return empno;
+    return this.formService.underprepare(empno);
   }
 
   @Post('getFormno')
@@ -91,14 +90,12 @@ export class FormController {
 
   @Patch('updateForm')
   async updateForm(
-    @Body() dto: UpdateFormDto
+    @Body() dto: UpdateFormDto,
   ): Promise<{ message: string; status: boolean }> {
     try {
       const result = await this.formService.updateForm(dto);
       return {
-        message: result
-          ? 'Form updated successfully'
-          : 'Failed to update form',
+        message: result ? 'Form updated successfully' : 'Failed to update form',
         status: result,
       };
     } catch (error) {
@@ -109,15 +106,13 @@ export class FormController {
   @Delete('deleteForm')
   @UseInterceptors(AnyFilesInterceptor())
   async deleteForm(
-    @Body() dto: UpdateFormDto
-  ): Promise<{ form: UpdateFormDto, message: string; status: boolean }> {
+    @Body() dto: UpdateFormDto,
+  ): Promise<{ form: UpdateFormDto; message: string; status: boolean }> {
     try {
       const result = await this.formService.deleteFlowAndForm(dto);
       return {
         form: dto,
-        message: result
-          ? 'Form deleted successfully'
-          : 'Failed to delete form',
+        message: result ? 'Form deleted successfully' : 'Failed to delete form',
         status: result,
       };
     } catch (error) {
@@ -126,17 +121,17 @@ export class FormController {
   }
 
   @Post('getFormDetail')
-  async getFormDetail(@Body() form: FormDto){
+  async getFormDetail(@Body() form: FormDto) {
     return this.formService.getFormDetail(form);
   }
 
   @Post('getMode')
-  async getMode(@Body() form: empnoFormDto){
+  async getMode(@Body() form: empnoFormDto) {
     return this.formService.getMode(form);
   }
 
   @Post('getRequestNo')
-  async getRequestNo(@Body('reqNo') reqNo: string){
+  async getRequestNo(@Body('reqNo') reqNo: string) {
     return this.formService.getRequestNo(reqNo);
   }
 }

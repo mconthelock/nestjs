@@ -9,7 +9,12 @@ import {
   Req,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiExcludeEndpoint} from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+  ApiExcludeEndpoint,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 
 import { FlowService } from './flow.service';
@@ -115,7 +120,7 @@ export class FlowController {
   @Post('doaction')
   @UseInterceptors(AnyFilesInterceptor())
   async doAction(@Body() dto: doactionFlowDto, @Req() req: Request) {
-     const ip = getClientIP(req);
+    const ip = getClientIP(req);
     return await this.flowService.doAction(dto, ip);
   }
 
@@ -123,5 +128,18 @@ export class FlowController {
   @Post('checkUnfinishedFlow')
   async checkUnfinishedFlow(@Body() form: FormDto) {
     return await this.flowService.checkUnfinishedFlow(form);
+  }
+
+  @Get('waitforapprove/:empno')
+  @ApiOperation({
+    summary: 'Count pending flows for a given empno',
+  })
+  @ApiParam({
+    name: 'empno',
+    description: 'Employee number to count pending flows for',
+    type: String,
+  })
+  async countPending(@Param('empno') empno: string) {
+    return this.flowService.countFlow({ VREPNO: empno, CSTEPST: '3' });
   }
 }

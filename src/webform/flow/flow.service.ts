@@ -26,6 +26,7 @@ import {
 import { formatDate, now } from 'src/common/utils/dayjs.utils';
 import { getSafeFields } from 'src/common/utils/Fields.utils';
 import { showFlowDto } from './dto/show-flow.dto';
+import { min } from 'class-validator';
 
 @Injectable()
 export class FlowService {
@@ -329,15 +330,15 @@ export class FlowService {
   async getFlowTree(form: FormDto, queryRunner?: QueryRunner) {
     const dataSource = queryRunner ? queryRunner : this.dataSource;
     const sql = `
-    SELECT DISTINCT LEVEL, CSTEPNO, CSTEPNEXTNO, CSTEPST, CEXTDATA, VAPVNO, NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, SNAME, VNAME, DAPVDATE, CAPVTIME, VREMARK,  VREPNO, VREALAPV 
-    FROM FLOW, AMECUSERALL, stepmst  WHERE  FLOW.VAPVNO = SEMPNO and flow.CSTEPNO = cno 
-    start with CSTART = '1' and 
-    NFRMNO = :1 and VORGNO = :2 and CYEAR = :3 
+    SELECT DISTINCT LEVEL, CSTEPNO, CSTEPNEXTNO, CSTEPST, CEXTDATA, VAPVNO, NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, SNAME, VNAME, DAPVDATE, CAPVTIME, VREMARK,  VREPNO, VREALAPV
+    FROM FLOW, AMECUSERALL, stepmst  WHERE  FLOW.VAPVNO = SEMPNO and flow.CSTEPNO = cno
+    start with CSTART = '1' and
+    NFRMNO = :1 and VORGNO = :2 and CYEAR = :3
     and CYEAR2 = :4 and NRUNNO = :5
-    connect by 
-    NFRMNO = prior NFRMNO and VORGNO = prior VORGNO and CYEAR = prior CYEAR 
-    and CYEAR2 = prior CYEAR2 and NRUNNO = prior NRUNNO 
-    and CSTEPNO = prior CSTEPNEXTNO 
+    connect by
+    NFRMNO = prior NFRMNO and VORGNO = prior VORGNO and CYEAR = prior CYEAR
+    and CYEAR2 = prior CYEAR2 and NRUNNO = prior NRUNNO
+    and CSTEPNO = prior CSTEPNEXTNO
     order by level
         `;
     return await dataSource.query(sql, [
@@ -618,7 +619,7 @@ export class FlowService {
       }
       // CHECK STEP STATUS
       const checkStep = await this.getEmpFlowStepReady(dto, runner);
-      
+
       if (checkStep.length === 0) {
         throw new Error('Ready step not found!');
       }
@@ -745,7 +746,7 @@ export class FlowService {
           await this.updateStepReqToReadyB(form, runner);
           break;
         case 'returnE':
-          if(!dto.CEXTDATA){
+          if (!dto.CEXTDATA) {
             throw new Error('CEXTDATA is required for returnE action');
           }
           whatAction = this.APV_NONE;
@@ -1122,7 +1123,7 @@ export class FlowService {
       stepReady: this.STEP_READY,
       apvNone: this.APV_NONE,
     };
-    
+
     return await this.execSql(
       sql,
       params,
@@ -1179,7 +1180,6 @@ export class FlowService {
     );
   }
 
-
   async sendMailToApprover(form: FormDto, queryRunner?: QueryRunner) {
     const res = await this.getNameReq(form, queryRunner);
     if (res.result.length > 0) {
@@ -1234,6 +1234,21 @@ export class FlowService {
     };
     return await this.execSql(sql, params, queryRunner);
   }
-
   //------------------------------- Do action End ---------------------------------
+
+  //------------------------------- Count Flow ------------------------------------
+  async countFlow(query: any) {
+    const result = await this.flowRepo.find({
+      where: query,
+      relations: ['form'],
+    });
+    return {
+      count: result.length,
+      minDate: result.reduce(
+        (min, p) => (p.form.DREQDATE < min ? p.form.DREQDATE : min),
+        result[0]?.form.DREQDATE,
+      ),
+    };
+  }
+  //------------------------------- Count Flow End ---------------------------------
 }

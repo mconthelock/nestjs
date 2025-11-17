@@ -1,10 +1,10 @@
-import { IsIn, IsNotEmpty, IsString } from 'class-validator';
+import { IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class FileDto {
   @IsNotEmpty()
   @IsString()
   baseDir: string; // FILE_PATH
-  
+
   @IsNotEmpty()
   @IsString()
   storedName: string; // FILE_FNAME (ชื่อที่เก็บจริง)
@@ -17,4 +17,18 @@ export class FileDto {
   @IsString()
   @IsIn(['open', 'download'])
   mode: string; // โหมดเปิดไฟล์หรือดาวน์โหลด
+}
+
+export class ListDto {
+  @IsNotEmpty()
+  @IsString()
+  baseDir: string;
+
+  @IsOptional()
+  @IsString()
+  path: string;
+
+  @IsOptional()
+  @IsString({ each: true })
+  allow?: string[];
 }

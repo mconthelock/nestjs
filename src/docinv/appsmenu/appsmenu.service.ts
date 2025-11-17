@@ -37,7 +37,8 @@ export class AppsmenuService {
         { MENU_TOP: result.MENU_ID },
       );
     }
-    return result;
+    // return result;
+    return this.findOneMenu(result.MENU_ID);
   }
 
   async update(id: number, data: CreateAppsmenuDto) {

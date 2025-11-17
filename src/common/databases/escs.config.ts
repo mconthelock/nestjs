@@ -42,5 +42,25 @@ if (process.env.HOST == 'AMEC') {
       },
     }),
   };
+} else {
+  escsConfig = {
+    name: 'escsConnection',
+    imports: [],
+    inject: [ConfigService, WINSTON_MODULE_PROVIDER],
+    useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
+      type: 'mysql',
+      host: process.env.HOME_HOST,
+      port: parseInt(process.env.HOME_PORT as string, 10),
+      username: process.env.HOME_USER,
+      password: process.env.HOME_PASSWORD,
+      database: process.env.AMEC_DATABASE,
+      entities: [
+        __dirname + '/../../**/**/*.entity{.ts,.js}',
+        __dirname + '/../../**/**/**/*.entity{.ts,.js}',
+      ],
+      synchronize: false,
+      logger: new TypeOrmWinstonLogger(winstonLogger),
+    }),
+  };
 }
 export default escsConfig;

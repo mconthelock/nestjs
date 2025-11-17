@@ -6,7 +6,7 @@ import { Flowmst } from './entities/flowmst.entity';
 @Injectable()
 export class FlowmstService {
   constructor(
-    @InjectRepository(Flowmst, 'amecConnection')
+    @InjectRepository(Flowmst, 'webformConnection')
     private readonly flowmstRepo: Repository<Flowmst>,
   ) {}
 

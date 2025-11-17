@@ -8,9 +8,9 @@ import { ESCSUserItemStation } from './entities/user-item-station.entity';
 @Injectable()
 export class ESCSUserItemStationService {
      constructor(
-        @InjectRepository(ESCSUserItemStation, 'amecConnection')
+        @InjectRepository(ESCSUserItemStation, 'escsConnection')
         private userItemStationRepo: Repository<ESCSUserItemStation>,
-        @InjectDataSource('amecConnection')
+        @InjectDataSource('escsConnection')
         private dataSource: DataSource,
       ) {}
    async addUserItemStation(dto: ESCSCreateUserItemStationDto, queryRunner?: QueryRunner) {

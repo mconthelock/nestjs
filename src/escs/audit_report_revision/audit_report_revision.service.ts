@@ -10,9 +10,9 @@ import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
 @Injectable()
 export class ESCSARRService {
   constructor(
-    @InjectRepository(AuditReportRevision, 'amecConnection')
+    @InjectRepository(AuditReportRevision, 'escsConnection')
     private auditRepo: Repository<AuditReportRevision>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('escsConnection')
     private readonly dataSource: DataSource,
   ) {}
 

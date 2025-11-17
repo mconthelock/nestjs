@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { QainsOA } from './entities/qains_operator_auditor.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([QainsOA], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([QainsOA], 'webformConnection')],
   controllers: [QainsOAController],
   providers: [QainsOAService],
   exports: [QainsOAService],

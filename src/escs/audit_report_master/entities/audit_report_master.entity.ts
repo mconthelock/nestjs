@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
-@Entity('AUDIT_REPORT_MASTER')
+@Entity({ name: 'AUDIT_REPORT_MASTER', schema: 'ESCCHKSHT' })
 export class AuditReportMaster {
 
     @PrimaryColumn()

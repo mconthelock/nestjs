@@ -6,9 +6,9 @@ import { QaType } from './entities/qa_type.entity';
 @Injectable()
 export class QaTypeService {
   constructor(
-    @InjectRepository(QaType, 'amecConnection')
+    @InjectRepository(QaType, 'webformConnection')
     private qatypeRepo: Repository<QaType>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('webformConnection')
     private dataSource: DataSource,
   ) {}
 

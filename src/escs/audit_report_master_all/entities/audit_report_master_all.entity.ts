@@ -1,7 +1,7 @@
 import { QainsForm } from "src/webform/qaform/qa-ins/qains_form/entities/qains_form.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, ViewColumn, ViewEntity } from "typeorm";
 
-@ViewEntity('AUDIT_REPORT_MASTER_ALL')
+@ViewEntity({ name: 'AUDIT_REPORT_MASTER_ALL', schema: 'ESCCHKSHT' })
 export class AuditReportMasterAll {
 
     @ViewColumn()

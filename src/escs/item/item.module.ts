@@ -5,7 +5,7 @@ import { Item } from './entities/item.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Item], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([Item], 'escsConnection')],
   controllers: [ESCSItemController],
   providers: [ESCSItemService],
 })

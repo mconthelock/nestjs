@@ -8,9 +8,9 @@ import { SearchESCSARMDto } from '../audit_report_master/dto/search-audit_report
 @Injectable()
 export class ESCSARMAService {
   constructor(
-    @InjectRepository(AuditReportMasterAll, 'amecConnection')
+    @InjectRepository(AuditReportMasterAll, 'escsConnection')
     private auditMasterAllRepo: Repository<AuditReportMasterAll>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('escsConnection')
     private readonly dataSource: DataSource,
     private readonly escsArrService: ESCSARRService,
   ) {}

@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 
-@Entity('ESCS_ITEM')
+@Entity({ name: 'ITEM', schema: 'ESCCHKSHT' })
 export class Item {
   @PrimaryColumn()
   IT_NO: string;

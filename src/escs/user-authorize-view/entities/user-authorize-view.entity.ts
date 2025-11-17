@@ -9,7 +9,10 @@ import {
   ViewEntity,
 } from 'typeorm';
 
-@ViewEntity('ESCS_USERS_AUTHORIZE_VIEW')
+@ViewEntity({
+  name: 'USERS_AUTHORIZE_VIEW',
+  schema: 'ESCCHKSHT'
+})
 export class ESCSUserAuthorizeView {
   @ViewColumn()
   USR_ID: number;

@@ -7,7 +7,7 @@ import { SearchEscsItemDto } from './dto/search-escs-item.dto';
 @Injectable()
 export class ESCSItemService {
   constructor(
-    @InjectRepository(Item, 'amecConnection')
+    @InjectRepository(Item, 'escsConnection')
     private itemRepo: Repository<Item>,
   ) {}
 

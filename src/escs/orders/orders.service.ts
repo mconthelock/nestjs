@@ -10,7 +10,7 @@ import { logQuery } from 'src/common/utils/debug.utils';
 @Injectable()
 export class ESCSOrdersService {
   constructor(
-    @InjectRepository(Orders, 'amecConnection')
+    @InjectRepository(Orders, 'escsConnection')
     private ordersRepo: Repository<Orders>,
   ) {}
   create(createOrderDto: CreateOrderDto) {

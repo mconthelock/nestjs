@@ -1,5 +1,9 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-@Entity('ESCS_USERS_SECTION')
+
+@Entity({
+  name: 'USERS_SECTION',
+  schema: 'ESCCHKSHT'
+})
 export class UserSection {
   @PrimaryColumn()
   SEC_ID: number;

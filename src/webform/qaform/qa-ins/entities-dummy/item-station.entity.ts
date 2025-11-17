@@ -1,7 +1,10 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { QainsForm } from '../qains_form/entities/qains_form.entity';
 
-@Entity('ESCS_ITEM_STATION')
+@Entity({
+  name: 'ITEM_STATION',
+  schema: 'ESCCHKSHT'
+})
 export class ESCSItemStation {
   @PrimaryColumn()
   ITS_ITEM: string;

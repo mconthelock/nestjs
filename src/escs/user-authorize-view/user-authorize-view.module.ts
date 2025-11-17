@@ -6,7 +6,7 @@ import { ESCSUserAuthorizeView } from './entities/user-authorize-view.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ESCSUserAuthorizeView], 'amecConnection'),
+    TypeOrmModule.forFeature([ESCSUserAuthorizeView], 'escsConnection'),
   ],
   controllers: [ESCSUserAuthorizeViewController],
   providers: [ESCSUserAuthorizeViewService],

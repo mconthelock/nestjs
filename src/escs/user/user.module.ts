@@ -5,7 +5,7 @@ import { EscsUser } from './entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([EscsUser], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([EscsUser], 'escsConnection')],
   controllers: [ESCSUserController],
   providers: [ESCSUserService],
   exports: [ESCSUserService],

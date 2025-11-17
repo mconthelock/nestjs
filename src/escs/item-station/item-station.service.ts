@@ -8,7 +8,7 @@ import { ESCSItemStation } from './entities/item-station.entity';
 @Injectable()
 export class ESCSItemStationService {
     constructor(
-        @InjectRepository(ESCSItemStation, 'amecConnection') 
+        @InjectRepository(ESCSItemStation, 'escsConnection') 
         private readonly itemStationRepository: Repository<ESCSItemStation>,
     ) {}
 

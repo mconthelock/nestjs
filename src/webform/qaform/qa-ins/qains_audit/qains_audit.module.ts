@@ -10,7 +10,7 @@ import { QaFileModule } from '../../qa_file/qa_file.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([QainsAudit], 'amecConnection'),
+    TypeOrmModule.forFeature([QainsAudit], 'webformConnection'),
     QainsOAModule,
     QaFileModule,
     FormModule

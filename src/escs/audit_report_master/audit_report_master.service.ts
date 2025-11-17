@@ -15,9 +15,9 @@ import { ESCSARMAService } from '../audit_report_master_all/audit_report_master_
 @Injectable()
 export class ESCSARMService {
   constructor(
-    @InjectRepository(AuditReportMaster, 'amecConnection')
+    @InjectRepository(AuditReportMaster, 'escsConnection')
     private auditMasterRepo: Repository<AuditReportMaster>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('escsConnection')
     private readonly dataSource: DataSource,
     private readonly escsArrService: ESCSARRService,
     private readonly escsArhService: ESCSARHService,

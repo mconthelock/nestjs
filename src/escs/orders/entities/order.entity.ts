@@ -1,5 +1,6 @@
 import { PrimaryColumn, Column, Entity } from 'typeorm';
-@Entity('ESCS_ORDERS')
+
+@Entity({ name: 'ORDERS', schema: 'ESCCHKSHT' })
 export class Orders {
   @PrimaryColumn()
   ORD_PRODUCTION: string;

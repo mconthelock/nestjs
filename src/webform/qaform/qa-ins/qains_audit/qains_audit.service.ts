@@ -15,9 +15,9 @@ import { deleteFile, joinPaths } from 'src/common/utils/files.utils';
 @Injectable()
 export class QainsAuditService {
   constructor(
-    @InjectRepository(QainsAudit, 'amecConnection')
+    @InjectRepository(QainsAudit, 'webformConnection')
     private auditRepo: Repository<QainsAudit>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('webformConnection')
     private readonly dataSource: DataSource,
     private readonly qainsOAService: QainsOAService,
     private readonly formService: FormService,

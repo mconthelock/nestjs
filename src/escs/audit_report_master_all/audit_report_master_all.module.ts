@@ -8,7 +8,7 @@ import { ESCSARRModule } from '../audit_report_revision/audit_report_revision.mo
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AuditReportMasterAll], 'amecConnection'),
+    TypeOrmModule.forFeature([AuditReportMasterAll], 'escsConnection'),
     ESCSARRModule,
   ],
   controllers: [ESCSARMAController],

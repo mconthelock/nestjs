@@ -16,7 +16,6 @@ import { QaFileService } from '../../qa_file/qa_file.service';
 import { FlowService } from 'src/webform/flow/flow.service';
 import { UsersService } from 'src/amec/users/users.service';
 import { MailService } from 'src/mail/mail.service';
-import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
 import { OrgposService } from 'src/webform/orgpos/orgpos.service';
 import { ESCSUserService } from 'src/escs/user/user.service';
 import { ESCSUserItemService } from 'src/escs/user-item/user-item.service';
@@ -42,16 +41,15 @@ import { ESCSUserSectionService } from 'src/escs/user_section/user_section.servi
 @Injectable()
 export class QainsFormService {
   constructor(
-    @InjectRepository(QainsForm, 'amecConnection')
+    @InjectRepository(QainsForm, 'webformConnection')
     private readonly qaformRepo: Repository<QainsForm>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('webformConnection')
     private dataSource: DataSource,
 
     private readonly formService: FormService,
     private readonly flowService: FlowService,
     private readonly QainsOAService: QainsOAService,
     private readonly QaFileService: QaFileService,
-    private readonly sequenceOrgService: SequenceOrgService,
     private readonly usersService: UsersService,
     private readonly mailService: MailService,
     private readonly orgposService: OrgposService,
@@ -101,29 +99,6 @@ export class QainsFormService {
         CYEAR2: createForm.data.CYEAR2,
         NRUNNO: createForm.data.NRUNNO,
       };
-
-      //   // update flow incharge1
-      //   const condIncharge1 = {
-      //     condition: {
-      //       ...form,
-      //       CEXTDATA: '01',
-      //     },
-      //     VAPVNO: dto.QA_INCHARGE_EMPNO,
-      //     VREPNO: dto.QA_INCHARGE_EMPNO,
-      //   };
-      //   this.flowService.updateFlow(condIncharge1, queryRunner);
-
-      //   // update flow incharge2
-      //   const condIncharge2 = {
-      //     condition: {
-      //       ...form,
-      //       CEXTDATA: '02',
-      //     },
-      //     VAPVNO: dto.QA_INCHARGE_EMPNO,
-      //     VREPNO: dto.QA_INCHARGE_EMPNO,
-      //   };
-      //   this.flowService.updateFlow(condIncharge2, queryRunner);
-
       const condSetFlow = {
         ...form,
         CEXTDATA: '00',

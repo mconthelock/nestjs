@@ -11,9 +11,9 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 @Injectable()
 export class QaFileService {
   constructor(
-    @InjectRepository(QaFile, 'amecConnection')
+    @InjectRepository(QaFile, 'webformConnection')
     private readonly qaformRepo: Repository<QaFile>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('webformConnection')
     private dataSource: DataSource,
   ) {}
 

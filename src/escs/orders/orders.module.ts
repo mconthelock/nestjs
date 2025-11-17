@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Orders } from './entities/order.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Orders], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([Orders], 'escsConnection')],
   controllers: [ESCSOrdersController],
   providers: [ESCSOrdersService],
 })

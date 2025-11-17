@@ -25,7 +25,7 @@ import { ESCSUserSectionModule } from 'src/escs/user_section/user_section.module
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([QainsForm, Form], 'amecConnection'),
+    TypeOrmModule.forFeature([QainsForm, Form], 'webformConnection'),
     FormModule,
     FlowModule,
     QainsOAModule,

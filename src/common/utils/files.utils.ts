@@ -85,7 +85,7 @@ export function getMimeType(name: string) {
  */
 export function buildContentDisposition(
   oname: string,
-  mode: 'open' | 'download',
+  mode: string, // 'open' | 'download'
 ) {
 //   const encoded = encodeURIComponent(oname).replace(/['()]/g, escape);
   const type = mode === 'download' ? 'attachment' : 'inline';

@@ -1,6 +1,10 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { QainsForm } from '../qains_form/entities/qains_form.entity';
-@Entity('ESCS_USERS_SECTION')
+
+@Entity({
+  name: 'USERS_SECTION',
+  schema: 'ESCCHKSHT'
+})
 export class UserSection {
   @PrimaryColumn()
   SEC_ID: number;

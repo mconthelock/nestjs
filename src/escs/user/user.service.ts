@@ -12,9 +12,9 @@ import { CreateEscsUserDto } from './dto/create-escs-user.dto';
 @Injectable()
 export class ESCSUserService {
   constructor(
-    @InjectRepository(EscsUser, 'amecConnection')
+    @InjectRepository(EscsUser, 'escsConnection')
     private userRepo: Repository<EscsUser>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('escsConnection')
     private dataSource: DataSource,
   ) {}
 
@@ -53,7 +53,7 @@ export class ESCSUserService {
       fields = [],
     } = searchDto;
     const repo = queryRunner ? queryRunner.manager : this.dataSource;
-    const query = repo.createQueryBuilder().from('ESCS_USERS', 'A');
+    const query = repo.createQueryBuilder().from('USERS', 'A');
 
     if (USR_ID) query.andWhere('A.USR_ID = :USR_ID', { USR_ID });
     if (USR_NO) query.andWhere('A.USR_NO = :USR_NO', { USR_NO });

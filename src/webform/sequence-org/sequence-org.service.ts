@@ -9,10 +9,10 @@ import { SearchSequenceOrgDto } from './dto/search-sequence-org.dto';
 @Injectable()
 export class SequenceOrgService {
   constructor(
-    @InjectRepository(SequenceOrg, 'amecConnection')
+    @InjectRepository(SequenceOrg, 'webformConnection')
     private readonly seqRepo: Repository<SequenceOrg>,
 
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('webformConnection')
     private dataSource: DataSource,
   ) {}
 

@@ -9,7 +9,7 @@ import { OrgTree } from './entities/org-tree.entity';
   providers: [OrgTreeService],
   exports: [OrgTreeService],
   imports: [
-    TypeOrmModule.forFeature([OrgTree], 'amecConnection'),
+    TypeOrmModule.forFeature([OrgTree], 'webformConnection'),
   ]
 })
 export class OrgTreeModule {}

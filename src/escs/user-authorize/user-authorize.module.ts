@@ -5,7 +5,7 @@ import { ESCSUserAuthorize } from './entities/user-authorize.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ESCSUserAuthorize], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([ESCSUserAuthorize], 'escsConnection')],
   controllers: [ESCSUserAuthorizeController],
   providers: [ESCSUserAuthorizeService],
   exports: [ESCSUserAuthorizeService],

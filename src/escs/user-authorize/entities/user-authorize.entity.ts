@@ -1,6 +1,9 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('ESCS_USERS_AUTHORIZE')
+@Entity({
+  name: 'USERS_AUTHORIZE',
+  schema: 'ESCCHKSHT'
+})
 export class ESCSUserAuthorize {
   @PrimaryColumn()
   UA_ITEM: string;

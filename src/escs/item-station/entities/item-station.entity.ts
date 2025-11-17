@@ -1,7 +1,10 @@
 import { ESCSUserAuthorizeView } from 'src/escs/user-authorize-view/entities/user-authorize-view.entity';
 import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
 
-@Entity('ESCS_ITEM_STATION')
+@Entity({
+  name: 'ITEM_STATION',
+  schema: 'ESCCHKSHT'
+})
 export class ESCSItemStation {
   @PrimaryColumn()
   ITS_ITEM: string;

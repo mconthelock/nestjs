@@ -8,9 +8,9 @@ import { DataSource, QueryRunner, Repository } from 'typeorm';
 @Injectable()
 export class ESCSUserAuthorizeService {
   constructor(
-    @InjectRepository(ESCSUserAuthorize, 'amecConnection')
+    @InjectRepository(ESCSUserAuthorize, 'escsConnection')
     private userAuthRepo: Repository<ESCSUserAuthorize>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('escsConnection')
     private dataSource: DataSource,
   ) {}
 

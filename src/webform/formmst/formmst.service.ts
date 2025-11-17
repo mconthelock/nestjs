@@ -10,7 +10,7 @@ export class FormmstService {
   constructor(
     @InjectRepository(Formmst, 'webformConnection')
     private formmstRepo: Repository<Formmst>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('webformConnection')
     private dataSource: DataSource,
   ) {}
 

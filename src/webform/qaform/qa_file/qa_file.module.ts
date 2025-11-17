@@ -5,7 +5,7 @@ import { QaFileController } from './qa_file.controller';
 import { QaFile } from './entities/qa_file.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([QaFile], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([QaFile], 'webformConnection')],
   controllers: [QaFileController],
   providers: [QaFileService],
   exports: [QaFileService],

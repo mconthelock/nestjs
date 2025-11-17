@@ -7,9 +7,9 @@ import { ESCSUserAuthorizeView } from './entities/user-authorize-view.entity';
 @Injectable()
 export class ESCSUserAuthorizeViewService {
   constructor(
-    @InjectRepository(ESCSUserAuthorizeView, 'amecConnection')
+    @InjectRepository(ESCSUserAuthorizeView, 'escsConnection')
     private userAuthRepo: Repository<ESCSUserAuthorizeView>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('escsConnection')
     private dataSource: DataSource,
   ) {}
 

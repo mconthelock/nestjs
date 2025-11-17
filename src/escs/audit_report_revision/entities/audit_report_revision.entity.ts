@@ -2,7 +2,10 @@ import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { EscsUser } from 'src/escs/user/entities/user.entity';
 import { QainsForm } from 'src/webform/qaform/qa-ins/qains_form/entities/qains_form.entity';
 
-@Entity('AUDIT_REPORT_REVISION')
+@Entity({
+  name: 'AUDIT_REPORT_REVISION',
+  schema: 'ESCCHKSHT'
+})
 export class AuditReportRevision {
   @PrimaryColumn()
   ARR_SECID: number;

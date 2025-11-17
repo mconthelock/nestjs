@@ -5,7 +5,7 @@ import { Rep } from './entities/rep.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Rep], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([Rep], 'webformConnection')],
   controllers: [RepController],
   providers: [RepService],
   exports: [RepService],

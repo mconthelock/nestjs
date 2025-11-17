@@ -1,7 +1,11 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 import { User } from '../../../amec/users/entities/user.entity';
 import { AuditReportRevision } from 'src/escs/audit_report_revision/entities/audit_report_revision.entity';
-@Entity('ESCS_USERS')
+
+@Entity({
+  name: 'USERS',
+  schema: 'ESCCHKSHT'
+})
 export class EscsUser {
   @PrimaryColumn()
   USR_ID: number;

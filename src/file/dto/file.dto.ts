@@ -1,0 +1,20 @@
+import { IsIn, IsNotEmpty, IsString } from 'class-validator';
+
+export class FileDto {
+  @IsNotEmpty()
+  @IsString()
+  baseDir: string; // FILE_PATH
+  
+  @IsNotEmpty()
+  @IsString()
+  storedName: string; // FILE_FNAME (ชื่อที่เก็บจริง)
+
+  @IsNotEmpty()
+  @IsString()
+  originalName?: string; // FILE_ONAME (ถ้ามีจะใช้ตั้งชื่อเวลา download/open)
+
+  @IsNotEmpty()
+  @IsString()
+  @IsIn(['open', 'download'])
+  mode: string; // โหมดเปิดไฟล์หรือดาวน์โหลด
+}

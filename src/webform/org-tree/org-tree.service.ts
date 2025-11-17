@@ -7,7 +7,7 @@ import { UpdateOrgTreeDto } from './dto/update-org-tree.dto';
 @Injectable()
 export class OrgTreeService {
   constructor(
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('webformConnection')
     private dataSource: DataSource,
   ) {}
   create(createOrgTreeDto: CreateOrgTreeDto) {

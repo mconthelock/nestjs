@@ -1,6 +1,9 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
-@Entity('ESCS_USERS_ITEM')
+@Entity({
+  name: 'USERS_ITEM',
+  schema: 'ESCCHKSHT'
+})
 export class ESCSUserItem {
     
     @PrimaryColumn()

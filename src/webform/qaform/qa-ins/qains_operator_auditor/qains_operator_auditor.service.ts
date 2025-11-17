@@ -10,9 +10,9 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 @Injectable()
 export class QainsOAService {
   constructor(
-    @InjectRepository(QainsOA, 'amecConnection')
+    @InjectRepository(QainsOA, 'webformConnection')
     private readonly qainsOARepo: Repository<QainsOA>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('webformConnection')
     private dataSource: DataSource,
   ) {}
   async createQainsOA(dto: CreateQainsOADto, queryRunner?: QueryRunner) {

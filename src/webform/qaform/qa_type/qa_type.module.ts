@@ -5,7 +5,7 @@ import { QaType } from './entities/qa_type.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([QaType], 'amecConnection')],
+  imports: [TypeOrmModule.forFeature([QaType], 'webformConnection')],
   controllers: [QaTypeController],
   providers: [QaTypeService],
 })

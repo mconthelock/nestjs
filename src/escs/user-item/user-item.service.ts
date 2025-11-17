@@ -8,9 +8,9 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class ESCSUserItemService {
   constructor(
-    @InjectRepository(ESCSUserItem, 'amecConnection')
+    @InjectRepository(ESCSUserItem, 'escsConnection')
     private userItemRepo: Repository<ESCSUserItem>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('escsConnection')
     private dataSource: DataSource,
   ) {}
 

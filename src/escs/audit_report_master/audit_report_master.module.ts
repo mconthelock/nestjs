@@ -9,7 +9,7 @@ import { ESCSARMAModule } from '../audit_report_master_all/audit_report_master_a
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AuditReportMaster], 'amecConnection'),
+    TypeOrmModule.forFeature([AuditReportMaster], 'escsConnection'),
     ESCSARRModule,
     ESCSARHModule,
     ESCSARMAModule

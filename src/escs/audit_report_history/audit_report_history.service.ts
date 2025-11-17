@@ -8,9 +8,9 @@ import { DataSource, QueryRunner, Repository } from 'typeorm';
 @Injectable()
 export class ESCSARHService {
   constructor(
-    @InjectRepository(AuditReportHistory, 'amecConnection')
+    @InjectRepository(AuditReportHistory, 'escsConnection')
     private readonly eSCSARHRepository: Repository<AuditReportHistory>,
-    @InjectDataSource('amecConnection')
+    @InjectDataSource('escsConnection')
     private readonly dataSource: DataSource,
   ) {}
 

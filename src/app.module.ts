@@ -48,6 +48,7 @@ import { ItgcModule } from './itgc/itgc.module';
 import { AS400Module } from './as400/as400.module';
 import { PACKINGModule } from './packing/packing.module';
 import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemical-section.module';
+import escsConfig from './common/databases/escs.config';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemic
     TypeOrmModule.forRootAsync(gpreportConfig),
     TypeOrmModule.forRootAsync(packingConfig),
     TypeOrmModule.forRootAsync(elmesConfig),
+    TypeOrmModule.forRootAsync(escsConfig),
     //Logging Config
     WinstonModule.forRoot(winstonConfig),
     //BB8 💣

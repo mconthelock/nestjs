@@ -8,9 +8,9 @@ import { ESCSUserFile } from './entities/user-file.entity';
 @Injectable()
 export class ESCSUserFileService {
    constructor(
-      @InjectRepository(ESCSUserFile, 'amecConnection')
+      @InjectRepository(ESCSUserFile, 'escsConnection')
       private userFileRepo: Repository<ESCSUserFile>,
-      @InjectDataSource('amecConnection')
+      @InjectDataSource('escsConnection')
       private dataSource: DataSource,
     ) {}
   

@@ -6,21 +6,20 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { TypeOrmWinstonLogger } from '../logger/typeorm-winston.logger';
 
 dotenv.config();
-let webformConfig: TypeOrmModuleAsyncOptions;
+let escsConfig: TypeOrmModuleAsyncOptions;
 if (process.env.HOST == 'AMEC') {
-  webformConfig = {
-    name: 'webformConnection',
+  escsConfig = {
+    name: 'escsConnection',
     imports: [],
     inject: [ConfigService, WINSTON_MODULE_PROVIDER],
     useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
       // inject: [ConfigService],
       // useFactory: async (config: ConfigService) => ({
       type: 'oracle',
-      username: process.env.WEBFORM_USER,
-      password: process.env.WEBFORM_PASSWORD,
-      schema: process.env.WEBFORM_SCHEMA,
-      //connectString: `${process.env.WEBFORM_HOST}:${process.env.WEBFORM_PORT}/${process.env.WEBFORM_SERVICE}?expire_time=5`,
-      connectString: `(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=${process.env.WEBFORM_HOST})(PORT=${process.env.WEBFORM_PORT}))(CONNECT_DATA=(SID=${process.env.WEBFORM_SERVICE})))`,
+      username: process.env.ESCS_USER,
+      password: process.env.ESCS_PASSWORD,
+      schema: process.env.ESCS_SCHEMA,
+      connectString: `(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=${process.env.ESCS_HOST})(PORT=${process.env.ESCS_PORT}))(CONNECT_DATA=(SID=${process.env.ESCS_SERVICE})))`,
       entities: [
         __dirname + '/../../**/**/*.entity{.ts,.js}',
         __dirname + '/../../**/**/**/*.entity{.ts,.js}',
@@ -43,24 +42,5 @@ if (process.env.HOST == 'AMEC') {
       },
     }),
   };
-} else {
-  webformConfig = {
-    name: 'webformConnection',
-    imports: [],
-    inject: [ConfigService],
-    useFactory: async (config: ConfigService) => ({
-      type: 'mysql',
-      host: process.env.HOME_HOST,
-      port: parseInt(process.env.HOME_PORT as string, 10),
-      username: process.env.HOME_USER,
-      password: process.env.HOME_PASSWORD,
-      database: process.env.WEBFORM_DATABASE,
-      entities: [
-        __dirname + '/../../**/**/*.entity{.ts,.js}',
-        __dirname + '/../../**/**/**/*.entity{.ts,.js}',
-      ],
-      synchronize: false,
-    }),
-  };
 }
-export default webformConfig;
+export default escsConfig;

@@ -12,7 +12,7 @@ import {
   getMimeType,
   safeJoin,
 } from 'src/common/utils/files.utils';
-import { FileDto } from './dto/file.dto';
+import { FileDto, ListDto } from './dto/file.dto';
 
 @Injectable()
 export class FileService {
@@ -37,8 +37,9 @@ export class FileService {
     });
   }
 
-  async listDir(baseDir: string, relativePath = '') {
-    const dirPath = safeJoin(baseDir, relativePath); // กัน traversal
+  //prettier-ignore
+  async listDir(dto: ListDto) {
+    const dirPath = safeJoin(dto.baseDir, dto.path ?? ''); // กัน traversal
 
     const stat = await fs.stat(dirPath);
     if (!stat.isDirectory()) {
@@ -48,14 +49,14 @@ export class FileService {
     const names = await fs.readdir(dirPath);
     const items = await Promise.all(
       names.map(async (name) => {
-        const full = path.join(dirPath, name);
+        const full = safeJoin(dirPath, name);
         const s = await fs.stat(full);
 
         return {
           name,
           isDir: s.isDirectory(),
           size: s.isFile() ? s.size : undefined,
-          path: path.posix.join(relativePath, name), // เก็บ relative path เอาไปใช้ตอนเปิดไฟล์
+          path: full, // เก็บ relative path เอาไปใช้ตอนเปิดไฟล์
           mimeType: s.isFile() ? getMimeType(name) : undefined,
           extension: s.isFile() ? path.extname(name).slice(1) : undefined, // เอา . ออก
         };
@@ -68,16 +69,26 @@ export class FileService {
       if (!a.isDir && b.isDir) return 1;
       return a.name.localeCompare(b.name);
     });
+
+    // กรองตามนามสกุลที่อนุญาต
+    const allowEts = dto.allow?.filter(e => e.trim() !== '').map(e => e.toLowerCase());
+            console.log(allowEts,dto.allow);
     
-    const filtered = items.filter(e => 
-    !e.name.startsWith('~$') && !e.name.startsWith('.')
-    );
+    const filtered = items.filter(e => {
+        if(allowEts && allowEts.length > 0) {
+            return (e.isDir || (e.extension && allowEts.includes(e.extension.toLowerCase()))) && !e.name.startsWith('~$') && !e.name.startsWith('.');
+        }else{
+            return !e.name.startsWith('~$') && !e.name.startsWith('.');
+        }
+    });
 
     return filtered;
   }
 
-  async listAllRecursively(baseDir: string, relativePath = '') {
-    const root = safeJoin(baseDir, relativePath);
+  //prettier-ignore
+  async listAllRecursively(dto: ListDto) {
+    const root = safeJoin(dto.baseDir, dto.path ?? '');
+    const allowEts = dto.allow?.filter(e => e.trim() !== '').map(e => e.toLowerCase());
 
     const stat = await fs.stat(root);
     if (!stat.isDirectory()) {
@@ -93,7 +104,7 @@ export class FileService {
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
         const relPath = path.posix.join(rel, entry.name);
-        console.log(results);
+
         // ข้ามไฟล์ซ่อนตามกติกาเราเอง
         if (
           entry.name.startsWith('~$') || // ไฟล์ชั่วคราวของ Excel
@@ -113,6 +124,10 @@ export class FileService {
           // dive deeper
           await walk(fullPath, relPath);
         } else {
+            if( allowEts && allowEts.length > 0 ) {
+                const ext = path.extname(entry.name).slice(1).toLowerCase();
+                if( !allowEts.includes(ext) ) continue;
+            }
           // push file
           results.push({
             name: entry.name,
@@ -126,7 +141,7 @@ export class FileService {
       }
     };
 
-    await walk(root, relativePath);
+    await walk(root, dto.path);
     return results;
   }
 }

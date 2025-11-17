@@ -2,7 +2,7 @@ import { Controller, Get, Param, Query, Res, Post, Body } from '@nestjs/common';
 import { Response } from 'express';
 import { getBase64Image } from 'src/common/utils/files.utils';
 import { FileService } from './file.service';
-import { FileDto } from './dto/file.dto';
+import { FileDto, ListDto } from './dto/file.dto';
 
 @Controller('files')
 export class FilesController {
@@ -23,13 +23,13 @@ export class FilesController {
     return getBase64Image(data.path);
   }
 
-  @Get('list')
-  async list(@Query('baseDir') baseDir: string, @Query('path') path = '') {
-    return await this.fileService.listDir(baseDir, path);
+  @Post('list')
+  async list(@Body() dto: ListDto) {
+    return await this.fileService.listDir(dto);
   }
 
-  @Get('listAll')
-  async listAll(@Query('baseDir') baseDir: string, @Query('path') path = '') {
-    return await this.fileService.listAllRecursively(baseDir, path);
+  @Post('listAll')
+  async listAll(@Body() dto: ListDto) {
+    return await this.fileService.listAllRecursively(dto);
   }
 }

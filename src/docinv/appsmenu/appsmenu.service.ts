@@ -15,9 +15,19 @@ export class AppsmenuService {
   async findAppMenu(id: number) {
     return this.menu.find({
       where: { MENU_PROGRAM: id },
+      relations: ['parent'],
       order: { MENU_TOP: 'asc', MENU_TYPE: 'asc', MENU_SEQ: 'asc' },
     });
   }
+
+  async findOneMenu(id: number) {
+    return this.menu.find({
+      where: { MENU_ID: id },
+      relations: ['parent'],
+      order: { MENU_TOP: 'asc', MENU_TYPE: 'asc', MENU_SEQ: 'asc' },
+    });
+  }
+
   async create(data: CreateAppsmenuDto) {
     const list = this.menu.create(data);
     const result = await this.menu.save(list);
@@ -36,7 +46,8 @@ export class AppsmenuService {
       throw new NotFoundException(`Menu with id ${id} not found`);
     }
     Object.assign(list, data);
-    return await this.menu.save(list);
+    const result = await this.menu.save(list);
+    return this.findOneMenu(result.MENU_ID);
   }
 
   async remove(id: number) {

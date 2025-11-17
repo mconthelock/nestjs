@@ -4,6 +4,7 @@ import {
   Column,
   OneToMany,
   JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 import { Appsmenuuser } from '../../appsmenuusers/entities/appsmenuuser.entity';
 
@@ -50,4 +51,8 @@ export class Appsmenu {
 
   @OneToMany(() => Appsmenuuser, (detail) => detail.MENU_ID)
   menuGroup: Appsmenuuser[];
+
+  @ManyToOne(() => Appsmenu, (menu) => menu.menuGroup)
+  @JoinColumn({ name: 'MENU_TOP', referencedColumnName: 'MENU_ID' })
+  parent: Appsmenu;
 }

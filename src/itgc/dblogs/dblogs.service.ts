@@ -54,13 +54,13 @@ export class DblogsService {
     );
 
     if (startDate) {
-      queryBuilder.andWhere('windows.LOG_DATE >= :startDate', {
+      queryBuilder.andWhere('logs.LOG_DATE >= :startDate', {
         startDate: formatDate(startDate),
       });
     }
 
     if (endDate) {
-      queryBuilder.andWhere('windows.LOG_DATE <= :endDate', {
+      queryBuilder.andWhere('logs.LOG_DATE <= :endDate', {
         endDate: formatDate(endDate),
       });
     }

@@ -1,6 +1,6 @@
 import { Entity, ViewColumn, ViewEntity } from "typeorm";
 
-@ViewEntity('MATRIX_EFFECT_ITEM_VIEW')
+@ViewEntity({ name: 'MATRIX_EFFECT_ITEM_VIEW', schema: 'DAILYIDS' })
 export class MatrixEffectView {
     @ViewColumn()
     ITEM_ID: number;

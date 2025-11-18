@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { MatrixItemMaster } from '../../matrix-item-master/entities/matrix-item-master.entity';
 
-@Entity('MATRIX_EFFECT_ITEM')
+@Entity({ name: 'MATRIX_EFFECT_ITEM', schema: 'DAILYIDS' })
 export class MatrixEffectItem {
   @PrimaryColumn()
   ITEM_ID: number;

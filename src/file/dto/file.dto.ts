@@ -9,7 +9,7 @@ export class FileDto {
   @IsString()
   storedName: string; // FILE_FNAME (ชื่อที่เก็บจริง)
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   originalName?: string; // FILE_ONAME (ถ้ามีจะใช้ตั้งชื่อเวลา download/open)
 

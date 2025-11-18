@@ -1,26 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMatrixAdDto } from './dto/create-matrix-ad.dto';
 import { UpdateMatrixAdDto } from './dto/update-matrix-ad.dto';
+import { MatrixAd } from './entities/matrix-ad.entity';
+import { DataSource, Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class MatrixAdsService {
+  constructor(
+    @InjectRepository(MatrixAd, 'idsConnection')
+    private matrixAdRepository: Repository<MatrixAd>,
+    @InjectDataSource('idsConnection')
+    private readonly dataSource: DataSource,
+  ) {}
+
   create(createMatrixAdDto: CreateMatrixAdDto) {
-    return 'This action adds a new matrixAd';
+    return this.matrixAdRepository.save(createMatrixAdDto);
   }
 
   findAll() {
-    return `This action returns all matrixAds`;
+    return this.matrixAdRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} matrixAd`;
-  }
-
-  update(id: number, updateMatrixAdDto: UpdateMatrixAdDto) {
-    return `This action updates a #${id} matrixAd`;
+    return this.matrixAdRepository.findOneBy({ ID: id });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} matrixAd`;
+    return this.matrixAdRepository.delete({ ID: id });
   }
 }

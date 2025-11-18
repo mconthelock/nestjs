@@ -3,11 +3,11 @@ import { MatrixAdsService } from './matrix-ads.service';
 import { CreateMatrixAdDto } from './dto/create-matrix-ad.dto';
 import { UpdateMatrixAdDto } from './dto/update-matrix-ad.dto';
 
-@Controller('matrix-ads')
+@Controller('matrix/ads')
 export class MatrixAdsController {
   constructor(private readonly matrixAdsService: MatrixAdsService) {}
 
-  @Post()
+  @Post('insert')
   create(@Body() createMatrixAdDto: CreateMatrixAdDto) {
     return this.matrixAdsService.create(createMatrixAdDto);
   }
@@ -20,11 +20,6 @@ export class MatrixAdsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.matrixAdsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMatrixAdDto: UpdateMatrixAdDto) {
-    return this.matrixAdsService.update(+id, updateMatrixAdDto);
   }
 
   @Delete(':id')

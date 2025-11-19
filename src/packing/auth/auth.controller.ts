@@ -30,10 +30,9 @@ export class AuthController {
     const result = await this.authService.validateUser(packLoginDto.uid, ip);
     if (result.status === 'success' && result.user) {
       response.cookie('packinguser', JSON.stringify(result.user), {
-        httpOnly: false,  // ป้องกัน JS อ่าน
-        secure: true,     // localhost ให้ false, production ให้ true          
-        sameSite: 'lax',
-        path: '/'
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",         
+        sameSite: 'lax'
       });
     }
 

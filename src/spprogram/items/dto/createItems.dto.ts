@@ -9,6 +9,7 @@ import {
 } from 'class-validator';
 
 export class createItemsDto {
+  @Type(() => Number)
   @IsNumber()
   ITEM_ID: number;
 

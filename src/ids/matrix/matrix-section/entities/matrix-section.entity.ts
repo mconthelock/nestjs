@@ -1,7 +1,7 @@
 import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
 import { MatrixItemMaster } from '../../matrix-item-master/entities/matrix-item-master.entity';
 
-@Entity('MATRIX_SECTION')
+@Entity({ name: 'MATRIX_SECTION', schema: 'DAILYIDS' })
 export class MatrixSection {
   @PrimaryColumn()
   ID: number;

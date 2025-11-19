@@ -3,7 +3,7 @@ import { MatrixEffectViewModule } from './matrix/matrix-effect-view/matrix-effec
 import { MatrixEffectItemModule } from './matrix/matrix-effect-item/matrix-effect-item.module';
 import { MatrixItemMasterModule } from './matrix/matrix-item-master/matrix-item-master.module';
 import { MatrixSectionModule } from './matrix/matrix-section/matrix-section.module';
-import { MatrixAdsModule } from './matrix/matrix-ads/matrix-ads.module';
+import { MatrixManualModule } from './matrix/matrix-ads/matrix-manual.module';
 
 @Module({
   imports: [
@@ -11,7 +11,7 @@ import { MatrixAdsModule } from './matrix/matrix-ads/matrix-ads.module';
     MatrixSectionModule,
     MatrixEffectItemModule,
     MatrixEffectViewModule,
-    MatrixAdsModule,
+    MatrixManualModule,
   ],
 })
 export class IdsModule {}

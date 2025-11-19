@@ -10,7 +10,7 @@ import {
 import { MatrixEffectItem } from '../../matrix-effect-item/entities/matrix-effect-item.entity';
 import { MatrixSection } from '../../matrix-section/entities/matrix-section.entity';
 
-@Entity('MATRIX_ITEM_MASTER')
+@Entity({ name: 'MATRIX_ITEM_MASTER', schema: 'DAILYIDS' })
 export class MatrixItemMaster {
   @PrimaryGeneratedColumn()
   ID: number;

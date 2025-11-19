@@ -20,7 +20,7 @@ import { Request } from 'express';
 import { FlowService } from './flow.service';
 
 import { SearchFlowDto } from './dto/search-flow.dto';
-import { UpdateFlowDto } from './dto/update-flow.dto';
+import { DeleteFlowStepDto, UpdateFlowDto } from './dto/update-flow.dto';
 import { FormDto } from '../form/dto/form.dto';
 import { empnoFormDto } from '../form/dto/empno-form.dto';
 import { doactionFlowDto } from './dto/doaction-flow.dto';
@@ -89,6 +89,17 @@ export class FlowController {
       };
     } catch (error) {
       throw error; // โยนข้อผิดพลาดกลับไปให้ NestJS จัดการ
+    }
+  }
+
+  @Delete('deleteFlowStep')
+  async deleteFlowStep(
+    @Body() dto: DeleteFlowStepDto,
+  ): Promise<{ message: string; status: boolean }> {
+    try {
+      return await this.flowService.deleteFlowStep(dto);
+    } catch (error) {
+      throw error;
     }
   }
 

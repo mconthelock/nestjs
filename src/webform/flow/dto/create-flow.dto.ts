@@ -1,55 +1,66 @@
-import { IsOptional, IsString, IsNumber, IsArray } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsArray,
+  IsNotEmpty,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 export class CreateFlowDto {
+  @IsNotEmpty()
   @IsNumber()
   @Type(() => Number)
   NFRMNO: number;
 
+  @IsNotEmpty()
   @IsString()
   VORGNO: string;
 
+  @IsNotEmpty()
   @IsString()
   CYEAR: string;
 
+  @IsNotEmpty()
   @IsString()
   CYEAR2: string;
 
+  @IsNotEmpty()
   @IsNumber()
   @Type(() => Number)
   NRUNNO: number;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  CSTEPNO?: string;
+  CSTEPNO: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  CSTEPNEXTNO?: string;
+  CSTEPNEXTNO: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  CSTART?: string;
+  CSTART: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  CSTEPST?: string;
+  CSTEPST: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  CTYPE?: string;
+  CTYPE: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  VPOSNO?: string;
+  VPOSNO: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  VAPVNO?: string;
+  VAPVNO: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  VREPNO?: string;
+  VREPNO: string;
 
   @IsOptional()
   @IsString()
@@ -82,9 +93,9 @@ export class CreateFlowDto {
   @IsString()
   CAPPLYALL?: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  VURL?: string;
+  VURL: string;
 
   @IsOptional()
   @IsString()

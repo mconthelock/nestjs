@@ -16,6 +16,7 @@ import { FileDto, ListDto } from './dto/file.dto';
 
 @Injectable()
 export class FileService {
+  private readonly skip = ['thumbs.db', 'desktop.ini'];
   async downloadOrOpenFile(args: FileDto): Promise<StreamableFile> {
     const fullPath = safeJoin(args.baseDir, args.storedName); // รวม path ให้ปลอดภัย
 
@@ -76,9 +77,9 @@ export class FileService {
     
     const filtered = items.filter(e => {
         if(allowEts && allowEts.length > 0) {
-            return (e.isDir || (e.extension && allowEts.includes(e.extension.toLowerCase()))) && !e.name.startsWith('~$') && !e.name.startsWith('.');
+            return (e.isDir || (e.extension && allowEts.includes(e.extension.toLowerCase()))) && !e.name.startsWith('~$') && !e.name.startsWith('.') && !this.skip.includes(e.name.toLowerCase()) ;
         }else{
-            return !e.name.startsWith('~$') && !e.name.startsWith('.');
+            return !e.name.startsWith('~$') && !e.name.startsWith('.') && !this.skip.includes(e.name.toLowerCase()) ;
         }
     });
 
@@ -108,7 +109,8 @@ export class FileService {
         // ข้ามไฟล์ซ่อนตามกติกาเราเอง
         if (
           entry.name.startsWith('~$') || // ไฟล์ชั่วคราวของ Excel
-          entry.name.startsWith('.') // พวก .git, .DS_Store ฯลฯ (ถ้าอยากตัด)
+          entry.name.startsWith('.') || // พวก .git, .DS_Store ฯลฯ (ถ้าอยากตัด)
+          this.skip.includes(entry.name.toLowerCase())
         ) {
           continue;
         }

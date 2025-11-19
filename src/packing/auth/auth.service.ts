@@ -47,7 +47,7 @@ export class AuthService {
     }
   }
 
-   /**
+  /**
    * Decode Employee ID from barcode
    * @author  Mr.Pathanapong Sokpukeaw
    * @since   2025-11-13

@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'MATRIX_EFFECT_ADS', schema: 'DAILYIDS' })
-export class MatrixAd {
+@Entity({ name: 'MATRIX_EFFECT_MANUAL', schema: 'DAILYIDS' })
+export class MatrixManual {
   @PrimaryGeneratedColumn()
   ID: number;
 
@@ -16,4 +16,10 @@ export class MatrixAd {
 
   @Column()
   DATECREATE: Date;
+
+  @Column()
+  USERUPDATE: string;
+  
+  @Column()
+  DATEUPDATE: Date;
 }

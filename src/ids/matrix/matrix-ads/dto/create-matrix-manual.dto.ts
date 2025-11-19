@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class CreateMatrixAdDto {
+export class CreateMatrixManualDto {
     @IsNotEmpty()
     @IsString()
     TITLE: string;

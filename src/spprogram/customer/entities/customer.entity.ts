@@ -9,7 +9,7 @@ import {
 import { ItemsCustomer } from '../../items-customer/entities/items-customer.entity';
 import { Ratio } from '../../ratio/entities/ratio.entity';
 
-@Entity('CUSTOMER')
+@Entity('DS_CUSTOMER')
 export class Customer {
   @PrimaryColumn()
   CUS_ID: number;

@@ -1,6 +1,14 @@
-import { Column, Entity, PrimaryColumn, JoinColumn, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryColumn,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { Pricelist } from '../../pricelist/entities/pricelist.entity';
 import { ItemsCustomer } from '../../items-customer/entities/items-customer.entity';
+import { Category } from '../../items-category/entities/category.entity';
 
 @Entity('DS_ITEM')
 export class Items {
@@ -73,4 +81,8 @@ export class Items {
 
   @OneToMany(() => ItemsCustomer, (prs) => prs.itemdesc)
   itemscustomer: ItemsCustomer[];
+
+  @OneToOne(() => Category, (category) => category.CATE_ID)
+  @JoinColumn({ name: 'CATEGORY', referencedColumnName: 'CATE_ID' })
+  category: Category;
 }

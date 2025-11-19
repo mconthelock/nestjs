@@ -1,8 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Items } from './entities/items.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
+import { Items } from './entities/items.entity';
 import { searchItemsDto } from './dto/searchItems.dto';
+
 @Injectable()
 export class ItemsService {
   constructor(
@@ -13,6 +15,7 @@ export class ItemsService {
   async findAll(query: searchItemsDto) {
     const qb = this.items
       .createQueryBuilder('item')
+      .leftJoinAndSelect('item.category', 'category')
       .leftJoinAndSelect('item.prices', 'price', 'price.LATEST = :latest', {
         latest: 1,
       });

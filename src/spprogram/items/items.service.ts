@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 
 import { Items } from './entities/items.entity';
 import { searchItemsDto } from './dto/searchItems.dto';
+import { createItemsDto } from './dto/createItems.dto';
+import { updateItemsDto } from './dto/updateItems.dto';
 
 @Injectable()
 export class ItemsService {
@@ -18,7 +20,8 @@ export class ItemsService {
       .leftJoinAndSelect('item.category', 'category')
       .leftJoinAndSelect('item.prices', 'price', 'price.LATEST = :latest', {
         latest: 1,
-      });
+      })
+      .leftJoinAndSelect('item.itemscustomer', 'itemcus');
 
     let drawing = undefined;
     if (query.ITEM_DWG !== undefined) {
@@ -202,5 +205,9 @@ export class ItemsService {
       check = true;
     }
     return res;
+  }
+
+  async updateItems(data: updateItemsDto) {
+    return this.items.save(data);
   }
 }

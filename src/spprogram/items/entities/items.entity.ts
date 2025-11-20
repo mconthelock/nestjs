@@ -7,8 +7,8 @@ import {
   OneToOne,
 } from 'typeorm';
 import { Pricelist } from '../../pricelist/entities/pricelist.entity';
-import { ItemsCustomer } from '../../items-customer/entities/items-customer.entity';
 import { Category } from '../../items-category/entities/category.entity';
+import { ItemsCustomer } from '../../items-customer/entities/items-customer.entity';
 
 @Entity('DS_ITEM')
 export class Items {

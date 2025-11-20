@@ -5,6 +5,7 @@ import {
   JoinColumn,
   OneToMany,
   OneToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Pricelist } from '../../pricelist/entities/pricelist.entity';
 import { Category } from '../../items-category/entities/category.entity';
@@ -12,7 +13,7 @@ import { ItemsCustomer } from '../../items-customer/entities/items-customer.enti
 
 @Entity('DS_ITEM')
 export class Items {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   ITEM_ID: number;
 
   @Column()

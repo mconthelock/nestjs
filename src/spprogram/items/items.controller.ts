@@ -35,6 +35,11 @@ export class ItemsController {
     return this.items.findAll(data);
   }
 
+  @Post('create')
+  create(@Body() data: createItemsDto) {
+    return this.items.createItems(data);
+  }
+
   @Post('update')
   updateItems(@Body() data: updateItemsDto) {
     return this.items.updateItems(data);

@@ -9,10 +9,6 @@ import {
 } from 'class-validator';
 
 export class createItemsDto {
-  @Type(() => Number)
-  @IsNumber()
-  ITEM_ID: number;
-
   @IsString()
   ITEM_NO: string;
 
@@ -28,6 +24,7 @@ export class createItemsDto {
 
   @Type(() => Number)
   @IsNumber()
+  @IsOptional()
   ITEM_TYPE: number;
 
   @IsString()

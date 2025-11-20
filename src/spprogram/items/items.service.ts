@@ -207,6 +207,10 @@ export class ItemsService {
     return res;
   }
 
+  async createItems(data: createItemsDto) {
+    return this.items.save(data);
+  }
+
   async updateItems(data: updateItemsDto) {
     return this.items.save(data);
   }

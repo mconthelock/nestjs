@@ -1,6 +1,9 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { PricelistService } from './pricelist.service';
 
+import { createPriceListDto } from './dto/create-price.dto';
+import { updatePriceListDto } from './dto/update-price.dto';
+
 @Controller('sp/pricelist')
 export class PricelistController {
   constructor(private readonly price: PricelistService) {}
@@ -13,5 +16,15 @@ export class PricelistController {
   @Post('customer')
   findCustomer(@Body() data: any[]) {
     return this.price.findCustomer(data);
+  }
+
+  @Post('create')
+  createPrice(@Body() data: createPriceListDto) {
+    return this.price.createPrice(data);
+  }
+
+  @Post('update')
+  updatePrice(@Body() data: updatePriceListDto) {
+    return this.price.updatePrice(data);
   }
 }

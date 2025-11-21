@@ -18,7 +18,7 @@ export class IdtagService {
       where: { ...where },
       relations: {
         bmdate: true,
-        tags: { process: true },
+        tags: { process: true, detail: true },
       },
     });
   }
@@ -28,7 +28,7 @@ export class IdtagService {
       where: { bmdate: { Q9PP: date } },
       relations: {
         bmdate: true,
-        tags: { process: true },
+        tags: { process: true, detail: true },
       },
     });
   }
@@ -37,7 +37,7 @@ export class IdtagService {
     return this.m08.find({
       relations: {
         bmdate: true,
-        tags: { process: true },
+        tags: { process: true, detail: true },
       },
     });
   }

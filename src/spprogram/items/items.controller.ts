@@ -25,7 +25,6 @@ export class ItemsController {
 
   @Post('search')
   findItems(@Body() data: searchItemsDto) {
-    console.log(data);
     return this.items.findAll(data);
   }
 

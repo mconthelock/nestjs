@@ -9,8 +9,8 @@ export class PricelistController {
   constructor(private readonly price: PricelistService) {}
 
   @Post('search')
-  search(@Body() data: any[]) {
-    return this.price.findAll();
+  search(@Body() data: updatePriceListDto) {
+    return this.price.findAll(data);
   }
 
   @Post('customer')

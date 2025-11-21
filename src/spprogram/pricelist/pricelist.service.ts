@@ -18,8 +18,8 @@ export class PricelistService {
     private readonly itemscus: Repository<ItemsCustomer>,
   ) {}
 
-  async findAll() {
-    return this.price.find({ relations: ['itemdesc'] });
+  async findAll(data: updatePriceListDto) {
+    return this.price.find({ relations: ['itemdesc'], where: { ...data } });
   }
 
   async findCustomer(data: any) {

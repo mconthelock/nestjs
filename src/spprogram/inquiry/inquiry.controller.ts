@@ -8,6 +8,11 @@ import { AuthGuard } from '@nestjs/passport';
 export class InquiryController {
   constructor(private readonly inq: InquiryService) {}
 
+  @Get('find/:id')
+  findOne(@Param('id') id: number) {
+    return this.inq.findOne(id);
+  }
+
   @Post('search')
   async search(@Body() searchDto: searchDto) {
     return await this.inq.search(searchDto);
@@ -41,11 +46,6 @@ export class InquiryController {
   @Post('revise')
   async revise(@Body() req: any) {
     return await this.inq.revise(req.id);
-  }
-
-  @Get('find/:id')
-  findOne(@Param('id') id: number) {
-    return this.inq.findOne(id);
   }
 
   @Post('delete')

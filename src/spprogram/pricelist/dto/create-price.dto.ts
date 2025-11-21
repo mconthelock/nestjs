@@ -51,4 +51,11 @@ export class createPriceListDto {
 
   @IsString()
   LATEST: string;
+
+  @Type(() => Date)
+  @IsDate()
+  CREATE_AT: Date;
+
+  @IsString()
+  CREATE_BY: string;
 }

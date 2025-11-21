@@ -37,11 +37,27 @@ export class PricelistService {
     });
   }
 
-  async createPrice(data: createPriceListDto) {
-    return this.price.save(data);
-  }
-
   async updatePrice(data: updatePriceListDto) {
-    return this.price.save(data);
+    const item = this.price.find({
+      where: {
+        FYYEAR: data.FYYEAR,
+        PERIOD: data.PERIOD,
+        ITEM: data.ITEM,
+        LATEST: '1',
+      },
+    });
+    if (item) {
+      await this.price.update(
+        {
+          FYYEAR: data.FYYEAR,
+          PERIOD: data.PERIOD,
+          ITEM: data.ITEM,
+          LATEST: '1',
+        },
+        { LATEST: '0' },
+      );
+    }
+    const newPrice = this.price.create(data);
+    return this.price.save(newPrice);
   }
 }

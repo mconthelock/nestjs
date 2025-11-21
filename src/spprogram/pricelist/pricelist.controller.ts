@@ -18,11 +18,6 @@ export class PricelistController {
     return this.price.findCustomer(data);
   }
 
-  @Post('create')
-  createPrice(@Body() data: createPriceListDto) {
-    return this.price.createPrice(data);
-  }
-
   @Post('update')
   updatePrice(@Body() data: updatePriceListDto) {
     return this.price.updatePrice(data);

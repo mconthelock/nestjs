@@ -18,11 +18,6 @@ export class OslogsService {
   async searchOslogs(data: searchOslogs) {
     const { query, server, startDate, endDate, users } = data;
     const queryBuilder = this.winos.createQueryBuilder('windows');
-    // if (query) {
-    //   queryBuilder.andWhere('windows.query LIKE :query', {
-    //     query: `%${query}%`,
-    //   });
-    // }
     queryBuilder.select(
       'LOG_DATE, LOG_TIME, LOG_SERVER, LOG_USER, LOG_DOMAIN, LOG_HOST, LOG_IP, LOG_MSG',
     );

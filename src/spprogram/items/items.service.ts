@@ -18,9 +18,7 @@ export class ItemsService {
     const qb = this.items
       .createQueryBuilder('item')
       .leftJoinAndSelect('item.category', 'category')
-      .leftJoinAndSelect('item.prices', 'price', 'price.LATEST = :latest', {
-        latest: 1,
-      })
+      .leftJoinAndSelect('item.prices', 'price')
       .leftJoinAndSelect('item.itemscustomer', 'itemcus');
 
     let drawing = undefined;

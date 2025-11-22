@@ -4,118 +4,24 @@ import {
   IsOptional,
   IsDate,
   IsNumber,
-  IsBoolean,
+  ValidateNested,
 } from 'class-validator';
-import { PartialType } from '@nestjs/mapped-types';
+import { PartialType, OmitType } from '@nestjs/mapped-types';
 import { createInqDto } from './create-inquiry.dto';
+import { createTimelineDto } from '../../timeline/dto/create-dto';
+import { createQuotationDto } from '../../quotation/dto/create-quotation.dto';
+export class TimelineDto extends PartialType(createTimelineDto) {}
 
-export class searchDto extends PartialType(createInqDto) {
+const OmitInqFields = ['INQ_STATUS'] as const;
+class SearchBase extends OmitType(createInqDto, OmitInqFields) {}
+
+export class searchDto extends PartialType(SearchBase) {
+  @IsOptional()
   @IsString()
-  @IsOptional()
-  INQ_MAR_REMARK: string;
+  INQ_STATUS?: string;
 
-  @IsNumber()
   @IsOptional()
-  @Type(() => Number)
-  LE_INQ_STATUS: number;
-
-  @IsNumber()
-  @IsOptional()
-  @Type(() => Number)
-  GE_INQ_STATUS: number;
-
-  @IsString()
-  @IsOptional()
-  LIKE_INQ_NO: string;
-
-  @IsString()
-  @IsOptional()
-  LIKE_INQ_PRJNO: string;
-
-  @IsString()
-  @IsOptional()
-  LIKE_INQ_PRJNAME: string;
-
-  @IsString()
-  @IsOptional()
-  LIKE_INQ_SHOPORDER: string;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  GE_INQ_DATE: Date;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  LE_INQ_DATE: Date;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  'timeline.GE_MAR_SEND': Date;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  'timeline.LE_MAR_SEND': Date;
-
-  @IsString()
-  @IsOptional()
-  'timeline.SE_USER': string;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  'timeline.GE_SG_READ': Date;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  'timeline.LE_SG_READ': Date;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  'timeline.GE_SE_CONFIRM': Date;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  'timeline.LE_SE_CONFIRM': Date;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  'quotation.GE_QUO_DATE': Date;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  'quotation.LE_QUO_DATE': Date;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  'quotation.GE_QUO_VALIDITY': Date;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  'quotation.LE_QUO_VALIDITY': Date;
-
-  @IsBoolean()
-  @IsOptional()
-  @Type(() => Boolean)
-  'timeline.ISNULL_BM_CONFIRM': boolean;
-
-  @IsBoolean()
-  @IsOptional()
-  @Type(() => Boolean)
-  'needDetail': boolean;
-
-  @IsBoolean()
-  @IsOptional()
-  @Type(() => Boolean)
-  'INQ_ORDER_TYPE': boolean;
+  @ValidateNested()
+  @Type(() => TimelineDto)
+  timeline?: TimelineDto;
 }

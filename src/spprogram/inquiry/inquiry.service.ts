@@ -2,6 +2,9 @@ import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner, Raw } from 'typeorm';
 import * as oracledb from 'oracledb'; // ต้อง import oracledb เพื่อกำหนดชนิดข้อมูลของ parameter
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { applyDynamicFilters } from 'src/common/helpers/query.helper';
+
+//Entities
 import { Inquiry } from './entities/inquiry.entity';
 import { InquiryGroup } from '../inquiry-group/entities/inquiry-group.entity';
 import { InquiryDetail } from '../inquiry-detail/entities/inquiry-detail.entity';
@@ -9,6 +12,7 @@ import { History } from '../history/entities/history.entity';
 import { Timeline } from '../timeline/entities/timeline.entity';
 import { Attachments } from '../attachments/entities/attachments.entity';
 
+//DTOs
 import { searchDto } from './dto/search.dto';
 import { createInqDto } from './dto/create-inquiry.dto';
 import { updateInqDto } from './dto/update-inquiry.dto';
@@ -26,6 +30,42 @@ export class InquiryService {
     @InjectRepository(Inquiry, 'spsysConnection')
     private readonly inq: Repository<Inquiry>,
   ) {}
+
+  async search(searchDto: searchDto) {
+    const qb = this.inq.createQueryBuilder('inq');
+    // Standard Joins
+    qb.leftJoinAndSelect('inq.details', 'details')
+      .leftJoinAndSelect('inq.inqgroup', 'inqgroup')
+      .leftJoinAndSelect('inq.status', 'status')
+      .leftJoinAndSelect('inq.maruser', 'maruser')
+      .leftJoinAndSelect('inq.timeline', 'timeline')
+      .leftJoinAndSelect('inq.quotation', 'quotation');
+    qb.where('inq.INQ_LATEST = :latest', { latest: 1 });
+
+    // Recursive Filter Application
+    await applyDynamicFilters(qb, searchDto, 'inq');
+    return qb.getMany();
+    // console.log(qb.getSql());
+    // console.log(qb.getParameters());
+    // return null;
+  }
+
+  //   async search(searchDto: searchDto) {
+  //     const qb = this.inq.createQueryBuilder('inq');
+  //     qb.where('inq.INQ_LATEST = 1');
+  //     if (searchDto.needDetail === true) {
+  //       qb.leftJoinAndSelect('inq.details', 'details');
+  //       delete searchDto.needDetail;
+  //     }
+
+  //     qb.orderBy('inq.INQ_ID', 'DESC')
+  //       .leftJoinAndSelect('inq.inqgroup', 'inqgroup')
+  //       .leftJoinAndSelect('inq.status', 'status')
+  //       .leftJoinAndSelect('inq.maruser', 'maruser')
+  //       .leftJoinAndSelect('inq.timeline', 'timeline')
+  //       .leftJoinAndSelect('inq.quotation', 'quotation');
+  //     return qb.getMany();
+  //   }
 
   async findOne(id: number) {
     return this.inq.findOne({
@@ -63,22 +103,7 @@ export class InquiryService {
     });
   }
 
-  async search(searchDto: searchDto) {
-    const qb = this.inq.createQueryBuilder('inq');
-    qb.where('inq.INQ_LATEST = 1');
-    if (searchDto.needDetail === true) {
-      qb.leftJoinAndSelect('inq.details', 'details');
-      delete searchDto.needDetail;
-    }
-    await this.setCondition(qb, searchDto);
-    qb.orderBy('inq.INQ_ID', 'DESC')
-      .leftJoinAndSelect('inq.inqgroup', 'inqgroup')
-      .leftJoinAndSelect('inq.status', 'status')
-      .leftJoinAndSelect('inq.maruser', 'maruser')
-      .leftJoinAndSelect('inq.timeline', 'timeline')
-      .leftJoinAndSelect('inq.quotation', 'quotation');
-    return qb.getMany();
-  }
+  //   await this.setCondition(qb, searchDto);
 
   async setCondition(qb, searchDto) {
     for (const key in searchDto) {
@@ -488,30 +513,30 @@ export class InquiryService {
       .execute();
   }
 
-  async delete(searchDto: searchDto) {
-    const params = [
-      searchDto.INQ_ID,
-      searchDto.INQ_MAR_PIC,
-      searchDto.INQ_MAR_REMARK,
-      { dir: oracledb.BIND_OUT, type: oracledb.STRING },
-    ];
-    const sql = `
-      BEGIN
-        INQUIRY_DELETE(
-            P_ID => :1,
-            P_USER => :2,
-            P_REMARK=> :3,
-            P_RESULT => :4
-        );
-      END;`;
-    const result = await this.ds.query(sql, params);
-    if (result[0] == null) {
-      throw new NotFoundException(
-        `Inquiry with ID (${searchDto.INQ_ID}) not found.`,
-      );
-    }
-    return { status: true, title: result[0] };
-  }
+  //   async delete(searchDto: searchDto) {
+  //     const params = [
+  //       searchDto.INQ_ID,
+  //       searchDto.INQ_MAR_PIC,
+  //       searchDto.INQ_MAR_REMARK,
+  //       { dir: oracledb.BIND_OUT, type: oracledb.STRING },
+  //     ];
+  //     const sql = `
+  //       BEGIN
+  //         INQUIRY_DELETE(
+  //             P_ID => :1,
+  //             P_USER => :2,
+  //             P_REMARK=> :3,
+  //             P_RESULT => :4
+  //         );
+  //       END;`;
+  //     const result = await this.ds.query(sql, params);
+  //     if (result[0] == null) {
+  //       throw new NotFoundException(
+  //         `Inquiry with ID (${searchDto.INQ_ID}) not found.`,
+  //       );
+  //     }
+  //     return { status: true, title: result[0] };
+  //   }
 
   async updatestatus(id: number, status: number, history?: createHistoryDto) {
     const runner = this.ds.createQueryRunner();

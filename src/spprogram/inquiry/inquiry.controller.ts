@@ -48,10 +48,10 @@ export class InquiryController {
     return await this.inq.revise(req.id);
   }
 
-  @Post('delete')
-  async delete(@Body() searchDto: searchDto) {
-    return await this.inq.delete(searchDto);
-  }
+  //   @Post('delete')
+  //   async delete(@Body() searchDto: searchDto) {
+  //     return await this.inq.delete(searchDto);
+  //   }
 
   @Post('update_status/:id')
   async updatestatus(@Body() req: inqDataDto, @Param('id') id: number) {

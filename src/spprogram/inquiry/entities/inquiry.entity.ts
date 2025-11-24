@@ -148,6 +148,18 @@ export class Inquiry {
   @Column()
   INQ_TCCUR: string;
 
+  @Column()
+  INQ_MAR_REMARK: string;
+
+  @Column()
+  INQ_SALE_REMARK: string;
+
+  @Column()
+  INQ_DE_REMARK: string;
+
+  @Column()
+  INQ_FIN_REMARK: string;
+
   // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
   // ตัวอย่าง:
   @OneToMany(() => InquiryGroup, (group) => group.inqs)

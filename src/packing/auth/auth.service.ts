@@ -1,5 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Login } from './entities/login.entity';
 import { PackLoginResponseDto } from './dto/pack-login-response.dto';
@@ -13,7 +14,7 @@ export class AuthService {
   ) {}
 
   /**
-   * Check user login via ValidatePackAuth stored procedure
+   * Validate user login via stored procedure and return user info
    * @author  Mr.Pathanapong Sokpukeaw
    * @since   2025-11-13
    * @param   {string} uid Employee barcode/ID
@@ -27,7 +28,7 @@ export class AuthService {
         return { status: 'error', message: 'รูปแบบรหัสพนักงานไม่ถูกต้อง', user: null };
       }
 
-      const sessionId = `sess-${Date.now()}`;
+      const sessionId = randomUUID();
       const empNo  = this.decodeID(empCode);
       const result = await this.loginRepo.query(
         `EXEC ValidatePackAuth @empid = @0, @ip = @1, @sessid = @2`,
@@ -37,7 +38,7 @@ export class AuthService {
       const row = result[0];
       if (row.errcode === '0') {
         const [userId, userName, useLocaltb] = row.errormsg.split('-');
-        const user: PackUserInfoDto = { userId, userName, useLocaltb };
+        const user: PackUserInfoDto = { userId, userName, useLocaltb, sessionId };
         return { status: 'success', message: 'Login success', user };
       } else {
         return { status: 'error', message: row.errormsg, user: null };
@@ -57,5 +58,24 @@ export class AuthService {
   decodeID(uid: number): string {
     const empno = Math.floor(uid / 4) - 92;
     return empno.toString().padStart(5, '0');
+  }
+
+  /**
+   * Update logout log in PAccessLog table by setting endtime
+   * @author  Mr.Pathanapong Sokpukeaw
+   * @since   2025-11-24
+   * @param   {string} userId Employee ID
+   * @param   {string} sessionId Session ID
+   * @return  {Promise<void>}
+   */
+  async updateLogout(userId: string, sessionId: string): Promise<void> {
+    try {
+      await this.loginRepo.query(
+        `UPDATE PAccessLog SET endtime = GETDATE() WHERE usrid = @0 AND accessid = @1`,
+        [userId, sessionId]
+      );
+    } catch (error) {
+      throw new InternalServerErrorException('Error updating logout log: ' + error.message);
+    }
   }
 }

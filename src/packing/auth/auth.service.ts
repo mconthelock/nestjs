@@ -2,15 +2,15 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Login } from './entities/login.entity';
+import { PAccessLog } from './entities/p-access-log.entity';
 import { PackLoginResponseDto } from './dto/pack-login-response.dto';
 import { PackUserInfoDto } from './dto/pack-user-info.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(Login, 'packingConnection')
-    private readonly loginRepo: Repository<Login>,
+    @InjectRepository(PAccessLog, 'packingConnection')
+    private readonly packmd: Repository<PAccessLog>,
   ) {}
 
   /**
@@ -30,7 +30,7 @@ export class AuthService {
 
       const sessionId = randomUUID();
       const empNo  = this.decodeID(empCode);
-      const result = await this.loginRepo.query(
+      const result = await this.packmd.query(
         `EXEC ValidatePackAuth @empid = @0, @ip = @1, @sessid = @2`,
         [empNo, ip, sessionId],
       );
@@ -70,10 +70,11 @@ export class AuthService {
    */
   async updateLogout(userId: string, sessionId: string): Promise<void> {
     try {
-      await this.loginRepo.query(
-        `UPDATE PAccessLog SET endtime = GETDATE() WHERE usrid = @0 AND accessid = @1`,
-        [userId, sessionId]
-      );
+      await this.packmd.createQueryBuilder()
+        .update(PAccessLog)
+        .set({ endtime: () => 'GETDATE()' })
+        .where('usrid = :userId AND accessid = :sessionId', { userId, sessionId })
+        .execute();
     } catch (error) {
       throw new InternalServerErrorException('Error updating logout log: ' + error.message);
     }

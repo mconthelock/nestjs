@@ -9,4 +9,7 @@ export class PackUserInfoDto {
 
   @ApiProperty({ description: '0 = AS400 data, 1 = Local data' })
   useLocaltb: string;
+
+  @ApiProperty({ description: 'Session ID' })
+  sessionId: string;
 }

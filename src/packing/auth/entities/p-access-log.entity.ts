@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity('PAccessLog')
+@Entity({ name: 'PAccessLog' })
 export class PAccessLog {
   @PrimaryGeneratedColumn()
   alogId: number;

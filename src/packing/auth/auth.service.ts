@@ -10,7 +10,7 @@ import { PackUserInfoDto } from './dto/pack-user-info.dto';
 export class AuthService {
   constructor(
     @InjectRepository(PAccessLog, 'packingConnection')
-    private readonly packmd: Repository<PAccessLog>,
+    private readonly md: Repository<PAccessLog>,
   ) {}
 
   /**
@@ -23,14 +23,14 @@ export class AuthService {
    */
   async validateUser(uid: string, ip: string): Promise<PackLoginResponseDto> {
     try {
-      const empCode = Number(uid);
-      if (isNaN(empCode)) {
-        return { status: 'error', message: 'รูปแบบรหัสพนักงานไม่ถูกต้อง', user: null };
+      if (!/^\d+$/.test(uid)) {
+        return { status: 'error', message: 'รหัสพนักงานต้องเป็นตัวเลขเท่านั้น', user: null };
       }
 
+      const empCode = Number(uid);
       const sessionId = randomUUID();
       const empNo  = this.decodeID(empCode);
-      const result = await this.packmd.query(
+      const result = await this.md.query(
         `EXEC ValidatePackAuth @empid = @0, @ip = @1, @sessid = @2`,
         [empNo, ip, sessionId],
       );
@@ -70,7 +70,7 @@ export class AuthService {
    */
   async updateLogout(userId: string, sessionId: string): Promise<void> {
     try {
-      await this.packmd.createQueryBuilder()
+      await this.md.createQueryBuilder()
         .update(PAccessLog)
         .set({ endtime: () => 'GETDATE()' })
         .where('usrid = :userId AND accessid = :sessionId', { userId, sessionId })

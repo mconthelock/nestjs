@@ -18,7 +18,20 @@ export async function applyDynamicFilters(qb, filters: any, alias: string) {
         paramName,
       );
       if (sql) {
-        qb.andWhere(sql, params);
+        // Convert date string parameters to Date objects
+        const processedParams = {};
+        for (const [paramKey, paramValue] of Object.entries(params)) {
+          // Check if the value looks like a date string (YYYY-MM-DD format)
+          if (
+            typeof paramValue === 'string' &&
+            /^\d{4}-\d{2}-\d{2}/.test(paramValue)
+          ) {
+            processedParams[paramKey] = new Date(paramValue);
+          } else {
+            processedParams[paramKey] = paramValue;
+          }
+        }
+        qb.andWhere(sql, processedParams);
       }
     }
   }

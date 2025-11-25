@@ -14,7 +14,7 @@ export class InquiryController {
   }
 
   @Post('search')
-  async search(@Body() searchDto: searchDto) {
+  async search(@Body() searchDto: any) {
     return await this.inq.search(searchDto);
   }
 

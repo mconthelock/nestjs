@@ -41,7 +41,6 @@ export class InquiryService {
       .leftJoinAndSelect('inq.timeline', 'timeline')
       .leftJoinAndSelect('inq.quotation', 'quotation');
     qb.where('inq.INQ_LATEST = :latest', { latest: 1 });
-
     // Recursive Filter Application
     await applyDynamicFilters(qb, searchDto, 'inq');
     return qb.getMany();

@@ -14,6 +14,7 @@ import idsConfig from './common/databases/dailyids.config';
 import packingConfig from './common/databases/packingsys.config';
 import elmesConfig from './common/databases/elmes.config';
 import escsConfig from './common/databases/escs.config';
+import pdmConfig from './common/databases/pdm.config';
 
 //Winston Logger
 import { WinstonModule } from 'nest-winston';
@@ -24,6 +25,9 @@ import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor
 import { IpLoggerMiddleware } from './middleware/ip-logger.middleware';
 import { RequestIdMiddleware } from './middleware/request-id.middleware';
 import { RequestContextMiddleware } from './middleware/request-context.middleware';
+
+//Redis Module
+import { RedisModule } from './common/redis/redis.module';
 
 //Master Modules
 import { AuthModule } from './auth/auth.module';
@@ -50,6 +54,7 @@ import { AS400Module } from './as400/as400.module';
 import { PackingModule } from './packing/packing.module';
 import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemical-section.module';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -66,8 +71,12 @@ import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemic
     TypeOrmModule.forRootAsync(packingConfig),
     TypeOrmModule.forRootAsync(elmesConfig),
     TypeOrmModule.forRootAsync(escsConfig),
+    TypeOrmModule.forRootAsync(pdmConfig),
     //Logging Config
     WinstonModule.forRoot(winstonConfig),
+
+    //Redis
+    RedisModule,
     //BB8 💣
     AuthModule,
     AmecModule,

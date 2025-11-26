@@ -4,6 +4,7 @@ import { MatrixEffectItemModule } from './matrix/matrix-effect-item/matrix-effec
 import { MatrixItemMasterModule } from './matrix/matrix-item-master/matrix-item-master.module';
 import { MatrixSectionModule } from './matrix/matrix-section/matrix-section.module';
 import { MatrixManualModule } from './matrix/matrix-ads/matrix-manual.module';
+import { ExpLocalPdmModule } from './exp-local-pdm/exp-local-pdm.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { MatrixManualModule } from './matrix/matrix-ads/matrix-manual.module';
     MatrixEffectItemModule,
     MatrixEffectViewModule,
     MatrixManualModule,
+    ExpLocalPdmModule,
   ],
 })
 export class IdsModule {}

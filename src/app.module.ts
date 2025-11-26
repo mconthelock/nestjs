@@ -14,6 +14,7 @@ import idsConfig from './common/databases/dailyids.config';
 import packingConfig from './common/databases/packingsys.config';
 import elmesConfig from './common/databases/elmes.config';
 import escsConfig from './common/databases/escs.config';
+import pdmConfig from './common/databases/pdm.config';
 
 //Winston Logger
 import { WinstonModule } from 'nest-winston';
@@ -66,6 +67,7 @@ import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemic
     TypeOrmModule.forRootAsync(packingConfig),
     TypeOrmModule.forRootAsync(elmesConfig),
     TypeOrmModule.forRootAsync(escsConfig),
+    TypeOrmModule.forRootAsync(pdmConfig),
     //Logging Config
     WinstonModule.forRoot(winstonConfig),
     //BB8 💣

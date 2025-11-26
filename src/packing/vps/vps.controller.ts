@@ -1,33 +1,48 @@
-import { Controller, Post, Body, Req, Res, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Req, Res, HttpCode, HttpStatus, BadRequestException , Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { VPSService } from './vps.service';
-import { CheckVisDto } from './dto/check-vis.dto';
-import { ItemDto } from './dto/item.dto';
+import { PackVISDto } from './dto/pack-vis.dto';
+import { PackItemDto } from './dto/pack-item.dto';
 
 @ApiTags('Validate Packing')
 @Controller('packing/vps')
 export class VPSController {
   constructor(private readonly vpsService: VPSService) {}
 
+
+
+  @Get('test-log')
+  @ApiOperation({ summary: 'Test SQL error log insertion' })
+  async testLog(): Promise<any> {
+    const data = await this.vpsService.listPIS('07C128A95807', '15234', false);
+    return JSON.stringify(data, null, 2);
+  }
+
+
+
   /**
    * Check VIS info and return corresponding PIS list
    * @author  Mr.Pathanapong Sokpukeaw
    * @since   2025-11-25
-   * @param   {CheckVisDto} body Payload containing VIS
+   * @param   {PackVISDto} body Payload containing VIS
    * @param   {Request} request HTTP request to read cookie UserId/UseLocaltb
    * @param   {Response} response HTTP response
-   * @return  {Promise<ItemDto[]>} List of items or error message
+   * @return  {Promise<PackItemDto>} List of items or error message
    */
-  @Post('check')
+  @Post('check-vis')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Check VIS info' })
-  @ApiBody({ type: CheckVisDto })
-  @ApiResponse({ status: 200, description: 'List of items', type: [ItemDto] })
-  async checkVis(@Body() body: CheckVisDto, @Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<ItemDto[]> {
-    const userId = request.cookies['UserId'];
-    const useLocal = request.cookies['UseLocaltb'];
-    return this.vpsService.checkVis(body.vis, userId, useLocal);
+  @ApiBody({ type: PackVISDto })
+  @ApiResponse({ status: 200, description: 'List of items', type: [PackItemDto] })
+  async checkVIS(@Body() body: PackVISDto, @Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<PackItemDto> {
+    const cookie = request.cookies['NodeJS.Packinguser'];
+    if (!cookie) {
+      throw new BadRequestException('User cookie not found');
+    }
+    
+    const user = JSON.parse(cookie);
+    return this.vpsService.checkVIS(body.vis, user.userId, user.useLocaltb);
   }
 
   /**
@@ -37,13 +52,13 @@ export class VPSController {
    * @param   {any} body Payload containing vis and pis
    * @param   {Request} request HTTP request to read cookie UserId
    * @param   {Response} response HTTP response
-   * @return  {Promise<ItemDto[]>} Result of saving PIS
+   * @return  {Promise<PackItemDto>} Result of saving PIS
    */
   @Post('check-pis')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Check PIS detail' })
-  @ApiResponse({ status: 200, description: 'PIS result', type: [ItemDto] })
-  async checkPis(@Body() body: any, @Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<ItemDto[]> {
+  @ApiResponse({ status: 200, description: 'PIS result', type: [PackItemDto] })
+  async checkPis(@Body() body: any, @Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<PackItemDto> {
     const { vis, pis } = body;
     const userId = request.cookies['UserId'];
     return this.vpsService.checkPisDetail(vis, pis, userId);
@@ -56,13 +71,13 @@ export class VPSController {
    * @param   {any} body Payload containing vis and barcode
    * @param   {Request} request HTTP request to read cookie UserId
    * @param   {Response} response HTTP response
-   * @return  {Promise<ItemDto[]>} Result of barcode check
+   * @return  {Promise<PackItemDto>} Result of barcode check
    */
   @Post('check-bc')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Check barcode input for closing VIS' })
-  @ApiResponse({ status: 200, description: 'Barcode check result', type: [ItemDto] })
-  async checkInputBc(@Body() body: any, @Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<ItemDto[]> {
+  @ApiResponse({ status: 200, description: 'Barcode check result', type: [PackItemDto] })
+  async checkInputBc(@Body() body: any, @Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<PackItemDto> {
     const userId = request.cookies['UserId'];
     return this.vpsService.checkInputBc(body.vis, body.barcode, userId);
   }

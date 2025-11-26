@@ -15,7 +15,7 @@ export class AuthController {
    * Handle user login request and set HttpOnly cookie
    * @author  Mr.Pathanapong Sokpukeaw
    * @since   2025-11-13
-   * @param   {PackLoginDto} packLoginDto User login payload
+   * @param   {PackLoginDto} body User login payload
    * @param   {Request} request HTTP request for getting client IP
    * @param   {Response} response HTTP response to set cookie
    * @return  {Promise<PackLoginResponseDto>} Login result with status and message
@@ -25,9 +25,9 @@ export class AuthController {
   @ApiOperation({ summary: 'Check user login by UID' })
   @ApiBody({ type: PackLoginDto })
   @ApiResponse({ status: 200, description: 'Login result', type: PackLoginResponseDto })
-  async login(@Body() packLoginDto: PackLoginDto, @Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<PackLoginResponseDto> {
+  async login(@Body() body: PackLoginDto, @Req() request: Request, @Res({ passthrough: true }) response: Response): Promise<PackLoginResponseDto> {
     const ip = getClientIP(request);
-    const result = await this.authService.validateUser(packLoginDto.uid, ip);
+    const result = await this.authService.validateUser(body.uid, ip);
     if (result.status === 'success' && result.user) {
       response.cookie('NodeJS.Packinguser', JSON.stringify(result.user), {
         httpOnly: false,

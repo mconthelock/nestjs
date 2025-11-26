@@ -9,6 +9,7 @@ import {
 import { M008KP } from '../../../rtnlibf/m008kp/entities/m008kp.entity';
 import { F002KP } from '../../f002kp/entities/f002kp.entity';
 import { F003KP } from '../../f003kp/entities/f003kp.entity';
+import { F110KP } from '../../../../amecmfg/f110kp/entities/f110kp.entity';
 
 @Entity('AMECMFG.F001KP')
 export class F001KP {
@@ -82,5 +83,9 @@ export class F001KP {
 
   @OneToMany(() => F003KP, (f3) => f3.tags)
   @JoinColumn([{ name: 'F01R01', referencedColumnName: 'F03R01' }])
-  detail: F003KP[];
+  orders: F003KP[];
+
+  @OneToMany(() => F110KP, (f11) => f11.tags)
+  @JoinColumn([{ name: 'F01R01', referencedColumnName: 'F03R01' }])
+  detail: F110KP[];
 }

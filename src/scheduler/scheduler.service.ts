@@ -73,8 +73,6 @@ export class SchedulerService implements OnModuleInit {
   async manualTrigger(id: string) {
     const job = await this.jobRepo.findOneBy({ ID: id });
     if (!job) throw new NotFoundException('Job not found');
-
-    // Manual Run ไม่ต้อง check redis lock ก็ได้ หรือจะ check ก็ได้แล้วแต่ design
     this.handleJobExecution(job);
     return { message: `Triggered job ${job.NAME}` };
   }
@@ -104,7 +102,6 @@ export class SchedulerService implements OnModuleInit {
   }
 
   async handleJobExecution(job: ScheduledJob) {
-    // ... (เหมือน logic เดิม: Redis Lock -> HTTP Call -> Log) ...
     const lockKey = `lock:job:${job.ID}:${new Date().getMinutes()}`;
     const ttl = 55;
 
@@ -124,9 +121,18 @@ export class SchedulerService implements OnModuleInit {
     let responseCode = 200;
 
     try {
-      // เรียก API ของตัวเอง
+      let payload = {};
+      try {
+        if (job.PARAMETES) {
+          payload = JSON.parse(job.PARAMETES);
+        }
+      } catch (e) {
+        this.logger.warn(`Invalid JSON parameters for job ${job.NAME}`);
+      }
+
       const response = await this.httpService.axiosRef.post(
-        `http://localhost:3000${job.URL}`,
+        `http://localhost:${process.env.PORT}${job.URL}`,
+        payload,
       );
       message = JSON.stringify(response.data);
       responseCode = response.status;

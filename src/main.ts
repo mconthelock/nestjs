@@ -15,6 +15,8 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
 import { AllExceptionsFilter } from './common/logger/http-exception.filter';
 import { SocketIoAdapter } from './common/ws/socket-io.adapter';
+import { REDIS, REDIS_SUB } from './common/redis/redis.provider';
+import { Redis } from 'ioredis';
 
 async function bootstrap() {
   // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์
@@ -44,8 +46,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // 🔗 ตั้ง WS adapter กลาง—ครอบทุก @WebSocketGateway
-  app.useWebSocketAdapter(new SocketIoAdapter(app));
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -90,6 +90,19 @@ async function bootstrap() {
       theme: 'bluePlanet',
     }),
   );
+
+    // 🔗 ตั้ง WS adapter กลาง—ครอบทุก @WebSocketGateway
+  const wsAdapter = new SocketIoAdapter(app);
+  app.useWebSocketAdapter(wsAdapter);
+
+  await app.init();
+
+  // ดึง client ที่สร้างใน RedisModule มาใช้ (provider)
+  const pub = app.get<Redis>(REDIS); // client ปกติจาก provider
+  const sub = app.get<Redis>(REDIS_SUB) || pub.duplicate(); // ถ้าอยากใช้ provider สำหรับ sub ด้วย
+
+  // เรียกเมธอดเดียวให้ Adapter จัดการ Redis ให้
+  wsAdapter.attachRedisAdapter(pub, sub);
 
   await app.listen(process.env.PORT ?? 3000);
   console.log(`Application is running on: ${await app.getUrl()}`);

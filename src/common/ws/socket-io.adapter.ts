@@ -1,10 +1,12 @@
 import { INestApplicationContext } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { ServerOptions } from 'socket.io';
+import Redis from 'ioredis';
+import { createAdapter } from '@socket.io/redis-adapter';
 
 const RAW_ALLOW_ORIGINS = (process.env.ALLOW_ORIGINS || '')
   .split(',')
-  .map(s => s.trim())
+  .map((s) => s.trim())
   .filter(Boolean);
 
 // helper: เช็ค wildcard โดเมน (*.mitsubishielevatorasia.co.th) + localhost
@@ -21,7 +23,8 @@ function isAllowedOrigin(origin?: string) {
     if (
       host === 'mitsubishielevatorasia.co.th' ||
       host.endsWith('.mitsubishielevatorasia.co.th')
-    ) return true;
+    )
+      return true;
 
     // localhost/dev
     if (host === 'localhost' || host === '127.0.0.1') return true;
@@ -33,6 +36,8 @@ function isAllowedOrigin(origin?: string) {
 }
 
 export class SocketIoAdapter extends IoAdapter {
+  public io: any;
+
   constructor(app: INestApplicationContext) {
     super(app);
   }
@@ -54,6 +59,19 @@ export class SocketIoAdapter extends IoAdapter {
     };
 
     const server = super.createIOServer(port, opt);
+    this.io = server;
     return server;
+  }
+
+  // เมธอดช่วย: สร้าง redis pub/sub และเชื่อม adapter ให้ io
+  attachRedisAdapter(pub: Redis, sub?: Redis) {
+    if (!this.io) {
+      throw new Error(
+        'Socket.IO server not created yet. Call after app.init()',
+      );
+    }
+    const subClient = sub || pub.duplicate();
+    this.io.adapter(createAdapter(pub, subClient));
+    console.log(`[SocketIoAdapter:${process.pid}] Redis adapter attached`);
   }
 }

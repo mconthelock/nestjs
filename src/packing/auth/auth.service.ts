@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, DataSource } from 'typeorm';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { PAccessLog } from './entities/p-access-log.entity';
 import { PackLoginResponseDto } from './dto/pack-login-response.dto';
 import { PackUserInfoDto } from './dto/pack-user-info.dto';
@@ -10,7 +10,10 @@ import { PackUserInfoDto } from './dto/pack-user-info.dto';
 export class AuthService {
   constructor(
     @InjectRepository(PAccessLog, 'packingConnection')
-    private readonly md: Repository<PAccessLog>,
+    private readonly logdb: Repository<PAccessLog>,
+
+    @InjectDataSource('packingConnection')
+    private readonly db: DataSource,
   ) {}
 
   /**
@@ -27,25 +30,40 @@ export class AuthService {
         return { status: 'error', message: 'รหัสพนักงานต้องเป็นตัวเลขเท่านั้น', user: null };
       }
 
+      const sessionId = this.generateLogId();
       const empCode = Number(uid);
-      const sessionId = randomUUID();
-      const empNo  = this.decodeID(empCode);
-      const result = await this.md.query(
-        `EXEC ValidatePackAuth @empid = @0, @ip = @1, @sessid = @2`,
-        [empNo, ip, sessionId],
-      );
-
-      const row = result[0];
-      if (row.errcode === '0') {
-        const [userId, userName, useLocaltb] = row.errormsg.split('-');
+      const empNo   = this.decodeID(empCode);
+      const result  = await this.db.query(`EXEC ValidatePackAuth @0,@1,@2`, [empNo, ip, sessionId]);
+      const d = result[0];
+      if (d.errcode === '0') {
+        const [userId, userName, useLocaltb] = d.errormsg.split('-');
         const user: PackUserInfoDto = { userId, userName, useLocaltb, sessionId };
         return { status: 'success', message: 'Login success', user };
       } else {
-        return { status: 'error', message: row.errormsg, user: null };
+        return { status: 'error', message: d.errormsg, user: null };
       }
     } catch (error) {
       throw new InternalServerErrorException('Database error: ' + error.message);
     }
+  }
+
+  /**
+   * Generate unique log ID
+   * @author  Mr.Pathanapong Sokpukeaw
+   * @since   2025-11-13
+   * @return  {string} Unique log ID: f742a825-0dab-4165-a3e9-27b6ec6b014c-20251126094545
+   */
+  generateLogId(): string {
+    const now  = new Date();
+    const yyyy = now.getFullYear().toString();
+    const mm  = (now.getMonth() + 1).toString().padStart(2, '0');
+    const dd  = now.getDate().toString().padStart(2, '0');
+    const hh  = now.getHours().toString().padStart(2, '0');
+    const min = now.getMinutes().toString().padStart(2, '0');
+    const ss  = now.getSeconds().toString().padStart(2, '0');
+    const timestamp = `${yyyy}${mm}${dd}${hh}${min}${ss}`;
+    const uuid = randomUUID();
+    return `${uuid}-${timestamp}`;
   }
 
   /**
@@ -70,7 +88,7 @@ export class AuthService {
    */
   async updateLogout(userId: string, sessionId: string): Promise<void> {
     try {
-      await this.md.createQueryBuilder()
+      await this.logdb.createQueryBuilder()
         .update(PAccessLog)
         .set({ endtime: () => 'GETDATE()' })
         .where('usrid = :userId AND accessid = :sessionId', { userId, sessionId })

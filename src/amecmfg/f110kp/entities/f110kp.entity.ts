@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { F001KP } from '../../../as400/shopf/f001kp/entities/f001kp.entity';
-@Entity('AMECMFG.F110KP')
+@Entity({ name: 'F110KP', schema: 'AMECMFG' })
 export class F110KP {
   @PrimaryColumn()
   F11K01: string;

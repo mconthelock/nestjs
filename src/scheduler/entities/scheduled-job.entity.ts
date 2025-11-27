@@ -21,6 +21,9 @@ export class ScheduledJob {
   URL: string;
 
   @Column()
+  PARAMETES: string;
+
+  @Column()
   CRON_EXPRESSION: string;
 
   @Column()

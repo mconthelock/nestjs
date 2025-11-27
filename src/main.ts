@@ -46,22 +46,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // 🔗 ตั้ง WS adapter กลาง—ครอบทุก @WebSocketGateway
-  // app.useWebSocketAdapter(new SocketIoAdapter(app));
-
-  const wsAdapter = new SocketIoAdapter(app);
-  app.useWebSocketAdapter(wsAdapter);
-
-  await app.init();
-
-  // ดึง client ที่สร้างใน RedisModule มาใช้ (provider)
-  const pub = app.get<Redis>(REDIS); // client ปกติจาก provider
-  const sub = app.get<Redis>(REDIS_SUB) || pub.duplicate(); // ถ้าอยากใช้ provider สำหรับ sub ด้วย
-
-  // เรียกเมธอดเดียวให้ Adapter จัดการ Redis ให้
-  wsAdapter.attachRedisAdapter(pub, sub);
-
-
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -106,6 +90,19 @@ async function bootstrap() {
       theme: 'bluePlanet',
     }),
   );
+
+    // 🔗 ตั้ง WS adapter กลาง—ครอบทุก @WebSocketGateway
+  const wsAdapter = new SocketIoAdapter(app);
+  app.useWebSocketAdapter(wsAdapter);
+
+  await app.init();
+
+  // ดึง client ที่สร้างใน RedisModule มาใช้ (provider)
+  const pub = app.get<Redis>(REDIS); // client ปกติจาก provider
+  const sub = app.get<Redis>(REDIS_SUB) || pub.duplicate(); // ถ้าอยากใช้ provider สำหรับ sub ด้วย
+
+  // เรียกเมธอดเดียวให้ Adapter จัดการ Redis ให้
+  wsAdapter.attachRedisAdapter(pub, sub);
 
   await app.listen(process.env.PORT ?? 3000);
   console.log(`Application is running on: ${await app.getUrl()}`);

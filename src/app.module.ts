@@ -29,6 +29,9 @@ import { RequestContextMiddleware } from './middleware/request-context.middlewar
 //Redis Module
 import { RedisModule } from './common/redis/redis.module';
 
+//Scheduler
+import { ScheduleModule } from '@nestjs/schedule';
+
 //Master Modules
 import { AuthModule } from './auth/auth.module';
 import { AmecMfgModule } from './amecmfg/amecmfg.module';
@@ -53,7 +56,7 @@ import { ItgcModule } from './itgc/itgc.module';
 import { AS400Module } from './as400/as400.module';
 import { PackingModule } from './packing/packing.module';
 import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemical-section.module';
-
+import { SchedulerModule } from './scheduler/scheduler.module';
 
 @Module({
   imports: [
@@ -77,6 +80,9 @@ import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemic
 
     //Redis
     RedisModule,
+
+    //Scheduler
+    ScheduleModule.forRoot(),
     //BB8 💣
     AuthModule,
     AmecModule,
@@ -102,6 +108,7 @@ import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemic
     IdsModule,
     ItgcModule,
     ChemicalSectionModule,
+    SchedulerModule,
   ],
   providers: [HttpLoggingInterceptor],
 })

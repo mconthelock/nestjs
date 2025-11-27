@@ -54,11 +54,11 @@ export class VPSService {
       const d = result[0];
       switch (d.errcode) {
         case '0':
-          return this.getPISfromVIS(vis, userId, useLocal);
+          return await this.getPISfromVIS(vis, userId, useLocal);
         case '1':
-          return this.listPIS(vis, userId, false);
+          return await this.listPIS(vis, userId, false);
         case '99':
-          return this.listPIS(vis, userId, true);
+          return await this.listPIS(vis, userId, true);
         default:
           return { status:d.errcode, message:d.errmsg };
       }
@@ -82,12 +82,12 @@ export class VPSService {
       const result = await this.db.query('exec InsertPackingDetail @0,@1,@2', [vis, useLocal, userId]);
       const d = result[0];
       if (d.errstate === '0'){
-        return this.listPIS(vis, userId, false);
+        return await this.listPIS(vis, userId, false);
       }else{
         return { status:d.errstate, message:d.errmsg }
       }
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      throw new Error(error.message);
     }
   }
 
@@ -111,9 +111,9 @@ export class VPSService {
         throw new Error("Column 'ordernoref' not found in query result");
       }
 
-      return { status: 'success', message: 'OK', chkcompte: finState, items: result };
+      return { status:'success', message:'', chkcompte:finState, items:result };
     } catch (error) {
-      return { status:'error', message:error.message };
+      throw new Error(error.message);
     }
   }
 

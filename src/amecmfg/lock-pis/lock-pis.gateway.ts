@@ -13,7 +13,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import Redis from 'ioredis';
 import { REDIS, REDIS_SUB } from '../../common/redis/redis.provider';
 import { UsersService } from '../../amec/users/users.service';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 
 @WebSocketGateway({ namespace: '/lockpis' })
 @Injectable()
@@ -54,7 +54,7 @@ export class LockPisGateway
         }
 
         // เราเป็นผู้ประมวลผลคนเดียวของข้อความนี้
-        console.log(`[pid=${process.pid}] will process expired message:`, message);
+        // console.log(`[pid=${process.pid}] will process expired message:`, message);
 
         console.log('expired:', message);
         if (message.startsWith('lock:')) {
@@ -75,6 +75,12 @@ export class LockPisGateway
               order: order,
             });
           }
+        }
+
+        try {
+          await this.redis.del(lockKey);
+        } catch (e) {
+          console.warn(`[pid=${process.pid}] failed to del lock ${lockKey}`, e?.message || e);
         }
       } catch (e) {
         console.log('error handling expired message', e);
@@ -161,7 +167,7 @@ export class LockPisGateway
         // สร้าง key เตือนล่วงหน้า
         // const notify = expire - 30 * 1000; // 30 วินาที
         const notify = expire - 5 * 1000; // 5 วินาที test
-        const warn = `warn:${itemId}::${order}`;
+        const warn = `warn:${sid}::${itemId}::${order}`;
         console.log('warn', warn);
         const setWarn = await this.redis.set(warn, sid, 'PX', notify);
         console.log('set warn', setWarn);

@@ -978,6 +978,27 @@ export class FlowService {
     stepNext: string,
     queryRunner?: QueryRunner,
   ) {
+    const check  = await queryRunner.manager.query(
+      'select * from flow where NFRMNO = :1 AND VORGNO = :2 AND CYEAR = :3 AND CYEAR2 = :4 AND NRUNNO = :5 and CSTEPNO in (select cStepNextNo from flow where NFRMNO = :6 AND VORGNO = :7 AND CYEAR = :8 AND CYEAR2 = :9 AND NRUNNO = :10 and CSTEPNO = :11) and CSTEPST = :12 and CAPVSTNO = :13',
+      [
+        form.NFRMNO,
+        form.VORGNO,
+        form.CYEAR,
+        form.CYEAR2,
+        form.NRUNNO,
+        form.NFRMNO,
+        form.VORGNO,
+        form.CYEAR,
+        form.CYEAR2,
+        form.NRUNNO,
+        stepNext,
+        this.STEP_NORMAL,
+        this.APV_NONE,
+      ]);
+    if(check.length == 0){
+      return;
+    }
+      
     const sql =
       'update flow set CAPVSTNO = :apvNone, CSTEPST = :stepWait where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CSTEPNO in (select cStepNextNo from flow where NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno and CSTEPNO = :stepNext) and CSTEPST = :stepNormal and CAPVSTNO = :apvNone2';
     const params = {

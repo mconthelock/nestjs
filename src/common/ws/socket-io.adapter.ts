@@ -6,7 +6,7 @@ import { createAdapter } from '@socket.io/redis-adapter';
 
 const RAW_ALLOW_ORIGINS = (process.env.ALLOW_ORIGINS || '')
   .split(',')
-  .map(s => s.trim())
+  .map((s) => s.trim())
   .filter(Boolean);
 
 // helper: เช็ค wildcard โดเมน (*.mitsubishielevatorasia.co.th) + localhost
@@ -23,7 +23,8 @@ function isAllowedOrigin(origin?: string) {
     if (
       host === 'mitsubishielevatorasia.co.th' ||
       host.endsWith('.mitsubishielevatorasia.co.th')
-    ) return true;
+    )
+      return true;
 
     // localhost/dev
     if (host === 'localhost' || host === '127.0.0.1') return true;
@@ -62,24 +63,15 @@ export class SocketIoAdapter extends IoAdapter {
     return server;
   }
 
-  
   // เมธอดช่วย: สร้าง redis pub/sub และเชื่อม adapter ให้ io
-  attachRedisAdapter() {
+  attachRedisAdapter(pub: Redis, sub?: Redis) {
     if (!this.io) {
-      throw new Error('Socket.IO server not created yet. Call after app.init()');
+      throw new Error(
+        'Socket.IO server not created yet. Call after app.init()',
+      );
     }
-    const pub = new Redis({
-      host: process.env.REDIS_HOST,
-      port: parseInt(process.env.REDIS_PORT, 10),
-      password: process.env.REDIS_PASSWORD,
-    });
-    const sub = pub.duplicate();
-
-    // optional: handle redis errors / reconnect logs
-    pub.on('error', (e) => console.error('[redis pub] error', e));
-    sub.on('error', (e) => console.error('[redis sub] error', e));
-
-    this.io.adapter(createAdapter(pub, sub));
-    console.log('[SocketIoAdapter] Redis adapter attached');
+    const subClient = sub || pub.duplicate();
+    this.io.adapter(createAdapter(pub, subClient));
+    console.log(`[SocketIoAdapter:${process.pid}] Redis adapter attached`);
   }
 }

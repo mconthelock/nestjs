@@ -15,13 +15,15 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
 import { AllExceptionsFilter } from './common/logger/http-exception.filter';
 import { SocketIoAdapter } from './common/ws/socket-io.adapter';
+import { REDIS, REDIS_SUB } from './common/redis/redis.provider';
+import { Redis } from 'ioredis';
 
 async function bootstrap() {
   // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์
   const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
   await fs.mkdir(uploadPath, { recursive: true });
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    // logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
+    logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
   });
 
   app.enableCors({
@@ -52,8 +54,12 @@ async function bootstrap() {
 
   await app.init();
 
+  // ดึง client ที่สร้างใน RedisModule มาใช้ (provider)
+  const pub = app.get<Redis>(REDIS); // client ปกติจาก provider
+  const sub = app.get<Redis>(REDIS_SUB) || pub.duplicate(); // ถ้าอยากใช้ provider สำหรับ sub ด้วย
+
   // เรียกเมธอดเดียวให้ Adapter จัดการ Redis ให้
-  wsAdapter.attachRedisAdapter();
+  wsAdapter.attachRedisAdapter(pub, sub);
 
 
   app.useGlobalPipes(

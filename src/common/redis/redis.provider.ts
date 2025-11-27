@@ -14,11 +14,11 @@ export const redisProvider: Provider = {
     });
 
     client.on('connect', () => {
-      console.log('[Redis] connected');
+      console.log(`[Redis:${process.pid}] connected (provider)`)
     });
 
     client.on('error', (err) => {
-      console.error('[Redis] error', err);
+      console.error(`[Redis:${process.pid}] error`, err);
     });
 
     return client;
@@ -34,11 +34,11 @@ export const redisSubProvider: Provider = {
       password: process.env.REDIS_PASSWORD,
     });
     sub.on('connect', () => {
-      console.log('[Redis] connected (subscriber)');
+      console.log(`[Redis:${process.pid}] connected (subscriber)`)
     });
 
     sub.on('error', (err) => {
-      console.error('[Redis] error (subscriber)', err);
+      console.error(`[Redis:${process.pid}] error (subscriber)`, err);
     });
     return sub;
   },

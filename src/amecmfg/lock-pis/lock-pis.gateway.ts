@@ -13,6 +13,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import Redis from 'ioredis';
 import { REDIS, REDIS_SUB } from '../../common/redis/redis.provider';
 import { UsersService } from '../../amec/users/users.service';
+import crypto from 'crypto';
 
 @WebSocketGateway({ namespace: '/lockpis' })
 @Injectable()
@@ -37,6 +38,24 @@ export class LockPisGateway
     this.redisSub.on('message', async (_chan, message) => {
       // message is key name that expired
       try {
+        // สร้าง key สั้นๆ ปลอดภัย (hash) เพื่อใช้เป็น lock-per-message
+        const hash = crypto.createHash('sha1').update(message).digest('hex');
+        const lockKey = `procLock:${hash}`;
+
+        // เลือก TTL ให้พอประมวลผล แล้วก็ short (ms)
+        const lockTtlMs = 2000; // 2 วินาที (ปรับตามเวลาประมวลผลจริง)
+
+        // พยายามได้ lock แบบ atomic (SET NX PX)
+        const got = await this.redis.set(lockKey, `${process.pid}`, 'PX', lockTtlMs, 'NX');
+        if (!got) {
+          // instance อื่นได้สิทธิ์ประมวลผลแล้ว -> ข้าม
+          console.log(`[pid=${process.pid}] skip processing (locked by other):`, message);
+          return;
+        }
+
+        // เราเป็นผู้ประมวลผลคนเดียวของข้อความนี้
+        console.log(`[pid=${process.pid}] will process expired message:`, message);
+
         console.log('expired:', message);
         if (message.startsWith('lock:')) {
           const payload = message.replace(/^lock:/, '');

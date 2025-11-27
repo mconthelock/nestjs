@@ -15,13 +15,14 @@ import { REDIS, REDIS_SUB } from '../../common/redis/redis.provider';
 import { UsersService } from '../../amec/users/users.service';
 import * as crypto from 'crypto';
 
+//prettier-ignore
 @WebSocketGateway({ namespace: '/lockpis' })
 @Injectable()
 export class LockPisGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() server: Server;
-  // private logger = new Logger('LockPisGateway');
+  private logger = new Logger('LockPisGateway');
 
   constructor(
     @Inject(REDIS) private readonly redis: Redis,
@@ -31,44 +32,39 @@ export class LockPisGateway
     // subscribe to expired events (DB 0)
     // channel name is "__keyevent@0__:expired" when notify-keyspace-events is set to Ex
     this.redisSub.subscribe('__keyevent@0__:expired', (err) => {
-      if (err) console.log('subscribe failed', err);
-      else console.log('Subscribed to __keyevent@0__:expired');
+      if (err) this.logger.error('subscribe failed', err);
+      else this.logger.debug('Subscribed to __keyevent@0__:expired');
     });
 
     this.redisSub.on('message', async (_chan, message) => {
+      
       // message is key name that expired
       try {
+        // กันไม่ให้ หลาย instance ประมวลผลพร้อมกัน
         // สร้าง key สั้นๆ ปลอดภัย (hash) เพื่อใช้เป็น lock-per-message
         const hash = crypto.createHash('sha1').update(message).digest('hex');
         const lockKey = `procLock:${hash}`;
 
         // เลือก TTL ให้พอประมวลผล แล้วก็ short (ms)
         const lockTtlMs = 2000; // 2 วินาที (ปรับตามเวลาประมวลผลจริง)
-
-        // พยายามได้ lock แบบ atomic (SET NX PX)
         const got = await this.redis.set(lockKey, `${process.pid}`, 'PX', lockTtlMs, 'NX');
         if (!got) {
           // instance อื่นได้สิทธิ์ประมวลผลแล้ว -> ข้าม
-          console.log(`[pid=${process.pid}] skip processing (locked by other):`, message);
+          // this.logger.debug(`[pid=${process.pid}] skip processing (locked by other):`, message);
           return;
         }
-
-        // เราเป็นผู้ประมวลผลคนเดียวของข้อความนี้
-        // console.log(`[pid=${process.pid}] will process expired message:`, message);
-
-        console.log('expired:', message);
+        this.logger.debug('expired:', message);
+        
         if (message.startsWith('lock:')) {
-          const payload = message.replace(/^lock:/, '');
-          const [itemId, order] = payload.split('::');
-          // emit to interested clients
+          const payload = message.replace(/^lock:/, ''); // ลบ prefix ออก
+          const [itemId, order] = payload.split('::');   // แยก itemId กับ order
+          //  แจ้งเตือนทุก client ว่า lock หมดอายุแล้ว
           this.server.emit('lock_expired', { itemId, order });
         } else if (message.startsWith('warn:')) {
-          // ถ้าทำ pre-warning key
-          const payload = message.replace(/^warn:/, '');
-          const [userId, itemId, order] = payload.split('::');
-          // ส่งเตือนเฉพาะ user
-          // ตัวอย่าง: ถ้าเก็บ mapping userSockets:<userId> => set(socketId)
-          const sockets = await this.redis.smembers(`userSockets:${userId}`);
+          const payload = message.replace(/^warn:/, '');        // ลบ prefix ออก
+          const [empno, itemId, order] = payload.split('::');  // แยก userId, itemId กับ order
+          // ส่งเตือนเฉพาะ client ว่า lock กำลังจะหมดอายุ
+          const sockets = await this.redis.smembers(`userSockets:${empno}`); // ดึง socket id ของ user นี้
           for (const sid of sockets) {
             this.server.to(sid).emit('will_expire', {
               itemId: itemId,
@@ -78,47 +74,47 @@ export class LockPisGateway
         }
 
         try {
-          await this.redis.del(lockKey);
+          await this.redis.del(lockKey); // ลบ lock หลังประมวลผลเสร็จ
         } catch (e) {
-          console.warn(`[pid=${process.pid}] failed to del lock ${lockKey}`, e?.message || e);
+          this.logger.warn(`[pid=${process.pid}] failed to del lock ${lockKey}`, e?.message || e);
         }
       } catch (e) {
-        console.log('error handling expired message', e);
+        this.logger.error('error handling expired message', e);
       }
     });
   }
 
   handleConnection(client: Socket) {
-    console.log('adapter keys:', Object.keys(this.server.adapter || {}));
-    console.log(
-      'disconnectSockets:',
-      typeof (this.server.adapter as any).disconnectSockets,
-    );
+    // ถ้าไม่มี empno ใน query string ให้ตัดการเชื่อมต่อ
     const empno = client.handshake.query.empno as string;
     if (!empno) {
       client.disconnect(true);
       return;
     }
     const sid = client.id;
-    client.data.empno = empno;
-    // register mapping socketId -> empno in redis for multi-instance
-
+    client.data.empno = empno; // เก็บ empno ไว้ใน client object
+    
     // เก็บ socket id ว่าใช้โดยใคร (expire เผื่อกรณี client หายไปเฉยๆ)
     this.redis.set(`socket:${sid}`, empno, 'EX', 60 * 60 * 24); // ตัวอย่าง expire 1 วัน
     // เก็บชุด socket id ของ user นี้
     this.redis.sadd(`userSockets:${empno}`, sid);
 
-    console.log(`CONNECT ${empno} (${sid})`);
+    this.logger.debug(`CONNECT ${empno} (${sid})`);
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
     const sid = client.id;
     const empno = client.data.empno;
+    const basket = await this.redis.smembers(`locks:${sid}`);
+    this.logger.debug('socket', sid, 'basket', basket);
+    for (const lock of basket) {
+      this.redis.del(lock);
+    }
     // ลบ socket id ออกจาก empno
     this.redis.srem(`userSockets:${empno}`, sid);
     // ลบ mapping socket id
     this.redis.del(`socket:${sid}`);
-    console.log(`DISCONNECT ${sid}`);
+    this.logger.debug(`DISCONNECT ${sid}`);
   }
 
   @SubscribeMessage('logout')
@@ -127,23 +123,24 @@ export class LockPisGateway
       const empno = client.data.empno; // ดึง empno จาก client
       const userSockets = await this.redis.smembers(`userSockets:${empno}`);
 
+      // ตัดการเชื่อมต่อทุก socket ของ user คนนี้
       this.server.in(userSockets).disconnectSockets(true);
 
-      console.log('userSockets', userSockets);
+      this.logger.debug('userSockets', userSockets);
       for (const sid of userSockets) {
         this.redis.del(`socket:${sid}`);
         const basket = await this.redis.smembers(`locks:${sid}`);
-        console.log('socket', sid, 'basket', basket);
+        this.logger.debug('socket', sid, 'basket', basket);
         for (const lock of basket) {
           this.redis.del(lock);
         }
       }
       this.redis.del(`userSockets:${empno}`);
 
-      console.log('user socket', this.redis.get(`userSockets:${empno}`));
+      this.logger.debug('user socket', this.redis.get(`userSockets:${empno}`));
 
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
   }
 
@@ -156,38 +153,37 @@ export class LockPisGateway
       const sid = client.id;
       const empno = client.data.empno;
       const { itemId, order } = data;
-      // const expire = 30 * 60 * 1000; // 30 minutes
-      const expire = 10 * 1000; // 5 seconds for testing
+      const expire = 30 * 60 * 1000; // 30 minutes
+      // const expire = 10 * 1000; // 10 seconds for testing
       const lock = `lock:${itemId}::${order}`;
       const setLock = await this.redis.set(lock, sid, 'PX', expire, 'NX');
-      console.log(`lock', ${setLock}`);
+      this.logger.debug(`lock', ${setLock}`);
       // เมื่อ lock สำเร็จ จะได้ 'OK'
       if (setLock === 'OK') {
-        console.log('lock true');
+        this.logger.debug('lock true');
         // สร้าง key เตือนล่วงหน้า
-        // const notify = expire - 30 * 1000; // 30 วินาที
-        const notify = expire - 5 * 1000; // 5 วินาที test
-        const warn = `warn:${sid}::${itemId}::${order}`;
-        console.log('warn', warn);
+        const notify = expire - 30 * 1000; // 30 วินาที
+        // const notify = expire - 5 * 1000; // 5 วินาที test
+        const warn = `warn:${empno}::${itemId}::${order}`;
+        this.logger.debug('warn', warn);
         const setWarn = await this.redis.set(warn, sid, 'PX', notify);
-        console.log('set warn', setWarn);
+        this.logger.debug('set warn', setWarn);
 
         // เก็บไว้ใน set ว่าผู้ใช้คนนี้ล็อกอะไรไว้บ้าง
         const basket = await this.redis.sadd(`locks:${sid}`, lock);
-        console.log(basket);
-        console.log(await this.redis.smembers(`locks:${sid}`));
+        this.logger.debug(await this.redis.smembers(`locks:${sid}`));
 
         // แจ้ง client ว่าล็อกสำเร็จ
         client.emit('lock_status', { itemId, order, status: true });
       } else {
-        console.log('lock false');
+        this.logger.debug('lock false');
 
         // ล็อกไม่สำเร็จ แจ้งว่าใครเป็นเจ้าของ
         // ดึงค่า sid จาก lock คือ value
         const ownerSid = await this.redis.get(lock);
         // ดึง empno ของเจ้าของจาก sid
         const ownerEmp = await this.redis.get(`socket:${ownerSid}`);
-        console.log(
+        this.logger.debug(
           `lock_item failed: ${itemId}::${order} by ${empno}, owned by ${ownerEmp}`,
         );
         client.emit('lock_status', {
@@ -198,8 +194,7 @@ export class LockPisGateway
         });
       }
     } catch (e) {
-      console.error(e);
-
+      this.logger.error(e);
       client.emit('lock_status', {
         itemId: data.itemId,
         order: data.order,
@@ -217,6 +212,7 @@ export class LockPisGateway
     const sid = client.id;
     const lock = `lock:${data.itemId}::${data.order}`;
     // safe unlock (only owner)
+    // ใช้ Lua script ในการตรวจสอบและลบแบบอะตอมมิก (atomic) ต้องเป็นเจ้าของเท่านั้นถึงลบได้
     const script = `
       if redis.call("get", KEYS[1]) == ARGV[1] then
         return redis.call("del", KEYS[1])

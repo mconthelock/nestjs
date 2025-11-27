@@ -21,7 +21,7 @@ async function bootstrap() {
   const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
   await fs.mkdir(uploadPath, { recursive: true });
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
+    // logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
   });
 
   app.enableCors({
@@ -45,7 +45,17 @@ async function bootstrap() {
   });
 
   // 🔗 ตั้ง WS adapter กลาง—ครอบทุก @WebSocketGateway
-  app.useWebSocketAdapter(new SocketIoAdapter(app));
+  // app.useWebSocketAdapter(new SocketIoAdapter(app));
+
+  const wsAdapter = new SocketIoAdapter(app);
+  app.useWebSocketAdapter(wsAdapter);
+
+  await app.init();
+
+  // เรียกเมธอดเดียวให้ Adapter จัดการ Redis ให้
+  wsAdapter.attachRedisAdapter();
+
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,

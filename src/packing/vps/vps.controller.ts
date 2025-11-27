@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Req, Res, HttpCode, HttpStatus, BadRequestException , Get } from '@nestjs/common';
+import { Controller, Post, Body, Req, Res, HttpCode, HttpStatus, BadRequestException, Get, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { VPSService } from './vps.service';
@@ -12,12 +12,15 @@ export class VPSController {
 
 
 
-  @Get('test-log')
+  @Get('test-log/:vis')
   @ApiOperation({ summary: 'Test SQL error log insertion' })
-  async testLog(): Promise<any> {
-    const data = await this.vpsService.listPIS('07C128A95807', '15234', false);
+  async testLog(
+    @Param('vis') vis: string
+  ): Promise<any> {
+    const data = await this.vpsService.checkVIS(vis, '15234', '0');
     return JSON.stringify(data, null, 2);
   }
+
 
 
 

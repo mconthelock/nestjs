@@ -91,7 +91,7 @@ async function bootstrap() {
     }),
   );
 
-    // 🔗 ตั้ง WS adapter กลาง—ครอบทุก @WebSocketGateway
+  // 🔗 ตั้ง WS adapter กลาง—ครอบทุก @WebSocketGateway
   const wsAdapter = new SocketIoAdapter(app);
   app.useWebSocketAdapter(wsAdapter);
 

@@ -2,6 +2,7 @@ import * as winston from 'winston';
 import stripAnsi from 'strip-ansi'; // npm i strip-ansi
 import chalk from 'chalk';
 import { requestNamespace } from '../../middleware/request-id.middleware';
+import { shouldIgnoreEndpoint } from './logger-ignore.config';
 const DailyRotateFile = require('winston-daily-rotate-file');
 
 const addRequestId = winston.format((info) => {
@@ -53,6 +54,17 @@ const skipSelectQuery = winston.format((info) => {
   return info;
 });
 
+const skipBlankReqID = winston.format((info) => {
+  if (
+    info.requestId === undefined ||
+    info.requestId === null ||
+    info.requestId === ''
+  ) {
+    return false;
+  }
+  return info;
+});
+
 const keyColors = {
   context: chalk.cyan,
   statusCode: chalk.magenta,
@@ -69,7 +81,25 @@ const skipError = winston.format((info) => {
   return info;
 });
 
+const onlyError = winston.format((info) => {
+  if (info.level === 'error') return info;
+  return false;
+});
+
+// กรอง endpoints ที่ไม่ต้องการ log (ยกเว้น error)
+const filterIgnoredEndpoints = winston.format((info) => {
+  // ถ้าเป็น error log ให้ผ่านไปเสมอ
+  if (info.level === 'error') return info;
+
+  // ตรวจสอบว่าเป็น HTTP Request log และมี URL ที่ต้อง ignore หรือไม่
+  if (typeof info.url === 'string' && shouldIgnoreEndpoint(info.url)) {
+    return false; // ไม่บันทึก log
+  }
+
+  return info; // บันทึก log ปกติ
+});
 export const winstonConfig = {
+  level: 'debug', // เพิ่ม global level
   format: winston.format.combine(
     ignoreTypeOrmEntities(),
     winston.format.timestamp(),
@@ -80,9 +110,11 @@ export const winstonConfig = {
     new winston.transports.Console({
       level: process.env.LOGGER_CONSOLE,
       format: winston.format.combine(
+        //filterIgnoredEndpoints(), // กรอง ignored endpoints
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         addRequestId(),
         ignoreTypeOrmEntities(),
+        skipBlankReqID(),
         winston.format.printf(
           ({ level, message, timestamp, requestId, ...meta }) => {
             if (level !== 'error')
@@ -111,10 +143,12 @@ export const winstonConfig = {
       maxFiles: '30d',
       level: process.env.LOGGER_FILE,
       format: winston.format.combine(
+        filterIgnoredEndpoints(), // กรอง ignored endpoints
         skipError(),
         stripColors(),
         ignoreTypeOrmEntities(),
-        // skipSelectQuery(),
+        //skipSelectQuery(),
+        skipBlankReqID(),
         addRequestId(),
         winston.format.timestamp(),
         winston.format.uncolorize(),
@@ -132,8 +166,10 @@ export const winstonConfig = {
       maxFiles: '30d',
       level: process.env.LOGGER_ERROR,
       format: winston.format.combine(
+        onlyError(), // เขียนแค่ error logs
         winston.format.timestamp(),
         addRequestId(),
+        winston.format.uncolorize(), // ลบสีออก
         winston.format.json(),
       ),
     }),

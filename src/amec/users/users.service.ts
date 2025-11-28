@@ -29,4 +29,12 @@ export class UsersService {
   search() {
     return this.userRepository.find();
   }
+
+  findBirthday(month: string) {
+    return this.userRepository
+      .createQueryBuilder('user')
+      .where("cstatus = '1' and sposcode < 80 and birthday is not null and SUBSTR(birthday, 5, 2) = :month", { month })
+      .orderBy('birthday')
+      .getMany();
+  }
 }

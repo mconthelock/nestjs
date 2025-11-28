@@ -61,6 +61,11 @@ export class SearchFlowDto {
   @IsString()
   CSTEPST?: string;
 
+  @ApiProperty({ example: '3' })
+  @IsOptional()
+  @IsString()
+  CEXTDATA?: string;
+
   @ApiProperty({ example: '0' })
   @IsOptional()
   CAPVSTNO?: string | string[];

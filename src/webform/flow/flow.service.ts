@@ -15,7 +15,6 @@ import { RepService } from '../rep/rep.service';
 import { FormService } from '../form/form.service';
 import { FormmstService } from '../formmst/formmst.service';
 import { UsersService } from 'src/amec/users/users.service';
-import { MailService } from 'src/mail/mail.service';
 import { checkHostTest } from 'src/common/helpers/repo.helper';
 
 import {
@@ -28,6 +27,7 @@ import { getSafeFields } from 'src/common/utils/Fields.utils';
 import { showFlowDto } from './dto/show-flow.dto';
 import { count } from 'console';
 import { min } from 'class-validator';
+import { MailService } from 'src/common/services/mail/mail.service';
 
 @Injectable()
 export class FlowService {

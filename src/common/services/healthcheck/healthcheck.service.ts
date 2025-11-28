@@ -90,6 +90,6 @@ export class HealthcheckService implements OnModuleInit {
         this.checkIds();
         this.checkdailyIDS();
       }
-    }, 6000);
+    }, 600_000);
   }
 }

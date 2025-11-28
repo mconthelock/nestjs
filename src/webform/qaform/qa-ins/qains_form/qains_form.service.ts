@@ -15,15 +15,16 @@ import { QainsOAService } from '../qains_operator_auditor/qains_operator_auditor
 import { QaFileService } from '../../qa_file/qa_file.service';
 import { FlowService } from 'src/webform/flow/flow.service';
 import { UsersService } from 'src/amec/users/users.service';
-import { MailService } from 'src/mail/mail.service';
 import { OrgposService } from 'src/webform/orgpos/orgpos.service';
 import { ESCSUserService } from 'src/escs/user/user.service';
 import { ESCSUserItemService } from 'src/escs/user-item/user-item.service';
 import { ESCSItemStationService } from 'src/escs/item-station/item-station.service';
 import { ESCSUserItemStationService } from 'src/escs/user-item-station/user-item-station.service';
-import { PDFService } from 'src/pdf/pdf.service';
 import { ESCSUserFileService } from 'src/escs/user-file/user-file.service';
 import { ESCSUserAuthorizeService } from 'src/escs/user-authorize/user-authorize.service';
+import { MailService } from 'src/common/services/mail/mail.service';
+import { PDFService } from 'src/common/services/pdf/pdf.service';
+
 
 import { SearchQainsFormDto } from './dto/search-qains_form.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';

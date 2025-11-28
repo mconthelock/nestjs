@@ -19,10 +19,7 @@ import { SpModule } from './spprogram/sp.module';
 import { MktModule } from './marketing/mkt.module';
 import { JobOrderModule } from './joborder/joborder.module';
 import { ESCSModule } from './escs/escs.module';
-import { FilesModule } from './file/file.module';
-import { MailModule } from './mail/mail.module';
 import { AutomationModule } from './automation/automation.module';
-import { PDFModule } from './pdf/pdf.module';
 import { HradminModule } from './hradmin/hradmin.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { IdsModule } from './ids/ids.module';
@@ -31,6 +28,7 @@ import { ItgcModule } from './itgc/itgc.module';
 import { AS400Module } from './as400/as400.module';
 import { PackingModule } from './packing/packing.module';
 import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemical-section.module';
+import { HbdModule } from './hbd/hbd.module';
 
 @Module({
   imports: [
@@ -52,15 +50,13 @@ import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemic
     HradminModule,
     //JB 🤴
     JobOrderModule,
-    FilesModule,
     ESCSModule,
-    PDFModule,
-    MailModule,
     PackingModule,
     InvoiceModule,
     IdsModule,
     ItgcModule,
     ChemicalSectionModule,
+    HbdModule,
   ],
   providers: [HttpLoggingInterceptor],
 })

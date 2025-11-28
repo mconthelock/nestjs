@@ -12,16 +12,16 @@ import { QaFileModule } from '../../qa_file/qa_file.module';
 import { FlowModule } from 'src/webform/flow/flow.module';
 import { SequenceOrgModule } from 'src/webform/sequence-org/sequence-org.module';
 import { UsersModule } from 'src/amec/users/users.module';
-import { MailModule } from 'src/mail/mail.module';
 import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
 import { ESCSUserModule } from 'src/escs/user/user.module';
 import { ESCSUserItemModule } from 'src/escs/user-item/user-item.module';
 import { ESCSItemStationModule } from 'src/escs/item-station/item-station.module';
 import { ESCSUserItemStationModule } from 'src/escs/user-item-station/user-item-station.module';
-import { PDFModule } from 'src/pdf/pdf.module';
 import { ESCSUserFileModule } from 'src/escs/user-file/user-file.module';
 import { ESCSUserAuthorizeModule } from 'src/escs/user-authorize/user-authorize.module';
 import { ESCSUserSectionModule } from 'src/escs/user_section/user_section.module';
+import { MailModule } from 'src/common/services/mail/mail.module';
+import { PDFModule } from 'src/common/services/pdf/pdf.module';
 
 @Module({
   imports: [

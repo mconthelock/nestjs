@@ -7,7 +7,7 @@ import { RepModule } from '../rep/rep.module';
 import { FormModule } from '../form/form.module';
 import { UsersModule } from 'src/amec/users/users.module';
 import { FormmstModule } from '../formmst/formmst.module';
-import { MailModule } from 'src/mail/mail.module';
+import { MailModule } from 'src/common/services/mail/mail.module';
 
 @Module({
   imports: [

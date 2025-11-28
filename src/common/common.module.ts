@@ -24,6 +24,9 @@ import { SchedulerModule } from './scheduler/scheduler.module';
 import { LoggerModule } from './logger/logger.module';
 import { HealthcheckService } from './services/healthcheck/healthcheck.service';
 import { QrcodeModule } from './services/qrcode/qrcode.module';
+import { MailModule } from './services/mail/mail.module';
+import { PDFModule } from './services/pdf/pdf.module';
+import { FilesModule } from './services/file/file.module';
 
 @Module({
   imports: [
@@ -45,6 +48,9 @@ import { QrcodeModule } from './services/qrcode/qrcode.module';
     SchedulerModule,
     LoggerModule,
     QrcodeModule,
+    MailModule,
+    PDFModule,
+    FilesModule
   ],
   providers: [GenerateIdService, HealthcheckService],
   exports: [GenerateIdService],

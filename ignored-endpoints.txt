@@ -1,0 +1,10 @@
+# รายการ endpoints ที่ไม่ต้องการบันทึก log (ยกเว้น error logs)
+# หนึ่งบรรทัดต่อหนึ่ง endpoint
+# บรรทัดที่ขึ้นต้นด้วย # จะถูกละเว้น
+
+/logger/daily
+/logger/monthly
+/health
+/health/check
+/favicon.ico
+/gpreport/news

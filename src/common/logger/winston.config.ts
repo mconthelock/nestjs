@@ -2,6 +2,7 @@ import * as winston from 'winston';
 import stripAnsi from 'strip-ansi'; // npm i strip-ansi
 import chalk from 'chalk';
 import { requestNamespace } from '../../middleware/request-id.middleware';
+import { shouldIgnoreEndpoint } from './logger-ignore.config';
 const DailyRotateFile = require('winston-daily-rotate-file');
 
 const addRequestId = winston.format((info) => {
@@ -85,6 +86,18 @@ const onlyError = winston.format((info) => {
   return false;
 });
 
+// กรอง endpoints ที่ไม่ต้องการ log (ยกเว้น error)
+const filterIgnoredEndpoints = winston.format((info) => {
+  // ถ้าเป็น error log ให้ผ่านไปเสมอ
+  if (info.level === 'error') return info;
+
+  // ตรวจสอบว่าเป็น HTTP Request log และมี URL ที่ต้อง ignore หรือไม่
+  if (typeof info.url === 'string' && shouldIgnoreEndpoint(info.url)) {
+    return false; // ไม่บันทึก log
+  }
+
+  return info; // บันทึก log ปกติ
+});
 export const winstonConfig = {
   level: 'debug', // เพิ่ม global level
   format: winston.format.combine(
@@ -97,6 +110,7 @@ export const winstonConfig = {
     new winston.transports.Console({
       level: process.env.LOGGER_CONSOLE,
       format: winston.format.combine(
+        //filterIgnoredEndpoints(), // กรอง ignored endpoints
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         addRequestId(),
         ignoreTypeOrmEntities(),
@@ -129,6 +143,7 @@ export const winstonConfig = {
       maxFiles: '30d',
       level: process.env.LOGGER_FILE,
       format: winston.format.combine(
+        filterIgnoredEndpoints(), // กรอง ignored endpoints
         skipError(),
         stripColors(),
         ignoreTypeOrmEntities(),

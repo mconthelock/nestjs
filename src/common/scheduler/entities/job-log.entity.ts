@@ -18,7 +18,7 @@ export class JobExecutionLog {
   @Column()
   JOB_ID: string;
 
-  @Column()
+  @Column({ default: () => 'CURRENT_TIMESTAMP' })
   START_TIME: Date;
 
   @Column()

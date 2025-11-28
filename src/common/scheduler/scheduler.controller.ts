@@ -1,32 +1,35 @@
 import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { SchedulerService } from './scheduler.service';
 import { CreateJobDto } from './dto/create-scheduler.dto';
+import { UpdateSchedulerDto } from './dto/update-scheduler.dto';
+import { SearchSchedulerDto } from './dto/search-scheduler.dto';
 
 @Controller('scheduler')
 export class SchedulerController {
   constructor(private readonly schedulerService: SchedulerService) {}
 
-  // 1. สร้าง Job ใหม่ (Frontend เรียกเส้นนี้)
-  @Post()
+  @Post('create')
   create(@Body() createJobDto: CreateJobDto) {
     return this.schedulerService.createJob(createJobDto);
   }
 
-  // 2. ดูรายชื่อ Job ทั้งหมด
+  @Post('update')
+  update(@Body() updateJobDto: UpdateSchedulerDto) {
+    return this.schedulerService.updateJob(updateJobDto);
+  }
+
   @Get('jobs')
   findAllJobs() {
     return this.schedulerService.findAllJobs();
   }
 
-  // 3. ดู Logs (รองรับการ Filter ตาม jobId)
-  @Get('logs')
-  getLogs(@Query('jobId') jobId?: string) {
-    return this.schedulerService.getLogs(jobId);
+  @Post('run')
+  manualRun(@Body() data: UpdateSchedulerDto) {
+    return this.schedulerService.manualTrigger(data.ID);
   }
 
-  // 4. สั่งรัน Job ทันที (Manual Trigger)
-  @Post(':id/run')
-  manualRun(@Param('id') id: string) {
-    return this.schedulerService.manualTrigger(id);
+  @Post('logs')
+  getLogs(@Body() data: SearchSchedulerDto) {
+    return this.schedulerService.getLogs(data);
   }
 }

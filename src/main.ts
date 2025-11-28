@@ -51,8 +51,40 @@ async function bootstrap() {
       transform: true,
       whitelist: true, // ตัดฟิลด์ที่ไม่ได้ประกาศใน DTO ทิ้ง
       //   forbidNonWhitelisted: true,   // ถ้ามีฟิลด์แปลก → โยน 400 แทนการตัดทิ้ง
-      exceptionFactory: (errors) =>
-        new BadRequestException(errors.map((e) => e.constraints)),
+      exceptionFactory: (errors) => {
+        //Map Label Decorator ใน DTO แทนชื่อฟิลด์จริง ในข้อความ Error(ถ้ามี)
+        const customMessages = errors.map((error) => {
+          // 1. หาว่า field นี้มี @Label แปะไว้ไหม?
+          const targetPrototype = Object.getPrototypeOf(error.target);
+          const labelName = Reflect.getMetadata(
+            'custom:label',
+            targetPrototype,
+            error.property,
+          );
+
+          // 2. ถ้ามี @Label ให้ใช้ชื่อนั้น ถ้าไม่มีให้ใช้ชื่อ Field เดิม
+          const displayName = labelName || error.property;
+
+          // 3. ดึงข้อความ Error เดิมของ NestJS มา Replace ชื่อ
+          const constraints = error.constraints
+            ? Object.values(error.constraints).map((msg) => {
+                // replace ชื่อ field เดิม (เช่น NAME) เป็น alias (เช่น First Name)
+                return msg.replace(error.property, displayName);
+              })
+            : [];
+
+          return {
+            //field: error.property,
+            message: constraints, // ส่ง array ของ error message กลับไป
+          };
+        });
+        //new BadRequestException(errors.map((e) => e.constraints));
+        return new BadRequestException({
+          statusCode: 400,
+          message: customMessages,
+          error: 'Bad Request',
+        });
+      },
     }),
   );
 

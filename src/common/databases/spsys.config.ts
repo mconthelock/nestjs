@@ -24,7 +24,7 @@ if (process.env.HOST == 'AMEC') {
         __dirname + '/../../**/**/**/*.entity{.ts,.js}',
       ],
       synchronize: false,
-      //   logging: ['query'],
+      logging: ['query', 'error', 'schema', 'warn', 'info', 'log'],
       logger: new TypeOrmWinstonLogger(winstonLogger),
       retryAttempts: 5,
       retryDelay: 2000,
@@ -46,14 +46,16 @@ if (process.env.HOST == 'AMEC') {
   spsysConfig = {
     name: 'spsysConnection',
     imports: [],
-    inject: [ConfigService],
-    useFactory: async (config: ConfigService) => ({
+    inject: [ConfigService, WINSTON_MODULE_PROVIDER],
+    useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
       type: 'mysql',
       host: process.env.HOME_HOST,
       port: parseInt(process.env.HOME_PORT as string, 10),
       username: process.env.HOME_USER,
       password: process.env.HOME_PASSWORD,
       database: process.env.SPSYS_DATABASE,
+      logging: ['query', 'error', 'schema', 'warn', 'info', 'log'],
+      logger: new TypeOrmWinstonLogger(winstonLogger),
       entities: [
         __dirname + '/../../**/**/*.entity{.ts,.js}',
         __dirname + '/../../**/**/**/*.entity{.ts,.js}',

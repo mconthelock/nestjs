@@ -82,6 +82,7 @@ export class SchedulerService implements OnModuleInit {
   async loadAndScheduleJobs() {
     const jobs = await this.jobRepo.find({ where: { IS_ACTIVE: 1 } });
     jobs.forEach((job) => this.addCronJob(job));
+    console.log(`Job Schedule was loaded`);
   }
 
   private addCronJob(job: ScheduledJob) {

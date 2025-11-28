@@ -53,6 +53,17 @@ const skipSelectQuery = winston.format((info) => {
   return info;
 });
 
+const skipBlankReqID = winston.format((info) => {
+  if (
+    info.requestId === undefined ||
+    info.requestId === null ||
+    info.requestId === ''
+  ) {
+    return false;
+  }
+  return info;
+});
+
 const keyColors = {
   context: chalk.cyan,
   statusCode: chalk.magenta,
@@ -69,7 +80,13 @@ const skipError = winston.format((info) => {
   return info;
 });
 
+const onlyError = winston.format((info) => {
+  if (info.level === 'error') return info;
+  return false;
+});
+
 export const winstonConfig = {
+  level: 'debug', // เพิ่ม global level
   format: winston.format.combine(
     ignoreTypeOrmEntities(),
     winston.format.timestamp(),
@@ -83,6 +100,7 @@ export const winstonConfig = {
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         addRequestId(),
         ignoreTypeOrmEntities(),
+        skipBlankReqID(),
         winston.format.printf(
           ({ level, message, timestamp, requestId, ...meta }) => {
             if (level !== 'error')
@@ -114,7 +132,8 @@ export const winstonConfig = {
         skipError(),
         stripColors(),
         ignoreTypeOrmEntities(),
-        // skipSelectQuery(),
+        //skipSelectQuery(),
+        skipBlankReqID(),
         addRequestId(),
         winston.format.timestamp(),
         winston.format.uncolorize(),
@@ -132,8 +151,10 @@ export const winstonConfig = {
       maxFiles: '30d',
       level: process.env.LOGGER_ERROR,
       format: winston.format.combine(
+        onlyError(), // เขียนแค่ error logs
         winston.format.timestamp(),
         addRequestId(),
+        winston.format.uncolorize(), // ลบสีออก
         winston.format.json(),
       ),
     }),

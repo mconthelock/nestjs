@@ -1,9 +1,9 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 @Injectable()
-export class LoggerService implements OnModuleInit {
+export class HealthcheckService implements OnModuleInit {
   constructor(
     @InjectDataSource('docinvConnection')
     private readonly docinvDs: DataSource,
@@ -90,6 +90,6 @@ export class LoggerService implements OnModuleInit {
         this.checkIds();
         this.checkdailyIDS();
       }
-    }, 600_000);
+    }, 6000);
   }
 }

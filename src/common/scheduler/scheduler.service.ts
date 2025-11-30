@@ -43,6 +43,30 @@ export class SchedulerService implements OnModuleInit {
 
   async onModuleInit() {
     await this.loadAndScheduleJobs();
+
+    // เพิ่ม cron job บีบอัด logs เก่าทุกวันเวลา 00:30
+    this.addLogCompressionJob();
+  }
+
+  /** Cron job สำหรับบีบอัด logs เก่าอัตโนมัติ */
+  private addLogCompressionJob() {
+    const job = new CronJob('30 0 * * *', async () => {
+      this.logger.log('Running automatic log compression...');
+      try {
+        const response = await this.httpService.axiosRef.post(
+          'http://localhost:3000/logger/compress-old-logs',
+        );
+        this.logger.log(
+          `Log compression completed: ${JSON.stringify(response.data.summary)}`,
+        );
+      } catch (error) {
+        this.logger.error(`Log compression failed: ${error.message}`);
+      }
+    });
+
+    this.schedulerRegistry.addCronJob('log-compression', job);
+    job.start();
+    this.logger.log('Log compression cron job registered (daily at 00:30)');
   }
 
   /*** ตรวจสอบว่า URL endpoint มีอยู่จริงหรือไม่*/

@@ -139,7 +139,6 @@ export const winstonConfig = {
       filename: 'logs-%DATE%.log',
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
-      maxSize: '20m',
       maxFiles: '30d',
       level: process.env.LOGGER_FILE,
       format: winston.format.combine(
@@ -162,13 +161,12 @@ export const winstonConfig = {
       filename: 'error-%DATE%.log',
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
-      maxSize: '20m',
       maxFiles: '30d',
       level: process.env.LOGGER_ERROR,
       format: winston.format.combine(
         onlyError(), // เขียนแค่ error logs
-        winston.format.timestamp(),
         addRequestId(),
+        winston.format.timestamp(),
         winston.format.uncolorize(), // ลบสีออก
         winston.format.json(),
       ),

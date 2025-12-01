@@ -20,6 +20,8 @@ export class HbdService {
       const month = now('MM');
 
       const data = await this.usersService.findBirthday(month);
+
+      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxT67UJS6WipWfiI6VbUpOx9X44S6ngFzRm37SeZQfbQ-gzBsyl6lDKhID0RyI7CR5hDw/exec";
     //   console.log(data);
 
       for (const user of data) {

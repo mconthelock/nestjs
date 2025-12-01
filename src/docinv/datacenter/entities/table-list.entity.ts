@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('A_TABLE_LIST')
-export class ATableList {
+@Entity({ name: 'A_TABLE_LIST', schema: 'AMECMFG' })
+export class TableList {
   @PrimaryGeneratedColumn()
   ID: number;
 

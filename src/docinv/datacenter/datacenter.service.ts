@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ATableList } from './entities/a-table-list.entity';
+import { TableCheck } from './entities/table-check.entity';
 
 @Injectable()
 export class DatacenterService {
   constructor(
-    @InjectRepository(ATableList, 'amecConnection')
-    private readonly table: Repository<ATableList>,
+    @InjectRepository(TableCheck, 'amecConnection')
+    private readonly table: Repository<TableCheck>,
   ) {}
 
-  async findAll(): Promise<ATableList[]> {
+  async findAll() {
     return this.table.find();
   }
 }

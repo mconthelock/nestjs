@@ -27,8 +27,9 @@ import { ElmesModule } from './elmes/elmes.module';
 import { ItgcModule } from './itgc/itgc.module';
 import { AS400Module } from './as400/as400.module';
 import { PackingModule } from './packing/packing.module';
-import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemical-section.module';
 import { HbdModule } from './hbd/hbd.module';
+import { EarlyHeadMiddleware } from './middleware/early-head.middleware';
+import { SafetyModule } from './safety/safety.module';
 
 @Module({
   imports: [
@@ -55,7 +56,7 @@ import { HbdModule } from './hbd/hbd.module';
     InvoiceModule,
     IdsModule,
     ItgcModule,
-    ChemicalSectionModule,
+    SafetyModule,
     HbdModule,
   ],
   providers: [HttpLoggingInterceptor],
@@ -63,7 +64,7 @@ import { HbdModule } from './hbd/hbd.module';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(RequestIdMiddleware, IpLoggerMiddleware, RequestContextMiddleware)
+      .apply(EarlyHeadMiddleware, RequestIdMiddleware, RequestContextMiddleware, IpLoggerMiddleware)
       .forRoutes('*');
   }
 }

@@ -29,6 +29,7 @@ import { AS400Module } from './as400/as400.module';
 import { PackingModule } from './packing/packing.module';
 import { ChemicalSectionModule } from './safety/chemical/chemical-section/chemical-section.module';
 import { HbdModule } from './hbd/hbd.module';
+import { EarlyHeadMiddleware } from './middleware/early-head.middleware';
 
 @Module({
   imports: [
@@ -63,7 +64,7 @@ import { HbdModule } from './hbd/hbd.module';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(RequestIdMiddleware, IpLoggerMiddleware, RequestContextMiddleware)
+      .apply(EarlyHeadMiddleware, RequestIdMiddleware, RequestContextMiddleware, IpLoggerMiddleware)
       .forRoutes('*');
   }
 }

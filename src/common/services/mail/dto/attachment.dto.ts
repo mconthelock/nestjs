@@ -13,5 +13,9 @@ export class AttachmentDto {
 
   @IsOptional()
   @IsString()
-  path: string;
+  path?: string;
+
+  @IsOptional()
+  @IsString()
+  encoding?: string;
 }

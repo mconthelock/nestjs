@@ -20,7 +20,7 @@ export class HbdService {
       const month = now('MM');
 
       const data = await this.usersService.findBirthday(month);
-      console.log(data);
+    //   console.log(data);
 
       for (const user of data) {
         const key = `${user.SEMPENCODE}|${user.SEMPNO}`;
@@ -35,7 +35,14 @@ export class HbdService {
           <p>Wishing you a wonderful year ahead!</p>
           <p><img src="${qrCode}" alt="Birthday QR Code"/></p>
           <p>Best Regards,<br/>AMEC</p>`,
+          attachments:[
+            { 
+                filename: 'AMEC Birthday QR Code.png', 
+                content: qrCode.split(',')[1], // ตัดเอาเฉพาะ base64 string
+                encoding: 'base64' }
+          ]
         });
+        return
       }
     } catch (error) {
       status = false;

@@ -7,7 +7,7 @@ import { UpdateHbdDto } from './dto/update-hbd.dto';
 export class HbdController {
   constructor(private readonly hbdService: HbdService) {}
   
-  @Get('genQR')
+  @Post('genQR')
   async generateQR() {
     return await this.hbdService.generateQR();
   }

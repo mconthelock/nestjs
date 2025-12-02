@@ -51,6 +51,7 @@ export class FilesController {
     if (!fs.existsSync(body.path)) {
       throw new BadRequestException('File not found on disk');
     }
+
     const fileContent = fs.readFileSync(body.path);
     const base64String = fileContent.toString('base64');
 

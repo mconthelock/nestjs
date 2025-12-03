@@ -1,6 +1,16 @@
-import { Controller, Get, Param, Query, Res, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  Res,
+  Post,
+  Body,
+  BadRequestException,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { getBase64Image } from 'src/common/utils/files.utils';
+import * as fs from 'fs';
 import { FileService } from './file.service';
 import { FileDto, ListDto } from './dto/file.dto';
 
@@ -31,5 +41,23 @@ export class FilesController {
   @Post('listAll')
   async listAll(@Body() dto: ListDto) {
     return await this.fileService.listAllRecursively(dto);
+  }
+
+  @Post('template/read')
+  async exportTemplate(
+    @Body() body: { path: string; name: string },
+    @Res() res: Response,
+  ) {
+    if (!fs.existsSync(body.path)) {
+      throw new BadRequestException('File not found on disk');
+    }
+
+    const fileContent = fs.readFileSync(body.path);
+    const base64String = fileContent.toString('base64');
+
+    return res.json({
+      filename: body.name,
+      content: base64String,
+    });
   }
 }

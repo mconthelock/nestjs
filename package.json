@@ -59,6 +59,7 @@
     "exceljs": "^4.4.0",
     "express": "^5.1.0",
     "graphql": "^16.11.0",
+    "https-proxy-agent": "^7.0.6",
     "ibm_db": "^3.3.2",
     "ioredis": "^5.8.2",
     "jszip": "^3.10.1",

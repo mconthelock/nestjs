@@ -39,7 +39,7 @@ export class OrdermainService {
   async sproj(req: SearchOrdermainDto) {
     return await this.ds.createQueryBuilder()
     .from('TMARKET_TEMP', 'A')
-    .leftJoin('TMAINTAINTYPE', 'B', 'SERIES = ABBREVIATION')
+    .leftJoin('TMAINTAINTYPE', 'B', 'SERIES = ABBREVIATION AND A.ISERIES = B.REFERXML')
     .select('prj_no, prj_name, spec, DETAIL AS MODEL ')
     .addSelect(' max(cust_rqs) ', 'EXPPLAN')
     .addSelect(' sum(QTY)', 'TOTUNIT')

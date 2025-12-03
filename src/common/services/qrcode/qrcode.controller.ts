@@ -237,6 +237,7 @@ export class QrcodeController {
     @Query('margin') margin?: string,
     @Query('dark') dark?: string,
     @Query('light') light?: string,
+    @Query('comname') comname?: string,
   ) {
     try {
       if (!text) {
@@ -258,7 +259,10 @@ export class QrcodeController {
       const svgString = await this.qrcodeService.generateSVG(text, options);
 
       res.setHeader('Content-Type', 'image/svg+xml');
-      res.setHeader('Content-Disposition', `inline; filename="qrcode.svg"`);
+      res.setHeader(
+        'Content-Disposition',
+        `inline; filename="${comname || 'qrcode'}.svg"`,
+      );
       res.send(svgString);
     } catch (error) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

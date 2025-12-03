@@ -190,6 +190,7 @@ export class QrcodeController {
     @Query('margin') margin?: string,
     @Query('dark') dark?: string,
     @Query('light') light?: string,
+    @Query('comname') comname?: string,
   ) {
     try {
       if (!text) {
@@ -211,7 +212,10 @@ export class QrcodeController {
       const buffer = await this.qrcodeService.generateBuffer(text, options);
 
       res.setHeader('Content-Type', 'image/png');
-      res.setHeader('Content-Disposition', `inline; filename="qrcode.png"`);
+      res.setHeader(
+        'Content-Disposition',
+        `inline; filename="${comname || 'qrcode'}.png"`,
+      );
       res.send(buffer);
     } catch (error) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

@@ -17,7 +17,7 @@ export class HbdService {
     private readonly usersService: UsersService,
     private readonly mailService: MailService,
   ) {}
-  private readonly GOOGLE_SCRIPT_URL: string =
+  private readonly GOOGLE_SCRIPT_URL: string = process.env.HBD_SCRIPT_URL ||
     'https://script.google.com/macros/s/AKfycbxKsd5Iy8GbKqYDZ3MFfh1rFkJOgutVpIr8we1dARuka7i1cDYBuaSU4Q3pSqIlszhAOA/exec';
 
   private readonly html = (body: string) => `<!DOCTYPE html>
@@ -55,6 +55,7 @@ export class HbdService {
     var message = 'Insert user to Google Sheet successfully';
     const log = [];
     var data = [];
+    const year = Number(now('YYYY'))
     try {
       log.push(`Start send QR Code at ${now('DD/MM/YYYY HH:mm:ss')}`);
       log.push(`================================================`);
@@ -66,12 +67,30 @@ export class HbdService {
       log.push(`Found ${users.length} users with birthdays in month: ${month}`);
       data = users;
 
+      // backup sheet
+      if(Number(month) == 1){
+        log.push(`================================================`);
+        log.push(`Backing up Google Sheet for year: ${year - 1}...`);
+        const bk = await this.callGoogleScript({
+          action: 'backup',
+          year: year,
+        });
+        if (bk && !bk.status) {
+          log.push(`Failed to backup Google Sheet: ${bk.message}`);
+        }else{
+          log.push(`Backup Google Sheet for year: ${year - 1} completed successfully`);
+        }
+        log.push(`================================================`);
+      }
+
       // insert user to Google Sheet
       if (insert) {
         log.push(`Inserting users to Google Sheet...`);
         const res = await this.callGoogleScript({
           action: 'insert',
           data: users,
+          month: month,
+          year: year,
         });
         if (res && !res.status) {
           log.push(`Failed to insert user to Google Sheet: ${res.message}`);
@@ -104,7 +123,7 @@ export class HbdService {
         await this.sendReport({
           month: Number(month) == 1 ? 12 : Number(month) - 1,
           // month: Number(1) == 1 ? 12 : Number(month) - 1, // test for January
-          year: Number(now('YYYY')),
+          year: year,
           empno: '02013', // HR empno
         }, log);
         message = `Send report to HR successfully`;

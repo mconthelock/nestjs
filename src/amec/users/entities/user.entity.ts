@@ -82,6 +82,9 @@ export class User {
   @Column()
   NTELNO: number;
 
+  @Column()
+  BIRTHDAY: Number;
+
   @OneToOne(() => Form, (form) => form.VINPUTER)
   @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'VINPUTER' })
   creator: User;

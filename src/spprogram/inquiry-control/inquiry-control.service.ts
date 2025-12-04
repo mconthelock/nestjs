@@ -16,7 +16,19 @@ export class InquiryControlService {
     return this.ctrl.find();
   }
 
-  update(updateDto: UpdateControllerDto) {
-    // Update logic here
+  async update(updateDto: UpdateControllerDto) {
+    const inqs = await this.ctrl.find({
+      where: {
+        CNT_PREFIX: updateDto.CNT_PREFIX,
+        CNT_AGENT: updateDto.CNT_AGENT,
+        CNT_TRADER: updateDto.CNT_TRADER,
+      },
+    });
+    await this.ctrl.update(inqs[0], updateDto);
+    return this.ctrl.findOneBy({
+      CNT_PREFIX: updateDto.CNT_PREFIX,
+      CNT_AGENT: updateDto.CNT_AGENT,
+      CNT_TRADER: updateDto.CNT_TRADER,
+    });
   }
 }

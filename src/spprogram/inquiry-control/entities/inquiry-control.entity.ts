@@ -11,14 +11,14 @@ export class InquiryControl {
   CNT_TRADER: string;
 
   @Column()
-  CNT_QUOTATION: string;
+  CNT_QUOTATION: number;
 
   @Column()
-  CNT_TERM: string;
+  CNT_TERM: number;
 
   @Column()
-  CNT_WEIGHT: string;
+  CNT_WEIGHT: number;
 
   @Column()
-  CNT_METHOD: string;
+  CNT_METHOD: number;
 }

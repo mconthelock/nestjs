@@ -1,34 +1,46 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ExpLocalPdmService } from './exp-local-pdm.service';
-import { CreateExpLocalPdmDto } from './dto/create-exp-local-pdm.dto';
-import { UpdateExpLocalPdmDto } from './dto/update-exp-local-pdm.dto';
+import { SearchExpLocalPdmDto } from './dto/search-exp-local-pdm.dto';
 
 @Controller('exp-local-pdm')
 export class ExpLocalPdmController {
   constructor(private readonly expLocalPdmService: ExpLocalPdmService) {}
 
-  @Post()
-  create(@Body() createExpLocalPdmDto: CreateExpLocalPdmDto) {
-    return this.expLocalPdmService.create(createExpLocalPdmDto);
+  @Post('Y/melina') // 1.1
+  async yMelina(@Body() dto: SearchExpLocalPdmDto) {
+    return await this.expLocalPdmService.yMelina(dto);
   }
 
-  @Get()
-  findAll() {
-    return this.expLocalPdmService.findAll();
+  @Post('Y/released') // 1.2
+  async yReleased(@Body() dto: SearchExpLocalPdmDto) {
+    return await this.expLocalPdmService.yReleased(dto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.expLocalPdmService.findOne(+id);
+  @Post('Y/melina/notReleased') // 1.3
+  async yMelinaNotReleased(@Body() dto: SearchExpLocalPdmDto) {
+    return await this.expLocalPdmService.yMelinaNotReleased(dto);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateExpLocalPdmDto: UpdateExpLocalPdmDto) {
-    return this.expLocalPdmService.update(+id, updateExpLocalPdmDto);
+  @Post('Y/notReleased') // 1.4
+  async yNotReleased() {
+    return await this.expLocalPdmService.yNotReleased();
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.expLocalPdmService.remove(+id);
+  @Post('KB/new') // 2.1
+  async kbNew(@Body() dto: SearchExpLocalPdmDto) {
+    return await this.expLocalPdmService.kbNew(dto);
+  }
+
+  @Post('KB/revise') // 2.2
+  async kbRevise(@Body() dto: SearchExpLocalPdmDto) {
+    return await this.expLocalPdmService.kbRevise(dto);
   }
 }

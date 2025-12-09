@@ -17,6 +17,10 @@ export class VPSController {
   async testLog(
     @Param('vis') vis: string
   ): Promise<any> {
+    // const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // // หน่วงเวลา 20 วินาที
+    // await sleep(20000);
     const data = await this.vpsService.checkVIS(vis, '15234', '0');
     return JSON.stringify(data, null, 2);
   }

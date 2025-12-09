@@ -4,11 +4,11 @@ import { PackUserInfoDto } from './pack-user-info.dto';
 
 export class PackLoginResponseDto {
   @ApiProperty({ 
-    enum: ['success', 'error'], 
+    enum: ['success', 'error', 'warning', 'info'], 
     description: 'Login status: success or error' 
   })
-  @IsEnum(['success', 'error'])
-  status: 'success' | 'error';
+  @IsEnum(['success', 'error', 'warning', 'info'])
+  status: 'success' | 'error' | 'warning' | 'info';
 
   @ApiProperty({ description: 'Message for the login result' })
   @IsString()

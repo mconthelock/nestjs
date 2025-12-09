@@ -60,11 +60,11 @@ export class VPSService {
         case '99':
           return await this.listPIS(vis, userId, true);
         default:
-          return { status:d.errcode, message:d.errmsg };
+          return { status:d.errcode === '-2' ? 'info' : 'error', message:d.errmsg };
       }
     } catch (error) {
       await this.keepSqlErr('CheckVISinfo', error.message, 1, userId);
-      throw new InternalServerErrorException(error.message);
+      return { status:'error', message:error.message }
     }
   }
 
@@ -84,7 +84,7 @@ export class VPSService {
       if (d.errstate === '0'){
         return await this.listPIS(vis, userId, false);
       }else{
-        return { status:d.errstate, message:d.errmsg }
+        return { status:'info', message:d.errmsg }
       }
     } catch (error) {
       throw new Error(error.message);
@@ -104,7 +104,7 @@ export class VPSService {
     try {
       const result = await this.db.query('exec GetListPIS @0,@1', [vis, userId]);
       if (result.length === 0){
-        return { status:'error', message:'ไม่พบรายการ VPS กรุณาสแกน VIS ใหม่อีกครั้ง' };
+        return { status:'info', message:'ไม่พบรายการ VPS กรุณาสแกน VIS ใหม่อีกครั้ง' };
       } 
 
       if (!('ordernoref' in result[0])) {

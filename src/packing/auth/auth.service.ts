@@ -27,7 +27,7 @@ export class AuthService {
   async validateUser(uid: string, ip: string): Promise<PackLoginResponseDto> {
     try {
       if (!/^\d+$/.test(uid)) {
-        return { status: 'error', message: 'รหัสพนักงานต้องเป็นตัวเลขเท่านั้น', user: null };
+        return { status: 'info', message: 'รหัสพนักงานต้องเป็นตัวเลขเท่านั้น', user: null };
       }
 
       const sessionId = this.generateLogId();
@@ -40,7 +40,7 @@ export class AuthService {
         const user: PackUserInfoDto = { userId, userName, useLocaltb, sessionId };
         return { status: 'success', message: 'Login success', user };
       } else {
-        return { status: 'error', message: d.errormsg, user: null };
+        return { status: 'info', message: d.errormsg, user: null };
       }
     } catch (error) {
       throw new InternalServerErrorException('Database error: ' + error.message);
@@ -74,7 +74,7 @@ export class AuthService {
    * @return  {string} Decoded Employee ID (5 digits)
    */
   decodeID(uid: number): string {
-    const empno = Math.floor(uid / 4) - 92;
+    const empno = (uid / 4) - 92;
     return empno.toString().padStart(5, '0');
   }
 

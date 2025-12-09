@@ -18,11 +18,11 @@ export class PackItemRowDto {
 
 export class PackItemDto {
   @ApiProperty({
-    enum: ['success', 'error'],
-    description: 'Status of VPS result (success or error)',
+    enum: ['success', 'error', 'warning', 'info'],
+    description: 'Status of VPS result',
   })
-  @IsEnum(['success', 'error'])
-  status: 'success' | 'error';
+  @IsEnum(['success', 'error', 'warning', 'info'])
+  status: 'success' | 'error' | 'warning' | 'info';
 
   @ApiProperty({ description: 'Result message' })
   @IsString()

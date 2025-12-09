@@ -49,6 +49,15 @@ export class QrcodeService {
    */
   async generateBuffer(text: string, options?: QRCodeOptions): Promise<Buffer> {
     try {
+      // แปลง escape sequences เช่น \r, \n, \t ให้เป็นตัวอักษรจริง
+      const processedText = text
+        .replace(/\\r/g, '\r')
+        .replace(/\\n/g, '\n')
+        .replace(/\\t/g, '\t')
+        .replace(/\\b/g, '\b')
+        .replace(/\\f/g, '\f')
+        .replace(/\\v/g, '\v')
+        .replace(/\\\\/g, '\\');
       const qrOptions = {
         width: options?.width || 256,
         margin: options?.margin || 2,
@@ -59,7 +68,7 @@ export class QrcodeService {
         errorCorrectionLevel: options?.errorCorrectionLevel || 'M',
       };
 
-      const buffer = await QRCode.toBuffer(text, qrOptions);
+      const buffer = await QRCode.toBuffer(processedText, qrOptions);
       return buffer;
     } catch (error) {
       throw new Error(`Failed to generate QR Code buffer: ${error.message}`);

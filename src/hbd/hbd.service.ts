@@ -226,11 +226,11 @@ export class HbdService {
   //prettier-ignore
   async sendMailReport( user: any, attachments: any, month: number, year: number, log?: string[]) {
     const name = user.STNAME;
-    const email = user.SRECMAIL;
+    const email = process.env.NODE_ENV != 'production' ? process.env.MAIL_ADMIN : user.SRECMAIL;
     try{
       const sendmail = await this.mailService.sendMail({
         from: `AMECHBD <amechbd@mitsubishielevatorasia.co.th>`,
-        // to: email,
+        to: email,
         subject: `Happy Birthday from AMEC (รายงาน) ประจำเดือน ${month} ปี ${year}`,
         html: this.html(`<p>เรียน คุณ ${name}</p>
         <div>ตามที่ท่านได้ทำการร้องขอรายงานข้อมูลวันเกิดพนักงานผ่านระบบ AMEC HBD เราขอส่งรายงานดังกล่าวมาให้ท่านตามไฟล์แนบในอีเมลนี้<br> หากท่านมีคำถามหรือข้อสงสัยเพิ่มเติมเกี่ยวกับรายงานนี้ กรุณาติดต่อผู้ดูแลระบบ เพื่อขอความช่วยเหลือ</div>
@@ -252,17 +252,20 @@ export class HbdService {
   async sendMailQR(user: any, log?: string[]) {
     const key = `${user.SEMPENCODE}|${user.SEMPNO}|${Number(String(user.BIRTHDAY).substring(4,6))}`;
     const name = user.STNAME;
-    const email = user.MEMEML;
+    const email = process.env.NODE_ENV != 'production' ? process.env.MAIL_ADMIN : user.MEMEML;
     try {
       const qrCode = await this.qrcodeService.generateDataURL(key);
+      const base64Data = qrCode.split(',')[1]; // ถ้า qrCode เป็น data URI
+      const imgBuffer = Buffer.from(base64Data, 'base64');
+      const cidName = 'birthday_qr@amec';
       const sendmail = await this.mailService.sendMail({
         from: `AMECHBD <amechbd@mitsubishielevatorasia.co.th>`,
-        // to: email,
+        to: email,
         subject: 'Happy Birthday from AMEC (คูปองวันเกิด)',
         html: this.html(`<p>เรียน คุณ ${name}</p>
         <p>สุขสันต์วันเกิด! ขอให้มีความสุขมากๆ ในวันพิเศษนี้ ทาง AMEC ขอส่งคูปองวันเกิดพิเศษให้ท่านตามไฟล์แนบในอีเมลนี้</p>
         <p>ขอให้ท่านมีความสุขในปีที่จะมาถึง!</p>
-        <p><img src="${qrCode}" alt="Birthday QR Code" /></p>
+        <p><img src="cid:${cidName}" alt="Birthday QR Code" /></p>
         <b>ขอแสดงความนับถือ</b>
         <p>หมายเหตุ :</p>
         <ul>
@@ -277,6 +280,12 @@ export class HbdService {
             filename: 'AMEC Birthday QR Code.png',
             content: qrCode.split(',')[1], // ตัดเอาเฉพาะ base64 string
             encoding: 'base64',
+          },
+          {
+            filename: 'AMEC Birthday QR Code.png',
+            content: imgBuffer,
+            cid: cidName,
+            encoding: 'image/png',
           },
         ],
       });

@@ -8,12 +8,17 @@ export class AttachmentDto {
 
   // content อาจจะเป็น base64 string หรือ path → เอาเป็น string ไปก่อน
   @IsOptional()
-  @IsString()
-  content: string;
+//   @IsString()
+  content: string | Buffer;
 
   @IsOptional()
   @IsString()
   path?: string;
+
+  @IsOptional()
+  @IsString()
+  cid?: string;
+
 
   @IsOptional()
   @IsString()

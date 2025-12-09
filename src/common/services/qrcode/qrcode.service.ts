@@ -34,7 +34,8 @@ export class QrcodeService {
         errorCorrectionLevel: options?.errorCorrectionLevel || 'M',
       };
 
-      const dataURL = await QRCode.toDataURL(text, qrOptions);
+      const processedText = await this.processedText(text);
+      const dataURL = await QRCode.toDataURL(processedText, qrOptions);
       return dataURL;
     } catch (error) {
       throw new Error(`Failed to generate QR Code: ${error.message}`);
@@ -50,14 +51,6 @@ export class QrcodeService {
   async generateBuffer(text: string, options?: QRCodeOptions): Promise<Buffer> {
     try {
       // แปลง escape sequences เช่น \r, \n, \t ให้เป็นตัวอักษรจริง
-      const processedText = text
-        .replace(/\\r/g, '\r')
-        .replace(/\\n/g, '\n')
-        .replace(/\\t/g, '\t')
-        .replace(/\\b/g, '\b')
-        .replace(/\\f/g, '\f')
-        .replace(/\\v/g, '\v')
-        .replace(/\\\\/g, '\\');
       const qrOptions = {
         width: options?.width || 256,
         margin: options?.margin || 2,
@@ -68,6 +61,7 @@ export class QrcodeService {
         errorCorrectionLevel: options?.errorCorrectionLevel || 'M',
       };
 
+      const processedText = await this.processedText(text);
       const buffer = await QRCode.toBuffer(processedText, qrOptions);
       return buffer;
     } catch (error) {
@@ -93,7 +87,8 @@ export class QrcodeService {
         errorCorrectionLevel: options?.errorCorrectionLevel || 'M',
       };
 
-      const svgString = await QRCode.toString(text, {
+      const processedText = await this.processedText(text);
+      const svgString = await QRCode.toString(processedText, {
         type: 'svg',
         ...qrOptions,
       });
@@ -165,5 +160,16 @@ export class QrcodeService {
   ): Promise<string> {
     const wifiString = `WIFI:T:${security};S:${ssid};P:${password};H:${hidden ? 'true' : 'false'};;`;
     return this.generateDataURL(wifiString, options);
+  }
+
+  async processedText(text: string) {
+    return text
+      .replace(/\\r/g, '\r')
+      .replace(/\\n/g, '\n')
+      .replace(/\\t/g, '\t')
+      .replace(/\\b/g, '\b')
+      .replace(/\\f/g, '\f')
+      .replace(/\\v/g, '\v')
+      .replace(/\\\\/g, '\\');
   }
 }

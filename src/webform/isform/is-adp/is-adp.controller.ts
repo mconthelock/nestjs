@@ -16,6 +16,7 @@ import { UpdateIsAdpDto } from './dto/update-is-adp.dto';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { Request } from 'express';
 import { getClientIP } from 'src/common/utils/ip.utils';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Controller('isform/is-adp')
 export class IsAdpController {
@@ -32,5 +33,10 @@ export class IsAdpController {
   ) {
     const ip = getClientIP(req);
     return await this.isAdpService.create(dto, file, ip, this.path);
+  }
+
+  @Post('getData')
+    async getData(@Body() dto: FormDto) {
+    return await this.isAdpService.getData(dto);
   }
 }

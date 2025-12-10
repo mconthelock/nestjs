@@ -7,6 +7,7 @@ import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { FormService } from 'src/webform/form/form.service';
 import { deleteFile, moveFileFromMulter } from 'src/common/utils/files.utils';
 import { IsFileService } from '../is-file/is-file.service';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Injectable()
 export class IsAdpService {
@@ -19,17 +20,40 @@ export class IsAdpService {
     private readonly isFileService: IsFileService,
   ) {}
 
+  async getData(dto: FormDto) {
+    // return this.dataSource.createQueryBuilder().from('AMEC.PDIVISION', 'a').getRawMany();
+    return this.dataSource.createQueryBuilder()
+    .from('ISADP_FORM', 'a')
+    .select([
+        '"a"."NFRMNO"', 
+        '"a"."VORGNO"', 
+        '"a"."CYEAR"', 
+        '"a"."CYEAR2"', 
+        '"a"."NRUNNO"', 
+        '"a"."PLANYEAR"',
+        '"a"."REQ_DIV"',
+        '"a"."USER_REQ"',
+        '"a"."DEV_PLAN"',
+        '"a"."MANHOUR" as "MH"',
+        '"a"."COST"',
+        '"b"."SDIV"'
+    ])
+    .where('a.NFRMNO = :NFRMNO', { NFRMNO: dto.NFRMNO })
+    .andWhere('a.VORGNO = :VORGNO', { VORGNO: dto.VORGNO })
+    .andWhere('a.CYEAR = :CYEAR', { CYEAR: dto.CYEAR })
+    .andWhere('a.CYEAR2 = :CYEAR2', { CYEAR2: dto.CYEAR2 })
+    .andWhere('a.NRUNNO = :NRUNNO', { NRUNNO: dto.NRUNNO })
+    .leftJoin(qb => qb.from('AMEC.PDIVISION', 'b'), 'b', 'a.REQ_DIV ="b"."SDIVCODE"')
+    .orderBy('a.REQ_DIV', 'ASC')
+    .getRawMany();
+  }
+
   async create(
     dto: CreateIsAdpDto,
     file: Express.Multer.File,
     ip: string,
     path: string,
   ) {
-    // Implement the logic to create a new IsAdp record
-    console.log(file, ip, path);
-
-    // return { message: 'IsAdp record created', data: dto };
-
     const queryRunner = this.dataSource.createQueryRunner();
     let movedTargets: string; // เก็บ path ปลายทางที่ย้ายสำเร็จ
     try {
@@ -53,7 +77,7 @@ export class IsAdpService {
       if (!createForm.status) {
         throw new Error(createForm.message.message);
       }
-
+      // 2. บันทึกข้อมูล IS-ADP
       const form = {
         NFRMNO: dto.NFRMNO,
         VORGNO: dto.VORGNO,
@@ -64,12 +88,12 @@ export class IsAdpService {
 
       await this.insert(form, dto.data, queryRunner);
 
-      // 2. ย้ายไฟล์ไปยังปลายทาง
+      // 3. ย้ายไฟล์ไปยังปลายทาง
       const formNo = await this.formService.getFormno(form); // Get the form number
       const destination = path + '/' + formNo; // Get the destination path
       const moved = await moveFileFromMulter(file, destination);
       movedTargets = moved.path;
-      // 3. บันทึก DB (ใช้ชื่อไฟล์ที่ "ปลายทางจริง" เพื่อความตรงกัน)
+      // 4. บันทึก DB (ใช้ชื่อไฟล์ที่ "ปลายทางจริง" เพื่อความตรงกัน)
       await this.isFileService.insert(
         {
           ...form,

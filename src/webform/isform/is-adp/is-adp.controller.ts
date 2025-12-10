@@ -1,34 +1,36 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  Req,
+  UploadedFile,
+} from '@nestjs/common';
 import { IsAdpService } from './is-adp.service';
 import { CreateIsAdpDto } from './dto/create-is-adp.dto';
 import { UpdateIsAdpDto } from './dto/update-is-adp.dto';
+import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
+import { Request } from 'express';
+import { getClientIP } from 'src/common/utils/ip.utils';
 
-@Controller('is-adp')
+@Controller('isform/is-adp')
 export class IsAdpController {
   constructor(private readonly isAdpService: IsAdpService) {}
 
-  @Post()
-  create(@Body() createIsAdpDto: CreateIsAdpDto) {
-    return this.isAdpService.create(createIsAdpDto);
-  }
+  private readonly path = `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/IS/ISADP/`;
 
-  @Get()
-  findAll() {
-    return this.isAdpService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.isAdpService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateIsAdpDto: UpdateIsAdpDto) {
-    return this.isAdpService.update(+id, updateIsAdpDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.isAdpService.remove(+id);
+  @Post('insert')
+  @UseInterceptors(getFileUploadInterceptor('file'))
+  async insert(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: CreateIsAdpDto,
+    @Req() req: Request,
+  ) {
+    const ip = getClientIP(req);
+    return await this.isAdpService.create(dto, file, ip, this.path);
   }
 }

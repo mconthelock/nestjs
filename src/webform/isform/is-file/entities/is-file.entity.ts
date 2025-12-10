@@ -1,10 +1,10 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({
-  name: 'ISADP_FORM',
+  name: 'IS_FILE',
   schema: 'WEBFORM',
 })
-export class IsAdp {
+export class IsFile {
   @PrimaryColumn()
   NFRMNO: number;
 
@@ -21,20 +21,32 @@ export class IsAdp {
   NRUNNO: number;
 
   @PrimaryColumn()
-  PLANYEAR: number;
-
-  @PrimaryColumn()
-  REQ_DIV: string;
+  FILE_ID: number;
 
   @Column()
-  USER_REQ: number;
+  FILE_ONAME: string;
 
   @Column()
-  DEV_PLAN: number;
+  FILE_FNAME: string;
 
   @Column()
-  MANHOUR: number;
+  FILE_USERCREATE: string;
 
   @Column()
-  COST: number;
+  FILE_DATECREATE: Date;
+
+  @Column()
+  FILE_USERUPDATE: string;
+
+  @Column()
+  FILE_DATEUPDATE: Date;
+
+  @Column()
+  FILE_TYPE: number;
+
+  @Column()
+  FILE_STATUS: number;
+
+  @Column()
+  FILE_PATH: string;
 }

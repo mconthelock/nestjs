@@ -10,8 +10,9 @@ import { CrdevicemstModule } from './crdevicemst/crdevicemst.module';
 import { IsTidModule } from './is-tid/is-tid.module';
 import { IsWorkloadModule } from './is-workload/is-workload.module';
 import { IsAdpModule } from './is-adp/is-adp.module';
+import { IsFileModule } from './is-file/is-file.module';
 
 @Module({
-  imports: [IsDevModule, IsForm3Module, IsMoModule, IsForm1Module, IsForm4Module, Form1ObjectiveModule, Form1WageModule, CrdevicemstModule, IsTidModule, IsWorkloadModule, IsAdpModule],
+  imports: [IsDevModule, IsForm3Module, IsMoModule, IsForm1Module, IsForm4Module, Form1ObjectiveModule, Form1WageModule, CrdevicemstModule, IsTidModule, IsWorkloadModule, IsAdpModule, IsFileModule],
 })
 export class ISFormModule {}

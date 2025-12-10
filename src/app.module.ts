@@ -64,7 +64,12 @@ import { SafetyModule } from './safety/safety.module';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(EarlyHeadMiddleware, RequestIdMiddleware, RequestContextMiddleware, IpLoggerMiddleware)
+      .apply(
+        EarlyHeadMiddleware,
+        RequestIdMiddleware,
+        RequestContextMiddleware,
+        IpLoggerMiddleware,
+      )
       .forRoutes('*');
   }
 }

@@ -50,7 +50,7 @@ import { FilesModule } from './services/file/file.module';
     QrcodeModule,
     MailModule,
     PDFModule,
-    FilesModule
+    FilesModule,
   ],
   providers: [GenerateIdService, HealthcheckService],
   exports: [GenerateIdService],

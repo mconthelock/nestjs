@@ -15,6 +15,7 @@ import { ModulesModule } from './modules/modules.module';
 import { RevisionModule } from './revision/revision.module';
 import { SourceModule } from './source/source.module';
 import { DatacenterModule } from './datacenter/datacenter.module';
+import { WorkAnnualDevPlanModule } from './work-annual-dev-plan/work-annual-dev-plan.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { DatacenterModule } from './datacenter/datacenter.module';
     RevisionModule,
     SourceModule,
     DatacenterModule,
+    WorkAnnualDevPlanModule,
   ],
 })
 export class DocinvModule {}

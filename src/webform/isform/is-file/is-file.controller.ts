@@ -1,11 +1,7 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
 } from '@nestjs/common';
 import { IsFileService } from './is-file.service';
 import { CreateIsFileDto } from './dto/create-is-file.dto';

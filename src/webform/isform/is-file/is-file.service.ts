@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreateIsFileDto } from './dto/create-is-file.dto';
-import { UpdateIsFileDto } from './dto/update-is-file.dto';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { IsFile } from './entities/is-file.entity';
-import { FILE } from 'dns';
 import { SearchIsFileDto } from './dto/search-is-file.dto';
 
 @Injectable()

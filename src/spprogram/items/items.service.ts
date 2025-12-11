@@ -35,6 +35,7 @@ export class ItemsService {
 
     Object.entries(query).forEach(([key, value]) => {
       if (!value) return;
+      console.log(key, value);
 
       if (key === 'ITEM_NAME') {
         qb.andWhere(`item.${key} LIKE :${key}`, { [key]: `${value}%` });

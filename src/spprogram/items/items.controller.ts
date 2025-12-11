@@ -7,6 +7,7 @@ import {
   UploadedFiles,
   BadRequestException,
   Get,
+  Param,
 } from '@nestjs/common';
 import { ItemsService } from './items.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -99,7 +100,7 @@ export class ItemsController {
   }
 
   @Get('photo/:id')
-  async getPhoto(@Body('id') id: number, @Body() res: Response) {
+  async getPhoto(@Param('id') id: number, @Body() res: Response) {
     const ds = await this.items.findAll({ ITEM_ID: id });
     const filePath = `${process.env.SP_FILE_PATH}/directsales/${ds[0].ITEM_THUMB}`;
     if (fs.existsSync(filePath)) {

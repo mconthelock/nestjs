@@ -26,7 +26,8 @@ export class createPriceListDto {
   @IsString()
   STATUS: string;
 
-  @IsString()
+  @Type(() => Date)
+  @IsDate()
   STARTIN: string;
 
   @Type(() => Number)

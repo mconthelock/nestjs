@@ -16,7 +16,7 @@ export class IsFileService {
     private dataSource: DataSource,
   ) {}
 
-  async getIsFile(dto: SearchIsFileDto, queryRunner?: QueryRunner) {
+  async getFile(dto: SearchIsFileDto, queryRunner?: QueryRunner) {
     const repo = queryRunner
       ? queryRunner.manager.getRepository(IsFile)
       : this.isFileRepo;

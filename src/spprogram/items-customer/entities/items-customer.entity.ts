@@ -10,8 +10,21 @@ export class ItemsCustomer {
   @PrimaryColumn()
   ITEMS_ID: number;
 
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  CREATE_AT: Date;
+
   @Column()
   CREATE_BY: string;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
+  UPDATE_AT: Date;
 
   @Column()
   UPDATE_BY: string;

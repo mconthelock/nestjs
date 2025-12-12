@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 
+import { updateItemCustomerDto } from './dto/update-item-customer.dto';
+
 @Injectable()
 export class ItemsCustomerService {
   constructor(
@@ -12,5 +14,9 @@ export class ItemsCustomerService {
 
   findAll(data: any) {
     return this.itemscus.find({ relations: ['prices'] });
+  }
+
+  update(data: updateItemCustomerDto) {
+    return this.itemscus.save(data);
   }
 }

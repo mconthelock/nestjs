@@ -1,9 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class PackLoginDto {
-  @ApiProperty({ example: '15234', description: 'Employee ID' })
+  @ApiProperty({ 
+    description: 'Employee ID',
+    example: '15234', 
+  })
   @IsString()
+  @Matches(/^\d+$/, { message: 'UID must be numeric' })
   @IsNotEmpty()
   readonly uid: string;
 }

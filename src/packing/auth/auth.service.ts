@@ -3,8 +3,11 @@ import { randomUUID } from 'crypto';
 import { Repository, DataSource } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { PAccessLog } from './entities/p-access-log.entity';
-import { PackLoginResponseDto } from './dto/pack-login-response.dto';
-import { PackUserInfoDto } from './dto/pack-user-info.dto';
+import { PackLoginUserDto, PackLoginResponseDto, LoginStatus } from './dto/pack-login-response.dto';
+
+enum AuthErrCode {
+  OK = '0',
+}
 
 @Injectable()
 export class AuthService {
@@ -26,24 +29,30 @@ export class AuthService {
    */
   async validateUser(uid: string, ip: string): Promise<PackLoginResponseDto> {
     try {
-      if (!/^\d+$/.test(uid)) {
-        return { status: 'info', message: 'รหัสพนักงานต้องเป็นตัวเลขเท่านั้น', user: null };
+      const sessionId = this.generateLogId();
+      const empNo = this.decodeID(Number(uid));
+      const [d]   = await this.db.query(
+        'EXEC ValidatePackAuth @0,@1,@2',
+        [empNo, ip, sessionId],
+      );
+
+      if (d.errcode !== AuthErrCode.OK) {
+        return {
+          status: LoginStatus.INFO,
+          message: d.errormsg,
+          user: null,
+        };
       }
 
-      const sessionId = this.generateLogId();
-      const empCode = Number(uid);
-      const empNo   = this.decodeID(empCode);
-      const result  = await this.db.query(`EXEC ValidatePackAuth @0,@1,@2`, [empNo, ip, sessionId]);
-      const d = result[0];
-      if (d.errcode === '0') {
-        const [userId, userName, useLocaltb] = d.errormsg.split('-');
-        const user: PackUserInfoDto = { userId, userName, useLocaltb, sessionId };
-        return { status: 'success', message: 'Login success', user };
-      } else {
-        return { status: 'info', message: d.errormsg, user: null };
-      }
+      const [userId, userName, useLocaltb] = d.errormsg.split('-');
+      const user: PackLoginUserDto = { userId, userName, useLocaltb, sessionId };
+      return {
+        status: LoginStatus.SUCCESS,
+        message: 'Login success',
+        user,
+      };
     } catch (error) {
-      throw new InternalServerErrorException('Database error: ' + error.message);
+      throw new InternalServerErrorException('Login error: ' + error.message);
     }
   }
 

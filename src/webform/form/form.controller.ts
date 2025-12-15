@@ -18,6 +18,7 @@ import { getClientIP } from 'src/common/utils/ip.utils';
 import { FormDto } from './dto/form.dto';
 import { empnoFormDto } from './dto/empno-form.dto';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { SearchFormDto } from './dto/search-form.dto';
 
 @ApiTags('Form')
 @Controller('form')
@@ -175,5 +176,10 @@ export class FormController {
   @Post('getRequestNo')
   async getRequestNo(@Body('reqNo') reqNo: string) {
     return this.formService.getRequestNo(reqNo);
+  }
+
+  @Post('searchForms')
+  async searchForms(@Body() dto: SearchFormDto) {
+    return await this.formService.searchForms(dto);
   }
 }

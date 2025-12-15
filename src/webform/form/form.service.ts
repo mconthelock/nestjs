@@ -20,6 +20,7 @@ import { FormDto } from './dto/form.dto';
 import { empnoFormDto } from './dto/empno-form.dto';
 import { minDate } from 'class-validator';
 import { count } from 'console';
+import { SearchFormDto } from './dto/search-form.dto';
 
 interface FormContext {
   ip: string;
@@ -910,5 +911,24 @@ export class FormService {
       });
     }
     return res;
+  }
+
+  async searchForms(dto: SearchFormDto) {
+    const form = await this.form.find({
+      where: dto
+    });
+    const result = [];
+    for( const f of form) {
+      const cond = {
+        NFRMNO: f.NFRMNO,
+        VORGNO: f.VORGNO,
+        CYEAR: f.CYEAR,
+        CYEAR2: f.CYEAR2,
+        NRUNNO: f.NRUNNO,
+      }
+      const formDetail = await this.getFormDetail(cond);
+      result.push(formDetail);
+    }
+    return result;
   }
 }

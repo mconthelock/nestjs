@@ -100,8 +100,6 @@ export class VPSService {
         'exec GetListPIS @0,@1',
         [vis, userId],
       );
-      console.log(rows);
-      console.log(rows.length);
 
       if (!rows || rows.length === 0) {
         return {
@@ -110,11 +108,18 @@ export class VPSService {
         };
       }
 
+      const items = rows.map((r: any) => ({
+        ordernoref: r.ordernoref,
+        iteminfo: r.iteminfo,
+        checksta: r.checksta === "1",
+        vpscode: r.ordernoref.substring(1, 8) + r.iteminfo.replace(' #', ''),
+      }));
+
       return {
         status: PackStatus.SUCCESS,
         message: '',
         chkcompte: finState,
-        items: rows,
+        items,
       };
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -142,34 +147,37 @@ export class VPSService {
         ErrDate: () => 'GETDATE()',
       });
     } catch (error) {
-      console.error('keepSqlErr failed:', error);
+      // console.error('keepSqlErr failed:', error);
     }
   }
 
   /**
    * Validate PIS detail and save into packing table
    * @author  Mr.Pathanapong Sokpukeaw
-   * @since   2025-11-25
+   * @since   2025-12-17
    * @param   {string} vis VIS code
    * @param   {string} pis PIS code
    * @param   {string} userId User ID
    * @return  {Promise<PackResultDto>} Item DTO
    */
-  async checkPisDetail(vis: string, pis: string, userId: string): Promise<PackResultDto> {
+  async checkPIS(vis: string, pis: string, userId: string): Promise<PackResultDto> {
     try {
-      const rows = await this.db.query(
+      const [d] = await this.db.query(
         'exec SavePISinPacking @0,@1,@2',
         [vis, pis, userId],
       );
 
-      const [code, message] = rows?.[0] ?? [];
-
-      return {
-        status: code === '0' ? PackStatus.SUCCESS : PackStatus.ERROR,
-        message: message ?? 'Save PIS failed',
-      };
+      switch (d.errcode) {
+        case VisErrCode.OK:
+          return { status: PackStatus.SUCCESS, message: d.errmsg, chkcompte: false };
+        case VisErrCode.FINISHED:
+          return { status: PackStatus.SUCCESS, message: d.errmsg, chkcompte: true };
+        default:
+          return { status: PackStatus.INFO, message: d.errmsg };
+      }
     } catch (error) {
-      throw new InternalServerErrorException('checkPisDetail failed: ' + error.message);
+      await this.keepSqlErr('CheckPisDetail', error.message, 1, userId);
+      return { status: PackStatus.ERROR, message: error.message };
     }
   }
 
@@ -182,7 +190,7 @@ export class VPSService {
    * @param   {string} userId User ID
    * @return  {Promise<PackResultDto>} Item DTO
    */
-  async checkShippingMark(vis: string, shipcode: string, userId: string): Promise<PackResultDto> {
+  async checkCloseVIS(vis: string, shipcode: string, userId: string): Promise<PackResultDto> {
     try {
       const [d] = await this.db.query(
         'exec CheckBcForCloseVIS @0,@1,@2',
@@ -190,7 +198,7 @@ export class VPSService {
       );
 
       if (d.code === '1') {
-        return this.visCheckCompte(vis, userId);
+        return this.visCheckComplate(vis, userId);
       }
 
       return {
@@ -198,7 +206,7 @@ export class VPSService {
         message: d.msge
       };
     } catch (error) {
-      throw new InternalServerErrorException('Check close VIS failed: ' + error.message);
+      return { status: PackStatus.ERROR, message: 'CheckCloseVIS failed: ' + error.message };
     }
   }
 
@@ -210,7 +218,7 @@ export class VPSService {
    * @param   {string} userId User ID
    * @return  {Promise<PackResultDto>} Item DTO
    */
-  async visCheckCompte(vis: string, userId: string): Promise<PackResultDto> {
+  async visCheckComplate(vis: string, userId: string): Promise<PackResultDto> {
     try {
       const [d] = await this.db.query(
         'exec CheckVIScompte @0,@1',
@@ -233,24 +241,21 @@ export class VPSService {
    * @since   2025-11-25
    * @param   {string} vis VIS code
    * @param   {string} userId User ID
-   * @return  {Promise<boolean>} True if lost item exists
+   * @return  {Promise<PackResultDto>} Item DTO
    */
-  async getLostItem(vis: string, userId: string): Promise<boolean> {
+  async getLostItem(vis: string, userId: string): Promise<PackResultDto> {
     try {
-      const rows = await this.db.query(
+      const [d] = await this.db.query(
         'exec CheckLostItem @0,@1',
         [vis, userId],
       );
 
-      const [code, message] = rows?.[0] ?? [];
-
-      if (code === '0') {
-        throw new InternalServerErrorException(message);
-      }
-
-      return true;
+      return {
+        status: d.resultcode === '1' ? PackStatus.SUCCESS : PackStatus.INFO,
+        message: d.resultmsg,
+      };
     } catch (error) {
-      throw new InternalServerErrorException('getLostItem failed: ' + error.message);
+      return { status: PackStatus.ERROR, message: 'GetLostItem failed: ' + error.message };
     }
   }
 }

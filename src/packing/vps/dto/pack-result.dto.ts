@@ -22,8 +22,13 @@ export class PackItemRowDto {
   @ApiProperty({ 
     example: 0 
   })
-  @Type(() => Number)
-  checksta: number;
+  checksta: boolean;
+
+  @ApiProperty({
+    description: 'VPS Code',
+    example: '8A95807183031',
+  })
+  vps: string;
 }
 
 export class PackResultDto {

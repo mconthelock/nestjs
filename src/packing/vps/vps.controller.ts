@@ -16,7 +16,7 @@ export class VPSController {
   private getPackingUser(req: Request): { userId: string; useLocaltb: string } {
     const cookie = req.cookies?.['NodeJS.Packinguser'];
     if (!cookie) {
-      throw new BadRequestException('User cookie not found');
+      throw new BadRequestException('timeout');
     }
 
     try {
@@ -31,13 +31,13 @@ export class VPSController {
   }
 
   /**
-   * Check VIS info and return corresponding PIS list
+   * Validate VIS and return corresponding PIS list
    * @author  Mr.Pathanapong Sokpukeaw
    * @since   2025-11-25
    */
   @Post('check-vis')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Check VIS info' })
+  @ApiOperation({ summary: 'Validate VIS and return PIS list' })
   @ApiBody({ type: PackVISDto })
   @ApiResponse({ status: 200, type: PackResultDto })
   async checkVIS(
@@ -49,52 +49,53 @@ export class VPSController {
   }
 
   /**
-   * Save PIS detail for a VIS
+   * Validate and save PIS for selected VIS
    * @author  Mr.Pathanapong Sokpukeaw
-   * @since   2025-11-25
+   * @since   2025-12-17
    */
-  @Post('check-pis')
+  @Post('confirm-pis')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Check PIS detail' })
+  @ApiOperation({ summary: 'Validate and save PIS for VIS' })
+  @ApiBody({ type: PackPISDto })
   @ApiResponse({ status: 200, type: PackResultDto })
-  async checkPis(
+  async confirmPIS(
     @Body() body: PackPISDto,
     @Req() req: Request,
   ): Promise<PackResultDto> {
     const user = this.getPackingUser(req);
-    return this.vpsService.checkPisDetail(body.vis, body.pis, user.userId);
+    return this.vpsService.checkPIS(body.vis, body.pis, user.userId);
   }
 
   /**
-   * Check shipping mark code for closing VIS
+   * Validate shipping mark and close VIS
    * @author  Mr.Pathanapong Sokpukeaw
    * @since   2025-12-12
    */
   @Post('check-closevis')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Check shipping mark for closing VIS' })
+  @ApiOperation({ summary: 'Validate shipping mark and close VIS' })
   @ApiResponse({ status: 200, type: PackResultDto })
-  async checkShippingMark(
+  async checkCloseVIS(
     @Body() body: PackCloseVISDto,
     @Req() req: Request,
   ): Promise<PackResultDto> {
     const user = this.getPackingUser(req);
-    return this.vpsService.checkShippingMark(body.vis, body.shipcode, user.userId);
+    return this.vpsService.checkCloseVIS(body.vis, body.shipcode, user.userId);
   }
 
   /**
    * Handle get lost items for a VIS
    * @author  Mr.Pathanapong Sokpukeaw
-   * @since   2025-11-25
+   * @since   2025-12-18
    */
   @Post('lost-item')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get lost items for a VIS' })
-  @ApiResponse({ status: 200, type: Boolean })
+  @ApiResponse({ status: 200, type: PackResultDto })
   async lostItem(
     @Body() body: PackVISDto,
     @Req() req: Request,
-  ): Promise<boolean> {
+  ): Promise<PackResultDto> {
     const user = this.getPackingUser(req);
     return this.vpsService.getLostItem(body.vis, user.userId);
   }

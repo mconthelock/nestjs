@@ -203,7 +203,7 @@ export class HbdService {
         column: [
             { header: "รหัสพนักงาน", key: "EMPNO", width: 15 },
             { header: "ชื่อ-สกุล", key: "NAME", width: 30 },
-            { header: "วันที่ใช้", key: "USEDATE", width: 15, type: "date", numFmt: "dd/mm/yyyy hh:mm:ss" },
+            { header: "วันที่ใช้", key: "USEDATE", width: 15, type: "date", numFmt: "DD/MM/YYYY hh:mm:ss" },
         ]
       });
         const buffer = await wk.xlsx.writeBuffer();

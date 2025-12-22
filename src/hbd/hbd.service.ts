@@ -216,7 +216,7 @@ export class HbdService {
             },
         ];
       await this.sendMailReport(user, res.attachments, month, year, log);
-      log.push(`Sent report to HR successfully`);
+      log?.push(`Sent report to HR successfully`);
       return { status: true, message: 'Send report successfully', user, data: res.data };
     } catch (error) {
       throw new Error(`Failed to Send report: ${error.message}`);

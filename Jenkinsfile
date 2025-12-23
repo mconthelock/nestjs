@@ -30,6 +30,7 @@ pipeline {
                     echo "Current directory: $(pwd)"
                     npm install
                     npm run build
+                    cp ecosystem.config.js dist/
                 '''
             }
         }
@@ -40,6 +41,8 @@ pipeline {
                     mkdir -p ${TARGET_DIR}
                     rsync -rlptvz --delete --no-perms --no-owner --no-group \
                     dist/ ${TARGET_DIR}/
+
+
                 '''
             }
         }

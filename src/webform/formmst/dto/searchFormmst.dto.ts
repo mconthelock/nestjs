@@ -24,7 +24,7 @@ export class SearchFormmstDto {
   @IsString()
   VANAME?: string;
 
-  @ApiPropertyOptional({ type: [String], example: ['NFRMNO', 'VORGNO', 'CYEAR', 'CYEAR2', 'NRUNNO'] })
+  @ApiPropertyOptional({ type: [String], example: ["NNO", "VORGNO", "CYEAR", "NRUNNO", "VNAME", "VANAME", "VDESC", "DCREDATE", "CCRETIME", "VAUTHPAGE", "VFORMPAGE", "VDIR", "NLIFETIME", "CSTATUS"] })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

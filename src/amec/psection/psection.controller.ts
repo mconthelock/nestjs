@@ -18,7 +18,7 @@ export class PsectionController {
 
   @Get()
   @ApiOperation({
-    summary: 'getSectionAll',
+    summary: 'Get Section All',
   })
   getSectionAll() {
     return this.psectionService.getSectionAll();
@@ -26,7 +26,7 @@ export class PsectionController {
 
   @Get(':code')
   @ApiOperation({
-    summary: 'getSectionByCode',
+    summary: 'Get Section By Code',
   })
   @ApiParam({ name: 'code', example: '050604', required: true })
   getSectionByCode(@Param('code') code: string) {
@@ -35,7 +35,7 @@ export class PsectionController {
 
   @Post('getSection')
   @ApiOperation({
-    summary: 'getSection',
+    summary: 'Get Section',
   })
   async getSection(@Body() searchDto: SearchSectionDto) {
     return this.psectionService.getSection(searchDto);

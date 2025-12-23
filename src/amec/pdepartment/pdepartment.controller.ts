@@ -30,7 +30,7 @@ export class PdepartmentController {
   }
 
   @Post('getDepartment')
-  @ApiOperation({ summary: 'Search departments' })
+  @ApiOperation({ summary: 'Get departments' })
   async getDepartment(@Body() searchDto: SearchDepartmentDto) {
     return this.pdepartmentService.getDepartment(searchDto);
   }

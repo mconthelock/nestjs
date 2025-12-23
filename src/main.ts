@@ -110,6 +110,7 @@ async function bootstrap() {
     .setTitle('AMEC API')
     .setDescription('API documentation for AMEC API')
     .setVersion(process.env.VERSION)
+    .addServer(process.env.APP_ENV)
     //.addTag('Auth', 'ใช้สำหรับจัดการการเข้าสู่ระบบและระบบยืนยันตัวตน')
     .addTag('IS-DEV', 'Manage a IS-DEV Request')
     .build();

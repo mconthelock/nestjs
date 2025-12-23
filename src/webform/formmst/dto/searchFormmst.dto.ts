@@ -1,30 +1,30 @@
 import { IsOptional, IsString, IsNumber, IsArray } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class SearchFormmstDto {
-  @ApiProperty({ required: false, example: 6 })
+  @ApiPropertyOptional({ example: 6 })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  readonly NNO?: number;
+  NNO?: number;
 
-  @ApiProperty({ required: false, example: '050601' })
+  @ApiPropertyOptional({ example: '050601' })
   @IsOptional()
   @IsString()
-  readonly VORGNO?: string;
+  VORGNO?: string;
 
-  @ApiProperty({ required: false, example: '25' })
+  @ApiPropertyOptional({ example: '25' })
   @IsOptional()
   @IsString()
-  readonly CYEAR?: string;
+  CYEAR?: string;
 
-  @ApiProperty({ required: false, example: 'IS-TID' })
+  @ApiPropertyOptional({ example: 'IS-TID' })
   @IsOptional()
   @IsString()
-  readonly VANAME?: string;
+  VANAME?: string;
 
-  @ApiProperty({ required: false, example: ['NFRMNO', 'VORGNO', 'CYEAR', 'CYEAR2', 'NRUNNO'] })
+  @ApiPropertyOptional({ type: [String], example: ['NFRMNO', 'VORGNO', 'CYEAR', 'CYEAR2', 'NRUNNO'] })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

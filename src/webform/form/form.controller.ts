@@ -10,7 +10,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { FormService } from './form.service';
 import { CreateFormDto } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
@@ -121,6 +121,7 @@ export class FormController {
     return this.formService.getFormno(dto);
   }
 
+  @ApiExcludeEndpoint()
   @Post('createForm')
   @ApiOperation({
     summary: 'Create Form',
@@ -146,6 +147,7 @@ export class FormController {
     }
   }
 
+  @ApiExcludeEndpoint()
   @Delete('deleteForm')
   @UseInterceptors(AnyFilesInterceptor())
   async deleteForm(

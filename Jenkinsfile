@@ -26,12 +26,16 @@ pipeline {
 
         stage('Install & Build on NAS') {
             steps {
-                sh '''
-                    echo "Current directory: $(pwd)"
-                    npm install
-                    npm run build
-                    cp ecosystem.config.js dist/
-                '''
+                withCredentials([file(credentialsId: 'api-env-file', variable: 'MY_ENV_FILE')]) {
+                    sh '''
+                        cp $MY_ENV_FILE .env
+
+                        npm install
+                        npm run build
+
+                        rm .env
+                    '''
+                }
             }
         }
 
@@ -42,6 +46,18 @@ pipeline {
                     rsync -rlptvz --delete --no-perms --no-owner --no-group \
                     dist/ ${TARGET_DIR}/dist/
                 '''
+            }
+        }
+
+        stage('Restart Application on NAS') {
+            steps {
+                sshagent(credentials: ['ssh-amecwebtest1']) {
+                   sh """
+                    ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
+                        ls -la
+                        pm2 reload api
+                    EOF """
+                }
             }
         }
     }

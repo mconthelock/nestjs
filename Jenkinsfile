@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         ENV = 'development'
-        TARGET_DIR = '/var/amecweb/wwwroot/development/api'
+        TARGET_DIR = '/var/amecweb/wwwroot/development/api_auto'
         GIT_SSL_NO_VERIFY = 'true'
     }
 
@@ -40,9 +40,7 @@ pipeline {
                 sh '''
                     mkdir -p ${TARGET_DIR}
                     rsync -rlptvz --delete --no-perms --no-owner --no-group \
-                    dist/ ${TARGET_DIR}/
-
-
+                    dist/ ${TARGET_DIR}/dist/
                 '''
             }
         }

@@ -86,16 +86,39 @@ pipeline {
             }
         }
 
-        // stage('Restart Application on NAS') {
-        //     steps {
-        //         sshagent(credentials: ['ssh-amecwebtest1']) {
-        //            sh """
-        //             ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
-        //                 ls -la
-        //                 pm2 reload api
-        //             EOF """
-        //         }
-        //     }
-        // }
+        stage('Restart Application on NAS') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
+                    sshagent(credentials: ['ssh-amecwebtest1']) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 "powershell -Command \\"
+                            try {
+                                # 1. แปลง Password ที่ได้จาก Jenkins เป็น SecureString ของ PowerShell
+                                \\$secPass = ConvertTo-SecureString '${env.NAS_PASS}' -AsPlainText -Force;
+                                \\$cred = New-Object System.Management.Automation.PSCredential('${env.NAS_USER}', \\$secPass);
+
+                                # 2. เชื่อมต่อ NAS เป็น Drive ใหม่ (สมมติชื่อ amec:)
+                                if (!(Get-PSDrive -Name amec -ErrorAction SilentlyContinue)) {
+                                    New-PSDrive -Name amec -PSProvider FileSystem -Root '\\\\\\\\amecnas\\\\amecweb' -Credential \\$cred;
+                                }
+
+                                # 3. ย้ายเข้าไปทำงานใน NAS
+                                cd amec:
+                                Write-Host 'Connected to NAS at: ' (Get-Location)
+
+                                # รันคำสั่งอื่นๆ ต่อไป เช่น pm2 reload
+                                # pm2 reload api
+
+                                exit 0;
+                            } catch {
+                                Write-Error 'Failed to access NAS: ' \\$_.Exception.Message;
+                                exit 1;
+                            }
+                            \\""
+                        """
+                    }
+                }
+            }
+        }
     }
 }

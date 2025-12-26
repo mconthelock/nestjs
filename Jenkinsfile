@@ -7,8 +7,6 @@ pipeline {
     }
 
     environment {
-        TARGET_DIR = ""
-        ENV_CRED_ID = ""
         GIT_SSL_NO_VERIFY = 'true'
     }
 
@@ -49,13 +47,14 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                checkout scmGit(
-                    branches: [[name: '*/main']],
-                    userRemoteConfigs: [[
-                        url: 'https://webhub.mitsubishielevatorasia.co.th/wsd/api.git',
-                        credentialsId: 'gitlab-auth-id']
-                    ]
-                )
+                // checkout scmGit(
+                //     branches: [[name: '*/main']],
+                //     userRemoteConfigs: [[
+                //         url: 'https://webhub.mitsubishielevatorasia.co.th/wsd/api.git',
+                //         credentialsId: 'gitlab-auth-id']
+                //     ]
+                // )
+                checkout scm
             }
         }
 

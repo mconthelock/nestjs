@@ -32,7 +32,7 @@ pipeline {
                     // กรณีอื่นๆ (เช่น GitLab Webhook ผลักมา หรือกดมือแต่เลือก development)
                     else {
                         env.TARGET_DIR = '/var/amecweb/wwwroot/development/api'
-                        env.ENV_CRED_ID = 'api-env-dev'
+                        env.ENV_CRED_ID = 'api-env-file'
                         env.NODE_ENV = 'development'
 
                         if (!isManualTrigger) {

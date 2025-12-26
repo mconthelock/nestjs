@@ -10,6 +10,10 @@ pipeline {
         GIT_SSL_NO_VERIFY = 'true'
     }
 
+    tools {
+        nodejs 'node'
+    }
+
     stages {
         stage('Setup Environment') {
             steps {

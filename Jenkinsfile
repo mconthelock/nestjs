@@ -86,12 +86,49 @@ pipeline {
             }
         }
 
-        stage('Restart Application on NAS') {
+        stage('Restart Application on NAS for Development') {
+             when {
+                expression { params.DEPLOY_ENV == 'development' }
+            }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
-                    sshagent(credentials: ['ssh-amecwebtest1']) {
+                sshagent(credentials: ['ssh-amecwebtest1']) {
+                    withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
                         sh """
                             ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
+                            powershell "
+                            \$pass = '${NAS_PASS}'
+                            \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
+                            \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
+
+                            if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
+                                Remove-PSDrive -Name 'Z' -Force
+                            }
+
+                            New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
+                            Set-Location Z:
+
+                            cd api
+                            npm install --production
+                            pm2 reload ecosystem.config.js
+
+                            Remove-PSDrive -Name 'Z' -Force
+                            "
+                        EOF
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Restart Application on NAS for Production') {
+            when {
+                expression { params.DEPLOY_ENV == 'production' }
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
+                    sshagent(credentials: ['ssh-amecweb1']) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
                             powershell "
                             \$pass = '${NAS_PASS}'
                             \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force

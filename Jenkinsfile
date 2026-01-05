@@ -69,7 +69,7 @@ pipeline {
                     sh '''
                         npm install
                         npm run build
-                        cp $ENV_FILE .env
+                        cp ${ENV_FILE} .env
                     '''
                 }
             }
@@ -81,7 +81,7 @@ pipeline {
                     mkdir -p ${TARGET_DIR}
                     rsync -rlptvz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
                     rsync -av public/ ${TARGET_DIR}/public/
-                    rsync -vpt package.json package-lock.json ecosystem.config.js ${TARGET_DIR}/
+                    rsync -vpt package.json package-lock.json ecosystem.config.js .env ${TARGET_DIR}/
                 '''
             }
         }
@@ -104,9 +104,8 @@ pipeline {
                             New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
                             Set-Location Z:
 
-                            cd Z:\\api
+                            cd api
                             npm install --production
-                            pm2 reload api || pm2 start dist/main.js --name api
                             "
                         EOF
                         """

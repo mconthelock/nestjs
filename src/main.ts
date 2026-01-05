@@ -25,6 +25,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
   });
+  
 
   app.enableCors({
     origin: (origin, cb) => {

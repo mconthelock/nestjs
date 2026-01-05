@@ -8,6 +8,7 @@ pipeline {
 
     environment {
         GIT_SSL_NO_VERIFY = 'true'
+        NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\development"
     }
 
     tools {
@@ -68,7 +69,6 @@ pipeline {
                     sh '''
                         npm install
                         npm run build
-
                         cp $ENV_FILE .env
                     '''
                 }
@@ -91,30 +91,24 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
                     sshagent(credentials: ['ssh-amecwebtest1']) {
                         sh """
-                            ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 "powershell -Command \\"
-                            try {
-                                # 1. แปลง Password ที่ได้จาก Jenkins เป็น SecureString ของ PowerShell
-                                \\$secPass = ConvertTo-SecureString '${env.NAS_PASS}' -AsPlainText -Force;
-                                \\$cred = New-Object System.Management.Automation.PSCredential('${env.NAS_USER}', \\$secPass);
+                            ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
+                            powershell "
+                            \$pass = '${NAS_PASS}'
+                            \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
+                            \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
 
-                                # 2. เชื่อมต่อ NAS เป็น Drive ใหม่ (สมมติชื่อ amec:)
-                                if (!(Get-PSDrive -Name amec -ErrorAction SilentlyContinue)) {
-                                    New-PSDrive -Name amec -PSProvider FileSystem -Root '\\\\\\\\amecnas\\\\amecweb' -Credential \\$cred;
-                                }
-
-                                # 3. ย้ายเข้าไปทำงานใน NAS
-                                cd amec:
-                                Write-Host 'Connected to NAS at: ' (Get-Location)
-
-                                # รันคำสั่งอื่นๆ ต่อไป เช่น pm2 reload
-                                # pm2 reload api
-
-                                exit 0;
-                            } catch {
-                                Write-Error 'Failed to access NAS: ' \\$_.Exception.Message;
-                                exit 1;
+                            if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
+                                Remove-PSDrive -Name 'Z' -Force
                             }
-                            \\""
+
+                            New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
+                            Set-Location Z:
+
+                            cd Z:\\api
+                            npm install --production
+                            pm2 reload api || pm2 start dist/main.js --name api
+                            "
+                        EOF
                         """
                     }
                 }

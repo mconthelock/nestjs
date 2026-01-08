@@ -27,6 +27,7 @@ import { QrcodeModule } from './services/qrcode/qrcode.module';
 import { MailModule } from './services/mail/mail.module';
 import { PDFModule } from './services/pdf/pdf.module';
 import { FilesModule } from './services/file/file.module';
+import ebudgetConfig from './databases/ebudget.config';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { FilesModule } from './services/file/file.module';
     TypeOrmModule.forRootAsync(spsysConfig),
     TypeOrmModule.forRootAsync(docinvConfig),
     TypeOrmModule.forRootAsync(webformConfig),
+    TypeOrmModule.forRootAsync(ebudgetConfig),
     TypeOrmModule.forRootAsync(invoiceConfig),
     TypeOrmModule.forRootAsync(auditConfig),
     TypeOrmModule.forRootAsync(idsConfig),

@@ -33,4 +33,8 @@ export class CreateOrderpartDto {
   @IsOptional()
   @IsString()
   CAR_NO?: string;
+
+  @IsOptional()
+  @IsString()
+  RECON_PARTS?: string;
 }

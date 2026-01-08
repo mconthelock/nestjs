@@ -1,14 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Raw } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { Repository, Raw, DataSource } from 'typeorm';
 import { SearchOrderpartDto } from './dto/search-orderpart.dto';
 import { Orderpart } from './entities/orderpart.entity';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class OrderpartsService {
   constructor(
     @InjectRepository(Orderpart, 'amecConnection')
     private readonly ords: Repository<Orderpart>,
+
+    @InjectDataSource('spsysConnection')
+    private readonly sp: DataSource,
   ) {}
 
   async search(req: SearchOrderpartDto) {
@@ -33,5 +37,29 @@ export class OrderpartsService {
       });
     }
     return await this.ords.find({ where: where });
+  }
+
+  async searchSP(req: SearchOrderpartDto) {
+    return await this.sp
+      .createQueryBuilder()
+      .from('TMARKET_TEMP_PARTS', 'A')
+      .leftJoin('MS_PARTS_CATEGORY', 'B', 'A.PART_CATEGORY = B.PCATE_CODE')
+      .innerJoin(
+        'SP_INQUIRY',
+        'C',
+        'A.INQUIRY_NO = C.INQ_NO AND C.INQ_LATEST = 1',
+      )
+      .select(
+        'IDS_DATE, TRADER, PCATE_NAME, PRJ_NO, AGENT, DSTN, INQUIRY_NO, CUST_RQS, CREATEBY, RECON_PARTS, TRADER',
+      )
+      .distinct(true)
+      //.where('ORDER_NO = :req', { req: req.ORDER_NO })
+      .where('RECON_PARTS = 0')
+      .andWhere('INQUIRY_NO IS NOT NULL')
+      .andWhere("revision_code <> 'D'")
+      .andWhere(
+        `IDS_DATE >= to_date('${dayjs().subtract(6, 'month').format('YYYYMMDD')}','YYYYMMDD')`,
+      )
+      .getRawMany();
   }
 }

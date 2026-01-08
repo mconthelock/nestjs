@@ -10,4 +10,9 @@ export class OrderpartsController {
   search(@Body() req: SearchOrderpartDto) {
     return this.ords.search(req);
   }
+
+  @Post('sp-orders')
+  searchSP(@Body() req: SearchOrderpartDto) {
+    return this.ords.searchSP(req);
+  }
 }

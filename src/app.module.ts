@@ -30,6 +30,7 @@ import { PackingModule } from './packing/packing.module';
 import { HbdModule } from './hbd/hbd.module';
 import { EarlyHeadMiddleware } from './middleware/early-head.middleware';
 import { SafetyModule } from './safety/safety.module';
+import { EbudgetModule } from './ebudget/ebudget.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { SafetyModule } from './safety/safety.module';
     ItgcModule,
     SafetyModule,
     HbdModule,
+    EbudgetModule
   ],
   providers: [HttpLoggingInterceptor],
 })

@@ -28,7 +28,7 @@ export class createPriceListDto {
 
   @Type(() => Date)
   @IsDate()
-  STARTIN: string;
+  STARTIN: Date;
 
   @Type(() => Number)
   @IsNumber()

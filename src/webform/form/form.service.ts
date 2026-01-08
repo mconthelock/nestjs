@@ -795,10 +795,10 @@ export class FormService {
   async getFormDetail(form: FormDto) {
     const formDetail = await this.dataSource
       .createQueryBuilder()
-      .select('F.*, A.SNAME AS VINPUTNAME, B.SNAME AS VREQNAME')
+      .select('F.*, A.SNAME AS VINPUTNAME, B.SNAME AS VREQNAME, A.SSECCODE AS VINPUTSECCODE, B.SSECCODE AS VREQSECCODE, A.SDEPCODE AS VINPUTDEPCODE, B.SDEPCODE AS VREQDEPCODE, A.SDIVCODE AS VINPUTDIVCODE, B.SDIVCODE AS VREQDIVCODE')
       .from('FORM', 'F')
-      .innerJoin('AMECUSERALL', 'A', 'A.SEMPNO = F.VINPUTER')
-      .innerJoin('AMECUSERALL', 'B', 'B.SEMPNO = F.VREQNO')
+      .leftJoin('AMECUSERALL', 'A', 'A.SEMPNO = F.VINPUTER')
+      .leftJoin('AMECUSERALL', 'B', 'B.SEMPNO = F.VREQNO')
       .where('F.NFRMNO = :NFRMNO', { NFRMNO: form.NFRMNO })
       .andWhere('F.VORGNO = :VORGNO', { VORGNO: form.VORGNO })
       .andWhere('F.CYEAR = :CYEAR', { CYEAR: form.CYEAR })

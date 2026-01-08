@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsString, IsNumber } from 'class-validator';
+import { IsString, IsNumber, IsDate, IsOptional } from 'class-validator';
 
 export class createItemCustomerDto {
   @Type(() => Number)
@@ -10,15 +10,20 @@ export class createItemCustomerDto {
   @IsNumber()
   ITEMS_ID: number;
 
-  @IsString()
-  CREATE_AT: string;
+  @Type(() => Date)
+  @IsDate()
+  @IsOptional()
+  CREATE_AT: Date;
 
   @IsString()
   CREATE_BY: string;
 
-  @IsString()
-  UPDATE_AT: string;
+  @Type(() => Date)
+  @IsDate()
+  @IsOptional()
+  UPDATE_AT: Date;
 
   @IsString()
+  @IsOptional()
   UPDATE_BY: string;
 }

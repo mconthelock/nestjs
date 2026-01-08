@@ -26,7 +26,7 @@ export class Pricelist {
   STATUS: string;
 
   @Column()
-  STARTIN: string;
+  STARTIN: Date;
 
   @Column()
   INQUIRY: number;

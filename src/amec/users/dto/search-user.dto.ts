@@ -38,4 +38,9 @@ export class searchDto {
   @IsOptional()
   @IsString()
   CSTATUS: string;
+
+  @ApiPropertyOptional({ example: '542A24028F7E1EFF6BE2BBC9A257FCE1' })
+  @IsOptional()
+  @IsString()
+  SEMPENCODE: string;
 }

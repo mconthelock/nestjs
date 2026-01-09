@@ -12,7 +12,7 @@ export class OrderpartsController {
   }
 
   @Post('sp-orders')
-  searchSP(@Body() req: SearchOrderpartDto) {
+  searchSP(@Body() req: any) {
     return this.ords.searchSP(req);
   }
 }

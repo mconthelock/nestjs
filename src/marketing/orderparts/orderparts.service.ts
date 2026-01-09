@@ -39,27 +39,74 @@ export class OrderpartsService {
     return await this.ords.find({ where: where });
   }
 
-  async searchSP(req: SearchOrderpartDto) {
-    return await this.sp
+  async searchSP(req: any) {
+    console.log(req);
+
+    const query = this.sp
       .createQueryBuilder()
-      .from('TMARKET_TEMP_PARTS', 'A')
-      .leftJoin('MS_PARTS_CATEGORY', 'B', 'A.PART_CATEGORY = B.PCATE_CODE')
-      .innerJoin(
-        'SP_INQUIRY',
-        'C',
-        'A.INQUIRY_NO = C.INQ_NO AND C.INQ_LATEST = 1',
-      )
       .select(
-        'IDS_DATE, TRADER, PCATE_NAME, PRJ_NO, AGENT, DSTN, INQUIRY_NO, CUST_RQS, CREATEBY, RECON_PARTS, TRADER',
+        "INQ_NO, INQ_TRADER, METHOD_DESC, IDS_DATE, CREATEBY, TRADER, PRJ_NO, PRJ_NAME, MFGNO, CAR_NO, AGENT, DSTN, AMEC_SCHDL, CUST_RQS, CASE WHEN INQ_TRADER = 'Direct' THEN 'STOCK PART' ELSE INQ_TRADER||'/' END AS SHIP, PT, MARREQPRDN, REMARK, P_O_AMOUNT, CSQTY, PCATE_NAME, C.*",
       )
-      .distinct(true)
-      //.where('ORDER_NO = :req', { req: req.ORDER_NO })
-      .where('RECON_PARTS = 0')
-      .andWhere('INQUIRY_NO IS NOT NULL')
-      .andWhere("revision_code <> 'D'")
-      .andWhere(
-        `IDS_DATE >= to_date('${dayjs().subtract(6, 'month').format('YYYYMMDD')}','YYYYMMDD')`,
+      .from('SP_INQUIRY', 'A')
+      .innerJoin('SP_METHOD', 'B', 'A.INQ_DELIVERY_METHOD = B.METHOD_ID')
+      .innerJoin(
+        'SP_INQUIRY_DETAIL',
+        'C',
+        'A.INQ_ID = C.INQID AND INQD_LATEST = 1',
       )
-      .getRawMany();
+      .leftJoin(
+        'TMARKET_TEMP_PARTS',
+        'D',
+        "A.INQ_NO = D.INQUIRY_NO AND REVISION_CODE != 'D'",
+      )
+      .leftJoin(
+        'SPCALSHEET_DETAIL_QTY',
+        'E',
+        'E.ORDNO = D.ORDER_NO AND E.ELVNO = D.ELV_NO AND E.INQNO = A.INQ_NO  AND E.CSSEQ = C.INQD_SEQ',
+      )
+      .innerJoin('MS_PARTS_CATEGORY', 'F', 'D.PART_CATEGORY = F.PCATE_CODE')
+      .where('INQ_LATEST = 1');
+    //   .andWhere("INQ_DATE >= to_date(:startDate, 'YYYYMMDD')", {
+    //     startDate: '20251001',
+    //   });
+
+    if (req) {
+      const date_list = ['SINQ_DATE', 'EINQ_DATE', 'SIDS_DATE', 'EIDS_DATE'];
+      const like_list = ['MFGNO', 'CAR_NO'];
+      for (const key in req) {
+        if (date_list.includes(key)) {
+          const dateKey = key.substring(1); // Remove first char (S or E)
+          query.andWhere(
+            `${dateKey} ${key.startsWith('S') ? '>=' : '<='} to_date(:${key}, 'YYYYMMDD')`,
+            {
+              [key]: dayjs(req[key]).format('YYYYMMDD'),
+            },
+          );
+          continue;
+        }
+
+        if (like_list.includes(key)) {
+          const trimmedValue = req[key].trim();
+          query.andWhere(`${key} LIKE :${key}`, {
+            [key]: `%${trimmedValue}%`,
+          });
+          continue;
+        }
+
+        // if (req.IS_ORDERS != undefined) {
+        //   query.andWhere('E.INQNO IS NOT NULL');
+        //   continue;
+        // }
+
+        if (key == 'IS_ORDERS') {
+          query.andWhere('E.INQNO IS NOT NULL');
+          continue;
+        }
+
+        const trimmedValue = req[key].trim();
+        query.andWhere(`${key} = :${key}`, { [key]: trimmedValue });
+      }
+    }
+    return await query.getRawMany();
   }
 }

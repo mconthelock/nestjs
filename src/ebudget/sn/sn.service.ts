@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EBUDGET_DATA_SN } from 'src/common/Entities/ebudget/views/EBUDGET_DATA_SN.entity';
 import { Repository } from 'typeorm';
-import { SearchEbudgetSnDto } from './dto/search.dto';
+import { SearchEbudgetSnDto } from './dto/search-sn.dto';
 
 @Injectable()
 export class SnService {

@@ -68,6 +68,9 @@ export class UsersController {
         if (value[0] === '!') {
           return val[key] != value.slice(1);
         }
+        if( key === 'SEMPENCODE'){
+            return val[key] == value.toUpperCase();
+        }
         return val[key] == value;
       });
     });

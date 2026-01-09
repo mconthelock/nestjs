@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { SnService } from './sn.service';
-import { SearchEbudgetSnDto } from './dto/search.dto';
+import { SearchEbudgetSnDto } from './dto/search-sn.dto';
 
 @Controller('ebudget/sn')
 export class SnController {

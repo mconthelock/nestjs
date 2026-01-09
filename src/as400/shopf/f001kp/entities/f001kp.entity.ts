@@ -86,6 +86,6 @@ export class F001KP {
   orders: F003KP[];
 
   @OneToMany(() => F110KP, (f11) => f11.tags)
-  @JoinColumn([{ name: 'F01R01', referencedColumnName: 'F03R01' }])
+  @JoinColumn([{ name: 'F01R01', referencedColumnName: 'F11K01' }])
   detail: F110KP[];
 }

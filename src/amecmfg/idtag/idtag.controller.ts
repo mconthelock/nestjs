@@ -8,7 +8,7 @@ export class IdtagController {
   constructor(private readonly tag: IdtagService) {}
 
   @Post('schd')
-  findBySchd(@Body() body: { schd: string; schdp?: string }) {
+  findBySchd(@Body() body: { schd: string; schdp?: string}) {
     return this.tag.findBySchd(body.schd, body.schdp);
   }
 
@@ -20,6 +20,16 @@ export class IdtagController {
   @Get('all')
   findAll() {
     return this.tag.findAll();
+  }
+
+  @Post('f110kp')
+  findf110kpBySchd(@Body() body: { schd: string; p?: string }) {
+    return this.tag.findf110kpBySchd(body.schd, body.p);
+  }
+
+  @Get('DetailByTag/:tag')
+  findDetailByTag(@Param('tag') tag: string) {
+    return this.tag.findDetailByTag(tag);
   }
 
   @Get('shop/:schd/:schdp/:shop')
@@ -42,5 +52,10 @@ export class IdtagController {
       })
       .filter((item) => item.tags.length > 0);
     return result;
+  }
+
+  @Get('jun')
+  async getWeekList() {
+    return this.tag.getWeekList();
   }
 }

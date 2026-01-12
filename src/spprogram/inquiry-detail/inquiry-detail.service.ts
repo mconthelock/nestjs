@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InquiryDetail } from './entities/inquiry-detail.entity';
-import { createDto } from './dto/create.dto';
+import { createDetailDto } from './dto/create.dto';
 
 @Injectable()
 export class InquiryDetailService {
@@ -11,7 +11,7 @@ export class InquiryDetailService {
     private readonly detail: Repository<InquiryDetail>,
   ) {}
 
-  async create(createDto: createDto) {
+  async create(createDto: createDetailDto) {
     const inquiryDetail = await this.detail.create(createDto);
     return await this.detail.save(inquiryDetail);
   }

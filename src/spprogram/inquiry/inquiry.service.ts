@@ -1,8 +1,10 @@
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner, Raw } from 'typeorm';
-import * as oracledb from 'oracledb'; // ต้อง import oracledb เพื่อกำหนดชนิดข้อมูลของ parameter
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
+import * as dayjs from 'dayjs';
+// ต้อง import oracledb เพื่อกำหนดชนิดข้อมูลของ parameter
+// import * as oracledb from 'oracledb';
 
 //Entities
 import { Inquiry } from './entities/inquiry.entity';
@@ -16,7 +18,7 @@ import { Attachments } from '../attachments/entities/attachments.entity';
 import { searchDto } from './dto/search.dto';
 import { createInqDto } from './dto/create-inquiry.dto';
 import { updateInqDto } from './dto/update-inquiry.dto';
-import { createDto as dtDto } from '../inquiry-detail/dto/create.dto';
+import { createDetailDto } from '../inquiry-detail/dto/create.dto';
 import { createTimelineDto } from '../timeline/dto/create-dto';
 import { updateTimelineDto } from '../timeline/dto/update-dto';
 import { createHistoryDto } from '../history/dto/create.dto';
@@ -32,39 +34,37 @@ export class InquiryService {
   ) {}
 
   async search(searchDto: searchDto) {
-    const qb = this.inq.createQueryBuilder('inq');
-    // Standard Joins
-    qb.leftJoinAndSelect('inq.details', 'details')
+    const qb = this.inq
+      .createQueryBuilder('inq')
       .leftJoinAndSelect('inq.inqgroup', 'inqgroup')
       .leftJoinAndSelect('inq.status', 'status')
-      .leftJoinAndSelect('inq.maruser', 'maruser')
-      .leftJoinAndSelect('inq.timeline', 'timeline')
-      .leftJoinAndSelect('inq.quotation', 'quotation');
+      .leftJoinAndSelect('inq.maruser', 'maruser');
+
+    if (searchDto.IS_DETAILS) {
+      qb.leftJoinAndSelect('inq.details', 'details');
+      searchDto = { ...searchDto, details: { INQD_LATEST: 1 } };
+      delete searchDto.IS_DETAILS;
+    }
+
+    if (searchDto.IS_TIMELINE) {
+      qb.leftJoinAndSelect('inq.timeline', 'timeline');
+      delete searchDto.IS_TIMELINE;
+    }
+
+    if (searchDto.IS_QUOTATION) {
+      qb.leftJoinAndSelect('inq.quotation', 'quotation');
+      delete searchDto.IS_QUOTATION;
+    }
+
+    if (searchDto.IS_ORDERS) {
+      qb.leftJoinAndSelect('inq.orders', 'orders');
+      delete searchDto.IS_ORDERS;
+    }
+
     qb.where('inq.INQ_LATEST = :latest', { latest: 1 });
-    // Recursive Filter Application
     await applyDynamicFilters(qb, searchDto, 'inq');
     return qb.getMany();
-    // console.log(qb.getSql());
-    // console.log(qb.getParameters());
-    // return null;
   }
-
-  //   async search(searchDto: searchDto) {
-  //     const qb = this.inq.createQueryBuilder('inq');
-  //     qb.where('inq.INQ_LATEST = 1');
-  //     if (searchDto.needDetail === true) {
-  //       qb.leftJoinAndSelect('inq.details', 'details');
-  //       delete searchDto.needDetail;
-  //     }
-
-  //     qb.orderBy('inq.INQ_ID', 'DESC')
-  //       .leftJoinAndSelect('inq.inqgroup', 'inqgroup')
-  //       .leftJoinAndSelect('inq.status', 'status')
-  //       .leftJoinAndSelect('inq.maruser', 'maruser')
-  //       .leftJoinAndSelect('inq.timeline', 'timeline')
-  //       .leftJoinAndSelect('inq.quotation', 'quotation');
-  //     return qb.getMany();
-  //   }
 
   async findOne(id: number) {
     return this.inq.findOne({
@@ -101,8 +101,6 @@ export class InquiryService {
       },
     });
   }
-
-  //   await this.setCondition(qb, searchDto);
 
   async setCondition(qb, searchDto) {
     for (const key in searchDto) {
@@ -301,7 +299,10 @@ export class InquiryService {
         dt.INQG_GROUP = group_id;
         dt.INQID = inquiry.INQ_ID;
         if (db_detail) {
-          const dto: dtDto = Object.assign({} as dtDto, db_detail);
+          const dto: createDetailDto = Object.assign(
+            {} as createDetailDto,
+            db_detail,
+          );
           Object.assign(dto, dt);
           delete dto.INQD_ID;
           delete dto.INQID;
@@ -311,7 +312,7 @@ export class InquiryService {
           //Create new detail
           dt.CREATE_AT = new Date();
           dt.CREATE_BY = header.UPDATE_BY;
-          const dto: dtDto = Object.assign({} as dtDto, dt);
+          const dto: createDetailDto = Object.assign({} as createDetailDto, dt);
           await runner.manager.save(InquiryDetail, dto);
         }
       }
@@ -379,7 +380,6 @@ export class InquiryService {
         await localRunner.startTransaction();
       }
       const runner = queryRunner || localRunner!;
-
       //Inquiry
       const inquiry = await runner.manager.findOne(Inquiry, {
         where: { INQ_ID: id },
@@ -566,5 +566,66 @@ export class InquiryService {
     const query = `SELECT * FROM DESIGN_PROCESS`;
     const result = await this.ds.query(query);
     return result;
+  }
+
+  async searchSP(req: any) {
+    const query = this.ds
+      .createQueryBuilder()
+      .select(
+        "INQ_NO, INQ_TRADER, INQ_TYPE, METHOD_DESC, IDS_DATE, CREATEBY, TRADER, SERIES, PRJ_NO, PRJ_NAME, MFGNO, ORDER_NO, PO_MELTEC, CAR_NO, AGENT, DSTN, AMEC_SCHDL, CUST_RQS, CASE WHEN INQ_TRADER = 'Direct' THEN 'STOCK PART' ELSE INQ_TRADER||'/' END AS SHIP, PT, MARREQPRDN, REMARK, P_O_AMOUNT, CSQTY, PCATE_NAME, C.*",
+      )
+      .from('SP_INQUIRY', 'A')
+      .innerJoin('SP_METHOD', 'B', 'A.INQ_DELIVERY_METHOD = B.METHOD_ID')
+      .innerJoin(
+        'SP_INQUIRY_DETAIL',
+        'C',
+        'A.INQ_ID = C.INQID AND INQD_LATEST = 1',
+      )
+      .leftJoin(
+        'TMARKET_TEMP_PARTS',
+        'D',
+        "A.INQ_NO = D.INQUIRY_NO AND REVISION_CODE != 'D'",
+      )
+      .leftJoin(
+        'SPCALSHEET_DETAIL_QTY',
+        'E',
+        'E.ORDNO = D.ORDER_NO AND E.ELVNO = D.ELV_NO AND E.INQNO = A.INQ_NO  AND E.CSSEQ = C.INQD_SEQ',
+      )
+      .innerJoin('MS_PARTS_CATEGORY', 'F', 'D.PART_CATEGORY = F.PCATE_CODE')
+      .where('INQ_LATEST = 1');
+
+    if (req) {
+      const date_list = ['SINQ_DATE', 'EINQ_DATE', 'SIDS_DATE', 'EIDS_DATE'];
+      const like_list = ['MFGNO', 'CAR_NO'];
+      for (const key in req) {
+        if (date_list.includes(key)) {
+          const dateKey = key.substring(1); // Remove first char (S or E)
+          query.andWhere(
+            `${dateKey} ${key.startsWith('S') ? '>=' : '<='} to_date(:${key}, 'YYYYMMDD')`,
+            {
+              [key]: dayjs(req[key]).format('YYYYMMDD'),
+            },
+          );
+          continue;
+        }
+
+        if (like_list.includes(key)) {
+          const trimmedValue = req[key].trim();
+          query.andWhere(`${key} LIKE :${key}`, {
+            [key]: `%${trimmedValue}%`,
+          });
+          continue;
+        }
+
+        if (key == 'IS_ORDERS') {
+          query.andWhere('E.INQNO IS NOT NULL');
+          continue;
+        }
+
+        const trimmedValue = req[key].trim();
+        query.andWhere(`${key} = :${key}`, { [key]: trimmedValue });
+      }
+    }
+    return await query.getRawMany();
   }
 }

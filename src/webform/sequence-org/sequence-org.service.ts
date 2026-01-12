@@ -41,12 +41,12 @@ export class SequenceOrgService {
          SELECT DISTINCT B.* FROM 
             (
                 SELECT * FROM SEQUENCEORG
-                START WITH HEADNO = :1 CONNECT BY PRIOR EMPNO = HEADNO AND PRIOR CCO = CCO1
+                START WITH HEADNO = :1 AND EMPNO != :2 CONNECT BY PRIOR EMPNO = HEADNO AND PRIOR CCO = CCO1
             ) A
             JOIN AMECUSERALL B ON A.EMPNO = B.SEMPNO
-            WHERE B.SEMPNO != :2  AND B.CSTATUS = 1
+            WHERE B.SEMPNO != :3  AND B.CSTATUS = 1
         `;
-    return await this.dataSource.query(sql, [empno, empno]);
+    return await this.dataSource.query(sql, [empno, empno, empno]);
   }
 
   async search(dto: SearchSequenceOrgDto, queryRunner?: QueryRunner): Promise<SequenceOrg[]> {

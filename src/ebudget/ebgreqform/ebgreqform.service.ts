@@ -14,7 +14,7 @@ export class EbgreqformService {
     private dataSource: DataSource,
   ) {}
 
-  async create(
+  async upsert(
     dto: CreateEbgreqformDto,
     queryRunner?: QueryRunner,
   ) {
@@ -31,9 +31,7 @@ export class EbgreqformService {
       }
       const runner = queryRunner || localRunner!;
 
-      const data = [];
-
-      const res = await runner.manager.insert(EBGREQFORM, data);
+      const res = await runner.manager.save(EBGREQFORM, dto);
       if (localRunner && didStartTx && runner.isTransactionActive)
         await localRunner.commitTransaction();
       return {

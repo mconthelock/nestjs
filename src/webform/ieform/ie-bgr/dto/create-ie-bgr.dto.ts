@@ -2,6 +2,7 @@ import { PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
+  IsDate,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -20,10 +21,13 @@ export class CreateIeBgrDto {
   empRequest: string;
 
   @IsOptional()
+  @IsString()
   remark: string;
 
   @IsOptional()
-  PREDATE: string;
+  @IsDate()
+  @Type(() => Date)
+  PREDATE: Date;
 
   @IsNotEmpty()
   @IsString()
@@ -78,8 +82,9 @@ export class CreateIeBgrDto {
   PIC: string;
 
   @IsNotEmpty()
-  @IsString()
-  FINDATE: string;
+  @IsDate()
+  @Type(() => Date)
+  FINDATE: Date;
 
   @IsNotEmpty()
   @IsString()
@@ -105,7 +110,7 @@ export class CreateIeBgrDto {
   @IsString()
   SCHEDULE: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   REMARK: string;
 

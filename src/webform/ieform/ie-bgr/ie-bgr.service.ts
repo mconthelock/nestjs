@@ -6,6 +6,7 @@ import { DataSource } from 'typeorm';
 import { FormService } from 'src/webform/form/form.service';
 import { deleteFile, moveFileFromMulter } from 'src/common/utils/files.utils';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
+import { EbgreqformService } from 'src/ebudget/ebgreqform/ebgreqform.service';
 
 @Injectable()
 export class IeBgrService {
@@ -14,6 +15,7 @@ export class IeBgrService {
     private dataSource: DataSource,
     private readonly formService: FormService,
     private readonly formmstService: FormmstService,
+    private readonly ebgreqformService: EbgreqformService,
   ) {}
   async create(
     dto: CreateIeBgrDto,
@@ -35,13 +37,12 @@ export class IeBgrService {
     path: string,
   ) {
     const queryRunner = this.dataSource.createQueryRunner();
-    let movedTargets: string; // เก็บ path ปลายทางที่ย้ายสำเร็จ
+    let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
       const formmst = await this.formmstService.getFormMasterByVaname('IE-BGR');
       console.log(formmst);
-      
 
       // 1. สร้าง Form ก่อน
       const createForm = await this.formService.create(
@@ -57,21 +58,25 @@ export class IeBgrService {
         queryRunner,
       );
 
-      console.log(createForm);
+      console.log(dto);
 
       if (!createForm.status) {
         throw new Error(createForm.message.message);
       }
 
-      console.log('create form success');
-      
-      // 2. บันทึกข้อมูล EBGREQFORM
-      const data = {
+      const form = {
         NFRMNO: createForm.data.NFRMNO,
         VORGNO: createForm.data.VORGNO,
         CYEAR: createForm.data.CYEAR,
         CYEAR2: createForm.data.CYEAR2,
         NRUNNO: createForm.data.NRUNNO,
+      };
+
+      console.log('create form success');
+
+      // 2. บันทึกข้อมูล EBGREQFORM
+      const data = {
+        ...form,
         ID: dto.BGTYPE,
         FYEAR: dto.FYEAR,
         SCATALOG: dto.SN,
@@ -93,8 +98,31 @@ export class IeBgrService {
         GPBID: dto.GPBID,
         GPFYEAR: dto.GPYear,
       };
-      console.log('data ' ,data);
-      
+
+      // Insert EBGREQFORM record
+      await this.ebgreqformService.upsert(data, queryRunner);
+
+      // 3. บันทึกไฟล์ และ รูปภาพ ลงในโฟลเดอร์ปลายทาง
+      let index = 0;
+      for (const key in files) {
+        const formNo = await this.formService.getFormno(form); // Get the form number
+        const destination = path + '/' + formNo; // Get the destination path
+        const fileList = files[key];
+        for (const file of fileList) {
+          const moved = await moveFileFromMulter(file, destination);
+          movedTargets.push(moved.path);
+          movedTargets.push(file.path);
+          console.log('Processing image file:', file.originalname);
+          // 4. บันทึกข้อมูลไฟล์ลงใน DB
+          if (key.startsWith('image') && fileList) {
+            console.log('Processing image file:', file.originalname);
+          } else if (key.startsWith('file') && fileList) {
+            console.log('Processing file:', file.originalname);
+          }
+        }
+        index++;
+      }
+      console.log(movedTargets);
 
       //   await this.insert(form, dto.data, queryRunner);
 
@@ -124,9 +152,10 @@ export class IeBgrService {
       };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      //   await deleteFile(movedTargets); // ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
-      //   await deleteFile(file.path); // ลบไฟล์ใน tmp ออก
-      return { status: false, message: 'Error: ' + error.message };
+      for (const filePath of movedTargets) {
+        await deleteFile(filePath); // ลบไฟล์ที่ย้ายสำเร็จไปแล้ว
+      }
+      return { status: false, message: 'Error: ' + error.message, dto };
     } finally {
       await queryRunner.release();
     }

@@ -3,7 +3,7 @@ import { EbgreqattfileService } from './ebgreqattfile.service';
 import { CreateEbgreqattfileDto } from './dto/create-ebgreqattfile.dto';
 import { UpdateEbgreqattfileDto } from './dto/update-ebgreqattfile.dto';
 
-@Controller('ebgreqattfile')
+@Controller('ebudget/file')
 export class EbgreqattfileController {
   constructor(private readonly ebgreqattfileService: EbgreqattfileService) {}
 }

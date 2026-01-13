@@ -3,7 +3,7 @@ import { EbgreqcolImageService } from './ebgreqcol-image.service';
 import { CreateEbgreqcolImageDto } from './dto/create-ebgreqcol-image.dto';
 import { UpdateEbgreqcolImageDto } from './dto/update-ebgreqcol-image.dto';
 
-@Controller('ebgreqcol-image')
+@Controller('ebudget/image')
 export class EbgreqcolImageController {
   constructor(private readonly ebgreqcolImageService: EbgreqcolImageService) {}
 

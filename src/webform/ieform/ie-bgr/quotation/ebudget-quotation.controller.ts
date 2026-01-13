@@ -10,7 +10,7 @@ import {
 import { QuotationService } from './ebudget-quotation.service';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
-@Controller('ebudget/quotation')
+@Controller('ieform/ie-bgr/quotation')
 export class QuotationController {
   constructor(private readonly quotationService: QuotationService) {}
 

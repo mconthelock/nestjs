@@ -25,4 +25,7 @@ export class EBGREQCOL_IMAGE {
 
   @Column()
   IMAGE_FILE: string;
+
+  @Column()
+  SFILE: string;
 }

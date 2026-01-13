@@ -22,7 +22,7 @@ import { Request } from 'express';
 export class IeBgrController {
   constructor(private readonly ieBgrService: IeBgrService) {}
 
-  private readonly path = `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/IE/IEBGR/`;
+  private readonly path = `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/IE/IEBGR/` as string;
 
   @Post('create')
   @UseInterceptors(

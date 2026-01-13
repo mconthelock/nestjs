@@ -32,8 +32,8 @@ export class AuthController {
     if (result.status === 'success' && result.user) {
       response.cookie('NodeJS.Packinguser', JSON.stringify(result.user), {
         httpOnly: false,
-        secure: process.env.NODE_ENV === "production",         
-        sameSite: 'lax'
+        secure: process.env.NODE_ENV === 'production',         
+        sameSite: 'lax',
       });
     }
 

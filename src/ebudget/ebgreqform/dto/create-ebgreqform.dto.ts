@@ -4,6 +4,7 @@ import { PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
+  IsDate,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -72,8 +73,9 @@ export class CreateIeBgrDto extends PickType(FormDto, [
   PIC: string;
 
   @IsNotEmpty()
-  @IsString()
-  FINDATE: string;
+  @IsDate()
+  @Type(() => Date)
+  FINDATE: Date;
 
   @IsNotEmpty()
   @IsString()
@@ -99,9 +101,9 @@ export class CreateIeBgrDto extends PickType(FormDto, [
   @IsString()
   SCHEDULE: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  REMARK: string;
+  REMARK?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -111,7 +113,8 @@ export class CreateIeBgrDto extends PickType(FormDto, [
   @IsString()
   GPYear: string;
 
-  @IsNotEmpty()
-  @IsString()
-  PPRESDATE: string;
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  PPRESDATE?: Date;
 }

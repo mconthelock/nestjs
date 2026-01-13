@@ -45,14 +45,5 @@ export class EBUDGET_QUOTATION_PRODUCT {
   CURRSECT: number;
 
   @Column()
-  DATE_CREATE: Date;
-
-  @Column()
-  DATE_UPDATE: Date;
-
-  @Column()
-  CREATE_BY: string;
-
-  @Column()
-  UPDATE_BY: string;
+  CURRCODE: string;
 }

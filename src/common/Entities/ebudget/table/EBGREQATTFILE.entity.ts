@@ -25,4 +25,7 @@ export class EBGREQATTFILE {
 
   @Column()
   SFILE: string;
+
+  @Column()
+  OFILE: string;
 }

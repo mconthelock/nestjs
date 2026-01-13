@@ -1,23 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { CreateEbgreqformDto } from './dto/create-ebgreqform.dto';
-import { UpdateEbgreqformDto } from './dto/update-ebgreqform.dto';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { CreateEbgreqattfileDto } from './dto/create-ebgreqattfile.dto';
+import { UpdateEbgreqattfileDto } from './dto/update-ebgreqattfile.dto';
+import { EBGREQATTFILE } from 'src/common/Entities/ebudget/table/EBGREQATTFILE.entity';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { EBGREQFORM } from 'src/common/Entities/ebudget/table/EBGREQFORM.entity';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
 
 @Injectable()
-export class EbgreqformService {
+export class EbgreqattfileService {
   constructor(
-    @InjectRepository(EBGREQFORM, 'ebudgetConnection')
-    private readonly repo: Repository<EBGREQFORM>,
+    @InjectRepository(EBGREQATTFILE, 'ebudgetConnection')
+    private readonly repo: Repository<EBGREQATTFILE>,
     @InjectDataSource('ebudgetConnection')
     private dataSource: DataSource,
   ) {}
 
-  async upsert(
-    dto: CreateEbgreqformDto,
-    queryRunner?: QueryRunner,
-  ) {
+  async upsert(dto: CreateEbgreqattfileDto, queryRunner?: QueryRunner) {
     let localRunner: QueryRunner | undefined;
     let didConnect = false;
     let didStartTx = false;
@@ -31,17 +28,17 @@ export class EbgreqformService {
       }
       const runner = queryRunner || localRunner!;
 
-      const res = await runner.manager.save(EBGREQFORM, dto);
+      const res = await runner.manager.save(EBGREQATTFILE, dto);
       if (localRunner && didStartTx && runner.isTransactionActive)
         await localRunner.commitTransaction();
       return {
         status: true,
-        message: 'Insert EBGREQFORM Successfully',
+        message: 'Insert EBGREQATTFILE Successfully',
       };
     } catch (error) {
       if (localRunner && didStartTx && localRunner.isTransactionActive)
         await localRunner.rollbackTransaction();
-      throw new Error('Insert EBGREQFORM Error: ' + error.message);
+      throw new Error('Insert EBGREQATTFILE Error: ' + error.message);
     } finally {
       if (localRunner && didConnect) await localRunner.release();
     }

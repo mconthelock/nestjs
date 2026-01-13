@@ -2,13 +2,13 @@ import { PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
+  IsDate,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { FormDto } from 'src/webform/form/dto/form.dto';
 
 export class CreateIeBgrDto {
   @IsNotEmpty()
@@ -17,13 +17,16 @@ export class CreateIeBgrDto {
 
   @IsNotEmpty()
   @IsString()
-  empRequest: string;
+  empRequest?: string;
 
   @IsOptional()
-  remark: string;
+  @IsString()
+  remark?: string;
 
   @IsOptional()
-  PREDATE: string;
+  @IsDate()
+  @Type(() => Date)
+  PREDATE?: Date;
 
   @IsNotEmpty()
   @IsString()
@@ -41,7 +44,7 @@ export class CreateIeBgrDto {
   @Transform(({ value }) =>
     typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
   )
-//   @Type(() => Number)
+  //   @Type(() => Number)
   @IsNumber()
   RECBG: number;
 
@@ -49,7 +52,7 @@ export class CreateIeBgrDto {
   @Transform(({ value }) =>
     typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
   )
-//   @Type(() => Number)
+  //   @Type(() => Number)
   @IsNumber()
   USEDBG: number;
 
@@ -57,7 +60,7 @@ export class CreateIeBgrDto {
   @Transform(({ value }) =>
     typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
   )
-//   @Type(() => Number)
+  //   @Type(() => Number)
   @IsNumber()
   REMBG: number;
 
@@ -65,7 +68,7 @@ export class CreateIeBgrDto {
   @Transform(({ value }) =>
     typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
   )
-//   @Type(() => Number)
+  //   @Type(() => Number)
   @IsNumber()
   REQAMT: number;
 
@@ -78,8 +81,9 @@ export class CreateIeBgrDto {
   PIC: string;
 
   @IsNotEmpty()
-  @IsString()
-  FINDATE: string;
+  @IsDate()
+  @Type(() => Date)
+  FINDATE: Date;
 
   @IsNotEmpty()
   @IsString()
@@ -105,9 +109,9 @@ export class CreateIeBgrDto {
   @IsString()
   SCHEDULE: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  REMARK: string;
+  REMARK?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -129,14 +133,15 @@ export class BGRQuotationDto {
   @IsString()
   QTA_FORM: string;
 
-  @IsNotEmpty()
-  @IsString()
-  QTA_VALID_DATE: string;
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  QTA_VALID_DATE?: Date;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  TOTAL: number;
+  TOTAL?: number;
 
   @IsOptional()
   @IsArray()

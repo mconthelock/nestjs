@@ -10,9 +10,11 @@ import { OrgposModule } from './orgpos/orgpos.module';
 import { OrgTreeModule } from './org-tree/org-tree.module';
 import { SequenceOrgModule } from './sequence-org/sequence-org.module';
 import { RepModule } from './rep/rep.module';
+import { IEFormModule } from './ieform/ie.module';
 
 @Module({
   imports: [
+    IEFormModule,
     ISFormModule,
     FormModule,
     FlowModule,

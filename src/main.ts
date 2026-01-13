@@ -140,5 +140,10 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
   console.log(`Application is running on: ${await app.getUrl()}`);
+
+   // แจ้ง PM2 ว่า instance พร้อมแล้ว
+  if (process.send) {
+    process.send('ready');
+  }
 }
 bootstrap();

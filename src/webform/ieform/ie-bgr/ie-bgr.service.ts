@@ -7,6 +7,9 @@ import { FormService } from 'src/webform/form/form.service';
 import { deleteFile, moveFileFromMulter } from 'src/common/utils/files.utils';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { EbgreqformService } from 'src/ebudget/ebgreqform/ebgreqform.service';
+import { EbgreqattfileService } from 'src/ebudget/ebgreqattfile/ebgreqattfile.service';
+import { EbgreqcolImageService } from 'src/ebudget/ebgreqcol-image/ebgreqcol-image.service';
+import { FlowService } from 'src/webform/flow/flow.service';
 
 @Injectable()
 export class IeBgrService {
@@ -15,24 +18,44 @@ export class IeBgrService {
     private dataSource: DataSource,
     private readonly formService: FormService,
     private readonly formmstService: FormmstService,
-    private readonly ebgreqformService: EbgreqformService,
+    private readonly ebudgetformService: EbgreqformService,
+    private readonly ebudgetattfileService: EbgreqattfileService,
+    private readonly ebudgetcolImageService: EbgreqcolImageService,
+    private readonly flowService: FlowService,
   ) {}
+
+  private readonly fileType = {
+    imageI: 1,
+    imageP: 2,
+    imageD: 3,
+    imageN: 4,
+    imageE: 5,
+    imageS: 6,
+    fileP: 1,
+    fileR: 2,
+    fileS: 3,
+    fileM: 4,
+    fileE: 5,
+    fileO: 6,
+  } as const;
+
   async create(
     dto: CreateIeBgrDto,
-    files: {
-      imageI?: Express.Multer.File[];
-      imageP?: Express.Multer.File[];
-      imageD?: Express.Multer.File[];
-      imageN?: Express.Multer.File[];
-      imageE?: Express.Multer.File[];
-      imageS?: Express.Multer.File[];
-      fileP?: Express.Multer.File[];
-      fileR?: Express.Multer.File[];
-      fileS?: Express.Multer.File[];
-      fileM?: Express.Multer.File[];
-      fileE?: Express.Multer.File[];
-      fileO?: Express.Multer.File[];
-    },
+    files: Partial<Record<keyof typeof this.fileType, Express.Multer.File[]>>,
+    // {
+    //   imageI?: Express.Multer.File[];
+    //   imageP?: Express.Multer.File[];
+    //   imageD?: Express.Multer.File[];
+    //   imageN?: Express.Multer.File[];
+    //   imageE?: Express.Multer.File[];
+    //   imageS?: Express.Multer.File[];
+    //   fileP?: Express.Multer.File[];
+    //   fileR?: Express.Multer.File[];
+    //   fileS?: Express.Multer.File[];
+    //   fileM?: Express.Multer.File[];
+    //   fileE?: Express.Multer.File[];
+    //   fileO?: Express.Multer.File[];
+    // },
     ip: string,
     path: string,
   ) {
@@ -100,14 +123,15 @@ export class IeBgrService {
       };
 
       // Insert EBGREQFORM record
-      await this.ebgreqformService.upsert(data, queryRunner);
+      await this.ebudgetformService.upsert(data, queryRunner);
 
       // 3. บันทึกไฟล์ และ รูปภาพ ลงในโฟลเดอร์ปลายทาง
-      let index = 0;
       for (const key in files) {
+        const raw = key.replace(/\[\]$/, "") as keyof typeof this.fileType; // รองรับกรณีที่ key เป็น array เช่น imageI[]
         const formNo = await this.formService.getFormno(form); // Get the form number
         const destination = path + '/' + formNo; // Get the destination path
         const fileList = files[key];
+        let fileIndex = 0;
         for (const file of fileList) {
           const moved = await moveFileFromMulter(file, destination);
           movedTargets.push(moved.path);
@@ -115,33 +139,37 @@ export class IeBgrService {
           console.log('Processing image file:', file.originalname);
           // 4. บันทึกข้อมูลไฟล์ลงใน DB
           if (key.startsWith('image') && fileList) {
-            console.log('Processing image file:', file.originalname);
+            
+            await this.ebudgetcolImageService.upsert(
+              {
+                ...form,
+                COLNO: this.fileType[raw],
+                ID: String(++fileIndex),
+                IMAGE_FILE: file.originalname,
+                SFILE:  moved.newName,
+              },
+              queryRunner,
+            );
           } else if (key.startsWith('file') && fileList) {
-            console.log('Processing file:', file.originalname);
+            await this.ebudgetattfileService.upsert(
+                {
+                    ...form,
+                    TYPENO: this.fileType[raw],
+                    ID: String(++fileIndex),
+                    SFILE:  moved.newName,
+                    OFILE: file.originalname,
+                },
+                queryRunner,
+            );
           }
         }
-        index++;
       }
+
+      // 5. บันทึกข้อมูล Quotation
+
+      
       console.log(movedTargets);
-
-      //   await this.insert(form, dto.data, queryRunner);
-
-      //   // 3. ย้ายไฟล์ไปยังปลายทาง
-      //   const formNo = await this.formService.getFormno(form); // Get the form number
-      //   const destination = path + '/' + formNo; // Get the destination path
-      //   const moved = await moveFileFromMulter(file, destination);
-      //   movedTargets = moved.path;
-      //   // 4. บันทึก DB (ใช้ชื่อไฟล์ที่ "ปลายทางจริง" เพื่อความตรงกัน)
-      //   await this.isFileService.insert(
-      //     {
-      //       ...form,
-      //       FILE_ONAME: file.originalname,
-      //       FILE_FNAME: moved.newName,
-      //       FILE_USERCREATE: dto.REQUESTER,
-      //       FILE_PATH: destination,
-      //     },
-      //     queryRunner,
-      //   );
+      await this.flowService.sendMailToApprover(form, queryRunner);
       throw new Error('test ');
 
       await queryRunner.commitTransaction();

@@ -10,6 +10,8 @@ import { EbgreqformService } from 'src/ebudget/ebgreqform/ebgreqform.service';
 import { EbgreqattfileService } from 'src/ebudget/ebgreqattfile/ebgreqattfile.service';
 import { EbgreqcolImageService } from 'src/ebudget/ebgreqcol-image/ebgreqcol-image.service';
 import { FlowService } from 'src/webform/flow/flow.service';
+import { EbudgetQuotationService } from 'src/ebudget/ebudget-quotation/ebudget-quotation.service';
+import { EbudgetQuotationProductService } from 'src/ebudget/ebudget-quotation-product/ebudget-quotation-product.service';
 
 @Injectable()
 export class IeBgrService {
@@ -22,6 +24,8 @@ export class IeBgrService {
     private readonly ebudgetattfileService: EbgreqattfileService,
     private readonly ebudgetcolImageService: EbgreqcolImageService,
     private readonly flowService: FlowService,
+    private readonly ebudgetQuotationService: EbudgetQuotationService,
+    private readonly ebudgetQuotationProductService: EbudgetQuotationProductService,
   ) {}
 
   private readonly fileType = {
@@ -65,7 +69,6 @@ export class IeBgrService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
       const formmst = await this.formmstService.getFormMasterByVaname('IE-BGR');
-      console.log(formmst);
 
       // 1. สร้าง Form ก่อน
       const createForm = await this.formService.create(
@@ -81,8 +84,6 @@ export class IeBgrService {
         queryRunner,
       );
 
-      console.log(dto);
-
       if (!createForm.status) {
         throw new Error(createForm.message.message);
       }
@@ -94,8 +95,6 @@ export class IeBgrService {
         CYEAR2: createForm.data.CYEAR2,
         NRUNNO: createForm.data.NRUNNO,
       };
-
-      console.log('create form success');
 
       // 2. บันทึกข้อมูล EBGREQFORM
       const data = {
@@ -127,7 +126,7 @@ export class IeBgrService {
 
       // 3. บันทึกไฟล์ และ รูปภาพ ลงในโฟลเดอร์ปลายทาง
       for (const key in files) {
-        const raw = key.replace(/\[\]$/, "") as keyof typeof this.fileType; // รองรับกรณีที่ key เป็น array เช่น imageI[]
+        const raw = key.replace(/\[\]$/, '') as keyof typeof this.fileType; // รองรับกรณีที่ key เป็น array เช่น imageI[]
         const formNo = await this.formService.getFormno(form); // Get the form number
         const destination = path + '/' + formNo; // Get the destination path
         const fileList = files[key];
@@ -136,42 +135,56 @@ export class IeBgrService {
           const moved = await moveFileFromMulter(file, destination);
           movedTargets.push(moved.path);
           movedTargets.push(file.path);
-          console.log('Processing image file:', file.originalname);
           // 4. บันทึกข้อมูลไฟล์ลงใน DB
           if (key.startsWith('image') && fileList) {
-            
             await this.ebudgetcolImageService.upsert(
               {
                 ...form,
                 COLNO: this.fileType[raw],
                 ID: String(++fileIndex),
                 IMAGE_FILE: file.originalname,
-                SFILE:  moved.newName,
+                SFILE: moved.newName,
               },
               queryRunner,
             );
           } else if (key.startsWith('file') && fileList) {
             await this.ebudgetattfileService.upsert(
-                {
-                    ...form,
-                    TYPENO: this.fileType[raw],
-                    ID: String(++fileIndex),
-                    SFILE:  moved.newName,
-                    OFILE: file.originalname,
-                },
-                queryRunner,
+              {
+                ...form,
+                TYPENO: this.fileType[raw],
+                ID: String(++fileIndex),
+                SFILE: moved.newName,
+                OFILE: file.originalname,
+              },
+              queryRunner,
             );
           }
         }
       }
 
       // 5. บันทึกข้อมูล Quotation
+      for (const quotation of dto.quotation) {
+        const resQuo = await this.ebudgetQuotationService.insert(
+          {
+            ...form,
+            QTA_FORM: quotation.QTA_FORM,
+            QTA_VALID_DATE: quotation.QTA_VALID_DATE,
+            TOTAL: quotation.TOTAL,
+            CREATE_BY: dto.empInput,
+          },
+          queryRunner,
+        );
+        // 6. บันทึกข้อมูล Quotation Product
+        for (const product of quotation.product) {
+            await this.ebudgetQuotationProductService.insert({
+                QUOTATION_ID: resQuo.data.ID,
+                ...product
+            }, queryRunner);
+        }
+      }
 
-      
-      console.log(movedTargets);
+      // 7. ส่งเมลแจ้ง
       await this.flowService.sendMailToApprover(form, queryRunner);
-      throw new Error('test ');
-
       await queryRunner.commitTransaction();
 
       return {

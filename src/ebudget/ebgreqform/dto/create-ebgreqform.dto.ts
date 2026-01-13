@@ -103,7 +103,7 @@ export class CreateIeBgrDto extends PickType(FormDto, [
 
   @IsOptional()
   @IsString()
-  REMARK: string;
+  REMARK?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -116,5 +116,5 @@ export class CreateIeBgrDto extends PickType(FormDto, [
   @IsOptional()
   @IsDate()
   @Type(() => Date)
-  PPRESDATE: Date;
+  PPRESDATE?: Date;
 }

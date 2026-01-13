@@ -9,7 +9,6 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { FormDto } from 'src/webform/form/dto/form.dto';
 
 export class CreateIeBgrDto {
   @IsNotEmpty()
@@ -18,16 +17,16 @@ export class CreateIeBgrDto {
 
   @IsNotEmpty()
   @IsString()
-  empRequest: string;
+  empRequest?: string;
 
   @IsOptional()
   @IsString()
-  remark: string;
+  remark?: string;
 
   @IsOptional()
   @IsDate()
   @Type(() => Date)
-  PREDATE: Date;
+  PREDATE?: Date;
 
   @IsNotEmpty()
   @IsString()
@@ -45,7 +44,7 @@ export class CreateIeBgrDto {
   @Transform(({ value }) =>
     typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
   )
-//   @Type(() => Number)
+  //   @Type(() => Number)
   @IsNumber()
   RECBG: number;
 
@@ -53,7 +52,7 @@ export class CreateIeBgrDto {
   @Transform(({ value }) =>
     typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
   )
-//   @Type(() => Number)
+  //   @Type(() => Number)
   @IsNumber()
   USEDBG: number;
 
@@ -61,7 +60,7 @@ export class CreateIeBgrDto {
   @Transform(({ value }) =>
     typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
   )
-//   @Type(() => Number)
+  //   @Type(() => Number)
   @IsNumber()
   REMBG: number;
 
@@ -69,7 +68,7 @@ export class CreateIeBgrDto {
   @Transform(({ value }) =>
     typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
   )
-//   @Type(() => Number)
+  //   @Type(() => Number)
   @IsNumber()
   REQAMT: number;
 
@@ -112,7 +111,7 @@ export class CreateIeBgrDto {
 
   @IsOptional()
   @IsString()
-  REMARK: string;
+  REMARK?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -134,14 +133,15 @@ export class BGRQuotationDto {
   @IsString()
   QTA_FORM: string;
 
-  @IsNotEmpty()
-  @IsString()
-  QTA_VALID_DATE: string;
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  QTA_VALID_DATE?: Date;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  TOTAL: number;
+  TOTAL?: number;
 
   @IsOptional()
   @IsArray()

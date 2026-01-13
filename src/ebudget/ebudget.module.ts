@@ -5,6 +5,8 @@ import { BiddingModule } from './bidding/bidding.module';
 import { EbgreqformModule } from './ebgreqform/ebgreqform.module';
 import { EbgreqcolImageModule } from './ebgreqcol-image/ebgreqcol-image.module';
 import { EbgreqattfileModule } from './ebgreqattfile/ebgreqattfile.module';
+import { EbudgetQuotationModule } from './ebudget-quotation/ebudget-quotation.module';
+import { EbudgetQuotationProductModule } from './ebudget-quotation-product/ebudget-quotation-product.module';
 
 @Module({
   imports: [
@@ -13,7 +15,9 @@ import { EbgreqattfileModule } from './ebgreqattfile/ebgreqattfile.module';
     BiddingModule,
     EbgreqformModule,
     EbgreqcolImageModule,
-    EbgreqattfileModule
+    EbgreqattfileModule,
+    EbudgetQuotationModule,
+    EbudgetQuotationProductModule
   ],
 })
 export class EbudgetModule {}

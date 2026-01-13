@@ -13,6 +13,19 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   /**
+   * Resolve cookie domain from request safely
+   * @author  Mr.Pathanapong Sokpukeaw
+   * @since   2025-11-12
+   */
+  private resolveCookieDomain(req: Request): string | undefined {
+    const host = req.hostname;
+    if (host.endsWith('.mitsubishielevatorasia.co.th')) {
+      return '.mitsubishielevatorasia.co.th';
+    }
+    return undefined;
+  }
+
+  /**
    * Handle user login request and set HttpOnly cookie
    * @author  Mr.Pathanapong Sokpukeaw
    * @since   2025-11-13
@@ -30,11 +43,12 @@ export class AuthController {
     const ip = getClientIP(request);
     const result = await this.authService.validateUser(body.uid, ip);
     if (result.status === 'success' && result.user) {
+      const cookieDomain = this.resolveCookieDomain(request);
       response.cookie('NodeJS.Packinguser', JSON.stringify(result.user), {
         httpOnly: false,
         secure: true,         
         sameSite: 'none',
-        domain: process.env.NODE_ENV === 'production' ? '.mitsubishielevatorasia.co.th' : 'localhost',
+        domain: cookieDomain,
       });
     }
 

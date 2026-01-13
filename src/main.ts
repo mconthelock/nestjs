@@ -25,7 +25,6 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
   });
-  
 
   app.enableCors({
     origin: (origin, cb) => {
@@ -141,7 +140,7 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
   console.log(`Application is running on: ${await app.getUrl()}`);
 
-   // แจ้ง PM2 ว่า instance พร้อมแล้ว
+  // แจ้ง PM2 ว่า instance พร้อมแล้ว
   if (process.send) {
     process.send('ready');
   }

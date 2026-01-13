@@ -13,6 +13,10 @@ import { InquiryDetail } from '../inquiry-detail/entities/inquiry-detail.entity'
 import { History } from '../history/entities/history.entity';
 import { Timeline } from '../timeline/entities/timeline.entity';
 import { Attachments } from '../attachments/entities/attachments.entity';
+import { Shipment } from '../shipment/entities/shipment.entity';
+
+import { Orderpart } from 'src/marketing/orderparts/entities/orderpart.entity';
+import { Spcalsheet } from 'src/marketing/spcalsheet/entities/spcalsheet.entity';
 
 //DTOs
 import { searchDto } from './dto/search.dto';
@@ -41,10 +45,23 @@ export class InquiryService {
       .leftJoinAndSelect('inq.maruser', 'maruser');
 
     if (searchDto.IS_DETAILS) {
-      qb.leftJoinAndSelect('inq.details', 'details');
-      searchDto = { ...searchDto, details: { INQD_LATEST: 1 } };
+      qb.leftJoinAndSelect(
+        'inq.details',
+        'details',
+        'details.INQD_LATEST = :latest',
+        { latest: 1 },
+      );
       delete searchDto.IS_DETAILS;
+
+      if (searchDto.IS_ORDERS) {
+        // prettier-ignore
+        qb.leftJoinAndMapMany('inq.sheet', Spcalsheet,'sheet', 'inq.INQ_NO = sheet.INQNO AND details.INQD_SEQ = sheet.LINENO')
+            .leftJoinAndMapMany('inq.orders', Orderpart, 'orders', 'inq.INQ_NO = orders.INQUIRY_NO AND orders.REVISION_CODE != :rev', { rev: 'D' })
+            .leftJoinAndSelect('inq.shipment', 'shipment');
+        delete searchDto.IS_ORDERS;
+      }
     }
+    if (searchDto.IS_ORDERS) delete searchDto.IS_ORDERS;
 
     if (searchDto.IS_TIMELINE) {
       qb.leftJoinAndSelect('inq.timeline', 'timeline');
@@ -54,11 +71,6 @@ export class InquiryService {
     if (searchDto.IS_QUOTATION) {
       qb.leftJoinAndSelect('inq.quotation', 'quotation');
       delete searchDto.IS_QUOTATION;
-    }
-
-    if (searchDto.IS_ORDERS) {
-      qb.leftJoinAndSelect('inq.orders', 'orders');
-      delete searchDto.IS_ORDERS;
     }
 
     qb.where('inq.INQ_LATEST = :latest', { latest: 1 });

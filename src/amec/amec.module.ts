@@ -5,6 +5,7 @@ import { PdepartmentModule } from './pdepartment/pdepartment.module';
 import { PsectionModule } from './psection/psection.module';
 import { UsersModule } from './users/users.module';
 import { PpositionModule } from './pposition/pposition.module';
+import { PprbiddingModule } from './pprbidding/pprbidding.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PpositionModule } from './pposition/pposition.module';
     PsectionModule,
     UsersModule,
     PpositionModule,
+    PprbiddingModule,
   ],
 })
 export class AmecModule {}

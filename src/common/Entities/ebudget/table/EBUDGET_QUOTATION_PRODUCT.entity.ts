@@ -29,13 +29,13 @@ export class EBUDGET_QUOTATION_PRODUCT {
   @Column()
   QTY: number;
 
-  @Column()
+  @Column({type: 'decimal', precision: 10, scale: 2 })
   PRICE: number;
 
-  @Column()
+  @Column({type: 'decimal', precision: 10, scale: 2 })
   CURRENCY: number;
 
-  @Column()
+  @Column({type: 'decimal', precision: 10, scale: 2 })
   TOTAL: number;
 
   @Column()

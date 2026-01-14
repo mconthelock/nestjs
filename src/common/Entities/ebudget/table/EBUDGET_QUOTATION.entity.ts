@@ -26,7 +26,7 @@ export class EBUDGET_QUOTATION {
   @Column()
   QTA_VALID_DATE: Date;
 
-  @Column()
+  @Column({type: 'decimal', precision: 10, scale: 2 })
   TOTAL: number;
 
   @Column()

@@ -11,6 +11,7 @@ import { OrgTreeModule } from './org-tree/org-tree.module';
 import { SequenceOrgModule } from './sequence-org/sequence-org.module';
 import { RepModule } from './rep/rep.module';
 import { IEFormModule } from './ieform/ie.module';
+import { RqffrmModule } from './rqffrm/rqffrm.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { IEFormModule } from './ieform/ie.module';
     OrgposModule,
     OrgTreeModule,
     SequenceOrgModule,
-    RepModule
+    RepModule,
+    RqffrmModule
   ],
 })
 export class WebformModule {}

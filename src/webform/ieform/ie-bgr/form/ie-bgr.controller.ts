@@ -17,6 +17,7 @@ import { UpdateIeBgrDto } from './dto/update-ie-bgr.dto';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
+import { LastApvIeBgrDto } from './dto/lastapv-ie-bgr.dto';
 
 @Controller('ieform/ie-bgr')
 export class IeBgrController {
@@ -63,4 +64,11 @@ export class IeBgrController {
     const ip = getClientIP(req);
     return this.ieBgrService.create(dto, files, ip, this.path);
   }
+
+  @Post('lastApprove')
+  lastApprove(@Body() dto: LastApvIeBgrDto, @Req() req: Request) {
+    const ip = getClientIP(req);
+    return this.ieBgrService.lastApprove(dto, ip);
+  }
+
 }

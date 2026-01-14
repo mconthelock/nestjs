@@ -121,6 +121,14 @@ export class FormController {
     return this.formService.getFormno(dto);
   }
 
+  @Get('getPK/:formno')
+  @ApiOperation({
+    summary: 'Get Form by Formno',
+  })
+  async getPkByFormno(@Param('formno') formno: string) {
+    return this.formService.getPkByFormno(formno);
+  }
+
   @ApiExcludeEndpoint()
   @Post('createForm')
   @ApiOperation({

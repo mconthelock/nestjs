@@ -18,4 +18,9 @@ export class QuotationController {
   async getTotal(@Body() dto: FormDto) {
     return await this.quotationService.getTotal(dto);
   }
+
+  @Post('data')
+  async getData(@Body() dto: FormDto) {
+    return await this.quotationService.getData(dto);
+  }
 }

@@ -4,6 +4,7 @@ import { UpdateEbudgetQuotationDto } from './dto/update-ebudget-quotation.dto';
 import { EBUDGET_QUOTATION } from 'src/common/Entities/ebudget/table/EBUDGET_QUOTATION.entity';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Injectable()
 export class EbudgetQuotationService {
@@ -43,5 +44,17 @@ export class EbudgetQuotationService {
     } finally {
       if (localRunner && didConnect) await localRunner.release();
     }
+  }
+
+  async getData(dto: FormDto) {
+    return this.repo.find({
+      where: {
+        NFRMNO: dto.NFRMNO,
+        VORGNO: dto.VORGNO,
+        CYEAR: dto.CYEAR,
+        CYEAR2: dto.CYEAR2,
+        NRUNNO: dto.NRUNNO,
+      },
+    });
   }
 }

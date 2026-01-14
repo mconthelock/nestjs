@@ -12,6 +12,9 @@ import { EbgreqcolImageService } from 'src/ebudget/ebgreqcol-image/ebgreqcol-ima
 import { FlowService } from 'src/webform/flow/flow.service';
 import { EbudgetQuotationService } from 'src/ebudget/ebudget-quotation/ebudget-quotation.service';
 import { EbudgetQuotationProductService } from 'src/ebudget/ebudget-quotation-product/ebudget-quotation-product.service';
+import { LastApvIeBgrDto } from './dto/lastapv-ie-bgr.dto';
+import { FormDto } from 'src/webform/form/dto/form.dto';
+import { PprbiddingService } from 'src/amec/pprbidding/pprbidding.service';
 
 @Injectable()
 export class IeBgrService {
@@ -26,6 +29,7 @@ export class IeBgrService {
     private readonly flowService: FlowService,
     private readonly ebudgetQuotationService: EbudgetQuotationService,
     private readonly ebudgetQuotationProductService: EbudgetQuotationProductService,
+    private readonly pprbiddingService: PprbiddingService,
   ) {}
 
   private readonly fileType = {
@@ -176,10 +180,13 @@ export class IeBgrService {
         );
         // 6. บันทึกข้อมูล Quotation Product
         for (const product of quotation.product) {
-            await this.ebudgetQuotationProductService.insert({
-                QUOTATION_ID: resQuo.data.ID,
-                ...product
-            }, queryRunner);
+          await this.ebudgetQuotationProductService.insert(
+            {
+              QUOTATION_ID: resQuo.data.ID,
+              ...product,
+            },
+            queryRunner,
+          );
         }
       }
 
@@ -197,6 +204,46 @@ export class IeBgrService {
         await deleteFile(filePath); // ลบไฟล์ที่ย้ายสำเร็จไปแล้ว
       }
       return { status: false, message: 'Error: ' + error.message, dto };
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async lastApprove(dto: LastApvIeBgrDto, ip: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      const form: FormDto = {
+        NFRMNO: dto.NFRMNO,
+        VORGNO: dto.VORGNO,
+        CYEAR: dto.CYEAR,
+        CYEAR2: dto.CYEAR2,
+        NRUNNO: dto.NRUNNO,
+      };
+      // Insert PPRBIDDING
+      for ( const bidding of dto.pprbidding ){
+        await this.pprbiddingService.create({
+          SPRNO: bidding.SPRNO,
+          BIDDINGNO: bidding.BIDDINGNO,
+          EBUDGETNO: bidding.EBUDGETNO,
+        }, queryRunner);
+      }
+        
+      // do action
+      await this.flowService.doAction(
+        { ...form, REMARK: dto.REMARK, ACTION: dto.ACTION, EMPNO: dto.EMPNO },
+        ip,
+        queryRunner,
+      );
+      await queryRunner.commitTransaction();
+      return {
+        status: true,
+        message: 'Action successful',
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new Error(error.message);
     } finally {
       await queryRunner.release();
     }

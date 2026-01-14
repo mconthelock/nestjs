@@ -10,6 +10,7 @@ import { EbgreqcolImageModule } from 'src/ebudget/ebgreqcol-image/ebgreqcol-imag
 import { FlowModule } from 'src/webform/flow/flow.module';
 import { EbudgetQuotationModule } from 'src/ebudget/ebudget-quotation/ebudget-quotation.module';
 import { EbudgetQuotationProductModule } from 'src/ebudget/ebudget-quotation-product/ebudget-quotation-product.module';
+import { PprbiddingModule } from 'src/amec/pprbidding/pprbidding.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { EbudgetQuotationProductModule } from 'src/ebudget/ebudget-quotation-pro
     EbudgetQuotationModule,
     EbudgetQuotationProductModule,
     FlowModule,
+    PprbiddingModule
   ],
   controllers: [IeBgrController],
   providers: [IeBgrService],

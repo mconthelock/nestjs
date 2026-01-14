@@ -3,13 +3,18 @@ import { DataSource, Repository } from 'typeorm';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import * as oracledb from 'oracledb';
 import { FormDto } from 'src/webform/form/dto/form.dto';
-
+import { FormService } from 'src/webform/form/form.service';
+import { EbudgetQuotationService } from 'src/ebudget/ebudget-quotation/ebudget-quotation.service';
+import { EbudgetQuotationProductService } from 'src/ebudget/ebudget-quotation-product/ebudget-quotation-product.service';
 
 @Injectable()
 export class QuotationService {
   constructor(
     @InjectDataSource('webformConnection')
     private dataSource: DataSource,
+    private formService: FormService,
+    private ebudgetQuotationService: EbudgetQuotationService,
+    private ebudgetQuotationProductService: EbudgetQuotationProductService,
   ) {}
   /**
    * Get total amount of a quotation form
@@ -63,5 +68,22 @@ export class QuotationService {
     } finally {
         await queryRunner.release();
     }
+  }
+
+  async getData(dto: FormDto) {
+    const form = await this.formService.getFormDetail(dto);
+    const quotationList = await this.ebudgetQuotationService.getData(dto);
+    // form.quotation = quotation;
+    const quotations = [];
+    for ( const q of quotationList ){
+        const detail = await this.formService.getPkByFormno(q.QTA_FORM);
+        const product = await this.ebudgetQuotationProductService.getData(q.ID);
+
+        detail.data.detail = q;
+        detail.data.product = product;
+        quotations.push(detail.data);
+    }
+    form.quotation = quotations;
+    return form;
   }
 }

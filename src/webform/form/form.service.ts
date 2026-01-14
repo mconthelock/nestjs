@@ -21,6 +21,7 @@ import { empnoFormDto } from './dto/empno-form.dto';
 import { minDate } from 'class-validator';
 import { count } from 'console';
 import { SearchFormDto } from './dto/search-form.dto';
+import { formDetailQb } from 'src/common/utils/qb-form-detail';
 
 interface FormContext {
   ip: string;
@@ -225,6 +226,25 @@ export class FormService {
     const runNo = String(dto.NRUNNO).padStart(6, '0'); // เช่น 1 => "000001"
     return `${form[0].VANAME}${year2}-${runNo}`;
   }
+
+  async getPkByFormno(formno: string){
+    const vaname = formno.replace(/\d+/g, '').replace(/-$/, '');
+    const formmst = await this.formmstService.getFormMasterByVaname(vaname);
+    const split = formno.split('-');
+    const form = {
+        NFRMNO: formmst.NNO,
+        VORGNO: formmst.VORGNO,
+        CYEAR: formmst.CYEAR,
+        CYEAR2: "20"+split[1].replace(/\D/g,''),
+        NRUNNO: Number(split[2])
+    }
+    return {
+        ...form,
+        data: await this.getFormDetail(form)
+    };
+  }
+
+
 
   async create(dto: CreateFormDto, ip: string, queryRunner?: QueryRunner) {
     let localRunner: QueryRunner | undefined;
@@ -793,30 +813,8 @@ export class FormService {
   }
 
   async getFormDetail(form: FormDto) {
-    const formDetail = await this.dataSource
-      .createQueryBuilder()
-      .select(`FT.VANAME || SUBSTR(F.CYEAR2,3,2) || '-' || LPAD(F.NRUNNO, 6, '0') AS FORMNO,(
-                CASE
-                WHEN INSTR(FT.VFORMPAGE, 'amecweb') > 0
-                    THEN FT.VFORMPAGE
-                ELSE
-                    'http://webflow.mitsubishielevatorasia.co.th' || 
-                    CASE WHEN SUBSTR(FT.VFORMPAGE, 1, 1) = '/' THEN '' ELSE '/' END ||
-                    FT.VFORMPAGE
-                END
-            )
-            || '?no='   || F.NFRMNO
-            || '&orgNo='|| F.VORGNO
-            || '&y='    || F.CYEAR
-            || '&y2='   || F.CYEAR2
-            || '&runNo='|| F.NRUNNO
-            || '&empno='
-            AS "link",
-        F.*, A.SNAME AS VINPUTNAME, B.SNAME AS VREQNAME, A.SSECCODE AS VINPUTSECCODE, B.SSECCODE AS VREQSECCODE, A.SDEPCODE AS VINPUTDEPCODE, B.SDEPCODE AS VREQDEPCODE, A.SDIVCODE AS VINPUTDIVCODE, B.SDIVCODE AS VREQDIVCODE`)
-      .from('FORM', 'F')
-      .innerJoin('FORMMST', 'FT', 'FT.NNO = F.NFRMNO AND FT.VORGNO = F.VORGNO AND FT.CYEAR = F.CYEAR')
-      .leftJoin('AMECUSERALL', 'A', 'A.SEMPNO = F.VINPUTER')
-      .leftJoin('AMECUSERALL', 'B', 'B.SEMPNO = F.VREQNO')
+    const query = formDetailQb(this.dataSource);
+    const formDetail = query
       .where('F.NFRMNO = :NFRMNO', { NFRMNO: form.NFRMNO })
       .andWhere('F.VORGNO = :VORGNO', { VORGNO: form.VORGNO })
       .andWhere('F.CYEAR = :CYEAR', { CYEAR: form.CYEAR })

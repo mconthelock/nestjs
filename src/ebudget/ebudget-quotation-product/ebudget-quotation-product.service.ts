@@ -49,4 +49,15 @@ export class EbudgetQuotationProductService {
       if (localRunner && didConnect) await localRunner.release();
     }
   }
+
+  async getData(id: number) {
+    return this.repo.find({
+      where: {
+        QUOTATION_ID: id
+      },
+      order: {
+        SEQ: 'ASC'
+      }
+    });
+  }
 }

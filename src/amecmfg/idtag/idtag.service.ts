@@ -55,10 +55,14 @@ export class IdtagService {
 
   async findf110kpBySchd(schd: string,p?: string) {
     const where: any = {};
+    // if (schd) where.tags = {F01R02: schd};
     if (schd) where.F11K05 = schd;
     if (p) where.F11K06 = p;
     return this.f11.find({
       where: { ...where },
+      relations: {
+        tags: { process: true},
+      }
     });
   }
 
@@ -97,5 +101,6 @@ export class IdtagService {
       .groupBy('f1.F01R02')
       .orderBy('f1.F01R02', 'DESC')
       .getRawMany();
+      
   }
 }

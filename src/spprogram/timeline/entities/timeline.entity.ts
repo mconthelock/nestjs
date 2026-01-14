@@ -96,6 +96,8 @@ export class Timeline {
   @Column()
   SALE_CLASS: string;
 
+  finusers?: any;
+
   // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
   // ตัวอย่าง:
   @OneToOne(() => Inquiry, (inqs) => inqs.timeline)

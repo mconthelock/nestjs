@@ -43,4 +43,10 @@ export class searchDto extends PartialType(SearchBase) {
 
   @IsOptional()
   IS_TIMELINE?: string;
+
+  @IsOptional()
+  IS_FIN?: string;
+
+  @IsOptional()
+  IS_GROUP?: string;
 }

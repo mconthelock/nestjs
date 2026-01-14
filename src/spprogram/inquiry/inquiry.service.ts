@@ -13,10 +13,10 @@ import { InquiryDetail } from '../inquiry-detail/entities/inquiry-detail.entity'
 import { History } from '../history/entities/history.entity';
 import { Timeline } from '../timeline/entities/timeline.entity';
 import { Attachments } from '../attachments/entities/attachments.entity';
-import { Shipment } from '../shipment/entities/shipment.entity';
 
 import { Orderpart } from 'src/marketing/orderparts/entities/orderpart.entity';
 import { Spcalsheet } from 'src/marketing/spcalsheet/entities/spcalsheet.entity';
+import { User } from 'src/amec/users/entities/user.entity';
 
 //DTOs
 import { searchDto } from './dto/search.dto';
@@ -40,9 +40,14 @@ export class InquiryService {
   async search(searchDto: searchDto) {
     const qb = this.inq
       .createQueryBuilder('inq')
-      .leftJoinAndSelect('inq.inqgroup', 'inqgroup')
       .leftJoinAndSelect('inq.status', 'status')
-      .leftJoinAndSelect('inq.maruser', 'maruser');
+      .leftJoinAndSelect('inq.maruser', 'maruser')
+      .leftJoinAndSelect('inq.shipment', 'shipment');
+
+    if (searchDto.IS_GROUP) {
+      qb.leftJoinAndSelect('inq.inqgroup', 'inqgroup');
+      delete searchDto.IS_GROUP;
+    }
 
     if (searchDto.IS_DETAILS) {
       qb.leftJoinAndSelect(
@@ -56,8 +61,7 @@ export class InquiryService {
       if (searchDto.IS_ORDERS) {
         // prettier-ignore
         qb.leftJoinAndMapMany('inq.sheet', Spcalsheet,'sheet', 'inq.INQ_NO = sheet.INQNO AND details.INQD_SEQ = sheet.LINENO')
-            .leftJoinAndMapMany('inq.orders', Orderpart, 'orders', 'inq.INQ_NO = orders.INQUIRY_NO AND orders.REVISION_CODE != :rev', { rev: 'D' })
-            .leftJoinAndSelect('inq.shipment', 'shipment');
+            .leftJoinAndMapMany('inq.orders', Orderpart, 'orders', 'inq.INQ_NO = orders.INQUIRY_NO AND orders.REVISION_CODE != :rev', { rev: 'D' });
         delete searchDto.IS_ORDERS;
       }
     }
@@ -66,6 +70,16 @@ export class InquiryService {
     if (searchDto.IS_TIMELINE) {
       qb.leftJoinAndSelect('inq.timeline', 'timeline');
       delete searchDto.IS_TIMELINE;
+
+      if (searchDto.IS_FIN) {
+        qb.leftJoinAndMapMany(
+          'timeline.finusers',
+          User,
+          'finusers',
+          'timeline.FIN_USER = finusers.SEMPNO',
+        );
+        delete searchDto.IS_FIN;
+      }
     }
 
     if (searchDto.IS_QUOTATION) {

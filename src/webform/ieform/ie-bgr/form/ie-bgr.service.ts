@@ -4,7 +4,11 @@ import { UpdateIeBgrDto } from './dto/update-ie-bgr.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { FormService } from 'src/webform/form/form.service';
-import { deleteFile, moveFileFromMulter } from 'src/common/utils/files.utils';
+import {
+  deleteFile,
+  joinPaths,
+  moveFileFromMulter,
+} from 'src/common/utils/files.utils';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { EbgreqformService } from 'src/ebudget/ebgreqform/ebgreqform.service';
 import { EbgreqattfileService } from 'src/ebudget/ebgreqattfile/ebgreqattfile.service';
@@ -69,36 +73,64 @@ export class IeBgrService {
   ) {
     const queryRunner = this.dataSource.createQueryRunner();
     let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
+    let returnDelFiles: string[] = []; // เก็บ path ไฟล์ที่ต้องลบในกรณี Return
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
-      const formmst = await this.formmstService.getFormMasterByVaname('IE-BGR');
 
-      // 1. สร้าง Form ก่อน
-      const createForm = await this.formService.create(
-        {
-          NFRMNO: formmst.NNO,
-          VORGNO: formmst.VORGNO,
-          CYEAR: formmst.CYEAR,
-          REQBY: dto.empRequest,
-          INPUTBY: dto.empInput,
-          REMARK: dto.remark,
-        },
-        ip,
-        queryRunner,
-      );
+      let form: FormDto;
+      // 1. ตรวจสอบกรณีเป็นการ Return
+      if (dto.isReturn) {
+        // 1.1 กรณี Return ให้ทำการ Do Action เลย
+        form = {
+          NFRMNO: dto.returnData.NFRMNO,
+          VORGNO: dto.returnData.VORGNO,
+          CYEAR: dto.returnData.CYEAR,
+          CYEAR2: dto.returnData.CYEAR2,
+          NRUNNO: dto.returnData.NRUNNO,
+        };
+        await this.flowService.doAction(
+          {
+            ...form,
+            ACTION: dto.returnData.ACTION,
+            EMPNO: dto.returnData.EMPNO,
+            REMARK: dto.remark,
+          },
+          ip,
+          queryRunner,
+        );
+      } else {
+        // 1.2 กรณี New ให้สร้าง Form ใหม่
+        const formmst =
+          await this.formmstService.getFormMasterByVaname('IE-BGR');
+        const createForm = await this.formService.create(
+          {
+            NFRMNO: formmst.NNO,
+            VORGNO: formmst.VORGNO,
+            CYEAR: formmst.CYEAR,
+            REQBY: dto.empRequest,
+            INPUTBY: dto.empInput,
+            REMARK: dto.remark,
+          },
+          ip,
+          queryRunner,
+        );
 
-      if (!createForm.status) {
-        throw new Error(createForm.message.message);
+        if (!createForm.status) {
+          throw new Error(createForm.message.message);
+        }
+
+        form = {
+          NFRMNO: createForm.data.NFRMNO,
+          VORGNO: createForm.data.VORGNO,
+          CYEAR: createForm.data.CYEAR,
+          CYEAR2: createForm.data.CYEAR2,
+          NRUNNO: createForm.data.NRUNNO,
+        };
       }
-
-      const form = {
-        NFRMNO: createForm.data.NFRMNO,
-        VORGNO: createForm.data.VORGNO,
-        CYEAR: createForm.data.CYEAR,
-        CYEAR2: createForm.data.CYEAR2,
-        NRUNNO: createForm.data.NRUNNO,
-      };
+      // 1.3 เตรียม path สำหรับบันทึกไฟล์
+      const formNo = await this.formService.getFormno(form); // Get the form number
+      const destination = path + '/' + formNo; // Get the destination path
 
       // 2. บันทึกข้อมูล EBGREQFORM
       const data = {
@@ -128,37 +160,166 @@ export class IeBgrService {
       // Insert EBGREQFORM record
       await this.ebudgetformService.upsert(data, queryRunner);
 
-      // 3. บันทึกไฟล์ และ รูปภาพ ลงในโฟลเดอร์ปลายทาง
+      console.log(files);
+      console.log('isReturn', dto.isReturn);
+      if (dto.isReturn) {
+        console.log('return');
+      }
+
+      // 3. จัดการไฟล์และรูปภาพ
+      if (dto.isReturn) {
+        // 3.1 ลบรูปภาพ
+        if (dto.returnData.delImage && dto.returnData.delImage.length > 0) {
+          let colno = [];
+          for (const image of dto.returnData.delImage) {
+            const cond = {
+              ...form,
+              COLNO: Number(image.colno),
+              ID: image.id,
+            };
+            const img = await this.ebudgetcolImageService.findOne(
+              cond,
+              queryRunner,
+            );
+            if (img) {
+              returnDelFiles.push(await joinPaths(destination, img.SFILE)); // เตรียมลบไฟล์ที่มีอยู่เดิม
+              await this.ebudgetcolImageService.delete(
+                { condition: cond },
+                queryRunner,
+              ); // ลบข้อมูลรูปภาพใน DB
+              colno.push(img.COLNO); // เก็บ colno ที่มีการลบไว้
+            }
+          }
+          colno = [...new Set(colno)]; // เอา colno ที่ซ้ำออก
+          for (const cn of colno) {
+            // 3.2 เรียงลำดับ ID ใหม่
+            const images = await this.ebudgetcolImageService.search(
+              {
+                ...form,
+                COLNO: cn,
+              },
+              queryRunner,
+            );
+            const sortedImages = images.sort((a, b) => {
+              const aNum = parseInt(a.ID);
+              const bNum = parseInt(b.ID);
+              return aNum - bNum;
+            });
+            let newId = 0;
+            for (const img of sortedImages) {
+              await this.ebudgetcolImageService.update(
+                {
+                  condition: {
+                    ...form,
+                    COLNO: cn,
+                    ID: img.ID,
+                  },
+                  ID: String(++newId),
+                },
+                queryRunner,
+              );
+            }
+          }
+        }
+        // 3.3 ลบไฟล์แนบ
+        if (dto.returnData.delattach && dto.returnData.delattach.length > 0) {
+          let typeno = [];
+          for (const f of dto.returnData.delattach) {
+            const cond = {
+              ...form,
+              TYPENO: Number(f.typeno),
+              ID: f.id,
+            };
+            const file = await this.ebudgetattfileService.findOne(
+              cond,
+              queryRunner,
+            );
+            if (file) {
+              returnDelFiles.push(await joinPaths(destination, file.SFILE)); // เตรียมลบไฟล์ที่มีอยู่เดิม
+              await this.ebudgetattfileService.delete(
+                { condition: cond },
+                queryRunner,
+              ); // ลบข้อมูลรูปภาพใน DB
+              typeno.push(file.TYPENO); // เก็บ typeno ที่มีการลบไว้
+            }
+          }
+          typeno = [...new Set(typeno)]; // เอา typeno ที่ซ้ำออก
+          for (const cn of typeno) {
+            // 3.4 เรียงลำดับ ID ใหม่
+            const files = await this.ebudgetattfileService.search(
+              {
+                ...form,
+                TYPENO: cn,
+              },
+              queryRunner,
+            );
+            const sortedFiles = files.sort((a, b) => {
+              const aNum = parseInt(a.ID);
+              const bNum = parseInt(b.ID);
+              return aNum - bNum;
+            });
+            let newId = 0;
+            for (const file of sortedFiles) {
+              await this.ebudgetattfileService.update(
+                {
+                  condition: {
+                    ...form,
+                    TYPENO: cn,
+                    ID: file.ID,
+                  },
+                  ID: String(++newId),
+                },
+                queryRunner,
+              );
+            }
+          }
+        }
+      }
+
+      // 3.5 บันทึกไฟล์ และ รูปภาพ ลงในโฟลเดอร์ปลายทาง
       for (const key in files) {
         const raw = key.replace(/\[\]$/, '') as keyof typeof this.fileType; // รองรับกรณีที่ key เป็น array เช่น imageI[]
-        const formNo = await this.formService.getFormno(form); // Get the form number
-        const destination = path + '/' + formNo; // Get the destination path
         const fileList = files[key];
-        let fileIndex = 0;
+        const data = key.startsWith('image')
+          ? await this.ebudgetcolImageService.search(
+              {
+                ...form,
+                COLNO: this.fileType[raw],
+              },
+              queryRunner,
+            )
+          : await this.ebudgetattfileService.search(
+              {
+                ...form,
+                TYPENO: this.fileType[raw],
+              },
+              queryRunner,
+            );
+        let fileIndex = data.length; // เริ่มนับจากจำนวนไฟล์เดิม
         for (const file of fileList) {
           const moved = await moveFileFromMulter(file, destination);
           movedTargets.push(moved.path);
           movedTargets.push(file.path);
-          // 4. บันทึกข้อมูลไฟล์ลงใน DB
+          // 3.6 บันทึกข้อมูลไฟล์ลงใน DB
           if (key.startsWith('image') && fileList) {
-            await this.ebudgetcolImageService.upsert(
+            await this.ebudgetcolImageService.insert(
               {
                 ...form,
                 COLNO: this.fileType[raw],
                 ID: String(++fileIndex),
-                IMAGE_FILE: file.originalname,
+                IMAGE_FILE: file.originalname.replace(/[^a-zA-Z0-9.]/g, '_'),
                 SFILE: moved.newName,
               },
               queryRunner,
             );
           } else if (key.startsWith('file') && fileList) {
-            await this.ebudgetattfileService.upsert(
+            await this.ebudgetattfileService.insert(
               {
                 ...form,
                 TYPENO: this.fileType[raw],
                 ID: String(++fileIndex),
                 SFILE: moved.newName,
-                OFILE: file.originalname,
+                OFILE: file.originalname.replace(/[^a-zA-Z0-9.]/g, '_'),
               },
               queryRunner,
             );
@@ -166,7 +327,7 @@ export class IeBgrService {
         }
       }
 
-      // 5. บันทึกข้อมูล Quotation
+      // 4. บันทึกข้อมูล Quotation
       for (const quotation of dto.quotation) {
         const resQuo = await this.ebudgetQuotationService.insert(
           {
@@ -178,17 +339,33 @@ export class IeBgrService {
           },
           queryRunner,
         );
-        // 6. บันทึกข้อมูล Quotation Product
+        // 5. บันทึกข้อมูล Quotation Product
         for (const product of quotation.product) {
-          await this.ebudgetQuotationProductService.insert(
-            {
-              QUOTATION_ID: resQuo.data.ID,
-              ...product,
-            },
-            queryRunner,
-          );
+          if (product.SEQ) {
+            console.log(product);
+
+            await this.ebudgetQuotationProductService.insert(
+              {
+                QUOTATION_ID: resQuo.data.ID,
+                ...product,
+              },
+              queryRunner,
+            );
+          }
         }
       }
+      // 6. กรณีเป็นการ Return ให้ลบไฟล์ที่เตรียมไว้
+      if (dto.isReturn) {
+        console.log(returnDelFiles);
+
+        for (const filePath of returnDelFiles) {
+          console.log(filePath);
+
+          await deleteFile(filePath); // ลบไฟล์ที่ย้ายสำเร็จไปแล้ว
+        }
+      }
+
+      throw new Error('test rollback');
 
       // 7. ส่งเมลแจ้ง
       await this.flowService.sendMailToApprover(form, queryRunner);
@@ -203,7 +380,7 @@ export class IeBgrService {
       for (const filePath of movedTargets) {
         await deleteFile(filePath); // ลบไฟล์ที่ย้ายสำเร็จไปแล้ว
       }
-      return { status: false, message: 'Error: ' + error.message, dto };
+      throw new Error(error.message);
     } finally {
       await queryRunner.release();
     }
@@ -222,14 +399,17 @@ export class IeBgrService {
         NRUNNO: dto.NRUNNO,
       };
       // Insert PPRBIDDING
-      for ( const bidding of dto.pprbidding ){
-        await this.pprbiddingService.create({
-          SPRNO: bidding.SPRNO,
-          BIDDINGNO: bidding.BIDDINGNO,
-          EBUDGETNO: bidding.EBUDGETNO,
-        }, queryRunner);
+      for (const bidding of dto.pprbidding) {
+        await this.pprbiddingService.create(
+          {
+            SPRNO: bidding.SPRNO,
+            BIDDINGNO: bidding.BIDDINGNO,
+            EBUDGETNO: bidding.EBUDGETNO,
+          },
+          queryRunner,
+        );
       }
-        
+
       // do action
       await this.flowService.doAction(
         { ...form, REMARK: dto.REMARK, ACTION: dto.ACTION, EMPNO: dto.EMPNO },

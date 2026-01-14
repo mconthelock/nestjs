@@ -2,8 +2,5 @@ import { PartialType } from '@nestjs/swagger';
 import { CreateEbgreqcolImageDto } from './create-ebgreqcol-image.dto';
 import { IsArray, IsNotEmpty } from 'class-validator';
 
-export class UpdateEbgreqcolImageDto extends PartialType(CreateEbgreqcolImageDto) {
-    @IsNotEmpty()
-    @IsArray()
-    condition: Partial<CreateEbgreqcolImageDto>;
+export class SearchEbgreqcolImageDto extends PartialType(CreateEbgreqcolImageDto) {
 }

@@ -707,7 +707,6 @@ export class FlowService {
             if (stepNext.stepNextNo != '00') {
               await this.updateNextStepWait(form, stepNext.stepno, runner);
             }
-            throw new Error('test');
           }
           break;
         case 'return':

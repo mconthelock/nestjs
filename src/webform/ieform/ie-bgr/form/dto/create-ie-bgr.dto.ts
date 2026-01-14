@@ -2,6 +2,7 @@ import { PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
+  IsBoolean,
   IsDate,
   IsNotEmpty,
   IsNumber,
@@ -9,8 +10,58 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+
+export class BGRDelImageDto {
+  @IsNotEmpty()
+  @IsString()
+  id: string;
+
+  @IsNotEmpty()
+  @IsString()
+  colno: string;
+}
+
+export class BGRDelAttDto {
+  @IsNotEmpty()
+  @IsString()
+  id: string; 
+
+  @IsNotEmpty()
+  @IsString()
+  typeno: string;
+}
+
+export class BGRReturnDto extends PickType(doactionFlowDto, [
+  'NFRMNO',
+  'VORGNO',
+  'CYEAR',
+  'CYEAR2',
+  'NRUNNO',
+  'ACTION',
+  'EMPNO',
+] as const) {
+  @IsOptional()
+  @IsArray()
+  @Type(() => BGRDelImageDto)
+  delImage?: BGRDelImageDto[];
+
+    @IsOptional()
+  @IsArray()
+  @Type(() => BGRDelAttDto)
+  delattach?: BGRDelAttDto[];
+}
 
 export class CreateIeBgrDto {
+  @IsOptional()
+  @IsBoolean()
+  @Type(() => Boolean)
+  isReturn?: boolean;
+
+  @IsOptional()
+  @Type(() => BGRReturnDto)
+  returnData?: BGRReturnDto;
+
   @IsNotEmpty()
   @IsString()
   empInput: string;
@@ -145,72 +196,73 @@ export class BGRQuotationDto {
 
   @IsOptional()
   @IsArray()
-  @ValidateNested({ each: true })
+//   @ValidateNested({ each: true }) // หากพี่ปิ๊กอยากให้ต้องเอา quotation ที่มี product เท่านั้น ให้เปิดบรรทัดนี้และไปเพิ่ม check ที่ fontend ให้กรองเฉพาะ quotation ที่มี product ด้วย
   @Type(() => BGRQuotationProductDto)
   product?: BGRQuotationProductDto[];
 }
 
 export class BGRQuotationProductDto {
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   SEQ: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   SVENDCODE: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   SVENDNAME: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   PRODCODE: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   PRODNAME: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   UNITCODE: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   UNIT: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   QTY: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   PRICE: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   CURRENCY: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   TOTAL: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   CURRYEAR: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   CURRSECT: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   CURRCODE: string;
 }
+

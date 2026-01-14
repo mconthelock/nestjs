@@ -18,6 +18,11 @@ export class InquiryController {
     return await this.inq.search(searchDto);
   }
 
+  @Post('query')
+  async query(@Body() searchDto: any) {
+    return await this.inq.searchSP(searchDto);
+  }
+
   @Post('create')
   async create(@Body() req: any) {
     const data = await this.inq.create(
@@ -47,11 +52,6 @@ export class InquiryController {
   async revise(@Body() req: any) {
     return await this.inq.revise(req.id);
   }
-
-  //   @Post('delete')
-  //   async delete(@Body() searchDto: searchDto) {
-  //     return await this.inq.delete(searchDto);
-  //   }
 
   @Post('update_status/:id')
   async updatestatus(@Body() req: inqDataDto, @Param('id') id: number) {

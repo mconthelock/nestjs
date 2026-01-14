@@ -6,6 +6,7 @@ import { AgentModule } from './agent/agent.module';
 import { AftsysdocModule } from './aftsysdoc/aftsysdoc.module';
 import { MscountryModule } from './mscountry/mscountry.module';
 import { TmaintaintypeModule } from './tmaintaintype/tmaintaintype.module';
+import { SpcalsheetModule } from './spcalsheet/spcalsheet.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TmaintaintypeModule } from './tmaintaintype/tmaintaintype.module';
     AgentModule,
     AftsysdocModule,
     MscountryModule,
+    SpcalsheetModule,
   ],
 })
 export class MktModule {}

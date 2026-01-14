@@ -11,6 +11,9 @@ module.exports = {
       error_file: './logs/pm2-err.log',
       out_file: './logs/pm2-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss',
+      wait_ready: true,
+      listen_timeout: 10000,
+      kill_timeout: 5000,
     },
   ],
 };

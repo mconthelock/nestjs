@@ -160,6 +160,9 @@ export class Inquiry {
   @Column()
   INQ_FIN_REMARK: string;
 
+  sheet?: any[];
+  orders?: any[];
+
   // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
   // ตัวอย่าง:
   @OneToMany(() => InquiryGroup, (group) => group.inqs)

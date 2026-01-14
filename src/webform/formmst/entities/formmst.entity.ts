@@ -4,7 +4,7 @@ import { Form } from './../../form/entities/form.entity';
 @Entity('FORMMST')
 export class Formmst {
   @PrimaryColumn()
-  NNO: string;
+  NNO: number;
 
   @PrimaryColumn()
   VORGNO: string;
@@ -13,7 +13,7 @@ export class Formmst {
   CYEAR: string;
 
   @Column()
-  NRUNNO: string;
+  NRUNNO: number;
 
   @Column()
   VNAME: string;
@@ -25,7 +25,7 @@ export class Formmst {
   VDESC: string;
 
   @Column()
-  DCREDATE: string;
+  DCREDATE: Date;
 
   @Column()
   CCRETIME: string;
@@ -40,7 +40,7 @@ export class Formmst {
   VDIR: string;
 
   @Column()
-  NLIFETIME: string;
+  NLIFETIME: number;
 
   @Column()
   CSTATUS: string;

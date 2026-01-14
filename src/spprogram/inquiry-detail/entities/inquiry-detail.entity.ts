@@ -11,6 +11,7 @@ import {
 import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 import { InquiryGroup } from '../../inquiry-group/entities/inquiry-group.entity';
 import { InquiryLog } from '../../inquiry-log/entities/inquiry-log.entity';
+// import { Spcalsheet } from 'src/marketing/spcalsheet/entities/spcalsheet.entity';
 
 @Entity('SP_INQUIRY_DETAIL')
 export class InquiryDetail {

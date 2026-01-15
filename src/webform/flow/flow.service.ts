@@ -756,9 +756,9 @@ export class FlowService {
             { ...params, whatAction, stepAction },
             runner,
           );
-          await this.updateStepNextExeToNormal(form, dto.CEXTDATA, runner);
-          await this.updateStepExeToReady(form, dto.CEXTDATA, runner);
-          await this.updateStepNextExeToWait(form, dto.CEXTDATA, runner);
+          await this.updateStepNextExeToNormal(form, dto.CEXTDATA, runner); // step ต่อจาก exe ทั้งหมดเป็น 1
+          await this.updateStepExeToReady(form, dto.CEXTDATA, runner); // step ที่ exe เป็น 3
+          await this.updateStepNextExeToWait(form, dto.CEXTDATA, runner); // step ต่อจาก exe เป็น 2
           break;
         default:
           throw new Error('Invalid action!');
@@ -977,7 +977,7 @@ export class FlowService {
     stepNext: string,
     queryRunner?: QueryRunner,
   ) {
-    const check  = await queryRunner.manager.query(
+    const check = await queryRunner.manager.query(
       'select * from flow where NFRMNO = :1 AND VORGNO = :2 AND CYEAR = :3 AND CYEAR2 = :4 AND NRUNNO = :5 and CSTEPNO in (select cStepNextNo from flow where NFRMNO = :6 AND VORGNO = :7 AND CYEAR = :8 AND CYEAR2 = :9 AND NRUNNO = :10 and CSTEPNO = :11) and CSTEPST = :12 and CAPVSTNO = :13',
       [
         form.NFRMNO,
@@ -993,11 +993,12 @@ export class FlowService {
         stepNext,
         this.STEP_NORMAL,
         this.APV_NONE,
-      ]);
-    if(check.length == 0){
+      ],
+    );
+    if (check.length == 0) {
       return;
     }
-      
+
     const sql =
       'update flow set CAPVSTNO = :apvNone, CSTEPST = :stepWait where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CSTEPNO in (select cStepNextNo from flow where NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno and CSTEPNO = :stepNext) and CSTEPST = :stepNormal and CAPVSTNO = :apvNone2';
     const params = {
@@ -1022,6 +1023,13 @@ export class FlowService {
   }
 
   async updateStepWaitToNormal(form: FormDto, queryRunner?: QueryRunner) {
+    const stepWait = this.getFlow(
+      { ...form, CSTEPST: this.STEP_WAIT },
+      queryRunner,
+    );
+    if ((await stepWait).length == 0) {
+      return;
+    }
     const sql =
       "update flow set CSTEPST = :stepNormal, VREALAPV = '' , CAPVSTNO = :apvNone, DAPVDATE = '' , CAPVTIME = '' where NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO and CSTEPST = :stepWait ";
     const params = {

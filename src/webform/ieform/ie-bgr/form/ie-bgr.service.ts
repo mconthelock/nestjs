@@ -328,6 +328,23 @@ export class IeBgrService {
       }
 
       // 4. บันทึกข้อมูล Quotation
+
+      if(dto.isReturn){
+        // 4.1 กรณี Return ให้ทำการยกเลิก Quotation รอบก่อนทั้งหมดเพราะค่าเงินอาจมีการเปลี่ยนแปลง หากอยากได้ revision ให้ order by DATE_UPDATE
+        const oldQuotations = await this.ebudgetQuotationService.getData({...form, STATUS: 1});
+        // const rejectQuotation = oldQuotations.filter(o => {
+        //     return !dto.quotation.find(n => n.QTA_FORM === o.QTA_FORM);
+        // })
+        
+        for ( const r of oldQuotations ) {
+            await this.ebudgetQuotationService.update({
+                ID: r.ID,
+                STATUS: 0,
+                UPDATE_BY: dto.returnData.EMPNO
+            }, queryRunner
+            );
+        }
+      }
       for (const quotation of dto.quotation) {
         const resQuo = await this.ebudgetQuotationService.insert(
           {
@@ -340,10 +357,9 @@ export class IeBgrService {
           queryRunner,
         );
         // 5. บันทึกข้อมูล Quotation Product
+        if(!quotation.product) continue;
         for (const product of quotation.product) {
           if (product.SEQ) {
-            console.log(product);
-
             await this.ebudgetQuotationProductService.insert(
               {
                 QUOTATION_ID: resQuo.data.ID,
@@ -354,7 +370,15 @@ export class IeBgrService {
           }
         }
       }
-      // 6. กรณีเป็นการ Return ให้ลบไฟล์ที่เตรียมไว้
+      
+
+      
+      // 6. ส่งเมลแจ้ง
+      await this.flowService.sendMailToApprover(form, queryRunner);
+      
+    //   throw new Error('test rollback');
+      await queryRunner.commitTransaction();
+      // 7 กรณีเป็นการ Return ให้ลบไฟล์ที่เตรียมไว้
       if (dto.isReturn) {
         console.log(returnDelFiles);
 
@@ -364,12 +388,6 @@ export class IeBgrService {
           await deleteFile(filePath); // ลบไฟล์ที่ย้ายสำเร็จไปแล้ว
         }
       }
-
-      throw new Error('test rollback');
-
-      // 7. ส่งเมลแจ้ง
-      await this.flowService.sendMailToApprover(form, queryRunner);
-      await queryRunner.commitTransaction();
 
       return {
         status: true,

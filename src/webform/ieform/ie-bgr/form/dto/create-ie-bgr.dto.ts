@@ -196,7 +196,7 @@ export class BGRQuotationDto {
 
   @IsOptional()
   @IsArray()
-//   @ValidateNested({ each: true }) // หากพี่ปิ๊กอยากให้ต้องเอา quotation ที่มี product เท่านั้น ให้เปิดบรรทัดนี้และไปเพิ่ม check ที่ fontend ให้กรองเฉพาะ quotation ที่มี product ด้วย
+  @ValidateNested({ each: true }) // หากพี่ปิ๊กอยากให้ต้องเอา quotation ที่มี product เท่านั้น ให้เปิดบรรทัดนี้และไปเพิ่ม check ที่ fontend ให้กรองเฉพาะ quotation ที่มี product ด้วย
   @Type(() => BGRQuotationProductDto)
   product?: BGRQuotationProductDto[];
 }

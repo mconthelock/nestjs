@@ -74,7 +74,7 @@ export class QuotationService {
 
   async getData(dto: FormDto) {
     const form = await this.formService.getFormDetail(dto);
-    const quotationList = await this.ebudgetQuotationService.getData(dto);
+    const quotationList = await this.ebudgetQuotationService.getData({...dto, STATUS: 1});
     // form.quotation = quotation;
     const quotations = [];
     for ( const q of quotationList ){

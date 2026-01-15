@@ -5,6 +5,7 @@ import { EBUDGET_QUOTATION } from 'src/common/Entities/ebudget/table/EBUDGET_QUO
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { FormDto } from 'src/webform/form/dto/form.dto';
+import { now } from 'src/common/utils/dayjs.utils';
 
 @Injectable()
 export class EbudgetQuotationService {
@@ -14,6 +15,12 @@ export class EbudgetQuotationService {
     @InjectDataSource('ebudgetConnection')
     private dataSource: DataSource,
   ) {}
+
+  async getData(dto: UpdateEbudgetQuotationDto) {
+    return this.repo.find({
+      where: dto,
+    });
+  }
 
   async insert(dto: CreateEbudgetQuotationDto, queryRunner?: QueryRunner) {
     let localRunner: QueryRunner | undefined;
@@ -46,15 +53,37 @@ export class EbudgetQuotationService {
     }
   }
 
-  async getData(dto: FormDto) {
-    return this.repo.find({
-      where: {
-        NFRMNO: dto.NFRMNO,
-        VORGNO: dto.VORGNO,
-        CYEAR: dto.CYEAR,
-        CYEAR2: dto.CYEAR2,
-        NRUNNO: dto.NRUNNO,
-      },
-    });
+  async update(dto: UpdateEbudgetQuotationDto, queryRunner?: QueryRunner) {
+    let localRunner: QueryRunner | undefined;
+    let didConnect = false;
+    let didStartTx = false;
+    try {
+      if (!queryRunner) {
+        localRunner = this.dataSource.createQueryRunner();
+        await localRunner.connect();
+        didConnect = true;
+        await localRunner.startTransaction();
+        didStartTx = true;
+      }
+      const runner = queryRunner || localRunner!;
+      const { ID, ...updateData } = dto;
+      const res = await runner.manager.update(EBUDGET_QUOTATION, ID, {
+        ...updateData,
+        DATE_UPDATE: now('YYYY-MM-DD HH:mm:ss'),
+      });
+      if (localRunner && didStartTx && runner.isTransactionActive)
+        await localRunner.commitTransaction();
+      return {
+        status: true,
+        data: res,
+        message: 'Update EBUDGET_QUOTATION Successfully',
+      };
+    } catch (error) {
+      if (localRunner && didStartTx && localRunner.isTransactionActive)
+        await localRunner.rollbackTransaction();
+      throw new Error('Update EBUDGET_QUOTATION Error: ' + error.message);
+    } finally {
+      if (localRunner && didConnect) await localRunner.release();
+    }
   }
 }

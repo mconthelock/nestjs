@@ -160,12 +160,6 @@ export class IeBgrService {
       // Insert EBGREQFORM record
       await this.ebudgetformService.upsert(data, queryRunner);
 
-      console.log(files);
-      console.log('isReturn', dto.isReturn);
-      if (dto.isReturn) {
-        console.log('return');
-      }
-
       // 3. จัดการไฟล์และรูปภาพ
       if (dto.isReturn) {
         // 3.1 ลบรูปภาพ
@@ -371,20 +365,13 @@ export class IeBgrService {
         }
       }
       
-
-      
       // 6. ส่งเมลแจ้ง
       await this.flowService.sendMailToApprover(form, queryRunner);
       
-    //   throw new Error('test rollback');
       await queryRunner.commitTransaction();
       // 7 กรณีเป็นการ Return ให้ลบไฟล์ที่เตรียมไว้
       if (dto.isReturn) {
-        console.log(returnDelFiles);
-
         for (const filePath of returnDelFiles) {
-          console.log(filePath);
-
           await deleteFile(filePath); // ลบไฟล์ที่ย้ายสำเร็จไปแล้ว
         }
       }

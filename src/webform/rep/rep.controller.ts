@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { RepService } from './rep.service';
 import { CreateRepDto } from './dto/create-rep.dto';
 import { UpdateRepDto } from './dto/update-rep.dto';
@@ -36,5 +44,10 @@ export class RepController {
   @Post('search')
   search(@Body() searchRepDto: SearchRepDto) {
     return this.repService.getRep(searchRepDto);
+  }
+
+  @Post('getRep')
+  getRep(@Body() searchRepDto: SearchRepDto) {
+    return this.repService.getRepresent(searchRepDto);
   }
 }

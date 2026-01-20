@@ -12,6 +12,8 @@ import { SequenceOrgModule } from './sequence-org/sequence-org.module';
 import { RepModule } from './rep/rep.module';
 import { IEFormModule } from './ieform/ie.module';
 import { RqffrmModule } from './rqffrm/rqffrm.module';
+import { PurCpmModule } from './purform/pur-cpm/pur-cpm.module';
+import { PurFileModule } from './purform/pur-file/pur-file.module';
 
 @Module({
   imports: [
@@ -27,7 +29,9 @@ import { RqffrmModule } from './rqffrm/rqffrm.module';
     OrgTreeModule,
     SequenceOrgModule,
     RepModule,
-    RqffrmModule
+    RqffrmModule,
+    PurCpmModule,
+    PurFileModule
   ],
 })
 export class WebformModule {}

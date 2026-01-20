@@ -17,16 +17,10 @@ import { FormmstService } from '../formmst/formmst.service';
 import { UsersService } from 'src/amec/users/users.service';
 import { checkHostTest } from 'src/common/helpers/repo.helper';
 
-import {
-  getBase64Image,
-  getBase64ImageFromUrl,
-  joinPaths,
-} from 'src/common/utils/files.utils';
+import { getBase64ImageFromUrl } from 'src/common/utils/files.utils';
 import { formatDate, now } from 'src/common/utils/dayjs.utils';
 import { getSafeFields } from 'src/common/utils/Fields.utils';
 import { showFlowDto } from './dto/show-flow.dto';
-import { count } from 'console';
-import { min } from 'class-validator';
 import { MailService } from 'src/common/services/mail/mail.service';
 
 @Injectable()
@@ -570,6 +564,63 @@ export class FlowService {
       return '';
     }
     return flow[0].CEXTDATA;
+  }
+
+  async resetFlow(form: FormDto, queryRunner?: QueryRunner) {
+    let localRunner: QueryRunner | undefined;
+    let didConnect = false;
+    let didStartTx = false;
+    try {
+      if (!queryRunner) {
+        localRunner = this.dataSource.createQueryRunner();
+        await localRunner.connect();
+        didConnect = true;
+        await localRunner.startTransaction();
+        didStartTx = true;
+      }
+      const runner = queryRunner || localRunner!;
+
+      const sql =
+        `SELECT DISTINCT LV, TO_CHAR(this.APPLY_ALL_APV.NFRMNO) AS NFRMNO2, TO_CHAR(this.APPLY_ALL_APV.NRUNNO) AS NRUNNO2, A.*, SNAME, SPOSITION, VNAME, CST
+        FROM FORM F
+        JOIN (
+            SELECT DISTINCT LEVEL AS LV, FLOW.*
+            FROM FLOW
+            START WITH 
+                NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno AND CSTART = '1'
+            CONNECT BY 
+                NFRMNO = :frm2 and VORGNO = :org2 AND CYEAR = :cyear AND CYEAR2 = :cyear2 AND NRUNNO = :runno2 AND CSTEPNO = PRIOR CSTEPNEXTNO
+        ) A ON F.NFRMNO = A.NFRMNO AND F.VORGNO = A.VORGNO AND F.CYEAR = A.CYEAR AND F.CYEAR2 = A.CYEAR2 AND F.NRUNNO = A.NRUNNO
+        JOIN AMEC.AEMPLOYEE 
+        `;
+      const params = {
+        ...form,
+        frm: form.NFRMNO,
+        org: form.VORGNO,
+        y: form.CYEAR,
+        y2: form.CYEAR2,
+        runno: form.NRUNNO,
+      };
+      await this.execSql(
+        sql,
+        params,
+        queryRunner,
+        'Update Step Next Exe To Step Wait',
+      );
+
+      if (localRunner && didStartTx && runner.isTransactionActive)
+        await localRunner.commitTransaction();
+      return {
+        status: true,
+        message: 'Reset flow Successfully',
+      };
+    } catch (error) {
+      if (localRunner && didStartTx && localRunner.isTransactionActive)
+        await localRunner.rollbackTransaction();
+      throw new Error('Reset flow Error: ' + error.message);
+    } finally {
+      if (localRunner && didConnect) await localRunner.release();
+    }
   }
 
   //------------------------------ Do action Start ------------------------------

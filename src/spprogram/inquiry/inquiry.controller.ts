@@ -18,11 +18,6 @@ export class InquiryController {
     return await this.inq.search(searchDto);
   }
 
-  @Post('query')
-  async query(@Body() searchDto: any) {
-    return await this.inq.searchSP(searchDto);
-  }
-
   @Post('create')
   async create(@Body() req: any) {
     const data = await this.inq.create(

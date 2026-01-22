@@ -42,7 +42,9 @@ export class InquiryService {
       .createQueryBuilder('inq')
       .leftJoinAndSelect('inq.status', 'status')
       .leftJoinAndSelect('inq.maruser', 'maruser')
-      .leftJoinAndSelect('inq.shipment', 'shipment');
+      .leftJoinAndSelect('inq.shipment', 'shipment')
+      .leftJoinAndSelect('inq.term', 'term')
+      .leftJoinAndSelect('inq.method', 'method');
 
     if (searchDto.IS_GROUP) {
       qb.leftJoinAndSelect('inq.inqgroup', 'inqgroup');

@@ -957,7 +957,7 @@ export class FlowService {
     // UPDATE APPROVAL STATUS
     let apvClause: string = '';
     params.stepNo = flow.CSTEPNO;
-    if (flow.CAPVTYPE == this.APV_TYPE_SINGLE && flow.CAPPLYALL == '0') {
+    if (flow.CAPVTYPE == this.APV_TYPE_SINGLE && flow.CAPPLYALL == this.APPLY_ALL_NONE) {
       apvClause = `and CSTEPNO = :stepNo`;
     } else if (
       flow.CAPVTYPE == this.APV_TYPE_SINGLE &&
@@ -973,7 +973,7 @@ export class FlowService {
       };
     } else if (
       flow.CAPVTYPE == this.APV_TYPE_MULTIPLE_CO &&
-      flow.CAPPLYALL == '0'
+      flow.CAPPLYALL == this.APPLY_ALL_NONE
     ) {
       apvClause = `and ((VAPVNO = :apv1 or VREPNO = :rep1) and CSTEPNO = :stepNo)`;
       params = {

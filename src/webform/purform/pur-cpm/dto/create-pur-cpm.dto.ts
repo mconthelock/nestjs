@@ -1,6 +1,7 @@
 import { PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsArray,
   IsDate,
   IsNotEmpty,
   IsNumber,
@@ -22,8 +23,9 @@ export class CreatePurCpmDto extends PickType(CreateFormDto, [
   DELIVELY: string;
 
   @IsNotEmpty()
-  @IsString()
-  INVOICE_TYPE: string;
+  //   @IsString()
+//   @IsArray()
+  INVOICE_TYPE: string | string[];
 
   @IsOptional()
   @IsString()
@@ -37,9 +39,9 @@ export class CreatePurCpmDto extends PickType(CreateFormDto, [
   @IsString()
   SUBJECT: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  ACCEPT_PO: string;
+  ACCEPT_PO?: string;
 
   @IsOptional()
   @IsString()
@@ -49,23 +51,23 @@ export class CreatePurCpmDto extends PickType(CreateFormDto, [
   @IsString()
   ACCEPT_OTHER?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  QUOTATION: string;
+  QUOTATION?: string;
 
   @IsOptional()
   @IsDate()
   @Type(() => Date)
   QUOTATION_DATE?: Date;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  PONO: string;
+  PONO?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   @Type(() => Number)
-  TOTAL_AMOUNT: number;
+  TOTAL_AMOUNT?: number;
 
   @IsOptional()
   @IsString()
@@ -111,6 +113,18 @@ export class CreatePurCpmDto extends PickType(CreateFormDto, [
   @IsNumber()
   @Type(() => Number)
   PAYMENT: number;
+
+  @IsOptional()
+  @IsString()
+  PAYMENT_DETAIL?: string;
+
+  @IsOptional()
+//   @IsArray()
+  ATTACH_TYPE: string | string[];
+
+  @IsOptional()
+  @IsString()
+  ATTACH_OTHER?: string;
 }
 
 export class InsertPurCpmDto extends PickType(CreatePurCpmDto, [
@@ -118,7 +132,7 @@ export class InsertPurCpmDto extends PickType(CreatePurCpmDto, [
   'VORGNO',
   'CYEAR',
   'DELIVELY',
-  'INVOICE_TYPE',
+  //   'INVOICE_TYPE',
   'INVOICE_OTHER',
   'SUBJECT',
   'ACCEPT_PO',
@@ -138,13 +152,22 @@ export class InsertPurCpmDto extends PickType(CreatePurCpmDto, [
   'PAYMENT_TYPE',
   'PAYMENT_NUM',
   'PAYMENT',
+  'ATTACH_OTHER',
 ] as const) {
-    @IsNotEmpty()
-    @IsString()
-    CYEAR2: string;
-  
-    @IsNotEmpty()
-    @IsNumber()
-    @Type(() => Number)
-    NRUNNO: number;
+  @IsNotEmpty()
+  @IsString()
+  INVOICE_TYPE: string;
+
+  @IsOptional()
+  @IsString()
+  ATTACH_TYPE?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  CYEAR2: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @Type(() => Number)
+  NRUNNO: number;
 }

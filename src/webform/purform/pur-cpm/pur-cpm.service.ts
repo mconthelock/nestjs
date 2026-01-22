@@ -14,6 +14,7 @@ import { PurFileService } from '../pur-file/pur-file.service';
 import { FlowService } from 'src/webform/flow/flow.service';
 import { RepService } from 'src/webform/rep/rep.service';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Injectable()
 export class PurCpmService {
@@ -24,10 +25,44 @@ export class PurCpmService {
     private dataSource: DataSource,
     private readonly formService: FormService,
     private readonly flowService: FlowService,
-    private readonly formmstService: FormmstService,   
+    private readonly formmstService: FormmstService,
     private readonly purFileService: PurFileService,
     private readonly repService: RepService,
   ) {}
+
+  async getData(dto: FormDto, queryRunner?: QueryRunner) {
+    let localRunner: QueryRunner | undefined;
+    let didConnect = false;
+    let didStartTx = false;
+    try {
+      if (!queryRunner) {
+        localRunner = this.dataSource.createQueryRunner();
+        await localRunner.connect();
+        didConnect = true;
+        await localRunner.startTransaction();
+        didStartTx = true;
+      }
+        const runner = queryRunner || localRunner!;
+        const res = await runner.manager.findOne(PURCPM_FORM, {
+          where: {
+            ...dto,
+          },
+          relations: {
+            FILES: true,
+          },
+        });
+        if (localRunner && didStartTx && runner.isTransactionActive)
+          await localRunner.commitTransaction();
+        return res;
+    } catch (error) {
+        if (localRunner && didStartTx && localRunner.isTransactionActive)
+            await localRunner.rollbackTransaction();
+        throw new Error('Get PUR-CPM Form Error: ' + error.message);
+    } finally {
+        if (localRunner && didConnect) await localRunner.release();
+    }
+  }
+
 
   async create(
     dto: CreatePurCpmDto,
@@ -70,7 +105,8 @@ export class PurCpmService {
 
       // 2. หากมี THIRD_PARTY ให้เพิ่ม flow cstepno 40
       if (THIRD_PARTY) {
-        const formmst = await this.formmstService.getFormMasterByVaname('PUR-CPM');
+        const formmst =
+          await this.formmstService.getFormMasterByVaname('PUR-CPM');
         const represent = await this.repService.getRepresent(
           {
             NFRMNO: form.NFRMNO,
@@ -80,40 +116,42 @@ export class PurCpmService {
           },
           queryRunner,
         );
-        console.log(represent);
-        
 
-        await this.flowService.updateFlow({
+        await this.flowService.updateFlow(
+          {
             condition: {
-                ...form,
-                CSTEPNO: '--',
+              ...form,
+              CSTEPNO: '--',
             },
             CSTEPNEXTNO: '40',
-        }, queryRunner);
-        await this.flowService.insertFlow({
-          ...form,
-          CSTEPNO: '40',
-          CSTEPNEXTNO: '06',
-          CSTART: '0',
-          CSTEPST: '2',
-          CTYPE: '3',
-          VPOSNO: '30',
-          VAPVNO: THIRD_PARTY,
-          VREPNO: represent,
-          CAPVSTNO: '0',
-          CAPVTYPE: '1',
-          CAPPLYALL: '0',
-          VURL: formmst?.VFORMPAGE || '',
-        }, queryRunner);
-    //   throw new Error('Test rollback');
-
-        await this.flowService.resetFlow(form, queryRunner)
+          },
+          queryRunner,
+        );
+        await this.flowService.insertFlow(
+          {
+            ...form,
+            CSTEPNO: '40',
+            CSTEPNEXTNO: '06',
+            CSTART: '0',
+            CSTEPST: '3',
+            CTYPE: '3',
+            VPOSNO: '30',
+            VAPVNO: THIRD_PARTY,
+            VREPNO: represent,
+            CAPVSTNO: '0',
+            CAPVTYPE: '1',
+            CAPPLYALL: '0',
+            VURL: formmst?.VFORMPAGE || '',
+          },
+          queryRunner,
+        );
+        await this.flowService.resetFlow(form, queryRunner);
       }
 
       // 3. เมื่อ PAYMENT ต่ำกว่า 10,000 ให้ลบ flow ddim, dim ออก
       if (data.PAYMENT < 10000) {
         await this.flowService.deleteFlowStep(
-          { ...form, CSTEPNO: '01' },
+          { ...form, CSTEPNO: '03' },
           queryRunner,
         );
         await this.flowService.deleteFlowStep(
@@ -123,12 +161,13 @@ export class PurCpmService {
       }
 
       // 4. บันทึกข้อมูล PUR-CPM
-
       await this.insert(
         {
+          ...data,
           CYEAR2: form.CYEAR2,
           NRUNNO: form.NRUNNO,
-          ...data,
+          INVOICE_TYPE: data.INVOICE_TYPE && typeof data.INVOICE_TYPE !== 'string' ? data.INVOICE_TYPE.join('|') : String(data.INVOICE_TYPE), // แปลง array เป็น string คั่นด้วย |
+          ATTACH_TYPE: dto.ATTACH_TYPE && typeof dto.ATTACH_TYPE !== 'string' ? dto.ATTACH_TYPE.join('|') : String(dto.ATTACH_TYPE), // แปลง array เป็น string คั่นด้วย |
         },
         queryRunner,
       );

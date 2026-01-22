@@ -140,4 +140,9 @@ export class FlowController {
   async checkUnfinishedFlow(@Body() form: FormDto) {
     return await this.flowService.checkUnfinishedFlow(form);
   }
+
+  @Post('resetFlow')
+  async resetFlow(@Body() form: FormDto) {
+    return await this.flowService.resetFlow(form);
+  }
 }

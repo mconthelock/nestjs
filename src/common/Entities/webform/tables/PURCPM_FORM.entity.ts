@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
+import { PUR_FILE } from './PUR_FILE.entity';
 
 @Entity({ name: 'PURCPM_FORM', schema: 'WEBFORM' })
 export class PURCPM_FORM {
@@ -79,4 +80,16 @@ export class PURCPM_FORM {
 
   @Column()
   PAYMENT: number;
+
+  @Column()
+  PAYMENT_DETAIL: string;
+
+  @Column()
+  ATTACH_TYPE: string;
+
+  @Column()
+  ATTACH_OTHER: string;
+
+  @OneToMany(() => PUR_FILE, (s) => s.MASTER)
+  FILES: PUR_FILE[];
 }

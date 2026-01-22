@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
+import { PURCPM_FORM } from './PURCPM_FORM.entity';
 
 @Entity({ name: 'PUR_FILE', schema: 'WEBFORM' })
 export class PUR_FILE {
@@ -46,4 +47,12 @@ export class PUR_FILE {
 
   @Column()
   FILE_PATH: string;
+
+  @ManyToOne(() => PURCPM_FORM, (s) => s.FILES)
+  @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+  @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
+  @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
+  @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+  @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+  MASTER: PURCPM_FORM;
 }

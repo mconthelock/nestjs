@@ -343,6 +343,42 @@ export class FlowService {
       form.CYEAR2,
       form.NRUNNO,
     ]);
+
+    //   const sql =
+    //     `SELECT DISTINCT LV, TO_CHAR(this.APPLY_ALL_APV.NFRMNO) AS NFRMNO2, TO_CHAR(this.APPLY_ALL_APV.NRUNNO) AS NRUNNO2, A.*, SNAME, SPOSITION, VNAME, CST
+    //     FROM FORM F
+    //     JOIN (
+    //         SELECT DISTINCT LEVEL AS LV, FLOW.*
+    //         FROM FLOW
+    //         START WITH
+    //             NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno AND CSTART = '1'
+    //         CONNECT BY
+    //             NFRMNO = :frm2 and VORGNO = :org2 AND CYEAR = :cyear AND CYEAR2 = :cyear2 AND NRUNNO = :runno2 AND CSTEPNO = PRIOR CSTEPNEXTNO
+    //     ) A ON F.NFRMNO = A.NFRMNO AND F.VORGNO = A.VORGNO AND F.CYEAR = A.CYEAR AND F.CYEAR2 = A.CYEAR2 AND F.NRUNNO = A.NRUNNO
+    //     JOIN AMEC.AEMPLOYEE E ON E.SEAMPNO = A.VAPVNO
+    //     JOIN AMEC.PPOSITION P ON P.SPOSCODE = E.SPOCODE
+    //     JOIN STEPMST S ON A.CSTEPNO = S.CNO
+    //     ORDER BY A.LV
+    //     `;
+    //   const params = {
+    //     ...form,
+    //     frm: form.NFRMNO,
+    //     org: form.VORGNO,
+    //     y: form.CYEAR,
+    //     y2: form.CYEAR2,
+    //     runno: form.NRUNNO,
+    //     frm2: form.NFRMNO,
+    //     org2: form.VORGNO,
+    //     cyear: form.CYEAR,
+    //     cyear2: form.CYEAR2,
+    //     runno2: form.NRUNNO,
+    //   };
+    //   await this.execSql(
+    //     sql,
+    //     params,
+    //     queryRunner,
+    //     'Reset flow',
+    //   );
   }
 
   async generateHtml(flowData: any, form: showFlowDto) {
@@ -565,6 +601,7 @@ export class FlowService {
     }
     return flow[0].CEXTDATA;
   }
+  //------------------------------ Reset flow Start ------------------------------
 
   async resetFlow(form: FormDto, queryRunner?: QueryRunner) {
     let localRunner: QueryRunner | undefined;
@@ -580,39 +617,121 @@ export class FlowService {
       }
       const runner = queryRunner || localRunner!;
 
-      const sql =
-        `SELECT DISTINCT LV, TO_CHAR(this.APPLY_ALL_APV.NFRMNO) AS NFRMNO2, TO_CHAR(this.APPLY_ALL_APV.NRUNNO) AS NRUNNO2, A.*, SNAME, SPOSITION, VNAME, CST
-        FROM FORM F
-        JOIN (
-            SELECT DISTINCT LEVEL AS LV, FLOW.*
-            FROM FLOW
-            START WITH 
-                NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno AND CSTART = '1'
-            CONNECT BY 
-                NFRMNO = :frm2 and VORGNO = :org2 AND CYEAR = :cyear AND CYEAR2 = :cyear2 AND NRUNNO = :runno2 AND CSTEPNO = PRIOR CSTEPNEXTNO
-        ) A ON F.NFRMNO = A.NFRMNO AND F.VORGNO = A.VORGNO AND F.CYEAR = A.CYEAR AND F.CYEAR2 = A.CYEAR2 AND F.NRUNNO = A.NRUNNO
-        JOIN AMEC.AEMPLOYEE 
-        `;
-      const params = {
-        ...form,
-        frm: form.NFRMNO,
-        org: form.VORGNO,
-        y: form.CYEAR,
-        y2: form.CYEAR2,
-        runno: form.NRUNNO,
-      };
-      await this.execSql(
-        sql,
-        params,
-        queryRunner,
-        'Update Step Next Exe To Step Wait',
-      );
+      const flowtree = await this.getFlowTree(form, runner);
+
+      if (flowtree.length === 0) {
+        throw new Error('Flow data not found');
+      }
+
+      let updated = true;
+      while (updated) {
+        updated = false;
+        const flowtree = await this.getFlowTree(form, runner);
+        for (let i = 0; i < flowtree.length - 1; i++) {
+          const currStep = flowtree[i];
+          const nextStep = flowtree[i + 1];
+          // STEP_APPROVE = '5', STEP_READY = '3', STEP_REJECT = '6', STEP_SKIP = '7', STEP_NORMAL = '1', STEP_WAIT = '2'
+          if (
+            currStep.CSTEPST == this.STEP_APPROVE &&
+            nextStep.CSTEPST != this.STEP_READY &&
+            nextStep.CSTEPST != this.STEP_REJECT &&
+            nextStep.CSTEPST != this.STEP_SKIP &&
+            nextStep.CSTEPST != this.STEP_APPROVE
+          ) {
+            await this.updateFlow(
+              {
+                condition: {
+                  NFRMNO: form.NFRMNO,
+                  VORGNO: form.VORGNO,
+                  CYEAR: form.CYEAR,
+                  CYEAR2: form.CYEAR2,
+                  NRUNNO: form.NRUNNO,
+                  CSTEPNO: nextStep.CSTEPNO,
+                },
+                CSTEPST: this.STEP_READY,
+              },
+              runner,
+            );
+            updated = true;
+          }
+          if (
+            currStep.CSTEPST == this.STEP_READY &&
+            nextStep.CSTEPST != this.STEP_WAIT &&
+            nextStep.CSTEPST != this.STEP_REJECT &&
+            nextStep.CSTEPST != this.STEP_SKIP &&
+            nextStep.CSTEPST != this.STEP_APPROVE
+          ) {
+            await this.updateFlow(
+              {
+                condition: {
+                  NFRMNO: form.NFRMNO,
+                  VORGNO: form.VORGNO,
+                  CYEAR: form.CYEAR,
+                  CYEAR2: form.CYEAR2,
+                  NRUNNO: form.NRUNNO,
+                  CSTEPNO: nextStep.CSTEPNO,
+                },
+                CSTEPST: this.STEP_WAIT,
+              },
+              runner,
+            );
+            updated = true;
+          }
+          if (
+            currStep.CSTEPST == this.STEP_WAIT &&
+            nextStep.CSTEPST != this.STEP_NORMAL &&
+            nextStep.CSTEPST != this.STEP_REJECT &&
+            nextStep.CSTEPST != this.STEP_SKIP &&
+            nextStep.CSTEPST != this.STEP_APPROVE
+          ) {
+            await this.updateFlow(
+              {
+                condition: {
+                  NFRMNO: form.NFRMNO,
+                  VORGNO: form.VORGNO,
+                  CYEAR: form.CYEAR,
+                  CYEAR2: form.CYEAR2,
+                  NRUNNO: form.NRUNNO,
+                  CSTEPNO: nextStep.CSTEPNO,
+                },
+                CSTEPST: this.STEP_NORMAL,
+              },
+              runner,
+            );
+            updated = true;
+          }
+          if (
+            currStep.CSTEPST == this.STEP_NORMAL &&
+            nextStep.CSTEPST != this.STEP_NORMAL &&
+            nextStep.CSTEPST != this.STEP_REJECT &&
+            nextStep.CSTEPST != this.STEP_SKIP &&
+            nextStep.CSTEPST != this.STEP_APPROVE
+          ) {
+            await this.updateFlow(
+              {
+                condition: {
+                  NFRMNO: form.NFRMNO,
+                  VORGNO: form.VORGNO,
+                  CYEAR: form.CYEAR,
+                  CYEAR2: form.CYEAR2,
+                  NRUNNO: form.NRUNNO,
+                  CSTEPNO: nextStep.CSTEPNO,
+                },
+                CSTEPST: this.STEP_NORMAL,
+              },
+              runner,
+            );
+            updated = true;
+          }
+        }
+      }
 
       if (localRunner && didStartTx && runner.isTransactionActive)
         await localRunner.commitTransaction();
       return {
         status: true,
         message: 'Reset flow Successfully',
+        data: await this.getFlowTree(form, runner),
       };
     } catch (error) {
       if (localRunner && didStartTx && localRunner.isTransactionActive)
@@ -622,6 +741,8 @@ export class FlowService {
       if (localRunner && didConnect) await localRunner.release();
     }
   }
+
+  // ------------------------------ Reset flow End ------------------------------
 
   //------------------------------ Do action Start ------------------------------
   async doAction(
@@ -836,7 +957,7 @@ export class FlowService {
     // UPDATE APPROVAL STATUS
     let apvClause: string = '';
     params.stepNo = flow.CSTEPNO;
-    if (flow.CAPVTYPE == this.APV_TYPE_SINGLE && flow.CAPPLYALL == '0') {
+    if (flow.CAPVTYPE == this.APV_TYPE_SINGLE && flow.CAPPLYALL == this.APPLY_ALL_NONE) {
       apvClause = `and CSTEPNO = :stepNo`;
     } else if (
       flow.CAPVTYPE == this.APV_TYPE_SINGLE &&
@@ -852,7 +973,7 @@ export class FlowService {
       };
     } else if (
       flow.CAPVTYPE == this.APV_TYPE_MULTIPLE_CO &&
-      flow.CAPPLYALL == '0'
+      flow.CAPPLYALL == this.APPLY_ALL_NONE
     ) {
       apvClause = `and ((VAPVNO = :apv1 or VREPNO = :rep1) and CSTEPNO = :stepNo)`;
       params = {

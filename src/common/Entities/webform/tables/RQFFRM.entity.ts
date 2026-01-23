@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { RQFLIST } from './RQFLIST.entity';
 
 @Entity({ name: 'RQFFRM', schema: 'WEBFORM' })
 export class RQFFRM {
@@ -94,4 +95,7 @@ export class RQFFRM {
 
   @Column()
   DDELIVERY: Date;
+
+  @OneToMany(() => RQFLIST, (item) => item.RQFFRM)
+  RQFLIST: RQFLIST[];
 }

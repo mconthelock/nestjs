@@ -10,6 +10,11 @@ export class RqffrmController {
 
   @Post('data')
   async getData(@Body() dto: FormDto) {
-    return this.rqffrmService.getData(dto);
+    return await this.rqffrmService.getData(dto);
+  }
+
+  @Get(':FYear')
+  async findFromYear(@Param('FYear') FYear: string) {
+    return await this.rqffrmService.findFromYear(FYear);
   }
 }

@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { RQFFRM } from './RQFFRM.entity';
 
 @Entity({ name: 'RQFLIST', schema: 'WEBFORM' })
 export class RQFLIST {
@@ -91,4 +92,14 @@ export class RQFLIST {
 
   @Column()
   REMARK_LIST: string;
+
+  @ManyToOne(() => RQFFRM, (rqffrm) => rqffrm.RQFLIST)
+  @JoinColumn([
+    { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+    { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+    { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+    { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+    { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+  ])
+  RQFFRM: RQFFRM;
 }

@@ -3,9 +3,10 @@ import { RqffrmService } from './rqffrm.service';
 import { RqffrmController } from './rqffrm.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RQFFRM } from 'src/common/Entities/webform/tables/RQFFRM.entity';
+import { FormModule } from '../form/form.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RQFFRM], 'webformConnection')],
+  imports: [TypeOrmModule.forFeature([RQFFRM], 'webformConnection'), FormModule],
   controllers: [RqffrmController],
   providers: [RqffrmService],
   exports: [RqffrmService],

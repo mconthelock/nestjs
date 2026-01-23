@@ -80,6 +80,6 @@ export class EBGREQFORM {
   @Column()
   GPBID: string;
 
-  @Column()
-  GPFYEAR: string;
+//   @Column()
+//   GPFYEAR: string;
 }

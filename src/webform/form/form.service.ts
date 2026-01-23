@@ -227,24 +227,22 @@ export class FormService {
     return `${form[0].VANAME}${year2}-${runNo}`;
   }
 
-  async getPkByFormno(formno: string){
+  async getPkByFormno(formno: string) {
     const vaname = formno.replace(/\d+/g, '').replace(/-$/, '');
     const formmst = await this.formmstService.getFormMasterByVaname(vaname);
     const split = formno.split('-');
     const form = {
-        NFRMNO: formmst.NNO,
-        VORGNO: formmst.VORGNO,
-        CYEAR: formmst.CYEAR,
-        CYEAR2: "20"+split[1].replace(/\D/g,''),
-        NRUNNO: Number(split[2])
-    }
+      NFRMNO: formmst.NNO,
+      VORGNO: formmst.VORGNO,
+      CYEAR: formmst.CYEAR,
+      CYEAR2: '20' + split[1].replace(/\D/g, ''),
+      NRUNNO: Number(split[2]),
+    };
     return {
-        ...form,
-        data: await this.getFormDetail(form)
+      ...form,
+      data: await this.getFormDetail(form),
     };
   }
-
-
 
   async create(dto: CreateFormDto, ip: string, queryRunner?: QueryRunner) {
     let localRunner: QueryRunner | undefined;
@@ -324,7 +322,13 @@ export class FormService {
         const notuse = await this.flowService.getFlow(context.query, runner);
         for (const row of notuse) {
           //   await this.deleteFlowStep(row, context, runner);
-          await this.flowService.deleteFlowStep(row, runner);
+          const deleteResult = await this.flowService.deleteFlowStep(
+            row,
+            runner,
+          );
+          if (!deleteResult.status) {
+            throw new Error(deleteResult.message);
+          }
         }
 
         //Draft form
@@ -932,17 +936,17 @@ export class FormService {
 
   async searchForms(dto: SearchFormDto) {
     const form = await this.form.find({
-      where: dto
+      where: dto,
     });
     const result = [];
-    for( const f of form) {
+    for (const f of form) {
       const cond = {
         NFRMNO: f.NFRMNO,
         VORGNO: f.VORGNO,
         CYEAR: f.CYEAR,
         CYEAR2: f.CYEAR2,
         NRUNNO: f.NRUNNO,
-      }
+      };
       const formDetail = await this.getFormDetail(cond);
       result.push(formDetail);
     }

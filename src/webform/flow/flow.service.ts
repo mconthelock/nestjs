@@ -252,7 +252,11 @@ export class FlowService {
         runner,
       );
       if (flow.length === 0) {
-        throw new Error('Flow step not found');
+        // throw new Error('Flow step not found');
+        return {
+          status: false,
+          message: 'Flow step not found',
+        };
       }
 
       // prettier-ignore

@@ -154,7 +154,7 @@ export class IeBgrService {
         REMARK: dto.REMARK,
         PPRESDATE: dto.PREDATE,
         GPBID: dto.GPBID,
-        GPFYEAR: dto.GPYear,
+        // GPFYEAR: dto.GPYear,
       };
 
       // Insert EBGREQFORM record

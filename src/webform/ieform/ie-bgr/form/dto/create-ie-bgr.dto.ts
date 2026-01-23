@@ -136,13 +136,13 @@ export class CreateIeBgrDto {
   @Type(() => Date)
   FINDATE: Date;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  ITMNAME: string;
+  ITMNAME?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  PURPOSE: string;
+  PURPOSE?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -152,9 +152,9 @@ export class CreateIeBgrDto {
   @IsString()
   INVDET: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  EFFT: string;
+  EFFT?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -168,9 +168,9 @@ export class CreateIeBgrDto {
   @IsString()
   GPBID: string;
 
-  @IsNotEmpty()
-  @IsString()
-  GPYear: string;
+//   @IsNotEmpty()
+//   @IsString()
+//   GPYear: string;
 
   @IsNotEmpty()
   @IsArray()

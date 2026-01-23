@@ -17,10 +17,12 @@ export class CreateIsAdpDto extends PickType(FormDto, [
 ] as const) {
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   REQUESTER: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   CREATEBY: string;
 
   @IsOptional()

@@ -11,6 +11,7 @@ import { FlowModule } from 'src/webform/flow/flow.module';
 import { EbudgetQuotationModule } from 'src/ebudget/ebudget-quotation/ebudget-quotation.module';
 import { EbudgetQuotationProductModule } from 'src/ebudget/ebudget-quotation-product/ebudget-quotation-product.module';
 import { PprbiddingModule } from 'src/amec/pprbidding/pprbidding.module';
+import { MailModule } from 'src/common/services/mail/mail.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { PprbiddingModule } from 'src/amec/pprbidding/pprbidding.module';
     EbudgetQuotationModule,
     EbudgetQuotationProductModule,
     FlowModule,
-    PprbiddingModule
+    PprbiddingModule,
+    MailModule
   ],
   controllers: [IeBgrController],
   providers: [IeBgrService],

@@ -70,5 +70,4 @@ export class IeBgrController {
     const ip = getClientIP(req);
     return this.ieBgrService.lastApprove(dto, ip);
   }
-
 }

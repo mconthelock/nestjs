@@ -19,6 +19,7 @@ import { EbudgetQuotationProductService } from 'src/ebudget/ebudget-quotation-pr
 import { LastApvIeBgrDto } from './dto/lastapv-ie-bgr.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { PprbiddingService } from 'src/amec/pprbidding/pprbidding.service';
+import { MailService } from 'src/common/services/mail/mail.service';
 
 @Injectable()
 export class IeBgrService {
@@ -34,6 +35,7 @@ export class IeBgrService {
     private readonly ebudgetQuotationService: EbudgetQuotationService,
     private readonly ebudgetQuotationProductService: EbudgetQuotationProductService,
     private readonly pprbiddingService: PprbiddingService,
+    private readonly mailService: MailService,
   ) {}
 
   private readonly fileType = {
@@ -421,6 +423,42 @@ export class IeBgrService {
         ip,
         queryRunner,
       );
+
+      const flowtree = await this.flowService.getFlowTree(form, queryRunner);
+      const emails: Array<string> = [];
+      for (const f of flowtree) {
+        if (['--', '04', '05', '06'].includes(f.CSTEPNO) && !emails.includes(f.SRECMAIL)) {
+          emails.push(f.SRECMAIL);
+        }
+      }
+
+      await this.mailService.sendMail({
+            from: 'webflow_admin@MitsubishiElevatorAsia.co.th',
+            to: emails,
+            // to: process.env.MAIL_ADMIN,
+            subject: 'Budget Requisition Form completed in the system',
+            html: `<!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="utf-8">
+            </head>
+            <body>
+            <section>
+                <p>To : Requester and Concerned Manager,</p>
+                <span>This is to inform you that the <b>Budget Requisition Form</b></span>
+                <br>
+                <span><b>( Budget No. ${await this.formService.getFormno(form)} )</b> has been <b>approved and completed in the system.</b></span>
+                <br>
+                <p>Please proceed with the next related actions as required.</p>
+                <br>
+                <p>
+                    Best regards,<br>
+                    IS Department.<br>
+                    Auto Send mail System.
+                </p>
+            </section>
+        </body>
+    </html>`});
       await queryRunner.commitTransaction();
       return {
         status: true,

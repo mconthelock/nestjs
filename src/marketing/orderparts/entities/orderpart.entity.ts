@@ -30,10 +30,28 @@ export class Orderpart {
   MFGNO: string;
 
   @Column()
+  ELV_NO: string;
+
+  @Column()
   CAR_NO: string;
 
   @Column()
-  IDS_DATE: string;
+  IDS_DATE: Date;
+
+  @Column()
+  AMEC_SCHDL: Date;
+
+  @Column()
+  AMEC_REQ_SHIP: Date;
+
+  @Column()
+  INV_A_NUMBER: string;
+
+  @Column()
+  INV_A_DATE: Date;
+
+  @Column()
+  P_O_DATE: Date;
 
   @Column()
   TRADER: string;

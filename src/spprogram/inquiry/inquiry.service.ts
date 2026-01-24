@@ -63,7 +63,7 @@ export class InquiryService {
       if (searchDto.IS_ORDERS) {
         // prettier-ignore
         qb.leftJoinAndMapMany('inq.sheet', Spcalsheet,'sheet', 'inq.INQ_NO = sheet.INQNO AND details.INQD_SEQ = sheet.LINENO')
-            .leftJoinAndMapMany('inq.orders', Orderpart, 'orders', 'inq.INQ_NO = orders.INQUIRY_NO AND orders.REVISION_CODE != :rev', { rev: 'D' })
+            .leftJoinAndMapMany('inq.orders', Orderpart, 'orders', 'sheet.ORDNO = orders.ORDER_NO AND sheet.ELVNO = orders.ELV_NO AND orders.REVISION_CODE != :rev', { rev: 'D' })
             .leftJoinAndMapMany('inq.pcategory', Partcategory, 'pcategory', 'orders.PART_CATEGORY = pcategory.PCATE_CODE');
         delete searchDto.IS_ORDERS;
       }

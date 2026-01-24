@@ -162,6 +162,7 @@ export class Inquiry {
 
   sheet?: any[];
   orders?: any[];
+  pcategory?: any[];
 
   // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
   // ตัวอย่าง:

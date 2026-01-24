@@ -49,4 +49,7 @@ export class searchDto extends PartialType(SearchBase) {
 
   @IsOptional()
   IS_GROUP?: string;
+
+  @IsOptional()
+  IS_WEIGHT?: string;
 }

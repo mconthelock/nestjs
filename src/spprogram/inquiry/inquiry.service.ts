@@ -2,7 +2,6 @@ import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner, Raw } from 'typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
-import * as dayjs from 'dayjs';
 // ต้อง import oracledb เพื่อกำหนดชนิดข้อมูลของ parameter
 // import * as oracledb from 'oracledb';
 
@@ -17,6 +16,7 @@ import { Attachments } from '../attachments/entities/attachments.entity';
 import { Orderpart } from 'src/marketing/orderparts/entities/orderpart.entity';
 import { Spcalsheet } from 'src/marketing/spcalsheet/entities/spcalsheet.entity';
 import { User } from 'src/amec/users/entities/user.entity';
+import { Partcategory } from 'src/spprogram/partcategory/entities/partcategory.entity';
 
 //DTOs
 import { searchDto } from './dto/search.dto';
@@ -63,7 +63,8 @@ export class InquiryService {
       if (searchDto.IS_ORDERS) {
         // prettier-ignore
         qb.leftJoinAndMapMany('inq.sheet', Spcalsheet,'sheet', 'inq.INQ_NO = sheet.INQNO AND details.INQD_SEQ = sheet.LINENO')
-            .leftJoinAndMapMany('inq.orders', Orderpart, 'orders', 'inq.INQ_NO = orders.INQUIRY_NO AND orders.REVISION_CODE != :rev', { rev: 'D' });
+            .leftJoinAndMapMany('inq.orders', Orderpart, 'orders', 'inq.INQ_NO = orders.INQUIRY_NO AND orders.REVISION_CODE != :rev', { rev: 'D' })
+            .leftJoinAndMapMany('inq.pcategory', Partcategory, 'pcategory', 'orders.PART_CATEGORY = pcategory.PCATE_CODE');
         delete searchDto.IS_ORDERS;
       }
     }
@@ -89,7 +90,11 @@ export class InquiryService {
       delete searchDto.IS_QUOTATION;
     }
 
-    console.log(searchDto);
+    if (searchDto.IS_WEIGHT) {
+      qb.leftJoinAndSelect('inq.weight', 'weight');
+      delete searchDto.IS_WEIGHT;
+    }
+
     qb.where('inq.INQ_LATEST = :latest', { latest: 1 });
     await applyDynamicFilters(qb, searchDto, 'inq');
     return qb.getMany();

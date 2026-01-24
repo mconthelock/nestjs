@@ -55,4 +55,10 @@ export class Orderpart {
 
   @PrimaryColumn()
   REVISION_EDIT: string;
+
+  @Column()
+  PART_CATEGORY: string;
+
+  @Column()
+  CREATEBY: string;
 }

@@ -79,4 +79,16 @@ export class Orderpart {
 
   @Column()
   CREATEBY: string;
+
+  @Column()
+  PO_MELTEC: string;
+
+  @Column()
+  DWGNO_MELTEC: string;
+
+  @Column()
+  PARTNAME_MELTEC: string;
+
+  @Column()
+  SPEC_MELTEC: string;
 }

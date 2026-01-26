@@ -71,6 +71,14 @@ export async function parseCondition(
     };
   }
 
+  // IS NULL check: "IS NULL"
+  if (val.toUpperCase() === 'IS NULL') {
+    return {
+      sql: `${column} IS NULL`,
+      params: {},
+    };
+  }
+
   // Standard Operator check: "> 20" or "<= 2025-12-11"
   const opData = await extractOp(val);
   return {

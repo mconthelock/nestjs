@@ -31,6 +31,7 @@ import { HbdModule } from './hbd/hbd.module';
 import { EarlyHeadMiddleware } from './middleware/early-head.middleware';
 import { SafetyModule } from './safety/safety.module';
 import { EbudgetModule } from './ebudget/ebudget.module';
+import { WarehouseModule } from './warehouse/warehouse.module';
 
 @Module({
   imports: [
@@ -59,7 +60,8 @@ import { EbudgetModule } from './ebudget/ebudget.module';
     ItgcModule,
     SafetyModule,
     HbdModule,
-    EbudgetModule
+    EbudgetModule,
+    WarehouseModule
   ],
   providers: [HttpLoggingInterceptor],
 })

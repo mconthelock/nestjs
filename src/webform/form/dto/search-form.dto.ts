@@ -9,62 +9,73 @@ import {
 } from 'class-validator';
 
 export class SearchFormDto {
-    @IsOptional()
-    @Type(() => Number)
-    @IsNumber()
-    readonly NFRMNO?: number;
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  readonly NFRMNO?: number;
 
-    @IsOptional()
-    @IsString()
-    readonly VORGNO?: string;
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  readonly VORGNO?: string;
 
-    @IsOptional()
-    @IsString()
-    readonly CYEAR?: string;
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  readonly CYEAR?: string;
 
-    @IsOptional()
-    @IsString()
-    readonly CYEAR2?: string;
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  readonly CYEAR2?: string;
 
-    @IsOptional()
-    @Type(() => Number)
-    @IsNumber()
-    readonly NRUNNO?: number;
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  readonly NRUNNO?: number;
 
-    @IsOptional()
-    @IsString()
-    readonly VREQNO?: string;
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  readonly VREQNO?: string;
 
-    @IsOptional()
-    @IsString()
-    readonly VINPUTER?: string;
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  readonly VINPUTER?: string;
 
-    @IsOptional()
-    @IsString()
-    readonly VREMARK?: string;
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  readonly VREMARK?: string;
 
-    @IsOptional()
-    @IsDateString()
-    @Type(() => Date)
-    readonly DREQDATE?: Date;
+  @IsOptional()
+  @IsDateString()
+  @Type(() => Date)
+  readonly DREQDATE?: Date;
 
-    @IsOptional()
-    @IsString()
-    readonly CREQTIME?: string;
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  readonly CREQTIME?: string;
 
-    @IsOptional()
-    @IsString()
-    readonly CST?: string;
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  readonly CST?: string;
 
-    @IsOptional()
-    @IsString()
-    readonly VFORMPAGE?: string;
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  readonly VFORMPAGE?: string;
 
-    @IsOptional()
-    @IsString()
-    readonly VREMOTE?: string;
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  readonly VREMOTE?: string;
 
-    @IsOptional()
-    @IsString()
-    readonly EMPNO?: string;
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  readonly EMPNO?: string;
 }

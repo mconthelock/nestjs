@@ -18,16 +18,19 @@ export class SearchFlowDto {
   @ApiProperty({ example: '050601' })
   //   @IsOptional()
   @IsString()
+  @Type(() => String)
   VORGNO: string;
 
   @ApiProperty({ example: '25' })
   //   @IsOptional()
   @IsString()
+  @Type(() => String)
   CYEAR: string;
 
   @ApiProperty({ example: '2025' })
   //   @IsOptional()
   @IsString()
+  @Type(() => String)
   CYEAR2: string;
 
   @ApiProperty({ example: 10 })
@@ -39,31 +42,37 @@ export class SearchFlowDto {
   @ApiProperty({ example: '08375' })
   @IsOptional()
   @IsString()
+  @Type(() => String)
   VAPVNO?: string;
 
   @ApiProperty({ example: '06' })
   @IsOptional()
   @IsString()
+  @Type(() => String)
   CSTEPNO?: string;
 
   @ApiProperty({ example: '06' })
   @IsOptional()
   @IsString()
+  @Type(() => String)
   CSTEPNEXTNO?: string;
 
   @ApiProperty({ example: '1' })
   @IsOptional()
   @IsString()
+  @Type(() => String)
   CSTART?: string;
 
   @ApiProperty({ example: '3' })
   @IsOptional()
   @IsString()
+  @Type(() => String)
   CSTEPST?: string;
 
   @ApiProperty({ example: '3' })
   @IsOptional()
   @IsString()
+  @Type(() => String)
   CEXTDATA?: string;
 
   @ApiProperty({ example: '0' })

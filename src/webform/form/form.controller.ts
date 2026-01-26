@@ -192,4 +192,10 @@ export class FormController {
   async searchForms(@Body() dto: SearchFormDto) {
     return await this.formService.searchForms(dto);
   }
+
+
+  @Post('getFormStatus')
+  async getFormStatus(@Body() form: FormDto) {
+    return await this.formService.getFormStatus(form);
+  }
 }

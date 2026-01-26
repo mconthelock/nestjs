@@ -15,19 +15,22 @@ export class FormDto {
   @IsNumber()
   NFRMNO: number;
 
-  @ApiProperty({ example: "000101" })
+  @ApiProperty({ example: '000101' })
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   VORGNO: string;
 
-  @ApiProperty({ example: "25"})
+  @ApiProperty({ example: '25' })
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   CYEAR: string;
 
-  @ApiProperty({ example: "2025" })
+  @ApiProperty({ example: '2025' })
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   CYEAR2: string;
 
   @ApiProperty({ example: 1 })

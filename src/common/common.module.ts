@@ -17,6 +17,7 @@ import packingConfig from './databases/packingsys.config';
 import elmesConfig from './databases/elmes.config';
 import escsConfig from './databases/escs.config';
 import pdmConfig from './databases/pdm.config';
+import sdsysConfig from './databases/sdsys.config';
 
 import { winstonConfig } from './logger/winston.config';
 import { RedisModule } from './redis/redis.module';
@@ -46,6 +47,7 @@ import ebudgetConfig from './databases/ebudget.config';
     TypeOrmModule.forRootAsync(elmesConfig),
     TypeOrmModule.forRootAsync(escsConfig),
     TypeOrmModule.forRootAsync(pdmConfig),
+    TypeOrmModule.forRootAsync(sdsysConfig),
     RedisModule,
     SchedulerModule,
     LoggerModule,

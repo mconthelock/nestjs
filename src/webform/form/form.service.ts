@@ -797,6 +797,14 @@ export class FormService {
     }
   }
 
+  async getFormStatus(
+    form: FormDto,
+    queryRunner?: QueryRunner,
+  ): Promise<string> {
+    const data = await this.getCst(form, queryRunner);
+    return data ? data.CST : '';
+  }
+
   async getCst(form: FormDto, queryRunner?: QueryRunner) {
     const repo = queryRunner
       ? queryRunner.manager.getRepository(Form)

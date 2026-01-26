@@ -13,6 +13,7 @@ import {
 export class UpdateFormDto extends PartialType(CreateFormDto) {
   @IsOptional()
   @IsString()
+  @Type(() => String)
   readonly CST?: string;
 
   @IsOptional()
@@ -20,6 +21,7 @@ export class UpdateFormDto extends PartialType(CreateFormDto) {
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   readonly CYEAR2?: string;
 
   @IsOptional()

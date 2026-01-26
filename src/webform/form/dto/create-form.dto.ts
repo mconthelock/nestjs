@@ -16,17 +16,21 @@ export class CreateFormDto extends PickType(FormDto, [
 ]) {
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   REQBY: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   INPUTBY: string;
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   REMARK?: string;
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   DRAFT?: string;
 }

@@ -15,14 +15,17 @@ export class CreateFlowDto {
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   VORGNO: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   CYEAR: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   CYEAR2: string;
 
   @IsNotEmpty()
@@ -32,42 +35,52 @@ export class CreateFlowDto {
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   CSTEPNO: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   CSTEPNEXTNO: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   CSTART: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   CSTEPST: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   CTYPE: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   VPOSNO: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   VAPVNO: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   VREPNO: string;
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   VREALAPV?: string;
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   CAPVSTNO?: string;
 
   @IsOptional()
@@ -75,33 +88,41 @@ export class CreateFlowDto {
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   CAPVTIME?: string;
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   CEXTDATA?: string;
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   CAPVTYPE?: string;
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   CREJTYPE?: string;
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   CAPPLYALL?: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   VURL: string;
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   VREMARK?: string;
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   VREMOTE?: string;
 }

@@ -460,7 +460,7 @@ export class FlowService {
       }
 
       html += `<tr>
-            <td style="border: 1px solid blue;"><img style="width:23px;"  src="${status[step.CSTEPST]}"/></td>
+            <td style="border: 1px solid blue;">${ status[step.CSTEPST] != '' ? `<img style="width:23px;"  src="${status[step.CSTEPST]}"/>` : ''}</td>
             <td style="border: 1px solid blue; padding: 5px 8px; white-space: nowrap; ${showStep}">${step.VNAME}</td>
             <td style="border: 1px solid blue; padding: 5px 8px; white-space: nowrap;text-align: center; color:blue;">${apv}</td>
             <td style="border: 1px solid blue; padding: 5px 8px; white-space: nowrap;">${step.SNAME}</td>

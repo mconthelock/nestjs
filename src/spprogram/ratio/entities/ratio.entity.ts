@@ -50,6 +50,9 @@ export class Ratio {
   CURRENCY: string;
 
   @Column()
+  SUPPLIER_CUR: string;
+
+  @Column()
   STATUS: number;
 
   @ManyToOne(() => QuotationType, (q) => q.ratio)

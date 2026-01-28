@@ -157,11 +157,10 @@ export class FileService {
         
       console.log(dto.path);
       
-
       for (const file of files) {
         console.log(file);
         
-        const moved = await moveFileFromMulter(file, dto.path);
+        const moved = dto.isPhp ? await moveFileFromMulter({file, destination:dto.path, isPhp: dto.isPhp}) :await moveFileFromMulter({file, destination:dto.path});
         movedTargets.push(moved.path);
         movedTargets.push(file.path);
         data.push(moved);

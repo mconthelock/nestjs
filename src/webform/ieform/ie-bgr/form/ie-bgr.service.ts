@@ -598,7 +598,7 @@ export class IeBgrService {
             );
         let fileIndex = data.length; // เริ่มนับจากจำนวนไฟล์เดิม
         for (const file of fileList) {
-          const moved = await moveFileFromMulter(file, destination);
+          const moved = await moveFileFromMulter({file, destination});
           movedTargets.push(moved.path);
           movedTargets.push(file.path);
           // 6. บันทึกข้อมูลไฟล์ลงใน DB

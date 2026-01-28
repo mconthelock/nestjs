@@ -1,4 +1,5 @@
-import { IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsBoolean, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class FileDto {
   @IsNotEmpty()
@@ -37,4 +38,9 @@ export class SaveFileDto {
     @IsNotEmpty()
     @IsString()
     path: string;
+
+    @IsOptional()
+    @IsBoolean()
+    @Type(() => Boolean)
+    isPhp: boolean;
 }

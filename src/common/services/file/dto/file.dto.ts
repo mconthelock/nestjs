@@ -32,3 +32,9 @@ export class ListDto {
   @IsString({ each: true })
   allow?: string[];
 }
+
+export class SaveFileDto {
+    @IsNotEmpty()
+    @IsString()
+    path: string;
+}

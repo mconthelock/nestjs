@@ -9,10 +9,12 @@ import { createReadStream, promises as fs } from 'fs'; // ฟังก์ชั�
 import * as path from 'path';
 import {
   buildContentDisposition,
+  deleteFile,
   getMimeType,
+  moveFileFromMulter,
   safeJoin,
 } from 'src/common/utils/files.utils';
-import { FileDto, ListDto } from './dto/file.dto';
+import { FileDto, ListDto, SaveFileDto } from './dto/file.dto';
 
 @Injectable()
 export class FileService {
@@ -145,5 +147,31 @@ export class FileService {
 
     await walk(root, dto.path);
     return results;
+  }
+
+  async saveFile(files: Express.Multer.File[], dto: SaveFileDto) {
+    let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
+    try {
+      const data = [];
+        console.log(files);
+        
+      console.log(dto.path);
+      
+
+      for (const file of files) {
+        console.log(file);
+        
+        const moved = await moveFileFromMulter(file, dto.path);
+        movedTargets.push(moved.path);
+        movedTargets.push(file.path);
+        data.push(moved);
+      }
+      return { status: true, data };
+    } catch (err) {
+      for (const filePath of movedTargets) {
+        await deleteFile(filePath); // ลบไฟล์ที่ย้ายสำเร็จไปแล้ว
+      }
+      throw err;
+    }
   }
 }

@@ -2,12 +2,13 @@ import {
   FileInterceptor,
   FilesInterceptor,
   FileFieldsInterceptor,
+  AnyFilesInterceptor,
 } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
 export function getFileUploadInterceptor(
-  field: string | { name: string; maxCount?: number }[],
+  field?: string | { name: string; maxCount?: number }[],
   multi = false,
   maxCount = 10,
 ) {
@@ -25,6 +26,10 @@ export function getFileUploadInterceptor(
       cb(null, uniqueName);
     },
   });
+
+  if (!field) {
+    return AnyFilesInterceptor({ storage });
+  }
 
   if (Array.isArray(field)) {
     return FileFieldsInterceptor(field, { storage });

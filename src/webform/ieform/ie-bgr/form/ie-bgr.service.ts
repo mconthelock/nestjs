@@ -119,7 +119,7 @@ export class IeBgrService {
       returnDelFiles = insertFile.returnDelFiles;
 
       // 5. บันทึก Quotation และ Quotation Product
-      const quotation = this.insertQuotations({
+      const quotation = await this.insertQuotations({
         isReturn: dto.isReturn,
         returnData: dto.returnData,
         form,
@@ -285,7 +285,7 @@ export class IeBgrService {
       returnDelFiles = insertFileRes.returnDelFiles;
 
       // 5. บันทึก Quotation และ Quotation Product
-      const quotation = this.insertQuotations({
+      const quotation = await this.insertQuotations({
         isReturn: dto.isReturn,
         returnData: dto.returnData,
         form,

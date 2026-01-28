@@ -1,4 +1,4 @@
-import { PickType } from '@nestjs/swagger';
+import { PartialType, PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
@@ -15,20 +15,24 @@ import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 export class BGRDelImageDto {
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   id: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   colno: string;
 }
 
 export class BGRDelAttDto {
   @IsNotEmpty()
   @IsString()
-  id: string; 
+  @Type(() => String)
+  id: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   typeno: string;
 }
 
@@ -46,7 +50,7 @@ export class BGRReturnDto extends PickType(doactionFlowDto, [
   @Type(() => BGRDelImageDto)
   delImage?: BGRDelImageDto[];
 
-    @IsOptional()
+  @IsOptional()
   @IsArray()
   @Type(() => BGRDelAttDto)
   delattach?: BGRDelAttDto[];
@@ -64,14 +68,17 @@ export class CreateIeBgrDto {
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   empInput: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   empRequest?: string;
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   remark?: string;
 
   @IsOptional()
@@ -81,14 +88,17 @@ export class CreateIeBgrDto {
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   BGTYPE: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   FYEAR: string;
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   SN: string;
 
   @IsNotEmpty()
@@ -129,6 +139,7 @@ export class CreateIeBgrDto {
 
   @IsNotEmpty()
   @IsString()
+  @Type(() => String)
   PIC: string;
 
   @IsNotEmpty()
@@ -168,9 +179,9 @@ export class CreateIeBgrDto {
   @IsString()
   GPBID: string;
 
-//   @IsNotEmpty()
-//   @IsString()
-//   GPYear: string;
+  //   @IsNotEmpty()
+  //   @IsString()
+  //   GPYear: string;
 
   @IsNotEmpty()
   @IsArray()
@@ -209,6 +220,7 @@ export class BGRQuotationProductDto {
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   SVENDCODE: string;
 
   @IsOptional()
@@ -217,6 +229,7 @@ export class BGRQuotationProductDto {
 
   @IsOptional()
   @IsString()
+  @Type(() => String)
   PRODCODE: string;
 
   @IsOptional()
@@ -266,3 +279,19 @@ export class BGRQuotationProductDto {
   CURRCODE: string;
 }
 
+export class DraftIeBgrDto extends PartialType(CreateIeBgrDto) {
+  @IsOptional()
+  @IsBoolean()
+  @Type(() => Boolean)
+  isDraft?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @Type(() => Boolean)
+  isSave?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  DRAFT?: string;
+}

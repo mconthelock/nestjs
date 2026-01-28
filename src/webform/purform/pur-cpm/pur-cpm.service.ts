@@ -176,7 +176,7 @@ export class PurCpmService {
       const formNo = await this.formService.getFormno(form); // Get the form number
       const destination = await joinPaths(path, formNo); // Get the destination path
       for (const file of files) {
-        const moved = await moveFileFromMulter(file, destination);
+        const moved = await moveFileFromMulter({file, destination});
         movedTargets.push(moved.path);
         // 6. บันทึก DB (ใช้ชื่อไฟล์ที่ "ปลายทางจริง" เพื่อความตรงกัน)
         await this.purFileService.insert(

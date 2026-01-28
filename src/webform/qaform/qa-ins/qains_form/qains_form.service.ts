@@ -155,7 +155,7 @@ export class QainsFormService {
       const formNo = await this.formService.getFormno(form); // Get the form number
       const destination = path + '/' + formNo; // Get the destination path
       for (const file of files) {
-        const moved = await moveFileFromMulter(file, destination);
+        const moved = await moveFileFromMulter({file, destination});
         movedTargets.push(moved.path);
         // 2) บันทึก DB (ใช้ชื่อไฟล์ที่ "ปลายทางจริง" เพื่อความตรงกัน)
         await this.QaFileService.createQaFile(
@@ -438,7 +438,7 @@ export class QainsFormService {
       const formNo = await this.formService.getFormno(form); // Get the form number
       const destination = path + '/' + formNo; // Get the destination path
       for (const file of files) {
-        const moved = await moveFileFromMulter(file, destination);
+        const moved = await moveFileFromMulter({file, destination});
         movedTargets.push(moved.path);
         await this.QaFileService.createQaFile(
           {

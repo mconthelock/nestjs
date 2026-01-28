@@ -165,7 +165,7 @@ export class QaFileService {
     const destination = d.folder ? await joinPaths(d.path, d.folder) : d.path; // Get the destination path
     const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
     for (const file of d.files) {
-      const moved = await moveFileFromMulter(file, destination);
+      const moved = await moveFileFromMulter({file, destination});
       movedTargets.push(moved.path);
       await this.createQaFile(
         {

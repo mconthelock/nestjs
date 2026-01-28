@@ -3,6 +3,7 @@ import { join, normalize } from 'path';
 import * as mime from 'mime-types';
 import { promises as fs } from 'fs';
 import * as contentDisposition from 'content-disposition';
+import { now } from './dayjs.utils';
 // import { existsSync, mkdirSync, renameSync } from 'fs';
 // /**
 //  * Moves a file from source to destination.
@@ -23,15 +24,22 @@ import * as contentDisposition from 'content-disposition';
 //   renameSync(sourcePath, newFilePath);
 // }
 
-export async function moveFileFromMulter(
-  file: Express.Multer.File,
-  destinationDir: string,
-  newName?: string, // ถ้าไม่ส่ง จะใช้ชื่อที่ Multer ตั้ง (file.filename)
-) {
-  await fs.mkdir(destinationDir, { recursive: true });
+export async function moveFileFromMulter({
+  file,
+  destination,
+  newName,
+  isPhp = false,
+}: {
+  file: Express.Multer.File;
+  destination: string;
+  newName?: string; // ถ้าไม่ส่ง จะใช้ชื่อที่ Multer ตั้ง (file.filename)
+  isPhp?: boolean; // ถ้าเป็น true จะใช้ ชื่อ ขึ้นต้นด้วย ปี เดือน วัน ชั่วโมง นาที_ชื่อไฟล์ เดิม เช่น 202601231707_test.xlsx
+}) {
+  await fs.mkdir(destination, { recursive: true });
 
-  const targetName = newName ?? file.filename; // เช่น 1734...-xxx.pdf
-  const targetPath = join(destinationDir, targetName);
+//   const targetName = newName ?? file.filename; // เช่น 1734...-xxx.pdf
+  const targetName = newName ? newName : isPhp ? now('YYYYMMDDHHmm') + '_' + file.originalname : file.filename;
+  const targetPath = join(destination, targetName);
   let status = false;
   try {
     await fs.rename(file.path, targetPath); // ย้ายจาก tmp → ปลายทาง
@@ -87,10 +95,10 @@ export function buildContentDisposition(
   oname: string,
   mode: string, // 'open' | 'download'
 ) {
-//   const encoded = encodeURIComponent(oname).replace(/['()]/g, escape);
+  //   const encoded = encodeURIComponent(oname).replace(/['()]/g, escape);
   const type = mode === 'download' ? 'attachment' : 'inline';
-//   return `${type}; filename="${oname}"; filename*=UTF-8''${encoded}`;
-return contentDisposition(oname, { type });
+  //   return `${type}; filename="${oname}"; filename*=UTF-8''${encoded}`;
+  return contentDisposition(oname, { type });
 }
 
 /**
@@ -134,7 +142,8 @@ export async function getBase64ImageFromUrl(url: string): Promise<string> {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
 
-    const contentType = res.headers.get('content-type') || 'application/octet-stream';
+    const contentType =
+      res.headers.get('content-type') || 'application/octet-stream';
     const buffer = Buffer.from(await res.arrayBuffer());
     return `data:${contentType};base64,${buffer.toString('base64')}`;
   } catch (err) {

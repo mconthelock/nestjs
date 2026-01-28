@@ -7,12 +7,16 @@ import {
   Post,
   Body,
   BadRequestException,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { getBase64Image } from 'src/common/utils/files.utils';
 import * as fs from 'fs';
 import { FileService } from './file.service';
-import { FileDto, ListDto } from './dto/file.dto';
+import { FileDto, ListDto, SaveFileDto } from './dto/file.dto';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 
 @Controller('files')
 export class FilesController {
@@ -59,5 +63,17 @@ export class FilesController {
       filename: body.name,
       content: base64String,
     });
+  }
+
+  @Post('saveFile')
+//   @UseInterceptors(AnyFilesInterceptor())
+  @UseInterceptors(getFileUploadInterceptor())
+//   @UseInterceptors(
+//       getFileUploadInterceptor([
+//         { name: 'test', maxCount: 10 },
+//       ]),
+//     )
+  async saveFile(@UploadedFiles() files: Express.Multer.File[],@Body() dto: SaveFileDto) {
+    return await this.fileService.saveFile(files, dto);
   }
 }

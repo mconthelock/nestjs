@@ -14,12 +14,16 @@ export class ApplogsService {
   constructor(
     @InjectRepository(AMECLog, 'auditConnection')
     private readonly amec: Repository<AMECLog>,
+
     @InjectRepository(ISOLog, 'auditConnection')
     private readonly iso: Repository<ISOLog>,
+
     @InjectRepository(SCMLog, 'auditConnection')
     private readonly scm: Repository<SCMLog>,
+
     @InjectRepository(AS400Log, 'auditConnection')
     private readonly as400: Repository<AS400Log>,
+
     private readonly users: SpecialuserService,
   ) {}
 
@@ -43,13 +47,13 @@ export class ApplogsService {
     }
 
     if (startDate) {
-      queryBuilder.andWhere('windows.LOG_DATE >= :startDate', {
+      queryBuilder.andWhere('logs.LOG_DATE >= :startDate', {
         startDate: formatDate(startDate),
       });
     }
 
     if (endDate) {
-      queryBuilder.andWhere('windows.LOG_DATE <= :endDate', {
+      queryBuilder.andWhere('logs.LOG_DATE <= :endDate', {
         endDate: formatDate(endDate),
       });
     }

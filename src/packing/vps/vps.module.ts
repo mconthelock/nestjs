@@ -11,8 +11,8 @@ import { LogMethodErr } from './entities/log-method-err.entity';
  * @since   2025-11-25
  */
 @Module({
-  imports: [TypeOrmModule.forFeature([LogMethodErr], 'packingConnection')],
-  controllers: [VPSController],
-  providers: [VPSService],
+    imports: [ TypeOrmModule.forFeature([LogMethodErr], 'packingConnection') ],
+    controllers: [VPSController],
+    providers: [VPSService],
 })
 export class VPSModule {}

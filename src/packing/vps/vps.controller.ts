@@ -1,34 +1,18 @@
-import { Controller, Post, Body, Req, HttpCode, HttpStatus, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Req, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { VPSService } from './vps.service';
 import { PackVISDto } from './dto/pack-vis.dto';
 import { PackPISDto } from './dto/pack-pis.dto';
 import { PackCloseVISDto } from './dto/pack-closevis.dto';
 import { PackResultDto } from './dto/pack-result.dto';
-import { IsString } from 'class-validator';
 
+@UseGuards(AuthGuard('jwt'))
 @ApiTags('Validate Packing')
 @Controller('packing/vps')
 export class VPSController {
   constructor(private readonly vpsService: VPSService) {}
-
-  private getPackingUser(req: Request): { userId: string; useLocaltb: string } {
-    const cookie = req.cookies?.['NodeJS.Packinguser'];
-    if (!cookie) {
-      throw new BadRequestException('timeout');
-    }
-
-    try {
-      const user = JSON.parse(cookie);
-      return {
-        userId: user.userId,
-        useLocaltb: user.useLocaltb,
-      };
-    } catch {
-      throw new BadRequestException('Invalid user cookie format');
-    }
-  }
 
   /**
    * Validate VIS and return corresponding PIS list
@@ -41,11 +25,9 @@ export class VPSController {
   @ApiBody({ type: PackVISDto })
   @ApiResponse({ status: 200, type: PackResultDto })
   async checkVIS(
-    @Body() body: PackVISDto,
-    @Req() req: Request,
+    @Body() body: PackVISDto
   ): Promise<PackResultDto> {
-    const user = this.getPackingUser(req);
-    return this.vpsService.checkVIS(body.vis, user.userId, user.useLocaltb);
+    return this.vpsService.checkVIS(body.vis, body.userId, body.useLocaltb);
   }
 
   /**
@@ -59,11 +41,9 @@ export class VPSController {
   @ApiBody({ type: PackPISDto })
   @ApiResponse({ status: 200, type: PackResultDto })
   async confirmPIS(
-    @Body() body: PackPISDto,
-    @Req() req: Request,
+    @Body() body: PackPISDto
   ): Promise<PackResultDto> {
-    const user = this.getPackingUser(req);
-    return this.vpsService.checkPIS(body.vis, body.pis, user.userId);
+    return this.vpsService.checkPIS(body.vis, body.pis, body.userId);
   }
 
   /**
@@ -76,11 +56,9 @@ export class VPSController {
   @ApiOperation({ summary: 'Validate shipping mark and close VIS' })
   @ApiResponse({ status: 200, type: PackResultDto })
   async checkCloseVIS(
-    @Body() body: PackCloseVISDto,
-    @Req() req: Request,
+    @Body() body: PackCloseVISDto
   ): Promise<PackResultDto> {
-    const user = this.getPackingUser(req);
-    return this.vpsService.checkCloseVIS(body.vis, body.shipcode, user.userId);
+    return this.vpsService.checkCloseVIS(body.vis, body.shipcode, body.userId);
   }
 
   /**
@@ -93,10 +71,8 @@ export class VPSController {
   @ApiOperation({ summary: 'Get lost items for a VIS' })
   @ApiResponse({ status: 200, type: PackResultDto })
   async lostItem(
-    @Body() body: PackVISDto,
-    @Req() req: Request,
+    @Body() body: PackVISDto
   ): Promise<PackResultDto> {
-    const user = this.getPackingUser(req);
-    return this.vpsService.getLostItem(body.vis, user.userId);
+    return this.vpsService.getLostItem(body.vis, body.userId);
   }
 }

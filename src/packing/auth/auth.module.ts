@@ -11,8 +11,8 @@ import { PAccessLog } from './entities/p-access-log.entity';
  * @since   2025-11-12
  */
 @Module({
-  imports: [TypeOrmModule.forFeature([PAccessLog], 'packingConnection')],
-  providers: [AuthService],
-  controllers: [AuthController],
+    imports: [ TypeOrmModule.forFeature([PAccessLog], 'packingConnection') ],
+    controllers: [AuthController],
+    providers: [AuthService]
 })
 export class AuthModule {}

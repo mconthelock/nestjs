@@ -7,7 +7,6 @@ export class PackLoginDto {
     example: '15234', 
   })
   @IsString()
-  @Matches(/^\d+$/, { message: 'UID must be numeric' })
   @IsNotEmpty()
-  readonly uid: string;
+  readonly empno: string;
 }

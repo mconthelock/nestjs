@@ -48,7 +48,7 @@ export class InquiryController {
     return await this.inq.revise(req.id);
   }
 
-  @Post('update_status/:id')
+  @Post('updateInquiry/:id')
   async updatestatus(@Body() req: inqDataDto, @Param('id') id: number) {
     await this.inq.updatestatus(id, req.header.INQ_STATUS, req.history);
     return await this.inq.findByNumber(req.header.INQ_NO);

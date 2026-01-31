@@ -546,6 +546,12 @@ export class InquiryService {
       .execute();
   }
 
+  async updateInquiry(dto: updateInqDto, id: number) {
+    const inquiry = await this.inq.findOne({ where: { INQ_ID: id } });
+    Object.assign(inquiry, dto);
+    return this.inq.save(inquiry);
+  }
+
   //   async delete(searchDto: searchDto) {
   //     const params = [
   //       searchDto.INQ_ID,

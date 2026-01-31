@@ -2,6 +2,7 @@ import { Controller, Post, Body, Param, Get, UseGuards } from '@nestjs/common';
 import { InquiryService } from './inquiry.service';
 import { searchDto } from './dto/search.dto';
 import { inqDataDto } from './dto/update-data.dto';
+import { updateInqDto } from './dto/update-inquiry.dto';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('sp/inquiry')
@@ -49,9 +50,9 @@ export class InquiryController {
   }
 
   @Post('updateInquiry/:id')
-  async updatestatus(@Body() req: inqDataDto, @Param('id') id: number) {
-    await this.inq.updatestatus(id, req.header.INQ_STATUS, req.history);
-    return await this.inq.findByNumber(req.header.INQ_NO);
+  async updateInquiry(@Body() req: updateInqDto, @Param('id') id: number) {
+    await this.inq.updateInquiry(req, id);
+    return await this.inq.findByNumber(req.INQ_NO);
   }
 
   @Get('designprocess')

@@ -56,9 +56,29 @@ export class IeBgrService {
     fileS: 3,
     fileM: 4,
     fileE: 5,
-    fileO: 6,
+    fileU: 6,
+    fileO: 7,
   } as const;
 
+  async report(dto: UpdateIeBgrDto) {
+    return this.dataSource.createQueryBuilder()
+    .distinct()
+    .from('FORM', 'F')
+    .select(`M.VANAME || SUBSTR(F.CYEAR2,3,2) || '-' || TRIM(TO_CHAR(F.NRUNNO,'000000')) AS FORMNO, F.DREQDATE AS ISSUE_DATE,
+		ER.PIC AS EMPNO, U.SEMPPRE || U.SNAME AS RESPONSIBLE_PERSON, ER.RESORG AS DEPT, ER.FYEAR AS BUDGET_YEAR, ER.SCATALOG AS INVESTMENT_SN, ER.RECBG AS RECIVED_BUDGET, 
+		ER.REQAMT AS REQUEST_AMOUT, ER.FINDATE, ER.ITMNAME, ER.PPRESDATE, ER.GPBID, F.CST AS FORM_STATUS,
+		FW2.DAPVDATE AS REQ_SEM_APPDATE, FW3.DAPVDATE AS REQ_DEM_APPDATE, FW4.DAPVDATE AS REQ_DDIM_APPDATE, FW5.DAPVDATE AS REQ_DIM_APPDATE,
+		FW6.DAPVDATE AS IE_DEM_APPDATE, FW7.DAPVDATE AS EP_DDIM_APPDATE, FW8.DAPVDATE AS EP_DIM_APPDATE, FW9.DAPVDATE AS GMFAC_APPDATE,
+		FW10.DAPVDATE AS CAT_DEM_APPDATE, FW11.DAPVDATE AS RAF_DIM_APPDATE, FW12.DAPVDATE AS P_APPDATE, FW13.DAPVDATE AS ADMIN_APPDATE`)
+    .innerJoin('FORMMST', 'FM', 'F.NFRMNO=FM.NNO AND F.VORGNO=FM.VORGNO AND F.CYEAR=FM.CYEAR')
+    .innerJoin('EBUDGET.EBGREQFORM', 'ER', 'F.NFRMNO=ER.NFRMNO AND F.VORGNO=ER.VORGNO AND F.CYEAR=ER.CYEAR AND F.CYEAR2=ER.CYEAR2 AND F.NRUNNO=ER.NRUNNO')
+    .innerJoin('AMECUSERALL', 'U', 'ER.PIC=U.SEMPNO')
+    .leftJoin
+  }
+
+  /**
+   * Create IE-BGR form
+   */
   async create(
     dto: CreateIeBgrDto,
     files: Partial<Record<keyof typeof this.fileType, Express.Multer.File[]>>,
@@ -237,24 +257,13 @@ export class IeBgrService {
     }
   }
 
+  /**
+   * บันทึกแบบร่าง (Draft)
+   */
   // prettier-ignore
   async draft(
     dto: DraftIeBgrDto,
     files: Partial<Record<keyof typeof this.fileType, Express.Multer.File[]>>,
-    // {
-    //   imageI?: Express.Multer.File[];
-    //   imageP?: Express.Multer.File[];
-    //   imageD?: Express.Multer.File[];
-    //   imageN?: Express.Multer.File[];
-    //   imageE?: Express.Multer.File[];
-    //   imageS?: Express.Multer.File[];
-    //   fileP?: Express.Multer.File[];
-    //   fileR?: Express.Multer.File[];
-    //   fileS?: Express.Multer.File[];
-    //   fileM?: Express.Multer.File[];
-    //   fileE?: Express.Multer.File[];
-    //   fileO?: Express.Multer.File[];
-    // },
     ip: string,
     path: string,
   ) {
@@ -436,7 +445,8 @@ export class IeBgrService {
         SCHEDULE: dto.SCHEDULE,
         REMARK: dto.REMARK,
         PPRESDATE: dto.PREDATE,
-        GPBID: dto.GPBID,
+        GPBID: dto.GPBID || null,
+        CASETYPE: dto.CASETYPE,
       };
 
       // Insert EBGREQFORM record

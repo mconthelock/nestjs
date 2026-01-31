@@ -4,6 +4,7 @@ import { UpdateEbgreqformDto } from './dto/update-ebgreqform.dto';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { EBGREQFORM } from 'src/common/Entities/ebudget/table/EBGREQFORM.entity';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Injectable()
 export class EbgreqformService {
@@ -13,6 +14,10 @@ export class EbgreqformService {
     @InjectDataSource('ebudgetConnection')
     private dataSource: DataSource,
   ) {}
+
+  async findOne(form: FormDto){
+    return this.repo.findOneBy(form);
+  }
 
   async upsert(
     dto: CreateEbgreqformDto,

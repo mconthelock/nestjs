@@ -1,6 +1,12 @@
 import { PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsDate,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
 export class CreateEbgreqformDto extends PickType(FormDto, [
@@ -100,11 +106,11 @@ export class CreateEbgreqformDto extends PickType(FormDto, [
   GPBID?: string;
 
   @IsOptional()
-  @IsString()
-  GPYear?: string;
-
-  @IsOptional()
   @IsDate()
   @Type(() => Date)
   PPRESDATE?: Date;
+
+  @IsOptional()
+  @IsString()
+  CASETYPE: string;
 }

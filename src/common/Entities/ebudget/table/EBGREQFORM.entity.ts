@@ -72,14 +72,8 @@ export class EBGREQFORM {
   PPRESDATE: Date;
 
   @Column()
-  PRREFNO: string;
-
-  @Column()
-  SVENDCODE: string;
-
-  @Column()
   GPBID: string;
 
-//   @Column()
-//   GPFYEAR: string;
+  @Column()
+  CASETYPE: string;
 }

@@ -175,9 +175,13 @@ export class CreateIeBgrDto {
   @IsString()
   REMARK?: string;
 
+  @IsOptional()
+  @IsString()
+  GPBID?: string;
+
   @IsNotEmpty()
   @IsString()
-  GPBID: string;
+  CASETYPE: string;
 
   //   @IsNotEmpty()
   //   @IsString()

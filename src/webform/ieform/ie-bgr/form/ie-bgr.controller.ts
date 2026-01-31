@@ -39,6 +39,7 @@ export class IeBgrController {
       { name: 'fileS[]', maxCount: 10 },
       { name: 'fileM[]', maxCount: 10 },
       { name: 'fileE[]', maxCount: 10 },
+      { name: 'fileU[]', maxCount: 10 },
       { name: 'fileO[]', maxCount: 10 },
     ]),
   )
@@ -57,6 +58,7 @@ export class IeBgrController {
       fileS?: Express.Multer.File[];
       fileM?: Express.Multer.File[];
       fileE?: Express.Multer.File[];
+      fileU?: Express.Multer.File[];
       fileO?: Express.Multer.File[];
     },
     @Req() req: Request,
@@ -79,6 +81,7 @@ export class IeBgrController {
       { name: 'fileS[]', maxCount: 10 },
       { name: 'fileM[]', maxCount: 10 },
       { name: 'fileE[]', maxCount: 10 },
+      { name: 'fileU[]', maxCount: 10 },
       { name: 'fileO[]', maxCount: 10 },
     ]),
   )
@@ -97,6 +100,7 @@ export class IeBgrController {
       fileS?: Express.Multer.File[];
       fileM?: Express.Multer.File[];
       fileE?: Express.Multer.File[];
+      fileU?: Express.Multer.File[];
       fileO?: Express.Multer.File[];
     },
     @Req() req: Request,
@@ -109,5 +113,10 @@ export class IeBgrController {
   lastApprove(@Body() dto: LastApvIeBgrDto, @Req() req: Request) {
     const ip = getClientIP(req);
     return this.ieBgrService.lastApprove(dto, ip);
+  }
+
+  @Post('report')
+  report(@Body() dto: UpdateIeBgrDto) {
+    return this.ieBgrService.report(dto);
   }
 }

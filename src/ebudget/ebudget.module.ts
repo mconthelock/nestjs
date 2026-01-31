@@ -6,6 +6,7 @@ import { EbgreqcolImageModule } from './ebgreqcol-image/ebgreqcol-image.module';
 import { EbgreqattfileModule } from './ebgreqattfile/ebgreqattfile.module';
 import { EbudgetQuotationModule } from './ebudget-quotation/ebudget-quotation.module';
 import { EbudgetQuotationProductModule } from './ebudget-quotation-product/ebudget-quotation-product.module';
+import { EbgreqcaseModule } from './ebgreqcase/ebgreqcase.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { EbudgetQuotationProductModule } from './ebudget-quotation-product/ebudg
     EbgreqcolImageModule,
     EbgreqattfileModule,
     EbudgetQuotationModule,
-    EbudgetQuotationProductModule
+    EbudgetQuotationProductModule,
+    EbgreqcaseModule
   ],
 })
 export class EbudgetModule {}

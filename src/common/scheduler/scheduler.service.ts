@@ -72,7 +72,7 @@ export class SchedulerService implements OnModuleInit {
   /*** ตรวจสอบว่า URL endpoint มีอยู่จริงหรือไม่*/
   private async validateEndpoint(url: string): Promise<boolean> {
     try {
-      const fullUrl = `http://localhost:${process.env.PORT}${url}`;
+      const fullUrl = `http://localhost:${process.env.PORT}/${url}`;
       const response = await this.httpService.axiosRef.head(fullUrl, {
         timeout: 5000,
         validateStatus: (status) => true, // ยอมรับทุก status เพื่อตรวจสอบ
@@ -98,7 +98,7 @@ export class SchedulerService implements OnModuleInit {
     } catch (error) {
       // ลอง OPTIONS method ถ้า HEAD ไม่ได้
       try {
-        const fullUrl = `http://localhost:${process.env.PORT}${url}`;
+        const fullUrl = `http://localhost:${process.env.PORT}/${url}`;
         const response = await this.httpService.axiosRef.options(fullUrl, {
           timeout: 5000,
           validateStatus: (status) => true,
@@ -263,8 +263,9 @@ export class SchedulerService implements OnModuleInit {
       }
 
       const response = await this.httpService.axiosRef.post(
-        `http://localhost:${process.env.PORT}${job.URL}`,
+        `http://localhost:${process.env.PORT}/${job.URL}`,
         payload,
+        { proxy: false },
       );
       message = JSON.stringify(response.data);
       responseCode = response.status;
@@ -272,7 +273,8 @@ export class SchedulerService implements OnModuleInit {
       status = 'FAILED';
       message = error.message;
       responseCode = error.response?.status || 500;
-      this.logger.error(`Job failed: ${message}`);
+      //this.logger.error(`Job failed: ${message}`);
+      throw new Error(`Job ${job.NAME} failed: ${message}`);
     } finally {
       const endTime = new Date();
       await this.logRepo.save({

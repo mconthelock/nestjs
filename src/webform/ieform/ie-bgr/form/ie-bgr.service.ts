@@ -27,6 +27,7 @@ import { PprbiddingService } from 'src/amec/pprbidding/pprbidding.service';
 import { MailService } from 'src/common/services/mail/mail.service';
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 import { IEBGR_REPORT_VIEW } from 'src/common/Entities/webform/views/IEBGR_REPORT_VIEW.entity';
+import { PpoService } from 'src/amec/ppo/ppo.service';
 
 @Injectable()
 export class IeBgrService {
@@ -45,6 +46,7 @@ export class IeBgrService {
     private readonly ebudgetQuotationProductService: EbudgetQuotationProductService,
     private readonly pprbiddingService: PprbiddingService,
     private readonly mailService: MailService,
+    private readonly ppoService: PpoService
   ) {}
 
   private readonly fileType = {
@@ -73,8 +75,42 @@ export class IeBgrService {
         }
     });
 
-    
-    return report;
+    for( const r of report ) {
+        const bidding = await this.pprbiddingService.search({
+            EBUDGETNO: r.FORMNO
+        });
+        let list = [];
+        for( const b of bidding ){
+            const po = await this.ppoService.search({ SREFNO: b.SPRNO});
+            if(po.length > 0){
+                list.push({SPRNO: b.SPRNO, SPONO: po.map(p => p.SPONO)});
+            }else{
+                list.push({SPRNO: b.SPRNO, SPONO: []});
+            }
+        }
+        r.prpo = list;
+    }
+
+    if(!dto.PRNO && !dto.PONO) return report;
+
+    // กรองเฉพาะรายการที่ตรงกับ PRNO หรือ PONO ตามที่ระบุใน dto
+    const filter = report.filter(r => {
+        // prpo: Array<{ SPRNO: string, SPONO: string[] }>
+        const matched = r.prpo.filter((p: { SPRNO: string; SPONO: string[] }) => {
+            if (dto.PRNO && dto.PONO) {
+                return p.SPRNO === dto.PRNO && p.SPONO.includes(dto.PONO);
+            }
+            if (dto.PRNO) {
+                return p.SPRNO === dto.PRNO;
+            }
+            if (dto.PONO) {
+                return p.SPONO.includes(dto.PONO);
+            }
+            return true;
+        });
+        return matched.length > 0;
+    });
+    return filter;
   }
 
   /**

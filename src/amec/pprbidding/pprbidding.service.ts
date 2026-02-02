@@ -50,4 +50,10 @@ export class PprbiddingService {
   findAll() {
     return this.repo.find();
   }
+
+  search(dto: UpdatePprbiddingDto){
+    return this.repo.findBy({
+      ...dto
+    });
+  }
 }

@@ -100,4 +100,6 @@ export class IEBGR_REPORT_VIEW {
 
   @ViewColumn()
   ADMIN_APPDATE: Date;
+
+  prpo: any;
 }

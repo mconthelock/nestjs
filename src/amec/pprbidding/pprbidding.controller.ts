@@ -16,4 +16,9 @@ export class PprbiddingController {
   findAll() {
     return this.pprbiddingService.findAll();
   }
+
+  @Post('search')
+  search(@Body() dto: UpdatePprbiddingDto) {
+    return this.pprbiddingService.search(dto);
+  }
 }

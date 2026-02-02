@@ -6,6 +6,8 @@ import { PsectionModule } from './psection/psection.module';
 import { UsersModule } from './users/users.module';
 import { PpositionModule } from './pposition/pposition.module';
 import { PprbiddingModule } from './pprbidding/pprbidding.module';
+import { PpoModule } from './ppo/ppo.module';
+import { PprModule } from './ppr/ppr.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { PprbiddingModule } from './pprbidding/pprbidding.module';
     UsersModule,
     PpositionModule,
     PprbiddingModule,
+    PpoModule,
+    PprModule,
   ],
 })
 export class AmecModule {}

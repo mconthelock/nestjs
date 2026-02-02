@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePurCpmDto, InsertPurCpmDto } from './dto/create-pur-cpm.dto';
 import { UpdatePurCpmDto } from './dto/update-pur-cpm.dto';
-import { PURCPM_FORM } from 'src/common/Entities/webform/tables/PURCPM_FORM.entity';
+import { PURCPM_FORM } from 'src/common/Entities/webform/table/PURCPM_FORM.entity';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { FormService } from 'src/webform/form/form.service';

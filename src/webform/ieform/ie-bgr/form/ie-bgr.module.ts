@@ -12,6 +12,7 @@ import { EbudgetQuotationModule } from 'src/ebudget/ebudget-quotation/ebudget-qu
 import { EbudgetQuotationProductModule } from 'src/ebudget/ebudget-quotation-product/ebudget-quotation-product.module';
 import { PprbiddingModule } from 'src/amec/pprbidding/pprbidding.module';
 import { MailModule } from 'src/common/services/mail/mail.module';
+import { IEBGR_REPORT_VIEW } from 'src/common/Entities/webform/views/IEBGR_REPORT_VIEW.entity';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { MailModule } from 'src/common/services/mail/mail.module';
     EbudgetQuotationProductModule,
     FlowModule,
     PprbiddingModule,
-    MailModule
+    MailModule,
+    TypeOrmModule.forFeature([IEBGR_REPORT_VIEW], 'webformConnection'),
   ],
   controllers: [IeBgrController],
   providers: [IeBgrService],

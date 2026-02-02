@@ -3,7 +3,7 @@ import { CreateRqffrmDto } from './dto/create-rqffrm.dto';
 import { UpdateRqffrmDto } from './dto/update-rqffrm.dto';
 import { FormDto } from '../form/dto/form.dto';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { RQFFRM } from 'src/common/Entities/webform/tables/RQFFRM.entity';
+import { RQFFRM } from 'src/common/Entities/webform/table/RQFFRM.entity';
 import { DataSource, Repository } from 'typeorm';
 import { FormService } from '../form/form.service';
 

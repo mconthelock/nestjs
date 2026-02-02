@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreatePurFileDto } from './dto/create-pur-file.dto';
 import { UpdatePurFileDto } from './dto/update-pur-file.dto';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { PUR_FILE } from 'src/common/Entities/webform/tables/PUR_FILE.entity';
+import { PUR_FILE } from 'src/common/Entities/webform/table/PUR_FILE.entity';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { SearchPurFileDto } from './dto/search-pur-file.dto';
 

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { PurCpmService } from './pur-cpm.service';
 import { PurCpmController } from './pur-cpm.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PURCPM_FORM } from 'src/common/Entities/webform/tables/PURCPM_FORM.entity';
+import { PURCPM_FORM } from 'src/common/Entities/webform/table/PURCPM_FORM.entity';
 import { FormModule } from 'src/webform/form/form.module';
 import { PurFileModule } from '../pur-file/pur-file.module';
 import { FlowModule } from 'src/webform/flow/flow.module';

@@ -5,9 +5,9 @@ import {
   CreateIeBgrDto,
   DraftIeBgrDto,
 } from './dto/create-ie-bgr.dto';
-import { UpdateIeBgrDto } from './dto/update-ie-bgr.dto';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource, QueryRunner } from 'typeorm';
+import { ReportIeBgrDto, UpdateIeBgrDto } from './dto/update-ie-bgr.dto';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { FormService } from 'src/webform/form/form.service';
 import {
   deleteFile,
@@ -26,10 +26,13 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 import { PprbiddingService } from 'src/amec/pprbidding/pprbidding.service';
 import { MailService } from 'src/common/services/mail/mail.service';
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
+import { IEBGR_REPORT_VIEW } from 'src/common/Entities/webform/views/IEBGR_REPORT_VIEW.entity';
 
 @Injectable()
 export class IeBgrService {
   constructor(
+    @InjectRepository(IEBGR_REPORT_VIEW, 'webformConnection')
+    private readonly reportRepo: Repository<IEBGR_REPORT_VIEW>,
     @InjectDataSource('webformConnection')
     private dataSource: DataSource,
     private readonly formService: FormService,
@@ -60,20 +63,18 @@ export class IeBgrService {
     fileO: 7,
   } as const;
 
-  async report(dto: UpdateIeBgrDto) {
-    return this.dataSource.createQueryBuilder()
-    .distinct()
-    .from('FORM', 'F')
-    .select(`M.VANAME || SUBSTR(F.CYEAR2,3,2) || '-' || TRIM(TO_CHAR(F.NRUNNO,'000000')) AS FORMNO, F.DREQDATE AS ISSUE_DATE,
-		ER.PIC AS EMPNO, U.SEMPPRE || U.SNAME AS RESPONSIBLE_PERSON, ER.RESORG AS DEPT, ER.FYEAR AS BUDGET_YEAR, ER.SCATALOG AS INVESTMENT_SN, ER.RECBG AS RECIVED_BUDGET, 
-		ER.REQAMT AS REQUEST_AMOUT, ER.FINDATE, ER.ITMNAME, ER.PPRESDATE, ER.GPBID, F.CST AS FORM_STATUS,
-		FW2.DAPVDATE AS REQ_SEM_APPDATE, FW3.DAPVDATE AS REQ_DEM_APPDATE, FW4.DAPVDATE AS REQ_DDIM_APPDATE, FW5.DAPVDATE AS REQ_DIM_APPDATE,
-		FW6.DAPVDATE AS IE_DEM_APPDATE, FW7.DAPVDATE AS EP_DDIM_APPDATE, FW8.DAPVDATE AS EP_DIM_APPDATE, FW9.DAPVDATE AS GMFAC_APPDATE,
-		FW10.DAPVDATE AS CAT_DEM_APPDATE, FW11.DAPVDATE AS RAF_DIM_APPDATE, FW12.DAPVDATE AS P_APPDATE, FW13.DAPVDATE AS ADMIN_APPDATE`)
-    .innerJoin('FORMMST', 'FM', 'F.NFRMNO=FM.NNO AND F.VORGNO=FM.VORGNO AND F.CYEAR=FM.CYEAR')
-    .innerJoin('EBUDGET.EBGREQFORM', 'ER', 'F.NFRMNO=ER.NFRMNO AND F.VORGNO=ER.VORGNO AND F.CYEAR=ER.CYEAR AND F.CYEAR2=ER.CYEAR2 AND F.NRUNNO=ER.NRUNNO')
-    .innerJoin('AMECUSERALL', 'U', 'ER.PIC=U.SEMPNO')
-    .leftJoin
+  async report(dto: ReportIeBgrDto) {
+    const report = await this.reportRepo.find({
+        where: {
+            FORMNO: dto.FORMNO,
+            DEPT: dto.DEPT,
+            EMPNO: dto.EMPNO,
+            FORM_STATUS: dto.FORM_STATUS,
+        }
+    });
+
+    
+    return report;
   }
 
   /**

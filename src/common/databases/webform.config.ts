@@ -5,6 +5,7 @@ import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { TypeOrmWinstonLogger } from '../logger/typeorm-winston.logger';
 
+
 dotenv.config();
 let webformConfig: TypeOrmModuleAsyncOptions;
 if (process.env.HOST == 'AMEC') {
@@ -24,6 +25,7 @@ if (process.env.HOST == 'AMEC') {
       entities: [
         __dirname + '/../../**/**/*.entity{.ts,.js}',
         __dirname + '/../../**/**/**/*.entity{.ts,.js}',
+        __dirname + '/../Entities/webform/**/*.entity{.ts,.js}',
       ],
       synchronize: false,
       logger: new TypeOrmWinstonLogger(winstonLogger),

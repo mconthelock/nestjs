@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { IeBgrService } from './ie-bgr.service';
 import { CreateIeBgrDto, DraftIeBgrDto } from './dto/create-ie-bgr.dto';
-import { UpdateIeBgrDto } from './dto/update-ie-bgr.dto';
+import { ReportIeBgrDto, UpdateIeBgrDto } from './dto/update-ie-bgr.dto';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
@@ -116,7 +116,7 @@ export class IeBgrController {
   }
 
   @Post('report')
-  report(@Body() dto: UpdateIeBgrDto) {
+  report(@Body() dto: ReportIeBgrDto) {
     return this.ieBgrService.report(dto);
   }
 }

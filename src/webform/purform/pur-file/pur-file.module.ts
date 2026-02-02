@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PurFileService } from './pur-file.service';
 import { PurFileController } from './pur-file.controller';
-import { PUR_FILE } from 'src/common/Entities/webform/tables/PUR_FILE.entity';
+import { PUR_FILE } from 'src/common/Entities/webform/table/PUR_FILE.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({

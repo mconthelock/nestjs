@@ -44,8 +44,8 @@ export class InquiryService {
       .leftJoinAndSelect('inq.maruser', 'maruser')
       .leftJoinAndSelect('inq.shipment', 'shipment')
       .leftJoinAndSelect('inq.term', 'term')
-      .leftJoinAndSelect('inq.method', 'method');
-
+      .leftJoinAndSelect('inq.method', 'method')
+      .leftJoinAndSelect('inq.quotype', 'quotype');
     if (searchDto.IS_GROUP) {
       qb.leftJoinAndSelect('inq.inqgroup', 'inqgroup');
       delete searchDto.IS_GROUP;

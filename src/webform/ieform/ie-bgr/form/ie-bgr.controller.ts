@@ -18,6 +18,7 @@ import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper'
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
 import { LastApvIeBgrDto } from './dto/lastapv-ie-bgr.dto';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('ieform/ie-bgr')
 export class IeBgrController {
@@ -116,6 +117,7 @@ export class IeBgrController {
   }
 
   @Post('report')
+  @UseInterceptors(getFileUploadInterceptor())
   report(@Body() dto: ReportIeBgrDto) {
     return this.ieBgrService.report(dto);
   }

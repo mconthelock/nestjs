@@ -18,21 +18,12 @@ export class Busstation {
   WORKDAY_TIMEIN: string;
 
   @Column()
-  WORKDAY_TIMEDROP: string;
-
-  @Column()
   NIGHT_TIMEIN: string;
-
-  @Column()
-  NIGHT_TIMEDROP: string;
 
   @Column()
   HOLIDAY_TIMEIN: string;
 
-  @Column()
-  HOLIDAY_TIMEDROP: string;
-
-  @ManyToOne(() => Busroute, (busroute) => busroute.busstation)
+  @ManyToOne(() => Busroute, (busroute) => busroute.station)
   @JoinColumn({ name: 'BUSLINE', referencedColumnName: 'BUSID' })
   route: Busroute;
 }

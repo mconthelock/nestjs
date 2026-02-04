@@ -8,6 +8,10 @@ export class CreateBusrouteDto {
   @IsString()
   BUSTYPE: string;
 
+  @Type(() => Number)
+  @IsNumber()
+  BUSSEAT: number;
+
   @IsString()
   BUSTATUS: string;
 

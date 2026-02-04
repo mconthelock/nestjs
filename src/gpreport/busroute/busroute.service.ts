@@ -16,8 +16,12 @@ export class BusrouteService {
     private ds: DataSource,
   ) {}
 
-  create(createBusrouteDto: CreateBusrouteDto) {
-    return this.bus.save(createBusrouteDto);
+  async create(createBusrouteDto: CreateBusrouteDto) {
+    const data = await this.bus.save(createBusrouteDto);
+    return await this.bus.findOne({
+      where: { BUSID: data.BUSID },
+      relations: ['station'],
+    });
   }
 
   async update(id: number, dto: UpdateBusrouteDto) {
@@ -27,7 +31,7 @@ export class BusrouteService {
       await this.bus.save(data);
       return await this.bus.findOne({
         where: { BUSID: id },
-        relations: ['busstation'],
+        relations: ['station'],
       });
     }
     throw new NotFoundException(`User with ID "${id}" not found`);
@@ -63,7 +67,7 @@ export class BusrouteService {
   }
 
   findAll() {
-    return this.bus.find({ relations: ['busstation'] });
+    return this.bus.find({ relations: ['station'] });
   }
 
   findOne(id: number) {

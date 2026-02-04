@@ -1,13 +1,14 @@
 import { Type } from 'class-transformer';
-import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsNumber } from 'class-validator';
 
-export class CreateBusrouteDto {
+export class CreateBusstationDto {
   @IsString()
   STATION_NAME: string;
 
   @IsString()
   STATION_STATUS: string;
 
+  @Type(() => Number)
   @IsNumber()
   BUSLINE: number;
 
@@ -15,21 +16,10 @@ export class CreateBusrouteDto {
   WORKDAY_TIMEIN: string;
 
   @IsString()
-  WORKDAY_TIMEDROP: string;
+  @IsOptional()
+  NIGHT_TIMEIN?: string;
 
   @IsString()
   @IsOptional()
-  NIGHT_TIMEIN: string;
-
-  @IsString()
-  @IsOptional()
-  NIGHT_TIMEDROP: string;
-
-  @IsString()
-  @IsOptional()
-  HOLIDAY_TIMEIN: string;
-
-  @IsString()
-  @IsOptional()
-  HOLIDAY_TIMEDROP: string;
+  HOLIDAY_TIMEIN?: string;
 }

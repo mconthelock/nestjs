@@ -1,11 +1,11 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreateBusrouteDto } from './create-busstation.dto';
+import { CreateBusstationDto } from './create-busstation.dto';
 import { Type } from 'class-transformer';
 import { IsNumber, IsOptional } from 'class-validator';
 
-export class UpdateBusrouteDto extends PartialType(CreateBusrouteDto) {
+export class UpdateBusstationDto extends PartialType(CreateBusstationDto) {
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  BUSID?: number;
+  STATION_ID?: number;
 }

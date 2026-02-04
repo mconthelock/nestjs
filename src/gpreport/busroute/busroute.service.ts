@@ -8,16 +8,16 @@ import { UpdateBusrouteDto } from './dto/update-busroute.dto';
 @Injectable()
 export class BusrouteService {
   constructor(
-    @InjectRepository(Busroute, 'amecConnection')
-    private readonly busrouteRepository: Repository<Busroute>,
+    @InjectRepository(Busroute, 'gpreportConnection')
+    private readonly bus: Repository<Busroute>,
   ) {}
 
   create(createBusrouteDto: CreateBusrouteDto) {
-    return this.busrouteRepository.save(createBusrouteDto);
+    return this.bus.save(createBusrouteDto);
   }
 
   findAll() {
-    return `This action returns all busroute`;
+    return this.bus.find({ relations: ['busstation'] });
   }
 
   findOne(id: number) {

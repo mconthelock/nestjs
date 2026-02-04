@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn, JoinColumn } from 'typeorm';
+import { Busstation } from 'src/gpreport/busstation/entities/busstation.entity';
 
 @Entity('BUS_ROUTE')
 export class Busroute {
@@ -17,8 +18,7 @@ export class Busroute {
   @Column()
   IS_CHONBURI: string;
 
-  // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
-  // ตัวอย่าง:
-  // @ManyToOne(() => User, user => user.posts)
-  // user: User;
+  @OneToMany(() => Busstation, (stop) => stop.BUSLINE)
+  @JoinColumn({ name: 'BUSID', referencedColumnName: 'BUSLINEID' })
+  busstation: Busstation[];
 }

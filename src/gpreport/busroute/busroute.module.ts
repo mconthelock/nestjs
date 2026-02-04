@@ -6,11 +6,7 @@ import { BusrouteController } from './busroute.controller';
 
 @Module({
   controllers: [BusrouteController],
-  imports: [
-    TypeOrmModule.forFeature([Busroute,
-    TypeOrmModule.forFeature([Busroute], 'amecConnection')
-  ], 'amecConnection')
-  ],
+  imports: [TypeOrmModule.forFeature([Busroute], 'gpreportConnection')],
   providers: [BusrouteService],
 })
 export class BusrouteModule {}

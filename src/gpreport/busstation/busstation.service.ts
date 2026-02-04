@@ -6,7 +6,17 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class BusstationService {
   constructor(
-    @InjectRepository(Busstation, 'amecConnection')
-    private readonly busstationRepository: Repository<Busstation>,
+    @InjectRepository(Busstation, 'gpreportConnection')
+    private readonly stop: Repository<Busstation>,
   ) {}
+
+  async findAll() {
+    return this.stop.find({ relations: ['route'] });
+  }
+
+  async create() {}
+
+  async update() {}
+
+  async delete() {}
 }

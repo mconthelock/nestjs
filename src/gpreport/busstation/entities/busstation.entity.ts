@@ -1,11 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Busroute } from 'src/gpreport/busroute/entities/busroute.entity';
 @Entity('BUS_STATION')
 export class Busstation {
-  @PrimaryGeneratedColumn()
-  id: number; // หากไม่พบ Primary Key ใน SQL จะใช้ id เป็น PrimaryGeneratedColumn เริ่มต้น
-
-  @Column()
+  @PrimaryColumn()
   STATION_ID: number;
 
   @Column()
@@ -35,8 +32,7 @@ export class Busstation {
   @Column()
   HOLIDAY_TIMEDROP: string;
 
-  // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
-  // ตัวอย่าง:
-  // @ManyToOne(() => User, user => user.posts)
-  // user: User;
+  @ManyToOne(() => Busroute, (busroute) => busroute.busstation)
+  @JoinColumn({ name: 'BUSLINE', referencedColumnName: 'BUSID' })
+  route: Busroute;
 }

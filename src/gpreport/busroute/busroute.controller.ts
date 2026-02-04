@@ -1,16 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { BusrouteService } from './busroute.service';
 import { CreateBusrouteDto } from './dto/create-busroute.dto';
 import { UpdateBusrouteDto } from './dto/update-busroute.dto';
-import { relative } from 'path';
 
 @Controller('gpreport/busroute')
 export class BusrouteController {
@@ -21,26 +12,21 @@ export class BusrouteController {
     return this.bus.create(createBusrouteDto);
   }
 
+  @Post('update/:id')
+  update(
+    @Param('id') id: number,
+    @Body() UpdateBusrouteDto: UpdateBusrouteDto,
+  ) {
+    return this.bus.update(id, UpdateBusrouteDto);
+  }
+
+  @Post('delete/:id')
+  delete(@Param('id') id: number) {
+    return this.bus.delete(id);
+  }
+
   @Get()
   findAll() {
     return this.bus.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.bus.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateBusrouteDto: UpdateBusrouteDto,
-  ) {
-    return this.bus.update(+id, updateBusrouteDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.bus.remove(+id);
   }
 }

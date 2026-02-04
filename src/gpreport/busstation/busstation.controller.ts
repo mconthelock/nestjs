@@ -1,7 +1,12 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { BusstationService } from './busstation.service';
 
-@Controller('busstation')
+@Controller('gpreport/busstop')
 export class BusstationController {
-  constructor(private readonly busstationService: BusstationService) {}
+  constructor(private readonly stop: BusstationService) {}
+
+  @Get()
+  findAll() {
+    return this.stop.findAll();
+  }
 }

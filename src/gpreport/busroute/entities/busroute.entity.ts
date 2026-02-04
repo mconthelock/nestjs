@@ -16,6 +16,9 @@ export class Busroute {
   BUSTATUS: string;
 
   @Column()
+  BUSSEAT: number;
+
+  @Column()
   IS_CHONBURI: string;
 
   @OneToMany(() => Busstation, (stop) => stop.BUSLINE)

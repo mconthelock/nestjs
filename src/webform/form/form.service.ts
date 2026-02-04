@@ -468,7 +468,7 @@ export class FormService {
       context.emppos,
       queryRunner,
     );
-    // context.flag = 1;
+    context.flag = 1; // หากไม่เจอตำแหน่งเช่น ใน ORGPOS ให้ไป set manager step โดยตรวจด้วย VPOSNO ของ FLOWMST ทีละ STEP
     if (val.length > 0) {
       context.flag = 2;
       for (const row of val) {

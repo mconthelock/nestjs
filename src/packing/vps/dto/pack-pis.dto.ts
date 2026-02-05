@@ -4,7 +4,7 @@ import { IsString, IsNotEmpty } from 'class-validator';
 export class PackPISDto {
     @ApiProperty({ 
         description: 'VIS Code',
-        example: '07C198A95807', 
+        example: '07C118A95807', 
     })
     @IsString() 
     @IsNotEmpty()

@@ -3,8 +3,9 @@ import { NewsModule } from './news/news.module';
 import { BuslineModule } from './busline/busline.module';
 import { BusstopModule } from './busstop/busstop.module';
 import { BusrouteModule } from './busroute/busroute.module';
+import { BuspassengerModule } from './buspassenger/buspassenger.module';
 
 @Module({
-  imports: [NewsModule, BuslineModule, BusstopModule, BusrouteModule],
+  imports: [NewsModule, BuslineModule, BusstopModule, BusrouteModule, BuspassengerModule],
 })
 export class gpreportModule {}

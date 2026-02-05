@@ -4,7 +4,7 @@ import { IsString, IsNotEmpty } from 'class-validator';
 export class PackCloseVISDto {
     @ApiProperty({ 
         description: 'VIS Code',
-        example: '8A9580711501'
+        example: '07C118A95807'
     })
     @IsString() 
     @IsNotEmpty()
@@ -12,7 +12,7 @@ export class PackCloseVISDto {
 
     @ApiProperty({ 
         description: 'Shipping mark',
-        example: '8A9580711501-SM'
+        example: '07C198A95807-SM'
     })
     @IsString() 
     @IsNotEmpty()

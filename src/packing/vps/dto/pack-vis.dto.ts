@@ -10,8 +10,8 @@ export class PackVISDto {
     @ApiProperty({ 
         description: 'VIS Code',
         examples: {
-            sample1: { value: '07C198A95807' },
-            sample2: { value: '07C1128A95807' },
+            sample1: { value: '07C118A95807' },
+            sample2: { value: '07C1108A95807' },
         },
     })
     @IsString() 

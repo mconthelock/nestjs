@@ -82,7 +82,10 @@ export class IEBGR_REPORT_VIEW {
 
   @ViewColumn()
   EP_DDIM_APPDATE: Date;
-
+  
+  @ViewColumn()
+  EP_DDIM_APPDATE2: Date;
+  
   @ViewColumn()
   EP_DIM_APPDATE: Date;
 

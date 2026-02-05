@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { NewsModule } from './news/news.module';
-import { BusrouteModule } from './busroute/busroute.module';
-import { BusstationModule } from './busstation/busstation.module';
+import { BuslineModule } from './busline/busline.module';
+import { BusstopModule } from './busstop/busstop.module';
 
 @Module({
-  imports: [NewsModule, BusrouteModule, BusstationModule],
+  imports: [NewsModule, BuslineModule, BusstopModule],
 })
 export class gpreportModule {}

@@ -1,19 +1,19 @@
 import { Type } from 'class-transformer';
-import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
-export class CreateBusrouteDto {
+export class CreateBuslineDto {
   @IsString()
   BUSNAME: string;
 
   @IsString()
   BUSTYPE: string;
 
+  @IsString()
+  BUSSTATUS: string;
+
   @Type(() => Number)
   @IsNumber()
   BUSSEAT: number;
-
-  @IsString()
-  BUSTATUS: string;
 
   @IsString()
   IS_CHONBURI: string;

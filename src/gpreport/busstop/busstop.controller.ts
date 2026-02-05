@@ -4,7 +4,7 @@ import { CreateBusstopDto } from './dto/create-busstop.dto';
 import { UpdateBusstopDto } from './dto/update-busstop.dto';
 import { SearchBusstopDto } from './dto/search-busstop.dto';
 
-@Controller('busstop')
+@Controller('bus/stop')
 export class BusstopController {
   constructor(private readonly stop: BusstopService) {}
 

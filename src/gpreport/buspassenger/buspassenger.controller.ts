@@ -11,7 +11,7 @@ import { BuspassengerService } from './buspassenger.service';
 import { CreateBuspassengerDto } from './dto/create-buspassenger.dto';
 import { UpdateBuspassengerDto } from './dto/update-buspassenger.dto';
 
-@Controller('buspassenger')
+@Controller('bus/passenger')
 export class BuspassengerController {
   constructor(private readonly buspassengerService: BuspassengerService) {}
 

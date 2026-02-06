@@ -20,6 +20,11 @@ export function formDetailQb(dataSource: DataSource) {
             || '&runNo='|| F.NRUNNO
             || '&empno='
             AS "link",
+            CASE 
+		        WHEN F.DREQDATE IS NOT NULL 
+		        THEN TO_DATE(TO_CHAR(F.DREQDATE, 'YYYY-MM-DD')|| ' ' || F.CREQTIME, 'YYYY-MM-DD HH24:MI:SS') 
+	        	ELSE NULL 
+	        END AS REQUEST_DATE,
         F.*, A.SNAME AS VINPUTNAME, B.SNAME AS VREQNAME, A.SSECCODE AS VINPUTSECCODE, B.SSECCODE AS VREQSECCODE, A.SDEPCODE AS VINPUTDEPCODE, B.SDEPCODE AS VREQDEPCODE, A.SDIVCODE AS VINPUTDIVCODE, B.SDIVCODE AS VREQDIVCODE`)
       .from('FORM', 'F')
       .innerJoin('FORMMST', 'FT', 'FT.NNO = F.NFRMNO AND FT.VORGNO = F.VORGNO AND FT.CYEAR = F.CYEAR')

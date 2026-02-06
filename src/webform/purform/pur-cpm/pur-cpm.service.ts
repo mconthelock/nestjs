@@ -30,6 +30,17 @@ export class PurCpmService {
     private readonly repService: RepService,
   ) {}
 
+  findbyYear(year: string){
+    return this.repo.find({
+      where: {
+        CYEAR2: year
+      },
+      relations:{
+        FILES: true,
+      }
+    });
+  }
+
   async getData(dto: FormDto, queryRunner?: QueryRunner) {
     let localRunner: QueryRunner | undefined;
     let didConnect = false;

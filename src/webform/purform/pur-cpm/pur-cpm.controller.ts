@@ -25,6 +25,11 @@ export class PurCpmController {
   private readonly path =
     `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/PUR/PURCPM/` as string;
 
+  @Get('year/:year')
+  findByYear(@Param('year') year: string) {
+    return this.purCpmService.findbyYear(year);
+  }
+
   @Post('data')
   getData(@Body() dto: FormDto) {
     return this.purCpmService.getData(dto);

@@ -6,7 +6,7 @@ export class findOneDto {
   TRADER: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   SUPPLIER: string;
 
   @Type(() => Number)

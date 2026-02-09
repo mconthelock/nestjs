@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsString, IsOptional, ValidateNested } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  ValidateNested,
+  IsDataURI,
+  IsDate,
+} from 'class-validator';
 import { PartialType, OmitType } from '@nestjs/mapped-types';
 import { createInqDto } from './create-inquiry.dto';
 import { createTimelineDto } from '../../timeline/dto/create-dto';
@@ -52,4 +58,14 @@ export class searchDto extends PartialType(SearchBase) {
 
   @IsOptional()
   IS_WEIGHT?: string;
+
+  @Type(() => Date)
+  @IsOptional()
+  @IsDate()
+  START_INQ_DATE?: Date;
+
+  @Type(() => Date)
+  @IsOptional()
+  @IsDate()
+  END_INQ_DATE?: Date;
 }

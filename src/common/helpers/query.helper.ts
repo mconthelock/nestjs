@@ -10,10 +10,15 @@ export async function applyDynamicFilters(qb, filters: any, alias: string) {
     }
     // Case 2: Actual Condition (e.g., "INQ_STATUS": ">20")
     else {
-      const paramName = `${alias}_${key}_${Math.random().toString(36).substring(7)}`;
+      let visual_key = key;
+      console.log(key);
+      if (key.startsWith('START_') || key.startsWith('END_')) {
+        visual_key = key.replace('START_', '').replace('END_', '');
+      }
+      const paramName = `${alias}_${visual_key}_${Math.random().toString(36).substring(7)}`;
       const { sql, params } = await parseCondition(
         alias,
-        key,
+        visual_key,
         value,
         paramName,
       );

@@ -1,8 +1,9 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('BUS_STOP')
 export class Busstop {
-  @PrimaryColumn()
+  //@PrimaryColumn()
+  @PrimaryGeneratedColumn('increment')
   STOP_ID: number;
 
   @Column()

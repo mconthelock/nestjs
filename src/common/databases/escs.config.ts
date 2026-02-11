@@ -21,6 +21,7 @@ if (process.env.HOST == 'AMEC') {
       schema: process.env.ESCS_SCHEMA,
       connectString: `(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=${process.env.ESCS_HOST})(PORT=${process.env.ESCS_PORT}))(CONNECT_DATA=(SID=${process.env.ESCS_SERVICE})))`,
       entities: [
+        __dirname + '/../Entities/escs/**/*.entity{.ts,.js}',
         __dirname + '/../../**/**/*.entity{.ts,.js}',
         __dirname + '/../../**/**/**/*.entity{.ts,.js}',
       ],

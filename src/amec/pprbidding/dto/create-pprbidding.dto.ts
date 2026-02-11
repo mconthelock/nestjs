@@ -1,13 +1,13 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreatePprbiddingDto {
   @IsNotEmpty()
   @IsString()
   SPRNO: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  BIDDINGNO: string;
+  BIDDINGNO: string | null;
   
   @IsNotEmpty()
   @IsString()

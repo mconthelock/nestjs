@@ -13,6 +13,7 @@ import { ESCSUserItemStationModule } from './user-item-station/user-item-station
 import { ESCSUserFileModule } from './user-file/user-file.module';
 import { ESCSUserAuthorizeModule } from './user-authorize/user-authorize.module';
 import { ESCSUserAuthorizeViewModule } from './user-authorize-view/user-authorize-view.module';
+import { BlockMasterModule } from './block-master/block-master.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ESCSUserAuthorizeViewModule } from './user-authorize-view/user-authoriz
     ESCSUserFileModule,
     ESCSUserAuthorizeModule,
     ESCSUserAuthorizeViewModule,
+    BlockMasterModule,
   ],
 })
 export class ESCSModule {}

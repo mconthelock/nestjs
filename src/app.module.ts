@@ -32,6 +32,8 @@ import { EarlyHeadMiddleware } from './middleware/early-head.middleware';
 import { SafetyModule } from './safety/safety.module';
 import { EbudgetModule } from './ebudget/ebudget.module';
 import { WarehouseModule } from './warehouse/warehouse.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { TransactionInterceptor } from './common/interceptors/transaction.interceptor';
 
 @Module({
   imports: [
@@ -61,9 +63,15 @@ import { WarehouseModule } from './warehouse/warehouse.module';
     SafetyModule,
     HbdModule,
     EbudgetModule,
-    WarehouseModule
+    WarehouseModule,
   ],
-  providers: [HttpLoggingInterceptor],
+  providers: [
+    HttpLoggingInterceptor,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransactionInterceptor,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

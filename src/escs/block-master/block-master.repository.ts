@@ -6,7 +6,7 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { CreateBlockMasterDto } from './dto/create-block-master.dto';
 import { BlockMaster } from 'src/common/Entities/escs/table/BLOCK_MASTER.entity';
-import { SearchBlockMasterDto, UpdateBlockMasterDto } from './dto/update-block-master.dto';
+import { UpdateBlockMasterDto } from './dto/update-block-master.dto';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 
 @Injectable({ scope: Scope.REQUEST })
@@ -35,7 +35,13 @@ export class BlockMasterRepository extends BaseRepository {
 
   async search(dto: FiltersDto) {
     const qb = this.manager.createQueryBuilder(BlockMaster, 'B');
-    this.applyFilters(qb, 'B', dto, ['NID', "VNAME", 'VCODE', 'NSTATUS', 'NUSERUPDATE']);
+    this.applyFilters(qb, 'B', dto, [
+      'NID',
+      'VNAME',
+      'VCODE',
+      'NSTATUS',
+      'NUSERUPDATE',
+    ]);
     return qb.orderBy('B.NID', 'ASC').getMany();
   }
 

@@ -14,15 +14,3 @@ export class UpdateBlockMasterDto extends PartialType(CreateBlockMasterDto) {
     @Type(() => Date)
     DDATEUPDATE?: Date;
 }
-
-export class SearchBlockMasterDto extends PartialType(CreateBlockMasterDto) {
-    @IsOptional()
-    @IsNumber()
-    @Type(() => Number)
-    NID?: number;
-
-    @IsOptional()
-    @IsNumber()
-    @Type(() => Number)
-    NSTATUS?: number;
-}

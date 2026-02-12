@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { BlockMasterService } from './block-master.service';
 import { CreateBlockMasterDto } from './dto/create-block-master.dto';
-import { SearchBlockMasterDto, UpdateBlockMasterDto } from './dto/update-block-master.dto';
+import { UpdateBlockMasterDto } from './dto/update-block-master.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { FiltersDto } from 'src/common/dto/filter.dto';

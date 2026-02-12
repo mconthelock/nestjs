@@ -44,7 +44,12 @@ export class ItemMfgRepository extends BaseRepository {
       'NTYPE',
       'NUSERUPDATE',
     ]);
-    return qb.orderBy('I.NID', 'ASC').getMany();
+    return qb
+      .innerJoinAndSelect('I.USER_SECTION', 'US')
+      .innerJoinAndSelect('I.ITEM_STATUS', 'IS')
+      .innerJoinAndSelect('I.ITEM_MFG_TYPE', 'IMT')
+      .orderBy('I.NID', 'ASC')
+      .getMany();
   }
 
   async update(id: number, dto: UpdateItemMfgDto) {

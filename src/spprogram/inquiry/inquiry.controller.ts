@@ -31,7 +31,7 @@ export class InquiryController {
   }
 
   @Post('update')
-  async update(@Body() req: inqDataDto) {
+  async update(@Body() req: any) {
     const data = await this.inq.update(
       req.header,
       req.details || [],
@@ -40,7 +40,6 @@ export class InquiryController {
       req.timelinedata,
       req.history,
     );
-
     return await this.inq.findByNumber(req.header.INQ_NO);
   }
 

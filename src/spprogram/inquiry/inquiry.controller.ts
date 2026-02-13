@@ -24,8 +24,8 @@ export class InquiryController {
     const data = await this.inq.create(
       req.header,
       req.details,
-      req.timelinedata || undefined,
-      req.history || undefined,
+      req.timelinedata || [],
+      req.history || [],
     );
     return await this.inq.findByNumber(req.header.INQ_NO);
   }

@@ -25,42 +25,50 @@ export class PDFService {
       width,
       ...opt
     } = dto.options;
-    const browser = await chromium.launch({ headless: true });
-    const page = await browser.newPage();
+    let browser: any;
+    try {
+      browser = await chromium.launch({ headless: true });
+      const page = await browser.newPage();
 
-    await page.setContent(dto.html, { waitUntil: 'networkidle' });
-    await page.emulateMedia({ media: 'print' });
+      await page.setContent(dto.html, { waitUntil: 'networkidle' });
+      await page.emulateMedia({ media: 'print' });
 
-    const options: PDFOptions = {
-      format: format || 'A4',
-      margin: margin || {
-        top: '18mm',
-        right: '15mm',
-        bottom: '20mm',
-        left: '15mm',
-      },
-      printBackground: printBackground || false, // สำคัญสำหรับ Tailwind/Bootstrap ที่ใช้ background/color
-      displayHeaderFooter: displayHeaderFooter || false,
-      landscape: landscape || false,
-      preferCSSPageSize: preferCSSPageSize || false,
-      outline: outline || false,
-      tagged: tagged || false,
-      scale: scale || 1,
-      pageRanges: pageRanges || '', // '1-5' or '1,3,5' or '1-3,5'
-    };
+      const options: PDFOptions = {
+        format: format || 'A4',
+        margin: margin || {
+          top: '18mm',
+          right: '15mm',
+          bottom: '20mm',
+          left: '15mm',
+        },
+        printBackground: printBackground ?? false, // สำคัญสำหรับ Tailwind/Bootstrap ที่ใช้ background/color
+        displayHeaderFooter: displayHeaderFooter || false,
+        landscape: landscape || false,
+        preferCSSPageSize: preferCSSPageSize || false,
+        outline: outline || false,
+        tagged: tagged || false,
+        scale: scale ?? 1,
+        pageRanges: pageRanges || '', // '1-5' or '1,3,5' or '1-3,5'
+      };
 
-    if (headerTemplate) options.headerTemplate = headerTemplate;
-    if (footerTemplate) options.footerTemplate = footerTemplate;
-    if (height) options.height = height;
-    if (width) options.width = width;
-    if (opt.path) options.path = opt.path;
+      if (headerTemplate) options.headerTemplate = headerTemplate;
+      if (footerTemplate) options.footerTemplate = footerTemplate;
+      if (height) options.height = height;
+      if (width) options.width = width;
+      if (opt.path) options.path = opt.path;
 
-    const buffer = await page.pdf(options);
+      const buffer = await page.pdf(options);
 
-    if (!opt.path) {
-      await browser.close();
-      return buffer;
+      return {
+        success: true,
+        data: buffer,
+      };
+    } catch (error) {
+      throw error;
+    } finally {
+      if (browser) {
+        await browser.close();
+      }
     }
-    await browser.close();
   }
 }

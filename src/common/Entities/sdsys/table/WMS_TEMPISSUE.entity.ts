@@ -1,6 +1,6 @@
 import { Column, PrimaryColumn, Entity } from 'typeorm';
 
-@Entity({ name: 'WMS_TEMPISSUE', schema: 'SDSYS' })
+@Entity({ name: 'WMS_TEMPISSUE_TEST', schema: 'SDSYS' })
 export class WMSTempIssueEntity {
   @PrimaryColumn()
   USERID: string;

@@ -1,8 +1,16 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { ITEM_MFG } from 'src/common/Entities/escs/table/ITEM_MFG.entity';
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 
 @Entity({
   name: 'USERS_SECTION',
-  schema: 'ESCCHKSHT'
+  schema: 'ESCCHKSHT',
 })
 export class UserSection {
   @PrimaryColumn()
@@ -11,7 +19,7 @@ export class UserSection {
   @Column()
   SEC_NAME: string;
 
-  @Column({default: 1})
+  @Column({ default: 1 })
   SEC_STATUS: number;
 
   @Column()
@@ -19,4 +27,7 @@ export class UserSection {
 
   @Column()
   SSECCODE: string;
+
+  @OneToMany(() => ITEM_MFG, (i) => i.USER_SECTION)
+  ITEM_MFG: ITEM_MFG[];
 }

@@ -1,11 +1,9 @@
 import { Module } from '@nestjs/common';
-// import { AuthModule } from './auth/auth.module';
-// import { VPSModule } from './vps/vps.module';
+import { WMSModule } from './wms/wms.module';
 
 @Module({
-//   imports: [
-//     AuthModule,
-//     VPSModule,
-//   ]
+  imports: [
+    WMSModule,
+  ]
 })
 export class WarehouseModule {}

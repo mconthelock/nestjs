@@ -5,10 +5,8 @@ import { Weight } from './entities/weight.entity';
 import { WeightController } from './weight.controller';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([Weight], 'spsysConnection')],
   controllers: [WeightController],
-  imports: [
-    TypeOrmModule.forFeature([Weight], 'amecConnection')
-  ],
   providers: [WeightService],
 })
 export class WeightModule {}

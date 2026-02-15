@@ -53,11 +53,13 @@ export class ApplicationController {
     @Body() body: UpdateApplicationDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
+    console.log(body.destination);
+
     if (files) {
-      files.map((file) => {
+      files.forEach((file) => {
         const type = file.originalname.split('-');
-        if (type[0] == 'icon') body = { ...body, APP_ICON: file.filename };
-        if (type[0] == 'poster') body = { ...body, APP_POSTER: file.filename };
+        if (type[0] === 'icon') body = { ...body, APP_ICON: file.filename };
+        if (type[0] === 'poster') body = { ...body, APP_POSTER: file.filename };
       });
     }
     return this.apps.update(+id, body);

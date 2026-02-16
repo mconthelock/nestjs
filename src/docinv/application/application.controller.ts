@@ -53,13 +53,14 @@ export class ApplicationController {
     @Body() body: UpdateApplicationDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    console.log(body.destination);
-
     if (files) {
       files.forEach((file) => {
+        const filelocation = process.env.ITADMIN_HOST;
         const type = file.originalname.split('-');
-        if (type[0] === 'icon') body = { ...body, APP_ICON: file.filename };
-        if (type[0] === 'poster') body = { ...body, APP_POSTER: file.filename };
+        if (type[0] === 'icon')
+          body = { ...body, APP_ICON: `${filelocation}/${file.filename}` };
+        if (type[0] === 'poster')
+          body = { ...body, APP_POSTER: `${filelocation}/${file.filename}` };
       });
     }
     return this.apps.update(+id, body);

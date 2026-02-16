@@ -16,6 +16,7 @@ import { ESCSUserAuthorizeViewModule } from './user-authorize-view/user-authoriz
 import { BlockMasterModule } from './block-master/block-master.module';
 import { ItemMfgModule } from './item-mfg/item-mfg.module';
 import { ItemMfgTypeModule } from './item-mfg-type/item-mfg-type.module';
+import { ItemSheetMfgModule } from './item-sheet-mfg/item-sheet-mfg.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ItemMfgTypeModule } from './item-mfg-type/item-mfg-type.module';
     BlockMasterModule,
     ItemMfgModule,
     ItemMfgTypeModule,
+    ItemSheetMfgModule,
   ],
 })
 export class ESCSModule {}

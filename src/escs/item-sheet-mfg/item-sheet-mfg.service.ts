@@ -1,29 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { CreateItemMfgTypeDto } from './dto/create-item-mfg-type.dto';
-import { UpdateItemMfgTypeDto } from './dto/update-item-mfg-type.dto';
+import { CreateItemSheetMfgDto } from './dto/create-item-sheet-mfg.dto';
+import { UpdateItemSheetMfgDto } from './dto/update-item-sheet-mfg.dto';
+import { ItemSheetMfgRepository } from './item-sheet-mfg.repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
-import { ItemMfgTypeRepository } from './item-mfg-type.repository';
 
 @Injectable()
-export class ItemMfgTypeService {
-  constructor(private readonly repo: ItemMfgTypeRepository) {}
-  async create(dto: CreateItemMfgTypeDto) {
+export class ItemSheetMfgService {
+  constructor(private readonly repo: ItemSheetMfgRepository) {}
+  async create(dto: CreateItemSheetMfgDto) {
     try {
       const res = await this.repo.create(dto);
       if (!res) {
         return {
           status: false,
-          message: 'Insert ITEM_MFG_TYPE Failed',
+          message: 'Insert ITEM_SHEET_MFG Failed',
           data: dto,
         };
       }
       return {
         status: true,
-        message: 'Insert ITEM_MFG_TYPE Successfully',
+        message: 'Insert ITEM_SHEET_MFG Successfully',
         data: res,
       };
     } catch (error) {
-      throw new Error('Insert ITEM_MFG_TYPE Error: ' + error.message);
+      throw new Error('Insert ITEM_SHEET_MFG Error: ' + error.message);
     }
   }
 
@@ -34,17 +34,17 @@ export class ItemMfgTypeService {
       if (length === 0) {
         return {
           status: false,
-          message: 'Search ITEM_MFG_TYPE Failed',
+          message: 'Search ITEM_SHEET_MFG Failed',
           data: [],
         };
       }
       return {
         status: true,
-        message: `Search ITEM_MFG_TYPE data found ${length} record(s)`,
+        message: `Search ITEM_SHEET_MFG data found ${length} record(s)`,
         data: res,
       };
     } catch (error) {
-      throw new Error('Search ITEM_MFG_TYPE Error: ' + error.message);
+      throw new Error('Search ITEM_SHEET_MFG Error: ' + error.message);
     }
   }
 
@@ -54,17 +54,17 @@ export class ItemMfgTypeService {
       if (res == null) {
         return {
           status: false,
-          message: 'Search ITEM_MFG_TYPE Failed',
+          message: 'Search ITEM_SHEET_MFG Failed',
           data: [],
         };
       }
       return {
         status: true,
-        message: `Search ITEM_MFG_TYPE data found 1 record(s)`,
+        message: `Search ITEM_SHEET_MFG data found 1 record(s)`,
         data: res,
       };
     } catch (error) {
-      throw new Error('Search ITEM_MFG_TYPE Error: ' + error.message);
+      throw new Error('Search ITEM_SHEET_MFG Error: ' + error.message);
     }
   }
 
@@ -75,36 +75,36 @@ export class ItemMfgTypeService {
       if (length === 0) {
         return {
           status: false,
-          message: 'Search ITEM_MFG_TYPE Failed',
+          message: 'Search ITEM_SHEET_MFG Failed',
           data: [],
         };
       }
       return {
         status: true,
-        message: `Search ITEM_MFG_TYPE data found ${length} record(s)`,
+        message: `Search ITEM_SHEET_MFG data found ${length} record(s)`,
         data: res,
       };
     } catch (error) {
-      throw new Error('Search ITEM_MFG_TYPE Error: ' + error.message);
+      throw new Error('Search ITEM_SHEET_MFG Error: ' + error.message);
     }
   }
 
-  async update(id: number, dto: UpdateItemMfgTypeDto) {
+  async update(id: number, dto: UpdateItemSheetMfgDto) {
     try {
       const res = await this.repo.update(id, dto);
       if (res.affected === 0) {
         return {
           status: false,
-          message: 'Update ITEM_MFG_TYPE Failed',
+          message: 'Update ITEM_SHEET_MFG Failed',
         };
       }
       return {
         status: true,
-        message: 'Update ITEM_MFG_TYPE Successfully',
+        message: 'Update ITEM_SHEET_MFG Successfully',
         data: res,
       };
     } catch (error) {
-      throw new Error('Update ITEM_MFG_TYPE Error: ' + error.message);
+      throw new Error('Update ITEM_SHEET_MFG Error: ' + error.message);
     }
   }
 
@@ -114,16 +114,16 @@ export class ItemMfgTypeService {
       if (res.affected === 0) {
         return {
           status: false,
-          message: 'Delete ITEM_MFG_TYPE Failed',
+          message: 'Delete ITEM_SHEET_MFG Failed',
         };
       }
       return {
         status: true,
-        message: 'Delete ITEM_MFG_TYPE Successfully',
+        message: 'Delete ITEM_SHEET_MFG Successfully',
         data: res,
       };
     } catch (error) {
-      throw new Error('Delete ITEM_MFG_TYPE Error: ' + error.message);
+      throw new Error('Delete ITEM_SHEET_MFG Error: ' + error.message);
     }
   }
 }

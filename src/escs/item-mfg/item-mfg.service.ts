@@ -34,13 +34,13 @@ export class ItemMfgService {
       if (length === 0) {
         return {
           status: false,
-          message: 'ItemMfg data not found',
+          message: 'Search ITEM_MFG Failed',
           data: [],
         };
       }
       return {
         status: true,
-        message: `ItemMfg data found ${length} record(s)`,
+        message: `Search ITEM_MFG data found ${length} record(s)`,
         data: res,
       };
     } catch (error) {
@@ -54,13 +54,13 @@ export class ItemMfgService {
       if (res == null) {
         return {
           status: false,
-          message: 'ItemMfg data not found',
+          message: 'Search ITEM_MFG Failed',
           data: [],
         };
       }
       return {
         status: true,
-        message: `ItemMfg data found 1 record(s)`,
+        message: `Search ITEM_MFG data found 1 record(s)`,
         data: res,
       };
     } catch (error) {
@@ -75,13 +75,13 @@ export class ItemMfgService {
       if (length === 0) {
         return {
           status: false,
-          message: 'ItemMfg data not found',
+          message: 'Search ITEM_MFG Failed',
           data: [],
         };
       }
       return {
         status: true,
-        message: `ItemMfg data found ${length} record(s)`,
+        message: `Search ITEM_MFG data found ${length} record(s)`,
         data: res,
       };
     } catch (error) {
@@ -95,7 +95,7 @@ export class ItemMfgService {
       if (res.affected === 0) {
         return {
           status: false,
-          message: 'ItemMfg data not found',
+          message: 'Update ITEM_MFG Failed',
         };
       }
       return {
@@ -114,7 +114,7 @@ export class ItemMfgService {
       if (res.affected === 0) {
         return {
           status: false,
-          message: 'ItemMfg data not found',
+          message: 'Delete ITEM_MFG Failed',
         };
       }
       return {

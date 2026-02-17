@@ -5,6 +5,9 @@ export class Spaccarrnglst {
   @PrimaryColumn()
   ORDERNO: string;
 
+  @Column()
+  MELCALACLS: string;
+
   @PrimaryColumn()
   ITEMNO: string;
 
@@ -15,14 +18,20 @@ export class Spaccarrnglst {
   BMCLS: string;
 
   @Column()
-  ITEMC: string;
-
-  @Column()
   APNAMERMRK: string;
 
   @Column()
   PARTNO: string;
 
   @Column()
+  TOTALQTY: number;
+
+  @Column()
   SCNDPRTCLS: string;
+
+  @Column()
+  SUPPLYCLS: string;
+
+  @Column()
+  REVSUBNO: string;
 }

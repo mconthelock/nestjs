@@ -8,5 +8,6 @@ import { ItemarrnglstController } from './itemarrnglst.controller';
   imports: [TypeOrmModule.forFeature([Itemarrnglst], 'elmesConnection')],
   controllers: [ItemarrnglstController],
   providers: [ItemarrnglstService],
+  exports: [ItemarrnglstService],
 })
 export class ItemarrnglstModule {}

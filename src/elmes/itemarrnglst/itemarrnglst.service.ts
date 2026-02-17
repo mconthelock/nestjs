@@ -20,10 +20,13 @@ export class ItemarrnglstService {
     const rows = [];
     let i = 0;
     let x = 0;
-
     for (const row of data) {
+      if (rows[i] === undefined && row.BMCLS !== 'A') continue;
       if (row.BMCLS === 'A' && row.TOTALQTY !== null) {
-        if (x > 0) i++;
+        if (x > 0) {
+          rows[i].variable = rows[i].variable.replaceAll(',,', ',');
+          i++;
+        }
         rows[i] = {
           orderno: row.ORDERNO,
           carno: row.ORDERNO.substring(6, 8),
@@ -37,7 +40,7 @@ export class ItemarrnglstService {
         };
       } else if (row.BMCLS === 'B') {
         if (rows[i].variable !== '') {
-          rows[i].variable += ', ' + (row.PARTNO?.trimStart() || '');
+          rows[i].variable += ',' + (row.PARTNO?.trimStart() || '');
         } else {
           rows[i].variable += row.PARTNO?.trimStart() || '';
         }

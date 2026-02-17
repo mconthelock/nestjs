@@ -16,6 +16,8 @@ export class SpaccarrnglstController {
 
   @Post('search')
   create(@Body() q: SearchSpaccarrnglstDto) {
+    //console.log(q);
     return this.item.findAll(q);
+    //return true;
   }
 }

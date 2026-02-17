@@ -1,8 +1,8 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'BLOCK_MASTER', schema: 'ESCCHKSHT' })
 export class BlockMaster {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   NID: number;
 
   @Column()

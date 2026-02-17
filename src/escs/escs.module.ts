@@ -17,6 +17,8 @@ import { BlockMasterModule } from './block-master/block-master.module';
 import { ItemMfgModule } from './item-mfg/item-mfg.module';
 import { ItemMfgTypeModule } from './item-mfg-type/item-mfg-type.module';
 import { ItemSheetMfgModule } from './item-sheet-mfg/item-sheet-mfg.module';
+import { ItemMfgListModule } from './item-mfg-list/item-mfg-list.module';
+import { ItemMfgHistoryModule } from './item-mfg-history/item-mfg-history.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { ItemSheetMfgModule } from './item-sheet-mfg/item-sheet-mfg.module';
     ItemMfgModule,
     ItemMfgTypeModule,
     ItemSheetMfgModule,
+    ItemMfgListModule,
+    ItemMfgHistoryModule,
   ],
 })
 export class ESCSModule {}

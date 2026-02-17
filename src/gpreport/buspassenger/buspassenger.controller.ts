@@ -15,31 +15,29 @@ import { UpdateBuspassengerDto } from './dto/update-buspassenger.dto';
 export class BuspassengerController {
   constructor(private readonly buspassengerService: BuspassengerService) {}
 
-  @Post()
-  create(@Body() createBuspassengerDto: CreateBuspassengerDto) {
-    return this.buspassengerService.create(createBuspassengerDto);
+  @Post('create')
+    create(@Body() dto: CreateBuspassengerDto) {
+    return this.buspassengerService.create(dto);
+  }
+  
+  @Post('update')
+    update(@Body() dto: UpdateBuspassengerDto) {
+    return this.buspassengerService.update(dto);
+  }
+  
+  @Post('delete')
+    delete(@Body() dto: UpdateBuspassengerDto) {
+    return this.buspassengerService.delete(dto);
+  }
+  
+  @Post('search')
+    find(@Body() dto: UpdateBuspassengerDto) {
+    return this.buspassengerService.findAll(dto);
   }
 
-  @Get()
-  findAll() {
-    return this.buspassengerService.findAll();
+  @Post('findByLine')
+  findByLine(@Body() body: { BUSLINE: number }) {
+    return this.buspassengerService.findByLine(body.BUSLINE);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.buspassengerService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateBuspassengerDto: UpdateBuspassengerDto,
-  ) {
-    return this.buspassengerService.update(+id, updateBuspassengerDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.buspassengerService.remove(+id);
-  }
 }

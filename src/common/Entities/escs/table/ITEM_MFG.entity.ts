@@ -1,11 +1,11 @@
 import { UserSection } from 'src/escs/user_section/entities/user_section.entity';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { ITEM_STATUS } from './ITEM_STATUS.entity';
 import { ITEM_MFG_TYPE } from './ITEM_MFG_TYPE.entity';
 
 @Entity({ name: 'ITEM_MFG', schema: 'ESCCHKSHT' })
 export class ITEM_MFG {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   NID: number;
 
   @Column()

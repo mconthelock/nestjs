@@ -34,13 +34,13 @@ export class BlockMasterService {
       if (length === 0) {
         return {
           status: false,
-          message: 'Block data not found',
+          message: 'Search BLOCK_MASTER Failed: No data found',
           data: [],
         };
       }
       return {
         status: true,
-        message: `Block data found ${length} record(s)`,
+        message: `Search BLOCK_MASTER data found ${length} record(s)`,
         data: res,
       };
     } catch (error) {
@@ -54,17 +54,17 @@ export class BlockMasterService {
       if (res == null) {
         return {
           status: false,
-          message: 'Block data not found',
+          message: `Search BLOCK_MASTER by id ${id} Failed: No data found`,
           data: [],
         };
       }
       return {
         status: true,
-        message: `Block data found 1 record(s)`,
+        message: `Search BLOCK_MASTER by id ${id} data found 1 record(s)`,
         data: res,
       };
     } catch (error) {
-      throw new Error('Search BLOCK_MASTER Error: ' + error.message);
+      throw new Error(`Search BLOCK_MASTER by id ${id} Error: ` + error.message);
     }
   }
 
@@ -75,13 +75,13 @@ export class BlockMasterService {
       if (length === 0) {
         return {
           status: false,
-          message: 'Block data not found',
+          message: 'Search BLOCK_MASTER Failed: No data found',
           data: [],
         };
       }
       return {
         status: true,
-        message: `Block data found ${length} record(s)`,
+        message: `Search BLOCK_MASTER data found ${length} record(s)`,
         data: res,
       };
     } catch (error) {
@@ -95,16 +95,16 @@ export class BlockMasterService {
       if (res.affected === 0) {
         return {
           status: false,
-          message: 'Block data not found',
+          message: `Update BLOCK_MASTER by id ${id} Failed`,
         };
       }
       return {
         status: true,
-        message: 'Update BLOCK_MASTER Successfully',
+        message: `Update BLOCK_MASTER by id ${id} Successfully`,
         data: res,
       };
     } catch (error) {
-      throw new Error('Update BLOCK_MASTER Error: ' + error.message);
+      throw new Error(`Update BLOCK_MASTER by id ${id} Error: ` + error.message);
     }
   }
 
@@ -114,16 +114,16 @@ export class BlockMasterService {
       if (res.affected === 0) {
         return {
           status: false,
-          message: 'Block data not found',
+          message: `Delete BLOCK_MASTER by id ${id} Failed`,
         };
       }
       return {
         status: true,
-        message: 'Delete BLOCK_MASTER Successfully',
+        message: `Delete BLOCK_MASTER by id ${id} Successfully`,
         data: res,
       };
     } catch (error) {
-      throw new Error('Delete BLOCK_MASTER Error: ' + error.message);
+      throw new Error(`Delete BLOCK_MASTER by id ${id} Error: ` + error.message);
     }
   }
 }

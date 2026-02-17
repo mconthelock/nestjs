@@ -1,8 +1,8 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'ITEM_SHEET_MFG', schema: 'ESCCHKSHT' })
 export class ITEM_SHEET_MFG {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   NID: number;
 
   @Column()

@@ -34,7 +34,7 @@ export class ItemMfgTypeService {
       if (length === 0) {
         return {
           status: false,
-          message: 'Search ITEM_MFG_TYPE Failed',
+          message: 'Search ITEM_MFG_TYPE Failed: No data found',
           data: [],
         };
       }
@@ -54,17 +54,17 @@ export class ItemMfgTypeService {
       if (res == null) {
         return {
           status: false,
-          message: 'Search ITEM_MFG_TYPE Failed',
+          message: `Search ITEM_MFG_TYPE by id ${id} Failed: No data found`,
           data: [],
         };
       }
       return {
         status: true,
-        message: `Search ITEM_MFG_TYPE data found 1 record(s)`,
+        message: `Search ITEM_MFG_TYPE by id ${id} data found 1 record(s)`,
         data: res,
       };
     } catch (error) {
-      throw new Error('Search ITEM_MFG_TYPE Error: ' + error.message);
+      throw new Error(`Search ITEM_MFG_TYPE by id ${id} Error: ` + error.message);
     }
   }
 
@@ -75,7 +75,7 @@ export class ItemMfgTypeService {
       if (length === 0) {
         return {
           status: false,
-          message: 'Search ITEM_MFG_TYPE Failed',
+          message: 'Search ITEM_MFG_TYPE Failed: No data found',
           data: [],
         };
       }
@@ -95,16 +95,16 @@ export class ItemMfgTypeService {
       if (res.affected === 0) {
         return {
           status: false,
-          message: 'Update ITEM_MFG_TYPE Failed',
+          message: `Update ITEM_MFG_TYPE by id ${id} Failed`,
         };
       }
       return {
         status: true,
-        message: 'Update ITEM_MFG_TYPE Successfully',
+        message: `Update ITEM_MFG_TYPE by id ${id} Successfully`,
         data: res,
       };
     } catch (error) {
-      throw new Error('Update ITEM_MFG_TYPE Error: ' + error.message);
+      throw new Error(`Update ITEM_MFG_TYPE by id ${id} Error: ` + error.message);
     }
   }
 
@@ -114,16 +114,16 @@ export class ItemMfgTypeService {
       if (res.affected === 0) {
         return {
           status: false,
-          message: 'Delete ITEM_MFG_TYPE Failed',
+          message: `Delete ITEM_MFG_TYPE by id ${id} Failed`,
         };
       }
       return {
         status: true,
-        message: 'Delete ITEM_MFG_TYPE Successfully',
+        message: `Delete ITEM_MFG_TYPE by id ${id} Successfully`,
         data: res,
       };
     } catch (error) {
-      throw new Error('Delete ITEM_MFG_TYPE Error: ' + error.message);
+      throw new Error(`Delete ITEM_MFG_TYPE by id ${id} Error: ` + error.message);
     }
   }
 }

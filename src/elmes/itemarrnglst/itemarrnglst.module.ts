@@ -5,8 +5,8 @@ import { Itemarrnglst } from './entities/itemarrnglst.entity';
 import { ItemarrnglstController } from './itemarrnglst.controller';
 
 @Module({
-  controllers: [ItemarrnglstController],
   imports: [TypeOrmModule.forFeature([Itemarrnglst], 'elmesConnection')],
+  controllers: [ItemarrnglstController],
   providers: [ItemarrnglstService],
 })
 export class ItemarrnglstModule {}

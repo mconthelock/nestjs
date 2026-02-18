@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BusrouteService } from './busroute.service';
 import { BusrouteController } from './busroute.controller';
-import { Busroute } from './entities/busroute.entity';
+import { Busroute } from 'src/common/Entities/gpreport/table/busroute.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Busroute], 'gpreportConnection')],

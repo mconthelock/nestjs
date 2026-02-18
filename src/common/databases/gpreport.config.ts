@@ -22,6 +22,7 @@ if (process.env.HOST == 'AMEC') {
       entities: [
         __dirname + '/../../**/**/*.entity{.ts,.js}',
         __dirname + '/../../**/**/**/*.entity{.ts,.js}',
+        __dirname + '/../Entities/gpreport/**/*.entity{.ts,.js}',
       ],
       synchronize: false,
       //   logging: ['query'],

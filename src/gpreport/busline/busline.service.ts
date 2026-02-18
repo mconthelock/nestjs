@@ -2,10 +2,10 @@ import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { Busline } from './entities/busline.entity';
 import { CreateBuslineDto } from './dto/create-busline.dto';
 import { UpdateBuslineDto } from './dto/update-busline.dto';
 import { SearchBuslineDto } from './dto/search-busline.dto';
+import { Busline } from 'src/common/Entities/gpreport/table/busline.entity';
 
 @Injectable()
 export class BuslineService {
@@ -39,4 +39,6 @@ export class BuslineService {
     // return this.bus.find({ relations: ['station'] });
     return this.bus.find({ where: q });
   }
+
+  
 }

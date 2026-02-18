@@ -1,9 +1,9 @@
-import { Buspassenger } from './entities/buspassenger.entity';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBuspassengerDto } from './dto/create-buspassenger.dto';
 import { UpdateBuspassengerDto } from './dto/update-buspassenger.dto';
+import { Buspassenger } from 'src/common/Entities/gpreport/table/buspassenger.entity';
 
 @Injectable()
 export class BuspassengerService {
@@ -48,8 +48,11 @@ export class BuspassengerService {
       throw new NotFoundException(`Passenger with EMPNO ${dto.EMPNO} and STATENO ${dto.STATENO} is not found`);
   }
 
-  async findByLine(busId: number) {
-    return this.dataSource.query(
+  async findByLine(busId: number) {    
+    return this.buspassengerRepository.find({
+      relations: ['Amecuserall', "stop", "stop.routed", "stop.routed.busmaster"]
+    });
+   /* return this.dataSource.query(
       `
         SELECT r.BUSLINE, s.STOP_ID, s.STOP_NAME, s.WORKDAY_TIMEIN, s.NIGHT_TIMEIN,
               s.HOLIDAY_TIMEIN, p.STATENO, r.IS_START,
@@ -67,6 +70,6 @@ export class BuspassengerService {
         WHERE r.BUSLINE = :1
         `,
       [busId],  
-    );
+    );*/
   }
 }

@@ -33,6 +33,14 @@ export class ItemSheetMfgRepository extends BaseRepository {
     return this.getRepository(ITEM_SHEET_MFG).findOneBy({ NID: id });
   }
 
+  findByItemId(itemId: number) {
+    return this.getRepository(ITEM_SHEET_MFG).find({
+      where: { NITEMID: itemId },
+      relations: ['ITEM_LIST', 'ITEM_LIST.HISTORY', 'ITEM'],
+      order: { NID: 'ASC' },
+    });
+  }
+
   async search(dto: FiltersDto) {
     const qb = this.manager.createQueryBuilder(ITEM_SHEET_MFG, 'I');
     this.applyFilters(qb, 'I', dto, [
@@ -42,7 +50,12 @@ export class ItemSheetMfgRepository extends BaseRepository {
       'NSTATUS',
       'NSEC_ID',
     ]);
-    return qb.orderBy('I.NID', 'ASC').getMany();
+    return qb
+      .leftJoinAndSelect('I.ITEM_LIST', 'ITEM_LIST')
+      .leftJoinAndSelect('ITEM_LIST.HISTORY', 'HISTORY')
+      .leftJoinAndSelect('I.ITEM', 'ITEM')
+      .orderBy('I.NID', 'ASC')
+      .getMany();
   }
 
   async update(id: number, dto: UpdateItemSheetMfgDto) {

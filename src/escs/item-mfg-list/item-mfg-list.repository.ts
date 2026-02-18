@@ -51,6 +51,10 @@ export class ItemMfgListRepository extends BaseRepository {
     async update(id: number, dto: UpdateItemMfgListDto) {
       return this.getRepository(ITEM_MFG_LIST).update(id, dto);
     }
+
+    async updateBySheetId(sheetId: number, dto: UpdateItemMfgListDto) {
+      return this.getRepository(ITEM_MFG_LIST).update({ NSHEETID: sheetId }, dto);
+    }
   
     async remove(id: number) {
       return this.getRepository(ITEM_MFG_LIST).delete(id);

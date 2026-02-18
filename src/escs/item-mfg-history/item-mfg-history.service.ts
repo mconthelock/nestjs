@@ -112,6 +112,28 @@ export class ItemMfgHistoryService {
     }
   }
 
+  async updateByItemListId(itemListId: number, dto: UpdateItemMfgHistoryDto) {
+    try {
+      const res = await this.repo.updateByItemListId(itemListId, dto);
+      if (res.affected === 0) {
+        return {
+          status: false,
+          message: `Update ITEM_MFG_HISTORY by itemListId ${itemListId} Failed`,
+        };
+      }
+      return {
+        status: true,
+        message: `Update ITEM_MFG_HISTORY by itemListId ${itemListId} Successfully`,
+        data: res,
+      };
+    } catch (error) {
+      throw new Error(
+        `Update ITEM_MFG_HISTORY by itemListId ${itemListId} Error: ` +
+          error.message,
+      );
+    }
+  }
+
   async remove(id: number) {
     try {
       const res = await this.repo.remove(id);

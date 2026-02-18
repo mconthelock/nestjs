@@ -44,6 +44,7 @@ export class ItemMfgListRepository extends BaseRepository {
         'NUSERUPDATE',
       ]);
       return qb
+        .leftJoinAndSelect('I.HISTORY', 'H')
         .orderBy('I.NITEMID, I.NSHEETID, I.VDRAWING', 'ASC')
         .getMany();
     }

@@ -5,7 +5,7 @@ export class CreateItemMfgHistoryDto {
   @IsNotEmpty()
   @IsNumber()
   @Type(() => Number)
-  NITEMID: number;
+  NITEMLISTID: number;
 
   @IsNotEmpty()
   @IsNumber()

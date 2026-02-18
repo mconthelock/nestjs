@@ -1,4 +1,14 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { ITEM_MFG } from './ITEM_MFG.entity';
+import { ITEM_MFG_LIST } from './ITEM_MFG_LIST.entity';
 
 @Entity({ name: 'ITEM_SHEET_MFG', schema: 'ESCCHKSHT' })
 export class ITEM_SHEET_MFG {
@@ -19,4 +29,11 @@ export class ITEM_SHEET_MFG {
 
   @Column()
   DDATEUPDATE: Date;
+
+  @OneToMany(() => ITEM_MFG_LIST, (item) => item.SHEET)
+  ITEM_LIST: ITEM_MFG_LIST[];
+
+  @ManyToOne(() => ITEM_MFG, (i) => i.SHEET)
+  @JoinColumn({ name: 'NITEMID', referencedColumnName: 'NID' })
+  ITEM: ITEM_MFG;
 }

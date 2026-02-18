@@ -1,7 +1,17 @@
 import { UserSection } from 'src/escs/user_section/entities/user_section.entity';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ITEM_STATUS } from './ITEM_STATUS.entity';
 import { ITEM_MFG_TYPE } from './ITEM_MFG_TYPE.entity';
+import { ITEM_MFG_LIST } from './ITEM_MFG_LIST.entity';
+import { ITEM_SHEET_MFG } from './ITEM_SHEET_MFG.entity';
 
 @Entity({ name: 'ITEM_MFG', schema: 'ESCCHKSHT' })
 export class ITEM_MFG {
@@ -43,4 +53,10 @@ export class ITEM_MFG {
   @ManyToOne(() => ITEM_MFG_TYPE, (i) => i.ITEM_MFG)
   @JoinColumn({ name: 'NTYPE', referencedColumnName: 'NTYPE' })
   ITEM_MFG_TYPE: ITEM_MFG_TYPE;
+
+  @OneToMany(() => ITEM_MFG_LIST, (i) => i.ITEM)
+  ITEM_LIST: ITEM_MFG_LIST[];
+
+  @OneToMany(() => ITEM_SHEET_MFG, (s) => s.ITEM)
+  SHEET: ITEM_SHEET_MFG[];
 }

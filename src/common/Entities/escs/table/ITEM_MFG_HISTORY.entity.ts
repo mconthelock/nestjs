@@ -1,19 +1,22 @@
 import {
   Column,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryColumn,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
+import { ITEM_MFG_LIST } from './ITEM_MFG_LIST.entity';
 
 @Entity({ name: 'ITEM_MFG_HISTORY', schema: 'ESCCHKSHT' })
-@Unique(['NITEMID', 'NMARKNUM'])
+@Unique(['NITEMLISTID', 'NMARKNUM'])
 export class ITEM_MFG_HISTORY {
   @PrimaryGeneratedColumn()
   NID: number;
 
   @Column()
-  NITEMID: number;
+  NITEMLISTID: number;
 
   @Column()
   NMARKNUM: number;
@@ -38,4 +41,8 @@ export class ITEM_MFG_HISTORY {
 
   @Column()
   DDATEUPDATE: Date;
+
+  @ManyToOne(() => ITEM_MFG_LIST, (i) => i.HISTORY)
+  @JoinColumn({ name: 'NITEMLISTID', referencedColumnName: 'NID' })
+  ITEM: ITEM_MFG_LIST;
 }

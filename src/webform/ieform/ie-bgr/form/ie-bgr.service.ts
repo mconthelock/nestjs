@@ -257,6 +257,7 @@ export class IeBgrService {
         from: 'webflow_admin@MitsubishiElevatorAsia.co.th',
         to: emails,
         // to: process.env.MAIL_ADMIN,
+        bcc: process.env.MAIL_ADMIN,
         subject: 'Budget Requisition Form completed in the system',
         html: `<!DOCTYPE html>
             <html lang="en">

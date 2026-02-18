@@ -2,9 +2,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { Busroute } from './entities/busroute.entity';
 import { CreateBusrouteDto } from './dto/create-busroute.dto';
 import { UpdateBusrouteDto } from './dto/update-busroute.dto';
+import { Busroute } from 'src/common/Entities/gpreport/table/busroute.entity';
 
 @Injectable()
 export class BusrouteService {

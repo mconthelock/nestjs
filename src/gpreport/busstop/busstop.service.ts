@@ -5,7 +5,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBusstopDto } from './dto/create-busstop.dto';
 import { UpdateBusstopDto } from './dto/update-busstop.dto';
 import { SearchBusstopDto } from './dto/search-busstop.dto';
-import { Busstop } from './entities/busstop.entity';
+import { Busstop } from 'src/common/Entities/gpreport/table/busstop.entity';
 
 @Injectable()
 export class BusstopService {

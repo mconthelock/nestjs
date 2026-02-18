@@ -16,6 +16,7 @@ import { EscsUser } from 'src/escs/user/entities/user.entity';
 import { Orgpos } from 'src/webform/orgpos/entities/orgpos.entity';
 import { Accesslog } from 'src/docinv/accesslog/entities/accesslog.entity';
 import { Designer } from 'src/spprogram/designer/entities/designer.entity';
+import { Buspassenger } from 'src/common/Entities/gpreport/table/buspassenger.entity';
 
 @Entity('AMECUSERALL')
 export class User {
@@ -125,4 +126,8 @@ export class User {
   @OneToOne(() => Designer, (des) => des.user)
   @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'DES_USER' })
   spdesigner: Designer;
+
+   @OneToOne(() => Buspassenger, (amecuser) => amecuser.Amecuserall)
+  @JoinColumn( {name: 'SEMPNO', referencedColumnName: 'EMPNO'})
+  BUSPASSENGER:User;
 }

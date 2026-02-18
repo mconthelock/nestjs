@@ -18,15 +18,12 @@ export class SpaccarrnglstService {
     itemData = itemData.filter(
       (item) => item.scndpart !== null && item.scndpart !== 'X',
     );
-
-    console.log(itemData);
-
     const data = await this.second.find({
       where: { ORDERNO: q.ORDERNO, ITEMNO: q.ITEMNO },
       order: { SERIALNO: 'ASC' },
     });
 
-    const rows = [];
+    let rows = [];
     let i = 0;
     let x = 0;
     for (const row of data) {
@@ -37,6 +34,7 @@ export class SpaccarrnglstService {
           i++;
         }
         rows[i] = {
+          seq: row.SERIALNO,
           orderno: row.ORDERNO,
           carno: row.ORDERNO.substring(6, 8),
           itemno: row.ITEMNO,
@@ -58,6 +56,11 @@ export class SpaccarrnglstService {
       }
       x++;
     }
+    rows.map((item) => {
+      if (item.variable !== '') {
+        item.variable = item.variable.replaceAll(',', ',x');
+      }
+    });
 
     const result = [];
     result.push(...itemData);

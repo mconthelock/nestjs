@@ -17,7 +17,7 @@ export class ItemarrnglstService {
       where: { ORDERNO: ordno, ITEMNO: item },
       order: { SERIALNO: 'ASC' },
     });
-    const rows = [];
+    let rows = [];
     let i = 0;
     let x = 0;
     for (const row of data) {
@@ -28,6 +28,7 @@ export class ItemarrnglstService {
           i++;
         }
         rows[i] = {
+          seq: row.SERIALNO,
           orderno: row.ORDERNO,
           carno: row.ORDERNO.substring(6, 8),
           itemno: row.ITEMNO,
@@ -49,6 +50,11 @@ export class ItemarrnglstService {
       }
       x++;
     }
+    rows.map((item) => {
+      if (item.variable !== '') {
+        item.variable = item.variable.replaceAll(',', ', ');
+      }
+    });
     return rows;
   }
 

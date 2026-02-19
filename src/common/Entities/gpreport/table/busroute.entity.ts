@@ -19,11 +19,13 @@ export class Busroute {
   @Column()
   IS_START: string;
 
-  @OneToMany(()=> Busstop ,(b) => b.routed)
-  //@JoinColumn({name: 'STOPNO', referencedColumnName: 'STOP_ID'})
-  route : Busstop;
 
-  @ManyToOne(()=> Busline ,(b) => b.busmst)
-  @JoinColumn({name: 'BUSLINE', referencedColumnName: 'BUSID'})
-  busmaster : Busline;
+  @ManyToOne(() => Busline, (l) => l.busmst)
+  @JoinColumn({ name: 'BUSLINE', referencedColumnName: 'BUSID' })
+  busmaster: Busline;
+
+  @ManyToOne(() => Busstop, (s) => s.routes)
+  @JoinColumn({ name: 'STOPNO', referencedColumnName: 'STOP_ID' })
+  stop: Busstop;
+
 }

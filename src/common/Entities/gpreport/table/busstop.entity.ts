@@ -27,7 +27,9 @@ export class Busstop {
   //@JoinColumn ({name: 'STOP_ID', referencedColumnName : 'BUSSTOP'})
   passenger : Buspassenger;
 
-  @ManyToOne(() => Busroute, (b) => b.route)
-  @JoinColumn ({name: 'STOP_ID', referencedColumnName : 'STOPNO'})
-  routed : Busroute;
+
+  @OneToMany(() => Busroute, (r) => r.stop)
+  routes: Busroute[];
+
+
 }

@@ -26,11 +26,18 @@ export class Buspassenger {
   @Column()
   UPDATE_BY: string;
 
-  @ManyToOne(() => User)
-  @JoinColumn({ name: 'EMPNO', referencedColumnName: 'SEMPNO' })
-  Amecuserall: User;
+
 
   @ManyToOne(() => Busstop, (b) => b.passenger)
   @JoinColumn ({name: 'BUSSTOP', referencedColumnName : 'STOP_ID'})
   stop : Busstop;
+/*
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'EMPNO', referencedColumnName: 'SEMPNO' })
+  Amecuserall: User;
+*/
+
+  @ManyToOne(() => User, (user) => user.BUSPASSENGER)
+  @JoinColumn({ name: 'EMPNO', referencedColumnName: 'SEMPNO' })
+  Amecuserall: User;
 }

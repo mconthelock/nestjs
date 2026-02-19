@@ -40,4 +40,9 @@ export class BuspassengerController {
     return this.buspassengerService.findAllWithRelations(dto.BUSLINE);
   }
 
+  @Get('getAllTransportRaw')   // ⭐ แนะนำใช้ GET
+  async getAllTransportRaw() {
+    return this.buspassengerService.getAllTransportRaw();
+  }
+
 }

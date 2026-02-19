@@ -5,11 +5,13 @@ import { CreateBuspassengerDto } from './dto/create-buspassenger.dto';
 import { UpdateBuspassengerDto } from './dto/update-buspassenger.dto';
 import { Buspassenger } from 'src/common/Entities/gpreport/table/buspassenger.entity';
 
+
 @Injectable()
 export class BuspassengerService {
   constructor(
     @InjectRepository(Buspassenger, 'gpreportConnection')
     private readonly buspassengerRepository: Repository<Buspassenger>,
+
     @InjectDataSource('gpreportConnection')
     private readonly dataSource: DataSource,
   ) {}
@@ -54,9 +56,37 @@ export class BuspassengerService {
       throw new NotFoundException(`Passenger with EMPNO ${dto.EMPNO} and STATENO ${dto.STATENO} is not found`);
   }
 
-  async findAllWithRelations(busId: number) {    
+  async findAllWithRelations_bk(busId: number) {    
     return this.buspassengerRepository.find({
-      relations: ['Amecuserall', "stop", "stop.routed", "stop.routed.busmaster"]
+      //relations: ['Amecuserall', "stop", "stop.routed", "stop.routed.busmaster"]
+      relations: ['stop', 'stop.routes','stop.routes.busmaster', 'Amecuserall' ]
     });
   }
+
+  async findAllWithRelations(busId: number) {
+    return this.buspassengerRepository
+      .createQueryBuilder('bp')
+      .leftJoinAndSelect('bp.stop', 'stop')
+      .leftJoinAndSelect('stop.routes', 'route')
+      .leftJoinAndSelect('route.busmaster', 'line')
+      .leftJoinAndSelect('bp.Amecuserall', 'user')
+      //.where('route.BUSLINE = :busId', { busId })
+      .getMany();
+  }
+
+  
+  async getAllTransportRaw() {
+    return this.dataSource
+      .createQueryBuilder()
+      .from('AMECUSERALL', 'u')
+      .leftJoin('BUS_PASSENGER', 'bp', 'bp.EMPNO = u.SEMPNO')
+      .leftJoin('BUS_STOP', 'stop', 'stop.STOP_ID = bp.BUSSTOP')
+      .leftJoin('BUS_ROUTE', 'route', 'route.STOPNO = stop.STOP_ID')
+      .leftJoin('BUS_LINE', 'line', 'line.BUSID = route.BUSLINE')
+      .where("u.CSTATUS = '1'")
+      .getRawMany();
+  }
+
+
+
 }

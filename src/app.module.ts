@@ -50,7 +50,7 @@ import { TransactionInterceptor } from './common/interceptors/transaction.interc
     SpModule,
     MktModule,
     ElmesModule,
-    //AS400Module,
+    AS400Module,
     AutomationModule,
     HradminModule,
     //JB 🤴

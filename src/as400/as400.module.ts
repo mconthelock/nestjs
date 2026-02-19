@@ -11,13 +11,13 @@ import { T016kpModule } from './rtnlibf/t016kp/t016kp.module';
 @Module({
   imports: [
     ConectionModule,
-    F001kpModule,
-    F002kpModule,
-    F003kpModule,
-    Q90010p2Module,
-    M008kpModule,
-    Q141kpModule,
-    T016kpModule,
+    // F001kpModule,
+    // F002kpModule,
+    // F003kpModule,
+    // Q90010p2Module,
+    // M008kpModule,
+    // Q141kpModule,
+    // T016kpModule,
   ],
 })
 export class AS400Module {}

@@ -1,3 +1,5 @@
+import { FiltersDto } from 'src/common/dto/filter.dto';
+
 export async function applyDynamicFilters(qb, filters: any, alias: string) {
   if (!filters) return;
 
@@ -11,7 +13,6 @@ export async function applyDynamicFilters(qb, filters: any, alias: string) {
     // Case 2: Actual Condition (e.g., "INQ_STATUS": ">20")
     else {
       let visual_key = key;
-      console.log(key);
       if (key.startsWith('START_') || key.startsWith('END_')) {
         visual_key = key.replace('START_', '').replace('END_', '');
       }
@@ -97,4 +98,90 @@ export async function extractOp(str: string) {
   const op = operators.find((o) => str.startsWith(o)) || '=';
   const val = str.replace(op, '').trim();
   return { op, val };
+}
+
+export async function parseConditionString(condition: FiltersDto) {
+  const operatorMap = {
+    eq: '=',
+    ne: '!=',
+    gt: '>',
+    gte: '>=',
+    lt: '<',
+    lte: '<=',
+  };
+
+  let query = '';
+  condition.filters.forEach((f, i) => {
+    const and = query != '' ? 'AND' : '';
+    let sep;
+    switch (f.type) {
+      case 'number':
+        sep = '';
+        break;
+      default:
+        sep = `'`;
+        break;
+    }
+
+    switch (f.op) {
+      case 'like':
+        query += ` ${and} ${f.field} LIKE '%${f.value}%'`;
+        break;
+
+      case 'startsWith':
+        query += ` ${and} ${f.field} LIKE '${f.value}%'`;
+        break;
+
+      case 'endsWith':
+        query += ` ${and} ${f.field} LIKE '%${f.value}'`;
+        break;
+
+      case 'in':
+        let inValues = '';
+        if (Array.isArray(f.value))
+          inValues = f.value.map((v) => `${sep}${v}${sep}`).join(', ');
+        query += ` ${and} ${f.field} IN (${inValues})`;
+        break;
+
+      case 'notIn':
+        let notInValues = '';
+        if (Array.isArray(f.value))
+          notInValues = f.value.map((v) => `${sep}${v}${sep}`).join(', ');
+        query += ` ${and} ${f.field} NOT IN (${notInValues})`;
+        break;
+
+      case 'isNull':
+        query += ` ${and} ${f.field} IS NULL`;
+        break;
+
+      case 'isNotNull':
+        query += ` ${and} ${f.field} IS NOT NULL`;
+        break;
+
+      default:
+        if (operatorMap[f.op]) {
+          query += ` ${and} ${f.field} ${operatorMap[f.op]} ${sep}${f.value}${sep}`;
+        }
+    }
+  });
+  return query !== '' ? ` WHERE ${query}` : '';
+}
+
+export async function parseCreateString(condition: FiltersDto, table: string) {
+  let column = '',
+    values = '';
+  condition.filters.forEach((f, i) => {
+    let sep;
+    switch (f.type) {
+      case 'number':
+        sep = '';
+        break;
+      default:
+        sep = `'`;
+        break;
+    }
+    column += `${i > 0 ? ', ' : ''}${f.field}`;
+    values += `${i > 0 ? ', ' : ''}${sep}${f.value}${sep}`;
+  });
+  return `INSERT INTO ${table} (${column}) VALUES (${values})`;
 }

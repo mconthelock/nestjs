@@ -41,4 +41,7 @@ export class FilterDto {
 
   @IsOptional()
   value: any;
+
+  @IsOptional()
+  type?: any;
 }

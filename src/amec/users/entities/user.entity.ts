@@ -127,7 +127,11 @@ export class User {
   @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'DES_USER' })
   spdesigner: Designer;
 
-   @OneToOne(() => Buspassenger, (amecuser) => amecuser.Amecuserall)
+/*
+  @OneToOne(() => Buspassenger, (amecuser) => amecuser.Amecuserall)
   @JoinColumn( {name: 'SEMPNO', referencedColumnName: 'EMPNO'})
   BUSPASSENGER:User;
+*/
+  @OneToMany(() => Buspassenger, (bp) => bp.Amecuserall)
+  BUSPASSENGER: Buspassenger[];
 }

@@ -1,5 +1,5 @@
 import { User } from 'src/amec/users/entities/user.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn, UpdateDateColumn  } from 'typeorm';
 import { Busroute } from './busroute.entity';
 import { Busstop } from './busstop.entity';
 
@@ -14,15 +14,21 @@ export class Buspassenger {
   @Column()
   BUSSTOP: number;
 
-  @Column()
+
+  @UpdateDateColumn({
+    name: 'UPDATE_DATE',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP'
+  })
   UPDATE_DATE: Date;
+
 
   @Column()
   UPDATE_BY: string;
 
-  @OneToOne(() => User, (amecuser) => amecuser.BUSPASSENGER)
-  @JoinColumn( {name: 'EMPNO', referencedColumnName: 'SEMPNO'})
-  Amecuserall:User
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'EMPNO', referencedColumnName: 'SEMPNO' })
+  Amecuserall: User;
 
   @ManyToOne(() => Busstop, (b) => b.passenger)
   @JoinColumn ({name: 'BUSSTOP', referencedColumnName : 'STOP_ID'})

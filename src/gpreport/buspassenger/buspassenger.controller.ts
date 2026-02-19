@@ -35,9 +35,9 @@ export class BuspassengerController {
     return this.buspassengerService.findAll(dto);
   }
 
-  @Post('findByLine')
-  findByLine(@Body() body: { BUSLINE: number }) {
-    return this.buspassengerService.findByLine(body.BUSLINE);
+  @Post("findAllWithRelations")
+  findAll(@Body() dto) {
+    return this.buspassengerService.findAllWithRelations(dto.BUSLINE);
   }
 
 }

@@ -20,7 +20,7 @@ export class Busroute {
   IS_START: string;
 
   @OneToMany(()=> Busstop ,(b) => b.routed)
-  @JoinColumn({name: 'STOPNO', referencedColumnName: 'STOP_ID'})
+  //@JoinColumn({name: 'STOPNO', referencedColumnName: 'STOP_ID'})
   route : Busstop;
 
   @ManyToOne(()=> Busline ,(b) => b.busmst)

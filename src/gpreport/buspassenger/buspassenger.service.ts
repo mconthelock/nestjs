@@ -19,23 +19,29 @@ export class BuspassengerService {
   }
 
   async create(dto: CreateBuspassengerDto) {
-    return this.buspassengerRepository.save(dto);
-  }
+  const entity = this.buspassengerRepository.create({
+    ...dto,
+    UPDATE_DATE: new Date(),   // 👈 เพิ่มตรงนี้
+  });
+  return await this.buspassengerRepository.save(entity);
+}
   
   async update(dto: UpdateBuspassengerDto) {
     const data = await this.buspassengerRepository.findOne({
       where: { EMPNO: dto.EMPNO, STATENO: dto.STATENO },
     });
-    if (data) {
-      Object.assign(data, dto);
-      data.UPDATE_DATE = new Date();
-      await this.buspassengerRepository.save(data)
-      return await this.buspassengerRepository.findOne({
-        where: { EMPNO: dto.EMPNO, STATENO : dto.STATENO },
-      });
+
+    if (!data) {
+      throw new NotFoundException(`Passenger is not found`);
     }
-    throw new NotFoundException(`Passenger is not found`);
+
+    Object.assign(data, dto);
+    data.UPDATE_DATE = new Date();  
+    data.UPDATE_BY = dto.UPDATE_BY;
+
+    return await this.buspassengerRepository.save(data);
   }
+
 
   async delete(dto: UpdateBuspassengerDto) {
       const data = await this.buspassengerRepository.findOne({
@@ -48,28 +54,9 @@ export class BuspassengerService {
       throw new NotFoundException(`Passenger with EMPNO ${dto.EMPNO} and STATENO ${dto.STATENO} is not found`);
   }
 
-  async findByLine(busId: number) {    
+  async findAllWithRelations(busId: number) {    
     return this.buspassengerRepository.find({
       relations: ['Amecuserall', "stop", "stop.routed", "stop.routed.busmaster"]
     });
-   /* return this.dataSource.query(
-      `
-        SELECT r.BUSLINE, s.STOP_ID, s.STOP_NAME, s.WORKDAY_TIMEIN, s.NIGHT_TIMEIN,
-              s.HOLIDAY_TIMEIN, p.STATENO, r.IS_START,
-              e.SEMPNO, e.SNAME, e.STNAME, e.SSEC, e.SDEPT, e.SDIV 
-        FROM GPREPORT.BUS_ROUTE r
-        INNER JOIN GPREPORT.BUS_STOP s 
-            ON r.STOPNO = s.STOP_ID 
-            AND s.STOP_STATUS = '1'
-        LEFT JOIN GPREPORT.BUS_PASSENGER p 
-            ON p.BUSSTOP = r.STOPNO 
-            AND p.STATENO = r.STATENO
-        LEFT JOIN AMEC.AMECUSERALL e 
-            ON e.SEMPNO = p.EMPNO 
-            AND e.CSTATUS = '1'
-        WHERE r.BUSLINE = :1
-        `,
-      [busId],  
-    );*/
   }
 }

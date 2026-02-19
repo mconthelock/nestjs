@@ -13,10 +13,6 @@ export class CreateBuspassengerDto {
   @IsNumber()
   BUSSTOP: number;
 
-  @Type(() => Date)
-  @IsDate()
-  UPDATE_DATE: Date;
-
   @IsString()
   UPDATE_BY: string;
 }

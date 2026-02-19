@@ -22,6 +22,6 @@ export class Busline {
   IS_CHONBURI: string;
 
   @OneToMany(()=> Busroute ,(b) => b.busmaster)
-  @JoinColumn({name: 'STOPNO', referencedColumnName: 'STOP_ID'})
+  //@JoinColumn({name: 'STOPNO', referencedColumnName: 'STOP_ID'})
   busmst : Busroute;
 }

@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'BLOCK_MASTER', schema: 'ESCCHKSHT' })
-export class BlockMaster {
+export class BLOCK_MASTER {
   @PrimaryGeneratedColumn()
   NID: number;
 

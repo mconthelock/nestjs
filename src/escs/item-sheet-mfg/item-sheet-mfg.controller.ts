@@ -55,6 +55,7 @@ export class ItemSheetMfgController {
   }
 
   @Delete(':id')
+  @UseTransaction('escsConnection')
   remove(@Param('id') id: string) {
     return this.itemSheetMfgService.remove(+id);
   }

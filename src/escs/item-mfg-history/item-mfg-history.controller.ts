@@ -41,6 +41,7 @@ export class ItemMfgHistoryController {
   }
 
   @Delete(':id')
+  @UseTransaction('escsConnection')
   remove(@Param('id') id: string) {
     return this.itemMfgHistoryService.remove(+id);
   }

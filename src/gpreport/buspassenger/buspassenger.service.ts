@@ -4,7 +4,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBuspassengerDto } from './dto/create-buspassenger.dto';
 import { UpdateBuspassengerDto } from './dto/update-buspassenger.dto';
 import { Buspassenger } from 'src/common/Entities/gpreport/table/buspassenger.entity';
-
+import { User } from 'src/amec/users/entities/user.entity';
 
 @Injectable()
 export class BuspassengerService {
@@ -14,6 +14,9 @@ export class BuspassengerService {
 
     @InjectDataSource('gpreportConnection')
     private readonly dataSource: DataSource,
+
+    @InjectRepository(User, 'gpreportConnection')  
+    private readonly userRepo: Repository<User>,
   ) {}
 
    async findAll(q: UpdateBuspassengerDto) {
@@ -74,16 +77,29 @@ export class BuspassengerService {
       .getMany();
   }
 
-  
-  async getAllTransportRaw() {
-    return this.dataSource
-      .createQueryBuilder()
-      .from('AMECUSERALL', 'u')
-      .leftJoin('BUS_PASSENGER', 'bp', 'bp.EMPNO = u.SEMPNO')
-      .leftJoin('BUS_STOP', 'stop', 'stop.STOP_ID = bp.BUSSTOP')
-      .leftJoin('BUS_ROUTE', 'route', 'route.STOPNO = stop.STOP_ID')
-      .leftJoin('BUS_LINE', 'line', 'line.BUSID = route.BUSLINE')
-      .where("u.CSTATUS = '1'")
+  async getAllTransport() {
+    return this.userRepo
+      .createQueryBuilder('u')
+      .leftJoin('u.BUSPASSENGER', 'bp')
+      .leftJoin('bp.stop', 'stop')
+      .leftJoin('stop.routes', 'route')
+      .leftJoin('route.busmaster', 'line')
+      .where('u.CSTATUS = :status', { status: '1' })
+      .andWhere('u.SEMPNO NOT LIKE :m', { m: 'M%' })
+      .andWhere('u.SEMPNO NOT IN (:...exclude)', {
+        exclude: ['SYSTEM','USRCONL','USRCONT','V25001','AS400']
+      })
+      .select([
+        'u.SEMPNO',
+        'u.STNAME',
+        'u.SSEC',
+        'u.SDEPT',
+        'u.SDIV',
+        'line.BUSNAME AS BUSNAME',
+        'stop.STOP_NAME AS STOP_NAME',
+        'stop.WORKDAY_TIMEIN AS TIMEIN'
+      ])
+      .orderBy('u.SEMPNO')
       .getRawMany();
   }
 

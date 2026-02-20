@@ -50,6 +50,7 @@ export class ItemMfgListController {
   }
 
   @Delete(':id')
+  @UseTransaction('escsConnection')
   remove(@Param('id') id: string) {
     return this.itemMfgListService.remove(+id);
   }

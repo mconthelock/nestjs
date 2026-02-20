@@ -19,6 +19,7 @@ import { ItemMfgTypeModule } from './item-mfg-type/item-mfg-type.module';
 import { ItemSheetMfgModule } from './item-sheet-mfg/item-sheet-mfg.module';
 import { ItemMfgListModule } from './item-mfg-list/item-mfg-list.module';
 import { ItemMfgHistoryModule } from './item-mfg-history/item-mfg-history.module';
+import { ItemMasterAuthorizeModule } from './item-master-authorize/item-master-authorize.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ItemMfgHistoryModule } from './item-mfg-history/item-mfg-history.module
     ItemSheetMfgModule,
     ItemMfgListModule,
     ItemMfgHistoryModule,
+    ItemMasterAuthorizeModule,
   ],
 })
 export class ESCSModule {}

@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { WMSTempIssueEntity } from 'src/common/Entities/sdsys/table/WMS_TEMPISSUE.entity';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import { WMSTempIssueDto } from './dto/wms-temp-issue.dto';
 
 @Injectable()
 export class WMSService {
     constructor(
-        @InjectRepository(WMSTempIssueEntity, 'sdsysConnection')
-        private readonly db: Repository<WMSTempIssueEntity>,
+        @InjectDataSource('sdsysConnection')
+        private readonly db: DataSource,
     ) {}
 
     /**
@@ -19,14 +18,11 @@ export class WMSService {
      * @return  {Promise<WMSTempIssueDto[]>}
      */
     async getIssueList(empno: string): Promise<WMSTempIssueDto[]> {
-        return this.db.find({
-            where: {
-                USERID: empno,
-                STATUS: '-',
-            },
-            order: {
-                LOCATION: 'ASC',
-            },
-        });
+        return this.db.query(`
+            SELECT *
+            FROM SDSYS.WMS_TEMPISSUE_TEST
+            WHERE USERID = :1
+            AND STATUS = '-'`, 
+        [empno]);
     }
 }

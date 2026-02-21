@@ -24,6 +24,7 @@ export class PrebmService {
 
   async delete(data: FiltersDto, table: string) {
     const query = await parseConditionString(data);
+    console.log(query);
     const result = await this.conn.runQuery(`DELETE FROM ${table} ${query}`);
     return result;
   }

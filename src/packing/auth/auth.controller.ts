@@ -11,7 +11,7 @@ import { getClientIP } from 'src/common/utils/ip.utils';
 @ApiTags('Packing Authen')
 @Controller('packing/auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(private readonly service: AuthService) {}
 
     /**
      * Handle user login request and set HttpOnly cookie
@@ -29,7 +29,7 @@ export class AuthController {
         @Res({ passthrough: true }) response: Response
     ): Promise<PackLoginResponseDto> {
         const ip = getClientIP(request);
-        return this.authService.validateUser(body.empno, ip);
+        return this.service.validateUser(body.empno, ip);
     }
 
     /**
@@ -45,7 +45,7 @@ export class AuthController {
         @Req() request: Request, 
         @Res({ passthrough: true }) response: Response
     ): Promise<PackLogoutResponseDto> {
-        await this.authService.updateLogout(body.userId, body.sessionId);
+        await this.service.updateLogout(body.userId, body.sessionId);
         return { status: 'success', message: 'Logged out successfully' };
     }
 }

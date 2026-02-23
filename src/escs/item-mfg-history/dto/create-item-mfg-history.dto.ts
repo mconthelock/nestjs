@@ -25,12 +25,12 @@ export class CreateItemMfgHistoryDto {
   @IsOptional()
   @IsString()
   @Type(() => String)
-  VINCHAREGE: string;
+  VINCHARGE: string;
 
   @IsOptional()
   @IsString()
   @Type(() => String)
-  VINCHAREGE_REMARK: string;
+  VINCHARGE_REMARK: string;
 
   @IsNotEmpty()
   @IsNumber()

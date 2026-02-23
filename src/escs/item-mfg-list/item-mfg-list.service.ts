@@ -3,10 +3,14 @@ import { CreateItemMfgListDto } from './dto/create-item-mfg-list.dto';
 import { UpdateItemMfgListDto } from './dto/update-item-mfg-list.dto';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { ItemMfgListRepository } from './item-mfg-list.repository';
+import { ItemMfgHistoryService } from '../item-mfg-history/item-mfg-history.service';
 
 @Injectable()
 export class ItemMfgListService {
-  constructor(private readonly repo: ItemMfgListRepository) {}
+  constructor(
+    private readonly repo: ItemMfgListRepository,
+    private readonly itemMfgHistoryService: ItemMfgHistoryService,
+  ) {}
   async create(dto: CreateItemMfgListDto) {
     try {
       const res = await this.repo.create(dto);
@@ -99,6 +103,29 @@ export class ItemMfgListService {
           status: false,
           message: `Update ITEM_MFG_LIST by id ${id} Failed`,
         };
+      }
+
+      if (dto.NSTATUS != null && dto.NSTATUS != 1) {
+        const itemlist = await this.search({
+          filters: [
+            {
+              field: 'NID',
+              op: 'eq',
+              value: id,
+            },
+          ],
+        });
+        
+        if (itemlist.data.length > 0) {
+          const data = {
+            NSTATUS: dto.NSTATUS,
+            NUSERUPDATE: dto.NUSERUPDATE,
+            DDATEUPDATE: dto.DDATEUPDATE,
+          };
+          for (const item of itemlist.data) {
+            await this.itemMfgHistoryService.updateByItemListId(item.NID, data);
+          }
+        }
       }
       return {
         status: true,

@@ -28,10 +28,10 @@ export class ITEM_MFG_HISTORY {
   VMARK_REMARK: string;
 
   @Column()
-  VINCHAREGE: string;
+  VINCHARGE: string;
 
   @Column()
-  VINCHAREGE_REMARK: string;
+  VINCHARGE_REMARK: string;
 
   @Column()
   NSTATUS: number;

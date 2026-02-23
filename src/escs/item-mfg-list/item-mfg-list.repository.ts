@@ -36,6 +36,7 @@ export class ItemMfgListRepository extends BaseRepository {
     async search(dto: FiltersDto) {
       const qb = this.manager.createQueryBuilder(ITEM_MFG_LIST, 'I');
       this.applyFilters(qb, 'I', dto, [
+        'NID',
         'NITEMID',
         'VDRAWING',
         'NSHEETID',

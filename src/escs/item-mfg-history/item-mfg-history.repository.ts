@@ -39,7 +39,7 @@ export class ItemMfgHistoryRepository extends BaseRepository {
       'NITEMLISTID',
       'NMARKNUM',
       'VMARK',
-      'VINCHAREGE',
+      'VINCHARGE',
       'NSTATUS',
       'NUSERUPDATE',
     ]);

@@ -20,6 +20,8 @@ export class InquiryGroupController {
 
   @Post('update')
   async update(@Body() req: inqGroupDataDto) {
+    console.log(req.data);
+
     return await this.group.update({
       data: req.data,
       condition: req.condition,

@@ -86,23 +86,11 @@ export class BuspassengerService {
       .leftJoin('route.busmaster', 'line')
       .where('u.CSTATUS = :status', { status: '1' })
       .andWhere('u.SEMPNO NOT LIKE :m', { m: 'M%' })
-      .andWhere('u.SEMPNO NOT IN (:...exclude)', {
-        exclude: ['SYSTEM','USRCONL','USRCONT','V25001','AS400']
-      })
-      .select([
-        'u.SEMPNO',
-        'u.STNAME',
-        'u.SSEC',
-        'u.SDEPT',
-        'u.SDIV',
-        'line.BUSNAME AS BUSNAME',
-        'stop.STOP_NAME AS STOP_NAME',
-        'stop.WORKDAY_TIMEIN AS TIMEIN'
-      ])
+      .andWhere('u.SEMPNO NOT IN (:...exclude)', { exclude: ['SYSTEM','USRCONL','USRCONT','V25001','AS400']})
+      .select([ 'u.SEMPNO','u.STNAME','u.SSEC', 'u.SDEPT','u.SDIV', 'line.BUSNAME AS BUSNAME','stop.STOP_NAME AS STOP_NAME', 'stop.WORKDAY_TIMEIN AS TIMEIN'])
       .orderBy('u.SEMPNO')
       .getRawMany();
   }
-
 
 
 }

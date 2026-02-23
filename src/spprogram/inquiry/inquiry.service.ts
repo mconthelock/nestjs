@@ -307,6 +307,7 @@ export class InquiryService {
         const group = await runner.manager.findOne(InquiryGroup, {
           where: {
             INQ_ID: inquiry.INQ_ID,
+            INQG_REV: inquiry.INQ_REV,
             INQG_GROUP: item,
             INQG_LATEST: 1,
           },
@@ -315,13 +316,17 @@ export class InquiryService {
         if (!group) {
           await runner.manager.save(InquiryGroup, {
             INQ_ID: inquiry.INQ_ID,
-            INQG_STATUS: inquiry.INQ_STATUS,
-            INQG_REV: '*',
+            INQG_REV: inquiry.INQ_REV,
             INQG_GROUP: item,
+            INQG_STATUS: inquiry.INQ_STATUS,
             INQG_LATEST: 1,
           });
           const savedGroups = await runner.manager.findOne(InquiryGroup, {
-            where: { INQ_ID: inquiry.INQ_ID, INQG_GROUP: item },
+            where: {
+              INQ_ID: inquiry.INQ_ID,
+              INQG_REV: inquiry.INQ_REV,
+              INQG_GROUP: item,
+            },
           });
           group_id = savedGroups.INQG_ID;
         } else {

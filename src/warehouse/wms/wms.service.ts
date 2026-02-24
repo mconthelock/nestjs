@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource } from 'typeorm'; 
+import { BIND_OUT, CURSOR, OUT_FORMAT_OBJECT } from 'oracledb';
 import { WMSTempIssueDto } from './dto/wms-temp-issue.dto';
 import { WMSUploadIssueDto } from './dto/wms-upload-issue.dto';
 
@@ -24,7 +25,8 @@ export class WMSService {
              SELECT USERID, STATUS, ISSUE, ITEMCODE, DESCRIPTION, PROD, LOCATION, QTY, ISSUETO, PO, LINE, INV, PALLET_ID, EXPIRE_DATE
              FROM WMS_TEMPISSUE_TEST
              WHERE USERID = :1
-             AND STATUS = '-'
+                AND STATUS = '-'
+             ORDER BY LOCATION ASC, PALLET_ID ASC, EXPIRE_DATE ASC, ISSUE ASC
             `, 
             [empno]
         );
@@ -33,32 +35,35 @@ export class WMSService {
     /**
      * Upload issue
      * @author  Mr.Pathanapong Sokpukeaw
-     * @since   2026-02-21
+     * @since   2026-02-24
      * @param   {WMSUploadIssueDto} dto Upload issue data
      * @return  {Promise<string>}
      */
     async uploadIssue(dto: WMSUploadIssueDto): Promise<string> {
-        // const result = await this.db.query(
-        //     `
-        //     UPDATE WMS_TEMPISSUE_TEST
-        //     SET STATUS = 'OK'
-        //     WHERE LOCATION = :1
-        //     AND PALLET_ID = :2
-        //     AND EXPIRE_DATE = :3
-        //     AND STATUS = '-'
-        //     `,
-        //     [
-        //         dto.location,
-        //         dto.palletId,
-        //         dto.expireDate,
-        //     ],
-        // );
+        const runner = this.db.createQueryRunner();
+        await runner.connect();
+        const connection: any = (runner as any).databaseConnection;
+        
+        try {
+            const res = await connection.execute(
+                `BEGIN WMS_UPLOAD_ISSUE(:location, :palletId, :expireDate, :out_cursor); END;`,
+                {
+                    location: dto.location,
+                    palletId: dto.palletId,
+                    expireDate: dto.expireDate,
+                    out_cursor: { dir: BIND_OUT, type: CURSOR },
+                },
+                { outFormat: OUT_FORMAT_OBJECT }
+            );
 
-        // const affected = result?.rowsAffected ?? 0;
-        // if (affected === 0) {
-        //     return 'NOTFOUND';
-        // }
-
-        return 'UPDATED';
+            const cursor = res.outBinds.out_cursor;
+            const rows = await cursor.getRows();
+            await cursor.close();
+            return rows[0]?.STATUS ?? 'ERROR';
+        } catch (error) {
+            return 'ERROR';
+        } finally {
+            await runner.release();
+        }
     }
 }

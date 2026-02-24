@@ -38,7 +38,7 @@ export class WMSController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Upload issue' })
     @ApiBody({ type: WMSUploadIssueDto })
-    @ApiResponse({ status: 200, schema:{example:{ status:'UPDATED' }} })
+    @ApiResponse({ status: 200, schema:{example:{ status:'OK' }} })
     async uploadIssue(
         @Body() body: WMSUploadIssueDto,
     ): Promise<{ status: string }> {

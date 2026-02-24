@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm';
 import { BIND_OUT, CURSOR, OUT_FORMAT_OBJECT } from 'oracledb';
 import { WMSTempIssueDto } from './dto/wms-temp-issue.dto';
 import { WMSUploadIssueDto } from './dto/wms-upload-issue.dto';
+import { WMSUploadIssueResponseDto } from './dto/wms-upload-issue-response.dto';
 
 @Injectable()
 export class WMSService {
@@ -37,9 +38,9 @@ export class WMSService {
      * @author  Mr.Pathanapong Sokpukeaw
      * @since   2026-02-24
      * @param   {WMSUploadIssueDto} dto Upload issue data
-     * @return  {Promise<string>}
+     * @return  {Promise<WMSUploadIssueResponseDto>}
      */
-    async uploadIssue(dto: WMSUploadIssueDto): Promise<string> {
+    async uploadIssue(dto: WMSUploadIssueDto): Promise<WMSUploadIssueResponseDto> {
         const runner = this.db.createQueryRunner();
         await runner.connect();
         const connection: any = (runner as any).databaseConnection;
@@ -59,9 +60,9 @@ export class WMSService {
             const cursor = res.outBinds.out_cursor;
             const rows = await cursor.getRows();
             await cursor.close();
-            return rows[0]?.STATUS ?? 'ERROR';
+            return rows[0];
         } catch (error) {
-            return 'ERROR';
+            return { STATUS: 'ERROR', MESSAGE: error.message };
         } finally {
             await runner.release();
         }

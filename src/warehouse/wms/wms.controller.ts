@@ -6,6 +6,7 @@ import { WMSService } from './wms.service';
 import { WMSUserDto } from './dto/wms-user.dto';
 import { WMSTempIssueDto } from './dto/wms-temp-issue.dto';
 import { WMSUploadIssueDto } from './dto/wms-upload-issue.dto';
+import { WMSUploadIssueResponseDto } from './dto/wms-upload-issue-response.dto';
 
 // @UseGuards(AuthGuard('jwt'))
 @ApiTags('Warehouse WMS')
@@ -38,11 +39,10 @@ export class WMSController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Upload issue' })
     @ApiBody({ type: WMSUploadIssueDto })
-    @ApiResponse({ status: 200, schema:{example:{ status:'OK' }} })
+    @ApiResponse({ status: 200, type: WMSUploadIssueResponseDto })
     async uploadIssue(
         @Body() body: WMSUploadIssueDto,
-    ): Promise<{ status: string }> {
-        const result = await this.service.uploadIssue(body);
-        return { status: result };
+    ): Promise<WMSUploadIssueResponseDto> {
+        return this.service.uploadIssue(body);
     }
 }

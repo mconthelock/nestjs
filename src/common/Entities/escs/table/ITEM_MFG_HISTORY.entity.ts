@@ -10,7 +10,6 @@ import {
 import { ITEM_MFG_LIST } from './ITEM_MFG_LIST.entity';
 
 @Entity({ name: 'ITEM_MFG_HISTORY', schema: 'ESCCHKSHT' })
-@Unique(['NITEMLISTID', 'NMARKNUM'])
 export class ITEM_MFG_HISTORY {
   @PrimaryGeneratedColumn()
   NID: number;

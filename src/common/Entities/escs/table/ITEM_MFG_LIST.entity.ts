@@ -13,7 +13,6 @@ import { ITEM_MFG_HISTORY } from './ITEM_MFG_HISTORY.entity';
 import { ITEM_MFG } from './ITEM_MFG.entity';
 
 @Entity({ name: 'ITEM_MFG_LIST', schema: 'ESCCHKSHT' })
-@Unique(['NITEMID', 'VDRAWING'])
 export class ITEM_MFG_LIST {
   @PrimaryGeneratedColumn()
   NID: number;

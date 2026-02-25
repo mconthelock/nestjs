@@ -1,5 +1,18 @@
 import { Type } from 'class-transformer';
-import { IsBoolean, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+
+export enum ListMode {
+  ALL = 'all',
+  FILE = 'file',
+  DIR = 'dir',
+}
 
 export class FileDto {
   @IsNotEmpty()
@@ -32,15 +45,19 @@ export class ListDto {
   @IsOptional()
   @IsString({ each: true })
   allow?: string[];
+
+  @IsOptional()
+  @IsEnum(ListMode)
+  mode?: ListMode; // all | file | dir
 }
 
 export class SaveFileDto {
-    @IsNotEmpty()
-    @IsString()
-    path: string;
+  @IsNotEmpty()
+  @IsString()
+  path: string;
 
-    @IsOptional()
-    @IsBoolean()
-    @Type(() => Boolean)
-    isPhp: boolean;
+  @IsOptional()
+  @IsBoolean()
+  @Type(() => Boolean)
+  isPhp: boolean;
 }

@@ -75,9 +75,34 @@ export class FileService {
 
     // กรองตามนามสกุลที่อนุญาต
     const allowEts = dto.allow?.filter(e => e.trim() !== '').map(e => e.toLowerCase());
-            console.log(allowEts,dto.allow);
+
+    const mode = dto.mode ?? 'all'; // 'all' | 'file' | 'dir'
+    
     
     const filtered = items.filter(e => {
+        const commonCheck =
+            !e.name.startsWith('~$') &&
+            !e.name.startsWith('.') &&
+            !this.skip.includes(e.name.toLowerCase());
+
+        if (!commonCheck) return false;
+
+        // mode filter
+        if (mode === 'file' && e.isDir) return false;
+        if (mode === 'dir' && !e.isDir) return false;
+
+         // extension filter (ใช้กับไฟล์เท่านั้น)
+        if (
+            mode !== 'dir' &&
+            allowEts &&
+            allowEts.length > 0 &&
+            !e.isDir
+        ) {
+            return e.extension && allowEts.includes(e.extension);
+        }
+
+        return true;
+
         if(allowEts && allowEts.length > 0) {
             return (e.isDir || (e.extension && allowEts.includes(e.extension.toLowerCase()))) && !e.name.startsWith('~$') && !e.name.startsWith('.') && !this.skip.includes(e.name.toLowerCase()) ;
         }else{
@@ -153,14 +178,14 @@ export class FileService {
     let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
     try {
       const data = [];
-        console.log(files);
-        
-      console.log(dto.path);
-      
       for (const file of files) {
-        console.log(file);
-        
-        const moved = dto.isPhp ? await moveFileFromMulter({file, destination:dto.path, isPhp: dto.isPhp}) :await moveFileFromMulter({file, destination:dto.path});
+        const moved = dto.isPhp
+          ? await moveFileFromMulter({
+              file,
+              destination: dto.path,
+              isPhp: dto.isPhp,
+            })
+          : await moveFileFromMulter({ file, destination: dto.path });
         movedTargets.push(moved.path);
         movedTargets.push(file.path);
         data.push(moved);

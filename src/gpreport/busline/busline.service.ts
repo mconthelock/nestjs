@@ -49,18 +49,14 @@ export class BuslineService {
   async deleteLineCascade(busId: number) {
     return this.dataSource.transaction(async (manager) => {
       await manager.update(Busline, { BUSID: busId }, { BUSSTATUS: '0' });
-      
-      //  หา stop ของ line
       const routes = await manager.find(Busroute, { where: { BUSLINE: busId } });
       const stopIds = routes.map(r => r.STOPNO);
-    
       await manager.delete(Busroute, { BUSLINE: busId });
 
       if (stopIds.length > 0) {
         await manager.update(Busstop, { STOP_ID: In(stopIds) }, { STOP_STATUS: '0' });
         await manager.delete(Buspassenger, { BUSSTOP: In(stopIds) });
       }
-
       return { success: true };
     });
   }

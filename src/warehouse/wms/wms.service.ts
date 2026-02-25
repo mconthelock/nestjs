@@ -47,17 +47,17 @@ export class WMSService {
         
         try {
             const res = await connection.execute(
-                `BEGIN WMS_UPLOAD_ISSUE(:location, :palletId, :expireDate, :out_cursor); END;`,
+                `BEGIN WMS_UPLOAD_ISSUE(:location, :palletId, :expireDate, :output); END;`,
                 {
                     location: dto.location,
                     palletId: dto.palletId,
                     expireDate: dto.expireDate,
-                    out_cursor: { dir: BIND_OUT, type: CURSOR },
+                    output: { dir: BIND_OUT, type: CURSOR },
                 },
                 { outFormat: OUT_FORMAT_OBJECT }
             );
 
-            const cursor = res.outBinds.out_cursor;
+            const cursor = res.outBinds.output;
             const rows = await cursor.getRows();
             await cursor.close();
             return rows[0];

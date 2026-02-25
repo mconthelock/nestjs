@@ -6,7 +6,7 @@ import { ItemMfgDeleteRepository } from './item-mfg-delete.repository';
 
 @Injectable()
 export class ItemMfgDeleteService {
- constructor(private readonly repo: ItemMfgDeleteRepository) {}
+  constructor(private readonly repo: ItemMfgDeleteRepository) {}
   async create(dto: CreateItemMfgDeleteDto) {
     try {
       const res = await this.repo.create(dto);
@@ -108,6 +108,27 @@ export class ItemMfgDeleteService {
     } catch (error) {
       throw new Error(
         `Update ITEM_MFG_DELETE by id ${id} Error: ` + error.message,
+      );
+    }
+  }
+
+  async updateByItemId(ItemId: number, dto: UpdateItemMfgDeleteDto) {
+    try {
+      const res = await this.repo.updateByItemId(ItemId, dto);
+      if (res.affected === 0) {
+        return {
+          status: false,
+          message: `Update ITEM_MFG_DELETE by ItemId ${ItemId} Failed`,
+        };
+      }
+      return {
+        status: true,
+        message: `Update ITEM_MFG_DELETE by ItemId ${ItemId} Successfully`,
+        data: res,
+      };
+    } catch (error) {
+      throw new Error(
+        `Update ITEM_MFG_DELETE by ItemId ${ItemId} Error: ` + error.message,
       );
     }
   }

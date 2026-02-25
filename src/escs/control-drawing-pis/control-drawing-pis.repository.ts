@@ -3,7 +3,7 @@ import { REQUEST } from '@nestjs/core';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Request } from 'express';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource } from 'typeorm';
+import { DataSource, Not } from 'typeorm';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { CreateControlDrawingPisDto } from './dto/create-control-drawing-pis.dto';
 import { UpdateControlDrawingPisDto } from './dto/update-control-drawing-pis.dto';
@@ -35,14 +35,25 @@ export class ControlDrawingPisRepository extends BaseRepository {
 
   async search(dto: FiltersDto) {
     const qb = this.manager.createQueryBuilder(CONTROL_DRAWING_PIS, 'I');
-    this.applyFilters(qb, 'I', dto, ['NID', 'NITEMID', 'VDRAWING', 'NSTATUS', 'NUSERUPDATE']);
-    return qb
-      .orderBy('I.NID', 'ASC')
-      .getMany();
+    this.applyFilters(qb, 'I', dto, [
+      'NID',
+      'NITEMID',
+      'VDRAWING',
+      'NSTATUS',
+      'NUSERUPDATE',
+    ]);
+    return qb.orderBy('I.NID', 'ASC').getMany();
   }
 
   async update(id: number, dto: UpdateControlDrawingPisDto) {
     return this.getRepository(CONTROL_DRAWING_PIS).update(id, dto);
+  }
+
+  async updateByItemId(ItemId: number, dto: UpdateControlDrawingPisDto) {
+    return this.getRepository(CONTROL_DRAWING_PIS).update(
+      { NITEMID: ItemId, NSTATUS: Not(3) },
+      dto,
+    );
   }
 
   async remove(id: number) {

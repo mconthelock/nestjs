@@ -12,6 +12,7 @@ import { ITEM_STATUS } from './ITEM_STATUS.entity';
 import { ITEM_MFG_TYPE } from './ITEM_MFG_TYPE.entity';
 import { ITEM_MFG_LIST } from './ITEM_MFG_LIST.entity';
 import { ITEM_SHEET_MFG } from './ITEM_SHEET_MFG.entity';
+import { BLOCK_MASTER } from './BLOCK_MASTER.entity';
 
 @Entity({ name: 'ITEM_MFG', schema: 'ESCCHKSHT' })
 export class ITEM_MFG {
@@ -59,4 +60,8 @@ export class ITEM_MFG {
 
   @OneToMany(() => ITEM_SHEET_MFG, (s) => s.ITEM)
   SHEET: ITEM_SHEET_MFG[];
+
+  @ManyToOne(() => BLOCK_MASTER, (b) => b.ITEM_MFG)
+  @JoinColumn({ name: 'NBLOCKID', referencedColumnName: 'NID' })
+  BLOCK_MASTER: BLOCK_MASTER;
 }

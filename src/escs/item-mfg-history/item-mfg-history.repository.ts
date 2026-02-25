@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateItemMfgHistoryDto } from './dto/create-item-mfg-history.dto';
 import { UpdateItemMfgHistoryDto } from './dto/update-item-mfg-history.dto';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource } from 'typeorm';
+import { DataSource, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
@@ -51,7 +51,7 @@ export class ItemMfgHistoryRepository extends BaseRepository {
   }
 
   async updateByItemListId(itemListId: number, dto: UpdateItemMfgHistoryDto) {
-    return this.getRepository(ITEM_MFG_HISTORY).update({ NITEMLISTID: itemListId }, dto);
+    return this.getRepository(ITEM_MFG_HISTORY).update({ NITEMLISTID: itemListId, NSTATUS: Not(3)}, dto);
   }
 
   async remove(id: number) {

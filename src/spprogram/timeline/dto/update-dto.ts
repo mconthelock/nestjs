@@ -1,131 +1,124 @@
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 import { createTimelineDto } from './create-dto';
 
+const setTransformDate = (value) => {
+  console.log('Transforming value:', value);
+  if (value == null || value == undefined || value == '') {
+    return null;
+  }
+  const date = new Date(value);
+  return isNaN(date.getTime()) ? null : date;
+};
+
 export class updateTimelineDto extends PartialType(createTimelineDto) {
   @IsString()
   @IsOptional()
-  SG_USER: string;
+  SG_USER?: string;
 
-  @IsDate()
   @IsOptional()
-  @Type(() => Date)
-  SG_READ: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  SG_READ?: Date;
 
-  @IsDate()
   @IsOptional()
-  @Type(() => Date)
-  SG_CONFIRM: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  SG_CONFIRM?: Date;
 
   @IsString()
   @IsOptional()
-  SE_USER: string;
+  SE_USER?: string;
 
-  @IsDate()
   @IsOptional()
-  @Type(() => Date)
-  SE_READ: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  SE_READ?: Date;
 
-  @IsDate()
   @IsOptional()
-  @Type(() => Date)
-  SE_CONFIRM: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  SE_CONFIRM?: Date;
 
-  @IsDate()
   @IsOptional()
-  @Type(() => Date)
-  DE_READ: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  DE_READ?: Date;
 
-  @IsDate()
   @IsOptional()
-  @Type(() => Date)
-  DE_CONFIRM: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  DE_CONFIRM?: Date;
 
-  @IsDate()
   @IsOptional()
-  @Type(() => Date)
-  BM_COFIRM: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  BM_CONFIRM?: Date;
 
   @IsString()
   @IsOptional()
-  PKC_USER: string;
+  PKC_USER?: string;
 
-  @IsDate()
   @IsOptional()
-  @Type(() => Date)
-  PKC_READ: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  PKC_READ?: Date;
 
-  @IsDate()
   @IsOptional()
-  @Type(() => Date)
-  PKC_CONFIRM: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  PKC_CONFIRM?: Date;
 
   @IsString()
   @IsOptional()
-  FIN_USER: string;
+  FIN_USER?: string;
 
-  @IsDate()
   @IsOptional()
-  @Type(() => Date)
-  FIN_READ: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  FIN_READ?: Date;
 
-  @IsDate()
   @IsOptional()
-  @Type(() => Date)
-  FIN_CONFIRM: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  FIN_CONFIRM?: Date;
 
   @IsString()
   @IsOptional()
-  FCK_USER: string;
+  FCK_USER?: string;
 
-  @IsDate()
+  @Transform(({ value }) => setTransformDate(value))
   @IsOptional()
-  @Type(() => Date)
-  FCK_READ: Date;
+  //   @IsDate()
+  FCK_READ?: Date | null;
 
-  @IsDate()
+  @Transform(({ value }) => setTransformDate(value))
   @IsOptional()
-  @Type(() => Date)
-  FCK_CONFIRM: Date;
-
-  @IsString()
-  @IsOptional()
-  FMN_USER: string;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  FMN_READ: Date;
-
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  FMN_CONFIRM: Date;
+  FCK_CONFIRM: Date | null;
 
   @IsString()
   @IsOptional()
-  QT_USER: string;
+  FMN_USER?: string;
 
-  @IsDate()
   @IsOptional()
-  @Type(() => Date)
-  QT_READ: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  FMN_READ?: Date;
 
-  @IsDate()
   @IsOptional()
-  @Type(() => Date)
-  QT_CONFIRM: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  FMN_CONFIRM?: Date;
 
   @IsString()
   @IsOptional()
-  BYPASS_SE: string;
+  QT_USER?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
+  QT_READ?: Date;
+
+  @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
+  QT_CONFIRM?: Date;
 
   @IsString()
   @IsOptional()
-  BYPASS_DE: string;
+  BYPASS_SE?: string;
 
   @IsString()
   @IsOptional()
-  SALE_CLASS: string;
+  BYPASS_DE?: string;
+
+  @IsString()
+  @IsOptional()
+  SALE_CLASS?: string;
 }

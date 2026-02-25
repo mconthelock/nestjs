@@ -254,6 +254,8 @@ export class InquiryService {
     timelinedata?: updateTimelineDto,
     history?: createHistoryDto,
   ) {
+    console.log(timelinedata);
+
     const runner = this.ds.createQueryRunner();
     await runner.connect();
     await runner.startTransaction();

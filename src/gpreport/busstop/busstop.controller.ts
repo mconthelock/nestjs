@@ -27,4 +27,9 @@ export class BusstopController {
   find(@Body() dto: SearchBusstopDto) {
     return this.stop.findAll(dto);
   }
+
+  @Post('deleteStop')
+  deleteStop(@Body() dto: UpdateBusstopDto) {
+    return this.stop.deleteStop(dto.STOP_ID);
+  }
 }

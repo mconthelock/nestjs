@@ -122,6 +122,7 @@ export class ItemSheetMfgService {
 
   async update(id: number, dto: UpdateItemSheetMfgDto) {
     try {
+      // update item sheet mfg
       const update = await this.repo.update(id, dto);
       if (update.affected === 0) {
         return {
@@ -129,7 +130,7 @@ export class ItemSheetMfgService {
           message: `Update ITEM_SHEET_MFG by id ${id} Failed`,
         };
       }
-      if (dto.NSTATUS != null && dto.NSTATUS != 1) {
+      if (dto.NSTATUS != null) {
         const itemlist = await this.itemMfgListService.search({
           filters: [
             {
@@ -145,8 +146,10 @@ export class ItemSheetMfgService {
             NUSERUPDATE: dto.NUSERUPDATE,
             DDATEUPDATE: dto.DDATEUPDATE,
           };
+          // update item list
           await this.itemMfgListService.updateBySheetId(id, data);
           for (const item of itemlist.data) {
+            // update item history
             await this.itemMfgHistoryService.updateByItemListId(item.NID, data);
           }
         }
@@ -160,6 +163,27 @@ export class ItemSheetMfgService {
     } catch (error) {
       throw new Error(
         `Update ITEM_SHEET_MFG by id ${id} Error: ` + error.message,
+      );
+    }
+  }
+
+  async updateByItemId(ItemId: number, dto: UpdateItemSheetMfgDto) {
+    try {
+      const res = await this.repo.updateByItemId(ItemId, dto);
+      if (res.affected === 0) {
+        return {
+          status: false,
+          message: `Update ITEM_SHEET_MFG by ItemId ${ItemId} Failed`,
+        };
+      }
+      return {
+        status: true,
+        message: `Update ITEM_SHEET_MFG by ItemId ${ItemId} Successfully`,
+        data: res,
+      };
+    } catch (error) {
+      throw new Error(
+        `Update ITEM_SHEET_MFG by ItemId ${ItemId} Error: ` + error.message,
       );
     }
   }

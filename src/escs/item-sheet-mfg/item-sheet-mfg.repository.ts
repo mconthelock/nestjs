@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateItemSheetMfgDto } from './dto/create-item-sheet-mfg.dto';
 import { UpdateItemSheetMfgDto } from './dto/update-item-sheet-mfg.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, Not } from 'typeorm';
 import { REQUEST } from '@nestjs/core';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { ITEM_SHEET_MFG } from 'src/common/Entities/escs/table/ITEM_SHEET_MFG.entity';
@@ -59,7 +59,17 @@ export class ItemSheetMfgRepository extends BaseRepository {
   }
 
   async update(id: number, dto: UpdateItemSheetMfgDto) {
-    return this.getRepository(ITEM_SHEET_MFG).update(id, dto);
+    return this.getRepository(ITEM_SHEET_MFG).update(
+      { NID: id, NSTATUS: Not(3) },
+      dto,
+    );
+  }
+
+  async updateByItemId(ItemId: number, dto: UpdateItemSheetMfgDto) {
+    return this.getRepository(ITEM_SHEET_MFG).update(
+      { NITEMID: ItemId, NSTATUS: Not(3) },
+      dto,
+    );
   }
 
   async remove(id: number) {

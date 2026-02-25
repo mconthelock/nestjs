@@ -115,7 +115,7 @@ export class ItemMfgListService {
             },
           ],
         });
-        
+
         if (itemlist.data.length > 0) {
           const data = {
             NSTATUS: dto.NSTATUS,
@@ -156,6 +156,27 @@ export class ItemMfgListService {
     } catch (error) {
       throw new Error(
         `Update ITEM_MFG_LIST by sheetId ${sheetId} Error: ` + error.message,
+      );
+    }
+  }
+
+  async updateByItemId(ItemId: number, dto: UpdateItemMfgListDto) {
+    try {
+      const res = await this.repo.updateByItemId(ItemId, dto);
+      if (res.affected === 0) {
+        return {
+          status: false,
+          message: `Update ITEM_MFG_LIST by ItemId ${ItemId} Failed`,
+        };
+      }
+      return {
+        status: true,
+        message: `Update ITEM_MFG_LIST by ItemId ${ItemId} Successfully`,
+        data: res,
+      };
+    } catch (error) {
+      throw new Error(
+        `Update ITEM_MFG_LIST by ItemId ${ItemId} Error: ` + error.message,
       );
     }
   }

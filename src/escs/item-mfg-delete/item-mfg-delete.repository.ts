@@ -3,7 +3,7 @@ import { REQUEST } from '@nestjs/core';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Request } from 'express';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource } from 'typeorm';
+import { DataSource, Not } from 'typeorm';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { CreateItemMfgDeleteDto } from './dto/create-item-mfg-delete.dto';
 import { UpdateItemMfgDeleteDto } from './dto/update-item-mfg-delete.dto';
@@ -35,14 +35,22 @@ export class ItemMfgDeleteRepository extends BaseRepository {
 
   async search(dto: FiltersDto) {
     const qb = this.manager.createQueryBuilder(ITEM_MFG_DELETE, 'I');
-    this.applyFilters(qb, 'I', dto, ['NID', 'NITEMID', 'VDRAWING', 'NSTATUS', 'NUSERUPDATE']);
-    return qb
-      .orderBy('I.NID', 'ASC')
-      .getMany();
+    this.applyFilters(qb, 'I', dto, [
+      'NID',
+      'NITEMID',
+      'VDRAWING',
+      'NSTATUS',
+      'NUSERUPDATE',
+    ]);
+    return qb.orderBy('I.NID', 'ASC').getMany();
   }
 
   async update(id: number, dto: UpdateItemMfgDeleteDto) {
-    return this.getRepository(ITEM_MFG_DELETE).update(id, dto);
+    return this.getRepository(ITEM_MFG_DELETE).update({ NID: id, NSTATUS: Not(3) }, dto);
+  }
+
+  async updateByItemId(ItemId: number, dto: UpdateItemMfgDeleteDto) {
+    return this.getRepository(ITEM_MFG_DELETE).update({ NITEMID: ItemId, NSTATUS: Not(3) }, dto);
   }
 
   async remove(id: number) {

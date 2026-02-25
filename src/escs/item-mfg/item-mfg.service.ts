@@ -122,15 +122,16 @@ export class ItemMfgService {
           itemId,
           data,
         );
+
+        const itemList = await this.itemMfgListService.search({
+          filters: [{ field: 'NITEMID', op: 'eq', value: itemId }],
+        });
+
         // update item mfg list
         const itemListRes = await this.itemMfgListService.updateByItemId(
           itemId,
           data,
         );
-
-        const itemList = await this.itemMfgListService.search({
-          filters: [{ field: 'NITEMID', op: 'eq', value: itemId }],
-        });
 
         if (itemList.status) {
           for (const item of itemList.data) {

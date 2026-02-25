@@ -33,7 +33,7 @@ export class VPSService {
   async checkVIS(vis: string, userId: string, useLocal: string): Promise<PackResultDto> {
     try {
       const [d] = await this.db.query(
-        'exec GetItemfromVIS @0,@1,@2',
+        'EXEC GetItemfromVIS @0,@1,@2',
         [vis, useLocal, userId],
       );
 
@@ -68,7 +68,7 @@ export class VPSService {
   async getPISfromVIS(vis: string, userId: string, useLocal: string): Promise<PackResultDto> {
     try {
       const [d] = await this.db.query(
-        'exec InsertPackingDetail @0,@1,@2',
+        'EXEC InsertPackingDetail @0,@1,@2',
         [vis, useLocal, userId],
       );
 
@@ -97,7 +97,7 @@ export class VPSService {
   async listPIS(vis: string, userId: string, finState: boolean): Promise<PackResultDto> {
     try {
       const rows = await this.db.query(
-        'exec GetListPIS @0,@1',
+        'EXEC GetListPIS @0,@1',
         [vis, userId],
       );
 
@@ -163,7 +163,7 @@ export class VPSService {
   async checkPIS(vis: string, pis: string, userId: string): Promise<PackResultDto> {
     try {
       const [d] = await this.db.query(
-        'exec SavePISinPacking @0,@1,@2',
+        'EXEC SavePISinPacking @0,@1,@2',
         [vis, pis, userId],
       );
 
@@ -193,7 +193,7 @@ export class VPSService {
   async checkCloseVIS(vis: string, shipcode: string, userId: string): Promise<PackResultDto> {
     try {
       const [d] = await this.db.query(
-        'exec CheckBcForCloseVIS @0,@1,@2',
+        'EXEC CheckBcForCloseVIS @0,@1,@2',
         [vis, shipcode, userId],
       );
 
@@ -221,7 +221,7 @@ export class VPSService {
   async visCheckComplate(vis: string, userId: string): Promise<PackResultDto> {
     try {
       const [d] = await this.db.query(
-        'exec CheckVIScompte @0,@1',
+        'EXEC CheckVIScompte @0,@1',
         [vis, userId],
       );
 
@@ -246,7 +246,7 @@ export class VPSService {
   async getLostItem(vis: string, userId: string): Promise<PackResultDto> {
     try {
       const [d] = await this.db.query(
-        'exec CheckLostItem @0,@1',
+        'EXEC CheckLostItem @0,@1',
         [vis, userId],
       );
 

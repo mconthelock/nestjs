@@ -45,7 +45,7 @@ export class OvertimeService {
       .select(['A.EMPNO AS EMPNO',`TO_CHAR(A.WORKDATE,'DD-MM-YYYY') AS WORKDATE`,'A.TIMEIN AS TIMEIN', 'A.TIMEOUT AS TIMEOUT', 'A.WKTYPENO AS WKTYPENO'
         ,'B.CST AS CST','C.SNAME AS SNAME','C.SSEC AS SSEC','C.SDEPT AS SDEPT','C.SDIV AS SDIV',])
       .from('OTFORM', 'A')
-      .innerJoin('FORM', 'B',`A.NFRMNO = B.NFRMNO AND A.VORGNO = B.VORGNO AND A.CYEAR = B.CYEAR AND A.CYEAR2 = B.CYEAR2`,)
+      .innerJoin('FORM', 'B',`A.NFRMNO = B.NFRMNO AND A.VORGNO = B.VORGNO AND A.CYEAR = B.CYEAR AND A.CYEAR2 = B.CYEAR2 AND A.NRUNNO = B.NRUNNO`,)
       .leftJoin('AMECUSERALL', 'C', 'A.EMPNO = C.SEMPNO')
       .where(`(A.WORKDATE) = TO_DATE(:workdate,'DD-MM-YYYY')`, { workdate })
       .andWhere('B.CST IN (1,2)')

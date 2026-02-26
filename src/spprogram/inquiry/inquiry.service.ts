@@ -2,6 +2,7 @@ import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner, Raw } from 'typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
+import { plainToInstance } from 'class-transformer';
 // ต้อง import oracledb เพื่อกำหนดชนิดข้อมูลของ parameter
 // import * as oracledb from 'oracledb';
 
@@ -254,8 +255,6 @@ export class InquiryService {
     timelinedata?: updateTimelineDto,
     history?: createHistoryDto,
   ) {
-    console.log(timelinedata);
-
     const runner = this.ds.createQueryRunner();
     await runner.connect();
     await runner.startTransaction();
@@ -387,11 +386,12 @@ export class InquiryService {
       }
 
       if (timelinedata !== undefined) {
+        const timelineDto = plainToInstance(updateTimelineDto, timelinedata);
         const timeline = await runner.manager.findOne(Timeline, {
           where: { INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV },
         });
         if (timeline !== undefined) {
-          Object.assign(timeline, timelinedata);
+          Object.assign(timeline, timelineDto);
           await runner.manager.update(
             Timeline,
             { INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV },

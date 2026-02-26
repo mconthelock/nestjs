@@ -39,6 +39,11 @@ if (process.env.HOST == 'AMEC') {
         poolTimeout: 300,
         poolPingInterval: 60,
         stmtCacheSize: 50,
+        setSessionVarsOnCheckOut: true,
+        sessionVars: {
+          NLS_DATE_FORMAT: 'YYYY-MM-DD HH24:MI:SS',
+          NLS_TIMESTAMP_FORMAT: 'YYYY-MM-DD HH24:MI:SS.FF',
+        },
       },
     }),
   };

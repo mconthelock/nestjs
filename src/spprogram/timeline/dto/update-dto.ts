@@ -19,10 +19,14 @@ export class updateTimelineDto extends PartialType(createTimelineDto) {
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   SG_READ?: Date;
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   SG_CONFIRM?: Date;
 
   @IsString()
@@ -31,22 +35,32 @@ export class updateTimelineDto extends PartialType(createTimelineDto) {
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   SE_READ?: Date;
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   SE_CONFIRM?: Date;
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   DE_READ?: Date;
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   DE_CONFIRM?: Date;
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   BM_CONFIRM?: Date;
 
   @IsString()
@@ -55,10 +69,14 @@ export class updateTimelineDto extends PartialType(createTimelineDto) {
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   PKC_READ?: Date;
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   PKC_CONFIRM?: Date;
 
   @IsString()
@@ -67,24 +85,31 @@ export class updateTimelineDto extends PartialType(createTimelineDto) {
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   FIN_READ?: Date;
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   FIN_CONFIRM?: Date;
 
   @IsString()
   @IsOptional()
   FCK_USER?: string;
 
-  @Transform(({ value }) => setTransformDate(value))
   @IsOptional()
-  //   @IsDate()
+  @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   FCK_READ?: Date | null;
 
-  @Transform(({ value }) => setTransformDate(value))
   @IsOptional()
-  FCK_CONFIRM: Date | null;
+  @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
+  FCK_CONFIRM?: Date | null;
 
   @IsString()
   @IsOptional()
@@ -92,10 +117,14 @@ export class updateTimelineDto extends PartialType(createTimelineDto) {
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   FMN_READ?: Date;
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   FMN_CONFIRM?: Date;
 
   @IsString()
@@ -104,10 +133,14 @@ export class updateTimelineDto extends PartialType(createTimelineDto) {
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   QT_READ?: Date;
 
   @IsOptional()
   @Transform(({ value }) => setTransformDate(value))
+  @Type(() => Date)
+  @IsDate()
   QT_CONFIRM?: Date;
 
   @IsString()

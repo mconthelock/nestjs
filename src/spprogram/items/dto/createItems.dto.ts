@@ -67,15 +67,13 @@ export class createItemsDto {
   ITEM_THUMB: string;
 
   @Type(() => Date)
-  @IsDate()
   CREATE_AT: Date;
 
   @IsString()
   CREATE_BY: string;
 
-  @Type(() => Date)
-  @IsDate()
   @IsOptional()
+  @Type(() => Date)
   UPDATE_AT: Date;
 
   @IsString()

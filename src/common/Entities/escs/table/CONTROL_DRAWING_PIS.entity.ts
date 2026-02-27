@@ -17,6 +17,12 @@ export class CONTROL_DRAWING_PIS {
   NSTATUS: number;
 
   @Column()
+  NUSERCREATE: number;
+
+  @Column()
+  DDATECREATE: Date;
+
+  @Column()
   NUSERUPDATE: number;
 
   @Column()

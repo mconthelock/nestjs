@@ -36,6 +36,12 @@ export class ITEM_MFG_LIST {
   NSTATUS: number;
 
   @Column()
+  NUSERCREATE: number;
+
+  @Column()
+  DDATECREATE: Date;
+
+  @Column()
   NUSERUPDATE: number;
 
   @Column()

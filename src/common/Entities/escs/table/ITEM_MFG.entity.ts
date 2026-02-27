@@ -38,6 +38,12 @@ export class ITEM_MFG {
   NTYPE: number;
 
   @Column()
+  NUSERCREATE: number;
+
+  @Column()
+  DDATECREATE: Date;
+
+  @Column()
   NUSERUPDATE: number;
 
   @Column()

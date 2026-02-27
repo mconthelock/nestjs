@@ -11,7 +11,12 @@ export class CreateItemSheetMfgDto {
   @IsString()
   @Type(() => String)
   VSHEET_NAME: string;
-  
+
+  @IsNotEmpty()
+  @IsNumber()
+  @Type(() => Number)
+  NUSERCREATE: number;
+
   @IsNotEmpty()
   @IsNumber()
   @Type(() => Number)

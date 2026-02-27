@@ -15,5 +15,10 @@ export class CreateBlockMasterDto {
   @IsNotEmpty()
   @IsNumber()
   @Type(() => Number)
+  NUSERCREATE: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @Type(() => Number)
   NUSERUPDATE: number;
 }

@@ -25,6 +25,12 @@ export class ITEM_SHEET_MFG {
   NSTATUS: number;
 
   @Column()
+  NUSERCREATE: number;
+
+  @Column()
+  DDATECREATE: Date;
+
+  @Column()
   NUSERUPDATE: number;
 
   @Column()

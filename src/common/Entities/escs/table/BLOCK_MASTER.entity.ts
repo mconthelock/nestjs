@@ -1,4 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ITEM_MFG } from './ITEM_MFG.entity';
 
 @Entity({ name: 'BLOCK_MASTER', schema: 'ESCCHKSHT' })
@@ -11,6 +17,12 @@ export class BLOCK_MASTER {
 
   @Column()
   VCODE: string;
+
+  @Column()
+  NUSERCREATE: number;
+
+  @Column()
+  DDATECREATE: Date;
 
   @Column()
   NUSERUPDATE: number;

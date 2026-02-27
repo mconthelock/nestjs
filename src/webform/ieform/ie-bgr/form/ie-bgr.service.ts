@@ -7,7 +7,7 @@ import {
 } from './dto/create-ie-bgr.dto';
 import { ReportIeBgrDto, UpdateIeBgrDto } from './dto/update-ie-bgr.dto';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { DataSource, Like, QueryRunner, Repository } from 'typeorm';
 import { FormService } from 'src/webform/form/form.service';
 import {
   deleteFile,
@@ -46,7 +46,7 @@ export class IeBgrService {
     private readonly ebudgetQuotationProductService: EbudgetQuotationProductService,
     private readonly pprbiddingService: PprbiddingService,
     private readonly mailService: MailService,
-    private readonly ppoService: PpoService
+    private readonly ppoService: PpoService,
   ) {}
 
   private readonly fileType = {
@@ -66,49 +66,52 @@ export class IeBgrService {
   } as const;
 
   async report(dto: ReportIeBgrDto) {
+    const where: any = {
+      DEPT: dto.DEPT,
+      EMPNO: dto.EMPNO,
+      FORM_STATUS: dto.FORM_STATUS,
+    };
+    if (dto.FORMNO) {
+      where.FORMNO = Like(`%${dto.FORMNO}%`);
+    }
     const report = await this.reportRepo.find({
-        where: {
-            FORMNO: dto.FORMNO,
-            DEPT: dto.DEPT,
-            EMPNO: dto.EMPNO,
-            FORM_STATUS: dto.FORM_STATUS,
-        }
+      where,
     });
 
-    for( const r of report ) {
-        const bidding = await this.pprbiddingService.search({
-            EBUDGETNO: r.FORMNO
-        });
-        let list = [];
-        for( const b of bidding ){
-            const po = await this.ppoService.search({ SREFNO: b.SPRNO});
-            if(po.length > 0){
-                list.push({SPRNO: b.SPRNO, SPONO: po.map(p => p.SPONO)});
-            }else{
-                list.push({SPRNO: b.SPRNO, SPONO: []});
-            }
+    for (const r of report) {
+      const bidding = await this.pprbiddingService.search({
+        EBUDGETNO: r.FORMNO,
+      });
+      let list = [];
+      for (const b of bidding) {
+        const po = await this.ppoService.search({ SREFNO: b.SPRNO });
+        if (po.length > 0) {
+          list.push({ SPRNO: b.SPRNO, SPONO: po.map((p) => p.SPONO) });
+        } else {
+          list.push({ SPRNO: b.SPRNO, SPONO: [] });
         }
-        r.prpo = list;
+      }
+      r.prpo = list;
     }
 
-    if(!dto.PRNO && !dto.PONO) return report;
+    if (!dto.PRNO && !dto.PONO) return report;
 
     // กรองเฉพาะรายการที่ตรงกับ PRNO หรือ PONO ตามที่ระบุใน dto
-    const filter = report.filter(r => {
-        // prpo: Array<{ SPRNO: string, SPONO: string[] }>
-        const matched = r.prpo.filter((p: { SPRNO: string; SPONO: string[] }) => {
-            if (dto.PRNO && dto.PONO) {
-                return p.SPRNO === dto.PRNO && p.SPONO.includes(dto.PONO);
-            }
-            if (dto.PRNO) {
-                return p.SPRNO === dto.PRNO;
-            }
-            if (dto.PONO) {
-                return p.SPONO.includes(dto.PONO);
-            }
-            return true;
-        });
-        return matched.length > 0;
+    const filter = report.filter((r) => {
+      // prpo: Array<{ SPRNO: string, SPONO: string[] }>
+      const matched = r.prpo.filter((p: { SPRNO: string; SPONO: string[] }) => {
+        if (dto.PRNO && dto.PONO) {
+          return p.SPRNO === dto.PRNO && p.SPONO.includes(dto.PONO);
+        }
+        if (dto.PRNO) {
+          return p.SPRNO === dto.PRNO;
+        }
+        if (dto.PONO) {
+          return p.SPONO.includes(dto.PONO);
+        }
+        return true;
+      });
+      return matched.length > 0;
     });
     return filter;
   }
@@ -646,7 +649,7 @@ export class IeBgrService {
             );
         let fileIndex = data.length; // เริ่มนับจากจำนวนไฟล์เดิม
         for (const file of fileList) {
-          const moved = await moveFileFromMulter({file, destination});
+          const moved = await moveFileFromMulter({ file, destination });
           movedTargets.push(moved.path);
           movedTargets.push(file.path);
           // 6. บันทึกข้อมูลไฟล์ลงใน DB

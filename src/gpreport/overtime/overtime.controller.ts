@@ -11,6 +11,7 @@ export class OvertimeController {
   search(@Body() q: UpdateOvertimeDto) {
     return this.overtimeService.findAll(q);
   }
+  
   @Post()
   create(@Body() createOvertimeDto: CreateOvertimeDto) {
     return this.overtimeService.create(createOvertimeDto);
@@ -29,5 +30,10 @@ export class OvertimeController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.overtimeService.remove(+id);
+  }
+
+  @Post('searchot/:workdate')
+  async getOtByWorkdate(@Param('workdate') workdate: string) {
+    return await this.overtimeService.getOtByWorkdate(workdate);
   }
 }

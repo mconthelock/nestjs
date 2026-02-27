@@ -9,6 +9,7 @@ import { PprbiddingModule } from './pprbidding/pprbidding.module';
 import { PpoModule } from './ppo/ppo.module';
 import { PprModule } from './ppr/ppr.module';
 import { PproductModule } from './pproduct/pproduct.module';
+import { PvenderModule } from './pvender/pvender.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { PproductModule } from './pproduct/pproduct.module';
     PpoModule,
     PprModule,
     PproductModule,
+    PvenderModule,
   ],
 })
 export class AmecModule {}

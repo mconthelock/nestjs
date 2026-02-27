@@ -11,7 +11,11 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class SearchPproductDto {
     @IsOptional()
     @IsString()
-    SPRODCODE: string;
+    SPRODCODE?: string;
+
+    @IsOptional()
+    @IsString()
+    SEXPTYPE?: string; 
 
     @IsOptional()
     @IsString()

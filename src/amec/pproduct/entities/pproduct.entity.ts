@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryColumn} from 'typeorm';
+import { Entity, Column, PrimaryColumn , ManyToOne, JoinColumn} from 'typeorm';
+import { Pvender } from 'src/amec/pvender/entities/pvender.entity';
 @Entity({
   schema: 'AMEC',
   name: 'PPRODUCT'
@@ -94,4 +95,7 @@ export class Pproduct {
   @Column()
   HAZARDSTATUS: string;
 
+ @ManyToOne(() => Pvender, (vendor) => vendor.products)
+ @JoinColumn({name:'SVENDCODE'})
+ vendor:Pvender;
 }

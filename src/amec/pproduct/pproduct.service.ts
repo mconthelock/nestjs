@@ -38,6 +38,43 @@ export class PproductService {
     return await this.productRepo.save(newProduct);
   }
 
+  async findVendorByProductCode(dto: SearchPproductDto)
+  {
+      const product = await this.productRepo.find({
+      where: { ...dto }, // ค้นหาจาก Product Code ที่ส่งมา
+      relations: ['vendor'], // สั่งให้ Join เอาข้อมูลจากตาราง PVENDER มาด้วย (อ้างอิงชื่อ 'vendor' จากใน entity)
+    });
+
+    return product;
+  }
+
+  async getProductsPagination(dto: SearchPproductDto ,page: number = 1, limit: number = 10)
+  {
+    const skip = (page-1) * limit;
+    const [products, total] = await this.productRepo.findAndCount({
+      where: { ...dto }, // ค้นหาจาก Product Code ที่ส่งมา
+      relations: ['vendor'], // สั่งให้ Join เอาข้อมูลจากตาราง PVENDER มาด้วย (อ้างอิงชื่อ 'vendor' จากใน entity)
+      take:limit,
+      skip:skip,
+      order:{
+        DADDDATE:'DESC',
+      }
+    });
+    const totalPages = Math.ceil(total/limit);
+    return {
+        data: products,
+        meta:{
+          totalItems:total,
+          itemCount:products.length,
+          itemsPerPage: limit,
+          totalPages:totalPages,
+          currentPage:page,
+        },
+    }
+  }
+
+
+
   // search(sprodcode?: string, prodname?:string)
   // {
   //   const conditions: any = {};

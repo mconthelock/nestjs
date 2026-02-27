@@ -35,7 +35,15 @@ export class PproductController {
 
   @Post('psearch')
   search(@Body() searchDto: SearchPproductDto) {
-    return this.pproductService.search(searchDto);
+    //return this.pproductService.search(searchDto);
+    return this.pproductService.findVendorByProductCode(searchDto);
+
+  }
+
+  @Post('searchpage')
+  searchpg(@Body() searchDto: SearchPproductDto , @Query('page') page: number =1 , @Query('limit') limit: number = 10) {
+    //return this.pproductService.search(searchDto);
+    return this.pproductService.getProductsPagination(searchDto,page,limit);
   }
 
   @Post('newproduct')

@@ -1,12 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-  IsString,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsDateString,
-  IsDate,
-} from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsDate } from 'class-validator';
 
 export class createItemsDto {
   @IsString()
@@ -20,20 +13,20 @@ export class createItemsDto {
 
   @IsString()
   @IsOptional()
-  ITEM_VARIABLE: string;
+  ITEM_VARIABLE?: string;
 
   @Type(() => Number)
   @IsNumber()
   @IsOptional()
-  ITEM_TYPE: number;
+  ITEM_TYPE?: number;
 
   @IsString()
   @IsOptional()
-  ITEM_CLASS: string;
+  ITEM_CLASS?: string;
 
   @IsString()
   @IsOptional()
-  ITEM_UNIT: string;
+  ITEM_UNIT?: string;
 
   @IsString()
   ITEM_SUPPLIER: string;
@@ -44,19 +37,19 @@ export class createItemsDto {
 
   @IsString()
   @IsOptional()
-  ITEM_REMARK: string;
+  ITEM_REMARK?: string;
 
   @IsString()
   @IsOptional()
-  ITEM_CUS_PUR: string;
+  ITEM_CUS_PUR?: string;
 
   @IsString()
   @IsOptional()
-  ITEM_AMEC_PUR: string;
+  ITEM_AMEC_PUR?: string;
 
   @IsString()
   @IsOptional()
-  ITEM_MODEL: string;
+  ITEM_MODEL?: string;
 
   @Type(() => Number)
   @IsNumber()
@@ -64,9 +57,10 @@ export class createItemsDto {
 
   @IsString()
   @IsOptional()
-  ITEM_THUMB: string;
+  ITEM_THUMB?: string;
 
   @Type(() => Date)
+  @IsDate()
   CREATE_AT: Date;
 
   @IsString()
@@ -74,9 +68,10 @@ export class createItemsDto {
 
   @IsOptional()
   @Type(() => Date)
-  UPDATE_AT: Date;
+  @IsDate()
+  UPDATE_AT?: Date;
 
   @IsString()
   @IsOptional()
-  UPDATE_BY: string;
+  UPDATE_BY?: string;
 }

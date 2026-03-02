@@ -34,6 +34,7 @@ import { EbudgetModule } from './ebudget/ebudget.module';
 import { WarehouseModule } from './warehouse/warehouse.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TransactionInterceptor } from './common/interceptors/transaction.interceptor';
+import { WorkloadModule } from './workload/workload.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { TransactionInterceptor } from './common/interceptors/transaction.interc
     HbdModule,
     EbudgetModule,
     WarehouseModule,
+    WorkloadModule,
   ],
   providers: [
     HttpLoggingInterceptor,

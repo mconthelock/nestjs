@@ -22,6 +22,7 @@ import { ItemMfgHistoryModule } from './item-mfg-history/item-mfg-history.module
 import { ItemMasterAuthorizeModule } from './item-master-authorize/item-master-authorize.module';
 import { ItemMfgDeleteModule } from './item-mfg-delete/item-mfg-delete.module';
 import { ControlDrawingPisModule } from './control-drawing-pis/control-drawing-pis.module';
+import { MfgDrawingModule } from './mfg-drawing/mfg-drawing.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { ControlDrawingPisModule } from './control-drawing-pis/control-drawing-p
     ItemMasterAuthorizeModule,
     ItemMfgDeleteModule,
     ControlDrawingPisModule,
+    MfgDrawingModule,
   ],
 })
 export class ESCSModule {}

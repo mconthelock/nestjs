@@ -67,7 +67,6 @@ export class ItemMfgService {
         return {
           status: false,
           message: `Search ITEM_MFG by id ${id} Failed: No data found`,
-          data: [],
         };
       }
       return {

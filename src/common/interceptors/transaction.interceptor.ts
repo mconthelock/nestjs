@@ -22,12 +22,15 @@ export class TransactionInterceptor implements NestInterceptor {
     private escsDS: DataSource,
     @InjectDataSource('webformConnection')
     private webformDS: DataSource,
+    @InjectDataSource('workloadConnection')
+    private workloadDS: DataSource,
     private readonly reflector: Reflector,
   ) {
     // เพิ่ม data sources ที่นี่เมื่อมีการเพิ่ม connection ใหม่
     this.dataSourceMap = {
       escsConnection: this.escsDS,
       webformConnection: this.webformDS,
+      workloadConnection: this.workloadDS,
     };
   }
 

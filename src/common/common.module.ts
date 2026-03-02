@@ -29,6 +29,7 @@ import { MailModule } from './services/mail/mail.module';
 import { PDFModule } from './services/pdf/pdf.module';
 import { FilesModule } from './services/file/file.module';
 import ebudgetConfig from './databases/ebudget.config';
+import workloadConfig from './databases/workload.config';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import ebudgetConfig from './databases/ebudget.config';
     TypeOrmModule.forRootAsync(escsConfig),
     TypeOrmModule.forRootAsync(pdmConfig),
     TypeOrmModule.forRootAsync(sdsysConfig),
+    TypeOrmModule.forRootAsync(workloadConfig),
     RedisModule,
     SchedulerModule,
     LoggerModule,

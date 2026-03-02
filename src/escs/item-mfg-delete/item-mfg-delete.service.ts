@@ -55,7 +55,6 @@ export class ItemMfgDeleteService {
         return {
           status: false,
           message: `Search ITEM_MFG_DELETE by id ${id} Failed: No data found`,
-          data: [],
         };
       }
       return {

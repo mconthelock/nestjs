@@ -54,6 +54,11 @@ export class InquiryController {
     return await this.inq.findByNumber(req.INQ_NO);
   }
 
+  @Post('delete')
+  async delete(@Body() searchDto: searchDto) {
+    return await this.inq.delete(searchDto);
+  }
+
   @Get('designprocess')
   @UseGuards(AuthGuard('jwt'))
   async designProcess() {

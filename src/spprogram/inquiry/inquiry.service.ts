@@ -4,7 +4,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 import { plainToInstance } from 'class-transformer';
 // ต้อง import oracledb เพื่อกำหนดชนิดข้อมูลของ parameter
-// import * as oracledb from 'oracledb';
+import * as oracledb from 'oracledb';
 
 //Entities
 import { Inquiry } from './entities/inquiry.entity';
@@ -559,30 +559,30 @@ export class InquiryService {
     return this.inq.save(inquiry);
   }
 
-  //   async delete(searchDto: searchDto) {
-  //     const params = [
-  //       searchDto.INQ_ID,
-  //       searchDto.INQ_MAR_PIC,
-  //       searchDto.INQ_MAR_REMARK,
-  //       { dir: oracledb.BIND_OUT, type: oracledb.STRING },
-  //     ];
-  //     const sql = `
-  //       BEGIN
-  //         INQUIRY_DELETE(
-  //             P_ID => :1,
-  //             P_USER => :2,
-  //             P_REMARK=> :3,
-  //             P_RESULT => :4
-  //         );
-  //       END;`;
-  //     const result = await this.ds.query(sql, params);
-  //     if (result[0] == null) {
-  //       throw new NotFoundException(
-  //         `Inquiry with ID (${searchDto.INQ_ID}) not found.`,
-  //       );
-  //     }
-  //     return { status: true, title: result[0] };
-  //   }
+  async delete(searchDto: searchDto) {
+    const params = [
+      searchDto.INQ_ID,
+      searchDto.INQ_MAR_PIC,
+      searchDto.INQ_MAR_REMARK,
+      { dir: oracledb.BIND_OUT, type: oracledb.STRING },
+    ];
+    const sql = `
+        BEGIN
+          INQUIRY_DELETE(
+              P_ID => :1,
+              P_USER => :2,
+              P_REMARK=> :3,
+              P_RESULT => :4
+          );
+        END;`;
+    const result = await this.ds.query(sql, params);
+    if (result[0] == null) {
+      throw new NotFoundException(
+        `Inquiry with ID (${searchDto.INQ_ID}) not found.`,
+      );
+    }
+    return { status: true, title: result[0] };
+  }
 
   async updatestatus(id: number, status: number, history?: createHistoryDto) {
     const runner = this.ds.createQueryRunner();

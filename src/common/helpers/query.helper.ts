@@ -32,7 +32,15 @@ export async function applyDynamicFilters(qb, filters: any, alias: string) {
             typeof paramValue === 'string' &&
             /^\d{4}-\d{2}-\d{2}/.test(paramValue)
           ) {
-            processedParams[paramKey] = new Date(paramValue);
+            //processedParams[paramKey] = new Date(paramValue);
+            const [year, month, day] = paramValue.split('-').map(Number);
+            const localDate = new Date(year, month - 1, day);
+            if (key.startsWith('END_')) {
+              localDate.setHours(23, 59, 59, 999);
+            } else {
+              localDate.setHours(0, 0, 0, 0);
+            }
+            processedParams[paramKey] = localDate;
           } else {
             processedParams[paramKey] = paramValue;
           }

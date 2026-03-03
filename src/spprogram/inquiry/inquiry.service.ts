@@ -397,12 +397,14 @@ export class InquiryService {
             { INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV },
             timeline,
           );
-          console.log('Update Timeline');
-          console.log({ INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV });
-          console.log(timeline);
+          //   console.log('Update Timeline');
+          //   console.log({ INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV });
+          //   console.log(timeline);
         }
       }
-      runner.manager.insert(History, history);
+      if (history !== undefined) {
+        runner.manager.insert(History, history);
+      }
       await runner.commitTransaction();
     } catch (err) {
       await runner.rollbackTransaction();

@@ -8,7 +8,7 @@ import { WMSTempIssueDto } from './dto/wms-temp-issue.dto';
 import { WMSUploadIssueDto } from './dto/wms-upload-issue.dto';
 import { WMSUploadIssueResponseDto } from './dto/wms-upload-issue-response.dto';
 
-// @UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'))
 @ApiTags('Warehouse WMS')
 @Controller('warehouse/wms')
 export class WMSController {

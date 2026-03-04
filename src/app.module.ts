@@ -34,6 +34,7 @@ import { EbudgetModule } from './ebudget/ebudget.module';
 import { WarehouseModule } from './warehouse/warehouse.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TransactionInterceptor } from './common/interceptors/transaction.interceptor';
+import { PursysModule } from './pursys/pursys.module';
 import { WorkloadModule } from './workload/workload.module';
 import { DatacenterModule } from './datacenter/datacenter.module';
 
@@ -66,6 +67,7 @@ import { DatacenterModule } from './datacenter/datacenter.module';
     HbdModule,
     EbudgetModule,
     WarehouseModule,
+    PursysModule,
     WorkloadModule,
     DatacenterModule
   ],

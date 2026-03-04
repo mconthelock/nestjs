@@ -31,7 +31,7 @@ import { FilesModule } from './services/file/file.module';
 import ebudgetConfig from './databases/ebudget.config';
 import workloadConfig from './databases/workload.config';
 import datacenterConfig from './databases/datacenter.config';
-
+import purConfig from './databases/pursys.config';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -52,6 +52,7 @@ import datacenterConfig from './databases/datacenter.config';
     TypeOrmModule.forRootAsync(spsysConfig),
     TypeOrmModule.forRootAsync(webformConfig),
     TypeOrmModule.forRootAsync(workloadConfig),
+    TypeOrmModule.forRootAsync(purConfig),
     RedisModule,
     SchedulerModule,
     LoggerModule,

@@ -5,8 +5,9 @@ import { BusstopModule } from './busstop/busstop.module';
 import { BusrouteModule } from './busroute/busroute.module';
 import { BuspassengerModule } from './buspassenger/buspassenger.module';
 import { OvertimeModule } from './overtime/overtime.module';
+import { DispatchModule } from './dispatch/dispatch.module';
 
 @Module({
-  imports: [NewsModule, BuslineModule, BusstopModule, BusrouteModule, BuspassengerModule, OvertimeModule],
+  imports: [NewsModule, BuslineModule, BusstopModule, BusrouteModule, BuspassengerModule, OvertimeModule, DispatchModule],
 })
 export class gpreportModule {}

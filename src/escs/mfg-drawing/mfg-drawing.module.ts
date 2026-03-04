@@ -9,21 +9,29 @@ import { ItemMfgListModule } from '../item-mfg-list/item-mfg-list.module';
 import { ItemMfgModule } from '../item-mfg/item-mfg.module';
 import { ItemMfgDeleteModule } from '../item-mfg-delete/item-mfg-delete.module';
 import { IdtagEfacLogModule } from 'src/workload/idtag-efac-log/idtag-efac-log.module';
+import { S011mpModule } from 'src/datacenter/s011mp/s011mp.module';
+import { F110kpModule } from 'src/datacenter/f110kp/f110kp.module';
+import { ControlDrawingPisModule } from '../control-drawing-pis/control-drawing-pis.module';
+import { FilesModule } from 'src/common/services/file/file.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([MFG_DRAWING], 'escsConnection'),
-    ItemMfgModule,
-    ItemMfgListModule,
-    ItemMfgDeleteModule,
-    IdtagEfacLogModule,
-  ],
-  controllers: [MfgDrawingController],
-  providers: [
-    MfgDrawingService,
-    MfgDrawingRepository,
-    MfgDrawingCreateChecksheetService,
-  ],
-  exports: [MfgDrawingService, MfgDrawingCreateChecksheetService],
+    imports: [
+        TypeOrmModule.forFeature([MFG_DRAWING], 'escsConnection'),
+        ItemMfgModule,
+        ItemMfgListModule,
+        ItemMfgDeleteModule,
+        ControlDrawingPisModule,
+        IdtagEfacLogModule,
+        F110kpModule,
+        S011mpModule,
+        FilesModule,
+    ],
+    controllers: [MfgDrawingController],
+    providers: [
+        MfgDrawingService,
+        MfgDrawingRepository,
+        MfgDrawingCreateChecksheetService,
+    ],
+    exports: [MfgDrawingService, MfgDrawingCreateChecksheetService],
 })
 export class MfgDrawingModule {}

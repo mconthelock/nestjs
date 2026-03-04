@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { join, normalize } from 'path';
+import { basename, join, normalize } from 'path';
 import * as mime from 'mime-types';
 import { promises as fs } from 'fs';
 import * as contentDisposition from 'content-disposition';
@@ -25,63 +25,89 @@ import { now } from './dayjs.utils';
 // }
 
 export async function moveFileFromMulter({
-  file,
-  destination,
-  newName,
-  isPhp = false,
+    file,
+    destination,
+    newName,
+    isPhp = false,
 }: {
-  file: Express.Multer.File;
-  destination: string;
-  newName?: string; // ถ้าไม่ส่ง จะใช้ชื่อที่ Multer ตั้ง (file.filename)
-  isPhp?: boolean; // ถ้าเป็น true จะใช้ ชื่อ ขึ้นต้นด้วย ปี เดือน วัน ชั่วโมง นาที_ชื่อไฟล์ เดิม เช่น 202601231707_test.xlsx
+    file: Express.Multer.File;
+    destination: string;
+    newName?: string; // ถ้าไม่ส่ง จะใช้ชื่อที่ Multer ตั้ง (file.filename)
+    isPhp?: boolean; // ถ้าเป็น true จะใช้ ชื่อ ขึ้นต้นด้วย ปี เดือน วัน ชั่วโมง นาที_ชื่อไฟล์ เดิม เช่น 202601231707_test.xlsx
 }) {
-  await fs.mkdir(destination, { recursive: true });
+    await fs.mkdir(destination, { recursive: true });
 
-//   const targetName = newName ?? file.filename; // เช่น 1734...-xxx.pdf
-  const targetName = newName ? newName : isPhp ? now('YYYYMMDDHHmm') + '_' + file.originalname : file.filename;
-  const targetPath = join(destination, targetName);
-  let status = false;
-  try {
-    await fs.rename(file.path, targetPath); // ย้ายจาก tmp → ปลายทาง
-    status = true; // ถ้าย้ายสำเร็จ
-  } catch (err: any) {
-    // เผื่อเจอ EXDEV (ข้ามดิสก์) ให้ fallback เป็น copy + unlink
-    if (err.code === 'EXDEV') {
-      await fs.copyFile(file.path, targetPath);
-      await fs.unlink(file.path);
-      status = true; // ถ้า copy สำเร็จ
-    } else {
-      await deleteFile(file.path); // ลบไฟล์ต้นทาง
-      throw err;
+    //   const targetName = newName ?? file.filename; // เช่น 1734...-xxx.pdf
+    const targetName = newName
+        ? newName
+        : isPhp
+          ? now('YYYYMMDDHHmm') + '_' + file.originalname
+          : file.filename;
+    const targetPath = join(destination, targetName);
+    let status = false;
+    try {
+        await fs.rename(file.path, targetPath); // ย้ายจาก tmp → ปลายทาง
+        status = true; // ถ้าย้ายสำเร็จ
+    } catch (err: any) {
+        // เผื่อเจอ EXDEV (ข้ามดิสก์) ให้ fallback เป็น copy + unlink
+        if (err.code === 'EXDEV') {
+            await fs.copyFile(file.path, targetPath);
+            await fs.unlink(file.path);
+            status = true; // ถ้า copy สำเร็จ
+        } else {
+            await deleteFile(file.path); // ลบไฟล์ต้นทาง
+            throw err;
+        }
     }
-  }
-  return {
-    status: status,
-    originalName: file.originalname,
-    newName: targetName,
-    mimetype: file.mimetype,
-    size: file.size,
-    path: targetPath,
-  };
+    return {
+        status: status,
+        originalName: file.originalname,
+        newName: targetName,
+        mimetype: file.mimetype,
+        size: file.size,
+        path: targetPath,
+    };
+}
+
+/**
+ * Copy ไฟล์จาก source ไปยัง destination โดยสร้างโฟลเดอร์ปลายทางถ้ายังไม่มี และคืน path ของไฟล์ที่ถูกคัดลอก
+ * @param source - path ของไฟล์ต้นทาง
+ * @param destination - โฟลเดอร์ปลายทาง
+ * @param newFileName - (ไม่จำเป็น) ชื่อไฟล์ใหม่ที่ต้องการใช้ในปลายทาง ถ้าไม่ส่งจะใช้ชื่อเดิมของไฟล์ต้นทาง
+ * @returns path ของไฟล์ที่ถูกคัดลอก
+ * @example
+ * await copyFile('/path/to/source/file.txt', '/path/to/destination', 'newFileName.txt');
+ * จะคัดลอก file.txt ไปยัง /path/to/destination/newFileName.txt และคืนค่า '/path/to/destination/newFileName.txt'
+ */
+export async function copyFile(
+    source: string,
+    destination: string,
+    newFileName?: string,
+) {
+    await fs.mkdir(destination, { recursive: true });
+    const fileName = newFileName ?? basename(source);
+    const targetPath = join(destination, fileName);
+    await fs.copyFile(source, targetPath);
+    return targetPath;
 }
 
 export async function deleteFile(path: string) {
-  try {
-    await fs.rm(path, { force: true, maxRetries: 2, retryDelay: 100 }); // ลบไฟล์ force = ไม่ throw error
-  } catch (err: any) {
-    console.warn(`ลบไฟล์ ${path} ไม่สำเร็จ:`, err.message);
-  }
+    try {
+        await fs.rm(path, { force: true, maxRetries: 2, retryDelay: 100 }); // ลบไฟล์ force = ไม่ throw error
+    } catch (err: any) {
+        console.warn(`ลบไฟล์ ${path} ไม่สำเร็จ:`, err.message);
+    }
 }
 
 export async function cleanupTmp(files: Express.Multer.File[]) {
-  await Promise.allSettled(files.map((f) => deleteFile(f.path)));
+    await Promise.allSettled(files.map((f) => deleteFile(f.path)));
 }
 
 // ฟังก์ชันนี้รับชื่อไฟล์ (name) แล้วคืนค่า MIME type ที่เหมาะสม
 export function getMimeType(name: string) {
-  // ใช้ mime.lookup เพื่อตรวจสอบ MIME type จากชื่อไฟล์
-  // ถ้าไม่พบ จะคืนค่า 'application/octet-stream' (ค่ามาตรฐานสำหรับไฟล์ทั่วไป)
-  return mime.lookup(name) || 'application/octet-stream';
+    // ใช้ mime.lookup เพื่อตรวจสอบ MIME type จากชื่อไฟล์
+    // ถ้าไม่พบ จะคืนค่า 'application/octet-stream' (ค่ามาตรฐานสำหรับไฟล์ทั่วไป)
+    return mime.lookup(name) || 'application/octet-stream';
 }
 
 /**
@@ -92,13 +118,13 @@ export function getMimeType(name: string) {
  * @returns สตริง Content-Disposition ที่เหมาะสมกับชื่อไฟล์และโหมดที่เลือก
  */
 export function buildContentDisposition(
-  oname: string,
-  mode: string, // 'open' | 'download'
+    oname: string,
+    mode: string, // 'open' | 'download'
 ) {
-  //   const encoded = encodeURIComponent(oname).replace(/['()]/g, escape);
-  const type = mode === 'download' ? 'attachment' : 'inline';
-  //   return `${type}; filename="${oname}"; filename*=UTF-8''${encoded}`;
-  return contentDisposition(oname, { type });
+    //   const encoded = encodeURIComponent(oname).replace(/['()]/g, escape);
+    const type = mode === 'download' ? 'attachment' : 'inline';
+    //   return `${type}; filename="${oname}"; filename*=UTF-8''${encoded}`;
+    return contentDisposition(oname, { type });
 }
 
 /**
@@ -110,44 +136,44 @@ export function buildContentDisposition(
  * @throws BadRequestException หาก path ที่รวมแล้วไม่ได้อยู่ใน baseDir
  */
 export function safeJoin(baseDir: string, fileName: string) {
-  // รวม path อย่างปลอดภัย ป้องกัน path traversal (เช่น ../)
-  // baseDir: โฟลเดอร์หลักที่อนุญาต
-  // fileName: ชื่อไฟล์หรือ path ย่อยที่ต้องการรวม
-  const base = normalize(baseDir);
-  const full = normalize(join(baseDir, fileName));
-  if (!full.startsWith(base)) {
-    // ถ้า path ที่รวมแล้วไม่ได้อยู่ใน baseDir ให้ throw error
-    throw new BadRequestException('Invalid path');
-  }
-  return full;
+    // รวม path อย่างปลอดภัย ป้องกัน path traversal (เช่น ../)
+    // baseDir: โฟลเดอร์หลักที่อนุญาต
+    // fileName: ชื่อไฟล์หรือ path ย่อยที่ต้องการรวม
+    const base = normalize(baseDir);
+    const full = normalize(join(baseDir, fileName));
+    if (!full.startsWith(base)) {
+        // ถ้า path ที่รวมแล้วไม่ได้อยู่ใน baseDir ให้ throw error
+        throw new BadRequestException('Invalid path');
+    }
+    return full;
 }
 
-export async function joinPaths(path1: string, path2: string): Promise<string> {
-  return join(path1, path2);
+export async function joinPaths(...paths: string[]): Promise<string> {
+    return join(...paths);
 }
 
 export async function getBase64Image(filePath: string): Promise<string> {
-  try {
-    const data = await fs.readFile(filePath);
-    const mimetype = getMimeType(filePath);
-    return `data:${mimetype};base64,${data.toString('base64')}`;
-  } catch (err) {
-    console.error(`File not found: ${filePath}`);
-    return '';
-  }
+    try {
+        const data = await fs.readFile(filePath);
+        const mimetype = getMimeType(filePath);
+        return `data:${mimetype};base64,${data.toString('base64')}`;
+    } catch (err) {
+        console.error(`File not found: ${filePath}`);
+        return '';
+    }
 }
 
 export async function getBase64ImageFromUrl(url: string): Promise<string> {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
 
-    const contentType =
-      res.headers.get('content-type') || 'application/octet-stream';
-    const buffer = Buffer.from(await res.arrayBuffer());
-    return `data:${contentType};base64,${buffer.toString('base64')}`;
-  } catch (err) {
-    console.error(`Failed to fetch image: ${url}`, err);
-    return '';
-  }
+        const contentType =
+            res.headers.get('content-type') || 'application/octet-stream';
+        const buffer = Buffer.from(await res.arrayBuffer());
+        return `data:${contentType};base64,${buffer.toString('base64')}`;
+    } catch (err) {
+        console.error(`Failed to fetch image: ${url}`, err);
+        return '';
+    }
 }

@@ -30,25 +30,27 @@ import { PDFModule } from './services/pdf/pdf.module';
 import { FilesModule } from './services/file/file.module';
 import ebudgetConfig from './databases/ebudget.config';
 import workloadConfig from './databases/workload.config';
+import datacenterConfig from './databases/datacenter.config';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
     WinstonModule.forRoot(winstonConfig),
     TypeOrmModule.forRootAsync(amecConfig),
-    TypeOrmModule.forRootAsync(spsysConfig),
-    TypeOrmModule.forRootAsync(docinvConfig),
-    TypeOrmModule.forRootAsync(webformConfig),
-    TypeOrmModule.forRootAsync(ebudgetConfig),
-    TypeOrmModule.forRootAsync(invoiceConfig),
     TypeOrmModule.forRootAsync(auditConfig),
-    TypeOrmModule.forRootAsync(idsConfig),
-    TypeOrmModule.forRootAsync(gpreportConfig),
-    TypeOrmModule.forRootAsync(packingConfig),
+    TypeOrmModule.forRootAsync(datacenterConfig),
+    TypeOrmModule.forRootAsync(docinvConfig),
+    TypeOrmModule.forRootAsync(ebudgetConfig),
     TypeOrmModule.forRootAsync(elmesConfig),
     TypeOrmModule.forRootAsync(escsConfig),
+    TypeOrmModule.forRootAsync(gpreportConfig),
+    TypeOrmModule.forRootAsync(idsConfig),
+    TypeOrmModule.forRootAsync(invoiceConfig),
+    TypeOrmModule.forRootAsync(packingConfig),
     TypeOrmModule.forRootAsync(pdmConfig),
     TypeOrmModule.forRootAsync(sdsysConfig),
+    TypeOrmModule.forRootAsync(spsysConfig),
+    TypeOrmModule.forRootAsync(webformConfig),
     TypeOrmModule.forRootAsync(workloadConfig),
     RedisModule,
     SchedulerModule,

@@ -40,7 +40,7 @@ export class ListDto {
 
   @IsOptional()
   @IsString()
-  path: string;
+  path?: string;
 
   @IsOptional()
   @IsString({ each: true })

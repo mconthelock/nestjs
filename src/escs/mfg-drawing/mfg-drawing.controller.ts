@@ -25,7 +25,7 @@ export class MfgDrawingController {
   @Post()
   @UseInterceptors(getFileUploadInterceptor())
   @UseTransaction('escsConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ escsConnection
-  create(@Body() dto: CreateMfgDrawingCheckSheetDto) {
+  create(@Body() dto: CreateMfgDrawingCheckSheetDto): Promise<any> {
     return this.mfgDrawingCheckSheetService.create(dto);
   }
 

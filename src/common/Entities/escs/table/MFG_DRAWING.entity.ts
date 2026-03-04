@@ -1,51 +1,57 @@
 import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-  Unique,
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryColumn,
+    PrimaryGeneratedColumn,
+    Unique,
 } from 'typeorm';
 
 @Entity({ name: 'MFG_DRAWING', schema: 'ESCCHKSHT' })
 export class MFG_DRAWING {
-  @PrimaryGeneratedColumn()
-  NID: number;
+    @PrimaryGeneratedColumn()
+    NID: number;
 
-  @Column()
-  NBLOCKID: number;
+    @Column()
+    NBLOCKID: number;
 
-  @Column()
-  NITEMID: number;
+    @Column()
+    NITEMID: number;
 
-  @Column()
-  VPIS: string;
+    @Column()
+    VPIS: string;
 
-  @Column()
-  VDRAWING: string;
+    @Column()
+    VDRAWING: string;
 
-  @Column()
-  SYSCODE: string;
+    @Column()
+    VSYSCODE: string;
 
-  @Column()
-  NINSPECTOR_STATUS: number;
+    @Column()
+    NINSPECTOR_STATUS: number;
 
-  @Column()
-  NFORELEAD_STATUS: number;
-  
-  @Column()
-  VFILE_NAME: string;
+    @Column()
+    NFORELEAD_STATUS: number;
 
-  @Column()
-  NUSERCREATE: number;
+    @Column()
+    VFILE_NAME: string;
 
-  @Column()
-  DDATECREATE: Date;
+    @Column()
+    VSTATUSCODE: string;
 
-  @Column()
-  NUSERUPDATE: number;
+    @Column()
+    NSTATUS: number;
 
-  @Column()
-  DDATEUPDATE: Date;
+    @Column()
+    NUSERCREATE: number;
+
+    @Column()
+    DDATECREATE: Date;
+
+    @Column()
+    NUSERUPDATE: number;
+
+    @Column()
+    DDATEUPDATE: Date;
 }

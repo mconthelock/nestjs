@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { S011mpRepository } from './s011mp.repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
-import { IdtagEfacLogRepository } from './idtag-efac-log.repository';
 
 @Injectable()
-export class IdtagEfacLogService {
-  constructor(private readonly repo: IdtagEfacLogRepository) {}
-
+export class S011mpService {
+  constructor(private readonly repo: S011mpRepository) {}
   async findAll() {
     try {
       const res = await this.repo.findAll();
@@ -13,38 +12,36 @@ export class IdtagEfacLogService {
       if (length === 0) {
         return {
           status: false,
-          message: 'Search IDTAG_EFAC_LOG Failed: No data found',
+          message: 'Search S011MP Failed: No data found',
           data: [],
         };
       }
       return {
         status: true,
-        message: `Search IDTAG_EFAC_LOG data found ${length} record(s)`,
+        message: `Search S011MP data found ${length} record(s)`,
         data: res,
       };
     } catch (error) {
-      throw new Error('Search IDTAG_EFAC_LOG Error: ' + error.message);
+      throw new Error('Search S011MP Error: ' + error.message);
     }
   }
 
-  async findOne(id: number) {
+  async findOne(S11M01: string, S11M02: string) {
     try {
-      const res = await this.repo.findOne(id);
+      const res = await this.repo.findOne(S11M01, S11M02);
       if (res == null) {
         return {
           status: false,
-          message: `Search IDTAG_EFAC_LOG by id ${id} Failed: No data found`,
+          message: `Search S011MP by id ${S11M01}, ${S11M02} Failed: No data found`,
         };
       }
       return {
         status: true,
-        message: `Search IDTAG_EFAC_LOG by id ${id} data found 1 record(s)`,
+        message: `Search S011MP by id ${S11M01}, ${S11M02} data found 1 record(s)`,
         data: res,
       };
     } catch (error) {
-      throw new Error(
-        `Search IDTAG_EFAC_LOG by id ${id} Error: ` + error.message,
-      );
+      throw new Error(`Search S011MP by id ${S11M01}, ${S11M02} Error: ` + error.message);
     }
   }
 
@@ -55,17 +52,17 @@ export class IdtagEfacLogService {
       if (length === 0) {
         return {
           status: false,
-          message: 'Search IDTAG_EFAC_LOG Failed: No data found',
+          message: 'Search S011MP Failed: No data found',
           data: [],
         };
       }
       return {
         status: true,
-        message: `Search IDTAG_EFAC_LOG data found ${length} record(s)`,
+        message: `Search S011MP data found ${length} record(s)`,
         data: res,
       };
     } catch (error) {
-      throw new Error('Search IDTAG_EFAC_LOG Error: ' + error.message);
+      throw new Error('Search S011MP Error: ' + error.message);
     }
   }
 }

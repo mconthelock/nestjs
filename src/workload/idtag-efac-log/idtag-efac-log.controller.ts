@@ -8,8 +8,6 @@ import {
   Delete,
 } from '@nestjs/common';
 import { IdtagEfacLogService } from './idtag-efac-log.service';
-import { CreateIdtagEfacLogDto } from './dto/create-idtag-efac-log.dto';
-import { UpdateIdtagEfacLogDto } from './dto/update-idtag-efac-log.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 

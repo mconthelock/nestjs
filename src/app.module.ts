@@ -35,6 +35,7 @@ import { WarehouseModule } from './warehouse/warehouse.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TransactionInterceptor } from './common/interceptors/transaction.interceptor';
 import { WorkloadModule } from './workload/workload.module';
+import { DatacenterModule } from './datacenter/datacenter.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { WorkloadModule } from './workload/workload.module';
     EbudgetModule,
     WarehouseModule,
     WorkloadModule,
+    DatacenterModule
   ],
   providers: [
     HttpLoggingInterceptor,

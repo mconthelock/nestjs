@@ -5,8 +5,6 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { FiltersDto } from 'src/common/dto/filter.dto';
-import { CreateIdtagEfacLogDto } from './dto/create-idtag-efac-log.dto';
-import { UpdateIdtagEfacLogDto } from './dto/update-idtag-efac-log.dto';
 import { IDTAG_EFAC_LOG } from 'src/common/Entities/workload/table/IDTAG_EFAC_LOG.entity';
 
 @Injectable()
@@ -16,10 +14,6 @@ export class IdtagEfacLogRepository extends BaseRepository {
     @Inject(REQUEST) req: Request,
   ) {
     super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
-  }
-
-  async create(dto: CreateIdtagEfacLogDto) {
-    return this.getRepository(IDTAG_EFAC_LOG).save(dto);
   }
 
   findAll() {
@@ -44,16 +38,10 @@ export class IdtagEfacLogRepository extends BaseRepository {
       'RUNNO',
       'PRINT_DATETIME',
       'LOT_NO',
-      'PRINT_BY'
+      'PRINT_BY',
     ]);
-    return qb.orderBy('I.MONTH, I.YEAR, I.RUNNO, I.CONTROL_NO, I.LOT_NO', 'ASC').getMany();
-  }
-
-  async update(id: number, dto: UpdateIdtagEfacLogDto) {
-    return this.getRepository(IDTAG_EFAC_LOG).update(id, dto);
-  }
-
-  async remove(id: number) {
-    return this.getRepository(IDTAG_EFAC_LOG).delete(id);
+    return qb
+      .orderBy('I.MONTH, I.YEAR, I.RUNNO, I.CONTROL_NO, I.LOT_NO', 'ASC')
+      .getMany();
   }
 }

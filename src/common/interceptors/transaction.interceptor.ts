@@ -24,6 +24,8 @@ export class TransactionInterceptor implements NestInterceptor {
     private webformDS: DataSource,
     @InjectDataSource('workloadConnection')
     private workloadDS: DataSource,
+    @InjectDataSource('datacenterConnection')
+    private datacenterDS: DataSource,
     private readonly reflector: Reflector,
   ) {
     // เพิ่ม data sources ที่นี่เมื่อมีการเพิ่ม connection ใหม่
@@ -31,6 +33,7 @@ export class TransactionInterceptor implements NestInterceptor {
       escsConnection: this.escsDS,
       webformConnection: this.webformDS,
       workloadConnection: this.workloadDS,
+      datacenterConnection: this.datacenterDS,
     };
   }
 

@@ -21,6 +21,8 @@ import { F110KP } from 'src/common/Entities/datacenter/table/F110KP.entity';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { FileService } from 'src/common/services/file/file.service';
 import { ListMode } from 'src/common/services/file/dto/file.dto';
+import { basename } from 'path';
+import { MfgSerialService } from '../mfg-serial/mfg-serial.service';
 
 interface State {
     blockId: number;
@@ -47,13 +49,11 @@ export class MfgDrawingCreateChecksheetService {
     constructor(
         private readonly mfgDrawingService: MfgDrawingService,
         private readonly itemMfgService: ItemMfgService,
-        private readonly itemMfgListService: ItemMfgListService,
-        private readonly itemMfgDeleteService: ItemMfgDeleteService,
-        private readonly controlDrawingPisService: ControlDrawingPisService,
         private readonly idtagEfacLogService: IdtagEfacLogService,
         private readonly f110kpService: F110kpService,
         private readonly s011mpService: S011mpService,
         private readonly fileService: FileService,
+        private readonly mfgSerialService: MfgSerialService,
     ) {}
 
     private readonly mapType = {
@@ -64,110 +64,100 @@ export class MfgDrawingCreateChecksheetService {
 
     async create(dto: CreateMfgDrawingCheckSheetDto) {
         try {
-            const state: State = {
-                blockId: dto.NBLOCKID,
-                itemId: dto.NITEMID,
-                usercreate: dto.NUSERCREATE,
-                serialNo: dto.ASERIALNO ?? [],
-                pis: dto.VPIS ?? null,
-                type: null,
-                typeName: null,
-                itemMfg: null,
-                list: null,
-                delete: [],
-                control: [],
-                drawing: null,
-                item: null,
-                order: null,
-                controlNo: null,
-                data: null,
-                path: null,
-            };
             // หา item mfg ด้วย NITEMID
             const item = await this.itemMfgService.findOne(dto.NITEMID);
             if (!item.status) {
                 throw new Error(`Item Mfg with id ${dto.NITEMID} not found`);
             }
-            // กำหนด type และ typeName ตาม NTYPE ของ item mfg
-            state.itemMfg = item.data;
-            state.type = item.data.NTYPE;
-            state.typeName = this.mapType[item.data.NTYPE] || 'unknown';
-            state.path = item.data.VPATH;
-
-            let dataList: ITEM_MFG_LIST[];
-            switch (state.typeName) {
+            const itemData: ITEM_MFG = item.data;
+            const blockName = itemData.BLOCK_MASTER
+                ? itemData.BLOCK_MASTER.VNAME
+                : null;
+            const itemName = itemData.VITEM_NAME;
+            const itemLists: ITEM_MFG_LIST[] = itemData.ITEM_LIST;
+            const deleteLists: ITEM_MFG_DELETE[] = itemData.DELETE_LIST;
+            const controlLists: CONTROL_DRAWING_PIS[] = itemData.CONTROL_LIST;
+            const typeName: string = this.mapType[itemData.NTYPE] || 'unknown';
+            const masterPath: string = itemData.VPATH;
+            let itemList: ITEM_MFG_LIST = null;
+            const deleteList: string[] =
+                deleteLists
+                    .filter((d) => d.NSTATUS == 1)
+                    .map((d) => d.VDRAWING) || [];
+            const controlList: string[] =
+                controlLists
+                    .filter((c) => c.NSTATUS == 1)
+                    .map((c) => c.VDRAWING) || [];
+            if (!masterPath) {
+                throw new Error(
+                    `Master path not found for item ${itemData.VITEM_NAME}`,
+                );
+            }
+            let drawing: string;
+            let fileName: string;
+            let newfileName: string;
+            switch (typeName) {
                 case 'multi':
-                    await this.getDrawingByIdTag(state);
+                    newfileName = dto.ASERIALNO[0];
+                    fileName = itemData.VFILE;
+                    drawing = await this.getDrawingByIdTag(dto.ASERIALNO[0]);
                     break;
                 case 'pisMulti':
-                    dataList = await this.getList(state);
-                    state.list = this.getListDrawing(
-                        dataList,
-                        await this.getDrawingByPis(state),
-                    );
+                    newfileName = dto.VPIS;
+                    drawing = await this.getDrawingByPis(dto.VPIS, controlList);
+                    itemList = this.getDrawingList(itemLists, drawing);
+                    fileName = itemList.VNUMBER_FILE;
                     break;
                 default:
-                    dataList = await this.getList(state);
-                    state.list = this.getListDrawing(
-                        dataList,
-                        await this.getDrawingByIdTag(state),
-                    );
+                    newfileName = dto.ASERIALNO[0];
+                    drawing = await this.getDrawingByIdTag(dto.ASERIALNO[0]);
+                    itemList = this.getDrawingList(itemLists, drawing);
+                    fileName = itemList.VNUMBER_FILE;
                     break;
             }
 
-            const insert = await this.insertData(state);
-            state.data = insert;
+            const insertData = await this.insertData({
+                blockId: itemData.NBLOCKID,
+                itemId: itemData.NID,
+                drawing: drawing,
+                pis: dto.VPIS,
+                usercreate: dto.NUSERCREATE,
+                typeName: typeName,
+                deleteList: deleteList,
+                path: masterPath,
+            });
 
-            await this.createFile(state);
+            const insertSerial = await this.insertSerial({
+                drawingId: insertData.NID,
+                serialNo: dto.ASERIALNO,
+                userCreate: dto.NUSERCREATE,
+            });
 
-            return state;
+            const destination = await joinPaths(
+                process.env.CHECKSHEET_MFG_FILE_PATH,
+                'temp',
+                'block_' + blockName,
+                'station_' + itemName,
+            );
+            await this.createFile(
+                insertData,
+                masterPath,
+                destination,
+                fileName,
+                newfileName,
+            );
+            const res = await this.mfgDrawingService.findOne(insertData.NID);
+            return {
+                data: res.data,
+                message: 'Create Checksheet Success',
+                status: true,
+            };
         } catch (error) {
             throw new Error('Create Checksheet Failed: ' + error.message);
         }
     }
 
-    async getList(state: State): Promise<ITEM_MFG_LIST[]> {
-        const itemId: number = state.itemId;
-        let itemLists: ITEM_MFG_LIST[] = [];
-        const condition: FiltersDto = {
-            filters: [
-                { field: 'NITEMID', op: 'eq', value: itemId },
-                { field: 'NSTATUS', op: 'eq', value: 1 },
-            ],
-        };
-        const listResult: {
-            status: boolean;
-            data: ITEM_MFG_LIST[];
-            message: string;
-        } = await this.itemMfgListService.search(condition);
-        if (!listResult.status) {
-            throw new Error(`Item Mfg List with item id ${itemId} not found`);
-        }
-        itemLists = listResult.data;
-
-        const deleteResult: {
-            status: boolean;
-            data: ITEM_MFG_DELETE[];
-            message: string;
-        } = await this.itemMfgDeleteService.search(condition);
-        if (deleteResult.status) {
-            state.delete = deleteResult.data?.map((d) => d.VDRAWING) || [];
-        }
-
-        const controlResult: {
-            status: boolean;
-            data: CONTROL_DRAWING_PIS[];
-            message: string;
-        } = await this.controlDrawingPisService.search(condition);
-        if (controlResult.status) {
-            state.control = controlResult.data?.map((c) => c.VDRAWING) || [];
-        }
-
-        return itemLists;
-    }
-
-    async getDrawingByIdTag(state: State): Promise<string> {
-        const serialNo: string[] = state.serialNo;
+    async getDrawingByIdTag(serialNo: string): Promise<string> {
         let controlNo: string = null;
         // หา control no จาก serial no
         const idtagLog: {
@@ -175,15 +165,14 @@ export class MfgDrawingCreateChecksheetService {
             data: IDTAG_EFAC_LOG[];
             message: string;
         } = await this.idtagEfacLogService.search({
-            filters: [{ field: 'LOT_NO', op: 'eq', value: serialNo[0] }],
+            filters: [{ field: 'LOT_NO', op: 'eq', value: serialNo }],
         });
         if (!idtagLog.status) {
             throw new Error(
-                `IDTAG_EFAC_LOG with serial no ${serialNo[0]} not found`,
+                `IDTAG_EFAC_LOG with serial no ${serialNo} not found`,
             );
         }
         controlNo = idtagLog.data[0].CONTROL_NO;
-        state.controlNo = controlNo;
         // หา F110KP ด้วย control no
         const f110kp: { status: boolean; data?: F110KP; message: string } =
             await this.f110kpService.findOne(controlNo);
@@ -191,13 +180,10 @@ export class MfgDrawingCreateChecksheetService {
             throw new Error(`F110KP with control no ${controlNo} not found`);
         }
         // return drawing จาก F110KP
-        state.drawing = f110kp.data.F11K27;
-        return state.drawing;
+        return f110kp.data.F11K27;
     }
 
-    async getDrawingByPis(state: State): Promise<string> {
-        const pis: string = state.pis;
-        const control: string[] = state.control;
+    async getDrawingByPis(pis: string, controls: string[]): Promise<string> {
         const order: string = pis.substring(0, 7);
         const item: string = pis.substring(7, 12);
         // หา S011MP ด้วย order และ item จาก PIS
@@ -215,17 +201,14 @@ export class MfgDrawingCreateChecksheetService {
         }
         // หา drawing ที่ตรงกับ control และไม่อยู่ใน delete list
         const matchdrawing: { drawing: string | null; order: string | null } =
-            this.matchDrawing(control, s011mp.data);
-        if (!matchdrawing) {
+            this.matchDrawing(controls, s011mp.data);
+        // return drawing จาก S011MP
+        if (!matchdrawing && !matchdrawing.drawing) {
             throw new Error(
                 `No matching drawing found in S011MP for order ${order} and item ${item}`,
             );
         }
-        // return drawing จาก S011MP
-        state.drawing = matchdrawing.drawing;
-        state.order = matchdrawing.order;
-        state.item = item;
-        return state.drawing;
+        return matchdrawing.drawing;
     }
 
     matchDrawing(
@@ -256,10 +239,11 @@ export class MfgDrawingCreateChecksheetService {
         };
     }
 
-    getListDrawing(list: ITEM_MFG_LIST[], drawing: string): ITEM_MFG_LIST {
+    getDrawingList(list: ITEM_MFG_LIST[], drawing: string): ITEM_MFG_LIST {
         const matched = list.find(
             (l) =>
-                l.VDRAWING === drawing || drawing.startsWith(l.VDRAWING + ' '),
+                l.NSTATUS == 1 &&
+                (l.VDRAWING === drawing || drawing.startsWith(l.VDRAWING + ' ')),
         );
         if (!matched) {
             throw new Error(
@@ -271,43 +255,61 @@ export class MfgDrawingCreateChecksheetService {
 
     checkDeleteDrawing(deleteDwg: string[], drawing: string): boolean {
         return deleteDwg.some(
-            (e) => drawing === e || drawing.startsWith(e + ' '),
+            (e) => (drawing === e || drawing.startsWith(e + ' ')),
         );
     }
 
-    async insertData(state: State): Promise<MFG_DRAWING[] | any | null> {
+    async insertData({
+        blockId,
+        itemId,
+        drawing,
+        pis,
+        usercreate,
+        typeName,
+        deleteList,
+        path,
+    }: {
+        blockId: number;
+        itemId: number;
+        drawing: string;
+        pis: string;
+        usercreate: number;
+        typeName: string;
+        deleteList: string[];
+        path: string;
+    }): Promise<MFG_DRAWING[] | any | null> {
         try {
             // ตรวจสอบว่ามีข้อมูลที่ตรงกับ blockId, itemId, drawing และ inspector status = 1 อยู่แล้วหรือไม่
             const isDataExist = await this.checkDataExist(
-                state.blockId,
-                state.itemId,
-                state.drawing,
+                blockId,
+                itemId,
+                drawing,
             );
             // สร้างใหม่ ถ้าไม่มีข้อมูลหรือมีแต่ inspector status = 1 แต่ถ้ามีข้อมูลให้ return ข้อมูลนั้นแทน
             const data: any = {
-                NBLOCKID: state.blockId,
-                NITEMID: state.itemId,
-                VPIS: state.pis,
-                VDRAWING: state.drawing,
+                NBLOCKID: blockId,
+                NITEMID: itemId,
+                VPIS: pis,
+                VDRAWING: drawing,
                 NINSPECTOR_STATUS: 1,
                 NFORELEAD_STATUS: 4,
                 VFILE_NAME: null,
                 NSTATUS: 1,
-                NUSERCREATE: state.usercreate,
+                NUSERCREATE: usercreate,
             };
             if (isDataExist.status) {
                 data.NID = isDataExist.data.NID;
-                data.NUSERUPDATE = state.usercreate;
+                data.NUSERUPDATE = usercreate;
                 data.DDATEUPDATE = new Date();
                 // ถ้าไม่ใช่ multi และ drawing อยู่ใน delete list ให้ตั้ง status เป็น 3
                 if (
-                    state.typeName != 'multi' &&
-                    this.checkDeleteDrawing(state.delete, state.drawing)
+                    typeName != 'multi' &&
+                    this.checkDeleteDrawing(deleteList, drawing)
                 ) {
                     data.NSTATUS = 3;
                     if (isDataExist.data.VFILE_NAME) {
                         const filePath = await joinPaths(
-                            state.path,
+                            path,
                             isDataExist.data.VFILE_NAME,
                         );
                         await deleteFile(filePath);
@@ -367,51 +369,76 @@ export class MfgDrawingCreateChecksheetService {
         }
     }
 
-    async createFile(state: State): Promise<void> {
+    async createFile(
+        data: MFG_DRAWING,
+        path: string,
+        destination: string,
+        fileName: string,
+        newName: string,
+    ): Promise<void> {
         try {
-            if (
-                state.data &&
-                state.data.NINSPECTOR_STATUS == 1 &&
-                state.data.NSTATUS == 1
-            ) {
-                const file = await this.getExcelFile(state.list, state.path);
-                console.log('file', file);
-                // ชื่อ block/ชื่อ station/filename
-                const destination = await joinPaths(
-                    process.env.CHECKSHEET_MFG_FILE_PATH,
-                    'temp',
-                    'block_' + state.blockId,
-                    'station_' + state.itemMfg.VITEM_NAME,
-                    
-                ); 
-                await copyFile(file.path, destination, state.serialNo[0]+'.'+ file.extension,);
-
+            if (data && data.NINSPECTOR_STATUS == 1 && data.NSTATUS == 1) {
+                const file = await this.getExcelFile(fileName, path);
+                const filePath = await copyFile(
+                    file.path,
+                    destination,
+                    newName + '.' + file.extension,
+                );
+                await this.mfgDrawingService.update(data.NID, {
+                    VFULL_PATH: filePath,
+                    VFILE_NAME: basename(filePath),
+                    NSTATUS: 4,
+                    DDATEUPDATE: new Date(),
+                    NUSERUPDATE: data.NUSERCREATE,
+                });
             }
         } catch (error) {
             throw new Error('Create File Failed: ' + error.message);
         }
     }
 
-    async getExcelFile(list: ITEM_MFG_LIST, path: string) {
-        const files= await this.fileService.listDir({
+    async getExcelFile(fileName: string, path: string) {
+        const files = await this.fileService.listDir({
             baseDir: path,
             allow: ['xls', 'xlsx'],
             mode: ListMode.FILE,
         });
-        
         const drawingFile = files.find((f) => {
             const nameWithoutExt = f.name.replace(/\.[^/.]+$/, '');
             return (
-                nameWithoutExt === list.VNUMBER_FILE ||
-                nameWithoutExt.startsWith(list.VNUMBER_FILE + ' ')
+                f.name === fileName ||
+                nameWithoutExt === fileName ||
+                nameWithoutExt.startsWith(fileName + ' ')
             );
         });
 
         if (!drawingFile) {
             throw new Error(
-                `File with name ${list.VNUMBER_FILE} not found in path ${path}`,
+                `File with name ${fileName} not found in path ${path}`,
             );
         }
         return drawingFile;
+    }
+
+    async insertSerial({
+        drawingId,
+        serialNo,
+        userCreate,
+    }: {
+        drawingId: number;
+        serialNo: string[];
+        userCreate: number;
+    }) {
+        await this.mfgSerialService.removeByDrawingId(drawingId);
+        const insertBatch = serialNo.map((sn) => ({
+            NDRAWINGID: drawingId,
+            VSERIALNO: sn,
+            NUSERCREATE: userCreate,
+        }));
+        const res = await this.mfgSerialService.create(insertBatch);
+        if (!res) {
+            throw new Error('Insert MFG_SERIAL Failed');
+        }
+        return res;
     }
 }

@@ -29,7 +29,7 @@ import { MailModule } from './services/mail/mail.module';
 import { PDFModule } from './services/pdf/pdf.module';
 import { FilesModule } from './services/file/file.module';
 import ebudgetConfig from './databases/ebudget.config';
-
+import purConfig from './databases/pursys.config';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -48,6 +48,7 @@ import ebudgetConfig from './databases/ebudget.config';
     TypeOrmModule.forRootAsync(escsConfig),
     TypeOrmModule.forRootAsync(pdmConfig),
     TypeOrmModule.forRootAsync(sdsysConfig),
+    TypeOrmModule.forRootAsync(purConfig),
     RedisModule,
     SchedulerModule,
     LoggerModule,

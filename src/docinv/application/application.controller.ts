@@ -40,11 +40,18 @@ export class ApplicationController {
             files.map((file) => {
                 const type = file.originalname.split('-');
                 if (type[0] == 'icon')
-                    body = { ...body, APP_ICON: file.filename };
+                    body = {
+                        ...body,
+                        APP_ICON: `${body.targeturl}/${file.filename}`,
+                    };
                 if (type[0] == 'poster')
-                    body = { ...body, APP_POSTER: file.filename };
+                    body = {
+                        ...body,
+                        APP_POSTER: `${body.targeturl}/${file.filename}`,
+                    };
             });
         }
+
         return this.apps.create(body);
     }
 
@@ -59,11 +66,18 @@ export class ApplicationController {
             files.forEach((file) => {
                 const type = file.originalname.split('-');
                 if (type[0] == 'icon')
-                    body = { ...body, APP_ICON: file.filename };
+                    body = {
+                        ...body,
+                        APP_ICON: `${body.targeturl}/${file.filename}`,
+                    };
                 if (type[0] == 'poster')
-                    body = { ...body, APP_POSTER: file.filename };
+                    body = {
+                        ...body,
+                        APP_POSTER: `${body.targeturl}/${file.filename}`,
+                    };
             });
         }
+        console.log(body);
         return this.apps.update(+id, body);
     }
 }

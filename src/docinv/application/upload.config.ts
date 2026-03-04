@@ -24,8 +24,6 @@ export const multerOptions: MulterOptions = {
     storage: diskStorage({
         destination: (req, file, cb) => {
             const uploadPath = path.join(req.body.destination);
-            console.log(uploadPath);
-
             if (!fs.existsSync(uploadPath)) {
                 fs.mkdirSync(uploadPath, { recursive: true });
             }

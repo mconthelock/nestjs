@@ -28,4 +28,10 @@ export class BuslineController {
   findAll(@Body() q: SearchBuslineDto) {
     return this.bus.findAll(q);
   }
+
+  @Post('deleteCascade')
+  deleteLineCascade(@Body() dto: UpdateBuslineDto) {
+    return this.bus.deleteLineCascade(dto.BUSID);
+  }
+
 }

@@ -17,14 +17,18 @@ export class ItemarrnglstService {
       where: { ORDERNO: ordno, ITEMNO: item },
       order: { SERIALNO: 'ASC' },
     });
-    const rows = [];
+    let rows = [];
     let i = 0;
     let x = 0;
-
     for (const row of data) {
+      if (rows[i] === undefined && row.BMCLS !== 'A') continue;
       if (row.BMCLS === 'A' && row.TOTALQTY !== null) {
-        if (x > 0) i++;
+        if (x > 0) {
+          rows[i].variable = rows[i].variable.replaceAll(',,', ',');
+          i++;
+        }
         rows[i] = {
+          seq: row.SERIALNO,
           orderno: row.ORDERNO,
           carno: row.ORDERNO.substring(6, 8),
           itemno: row.ITEMNO,
@@ -37,7 +41,7 @@ export class ItemarrnglstService {
         };
       } else if (row.BMCLS === 'B') {
         if (rows[i].variable !== '') {
-          rows[i].variable += ', ' + (row.PARTNO?.trimStart() || '');
+          rows[i].variable += ',' + (row.PARTNO?.trimStart() || '');
         } else {
           rows[i].variable += row.PARTNO?.trimStart() || '';
         }
@@ -46,6 +50,11 @@ export class ItemarrnglstService {
       }
       x++;
     }
+    rows.map((item) => {
+      if (item.variable !== '') {
+        item.variable = item.variable.replaceAll(',', ', ');
+      }
+    });
     return rows;
   }
 

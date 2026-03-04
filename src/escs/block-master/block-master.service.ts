@@ -3,10 +3,14 @@ import { CreateBlockMasterDto } from './dto/create-block-master.dto';
 import { UpdateBlockMasterDto } from './dto/update-block-master.dto';
 import { BlockMasterRepository } from './block-master.repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
+import { ItemMfgService } from '../item-mfg/item-mfg.service';
 
 @Injectable()
 export class BlockMasterService {
-  constructor(private readonly repo: BlockMasterRepository) {}
+  constructor(
+    private readonly repo: BlockMasterRepository,
+    private readonly itemMfgService: ItemMfgService,
+  ) {}
   async create(dto: CreateBlockMasterDto) {
     try {
       const res = await this.repo.create(dto);
@@ -64,7 +68,9 @@ export class BlockMasterService {
         data: res,
       };
     } catch (error) {
-      throw new Error(`Search BLOCK_MASTER by id ${id} Error: ` + error.message);
+      throw new Error(
+        `Search BLOCK_MASTER by id ${id} Error: ` + error.message,
+      );
     }
   }
 
@@ -98,13 +104,32 @@ export class BlockMasterService {
           message: `Update BLOCK_MASTER by id ${id} Failed`,
         };
       }
+      if (dto.NSTATUS != null) {
+        
+        const itemMfg = await this.itemMfgService.search({
+          filters: [{ field: 'NBLOCKID', op: 'eq', value: id }],
+        });
+        if (itemMfg.status) {
+          for (const item of itemMfg.data) {
+            const itemId = item.NID;
+            const update = await this.itemMfgService.update(itemId, {
+              NSTATUS: dto.NSTATUS,
+              NUSERUPDATE: dto.NUSERUPDATE,
+              DDATEUPDATE: dto.DDATEUPDATE,
+            });
+          }
+        }
+      }
+
       return {
         status: true,
         message: `Update BLOCK_MASTER by id ${id} Successfully`,
         data: res,
       };
     } catch (error) {
-      throw new Error(`Update BLOCK_MASTER by id ${id} Error: ` + error.message);
+      throw new Error(
+        `Update BLOCK_MASTER by id ${id} Error: ` + error.message,
+      );
     }
   }
 
@@ -123,7 +148,9 @@ export class BlockMasterService {
         data: res,
       };
     } catch (error) {
-      throw new Error(`Delete BLOCK_MASTER by id ${id} Error: ` + error.message);
+      throw new Error(
+        `Delete BLOCK_MASTER by id ${id} Error: ` + error.message,
+      );
     }
   }
 }

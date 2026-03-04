@@ -12,7 +12,7 @@ import { PackResultDto } from './dto/pack-result.dto';
 @ApiTags('Validate Packing')
 @Controller('packing/vps')
 export class VPSController {
-  constructor(private readonly vpsService: VPSService) {}
+  constructor(private readonly service: VPSService) {}
 
   /**
    * Validate VIS and return corresponding PIS list
@@ -27,7 +27,7 @@ export class VPSController {
   async checkVIS(
     @Body() body: PackVISDto
   ): Promise<PackResultDto> {
-    return this.vpsService.checkVIS(body.vis, body.userId, body.useLocaltb);
+    return this.service.checkVIS(body.vis, body.userId, body.useLocaltb);
   }
 
   /**
@@ -43,7 +43,7 @@ export class VPSController {
   async confirmPIS(
     @Body() body: PackPISDto
   ): Promise<PackResultDto> {
-    return this.vpsService.checkPIS(body.vis, body.pis, body.userId);
+    return this.service.checkPIS(body.vis, body.pis, body.userId);
   }
 
   /**
@@ -58,7 +58,7 @@ export class VPSController {
   async checkCloseVIS(
     @Body() body: PackCloseVISDto
   ): Promise<PackResultDto> {
-    return this.vpsService.checkCloseVIS(body.vis, body.shipcode, body.userId);
+    return this.service.checkCloseVIS(body.vis, body.shipcode, body.userId);
   }
 
   /**
@@ -73,6 +73,6 @@ export class VPSController {
   async lostItem(
     @Body() body: PackVISDto
   ): Promise<PackResultDto> {
-    return this.vpsService.getLostItem(body.vis, body.userId);
+    return this.service.getLostItem(body.vis, body.userId);
   }
 }

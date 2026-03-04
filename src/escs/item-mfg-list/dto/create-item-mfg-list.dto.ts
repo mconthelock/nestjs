@@ -17,15 +17,20 @@ export class CreateItemMfgListDto {
   @Type(() => Number)
   NSHEETID: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @Type(() => String)
-  VNUMBER_FILE: string;
+  VNUMBER_FILE?: string;
 
   @IsOptional()
   @IsString()
   @Type(() => String)
-  VREMARK: string;
+  VREMARK?: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @Type(() => Number)
+  NUSERCREATE: number;
 
   @IsNotEmpty()
   @IsNumber()

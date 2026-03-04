@@ -18,6 +18,11 @@ import { ItemMfgModule } from './item-mfg/item-mfg.module';
 import { ItemMfgTypeModule } from './item-mfg-type/item-mfg-type.module';
 import { ItemSheetMfgModule } from './item-sheet-mfg/item-sheet-mfg.module';
 import { ItemMfgListModule } from './item-mfg-list/item-mfg-list.module';
+import { ItemMfgHistoryModule } from './item-mfg-history/item-mfg-history.module';
+import { ItemMasterAuthorizeModule } from './item-master-authorize/item-master-authorize.module';
+import { ItemMfgDeleteModule } from './item-mfg-delete/item-mfg-delete.module';
+import { ControlDrawingPisModule } from './control-drawing-pis/control-drawing-pis.module';
+import { MfgDrawingModule } from './mfg-drawing/mfg-drawing.module';
 
 @Module({
   imports: [
@@ -40,6 +45,11 @@ import { ItemMfgListModule } from './item-mfg-list/item-mfg-list.module';
     ItemMfgTypeModule,
     ItemSheetMfgModule,
     ItemMfgListModule,
+    ItemMfgHistoryModule,
+    ItemMasterAuthorizeModule,
+    ItemMfgDeleteModule,
+    ControlDrawingPisModule,
+    MfgDrawingModule,
   ],
 })
 export class ESCSModule {}

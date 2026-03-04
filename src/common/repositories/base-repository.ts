@@ -1,5 +1,10 @@
 import { Request } from 'express';
-import { DataSource, EntityManager, Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  DataSource,
+  EntityManager,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm';
 import { ENTITY_MANAGER_KEY } from '../interceptors/transaction.interceptor';
 import { FiltersDto } from '../dto/filter.dto';
 
@@ -10,7 +15,14 @@ export class BaseRepository {
   ) {}
 
   protected get manager(): EntityManager {
-    return this.request[ENTITY_MANAGER_KEY] ?? this.dataSource.manager;
+    // return this.request[ENTITY_MANAGER_KEY] ?? this.dataSource.manager;
+    const txManager = this.request[ENTITY_MANAGER_KEY];
+
+    if (txManager && txManager.connection === this.dataSource) {
+      return txManager;
+    }
+
+    return this.dataSource.manager;
   }
 
   protected getRepository<T>(entityCls: new () => T): Repository<T> {
@@ -61,8 +73,8 @@ export class BaseRepository {
             [param]: f.value,
           });
           break;
-        
-          case 'notIn':
+
+        case 'notIn':
           qb.andWhere(`${alias}.${f.field} NOT IN (:...${param})`, {
             [param]: f.value,
           });

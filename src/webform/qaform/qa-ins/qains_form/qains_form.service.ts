@@ -637,6 +637,7 @@ export class QainsFormService {
         </div>`;
       await this.mailService.sendMail({
         to: semInfo.SRECMAIL,
+        bcc: process.env.MAIL_ADMIN,
         from: 'webflow_admin@mitsubishielevatorasia.co.th',
         subject: `Quality built in item ${item}`,
         html: html,
@@ -1242,6 +1243,7 @@ export class QainsFormService {
     await this.mailService.sendMail({
       to: to,
       cc: cc,
+      bcc: process.env.MAIL_ADMIN,
       from: 'webflow_admin@mitsubishielevatorasia.co.th',
       subject: `แจ้ง Login การเข้าใช้งานโปรแกรม E-Check Sheet สำหรับ Item ${data.QA_ITEM}`,
       html: html,

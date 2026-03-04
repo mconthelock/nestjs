@@ -43,11 +43,14 @@ export class ItemMfgTypeController {
   }
 
   @Patch(':id')
+  @UseInterceptors(getFileUploadInterceptor())
+  @UseTransaction('escsConnection')
   update(@Param('id') id: string, @Body() dto: UpdateItemMfgTypeDto) {
     return this.itemMfgTypeService.update(+id, dto);
   }
 
   @Delete(':id')
+  @UseTransaction('escsConnection')
   remove(@Param('id') id: string) {
     return this.itemMfgTypeService.remove(+id);
   }

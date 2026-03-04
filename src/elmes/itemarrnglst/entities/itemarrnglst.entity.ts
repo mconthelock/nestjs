@@ -34,9 +34,4 @@ export class Itemarrnglst {
 
   @Column()
   REVSUBNO: string;
-
-  // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
-  // ตัวอย่าง:
-  // @ManyToOne(() => User, user => user.posts)
-  // user: User;
 }

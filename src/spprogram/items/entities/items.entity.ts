@@ -61,17 +61,13 @@ export class Items {
   @Column()
   ITEM_THUMB: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column()
   CREATE_AT: Date;
 
   @Column()
   CREATE_BY: string;
 
-  @Column({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
+  @Column()
   UPDATE_AT: Date;
 
   @Column()

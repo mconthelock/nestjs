@@ -1,5 +1,14 @@
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
+
+const setTransformDate = (value) => {
+  console.log('Transforming value:', value);
+  if (value == null || value == undefined || value == '') {
+    return null;
+  }
+  const date = new Date(value);
+  return isNaN(date.getTime()) ? null : date;
+};
 
 export class createGroupDto {
   @IsNumber()
@@ -38,16 +47,19 @@ export class createGroupDto {
   INQG_CLASS?: string;
 
   @IsOptional()
-  @Type(() => Date)
-  INQG_ASG_DATE?: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  @IsDate()
+  INQG_ASG_DATE?: Date | null;
 
   @IsOptional()
-  @Type(() => Date)
-  INQG_DES_DATE?: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  @IsDate()
+  INQG_DES_DATE?: Date | null;
 
   @IsOptional()
-  @Type(() => Date)
-  INQG_CHK_DATE?: Date;
+  @Transform(({ value }) => setTransformDate(value))
+  @IsDate()
+  INQG_CHK_DATE?: Date | null;
 
   @IsString()
   @IsOptional()

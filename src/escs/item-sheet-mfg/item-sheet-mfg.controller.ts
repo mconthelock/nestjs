@@ -36,6 +36,11 @@ export class ItemSheetMfgController {
     return this.itemSheetMfgService.findOne(+id);
   }
 
+  @Get('/item/:itemId')
+  findByItemId(@Param('itemId') itemId: string) {
+    return this.itemSheetMfgService.findByItemId(+itemId);
+  }
+
   @Post('search')
   @UseTransaction('escsConnection')
   async search(@Body() dto: FiltersDto) {
@@ -50,6 +55,7 @@ export class ItemSheetMfgController {
   }
 
   @Delete(':id')
+  @UseTransaction('escsConnection')
   remove(@Param('id') id: string) {
     return this.itemSheetMfgService.remove(+id);
   }

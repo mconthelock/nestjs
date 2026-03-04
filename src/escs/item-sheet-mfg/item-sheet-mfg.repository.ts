@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateItemSheetMfgDto } from './dto/create-item-sheet-mfg.dto';
 import { UpdateItemSheetMfgDto } from './dto/update-item-sheet-mfg.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, Not } from 'typeorm';
 import { REQUEST } from '@nestjs/core';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { ITEM_SHEET_MFG } from 'src/common/Entities/escs/table/ITEM_SHEET_MFG.entity';
@@ -33,6 +33,14 @@ export class ItemSheetMfgRepository extends BaseRepository {
     return this.getRepository(ITEM_SHEET_MFG).findOneBy({ NID: id });
   }
 
+  findByItemId(itemId: number) {
+    return this.getRepository(ITEM_SHEET_MFG).find({
+      where: { NITEMID: itemId },
+      relations: ['ITEM_LIST', 'ITEM_LIST.HISTORY', 'ITEM'],
+      order: { NID: 'ASC' },
+    });
+  }
+
   async search(dto: FiltersDto) {
     const qb = this.manager.createQueryBuilder(ITEM_SHEET_MFG, 'I');
     this.applyFilters(qb, 'I', dto, [
@@ -42,11 +50,26 @@ export class ItemSheetMfgRepository extends BaseRepository {
       'NSTATUS',
       'NSEC_ID',
     ]);
-    return qb.orderBy('I.NID', 'ASC').getMany();
+    return qb
+      .leftJoinAndSelect('I.ITEM_LIST', 'ITEM_LIST')
+      .leftJoinAndSelect('ITEM_LIST.HISTORY', 'HISTORY')
+      .leftJoinAndSelect('I.ITEM', 'ITEM')
+      .orderBy('I.NID', 'ASC')
+      .getMany();
   }
 
   async update(id: number, dto: UpdateItemSheetMfgDto) {
-    return this.getRepository(ITEM_SHEET_MFG).update(id, dto);
+    return this.getRepository(ITEM_SHEET_MFG).update(
+      { NID: id, NSTATUS: Not(3) },
+      dto,
+    );
+  }
+
+  async updateByItemId(ItemId: number, dto: UpdateItemSheetMfgDto) {
+    return this.getRepository(ITEM_SHEET_MFG).update(
+      { NITEMID: ItemId, NSTATUS: Not(3) },
+      dto,
+    );
   }
 
   async remove(id: number) {

@@ -16,7 +16,7 @@ export class History {
   @PrimaryColumn()
   INQH_ACTION: number;
 
-  @Column({ default: () => 'sysdate' })
+  @PrimaryColumn()
   INQH_DATE: Date;
 
   @Column({ default: () => 1 })

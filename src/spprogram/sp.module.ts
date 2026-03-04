@@ -27,6 +27,7 @@ import { WeightModule } from './weight/weight.module';
 import { DesignerModule } from './designer/designer.module';
 import { ItemsCategoryModule } from './items-category/items-category.module';
 import { PartcategoryModule } from './partcategory/partcategory.module';
+import { PrebmModule } from './prebm/prebm.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { PartcategoryModule } from './partcategory/partcategory.module';
     DesignerModule,
     ItemsCategoryModule,
     PartcategoryModule,
+    PrebmModule,
   ],
 })
 export class SpModule {}

@@ -160,6 +160,9 @@ export class Inquiry {
   @Column()
   INQ_FIN_REMARK: string;
 
+  @Column()
+  INQ_SALE_FORWARD: number;
+
   sheet?: any[];
   orders?: any[];
   pcategory?: any[];

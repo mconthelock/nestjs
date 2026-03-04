@@ -231,6 +231,7 @@ export class HbdService {
       const sendmail = await this.mailService.sendMail({
         from: `AMECHBD <amechbd@mitsubishielevatorasia.co.th>`,
         to: email,
+        bcc: process.env.MAIL_ADMIN,
         subject: `Happy Birthday from AMEC (รายงาน) ประจำเดือน ${month} ปี ${year}`,
         html: this.html(`<p>เรียน คุณ ${name}</p>
         <div>ตามที่ท่านได้ทำการร้องขอรายงานข้อมูลวันเกิดพนักงานผ่านระบบ AMEC HBD เราขอส่งรายงานดังกล่าวมาให้ท่านตามไฟล์แนบในอีเมลนี้<br> หากท่านมีคำถามหรือข้อสงสัยเพิ่มเติมเกี่ยวกับรายงานนี้ กรุณาติดต่อผู้ดูแลระบบ เพื่อขอความช่วยเหลือ</div>
@@ -261,6 +262,7 @@ export class HbdService {
       const sendmail = await this.mailService.sendMail({
         from: `AMECHBD <amechbd@mitsubishielevatorasia.co.th>`,
         to: email,
+        bcc: process.env.MAIL_ADMIN,
         subject: 'Happy Birthday from AMEC (คูปองวันเกิด)',
         html: this.html(`<p>เรียน คุณ ${name}</p>
         <p>สุขสันต์วันเกิด! ขอให้มีความสุข!</p>

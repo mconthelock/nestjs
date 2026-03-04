@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
 
 export class createTimelineDto {
@@ -12,6 +12,12 @@ export class createTimelineDto {
   MAR_USER: string;
 
   @IsDate()
-  @Type(() => Date)
+  @Transform(({ value }) => {
+    if (value === null || value === undefined || value === '') {
+      return null;
+    }
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? null : date;
+  })
   MAR_SEND: Date;
 }

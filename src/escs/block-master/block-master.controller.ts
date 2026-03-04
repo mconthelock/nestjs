@@ -41,6 +41,7 @@ export class BlockMasterController {
   }
 
   @Delete(':id')
+  @UseTransaction('escsConnection')
   remove(@Param('id') id: string) {
     return this.blockMasterService.remove(+id);
   }

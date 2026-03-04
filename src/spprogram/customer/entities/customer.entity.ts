@@ -53,6 +53,9 @@ export class Customer {
   @Column()
   CUS_ADJUST: number;
 
+  @Column()
+  CUS_STATUS: string;
+
   @OneToMany(() => ItemsCustomer, (item) => item.customer)
   @JoinColumn({ name: 'CUS_ID', referencedColumnName: 'CUSTOMER_ID' })
   items: ItemsCustomer;

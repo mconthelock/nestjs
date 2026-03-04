@@ -1,7 +1,14 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { ITEM_MFG } from './ITEM_MFG.entity';
 
 @Entity({ name: 'BLOCK_MASTER', schema: 'ESCCHKSHT' })
-export class BlockMaster {
+export class BLOCK_MASTER {
   @PrimaryGeneratedColumn()
   NID: number;
 
@@ -12,6 +19,12 @@ export class BlockMaster {
   VCODE: string;
 
   @Column()
+  NUSERCREATE: number;
+
+  @Column()
+  DDATECREATE: Date;
+
+  @Column()
   NUSERUPDATE: number;
 
   @Column()
@@ -19,4 +32,7 @@ export class BlockMaster {
 
   @Column()
   NSTATUS: number;
+
+  @OneToMany(() => ITEM_MFG, (i) => i.BLOCK_MASTER)
+  ITEM_MFG: ITEM_MFG[];
 }

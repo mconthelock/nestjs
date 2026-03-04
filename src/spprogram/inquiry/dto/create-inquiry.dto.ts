@@ -17,8 +17,8 @@ export class createInqDto {
   @Type(() => Number)
   INQ_STATUS: number;
 
-  @IsDate()
   @Type(() => Date)
+  @IsDate()
   INQ_DATE: Date;
 
   @IsString()
@@ -96,21 +96,25 @@ export class createInqDto {
   @IsOptional()
   INQ_REMARK: string;
 
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  CREATE_AT: Date;
-
   @IsString()
   @IsOptional()
-  CREATE_BY: string;
+  INQ_MAR_REMARK?: string;
 
   @IsDate()
   @IsOptional()
   @Type(() => Date)
-  UPDATE_AT: Date;
+  CREATE_AT?: Date;
 
   @IsString()
   @IsOptional()
-  UPDATE_BY: string;
+  CREATE_BY?: string;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  UPDATE_AT?: Date;
+
+  @IsString()
+  @IsOptional()
+  UPDATE_BY?: string;
 }

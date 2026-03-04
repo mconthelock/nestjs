@@ -2,8 +2,9 @@ import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner, Raw } from 'typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
+import { plainToInstance } from 'class-transformer';
 // ต้อง import oracledb เพื่อกำหนดชนิดข้อมูลของ parameter
-// import * as oracledb from 'oracledb';
+import * as oracledb from 'oracledb';
 
 //Entities
 import { Inquiry } from './entities/inquiry.entity';
@@ -307,6 +308,7 @@ export class InquiryService {
         const group = await runner.manager.findOne(InquiryGroup, {
           where: {
             INQ_ID: inquiry.INQ_ID,
+            INQG_REV: inquiry.INQ_REV,
             INQG_GROUP: item,
             INQG_LATEST: 1,
           },
@@ -315,13 +317,17 @@ export class InquiryService {
         if (!group) {
           await runner.manager.save(InquiryGroup, {
             INQ_ID: inquiry.INQ_ID,
-            INQG_STATUS: inquiry.INQ_STATUS,
-            INQG_REV: '*',
+            INQG_REV: inquiry.INQ_REV,
             INQG_GROUP: item,
+            INQG_STATUS: inquiry.INQ_STATUS,
             INQG_LATEST: 1,
           });
           const savedGroups = await runner.manager.findOne(InquiryGroup, {
-            where: { INQ_ID: inquiry.INQ_ID, INQG_GROUP: item },
+            where: {
+              INQ_ID: inquiry.INQ_ID,
+              INQG_REV: inquiry.INQ_REV,
+              INQG_GROUP: item,
+            },
           });
           group_id = savedGroups.INQG_ID;
         } else {
@@ -380,22 +386,25 @@ export class InquiryService {
       }
 
       if (timelinedata !== undefined) {
+        const timelineDto = plainToInstance(updateTimelineDto, timelinedata);
         const timeline = await runner.manager.findOne(Timeline, {
           where: { INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV },
         });
         if (timeline !== undefined) {
-          Object.assign(timeline, timelinedata);
+          Object.assign(timeline, timelineDto);
           await runner.manager.update(
             Timeline,
             { INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV },
             timeline,
           );
-          console.log('Update Timeline');
-          console.log({ INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV });
-          console.log(timeline);
+          //   console.log('Update Timeline');
+          //   console.log({ INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV });
+          //   console.log(timeline);
         }
       }
-      runner.manager.insert(History, history);
+      if (history !== undefined) {
+        runner.manager.insert(History, history);
+      }
       await runner.commitTransaction();
     } catch (err) {
       await runner.rollbackTransaction();
@@ -552,30 +561,30 @@ export class InquiryService {
     return this.inq.save(inquiry);
   }
 
-  //   async delete(searchDto: searchDto) {
-  //     const params = [
-  //       searchDto.INQ_ID,
-  //       searchDto.INQ_MAR_PIC,
-  //       searchDto.INQ_MAR_REMARK,
-  //       { dir: oracledb.BIND_OUT, type: oracledb.STRING },
-  //     ];
-  //     const sql = `
-  //       BEGIN
-  //         INQUIRY_DELETE(
-  //             P_ID => :1,
-  //             P_USER => :2,
-  //             P_REMARK=> :3,
-  //             P_RESULT => :4
-  //         );
-  //       END;`;
-  //     const result = await this.ds.query(sql, params);
-  //     if (result[0] == null) {
-  //       throw new NotFoundException(
-  //         `Inquiry with ID (${searchDto.INQ_ID}) not found.`,
-  //       );
-  //     }
-  //     return { status: true, title: result[0] };
-  //   }
+  async delete(searchDto: searchDto) {
+    const params = [
+      searchDto.INQ_ID,
+      searchDto.INQ_MAR_PIC,
+      searchDto.INQ_MAR_REMARK,
+      { dir: oracledb.BIND_OUT, type: oracledb.STRING },
+    ];
+    const sql = `
+        BEGIN
+          INQUIRY_DELETE(
+              P_ID => :1,
+              P_USER => :2,
+              P_REMARK=> :3,
+              P_RESULT => :4
+          );
+        END;`;
+    const result = await this.ds.query(sql, params);
+    if (result[0] == null) {
+      throw new NotFoundException(
+        `Inquiry with ID (${searchDto.INQ_ID}) not found.`,
+      );
+    }
+    return { status: true, title: result[0] };
+  }
 
   async updatestatus(id: number, status: number, history?: createHistoryDto) {
     const runner = this.ds.createQueryRunner();

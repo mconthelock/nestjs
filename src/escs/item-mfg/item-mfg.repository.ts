@@ -3,7 +3,7 @@ import { REQUEST } from '@nestjs/core';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Request } from 'express';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource } from 'typeorm';
+import { DataSource, Not } from 'typeorm';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { ITEM_MFG } from 'src/common/Entities/escs/table/ITEM_MFG.entity';
 import { CreateItemMfgDto } from './dto/create-item-mfg.dto';
@@ -48,12 +48,13 @@ export class ItemMfgRepository extends BaseRepository {
       .innerJoinAndSelect('I.USER_SECTION', 'US')
       .innerJoinAndSelect('I.ITEM_STATUS', 'IS')
       .innerJoinAndSelect('I.ITEM_MFG_TYPE', 'IMT')
+      .innerJoinAndSelect('I.BLOCK_MASTER', 'BM')
       .orderBy('I.NID', 'ASC')
       .getMany();
   }
 
   async update(id: number, dto: UpdateItemMfgDto) {
-    return this.getRepository(ITEM_MFG).update(id, dto);
+    return this.getRepository(ITEM_MFG).update({ NID: id, NSTATUS: Not(3) }, dto);
   }
 
   async remove(id: number) {

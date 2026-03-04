@@ -1,131 +1,157 @@
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 import { createTimelineDto } from './create-dto';
 
+const setTransformDate = (value) => {
+  console.log('Transforming value:', value);
+  if (value == null || value == undefined || value == '') {
+    return null;
+  }
+  const date = new Date(value);
+  return isNaN(date.getTime()) ? null : date;
+};
+
 export class updateTimelineDto extends PartialType(createTimelineDto) {
   @IsString()
   @IsOptional()
-  SG_USER: string;
+  SG_USER?: string;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  SG_READ: Date;
+  @IsDate()
+  SG_READ?: Date;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  SG_CONFIRM: Date;
+  @IsDate()
+  SG_CONFIRM?: Date;
 
   @IsString()
   @IsOptional()
-  SE_USER: string;
+  SE_USER?: string;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  SE_READ: Date;
+  @IsDate()
+  SE_READ?: Date;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  SE_CONFIRM: Date;
+  @IsDate()
+  SE_CONFIRM?: Date;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  DE_READ: Date;
+  @IsDate()
+  DE_READ?: Date;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  DE_CONFIRM: Date;
+  @IsDate()
+  DE_CONFIRM?: Date;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  BM_COFIRM: Date;
+  @IsDate()
+  BM_CONFIRM?: Date;
 
   @IsString()
   @IsOptional()
-  PKC_USER: string;
+  PKC_USER?: string;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  PKC_READ: Date;
+  @IsDate()
+  PKC_READ?: Date;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  PKC_CONFIRM: Date;
+  @IsDate()
+  PKC_CONFIRM?: Date;
 
   @IsString()
   @IsOptional()
-  FIN_USER: string;
+  FIN_USER?: string;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  FIN_READ: Date;
+  @IsDate()
+  FIN_READ?: Date;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  FIN_CONFIRM: Date;
+  @IsDate()
+  FIN_CONFIRM?: Date;
 
   @IsString()
   @IsOptional()
-  FCK_USER: string;
+  FCK_USER?: string;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  FCK_READ: Date;
+  @IsDate()
+  FCK_READ?: Date | null;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  FCK_CONFIRM: Date;
+  @IsDate()
+  FCK_CONFIRM?: Date | null;
 
   @IsString()
   @IsOptional()
-  FMN_USER: string;
+  FMN_USER?: string;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  FMN_READ: Date;
+  @IsDate()
+  FMN_READ?: Date;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  FMN_CONFIRM: Date;
+  @IsDate()
+  FMN_CONFIRM?: Date;
 
   @IsString()
   @IsOptional()
-  QT_USER: string;
+  QT_USER?: string;
 
-  @IsDate()
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  QT_READ: Date;
-
   @IsDate()
+  QT_READ?: Date;
+
   @IsOptional()
+  @Transform(({ value }) => setTransformDate(value))
   @Type(() => Date)
-  QT_CONFIRM: Date;
+  @IsDate()
+  QT_CONFIRM?: Date;
 
   @IsString()
   @IsOptional()
-  BYPASS_SE: string;
+  BYPASS_SE?: string;
 
   @IsString()
   @IsOptional()
-  BYPASS_DE: string;
+  BYPASS_DE?: string;
 
   @IsString()
   @IsOptional()
-  SALE_CLASS: string;
+  SALE_CLASS?: string;
 }

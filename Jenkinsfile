@@ -67,7 +67,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: "${env.ENV_CRED_ID}", variable: 'ENV_FILE')]) {
                     sh '''
-                        npm install
+                        npm install --include=dev
                         npm run build
                         cp ${ENV_FILE} .env
                     '''

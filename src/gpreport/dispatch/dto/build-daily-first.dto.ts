@@ -1,21 +1,13 @@
-import {  IsString } from 'class-validator';
+import { IsString } from 'class-validator';
+import { DispatchKeyDto } from './dispatch-key.dto';
 
-export class BuildDailyFirstDto {
+export class BuildDailyFirstDto extends DispatchKeyDto {
   @IsString()
-  workdate: string;             // "YYYY-MM-DD"
-  
-  @IsString()
-  dispatch_type: 'O' | 'W';      // 'O' = OT  | W = WORK
+  timeout_from: string;
 
   @IsString()
-  shift: 'D' | 'N' | 'H';  // D =OT DAY | N = OT NIGHT | H = HOLIDAY
- 
-  @IsString()
-  timeout_from: string;          // "1730" | ""
+  timeout_to: string;
 
   @IsString()
-  timeout_to: string;            // "1930"
-
-  @IsString()
-  update_by: string;             // "JOB" หรือ empno
+  update_by: string;
 }

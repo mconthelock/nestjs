@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
-import { GetOrInitDto } from './dto/get-or-init.dto';
 import { SaveDispatchDto } from './dto/save-dispatch.dto';
 import { SaveOverwriteDto } from './dto/save-overwrite.dto';
 import { BuildDailyFirstDto } from './dto/build-daily-first.dto';
@@ -10,7 +9,7 @@ import { BusDispatchHead } from './entities/bus_dispatch_head.entity';
 import { BusDispatchLine } from './entities/bus_dispatch_line.entity';
 import { BusDispatchStop } from './entities/bus_dispatch_stop.entity';
 import { BusDispatchPassenger } from './entities/bus_dispatch_passenger.entity';
-
+import { DispatchKeyDto } from './dto/dispatch-key.dto';
 
 
 @Injectable()
@@ -31,119 +30,6 @@ export class DispatchService {
     @InjectRepository(BusDispatchPassenger, 'gpreportConnection')
     private passRepo: Repository<BusDispatchPassenger>,
 ) {}
-
-async getOrInit(dto: GetOrInitDto) {
-  console.log('[getOrInit] dispatch_date raw =', dto.dispatch_date, 'type =', typeof dto.dispatch_date);
-  const dispatchDate = this.toOracleDateOnly(dto.dispatch_date);
-  const head = await this.headRepo.findOne({
-    where: {
-      dispatch_date: dispatchDate,
-      dispatch_type: dto.dispatch_type,
-      shift: dto.shift,
-    },
-  });
-
-    if (!head) {
-    const created = this.headRepo.create({
-      dispatch_date: dispatchDate,
-      dispatch_type: dto.dispatch_type,
-      shift: dto.shift,
-      status: 'D',
-      update_by: dto.update_by,
-      update_date: new Date(),
-    });
-
-    const savedHead = await this.headRepo.save(created);
-      return {
-        dispatch_id: savedHead.dispatch_id,
-        dispatch_date: this.fmtMMDDYYYY(savedHead.dispatch_date),
-        dispatch_type: savedHead.dispatch_type,
-        shift: savedHead.shift,
-        status: savedHead.status,
-        update_by: savedHead.update_by,
-        update_date: this.fmtMMDDYYYY(savedHead.update_date),
-        lines: [],
-      };
-    }
-
-    // ===== load lines =====
-    const lines = await this.lineRepo.find({
-      where: { dispatch_id: head.dispatch_id } as any,
-    });
-
-    const lineIds = lines.map((l: any) => l.line_id);
-
-    // ===== load stops =====
-    const stops = lineIds.length
-      ? await this.stopRepo.find({
-          where: { line_id: In(lineIds) } as any,
-        })
-      : [];
-
-    const stopDispatchIds = stops.map((s: any) => s.stop_dispatch_id);
-
-    // ===== load passengers =====
-    // สมมติ passenger entity มี stop_dispatch_id
-    const passengers = stopDispatchIds.length
-      ? await this.passRepo.find({
-          where: { stop_dispatch_id: In(stopDispatchIds) } as any,
-        })
-      : [];
-
-    // ===== nest passengers by stop_dispatch_id =====
-    const passengersByStop = new Map<number, any[]>();
-    for (const p of passengers as any[]) {
-      const key = p.stop_dispatch_id;
-      if (!passengersByStop.has(key)) passengersByStop.set(key, []);
-      passengersByStop.get(key)!.push({
-        dispatch_pass_id: p.dispatch_pass_id,
-        empno: p.empno,
-      });
-    }
-
-    // ===== nest stops by line_id =====
-    const stopsByLine = new Map<number, any[]>();
-    for (const s of stops as any[]) {
-      const key = s.line_id;
-      const stopKey = s.stop_dispatch_id;
-
-      const stopOut = {
-        stop_dispatch_id: s.stop_dispatch_id,
-        stop_id: s.stop_id,
-        stop_name: s.stop_name,
-        plan_time: s.plan_time,
-        passenger_count: s.passenger_count,
-        passengers: passengersByStop.get(stopKey) || [],
-      };
-
-      if (!stopsByLine.has(key)) stopsByLine.set(key, []);
-      stopsByLine.get(key)!.push(stopOut);
-    }
-
-    // ===== output lines =====
-    const linesOut = (lines as any[]).map((l) => ({
-      line_id: l.line_id,
-      dispatch_id: l.dispatch_id,
-      busid: l.busid,
-      busname: l.busname,
-      bustype: l.bustype,
-      busseat: l.busseat,
-      line_status: l.line_status,
-      stops: stopsByLine.get(l.line_id) || [],
-    }));
-
-
-    return {
-      dispatch_id: head.dispatch_id,
-      dispatch_date: head.dispatch_date,
-      dispatch_type: head.dispatch_type,
-      shift: head.shift,
-      status: head.status,
-      update_by: head.update_by,
-      update_date: head.update_date,
-      lines: linesOut,
-    };
-  }
 
 
   async saveDispatch(dto: SaveDispatchDto) {
@@ -320,7 +206,6 @@ async getOrInit(dto: GetOrInitDto) {
 
       for (const b of buses) {
         const line_id = lineSeq++;
-
         const line = manager.create(BusDispatchLine, {
           dispatch_id,
           line_id,
@@ -336,7 +221,6 @@ async getOrInit(dto: GetOrInitDto) {
       }
 
       // 6) build STOP groups per BUSID (distinct STOP_ID) + order by ROUTE_SEQ
-      // key = `${busid}|${stop_id}` -> value = { stop_id, line_id }
       const stopKeyByBusStop = new Map<string, { stop_id: number; line_id: number }>();
       for (const [busid, line_id] of lineIdByBusId.entries()) {
         const stopMap = new Map<number, any>();
@@ -370,9 +254,7 @@ async getOrInit(dto: GetOrInitDto) {
             line_id,
             stop_id: s.stop_id,
             stop_name: s.stop_name,
-            seq: stopSeq++,
             plan_time: s.plan_time,
-            passenger_count: 0,
           });
 
           await manager.save(stopEntity);
@@ -424,6 +306,97 @@ async getOrInit(dto: GetOrInitDto) {
 
       return { ok: true, created };
     });
+  }
+
+
+  async getDispatch(dto: DispatchKeyDto) {
+    const workDate = this.toOracleDateOnly(dto.workdate);
+
+    const head = await this.headRepo.findOne({
+      where: {
+        dispatch_date: workDate,
+        dispatch_type: dto.dispatch_type,
+        shift: dto.shift,
+      } as any,
+    });
+
+    if (!head) {
+      return {
+        dispatch_id: null,
+        workdate: dto.workdate,
+        dispatch_type: dto.dispatch_type,
+        shift: dto.shift,
+        status: 'D',
+        update_by: null,
+        update_date: null,
+        lines: [],
+      };
+    }
+
+    const dispatch_id = head.dispatch_id;
+    const [lines, stops, passengers] = await Promise.all([
+      this.lineRepo.find({
+        where: { dispatch_id } as any,
+        order: { line_id: 'ASC' as any },
+      }),
+      this.stopRepo.find({
+        where: { dispatch_id } as any,
+        order: { line_id: 'ASC' as any, stop_id: 'ASC' as any },
+      }),
+      this.passRepo.find({
+        where: { dispatch_id } as any,
+        order: { stop_id: 'ASC' as any, empno: 'ASC' as any },
+      }),
+    ]);
+
+    // passengers by stop_id
+    const passByStopId = new Map<number, Array<{ empno: string }>>();
+    for (const p of passengers) {
+      const sid = Number((p as any).stop_id);
+      if (!passByStopId.has(sid)) passByStopId.set(sid, []);
+      passByStopId.get(sid)!.push({ empno: (p as any).empno });
+    }
+
+    // stops by line_id
+    const stopsByLineId = new Map<number, any[]>();
+    for (const s of stops) {
+      const lid = Number((s as any).line_id);
+      const sid = Number((s as any).stop_id);
+
+      const out = {
+        dispatch_id,
+        line_id: lid,
+        stop_id: sid,
+        stop_name: (s as any).stop_name,
+        plan_time: (s as any).plan_time,
+        passengers: passByStopId.get(sid) || [],
+      };
+
+      if (!stopsByLineId.has(lid)) stopsByLineId.set(lid, []);
+      stopsByLineId.get(lid)!.push(out);
+    }
+
+    const linesOut = lines.map((l) => ({
+      dispatch_id,
+      line_id: Number((l as any).line_id),
+      busid: (l as any).busid,
+      busname: (l as any).busname,
+      bustype: (l as any).bustype,
+      busseat: (l as any).busseat,
+      line_status: (l as any).line_status,
+      stops: stopsByLineId.get(Number((l as any).line_id)) || [],
+    }));
+
+    return {
+      dispatch_id,
+      workdate: dto.workdate,
+      dispatch_type: head.dispatch_type,
+      shift: head.shift,
+      status: head.status,
+      update_by: head.update_by,
+      update_date: head.update_date,
+      lines: linesOut,
+    };
   }
 
 }

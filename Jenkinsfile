@@ -67,7 +67,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: "${env.ENV_CRED_ID}", variable: 'ENV_FILE')]) {
                     sh '''
-                        npm install --include=dev
+                        npm install
                         npm run build
                         cp ${ENV_FILE} .env
                     '''
@@ -142,7 +142,34 @@ pipeline {
                             Set-Location Z:
 
                             cd api
-                            npm install --production
+                            npm install
+                            pm2 reload ecosystem.config.js
+
+                            Remove-PSDrive -Name 'Z' -Force
+                            "
+                        EOF
+                        """
+                    }
+                }
+            },
+            withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
+                    sshagent(credentials: ['ssh-amecweb2']) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
+                            powershell "
+                            \$pass = '${NAS_PASS}'
+                            \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
+                            \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
+
+                            if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
+                                Remove-PSDrive -Name 'Z' -Force
+                            }
+
+                            New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
+                            Set-Location Z:
+
+                            cd api
+                            npm install
                             pm2 reload ecosystem.config.js
 
                             Remove-PSDrive -Name 'Z' -Force

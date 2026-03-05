@@ -109,7 +109,7 @@ pipeline {
 
                             $env:NODE_ENV='development'
                             cd api
-                            npm install --production
+                            npm install --omit=dev
                             pm2 reload ecosystem.config.js --update-env
 
                             Remove-PSDrive -Name 'Z' -Force
@@ -143,7 +143,7 @@ pipeline {
 
                             cd api
                             $env:NODE_ENV='production'
-                            npm install --production
+                            npm install --omit=dev
                             pm2 reload ecosystem.config.js --update-env
 
                             Remove-PSDrive -Name 'Z' -Force

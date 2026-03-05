@@ -8,7 +8,6 @@ pipeline {
 
     environment {
         GIT_SSL_NO_VERIFY = 'true'
-        NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\development"
     }
 
     tools {
@@ -30,6 +29,7 @@ pipeline {
                         env.TARGET_DIR = '/var/amecweb/wwwroot/production/api'
                         env.ENV_CRED_ID = 'api-env-prod'
                         env.NODE_ENV = 'production'
+                        env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\production"
                         echo ">>> MANUAL BUILD: Deploying to PRODUCTION"
                     }
                     // กรณีอื่นๆ (เช่น GitLab Webhook ผลักมา หรือกดมือแต่เลือก development)
@@ -37,6 +37,7 @@ pipeline {
                         env.TARGET_DIR = '/var/amecweb/wwwroot/development/api'
                         env.ENV_CRED_ID = 'api-env-file'
                         env.NODE_ENV = 'development'
+                        env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\development"
 
                         if (!isManualTrigger) {
                             echo ">>> WEBHOOK DETECTED: Auto-deploying to DEVELOPMENT"
@@ -103,7 +104,7 @@ pipeline {
                                 Remove-PSDrive -Name 'Z' -Force
                             }
 
-                            New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
+                            New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
                             Set-Location Z:
 
                             $env:NODE_ENV='development'
@@ -137,7 +138,7 @@ pipeline {
                                 Remove-PSDrive -Name 'Z' -Force
                             }
 
-                            New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
+                            New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
                             Set-Location Z:
 
                             cd api
@@ -163,7 +164,7 @@ pipeline {
                                 Remove-PSDrive -Name 'Z' -Force
                             }
 
-                            New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
+                            New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
                             Set-Location Z:
 
                             cd api

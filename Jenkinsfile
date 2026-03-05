@@ -27,7 +27,7 @@ pipeline {
                     // 2. ตรวจสอบเงื่อนไข
                     // จะไป Production ได้ต้อง: กดมือเอง (Manual) AND เลือก Parameter เป็น production
                     if (isManualTrigger && params.DEPLOY_ENV == 'production') {
-                        env.TARGET_DIR = '/var/amecweb/wwwroot/production/api_test'
+                        env.TARGET_DIR = '/var/amecweb/wwwroot/production/api'
                         env.ENV_CRED_ID = 'api-env-prod'
                         env.NODE_ENV = 'production'
                         echo ">>> MANUAL BUILD: Deploying to PRODUCTION"

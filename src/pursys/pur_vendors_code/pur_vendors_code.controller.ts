@@ -3,11 +3,11 @@ import { PurVendorsCodeService } from './pur_vendors_code.service';
 import { CreatePurVendorsCodeDto } from './dto/create-pur_vendors_code.dto';
 import { UpdatePurVendorsCodeDto } from './dto/update-pur_vendors_code.dto';
 
-@Controller('pur-vendors-code')
+@Controller('pursys/pur_vendors_code')
 export class PurVendorsCodeController {
   constructor(private readonly purVendorsCodeService: PurVendorsCodeService) {}
 
-  @Post()
+  @Post('createvendorcode')
   create(@Body() createPurVendorsCodeDto: CreatePurVendorsCodeDto) {
     return this.purVendorsCodeService.create(createPurVendorsCodeDto);
   }
@@ -22,13 +22,15 @@ export class PurVendorsCodeController {
     return this.purVendorsCodeService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePurVendorsCodeDto: UpdatePurVendorsCodeDto) {
-    return this.purVendorsCodeService.update(+id, updatePurVendorsCodeDto);
+  @Post('updatevendorcode')
+    update(@Body('id') id: number, @Body() updatePurVendorsCodeDto: UpdatePurVendorsCodeDto) {
+    return this.purVendorsCodeService.update(id , updatePurVendorsCodeDto);
+
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Post('deletevendorcode')
+  remove(@Body('id') id: number) {
     return this.purVendorsCodeService.remove(+id);
   }
+
 }

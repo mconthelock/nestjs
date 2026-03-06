@@ -163,7 +163,7 @@ pipeline {
                             Set-Location Z:
 
                             $env:NODE_ENV='production'
-                            cd api
+                            cd api_test
                             pm2 start ecosystem.config.js --update-env
 
                             Remove-PSDrive -Name 'Z' -Force

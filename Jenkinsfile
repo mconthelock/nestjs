@@ -27,7 +27,8 @@ pipeline {
                     // จะไป Production ได้ต้อง: กดมือเอง (Manual) AND เลือก Parameter เป็น production
                     if (isManualTrigger && params.DEPLOY_ENV == 'production') {
                         env.TARGET_DIR = '/var/amecweb/wwwroot/production/api_test'
-                        env.ENV_CRED_ID = 'api-env-prod'
+                        //env.ENV_CRED_ID = 'api-env-prod'
+                        env.ENV_CRED_ID = 'apitest-env-prod'
                         env.NODE_ENV = 'production'
                         env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\production"
                         echo ">>> MANUAL BUILD: Deploying to PRODUCTION"

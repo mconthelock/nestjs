@@ -188,7 +188,7 @@ pipeline {
                             New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
                             Set-Location Z:
 
-                            $env:NODE_ENV='production'
+                            \$env:NODE_ENV='production'
                             cd api_test
                             pm2 start ecosystem.config.js --update-env
 

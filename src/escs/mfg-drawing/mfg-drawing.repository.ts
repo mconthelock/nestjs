@@ -11,47 +11,57 @@ import { MFG_DRAWING } from 'src/common/Entities/escs/table/MFG_DRAWING.entity';
 
 @Injectable()
 export class MfgDrawingRepository extends BaseRepository {
-  constructor(
-    @InjectDataSource('escsConnection') ds: DataSource,
-    @Inject(REQUEST) req: Request,
-  ) {
-    super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
-  }
+    constructor(
+        @InjectDataSource('escsConnection') ds: DataSource,
+        @Inject(REQUEST) req: Request,
+    ) {
+        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+    }
 
-  async create(dto: CreateMfgDrawingDto) {
-    return this.getRepository(MFG_DRAWING).save(dto);
-  }
+    async create(dto: CreateMfgDrawingDto) {
+        return this.getRepository(MFG_DRAWING).save(dto);
+    }
 
-  findAll() {
-    // ใช้ได้ทั้งหมด
-    // return this.manager.query(`select * from MFG_DRAWING`);
-    // return this.getRepository(MFG_DRAWING).find();
-    return this.manager.find(MFG_DRAWING);
-  }
+    findAll() {
+        // ใช้ได้ทั้งหมด
+        // return this.manager.query(`select * from MFG_DRAWING`);
+        // return this.getRepository(MFG_DRAWING).find();
+        return this.manager.find(MFG_DRAWING);
+    }
 
-  findOne(id: number) {
-    return this.getRepository(MFG_DRAWING).findOneBy({ NID: id });
-  }
+    findOne(id: number) {
+        return this.getRepository(MFG_DRAWING).findOne({
+            where: { NID: id },
+            relations: ['MFG_SERIAL', 'INSPECTOR_STATUS', 'FORELEAD_STATUS', 'DRAWING_STATUS'],
+        });
+    }
 
-  async search(dto: FiltersDto) {
-    const qb = this.manager.createQueryBuilder(MFG_DRAWING, 'M');
-    this.applyFilters(qb, 'M', dto, [
-      'NID',
-      'NBLOCKID',
-      'NITEMID',
-      'VPIS',
-      'VDRAWING',
-      'NINSPECTOR_STATUS',
-      'NFORELEAD_STATUS'
-    ]);
-    return qb.orderBy('M.NID, M.NBLOCKID, M.NITEMID, M.VPIS, M.VDRAWING', 'ASC').getMany();
-  }
+    async search(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(MFG_DRAWING, 'M');
+        this.applyFilters(qb, 'M', dto, [
+            'NID',
+            'NBLOCKID',
+            'NITEMID',
+            'VPIS',
+            'VDRAWING',
+            'NINSPECTOR_STATUS',
+            'NFORELEAD_STATUS',
+            'NSTATUS',
+        ]);
+        return qb
+            .leftJoinAndSelect('M.MFG_SERIAL', 'MS')
+            .leftJoinAndSelect('M.INSPECTOR_STATUS', 'IS')
+            .leftJoinAndSelect('M.FORELEAD_STATUS', 'FS')
+            .leftJoinAndSelect('M.DRAWING_STATUS', 'DS')
+            .orderBy('M.NID, M.NBLOCKID, M.NITEMID, M.VPIS, M.VDRAWING', 'ASC')
+            .getMany();
+    }
 
-  async update(id: number, dto: UpdateMfgDrawingDto) {
-    return this.getRepository(MFG_DRAWING).update(id, dto);
-  }
+    async update(id: number, dto: UpdateMfgDrawingDto) {
+        return this.getRepository(MFG_DRAWING).update(id, dto);
+    }
 
-  async remove(id: number) {
-    return this.getRepository(MFG_DRAWING).delete(id);
-  }
+    async remove(id: number) {
+        return this.getRepository(MFG_DRAWING).delete(id);
+    }
 }

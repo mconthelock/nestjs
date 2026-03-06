@@ -3,7 +3,7 @@ const instanceCount = envMode === 'production' ? 4 : 2;
 module.exports = {
     apps: [
         {
-            name: 'api_test',
+            name: 'api',
             script: './dist/main.js',
             exec_mode: 'cluster',
             instances: instanceCount,
@@ -13,8 +13,8 @@ module.exports = {
             error_file: './logs/pm2-err.log',
             out_file: './logs/pm2-out.log',
             log_date_format: 'YYYY-MM-DD HH:mm:ss',
-            wait_ready: false,
-            listen_timeout: 10000,
+            wait_ready: true,
+            listen_timeout: 60000,
             kill_timeout: 5000,
         },
     ],

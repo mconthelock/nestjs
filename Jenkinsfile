@@ -130,9 +130,9 @@ pipeline {
                             New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
                             Set-Location Z:
 
-                            $env:NODE_ENV='development'
+                            \$env:NODE_ENV='development'
                             cd api
-                            pm2 reload ecosystem.config.js --update-env
+                            pm2 reload ecosystem.config.js
 
                             Remove-PSDrive -Name 'Z' -Force
                             "
@@ -148,30 +148,30 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
                     // Server 1: amecweb1
-                    // sshagent(credentials: ['ssh-amecweb1']) {
-                    //     sh """
-                    //         ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
-                    //         powershell "
-                    //         \$pass = '${NAS_PASS}'
-                    //         \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
-                    //         \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
+                    sshagent(credentials: ['ssh-amecweb1']) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
+                            powershell "
+                            \$pass = '${NAS_PASS}'
+                            \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
+                            \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
 
-                    //         if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
-                    //             Remove-PSDrive -Name 'Z' -Force
-                    //         }
+                            if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
+                                Remove-PSDrive -Name 'Z' -Force
+                            }
 
-                    //         New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
-                    //         Set-Location Z:
+                            New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
+                            Set-Location Z:
 
-                    //         $env:NODE_ENV='production'
-                    //         cd api_test
-                    //         pm2 start ecosystem.config.js --update-env
+                            \$env:NODE_ENV='production'
+                            cd api
+                            pm2 reload ecosystem.config.js
 
-                    //         Remove-PSDrive -Name 'Z' -Force
-                    //         "
-                    //     EOF
-                    //     """
-                    // }
+                            Remove-PSDrive -Name 'Z' -Force
+                            "
+                        EOF
+                        """
+                    }
 
                     sshagent(credentials: ['ssh-amecweb2']) {
                         sh """
@@ -189,9 +189,8 @@ pipeline {
                             Set-Location Z:
 
                             \$env:NODE_ENV='production'
-                            cd api_test
+                            cd api
                             pm2 reload ecosystem.config.js
-
                             Remove-PSDrive -Name 'Z' -Force
                             "
                         EOF

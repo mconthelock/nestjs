@@ -77,14 +77,36 @@ pipeline {
             }
         }
 
+        stage('Check dependency change') {
+            steps {
+                script {
+                    def changed = sh(
+                        script: "git diff --name-only HEAD~1 HEAD | grep package-lock.json || true",
+                        returnStdout: true
+                    ).trim()
+
+                    env.NPM_CHANGED = changed ? "true" : "false"
+                }
+            }
+        }
+
         stage('Deploy to NAS') {
             steps {
                 sh '''
                     mkdir -p ${TARGET_DIR}
-                    rsync -rlptvz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
+                    rsync -rlptz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
                     rsync -av public/ ${TARGET_DIR}/public/
                     rsync -vpt package.json package-lock.json ecosystem.config.js .env ${TARGET_DIR}/
                 '''
+                script {
+                    if (env.NPM_CHANGED == "true") {
+                        sh '''
+                            rsync -rlptz --delete node_modules/ ${TARGET_DIR}/node_modules/
+                        '''
+                    } else {
+                        echo "node_modules unchanged, skip sync"
+                    }
+                }
             }
         }
 
@@ -109,7 +131,6 @@ pipeline {
 
                             $env:NODE_ENV='development'
                             cd api
-                            npm install
                             pm2 reload ecosystem.config.js --update-env
 
                             Remove-PSDrive -Name 'Z' -Force
@@ -143,7 +164,6 @@ pipeline {
 
                             cd api
                             $env:NODE_ENV='production'
-                            npm install
                             pm2 reload ecosystem.config.js --update-env
 
                             Remove-PSDrive -Name 'Z' -Force

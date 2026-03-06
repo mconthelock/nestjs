@@ -462,11 +462,8 @@ export class DispatchService {
 
     const linesOut = lines.map((l) => {
       const busid = Number((l as any).busid);
-
       return {
-        dispatch_id,
-        line_id: busid, // เผื่อ frontend เดิมยังอ้าง line_id
-        busid: busid,
+        dispatch_id, line_id: busid, busid: busid,
         busname: (l as any).busname,
         bustype: (l as any).bustype,
         busseat: (l as any).busseat,

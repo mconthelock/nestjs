@@ -4,10 +4,11 @@ import { BusDispatchPassenger } from './bus_dispatch_passenger.entity';
 
 @Entity({ name: 'BUS_DISPATCH_STOP' })
 export class BusDispatchStop {
+
   @PrimaryColumn({ name: 'DISPATCH_ID', type: 'number' })
   dispatch_id: number;
 
-  @Column({ name: 'LINE_ID', type: 'number' })
+  @Column({ name: 'LINE_ID', type: 'number' }) // value = BUSID
   line_id: number;
 
   @PrimaryColumn({ name: 'STOP_ID', type: 'number' })
@@ -19,9 +20,11 @@ export class BusDispatchStop {
   @Column({ name: 'PLAN_TIME', type: 'varchar2', length: 4, nullable: true })
   plan_time: string | null;
 
-
   @ManyToOne(() => BusDispatchLine, (l) => l.stops, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'LINE_ID', referencedColumnName: 'line_id' })
+  @JoinColumn([
+    { name: 'DISPATCH_ID', referencedColumnName: 'dispatch_id' },
+    { name: 'LINE_ID', referencedColumnName: 'busid' },
+  ])
   line: BusDispatchLine;
 
   @OneToMany(() => BusDispatchPassenger, (p) => p.stop)

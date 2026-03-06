@@ -1,18 +1,14 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
 import { BusDispatchHead } from './bus_dispatch_head.entity';
 import { BusDispatchStop } from './bus_dispatch_stop.entity';
-
 
 @Entity({ name: 'BUS_DISPATCH_LINE' })
 export class BusDispatchLine {
   @PrimaryColumn({ name: 'DISPATCH_ID', type: 'number' })
   dispatch_id: number;
 
-  @PrimaryColumn({ name: 'LINE_ID', type: 'number' })
-  line_id: number;
-
-  @Column({ name: 'BUSID', type: 'number', nullable: true })
-  busid: number | null;
+  @PrimaryColumn({ name: 'BUSID', type: 'number' })
+  busid: number;
 
   @Column({ name: 'BUSNAME', type: 'varchar2', length: 100, nullable: true })
   busname: string | null;

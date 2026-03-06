@@ -115,6 +115,7 @@ export class DispatchService {
     return null;
   }
 
+  
  async buildDailyFirst(dto: BuildDailyFirstDto) {
     const workDate = this.toOracleDateOnly(dto.workdate);
     return this.dataSource.transaction(async (manager) => {
@@ -309,94 +310,166 @@ export class DispatchService {
   }
 
 
-  async getDispatch(dto: DispatchKeyDto) {
-    const workDate = this.toOracleDateOnly(dto.workdate);
+async getDispatch(dto: DispatchKeyDto) {
+  const workDate = this.toOracleDateOnly(dto.workdate);
+  const head = await this.headRepo.findOne({
+    where: {
+      dispatch_date: workDate,
+      dispatch_type: dto.dispatch_type,
+      shift: dto.shift,
+    } as any,
+  });
 
-    const head = await this.headRepo.findOne({
-      where: {
-        dispatch_date: workDate,
-        dispatch_type: dto.dispatch_type,
-        shift: dto.shift,
-      } as any,
-    });
-
-    if (!head) {
-      return {
-        dispatch_id: null,
-        workdate: dto.workdate,
-        dispatch_type: dto.dispatch_type,
-        shift: dto.shift,
-        status: 'D',
-        update_by: null,
-        update_date: null,
-        lines: [],
-      };
-    }
-
-    const dispatch_id = head.dispatch_id;
-    const [lines, stops, passengers] = await Promise.all([
-      this.lineRepo.find({
-        where: { dispatch_id } as any,
-        order: { line_id: 'ASC' as any },
-      }),
-      this.stopRepo.find({
-        where: { dispatch_id } as any,
-        order: { line_id: 'ASC' as any, stop_id: 'ASC' as any },
-      }),
-      this.passRepo.find({
-        where: { dispatch_id } as any,
-        order: { stop_id: 'ASC' as any, empno: 'ASC' as any },
-      }),
-    ]);
-
-    // passengers by stop_id
-    const passByStopId = new Map<number, Array<{ empno: string }>>();
-    for (const p of passengers) {
-      const sid = Number((p as any).stop_id);
-      if (!passByStopId.has(sid)) passByStopId.set(sid, []);
-      passByStopId.get(sid)!.push({ empno: (p as any).empno });
-    }
-
-    // stops by line_id
-    const stopsByLineId = new Map<number, any[]>();
-    for (const s of stops) {
-      const lid = Number((s as any).line_id);
-      const sid = Number((s as any).stop_id);
-
-      const out = {
-        dispatch_id,
-        line_id: lid,
-        stop_id: sid,
-        stop_name: (s as any).stop_name,
-        plan_time: (s as any).plan_time,
-        passengers: passByStopId.get(sid) || [],
-      };
-
-      if (!stopsByLineId.has(lid)) stopsByLineId.set(lid, []);
-      stopsByLineId.get(lid)!.push(out);
-    }
-
-    const linesOut = lines.map((l) => ({
-      dispatch_id,
-      line_id: Number((l as any).line_id),
-      busid: (l as any).busid,
-      busname: (l as any).busname,
-      bustype: (l as any).bustype,
-      busseat: (l as any).busseat,
-      line_status: (l as any).line_status,
-      stops: stopsByLineId.get(Number((l as any).line_id)) || [],
-    }));
-
+  if (!head) {
     return {
-      dispatch_id,
+      dispatch_id: null,
       workdate: dto.workdate,
-      dispatch_type: head.dispatch_type,
-      shift: head.shift,
-      status: head.status,
-      update_by: head.update_by,
-      update_date: head.update_date,
-      lines: linesOut,
+      dispatch_type: dto.dispatch_type,
+      shift: dto.shift,
+      status: 'D',
+      update_by: null,
+      update_date: null,
+      lines: [],
     };
   }
+
+  const dispatch_id = head.dispatch_id;
+  const [lines, stops, passengers] = await Promise.all([
+    this.lineRepo.find({
+      where: { dispatch_id } as any,
+      order: { line_id: 'ASC' as any },
+    }),
+    this.stopRepo.find({
+      where: { dispatch_id } as any,
+      order: { line_id: 'ASC' as any, stop_id: 'ASC' as any },
+    }),
+    this.passRepo.find({
+      where: { dispatch_id } as any,
+      order: { stop_id: 'ASC' as any, empno: 'ASC' as any },
+    }),
+  ]);
+
+  // -------------------------------------------------
+  // โหลดข้อมูลพนักงานเพิ่มจาก AMECUSERALL
+  // -------------------------------------------------
+  const empnos = [...new Set(
+    passengers
+      .map((p) => String((p as any).empno || '').trim())
+      .filter(Boolean),
+  )];
+
+  const empInfoMap = new Map<
+    string,
+    {
+      empno: string;
+      engname: string | null;
+      thainame: string | null;
+      ssec: string | null;
+      sdept: string | null;
+      sdiv: string | null;
+    }
+  >();
+
+  if (empnos.length) {
+    const bindSql = empnos.map((_, i) => `:${i + 1}`).join(',');
+
+    const empRows: any[] = await this.dataSource.query(
+      `
+      SELECT
+        U.SEMPNO,
+        U.SSEC,
+        U.SDEPT,
+        U.SDIV,
+        U.SNAME,
+        U.STNAME AS STNAME
+      FROM AMEC.AMECUSERALL U
+      WHERE U.SEMPNO IN (${bindSql})
+      `,
+      empnos,
+    );
+
+    for (const r of empRows) {
+      const empno = String(r.SEMPNO).trim();
+      empInfoMap.set(empno, {
+        empno,
+        engname: r.SNAME ?? null,
+        thainame: r.STNAME ?? null,
+        ssec: r.SSEC ?? null,
+        sdept: r.SDEPT ?? null,
+        sdiv: r.SDIV ?? null,
+      });
+    }
+  }
+
+  // passengers by stop_id
+  const passByStopId = new Map<
+    number,
+    Array<{
+      empno: string;
+      engname: string | null;
+      thainame: string | null;
+      ssec: string | null;
+      sdept: string | null;
+      sdiv: string | null;
+    }>
+  >();
+
+  for (const p of passengers) {
+    const sid = Number((p as any).stop_id);
+    const empno = String((p as any).empno).trim();
+    const empInfo = empInfoMap.get(empno);
+
+    if (!passByStopId.has(sid)) passByStopId.set(sid, []);
+    passByStopId.get(sid)!.push({
+      empno,
+      engname: empInfo?.engname ?? null,
+      thainame: empInfo?.thainame ?? null,
+      ssec: empInfo?.ssec ?? null,
+      sdept: empInfo?.sdept ?? null,
+      sdiv: empInfo?.sdiv ?? null,
+    });
+  }
+
+  // stops by line_id
+  const stopsByLineId = new Map<number, any[]>();
+  for (const s of stops) {
+    const lid = Number((s as any).line_id);
+    const sid = Number((s as any).stop_id);
+
+    const out = {
+      dispatch_id,
+      line_id: lid,
+      stop_id: sid,
+      stop_name: (s as any).stop_name,
+      plan_time: (s as any).plan_time,
+      passengers: passByStopId.get(sid) || [],
+    };
+
+    if (!stopsByLineId.has(lid)) stopsByLineId.set(lid, []);
+    stopsByLineId.get(lid)!.push(out);
+  }
+
+  const linesOut = lines.map((l) => ({
+    dispatch_id,
+    line_id: Number((l as any).line_id),
+    busid: (l as any).busid,
+    busname: (l as any).busname,
+    bustype: (l as any).bustype,
+    busseat: (l as any).busseat,
+    line_status: (l as any).line_status,
+    stops: stopsByLineId.get(Number((l as any).line_id)) || [],
+  }));
+
+  return {
+    dispatch_id,
+    workdate: dto.workdate,
+    dispatch_type: head.dispatch_type,
+    shift: head.shift,
+    status: head.status,
+    update_by: head.update_by,
+    update_date: head.update_date,
+    lines: linesOut,
+  };
+}
 
 }

@@ -3,7 +3,7 @@ const instanceCount = envMode === 'production' ? 4 : 2;
 module.exports = {
     apps: [
         {
-            name: 'api',
+            name: 'api_test',
             script: './dist/main.js',
             exec_mode: 'cluster',
             instances: instanceCount,

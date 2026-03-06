@@ -32,7 +32,9 @@ export class PurVendorsCode {
     @Column()
     CODE_TYPE: number;
 
-    @ManyToOne(() => PurVendor, (vendor) => vendor.codes)
+    @ManyToOne(() => PurVendor, (vendor) => vendor.codes,{
+      onDelete: 'CASCADE'
+    })
     @JoinColumn({ name: 'VENDOR_ID' })
     vendor: PurVendor;  
 }

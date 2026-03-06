@@ -61,7 +61,9 @@ export class PurVendor {
 
   @Column()
   ADDR_WEB: string;
-  @OneToMany(() => PurVendorsCode, (code) => code.vendor)
+  @OneToMany(() => PurVendorsCode, (code) => code.vendor,{
+    cascade: true,
+  })
   codes: PurVendorsCode[];
 
 }

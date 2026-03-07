@@ -94,8 +94,10 @@ export async function copyFile(
 export async function deleteFile(path: string) {
     try {
         await fs.rm(path, { force: true, maxRetries: 2, retryDelay: 100 }); // ลบไฟล์ force = ไม่ throw error
+        return true;
     } catch (err: any) {
         console.warn(`ลบไฟล์ ${path} ไม่สำเร็จ:`, err.message);
+        return false;
     }
 }
 

@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { MFG_SERIAL } from './MFG_SERIAL.entity';
 import { SYS_STATUS } from './SYS_STATUS.entity';
+import { MFG_DRAWING_ACTION } from './MFG_DRAWING_ACTION.entity';
 
 @Entity({ name: 'MFG_DRAWING', schema: 'ESCCHKSHT' })
 export class MFG_DRAWING {
@@ -78,10 +79,13 @@ export class MFG_DRAWING {
     ])
     FORELEAD_STATUS: SYS_STATUS;
 
-    @ManyToOne(() => SYS_STATUS, (s) => s.MFG_DRAWINGS_DRAWING)
+    @ManyToOne(() => SYS_STATUS, (s) => s.MFG_DRAWING)
     @JoinColumn([
         { name: 'NSTATUS', referencedColumnName: 'ST_ID' },
         { name: 'VSTATUSCODE', referencedColumnName: 'ST_CODE' },
     ])
     DRAWING_STATUS: SYS_STATUS;
+
+    @OneToMany(() => MFG_DRAWING_ACTION, (a) => a.DRAWING)
+    ACTIONS: MFG_DRAWING_ACTION[];
 }

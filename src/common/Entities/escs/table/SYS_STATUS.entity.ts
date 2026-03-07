@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { MFG_DRAWING } from './MFG_DRAWING.entity';
+import { MFG_DRAWING_ACTION } from './MFG_DRAWING_ACTION.entity';
 
 @Entity({ name: 'SYS_STATUS', schema: 'ESCCHKSHT' })
 export class SYS_STATUS {
@@ -22,5 +23,8 @@ export class SYS_STATUS {
     MFG_DRAWINGS_FORELEAD: MFG_DRAWING[];
 
     @OneToMany(() => MFG_DRAWING, (m) => m.DRAWING_STATUS)
-    MFG_DRAWINGS_DRAWING: MFG_DRAWING[];
+    MFG_DRAWING: MFG_DRAWING[];
+
+    @OneToMany(() => MFG_DRAWING_ACTION, (m) => m.STATUS)
+    MFG_DRAWING_ACTION: MFG_DRAWING_ACTION[];
 }

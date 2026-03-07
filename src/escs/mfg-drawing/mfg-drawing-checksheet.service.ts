@@ -127,11 +127,13 @@ export class MfgDrawingCreateChecksheetService {
                 path: masterPath,
             });
 
-            const insertSerial = await this.insertSerial({
-                drawingId: insertData.NID,
-                serialNo: dto.ASERIALNO,
-                userCreate: dto.NUSERCREATE,
-            });
+            if(this.isEditable(insertData.NINSPECTOR_STATUS)){
+                const insertSerial = await this.insertSerial({
+                    drawingId: insertData.NID,
+                    serialNo: dto.ASERIALNO,
+                    userCreate: dto.NUSERCREATE,
+                });
+            }
 
             const destination = await joinPaths(
                 process.env.CHECKSHEET_MFG_FILE_PATH,

@@ -32,7 +32,7 @@ export class MfgDrawingRepository extends BaseRepository {
     findOne(id: number) {
         return this.getRepository(MFG_DRAWING).findOne({
             where: { NID: id },
-            relations: ['MFG_SERIAL', 'INSPECTOR_STATUS', 'FORELEAD_STATUS', 'DRAWING_STATUS'],
+            relations: ['MFG_SERIAL', 'INSPECTOR_STATUS', 'FORELEAD_STATUS', 'DRAWING_STATUS', 'ACTIONS' , 'ACTIONS.STATUS', 'ACTIONS.USERS'],
         });
     }
 
@@ -53,6 +53,7 @@ export class MfgDrawingRepository extends BaseRepository {
             .leftJoinAndSelect('M.INSPECTOR_STATUS', 'IS')
             .leftJoinAndSelect('M.FORELEAD_STATUS', 'FS')
             .leftJoinAndSelect('M.DRAWING_STATUS', 'DS')
+            .leftJoinAndSelect('M.ACTIONS', 'A')
             .orderBy('M.NID, M.NBLOCKID, M.NITEMID, M.VPIS, M.VDRAWING', 'ASC')
             .getMany();
     }

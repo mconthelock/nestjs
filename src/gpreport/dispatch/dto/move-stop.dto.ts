@@ -14,6 +14,13 @@ export class MoveStopDto {
   target_line_id: string;
 
   @IsNotEmpty()
+  @IsNumberString()
+  stop_name?: string;
+
+  @IsNumberString()
+  plan_time?: string;
+
+  @IsNotEmpty()
   @IsString()
   update_by: string;
 }

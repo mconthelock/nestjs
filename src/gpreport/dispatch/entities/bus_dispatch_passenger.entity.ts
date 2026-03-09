@@ -12,10 +12,15 @@ export class BusDispatchPassenger {
   @PrimaryColumn({ name: 'EMPNO', type: 'varchar2', length: 5 })
   empno: string;
 
+  @Column({ name: 'STATUS', type: 'varchar2', length: 1, default: () => "'E'" })
+  status: string;
+
   @ManyToOne(() => BusDispatchStop, (s) => s.passengers, { onDelete: 'CASCADE' })
   @JoinColumn([
     { name: 'DISPATCH_ID', referencedColumnName: 'dispatch_id' },
     { name: 'STOP_ID', referencedColumnName: 'stop_id' },
   ])
   stop: BusDispatchStop;
+  
 }
+

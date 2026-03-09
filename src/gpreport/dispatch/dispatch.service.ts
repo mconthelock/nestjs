@@ -301,6 +301,7 @@ export class DispatchService {
               dispatch_id,
               stop_id,
               empno,
+              status: 'E',
             }),
           );
         }
@@ -326,6 +327,7 @@ export class DispatchService {
 
   async getDispatch(dto: DispatchKeyDto) {
     const workDate = this.toOracleDateOnly(dto.workdate);
+
     const head = await this.headRepo.findOne({
       where: {
         dispatch_date: workDate,
@@ -348,17 +350,20 @@ export class DispatchService {
     }
 
     const dispatch_id = head.dispatch_id;
+
     const [lines, stops, passengers] = await Promise.all([
       this.lineRepo.find({
         where: { dispatch_id } as any,
         order: { busid: 'ASC' as any },
       }),
+
       this.stopRepo.find({
         where: { dispatch_id } as any,
         order: { line_id: 'ASC' as any, stop_id: 'ASC' as any },
       }),
+
       this.passRepo.find({
-        where: { dispatch_id } as any,
+        where: { dispatch_id, status: 'E' } as any,
         order: { stop_id: 'ASC' as any, empno: 'ASC' as any },
       }),
     ]);
@@ -403,6 +408,7 @@ export class DispatchService {
 
       for (const r of empRows) {
         const empno = String(r.SEMPNO).trim();
+
         empInfoMap.set(empno, {
           empno,
           engname: r.SNAME ?? null,
@@ -432,6 +438,7 @@ export class DispatchService {
       const empInfo = empInfoMap.get(empno);
 
       if (!passByStopId.has(sid)) passByStopId.set(sid, []);
+
       passByStopId.get(sid)!.push({
         empno,
         engname: empInfo?.engname ?? null,
@@ -443,8 +450,9 @@ export class DispatchService {
     }
 
     const stopsByLineId = new Map<number, any[]>();
+
     for (const s of stops) {
-      const lid = Number((s as any).line_id); // ตอนนี้ lid = busid
+      const lid = Number((s as any).line_id);
       const sid = Number((s as any).stop_id);
 
       const out = {
@@ -453,22 +461,35 @@ export class DispatchService {
         stop_id: sid,
         stop_name: (s as any).stop_name,
         plan_time: (s as any).plan_time,
+        passenger_count: (passByStopId.get(sid) || []).length,
         passengers: passByStopId.get(sid) || [],
       };
 
       if (!stopsByLineId.has(lid)) stopsByLineId.set(lid, []);
+
       stopsByLineId.get(lid)!.push(out);
     }
 
     const linesOut = lines.map((l) => {
       const busid = Number((l as any).busid);
+
+      const lineStops = stopsByLineId.get(busid) || [];
+
+      const passenger_count = lineStops.reduce(
+        (sum, stop) => sum + (stop.passengers?.length || 0),
+        0,
+      );
+
       return {
-        dispatch_id, line_id: busid, busid: busid,
+        dispatch_id,
+        line_id: busid,
+        busid,
         busname: (l as any).busname,
         bustype: (l as any).bustype,
         busseat: (l as any).busseat,
         line_status: (l as any).line_status,
-        stops: stopsByLineId.get(busid) || [],
+        passenger_count,
+        stops: lineStops,
       };
     });
 
@@ -486,24 +507,123 @@ export class DispatchService {
 
   async moveStop(dto: MoveStopDto) {
     return this.dataSource.transaction(async (manager) => {
+
       const dispatch_id = Number(dto.dispatch_id);
       const stop_id = Number(dto.stop_id);
-      const target_line_id = Number(dto.target_line_id);
-      const head = await manager.findOne(BusDispatchHead, { where: { dispatch_id }, });
+
+      const head = await manager.findOne(BusDispatchHead, {
+        where: { dispatch_id },
+      });
+
       if (!head) throw new Error('DISPATCH_NOT_FOUND');
       if (head.status === 'C') throw new Error('DISPATCH_CLOSED');
 
-      const stop = await manager.findOne(BusDispatchStop, { where: { dispatch_id,stop_id,},});
+      const stop = await manager.findOne(BusDispatchStop, {
+        where: { dispatch_id, stop_id },
+      });
+
       if (!stop) throw new Error('STOP_NOT_FOUND');
-      const targetLine = await manager.findOne(BusDispatchLine, { where: {dispatch_id,busid: target_line_id,}, });
-      if (!targetLine) throw new Error('TARGET_LINE_NOT_FOUND');
-      stop.line_id = target_line_id;
+
+      // ---------- move line ----------
+      if (dto.target_line_id !== undefined) {
+        const target_line_id = Number(dto.target_line_id);
+
+        const targetLine = await manager.findOne(BusDispatchLine, {
+          where: { dispatch_id, busid: target_line_id },
+        });
+
+        if (!targetLine) throw new Error('TARGET_LINE_NOT_FOUND');
+
+        stop.line_id = target_line_id;
+      }
+
+      // ---------- update stop name ----------
+      if (dto.stop_name !== undefined) {
+        stop.stop_name = String(dto.stop_name).trim();
+      }
+
+      // ---------- update plan time ----------
+      if (dto.plan_time !== undefined) {
+        stop.plan_time = dto.plan_time;
+      }
+
       await manager.save(BusDispatchStop, stop);
+
       head.update_by = dto.update_by;
       head.update_date = new Date();
       await manager.save(BusDispatchHead, head);
 
-      return { ok: true, dispatch_id, stop_id, line_id: target_line_id,};
+      return {
+        ok: true,
+        dispatch_id,
+        stop_id,
+        line_id: stop.line_id,
+        stop_name: stop.stop_name,
+        plan_time: stop.plan_time,
+      };
+    });
+  }
+
+  async disablePassenger(dto: { dispatch_id: number; empno: string; update_by: string }) {
+    return this.dataSource.transaction(async (manager) => {
+      const dispatch_id = Number(dto.dispatch_id);
+      const empno = String(dto.empno).trim();
+
+      const head = await manager.findOne(BusDispatchHead, {
+        where: { dispatch_id },
+      });
+      if (!head) throw new Error('DISPATCH_NOT_FOUND');
+      if (head.status === 'C') throw new Error('DISPATCH_CLOSED');
+
+      const passenger = await manager.findOne(BusDispatchPassenger, {
+        where: { dispatch_id, empno } as any,
+      });
+      if (!passenger) throw new Error('PASSENGER_NOT_FOUND');
+
+      passenger.status = 'D';
+      await manager.save(BusDispatchPassenger, passenger);
+
+      head.update_by = dto.update_by;
+      head.update_date = new Date();
+      await manager.save(BusDispatchHead, head);
+
+      return { ok: true, dispatch_id, empno, status: 'D' };
+    });
+  }
+
+  async upsertPassenger(dto: { dispatch_id: number; stop_id: number; empno: string; update_by: string }) {
+    return this.dataSource.transaction(async (manager) => {
+      const dispatch_id = Number(dto.dispatch_id);
+      const stop_id = Number(dto.stop_id);
+      const empno = String(dto.empno).trim();
+      const head = await manager.findOne(BusDispatchHead, { where: { dispatch_id }, });
+      if (!head) throw new Error('DISPATCH_NOT_FOUND');
+      if (head.status === 'C') throw new Error('DISPATCH_CLOSED');
+
+      const stop = await manager.findOne(BusDispatchStop, {  where: { dispatch_id, stop_id } as any, });
+      if (!stop) throw new Error('STOP_NOT_FOUND');
+
+      let passenger = await manager.findOne(BusDispatchPassenger, {  where: { dispatch_id, empno } as any, });
+
+      if (passenger) {
+        passenger.stop_id = stop_id;
+        passenger.status = 'E';
+        await manager.save(BusDispatchPassenger, passenger);
+      } else {
+        passenger = manager.create(BusDispatchPassenger, {
+          dispatch_id,
+          stop_id,
+          empno,
+          status: 'E',
+        });
+        await manager.save(BusDispatchPassenger, passenger);
+      }
+
+      head.update_by = dto.update_by;
+      head.update_date = new Date();
+      await manager.save(BusDispatchHead, head);
+
+      return { ok: true, dispatch_id, stop_id, empno };
     });
   }
 }

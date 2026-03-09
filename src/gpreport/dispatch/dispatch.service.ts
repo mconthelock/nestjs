@@ -44,7 +44,6 @@ export class DispatchService {
     head.update_date = new Date();
 
     await this.headRepo.save(head);
-
     return { dispatch_id: head.dispatch_id, status: head.status };
   }
 
@@ -578,15 +577,36 @@ export class DispatchService {
     return this.dataSource.transaction(async (manager) => {
       const dispatch_id = Number(dto.dispatch_id);
       const stop_id = Number(dto.stop_id);
-      const empno = String(dto.empno).trim();
-      const head = await manager.findOne(BusDispatchHead, { where: { dispatch_id }, });
+      const empno = String(dto.empno || '').trim();
+      if (!dispatch_id) throw new Error('DISPATCH_ID_REQUIRED');
+      if (!stop_id) throw new Error('STOP_ID_REQUIRED');
+      if (!empno) throw new Error('EMPNO_REQUIRED');
+
+      const head = await manager.findOne(BusDispatchHead, {
+        where: { dispatch_id },
+      });
       if (!head) throw new Error('DISPATCH_NOT_FOUND');
       if (head.status === 'C') throw new Error('DISPATCH_CLOSED');
 
-      const stop = await manager.findOne(BusDispatchStop, {  where: { dispatch_id, stop_id } as any, });
+      const stop = await manager.findOne(BusDispatchStop, {
+        where: { dispatch_id, stop_id } as any,
+      });
       if (!stop) throw new Error('STOP_NOT_FOUND');
 
-      let passenger = await manager.findOne(BusDispatchPassenger, {  where: { dispatch_id, empno } as any, });
+      const empRows: any[] = await manager.query(
+        `
+        SELECT U.SEMPNO, U.STNAME, U.CSTATUS
+        FROM AMEC.AMECUSERALL U
+        WHERE U.SEMPNO = :1
+        `,
+        [empno],
+      );
+
+      if (!empRows.length) throw new Error('EMPLOYEE_NOT_FOUND');
+
+      let passenger = await manager.findOne(BusDispatchPassenger, {
+        where: { dispatch_id, empno } as any,
+      });
 
       if (passenger) {
         passenger.stop_id = stop_id;
@@ -606,7 +626,16 @@ export class DispatchService {
       head.update_date = new Date();
       await manager.save(BusDispatchHead, head);
 
-      return { ok: true, dispatch_id, stop_id, empno };
+      return {
+        ok: true,
+        dispatch_id,
+        stop_id,
+        empno,
+        status: 'E',
+      };
     });
   }
+
+
+
 }

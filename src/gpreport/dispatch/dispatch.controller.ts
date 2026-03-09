@@ -1,6 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { DispatchService } from './dispatch.service';
-import { GetOrInitDto } from './dto/get-or-init.dto';
 import { SaveDispatchDto } from './dto/save-dispatch.dto';
 import { SaveOverwriteDto } from './dto/save-overwrite.dto';
 import { BuildDailyFirstDto } from './dto/build-daily-first.dto';

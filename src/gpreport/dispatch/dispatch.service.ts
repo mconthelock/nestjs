@@ -507,46 +507,29 @@ export class DispatchService {
 
   async moveStop(dto: MoveStopDto) {
     return this.dataSource.transaction(async (manager) => {
-
       const dispatch_id = Number(dto.dispatch_id);
       const stop_id = Number(dto.stop_id);
-
-      const head = await manager.findOne(BusDispatchHead, {
-        where: { dispatch_id },
-      });
+      const head = await manager.findOne(BusDispatchHead, {  where: { dispatch_id },  });
 
       if (!head) throw new Error('DISPATCH_NOT_FOUND');
       if (head.status === 'C') throw new Error('DISPATCH_CLOSED');
 
-      const stop = await manager.findOne(BusDispatchStop, {
-        where: { dispatch_id, stop_id },
-      });
+      const stop = await manager.findOne(BusDispatchStop, { where: { dispatch_id, stop_id },});
 
       if (!stop) throw new Error('STOP_NOT_FOUND');
-
       // ---------- move line ----------
       if (dto.target_line_id !== undefined) {
         const target_line_id = Number(dto.target_line_id);
-
-        const targetLine = await manager.findOne(BusDispatchLine, {
-          where: { dispatch_id, busid: target_line_id },
-        });
-
+        const targetLine = await manager.findOne(BusDispatchLine, { where: { dispatch_id, busid: target_line_id }, });
         if (!targetLine) throw new Error('TARGET_LINE_NOT_FOUND');
-
         stop.line_id = target_line_id;
       }
 
       // ---------- update stop name ----------
-      if (dto.stop_name !== undefined) {
-        stop.stop_name = String(dto.stop_name).trim();
-      }
+      if (dto.stop_name !== undefined) {  stop.stop_name = String(dto.stop_name).trim(); }
 
       // ---------- update plan time ----------
-      if (dto.plan_time !== undefined) {
-        stop.plan_time = dto.plan_time;
-      }
-
+      if (dto.plan_time !== undefined) {  stop.plan_time = dto.plan_time; }
       await manager.save(BusDispatchStop, stop);
 
       head.update_by = dto.update_by;

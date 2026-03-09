@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumberString, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumberString, IsOptional, IsString } from 'class-validator';
 
 export class MoveStopDto {
   @IsNotEmpty()
@@ -17,6 +17,7 @@ export class MoveStopDto {
   @IsNumberString()
   stop_name?: string;
 
+  @IsOptional()
   @IsNumberString()
   plan_time?: string;
 

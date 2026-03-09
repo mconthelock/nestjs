@@ -29,4 +29,10 @@ export class DispatchController {
   async moveStop(@Body() dto: MoveStopDto) {
     return this.service.moveStop(dto);
   }
+
+  @Post('disable-passenger')
+  disablePassenger(@Body() dto: { dispatch_id: number; empno: string; update_by: string }) {
+    return this.service.disablePassenger(dto);
+  }
+  
 }

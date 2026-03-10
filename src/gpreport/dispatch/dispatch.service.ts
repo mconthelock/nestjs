@@ -5,10 +5,10 @@ import { SaveDispatchDto } from './dto/save-dispatch.dto';
 import { SaveOverwriteDto } from './dto/save-overwrite.dto';
 import { BuildDailyFirstDto } from './dto/build-daily-first.dto';
 
-import { BusDispatchHead } from './entities/bus_dispatch_head.entity';
-import { BusDispatchLine } from './entities/bus_dispatch_line.entity';
-import { BusDispatchStop } from './entities/bus_dispatch_stop.entity';
-import { BusDispatchPassenger } from './entities/bus_dispatch_passenger.entity';
+import { BusDispatchHead } from '../../common/Entities/gpreport/table/bus_dispatch_head.entity';
+import { BusDispatchLine } from '../../common/Entities/gpreport/table/bus_dispatch_line.entity';
+import { BusDispatchStop } from '../../common/Entities/gpreport/table/bus_dispatch_stop.entity';
+import { BusDispatchPassenger } from '../../common/Entities/gpreport/table/bus_dispatch_passenger.entity';
 import { DispatchKeyDto } from './dto/dispatch-key.dto';
 import { MoveStopDto } from './dto/move-stop.dto';
 import { DeleteLineDto } from './dto/delete-line.dto';
@@ -49,40 +49,6 @@ export class DispatchService {
     return { dispatch_id: head.dispatch_id, status: head.status };
   }
 
-  private toOracleDateOnly(input: any): Date {
-    if (input === null || input === undefined) {
-      throw new Error('INVALID_DATE_FORMAT');
-    }
-
-    if (input instanceof Date && !isNaN(input.getTime())) {
-      return new Date(input.getFullYear(), input.getMonth(), input.getDate());
-    }
-
-    const s = String(input).trim();
-
-    const iso = new Date(s);
-    if (!isNaN(iso.getTime())) {
-      return new Date(iso.getFullYear(), iso.getMonth(), iso.getDate());
-    }
-
-    const m1 = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (m1) {
-      const y = Number(m1[1]);
-      const m = Number(m1[2]);
-      const d = Number(m1[3]);
-      return new Date(y, m - 1, d);
-    }
-
-    const m2 = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-    if (m2) {
-      const d = Number(m2[1]);
-      const m = Number(m2[2]);
-      const y = Number(m2[3]);
-      return new Date(y, m - 1, d);
-    }
-
-    throw new Error(`INVALID_DATE_FORMAT:${s}`);
-  }
 
   async saveOverwrite(dto: SaveOverwriteDto) {
     const head = await this.headRepo.findOne({
@@ -99,14 +65,6 @@ export class DispatchService {
     return { dispatch_id: head.dispatch_id, ok: true };
   }
 
-  private fmtMMDDYYYY(d: Date | null) {
-    if (!d) return null;
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    const yyyy = d.getFullYear();
-    return `${mm}/${dd}/${yyyy}`;
-  }
-
   private pickPlanTime(shift: string, r: any): string | null {
     if (shift === 'D') return r.WORKDAY_TIMEIN ? String(r.WORKDAY_TIMEIN).trim() : null;
     if (shift === 'N') return r.NIGHT_TIMEIN ? String(r.NIGHT_TIMEIN).trim() : null;
@@ -115,8 +73,7 @@ export class DispatchService {
   }
 
   async buildDailyFirst(dto: BuildDailyFirstDto) {
-    const workDate = this.toOracleDateOnly(dto.workdate);
-
+    const workDate = dto.workdate;
     return this.dataSource.transaction(async (manager) => {
       const rows: any[] = await manager.query(
         `SELECT
@@ -134,11 +91,7 @@ export class DispatchService {
           AND OT.TIMEOUT <= :2
           AND OT.TIMEOUT >= :3
         ORDER BY OT.EMPNO`,
-        [
-          workDate,
-          dto.timeout_to,
-          dto.timeout_from,
-        ],
+        [ workDate, dto.timeout_to, dto.timeout_from,],
       );
 
       if (!rows.length) {
@@ -188,11 +141,7 @@ export class DispatchService {
           busMap.set(busid, {
             busid,
             busname: r.BUSNAME ?? null,
-            busseat:
-              r.BUSSEAT !== null && r.BUSSEAT !== undefined
-                ? Number(r.BUSSEAT)
-                : null,
-            bustype: r.BUSTYPE ?? null,
+            busseat: r.BUSSEAT !== null && r.BUSSEAT !== undefined? Number(r.BUSSEAT): null, bustype: r.BUSTYPE ?? null,
           });
         }
       }
@@ -206,7 +155,6 @@ export class DispatchService {
 
       // เปลี่ยนจาก lineIdByBusId -> ใช้ busid ตรง ๆ
       const busIds = new Set<number>();
-
       for (const b of buses) {
         const line = manager.create(BusDispatchLine, {
           dispatch_id,
@@ -223,17 +171,13 @@ export class DispatchService {
 
       // 6) build STOP groups per BUSID
       const stopKeyByBusStop = new Map<string, { stop_id: number; line_id: number }>();
-
       for (const busid of busIds.values()) {
         const stopMap = new Map<number, any>();
 
         for (const r of rowsShift) {
           if (Number(r.BUSID) !== busid) continue;
 
-          const stop_id =
-            r.STOP_ID !== null && r.STOP_ID !== undefined
-              ? Number(r.STOP_ID)
-              : null;
+          const stop_id = r.STOP_ID !== null && r.STOP_ID !== undefined ? Number(r.STOP_ID) : null;
 
           if (stop_id === null) continue;
 
@@ -242,10 +186,7 @@ export class DispatchService {
               stop_id,
               stop_name: r.STOP_NAME ?? null,
               plan_time: this.pickPlanTime(shift, r),
-              route_seq:
-                r.ROUTE_SEQ !== null && r.ROUTE_SEQ !== undefined
-                  ? Number(r.ROUTE_SEQ)
-                  : 9999,
+              route_seq: r.ROUTE_SEQ !== null && r.ROUTE_SEQ !== undefined? Number(r.ROUTE_SEQ) : 9999,
             });
           }
         }
@@ -327,8 +268,7 @@ export class DispatchService {
   }
 
   async getDispatch(dto: DispatchKeyDto) {
-    const workDate = this.toOracleDateOnly(dto.workdate);
-
+    const workDate = dto.workdate;
     const head = await this.headRepo.findOne({
       where: {
         dispatch_date: workDate,
@@ -587,26 +527,13 @@ export class DispatchService {
       if (!stop_id) throw new Error('STOP_ID_REQUIRED');
       if (!empno) throw new Error('EMPNO_REQUIRED');
 
-      const head = await manager.findOne(BusDispatchHead, {
-        where: { dispatch_id },
-      });
+      const head = await manager.findOne(BusDispatchHead, { where: { dispatch_id }, });
       if (!head) throw new Error('DISPATCH_NOT_FOUND');
       if (head.status === 'C') throw new Error('DISPATCH_CLOSED');
 
-      const stop = await manager.findOne(BusDispatchStop, {
-        where: { dispatch_id, stop_id } as any,
-      });
+      const stop = await manager.findOne(BusDispatchStop, { where: { dispatch_id, stop_id } as any,});
       if (!stop) throw new Error('STOP_NOT_FOUND');
-
-      const empRows: any[] = await manager.query(
-        `
-        SELECT U.SEMPNO, U.STNAME, U.CSTATUS
-        FROM AMEC.AMECUSERALL U
-        WHERE U.SEMPNO = :1
-        `,
-        [empno],
-      );
-
+      const empRows: any[] = await manager.query( ` SELECT U.SEMPNO, U.STNAME, U.CSTATUS FROM AMEC.AMECUSERALL U WHERE U.SEMPNO = :1`,[empno],);
       if (!empRows.length) throw new Error('EMPLOYEE_NOT_FOUND');
 
       let passenger = await manager.findOne(BusDispatchPassenger, {
@@ -645,16 +572,13 @@ export class DispatchService {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
-
     try {
       const dispatchId = Number(dto.dispatch_id);
       const busid = Number(dto.busid);
       const updateBy = String(dto.update_by);
-
       const lineRepo = queryRunner.manager.getRepository(BusDispatchLine);
       const stopRepo = queryRunner.manager.getRepository(BusDispatchStop);
       const passengerRepo = queryRunner.manager.getRepository(BusDispatchPassenger);
-
       const line = await lineRepo.findOne({
         where: {
           dispatch_id: dispatchId,
@@ -685,7 +609,6 @@ export class DispatchService {
       });
 
       const stopIds = stops.map((item) => item.stop_id).filter(Boolean);
-
       if (stopIds.length > 0) {
         await passengerRepo.update(
           {

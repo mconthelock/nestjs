@@ -155,21 +155,21 @@ export class CreateIeBgrDto {
   @IsString()
   PURPOSE?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  DETPLAN: string;
+  DETPLAN?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  INVDET: string;
+  INVDET?: string;
 
   @IsOptional()
   @IsString()
   EFFT?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  SCHEDULE: string;
+  SCHEDULE?: string;
 
   @IsOptional()
   @IsString()

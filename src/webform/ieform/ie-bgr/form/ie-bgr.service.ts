@@ -414,6 +414,16 @@ export class IeBgrService {
             ip,
             queryRunner,
           );
+        }else{
+            if(dto.remark != undefined){
+                this.flowService.updateFlow({
+                    condition: {
+                        ...form,
+                        CSTEPNO: '--',
+                    },
+                    VREMARK: dto.remark,
+                })
+            }
         }
       } else {
         // 1.3 กรณี New ให้สร้าง Form ใหม่

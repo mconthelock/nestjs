@@ -8,7 +8,6 @@ import { BusDispatchLine } from './entities/bus_dispatch_line.entity';
 import { BusDispatchStop } from './entities/bus_dispatch_stop.entity';
 import { BusDispatchPassenger } from './entities/bus_dispatch_passenger.entity';
 
-
 @Module({
   imports: [TypeOrmModule.forFeature([BusDispatchHead, BusDispatchLine, BusDispatchStop, BusDispatchPassenger],'gpreportConnection',),],
   controllers: [DispatchController],providers: [DispatchService],exports: [DispatchService],

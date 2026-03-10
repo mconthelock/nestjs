@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, In } from 'typeorm';
 import { SaveDispatchDto } from './dto/save-dispatch.dto';
 import { SaveOverwriteDto } from './dto/save-overwrite.dto';
 import { BuildDailyFirstDto } from './dto/build-daily-first.dto';
@@ -11,6 +11,8 @@ import { BusDispatchStop } from './entities/bus_dispatch_stop.entity';
 import { BusDispatchPassenger } from './entities/bus_dispatch_passenger.entity';
 import { DispatchKeyDto } from './dto/dispatch-key.dto';
 import { MoveStopDto } from './dto/move-stop.dto';
+import { DeleteLineDto } from './dto/delete-line.dto';
+
 
 @Injectable()
 export class DispatchService {
@@ -44,7 +46,6 @@ export class DispatchService {
     head.update_date = new Date();
 
     await this.headRepo.save(head);
-
     return { dispatch_id: head.dispatch_id, status: head.status };
   }
 
@@ -353,7 +354,10 @@ export class DispatchService {
 
     const [lines, stops, passengers] = await Promise.all([
       this.lineRepo.find({
-        where: { dispatch_id } as any,
+        where: {
+          dispatch_id,
+          line_status: '1',
+        } as any,
         order: { busid: 'ASC' as any },
       }),
 
@@ -578,15 +582,36 @@ export class DispatchService {
     return this.dataSource.transaction(async (manager) => {
       const dispatch_id = Number(dto.dispatch_id);
       const stop_id = Number(dto.stop_id);
-      const empno = String(dto.empno).trim();
-      const head = await manager.findOne(BusDispatchHead, { where: { dispatch_id }, });
+      const empno = String(dto.empno || '').trim();
+      if (!dispatch_id) throw new Error('DISPATCH_ID_REQUIRED');
+      if (!stop_id) throw new Error('STOP_ID_REQUIRED');
+      if (!empno) throw new Error('EMPNO_REQUIRED');
+
+      const head = await manager.findOne(BusDispatchHead, {
+        where: { dispatch_id },
+      });
       if (!head) throw new Error('DISPATCH_NOT_FOUND');
       if (head.status === 'C') throw new Error('DISPATCH_CLOSED');
 
-      const stop = await manager.findOne(BusDispatchStop, {  where: { dispatch_id, stop_id } as any, });
+      const stop = await manager.findOne(BusDispatchStop, {
+        where: { dispatch_id, stop_id } as any,
+      });
       if (!stop) throw new Error('STOP_NOT_FOUND');
 
-      let passenger = await manager.findOne(BusDispatchPassenger, {  where: { dispatch_id, empno } as any, });
+      const empRows: any[] = await manager.query(
+        `
+        SELECT U.SEMPNO, U.STNAME, U.CSTATUS
+        FROM AMEC.AMECUSERALL U
+        WHERE U.SEMPNO = :1
+        `,
+        [empno],
+      );
+
+      if (!empRows.length) throw new Error('EMPLOYEE_NOT_FOUND');
+
+      let passenger = await manager.findOne(BusDispatchPassenger, {
+        where: { dispatch_id, empno } as any,
+      });
 
       if (passenger) {
         passenger.stop_id = stop_id;
@@ -606,7 +631,87 @@ export class DispatchService {
       head.update_date = new Date();
       await manager.save(BusDispatchHead, head);
 
-      return { ok: true, dispatch_id, stop_id, empno };
+      return {
+        ok: true,
+        dispatch_id,
+        stop_id,
+        empno,
+        status: 'E',
+      };
     });
   }
+
+  async deleteLinedispatch(dto: DeleteLineDto) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const dispatchId = Number(dto.dispatch_id);
+      const busid = Number(dto.busid);
+      const updateBy = String(dto.update_by);
+
+      const lineRepo = queryRunner.manager.getRepository(BusDispatchLine);
+      const stopRepo = queryRunner.manager.getRepository(BusDispatchStop);
+      const passengerRepo = queryRunner.manager.getRepository(BusDispatchPassenger);
+
+      const line = await lineRepo.findOne({
+        where: {
+          dispatch_id: dispatchId,
+          busid: busid,
+        },
+      });
+
+      if (!line) {
+        throw new Error("ไม่พบข้อมูลสายรถที่ต้องการลบ");
+      }
+
+      await lineRepo.update(
+        {
+          dispatch_id: dispatchId,
+          busid: busid,
+        },
+        {
+          line_status: "0",
+        },
+      );
+
+      const stops = await stopRepo.find({
+        where: {
+          dispatch_id: dispatchId,
+          line_id: busid,
+        },
+        select: ["stop_id"],
+      });
+
+      const stopIds = stops.map((item) => item.stop_id).filter(Boolean);
+
+      if (stopIds.length > 0) {
+        await passengerRepo.update(
+          {
+            dispatch_id: dispatchId,
+            stop_id: In(stopIds),
+          },
+          {
+            status: "D",
+          },
+        );
+      }
+
+      await queryRunner.commitTransaction();
+
+      return {
+        statusCode: 200,
+        message: "ลบสายรถสำเร็จ",
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+
+
 }

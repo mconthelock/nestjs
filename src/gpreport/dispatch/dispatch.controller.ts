@@ -1,10 +1,11 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Param } from '@nestjs/common';
 import { DispatchService } from './dispatch.service';
 import { SaveDispatchDto } from './dto/save-dispatch.dto';
 import { SaveOverwriteDto } from './dto/save-overwrite.dto';
 import { BuildDailyFirstDto } from './dto/build-daily-first.dto';
 import { DispatchKeyDto } from './dto/dispatch-key.dto';
 import { MoveStopDto } from './dto/move-stop.dto';
+import { DeleteLineDto } from './dto/delete-line.dto';
 
 @Controller('bus/dispatch')
 export class DispatchController {
@@ -33,5 +34,10 @@ export class DispatchController {
   disablePassenger(@Body() dto: { dispatch_id: number; empno: string; update_by: string }) {
     return this.service.disablePassenger(dto);
   }
-  
+
+  @Post('delete-linedispatch')
+  async deleteLine(@Body() dto: DeleteLineDto) {
+    return await this.service.deleteLinedispatch(dto);
+  }
+    
 }

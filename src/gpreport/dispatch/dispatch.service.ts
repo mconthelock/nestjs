@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, In } from 'typeorm';
 import { SaveDispatchDto } from './dto/save-dispatch.dto';
 import { SaveOverwriteDto } from './dto/save-overwrite.dto';
 import { BuildDailyFirstDto } from './dto/build-daily-first.dto';
@@ -11,6 +11,8 @@ import { BusDispatchStop } from './entities/bus_dispatch_stop.entity';
 import { BusDispatchPassenger } from './entities/bus_dispatch_passenger.entity';
 import { DispatchKeyDto } from './dto/dispatch-key.dto';
 import { MoveStopDto } from './dto/move-stop.dto';
+import { DeleteLineDto } from './dto/delete-line.dto';
+
 
 @Injectable()
 export class DispatchService {
@@ -352,7 +354,10 @@ export class DispatchService {
 
     const [lines, stops, passengers] = await Promise.all([
       this.lineRepo.find({
-        where: { dispatch_id } as any,
+        where: {
+          dispatch_id,
+          line_status: '1',
+        } as any,
         order: { busid: 'ASC' as any },
       }),
 
@@ -634,6 +639,77 @@ export class DispatchService {
         status: 'E',
       };
     });
+  }
+
+  async deleteLinedispatch(dto: DeleteLineDto) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const dispatchId = Number(dto.dispatch_id);
+      const busid = Number(dto.busid);
+      const updateBy = String(dto.update_by);
+
+      const lineRepo = queryRunner.manager.getRepository(BusDispatchLine);
+      const stopRepo = queryRunner.manager.getRepository(BusDispatchStop);
+      const passengerRepo = queryRunner.manager.getRepository(BusDispatchPassenger);
+
+      const line = await lineRepo.findOne({
+        where: {
+          dispatch_id: dispatchId,
+          busid: busid,
+        },
+      });
+
+      if (!line) {
+        throw new Error("ไม่พบข้อมูลสายรถที่ต้องการลบ");
+      }
+
+      await lineRepo.update(
+        {
+          dispatch_id: dispatchId,
+          busid: busid,
+        },
+        {
+          line_status: "0",
+        },
+      );
+
+      const stops = await stopRepo.find({
+        where: {
+          dispatch_id: dispatchId,
+          line_id: busid,
+        },
+        select: ["stop_id"],
+      });
+
+      const stopIds = stops.map((item) => item.stop_id).filter(Boolean);
+
+      if (stopIds.length > 0) {
+        await passengerRepo.update(
+          {
+            dispatch_id: dispatchId,
+            stop_id: In(stopIds),
+          },
+          {
+            status: "D",
+          },
+        );
+      }
+
+      await queryRunner.commitTransaction();
+
+      return {
+        statusCode: 200,
+        message: "ลบสายรถสำเร็จ",
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
 

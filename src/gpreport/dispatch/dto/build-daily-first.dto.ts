@@ -1,4 +1,5 @@
-import { IsString, IsIn } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsString, IsIn, IsDate } from 'class-validator';
 
 export class BuildDailyFirstDto {
   @IsString()
@@ -10,8 +11,15 @@ export class BuildDailyFirstDto {
   @IsString()
   update_by: string;
 
-  @IsString()
-  workdate: string; 
+  @Type(() => Date)
+  @Transform(({ value }) => {
+      if (!value) return null;
+      const d = new Date(value);
+      d.setHours(0, 0, 0, 0);
+      return d;
+  })
+  @IsDate()
+  workdate: Date; 
   
   @IsIn(['O', 'W']) // O = OT, W = Workday
   dispatch_type: 'O' | 'W';

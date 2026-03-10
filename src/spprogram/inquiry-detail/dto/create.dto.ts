@@ -95,7 +95,11 @@ export class createDetailDto {
 
     @IsString()
     @IsOptional()
-    INQD_DES_REMARK: string;
+    INQD_DES_REMARK?: string;
+
+    @IsString()
+    @IsOptional()
+    INQD_SALE_REMARK?: string;
 
     @IsString()
     @IsOptional()

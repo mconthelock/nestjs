@@ -23,6 +23,7 @@ import { FileService } from 'src/common/services/file/file.service';
 import { ListMode } from 'src/common/services/file/dto/file.dto';
 import { basename } from 'path';
 import { MfgSerialService } from '../mfg-serial/mfg-serial.service';
+import { MfgDrawingActionService } from '../mfg-drawing-action/mfg-drawing-action.service';
 
 interface State {
     blockId: number;
@@ -54,6 +55,7 @@ export class MfgDrawingCreateChecksheetService {
         private readonly s011mpService: S011mpService,
         private readonly fileService: FileService,
         private readonly mfgSerialService: MfgSerialService,
+        private readonly mfgDrawingActionService: MfgDrawingActionService,
     ) {}
 
     private readonly mapType = {
@@ -125,9 +127,10 @@ export class MfgDrawingCreateChecksheetService {
                 typeName: typeName,
                 deleteList: deleteList,
                 path: masterPath,
+                revise: dto.REVISE,
             });
 
-            if(this.isEditable(insertData.NINSPECTOR_STATUS)){
+            if (this.isEditable(insertData.NINSPECTOR_STATUS)) {
                 const insertSerial = await this.insertSerial({
                     drawingId: insertData.NID,
                     serialNo: dto.ASERIALNO,
@@ -245,7 +248,8 @@ export class MfgDrawingCreateChecksheetService {
         const matched = list.find(
             (l) =>
                 l.NSTATUS == 1 &&
-                (l.VDRAWING === drawing || drawing.startsWith(l.VDRAWING + ' ')),
+                (l.VDRAWING === drawing ||
+                    drawing.startsWith(l.VDRAWING + ' ')),
         );
         if (!matched) {
             throw new Error(
@@ -257,7 +261,7 @@ export class MfgDrawingCreateChecksheetService {
 
     checkDeleteDrawing(deleteDwg: string[], drawing: string): boolean {
         return deleteDwg.some(
-            (e) => (drawing === e || drawing.startsWith(e + ' ')),
+            (e) => drawing === e || drawing.startsWith(e + ' '),
         );
     }
 
@@ -270,6 +274,7 @@ export class MfgDrawingCreateChecksheetService {
         typeName,
         deleteList,
         path,
+        revise,
     }: {
         blockId: number;
         itemId: number;
@@ -279,6 +284,7 @@ export class MfgDrawingCreateChecksheetService {
         typeName: string;
         deleteList: string[];
         path: string;
+        revise?: boolean;
     }): Promise<MFG_DRAWING[] | any | null> {
         try {
             // ตรวจสอบว่ามีข้อมูลที่ตรงกับ blockId, itemId, drawing และ inspector status = 1 อยู่แล้วหรือไม่
@@ -303,6 +309,16 @@ export class MfgDrawingCreateChecksheetService {
                 data.NID = isDataExist.data.NID;
                 data.NUSERUPDATE = usercreate;
                 data.DDATEUPDATE = new Date();
+                // ถ้า revise เป็น true ให้ update drawing และ delete serial
+                console.log('test revise', revise , typeof revise);
+                
+                if (revise) {
+                    const update = await this.mfgSerialService.update({ NDRAWINGID: data.NID }, { NSTATUS: 3 });
+                    console.log('Update serial', update);
+                    // throw new Error(`test`);
+                    await this.mfgDrawingActionService.update(data.NID, { NSTATUS: 3 });
+                }
+
                 // ถ้าไม่ใช่ multi และ drawing อยู่ใน delete list ให้ตั้ง status เป็น 3
                 if (
                     typeName != 'multi' &&
@@ -320,7 +336,8 @@ export class MfgDrawingCreateChecksheetService {
             }
             if (
                 !isDataExist.status ||
-                this.isEditable(isDataExist.data?.NINSPECTOR_STATUS)
+                this.isEditable(isDataExist.data?.NINSPECTOR_STATUS) ||
+                revise
                 // isDataExist.data?.NINSPECTOR_STATUS == 1
             ) {
                 const insert = await this.mfgDrawingService.create(data);
@@ -431,7 +448,7 @@ export class MfgDrawingCreateChecksheetService {
         serialNo: string[];
         userCreate: number;
     }) {
-        await this.mfgSerialService.removeByDrawingId(drawingId);
+        await this.mfgSerialService.removeByCondition({ NDRAWINGID: drawingId });
         const insertBatch = serialNo.map((sn) => ({
             NDRAWINGID: drawingId,
             VSERIALNO: sn,

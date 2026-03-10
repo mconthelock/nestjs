@@ -7,16 +7,16 @@ import {
     IsString,
 } from 'class-validator';
 
-export class CreateMfgSerialDto {
+export class CreateMfgDrawingActionDto {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
     NDRAWINGID: number;
 
-    @IsOptional()
-    @IsString()
-    @Type(() => String)
-    VSERIALNO?: string;
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    NACTION: number;
 
     @IsOptional()
     @IsNumber()
@@ -26,15 +26,10 @@ export class CreateMfgSerialDto {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    NUSERCREATE: number;
+    NUSERACT: number;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsDate()
     @Type(() => Date)
-    DDATEUPDATE?: Date;
-
-    @IsOptional()
-    @IsNumber()
-    @Type(() => Number)
-    NUSERUPDATE?: number;
+    DACTDATE: Date;
 }

@@ -11,6 +11,7 @@ import { S011mpModule } from 'src/datacenter/s011mp/s011mp.module';
 import { F110kpModule } from 'src/datacenter/f110kp/f110kp.module';
 import { FilesModule } from 'src/common/services/file/file.module';
 import { MfgSerialModule } from '../mfg-serial/mfg-serial.module';
+import { MfgDrawingActionModule } from '../mfg-drawing-action/mfg-drawing-action.module';
 
 @Module({
     imports: [
@@ -21,6 +22,7 @@ import { MfgSerialModule } from '../mfg-serial/mfg-serial.module';
         S011mpModule,
         FilesModule,
         MfgSerialModule,
+        MfgDrawingActionModule,
     ],
     controllers: [MfgDrawingController],
     providers: [

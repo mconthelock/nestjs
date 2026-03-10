@@ -24,6 +24,7 @@ import { ItemMfgDeleteModule } from './item-mfg-delete/item-mfg-delete.module';
 import { ControlDrawingPisModule } from './control-drawing-pis/control-drawing-pis.module';
 import { MfgDrawingModule } from './mfg-drawing/mfg-drawing.module';
 import { MfgSerialModule } from './mfg-serial/mfg-serial.module';
+import { MfgDrawingActionModule } from './mfg-drawing-action/mfg-drawing-action.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { MfgSerialModule } from './mfg-serial/mfg-serial.module';
     ControlDrawingPisModule,
     MfgDrawingModule,
     MfgSerialModule,
+    MfgDrawingActionModule,
   ],
 })
 export class ESCSModule {}

@@ -44,11 +44,14 @@ export class MfgSerialRepository extends BaseRepository {
             .getMany();
     }
 
-    async update(id: number, dto: UpdateMfgSerialDto) {
+    async update(id: number | { NID: number } | { NDRAWINGID: number }, dto: UpdateMfgSerialDto) {
         return this.getRepository(MFG_SERIAL).update(id, dto);
     }
 
-    async remove(id: number | { NID: number } | { NDRAWINGID: number }) {
-        return this.getRepository(MFG_SERIAL).delete(id);
+    async remove(id: number| UpdateMfgSerialDto) {
+        if(typeof id === 'number'){
+            return this.getRepository(MFG_SERIAL).delete(id);
+        }
+        return this.getRepository(MFG_SERIAL).delete({...id, NSTATUS: Not(3)});
     }
 }

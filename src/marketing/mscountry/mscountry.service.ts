@@ -5,12 +5,12 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MscountryService {
-  constructor(
-    @InjectRepository(Mscountry, 'amecConnection')
-    private readonly country: Repository<Mscountry>,
-  ) {}
+    constructor(
+        @InjectRepository(Mscountry, 'datacenterConnection')
+        private readonly country: Repository<Mscountry>,
+    ) {}
 
-  findAll() {
-    return this.country.find({ order: { CTNAME: 'asc' } });
-  }
+    findAll() {
+        return this.country.find({ order: { CTNAME: 'asc' } });
+    }
 }

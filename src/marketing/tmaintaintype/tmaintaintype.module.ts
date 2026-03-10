@@ -5,10 +5,10 @@ import { Tmaintaintype } from './entities/tmaintaintype.entity';
 import { TmaintaintypeController } from './tmaintaintype.controller';
 
 @Module({
-  controllers: [TmaintaintypeController],
-  imports: [
-    TypeOrmModule.forFeature([Tmaintaintype], 'amecConnection')
-  ],
-  providers: [TmaintaintypeService],
+    controllers: [TmaintaintypeController],
+    imports: [
+        TypeOrmModule.forFeature([Tmaintaintype], 'datacenterConnection'),
+    ],
+    providers: [TmaintaintypeService],
 })
 export class TmaintaintypeModule {}

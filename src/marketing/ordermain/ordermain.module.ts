@@ -5,8 +5,8 @@ import { OrdermainController } from './ordermain.controller';
 import { Ordermain } from './entities/ordermain.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Ordermain], 'amecConnection')],
-  controllers: [OrdermainController],
-  providers: [OrdermainService],
+    imports: [TypeOrmModule.forFeature([Ordermain], 'datacenterConnection')],
+    controllers: [OrdermainController],
+    providers: [OrdermainService],
 })
 export class OrdermainModule {}

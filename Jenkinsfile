@@ -95,14 +95,14 @@ pipeline {
             steps {
                 sh '''
                     mkdir -p ${TARGET_DIR}
-                    rsync -rlptz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
+                    rsync -rlptvz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
                     rsync -av public/ ${TARGET_DIR}/public/
                     rsync -vpt package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env ${TARGET_DIR}/
                 '''
                 script {
                     if (env.NPM_CHANGED == "true") {
                         sh '''
-                            rsync -rlptz --delete node_modules/ ${TARGET_DIR}/node_modules/
+                            rsync -rlptvz --delete node_modules/ ${TARGET_DIR}/node_modules/
                         '''
                     } else {
                         echo "node_modules unchanged, skip sync"

@@ -23,7 +23,7 @@ export class WMSService {
     async getIssueList(empno: string): Promise<WMSTempIssueDto[]> {
         return this.db.query(
             `
-             SELECT USERID, STATUS, ISSUE, ITEMCODE, DESCRIPTION, PROD, LOCATION, QTY, ISSUETO, PO, LINE, INV, PALLET_ID, EXPIRE_DATE
+             SELECT USERID, STATUS, ISSUE, ITEMCODE, ONHAND, DESCRIPTION, PROD, LOCATION, QTY, ISSUETO, PO, LINE, INV, PALLET_ID, EXPIRE_DATE
              FROM WMS_TEMPISSUE
              WHERE USERID = :1
                 AND STATUS = '-'

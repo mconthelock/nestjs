@@ -26,7 +26,7 @@ pipeline {
                     // 2. ตรวจสอบเงื่อนไข
                     // จะไป Production ได้ต้อง: กดมือเอง (Manual) AND เลือก Parameter เป็น production
                     if (isManualTrigger && params.DEPLOY_ENV == 'production') {
-                        env.TARGET_DIR = '/var/amecweb/wwwroot/production/api_test'
+                        env.TARGET_DIR = '/var/amecweb/wwwroot/production/api'
                         env.ENV_CRED_ID = 'api-env-prod'
                         // env.ENV_CRED_ID = 'apitest-env-prod'
                         env.NODE_ENV = 'production'
@@ -95,14 +95,14 @@ pipeline {
             steps {
                 sh '''
                     mkdir -p ${TARGET_DIR}
-                    rsync -rlptvz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
+                    rsync -rlptz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
                     rsync -av public/ ${TARGET_DIR}/public/
                     rsync -vpt package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env ${TARGET_DIR}/
                 '''
                 script {
                     if (env.NPM_CHANGED == "true") {
                         sh '''
-                            rsync -rlptvz --delete node_modules/ ${TARGET_DIR}/node_modules/
+                            rsync -rlptz --delete node_modules/ ${TARGET_DIR}/node_modules/
                         '''
                     } else {
                         echo "node_modules unchanged, skip sync"

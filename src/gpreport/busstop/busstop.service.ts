@@ -47,10 +47,7 @@ export class BusstopService {
 
   async getStopRoutes() {
     const stops = await this.stop.find({
-      where: {
-        STOP_STATUS: '1',
-        routes: {},
-      },
+      where: { STOP_STATUS: '1', routes: {}, },
       relations: { routes: true, },
       order: { STOP_NAME: 'ASC', },
     });
@@ -68,5 +65,5 @@ export class BusstopService {
     );
   }
 
-  
+
 }

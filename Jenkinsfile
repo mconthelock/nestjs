@@ -180,6 +180,7 @@ pipeline {
 
                             \$env:NODE_ENV='production'
                             cd api
+                            npm install
                             pm2 reload ecosystem.config.js
 
                             Remove-PSDrive -Name 'Z' -Force

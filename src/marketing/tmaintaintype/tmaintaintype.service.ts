@@ -5,12 +5,12 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class TmaintaintypeService {
-  constructor(
-    @InjectRepository(Tmaintaintype, 'amecConnection')
-    private readonly msttype: Repository<Tmaintaintype>,
-  ) {}
+    constructor(
+        @InjectRepository(Tmaintaintype, 'datacenterConnection')
+        private readonly msttype: Repository<Tmaintaintype>,
+    ) {}
 
-  findAll() {
-    return this.msttype.find({ order: { ABBREVIATION: 'asc' } });
-  }
+    findAll() {
+        return this.msttype.find({ order: { ABBREVIATION: 'asc' } });
+    }
 }

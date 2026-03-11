@@ -32,4 +32,11 @@ export class BusstopController {
   deleteStop(@Body() dto: UpdateBusstopDto) {
     return this.stop.deleteStop(dto.STOP_ID);
   }
+
+
+  @Post('getStopRoutes')
+  get() {
+    return this.stop.getStopRoutes();
+  }
+
 }

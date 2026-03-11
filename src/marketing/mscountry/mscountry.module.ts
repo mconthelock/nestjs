@@ -5,10 +5,8 @@ import { Mscountry } from './entities/mscountry.entity';
 import { MscountryController } from './mscountry.controller';
 
 @Module({
-  controllers: [MscountryController],
-  imports: [
-    TypeOrmModule.forFeature([Mscountry], 'amecConnection')
-  ],
-  providers: [MscountryService],
+    controllers: [MscountryController],
+    imports: [TypeOrmModule.forFeature([Mscountry], 'datacenterConnection')],
+    providers: [MscountryService],
 })
 export class MscountryModule {}

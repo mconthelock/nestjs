@@ -5,8 +5,8 @@ import { OrderdummyController } from './orderdummy.controller';
 import { Orderdummy } from './entities/orderdummy.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Orderdummy], 'amecConnection')],
-  controllers: [OrderdummyController],
-  providers: [OrderdummyService],
+    imports: [TypeOrmModule.forFeature([Orderdummy], 'datacenterConnection')],
+    controllers: [OrderdummyController],
+    providers: [OrderdummyService],
 })
 export class OrderdummyModule {}

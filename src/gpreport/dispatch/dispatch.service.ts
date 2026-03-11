@@ -12,7 +12,7 @@ import { BusDispatchPassenger } from '../../common/Entities/gpreport/table/bus_d
 import { DispatchKeyDto } from './dto/dispatch-key.dto';
 import { MoveStopDto } from './dto/move-stop.dto';
 import { DeleteLineDto } from './dto/delete-line.dto';
-
+import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
 
 @Injectable()
 export class DispatchService {
@@ -635,6 +635,115 @@ export class DispatchService {
     }
   }
 
+  async saveAddPassenger(dto: SaveAddPassengerDto) {
+    return await this.dataSource.transaction(async (manager) => {
+      const dispatchId = Number(dto.dispatch_id);
+      const busid = Number(dto.line.busid);
+      const stopId = Number(dto.stop.stop_id);
+      const empno = String(dto.passenger.empno);
+      const updateBy = String(dto.update_by);
 
+      const lineRepo = manager.getRepository(BusDispatchLine);
+      const stopRepo = manager.getRepository(BusDispatchStop);
+      const passengerRepo = manager.getRepository(BusDispatchPassenger);
+
+      // 1) ตรวจสอบ passenger ก่อน
+      const existsPassenger = await passengerRepo.findOne({
+        where: {
+          dispatch_id: dispatchId,
+          empno: empno,
+        },
+      });
+
+      if (existsPassenger && existsPassenger.status === 'E') {
+        return {
+          status: false,
+          message: 'มีการจัดรถให้พนักงานนี้แล้ว',
+        };
+      }
+
+      // 2) ตรวจสอบ line
+      const existsLine = await lineRepo.findOne({
+        where: {
+          dispatch_id: dispatchId,
+          busid: busid,
+        },
+      });
+
+      if (!existsLine) {
+        await lineRepo.save(
+          lineRepo.create({
+            dispatch_id: dispatchId,
+            busid: busid,
+            busname: dto.line.busname || null,
+            bustype: dto.line.bustype || null,
+            busseat: dto.line.busseat ?? null,
+            line_status: '1',
+          }),
+        );
+      } else {
+        await lineRepo.update(
+          {
+            dispatch_id: dispatchId,
+            busid: busid,
+          },
+          {
+            line_status: '1',
+            busname: dto.line.busname || existsLine.busname || null,
+            bustype: dto.line.bustype || existsLine.bustype || null,
+            busseat: dto.line.busseat ?? existsLine.busseat ?? null,
+          },
+        );
+      }
+
+      // 3) ตรวจสอบ stop
+      const existsStop = await stopRepo.findOne({
+        where: {
+          dispatch_id: dispatchId,
+          stop_id: stopId,
+        },
+      });
+
+      if (!existsStop) {
+        await stopRepo.save(
+          stopRepo.create({
+            dispatch_id: dispatchId,
+            line_id: busid, // value = BUSID
+            stop_id: stopId,
+            stop_name: dto.stop.stop_name || null,
+            plan_time: dto.stop.plan_time || null,
+          }),
+        );
+      }
+
+      // 4) insert / update passenger
+      if (!existsPassenger) {
+        await passengerRepo.save(
+          passengerRepo.create({
+            dispatch_id: dispatchId,
+            stop_id: stopId,
+            empno: empno,
+            status: 'E',
+          }),
+        );
+      } else if (existsPassenger.status === 'D') {
+        await passengerRepo.update(
+          {
+            dispatch_id: dispatchId,
+            empno: empno,
+          },
+          {
+            stop_id: stopId,
+            status: 'E',
+          },
+        );
+      }
+
+      return {
+        status: true,
+        message: 'บันทึกข้อมูลผู้โดยสารสำเร็จ',
+      };
+    });
+  }
 
 }

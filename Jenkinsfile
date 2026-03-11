@@ -81,15 +81,28 @@ pipeline {
         stage('Check dependency change') {
             steps {
                 script {
-                    def changed = sh(
-                        script: "git diff --name-only HEAD~1 HEAD | grep package-lock.json || true",
+                    // def changed = sh(
+                    //     script: "git diff --name-only HEAD~1 HEAD | grep package-lock.json || true",
+                    //     returnStdout: true
+                    // ).trim()
+
+                    // env.NPM_CHANGED = changed ? "true" : "false"
+
+                    def hash = sh(
+                        script: "sha256sum package-lock.json | cut -d ' ' -f1",
                         returnStdout: true
                     ).trim()
 
-                    env.NPM_CHANGED = changed ? "true" : "false"
+                    def oldHash = sh(
+                        script: "cat ${TARGET_DIR}/.package-lock.hash 2>/dev/null || true",
+                        returnStdout: true
+                    ).trim()
+
+                    env.NPM_CHANGED = (hash != oldHash) ? "true" : "false"
+                    env.NEW_HASH = hash
+                        }
+                    }
                 }
-            }
-        }
 
         stage('Deploy to NAS') {
             steps {
@@ -98,16 +111,18 @@ pipeline {
                     rsync -rlptz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
                     rsync -av public/ ${TARGET_DIR}/public/
                     rsync -vpt package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env ${TARGET_DIR}/
+                    echo ${NPM_CHANGED} ${NEW_HASH} > ${TARGET_DIR}/.package-lock.hash
                 '''
-                script {
-                    if (env.NPM_CHANGED == "true") {
-                        sh '''
-                            rsync -rlptz --delete node_modules/ ${TARGET_DIR}/node_modules/
-                        '''
-                    } else {
-                        echo "node_modules unchanged, skip sync"
-                    }
-                }
+                // script {
+                //     if (env.NPM_CHANGED == "true") {
+                //         sh '''
+                //             rsync -rlptz --delete node_modules/ ${TARGET_DIR}/node_modules/
+                //             echo ${NEW_HASH} > ${TARGET_DIR}/.package-lock.hash
+                //         '''
+                //     } else {
+                //         echo "node_modules unchanged, skip sync"
+                //     }
+                // }
             }
         }
 
@@ -165,6 +180,7 @@ pipeline {
 
                             \$env:NODE_ENV='production'
                             cd api
+                            npm install
                             pm2 reload ecosystem.config.js
 
                             Remove-PSDrive -Name 'Z' -Force

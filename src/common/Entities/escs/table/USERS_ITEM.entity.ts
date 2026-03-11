@@ -4,7 +4,7 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
   name: 'USERS_ITEM',
   schema: 'ESCCHKSHT'
 })
-export class ESCSUserItem {
+export class USERS_ITEM {
     
     @PrimaryColumn()
     USR_NO: string;

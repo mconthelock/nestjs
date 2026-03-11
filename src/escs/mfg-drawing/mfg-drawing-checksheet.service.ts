@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMfgDrawingCheckSheetDto } from './dto/create-mfg-drawing.dto';
-import { UpdateMfgDrawingDto } from './dto/update-mfg-drawing.dto';
-import { ItemMfgListService } from '../item-mfg-list/item-mfg-list.service';
 import { ItemMfgService } from '../item-mfg/item-mfg.service';
-import { ItemMfgDeleteService } from '../item-mfg-delete/item-mfg-delete.service';
 import { IdtagEfacLogService } from 'src/workload/idtag-efac-log/idtag-efac-log.service';
 import { S011mpService } from 'src/datacenter/s011mp/s011mp.service';
 import { ITEM_MFG_LIST } from 'src/common/Entities/escs/table/ITEM_MFG_LIST.entity';
@@ -11,39 +8,17 @@ import { ITEM_MFG_DELETE } from 'src/common/Entities/escs/table/ITEM_MFG_DELETE.
 import { ITEM_MFG } from 'src/common/Entities/escs/table/ITEM_MFG.entity';
 import { F110kpService } from 'src/datacenter/f110kp/f110kp.service';
 import { CONTROL_DRAWING_PIS } from 'src/common/Entities/escs/table/CONTROL_DRAWING_PIS.entity';
-import { ControlDrawingPisService } from '../control-drawing-pis/control-drawing-pis.service';
 import { S011MP } from 'src/common/Entities/datacenter/table/S011MP.entity';
 import { MfgDrawingService } from './mfg-drawing.service';
 import { MFG_DRAWING } from 'src/common/Entities/escs/table/MFG_DRAWING.entity';
 import { copyFile, deleteFile, joinPaths } from 'src/common/utils/files.utils';
 import { IDTAG_EFAC_LOG } from 'src/common/Entities/workload/table/IDTAG_EFAC_LOG.entity';
 import { F110KP } from 'src/common/Entities/datacenter/table/F110KP.entity';
-import { FiltersDto } from 'src/common/dto/filter.dto';
 import { FileService } from 'src/common/services/file/file.service';
 import { ListMode } from 'src/common/services/file/dto/file.dto';
 import { basename } from 'path';
 import { MfgSerialService } from '../mfg-serial/mfg-serial.service';
 import { MfgDrawingActionService } from '../mfg-drawing-action/mfg-drawing-action.service';
-
-interface State {
-    blockId: number;
-    itemId: number;
-    usercreate: number;
-    serialNo: string[];
-    pis: string;
-    type: number;
-    typeName: string;
-    itemMfg: ITEM_MFG;
-    list: ITEM_MFG_LIST;
-    delete: string[];
-    control: string[];
-    drawing: string;
-    item: string;
-    order: string;
-    controlNo: string;
-    data: any;
-    path: string;
-}
 
 @Injectable()
 export class MfgDrawingCreateChecksheetService {

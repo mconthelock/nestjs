@@ -17,7 +17,7 @@ import { FlowService } from 'src/webform/flow/flow.service';
 import { UsersService } from 'src/amec/users/users.service';
 import { OrgposService } from 'src/webform/orgpos/orgpos.service';
 import { ESCSUserService } from 'src/escs/user/user.service';
-import { ESCSUserItemService } from 'src/escs/user-item/user-item.service';
+import { UserItemService } from 'src/escs/user-item/user-item.service';
 import { ESCSItemStationService } from 'src/escs/item-station/item-station.service';
 import { ESCSUserItemStationService } from 'src/escs/user-item-station/user-item-station.service';
 import { ESCSUserFileService } from 'src/escs/user-file/user-file.service';
@@ -55,7 +55,7 @@ export class QainsFormService {
     private readonly mailService: MailService,
     private readonly orgposService: OrgposService,
     private readonly escsUserService: ESCSUserService,
-    private readonly escsUserItemService: ESCSUserItemService,
+    private readonly escsUserItemService: UserItemService,
     private readonly escsItemStationService: ESCSItemStationService,
     private readonly escsUserItemStationService: ESCSUserItemStationService,
     private readonly PDFService: PDFService,
@@ -701,6 +701,7 @@ export class QainsFormService {
             {
               USR_NO: p.QOA_EMPNO,
               IT_NO: formData.QA_ITEM,
+              UI_USERUPDATE: dto.EMPNO
             },
             queryRunner,
           );

@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ESCSUserItemService } from './user-item.service';
-import { ESCSCreateUserItemDto } from './dto/create-user-item.dto';
-import { ESCSUpdateUserItemDto } from './dto/update-user-item.dto';
+import { UserItemService } from './user-item.service';
+import { CreateUserItemDto } from './dto/create-user-item.dto';
+import { UpdateUserItemDto } from './dto/update-user-item.dto';
 
 @Controller('escs/user-item')
-export class ESCSUserItemController {
-  constructor(private readonly userItemService: ESCSUserItemService) {}
+export class UserItemController {
+  constructor(private readonly userItemService: UserItemService) {}
 }

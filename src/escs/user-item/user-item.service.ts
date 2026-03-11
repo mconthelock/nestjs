@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { ESCSCreateUserItemDto } from './dto/create-user-item.dto';
-import { ESCSUpdateUserItemDto } from './dto/update-user-item.dto';
+import { CreateUserItemDto } from './dto/create-user-item.dto';
+import { UpdateUserItemDto } from './dto/update-user-item.dto';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { ESCSUserItem } from './entities/user-item.entity';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { USERS_ITEM } from 'src/common/Entities/escs/table/USERS_ITEM.entity';
 
 @Injectable()
-export class ESCSUserItemService {
+export class UserItemService {
   constructor(
-    @InjectRepository(ESCSUserItem, 'escsConnection')
-    private userItemRepo: Repository<ESCSUserItem>,
+    @InjectRepository(USERS_ITEM, 'escsConnection')
+    private userItemRepo: Repository<USERS_ITEM>,
     @InjectDataSource('escsConnection')
     private dataSource: DataSource,
   ) {}
 
-  async addUserItem(dto: ESCSCreateUserItemDto, queryRunner?: QueryRunner) {
+  async addUserItem(dto: CreateUserItemDto, queryRunner?: QueryRunner) {
     let localRunner: QueryRunner | undefined;
     let didConnect = false;
     let didStartTx = false;
@@ -28,7 +28,7 @@ export class ESCSUserItemService {
       }
       const runner = queryRunner || localRunner!;
 
-      await runner.manager.save(ESCSUserItem, dto);
+      await runner.manager.save(USERS_ITEM, dto);
       if (localRunner && didStartTx && runner.isTransactionActive)
         await localRunner.commitTransaction();
       return {

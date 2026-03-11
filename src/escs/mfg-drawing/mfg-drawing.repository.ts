@@ -62,6 +62,7 @@ export class MfgDrawingRepository extends BaseRepository {
             'NINSPECTOR_STATUS',
             'NFORELEAD_STATUS',
             'NSTATUS',
+            'A.NUSERACT'
         ]);
         return qb
             .leftJoinAndSelect(

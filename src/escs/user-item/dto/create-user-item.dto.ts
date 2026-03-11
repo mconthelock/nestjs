@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class ESCSCreateUserItemDto {
+export class CreateUserItemDto {
   @IsNotEmpty()
   @IsString()
   USR_NO: string;

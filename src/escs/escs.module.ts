@@ -8,7 +8,7 @@ import { ESCSARRModule } from './audit_report_revision/audit_report_revision.mod
 import { ESCSARHModule } from './audit_report_history/audit_report_history.module';
 import { ESCSARMAModule } from './audit_report_master_all/audit_report_master_all.module';
 import { ESCSItemStationModule } from './item-station/item-station.module';
-import { ESCSUserItemModule } from './user-item/user-item.module';
+import { UserItemModule } from './user-item/user-item.module';
 import { ESCSUserItemStationModule } from './user-item-station/user-item-station.module';
 import { ESCSUserFileModule } from './user-file/user-file.module';
 import { ESCSUserAuthorizeModule } from './user-authorize/user-authorize.module';
@@ -37,7 +37,7 @@ import { MfgDrawingActionModule } from './mfg-drawing-action/mfg-drawing-action.
     ESCSARHModule,
     ESCSARMAModule,
     ESCSItemStationModule,
-    ESCSUserItemModule,
+    UserItemModule,
     ESCSUserItemStationModule,
     ESCSUserFileModule,
     ESCSUserAuthorizeModule,

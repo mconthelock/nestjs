@@ -14,7 +14,7 @@ import { SequenceOrgModule } from 'src/webform/sequence-org/sequence-org.module'
 import { UsersModule } from 'src/amec/users/users.module';
 import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
 import { ESCSUserModule } from 'src/escs/user/user.module';
-import { ESCSUserItemModule } from 'src/escs/user-item/user-item.module';
+import { UserItemModule } from 'src/escs/user-item/user-item.module';
 import { ESCSItemStationModule } from 'src/escs/item-station/item-station.module';
 import { ESCSUserItemStationModule } from 'src/escs/user-item-station/user-item-station.module';
 import { ESCSUserFileModule } from 'src/escs/user-file/user-file.module';
@@ -35,7 +35,7 @@ import { PDFModule } from 'src/common/services/pdf/pdf.module';
     MailModule,
     OrgposModule,
     ESCSUserModule,
-    ESCSUserItemModule,
+    UserItemModule,
     ESCSItemStationModule,
     ESCSUserItemStationModule,
     PDFModule,

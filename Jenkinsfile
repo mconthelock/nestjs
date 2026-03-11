@@ -111,8 +111,9 @@ pipeline {
                     rsync -rlptz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
                     rsync -av public/ ${TARGET_DIR}/public/
                     rsync -vpt package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env ${TARGET_DIR}/
-                    rsync -rlptz --delete node_modules/ ${TARGET_DIR}/node_modules/
+                    rsync -rlptzL --delete node_modules/ ${TARGET_DIR}/node_modules/
                 '''
+                echo ${NPM_CHANGED} ${NEW_HASH} > ${TARGET_DIR}/.package-lock.hash
                 // script {
                 //     if (env.NPM_CHANGED == "true") {
                 //         sh '''

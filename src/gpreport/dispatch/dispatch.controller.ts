@@ -6,6 +6,8 @@ import { BuildDailyFirstDto } from './dto/build-daily-first.dto';
 import { DispatchKeyDto } from './dto/dispatch-key.dto';
 import { MoveStopDto } from './dto/move-stop.dto';
 import { DeleteLineDto } from './dto/delete-line.dto';
+import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
+
 
 @Controller('bus/dispatch')
 export class DispatchController {
@@ -40,4 +42,8 @@ export class DispatchController {
     return await this.service.deleteLinedispatch(dto);
   }
     
+  @Post('save-add-passenger')
+  async saveAddPassenger(@Body() dto: SaveAddPassengerDto) {
+    return this.service.saveAddPassenger(dto);
+  }
 }

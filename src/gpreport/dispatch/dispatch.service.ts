@@ -4,6 +4,7 @@ import { DataSource, Repository, In } from 'typeorm';
 import { SaveDispatchDto } from './dto/save-dispatch.dto';
 import { SaveOverwriteDto } from './dto/save-overwrite.dto';
 import { BuildDailyFirstDto } from './dto/build-daily-first.dto';
+import { DailyDispatchReportDto } from './dto/dispatch-report.dto';
 
 import { BusDispatchHead } from '../../common/Entities/gpreport/table/bus_dispatch_head.entity';
 import { BusDispatchLine } from '../../common/Entities/gpreport/table/bus_dispatch_line.entity';
@@ -745,5 +746,186 @@ export class DispatchService {
       };
     });
   }
+
+
+  //================================== รายงาน ==================================//
+  async getReportBus(dto: DailyDispatchReportDto) {
+    const dispatchId = Number(dto.dispatch_id);
+    // 1) ดึง line
+    const lines = await this.dataSource
+      .getRepository(BusDispatchLine)
+      .createQueryBuilder('l')
+      .where('l.dispatch_id = :dispatchId', { dispatchId })
+      .andWhere("NVL(l.line_status, '1') = '1'")
+      .orderBy('l.busid', 'ASC')
+      .getMany();
+
+    // 2) ดึง stop
+    const stops = await this.dataSource
+      .getRepository(BusDispatchStop)
+      .createQueryBuilder('s')
+      .where('s.dispatch_id = :dispatchId', { dispatchId })
+      .orderBy('s.line_id', 'ASC')
+      .addOrderBy('s.plan_time', 'ASC')
+      .addOrderBy('s.stop_id', 'ASC')
+      .getMany();
+
+    // 3) ดึง passenger ที่ enable
+    const passengers = await this.dataSource
+      .getRepository(BusDispatchPassenger)
+      .createQueryBuilder('p')
+      .where('p.dispatch_id = :dispatchId', { dispatchId })
+      .andWhere("NVL(p.status, 'E') = 'E'")
+      .orderBy('p.stop_id', 'ASC')
+      .addOrderBy('p.empno', 'ASC')
+      .getMany();
+
+    // 4) หา empno ทั้งหมด
+    const empnos = passengers.map((p) => p.empno);
+
+    // 5) map ข้อมูลชื่อ/แผนกจาก source เดิม
+    const employeeMap = await this.getEmployeeReportMap(empnos);
+
+    // 6) ประกอบ report
+    const resultLines = lines.map((line) => {
+      const lineStops = stops.filter((s) => s.line_id === line.busid).map((stop) => {
+          const stopPassengers = passengers.filter((p) => p.stop_id === stop.stop_id).map((p, index) => {
+              const emp = employeeMap[p.empno] || {};
+
+              return {
+                no: index + 1,
+                empno: p.empno,
+                fullname: emp.fullname || '',
+                dept: emp.dept || '',
+                sec: emp.sec || '',
+                div: emp.div || '',
+              };
+            });
+
+          return {
+            stop_id: stop.stop_id,
+            stop_name: stop.stop_name || '',
+            plan_time: stop.plan_time || '',
+            passengers: stopPassengers,
+          };
+        });
+
+      return {
+        busid: line.busid,
+        busname: line.busname || '',
+        bustype: line.bustype || '',
+        busseat: line.busseat,
+        line_status: line.line_status || '',
+        stops: lineStops,
+      };
+    });
+
+    return {
+      status: true,
+      dispatch_id: dispatchId,
+      title: await this.buildDispatchReportTitle(dispatchId),
+      lines: resultLines,
+    };
+  }
+
+
+  async getReportDisabledPassenger(dto: DailyDispatchReportDto) {
+    const dispatchId = Number(dto.dispatch_id);
+    const passengers = await this.dataSource
+      .getRepository(BusDispatchPassenger)
+      .createQueryBuilder('p')
+      .leftJoinAndSelect(BusDispatchStop, 's', 's.dispatch_id = p.dispatch_id AND s.stop_id = p.stop_id')
+      .where('p.dispatch_id = :dispatchId', { dispatchId })
+      .andWhere("NVL(p.status, 'E') = 'D'")
+      .orderBy('p.empno', 'ASC')
+      .getRawMany();
+
+    const empnos = passengers.map((p) => p.p_EMPNO);
+    const employeeMap = await this.getEmployeeReportMap(empnos);
+
+    const rows = passengers.map((row, index) => {
+      const empno = row.p_EMPNO;
+      const emp = employeeMap[empno] || {};
+
+      return {
+        no: index + 1,
+        empno,
+        fullname: emp.fullname || '',
+        dept: emp.dept || '',
+        stop_name: row.s_STOP_NAME || '',
+        plan_time: row.s_PLAN_TIME || '',
+      };
+    });
+
+    return {
+      status: true,
+      dispatch_id: dispatchId,
+      title: 'รายชื่อผู้ที่ไม่ได้จัดรถ',
+      rows,
+    };
+  }
+
+  private async getEmployeeReportMap(empnos: string[]) {
+  if (!empnos.length) return {};
+
+  const uniqueEmpnos = [...new Set(empnos)];
+  const placeholders = uniqueEmpnos.map((_, i) => `:${i + 1}`).join(',');
+
+  const rows = await this.dataSource.query(
+    `
+    SELECT
+      SEMPNO,
+      SNAME,
+      SSEC,
+      SDEPT,
+      SDIV
+    FROM AMECUSERALL
+    WHERE SEMPNO IN (${placeholders})
+    `,
+    uniqueEmpnos
+  );
+
+  const map: Record<string, any> = {};
+
+  for (const r of rows) {
+    const empno = String(r.SEMPNO);
+
+    map[empno] = {
+      fullname: r.SNAME || '',
+      sec: r.SSEC || '',
+      dept: r.SDEPT || '',
+      div: r.SDIV || '',
+    };
+  }
+
+  return map;
+}
+
+
+  private async buildDispatchReportTitle(dispatchId: number) {
+    const head = await this.dataSource
+      .getRepository(BusDispatchHead)
+      .createQueryBuilder('h')
+      .where('h.dispatch_id = :dispatchId', { dispatchId })
+      .getOne();
+
+    if (!head) return 'ตารางรถรับส่งพนักงาน';
+
+    const date = head.dispatch_date
+      ? new Date(head.dispatch_date).toLocaleDateString('th-TH')
+      : '';
+
+    let timeText = '';
+    if (head.dispatch_type === 'O' && head.shift === 'D') timeText = 'OT เวลา 19.30 น.';
+    else if (head.dispatch_type === 'O' && head.shift === 'N') timeText = 'OT เวลา 07.30 น.';
+    else if (head.shift === 'H') timeText = 'HOLIDAY';
+
+    return `ตารางรถรับส่งพนักงาน ${timeText} ประจำวันที่ ${date}`;
+  }
+
+  
+
+
+
 
 }

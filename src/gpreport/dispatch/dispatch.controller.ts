@@ -7,7 +7,14 @@ import { DispatchKeyDto } from './dto/dispatch-key.dto';
 import { MoveStopDto } from './dto/move-stop.dto';
 import { DeleteLineDto } from './dto/delete-line.dto';
 import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { DailyDispatchReportDto } from './dto/dispatch-report.dto';
 
+export class DispatchReportDto {
+  @IsString()
+  @IsNotEmpty()
+  dispatch_id: string;
+}
 
 @Controller('bus/dispatch')
 export class DispatchController {
@@ -45,5 +52,15 @@ export class DispatchController {
   @Post('save-add-passenger')
   async saveAddPassenger(@Body() dto: SaveAddPassengerDto) {
     return this.service.saveAddPassenger(dto);
+  }
+
+  @Post('report-bus-daily')
+  getReportBus(@Body() dto: DailyDispatchReportDto) {
+    return this.service.getReportBus(dto);
+  }
+
+  @Post('report-disabled-passenger-daily')
+  getReportDisabledPassenger(@Body() dto: DailyDispatchReportDto) {
+    return this.service.getReportDisabledPassenger(dto);
   }
 }

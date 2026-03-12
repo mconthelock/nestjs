@@ -146,7 +146,9 @@ pipeline {
 
                             \$env:NODE_ENV='production'
                             cd api
-                            rm -rf node_modules
+                            if (Test-Path node_modules) {
+                                cmd /c rmdir /s /q node_modules
+                            }
                             npm ci --omit=dev 
                             node -e "require('sharp'); console.log('sharp OK')"
                             Remove-PSDrive -Name 'Z' -Force

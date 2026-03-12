@@ -132,7 +132,7 @@ pipeline {
                     sshagent(credentials: ['ssh-amecweb1']) {
                         sh """
                             ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
-                            powershell "
+                            powershell -NoProfile -Command "
                             \$pass = '${NAS_PASS}'
                             \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
                             \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
@@ -150,7 +150,7 @@ pipeline {
                                 cmd /c rmdir /s /q node_modules
                             }
                             npm ci --omit=dev 
-                            node -e "require('sharp'); console.log('sharp OK')"
+                            node -e \\"require('sharp'); console.log('sharp OK')\\"
                             Remove-PSDrive -Name 'Z' -Force
                             "
                         EOF

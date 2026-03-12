@@ -15,6 +15,6 @@ export class DispatchKeyDto {
   @IsIn(['O', 'W']) // O = OT, W = Workday
   dispatch_type: 'O' | 'W';
 
-  @IsIn(['D', 'N', 'H']) // D = Day, N = Night, H = Holiday
-  shift: 'D' | 'N' | 'H';
+  @IsIn(['D', 'S' , 'N', 'H']) // D=Day(19.30), S=Special (21.30),  N=Night (07.30), H=Holiday (17.00)
+  shift: 'D' | 'S' | 'N' | 'H';
 }

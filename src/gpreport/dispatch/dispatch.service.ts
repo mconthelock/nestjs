@@ -842,7 +842,6 @@ export class DispatchService {
 
     const empnos = passengers.map((p) => p.p_EMPNO);
     const employeeMap = await this.getEmployeeReportMap(empnos);
-
     const rows = passengers.map((row, index) => {
       const empno = row.p_EMPNO;
       const emp = employeeMap[empno] || {};
@@ -917,8 +916,9 @@ export class DispatchService {
 
     let timeText = '';
     if (head.dispatch_type === 'O' && head.shift === 'D') timeText = 'OT เวลา 19.30 น.';
-    else if (head.dispatch_type === 'O' && head.shift === 'N') timeText = 'OT เวลา 07.30 น.';
-    else if (head.shift === 'H') timeText = 'HOLIDAY';
+    else if (head.dispatch_type === 'O' && head.shift === 'S') timeText = 'OT เวลา 21.30 น.';
+    else if (head.dispatch_type === 'O' && head.shift === 'N') timeText = 'OT (กะกลางคืน) เวลา 07.30 น.';
+    else if (head.shift === 'H') timeText = 'OT เวลา 17.00 น.';
 
     return `ตารางรถรับส่งพนักงาน ${timeText} ประจำวันที่ ${date}`;
   }

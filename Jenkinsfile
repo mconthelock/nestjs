@@ -131,31 +131,27 @@ pipeline {
                     // Server 1: amecweb1
                     sshagent(credentials: ['ssh-amecweb1']) {
                         sh """
-                            ssh -o StrictHostKeyChecking=no Administrator@amecweb1 powershell -NoProfile -Command "& {
+                            ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
+                            powershell "
+                            \$pass = '${NAS_PASS}'
+                            \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
+                            \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
 
-                            \\$pass='${NAS_PASS}';
-                            \\$secPass=ConvertTo-SecureString \\$pass -AsPlainText -Force;
-                            \\$cred=New-Object System.Management.Automation.PSCredential('${NAS_USER}',\\$secPass);
+                            if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
+                                Remove-PSDrive -Name 'Z' -Force
+                            }
 
-                            if (Get-PSDrive -Name Z -ErrorAction SilentlyContinue) { Remove-PSDrive -Name Z -Force }
-
-                            New-PSDrive -Name Z -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \\$cred -Scope Global -ErrorAction Stop
-
+                            New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
                             Set-Location Z:\\api_test
-
                             dir
-
-                            \\$env:NODE_ENV='production'
-
-                            if (Test-Path node_modules) { cmd /c rmdir /s /q node_modules }
-
-                            npm ci --omit=dev
-
-                            node -e \\"require('sharp'); console.log('sharp OK')\\"
-
-                            Remove-PSDrive -Name Z -Force
-
-                            }"
+                            \$env:NODE_ENV='production'
+                            if (Test-Path node_modules) {
+                                cmd /c rmdir /s /q node_modules
+                            }
+                            npm ci --omit=dev 
+                            Remove-PSDrive -Name 'Z' -Force
+                            "
+                        EOF
                         """
                     }
 

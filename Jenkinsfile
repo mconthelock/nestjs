@@ -131,27 +131,31 @@ pipeline {
                     // Server 1: amecweb1
                     sshagent(credentials: ['ssh-amecweb1']) {
                         sh """
-                            ssh -o StrictHostKeyChecking=no Administrator@amecweb1 powershell -NoProfile -Command "
-                            \$pass = '${NAS_PASS}';
-                            \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force;
-                            \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass);
+                            ssh -o StrictHostKeyChecking=no Administrator@amecweb1 powershell -NoProfile -Command "& {
 
-                            if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) { Remove-PSDrive -Name 'Z' -Force };
+                            \\$pass='${NAS_PASS}';
+                            \\$secPass=ConvertTo-SecureString \\$pass -AsPlainText -Force;
+                            \\$cred=New-Object System.Management.Automation.PSCredential('${NAS_USER}',\\$secPass);
 
-                            New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop;
-                            Set-Location Z:\\api_test;
-                            dir;
+                            if (Get-PSDrive -Name Z -ErrorAction SilentlyContinue) { Remove-PSDrive -Name Z -Force }
 
-                            \$env:NODE_ENV='production';
+                            New-PSDrive -Name Z -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \\$cred -Scope Global -ErrorAction Stop
 
-                            if (Test-Path node_modules) { cmd /c rmdir /s /q node_modules };
+                            Set-Location Z:\\api_test
 
-                            npm ci --omit=dev;
+                            dir
 
-                            node -e \\"require('sharp'); console.log('sharp OK')\\";
+                            \\$env:NODE_ENV='production'
 
-                            Remove-PSDrive -Name 'Z' -Force;
-                            "
+                            if (Test-Path node_modules) { cmd /c rmdir /s /q node_modules }
+
+                            npm ci --omit=dev
+
+                            node -e \\"require('sharp'); console.log('sharp OK')\\"
+
+                            Remove-PSDrive -Name Z -Force
+
+                            }"
                         """
                     }
 

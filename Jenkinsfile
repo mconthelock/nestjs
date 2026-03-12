@@ -27,6 +27,7 @@ pipeline {
                     // จะไป Production ได้ต้อง: กดมือเอง (Manual) AND เลือก Parameter เป็น production
                     if (isManualTrigger && params.DEPLOY_ENV == 'production') {
                         env.TARGET_DIR = '/var/amecweb/wwwroot/production/api_test'
+                        env.REMOTE_HOST = 'amecweb1, amecweb2'
                         env.ENV_CRED_ID = 'api-env-prod'
                         // env.ENV_CRED_ID = 'apitest-env-prod'
                         env.NODE_ENV = 'production'
@@ -36,6 +37,7 @@ pipeline {
                     // กรณีอื่นๆ (เช่น GitLab Webhook ผลักมา หรือกดมือแต่เลือก development)
                     else {
                         env.TARGET_DIR = '/var/amecweb/wwwroot/development/api'
+                        env.REMOTE_HOST = 'amecwebtest'
                         env.ENV_CRED_ID = 'api-env-file'
                         env.NODE_ENV = 'development'
                         env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\development"
@@ -111,6 +113,13 @@ pipeline {
                             body: """
                                 Dear Team,
                                 The package.json file has changed in the latest deployment to ${params.DEPLOY_ENV} environment. Please log in to the NAS server and run 'npm install' in the target directory to ensure all dependencies are up to date.
+                                -------------------------------------------
+                                ขั้นตอนที่ต้องทำ:
+                                1. CD ไปที่ ${TARGET_DIR}
+                                2. รันคำสั่ง: npm install
+                                3. Remote Desktop ไปที่ ${REMOTE_HOST}
+                                4. เปิด Terminal
+                                5. รันคำสั่ง: pm2 reload api
                             """
                         )
                     } else if (packageChanged == "NEW") {
@@ -131,37 +140,52 @@ pipeline {
             }
         }
 
-        // stage('Restart Application on NAS for Development') {
-        //     when { expression { params.DEPLOY_ENV == 'development' }}
-        //     steps {
-        //         sshagent(credentials: ['ssh-amecwebtest1']) {
-        //             withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
-        //                 sh """
-        //                     ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
-        //                     powershell "
-        //                     \$pass = '${NAS_PASS}'
-        //                     \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
-        //                     \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
+        stage('Restart Application on NAS for Development') {
+            when { expression { params.DEPLOY_ENV == 'development' }}
+            steps {
+                script {
+                    if (env.PACKAGE_STATUS == "CHANGED") {
+                        echo "================================================"
+                        echo "⚠️  WARNING: package.json has changed!"
+                        echo "⚠️  Please run manually:"
+                        echo "    1. CD ไปที่ ${TARGET_DIR}"
+                        echo "    2. รันคำสั่ง: npm install"
+                        echo "    3. Remote Desktop ไปที่ ${REMOTE_HOST}"
+                        echo "    4. เปิด Terminal"
+                        echo "    5. รันคำสั่ง: pm2 reload api"
+                        echo "================================================"
+                        echo "Skipping automatic PM2 reload..."
+                    } else {
+                        sshagent(credentials: ['ssh-amecwebtest1']) {
+                            withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
+                                sh """
+                                    ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
+                                    powershell "
+                                    \$pass = '${NAS_PASS}'
+                                    \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
+                                    \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
 
-        //                     if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
-        //                         Remove-PSDrive -Name 'Z' -Force
-        //                     }
+                                    if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
+                                        Remove-PSDrive -Name 'Z' -Force
+                                    }
 
-        //                     New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
-        //                     Set-Location Z:
+                                    New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
+                                    Set-Location Z:
 
-        //                     \$env:NODE_ENV='development'
-        //                     cd api
-        //                     pm2 reload ecosystem.config.js
+                                    \$env:NODE_ENV='development'
+                                    cd api
+                                    pm2 reload ecosystem.config.js
 
-        //                     Remove-PSDrive -Name 'Z' -Force
-        //                     "
-        //                 EOF
-        //                 """
-        //             }
-        //         }
-        //     }
-        // }
+                                    Remove-PSDrive -Name 'Z' -Force
+                                    "
+                                EOF
+                                """
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         stage('Restart Application on NAS for Production') {
             when { expression { params.DEPLOY_ENV == 'production'} }
@@ -171,10 +195,11 @@ pipeline {
                         echo "================================================"
                         echo "⚠️  WARNING: package.json has changed!"
                         echo "⚠️  Please run manually:"
-                        echo "    1. RDP to amecweb1"
-                        echo "    2. cd \\\\\\\\172.21.255.188\\\\amecweb\\\\wwwroot\\\\production\\\\api_test"
-                        echo "    3. npm install"
-                        echo "    4. pm2 reload ecosystem.config.js"
+                        echo "    1. CD ไปที่ ${TARGET_DIR}"
+                        echo "    2. รันคำสั่ง: npm install"
+                        echo "    3. Remote Desktop ไปที่ ${REMOTE_HOST}"
+                        echo "    4. เปิด Terminal"
+                        echo "    5. รันคำสั่ง: pm2 reload api"
                         echo "================================================"
                         echo "Skipping automatic PM2 reload..."
                     } else {
@@ -192,38 +217,36 @@ pipeline {
                                     }
 
                                     New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
-                                    Set-Location Z:\\\\api_test
+                                    Set-Location Z:\\\\api
 
                                     \$env:NODE_ENV = 'production'
-                                    pm2 reload api_test
+                                    pm2 reload ecosystem.config.js
                                     Remove-PSDrive -Name Z -Force
                                     "
                                 EOF
                                 """
                             }
-                    // sshagent(credentials: ['ssh-amecweb2']) {
-                    //     sh """
-                    //         ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
-                    //         powershell "
-                    //         \$pass = '${NAS_PASS}'
-                    //         \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
-                    //         \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
+                            sshagent(credentials: ['ssh-amecweb2']) {
+                                sh """
+                                    ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
+                                    powershell "
+                                    \$pass = '${NAS_PASS}'
+                                    \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
+                                    \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
 
-                    //         if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
-                    //             Remove-PSDrive -Name 'Z' -Force
-                    //         }
+                                    if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
+                                        Remove-PSDrive -Name 'Z' -Force
+                                    }
 
-                    //         New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
-                    //         Set-Location Z:
+                                    New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
+                                    Set-Location Z:\\\\api
 
-                    //         \$env:NODE_ENV='production'
-                    //         cd api
-                    //         pm2 reload ecosystem.config.js
-                    //         Remove-PSDrive -Name 'Z' -Force
-                    //         "
-                    //     EOF
-                    //     """
-                    // }
+                                    pm2 reload ecosystem.config.js
+                                    Remove-PSDrive -Name 'Z' -Force
+                                    "
+                                EOF
+                                """
+                            }
                         }
                     }
                 }

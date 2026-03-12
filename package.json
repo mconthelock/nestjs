@@ -22,7 +22,8 @@
     "typeorm": "typeorm --dataSource src/common/databases/data-source.ts",
     "migration:create": "npm run typeorm -- migration:create -n",
     "migration:run": "npm run typeorm -- migration:run",
-    "migration:revert": "npm run typeorm -- migration:revert"
+    "migration:revert": "npm run typeorm -- migration:revert",
+    "postinstall": "playwright install chromium"
   },
   "dependencies": {
     "@nestjs/apollo": "^13.1.0",

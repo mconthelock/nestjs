@@ -57,6 +57,7 @@ pipeline {
                 sh '''
                     echo "Testing write access to target directory..."
                     cd ${TARGET_DIR} || { echo "Failed to change directory to ${TARGET_DIR}"; exit 1; }
+                    npm install node-pre-gyp || { echo "npm install node-pre-gyp failed in ${TARGET_DIR}"; exit 1; }
                     npm ci --omit=dev  --no-bin-links || { echo "npm install failed in ${TARGET_DIR}"; exit 1; }
                     echo "Write test successful!" || echo "Write test failed!"
                 '''

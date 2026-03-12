@@ -80,14 +80,44 @@ pipeline {
 
         stage('Deploy to NAS') {
             steps {
+                script {
+                    // เช็ค package.json ก่อน deploy
+                    def packageChanged = sh(
+                        script: """
+                            if [ -f ${TARGET_DIR}/package.json ]; then
+                                OLD_HASH=\$(md5sum ${TARGET_DIR}/package.json | cut -d' ' -f1)
+                                NEW_HASH=\$(md5sum package.json | cut -d' ' -f1)
+                                if [ "\$OLD_HASH" != "\$NEW_HASH" ]; then
+                                    echo "CHANGED"
+                                else
+                                    echo "UNCHANGED"
+                                fi
+                            else
+                                echo "NEW"
+                            fi
+                        """,
+                        returnStdout: true
+                    ).trim()
+                    
+                    env.PACKAGE_STATUS = packageChanged
+                    
+                    if (packageChanged == "CHANGED") {
+                        echo "⚠️  WARNING: package.json has changed!"
+                        echo "⚠️  You need to run: npm install manually"
+                    } else if (packageChanged == "NEW") {
+                        echo "ℹ️  First deployment detected"
+                    } else {
+                        echo "✓ package.json unchanged"
+                    }
+                }
+                
                 sh '''
                     mkdir -p ${TARGET_DIR}
                     rsync -rlptz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
                     rsync -av public/ ${TARGET_DIR}/public/
                     rsync -vpt package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env ${TARGET_DIR}/
 
-                    echo "Testing write access to target directory..."
-                    
+                    echo "Deploy completed"
                 '''
             }
         }
@@ -127,58 +157,42 @@ pipeline {
         stage('Restart Application on NAS for Production') {
             when { expression { params.DEPLOY_ENV == 'production'} }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
-                    // Server 1: amecweb1
-                    sshagent(credentials: ['ssh-amecweb1']) {
-                        sh """
-                            ssh -o StrictHostKeyChecking=no Administrator@amecweb1 powershell -Command - << 'PSEOF'
-                            \$pass = '${NAS_PASS}'
-                            \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
-                            \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
+                script {
+                    if (env.PACKAGE_STATUS == "CHANGED") {
+                        echo "================================================"
+                        echo "⚠️  WARNING: package.json has changed!"
+                        echo "⚠️  Please run manually:"
+                        echo "    1. RDP to amecweb1"
+                        echo "    2. cd \\\\\\\\172.21.255.188\\\\amecweb\\\\wwwroot\\\\production\\\\api_test"
+                        echo "    3. npm install"
+                        echo "    4. pm2 reload ecosystem.config.js"
+                        echo "================================================"
+                        echo "Skipping automatic PM2 reload..."
+                    } else {
+                        withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
+                            sshagent(credentials: ['ssh-amecweb1']) {
+                                sh """
+                                    ssh -o StrictHostKeyChecking=no Administrator@amecweb1 powershell -Command - << 'PSEOF'
+                                    \$pass = '${NAS_PASS}'
+                                    \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
+                                    \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
 
-                            Write-Host 'Mounting network drive...'
-                            if (Get-PSDrive -Name Z -ErrorAction SilentlyContinue) {
-                                Remove-PSDrive -Name Z -Force
+                                    Write-Host 'Mounting network drive...'
+                                    if (Get-PSDrive -Name Z -ErrorAction SilentlyContinue) {
+                                        Remove-PSDrive -Name Z -Force
+                                    }
+
+                                    New-PSDrive -Name Z -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
+                                    Set-Location Z:\\\\api_test
+
+                                    Write-Host 'Reloading application with PM2...' -ForegroundColor Green
+                                    \$env:NODE_ENV = 'production'
+
+                                    Remove-PSDrive -Name Z -Force
+                                    Write-Host 'Application reloaded successfully!' -ForegroundColor Green
+                                    PSEOF
+                                """
                             }
-
-                            New-PSDrive -Name Z -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
-                            Set-Location Z:\\api_test
-
-                            Write-Host 'Current directory contents:'
-                            Get-ChildItem
-
-                            \$env:NODE_ENV = 'production'
-
-                            Write-Host 'Removing node_modules...'
-                            if (Test-Path node_modules) {
-                                Remove-Item -Path node_modules -Recurse -Force
-                            }
-
-                            Write-Host 'Setting npm proxy configuration...'
-                            \$env:HTTP_PROXY = 'http://192.168.3.1:3128'
-                            \$env:HTTPS_PROXY = 'http://192.168.3.1:3128'
-                            npm config set proxy http://192.168.3.1:3128
-                            npm config set https-proxy http://192.168.3.1:3128
-                            npm config set fetch-timeout 300000
-                            npm config set fetch-retries 5
-
-                            Write-Host 'Starting npm ci (this may take several minutes)...'
-                            npm ci --omit=dev --loglevel=info
-
-                            Write-Host 'Cleaning up npm proxy configuration...'
-                            npm config delete proxy
-                            npm config delete https-proxy
-                            Remove-Item Env:\\HTTP_PROXY -ErrorAction SilentlyContinue
-                            Remove-Item Env:\\HTTPS_PROXY -ErrorAction SilentlyContinue
-
-                            Write-Host 'npm ci completed successfully'
-
-                            Remove-PSDrive -Name Z -Force
-                            Write-Host 'Done!'
-                            PSEOF
-                        """
-                    }
-
                     // sshagent(credentials: ['ssh-amecweb2']) {
                     //     sh """
                     //         ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
@@ -202,6 +216,8 @@ pipeline {
                     //     EOF
                     //     """
                     // }
+                        }
+                    }
                 }
             }
         }

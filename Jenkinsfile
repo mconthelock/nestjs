@@ -132,6 +132,8 @@ pipeline {
                     sshagent(credentials: ['ssh-amecweb1']) {
                         sh """
                             ssh -o StrictHostKeyChecking=no Administrator@amecweb1 powershell -Command - << 'PSEOF'
+                            \$pass = '${NAS_PASS}'
+                            \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
                             \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
 
                             Write-Host 'Mounting network drive...'
@@ -152,8 +154,22 @@ pipeline {
                                 Remove-Item -Path node_modules -Recurse -Force
                             }
 
+                            Write-Host 'Setting npm proxy configuration...'
+                            \$env:HTTP_PROXY = 'http://192.168.3.1:3128'
+                            \$env:HTTPS_PROXY = 'http://192.168.3.1:3128'
+                            npm config set proxy http://192.168.3.1:3128
+                            npm config set https-proxy http://192.168.3.1:3128
+                            npm config set fetch-timeout 300000
+                            npm config set fetch-retries 5
+
                             Write-Host 'Starting npm ci (this may take several minutes)...'
                             npm ci --omit=dev --loglevel=info
+
+                            Write-Host 'Cleaning up npm proxy configuration...'
+                            npm config delete proxy
+                            npm config delete https-proxy
+                            Remove-Item Env:\\HTTP_PROXY -ErrorAction SilentlyContinue
+                            Remove-Item Env:\\HTTPS_PROXY -ErrorAction SilentlyContinue
 
                             Write-Host 'npm ci completed successfully'
 

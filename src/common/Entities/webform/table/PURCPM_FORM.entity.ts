@@ -63,7 +63,7 @@ export class PURCPM_FORM {
   @Column()
   INVOICE_NO: string;
 
-  @Column()
+  @Column({type: 'decimal', precision: 10, scale: 2 })
   INVOICE_AMOUNT: number;
 
   @Column()
@@ -78,7 +78,7 @@ export class PURCPM_FORM {
   @Column()
   PAYMENT_NUM: number;
 
-  @Column()
+  @Column({type: 'decimal', precision: 10, scale: 2 })
   PAYMENT: number;
 
   @Column()

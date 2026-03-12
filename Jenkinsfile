@@ -55,6 +55,46 @@ pipeline {
         stage('Test Change Directory') {
             steps {
                 sh '''
+                   
+                '''
+            }
+
+        }
+
+        stage('Checkout') {
+            steps {
+                // checkout scmGit(
+                //     branches: [[name: '*/main']],
+                //     userRemoteConfigs: [[
+                //         url: 'https://webhub.mitsubishielevatorasia.co.th/wsd/api.git',
+                //         credentialsId: 'gitlab-auth-id']
+                //     ]
+                // )
+                checkout scm
+            }
+        }
+
+        stage('Install & Build') {
+            steps {
+                withCredentials([file(credentialsId: "${env.ENV_CRED_ID}", variable: 'ENV_FILE')]) {
+                    sh '''
+                        NODE_ENV=development
+                        npm install
+                        npm run build
+                        cp ${ENV_FILE} .env
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to NAS') {
+            steps {
+                sh '''
+                    mkdir -p ${TARGET_DIR}
+                    rsync -rlptz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
+                    rsync -av public/ ${TARGET_DIR}/public/
+                    rsync -vpt package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env ${TARGET_DIR}/
+
                     echo "Testing write access to target directory..."
                     npm install -g node-gyp node-gyp-build @mapbox/node-pre-gyp
                     cd ${TARGET_DIR} || { echo "Failed to change directory to ${TARGET_DIR}"; exit 1; }
@@ -63,82 +103,7 @@ pipeline {
                     echo "Write test successful!" || echo "Write test failed!"
                 '''
             }
-
         }
-
-        // stage('Checkout') {
-        //     steps {
-        //         // checkout scmGit(
-        //         //     branches: [[name: '*/main']],
-        //         //     userRemoteConfigs: [[
-        //         //         url: 'https://webhub.mitsubishielevatorasia.co.th/wsd/api.git',
-        //         //         credentialsId: 'gitlab-auth-id']
-        //         //     ]
-        //         // )
-        //         checkout scm
-        //     }
-        // }
-
-        // stage('Install & Build') {
-        //     steps {
-        //         withCredentials([file(credentialsId: "${env.ENV_CRED_ID}", variable: 'ENV_FILE')]) {
-        //             sh '''
-        //                 NODE_ENV=development
-        //                 npm install
-        //                 npm run build
-        //                 cp ${ENV_FILE} .env
-        //             '''
-        //         }
-        //     }
-        // }
-
-        // stage('Check dependency change') {
-        //     steps {
-        //         script {
-        //             // def changed = sh(
-        //             //     script: "git diff --name-only HEAD~1 HEAD | grep package-lock.json || true",
-        //             //     returnStdout: true
-        //             // ).trim()
-
-        //             // env.NPM_CHANGED = changed ? "true" : "false"
-
-        //             def hash = sh(
-        //                 script: "sha256sum package-lock.json | cut -d ' ' -f1",
-        //                 returnStdout: true
-        //             ).trim()
-
-        //             def oldHash = sh(
-        //                 script: "cat ${TARGET_DIR}/.package-lock.hash 2>/dev/null || true",
-        //                 returnStdout: true
-        //             ).trim()
-
-        //             env.NPM_CHANGED = (hash != oldHash) ? "true" : "false"
-        //             env.NEW_HASH = hash
-        //         }
-        //     }
-        // }
-
-        // stage('Deploy to NAS') {
-        //     steps {
-        //         sh '''
-        //             mkdir -p ${TARGET_DIR}
-        //             rsync -rlptz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
-        //             rsync -av public/ ${TARGET_DIR}/public/
-        //             rsync -vpt package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env ${TARGET_DIR}/
-        //             echo ${NPM_CHANGED} ${NEW_HASH} > ${TARGET_DIR}/.package-lock.hash
-        //         '''
-        //         // script {
-        //         //     if (env.NPM_CHANGED == "true") {
-        //         //         sh '''
-        //         //             rsync -rlptz --delete node_modules/ ${TARGET_DIR}/node_modules/
-        //         //             echo ${NEW_HASH} > ${TARGET_DIR}/.package-lock.hash
-        //         //         '''
-        //         //     } else {
-        //         //         echo "node_modules unchanged, skip sync"
-        //         //     }
-        //         // }
-        //     }
-        // }
 
         // stage('Restart Application on NAS for Development') {
         //     when { expression { params.DEPLOY_ENV == 'development' }}

@@ -131,9 +131,7 @@ pipeline {
                     // Server 1: amecweb1
                     sshagent(credentials: ['ssh-amecweb1']) {
                         sh """
-                            ssh -o StrictHostKeyChecking=no Administrator@amecweb1 'powershell -' << 'PSEOF'
-                            \$pass = '${NAS_PASS}'
-                            \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
+                            ssh -o StrictHostKeyChecking=no Administrator@amecweb1 powershell -Command - << 'PSEOF'
                             \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
 
                             Write-Host 'Mounting network drive...'

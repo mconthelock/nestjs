@@ -104,6 +104,15 @@ pipeline {
                     if (packageChanged == "CHANGED") {
                         echo "⚠️  WARNING: package.json has changed!"
                         echo "⚠️  You need to run: npm install manually"
+                        mail (
+                            to: 'sec_wsd@MitsubishiElevatorAsia.co.th',
+                            subject: "⚠️WARNING: package.json has changed! You need to run: npm install manually (${params.DEPLOY_ENV})",
+                            from: 'jenkins-notify@MitsubishiElevatorAsia.co.th',
+                            body: """
+                                Dear Team,
+                                The package.json file has changed in the latest deployment to ${params.DEPLOY_ENV} environment. Please log in to the NAS server and run 'npm install' in the target directory to ensure all dependencies are up to date.
+                            """
+                        )
                     } else if (packageChanged == "NEW") {
                         echo "ℹ️  First deployment detected"
                     } else {
@@ -186,7 +195,7 @@ pipeline {
                                     Set-Location Z:\\\\api_test
 
                                     \$env:NODE_ENV = 'production'
-
+                                    pm2 reload api_test
                                     Remove-PSDrive -Name Z -Force
                                     "
                                 EOF

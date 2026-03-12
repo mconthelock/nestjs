@@ -56,8 +56,9 @@ pipeline {
             steps {
                 sh '''
                     echo "Testing write access to target directory..."
+                    npm install -g @mapbox/node-pre-gyp
                     cd ${TARGET_DIR} || { echo "Failed to change directory to ${TARGET_DIR}"; exit 1; }
-                    npm install node-pre-gyp --no-bin-links || { echo "npm install node-pre-gyp failed in ${TARGET_DIR}"; exit 1; }
+                    rm -rf node_modules
                     npm ci --omit=dev  --no-bin-links || { echo "npm install failed in ${TARGET_DIR}"; exit 1; }
                     echo "Write test successful!" || echo "Write test failed!"
                 '''

@@ -52,15 +52,6 @@ pipeline {
             }
         }
 
-        stage('Test Change Directory') {
-            steps {
-                sh '''
-                   
-                '''
-            }
-
-        }
-
         stage('Checkout') {
             steps {
                 // checkout scmGit(
@@ -99,7 +90,7 @@ pipeline {
                     npm install -g node-gyp node-gyp-build @mapbox/node-pre-gyp
                     cd ${TARGET_DIR} || { echo "Failed to change directory to ${TARGET_DIR}"; exit 1; }
                     rm -rf node_modules
-                    npm ci --omit=dev  --no-bin-links  --ignore-scripts || { echo "npm install failed in ${TARGET_DIR}"; exit 1; }
+                    npm ci --omit=dev  --no-bin-links || { echo "npm install failed in ${TARGET_DIR}"; exit 1; }
                     echo "Write test successful!" || echo "Write test failed!"
                 '''
             }

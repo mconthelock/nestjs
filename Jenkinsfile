@@ -84,7 +84,7 @@ pipeline {
                     // เช็ค package.json ก่อน deploy
                     def packageChanged = sh(
                         script: """
-                            if [ -f ${TARGET_DIR}/package.json ]; then
+                            if [ -f /var/amecweb/wwwroot/production/api/package.json ]; then
                                 OLD_HASH=\$(md5sum ${TARGET_DIR}/package.json | cut -d' ' -f1)
                                 NEW_HASH=\$(md5sum package.json | cut -d' ' -f1)
                                 if [ "\$OLD_HASH" != "\$NEW_HASH" ]; then
@@ -188,7 +188,7 @@ pipeline {
                                     \$env:NODE_ENV = 'production'
 
                                     Remove-PSDrive -Name Z -Force
-                                    Write-Host 'Application reloaded successfully!' -ForegroundColor Green
+                                    "
                                 EOF
                                 """
                             }

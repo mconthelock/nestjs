@@ -84,7 +84,7 @@ pipeline {
                     // เช็ค package.json ก่อน deploy
                     def packageChanged = sh(
                         script: """
-                            if [ -f /var/amecweb/wwwroot/production/api/package.json ]; then
+                            if [ -f ${TARGET_DIR}/package.json ]; then
                                 OLD_HASH=\$(md5sum ${TARGET_DIR}/package.json | cut -d' ' -f1)
                                 NEW_HASH=\$(md5sum package.json | cut -d' ' -f1)
                                 if [ "\$OLD_HASH" != "\$NEW_HASH" ]; then

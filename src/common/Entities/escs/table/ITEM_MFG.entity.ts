@@ -34,6 +34,9 @@ export class ITEM_MFG {
     VFILE: string;
 
     @Column()
+    NQTY: number;
+
+    @Column()
     NSTATUS: number;
 
     @Column()

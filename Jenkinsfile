@@ -91,6 +91,7 @@ pipeline {
                     cd ${TARGET_DIR} || { echo "Failed to change directory to ${TARGET_DIR}"; exit 1; }
                     rm -rf node_modules
                     npm ci --omit=dev  --no-bin-links || { echo "npm install failed in ${TARGET_DIR}"; exit 1; }
+                    npm rebuild sharp --platform=win32 --arch=x64
                     echo "Write test successful!" || echo "Write test failed!"
                 '''
             }

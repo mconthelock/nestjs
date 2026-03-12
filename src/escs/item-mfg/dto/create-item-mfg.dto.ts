@@ -25,6 +25,11 @@ export class CreateItemMfgDto {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
+    NQTY: number;
+    
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
     NSEC_ID: number;
 
     @IsNotEmpty()

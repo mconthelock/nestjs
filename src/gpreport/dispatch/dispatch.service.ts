@@ -795,7 +795,7 @@ export class DispatchService {
               return {
                 no: index + 1,
                 empno: p.empno,
-                fullname: emp.fullname || '',
+                fullname: emp.thname || '',
                 dept: emp.dept || '',
                 sec: emp.sec || '',
                 div: emp.div || '',
@@ -849,8 +849,10 @@ export class DispatchService {
       return {
         no: index + 1,
         empno,
-        fullname: emp.fullname || '',
+        fullname: emp.thname || '',
+        sec: emp.sec || '',
         dept: emp.dept || '',
+        div: emp.div || '',
         stop_name: row.s_STOP_NAME || '',
         plan_time: row.s_PLAN_TIME || '',
       };
@@ -865,40 +867,35 @@ export class DispatchService {
   }
 
   private async getEmployeeReportMap(empnos: string[]) {
-  if (!empnos.length) return {};
+    if (!empnos.length) return {};
+    const uniqueEmpnos = [...new Set(empnos)];
+    const placeholders = uniqueEmpnos.map((_, i) => `:${i + 1}`).join(',');
+    const rows = await this.dataSource.query(
+      ` SELECT
+        SEMPNO,
+        SNAME,
+        STNAME,
+        SSEC,
+        SDEPT,
+        SDIV
+      FROM AMECUSERALL
+      WHERE SEMPNO IN (${placeholders}) `,
+      uniqueEmpnos
+    );
 
-  const uniqueEmpnos = [...new Set(empnos)];
-  const placeholders = uniqueEmpnos.map((_, i) => `:${i + 1}`).join(',');
-
-  const rows = await this.dataSource.query(
-    `
-    SELECT
-      SEMPNO,
-      SNAME,
-      SSEC,
-      SDEPT,
-      SDIV
-    FROM AMECUSERALL
-    WHERE SEMPNO IN (${placeholders})
-    `,
-    uniqueEmpnos
-  );
-
-  const map: Record<string, any> = {};
-
-  for (const r of rows) {
-    const empno = String(r.SEMPNO);
-
-    map[empno] = {
-      fullname: r.SNAME || '',
-      sec: r.SSEC || '',
-      dept: r.SDEPT || '',
-      div: r.SDIV || '',
-    };
+    const map: Record<string, any> = {};
+    for (const r of rows) {
+      const empno = String(r.SEMPNO);
+      map[empno] = {
+        thname: r.STNAME || '',
+        engname: r.SNAME || '',
+        sec: r.SSEC || '',
+        dept: r.SDEPT || '',
+        div: r.SDIV || '',
+      };
+    }
+    return map;
   }
-
-  return map;
-}
 
 
   private async buildDispatchReportTitle(dispatchId: number) {

@@ -1,21 +1,43 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { PDFDocument } from 'pdf-lib';
-import { PDFParse } from 'pdf-parse';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { spawn } from 'child_process';
+import { PDFDocument } from 'pdf-lib';
+import { PDFParse } from 'pdf-parse';
 
 import { M008KP } from 'src/as400/rtnlibf/m008kp/entities/m008kp.entity';
 import { F110KP } from 'src/amecmfg/f110kp/entities/f110kp.entity';
 import { F001KP } from 'src/as400/shopf/f001kp/entities/f001kp.entity';
-import { Repository } from 'typeorm';
+
+import { IdtagFiles } from '../../common/Entities/workload/table/idtag-files.entity';
+import { IdtagPages } from '../../common/Entities/workload/table/idtag-pages.entity';
+
+interface tagFileData {
+    FILES: number;
+    SCHDDATE: Date;
+    SCHDNUMBER: string;
+    SCHDP: string;
+    FILE_ONAME: string;
+    FILE_NAME: string;
+    FILE_FOLDER: string;
+    FILE_TOTALPAGE?: number;
+    FILE_STATUS?: string;
+    CREATE_DATE?: Date;
+    PRINTED_DATE?: Date;
+}
+
+interface tagPageData {
+    FILES_ID: number;
+    PAGE_NUM: number;
+    PAGE_TAG: string;
+    PAGE_STATUS: string;
+}
 
 @Injectable()
 export class IdtagService {
-    private formatElapsedTime(startTime: number) {
-        return `${Date.now() - startTime} ms`;
-    }
-
     constructor(
         @InjectRepository(M008KP, 'amecConnection')
         private readonly m08: Repository<M008KP>,
@@ -23,6 +45,15 @@ export class IdtagService {
         private readonly f11: Repository<F110KP>,
         @InjectRepository(F001KP, 'amecConnection')
         private readonly f01: Repository<F001KP>,
+
+        @InjectRepository(IdtagFiles, 'workloadConnection')
+        private readonly tagfile: Repository<IdtagFiles>,
+
+        @InjectRepository(IdtagPages, 'workloadConnection')
+        private readonly tagpage: Repository<IdtagPages>,
+
+        @InjectDataSource('workloadConnection')
+        private wkds: DataSource,
     ) {}
 
     async findBySchd(schd: string, schdp?: string) {
@@ -114,12 +145,16 @@ export class IdtagService {
 
     //Print PDF
     //inputFilePath: string, outputDirectory: string
+    private formatElapsedTime(startTime: number) {
+        return `${Date.now() - startTime} ms`;
+    }
+
     async processPdfDocument() {
         const totalStartTime = Date.now();
         try {
             const outputDirectory = path.join(
                 process.env.IDTAG_FILE_PATH,
-                'output/',
+                'TAG295G1/',
             );
             await fs.mkdir(outputDirectory, { recursive: true });
             console.log(
@@ -128,10 +163,9 @@ export class IdtagService {
 
             const inputFilePath = path.join(
                 process.env.IDTAG_FILE_PATH,
-                'TAGSUB.pdf',
-                // 'input.pdf',
+                'TAG295G1.pdf',
             );
-            // อ่านไฟล์ต้นฉบับ
+
             const readStartTime = Date.now();
             const pdfBytes = await fs.readFile(inputFilePath);
             console.log(
@@ -155,13 +189,10 @@ export class IdtagService {
             // ขั้นตอนที่ 2 & 3: แบ่งหน้า, อ่านข้อความตั้งชื่อไฟล์ และจำลองการบันทึกลง Database
             const splitStartTime = Date.now();
             for (let i = 1; i < pageCount; i++) {
-                const pageStartTime = Date.now();
-                // สร้างเอกสารใหม่สำหรับ 1 หน้า
                 const singlePageDoc = await PDFDocument.create();
                 const [copiedPage] = await singlePageDoc.copyPages(pdfDoc, [i]);
                 singlePageDoc.addPage(copiedPage);
                 const singlePageBytes = await singlePageDoc.save();
-                // อ่านข้อความในหน้านั้นๆ เพื่อหาชื่อไฟล์
                 const parser = new PDFParse({
                     data: Buffer.from(singlePageBytes),
                 });
@@ -173,28 +204,25 @@ export class IdtagService {
                     const tagNo = tagData[0]
                         .substring(0, 12)
                         .replace(/\s/g, '');
-                    // กำหนดชื่อไฟล์และ Path
-                    const newFileName = `${tagNo}_page${i}.pdf`;
+                    const newFileName = `${tagNo}.pdf`;
                     const outputPath = path.join(outputDirectory, newFileName);
-                    // บันทึกไฟล์แยกแต่ละหน้า
                     await fs.writeFile(outputPath, singlePageBytes);
                     splitFilesData.push({
                         fileName: tagNo,
                         filePath: outputPath,
-                        pageNumber: i + 1,
+                        pageNumber: i,
                     });
-                    // console.log(
-                    //     `[Idtag] Processed page ${i + 1} (${tagNo}) in ${this.formatElapsedTime(pageStartTime)}`,
-                    // );
-                    // ขั้นตอนที่ 3: บันทึกข้อมูลลง Database (เรียกใช้ฟังก์ชันจำลอง)
-                    // await this.saveToDatabase(extractedName, outputPath, i + 1);
                 } finally {
                     await parser.destroy();
                 }
             }
+
             console.log(
                 `[Idtag] Split ${splitFilesData.length} pages in ${this.formatElapsedTime(splitStartTime)}`,
             );
+
+            // ขั้นตอนที่ 3: บันทึกข้อมูลลง Database
+            await this.saveTagsData(splitFilesData, pageCount);
 
             // ขั้นตอนที่ 4: รวม PDF กลับมาเป็น 1 ไฟล์ให้เร็วที่สุด
             const mergeStartTime = Date.now();
@@ -208,16 +236,13 @@ export class IdtagService {
             console.log(
                 `[Idtag] Total processing time ${this.formatElapsedTime(totalStartTime)}`,
             );
-
-            //   return { status: 'success', totalPages: pageCount };
+            //return { status: 'success', totalPages: pageCount };
             return '';
         } catch (error) {
             console.error('เกิดข้อผิดพลาดในการประมวลผล PDF', error);
             throw error;
         }
     }
-
-    // ฟังก์ชันจำลองการทำงานของ Database
 
     // Logic การรวมไฟล์ให้เร็วที่สุด
     private async mergePdfsFast(
@@ -247,10 +272,98 @@ export class IdtagService {
             );
         }
 
-        const mergedPdfBytes = await mergedPdf.save();
+        const mergedPdfBytes = await mergedPdf.save({ useObjectStreams: true });
         await fs.writeFile(outputPath, mergedPdfBytes);
         console.log(
             `[Idtag] Saved merged PDF in ${this.formatElapsedTime(mergeStartTime)}`,
         );
+        await this.compressPdfWithGhostscript(outputPath);
+    }
+
+    private async compressPdfWithGhostscript(filePath: string) {
+        const compressStartTime = Date.now();
+        const parsedPath = path.parse(filePath);
+        const compressedPath = path.join(
+            parsedPath.dir,
+            `${parsedPath.name}.compressed${parsedPath.ext}`,
+        );
+        // const ghostscriptCommands = await this.getGhostscriptCommands();
+
+        await this.runGhostscript(filePath, compressedPath);
+        console.log(
+            `[Idtag] compressPdf in ${this.formatElapsedTime(compressStartTime)}`,
+        );
+        return compressedPath;
+    }
+
+    private async runGhostscript(inputPath: string, outputPath: string) {
+        const command =
+            '\\\\amecnas\\AMECWEB\\wwwroot\\production\\cdn\\Application\\gs\\gs10.00.0\\bin\\gswin32c.exe';
+        await new Promise<void>((resolve, reject) => {
+            const stderrChunks: Buffer[] = [];
+            const child = spawn(command, [
+                ...[],
+                '-sDEVICE=pdfwrite',
+                '-dCompatibilityLevel=1.7',
+                '-dNOPAUSE',
+                '-dQUIET',
+                '-dBATCH',
+                `-dPDFSETTINGS=/ebook`,
+                `-sOutputFile=${outputPath}`,
+                inputPath,
+            ]);
+
+            child.stderr.on('data', (chunk) => stderrChunks.push(chunk));
+            child.on('error', (error) => reject(error));
+            child.on('close', (code) => {
+                if (code === 0) {
+                    resolve();
+                    return;
+                }
+
+                reject(
+                    new Error(
+                        `Ghostscript exited with code ${code}: ${Buffer.concat(stderrChunks).toString().trim()}`,
+                    ),
+                );
+            });
+        });
+    }
+
+    private async saveTagsData(splitFilesData, pageCount) {
+        const runner = this.wkds.createQueryRunner();
+        await runner.connect();
+        await runner.startTransaction();
+        try {
+            const files: tagFileData = {
+                FILES: null,
+                SCHDDATE: new Date(),
+                SCHDNUMBER: '2026031',
+                SCHDP: 'G1',
+                FILE_ONAME: 'TAG295G1.pdf',
+                FILE_NAME: 'TAG295G1.pdf',
+                FILE_FOLDER: 'TAG295G1',
+                FILE_TOTALPAGE: pageCount,
+                FILE_STATUS: '0',
+                CREATE_DATE: new Date(),
+            };
+            const savedFile = await runner.manager.save(IdtagFiles, files);
+            for (const fileData of splitFilesData) {
+                const page: tagPageData = {
+                    FILES_ID: savedFile.FILES,
+                    PAGE_NUM: fileData.pageNumber,
+                    PAGE_TAG: fileData.fileName,
+                    PAGE_STATUS: '0',
+                };
+                await runner.manager.save(IdtagPages, page);
+            }
+
+            await runner.commitTransaction();
+        } catch (err) {
+            await runner.rollbackTransaction();
+            throw err;
+        } finally {
+            await runner.release();
+        }
     }
 }

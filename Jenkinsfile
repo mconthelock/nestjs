@@ -172,25 +172,24 @@ pipeline {
                         withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
                             sshagent(credentials: ['ssh-amecweb1']) {
                                 sh """
-                                    ssh -o StrictHostKeyChecking=no Administrator@amecweb1 powershell -Command - << 'PSEOF'
+                                    ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
+                                    powershell "
                                     \$pass = '${NAS_PASS}'
                                     \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
                                     \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
 
-                                    Write-Host 'Mounting network drive...'
-                                    if (Get-PSDrive -Name Z -ErrorAction SilentlyContinue) {
-                                        Remove-PSDrive -Name Z -Force
+                                    if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
+                                        Remove-PSDrive -Name 'Z' -Force
                                     }
 
-                                    New-PSDrive -Name Z -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
+                                    New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
                                     Set-Location Z:\\\\api_test
 
-                                    Write-Host 'Reloading application with PM2...' -ForegroundColor Green
                                     \$env:NODE_ENV = 'production'
 
                                     Remove-PSDrive -Name Z -Force
                                     Write-Host 'Application reloaded successfully!' -ForegroundColor Green
-                                    PSEOF
+                                EOF
                                 """
                             }
                     // sshagent(credentials: ['ssh-amecweb2']) {

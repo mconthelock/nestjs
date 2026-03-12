@@ -795,7 +795,7 @@ export class DispatchService {
               return {
                 no: index + 1,
                 empno: p.empno,
-                fullname: emp.fullname || '',
+                fullname: emp.thname || '',
                 dept: emp.dept || '',
                 sec: emp.sec || '',
                 div: emp.div || '',
@@ -842,7 +842,6 @@ export class DispatchService {
 
     const empnos = passengers.map((p) => p.p_EMPNO);
     const employeeMap = await this.getEmployeeReportMap(empnos);
-
     const rows = passengers.map((row, index) => {
       const empno = row.p_EMPNO;
       const emp = employeeMap[empno] || {};
@@ -850,8 +849,10 @@ export class DispatchService {
       return {
         no: index + 1,
         empno,
-        fullname: emp.fullname || '',
+        fullname: emp.thname || '',
+        sec: emp.sec || '',
         dept: emp.dept || '',
+        div: emp.div || '',
         stop_name: row.s_STOP_NAME || '',
         plan_time: row.s_PLAN_TIME || '',
       };
@@ -866,40 +867,35 @@ export class DispatchService {
   }
 
   private async getEmployeeReportMap(empnos: string[]) {
-  if (!empnos.length) return {};
+    if (!empnos.length) return {};
+    const uniqueEmpnos = [...new Set(empnos)];
+    const placeholders = uniqueEmpnos.map((_, i) => `:${i + 1}`).join(',');
+    const rows = await this.dataSource.query(
+      ` SELECT
+        SEMPNO,
+        SNAME,
+        STNAME,
+        SSEC,
+        SDEPT,
+        SDIV
+      FROM AMECUSERALL
+      WHERE SEMPNO IN (${placeholders}) `,
+      uniqueEmpnos
+    );
 
-  const uniqueEmpnos = [...new Set(empnos)];
-  const placeholders = uniqueEmpnos.map((_, i) => `:${i + 1}`).join(',');
-
-  const rows = await this.dataSource.query(
-    `
-    SELECT
-      SEMPNO,
-      SNAME,
-      SSEC,
-      SDEPT,
-      SDIV
-    FROM AMECUSERALL
-    WHERE SEMPNO IN (${placeholders})
-    `,
-    uniqueEmpnos
-  );
-
-  const map: Record<string, any> = {};
-
-  for (const r of rows) {
-    const empno = String(r.SEMPNO);
-
-    map[empno] = {
-      fullname: r.SNAME || '',
-      sec: r.SSEC || '',
-      dept: r.SDEPT || '',
-      div: r.SDIV || '',
-    };
+    const map: Record<string, any> = {};
+    for (const r of rows) {
+      const empno = String(r.SEMPNO);
+      map[empno] = {
+        thname: r.STNAME || '',
+        engname: r.SNAME || '',
+        sec: r.SSEC || '',
+        dept: r.SDEPT || '',
+        div: r.SDIV || '',
+      };
+    }
+    return map;
   }
-
-  return map;
-}
 
 
   private async buildDispatchReportTitle(dispatchId: number) {
@@ -917,8 +913,9 @@ export class DispatchService {
 
     let timeText = '';
     if (head.dispatch_type === 'O' && head.shift === 'D') timeText = 'OT เวลา 19.30 น.';
-    else if (head.dispatch_type === 'O' && head.shift === 'N') timeText = 'OT เวลา 07.30 น.';
-    else if (head.shift === 'H') timeText = 'HOLIDAY';
+    else if (head.dispatch_type === 'O' && head.shift === 'S') timeText = 'OT เวลา 21.30 น.';
+    else if (head.dispatch_type === 'O' && head.shift === 'N') timeText = 'OT (กะกลางคืน) เวลา 07.30 น.';
+    else if (head.shift === 'H') timeText = 'OT เวลา 17.00 น.';
 
     return `ตารางรถรับส่งพนักงาน ${timeText} ประจำวันที่ ${date}`;
   }

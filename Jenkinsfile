@@ -145,7 +145,7 @@ pipeline {
                             Set-Location Z:
 
                             \$env:NODE_ENV='production'
-                            cd api
+                            cd api_test
                             if (Test-Path node_modules) {
                                 cmd /c rmdir /s /q node_modules
                             }

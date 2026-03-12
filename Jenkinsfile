@@ -131,39 +131,37 @@ pipeline {
                     // Server 1: amecweb1
                     sshagent(credentials: ['ssh-amecweb1']) {
                         sh """
-                            ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'ENDSSH'
-                            powershell -Command "
-                                \\\$pass = '${NAS_PASS}'
-                                \\\$secPass = ConvertTo-SecureString \\\$pass -AsPlainText -Force
-                                \\\$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \\\$secPass)
-                                
-                                Write-Host 'Mounting network drive...'
-                                if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
-                                    Remove-PSDrive -Name 'Z' -Force
-                                }
-                                
-                                New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \\\$cred -Scope Global -ErrorAction Stop
-                                Set-Location Z:\\\\api_test
-                                
-                                Write-Host 'Current directory contents:'
-                                Get-ChildItem
-                                
-                                \\\$env:NODE_ENV='production'
-                                
-                                Write-Host 'Removing node_modules...'
-                                if (Test-Path node_modules) {
-                                    Remove-Item -Path node_modules -Recurse -Force
-                                }
-                                
-                                Write-Host 'Starting npm ci (this may take several minutes)...'
-                                npm ci --omit=dev --loglevel=info
-                                
-                                Write-Host 'npm ci completed successfully'
-                                
-                                Remove-PSDrive -Name 'Z' -Force
-                                Write-Host 'Done!'
-                            "
-                            ENDSSH
+                            ssh -o StrictHostKeyChecking=no Administrator@amecweb1 'powershell -' << 'PSEOF'
+                            \\\$pass = '${NAS_PASS}'
+                            \\\$secPass = ConvertTo-SecureString \\\$pass -AsPlainText -Force
+                            \\\$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \\\$secPass)
+
+                            Write-Host 'Mounting network drive...'
+                            if (Get-PSDrive -Name Z -ErrorAction SilentlyContinue) {
+                                Remove-PSDrive -Name Z -Force
+                            }
+
+                            New-PSDrive -Name Z -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \\\$cred -Scope Global -ErrorAction Stop
+                            Set-Location Z:\\\\api_test
+
+                            Write-Host 'Current directory contents:'
+                            Get-ChildItem
+
+                            \\\$env:NODE_ENV = 'production'
+
+                            Write-Host 'Removing node_modules...'
+                            if (Test-Path node_modules) {
+                                Remove-Item -Path node_modules -Recurse -Force
+                            }
+
+                            Write-Host 'Starting npm ci (this may take several minutes)...'
+                            npm ci --omit=dev --loglevel=info
+
+                            Write-Host 'npm ci completed successfully'
+
+                            Remove-PSDrive -Name Z -Force
+                            Write-Host 'Done!'
+                            PSEOF
                         """
                     }
 

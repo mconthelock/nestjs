@@ -87,12 +87,7 @@ pipeline {
                     rsync -vpt package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env ${TARGET_DIR}/
 
                     echo "Testing write access to target directory..."
-                    npm install -g node-gyp node-gyp-build @mapbox/node-pre-gyp
-                    cd ${TARGET_DIR} || { echo "Failed to change directory to ${TARGET_DIR}"; exit 1; }
-                    rm -rf node_modules
-                    npm ci --omit=dev  --no-bin-links || { echo "npm install failed in ${TARGET_DIR}"; exit 1; }
-                    npm rebuild sharp --platform=win32 --arch=x64
-                    echo "Write test successful!" || echo "Write test failed!"
+                    
                 '''
             }
         }
@@ -129,62 +124,62 @@ pipeline {
         //     }
         // }
 
-        // stage('Restart Application on NAS for Production') {
-        //     when { expression { params.DEPLOY_ENV == 'production'} }
-        //     steps {
-        //         withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
-        //             // Server 1: amecweb1
-        //             sshagent(credentials: ['ssh-amecweb1']) {
-        //                 sh """
-        //                     ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
-        //                     powershell "
-        //                     \$pass = '${NAS_PASS}'
-        //                     \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
-        //                     \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
+        stage('Restart Application on NAS for Production') {
+            when { expression { params.DEPLOY_ENV == 'production'} }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
+                    // Server 1: amecweb1
+                    sshagent(credentials: ['ssh-amecweb1']) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
+                            powershell "
+                            \$pass = '${NAS_PASS}'
+                            \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
+                            \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
 
-        //                     if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
-        //                         Remove-PSDrive -Name 'Z' -Force
-        //                     }
+                            if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
+                                Remove-PSDrive -Name 'Z' -Force
+                            }
 
-        //                     New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
-        //                     Set-Location Z:
+                            New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
+                            Set-Location Z:
 
-        //                     \$env:NODE_ENV='production'
-        //                     cd api
-        //                     npm ci --omit=dev
+                            \$env:NODE_ENV='production'
+                            cd api
+                            rm -rf node_modules
+                            npm ci --omit=dev 
+                            node -e "require('sharp'); console.log('sharp OK')"
+                            Remove-PSDrive -Name 'Z' -Force
+                            "
+                        EOF
+                        """
+                    }
 
+                    // sshagent(credentials: ['ssh-amecweb2']) {
+                    //     sh """
+                    //         ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
+                    //         powershell "
+                    //         \$pass = '${NAS_PASS}'
+                    //         \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
+                    //         \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
 
-        //                     Remove-PSDrive -Name 'Z' -Force
-        //                     "
-        //                 EOF
-        //                 """
-        //             }
+                    //         if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
+                    //             Remove-PSDrive -Name 'Z' -Force
+                    //         }
 
-        //             // sshagent(credentials: ['ssh-amecweb2']) {
-        //             //     sh """
-        //             //         ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
-        //             //         powershell "
-        //             //         \$pass = '${NAS_PASS}'
-        //             //         \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
-        //             //         \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
+                    //         New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
+                    //         Set-Location Z:
 
-        //             //         if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
-        //             //             Remove-PSDrive -Name 'Z' -Force
-        //             //         }
-
-        //             //         New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
-        //             //         Set-Location Z:
-
-        //             //         \$env:NODE_ENV='production'
-        //             //         cd api
-        //             //         pm2 reload ecosystem.config.js
-        //             //         Remove-PSDrive -Name 'Z' -Force
-        //             //         "
-        //             //     EOF
-        //             //     """
-        //             // }
-        //         }
-        //     }
-        // }
+                    //         \$env:NODE_ENV='production'
+                    //         cd api
+                    //         pm2 reload ecosystem.config.js
+                    //         Remove-PSDrive -Name 'Z' -Force
+                    //         "
+                    //     EOF
+                    //     """
+                    // }
+                }
+            }
+        }
     }
 }

@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateItemMfgDto {
     @IsNotEmpty()
@@ -17,16 +17,16 @@ export class CreateItemMfgDto {
     @Type(() => String)
     VPATH: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Type(() => String)
-    VFILE: string;
+    VFILE?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    NQTY: number;
-    
+    NQTY?: number;
+
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)

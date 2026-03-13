@@ -899,6 +899,8 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     };
   }
 
+//================================================================== //
+
 
   async getReportDisabledPassenger(dto: DailyDispatchReportDto) {
     const dispatchId = Number(dto.dispatch_id);

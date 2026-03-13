@@ -24,9 +24,7 @@ export class Busstop {
   HOLIDAY_TIMEIN: string;
 
   @OneToMany(() => Buspassenger, (b) => b.stop)
-  //@JoinColumn ({name: 'STOP_ID', referencedColumnName : 'BUSSTOP'})
   passenger : Buspassenger;
-
 
   @OneToMany(() => Busroute, (r) => r.stop)
   routes: Busroute[];

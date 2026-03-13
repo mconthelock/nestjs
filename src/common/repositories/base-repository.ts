@@ -1,102 +1,167 @@
 import { Request } from 'express';
 import {
-  DataSource,
-  EntityManager,
-  Repository,
-  SelectQueryBuilder,
+    Brackets,
+    DataSource,
+    EntityManager,
+    Repository,
+    SelectQueryBuilder,
+    WhereExpressionBuilder,
 } from 'typeorm';
 import { ENTITY_MANAGER_KEY } from '../interceptors/transaction.interceptor';
 import { FiltersDto } from '../dto/filter.dto';
 
 export class BaseRepository {
-  constructor(
-    private dataSource: DataSource,
-    private request: Request,
-  ) {}
+    constructor(
+        private dataSource: DataSource,
+        private request: Request,
+    ) {}
 
-  protected get manager(): EntityManager {
-    // return this.request[ENTITY_MANAGER_KEY] ?? this.dataSource.manager;
-    const txManager = this.request[ENTITY_MANAGER_KEY];
+    protected get manager(): EntityManager {
+        // return this.request[ENTITY_MANAGER_KEY] ?? this.dataSource.manager;
+        const txManager = this.request[ENTITY_MANAGER_KEY];
 
-    if (txManager && txManager.connection === this.dataSource) {
-      return txManager;
+        if (txManager && txManager.connection === this.dataSource) {
+            return txManager;
+        }
+
+        return this.dataSource.manager;
     }
 
-    return this.dataSource.manager;
-  }
+    protected getRepository<T>(entityCls: new () => T): Repository<T> {
+        return this.manager.getRepository(entityCls);
+    }
 
-  protected getRepository<T>(entityCls: new () => T): Repository<T> {
-    return this.manager.getRepository(entityCls);
-  }
+    private applyCondition<T>(
+        qb: WhereExpressionBuilder ,
+        column: string,
+        op: string,
+        value: any,
+        param: string,
+    ) {
+        const operatorMap = {
+            eq: '=',
+            ne: '!=',
+            gt: '>',
+            gte: '>=',
+            lt: '<',
+            lte: '<=',
+        };
 
-  protected applyFilters<T>(
-    qb: SelectQueryBuilder<T>,
-    alias: string,
-    condition: FiltersDto,
-    allowedFields: string[],
-  ) {
-    const operatorMap = {
-      eq: '=',
-      ne: '!=',
-      gt: '>',
-      gte: '>=',
-      lt: '<',
-      lte: '<=',
-    };
+        switch (op) {
+            case 'like':
+                qb.andWhere(`${column} LIKE :${param}`, {
+                    [param]: `%${value}%`,
+                });
+                break;
 
-    condition.filters.forEach((f, i) => {
-      if (!allowedFields.includes(f.field)) return;
+            case 'startsWith':
+                qb.andWhere(`${column} LIKE :${param}`, {
+                    [param]: `${value}%`,
+                });
+                break;
 
-      const param = `val_${i}`;
+            case 'endsWith':
+                qb.andWhere(`${column} LIKE :${param}`, {
+                    [param]: `%${value}`,
+                });
+                break;
 
-      switch (f.op) {
-        case 'like':
-          qb.andWhere(`${alias}.${f.field} LIKE :${param}`, {
-            [param]: `%${f.value}%`,
-          });
-          break;
+            case 'in':
+                qb.andWhere(`${column} IN (:...${param})`, { [param]: value });
+                break;
 
-        case 'startsWith':
-          qb.andWhere(`${alias}.${f.field} LIKE :${param}`, {
-            [param]: `${f.value}%`,
-          });
-          break;
+            case 'notIn':
+                qb.andWhere(`${column} NOT IN (:...${param})`, {
+                    [param]: value,
+                });
+                break;
 
-        case 'endsWith':
-          qb.andWhere(`${alias}.${f.field} LIKE :${param}`, {
-            [param]: `%${f.value}`,
-          });
-          break;
+            case 'isNull':
+                qb.andWhere(`${column} IS NULL`);
+                break;
 
-        case 'in':
-          qb.andWhere(`${alias}.${f.field} IN (:...${param})`, {
-            [param]: f.value,
-          });
-          break;
+            case 'isNotNull':
+                qb.andWhere(`${column} IS NOT NULL`);
+                break;
 
-        case 'notIn':
-          qb.andWhere(`${alias}.${f.field} NOT IN (:...${param})`, {
-            [param]: f.value,
-          });
-          break;
+            default:
+                if (operatorMap[op]) {
+                    qb.andWhere(`${column} ${operatorMap[op]} :${param}`, {
+                        [param]: value,
+                    });
+                }
+        }
+    }
 
-        case 'isNull':
-          qb.andWhere(`${alias}.${f.field} IS NULL`);
-          break;
+    private applyFilterNode<T>(
+        qb: WhereExpressionBuilder,
+        alias: string,
+        node: any,
+        allowedFields: string[],
+        idx: { value: number },
+    ) {
+        if (node.AND) {
+            qb.andWhere(
+                new Brackets((qb2) => {
+                    node.AND.forEach((n) =>
+                        this.applyFilterNode(qb2, alias, n, allowedFields, idx),
+                    );
+                }),
+            );
+            return;
+        }
 
-        case 'isNotNull':
-          qb.andWhere(`${alias}.${f.field} IS NOT NULL`);
-          break;
+        if (node.OR) {
+            qb.andWhere(
+                new Brackets((qb2) => {
+                    node.OR.forEach((n, i) => {
+                        qb2[i === 0 ? 'where' : 'orWhere'](
+                            new Brackets((qb3) => {
+                                this.applyFilterNode(
+                                    qb3,
+                                    alias,
+                                    n,
+                                    allowedFields,
+                                    idx,
+                                );
+                            }),
+                        );
+                    });
+                }),
+            );
+            return;
+        }
 
-        default:
-          if (operatorMap[f.op]) {
-            qb.andWhere(`${alias}.${f.field} ${operatorMap[f.op]} :${param}`, {
-              [param]: f.value,
-            });
-          }
-      }
-    });
+        if (!allowedFields.includes(node.field)) return;
 
-    return qb;
-  }
+        const param = `val_${idx.value++}`;
+
+        const column = node.field.includes('.')
+            ? node.field
+            : `${alias}.${node.field}`;
+
+        this.applyCondition(qb, column, node.op, node.value, param);
+    }
+
+    protected applyFilters<T>(
+        qb: SelectQueryBuilder<T>,
+        alias: string,
+        condition: FiltersDto,
+        allowedFields: string[],
+    ) {
+        const idx = { value: 0 };
+
+        // format ใหม่ (AND / OR tree)
+        if (condition.AND || condition.OR) {
+            this.applyFilterNode(qb, alias, condition, allowedFields, idx);
+            return qb;
+        }
+
+        // format เดิม (backward compatible)
+        condition.filters?.forEach((f) => {
+            this.applyFilterNode(qb, alias, f, allowedFields, idx);
+        });
+
+        return qb;
+    }
 }

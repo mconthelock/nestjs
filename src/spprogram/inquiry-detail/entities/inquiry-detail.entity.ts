@@ -82,6 +82,9 @@ export class InquiryDetail {
     INQD_DES_REMARK: string;
 
     @Column()
+    INQD_SALE_REMARK: string;
+
+    @Column()
     INQD_FIN_REMARK: string;
 
     @Column()

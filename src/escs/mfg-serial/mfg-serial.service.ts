@@ -91,7 +91,10 @@ export class MfgSerialService {
         }
     }
 
-    async update(id: number, dto: UpdateMfgSerialDto) {
+    async update(
+        id: number | { NID: number } | { NDRAWINGID: number },
+        dto: UpdateMfgSerialDto,
+    ) {
         try {
             const res = await this.repo.update(id, dto);
             if (res.affected === 0) {
@@ -133,7 +136,7 @@ export class MfgSerialService {
         }
     }
 
-      async removeByDrawingId(drawingId: number) {
+    async removeByDrawingId(drawingId: number) {
         try {
             const res = await this.repo.remove({ NDRAWINGID: drawingId });
             if (res.affected === 0) {
@@ -149,7 +152,29 @@ export class MfgSerialService {
             };
         } catch (error) {
             throw new Error(
-                `Delete MFG_SERIAL by drawingId ${drawingId} Error: ` + error.message,
+                `Delete MFG_SERIAL by drawingId ${drawingId} Error: ` +
+                    error.message,
+            );
+        }
+    }
+
+    async removeByCondition(condition: UpdateMfgSerialDto) {
+        try {
+            const res = await this.repo.remove(condition);
+            if (res.affected === 0) {
+                return {
+                    status: false,
+                    message: `Delete MFG_SERIAL by condition Failed`,
+                };
+            }
+            return {
+                status: true,
+                message: `Delete MFG_SERIAL by condition Successfully`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(
+                `Delete MFG_SERIAL by condition Error: ` + error.message,
             );
         }
     }

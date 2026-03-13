@@ -30,10 +30,25 @@ export class MfgDrawingRepository extends BaseRepository {
     }
 
     findOne(id: number) {
-        return this.getRepository(MFG_DRAWING).findOne({
-            where: { NID: id },
-            relations: ['MFG_SERIAL', 'INSPECTOR_STATUS', 'FORELEAD_STATUS', 'DRAWING_STATUS', 'ACTIONS' , 'ACTIONS.STATUS', 'ACTIONS.USERS'],
-        });
+        return this.manager
+            .createQueryBuilder(MFG_DRAWING, 'M')
+            .where('M.NID = :id', { id })
+            .leftJoinAndSelect(
+                'M.MFG_SERIAL',
+                'MS',
+                'MS.NSTATUS = :serialStatus',
+                { serialStatus: 1 },
+            )
+            .leftJoinAndSelect('M.INSPECTOR_STATUS', 'IS')
+            .leftJoinAndSelect('M.FORELEAD_STATUS', 'FS')
+            .leftJoinAndSelect('M.DRAWING_STATUS', 'DS')
+            .leftJoinAndSelect('M.ACTIONS', 'A', 'A.NSTATUS = :actionStatus', {
+                actionStatus: 1,
+            })
+            .leftJoinAndSelect('A.STATUS', 'AS')
+            .leftJoinAndSelect('A.USERS', 'AU')
+            .orderBy('M.NID, M.NBLOCKID, M.NITEMID, M.VPIS, M.VDRAWING', 'ASC')
+            .getOne();
     }
 
     async search(dto: FiltersDto) {
@@ -47,13 +62,23 @@ export class MfgDrawingRepository extends BaseRepository {
             'NINSPECTOR_STATUS',
             'NFORELEAD_STATUS',
             'NSTATUS',
+            'A.NUSERACT'
         ]);
         return qb
-            .leftJoinAndSelect('M.MFG_SERIAL', 'MS')
+            .leftJoinAndSelect(
+                'M.MFG_SERIAL',
+                'MS',
+                'MS.NSTATUS = :serialStatus',
+                { serialStatus: 1 },
+            )
             .leftJoinAndSelect('M.INSPECTOR_STATUS', 'IS')
             .leftJoinAndSelect('M.FORELEAD_STATUS', 'FS')
             .leftJoinAndSelect('M.DRAWING_STATUS', 'DS')
-            .leftJoinAndSelect('M.ACTIONS', 'A')
+            .leftJoinAndSelect('M.ACTIONS', 'A', 'A.NSTATUS = :actionStatus', {
+                actionStatus: 1,
+            })
+            .leftJoinAndSelect('A.STATUS', 'AS')
+            .leftJoinAndSelect('A.USERS', 'AU')
             .orderBy('M.NID, M.NBLOCKID, M.NITEMID, M.VPIS, M.VDRAWING', 'ASC')
             .getMany();
     }

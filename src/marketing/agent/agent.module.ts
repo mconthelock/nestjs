@@ -5,8 +5,8 @@ import { Agent } from './entities/agent.entity';
 import { AgentController } from './agent.controller';
 
 @Module({
-  controllers: [AgentController],
-  imports: [TypeOrmModule.forFeature([Agent], 'amecConnection')],
-  providers: [AgentService],
+    controllers: [AgentController],
+    imports: [TypeOrmModule.forFeature([Agent], 'datacenterConnection')],
+    providers: [AgentService],
 })
 export class AgentModule {}

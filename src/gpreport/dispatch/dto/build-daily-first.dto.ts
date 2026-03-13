@@ -1,4 +1,5 @@
-import { IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsString, IsIn, IsDate } from 'class-validator';
 import { DispatchKeyDto } from './dispatch-key.dto';
 
 export class BuildDailyFirstDto extends DispatchKeyDto {
@@ -9,5 +10,5 @@ export class BuildDailyFirstDto extends DispatchKeyDto {
   timeout_to: string;
 
   @IsString()
-  update_by: string;
+  update_by: string;  
 }

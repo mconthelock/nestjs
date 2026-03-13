@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMfgDrawingCheckSheetDto } from './dto/create-mfg-drawing.dto';
-import { UpdateMfgDrawingDto } from './dto/update-mfg-drawing.dto';
-import { ItemMfgListService } from '../item-mfg-list/item-mfg-list.service';
 import { ItemMfgService } from '../item-mfg/item-mfg.service';
-import { ItemMfgDeleteService } from '../item-mfg-delete/item-mfg-delete.service';
 import { IdtagEfacLogService } from 'src/workload/idtag-efac-log/idtag-efac-log.service';
 import { S011mpService } from 'src/datacenter/s011mp/s011mp.service';
 import { ITEM_MFG_LIST } from 'src/common/Entities/escs/table/ITEM_MFG_LIST.entity';
@@ -11,38 +8,17 @@ import { ITEM_MFG_DELETE } from 'src/common/Entities/escs/table/ITEM_MFG_DELETE.
 import { ITEM_MFG } from 'src/common/Entities/escs/table/ITEM_MFG.entity';
 import { F110kpService } from 'src/datacenter/f110kp/f110kp.service';
 import { CONTROL_DRAWING_PIS } from 'src/common/Entities/escs/table/CONTROL_DRAWING_PIS.entity';
-import { ControlDrawingPisService } from '../control-drawing-pis/control-drawing-pis.service';
 import { S011MP } from 'src/common/Entities/datacenter/table/S011MP.entity';
 import { MfgDrawingService } from './mfg-drawing.service';
 import { MFG_DRAWING } from 'src/common/Entities/escs/table/MFG_DRAWING.entity';
 import { copyFile, deleteFile, joinPaths } from 'src/common/utils/files.utils';
 import { IDTAG_EFAC_LOG } from 'src/common/Entities/workload/table/IDTAG_EFAC_LOG.entity';
 import { F110KP } from 'src/common/Entities/datacenter/table/F110KP.entity';
-import { FiltersDto } from 'src/common/dto/filter.dto';
 import { FileService } from 'src/common/services/file/file.service';
 import { ListMode } from 'src/common/services/file/dto/file.dto';
 import { basename } from 'path';
 import { MfgSerialService } from '../mfg-serial/mfg-serial.service';
-
-interface State {
-    blockId: number;
-    itemId: number;
-    usercreate: number;
-    serialNo: string[];
-    pis: string;
-    type: number;
-    typeName: string;
-    itemMfg: ITEM_MFG;
-    list: ITEM_MFG_LIST;
-    delete: string[];
-    control: string[];
-    drawing: string;
-    item: string;
-    order: string;
-    controlNo: string;
-    data: any;
-    path: string;
-}
+import { MfgDrawingActionService } from '../mfg-drawing-action/mfg-drawing-action.service';
 
 @Injectable()
 export class MfgDrawingCreateChecksheetService {
@@ -54,6 +30,7 @@ export class MfgDrawingCreateChecksheetService {
         private readonly s011mpService: S011mpService,
         private readonly fileService: FileService,
         private readonly mfgSerialService: MfgSerialService,
+        private readonly mfgDrawingActionService: MfgDrawingActionService,
     ) {}
 
     private readonly mapType = {
@@ -125,9 +102,10 @@ export class MfgDrawingCreateChecksheetService {
                 typeName: typeName,
                 deleteList: deleteList,
                 path: masterPath,
+                revise: dto.REVISE,
             });
 
-            if(this.isEditable(insertData.NINSPECTOR_STATUS)){
+            if (this.isEditable(insertData.NINSPECTOR_STATUS)) {
                 const insertSerial = await this.insertSerial({
                     drawingId: insertData.NID,
                     serialNo: dto.ASERIALNO,
@@ -245,7 +223,8 @@ export class MfgDrawingCreateChecksheetService {
         const matched = list.find(
             (l) =>
                 l.NSTATUS == 1 &&
-                (l.VDRAWING === drawing || drawing.startsWith(l.VDRAWING + ' ')),
+                (l.VDRAWING === drawing ||
+                    drawing.startsWith(l.VDRAWING + ' ')),
         );
         if (!matched) {
             throw new Error(
@@ -257,7 +236,7 @@ export class MfgDrawingCreateChecksheetService {
 
     checkDeleteDrawing(deleteDwg: string[], drawing: string): boolean {
         return deleteDwg.some(
-            (e) => (drawing === e || drawing.startsWith(e + ' ')),
+            (e) => drawing === e || drawing.startsWith(e + ' '),
         );
     }
 
@@ -270,6 +249,7 @@ export class MfgDrawingCreateChecksheetService {
         typeName,
         deleteList,
         path,
+        revise,
     }: {
         blockId: number;
         itemId: number;
@@ -279,6 +259,7 @@ export class MfgDrawingCreateChecksheetService {
         typeName: string;
         deleteList: string[];
         path: string;
+        revise?: boolean;
     }): Promise<MFG_DRAWING[] | any | null> {
         try {
             // ตรวจสอบว่ามีข้อมูลที่ตรงกับ blockId, itemId, drawing และ inspector status = 1 อยู่แล้วหรือไม่
@@ -303,6 +284,16 @@ export class MfgDrawingCreateChecksheetService {
                 data.NID = isDataExist.data.NID;
                 data.NUSERUPDATE = usercreate;
                 data.DDATEUPDATE = new Date();
+                // ถ้า revise เป็น true ให้ update drawing และ delete serial
+                console.log('test revise', revise , typeof revise);
+                
+                if (revise) {
+                    const update = await this.mfgSerialService.update({ NDRAWINGID: data.NID }, { NSTATUS: 3 });
+                    console.log('Update serial', update);
+                    // throw new Error(`test`);
+                    await this.mfgDrawingActionService.update(data.NID, { NSTATUS: 3 });
+                }
+
                 // ถ้าไม่ใช่ multi และ drawing อยู่ใน delete list ให้ตั้ง status เป็น 3
                 if (
                     typeName != 'multi' &&
@@ -320,7 +311,8 @@ export class MfgDrawingCreateChecksheetService {
             }
             if (
                 !isDataExist.status ||
-                this.isEditable(isDataExist.data?.NINSPECTOR_STATUS)
+                this.isEditable(isDataExist.data?.NINSPECTOR_STATUS) ||
+                revise
                 // isDataExist.data?.NINSPECTOR_STATUS == 1
             ) {
                 const insert = await this.mfgDrawingService.create(data);
@@ -431,7 +423,7 @@ export class MfgDrawingCreateChecksheetService {
         serialNo: string[];
         userCreate: number;
     }) {
-        await this.mfgSerialService.removeByDrawingId(drawingId);
+        await this.mfgSerialService.removeByCondition({ NDRAWINGID: drawingId });
         const insertBatch = serialNo.map((sn) => ({
             NDRAWINGID: drawingId,
             VSERIALNO: sn,

@@ -9,5 +9,5 @@ export class SaveDispatchDto {
   update_by?: string;
 
   @IsArray()
-  lines: any[]; // ตอนนี้ any ไปก่อน เดี๋ยวค่อยทำ nested dto
+  lines: any[]; 
 }

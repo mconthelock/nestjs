@@ -5,15 +5,15 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AgentService {
-  constructor(
-    @InjectRepository(Agent, 'amecConnection')
-    private readonly agent: Repository<Agent>,
-  ) {}
+    constructor(
+        @InjectRepository(Agent, 'datacenterConnection')
+        private readonly agent: Repository<Agent>,
+    ) {}
 
-  findAll() {
-    return this.agent.find({
-      relations: { country: true },
-      order: { AGENT: 'ASC', country: { CTNAME: 'ASC' } },
-    });
-  }
+    findAll() {
+        return this.agent.find({
+            relations: { country: true },
+            order: { AGENT: 'ASC', country: { CTNAME: 'ASC' } },
+        });
+    }
 }

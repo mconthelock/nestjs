@@ -1,12 +1,14 @@
 import { Type } from 'class-transformer';
 import {
     IsArray,
+    IsBoolean,
     IsDate,
     IsNotEmpty,
     IsNumber,
     IsOptional,
     IsString,
 } from 'class-validator';
+import { ToBoolean } from 'src/common/utils/transform';
 
 export class CreateMfgDrawingDto {
     @IsNotEmpty()
@@ -95,4 +97,9 @@ export class CreateMfgDrawingCheckSheetDto {
     @IsNumber()
     @Type(() => Number)
     NUSERCREATE: number;
+
+    @IsOptional()
+    @ToBoolean()
+    @IsBoolean()
+    REVISE: boolean;
 }

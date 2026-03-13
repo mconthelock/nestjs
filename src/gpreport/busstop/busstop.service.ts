@@ -7,6 +7,7 @@ import { UpdateBusstopDto } from './dto/update-busstop.dto';
 import { SearchBusstopDto } from './dto/search-busstop.dto';
 import { Busstop } from 'src/common/Entities/gpreport/table/busstop.entity';
 import { Buspassenger } from 'src/common/Entities/gpreport/table/buspassenger.entity';
+import { Busroute } from 'src/common/Entities/gpreport/table/busroute.entity';
 
 @Injectable()
 export class BusstopService {
@@ -43,4 +44,26 @@ export class BusstopService {
       return { success: true };
     });
   }
+
+  async getStopRoutes() {
+    const stops = await this.stop.find({
+      where: { STOP_STATUS: '1', routes: {}, },
+      relations: { routes: true, },
+      order: { STOP_NAME: 'ASC', },
+    });
+
+    return stops.flatMap((stop) =>
+      (stop.routes || []).map((route) => ({
+        STOP_ID: stop.STOP_ID,
+        STOP_NAME: stop.STOP_NAME,
+        STOP_STATUS: stop.STOP_STATUS,
+        WORKDAY_TIMEIN: stop.WORKDAY_TIMEIN,
+        NIGHT_TIMEIN: stop.NIGHT_TIMEIN,
+        HOLIDAY_TIMEIN: stop.HOLIDAY_TIMEIN,
+        BUSLINE: route.BUSLINE,
+      })),
+    );
+  }
+
+
 }

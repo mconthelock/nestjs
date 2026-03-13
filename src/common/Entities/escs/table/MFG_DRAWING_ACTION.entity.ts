@@ -15,6 +15,9 @@ export class MFG_DRAWING_ACTION {
     VCODEACT: string;
 
     @PrimaryColumn()
+    NSTATUS: number;
+
+    @PrimaryColumn()
     NUSERACT: number;
 
     @PrimaryColumn()

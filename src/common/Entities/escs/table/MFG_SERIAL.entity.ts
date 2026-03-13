@@ -27,6 +27,9 @@ export class MFG_SERIAL {
     DDATECREATE: Date;
 
     @Column()
+    NSTATUS: number;
+
+    @Column()
     NUSERUPDATE: number;
 
     @Column()

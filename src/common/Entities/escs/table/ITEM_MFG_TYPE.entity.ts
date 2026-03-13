@@ -10,6 +10,9 @@ export class ITEM_MFG_TYPE {
   VDESCRIPTION: string;
 
   @Column()
+  VSERIALTYPE: string;
+
+  @Column()
   DDATECREATE: Date;
 
   @OneToMany(() => ITEM_MFG, (i) => i.ITEM_MFG_TYPE)

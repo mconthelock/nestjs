@@ -108,33 +108,71 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     // 2) source from OTFORM
     const rows: any[] = await manager.query(
       `
-      SELECT
-        OT.EMPNO,
-        LINE.BUSID,
-        LINE.BUSNAME,
-        LINE.BUSSEAT,
-        LINE.BUSTYPE,
-        STOP.STOP_ID,
-        STOP.STOP_NAME,
-        STOP.WORKDAY_TIMEIN,
-        STOP.NIGHT_TIMEIN,
-        STOP.HOLIDAY_TIMEIN,
-        ROUTE.STATENO AS ROUTE_SEQ
-      FROM WEBFORM.OTFORM OT
-      JOIN GPREPORT.BUS_PASSENGER PSG
-        ON PSG.EMPNO = OT.EMPNO
-      JOIN GPREPORT.BUS_ROUTE ROUTE
-        ON ROUTE.STOPNO = PSG.BUSSTOP
-      JOIN GPREPORT.BUS_STOP STOP
-        ON STOP.STOP_ID = PSG.BUSSTOP
-      JOIN GPREPORT.BUS_LINE LINE
-        ON LINE.BUSID = ROUTE.BUSLINE
-      WHERE OT.WORKDATE = :1
-        AND OT.TIMEIN >= :2
-        AND OT.TIMEOUT <= :3
+        SELECT * FROM (
+          SELECT
+            OT.EMPNO,
+            CASE
+                WHEN CAD.BUSLINENO IS NOT NULL THEN CAD.BUSLINENO
+                ELSE LINE.BUSID
+            END AS BUSID,
+            CASE
+                WHEN CAD.BUSLINENO IS NOT NULL THEN LINE_CAD.BUSNAME
+                ELSE LINE.BUSNAME
+            END AS BUSNAME,
+            CASE
+                WHEN CAD.BUSLINENO IS NOT NULL THEN LINE_CAD.BUSSEAT
+                ELSE LINE.BUSSEAT
+            END AS BUSSEAT,
+            CASE
+                WHEN CAD.BUSLINENO IS NOT NULL THEN LINE_CAD.BUSTYPE
+                ELSE LINE.BUSTYPE
+            END AS BUSTYPE,
+            CASE
+                WHEN CAD.BUSSTOPNO IS NOT NULL THEN CAD.BUSSTOPNO
+                ELSE STOP.STOP_ID
+            END AS STOP_ID,
+            CASE
+                WHEN CAD.BUSSTOPNO IS NOT NULL THEN STOP_CAD.STOP_NAME
+                ELSE STOP.STOP_NAME
+            END AS STOP_NAME,
+            CASE
+                WHEN CAD.BUSSTOPNO IS NOT NULL THEN STOP_CAD.WORKDAY_TIMEIN
+                ELSE STOP.WORKDAY_TIMEIN
+            END AS WORKDAY_TIMEIN,
+            CASE
+                WHEN CAD.BUSSTOPNO IS NOT NULL THEN STOP_CAD.NIGHT_TIMEIN
+                ELSE STOP.NIGHT_TIMEIN
+            END AS NIGHT_TIMEIN,
+            CASE
+                WHEN CAD.BUSSTOPNO IS NOT NULL THEN STOP_CAD.HOLIDAY_TIMEIN
+                ELSE STOP.HOLIDAY_TIMEIN
+            END AS HOLIDAY_TIMEIN,
+            ROUTE.STATENO AS ROUTE_SEQ,
+            CAD.BUSLINENO AS NEW_BUSLINENO,
+            CAD.BUSSTOPNO AS NEW_BUSSTOPNO
+        FROM WEBFORM.OTFORM OT
+        JOIN GPREPORT.BUS_PASSENGER PSG
+            ON PSG.EMPNO = OT.EMPNO
+        JOIN GPREPORT.BUS_ROUTE ROUTE
+            ON ROUTE.STOPNO = PSG.BUSSTOP
+        JOIN GPREPORT.BUS_STOP STOP
+            ON STOP.STOP_ID = PSG.BUSSTOP
+        JOIN GPREPORT.BUS_LINE LINE
+            ON LINE.BUSID = ROUTE.BUSLINE
+        LEFT JOIN WEBFORM.CHANGEADDR CAD
+            ON OT.WORKDATE = CAD.WORKDATE
+          AND OT.EMPNO = CAD.EMPNO
+        LEFT JOIN GPREPORT.BUS_LINE LINE_CAD
+            ON LINE_CAD.BUSID = CAD.BUSLINENO
+        LEFT JOIN GPREPORT.BUS_STOP STOP_CAD
+            ON STOP_CAD.STOP_ID = CAD.BUSSTOPNO
+        WHERE OT.WORKDATE = :1
+          AND OT.TIMEIN >= :2
+          AND OT.TIMEOUT <= :3
+      ) WHERE STOP_ID  <> 999  
       `,
       [workDate, dto.timeout_from, dto.timeout_to],
-    );
+    ); //STOP_ID  = 999   = รถส่วนตัว
 
     if (!rows.length) {
       return {

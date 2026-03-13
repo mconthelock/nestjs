@@ -24,8 +24,10 @@ export class PurVendorsService {
   {
     const {KEYWORD, STATUS, TYPE} = searchDto;
     const qb = this.purVendorRepo.createQueryBuilder('vendor')
-    .leftJoinAndSelect('vendor.codes', 'code');
-
+    .leftJoinAndSelect('vendor.VENDOR_CODES', 'code')
+    .leftJoinAndSelect('vendor.VENDOR_ADDRESS', 'address')
+    .leftJoinAndSelect('vendor.VENDOR_ATTFILE', 'attfile');
+ 
     if (KEYWORD) {
       qb.andWhere(
         new Brackets((qbInner) => {

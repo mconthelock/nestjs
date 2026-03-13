@@ -5,20 +5,28 @@ import {
   IsArray,
   IsNotEmpty,
   IsDateString,
+  ValidateNested
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { CreatePurVendorsCodeDto } from 'src/pursys/pur_vendors_code/dto/create-pur_vendors_code.dto';
+import { CreatePurVendorsAddressDto } from 'src/pursys/pur_vendors_address/dto/create-pur_vendors_address.dto';
+import { CreatePurVendorsAttfileDto } from 'src/pursys/pur_vendors_attfile/dto/create-pur_vendors_attfile.dto'; 
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class CreatePurVendorDto {
-    @ApiProperty({ description: 'ชื่อของ Vendor', example: 'บริษัท ABC จำกัด' })
+    @ApiProperty({ description: 'ชื่อของ Vendor', example: 'ABC Company' })
     @IsNotEmpty()
     @IsString()
     VND_NAME: string;
 
-    @ApiProperty({ description: 'ชื่อเต็มของ Vendor', example: 'บริษัท ABC จำกัด' })
-    @IsNotEmpty()
+    @ApiProperty({ description: 'ชื่อภาษาไทย', example: 'บริษัท ABC จำกัด' })
+    @IsOptional()
     @IsString()
-    VND_LONGNAME: string;
+    VND_TNAME: string;
 
+    @ApiProperty({ description: 'ชื่อผู้ติดต่อ', example: 'John Doe' })
+    @IsOptional()
+    @IsString()
+    VND_SALE: string;
 
     @IsNotEmpty()
     @IsNumber()
@@ -44,47 +52,29 @@ export class CreatePurVendorDto {
     VND_USERUPDATE: number; 
 
     @IsOptional()
-    @IsNumber()
-    ADDR_BRANCH_CODE: number;
-
-    @IsOptional()
-    @IsString()
-    ADDR_BRANCH_DESC: string;
-
-    @IsNotEmpty()
-    @IsString()
-    ADDR_LINE1: string;
-
-    @IsOptional()
-    @IsString()
-    ADDR_LINE2: string;
-
-    @IsOptional()
-    @IsString()
-    ADDR_LINE3: string;
-
-    @IsOptional()
-    @IsString()
-    ADDR_CITY: string;
-
-    @IsOptional()
-    @IsString()
-    ADDR_STATE: string;
-
-    @IsOptional()
-    @IsNumber()
-    ADDR_COUNTRY: number; 
-
-    @IsOptional()
-    @IsString()
-    ADDR_ZIPCODE: string; 
-
-    @IsOptional()
     @IsString()
     ADDR_PHONE: string; 
 
     @IsOptional()
     @IsString()
     ADDR_WEB: string; 
+
+    @IsOptional() 
+    @IsArray() 
+    @ValidateNested({ each: true }) 
+    @Type(() => CreatePurVendorsCodeDto) 
+    VENDOR_CODES?: CreatePurVendorsCodeDto[];
+
+    @IsOptional() 
+    @IsArray() 
+    @ValidateNested({ each: true }) 
+    @Type(() => CreatePurVendorsAddressDto) 
+    VENDOR_ADDRESS?: CreatePurVendorsAddressDto[];
+
+    @IsOptional() 
+    @IsArray() 
+    @ValidateNested({ each: true }) 
+    @Type(() => CreatePurVendorsAttfileDto)
+    VENDOR_ATTFILE?: CreatePurVendorsAttfileDto[];
 
 }

@@ -104,8 +104,6 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     }
 
     const dispatch_id = head.dispatch_id;
-
-    // 2) source from OTFORM
     const rows: any[] = await manager.query(
       `
         SELECT * FROM (
@@ -151,6 +149,12 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
             CAD.BUSLINENO AS NEW_BUSLINENO,
             CAD.BUSSTOPNO AS NEW_BUSSTOPNO
         FROM WEBFORM.OTFORM OT
+        INNER JOIN WEBFORM.FORM F
+            ON F.NFRMNO = OT.NFRMNO
+            AND F.VORGNO = OT.VORGNO
+            AND F.CYEAR  = OT.CYEAR
+            AND F.CYEAR2 = OT.CYEAR2
+            AND F.NRUNNO = OT.NRUNNO
         JOIN GPREPORT.BUS_PASSENGER PSG
             ON PSG.EMPNO = OT.EMPNO
         JOIN GPREPORT.BUS_ROUTE ROUTE
@@ -169,6 +173,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
         WHERE OT.WORKDATE = :1
           AND OT.TIMEIN >= :2
           AND OT.TIMEOUT <= :3
+          AND F.CST <> '3'
       ) WHERE STOP_ID  <> 999  
       `,
       [workDate, dto.timeout_from, dto.timeout_to],

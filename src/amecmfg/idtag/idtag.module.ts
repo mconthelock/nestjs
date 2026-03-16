@@ -5,18 +5,22 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { M008KP } from 'src/as400/rtnlibf/m008kp/entities/m008kp.entity';
 import { F110KP } from 'src/amecmfg/f110kp/entities/f110kp.entity';
 import { F001KP } from 'src/as400/shopf/f001kp/entities/f001kp.entity';
+import { FileLoggerModule } from 'src/common/services/file-logger/file-logger.module';
+import { IdTagRepository } from './idtag.repository';
 
 import { IdtagFiles } from '../../common/Entities/workload/table/idtag-files.entity';
 import { IdtagPages } from '../../common/Entities/workload/table/idtag-pages.entity';
+import { IdtagImages } from '../../common/Entities/workload/views/idtag-images.entity';
 @Module({
     imports: [
+        FileLoggerModule,
         TypeOrmModule.forFeature([M008KP, F110KP, F001KP], 'amecConnection'),
         TypeOrmModule.forFeature(
-            [IdtagFiles, IdtagPages],
+            [IdtagFiles, IdtagPages, IdtagImages],
             'workloadConnection',
         ),
     ],
     controllers: [IdtagController],
-    providers: [IdtagService],
+    providers: [IdtagService, IdTagRepository],
 })
 export class IdtagModule {}

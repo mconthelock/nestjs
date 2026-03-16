@@ -10,14 +10,17 @@ import {
 import { MfgSerialService } from './mfg-serial.service';
 import { CreateMfgSerialDto } from './dto/create-mfg-serial.dto';
 import { UpdateMfgSerialDto } from './dto/update-mfg-serial.dto';
+import { UseTransaction } from 'src/common/decorator/transaction.decorator';
+import { FiltersDto } from 'src/common/dto/filter.dto';
 
-@Controller('mfg-serial')
+@Controller('escs/mfg-serial')
 export class MfgSerialController {
     constructor(private readonly mfgSerialService: MfgSerialService) {}
 
-    @Post()
-    create(@Body() dto: CreateMfgSerialDto) {
-        return this.mfgSerialService.create(dto);
+    @Post('search')
+    @UseTransaction('escsConnection')
+    async search(@Body() dto: FiltersDto) {
+        return this.mfgSerialService.search(dto);
     }
 
     @Get()

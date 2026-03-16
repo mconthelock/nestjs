@@ -13,7 +13,7 @@ import { UpdateMfgDrawingActionDto } from './dto/update-mfg-drawing-action.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 
-@Controller('mfg-drawing-action')
+@Controller('escs/mfg-drawing-action')
 export class MfgDrawingActionController {
     constructor(
         private readonly mfgDrawingActionService: MfgDrawingActionService,

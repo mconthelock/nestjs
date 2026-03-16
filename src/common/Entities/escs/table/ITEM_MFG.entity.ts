@@ -15,6 +15,7 @@ import { ITEM_SHEET_MFG } from './ITEM_SHEET_MFG.entity';
 import { BLOCK_MASTER } from './BLOCK_MASTER.entity';
 import { ITEM_MFG_DELETE } from './ITEM_MFG_DELETE.entity';
 import { CONTROL_DRAWING_PIS } from './CONTROL_DRAWING_PIS.entity';
+import { MFG_DRAWING } from './MFG_DRAWING.entity';
 
 @Entity({ name: 'ITEM_MFG', schema: 'ESCCHKSHT' })
 export class ITEM_MFG {
@@ -84,4 +85,7 @@ export class ITEM_MFG {
 
     @OneToMany(() => CONTROL_DRAWING_PIS, (c) => c.ITEM)
     CONTROL_LIST: CONTROL_DRAWING_PIS[];
+
+    @OneToMany(() => MFG_DRAWING, (d) => d.ITEM_MFG)
+    MFG_DRAWING: MFG_DRAWING[];
 }

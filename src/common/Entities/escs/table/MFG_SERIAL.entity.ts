@@ -21,6 +21,9 @@ export class MFG_SERIAL {
     VSERIALNO: string;
 
     @Column()
+    NTYPE: number;
+
+    @Column()
     NUSERCREATE: number;
 
     @Column()

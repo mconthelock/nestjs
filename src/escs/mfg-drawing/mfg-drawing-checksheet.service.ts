@@ -42,6 +42,7 @@ export class MfgDrawingCreateChecksheetService {
     async create(dto: CreateMfgDrawingCheckSheetDto) {
         try {
             // หา item mfg ด้วย NITEMID
+            let message: string = 'Search Checksheet Success';
             const item = await this.itemMfgService.findOne(dto.NITEMID);
             if (!item.status) {
                 throw new Error(`Item Mfg with id ${dto.NITEMID} not found`);
@@ -73,23 +74,36 @@ export class MfgDrawingCreateChecksheetService {
             let drawing: string;
             let fileName: string;
             let newfileName: string;
+            let serialList: { VSERIALNO: string; NTYPE: number }[];
             switch (typeName) {
                 case 'multi':
                     newfileName = dto.ASERIALNO[0];
                     fileName = itemData.VFILE;
                     drawing = await this.getDrawingByIdTag(dto.ASERIALNO[0]);
+                    serialList = dto.ASERIALNO.map((sn, index) => ({
+                        VSERIALNO: sn,
+                        NTYPE: 1, // กำหนด type เป็น 1 สำหรับ serial no ทั้งหมดในกรณี multi
+                    }));
                     break;
                 case 'pisMulti':
                     newfileName = dto.VPIS;
                     drawing = await this.getDrawingByPis(dto.VPIS, controlList);
                     itemList = this.getDrawingList(itemLists, drawing);
                     fileName = itemList.VNUMBER_FILE;
+                    serialList = dto.ASERIALNO.map((sn, index) => ({
+                        VSERIALNO: sn,
+                        NTYPE: 2, // กำหนด type เป็น 2 สำหรับ serial no ทั้งหมดในกรณี pisMulti
+                    }));
                     break;
                 default:
                     newfileName = dto.ASERIALNO[0];
                     drawing = await this.getDrawingByIdTag(dto.ASERIALNO[0]);
                     itemList = this.getDrawingList(itemLists, drawing);
                     fileName = itemList.VNUMBER_FILE;
+                    serialList = dto.ASERIALNO.map((sn, index) => ({
+                        VSERIALNO: sn,
+                        NTYPE: 1, // กำหนด type เป็น 1 สำหรับ serial no ทั้งหมดในกรณี default
+                    }));
                     break;
             }
 
@@ -106,9 +120,10 @@ export class MfgDrawingCreateChecksheetService {
             });
 
             if (this.isEditable(insertData.NINSPECTOR_STATUS)) {
+                message = 'Create Checksheet Success';
                 const insertSerial = await this.insertSerial({
                     drawingId: insertData.NID,
-                    serialNo: dto.ASERIALNO,
+                    serialList: serialList,
                     userCreate: dto.NUSERCREATE,
                 });
             }
@@ -129,7 +144,7 @@ export class MfgDrawingCreateChecksheetService {
             const res = await this.mfgDrawingService.findOne(insertData.NID);
             return {
                 data: res.data,
-                message: 'Create Checksheet Success',
+                message: dto.REVISE ? 'Revise Checksheet Success' : message,
                 status: true,
             };
         } catch (error) {
@@ -159,8 +174,19 @@ export class MfgDrawingCreateChecksheetService {
         if (!f110kp.status) {
             throw new Error(`F110KP with control no ${controlNo} not found`);
         }
+        const data = f110kp.data;
+        let drawing: string = null;
+        if (!data.F11K27 || data.F11K27.trim() === '') {
+            if (!data.F11K10 || data.F11K10.trim() === '') {
+                drawing = data.F11K16;
+            } else {
+                drawing = data.F11K10;
+            }
+        } else {
+            drawing = data.F11K27;
+        }
         // return drawing จาก F110KP
-        return f110kp.data.F11K27;
+        return drawing;
     }
 
     async getDrawingByPis(pis: string, controls: string[]): Promise<string> {
@@ -285,13 +311,16 @@ export class MfgDrawingCreateChecksheetService {
                 data.NUSERUPDATE = usercreate;
                 data.DDATEUPDATE = new Date();
                 // ถ้า revise เป็น true ให้ update drawing และ delete serial
-                console.log('test revise', revise , typeof revise);
-                
+
                 if (revise) {
-                    const update = await this.mfgSerialService.update({ NDRAWINGID: data.NID }, { NSTATUS: 3 });
-                    console.log('Update serial', update);
+                    const update = await this.mfgSerialService.update(
+                        { NDRAWINGID: data.NID },
+                        { NSTATUS: 3 },
+                    );
                     // throw new Error(`test`);
-                    await this.mfgDrawingActionService.update(data.NID, { NSTATUS: 3 });
+                    await this.mfgDrawingActionService.update(data.NID, {
+                        NSTATUS: 3,
+                    });
                 }
 
                 // ถ้าไม่ใช่ multi และ drawing อยู่ใน delete list ให้ตั้ง status เป็น 3
@@ -416,17 +445,20 @@ export class MfgDrawingCreateChecksheetService {
 
     async insertSerial({
         drawingId,
-        serialNo,
+        serialList,
         userCreate,
     }: {
         drawingId: number;
-        serialNo: string[];
+        serialList: { VSERIALNO: string; NTYPE: number }[];
         userCreate: number;
     }) {
-        await this.mfgSerialService.removeByCondition({ NDRAWINGID: drawingId });
-        const insertBatch = serialNo.map((sn) => ({
+        await this.mfgSerialService.removeByCondition({
             NDRAWINGID: drawingId,
-            VSERIALNO: sn,
+        });
+        const insertBatch = serialList.map((sn) => ({
+            NDRAWINGID: drawingId,
+            VSERIALNO: sn.VSERIALNO,
+            NTYPE: sn.NTYPE,
             NUSERCREATE: userCreate,
         }));
         const res = await this.mfgSerialService.create(insertBatch);

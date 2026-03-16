@@ -18,6 +18,11 @@ export class CreateMfgSerialDto {
     @Type(() => String)
     VSERIALNO?: string;
 
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    NTYPE: number;
+
     @IsOptional()
     @IsNumber()
     @Type(() => Number)

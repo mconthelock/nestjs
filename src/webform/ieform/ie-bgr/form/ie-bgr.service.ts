@@ -415,15 +415,15 @@ export class IeBgrService {
             queryRunner,
           );
         }else{
-            if(dto.remark != undefined){
+            // if(dto.remark != undefined){
                 this.flowService.updateFlow({
                     condition: {
                         ...form,
                         CSTEPNO: '--',
                     },
-                    VREMARK: dto.remark,
+                    VREMARK: dto.remark ?? null,
                 })
-            }
+            // }
         }
       } else {
         // 1.3 กรณี New ให้สร้าง Form ใหม่

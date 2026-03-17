@@ -498,6 +498,7 @@ export class IeBgrService {
         PPRESDATE: dto.PREDATE,
         GPBID: dto.GPBID || null,
         CASETYPE: dto.CASETYPE,
+        AVALIABLE_BALANCE: dto.AVALIABLE_BALANCE,
       };
 
       // Insert EBGREQFORM record

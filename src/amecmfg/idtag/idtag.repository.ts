@@ -9,6 +9,7 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 import { IdtagFiles } from '../../common/Entities/workload/table/idtag-files.entity';
 import { IdtagPages } from '../../common/Entities/workload/table/idtag-pages.entity';
 import { IdtagImages } from '../../common/Entities/workload/views/idtag-images.entity';
+import { IdtagCndata } from '../../common/Entities/workload/views/idtag-cndata.entity';
 
 import { CreateIdtagFilesDto } from './dto/create-idtag-files.dto';
 import { CreateIdtagPagesDto } from './dto/create-idtag-pages.dto';
@@ -26,27 +27,19 @@ export class IdTagRepository extends BaseRepository {
         fileData: CreateIdtagFilesDto,
         pagesData: Omit<CreateIdtagPagesDto, 'FILES_ID'>[],
     ) {
-        return this.manager.transaction(async (manager) => {
-            const savedFile = await manager.save(IdtagFiles, fileData);
+        const savedFile = await this.manager.save(IdtagFiles, fileData);
+        const pageEntities = pagesData.map((pageData) =>
+            this.manager.create(IdtagPages, {
+                ...pageData,
+                FILES_ID: savedFile.FILES,
+                PAGE_NUM: Number(pageData.PAGE_NUM),
+                PAGE_STATUS: pageData.PAGE_STATUS ?? '0',
+            }),
+        );
 
-            const pageEntities = pagesData.map((pageData) =>
-                manager.create(IdtagPages, {
-                    ...pageData,
-                    FILES_ID: savedFile.FILES,
-                    PAGE_NUM: Number(pageData.PAGE_NUM),
-                    PAGE_STATUS: pageData.PAGE_STATUS ?? '0',
-                }),
-            );
-
-            const savedPages = pageEntities.length
-                ? await manager.save(IdtagPages, pageEntities)
-                : [];
-
-            return {
-                file: savedFile,
-                pages: savedPages,
-            };
-        });
+        if (pageEntities.length)
+            await this.manager.insert(IdtagPages, pageEntities);
+        return savedFile;
     }
 
     async findImage(dto: FiltersDto) {
@@ -65,5 +58,11 @@ export class IdTagRepository extends BaseRepository {
                 PAGE_IMG: '1',
             },
         );
+    }
+
+    async findCndata(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(IdtagCndata, 'C');
+        this.applyFilters(qb, 'C', dto, ['FILES_ID', 'PAGE_CN']);
+        return qb.getMany();
     }
 }

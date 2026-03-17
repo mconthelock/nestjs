@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 
+import dayjs from 'dayjs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 const fontkit = require('@pdf-lib/fontkit');
@@ -10,13 +11,9 @@ import { spawn } from 'child_process';
 import { PDFDocument, rgb, degrees } from 'pdf-lib';
 import { PDFParse } from 'pdf-parse';
 import { compressDimension } from 'src/common/helpers/resize-image.helper';
-import {
-    drawGrid,
-    writeLineBox,
-    protectedFile,
-} from 'src/common/helpers/file-pdf.helper';
-
+import { writeLineBox } from 'src/common/helpers/file-pdf.helper';
 import { FileLoggerService } from 'src/common/services/file-logger/file-logger.service';
+import { R027mp1Service } from 'src/as400/rtnlibf/r027mp1/r027mp1.service';
 
 import { M008KP } from 'src/as400/rtnlibf/m008kp/entities/m008kp.entity';
 import { F110KP } from 'src/amecmfg/f110kp/entities/f110kp.entity';
@@ -27,16 +24,29 @@ import { IdtagPages } from '../../common/Entities/workload/table/idtag-pages.ent
 import { IdtagImages } from '../../common/Entities/workload/views/idtag-images.entity';
 import { IdTagRepository } from './idtag.repository';
 
+interface filesData {
+    bmdate: Date;
+    folder: string;
+    originalfilename: string;
+    filename: string;
+    pageCount: number;
+    schd: string;
+    schdp: string;
+    splitFilesData: {
+        fileName: string;
+        filePath: string;
+        pageNumber: number;
+    }[];
+}
+
 @Injectable()
 export class IdtagService {
     private logFileName = '';
-    private readonly imagePlacement = {
-        boxLeftRatio: 0.33,
-        boxBottomRatio: 0.04,
-        boxWidthRatio: 0.65,
-        boxHeightRatio: 0.9,
-        padding: 6,
-    };
+    private pdfDirectory;
+    private readonly fontPath = path.join(
+        process.cwd(),
+        'public/fonts/Roboto-Regular.ttf',
+    );
 
     constructor(
         @InjectRepository(M008KP, 'amecConnection')
@@ -48,6 +58,7 @@ export class IdtagService {
 
         private readonly repo: IdTagRepository,
         private readonly fileLogger: FileLoggerService,
+        private r027: R027mp1Service,
     ) {}
 
     async findBySchd(schd: string, schdp?: string) {
@@ -150,29 +161,46 @@ export class IdtagService {
         });
     }
 
-    async processPdfDocument() {
-        //await this.putImagesTS();
-        //return;
+    private async setPdfPath(data) {
+        const file = data.filename.replace('.pdf', '');
+        this.pdfDirectory = path.join(
+            process.env.IDTAG_FILE_PATH,
+            `test/`,
+            `${data.schd}${data.schdp}/`,
+            `${data.filedir}/`,
+            `${file}/`,
+        );
+        await fs.mkdir(this.pdfDirectory, { recursive: true });
+        this.logFileName = `IDTAG/${data.schd}${data.schdp}/${data.filedir}/${file}.log`;
+        return;
+    }
+
+    async processPdfDocument(body: {
+        filename: string;
+        schd: string;
+        schdp: string;
+        filedir: string;
+        bmdate: string;
+    }) {
+        await this.putFirstLot();
+        return;
         const totalStartTime = Date.now();
         try {
-            this.logFileName = `IDTAG/202603XP2/TAGLZME.log`;
-            const outputDirectory = path.join(
-                process.env.IDTAG_FILE_PATH,
-                'test/TAGLZME/',
-            );
-            await fs.mkdir(outputDirectory, { recursive: true });
+            await this.setPdfPath(body);
+            await this.putCNNo(1);
+            return;
+            const outputDirectory = this.pdfDirectory;
             const inputFilePath = path.join(
                 process.env.IDTAG_FILE_PATH,
-                'test/TAGLZME.pdf',
+                'test/TAGSUB.pdf',
             );
-
             const readStartTime = Date.now();
             const pdfBytes = await fs.readFile(inputFilePath);
             await this.writeLog(
                 `Read source PDF in ${this.formatElapsedTime(readStartTime)}`,
             );
 
-            // ขั้นตอนที่ 1: โหลด PDF ด้วย pdf-lib (เมื่อ save จะได้โครงสร้างไฟล์ที่อัปเดตและบีบอัดขึ้น)
+            // ขั้นตอนที่ 1: โหลด PDF ด้วย pdf-lib
             const loadStartTime = Date.now();
             const pdfDoc = await PDFDocument.load(pdfBytes);
             const pageCount = pdfDoc.getPageCount();
@@ -186,7 +214,7 @@ export class IdtagService {
                 pageNumber: number;
             }[] = [];
 
-            // ขั้นตอนที่ 2 & 3: แบ่งหน้า, อ่านข้อความตั้งชื่อไฟล์ และจำลองการบันทึกลง Database
+            // ขั้นตอนที่ 2 & 3: แบ่งหน้า, อ่านข้อความ และตั้งชื่อไฟล์
             const splitStartTime = Date.now();
             for (let i = 1; i < pageCount; i++) {
                 const singlePageDoc = await PDFDocument.create();
@@ -222,8 +250,18 @@ export class IdtagService {
 
             // ขั้นตอนที่ 3: บันทึกข้อมูลลง Database
             const saveStartTime = Date.now();
-            const tagdata = await this.saveTagsData(splitFilesData, pageCount);
-            const fileID = tagdata.file.FILES;
+            const dbdate: filesData = {
+                bmdate: new Date(body.bmdate),
+                folder: body.filedir,
+                originalfilename: body.filename,
+                filename: `${body.filename.replace('.pdf', '')}_processed.pdf`,
+                pageCount,
+                schd: body.schd,
+                schdp: body.schdp,
+                splitFilesData,
+            };
+            const tagdata = await this.saveTagsData(dbdate);
+            const fileID = tagdata.FILES;
             await this.writeLog(
                 `Saved PDF data in ${this.formatElapsedTime(saveStartTime)}`,
             );
@@ -338,22 +376,17 @@ export class IdtagService {
         });
     }
 
-    private async saveTagsData(
-        splitFilesData: {
-            fileName: string;
-            pageNumber: number;
-        }[],
-        pageCount: number,
-    ) {
+    private async saveTagsData(data: filesData) {
+        const splitFilesData = data.splitFilesData || [];
         return this.repo.createPrint(
             {
-                SCHDDATE: new Date(),
-                SCHDNUMBER: '2026031',
-                SCHDP: 'G1',
-                FILE_ONAME: 'TAG295G1.pdf',
-                FILE_NAME: 'TAG295G1.pdf',
-                FILE_FOLDER: 'TAG295G1',
-                FILE_TOTALPAGE: pageCount,
+                SCHDDATE: data.bmdate,
+                SCHDNUMBER: data.schd,
+                SCHDP: data.schdp,
+                FILE_ONAME: data.originalfilename,
+                FILE_NAME: data.filename,
+                FILE_FOLDER: data.folder,
+                FILE_TOTALPAGE: data.pageCount,
                 FILE_STATUS: '0',
                 CREATE_DATE: new Date(),
             },
@@ -369,11 +402,6 @@ export class IdtagService {
 
     //Start: Put photo to PDF
     private async putImages(filesId: number) {
-        const pdfDirectory = path.join(
-            process.env.IDTAG_FILE_PATH,
-            `test`,
-            `TAGLZME`,
-        );
         const imageData = await this.repo.findImage({
             filters: [
                 { field: 'FILES_ID', op: 'eq', value: filesId },
@@ -383,20 +411,23 @@ export class IdtagService {
 
         for (const img of imageData) {
             try {
-                if (!img.DWG_IMG) {
+                if (!img.DWG_IMG) continue;
+                const imagePath = await this.setImagePath(img.DWG_IMG);
+                if (imagePath == null) {
                     await this.writeLog(
-                        `Skip tag ${img.PAGE_TAG}: drawing image is empty`,
+                        `Skip tag ${img.PAGE_TAG}: Image ${img.DWG_IMG} is not found`,
                     );
                     continue;
                 }
-
-                const imagePath = await this.setImagePath(img.DWG_IMG);
-                const pdfPath = path.join(pdfDirectory, `${img.PAGE_TAG}.pdf`);
+                const pdfPath = path.join(
+                    this.pdfDirectory,
+                    `${img.PAGE_TAG}.pdf`,
+                );
 
                 await this.embedImageToPdf(
                     pdfPath,
                     imagePath,
-                    `${img.DWG_WEIGHT} ${img.DWG_WEIGHT_UNIT}/${img.DWG_UNIT}`,
+                    `${img.DWG_WEIGHT == null ? 0 : img.DWG_WEIGHT} ${img.DWG_WEIGHT_UNIT}/${img.DWG_UNIT}`,
                 );
                 await this.repo.updatePageImage(
                     img.FILES_ID,
@@ -428,6 +459,12 @@ export class IdtagService {
             return thumb;
         }
 
+        const chkImgExists = await fs
+            .access(image)
+            .then(() => true)
+            .catch(() => false);
+        if (!chkImgExists) return null;
+
         const imageBytes = await fs.readFile(image);
         await compressDimension(imageBytes, 'image/jpeg', 500).then(
             (compressedBuffer) => {
@@ -442,10 +479,9 @@ export class IdtagService {
         imagePath: string,
         text: string,
     ) {
-        const fontPath = path.join(process.cwd(), 'public/fonts/THSarabun.ttf');
         const [pdfBytes, fontBytes] = await Promise.all([
             fs.readFile(pdfPath),
-            fs.readFile(fontPath),
+            fs.readFile(this.fontPath),
         ]);
 
         const pdfDoc = await PDFDocument.load(pdfBytes);
@@ -523,12 +559,82 @@ export class IdtagService {
             color: rgb(0, 0, 0),
             rotate: degrees(90),
         });
-
         await fs.writeFile(pdfPath, await pdfDoc.save());
     }
 
     //End: Put photo to PDF
-    private async putCNNo() {}
+    private async putCNNo(filesId: number) {
+        const cnData = await this.repo.findCndata({
+            filters: [
+                { field: 'FILES_ID', op: 'eq', value: filesId },
+                { field: 'PAGE_CN', op: 'isNull' },
+            ],
+        });
 
-    private async putFirstLot() {}
+        for (const data of cnData) {
+            try {
+                const pdfPath = path.join(
+                    this.pdfDirectory,
+                    `${data.PAGE_TAG}.pdf`,
+                );
+                await this.embedCNToPdf(pdfPath, {
+                    cnno: data.DOCNO,
+                    sendto: data.SENTTO,
+                    senddate: data.PRDCTNAME,
+                });
+            } catch (error) {
+                await this.writeLog(
+                    `Error processing CN Data for tag ${data.PAGE_TAG}`,
+                    { error },
+                );
+            }
+        }
+    }
+
+    private async embedCNToPdf(pdfPath: string, text: any) {
+        const [pdfBytes, fontBytes] = await Promise.all([
+            fs.readFile(pdfPath),
+            fs.readFile(this.fontPath),
+        ]);
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+        pdfDoc.registerFontkit(fontkit);
+        const fontstyle = await pdfDoc.embedFont(fontBytes);
+        const [page] = pdfDoc.getPages();
+        const opt = {
+            pdfpage: page,
+            fontstyle: fontstyle,
+            fontsize: 14,
+            boxHeight: 15,
+        };
+        await writeLineBox({
+            ...opt,
+            text: `${text.cnno}`,
+            align: 'center',
+            boxX: 345,
+            boxY: 164,
+            boxWidth: 129,
+            drawBorder: {
+                color: rgb(0.9, 0.9, 0.9),
+                width: 0,
+                bgColor: rgb(0.9, 0.9, 0.9),
+            },
+        });
+
+        await writeLineBox({
+            ...opt,
+            text: `PLEASE SEND TO ${text.sendto} ON ${text.senddate}`,
+            align: 'left',
+            boxX: 15,
+            boxY: 790,
+        });
+        await fs.writeFile(pdfPath, await pdfDoc.save());
+    }
+
+    private async putFirstLot() {
+        const firstData = await this.r027.findAll({
+            filters: [{ field: 'R27M13', op: 'eq', value: '20260317' }],
+        });
+
+        console.log(firstData, firstData.length);
+    }
 }

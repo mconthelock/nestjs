@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { IdtagService } from './idtag.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 @ApiTags('AS400 - ID Tag')
 @Controller('idtag')
@@ -61,8 +62,18 @@ export class IdtagController {
         return this.tag.getWeekList();
     }
 
-    @Get('process-pdf')
-    async processPdfDocument() {
-        return this.tag.processPdfDocument();
+    @Post('process-pdf')
+    @UseTransaction('workloadConnection')
+    async processPdfDocument(
+        @Body()
+        body: {
+            filename: string;
+            schd: string;
+            schdp: string;
+            filedir: string;
+            bmdate: string;
+        },
+    ) {
+        return this.tag.processPdfDocument(body);
     }
 }

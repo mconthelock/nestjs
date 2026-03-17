@@ -428,7 +428,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       this.dataSource.query(
         `
         SELECT
-          P.STOP_ID AS stop_id,
+          P.STOP_ID AS stop_id, H.STATUS AS status,
           P.EMPNO AS empno,
           U.SNAME AS engname,
           U.STNAME AS thainame,
@@ -436,6 +436,8 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
           U.SDEPT AS sdept,
           U.SDIV AS sdiv
         FROM GPREPORT.BUS_DISPATCH_PASSENGER P
+        INNER JOIN GPREPORT.BUS_DISPATCH_HEAD H
+          ON H.DISPATCH_ID = P.DISPATCH_ID
         LEFT JOIN AMEC.AMECUSERALL U
           ON U.SEMPNO = P.EMPNO
         WHERE P.DISPATCH_ID = :1

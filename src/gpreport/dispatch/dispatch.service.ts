@@ -1012,7 +1012,6 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       const dispatch_id = Number(dto.dispatch_id);
       const empno = String(dto.empno).trim();
       const status = String(dto.status).trim();
-
       const head = await manager.findOne(BusDispatchHead, {
         where: { dispatch_id },
       });

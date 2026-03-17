@@ -14,6 +14,7 @@ import { DispatchKeyDto } from './dto/dispatch-key.dto';
 import { MoveStopDto } from './dto/move-stop.dto';
 import { DeleteLineDto } from './dto/delete-line.dto';
 import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
+import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
 
 @Injectable()
 export class DispatchService {
@@ -33,6 +34,18 @@ export class DispatchService {
     @InjectRepository(BusDispatchPassenger, 'gpreportConnection')
     private passRepo: Repository<BusDispatchPassenger>,
   ) {}
+
+  async updateStatus(dto: UpdateStatusDispatchDto) {
+    const head = await this.headRepo.findOne({
+      where: { dispatch_id: dto.dispatch_id },
+    });
+
+    if (!head) throw new Error('DISPATCH_NOT_FOUND');
+
+    head.status = dto.status;
+    await this.headRepo.save(head);
+    return { dispatch_id: head.dispatch_id, ok: true };
+  }
 
   async saveDispatch(dto: SaveDispatchDto) {
     const head = await this.headRepo.findOne({
@@ -836,7 +849,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       .createQueryBuilder('s')
       .where('s.dispatch_id = :dispatchId', { dispatchId })
       .orderBy('s.line_id', 'ASC')
-      .addOrderBy('s.plan_time', 'ASC')
+      .addOrderBy('s.plan_time', 'DESC')
       .addOrderBy('s.stop_id', 'ASC')
       .getMany();
 

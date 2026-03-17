@@ -10,6 +10,8 @@ import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { DailyDispatchReportDto } from './dto/dispatch-report.dto';
 import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
+import { UpdatePassengerStatusDto } from './dto/update-passenger-status.dto';
+
 
 export class DispatchReportDto {
   @IsString()
@@ -24,6 +26,7 @@ export class DispatchController {
   get(@Body() dto: DispatchKeyDto) {
     return this.service.getDispatch(dto);
   }
+  
 
   @Post('save-overwrite')
   saveOverwrite(@Body() dto: SaveOverwriteDto) {
@@ -70,4 +73,10 @@ export class DispatchController {
   getReportDisabledPassenger(@Body() dto: DailyDispatchReportDto) {
     return this.service.getReportDisabledPassenger(dto);
   }
+
+  @Post('update-passenger-status')
+  async updatePassengerStatus(@Body() dto: UpdatePassengerStatusDto) {
+    return await this.service.updatePassengerStatus(dto);
+  }
+
 }

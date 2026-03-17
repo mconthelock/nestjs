@@ -15,6 +15,7 @@ import { MoveStopDto } from './dto/move-stop.dto';
 import { DeleteLineDto } from './dto/delete-line.dto';
 import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
 import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
+import { UpdatePassengerStatusDto } from './dto/update-passenger-status.dto';
 
 @Injectable()
 export class DispatchService {
@@ -1005,9 +1006,41 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     return `ตารางรถรับส่งพนักงาน ${timeText} ประจำวันที่ ${date}`;
   }
 
-  
 
+  async updatePassengerStatus(dto: UpdatePassengerStatusDto) {
+    return this.dataSource.transaction(async (manager) => {
+      const dispatch_id = Number(dto.dispatch_id);
+      const empno = String(dto.empno).trim();
+      const status = String(dto.status).trim();
 
+      const head = await manager.findOne(BusDispatchHead, {
+        where: { dispatch_id },
+      });
+
+      if (!head) throw new Error('DISPATCH_NOT_FOUND');
+      if (head.status === 'C') throw new Error('DISPATCH_CLOSED');
+
+      const passenger = await manager.findOne(BusDispatchPassenger, {
+        where: { dispatch_id, empno } as any,
+      });
+
+      if (!passenger) throw new Error('PASSENGER_NOT_FOUND');
+
+      passenger.status = status;
+      await manager.save(BusDispatchPassenger, passenger);
+
+      head.update_by = dto.update_by;
+      head.update_date = new Date();
+      await manager.save(BusDispatchHead, head);
+
+      return {
+        ok: true,
+        dispatch_id,
+        empno,
+        status,
+      };
+    });
+  }
 
 
 }

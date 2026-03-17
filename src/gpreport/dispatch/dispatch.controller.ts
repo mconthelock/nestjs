@@ -9,6 +9,7 @@ import { DeleteLineDto } from './dto/delete-line.dto';
 import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { DailyDispatchReportDto } from './dto/dispatch-report.dto';
+import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
 
 export class DispatchReportDto {
   @IsString()
@@ -27,6 +28,12 @@ export class DispatchController {
   @Post('save-overwrite')
   saveOverwrite(@Body() dto: SaveOverwriteDto) {
     return this.service.saveOverwrite(dto);
+  }
+
+  
+  @Post('update-status')
+  updateStatus(@Body() dto: UpdateStatusDispatchDto) {
+    return this.service.updateStatus(dto);
   }
 
   @Post('build-daily-first')

@@ -62,7 +62,7 @@ export class IdTagRepository extends BaseRepository {
                 PAGE_NUM: pageNum,
             },
             {
-                PAGE_IMG: pageImg,
+                PAGE_IMG: '1',
             },
         );
     }

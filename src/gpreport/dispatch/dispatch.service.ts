@@ -14,6 +14,7 @@ import { DispatchKeyDto } from './dto/dispatch-key.dto';
 import { MoveStopDto } from './dto/move-stop.dto';
 import { DeleteLineDto } from './dto/delete-line.dto';
 import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
+import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
 
 @Injectable()
 export class DispatchService {
@@ -33,6 +34,18 @@ export class DispatchService {
     @InjectRepository(BusDispatchPassenger, 'gpreportConnection')
     private passRepo: Repository<BusDispatchPassenger>,
   ) {}
+
+  async updateStatus(dto: UpdateStatusDispatchDto) {
+    const head = await this.headRepo.findOne({
+      where: { dispatch_id: dto.dispatch_id },
+    });
+
+    if (!head) throw new Error('DISPATCH_NOT_FOUND');
+
+    head.status = dto.status;
+    await this.headRepo.save(head);
+    return { dispatch_id: head.dispatch_id, ok: true };
+  }
 
   async saveDispatch(dto: SaveDispatchDto) {
     const head = await this.headRepo.findOne({
@@ -174,10 +187,10 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
           AND OT.TIMEIN >= :2
           AND OT.TIMEOUT <= :3
           AND F.CST <> '3'
-      ) WHERE STOP_ID  <> 999  
+      ) 
       `,
       [workDate, dto.timeout_from, dto.timeout_to],
-    ); //STOP_ID  = 999   = รถส่วนตัว
+    ); 
 
     if (!rows.length) {
       return {
@@ -213,7 +226,6 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
 
     // 4) filter source rows
     // - skip empno ที่มีอยู่แล้วใน dispatch นี้
-    // - skip empno ที่ source ได้ stop_id = 999 หรือ busid = 30
     const sourceRows = rows.filter((r) => {
       const empno = String(r.EMPNO || '').trim();
       const busid = r.BUSID != null ? Number(r.BUSID) : null;
@@ -221,8 +233,6 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
 
       if (!empno || !busid || !stop_id) return false;
       if (passEmpSet.has(empno)) return false;
-      if (busid === 30 || stop_id === 999) return false;
-
       return true;
     });
 
@@ -431,7 +441,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       this.dataSource.query(
         `
         SELECT
-          P.STOP_ID AS stop_id,
+          P.STOP_ID AS stop_id, H.STATUS AS status,
           P.EMPNO AS empno,
           U.SNAME AS engname,
           U.STNAME AS thainame,
@@ -439,6 +449,8 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
           U.SDEPT AS sdept,
           U.SDIV AS sdiv
         FROM GPREPORT.BUS_DISPATCH_PASSENGER P
+        INNER JOIN GPREPORT.BUS_DISPATCH_HEAD H
+          ON H.DISPATCH_ID = P.DISPATCH_ID
         LEFT JOIN AMEC.AMECUSERALL U
           ON U.SEMPNO = P.EMPNO
         WHERE P.DISPATCH_ID = :1
@@ -837,7 +849,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       .createQueryBuilder('s')
       .where('s.dispatch_id = :dispatchId', { dispatchId })
       .orderBy('s.line_id', 'ASC')
-      .addOrderBy('s.plan_time', 'ASC')
+      .addOrderBy('s.plan_time', 'DESC')
       .addOrderBy('s.stop_id', 'ASC')
       .getMany();
 

@@ -4,8 +4,10 @@ import { DataSource, Repository } from 'typeorm';
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
+const fontkit = require('@pdf-lib/fontkit');
+// import fontkit from '@pdf-lib/fontkit';
 import { spawn } from 'child_process';
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument, rgb, degrees } from 'pdf-lib';
 import { PDFParse } from 'pdf-parse';
 import { compressDimension } from 'src/common/helpers/resize-image.helper';
 import {
@@ -149,8 +151,8 @@ export class IdtagService {
     }
 
     async processPdfDocument() {
-        await this.putImagesTS();
-        return;
+        //await this.putImagesTS();
+        //return;
         const totalStartTime = Date.now();
         try {
             this.logFileName = `IDTAG/202603XP2/TAGLZME.log`;
@@ -365,104 +367,13 @@ export class IdtagService {
         );
     }
 
-    private getRequiredIdtagPath(...segments: string[]) {
-        if (!process.env.IDTAG_FILE_PATH) {
-            throw new Error('IDTAG_FILE_PATH is not configured');
-        }
-        return path.join(process.env.IDTAG_FILE_PATH, ...segments);
-    }
-
-    private async thumbnailImage(inputPath: string, outputPath: string) {
-        const imageBytes = await fs.readFile(inputPath);
-        await compressDimension(imageBytes, 'image/jpeg', 500).then(
-            (compressedBuffer) => {
-                return fs.writeFile(outputPath, compressedBuffer);
-            },
-        );
-    }
-
-    private mmToPoints(mm: number) {
-        return (mm * 72) / 25.4;
-    }
-
-    private pointTomm(point: number) {
-        return (point / 72) * 25.4;
-    }
-
-    private async embedImageToPdf(pdfPath: string, imagePath: string) {
-        const pdfBytes = await fs.readFile(pdfPath);
-        const pdfDoc = await PDFDocument.load(pdfBytes);
-        const [page] = pdfDoc.getPages();
-
-        if (!page) {
-            throw new Error(`PDF file has no pages: ${pdfPath}`);
-        }
-
-        await drawGrid(page, 10);
-        const imageBytes = await fs.readFile(imagePath);
-        const extension = path.extname(imagePath).toLowerCase();
-        const embeddedImage = ['.jpg', '.jpeg'].includes(extension)
-            ? await pdfDoc.embedJpg(imageBytes)
-            : extension === '.png'
-              ? await pdfDoc.embedPng(imageBytes)
-              : null;
-
-        if (!embeddedImage) {
-            throw new Error(`Unsupported image type: ${extension}`);
-        }
-
-        const rectX = 269;
-        const rectY = 87;
-        const rectWidth = 270;
-        const rectHeight = 87;
-        const padding = 4;
-        const availableWidth = Math.max(rectWidth - padding * 2, 1);
-        const availableHeight = Math.max(rectHeight - padding * 2, 1);
-        const scale = Math.min(
-            availableWidth / embeddedImage.width,
-            availableHeight / embeddedImage.height,
-            1,
-        );
-        const drawWidth = embeddedImage.width * scale;
-        const drawHeight = embeddedImage.height * scale;
-        const drawX = rectX + (rectWidth - drawWidth) / 2;
-        const drawY = rectY + (rectHeight - drawHeight) / 2;
-
-        page.drawRectangle({
-            x: rectX,
-            y: rectY,
-            width: rectWidth,
-            height: rectHeight,
-            color: rgb(1, 1, 1),
-        });
-
-        page.drawImage(embeddedImage, {
-            x: drawX,
-            y: drawY,
-            width: drawWidth,
-            height: drawHeight,
-        });
-
-        await fs.writeFile(pdfPath, await pdfDoc.save());
-    }
-
-    private async putImagesTS() {
-        const pdfDirectory = this.getRequiredIdtagPath('test', 'TAGLZME');
-        const imageDirectory = this.getRequiredIdtagPath('thumbnail');
-        const imagePath = path.join(imageDirectory, 'AS101C230-02(B).jpg');
-        // const thumbnail = path.join(
-        //     process.env.IDTAG_FILE_PATH,
-        //     'thumbnail/AS101C230-02(B).jpg',
-        // );
-        // await this.thumbnailImage(imagePath, thumbnail);
-        const pdfPath = path.join(pdfDirectory, `X.pdf`);
-        await this.embedImageToPdf(pdfPath, imagePath);
-    }
-
+    //Start: Put photo to PDF
     private async putImages(filesId: number) {
-        const pdfDirectory = this.getRequiredIdtagPath('test', 'TAGLZME');
-        const imageDirectory = this.getRequiredIdtagPath('images');
-
+        const pdfDirectory = path.join(
+            process.env.IDTAG_FILE_PATH,
+            `test`,
+            `TAGLZME`,
+        );
         const imageData = await this.repo.findImage({
             filters: [
                 { field: 'FILES_ID', op: 'eq', value: filesId },
@@ -479,18 +390,22 @@ export class IdtagService {
                     continue;
                 }
 
-                const imagePath = path.join(imageDirectory, img.DWG_IMG);
+                const imagePath = await this.setImagePath(img.DWG_IMG);
                 const pdfPath = path.join(pdfDirectory, `${img.PAGE_TAG}.pdf`);
 
-                await this.embedImageToPdf(pdfPath, imagePath);
-                // await this.repo.updatePageImage(
-                //     img.FILES_ID,
-                //     img.PAGE_NUM,
-                //     img.DWG_IMG,
-                // );
-                // await this.writeLog(
-                //     `Embedded image ${img.DWG_IMG} into ${img.PAGE_TAG}.pdf`,
-                // );
+                await this.embedImageToPdf(
+                    pdfPath,
+                    imagePath,
+                    `${img.DWG_WEIGHT} ${img.DWG_WEIGHT_UNIT}/${img.DWG_UNIT}`,
+                );
+                await this.repo.updatePageImage(
+                    img.FILES_ID,
+                    img.PAGE_NUM,
+                    img.DWG_IMG,
+                );
+                await this.writeLog(
+                    `Embedded image ${img.DWG_IMG} into ${img.PAGE_TAG}.pdf`,
+                );
             } catch (error) {
                 await this.writeLog(
                     `Error processing image for tag ${img.PAGE_TAG}`,
@@ -500,6 +415,119 @@ export class IdtagService {
         }
     }
 
+    private async setImagePath(img: string) {
+        const image = path.join(process.env.IDTAG_FILE_PATH, `images/`, img);
+        const thumb = path.join(process.env.IDTAG_FILE_PATH, `thumbnail/`, img);
+
+        const fileExists = await fs
+            .access(thumb)
+            .then(() => true)
+            .catch(() => false);
+
+        if (fileExists) {
+            return thumb;
+        }
+
+        const imageBytes = await fs.readFile(image);
+        await compressDimension(imageBytes, 'image/jpeg', 500).then(
+            (compressedBuffer) => {
+                return fs.writeFile(thumb, compressedBuffer);
+            },
+        );
+        return thumb;
+    }
+
+    private async embedImageToPdf(
+        pdfPath: string,
+        imagePath: string,
+        text: string,
+    ) {
+        const fontPath = path.join(process.cwd(), 'public/fonts/THSarabun.ttf');
+        const [pdfBytes, fontBytes] = await Promise.all([
+            fs.readFile(pdfPath),
+            fs.readFile(fontPath),
+        ]);
+
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+        pdfDoc.registerFontkit(fontkit);
+        const fontstyle = await pdfDoc.embedFont(fontBytes);
+        const [page] = pdfDoc.getPages();
+
+        if (!page) {
+            throw new Error(`PDF file has no pages: ${pdfPath}`);
+        }
+
+        const opt = {
+            pdfpage: page,
+            fontstyle: fontstyle,
+            fontsize: 14,
+            drawBorder: {
+                color: rgb(0, 0, 0),
+                width: 1,
+            },
+            text: '',
+            boxX: 283,
+            boxY: 685,
+            boxWidth: 270,
+            boxHeight: 100,
+            align: 'left',
+        };
+        await writeLineBox(opt);
+
+        const imageBytes = await fs.readFile(imagePath);
+        const extension = path.extname(imagePath).toLowerCase();
+        const embeddedImage = ['.jpg', '.jpeg'].includes(extension)
+            ? await pdfDoc.embedJpg(imageBytes)
+            : extension === '.png'
+              ? await pdfDoc.embedPng(imageBytes)
+              : null;
+
+        if (!embeddedImage) {
+            throw new Error(`Unsupported image type: ${extension}`);
+        }
+
+        const imgHeight = 100;
+        const imgWidth = Math.ceil(
+            (embeddedImage.width / embeddedImage.height) * imgHeight,
+        );
+
+        const imgX = 270 - imgWidth + 283;
+        const imgY = 79;
+        page.drawImage(embeddedImage, {
+            x: imgX,
+            y: imgY,
+            width: imgWidth,
+            height: imgHeight,
+        });
+
+        const labelGap = 5;
+        const labelWidth = 20;
+        const labelHeight = imgHeight;
+        const labelX = imgX - labelGap - labelWidth;
+        const labelY = imgY;
+
+        page.drawRectangle({
+            x: labelX,
+            y: labelY,
+            width: labelWidth,
+            height: labelHeight,
+            borderWidth: 1,
+            borderColor: rgb(0, 0, 0),
+        });
+
+        page.drawText(text, {
+            x: labelX + 13,
+            y: labelY + 15,
+            size: 14,
+            font: fontstyle,
+            color: rgb(0, 0, 0),
+            rotate: degrees(90),
+        });
+
+        await fs.writeFile(pdfPath, await pdfDoc.save());
+    }
+
+    //End: Put photo to PDF
     private async putCNNo() {}
 
     private async putFirstLot() {}

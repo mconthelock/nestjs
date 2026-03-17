@@ -174,10 +174,10 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
           AND OT.TIMEIN >= :2
           AND OT.TIMEOUT <= :3
           AND F.CST <> '3'
-      ) WHERE STOP_ID  <> 999  
+      ) 
       `,
       [workDate, dto.timeout_from, dto.timeout_to],
-    ); //STOP_ID  = 999   = รถส่วนตัว
+    ); 
 
     if (!rows.length) {
       return {
@@ -213,7 +213,6 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
 
     // 4) filter source rows
     // - skip empno ที่มีอยู่แล้วใน dispatch นี้
-    // - skip empno ที่ source ได้ stop_id = 999 หรือ busid = 30
     const sourceRows = rows.filter((r) => {
       const empno = String(r.EMPNO || '').trim();
       const busid = r.BUSID != null ? Number(r.BUSID) : null;
@@ -221,8 +220,6 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
 
       if (!empno || !busid || !stop_id) return false;
       if (passEmpSet.has(empno)) return false;
-      if (busid === 30 || stop_id === 999) return false;
-
       return true;
     });
 

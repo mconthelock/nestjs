@@ -16,6 +16,7 @@ import { DeleteLineDto } from './dto/delete-line.dto';
 import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
 import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
 import { UpdatePassengerStatusDto } from './dto/update-passenger-status.dto';
+import { AMECUUSERALL } from 'src/common/Entities/amec/views/AMECUUSERALL.entity';
 
 @Injectable()
 export class DispatchService {
@@ -835,6 +836,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
   //================================== รายงาน ==================================//
   async getReportBus(dto: DailyDispatchReportDto) {
     const dispatchId = Number(dto.dispatch_id);
+
     // 1) ดึง line
     const lines = await this.dataSource
       .getRepository(BusDispatchLine)
@@ -854,35 +856,42 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       .addOrderBy('s.stop_id', 'ASC')
       .getMany();
 
-    // 3) ดึง passenger ที่ enable
+    // 3) ดึง passenger ที่ enable + join employee
     const passengers = await this.dataSource
       .getRepository(BusDispatchPassenger)
       .createQueryBuilder('p')
+      .leftJoin(
+        'AMECUSERALL',
+        'u',
+        "TRIM(TO_CHAR(u.SEMPNO)) = TRIM(TO_CHAR(p.empno))",
+      )
+      .select('p.EMPNO', 'empno')
+      .addSelect('p.STOP_ID', 'stop_id')
+      .addSelect('u.STNAME', 'fullname')
+      .addSelect('u.SDEPT', 'dept')
+      .addSelect('u.SSEC', 'sec')
+      .addSelect('u.SDIV', 'div')
       .where('p.dispatch_id = :dispatchId', { dispatchId })
       .andWhere("NVL(p.status, 'E') = 'E'")
       .orderBy('p.stop_id', 'ASC')
       .addOrderBy('p.empno', 'ASC')
-      .getMany();
+      .getRawMany();
 
-    // 4) หา empno ทั้งหมด
-    const empnos = passengers.map((p) => p.empno);
-
-    // 5) map ข้อมูลชื่อ/แผนกจาก source เดิม
-    const employeeMap = await this.getEmployeeReportMap(empnos);
-
-    // 6) ประกอบ report
+    // 4) ประกอบ report
     const resultLines = lines.map((line) => {
-      const lineStops = stops.filter((s) => s.line_id === line.busid).map((stop) => {
-          const stopPassengers = passengers.filter((p) => p.stop_id === stop.stop_id).map((p, index) => {
-              const emp = employeeMap[p.empno] || {};
-
+      const lineStops = stops
+        .filter((s) => s.line_id === line.busid)
+        .map((stop) => {
+          const stopPassengers = passengers
+            .filter((p) => Number(p.stop_id) === Number(stop.stop_id))
+            .map((p, index) => {
               return {
                 no: index + 1,
-                empno: p.empno,
-                fullname: emp.thname || '',
-                dept: emp.dept || '',
-                sec: emp.sec || '',
-                div: emp.div || '',
+                empno: p.empno || '',
+                fullname: p.fullname || '',
+                dept: p.dept || '',
+                sec: p.sec || '',
+                div: p.div || '',
               };
             });
 
@@ -911,38 +920,44 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       lines: resultLines,
     };
   }
-
 //================================================================== //
-
-
   async getReportDisabledPassenger(dto: DailyDispatchReportDto) {
     const dispatchId = Number(dto.dispatch_id);
-    const passengers = await this.dataSource
-      .getRepository(BusDispatchPassenger)
+
+    const passengers = await this.passRepo
       .createQueryBuilder('p')
-      .leftJoinAndSelect(BusDispatchStop, 's', 's.dispatch_id = p.dispatch_id AND s.stop_id = p.stop_id')
+      .leftJoin(
+        BusDispatchStop,
+        's',
+        's.dispatch_id = p.dispatch_id AND s.stop_id = p.stop_id',
+      )
+      .leftJoin(
+        'AMECUSERALL',
+        'u',
+        "TRIM(TO_CHAR(u.SEMPNO)) = TRIM(TO_CHAR(p.empno))",
+      )
+      .select('p.EMPNO', 'empno')
+      .addSelect('s.STOP_NAME', 'stop_name')
+      .addSelect('s.PLAN_TIME', 'plan_time')
+      .addSelect('u.STNAME', 'fullname')
+      .addSelect('u.SSEC', 'sec')
+      .addSelect('u.SDEPT', 'dept')
+      .addSelect('u.SDIV', 'div')
       .where('p.dispatch_id = :dispatchId', { dispatchId })
       .andWhere("NVL(p.status, 'E') = 'D'")
       .orderBy('p.empno', 'ASC')
       .getRawMany();
 
-    const empnos = passengers.map((p) => p.p_EMPNO);
-    const employeeMap = await this.getEmployeeReportMap(empnos);
-    const rows = passengers.map((row, index) => {
-      const empno = row.p_EMPNO;
-      const emp = employeeMap[empno] || {};
-
-      return {
-        no: index + 1,
-        empno,
-        fullname: emp.thname || '',
-        sec: emp.sec || '',
-        dept: emp.dept || '',
-        div: emp.div || '',
-        stop_name: row.s_STOP_NAME || '',
-        plan_time: row.s_PLAN_TIME || '',
-      };
-    });
+    const rows = passengers.map((row, index) => ({
+      no: index + 1,
+      empno: row.empno || '',
+      fullname: row.fullname || '',
+      sec: row.sec || '',
+      dept: row.dept || '',
+      div: row.div || '',
+      stop_name: row.stop_name || '',
+      plan_time: row.plan_time || '',
+    }));
 
     return {
       status: true,
@@ -951,39 +966,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       rows,
     };
   }
-
-  private async getEmployeeReportMap(empnos: string[]) {
-    if (!empnos.length) return {};
-    const uniqueEmpnos = [...new Set(empnos)];
-    const placeholders = uniqueEmpnos.map((_, i) => `:${i + 1}`).join(',');
-    const rows = await this.dataSource.query(
-      ` SELECT
-        SEMPNO,
-        SNAME,
-        STNAME,
-        SSEC,
-        SDEPT,
-        SDIV
-      FROM AMECUSERALL
-      WHERE SEMPNO IN (${placeholders}) `,
-      uniqueEmpnos
-    );
-
-    const map: Record<string, any> = {};
-    for (const r of rows) {
-      const empno = String(r.SEMPNO);
-      map[empno] = {
-        thname: r.STNAME || '',
-        engname: r.SNAME || '',
-        sec: r.SSEC || '',
-        dept: r.SDEPT || '',
-        div: r.SDIV || '',
-      };
-    }
-    return map;
-  }
-
-
+  
   private async buildDispatchReportTitle(dispatchId: number) {
     const head = await this.dataSource
       .getRepository(BusDispatchHead)

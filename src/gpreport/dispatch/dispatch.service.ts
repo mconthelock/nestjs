@@ -15,6 +15,9 @@ import { MoveStopDto } from './dto/move-stop.dto';
 import { DeleteLineDto } from './dto/delete-line.dto';
 import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
 import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
+import { UpdatePassengerStatusDto } from './dto/update-passenger-status.dto';
+import { UpdateLineStatusDto } from './dto/update-line-status.dto';
+
 
 @Injectable()
 export class DispatchService {
@@ -428,7 +431,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       this.lineRepo.find({
         where: {
           dispatch_id,
-          line_status: '1',
+          //line_status: '1',
         } as any,
         order: { busid: 'ASC' as any },
       }),
@@ -652,17 +655,22 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     });
   }
 
-  async deleteLinedispatch(dto: DeleteLineDto) {
+  async updateLinedispatchStatus(dto: UpdateLineStatusDto) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+
     try {
       const dispatchId = Number(dto.dispatch_id);
       const busid = Number(dto.busid);
       const updateBy = String(dto.update_by);
+      const lineStatus = String(dto.status) as '0' | '1';
+      const passengerStatus = lineStatus === '0' ? 'D' : 'E';
+
       const lineRepo = queryRunner.manager.getRepository(BusDispatchLine);
       const stopRepo = queryRunner.manager.getRepository(BusDispatchStop);
       const passengerRepo = queryRunner.manager.getRepository(BusDispatchPassenger);
+
       const line = await lineRepo.findOne({
         where: {
           dispatch_id: dispatchId,
@@ -671,7 +679,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       });
 
       if (!line) {
-        throw new Error("ไม่พบข้อมูลสายรถที่ต้องการลบ");
+        throw new Error('ไม่พบข้อมูลสายรถที่ต้องการแก้ไขสถานะ');
       }
 
       await lineRepo.update(
@@ -680,7 +688,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
           busid: busid,
         },
         {
-          line_status: "0",
+          line_status: lineStatus,
         },
       );
 
@@ -689,10 +697,11 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
           dispatch_id: dispatchId,
           line_id: busid,
         },
-        select: ["stop_id"],
+        select: ['stop_id'],
       });
 
       const stopIds = stops.map((item) => item.stop_id).filter(Boolean);
+
       if (stopIds.length > 0) {
         await passengerRepo.update(
           {
@@ -700,7 +709,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
             stop_id: In(stopIds),
           },
           {
-            status: "D",
+            status: passengerStatus,
           },
         );
       }
@@ -709,7 +718,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
 
       return {
         statusCode: 200,
-        message: "ลบสายรถสำเร็จ",
+        message: lineStatus === '0' ? 'ซ่อนสายรถสำเร็จ' : 'กู้กลับสายรถสำเร็จ',
       };
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -718,6 +727,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       await queryRunner.release();
     }
   }
+
 
   async saveAddPassenger(dto: SaveAddPassengerDto) {
     return await this.dataSource.transaction(async (manager) => {
@@ -834,6 +844,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
   //================================== รายงาน ==================================//
   async getReportBus(dto: DailyDispatchReportDto) {
     const dispatchId = Number(dto.dispatch_id);
+
     // 1) ดึง line
     const lines = await this.dataSource
       .getRepository(BusDispatchLine)
@@ -853,35 +864,42 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       .addOrderBy('s.stop_id', 'ASC')
       .getMany();
 
-    // 3) ดึง passenger ที่ enable
+    // 3) ดึง passenger ที่ enable + join employee
     const passengers = await this.dataSource
       .getRepository(BusDispatchPassenger)
       .createQueryBuilder('p')
+      .leftJoin(
+        'AMECUSERALL',
+        'u',
+        "TRIM(TO_CHAR(u.SEMPNO)) = TRIM(TO_CHAR(p.empno))",
+      )
+      .select('p.EMPNO', 'empno')
+      .addSelect('p.STOP_ID', 'stop_id')
+      .addSelect('u.STNAME', 'fullname')
+      .addSelect('u.SDEPT', 'dept')
+      .addSelect('u.SSEC', 'sec')
+      .addSelect('u.SDIV', 'div')
       .where('p.dispatch_id = :dispatchId', { dispatchId })
       .andWhere("NVL(p.status, 'E') = 'E'")
       .orderBy('p.stop_id', 'ASC')
       .addOrderBy('p.empno', 'ASC')
-      .getMany();
+      .getRawMany();
 
-    // 4) หา empno ทั้งหมด
-    const empnos = passengers.map((p) => p.empno);
-
-    // 5) map ข้อมูลชื่อ/แผนกจาก source เดิม
-    const employeeMap = await this.getEmployeeReportMap(empnos);
-
-    // 6) ประกอบ report
+    // 4) ประกอบ report
     const resultLines = lines.map((line) => {
-      const lineStops = stops.filter((s) => s.line_id === line.busid).map((stop) => {
-          const stopPassengers = passengers.filter((p) => p.stop_id === stop.stop_id).map((p, index) => {
-              const emp = employeeMap[p.empno] || {};
-
+      const lineStops = stops
+        .filter((s) => s.line_id === line.busid)
+        .map((stop) => {
+          const stopPassengers = passengers
+            .filter((p) => Number(p.stop_id) === Number(stop.stop_id))
+            .map((p, index) => {
               return {
                 no: index + 1,
-                empno: p.empno,
-                fullname: emp.thname || '',
-                dept: emp.dept || '',
-                sec: emp.sec || '',
-                div: emp.div || '',
+                empno: p.empno || '',
+                fullname: p.fullname || '',
+                dept: p.dept || '',
+                sec: p.sec || '',
+                div: p.div || '',
               };
             });
 
@@ -910,38 +928,44 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       lines: resultLines,
     };
   }
-
 //================================================================== //
-
-
   async getReportDisabledPassenger(dto: DailyDispatchReportDto) {
     const dispatchId = Number(dto.dispatch_id);
-    const passengers = await this.dataSource
-      .getRepository(BusDispatchPassenger)
+
+    const passengers = await this.passRepo
       .createQueryBuilder('p')
-      .leftJoinAndSelect(BusDispatchStop, 's', 's.dispatch_id = p.dispatch_id AND s.stop_id = p.stop_id')
+      .leftJoin(
+        BusDispatchStop,
+        's',
+        's.dispatch_id = p.dispatch_id AND s.stop_id = p.stop_id',
+      )
+      .leftJoin(
+        'AMECUSERALL',
+        'u',
+        "TRIM(TO_CHAR(u.SEMPNO)) = TRIM(TO_CHAR(p.empno))",
+      )
+      .select('p.EMPNO', 'empno')
+      .addSelect('s.STOP_NAME', 'stop_name')
+      .addSelect('s.PLAN_TIME', 'plan_time')
+      .addSelect('u.STNAME', 'fullname')
+      .addSelect('u.SSEC', 'sec')
+      .addSelect('u.SDEPT', 'dept')
+      .addSelect('u.SDIV', 'div')
       .where('p.dispatch_id = :dispatchId', { dispatchId })
       .andWhere("NVL(p.status, 'E') = 'D'")
       .orderBy('p.empno', 'ASC')
       .getRawMany();
 
-    const empnos = passengers.map((p) => p.p_EMPNO);
-    const employeeMap = await this.getEmployeeReportMap(empnos);
-    const rows = passengers.map((row, index) => {
-      const empno = row.p_EMPNO;
-      const emp = employeeMap[empno] || {};
-
-      return {
-        no: index + 1,
-        empno,
-        fullname: emp.thname || '',
-        sec: emp.sec || '',
-        dept: emp.dept || '',
-        div: emp.div || '',
-        stop_name: row.s_STOP_NAME || '',
-        plan_time: row.s_PLAN_TIME || '',
-      };
-    });
+    const rows = passengers.map((row, index) => ({
+      no: index + 1,
+      empno: row.empno || '',
+      fullname: row.fullname || '',
+      sec: row.sec || '',
+      dept: row.dept || '',
+      div: row.div || '',
+      stop_name: row.stop_name || '',
+      plan_time: row.plan_time || '',
+    }));
 
     return {
       status: true,
@@ -950,39 +974,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       rows,
     };
   }
-
-  private async getEmployeeReportMap(empnos: string[]) {
-    if (!empnos.length) return {};
-    const uniqueEmpnos = [...new Set(empnos)];
-    const placeholders = uniqueEmpnos.map((_, i) => `:${i + 1}`).join(',');
-    const rows = await this.dataSource.query(
-      ` SELECT
-        SEMPNO,
-        SNAME,
-        STNAME,
-        SSEC,
-        SDEPT,
-        SDIV
-      FROM AMECUSERALL
-      WHERE SEMPNO IN (${placeholders}) `,
-      uniqueEmpnos
-    );
-
-    const map: Record<string, any> = {};
-    for (const r of rows) {
-      const empno = String(r.SEMPNO);
-      map[empno] = {
-        thname: r.STNAME || '',
-        engname: r.SNAME || '',
-        sec: r.SSEC || '',
-        dept: r.SDEPT || '',
-        div: r.SDIV || '',
-      };
-    }
-    return map;
-  }
-
-
+  
   private async buildDispatchReportTitle(dispatchId: number) {
     const head = await this.dataSource
       .getRepository(BusDispatchHead)
@@ -1005,9 +997,40 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     return `ตารางรถรับส่งพนักงาน ${timeText} ประจำวันที่ ${date}`;
   }
 
-  
 
+  async updatePassengerStatus(dto: UpdatePassengerStatusDto) {
+    return this.dataSource.transaction(async (manager) => {
+      const dispatch_id = Number(dto.dispatch_id);
+      const empno = String(dto.empno).trim();
+      const status = String(dto.status).trim();
+      const head = await manager.findOne(BusDispatchHead, {
+        where: { dispatch_id },
+      });
 
+      if (!head) throw new Error('DISPATCH_NOT_FOUND');
+      if (head.status === 'C') throw new Error('DISPATCH_CLOSED');
+
+      const passenger = await manager.findOne(BusDispatchPassenger, {
+        where: { dispatch_id, empno } as any,
+      });
+
+      if (!passenger) throw new Error('PASSENGER_NOT_FOUND');
+
+      passenger.status = status;
+      await manager.save(BusDispatchPassenger, passenger);
+
+      head.update_by = dto.update_by;
+      head.update_date = new Date();
+      await manager.save(BusDispatchHead, head);
+
+      return {
+        ok: true,
+        dispatch_id,
+        empno,
+        status,
+      };
+    });
+  }
 
 
 }

@@ -3,6 +3,9 @@ import { View, ViewColumn, ViewEntity } from 'typeorm';
 @ViewEntity({ name: 'IEBGR_REPORT_VIEW', schema: 'WEBFORM' })
 export class IEBGR_REPORT_VIEW {
   @ViewColumn()
+  LINK: string;
+  
+  @ViewColumn()
   FORMNO: string;
 
   @ViewColumn()

@@ -16,7 +16,6 @@ import { DeleteLineDto } from './dto/delete-line.dto';
 import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
 import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
 import { UpdatePassengerStatusDto } from './dto/update-passenger-status.dto';
-import { AMECUUSERALL } from 'src/common/Entities/amec/views/AMECUUSERALL.entity';
 
 @Injectable()
 export class DispatchService {

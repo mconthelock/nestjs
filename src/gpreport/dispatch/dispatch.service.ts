@@ -16,6 +16,8 @@ import { DeleteLineDto } from './dto/delete-line.dto';
 import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
 import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
 import { UpdatePassengerStatusDto } from './dto/update-passenger-status.dto';
+import { UpdateLineStatusDto } from './dto/update-line-status.dto';
+
 
 @Injectable()
 export class DispatchService {
@@ -429,7 +431,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       this.lineRepo.find({
         where: {
           dispatch_id,
-          line_status: '1',
+          //line_status: '1',
         } as any,
         order: { busid: 'ASC' as any },
       }),
@@ -653,17 +655,22 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     });
   }
 
-  async deleteLinedispatch(dto: DeleteLineDto) {
+  async updateLinedispatchStatus(dto: UpdateLineStatusDto) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+
     try {
       const dispatchId = Number(dto.dispatch_id);
       const busid = Number(dto.busid);
       const updateBy = String(dto.update_by);
+      const lineStatus = String(dto.status) as '0' | '1';
+      const passengerStatus = lineStatus === '0' ? 'D' : 'E';
+
       const lineRepo = queryRunner.manager.getRepository(BusDispatchLine);
       const stopRepo = queryRunner.manager.getRepository(BusDispatchStop);
       const passengerRepo = queryRunner.manager.getRepository(BusDispatchPassenger);
+
       const line = await lineRepo.findOne({
         where: {
           dispatch_id: dispatchId,
@@ -672,7 +679,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       });
 
       if (!line) {
-        throw new Error("ไม่พบข้อมูลสายรถที่ต้องการลบ");
+        throw new Error('ไม่พบข้อมูลสายรถที่ต้องการแก้ไขสถานะ');
       }
 
       await lineRepo.update(
@@ -681,7 +688,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
           busid: busid,
         },
         {
-          line_status: "0",
+          line_status: lineStatus,
         },
       );
 
@@ -690,10 +697,11 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
           dispatch_id: dispatchId,
           line_id: busid,
         },
-        select: ["stop_id"],
+        select: ['stop_id'],
       });
 
       const stopIds = stops.map((item) => item.stop_id).filter(Boolean);
+
       if (stopIds.length > 0) {
         await passengerRepo.update(
           {
@@ -701,7 +709,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
             stop_id: In(stopIds),
           },
           {
-            status: "D",
+            status: passengerStatus,
           },
         );
       }
@@ -710,7 +718,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
 
       return {
         statusCode: 200,
-        message: "ลบสายรถสำเร็จ",
+        message: lineStatus === '0' ? 'ซ่อนสายรถสำเร็จ' : 'กู้กลับสายรถสำเร็จ',
       };
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -719,6 +727,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       await queryRunner.release();
     }
   }
+
 
   async saveAddPassenger(dto: SaveAddPassengerDto) {
     return await this.dataSource.transaction(async (manager) => {

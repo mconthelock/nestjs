@@ -11,6 +11,7 @@ import { IsNotEmpty, IsString } from 'class-validator';
 import { DailyDispatchReportDto } from './dto/dispatch-report.dto';
 import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
 import { UpdatePassengerStatusDto } from './dto/update-passenger-status.dto';
+import { UpdateLineStatusDto } from './dto/update-line-status.dto';
 
 
 export class DispatchReportDto {
@@ -54,10 +55,6 @@ export class DispatchController {
     return this.service.disablePassenger(dto);
   }
 
-  @Post('delete-linedispatch')
-  async deleteLine(@Body() dto: DeleteLineDto) {
-    return await this.service.deleteLinedispatch(dto);
-  }
     
   @Post('save-add-passenger')
   async saveAddPassenger(@Body() dto: SaveAddPassengerDto) {
@@ -77,6 +74,11 @@ export class DispatchController {
   @Post('update-passenger-status')
   async updatePassengerStatus(@Body() dto: UpdatePassengerStatusDto) {
     return await this.service.updatePassengerStatus(dto);
+  }
+
+  @Post('update-line-status')
+  updateLinedispatchStatus(@Body() dto: UpdateLineStatusDto) {
+    return this.service.updateLinedispatchStatus(dto);
   }
 
 }

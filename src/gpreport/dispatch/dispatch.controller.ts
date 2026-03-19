@@ -10,7 +10,7 @@ import { DailyDispatchReportDto } from './dto/dispatch-report.dto';
 import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
 import { UpdatePassengerStatusDto } from './dto/update-passenger-status.dto';
 import { UpdateLineStatusDto } from './dto/update-line-status.dto';
-
+import { UpdateLineTypeDto } from './dto/update-line-type.dto';
 
 export class DispatchReportDto {
   @IsString()
@@ -77,6 +77,11 @@ export class DispatchController {
   @Post('update-line-status')
   updateLinedispatchStatus(@Body() dto: UpdateLineStatusDto) {
     return this.service.updateLinedispatchStatus(dto);
+  }
+
+  @Post('update-line-type')
+  async updateLineType(@Body() dto: UpdateLineTypeDto) {
+    return await this.service.updateLineType(dto);
   }
 
 }

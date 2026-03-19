@@ -34,4 +34,7 @@ export class IdtagFiles {
 
     @Column()
     PRINTED_DATE: Date;
+
+    @Column()
+    FILE_PRINTEDPAGE: number;
 }

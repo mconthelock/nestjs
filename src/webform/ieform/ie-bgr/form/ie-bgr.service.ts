@@ -79,19 +79,29 @@ export class IeBgrService {
         });
 
         for (const r of report) {
+            // const bidding = await this.pprbiddingService.search({
+            //     EBUDGETNO: r.FORMNO,
+            // });
             const bidding = await this.pprbiddingService.search({
-                EBUDGETNO: r.FORMNO,
+                filters: [
+                    { field: 'EBUDGETNO', op: 'eq', value: r.FORMNO },
+                    { field: 'PR.NSTEP', op: 'notIn', value: [0, 99] },
+                ],
             });
             let list = [];
-            for (const b of bidding) {
-                const po = await this.ppoService.search({ SREFNO: b.SPRNO });
-                if (po.length > 0) {
-                    list.push({
-                        SPRNO: b.SPRNO,
-                        SPONO: po.map((p) => p.SPONO),
+            if (bidding.status) {
+                for (const b of bidding.data) {
+                    const po = await this.ppoService.search({
+                        SREFNO: b.SPRNO,
                     });
-                } else {
-                    list.push({ SPRNO: b.SPRNO, SPONO: [] });
+                    if (po.length > 0) {
+                        list.push({
+                            SPRNO: b.SPRNO,
+                            SPONO: po.map((p) => p.SPONO),
+                        });
+                    } else {
+                        list.push({ SPRNO: b.SPRNO, SPONO: [] });
+                    }
                 }
             }
             r.prpo = list;
@@ -281,26 +291,26 @@ export class IeBgrService {
                 subject: 'Budget Requisition Form completed in the system',
                 html: `<!DOCTYPE html>
             <html lang="en">
-            <head>
-                <meta charset="utf-8">
-            </head>
-            <body>
-            <section>
-                <p>To : Requester and Concerned Manager,</p>
-                <span>This is to inform you that the <b>Budget Requisition Form</b></span>
-                <br>
-                <span><b>( Budget No. ${await this.formService.getFormno(form)} )</b> has been <b>approved and completed in the system.</b></span>
-                <br>
-                <p>Please proceed with the next related actions as required.</p>
-                <br>
-                <p>
-                    Best regards,<br>
-                    IS Department.<br>
-                    Auto Send mail System.
-                </p>
-            </section>
-        </body>
-    </html>`,
+                <head>
+                    <meta charset="utf-8">
+                </head>
+                <body>
+                    <section>
+                        <p>To : Requester and Concerned Manager,</p>
+                        <span>This is to inform you that the <b>Budget Requisition Form</b></span>
+                        <br>
+                        <span><b>( Budget No. ${await this.formService.getFormno(form)} )</b> has been <b>approved and completed in the system.</b></span>
+                        <br>
+                        <p>Please proceed with the next related actions as required.</p>
+                        <br>
+                        <p>
+                            Best regards,<br>
+                            IS Department.<br>
+                            Auto Send mail System.
+                        </p>
+                    </section>
+                </body>
+            </html>`,
             });
             await queryRunner.commitTransaction();
             return {

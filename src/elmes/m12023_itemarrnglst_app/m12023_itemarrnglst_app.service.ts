@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { S011mpRepository } from './s011mp.repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
+import { M12023ItemarrnglstAppRepository } from './m12023_itemarrnglst_app.repository';
 
 @Injectable()
-export class S011mpService {
-    constructor(private readonly repo: S011mpRepository) {}
+export class M12023ItemarrnglstAppService {
+    constructor(private readonly repo: M12023ItemarrnglstAppRepository) {}
     async findAll() {
         try {
             const res = await this.repo.findAll();
@@ -12,37 +12,40 @@ export class S011mpService {
             if (length === 0) {
                 return {
                     status: false,
-                    message: 'Search S011MP Failed: No data found',
+                    message:
+                        'Search M12023ItemarrnglstApp Failed: No data found',
                     data: [],
                 };
             }
             return {
                 status: true,
-                message: `Search S011MP data found ${length} record(s)`,
-                data: res,
-            };
-        } catch (error) {
-            throw new Error('Search S011MP Error: ' + error.message);
-        }
-    }
-
-    async findOne(S11M01: string, S11M02: string) {
-        try {
-            const res = await this.repo.findOne(S11M01, S11M02);
-            if (res == null) {
-                return {
-                    status: false,
-                    message: `Search S011MP by id ${S11M01}, ${S11M02} Failed: No data found`,
-                };
-            }
-            return {
-                status: true,
-                message: `Search S011MP by id ${S11M01}, ${S11M02} data found 1 record(s)`,
+                message: `Search M12023ItemarrnglstApp data found ${length} record(s)`,
                 data: res,
             };
         } catch (error) {
             throw new Error(
-                `Search S011MP by id ${S11M01}, ${S11M02} Error: ` +
+                'Search M12023ItemarrnglstApp Error: ' + error.message,
+            );
+        }
+    }
+
+    async findOne(order: string) {
+        try {
+            const res = await this.repo.findOne(order);
+            if (res == null) {
+                return {
+                    status: false,
+                    message: `Search M12023ItemarrnglstApp by id ${order} Failed: No data found`,
+                };
+            }
+            return {
+                status: true,
+                message: `Search M12023ItemarrnglstApp by id ${order} data found 1 record(s)`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(
+                `Search M12023ItemarrnglstApp by id ${order} Error: ` +
                     error.message,
             );
         }
@@ -55,17 +58,20 @@ export class S011mpService {
             if (length === 0) {
                 return {
                     status: false,
-                    message: 'Search S011MP Failed: No data found',
+                    message:
+                        'Search M12023ItemarrnglstApp Failed: No data found',
                     data: [],
                 };
             }
             return {
                 status: true,
-                message: `Search S011MP data found ${length} record(s)`,
+                message: `Search M12023ItemarrnglstApp data found ${length} record(s)`,
                 data: res,
             };
         } catch (error) {
-            throw new Error('Search S011MP Error: ' + error.message);
+            throw new Error(
+                'Search M12023ItemarrnglstApp Error: ' + error.message,
+            );
         }
     }
 }

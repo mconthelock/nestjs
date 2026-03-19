@@ -12,6 +12,7 @@ import { F110kpModule } from 'src/datacenter/f110kp/f110kp.module';
 import { FilesModule } from 'src/common/services/file/file.module';
 import { MfgSerialModule } from '../mfg-serial/mfg-serial.module';
 import { MfgDrawingActionModule } from '../mfg-drawing-action/mfg-drawing-action.module';
+import { F001kpModule } from 'src/datacenter/f001kp/f001kp.module';
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import { MfgDrawingActionModule } from '../mfg-drawing-action/mfg-drawing-action
         ItemMfgModule,
         IdtagEfacLogModule,
         F110kpModule,
+        F001kpModule,
         S011mpModule,
         FilesModule,
         MfgSerialModule,

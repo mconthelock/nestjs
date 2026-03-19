@@ -38,7 +38,7 @@ export class PprbiddingRepository extends BaseRepository {
             'BIDDINGNO',
             'EBUDGETNO',
             'PR.CAPPROVE',
-            'PR.SNTEP'
+            'PR.NSTEP'
         ]);
         return qb
             .innerJoinAndSelect('P.PPR', 'PR')

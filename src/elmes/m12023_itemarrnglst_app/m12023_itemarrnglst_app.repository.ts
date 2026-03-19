@@ -10,7 +10,7 @@ import { M12023_ITEMARRNGLST_APP } from 'src/common/Entities/elmes/table/M12023_
 @Injectable()
 export class M12023ItemarrnglstAppRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('datacenterConnection') ds: DataSource,
+        @InjectDataSource('elmesConnection') ds: DataSource,
         @Inject(REQUEST) req: Request,
     ) {
         super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository

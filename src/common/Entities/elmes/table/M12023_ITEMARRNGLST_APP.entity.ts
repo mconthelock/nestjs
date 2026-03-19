@@ -1,5 +1,6 @@
-import { Column, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
+@Entity({ name: 'M12023_ITEMARRNGLST_APP', schema: 'UNIONV' })
 export class M12023_ITEMARRNGLST_APP {
     @PrimaryColumn()
     ORDERNO: string;

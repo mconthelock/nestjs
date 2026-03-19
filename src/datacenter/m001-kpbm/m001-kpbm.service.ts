@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { S011mpRepository } from './s011mp.repository';
+import { M001KpbmRepository } from './m001-kpbm.repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 
 @Injectable()
-export class S011mpService {
-    constructor(private readonly repo: S011mpRepository) {}
+export class M001KpbmService {
+    constructor(private readonly repo: M001KpbmRepository) {}
     async findAll() {
         try {
             const res = await this.repo.findAll();
@@ -12,37 +12,37 @@ export class S011mpService {
             if (length === 0) {
                 return {
                     status: false,
-                    message: 'Search S011MP Failed: No data found',
+                    message: 'Search M001KPBM Failed: No data found',
                     data: [],
                 };
             }
             return {
                 status: true,
-                message: `Search S011MP data found ${length} record(s)`,
+                message: `Search M001KPBM data found ${length} record(s)`,
                 data: res,
             };
         } catch (error) {
-            throw new Error('Search S011MP Error: ' + error.message);
+            throw new Error('Search M001KPBM Error: ' + error.message);
         }
     }
 
-    async findOne(S11M01: string, S11M02: string) {
+    async findOne(order: string, item: string, prod: string) {
         try {
-            const res = await this.repo.findOne(S11M01, S11M02);
+            const res = await this.repo.findOne(order, item, prod);
             if (res == null) {
                 return {
                     status: false,
-                    message: `Search S011MP by id ${S11M01}, ${S11M02} Failed: No data found`,
+                    message: `Search M001KPBM by ${order}, ${item}, ${prod} Failed: No data found`,
                 };
             }
             return {
                 status: true,
-                message: `Search S011MP by id ${S11M01}, ${S11M02} data found 1 record(s)`,
+                message: `Search M001KPBM by ${order}, ${item}, ${prod} data found 1 record(s)`,
                 data: res,
             };
         } catch (error) {
             throw new Error(
-                `Search S011MP by id ${S11M01}, ${S11M02} Error: ` +
+                `Search M001KPBM by ${order}, ${item}, ${prod} Error: ` +
                     error.message,
             );
         }
@@ -55,17 +55,17 @@ export class S011mpService {
             if (length === 0) {
                 return {
                     status: false,
-                    message: 'Search S011MP Failed: No data found',
+                    message: 'Search M001KPBM Failed: No data found',
                     data: [],
                 };
             }
             return {
                 status: true,
-                message: `Search S011MP data found ${length} record(s)`,
+                message: `Search M001KPBM data found ${length} record(s)`,
                 data: res,
             };
         } catch (error) {
-            throw new Error('Search S011MP Error: ' + error.message);
+            throw new Error('Search M001KPBM Error: ' + error.message);
         }
     }
 }

@@ -19,6 +19,8 @@ import { ListMode } from 'src/common/services/file/dto/file.dto';
 import { basename } from 'path';
 import { MfgSerialService } from '../mfg-serial/mfg-serial.service';
 import { MfgDrawingActionService } from '../mfg-drawing-action/mfg-drawing-action.service';
+import { F001kpService } from 'src/datacenter/f001kp/f001kp.service';
+import { F001KP } from 'src/common/Entities/datacenter/table/F001KP.entity';
 
 @Injectable()
 export class MfgDrawingCreateChecksheetService {
@@ -27,6 +29,7 @@ export class MfgDrawingCreateChecksheetService {
         private readonly itemMfgService: ItemMfgService,
         private readonly idtagEfacLogService: IdtagEfacLogService,
         private readonly f110kpService: F110kpService,
+        private readonly f001kpService: F001kpService,
         private readonly s011mpService: S011mpService,
         private readonly fileService: FileService,
         private readonly mfgSerialService: MfgSerialService,
@@ -72,14 +75,20 @@ export class MfgDrawingCreateChecksheetService {
                 );
             }
             let drawing: string;
+            let controlNo: string;
             let fileName: string;
             let newfileName: string;
             let serialList: { VSERIALNO: string; NTYPE: number }[];
+            let dataByidTag: { controlNo: string; drawing: string };
             switch (typeName) {
                 case 'multi':
                     newfileName = dto.ASERIALNO[0];
                     fileName = itemData.VFILE;
-                    drawing = await this.getDrawingByIdTag(dto.ASERIALNO[0]);
+                    dataByidTag = await this.getDrawingByIdTag(
+                        dto.ASERIALNO[0],
+                    );
+                    drawing = dataByidTag.drawing;
+                    controlNo = dataByidTag.controlNo;
                     serialList = dto.ASERIALNO.map((sn, index) => ({
                         VSERIALNO: sn,
                         NTYPE: 1, // กำหนด type เป็น 1 สำหรับ serial no ทั้งหมดในกรณี multi
@@ -97,7 +106,11 @@ export class MfgDrawingCreateChecksheetService {
                     break;
                 default:
                     newfileName = dto.ASERIALNO[0];
-                    drawing = await this.getDrawingByIdTag(dto.ASERIALNO[0]);
+                    dataByidTag = await this.getDrawingByIdTag(
+                        dto.ASERIALNO[0],
+                    );
+                    drawing = dataByidTag.drawing;
+                    controlNo = dataByidTag.controlNo;
                     itemList = this.getDrawingList(itemLists, drawing);
                     fileName = itemList.VNUMBER_FILE;
                     serialList = dto.ASERIALNO.map((sn, index) => ({
@@ -152,7 +165,9 @@ export class MfgDrawingCreateChecksheetService {
         }
     }
 
-    async getDrawingByIdTag(serialNo: string): Promise<string> {
+    async getDrawingByIdTag(
+        serialNo: string,
+    ): Promise<{ controlNo: string; drawing: string }> {
         let controlNo: string = null;
         // หา control no จาก serial no
         const idtagLog: {
@@ -167,26 +182,50 @@ export class MfgDrawingCreateChecksheetService {
                 `IDTAG_EFAC_LOG with serial no ${serialNo} not found`,
             );
         }
-        controlNo = idtagLog.data[0].CONTROL_NO;
-        // หา F110KP ด้วย control no
-        const f110kp: { status: boolean; data?: F110KP; message: string } =
-            await this.f110kpService.findOne(controlNo);
-        if (!f110kp.status) {
-            throw new Error(`F110KP with control no ${controlNo} not found`);
+        if (idtagLog.data.length > 1) {
+            throw new Error(
+                `Multiple IDTAG_EFAC_LOG entries found for serial no ${serialNo}`,
+            );
         }
-        const data = f110kp.data;
+        controlNo = idtagLog.data[0].CONTROL_NO;
+        // ------------อันแรก------------
+        // หา F110KP ด้วย control no
+        // const f110kp: { status: boolean; data?: F110KP; message: string } =
+        //     await this.f110kpService.findOne(controlNo);
+        // if (!f110kp.status) {
+        //     throw new Error(`F110KP with control no ${controlNo} not found`);
+        // }
+        // const data = f110kp.data;
+        // let drawing: string = null;
+        // if (!data.F11K27 || data.F11K27.trim() === '') {
+        //     if (!data.F11K10 || data.F11K10.trim() === '') {
+        //         drawing = data.F11K16;
+        //     } else {
+        //         drawing = data.F11K10;
+        //     }
+        // } else {
+        //     drawing = data.F11K27;
+        // }
+
+        const f001kp: { status: boolean; data?: F001KP; message: string } =
+            await this.f001kpService.findOne(controlNo);
+        if (!f001kp.status) {
+            throw new Error(`F001KP with control no ${controlNo} not found`);
+        }
+        const data = f001kp.data;
         let drawing: string = null;
-        if (!data.F11K27 || data.F11K27.trim() === '') {
-            if (!data.F11K10 || data.F11K10.trim() === '') {
-                drawing = data.F11K16;
+        if (!data.F01R06 || data.F01R06.trim() === '') {
+            if (!data.F01R05 || data.F01R05.trim() === '') {
+                drawing = data.F01R04;
             } else {
-                drawing = data.F11K10;
+                drawing = data.F01R05;
             }
         } else {
-            drawing = data.F11K27;
+            drawing = data.F01R06;
         }
-        // return drawing จาก F110KP
-        return drawing;
+
+        // return drawing จาก F001KP
+        return { controlNo, drawing };
     }
 
     async getDrawingByPis(pis: string, controls: string[]): Promise<string> {

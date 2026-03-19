@@ -5,10 +5,10 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { FiltersDto } from 'src/common/dto/filter.dto';
-import { S011MP } from 'src/common/Entities/datacenter/table/S011MP.entity';
+import { F001KP } from 'src/common/Entities/datacenter/table/F001KP.entity';
 
 @Injectable()
-export class S011mpRepository extends BaseRepository {
+export class F001kpRepository extends BaseRepository {
     constructor(
         @InjectDataSource('datacenterConnection') ds: DataSource,
         @Inject(REQUEST) req: Request,
@@ -18,25 +18,27 @@ export class S011mpRepository extends BaseRepository {
 
     findAll() {
         // ใช้ได้ทั้งหมด
-        // return this.manager.query(`select * from S011MP`);
-        // return this.getRepository(S011MP).find();
-        return this.manager.find(S011MP);
+        // return this.manager.query(`select * from F001KP`);
+        // return this.getRepository(F001KP).find();
+        return this.manager.find(F001KP);
     }
 
-    findOne(S11M01: string, S11M02: string) {
-        return this.getRepository(S011MP).findOneBy({
-            S11M01: Like(`%${S11M01}%`),
-            S11M02,
+    findOne(controlNo: string) {
+        return this.getRepository(F001KP).findOneBy({
+            F01R01: controlNo,
         });
     }
 
     async search(dto: FiltersDto) {
-        const qb = this.manager.createQueryBuilder(S011MP, 'S');
-        this.applyFilters(qb, 'S', dto, [
-            'S11M01',
-            'S11M02',
-            'S11M03',
-            'S11M04',
+        const qb = this.manager.createQueryBuilder(F001KP, 'F');
+        this.applyFilters(qb, 'F', dto, [
+            'F01R01',
+            'F01R02',
+            'F01R03',
+            'F01R04',
+            'F01R05',
+            'F01R06',
+            'F01R07',
         ]);
         return qb.getMany();
     }

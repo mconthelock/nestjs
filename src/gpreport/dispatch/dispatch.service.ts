@@ -17,7 +17,7 @@ import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
 import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
 import { UpdatePassengerStatusDto } from './dto/update-passenger-status.dto';
 import { UpdateLineStatusDto } from './dto/update-line-status.dto';
-
+import { UpdateLineTypeDto } from './dto/update-line-type.dto';
 
 @Injectable()
 export class DispatchService {
@@ -1032,5 +1032,31 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     });
   }
 
+  async updateLineType(dto: UpdateLineTypeDto) {
+    const dispatchId = Number(dto.dispatch_id);
+    const busId = Number(dto.busid);
+    const repo = this.dataSource.getRepository(BusDispatchLine);
+    const line = await repo.findOne({
+      where: {
+        dispatch_id: dispatchId,
+        busid: busId,
+      },
+    });
+
+    if (!line) {
+      return {
+        status: false,
+        message: 'ไม่พบข้อมูลสายรถที่ต้องการแก้ไข',
+      };
+    }
+
+    line.bustype = dto.bustype;
+    line.busseat = Number(dto.busseat);
+    await repo.save(line);
+    return {
+      status: true,
+      message: 'แก้ไขประเภทรถสำเร็จ',
+    };
+  }
 
 }

@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateF001kpDto } from './dto/create-f001kp.dto';
-import { UpdateF001kpDto } from './dto/update-f001kp.dto';
 import { F001kpRepository } from './f001kp.repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 

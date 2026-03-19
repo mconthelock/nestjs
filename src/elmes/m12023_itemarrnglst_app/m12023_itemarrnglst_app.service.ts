@@ -35,17 +35,17 @@ export class M12023ItemarrnglstAppService {
             if (res == null) {
                 return {
                     status: false,
-                    message: `Search M12023ItemarrnglstApp by id ${order} Failed: No data found`,
+                    message: `Search M12023ItemarrnglstApp by order ${order} Failed: No data found`,
                 };
             }
             return {
                 status: true,
-                message: `Search M12023ItemarrnglstApp by id ${order} data found 1 record(s)`,
+                message: `Search M12023ItemarrnglstApp by order ${order} data found 1 record(s)`,
                 data: res,
             };
         } catch (error) {
             throw new Error(
-                `Search M12023ItemarrnglstApp by id ${order} Error: ` +
+                `Search M12023ItemarrnglstApp by order ${order} Error: ` +
                     error.message,
             );
         }

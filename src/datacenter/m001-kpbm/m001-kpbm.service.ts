@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { F002kpRepository } from './f002kp.repository';
+import { M001KpbmRepository } from './m001-kpbm.repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 
 @Injectable()
-export class F002kpService {
-    constructor(private readonly repo: F002kpRepository) {}
+export class M001KpbmService {
+    constructor(private readonly repo: M001KpbmRepository) {}
     async findAll() {
         try {
             const res = await this.repo.findAll();
@@ -12,37 +12,37 @@ export class F002kpService {
             if (length === 0) {
                 return {
                     status: false,
-                    message: 'Search F002KP Failed: No data found',
+                    message: 'Search M001KPBM Failed: No data found',
                     data: [],
                 };
             }
             return {
                 status: true,
-                message: `Search F002KP data found ${length} record(s)`,
+                message: `Search M001KPBM data found ${length} record(s)`,
                 data: res,
             };
         } catch (error) {
-            throw new Error('Search F002KP Error: ' + error.message);
+            throw new Error('Search M001KPBM Error: ' + error.message);
         }
     }
 
-    async findOne(controlNo: string) {
+    async findOne(order: string, item: string, prod: string) {
         try {
-            const res = await this.repo.findOne(controlNo);
+            const res = await this.repo.findOne(order, item, prod);
             if (res == null) {
                 return {
                     status: false,
-                    message: `Search F002KP by control number ${controlNo} Failed: No data found`,
+                    message: `Search M001KPBM by ${order}, ${item}, ${prod} Failed: No data found`,
                 };
             }
             return {
                 status: true,
-                message: `Search F002KP by control number ${controlNo} data found 1 record(s)`,
+                message: `Search M001KPBM by ${order}, ${item}, ${prod} data found 1 record(s)`,
                 data: res,
             };
         } catch (error) {
             throw new Error(
-                `Search F002KP by control number ${controlNo} Error: ` +
+                `Search M001KPBM by ${order}, ${item}, ${prod} Error: ` +
                     error.message,
             );
         }
@@ -55,17 +55,17 @@ export class F002kpService {
             if (length === 0) {
                 return {
                     status: false,
-                    message: 'Search F002KP Failed: No data found',
+                    message: 'Search M001KPBM Failed: No data found',
                     data: [],
                 };
             }
             return {
                 status: true,
-                message: `Search F002KP data found ${length} record(s)`,
+                message: `Search M001KPBM data found ${length} record(s)`,
                 data: res,
             };
         } catch (error) {
-            throw new Error('Search F002KP Error: ' + error.message);
+            throw new Error('Search M001KPBM Error: ' + error.message);
         }
     }
 }

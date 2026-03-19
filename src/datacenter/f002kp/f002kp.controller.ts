@@ -8,8 +8,6 @@ import {
     Delete,
 } from '@nestjs/common';
 import { F002kpService } from './f002kp.service';
-import { CreateF002kpDto } from './dto/create-f002kp.dto';
-import { UpdateF002kpDto } from './dto/update-f002kp.dto';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 

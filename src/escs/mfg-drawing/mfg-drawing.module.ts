@@ -13,6 +13,7 @@ import { FilesModule } from 'src/common/services/file/file.module';
 import { MfgSerialModule } from '../mfg-serial/mfg-serial.module';
 import { MfgDrawingActionModule } from '../mfg-drawing-action/mfg-drawing-action.module';
 import { F001kpModule } from 'src/datacenter/f001kp/f001kp.module';
+import { GeneralPartListModule } from 'src/general-part-list/general-part-list.module';
 
 @Module({
     imports: [
@@ -25,6 +26,7 @@ import { F001kpModule } from 'src/datacenter/f001kp/f001kp.module';
         FilesModule,
         MfgSerialModule,
         MfgDrawingActionModule,
+        GeneralPartListModule,
     ],
     controllers: [MfgDrawingController],
     providers: [

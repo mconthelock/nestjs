@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
-@Entity('TMARKET_TEMP_DUMMY')
-export class Orderdummy {
+@Entity({ name: 'TMARKET_TEMP_DUMMY', schema: 'AMECMFG' })
+export class TMARKET_TEMP_DUMMY {
   @Column()
   RECON_PARTS: string;
 

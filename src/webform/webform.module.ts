@@ -14,6 +14,7 @@ import { IEFormModule } from './ieform/ie.module';
 import { RqffrmModule } from './rqffrm/rqffrm.module';
 import { PurCpmModule } from './purform/pur-cpm/pur-cpm.module';
 import { PurFileModule } from './purform/pur-file/pur-file.module';
+import { OrganizationsModule } from './organizations/organizations.module';
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { PurFileModule } from './purform/pur-file/pur-file.module';
     RepModule,
     RqffrmModule,
     PurCpmModule,
-    PurFileModule
+    PurFileModule,
+    OrganizationsModule
   ],
 })
 export class WebformModule {}

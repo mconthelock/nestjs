@@ -37,6 +37,7 @@ import { TransactionInterceptor } from './common/interceptors/transaction.interc
 import { PursysModule } from './pursys/pursys.module';
 import { WorkloadModule } from './workload/workload.module';
 import { DatacenterModule } from './datacenter/datacenter.module';
+import { GeneralPartListModule } from './general-part-list/general-part-list.module';
 
 @Module({
   imports: [
@@ -69,7 +70,8 @@ import { DatacenterModule } from './datacenter/datacenter.module';
     WarehouseModule,
     PursysModule,
     WorkloadModule,
-    DatacenterModule
+    DatacenterModule,
+    GeneralPartListModule
   ],
   providers: [
     HttpLoggingInterceptor,

@@ -12,7 +12,6 @@ import { BusDispatchStop } from '../../common/Entities/gpreport/table/bus_dispat
 import { BusDispatchPassenger } from '../../common/Entities/gpreport/table/bus_dispatch_passenger.entity';
 import { DispatchKeyDto } from './dto/dispatch-key.dto';
 import { MoveStopDto } from './dto/move-stop.dto';
-import { DeleteLineDto } from './dto/delete-line.dto';
 import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
 import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
 import { UpdatePassengerStatusDto } from './dto/update-passenger-status.dto';
@@ -50,20 +49,24 @@ export class DispatchService {
     return { dispatch_id: head.dispatch_id, ok: true };
   }
 
-  async saveDispatch(dto: SaveDispatchDto) {
+  async updateDispatchStatusHead(dto: SaveDispatchDto) {
     const head = await this.headRepo.findOne({
       where: { dispatch_id: dto.dispatch_id },
     });
 
     if (!head) throw new Error('DISPATCH_NOT_FOUND');
-    if (head.status === 'C') throw new Error('DISPATCH_CLOSED');
 
-    head.status = 'S';
+    head.status = dto.status;
     head.update_by = dto.update_by;
     head.update_date = new Date();
 
     await this.headRepo.save(head);
-    return { dispatch_id: head.dispatch_id, status: head.status };
+
+    return {
+      dispatch_id: head.dispatch_id,
+      status: head.status,
+      message: 'อัปเดตสถานะเรียบร้อย',
+    };
   }
 
 
@@ -1057,6 +1060,10 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       status: true,
       message: 'แก้ไขประเภทรถสำเร็จ',
     };
+  }
+
+  async updateDispatchHead(dto:SaveDispatchDto){
+
   }
 
 }

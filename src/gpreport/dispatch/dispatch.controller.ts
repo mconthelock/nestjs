@@ -11,6 +11,7 @@ import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
 import { UpdatePassengerStatusDto } from './dto/update-passenger-status.dto';
 import { UpdateLineStatusDto } from './dto/update-line-status.dto';
 import { UpdateLineTypeDto } from './dto/update-line-type.dto';
+import { SaveDispatchDto } from './dto/save-dispatch.dto';
 
 export class DispatchReportDto {
   @IsString()
@@ -24,6 +25,11 @@ export class DispatchController {
   @Post('get-dispatch')
   get(@Body() dto: DispatchKeyDto) {
     return this.service.getDispatch(dto);
+  }
+
+  @Post('update-status-head')
+  async updateDispatchStatus(@Body() dto: SaveDispatchDto) {
+    return this.service.updateDispatchStatusHead(dto);
   }
   
 
@@ -84,4 +90,7 @@ export class DispatchController {
     return await this.service.updateLineType(dto);
   }
 
-}
+
+  
+
+} 

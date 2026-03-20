@@ -4,9 +4,12 @@ import * as path from 'path';
 import { spawn } from 'child_process';
 
 export async function writeLineBox(opt) {
+    const fontstyle =
+        opt.fontstyle ||
+        (await opt.pdfpage.doc.embedFont(StandardFonts.Helvetica));
     const { height } = opt.pdfpage.getSize();
     const yTop = height - opt.boxY;
-    const fontHeight = opt.fontstyle.heightAtSize(opt.fontsize);
+    const fontHeight = fontstyle.heightAtSize(opt.fontsize);
 
     // วาดเส้นกรอบถ้าต้องการ
     if (opt.drawBorder) {
@@ -21,7 +24,7 @@ export async function writeLineBox(opt) {
         });
     }
 
-    const textWidth = opt.fontstyle.widthOfTextAtSize(opt.text, opt.fontsize);
+    const textWidth = fontstyle.widthOfTextAtSize(opt.text, opt.fontsize);
     let xPos = opt.boxX;
     if (opt.align === 'center')
         xPos = opt.boxX + (opt.boxWidth - textWidth) / 2;
@@ -33,7 +36,7 @@ export async function writeLineBox(opt) {
         x: xPos,
         y: yPos,
         size: opt.fontsize,
-        font: opt.fontstyle,
+        font: fontstyle,
         color: rgb(0, 0, 0),
     });
 }

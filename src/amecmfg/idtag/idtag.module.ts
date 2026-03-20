@@ -9,16 +9,18 @@ import { FileLoggerModule } from 'src/common/services/file-logger/file-logger.mo
 import { R027mp1Module } from 'src/as400/rtnlibf/r027mp1/r027mp1.module';
 import { IdTagRepository } from './idtag.repository';
 
+import { IdtagList } from '../../common/Entities/workload/table/idtag-list.entity';
 import { IdtagFiles } from '../../common/Entities/workload/table/idtag-files.entity';
 import { IdtagPages } from '../../common/Entities/workload/table/idtag-pages.entity';
 import { IdtagImages } from '../../common/Entities/workload/views/idtag-images.entity';
+import {} from '../../common/Entities/workload/views/idtag-images.entity';
 @Module({
     imports: [
         FileLoggerModule,
         R027mp1Module,
         TypeOrmModule.forFeature([M008KP, F110KP, F001KP], 'amecConnection'),
         TypeOrmModule.forFeature(
-            [IdtagFiles, IdtagPages, IdtagImages],
+            [IdtagFiles, IdtagPages, IdtagImages, IdtagList],
             'workloadConnection',
         ),
     ],

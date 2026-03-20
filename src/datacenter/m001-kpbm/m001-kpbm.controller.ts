@@ -3,7 +3,7 @@ import { M001KpbmService } from './m001-kpbm.service';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 
-@Controller('datacenter/m001-kpbm')
+@Controller('datacenter/m001kpbm')
 export class M001KpbmController {
     constructor(private readonly m001KpbmService: M001KpbmService) {}
     @Get()
@@ -11,7 +11,7 @@ export class M001KpbmController {
         return this.m001KpbmService.findAll();
     }
 
-    @Get(':order/:item/:prod')
+    @Get('findOne/:order/:item/:prod')
     findOne(
         @Param('order') order: string,
         @Param('item') item: string,
@@ -24,5 +24,10 @@ export class M001KpbmController {
     @UseTransaction('datacenterConnection')
     search(@Body() dto: FiltersDto) {
         return this.m001KpbmService.search(dto);
+    }
+
+    @Get('getGPL/:order/:item')
+    getGPL(@Param('order') order: string, @Param('item') item: string) {
+        return this.m001KpbmService.getGPL(order, item);
     }
 }

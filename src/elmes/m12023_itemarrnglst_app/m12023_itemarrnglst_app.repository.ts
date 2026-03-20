@@ -23,9 +23,10 @@ export class M12023ItemarrnglstAppRepository extends BaseRepository {
         return this.manager.find(M12023_ITEMARRNGLST_APP);
     }
 
-    findOne(order: string) {
+    findOne(order: string, item: string) {
         return this.getRepository(M12023_ITEMARRNGLST_APP).findOneBy({
             ORDERNO: order,
+            ITEMNO: item,
         });
     }
 
@@ -41,5 +42,16 @@ export class M12023ItemarrnglstAppRepository extends BaseRepository {
             'SERIALNO',
         ]);
         return qb.getMany();
+    }
+
+    getGPL(order: string, item: string[]) {
+        return this.manager
+            .createQueryBuilder(M12023_ITEMARRNGLST_APP, 'M')
+            .select(
+                'ORDERNO, ITEMNO, SERIALNO, REGYMDHMS, UPYMDHMS, BMCLS, APNAMERMRK, PARTNO, DRAWRANK, TOTALQTY, SCNDPRTCLS, SUPPLYCLS, FINPNTCLS, UNIT, DSGELENO, STDBLK, REVSUBNO',
+            )
+            .where('M.ORDERNO = :order', { order })
+            .andWhere('M.ITEMNO IN (:...item)', { item })
+            .getRawMany();
     }
 }

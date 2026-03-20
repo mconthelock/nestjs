@@ -36,4 +36,8 @@ export class CreateIdtagFilesDto {
     @IsDate()
     @IsOptional()
     PRINTED_DATE?: Date;
+
+    @Type(() => Number)
+    @IsNumber()
+    FILE_PRINTEDPAGE: number;
 }

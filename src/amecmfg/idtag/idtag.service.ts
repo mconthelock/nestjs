@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 const fontkit = require('@pdf-lib/fontkit');
@@ -18,10 +18,6 @@ import { R027mp1Service } from 'src/as400/rtnlibf/r027mp1/r027mp1.service';
 import { M008KP } from 'src/as400/rtnlibf/m008kp/entities/m008kp.entity';
 import { F110KP } from 'src/amecmfg/f110kp/entities/f110kp.entity';
 import { F001KP } from 'src/as400/shopf/f001kp/entities/f001kp.entity';
-
-import { IdtagFiles } from '../../common/Entities/workload/table/idtag-files.entity';
-import { IdtagPages } from '../../common/Entities/workload/table/idtag-pages.entity';
-import { IdtagImages } from '../../common/Entities/workload/views/idtag-images.entity';
 import { IdTagRepository } from './idtag.repository';
 
 interface filesData {
@@ -151,7 +147,13 @@ export class IdtagService {
     //Print PDF
     //inputFilePath: string, outputDirectory: string
     private formatElapsedTime(startTime: number) {
-        return `${Date.now() - startTime} ms`;
+        const elapsed = Date.now() - startTime;
+        const minutes = Math.floor(elapsed / 60000);
+        const seconds = Math.floor((elapsed % 60000) / 1000);
+        const ms = elapsed % 1000;
+        if (minutes > 0) return `${minutes} min ${seconds} sec ${ms} ms`;
+        if (seconds > 0) return `${seconds} sec ${ms} ms`;
+        return `${ms} ms`;
     }
 
     private async writeLog(message: string, error?: unknown) {
@@ -172,6 +174,15 @@ export class IdtagService {
         );
         await fs.mkdir(this.pdfDirectory, { recursive: true });
         this.logFileName = `IDTAG/${data.schd}${data.schdp}/${data.filedir}/${file}.log`;
+        if (
+            await fs
+                .access(this.logFileName)
+                .then(() => true)
+                .catch(() => false)
+        ) {
+            this.writeLog(`\n---------------------------------------------`);
+            this.writeLog(`\n`);
+        }
         return;
     }
 
@@ -182,17 +193,13 @@ export class IdtagService {
         filedir: string;
         bmdate: string;
     }) {
-        await this.putFirstLot();
-        return;
         const totalStartTime = Date.now();
         try {
             await this.setPdfPath(body);
-            await this.putCNNo(1);
-            return;
             const outputDirectory = this.pdfDirectory;
             const inputFilePath = path.join(
                 process.env.IDTAG_FILE_PATH,
-                'test/TAGSUB.pdf',
+                `test/${body.filename}`,
             );
             const readStartTime = Date.now();
             const pdfBytes = await fs.readFile(inputFilePath);
@@ -250,17 +257,17 @@ export class IdtagService {
 
             // ขั้นตอนที่ 3: บันทึกข้อมูลลง Database
             const saveStartTime = Date.now();
-            const dbdate: filesData = {
+            const dbdata: filesData = {
                 bmdate: new Date(body.bmdate),
                 folder: body.filedir,
                 originalfilename: body.filename,
-                filename: `${body.filename.replace('.pdf', '')}_processed.pdf`,
-                pageCount,
+                filename: `${Date.now()}.pdf`,
+                pageCount: pageCount - 1,
                 schd: body.schd,
                 schdp: body.schdp,
                 splitFilesData,
             };
-            const tagdata = await this.saveTagsData(dbdate);
+            const tagdata = await this.saveTagsData(dbdata);
             const fileID = tagdata.FILES;
             await this.writeLog(
                 `Saved PDF data in ${this.formatElapsedTime(saveStartTime)}`,
@@ -269,111 +276,51 @@ export class IdtagService {
             const putImagesStartTime = Date.now();
             await this.putImages(fileID);
             await this.writeLog(
-                `Saved PDF data in ${this.formatElapsedTime(putImagesStartTime)}`,
+                `Put images in complete PDF in ${this.formatElapsedTime(putImagesStartTime)}`,
             );
 
-            // ขั้นตอนที่ 4: รวม PDF กลับมาเป็น 1 ไฟล์ให้เร็วที่สุด
-            const mergeStartTime = Date.now();
-            await this.mergePdfsFast(
-                splitFilesData,
-                path.join(outputDirectory, 'Merged_Final_1.7.pdf'),
+            // ขั้นตอนที่ 4: ใส่ CN No. ลงใน PDF
+            const cnStartTime = Date.now();
+            await this.putCNNo(fileID);
+            await this.writeLog(
+                `Put CN No. in complete PDF in ${this.formatElapsedTime(cnStartTime)}`,
             );
+
+            // ขั้นตอนที่ 5: ใส่เลขที่ Lot แรกลงใน PDF
+            const firstStartTime = Date.now();
+            await this.putFirstLot(dbdata.bmdate);
+            await this.writeLog(
+                `Put first Lot No. in complete PDF in ${this.formatElapsedTime(firstStartTime)}`,
+            );
+
+            // ขั้นตอนที่ 6: รวม PDF กลับมาเป็น 1 ไฟล์
+            const outFilePath = path.join(
+                outputDirectory,
+                `${dbdata.filename}`,
+            );
+            const mergeStartTime = Date.now();
+            await this.mergePdfsFast(splitFilesData, outFilePath);
             await this.writeLog(
                 `Merged PDF in ${this.formatElapsedTime(mergeStartTime)}`,
             );
+
+            const compressStartTime = Date.now();
+            await this.compressPdfWithGhostscript(outFilePath);
+            await this.writeLog(
+                `Compressed PDF in ${this.formatElapsedTime(compressStartTime)}`,
+            );
+            await this.allowPrint(dbdata.folder, dbdata.filename, fileID);
             await this.writeLog(
                 `Total processing time ${this.formatElapsedTime(totalStartTime)}`,
             );
-            //return { status: 'success', totalPages: pageCount };
-            return '';
+            return { status: 'success', totalPages: pageCount - 1 };
         } catch (error) {
-            await this.writeLog('เกิดข้อผิดพลาดในการประมวลผล PDF', { error });
+            await this.writeLog(
+                'เกิดข้อผิดพลาดในการประมวลผล PDF',
+                error.message,
+            );
             throw error;
         }
-    }
-
-    // Logic การรวมไฟล์ให้เร็วที่สุด
-    private async mergePdfsFast(
-        filesData: { filePath: string }[],
-        outputPath: string,
-    ) {
-        const mergeStartTime = Date.now();
-        const mergedPdf = await PDFDocument.create();
-        const BATCH_SIZE = 100;
-        for (let i = 0; i < filesData.length; i += BATCH_SIZE) {
-            const batchStartTime = Date.now();
-            const batch = filesData.slice(i, i + BATCH_SIZE);
-
-            // อ่านไฟล์ใน Batch พร้อมๆ กัน
-            const buffers = await Promise.all(
-                batch.map((file) => fs.readFile(file.filePath)),
-            );
-
-            // นำไฟล์ที่อ่านได้มาใส่ในเอกสารหลัก
-            for (const buffer of buffers) {
-                const tempDoc = await PDFDocument.load(buffer);
-                const [copiedPage] = await mergedPdf.copyPages(tempDoc, [0]);
-                mergedPdf.addPage(copiedPage);
-            }
-            await this.writeLog(
-                `Merged batch ${i / BATCH_SIZE + 1} (${batch.length} files) in ${this.formatElapsedTime(batchStartTime)}`,
-            );
-        }
-
-        const mergedPdfBytes = await mergedPdf.save({ useObjectStreams: true });
-        await fs.writeFile(outputPath, mergedPdfBytes);
-        await this.writeLog(
-            `Merged complete PDF in ${this.formatElapsedTime(mergeStartTime)}`,
-        );
-        await this.compressPdfWithGhostscript(outputPath);
-    }
-
-    private async compressPdfWithGhostscript(filePath: string) {
-        const compressStartTime = Date.now();
-        const parsedPath = path.parse(filePath);
-        const compressedPath = path.join(
-            parsedPath.dir,
-            `${parsedPath.name}.compressed${parsedPath.ext}`,
-        );
-        await this.runGhostscript(filePath, compressedPath);
-        await this.writeLog(
-            `Compressed PDF in ${this.formatElapsedTime(compressStartTime)}`,
-        );
-        return compressedPath;
-    }
-
-    private async runGhostscript(inputPath: string, outputPath: string) {
-        const command =
-            '\\\\amecnas\\AMECWEB\\wwwroot\\production\\cdn\\Application\\gs\\gs10.00.0\\bin\\gswin32c.exe';
-        await new Promise<void>((resolve, reject) => {
-            const stderrChunks: Buffer[] = [];
-            const child = spawn(command, [
-                ...[],
-                '-sDEVICE=pdfwrite',
-                '-dCompatibilityLevel=1.7',
-                '-dNOPAUSE',
-                '-dQUIET',
-                '-dBATCH',
-                `-dPDFSETTINGS=/ebook`,
-                `-sOutputFile=${outputPath}`,
-                inputPath,
-            ]);
-
-            child.stderr.on('data', (chunk) => stderrChunks.push(chunk));
-            child.on('error', (error) => reject(error));
-            child.on('close', (code) => {
-                if (code === 0) {
-                    resolve();
-                    return;
-                }
-
-                reject(
-                    new Error(
-                        `Ghostscript exited with code ${code}: ${Buffer.concat(stderrChunks).toString().trim()}`,
-                    ),
-                );
-            });
-        });
     }
 
     private async saveTagsData(data: filesData) {
@@ -388,6 +335,7 @@ export class IdtagService {
                 FILE_FOLDER: data.folder,
                 FILE_TOTALPAGE: data.pageCount,
                 FILE_STATUS: '0',
+                FILE_PRINTEDPAGE: 0,
                 CREATE_DATE: new Date(),
             },
             splitFilesData
@@ -413,12 +361,7 @@ export class IdtagService {
             try {
                 if (!img.DWG_IMG) continue;
                 const imagePath = await this.setImagePath(img.DWG_IMG);
-                if (imagePath == null) {
-                    await this.writeLog(
-                        `Skip tag ${img.PAGE_TAG}: Image ${img.DWG_IMG} is not found`,
-                    );
-                    continue;
-                }
+                if (imagePath == null) continue;
                 const pdfPath = path.join(
                     this.pdfDirectory,
                     `${img.PAGE_TAG}.pdf`,
@@ -429,18 +372,18 @@ export class IdtagService {
                     imagePath,
                     `${img.DWG_WEIGHT == null ? 0 : img.DWG_WEIGHT} ${img.DWG_WEIGHT_UNIT}/${img.DWG_UNIT}`,
                 );
+                await this.writeLog(
+                    `Put image ${img.DWG_IMG} to ${img.PAGE_TAG}`,
+                );
                 await this.repo.updatePageImage(
                     img.FILES_ID,
                     img.PAGE_NUM,
                     img.DWG_IMG,
                 );
-                await this.writeLog(
-                    `Embedded image ${img.DWG_IMG} into ${img.PAGE_TAG}.pdf`,
-                );
             } catch (error) {
                 await this.writeLog(
                     `Error processing image for tag ${img.PAGE_TAG}`,
-                    { error },
+                    error.message,
                 );
             }
         }
@@ -449,7 +392,6 @@ export class IdtagService {
     private async setImagePath(img: string) {
         const image = path.join(process.env.IDTAG_FILE_PATH, `images/`, img);
         const thumb = path.join(process.env.IDTAG_FILE_PATH, `thumbnail/`, img);
-
         const fileExists = await fs
             .access(thumb)
             .then(() => true)
@@ -479,23 +421,15 @@ export class IdtagService {
         imagePath: string,
         text: string,
     ) {
-        const [pdfBytes, fontBytes] = await Promise.all([
-            fs.readFile(pdfPath),
-            fs.readFile(this.fontPath),
-        ]);
-
+        const pdfBytes = await fs.readFile(pdfPath);
         const pdfDoc = await PDFDocument.load(pdfBytes);
-        pdfDoc.registerFontkit(fontkit);
-        const fontstyle = await pdfDoc.embedFont(fontBytes);
         const [page] = pdfDoc.getPages();
-
         if (!page) {
             throw new Error(`PDF file has no pages: ${pdfPath}`);
         }
 
         const opt = {
             pdfpage: page,
-            fontstyle: fontstyle,
             fontsize: 14,
             drawBorder: {
                 color: rgb(0, 0, 0),
@@ -509,7 +443,6 @@ export class IdtagService {
             align: 'left',
         };
         await writeLineBox(opt);
-
         const imageBytes = await fs.readFile(imagePath);
         const extension = path.extname(imagePath).toLowerCase();
         const embeddedImage = ['.jpg', '.jpeg'].includes(extension)
@@ -541,7 +474,6 @@ export class IdtagService {
         const labelHeight = imgHeight;
         const labelX = imgX - labelGap - labelWidth;
         const labelY = imgY;
-
         page.drawRectangle({
             x: labelX,
             y: labelY,
@@ -555,14 +487,14 @@ export class IdtagService {
             x: labelX + 13,
             y: labelY + 15,
             size: 14,
-            font: fontstyle,
             color: rgb(0, 0, 0),
             rotate: degrees(90),
         });
         await fs.writeFile(pdfPath, await pdfDoc.save());
     }
-
     //End: Put photo to PDF
+
+    //Start: Put Text to PDF
     private async putCNNo(filesId: number) {
         const cnData = await this.repo.findCndata({
             filters: [
@@ -572,37 +504,62 @@ export class IdtagService {
         });
 
         for (const data of cnData) {
+            const pdfPath = path.join(
+                this.pdfDirectory,
+                `${data.PAGE_TAG}.pdf`,
+            );
             try {
-                const pdfPath = path.join(
-                    this.pdfDirectory,
-                    `${data.PAGE_TAG}.pdf`,
-                );
                 await this.embedCNToPdf(pdfPath, {
                     cnno: data.DOCNO,
                     sendto: data.SENTTO,
                     senddate: data.PRDCTNAME,
                 });
+                await this.writeLog(
+                    `Put CN No. ${data.DOCNO} to ${data.PAGE_TAG}`,
+                );
             } catch (error) {
                 await this.writeLog(
                     `Error processing CN Data for tag ${data.PAGE_TAG}`,
-                    { error },
+                    error.message,
                 );
             }
         }
     }
 
+    private async putFirstLot(bmdate) {
+        const bmdateStr = dayjs(bmdate).format('YYYYMMDD');
+        const firstData = await this.r027.findAll({
+            filters: [
+                { field: 'R27M13', op: 'eq', value: bmdateStr },
+                { field: 'R27M09', op: 'ne', value: '' },
+            ],
+        });
+
+        for (const data of firstData) {
+            const pdfPath = path.join(this.pdfDirectory, `${data.R27M11}.pdf`);
+            try {
+                await this.embedCNToPdf(pdfPath, {
+                    cnno: data.R27M09,
+                });
+                await this.writeLog(
+                    `Put First Lot. No. ${data.R27M09} to ${data.R27M11}`,
+                );
+            } catch (error) {
+                // await this.writeLog(
+                //     `Error processing CN Data for tag ${data.R27M09}`,
+                //     error.message,
+                // );
+                continue;
+            }
+        }
+    }
+
     private async embedCNToPdf(pdfPath: string, text: any) {
-        const [pdfBytes, fontBytes] = await Promise.all([
-            fs.readFile(pdfPath),
-            fs.readFile(this.fontPath),
-        ]);
+        const pdfBytes = await fs.readFile(pdfPath);
         const pdfDoc = await PDFDocument.load(pdfBytes);
-        pdfDoc.registerFontkit(fontkit);
-        const fontstyle = await pdfDoc.embedFont(fontBytes);
         const [page] = pdfDoc.getPages();
         const opt = {
             pdfpage: page,
-            fontstyle: fontstyle,
             fontsize: 14,
             boxHeight: 15,
         };
@@ -620,21 +577,95 @@ export class IdtagService {
             },
         });
 
-        await writeLineBox({
-            ...opt,
-            text: `PLEASE SEND TO ${text.sendto} ON ${text.senddate}`,
-            align: 'left',
-            boxX: 15,
-            boxY: 790,
-        });
+        if (text.sendto) {
+            await writeLineBox({
+                ...opt,
+                text: `PLEASE SEND TO ${text.sendto} ON ${text.senddate}`,
+                align: 'left',
+                boxX: 15,
+                boxY: 790,
+            });
+        }
         await fs.writeFile(pdfPath, await pdfDoc.save());
     }
 
-    private async putFirstLot() {
-        const firstData = await this.r027.findAll({
-            filters: [{ field: 'R27M13', op: 'eq', value: '20260317' }],
-        });
+    private async mergePdfsFast(
+        filesData: { filePath: string }[],
+        outputPath: string,
+    ) {
+        const mergedPdf = await PDFDocument.create();
+        const BATCH_SIZE = 100;
+        for (let i = 0; i < filesData.length; i += BATCH_SIZE) {
+            const batchStartTime = Date.now();
+            const batch = filesData.slice(i, i + BATCH_SIZE);
+            const buffers = await Promise.all(
+                batch.map((file) => fs.readFile(file.filePath)),
+            );
+            for (const buffer of buffers) {
+                const tempDoc = await PDFDocument.load(buffer);
+                const [copiedPage] = await mergedPdf.copyPages(tempDoc, [0]);
+                mergedPdf.addPage(copiedPage);
+            }
+            await this.writeLog(
+                `Merged batch ${i / BATCH_SIZE + 1} (${batch.length} files) in ${this.formatElapsedTime(batchStartTime)}`,
+            );
+        }
 
-        console.log(firstData, firstData.length);
+        const mergedPdfBytes = await mergedPdf.save({ useObjectStreams: true });
+        await fs.writeFile(outputPath, mergedPdfBytes);
+    }
+
+    private async compressPdfWithGhostscript(inputPath: string) {
+        const command =
+            '\\\\amecnas\\AMECWEB\\wwwroot\\production\\cdn\\Application\\gs\\gs10.00.0\\bin\\gswin32c.exe';
+        const parsedPath = path.parse(inputPath);
+        // `${parsedPath.name}.compressed${parsedPath.ext}`,
+        const compressedPath = path.join(parsedPath.dir, `output.pdf`);
+        await new Promise<void>((resolve, reject) => {
+            const stderrChunks: Buffer[] = [];
+            const child = spawn(command, [
+                ...[],
+                '-sDEVICE=pdfwrite',
+                '-dCompatibilityLevel=1.7',
+                '-dNOPAUSE',
+                '-dQUIET',
+                '-dBATCH',
+                `-dPDFSETTINGS=/ebook`,
+                `-sOutputFile=${compressedPath}`,
+                inputPath,
+            ]);
+
+            child.stderr.on('data', (chunk) => stderrChunks.push(chunk));
+            child.on('error', (error) => reject(error));
+            child.on('close', (code) => {
+                if (code === 0) {
+                    resolve();
+                    return;
+                }
+
+                reject(
+                    new Error(
+                        `Ghostscript exited with code ${code}: ${Buffer.concat(stderrChunks).toString().trim()}`,
+                    ),
+                );
+            });
+        });
+    }
+
+    private async allowPrint(
+        folder: string,
+        filename: string,
+        filesId: number,
+    ) {
+        //0 => On process, 1 => Hold, 2 => Pending Print, 3 => Printed, 4 => Error
+        const data = await this.repo.finndPrintList({
+            filters: [
+                { field: 'MST_DIR', op: 'eq', value: folder },
+                { field: 'MST_FILE', op: 'eq', value: filename },
+                { field: 'MST_STATUS', op: 'eq', value: '1' },
+            ],
+        });
+        let status: string = data.length > 0 ? '2' : '1';
+        return await this.repo.updatePrintFileStatus(filesId, status);
     }
 }

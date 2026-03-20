@@ -6,6 +6,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 
+import { IdtagList } from '../../common/Entities/workload/table/idtag-list.entity';
 import { IdtagFiles } from '../../common/Entities/workload/table/idtag-files.entity';
 import { IdtagPages } from '../../common/Entities/workload/table/idtag-pages.entity';
 import { IdtagImages } from '../../common/Entities/workload/views/idtag-images.entity';
@@ -64,5 +65,22 @@ export class IdTagRepository extends BaseRepository {
         const qb = this.manager.createQueryBuilder(IdtagCndata, 'C');
         this.applyFilters(qb, 'C', dto, ['FILES_ID', 'PAGE_CN']);
         return qb.getMany();
+    }
+
+    async finndPrintList(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(IdtagList, 'L');
+        this.applyFilters(qb, 'L', dto, ['MST_DIR', 'MST_FILE']);
+        return qb.getMany();
+    }
+
+    async updatePrintFileStatus(files: number, status: string) {
+        return this.getRepository(IdtagFiles).update(
+            {
+                FILES: files,
+            },
+            {
+                FILE_STATUS: status,
+            },
+        );
     }
 }

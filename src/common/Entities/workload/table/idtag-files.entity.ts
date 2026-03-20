@@ -27,7 +27,7 @@ export class IdtagFiles {
     FILE_TOTALPAGE: number;
 
     @Column()
-    FILE_STATUS: string;
+    FILE_STATUS: number;
 
     @Column()
     CREATE_DATE: Date;

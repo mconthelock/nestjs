@@ -21,6 +21,7 @@ import { MfgSerialService } from '../mfg-serial/mfg-serial.service';
 import { MfgDrawingActionService } from '../mfg-drawing-action/mfg-drawing-action.service';
 import { F001kpService } from 'src/datacenter/f001kp/f001kp.service';
 import { F001KP } from 'src/common/Entities/datacenter/table/F001KP.entity';
+import { GeneralPartListService } from 'src/general-part-list/general-part-list.service';
 
 @Injectable()
 export class MfgDrawingCreateChecksheetService {
@@ -34,6 +35,7 @@ export class MfgDrawingCreateChecksheetService {
         private readonly fileService: FileService,
         private readonly mfgSerialService: MfgSerialService,
         private readonly mfgDrawingActionService: MfgDrawingActionService,
+        private readonly generalPartListService: GeneralPartListService,
     ) {}
 
     private readonly mapType = {
@@ -223,8 +225,31 @@ export class MfgDrawingCreateChecksheetService {
         } else {
             drawing = data.F01R06;
         }
+        // หาจาก General part list ด้วย order และ item ที่ได้จาก F001KP
+        const order = data.F01R07?.trim();
+        const item = data.F01R03?.trim();
+        const getGpl = await this.generalPartListService.getGPL(order, item);
+        if(!getGpl.status){
+            throw new Error(`General Part List with order ${order} and item ${item} not found`);
+        }
+        const gpl = getGpl.data;
 
-        // return drawing จาก F001KP
+        const match = gpl.find((d) => {
+            if(!d.DRAWING || d.DRAWING.trim() === ''){
+                return false;
+            }
+            const gplDrawing = d.DRAWING.replace(/\s/g, '');
+            const targetDrawing = drawing.replace(/\s/g, '');
+            console.log(gplDrawing, targetDrawing);
+            return gplDrawing === targetDrawing || gplDrawing.startsWith(targetDrawing);
+        });
+
+        if(!match){
+            throw new Error(`No matching drawing found in General Part List for drawing ${drawing}, order ${order} and item ${item}`);
+        }
+
+        drawing = match.DRAWING;
+
         return { controlNo, drawing };
     }
 

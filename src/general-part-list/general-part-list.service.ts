@@ -73,7 +73,7 @@ export class GeneralPartListService {
         let i: number = -1;
         gpl.forEach((v) => {
             if (v.BMCLS == 'A') {
-                if (v.PARTNO.substring(1, 2) != ' ') {
+                if (v.PARTNO?.substring(1, 2) != ' ') {
                     i++;
                     data.push({
                         ORDERNO: order,

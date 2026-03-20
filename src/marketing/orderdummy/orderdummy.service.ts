@@ -2,13 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Raw } from 'typeorm';
 import { SearchOrderdummyDto } from './dto/search-orderdummy.dto';
-import { Orderdummy } from './entities/orderdummy.entity';
+import { TMARKET_TEMP_DUMMY } from 'src/common/Entities/datacenter/table/TMARKET_TEMP_DUMMY.entity';
+import { OrderdummyRepository } from './orderdummy.repository';
 
 @Injectable()
 export class OrderdummyService {
     constructor(
-        @InjectRepository(Orderdummy, 'datacenterConnection')
-        private readonly ords: Repository<Orderdummy>,
+        @InjectRepository(TMARKET_TEMP_DUMMY, 'datacenterConnection')
+        private readonly ords: Repository<TMARKET_TEMP_DUMMY>,
+        private readonly repo: OrderdummyRepository,
     ) {}
 
     async search(req: SearchOrderdummyDto) {
@@ -36,5 +38,28 @@ export class OrderdummyService {
             );
         }
         return await this.ords.find({ where: where });
+    }
+
+    async getOrderMain(order: string, item: string) {
+        try {
+            const res = await this.repo.getOrderMain(order, item);
+            const length = res.length;
+            if (length === 0) {
+                return {
+                    status: false,
+                    message: `Failed: No data found`,
+                };
+            }
+            const ordermain = res[0].MFGMAIN;
+            return {
+                status: true,
+                message: `Success: Data found with ordermain ${ordermain}`,
+                data: ordermain,
+            };
+        } catch (error) {
+            throw new Error(
+                `Get GPL by ${order}, ${item} Error: ` + error.message,
+            );
+        }
     }
 }

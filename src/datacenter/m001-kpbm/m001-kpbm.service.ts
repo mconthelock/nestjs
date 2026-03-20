@@ -68,4 +68,32 @@ export class M001KpbmService {
             throw new Error('Search M001KPBM Error: ' + error.message);
         }
     }
+
+    async getGPL(order: string, item: string | string[]) {
+        try {
+            if(typeof item === 'string' && item.includes(',')){
+                item = item.split(',');
+            }else if(typeof item === 'string'){
+                item = [item];
+            }
+            const res = await this.repo.getGPL(order, item);
+            const length = res.length;
+            if (length === 0) {
+                return {
+                    status: false,
+                    message: `Get GPL by ${order}, ${item} Failed: No data found`,
+                    data: [],
+                };
+            }
+            return {
+                status: true,
+                message: `Get GPL by ${order}, ${item} data found ${length} record(s)`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(
+                `Get GPL by ${order}, ${item} Error: ` + error.message,
+            );
+        }
+    }
 }

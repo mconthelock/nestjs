@@ -22,14 +22,19 @@ export class M12023ItemarrnglstAppController {
         return this.m12023ItemarrnglstAppService.findAll();
     }
 
-    @Get(':order')
-    findOne(@Param('order') order: string) {
-        return this.m12023ItemarrnglstAppService.findOne(order);
+    @Get(':order/:item')
+    findOne(@Param('order') order: string, @Param('item') item: string) {
+        return this.m12023ItemarrnglstAppService.findOne(order, item);
     }
 
     @Post('search')
     @UseTransaction('elmesConnection')
     async search(@Body() dto: FiltersDto) {
         return this.m12023ItemarrnglstAppService.search(dto);
+    }
+
+    @Get('getGPL/:order/:item')
+    getGPL(@Param('order') order: string, @Param('item') item: string) {
+        return this.m12023ItemarrnglstAppService.getGPL(order, item);
     }
 }

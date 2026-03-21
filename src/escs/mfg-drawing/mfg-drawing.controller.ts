@@ -33,11 +33,6 @@ export class MfgDrawingController {
         return this.mfgDrawingCheckSheetService.create(dto);
     }
 
-    @Post('test')
-    test(){
-        // return this.mfgDrawingCheckSheetService.getDrawingByIdTag('02-01-26-001');
-    }
-
     @Get()
     findAll() {
         return this.mfgDrawingService.findAll();

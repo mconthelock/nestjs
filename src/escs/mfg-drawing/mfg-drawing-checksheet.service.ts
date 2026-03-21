@@ -62,7 +62,11 @@ export class MfgDrawingCreateChecksheetService {
             const controlLists: CONTROL_DRAWING_PIS[] = itemData.CONTROL_LIST;
             const typeName: string = this.mapType[itemData.NTYPE] || 'unknown';
             const masterPath: string = itemData.VPATH;
-            let itemList: ITEM_MFG_LIST = null;
+            // let itemList: ITEM_MFG_LIST = null;
+            let listOfCS: {
+                VDRAWING: { DRAWING: string; G: string[]; L: string[][] };
+                VNUMBER_FILE: string;
+            } = null;
             const deleteList: string[] =
                 deleteLists
                     .filter((d) => d.NSTATUS == 1)
@@ -99,8 +103,8 @@ export class MfgDrawingCreateChecksheetService {
                 case 'pisMulti':
                     newfileName = dto.VPIS;
                     drawing = await this.getDrawingByPis(dto.VPIS, controlList);
-                    itemList = this.getDrawingList(itemLists, drawing);
-                    fileName = itemList.VNUMBER_FILE;
+                    listOfCS = this.getDataListOfCS(itemLists, drawing);
+                    fileName = listOfCS.VNUMBER_FILE;
                     serialList = dto.ASERIALNO.map((sn, index) => ({
                         VSERIALNO: sn,
                         NTYPE: 2, // กำหนด type เป็น 2 สำหรับ serial no ทั้งหมดในกรณี pisMulti
@@ -113,8 +117,9 @@ export class MfgDrawingCreateChecksheetService {
                     );
                     drawing = dataByidTag.drawing;
                     controlNo = dataByidTag.controlNo;
-                    itemList = this.getDrawingList(itemLists, drawing);
-                    fileName = itemList.VNUMBER_FILE;
+
+                    listOfCS = this.getDataListOfCS(itemLists, drawing);
+                    fileName = listOfCS.VNUMBER_FILE;
                     serialList = dto.ASERIALNO.map((sn, index) => ({
                         VSERIALNO: sn,
                         NTYPE: 1, // กำหนด type เป็น 1 สำหรับ serial no ทั้งหมดในกรณี default
@@ -126,6 +131,7 @@ export class MfgDrawingCreateChecksheetService {
                 blockId: itemData.NBLOCKID,
                 itemId: itemData.NID,
                 drawing: drawing,
+                controlNo: controlNo,
                 pis: dto.VPIS,
                 usercreate: dto.NUSERCREATE,
                 typeName: typeName,
@@ -229,23 +235,29 @@ export class MfgDrawingCreateChecksheetService {
         const order = data.F01R07?.trim();
         const item = data.F01R03?.trim();
         const getGpl = await this.generalPartListService.getGPL(order, item);
-        if(!getGpl.status){
-            throw new Error(`General Part List with order ${order} and item ${item} not found`);
+        if (!getGpl.status) {
+            throw new Error(
+                `General Part List with order ${order} and item ${item} not found`,
+            );
         }
         const gpl = getGpl.data;
 
         const match = gpl.find((d) => {
-            if(!d.DRAWING || d.DRAWING.trim() === ''){
+            if (!d.DRAWING || d.DRAWING.trim() === '') {
                 return false;
             }
             const gplDrawing = d.DRAWING.replace(/\s/g, '');
             const targetDrawing = drawing.replace(/\s/g, '');
-            console.log(gplDrawing, targetDrawing);
-            return gplDrawing === targetDrawing || gplDrawing.startsWith(targetDrawing);
+            return (
+                gplDrawing === targetDrawing ||
+                gplDrawing.startsWith(targetDrawing)
+            );
         });
 
-        if(!match){
-            throw new Error(`No matching drawing found in General Part List for drawing ${drawing}, order ${order} and item ${item}`);
+        if (!match) {
+            throw new Error(
+                `No matching drawing found in General Part List for drawing ${drawing}, order ${order} and item ${item}`,
+            );
         }
 
         drawing = match.DRAWING;
@@ -271,7 +283,7 @@ export class MfgDrawingCreateChecksheetService {
         }
         // หา drawing ที่ตรงกับ control และไม่อยู่ใน delete list
         const matchdrawing: { drawing: string | null; order: string | null } =
-            this.matchDrawing(controls, s011mp.data);
+            this.matchDrawingS011MP(controls, s011mp.data);
         // return drawing จาก S011MP
         if (!matchdrawing && !matchdrawing.drawing) {
             throw new Error(
@@ -281,7 +293,7 @@ export class MfgDrawingCreateChecksheetService {
         return matchdrawing.drawing;
     }
 
-    matchDrawing(
+    matchDrawingS011MP(
         control: string[],
         drawing: S011MP[],
     ): { drawing: string | null; order: string | null } {
@@ -309,31 +321,314 @@ export class MfgDrawingCreateChecksheetService {
         };
     }
 
-    getDrawingList(list: ITEM_MFG_LIST[], drawing: string): ITEM_MFG_LIST {
-        const matched = list.find(
-            (l) =>
-                l.NSTATUS == 1 &&
-                (l.VDRAWING === drawing ||
-                    drawing.startsWith(l.VDRAWING + ' ')),
-        );
-        if (!matched) {
+    // getDrawingList(list: ITEM_MFG_LIST[], drawing: string): ITEM_MFG_LIST {
+    //     const matched = list.find(
+    //         (l) =>
+    //             l.NSTATUS == 1 &&
+    //             (l.VDRAWING === drawing ||
+    //                 drawing.startsWith(l.VDRAWING + ' ')),
+    //     );
+    //     if (!matched) {
+    //         throw new Error(
+    //             `No matching drawing found in Master for drawing ${drawing}`,
+    //         );
+    //     }
+    //     return matched;
+    // }
+
+    /**
+     * Get data list of check sheet.
+     * @param list
+     * @param col VNUMBER_FILE or VDRAWING
+     * @param drawing BA105A280 G01L21L85L92
+     * @returns
+     * @example
+     * getDataListOfCS(list, 'BA105A280 G01L21L85L92') =>
+     * { VDRAWING: { DRAWING: 'BA105A280', G: ['G01'], L: [['L21'], ['L85'], ['L92']] }, VNUMBER_FILE: 'file1' }
+     */
+    getDataListOfCS(
+        list: ITEM_MFG_LIST[],
+        drawing: string,
+    ): {
+        VDRAWING: { DRAWING: string; G: string[]; L: string[][] };
+        VNUMBER_FILE: string;
+    } {
+        let res: any = [];
+        if (drawing) {
+            let cStepMatch: number = 0;
+            const master = this.readMaster(list);
+
+            // Set dwg from "general part list" to variable array.
+            const dwg = this.extractDrawing(drawing);
+            for (let i = 0; i < master.length; i++) {
+                const masterDwg = master[i].VDRAWING;
+                const cStepTemp = this.matchDrawing(dwg, masterDwg);
+                if (cStepTemp !== 0) {
+                    if (cStepTemp === cStepMatch) {
+                        throw new Error(
+                            `Multiple matching drawings found in Master for drawing ${drawing}`,
+                        );
+                    }
+
+                    if (cStepTemp > cStepMatch) {
+                        cStepMatch = cStepTemp;
+                        res = master[i];
+                    }
+                }
+            }
+        }
+
+        if (!res || res.length === 0) {
             throw new Error(
-                `No matching drawing found in ITEM_MFG_LIST for drawing ${drawing}`,
+                `No matching drawing found in Master for drawing ${drawing}`,
             );
         }
-        return matched;
+        return res;
     }
 
+    /**
+     * Match drawing with master data.
+     * @since 2026-03-21
+     * @param dwg is value drawing GL, (E.g. ['BA105A280', 'G01', 'L21', 'L85', 'L92'])
+     * @param masterDwg is master drawing with separated G and L, (E.g. { DRAWING: 'BA105A280', G: ['G01'], L: [['L21'], ['L85'], ['L92']] })
+     * @returns number of matching steps
+     * @example
+     * matchDrawing(['BA105A280', 'G01', 'L21', 'L85', 'L92'], { DRAWING: 'BA105A280', G: ['G01'], L: [['L21'], ['L85'], ['L92']] }) => 5
+     * matchDrawing(['BA105A280', 'G01', 'L21', 'L85'], { DRAWING: 'BA105A280', G: ['G01'], L: [['L21'], ['L85'], ['L92']] }) => 4
+     */
+    private matchDrawing(
+        dwg: string[],
+        masterDwg: { DRAWING: string; G: string[]; L: string[][] },
+    ): number {
+        let step = 0;
+
+        // 1. check DRAWING
+        if (dwg[0] !== masterDwg.DRAWING) return 0;
+        step++;
+
+        // 2. check G (ตำแหน่งที่ 1)
+        if (masterDwg.G.length > 0) {
+            if (!dwg[1] || !masterDwg.G.includes(dwg[1])) {
+                return 0;
+            }
+            step++;
+        }
+
+        // 3. check L (ตำแหน่งต่อไป)
+        for (let i = 0; i < masterDwg.L.length; i++) {
+            const dwgIndex = i + 2; // offset
+            const lGroup = masterDwg.L[i];
+
+            if (!dwg[dwgIndex] || !lGroup.includes(dwg[dwgIndex])) {
+                return 0;
+            }
+            step++;
+        }
+
+        return step;
+    }
+
+    /**
+     * Extract drawing from string.
+     * @since 2026-03-21
+     * @param drawing BA105A280 G01L21L85L92
+     * @returns [ 'BA105A280', 'G01', 'L21', 'L85', 'L92' ]
+     * @description แยกตัวอักษร G และ L ออกจาก string drawing และ return เป็น array โดยแยก G และ L ออกจากกัน
+     * @example
+     * extractDrawing('BA105A280 G01L21L85L92') => [ 'BA105A280', 'G01', 'L21', 'L85', 'L92' ]
+     */
+    extractDrawing(drawing: string): string[] {
+        const split = drawing.split(' ');
+        const dwg: string[] = [split[0]];
+        const gl = this.splitGPL(split[1]);
+        dwg.push(...gl);
+        return dwg;
+    }
+
+    /**
+     * Read master data for check sheet.
+     * @param list
+     * @returns {
+     *   VDRAWING: { DRAWING: string, G: string[], L: string[][] },
+     *   VNUMBER_FILE: string
+     * }[]
+     * @description แปลงข้อมูลจาก ITEM_MFG_LIST ให้เหลือแค่ VDRAWING ที่ถูกแยกตัวอักษร G และ L ออกจากกัน และ VNUMBER_FILE
+     * @example
+     * readMaster(list) => [
+     *   {
+     *     VDRAWING: { DRAWING: 'BA105A280', G: ['G01'], L: [['L21'], ['L85'], ['L92']] },
+     *     VNUMBER_FILE: 'file1'
+     *   }
+     * ]
+     */
+    readMaster(list: ITEM_MFG_LIST[]): {
+        VDRAWING: { DRAWING: string; G: string[]; L: string[][] };
+        VNUMBER_FILE: string;
+    }[] {
+        const mapList = list
+            .filter((l) => l.NSTATUS == 1)
+            .map((l) => ({
+                VDRAWING: this.explodeGL(l.VDRAWING),
+                VNUMBER_FILE: l.VNUMBER_FILE,
+            }));
+        return mapList;
+    }
+
+    /**
+     * Check if a drawing should be deleted based on the delete list.
+     * @param deleteDwg 'BA212B768 G01 L03~L05'
+     * @param drawing 'BA212B768 G01L03L04L05'
+     * @returns boolean
+     * @description เปรียบเทียบ drawing กับ delete list โดยแยกตัวอักษร G และ L ออกจากกัน แล้วตรวจสอบว่า drawing มีค่า G และ L ที่ตรงกับ delete list หรือไม่ โดยที่ถ้า delete list มี G01 L03~L05 จะถือว่า G01L03L04L05 ตรงกับ delete list และควรจะถูกลบ
+     * @example
+     * checkDeleteDrawing(['BA212B768 G01 L03~L05'], 'BA212B768 G01L03') => true
+     * checkDeleteDrawing(['BA212B768 G01 L03~L05'], 'BA212B768 G06') => false
+     */
     checkDeleteDrawing(deleteDwg: string[], drawing: string): boolean {
-        return deleteDwg.some(
-            (e) => drawing === e || drawing.startsWith(e + ' '),
-        );
+        if (!drawing) return false;
+
+        const master = deleteDwg.map((d) => ({
+            VDRAWING: this.explodeGL(d),
+        }));
+
+        const dwg = this.extractDrawing(drawing);
+
+        for (const m of master) {
+            const masterDwg = m.VDRAWING;
+
+            const match = this.matchDrawing(dwg, masterDwg);
+
+            const totalStep =
+                1 + (masterDwg.G.length > 0 ? 1 : 0) + masterDwg.L.length;
+
+            if (match === totalStep) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // checkDeleteDrawing(deleteDwg: string[], drawing: string): boolean {
+    //     return deleteDwg.some(
+    //         (e) => drawing === e || drawing.startsWith(e + ' '),
+    //     );
+    // }
+
+    /**
+     * Set value G and L to checkSheet file.
+     * @since 2026-03-20
+     * @param {string} drawing is value drawing GL, (E.g. 'G01L01')
+     * @return {string[]} is value GL, (E.g. ['G01', 'L01'])
+     * @example
+     * splitGPL('G01L01') => ['G01', 'L01']
+     */
+    splitGPL(drawing: string): string[] {
+        const regex = /[GL-]{1}\d{2,3}/g;
+        const matches = drawing.match(regex);
+        return matches || [];
+    }
+
+    /**
+     * Set value G and L.
+     * @since 2026-03-20
+     * @param  {string} drawing is 'BS123A571 G01 L12~L14'
+     * @return {object} is { DRAWING: string, G: string[], L: string[] }
+     * @example
+     * explodeGL('BS123A571 G01 L01~L04 L12~L14') => { DRAWING: 'BS123A571', G: ['G01'], L: [['L01', 'L02', 'L03', 'L04'], ['L12', 'L13', 'L14']] }
+     */
+    explodeGL(drawing: string): {
+        DRAWING: string;
+        G: string[];
+        L: string[][];
+    } {
+        // replace space ซ้ำให้เหลือช่องเดียว
+        drawing = this.expandGLRange(drawing);
+        const split: string[] = drawing.split(' ');
+        const parsed = this.parseGLSegments(split);
+        return {
+            DRAWING: split[0],
+            G: parsed.G,
+            L: parsed.L,
+        };
+    }
+
+    /**
+     * Expand GL range in the drawing string.
+     * @since 2026-03-21
+     * @param drawing BS123A571 G01 L12~L14
+     * @returns BS123A571 G01 L12L13L14
+     * @description แปลงช่วงของ G และ L ที่มีรูปแบบเป็น G01~G05 หรือ L01~L04 ให้กลายเป็น G01G02G03G04G05 หรือ L01L02L03L04 โดยที่ยังคงรูปแบบเดิมของ string ไว้
+     * @example
+     * expandGLRange('BS123A571 G01 L01~L04 L12~L14') => 'BS123A571 G01 L01L02L03L04 L12L13L14'
+     * expandGLRange('BS123A571 G01 L01') => 'BS123A571 G01 L01'
+     */
+    expandGLRange(drawing: string): string {
+        // replace space ซ้ำให้เหลือช่องเดียว
+        drawing = drawing.replace(/\s+/g, ' ');
+
+        const pattern = /[GL-]{1}\d{2,3}~[GL]{1}\d{2,3}/g;
+        const matches = drawing.match(pattern) || [];
+        matches.forEach((val) => {
+            let GL = val.split('~');
+
+            let min = GL[0].replace(/[GL]{1}/g, '');
+            let max = GL[1].replace(/[GL]{1}/g, '');
+
+            const prefix = GL[0].replace(/\d+/g, '');
+
+            let tmpGL = '';
+            for (let i = parseInt(min); i <= parseInt(max); i++) {
+                tmpGL += prefix + String(i).padStart(min.length, '0');
+            }
+
+            drawing = drawing.replace(val, tmpGL);
+        });
+        return drawing;
+    }
+
+    /**
+     * Parse G and L segments from the split drawing string.
+     * @since 2026-03-21
+     * @param split ['BS123A571', 'G05', 'L20L21', 'L50L51L52']
+     * @returns  { G: ['G05'], L: [['L20', 'L21'], ['L50', 'L51', 'L52']] }
+     * @description แยก segment ของ G และ L ออกจากกัน โดยที่ G จะถูกเก็บใน array เดียว ส่วน L จะถูกเก็บใน array ของ array เพื่อแยกแต่ละกลุ่มของ L ออกจากกัน
+     * @example
+     * parseGLSegments(['BS123A571', 'G05', 'L20L21', 'L50L51L52']) => { G: ['G05'], L: [['L20', 'L21'], ['L50', 'L51', 'L52']] }
+     */
+    parseGLSegments(split: string[]): {
+        G: string[];
+        L: string[][];
+    } {
+        let indexL = -1;
+        let checkG = false;
+
+        const result = {
+            G: [] as string[],
+            L: [] as string[][],
+        };
+
+        for (let i = 1; i < split.length; i++) {
+            const gl = this.splitGPL(split[i]);
+
+            if (split[i].startsWith('L') && gl.length > 0) {
+                result.L[++indexL] = gl;
+            } else if (split[i].startsWith('G') && gl.length > 0) {
+                if (checkG) {
+                    throw new Error('Invalid format: multiple G groups found');
+                }
+
+                result.G.push(...gl);
+                checkG = true;
+            }
+        }
+
+        return result;
     }
 
     async insertData({
         blockId,
         itemId,
         drawing,
+        controlNo,
         pis,
         usercreate,
         typeName,
@@ -344,6 +639,7 @@ export class MfgDrawingCreateChecksheetService {
         blockId: number;
         itemId: number;
         drawing: string;
+        controlNo: string;
         pis: string;
         usercreate: number;
         typeName: string;
@@ -364,6 +660,7 @@ export class MfgDrawingCreateChecksheetService {
                 NITEMID: itemId,
                 VPIS: pis,
                 VDRAWING: drawing,
+                VCONTROLNO: controlNo,
                 NINSPECTOR_STATUS: 1,
                 NFORELEAD_STATUS: 4,
                 VFILE_NAME: null,
@@ -381,7 +678,6 @@ export class MfgDrawingCreateChecksheetService {
                         { NDRAWINGID: data.NID },
                         { NSTATUS: 3 },
                     );
-                    // throw new Error(`test`);
                     await this.mfgDrawingActionService.update(data.NID, {
                         NSTATUS: 3,
                     });

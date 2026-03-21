@@ -12,6 +12,9 @@ export class IdtagFiles {
     SCHDNUMBER: string;
 
     @Column()
+    SCHDCHAR: string;
+
+    @Column()
     SCHDP: string;
 
     @Column()

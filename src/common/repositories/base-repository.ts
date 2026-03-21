@@ -20,7 +20,11 @@ export class BaseRepository {
         // return this.request[ENTITY_MANAGER_KEY] ?? this.dataSource.manager;
         const txManager = this.request[ENTITY_MANAGER_KEY];
 
-        if (txManager && txManager.connection === this.dataSource) {
+        if (
+            txManager &&
+            txManager.connection === this.dataSource &&
+            !txManager.queryRunner?.isReleased
+        ) {
             return txManager;
         }
 
@@ -32,7 +36,7 @@ export class BaseRepository {
     }
 
     private applyCondition<T>(
-        qb: WhereExpressionBuilder ,
+        qb: WhereExpressionBuilder,
         column: string,
         op: string,
         value: any,

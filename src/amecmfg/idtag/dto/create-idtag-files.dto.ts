@@ -10,6 +10,9 @@ export class CreateIdtagFilesDto {
     SCHDNUMBER: string;
 
     @IsString()
+    SCHDCHAR: string;
+
+    @IsString()
     SCHDP: string;
 
     @IsString()
@@ -41,4 +44,9 @@ export class CreateIdtagFilesDto {
     @Type(() => Number)
     @IsNumber()
     FILE_PRINTEDPAGE: number;
+
+    @Type(() => Number)
+    @IsNumber()
+    @IsOptional()
+    FILES?: number;
 }

@@ -16,6 +16,7 @@ import { IdtagCndata } from '../../common/Entities/workload/views/idtag-cndata.e
 import { CreateIdtagFilesDto } from './dto/create-idtag-files.dto';
 import { CreateIdtagPagesDto } from './dto/create-idtag-pages.dto';
 import { SearchIdtagFilesDto } from './dto/search-idtag-file.dto';
+import { stat } from 'fs';
 
 @Injectable({ scope: Scope.REQUEST })
 export class IdTagRepository extends BaseRepository {
@@ -24,6 +25,10 @@ export class IdTagRepository extends BaseRepository {
         @Inject(REQUEST) req: Request,
     ) {
         super(ds, req as Request);
+    }
+
+    async findFileById(filesId: number) {
+        return this.getRepository(IdtagFiles).findOneBy({ FILES: filesId });
     }
 
     async createPrint(
@@ -71,24 +76,48 @@ export class IdTagRepository extends BaseRepository {
 
     async findPrintList(dto?: FiltersDto) {
         const qb = this.manager.createQueryBuilder(IdtagList, 'L');
-        if (dto) await this.applyFilters(qb, 'L', dto, ['MST_DIR', 'MST_FILE']);
+        if (dto)
+            await this.applyFilters(qb, 'L', dto, [
+                'MST_DIR',
+                'MST_FILE',
+                'MST_STATUS',
+            ]);
         return qb.getMany();
     }
 
-    async updatePrintFileStatus(files: number, status: number) {
+    async updatePrintFileStatus(files: number, status: number, page?: number) {
         return this.getRepository(IdtagFiles).update(
             {
                 FILES: files,
             },
             {
                 FILE_STATUS: status,
+                PRINTED_DATE: status == 3 ? new Date() : null,
+                FILE_PRINTEDPAGE: page || 0,
             },
         );
+    }
+
+    async updatePrintPagesStatus(files: number, status: number) {
+        return this.manager
+            .createQueryBuilder()
+            .update(IdtagPages)
+            .set({ PAGE_STATUS: status })
+            .where('FILES_ID = :files', { files })
+            .execute();
     }
 
     async findAllFiles(dto: SearchIdtagFilesDto) {
         const qb = this.manager.createQueryBuilder(IdtagFiles, 'files');
         await applyDynamicFilters(qb, dto, 'files');
         return qb.getMany();
+    }
+
+    async deletePdf(filesId: number) {
+        const file = this.manager.delete(IdtagFiles, { FILES: filesId });
+        const pages = await this.manager.delete(IdtagPages, {
+            FILES_ID: filesId,
+        });
+        return { file, pages };
     }
 }

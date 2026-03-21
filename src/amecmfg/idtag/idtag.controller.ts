@@ -72,26 +72,21 @@ export class IdtagController {
         return this.tag.getWeekList();
     }
 
+    //Print PDF on ITADMIN Project
     @Post('process-pdf')
-    @UseTransaction('workloadConnection')
     @UseInterceptors(getFileUploadInterceptor('files[]', true, 20))
     async processPdfDocument(
         @UploadedFiles() files: Express.Multer.File[],
         @Body()
         body: {
-            filename: string;
-            schd: string;
-            schdp: string;
+            schd_number: string;
+            schd_txt: string;
+            schd_p: string;
             filedir: string;
             bmdate: string;
         },
     ) {
         return this.tag.processPdfDocument(body, files);
-    }
-
-    @Get('process-pdf/status/:jobId')
-    async getProcessPdfStatus(@Param('jobId') jobId: string) {
-        return this.tag.getPdfProcessStatus(jobId);
     }
 
     @Post('print-list')
@@ -103,17 +98,33 @@ export class IdtagController {
         return this.tag.findAllFiles(body);
     }
 
-    @Post('process-logs')
-    async processPdfLog(
-        @Body()
-        body: {
-            schd: string;
-            schdp: string;
-            filedir: string;
-            filename: string;
-        },
+    @Get('download/:id')
+    @UseTransaction('workloadConnection')
+    async downloadFile(@Param('id') id: number) {
+        return this.tag.downloadFile(id);
+    }
+
+    @Get('process-logs/:id')
+    async processPdfLog(@Param('id') id: number) {
+        return this.tag.findFilesLog(id);
+    }
+
+    @Post('update-printed')
+    @UseTransaction('workloadConnection')
+    async updatePrintedStatus(
+        @Body() body: { files: number; status: number; page: number },
     ) {
-        return this.tag.findFilesLog(body);
+        return this.tag.updatePrintFileStatus(
+            body.files,
+            body.status,
+            body.page,
+        );
+    }
+
+    @Get('delete/:id')
+    @UseTransaction('workloadConnection')
+    async deletePdf(@Param('id') id: number) {
+        return this.tag.deletePdf(id);
     }
 
     @Get('print-master')

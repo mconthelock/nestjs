@@ -26,6 +26,11 @@ export class CreateMfgDrawingDto {
     @Type(() => String)
     VPIS?: string;
 
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    VCONTROLNO?: string;
+
     @IsNotEmpty()
     @IsString()
     @Type(() => String)

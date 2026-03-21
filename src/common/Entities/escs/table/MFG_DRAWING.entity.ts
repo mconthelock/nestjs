@@ -29,6 +29,9 @@ export class MFG_DRAWING {
     VPIS: string;
 
     @Column()
+    VCONTROLNO: string;
+
+    @Column()
     VDRAWING: string;
 
     @Column()

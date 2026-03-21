@@ -4,7 +4,7 @@ module.exports = {
     apps: [
         {
             name: 'api',
-            script: './dist/main.js',
+            script: './dist/src/main.js',
             exec_mode: 'cluster',
             instances: instanceCount,
             autorestart: true,

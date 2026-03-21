@@ -5,20 +5,21 @@ import { DataSource, Repository } from 'typeorm';
 import * as dayjs from 'dayjs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-const fontkit = require('@pdf-lib/fontkit');
-// import fontkit from '@pdf-lib/fontkit';
 import { spawn } from 'child_process';
 import { PDFDocument, rgb, degrees } from 'pdf-lib';
 import { PDFParse } from 'pdf-parse';
 import { compressDimension } from 'src/common/helpers/resize-image.helper';
 import { writeLineBox } from 'src/common/helpers/file-pdf.helper';
 import { FileLoggerService } from 'src/common/services/file-logger/file-logger.service';
+import { moveFileFromMulter } from 'src/common/utils/files.utils';
 import { R027mp1Service } from 'src/as400/rtnlibf/r027mp1/r027mp1.service';
 
 import { M008KP } from 'src/as400/rtnlibf/m008kp/entities/m008kp.entity';
 import { F110KP } from 'src/amecmfg/f110kp/entities/f110kp.entity';
 import { F001KP } from 'src/as400/shopf/f001kp/entities/f001kp.entity';
+
 import { IdTagRepository } from './idtag.repository';
+import { SearchIdtagFilesDto } from './dto/search-idtag-file.dto';
 
 interface filesData {
     bmdate: Date;
@@ -35,14 +36,23 @@ interface filesData {
     }[];
 }
 
+export interface PdfJobStatus {
+    jobId: string;
+    status: 'queued' | 'running' | 'completed' | 'failed' | 'not_found';
+    message: string;
+    queuedAt?: string;
+    startedAt?: string;
+    finishedAt?: string;
+    totalPages?: number;
+    error?: string;
+}
+
 @Injectable()
 export class IdtagService {
     private logFileName = '';
     private pdfDirectory;
-    private readonly fontPath = path.join(
-        process.cwd(),
-        'public/fonts/Roboto-Regular.ttf',
-    );
+    private pdfProcessQueue: Promise<void> = Promise.resolve();
+    private readonly pdfJobStatusMap = new Map<string, PdfJobStatus>();
 
     constructor(
         @InjectRepository(M008KP, 'amecConnection')
@@ -145,7 +155,250 @@ export class IdtagService {
     }
 
     //Print PDF
-    //inputFilePath: string, outputDirectory: string
+    // Process PDF document
+    async processPdfDocument(
+        body: {
+            filename: string;
+            schd: string;
+            schdp: string;
+            filedir: string;
+            bmdate: string;
+        },
+        files: Express.Multer.File[],
+    ) {
+        for (const file of files) {
+            await this.setPdfPath({ ...body, filename: file.originalname });
+            const moved = await moveFileFromMulter({
+                file,
+                destination: this.pdfDirectory,
+            });
+            //FILE_ONAME: file.originalname, // ชื่อเดิมฝั่ง client
+            //FILE_FNAME: moved.newName, // ชื่อไฟล์ที่ใช้เก็บจริง
+
+            const jobId = `pdf_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+            this.pdfJobStatusMap.set(jobId, {
+                jobId,
+                status: 'queued',
+                message: 'PDF job is queued',
+                queuedAt: new Date().toISOString(),
+            });
+
+            this.pdfProcessQueue = this.pdfProcessQueue
+                .then(() =>
+                    this.runPdfProcessJob(
+                        { ...body, filename: moved.newName },
+                        jobId,
+                    ),
+                )
+                .catch((error) => {
+                    this.pdfJobStatusMap.set(jobId, {
+                        ...(this.pdfJobStatusMap.get(jobId) || {
+                            jobId,
+                            queuedAt: new Date().toISOString(),
+                        }),
+                        status: 'failed',
+                        message: 'Background queue failed',
+                        finishedAt: new Date().toISOString(),
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : String(error),
+                    });
+                    this.writeLog(
+                        `[${jobId}] Background queue error`,
+                        error instanceof Error ? error.message : String(error),
+                    );
+                });
+        }
+        return;
+
+        // return {
+        //     status: 'queued',
+        //     jobId,
+        //     message: 'PDF processing started in background',
+        // };
+    }
+
+    private async runPdfProcessJob(
+        body: {
+            filename: string;
+            schd: string;
+            schdp: string;
+            filedir: string;
+            bmdate: string;
+        },
+        jobId: string,
+    ) {
+        const totalStartTime = Date.now();
+        this.pdfJobStatusMap.set(jobId, {
+            ...(this.pdfJobStatusMap.get(jobId) || {
+                jobId,
+                queuedAt: new Date().toISOString(),
+            }),
+            status: 'running',
+            message: 'Background processing is running',
+            startedAt: new Date().toISOString(),
+        });
+        try {
+            // await this.setPdfPath(body);
+            await this.writeLog(`[${jobId}] Background processing started`);
+            const outputDirectory = this.pdfDirectory;
+            const inputFilePath = path.join(
+                process.env.IDTAG_FILE_PATH,
+                `${body.filename}`,
+            );
+            const readStartTime = Date.now();
+            const pdfBytes = await fs.readFile(inputFilePath);
+            await this.writeLog(
+                `Read source PDF in ${this.formatElapsedTime(readStartTime)}`,
+            );
+
+            // ขั้นตอนที่ 1: โหลด PDF ด้วย pdf-lib
+            const loadStartTime = Date.now();
+            const pdfDoc = await PDFDocument.load(pdfBytes);
+            const pageCount = pdfDoc.getPageCount();
+            await this.writeLog(
+                `Loaded PDF (${pageCount} pages) in ${this.formatElapsedTime(loadStartTime)}`,
+            );
+
+            const splitFilesData: {
+                fileName: string;
+                filePath: string;
+                pageNumber: number;
+            }[] = [];
+
+            // ขั้นตอนที่ 2: แบ่งหน้า, อ่านข้อความ และตั้งชื่อไฟล์
+            await this.splitFiles(
+                pdfDoc,
+                outputDirectory,
+                pageCount,
+                splitFilesData,
+            );
+
+            // ขั้นตอนที่ 3: บันทึกข้อมูลลง Database
+            const saveStartTime = Date.now();
+            const dbdata: filesData = {
+                bmdate: new Date(body.bmdate),
+                folder: body.filedir,
+                originalfilename: body.filename,
+                filename: `${Date.now()}.pdf`,
+                pageCount: pageCount - 1,
+                schd: body.schd,
+                schdp: body.schdp,
+                splitFilesData,
+            };
+            const tagdata = await this.saveTagsData(dbdata);
+            const fileID = tagdata.FILES;
+            await this.writeLog(
+                `Saved PDF data in ${this.formatElapsedTime(saveStartTime)}`,
+            );
+
+            // ขั้นตอนที่ 4: ใส่รูปภาพto PDF
+            await this.putImages(fileID);
+
+            // ขั้นตอนที่ 5: ใส่ CN No. ลงใน PDF
+            await this.putCNNo(fileID);
+
+            // ขั้นตอนที่ 5: ใส่เลขที่ Lot แรกลงใน PDF
+
+            await this.putFirstLot(dbdata.bmdate);
+
+            // ขั้นตอนที่ 6: รวม PDF กลับมาเป็น 1 ไฟล์
+            const outFilePath = path.join(
+                outputDirectory,
+                `${dbdata.filename}`,
+            );
+            const mergeStartTime = Date.now();
+            await this.mergePdfsFast(splitFilesData, outFilePath);
+            await this.writeLog(
+                `Merged PDF in ${this.formatElapsedTime(mergeStartTime)}`,
+            );
+
+            const compressStartTime = Date.now();
+            await this.compressPdfWithGhostscript(outFilePath);
+            await this.writeLog(
+                `Compressed PDF in ${this.formatElapsedTime(compressStartTime)}`,
+            );
+            await this.allowPrint(
+                dbdata.folder,
+                dbdata.originalfilename,
+                fileID,
+            );
+            await this.writeLog(
+                `Total processing time ${this.formatElapsedTime(totalStartTime)}`,
+            );
+            this.pdfJobStatusMap.set(jobId, {
+                ...(this.pdfJobStatusMap.get(jobId) || { jobId }),
+                status: 'completed',
+                message: 'Background processing completed',
+                finishedAt: new Date().toISOString(),
+                totalPages: pageCount - 1,
+            });
+            await this.writeLog(`[${jobId}] Background processing completed`);
+            return;
+        } catch (error) {
+            this.pdfJobStatusMap.set(jobId, {
+                ...(this.pdfJobStatusMap.get(jobId) || { jobId }),
+                status: 'failed',
+                message: 'Background processing failed',
+                finishedAt: new Date().toISOString(),
+                error: error instanceof Error ? error.message : String(error),
+            });
+            await this.writeLog(
+                'เกิดข้อผิดพลาดในการประมวลผล PDF',
+                error.message,
+            );
+            await this.writeLog(
+                `[${jobId}] Background processing failed`,
+                error instanceof Error ? error.message : String(error),
+            );
+            return;
+        }
+    }
+
+    private async splitFiles(
+        pdfDoc: PDFDocument,
+        outputDirectory: string,
+        pageCount: number,
+        splitFilesData: {
+            fileName: string;
+            filePath: string;
+            pageNumber: number;
+        }[],
+    ) {
+        const splitStartTime = Date.now();
+        for (let i = 1; i < pageCount; i++) {
+            const singlePageDoc = await PDFDocument.create();
+            const [copiedPage] = await singlePageDoc.copyPages(pdfDoc, [i]);
+            singlePageDoc.addPage(copiedPage);
+            const singlePageBytes = await singlePageDoc.save();
+            const parser = new PDFParse({
+                data: Buffer.from(singlePageBytes),
+            });
+            let parsedData;
+            try {
+                parsedData = await parser.getText();
+                const textContent = parsedData.text;
+                const tagData = textContent.split('\n');
+                const tagNo = tagData[0].substring(0, 12).replace(/\s/g, '');
+                const newFileName = `${tagNo}.pdf`;
+                const outputPath = path.join(outputDirectory, newFileName);
+                await fs.writeFile(outputPath, singlePageBytes);
+                splitFilesData.push({
+                    fileName: tagNo,
+                    filePath: outputPath,
+                    pageNumber: i,
+                });
+            } finally {
+                await parser.destroy();
+            }
+        }
+        await this.writeLog(
+            `Split ${splitFilesData.length} pages in ${this.formatElapsedTime(splitStartTime)}`,
+        );
+        return splitFilesData;
+    }
+
     private formatElapsedTime(startTime: number) {
         const elapsed = Date.now() - startTime;
         const minutes = Math.floor(elapsed / 60000);
@@ -186,143 +439,6 @@ export class IdtagService {
         return;
     }
 
-    async processPdfDocument(body: {
-        filename: string;
-        schd: string;
-        schdp: string;
-        filedir: string;
-        bmdate: string;
-    }) {
-        const totalStartTime = Date.now();
-        try {
-            await this.setPdfPath(body);
-            const outputDirectory = this.pdfDirectory;
-            const inputFilePath = path.join(
-                process.env.IDTAG_FILE_PATH,
-                `test/${body.filename}`,
-            );
-            const readStartTime = Date.now();
-            const pdfBytes = await fs.readFile(inputFilePath);
-            await this.writeLog(
-                `Read source PDF in ${this.formatElapsedTime(readStartTime)}`,
-            );
-
-            // ขั้นตอนที่ 1: โหลด PDF ด้วย pdf-lib
-            const loadStartTime = Date.now();
-            const pdfDoc = await PDFDocument.load(pdfBytes);
-            const pageCount = pdfDoc.getPageCount();
-            await this.writeLog(
-                `Loaded PDF (${pageCount} pages) in ${this.formatElapsedTime(loadStartTime)}`,
-            );
-
-            const splitFilesData: {
-                fileName: string;
-                filePath: string;
-                pageNumber: number;
-            }[] = [];
-
-            // ขั้นตอนที่ 2 & 3: แบ่งหน้า, อ่านข้อความ และตั้งชื่อไฟล์
-            const splitStartTime = Date.now();
-            for (let i = 1; i < pageCount; i++) {
-                const singlePageDoc = await PDFDocument.create();
-                const [copiedPage] = await singlePageDoc.copyPages(pdfDoc, [i]);
-                singlePageDoc.addPage(copiedPage);
-                const singlePageBytes = await singlePageDoc.save();
-                const parser = new PDFParse({
-                    data: Buffer.from(singlePageBytes),
-                });
-                let parsedData;
-                try {
-                    parsedData = await parser.getText();
-                    const textContent = parsedData.text;
-                    const tagData = textContent.split('\n');
-                    const tagNo = tagData[0]
-                        .substring(0, 12)
-                        .replace(/\s/g, '');
-                    const newFileName = `${tagNo}.pdf`;
-                    const outputPath = path.join(outputDirectory, newFileName);
-                    await fs.writeFile(outputPath, singlePageBytes);
-                    splitFilesData.push({
-                        fileName: tagNo,
-                        filePath: outputPath,
-                        pageNumber: i,
-                    });
-                } finally {
-                    await parser.destroy();
-                }
-            }
-            await this.writeLog(
-                `Split ${splitFilesData.length} pages in ${this.formatElapsedTime(splitStartTime)}`,
-            );
-
-            // ขั้นตอนที่ 3: บันทึกข้อมูลลง Database
-            const saveStartTime = Date.now();
-            const dbdata: filesData = {
-                bmdate: new Date(body.bmdate),
-                folder: body.filedir,
-                originalfilename: body.filename,
-                filename: `${Date.now()}.pdf`,
-                pageCount: pageCount - 1,
-                schd: body.schd,
-                schdp: body.schdp,
-                splitFilesData,
-            };
-            const tagdata = await this.saveTagsData(dbdata);
-            const fileID = tagdata.FILES;
-            await this.writeLog(
-                `Saved PDF data in ${this.formatElapsedTime(saveStartTime)}`,
-            );
-
-            const putImagesStartTime = Date.now();
-            await this.putImages(fileID);
-            await this.writeLog(
-                `Put images in complete PDF in ${this.formatElapsedTime(putImagesStartTime)}`,
-            );
-
-            // ขั้นตอนที่ 4: ใส่ CN No. ลงใน PDF
-            const cnStartTime = Date.now();
-            await this.putCNNo(fileID);
-            await this.writeLog(
-                `Put CN No. in complete PDF in ${this.formatElapsedTime(cnStartTime)}`,
-            );
-
-            // ขั้นตอนที่ 5: ใส่เลขที่ Lot แรกลงใน PDF
-            const firstStartTime = Date.now();
-            await this.putFirstLot(dbdata.bmdate);
-            await this.writeLog(
-                `Put first Lot No. in complete PDF in ${this.formatElapsedTime(firstStartTime)}`,
-            );
-
-            // ขั้นตอนที่ 6: รวม PDF กลับมาเป็น 1 ไฟล์
-            const outFilePath = path.join(
-                outputDirectory,
-                `${dbdata.filename}`,
-            );
-            const mergeStartTime = Date.now();
-            await this.mergePdfsFast(splitFilesData, outFilePath);
-            await this.writeLog(
-                `Merged PDF in ${this.formatElapsedTime(mergeStartTime)}`,
-            );
-
-            const compressStartTime = Date.now();
-            await this.compressPdfWithGhostscript(outFilePath);
-            await this.writeLog(
-                `Compressed PDF in ${this.formatElapsedTime(compressStartTime)}`,
-            );
-            await this.allowPrint(dbdata.folder, dbdata.filename, fileID);
-            await this.writeLog(
-                `Total processing time ${this.formatElapsedTime(totalStartTime)}`,
-            );
-            return { status: 'success', totalPages: pageCount - 1 };
-        } catch (error) {
-            await this.writeLog(
-                'เกิดข้อผิดพลาดในการประมวลผล PDF',
-                error.message,
-            );
-            throw error;
-        }
-    }
-
     private async saveTagsData(data: filesData) {
         const splitFilesData = data.splitFilesData || [];
         return this.repo.createPrint(
@@ -334,7 +450,7 @@ export class IdtagService {
                 FILE_NAME: data.filename,
                 FILE_FOLDER: data.folder,
                 FILE_TOTALPAGE: data.pageCount,
-                FILE_STATUS: '0',
+                FILE_STATUS: 0,
                 FILE_PRINTEDPAGE: 0,
                 CREATE_DATE: new Date(),
             },
@@ -350,12 +466,20 @@ export class IdtagService {
 
     //Start: Put photo to PDF
     private async putImages(filesId: number) {
+        const putImagesStartTime = Date.now();
         const imageData = await this.repo.findImage({
             filters: [
                 { field: 'FILES_ID', op: 'eq', value: filesId },
                 { field: 'PAGE_IMG', op: 'isNull' },
             ],
         });
+
+        if (imageData.length === 0) {
+            await this.writeLog(
+                `No images to put in PDF for FILES_ID ${filesId}`,
+            );
+            return;
+        }
 
         for (const img of imageData) {
             try {
@@ -387,6 +511,10 @@ export class IdtagService {
                 );
             }
         }
+
+        await this.writeLog(
+            `Put images in complete PDF in ${this.formatElapsedTime(putImagesStartTime)}`,
+        );
     }
 
     private async setImagePath(img: string) {
@@ -496,12 +624,20 @@ export class IdtagService {
 
     //Start: Put Text to PDF
     private async putCNNo(filesId: number) {
+        const cnStartTime = Date.now();
         const cnData = await this.repo.findCndata({
             filters: [
                 { field: 'FILES_ID', op: 'eq', value: filesId },
                 { field: 'PAGE_CN', op: 'isNull' },
             ],
         });
+
+        if (cnData.length === 0) {
+            await this.writeLog(
+                `No CN data to put in PDF for FILES_ID ${filesId}`,
+            );
+            return;
+        }
 
         for (const data of cnData) {
             const pdfPath = path.join(
@@ -524,9 +660,14 @@ export class IdtagService {
                 );
             }
         }
+
+        await this.writeLog(
+            `Put CN No. in complete PDF in ${this.formatElapsedTime(cnStartTime)}`,
+        );
     }
 
     private async putFirstLot(bmdate) {
+        const firstStartTime = Date.now();
         const bmdateStr = dayjs(bmdate).format('YYYYMMDD');
         const firstData = await this.r027.findAll({
             filters: [
@@ -535,6 +676,7 @@ export class IdtagService {
             ],
         });
 
+        let lotCount = 0;
         for (const data of firstData) {
             const pdfPath = path.join(this.pdfDirectory, `${data.R27M11}.pdf`);
             try {
@@ -544,14 +686,21 @@ export class IdtagService {
                 await this.writeLog(
                     `Put First Lot. No. ${data.R27M09} to ${data.R27M11}`,
                 );
+                lotCount++;
             } catch (error) {
-                // await this.writeLog(
-                //     `Error processing CN Data for tag ${data.R27M09}`,
-                //     error.message,
-                // );
                 continue;
             }
         }
+
+        if (lotCount === 0) {
+            await this.writeLog(
+                `No First Lot No. data to put in PDF for BMDate ${bmdateStr}`,
+            );
+            return;
+        }
+        await this.writeLog(
+            `Put first Lot No. in complete PDF in ${this.formatElapsedTime(firstStartTime)}`,
+        );
     }
 
     private async embedCNToPdf(pdfPath: string, text: any) {
@@ -658,14 +807,57 @@ export class IdtagService {
         filesId: number,
     ) {
         //0 => On process, 1 => Hold, 2 => Pending Print, 3 => Printed, 4 => Error
-        const data = await this.repo.finndPrintList({
+        const data = await this.repo.findPrintList({
             filters: [
-                { field: 'MST_DIR', op: 'eq', value: folder },
-                { field: 'MST_FILE', op: 'eq', value: filename },
+                {
+                    field: 'MST_DIR',
+                    op: 'eq',
+                    value: `TAG${folder}`,
+                },
+                {
+                    field: 'MST_FILE',
+                    op: 'eq',
+                    value: filename.replace(/\.pdf$/i, ''),
+                },
                 { field: 'MST_STATUS', op: 'eq', value: '1' },
             ],
         });
-        let status: string = data.length > 0 ? '2' : '1';
+        const status: number = data.length > 0 ? 2 : 1;
         return await this.repo.updatePrintFileStatus(filesId, status);
+    }
+    // End Process PDF document
+
+    async findAllFiles(dto: SearchIdtagFilesDto) {
+        return this.repo.findAllFiles(dto);
+    }
+
+    async findFilesLog(body: {
+        schd: string;
+        schdp: string;
+        filedir: string;
+        filename: string;
+    }) {
+        await this.setPdfPath(body);
+        try {
+            return await this.fileLogger.readLog({
+                fileName: this.logFileName,
+            });
+        } catch {
+            throw new Error('Log file not found');
+        }
+    }
+
+    async findMaster() {
+        return this.repo.findPrintList();
+    }
+
+    getPdfProcessStatus(jobId: string): PdfJobStatus {
+        return (
+            this.pdfJobStatusMap.get(jobId) || {
+                jobId,
+                status: 'not_found',
+                message: 'Job not found',
+            }
+        );
     }
 }

@@ -5,6 +5,7 @@ import { REQUEST } from '@nestjs/core';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
+import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 
 import { IdtagList } from '../../common/Entities/workload/table/idtag-list.entity';
 import { IdtagFiles } from '../../common/Entities/workload/table/idtag-files.entity';
@@ -14,6 +15,7 @@ import { IdtagCndata } from '../../common/Entities/workload/views/idtag-cndata.e
 
 import { CreateIdtagFilesDto } from './dto/create-idtag-files.dto';
 import { CreateIdtagPagesDto } from './dto/create-idtag-pages.dto';
+import { SearchIdtagFilesDto } from './dto/search-idtag-file.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class IdTagRepository extends BaseRepository {
@@ -67,13 +69,13 @@ export class IdTagRepository extends BaseRepository {
         return qb.getMany();
     }
 
-    async finndPrintList(dto: FiltersDto) {
+    async findPrintList(dto?: FiltersDto) {
         const qb = this.manager.createQueryBuilder(IdtagList, 'L');
-        this.applyFilters(qb, 'L', dto, ['MST_DIR', 'MST_FILE']);
+        if (dto) await this.applyFilters(qb, 'L', dto, ['MST_DIR', 'MST_FILE']);
         return qb.getMany();
     }
 
-    async updatePrintFileStatus(files: number, status: string) {
+    async updatePrintFileStatus(files: number, status: number) {
         return this.getRepository(IdtagFiles).update(
             {
                 FILES: files,
@@ -82,5 +84,11 @@ export class IdTagRepository extends BaseRepository {
                 FILE_STATUS: status,
             },
         );
+    }
+
+    async findAllFiles(dto: SearchIdtagFilesDto) {
+        const qb = this.manager.createQueryBuilder(IdtagFiles, 'files');
+        await applyDynamicFilters(qb, dto, 'files');
+        return qb.getMany();
     }
 }

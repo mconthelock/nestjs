@@ -25,8 +25,9 @@ export class CreateIdtagFilesDto {
     @IsNumber()
     FILE_TOTALPAGE: number;
 
-    @IsString()
-    FILE_STATUS: string;
+    @Type(() => Number)
+    @IsNumber()
+    FILE_STATUS: number;
 
     @Type(() => Date)
     @IsDate()

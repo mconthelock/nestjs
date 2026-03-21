@@ -54,7 +54,6 @@ export class FileLoggerService {
                 options.directory,
             );
             await fs.mkdir(path.dirname(logFilePath), { recursive: true });
-
             const errorText = options.error
                 ? `\n${this.formatError(options.error)}`
                 : '';
@@ -66,6 +65,22 @@ export class FileLoggerService {
             );
         } catch {
             // Logging must not break the caller workflow.
+        }
+    }
+
+    async readLog(options: {
+        fileName: string;
+        directory?: string;
+        error?: unknown;
+    }) {
+        try {
+            const logFilePath = this.resolveLogFilePath(
+                options.fileName,
+                options.directory,
+            );
+            return await fs.readFile(logFilePath, 'utf8');
+        } catch {
+            throw new Error('Log file not found');
         }
     }
 }

@@ -1,7 +1,17 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Param,
+    Post,
+    UploadedFiles,
+    UseInterceptors,
+} from '@nestjs/common';
 import { IdtagService } from './idtag.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
+import { SearchIdtagFilesDto } from './dto/search-idtag-file.dto';
+import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 
 @ApiTags('AS400 - ID Tag')
 @Controller('idtag')
@@ -64,7 +74,9 @@ export class IdtagController {
 
     @Post('process-pdf')
     @UseTransaction('workloadConnection')
+    @UseInterceptors(getFileUploadInterceptor('files[]', true, 20))
     async processPdfDocument(
+        @UploadedFiles() files: Express.Multer.File[],
         @Body()
         body: {
             filename: string;
@@ -74,6 +86,38 @@ export class IdtagController {
             bmdate: string;
         },
     ) {
-        return this.tag.processPdfDocument(body);
+        return this.tag.processPdfDocument(body, files);
+    }
+
+    @Get('process-pdf/status/:jobId')
+    async getProcessPdfStatus(@Param('jobId') jobId: string) {
+        return this.tag.getPdfProcessStatus(jobId);
+    }
+
+    @Post('print-list')
+    @UseTransaction('workloadConnection')
+    async getPrintPfd(
+        @Body()
+        body: SearchIdtagFilesDto,
+    ) {
+        return this.tag.findAllFiles(body);
+    }
+
+    @Post('process-logs')
+    async processPdfLog(
+        @Body()
+        body: {
+            schd: string;
+            schdp: string;
+            filedir: string;
+            filename: string;
+        },
+    ) {
+        return this.tag.findFilesLog(body);
+    }
+
+    @Get('print-master')
+    async findAllFolder() {
+        return this.tag.findMaster();
     }
 }

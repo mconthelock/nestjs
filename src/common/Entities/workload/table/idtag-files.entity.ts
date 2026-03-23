@@ -40,4 +40,7 @@ export class IdtagFiles {
 
     @Column()
     FILE_PRINTEDPAGE: number;
+
+    @Column()
+    FILES_PARENT: number;
 }

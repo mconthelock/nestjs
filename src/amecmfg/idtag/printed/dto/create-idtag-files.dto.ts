@@ -48,5 +48,10 @@ export class CreateIdtagFilesDto {
     @Type(() => Number)
     @IsNumber()
     @IsOptional()
+    FILES_PARENT?: number;
+
+    @Type(() => Number)
+    @IsNumber()
+    @IsOptional()
     FILES?: number;
 }

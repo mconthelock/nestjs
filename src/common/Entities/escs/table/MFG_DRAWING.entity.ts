@@ -11,6 +11,8 @@ import {
 import { MFG_SERIAL } from './MFG_SERIAL.entity';
 import { SYS_STATUS } from './SYS_STATUS.entity';
 import { MFG_DRAWING_ACTION } from './MFG_DRAWING_ACTION.entity';
+import { ITEM_MFG } from './ITEM_MFG.entity';
+import { BLOCK_MASTER } from './BLOCK_MASTER.entity';
 
 @Entity({ name: 'MFG_DRAWING', schema: 'ESCCHKSHT' })
 export class MFG_DRAWING {
@@ -25,6 +27,9 @@ export class MFG_DRAWING {
 
     @Column()
     VPIS: string;
+
+    @Column()
+    VCONTROLNO: string;
 
     @Column()
     VDRAWING: string;
@@ -88,4 +93,12 @@ export class MFG_DRAWING {
 
     @OneToMany(() => MFG_DRAWING_ACTION, (a) => a.DRAWING)
     ACTIONS: MFG_DRAWING_ACTION[];
+
+    @ManyToOne(() => ITEM_MFG, (i) => i.MFG_DRAWING)
+    @JoinColumn([{ name: 'NITEMID', referencedColumnName: 'NID' }])
+    ITEM_MFG: ITEM_MFG;
+
+    @ManyToOne(() => BLOCK_MASTER, (b) => b.MFG_DRAWING)
+    @JoinColumn([{ name: 'NBLOCKID', referencedColumnName: 'NID' }])
+    BLOCK_MASTER: BLOCK_MASTER;
 }

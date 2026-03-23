@@ -10,6 +10,7 @@ import { PpoModule } from './ppo/ppo.module';
 import { PprModule } from './ppr/ppr.module';
 import { PproductModule } from './pproduct/pproduct.module';
 import { PvenderModule } from './pvender/pvender.module';
+import { BrcurrencyModule } from './brcurrency/brcurrency.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PvenderModule } from './pvender/pvender.module';
     PprModule,
     PproductModule,
     PvenderModule,
+    BrcurrencyModule,
   ],
 })
 export class AmecModule {}

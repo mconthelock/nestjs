@@ -125,6 +125,10 @@ export class CreatePurCpmDto extends PickType(CreateFormDto, [
   @IsOptional()
   @IsString()
   ATTACH_OTHER?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  CURRENCY: string;
 }
 
 export class InsertPurCpmDto extends PickType(CreatePurCpmDto, [

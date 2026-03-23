@@ -1008,7 +1008,7 @@ export class QainsFormService {
         <head>
             <meta charset="utf-8"/>
             <meta name="viewport" content="width=device-width,initial-scale=1"/>
-            <link rel="stylesheet" href="${process.env.APP_HOST}/form/assets/dist/css/v1.0.1.min.css">
+            <link rel="stylesheet" href="${process.env.APP_HOST}/form/assets/dist/css/tailwind.css">
             <link rel="stylesheet" href="${process.env.APP_HOST}/cdn/icofont/icofont.min.css">
             <style>
                 html, body {

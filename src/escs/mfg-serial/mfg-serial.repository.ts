@@ -19,7 +19,7 @@ export class MfgSerialRepository extends BaseRepository {
     }
 
     async create(dto: CreateMfgSerialDto | CreateMfgSerialDto[]) {
-        if(Array.isArray(dto)) {
+        if (Array.isArray(dto)) {
             return this.getRepository(MFG_SERIAL).save(dto);
         }
         return this.getRepository(MFG_SERIAL).save(dto);
@@ -38,20 +38,37 @@ export class MfgSerialRepository extends BaseRepository {
 
     async search(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(MFG_SERIAL, 'M');
-        this.applyFilters(qb, 'M', dto, ['NID', 'NDRAWINGID', 'VSERIALNO']);
+        this.applyFilters(qb, 'M', dto, [
+            'NID',
+            'NDRAWINGID',
+            'VSERIALNO',
+            'NSTATUS',
+            'D.NBLOCKID',
+            'D.NITEMID',
+        ]);
         return qb
+            .select(['M', 'I.VITEM_NAME', 'B.VNAME'])
+            .leftJoinAndSelect('M.MFG_DRAWING', 'D')
+            .leftJoin('D.ITEM_MFG', 'I')
+            .leftJoin('D.BLOCK_MASTER', 'B')
             .orderBy('M.NID, M.NDRAWINGID, M.VSERIALNO', 'ASC')
             .getMany();
     }
 
-    async update(id: number | { NID: number } | { NDRAWINGID: number }, dto: UpdateMfgSerialDto) {
+    async update(
+        id: number | { NID: number } | { NDRAWINGID: number },
+        dto: UpdateMfgSerialDto,
+    ) {
         return this.getRepository(MFG_SERIAL).update(id, dto);
     }
 
-    async remove(id: number| UpdateMfgSerialDto) {
-        if(typeof id === 'number'){
+    async remove(id: number | UpdateMfgSerialDto) {
+        if (typeof id === 'number') {
             return this.getRepository(MFG_SERIAL).delete(id);
         }
-        return this.getRepository(MFG_SERIAL).delete({...id, NSTATUS: Not(3)});
+        return this.getRepository(MFG_SERIAL).delete({
+            ...id,
+            NSTATUS: Not(3),
+        });
     }
 }

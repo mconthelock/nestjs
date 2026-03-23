@@ -1,11 +1,7 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
 } from '@nestjs/common';
 import { BuspassengerService } from './buspassenger.service';
 import { CreateBuspassengerDto } from './dto/create-buspassenger.dto';

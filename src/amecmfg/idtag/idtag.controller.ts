@@ -1,6 +1,17 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Param,
+    Post,
+    UploadedFiles,
+    UseInterceptors,
+} from '@nestjs/common';
 import { IdtagService } from './idtag.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UseTransaction } from 'src/common/decorator/transaction.decorator';
+import { SearchIdtagFilesDto } from './dto/search-idtag-file.dto';
+import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 
 @ApiTags('AS400 - ID Tag')
 @Controller('idtag')
@@ -61,8 +72,63 @@ export class IdtagController {
         return this.tag.getWeekList();
     }
 
-    @Get('process-pdf')
-    async processPdfDocument() {
-        return this.tag.processPdfDocument();
+    //Print PDF on ITADMIN Project
+    @Post('process-pdf')
+    @UseInterceptors(getFileUploadInterceptor('files[]', true, 20))
+    async processPdfDocument(
+        @UploadedFiles() files: Express.Multer.File[],
+        @Body()
+        body: {
+            schd_number: string;
+            schd_txt: string;
+            schd_p: string;
+            filedir: string;
+            bmdate: string;
+        },
+    ) {
+        return this.tag.processPdfDocument(body, files);
+    }
+
+    @Post('print-list')
+    @UseTransaction('workloadConnection')
+    async getPrintPfd(
+        @Body()
+        body: SearchIdtagFilesDto,
+    ) {
+        return this.tag.findAllFiles(body);
+    }
+
+    @Get('download/:id')
+    @UseTransaction('workloadConnection')
+    async downloadFile(@Param('id') id: number) {
+        return this.tag.downloadFile(id);
+    }
+
+    @Get('process-logs/:id')
+    async processPdfLog(@Param('id') id: number) {
+        return this.tag.findFilesLog(id);
+    }
+
+    @Post('update-printed')
+    @UseTransaction('workloadConnection')
+    async updatePrintedStatus(
+        @Body() body: { files: number; status: number; page: number },
+    ) {
+        return this.tag.updatePrintFileStatus(
+            body.files,
+            body.status,
+            body.page,
+        );
+    }
+
+    @Get('delete/:id')
+    @UseTransaction('workloadConnection')
+    async deletePdf(@Param('id') id: number) {
+        return this.tag.deletePdf(id);
+    }
+
+    @Get('print-master')
+    async findAllFolder() {
+        return this.tag.findMaster();
     }
 }

@@ -6,9 +6,9 @@ import { S011MP } from 'src/common/Entities/datacenter/table/S011MP.entity';
 import { S011mpRepository } from './s011mp.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([S011MP], 'datacenterConnection')],
-  controllers: [S011mpController],
-  providers: [S011mpService, S011mpRepository],
-  exports: [S011mpService],
+    imports: [TypeOrmModule.forFeature([S011MP], 'datacenterConnection')],
+    controllers: [S011mpController],
+    providers: [S011mpService, S011mpRepository],
+    exports: [S011mpService],
 })
 export class S011mpModule {}

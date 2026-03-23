@@ -24,12 +24,12 @@ export class BuspassengerService {
   }
 
   async create(dto: CreateBuspassengerDto) {
-  const entity = this.buspassengerRepository.create({
-    ...dto,
-    UPDATE_DATE: new Date(),   // 👈 เพิ่มตรงนี้
-  });
-  return await this.buspassengerRepository.save(entity);
-}
+    const entity = this.buspassengerRepository.create({
+      ...dto,
+      UPDATE_DATE: new Date(),   // 👈 เพิ่มตรงนี้
+    });
+    return await this.buspassengerRepository.save(entity);
+  }
   
   async update(dto: UpdateBuspassengerDto) {
     const data = await this.buspassengerRepository.findOne({

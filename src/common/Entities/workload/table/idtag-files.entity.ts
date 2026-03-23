@@ -12,6 +12,9 @@ export class IdtagFiles {
     SCHDNUMBER: string;
 
     @Column()
+    SCHDCHAR: string;
+
+    @Column()
     SCHDP: string;
 
     @Column()
@@ -27,11 +30,14 @@ export class IdtagFiles {
     FILE_TOTALPAGE: number;
 
     @Column()
-    FILE_STATUS: string;
+    FILE_STATUS: number;
 
     @Column()
     CREATE_DATE: Date;
 
     @Column()
     PRINTED_DATE: Date;
+
+    @Column()
+    FILE_PRINTEDPAGE: number;
 }

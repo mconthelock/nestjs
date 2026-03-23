@@ -1,14 +1,17 @@
 import { Body, Controller, Post, Param } from '@nestjs/common';
 import { DispatchService } from './dispatch.service';
-import { SaveDispatchDto } from './dto/save-dispatch.dto';
 import { SaveOverwriteDto } from './dto/save-overwrite.dto';
 import { BuildDailyFirstDto } from './dto/build-daily-first.dto';
 import { DispatchKeyDto } from './dto/dispatch-key.dto';
 import { MoveStopDto } from './dto/move-stop.dto';
-import { DeleteLineDto } from './dto/delete-line.dto';
 import { SaveAddPassengerDto } from './dto/save-add-passenger.dto';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { DailyDispatchReportDto } from './dto/dispatch-report.dto';
+import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
+import { UpdatePassengerStatusDto } from './dto/update-passenger-status.dto';
+import { UpdateLineStatusDto } from './dto/update-line-status.dto';
+import { UpdateLineTypeDto } from './dto/update-line-type.dto';
+import { SaveDispatchDto } from './dto/save-dispatch.dto';
 
 export class DispatchReportDto {
   @IsString()
@@ -24,9 +27,21 @@ export class DispatchController {
     return this.service.getDispatch(dto);
   }
 
+  @Post('update-status-head')
+  async updateDispatchStatus(@Body() dto: SaveDispatchDto) {
+    return this.service.updateDispatchStatusHead(dto);
+  }
+  
+
   @Post('save-overwrite')
   saveOverwrite(@Body() dto: SaveOverwriteDto) {
     return this.service.saveOverwrite(dto);
+  }
+
+  
+  @Post('update-status')
+  updateStatus(@Body() dto: UpdateStatusDispatchDto) {
+    return this.service.updateStatus(dto);
   }
 
   @Post('build-daily-first')
@@ -44,10 +59,6 @@ export class DispatchController {
     return this.service.disablePassenger(dto);
   }
 
-  @Post('delete-linedispatch')
-  async deleteLine(@Body() dto: DeleteLineDto) {
-    return await this.service.deleteLinedispatch(dto);
-  }
     
   @Post('save-add-passenger')
   async saveAddPassenger(@Body() dto: SaveAddPassengerDto) {
@@ -63,4 +74,23 @@ export class DispatchController {
   getReportDisabledPassenger(@Body() dto: DailyDispatchReportDto) {
     return this.service.getReportDisabledPassenger(dto);
   }
-}
+
+  @Post('update-passenger-status')
+  async updatePassengerStatus(@Body() dto: UpdatePassengerStatusDto) {
+    return await this.service.updatePassengerStatus(dto);
+  }
+
+  @Post('update-line-status')
+  updateLinedispatchStatus(@Body() dto: UpdateLineStatusDto) {
+    return this.service.updateLinedispatchStatus(dto);
+  }
+
+  @Post('update-line-type')
+  async updateLineType(@Body() dto: UpdateLineTypeDto) {
+    return await this.service.updateLineType(dto);
+  }
+
+
+  
+
+} 

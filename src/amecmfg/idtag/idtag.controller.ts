@@ -115,38 +115,31 @@ export class IdtagController {
         return this.prined.downloadFile(id);
     }
 
-    /*
-
-
-
-
     @Get('process-logs/:id')
     async processPdfLog(@Param('id') id: number) {
-        return this.tag.findFilesLog(id);
+        return this.prined.findFilesLog(id);
     }
 
-    @Post('update-printed')
+    @Get('delete/:id')
+    @UseTransaction('workloadConnection')
+    async deletePdf(@Param('id') id: number) {
+        return this.prined.deletePdf(id);
+    }
+
+    @Post('update-files')
     @UseTransaction('workloadConnection')
     async updatePrintedStatus(
         @Body() body: { files: number; status: number; page: number },
     ) {
-        return this.tag.updatePrintFileStatus(
+        return this.prined.updatePrintFileStatus(
             body.files,
             body.status,
             body.page,
         );
     }
 
-    @Get('delete/:id')
-    @UseTransaction('workloadConnection')
-    async deletePdf(@Param('id') id: number) {
-        return this.tag.deletePdf(id);
-    }
-
-
-
     //Job scheduling for NC Detail
-    @Get('notify-nc-detail')
+    /* @Get('notify-nc-detail')
     async notifyNcDetail() {
         return this.tag.notifyNcDetail();
     }

@@ -1,7 +1,7 @@
 import { ViewColumn, ViewEntity } from 'typeorm';
 
 @ViewEntity({ name: 'IDTAGS_CNDATA', schema: 'WORKLOAD' })
-export class IdtagCndata {
+export class IdtagCnData {
     @ViewColumn()
     FILES_ID: number;
 

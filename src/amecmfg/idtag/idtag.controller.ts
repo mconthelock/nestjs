@@ -7,16 +7,22 @@ import {
     UploadedFiles,
     UseInterceptors,
 } from '@nestjs/common';
-import { IdtagService } from './idtag.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
-import { SearchIdtagFilesDto } from './dto/search-idtag-file.dto';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
+
+import { IdtagService } from './idtag.service';
+import { PrintedService } from './printed/printed.service';
+
+import { SearchIdtagFilesDto } from './printed/dto/search-idtag-file.dto';
 
 @ApiTags('AS400 - ID Tag')
 @Controller('idtag')
 export class IdtagController {
-    constructor(private readonly tag: IdtagService) {}
+    constructor(
+        private readonly tag: IdtagService,
+        private readonly prined: PrintedService,
+    ) {}
 
     @Post('schd')
     findBySchd(@Body() body: { schd: string; schdp?: string }) {
@@ -73,6 +79,20 @@ export class IdtagController {
     }
 
     //Print PDF on ITADMIN Project
+    @Get('print-master')
+    async findAllFolder() {
+        return this.prined.findMaster();
+    }
+
+    @Post('print-list')
+    @UseTransaction('workloadConnection')
+    async getPrintPfd(
+        @Body()
+        body: SearchIdtagFilesDto,
+    ) {
+        return this.prined.findAllFiles(body);
+    }
+
     @Post('process-pdf')
     @UseInterceptors(getFileUploadInterceptor('files[]', true, 20))
     async processPdfDocument(
@@ -86,49 +106,46 @@ export class IdtagController {
             bmdate: string;
         },
     ) {
-        return this.tag.processPdfDocument(body, files);
-    }
-
-    @Post('print-list')
-    @UseTransaction('workloadConnection')
-    async getPrintPfd(
-        @Body()
-        body: SearchIdtagFilesDto,
-    ) {
-        return this.tag.findAllFiles(body);
+        return this.prined.processPdfDocument(body, files);
     }
 
     @Get('download/:id')
     @UseTransaction('workloadConnection')
     async downloadFile(@Param('id') id: number) {
-        return this.tag.downloadFile(id);
+        return this.prined.downloadFile(id);
     }
 
     @Get('process-logs/:id')
     async processPdfLog(@Param('id') id: number) {
-        return this.tag.findFilesLog(id);
+        return this.prined.findFilesLog(id);
     }
 
-    @Post('update-printed')
+    @Get('delete/:id')
+    @UseTransaction('workloadConnection')
+    async deletePdf(@Param('id') id: number) {
+        return this.prined.deletePdf(id);
+    }
+
+    @Post('update-files')
     @UseTransaction('workloadConnection')
     async updatePrintedStatus(
         @Body() body: { files: number; status: number; page: number },
     ) {
-        return this.tag.updatePrintFileStatus(
+        return this.prined.updatePrintFileStatus(
             body.files,
             body.status,
             body.page,
         );
     }
 
-    @Get('delete/:id')
-    @UseTransaction('workloadConnection')
-    async deletePdf(@Param('id') id: number) {
-        return this.tag.deletePdf(id);
+    //Job scheduling for NC Detail
+    /* @Get('notify-nc-detail')
+    async notifyNcDetail() {
+        return this.tag.notifyNcDetail();
     }
 
-    @Get('print-master')
-    async findAllFolder() {
-        return this.tag.findMaster();
-    }
+    @Get('process-nc-detail')
+    async processNcDetail() {
+        return this.tag.processNcDetail();
+    }*/
 }

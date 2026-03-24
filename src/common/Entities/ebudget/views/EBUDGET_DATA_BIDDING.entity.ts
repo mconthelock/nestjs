@@ -37,4 +37,22 @@ export class EBUDGET_DATA_BIDDING {
 
     @ViewColumn()
     VINPUTER: string;
+
+    @ViewColumn()
+    REQSEC: string;
+
+    @ViewColumn()
+    REQDEPT: string;
+
+    @ViewColumn()
+    REQDIV: string;
+
+    @ViewColumn()
+    INPUTSEC: string;
+
+    @ViewColumn()
+    INPUTDEPT: string;
+
+    @ViewColumn()
+    INPUTDIV: string;
 }

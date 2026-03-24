@@ -17,8 +17,9 @@ import { UpdateStatusDispatchDto } from './dto/update-status-dispatch.dto';
 import { UpdatePassengerStatusDto } from './dto/update-passenger-status.dto';
 import { UpdateLineStatusDto } from './dto/update-line-status.dto';
 import { UpdateLineTypeDto } from './dto/update-line-type.dto';
-import * as fs from 'fs';
-import * as path from 'path';
+import { RunDailyScheduleDto } from './dto/build-run-daily-schedule.dto';
+
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class DispatchService {
@@ -1066,8 +1067,71 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     };
   }
 
-  async updateDispatchHead(dto:SaveDispatchDto){
+  async runDailySchedule(dto: RunDailyScheduleDto) {
+    const runDate = dayjs().format('YYYY-MM-DD');
+    const updateBy = dto.update_by;
 
+    const today = dayjs(runDate);
+    const tomorrow = today.add(1, 'day');
+
+    const jobs : BuildDailyFirstDto[]  = [
+      {
+        workdate: today.startOf('day').toDate(),
+        dispatch_type: 'O',
+        timeout_from: '1730',
+        timeout_to: '1930',
+        update_by: updateBy,
+        shift: 'D',
+      },
+      {
+        workdate: today.startOf('day').toDate(),
+        dispatch_type: 'O',
+        timeout_from: '1730',
+        timeout_to: '2130',
+        update_by: updateBy,
+        shift: 'D',
+      },
+      {
+        workdate: tomorrow.startOf('day').toDate(),
+        dispatch_type: 'O',
+        timeout_from: '0530',
+        timeout_to: '0730',
+        update_by: updateBy,
+        shift: 'D',
+      },
+    ];
+
+    for (const job of jobs) {
+      await this.buildDailyFirst(job);
+    }
+
+    const isHoliday = await this.checkHoliday(tomorrow.format('YYYYMMDD'));
+
+    if (isHoliday) {
+      await this.buildDailyFirst({
+        workdate: tomorrow.startOf('day').toDate(),
+        dispatch_type: 'O',
+        timeout_from: '0800',
+        timeout_to: '1700',
+        update_by: updateBy,
+        shift: 'D',
+      });
+    }
+
+    return {
+      status: true,
+      message: 'Run daily schedule completed',
+    };
+  }
+
+  async checkHoliday(holidayDate: string): Promise<boolean> {
+    const rows = await this.dataSource.query(
+      `SELECT HOLIDAY
+        FROM WEBFORM.HOLIDAY
+        WHERE HOLIDAY = :1`,
+      [holidayDate],
+    );
+    return Array.isArray(rows) && rows.length > 0;
   }
 
 }

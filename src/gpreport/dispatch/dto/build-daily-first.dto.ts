@@ -10,5 +10,5 @@ export class BuildDailyFirstDto extends DispatchKeyDto {
   timeout_to: string;
 
   @IsString()
-  update_by: string;  
+  update_by: string;
 }

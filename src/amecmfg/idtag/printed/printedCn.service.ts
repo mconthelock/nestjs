@@ -8,6 +8,7 @@ import { writeLineBox } from 'src/common/helpers/file-pdf.helper';
 import { IdTagRepository } from './idtag.repository';
 import { PrintedService } from './printed.service';
 import { R027mp1Service } from 'src/as400/rtnlibf/r027mp1/r027mp1.service';
+
 @Injectable()
 export class PrintedCnService {
     constructor(

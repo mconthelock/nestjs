@@ -13,6 +13,8 @@ import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper'
 
 import { IdtagService } from './idtag.service';
 import { PrintedService } from './printed/printed.service';
+import { PrintedNcService } from './printed/printedNc.service';
+import { PrintedTopLabelService } from './printed/printedTopLabel.service';
 
 import { SearchIdtagFilesDto } from './printed/dto/search-idtag-file.dto';
 
@@ -21,7 +23,9 @@ import { SearchIdtagFilesDto } from './printed/dto/search-idtag-file.dto';
 export class IdtagController {
     constructor(
         private readonly tag: IdtagService,
-        private readonly prined: PrintedService,
+        private readonly printed: PrintedService,
+        private readonly nc: PrintedNcService,
+        private readonly label: PrintedTopLabelService,
     ) {}
 
     @Post('schd')
@@ -81,7 +85,7 @@ export class IdtagController {
     //Print PDF on ITADMIN Project
     @Get('print-master')
     async findAllFolder() {
-        return this.prined.findMaster();
+        return this.printed.findMaster();
     }
 
     @Post('print-list')
@@ -90,7 +94,7 @@ export class IdtagController {
         @Body()
         body: SearchIdtagFilesDto,
     ) {
-        return this.prined.findAllFiles(body);
+        return this.printed.findAllFiles(body);
     }
 
     @Post('process-pdf')
@@ -106,46 +110,45 @@ export class IdtagController {
             bmdate: string;
         },
     ) {
-        return this.prined.processPdfDocument(body, files);
+        return this.printed.processPdfDocument(body, files);
     }
 
     @Get('download/:id')
     @UseTransaction('workloadConnection')
     async downloadFile(@Param('id') id: number) {
-        return this.prined.downloadFile(id);
+        return this.printed.downloadFile(id);
     }
 
     @Get('process-logs/:id')
     async processPdfLog(@Param('id') id: number) {
-        return this.prined.findFilesLog(id);
+        return this.printed.findFilesLog(id);
     }
 
     @Get('delete/:id')
     @UseTransaction('workloadConnection')
     async deletePdf(@Param('id') id: number) {
-        return this.prined.deletePdf(id);
+        return this.printed.deletePdf(id);
     }
 
     @Post('update-files')
     @UseTransaction('workloadConnection')
-    async updatePrintedStatus(
-        @Body() body: { files: number; status: number; page: number },
-    ) {
-        return this.prined.updatePrintFileStatus(
-            body.files,
-            body.status,
-            body.page,
-        );
+    async updatePrintedStatus(@Body() body: { files: number; status: number }) {
+        return this.printed.updatePrintFileStatus(body.files, body.status);
     }
 
     //Job scheduling for NC Detail
-    /* @Get('notify-nc-detail')
+    @Get('notify-nc-detail')
     async notifyNcDetail() {
-        return this.tag.notifyNcDetail();
+        return this.nc.notifyNcDetail();
     }
 
     @Get('process-nc-detail')
     async processNcDetail() {
-        return this.tag.processNcDetail();
-    }*/
+        return this.nc.processNcDetail();
+    }
+
+    @Get('process-label')
+    async processLabelDetail() {
+        return this.label.processLabelDetail(35);
+    }
 }

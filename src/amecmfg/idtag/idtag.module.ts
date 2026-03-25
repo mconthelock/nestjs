@@ -20,6 +20,9 @@ import { PrintedQueueService } from './printed/PrintedQueue.service';
 import { PrintedImagesService } from './printed/printedImage.service';
 import { PrintedCnService } from './printed/printedCn.service';
 import { PrintedMergeService } from './printed/printedMerge.service';
+import { PrintedNcService } from './printed/printedNc.service';
+import { PrintedTopLabelService } from './printed/printedTopLabel.service';
+
 @Module({
     imports: [
         FileLoggerModule,
@@ -40,6 +43,8 @@ import { PrintedMergeService } from './printed/printedMerge.service';
         PrintedImagesService,
         PrintedCnService,
         PrintedMergeService,
+        PrintedNcService,
+        PrintedTopLabelService,
     ],
 })
 export class IdtagModule {}

@@ -13,6 +13,7 @@ import { UpdateLineStatusDto } from './dto/update-line-status.dto';
 import { UpdateLineTypeDto } from './dto/update-line-type.dto';
 import { SaveDispatchDto } from './dto/save-dispatch.dto';
 import { RunDailyScheduleDto } from './dto/build-run-daily-schedule.dto';
+import { ExportAndSendMailDto } from './dto/export-and-sendmail.dto';
 
 export class DispatchReportDto {
   @IsString()
@@ -96,7 +97,14 @@ export class DispatchController {
     return this.service.runDailySchedule(dto);
   }
 
+  @Post('create-share-folder')
+  async createShareFolder() {
+    return await this.service.createShareFolder();
+  }
 
-  
+  @Post('export-and-sendmail')
+  async exportAndSendMail(@Body() dto: ExportAndSendMailDto) {
+    return await this.service.exportAndSendMail(dto);
+  }
 
 } 

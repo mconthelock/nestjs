@@ -300,17 +300,6 @@ export class MfgDrawingCreateChecksheetService {
         const match = drawing.find((d) => {
             return control.some((c) => {
                 const drawing = d.S11M04;
-                // ถ้า drawing อยู่ใน delete list ให้ข้าม
-                // if (
-                //     state.delete.some(
-                //         (e) => drawing === e || drawing.startsWith(e + ' '),
-                //     )
-                // ) {
-                //     return false;
-                // }
-                // console.log('Drawing', drawing);
-                // console.log('Control', c);
-                // console.log('Match', drawing === c || drawing.startsWith(c + ' '));
                 // ถ้า drawing ตรงกับ control หรือเริ่มต้นด้วย control ตามด้วย space ให้ถือว่า match
                 return drawing === c || drawing.startsWith(c + ' ');
             });
@@ -476,7 +465,7 @@ export class MfgDrawingCreateChecksheetService {
 
     /**
      * Check if a drawing should be deleted based on the delete list.
-     * @param deleteDwg 'BA212B768 G01 L03~L05'
+     * @param deleteDwg ['BA212B768 G01 L03~L05', ...]
      * @param drawing 'BA212B768 G01L03L04L05'
      * @returns boolean
      * @description เปรียบเทียบ drawing กับ delete list โดยแยกตัวอักษร G และ L ออกจากกัน แล้วตรวจสอบว่า drawing มีค่า G และ L ที่ตรงกับ delete list หรือไม่ โดยที่ถ้า delete list มี G01 L03~L05 จะถือว่า G01L03L04L05 ตรงกับ delete list และควรจะถูกลบ
@@ -686,7 +675,9 @@ export class MfgDrawingCreateChecksheetService {
                 // ถ้าไม่ใช่ multi และ drawing อยู่ใน delete list ให้ตั้ง status เป็น 3
                 if (
                     typeName != 'multi' &&
-                    this.checkDeleteDrawing(deleteList, drawing)
+                    this.checkDeleteDrawing(deleteList, drawing) &&
+                    [1,3].includes(isDataExist.data.NSTATUS) &&
+                    isDataExist.data.NINSPECTOR_STATUS === 1
                 ) {
                     data.NSTATUS = 3;
                     if (isDataExist.data.VFILE_NAME) {

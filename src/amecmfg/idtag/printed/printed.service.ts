@@ -10,7 +10,6 @@ import { FileLoggerService } from 'src/common/services/file-logger/file-logger.s
 import { PrintedQueueService } from './PrintedQueue.service';
 import { IdTagRepository } from './idtag.repository';
 import { SearchIdtagFilesDto } from './dto/search-idtag-file.dto';
-import { FiltersDto } from 'src/common/dto/filter.dto';
 
 export interface PdfProcessContext {
     logFileName: string;
@@ -53,7 +52,11 @@ export interface PdfJobStatus {
 export class PrintedService {
     private readonly pdfContext = new AsyncLocalStorage<PdfProcessContext>();
     public readonly pdfJobStatusMap = new Map<string, PdfJobStatus>();
-    private pdfProcessQueue: Promise<void> = Promise.resolve();
+    private readonly maxParallelPdfJobs = this.resolveMaxParallelPdfJobs(
+        process.env.IDTAG_PDF_MAX_CONCURRENT_JOBS,
+    );
+    private activePdfJobs = 0;
+    private readonly pendingPdfJobs: Array<() => Promise<void>> = [];
 
     constructor(
         private readonly fileLogger: FileLoggerService,
@@ -106,6 +109,44 @@ export class PrintedService {
         if (minutes > 0) return `${minutes} min ${seconds} sec ${ms} ms`;
         if (seconds > 0) return `${seconds} sec ${ms} ms`;
         return `${ms} ms`;
+    }
+
+    private resolveMaxParallelPdfJobs(raw?: string): number {
+        const fallback = 3;
+        if (!raw) {
+            return fallback;
+        }
+
+        const parsed = Number(raw);
+        if (!Number.isFinite(parsed)) {
+            return fallback;
+        }
+
+        const rounded = Math.floor(parsed);
+        return Math.min(5, Math.max(3, rounded));
+    }
+
+    private enqueuePdfProcessJob(task: () => Promise<void>): void {
+        this.pendingPdfJobs.push(task);
+        this.runPendingPdfJobs();
+    }
+
+    private runPendingPdfJobs(): void {
+        while (
+            this.activePdfJobs < this.maxParallelPdfJobs &&
+            this.pendingPdfJobs.length > 0
+        ) {
+            const nextTask = this.pendingPdfJobs.shift();
+            if (!nextTask) {
+                return;
+            }
+
+            this.activePdfJobs += 1;
+            void nextTask().finally(() => {
+                this.activePdfJobs -= 1;
+                this.runPendingPdfJobs();
+            });
+        }
     }
 
     async processPdfDocument(
@@ -162,10 +203,10 @@ export class PrintedService {
                 data: tagData,
             });
 
-            //Process PDF in background queue
-            this.pdfProcessQueue = this.pdfProcessQueue
-                .then(() =>
-                    this.queue.runPdfProcessJob(
+            // Process PDF jobs concurrently with a bounded worker pool.
+            this.enqueuePdfProcessJob(async () => {
+                try {
+                    await this.queue.runPdfProcessJob(
                         {
                             ...dbData,
                             fileid: tagData.FILES,
@@ -174,9 +215,8 @@ export class PrintedService {
                             logFileName: pdfContext.logFileName,
                         },
                         jobId,
-                    ),
-                )
-                .catch((error) => {
+                    );
+                } catch (error) {
                     this.pdfJobStatusMap.set(jobId, {
                         ...(this.pdfJobStatusMap.get(jobId) || {
                             jobId,
@@ -190,12 +230,13 @@ export class PrintedService {
                                 ? error.message
                                 : String(error),
                     });
-                    this.writeLog(
+                    await this.writeLog(
                         `[${jobId}] Background queue error`,
                         error instanceof Error ? error.message : String(error),
                         pdfContext.logFileName,
                     );
-                });
+                }
+            });
         }
         return {
             status: 'queued',
@@ -304,7 +345,7 @@ export class PrintedService {
                 recursive: true,
                 force: true,
             });
-            return this.repo.deletePdf(filesId);
+            return this.repo.deleteFiles(filesId);
         } catch (error) {
             throw new Error(
                 `Error deleting PDF directory for FILES_ID ${filesId}`,
@@ -312,205 +353,29 @@ export class PrintedService {
         }
     }
 
-    async updatePrintFileStatus(filesId: number, status: number, page: number) {
-        const file = await this.repo.updatePrintFileStatus(filesId, status);
-        const pages = await this.repo.updatePrintPagesStatus(filesId, status);
-        return { file, pages };
+    async updatePrintFileStatus(filesId: number, status: number) {
+        try {
+            const file = await this.repo.findAllFiles({ FILES: filesId });
+            this.repo.updatePages(
+                Array.from({ length: file[0].FILE_TOTALPAGE }, (_, i) => ({
+                    FILES_ID: filesId,
+                    PAGE_NUM: i + 1,
+                    PAGE_STATUS: status.toString(),
+                })),
+            );
+            return this.repo.updateFiles({
+                FILES: filesId,
+                FILE_STATUS: status,
+                PRINTED_DATE: status === 3 ? new Date() : null,
+            });
+        } catch (error) {
+            throw new Error(
+                `Error updating print file status for FILES_ID ${filesId}`,
+            );
+        }
+
+        //const file = await this.repo.updatePrintFileStatus(filesId, status);
+        //const pages = await this.repo.updatePrintPagesStatus(filesId, status);
+        //return { file, pages };
     }
-
-    //Job scheduling for NC Detail
-    // async notifyNcDetail() {
-    //     const templatePath = path.join(
-    //         process.env.IDTAG_FILE_PATH,
-    //         `templates/NC Detail Template.xlsx`,
-    //     );
-    //     const exportFileName = `NC Detail ${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`;
-    //     const data = await this.repo.findNcDetail({
-    //         filters: [{ field: 'TASKNAME', op: 'isNull' }],
-    //     });
-
-    //     try {
-    //         const attachment = await exportExcel({
-    //             templatePath,
-    //             filename: exportFileName,
-    //             data,
-    //         });
-    //         await this.mail.sendMail({
-    //             to: 'chalorms@MitsubishiElevatorAsia.co.th',
-    //             subject: `NC Detail Report - ${dayjs().format('YYYY-MM-DD')}`,
-    //             html: '',
-    //             attachments: [
-    //                 {
-    //                     filename: exportFileName,
-    //                     content: attachment,
-    //                 },
-    //             ],
-    //         });
-    //     } catch (error) {
-    //         throw new Error(
-    //             `Error generating NC Detail Excel: ${error instanceof Error ? error.message : String(error)}`,
-    //         );
-    //     }
-    // }
-
-    // async processNcDetail() {
-    //     const data = await this.repo.findNcDetail({
-    //         filters: [
-    //             { field: 'TASKNAME', op: 'isNotNull' },
-    //             { field: 'PAGE_NC', op: 'eq', value: '0' },
-    //         ],
-    //     });
-    //     try {
-    //         if (!data.length) return;
-    //         const grouped = new Map<number, any[]>();
-    //         for (const row of data) {
-    //             const group = grouped.get(row.FILES_ID) || [];
-    //             group.push(row);
-    //             grouped.set(row.FILES_ID, group);
-    //         }
-
-    //         for (const [filesId, item] of grouped) {
-    //             const dbData: filesData = {
-    //                 bmdate: item[0].SCHDDATE,
-    //                 folder: item[0].FILE_FOLDER,
-    //                 originalfilename: `${item[0].FILE_ONAME.replace(/\.pdf$/i, '')}(${item[0].TASKNAME}).pdf`,
-    //                 filename: `${Date.now()}.pdf`,
-    //                 pageCount: item.length,
-    //                 schd_number: item[0].SCHDNUMBER,
-    //                 schd_txt: item[0].SCHDCHAR,
-    //                 schdp: item[0].SCHDP,
-    //                 parentFileId: filesId,
-    //             };
-    //             const tagData = await this.saveTagsData(dbData);
-    //             console.log(tagData);
-    //         }
-
-    //         // const results: {
-    //         //     filesId: number;
-    //         //     taskName: string;
-    //         //     pages: number;
-    //         //     outputPath?: string;
-    //         //     status: 'processed' | 'skipped' | 'failed';
-    //         //     reason?: string;
-    //         // }[] = [];
-
-    //         // for (const [filesId, groupRows] of grouped.entries()) {
-    //         //     const firstRow = groupRows[0];
-    //         //     const fileName =
-    //         //         firstRow?.FILE_ONAME ||
-    //         //         firstRow?.FILE_NAME ||
-    //         //         `${filesId}.pdf`;
-
-    //         //     try {
-    //         //         const pdfContext = await this.setPdfPath({
-    //         //             schd_number: firstRow.SCHDNUMBER,
-    //         //             schd_txt: firstRow.SCHDCHAR,
-    //         //             schd_p: firstRow.SCHDP,
-    //         //             filedir: firstRow.FILE_FOLDER,
-    //         //             filename: fileName,
-    //         //         });
-
-    //         //         const taskName = String(firstRow.TASKNAME || 'NC_DETAIL')
-    //         //             .trim()
-    //         //             .replace(/[<>:"/\\|?*\x00-\x1F]/g, '_');
-    //         //         const outputDirectory = path.join(
-    //         //             pdfContext.pdfDirectory,
-    //         //             'NC_DETAIL',
-    //         //         );
-    //         //         await fs.mkdir(outputDirectory, { recursive: true });
-
-    //         //         const outputFileName = `${taskName}_${filesId}_${dayjs().format('YYYYMMDD_HHmmss')}.pdf`;
-    //         //         const outputPath = path.join(
-    //         //             outputDirectory,
-    //         //             outputFileName,
-    //         //         );
-
-    //         //         const sourcePages: { filePath: string }[] = [];
-    //         //         const pageNums: number[] = [];
-
-    //         //         for (const row of groupRows) {
-    //         //             const pagePath = path.join(
-    //         //                 pdfContext.pdfDirectory,
-    //         //                 `${row.PAGE_TAG}.pdf`,
-    //         //             );
-    //         //             const exists = await fs
-    //         //                 .access(pagePath)
-    //         //                 .then(() => true)
-    //         //                 .catch(() => false);
-
-    //         //             if (!exists) {
-    //         //                 await this.writeLog(
-    //         //                     `[NC_DETAIL][${filesId}] Missing page file: ${pagePath}`,
-    //         //                     undefined,
-    //         //                     pdfContext.logFileName,
-    //         //                 );
-    //         //                 continue;
-    //         //             }
-
-    //         //             sourcePages.push({ filePath: pagePath });
-    //         //             pageNums.push(Number(row.PAGE_NUM));
-    //         //         }
-
-    //         //         if (!sourcePages.length) {
-    //         //             results.push({
-    //         //                 filesId,
-    //         //                 taskName,
-    //         //                 pages: 0,
-    //         //                 status: 'skipped',
-    //         //                 reason: 'No source pages found',
-    //         //             });
-    //         //             continue;
-    //         //         }
-
-    //         //         await this.mergePdfsFast(sourcePages, outputPath);
-    //         //         await this.repo.updateNcPagesStatusByPageNums(
-    //         //             filesId,
-    //         //             pageNums,
-    //         //             '1',
-    //         //         );
-
-    //         //         await this.writeLog(
-    //         //             `[NC_DETAIL][${filesId}] Created ${outputPath} (${sourcePages.length} pages)`,
-    //         //             undefined,
-    //         //             pdfContext.logFileName,
-    //         //         );
-
-    //         //         results.push({
-    //         //             filesId,
-    //         //             taskName,
-    //         //             pages: sourcePages.length,
-    //         //             outputPath,
-    //         //             status: 'processed',
-    //         //         });
-    //         //     } catch (groupError) {
-    //         //         results.push({
-    //         //             filesId,
-    //         //             taskName: String(firstRow?.TASKNAME || 'NC_DETAIL'),
-    //         //             pages: groupRows.length,
-    //         //             status: 'failed',
-    //         //             reason:
-    //         //                 groupError instanceof Error
-    //         //                     ? groupError.message
-    //         //                     : String(groupError),
-    //         //         });
-    //         //     }
-    //         // }
-
-    //         // return {
-    //         //     status: 'completed',
-    //         //     totalGroups: grouped.size,
-    //         //     processedGroups: results.filter((x) => x.status === 'processed')
-    //         //         .length,
-    //         //     skippedGroups: results.filter((x) => x.status === 'skipped')
-    //         //         .length,
-    //         //     failedGroups: results.filter((x) => x.status === 'failed')
-    //         //         .length,
-    //         //     results,
-    //         // };
-    //     } catch (error) {
-    //         throw new Error(
-    //             `Error processing NC Detail: ${error instanceof Error ? error.message : String(error)}`,
-    //         );
-    //     }
-    // }
 }

@@ -197,11 +197,7 @@ export class PrintedService {
                 message: 'PDF job is queued',
                 queuedAt: new Date().toISOString(),
             });
-
-            queuedJobs.push({
-                jobId,
-                data: tagData,
-            });
+            queuedJobs.push({ jobId, data: tagData });
 
             // Process PDF jobs concurrently with a bounded worker pool.
             this.enqueuePdfProcessJob(async () => {

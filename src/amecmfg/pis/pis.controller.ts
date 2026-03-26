@@ -22,23 +22,13 @@ export class PisController {
     async processPdfDocument(
         @UploadedFiles() files: Express.Multer.File[],
         @Body()
-        body: {},
+        body: {
+            schd_number: string;
+            schd_txt: string;
+            schd_p: string;
+            bmdate: string;
+        },
     ) {
         return this.printed.processPdfDocument(body, files);
-    }
-
-    @Get('test')
-    async test() {
-        const input = `${process.env.IDTAG_FILE_PATH}TEST/PISESC1170326.pdf`;
-        await this.printed.processPdfDocumentTs(
-            {
-                filename: 'PISESC1170326.pdf',
-                schd_txt: '202604X',
-                schd_p: 'P1',
-                filedir: '',
-            },
-            input,
-        );
-        return { message: 'PIS Controller is working!' };
     }
 }

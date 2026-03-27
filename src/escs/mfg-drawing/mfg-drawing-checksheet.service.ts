@@ -81,7 +81,7 @@ export class MfgDrawingCreateChecksheetService {
                 );
             }
             let drawing: string;
-            let controlNo: string;
+            let controlNo: string = dto.VCONTROLNO;
             let fileName: string;
             let newfileName: string;
             let serialList: { VSERIALNO: string; NTYPE: number }[];
@@ -90,11 +90,11 @@ export class MfgDrawingCreateChecksheetService {
                 case 'multi':
                     newfileName = dto.ASERIALNO[0];
                     fileName = itemData.VFILE;
-                    dataByidTag = await this.getDrawingByIdTag(
-                        dto.ASERIALNO[0],
-                    );
-                    drawing = dataByidTag.drawing;
-                    controlNo = dataByidTag.controlNo;
+                    // dataByidTag = await this.getDrawingByIdTag(
+                    //     dto.ASERIALNO[0],
+                    // );
+                    // drawing = dataByidTag.drawing;
+                    drawing = await this.getDrawingByControlNo(controlNo);
                     serialList = dto.ASERIALNO.map((sn, index) => ({
                         VSERIALNO: sn,
                         NTYPE: 1, // กำหนด type เป็น 1 สำหรับ serial no ทั้งหมดในกรณี multi
@@ -112,12 +112,11 @@ export class MfgDrawingCreateChecksheetService {
                     break;
                 default:
                     newfileName = dto.ASERIALNO[0];
-                    dataByidTag = await this.getDrawingByIdTag(
-                        dto.ASERIALNO[0],
-                    );
-                    drawing = dataByidTag.drawing;
-                    controlNo = dataByidTag.controlNo;
-
+                    // dataByidTag = await this.getDrawingByIdTag(
+                    //     dto.ASERIALNO[0],
+                    // );
+                    // drawing = dataByidTag.drawing;
+                    drawing = await this.getDrawingByControlNo(controlNo);
                     listOfCS = this.getDataListOfCS(itemLists, drawing);
                     fileName = listOfCS.VNUMBER_FILE;
                     serialList = dto.ASERIALNO.map((sn, index) => ({
@@ -171,6 +170,55 @@ export class MfgDrawingCreateChecksheetService {
         } catch (error) {
             throw new Error('Create Checksheet Failed: ' + error.message);
         }
+    }
+
+    async getDrawingByControlNo(controlNo: string): Promise<string> {
+        const f001kp: { status: boolean; data?: F001KP; message: string } =
+            await this.f001kpService.findOne(controlNo);
+        if (!f001kp.status) {
+            throw new Error(`F001KP with control no ${controlNo} not found`);
+        }
+        const data = f001kp.data;
+        let drawing: string = null;
+        if (!data.F01R06 || data.F01R06.trim() === '') {
+            if (!data.F01R05 || data.F01R05.trim() === '') {
+                drawing = data.F01R04;
+            } else {
+                drawing = data.F01R05;
+            }
+        } else {
+            drawing = data.F01R06;
+        }
+        // หาจาก General part list ด้วย order และ item ที่ได้จาก F001KP
+        const order = data.F01R07?.trim();
+        const item = data.F01R03?.trim();
+        const getGpl = await this.generalPartListService.getGPL(order, item);
+        if (!getGpl.status) {
+            throw new Error(
+                `General Part List with order ${order} and item ${item} not found`,
+            );
+        }
+        const gpl = getGpl.data;
+
+        const match = gpl.find((d) => {
+            if (!d.DRAWING || d.DRAWING.trim() === '') {
+                return false;
+            }
+            const gplDrawing = d.DRAWING.replace(/\s/g, '');
+            const targetDrawing = drawing.replace(/\s/g, '');
+            return (
+                gplDrawing === targetDrawing ||
+                gplDrawing.startsWith(targetDrawing)
+            );
+        });
+
+        if (!match) {
+            throw new Error(
+                `No matching drawing found in General Part List for drawing ${drawing}, order ${order} and item ${item}`,
+            );
+        }
+
+        return match.DRAWING;
     }
 
     async getDrawingByIdTag(

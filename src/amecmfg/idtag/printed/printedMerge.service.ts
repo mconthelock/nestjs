@@ -115,5 +115,7 @@ export class PrintedMergeService {
                 );
             });
         });
+
+        return compressedPath;
     }
 }

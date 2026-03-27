@@ -5,17 +5,26 @@ import {
     Post,
     Body,
     Get,
+    Param,
 } from '@nestjs/common';
 import { PisService } from './pis.service';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { PrintedService } from './printed/printed.service';
+import { UseTransaction } from 'src/common/decorator/transaction.decorator';
+import { SearchPisFilesDto } from './printed/dto/search-pis-file.dto';
 
 @Controller('pis')
 export class PisController {
-    constructor(
-        private readonly pisService: PisService,
-        private readonly printed: PrintedService,
-    ) {}
+    constructor(private readonly printed: PrintedService) {}
+
+    @Post('print-list')
+    @UseTransaction('workloadConnection')
+    async getPrintPfd(
+        @Body()
+        body: SearchPisFilesDto,
+    ) {
+        return this.printed.findAllFiles(body);
+    }
 
     @Post('process-pdf')
     @UseInterceptors(getFileUploadInterceptor('files[]', true, 20))
@@ -30,5 +39,23 @@ export class PisController {
         },
     ) {
         return this.printed.processPdfDocument(body, files);
+    }
+
+    @Get('download/:id')
+    @UseTransaction('workloadConnection')
+    async downloadFile(@Param('id') id: number) {
+        return this.printed.downloadFile(id);
+    }
+
+    @Post('update-files')
+    @UseTransaction('workloadConnection')
+    async updatePrinted(@Body() body: { files: number; status: number }) {
+        return this.printed.updatePrint(body.files, body.status);
+    }
+
+    @Get('delete/:id')
+    @UseTransaction('workloadConnection')
+    async deletePdf(@Param('id') id: number) {
+        return this.printed.deletePdf(id);
     }
 }

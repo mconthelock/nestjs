@@ -23,7 +23,8 @@ async function bootstrap() {
     const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
     await fs.mkdir(uploadPath, { recursive: true });
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-        logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
+        // logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
+        logger: ['error', 'warn'], // เปิดเฉพาะ log ระดับ error และ warn ของ NestJS เพื่อให้ winston จัดการ log ทั้งหมด
     });
 
     app.enableCors({

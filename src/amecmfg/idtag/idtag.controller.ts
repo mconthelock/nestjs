@@ -146,9 +146,4 @@ export class IdtagController {
     async processNcDetail() {
         return this.nc.processNcDetail();
     }
-
-    @Get('process-label')
-    async processLabelDetail() {
-        return this.label.processLabelDetail(35);
-    }
 }

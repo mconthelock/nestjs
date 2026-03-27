@@ -297,7 +297,10 @@ export class PrintedService {
             schd_txt: fileData[0].SCHDCHAR,
             schd_p: fileData[0].SCHDP,
             filedir: fileData[0].FILE_FOLDER,
-            filename: fileData[0].FILE_ONAME,
+            filename:
+                fileData[0].FILES_PARENT != null
+                    ? fileData[0].FILE_NAME
+                    : fileData[0].FILE_ONAME,
         });
         try {
             return {

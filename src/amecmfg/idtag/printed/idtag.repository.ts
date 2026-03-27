@@ -117,15 +117,23 @@ export class IdTagRepository extends BaseRepository {
     async updatePages(
         pagesData: Array<
             Omit<UpadateIdtagPagesDto, 'FILES_ID' | 'PAGE_NUM'> &
-                Pick<CreateIdtagPagesDto, 'FILES_ID' | 'PAGE_NUM'>
+                Pick<CreateIdtagPagesDto, 'FILES_ID' | 'PAGE_NUM'> & {
+                    NEXT_FILES_ID?: number;
+                }
         >,
     ) {
         const updatePromises = pagesData.map((pageData) => {
-            const { FILES_ID, PAGE_NUM, ...updateData } = pageData;
+            const { FILES_ID, PAGE_NUM, NEXT_FILES_ID, ...updateData } =
+                pageData;
             return this.manager.update(
                 IdtagPages,
                 { FILES_ID, PAGE_NUM },
-                updateData,
+                {
+                    ...updateData,
+                    ...(NEXT_FILES_ID != null
+                        ? { FILES_ID: NEXT_FILES_ID }
+                        : {}),
+                },
             );
         });
         await Promise.all(updatePromises);

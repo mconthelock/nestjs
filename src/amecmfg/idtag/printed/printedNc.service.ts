@@ -80,14 +80,19 @@ export class PrintedNcService {
                     bmdate: item[0].SCHDDATE,
                     folder: item[0].FILE_FOLDER,
                     originalfilename: `${item[0].FILE_ONAME.replace(/\.pdf$/i, '')}(${item[0].TASKNAME}).pdf`,
-                    filename: `${Date.now()}.pdf`,
+                    filename: item[0].FILE_ONAME,
                     pageCount: item.length,
                     schd_number: item[0].SCHDNUMBER,
                     schd_txt: item[0].SCHDCHAR,
                     schdp: item[0].SCHDP,
                     parentFileId: filesId,
                 };
-                // const tagData = await this.printed.saveTagsData(dbData);
+                const tagData = await this.printed.saveTagsData(dbData);
+
+                await this.repo.updateFiles({
+                    FILES: filesId,
+                    FILE_PRINTEDPAGE: item[0].FILE_PRINTEDPAGE + item.length,
+                });
 
                 const splitFilesData: {
                     fileName: string;
@@ -109,16 +114,12 @@ export class PrintedNcService {
 
                     await this.printed.writeLog(
                         `Processing NC Detail for ${dbData.originalfilename}, PAGE_TAG ${row.PAGE_TAG}`,
-                        null,
-                        pdfContext.logFileName,
                     );
 
                     try {
                         await this.embedNCToPdf(pdfPath, row.TAGMARK);
                         await this.printed.writeLog(
                             `Put NC No. ${row.TAGMARK} to ${row.PAGE_TAG}`,
-                            null,
-                            pdfContext.logFileName,
                         );
 
                         splitFilesData.push({
@@ -132,19 +133,35 @@ export class PrintedNcService {
                             error instanceof Error
                                 ? error.message
                                 : String(error),
-                            pdfContext.logFileName,
                         );
                     }
                 }
 
-                this.merge.mergePdfsFast(
-                    splitFilesData,
-                    path.join(pdfContext.pdfDirectory, dbData.filename),
+                await this.repo.updatePages(
+                    splitFilesData.map((file) => ({
+                        FILES_ID: filesId,
+                        PAGE_NUM: file.pageNumber,
+                        NEXT_FILES_ID: tagData.FILES,
+                        PAGE_NC: '1',
+                    })),
                 );
+                await this.repo.updateFiles({
+                    FILES: tagData.FILES,
+                    FILE_STATUS: 2,
+                });
+
+                const outputPath = path.join(
+                    pdfContext.pdfDirectory,
+                    dbData.filename,
+                );
+                const filnalFilePath = path.join(
+                    pdfContext.pdfDirectory,
+                    dbData.originalfilename,
+                );
+                await this.merge.mergePdfsFast(splitFilesData, outputPath);
+                await fs.rename(outputPath, filnalFilePath);
                 await this.printed.writeLog(
                     `Merged NC Detail PDF for ${dbData.originalfilename}`,
-                    null,
-                    pdfContext.logFileName,
                 );
             }
         } catch (error) {
@@ -168,13 +185,13 @@ export class PrintedNcService {
             ...opt,
             text: `${ncData}`,
             align: 'right',
-            boxX: 425,
+            boxX: 260,
             boxY: 790,
-            boxWidth: 150,
+            boxWidth: 300,
             // drawBorder: {
             //     color: rgb(0.9, 0.9, 0.9),
-            //     width: 0,
-            //     bgColor: rgb(0.9, 0.9, 0.9),
+            //     width: 0.5,
+            //     bgColor: rgb(1, 0.9, 0.9),
             // },
         });
         await fs.writeFile(pdfPath, await pdfDoc.save());

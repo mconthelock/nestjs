@@ -88,7 +88,7 @@ export class PrintedTopLabelService {
             ...opt,
             text: `${labelData}`,
             align: 'right',
-            boxX: 275,
+            boxX: 260,
             boxY: 10,
             boxWidth: 300,
             // drawBorder: {
@@ -102,7 +102,7 @@ export class PrintedTopLabelService {
             ...opt,
             text: `${labelData}`,
             align: 'right',
-            boxX: 275,
+            boxX: 260,
             boxY: 810,
             boxWidth: 300,
             // drawBorder: {

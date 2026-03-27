@@ -265,8 +265,8 @@ export class OrderListService {
      */
     async orderlistNew(dto: SearchOrderListDto) {
         const data = await this.setQueryNew(dto).getRawMany();
-        return data;
-        // return await this.getRevisionHistory(data);
+        // return data;
+        return await this.getRevisionHistory(data);
     }
 
     async confirm(dto: SearchOrderListDto) {

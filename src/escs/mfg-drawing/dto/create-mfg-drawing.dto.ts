@@ -93,6 +93,11 @@ export class CreateMfgDrawingCheckSheetDto {
     @Type(() => String)
     VPIS?: string;
 
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    VCONTROLNO?: string;
+
     @IsNotEmpty()
     @IsArray()
     @IsString({ each: true })

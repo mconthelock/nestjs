@@ -912,10 +912,11 @@ export class DispatchService {
     };
   }
 
+
+//---------------------------------------------- R U N  J O B ------------------------------------------------------
   async runDailySchedule(dto: RunDailyScheduleDto) {
     const runDate = dayjs().format('YYYY-MM-DD');
     const updateBy = dto.update_by;
-
     const today = dayjs(runDate);
     const tomorrow = today.add(1, 'day');
 
@@ -950,17 +951,20 @@ export class DispatchService {
       await this.buildDailyFirst(job);
     }
 
-    const isHoliday = await this.checkHoliday(tomorrow.format('YYYYMMDD'));
+    // ตรวจวันหยุดต่อเนื่องตั้งแต่วันพรุ่งนี้เป็นต้นไป
+    let holidayDate = tomorrow.clone();
 
-    if (isHoliday) {
+    while (await this.checkHoliday(holidayDate.format('YYYYMMDD'))) {
       await this.buildDailyFirst({
-        workdate: tomorrow.startOf('day').toDate(),
+        workdate: holidayDate.startOf('day').toDate(),
         dispatch_type: 'O',
         timeout_from: '0800',
         timeout_to: '1700',
         update_by: updateBy,
         shift: 'D',
       });
+
+      holidayDate = holidayDate.add(1, 'day');
     }
 
     return {
@@ -969,15 +973,12 @@ export class DispatchService {
     };
   }
 
+
   async checkHoliday(holidayDate: string): Promise<boolean> {
-    const rows = await this.dataSource.query(
-      `SELECT HOLIDAY
-       FROM WEBFORM.HOLIDAY
-       WHERE HOLIDAY = :1`,
-      [holidayDate],
-    );
+    const rows = await this.dataSource.query(`SELECT HOLIDAY FROM WEBFORM.HOLIDAY WHERE HOLIDAY = :1`, [holidayDate], );
     return Array.isArray(rows) && rows.length > 0;
   }
+
 
   async createShareFolder() {
     return this.dispatchExportService.createShareFolder();
@@ -1024,7 +1025,7 @@ export class DispatchService {
     await workbook2.xlsx.writeFile(filePath2);
 
     await this.dispatchMailService.sendDispatchMail({
-      to: dto.mail_to || 'supamid@mitsubishielevatorasia.co.th',
+      to: 'supamid@mitsubishielevatorasia.co.th',
       cc: dto.mail_cc || '',
       bcc: dto.mail_bcc || '',
       subject: `แจ้งแผนการจัดรถพนักงาน (${dto.workdate})`,

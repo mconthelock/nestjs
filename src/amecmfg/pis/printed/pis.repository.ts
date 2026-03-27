@@ -14,6 +14,8 @@ import { PisLabel } from 'src/common/Entities/workload/views/pis-label.entity';
 import { SearchPisFilesDto } from './dto/search-pis-file.dto';
 import { CreatePisPagesDto } from './dto/create-pis-pages.dto';
 import { CreatePisFilesDto } from './dto/create-pis-files.dto';
+import { UpdatePisFilesDto } from './dto/update-pis-file.dto';
+import { UpadatePisPagesDto } from './dto/update-pis-pages.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class PisRepository extends BaseRepository {
@@ -59,5 +61,43 @@ export class PisRepository extends BaseRepository {
         if (pageEntities.length)
             await this.manager.insert(PisPages, pageEntities);
         return savedFile;
+    }
+
+    async updateFiles(fileData: UpdatePisFilesDto) {
+        return await this.manager.update(
+            PisFiles,
+            { FILES: fileData.FILES },
+            fileData,
+        );
+    }
+
+    async updatePages(
+        pagesData: Array<
+            Omit<UpadatePisPagesDto, 'FILES_ID' | 'PAGE_NUM'> &
+                Pick<CreatePisPagesDto, 'FILES_ID' | 'PAGE_NUM'>
+        >,
+    ) {
+        const updatePromises = pagesData.map((pageData) => {
+            const { FILES_ID, PAGE_NUM, ...updateData } = pageData;
+            return this.manager.update(
+                PisPages,
+                { FILES_ID, PAGE_NUM },
+                updateData,
+            );
+        });
+        await Promise.all(updatePromises);
+        return { updated: updatePromises.length };
+    }
+
+    async deleteFiles(filesId: number) {
+        const file = await this.manager.delete(PisFiles, { FILES: filesId });
+        const pages = await this.manager.delete(PisPages, {
+            FILES_ID: filesId,
+        });
+        return { file, pages };
+    }
+
+    async deletePages(pagesId: number) {
+        return this.manager.delete(PisPages, { PAGE_ID: pagesId });
     }
 }

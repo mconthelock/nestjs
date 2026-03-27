@@ -121,7 +121,10 @@ export class PrintedQueueService {
 
                     // ขั้นตอนที่ 8: ลดขนาด PDF ด้วย Ghostscript
                     const compressStartTime = Date.now();
-                    await this.merge.compressPdfWithGhostscript(outFilePath);
+                    const filnalFilePath =
+                        await this.merge.compressPdfWithGhostscript(
+                            outFilePath,
+                        );
                     await this.printed.writeLog(
                         `Compressed PDF in ${this.printed.formatElapsedTime(compressStartTime)}`,
                     );
@@ -131,7 +134,7 @@ export class PrintedQueueService {
                         outputDirectory,
                         dbdata.originalfilename,
                     );
-                    await fs.rename(outFilePath, finalPath);
+                    await fs.rename(filnalFilePath, finalPath);
 
                     // ขั้นตอนที่ 10: เช็คอนุญาตให้พิมพ์ PDF ได้โดยการอัพเดทสถานะใน Database
                     await this.allowPrint(

@@ -9,12 +9,14 @@ import { IdTagRepository } from './idtag.repository';
 import { filesData, PrintedService } from './printed.service';
 import { PDFDocument, rgb } from 'pdf-lib';
 import { writeLineBox } from 'src/common/helpers/file-pdf.helper';
+import { PrintedMergeService } from './printedMerge.service';
 
 @Injectable()
 export class PrintedNcService {
     constructor(
         @Inject(forwardRef(() => PrintedService))
         private readonly printed: PrintedService,
+        private readonly merge: PrintedMergeService,
         private readonly repo: IdTagRepository,
         private readonly mail: MailService,
     ) {}
@@ -87,19 +89,23 @@ export class PrintedNcService {
                 };
                 // const tagData = await this.printed.saveTagsData(dbData);
 
+                const splitFilesData: {
+                    fileName: string;
+                    filePath: string;
+                    pageNumber: number;
+                }[] = [];
+
+                const pdfContext = await this.printed.setPdfPath({
+                    ...dbData,
+                    schd_p: item[0].SCHDP,
+                    filedir: item[0].FILE_FOLDER,
+                    filename: item[0].FILE_ONAME,
+                });
                 for (const row of item) {
-                    const pdfContext = await this.printed.setPdfPath({
-                        ...dbData,
-                        schd_p: row.SCHDP,
-                        filedir: row.FILE_FOLDER,
-                        filename: row.FILE_ONAME,
-                    });
                     const pdfPath = path.join(
                         pdfContext.pdfDirectory,
                         `${row.PAGE_TAG}.pdf`,
                     );
-
-                    console.log(pdfContext.pdfDirectory);
 
                     await this.printed.writeLog(
                         `Processing NC Detail for ${dbData.originalfilename}, PAGE_TAG ${row.PAGE_TAG}`,
@@ -114,6 +120,12 @@ export class PrintedNcService {
                             null,
                             pdfContext.logFileName,
                         );
+
+                        splitFilesData.push({
+                            fileName: row.PAGE_TAG,
+                            filePath: pdfPath,
+                            pageNumber: row.PAGE_NUM,
+                        });
                     } catch (error) {
                         await this.printed.writeLog(
                             `Error processing CN Data for tag ${row.PAGE_TAG}`,
@@ -124,6 +136,16 @@ export class PrintedNcService {
                         );
                     }
                 }
+
+                this.merge.mergePdfsFast(
+                    splitFilesData,
+                    path.join(pdfContext.pdfDirectory, dbData.filename),
+                );
+                await this.printed.writeLog(
+                    `Merged NC Detail PDF for ${dbData.originalfilename}`,
+                    null,
+                    pdfContext.logFileName,
+                );
             }
         } catch (error) {
             throw new Error(
@@ -146,7 +168,7 @@ export class PrintedNcService {
             ...opt,
             text: `${ncData}`,
             align: 'right',
-            boxX: 400,
+            boxX: 425,
             boxY: 790,
             boxWidth: 150,
             // drawBorder: {

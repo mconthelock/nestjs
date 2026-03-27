@@ -369,9 +369,5 @@ export class PrintedService {
                 `Error updating print file status for FILES_ID ${filesId}`,
             );
         }
-
-        //const file = await this.repo.updatePrintFileStatus(filesId, status);
-        //const pages = await this.repo.updatePrintPagesStatus(filesId, status);
-        //return { file, pages };
     }
 }

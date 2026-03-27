@@ -11,6 +11,7 @@ import { FileLoggerService } from 'src/common/services/file-logger/file-logger.s
 import { moveFileFromMulter } from 'src/common/utils/files.utils';
 import { writeLineBox } from 'src/common/helpers/file-pdf.helper';
 import { PisRepository } from './pis.repository';
+import { SearchPisFilesDto } from './dto/search-pis-file.dto';
 
 export interface PdfProcessContext {
     logFileName: string;
@@ -249,6 +250,7 @@ export class PrintedService {
                 pdfDirectory: body.pdfDirectory,
             },
             async () => {
+                const totalStartTime = Date.now();
                 await this.writeLog(`[${jobId}] Background processing started`);
                 await this.writeLog(
                     `Start read source PDF in ${body.inputPath}`,
@@ -297,10 +299,10 @@ export class PrintedService {
                     `Saved PDF data in ${this.formatElapsedTime(saveStartTime)}`,
                 );
 
-                // ขั้นตอนที่ 4: บันทึกข้อมูลลง Database
+                // ขั้นตอนที่ 4: ใส่ข้อมูล Label ลงในแต่ละหน้า PDF ตามเงื่อนไข
                 await this.processLabelDetail(fileID);
 
-                // ขั้นตอนที่ 4: บันทึกข้อมูลลง Database
+                // ขั้นตอนที่ 5: รวมไฟล์ PDF กลับเป็นไฟล์เดียว
                 const outFilePath = path.join(
                     outputDirectory,
                     `${dbdata.filename}`,
@@ -311,19 +313,42 @@ export class PrintedService {
                     `Merged PDF in ${this.formatElapsedTime(mergeStartTime)}`,
                 );
 
-                // ขั้นตอนที่ 8: ลดขนาด PDF ด้วย Ghostscript
+                // ขั้นตอนที่ 6: ลดขนาด PDF ด้วย Ghostscript
                 const compressStartTime = Date.now();
                 await this.compressPdfWithGhostscript(outFilePath);
                 await this.writeLog(
                     `Compressed PDF in ${this.formatElapsedTime(compressStartTime)}`,
                 );
 
-                // ขั้นตอนที่ 9: Rename ไฟล์ PDF เป็นชื่อตาม originalfilename
+                // ขั้นตอนที่ 7: Rename ไฟล์ PDF เป็นชื่อตาม originalfilename
                 const finalPath = path.join(
                     outputDirectory,
                     dbdata.originalfilename,
                 );
                 await fs.rename(outFilePath, finalPath);
+
+                // อัปเดตสถานะงานเป็น 'completed'
+                this.repo.updateFiles({
+                    FILES: fileID,
+                    FILE_STATUS: 2,
+                });
+                await this.writeLog(
+                    `Total processing time ${this.formatElapsedTime(totalStartTime)}`,
+                );
+                this.pdfJobStatusMap.set(jobId, {
+                    ...(this.pdfJobStatusMap.get(jobId) || {
+                        jobId,
+                    }),
+                    status: 'completed',
+                    message: 'Background processing completed',
+                    finishedAt: new Date().toISOString(),
+                    totalPages: pageCount - 1,
+                    fileId: fileID,
+                });
+                await this.writeLog(
+                    `[${jobId}] Background processing completed`,
+                );
+                return;
             },
         );
     }
@@ -496,11 +521,11 @@ export class PrintedService {
             boxX: 275,
             boxY: 3,
             boxWidth: 300,
-            drawBorder: {
-                color: rgb(1, 0, 0),
-                width: 0.5,
-                bgColor: rgb(1, 1, 1),
-            },
+            // drawBorder: {
+            //     color: rgb(1, 0, 0),
+            //     width: 0.5,
+            //     bgColor: rgb(1, 1, 1),
+            // },
         });
 
         await writeLineBox({
@@ -569,5 +594,74 @@ export class PrintedService {
                 );
             });
         });
+    }
+
+    async downloadFile(id: number) {
+        const fileData = await this.repo.findAllFiles({ FILES: id });
+        if (!fileData) {
+            throw new Error('File not found');
+        }
+
+        const pdfContext = await this.setPdfPath({
+            schd_number: fileData[0].SCHDNUMBER,
+            schd_txt: fileData[0].SCHDCHAR,
+            schd_p: fileData[0].SCHDP,
+            filename: fileData[0].FILE_ONAME,
+        });
+        try {
+            return {
+                filePath: pdfContext.pdfDirectory,
+                fileName: fileData[0].FILE_ONAME,
+            };
+        } catch {
+            throw new Error('File not found');
+        }
+    }
+
+    async findAllFiles(dto: SearchPisFilesDto) {
+        return this.repo.findAllFiles(dto);
+    }
+
+    async updatePrint(filesId: number, status: number) {
+        try {
+            const file = await this.repo.findAllFiles({ FILES: filesId });
+            this.repo.updatePages(
+                Array.from({ length: file[0].FILE_TOTALPAGE }, (_, i) => ({
+                    FILES_ID: filesId,
+                    PAGE_NUM: i + 1,
+                    PAGE_STATUS: status.toString(),
+                })),
+            );
+            return this.repo.updateFiles({
+                FILES: filesId,
+                FILE_STATUS: status,
+                PRINTED_DATE: status === 3 ? new Date() : null,
+            });
+        } catch (error) {
+            throw new Error(
+                `Error updating print file status for FILES_ID ${filesId}`,
+            );
+        }
+    }
+
+    async deletePdf(filesId: number) {
+        const fileData = await this.repo.findAllFiles({ FILES: filesId });
+        const pdfContext = await this.setPdfPath({
+            schd_number: fileData[0].SCHDNUMBER,
+            schd_txt: fileData[0].SCHDCHAR,
+            schd_p: fileData[0].SCHDP,
+            filename: fileData[0].FILE_ONAME,
+        });
+        try {
+            await fs.rm(pdfContext.pdfDirectory, {
+                recursive: true,
+                force: true,
+            });
+            return this.repo.deleteFiles(filesId);
+        } catch (error) {
+            throw new Error(
+                `Error deleting PDF directory for FILES_ID ${filesId}`,
+            );
+        }
     }
 }

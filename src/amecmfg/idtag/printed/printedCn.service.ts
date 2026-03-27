@@ -84,7 +84,7 @@ export class PrintedCnService {
             const cdir = await this.printed.getCurrentPdfDirectory();
             const pdfPath = path.join(cdir, `${data.R27M11}.pdf`);
             try {
-                await this.embedCNToPdf(pdfPath, {
+                await this.embedFirstToPdf(pdfPath, {
                     cnno: data.R27M09,
                 });
                 await this.printed.writeLog(
@@ -137,6 +137,28 @@ export class PrintedCnService {
                 align: 'left',
                 boxX: 15,
                 boxY: 790,
+            });
+        }
+        await fs.writeFile(pdfPath, await pdfDoc.save());
+    }
+
+    private async embedFirstToPdf(pdfPath: string, text: any) {
+        const pdfBytes = await fs.readFile(pdfPath);
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+        const [page] = pdfDoc.getPages();
+        const opt = {
+            pdfpage: page,
+            fontsize: 14,
+            boxHeight: 15,
+        };
+
+        if (text.sendto) {
+            await writeLineBox({
+                ...opt,
+                text: `${text.cnno}`,
+                align: 'left',
+                boxX: 15,
+                boxY: 810,
             });
         }
         await fs.writeFile(pdfPath, await pdfDoc.save());

@@ -10,6 +10,7 @@ import { filesData, PrintedService } from './printed.service';
 import { PDFDocument, rgb } from 'pdf-lib';
 import { writeLineBox } from 'src/common/helpers/file-pdf.helper';
 import { PrintedMergeService } from './printedMerge.service';
+import { buildNcDetailEmailTemplate } from './templates/nc-detail-email.template';
 
 @Injectable()
 export class PrintedNcService {
@@ -42,7 +43,9 @@ export class PrintedNcService {
             const mailSent = await this.mail.sendMail({
                 to: 'chalorms@MitsubishiElevatorAsia.co.th',
                 subject: `NC Detail Report - ${dayjs().format('YYYY-MM-DD')}`,
-                html: '',
+                html: buildNcDetailEmailTemplate({
+                    reportDate: dayjs().format('YYYY-MM-DD'),
+                }),
                 attachments: [
                     {
                         filename: exportFileName,

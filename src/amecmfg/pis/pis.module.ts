@@ -5,12 +5,16 @@ import { PisController } from './pis.controller';
 import { PrintedService } from './printed/printed.service';
 import { FileLoggerModule } from 'src/common/services/file-logger/file-logger.module';
 
+import { PisFiles } from 'src/common/Entities/workload/table/pis-files.entity';
+import { PisPages } from 'src/common/Entities/workload/table/pis-pages.entity';
+import { PisRepository } from './printed/pis.repository';
+
 @Module({
     imports: [
         FileLoggerModule,
-        TypeOrmModule.forFeature([], 'workloadConnection'),
+        TypeOrmModule.forFeature([PisFiles, PisPages], 'workloadConnection'),
     ],
     controllers: [PisController],
-    providers: [PisService, PrintedService],
+    providers: [PisService, PrintedService, PisRepository],
 })
 export class PisModule {}

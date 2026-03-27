@@ -51,9 +51,6 @@ export class PrintedTopLabelService {
                     pdfContext.pdfDirectory,
                     `${row.PAGE_TAG}.pdf`,
                 );
-
-                console.log(pdfPath);
-
                 try {
                     await this.embedLabelToPdf(pdfPath, text.trim());
                     await this.printed.writeLog(
@@ -84,13 +81,14 @@ export class PrintedTopLabelService {
             pdfpage: page,
             fontsize: 14,
             boxHeight: 15,
+            fontColor: rgb(1, 0, 0),
         };
 
         await writeLineBox({
             ...opt,
             text: `${labelData}`,
             align: 'right',
-            boxX: 250,
+            boxX: 275,
             boxY: 10,
             boxWidth: 300,
             // drawBorder: {
@@ -104,7 +102,7 @@ export class PrintedTopLabelService {
             ...opt,
             text: `${labelData}`,
             align: 'right',
-            boxX: 250,
+            boxX: 275,
             boxY: 810,
             boxWidth: 300,
             // drawBorder: {

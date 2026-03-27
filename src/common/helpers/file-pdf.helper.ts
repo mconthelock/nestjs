@@ -10,6 +10,7 @@ export async function writeLineBox(opt) {
     const { height } = opt.pdfpage.getSize();
     const yTop = height - opt.boxY;
     const fontHeight = fontstyle.heightAtSize(opt.fontsize);
+    const fontColor = opt.fontColor || rgb(0, 0, 0);
 
     // วาดเส้นกรอบถ้าต้องการ
     if (opt.drawBorder) {
@@ -37,7 +38,7 @@ export async function writeLineBox(opt) {
         y: yPos,
         size: opt.fontsize,
         font: fontstyle,
-        color: rgb(0, 0, 0),
+        color: fontColor,
     });
 }
 

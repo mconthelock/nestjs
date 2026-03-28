@@ -181,6 +181,7 @@ export class JopPurConfService {
                 }),
             )
             .andWhere('jop.JOP_REVISION <= PUR.MAX_REV')
+            .andWhere('jop.JOP_REVISION > 0') 
             .getRawMany();
     }
 
@@ -206,6 +207,7 @@ export class JopPurConfService {
                 'jop.JOP_REVISION <= (SELECT MAX(r2.JOP_REVISION) FROM JOP_PUR_CONF r2 WHERE r2.JOP_MFGNO = :mfgno2 AND r2.JOP_PONO = :pono2 AND r2.JOP_LINENO = :lineno2)',
                 { mfgno2: mfgno, pono2: pono, lineno2: lineno },
             )
+            .andWhere('jop.JOP_REVISION > 0') 
             .orderBy('jop.JOP_REVISION', 'ASC')
             //   .leftJoinAndSelect('jop.marRequest', 'marRequest')
             .leftJoinAndSelect('jop.purConfirm', 'purConfirm')

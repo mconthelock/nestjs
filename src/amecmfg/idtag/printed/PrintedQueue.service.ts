@@ -226,7 +226,7 @@ export class PrintedQueueService {
         const status: number = data.length > 0 ? 1 : 2;
         await this.repo.updateFiles({
             FILES: filesId,
-            FILE_STATUS: status,
+            FILE_STATUS: 2, // Manual update เป็น 2 ก่อน รอ PP พร้อมใส่ข้อมูล NC
         });
         if (status === 1) {
             this.repo.updatePages(

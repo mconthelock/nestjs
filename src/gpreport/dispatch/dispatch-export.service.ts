@@ -8,8 +8,8 @@ import { ExportAndSendMailDto } from './dto/export-and-sendmail.dto';
 export class DispatchExportService {
   async createShareFolder() {
     try {
-      const basePath = '\\\\amecnas\\FileServer\\Public\\golf\\TEST';
-      // const basePath = '\\\\amecnas\\FileServer\\GP_Div\\Electronic_Data\\Xerox_in\\0.2 GA\\Bus_report';
+      //const basePath = '\\\\amecnas\\FileServer\\Public\\golf\\TEST';
+      const basePath = '\\\\amecnas\\FileServer\\GP_Div\\Electronic_Data\\Xerox_in\\0.2 GA\\Bus_report';
 
       const now = new Date();
       const year = now.getFullYear().toString();

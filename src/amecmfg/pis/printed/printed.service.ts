@@ -463,7 +463,7 @@ export class PrintedService {
                 }
 
                 if (row.URGETNT > 0) {
-                    text += 'URGETNT ';
+                    text += 'URGENT ';
                 }
 
                 if (row.EARTHQ > 0) {

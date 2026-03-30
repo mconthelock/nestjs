@@ -635,7 +635,7 @@ export class PrintedService {
             return this.repo.updateFiles({
                 FILES: filesId,
                 FILE_STATUS: status,
-                PRINTED_DATE: status === 3 ? new Date() : null,
+                PRINTED_DATE: status == 3 ? new Date() : null,
             });
         } catch (error) {
             throw new Error(

@@ -88,7 +88,7 @@ export class MfgDrawingCreateChecksheetService {
             let dataByidTag: { controlNo: string; drawing: string };
             switch (typeName) {
                 case 'multi':
-                    newfileName = dto.ASERIALNO[0];
+                    newfileName = controlNo //dto.ASERIALNO[0];
                     fileName = itemData.VFILE;
                     // dataByidTag = await this.getDrawingByIdTag(
                     //     dto.ASERIALNO[0],
@@ -111,7 +111,7 @@ export class MfgDrawingCreateChecksheetService {
                     }));
                     break;
                 default:
-                    newfileName = dto.ASERIALNO[0];
+                    newfileName = controlNo //dto.ASERIALNO[0];
                     // dataByidTag = await this.getDrawingByIdTag(
                     //     dto.ASERIALNO[0],
                     // );

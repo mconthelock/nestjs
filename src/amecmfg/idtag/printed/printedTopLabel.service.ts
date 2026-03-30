@@ -29,7 +29,7 @@ export class PrintedTopLabelService {
                 }
 
                 if (row.URGETNT > 0) {
-                    text += 'URGETNT ';
+                    text += 'URGENT ';
                 }
 
                 if (row.EARTHQ > 0) {

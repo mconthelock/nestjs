@@ -1045,13 +1045,17 @@ export class DispatchService {
     };
   }
 
+
   async update_fin_status_Dispatch() {
     const result = await this.dataSource
       .createQueryBuilder()
-      .update('BUS_DISPATCH_HEAD')
-      .set({ STATUS: 'F' })
-      .where('STATUS <> :finalStatus', { finalStatus: 'F' })
-      .andWhere('WORKDATE = TRUNC(SYSDATE) - 6')
+      .update(BusDispatchHead)
+      .set({
+        status: 'F',
+        update_date: new Date(),
+      })
+      .where("NVL(status, 'N') <> :finalStatus", { finalStatus: 'F' })
+      .andWhere('TRUNC(dispatch_date) = TRUNC(SYSDATE) - 1')
       .execute();
 
     return {
@@ -1060,4 +1064,6 @@ export class DispatchService {
       affected: result.affected || 0,
     };
   }
+
+
 }

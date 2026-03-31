@@ -1024,14 +1024,17 @@ export class DispatchService {
     await workbook1.xlsx.writeFile(filePath1);
     await workbook2.xlsx.writeFile(filePath2);
 
-    await this.dispatchMailService.sendDispatchMail({
-      to: 'supamid@mitsubishielevatorasia.co.th',
-      cc: dto.mail_cc || '',
-      bcc: dto.mail_bcc || '',
-      subject: `แจ้งแผนการจัดรถพนักงาน (${dto.workdate})`,
-      html: this.dispatchMailService.buildDispatchMailHtml(dto),
-      attachments: [filePath1, filePath2],
-    });
+   await this.dispatchMailService.sendDispatchMail({
+    to: ['warawuts@MitsubishiElevatorAsia.co.th'],
+    cc: [
+      'rewepong@MitsubishiElevatorAsia.co.th',
+      'supamid@mitsubishielevatorasia.co.th'
+    ],
+    bcc: ['kallaya@MitsubishiElevatorAsia.co.th'],
+    subject: `แจ้งแผนการจัดรถพนักงาน (${dto.workdate})`,
+    html: this.dispatchMailService.buildDispatchMailHtml(dto),
+    attachments: [filePath1, filePath2],
+  });
 
     const updateDto: SaveDispatchDto = {
       dispatch_id: dispatchId,
@@ -1050,6 +1053,22 @@ export class DispatchService {
         { fileName: fileName1, filePath: filePath1 },
         { fileName: fileName2, filePath: filePath2 },
       ],
+    };
+  }
+
+  async update_fin_status_Dispatch() {
+    const result = await this.dataSource
+      .createQueryBuilder()
+      .update('BUS_DISPATCH_HEAD')
+      .set({ STATUS: 'F' })
+      .where('STATUS <> :finalStatus', { finalStatus: 'F' })
+      .andWhere('WORKDATE = TRUNC(SYSDATE) - 6')
+      .execute();
+
+    return {
+      status: true,
+      message: 'Auto finalize completed',
+      affected: result.affected || 0,
     };
   }
 }

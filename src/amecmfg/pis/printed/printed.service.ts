@@ -429,7 +429,7 @@ export class PrintedService {
                     .substring(11, 17)
                     .replace(/-/g, '');
 
-                const newFileName = `${mfgno}-${packno}.pdf`;
+                const newFileName = `${mfgno}-${packno}-${i}.pdf`;
                 const outputPath = path.join(outputDirectory, newFileName);
                 await fs.writeFile(outputPath, singlePageBytes);
                 splitFilesData.push({
@@ -636,6 +636,7 @@ export class PrintedService {
                 FILES: filesId,
                 FILE_STATUS: status,
                 PRINTED_DATE: status == 3 ? new Date() : null,
+                FILE_PRINTEDPAGE: status == 3 ? file[0].FILE_TOTALPAGE : 0,
             });
         } catch (error) {
             throw new Error(

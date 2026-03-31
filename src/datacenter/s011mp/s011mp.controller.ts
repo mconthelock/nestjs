@@ -11,7 +11,7 @@ import { S011mpService } from './s011mp.service';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 
-@Controller('s011mp')
+@Controller('datacenter/s011mp')
 export class S011mpController {
     constructor(private readonly s011mpService: S011mpService) {}
     @Get()

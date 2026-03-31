@@ -366,6 +366,7 @@ export class PrintedService {
                 FILES: filesId,
                 FILE_STATUS: status,
                 PRINTED_DATE: status == 3 ? new Date() : null,
+                FILE_PRINTEDPAGE: status == 3 ? file[0].FILE_TOTALPAGE : 0,
             });
         } catch (error) {
             throw new Error(

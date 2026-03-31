@@ -81,20 +81,20 @@ export class MfgDrawingCreateChecksheetService {
                 );
             }
             let drawing: string;
-            let controlNo: string;
+            let controlNo: string = dto.VCONTROLNO;
             let fileName: string;
             let newfileName: string;
             let serialList: { VSERIALNO: string; NTYPE: number }[];
             let dataByidTag: { controlNo: string; drawing: string };
             switch (typeName) {
                 case 'multi':
-                    newfileName = dto.ASERIALNO[0];
+                    newfileName = controlNo //dto.ASERIALNO[0];
                     fileName = itemData.VFILE;
-                    dataByidTag = await this.getDrawingByIdTag(
-                        dto.ASERIALNO[0],
-                    );
-                    drawing = dataByidTag.drawing;
-                    controlNo = dataByidTag.controlNo;
+                    // dataByidTag = await this.getDrawingByIdTag(
+                    //     dto.ASERIALNO[0],
+                    // );
+                    // drawing = dataByidTag.drawing;
+                    drawing = await this.getDrawingByControlNo(controlNo);
                     serialList = dto.ASERIALNO.map((sn, index) => ({
                         VSERIALNO: sn,
                         NTYPE: 1, // กำหนด type เป็น 1 สำหรับ serial no ทั้งหมดในกรณี multi
@@ -111,13 +111,12 @@ export class MfgDrawingCreateChecksheetService {
                     }));
                     break;
                 default:
-                    newfileName = dto.ASERIALNO[0];
-                    dataByidTag = await this.getDrawingByIdTag(
-                        dto.ASERIALNO[0],
-                    );
-                    drawing = dataByidTag.drawing;
-                    controlNo = dataByidTag.controlNo;
-
+                    newfileName = controlNo //dto.ASERIALNO[0];
+                    // dataByidTag = await this.getDrawingByIdTag(
+                    //     dto.ASERIALNO[0],
+                    // );
+                    // drawing = dataByidTag.drawing;
+                    drawing = await this.getDrawingByControlNo(controlNo);
                     listOfCS = this.getDataListOfCS(itemLists, drawing);
                     fileName = listOfCS.VNUMBER_FILE;
                     serialList = dto.ASERIALNO.map((sn, index) => ({
@@ -171,6 +170,55 @@ export class MfgDrawingCreateChecksheetService {
         } catch (error) {
             throw new Error('Create Checksheet Failed: ' + error.message);
         }
+    }
+
+    async getDrawingByControlNo(controlNo: string): Promise<string> {
+        const f001kp: { status: boolean; data?: F001KP; message: string } =
+            await this.f001kpService.findOne(controlNo);
+        if (!f001kp.status) {
+            throw new Error(`F001KP with control no ${controlNo} not found`);
+        }
+        const data = f001kp.data;
+        let drawing: string = null;
+        if (!data.F01R06 || data.F01R06.trim() === '') {
+            if (!data.F01R05 || data.F01R05.trim() === '') {
+                drawing = data.F01R04;
+            } else {
+                drawing = data.F01R05;
+            }
+        } else {
+            drawing = data.F01R06;
+        }
+        // หาจาก General part list ด้วย order และ item ที่ได้จาก F001KP
+        const order = data.F01R07?.trim();
+        const item = data.F01R03?.trim();
+        const getGpl = await this.generalPartListService.getGPL(order, item);
+        if (!getGpl.status) {
+            throw new Error(
+                `General Part List with order ${order} and item ${item} not found`,
+            );
+        }
+        const gpl = getGpl.data;
+
+        const match = gpl.find((d) => {
+            if (!d.DRAWING || d.DRAWING.trim() === '') {
+                return false;
+            }
+            const gplDrawing = d.DRAWING.replace(/\s/g, '');
+            const targetDrawing = drawing.replace(/\s/g, '');
+            return (
+                gplDrawing === targetDrawing ||
+                gplDrawing.startsWith(targetDrawing)
+            );
+        });
+
+        if (!match) {
+            throw new Error(
+                `No matching drawing found in General Part List for drawing ${drawing}, order ${order} and item ${item}`,
+            );
+        }
+
+        return match.DRAWING;
     }
 
     async getDrawingByIdTag(
@@ -300,17 +348,6 @@ export class MfgDrawingCreateChecksheetService {
         const match = drawing.find((d) => {
             return control.some((c) => {
                 const drawing = d.S11M04;
-                // ถ้า drawing อยู่ใน delete list ให้ข้าม
-                // if (
-                //     state.delete.some(
-                //         (e) => drawing === e || drawing.startsWith(e + ' '),
-                //     )
-                // ) {
-                //     return false;
-                // }
-                // console.log('Drawing', drawing);
-                // console.log('Control', c);
-                // console.log('Match', drawing === c || drawing.startsWith(c + ' '));
                 // ถ้า drawing ตรงกับ control หรือเริ่มต้นด้วย control ตามด้วย space ให้ถือว่า match
                 return drawing === c || drawing.startsWith(c + ' ');
             });
@@ -476,7 +513,7 @@ export class MfgDrawingCreateChecksheetService {
 
     /**
      * Check if a drawing should be deleted based on the delete list.
-     * @param deleteDwg 'BA212B768 G01 L03~L05'
+     * @param deleteDwg ['BA212B768 G01 L03~L05', ...]
      * @param drawing 'BA212B768 G01L03L04L05'
      * @returns boolean
      * @description เปรียบเทียบ drawing กับ delete list โดยแยกตัวอักษร G และ L ออกจากกัน แล้วตรวจสอบว่า drawing มีค่า G และ L ที่ตรงกับ delete list หรือไม่ โดยที่ถ้า delete list มี G01 L03~L05 จะถือว่า G01L03L04L05 ตรงกับ delete list และควรจะถูกลบ
@@ -686,7 +723,9 @@ export class MfgDrawingCreateChecksheetService {
                 // ถ้าไม่ใช่ multi และ drawing อยู่ใน delete list ให้ตั้ง status เป็น 3
                 if (
                     typeName != 'multi' &&
-                    this.checkDeleteDrawing(deleteList, drawing)
+                    this.checkDeleteDrawing(deleteList, drawing) &&
+                    [1,3].includes(isDataExist.data.NSTATUS) &&
+                    isDataExist.data.NINSPECTOR_STATUS === 1
                 ) {
                     data.NSTATUS = 3;
                     if (isDataExist.data.VFILE_NAME) {

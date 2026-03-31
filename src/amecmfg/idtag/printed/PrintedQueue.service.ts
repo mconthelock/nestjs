@@ -12,16 +12,18 @@ import {
 import { PrintedImagesService } from './printedImage.service';
 import { PrintedCnService } from './printedCn.service';
 import { PrintedMergeService } from './printedMerge.service';
+import { PrintedTopLabelService } from './printedTopLabel.service';
 
 @Injectable()
 export class PrintedQueueService {
     constructor(
-        private readonly repo: IdTagRepository,
         @Inject(forwardRef(() => PrintedService))
         private readonly printed: PrintedService,
+        private readonly repo: IdTagRepository,
         private readonly imgs: PrintedImagesService,
         private readonly cns: PrintedCnService,
         private readonly merge: PrintedMergeService,
+        private readonly label: PrintedTopLabelService,
     ) {}
 
     async runPdfProcessJob(body: filesData & PdfProcessContext, jobId: string) {
@@ -97,10 +99,16 @@ export class PrintedQueueService {
                     await this.cns.putCNNo(fileID);
 
                     // ขั้นตอนที่ 5: ใส่เลขที่ Lot แรกลงใน PDF
-
                     await this.cns.putFirstLot(dbdata.bmdate);
 
-                    // ขั้นตอนที่ 6: รวม PDF กลับมาเป็น 1 ไฟล์
+                    // ขั้นตอนที่ 6: ใส่ Label ด้านบนของ PDF (Japan/Urgent/Eathquake)
+                    const labelStartTime = Date.now();
+                    await this.label.processLabelDetail(fileID);
+                    await this.printed.writeLog(
+                        `Put Remark Lable PDF in ${this.printed.formatElapsedTime(labelStartTime)}`,
+                    );
+
+                    // ขั้นตอนที่ 7: รวม PDF กลับมาเป็น 1 ไฟล์
                     const outFilePath = path.join(
                         outputDirectory,
                         `${dbdata.filename}`,
@@ -111,16 +119,31 @@ export class PrintedQueueService {
                         `Merged PDF in ${this.printed.formatElapsedTime(mergeStartTime)}`,
                     );
 
+                    // ขั้นตอนที่ 8: ลดขนาด PDF ด้วย Ghostscript
                     const compressStartTime = Date.now();
-                    await this.merge.compressPdfWithGhostscript(outFilePath);
+                    const filnalFilePath =
+                        await this.merge.compressPdfWithGhostscript(
+                            outFilePath,
+                        );
                     await this.printed.writeLog(
                         `Compressed PDF in ${this.printed.formatElapsedTime(compressStartTime)}`,
                     );
+
+                    // ขั้นตอนที่ 9: Rename ไฟล์ PDF เป็นชื่อตาม originalfilename
+                    const finalPath = path.join(
+                        outputDirectory,
+                        dbdata.originalfilename,
+                    );
+                    await fs.rename(filnalFilePath, finalPath);
+
+                    // ขั้นตอนที่ 10: เช็คอนุญาตให้พิมพ์ PDF ได้โดยการอัพเดทสถานะใน Database
                     await this.allowPrint(
                         dbdata.folder,
                         dbdata.originalfilename,
                         fileID,
+                        dbdata.pageCount - 1,
                     );
+
                     await this.printed.writeLog(
                         `Total processing time ${this.printed.formatElapsedTime(totalStartTime)}`,
                     );
@@ -178,8 +201,13 @@ export class PrintedQueueService {
         folder: string,
         filename: string,
         filesId: number,
+        pageCount: number,
     ) {
-        //0 => On process, 1 => Hold, 2 => Pending Print, 3 => Printed, 4 => Error
+        // 0 => On process
+        // 1 => Hold
+        // 2 => Pending Print
+        // 3 => Printed
+        // 4 => Error
         const data = await this.repo.findAllList({
             filters: [
                 {
@@ -196,9 +224,18 @@ export class PrintedQueueService {
             ],
         });
         const status: number = data.length > 0 ? 1 : 2;
-        await this.repo.updatePrintFileStatus(filesId, status);
+        await this.repo.updateFiles({
+            FILES: filesId,
+            FILE_STATUS: 2, // Manual update เป็น 2 ก่อน รอ PP พร้อมใส่ข้อมูล NC
+        });
         if (status === 1) {
-            await this.repo.updateNcPagesStatus(filesId, '0');
+            this.repo.updatePages(
+                Array.from({ length: pageCount }, (_, i) => ({
+                    FILES_ID: filesId,
+                    PAGE_NUM: i + 1,
+                    PAGE_NC: '0',
+                })),
+            );
         }
         return;
     }

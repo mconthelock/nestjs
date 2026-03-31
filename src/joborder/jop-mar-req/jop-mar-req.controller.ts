@@ -35,4 +35,9 @@ export class JopMarReqController {
       return await this.jopMarReqService.search(dto);
   }
 
+  @Post('getRevisionHistoryByKey')
+  async getRevisionHistoryByKey(@Body() list: { mfg: string; pono: number; line: number }[]) {
+      return await this.jopMarReqService.getRevisionHistoryByKey(list);
+  }
+
 }

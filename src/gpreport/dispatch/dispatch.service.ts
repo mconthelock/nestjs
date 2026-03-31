@@ -5,7 +5,6 @@ import { SaveDispatchDto } from './dto/save-dispatch.dto';
 import { SaveOverwriteDto } from './dto/save-overwrite.dto';
 import { BuildDailyFirstDto } from './dto/build-daily-first.dto';
 import { DailyDispatchReportDto } from './dto/dispatch-report.dto';
-
 import { BusDispatchHead } from '../../common/Entities/gpreport/table/bus_dispatch_head.entity';
 import { BusDispatchLine } from '../../common/Entities/gpreport/table/bus_dispatch_line.entity';
 import { BusDispatchStop } from '../../common/Entities/gpreport/table/bus_dispatch_stop.entity';
@@ -18,8 +17,14 @@ import { UpdatePassengerStatusDto } from './dto/update-passenger-status.dto';
 import { UpdateLineStatusDto } from './dto/update-line-status.dto';
 import { UpdateLineTypeDto } from './dto/update-line-type.dto';
 import { RunDailyScheduleDto } from './dto/build-run-daily-schedule.dto';
+import { ExportAndSendMailDto } from './dto/export-and-sendmail.dto';
 
 import * as dayjs from 'dayjs';
+import * as path from 'path';
+
+import { DispatchReportService } from './dispatch-report.service';
+import { DispatchExportService } from './dispatch-export.service';
+import { DispatchMailService } from './dispatch-mail.service';
 
 @Injectable()
 export class DispatchService {
@@ -38,6 +43,10 @@ export class DispatchService {
 
     @InjectRepository(BusDispatchPassenger, 'gpreportConnection')
     private passRepo: Repository<BusDispatchPassenger>,
+
+    private readonly dispatchReportService: DispatchReportService,
+    private readonly dispatchExportService: DispatchExportService,
+    private readonly dispatchMailService: DispatchMailService,
   ) {}
 
   async updateStatus(dto: UpdateStatusDispatchDto) {
@@ -72,9 +81,6 @@ export class DispatchService {
     };
   }
 
-
-
-
   async saveOverwrite(dto: SaveOverwriteDto) {
     const head = await this.headRepo.findOne({
       where: { dispatch_id: dto.dispatch_id },
@@ -97,39 +103,35 @@ export class DispatchService {
     return null;
   }
 
+  async buildDailyFirst(dto: BuildDailyFirstDto) {
+    const workDate = dto.workdate;
+    const shift = dto.shift;
 
-
-// ==================================================== build-daily-first ==================================================== //
-async buildDailyFirst(dto: BuildDailyFirstDto) {
-  const workDate = dto.workdate;
-  const shift = dto.shift;
-
-  return this.dataSource.transaction(async (manager) => {
-    // 1) ensure head
-    let head = await manager.findOne(BusDispatchHead, {
-      where: {
-        dispatch_date: workDate,
-        dispatch_type: dto.dispatch_type,
-        shift,
-      },
-    });
-
-    if (!head) {
-      head = await manager.save(
-        manager.create(BusDispatchHead, {
+    return this.dataSource.transaction(async (manager) => {
+      let head = await manager.findOne(BusDispatchHead, {
+        where: {
           dispatch_date: workDate,
           dispatch_type: dto.dispatch_type,
           shift,
-          status: 'D',
-          update_by: dto.update_by,
-          update_date: new Date(),
-        }),
-      );
-    }
+        },
+      });
 
-    const dispatch_id = head.dispatch_id;
-    const rows: any[] = await manager.query(
-      `
+      if (!head) {
+        head = await manager.save(
+          manager.create(BusDispatchHead, {
+            dispatch_date: workDate,
+            dispatch_type: dto.dispatch_type,
+            shift,
+            status: 'D',
+            update_by: dto.update_by,
+            update_date: new Date(),
+          }),
+        );
+      }
+
+      const dispatch_id = head.dispatch_id;
+      const rows: any[] = await manager.query(
+        `
         SELECT * FROM (
           SELECT
             OT.EMPNO,
@@ -200,217 +202,209 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
           AND F.CST <> '3'
       ) 
       `,
-      [workDate, dto.timeout_from, dto.timeout_to],
-    ); 
-
-    if (!rows.length) {
-      return {
-        ok: true,
-        message: 'NO_OT_ROWS',
-        created: [
-          {
-            shift,
-            dispatch_id,
-            status: head.status,
-            lines_added: 0,
-            stops_added: 0,
-            passengers_added: 0,
-          },
-        ],
-      };
-    }
-
-    // 3) existing data in this dispatch
-    const [existingLines, existingStops, existingPassengers] = await Promise.all([
-      manager.find(BusDispatchLine, { where: { dispatch_id } }),
-      manager.find(BusDispatchStop, { where: { dispatch_id } }),
-      manager.find(BusDispatchPassenger, { where: { dispatch_id } }),
-    ]);
-
-    const lineSet = new Set(existingLines.map((l) => Number(l.busid)));
-    const stopSet = new Set(
-      existingStops.map((s) => `${Number(s.line_id)}|${Number(s.stop_id)}`),
-    );
-    const passEmpSet = new Set(
-      existingPassengers.map((p) => String(p.empno || '').trim()).filter(Boolean),
-    );
-
-    // 4) filter source rows
-    // - skip empno ที่มีอยู่แล้วใน dispatch นี้
-    const sourceRows = rows.filter((r) => {
-      const empno = String(r.EMPNO || '').trim();
-      const busid = r.BUSID != null ? Number(r.BUSID) : null;
-      const stop_id = r.STOP_ID != null ? Number(r.STOP_ID) : null;
-
-      if (!empno || !busid || !stop_id) return false;
-      if (passEmpSet.has(empno)) return false;
-      return true;
-    });
-
-    if (!sourceRows.length) {
-      return {
-        ok: true,
-        message: 'NO_NEW_ROWS',
-        created: [
-          {
-            shift,
-            dispatch_id,
-            status: head.status,
-            lines_added: 0,
-            stops_added: 0,
-            passengers_added: 0,
-          },
-        ],
-      };
-    }
-
-    // 5) group source
-    const busMap = new Map<
-      number,
-      {
-        busid: number;
-        busname: string | null;
-        busseat: number | null;
-        bustype: string | null;
-        stops: Map<
-          number,
-          {
-            stop_id: number;
-            stop_name: string | null;
-            plan_time: string | null;
-            route_seq: number;
-          }
-        >;
-      }
-    >();
-
-    const empSourceMap = new Map<string, { busid: number; stop_id: number }>();
-
-    for (const r of sourceRows) {
-      const busid = Number(r.BUSID);
-      const stop_id = Number(r.STOP_ID);
-      const empno = String(r.EMPNO || '').trim();
-
-      if (!busMap.has(busid)) {
-        busMap.set(busid, {
-          busid,
-          busname: r.BUSNAME ?? null,
-          busseat: r.BUSSEAT != null ? Number(r.BUSSEAT) : null,
-          bustype: r.BUSTYPE ?? null,
-          stops: new Map(),
-        });
-      }
-
-      const bus = busMap.get(busid)!;
-
-      if (!bus.stops.has(stop_id)) {
-        bus.stops.set(stop_id, {
-          stop_id,
-          stop_name: r.STOP_NAME ?? null,
-          plan_time: this.pickPlanTime(shift, r),
-          route_seq: r.ROUTE_SEQ != null ? Number(r.ROUTE_SEQ) : 9999,
-        });
-      }
-
-      if (!empSourceMap.has(empno)) {
-        empSourceMap.set(empno, { busid, stop_id });
-      }
-    }
-
-    const buses = Array.from(busMap.values()).sort((a, b) => {
-      const an = String(a.busname ?? '').toLowerCase();
-      const bn = String(b.busname ?? '').toLowerCase();
-      return an && bn ? an.localeCompare(bn) : a.busid - b.busid;
-    });
-
-    // 6) insert missing lines
-    const linesToInsert = buses
-      .filter((b) => !lineSet.has(b.busid))
-      .map((b) =>
-        manager.create(BusDispatchLine, {
-          dispatch_id,
-          busid: b.busid,
-          busname: b.busname,
-          bustype: b.bustype,
-          busseat: b.busseat,
-          line_status: '1',
-        }),
+        [workDate, dto.timeout_from, dto.timeout_to],
       );
 
-    if (linesToInsert.length) {
-      await manager.save(BusDispatchLine, linesToInsert);
-      for (const l of linesToInsert) lineSet.add(Number(l.busid));
-    }
+      if (!rows.length) {
+        return {
+          ok: true,
+          message: 'NO_OT_ROWS',
+          created: [
+            {
+              shift,
+              dispatch_id,
+              status: head.status,
+              lines_added: 0,
+              stops_added: 0,
+              passengers_added: 0,
+            },
+          ],
+        };
+      }
 
-    // 7) insert missing stops
-    const stopsToInsert: BusDispatchStop[] = [];
+      const [existingLines, existingStops, existingPassengers] = await Promise.all([
+        manager.find(BusDispatchLine, { where: { dispatch_id } }),
+        manager.find(BusDispatchStop, { where: { dispatch_id } }),
+        manager.find(BusDispatchPassenger, { where: { dispatch_id } }),
+      ]);
 
-    for (const b of buses) {
-      const stopsSorted = Array.from(b.stops.values()).sort((x, y) => {
-        if (x.route_seq !== y.route_seq) return x.route_seq - y.route_seq;
-        return x.stop_id - y.stop_id;
+      const lineSet = new Set(existingLines.map((l) => Number(l.busid)));
+      const stopSet = new Set(
+        existingStops.map((s) => `${Number(s.line_id)}|${Number(s.stop_id)}`),
+      );
+      const passEmpSet = new Set(
+        existingPassengers.map((p) => String(p.empno || '').trim()).filter(Boolean),
+      );
+
+      const sourceRows = rows.filter((r) => {
+        const empno = String(r.EMPNO || '').trim();
+        const busid = r.BUSID != null ? Number(r.BUSID) : null;
+        const stop_id = r.STOP_ID != null ? Number(r.STOP_ID) : null;
+
+        if (!empno || !busid || !stop_id) return false;
+        if (passEmpSet.has(empno)) return false;
+        return true;
       });
 
-      for (const s of stopsSorted) {
-        const key = `${b.busid}|${s.stop_id}`;
-        if (stopSet.has(key)) continue;
+      if (!sourceRows.length) {
+        return {
+          ok: true,
+          message: 'NO_NEW_ROWS',
+          created: [
+            {
+              shift,
+              dispatch_id,
+              status: head.status,
+              lines_added: 0,
+              stops_added: 0,
+              passengers_added: 0,
+            },
+          ],
+        };
+      }
 
-        stopsToInsert.push(
-          manager.create(BusDispatchStop, {
+      const busMap = new Map<
+        number,
+        {
+          busid: number;
+          busname: string | null;
+          busseat: number | null;
+          bustype: string | null;
+          stops: Map<
+            number,
+            {
+              stop_id: number;
+              stop_name: string | null;
+              plan_time: string | null;
+              route_seq: number;
+            }
+          >;
+        }
+      >();
+
+      const empSourceMap = new Map<string, { busid: number; stop_id: number }>();
+
+      for (const r of sourceRows) {
+        const busid = Number(r.BUSID);
+        const stop_id = Number(r.STOP_ID);
+        const empno = String(r.EMPNO || '').trim();
+
+        if (!busMap.has(busid)) {
+          busMap.set(busid, {
+            busid,
+            busname: r.BUSNAME ?? null,
+            busseat: r.BUSSEAT != null ? Number(r.BUSSEAT) : null,
+            bustype: r.BUSTYPE ?? null,
+            stops: new Map(),
+          });
+        }
+
+        const bus = busMap.get(busid)!;
+
+        if (!bus.stops.has(stop_id)) {
+          bus.stops.set(stop_id, {
+            stop_id,
+            stop_name: r.STOP_NAME ?? null,
+            plan_time: this.pickPlanTime(shift, r),
+            route_seq: r.ROUTE_SEQ != null ? Number(r.ROUTE_SEQ) : 9999,
+          });
+        }
+
+        if (!empSourceMap.has(empno)) {
+          empSourceMap.set(empno, { busid, stop_id });
+        }
+      }
+
+      const buses = Array.from(busMap.values()).sort((a, b) => {
+        const an = String(a.busname ?? '').toLowerCase();
+        const bn = String(b.busname ?? '').toLowerCase();
+        return an && bn ? an.localeCompare(bn) : a.busid - b.busid;
+      });
+
+      const linesToInsert = buses
+        .filter((b) => !lineSet.has(b.busid))
+        .map((b) =>
+          manager.create(BusDispatchLine, {
             dispatch_id,
-            line_id: b.busid,
-            stop_id: s.stop_id,
-            stop_name: s.stop_name,
-            plan_time: s.plan_time,
+            busid: b.busid,
+            busname: b.busname,
+            bustype: b.bustype,
+            busseat: b.busseat,
+            line_status: '1',
           }),
         );
 
-        stopSet.add(key);
+      if (linesToInsert.length) {
+        await manager.save(BusDispatchLine, linesToInsert);
+        for (const l of linesToInsert) lineSet.add(Number(l.busid));
       }
-    }
 
-    if (stopsToInsert.length) {
-      await manager.save(BusDispatchStop, stopsToInsert);
-    }
+      const stopsToInsert: BusDispatchStop[] = [];
 
-    // 8) insert missing passengers
-    const passengersToInsert: BusDispatchPassenger[] = [];
+      for (const b of buses) {
+        const stopsSorted = Array.from(b.stops.values()).sort((x, y) => {
+          if (x.route_seq !== y.route_seq) return x.route_seq - y.route_seq;
+          return x.stop_id - y.stop_id;
+        });
 
-    for (const [empno, src] of empSourceMap.entries()) {
-      if (passEmpSet.has(empno)) continue;
+        for (const s of stopsSorted) {
+          const key = `${b.busid}|${s.stop_id}`;
+          if (stopSet.has(key)) continue;
 
-      passengersToInsert.push(
-        manager.create(BusDispatchPassenger, {
-          dispatch_id,
-          stop_id: src.stop_id,
-          empno,
-          status: 'E',
-        }),
-      );
+          stopsToInsert.push(
+            manager.create(BusDispatchStop, {
+              dispatch_id,
+              line_id: b.busid,
+              stop_id: s.stop_id,
+              stop_name: s.stop_name,
+              plan_time: s.plan_time,
+            }),
+          );
 
-      passEmpSet.add(empno);
-    }
+          stopSet.add(key);
+        }
+      }
 
-    if (passengersToInsert.length) {
-      await manager.save(BusDispatchPassenger, passengersToInsert);
-    }
+      if (stopsToInsert.length) {
+        await manager.save(BusDispatchStop, stopsToInsert);
+      }
 
-    return {
-      ok: true,
-      created: [
-        {
-          shift,
-          dispatch_id,
-          status: head.status,
-          lines_added: linesToInsert.length,
-          stops_added: stopsToInsert.length,
-          passengers_added: passengersToInsert.length,
-        },
-      ],
-    };
-  });
-}
-// ==================================================== //
+      const passengersToInsert: BusDispatchPassenger[] = [];
+
+      for (const [empno, src] of empSourceMap.entries()) {
+        if (passEmpSet.has(empno)) continue;
+
+        passengersToInsert.push(
+          manager.create(BusDispatchPassenger, {
+            dispatch_id,
+            stop_id: src.stop_id,
+            empno,
+            status: 'E',
+          }),
+        );
+
+        passEmpSet.add(empno);
+      }
+
+      if (passengersToInsert.length) {
+        await manager.save(BusDispatchPassenger, passengersToInsert);
+      }
+
+      return {
+        ok: true,
+        created: [
+          {
+            shift,
+            dispatch_id,
+            status: head.status,
+            lines_added: linesToInsert.length,
+            stops_added: stopsToInsert.length,
+            passengers_added: passengersToInsert.length,
+          },
+        ],
+      };
+    });
+  }
 
   async getDispatch(dto: DispatchKeyDto) {
     const head = await this.headRepo.findOne({
@@ -439,7 +433,6 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       this.lineRepo.find({
         where: {
           dispatch_id,
-          //line_status: '1',
         } as any,
         order: { busid: 'ASC' as any },
       }),
@@ -542,33 +535,36 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       lines: linesOut,
     };
   }
-  
 
   async moveStop(dto: MoveStopDto) {
     return this.dataSource.transaction(async (manager) => {
       const dispatch_id = Number(dto.dispatch_id);
       const stop_id = Number(dto.stop_id);
-      const head = await manager.findOne(BusDispatchHead, {  where: { dispatch_id },  });
+      const head = await manager.findOne(BusDispatchHead, { where: { dispatch_id } });
 
       if (!head) throw new Error('DISPATCH_NOT_FOUND');
       if (head.status === 'C') throw new Error('DISPATCH_CLOSED');
 
-      const stop = await manager.findOne(BusDispatchStop, { where: { dispatch_id, stop_id },});
-
+      const stop = await manager.findOne(BusDispatchStop, { where: { dispatch_id, stop_id } });
       if (!stop) throw new Error('STOP_NOT_FOUND');
-      // ---------- move line ----------
+
       if (dto.target_line_id !== undefined) {
         const target_line_id = Number(dto.target_line_id);
-        const targetLine = await manager.findOne(BusDispatchLine, { where: { dispatch_id, busid: target_line_id }, });
+        const targetLine = await manager.findOne(BusDispatchLine, {
+          where: { dispatch_id, busid: target_line_id },
+        });
         if (!targetLine) throw new Error('TARGET_LINE_NOT_FOUND');
         stop.line_id = target_line_id;
       }
 
-      // ---------- update stop name ----------
-      if (dto.stop_name !== undefined) {  stop.stop_name = String(dto.stop_name).trim(); }
+      if (dto.stop_name !== undefined) {
+        stop.stop_name = String(dto.stop_name).trim();
+      }
 
-      // ---------- update plan time ----------
-      if (dto.plan_time !== undefined) {  stop.plan_time = dto.plan_time; }
+      if (dto.plan_time !== undefined) {
+        stop.plan_time = dto.plan_time;
+      }
+
       await manager.save(BusDispatchStop, stop);
 
       head.update_by = dto.update_by;
@@ -622,13 +618,17 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       if (!stop_id) throw new Error('STOP_ID_REQUIRED');
       if (!empno) throw new Error('EMPNO_REQUIRED');
 
-      const head = await manager.findOne(BusDispatchHead, { where: { dispatch_id }, });
+      const head = await manager.findOne(BusDispatchHead, { where: { dispatch_id } });
       if (!head) throw new Error('DISPATCH_NOT_FOUND');
       if (head.status === 'C') throw new Error('DISPATCH_CLOSED');
 
-      const stop = await manager.findOne(BusDispatchStop, { where: { dispatch_id, stop_id } as any,});
+      const stop = await manager.findOne(BusDispatchStop, { where: { dispatch_id, stop_id } as any });
       if (!stop) throw new Error('STOP_NOT_FOUND');
-      const empRows: any[] = await manager.query( ` SELECT U.SEMPNO, U.STNAME, U.CSTATUS FROM AMEC.AMECUSERALL U WHERE U.SEMPNO = :1`,[empno],);
+
+      const empRows: any[] = await manager.query(
+        `SELECT U.SEMPNO, U.STNAME, U.CSTATUS FROM AMEC.AMECUSERALL U WHERE U.SEMPNO = :1`,
+        [empno],
+      );
       if (!empRows.length) throw new Error('EMPLOYEE_NOT_FOUND');
 
       let passenger = await manager.findOne(BusDispatchPassenger, {
@@ -671,7 +671,6 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     try {
       const dispatchId = Number(dto.dispatch_id);
       const busid = Number(dto.busid);
-      const updateBy = String(dto.update_by);
       const lineStatus = String(dto.status) as '0' | '1';
       const passengerStatus = lineStatus === '0' ? 'D' : 'E';
 
@@ -736,20 +735,16 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     }
   }
 
-
   async saveAddPassenger(dto: SaveAddPassengerDto) {
     return await this.dataSource.transaction(async (manager) => {
       const dispatchId = Number(dto.dispatch_id);
       const busid = Number(dto.line.busid);
       const stopId = Number(dto.stop.stop_id);
       const empno = String(dto.passenger.empno);
-      const updateBy = String(dto.update_by);
-
       const lineRepo = manager.getRepository(BusDispatchLine);
       const stopRepo = manager.getRepository(BusDispatchStop);
       const passengerRepo = manager.getRepository(BusDispatchPassenger);
 
-      // 1) ตรวจสอบ passenger ก่อน
       const existsPassenger = await passengerRepo.findOne({
         where: {
           dispatch_id: dispatchId,
@@ -764,7 +759,6 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
         };
       }
 
-      // 2) ตรวจสอบ line
       const existsLine = await lineRepo.findOne({
         where: {
           dispatch_id: dispatchId,
@@ -798,7 +792,6 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
         );
       }
 
-      // 3) ตรวจสอบ stop
       const existsStop = await stopRepo.findOne({
         where: {
           dispatch_id: dispatchId,
@@ -810,7 +803,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
         await stopRepo.save(
           stopRepo.create({
             dispatch_id: dispatchId,
-            line_id: busid, // value = BUSID
+            line_id: busid,
             stop_id: stopId,
             stop_name: dto.stop.stop_name || null,
             plan_time: dto.stop.plan_time || null,
@@ -818,7 +811,6 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
         );
       }
 
-      // 4) insert / update passenger
       if (!existsPassenger) {
         await passengerRepo.save(
           passengerRepo.create({
@@ -848,169 +840,20 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     });
   }
 
-
-  //================================== รายงาน ==================================//
   async getReportBus(dto: DailyDispatchReportDto) {
-    const dispatchId = Number(dto.dispatch_id);
-
-    // 1) ดึง line
-    const lines = await this.dataSource
-      .getRepository(BusDispatchLine)
-      .createQueryBuilder('l')
-      .where('l.dispatch_id = :dispatchId', { dispatchId })
-      .andWhere("NVL(l.line_status, '1') = '1'")
-      .orderBy('l.busid', 'ASC')
-      .getMany();
-
-    // 2) ดึง stop
-    const stops = await this.dataSource
-      .getRepository(BusDispatchStop)
-      .createQueryBuilder('s')
-      .where('s.dispatch_id = :dispatchId', { dispatchId })
-      .orderBy('s.line_id', 'ASC')
-      .addOrderBy('s.plan_time', 'DESC')
-      .addOrderBy('s.stop_id', 'ASC')
-      .getMany();
-
-    // 3) ดึง passenger ที่ enable + join employee
-    const passengers = await this.dataSource
-      .getRepository(BusDispatchPassenger)
-      .createQueryBuilder('p')
-      .leftJoin(
-        'AMECUSERALL',
-        'u',
-        "TRIM(TO_CHAR(u.SEMPNO)) = TRIM(TO_CHAR(p.empno))",
-      )
-      .select('p.EMPNO', 'empno')
-      .addSelect('p.STOP_ID', 'stop_id')
-      .addSelect('u.STNAME', 'fullname')
-      .addSelect('u.SDEPT', 'dept')
-      .addSelect('u.SSEC', 'sec')
-      .addSelect('u.SDIV', 'div')
-      .where('p.dispatch_id = :dispatchId', { dispatchId })
-      .andWhere("NVL(p.status, 'E') = 'E'")
-      .orderBy('p.stop_id', 'ASC')
-      .addOrderBy('p.empno', 'ASC')
-      .getRawMany();
-
-    // 4) ประกอบ report
-    const resultLines = lines.map((line) => {
-      const lineStops = stops
-        .filter((s) => s.line_id === line.busid)
-        .map((stop) => {
-          const stopPassengers = passengers
-            .filter((p) => Number(p.stop_id) === Number(stop.stop_id))
-            .map((p, index) => {
-              return {
-                no: index + 1,
-                empno: p.empno || '',
-                fullname: p.fullname || '',
-                dept: p.dept || '',
-                sec: p.sec || '',
-                div: p.div || '',
-              };
-            });
-
-          return {
-            stop_id: stop.stop_id,
-            stop_name: stop.stop_name || '',
-            plan_time: stop.plan_time || '',
-            passengers: stopPassengers,
-          };
-        });
-
-      return {
-        busid: line.busid,
-        busname: line.busname || '',
-        bustype: line.bustype || '',
-        busseat: line.busseat,
-        line_status: line.line_status || '',
-        stops: lineStops,
-      };
-    });
-
-    return {
-      status: true,
-      dispatch_id: dispatchId,
-      title: await this.buildDispatchReportTitle(dispatchId),
-      lines: resultLines,
-    };
+    return this.dispatchReportService.getReportBus(dto);
   }
-//================================================================== //
+
   async getReportDisabledPassenger(dto: DailyDispatchReportDto) {
-    const dispatchId = Number(dto.dispatch_id);
-
-    const passengers = await this.passRepo
-      .createQueryBuilder('p')
-      .leftJoin(
-        BusDispatchStop,
-        's',
-        's.dispatch_id = p.dispatch_id AND s.stop_id = p.stop_id',
-      )
-      .leftJoin(
-        'AMECUSERALL',
-        'u',
-        "TRIM(TO_CHAR(u.SEMPNO)) = TRIM(TO_CHAR(p.empno))",
-      )
-      .select('p.EMPNO', 'empno')
-      .addSelect('s.STOP_NAME', 'stop_name')
-      .addSelect('s.PLAN_TIME', 'plan_time')
-      .addSelect('u.STNAME', 'fullname')
-      .addSelect('u.SSEC', 'sec')
-      .addSelect('u.SDEPT', 'dept')
-      .addSelect('u.SDIV', 'div')
-      .where('p.dispatch_id = :dispatchId', { dispatchId })
-      .andWhere("NVL(p.status, 'E') = 'D'")
-      .orderBy('p.empno', 'ASC')
-      .getRawMany();
-
-    const rows = passengers.map((row, index) => ({
-      no: index + 1,
-      empno: row.empno || '',
-      fullname: row.fullname || '',
-      sec: row.sec || '',
-      dept: row.dept || '',
-      div: row.div || '',
-      stop_name: row.stop_name || '',
-      plan_time: row.plan_time || '',
-    }));
-
-    return {
-      status: true,
-      dispatch_id: dispatchId,
-      title: 'รายชื่อผู้ที่ไม่ได้จัดรถ',
-      rows,
-    };
+    return this.dispatchReportService.getReportDisabledPassenger(dto);
   }
-  
-  private async buildDispatchReportTitle(dispatchId: number) {
-    const head = await this.dataSource
-      .getRepository(BusDispatchHead)
-      .createQueryBuilder('h')
-      .where('h.dispatch_id = :dispatchId', { dispatchId })
-      .getOne();
-
-    if (!head) return 'ตารางรถรับส่งพนักงาน';
-
-    const date = head.dispatch_date
-      ? new Date(head.dispatch_date).toLocaleDateString('th-TH')
-      : '';
-
-    let timeText = '';
-    if (head.dispatch_type === 'O' && head.shift === 'D') timeText = 'OT เวลา 19.30 น.';
-    else if (head.dispatch_type === 'O' && head.shift === 'S') timeText = 'OT เวลา 21.30 น.';
-    else if (head.dispatch_type === 'O' && head.shift === 'N') timeText = 'OT (กะกลางคืน) เวลา 07.30 น.';
-    else if (head.shift === 'H') timeText = 'OT เวลา 17.00 น.';
-
-    return `ตารางรถรับส่งพนักงาน ${timeText} ประจำวันที่ ${date}`;
-  }
-
 
   async updatePassengerStatus(dto: UpdatePassengerStatusDto) {
     return this.dataSource.transaction(async (manager) => {
       const dispatch_id = Number(dto.dispatch_id);
       const empno = String(dto.empno).trim();
       const status = String(dto.status).trim();
+
       const head = await manager.findOne(BusDispatchHead, {
         where: { dispatch_id },
       });
@@ -1044,6 +887,7 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     const dispatchId = Number(dto.dispatch_id);
     const busId = Number(dto.busid);
     const repo = this.dataSource.getRepository(BusDispatchLine);
+
     const line = await repo.findOne({
       where: {
         dispatch_id: dispatchId,
@@ -1061,20 +905,22 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     line.bustype = dto.bustype;
     line.busseat = Number(dto.busseat);
     await repo.save(line);
+
     return {
       status: true,
       message: 'แก้ไขประเภทรถสำเร็จ',
     };
   }
 
+
+//---------------------------------------------- R U N  J O B ------------------------------------------------------
   async runDailySchedule(dto: RunDailyScheduleDto) {
     const runDate = dayjs().format('YYYY-MM-DD');
     const updateBy = dto.update_by;
-
     const today = dayjs(runDate);
     const tomorrow = today.add(1, 'day');
 
-    const jobs : BuildDailyFirstDto[]  = [
+    const jobs: BuildDailyFirstDto[] = [
       {
         workdate: today.startOf('day').toDate(),
         dispatch_type: 'O',
@@ -1105,17 +951,20 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
       await this.buildDailyFirst(job);
     }
 
-    const isHoliday = await this.checkHoliday(tomorrow.format('YYYYMMDD'));
+    // ตรวจวันหยุดต่อเนื่องตั้งแต่วันพรุ่งนี้เป็นต้นไป
+    let holidayDate = tomorrow.clone();
 
-    if (isHoliday) {
+    while (await this.checkHoliday(holidayDate.format('YYYYMMDD'))) {
       await this.buildDailyFirst({
-        workdate: tomorrow.startOf('day').toDate(),
+        workdate: holidayDate.startOf('day').toDate(),
         dispatch_type: 'O',
         timeout_from: '0800',
         timeout_to: '1700',
         update_by: updateBy,
         shift: 'D',
       });
+
+      holidayDate = holidayDate.add(1, 'day');
     }
 
     return {
@@ -1124,14 +973,83 @@ async buildDailyFirst(dto: BuildDailyFirstDto) {
     };
   }
 
+
   async checkHoliday(holidayDate: string): Promise<boolean> {
-    const rows = await this.dataSource.query(
-      `SELECT HOLIDAY
-        FROM WEBFORM.HOLIDAY
-        WHERE HOLIDAY = :1`,
-      [holidayDate],
-    );
+    const rows = await this.dataSource.query(`SELECT HOLIDAY FROM WEBFORM.HOLIDAY WHERE HOLIDAY = :1`, [holidayDate], );
     return Array.isArray(rows) && rows.length > 0;
   }
 
+
+  async createShareFolder() {
+    return this.dispatchExportService.createShareFolder();
+  }
+
+  async exportAndSendMail(dto: ExportAndSendMailDto) {
+    const dispatchId = Number(dto.dispatch_id);
+    if (!dispatchId) {
+      throw new Error('dispatch_id ไม่ถูกต้อง');
+    }
+
+    const reportDto: DailyDispatchReportDto = {
+      dispatch_id: String(dispatchId),
+    };
+
+    const reportBusRes = await this.dispatchReportService.getReportBus(reportDto);
+    if (!reportBusRes?.status) {
+      throw new Error(reportBusRes?.message || 'ไม่สามารถดึงข้อมูลรายงานจัดรถได้');
+    }
+
+    const reportDisabledRes = await this.dispatchReportService.getReportDisabledPassenger(reportDto);
+    if (!reportDisabledRes?.status) {
+      throw new Error(reportDisabledRes?.message || 'ไม่สามารถดึงข้อมูลรายงานผู้ไม่ได้จัดรถได้');
+    }
+
+    const folderRes = await this.dispatchExportService.createShareFolder();
+    if (!folderRes?.status || !folderRes?.folderPath) {
+      throw new Error(folderRes?.message || 'ไม่สามารถสร้างโฟลเดอร์กลางได้');
+    }
+
+    const folderPath = folderRes.folderPath;
+
+    const workbook1 = await this.dispatchExportService.buildBusDailyLayoutWorkbook(reportBusRes);
+    const workbook2 = await this.dispatchExportService.buildDisabledPassengerWorkbook(reportDisabledRes, dto);
+
+    const timeStamp = dayjs().format('YYYYMMDD_HHmmss');
+    const fileName1 = `OT_Daily_Transportation_Route_${timeStamp}.xlsx`;
+    const fileName2 = `List_of_Employee_unable_arrange_transportation_${timeStamp}.xlsx`;
+
+    const filePath1 = path.join(folderPath, fileName1);
+    const filePath2 = path.join(folderPath, fileName2);
+
+    await workbook1.xlsx.writeFile(filePath1);
+    await workbook2.xlsx.writeFile(filePath2);
+
+    await this.dispatchMailService.sendDispatchMail({
+      to: 'supamid@mitsubishielevatorasia.co.th',
+      cc: dto.mail_cc || '',
+      bcc: dto.mail_bcc || '',
+      subject: `แจ้งแผนการจัดรถพนักงาน (${dto.workdate})`,
+      html: this.dispatchMailService.buildDispatchMailHtml(dto),
+      attachments: [filePath1, filePath2],
+    });
+
+    const updateDto: SaveDispatchDto = {
+      dispatch_id: dispatchId,
+      status: 'F',
+      update_by: dto.update_by,
+    };
+
+    const updateRes = await this.updateDispatchStatusHead(updateDto);
+
+    return {
+      status: true,
+      message: 'สร้างไฟล์ Excel และส่งอีเมลสำเร็จ',
+      update: updateRes,
+      folderPath,
+      files: [
+        { fileName: fileName1, filePath: filePath1 },
+        { fileName: fileName2, filePath: filePath2 },
+      ],
+    };
+  }
 }

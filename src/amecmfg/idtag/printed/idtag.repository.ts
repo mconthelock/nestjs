@@ -13,10 +13,13 @@ import { IdtagPages } from '../../../common/Entities/workload/table/idtag-pages.
 import { IdtagImages } from '../../../common/Entities/workload/views/idtag-images.entity';
 import { IdtagCnData } from '../../../common/Entities/workload/views/idtag-cndata.entity';
 import { IdtagNcDetail } from '../../../common/Entities/workload/views/idtag-ncdetail.entity';
+import { IdtagLabel } from '../../../common/Entities/workload/views/idtag-label.entity';
 
 import { CreateIdtagFilesDto } from './dto/create-idtag-files.dto';
 import { CreateIdtagPagesDto } from './dto/create-idtag-pages.dto';
 import { SearchIdtagFilesDto } from './dto/search-idtag-file.dto';
+import { UpdateIdtagFilesDto } from './dto/update-idtag-file.dto';
+import { UpadateIdtagPagesDto } from './dto/update-idtag-pages.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class IdTagRepository extends BaseRepository {
@@ -46,7 +49,7 @@ export class IdTagRepository extends BaseRepository {
 
     async findAllPagess(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(IdtagPages, 'pages');
-        this.applyFilters(qb, 'pages', dto, ['FILES_ID', 'PAGE_CN']);
+        this.applyFilters(qb, 'pages', dto, ['FILES_ID']);
         return qb.getMany();
     }
 
@@ -63,8 +66,20 @@ export class IdTagRepository extends BaseRepository {
     }
 
     async findAllNc(dto: FiltersDto) {
-        const qb = this.manager.createQueryBuilder(IdtagNcDetail, 'nc');
-        this.applyFilters(qb, 'nc', dto, ['FILES_ID', 'PAGE_CN']);
+        const qb = this.manager.createQueryBuilder(IdtagNcDetail, 'N');
+        this.applyFilters(qb, 'N', dto, ['TASKNAME', 'PAGE_NC']);
+        qb.orderBy('N.FILES_ID', 'ASC')
+            .addOrderBy('SEQNO', 'ASC')
+            .addOrderBy('N.PAGE_NUM', 'ASC');
+        return qb.getMany();
+    }
+
+    async findAllLabel(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(IdtagLabel, 'label');
+        this.applyFilters(qb, 'label', dto, ['FILES_ID']);
+        qb.orderBy('FILES_ID', 'ASC')
+            .addOrderBy('FILES_ID', 'ASC')
+            .addOrderBy('PAGE_NUM', 'ASC');
         return qb.getMany();
     }
 
@@ -87,76 +102,114 @@ export class IdTagRepository extends BaseRepository {
         return savedFile;
     }
 
-    async createFiles() {}
+    async createFiles(fileData: CreateIdtagFilesDto) {
+        return await this.manager.save(IdtagFiles, fileData);
+    }
 
-    async createPages() {}
-
-    async updateFiles() {}
-
-    async updatePages() {}
-
-    async deelteFiles() {}
-
-    async dedletePages() {}
-
-    async updatePageImage(filesId: number, pageNum: number, pageImg: string) {
-        return this.getRepository(IdtagPages).update(
-            {
-                FILES_ID: filesId,
-                PAGE_NUM: pageNum,
-            },
-            {
-                PAGE_IMG: '1',
-            },
+    async updateFiles(fileData: UpdateIdtagFilesDto) {
+        return await this.manager.update(
+            IdtagFiles,
+            { FILES: fileData.FILES },
+            fileData,
         );
     }
 
-    async updatePrintFileStatus(files: number, status: number, page?: number) {
-        return this.getRepository(IdtagFiles).update(
-            {
-                FILES: files,
-            },
-            {
-                FILE_STATUS: status,
-                PRINTED_DATE: status == 3 ? new Date() : null,
-                FILE_PRINTEDPAGE: page || 0,
-            },
-        );
-    }
-
-    async updatePrintPagesStatus(files: number, status: number) {
-        return this.manager
-            .createQueryBuilder()
-            .update(IdtagPages)
-            .set({ PAGE_STATUS: status })
-            .where('FILES_ID = :files', { files })
-            .execute();
-    }
-
-    async updateNcPagesStatus(files: number, status: string) {
-        return this.manager
-            .createQueryBuilder()
-            .update(IdtagPages)
-            .set({ PAGE_NC: status })
-            .where('FILES_ID = :files', { files })
-            .execute();
-    }
-
-    async updateNcPagesStatusByPageNums(
-        files: number,
-        pageNums: number[],
-        status: string,
+    async updatePages(
+        pagesData: Array<
+            Omit<UpadateIdtagPagesDto, 'FILES_ID' | 'PAGE_NUM'> &
+                Pick<CreateIdtagPagesDto, 'FILES_ID' | 'PAGE_NUM'> & {
+                    NEXT_FILES_ID?: number;
+                }
+        >,
     ) {
-        if (!pageNums.length) return;
-
-        return this.manager
-            .createQueryBuilder()
-            .update(IdtagPages)
-            .set({ PAGE_NC: status })
-            .where('FILES_ID = :files', { files })
-            .andWhere('PAGE_NUM IN (:...pageNums)', { pageNums })
-            .execute();
+        const updatePromises = pagesData.map((pageData) => {
+            const { FILES_ID, PAGE_NUM, NEXT_FILES_ID, ...updateData } =
+                pageData;
+            return this.manager.update(
+                IdtagPages,
+                { FILES_ID, PAGE_NUM },
+                {
+                    ...updateData,
+                    ...(NEXT_FILES_ID != null
+                        ? { FILES_ID: NEXT_FILES_ID }
+                        : {}),
+                },
+            );
+        });
+        await Promise.all(updatePromises);
+        return { updated: updatePromises.length };
     }
+
+    async deleteFiles(filesId: number) {
+        const file = await this.manager.delete(IdtagFiles, { FILES: filesId });
+        const pages = await this.manager.delete(IdtagPages, {
+            FILES_ID: filesId,
+        });
+        return { file, pages };
+    }
+
+    async deletePages(pagesId: number) {
+        return this.manager.delete(IdtagPages, { PAGE_ID: pagesId });
+    }
+
+    // async updatePageImage(filesId: number, pageNum: number, pageImg: string) {
+    //     return this.getRepository(IdtagPages).update(
+    //         {
+    //             FILES_ID: filesId,
+    //             PAGE_NUM: pageNum,
+    //         },
+    //         {
+    //             PAGE_IMG: '1',
+    //         },
+    //     );
+    // }
+
+    // async updatePrintFileStatus(files: number, status: number, page?: number) {
+    //     return this.getRepository(IdtagFiles).update(
+    //         {
+    //             FILES: files,
+    //         },
+    //         {
+    //             FILE_STATUS: status,
+    //             PRINTED_DATE: status == 3 ? new Date() : null,
+    //             FILE_PRINTEDPAGE: page || 0,
+    //         },
+    //     );
+    // }
+
+    // async updatePrintPagesStatus(files: number, status: number) {
+    //     return this.manager
+    //         .createQueryBuilder()
+    //         .update(IdtagPages)
+    //         .set({ PAGE_STATUS: status })
+    //         .where('FILES_ID = :files', { files })
+    //         .execute();
+    // }
+
+    // async updateNcPagesStatus(files: number, status: string) {
+    //     return this.manager
+    //         .createQueryBuilder()
+    //         .update(IdtagPages)
+    //         .set({ PAGE_NC: status })
+    //         .where('FILES_ID = :files', { files })
+    //         .execute();
+    // }
+
+    // async updateNcPagesStatusByPageNums(
+    //     files: number,
+    //     pageNums: number[],
+    //     status: string,
+    // ) {
+    //     if (!pageNums.length) return;
+
+    //     return this.manager
+    //         .createQueryBuilder()
+    //         .update(IdtagPages)
+    //         .set({ PAGE_NC: status })
+    //         .where('FILES_ID = :files', { files })
+    //         .andWhere('PAGE_NUM IN (:...pageNums)', { pageNums })
+    //         .execute();
+    // }
 
     // async findAllFiles(dto: SearchIdtagFilesDto) {
     //     const qb = this.manager.createQueryBuilder(IdtagFiles, 'files');
@@ -164,21 +217,13 @@ export class IdTagRepository extends BaseRepository {
     //     return qb.getMany();
     // }
 
-    async deletePdf(filesId: number) {
-        const file = this.manager.delete(IdtagFiles, { FILES: filesId });
-        const pages = await this.manager.delete(IdtagPages, {
-            FILES_ID: filesId,
-        });
-        return { file, pages };
-    }
+    // async deletePdf(filesId: number) {
+    //     const file = this.manager.delete(IdtagFiles, { FILES: filesId });
+    //     const pages = await this.manager.delete(IdtagPages, {
+    //         FILES_ID: filesId,
+    //     });
+    //     return { file, pages };
+    // }
 
     // NC Detail
-    async findNcDetail(dto: FiltersDto) {
-        const qb = this.manager.createQueryBuilder(IdtagNcDetail, 'N');
-        this.applyFilters(qb, 'N', dto, ['TASKNAME', 'PAGE_TAG']);
-        qb.orderBy('N.FILES_ID', 'ASC')
-            .addOrderBy('SEQNO', 'ASC')
-            .addOrderBy('N.PAGE_NUM', 'ASC');
-        return qb.getMany();
-    }
 }

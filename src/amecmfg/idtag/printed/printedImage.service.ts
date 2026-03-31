@@ -73,11 +73,13 @@ export class PrintedImagesService {
                 await this.printed.writeLog(
                     `Put image ${img.DWG_IMG} to ${img.PAGE_TAG}`,
                 );
-                await this.repo.updatePageImage(
-                    img.FILES_ID,
-                    img.PAGE_NUM,
-                    img.DWG_IMG,
-                );
+                await this.repo.updatePages([
+                    {
+                        FILES_ID: filesId,
+                        PAGE_NUM: img.PAGE_NUM,
+                        PAGE_IMG: '1',
+                    },
+                ]);
             } catch (error) {
                 await this.printed.writeLog(
                     `Error processing image for tag ${img.PAGE_TAG}`,

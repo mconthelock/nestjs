@@ -59,6 +59,7 @@ export class MfgDrawingRepository extends BaseRepository {
             'NITEMID',
             'VPIS',
             'VDRAWING',
+            'VCONTROLNO',
             'NINSPECTOR_STATUS',
             'NFORELEAD_STATUS',
             'NSTATUS',

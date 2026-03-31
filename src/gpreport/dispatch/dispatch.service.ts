@@ -108,28 +108,6 @@ export class DispatchService {
     const shift = dto.shift;
 
     return this.dataSource.transaction(async (manager) => {
-      let head = await manager.findOne(BusDispatchHead, {
-        where: {
-          dispatch_date: workDate,
-          dispatch_type: dto.dispatch_type,
-          shift,
-        },
-      });
-
-      if (!head) {
-        head = await manager.save(
-          manager.create(BusDispatchHead, {
-            dispatch_date: workDate,
-            dispatch_type: dto.dispatch_type,
-            shift,
-            status: 'D',
-            update_by: dto.update_by,
-            update_date: new Date(),
-          }),
-        );
-      }
-
-      const dispatch_id = head.dispatch_id;
       const rows: any[] = await manager.query(
         `
         SELECT * FROM (
@@ -174,34 +152,34 @@ export class DispatchService {
             ROUTE.STATENO AS ROUTE_SEQ,
             CAD.BUSLINENO AS NEW_BUSLINENO,
             CAD.BUSSTOPNO AS NEW_BUSSTOPNO
-        FROM WEBFORM.OTFORM OT
-        INNER JOIN WEBFORM.FORM F
-            ON F.NFRMNO = OT.NFRMNO
-            AND F.VORGNO = OT.VORGNO
-            AND F.CYEAR  = OT.CYEAR
-            AND F.CYEAR2 = OT.CYEAR2
-            AND F.NRUNNO = OT.NRUNNO
-        JOIN GPREPORT.BUS_PASSENGER PSG
-            ON PSG.EMPNO = OT.EMPNO
-        JOIN GPREPORT.BUS_ROUTE ROUTE
-            ON ROUTE.STOPNO = PSG.BUSSTOP
-        JOIN GPREPORT.BUS_STOP STOP
-            ON STOP.STOP_ID = PSG.BUSSTOP
-        JOIN GPREPORT.BUS_LINE LINE
-            ON LINE.BUSID = ROUTE.BUSLINE
-        LEFT JOIN WEBFORM.CHANGEADDR CAD
-            ON OT.WORKDATE = CAD.WORKDATE
-          AND OT.EMPNO = CAD.EMPNO
-        LEFT JOIN GPREPORT.BUS_LINE LINE_CAD
-            ON LINE_CAD.BUSID = CAD.BUSLINENO
-        LEFT JOIN GPREPORT.BUS_STOP STOP_CAD
-            ON STOP_CAD.STOP_ID = CAD.BUSSTOPNO
-        WHERE OT.WORKDATE = :1
-          AND OT.TIMEIN >= :2
-          AND OT.TIMEOUT <= :3
-          AND F.CST <> '3'
-      ) 
-      `,
+          FROM WEBFORM.OTFORM OT
+          INNER JOIN WEBFORM.FORM F
+              ON F.NFRMNO = OT.NFRMNO
+              AND F.VORGNO = OT.VORGNO
+              AND F.CYEAR  = OT.CYEAR
+              AND F.CYEAR2 = OT.CYEAR2
+              AND F.NRUNNO = OT.NRUNNO
+          JOIN GPREPORT.BUS_PASSENGER PSG
+              ON PSG.EMPNO = OT.EMPNO
+          JOIN GPREPORT.BUS_ROUTE ROUTE
+              ON ROUTE.STOPNO = PSG.BUSSTOP
+          JOIN GPREPORT.BUS_STOP STOP
+              ON STOP.STOP_ID = PSG.BUSSTOP
+          JOIN GPREPORT.BUS_LINE LINE
+              ON LINE.BUSID = ROUTE.BUSLINE
+          LEFT JOIN WEBFORM.CHANGEADDR CAD
+              ON OT.WORKDATE = CAD.WORKDATE
+            AND OT.EMPNO = CAD.EMPNO
+          LEFT JOIN GPREPORT.BUS_LINE LINE_CAD
+              ON LINE_CAD.BUSID = CAD.BUSLINENO
+          LEFT JOIN GPREPORT.BUS_STOP STOP_CAD
+              ON STOP_CAD.STOP_ID = CAD.BUSSTOPNO
+          WHERE OT.WORKDATE = :1
+            AND OT.TIMEIN >= :2
+            AND OT.TIMEOUT <= :3
+            AND F.CST <> '3'
+        )
+        `,
         [workDate, dto.timeout_from, dto.timeout_to],
       );
 
@@ -209,18 +187,32 @@ export class DispatchService {
         return {
           ok: true,
           message: 'NO_OT_ROWS',
-          created: [
-            {
-              shift,
-              dispatch_id,
-              status: head.status,
-              lines_added: 0,
-              stops_added: 0,
-              passengers_added: 0,
-            },
-          ],
+          created: [],
         };
       }
+
+      let head = await manager.findOne(BusDispatchHead, {
+        where: {
+          dispatch_date: workDate,
+          dispatch_type: dto.dispatch_type,
+          shift,
+        },
+      });
+
+      if (!head) {
+        head = await manager.save(
+          manager.create(BusDispatchHead, {
+            dispatch_date: workDate,
+            dispatch_type: dto.dispatch_type,
+            shift,
+            status: 'D',
+            update_by: dto.update_by,
+            update_date: new Date(),
+          }),
+        );
+      }
+
+      const dispatch_id = head.dispatch_id;
 
       const [existingLines, existingStops, existingPassengers] = await Promise.all([
         manager.find(BusDispatchLine, { where: { dispatch_id } }),
@@ -1025,9 +1017,9 @@ export class DispatchService {
     await workbook2.xlsx.writeFile(filePath2);
 
     await this.dispatchMailService.sendDispatchMail({
-      to: 'supamid@mitsubishielevatorasia.co.th',
-      cc: dto.mail_cc || '',
-      bcc: dto.mail_bcc || '',
+      to: ['warawuts@MitsubishiElevatorAsia.co.th','nathawu@MitsubishiElevatorAsia.co.th'],
+      cc: ['rewepong@MitsubishiElevatorAsia.co.th','supamid@mitsubishielevatorasia.co.th'],
+      bcc: ['kallaya@MitsubishiElevatorAsia.co.th'],
       subject: `แจ้งแผนการจัดรถพนักงาน (${dto.workdate})`,
       html: this.dispatchMailService.buildDispatchMailHtml(dto),
       attachments: [filePath1, filePath2],
@@ -1052,4 +1044,26 @@ export class DispatchService {
       ],
     };
   }
+
+
+  async update_fin_status_Dispatch() {
+    const result = await this.dataSource
+      .createQueryBuilder()
+      .update(BusDispatchHead)
+      .set({
+        status: 'F',
+        update_date: new Date(),
+      })
+      .where("NVL(status, 'N') <> :finalStatus", { finalStatus: 'F' })
+      .andWhere('TRUNC(dispatch_date) = TRUNC(SYSDATE) - 1')
+      .execute();
+
+    return {
+      status: true,
+      message: 'Auto finalize completed',
+      affected: result.affected || 0,
+    };
+  }
+
+
 }

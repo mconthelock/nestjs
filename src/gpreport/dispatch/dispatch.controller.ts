@@ -107,4 +107,9 @@ export class DispatchController {
     return await this.service.exportAndSendMail(dto);
   }
 
+  @Post('auto-update-status-dispatch')
+  async update_fin_status_Dispatch() {
+    return this.service.update_fin_status_Dispatch();
+  }
+
 } 

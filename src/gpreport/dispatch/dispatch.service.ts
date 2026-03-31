@@ -1016,14 +1016,14 @@ export class DispatchService {
     await workbook1.xlsx.writeFile(filePath1);
     await workbook2.xlsx.writeFile(filePath2);
 
-   await this.dispatchMailService.sendDispatchMail({
-    to: ['warawuts@MitsubishiElevatorAsia.co.th','nathawu@MitsubishiElevatorAsia.co.th'],
-    cc: ['rewepong@MitsubishiElevatorAsia.co.th','supamid@mitsubishielevatorasia.co.th'],
-    bcc: ['kallaya@MitsubishiElevatorAsia.co.th'],
-    subject: `แจ้งแผนการจัดรถพนักงาน (${dto.workdate})`,
-    html: this.dispatchMailService.buildDispatchMailHtml(dto),
-    attachments: [filePath1, filePath2],
-  });
+    await this.dispatchMailService.sendDispatchMail({
+      to: ['warawuts@MitsubishiElevatorAsia.co.th','nathawu@MitsubishiElevatorAsia.co.th'],
+      cc: ['rewepong@MitsubishiElevatorAsia.co.th','supamid@mitsubishielevatorasia.co.th'],
+      bcc: ['kallaya@MitsubishiElevatorAsia.co.th'],
+      subject: `แจ้งแผนการจัดรถพนักงาน (${dto.workdate})`,
+      html: this.dispatchMailService.buildDispatchMailHtml(dto),
+      attachments: [filePath1, filePath2],
+    });
 
     const updateDto: SaveDispatchDto = {
       dispatch_id: dispatchId,

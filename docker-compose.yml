@@ -1,39 +1,24 @@
-version: "3.7"
-
 services:
-  db:
-    image: mysql:latest
-    container_name: mysql_db
-    command: --default-authentication-plugin=mysql_native_password
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: tutorial
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - my_network
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: phpmyadmin
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: root
-    ports:
-      - "8080:80"
-    depends_on:
-      - db
-    networks:
-      - my_network
+    amecweb:
+        image: keymetrics/pm2:22-alpine
+        container_name: amecweb_api
+        restart: always
+        ports:
+            - "3005:3001"
+        volumes:
+            - ./amecweb:/var/www/
+        working_dir: /var/www
+        environment:
+            - TZ=Asia/Bangkok
+            - HTTP_PROXY=http://192.168.3.1:3128
+            - HTTPS_PROXY=http://192.168.3.1:3128
+            - http_proxy=http://192.168.3.1:3128
+            - https_proxy=http://192.168.3.1:3128
+            - NO_PROXY=localhost,127.0.0.1,webhub.mitsubishielevatorasia.co.th,172.21.251.42,.mitsubishielevatorasia.co.th
+            - no_proxy=localhost,127.0.0.1,webhub.mitsubishielevatorasia.co.th,172.21.251.42,.mitsubishielevatorasia.co.th
+        networks:
+            - devops_net
 
 networks:
-  my_network:
-    driver: bridge
-
-volumes:
-  mysql_data:
-    driver: local
+    devops_net:
+        external: true

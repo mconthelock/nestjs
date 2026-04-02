@@ -17,7 +17,6 @@ export class DispatchExportService {
 
       const yearPath = path.join(basePath, year);
       const monthPath = path.join(yearPath, month);
-
       await mkdir(yearPath, { recursive: true });
       await mkdir(monthPath, { recursive: true });
 

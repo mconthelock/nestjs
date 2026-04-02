@@ -20,7 +20,7 @@ import { User } from 'src/amec/users/entities/user.entity';
 import { Partcategory } from 'src/spprogram/partcategory/entities/partcategory.entity';
 
 //DTOs
-import { searchDto } from './dto/search.dto';
+import { searchInqDto } from './dto/search.dto';
 import { createInqDto } from './dto/create-inquiry.dto';
 import { updateInqDto } from './dto/update-inquiry.dto';
 import { createDetailDto } from '../inquiry-detail/dto/create.dto';
@@ -38,7 +38,7 @@ export class InquiryService {
         private readonly inq: Repository<Inquiry>,
     ) {}
 
-    async search(searchDto: searchDto) {
+    async search(searchDto: searchInqDto) {
         const qb = this.inq
             .createQueryBuilder('inq')
             .leftJoinAndSelect('inq.status', 'status')
@@ -48,7 +48,12 @@ export class InquiryService {
             .leftJoinAndSelect('inq.method', 'method')
             .leftJoinAndSelect('inq.quotype', 'quotype');
         if (searchDto.IS_GROUP) {
-            qb.leftJoinAndSelect('inq.inqgroup', 'inqgroup');
+            qb.leftJoinAndSelect(
+                'inq.inqgroup',
+                'inqgroup',
+                'inqgroup.INQG_LATEST = :latest',
+                { latest: 1 },
+            );
             delete searchDto.IS_GROUP;
         }
 
@@ -581,7 +586,7 @@ export class InquiryService {
         return this.inq.save(inquiry);
     }
 
-    async delete(searchDto: searchDto) {
+    async delete(searchDto: searchInqDto) {
         const params = [
             searchDto.INQ_ID,
             searchDto.INQ_MAR_PIC,

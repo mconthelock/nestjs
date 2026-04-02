@@ -1,10 +1,10 @@
 import { Type } from 'class-transformer';
 import {
-  IsString,
-  IsOptional,
-  ValidateNested,
-  IsDataURI,
-  IsDate,
+    IsString,
+    IsOptional,
+    ValidateNested,
+    IsDataURI,
+    IsDate,
 } from 'class-validator';
 import { PartialType, OmitType } from '@nestjs/mapped-types';
 import { createInqDto } from './create-inquiry.dto';
@@ -18,54 +18,54 @@ export class DetailDto extends PartialType(createDetailDto) {}
 const OmitInqFields = ['INQ_STATUS'] as const;
 class SearchBase extends OmitType(createInqDto, OmitInqFields) {}
 
-export class searchDto extends PartialType(SearchBase) {
-  @IsOptional()
-  @IsString()
-  INQ_STATUS?: string;
+export class searchInqDto extends PartialType(SearchBase) {
+    @IsOptional()
+    @IsString()
+    INQ_STATUS?: string;
 
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => TimelineDto)
-  timeline?: TimelineDto;
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => TimelineDto)
+    timeline?: TimelineDto;
 
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => QuotationDto)
-  quotation?: QuotationDto;
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => QuotationDto)
+    quotation?: QuotationDto;
 
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => DetailDto)
-  details?: DetailDto;
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => DetailDto)
+    details?: DetailDto;
 
-  @IsOptional()
-  IS_ORDERS?: string;
+    @IsOptional()
+    IS_ORDERS?: string;
 
-  @IsOptional()
-  IS_DETAILS?: string;
+    @IsOptional()
+    IS_DETAILS?: string;
 
-  @IsOptional()
-  IS_QUOTATION?: string;
+    @IsOptional()
+    IS_QUOTATION?: string;
 
-  @IsOptional()
-  IS_TIMELINE?: string;
+    @IsOptional()
+    IS_TIMELINE?: string;
 
-  @IsOptional()
-  IS_FIN?: string;
+    @IsOptional()
+    IS_FIN?: string;
 
-  @IsOptional()
-  IS_GROUP?: string;
+    @IsOptional()
+    IS_GROUP?: string;
 
-  @IsOptional()
-  IS_WEIGHT?: string;
+    @IsOptional()
+    IS_WEIGHT?: string;
 
-  @Type(() => Date)
-  @IsOptional()
-  @IsDate()
-  START_INQ_DATE?: Date;
+    @Type(() => Date)
+    @IsOptional()
+    @IsDate()
+    START_INQ_DATE?: Date;
 
-  @Type(() => Date)
-  @IsOptional()
-  @IsDate()
-  END_INQ_DATE?: Date;
+    @Type(() => Date)
+    @IsOptional()
+    @IsDate()
+    END_INQ_DATE?: Date;
 }

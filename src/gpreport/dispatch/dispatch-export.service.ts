@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import * as ExcelJS from 'exceljs';
-import * as fs from 'fs-extra';
 import { ExportAndSendMailDto } from './dto/export-and-sendmail.dto';
+import { mkdir, writeFile } from 'fs/promises';
 
 @Injectable()
 export class DispatchExportService {
@@ -17,12 +17,11 @@ export class DispatchExportService {
 
       const yearPath = path.join(basePath, year);
       const monthPath = path.join(yearPath, month);
-
-      await fs.mkdir(yearPath, { recursive: true });
-      await fs.mkdir(monthPath, { recursive: true });
+      await mkdir(yearPath, { recursive: true });
+      await mkdir(monthPath, { recursive: true });
 
       const testFile = path.join(monthPath, 'test.txt');
-      await fs.writeFile(testFile, `test at ${new Date().toISOString()}`);
+      await writeFile(testFile, `test at ${new Date().toISOString()}`);
 
       return {
         status: true,

@@ -76,7 +76,7 @@ export class PrintedService {
             `${file}/`,
         );
         await fs.mkdir(pdfDirectory, { recursive: true });
-        const logFileName = `PIS/${data.schd_txt}${data.schd_p}/${data.filedir}/${file}.log`;
+        const logFileName = `PIS/${data.schd_txt}${data.schd_p}/${file}.log`;
         return {
             logFileName,
             pdfDirectory,
@@ -482,7 +482,7 @@ export class PrintedService {
 
                 const pdfPath = path.join(
                     pdfContext.pdfDirectory,
-                    `${row.PAGE_MFGNO}-${row.PAGE_PACKING}.pdf`,
+                    `${row.PAGE_MFGNO}-${row.PAGE_PACKING}-${row.PAGE_NUM}.pdf`,
                 );
                 try {
                     await this.embedLabelToPdf(pdfPath, text.trim());

@@ -370,12 +370,10 @@ export class DispatchExportService {
 
   async buildDisabledPassengerWorkbook(reportRes: any, dto: ExportAndSendMailDto) {
     const rows = Array.isArray(reportRes.rows) ? reportRes.rows : [];
-
     const displayDateText =
       reportRes?.display_date_text ||
       dto?.display_date_text ||
       '-';
-
     const displayTimeText =
       reportRes?.display_time_text ||
       dto?.display_time_text ||
@@ -389,25 +387,26 @@ export class DispatchExportService {
     sheet.insertRow(3, [`เวลา : ${displayTimeText}`]);
     sheet.insertRow(4, []);
 
-    this.mergeCell(sheet, 1, 1, 1, 8);
-    this.mergeCell(sheet, 2, 1, 2, 8);
-    this.mergeCell(sheet, 3, 1, 3, 8);
+    this.mergeCell(sheet, 1, 1, 1, 7);
+    this.mergeCell(sheet, 2, 1, 2, 7);
+    this.mergeCell(sheet, 3, 1, 3, 7);
 
-    this.applyStyleToRange(sheet, 1, 8, 1, {
+    this.applyStyleToRange(sheet, 1, 7, 1, {
       font: { bold: true, size: 16 },
       alignment: this.alignment('center', 'middle'),
     });
 
-    this.applyStyleToRange(sheet, 1, 8, 2, {
+    this.applyStyleToRange(sheet, 1, 7, 2, {
       font: { bold: true, size: 14 },
       alignment: this.alignment('center', 'middle'),
     });
 
-    this.applyStyleToRange(sheet, 1, 8, 3, {
+    this.applyStyleToRange(sheet, 1, 7, 3, {
       font: { bold: true, size: 14 },
       alignment: this.alignment('center', 'middle'),
     });
 
+    // 🔥 ลบคอลัม "เวลากลับ"
     sheet.getRow(5).values = [
       'No',
       'รหัส',
@@ -416,10 +415,9 @@ export class DispatchExportService {
       'DEPT',
       'DIV',
       'จุดรถ',
-      'เวลากลับ',
     ];
 
-    this.applyStyleToRange(sheet, 1, 8, 5, {
+    this.applyStyleToRange(sheet, 1, 7, 5, {
       font: { bold: true, size: 13 },
       alignment: this.alignment('center', 'middle'),
       border: this.border(),
@@ -435,7 +433,6 @@ export class DispatchExportService {
         row.dept || '',
         row.div || '',
         row.stop_name || '',
-        row.plan_time || '',
       ];
     });
 
@@ -446,7 +443,6 @@ export class DispatchExportService {
     sheet.getColumn(5).width = 18;
     sheet.getColumn(6).width = 18;
     sheet.getColumn(7).width = 24;
-    sheet.getColumn(8).width = 12;
 
     sheet.eachRow((row, rowNumber) => {
       if (rowNumber >= 5) {
@@ -474,4 +470,6 @@ export class DispatchExportService {
 
     return workbook;
   }
+
+
 }

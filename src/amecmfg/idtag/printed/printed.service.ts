@@ -1,10 +1,9 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { PDFDocument } from 'pdf-lib';
-// import { PDFParse } from 'pdf-parse';
-
 import { moveFileFromMulter } from 'src/common/utils/files.utils';
 import { FileLoggerService } from 'src/common/services/file-logger/file-logger.service';
 import { PrintedQueueService } from './PrintedQueue.service';

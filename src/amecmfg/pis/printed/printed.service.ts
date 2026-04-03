@@ -482,7 +482,7 @@ export class PrintedService {
 
                 const pdfPath = path.join(
                     pdfContext.pdfDirectory,
-                    `${row.PAGE_MFGNO}-${row.PAGE_PACKING}.pdf`,
+                    `${row.PAGE_MFGNO}-${row.PAGE_PACKING}-${row.PAGE_NUM}.pdf`,
                 );
                 try {
                     await this.embedLabelToPdf(pdfPath, text.trim());

@@ -83,7 +83,7 @@ export class PrintedImagesService {
             } catch (error) {
                 await this.printed.writeLog(
                     `Error processing image for tag ${img.PAGE_TAG}`,
-                    error.message,
+                    error instanceof Error ? error.message : '',
                 );
             }
         }

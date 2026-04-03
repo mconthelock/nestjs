@@ -1,8 +1,8 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as dayjs from 'dayjs';
+import * as dayjsModule from 'dayjs';
+const dayjs = (dayjsModule as any).default ?? (dayjsModule as any);
 import { rgb, PDFDocument } from 'pdf-lib';
-
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { writeLineBox } from 'src/common/helpers/file-pdf.helper';
 import { IdTagRepository } from './idtag.repository';

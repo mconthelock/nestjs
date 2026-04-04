@@ -208,6 +208,7 @@ pipeline {
                     } else {
                         withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
                             sshagent(credentials: ['ssh-amecweb1']) {
+                                sh "date '+%Y-%m-%d %H:%M:%S'"
                                 sh """
                                     ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
                                     powershell "
@@ -228,8 +229,10 @@ pipeline {
                                     "
                                 EOF
                                 """
+                                sh "date '+%Y-%m-%d %H:%M:%S'"
                             }
                             sshagent(credentials: ['ssh-amecweb2']) {
+                                sh "date '+%Y-%m-%d %H:%M:%S'"
                                 sh """
                                     ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
                                     powershell "
@@ -249,6 +252,7 @@ pipeline {
                                     "
                                 EOF
                                 """
+                                sh "date '+%Y-%m-%d %H:%M:%S'"
                             }
                         }
                     }

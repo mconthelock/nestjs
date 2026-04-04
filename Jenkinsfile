@@ -100,9 +100,9 @@ pipeline {
                         """,
                         returnStdout: true
                     ).trim()
-                    
+
                     env.PACKAGE_STATUS = packageChanged
-                    
+
                     if (packageChanged == "CHANGED") {
                         echo "⚠️  WARNING: package.json has changed!"
                         echo "⚠️  You need to run: npm install manually"
@@ -128,7 +128,7 @@ pipeline {
                         echo "✓ package.json unchanged"
                     }
                 }
-                
+
                 sh '''
                     mkdir -p ${TARGET_DIR}
                     rsync -rlptz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
@@ -158,6 +158,7 @@ pipeline {
                     } else {
                         sshagent(credentials: ['ssh-amecwebtest1']) {
                             withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
+                                echo "Current start at: $(date)"
                                 sh """
                                     ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
                                     powershell "
@@ -180,6 +181,8 @@ pipeline {
                                     "
                                 EOF
                                 """
+
+                                echo "Finished at: $(date)"
                             }
                         }
                     }

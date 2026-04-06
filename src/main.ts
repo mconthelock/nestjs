@@ -22,7 +22,8 @@ import * as oracledb from 'oracledb';
 
 async function bootstrap() {
     oracledb.initOracleClient({
-        libDir: 'C:\\oracle\\instantclient_23_0',
+        libDir:
+            process.env.ORACLE_CLIENT_LIB_DIR || 'C:/oracle/instantclient_23_0', // ปรับ path ตามที่ติดตั้ง Oracle Instant Client
     });
 
     // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์

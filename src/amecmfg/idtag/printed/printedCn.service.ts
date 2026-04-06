@@ -1,8 +1,8 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as dayjs from 'dayjs';
-import { degrees, rgb, PDFDocument } from 'pdf-lib';
-
+import * as dayjsModule from 'dayjs';
+const dayjs = (dayjsModule as any).default ?? (dayjsModule as any);
+import { rgb, PDFDocument } from 'pdf-lib';
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { writeLineBox } from 'src/common/helpers/file-pdf.helper';
 import { IdTagRepository } from './idtag.repository';
@@ -62,7 +62,6 @@ export class PrintedCnService {
     async putFirstLot(bmdate: Date | string) {
         const firstStartTime = Date.now();
         const bmdateStr = dayjs(bmdate).format('YYYYMMDD');
-
         let firstData: any[] = [];
         try {
             firstData = await this.r027.findAll({
@@ -84,9 +83,7 @@ export class PrintedCnService {
             const cdir = await this.printed.getCurrentPdfDirectory();
             const pdfPath = path.join(cdir, `${data.R27M11}.pdf`);
             try {
-                await this.embedFirstToPdf(pdfPath, {
-                    cnno: data.R27M09,
-                });
+                await this.embedFirstToPdf(pdfPath, data.R27M09);
                 await this.printed.writeLog(
                     `Put First Lot. No. ${data.R27M09} to ${data.R27M11}`,
                 );
@@ -133,34 +130,37 @@ export class PrintedCnService {
         if (text.sendto) {
             await writeLineBox({
                 ...opt,
-                text: `PLEASE SEND TO ${text.sendto} ON ${text.senddate}`,
+                text: `PLEASE SEND TO ${text.sendto} ${text.senddate == null ? '' : `ON ${dayjs(text.senddate).format('DD/MM/YYYY')}`}`,
                 align: 'left',
+                fontsize: 12,
                 boxX: 15,
                 boxY: 790,
+                boxWidth: 300,
+                drawBorder: {
+                    color: rgb(1, 1, 1),
+                    width: 0,
+                    bgColor: rgb(1, 1, 1),
+                },
             });
         }
         await fs.writeFile(pdfPath, await pdfDoc.save());
     }
 
-    private async embedFirstToPdf(pdfPath: string, text: any) {
+    private async embedFirstToPdf(pdfPath: string, text: string) {
         const pdfBytes = await fs.readFile(pdfPath);
         const pdfDoc = await PDFDocument.load(pdfBytes);
         const [page] = pdfDoc.getPages();
-        const opt = {
+        await writeLineBox({
             pdfpage: page,
-            fontsize: 14,
+            fontsize: 12,
             boxHeight: 15,
-        };
+            boxWidth: 170,
+            text: `${text}`,
+            align: 'left',
+            boxX: 15,
+            boxY: 810,
+        });
 
-        if (text.sendto) {
-            await writeLineBox({
-                ...opt,
-                text: `${text.cnno}`,
-                align: 'left',
-                boxX: 15,
-                boxY: 810,
-            });
-        }
         await fs.writeFile(pdfPath, await pdfDoc.save());
     }
 }

@@ -2,8 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
-import * as compression from 'compression';
-import * as cookieParser from 'cookie-parser';
+// import * as compression from 'compression';
+import cookieParser from 'cookie-parser';
+import compression from 'compression';
 
 import { NestExpressApplication } from '@nestjs/platform-express'; // ✅ ต้องเพิ่ม
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -17,8 +18,13 @@ import { AllExceptionsFilter } from './common/logger/http-exception.filter';
 import { SocketIoAdapter } from './common/ws/socket-io.adapter';
 import { REDIS, REDIS_SUB } from './common/redis/redis.provider';
 import { Redis } from 'ioredis';
+import * as oracledb from 'oracledb';
 
 async function bootstrap() {
+    oracledb.initOracleClient({
+        libDir: 'C:\\oracle\\instantclient_23_0',
+    });
+
     // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์
     const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
     await fs.mkdir(uploadPath, { recursive: true });

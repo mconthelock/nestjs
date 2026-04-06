@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('ISTID_FORM')
-export class IsTid {
+export class ISTID_FORM {
   @PrimaryColumn()
   NFRMNO: number;
 

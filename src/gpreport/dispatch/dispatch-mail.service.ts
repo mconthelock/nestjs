@@ -20,9 +20,9 @@ export class DispatchMailService {
   }
 
   async sendDispatchMail(params: {
-    to: string;
-    cc?: string;
-    bcc?: string;
+    to: string | string[];
+    cc?: string | string[];
+    bcc?: string | string[];
     subject: string;
     html: string;
     attachments: string[];

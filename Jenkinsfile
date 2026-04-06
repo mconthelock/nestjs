@@ -100,9 +100,9 @@ pipeline {
                         """,
                         returnStdout: true
                     ).trim()
-                    
+
                     env.PACKAGE_STATUS = packageChanged
-                    
+
                     if (packageChanged == "CHANGED") {
                         echo "⚠️  WARNING: package.json has changed!"
                         echo "⚠️  You need to run: npm install manually"
@@ -128,7 +128,7 @@ pipeline {
                         echo "✓ package.json unchanged"
                     }
                 }
-                
+
                 sh '''
                     mkdir -p ${TARGET_DIR}
                     rsync -rlptz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
@@ -158,6 +158,7 @@ pipeline {
                     } else {
                         sshagent(credentials: ['ssh-amecwebtest1']) {
                             withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
+                                sh "date '+%Y-%m-%d %H:%M:%S'"
                                 sh """
                                     ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
                                     powershell "
@@ -180,6 +181,8 @@ pipeline {
                                     "
                                 EOF
                                 """
+
+                                sh "date '+%Y-%m-%d %H:%M:%S'"
                             }
                         }
                     }
@@ -205,6 +208,7 @@ pipeline {
                     } else {
                         withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
                             sshagent(credentials: ['ssh-amecweb1']) {
+                                sh "date '+%Y-%m-%d %H:%M:%S'"
                                 sh """
                                     ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
                                     powershell "
@@ -225,8 +229,10 @@ pipeline {
                                     "
                                 EOF
                                 """
+                                sh "date '+%Y-%m-%d %H:%M:%S'"
                             }
                             sshagent(credentials: ['ssh-amecweb2']) {
+                                sh "date '+%Y-%m-%d %H:%M:%S'"
                                 sh """
                                     ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
                                     powershell "
@@ -246,6 +252,7 @@ pipeline {
                                     "
                                 EOF
                                 """
+                                sh "date '+%Y-%m-%d %H:%M:%S'"
                             }
                         }
                     }

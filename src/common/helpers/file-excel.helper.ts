@@ -1,7 +1,8 @@
 import * as ExcelJS from 'exceljs';
-import * as dayjs from 'dayjs';
 import { promises as fs } from 'fs';
 import * as path from 'path';
+import * as dayjsModule from 'dayjs';
+const dayjs = (dayjsModule as any).default ?? (dayjsModule as any);
 
 interface excelExportOptions {
     templatePath: string;

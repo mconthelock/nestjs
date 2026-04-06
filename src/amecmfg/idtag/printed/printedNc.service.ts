@@ -1,6 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as dayjs from 'dayjs';
+import * as dayjsModule from 'dayjs';
+const dayjs = (dayjsModule as any).default ?? (dayjsModule as any);
 
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { exportExcel } from 'src/common/helpers/file-excel.helper';

@@ -138,34 +138,53 @@ export class DispatchReportService {
       plan_time: row.plan_time || '',
     }));
 
+    const displayInfo = await this.getDispatchDisplayInfo(dispatchId);
+
     return {
       status: true,
       dispatch_id: dispatchId,
-      title: 'รายชื่อผู้ที่ไม่ได้จัดรถ',
+      title: 'รายชื่อผู้ที่ไม่สามารถจัดรถรับส่งได้',
+      display_date_text: displayInfo.display_date_text,
+      display_time_text: displayInfo.display_time_text,
       rows,
       message: 'ok',
     };
   }
 
-  private async buildDispatchReportTitle(dispatchId: number) {
+  private async getDispatchDisplayInfo(dispatchId: number) {
     const head = await this.dataSource
       .getRepository(BusDispatchHead)
       .createQueryBuilder('h')
       .where('h.dispatch_id = :dispatchId', { dispatchId })
       .getOne();
 
-    if (!head) return 'ตารางรถรับส่งพนักงาน';
+    if (!head) {
+      return {
+        display_date_text: '-',
+        display_time_text: '',
+        title: 'ตารางรถรับส่งพนักงาน',
+      };
+    }
 
-    const date = head.dispatch_date
+    const displayDateText = head.dispatch_date
       ? new Date(head.dispatch_date).toLocaleDateString('th-TH')
-      : '';
+      : '-';
 
-    let timeText = '';
-    if (head.dispatch_type === 'O' && head.shift === 'D') timeText = 'OT เวลา 19.30 น.';
-    else if (head.dispatch_type === 'O' && head.shift === 'S') timeText = 'OT เวลา 21.30 น.';
-    else if (head.dispatch_type === 'O' && head.shift === 'N') timeText = 'OT (กะกลางคืน) เวลา 07.30 น.';
-    else if (head.shift === 'H') timeText = 'OT เวลา 17.00 น.';
+    let displayTimeText = '';
+    if (head.dispatch_type === 'O' && head.shift === 'D') displayTimeText = 'OT เวลา 19.30 น.';
+    else if (head.dispatch_type === 'O' && head.shift === 'S') displayTimeText = 'OT เวลา 21.30 น.';
+    else if (head.dispatch_type === 'O' && head.shift === 'N') displayTimeText = 'OT (กะกลางคืน) เวลา 07.30 น.';
+    else if (head.shift === 'H') displayTimeText = 'OT เวลา 17.00 น.';
 
-    return `ตารางรถรับส่งพนักงาน ${timeText} ประจำวันที่ ${date}`;
+    return {
+      display_date_text: displayDateText,
+      display_time_text: displayTimeText,
+      title: `ตารางรถรับส่งพนักงาน ${displayTimeText} ประจำวันที่ ${displayDateText}`,
+    };
+  }
+
+  private async buildDispatchReportTitle(dispatchId: number) {
+    const info = await this.getDispatchDisplayInfo(dispatchId);
+    return info.title;
   }
 }

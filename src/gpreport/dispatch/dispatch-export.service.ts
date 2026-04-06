@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import * as ExcelJS from 'exceljs';
-import * as fs from 'fs-extra';
 import { ExportAndSendMailDto } from './dto/export-and-sendmail.dto';
+import { mkdir, writeFile } from 'fs/promises';
 
 @Injectable()
 export class DispatchExportService {
@@ -17,12 +17,11 @@ export class DispatchExportService {
 
       const yearPath = path.join(basePath, year);
       const monthPath = path.join(yearPath, month);
-
-      await fs.mkdir(yearPath, { recursive: true });
-      await fs.mkdir(monthPath, { recursive: true });
+      await mkdir(yearPath, { recursive: true });
+      await mkdir(monthPath, { recursive: true });
 
       const testFile = path.join(monthPath, 'test.txt');
-      await fs.writeFile(testFile, `test at ${new Date().toISOString()}`);
+      await writeFile(testFile, `test at ${new Date().toISOString()}`);
 
       return {
         status: true,
@@ -371,28 +370,44 @@ export class DispatchExportService {
 
   async buildDisabledPassengerWorkbook(reportRes: any, dto: ExportAndSendMailDto) {
     const rows = Array.isArray(reportRes.rows) ? reportRes.rows : [];
+    const displayDateText =
+      reportRes?.display_date_text ||
+      dto?.display_date_text ||
+      '-';
+    const displayTimeText =
+      reportRes?.display_time_text ||
+      dto?.display_time_text ||
+      '';
 
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Disabled Passenger');
 
     sheet.insertRow(1, ['รายชื่อผู้ที่ไม่สามารถจัดรถรับส่งได้']);
-    sheet.insertRow(2, [`ประจำวันที่ : ${dto.display_date_text || '-'}`]);
-    sheet.insertRow(3, []);
+    sheet.insertRow(2, [`ประจำวันที่ : ${displayDateText}`]);
+    sheet.insertRow(3, [`เวลา : ${displayTimeText}`]);
+    sheet.insertRow(4, []);
 
-    this.mergeCell(sheet, 1, 1, 1, 8);
-    this.mergeCell(sheet, 2, 1, 2, 8);
+    this.mergeCell(sheet, 1, 1, 1, 7);
+    this.mergeCell(sheet, 2, 1, 2, 7);
+    this.mergeCell(sheet, 3, 1, 3, 7);
 
-    this.applyStyleToRange(sheet, 1, 8, 1, {
+    this.applyStyleToRange(sheet, 1, 7, 1, {
       font: { bold: true, size: 16 },
       alignment: this.alignment('center', 'middle'),
     });
 
-    this.applyStyleToRange(sheet, 1, 8, 2, {
+    this.applyStyleToRange(sheet, 1, 7, 2, {
       font: { bold: true, size: 14 },
       alignment: this.alignment('center', 'middle'),
     });
 
-    sheet.getRow(4).values = [
+    this.applyStyleToRange(sheet, 1, 7, 3, {
+      font: { bold: true, size: 14 },
+      alignment: this.alignment('center', 'middle'),
+    });
+
+    // 🔥 ลบคอลัม "เวลากลับ"
+    sheet.getRow(5).values = [
       'No',
       'รหัส',
       'ชื่อ-นามสกุล',
@@ -400,17 +415,16 @@ export class DispatchExportService {
       'DEPT',
       'DIV',
       'จุดรถ',
-      'เวลากลับ',
     ];
 
-    this.applyStyleToRange(sheet, 1, 8, 4, {
+    this.applyStyleToRange(sheet, 1, 7, 5, {
       font: { bold: true, size: 13 },
       alignment: this.alignment('center', 'middle'),
       border: this.border(),
     });
 
     rows.forEach((row, i) => {
-      const rowNumber = i + 5;
+      const rowNumber = i + 6;
       sheet.getRow(rowNumber).values = [
         row.no ?? i + 1,
         row.empno || '',
@@ -419,7 +433,6 @@ export class DispatchExportService {
         row.dept || '',
         row.div || '',
         row.stop_name || '',
-        dto.display_time_text || '',
       ];
     });
 
@@ -430,10 +443,9 @@ export class DispatchExportService {
     sheet.getColumn(5).width = 18;
     sheet.getColumn(6).width = 18;
     sheet.getColumn(7).width = 24;
-    sheet.getColumn(8).width = 12;
 
     sheet.eachRow((row, rowNumber) => {
-      if (rowNumber >= 4) {
+      if (rowNumber >= 5) {
         row.eachCell((cell, colNumber) => {
           cell.font = { ...(cell.font || {}), size: 12 };
           cell.alignment = {
@@ -442,7 +454,7 @@ export class DispatchExportService {
             wrapText: true,
           };
 
-          if (colNumber === 3 && rowNumber >= 5) {
+          if (colNumber === 3 && rowNumber >= 6) {
             cell.alignment = {
               vertical: 'middle',
               horizontal: 'left',
@@ -458,4 +470,6 @@ export class DispatchExportService {
 
     return workbook;
   }
+
+
 }

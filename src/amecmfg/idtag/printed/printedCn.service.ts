@@ -115,7 +115,7 @@ export class PrintedCnService {
         };
         await writeLineBox({
             ...opt,
-            text: `${text.cnno}`,
+            text: `${text.cnno == null ? '' : text.cnno}`,
             align: 'center',
             boxX: 345,
             boxY: 164,
@@ -155,7 +155,7 @@ export class PrintedCnService {
             fontsize: 12,
             boxHeight: 15,
             boxWidth: 170,
-            text: `${text}`,
+            text: `${text == null ? '' : text}`,
             align: 'left',
             boxX: 15,
             boxY: 810,

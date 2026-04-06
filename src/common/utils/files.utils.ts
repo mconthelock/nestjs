@@ -2,7 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { basename, join, normalize } from 'path';
 import * as mime from 'mime-types';
 import { promises as fs } from 'fs';
-import * as contentDisposition from 'content-disposition';
+import contentDisposition from 'content-disposition';
 import { now } from './dayjs.utils';
 // import { existsSync, mkdirSync, renameSync } from 'fs';
 // /**

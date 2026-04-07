@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
 import * as compression from 'compression';
-import * as cookieParser from 'cookieParser';
+import * as cookieParser from 'cookie-parser';
 // import cookieParser from 'cookie-parser';
 // import compression from 'compression';
 

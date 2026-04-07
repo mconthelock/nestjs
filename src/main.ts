@@ -2,10 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
-import * as compression from 'compression';
-import * as cookieParser from 'cookie-parser';
-// import cookieParser from 'cookie-parser';
-// import compression from 'compression';
+// import * as compression from 'compression';
+// import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
+import compression from 'compression';
 
 import { NestExpressApplication } from '@nestjs/platform-express'; // ✅ ต้องเพิ่ม
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -22,10 +22,10 @@ import { Redis } from 'ioredis';
 import * as oracledb from 'oracledb';
 
 async function bootstrap() {
-    // oracledb.initOracleClient({
-    //     libDir:
-    //         process.env.ORACLE_CLIENT_LIB_DIR || 'C:/oracle/instantclient_23_0', // ปรับ path ตามที่ติดตั้ง Oracle Instant Client
-    // });
+    oracledb.initOracleClient({
+        libDir:
+            process.env.ORACLE_CLIENT_LIB_DIR || 'C:/oracle/instantclient_23_0', // ปรับ path ตามที่ติดตั้ง Oracle Instant Client
+    });
 
     // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์
     const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;

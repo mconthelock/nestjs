@@ -21,10 +21,10 @@ import { Redis } from 'ioredis';
 import * as oracledb from 'oracledb';
 
 async function bootstrap() {
-    oracledb.initOracleClient({
-        libDir:
-            process.env.ORACLE_CLIENT_LIB_DIR || 'C:/oracle/instantclient_23_0', // ปรับ path ตามที่ติดตั้ง Oracle Instant Client
-    });
+    // oracledb.initOracleClient({
+    //     libDir:
+    //         process.env.ORACLE_CLIENT_LIB_DIR || 'C:/oracle/instantclient_23_0', // ปรับ path ตามที่ติดตั้ง Oracle Instant Client
+    // });
 
     // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์
     const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;

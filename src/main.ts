@@ -2,10 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import * as bodyParser from 'body-parser';
-import * as compression from 'compression';
-import * as cookieParser from 'cookie-parser';
-// import cookieParser from 'cookie-parser';
-// import compression from 'compression';
+// import * as compression from 'compression';
+// import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
+import compression from 'compression';
 
 import { NestExpressApplication } from '@nestjs/platform-express'; // ✅ ต้องเพิ่ม
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';

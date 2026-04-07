@@ -19,11 +19,10 @@ import { UpdateLineTypeDto } from './dto/update-line-type.dto';
 import { RunDailyScheduleDto } from './dto/build-run-daily-schedule.dto';
 import { ExportAndSendMailDto } from './dto/export-and-sendmail.dto';
 import * as path from 'path';
-
+import * as dayjs from 'dayjs';
 import { DispatchReportService } from './dispatch-report.service';
 import { DispatchExportService } from './dispatch-export.service';
 import { DispatchMailService } from './dispatch-mail.service';
-import dayjs from 'dayjs';
 
 @Injectable()
 export class DispatchService {

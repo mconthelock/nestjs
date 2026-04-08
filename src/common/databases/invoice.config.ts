@@ -25,6 +25,7 @@ if (process.env.HOST == 'AMEC') {
       retryAttempts: 5,
       retryDelay: 2000,
       options: {
+        instanceName: process.env.INVOICE_INSTANCE, // ใช้ instanceName แทนถ้าเป็น SQL Server ที่มี instance
         encrypt: process.env.INVOICE_ENCRYPT === 'true' || false,
         enableArithAbort: true,
         trustServerCertificate: true,

@@ -3,13 +3,14 @@ import { BiddingService } from './bidding.service';
 import { BiddingController } from './bidding.controller';
 import { EBUDGET_DATA_BIDDING } from 'src/common/Entities/ebudget/views/EBUDGET_DATA_BIDDING.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { BiddingRepository } from './bidding.repository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([EBUDGET_DATA_BIDDING], 'ebudgetConnection'),
-  ],
-  controllers: [BiddingController],
-  providers: [BiddingService],
-  exports: [BiddingService],
+    imports: [
+        TypeOrmModule.forFeature([EBUDGET_DATA_BIDDING], 'ebudgetConnection'),
+    ],
+    controllers: [BiddingController],
+    providers: [BiddingService, BiddingRepository],
+    exports: [BiddingService],
 })
 export class BiddingModule {}

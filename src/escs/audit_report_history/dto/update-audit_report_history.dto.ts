@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreateESCSARHDto } from './create-audit_report_history.dto';
+import { CreateAuditReportHistoryDto } from './create-audit_report_history.dto';
 
-export class UpdateESCSARHDto extends PartialType(CreateESCSARHDto) {}
+export class UpdateAuditReportHistoryDto extends PartialType(CreateAuditReportHistoryDto) {}

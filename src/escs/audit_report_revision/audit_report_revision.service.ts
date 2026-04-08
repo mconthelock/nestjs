@@ -1,90 +1,47 @@
 import { Injectable } from '@nestjs/common';
-import { CreateESCSARRDto } from './dto/create-audit_report_revision.dto';
-import { UpdateESCSARRDto } from './dto/update-audit_report_revision.dto';
-import { SearchESCSARRDto } from './dto/search-audit_report_revision.dto';
-import { AuditReportRevision } from './entities/audit_report_revision.entity';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { CreateAuditReportRevisionDto } from './dto/create-audit_report_revision.dto';
+import { UpdateAuditReportRevisionDto } from './dto/update-audit_report_revision.dto';
+import { SearchAuditReportRevisionDto } from './dto/search-audit_report_revision.dto';
 import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
+import { AuditReportRevisionRepository } from './audit_report_revision.repository';
+import { AUDIT_REPORT_REVISION } from 'src/common/Entities/escs/table/AUDIT_REPORT_REVISION.entity';
 
 @Injectable()
-export class ESCSARRService {
-  constructor(
-    @InjectRepository(AuditReportRevision, 'escsConnection')
-    private auditRepo: Repository<AuditReportRevision>,
-    @InjectDataSource('escsConnection')
-    private readonly dataSource: DataSource,
-  ) {}
+export class AuditReportRevisionService {
+    constructor(private readonly repo: AuditReportRevisionRepository) {}
 
-  async getAuditReportRevision(
-    dto: SearchESCSARRDto,
-    queryRunner?: QueryRunner,
-  ) {
-    const repo = queryRunner
-      ? queryRunner.manager.getRepository(AuditReportRevision)
-      : this.auditRepo;
-    return repo.find({
-      where: dto,
-      order: { ARR_REV: dto.orderbyDirection || 'DESC' },
-      relations: ['ARR_INCHARGE_INFO'],
-    });
-  }
-
-  async findLatestRevision(
-    secid: number,
-    queryRunner?: QueryRunner,
-  ): Promise<AuditReportRevision | null> {
-    const repo = queryRunner
-      ? queryRunner.manager.getRepository(AuditReportRevision)
-      : this.auditRepo;
-    return await repo.findOne({
-      where: {
-        ARR_SECID: secid,
-      },
-      order: {
-        ARR_REV: 'DESC',
-      },
-    });
-  }
-
-  async getNextRevision(
-    secid: number,
-    queryRunner?: QueryRunner,
-  ): Promise<number> {
-    const lastRevision = await this.findLatestRevision(secid, queryRunner);
-    return lastRevision ? lastRevision.ARR_REV + 1 : 0;
-  }
-
-  async create(dto: CreateESCSARRDto, queryRunner?: QueryRunner) {
-    let localRunner: QueryRunner | undefined;
-    try {
-      if (!queryRunner) {
-        localRunner = this.dataSource.createQueryRunner();
-        await localRunner.connect();
-        await localRunner.startTransaction();
-      }
-      const runner = queryRunner || localRunner!;
-      const revision = await this.getNextRevision(dto.ARR_SECID, runner);
-      const data = {
-        ARR_REV: revision,
-        ARR_REV_TEXT: numberToAlphabetRevision(revision),
-        ...dto,
-      };
-
-      await runner.manager.insert(AuditReportRevision, data);
-      if (localRunner) await localRunner.commitTransaction();
-      return {
-        status: true,
-        message: 'Save Successfully',
-        revision: revision,
-      };
-    } catch (error) {
-      if (localRunner) await localRunner.rollbackTransaction();
-      throw new Error(
-        'Insert revision Error: ' + error.message,
-      );
-    } finally {
-      if (localRunner) await localRunner.release();
+    async getAuditReportRevision(dto: SearchAuditReportRevisionDto) {
+        return this.repo.getAuditReportRevision(dto);
     }
-  }
+
+    async findLatestRevision(
+        secid: number,
+    ): Promise<AUDIT_REPORT_REVISION | null> {
+        return await this.repo.findLatestRevision(secid);
+    }
+
+    async getNextRevision(secid: number): Promise<number> {
+        const lastRevision = await this.repo.findLatestRevision(secid);
+        return lastRevision ? lastRevision.ARR_REV + 1 : 0;
+    }
+
+    async create(dto: CreateAuditReportRevisionDto) {
+        try {
+            const revision = await this.getNextRevision(dto.ARR_SECID);
+            const data = {
+                ARR_REV: revision,
+                ARR_REV_TEXT: numberToAlphabetRevision(revision),
+                ...dto,
+            };
+
+            await this.repo.insert(data);
+            return {
+                status: true,
+                message: 'Save Successfully',
+                revision: revision,
+            };
+        } catch (error) {
+            throw new Error('Insert revision Error: ' + error.message);
+        }
+    }
 }

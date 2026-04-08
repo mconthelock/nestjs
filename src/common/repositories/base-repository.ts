@@ -19,7 +19,13 @@ export class BaseRepository {
     protected get manager(): EntityManager {
         // return this.request[ENTITY_MANAGER_KEY] ?? this.dataSource.manager;
         const txManager = this.request[ENTITY_MANAGER_KEY];
+        const forceTx = this.request['FORCE_TX'];
+        // 🟢 โหมดบังคับใช้ connection เดียว
+        if (forceTx && txManager && !txManager.queryRunner?.isReleased) {
+            return txManager;
+        }
 
+        // 🔵 โหมดปกติ (ปลอดภัย multi-connection)
         if (
             txManager &&
             txManager.connection === this.dataSource &&

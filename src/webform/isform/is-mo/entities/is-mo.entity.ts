@@ -1,57 +1,57 @@
+import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
-import { Form } from 'src/webform/form/entities/form.entity';
 
 @Entity('OPRFORM')
 export class IsMo {
-  @PrimaryColumn()
-  NFRMNO: string;
+    @PrimaryColumn()
+    NFRMNO: string;
 
-  @PrimaryColumn()
-  VORGNO: string;
+    @PrimaryColumn()
+    VORGNO: string;
 
-  @PrimaryColumn()
-  CYEAR: string;
+    @PrimaryColumn()
+    CYEAR: string;
 
-  @PrimaryColumn()
-  CYEAR2: string;
+    @PrimaryColumn()
+    CYEAR2: string;
 
-  @PrimaryColumn()
-  NRUNNO: string;
+    @PrimaryColumn()
+    NRUNNO: string;
 
-  @Column()
-  VTITLE: string;
+    @Column()
+    VTITLE: string;
 
-  @Column()
-  NISOPRNO: string;
+    @Column()
+    NISOPRNO: string;
 
-  @Column()
-  VEQPREQ: string;
+    @Column()
+    VEQPREQ: string;
 
-  @Column()
-  DUSEREXP: string;
+    @Column()
+    DUSEREXP: string;
 
-  @Column()
-  VDETAIL: string;
+    @Column()
+    VDETAIL: string;
 
-  @Column()
-  DADATE: string;
+    @Column()
+    DADATE: string;
 
-  @Column()
-  DAEDATE: string;
+    @Column()
+    DAEDATE: string;
 
-  @Column()
-  DPDATE: string;
+    @Column()
+    DPDATE: string;
 
-  @Column()
-  DPEDATE: string;
+    @Column()
+    DPEDATE: string;
 
-  @OneToOne(() => Form, (form) => form.isdev)
-  @JoinColumn([
-    { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
-    { name: 'VORGNO', referencedColumnName: 'VORGNO' },
-    { name: 'CYEAR', referencedColumnName: 'CYEAR' },
-    { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
-    { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
-  ])
-  form: Form;
+    @OneToOne(() => FORM, (form) => form.isdev)
+    @JoinColumn([
+        { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+        { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+        { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+    ])
+    form: FORM;
 }

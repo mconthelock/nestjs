@@ -6,17 +6,15 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { Form } from '../../../webform/form/entities/form.entity';
 import { Appsuser } from '../../../docinv/appsusers/entities/appsuser.entity';
 import { Workpic } from '../../../docinv/workpic/entities/workpic.entity';
 import { SetRequestDate } from 'src/joborder/set-request-date/entities/set-request-date.entity';
 import { JopMarReq } from 'src/joborder/jop-mar-req/entities/jop-mar-req.entity';
 import { JopPurConf } from 'src/joborder/jop-pur-conf/entities/jop-pur-conf.entity';
-import { EscsUser } from 'src/escs/user/entities/user.entity';
-import { Orgpos } from 'src/webform/orgpos/entities/orgpos.entity';
 import { Accesslog } from 'src/docinv/accesslog/entities/accesslog.entity';
 import { Designer } from 'src/spprogram/designer/entities/designer.entity';
 import { Buspassenger } from 'src/common/Entities/gpreport/table/buspassenger.entity';
+import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
 @Entity('AMECUSERALL')
 export class User {
@@ -86,10 +84,6 @@ export class User {
   @Column()
   BIRTHDAY: Number;
 
-  @OneToOne(() => Form, (form) => form.VINPUTER)
-  @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'VINPUTER' })
-  creator: User;
-
   //Docinv
   @OneToOne(() => Workpic, (dev) => dev.developer)
   @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'PIC_ID' })
@@ -111,13 +105,6 @@ export class User {
 
   @OneToMany(() => JopPurConf, (req) => req.purConfirm)
   jopPurConf: JopPurConf[];
-
-  @OneToOne(() => EscsUser, (escsUser) => escsUser.user)
-  escsUser: EscsUser;
-
-  @OneToOne(() => Orgpos, (o) => o.EMPINFO)
-  @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'VEMPNO' })
-  orgpos: Orgpos;
 
   @OneToMany(() => Accesslog, (log) => log.users)
   @JoinColumn([{ name: 'SEMPNO', referencedColumnName: 'LOG_USER' }])

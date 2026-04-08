@@ -8,6 +8,7 @@ import { PurFileModule } from '../pur-file/pur-file.module';
 import { FlowModule } from 'src/webform/flow/flow.module';
 import { RepModule } from 'src/webform/rep/rep.module';
 import { FormmstModule } from 'src/webform/formmst/formmst.module';
+import { PurCpmRepository } from './pur-cpm.repository';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { FormmstModule } from 'src/webform/formmst/formmst.module';
     RepModule
   ],
   controllers: [PurCpmController],
-  providers: [PurCpmService],
+  providers: [PurCpmService, PurCpmRepository],
   exports: [PurCpmService],
 })
 export class PurCpmModule {}

@@ -11,21 +11,23 @@ import { PprModule } from './ppr/ppr.module';
 import { PproductModule } from './pproduct/pproduct.module';
 import { PvenderModule } from './pvender/pvender.module';
 import { BrcurrencyModule } from './brcurrency/brcurrency.module';
+import { AmecUserAllModule } from './amecuserall/amecuserall.module';
 
 @Module({
-  imports: [
-    PdivisionModule,
-    AemployeeModule,
-    PdepartmentModule,
-    PsectionModule,
-    UsersModule,
-    PpositionModule,
-    PprbiddingModule,
-    PpoModule,
-    PprModule,
-    PproductModule,
-    PvenderModule,
-    BrcurrencyModule,
-  ],
+    imports: [
+        PdivisionModule,
+        AemployeeModule,
+        PdepartmentModule,
+        PsectionModule,
+        UsersModule,
+        PpositionModule,
+        PprbiddingModule,
+        PpoModule,
+        PprModule,
+        PproductModule,
+        PvenderModule,
+        BrcurrencyModule,
+        AmecUserAllModule,
+    ],
 })
 export class AmecModule {}

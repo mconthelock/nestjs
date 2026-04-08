@@ -33,7 +33,7 @@ export class IsTidRepository extends BaseRepository {
     }
 
     async search(dto: FiltersDto) {
-        const qb = this.manager.createQueryBuilder(ISTID_FORM, 'M');
+        const qb = this.manager.createQueryBuilder(ISTID_FORM, 'I');
         this.applyFilters(qb, 'I', dto, ['CYEAR2', 'NRUNNO']);
         return qb.getMany();
     }

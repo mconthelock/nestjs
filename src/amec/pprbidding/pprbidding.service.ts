@@ -17,34 +17,16 @@ export class PprbiddingService {
         private readonly pprrepo: PprbiddingRepository,
     ) {}
 
-    async create(dto: CreatePprbiddingDto, queryRunner?: QueryRunner) {
-        let localRunner: QueryRunner | undefined;
-        let didConnect = false;
-        let didStartTx = false;
+    async create(dto: CreatePprbiddingDto) {
         try {
-            if (!queryRunner) {
-                localRunner = this.dataSource.createQueryRunner();
-                await localRunner.connect();
-                didConnect = true;
-                await localRunner.startTransaction();
-                didStartTx = true;
-            }
-            const runner = queryRunner || localRunner!;
-
-            const res = await runner.manager.save(PPRBIDDING, dto);
-            if (localRunner && didStartTx && runner.isTransactionActive)
-                await localRunner.commitTransaction();
+            const res = await this.repo.save(dto);
             return {
                 status: true,
                 message: 'Insert PPRBIDDING Successfully',
                 data: res,
             };
         } catch (error) {
-            if (localRunner && didStartTx && localRunner.isTransactionActive)
-                await localRunner.rollbackTransaction();
             throw new Error('Insert PPRBIDDING Error: ' + error.message);
-        } finally {
-            if (localRunner && didConnect) await localRunner.release();
         }
     }
 
@@ -68,7 +50,7 @@ export class PprbiddingService {
             throw new Error('Search PR Bidding Error: ' + error.message);
         }
     }
-    
+
     async search(dto: FiltersDto) {
         try {
             const res = await this.pprrepo.search(dto);

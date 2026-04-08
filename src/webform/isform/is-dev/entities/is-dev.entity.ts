@@ -1,5 +1,5 @@
+import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
-import { Form } from 'src/webform/form/entities/form.entity';
 
 @Entity('ISDEVFORM')
 export class IsDev {
@@ -60,7 +60,7 @@ export class IsDev {
   @Column()
   NACTTIME: number;
 
-  @OneToOne(() => Form, (form) => form.isdev)
+  @OneToOne(() => FORM, (form) => form.isdev)
   @JoinColumn([
     { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
     { name: 'VORGNO', referencedColumnName: 'VORGNO' },
@@ -68,5 +68,5 @@ export class IsDev {
     { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
     { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
   ])
-  form: Form;
+  form: FORM;
 }

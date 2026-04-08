@@ -2,7 +2,7 @@ import { IsOptional, IsString, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class SearchEscsUserSectionDto {
+export class SearchUsersSectionDto {
   @ApiProperty({ required: false, example: 1 })
   @IsOptional()
   @Type(() => Number)

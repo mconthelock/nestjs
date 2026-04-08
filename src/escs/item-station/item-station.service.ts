@@ -1,25 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { CreateESCSItemStationDto } from './dto/create-item-station.dto';
-import { UpdateESCSItemStationDto } from './dto/update-item-station.dto';
-import { QueryRunner, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { ESCSItemStation } from './entities/item-station.entity';
+import { CreateItemStationDto } from './dto/create-item-station.dto';
+import { UpdateItemStationDto } from './dto/update-item-station.dto';
+import { ItemStationRepository } from './item-station.repository';
 
 @Injectable()
-export class ESCSItemStationService {
-    constructor(
-        @InjectRepository(ESCSItemStation, 'escsConnection') 
-        private readonly itemStationRepository: Repository<ESCSItemStation>,
-    ) {}
+export class ItemStationService {
+    constructor(private readonly repo: ItemStationRepository) {}
 
-    async searchItemStation(dto: UpdateESCSItemStationDto, queryRunner?: QueryRunner) {
-        const repo = queryRunner ? queryRunner.manager.getRepository(ESCSItemStation) : this.itemStationRepository;
-        return repo.find({
-            where: dto,
-            order: {
-                ITS_NO: 'ASC',
-            },
-        });
-
+    async searchItemStation(dto: UpdateItemStationDto) {
+        return this.repo.searchItemStation(dto);
     }
 }

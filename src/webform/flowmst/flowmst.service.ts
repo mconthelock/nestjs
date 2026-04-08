@@ -1,44 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { QueryRunner, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Flowmst } from './entities/flowmst.entity';
+import { FlowmstRepository } from './flowmst.repository';
 
 @Injectable()
 export class FlowmstService {
-  constructor(
-    @InjectRepository(Flowmst, 'webformConnection')
-    private readonly flowmstRepo: Repository<Flowmst>,
-  ) {}
+    constructor(
+        private readonly repo: FlowmstRepository,
+    ) {}
 
-  getFlowMasterAll() {
-    return this.flowmstRepo.find();
-  }
+    getFlowMasterAll() {
+        return this.repo.findAll();
+    }
 
-  async getFlowMaster(
-    NFRMNO: number,
-    VORGNO: string,
-    CYEAR: string,
-    queryRunner?: QueryRunner,
-  ) {
-    const repo = queryRunner
-      ? queryRunner.manager.getRepository(Flowmst)
-      : this.flowmstRepo;
-    const sql = `
-        SELECT TO_CHAR(NFRMNO) AS NFRMNO, A.*
-        FROM FLOWMST A
-        START WITH NFRMNO = :1
-            AND vOrgNo = :2
-            AND cYear = :3
-            AND cStart = '1'
-        CONNECT BY NFRMNO = :4
-            AND vOrgNo = :5
-            AND cYear = :6
-            AND cStepNo = PRIOR cStepNextNo
-        `;
-    return await repo.query(
-      sql,
-      [NFRMNO, VORGNO, CYEAR, NFRMNO, VORGNO, CYEAR]
-    );
-    // return repo.find({ where: { NFRMNO, VORGNO, CYEAR } });
-  }
+    async getFlowMaster(NFRMNO: number, VORGNO: string, CYEAR: string) {
+        return await this.repo.getFlowMaster(NFRMNO, VORGNO, CYEAR);
+    }
 }

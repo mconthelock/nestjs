@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class ESCSCreateUserItemStationDto {
+export class CreateUsersItemStationDto {
   @IsNotEmpty()
   @IsString()
   US_USER: string;

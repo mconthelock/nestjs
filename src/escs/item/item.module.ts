@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
-import { ESCSItemService } from './item.service';
-import { ESCSItemController } from './item.controller';
-import { Item } from './entities/item.entity';
+import { ItemService } from './item.service';
+import { ItemController } from './item.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ItemRepository } from './item.repository';
+import { ITEM } from 'src/common/Entities/escs/table/ITEM.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Item], 'escsConnection')],
-  controllers: [ESCSItemController],
-  providers: [ESCSItemService],
+    imports: [TypeOrmModule.forFeature([ITEM], 'escsConnection')],
+    controllers: [ItemController],
+    providers: [ItemService, ItemRepository],
+    exports: [ItemService],
 })
-export class ESCSItemModule {}
+export class ItemModule {}

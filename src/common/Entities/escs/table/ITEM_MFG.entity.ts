@@ -1,4 +1,4 @@
-import { UserSection } from 'src/escs/user_section/entities/user_section.entity';
+
 import {
     Column,
     Entity,
@@ -16,6 +16,7 @@ import { BLOCK_MASTER } from './BLOCK_MASTER.entity';
 import { ITEM_MFG_DELETE } from './ITEM_MFG_DELETE.entity';
 import { CONTROL_DRAWING_PIS } from './CONTROL_DRAWING_PIS.entity';
 import { MFG_DRAWING } from './MFG_DRAWING.entity';
+import { USERS_SECTION } from './USERS_SECTION.entity';
 
 @Entity({ name: 'ITEM_MFG', schema: 'ESCCHKSHT' })
 export class ITEM_MFG {
@@ -58,9 +59,9 @@ export class ITEM_MFG {
     @Column()
     DDATEUPDATE: Date;
 
-    @ManyToOne(() => UserSection, (u) => u.ITEM_MFG)
+    @ManyToOne(() => USERS_SECTION, (u) => u.ITEM_MFG)
     @JoinColumn({ name: 'NSEC_ID', referencedColumnName: 'SEC_ID' })
-    USER_SECTION: UserSection;
+    USER_SECTION: USERS_SECTION;
 
     @ManyToOne(() => ITEM_STATUS, (i) => i.ITEM_MFG)
     @JoinColumn({ name: 'NSTATUS', referencedColumnName: 'NSTATUS' })

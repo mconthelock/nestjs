@@ -27,11 +27,19 @@ import { doactionFlowDto } from './dto/doaction-flow.dto';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { showFlowDto } from './dto/show-flow.dto';
+import { ShowFlowService } from './show-flow.service';
+import { DeleteFlowStepService } from './delete-flow-step.service';
+import { DoactionFlowService } from './doaction.service';
+import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 @ApiTags('Flow')
 @Controller('flow')
 export class FlowController {
-  constructor(private readonly flowService: FlowService) {}
+  constructor(private readonly flowService: FlowService,
+    private readonly showFlowService: ShowFlowService,
+    private readonly deleteFlowStepService: DeleteFlowStepService,
+    private readonly doactionFlowService: DoactionFlowService
+  ) {}
 
   @Post('getExtData')
   @ApiOperation({ summary: 'Get ext data' })
@@ -50,11 +58,7 @@ export class FlowController {
     @Body() dto: UpdateFlowDto,
   ): Promise<{ message: string; status: boolean }> {
     try {
-      const result = await this.flowService.updateFlow(dto);
-      return {
-        message: result ? 'Flow updated successfully' : 'Failed to update flow',
-        status: result,
-      };
+      return await this.flowService.updateFlow(dto);
     } catch (error) {
       throw error; // โยนข้อผิดพลาดกลับไปให้ NestJS จัดการ
     }
@@ -65,13 +69,7 @@ export class FlowController {
     @Body() dto: UpdateFlowDto,
   ): Promise<{ message: string; status: boolean }> {
     try {
-      const result = await this.flowService.reAlignFlow(dto);
-      return {
-        message: result
-          ? 'Flow realigned successfully'
-          : 'Failed to realign flow',
-        status: result,
-      };
+      return await this.flowService.reAlignFlow(dto);
     } catch (error) {
       throw error; // โยนข้อผิดพลาดกลับไปให้ NestJS จัดการ
     }
@@ -82,22 +80,19 @@ export class FlowController {
     @Body() dto: UpdateFlowDto,
   ): Promise<{ message: string; status: boolean }> {
     try {
-      const result = await this.flowService.deleteFlow(dto);
-      return {
-        message: result ? 'Flow deleted successfully' : 'Failed to delete flow',
-        status: result,
-      };
+      return await this.flowService.deleteFlow(dto);
     } catch (error) {
       throw error; // โยนข้อผิดพลาดกลับไปให้ NestJS จัดการ
     }
   }
 
   @Delete('deleteFlowStep')
+  @UseTransaction('webformConnection')
   async deleteFlowStep(
     @Body() dto: DeleteFlowStepDto,
   ): Promise<{ message: string; status: boolean }> {
     try {
-      return await this.flowService.deleteFlowStep(dto);
+      return await this.deleteFlowStepService.deleteFlowStep(dto);
     } catch (error) {
       throw error;
     }
@@ -105,7 +100,7 @@ export class FlowController {
 
   @Post('showflow')
   async showFlow(@Body() dto: showFlowDto) {
-    return await this.flowService.showFlow(dto);
+    return await this.showFlowService.showFlow(dto);
   }
 
   @Post('getFlowTree')
@@ -129,19 +124,21 @@ export class FlowController {
   }
 
   @Post('doaction')
+  @UseTransaction('webformConnection')
   @UseInterceptors(AnyFilesInterceptor())
   async doAction(@Body() dto: doactionFlowDto, @Req() req: Request) {
     const ip = getClientIP(req);
-    return await this.flowService.doAction(dto, ip);
+    return await this.doactionFlowService.doAction(dto, ip);
   }
 
   @ApiExcludeEndpoint()
   @Post('checkUnfinishedFlow')
   async checkUnfinishedFlow(@Body() form: FormDto) {
-    return await this.flowService.checkUnfinishedFlow(form);
+    return await this.doactionFlowService.checkUnfinishedFlow(form);
   }
 
   @Post('resetFlow')
+  @UseTransaction('webformConnection')
   async resetFlow(@Body() form: FormDto) {
     return await this.flowService.resetFlow(form);
   }

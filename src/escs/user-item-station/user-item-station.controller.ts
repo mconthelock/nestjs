@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ESCSUserItemStationService } from './user-item-station.service';
-import { ESCSCreateUserItemStationDto } from './dto/create-user-item-station.dto';
-import { ESCSUpdateUserItemStationDto } from './dto/update-user-item-station.dto';
+import { Controller } from '@nestjs/common';
+import { UsersItemStationService } from './user-item-station.service';
+import { CreateUsersItemStationDto } from './dto/create-user-item-station.dto';
+import { UpdateUsersItemStationDto } from './dto/update-user-item-station.dto';
 
 @Controller('escs/user-item-station')
-export class ESCSUserItemStationController {
-  constructor(private readonly userItemStationService: ESCSUserItemStationService) {}
+export class UsersItemStationController {
+    constructor(
+        private readonly usersItemStationService: UsersItemStationService,
+    ) {}
 }

@@ -10,90 +10,96 @@ import { RqffrmService } from 'src/webform/rqffrm/rqffrm.service';
 
 @Injectable()
 export class QuotationService {
-  constructor(
-    @InjectDataSource('webformConnection')
-    private dataSource: DataSource,
-    private formService: FormService,
-    private ebudgetQuotationService: EbudgetQuotationService,
-    private ebudgetQuotationProductService: EbudgetQuotationProductService,
-    private rqffrmService: RqffrmService,
-  ) {}
-  /**
-   * Get total amount of a quotation form
-   */
-  //prettier-ignore
-  async getTotal(dto: FormDto) {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
+    constructor(
+        @InjectDataSource('webformConnection')
+        private dataSource: DataSource,
+        private formService: FormService,
+        private ebudgetQuotationService: EbudgetQuotationService,
+        private ebudgetQuotationProductService: EbudgetQuotationProductService,
+        private rqffrmService: RqffrmService,
+    ) {}
+    /**
+     * Get total amount of a quotation form
+     */
+    async getTotal(dto: FormDto) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
 
-    try {
-        // ดึง raw oracle connection
-        const raw = await (queryRunner as any).databaseConnection;
+        try {
+            // ดึง raw oracle connection
+            const raw = await (queryRunner as any).databaseConnection;
 
-        const result = await raw.execute(
-        `
-        BEGIN
-            EBG_QUOTATION(
-            :p_nfrmno,
-            :p_vorgno,
-            :p_cyear,
-            :p_cyear2,
-            :p_nrunno,
-            :o_detail,
-            :o_product
+            const result = await raw.execute(
+                `
+                BEGIN
+                    EBG_QUOTATION(
+                    :p_nfrmno,
+                    :p_vorgno,
+                    :p_cyear,
+                    :p_cyear2,
+                    :p_nrunno,
+                    :o_detail,
+                    :o_product
+                    );
+                END;
+                `,
+                {
+                    p_nfrmno: dto.NFRMNO,
+                    p_vorgno: dto.VORGNO,
+                    p_cyear: dto.CYEAR,
+                    p_cyear2: dto.CYEAR2,
+                    p_nrunno: dto.NRUNNO,
+                    o_detail: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
+                    o_product: {
+                        dir: oracledb.BIND_OUT,
+                        type: oracledb.CURSOR,
+                    },
+                },
+                { outFormat: oracledb.OUT_FORMAT_OBJECT },
             );
-        END;
-        `,
-        {
-            p_nfrmno: dto.NFRMNO,
-            p_vorgno: dto.VORGNO,
-            p_cyear: dto.CYEAR,
-            p_cyear2: dto.CYEAR2,
-            p_nrunno: dto.NRUNNO,
-            o_detail: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
-            o_product:  { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
-        },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT }
-        );
 
-        const detailCur = result.outBinds.o_detail;
-        const productCur = result.outBinds.o_product;
+            const detailCur = result.outBinds.o_detail;
+            const productCur = result.outBinds.o_product;
 
-        const detail = await detailCur.getRows();
-        const product  = await productCur.getRows();
+            const detail = await detailCur.getRows();
+            const product = await productCur.getRows();
 
-        await detailCur.close();
-        await productCur.close();
+            await detailCur.close();
+            await productCur.close();
 
-        return { detail, product };
-
-    } finally {
-        await queryRunner.release();
+            return { detail, product };
+        } finally {
+            await queryRunner.release();
+        }
     }
-  }
 
-  async getData(dto: FormDto) {
-    const form = await this.formService.getFormDetail(dto);
-    const quotationList = await this.ebudgetQuotationService.getData({...dto, STATUS: 1});
-    // form.quotation = quotation;
-    const quotations = [];
-    for ( const q of quotationList ){
-        const detail = await this.formService.getPkByFormno(q.QTA_FORM);
-        const product = await this.ebudgetQuotationProductService.getData(q.ID);
-        const data = await this.rqffrmService.getData({
-            NFRMNO: detail.NFRMNO,
-            VORGNO: detail.VORGNO,
-            CYEAR: detail.CYEAR,
-            CYEAR2: detail.CYEAR2,
-            NRUNNO: detail.NRUNNO,
+    async getData(dto: FormDto) {
+        const form = await this.formService.getFormDetail(dto);
+        const quotationList = await this.ebudgetQuotationService.getData({
+            ...dto,
+            STATUS: 1,
         });
+        // form.quotation = quotation;
+        const quotations = [];
+        for (const q of quotationList) {
+            const detail = await this.formService.getPkByFormno(q.QTA_FORM);
+            const product = await this.ebudgetQuotationProductService.getData(
+                q.ID,
+            );
+            const data = await this.rqffrmService.getData({
+                NFRMNO: detail.NFRMNO,
+                VORGNO: detail.VORGNO,
+                CYEAR: detail.CYEAR,
+                CYEAR2: detail.CYEAR2,
+                NRUNNO: detail.NRUNNO,
+            });
 
-        detail.data.data = data;
-        detail.data.detail = q;
-        detail.data.product = product;
-        quotations.push(detail.data);
+            detail.data.data = data;
+            detail.data.detail = q;
+            detail.data.product = product;
+            quotations.push(detail.data);
+        }
+        form.quotation = quotations;
+        return form;
     }
-    form.quotation = quotations;
-    return form;
-  }
 }

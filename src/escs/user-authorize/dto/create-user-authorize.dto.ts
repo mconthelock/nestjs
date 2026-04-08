@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class ESCSCreateUserAuthorizeDto {
+export class CreateUsersAuthorizeDto {
   @IsNotEmpty()
   @IsString()
   UA_ITEM: string;

@@ -18,10 +18,6 @@ export class UserItemRepository extends BaseRepository {
         super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
-    async create(dto: CreateUserItemDto) {
-        return this.getRepository(USERS_ITEM).save(dto);
-    }
-
     findAll() {
         // ใช้ได้ทั้งหมด
         // return this.manager.query(`select * from USERS_ITEM`);
@@ -40,6 +36,10 @@ export class UserItemRepository extends BaseRepository {
         const qb = this.manager.createQueryBuilder(USERS_ITEM, 'U');
         this.applyFilters(qb, 'U', dto, ['USR_NO', 'IT_NO']);
         return qb.orderBy('U.USR_NO, U.IT_NO', 'ASC').getMany();
+    }
+
+    async create(dto: CreateUserItemDto) {
+        return this.getRepository(USERS_ITEM).save(dto);
     }
 
     async update(

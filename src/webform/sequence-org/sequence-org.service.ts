@@ -1,58 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
-import { CreateSequenceOrgDto } from './dto/create-sequence-org.dto';
-import { UpdateSequenceOrgDto } from './dto/update-sequence-org.dto';
-import { SequenceOrg } from './entities/sequence-org.entity';
 import { SearchSequenceOrgDto } from './dto/search-sequence-org.dto';
+import { SequenceOrgRepository } from './sequence-org.repository';
+import { SEQUENCEORG } from 'src/common/Entities/webform/table/SEQUENCEORG.entity';
 
 @Injectable()
 export class SequenceOrgService {
-  constructor(
-    @InjectRepository(SequenceOrg, 'webformConnection')
-    private readonly seqRepo: Repository<SequenceOrg>,
+    constructor(private readonly repo: SequenceOrgRepository) {}
 
-    @InjectDataSource('webformConnection')
-    private dataSource: DataSource,
-  ) {}
+    findAll() {
+        return this.repo.findAll();
+    }
 
-  findAll() {
-    return this.seqRepo.find();
-  }
+    async getManager(empno: string, selectFields?: string[]) {
+        return await this.repo.getManager(empno, selectFields);
+    }
 
-  async getManager(empno: string, queryRunner?: QueryRunner) {
-    const repo = queryRunner
-      ? queryRunner.manager.getRepository(SequenceOrg)
-      : this.seqRepo;
-    return repo
-      .createQueryBuilder('seq')
-      .select('seq.HEADNO', 'HEADNO')
-      .where('seq.EMPNO = :empno', { empno })
-      .andWhere(
-        'seq.SPOSCODE = (select SPOSCODE from AMECUSERALL where sEmpNo = :empno2)',
-        { empno2: empno },
-      )
-      .orderBy('seq.CCO', 'ASC')
-      .getRawMany();
-  }
+    async getSubordinates(empno: string) {
+        return await this.repo.getSubordinates(empno);
+    }
 
-  async getSubordinates(empno: string) {
-    const sql = `
-         SELECT DISTINCT B.* FROM 
-            (
-                SELECT * FROM SEQUENCEORG
-                START WITH HEADNO = :1 AND EMPNO != :2 CONNECT BY PRIOR EMPNO = HEADNO AND PRIOR CCO = CCO1
-            ) A
-            JOIN AMECUSERALL B ON A.EMPNO = B.SEMPNO
-            WHERE B.SEMPNO != :3  AND B.CSTATUS = 1
-        `;
-    return await this.dataSource.query(sql, [empno, empno, empno]);
-  }
-
-  async search(dto: SearchSequenceOrgDto, queryRunner?: QueryRunner): Promise<SequenceOrg[]> {
-    const repo = queryRunner
-      ? queryRunner.manager.getRepository(SequenceOrg)
-      : this.seqRepo;
-    return await repo.find({ where: dto });
-  }
+    async search(dto: SearchSequenceOrgDto): Promise<SEQUENCEORG[]> {
+        return await this.repo.search(dto);
+    }
 }

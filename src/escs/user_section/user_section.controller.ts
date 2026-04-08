@@ -3,18 +3,16 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
 } from '@nestjs/common';
-import { ESCSUserSectionService } from './user_section.service';
-import { SearchEscsUserSectionDto } from './dto/search-escs-usersection.dto';
+import { UsersSectionService } from './user_section.service';
+import { SearchUsersSectionDto } from './dto/search-escs-usersection.dto';
 import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 
-@ApiTags('ESCS User Section')
+@ApiTags('ESCS Users Section')
 @Controller('escs/userSection')
-export class ESCSUserSectionController {
-  constructor(private readonly userSectionService: ESCSUserSectionService) {}
+export class UsersSectionController {
+  constructor(private readonly userSectionService: UsersSectionService) {}
 
   @Get()
   @ApiOperation({
@@ -37,7 +35,7 @@ export class ESCSUserSectionController {
   @ApiOperation({
     summary: 'getSection',
   })
-  async getSection(@Body() searchDto: SearchEscsUserSectionDto) {
+  async getSection(@Body() searchDto: SearchUsersSectionDto) {
     return this.userSectionService.getSection(searchDto);
   }
 }

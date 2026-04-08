@@ -1,35 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { ESCSSearchUserAuthorizeViewDto } from './dto/search-user-authorize-view.dto';
+import { SearchUserAuthorizeViewDto } from './dto/search-user-authorize-view.dto';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { ESCSUserAuthorizeView } from './entities/user-authorize-view.entity';
+import { UsersAuthorizeViewRepository } from './user-authorize-view.repository';
 
 @Injectable()
-export class ESCSUserAuthorizeViewService {
-  constructor(
-    @InjectRepository(ESCSUserAuthorizeView, 'escsConnection')
-    private userAuthRepo: Repository<ESCSUserAuthorizeView>,
-    @InjectDataSource('escsConnection')
-    private dataSource: DataSource,
-  ) {}
+export class UsersAuthorizeViewService {
+    constructor(private readonly repo: UsersAuthorizeViewRepository) {}
 
-  async getUserAuthorizeView(
-    dto: ESCSSearchUserAuthorizeViewDto,
-    queryRunner?: QueryRunner,
-  ) {
-    const repo = queryRunner
-      ? queryRunner.manager.getRepository(ESCSUserAuthorizeView)
-      : this.userAuthRepo;
-    return repo.find({
-      where: dto,
-      relations: {
-        STATION: true,
-      },
-      order: {
-        USR_NO: 'ASC',
-        IT_NO: 'ASC',
-        STATION_NO: 'ASC',
-      }
-    });
-  }
+    async getUserAuthorizeView(
+        dto: SearchUserAuthorizeViewDto,
+    ) {
+        return this.repo.getUserAuthorizeView(dto);
+    }
 }

@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
-import { ESCSUserFileService } from './user-file.service';
-import { ESCSUserFileController } from './user-file.controller';
+import { UsersFileService } from './user-file.service';
+import { UsersFileController } from './user-file.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ESCSUserFile } from './entities/user-file.entity';
+import { UsersFileRepository } from './user-file.repository';
+import { USERS_FILES } from 'src/common/Entities/escs/table/USERS_FILES.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ESCSUserFile], 'escsConnection')],
-  controllers: [ESCSUserFileController],
-  providers: [ESCSUserFileService],
-  exports: [ESCSUserFileService],
+    imports: [TypeOrmModule.forFeature([USERS_FILES], 'escsConnection')],
+    controllers: [UsersFileController],
+    providers: [UsersFileService, UsersFileRepository],
+    exports: [UsersFileService],
 })
-export class ESCSUserFileModule {}
+export class UsersFileModule {}

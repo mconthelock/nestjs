@@ -1,23 +1,19 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
 } from '@nestjs/common';
-import { ESCSUserAuthorizeViewService } from './user-authorize-view.service';
-import { ESCSSearchUserAuthorizeViewDto } from './dto/search-user-authorize-view.dto';
+import { UsersAuthorizeViewService } from './user-authorize-view.service';
+import { SearchUserAuthorizeViewDto } from './dto/search-user-authorize-view.dto';
 
 @Controller('escs/user-authorize-view')
-export class ESCSUserAuthorizeViewController {
+export class UsersAuthorizeViewController {
   constructor(
-    private readonly userAuthorizeViewService: ESCSUserAuthorizeViewService,
+    private readonly usersAuthorizeViewService: UsersAuthorizeViewService,
   ) {}
 
   @Post('getUserAuthorizeView')
-  async getUserAuthorizeView(@Body() dto: ESCSSearchUserAuthorizeViewDto) {
-    return this.userAuthorizeViewService.getUserAuthorizeView(dto);
+  async getUserAuthorizeView(@Body() dto: SearchUserAuthorizeViewDto) {
+    return this.usersAuthorizeViewService.getUserAuthorizeView(dto);
   }
 }

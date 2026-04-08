@@ -1,40 +1,46 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { QueryRunner, Repository } from 'typeorm';
-
-import { User } from './entities/user.entity';
+import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User, 'amecConnection')
-    private readonly userRepository: Repository<User>,
-  ) {}
+    constructor(
+        private readonly repo: UsersRepository,
+    ) {}
 
-  findEmp(empno: string, queryRunner?: QueryRunner) {
-    const repo = queryRunner
-      ? queryRunner.manager.getRepository(User)
-      : this.userRepository;
-    return repo.findOne({
-      where: { SEMPNO: empno },
-    });
-  }
+    findEmp(empno: string) {
+        return this.repo.findOne(empno);
+    }
 
-  findEmpEncode(empno: string) {
-    return this.userRepository.findOne({
-      where: { SEMPENCODE: empno },
-    });
-  }
+    findEmpEncode(empno: string) {
+        return this.repo.findEmpEncode(empno);
+    }
 
-  search() {
-    return this.userRepository.find();
-  }
+    search() {
+        return this.repo.findAll();
+    }
 
-  findBirthday(month: string) {
-    return this.userRepository
-      .createQueryBuilder('user')
-      .where("cstatus = '1' and sposcode < 80 and birthday is not null and SUBSTR(birthday, 5, 2) = :month", { month })
-      .orderBy('birthday')
-      .getMany();
-  }
+    findBirthday(month: string) {
+        return this.repo.findBirthday(month);
+    }
+
+    async findOne(empno: string) {
+        try {
+            const res = await this.repo.findOne(empno);
+            if (!res) {
+                return {
+                    status: false,
+                    message: `Employee with empno ${empno} not found`,
+                };
+            }
+            return {
+                status: true,
+                message: `Employee with empno ${empno} found`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(
+                `Error finding employee with empno ${empno}: ` + error.message,
+            );
+        }
+    }
 }

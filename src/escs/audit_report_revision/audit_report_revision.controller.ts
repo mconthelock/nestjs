@@ -1,15 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ESCSARRService } from './audit_report_revision.service';
-import { CreateESCSARRDto } from './dto/create-audit_report_revision.dto';
-import { UpdateESCSARRDto } from './dto/update-audit_report_revision.dto';
-import { SearchESCSARRDto } from './dto/search-audit_report_revision.dto';
+import { Controller, Post, Body } from '@nestjs/common';
+import { AuditReportRevisionService } from './audit_report_revision.service';
+import { SearchAuditReportRevisionDto } from './dto/search-audit_report_revision.dto';
 
 @Controller('escs/audit-report-revision')
-export class ESCSARRController {
-  constructor(private readonly ESCSARRService: ESCSARRService) {}
+export class AuditReportRevisionController {
+    constructor(
+        private readonly AuditReportRevisionService: AuditReportRevisionService,
+    ) {}
 
-  @Post('getAuditReportRevision')
-  async getAuditReportRevision(@Body() dto: SearchESCSARRDto ) {
-    return this.ESCSARRService.getAuditReportRevision(dto);
-  }
+    @Post('getAuditReportRevision')
+    async getAuditReportRevision(@Body() dto: SearchAuditReportRevisionDto) {
+        return this.AuditReportRevisionService.getAuditReportRevision(dto);
+    }
 }

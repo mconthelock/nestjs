@@ -1,298 +1,205 @@
 import { Injectable } from '@nestjs/common';
-import { CreateESCSARMDto } from './dto/create-audit_report_master.dto';
-import { UpdateESCSARMDto } from './dto/update-audit_report_master.dto';
-import { SearchESCSARMDto } from './dto/search-audit_report_master.dto';
-import { SaveESCSARMDto } from './dto/save-audit_report_master.dto';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { AuditReportMaster } from './entities/audit_report_master.entity';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { CreateAuditReportMasterDto } from './dto/create-audit_report_master.dto';
+import { UpdateAuditReportMasterDto } from './dto/update-audit_report_master.dto';
+import { SearchAuditReportMasterDto } from './dto/search-audit_report_master.dto';
+import { SaveAuditReportMasterDto } from './dto/save-audit_report_master.dto';
 
-import { ESCSARRService } from '../audit_report_revision/audit_report_revision.service';
-import { DataESCSARMDto } from './dto/data-audit_report_master.dto';
-import { ESCSARHService } from '../audit_report_history/audit_report_history.service';
-import { ESCSARMAService } from '../audit_report_master_all/audit_report_master_all.service';
+import { AuditReportRevisionService } from '../audit_report_revision/audit_report_revision.service';
+import { DataAuditReportMasterDto } from './dto/data-audit_report_master.dto';
+import { AuditReportHistoryService } from '../audit_report_history/audit_report_history.service';
+import { AuditReportMasterRepository } from './audit_report_master.repository';
 
 @Injectable()
-export class ESCSARMService {
-  constructor(
-    @InjectRepository(AuditReportMaster, 'escsConnection')
-    private auditMasterRepo: Repository<AuditReportMaster>,
-    @InjectDataSource('escsConnection')
-    private readonly dataSource: DataSource,
-    private readonly escsArrService: ESCSARRService,
-    private readonly escsArhService: ESCSARHService,
-    private readonly escsArmaService: ESCSARMAService,
-  ) {}
+export class AuditReportMasterService {
+    constructor(
+        private readonly repo: AuditReportMasterRepository,
+        private readonly auditReportRevisionService: AuditReportRevisionService,
+        private readonly auditReportHistoryService: AuditReportHistoryService,
+    ) {}
 
-  async getAuditReportMaster(dto: SearchESCSARMDto, queryRunner?: QueryRunner) {
-    const repo = queryRunner ? queryRunner.manager : this.dataSource;
-    const query = repo
-      .createQueryBuilder()
-      .from(AuditReportMaster, 'A')
-      .orderBy('ARM_NO, ARM_SEQ', 'ASC');
-
-    if (dto.ARM_REV !== undefined) {
-      query.andWhere('ARM_REV = :rev', { rev: dto.ARM_REV });
-    } else {
-      const lastRevision = await this.escsArrService.findLatestRevision(
-        dto.ARM_SECID,
-        queryRunner,
-      );
-      if (lastRevision != null) {
-        query.andWhere('ARM_REV = :rev', { rev: lastRevision.ARR_REV });
-      }
-    }
-    if (dto.ARM_STATUS !== undefined) {
-      query.andWhere('ARM_STATUS = :status', { status: dto.ARM_STATUS });
-    }
-    if (dto.ARM_SECID !== undefined) {
-      query.andWhere('ARM_SECID = :secid', { secid: dto.ARM_SECID });
-    }
-    return await query.getRawMany();
-  }
-
-  async saveEscsARM(dto: SaveESCSARMDto, queryRunner?: QueryRunner) {
-    let localRunner: QueryRunner | undefined;
-    try {
-      if (!queryRunner) {
-        localRunner = this.dataSource.createQueryRunner();
-        await localRunner.connect();
-        await localRunner.startTransaction();
-      }
-      const { topic, list, incharge, reason, secid, total } = dto;
-      const runner = queryRunner || localRunner!;
-      const currentData = await this.getAuditReportMaster(
-        { ARM_SECID: secid },
-        runner,
-      );
-      const revision = await this.escsArrService.create(
-        {
-          ARR_SECID: secid,
-          ARR_INCHARGE: incharge,
-          ARR_REASON: reason,
-          ARR_TOTAL: total
-        },
-        runner,
-      );
-      for (const row of currentData) {
-        await this.escsArhService.create(
-          {
-            ARH_SECID: row.ARM_SECID,
-            ARH_REV: row.ARM_REV,
-            ARH_NO: row.ARM_NO,
-            ARH_SEQ: row.ARM_SEQ,
-            ARH_TYPE: row.ARM_TYPE,
-            ARH_DETAIL: row.ARM_DETAIL,
-            ARH_FACTOR: row.ARM_FACTOR,
-            ARH_MAXSCORE: row.ARM_MAXSCORE,
-            ARH_STATUS: row.ARM_STATUS,
-          },
-          runner,
-        );
-      }
-
-      if (topic.length > 0) {
-        for (const t of topic) {
-          const data: any = await this.setData(t, revision.revision);
-          data.ARM_TYPE = 'H';
-          data.ARM_SEQ = 0;
-          data.ARM_SECID = secid;
-          if (t.type == 'del') {
-            await this.delete(data, runner);
-          } else if (t.type == 'edit') {
-            await this.update(
-              {
-                ...data,
-                condition: {
-                  ARM_REV: t.rev,
-                  ARM_NO: t.topic,
-                  ARM_SEQ: 0,
-                  ARM_TYPE: 'H',
-                },
-              },
-              runner,
-            );
-          } else {
-            await this.create(data, runner);
-          }
+    async getAuditReportMaster(dto: SearchAuditReportMasterDto) {
+        const condition = { ...dto };
+        if (dto.ARM_REV !== undefined) {
+            condition.ARM_REV = dto.ARM_REV;
+        } else {
+            const lastRevision =
+                await this.auditReportRevisionService.findLatestRevision(
+                    dto.ARM_SECID,
+                );
+            if (lastRevision != null) {
+                condition.ARM_REV = lastRevision.ARR_REV;
+            }
         }
-      }
-      if (list.length > 0) {
-        for (const l of list) {
-          const data: any = await this.setData(l, revision.revision);
-          data.ARM_TYPE = 'D';
-          data.ARM_SECID = secid;
-          if (l.type == 'del') {
-            await this.delete(data, runner);
-          } else if (l.type == 'edit') {
-            await this.update(
-              {
-                ...data,
-                condition: {
-                  ARM_REV: l.rev,
-                  ARM_NO: l.topic,
-                  ARM_SEQ: l.seq,
-                  ARM_TYPE: 'D',
-                },
-              },
-              runner,
-            );
-          } else {
-            await this.create(data, runner);
-          }
+        if (dto.ARM_STATUS !== undefined) {
+            condition.ARM_STATUS = dto.ARM_STATUS;
         }
-      }
-      await this.update(
-        { ARM_REV: revision.revision, condition: { ARM_SECID: secid } },
-        runner,
-      );
-      if (localRunner) await localRunner.commitTransaction();
-      return {
-        status: true,
-        message: 'Save Successfully',
-      };
-    } catch (error) {
-      if (localRunner) await localRunner.rollbackTransaction();
-      throw new Error('Error: ' + error.message);
-    } finally {
-      if (localRunner) await localRunner.release();
+        if (dto.ARM_SECID !== undefined) {
+            condition.ARM_SECID = dto.ARM_SECID;
+        }
+        return await this.repo.find(condition);
     }
-  }
 
-  async setData(dto: DataESCSARMDto, revision: number) {
-    const {
-      rev,
-      detail,
-      type,
-      status,
-      topic,
-      new_topic,
-      seq,
-      new_seq,
-      factor,
-      maxScore,
-    } = dto;
-    if (type == 'new') {
-      return {
-        ARM_REV: revision,
-        ARM_NO: new_topic || topic,
-        ARM_SEQ: new_seq || seq,
-        ARM_DETAIL: detail,
-        ARM_FACTOR: factor ?? 0,
-        ARM_MAXSCORE: maxScore ?? 3,
-      };
-    } else if (type == 'edit') {
-      return {
-        ARM_REV: revision,
-        ARM_NO: new_topic || topic,
-        ARM_SEQ: new_seq || seq,
-        ARM_STATUS: status,
-        ARM_DETAIL: detail,
-        ARM_FACTOR: factor ?? 0,
-        ARM_MAXSCORE: maxScore ?? 3,
-      };
-    } else if (type == 'del') {
-      return {
-        ARM_REV: rev,
-        ARM_NO: topic,
-        ARM_SEQ: seq,
-      };
+    async saveAuditReportMaster(dto: SaveAuditReportMasterDto) {
+        try {
+            const { topic, list, incharge, reason, secid, total } = dto;
+            const currentData = await this.getAuditReportMaster({
+                ARM_SECID: secid,
+            });
+            const revision = await this.auditReportRevisionService.create({
+                ARR_SECID: secid,
+                ARR_INCHARGE: incharge,
+                ARR_REASON: reason,
+                ARR_TOTAL: total,
+            });
+            for (const row of currentData) {
+                await this.auditReportHistoryService.create({
+                    ARH_SECID: row.ARM_SECID,
+                    ARH_REV: row.ARM_REV,
+                    ARH_NO: row.ARM_NO,
+                    ARH_SEQ: row.ARM_SEQ,
+                    ARH_TYPE: row.ARM_TYPE,
+                    ARH_DETAIL: row.ARM_DETAIL,
+                    ARH_FACTOR: row.ARM_FACTOR,
+                    ARH_MAXSCORE: row.ARM_MAXSCORE,
+                    ARH_STATUS: row.ARM_STATUS,
+                });
+            }
+
+            if (topic.length > 0) {
+                for (const t of topic) {
+                    const data: any = await this.setData(t, revision.revision);
+                    data.ARM_TYPE = 'H';
+                    data.ARM_SEQ = 0;
+                    data.ARM_SECID = secid;
+                    if (t.type == 'del') {
+                        await this.delete(data);
+                    } else if (t.type == 'edit') {
+                        await this.update({
+                            ...data,
+                            condition: {
+                                ARM_REV: t.rev,
+                                ARM_NO: t.topic,
+                                ARM_SEQ: 0,
+                                ARM_TYPE: 'H',
+                            },
+                        });
+                    } else {
+                        await this.create(data);
+                    }
+                }
+            }
+            if (list.length > 0) {
+                for (const l of list) {
+                    const data: any = await this.setData(l, revision.revision);
+                    data.ARM_TYPE = 'D';
+                    data.ARM_SECID = secid;
+                    if (l.type == 'del') {
+                        await this.delete(data);
+                    } else if (l.type == 'edit') {
+                        await this.update({
+                            ...data,
+                            condition: {
+                                ARM_REV: l.rev,
+                                ARM_NO: l.topic,
+                                ARM_SEQ: l.seq,
+                                ARM_TYPE: 'D',
+                            },
+                        });
+                    } else {
+                        await this.create(data);
+                    }
+                }
+            }
+            await this.update({
+                ARM_REV: revision.revision,
+                condition: { ARM_SECID: secid },
+            });
+            return {
+                status: true,
+                message: 'Save Successfully',
+            };
+        } catch (error) {
+            throw new Error('Error: ' + error.message);
+        }
     }
-  }
 
-  async create(dto: CreateESCSARMDto, queryRunner?: QueryRunner) {
-    let localRunner: QueryRunner | undefined;
-    let didConnect = false;
-    let didStartTx = false;
-    try {
-      if (!queryRunner) {
-        localRunner = this.dataSource.createQueryRunner();
-        await localRunner.connect();
-        didConnect = true;
-        await localRunner.startTransaction();
-        didStartTx = true;
-      }
-      const runner = queryRunner || localRunner!;
-
-      await runner.manager.insert(AuditReportMaster, dto);
-      if (localRunner && didStartTx && runner.isTransactionActive)
-        await localRunner.commitTransaction();
-      return {
-        status: true,
-        message: 'Insert Successfully',
-      };
-    } catch (error) {
-      if (localRunner && didStartTx && localRunner.isTransactionActive)
-        await localRunner.rollbackTransaction();
-      throw new Error(
-        'Insert master Error: ' + error.message,
-      );
-    } finally {
-      if (localRunner && didConnect) await localRunner.release();
+    async setData(dto: DataAuditReportMasterDto, revision: number) {
+        const {
+            rev,
+            detail,
+            type,
+            status,
+            topic,
+            new_topic,
+            seq,
+            new_seq,
+            factor,
+            maxScore,
+        } = dto;
+        if (type == 'new') {
+            return {
+                ARM_REV: revision,
+                ARM_NO: new_topic || topic,
+                ARM_SEQ: new_seq || seq,
+                ARM_DETAIL: detail,
+                ARM_FACTOR: factor ?? 0,
+                ARM_MAXSCORE: maxScore ?? 3,
+            };
+        } else if (type == 'edit') {
+            return {
+                ARM_REV: revision,
+                ARM_NO: new_topic || topic,
+                ARM_SEQ: new_seq || seq,
+                ARM_STATUS: status,
+                ARM_DETAIL: detail,
+                ARM_FACTOR: factor ?? 0,
+                ARM_MAXSCORE: maxScore ?? 3,
+            };
+        } else if (type == 'del') {
+            return {
+                ARM_REV: rev,
+                ARM_NO: topic,
+                ARM_SEQ: seq,
+            };
+        }
     }
-  }
 
-  async update(dto: UpdateESCSARMDto, queryRunner?: QueryRunner) {
-    let localRunner: QueryRunner | undefined;
-    let didConnect = false;
-    let didStartTx = false;
-    try {
-      if (!queryRunner) {
-        localRunner = this.dataSource.createQueryRunner();
-        await localRunner.connect();
-        didConnect = true;
-        await localRunner.startTransaction();
-        didStartTx = true;
-      }
-      const runner = queryRunner || localRunner!;
-      const { condition, ...data } = dto;
-
-      await runner.manager.update(AuditReportMaster, condition, data);
-      if (localRunner && didStartTx && runner.isTransactionActive)
-        await localRunner.commitTransaction();
-      return { status: true, message: 'Update master Successfully' };
-    } catch (error) {
-      if (localRunner && didStartTx && localRunner.isTransactionActive)
-        await localRunner.rollbackTransaction();
-      throw new Error(
-        'Update master Error: ' + error.message,
-      );
-    } finally {
-      if (localRunner && didConnect) await localRunner.release();
+    async create(dto: CreateAuditReportMasterDto) {
+        try {
+            const res = await this.repo.insert(dto);
+            if (res.identifiers.length === 0) {
+                throw new Error('No record inserted');
+            }
+            return {
+                status: true,
+                message: 'Insert Successfully',
+            };
+        } catch (error) {
+            throw new Error('Insert master Error: ' + error.message);
+        }
     }
-  }
 
-  async delete(dto: UpdateESCSARMDto, queryRunner?: QueryRunner) {
-    let localRunner: QueryRunner | undefined;
-    let didConnect = false;
-    let didStartTx = false;
-    try {
-      if (!queryRunner) {
-        localRunner = this.dataSource.createQueryRunner();
-        await localRunner.connect();
-        didConnect = true;
-        await localRunner.startTransaction();
-        didStartTx = true;
-      }
-      const runner = queryRunner || localRunner!;
-
-      await runner.manager.delete(AuditReportMaster, {
-        ARM_REV: dto.ARM_REV,
-        ARM_NO: dto.ARM_NO,
-        ARM_SEQ: dto.ARM_SEQ,
-        ARM_TYPE: dto.ARM_TYPE,
-      });
-      if (localRunner && didStartTx && runner.isTransactionActive)
-        await localRunner.commitTransaction();
-      return { status: true, message: 'Delete master Successfully' };
-    } catch (error) {
-      if (localRunner && didStartTx && localRunner.isTransactionActive)
-        await localRunner.rollbackTransaction();
-      throw new Error(
-        'Delete master Error: ' + error.message,
-      );
-    } finally {
-      if (localRunner && didConnect) await localRunner.release();
+    async update(dto: UpdateAuditReportMasterDto) {
+        try {
+            const res = await this.repo.update(dto);
+            if (res.affected === 0) {
+                throw new Error('No record updated');
+            }
+            return { status: true, message: 'Update master Successfully' };
+        } catch (error) {
+            throw new Error('Update master Error: ' + error.message);
+        }
     }
-  }
+
+    async delete(dto: UpdateAuditReportMasterDto) {
+        try {
+            const res = await this.repo.delete(dto);
+            if (res.affected === 0) {
+                throw new Error('No record deleted');
+            }
+            return { status: true, message: 'Delete master Successfully' };
+        } catch (error) {
+            throw new Error('Delete master Error: ' + error.message);
+        }
+    }
 }

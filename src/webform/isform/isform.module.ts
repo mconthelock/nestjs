@@ -11,8 +11,9 @@ import { IsTidModule } from './is-tid/is-tid.module';
 import { IsWorkloadModule } from './is-workload/is-workload.module';
 import { IsAdpModule } from './is-adp/is-adp.module';
 import { IsFileModule } from './is-file/is-file.module';
+import { IsCfsModule } from './is-cfs/is-cfs.module';
 
 @Module({
-  imports: [IsDevModule, IsForm3Module, IsMoModule, IsForm1Module, IsForm4Module, Form1ObjectiveModule, Form1WageModule, CrdevicemstModule, IsTidModule, IsWorkloadModule, IsAdpModule, IsFileModule],
+  imports: [IsDevModule, IsForm3Module, IsMoModule, IsForm1Module, IsForm4Module, Form1ObjectiveModule, Form1WageModule, CrdevicemstModule, IsTidModule, IsWorkloadModule, IsAdpModule, IsFileModule, IsCfsModule],
 })
 export class ISFormModule {}

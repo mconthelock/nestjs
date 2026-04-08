@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class ESCSCreateUserFileDto {
+export class CreateUsersFileDto {
   @IsNotEmpty()
   @IsString()
   UF_ITEM: string;

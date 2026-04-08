@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
-import { Form } from 'src/webform/form/entities/form.entity';
+import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
 @Entity('OTFORM')
 export class GpOt {
@@ -54,7 +54,7 @@ export class GpOt {
   @Column()
   SPECIAL_REASON: string;
 
-  @OneToOne(() => Form, (form) => form.isdev)
+  @OneToOne(() => FORM, (form) => form.isdev)
   @JoinColumn([
     { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
     { name: 'VORGNO', referencedColumnName: 'VORGNO' },
@@ -62,5 +62,5 @@ export class GpOt {
     { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
     { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
   ])
-  form: Form;
+  form: FORM;
 }

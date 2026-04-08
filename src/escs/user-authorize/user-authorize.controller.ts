@@ -1,10 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ESCSUserAuthorizeService } from './user-authorize.service';
-import { ESCSCreateUserAuthorizeDto } from './dto/create-user-authorize.dto';
-import { ESCSUpdateUserAuthorizeDto } from './dto/update-user-authorize.dto';
+import { Controller } from '@nestjs/common';
+import { UsersAuthorizeService } from './user-authorize.service';
 
 @Controller('escs/user-authorize')
-export class ESCSUserAuthorizeController {
-  constructor(private readonly userAuthorizeService: ESCSUserAuthorizeService) {}
-
+export class UsersAuthorizeController {
+    constructor(private readonly userAuthorizeService: UsersAuthorizeService) {}
 }

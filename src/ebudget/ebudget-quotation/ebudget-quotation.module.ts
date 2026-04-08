@@ -3,11 +3,14 @@ import { EbudgetQuotationService } from './ebudget-quotation.service';
 import { EbudgetQuotationController } from './ebudget-quotation.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EBUDGET_QUOTATION } from 'src/common/Entities/ebudget/table/EBUDGET_QUOTATION.entity';
+import { EbudgetQuotationRepository } from './ebudget-quotation.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([EBUDGET_QUOTATION], 'ebudgetConnection')],
-  controllers: [EbudgetQuotationController],
-  providers: [EbudgetQuotationService],
-  exports: [EbudgetQuotationService],
+    imports: [
+        TypeOrmModule.forFeature([EBUDGET_QUOTATION], 'ebudgetConnection'),
+    ],
+    controllers: [EbudgetQuotationController],
+    providers: [EbudgetQuotationService, EbudgetQuotationRepository],
+    exports: [EbudgetQuotationService],
 })
 export class EbudgetQuotationModule {}

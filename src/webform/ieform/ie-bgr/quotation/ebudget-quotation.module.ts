@@ -7,14 +7,14 @@ import { EbudgetQuotationModule } from 'src/ebudget/ebudget-quotation/ebudget-qu
 import { FormModule } from 'src/webform/form/form.module';
 import { RqffrmModule } from 'src/webform/rqffrm/rqffrm.module';
 @Module({
-  imports: [
-    FormModule,
-    EbudgetQuotationProductModule,
-    EbudgetQuotationModule,
-    RqffrmModule,
-  ],
-  controllers: [QuotationController],
-  providers: [QuotationService],
-  exports: [QuotationService],
+    imports: [
+        FormModule,
+        EbudgetQuotationProductModule,
+        EbudgetQuotationModule,
+        RqffrmModule,
+    ],
+    controllers: [QuotationController],
+    providers: [QuotationService],
+    exports: [QuotationService],
 })
 export class QuotationModule {}

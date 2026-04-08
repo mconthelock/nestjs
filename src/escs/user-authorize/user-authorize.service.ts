@@ -1,49 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { ESCSCreateUserAuthorizeDto } from './dto/create-user-authorize.dto';
-import { ESCSUpdateUserAuthorizeDto } from './dto/update-user-authorize.dto';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { ESCSUserAuthorize } from './entities/user-authorize.entity';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { CreateUsersAuthorizeDto } from './dto/create-user-authorize.dto';
+import { UsersAuthorizeRepository } from './user-authorize.repository';
 
 @Injectable()
-export class ESCSUserAuthorizeService {
-  constructor(
-    @InjectRepository(ESCSUserAuthorize, 'escsConnection')
-    private userAuthRepo: Repository<ESCSUserAuthorize>,
-    @InjectDataSource('escsConnection')
-    private dataSource: DataSource,
-  ) {}
+export class UsersAuthorizeService {
+    constructor(private readonly repo: UsersAuthorizeRepository) {}
 
-  async addUserAuth(
-    dto: ESCSCreateUserAuthorizeDto,
-    queryRunner?: QueryRunner,
-  ) {
-    let localRunner: QueryRunner | undefined;
-    let didConnect = false;
-    let didStartTx = false;
-    try {
-      if (!queryRunner) {
-        localRunner = this.dataSource.createQueryRunner();
-        await localRunner.connect();
-        didConnect = true;
-        await localRunner.startTransaction();
-        didStartTx = true;
-      }
-      const runner = queryRunner || localRunner!;
-
-      await runner.manager.save(ESCSUserAuthorize, dto);
-      if (localRunner && didStartTx && runner.isTransactionActive)
-        await localRunner.commitTransaction();
-      return {
-        status: true,
-        message: 'Insert user Auth Successfully',
-      };
-    } catch (error) {
-      if (localRunner && didStartTx && localRunner.isTransactionActive)
-        await localRunner.rollbackTransaction();
-      throw new Error('Insert user Auth ' + error.message);
-    } finally {
-      if (localRunner && didConnect) await localRunner.release();
+    async addUserAuth(dto: CreateUsersAuthorizeDto) {
+        try {
+            const res = await this.repo.create(dto);
+            if (!res) {
+                throw new Error('Insert user Auth Failed');
+            }
+            return {
+                status: true,
+                message: 'Insert user Auth Successfully',
+            };
+        } catch (error) {
+            throw new Error('Insert user Auth ' + error.message);
+        }
     }
-  }
 }

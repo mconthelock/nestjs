@@ -1,7 +1,7 @@
-import { Transform, Type } from 'class-transformer';
-import { IsOptional, IsString, IsNumber, IsArray, IsBoolean } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsOptional, IsString, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-export class SearchEscsItemDto {
+export class SearchItemDto {
     @ApiProperty({ required: false, example: '141' })
     @IsOptional()
     @IsString()
@@ -13,7 +13,7 @@ export class SearchEscsItemDto {
     @IsNumber()
     readonly IT_USERUPDATE?: number;
 
-    @ApiProperty({ required: false, example: 1})
+    @ApiProperty({ required: false, example: 1 })
     @IsOptional()
     @Type(() => Number)
     @IsNumber()
@@ -36,5 +36,4 @@ export class SearchEscsItemDto {
     @Type(() => Number)
     @IsNumber()
     readonly IT_MFGDATE?: number;
-
 }

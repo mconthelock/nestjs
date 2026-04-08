@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/swagger';
-import { ESCSCreateUserItemStationDto } from './create-user-item-station.dto';
+import { CreateUsersItemStationDto } from './create-user-item-station.dto';
 
-export class ESCSUpdateUserItemStationDto extends PartialType(ESCSCreateUserItemStationDto) {}
+export class UpdateUsersItemStationDto extends PartialType(CreateUsersItemStationDto) {}

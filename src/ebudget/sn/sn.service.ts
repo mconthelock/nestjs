@@ -1,28 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { EBUDGET_DATA_SN } from 'src/common/Entities/ebudget/views/EBUDGET_DATA_SN.entity';
-import { Repository } from 'typeorm';
 import { SearchEbudgetSnDto } from './dto/search-sn.dto';
+import { SnRepository } from './sn.repository';
 
 @Injectable()
 export class SnService {
-  constructor(
-    @InjectRepository(EBUDGET_DATA_SN, 'ebudgetConnection')
-    private readonly repo: Repository<EBUDGET_DATA_SN>,
-  ) {}
+    constructor(private readonly repo: SnRepository) {}
 
-  findAll() {
-    return this.repo.find({ order: { FYEAR: 'ASC', SN: 'ASC' } });
-  }
+    findAll() {
+        return this.repo.findAll();
+    }
 
-  async getDataSn(dto: SearchEbudgetSnDto) {
-    return await this.repo.find({
-      where: {
-        VORGCODE: dto.VORGCODE,
-        FYEAR: dto.FYEAR,
-        CSTATUS: '1',
-      },
-      order: { SN: 'ASC' },
-    });
-  }
+    async getDataSn(dto: SearchEbudgetSnDto) {
+        return await this.repo.getDataSn(dto);
+    }
 }

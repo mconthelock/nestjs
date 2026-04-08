@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
-import { ESCSUserService } from './user.service';
-import { ESCSUserController } from './user.controller';
-import { EscsUser } from './entities/user.entity';
+import { UsersService } from './user.service';
+import { UsersController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersRepository } from './user.repository';
+import { USERS } from 'src/common/Entities/escs/table/USERS.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([EscsUser], 'escsConnection')],
-  controllers: [ESCSUserController],
-  providers: [ESCSUserService],
-  exports: [ESCSUserService],
+    imports: [TypeOrmModule.forFeature([USERS], 'escsConnection')],
+    controllers: [UsersController],
+    providers: [UsersService, UsersRepository],
+    exports: [UsersService],
 })
-export class ESCSUserModule {}
+export class UsersModule {}

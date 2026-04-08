@@ -1,14 +1,13 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({
-  name: 'USERS_ITEM',
-  schema: 'ESCCHKSHT'
+    name: 'USERS_ITEM',
+    schema: 'ESCCHKSHT',
 })
 export class USERS_ITEM {
-    
     @PrimaryColumn()
     USR_NO: string;
-    
+
     @PrimaryColumn()
     IT_NO: string;
 

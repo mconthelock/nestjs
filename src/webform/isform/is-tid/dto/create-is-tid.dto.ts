@@ -12,27 +12,6 @@ import {
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
-export class CreateIsTidFormDto extends PickType(CreateFormDto, [
-    'NFRMNO',
-    'VORGNO',
-    'CYEAR',
-    'REQBY',
-    'INPUTBY',
-    'REMARK',
-] as const) {
-    @IsNotEmpty()
-    @IsArray()
-    @ValidateNested({ each: true }) // บอกว่าเป็น array ของ object
-    @Type(() => CreateIsTidFormDto) // ต้องแปลงเป็น AttachmentDto
-    USERDATA: CreateIsTidFormDto[];
-
-    @IsOptional()
-    @IsArray()
-    @ValidateNested({ each: true }) // บอกว่าเป็น array ของ object
-    @Type(() => CreateIsTidFormDto) // ต้องแปลงเป็น AttachmentDto
-    CONTROLLERDATA?: CreateIsTidFormDto[];
-}
-
 export class CreateIsTidDto extends PickType(FormDto, [
     'NFRMNO',
     'VORGNO',
@@ -45,12 +24,12 @@ export class CreateIsTidDto extends PickType(FormDto, [
     @IsString()
     TID_REQUESTER: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @Transform(
         ({ value }) => (Array.isArray(value) ? value.join('|') : value), // ถ้าเป็น string เดี่ยว → wrap array
     )
     @IsString()
-    TID_REQNO: string;
+    TID_REQNO?: string;
 
     @IsNotEmpty()
     @Type(() => Date)
@@ -82,10 +61,10 @@ export class CreateIsTidDto extends PickType(FormDto, [
     @IsString()
     TID_CONTROLLER?: string;
 
-    @IsOptional()
+    @IsNotEmpty()
     @Type(() => String)
     @IsString()
-    TID_WORKCONTENT?: string;
+    TID_WORKCONTENT: string;
 
     @IsOptional()
     @Type(() => String)
@@ -106,4 +85,62 @@ export class CreateIsTidDto extends PickType(FormDto, [
     @Type(() => Number)
     @IsNumber()
     TID_LATE: number;
+}
+
+export class IsTidUserData extends PickType(CreateIsTidDto, [
+    'TID_REQUESTER',
+    'TID_REQNO',
+    'TID_REQ_DATE',
+    'TID_TIMESTART',
+    'TID_TIMEEND',
+    'TID_SERVERNAME',
+    'TID_USERLOGIN',
+    'TID_CONTROLLER',
+    'TID_WORKCONTENT',
+    'TID_REASON',
+    'TID_CHANGEDATA',
+    'TID_FORMTYPE',
+    'TID_LATE',
+] as const) {}
+
+export class IsTidControllerData extends PickType(CreateIsTidDto, [
+    'TID_REQUESTER',
+    'TID_REQ_DATE',
+    'TID_TIMESTART',
+    'TID_TIMEEND',
+    'TID_SERVERNAME',
+    'TID_USERLOGIN',
+    'TID_WORKCONTENT',
+    'TID_CHANGEDATA',
+    'TID_FORMTYPE',
+    'TID_LATE',
+] as const) {}
+
+export class CreateIsTidFormDto extends PickType(CreateFormDto, [
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'REQBY',
+    'INPUTBY',
+    'REMARK',
+] as const) {
+    @IsNotEmpty()
+    @ValidateNested()
+    @Type(() => IsTidUserData)
+    USERDATA: IsTidUserData;
+
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => IsTidControllerData)
+    CONTROLLERDATA?: IsTidControllerData;
+
+    @IsNotEmpty()
+    @Type(() => Number)
+    @IsNumber()
+    FORMTYPE: number;
+
+    @IsNotEmpty()
+    @Type(() => Number)
+    @IsNumber()
+    CHANGEDATA: number;
 }

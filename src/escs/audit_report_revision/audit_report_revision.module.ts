@@ -1,13 +1,16 @@
 import { Module } from '@nestjs/common';
-import { ESCSARRService } from './audit_report_revision.service';
-import { ESCSARRController } from './audit_report_revision.controller';
+import { AuditReportRevisionService } from './audit_report_revision.service';
+import { AuditReportRevisionController } from './audit_report_revision.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuditReportRevision } from './entities/audit_report_revision.entity';
+import { AuditReportRevisionRepository } from './audit_report_revision.repository';
+import { AUDIT_REPORT_REVISION } from 'src/common/Entities/escs/table/AUDIT_REPORT_REVISION.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AuditReportRevision], 'escsConnection')],
-  controllers: [ESCSARRController],
-  providers: [ESCSARRService],
-  exports: [ESCSARRService],
+    imports: [
+        TypeOrmModule.forFeature([AUDIT_REPORT_REVISION], 'escsConnection'),
+    ],
+    controllers: [AuditReportRevisionController],
+    providers: [AuditReportRevisionService, AuditReportRevisionRepository],
+    exports: [AuditReportRevisionService],
 })
-export class ESCSARRModule {}
+export class AuditReportRevisionModule {}

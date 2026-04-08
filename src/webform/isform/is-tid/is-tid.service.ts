@@ -7,7 +7,7 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 
 @Injectable()
 export class IsTidService {
-    constructor(private readonly repo: IsTidRepository) {}
+    constructor(protected readonly repo: IsTidRepository) {}
 
     async findOne(dto: FormDto) {
         try {
@@ -117,7 +117,8 @@ export class IsTidService {
             };
         } catch (error) {
             throw new Error(
-                `Update IS_TID by cyear2 = ${form.CYEAR2} nrunno = ${form.NRUNNO} Error: ` + error.message,
+                `Update IS_TID by cyear2 = ${form.CYEAR2} nrunno = ${form.NRUNNO} Error: ` +
+                    error.message,
             );
         }
     }
@@ -138,7 +139,8 @@ export class IsTidService {
             };
         } catch (error) {
             throw new Error(
-                `Delete IS_TID by cyear2 = ${form.CYEAR2} nrunno = ${form.NRUNNO} Error: ` + error.message,
+                `Delete IS_TID by cyear2 = ${form.CYEAR2} nrunno = ${form.NRUNNO} Error: ` +
+                    error.message,
             );
         }
     }

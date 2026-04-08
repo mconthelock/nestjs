@@ -1,22 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { Repository, DataSource } from 'typeorm';
-import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
-import { QaType } from './entities/qa_type.entity';
+import { QaTypeRepository } from './qa_type.repository';
 
 @Injectable()
 export class QaTypeService {
-  constructor(
-    @InjectRepository(QaType, 'webformConnection')
-    private qatypeRepo: Repository<QaType>,
-    @InjectDataSource('webformConnection')
-    private dataSource: DataSource,
-  ) {}
+    constructor(private readonly repo: QaTypeRepository) {}
 
-  getQaTypeAll() {
-    return this.qatypeRepo.find();
-  }
+    getQaTypeAll() {
+        return this.repo.findAll();
+    }
 
-  getQaTypeByCode(code: string) {
-    return this.qatypeRepo.findOne({ where: { QAT_CODE: code } });
-  }
+    getQaTypeByCode(code: string) {
+        return this.repo.findOneByCode(code);
+    }
 }

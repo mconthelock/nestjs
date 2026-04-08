@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 import { Workplan } from '../../../../docinv/workplan/entities/workplan.entity';
-import { Form } from 'src/webform/form/entities/form.entity';
+import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
 @Entity('WORK_PLAN_FRM')
 export class IsForm1 {
@@ -25,7 +25,7 @@ export class IsForm1 {
   @Column()
   EFFP: string;
 
-  @OneToOne(() => Form, (form) => form.form1)
+  @OneToOne(() => FORM, (form) => form.form1)
   @JoinColumn([
     { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
     { name: 'VORGNO', referencedColumnName: 'VORGNO' },
@@ -33,7 +33,7 @@ export class IsForm1 {
     { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
     { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
   ])
-  form: Form;
+  form: FORM;
 
   @OneToOne(() => Workplan, (plan) => plan.planfrm)
   @JoinColumn([{ name: 'PLANID', referencedColumnName: 'PLANID' }])

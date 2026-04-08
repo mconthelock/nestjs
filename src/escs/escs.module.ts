@@ -1,18 +1,18 @@
 import { Module } from '@nestjs/common';
-import { ESCSItemModule } from './item/item.module';
-import { ESCSUserSectionModule } from './user_section/user_section.module';
-import { ESCSUserModule } from './user/user.module';
-import { ESCSOrdersModule } from './orders/orders.module';
-import { ESCSARMModule } from './audit_report_master/audit_report_master.module';
-import { ESCSARRModule } from './audit_report_revision/audit_report_revision.module';
-import { ESCSARHModule } from './audit_report_history/audit_report_history.module';
-import { ESCSARMAModule } from './audit_report_master_all/audit_report_master_all.module';
-import { ESCSItemStationModule } from './item-station/item-station.module';
+import { ItemModule } from './item/item.module';
+import { UsersSectionModule } from './user_section/user_section.module';
+import { UsersModule } from './user/user.module';
+import { OrdersModule } from './orders/orders.module';
+import { AuditReportMasterModule } from './audit_report_master/audit_report_master.module';
+import { AuditReportRevisionModule } from './audit_report_revision/audit_report_revision.module';
+import { AuditReportHistoryModule } from './audit_report_history/audit_report_history.module';
+import { AuditReportMasterAllModule } from './audit_report_master_all/audit_report_master_all.module';
+import { ItemStationModule } from './item-station/item-station.module';
 import { UserItemModule } from './user-item/user-item.module';
-import { ESCSUserItemStationModule } from './user-item-station/user-item-station.module';
-import { ESCSUserFileModule } from './user-file/user-file.module';
-import { ESCSUserAuthorizeModule } from './user-authorize/user-authorize.module';
-import { ESCSUserAuthorizeViewModule } from './user-authorize-view/user-authorize-view.module';
+import { UsersItemStationModule } from './user-item-station/user-item-station.module';
+import { UsersFileModule } from './user-file/user-file.module';
+import { UsersAuthorizeModule } from './user-authorize/user-authorize.module';
+import { UsersAuthorizeViewModule } from './user-authorize-view/user-authorize-view.module';
 import { BlockMasterModule } from './block-master/block-master.module';
 import { ItemMfgModule } from './item-mfg/item-mfg.module';
 import { ItemMfgTypeModule } from './item-mfg-type/item-mfg-type.module';
@@ -27,33 +27,33 @@ import { MfgSerialModule } from './mfg-serial/mfg-serial.module';
 import { MfgDrawingActionModule } from './mfg-drawing-action/mfg-drawing-action.module';
 
 @Module({
-  imports: [
-    ESCSItemModule,
-    ESCSUserSectionModule,
-    ESCSUserModule,
-    ESCSOrdersModule,
-    ESCSARMModule,
-    ESCSARRModule,
-    ESCSARHModule,
-    ESCSARMAModule,
-    ESCSItemStationModule,
-    UserItemModule,
-    ESCSUserItemStationModule,
-    ESCSUserFileModule,
-    ESCSUserAuthorizeModule,
-    ESCSUserAuthorizeViewModule,
-    BlockMasterModule,
-    ItemMfgModule,
-    ItemMfgTypeModule,
-    ItemSheetMfgModule,
-    ItemMfgListModule,
-    ItemMfgHistoryModule,
-    ItemMasterAuthorizeModule,
-    ItemMfgDeleteModule,
-    ControlDrawingPisModule,
-    MfgDrawingModule,
-    MfgSerialModule,
-    MfgDrawingActionModule,
-  ],
+    imports: [
+        AuditReportHistoryModule,
+        AuditReportMasterModule,
+        AuditReportRevisionModule,
+        AuditReportMasterAllModule,
+        BlockMasterModule,
+        ControlDrawingPisModule,
+        ItemModule,
+        ItemMasterAuthorizeModule,
+        ItemMfgModule,
+        ItemMfgDeleteModule,
+        ItemMfgHistoryModule,
+        ItemMfgListModule,
+        ItemMfgTypeModule,
+        ItemSheetMfgModule,
+        ItemStationModule,
+        OrdersModule,
+        MfgDrawingModule,
+        MfgDrawingActionModule,
+        MfgSerialModule,
+        UserItemModule,
+        UsersAuthorizeModule,
+        UsersAuthorizeViewModule,
+        UsersItemStationModule,
+        UsersFileModule,
+        UsersModule,
+        UsersSectionModule,
+    ],
 })
 export class ESCSModule {}

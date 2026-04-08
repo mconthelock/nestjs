@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class CreateESCSItemStationDto {
+export class CreateItemStationDto {
   @IsNotEmpty()
   @IsString()
   ITS_ITEM: string;

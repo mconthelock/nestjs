@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class CreateESCSARRDto {
+export class CreateAuditReportRevisionDto {
 //   @IsNotEmpty()
 //   @Type(() => Number)
 //   @IsNumber()

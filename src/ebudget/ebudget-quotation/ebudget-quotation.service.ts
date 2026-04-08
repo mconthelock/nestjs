@@ -4,86 +4,48 @@ import { UpdateEbudgetQuotationDto } from './dto/update-ebudget-quotation.dto';
 import { EBUDGET_QUOTATION } from 'src/common/Entities/ebudget/table/EBUDGET_QUOTATION.entity';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { FormDto } from 'src/webform/form/dto/form.dto';
 import { now } from 'src/common/utils/dayjs.utils';
+import { EbudgetQuotationRepository } from './ebudget-quotation.repository';
 
 @Injectable()
 export class EbudgetQuotationService {
-  constructor(
-    @InjectRepository(EBUDGET_QUOTATION, 'ebudgetConnection')
-    private readonly repo: Repository<EBUDGET_QUOTATION>,
-    @InjectDataSource('ebudgetConnection')
-    private dataSource: DataSource,
-  ) {}
+    constructor(private readonly repo: EbudgetQuotationRepository) {}
 
-  async getData(dto: UpdateEbudgetQuotationDto) {
-    return this.repo.find({
-      where: dto,
-    });
-  }
-
-  async insert(dto: CreateEbudgetQuotationDto, queryRunner?: QueryRunner) {
-    let localRunner: QueryRunner | undefined;
-    let didConnect = false;
-    let didStartTx = false;
-    try {
-      if (!queryRunner) {
-        localRunner = this.dataSource.createQueryRunner();
-        await localRunner.connect();
-        didConnect = true;
-        await localRunner.startTransaction();
-        didStartTx = true;
-      }
-      const runner = queryRunner || localRunner!;
-
-      const res = await runner.manager.save(EBUDGET_QUOTATION, dto);
-      if (localRunner && didStartTx && runner.isTransactionActive)
-        await localRunner.commitTransaction();
-      return {
-        status: true,
-        message: 'Insert EBUDGET_QUOTATION Successfully',
-        data: res,
-      };
-    } catch (error) {
-      if (localRunner && didStartTx && localRunner.isTransactionActive)
-        await localRunner.rollbackTransaction();
-      throw new Error('Insert EBUDGET_QUOTATION Error: ' + error.message);
-    } finally {
-      if (localRunner && didConnect) await localRunner.release();
+    async getData(dto: UpdateEbudgetQuotationDto) {
+        return this.repo.getData(dto);
     }
-  }
 
-  async update(dto: UpdateEbudgetQuotationDto, queryRunner?: QueryRunner) {
-    let localRunner: QueryRunner | undefined;
-    let didConnect = false;
-    let didStartTx = false;
-    try {
-      if (!queryRunner) {
-        localRunner = this.dataSource.createQueryRunner();
-        await localRunner.connect();
-        didConnect = true;
-        await localRunner.startTransaction();
-        didStartTx = true;
-      }
-      const runner = queryRunner || localRunner!;
-      const { ID, ...updateData } = dto;
-      const res = await runner.manager.update(EBUDGET_QUOTATION, ID, {
-        ...updateData,
-        DATE_UPDATE: now('YYYY-MM-DD HH:mm:ss'),
-      });
-      if (localRunner && didStartTx && runner.isTransactionActive)
-        await localRunner.commitTransaction();
-      return {
-        status: true,
-        data: res,
-        message: 'Update EBUDGET_QUOTATION Successfully',
-      };
-    } catch (error) {
-      if (localRunner && didStartTx && localRunner.isTransactionActive)
-        await localRunner.rollbackTransaction();
-      throw new Error('Update EBUDGET_QUOTATION Error: ' + error.message);
-    } finally {
-      if (localRunner && didConnect) await localRunner.release();
+    async insert(dto: CreateEbudgetQuotationDto) {
+        try {
+            const res = await this.repo.insert(dto);
+            if (!res) {
+                throw new Error('Insert EBUDGET_QUOTATION Failed');
+            }
+            return {
+                status: true,
+                message: 'Insert EBUDGET_QUOTATION Successfully',
+                data: res,
+            };
+        } catch (error) {
+            throw new Error('Insert EBUDGET_QUOTATION Error: ' + error.message);
+        }
     }
-  }
+
+    async update(dto: UpdateEbudgetQuotationDto) {
+        try {
+            const res = await this.repo.update(dto);
+            if (res.affected === 0) {
+                throw new Error(
+                    'Update EBUDGET_QUOTATION Failed: No rows affected',
+                );
+            }
+            return {
+                status: true,
+                data: res,
+                message: 'Update EBUDGET_QUOTATION Successfully',
+            };
+        } catch (error) {
+            throw new Error('Update EBUDGET_QUOTATION Error: ' + error.message);
+        }
+    }
 }

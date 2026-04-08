@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/swagger';
-import { ESCSCreateUserAuthorizeDto } from './create-user-authorize.dto';
+import { CreateUsersAuthorizeDto } from './create-user-authorize.dto';
 
-export class ESCSUpdateUserAuthorizeDto extends PartialType(ESCSCreateUserAuthorizeDto) {}
+export class UpdateUsersAuthorizeDto extends PartialType(CreateUsersAuthorizeDto) {}

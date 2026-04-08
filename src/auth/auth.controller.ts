@@ -20,7 +20,6 @@ import { Response } from 'express';
 import * as CryptoJS from 'crypto-js';
 import * as bcrypt from 'bcrypt';
 import { ApiTags, ApiOperation, ApiExcludeEndpoint } from '@nestjs/swagger';
-import { LocalStrategy } from './local.strategy';
 
 interface encryptObj {
     text: string;
@@ -32,7 +31,6 @@ interface encryptObj {
 export class AuthController {
     constructor(
         private authService: AuthService,
-        private localStrategy: LocalStrategy,
     ) {}
     @HttpCode(HttpStatus.OK)
     @UseGuards(AuthGuard('local'))

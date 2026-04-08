@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { CreateMfgDrawingDto } from './dto/create-mfg-drawing.dto';
 import { UpdateMfgDrawingDto } from './dto/update-mfg-drawing.dto';
@@ -13,9 +11,8 @@ import { MFG_DRAWING } from 'src/common/Entities/escs/table/MFG_DRAWING.entity';
 export class MfgDrawingRepository extends BaseRepository {
     constructor(
         @InjectDataSource('escsConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     async create(dto: CreateMfgDrawingDto) {

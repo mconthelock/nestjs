@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 import { ITEM } from 'src/common/Entities/escs/table/ITEM.entity';
 import { SearchItemDto } from './dto/search-escs-item.dto';
 
@@ -11,9 +9,8 @@ import { SearchItemDto } from './dto/search-escs-item.dto';
 export class ItemRepository extends BaseRepository {
     constructor(
         @InjectDataSource('escsConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     getItemAll() {

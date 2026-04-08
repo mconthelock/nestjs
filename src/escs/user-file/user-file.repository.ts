@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 import { USERS_FILES } from 'src/common/Entities/escs/table/USERS_FILES.entity';
 import { UpdateUsersFileDto } from './dto/update-user-file.dto';
 
@@ -11,9 +9,8 @@ import { UpdateUsersFileDto } from './dto/update-user-file.dto';
 export class UsersFileRepository extends BaseRepository {
     constructor(
         @InjectDataSource('escsConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     async insert(dto: any) {

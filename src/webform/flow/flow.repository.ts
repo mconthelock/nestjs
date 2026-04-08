@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource, In, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 import { UpdateFlowDto } from './dto/update-flow.dto';
 import { SearchFlowDto } from './dto/search-flow.dto';
 import { getSafeFields } from 'src/common/utils/Fields.utils';
@@ -16,9 +14,8 @@ import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 export class FlowRepository extends BaseRepository {
     constructor(
         @InjectDataSource('webformConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     private readonly APV_TYPE_SINGLE = '1';

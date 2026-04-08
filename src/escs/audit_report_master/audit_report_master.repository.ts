@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 import { AUDIT_REPORT_MASTER } from 'src/common/Entities/escs/table/AUDIT_REPORT_MASTER.entity';
 import { SearchAuditReportMasterDto } from './dto/search-audit_report_master.dto';
 import { UpdateAuditReportMasterDto } from './dto/update-audit_report_master.dto';
@@ -13,9 +11,8 @@ import { CreateAuditReportMasterDto } from './dto/create-audit_report_master.dto
 export class AuditReportMasterRepository extends BaseRepository {
     constructor(
         @InjectDataSource('escsConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     async find(dto: SearchAuditReportMasterDto) {

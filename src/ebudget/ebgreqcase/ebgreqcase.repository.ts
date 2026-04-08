@@ -1,17 +1,14 @@
-import { Inject, Injectable, Scope } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
+import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { Request } from 'express';
 import { EBGREQCASE } from 'src/common/Entities/ebudget/table/EBGREQCASE.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class EbgreqcaseRepository extends BaseRepository {
     constructor(
         @InjectDataSource('ebudgetConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     findAll() {

@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource, Like, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { M12023_ITEMARRNGLST_APP } from 'src/common/Entities/elmes/table/M12023_ITEMARRNGLST_APP.entity';
 
@@ -11,9 +9,8 @@ import { M12023_ITEMARRNGLST_APP } from 'src/common/Entities/elmes/table/M12023_
 export class M12023ItemarrnglstAppRepository extends BaseRepository {
     constructor(
         @InjectDataSource('elmesConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     findAll() {

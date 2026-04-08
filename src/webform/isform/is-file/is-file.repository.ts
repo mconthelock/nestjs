@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 import { SearchIsFileDto } from './dto/search-is-file.dto';
 import { IS_FILE } from 'src/common/Entities/webform/table/IS_FILE.entity';
 import { CreateIsFileDto } from './dto/create-is-file.dto';
@@ -12,9 +10,8 @@ import { CreateIsFileDto } from './dto/create-is-file.dto';
 export class IsFileRepository extends BaseRepository {
     constructor(
         @InjectDataSource('webformConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     async getFile(dto: SearchIsFileDto) {

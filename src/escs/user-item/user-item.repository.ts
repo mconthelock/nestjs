@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { CreateUserItemDto } from './dto/create-user-item.dto';
 import { UpdateUserItemDto } from './dto/update-user-item.dto';
@@ -13,9 +11,8 @@ import { USERS_ITEM } from 'src/common/Entities/escs/table/USERS_ITEM.entity';
 export class UserItemRepository extends BaseRepository {
     constructor(
         @InjectDataSource('escsConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     findAll() {

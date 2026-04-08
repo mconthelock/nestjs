@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 import { PURCPM_FORM } from 'src/common/Entities/webform/table/PURCPM_FORM.entity';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { InsertPurCpmDto } from './dto/create-pur-cpm.dto';
@@ -12,9 +10,8 @@ import { InsertPurCpmDto } from './dto/create-pur-cpm.dto';
 export class PurCpmRepository extends BaseRepository {
     constructor(
         @InjectDataSource('webformConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     findbyYear(year: string) {

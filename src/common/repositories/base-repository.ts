@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import {
     Brackets,
     DataSource,
@@ -7,19 +6,16 @@ import {
     SelectQueryBuilder,
     WhereExpressionBuilder,
 } from 'typeorm';
-import { ENTITY_MANAGER_KEY } from '../interceptors/transaction.interceptor';
+import { transactionContext } from '../interceptors/transaction-context';
 import { FiltersDto } from '../dto/filter.dto';
 
 export class BaseRepository {
-    constructor(
-        private dataSource: DataSource,
-        private request: Request,
-    ) {}
+    constructor(private dataSource: DataSource) {}
 
     protected get manager(): EntityManager {
-        // return this.request[ENTITY_MANAGER_KEY] ?? this.dataSource.manager;
-        const txManager = this.request[ENTITY_MANAGER_KEY];
-        const forceTx = this.request['FORCE_TX'];
+        const store = transactionContext.getStore();
+        const txManager = store?.manager;
+        const forceTx = store?.forceTx;
         // 🟢 โหมดบังคับใช้ connection เดียว
         if (forceTx && txManager && !txManager.queryRunner?.isReleased) {
             return txManager;

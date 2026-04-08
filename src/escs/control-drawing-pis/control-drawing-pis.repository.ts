@@ -1,7 +1,5 @@
-import { Inject, Injectable, Scope } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
+import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { Request } from 'express';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource, Not } from 'typeorm';
 import { FiltersDto } from 'src/common/dto/filter.dto';
@@ -9,13 +7,12 @@ import { CreateControlDrawingPisDto } from './dto/create-control-drawing-pis.dto
 import { UpdateControlDrawingPisDto } from './dto/update-control-drawing-pis.dto';
 import { CONTROL_DRAWING_PIS } from 'src/common/Entities/escs/table/CONTROL_DRAWING_PIS.entity';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class ControlDrawingPisRepository extends BaseRepository {
   constructor(
     @InjectDataSource('escsConnection') ds: DataSource,
-    @Inject(REQUEST) req: Request,
-  ) {
-    super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+    ) {
+    super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
   }
 
   async create(dto: CreateControlDrawingPisDto) {

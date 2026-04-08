@@ -6,10 +6,10 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { Request } from 'express';
 import { Observable, catchError, concatMap, finalize } from 'rxjs';
 import { DataSource } from 'typeorm';
 import { FORCE_TX_KEY, TX_CONNECTION_KEY } from '../decorator/transaction.decorator';
+import { transactionContext } from './transaction-context';
 
 export const ENTITY_MANAGER_KEY = 'ENTITY_MANAGER';
 
@@ -55,7 +55,6 @@ export class TransactionInterceptor implements NestInterceptor {
         if (!connectionName) {
             return next.handle();
         }
-        const req = context.switchToHttp().getRequest<Request>();
 
         const dataSource = this.dataSourceMap[connectionName];
 
@@ -67,21 +66,27 @@ export class TransactionInterceptor implements NestInterceptor {
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
-        req[ENTITY_MANAGER_KEY] = queryRunner.manager;
-        req['FORCE_TX'] = forceTx;
-
-        return next.handle().pipe(
-            concatMap(async (data) => {
-                await queryRunner.commitTransaction();
-                return data;
-            }),
-            catchError(async (err) => {
-                await queryRunner.rollbackTransaction();
-                throw err;
-            }),
-            finalize(async () => {
-                await queryRunner.release();
-            }),
-        );
+        return new Observable((subscriber) => {
+            transactionContext.run(
+                { manager: queryRunner.manager, forceTx },
+                () => {
+                    next.handle()
+                        .pipe(
+                            concatMap(async (data) => {
+                                await queryRunner.commitTransaction();
+                                return data;
+                            }),
+                            catchError(async (err) => {
+                                await queryRunner.rollbackTransaction();
+                                throw err;
+                            }),
+                            finalize(async () => {
+                                await queryRunner.release();
+                            }),
+                        )
+                        .subscribe(subscriber);
+                },
+            );
+        });
     }
 }

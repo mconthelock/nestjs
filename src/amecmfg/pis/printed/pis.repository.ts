@@ -1,7 +1,5 @@
-import { Inject, Injectable, Scope } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { Request } from 'express';
-import { REQUEST } from '@nestjs/core';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
@@ -17,13 +15,12 @@ import { CreatePisFilesDto } from './dto/create-pis-files.dto';
 import { UpdatePisFilesDto } from './dto/update-pis-file.dto';
 import { UpadatePisPagesDto } from './dto/update-pis-pages.dto';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class PisRepository extends BaseRepository {
     constructor(
         @InjectDataSource('workloadConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request);
+        ) {
+        super(ds);
     }
 
     async findAllFiles(dto: SearchPisFilesDto) {

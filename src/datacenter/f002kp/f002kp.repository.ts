@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource, Like, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { F002KP } from 'src/common/Entities/datacenter/table/F002KP.entity';
 
@@ -11,9 +9,8 @@ import { F002KP } from 'src/common/Entities/datacenter/table/F002KP.entity';
 export class F002kpRepository extends BaseRepository {
     constructor(
         @InjectDataSource('datacenterConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     findAll() {

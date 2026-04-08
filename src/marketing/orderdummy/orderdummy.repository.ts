@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { TMARKET_TEMP_DUMMY } from 'src/common/Entities/datacenter/table/TMARKET_TEMP_DUMMY.entity';
 import { TMARKET_TEMP } from 'src/common/Entities/datacenter/table/TMARKET_TEMP.entity';
@@ -12,9 +10,8 @@ import { TMARKET_TEMP } from 'src/common/Entities/datacenter/table/TMARKET_TEMP.
 export class OrderdummyRepository extends BaseRepository {
     constructor(
         @InjectDataSource('datacenterConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     async search(dto: FiltersDto) {

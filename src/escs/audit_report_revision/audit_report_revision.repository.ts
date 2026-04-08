@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
 import { SearchAuditReportRevisionDto } from './dto/search-audit_report_revision.dto';
 import { AUDIT_REPORT_REVISION } from 'src/common/Entities/escs/table/AUDIT_REPORT_REVISION.entity';
 import { CreateAuditReportRevisionDto } from './dto/create-audit_report_revision.dto';
@@ -12,9 +10,8 @@ import { CreateAuditReportRevisionDto } from './dto/create-audit_report_revision
 export class AuditReportRevisionRepository extends BaseRepository {
     constructor(
         @InjectDataSource('escsConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     async getAuditReportRevision(dto: SearchAuditReportRevisionDto) {

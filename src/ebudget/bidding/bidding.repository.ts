@@ -1,18 +1,15 @@
-import { Inject, Injectable, Scope } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
+import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { Request } from 'express';
 import { EBUDGET_DATA_BIDDING } from 'src/common/Entities/ebudget/views/EBUDGET_DATA_BIDDING.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource, Like, MoreThanOrEqual } from 'typeorm';
 import { SearchEbudgetBiddingDto } from './dto/search-bidding.dto';
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class BiddingRepository extends BaseRepository {
     constructor(
         @InjectDataSource('ebudgetConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     findAll() {

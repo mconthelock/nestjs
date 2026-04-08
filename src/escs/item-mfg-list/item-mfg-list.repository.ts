@@ -1,21 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateItemMfgListDto } from './dto/create-item-mfg-list.dto';
 import { UpdateItemMfgListDto } from './dto/update-item-mfg-list.dto';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { FiltersDto } from 'src/common/dto/filter.dto';
-import { Request } from 'express';
-import { REQUEST } from '@nestjs/core';
 import { ITEM_MFG_LIST } from 'src/common/Entities/escs/table/ITEM_MFG_LIST.entity';
 
 @Injectable()
 export class ItemMfgListRepository extends BaseRepository {
   constructor(
     @InjectDataSource('escsConnection') ds: DataSource,
-    @Inject(REQUEST) req: Request,
-  ) {
-    super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+    ) {
+    super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
   }
 
   async create(dto: CreateItemMfgListDto) {

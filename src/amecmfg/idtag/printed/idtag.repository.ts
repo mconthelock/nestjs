@@ -1,7 +1,5 @@
-import { Request } from 'express';
 import { DataSource } from 'typeorm';
-import { Inject, Injectable, Scope } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
+import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
@@ -21,13 +19,12 @@ import { SearchIdtagFilesDto } from './dto/search-idtag-file.dto';
 import { UpdateIdtagFilesDto } from './dto/update-idtag-file.dto';
 import { UpadateIdtagPagesDto } from './dto/update-idtag-pages.dto';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class IdTagRepository extends BaseRepository {
     constructor(
         @InjectDataSource('workloadConnection') ds: DataSource,
-        @Inject(REQUEST) req: Request,
-    ) {
-        super(ds, req as Request);
+        ) {
+        super(ds);
     }
 
     async findAllList(dto?: FiltersDto) {

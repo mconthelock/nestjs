@@ -1,7 +1,5 @@
-import { Inject, Injectable, Scope } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
+import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { Request } from 'express';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { FiltersDto } from 'src/common/dto/filter.dto';
@@ -9,13 +7,12 @@ import { CreateItemMfgTypeDto } from './dto/create-item-mfg-type.dto';
 import { UpdateItemMfgTypeDto } from './dto/update-item-mfg-type.dto';
 import { ITEM_MFG_TYPE } from 'src/common/Entities/escs/table/ITEM_MFG_TYPE.entity';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class ItemMfgTypeRepository extends BaseRepository {
   constructor(
     @InjectDataSource('escsConnection') ds: DataSource,
-    @Inject(REQUEST) req: Request,
-  ) {
-    super(ds, req as Request); // นำค่าไปเก็บและใช้ใน BaseRepository
+    ) {
+    super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
   }
 
   async create(dto: CreateItemMfgTypeDto) {

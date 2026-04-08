@@ -28,42 +28,42 @@ import { QrcodeModule } from './services/qrcode/qrcode.module';
 import { MailModule } from './services/mail/mail.module';
 import { PDFModule } from './services/pdf/pdf.module';
 import { FilesModule } from './services/file/file.module';
-import { BackgroundTaskModule } from './background-task/background-task.module';
+// import { BackgroundTaskModule } from './background-task/background-task.module';
 import ebudgetConfig from './databases/ebudget.config';
 import workloadConfig from './databases/workload.config';
 import datacenterConfig from './databases/datacenter.config';
 import purConfig from './databases/pursys.config';
 @Module({
-  imports: [
-    ScheduleModule.forRoot(),
-    WinstonModule.forRoot(winstonConfig),
-    TypeOrmModule.forRootAsync(amecConfig),
-    TypeOrmModule.forRootAsync(auditConfig),
-    TypeOrmModule.forRootAsync(datacenterConfig),
-    TypeOrmModule.forRootAsync(docinvConfig),
-    TypeOrmModule.forRootAsync(ebudgetConfig),
-    TypeOrmModule.forRootAsync(elmesConfig),
-    TypeOrmModule.forRootAsync(escsConfig),
-    TypeOrmModule.forRootAsync(gpreportConfig),
-    TypeOrmModule.forRootAsync(idsConfig),
-    TypeOrmModule.forRootAsync(invoiceConfig),
-    TypeOrmModule.forRootAsync(packingConfig),
-    TypeOrmModule.forRootAsync(pdmConfig),
-    TypeOrmModule.forRootAsync(sdsysConfig),
-    TypeOrmModule.forRootAsync(spsysConfig),
-    TypeOrmModule.forRootAsync(webformConfig),
-    TypeOrmModule.forRootAsync(workloadConfig),
-    TypeOrmModule.forRootAsync(purConfig),
-    RedisModule,
-    SchedulerModule,
-    LoggerModule,
-    QrcodeModule,
-    MailModule,
-    PDFModule,
-    FilesModule,
-    BackgroundTaskModule,
-  ],
-  providers: [GenerateIdService, HealthcheckService],
-  exports: [GenerateIdService],
+    imports: [
+        ScheduleModule.forRoot(),
+        WinstonModule.forRoot(winstonConfig),
+        TypeOrmModule.forRootAsync(amecConfig),
+        TypeOrmModule.forRootAsync(auditConfig),
+        TypeOrmModule.forRootAsync(datacenterConfig),
+        TypeOrmModule.forRootAsync(docinvConfig),
+        TypeOrmModule.forRootAsync(ebudgetConfig),
+        TypeOrmModule.forRootAsync(elmesConfig),
+        TypeOrmModule.forRootAsync(escsConfig),
+        TypeOrmModule.forRootAsync(gpreportConfig),
+        TypeOrmModule.forRootAsync(idsConfig),
+        TypeOrmModule.forRootAsync(invoiceConfig),
+        TypeOrmModule.forRootAsync(packingConfig),
+        TypeOrmModule.forRootAsync(pdmConfig),
+        TypeOrmModule.forRootAsync(sdsysConfig),
+        TypeOrmModule.forRootAsync(spsysConfig),
+        TypeOrmModule.forRootAsync(webformConfig),
+        TypeOrmModule.forRootAsync(workloadConfig),
+        TypeOrmModule.forRootAsync(purConfig),
+        RedisModule,
+        SchedulerModule,
+        LoggerModule,
+        QrcodeModule,
+        MailModule,
+        PDFModule,
+        FilesModule,
+        // BackgroundTaskModule,
+    ],
+    providers: [GenerateIdService, HealthcheckService],
+    exports: [GenerateIdService],
 })
 export class CommonModule {}

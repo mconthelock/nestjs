@@ -211,8 +211,6 @@ export class IsTidCreateFormService extends IsTidService {
             step = step.filter((s) => s.CSTEPNO === '06' || s.CSTEPNO === '19'); // อนุมัติแค่ step 06
             let ms = 60000;
             for (const s of step) {
-                console.log(s);
-
                 await this.doactionFlowService.doAction(
                     {
                         ...form,

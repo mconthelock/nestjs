@@ -31,9 +31,6 @@ export class IsCfsCreateFormService extends IsCfsService {
             if (!formmst) {
                 throw new Error('Form master not found for IS-CFS');
             }
-
-            console.log('reqno', dto.REQNO);
-            
             const devNo = dto.REQNO.split('|');
             for (const d of devNo) {
                 const createForm = await this.createFormService.create(
@@ -71,9 +68,6 @@ export class IsCfsCreateFormService extends IsCfsService {
                     );
                 }
                 const { step, stepDelete } = await this.setFlowStep(data);
-                console.log('step',step);
-                console.log('stepDelete',stepDelete);
-                
                 for (const s of step) {
                     await this.flowService.updateFlow({
                         condition: {
@@ -110,8 +104,6 @@ export class IsCfsCreateFormService extends IsCfsService {
             { CSTEPNO: '05' }, // DDEM
             { CSTEPNO: '04' }, // DEM
         ];
-        console.log(form);
-        
         const tidStep = await this.setTIDStep(form.CFS_REQUESTER, flowStep);
         const isDevStep = await this.setDevStep(form.CFS_REQNO, tidStep);
         return await this.cleanStep(isDevStep);
@@ -142,8 +134,6 @@ export class IsCfsCreateFormService extends IsCfsService {
         reqNo: string,
         step: { CSTEPNO: string }[],
     ): Promise<{ CSTEPNO: string }[]> {
-        console.log('req', reqNo);
-        
         const form = await this.formService.crackRequestNo(reqNo);
         for (const f of form) {
             const requestNo = await this.formService.getRequestNo(reqNo);
@@ -183,8 +173,6 @@ export class IsCfsCreateFormService extends IsCfsService {
         const stepDelete = [];
         const stepCopy = [];
         for (const [key, s] of step.entries()) {
-            console.log('test', s['apv'], s);
-            
             if (!s['apv']) {
                 stepDelete.push(s);
             }else{
@@ -228,10 +216,14 @@ export class IsCfsCreateFormService extends IsCfsService {
             DDEM: [null, 4],
             DEM: [1, 5],
         };
+        if(!map[position]){
+            return step;
+        }
         const index = map[position][round] ?? null;
         if (index !== null) {
             step[index]['apv'] = empno;
         }
+        
         return step;
     }
 

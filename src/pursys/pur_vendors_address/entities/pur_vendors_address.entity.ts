@@ -2,37 +2,37 @@ import { Column, Entity, PrimaryGeneratedColumn , ManyToOne,JoinColumn, Code } f
 import { PurVendor } from '../../pur_vendors/entities/pur_vendor.entity';
 @Entity({
   schema: 'PURSYS',
-  name: 'PUR_VENDORS_CODE'
+  name: 'PUR_VENDORS_ADDRESS'
 })
-export class PurVendorsCode {
+export class PurVendorsAddress {
     @PrimaryGeneratedColumn()
-    CODE_ID: number;
+    ADDR_ID: number;
 
     @Column()
-    CODE_NUM: number;
- 
-    @Column()
-    VENDOR_ID: number;
+    ADDR_TYPE: string;
 
     @Column()
-    CODE_STATUS: number;
-
-    @Column({ type: 'date' })
-    CODE_REGDATE: string;
+    ADDR_LINE1: string;
 
     @Column()
-    CODE_CURRENCY: string;
+    ADDR_LINE2: string; 
+    
+    @Column()
+    ADDR_LINE3: string; 
 
     @Column()
-    CODE_SHIP: number;
+    ADDR_CITY: string;
 
     @Column()
-    CODE_PAY: string;
+    ADDR_STATE: string;
 
     @Column()
-    CODE_TYPE: number;
+    ADDR_COUNTRY: number;
 
-    @ManyToOne(() => PurVendor, (vendor) => vendor.VENDOR_CODES,{
+    @Column()
+    ADDR_ZIPCODE: string;
+
+    @ManyToOne(() => PurVendor, (vendor) => vendor.VENDOR_ADDRESS,{
       onDelete: 'CASCADE'
     })
     @JoinColumn({ name: 'VENDOR_ID' })

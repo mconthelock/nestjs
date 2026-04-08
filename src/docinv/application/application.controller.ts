@@ -9,9 +9,7 @@ import {
     UseInterceptors,
     UploadedFiles,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { multerOptions } from './upload.config';
-
+import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { ApplicationService } from './application.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
@@ -31,53 +29,39 @@ export class ApplicationController {
     }
 
     @Post()
-    @UseInterceptors(FilesInterceptor('files', 10, multerOptions))
+    @UseInterceptors(
+        getFileUploadInterceptor([
+            { name: 'iconfile', maxCount: 10 },
+            { name: 'posterfile', maxCount: 10 },
+        ]),
+    )
     create(
-        @UploadedFiles() files: Array<Express.Multer.File>,
         @Body() body: CreateApplicationDto,
+        @UploadedFiles()
+        files: {
+            iconfile?: Express.Multer.File[];
+            posterfile?: Express.Multer.File[];
+        },
     ) {
-        if (files) {
-            files.map((file) => {
-                const type = file.originalname.split('-');
-                if (type[0] == 'icon')
-                    body = {
-                        ...body,
-                        APP_ICON: `${body.targeturl}/${file.filename}`,
-                    };
-                if (type[0] == 'poster')
-                    body = {
-                        ...body,
-                        APP_POSTER: `${body.targeturl}/${file.filename}`,
-                    };
-            });
-        }
-
-        return this.apps.create(body);
+        return this.apps.create(body, files);
     }
 
     @Patch(':id')
-    @UseInterceptors(FilesInterceptor('files', 10, multerOptions))
+    @UseInterceptors(
+        getFileUploadInterceptor([
+            { name: 'iconfile', maxCount: 10 },
+            { name: 'posterfile', maxCount: 10 },
+        ]),
+    )
     update(
         @Param('id') id: string,
         @Body() body: UpdateApplicationDto,
-        @UploadedFiles() files: Array<Express.Multer.File>,
+        @UploadedFiles()
+        files: {
+            iconfile?: Express.Multer.File[];
+            posterfile?: Express.Multer.File[];
+        },
     ) {
-        if (files) {
-            files.forEach((file) => {
-                const type = file.originalname.split('-');
-                if (type[0] == 'icon')
-                    body = {
-                        ...body,
-                        APP_ICON: `${body.targeturl}/${file.filename}`,
-                    };
-                if (type[0] == 'poster')
-                    body = {
-                        ...body,
-                        APP_POSTER: `${body.targeturl}/${file.filename}`,
-                    };
-            });
-        }
-        console.log(body);
-        return this.apps.update(+id, body);
+        return this.apps.update(+id, body, files);
     }
 }

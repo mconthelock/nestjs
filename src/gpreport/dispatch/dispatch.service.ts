@@ -18,13 +18,12 @@ import { UpdateLineStatusDto } from './dto/update-line-status.dto';
 import { UpdateLineTypeDto } from './dto/update-line-type.dto';
 import { RunDailyScheduleDto } from './dto/build-run-daily-schedule.dto';
 import { ExportAndSendMailDto } from './dto/export-and-sendmail.dto';
-
-import * as dayjs from 'dayjs';
 import * as path from 'path';
-
+import dayjs = require('dayjs');
 import { DispatchReportService } from './dispatch-report.service';
 import { DispatchExportService } from './dispatch-export.service';
 import { DispatchMailService } from './dispatch-mail.service';
+
 
 @Injectable()
 export class DispatchService {
@@ -953,7 +952,7 @@ export class DispatchService {
         timeout_from: '0800',
         timeout_to: '1700',
         update_by: updateBy,
-        shift: 'D',
+        shift: 'H',
       });
 
       holidayDate = holidayDate.add(1, 'day');

@@ -1,20 +1,21 @@
 import {
-  Injectable,
-  InternalServerErrorException,
-  UnauthorizedException,
+    Injectable,
+    InternalServerErrorException,
+    UnauthorizedException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { PDFDocument } from 'pdf-lib';
 import * as ExcelJS from 'exceljs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as dayjs from 'dayjs';
+import * as dayjsModule from 'dayjs';
+const dayjs = (dayjsModule as any).default ?? (dayjsModule as any);
 import 'dayjs/locale/th';
 import { digitsNumber, intVal } from '../../common/helpers/baht-text.helper';
 import {
-  drawGrid,
-  writeLineBox,
-  protectedFile,
+    drawGrid,
+    writeLineBox,
+    protectedFile,
 } from '../../common/helpers/file-pdf.helper';
 import { cloneRows } from 'src/common/helpers/file-excel.helper';
 import { DatabaseService } from '../shared/database.service';
@@ -23,164 +24,173 @@ import * as oracledb from 'oracledb';
 
 @Injectable()
 export class PromoteService {
-  protected pdfdoc: PDFDocument;
-  protected pdfpage: any;
-  protected fontstyle: any;
-  protected fontsize: number;
-  protected output_path: string;
+    protected pdfdoc: PDFDocument;
+    protected pdfpage: any;
+    protected fontstyle: any;
+    protected fontsize: number;
+    protected output_path: string;
 
-  constructor(private dbService: DatabaseService) {}
+    constructor(private dbService: DatabaseService) {}
 
-  async findAll(credentials: any, body: any) {
-    let hrAdminDataSource: DataSource;
-    let conn: oracledb.Connection;
-    try {
-      const connection = await this.dbService.createConnection(credentials);
-      hrAdminDataSource = connection.hrAdminDataSource;
-      conn = connection.conn;
-      const result = await conn.execute(
-        `DECLARE v_cursor SYS_REFCURSOR;
+    async findAll(credentials: any, body: any) {
+        let hrAdminDataSource: DataSource;
+        let conn: oracledb.Connection;
+        try {
+            const connection =
+                await this.dbService.createConnection(credentials);
+            hrAdminDataSource = connection.hrAdminDataSource;
+            conn = connection.conn;
+            const result = await conn.execute(
+                `DECLARE v_cursor SYS_REFCURSOR;
           BEGIN
               PROMOTE(:KEYVALUE, :FYEAR, :EMPCYCL, :EMTYPE, v_cursor);
               :result := v_cursor;
           END;`,
-        {
-          KEYVALUE: connection.passcode,
-          FYEAR: body.year,
-          EMPCYCL: body.cycle,
-          EMTYPE: body.type,
-          result: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
-        },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT },
-      );
-      const resultSet = result.outBinds.result;
-      const rows = await resultSet.getRows();
-      await resultSet.close();
-      return rows;
-    } catch (error) {
-      if (error.message.includes('ORA-01017')) {
-        throw new UnauthorizedException(
-          'Invalid credentials for sensitive data access.',
-        );
-      }
-      console.error('Error fetching Promotion data:', error);
-      throw new InternalServerErrorException('Failed to fetch Promotion data.');
-    } finally {
-      await this.dbService.closeConnection(hrAdminDataSource, conn);
+                {
+                    KEYVALUE: connection.passcode,
+                    FYEAR: body.year,
+                    EMPCYCL: body.cycle,
+                    EMTYPE: body.type,
+                    result: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
+                },
+                { outFormat: oracledb.OUT_FORMAT_OBJECT },
+            );
+            const resultSet = result.outBinds.result;
+            const rows = await resultSet.getRows();
+            await resultSet.close();
+            return rows;
+        } catch (error) {
+            if (error.message.includes('ORA-01017')) {
+                throw new UnauthorizedException(
+                    'Invalid credentials for sensitive data access.',
+                );
+            }
+            console.error('Error fetching Promotion data:', error);
+            throw new InternalServerErrorException(
+                'Failed to fetch Promotion data.',
+            );
+        } finally {
+            await this.dbService.closeConnection(hrAdminDataSource, conn);
+        }
     }
-  }
 
-  async findById(credentials: any, body: any) {
-    let hrAdminDataSource: DataSource;
-    let conn: oracledb.Connection;
-    try {
-      const connection = await this.dbService.createConnection(credentials);
-      hrAdminDataSource = connection.hrAdminDataSource;
-      conn = connection.conn;
-      const result = await conn.execute(
-        `DECLARE v_cursor SYS_REFCURSOR;
+    async findById(credentials: any, body: any) {
+        let hrAdminDataSource: DataSource;
+        let conn: oracledb.Connection;
+        try {
+            const connection =
+                await this.dbService.createConnection(credentials);
+            hrAdminDataSource = connection.hrAdminDataSource;
+            conn = connection.conn;
+            const result = await conn.execute(
+                `DECLARE v_cursor SYS_REFCURSOR;
           BEGIN
               PROMOTEEMPLOYEE(:KEYVALUE, :EFFDATE, :EMPNO, v_cursor);
               :result := v_cursor;
           END;`,
+                {
+                    KEYVALUE: connection.passcode,
+                    EFFDATE: body.period,
+                    EMPNO: body.empno,
+                    result: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
+                },
+                { outFormat: oracledb.OUT_FORMAT_OBJECT },
+            );
+            const resultSet = result.outBinds.result;
+            const rows = await resultSet.getRow();
+            await resultSet.close();
+            return rows;
+        } catch (error) {
+            console.error('Error fetching Twi 50 data:', error);
+            throw new InternalServerErrorException(
+                'Failed to fetch Promote data.',
+            );
+        } finally {
+            await this.dbService.closeConnection(hrAdminDataSource, conn);
+        }
+    }
+
+    async createFile(data: any) {
+        const libs = [
+            { id: 'MP', path: 'Non-Manager' },
+            { id: 'MG', path: 'Manager' },
+            { id: 'JP', path: 'Japanese' },
+        ];
+        try {
+            const templatePath = path.join(
+                `${process.env.GP_FILE_PATH}/Template/`,
+                'Salary Adjustment Letter.pdf',
+            );
+            let dir = libs.find((e) => e.id == data.ASETYP).path;
+            let effdate = dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
+                .locale('en')
+                .format('YYYY MMMM');
+            if (!dir) dir = 'Non-Manager';
+            this.output_path = `${process.env.GP_FILE_PATH}/${dir}/Salary Adjustment Letter (หนังสือแจ้งปรับ)/${effdate}/`;
+            const fontPath = path.join(
+                process.cwd(),
+                'public/fonts/THSarabun.ttf',
+            );
+            const [existingPdfBytes, fontBytes] = await Promise.all([
+                fs.readFile(templatePath),
+                fs.readFile(fontPath),
+            ]);
+            this.pdfdoc = await PDFDocument.load(existingPdfBytes);
+            this.pdfdoc.registerFontkit(fontkit);
+            this.fontstyle = await this.pdfdoc.embedFont(fontBytes);
+            const pages = this.pdfdoc.getPages();
+
+            this.fontsize = 14;
+            this.pdfpage = pages[0];
+            //   await drawGrid(this.pdfpage, 10);
+            await this.setPdfValue(data);
+            const pdfBytes = await this.pdfdoc.save();
+            await fs.mkdir(this.output_path, { recursive: true });
+            const output = path.join(this.output_path, `_${data.ASECOD}.pdf`);
+            await fs.writeFile(output, pdfBytes);
+            await protectedFile({
+                output_path: this.output_path,
+                input: `_${data.ASECOD}.pdf`,
+                output: `${data.ASECOD}.pdf`,
+                userpassword: data.BIRTHDAY.toString(),
+                adminpassword: data.passkey,
+                delete_input: true,
+            });
+            return {
+                dir,
+                empno: data.ASECOD,
+                mail: data.MEMEML,
+                th_name: data.SEMPPRT + data.STNAME,
+                th_period: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
+                    .locale('th')
+                    .format('MMMM YYYY'),
+                en_name: data.SEMPPRE + data.SNAME,
+                en_period: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
+                    .locale('en')
+                    .format('MMMM YYYY'),
+                file: path.join(this.output_path, `${data.ASECOD}.pdf`),
+            };
+        } catch (error) {
+            console.error('Error filling PDF template:', error);
+            throw new Error('Failed to fill PDF template');
+        }
+    }
+
+    async setPdfValue(data: any) {
+        const lineOption = {
+            pdfpage: this.pdfpage,
+            fontstyle: this.fontstyle,
+            fontsize: this.fontsize,
+            drawBorder: false,
+            text: '',
+            boxX: 0,
+            boxY: 0,
+            boxWidth: '100',
+            boxHeight: 10,
+            align: 'left',
+        };
+        // prettier-ignore
         {
-          KEYVALUE: connection.passcode,
-          EFFDATE: body.period,
-          EMPNO: body.empno,
-          result: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
-        },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT },
-      );
-      const resultSet = result.outBinds.result;
-      const rows = await resultSet.getRow();
-      await resultSet.close();
-      return rows;
-    } catch (error) {
-      console.error('Error fetching Twi 50 data:', error);
-      throw new InternalServerErrorException('Failed to fetch Promote data.');
-    } finally {
-      await this.dbService.closeConnection(hrAdminDataSource, conn);
-    }
-  }
-
-  async createFile(data: any) {
-    const libs = [
-      { id: 'MP', path: 'Non-Manager' },
-      { id: 'MG', path: 'Manager' },
-      { id: 'JP', path: 'Japanese' },
-    ];
-    try {
-      const templatePath = path.join(
-        `${process.env.GP_FILE_PATH}/Template/`,
-        'Salary Adjustment Letter.pdf',
-      );
-      let dir = libs.find((e) => e.id == data.ASETYP).path;
-      let effdate = dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
-        .locale('en')
-        .format('YYYY MMMM');
-      if (!dir) dir = 'Non-Manager';
-      this.output_path = `${process.env.GP_FILE_PATH}/${dir}/Salary Adjustment Letter (หนังสือแจ้งปรับ)/${effdate}/`;
-      const fontPath = path.join(process.cwd(), 'public/fonts/THSarabun.ttf');
-      const [existingPdfBytes, fontBytes] = await Promise.all([
-        fs.readFile(templatePath),
-        fs.readFile(fontPath),
-      ]);
-      this.pdfdoc = await PDFDocument.load(existingPdfBytes);
-      this.pdfdoc.registerFontkit(fontkit);
-      this.fontstyle = await this.pdfdoc.embedFont(fontBytes);
-      const pages = this.pdfdoc.getPages();
-
-      this.fontsize = 14;
-      this.pdfpage = pages[0];
-      //   await drawGrid(this.pdfpage, 10);
-      await this.setPdfValue(data);
-      const pdfBytes = await this.pdfdoc.save();
-      await fs.mkdir(this.output_path, { recursive: true });
-      const output = path.join(this.output_path, `_${data.ASECOD}.pdf`);
-      await fs.writeFile(output, pdfBytes);
-      await protectedFile({
-        output_path: this.output_path,
-        input: `_${data.ASECOD}.pdf`,
-        output: `${data.ASECOD}.pdf`,
-        userpassword: data.BIRTHDAY.toString(),
-        adminpassword: data.passkey,
-        delete_input: true,
-      });
-      return {
-        dir,
-        empno: data.ASECOD,
-        mail: data.MEMEML,
-        th_name: data.SEMPPRT + data.STNAME,
-        th_period: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
-          .locale('th')
-          .format('MMMM YYYY'),
-        en_name: data.SEMPPRE + data.SNAME,
-        en_period: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
-          .locale('en')
-          .format('MMMM YYYY'),
-        file: path.join(this.output_path, `${data.ASECOD}.pdf`),
-      };
-    } catch (error) {
-      console.error('Error filling PDF template:', error);
-      throw new Error('Failed to fill PDF template');
-    }
-  }
-
-  async setPdfValue(data: any) {
-    const lineOption = {
-      pdfpage: this.pdfpage,
-      fontstyle: this.fontstyle,
-      fontsize: this.fontsize,
-      drawBorder: false,
-      text: '',
-      boxX: 0,
-      boxY: 0,
-      boxWidth: '100',
-      boxHeight: 10,
-      align: 'left',
-    };
-    // prettier-ignore
-    {
         //dayjs.locale('th');
         writeLineBox({...lineOption, text: `${data.SEMPPRT}${data.STNAME}`, boxX: 95, boxY: 145, boxWidth: 170, boxHeight: 15, align: 'left'});
         writeLineBox({...lineOption, text: data.ASECOD, boxX: 330, boxY: 145, boxWidth: 55, boxHeight: 15, align: 'center'});
@@ -218,25 +228,29 @@ export class PromoteService {
         const date = dayjs().format('YYYY/MM/DD HH:mm:ss');;
         writeLineBox({...lineOption, fontsize: 10, text: date, boxX: 59, boxY: 655, boxWidth: 130, boxHeight: 10, align: 'left'});
     }
-  }
+    }
 
-  async createExcel(data: any[]) {
-    const templatePath = path.resolve(
-      process.cwd(),
-      'public/export/promote.xlsx',
-    );
+    async createExcel(data: any[]) {
+        const templatePath = path.resolve(
+            process.cwd(),
+            'public/export/promote.xlsx',
+        );
 
-    try {
-      const workbook = new ExcelJS.Workbook();
-      await workbook.xlsx.readFile(templatePath);
-      const sheet = workbook.getWorksheet(1);
-      for (const [index, row] of data.entries()) {
-        const sourceStyleRow = index % 2 === 0 ? 3 : 4;
-        if (index > 1) {
-          await cloneRows(sheet, sourceStyleRow, sheet.lastRow.number + 1);
-        }
-        // prettier-ignore
-        {
+        try {
+            const workbook = new ExcelJS.Workbook();
+            await workbook.xlsx.readFile(templatePath);
+            const sheet = workbook.getWorksheet(1);
+            for (const [index, row] of data.entries()) {
+                const sourceStyleRow = index % 2 === 0 ? 3 : 4;
+                if (index > 1) {
+                    await cloneRows(
+                        sheet,
+                        sourceStyleRow,
+                        sheet.lastRow.number + 1,
+                    );
+                }
+                // prettier-ignore
+                {
         const effdate = dayjs(row.ASEFDT.toString(), 'YYYYMMDD').locale('th').format('DD MMMM YYYY');
         sheet.getCell(index + 3, 1).value = row.ASYEAR;
         sheet.getCell(index + 3, 2).value = row.ASCYCL == 'A' ? 'April' : 'October';
@@ -264,14 +278,14 @@ export class PromoteService {
         sheet.getCell(index + 3, 24).value = intVal(row.NEWSPAW);
         sheet.getCell(index + 3, 25).value = effdate;
         }
-      }
-      const buffer = await workbook.xlsx.writeBuffer();
-      return buffer;
-    } catch (error) {
-      console.error('Error reading Excel template:', error);
-      throw new InternalServerErrorException(
-        'Invalid template: Missing "Data" sheet.',
-      );
+            }
+            const buffer = await workbook.xlsx.writeBuffer();
+            return buffer;
+        } catch (error) {
+            console.error('Error reading Excel template:', error);
+            throw new InternalServerErrorException(
+                'Invalid template: Missing "Data" sheet.',
+            );
+        }
     }
-  }
 }

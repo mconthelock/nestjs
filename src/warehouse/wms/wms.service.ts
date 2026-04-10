@@ -25,10 +25,10 @@ export class WMSService {
             `
              SELECT USERID, STATUS, ISSUE, ITEMCODE, ONHAND, DESCRIPTION, PROD, LOCATION, QTY, ISSUETO, PO, LINE, INV, PALLET_ID, EXPIRE_DATE
              FROM WMS_TEMPISSUE
-             WHERE USERID = :1
+             WHERE USERID = :empno
                 AND STATUS = '-'
              ORDER BY LOCATION ASC, PALLET_ID ASC, EXPIRE_DATE ASC, ISSUE ASC
-            `, 
+            `,
             [empno]
         );
     }

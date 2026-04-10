@@ -35,6 +35,10 @@ export class PackLoginUserDto {
   @IsString()
   @IsNotEmpty()
   sessionId: string;
+
+  @ApiProperty({ example: true, description: 'User has reprint permission' })
+  @IsOptional()
+  hasReprint?: boolean;
 }
 
 export class PackLoginResponseDto {

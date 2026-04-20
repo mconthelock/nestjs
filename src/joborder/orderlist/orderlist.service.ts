@@ -95,9 +95,9 @@ export class OrderListService {
             query.andWhere('J.JOP_PUR_STATUS IS NULL');
         } else if (JOP_PUR_STATUS >= 0) {
             query.andWhere('J.JOP_PUR_STATUS = :JOP_PUR_STATUS', { JOP_PUR_STATUS });
-        }   
+        }
 
-        // search report 
+        // search report
         if (PRJ_NO)     query.andWhere('O.PRJ_NO LIKE :PRJ_NO', { PRJ_NO: `%${PRJ_NO}%` });
         if (AGENT)      query.andWhere('O.AGENT = :AGENT', { AGENT });
         if (SERIES)     query.andWhere('O.SERIES LIKE :SERIES', { SERIES: `%${SERIES}%` });
@@ -123,11 +123,11 @@ export class OrderListService {
 
         // all order, pending confirm, pending shipment
         if (TURNOVER_STATUS >= 0)    query.andWhere('O.TURNOVER_STATUS = :TURNOVER_STATUS', { TURNOVER_STATUS });
-        
+
         if (type === 'count') {
             return query;
         } else if (type === 'data') {
-            
+
             let select = [];
             if (fields.length > 0) {
                 select = getSafeFields(fields, this.allowFields);
@@ -190,8 +190,8 @@ export class OrderListService {
                     ,'J',
                     'O.PRNO = J.JOP_PONO and O.LINENO = J.JOP_LINENO and O.MFGNO = J.JOP_MFGNO'
             );
-            query.leftJoin('AMECUSERALL', 'U', 'J.JOP_MAR_REQUEST = U.SEMPNO');
-            query.leftJoin('AMECUSERALL', 'I', 'J.JOP_PUR_CONFIRM = I.SEMPNO');
+            query.leftJoin('(SELECT * FROM AMECUSERALL)', 'U', 'J.JOP_MAR_REQUEST = U.SEMPNO');
+            query.leftJoin('(SELECT * FROM AMECUSERALL)', 'I', 'J.JOP_PUR_CONFIRM = I.SEMPNO');
             return query;
         }
     }
@@ -202,23 +202,33 @@ export class OrderListService {
         const purConditions: { mfg: string; pono: number; line: number }[] = [];
         for (const c of list) {
             if (!c.JOP_MFGNO || !c.JOP_PONO || !c.JOP_LINENO) continue;
-            const key = { mfg: c.JOP_MFGNO, pono: c.JOP_PONO, line: c.JOP_LINENO };
+            const key = {
+                mfg: c.JOP_MFGNO,
+                pono: c.JOP_PONO,
+                line: c.JOP_LINENO,
+            };
             if (c.JOP_MAR_REVISION > 0) marConditions.push(key);
             if (c.JOP_PUR_REVISION > 0) purConditions.push(key);
         }
 
-        if (marConditions.length === 0 && purConditions.length === 0) return list;
+        if (marConditions.length === 0 && purConditions.length === 0)
+            return list;
 
-        const marReqRevision = marConditions.length > 0
-            ? await this.JopMarReqService.getRevisionHistoryByKey(marConditions)
-            : [];
+        const marReqRevision =
+            marConditions.length > 0
+                ? await this.JopMarReqService.getRevisionHistoryByKey(
+                      marConditions,
+                  )
+                : [];
 
-        const purConfRevision = purConditions.length > 0
-            ? await this.JopPurConfService.getRevisionHistoryByKey(purConditions)
-            : [];
+        const purConfRevision =
+            purConditions.length > 0
+                ? await this.JopPurConfService.getRevisionHistoryByKey(
+                      purConditions,
+                  )
+                : [];
 
         const revisions = [...marReqRevision, ...purConfRevision];
-        
 
         for (const r of revisions) {
             const key = `${r.REVTYPE}_${r.MFGNO}_${r.PONO}_${r.LINENO}`;

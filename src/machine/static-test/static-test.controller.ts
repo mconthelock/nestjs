@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { StaticTestService } from './static-test.service';
 import { GetStaticTestDto } from './dto/get-static-test.dto';
-import { StaticTestResultDto } from './dto/static-test-result.dto';
+import { StaticTestResponseDto } from './dto/static-test-result.dto';
 
 @ApiTags('Machine Static Test')
 @Controller('machine/static-test')
@@ -18,10 +18,10 @@ export class StaticTestController {
     @Get('result')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get static test result' })
-    @ApiResponse({ status: 200, type: StaticTestResultDto })
+    @ApiResponse({ status: 200, type: StaticTestResponseDto })
     async getStaticTestResult(
         @Query() query: GetStaticTestDto,
-    ): Promise<StaticTestResultDto | null> {
+    ): Promise<StaticTestResponseDto | null> {
         return this.service.getStaticTestResult(query.machine, query.serial);
     }
 }

@@ -5,7 +5,7 @@ import { VPSModule } from './vps/vps.module';
 @Module({
   imports: [
     AuthModule,
-    VPSModule,
+    VPSModule
   ]
 })
 export class PackingModule {}

@@ -5,10 +5,10 @@ import { SYS_FOLDER_PATH } from 'src/common/Entities/escs/table/SYS_FOLDER_PATH.
 import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
-import { StaticTestResponseDto } from './dto/static-test-result.dto';
+import { LoadLessTestResponseDto } from './dto/load-less-test-result.dto';
 
 @Injectable()
-export class StaticTestService {
+export class LoadLessTestService {
     constructor(
         @InjectRepository(SYS_FOLDER_PATH, 'escsConnection')
         private readonly db: Repository<SYS_FOLDER_PATH>,
@@ -16,14 +16,14 @@ export class StaticTestService {
 
 
     /**
-     * Get static test result from CSV file by machine and serial number
+     * Get load less test result from CSV file by machine and serial number
      * @author  Mr.Pathanapong Sokpukeaw
      * @since   2026-04-20
      * @param   {string} machine Machine code (e.g. 01, 02)
      * @param   {string} serial Serial number
-     * @return  {Promise<StaticTestResponseDto | null>}
+     * @return  {Promise<LoadLessTestResponseDto | null>}
      */
-    async getStaticTestResult(machine: string, serial: string): Promise<StaticTestResponseDto | null> {
+    async getLoadLessTestResult(machine: string, serial: string): Promise<LoadLessTestResponseDto | null> {
         const basePath  = await this.getPath('TSTM-001');
         const machineNo = this.formatMachine(machine);
         const now   = new Date();

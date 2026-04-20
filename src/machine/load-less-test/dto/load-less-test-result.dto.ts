@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
-export class StaticTestResultDto {
+export class LoadLessTestResultDto {
     @ApiProperty({ example: '10.0753', description: 'Resistance Motor U' })
     @IsString()
     resistanceMotorU: string;
@@ -23,10 +23,10 @@ export class StaticTestResultDto {
     resistanceBrakeR: string;
 }
 
-export class StaticTestResponseDto {
+export class LoadLessTestResponseDto {
     @ApiProperty({ example: 'OK', description: 'Response status' })
     status: 'OK' | 'NO_DATA' | 'FILE_NOT_FOUND';
 
-    @ApiProperty({ type: StaticTestResultDto, nullable: true })
-    data: StaticTestResultDto | null;
+    @ApiProperty({ type: LoadLessTestResultDto, nullable: true })
+    data: LoadLessTestResultDto | null;
 }

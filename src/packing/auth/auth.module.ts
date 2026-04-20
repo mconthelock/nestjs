@@ -12,7 +12,7 @@ import { PAccessLog } from './entities/p-access-log.entity';
  */
 @Module({
     imports: [ TypeOrmModule.forFeature([PAccessLog], 'packingConnection') ],
-    controllers: [AuthController],
-    providers: [AuthService]
+    controllers: [ AuthController ],
+    providers: [ AuthService ]
 })
 export class AuthModule {}

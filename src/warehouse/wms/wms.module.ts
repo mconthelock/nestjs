@@ -9,7 +9,7 @@ import { WMSService } from './wms.service';
  * @since   2026-02-12
  */
 @Module({
-    controllers: [WMSController],
-    providers: [WMSService],
+    controllers: [ WMSController ],
+    providers: [ WMSService ]
 })
 export class WMSModule {}

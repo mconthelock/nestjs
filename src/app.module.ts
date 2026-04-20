@@ -38,6 +38,7 @@ import { PursysModule } from './pursys/pursys.module';
 import { WorkloadModule } from './workload/workload.module';
 import { DatacenterModule } from './datacenter/datacenter.module';
 import { GeneralPartListModule } from './general-part-list/general-part-list.module';
+import { MachineModule } from './machine/machine.module';
 
 @Module({
   imports: [
@@ -71,7 +72,8 @@ import { GeneralPartListModule } from './general-part-list/general-part-list.mod
     PursysModule,
     WorkloadModule,
     DatacenterModule,
-    GeneralPartListModule
+    GeneralPartListModule,
+    MachineModule,
   ],
   providers: [
     HttpLoggingInterceptor,

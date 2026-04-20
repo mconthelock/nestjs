@@ -2,10 +2,11 @@ import { Controller, Get, Query, HttpCode, HttpStatus, UseGuards } from '@nestjs
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { StaticTestService } from './static-test.service';
+import { GetStaticTestDto } from './dto/get-static-test.dto';
 import { StaticTestResultDto } from './dto/static-test-result.dto';
 
-@ApiTags('Static Test')
-@Controller('production/static-test')
+@ApiTags('Machine Static Test')
+@Controller('machine/static-test')
 export class StaticTestController {
     constructor(private readonly service: StaticTestService) {}
 
@@ -17,13 +18,10 @@ export class StaticTestController {
     @Get('result')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get static test result' })
-    @ApiQuery({ name: 'machine', example: '02' })
-    @ApiQuery({ name: 'serial', example: '163103260178' })
     @ApiResponse({ status: 200, type: StaticTestResultDto })
     async getStaticTestResult(
-        @Query('machine') machine: string,
-        @Query('serial') serial: string,
+        @Query() query: GetStaticTestDto,
     ): Promise<StaticTestResultDto | null> {
-        return this.service.getStaticTestResult(machine, serial);
+        return this.service.getStaticTestResult(query.machine, query.serial);
     }
 }

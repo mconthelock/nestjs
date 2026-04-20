@@ -283,7 +283,10 @@ export class VPSService {
             };
         } catch (error) {
             await this.keepSqlErr('VISCheckCompte', error.message, 1, userId);
-            return { status: PackStatus.ERROR, message: error.message };
+            return { 
+                status: PackStatus.ERROR, 
+                message: error.message 
+            };
         }
     }
 

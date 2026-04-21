@@ -84,10 +84,10 @@ export class PromoteService {
             conn = connection.conn;
             const result = await conn.execute(
                 `DECLARE v_cursor SYS_REFCURSOR;
-          BEGIN
-              PROMOTEEMPLOYEE(:KEYVALUE, :EFFDATE, :EMPNO, v_cursor);
-              :result := v_cursor;
-          END;`,
+                    BEGIN
+                        PROMOTEEMPLOYEE(:KEYVALUE, :EFFDATE, :EMPNO, v_cursor);
+                        :result := v_cursor;
+                    END;`,
                 {
                     KEYVALUE: connection.passcode,
                     EFFDATE: body.period,

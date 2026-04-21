@@ -8,8 +8,8 @@ import * as zlib from 'zlib';
 @Controller('logger')
 export class LoggerController {
     private logDir = path.join(process.cwd(), 'logs');
-    //   private logDir = '//amecnas/amecweb/wwwroot/production/api/logs';
-    // private logDir = '//amecnas/amecweb/wwwroot/development/api/logs';
+    //private logDir = '//amecnas/amecweb/wwwroot/production/api/logs';
+    //private logDir = '//amecnas/amecweb/wwwroot/development/api/logs';
     constructor(private readonly logger: LoggerService) {}
 
     @Post('daily')

@@ -50,19 +50,18 @@ export async function protectedFile(opt) {
 
     const input = path.join(winPath, opt.input);
     const output = path.join(winPath, opt.output);
-    //   spawn qpdf
-    // prettier-ignore
+    //console.log(input, output);
     const child = spawn('qpdf', [
-    '--encrypt',
-    `${opt.userpassword}`, // user password
-    `${opt.adminpassword}`, // owner password
-    '256',
-    '--print=full',
-    '--modify=none',
-    '--', // <-- ต้องมี
-    input,
-    output,
-  ]);
+        '--encrypt',
+        `${opt.userpassword}`, // user password
+        `${opt.adminpassword}`, // owner password
+        '256',
+        '--print=full',
+        '--modify=none',
+        '--', // <-- ต้องมี
+        input,
+        output,
+    ]);
     child.stdout.on('data', (data) => console.log(`stdout: ${data}`));
     child.stderr.on('data', (data) => console.error(`stderr: ${data}`));
     child.on('close', async (code) => {

@@ -142,12 +142,14 @@ export class PromoteService {
 
             this.fontsize = 14;
             this.pdfpage = pages[0];
-            //   await drawGrid(this.pdfpage, 10);
+            //await drawGrid(this.pdfpage, 10);
             await this.setPdfValue(data);
             const pdfBytes = await this.pdfdoc.save();
             await fs.mkdir(this.output_path, { recursive: true });
             const output = path.join(this.output_path, `_${data.ASECOD}.pdf`);
             await fs.writeFile(output, pdfBytes);
+
+            // ป้องกันไฟล์ด้วยรหัสผ่าน
             await protectedFile({
                 output_path: this.output_path,
                 input: `_${data.ASECOD}.pdf`,
@@ -156,6 +158,9 @@ export class PromoteService {
                 adminpassword: data.passkey,
                 delete_input: true,
             });
+
+            // Delete the temporary unprotected file
+            await fs.unlink(path.join(this.output_path, `_${data.ASECOD}.pdf`));
             return {
                 dir,
                 empno: data.ASECOD,

@@ -50,27 +50,42 @@ export async function protectedFile(opt) {
 
     const input = path.join(winPath, opt.input);
     const output = path.join(winPath, opt.output);
-    //console.log(input, output);
-    const child = spawn('qpdf', [
-        '--encrypt',
-        `${opt.userpassword}`, // user password
-        `${opt.adminpassword}`, // owner password
-        '256',
-        '--print=full',
-        '--modify=none',
-        '--', // <-- ต้องมี
-        input,
-        output,
-    ]);
-    child.stdout.on('data', (data) => console.log(`stdout: ${data}`));
-    child.stderr.on('data', (data) => console.error(`stderr: ${data}`));
-    child.on('close', async (code) => {
-        if (opt.delete_input) {
-            await fs.unlink(input);
-        }
-        console.log(`qpdf exited with code ${code}`);
+    const command =
+        '\\\\amecnas\\AMECWEB\\wwwroot\\production\\cdn\\Application\\gs\\gs10.00.0\\bin\\gswin32c.exe';
+    await new Promise<void>((resolve, reject) => {
+        const stderrChunks: Buffer[] = [];
+        const child = spawn(command, [
+            ...[],
+            '-sDEVICE=pdfwrite',
+            '-dCompatibilityLevel=1.7',
+            `-sOwnerPassword=${opt.adminpassword}`,
+            `-sUserPassword=${opt.userpassword}`,
+            '-dEncryptionR=3',
+            '-dKeyLength=128',
+            '-dPermissions=-4', // ห้ามพิมพ์และแก้ไข
+            '-dNOPAUSE',
+            '-dQUIET',
+            '-dBATCH',
+            `-dPDFSETTINGS=/ebook`,
+            `-sOutputFile=${output}`,
+            input,
+        ]);
+
+        child.stderr.on('data', (chunk) => stderrChunks.push(chunk));
+        child.on('error', (error) => reject(error));
+        child.on('close', (code) => {
+            if (code === 0) {
+                resolve();
+                return;
+            }
+
+            reject(
+                new Error(
+                    `Ghostscript exited with code ${code}: ${Buffer.concat(stderrChunks).toString().trim()}`,
+                ),
+            );
+        });
     });
-    return;
 }
 
 export async function drawGrid(pdfpage, spacing = 50, labelSpacing = 50) {

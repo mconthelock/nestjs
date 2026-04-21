@@ -14,29 +14,28 @@ export class LoadLessTestService {
         private readonly db: Repository<SYS_FOLDER_PATH>,
     ) {}
 
-
     /**
      * Get load less test result from CSV file by machine and serial number
      * @author  Mr.Pathanapong Sokpukeaw
-     * @since   2026-04-20
-     * @param   {string} machine Machine code (e.g. 01, 02)
+     * @since   2026-04-21
      * @param   {string} serial Serial number
+     * @param   {string} order Order number
      * @return  {Promise<LoadLessTestResponseDto | null>}
      */
-    async getLoadLessTestResult(machine: string, serial: string): Promise<LoadLessTestResponseDto | null> {
-        const basePath  = await this.getPath('TSTM-001');
-        const machineNo = this.formatMachine(machine);
+    async getLoadLessTestResult(serial: string, order: string): Promise<LoadLessTestResponseDto | null> {
+        const basePath = await this.getPath('TSTM-001');
         const now   = new Date();
         const year  = now.getFullYear();
         const month = now.getMonth() + 1;
+        const day   = now.getDate();
         const folderPath = path.join(
             basePath,
             `Year ${year}`,
             this.formatMonth(month, year),
-            'Static no.1,2'
+            'Load less'
         );
 
-        const fileName = `(Static${machineNo})_${year}${this.pad(month)}.csv`;
+        const fileName = `${year}_${this.pad(month)}${this.pad(day)}.csv`;
         const fullPath = path.join(folderPath, fileName);
         if (!fs.existsSync(fullPath)) {
             throw new Error(`File not found: ${fullPath}`);
@@ -49,18 +48,20 @@ export class LoadLessTestService {
         });
 
         for await (const line of rl) {
-            const cols = line.split(',');
-            const serialCol = cols[4]?.trim();
-            const statusCol = cols[cols.length - 2]?.trim();
-            if (serialCol === serial && statusCol === 'OK') {
+            const cols   = line.split(',');
+            const header = cols[0]?.trim();
+            const parts  = header.split('|');
+
+            if (parts.length < 3) continue;
+
+            const serialCol = parts[1]?.trim();
+            const orderCol  = parts[2]?.trim();
+            const statusCol = cols[cols.length - 1]?.trim(); 
+            if ( serialCol === serial && orderCol === order && statusCol === 'OK') {
                 return {
                     status: 'OK',
                     data: {
-                        resistanceMotorU: cols[15],
-                        resistanceMotorV: cols[20],
-                        resistanceMotorW: cols[25],
-                        resistanceBrakeL: cols[55],
-                        resistanceBrakeR: cols[40]
+                        inducedVoltageConstant: cols[9]
                     }
                 };
             }
@@ -74,7 +75,7 @@ export class LoadLessTestService {
 
     private async getPath(fdpId: string): Promise<string> {
         const data = await this.db.findOne({
-            where: { FDP_ID: fdpId },
+            where: { FDP_ID: fdpId }
         });
 
         if (!data) {
@@ -84,8 +85,8 @@ export class LoadLessTestService {
         return data.FDP_DESCRIPTION;
     }
 
-    private pad(month: number): string {
-        return month.toString().padStart(2, '0');
+    private pad(num: number): string {
+        return num.toString().padStart(2, '0');
     }
 
     private formatMonth(month: number, year: number): string {
@@ -96,9 +97,5 @@ export class LoadLessTestService {
         ];
 
         return `${this.pad(month)}.${months[month - 1]} ${yy}`;
-    }
-
-    private formatMachine(machine: string): string {
-        return machine.toString().padStart(2, '0');
     }
 }

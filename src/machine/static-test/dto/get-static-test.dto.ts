@@ -11,7 +11,10 @@ export class GetStaticTestDto {
     @IsNotEmpty()
     machine: string;
 
-    @ApiProperty({ example: '163103260178', description: 'Serial number' })
+    @ApiProperty({ 
+        example: '163103260178', 
+        description: 'Serial number' 
+    })
     @IsString()
     @IsNotEmpty()
     serial: string;

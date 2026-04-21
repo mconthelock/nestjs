@@ -1,6 +1,5 @@
-import { Controller, Get, Query, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { Controller, Get, Query, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { StaticTestService } from './static-test.service';
 import { GetStaticTestDto } from './dto/get-static-test.dto';
 import { StaticTestResponseDto } from './dto/static-test-result.dto';

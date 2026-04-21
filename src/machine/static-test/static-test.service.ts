@@ -14,7 +14,6 @@ export class StaticTestService {
         private readonly db: Repository<SYS_FOLDER_PATH>,
     ) {}
 
-
     /**
      * Get static test result from CSV file by machine and serial number
      * @author  Mr.Pathanapong Sokpukeaw
@@ -74,7 +73,7 @@ export class StaticTestService {
 
     private async getPath(fdpId: string): Promise<string> {
         const data = await this.db.findOne({
-            where: { FDP_ID: fdpId },
+            where: { FDP_ID: fdpId }
         });
 
         if (!data) {

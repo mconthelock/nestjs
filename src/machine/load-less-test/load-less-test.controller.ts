@@ -1,6 +1,5 @@
-import { Controller, Get, Query, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { Controller, Get, Query, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { LoadLessTestService } from './load-less-test.service';
 import { GetLoadLessTestDto } from './dto/get-load-less-test.dto';
 import { LoadLessTestResponseDto } from './dto/load-less-test-result.dto';
@@ -13,7 +12,7 @@ export class LoadLessTestController {
     /**
      * Get load less test result by machine and serial number
      * @author  Mr.Pathanapong Sokpukeaw
-     * @since   2026-04-20
+     * @since   2026-04-21
      */
     @Get('result')
     @HttpCode(HttpStatus.OK)
@@ -22,6 +21,7 @@ export class LoadLessTestController {
     async getLoadLessTestResult(
         @Query() query: GetLoadLessTestDto,
     ): Promise<LoadLessTestResponseDto | null> {
-        return this.service.getLoadLessTestResult(query.machine, query.serial);
+        const [serial, order] = query.data.split('|');
+        return this.service.getLoadLessTestResult(serial, order);
     }
 }

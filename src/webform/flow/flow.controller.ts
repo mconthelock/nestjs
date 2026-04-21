@@ -1,19 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Req,
-  UseInterceptors,
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    Req,
+    UseInterceptors,
 } from '@nestjs/common';
 import {
-  ApiTags,
-  ApiOperation,
-  ApiParam,
-  ApiExcludeEndpoint,
+    ApiTags,
+    ApiOperation,
+    ApiParam,
+    ApiExcludeEndpoint,
 } from '@nestjs/swagger';
 import { Request } from 'express';
 
@@ -30,116 +30,130 @@ import { showFlowDto } from './dto/show-flow.dto';
 import { ShowFlowService } from './show-flow.service';
 import { DeleteFlowStepService } from './delete-flow-step.service';
 import { DoactionFlowService } from './doaction.service';
-import { UseTransaction } from 'src/common/decorator/transaction.decorator';
+import {
+    UseForceTransaction,
+    UseTransaction,
+} from 'src/common/decorator/transaction.decorator';
+import { InsertFlowStepService } from './insert-flow-step.service';
+import { insertFlowDto } from './dto/insert-flow-step.dto';
 
 @ApiTags('Flow')
 @Controller('flow')
 export class FlowController {
-  constructor(private readonly flowService: FlowService,
-    private readonly showFlowService: ShowFlowService,
-    private readonly deleteFlowStepService: DeleteFlowStepService,
-    private readonly doactionFlowService: DoactionFlowService
-  ) {}
+    constructor(
+        private readonly flowService: FlowService,
+        private readonly showFlowService: ShowFlowService,
+        private readonly deleteFlowStepService: DeleteFlowStepService,
+        private readonly doactionFlowService: DoactionFlowService,
+        private readonly insertFlowStepService: InsertFlowStepService,
+    ) {}
 
-  @Post('getExtData')
-  @ApiOperation({ summary: 'Get ext data' })
-  async getExtData(@Body() dto: empnoFormDto) {
-    return this.flowService.getExtData(dto);
-  }
-
-  @Post('search')
-  @ApiOperation({ summary: 'Search flow data' })
-  getFlow(@Body() dto: SearchFlowDto) {
-    return this.flowService.getFlow(dto);
-  }
-
-  @Patch('updateFlow')
-  async updateFlow(
-    @Body() dto: UpdateFlowDto,
-  ): Promise<{ message: string; status: boolean }> {
-    try {
-      return await this.flowService.updateFlow(dto);
-    } catch (error) {
-      throw error; // โยนข้อผิดพลาดกลับไปให้ NestJS จัดการ
+    @Post('getExtData')
+    @ApiOperation({ summary: 'Get ext data' })
+    async getExtData(@Body() dto: empnoFormDto) {
+        return this.flowService.getExtData(dto);
     }
-  }
 
-  @Patch('realignFlow')
-  async realignFlow(
-    @Body() dto: UpdateFlowDto,
-  ): Promise<{ message: string; status: boolean }> {
-    try {
-      return await this.flowService.reAlignFlow(dto);
-    } catch (error) {
-      throw error; // โยนข้อผิดพลาดกลับไปให้ NestJS จัดการ
+    @Post('search')
+    @ApiOperation({ summary: 'Search flow data' })
+    getFlow(@Body() dto: SearchFlowDto) {
+        return this.flowService.getFlow(dto);
     }
-  }
 
-  @Delete('deleteFlow')
-  async deleteFlow(
-    @Body() dto: UpdateFlowDto,
-  ): Promise<{ message: string; status: boolean }> {
-    try {
-      return await this.flowService.deleteFlow(dto);
-    } catch (error) {
-      throw error; // โยนข้อผิดพลาดกลับไปให้ NestJS จัดการ
+    @Patch('updateFlow')
+    async updateFlow(
+        @Body() dto: UpdateFlowDto,
+    ): Promise<{ message: string; status: boolean }> {
+        try {
+            return await this.flowService.updateFlow(dto);
+        } catch (error) {
+            throw error; // โยนข้อผิดพลาดกลับไปให้ NestJS จัดการ
+        }
     }
-  }
 
-  @Delete('deleteFlowStep')
-  @UseTransaction('webformConnection')
-  async deleteFlowStep(
-    @Body() dto: DeleteFlowStepDto,
-  ): Promise<{ message: string; status: boolean }> {
-    try {
-      return await this.deleteFlowStepService.deleteFlowStep(dto);
-    } catch (error) {
-      throw error;
+    @Patch('realignFlow')
+    async realignFlow(
+        @Body() dto: UpdateFlowDto,
+    ): Promise<{ message: string; status: boolean }> {
+        try {
+            return await this.flowService.reAlignFlow(dto);
+        } catch (error) {
+            throw error; // โยนข้อผิดพลาดกลับไปให้ NestJS จัดการ
+        }
     }
-  }
 
-  @Post('showflow')
-  async showFlow(@Body() dto: showFlowDto) {
-    return await this.showFlowService.showFlow(dto);
-  }
+    @Delete('deleteFlow')
+    async deleteFlow(
+        @Body() dto: UpdateFlowDto,
+    ): Promise<{ message: string; status: boolean }> {
+        try {
+            return await this.flowService.deleteFlow(dto);
+        } catch (error) {
+            throw error; // โยนข้อผิดพลาดกลับไปให้ NestJS จัดการ
+        }
+    }
 
-  @Post('getFlowTree')
-  async getFlowTree(@Body() form: FormDto) {
-    return await this.flowService.getFlowTree(form);
-  }
+    @Delete('deleteFlowStep')
+    @UseTransaction('webformConnection')
+    async deleteFlowStep(
+        @Body() dto: DeleteFlowStepDto,
+    ): Promise<{ message: string; status: boolean }> {
+        try {
+            return await this.deleteFlowStepService.deleteFlowStep(dto);
+        } catch (error) {
+            throw error;
+        }
+    }
 
-  @Post('getEmpFlowStepReady')
-  async getEmpFlowStepReady(@Body() form: empnoFormDto) {
-    return await this.flowService.getEmpFlowStepReady(form);
-  }
+    @Post('showflow')
+    async showFlow(@Body() dto: showFlowDto) {
+        return await this.showFlowService.showFlow(dto);
+    }
 
-  @Post('checkReturn')
-  async checkReturn(@Body() dto: empnoFormDto) {
-    return await this.flowService.checkReturn(dto);
-  }
+    @Post('getFlowTree')
+    async getFlowTree(@Body() form: FormDto) {
+        return await this.flowService.getFlowTree(form);
+    }
 
-  @Post('checkReturnb')
-  async checkReturnb(@Body() dto: empnoFormDto) {
-    return await this.flowService.checkReturnb(dto);
-  }
+    @Post('getEmpFlowStepReady')
+    async getEmpFlowStepReady(@Body() form: empnoFormDto) {
+        return await this.flowService.getEmpFlowStepReady(form);
+    }
 
-  @Post('doaction')
-  @UseTransaction('webformConnection')
-  @UseInterceptors(AnyFilesInterceptor())
-  async doAction(@Body() dto: doactionFlowDto, @Req() req: Request) {
-    const ip = getClientIP(req);
-    return await this.doactionFlowService.doAction(dto, ip);
-  }
+    @Post('checkReturn')
+    async checkReturn(@Body() dto: empnoFormDto) {
+        return await this.flowService.checkReturn(dto);
+    }
 
-  @ApiExcludeEndpoint()
-  @Post('checkUnfinishedFlow')
-  async checkUnfinishedFlow(@Body() form: FormDto) {
-    return await this.doactionFlowService.checkUnfinishedFlow(form);
-  }
+    @Post('checkReturnb')
+    async checkReturnb(@Body() dto: empnoFormDto) {
+        return await this.flowService.checkReturnb(dto);
+    }
 
-  @Post('resetFlow')
-  @UseTransaction('webformConnection')
-  async resetFlow(@Body() form: FormDto) {
-    return await this.flowService.resetFlow(form);
-  }
+    @Post('doaction')
+    @UseTransaction('webformConnection')
+    @UseInterceptors(AnyFilesInterceptor())
+    async doAction(@Body() dto: doactionFlowDto, @Req() req: Request) {
+        const ip = getClientIP(req);
+        return await this.doactionFlowService.doAction(dto, ip);
+    }
+
+    @ApiExcludeEndpoint()
+    @Post('checkUnfinishedFlow')
+    async checkUnfinishedFlow(@Body() form: FormDto) {
+        return await this.doactionFlowService.checkUnfinishedFlow(form);
+    }
+
+    @Post('resetFlow')
+    @UseTransaction('webformConnection')
+    async resetFlow(@Body() form: FormDto) {
+        return await this.flowService.resetFlow(form);
+    }
+
+    @Post('insertFlowStep')
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
+    async insertFlowStep(@Body() dto: insertFlowDto) {
+        return await this.insertFlowStepService.insertFlowStep(dto);
+    }
 }

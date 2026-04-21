@@ -5,14 +5,13 @@ import {
     Body,
     Patch,
     Param,
-    Delete,
     Req,
     UploadedFiles,
     UseInterceptors,
 } from '@nestjs/common';
 import { PurCpmService } from './pur-cpm.service';
 import { CreatePurCpmDto } from './dto/create-pur-cpm.dto';
-import { UpdatePurCpmDto } from './dto/update-pur-cpm.dto';
+import { ReturnArppoveDto } from './dto/update-pur-cpm.dto';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
@@ -21,10 +20,16 @@ import {
     UseForceTransaction,
     UseTransaction,
 } from 'src/common/decorator/transaction.decorator';
+import { PurCpmReturnAprroveService } from './pur-cpm-return-aprrove.service';
+import { PurCpmRequestService } from './pur-cpm-request.service';
 
 @Controller('purform/pur-cpm')
 export class PurCpmController {
-    constructor(private readonly purCpmService: PurCpmService) {}
+    constructor(
+        private readonly purCpmService: PurCpmService,
+        private readonly purCpmRequestService: PurCpmRequestService,
+        private readonly purCpmReturnAprroveService: PurCpmReturnAprroveService,
+    ) {}
 
     private readonly path =
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/PUR/PURCPM/` as string;
@@ -50,6 +55,25 @@ export class PurCpmController {
         @Req() req: Request,
     ) {
         const ip = getClientIP(req);
-        return this.purCpmService.create(dto, files, ip, this.path);
+        return this.purCpmRequestService.request(dto, files, ip, this.path);
+    }
+
+    @Patch()
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
+    @UseInterceptors(getFileUploadInterceptor('files', true))
+    update(
+        @Body() dto: ReturnArppoveDto,
+        @UploadedFiles()
+        files: Express.Multer.File[],
+        @Req() req: Request,
+    ) {
+        const ip = getClientIP(req);
+        return this.purCpmReturnAprroveService.returnApprove(
+            dto,
+            files,
+            this.path,
+            ip,
+        );
     }
 }

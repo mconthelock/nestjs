@@ -1,177 +1,179 @@
 import { PickType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
-  IsArray,
-  IsDate,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
+    IsArray,
+    IsDate,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
 } from 'class-validator';
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 
 export class CreatePurCpmDto extends PickType(CreateFormDto, [
-  'NFRMNO',
-  'VORGNO',
-  'CYEAR',
-  'REQBY',
-  'INPUTBY',
-  'REMARK',
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'REQBY',
+    'INPUTBY',
+    'REMARK',
 ] as const) {
-  @IsNotEmpty()
-  @IsString()
-  DELIVELY: string;
+    @IsNotEmpty()
+    @IsString()
+    DELIVELY: string;
 
-  @IsNotEmpty()
-  //   @IsString()
-//   @IsArray()
-  INVOICE_TYPE: string | string[];
+    @IsNotEmpty()
+    @Transform(
+        ({ value }) => (Array.isArray(value) ? value.join('|') : value), // ถ้าเป็น string เดี่ยว → wrap array
+    )
+    @IsString()
+    INVOICE_TYPE: string;
 
-  @IsOptional()
-  @IsString()
-  INVOICE_OTHER?: string;
+    @IsOptional()
+    @IsString()
+    INVOICE_OTHER?: string;
 
-  @IsOptional()
-  @IsString()
-  THIRD_PARTY?: string;
+    @IsOptional()
+    @IsString()
+    THIRD_PARTY?: string;
 
-  @IsNotEmpty()
-  @IsString()
-  SUBJECT: string;
+    @IsNotEmpty()
+    @IsString()
+    SUBJECT: string;
 
-  @IsOptional()
-  @IsString()
-  ACCEPT_PO?: string;
+    @IsOptional()
+    @IsString()
+    ACCEPT_PO?: string;
 
-  @IsOptional()
-  @IsString()
-  ACCEPT_SUBCON?: string;
+    @IsOptional()
+    @IsString()
+    ACCEPT_SUBCON?: string;
 
-  @IsOptional()
-  @IsString()
-  ACCEPT_OTHER?: string;
+    @IsOptional()
+    @IsString()
+    ACCEPT_OTHER?: string;
 
-  @IsOptional()
-  @IsString()
-  QUOTATION?: string;
+    @IsOptional()
+    @IsString()
+    QUOTATION?: string;
 
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  QUOTATION_DATE?: Date;
+    @IsOptional()
+    @IsDate()
+    @Type(() => Date)
+    QUOTATION_DATE?: Date;
 
-  @IsOptional()
-  @IsString()
-  PONO?: string;
+    @IsOptional()
+    @IsString()
+    PONO?: string;
 
-  @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  TOTAL_AMOUNT?: number;
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    TOTAL_AMOUNT?: number;
 
-  @IsOptional()
-  @IsString()
-  PO_SIGNBY?: string;
+    @IsOptional()
+    @IsString()
+    PO_SIGNBY?: string;
 
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  PO_SIGNDATE?: Date;
+    @IsOptional()
+    @IsDate()
+    @Type(() => Date)
+    PO_SIGNDATE?: Date;
 
-  @IsOptional()
-  @IsString()
-  FORM_TYPE?: string;
+    @IsOptional()
+    @IsString()
+    FORM_TYPE?: string;
 
-  @IsNotEmpty()
-  @IsString()
-  INVOICE_NO: string;
+    @IsNotEmpty()
+    @IsString()
+    INVOICE_NO: string;
 
-  @IsNotEmpty()
-  @IsNumber()
-  @Type(() => Number)
-  INVOICE_AMOUNT: number;
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    INVOICE_AMOUNT: number;
 
-  @IsOptional()
-  @IsString()
-  PERSON_INCHARGE?: string;
+    @IsOptional()
+    @IsString()
+    PERSON_INCHARGE?: string;
 
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  INVOICE_DATE?: Date;
+    @IsOptional()
+    @IsDate()
+    @Type(() => Date)
+    INVOICE_DATE?: Date;
 
-  @IsNotEmpty()
-  @IsString()
-  PAYMENT_TYPE: string;
+    @IsNotEmpty()
+    @IsString()
+    PAYMENT_TYPE: string;
 
-  @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  PAYMENT_NUM?: number;
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    PAYMENT_NUM?: number;
 
-  @IsNotEmpty()
-  @IsNumber()
-  @Type(() => Number)
-  PAYMENT: number;
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    PAYMENT: number;
 
-  @IsOptional()
-  @IsString()
-  PAYMENT_DETAIL?: string;
+    @IsOptional()
+    @IsString()
+    PAYMENT_DETAIL?: string;
 
-  @IsOptional()
-//   @IsArray()
-  ATTACH_TYPE: string | string[];
+    @IsOptional()
+    @Transform(
+        ({ value }) => (Array.isArray(value) ? value.join('|') : value), // ถ้าเป็น string เดี่ยว → wrap array
+    )
+    @IsString()
+    ATTACH_TYPE: string;
 
-  @IsOptional()
-  @IsString()
-  ATTACH_OTHER?: string;
+    @IsOptional()
+    @IsString()
+    ATTACH_OTHER?: string;
 
-  @IsNotEmpty()
-  @IsString()
-  CURRENCY: string;
+    @IsNotEmpty()
+    @IsString()
+    CURRENCY: string;
 }
 
 export class InsertPurCpmDto extends PickType(CreatePurCpmDto, [
-  'NFRMNO',
-  'VORGNO',
-  'CYEAR',
-  'DELIVELY',
-  //   'INVOICE_TYPE',
-  'INVOICE_OTHER',
-  'SUBJECT',
-  'ACCEPT_PO',
-  'ACCEPT_SUBCON',
-  'ACCEPT_OTHER',
-  'QUOTATION',
-  'QUOTATION_DATE',
-  'PONO',
-  'TOTAL_AMOUNT',
-  'PO_SIGNBY',
-  'PO_SIGNDATE',
-  'FORM_TYPE',
-  'INVOICE_NO',
-  'INVOICE_AMOUNT',
-  'PERSON_INCHARGE',
-  'INVOICE_DATE',
-  'PAYMENT_TYPE',
-  'PAYMENT_NUM',
-  'PAYMENT',
-  'ATTACH_OTHER',
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'DELIVELY',
+    'INVOICE_TYPE',
+    'INVOICE_OTHER',
+    'SUBJECT',
+    'ACCEPT_PO',
+    'ACCEPT_SUBCON',
+    'ACCEPT_OTHER',
+    'QUOTATION',
+    'QUOTATION_DATE',
+    'PONO',
+    'TOTAL_AMOUNT',
+    'PO_SIGNBY',
+    'PO_SIGNDATE',
+    'FORM_TYPE',
+    'INVOICE_NO',
+    'INVOICE_AMOUNT',
+    'PERSON_INCHARGE',
+    'INVOICE_DATE',
+    'PAYMENT_TYPE',
+    'PAYMENT_NUM',
+    'PAYMENT',
+    'PAYMENT_DETAIL',
+    'ATTACH_TYPE',
+    'ATTACH_OTHER',
+    'THIRD_PARTY',
+    'CURRENCY',
 ] as const) {
-  @IsNotEmpty()
-  @IsString()
-  INVOICE_TYPE: string;
 
-  @IsOptional()
-  @IsString()
-  ATTACH_TYPE?: string;
+    @IsNotEmpty()
+    @IsString()
+    CYEAR2: string;
 
-  @IsNotEmpty()
-  @IsString()
-  CYEAR2: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @Type(() => Number)
-  NRUNNO: number;
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    NRUNNO: number;
 }

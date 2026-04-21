@@ -12,6 +12,10 @@ import { ShowFlowService } from './show-flow.service';
 import { DoactionFlowService } from './doaction.service';
 import { DeleteFlowStepService } from './delete-flow-step.service';
 import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
+import { InsertFlowStepService } from './insert-flow-step.service';
+import { OrgposModule } from '../orgpos/orgpos.module';
+import { OrgTreeModule } from '../org-tree/org-tree.module';
+import { FlowmstModule } from '../flowmst/flowmst.module';
 
 @Module({
     imports: [
@@ -20,7 +24,10 @@ import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
         MailModule,
         forwardRef(() => FormModule),
         FormmstModule,
+        FlowmstModule,
         UsersModule,
+        OrgposModule,
+        OrgTreeModule,
     ],
     controllers: [FlowController],
     providers: [
@@ -29,12 +36,14 @@ import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
         ShowFlowService,
         DoactionFlowService,
         DeleteFlowStepService,
+        InsertFlowStepService,
     ],
     exports: [
         FlowService,
         ShowFlowService,
         DoactionFlowService,
         DeleteFlowStepService,
+        InsertFlowStepService,
     ],
 })
 export class FlowModule {}

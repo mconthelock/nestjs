@@ -100,6 +100,9 @@ export class PURCPM_FORM {
     @Column()
     CURRENCY: string;
 
+    @Column()
+    THIRD_PARTY: string;
+
     @OneToMany(() => PUR_FILE, (s) => s.MASTER)
     FILES: PUR_FILE[];
 }

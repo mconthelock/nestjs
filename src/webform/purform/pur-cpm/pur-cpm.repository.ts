@@ -5,12 +5,11 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { PURCPM_FORM } from 'src/common/Entities/webform/table/PURCPM_FORM.entity';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { InsertPurCpmDto } from './dto/create-pur-cpm.dto';
+import { UpdatePurCpmDto } from './dto/update-pur-cpm.dto';
 
 @Injectable()
 export class PurCpmRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -37,6 +36,11 @@ export class PurCpmRepository extends BaseRepository {
     }
 
     async insert(dto: InsertPurCpmDto) {
-        return await this.manager.getRepository(PURCPM_FORM).insert(dto);
+        return await this.getRepository(PURCPM_FORM).insert(dto);
+    }
+
+    async update(condition: FormDto, data: UpdatePurCpmDto) {
+        return await this.getRepository(PURCPM_FORM)
+            .update(condition, data);
     }
 }

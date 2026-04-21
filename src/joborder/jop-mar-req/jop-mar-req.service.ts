@@ -263,7 +263,7 @@ export class JopMarReqService {
                 'B',
                 'A.JOP_MFGNO = B.JOP_MFGNO AND A.JOP_PONO = B.JOP_PONO AND A.JOP_LINENO = B.JOP_LINENO AND B.LAST_REVISION = A.JOP_REVISION',
             )
-            .innerJoin('AMECUSERALL', 'U', 'A.JOP_MAR_REQUEST = U.SEMPNO');
+            .innerJoin('(SELECT * FROM AMECUSERALL)', 'U', 'A.JOP_MAR_REQUEST = U.SEMPNO');
         query.distinct(dto.distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
         let select = [];
         if (fields.length > 0) {

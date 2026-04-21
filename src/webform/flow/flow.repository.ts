@@ -12,9 +12,7 @@ import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 
 @Injectable()
 export class FlowRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -107,57 +105,51 @@ export class FlowRepository extends BaseRepository {
     }
 
     getFlowTree(form: FormDto) {
+        // return this.manager.getRepository(FLOW).query(
+        //     `
+        //     SELECT DISTINCT LEVEL, CSTEPNO, CSTEPNEXTNO, CSTEPST, CEXTDATA, VAPVNO, SRECMAIL, NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, SNAME, VNAME, DAPVDATE, CAPVTIME, VREMARK,  VREPNO, VREALAPV
+        //     FROM FLOW, AMECUSERALL, stepmst  WHERE  FLOW.VAPVNO = SEMPNO and flow.CSTEPNO = cno
+        //     start with CSTART = '1' and
+        //     NFRMNO = :1 and VORGNO = :2 and CYEAR = :3
+        //     and CYEAR2 = :4 and NRUNNO = :5
+        //     connect by
+        //     NFRMNO = prior NFRMNO and VORGNO = prior VORGNO and CYEAR = prior CYEAR
+        //     and CYEAR2 = prior CYEAR2 and NRUNNO = prior NRUNNO
+        //     and CSTEPNO = prior CSTEPNEXTNO
+        //     order by level
+        // `,
+        //     [form.NFRMNO, form.VORGNO, form.CYEAR, form.CYEAR2, form.NRUNNO],
+        // );
         return this.manager.getRepository(FLOW).query(
             `
-            SELECT DISTINCT LEVEL, CSTEPNO, CSTEPNEXTNO, CSTEPST, CEXTDATA, VAPVNO, SRECMAIL, NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, SNAME, VNAME, DAPVDATE, CAPVTIME, VREMARK,  VREPNO, VREALAPV
-            FROM FLOW, AMECUSERALL, stepmst  WHERE  FLOW.VAPVNO = SEMPNO and flow.CSTEPNO = cno
-            start with CSTART = '1' and
-            NFRMNO = :1 and VORGNO = :2 and CYEAR = :3
-            and CYEAR2 = :4 and NRUNNO = :5
-            connect by
-            NFRMNO = prior NFRMNO and VORGNO = prior VORGNO and CYEAR = prior CYEAR
-            and CYEAR2 = prior CYEAR2 and NRUNNO = prior NRUNNO
-            and CSTEPNO = prior CSTEPNEXTNO
-            order by level
+            SELECT  F.LV AS "LEVEL", F.CSTEPNO, F.CSTEPNEXTNO, F.CSTEPST, F.CEXTDATA, F.VAPVNO, E.SRECMAIL, 
+                    F.NFRMNO, F.VORGNO, F.CYEAR, F.CYEAR2, F.NRUNNO, E.SNAME, S.VNAME, 
+                    F.DAPVDATE, F.CAPVTIME, F.VREMARK, F.VREPNO, F.VREALAPV
+            FROM (
+                SELECT LEVEL AS LV, FLOW.*
+                FROM FLOW
+                START WITH
+                    NFRMNO = :1 
+                    AND VORGNO = :2 
+                    AND CYEAR = :3 
+                    AND CYEAR2 = :4 
+                    AND NRUNNO = :5 
+                    AND CSTART = '1'
+                CONNECT BY
+                    NFRMNO = prior NFRMNO 
+                    AND VORGNO = prior VORGNO 
+                    AND CYEAR = prior CYEAR 
+                    AND CYEAR2 = prior CYEAR2 
+                    AND NRUNNO = prior NRUNNO  
+                    AND CSTEPNO = PRIOR CSTEPNEXTNO
+            ) F
+            JOIN AMEC.AEMPLOYEE E ON E.SEMPNO = F.VAPVNO
+            JOIN AMEC.PPOSITION P ON P.SPOSCODE = E.SPOSCODE
+            JOIN STEPMST S ON F.CSTEPNO = S.CNO
+            ORDER BY F.LV
         `,
             [form.NFRMNO, form.VORGNO, form.CYEAR, form.CYEAR2, form.NRUNNO],
         );
-
-        //   const sql =
-        //     `SELECT DISTINCT LV, TO_CHAR(this.APPLY_ALL_APV.NFRMNO) AS NFRMNO2, TO_CHAR(this.APPLY_ALL_APV.NRUNNO) AS NRUNNO2, A.*, SNAME, SPOSITION, VNAME, CST
-        //     FROM FORM F
-        //     JOIN (
-        //         SELECT DISTINCT LEVEL AS LV, FLOW.*
-        //         FROM FLOW
-        //         START WITH
-        //             NFRMNO = :frm AND VORGNO = :org AND CYEAR = :y AND CYEAR2 = :y2 AND NRUNNO = :runno AND CSTART = '1'
-        //         CONNECT BY
-        //             NFRMNO = :frm2 and VORGNO = :org2 AND CYEAR = :cyear AND CYEAR2 = :cyear2 AND NRUNNO = :runno2 AND CSTEPNO = PRIOR CSTEPNEXTNO
-        //     ) A ON F.NFRMNO = A.NFRMNO AND F.VORGNO = A.VORGNO AND F.CYEAR = A.CYEAR AND F.CYEAR2 = A.CYEAR2 AND F.NRUNNO = A.NRUNNO
-        //     JOIN AMEC.AEMPLOYEE E ON E.SEAMPNO = A.VAPVNO
-        //     JOIN AMEC.PPOSITION P ON P.SPOSCODE = E.SPOCODE
-        //     JOIN STEPMST S ON A.CSTEPNO = S.CNO
-        //     ORDER BY A.LV
-        //     `;
-        //   const params = {
-        //     ...form,
-        //     frm: form.NFRMNO,
-        //     org: form.VORGNO,
-        //     y: form.CYEAR,
-        //     y2: form.CYEAR2,
-        //     runno: form.NRUNNO,
-        //     frm2: form.NFRMNO,
-        //     org2: form.VORGNO,
-        //     cyear: form.CYEAR,
-        //     cyear2: form.CYEAR2,
-        //     runno2: form.NRUNNO,
-        //   };
-        //   await this.execSql(
-        //     sql,
-        //     params,
-        //     queryRunner,
-        //     'Reset flow',
-        //   );
     }
 
     async getEmpFlowStepReady(form: empnoFormDto) {
@@ -201,7 +193,8 @@ export class FlowRepository extends BaseRepository {
             return [];
         }
         const cstep = flow[0].CSTEPNEXTNO;
-       return await this.manager.getRepository(FLOW)
+        return await this.manager
+            .getRepository(FLOW)
             .createQueryBuilder('f')
             .where('f.NFRMNO = :nfrmno', { nfrmno: dto.NFRMNO })
             .andWhere('f.VORGNO = :vorgno', { vorgno: dto.VORGNO })

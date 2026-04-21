@@ -25,6 +25,8 @@ import { ControlDrawingPisModule } from './control-drawing-pis/control-drawing-p
 import { MfgDrawingModule } from './mfg-drawing/mfg-drawing.module';
 import { MfgSerialModule } from './mfg-serial/mfg-serial.module';
 import { MfgDrawingActionModule } from './mfg-drawing-action/mfg-drawing-action.module';
+import { ReturnApvListModule } from './return-apv-list/return-apv-list.module';
+import { OrdersDrawingModule } from './orders-drawing/orders-drawing.module';
 
 @Module({
     imports: [
@@ -54,6 +56,8 @@ import { MfgDrawingActionModule } from './mfg-drawing-action/mfg-drawing-action.
         UsersFileModule,
         UsersModule,
         UsersSectionModule,
+        ReturnApvListModule,
+        OrdersDrawingModule,
     ],
 })
 export class ESCSModule {}

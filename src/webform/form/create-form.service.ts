@@ -230,7 +230,7 @@ export class FormCreateService extends FormService {
             context.emppos,
         );
         context.flag = 1; // หากไม่เจอตำแหน่งเช่น ใน ORGPOS ให้ไป set manager step โดยตรวจด้วย VPOSNO ของ FLOWMST ทีละ STEP
-        if (orgTree) {
+        if (orgTree && orgTree.length > 0) {
             context.flag = 2;
             for (const row of orgTree) {
                 await this.getRepresent(row.VEMPNO, context);

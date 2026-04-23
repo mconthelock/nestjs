@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { ORDERS } from './ORDERS.entity';
 
 @Entity({ name: 'ORDERS_DRAWING', schema: 'ESCCHKSHT' })
 export class ORDERS_DRAWING {
@@ -73,4 +74,12 @@ export class ORDERS_DRAWING {
 
     @Column()
     ORDDW_STATION: string;
+
+    @OneToOne(() => ORDERS)
+    @JoinColumn([
+        { name: 'ORD_PRODUCTION', referencedColumnName: 'ORD_PRODUCTION' },
+        { name: 'ORD_NO', referencedColumnName: 'ORD_NO' },
+        { name: 'ORD_ITEM', referencedColumnName: 'ORD_ITEM' },
+    ])
+    orders: ORDERS;
 }

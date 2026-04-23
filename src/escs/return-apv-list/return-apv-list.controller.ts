@@ -21,7 +21,12 @@ export class ReturnApvListController {
     }
 
     @Patch()
-    update(@Body() dto: UpdateReturnApvListDto) {
-        return this.returnApvListService.upsert(dto);
+    actions(@Body() dto: UpdateReturnApvListDto) {
+        return this.returnApvListService.actions(dto);
+    }
+
+    @Get('sec/:sec')
+    findBySec(@Param('sec') sec: string) {
+        return this.returnApvListService.findBySec(+sec);
     }
 }

@@ -1,9 +1,13 @@
 import {
     Column,
     Entity,
+    JoinColumn,
+    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import { ORDERS_DRAWING } from './ORDERS_DRAWING.entity';
+import { ORDERS } from './ORDERS.entity';
 
 @Entity({ name: 'RETURN_APV_LIST', schema: 'ESCCHKSHT' })
 export class RETURN_APV_LIST {
@@ -23,13 +27,13 @@ export class RETURN_APV_LIST {
     NDRAWINGID: number;
 
     @Column()
-    VUSERCREATE: string;
+    NUSERCREATE: number;
 
     @Column()
     DDATECREATE: Date;
 
     @Column()
-    VUSERUPDATE: string;
+    NUSERUPDATE: number;
 
     @UpdateDateColumn()
     DDATEUPDATE: Date;
@@ -42,4 +46,13 @@ export class RETURN_APV_LIST {
 
     @Column()
     NSTATUS: number;
+
+    @OneToOne(() => ORDERS_DRAWING)
+    @JoinColumn([
+        { name: 'VPROD', referencedColumnName: 'ORD_PRODUCTION' },
+        { name: 'VORD_NO', referencedColumnName: 'ORD_NO' },
+        { name: 'VITEM', referencedColumnName: 'ORD_ITEM' },
+        { name: 'NDRAWINGID', referencedColumnName: 'ORDDW_ID' },
+    ])
+    ordersDrawing: ORDERS_DRAWING;
 }

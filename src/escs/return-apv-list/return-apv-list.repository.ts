@@ -22,4 +22,11 @@ export class ReturnApvListRepository extends BaseRepository {
             relations: ['ordersDrawing', 'ordersDrawing.orders'],
         });
     }
+
+    findById(id: number) {
+        return this.getRepository(RETURN_APV_LIST).findOne({
+            where: { NID: id },
+            relations: ['ordersDrawing', 'ordersDrawing.orders'],
+        });
+    }
 }

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ReturnApvListService } from './return-apv-list.service';
 import { CreateReturnApvListDto } from './dto/create-return-apv-list.dto';
-import { UpdateReturnApvListDto } from './dto/update-return-apv-list.dto';
+import { ActionReturnApvListDto, UpdateReturnApvListDto } from './dto/update-return-apv-list.dto';
 
 @Controller('escs/return-apv-list')
 export class ReturnApvListController {
@@ -21,7 +21,7 @@ export class ReturnApvListController {
     }
 
     @Patch()
-    actions(@Body() dto: UpdateReturnApvListDto) {
+    actions(@Body() dto: ActionReturnApvListDto) {
         return this.returnApvListService.actions(dto);
     }
 

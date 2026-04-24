@@ -38,7 +38,11 @@ export class LoadLessTestService {
         const fileName = `${year}_${this.pad(month)}${this.pad(day)}.csv`;
         const fullPath = path.join(folderPath, fileName);
         if (!fs.existsSync(fullPath)) {
-            throw new Error(`File not found: ${fullPath}`);
+            return {
+                status: 'ERROR',
+                message: `File not found: ${fileName}`,
+                data: null
+            };
         }
 
         const fileStream = fs.createReadStream(fullPath);
@@ -59,7 +63,8 @@ export class LoadLessTestService {
             const statusCol = cols[cols.length - 1]?.trim(); 
             if ( serialCol === serial && orderCol === order && statusCol === 'OK') {
                 return {
-                    status: 'OK',
+                    status: 'SUCCESS',
+                    message: null,
                     data: {
                         inducedVoltageConstant: cols[9]
                     }
@@ -68,7 +73,8 @@ export class LoadLessTestService {
         }
 
         return {
-            status: 'NO_DATA',
+            status: 'ERROR',
+            message: 'ไม่พบข้อมูล Test ในระบบ กรุณาลองใหม่อีกครั้ง!',  
             data: null
         };
     }

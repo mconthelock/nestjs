@@ -39,7 +39,8 @@ export class LoadLessTestService {
         const fullPath = path.join(folderPath, fileName);
         if (!fs.existsSync(fullPath)) {
             return {
-                status: 'FILE_NOT_FOUND',
+                status: 'ERROR',
+                message: `File not found: ${fileName}`,
                 data: null
             };
         }
@@ -62,7 +63,8 @@ export class LoadLessTestService {
             const statusCol = cols[cols.length - 1]?.trim(); 
             if ( serialCol === serial && orderCol === order && statusCol === 'OK') {
                 return {
-                    status: 'OK',
+                    status: 'SUCCESS',
+                    mesage: null,
                     data: {
                         inducedVoltageConstant: cols[9]
                     }
@@ -71,7 +73,8 @@ export class LoadLessTestService {
         }
 
         return {
-            status: 'NO_DATA',
+            status: 'ERROR',
+            message: 'ไม่พบข้อมูล Test ในระบบ กรุณาลองใหม่อีกครั้ง!',  
             data: null
         };
     }

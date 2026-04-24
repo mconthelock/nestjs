@@ -64,7 +64,7 @@ export class LoadLessTestService {
             if ( serialCol === serial && orderCol === order && statusCol === 'OK') {
                 return {
                     status: 'SUCCESS',
-                    mesage: null,
+                    message: null,
                     data: {
                         inducedVoltageConstant: cols[9]
                     }

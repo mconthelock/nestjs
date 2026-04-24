@@ -38,7 +38,10 @@ export class LoadLessTestService {
         const fileName = `${year}_${this.pad(month)}${this.pad(day)}.csv`;
         const fullPath = path.join(folderPath, fileName);
         if (!fs.existsSync(fullPath)) {
-            throw new Error(`File not found: ${fullPath}`);
+            return {
+                status: 'FILE_NOT_FOUND',
+                data: null
+            };
         }
 
         const fileStream = fs.createReadStream(fullPath);

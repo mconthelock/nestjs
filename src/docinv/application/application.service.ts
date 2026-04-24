@@ -48,7 +48,8 @@ export class ApplicationService {
 
     async findAll() {
         const apps = await this.apps.find();
-        return Promise.all(apps.map((app) => this.mapApplicationFiles(app)));
+        //return Promise.all(apps.map((app) => this.mapApplicationFiles(app)));
+        return apps;
     }
 
     async create(

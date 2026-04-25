@@ -106,12 +106,8 @@ export class OracleRepository {
             `;
 
             // Execute stored procedure
-            const result = await connection.execute(sql, bindParams);
-
-            // Commit only if autoCommit is disabled
-            if (result?.outBinds === undefined && connection?.commit) {
-                await connection.commit();
-            }
+            await connection.execute(sql, bindParams);
+            await connection.commit();
         } finally {
             // Always release query runner
             await runner.release();

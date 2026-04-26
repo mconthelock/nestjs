@@ -3,24 +3,24 @@ import { BusDispatchStop } from './bus_dispatch_stop.entity';
 
 @Entity({ name: 'BUS_DISPATCH_PASSENGER' })
 export class BusDispatchPassenger {
-  @PrimaryColumn({ name: 'DISPATCH_ID', type: 'number' })
-  dispatch_id: number;
+    @PrimaryColumn()
+    DISPATCH_ID: number;
 
-  @Column({ name: 'STOP_ID', type: 'number' })
-  stop_id: number;
+    @Column()
+    STOP_ID: number;
 
-  @PrimaryColumn({ name: 'EMPNO', type: 'varchar2', length: 5 })
-  empno: string;
+    @PrimaryColumn()
+    EMPNO: string;
 
-  @Column({ name: 'STATUS', type: 'varchar2', length: 1, default: () => "'E'" })
-  status: string;
+    @Column()
+    STATUS: string;
 
-  @ManyToOne(() => BusDispatchStop, (s) => s.passengers, { onDelete: 'CASCADE' })
-  @JoinColumn([
-    { name: 'DISPATCH_ID', referencedColumnName: 'dispatch_id' },
-    { name: 'STOP_ID', referencedColumnName: 'stop_id' },
-  ])
-  stop: BusDispatchStop;
-  
+    @ManyToOne(() => BusDispatchStop, (s) => s.passengers, {
+        onDelete: 'CASCADE',
+    })
+    @JoinColumn([
+        { name: 'DISPATCH_ID', referencedColumnName: 'DISPATCH_ID' },
+        { name: 'STOP_ID', referencedColumnName: 'STOP_ID' },
+    ])
+    stop: BusDispatchStop;
 }
-

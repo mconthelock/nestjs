@@ -2,33 +2,37 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { FinDsService } from './fin-ds.service';
 import { CreateFinDDto } from './dto/create-fin-d.dto';
 import { UpdateFinDDto } from './dto/update-fin-d.dto';
+import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 @Controller('fin-ds')
 export class FinDsController {
   constructor(private readonly finDsService: FinDsService) {}
 
-  @Post()
-  create(@Body() createFinDDto: CreateFinDDto) {
-    return this.finDsService.create(createFinDDto);
-  }
+
 
   @Get()
   findAll() {
     return this.finDsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.finDsService.findOne(+id);
+  @Post()
+  @UseTransaction('webformconnection')
+  create(@Body() createFinDDto: CreateFinDDto) {
+    return this.finDsService.create(createFinDDto);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFinDDto: UpdateFinDDto) {
-    return this.finDsService.update(+id, updateFinDDto);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.finDsService.findOne(+id);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.finDsService.remove(+id);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateFinDDto: UpdateFinDDto) {
+  //   return this.finDsService.update(+id, updateFinDDto);
+  // }
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.finDsService.remove(+id);
+  // }
 }

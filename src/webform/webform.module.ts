@@ -15,6 +15,8 @@ import { RqffrmModule } from './rqffrm/rqffrm.module';
 import { PurCpmModule } from './purform/pur-cpm/pur-cpm.module';
 import { PurFileModule } from './purform/pur-file/pur-file.module';
 import { OrganizationsModule } from './organizations/organizations.module';
+import { GpformModule } from './gpform/gpform.module';
+import { FinformModule } from './finform/finform.module';
 
 @Module({
   imports: [
@@ -33,7 +35,9 @@ import { OrganizationsModule } from './organizations/organizations.module';
     RqffrmModule,
     PurCpmModule,
     PurFileModule,
-    OrganizationsModule
+    OrganizationsModule,
+    GpformModule,
+    FinformModule
   ],
 })
 export class WebformModule {}

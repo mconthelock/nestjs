@@ -18,7 +18,7 @@ export class SaveDto {
     @IsString()
     item: string;
 
-    @ApiProperty({ example: 1 })
+    @ApiProperty({ example: 999 })
     @IsNumber()
     dwgid: number;
 

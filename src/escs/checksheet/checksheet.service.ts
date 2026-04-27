@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ChecksheetRepository } from './checksheet.repository';
 import { InCheckDto } from './dto/in-check.dto';
 import { SaveDto } from './dto/save.dto';
 import { DeleteDto } from './dto/delete.dto';
 import { ChecksheetResponseDto } from './dto/response.dto';
+import { ChecksheetProc } from './enums/proc.enum';
 
 @Injectable()
 export class ChecksheetService {
@@ -18,12 +19,16 @@ export class ChecksheetService {
      * @return  {Promise<ChecksheetResponseDto>} Result of IN_CHECK procedure
      */
     async inCheck(dto: InCheckDto): Promise<ChecksheetResponseDto> {
-        const res = await this.repo.getInCheck(dto);
-        return {
-            status: res?.length ? 'SUCCESS' : 'ERROR',
-            message: res?.length ? null : 'No data found',
-            data: res,
-        };
+        try {
+            const res = await this.repo.getInCheck(dto);
+            return {
+                status: 'SUCCESS',
+                message: res.length ? null : 'No data found',
+                data: res,
+            };
+        } catch (err) {
+            throw new InternalServerErrorException('IN_CHECK failed');
+        }
     }
 
     /**
@@ -35,13 +40,17 @@ export class ChecksheetService {
      * @return  {Promise<ChecksheetResponseDto>}
      */
     async save(dto: SaveDto): Promise<ChecksheetResponseDto> {
-        const fn = this.fnAction(dto.action);
-        await this.repo.saveAction(fn, dto);
-        return {
-            status: 'SUCCESS',
-            message: null,
-            data: null,
-        };
+        try {
+            const proc = this.fnAction(dto.action);
+            await this.repo.saveAction(proc, dto);
+            return {
+                status: 'SUCCESS',
+                message: null,
+                data: null,
+            };
+        } catch (err) {
+            throw new InternalServerErrorException('SAVE failed');
+        }
     }
 
     /**
@@ -63,16 +72,16 @@ export class ChecksheetService {
     /**
      * Get function mapping.
      */
-    private fnAction(d: string): string {
-        switch (d) {
+    private fnAction(action: string): string {
+        switch (action) {
             case 'draft':
-                return 'IN_DRAFT';
+                return ChecksheetProc.IN_DRAFT;
             case 'submit':
-                return 'IN_SUBMIT';
+                return ChecksheetProc.IN_SUBMIT;
             case 'edit':
-                return 'FL_EDIT';
+                return ChecksheetProc.FL_EDIT;
             default:
-                return 'ERR';
+                throw new Error(`Invalid action: ${action}`);
         }
     }
 }

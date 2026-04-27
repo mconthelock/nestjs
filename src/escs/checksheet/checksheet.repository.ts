@@ -3,6 +3,7 @@ import { OracleRepository } from 'src/common/repositories/oracle-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { SaveDto } from './dto/save.dto';
+import { ChecksheetProc } from './enums/proc.enum';
 
 @Injectable()
 export class ChecksheetRepository extends OracleRepository {
@@ -18,7 +19,7 @@ export class ChecksheetRepository extends OracleRepository {
      */
     getInCheck(dto: any) {
         return this.execCursor(
-            'IN_CHECK',
+            ChecksheetProc.IN_CHECK,
             dto,
             ['prod', 'order', 'item', 'dwgid', 'reg', 'user'],
         );

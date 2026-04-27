@@ -1,5 +1,6 @@
 import { DataSource, QueryRunner } from 'typeorm';
 import * as oracledb from 'oracledb';
+import { Connection, Result } from 'oracledb';
 
 /**
  * Oracle Base Repository
@@ -11,12 +12,37 @@ export class OracleRepository {
 
     /**
      * Create query runner safely
-     * @returns {Promise<QueryRunner>}
      */
     private async createRunner(): Promise<QueryRunner> {
         const runner = this.ds.createQueryRunner();
         await runner.connect();
         return runner;
+    }
+
+    /**
+     * Get native Oracle connection
+     */
+    private getConnection(runner: QueryRunner): Connection {
+        return (runner as any).databaseConnection as Connection;
+    }
+
+    /**
+     * Validate & map bind params
+     */
+    private mapBindParams(
+        params: Record<string, any>,
+        bindOrder: string[]
+    ): Record<string, any> {
+        const bindParams: Record<string, any> = {};
+
+        for (const key of bindOrder) {
+            if (!(key in params)) {
+                throw new Error(`Missing param: ${key}`);
+            }
+            bindParams[key] = params[key];
+        }
+
+        return bindParams;
     }
 
     /**
@@ -34,17 +60,10 @@ export class OracleRepository {
         bindOrder: string[]
     ) {
         const runner = await this.createRunner();
+        const connection = this.getConnection(runner);
 
         try {
-            // Use native Oracle connection (required for REF CURSOR)
-            const connection: any = (runner as any).databaseConnection;
-
-            const bindParams: Record<string, any> = {};
-
-            // Map input parameters based on defined order
-            bindOrder.forEach((key) => {
-                bindParams[key] = params[key];
-            });
+            const bindParams = this.mapBindParams(params, bindOrder);
 
             // Define OUT cursor parameter
             bindParams.RESULT = {
@@ -59,13 +78,16 @@ export class OracleRepository {
                 ); END;
             `;
 
-            const result = await connection.execute(sql, bindParams);
+            const result = await connection.execute(sql, bindParams, { outFormat: oracledb.OUT_FORMAT_OBJECT });
             const cursor = result.outBinds.RESULT;
             const rows   = await cursor.getRows();
 
             await cursor.close();
 
             return rows;
+        } catch (error) {
+            console.error(`Error executing procedure ${procName}:`, error);
+            throw error;
         } finally {
             // Always release query runner
             await runner.release();
@@ -87,17 +109,10 @@ export class OracleRepository {
         bindOrder: string[]
     ) {
         const runner = await this.createRunner();
+        const connection = this.getConnection(runner);
 
         try {
-            // Use native Oracle connection (required for procedure execution)
-            const connection: any = (runner as any).databaseConnection;
-
-            const bindParams: Record<string, any> = {};
-
-            // Map input parameters based on defined order
-            bindOrder.forEach((key) => {
-                bindParams[key] = params[key];
-            });
+            const bindParams = this.mapBindParams(params, bindOrder);
 
             const sql = `
                 BEGIN ${procName}(
@@ -108,6 +123,8 @@ export class OracleRepository {
             // Execute stored procedure
             await connection.execute(sql, bindParams);
             await connection.commit();
+        } catch (error) {
+            throw error;
         } finally {
             // Always release query runner
             await runner.release();

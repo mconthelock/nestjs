@@ -2,12 +2,12 @@ import {
     Column,
     Entity,
     JoinColumn,
-    OneToOne,
+    ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 import { ORDERS_DRAWING } from './ORDERS_DRAWING.entity';
-import { ORDERS } from './ORDERS.entity';
+import { USERS } from './USERS.entity';
 
 @Entity({ name: 'RETURN_APV_LIST', schema: 'ESCCHKSHT' })
 export class RETURN_APV_LIST {
@@ -47,7 +47,7 @@ export class RETURN_APV_LIST {
     @Column()
     NSTATUS: number;
 
-    @OneToOne(() => ORDERS_DRAWING)
+    @ManyToOne(() => ORDERS_DRAWING)
     @JoinColumn([
         { name: 'VPROD', referencedColumnName: 'ORD_PRODUCTION' },
         { name: 'VORD_NO', referencedColumnName: 'ORD_NO' },
@@ -55,4 +55,8 @@ export class RETURN_APV_LIST {
         { name: 'NDRAWINGID', referencedColumnName: 'ORDDW_ID' },
     ])
     ordersDrawing: ORDERS_DRAWING;
+
+    @ManyToOne(() => USERS)
+    @JoinColumn({ name: 'NUSERCREATE', referencedColumnName: 'USR_ID' })
+    userCreate: USERS;
 }

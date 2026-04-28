@@ -12,10 +12,17 @@ export class LoadLessTestResultDto {
 
 export class LoadLessTestResponseDto {
     @ApiProperty({ 
-        example: 'OK', 
+        example: 'SUCCESS', 
         description: 'Response status' 
     })
-    status: 'OK' | 'NO_DATA' | 'FILE_NOT_FOUND';
+    status: 'SUCCESS' | 'ERROR' ;
+
+    @ApiProperty({ 
+        example: 'ไม่พบข้อมูล Test ในระบบ กรุณาลองใหม่อีกครั้ง!', 
+        description: 'Error message if status is ERROR', 
+        nullable: true 
+    })
+    message: string | null;
 
     @ApiProperty({ 
         type: LoadLessTestResultDto, 

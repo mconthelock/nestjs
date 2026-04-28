@@ -1,8 +1,15 @@
-import { Column, Entity, PrimaryGeneratedColumn , ManyToOne,JoinColumn, Code } from 'typeorm';
-import { PurVendor } from '../../pur_vendors/entities/pur_vendor.entity';
+import {
+    Column,
+    Entity,
+    PrimaryGeneratedColumn,
+    ManyToOne,
+    JoinColumn,
+    Code,
+} from 'typeorm';
+import { PurVendor } from './pur_vendor.entity';
 @Entity({
-  schema: 'PURSYS',
-  name: 'PUR_VENDORS_ADDRESS'
+    schema: 'PURSYS',
+    name: 'PUR_VENDORS_ADDRESS',
 })
 export class PurVendorsAddress {
     @PrimaryGeneratedColumn()
@@ -15,10 +22,10 @@ export class PurVendorsAddress {
     ADDR_LINE1: string;
 
     @Column()
-    ADDR_LINE2: string; 
-    
+    ADDR_LINE2: string;
+
     @Column()
-    ADDR_LINE3: string; 
+    ADDR_LINE3: string;
 
     @Column()
     ADDR_CITY: string;
@@ -32,9 +39,9 @@ export class PurVendorsAddress {
     @Column()
     ADDR_ZIPCODE: string;
 
-    @ManyToOne(() => PurVendor, (vendor) => vendor.VENDOR_ADDRESS,{
-      onDelete: 'CASCADE'
+    @ManyToOne(() => PurVendor, (vendor) => vendor.VENDOR_ADDRESS, {
+        onDelete: 'CASCADE',
     })
     @JoinColumn({ name: 'VENDOR_ID' })
-    vendor: PurVendor;  
+    vendor: PurVendor;
 }

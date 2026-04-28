@@ -27,6 +27,7 @@ import { MfgSerialModule } from './mfg-serial/mfg-serial.module';
 import { MfgDrawingActionModule } from './mfg-drawing-action/mfg-drawing-action.module';
 import { ReturnApvListModule } from './return-apv-list/return-apv-list.module';
 import { OrdersDrawingModule } from './orders-drawing/orders-drawing.module';
+import { ChecksheetModule } from './checksheet/checksheet.module';
 import { GetOrderModule } from './get-order/get-order.module';
 
 @Module({
@@ -59,6 +60,7 @@ import { GetOrderModule } from './get-order/get-order.module';
         UsersSectionModule,
         ReturnApvListModule,
         OrdersDrawingModule,
+        ChecksheetModule,
         GetOrderModule,
     ],
 })

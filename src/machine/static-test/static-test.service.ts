@@ -38,7 +38,11 @@ export class StaticTestService {
         const fileName = `(Static${machineNo})_${year}${this.pad(month)}.csv`;
         const fullPath = path.join(folderPath, fileName);
         if (!fs.existsSync(fullPath)) {
-            throw new Error(`File not found: ${fullPath}`);
+            return {
+                status: 'ERROR',
+                message: `File not found: ${fileName}`,
+                data: null
+            };
         }
 
         const fileStream = fs.createReadStream(fullPath);
@@ -53,7 +57,8 @@ export class StaticTestService {
             const statusCol = cols[cols.length - 2]?.trim();
             if (serialCol === serial && statusCol === 'OK') {
                 return {
-                    status: 'OK',
+                    status: 'SUCCESS',
+                    message: null,
                     data: {
                         resistanceMotorU: cols[15],
                         resistanceMotorV: cols[20],
@@ -66,7 +71,8 @@ export class StaticTestService {
         }
 
         return {
-            status: 'NO_DATA',
+            status: 'ERROR',
+            message: 'ไม่พบข้อมูล Test ในระบบ กรุณาลองใหม่อีกครั้ง!',
             data: null
         };
     }

@@ -1,32 +1,38 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryColumn,
+} from 'typeorm';
 import { BusDispatchLine } from './bus_dispatch_line.entity';
 import { BusDispatchPassenger } from './bus_dispatch_passenger.entity';
 
 @Entity({ name: 'BUS_DISPATCH_STOP' })
 export class BusDispatchStop {
+    @PrimaryColumn()
+    DISPATCH_ID: number;
 
-  @PrimaryColumn({ name: 'DISPATCH_ID', type: 'number' })
-  dispatch_id: number;
+    @Column() // value = BUSID
+    LINE_ID: number;
 
-  @Column({ name: 'LINE_ID', type: 'number' }) // value = BUSID
-  line_id: number;
+    @PrimaryColumn()
+    STOP_ID: number;
 
-  @PrimaryColumn({ name: 'STOP_ID', type: 'number' })
-  stop_id: number;
+    @Column()
+    STOP_NAME: string | null;
 
-  @Column({ name: 'STOP_NAME', type: 'varchar2', length: 100, nullable: true })
-  stop_name: string | null;
+    @Column()
+    PLAN_TIME: string | null;
 
-  @Column({ name: 'PLAN_TIME', type: 'varchar2', length: 4, nullable: true })
-  plan_time: string | null;
+    @ManyToOne(() => BusDispatchLine, (l) => l.stops, { onDelete: 'CASCADE' })
+    @JoinColumn([
+        { name: 'DISPATCH_ID', referencedColumnName: 'DISPATCH_ID' },
+        { name: 'LINE_ID', referencedColumnName: 'BUSID' },
+    ])
+    line: BusDispatchLine;
 
-  @ManyToOne(() => BusDispatchLine, (l) => l.stops, { onDelete: 'CASCADE' })
-  @JoinColumn([
-    { name: 'DISPATCH_ID', referencedColumnName: 'dispatch_id' },
-    { name: 'LINE_ID', referencedColumnName: 'busid' },
-  ])
-  line: BusDispatchLine;
-
-  @OneToMany(() => BusDispatchPassenger, (p) => p.stop)
-  passengers: BusDispatchPassenger[];
+    @OneToMany(() => BusDispatchPassenger, (p) => p.stop)
+    passengers: BusDispatchPassenger[];
 }

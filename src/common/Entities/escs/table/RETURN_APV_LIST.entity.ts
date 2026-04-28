@@ -27,6 +27,15 @@ export class RETURN_APV_LIST {
     NDRAWINGID: number;
 
     @Column()
+    NSECID: number;
+
+    @Column()
+    NSTATUS: number;
+
+    @Column()
+    VREASON: string;
+
+    @Column()
     NUSERCREATE: number;
 
     @Column()
@@ -39,13 +48,7 @@ export class RETURN_APV_LIST {
     DDATEUPDATE: Date;
 
     @Column()
-    NSECID: number;
-
-    @Column()
     VSTATUSCODE: string;
-
-    @Column()
-    NSTATUS: number;
 
     @ManyToOne(() => ORDERS_DRAWING)
     @JoinColumn([

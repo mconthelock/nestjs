@@ -21,6 +21,7 @@ export async function renderMailTemplate(
         join(
             process.cwd(),
             'dist',
+            'src',
             'common',
             'services',
             'mail',

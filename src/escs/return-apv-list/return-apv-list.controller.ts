@@ -10,17 +10,20 @@ import {
 import { ReturnApvListService } from './return-apv-list.service';
 import { CreateReturnApvListDto } from './dto/create-return-apv-list.dto';
 import { ActionReturnApvListDto, UpdateReturnApvListDto } from './dto/update-return-apv-list.dto';
+import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 @Controller('escs/return-apv-list')
 export class ReturnApvListController {
     constructor(private readonly returnApvListService: ReturnApvListService) {}
 
     @Post()
+    @UseTransaction('escsConnection')
     return(@Body() dto: CreateReturnApvListDto) {
         return this.returnApvListService.return(dto);
     }
 
     @Patch()
+    @UseTransaction('escsConnection')
     actions(@Body() dto: ActionReturnApvListDto) {
         return this.returnApvListService.actions(dto);
     }

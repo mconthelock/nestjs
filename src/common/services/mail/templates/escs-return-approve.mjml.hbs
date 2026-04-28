@@ -1,0 +1,85 @@
+<mjml>
+    <mj-head>
+        <mj-attributes>
+            <mj-text font-family="Arial, Helvetica, sans-serif" font-size="14px" />
+        </mj-attributes>
+    </mj-head>
+
+    <mj-body background-color="#f4f6f8" width="800px">
+
+        <!-- Header -->
+        <mj-section background-color="#1e293b" padding="16px">
+            <mj-column>
+                <mj-text color="#ffffff" font-size="18px" font-weight="bold">
+                    Approval Notification
+                </mj-text>
+            </mj-column>
+        </mj-section>
+
+        <!-- Content Card -->
+        <mj-section padding="0">
+            <mj-column background-color="#ffffff" padding="20px" border-radius="6px">
+
+                <mj-text>
+                    Dear {{toName}},
+                </mj-text>
+
+                <mj-text color="#555">
+                    You have the following items:
+                </mj-text>
+
+                <!-- Table -->
+                <mj-table width="100%" table-layout="fixed">
+
+                    <tr style="background:#e5e7eb; font-weight:bold;">
+                        <th width="12%" style="padding:8px;">Production</th>
+                        <th width="15%" style="padding:8px;">Order No.</th>
+                        <th width="10%" style="padding:8px;">Item No.</th>
+                        <th width="20%" style="padding:8px;">Project Name</th>
+                        <th width="15%" style="padding:8px;">Part Name</th>
+                        <th width="15%" style="padding:8px;">Drawing</th>
+                        <th width="13%" style="padding:8px;">Status</th>
+                    </tr>
+
+                    {{#each list}}
+                    <tr style="border-bottom:1px solid #eee;">
+                        <td style="padding:8px;">{{PROD}}</td>
+                        <td style="padding:8px;">{{ORD_NO}}</td>
+                        <td style="padding:8px;">{{ITEM}}</td>
+                        <td style="padding:8px;">{{PROJECT}}</td>
+                        <td style="padding:8px;">{{PATHNAME}}</td>
+                        <td style="padding:8px;">{{DRAWING}}</td>
+                        <td style="padding:8px;">
+                            {{#if APPROVE}}
+                            <span style="color:#16a34a; font-weight:bold;">Approved</span>
+                            {{else}}
+                            <span style="color:#dc2626; font-weight:bold;">Rejected</span>
+                            {{/if}}
+                        </td>
+                    </tr>
+                    {{/each}}
+
+                </mj-table>
+
+                <mj-text padding-top="10px">
+                    Please log in to the system for more details.
+                </mj-text>
+                <mj-button font-family="Helvetica" background-color="#f45e43" color="white"
+                    href="https://amecweb.mitsubishielevatorasia.co.th/autochecksheet/">
+                    Log In
+                </mj-button>
+
+            </mj-column>
+        </mj-section>
+
+        <!-- Footer -->
+        <mj-section background-color="#f1f5f9" padding="10px">
+            <mj-column>
+                <mj-text font-size="12px" color="#888" align="center">
+                    This is an automated email. Please do not reply.
+                </mj-text>
+            </mj-column>
+        </mj-section>
+
+    </mj-body>
+</mjml>

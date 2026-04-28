@@ -18,6 +18,11 @@ export class CreateReturnApvListDto {
     VITEM: string;
 
     @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
+    VREASON: string;
+
+    @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
     NDRAWINGID: number;

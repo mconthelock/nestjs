@@ -69,6 +69,39 @@ export async function moveFileFromMulter({
     };
 }
 
+export async function moveFileFormPath({
+    originalPath, // เช่น /path/to/source/file.txt
+    destination, // เช่น /path/to/destination
+    newName, // (ไม่จำเป็น) ชื่อไฟล์ใหม่ที่ต้องการใช้ในปลายทาง ถ้าไม่ส่งจะใช้ชื่อเดิมของไฟล์ต้นทาง
+}: {
+    originalPath: string;
+    destination: string;
+    newName?: string;
+}): Promise<{ status: boolean; path: string; fileName: string }> {
+    await fs.mkdir(destination, { recursive: true });
+    const fileName = newName ?? basename(originalPath);
+    const targetPath = join(destination, fileName);
+    let status = false;
+    try {
+        await fs.rename(originalPath, targetPath);
+        status = true;
+    } catch (err: any) {
+        if (err.code === 'EXDEV') {
+            await fs.copyFile(originalPath, targetPath);
+            await fs.unlink(originalPath);
+            status = true;
+        } else {
+            throw err;
+        }
+    }
+
+    return {
+        status,
+        path: targetPath,
+        fileName,
+    };
+}
+
 /**
  * Copy ไฟล์จาก source ไปยัง destination โดยสร้างโฟลเดอร์ปลายทางถ้ายังไม่มี และคืน path ของไฟล์ที่ถูกคัดลอก
  * @param source - path ของไฟล์ต้นทาง

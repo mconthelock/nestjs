@@ -28,6 +28,7 @@ import { MfgDrawingActionModule } from './mfg-drawing-action/mfg-drawing-action.
 import { ReturnApvListModule } from './return-apv-list/return-apv-list.module';
 import { OrdersDrawingModule } from './orders-drawing/orders-drawing.module';
 import { ChecksheetModule } from './checksheet/checksheet.module';
+import { GetOrderModule } from './get-order/get-order.module';
 
 @Module({
     imports: [
@@ -60,6 +61,7 @@ import { ChecksheetModule } from './checksheet/checksheet.module';
         ReturnApvListModule,
         OrdersDrawingModule,
         ChecksheetModule,
+        GetOrderModule,
     ],
 })
 export class ESCSModule {}

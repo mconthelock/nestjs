@@ -1,9 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { CreateReturnApvListDto } from './dto/create-return-apv-list.dto';
-import { ActionReturnApvListDto, UpdateReturnApvListDto } from './dto/update-return-apv-list.dto';
+import {
+    ActionReturnApvListDto,
+    UpdateReturnApvListDto,
+} from './dto/update-return-apv-list.dto';
 import { ReturnApvListRepository } from './return-apv-list.repository';
 import { OrdersDrawingService } from '../orders-drawing/orders-drawing.service';
 import { MailService } from 'src/common/services/mail/mail.service';
+import {
+    joinPaths,
+    moveFileFormPath,
+    moveFileFromMulter,
+} from 'src/common/utils/files.utils';
+import { GetOrderService } from '../get-order/get-order.service';
 
 @Injectable()
 export class ReturnApvListService {
@@ -11,27 +20,8 @@ export class ReturnApvListService {
         private readonly repo: ReturnApvListRepository,
         private readonly orderDrawingService: OrdersDrawingService,
         private readonly mailService: MailService,
+        private readonly getOrderService: GetOrderService,
     ) {}
-
-    async upsert(dto: CreateReturnApvListDto | UpdateReturnApvListDto) {
-        try {
-            const res = await this.repo.upsert(dto);
-            if (!res) {
-                return {
-                    status: false,
-                    message: 'Upsert ReturnApvList Failed',
-                    data: dto,
-                };
-            }
-            return {
-                status: true,
-                message: 'Upsert ReturnApvList Successfully',
-                data: res,
-            };
-        } catch (error) {
-            throw new Error(`Failed to upsert ReturnApvList: ${error.message}`);
-        }
-    }
 
     async return(dto: CreateReturnApvListDto) {
         try {
@@ -53,13 +43,24 @@ export class ReturnApvListService {
     }
 
     async actions(dto: ActionReturnApvListDto) {
+        let filesList: {
+            masterPath: string;
+            tempPath: string;
+            fileName: string;
+        }[] = [];
         try {
+            let targetPath: string[] = [];
             const list = dto.LIST;
-            const listUpdate = [];
-            for( const l of list ){
+            const listsByEmp: Record<
+                string,
+                { EMAIL: string; USER_CREATE: string; rows: any[] }
+            > = {};
+            for (const l of list) {
                 const status = l.NSTATUS === 1 ? 5 : l.NSTATUS === 2 ? 7 : 8;
                 await this.repo.upsert(l);
                 const data = await this.repo.findById(l.NID);
+                const userData = data.userCreate.user;
+
                 const updateDwg = await this.orderDrawingService.update({
                     ORD_PRODUCTION: data.VPROD,
                     ORD_ITEM: data.VITEM,
@@ -68,30 +69,97 @@ export class ReturnApvListService {
                     ORDDW_FORELEAD_STATUS: status,
                 });
                 if (!updateDwg.status) {
-                    throw new Error(`Failed to update ORDERS_DRAWING with NID: ${l.NID}`);
+                    throw new Error(
+                        `Failed to update ORDERS_DRAWING with NID: ${l.NID}`,
+                    );
                 }
-                listUpdate.push({
-                    PROD: data.VPROD,
-                    ITEM: data.VITEM,
-                    ORD_NO: data.VORD_NO,
-                    DRAWING: data.ordersDrawing.ORDDW_DRAWING,
-                    PATHNAME: data.ordersDrawing.ORDDW_PART,
-                    PROJECT: data.ordersDrawing.orders.ORD_PROJECT,
-                });
-            }
-            if(dto.NSTATUS === 1) {
-                await this.mailService.sendMail({
-                    to: 'example@example.com',
-                    subject: 'Status Update',
-                    html: 'The status has been updated to 1.',
-                });
 
+                //prettier-ignore
+                if (l.NSTATUS === 1) {
+                    const orderRes = await this.getOrderService.findOne(
+                        data.VPROD,
+                        data.VORD_NO,
+                        data.VITEM,
+                        data.NDRAWINGID,
+                    );
+                    if(!orderRes.status) {
+                        throw new Error(
+                            `Failed to get order data for PROD: ${data.VPROD}, ORD_NO: ${data.VORD_NO}, ITEM: ${data.VITEM}, DRAWINGID: ${data.NDRAWINGID}`,
+                        );
+                    }
+                    const orderData = orderRes.data;
+                    const masterPath = orderData.FDP_DESCRIPTION.includes('(TEMP)') ? orderData.FDP_DESCRIPTION.replace('(TEMP)', '(IS)') : orderData.FDP_DESCRIPTION;
+                    const tempPath = orderData.FDP_DESCRIPTION.includes('(TEMP)') ? orderData.FDP_DESCRIPTION : `${orderData.FDP_DESCRIPTION.replace('(IS)', '(TEMP)')}`;
+                    console.log(masterPath, tempPath);
+                    
+                    const moveFileRes = await moveFileFormPath({
+                        originalPath: await joinPaths(masterPath, orderData.ORDDW_FILENAME),
+                        destination: tempPath
+                    });
+                    if(!moveFileRes.status) {
+                         throw new Error(
+                            `Failed to move file from ${masterPath} to ${tempPath} for order PROD: ${data.VPROD}, ORD_NO: ${data.VORD_NO}, ITEM: ${data.VITEM}, DRAWINGID: ${data.NDRAWINGID}`,
+                        );
+                    }
+                    targetPath.push(moveFileRes.path);
+                    filesList.push({
+                        masterPath,
+                        tempPath,
+                        fileName: orderData.ORDDW_FILENAME,
+                    });
+                }
+                const empno = userData.SEMPNO;
+                if (!listsByEmp[empno]) {
+                    listsByEmp[empno] = {
+                        EMAIL: userData.SRECMAIL,
+                        USER_CREATE: userData.SNAME,
+                        rows: [],
+                    };
+                }
+
+                listsByEmp[empno].rows.push({
+                    PROD: data.VPROD,
+                    ORD_NO: data.VORD_NO,
+                    ITEM: data.VITEM,
+                    PROJECT: data.ordersDrawing.orders.ORD_PROJECT,
+                    PATHNAME: data.ordersDrawing.ORDDW_PART,
+                    DRAWING: data.ordersDrawing.ORDDW_DRAWING,
+                    APPROVE: l.NSTATUS === 1,
+                    USER_CREATE: userData.SNAME,
+                    EMAIL: userData.SRECMAIL,
+                });
             }
+            for (const emp of Object.keys(listsByEmp)) {
+                const empData = listsByEmp[emp];
+                await this.mailService.sendMail({
+                    to:
+                        process.env.NODE_ENV != 'production'
+                            ? process.env.MAIL_ADMIN
+                            : empData.EMAIL,
+                    subject: 'Auto check sheet return approve',
+                    template: 'escs-return-approve',
+                    context: {
+                        toName: empData.USER_CREATE,
+                        list: empData.rows,
+                    },
+                    bcc: process.env.MAIL_ADMIN,
+                });
+            }
+
+            // throw new Error(`test`);
+
             return {
                 status: true,
                 message: 'Return Successfully',
+                targetPath,
             };
         } catch (error) {
+            for (const file of filesList) {
+                await moveFileFormPath({
+                    originalPath: await joinPaths(file.tempPath, file.fileName),
+                    destination: file.masterPath,
+                });
+            }
             throw new Error(`Failed to return: ${error.message}`);
         }
     }

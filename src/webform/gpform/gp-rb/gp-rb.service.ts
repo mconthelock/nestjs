@@ -20,7 +20,7 @@ export class GpRbService {
     async create(dto: CreateGpRbDto, ip: string) {
         try {
             const formmst =
-                await this.formmstService.getFormMasterByVaname('GP-GAR');
+                await this.formmstService.getFormMasterByVaname('GP-RB');
             const createForm = await this.formCreateService.create(
                 {
                     NFRMNO: formmst.NNO,

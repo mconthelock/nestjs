@@ -2,7 +2,7 @@ import { Type } from 'class-transformer';
 import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateGpRbDto {
-    @IsNotEmpty()
+    /*@IsNotEmpty()
     @IsString()
     @Type(() => String)
     REQBY: string;
@@ -10,7 +10,7 @@ export class CreateGpRbDto {
     @IsNotEmpty()
     @IsString()
     @Type(() => String)
-    INPUTBY: string;
+    INPUTBY: string;*/
     
     @IsNotEmpty()
     @IsString()

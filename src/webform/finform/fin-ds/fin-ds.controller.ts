@@ -4,7 +4,7 @@ import { CreateFinDDto } from './dto/create-fin-d.dto';
 import { UpdateFinDDto } from './dto/update-fin-d.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 
-@Controller('fin-ds')
+@Controller('finform/fin-ds')
 export class FinDsController {
   constructor(private readonly finDsService: FinDsService) {}
 

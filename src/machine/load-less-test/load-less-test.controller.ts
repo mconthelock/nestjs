@@ -9,14 +9,9 @@ import { LoadLessTestResponseDto } from './dto/load-less-test-result.dto';
 export class LoadLessTestController {
     constructor(private readonly service: LoadLessTestService) {}
 
-    /**
-     * Get load less test result by machine and serial number
-     * @author  Mr.Pathanapong Sokpukeaw
-     * @since   2026-04-21
-     */
     @Get('result')
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Get load less test result' })
+    @ApiOperation({ summary: 'Get load less test result from CSV file by machine and serial number' })
     @ApiResponse({ status: 200, type: LoadLessTestResponseDto })
     async getLoadLessTestResult(
         @Query() query: GetLoadLessTestDto,

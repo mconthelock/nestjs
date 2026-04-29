@@ -26,8 +26,8 @@ export class GpRbService {
                     NFRMNO: formmst.NNO,
                     VORGNO: formmst.VORGNO,
                     CYEAR: formmst.CYEAR,
-                    REQBY: dto.REQBY,
-                    INPUTBY: dto.INPUTBY,
+                    REQBY: dto.reqCode,        
+                    INPUTBY: dto.inputBy
                 },
                 ip,
             );

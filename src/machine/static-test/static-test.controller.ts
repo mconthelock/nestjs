@@ -9,14 +9,9 @@ import { StaticTestResponseDto } from './dto/static-test-result.dto';
 export class StaticTestController {
     constructor(private readonly service: StaticTestService) {}
 
-    /**
-     * Get static test result by machine and serial number
-     * @author  Mr.Pathanapong Sokpukeaw
-     * @since   2026-04-20
-     */
     @Get('result')
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Get static test result' })
+    @ApiOperation({ summary: 'Get static test result from CSV file by machine and serial number' })
     @ApiResponse({ status: 200, type: StaticTestResponseDto })
     async getStaticTestResult(
         @Query() query: GetStaticTestDto,

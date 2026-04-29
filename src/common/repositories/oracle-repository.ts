@@ -47,12 +47,6 @@ export class OracleRepository {
 
     /**
      * Execute Oracle procedure with REF CURSOR
-     * @author Mr.Pathanapong Sokpukeaw
-     * @since 2026-04-25
-     * @param {string} procName Oracle procedure name
-     * @param {Record<string, any>} params Input parameters
-     * @param {string[]} bindOrder Parameter order for binding
-     * @returns {Promise<any[]>}
      */
     protected async execCursor(
         procName: string,
@@ -86,7 +80,6 @@ export class OracleRepository {
 
             return rows;
         } catch (error) {
-            console.error(`Error executing procedure ${procName}:`, error);
             throw error;
         } finally {
             // Always release query runner
@@ -96,12 +89,6 @@ export class OracleRepository {
 
     /**
      * Execute Oracle procedure (no cursor)
-     * @author Mr.Pathanapong Sokpukeaw
-     * @since 2026-04-25
-     * @param {string} procName Oracle procedure name
-     * @param {Record<string, any>} params Input parameters
-     * @param {string[]} bindOrder Parameter order for binding
-     * @returns {Promise<void>}
      */
     protected async execProcedure(
         procName: string,
@@ -124,10 +111,21 @@ export class OracleRepository {
             await connection.execute(sql, bindParams);
             await connection.commit();
         } catch (error) {
+            try {
+                await connection.rollback();
+            } catch (_) {}
+            
             throw error;
         } finally {
             // Always release query runner
             await runner.release();
         }
+    }
+
+    /**
+     * Execute raw SQL query
+     */
+    protected async query(sql: string, params?: any) {
+        return this.ds.query(sql, params);
     }
 }

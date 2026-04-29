@@ -14,14 +14,6 @@ export class StaticTestService {
         private readonly db: Repository<SYS_FOLDER_PATH>,
     ) {}
 
-    /**
-     * Get static test result from CSV file by machine and serial number
-     * @author  Mr.Pathanapong Sokpukeaw
-     * @since   2026-04-20
-     * @param   {string} machine Machine code (e.g. 01, 02)
-     * @param   {string} serial Serial number
-     * @return  {Promise<StaticTestResponseDto | null>}
-     */
     async getStaticTestResult(machine: string, serial: string): Promise<StaticTestResponseDto | null> {
         const basePath  = await this.getPath('TSTM-001');
         const machineNo = this.formatMachine(machine);

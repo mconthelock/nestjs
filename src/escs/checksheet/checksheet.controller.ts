@@ -5,43 +5,38 @@ import { InCheckDto } from './dto/in-check.dto';
 import { SaveDto } from './dto/save.dto';
 import { DeleteDto } from './dto/delete.dto';
 import { ChecksheetResponseDto } from './dto/response.dto';
+import { GetOrderDto } from './dto/get-order.dto';
+import { GetOrderResponseDto } from './dto/get-order-response.dto';
 
 @ApiTags('ESCS Excel Checksheet')
 @Controller('checksheet')
 export class ChecksheetController {
     constructor(private readonly service: ChecksheetService) {}
 
-    /**
-     * Inspector check data checksheet for ready save.
-     * @author Mr.Pathanapong Sokpukeaw
-     * @since 2026-04-25
-     */
+    @Post('get-order')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Get order data' })
+    @ApiResponse({ status: 200, type: GetOrderResponseDto })
+    async getOrder(@Body() dto: GetOrderDto): Promise<GetOrderResponseDto | null> {
+        return this.service.getOrder(dto);
+    }
+
     @Post('in-check')
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Check data before save' })
+    @ApiOperation({ summary: 'Validate data before save' })
     @ApiResponse({ status: 200, type: ChecksheetResponseDto })
     async inCheck(@Body() dto: InCheckDto): Promise<ChecksheetResponseDto> {
         return this.service.inCheck(dto);
     }
 
-    /**
-     * User save data and excel file.
-     * @author Mr.Pathanapong Sokpukeaw
-     * @since 2026-04-25
-     */
     @Post('save')
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Save draft / submit / edit' })
+    @ApiOperation({ summary: 'Save checksheet data with workflow (draft, submit, edit)' })
     @ApiResponse({ status: 200, type: ChecksheetResponseDto })
     async save(@Body() dto: SaveDto): Promise<ChecksheetResponseDto> {
         return this.service.save(dto);
     }
 
-    /**
-     * Delete file sharepoint.
-     * @author Mr.Pathanapong Sokpukeaw
-     * @since 2026-04-25
-     */
     @Post('delete')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Delete file from SharePoint' })

@@ -303,6 +303,20 @@ export class InquiryService {
             }
 
             //Update inquiry detail
+            const inquiryDetailColumns = new Set(
+                runner.manager
+                    .getRepository(InquiryDetail)
+                    .metadata.columns.map((column) => column.propertyName),
+            );
+
+            const sanitizeDetailPayload = (payload: Record<string, any>) => {
+                return Object.fromEntries(
+                    Object.entries(payload).filter(([key]) =>
+                        inquiryDetailColumns.has(key),
+                    ),
+                );
+            };
+
             for (const dt of details) {
                 const dt_id = revised
                     ? { INQD_PREV: dt.INQD_ID, INQD_LATEST: 1 }
@@ -358,10 +372,8 @@ export class InquiryService {
                         db_detail,
                     );
                     Object.assign(dto, dt);
-                    // delete dto.INQD_ID;
-                    // delete dto.INQID;
-                    // delete dto.INQD_PREV;
-                    await runner.manager.update(InquiryDetail, dt_id, dto);
+                    const safeDto = sanitizeDetailPayload(dto);
+                    await runner.manager.update(InquiryDetail, dt_id, safeDto);
                 } else {
                     //Create new detail
                     dt.CREATE_AT = new Date();
@@ -370,7 +382,8 @@ export class InquiryService {
                         {} as createDetailDto,
                         dt,
                     );
-                    await runner.manager.save(InquiryDetail, dto);
+                    const safeDto = sanitizeDetailPayload(dto);
+                    await runner.manager.save(InquiryDetail, safeDto);
                 }
             }
 

@@ -1,87 +1,87 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ChecksheetRepository } from './checksheet.repository';
 import { InCheckDto } from './dto/in-check.dto';
 import { SaveDto } from './dto/save.dto';
 import { DeleteDto } from './dto/delete.dto';
 import { ChecksheetResponseDto } from './dto/response.dto';
+import { GetOrderDto } from './dto/get-order.dto';
+import { GetOrderResponseDto } from './dto/get-order-response.dto';
 import { ChecksheetProc } from './enums/proc.enum';
 
 @Injectable()
 export class ChecksheetService {
     constructor(private readonly repo: ChecksheetRepository) {}
 
-    /**
-     * Inspector check data checksheet for ready save.
-     * Validate data before allowing save action from Excel Add-in.
-     * @author  Mr.Pathanapong Sokpukeaw
-     * @since   2026-04-25
-     * @param   {InCheckDto} dto Input data from Excel Add-in
-     * @return  {Promise<ChecksheetResponseDto>} Result of IN_CHECK procedure
-     */
+    async getOrder(dto: GetOrderDto): Promise<GetOrderResponseDto | null> {
+        try {
+            const res = await this.repo.getOrder(dto);
+            if (!res?.length) {
+                throw new NotFoundException('Order not found');
+            }
+
+            const { ORDERNO, TYPE_MODEL } = res[0];
+            return {
+                orderNo: ORDERNO,
+                typeModel: TYPE_MODEL
+            };
+        } catch (err) {
+            if (err instanceof NotFoundException) throw err;
+
+            throw new InternalServerErrorException({
+                message: 'GET_ORDER failed',
+                error: err?.message
+            });
+        }
+    }
+
     async inCheck(dto: InCheckDto): Promise<ChecksheetResponseDto> {
         try {
             const res = await this.repo.getInCheck(dto);
             return {
                 status: 'SUCCESS',
                 message: res.length ? null : 'No data found',
-                data: res,
+                data: res
             };
         } catch (err) {
             throw new InternalServerErrorException('IN_CHECK failed');
         }
     }
 
-    /**
-     * User save data and excel file.
-     * Handle save workflow (draft / submit / edit).
-     * @author  Mr.Pathanapong Sokpukeaw
-     * @since   2026-04-25
-     * @param   {SaveDto} dto Input data from Excel Add-in
-     * @return  {Promise<ChecksheetResponseDto>}
-     */
     async save(dto: SaveDto): Promise<ChecksheetResponseDto> {
         try {
-            const proc = this.fnAction(dto.action);
-            await this.repo.saveAction(proc, dto);
+            const procedure = this.mapActionToProcedure(dto.action);
+            await this.repo.saveAction(procedure, dto);
             return {
                 status: 'SUCCESS',
-                message: null,
-                data: null,
+                message: 'Saved successfully',
+                data: null
             };
         } catch (err) {
             throw new InternalServerErrorException('SAVE failed');
         }
     }
 
-    /**
-     * Delete file from SharePoint system.
-     * (Temporary mock implementation - will integrate SharePoint service later)
-     * @author  Mr.Pathanapong Sokpukeaw
-     * @since   2026-04-25
-     * @param   {DeleteDto} dto Input data for delete operation
-     * @return  {Promise<ChecksheetResponseDto>}
-     */
     async delete(dto: DeleteDto): Promise<ChecksheetResponseDto> {
         return {
             status: 'SUCCESS',
             message: `Deleted ${dto.filename}`,
-            data: null,
+            data: null
         };
     }
 
-    /**
-     * Get function mapping.
-     */
-    private fnAction(action: string): string {
-        switch (action) {
-            case 'draft':
-                return ChecksheetProc.IN_DRAFT;
-            case 'submit':
-                return ChecksheetProc.IN_SUBMIT;
-            case 'edit':
-                return ChecksheetProc.FL_EDIT;
-            default:
-                throw new Error(`Invalid action: ${action}`);
+    private readonly actionProcedureMap: Record<string, ChecksheetProc> = {
+        draft: ChecksheetProc.IN_DRAFT,
+        submit: ChecksheetProc.IN_SUBMIT,
+        edit: ChecksheetProc.FL_EDIT
+    };
+
+    private mapActionToProcedure(action: string): ChecksheetProc {
+        const procedure = this.actionProcedureMap[action];
+
+        if (!procedure) {
+            throw new Error(`Invalid action: ${action}`);
         }
+
+        return procedure;
     }
 }

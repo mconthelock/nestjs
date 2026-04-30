@@ -11,10 +11,10 @@ import { EdrCauseMst } from '../../common/Entities/edailyreport/table/edr_cause_
 @Injectable()
 export class MfgEdrService {
   constructor(
-    @InjectRepository(EdrWorktypeMst)
+    @InjectRepository(EdrWorktypeMst, 'webformConnection')
     private readonly worktypeRepo: Repository<EdrWorktypeMst>,
 
-    @InjectRepository(EdrCauseMst)
+    @InjectRepository(EdrCauseMst, 'webformConnection')
     private readonly causeRepo: Repository<EdrCauseMst>,
   ) {}
 

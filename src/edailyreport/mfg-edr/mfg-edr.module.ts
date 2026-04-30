@@ -12,7 +12,7 @@ import { EdrCauseMst } from '../../common/Entities/edailyreport/table/edr_cause_
     TypeOrmModule.forFeature([
       EdrWorktypeMst,
       EdrCauseMst,
-    ]),
+    ], 'webformConnection'),
   ],
   controllers: [MfgEdrController],
   providers: [MfgEdrService],

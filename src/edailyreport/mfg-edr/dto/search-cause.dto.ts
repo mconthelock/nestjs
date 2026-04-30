@@ -1,5 +1,6 @@
-import { PartialType } from '@nestjs/swagger';
+import { IsString } from 'class-validator';
 
 export class SearchCauseDto {
+  @IsString()
   CAUSE_GROUP: string;
 }

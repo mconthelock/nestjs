@@ -17,6 +17,7 @@ import { PurFileModule } from './purform/pur-file/pur-file.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { GpformModule } from './gpform/gpform.module';
 import { FinformModule } from './finform/finform.module';
+import { StInpModule } from './stform/st-inp/st-inp.module';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { FinformModule } from './finform/finform.module';
     PurFileModule,
     OrganizationsModule,
     GpformModule,
-    FinformModule
+    FinformModule,
+    StInpModule
   ],
 })
 export class WebformModule {}

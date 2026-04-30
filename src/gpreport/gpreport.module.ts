@@ -6,8 +6,20 @@ import { BusrouteModule } from './busroute/busroute.module';
 import { BuspassengerModule } from './buspassenger/buspassenger.module';
 import { OvertimeModule } from './overtime/overtime.module';
 import { DispatchModule } from './dispatch/dispatch.module';
+import { StyImageModule } from './sty-image/sty-image.module';
+import { StyPatrolModule } from './sty-patrol/sty-patrol.module';
 
 @Module({
-  imports: [NewsModule, BuslineModule, BusstopModule, BusrouteModule, BuspassengerModule, OvertimeModule, DispatchModule],
+    imports: [
+        NewsModule,
+        BuslineModule,
+        BusstopModule,
+        BusrouteModule,
+        BuspassengerModule,
+        OvertimeModule,
+        DispatchModule,
+        StyImageModule,
+        StyPatrolModule,
+    ],
 })
 export class gpreportModule {}

@@ -7,9 +7,7 @@ import { SearchSequenceOrgDto } from './dto/search-sequence-org.dto';
 
 @Injectable()
 export class SequenceOrgRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -66,4 +64,15 @@ export class SequenceOrgRepository extends BaseRepository {
     async search(dto: SearchSequenceOrgDto): Promise<SEQUENCEORG[]> {
         return await this.getRepository(SEQUENCEORG).find({ where: dto });
     }
+
+     async getByPosition(VORGNO: string, SPOSCODE: string) {
+        return await this.getRepository(SEQUENCEORG).findOne({
+            where: {
+                VORGNO: VORGNO,
+                SPOSCODE: SPOSCODE,
+            },
+            relations: ['EMPINFO'],
+        });
+    }
+
 }

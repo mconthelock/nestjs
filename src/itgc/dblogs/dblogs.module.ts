@@ -1,23 +1,27 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { Amecdblog } from 'src/common/Entities/itgc/views/amecdb.entity';
+import { IsodbLog } from 'src/common/Entities/itgc/views/isodb.entity';
+import { LndbLog } from 'src/common/Entities/itgc/views/lndb.entity';
+import { scmdbLog } from 'src/common/Entities/itgc/views/scmdb.entity';
+import { AS400dbLog } from 'src/common/Entities/itgc/views/as400db.entrity';
+
+import { SpecialuserModule } from '../specialuser/specialuser.module';
 import { DblogsService } from './dblogs.service';
 import { DblogsController } from './dblogs.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { SpecialuserModule } from '../specialuser/specialuser.module';
-import { ISOLog } from './entities/iso.entity';
-import { AMECLog } from './entities/amec.entity';
-import { LnLog } from './entities/ln.entity';
-import { SCMLog } from './entities/scm.entity';
-import { Windows } from '../oslogs/entities/windows.entity';
+
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([AMECLog], 'auditConnection'),
-    TypeOrmModule.forFeature([ISOLog], 'auditConnection'),
-    TypeOrmModule.forFeature([LnLog], 'auditConnection'),
-    TypeOrmModule.forFeature([SCMLog], 'auditConnection'),
-    TypeOrmModule.forFeature([Windows], 'auditConnection'),
-    SpecialuserModule,
-  ],
-  controllers: [DblogsController],
-  providers: [DblogsService],
+    imports: [
+        TypeOrmModule.forFeature([Amecdblog], 'docinvConnection'),
+        TypeOrmModule.forFeature([LndbLog], 'lnConnection'),
+        TypeOrmModule.forFeature(
+            [IsodbLog, scmdbLog, AS400dbLog],
+            'auditConnection',
+        ),
+        SpecialuserModule,
+    ],
+    controllers: [DblogsController],
+    providers: [DblogsService],
 })
 export class DblogsModule {}

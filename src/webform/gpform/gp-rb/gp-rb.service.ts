@@ -20,14 +20,14 @@ export class GpRbService {
     async create(dto: CreateGpRbDto, ip: string) {
         try {
             const formmst =
-                await this.formmstService.getFormMasterByVaname('GP-GAR');
+                await this.formmstService.getFormMasterByVaname('GP-RB');
             const createForm = await this.formCreateService.create(
                 {
                     NFRMNO: formmst.NNO,
                     VORGNO: formmst.VORGNO,
                     CYEAR: formmst.CYEAR,
-                    REQBY: dto.REQBY,
-                    INPUTBY: dto.INPUTBY,
+                    REQBY: dto.reqCode,        
+                    INPUTBY: dto.inputBy
                 },
                 ip,
             );

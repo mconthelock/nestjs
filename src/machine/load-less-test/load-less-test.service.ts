@@ -14,14 +14,6 @@ export class LoadLessTestService {
         private readonly db: Repository<SYS_FOLDER_PATH>,
     ) {}
 
-    /**
-     * Get load less test result from CSV file by machine and serial number
-     * @author  Mr.Pathanapong Sokpukeaw
-     * @since   2026-04-21
-     * @param   {string} serial Serial number
-     * @param   {string} order Order number
-     * @return  {Promise<LoadLessTestResponseDto | null>}
-     */
     async getLoadLessTestResult(serial: string, order: string): Promise<LoadLessTestResponseDto | null> {
         const basePath = await this.getPath('TSTM-001');
         const now   = new Date();

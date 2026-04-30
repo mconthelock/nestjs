@@ -6,26 +6,27 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { TypeOrmWinstonLogger } from '../logger/typeorm-winston.logger';
 dotenv.config();
 
-let auditConfig: TypeOrmModuleAsyncOptions;
+let lnConfig: TypeOrmModuleAsyncOptions;
 if (process.env.HOST == 'AMEC') {
-    auditConfig = {
-        name: 'auditConnection',
+    lnConfig = {
+        name: 'lnConnection',
         imports: [],
         inject: [ConfigService, WINSTON_MODULE_PROVIDER],
         useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
             type: 'mssql',
-            host: process.env.AUD_HOST,
-            port: Number(process.env.AUD_PORT) || 1433,
-            username: process.env.AUD_USER,
-            password: process.env.AUD_PASSWORD,
-            database: process.env.AUD_DATABASE || process.env.AUD_SERVICE,
+            host: process.env.LN_HOST,
+            port: Number(process.env.LN_PORT) || 1433,
+            username: process.env.LN_USER,
+            password: process.env.LN_PASSWORD,
+            database: process.env.LN_DATABASE || process.env.LN_SERVICE,
+            // entities: [__dirname + '/../../itgc/**/*.entity{.ts,.js}'],
             autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),
             retryAttempts: 5,
             retryDelay: 2000,
             options: {
-                instanceName: process.env.AUD_INSTANCE, // ใช้ instanceName แทนถ้าเป็น SQL Server ที่มี instance
+                instanceName: process.env.LN_INSTANCE, // ใช้ instanceName แทนถ้าเป็น SQL Server ที่มี instance
                 encrypt: false,
                 enableArithAbort: true,
                 trustServerCertificate: true,
@@ -44,8 +45,8 @@ if (process.env.HOST == 'AMEC') {
         }),
     };
 } else {
-    auditConfig = {
-        name: 'auditConnection',
+    lnConfig = {
+        name: 'lnConnection',
         imports: [],
         inject: [ConfigService],
         useFactory: async (config: ConfigService) => ({
@@ -64,4 +65,4 @@ if (process.env.HOST == 'AMEC') {
     };
 }
 
-export default auditConfig;
+export default lnConfig;

@@ -17,15 +17,15 @@ export class FinDsRepository extends BaseRepository {
     ){
         super(ds);
     }
-//   super(ds);   =  เป็นการนำค่าไปเก็บแกล้วใช้ใน BaseRepository
 
     findall(){
         return this.getRepository(DSDUTYSTAMP).find({
             where: {
                 ACTIVE : "1"
+            },
+            order:{
+                DUTY_VALUE: 'asc'
             }
         });
-
-        // this.manager.getRepository(GA_REQ_CATEGORY).find();
     }
 }

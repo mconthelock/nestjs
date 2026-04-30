@@ -20,7 +20,7 @@ export class SaveDto {
 
     @ApiProperty({ example: 999 })
     @IsNumber()
-    dwgid: number;
+    dwgId: number;
 
     @ApiProperty({ example: 1 })
     @IsNumber()

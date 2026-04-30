@@ -1,28 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer';
 
-export class InCheckDto {
-    @ApiProperty({ example: '2026045', description: 'Production' })
+export class GetOrderDto {
+    @ApiProperty({ example: '2026045', description: 'Production number' })
     @IsString()
+    @IsNotEmpty()
     prod: string;
 
     @ApiProperty({ example: 'E8BE11016', description: 'Order number' })
     @IsString()
+    @IsNotEmpty()
     order: string;
 
     @ApiProperty({ example: '101-05', description: 'Item number' })
     @IsString()
+    @IsNotEmpty()
     item: string;
 
     @ApiProperty({ example: 1, description: 'Drawing ID' })
+    @Type(() => Number)
     @IsNumber()
     dwgId: number;
-
-    @ApiProperty({ example: '202604221115', description: 'Create checksheet date' })
-    @IsString()
-    reg: string;
-
-    @ApiProperty({ example: 1, description: 'User ID' })
-    @IsNumber()
-    user: number;
 }

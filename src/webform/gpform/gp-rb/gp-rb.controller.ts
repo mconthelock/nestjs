@@ -17,12 +17,15 @@ export class GpRbController {
     return this.gpRbServicee.findAll();
   }
 
+   /*stampFormatGroup ถูกแก้ไขเข้ามาเพื่อจะเลือกข้อมูลไป insert เข้าตาราง */
   @Post()
   @UseTransaction('webformConnection')
   @UseInterceptors(getFileUploadInterceptor())
-  create(@Body() dto:CreateGpRbDto,@Req() req:Request) {
+  create(@Body() body: any, @Req() req:Request) {
     const ip = getClientIP(req)
-    return this.gpRbServicee.create(dto,ip);
+    const dto = body as CreateGpRbDto;
+    const stampFormatGroup = body.stampFormatGroup;
+    return this.gpRbServicee.create(dto, stampFormatGroup, ip);
   }
 }
  

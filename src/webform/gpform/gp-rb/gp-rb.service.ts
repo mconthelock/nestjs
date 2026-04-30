@@ -16,8 +16,8 @@ export class GpRbService {
     findAll() {
         return this.repo.findAll();
     }
-
-    async create(dto: CreateGpRbDto, ip: string) {
+    /*stampFormatGroup ถูกแก้ไขเข้ามาเพื่อจะเลือกข้อมูลไป insert เข้าตาราง */
+    async create(dto: CreateGpRbDto, stampFormatGroup: string, ip: string) {
         try {
             const formmst =
                 await this.formmstService.getFormMasterByVaname('GP-RB');
@@ -41,21 +41,25 @@ export class GpRbService {
             console.log('Form Master;', formmst);
  
             /*สร้างเงื่อนไขที่เลือกระหว่างแบบที่ 1 หรือ 2*/
-            await this.repo.CreateStampReq({
-                ...form,
-                PURPOSE_ID: dto.PURPOSE_ID,
-                PURPOSE_OTHER: dto.PURPOSE_OTHER,
-                SPOSCODE: dto.SPOSCODE,
-                NAME_STAMP: dto.NAME_STAMP,
-                REMARK: dto.REMARK,
-            });
+            if (stampFormatGroup === 'standard') {
+                await this.repo.CreateStampReq({
+                    ...form,
+                    PURPOSE_ID: dto.PURPOSE_ID,
+                    PURPOSE_OTHER: dto.PURPOSE_OTHER,
+                    SPOSCODE: dto.SPOSCODE,
+                    NAME_STAMP: dto.NAME_STAMP,
+                    REMARK: dto.REMARK,
+                });
+            }
             /*สร้างเงื่อนไขที่เลือกระหว่างแบบที่ 1 หรือ 2*/
-            await this.repo.CreateCusStampReq({
-                ...form,
-                CUST_SIZE: dto.CUST_SIZE,
-                QTY: dto.QTY,
-                REMARK: dto.REMARK,
-            });
+            if (stampFormatGroup === 'other') {
+                await this.repo.CreateCusStampReq({
+                    ...form,
+                    CUST_SIZE: dto.CUST_SIZE,
+                    QTY: dto.QTY,
+                    REMARK: dto.REMARK,
+                });
+            }
 
             return {
                 status: true,

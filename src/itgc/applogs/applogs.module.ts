@@ -6,16 +6,14 @@ import { SpecialuserModule } from '../specialuser/specialuser.module';
 
 import { AmecappLog } from 'src/common/Entities/itgc/views/amecapp.entity';
 import { As400appLog } from 'src/common/Entities/itgc/views/as400app.entity';
-import { InvoiceAppLog } from 'src/common/Entities/itgc/views/invoiceapp.entity';
-import { MarketingAppLog } from 'src/common/Entities/itgc/views/mktapp.entity';
+import { IsoAppLog } from 'src/common/Entities/itgc/views/isoapp.entity';
 import { ScmappLog } from 'src/common/Entities/itgc/views/scmapp.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([AmecappLog], 'auditConnection'),
-        TypeOrmModule.forFeature([As400appLog], 'auditConnection'),
+        TypeOrmModule.forFeature([AmecappLog], 'docinvConnection'),
         TypeOrmModule.forFeature(
-            [InvoiceAppLog, MarketingAppLog, ScmappLog],
+            [IsoAppLog, ScmappLog, As400appLog],
             'auditConnection',
         ),
         SpecialuserModule,

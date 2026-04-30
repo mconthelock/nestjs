@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('APP_LOG_VIEW')
+@Entity('AS400_LOG_VIEW')
 export class As400appLog {
     @PrimaryColumn()
     LOG_DATE: Date;
@@ -10,6 +10,9 @@ export class As400appLog {
 
     @Column()
     LOG_USER: string;
+
+    @Column()
+    LOG_USERNAME: string;
 
     @Column()
     LOG_DOMAIN: string;

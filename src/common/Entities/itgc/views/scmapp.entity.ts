@@ -12,6 +12,9 @@ export class ScmappLog {
     LOG_USER: string;
 
     @Column()
+    LOG_USERNAME: string;
+
+    @Column()
     LOG_DOMAIN: string;
 
     @Column()

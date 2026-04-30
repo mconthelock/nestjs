@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('APP_LOG_VIEW')
-export class InvoiceAppLog {
+export class IsoAppLog {
     @PrimaryColumn()
     LOG_DATE: Date;
 
@@ -10,6 +10,9 @@ export class InvoiceAppLog {
 
     @Column()
     LOG_USER: string;
+
+    @Column()
+    LOG_USERNAME: string;
 
     @Column()
     LOG_DOMAIN: string;

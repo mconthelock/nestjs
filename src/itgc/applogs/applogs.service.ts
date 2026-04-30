@@ -1,3 +1,7 @@
+import * as dayjsModule from 'dayjs';
+const dayjs = (dayjsModule as any).default ?? (dayjsModule as any);
+import * as utcModule from 'dayjs/plugin/utc';
+import * as timezoneModule from 'dayjs/plugin/timezone';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -8,27 +12,28 @@ import { formatDate } from 'src/common/utils/dayjs.utils';
 
 import { AmecappLog } from 'src/common/Entities/itgc/views/amecapp.entity';
 import { As400appLog } from 'src/common/Entities/itgc/views/as400app.entity';
-import { InvoiceAppLog } from 'src/common/Entities/itgc/views/invoiceapp.entity';
-import { MarketingAppLog } from 'src/common/Entities/itgc/views/mktapp.entity';
+import { IsoAppLog } from 'src/common/Entities/itgc/views/isoapp.entity';
 import { ScmappLog } from 'src/common/Entities/itgc/views/scmapp.entity';
+
+const utc = (utcModule as any).default ?? (utcModule as any);
+const timezone = (timezoneModule as any).default ?? (timezoneModule as any);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 @Injectable()
 export class ApplogsService {
     constructor(
-        @InjectRepository(AmecappLog, 'auditConnection')
+        @InjectRepository(AmecappLog, 'docinvConnection')
         private readonly amec: Repository<AmecappLog>,
-
-        @InjectRepository(InvoiceAppLog, 'auditConnection')
-        private readonly iso: Repository<InvoiceAppLog>,
-
-        @InjectRepository(MarketingAppLog, 'auditConnection')
-        private readonly marketing: Repository<MarketingAppLog>,
 
         @InjectRepository(ScmappLog, 'auditConnection')
         private readonly scm: Repository<ScmappLog>,
 
         @InjectRepository(As400appLog, 'auditConnection')
         private readonly as400: Repository<As400appLog>,
+
+        @InjectRepository(IsoAppLog, 'auditConnection')
+        private readonly iso: Repository<IsoAppLog>,
 
         private readonly users: SpecialuserService,
     ) {}
@@ -53,14 +58,21 @@ export class ApplogsService {
         }
 
         if (startDate) {
+            const startOfDayBangkok = dayjs(startDate)
+                .tz('Asia/Bangkok')
+                .startOf('day');
             queryBuilder.andWhere('logs.LOG_DATE >= :startDate', {
-                startDate: formatDate(startDate),
+                startDate: startOfDayBangkok.toDate(),
             });
         }
 
         if (endDate) {
-            queryBuilder.andWhere('logs.LOG_DATE <= :endDate', {
-                endDate: formatDate(endDate),
+            const endOfRangeBangkok = dayjs(endDate)
+                .tz('Asia/Bangkok')
+                .startOf('day')
+                .add(1, 'day');
+            queryBuilder.andWhere('logs.LOG_DATE < :endDate', {
+                endDate: endOfRangeBangkok.toDate(),
             });
         }
 
@@ -82,19 +94,21 @@ export class ApplogsService {
             return results.filter((log) =>
                 systemLogins.some((user) => user.USER_LOGIN === log.LOG_USER),
             );
-        } else {
-            if (server == 'AS400') {
-                const as400Logins = appusers.filter(
-                    (user) =>
-                        user.SERVER_NAME == server && user.CATEGORY == 'APP',
-                );
-                return results.filter((log) =>
-                    as400Logins.some(
-                        (user) => user.USER_LOGIN === log.LOG_USER,
-                    ),
-                );
-            }
-            return results;
         }
+        // else {
+        //     if (server == 'AS400') {
+        //         const as400Logins = appusers.filter(
+        //             (user) =>
+        //                 user.SERVER_NAME == server && user.CATEGORY == 'APP',
+        //         );
+        //         return results.filter((log) =>
+        //             as400Logins.some(
+        //                 (user) => user.USER_LOGIN === log.LOG_USER,
+        //             ),
+        //         );
+        //     }
+        //     return results;
+        // }
+        return results;
     }
 }

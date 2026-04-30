@@ -7,14 +7,18 @@ import { ChecksheetResponseDto } from './dto/response.dto';
 import { GetOrderDto } from './dto/get-order.dto';
 import { GetOrderResponseDto } from './dto/get-order-response.dto';
 import { ChecksheetProc } from './enums/proc.enum';
+import { GetOrderService } from '../get-order/get-order.service';
 
 @Injectable()
 export class ChecksheetService {
-    constructor(private readonly repo: ChecksheetRepository) {}
+    constructor(
+        private readonly repo: ChecksheetRepository,
+        private readonly ordservice: GetOrderService,
+    ) {}
 
     async getOrder(dto: GetOrderDto): Promise<GetOrderResponseDto | null> {
         try {
-            const res = await this.repo.getOrder(dto);
+            const res = await this.ordservice.getOrder(dto);
             if (!res?.length) {
                 throw new NotFoundException('Order not found');
             }

@@ -36,24 +36,21 @@ export class MfgEdrService {
 
   async getWorktype() {
     return this.worktypeRepo.find({
-      where: {
-        FOR_MFG: '1',
-      },
-      order: {
-        TID: 'ASC',
-      },
+      where: { FOR_MFG: '1',},
+      order: { TID: 'ASC',},
     });
   }
 
   async getCause(dto: SearchCauseDto) {
-    return this.causeRepo.find({
-      where: {
-        FOR_MFG: '1',
-        CAUSE_GROUP: dto.CAUSE_GROUP,
-      },
-      order: {
-        CID: 'ASC',
-      },
-    });
+    const causeGroup = (dto as any).CAUSE_GROUP;
+    if (!causeGroup) {throw new Error('CAUSE_GROUP is required');}
+    return this.causeRepo
+      .createQueryBuilder('cause')
+      .where('cause.FOR_MFG = :forMfg', { forMfg: '1' })
+      .andWhere('cause.CAUSE_GROUP = :causeGroup', { causeGroup })
+      .orderBy('cause.CID', 'ASC')
+      .getMany();
   }
+
+    
 }

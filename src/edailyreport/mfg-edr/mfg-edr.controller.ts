@@ -27,8 +27,13 @@ export class MfgEdrController {
     return this.mfgEdrService.remove(+id);
   }
 
-    @Post('search_cause')
-    getCause(@Body() dto: SearchCauseDto) {
-      return this.mfgEdrService.getCause(dto);
-    }
+  @Post('cause')
+  getCause(@Body() dto: SearchCauseDto) {
+    return this.mfgEdrService.getCause(dto);
+  }
+
+  @Get('worktype')
+  getWorktype() {
+    return this.mfgEdrService.getWorktype();
+  }
 }

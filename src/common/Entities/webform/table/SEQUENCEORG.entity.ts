@@ -1,4 +1,5 @@
-import { Entity, PrimaryColumn } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { AMECUSERALL } from '../../amec/views/AMECUSERALL.entity';
 @Entity({
     name: 'SEQUENCEORG',
     schema: 'WEBFORM',
@@ -27,4 +28,8 @@ export class SEQUENCEORG {
 
     @PrimaryColumn()
     VORGNO1: string;
+
+    @ManyToOne(() => AMECUSERALL)
+    @JoinColumn({ name: 'EMPNO', referencedColumnName: 'SEMPNO' })
+    EMPINFO: AMECUSERALL;
 }

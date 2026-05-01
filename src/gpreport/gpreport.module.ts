@@ -8,6 +8,7 @@ import { OvertimeModule } from './overtime/overtime.module';
 import { DispatchModule } from './dispatch/dispatch.module';
 import { StyImageModule } from './sty-image/sty-image.module';
 import { StyPatrolModule } from './sty-patrol/sty-patrol.module';
+import { StyTypeModule } from './sty-type/sty-type.module';
 
 @Module({
     imports: [
@@ -20,6 +21,7 @@ import { StyPatrolModule } from './sty-patrol/sty-patrol.module';
         DispatchModule,
         StyImageModule,
         StyPatrolModule,
+        StyTypeModule,
     ],
 })
 export class gpreportModule {}

@@ -7,9 +7,7 @@ import { ORGANIZATIONS } from 'src/common/Entities/webform/views/ORGANIZATIONS.e
 
 @Injectable()
 export class OrganizationsRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -22,7 +20,12 @@ export class OrganizationsRepository extends BaseRepository {
 
     async search(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(ORGANIZATIONS, 'O');
-        this.applyFilters(qb, 'O', dto, ['SDEPCODE', 'SDIVCODE', 'SSEC']);
+        this.applyFilters(qb, 'O', dto, [
+            'SDEPCODE',
+            'SDIVCODE',
+            'SSEC',
+            'CSTATUS',
+        ]);
         return qb.getMany();
     }
 }

@@ -24,8 +24,6 @@ export class DatacenterController {
         @Body() data: { repId: string; repType: string },
         @Res() res: Response,
     ) {
-        console.log(data);
-
         const localPath = await this.table.loadReport(data.repType, data.repId);
         if (!localPath) {
             throw new NotFoundException('Report not found');

@@ -19,7 +19,6 @@ if (process.env.HOST == 'AMEC') {
             username: process.env.LN_USER,
             password: process.env.LN_PASSWORD,
             database: process.env.LN_DATABASE || process.env.LN_SERVICE,
-            // entities: [__dirname + '/../../itgc/**/*.entity{.ts,.js}'],
             autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),

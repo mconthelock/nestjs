@@ -19,7 +19,7 @@ if (process.env.HOST == 'AMEC') {
             username: process.env.AUD_USER,
             password: process.env.AUD_PASSWORD,
             database: process.env.AUD_DATABASE || process.env.AUD_SERVICE,
-            entities: [__dirname + '/../../itgc/**/*.entity{.ts,.js}'],
+            autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),
             retryAttempts: 5,

@@ -29,11 +29,9 @@ export class DatacenterService {
     private async ftpDownload(fileName: string): Promise<string> {
         const client = new ftp.Client();
         client.ftp.verbose = false;
-
         const remotePath = `/home/ogguser/oggos400/dirrpt/${fileName}`;
         const localDir = path.join(process.cwd(), 'public');
         const localPath = path.join(localDir, fileName);
-
         if (!fs.existsSync(localDir)) {
             fs.mkdirSync(localDir, { recursive: true });
         }

@@ -1,11 +1,7 @@
 import {
     Controller,
     Get,
-    Post,
-    Body,
-    Patch,
     Param,
-    Delete,
 } from '@nestjs/common';
 import { StyTypeService } from './sty-type.service';
 import { CreateStyTypeDto } from './dto/create-sty-type.dto';

@@ -9,6 +9,7 @@ import { DispatchModule } from './dispatch/dispatch.module';
 import { StyImageModule } from './sty-image/sty-image.module';
 import { StyPatrolModule } from './sty-patrol/sty-patrol.module';
 import { StyTypeModule } from './sty-type/sty-type.module';
+import { StyItemsModule } from './sty-items/sty-items.module';
 
 @Module({
     imports: [
@@ -22,6 +23,7 @@ import { StyTypeModule } from './sty-type/sty-type.module';
         StyImageModule,
         StyPatrolModule,
         StyTypeModule,
+        StyItemsModule,
     ],
 })
 export class gpreportModule {}

@@ -121,11 +121,4 @@ export class OracleRepository {
             await runner.release();
         }
     }
-
-    /**
-     * Execute raw SQL query
-     */
-    protected async query(sql: string, params?: any) {
-        return this.ds.query(sql, params);
-    }
 }

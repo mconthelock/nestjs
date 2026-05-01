@@ -30,6 +30,15 @@ export class ImmItemmst {
     IUMP: string;
 
     @Column()
+    IUMCN: number;
+
+    @Column()
+    IONOD: number;
+
+    @Column()
+    ONHAND: number;
+
+    @Column()
     IABBT: string;
 
     @Column()

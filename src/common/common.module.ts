@@ -13,6 +13,7 @@ import invoiceConfig from './databases/invoice.config';
 import auditConfig from './databases/auditDB.config';
 import idsConfig from './databases/dailyids.config';
 import gpreportConfig from './databases/gpreport.config';
+import lnConfig from './databases/ln.config';
 import packingConfig from './databases/packingsys.config';
 import elmesConfig from './databases/elmes.config';
 import escsConfig from './databases/escs.config';
@@ -47,6 +48,7 @@ import purConfig from './databases/pursys.config';
         TypeOrmModule.forRootAsync(gpreportConfig),
         TypeOrmModule.forRootAsync(idsConfig),
         TypeOrmModule.forRootAsync(invoiceConfig),
+        TypeOrmModule.forRootAsync(lnConfig),
         TypeOrmModule.forRootAsync(packingConfig),
         TypeOrmModule.forRootAsync(pdmConfig),
         TypeOrmModule.forRootAsync(sdsysConfig),

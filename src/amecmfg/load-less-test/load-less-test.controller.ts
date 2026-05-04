@@ -5,7 +5,7 @@ import { GetLoadLessTestDto } from './dto/get-load-less-test.dto';
 import { LoadLessTestResponseDto } from './dto/load-less-test-result.dto';
 
 @ApiTags('Machine Load Less Test')
-@Controller('machine/load-less-test')
+@Controller('amecmfg/load-less-test')
 export class LoadLessTestController {
     constructor(private readonly service: LoadLessTestService) {}
 

@@ -29,6 +29,7 @@ import { ReturnApvListModule } from './return-apv-list/return-apv-list.module';
 import { OrdersDrawingModule } from './orders-drawing/orders-drawing.module';
 import { ChecksheetModule } from './checksheet/checksheet.module';
 import { GetOrderModule } from './get-order/get-order.module';
+import { MachineModule } from './machine/machine.module';
 
 @Module({
     imports: [
@@ -62,6 +63,7 @@ import { GetOrderModule } from './get-order/get-order.module';
         OrdersDrawingModule,
         ChecksheetModule,
         GetOrderModule,
+        MachineModule
     ],
 })
 export class ESCSModule {}

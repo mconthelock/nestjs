@@ -5,7 +5,7 @@ import { GetStaticTestDto } from './dto/get-static-test.dto';
 import { StaticTestResponseDto } from './dto/static-test-result.dto';
 
 @ApiTags('Machine Static Test')
-@Controller('machine/static-test')
+@Controller('amecmfg/static-test')
 export class StaticTestController {
     constructor(private readonly service: StaticTestService) {}
 

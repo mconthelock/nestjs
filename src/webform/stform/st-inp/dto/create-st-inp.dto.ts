@@ -1,6 +1,15 @@
 import { PartialType, PickType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+    IsDate,
+    IsDateString,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+    ValidateNested,
+} from 'class-validator';
+import { StringToDate } from 'src/common/utils/transform';
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 
 export class PatrolListDto {
@@ -24,15 +33,15 @@ export class PatrolListDto {
     @Type(() => Number)
     PA_CLASS: number;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Type(() => String)
-    PA_SUGGESTION: string;
+    PA_SUGGESTION?: string;
 
     @IsNotEmpty()
-    @IsString()
-    @Type(() => String)
-    PA_MAT: string;
+    @IsNumber()
+    @Type(() => Number)
+    PA_MAT: number;
 }
 
 export class CreateStInpDto extends PickType(CreateFormDto, [
@@ -47,8 +56,8 @@ export class CreateStInpDto extends PickType(CreateFormDto, [
     PA_OWNER: string;
 
     @IsNotEmpty()
+    @StringToDate()
     @IsDate()
-    @Type(() => Date)
     PA_DATE: Date;
 
     @IsNotEmpty()
@@ -67,6 +76,7 @@ export class CreateStInpDto extends PickType(CreateFormDto, [
     PA_USERCREATE: string;
 
     @IsNotEmpty()
+    @ValidateNested({ each: true })
     @Type(() => PatrolListDto)
     PA_LIST: PatrolListDto[];
 }

@@ -1,8 +1,8 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'STY_TYPE', schema: 'GPREPORT' })
 export class STY_TYPE {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     TYPE_ID: number;
 
     @Column()

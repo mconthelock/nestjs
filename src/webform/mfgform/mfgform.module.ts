@@ -5,4 +5,4 @@ import { MfgEdrModule } from './mfg-edr/mfg-edr.module';
 @Module({
   imports: [MfgEdrModule],
 })
-export class edailyreportModule {}
+export class mfgformModule {}

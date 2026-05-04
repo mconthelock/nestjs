@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { MfgEdrService } from './mfg-edr.service';
 import { CreateMfgEdrDto } from './dto/create-mfg-edr.dto';
 import { SearchCauseDto } from './dto/search-cause.dto';
+
+
 
 @Controller('mfg-edr')
 export class MfgEdrController {
@@ -32,8 +34,22 @@ export class MfgEdrController {
     return this.mfgEdrService.getCause(dto);
   }
 
-  @Get('worktype')
+  @Post('worktype')
   getWorktype() {
     return this.mfgEdrService.getWorktype();
   }
+
+  @Post('process')
+  getProcess() {
+    return this.mfgEdrService.getProcess();
+  }
+
+  @Post('line')
+  getLine() {
+    return this.mfgEdrService.getLine();
+  }
+
 }
+
+
+

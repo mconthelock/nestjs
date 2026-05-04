@@ -1,8 +1,8 @@
-import { Column, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity({ name: 'STY_IMAGE', schema: 'GPREPORT' })
 export class STY_IMAGE {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     IMAGE_ID: number;
 
     @Column()

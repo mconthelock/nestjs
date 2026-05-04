@@ -1,9 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { STY_TYPE } from './STY_TYPE.entity';
 
 @Entity({ name: 'STY_ITEMS', schema: 'GPREPORT' })
 export class STY_ITEMS {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     ITEMS_ID: number;
 
     @Column()

@@ -7,28 +7,4 @@ import { UpdateStyPatrolDto } from './dto/update-sty-patrol.dto';
 export class StyPatrolController {
   constructor(private readonly styPatrolService: StyPatrolService) {}
 
-  @Post()
-  create(@Body() createStyPatrolDto: CreateStyPatrolDto) {
-    return this.styPatrolService.create(createStyPatrolDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.styPatrolService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.styPatrolService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStyPatrolDto: UpdateStyPatrolDto) {
-    return this.styPatrolService.update(+id, updateStyPatrolDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.styPatrolService.remove(+id);
-  }
 }

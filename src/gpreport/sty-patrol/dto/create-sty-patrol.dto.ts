@@ -12,6 +12,11 @@ export class CreateStyPatrolDto extends PickType(FormDto, [
 ]) {
     @IsNotEmpty()
     @IsString()
+    @Type(() => Number)
+    PA_ID: number;
+
+    @IsNotEmpty()
+    @IsString()
     @Type(() => String)
     PA_OWNER: string;
 
@@ -53,6 +58,11 @@ export class CreateStyPatrolDto extends PickType(FormDto, [
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
+    PA_IMAGE: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
     PA_CLASS: number;
 
     @IsNotEmpty()
@@ -62,6 +72,6 @@ export class CreateStyPatrolDto extends PickType(FormDto, [
 
     @IsNotEmpty()
     @IsString()
-    @Type(() => String)
-    PA_MAT: string;
+    @Type(() => Number)
+    PA_MAT: number;
 }

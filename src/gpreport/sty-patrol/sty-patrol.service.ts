@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { CreateStyPatrolDto } from './dto/create-sty-patrol.dto';
 import { UpdateStyPatrolDto } from './dto/update-sty-patrol.dto';
+import { StyPatrolRepository } from './sty-patrol.repository';
 
 @Injectable()
 export class StyPatrolService {
-  create(createStyPatrolDto: CreateStyPatrolDto) {
-    return 'This action adds a new styPatrol';
-  }
+    constructor(private readonly repo: StyPatrolRepository) {}
 
-  findAll() {
-    return `This action returns all styPatrol`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} styPatrol`;
-  }
-
-  update(id: number, updateStyPatrolDto: UpdateStyPatrolDto) {
-    return `This action updates a #${id} styPatrol`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} styPatrol`;
-  }
+    async create(
+        createStyPatrolDto: CreateStyPatrolDto | CreateStyPatrolDto[],
+    ) {
+        try {
+            const res = await this.repo.create(createStyPatrolDto);
+            if (!res) {
+                return { status: false, message: 'Failed to create StyPatrol' };
+            }
+            return {
+                status: true,
+                message: 'StyPatrol created successfully',
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(`Failed to create StyPatrol: ${error.message}`);
+        }
+    }
 }

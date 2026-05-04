@@ -11,7 +11,11 @@ export class MachineService {
         try {
             const res = await this.repo.findMachine(dto);
             if (!res) {
-                throw new NotFoundException('Machine not found');
+                return {
+                    status: 'ERROR',
+                    message: 'ไม่พบข้อมูลเครื่องจักร',
+                    data: null
+                };
             }
 
             return {
@@ -21,8 +25,8 @@ export class MachineService {
                     mcType: res.MC_TYPE,
                     mcNo: res.MC_NO,
                     mcDatasource: res.MC_DATASOURCE,
-                    mcName: res.MC_NAME,
-                },
+                    mcName: res.MC_NAME
+                }
             };
         } catch (err) {
             if (err instanceof NotFoundException) throw err;

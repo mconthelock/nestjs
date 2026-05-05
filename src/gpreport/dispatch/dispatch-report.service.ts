@@ -24,18 +24,18 @@ export class DispatchReportService {
         const lines = await this.dataSource
             .getRepository(BusDispatchLine)
             .createQueryBuilder('l')
-            .where('l.dispatch_id = :dispatchId', { dispatchId })
-            .andWhere("NVL(l.line_status, '1') = '1'")
-            .orderBy('l.busid', 'ASC')
+            .where('l.DISPATCH_ID = :dispatchId', { dispatchId })
+            .andWhere("NVL(l.LINE_STATUS, '1') = '1'")
+            .orderBy('l.BUSID', 'ASC')
             .getMany();
 
         const stops = await this.dataSource
             .getRepository(BusDispatchStop)
             .createQueryBuilder('s')
-            .where('s.dispatch_id = :dispatchId', { dispatchId })
-            .orderBy('s.line_id', 'ASC')
-            .addOrderBy('s.plan_time', 'DESC')
-            .addOrderBy('s.stop_id', 'ASC')
+            .where('s.DISPATCH_ID = :dispatchId', { dispatchId })
+            .orderBy('s.LINE_ID', 'ASC')
+            .addOrderBy('s.PLAN_TIME', 'DESC')
+            .addOrderBy('s.STOP_ID', 'ASC')
             .getMany();
 
         const passengers = await this.dataSource
@@ -52,10 +52,10 @@ export class DispatchReportService {
             .addSelect('u.SDEPT', 'dept')
             .addSelect('u.SSEC', 'sec')
             .addSelect('u.SDIV', 'div')
-            .where('p.dispatch_id = :dispatchId', { dispatchId })
-            .andWhere("NVL(p.status, 'E') = 'E'")
-            .orderBy('p.stop_id', 'ASC')
-            .addOrderBy('p.empno', 'ASC')
+            .where('p.DISPATCH_ID = :dispatchId', { dispatchId })
+            .andWhere("NVL(p.STATUS, 'E') = 'E'")
+            .orderBy('p.STOP_ID', 'ASC')
+            .addOrderBy('p.EMPNO', 'ASC')
             .getRawMany();
 
         const resultLines = lines.map((line) => {
@@ -110,7 +110,7 @@ export class DispatchReportService {
             .leftJoin(
                 BusDispatchStop,
                 's',
-                's.dispatch_id = p.dispatch_id AND s.stop_id = p.stop_id',
+                's.DISPATCH_ID = p.DISPATCH_ID AND s.STOP_ID = p.STOP_ID',
             )
             .leftJoin(
                 'AMECUSERALL',
@@ -124,9 +124,9 @@ export class DispatchReportService {
             .addSelect('u.SSEC', 'sec')
             .addSelect('u.SDEPT', 'dept')
             .addSelect('u.SDIV', 'div')
-            .where('p.dispatch_id = :dispatchId', { dispatchId })
-            .andWhere("NVL(p.status, 'E') = 'D'")
-            .orderBy('p.empno', 'ASC')
+            .where('p.DISPATCH_ID = :dispatchId', { dispatchId })
+            .andWhere("NVL(p.STATUS, 'E') = 'D'")
+            .orderBy('p.EMPNO', 'ASC')
             .getRawMany();
 
         const rows = passengers.map((row, index) => ({
@@ -157,7 +157,7 @@ export class DispatchReportService {
         const head = await this.dataSource
             .getRepository(BusDispatchHead)
             .createQueryBuilder('h')
-            .where('h.dispatch_id = :dispatchId', { dispatchId })
+            .where('h.DISPATCH_ID = :dispatchId', { dispatchId })
             .getOne();
 
         if (!head) {

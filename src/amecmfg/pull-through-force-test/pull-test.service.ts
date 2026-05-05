@@ -87,15 +87,17 @@ export class PullTestService {
             database: parts['Initial Catalog'],
             user: parts['User ID'],
             password: parts['Password'],
+            connectionTimeout: 5000, 
+            requestTimeout: 5000,
             options: {
-                instanceName,
+                instanceName, 
                 encrypt: false,
                 trustServerCertificate: true,
             },
             pool: {
                 max: 5,
                 min: 0,
-                idleTimeoutMillis: 30000,
+                idleTimeoutMillis: 5000,
             },
         };
     }

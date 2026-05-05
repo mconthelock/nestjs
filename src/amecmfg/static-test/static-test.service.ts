@@ -1,10 +1,10 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import * as readline from 'readline';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SYS_FOLDER_PATH } from 'src/common/Entities/escs/table/SYS_FOLDER_PATH.entity';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as readline from 'readline';
 import { StaticTestResponseDto } from './dto/static-test-result.dto';
 
 @Injectable()

@@ -13,9 +13,7 @@ export class StaticTestController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get static test result from CSV file by machine and serial number' })
     @ApiResponse({ status: 200, type: StaticTestResponseDto })
-    async getStaticTestResult(
-        @Query() query: GetStaticTestDto,
-    ): Promise<StaticTestResponseDto | null> {
+    async getStaticTestResult(@Query() query: GetStaticTestDto): Promise<StaticTestResponseDto | null> {
         return this.service.getStaticTestResult(query.machine, query.serial);
     }
 }

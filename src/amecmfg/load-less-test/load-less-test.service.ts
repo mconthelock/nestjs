@@ -1,10 +1,10 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import * as readline from 'readline';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SYS_FOLDER_PATH } from 'src/common/Entities/escs/table/SYS_FOLDER_PATH.entity';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as readline from 'readline';
 import { LoadLessTestResponseDto } from './dto/load-less-test-result.dto';
 
 @Injectable()
@@ -58,6 +58,10 @@ export class LoadLessTestService {
                     status: 'SUCCESS',
                     message: null,
                     data: {
+                        suctionSoundDb: cols[5],
+                        fallingSoundDb: cols[6],
+                        runningSoundDb: cols[7],
+                        housingTemp: cols[8],
                         inducedVoltageConstant: cols[9]
                     }
                 };

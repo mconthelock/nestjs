@@ -22,4 +22,12 @@ export class MachineRepository extends BaseRepository {
             },
         });
     }
+
+    findByName(name: string) {
+        return this.getRepository(MACHINE_NAME).findOne({
+            where: {
+                MC_NAME: name
+            },
+        });
+    }
 }

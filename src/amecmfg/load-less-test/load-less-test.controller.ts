@@ -13,9 +13,7 @@ export class LoadLessTestController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get load less test result from CSV file by machine and serial number' })
     @ApiResponse({ status: 200, type: LoadLessTestResponseDto })
-    async getLoadLessTestResult(
-        @Query() query: GetLoadLessTestDto,
-    ): Promise<LoadLessTestResponseDto | null> {
+    async getLoadLessTestResult(@Query() query: GetLoadLessTestDto): Promise<LoadLessTestResponseDto | null> {
         const [serial, order] = query.data.split('|');
         return this.service.getLoadLessTestResult(serial, order);
     }

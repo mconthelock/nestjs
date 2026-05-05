@@ -10,6 +10,9 @@ import { EdrCauseMst } from '../../../common/Entities/webform/table/edr_cause_ms
 import { EdrLineMst } from '../../../common/Entities/webform/table/edr_line_mst.entity';
 import { EdrProcessMst } from '../../../common/Entities/webform/table/edr_process_mst.entity';
 
+import { AmecOrders } from 'src/common/Entities/workload/table/amecorders.entity';
+import { AmecOrdersSchedule } from 'src/common/Entities/workload/table/amecorders_schedule.entity';
+
 @Injectable()
 export class MfgEdrService {
   constructor(
@@ -24,6 +27,12 @@ export class MfgEdrService {
 
     @InjectRepository(EdrLineMst, 'webformConnection')
     private readonly lineRepo: Repository<EdrLineMst>,
+
+    @InjectRepository(AmecOrders, 'webformConnection')
+    private readonly amecOrdersRepo: Repository<AmecOrders>,
+
+    @InjectRepository(AmecOrdersSchedule, 'webformConnection')
+    private readonly amecOrdersScheduleRepo: Repository<AmecOrdersSchedule>,
   ) {}
 
   create(createMfgEdrDto: CreateMfgEdrDto) {
@@ -70,6 +79,29 @@ export class MfgEdrService {
     return this.lineRepo.find({
       order: { LID: 'ASC',},
     });
+  }
+
+  async getOrderDetail(order: string) {
+    if (!order) {
+      throw new Error('MFGNO is required');
+    }
+
+    return this.amecOrdersRepo
+      .createQueryBuilder('A')
+      .select([
+        'A.PRJ_NO AS PRJ_NO',
+        'A.SERIES AS MODEL',
+        'B.MFGBM AS PROD',
+      ])
+      .leftJoin(
+        AmecOrdersSchedule,
+        'B',
+        'A.MFGNO = B.REFMFGNO'
+      )
+      .where('UPPER(A.MFGNO) = :order', {
+        order: order.toUpperCase(),
+      })
+      .getRawOne();
   }
 
     

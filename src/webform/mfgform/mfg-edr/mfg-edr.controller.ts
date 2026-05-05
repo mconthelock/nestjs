@@ -49,6 +49,11 @@ export class MfgEdrController {
     return this.mfgEdrService.getLine();
   }
 
+  @Post('amec-order-detail')
+  getOrderDetail(@Body() body: any) {
+    return this.mfgEdrService.getOrderDetail(body.MFGNO);
+  }
+
 }
 
 

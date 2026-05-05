@@ -60,11 +60,11 @@ export class DispatchReportService {
 
         const resultLines = lines.map((line) => {
             const lineStops = stops
-                .filter((s) => s.LINE_ID === line.BUSID)
+                .filter((s) => Number(s.LINE_ID) === Number(line.BUSID))
                 .map((stop) => {
                     const stopPassengers = passengers
                         .filter(
-                            (p) => Number(p.STOP_ID) === Number(stop.STOP_ID),
+                            (p) => Number(p.stop_id) === Number(stop.STOP_ID),
                         )
                         .map((p, index) => ({
                             no: index + 1,
@@ -173,13 +173,16 @@ export class DispatchReportService {
             : '-';
 
         let displayTimeText = '';
-        if (head.DISPATCH_TYPE === 'O' && head.SHIFT === 'D')
+
+        if (head.DISPATCH_TYPE === 'O' && head.SHIFT === 'D') {
             displayTimeText = 'OT เวลา 19.30 น.';
-        else if (head.DISPATCH_TYPE === 'O' && head.SHIFT === 'S')
+        } else if (head.DISPATCH_TYPE === 'O' && head.SHIFT === 'S') {
             displayTimeText = 'OT เวลา 21.30 น.';
-        else if (head.DISPATCH_TYPE === 'O' && head.SHIFT === 'N')
+        } else if (head.DISPATCH_TYPE === 'O' && head.SHIFT === 'N') {
             displayTimeText = 'OT (กะกลางคืน) เวลา 07.30 น.';
-        else if (head.SHIFT === 'H') displayTimeText = 'OT เวลา 17.00 น.';
+        } else if (head.SHIFT === 'H') {
+            displayTimeText = 'OT เวลา 17.00 น.';
+        }
 
         return {
             display_date_text: displayDateText,

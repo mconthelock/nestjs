@@ -423,7 +423,7 @@ export class DispatchService {
                 DISPATCH_DATE: dto.workdate,
                 DISPATCH_TYPE: dto.dispatch_type,
                 SHIFT: dto.shift,
-            } as any,
+            },
         });
 
         if (!head) {
@@ -440,45 +440,47 @@ export class DispatchService {
         }
 
         const dispatch_id = head.DISPATCH_ID;
+
         const [lines, stops, passengers] = await Promise.all([
             this.lineRepo.find({
-                where: {
-                    DISPATCH_ID: dispatch_id,
-                } as any,
-                order: { BUSID: 'ASC' as any },
+                where: { DISPATCH_ID: dispatch_id },
+                order: { BUSID: 'ASC' },
             }),
 
             this.stopRepo.find({
-                where: { DISPATCH_ID: dispatch_id } as any,
-                order: { LINE_ID: 'ASC' as any, STOP_ID: 'ASC' as any },
+                where: { DISPATCH_ID: dispatch_id },
+                order: { LINE_ID: 'ASC', STOP_ID: 'ASC' },
             }),
 
             this.dataSource.query(
                 `
-        SELECT
-          P.STOP_ID AS stop_id, H.STATUS AS status,
-          P.EMPNO AS empno,
-          U.SNAME AS engname,
-          U.STNAME AS thainame,
-          U.SSEC AS ssec,
-          U.SDEPT AS sdept,
-          U.SDIV AS sdiv
-        FROM GPREPORT.BUS_DISPATCH_PASSENGER P
-        INNER JOIN GPREPORT.BUS_DISPATCH_HEAD H
-          ON H.DISPATCH_ID = P.DISPATCH_ID
-        LEFT JOIN AMEC.AMECUSERALL U
-          ON U.SEMPNO = P.EMPNO
-        WHERE P.DISPATCH_ID = :1
-          AND P.STATUS = :2
-        ORDER BY P.STOP_ID ASC, P.EMPNO ASC
-        `,
+                SELECT
+                P.STOP_ID AS stop_id,
+                H.STATUS AS status,
+                P.EMPNO AS empno,
+                U.SNAME AS engname,
+                U.STNAME AS thainame,
+                U.SSEC AS ssec,
+                U.SDEPT AS sdept,
+                U.SDIV AS sdiv
+                FROM GPREPORT.BUS_DISPATCH_PASSENGER P
+                INNER JOIN GPREPORT.BUS_DISPATCH_HEAD H
+                ON H.DISPATCH_ID = P.DISPATCH_ID
+                LEFT JOIN AMEC.AMECUSERALL U
+                ON U.SEMPNO = P.EMPNO
+                WHERE P.DISPATCH_ID = :1
+                AND P.STATUS = :2
+                ORDER BY P.STOP_ID ASC, P.EMPNO ASC
+                `,
                 [dispatch_id, 'E'],
             ),
         ]);
 
         const passByStopId = new Map<number, any[]>();
+
         for (const p of passengers) {
             const stopId = Number(p.STOP_ID ?? p.stop_id);
+
             if (!passByStopId.has(stopId)) {
                 passByStopId.set(stopId, []);
             }
@@ -494,18 +496,20 @@ export class DispatchService {
         }
 
         const stopsByLineId = new Map<number, any[]>();
+
         for (const s of stops) {
-            const lineId = Number((s as any).LINE_ID);
-            const stopId = Number((s as any).STOP_ID);
+            const lineId = Number(s.LINE_ID);
+            const stopId = Number(s.STOP_ID);
             const stopPassengers = passByStopId.get(stopId) || [];
+
             const stopOut = {
-                DISPATCH_ID: dispatch_id,
-                LINE_ID: lineId,
-                STOP_ID: stopId,
-                STOP_NAME: (s as any).stop_name,
-                PLAN_TIME: (s as any).plan_time,
-                PASSENGER_COUNT: stopPassengers.length,
-                PASSENGERS: stopPassengers,
+                dispatch_id,
+                line_id: lineId,
+                stop_id: stopId,
+                stop_name: s.STOP_NAME,
+                plan_time: s.PLAN_TIME,
+                passenger_count: stopPassengers.length,
+                passengers: stopPassengers,
             };
 
             if (!stopsByLineId.has(lineId)) {
@@ -516,8 +520,9 @@ export class DispatchService {
         }
 
         const linesOut = lines.map((l) => {
-            const busid = Number((l as any).busid);
+            const busid = Number(l.BUSID);
             const lineStops = stopsByLineId.get(busid) || [];
+
             const passenger_count = lineStops.reduce((sum, stop) => {
                 return sum + (stop.passengers?.length || 0);
             }, 0);
@@ -526,10 +531,10 @@ export class DispatchService {
                 dispatch_id,
                 line_id: busid,
                 busid,
-                busname: (l as any).busname,
-                bustype: (l as any).bustype,
-                busseat: (l as any).busseat,
-                line_status: (l as any).line_status,
+                busname: l.BUSNAME,
+                bustype: l.BUSTYPE,
+                busseat: l.BUSSEAT,
+                line_status: l.LINE_STATUS,
                 passenger_count,
                 stops: lineStops,
             };

@@ -5,8 +5,19 @@ import { LockPisModule } from './lock-pis/lock-pis.module';
 import { IdtagModule } from './idtag/idtag.module';
 import { F110kpModule } from './f110kp/f110kp.module';
 import { PisModule } from './pis/pis.module';
+import { StaticTestModule } from './static-test/static-test.module';
+import { LoadLessTestModule } from './load-less-test/load-less-test.module';
 
 @Module({
-  imports: [AmeccalendarModule, AvmModule, LockPisModule, IdtagModule, F110kpModule, PisModule],
+  imports: [
+    AmeccalendarModule, 
+    AvmModule, 
+    LockPisModule, 
+    IdtagModule, 
+    F110kpModule, 
+    PisModule,
+    StaticTestModule,
+    LoadLessTestModule,
+],
 })
 export class AmecMfgModule {}

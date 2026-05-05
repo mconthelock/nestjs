@@ -13,6 +13,8 @@ import {
     moveFileFromMulter,
 } from 'src/common/utils/files.utils';
 import { GetOrderService } from '../get-order/get-order.service';
+import { UsersSectionService } from '../user_section/user_section.service';
+import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
 
 @Injectable()
 export class ReturnApvListService {
@@ -21,17 +23,55 @@ export class ReturnApvListService {
         private readonly orderDrawingService: OrdersDrawingService,
         private readonly mailService: MailService,
         private readonly getOrderService: GetOrderService,
+        private readonly userSectionService: UsersSectionService,
+        private readonly sequenceOrgService: SequenceOrgService,
     ) {}
 
     async return(dto: CreateReturnApvListDto) {
         try {
-            await this.repo.upsert(dto);
+            const insert = await this.repo.upsert(dto);
             await this.orderDrawingService.update({
                 ORD_PRODUCTION: dto.VPROD,
                 ORD_ITEM: dto.VITEM,
                 ORD_NO: dto.VORD_NO,
                 ORDDW_ID: dto.NDRAWINGID,
                 ORDDW_FORELEAD_STATUS: 8,
+            });
+            const list = await this.repo.findById(insert.NID);
+            const section = await this.userSectionService.getUserSecByID(
+                dto.NSECID,
+            );
+            const sem = await this.sequenceOrgService.getByPosition({
+                SPOSCODE: '30',
+                VORGNO: section.SSECCODE,
+            });
+            if (!sem.status) {
+                throw new Error(
+                    `Manager with position code 30 and org code ${section.SSECCODE} not found`,
+                );
+            }
+            await this.mailService.sendMail({
+                to:
+                    process.env.NODE_ENV != 'production'
+                        ? process.env.MAIL_ADMIN
+                        : sem.data.EMPINFO.SRECMAIL,
+                subject: 'Auto check sheet return approve',
+                template: 'escs-return-approve',
+                context: {
+                    toName: sem.data.EMPINFO.SNAME,
+                    list: [
+                        {
+                            PROD: list.VPROD,
+                            ORD_NO: list.VORD_NO,
+                            ITEM: list.VITEM,
+                            PROJECT: list.ordersDrawing.orders.ORD_PROJECT,
+                            PATHNAME: list.ordersDrawing.ORDDW_PART,
+                            DRAWING: list.ordersDrawing.ORDDW_DRAWING,
+                            WAITING: true,
+                        },
+                    ],
+                },
+                bcc: process.env.MAIL_ADMIN,
             });
             return {
                 status: true,
@@ -145,9 +185,6 @@ export class ReturnApvListService {
                     bcc: process.env.MAIL_ADMIN,
                 });
             }
-
-            // throw new Error(`test`);
-
             return {
                 status: true,
                 message: 'Return Successfully',
@@ -178,6 +215,26 @@ export class ReturnApvListService {
             return {
                 status: true,
                 message: `Data found ${length} record(s)`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(`Failed to find ReturnApvList: ${error.message}`);
+        }
+    }
+
+    async findById(id: number) {
+        try {
+            const res = await this.repo.findById(id);
+            if (!res) {
+                return {
+                    status: false,
+                    message: 'No data found',
+                    data: [],
+                };
+            }
+            return {
+                status: true,
+                message: `Data found 1 record(s)`,
                 data: res,
             };
         } catch (error) {

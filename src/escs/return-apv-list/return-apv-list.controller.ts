@@ -9,7 +9,10 @@ import {
 } from '@nestjs/common';
 import { ReturnApvListService } from './return-apv-list.service';
 import { CreateReturnApvListDto } from './dto/create-return-apv-list.dto';
-import { ActionReturnApvListDto, UpdateReturnApvListDto } from './dto/update-return-apv-list.dto';
+import {
+    ActionReturnApvListDto,
+    UpdateReturnApvListDto,
+} from './dto/update-return-apv-list.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 @Controller('escs/return-apv-list')
@@ -31,5 +34,10 @@ export class ReturnApvListController {
     @Get('sec/:sec')
     findBySec(@Param('sec') sec: string) {
         return this.returnApvListService.findBySec(+sec);
+    }
+
+    @Get('id/:id')
+    findById(@Param('id') id: string) {
+        return this.returnApvListService.findById(+id);
     }
 }

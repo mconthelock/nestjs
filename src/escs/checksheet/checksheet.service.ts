@@ -4,39 +4,13 @@ import { InCheckDto } from './dto/in-check.dto';
 import { SaveDto } from './dto/save.dto';
 import { DeleteDto } from './dto/delete.dto';
 import { ChecksheetResponseDto } from './dto/response.dto';
-import { GetOrderDto } from './dto/get-order.dto';
-import { GetOrderResponseDto } from './dto/get-order-response.dto';
 import { ChecksheetProc } from './enums/proc.enum';
-import { GetOrderService } from '../get-order/get-order.service';
 
 @Injectable()
 export class ChecksheetService {
     constructor(
-        private readonly repo: ChecksheetRepository,
-        private readonly ordservice: GetOrderService,
+        private readonly repo: ChecksheetRepository
     ) {}
-
-    async getOrder(dto: GetOrderDto): Promise<GetOrderResponseDto | null> {
-        try {
-            const res = await this.ordservice.getOrder(dto);
-            if (!res?.length) {
-                throw new NotFoundException('Order not found');
-            }
-
-            const { ORDERNO, TYPE_MODEL } = res[0];
-            return {
-                orderNo: ORDERNO,
-                typeModel: TYPE_MODEL
-            };
-        } catch (err) {
-            if (err instanceof NotFoundException) throw err;
-
-            throw new InternalServerErrorException({
-                message: 'GET_ORDER failed',
-                error: err?.message
-            });
-        }
-    }
 
     async inCheck(dto: InCheckDto): Promise<ChecksheetResponseDto> {
         try {

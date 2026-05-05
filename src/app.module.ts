@@ -38,7 +38,6 @@ import { PursysModule } from './pursys/pursys.module';
 import { WorkloadModule } from './workload/workload.module';
 import { DatacenterModule } from './datacenter/datacenter.module';
 import { GeneralPartListModule } from './general-part-list/general-part-list.module';
-import { MachineModule } from './machine/machine.module';
 import { MfgEdrModule } from './webform/mfgform/mfg-edr/mfg-edr.module';
 
 @Module({
@@ -74,7 +73,6 @@ import { MfgEdrModule } from './webform/mfgform/mfg-edr/mfg-edr.module';
     WorkloadModule,
     DatacenterModule,
     GeneralPartListModule,
-    MachineModule,
     MfgEdrModule,
   ],
   providers: [

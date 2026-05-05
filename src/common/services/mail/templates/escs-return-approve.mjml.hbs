@@ -52,6 +52,8 @@
                         <td style="padding:8px;">
                             {{#if APPROVE}}
                             <span style="color:#16a34a; font-weight:bold;">Approved</span>
+                            {{else if WAITING}}
+                            <span style="color:#f59e0b; font-weight:bold;">Waiting for return</span>
                             {{else}}
                             <span style="color:#dc2626; font-weight:bold;">Rejected</span>
                             {{/if}}

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { CreateGpRbDto } from './dto/create-gp-rb.dto';
 import { UpdateGpRbDto } from './dto/update-gp-rb.dto';
 import { GpRbRepository } from './gp-rb.repository';
@@ -7,6 +7,8 @@ import { FormCreateService } from 'src/webform/form/create-form.service';
 
 @Injectable()
 export class GpRbService {
+    private readonly logger = new Logger(GpRbService.name);
+
     constructor(
         private readonly repo: GpRbRepository,
         private readonly formmstService: FormmstService,
@@ -16,11 +18,21 @@ export class GpRbService {
     findAll() {
         return this.repo.findAll();
     }
-    /*stampFormatGroup ถูกแก้ไขเข้ามาเพื่อจะเลือกข้อมูลไป insert เข้าตาราง */
     async create(dto: CreateGpRbDto, stampFormatGroup: string, ip: string) {
         try {
-            const formmst =
-                await this.formmstService.getFormMasterByVaname('GP-RB');
+            // ตรวจสอบว่า stampFormatGroup ได้รับค่าแล้ว
+            if (!stampFormatGroup) {
+                throw new BadRequestException('stampFormatGroup is required (standard or other)');
+            }
+
+            // ดึงข้อมูล Form Master
+            const formmst = await this.formmstService.getFormMasterByVaname('GP-RB');
+            if (!formmst) {
+                this.logger.warn('FORMMST not found for VANAME=GP-RB');
+                throw new Error('Form master not found for GP-RB. Check FORMMST table.');
+            }
+
+            // สร้าง Form
             const createForm = await this.formCreateService.create(
                 {
                     NFRMNO: formmst.NNO,
@@ -28,9 +40,17 @@ export class GpRbService {
                     CYEAR: formmst.CYEAR,
                     REQBY: dto.REQBY,
                     INPUTBY: dto.INPUTBY,
+                    REMARK: dto.REMARK,
                 },
                 ip,
             );
+
+            // ตรวจสอบผลการสร้าง Form
+            if (!createForm?.status) {
+                const errMsg = createForm?.message?.message || createForm?.message || 'Unknown error';
+                throw new Error(`Form creation failed: ${errMsg}`);
+            }
+
             const form = {
                 NFRMNO: createForm.data.NFRMNO,
                 VORGNO: createForm.data.VORGNO,
@@ -38,9 +58,8 @@ export class GpRbService {
                 CYEAR2: createForm.data.CYEAR2,
                 NRUNNO: createForm.data.NRUNNO,
             };
-            console.log('Form Master;', formmst);
- 
-            /*สร้างเงื่อนไขที่เลือกระหว่างแบบที่ 1 หรือ 2*/
+
+            // บันทึกข้อมูล Stamp Request ตามประเภท
             if (stampFormatGroup === 'standard') {
                 await this.repo.CreateStampReq({
                     ...form,
@@ -48,25 +67,30 @@ export class GpRbService {
                     PURPOSE_OTHER: dto.PURPOSE_OTHER,
                     SPOSCODE: dto.SPOSCODE,
                     NAME_STAMP: dto.NAME_STAMP,
-                    REMARK: dto.REMARK,
+                    REMARK: dto.STAMP_REMARK,
                 });
-            }
-            /*สร้างเงื่อนไขที่เลือกระหว่างแบบที่ 1 หรือ 2*/
-            if (stampFormatGroup === 'other') {
+            } else if (stampFormatGroup === 'other') {
                 await this.repo.CreateCusStampReq({
                     ...form,
                     CUST_SIZE: dto.CUST_SIZE,
                     QTY: dto.QTY,
-                    REMARK: dto.REMARK,
+                    REMARK: dto.STAMPCUS_REMARK,
                 });
+            } else {
+                throw new BadRequestException(
+                    `Invalid stampFormatGroup: "${stampFormatGroup}". Must be "standard" or "other"`
+                );
             }
 
             return {
                 status: true,
                 message: 'GP-RB form created successfully',
-            }
+            };
         } catch (error) {
-            throw new Error('Failed to ctrate GP-RB form');
+            const message = error instanceof Error ? error.message : String(error);
+            this.logger.error('Error creating GP-RB form:', message);
+            throw error;
         }
     }
+
 }

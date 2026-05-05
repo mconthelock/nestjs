@@ -7,6 +7,8 @@ import { RETURN_APV_LIST } from 'src/common/Entities/escs/table/RETURN_APV_LIST.
 import { OrdersDrawingModule } from '../orders-drawing/orders-drawing.module';
 import { MailModule } from 'src/common/services/mail/mail.module';
 import { GetOrderModule } from '../get-order/get-order.module';
+import { SequenceOrgModule } from 'src/webform/sequence-org/sequence-org.module';
+import { UsersSectionModule } from '../user_section/user_section.module';
 
 @Module({
     imports: [
@@ -14,6 +16,8 @@ import { GetOrderModule } from '../get-order/get-order.module';
         OrdersDrawingModule,
         MailModule,
         GetOrderModule,
+        SequenceOrgModule,
+        UsersSectionModule,
     ],
     controllers: [ReturnApvListController],
     providers: [ReturnApvListService, ReturnApvListRepository],

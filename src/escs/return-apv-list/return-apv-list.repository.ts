@@ -18,7 +18,11 @@ export class ReturnApvListRepository extends BaseRepository {
 
     findBySec(sec: number) {
         return this.getRepository(RETURN_APV_LIST).find({
-            where: { NSECID: sec, NSTATUS: 0, ordersDrawing: { ORDDW_FORELEAD_STATUS: 8 } },
+            where: {
+                NSECID: sec,
+                NSTATUS: 0,
+                ordersDrawing: { ORDDW_FORELEAD_STATUS: 8 },
+            },
             relations: ['ordersDrawing', 'ordersDrawing.orders'],
         });
     }
@@ -26,7 +30,12 @@ export class ReturnApvListRepository extends BaseRepository {
     findById(id: number) {
         return this.getRepository(RETURN_APV_LIST).findOne({
             where: { NID: id },
-            relations: ['ordersDrawing', 'ordersDrawing.orders', 'userCreate', 'userCreate.user'],
+            relations: [
+                'ordersDrawing',
+                'ordersDrawing.orders',
+                'userCreate',
+                'userCreate.user',
+            ],
         });
     }
 }

@@ -44,7 +44,7 @@ export class DispatchReportService {
             .leftJoin(
                 'AMECUSERALL',
                 'u',
-                'TRIM(TO_CHAR(u.SEMPNO)) = TRIM(TO_CHAR(p.empno))',
+                'TRIM(TO_CHAR(u.SEMPNO)) = TRIM(TO_CHAR(p.EMPNO))',
             )
             .select('p.EMPNO', 'empno')
             .addSelect('p.STOP_ID', 'stop_id')
@@ -115,7 +115,7 @@ export class DispatchReportService {
             .leftJoin(
                 'AMECUSERALL',
                 'u',
-                'TRIM(TO_CHAR(u.SEMPNO)) = TRIM(TO_CHAR(p.empno))',
+                'TRIM(TO_CHAR(u.SEMPNO)) = TRIM(TO_CHAR(p.EMPNO))',
             )
             .select('p.EMPNO', 'empno')
             .addSelect('s.STOP_NAME', 'stop_name')

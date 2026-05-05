@@ -420,9 +420,9 @@ export class DispatchService {
     async getDispatch(dto: DispatchKeyDto) {
         const head = await this.headRepo.findOne({
             where: {
-                dispatch_date: dto.workdate,
-                dispatch_type: dto.dispatch_type,
-                shift: dto.shift,
+                DISPATCH_DATE: dto.workdate,
+                DISPATCH_TYPE: dto.dispatch_type,
+                SHIFT: dto.shift,
             } as any,
         });
 
@@ -443,7 +443,7 @@ export class DispatchService {
         const [lines, stops, passengers] = await Promise.all([
             this.lineRepo.find({
                 where: {
-                    dispatch_id,
+                    DISPATCH_ID: dispatch_id,
                 } as any,
                 order: { BUSID: 'ASC' as any },
             }),
@@ -495,17 +495,17 @@ export class DispatchService {
 
         const stopsByLineId = new Map<number, any[]>();
         for (const s of stops) {
-            const lineId = Number((s as any).line_id);
-            const stopId = Number((s as any).stop_id);
+            const lineId = Number((s as any).LINE_ID);
+            const stopId = Number((s as any).STOP_ID);
             const stopPassengers = passByStopId.get(stopId) || [];
             const stopOut = {
-                dispatch_id,
-                line_id: lineId,
-                stop_id: stopId,
-                stop_name: (s as any).stop_name,
-                plan_time: (s as any).plan_time,
-                passenger_count: stopPassengers.length,
-                passengers: stopPassengers,
+                DISPATCH_ID: dispatch_id,
+                LINE_ID: lineId,
+                STOP_ID: stopId,
+                STOP_NAME: (s as any).stop_name,
+                PLAN_TIME: (s as any).plan_time,
+                PASSENGER_COUNT: stopPassengers.length,
+                PASSENGERS: stopPassengers,
             };
 
             if (!stopsByLineId.has(lineId)) {

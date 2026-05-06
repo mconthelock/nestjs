@@ -5,6 +5,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { STY_PATROL_INSPECTION } from 'src/common/Entities/gpreport/views/STY_PATROL_INSPECTION.entity';
 import { ReportStyPatrolInspectionDto } from './dto/report-sty-patrol-inspection.dto';
 import { STY_ITEMS } from 'src/common/Entities/gpreport/table/STY_ITEMS.entity';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Injectable()
 export class StyPatrolInspectionRepository extends BaseRepository {
@@ -77,5 +78,20 @@ export class StyPatrolInspectionRepository extends BaseRepository {
             )
             .orderBy('OWNER_SECTION, ITEMS_ID, CLASS', 'ASC');
         return query.getRawMany();
+    }
+
+    listByForm(dto: FormDto) {
+        return this.getRepository(STY_PATROL_INSPECTION).find({
+            where: {
+                NFRMNO: dto.NFRMNO,
+                VORGNO: dto.VORGNO,
+                CYEAR: dto.CYEAR,
+                CYEAR2: dto.CYEAR2,
+                NRUNNO: dto.NRUNNO,
+            },
+            order: {
+                PA_ID: 'ASC',
+            },
+        });
     }
 }

@@ -21,6 +21,6 @@ export class GpRbRepository extends BaseRepository {
     }
 
     async CreateCusStampReq(dto:CreateCusStampReqDto) {
-        return this.getRepository(RB_CUS_STAMP_REQ).save(dto);
+        return this.getRepository(RB_CUS_STAMP_REQ).save({...dto, REMARK: dto.STAMPCUS_REMARK});
     }
 }

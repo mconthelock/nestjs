@@ -10,7 +10,9 @@ import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper'
 
 @Controller('gpform/gp-rb')
 export class GpRbController {
-  constructor(private readonly gpRbServicee: GpRbService) {}
+  constructor(
+    private readonly gpRbServicee: GpRbService, ){}
+
 
   @Get()
   findAll(){
@@ -21,11 +23,8 @@ export class GpRbController {
   @Post()
   @UseTransaction('webformConnection')
   @UseInterceptors(getFileUploadInterceptor())
-  create(@Body() body: any, @Req() req:Request) {
+  create(@Body() dto: CreateGpRbDto, @Req() req:Request) {
     const ip = getClientIP(req)
-    const dto = body as CreateGpRbDto;
-    const stampFormatGroup = body.stampFormatGroup;
-    return this.gpRbServicee.create(dto, stampFormatGroup, ip);
+    return this.gpRbServicee.create(dto, ip);
   }
 }
- 

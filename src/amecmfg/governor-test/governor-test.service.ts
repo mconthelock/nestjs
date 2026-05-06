@@ -113,6 +113,8 @@ export class GovernorTestService {
             database: parts['Initial Catalog'],
             user: parts['User ID'],
             password: parts['Password'],
+            connectionTimeout: 5000, 
+            requestTimeout: 5000,
             options: {
                 instanceName, 
                 encrypt: false,
@@ -121,7 +123,7 @@ export class GovernorTestService {
             pool: {
                 max: 5,
                 min: 0,
-                idleTimeoutMillis: 30000,
+                idleTimeoutMillis: 5000,
             },
         };
     }

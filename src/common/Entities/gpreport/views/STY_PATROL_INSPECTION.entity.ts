@@ -9,7 +9,7 @@ export class STY_PATROL_INSPECTION {
     FORMNO: string;
 
     @ViewColumn()
-    NFRMNO: string;
+    NFRMNO: number;
 
     @ViewColumn()
     VORGNO: string;

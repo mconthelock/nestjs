@@ -3,6 +3,7 @@ import { CreateStyPatrolInspectionDto } from './dto/create-sty-patrol-inspection
 import { UpdateStyPatrolInspectionDto } from './dto/update-sty-patrol-inspection.dto';
 import { StyPatrolInspectionRepository } from './sty-patrol-inspection.repository';
 import { ReportStyPatrolInspectionDto } from './dto/report-sty-patrol-inspection.dto';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Injectable()
 export class StyPatrolInspectionService {
@@ -10,28 +11,26 @@ export class StyPatrolInspectionService {
 
     async listByMonthYear(month: string, year: string) {
         try {
-        const [monthNum, yearNum] = [Number(month), Number(year)];
-        console.log('month', monthNum, 'year', yearNum);
-        
-        const startDate = new Date(yearNum, monthNum - 1, 1);
-        const endDate = new Date(yearNum, monthNum, 0); // วันสุดท้ายของเดือน
-        console.log('start', startDate, 'end', endDate);
-        
-        const res = await this.repo.findBylength(startDate, endDate);
-        if(res.length === 0) {
+            const [monthNum, yearNum] = [Number(month), Number(year)];
+            const startDate = new Date(yearNum, monthNum - 1, 1);
+            const endDate = new Date(yearNum, monthNum, 0); // วันสุดท้ายของเดือน
+            const res = await this.repo.findBylength(startDate, endDate);
+            if (res.length === 0) {
+                return {
+                    status: false,
+                    message: `No patrol inspections found for ${month}/${year}`,
+                    data: [],
+                };
+            }
             return {
-                status: false,
-                message: `No patrol inspections found for ${month}/${year}`,
-                data: [],
+                status: true,
+                message: `Patrol inspections found for ${month}/${year} (${res.length} record(s))`,
+                data: res,
             };
-        }
-        return {
-            status: true,
-            message: `Patrol inspections found for ${month}/${year} (${res.length} record(s))`,
-            data: res,
-        };
-        }catch (error) {
-            throw new Error('Error fetching patrol inspections: ' + error.message);
+        } catch (error) {
+            throw new Error(
+                'Error fetching patrol inspections: ' + error.message,
+            );
         }
     }
 
@@ -52,6 +51,29 @@ export class StyPatrolInspectionService {
             };
         } catch (error) {
             throw new Error(`Failed to get item report: ${error.message}`);
-        }   
+        }
+    }
+
+    async listByForm(dto: FormDto) {
+        try {
+            const res = await this.repo.listByForm(dto);
+            if (res.length === 0) {
+                return {
+                    status: false,
+                    message:
+                        'No patrol inspections found for the provided form criteria',
+                    data: [],
+                };
+            }
+            return {
+                status: true,
+                message: `Patrol inspections found for the provided form criteria (${res.length} record(s))`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(
+                `Failed to list patrol inspections by form: ${error.message}`,
+            );
+        }
     }
 }

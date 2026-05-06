@@ -28,4 +28,16 @@ export class FinDsRepository extends BaseRepository {
             }
         });
     }
+
+
+
+
+
+///  CREATE HEAD prepare for create form
+     async createHead(data: DSREQHEAD) {
+            return this.getRepository(DSREQHEAD).save(data);
+        }
+     async createdetail(data: DSREQDETAIL) {
+            return this.getRepository(DSREQDETAIL).save(data);
+        }
 }

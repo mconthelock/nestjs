@@ -12,12 +12,14 @@ import {DSREQDETAIL } from  'src/common/Entities/webform/table/FINDS_REQ_DETAIL.
 import {DSSTOCK } from  'src/common/Entities/webform/table/FINDS_STOCK.entity'
 import {DSREQHEAD } from  'src/common/Entities/webform/table/FINDS_REQ_HEAD.entity'
 import { FinDsRepository } from './fin-ds.repository';
+import { FormmstModule } from 'src/webform/formmst/formmst.module';
 
 @Module({
   imports:[
       TypeOrmModule.forFeature([DSDUTYSTAMP], 'webformConnection'),
       FormModule,
       FlowModule,
+      FormmstModule
   ],
 
   controllers: [FinDsController],

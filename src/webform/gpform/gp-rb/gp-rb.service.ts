@@ -62,7 +62,7 @@ export class GpRbService {
             let insert;
             // บันทึกข้อมูล Stamp Request ตามประเภท
             if (stampFormatGroup === 'standard') {
-                if(!dto.PURPOSE_ID || !dto.NAME_STAMP ) {
+                if(!dto.PURPOSE_ID || !dto.PURPOSE_OTHER || dto.SPOSCODE|| !dto.NAME_STAMP ) {
                     throw new BadRequestException('PURPOSE_ID and NAME_STAMP are required for standard stamp group');
                 }
                 insert = await this.repo.CreateStampReq({
@@ -76,6 +76,9 @@ export class GpRbService {
                 console.log(insert);
                 
             } else if (stampFormatGroup === 'other') {
+                if(!dto.CUST_SIZE || !dto.QTY) {
+                    throw new BadRequestException('CUST_SIZE and QTY are required for other stamp group');
+                }   
                 insert = await this.repo.CreateCusStampReq({
                     ...form,
                     CUST_SIZE: dto.CUST_SIZE,

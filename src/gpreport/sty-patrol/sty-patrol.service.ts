@@ -24,4 +24,20 @@ export class StyPatrolService {
             throw new Error(`Failed to create StyPatrol: ${error.message}`);
         }
     }
+
+    async update(dto: UpdateStyPatrolDto) {
+        try {
+            const res = await this.repo.update(dto);
+            if (res.affected === 0) {
+                return { status: false, message: 'Failed to update StyPatrol' };
+            }
+            return {
+                status: true,
+                message: 'StyPatrol updated successfully',
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(`Failed to update StyPatrol: ${error.message}`);
+        }
+    }
 }

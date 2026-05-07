@@ -11,6 +11,7 @@ import { StyPatrolService } from 'src/gpreport/sty-patrol/sty-patrol.service';
 import { CreateStyPatrolDto } from 'src/gpreport/sty-patrol/dto/create-sty-patrol.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { FlowService } from 'src/webform/flow/flow.service';
+import { FormService } from 'src/webform/form/form.service';
 
 @Injectable()
 export class StInpService {
@@ -21,6 +22,7 @@ export class StInpService {
         protected readonly styTypeService: StyTypeService,
         protected readonly styPatrolService: StyPatrolService,
         protected readonly flowService: FlowService,
+        protected readonly formService: FormService
     ) {}
 
     async createForm(dto: CreateFormDto, ip: string, owner: string) {
@@ -79,6 +81,8 @@ export class StInpService {
                 PA_USERCREATE: dto.PA_USERCREATE,
             };
 
+            const formno = await this.formService.getFormno(form);
+
             for (const list of dto.PA_LIST) {
                 const index = dto.PA_LIST.indexOf(list) + 1;
                 // insert and move image
@@ -88,6 +92,7 @@ export class StInpService {
                         path,
                         userCreate: dto.PA_USERCREATE,
                         typeId: styType.data[0].TYPE_ID,
+                        folder: formno,
                     },
                 );
                 movedTargets.push(...movedFile.path);

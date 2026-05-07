@@ -8,6 +8,7 @@ import { StyTypeModule } from 'src/gpreport/sty-type/sty-type.module';
 import { StyPatrolModule } from 'src/gpreport/sty-patrol/sty-patrol.module';
 import { StInpCreateService } from './st-inp-create.service';
 import { FlowModule } from 'src/webform/flow/flow.module';
+import { StInpCorrectiveService } from './st-inp-corrective.service';
 
 @Module({
     imports: [
@@ -19,7 +20,7 @@ import { FlowModule } from 'src/webform/flow/flow.module';
         StyPatrolModule,
     ],
     controllers: [StInpController],
-    providers: [StInpService, StInpCreateService],
+    providers: [StInpService, StInpCreateService, StInpCorrectiveService],
     exports: [StInpService],
 })
 export class StInpModule {}

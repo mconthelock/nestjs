@@ -9,6 +9,7 @@ import { StyPatrolModule } from 'src/gpreport/sty-patrol/sty-patrol.module';
 import { StInpCreateService } from './st-inp-create.service';
 import { FlowModule } from 'src/webform/flow/flow.module';
 import { StInpCorrectiveService } from './st-inp-corrective.service';
+import { StInpEvaluateService } from './st-inp-evaluate.service';
 
 @Module({
     imports: [
@@ -20,7 +21,12 @@ import { StInpCorrectiveService } from './st-inp-corrective.service';
         StyPatrolModule,
     ],
     controllers: [StInpController],
-    providers: [StInpService, StInpCreateService, StInpCorrectiveService],
+    providers: [
+        StInpService,
+        StInpCreateService,
+        StInpCorrectiveService,
+        StInpEvaluateService,
+    ],
     exports: [StInpService],
 })
 export class StInpModule {}

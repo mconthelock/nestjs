@@ -27,6 +27,8 @@ import {
     CorrectiveStInpDetailDto,
     CorrectiveStInpDto,
 } from './dto/corrective-st-inp.dto';
+import { StInpEvaluateService } from './st-inp-evaluate.service';
+import { EvaluateStInpDto } from './dto/evaluate-st-inp.dto';
 
 @Controller('stform/st-inp')
 export class StInpController {
@@ -34,6 +36,7 @@ export class StInpController {
         private readonly stInpService: StInpService,
         private readonly stInpCreateService: StInpCreateService,
         private readonly stInpCorrectiveService: StInpCorrectiveService,
+        private readonly stInpEvaluateService: StInpEvaluateService,
     ) {}
 
     private readonly path = `${process.env.AMEC_FILE_PATH}${process.env.STATE}/safety/image/Patrol/`;
@@ -75,5 +78,13 @@ export class StInpController {
     ) {
         const ip = getClientIP(req);
         return this.stInpCorrectiveService.setCorrectiveDetail(dto, ip, file, this.path);
+    }
+
+    @Patch('setEvaluate')
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
+    SetEvaluate(@Body() dto: EvaluateStInpDto, @Req() req: Request) {
+        const ip = getClientIP(req);
+        return this.stInpEvaluateService.setEvaluate(dto, ip);
     }
 }

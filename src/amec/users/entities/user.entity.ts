@@ -1,124 +1,124 @@
 import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  OneToOne,
-  JoinColumn,
-  OneToMany,
+    Entity,
+    PrimaryColumn,
+    Column,
+    OneToOne,
+    JoinColumn,
+    OneToMany,
 } from 'typeorm';
-import { Appsuser } from '../../../docinv/appsusers/entities/appsuser.entity';
+import { Appsuser } from '../../../common/Entities/docinv/table/appsuser.entity';
 import { Workpic } from '../../../docinv/workpic/entities/workpic.entity';
 import { SetRequestDate } from 'src/joborder/set-request-date/entities/set-request-date.entity';
 import { JopMarReq } from 'src/joborder/jop-mar-req/entities/jop-mar-req.entity';
 import { JopPurConf } from 'src/joborder/jop-pur-conf/entities/jop-pur-conf.entity';
-import { Accesslog } from 'src/docinv/accesslog/entities/accesslog.entity';
+import { Accesslog } from 'src/common/Entities/docinv/table/accesslog.entity';
 import { Designer } from 'src/spprogram/designer/entities/designer.entity';
 import { Buspassenger } from 'src/common/Entities/gpreport/table/buspassenger.entity';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
 @Entity('AMECUSERALL')
 export class User {
-  @PrimaryColumn()
-  SEMPNO: string;
+    @PrimaryColumn()
+    SEMPNO: string;
 
-  @Column()
-  SEMPPRE: string;
+    @Column()
+    SEMPPRE: string;
 
-  @Column()
-  SNAME: string;
+    @Column()
+    SNAME: string;
 
-  @Column()
-  SRECMAIL: string;
+    @Column()
+    SRECMAIL: string;
 
-  @Column()
-  SSECCODE: string;
+    @Column()
+    SSECCODE: string;
 
-  @Column()
-  SSEC: string;
+    @Column()
+    SSEC: string;
 
-  @Column()
-  SDEPCODE: string;
+    @Column()
+    SDEPCODE: string;
 
-  @Column()
-  SDEPT: string;
+    @Column()
+    SDEPT: string;
 
-  @Column()
-  SDIVCODE: string;
+    @Column()
+    SDIVCODE: string;
 
-  @Column()
-  SDIV: string;
+    @Column()
+    SDIV: string;
 
-  @Column()
-  SPOSCODE: string;
+    @Column()
+    SPOSCODE: string;
 
-  @Column()
-  SPOSNAME: string;
+    @Column()
+    SPOSNAME: string;
 
-  @Column()
-  SPOSITION: string;
+    @Column()
+    SPOSITION: string;
 
-  @Column()
-  SPASSWORD1: string;
+    @Column()
+    SPASSWORD1: string;
 
-  @Column()
-  CSTATUS: string;
+    @Column()
+    CSTATUS: string;
 
-  @Column()
-  SEMPENCODE: string;
+    @Column()
+    SEMPENCODE: string;
 
-  @Column()
-  MEMEML: string;
+    @Column()
+    MEMEML: string;
 
-  @Column()
-  SEMPPRT: string;
+    @Column()
+    SEMPPRT: string;
 
-  @Column()
-  STNAME: string;
+    @Column()
+    STNAME: string;
 
-  @Column()
-  STARTDATE: Date;
+    @Column()
+    STARTDATE: Date;
 
-  @Column()
-  NTELNO: number;
+    @Column()
+    NTELNO: number;
 
-  @Column()
-  BIRTHDAY: Number;
+    @Column()
+    BIRTHDAY: Number;
 
-  //Docinv
-  @OneToOne(() => Workpic, (dev) => dev.developer)
-  @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'PIC_ID' })
-  dev: Workpic;
+    //Docinv
+    @OneToOne(() => Workpic, (dev) => dev.developer)
+    @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'PIC_ID' })
+    dev: Workpic;
 
-  @OneToOne(() => Appsuser, (emp) => emp.employee)
-  @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'USERS_ID' })
-  appemp: Workpic;
+    @OneToOne(() => Appsuser, (emp) => emp.employee)
+    @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'USERS_ID' })
+    appemp: Workpic;
 
-  //Joborder
-  @OneToMany(() => SetRequestDate, (req) => req.JOP_MAR_REQUEST)
-  marRequest: SetRequestDate[];
+    //Joborder
+    @OneToMany(() => SetRequestDate, (req) => req.JOP_MAR_REQUEST)
+    marRequest: SetRequestDate[];
 
-  @OneToMany(() => SetRequestDate, (req) => req.JOP_PUR_CONFIRM)
-  purConfirm: SetRequestDate[];
+    @OneToMany(() => SetRequestDate, (req) => req.JOP_PUR_CONFIRM)
+    purConfirm: SetRequestDate[];
 
-  @OneToMany(() => JopMarReq, (req) => req.marRequest)
-  jopMarReq: JopMarReq[];
+    @OneToMany(() => JopMarReq, (req) => req.marRequest)
+    jopMarReq: JopMarReq[];
 
-  @OneToMany(() => JopPurConf, (req) => req.purConfirm)
-  jopPurConf: JopPurConf[];
+    @OneToMany(() => JopPurConf, (req) => req.purConfirm)
+    jopPurConf: JopPurConf[];
 
-  @OneToMany(() => Accesslog, (log) => log.users)
-  @JoinColumn([{ name: 'SEMPNO', referencedColumnName: 'LOG_USER' }])
-  loginlogs: Accesslog[];
+    // @OneToMany(() => Accesslog, (log) => log.users)
+    // @JoinColumn([{ name: 'SEMPNO', referencedColumnName: 'LOG_USER' }])
+    // loginlogs: Accesslog[];
 
-  @OneToOne(() => Designer, (des) => des.user)
-  @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'DES_USER' })
-  spdesigner: Designer;
+    @OneToOne(() => Designer, (des) => des.user)
+    @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'DES_USER' })
+    spdesigner: Designer;
 
-/*
+    /*
   @OneToOne(() => Buspassenger, (amecuser) => amecuser.Amecuserall)
   @JoinColumn( {name: 'SEMPNO', referencedColumnName: 'EMPNO'})
   BUSPASSENGER:User;
 */
-  @OneToMany(() => Buspassenger, (bp) => bp.Amecuserall)
-  BUSPASSENGER: Buspassenger[];
+    @OneToMany(() => Buspassenger, (bp) => bp.Amecuserall)
+    BUSPASSENGER: Buspassenger[];
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TableCheck } from './entities/table-check.entity';
+import { TableCheck } from '../../common/Entities/docinv/table/table-check.entity';
 import * as ftp from 'basic-ftp';
 import * as path from 'path';
 import * as fs from 'fs';

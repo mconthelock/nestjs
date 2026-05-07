@@ -24,7 +24,7 @@ import { HradminModule } from './hradmin/hradmin.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { IdsModule } from './ids/ids.module';
 import { ElmesModule } from './elmes/elmes.module';
-import { ItgcModule } from './itgc/itgc.module';
+// import { ItgcModule } from './itgc/itgc.module';
 import { AS400Module } from './as400/as400.module';
 import { PackingModule } from './packing/packing.module';
 import { HbdModule } from './hbd/hbd.module';
@@ -41,57 +41,57 @@ import { GeneralPartListModule } from './general-part-list/general-part-list.mod
 import { MfgEdrModule } from './webform/mfgform/mfg-edr/mfg-edr.module';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    CommonModule,
+    imports: [
+        ConfigModule.forRoot({ isGlobal: true }),
+        CommonModule,
 
-    //BB8 💣
-    AuthModule,
-    AmecModule,
-    AmecMfgModule,
-    DocinvModule,
-    gpreportModule,
-    WebformModule,
-    SpModule,
-    MktModule,
-    ElmesModule,
-    AS400Module,
-    AutomationModule,
-    HradminModule,
-    //JB 🤴
-    JobOrderModule,
-    ESCSModule,
-    PackingModule,
-    InvoiceModule,
-    IdsModule,
-    ItgcModule,
-    SafetyModule,
-    HbdModule,
-    EbudgetModule,
-    WarehouseModule,
-    PursysModule,
-    WorkloadModule,
-    DatacenterModule,
-    GeneralPartListModule,
-    MfgEdrModule,
-  ],
-  providers: [
-    HttpLoggingInterceptor,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: TransactionInterceptor,
-    },
-  ],
+        //BB8 💣
+        AuthModule,
+        AmecModule,
+        AmecMfgModule,
+        DocinvModule,
+        gpreportModule,
+        WebformModule,
+        SpModule,
+        MktModule,
+        ElmesModule,
+        AS400Module,
+        AutomationModule,
+        HradminModule,
+        //JB 🤴
+        JobOrderModule,
+        ESCSModule,
+        PackingModule,
+        InvoiceModule,
+        IdsModule,
+        // ItgcModule,
+        SafetyModule,
+        HbdModule,
+        EbudgetModule,
+        WarehouseModule,
+        PursysModule,
+        WorkloadModule,
+        DatacenterModule,
+        GeneralPartListModule,
+        MfgEdrModule,
+    ],
+    providers: [
+        HttpLoggingInterceptor,
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: TransactionInterceptor,
+        },
+    ],
 })
 export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(
-        EarlyHeadMiddleware,
-        RequestIdMiddleware,
-        RequestContextMiddleware,
-        IpLoggerMiddleware,
-      )
-      .forRoutes('*');
-  }
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+            .apply(
+                EarlyHeadMiddleware,
+                RequestIdMiddleware,
+                RequestContextMiddleware,
+                IpLoggerMiddleware,
+            )
+            .forRoutes('*');
+    }
 }

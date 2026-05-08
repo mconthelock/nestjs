@@ -20,7 +20,7 @@ export class GpRbService {
     }
     async create(dto: CreateGpRbDto, ip: string) {
         try {
-            const stampFormatGroup = dto.STAMPGROUP?.toLowerCase();
+            const stampFormatGroup = dto.stampFormatGroup?.toLowerCase();
             // ตรวจสอบว่า stampFormatGroup ได้รับค่าแล้ว
             if (!stampFormatGroup) {
                 throw new BadRequestException('stampFormatGroup is required (standard or other)');
@@ -62,9 +62,9 @@ export class GpRbService {
             let insert;
             // บันทึกข้อมูล Stamp Request ตามประเภท
             if (stampFormatGroup === 'standard') {
-                if(!dto.PURPOSE_ID || !dto.PURPOSE_OTHER || dto.SPOSCODE|| !dto.NAME_STAMP ) {
+         /*      if(!dto.PURPOSE_ID || !dto.PURPOSE_OTHER || !dto.SPOSCODE|| !dto.NAME_STAMP ) {
                     throw new BadRequestException('PURPOSE_ID and NAME_STAMP are required for standard stamp group');
-                }
+                } */
                 insert = await this.repo.CreateStampReq({
                     ...form,
                     PURPOSE_ID: dto.PURPOSE_ID,
@@ -76,7 +76,7 @@ export class GpRbService {
                 console.log(insert);
                 
             } else if (stampFormatGroup === 'other') {
-                if(!dto.CUST_SIZE || !dto.QTY) {
+               if(!dto.CUST_SIZE || !dto.QTY) {
                     throw new BadRequestException('CUST_SIZE and QTY are required for other stamp group');
                 }   
                 insert = await this.repo.CreateCusStampReq({

@@ -92,12 +92,15 @@ export class CreateGpRbDto extends IntersectionType(
         'NAME_STAMP',
         'STAMP_REMARK',
     ] as const),
-    PickType(CreateCusStampReqDto, ['CUST_SIZE', 'QTY', 'STAMPCUS_REMARK'] as const),
+    PickType(CreateCusStampReqDto, [
+        'CUST_SIZE',
+        'QTY',
+        'STAMPCUS_REMARK',
+    ] as const),
 ) {
-
     @IsNotEmpty()
     @IsString()
     @IsEnum(['standard', 'other'])
     @Type(() => String)
-    STAMPGROUP: string;
+    stampFormatGroup: string;
 }

@@ -33,7 +33,6 @@ import { EvaluateStInpDto } from './dto/evaluate-st-inp.dto';
 @Controller('stform/st-inp')
 export class StInpController {
     constructor(
-        private readonly stInpService: StInpService,
         private readonly stInpCreateService: StInpCreateService,
         private readonly stInpCorrectiveService: StInpCorrectiveService,
         private readonly stInpEvaluateService: StInpEvaluateService,

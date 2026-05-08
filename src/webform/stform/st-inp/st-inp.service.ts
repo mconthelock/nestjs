@@ -1,17 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { CreateStInpDto } from './dto/create-st-inp.dto';
-import { UpdateStInpDto } from './dto/update-st-inp.dto';
 import { FormCreateService } from 'src/webform/form/create-form.service';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 import { StyImageService } from 'src/gpreport/sty-image/sty-image.service';
-import { deleteFile } from 'src/common/utils/files.utils';
 import { StyTypeService } from 'src/gpreport/sty-type/sty-type.service';
-import { StyPatrolService } from 'src/gpreport/sty-patrol/sty-patrol.service';
-import { CreateStyPatrolDto } from 'src/gpreport/sty-patrol/dto/create-sty-patrol.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { FlowService } from 'src/webform/flow/flow.service';
 import { FormService } from 'src/webform/form/form.service';
+import { StinpFormService } from 'src/gpreport/stinp-form/stinp-form.service';
+import { StinpFormListService } from 'src/gpreport/stinp-form-list/stinp-form-list.service';
 
 @Injectable()
 export class StInpService {
@@ -20,9 +18,10 @@ export class StInpService {
         protected readonly formmstService: FormmstService,
         protected readonly styImageService: StyImageService,
         protected readonly styTypeService: StyTypeService,
-        protected readonly styPatrolService: StyPatrolService,
         protected readonly flowService: FlowService,
-        protected readonly formService: FormService
+        protected readonly formService: FormService,
+        protected readonly stinpFormService: StinpFormService,
+        protected readonly stinpFormListService: StinpFormListService,
     ) {}
 
     async createForm(dto: CreateFormDto, ip: string, owner: string) {
@@ -72,43 +71,42 @@ export class StInpService {
                 throw new Error('STY Type not found for code PT');
             }
 
-            const dataList = {
+            const insertedStinpForm = await this.stinpFormService.create({
                 ...form,
-                PA_OWNER: dto.PA_OWNER,
-                PA_DATE: dto.PA_DATE,
-                PA_SECTION: dto.PA_SECTION,
-                PA_AUDIT: dto.PA_AUDIT,
-                PA_USERCREATE: dto.PA_USERCREATE,
-            };
+                VOWNER: dto.PA_OWNER,
+                DDATE: dto.PA_DATE,
+                VSECTION: dto.PA_SECTION,
+                VAUDIT: dto.PA_AUDIT,
+            });
 
             const formno = await this.formService.getFormno(form);
-
-            for (const list of dto.PA_LIST) {
-                const index = dto.PA_LIST.indexOf(list) + 1;
-                // insert and move image
-                const movedFile = await this.styImageService.moveAndInsertFiles(
-                    {
-                        file: files[index - 1],
-                        path,
-                        userCreate: dto.PA_USERCREATE,
-                        typeId: styType.data[0].TYPE_ID,
-                        folder: formno,
-                    },
-                );
-                movedTargets.push(...movedFile.path);
-                const dataPatrol = {
-                    ...dataList,
-                    PA_ID: index,
-                    PA_ITEMS: list.PA_ITEMS,
-                    PA_AREA: list.PA_AREA,
-                    PA_DETECTED: list.PA_DETECTED,
-                    PA_CLASS: list.PA_CLASS,
-                    PA_SUGGESTION: list.PA_SUGGESTION || null,
-                    PA_MAT: list.PA_MAT,
-                    PA_IMAGE: movedFile.data.IMAGE_ID,
-                };
-                await this.styPatrolService.create(dataPatrol);
+            if (dto.PA_LIST?.length > 0) {
+                for (const list of dto.PA_LIST) {
+                    const index = dto.PA_LIST.indexOf(list) + 1;
+                    // insert and move image
+                    const movedFile =
+                        await this.styImageService.moveAndInsertFiles({
+                            file: files[index - 1],
+                            path,
+                            userCreate: dto.PA_USERCREATE,
+                            typeId: styType.data[0].TYPE_ID,
+                            folder: formno,
+                        });
+                    movedTargets.push(...movedFile.path);
+                    await this.stinpFormListService.create({
+                        ...form,
+                        NID: index,
+                        NITEM: list.PA_ITEMS,
+                        VAREA: list.PA_AREA,
+                        VDETECTED: list.PA_DETECTED,
+                        NCLASS: list.PA_CLASS,
+                        VSUGGESTION: list.PA_SUGGESTION || null,
+                        NMAT: list.PA_MAT,
+                        NIMAGE: movedFile.data.IMAGE_ID,
+                    });
+                }
             }
+
             return movedTargets;
         } catch (error) {
             throw new Error(`Failed to insert list: ${error.message}`);

@@ -10,6 +10,8 @@ import { StInpCreateService } from './st-inp-create.service';
 import { FlowModule } from 'src/webform/flow/flow.module';
 import { StInpCorrectiveService } from './st-inp-corrective.service';
 import { StInpEvaluateService } from './st-inp-evaluate.service';
+import { StinpFormListModule } from 'src/gpreport/stinp-form-list/stinp-form-list.module';
+import { StinpFormModule } from 'src/gpreport/stinp-form/stinp-form.module';
 
 @Module({
     imports: [
@@ -19,6 +21,8 @@ import { StInpEvaluateService } from './st-inp-evaluate.service';
         StyImageModule,
         StyTypeModule,
         StyPatrolModule,
+        StinpFormModule,
+        StinpFormListModule,
     ],
     controllers: [StInpController],
     providers: [

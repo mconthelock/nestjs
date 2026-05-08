@@ -11,6 +11,8 @@ import { StyTypeService } from 'src/gpreport/sty-type/sty-type.service';
 import { StyImageService } from 'src/gpreport/sty-image/sty-image.service';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
+import { StinpFormListService } from 'src/gpreport/stinp-form-list/stinp-form-list.service';
+import { StinpFormService } from 'src/gpreport/stinp-form/stinp-form.service';
 
 @Injectable()
 export class StInpEvaluateService extends StInpService {
@@ -19,7 +21,8 @@ export class StInpEvaluateService extends StInpService {
         protected readonly formmstService: FormmstService,
         protected readonly styImageService: StyImageService,
         protected readonly styTypeService: StyTypeService,
-        protected readonly styPatrolService: StyPatrolService,
+        protected readonly stinpFormService: StinpFormService,
+        protected readonly stinpFormListService: StinpFormListService,
         protected readonly flowService: FlowService,
         protected readonly formService: FormService,
         private readonly doactionService: DoactionFlowService,
@@ -29,9 +32,10 @@ export class StInpEvaluateService extends StInpService {
             formmstService,
             styImageService,
             styTypeService,
-            styPatrolService,
             flowService,
             formService,
+            stinpFormService,
+            stinpFormListService,
         );
     }
 
@@ -50,7 +54,12 @@ export class StInpEvaluateService extends StInpService {
                     PA_ID: list.PA_ID,
                     PA_AUDIT_EVALUATE: list.PA_AUDIT_EVALUATE,
                 };
-                await this.styPatrolService.update(data);
+                await this.stinpFormListService.update(
+                    { ...form, NID: list.PA_ID },
+                    {
+                        NAUDIT_EVALUATE: list.PA_AUDIT_EVALUATE,
+                    },
+                );
             }
 
             await this.doactionService.doAction(

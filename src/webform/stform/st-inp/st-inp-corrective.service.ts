@@ -12,6 +12,8 @@ import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 import { FormService } from 'src/webform/form/form.service';
+import { StinpFormListService } from 'src/gpreport/stinp-form-list/stinp-form-list.service';
+import { StinpFormService } from 'src/gpreport/stinp-form/stinp-form.service';
 
 @Injectable()
 export class StInpCorrectiveService extends StInpService {
@@ -20,9 +22,10 @@ export class StInpCorrectiveService extends StInpService {
         protected readonly formmstService: FormmstService,
         protected readonly styImageService: StyImageService,
         protected readonly styTypeService: StyTypeService,
-        protected readonly styPatrolService: StyPatrolService,
         protected readonly flowService: FlowService,
         protected readonly formService: FormService,
+        protected readonly stinpFormService: StinpFormService,
+        protected readonly stinpFormListService: StinpFormListService,
         private readonly doactionService: DoactionFlowService,
     ) {
         super(
@@ -30,9 +33,10 @@ export class StInpCorrectiveService extends StInpService {
             formmstService,
             styImageService,
             styTypeService,
-            styPatrolService,
             flowService,
             formService,
+            stinpFormService,
+            stinpFormListService,
         );
     }
 
@@ -92,7 +96,7 @@ export class StInpCorrectiveService extends StInpService {
                 CYEAR2: dto.CYEAR2,
                 NRUNNO: dto.NRUNNO,
             };
-             const formno = await this.formService.getFormno(form);
+            const formno = await this.formService.getFormno(form);
 
             for (const list of dto.PA_LIST) {
                 const index = dto.PA_LIST.indexOf(list);
@@ -107,17 +111,17 @@ export class StInpCorrectiveService extends StInpService {
                     },
                 );
                 movedTargets.push(...movedFile.path);
-                const dataPatrol = {
-                    ...form,
-                    PA_ID: list.PA_ID,
-                    PA_EMP_CORRECTIVE: list.PA_EMP_CORRECTIVE,
-                    PA_CORRECTIVE: list.PA_CORRECTIVE,
-                    PA_FINISH_DATE: list.PA_FINISH_DATE,
-                    PA_MORNING_TALK: list.PA_MORNING_TALK,
-                    PA_IMAGE_AFTER: movedFile.data.IMAGE_ID,
-                };
-                
-                await this.styPatrolService.update(dataPatrol);
+
+                await this.stinpFormListService.update(
+                    { ...form, NID: list.PA_ID },
+                    {
+                        VEMP_CORRECTIVE: list.PA_EMP_CORRECTIVE,
+                        VCORRECTIVE: list.PA_CORRECTIVE,
+                        DFINISH_DATE: list.PA_FINISH_DATE,
+                        DMORNING_TALK: list.PA_MORNING_TALK,
+                        NIMAGE_AFTER: movedFile.data.IMAGE_ID,
+                    },
+                );
             }
 
             if (dto.ACTION !== 'save') {

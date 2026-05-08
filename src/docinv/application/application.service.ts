@@ -6,7 +6,7 @@ import {
     moveFileFromMulter,
 } from 'src/common/utils/files.utils';
 
-import { Application } from './entities/application.entity';
+import { Application } from '../../common/Entities/docinv/table/application.entity';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
 import { AppsgroupsService } from '../appsgroups/appsgroups.service';

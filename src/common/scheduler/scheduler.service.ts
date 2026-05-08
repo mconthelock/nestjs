@@ -13,8 +13,9 @@ import { Repository } from 'typeorm';
 import Redis from 'ioredis';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 
-import { ScheduledJob } from './entities/scheduled-job.entity';
-import { JobExecutionLog } from './entities/job-log.entity';
+import { JobExecutionLog } from 'src/common/Entities/docinv/table/job-log.entity';
+import { ScheduledJob } from 'src/common/Entities/docinv/table/scheduled-job.entity';
+
 import { CreateJobDto } from './dto/create-scheduler.dto';
 import { UpdateSchedulerDto } from './dto/update-scheduler.dto';
 import { SearchSchedulerDto } from './dto/search-scheduler.dto';
@@ -59,7 +60,6 @@ export class SchedulerService implements OnModuleInit {
                     {
                         proxy: false, // ปิดการใช้ proxy เพื่อหลีกเลี่ยงปัญหาในบางสภาพแวดล้อม (เช่น Docker) ที่อาจทำให้การตรวจสอบ endpoint ล้มเหลวโดยไม่จำเป็น
                     },
-
                 );
                 this.logger.log(
                     `Log compression completed: ${JSON.stringify(response.data.summary)}`,
@@ -136,6 +136,11 @@ export class SchedulerService implements OnModuleInit {
 
     // --- CRUD & Management ---
     async createJob(dto: CreateJobDto) {
+        const cronExpression = this.normalizeCronExpression(
+            dto.CRON_EXPRESSION,
+        );
+        this.ensureValidCronExpression(cronExpression);
+
         // ตรวจสอบว่า endpoint มีอยู่จริง
         const isValidEndpoint = await this.validateEndpoint(dto.URL);
         if (!isValidEndpoint) {
@@ -146,6 +151,7 @@ export class SchedulerService implements OnModuleInit {
 
         const newJob = this.jobRepo.create({
             ...dto,
+            CRON_EXPRESSION: cronExpression,
             IS_ACTIVE: 1,
         });
         const savedJob = await this.jobRepo.save(newJob);
@@ -154,6 +160,14 @@ export class SchedulerService implements OnModuleInit {
     }
 
     async updateJob(dto: UpdateSchedulerDto) {
+        if (dto.CRON_EXPRESSION !== undefined) {
+            const cronExpression = this.normalizeCronExpression(
+                dto.CRON_EXPRESSION,
+            );
+            this.ensureValidCronExpression(cronExpression);
+            dto.CRON_EXPRESSION = cronExpression;
+        }
+
         // ตรวจสอบว่า endpoint มีอยู่จริง
         const isValidEndpoint = await this.validateEndpoint(dto.URL);
         if (!isValidEndpoint) {
@@ -218,6 +232,23 @@ export class SchedulerService implements OnModuleInit {
     }
 
     private addCronJob(job: ScheduledJob) {
+        const cronExpression = this.normalizeCronExpression(
+            job.CRON_EXPRESSION,
+        );
+        if (!cronExpression) {
+            this.logger.warn(
+                `Skip scheduling job ${job.NAME} (${job.ID}): CRON_EXPRESSION is empty`,
+            );
+            return;
+        }
+
+        if (!this.isValidCronExpression(cronExpression)) {
+            this.logger.warn(
+                `Skip scheduling job ${job.NAME} (${job.ID}): invalid cron expression "${cronExpression}"`,
+            );
+            return;
+        }
+
         // ป้องกันการ Duplicate name
         try {
             if (this.schedulerRegistry.doesExist('cron', job.NAME)) {
@@ -225,13 +256,43 @@ export class SchedulerService implements OnModuleInit {
             }
         } catch (e) {}
 
-        const cronJob = new CronJob(job.CRON_EXPRESSION, async () => {
+        const cronJob = new CronJob(cronExpression, async () => {
             await this.handleJobExecution(job);
         });
 
         this.schedulerRegistry.addCronJob(job.NAME, cronJob);
         cronJob.start();
         this.logger.log(`Scheduled job: ${job.NAME}`);
+    }
+
+    private normalizeCronExpression(expression: string): string {
+        if (!expression) {
+            return '';
+        }
+
+        return expression.trim().replace(/\s+/g, ' ');
+    }
+
+    private ensureValidCronExpression(expression: string): void {
+        if (!expression) {
+            throw new BadRequestException('Cron expression is required');
+        }
+
+        if (!this.isValidCronExpression(expression)) {
+            throw new BadRequestException(
+                `Invalid cron expression: ${expression}`,
+            );
+        }
+    }
+
+    private isValidCronExpression(expression: string): boolean {
+        try {
+            // Use cron parser to validate syntax and field count.
+            new CronJob(expression, () => undefined);
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
 
     async handleJobExecution(job: ScheduledJob, bypassLock: boolean = false) {

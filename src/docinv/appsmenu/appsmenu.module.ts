@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppsmenuService } from './appsmenu.service';
 import { AppsmenuController } from './appsmenu.controller';
-import { Appsmenu } from './entities/appsmenu.entity';
+import { Appsmenu } from '../../common/Entities/docinv/table/appsmenu.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([Appsmenu], 'docinvConnection')],
-  controllers: [AppsmenuController],
-  providers: [AppsmenuService],
+    imports: [TypeOrmModule.forFeature([Appsmenu], 'docinvConnection')],
+    controllers: [AppsmenuController],
+    providers: [AppsmenuService],
 })
 export class AppsmenuModule {}

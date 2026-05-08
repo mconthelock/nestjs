@@ -75,10 +75,10 @@ export class CreateStInpDto extends PickType(CreateFormDto, [
     @Type(() => String)
     PA_USERCREATE: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @ValidateNested({ each: true })
     @Type(() => PatrolListDto)
-    PA_LIST: PatrolListDto[];
+    PA_LIST?: PatrolListDto[];
 }
 
 export class DraftStInpDto extends PartialType(CreateStInpDto) {}

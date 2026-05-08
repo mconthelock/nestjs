@@ -13,7 +13,6 @@ export class StInpCreateService extends StInpService {
     ) {
         const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
         try {
-            console.log(dto);
             const formmst =
                 await this.formmstService.getFormMasterByVaname('ST-INP');
             if (!formmst) {

@@ -1,6 +1,6 @@
 import { PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
 export class CreateStyPatrolDto extends PickType(FormDto, [
@@ -11,67 +11,67 @@ export class CreateStyPatrolDto extends PickType(FormDto, [
     'NRUNNO',
 ]) {
     @IsNotEmpty()
-    @IsString()
+    @IsNumber()
     @Type(() => Number)
     PA_ID: number;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Type(() => String)
-    PA_OWNER: string;
+    PA_OWNER?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
-    PA_DATE: Date;
+    PA_DATE?: Date;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Type(() => String)
-    PA_SECTION: string;
+    PA_SECTION?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Type(() => String)
-    PA_AUDIT: string;
+    PA_AUDIT?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Type(() => String)
-    PA_USERCREATE: string;
+    PA_USERCREATE?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    PA_ITEMS: number;
+    PA_ITEMS?: number;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Type(() => String)
-    PA_AREA: string;
+    PA_AREA?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Type(() => String)
-    PA_DETECTED: string;
+    PA_DETECTED?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    PA_IMAGE: number;
+    PA_IMAGE?: number;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    PA_CLASS: number;
+    PA_CLASS?: number;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Type(() => String)
-    PA_SUGGESTION: string;
+    PA_SUGGESTION?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Type(() => Number)
-    PA_MAT: number;
+    PA_MAT?: number;
 }

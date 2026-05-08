@@ -33,4 +33,9 @@ export class StyPatrolInspectionController {
     listByForm(@Body() dto: FormDto) {
         return this.styPatrolInspectionService.listByForm(dto);
     }
+
+    @Get('draft/:empno')
+    findDraft(@Param('empno') empno: string) {
+        return this.styPatrolInspectionService.findDraft(empno);
+    }
 }

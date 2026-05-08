@@ -1,0 +1,58 @@
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    OneToMany,
+    JoinColumn,
+    ManyToOne,
+} from 'typeorm';
+import { Appsmenuuser } from './appsmenuuser.entity';
+
+@Entity('APP_MENU')
+export class Appsmenu {
+    @PrimaryGeneratedColumn()
+    MENU_ID: number;
+
+    @Column()
+    MENU_DISPLAY: string;
+
+    @Column()
+    MENU_CLASS: string;
+
+    @Column()
+    MENU_TYPE: number;
+
+    @Column()
+    MENU_TOP: number;
+
+    @Column()
+    MENU_SEQ: number;
+
+    @Column()
+    MENU_LINK: string;
+
+    @Column()
+    MENU_REMARK: string;
+
+    @Column()
+    MENU_PROGRAM: number;
+
+    @Column()
+    MENU_NO: number;
+
+    @Column()
+    MENU_STATUS: number;
+
+    @Column()
+    MENU_TNAME: string;
+
+    @Column()
+    MENU_ICON: string;
+
+    @OneToMany(() => Appsmenuuser, (detail) => detail.MENU_ID)
+    menuGroup: Appsmenuuser[];
+
+    @ManyToOne(() => Appsmenu, (menu) => menu.menuGroup)
+    @JoinColumn({ name: 'MENU_TOP', referencedColumnName: 'MENU_ID' })
+    parent: Appsmenu;
+}

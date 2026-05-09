@@ -19,4 +19,10 @@ export class StinpFormRepository extends BaseRepository {
     async update(condition: FormDto, data: UpdateStinpFormDto) {
         return this.getRepository(STINP_FORM).update(condition, data);
     }
+
+    async findOne(condition: FormDto) {
+        return this.getRepository(STINP_FORM).findOne({
+            where: condition,
+        });
+    }
 }

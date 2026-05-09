@@ -11,6 +11,7 @@ import { StInpCorrectiveService } from './st-inp-corrective.service';
 import { StInpEvaluateService } from './st-inp-evaluate.service';
 import { StinpFormListModule } from 'src/gpreport/stinp-form-list/stinp-form-list.module';
 import { StinpFormModule } from 'src/gpreport/stinp-form/stinp-form.module';
+import { StInpSaveDraftService } from './st-inp-saveDraft.service';
 
 @Module({
     imports: [
@@ -27,6 +28,7 @@ import { StinpFormModule } from 'src/gpreport/stinp-form/stinp-form.module';
         StInpService,
         StInpCreateService,
         StInpCorrectiveService,
+        StInpSaveDraftService,
         StInpEvaluateService,
     ],
     exports: [StInpService],

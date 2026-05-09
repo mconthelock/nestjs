@@ -111,6 +111,20 @@ export class StInpCorrectiveService extends StInpService {
                 );
                 movedTargets.push(...movedFile.path);
 
+                const existing = await this.stinpFormListService.findOne({
+                    ...form,
+                    NID: list.PA_ID,
+                });
+                if (!existing.status) {
+                    throw new Error(
+                        `Form list item not found with ID: ${list.PA_ID}`,
+                    ); // ป้องกันกรณีที่มี PA_ID แต่ไม่เจอใน DB
+                }
+                if (existing.data.NIMAGE_AFTER) {
+                    await this.styImageService.delete(
+                        existing.data.NIMAGE_AFTER,
+                    ); // ลบไฟล์เก่า
+                }
                 await this.stinpFormListService.update(
                     { ...form, NID: list.PA_ID },
                     {

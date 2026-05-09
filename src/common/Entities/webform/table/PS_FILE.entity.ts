@@ -1,0 +1,52 @@
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity({
+    name: 'PS_FILE',
+    schema: 'WEBFORM',
+})
+export class PS_FILE {
+    @PrimaryColumn()
+    NFRMNO: number;
+
+    @PrimaryColumn()
+    VORGNO: string;
+
+    @PrimaryColumn()
+    CYEAR: string;
+
+    @PrimaryColumn()
+    CYEAR2: string;
+
+    @PrimaryColumn()
+    NRUNNO: number;
+
+    @PrimaryGeneratedColumn()
+    FILE_ID: number;
+
+    @Column()
+    FILE_ONAME: string;
+
+    @Column()
+    FILE_FNAME: string;
+
+    @Column()
+    FILE_USERCREATE: string;
+
+    @Column()
+    FILE_DATECREATE: Date;
+
+    @Column()
+    FILE_USERUPDATE: string;
+
+    @Column()
+    FILE_DATEUPDATE: Date;
+
+    @Column()
+    FILE_TYPE: number;
+
+    @Column()
+    FILE_STATUS: number;
+
+    @Column()
+    FILE_PATH: string;
+}

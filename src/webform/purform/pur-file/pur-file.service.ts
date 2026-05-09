@@ -30,6 +30,22 @@ export class PurFileService {
         }
     }
 
+    async create(dto: CreatePurFileDto) {
+        try {
+            const res = await this.repo.create(dto);
+            if (!res) {
+                throw new Error('Failed to insert PUR File record');
+            }
+            return {
+                status: true,
+                message: 'Insert PUR File Successfully',
+                data: res,
+            };
+        } catch (error) {
+            throw new Error('Insert PUR File Error: ' + error.message);
+        }
+    }
+
     async deleteFileByID(id: number) {
         try {
             const res = await this.repo.deleteById(id);

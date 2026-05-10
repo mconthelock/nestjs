@@ -1,5 +1,13 @@
-import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import {
+    Entity,
+    PrimaryColumn,
+    Column,
+    OneToOne,
+    JoinColumn,
+    ManyToOne,
+} from 'typeorm';
 import { FORM } from './FORM.entity';
+import { FORMMST_GROUP } from './FORMMST_GROUP.entity';
 
 @Entity({ name: 'FORMMST', schema: 'WEBFORM' })
 export class FORMMST {
@@ -44,6 +52,13 @@ export class FORMMST {
 
     @Column()
     CSTATUS: string;
+
+    @ManyToOne(() => FORMMST_GROUP)
+    @JoinColumn([
+        { name: 'VORGNO', referencedColumnName: 'VGROUPORG' },
+        { name: 'VDIR', referencedColumnName: 'VGROUP' },
+    ])
+    formmstGroup: FORMMST_GROUP;
 
     @OneToOne(() => FORM, (form) => form.formmst)
     @JoinColumn([

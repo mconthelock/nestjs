@@ -80,7 +80,8 @@ export class PsectionService {
     );
     query
       .andWhere('C.SSECTION NOT LIKE :section', { section: '%Cancel%' })
-      .andWhere('C.SSECCODE != :sectionCode', { sectionCode: '00' });
+      .andWhere('C.SSECCODE != :sectionCode', { sectionCode: '00' })
+      .orderBy('C.SSEC', 'ASC');
     return query.getRawMany();
   }
 }

@@ -15,4 +15,14 @@ export class StyImageRepository extends BaseRepository {
     async create(dto: CreateStyImageDto) {
         return this.getRepository(STY_IMAGE).save(dto);
     }
+
+    async findOne(id: number) {
+        return this.getRepository(STY_IMAGE).findOne({
+            where: { IMAGE_ID: id },
+        });
+    }
+
+    async delete(id: number) {
+        return this.getRepository(STY_IMAGE).delete({ IMAGE_ID: id });
+    }
 }

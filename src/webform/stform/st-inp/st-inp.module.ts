@@ -5,9 +5,13 @@ import { FormModule } from 'src/webform/form/form.module';
 import { FormmstModule } from 'src/webform/formmst/formmst.module';
 import { StyImageModule } from 'src/gpreport/sty-image/sty-image.module';
 import { StyTypeModule } from 'src/gpreport/sty-type/sty-type.module';
-import { StyPatrolModule } from 'src/gpreport/sty-patrol/sty-patrol.module';
 import { StInpCreateService } from './st-inp-create.service';
 import { FlowModule } from 'src/webform/flow/flow.module';
+import { StInpCorrectiveService } from './st-inp-corrective.service';
+import { StInpEvaluateService } from './st-inp-evaluate.service';
+import { StinpFormListModule } from 'src/gpreport/stinp-form-list/stinp-form-list.module';
+import { StinpFormModule } from 'src/gpreport/stinp-form/stinp-form.module';
+import { StInpSaveDraftService } from './st-inp-saveDraft.service';
 
 @Module({
     imports: [
@@ -16,10 +20,17 @@ import { FlowModule } from 'src/webform/flow/flow.module';
         FlowModule,
         StyImageModule,
         StyTypeModule,
-        StyPatrolModule,
+        StinpFormModule,
+        StinpFormListModule,
     ],
     controllers: [StInpController],
-    providers: [StInpService, StInpCreateService],
+    providers: [
+        StInpService,
+        StInpCreateService,
+        StInpCorrectiveService,
+        StInpSaveDraftService,
+        StInpEvaluateService,
+    ],
     exports: [StInpService],
 })
 export class StInpModule {}

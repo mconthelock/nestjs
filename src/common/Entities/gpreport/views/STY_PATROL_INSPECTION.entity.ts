@@ -9,7 +9,7 @@ export class STY_PATROL_INSPECTION {
     FORMNO: string;
 
     @ViewColumn()
-    NFRMNO: string;
+    NFRMNO: number;
 
     @ViewColumn()
     VORGNO: string;
@@ -78,6 +78,9 @@ export class STY_PATROL_INSPECTION {
     PA_DETECTED: string;
 
     @ViewColumn()
+    PA_CLASS: number;
+
+    @ViewColumn()
     CLASS: string;
 
     @ViewColumn()
@@ -103,6 +106,9 @@ export class STY_PATROL_INSPECTION {
 
     @ViewColumn()
     PA_FINISH_DATE: Date;
+
+    @ViewColumn()
+    PA_IMAGE: number;
 
     @ViewColumn()
     PA_IMAGE_AFTER: number;

@@ -11,23 +11,22 @@ export class DSREQHEAD {
 
     @PrimaryColumn()
     CYEAR: string;
-    
+
     @PrimaryColumn()
     CYEAR2: string;
 
     @PrimaryColumn()
     NRUNNO: number;
 
-    
-
     @Column()
     OPTION_CODE: string;
 
     @Column()
-    EFFECTIVE_DATE: string;
+    EFFECTIVE_DATE: Date;
 
     @Column()
-    DATE_RECEIVE: string;
+    DATE_RECEIVE: Date;
 
-
+    @Column()
+    LOCATION: string;
 }

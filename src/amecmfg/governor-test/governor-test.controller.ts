@@ -5,7 +5,7 @@ import { GetGovernorTestDto } from './dto/get-governor-test.dto';
 import { GovernorTestResponseDto } from './dto/governor-test-response.dto';
 
 @ApiTags('Machine Governor Test')
-@Controller('escs/governor-test')
+@Controller('amecmfg/governor-test')
 export class GovernorTestController {
     constructor(private readonly service: GovernorTestService) {}
 

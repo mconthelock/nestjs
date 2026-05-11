@@ -8,6 +8,7 @@ import { PisModule } from './pis/pis.module';
 import { StaticTestModule } from './static-test/static-test.module';
 import { LoadLessTestModule } from './load-less-test/load-less-test.module';
 import { GovernorTestModule } from './governor-test/governor-test.module';
+import { PullTestModule } from './pull-through-force-test/pull-test.module';
 
 @Module({
     imports: [
@@ -19,7 +20,8 @@ import { GovernorTestModule } from './governor-test/governor-test.module';
         PisModule,
         StaticTestModule,
         LoadLessTestModule,
-        GovernorTestModule
+        GovernorTestModule,
+        PullTestModule
     ],
 })
 export class AmecMfgModule {}

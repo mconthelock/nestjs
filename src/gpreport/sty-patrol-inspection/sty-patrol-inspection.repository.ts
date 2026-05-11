@@ -5,6 +5,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { STY_PATROL_INSPECTION } from 'src/common/Entities/gpreport/views/STY_PATROL_INSPECTION.entity';
 import { ReportStyPatrolInspectionDto } from './dto/report-sty-patrol-inspection.dto';
 import { STY_ITEMS } from 'src/common/Entities/gpreport/table/STY_ITEMS.entity';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Injectable()
 export class StyPatrolInspectionRepository extends BaseRepository {
@@ -42,7 +43,42 @@ export class StyPatrolInspectionRepository extends BaseRepository {
         });
     }
 
-     getItemReport(dto: ReportStyPatrolInspectionDto) {
+    findDraft(empno: string = '') {
+        const query = this.manager
+            .createQueryBuilder(STY_PATROL_INSPECTION, 'P')
+            .select([
+                'P.FORMNO',
+                'P.NFRMNO',
+                'P.VORGNO',
+                'P.CYEAR',
+                'P.CYEAR2',
+                'P.NRUNNO',
+                'P.PA_SECTION',
+                'P.OWNER_SECTION',
+                'P.PA_OWNER',
+                'P.STNAME',
+                'P.SNAME',
+                'P.SSEC',
+                'P.SDEPT',
+                'P.SDIV',
+                'P.PA_DATE',
+                'P.PA_AUDIT',
+                'P.CST',
+            ])
+            .leftJoin(
+                'FLOW',
+                'F',
+                "P.NFRMNO = F.NFRMNO AND P.VORGNO = F.VORGNO AND P.CYEAR = F.CYEAR AND P.CYEAR2 = F.CYEAR2 AND P.NRUNNO = F.NRUNNO AND F.CSTEPNO = '--' AND F.CSTEPST = '3'",
+            )
+            .orderBy('P.NRUNNO', 'ASC');
+        if (empno) {
+            query.where('(F.VAPVNO = :empno OR F.VREPNO = :empno)', { empno });
+
+        }
+        return query.getMany();
+    }
+
+    getItemReport(dto: ReportStyPatrolInspectionDto) {
         const sub = this.manager
             .createQueryBuilder()
             .subQuery()
@@ -77,5 +113,20 @@ export class StyPatrolInspectionRepository extends BaseRepository {
             )
             .orderBy('OWNER_SECTION, ITEMS_ID, CLASS', 'ASC');
         return query.getRawMany();
+    }
+
+    listByForm(dto: FormDto) {
+        return this.getRepository(STY_PATROL_INSPECTION).find({
+            where: {
+                NFRMNO: dto.NFRMNO,
+                VORGNO: dto.VORGNO,
+                CYEAR: dto.CYEAR,
+                CYEAR2: dto.CYEAR2,
+                NRUNNO: dto.NRUNNO,
+            },
+            order: {
+                PA_ID: 'ASC',
+            },
+        });
     }
 }

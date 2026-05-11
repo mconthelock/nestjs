@@ -1,12 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 export class GetPullTestDto {
     @ApiProperty({ 
-        example: 'E8CB37524', 
+        example: 'EOAD00055', 
         description: 'Order number' 
     })
     @IsString()
+    @IsNotEmpty()
     order: string;
 
     @ApiProperty({ 
@@ -14,12 +15,15 @@ export class GetPullTestDto {
         description: 'Machine name' 
     })
     @IsString()
+    @IsNotEmpty()
     machineName: string;
 
     @ApiProperty({ 
         example: 'CAR', 
-        description: 'Type model' 
+        enum: ['CAR', 'CWT'], 
+        description: 'Type model (CAR | CWT)'  
     })
     @IsString()
+    @IsNotEmpty()
     typeModel: string;
 }

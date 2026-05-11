@@ -3,7 +3,6 @@ import { ApplicationModule } from './application/application.module';
 import { AppsmenuModule } from './appsmenu/appsmenu.module';
 import { AppsusersModule } from './appsusers/appsusers.module';
 import { AppsgroupsModule } from './appsgroups/appsgroups.module';
-import { AppsusersgroupsModule } from './appsusersgroups/appsusersgroups.module';
 import { AppsmenuusersModule } from './appsmenuusers/appsmenuusers.module';
 import { AccesslogModule } from './accesslog/accesslog.module';
 import { WorkplanModule } from './workplan/workplan.module';
@@ -16,26 +15,35 @@ import { RevisionModule } from './revision/revision.module';
 import { SourceModule } from './source/source.module';
 import { DatacenterModule } from './datacenter/datacenter.module';
 import { WorkAnnualDevPlanModule } from './work-annual-dev-plan/work-annual-dev-plan.module';
+import { TasklogsModule } from './tasklogs/tasklogs.module';
+import { ApplogsModule } from './applogs/applogs.module';
+import { DblogsModule } from './dblogs/dblogs.module';
+import { OslogsModule } from './oslogs/oslogs.module';
+import { SpecialuserModule } from './specialuser/specialuser.module';
 
 @Module({
-  imports: [
-    ApplicationModule,
-    AppsmenuModule,
-    AppsusersModule,
-    AppsgroupsModule,
-    AppsusersgroupsModule,
-    AppsmenuusersModule,
-    AccesslogModule,
-    WorkplanModule,
-    WorkpicModule,
-    SpecificationModule,
-    ReleaseModule,
-    ProgramModule,
-    ModulesModule,
-    RevisionModule,
-    SourceModule,
-    DatacenterModule,
-    WorkAnnualDevPlanModule,
-  ],
+    imports: [
+        ApplicationModule,
+        AppsmenuModule,
+        AppsusersModule,
+        AppsgroupsModule,
+        AppsmenuusersModule,
+        AccesslogModule,
+        WorkplanModule,
+        WorkpicModule,
+        SpecificationModule,
+        ReleaseModule,
+        ProgramModule,
+        ModulesModule,
+        RevisionModule,
+        SourceModule,
+        DatacenterModule,
+        WorkAnnualDevPlanModule,
+        SpecialuserModule,
+        OslogsModule,
+        DblogsModule,
+        ApplogsModule,
+        TasklogsModule,
+    ],
 })
 export class DocinvModule {}

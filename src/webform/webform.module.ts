@@ -12,34 +12,42 @@ import { SequenceOrgModule } from './sequence-org/sequence-org.module';
 import { RepModule } from './rep/rep.module';
 import { IEFormModule } from './ieform/ie.module';
 import { RqffrmModule } from './rqffrm/rqffrm.module';
-import { PurCpmModule } from './purform/pur-cpm/pur-cpm.module';
-import { PurFileModule } from './purform/pur-file/pur-file.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { GpformModule } from './gpform/gpform.module';
 import { FinformModule } from './finform/finform.module';
-import { StInpModule } from './stform/st-inp/st-inp.module';
+import { HandleFileFormModule } from './handle-file-form/handle-file-form.module';
+import { FormAttachmentTypeModule } from './form-attachment-type/form-attachment-type.module';
+import { FeformModule } from './feform/feform.module';
+import { MarFormModule } from './marform/marform.module';
+import { STFormModule } from './stform/stform.module';
+import { PurFormModule } from './purform/purform.module';
+import { PsFormModule } from './psform/psform.module';
 
 @Module({
-  imports: [
-    IEFormModule,
-    ISFormModule,
-    FormModule,
-    FlowModule,
-    FlowmstModule,
-    FormmstModule,
-    GpOtModule,
-    QAFormModule,
-    OrgposModule,
-    OrgTreeModule,
-    SequenceOrgModule,
-    RepModule,
-    RqffrmModule,
-    PurCpmModule,
-    PurFileModule,
-    OrganizationsModule,
-    GpformModule,
-    FinformModule,
-    StInpModule
-  ],
+    imports: [
+        IEFormModule,
+        ISFormModule,
+        FormModule,
+        FlowModule,
+        FlowmstModule,
+        FormmstModule,
+        GpOtModule,
+        QAFormModule,
+        OrgposModule,
+        OrgTreeModule,
+        SequenceOrgModule,
+        RepModule,
+        RqffrmModule,
+        PurFormModule,
+        OrganizationsModule,
+        GpformModule,
+        FinformModule,
+        HandleFileFormModule,
+        FormAttachmentTypeModule,
+        FeformModule,
+        MarFormModule,
+        PsFormModule,
+        STFormModule,
+    ],
 })
 export class WebformModule {}

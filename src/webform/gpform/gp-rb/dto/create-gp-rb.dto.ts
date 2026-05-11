@@ -1,6 +1,12 @@
 import { IntersectionType, PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+    IsEnum,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+} from 'class-validator';
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
@@ -57,7 +63,7 @@ export class CreateCusStampReqDto extends PickType(FormDto, [
     @IsOptional()
     @IsString()
     @Type(() => String)
-    REMARK?: string;
+    STAMPCUS_REMARK?: string;
 }
 
 export class CreateGpRbtempDto extends IntersectionType(
@@ -76,11 +82,25 @@ export class CreateGpRbtempDto extends IntersectionType(
 }
 
 export class CreateGpRbDto extends IntersectionType(
-    CreateGpRbtempDto,
-    PickType(CreateCusStampReqDto, ['CUST_SIZE', 'QTY', 'REMARK'] as const),
+    PickType(CreateGpRbtempDto, [
+        'INPUTBY',
+        'REQBY',
+        'REMARK',
+        'PURPOSE_ID',
+        'PURPOSE_OTHER',
+        'SPOSCODE',
+        'NAME_STAMP',
+        'STAMP_REMARK',
+    ] as const),
+    PickType(CreateCusStampReqDto, [
+        'CUST_SIZE',
+        'QTY',
+        'STAMPCUS_REMARK',
+    ] as const),
 ) {
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
+    @IsEnum(['standard', 'other'])
     @Type(() => String)
-    STAMPCUS_REMARK?: string;
+    stampFormatGroup: string;
 }

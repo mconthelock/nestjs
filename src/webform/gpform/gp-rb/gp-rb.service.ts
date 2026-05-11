@@ -43,8 +43,9 @@ export class GpRbService {
     findAll() {
         return this.repo.findAll();
     }
-    async create(dto: CreateGpRbDto, stampFormatGroup: string, ip: string) {
+    async create(dto: CreateGpRbDto, ip: string) {
         try {
+            const stampFormatGroup = dto.stampFormatGroup?.toLowerCase();
             // ตรวจสอบว่า stampFormatGroup ได้รับค่าแล้ว
             if (!stampFormatGroup) {
                 throw new BadRequestException('stampFormatGroup is required (standard or other)');
@@ -83,10 +84,13 @@ export class GpRbService {
                 CYEAR2: createForm.data.CYEAR2,
                 NRUNNO: createForm.data.NRUNNO,
             };
-
+            let insert;
             // บันทึกข้อมูล Stamp Request ตามประเภท
             if (stampFormatGroup === 'standard') {
-                await this.repo.CreateStampReq({
+         /*      if(!dto.PURPOSE_ID || !dto.PURPOSE_OTHER || !dto.SPOSCODE|| !dto.NAME_STAMP ) {
+                    throw new BadRequestException('PURPOSE_ID and NAME_STAMP are required for standard stamp group');
+                } */
+                insert = await this.repo.CreateStampReq({
                     ...form,
                     PURPOSE_ID: dto.PURPOSE_ID,
                     PURPOSE_OTHER: dto.PURPOSE_OTHER,
@@ -94,12 +98,17 @@ export class GpRbService {
                     NAME_STAMP: dto.NAME_STAMP,
                     REMARK: dto.STAMP_REMARK,
                 });
+                console.log(insert);
+                
             } else if (stampFormatGroup === 'other') {
-                await this.repo.CreateCusStampReq({
+               if(!dto.CUST_SIZE || !dto.QTY) {
+                    throw new BadRequestException('CUST_SIZE and QTY are required for other stamp group');
+                }   
+                insert = await this.repo.CreateCusStampReq({
                     ...form,
                     CUST_SIZE: dto.CUST_SIZE,
                     QTY: dto.QTY,
-                    REMARK: dto.STAMPCUS_REMARK,
+                    STAMPCUS_REMARK: dto.STAMPCUS_REMARK,
                 });
             } else {
                 throw new BadRequestException(
@@ -107,13 +116,14 @@ export class GpRbService {
                 );
             }
 
+            // throw new Error('test');
+
             return {
                 status: true,
                 message: 'GP-RB form created successfully',
+                data: insert
             };
         } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            this.logger.error('Error creating GP-RB form:', message);
             throw error;
         }
     }

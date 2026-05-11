@@ -1,6 +1,6 @@
 import { PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class PrimaryKeyStinpFormListDto {
     @IsNotEmpty()
@@ -63,10 +63,10 @@ export class CreateStinpFormListDto extends PickType(
     @Type(() => Number)
     NCLASS: number;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Type(() => String)
-    VSUGGESTION: string;
+    VSUGGESTION?: string;
 
     @IsNotEmpty()
     @IsNumber()

@@ -43,8 +43,8 @@ export class StyPatrolInspectionRepository extends BaseRepository {
         });
     }
 
-    findDraft(empno: string) {
-        return this.manager
+    findDraft(empno: string = '') {
+        const query = this.manager
             .createQueryBuilder(STY_PATROL_INSPECTION, 'P')
             .select([
                 'P.FORMNO',
@@ -70,9 +70,12 @@ export class StyPatrolInspectionRepository extends BaseRepository {
                 'F',
                 "P.NFRMNO = F.NFRMNO AND P.VORGNO = F.VORGNO AND P.CYEAR = F.CYEAR AND P.CYEAR2 = F.CYEAR2 AND P.NRUNNO = F.NRUNNO AND F.CSTEPNO = '--' AND F.CSTEPST = '3'",
             )
-            .where('(F.VAPVNO = :empno OR F.VREPNO = :empno)', { empno })
-            .orderBy('P.NRUNNO', 'ASC')
-            .getMany();
+            .orderBy('P.NRUNNO', 'ASC');
+        if (empno) {
+            query.where('(F.VAPVNO = :empno OR F.VREPNO = :empno)', { empno });
+
+        }
+        return query.getMany();
     }
 
     getItemReport(dto: ReportStyPatrolInspectionDto) {

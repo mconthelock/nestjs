@@ -40,4 +40,26 @@ export class IsFileService {
             throw new Error('Insert IS File Error: ' + error.message);
         }
     }
+
+    async create(dto: CreateIsFileDto) {
+        try {
+            const id = await this.setId(dto);
+            const data = {
+                ...dto,
+                FILE_ID: id,
+            };
+
+            const res = await this.repo.create(data);
+            if (!res) {
+                throw new Error('Failed to insert IS File');
+            }
+            return {
+                status: true,
+                message: 'Insert IS File Successfully',
+                data: res,
+            };
+        } catch (error) {
+            throw new Error('Insert IS File Error: ' + error.message);
+        }
+    }
 }

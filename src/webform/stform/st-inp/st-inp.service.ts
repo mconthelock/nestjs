@@ -37,7 +37,16 @@ export class StInpService {
                 CYEAR2: createForm.data.CYEAR2,
                 NRUNNO: createForm.data.NRUNNO,
             };
-            for (const step of ['06', '19']) {
+            await this.setOwnerFlow(form, owner);
+            return form;
+        } catch (error) {
+            throw new Error(`Failed to create form: ${error.message}`);
+        }
+    }
+
+    async setOwnerFlow(form: FormDto, owner: string) {
+        try {
+             for (const step of ['06', '19']) {
                 const update = await this.flowService.updateFlow({
                     condition: {
                         ...form,
@@ -46,12 +55,11 @@ export class StInpService {
                     VAPVNO: owner,
                 });
             }
-
-            return form;
         } catch (error) {
-            throw new Error(`Failed to create form: ${error.message}`);
+            throw new Error(`Failed to set owner flow: ${error.message}`);
         }
     }
+
 
     async insertList({
         form,

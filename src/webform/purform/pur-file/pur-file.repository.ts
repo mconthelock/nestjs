@@ -31,6 +31,10 @@ export class PurFileRepository extends BaseRepository {
         return this.getRepository(PUR_FILE).insert(dto);
     }
 
+    async create(dto: CreatePurFileDto) {
+        return this.getRepository(PUR_FILE).save(dto);
+    }
+
     async deleteById(id: number) {
         return this.getRepository(PUR_FILE).delete({ FILE_ID: id });
     }

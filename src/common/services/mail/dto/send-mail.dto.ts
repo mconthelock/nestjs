@@ -16,12 +16,12 @@ export class SendMailDto {
     @IsOptional()
     port?: string | number;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     from?: string;
 
     @IsNotEmpty()
-    to?: string | string[];
+    to: string | string[];
 
     @IsOptional()
     @IsString()

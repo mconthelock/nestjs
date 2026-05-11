@@ -25,9 +25,8 @@ export class HandleFileFormController {
     @UseInterceptors(getFileUploadInterceptor())
     async insertFileOne(
         @Body() dto: InsertAndMoveHandleFileFormDto,
-        @UploadedFiles() file: Express.Multer.File,
+        @UploadedFiles() files: Express.Multer.File[],
     ) {
-        console.log(file);
-        return await this.handleFileFormService.insertFiles(dto, file);
+        return await this.handleFileFormService.insertFiles(dto, files);
     }
 }

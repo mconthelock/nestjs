@@ -131,9 +131,11 @@ export class MfgEdrService {
       .getRawOne();
   }
 
-   async create(dto: CreateMfgEdrDto) {
+  async create(dto: CreateMfgEdrDto) {
+    console.log('CREATE MFG EDR DTO:', dto);
     return this.dataSource.transaction(async (manager) => {
       const key = this.getFormKey(dto);
+      console.log('FORM KEY:', key);
 
       await this.insertFormHead(manager, key, dto);
       const listCount = await this.insertFormList(manager, key, dto.list ?? []);
@@ -152,8 +154,13 @@ export class MfgEdrService {
   }
 
   private getFormKey(dto: CreateMfgEdrDto): FormKey {
-    const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO } = dto;
-    return { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO };
+    return {
+      NFRMNO: Number(dto.NFRMNO),
+      VORGNO: String(dto.VORGNO),
+      CYEAR: String(dto.CYEAR),
+      CYEAR2: String(dto.CYEAR2),
+      NRUNNO: Number(dto.NRUNNO),
+    };
   }
 
   private async insertFormHead(

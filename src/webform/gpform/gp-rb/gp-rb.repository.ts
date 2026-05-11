@@ -24,3 +24,26 @@ export class GpRbRepository extends BaseRepository {
         return this.getRepository(RB_CUS_STAMP_REQ).save({...dto, REMARK: dto.STAMPCUS_REMARK});
     }
 }
+
+
+// สำหรับดึงข้อมูลแสดงในหน้า show-gp-rb by Plankton
+@Injectable()
+export class ShowstampGpRbRepository extends BaseRepository {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+        super(ds);
+    }
+    findAll() {
+        return this.getRepository(RB_STAMP_REQ).find();
+    }
+}
+
+// สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton
+@Injectable()
+export class ShowCusStampGpRbRepository extends BaseRepository {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+        super(ds);
+    }
+    findAll() {
+        return this.getRepository(RB_CUS_STAMP_REQ).find();
+    }   
+}

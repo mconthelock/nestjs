@@ -1,4 +1,4 @@
-import { PartialType, PickType } from '@nestjs/swagger';
+import { IntersectionType, PartialType, PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
     IsDate,
@@ -10,9 +10,15 @@ import {
     ValidateNested,
 } from 'class-validator';
 import { StringToDate } from 'src/common/utils/transform';
+import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 
 export class PatrolListDto {
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    PA_ID?: number;
+
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
@@ -75,10 +81,22 @@ export class CreateStInpDto extends PickType(CreateFormDto, [
     @Type(() => String)
     PA_USERCREATE: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @ValidateNested({ each: true })
     @Type(() => PatrolListDto)
-    PA_LIST: PatrolListDto[];
+    PA_LIST?: PatrolListDto[];
 }
 
-export class DraftStInpDto extends PartialType(CreateStInpDto) {}
+export class DraftStInpDto extends IntersectionType(
+    PickType(doactionFlowDto, [
+        'NFRMNO',
+        'VORGNO',
+        'CYEAR',
+        'CYEAR2',
+        'NRUNNO',
+        'EMPNO',
+        'ACTION',
+        'REMARK',
+    ]),
+    PartialType(CreateStInpDto),
+) {}

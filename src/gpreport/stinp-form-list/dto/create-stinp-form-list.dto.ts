@@ -1,77 +1,75 @@
 import { PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class CreateStyPatrolDto extends PickType(FormDto, [
-    'NFRMNO',
-    'VORGNO',
-    'CYEAR',
-    'CYEAR2',
-    'NRUNNO',
-]) {
+export class PrimaryKeyStinpFormListDto {
     @IsNotEmpty()
-    @IsString()
+    @IsNumber()
     @Type(() => Number)
-    PA_ID: number;
+    NFRMNO: number;
 
     @IsNotEmpty()
     @IsString()
     @Type(() => String)
-    PA_OWNER: string;
-
-    @IsNotEmpty()
-    @IsDate()
-    @Type(() => Date)
-    PA_DATE: Date;
+    VORGNO: string;
 
     @IsNotEmpty()
     @IsString()
     @Type(() => String)
-    PA_SECTION: string;
+    CYEAR: string;
 
     @IsNotEmpty()
     @IsString()
     @Type(() => String)
-    PA_AUDIT: string;
-
-    @IsNotEmpty()
-    @IsString()
-    @Type(() => String)
-    PA_USERCREATE: string;
+    CYEAR2: string;
 
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    PA_ITEMS: number;
-
-    @IsNotEmpty()
-    @IsString()
-    @Type(() => String)
-    PA_AREA: string;
-
-    @IsNotEmpty()
-    @IsString()
-    @Type(() => String)
-    PA_DETECTED: string;
+    NRUNNO: number;
 
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    PA_IMAGE: number;
+    NID: number;
+}
 
+export class CreateStinpFormListDto extends PickType(
+    PrimaryKeyStinpFormListDto,
+    ['NFRMNO', 'VORGNO', 'CYEAR', 'CYEAR2', 'NRUNNO', 'NID'],
+) {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    PA_CLASS: number;
+    NITEM: number;
 
     @IsNotEmpty()
     @IsString()
     @Type(() => String)
-    PA_SUGGESTION: string;
+    VAREA: string;
 
     @IsNotEmpty()
     @IsString()
+    @Type(() => String)
+    VDETECTED: string;
+
+    @IsNotEmpty()
+    @IsNumber()
     @Type(() => Number)
-    PA_MAT: number;
+    NIMAGE: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    NCLASS: number;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    VSUGGESTION?: string;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    NMAT: number;
 }

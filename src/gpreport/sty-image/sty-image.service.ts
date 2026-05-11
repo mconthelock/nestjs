@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateStyImageDto } from './dto/create-sty-image.dto';
 import { UpdateStyImageDto } from './dto/update-sty-image.dto';
-import { joinPaths, moveFileFromMulter } from 'src/common/utils/files.utils';
+import { deleteFile, joinPaths, moveFileFromMulter } from 'src/common/utils/files.utils';
 import { StyImageRepository } from './sty-image.repository';
 
 @Injectable()
@@ -51,6 +51,28 @@ export class StyImageService {
             };
         } catch (error) {
             throw new Error('Insert IMAGE Failed: ' + error.message);
+        }
+    }
+
+    async delete(id: number) {
+        try {
+            // const img = await this.repo.findOne(id);
+            // if (!img) {
+            //     throw new Error('Image not found with id: ' + id);
+            // }
+
+            // await deleteFile(await joinPaths(img.IMAGE_PATH, img.IMAGE_FNAME)); // ลบไฟล์จริง
+
+            const res = await this.repo.delete(id);
+            if (res.affected === 0) {
+                throw new Error('No rows deleted');
+            }
+            return {
+                status: true,
+                message: 'Delete safety image Successfully',
+            };
+        } catch (error) {
+            throw new Error('Delete safety image Error: ' + error.message);
         }
     }
 }

@@ -33,27 +33,26 @@ export class LoadLessTestService {
             return {
                 status: 'ERROR',
                 message: `File not found: ${fileName}`,
-                data: null
+                data: null,
             };
         }
 
-        const fileStream = fs.createReadStream(fullPath);
-        const rl = readline.createInterface({
-            input: fileStream,
-            crlfDelay: Infinity
-        });
+        const content = fs.readFileSync(fullPath, 'utf-8');
+        const lines = content.split(/\r?\n/).reverse();
+        for (const line of lines) {
+            if (!line.trim()) continue;
 
-        for await (const line of rl) {
             const cols   = line.split(',');
             const header = cols[0]?.trim();
-            const parts  = header.split('|');
+            if (!header) continue;
 
+            const parts = header.split('|');
             if (parts.length < 3) continue;
 
             const serialCol = parts[1]?.trim();
             const orderCol  = parts[2]?.trim();
-            const statusCol = cols[cols.length - 1]?.trim(); 
-            if ( serialCol === serial && orderCol === order && statusCol === 'OK') {
+            const statusCol = cols[cols.length - 1]?.trim();
+            if (serialCol === serial && orderCol === order && statusCol === 'OK') {
                 return {
                     status: 'SUCCESS',
                     message: null,
@@ -62,16 +61,16 @@ export class LoadLessTestService {
                         fallingSoundDb: cols[6],
                         runningSoundDb: cols[7],
                         housingTemp: cols[8],
-                        inducedVoltageConstant: cols[9]
-                    }
+                        inducedVoltageConstant: cols[9],
+                    },
                 };
             }
         }
 
         return {
             status: 'ERROR',
-            message: 'ไม่พบข้อมูล Test ในระบบ กรุณาลองใหม่อีกครั้ง!',  
-            data: null
+            message: 'ไม่พบข้อมูล Test ในระบบ กรุณาลองใหม่อีกครั้ง!',
+            data: null,
         };
     }
 

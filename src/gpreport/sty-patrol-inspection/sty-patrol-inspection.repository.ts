@@ -43,7 +43,42 @@ export class StyPatrolInspectionRepository extends BaseRepository {
         });
     }
 
-     getItemReport(dto: ReportStyPatrolInspectionDto) {
+    findDraft(empno: string = '') {
+        const query = this.manager
+            .createQueryBuilder(STY_PATROL_INSPECTION, 'P')
+            .select([
+                'P.FORMNO',
+                'P.NFRMNO',
+                'P.VORGNO',
+                'P.CYEAR',
+                'P.CYEAR2',
+                'P.NRUNNO',
+                'P.PA_SECTION',
+                'P.OWNER_SECTION',
+                'P.PA_OWNER',
+                'P.STNAME',
+                'P.SNAME',
+                'P.SSEC',
+                'P.SDEPT',
+                'P.SDIV',
+                'P.PA_DATE',
+                'P.PA_AUDIT',
+                'P.CST',
+            ])
+            .leftJoin(
+                'FLOW',
+                'F',
+                "P.NFRMNO = F.NFRMNO AND P.VORGNO = F.VORGNO AND P.CYEAR = F.CYEAR AND P.CYEAR2 = F.CYEAR2 AND P.NRUNNO = F.NRUNNO AND F.CSTEPNO = '--' AND F.CSTEPST = '3'",
+            )
+            .orderBy('P.NRUNNO', 'ASC');
+        if (empno) {
+            query.where('(F.VAPVNO = :empno OR F.VREPNO = :empno)', { empno });
+
+        }
+        return query.getMany();
+    }
+
+    getItemReport(dto: ReportStyPatrolInspectionDto) {
         const sub = this.manager
             .createQueryBuilder()
             .subQuery()

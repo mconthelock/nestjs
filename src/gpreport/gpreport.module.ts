@@ -7,10 +7,11 @@ import { BuspassengerModule } from './buspassenger/buspassenger.module';
 import { OvertimeModule } from './overtime/overtime.module';
 import { DispatchModule } from './dispatch/dispatch.module';
 import { StyImageModule } from './sty-image/sty-image.module';
-import { StyPatrolModule } from './sty-patrol/sty-patrol.module';
 import { StyTypeModule } from './sty-type/sty-type.module';
 import { StyItemsModule } from './sty-items/sty-items.module';
 import { StyPatrolInspectionModule } from './sty-patrol-inspection/sty-patrol-inspection.module';
+import { StinpFormModule } from './stinp-form/stinp-form.module';
+import { StinpFormListModule } from './stinp-form-list/stinp-form-list.module';
 
 @Module({
     imports: [
@@ -22,10 +23,11 @@ import { StyPatrolInspectionModule } from './sty-patrol-inspection/sty-patrol-in
         OvertimeModule,
         DispatchModule,
         StyImageModule,
-        StyPatrolModule,
         StyTypeModule,
         StyItemsModule,
         StyPatrolInspectionModule,
+        StinpFormModule,
+        StinpFormListModule,
     ],
 })
 export class gpreportModule {}

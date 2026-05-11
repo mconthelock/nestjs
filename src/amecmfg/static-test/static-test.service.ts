@@ -33,17 +33,15 @@ export class StaticTestService {
             return {
                 status: 'ERROR',
                 message: `File not found: ${fileName}`,
-                data: null
+                data: null,
             };
         }
 
-        const fileStream = fs.createReadStream(fullPath);
-        const rl = readline.createInterface({
-            input: fileStream,
-            crlfDelay: Infinity
-        });
+        const content = fs.readFileSync(fullPath, 'utf-8');
+        const lines   = content.split(/\r?\n/).reverse();
+        for (const line of lines) {
+            if (!line.trim()) continue;
 
-        for await (const line of rl) {
             const cols = line.split(',');
             const serialCol = cols[4]?.trim();
             const statusCol = cols[cols.length - 2]?.trim();
@@ -56,8 +54,8 @@ export class StaticTestService {
                         resistanceMotorV: cols[20],
                         resistanceMotorW: cols[25],
                         resistanceBrakeL: cols[55],
-                        resistanceBrakeR: cols[40]
-                    }
+                        resistanceBrakeR: cols[40],
+                    },
                 };
             }
         }
@@ -65,7 +63,7 @@ export class StaticTestService {
         return {
             status: 'ERROR',
             message: 'ไม่พบข้อมูล Test ในระบบ กรุณาลองใหม่อีกครั้ง!',
-            data: null
+            data: null,
         };
     }
 

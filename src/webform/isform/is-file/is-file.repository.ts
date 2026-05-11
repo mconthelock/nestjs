@@ -8,9 +8,7 @@ import { CreateIsFileDto } from './dto/create-is-file.dto';
 
 @Injectable()
 export class IsFileRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -35,5 +33,9 @@ export class IsFileRepository extends BaseRepository {
 
     async insert(dto: CreateIsFileDto) {
         return await this.getRepository(IS_FILE).insert(dto);
+    }
+
+    async create(dto: CreateIsFileDto) {
+        return await this.getRepository(IS_FILE).save(dto);
     }
 }

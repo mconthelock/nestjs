@@ -1,9 +1,34 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { CreateGpRbDto } from './dto/create-gp-rb.dto';
 import { UpdateGpRbDto } from './dto/update-gp-rb.dto';
-import { GpRbRepository } from './gp-rb.repository';
+import { GpRbRepository, ShowCusStampGpRbRepository, ShowstampGpRbRepository } from './gp-rb.repository';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
+
+
+// สำหรับดึงข้อมูลแสดงในหน้า show-gp-rb by Plankton
+@Injectable()
+export class ShowstampGpRbService {
+    private readonly logger = new Logger(ShowstampGpRbService.name); 
+    constructor(
+        private readonly repo: ShowstampGpRbRepository,
+    ) {}
+    findAll() {
+        return this.repo.findAll();
+    }
+}
+
+// สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton
+@Injectable()
+export class ShowCusstampGpRbService {
+    private readonly logger = new Logger(ShowCusstampGpRbService.name);
+    constructor(
+        private readonly repo: ShowCusStampGpRbRepository,
+    ) {}
+    findAll() {
+        return this.repo.findAll();
+    }
+}
 
 @Injectable()
 export class GpRbService {
@@ -20,7 +45,7 @@ export class GpRbService {
     }
     async create(dto: CreateGpRbDto, ip: string) {
         try {
-            const stampFormatGroup = dto.STAMPGROUP?.toLowerCase();
+            const stampFormatGroup = dto.stampFormatGroup?.toLowerCase();
             // ตรวจสอบว่า stampFormatGroup ได้รับค่าแล้ว
             if (!stampFormatGroup) {
                 throw new BadRequestException('stampFormatGroup is required (standard or other)');
@@ -62,9 +87,9 @@ export class GpRbService {
             let insert;
             // บันทึกข้อมูล Stamp Request ตามประเภท
             if (stampFormatGroup === 'standard') {
-                if(!dto.PURPOSE_ID || !dto.PURPOSE_OTHER || dto.SPOSCODE|| !dto.NAME_STAMP ) {
+         /*      if(!dto.PURPOSE_ID || !dto.PURPOSE_OTHER || !dto.SPOSCODE|| !dto.NAME_STAMP ) {
                     throw new BadRequestException('PURPOSE_ID and NAME_STAMP are required for standard stamp group');
-                }
+                } */
                 insert = await this.repo.CreateStampReq({
                     ...form,
                     PURPOSE_ID: dto.PURPOSE_ID,
@@ -76,7 +101,7 @@ export class GpRbService {
                 console.log(insert);
                 
             } else if (stampFormatGroup === 'other') {
-                if(!dto.CUST_SIZE || !dto.QTY) {
+               if(!dto.CUST_SIZE || !dto.QTY) {
                     throw new BadRequestException('CUST_SIZE and QTY are required for other stamp group');
                 }   
                 insert = await this.repo.CreateCusStampReq({

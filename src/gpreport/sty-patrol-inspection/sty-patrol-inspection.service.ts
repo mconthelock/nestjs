@@ -34,6 +34,28 @@ export class StyPatrolInspectionService {
         }
     }
 
+    async findDraft(empno: string) {
+        try {
+            const res = await this.repo.findDraft(empno);
+            if (res.length === 0) {
+                return {
+                    status: false,
+                    message: `No draft patrol inspections found for employee number ${empno}`,
+                    data: null,
+                };
+            }
+            return {
+                status: true,
+                message: `Draft patrol inspections found for employee number ${empno} (${res.length} record(s))`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(
+                'Error fetching draft patrol inspection: ' + error.message,
+            );
+        }
+    }
+
     async getItemReport(dto: ReportStyPatrolInspectionDto) {
         try {
             const res = await this.repo.getItemReport(dto);

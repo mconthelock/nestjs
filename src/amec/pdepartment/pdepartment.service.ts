@@ -68,7 +68,8 @@ export class PdepartmentService {
     );
     query
       .andWhere('B.SDEPARTMENT NOT LIKE :department', { department: '%Cancel%' })
-      .andWhere('B.SDEPCODE != :departmentCode', { departmentCode: '00' });
+      .andWhere('B.SDEPCODE != :departmentCode', { departmentCode: '00' })
+      .orderBy('B.SDEPT', 'ASC');
     return query.getRawMany();
   }
 }

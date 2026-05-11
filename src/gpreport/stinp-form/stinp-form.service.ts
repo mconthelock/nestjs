@@ -39,4 +39,25 @@ export class StinpFormService {
             throw new Error(`Failed to update StinpForm: ${error.message}`);
         }
     }
+
+    async findOne(condition: FormDto) {
+        try {
+            const res = await this.repo.findOne(condition);
+            if (!res) {
+                return {
+                    status: false,
+                    message: 'Safety inspection report  not found',
+                };
+            }
+            return {
+                status: true,
+                message: 'Safety inspection report  found successfully',
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(
+                `Failed to find Safety inspection report : ${error.message}`,
+            );
+        }
+    }
 }

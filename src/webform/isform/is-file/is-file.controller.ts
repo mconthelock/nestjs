@@ -7,11 +7,6 @@ import { SearchIsFileDto } from './dto/search-is-file.dto';
 export class IsFileController {
     constructor(private readonly isFileService: IsFileService) {}
 
-    @Post('insert')
-    async insert(@Body() dto: CreateIsFileDto) {
-        return await this.isFileService.insert(dto);
-    }
-
     @Post('getFile')
     async getFile(@Body() dto: SearchIsFileDto) {
         return await this.isFileService.getFile(dto);

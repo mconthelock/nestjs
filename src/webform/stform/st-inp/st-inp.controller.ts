@@ -12,7 +12,7 @@ import {
     UploadedFiles,
 } from '@nestjs/common';
 import { StInpService } from './st-inp.service';
-import { CreateStInpDto } from './dto/create-st-inp.dto';
+import { CreateStInpDto, DraftStInpDto } from './dto/create-st-inp.dto';
 import { UpdateStInpDto } from './dto/update-st-inp.dto';
 import { Request } from 'express';
 import { getClientIP } from 'src/common/utils/ip.utils';
@@ -29,11 +29,13 @@ import {
 } from './dto/corrective-st-inp.dto';
 import { StInpEvaluateService } from './st-inp-evaluate.service';
 import { EvaluateStInpDto } from './dto/evaluate-st-inp.dto';
+import { StInpSaveDraftService } from './st-inp-saveDraft.service';
 
 @Controller('stform/st-inp')
 export class StInpController {
     constructor(
         private readonly stInpCreateService: StInpCreateService,
+        private readonly stInpSaveDraftService: StInpSaveDraftService,
         private readonly stInpCorrectiveService: StInpCorrectiveService,
         private readonly stInpEvaluateService: StInpEvaluateService,
     ) {}
@@ -58,6 +60,19 @@ export class StInpController {
         );
     }
 
+    @Post('saveAndAction')
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
+    @UseInterceptors(getFileUploadInterceptor('PA_IMAGE[]', true, 30))
+    saveDraft(
+        @Body() dto: DraftStInpDto,
+        @Req() req: Request,
+        @UploadedFiles() file: Express.Multer.File[],
+    ) {
+        const ip = getClientIP(req);
+        return this.stInpSaveDraftService.saveDraft(dto, ip, file, this.path);
+    }
+
     @Post('setCorrective')
     @UseTransaction('webformConnection')
     @UseForceTransaction()
@@ -76,7 +91,12 @@ export class StInpController {
         @UploadedFiles() file: Express.Multer.File[],
     ) {
         const ip = getClientIP(req);
-        return this.stInpCorrectiveService.setCorrectiveDetail(dto, ip, file, this.path);
+        return this.stInpCorrectiveService.setCorrectiveDetail(
+            dto,
+            ip,
+            file,
+            this.path,
+        );
     }
 
     @Patch('setEvaluate')

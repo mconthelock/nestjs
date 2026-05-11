@@ -6,7 +6,6 @@ import { EvaluateStInpDto } from './dto/evaluate-st-inp.dto';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 import { FormService } from 'src/webform/form/form.service';
 import { FlowService } from 'src/webform/flow/flow.service';
-import { StyPatrolService } from 'src/gpreport/sty-patrol/sty-patrol.service';
 import { StyTypeService } from 'src/gpreport/sty-type/sty-type.service';
 import { StyImageService } from 'src/gpreport/sty-image/sty-image.service';
 import { FormmstService } from 'src/webform/formmst/formmst.service';

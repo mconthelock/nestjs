@@ -5,7 +5,6 @@ import {
     CorrectiveStInpDto,
 } from './dto/corrective-st-inp.dto';
 import { FlowService } from 'src/webform/flow/flow.service';
-import { StyPatrolService } from 'src/gpreport/sty-patrol/sty-patrol.service';
 import { StyTypeService } from 'src/gpreport/sty-type/sty-type.service';
 import { StyImageService } from 'src/gpreport/sty-image/sty-image.service';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
@@ -112,6 +111,20 @@ export class StInpCorrectiveService extends StInpService {
                 );
                 movedTargets.push(...movedFile.path);
 
+                const existing = await this.stinpFormListService.findOne({
+                    ...form,
+                    NID: list.PA_ID,
+                });
+                if (!existing.status) {
+                    throw new Error(
+                        `Form list item not found with ID: ${list.PA_ID}`,
+                    ); // ป้องกันกรณีที่มี PA_ID แต่ไม่เจอใน DB
+                }
+                if (existing.data.NIMAGE_AFTER) {
+                    await this.styImageService.delete(
+                        existing.data.NIMAGE_AFTER,
+                    ); // ลบไฟล์เก่า
+                }
                 await this.stinpFormListService.update(
                     { ...form, NID: list.PA_ID },
                     {

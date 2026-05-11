@@ -9,9 +9,7 @@ import { FORMMST } from 'src/common/Entities/webform/table/FORMMST.entity';
 
 @Injectable()
 export class FormmstRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -21,10 +19,10 @@ export class FormmstRepository extends BaseRepository {
     private allowFields = [...this.formmst];
 
     findAll() {
-        // ใช้ได้ทั้งหมด
-        // return this.manager.query(`select * from FORMMST`);
-        // return this.getRepository(FORMMST).find();
-        return this.manager.find(FORMMST);
+        return this.manager
+            .createQueryBuilder(FORMMST, 'FORMMST')
+            .leftJoinAndSelect('FORMMST.formmstGroup', 'FORMMST_GROUP')
+            .getMany();
     }
 
     findOne(dto: SearchFormmstDto) {

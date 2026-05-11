@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { GpRbModule } from './gp-rb/gp-rb.module';
+import { GpRbModule, ShowCusStampGpRbModule, ShowstampGpRbModule } from './gp-rb/gp-rb.module';
 
 @Module({
-  imports: [GpRbModule]
+  imports: [GpRbModule, ShowstampGpRbModule, ShowCusStampGpRbModule],
 })
 export class GpformModule {}
+

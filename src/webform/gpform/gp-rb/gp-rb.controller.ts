@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseInterceptors } from '@nestjs/common';
-import { GpRbService} from './gp-rb.service';
+import { GpRbService, ShowCusstampGpRbService, ShowstampGpRbService} from './gp-rb.service';
 import { CreateGpRbDto } from './dto/create-gp-rb.dto';
 import { UpdateGpRbDto } from './dto/update-gp-rb.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
@@ -28,4 +28,27 @@ export class GpRbController {
     return this.gpRbServicee.create(dto, stampFormatGroup, ip);
   }
 }
- 
+
+
+// สำหรับดึงข้อมูลแสดงในหน้า show-gp-rb by Plankton
+@Controller('gpform/showstamp-gp-rb')
+export class ShowstampGpRbController {
+  constructor(private readonly gpRbServicee: ShowstampGpRbService) {}
+
+  @Get()
+  findAll(){
+    return this.gpRbServicee.findAll();
+  }
+}    
+
+// สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton  
+@Controller('gpform/showcusstamp-gp-rb')
+export class ShowCusStampGpRbController {
+  constructor(private readonly gpRbServicee: ShowCusstampGpRbService) {} 
+
+  @Get()
+  findAll(){
+    return this.gpRbServicee.findAll();
+  } 
+}
+

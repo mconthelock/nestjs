@@ -38,7 +38,7 @@ export class HandleFileFormService {
     ) {
         const { FORM_TYPE, FILE_CODE, PATH, CREATEBY } = dto;
         try {
-            if (!file) {
+            if (!file || (Array.isArray(file) && file.length === 0)) {
                 throw new Error('No file uploaded');
             }
             let fileType: number | undefined;

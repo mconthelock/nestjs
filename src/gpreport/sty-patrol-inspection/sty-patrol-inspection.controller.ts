@@ -38,4 +38,11 @@ export class StyPatrolInspectionController {
     findDraft(@Param('empno') empno: string) {
         return this.styPatrolInspectionService.findDraft(empno);
     }
+
+    @Get('report/summaryClass/:fyear')
+    summaryClass(@Param('fyear') fyear: string) {
+        return this.styPatrolInspectionService.summaryClass(fyear);
+    }
+
+
 }

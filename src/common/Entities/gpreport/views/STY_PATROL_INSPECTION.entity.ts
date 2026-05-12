@@ -27,7 +27,16 @@ export class STY_PATROL_INSPECTION {
     PA_ID: number;
 
     @ViewColumn()
+    PA_ORG_OWNER: string;
+
+    @ViewColumn()
     PA_SECTION: string;
+
+    @ViewColumn()
+    PA_DEPARTMENT: string;
+
+    @ViewColumn()
+    PA_DIVISION: string;
 
     @ViewColumn()
     OWNER_SECTION: string;
@@ -79,6 +88,9 @@ export class STY_PATROL_INSPECTION {
 
     @ViewColumn()
     PA_CLASS: number;
+    
+    @ViewColumn()
+    TYPE_NO: number;
 
     @ViewColumn()
     CLASS: string;

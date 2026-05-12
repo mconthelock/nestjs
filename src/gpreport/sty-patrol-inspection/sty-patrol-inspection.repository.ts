@@ -73,7 +73,6 @@ export class StyPatrolInspectionRepository extends BaseRepository {
             .orderBy('P.NRUNNO', 'ASC');
         if (empno) {
             query.where('(F.VAPVNO = :empno OR F.VREPNO = :empno)', { empno });
-
         }
         return query.getMany();
     }
@@ -128,5 +127,41 @@ export class StyPatrolInspectionRepository extends BaseRepository {
                 PA_ID: 'ASC',
             },
         });
+    }
+
+    async summaryClass(fyear: string) {
+        return this.manager.query(
+            `WITH CLASS_LIST AS (
+                SELECT TYPE_NAME AS CLASS, TYPE_NO  FROM STY_TYPE
+                WHERE TYPE_CODE = 'PTC' AND TYPE_NO IN (1,2)
+            )
+            SELECT 
+                C.CLASS,
+                NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 1 THEN 1 END), 0) JAN,
+                NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 2 THEN 1 END), 0) FEB,
+                NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 3 THEN 1 END), 0) MAR,
+                NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 4 THEN 1 END), 0) APR,
+                NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 5 THEN 1 END), 0) MAY,
+                NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 6 THEN 1 END), 0) JUN,
+                NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 7 THEN 1 END), 0) JUL,
+                NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 8 THEN 1 END), 0) AUG,
+                NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 9 THEN 1 END), 0) SEP,
+                NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 10 THEN 1 END), 0) OCT,
+                NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 11 THEN 1 END), 0) NOV,
+                NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 12 THEN 1 END), 0) DEC,
+                NVL(COUNT(S.TYPE_NO), 0) TOTAL
+            FROM CLASS_LIST C 
+            LEFT JOIN STY_PATROL_INSPECTION S
+            ON S.TYPE_NO = C.TYPE_NO
+            AND S.PA_DATE >= TO_DATE(:1 || '-04-01', 'YYYY-MM-DD')
+            AND S.PA_DATE < ADD_MONTHS(
+                TO_DATE(:2 || '-04-01', 'YYYY-MM-DD'),
+                12
+            )
+            AND S.CST = '2'
+            GROUP BY C.CLASS
+            ORDER BY C.CLASS`,
+            [fyear, fyear],
+        );
     }
 }

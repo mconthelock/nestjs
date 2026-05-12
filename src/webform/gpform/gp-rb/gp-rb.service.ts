@@ -4,6 +4,7 @@ import { UpdateGpRbDto } from './dto/update-gp-rb.dto';
 import { GpRbRepository, ShowCusStampGpRbRepository, ShowstampGpRbRepository } from './gp-rb.repository';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 
 // สำหรับดึงข้อมูลแสดงในหน้า show-gp-rb by Plankton
@@ -16,6 +17,9 @@ export class ShowstampGpRbService {
     findAll() {
         return this.repo.findAll();
     }
+    async findOne(dto: FormDto) {
+        return this.repo.findOne(dto);
+    }
 }
 
 // สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton
@@ -27,6 +31,9 @@ export class ShowCusstampGpRbService {
     ) {}
     findAll() {
         return this.repo.findAll();
+    }
+    findOne(dto: FormDto) {
+        return this.repo.findOne(dto);
     }
 }
 

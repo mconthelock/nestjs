@@ -6,6 +6,7 @@ import { DataSource } from 'typeorm';
 import { CreateCusStampReqDto, CreateGpRbDto, CreateStampReqDto } from './dto/create-gp-rb.dto';
 import { RB_STAMP_REQ } from 'src/common/Entities/webform/table/GPRB_STAMP_REQ.entity';
 import { RB_CUS_STAMP_REQ } from 'src/common/Entities/webform/table/GPRB_CUS_STAMP_REQ.entity';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Injectable()
 export class GpRbRepository extends BaseRepository {
@@ -35,6 +36,18 @@ export class ShowstampGpRbRepository extends BaseRepository {
     findAll() {
         return this.getRepository(RB_STAMP_REQ).find();
     }
+    async findOne(dto: FormDto)   {
+        return this.getRepository(RB_STAMP_REQ).findOne({
+            where: {
+                NFRMNO: dto.NFRMNO, 
+                VORGNO: dto.VORGNO,
+                CYEAR: dto.CYEAR,
+                CYEAR2: dto.CYEAR2,
+                NRUNNO: dto.NRUNNO,
+            },
+        });
+    }
+
 }
 
 // สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton
@@ -45,5 +58,16 @@ export class ShowCusStampGpRbRepository extends BaseRepository {
     }
     findAll() {
         return this.getRepository(RB_CUS_STAMP_REQ).find();
+    }   
+    async findOne(dto: FormDto)   {
+        return this.getRepository(RB_CUS_STAMP_REQ).findOne({
+            where: {
+                NFRMNO: dto.NFRMNO, 
+                VORGNO: dto.VORGNO,
+                CYEAR: dto.CYEAR,
+                CYEAR2: dto.CYEAR2,
+                NRUNNO: dto.NRUNNO,
+            },
+        });
     }   
 }

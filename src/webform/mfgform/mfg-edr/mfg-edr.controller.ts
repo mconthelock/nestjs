@@ -14,6 +14,11 @@ export class MfgEdrController {
     return this.mfgEdrService.create(createMfgEdrDto);
   }
 
+  @Post('update-detail')
+  updateDetail(@Body() dto: CreateMfgEdrDto) {
+    return this.mfgEdrService.updateDetail(dto);
+  }
+  
   @Get()
   findAll() {
     return this.mfgEdrService.findAll();

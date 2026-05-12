@@ -9,6 +9,13 @@ import { EdrCauseMst } from '../../../common/Entities/webform/table/edr_cause_ms
 import { EdrLineMst } from '../../../common/Entities/webform/table/edr_line_mst.entity';
 import { EdrProcessMst } from '../../../common/Entities/webform/table/edr_process_mst.entity';
 
+  import { MfgEdrFormHead } from '../../../common/Entities/webform/table/mfg_edr_form_head.entity';
+  import { MfgEdrFormList } from '../../../common/Entities/webform/table/mfg_edr_form_list.entity';
+  import { MfgEdrFormAtt } from '../../../common/Entities/webform/table/mfg_edr_form_att.entity';
+  import { MfgEdrFormCorrective } from '../../../common/Entities/webform/table/mfg_edr_form_corrective.entity';
+  import { MfgEdrFormPreventive } from '../../../common/Entities/webform/table/mfg_edr_form_preventive.entity';
+  import { MfgEdrFormWhy } from '../../../common/Entities/webform/table/mfg_edr_form_why.entity';
+
 import { AmecOrders } from 'src/common/Entities/workload/table/amecorders.entity';
 import { AmecOrdersSchedule } from 'src/common/Entities/workload/table/amecorders_schedule.entity';
 
@@ -20,7 +27,13 @@ import { AmecOrdersSchedule } from 'src/common/Entities/workload/table/amecorder
       EdrProcessMst,
       EdrCauseMst,
       AmecOrders,
-      AmecOrdersSchedule
+      AmecOrdersSchedule,
+      MfgEdrFormHead,
+      MfgEdrFormList,
+      MfgEdrFormAtt,
+      MfgEdrFormCorrective,
+      MfgEdrFormPreventive,
+      MfgEdrFormWhy
     ], 'webformConnection'),
   ],
   controllers: [MfgEdrController],

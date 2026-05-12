@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { MfgEdrService } from './mfg-edr.service';
 import { CreateMfgEdrDto } from './dto/create-mfg-edr.dto';
 import { SearchCauseDto } from './dto/search-cause.dto';
-
+import { GetMfgEdrDto } from './dto/get-mfg-edr.dto';
 
 
 @Controller('mfg-edr')
@@ -57,6 +57,11 @@ export class MfgEdrController {
   @Post('amec-order-detail')
   getOrderDetail(@Body() body: any) {
     return this.mfgEdrService.getOrderDetail(body.MFGNO);
+  }
+
+  @Post('get')
+  getMfgEdr(@Body() dto: GetMfgEdrDto) {
+    return this.mfgEdrService.getMfgEdr(dto);
   }
 
 }

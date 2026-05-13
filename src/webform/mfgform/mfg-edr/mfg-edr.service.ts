@@ -64,7 +64,7 @@ export class MfgEdrService {
     @InjectRepository(MfgEdrFormWhy, 'webformConnection')
     private readonly formWhyRepo: Repository<MfgEdrFormWhy>,
 
-    @InjectRepository(FORM)
+    @InjectRepository(FORM, 'webformConnection')
     private readonly formRepo: Repository<FORM>,
 
     @InjectDataSource('webformConnection')
@@ -295,18 +295,8 @@ export class MfgEdrService {
     
     const form = await this.formRepo
       .createQueryBuilder('A')
-      .leftJoin(
-        AMECUSERALL,
-        'B',
-        'A.VREQNO = B.SEMPNO',
-      )
-
-      .leftJoin(
-        AMECUSERALL,
-        'C',
-        'A.VINPNO = C.SEMPNO',
-      )
-
+      .leftJoin(AMECUSERALL,'B', 'A.VREQNO = B.SEMPNO', )
+      .leftJoin( AMECUSERALL,'C','A.VINPUTER = C.SEMPNO',)
       .select([
         'A.*',
         'B.SEMPNO AS REQ_EMPNO',
@@ -323,34 +313,24 @@ export class MfgEdrService {
 
     const head = await this.formHeadRepo
       .createQueryBuilder('H')
-      .leftJoin(
-        EdrWorktypeMst,
-        'WT',
-        'WT.TID = H.TID',
-      )
-      .leftJoin(
-        EdrCauseMst,
-        'C',
-        'C.CID = H.CID',
-      )
-
+      .leftJoin(EdrWorktypeMst,'WT','WT.TID = H.TID',)
+      .leftJoin(EdrCauseMst,'C','C.CID = H.CID',)
+      .leftJoin(AMECUSERALL,'D', 'H.REPAIR_BY = D.SEMPNO', )
       .select([
         'H.NFRMNO AS NFRMNO',
         'H.VORGNO AS VORGNO',
         'H.CYEAR AS CYEAR',
         'H.CYEAR2 AS CYEAR2',
         'H.NRUNNO AS NRUNNO',
-
         'H.TID AS TID',
         'WT.TYPENAME AS TYPENAME',
-
         'H.CID AS CID',
         'C.CAUSE AS CAUSE',
         'C.CAUSENAME AS CAUSENAME',
         'C.CAUSE_GROUP AS CAUSE_GROUP',
-
         'H.SSECCODE AS SSECCODE',
         'H.REPAIR_BY AS REPAIR_BY',
+        'D.SNAME AS REPAIR_BY_NAME',
         'H.DAILY_MONTH AS DAILY_MONTH',
         'H.DAILY_RUNNO AS DAILY_RUNNO',
         'H.REASON_CAUSE AS REASON_CAUSE',
@@ -361,27 +341,21 @@ export class MfgEdrService {
       .andWhere('H.CYEAR = :CYEAR', key)
       .andWhere('H.CYEAR2 = :CYEAR2', key)
       .andWhere('H.NRUNNO = :NRUNNO', key)
-
       .getRawOne();
 
     const list = await this.formListRepo
       .createQueryBuilder('L')
-      .leftJoin(
-        EdrLineMst,
-        'LM',
-        'LM.LID = L.LID',
-      )
-
-      .leftJoin(
-        EdrProcessMst,
-        'PM',
-        'PM.PID = L.PID',
-      )
-
+      .leftJoin(EdrLineMst,'LM','LM.LID = L.LID',)
+      .leftJoin(EdrProcessMst,'PM','PM.PID = L.PID',)
+      .leftJoin(AmecOrders,'A','UPPER(A.MFGNO) = UPPER(L.ORDERNO)',)
+      .leftJoin(AmecOrdersSchedule,'B','A.MFGNO = B.REFMFGNO',)
       .select([
         'L.*',
         'LM.LINE AS LINE',
         'PM.PROCESS AS PROCESS',
+        'A.PRJ_NO AS PRJ_NO',
+        'A.SERIES AS MODEL',
+        'B.MFGBM AS PROD',
       ])
 
       .where('L.NFRMNO = :NFRMNO', key)

@@ -20,7 +20,8 @@ import { MfgEdrFormWhy } from '../../../common/Entities/webform/table/mfg_edr_fo
 
 import { AmecOrders } from 'src/common/Entities/workload/table/amecorders.entity';
 import { AmecOrdersSchedule } from 'src/common/Entities/workload/table/amecorders_schedule.entity';
-
+import { FORM } from '../../../common/Entities/webform/table/FORM.entity';
+import { AMECUSERALL } from '../../../common/Entities/amec/views/AMECUSERALL.entity';
 
 type FormKey = Pick<CreateMfgEdrDto, 'NFRMNO' | 'VORGNO' | 'CYEAR' | 'CYEAR2' | 'NRUNNO'>;
 
@@ -62,6 +63,9 @@ export class MfgEdrService {
 
     @InjectRepository(MfgEdrFormWhy, 'webformConnection')
     private readonly formWhyRepo: Repository<MfgEdrFormWhy>,
+
+    @InjectRepository(FORM)
+    private readonly formRepo: Repository<FORM>,
 
     @InjectDataSource('webformConnection')
     private readonly dataSource: DataSource,
@@ -276,129 +280,152 @@ export class MfgEdrService {
   }
 
   async getMfgEdr(dto: GetMfgEdrDto) {
-  const key = {
-    NFRMNO: Number(dto.NFRMNO),
-    VORGNO: String(dto.VORGNO),
-    CYEAR: String(dto.CYEAR),
-    CYEAR2: String(dto.CYEAR2),
-    NRUNNO: Number(dto.NRUNNO),
-  };
+    console.log('RAW DTO =', dto);
+    console.log('KEYS =', Object.keys(dto || {}));
 
-  const head = await this.formHeadRepo
-    .createQueryBuilder('H')
+    const key = {
+      NFRMNO: Number(dto.NFRMNO),
+      VORGNO: dto.VORGNO,
+      CYEAR: dto.CYEAR,
+      CYEAR2: dto.CYEAR2,
+      NRUNNO: Number(dto.NRUNNO),
+    };
 
-    .leftJoin(
-      EdrWorktypeMst,
-      'WT',
-      'WT.TID = H.TID',
-    )
+    console.log('KEY =', key);
+    
+    const form = await this.formRepo
+      .createQueryBuilder('A')
+      .leftJoin(
+        AMECUSERALL,
+        'B',
+        'A.VREQNO = B.SEMPNO',
+      )
 
-    .leftJoin(
-      EdrCauseMst,
-      'C',
-      'C.CID = H.CID',
-    )
+      .leftJoin(
+        AMECUSERALL,
+        'C',
+        'A.VINPNO = C.SEMPNO',
+      )
 
-    .select([
-      'H.NFRMNO AS NFRMNO',
-      'H.VORGNO AS VORGNO',
-      'H.CYEAR AS CYEAR',
-      'H.CYEAR2 AS CYEAR2',
-      'H.NRUNNO AS NRUNNO',
+      .select([
+        'A.*',
+        'B.SEMPNO AS REQ_EMPNO',
+        'B.SNAME AS REQ_NAME',
+        'C.SEMPNO AS INP_EMPNO',
+        'C.SNAME AS INP_NAME',
+      ])
+      .where('A.NFRMNO = :NFRMNO', key)
+      .andWhere('A.VORGNO = :VORGNO', key)
+      .andWhere('A.CYEAR = :CYEAR', key)
+      .andWhere('A.CYEAR2 = :CYEAR2', key)
+      .andWhere('A.NRUNNO = :NRUNNO', key)
+      .getRawOne();
 
-      'H.TID AS TID',
-      'WT.TYPENAME AS TYPENAME',
-      'WT.TYPESTATUS AS TYPESTATUS',
+    const head = await this.formHeadRepo
+      .createQueryBuilder('H')
+      .leftJoin(
+        EdrWorktypeMst,
+        'WT',
+        'WT.TID = H.TID',
+      )
+      .leftJoin(
+        EdrCauseMst,
+        'C',
+        'C.CID = H.CID',
+      )
 
-      'H.CID AS CID',
-      'C.CAUSE AS CAUSE',
-      'C.CAUSENAME AS CAUSENAME',
-      'C.CAUSE_GROUP AS CAUSE_GROUP',
-      'C.CAUSESTATUS AS CAUSESTATUS',
+      .select([
+        'H.NFRMNO AS NFRMNO',
+        'H.VORGNO AS VORGNO',
+        'H.CYEAR AS CYEAR',
+        'H.CYEAR2 AS CYEAR2',
+        'H.NRUNNO AS NRUNNO',
 
-      'H.SSECCODE AS SSECCODE',
-      'H.REPAIR_BY AS REPAIR_BY',
-      'H.DAILY_MONTH AS DAILY_MONTH',
-      'H.DAILY_RUNNO AS DAILY_RUNNO',
-      'H.REASON_CAUSE AS REASON_CAUSE',
-    ])
+        'H.TID AS TID',
+        'WT.TYPENAME AS TYPENAME',
 
-    .where('H.NFRMNO = :NFRMNO', key)
-    .andWhere('H.VORGNO = :VORGNO', key)
-    .andWhere('H.CYEAR = :CYEAR', key)
-    .andWhere('H.CYEAR2 = :CYEAR2', key)
-    .andWhere('H.NRUNNO = :NRUNNO', key)
+        'H.CID AS CID',
+        'C.CAUSE AS CAUSE',
+        'C.CAUSENAME AS CAUSENAME',
+        'C.CAUSE_GROUP AS CAUSE_GROUP',
 
-    .getRawOne();
+        'H.SSECCODE AS SSECCODE',
+        'H.REPAIR_BY AS REPAIR_BY',
+        'H.DAILY_MONTH AS DAILY_MONTH',
+        'H.DAILY_RUNNO AS DAILY_RUNNO',
+        'H.REASON_CAUSE AS REASON_CAUSE',
+      ])
 
-  const list = await this.formListRepo
-    .createQueryBuilder('L')
+      .where('H.NFRMNO = :NFRMNO', key)
+      .andWhere('H.VORGNO = :VORGNO', key)
+      .andWhere('H.CYEAR = :CYEAR', key)
+      .andWhere('H.CYEAR2 = :CYEAR2', key)
+      .andWhere('H.NRUNNO = :NRUNNO', key)
 
-    .leftJoin(
-      EdrLineMst,
-      'LM',
-      'LM.LID = L.LID',
-    )
+      .getRawOne();
 
-    .leftJoin(
-      EdrProcessMst,
-      'PM',
-      'PM.PID = L.PID',
-    )
+    const list = await this.formListRepo
+      .createQueryBuilder('L')
+      .leftJoin(
+        EdrLineMst,
+        'LM',
+        'LM.LID = L.LID',
+      )
 
-    .select([
-      'L.*',
+      .leftJoin(
+        EdrProcessMst,
+        'PM',
+        'PM.PID = L.PID',
+      )
 
-      'LM.LINE_NAME AS LINE_NAME',
-      'LM.LINE_STATUS AS LINE_STATUS',
+      .select([
+        'L.*',
+        'LM.LINE AS LINE',
+        'PM.PROCESS AS PROCESS',
+      ])
 
-      'PM.PROCESS_NAME AS PROCESS_NAME',
-      'PM.PROCESS_STATUS AS PROCESS_STATUS',
-    ])
+      .where('L.NFRMNO = :NFRMNO', key)
+      .andWhere('L.VORGNO = :VORGNO', key)
+      .andWhere('L.CYEAR = :CYEAR', key)
+      .andWhere('L.CYEAR2 = :CYEAR2', key)
+      .andWhere('L.NRUNNO = :NRUNNO', key)
+      .orderBy('L.ID', 'ASC')
+      .getRawMany();
 
-    .where('L.NFRMNO = :NFRMNO', key)
-    .andWhere('L.VORGNO = :VORGNO', key)
-    .andWhere('L.CYEAR = :CYEAR', key)
-    .andWhere('L.CYEAR2 = :CYEAR2', key)
-    .andWhere('L.NRUNNO = :NRUNNO', key)
+    const att = await this.formAttRepo.find({
+      where: key,
+      order: { ID: 'ASC' },
+    });
 
-    .orderBy('L.ID', 'ASC')
+    const corrective = await this.formCorrectiveRepo.find({
+      where: key,
+      order: { ID: 'ASC' },
+    });
 
-    .getRawMany();
+    const preventive = await this.formPreventiveRepo.find({
+      where: key,
+      order: { ID: 'ASC' },
+    });
 
-  const att = await this.formAttRepo.find({
-    where: key,
-    order: { ID: 'ASC' },
-  });
+    const why = await this.formWhyRepo.find({
+      where: key,
+      order: { ID: 'ASC' },
+    });
 
-  const corrective = await this.formCorrectiveRepo.find({
-    where: key,
-    order: { ID: 'ASC' },
-  });
-
-  const preventive = await this.formPreventiveRepo.find({
-    where: key,
-    order: { ID: 'ASC' },
-  });
-
-  const why = await this.formWhyRepo.find({
-    where: key,
-    order: { ID: 'ASC' },
-  });
-
-  return {
-    status: true,
-    data: {
-      head,
-      list,
-      att,
-      corrective,
-      preventive,
-      why,
-    },
-  };
-}
-  
+    return {
+      status: true,
+      data: {
+        form,
+        head,
+        list,
+        att,
+        corrective,
+        preventive,
+        why,
+      },
+    };
+  }
+    
 
 
     

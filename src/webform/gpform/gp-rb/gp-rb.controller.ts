@@ -6,6 +6,7 @@ import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from "express";
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
+import { FormService } from 'src/webform/form/form.service';
 
 
 @Controller('gpform/gp-rb')
@@ -33,12 +34,19 @@ export class GpRbController {
 // สำหรับดึงข้อมูลแสดงในหน้า show-gp-rb by Plankton
 @Controller('gpform/showstamp-gp-rb')
 export class ShowstampGpRbController {
-  constructor(private readonly gpRbServicee: ShowstampGpRbService) {}
+  constructor(private readonly gpRbServicee: ShowstampGpRbService,) {}
 
-  @Get()
-  findAll(){
-    return this.gpRbServicee.findAll();
+  @Get('/:fno/:orgno/:cyear/:cyear2/:nrunno')
+  findOne(
+    @Param('fno') fno: number,
+    @Param('orgno') orgno: string,  
+    @Param('cyear') cyear: string,
+    @Param('cyear2') cyear2: string,
+    @Param('nrunno') nrunno: number,
+  ){
+    return this.gpRbServicee.findOne({NFRMNO: fno, VORGNO: orgno, CYEAR: cyear, CYEAR2: cyear2, NRUNNO: nrunno});
   }
+
 }    
 
 // สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton  
@@ -46,9 +54,15 @@ export class ShowstampGpRbController {
 export class ShowCusStampGpRbController {
   constructor(private readonly gpRbServicee: ShowCusstampGpRbService) {} 
 
-  @Get()
-  findAll(){
-    return this.gpRbServicee.findAll();
-  } 
+  @Get('/:fno/:orgno/:cyear/:cyear2/:nrunno')
+  findOne(
+    @Param('fno') fno: number,
+    @Param('orgno') orgno: string,  
+    @Param('cyear') cyear: string,
+    @Param('cyear2') cyear2: string,
+    @Param('nrunno') nrunno: number,
+  ){
+    return this.gpRbServicee.findOne({NFRMNO: fno, VORGNO: orgno, CYEAR: cyear, CYEAR2: cyear2, NRUNNO: nrunno});
+   }
 }
 

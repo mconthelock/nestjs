@@ -6,25 +6,25 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 
 export class CreateFinDDto {
 
-    // @IsNotEmpty()
-    @IsNumber()
-    @Type(()=> Number)
-    LINE_ID: number;
+  @IsNotEmpty()
+  @IsNumber()
+  @Type(() => Number)
+  LINE_ID: number;
 
-    // @IsNotEmpty()
-    @IsString()
-    @Type(()=> String)
-    REASON: string;
+  @IsNotEmpty()
+  @IsString()
+  REASON: string;
 
-    // @IsNotEmpty()
-    @IsNumber()
-    @Type(()=> Number)
-    QTY: number;
+  @IsNotEmpty()
+  @IsNumber()
+  @Type(() => Number)
+  DUTY_VALUE: number;
 
-    // @IsNotEmpty()
-    @IsNumber()
-    @Type(()=> Number)
-    AMT: number;
+  @IsNotEmpty()
+  @IsNumber()
+  @Type(() => Number)
+  QTY: number;
+
 
 }
 
@@ -34,7 +34,11 @@ export class CreateFinDDto {
     'INPUTBY',
     'REQBY',
     'REMARK',
-
+//   'NFRMNO',
+//   'VORGNO',
+//   'CYEAR',
+//   'CYEAR2',
+//   'NRUNNO',
 ]as const) {
 
     @IsNotEmpty()

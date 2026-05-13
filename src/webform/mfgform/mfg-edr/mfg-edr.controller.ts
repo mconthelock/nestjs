@@ -59,7 +59,7 @@ export class MfgEdrController {
     return this.mfgEdrService.getOrderDetail(body.MFGNO);
   }
 
-  @Post('get')
+  @Post('get-mfg-edr')
   getMfgEdr(@Body() dto: GetMfgEdrDto) {
     return this.mfgEdrService.getMfgEdr(dto);
   }

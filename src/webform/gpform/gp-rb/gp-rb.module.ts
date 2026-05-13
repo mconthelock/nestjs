@@ -8,11 +8,14 @@ import { FormModule } from 'src/webform/form/form.module';
 import { RB_PURPOSE } from 'src/common/Entities/webform/table/GPRB_PURPOSE.entity';
 import { RB_STAMP_REQ } from 'src/common/Entities/webform/table/GPRB_STAMP_REQ.entity';
 import { RB_CUS_STAMP_REQ } from 'src/common/Entities/webform/table/GPRB_CUS_STAMP_REQ.entity';
+import { HandleFileFormModule } from 'src/webform/handle-file-form/handle-file-form.module';
+
 
 @Module({
   imports:[TypeOrmModule.forFeature([RB_PURPOSE],'webformConnection'),
   FormmstModule,
-  FormModule
+  FormModule,
+  HandleFileFormModule
 ],
   controllers: [GpRbController],
   providers: [GpRbService,GpRbRepository],
@@ -38,3 +41,4 @@ export class ShowstampGpRbModule {}
   exports:[ShowCusstampGpRbService],
 })
 export class ShowCusStampGpRbModule {}  
+

@@ -21,11 +21,32 @@ import { Request } from 'express';
 @Controller('finform/fin-ds')
 export class FinDsController {
     constructor(private readonly finDsService: FinDsService) {}
-    // constructor(private readonly finDsService: FinDsService) {}
 
     @Get()
     findAll() {
         return this.finDsService.findAll();
+    }
+
+    // ดึงรายการ Head ทั้งหมด สำหรับหน้า show
+    @Get('show')
+    findAllHeadForShow() {
+        return this.finDsService.findAllHeadForShow();
+    }
+
+    // ดึงรายการเดียว พร้อม detail
+    @Get('show/:nfrmno/:vorgno/:cyear/:nrunno')
+    findOneForShow(
+        @Param('nfrmno') nfrmno: string,
+        @Param('vorgno') vorgno: string,
+        @Param('cyear') cyear: string,
+        @Param('nrunno') nrunno: string,
+    ) {
+        return this.finDsService.findOneForShow(
+            Number(nfrmno),
+            vorgno,
+            cyear,
+            Number(nrunno),
+        );
     }
 
     @Post()
@@ -36,31 +57,7 @@ export class FinDsController {
         @UploadedFiles() files: Express.Multer.File[],
         @Req() req: Request,
     ) {
-        // return this.finDsService.create(createFinDDto,files);
         const ip = getClientIP(req);
         return this.finDsService.create(dto, files, ip);
     }
-
-    // @create()
-    //  create2(
-    //     @Body() dto: CreateFinDFormdto,
-    //     @UploadedFiles() files: Express.Multer.File[]
-    // ) {
-    //     return this.finDsService.create(dto,files);
-    // }
-
-    // @Get(':id')
-    // findOne(@Param('id') id: string) {
-    //   return this.finDsService.findOne(+id);
-    // }
-
-    // @Patch(':id')
-    // update(@Param('id') id: string, @Body() updateFinDDto: UpdateFinDDto) {
-    //   return this.finDsService.update(+id, updateFinDDto);
-    // }
-
-    // @Delete(':id')
-    // remove(@Param('id') id: string) {
-    //   return this.finDsService.remove(+id);
-    // }
 }

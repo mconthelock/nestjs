@@ -4,6 +4,7 @@ import { Repository, DataSource, EntityManager  } from 'typeorm';
 
 import { CreateMfgEdrDto } from './dto/create-mfg-edr.dto';
 import { SearchCauseDto } from './dto/search-cause.dto';
+import { GetMfgEdrDto } from './dto/get-mfg-edr.dto';
 
 import { EdrWorktypeMst } from '../../../common/Entities/webform/table/edr_worktype_mst.entity';
 import { EdrCauseMst } from '../../../common/Entities/webform/table/edr_cause_mst.entity';
@@ -19,6 +20,8 @@ import { MfgEdrFormWhy } from '../../../common/Entities/webform/table/mfg_edr_fo
 
 import { AmecOrders } from 'src/common/Entities/workload/table/amecorders.entity';
 import { AmecOrdersSchedule } from 'src/common/Entities/workload/table/amecorders_schedule.entity';
+import { FORM } from '../../../common/Entities/webform/table/FORM.entity';
+import { AMECUSERALL } from '../../../common/Entities/amec/views/AMECUSERALL.entity';
 
 type FormKey = Pick<CreateMfgEdrDto, 'NFRMNO' | 'VORGNO' | 'CYEAR' | 'CYEAR2' | 'NRUNNO'>;
 
@@ -60,6 +63,9 @@ export class MfgEdrService {
 
     @InjectRepository(MfgEdrFormWhy, 'webformConnection')
     private readonly formWhyRepo: Repository<MfgEdrFormWhy>,
+
+    @InjectRepository(FORM, 'webformConnection')
+    private readonly formRepo: Repository<FORM>,
 
     @InjectDataSource('webformConnection')
     private readonly dataSource: DataSource,
@@ -272,6 +278,128 @@ export class MfgEdrService {
       };
     });
   }
+
+  async getMfgEdr(dto: GetMfgEdrDto) {
+    console.log('RAW DTO =', dto);
+    console.log('KEYS =', Object.keys(dto || {}));
+
+    const key = {
+      NFRMNO: Number(dto.NFRMNO),
+      VORGNO: dto.VORGNO,
+      CYEAR: dto.CYEAR,
+      CYEAR2: dto.CYEAR2,
+      NRUNNO: Number(dto.NRUNNO),
+    };
+
+    console.log('KEY =', key);
+    
+    const form = await this.formRepo
+      .createQueryBuilder('A')
+      .leftJoin(AMECUSERALL,'B', 'A.VREQNO = B.SEMPNO', )
+      .leftJoin( AMECUSERALL,'C','A.VINPUTER = C.SEMPNO',)
+      .select([
+        'A.*',
+        'B.SEMPNO AS REQ_EMPNO',
+        'B.SNAME AS REQ_NAME',
+        'C.SEMPNO AS INP_EMPNO',
+        'C.SNAME AS INP_NAME',
+      ])
+      .where('A.NFRMNO = :NFRMNO', key)
+      .andWhere('A.VORGNO = :VORGNO', key)
+      .andWhere('A.CYEAR = :CYEAR', key)
+      .andWhere('A.CYEAR2 = :CYEAR2', key)
+      .andWhere('A.NRUNNO = :NRUNNO', key)
+      .getRawOne();
+
+    const head = await this.formHeadRepo
+      .createQueryBuilder('H')
+      .leftJoin(EdrWorktypeMst,'WT','WT.TID = H.TID',)
+      .leftJoin(EdrCauseMst,'C','C.CID = H.CID',)
+      .leftJoin(AMECUSERALL,'D', 'H.REPAIR_BY = D.SEMPNO', )
+      .select([
+        'H.NFRMNO AS NFRMNO',
+        'H.VORGNO AS VORGNO',
+        'H.CYEAR AS CYEAR',
+        'H.CYEAR2 AS CYEAR2',
+        'H.NRUNNO AS NRUNNO',
+        'H.TID AS TID',
+        'WT.TYPENAME AS TYPENAME',
+        'H.CID AS CID',
+        'C.CAUSE AS CAUSE',
+        'C.CAUSENAME AS CAUSENAME',
+        'C.CAUSE_GROUP AS CAUSE_GROUP',
+        'H.SSECCODE AS SSECCODE',
+        'H.REPAIR_BY AS REPAIR_BY',
+        'D.SNAME AS REPAIR_BY_NAME',
+        'H.DAILY_MONTH AS DAILY_MONTH',
+        'H.DAILY_RUNNO AS DAILY_RUNNO',
+        'H.REASON_CAUSE AS REASON_CAUSE',
+      ])
+
+      .where('H.NFRMNO = :NFRMNO', key)
+      .andWhere('H.VORGNO = :VORGNO', key)
+      .andWhere('H.CYEAR = :CYEAR', key)
+      .andWhere('H.CYEAR2 = :CYEAR2', key)
+      .andWhere('H.NRUNNO = :NRUNNO', key)
+      .getRawOne();
+
+    const list = await this.formListRepo
+      .createQueryBuilder('L')
+      .leftJoin(EdrLineMst,'LM','LM.LID = L.LID',)
+      .leftJoin(EdrProcessMst,'PM','PM.PID = L.PID',)
+      .leftJoin(AmecOrders,'A','UPPER(A.MFGNO) = UPPER(L.ORDERNO)',)
+      .leftJoin(AmecOrdersSchedule,'B','A.MFGNO = B.REFMFGNO',)
+      .select([
+        'L.*',
+        'LM.LINE AS LINE',
+        'PM.PROCESS AS PROCESS',
+        'A.PRJ_NO AS PRJ_NO',
+        'A.SERIES AS MODEL',
+        'B.MFGBM AS PROD',
+      ])
+
+      .where('L.NFRMNO = :NFRMNO', key)
+      .andWhere('L.VORGNO = :VORGNO', key)
+      .andWhere('L.CYEAR = :CYEAR', key)
+      .andWhere('L.CYEAR2 = :CYEAR2', key)
+      .andWhere('L.NRUNNO = :NRUNNO', key)
+      .orderBy('L.ID', 'ASC')
+      .getRawMany();
+
+    const att = await this.formAttRepo.find({
+      where: key,
+      order: { ID: 'ASC' },
+    });
+
+    const corrective = await this.formCorrectiveRepo.find({
+      where: key,
+      order: { ID: 'ASC' },
+    });
+
+    const preventive = await this.formPreventiveRepo.find({
+      where: key,
+      order: { ID: 'ASC' },
+    });
+
+    const why = await this.formWhyRepo.find({
+      where: key,
+      order: { ID: 'ASC' },
+    });
+
+    return {
+      status: true,
+      data: {
+        form,
+        head,
+        list,
+        att,
+        corrective,
+        preventive,
+        why,
+      },
+    };
+  }
+    
 
 
     

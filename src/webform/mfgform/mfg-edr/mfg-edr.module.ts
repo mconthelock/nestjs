@@ -19,6 +19,7 @@ import { MfgEdrFormWhy } from '../../../common/Entities/webform/table/mfg_edr_fo
 import { AmecOrders } from 'src/common/Entities/workload/table/amecorders.entity';
 import { AmecOrdersSchedule } from 'src/common/Entities/workload/table/amecorders_schedule.entity';
 import { FORM } from '../../../common/Entities/webform/table/FORM.entity';
+import { FLOW } from '../../../common/Entities/webform/table/FLOW.entity';
 import { AMECUSERALL } from '../../../common/Entities/amec/views/AMECUSERALL.entity';
 
 @Module({
@@ -37,6 +38,7 @@ import { AMECUSERALL } from '../../../common/Entities/amec/views/AMECUSERALL.ent
       MfgEdrFormPreventive,
       MfgEdrFormWhy,
       FORM,
+      FLOW,
       AMECUSERALL,
     ], 'webformConnection'),
   ],

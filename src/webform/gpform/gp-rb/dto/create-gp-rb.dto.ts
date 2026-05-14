@@ -50,10 +50,6 @@ export class CreateCusStampReqDto extends PickType(FormDto, [
     'CYEAR2',
     'NRUNNO',
 ] as const) {
-    @IsOptional()
-    @IsString()
-    @Type(() => String)
-    CUST_SIZE?: string;
 
     @IsOptional()
     @IsNumber()
@@ -93,7 +89,6 @@ export class CreateGpRbDto extends IntersectionType(
         'STAMP_REMARK',
     ] as const),
     PickType(CreateCusStampReqDto, [
-        'CUST_SIZE',
         'QTY',
         'STAMPCUS_REMARK',
     ] as const),

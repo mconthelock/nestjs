@@ -47,7 +47,7 @@ export class ShowstampGpRbRepository extends BaseRepository {
             },
         });
     }
-
+    
 }
 
 // สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton

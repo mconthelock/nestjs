@@ -6,6 +6,7 @@ import { STY_PATROL_INSPECTION } from 'src/common/Entities/gpreport/views/STY_PA
 import { ReportStyPatrolInspectionDto } from './dto/report-sty-patrol-inspection.dto';
 import { STY_ITEMS } from 'src/common/Entities/gpreport/table/STY_ITEMS.entity';
 import { FormDto } from 'src/webform/form/dto/form.dto';
+import { STY_TYPE } from 'src/common/Entities/gpreport/table/STY_TYPE.entity';
 
 @Injectable()
 export class StyPatrolInspectionRepository extends BaseRepository {
@@ -129,7 +130,7 @@ export class StyPatrolInspectionRepository extends BaseRepository {
         });
     }
 
-    async summaryClass(fyear: string) {
+    async summaryClass(fyear: string, seccode?: string) {
         return this.manager.query(
             `WITH CLASS_LIST AS (
                 SELECT TYPE_NAME AS CLASS, TYPE_NO  FROM STY_TYPE
@@ -151,17 +152,117 @@ export class StyPatrolInspectionRepository extends BaseRepository {
                 NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 12 THEN 1 END), 0) DEC,
                 NVL(COUNT(S.TYPE_NO), 0) TOTAL
             FROM CLASS_LIST C 
-            LEFT JOIN STY_PATROL_INSPECTION S
+            LEFT JOIN (
+                SELECT * FROM STY_PATROL_INSPECTION
+                ${seccode ? 'WHERE PA_SECTION = :1' : ''}
+            )S
             ON S.TYPE_NO = C.TYPE_NO
-            AND S.PA_DATE >= TO_DATE(:1 || '-04-01', 'YYYY-MM-DD')
+            AND S.PA_DATE >= TO_DATE(:2 || '-04-01', 'YYYY-MM-DD')
             AND S.PA_DATE < ADD_MONTHS(
-                TO_DATE(:2 || '-04-01', 'YYYY-MM-DD'),
+                TO_DATE(:3 || '-04-01', 'YYYY-MM-DD'),
                 12
             )
             AND S.CST = '2'
             GROUP BY C.CLASS
             ORDER BY C.CLASS`,
-            [fyear, fyear],
+            seccode ? [seccode, fyear, fyear] : [fyear, fyear],
+        );
+    }
+
+    async summaryDepartment(fyear: string, month: number) {
+        return this.manager.query(
+            `WITH CLASS_LIST AS (
+                SELECT TYPE_NAME AS CLASS, TYPE_NO  FROM STY_TYPE
+                WHERE TYPE_CODE = 'PTC' AND TYPE_NO IN (1,2)
+            )
+            SELECT D.SDEPCODE, D.SDEPT, C.CLASS,  NVL(P.AMOUNT, 0) AS AMOUNT
+            FROM AMEC.PDEPARTMENT D
+            CROSS JOIN CLASS_LIST C
+            LEFT JOIN (
+                SELECT SDEPCODE, SDEPT, CLASS, COUNT(CLASS) AS AMOUNT
+                FROM STY_PATROL_INSPECTION	
+                WHERE CST = '2'
+                AND PA_DATE >= TO_DATE(:1 || '-04-01', 'YYYY-MM-DD')
+                AND PA_DATE < ADD_MONTHS(
+                    TO_DATE(:2 || '-04-01', 'YYYY-MM-DD'),
+                    12
+                )
+                AND EXTRACT(MONTH FROM PA_DATE) = :3
+                GROUP BY SDEPCODE, SDEPT, CLASS
+            ) P ON D.SDEPCODE = P.SDEPCODE AND C.CLASS = P.CLASS
+            WHERE D.SDEPCODE != '00'
+            AND UPPER(D.SDEPT) NOT LIKE '%CANCEL%'
+            ORDER BY SDEPT, CLASS`,
+            [fyear, fyear, month],
+        );
+    }
+
+    //prettier-ignore
+    async summaryItem(fyear: string, month: number, className: string, sseccode?: string) {
+        const sub = this.manager.createQueryBuilder(STY_PATROL_INSPECTION, 'P')
+        .select('P.ITEMS_ID, P.CLASS')
+        .where('P.CST = 2')
+        .andWhere(`PA_DATE >= TO_DATE(:fyear || '-04-01', 'YYYY-MM-DD')`, { fyear })
+        .andWhere(`PA_DATE < ADD_MONTHS(TO_DATE(:fyear || '-04-01', 'YYYY-MM-DD'), 12)`, { fyear })
+        .andWhere('EXTRACT(MONTH FROM PA_DATE) = :month', { month })
+        .andWhere('P.CLASS = :className', { className });
+        if (sseccode) {
+            sub.andWhere('P.PA_SECTION = :sseccode', { sseccode });
+        }
+        return this.manager.createQueryBuilder(STY_ITEMS, 'I')
+        .select('I.ITEMS_ID, I.ITEMS_NAME, P.CLASS, COUNT(P.CLASS) AS AMOUNT')
+        .innerJoin(STY_TYPE, 'T', "I.ITEMS_TYPE = T.TYPE_ID AND  T.TYPE_CODE = 'PT'")
+        .leftJoin(`(${sub.getQuery()})`, 'P', 'I.ITEMS_ID = P.ITEMS_ID')
+        .setParameters(sub.getParameters())
+        .groupBy('I.ITEMS_ID, I.ITEMS_NAME, P.CLASS')
+        .orderBy('I.ITEMS_ID', 'ASC')
+        .getRawMany();
+    }
+
+    //prettier-ignore
+    async summaryItemBySec(fyear: string, month: number, sseccode: string) {
+        const sub = this.manager.createQueryBuilder(STY_PATROL_INSPECTION, 'P')
+        .select('P.ITEMS_ID AS ITEMS_ID')
+        .where('P.CST = 2')
+        .andWhere(`PA_DATE >= TO_DATE(:fyear || '-04-01', 'YYYY-MM-DD')`, { fyear })
+        .andWhere(`PA_DATE < ADD_MONTHS(TO_DATE(:fyear || '-04-01', 'YYYY-MM-DD'), 12)`, { fyear })
+        .andWhere('EXTRACT(MONTH FROM PA_DATE) = :month', { month })
+        .andWhere('P.PA_SECTION = :sseccode', { sseccode });
+        return this.manager.createQueryBuilder(STY_ITEMS, 'I')
+        .select('I.ITEMS_ID, I.ITEMS_NAME, COUNT(P.ITEMS_ID) AS AMOUNT')
+        .innerJoin(STY_TYPE, 'T', "I.ITEMS_TYPE = T.TYPE_ID AND  T.TYPE_CODE = 'PT'")
+        .leftJoin(`(${sub.getQuery()})`, 'P', 'I.ITEMS_ID = P.ITEMS_ID')
+        .setParameters(sub.getParameters())
+        .groupBy('I.ITEMS_ID, I.ITEMS_NAME')
+        .orderBy('I.ITEMS_ID', 'ASC')
+        .getRawMany();
+    }
+
+    async summarySection(fyear: string, month: number, deptcode: string) {
+        return this.manager.query(
+            `WITH CLASS_LIST AS (
+                SELECT TYPE_NAME AS CLASS, TYPE_NO  FROM STY_TYPE
+                WHERE TYPE_CODE = 'PTC' AND TYPE_NO IN (1,2)
+            )
+            SELECT O.SSECCODE, O.SSEC, C.CLASS, NVL(P.AMOUNT,0) AS AMOUNT
+            FROM ORGANIZATIONS O
+            CROSS JOIN CLASS_LIST C
+            LEFT JOIN 
+            (
+                SELECT SSECCODE, CLASS, COUNT(CLASS) AS AMOUNT
+                FROM STY_PATROL_INSPECTION	
+                WHERE CST = '2'
+                AND PA_DATE >= TO_DATE(:1 || '-04-01', 'YYYY-MM-DD')
+                AND PA_DATE < ADD_MONTHS(
+                    TO_DATE(:2 || '-04-01', 'YYYY-MM-DD'),
+                    12
+                )
+                AND EXTRACT(MONTH FROM PA_DATE) = :3
+                AND PA_SECTION IS NOT NULL
+                GROUP BY SSECCODE, CLASS
+            ) P ON O.SSECCODE = P.SSECCODE AND P.CLASS = C.CLASS
+            WHERE O.SDEPCODE = :4 AND O.CSTATUS = '1' AND O.SSECCODE != '00'`,
+            [fyear, fyear, month, deptcode],
         );
     }
 }

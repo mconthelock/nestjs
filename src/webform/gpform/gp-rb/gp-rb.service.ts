@@ -1,6 +1,6 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { CreateGpRbDto } from './dto/create-gp-rb.dto';
-import { UpdateGpRbDto } from './dto/update-gp-rb.dto';
+import { UpdateGpRbDto, UpdateNamestampdto } from './dto/update-gp-rb.dto';
 import {
     GpRbRepository,
     ShowCusStampGpRbRepository,
@@ -21,6 +21,27 @@ export class ShowstampGpRbService {
     }
     async findOne(dto: FormDto) {
         return this.repo.findOne(dto);
+    }
+    async Editname(dto: UpdateNamestampdto, ip: string){
+        try{
+            if (!dto.NAME_STAMP) {
+                throw new BadRequestException('NAME_STAMP is required');
+            }
+
+            const updateResult = await this.repo.updateNameStamp(dto);
+
+            if (!updateResult.affected) {
+                throw new BadRequestException('GP-RB stamp request not found');
+            }
+
+            return {
+                status: true,
+                message: 'NAME_STAMP updated successfully',
+                data: updateResult,
+            };
+        }catch(error){
+            throw error;
+        }
     }
     
     

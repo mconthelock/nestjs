@@ -16,6 +16,9 @@ export class CreateMfgEdrDto {
   @IsNumber()
   NRUNNO: number;
 
+  @IsString()
+  REQBY?: string;
+
   @IsOptional()
   @IsNumber()
   TID?: number | null;

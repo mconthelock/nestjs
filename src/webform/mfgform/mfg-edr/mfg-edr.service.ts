@@ -146,9 +146,18 @@ export class MfgEdrService {
     console.log('CREATE MFG EDR DTO:', dto);
     return this.dataSource.transaction(async (manager) => {
       const key = this.getFormKey(dto);
-      console.log('FORM KEY:', key);
+      const REQBY = String((dto as any).REQBY || '').trim();
+
+      if (!REQBY) throw new Error('REQBY is required');
+
+      const requesterSseccode = await this.getRequesterSseccode(manager, REQBY);
+      if (!requesterSseccode) throw new Error('Requester SSECCODE not found');
+
+      dto.SSECCODE = requesterSseccode;
 
       await this.insertFormHead(manager, key, dto);
+      await this.syncApproveFlowStep18(manager, key, dto);
+
       const listCount = await this.insertFormList(manager, key, dto.list ?? []);
       const attCount = await this.insertFormAtt(manager, key, dto.att ?? []);
 
@@ -172,6 +181,110 @@ export class MfgEdrService {
       CYEAR2: String(dto.CYEAR2),
       NRUNNO: Number(dto.NRUNNO),
     };
+  }
+
+  private async syncApproveFlowStep18(
+      manager: EntityManager,
+      key: FormKey,
+      dto: CreateMfgEdrDto,
+    ) {
+      const SSECCODE = String(dto.SSECCODE || '').trim();
+      if (!SSECCODE) throw new Error('Requester SSECCODE not found');
+
+      const flowKey = {
+        NFRMNO: Number(key.NFRMNO),
+        VORGNO: String(key.VORGNO),
+        CYEAR: String(key.CYEAR),
+        CYEAR2: String(key.CYEAR2),
+        NRUNNO: Number(key.NRUNNO),
+      };
+
+      const approveUser = await manager
+        .createQueryBuilder(AMECUSERALL, 'U')
+        .select('U.SEMPNO', 'SEMPNO')
+        .where('TRIM(U.SSECCODE) = :SSECCODE', { SSECCODE })
+        .andWhere("TO_CHAR(U.SPOSCODE) = :SPOSCODE", { SPOSCODE: '33' })
+        .andWhere("TO_CHAR(U.CSTATUS) = :CSTATUS", { CSTATUS: '1' })
+        .getRawOne();
+
+    const step18 = await manager
+      .createQueryBuilder(FLOW, 'F')
+      .select([
+        'F.CSTEPNO AS CSTEPNO',
+        'F.CSTEPNEXTNO AS CSTEPNEXTNO',
+      ])
+      .where('F.NFRMNO = :NFRMNO', flowKey)
+      .andWhere('F.VORGNO = :VORGNO', flowKey)
+      .andWhere('F.CYEAR = :CYEAR', flowKey)
+      .andWhere('F.CYEAR2 = :CYEAR2', flowKey)
+      .andWhere('F.NRUNNO = :NRUNNO', flowKey)
+      .andWhere("TO_CHAR(F.CSTEPNO) = :CSTEPNO", { CSTEPNO: '18' })
+      .getRawOne();
+
+    if (!step18) return;
+
+      const step18NextNo = String(step18.CSTEPNEXTNO || '').trim();
+
+    if (approveUser?.SEMPNO) {
+      await manager
+        .createQueryBuilder()
+        .update(FLOW)
+        .set({
+          VAPVNO: approveUser.SEMPNO,
+          VREPNO: approveUser.SEMPNO,
+        } as any)
+        .where('NFRMNO = :NFRMNO', key)
+        .andWhere('VORGNO = :VORGNO', key)
+        .andWhere('CYEAR = :CYEAR', key)
+        .andWhere('CYEAR2 = :CYEAR2', key)
+        .andWhere('NRUNNO = :NRUNNO', key)
+        .andWhere("TO_CHAR(CSTEPNO) = :CSTEPNO", { CSTEPNO: '18' })
+        .execute();
+
+      return;
+    }
+
+    if (step18NextNo) {
+      await manager
+        .createQueryBuilder()
+        .update(FLOW)
+        .set({
+          CSTEPNEXTNO: step18NextNo,
+        } as any)
+        .where('NFRMNO = :NFRMNO', key)
+        .andWhere('VORGNO = :VORGNO', key)
+        .andWhere('CYEAR = :CYEAR', key)
+        .andWhere('CYEAR2 = :CYEAR2', key)
+        .andWhere('NRUNNO = :NRUNNO', key)
+        .andWhere("TO_CHAR(CSTEPNEXTNO) = :CSTEPNEXTNO", { CSTEPNEXTNO: '18' })
+        .execute();
+    }
+
+    await manager
+      .createQueryBuilder()
+      .delete()
+      .from(FLOW)
+      .where('NFRMNO = :NFRMNO', key)
+      .andWhere('VORGNO = :VORGNO', key)
+      .andWhere('CYEAR = :CYEAR', key)
+      .andWhere('CYEAR2 = :CYEAR2', key)
+      .andWhere('NRUNNO = :NRUNNO', key)
+      .andWhere("TO_CHAR(CSTEPNO) = :CSTEPNO", { CSTEPNO: '18' })
+      .execute();
+  }
+
+  private async getRequesterSseccode(
+    manager: EntityManager,
+    reqby: string,
+  ) {
+    const requester = await manager
+      .createQueryBuilder(AMECUSERALL, 'R')
+      .select('TRIM(R.SSECCODE)', 'SSECCODE')
+      .where('TRIM(R.SEMPNO) = :REQBY', { REQBY: reqby })
+      .andWhere("TO_CHAR(R.CSTATUS) = :CSTATUS", { CSTATUS: '1' })
+      .getRawOne();
+
+    return String(requester?.SSECCODE || '').trim();
   }
 
   private async insertFormHead(

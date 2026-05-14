@@ -20,6 +20,8 @@ export class ShowstampGpRbService {
     async findOne(dto: FormDto) {
         return this.repo.findOne(dto);
     }
+    
+    
 }
 
 // สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton
@@ -134,5 +136,6 @@ export class GpRbService {
             throw error;
         }
     }
+    
 
 }

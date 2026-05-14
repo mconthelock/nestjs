@@ -58,9 +58,9 @@ export class QainsOAService {
     async update(dto: UpdateQainsOADto) {
         try {
             const res = await this.repo.update(dto);
-            if (res.affected === 0) {
-                throw new Error('No rows updated');
-            }
+            // if (res.affected === 0) {
+            //     throw new Error('No rows updated');
+            // }
             return {
                 status: true,
                 message: 'Update Qains operator and auditor Successfully',
@@ -75,9 +75,9 @@ export class QainsOAService {
     async delete(dto: CreateQainsOADto) {
         try {
             const res = await this.repo.delete(dto);
-            if (res.affected === 0) {
-                throw new Error('No rows deleted');
-            }
+            // if (res.affected === 0) {
+            //     throw new Error('No rows deleted');
+            // }
             return {
                 status: true,
                 message: 'Delete Qains operator and auditor Successfully',

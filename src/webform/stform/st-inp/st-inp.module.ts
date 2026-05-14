@@ -12,6 +12,10 @@ import { StInpEvaluateService } from './st-inp-evaluate.service';
 import { StinpFormListModule } from 'src/gpreport/stinp-form-list/stinp-form-list.module';
 import { StinpFormModule } from 'src/gpreport/stinp-form/stinp-form.module';
 import { StInpSaveDraftService } from './st-inp-saveDraft.service';
+import { StInpJobAlertService } from './job/st-inp-mail-alert.service';
+import { StInpRepository } from './st-inp.repository';
+import { MailModule } from 'src/common/services/mail/mail.module';
+import { SequenceOrgModule } from 'src/webform/sequence-org/sequence-org.module';
 
 @Module({
     imports: [
@@ -22,6 +26,8 @@ import { StInpSaveDraftService } from './st-inp-saveDraft.service';
         StyTypeModule,
         StinpFormModule,
         StinpFormListModule,
+        MailModule,
+        SequenceOrgModule,
     ],
     controllers: [StInpController],
     providers: [
@@ -30,6 +36,8 @@ import { StInpSaveDraftService } from './st-inp-saveDraft.service';
         StInpCorrectiveService,
         StInpSaveDraftService,
         StInpEvaluateService,
+        StInpJobAlertService,
+        StInpRepository,
     ],
     exports: [StInpService],
 })

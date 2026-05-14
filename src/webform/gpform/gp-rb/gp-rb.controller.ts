@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Req,UploadedFiles, U
 import { GpRbService, ShowCusstampGpRbService, ShowstampGpRbService} from './gp-rb.service';
 import { CreateGpRbDto } from './dto/create-gp-rb.dto';
 import { UpdateGpRbDto } from './dto/update-gp-rb.dto';
-import { UseTransaction,UseForceTransaction} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from "express";
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
@@ -32,6 +32,8 @@ export class GpRbController {
     const ip = getClientIP(req)
     return this.gpRbServicee.create(dto, ip, file);
   }
+
+  
 }
 
 
@@ -50,6 +52,11 @@ export class ShowstampGpRbController {
   ){
     return this.gpRbServicee.findOne({NFRMNO: fno, VORGNO: orgno, CYEAR: cyear, CYEAR2: cyear2, NRUNNO: nrunno});
   }
+  
+  // @Patch()
+  // @UseTransaction('webformConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ webformConnection
+  // @UseForceTransaction()
+  // update(@Body() dto: )
 
 }    
 
@@ -68,5 +75,6 @@ export class ShowCusStampGpRbController {
   ){
     return this.gpRbServicee.findOne({NFRMNO: fno, VORGNO: orgno, CYEAR: cyear, CYEAR2: cyear2, NRUNNO: nrunno});
    }
+  
 }
 

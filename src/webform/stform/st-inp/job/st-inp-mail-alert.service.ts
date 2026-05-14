@@ -25,12 +25,9 @@ export class StInpJobAlertService {
                 formmst.CYEAR,
                 date,
             );
-            throw new Error(`No pending items found for alert.`);
             if(list.length === 0){
                 throw new Error(`No pending items found for alert.`);
             }
-            
-            // throw new Error(`Test error to check alert system`); // ทดสอบการส่งเมลเมื่อเกิดข้อผิดพลาด
             const ddem = await this.sequenceOrgService.getByPosition({
                 SPOSCODE: '21',
                 VORGNO: '020601',

@@ -18,9 +18,11 @@ import { MfgEdrFormCorrective } from '../../../common/Entities/webform/table/mfg
 import { MfgEdrFormPreventive } from '../../../common/Entities/webform/table/mfg_edr_form_preventive.entity';
 import { MfgEdrFormWhy } from '../../../common/Entities/webform/table/mfg_edr_form_why.entity';
 
+
 import { AmecOrders } from 'src/common/Entities/workload/table/amecorders.entity';
 import { AmecOrdersSchedule } from 'src/common/Entities/workload/table/amecorders_schedule.entity';
 import { FORM } from '../../../common/Entities/webform/table/FORM.entity';
+import { FLOW } from '../../../common/Entities/webform/table/FLOW.entity';
 import { AMECUSERALL } from '../../../common/Entities/amec/views/AMECUSERALL.entity';
 
 type FormKey = Pick<CreateMfgEdrDto, 'NFRMNO' | 'VORGNO' | 'CYEAR' | 'CYEAR2' | 'NRUNNO'>;
@@ -66,6 +68,9 @@ export class MfgEdrService {
 
     @InjectRepository(FORM, 'webformConnection')
     private readonly formRepo: Repository<FORM>,
+
+    @InjectRepository(FLOW, 'webformConnection')
+    private readonly flowRepo: Repository<FLOW>,
 
     @InjectDataSource('webformConnection')
     private readonly dataSource: DataSource,
@@ -179,13 +184,23 @@ export class MfgEdrService {
 
     const {
       TID = null,
-      SSECCODE = null,
+      SSECCODE = dto.SSECCODE ? String(dto.SSECCODE).trim() : null,
       CID = null,
       REPAIR_BY = null,
-      DAILY_MONTH = null,
-      DAILY_RUNNO = null,
       REASON_CAUSE = null,
     } = dto;
+
+
+
+    const DAILY_MONTH = new Date().toLocaleString('en-US', { month: 'short' }).toUpperCase();
+    const lastRun = await manager
+      .createQueryBuilder(MfgEdrFormHead, 'H')
+      .select('MAX(H.DAILY_RUNNO)', 'DAILY_RUNNO')
+      .where('H.CYEAR2 = :CYEAR2', { CYEAR2: key.CYEAR2 })
+      .andWhere('H.DAILY_MONTH = :DAILY_MONTH', { DAILY_MONTH })
+      .andWhere('H.SSECCODE = :SSECCODE', { SSECCODE })
+      .getRawOne();
+    const DAILY_RUNNO = Number(lastRun?.DAILY_RUNNO || 0) + 1;
 
     return manager.save(
       MfgEdrFormHead,
@@ -301,6 +316,7 @@ export class MfgEdrService {
         'A.*',
         'B.SEMPNO AS REQ_EMPNO',
         'B.SNAME AS REQ_NAME',
+        'B.SSEC AS REQ_SEC',
         'C.SEMPNO AS INP_EMPNO',
         'C.SNAME AS INP_NAME',
       ])
@@ -310,6 +326,16 @@ export class MfgEdrService {
       .andWhere('A.CYEAR2 = :CYEAR2', key)
       .andWhere('A.NRUNNO = :NRUNNO', key)
       .getRawOne();
+
+    const flow = await this.flowRepo
+      .createQueryBuilder('F')
+      .where('F.NFRMNO = :NFRMNO', key)
+      .andWhere('F.VORGNO = :VORGNO', key)
+      .andWhere('F.CYEAR = :CYEAR', key)
+      .andWhere('F.CYEAR2 = :CYEAR2', key)
+      .andWhere('F.NRUNNO = :NRUNNO', key)
+      .orderBy('F.CSTEPNO', 'ASC')
+      .getMany();
 
     const head = await this.formHeadRepo
       .createQueryBuilder('H')
@@ -390,6 +416,7 @@ export class MfgEdrService {
       status: true,
       data: {
         form,
+        flow,
         head,
         list,
         att,
@@ -399,7 +426,99 @@ export class MfgEdrService {
       },
     };
   }
-    
+
+
+  async updateWhyEffect(dto: any) {
+    const key = {
+      NFRMNO: Number(dto.NFRMNO),
+      VORGNO: String(dto.VORGNO),
+      CYEAR: String(dto.CYEAR),
+      CYEAR2: String(dto.CYEAR2),
+      NRUNNO: Number(dto.NRUNNO),
+    };
+
+    return await this.dataSource.transaction(async (manager) => {
+      if (Array.isArray(dto.DETAIL_LIST)) {
+        for (const row of dto.DETAIL_LIST) {
+          if (!row.ID) continue;
+
+          await manager.update(
+            MfgEdrFormList,
+            {
+              ...key,
+              ID: Number(row.ID),
+            },
+            {
+              LV_EFFECT: row.LV_EFFECT || null,
+              EFFECT: row.EFFECT || null,
+            },
+          );
+        }
+      }
+
+      await manager.delete(MfgEdrFormWhy, key);
+      if (Array.isArray(dto.WHY_LIST)) {
+        const whyRows = dto.WHY_LIST
+          .filter((row) => row.WHY)
+          .map((row, index) =>
+            manager.create(MfgEdrFormWhy, {
+              ...key,
+              ID: index + 1,
+              WHY: row.WHY,
+            }),
+          );
+
+        if (whyRows.length) {
+          await manager.save(MfgEdrFormWhy, whyRows);
+        }
+      }
+
+      await manager.delete(MfgEdrFormCorrective, key);
+      if (Array.isArray(dto.CORRECTIVE_LIST)) {
+        const correctiveRows = dto.CORRECTIVE_LIST
+          .filter((row) => row.CORRECTIVE)
+          .map((row, index) =>
+            manager.create(MfgEdrFormCorrective, {
+              ...key,
+              ID: index + 1,
+              CORRECTIVE: row.CORRECTIVE,
+              DUE_DATE: row.DUE_DATE || null,
+              PIC: row.PIC || null,
+            }),
+          );
+
+        if (correctiveRows.length) {
+          await manager.save(MfgEdrFormCorrective, correctiveRows);
+        }
+      }
+
+      await manager.delete(MfgEdrFormPreventive, key);
+
+      if (Array.isArray(dto.PREVENTIVE_LIST)) {
+        const preventiveRows = dto.PREVENTIVE_LIST
+          .filter((row) => row.PREVENTIVE)
+          .map((row, index) =>
+            manager.create(MfgEdrFormPreventive, {
+              ...key,
+              ID: index + 1,
+              PREVENTIVE: row.PREVENTIVE,
+              DUE_DATE: row.DUE_DATE || null,
+              PIC: row.PIC || null,
+            }),
+          );
+
+        if (preventiveRows.length) {
+          await manager.save(MfgEdrFormPreventive, preventiveRows);
+        }
+      }
+
+      return {
+        status: true,
+        message: 'Update why/effect success',
+      };
+    });
+  }
+      
 
 
     

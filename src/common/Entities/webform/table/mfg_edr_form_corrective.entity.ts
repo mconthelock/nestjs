@@ -27,6 +27,9 @@ export class MfgEdrFormCorrective {
   @Column()
   DUE_DATE: string | null;
 
+  @Column()
+  PIC: string | null;
+
   @ManyToOne(() => MfgEdrFormHead, (head) => head.corrective)
   @JoinColumn([
     { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },

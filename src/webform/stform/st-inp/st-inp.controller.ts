@@ -30,6 +30,7 @@ import {
 import { StInpEvaluateService } from './st-inp-evaluate.service';
 import { EvaluateStInpDto } from './dto/evaluate-st-inp.dto';
 import { StInpSaveDraftService } from './st-inp-saveDraft.service';
+import { StInpJobAlertService } from './job/st-inp-mail-alert.service';
 
 @Controller('stform/st-inp')
 export class StInpController {
@@ -38,6 +39,7 @@ export class StInpController {
         private readonly stInpSaveDraftService: StInpSaveDraftService,
         private readonly stInpCorrectiveService: StInpCorrectiveService,
         private readonly stInpEvaluateService: StInpEvaluateService,
+        private readonly stInpJobAlertService: StInpJobAlertService,
     ) {}
 
     private readonly path = `${process.env.AMEC_FILE_PATH}${process.env.STATE}/safety/image/Patrol/`;
@@ -106,4 +108,15 @@ export class StInpController {
         const ip = getClientIP(req);
         return this.stInpEvaluateService.setEvaluate(dto, ip);
     }
+
+    @Get('job/mailAlert')
+    async mailAlert() {
+        return this.stInpJobAlertService.alert();
+    }
+
+    @Get('job/mailAlert/:date')
+    async mailAlertManual(@Param('date') date: string) {
+        return this.stInpJobAlertService.alert(date);
+    }
+
 }

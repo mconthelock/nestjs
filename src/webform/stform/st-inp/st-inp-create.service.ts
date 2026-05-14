@@ -38,6 +38,7 @@ export class StInpCreateService extends StInpService {
             // throw new Error('test');
             return {
                 status: true,
+                data: form,
                 message: 'Created Successfully',
             };
         } catch (error) {

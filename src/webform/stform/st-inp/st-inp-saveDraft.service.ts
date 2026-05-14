@@ -93,6 +93,7 @@ export class StInpSaveDraftService extends StInpService {
                 }
             } else {
                 const listIds: number[] = [];
+                const listDelImg: number[] = [];
                 for (const newlist of dto.PA_LIST) {
                     const index = dto.PA_LIST.indexOf(newlist);
                     // insert and move image
@@ -106,8 +107,9 @@ export class StInpSaveDraftService extends StInpService {
                         });
                     movedTargets.push(...movedFile.path);
                     // ถ้ามี PA_ID แสดงว่าเป็นรายการที่มีอยู่แล้ว ให้ update แต่ถ้าไม่มี PA_ID แสดงว่าเป็นรายการใหม่ ให้ create
+                    listIds.push(index + 1);
                     if (newlist.PA_ID) {
-                        listIds.push(newlist.PA_ID);
+                        // listIds.push(newlist.PA_ID);
                         // ถ้าเป็นรายการที่มีอยู่แล้ว ให้ลบไฟล์เก่าแล้ว update ด้วยไฟล์ใหม่
                         const existing =
                             await this.stinpFormListService.findOne({
@@ -119,13 +121,20 @@ export class StInpSaveDraftService extends StInpService {
                                 `Form list item not found with ID: ${newlist.PA_ID}`,
                             ); // ป้องกันกรณีที่มี PA_ID แต่ไม่เจอใน DB
                         }
-                        const del = await this.styImageService.delete(
-                            existing.data.NIMAGE,
-                        ); // ลบไฟล์เก่า
-
+                        if(!listDelImg.includes(existing.data.NIMAGE)) {
+                            listDelImg.push(existing.data.NIMAGE); // เก็บไฟล์เก่าไว้ลบทีหลัง
+                        }
+                         const existingOld =
+                            await this.stinpFormListService.findOne({
+                                ...form,
+                                NID: index + 1,
+                            });
+                        if (existingOld.status && !listDelImg.includes(existingOld.data.NIMAGE)) {
+                            listDelImg.push(existingOld.data.NIMAGE); // เก็บไฟล์เก่าไว้ลบทีหลัง
+                        }
                         // update ข้อมูลแถวใหม่
                         await this.stinpFormListService.update(
-                            { ...form, NID: newlist.PA_ID },
+                            { ...form, NID: index+1 },
                             {
                                 NITEM: newlist.PA_ITEMS,
                                 VAREA: newlist.PA_AREA,
@@ -143,14 +152,10 @@ export class StInpSaveDraftService extends StInpService {
                                 ...form,
                                 NID: index + 1,
                             });
-                        if (existing.status) {
-                            const del = await this.styImageService.delete(
-                                existing.data.NIMAGE,
-                            ); // ลบไฟล์เก่า
+                        if (existing.status && !listDelImg.includes(existing.data.NIMAGE)) {
+                            listDelImg.push(existing.data.NIMAGE); // เก็บไฟล์เก่าไว้ลบทีหลัง
                         }
-
                         // ถ้าเป็นรายการใหม่ ให้สร้างแถวใหม่ด้วย NID ที่เพิ่มขึ้นจากแถวสุดท้ายในที่นี้หากมี primary key มันจะ update
-                        listIds.push(index + 1);
                         await this.stinpFormListService.create({
                             ...form,
                             NID: index + 1,
@@ -162,6 +167,7 @@ export class StInpSaveDraftService extends StInpService {
                             NMAT: newlist.PA_MAT,
                             NIMAGE: movedFile.data.IMAGE_ID,
                         });
+                        
                     }
                 }
                 if (list.status) {
@@ -175,6 +181,9 @@ export class StInpSaveDraftService extends StInpService {
                             NID: d.NID,
                         });
                         await this.styImageService.delete(d.NIMAGE); // ลบไฟล์เก่า
+                    }
+                    for (const imgId of listDelImg) {
+                        await this.styImageService.delete(imgId); // ลบไฟล์เก่า
                     }
                 }
             }

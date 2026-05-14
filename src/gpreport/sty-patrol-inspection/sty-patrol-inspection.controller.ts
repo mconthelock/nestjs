@@ -39,10 +39,79 @@ export class StyPatrolInspectionController {
         return this.styPatrolInspectionService.findDraft(empno);
     }
 
-    @Get('report/summaryClass/:fyear')
+    @Get('summary/class/:fyear')
     summaryClass(@Param('fyear') fyear: string) {
         return this.styPatrolInspectionService.summaryClass(fyear);
     }
 
+    @Get('summary/class/section/:fyear/:seccode')
+    summaryClassBySec(
+        @Param('fyear') fyear: string,
+        @Param('seccode') seccode: string,
+    ) {
+        return this.styPatrolInspectionService.summaryClass(fyear, seccode);
+    }
 
+    @Get('summary/item/:fyear/:month/:class')
+    summaryItem(
+        @Param('fyear') fyear: string,
+        @Param('month') month: string,
+        @Param('class') className: string,
+    ) {
+        return this.styPatrolInspectionService.summaryItem(
+            fyear,
+            +month,
+            className,
+        );
+    }
+
+    @Get('summary/item/section/:fyear/:month/:sseccode')
+    summaryItemBySec(
+        @Param('fyear') fyear: string,
+        @Param('month') month: string,
+        @Param('sseccode') sseccode: string,
+    ) {
+        return this.styPatrolInspectionService.summaryItemBySec(
+            fyear,
+            +month,
+            sseccode,
+        );
+    }
+
+    @Get('summary/item/section/class/:fyear/:month/:class/:sseccode')
+    summaryItemClassBySec(
+        @Param('fyear') fyear: string,
+        @Param('month') month: string,
+        @Param('class') className: string,
+        @Param('sseccode') sseccode: string,
+    ) {
+        return this.styPatrolInspectionService.summaryItem(
+            fyear,
+            +month,
+            className,
+            sseccode,
+        );
+    }
+
+
+    @Get('summary/section/:fyear/:month/:deptcode')
+    summarySection(
+        @Param('fyear') fyear: string,
+        @Param('month') month: string,
+        @Param('deptcode') deptcode: string,
+    ) {
+        return this.styPatrolInspectionService.summarySection(
+            fyear,
+            +month,
+            deptcode,
+        );
+    }
+
+    @Get('summary/department/:fyear/:month')
+    summaryDepartment(
+        @Param('fyear') fyear: string,
+        @Param('month') month: string,
+    ) {
+        return this.styPatrolInspectionService.summaryDepartment(fyear, +month);
+    }
 }

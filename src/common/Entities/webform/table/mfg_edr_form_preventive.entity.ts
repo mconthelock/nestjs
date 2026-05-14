@@ -27,6 +27,9 @@ export class MfgEdrFormPreventive {
   @Column()
   DUE_DATE: string | null;
 
+  @Column()
+  PIC: string | null;
+
   @ManyToOne(() => MfgEdrFormHead, (head) => head.preventive)
     @JoinColumn([
       { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },

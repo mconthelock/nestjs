@@ -9,15 +9,18 @@ import { EdrCauseMst } from '../../../common/Entities/webform/table/edr_cause_ms
 import { EdrLineMst } from '../../../common/Entities/webform/table/edr_line_mst.entity';
 import { EdrProcessMst } from '../../../common/Entities/webform/table/edr_process_mst.entity';
 
-  import { MfgEdrFormHead } from '../../../common/Entities/webform/table/mfg_edr_form_head.entity';
-  import { MfgEdrFormList } from '../../../common/Entities/webform/table/mfg_edr_form_list.entity';
-  import { MfgEdrFormAtt } from '../../../common/Entities/webform/table/mfg_edr_form_att.entity';
-  import { MfgEdrFormCorrective } from '../../../common/Entities/webform/table/mfg_edr_form_corrective.entity';
-  import { MfgEdrFormPreventive } from '../../../common/Entities/webform/table/mfg_edr_form_preventive.entity';
-  import { MfgEdrFormWhy } from '../../../common/Entities/webform/table/mfg_edr_form_why.entity';
+import { MfgEdrFormHead } from '../../../common/Entities/webform/table/mfg_edr_form_head.entity';
+import { MfgEdrFormList } from '../../../common/Entities/webform/table/mfg_edr_form_list.entity';
+import { MfgEdrFormAtt } from '../../../common/Entities/webform/table/mfg_edr_form_att.entity';
+import { MfgEdrFormCorrective } from '../../../common/Entities/webform/table/mfg_edr_form_corrective.entity';
+import { MfgEdrFormPreventive } from '../../../common/Entities/webform/table/mfg_edr_form_preventive.entity';
+import { MfgEdrFormWhy } from '../../../common/Entities/webform/table/mfg_edr_form_why.entity';
 
 import { AmecOrders } from 'src/common/Entities/workload/table/amecorders.entity';
 import { AmecOrdersSchedule } from 'src/common/Entities/workload/table/amecorders_schedule.entity';
+import { FORM } from '../../../common/Entities/webform/table/FORM.entity';
+import { FLOW } from '../../../common/Entities/webform/table/FLOW.entity';
+import { AMECUSERALL } from '../../../common/Entities/amec/views/AMECUSERALL.entity';
 
 @Module({
   imports: [
@@ -33,7 +36,10 @@ import { AmecOrdersSchedule } from 'src/common/Entities/workload/table/amecorder
       MfgEdrFormAtt,
       MfgEdrFormCorrective,
       MfgEdrFormPreventive,
-      MfgEdrFormWhy
+      MfgEdrFormWhy,
+      FORM,
+      FLOW,
+      AMECUSERALL,
     ], 'webformConnection'),
   ],
   controllers: [MfgEdrController],

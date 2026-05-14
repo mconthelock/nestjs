@@ -104,9 +104,9 @@ export class QaFileService {
             if (dto.FILE_ID !== undefined) condition['FILE_ID'] = dto.FILE_ID;
 
             const res = await this.repo.delete(condition);
-            if (res.affected === 0) {
-                throw new Error('No rows deleted');
-            }
+            // if (res.affected === 0) {
+            //     throw new Error('No rows deleted');
+            // }
             return { status: true, message: 'Delete master Successfully' };
         } catch (error) {
             throw new Error('Delete master Error: ' + error.message);

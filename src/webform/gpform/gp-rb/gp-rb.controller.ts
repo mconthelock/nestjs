@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req,UploadedFiles, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { GpRbService, ShowCusstampGpRbService, ShowstampGpRbService} from './gp-rb.service';
 import { CreateGpRbDto } from './dto/create-gp-rb.dto';
 import { UpdateGpRbDto } from './dto/update-gp-rb.dto';
@@ -23,10 +23,14 @@ export class GpRbController {
    /*stampFormatGroup ถูกแก้ไขเข้ามาเพื่อจะเลือกข้อมูลไป insert เข้าตาราง */
   @Post()
   @UseTransaction('webformConnection')
-  @UseInterceptors(getFileUploadInterceptor())
-  create(@Body() dto: CreateGpRbDto, @Req() req:Request) {
+  @UseInterceptors(getFileUploadInterceptor('otherAttachment'))
+  create(
+    @Body() dto: CreateGpRbDto, 
+    @Req() req:Request,  
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     const ip = getClientIP(req)
-    return this.gpRbServicee.create(dto, ip);
+    return this.gpRbServicee.create(dto, ip, file);
   }
 
   

@@ -5,6 +5,8 @@ import { GpRbRepository, ShowCusStampGpRbRepository, ShowstampGpRbRepository } f
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
 import { FormDto } from 'src/webform/form/dto/form.dto';
+import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
+
 
 
 // สำหรับดึงข้อมูลแสดงในหน้า show-gp-rb by Plankton
@@ -41,18 +43,18 @@ export class ShowCusstampGpRbService {
 
 @Injectable()
 export class GpRbService {
-    private readonly logger = new Logger(GpRbService.name);
 
     constructor(
         private readonly repo: GpRbRepository,
         private readonly formmstService: FormmstService,
         private readonly formCreateService: FormCreateService,
+        private readonly handleFileFormService: HandleFileFormService,
     ) {}
 
     findAll() {
         return this.repo.findAll();
     }
-    async create(dto: CreateGpRbDto, ip: string) {
+    async create(dto: CreateGpRbDto, ip: string, file: Express.Multer.File) {
         try {
             const stampFormatGroup = dto.stampFormatGroup?.toLowerCase();
             // ตรวจสอบว่า stampFormatGroup ได้รับค่าแล้ว
@@ -63,7 +65,6 @@ export class GpRbService {
             // ดึงข้อมูล Form Master
             const formmst = await this.formmstService.getFormMasterByVaname('GP-RB');
             if (!formmst) {
-                this.logger.warn('FORMMST not found for VANAME=GP-RB');
                 throw new Error('Form master not found for GP-RB. Check FORMMST table.');
             }
 
@@ -125,6 +126,11 @@ export class GpRbService {
                 );
             }
 
+            const save = await  this.handleFileFormService.insertFiles({
+                ...form,
+                FORM_TYPE: "GP",
+                CREATEBY: dto.REQBY,
+            }, file);
             // throw new Error('test');
 
             return {

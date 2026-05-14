@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsNumber, IsString } from 'class-validator';
 
 export class InCheckDto {
     @ApiProperty({ example: '2026045', description: 'Production' })
     @IsString()
+    @Type(() => String)
     prod: string;
 
     @ApiProperty({ example: 'E8BE11016', description: 'Order number' })
@@ -16,13 +18,19 @@ export class InCheckDto {
 
     @ApiProperty({ example: 1, description: 'Drawing ID' })
     @IsNumber()
+    @Type(() => Number)
     dwgId: number;
 
-    @ApiProperty({ example: '202604221115', description: 'Create checksheet date' })
+    @ApiProperty({
+        example: '202604221115',
+        description: 'Create checksheet date',
+    })
     @IsString()
+    @Type(() => String)
     reg: string;
 
     @ApiProperty({ example: 1, description: 'User ID' })
     @IsNumber()
+    @Type(() => Number)
     user: number;
 }

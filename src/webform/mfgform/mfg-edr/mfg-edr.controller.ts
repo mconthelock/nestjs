@@ -64,6 +64,11 @@ export class MfgEdrController {
     return this.mfgEdrService.getMfgEdr(dto);
   }
 
+  @Post('update-why-effect')
+  async updateWhyEffect(@Body() dto: any) {
+    return this.mfgEdrService.updateWhyEffect(dto);
+  }
+
 }
 
 

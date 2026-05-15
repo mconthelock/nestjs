@@ -3,6 +3,7 @@ import { CreateMfgFileDto } from './dto/create-mfg-file.dto';
 import { UpdateMfgFileDto } from './dto/update-mfg-file.dto';
 import { MfgFileRepository } from './mfg-file.repository';
 import { CreateHandleFileFormDto } from 'src/webform/handle-file-form/dto/create-handle-file-form.dto';
+import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class MfgFileService {
@@ -21,5 +22,9 @@ export class MfgFileService {
         } catch (error) {
             throw new Error('Insert MFG File Error: ' + error.message);
         }
+    }
+
+    async getFile(dto: QueryHandleFileFormDto) {
+        return this.repo.getFile(dto);
     }
 }

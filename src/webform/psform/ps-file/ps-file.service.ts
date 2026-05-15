@@ -3,6 +3,7 @@ import { CreatePsFileDto } from './dto/create-ps-file.dto';
 import { UpdatePsFileDto } from './dto/update-ps-file.dto';
 import { PsFileRepository } from './ps-file.repository';
 import { CreateHandleFileFormDto } from 'src/webform/handle-file-form/dto/create-handle-file-form.dto';
+import { QueryHandleFileFormDto, SearchHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class PsFileService {
@@ -21,5 +22,9 @@ export class PsFileService {
         } catch (error) {
             throw new Error('Insert PS File Error: ' + error.message);
         }
+    }
+
+    async getFile(dto: QueryHandleFileFormDto) {
+        return this.repo.getFile(dto);
     }
 }

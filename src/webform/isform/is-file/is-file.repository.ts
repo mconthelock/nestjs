@@ -5,6 +5,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { SearchIsFileDto } from './dto/search-is-file.dto';
 import { IS_FILE } from 'src/common/Entities/webform/table/IS_FILE.entity';
 import { CreateIsFileDto } from './dto/create-is-file.dto';
+import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class IsFileRepository extends BaseRepository {
@@ -12,7 +13,7 @@ export class IsFileRepository extends BaseRepository {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
-    async getFile(dto: SearchIsFileDto) {
+    async getFile(dto: QueryHandleFileFormDto) {
         return this.getRepository(IS_FILE).find({
             where: dto,
             order: {

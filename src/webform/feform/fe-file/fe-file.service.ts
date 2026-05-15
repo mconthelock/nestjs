@@ -3,6 +3,7 @@ import { CreateFeFileDto } from './dto/create-fe-file.dto';
 import { UpdateFeFileDto } from './dto/update-fe-file.dto';
 import { CreateHandleFileFormDto } from 'src/webform/handle-file-form/dto/create-handle-file-form.dto';
 import { FeFileRepository } from './fe-file.repository';
+import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class FeFileService {
@@ -21,5 +22,9 @@ export class FeFileService {
         } catch (error) {
             throw new Error('Insert FE File Error: ' + error.message);
         }
+    }
+
+    async getFile(dto: QueryHandleFileFormDto) {
+        return this.repo.getFile(dto);
     }
 }

@@ -14,6 +14,7 @@ import { FeFileService } from '../feform/fe-file/fe-file.service';
 import { MarFileService } from '../marform/mar-file/mar-file.service';
 import { MfgFileService } from '../mfgform/mfg-file/mfg-file.service';
 import { PsFileService } from '../psform/ps-file/ps-file.service';
+import { SearchHandleFileFormDto } from './dto/search-handle-file-form.dto';
 
 @Injectable()
 export class HandleFileFormService {
@@ -210,6 +211,75 @@ export class HandleFileFormService {
         } catch (error) {
             throw new Error(
                 `Insert File Record ${formType} : ${error.message}`,
+            );
+        }
+    }
+
+    async getFile(dto: SearchHandleFileFormDto) {
+        const { FORM_TYPE, FILE_CODE, ...d} = dto;
+        console.log(dto);
+        
+        try {
+            let res: any;
+            let fileType: number | undefined;
+            if (FILE_CODE) {
+                const fileTypeRes =
+                    await this.formAttachmentTypeService.findOneByCode(
+                        FILE_CODE,
+                    );
+                if (!fileTypeRes.status) {
+                    throw new Error(
+                        `File type with code ${FILE_CODE} not found`,
+                    );
+                }
+                fileType = fileTypeRes.data.NID;
+            }
+            const data = {
+                ...d,
+                FILE_TYPE: fileType, // ส่งค่า NID ของประเภทไฟล์ถ้ามี FILE_CODE และพบข้อมูลในฐานข้อมูล
+            }
+            switch (FORM_TYPE) {
+                case 'FE':
+                    res = await this.feFileService.getFile(data);
+                    break;
+                case 'FIN':
+                    res = await this.finFileService.getFile(data);
+                    break;
+                case 'GP':
+                    res = await this.gpFileService.getFile(data);
+                    break;
+                case 'IE':
+                    res = await this.ieFileService.getFile(data);
+                    break;
+                case 'IS':
+                    res = await this.isFileService.getFile(data);
+                    break;
+                case 'MAR':
+                    res = await this.marFileService.getFile(data);
+                    break;
+                case 'MFG':
+                    res = await this.mfgFileService.getFile(data);
+                    break;
+                case 'PS':
+                    res = await this.psFileService.getFile(data);
+                    break;
+                case 'PUR':
+                    res = await this.purFileService.getFile(data);
+                    break;
+                default:
+                    throw new Error(`Unsupported form type: ${FORM_TYPE}`);
+            }
+            if(res.length === 0) {
+                throw new Error('File not found with given criteria');
+            }
+            return {
+                status: true,
+                data: res,
+                message: `Found ${res.length} record(s)`
+            };
+        } catch (error) {
+            throw new Error(
+                `Get File Record ${FORM_TYPE} : ${error.message}`,
             );
         }
     }

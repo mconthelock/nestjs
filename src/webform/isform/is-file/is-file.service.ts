@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { CreateIsFileDto } from './dto/create-is-file.dto';
 import { SearchIsFileDto } from './dto/search-is-file.dto';
 import { IsFileRepository } from './is-file.repository';
+import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class IsFileService {
     constructor(private readonly repo: IsFileRepository) {}
 
-    async getFile(dto: SearchIsFileDto) {
+    async getFile(dto: QueryHandleFileFormDto) {
         return this.repo.getFile(dto);
     }
 

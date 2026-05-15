@@ -5,6 +5,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { SearchPurFileDto } from './dto/search-pur-file.dto';
 import { PUR_FILE } from 'src/common/Entities/webform/table/PUR_FILE.entity';
 import { CreatePurFileDto } from './dto/create-pur-file.dto';
+import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class PurFileRepository extends BaseRepository {
@@ -12,7 +13,7 @@ export class PurFileRepository extends BaseRepository {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
-    async getFile(dto: SearchPurFileDto) {
+    async getFile(dto: QueryHandleFileFormDto) {
         return this.getRepository(PUR_FILE).find({
             where: dto,
             order: {

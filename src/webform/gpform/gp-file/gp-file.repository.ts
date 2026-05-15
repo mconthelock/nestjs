@@ -3,7 +3,7 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { GP_FILE } from 'src/common/Entities/webform/table/GP_FILE.entity';
-import { SearchHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
+import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
 import { CreateHandleFileFormDto } from 'src/webform/handle-file-form/dto/create-handle-file-form.dto';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class GpFileRepository extends BaseRepository {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
-    async getFile(dto: SearchHandleFileFormDto) {
+    async getFile(dto: QueryHandleFileFormDto) {
         return this.getRepository(GP_FILE).find({
             where: dto,
             order: {

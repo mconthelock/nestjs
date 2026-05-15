@@ -183,95 +183,93 @@ export class MfgEdrService {
     };
   }
 
-  private async syncApproveFlowStep18(
-      manager: EntityManager,
-      key: FormKey,
-      dto: CreateMfgEdrDto,
-    ) {
-      const SSECCODE = String(dto.SSECCODE || '').trim();
-      if (!SSECCODE) throw new Error('Requester SSECCODE not found');
+ private async syncApproveFlowStep18(
+  manager: EntityManager,
+  key: FormKey,
+  dto: CreateMfgEdrDto,
+) {
+  const SSECCODE = String(dto.SSECCODE || '').trim();
+  if (!SSECCODE) throw new Error('Requester SSECCODE not found');
 
-      const flowKey = {
-        NFRMNO: Number(key.NFRMNO),
-        VORGNO: String(key.VORGNO),
-        CYEAR: String(key.CYEAR),
-        CYEAR2: String(key.CYEAR2),
-        NRUNNO: Number(key.NRUNNO),
-      };
+  const flowKey = {
+    NFRMNO: Number(key.NFRMNO),
+    VORGNO: String(key.VORGNO),
+    CYEAR: String(key.CYEAR),
+    CYEAR2: String(key.CYEAR2),
+    NRUNNO: Number(key.NRUNNO),
+  };
 
-      const approveUser = await manager
-        .createQueryBuilder(AMECUSERALL, 'U')
-        .select('U.SEMPNO', 'SEMPNO')
-        .where('TRIM(U.SSECCODE) = :SSECCODE', { SSECCODE })
-        .andWhere("TO_CHAR(U.SPOSCODE) = :SPOSCODE", { SPOSCODE: '33' })
-        .andWhere("TO_CHAR(U.CSTATUS) = :CSTATUS", { CSTATUS: '1' })
-        .getRawOne();
+  const step18 = await manager
+    .createQueryBuilder(FLOW, 'F')
+    .select([
+      'F.CSTEPNO AS CSTEPNO',
+      'F.CSTEPNEXTNO AS CSTEPNEXTNO',
+    ])
+    .where('F.NFRMNO = :NFRMNO', flowKey)
+    .andWhere('F.VORGNO = :VORGNO', flowKey)
+    .andWhere('F.CYEAR = :CYEAR', flowKey)
+    .andWhere('F.CYEAR2 = :CYEAR2', flowKey)
+    .andWhere('F.NRUNNO = :NRUNNO', flowKey)
+    .andWhere("TO_CHAR(F.CSTEPNO) = :CSTEPNO", { CSTEPNO: '18' })
+    .getRawOne();
 
-    const step18 = await manager
-      .createQueryBuilder(FLOW, 'F')
-      .select([
-        'F.CSTEPNO AS CSTEPNO',
-        'F.CSTEPNEXTNO AS CSTEPNEXTNO',
-      ])
-      .where('F.NFRMNO = :NFRMNO', flowKey)
-      .andWhere('F.VORGNO = :VORGNO', flowKey)
-      .andWhere('F.CYEAR = :CYEAR', flowKey)
-      .andWhere('F.CYEAR2 = :CYEAR2', flowKey)
-      .andWhere('F.NRUNNO = :NRUNNO', flowKey)
-      .andWhere("TO_CHAR(F.CSTEPNO) = :CSTEPNO", { CSTEPNO: '18' })
-      .getRawOne();
+  if (!step18) return;
 
-    if (!step18) return;
+  const approveUser = await manager
+    .createQueryBuilder(AMECUSERALL, 'U')
+    .select('TRIM(U.SEMPNO)', 'SEMPNO')
+    .where('TRIM(U.SSECCODE) = :SSECCODE', { SSECCODE })
+    .andWhere("TO_CHAR(U.SPOSCODE) = :SPOSCODE", { SPOSCODE: '33' })
+    .andWhere("TO_CHAR(U.CSTATUS) = :CSTATUS", { CSTATUS: '1' })
+    .getRawOne();
 
-      const step18NextNo = String(step18.CSTEPNEXTNO || '').trim();
-
-    if (approveUser?.SEMPNO) {
-      await manager
-        .createQueryBuilder()
-        .update(FLOW)
-        .set({
-          VAPVNO: approveUser.SEMPNO,
-          VREPNO: approveUser.SEMPNO,
-        } as any)
-        .where('NFRMNO = :NFRMNO', key)
-        .andWhere('VORGNO = :VORGNO', key)
-        .andWhere('CYEAR = :CYEAR', key)
-        .andWhere('CYEAR2 = :CYEAR2', key)
-        .andWhere('NRUNNO = :NRUNNO', key)
-        .andWhere("TO_CHAR(CSTEPNO) = :CSTEPNO", { CSTEPNO: '18' })
-        .execute();
-
-      return;
-    }
-
-    if (step18NextNo) {
-      await manager
-        .createQueryBuilder()
-        .update(FLOW)
-        .set({
-          CSTEPNEXTNO: step18NextNo,
-        } as any)
-        .where('NFRMNO = :NFRMNO', key)
-        .andWhere('VORGNO = :VORGNO', key)
-        .andWhere('CYEAR = :CYEAR', key)
-        .andWhere('CYEAR2 = :CYEAR2', key)
-        .andWhere('NRUNNO = :NRUNNO', key)
-        .andWhere("TO_CHAR(CSTEPNEXTNO) = :CSTEPNEXTNO", { CSTEPNEXTNO: '18' })
-        .execute();
-    }
-
+  if (approveUser?.SEMPNO) {
     await manager
       .createQueryBuilder()
-      .delete()
-      .from(FLOW)
-      .where('NFRMNO = :NFRMNO', key)
-      .andWhere('VORGNO = :VORGNO', key)
-      .andWhere('CYEAR = :CYEAR', key)
-      .andWhere('CYEAR2 = :CYEAR2', key)
-      .andWhere('NRUNNO = :NRUNNO', key)
+      .update(FLOW)
+      .set({
+        VAPVNO: approveUser.SEMPNO,
+        VREPNO: approveUser.SEMPNO,
+      } as any)
+      .where('NFRMNO = :NFRMNO', flowKey)
+      .andWhere('VORGNO = :VORGNO', flowKey)
+      .andWhere('CYEAR = :CYEAR', flowKey)
+      .andWhere('CYEAR2 = :CYEAR2', flowKey)
+      .andWhere('NRUNNO = :NRUNNO', flowKey)
       .andWhere("TO_CHAR(CSTEPNO) = :CSTEPNO", { CSTEPNO: '18' })
       .execute();
+
+    return;
   }
+
+  const nextStepNo = String(step18.CSTEPNEXTNO || '').trim();
+
+  await manager
+    .createQueryBuilder()
+    .update(FLOW)
+    .set({
+      CSTEPNEXTNO: nextStepNo,
+    } as any)
+    .where('NFRMNO = :NFRMNO', flowKey)
+    .andWhere('VORGNO = :VORGNO', flowKey)
+    .andWhere('CYEAR = :CYEAR', flowKey)
+    .andWhere('CYEAR2 = :CYEAR2', flowKey)
+    .andWhere('NRUNNO = :NRUNNO', flowKey)
+    .andWhere("TO_CHAR(CSTEPNEXTNO) = :OLDSTEP", { OLDSTEP: '18' })
+    .execute();
+
+  await manager
+    .createQueryBuilder()
+    .delete()
+    .from(FLOW)
+    .where('NFRMNO = :NFRMNO', flowKey)
+    .andWhere('VORGNO = :VORGNO', flowKey)
+    .andWhere('CYEAR = :CYEAR', flowKey)
+    .andWhere('CYEAR2 = :CYEAR2', flowKey)
+    .andWhere('NRUNNO = :NRUNNO', flowKey)
+    .andWhere("TO_CHAR(CSTEPNO) = :CSTEPNO", { CSTEPNO: '18' })
+    .execute();
+}
 
   private async getRequesterSseccode(
     manager: EntityManager,

@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { CreatePurFileDto } from './dto/create-pur-file.dto';
 import { SearchPurFileDto } from './dto/search-pur-file.dto';
 import { PurFileRepository } from './pur-file.repository';
+import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class PurFileService {
     constructor(private readonly repo: PurFileRepository) {}
 
-    async getFile(dto: SearchPurFileDto) {
-        return await this.repo.getFile(dto);
+    async getFile(dto: QueryHandleFileFormDto) {
+        return this.repo.getFile(dto);
     }
 
     async getFileById(id: number) {

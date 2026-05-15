@@ -3,6 +3,7 @@ import { CreateFinFileDto } from './dto/create-fin-file.dto';
 import { UpdateFinFileDto } from './dto/update-fin-file.dto';
 import { FinFileRepository } from './fin-file.repository';
 import { CreateHandleFileFormDto } from 'src/webform/handle-file-form/dto/create-handle-file-form.dto';
+import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class FinFileService {
@@ -21,5 +22,9 @@ export class FinFileService {
         } catch (error) {
             throw new Error('Insert Fin File Error: ' + error.message);
         }
+    }
+
+    async getFile(dto: QueryHandleFileFormDto) {
+        return this.repo.getFile(dto);
     }
 }

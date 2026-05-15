@@ -274,8 +274,8 @@ export class HandleFileFormService {
             }
             return {
                 status: true,
+                message: `Found ${res.length} record(s)`,
                 data: res,
-                message: `Found ${res.length} record(s)`
             };
         } catch (error) {
             throw new Error(

@@ -6,14 +6,14 @@ import {
     JoinColumn,
     OneToMany,
 } from 'typeorm';
-import { Appsuser } from '../../../common/Entities/docinv/table/appsuser.entity';
-import { Workpic } from '../../../docinv/workpic/entities/workpic.entity';
 import { SetRequestDate } from 'src/joborder/set-request-date/entities/set-request-date.entity';
 import { JopMarReq } from 'src/joborder/jop-mar-req/entities/jop-mar-req.entity';
 import { JopPurConf } from 'src/joborder/jop-pur-conf/entities/jop-pur-conf.entity';
-import { Accesslog } from 'src/common/Entities/docinv/table/accesslog.entity';
 import { Designer } from 'src/spprogram/designer/entities/designer.entity';
 import { Buspassenger } from 'src/common/Entities/gpreport/table/buspassenger.entity';
+
+import { Accesslog } from 'src/common/Entities/docinv/table/accesslog.entity';
+import { Appsuser } from '../../../common/Entities/docinv/table/appsuser.entity';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
 @Entity('AMECUSERALL')
@@ -85,13 +85,13 @@ export class User {
     BIRTHDAY: Number;
 
     //Docinv
-    @OneToOne(() => Workpic, (dev) => dev.developer)
-    @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'PIC_ID' })
-    dev: Workpic;
+    // @OneToOne(() => Workpic, (dev) => dev.developer)
+    // @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'PIC_ID' })
+    // dev: Workpic;
 
     @OneToOne(() => Appsuser, (emp) => emp.employee)
     @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'USERS_ID' })
-    appemp: Workpic;
+    appemp: Appsuser;
 
     //Joborder
     @OneToMany(() => SetRequestDate, (req) => req.JOP_MAR_REQUEST)
@@ -115,10 +115,10 @@ export class User {
     spdesigner: Designer;
 
     /*
-  @OneToOne(() => Buspassenger, (amecuser) => amecuser.Amecuserall)
-  @JoinColumn( {name: 'SEMPNO', referencedColumnName: 'EMPNO'})
-  BUSPASSENGER:User;
-*/
+    @OneToOne(() => Buspassenger, (amecuser) => amecuser.Amecuserall)
+    @JoinColumn( {name: 'SEMPNO', referencedColumnName: 'EMPNO'})
+    BUSPASSENGER:User;
+    */
     @OneToMany(() => Buspassenger, (bp) => bp.Amecuserall)
     BUSPASSENGER: Buspassenger[];
 }

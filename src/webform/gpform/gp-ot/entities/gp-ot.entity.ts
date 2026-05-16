@@ -3,64 +3,54 @@ import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
 @Entity('OTFORM')
 export class GpOt {
-  @PrimaryColumn()
-  NFRMNO: string;
+    @PrimaryColumn()
+    NFRMNO: string;
 
-  @PrimaryColumn()
-  VORGNO: string;
+    @PrimaryColumn()
+    VORGNO: string;
 
-  @PrimaryColumn()
-  CYEAR: string;
+    @PrimaryColumn()
+    CYEAR: string;
 
-  @PrimaryColumn()
-  CYEAR2: string;
+    @PrimaryColumn()
+    CYEAR2: string;
 
-  @PrimaryColumn()
-  NRUNNO: string;
+    @PrimaryColumn()
+    NRUNNO: string;
 
-  @Column()
-  EMPNO: string;
+    @Column()
+    EMPNO: string;
 
-  @Column()
-  WORKDATE: string;
+    @Column()
+    WORKDATE: string;
 
-  @Column()
-  TIMEIN: string;
+    @Column()
+    TIMEIN: string;
 
-  @Column()
-  TIMEOUT: string;
+    @Column()
+    TIMEOUT: string;
 
-  @Column()
-  OTJOB: string;
+    @Column()
+    OTJOB: string;
 
-  @Column()
-  WKTYPENO: string;
+    @Column()
+    WKTYPENO: string;
 
-  @Column()
-  REMARK: string;
+    @Column()
+    REMARK: string;
 
-  @Column()
-  FORSECCODE: string;
+    @Column()
+    FORSECCODE: string;
 
-  @Column()
-  VFILENAME: string;
+    @Column()
+    VFILENAME: string;
 
-  @Column()
-  OT3: string;
+    @Column()
+    OT3: string;
 
-  @Column()
-  SPECIAL: string;
+    @Column()
+    SPECIAL: string;
 
-  @Column()
-  SPECIAL_REASON: string;
-
-  @OneToOne(() => FORM, (form) => form.isdev)
-  @JoinColumn([
-    { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
-    { name: 'VORGNO', referencedColumnName: 'VORGNO' },
-    { name: 'CYEAR', referencedColumnName: 'CYEAR' },
-    { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
-    { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
-  ])
-  form: FORM;
+    @Column()
+    SPECIAL_REASON: string;
 }

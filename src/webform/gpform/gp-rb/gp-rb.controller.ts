@@ -81,18 +81,18 @@ export class ShowstampGpRbController {
         @Param('cyear') cyear: string,
         @Param('cyear2') cyear2: string,
         @Param('nrunno') nrunno: number,
-        @Body() dto: Pick<UpdateNamestampdto, 'NAME_STAMP'>,
+        @Body() dto: UpdateNamestampdto,
         @Req() req: Request,
     ) {
         const ip = getClientIP(req);
         const updateDto = {
-              NFRMNO: fno,
-              VORGNO: orgno,
-              CYEAR: cyear,
-              CYEAR2: cyear2,
-              NRUNNO: nrunno,
-              NAME_STAMP: dto.NAME_STAMP,
-            }
+            NFRMNO: fno,
+            VORGNO: orgno,
+            CYEAR: cyear,
+            CYEAR2: cyear2,
+            NRUNNO: nrunno,
+            ...dto,
+        };
         return this.gpRbServicee.doaction(updateDto, ip);
     }
 }

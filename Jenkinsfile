@@ -29,6 +29,7 @@ pipeline {
                         env.TARGET_DIR = '/var/amecweb/wwwroot/production/api'
                         env.REMOTE_HOST = 'amecweb1, amecweb2'
                         env.ENV_CRED_ID = 'api-env-prod'
+                        env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.production'
                         // env.ENV_CRED_ID = 'apitest-env-prod'
                         env.NODE_ENV = 'production'
                         env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\production"
@@ -39,6 +40,7 @@ pipeline {
                         env.TARGET_DIR = '/var/amecweb/wwwroot/development/api'
                         env.REMOTE_HOST = 'amecwebtest'
                         env.ENV_CRED_ID = 'api-env-file'
+                        env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.development'
                         env.NODE_ENV = 'development'
                         env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\development"
 
@@ -69,14 +71,14 @@ pipeline {
 
         stage('Install & Build') {
             steps {
-                withCredentials([file(credentialsId: "${env.ENV_CRED_ID}", variable: 'ENV_FILE')]) {
+                //withCredentials([file(credentialsId: "${env.ENV_CRED_ID}", variable: 'ENV_FILE')]) {
                     sh '''
+                        cp ${ENV_DIR} .env
                         NODE_ENV=development
                         npm install
                         npm run build
-                        cp ${ENV_FILE} .env
                     '''
-                }
+                //}
             }
         }
 

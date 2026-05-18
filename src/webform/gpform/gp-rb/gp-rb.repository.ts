@@ -4,7 +4,7 @@ import { RB_PURPOSE } from 'src/common/Entities/webform/table/GPRB_PURPOSE.entit
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { CreateCusStampReqDto, CreateGpRbDto, CreateStampReqDto } from './dto/create-gp-rb.dto';
-import { UpdateNamestampdto } from './dto/update-gp-rb.dto';
+import { UpdateGpRbDto, UpdateNamestampdto } from './dto/update-gp-rb.dto';
 import { RB_STAMP_REQ } from 'src/common/Entities/webform/table/GPRB_STAMP_REQ.entity';
 import { RB_CUS_STAMP_REQ } from 'src/common/Entities/webform/table/GPRB_CUS_STAMP_REQ.entity';
 import { FormDto } from 'src/webform/form/dto/form.dto';
@@ -49,18 +49,19 @@ export class ShowstampGpRbRepository extends BaseRepository {
         });
     }
 
-    async updateNameStamp(dto: UpdateNamestampdto) {
+    async updateNameStamp(form: FormDto, dto: UpdateGpRbDto) {
         return this.getRepository(RB_STAMP_REQ).update(
-            {
-                NFRMNO: dto.NFRMNO,
-                VORGNO: dto.VORGNO,
-                CYEAR: dto.CYEAR,
-                CYEAR2: dto.CYEAR2,
-                NRUNNO: dto.NRUNNO,
-            },
-            {
-                NAME_STAMP: dto.NAME_STAMP,
-            },
+            form, dto
+            // {
+            //     NFRMNO: dto.NFRMNO,
+            //     VORGNO: dto.VORGNO,
+            //     CYEAR: dto.CYEAR,
+            //     CYEAR2: dto.CYEAR2,
+            //     NRUNNO: dto.NRUNNO,
+            // },
+            // {
+            //     NAME_STAMP: dto.NAME_STAMP,
+            // },
         );
     }
 }

@@ -13,13 +13,15 @@ import {DSSTOCK } from  'src/common/Entities/webform/table/FINDS_STOCK.entity'
 import {DSREQHEAD } from  'src/common/Entities/webform/table/FINDS_REQ_HEAD.entity'
 import { FinDsRepository } from './fin-ds.repository';
 import { FormmstModule } from 'src/webform/formmst/formmst.module';
+import { HandleFileFormModule } from "src/webform/handle-file-form/handle-file-form.module";
+
 
 @Module({
   imports:[
       TypeOrmModule.forFeature([DSDUTYSTAMP], 'webformConnection'),
       FormModule,
       FlowModule,
-      FormmstModule
+      FormmstModule,HandleFileFormModule
   ],
 
   controllers: [FinDsController],

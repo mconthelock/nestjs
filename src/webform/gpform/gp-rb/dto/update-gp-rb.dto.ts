@@ -6,17 +6,25 @@ import { Type } from 'class-transformer';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 
-export class UpdateGpRbDto extends PartialType(CreateGpRbDto) {}
+export class UpdateGpRbDto {
+  @IsNotEmpty()
+  @IsString()
+  @Type(() => String)
+  NAME_STAMP: string;
+}
 
 export class UpdateNamestampdto extends PickType(doactionFlowDto, [
-    'NFRMNO',
-    'VORGNO',
-    'CYEAR',
-    'CYEAR2',
-    'NRUNNO',
+  'NFRMNO',
+  'VORGNO',
+  'CYEAR',
+  'CYEAR2',
+  'NRUNNO',
+  'EMPNO',
+  'ACTION',
+  'REMARK',
 ] as const) {
-    @IsOptional()
-    @IsString()
-    @Type(() => String)
-    NAME_STAMP?: string;
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => UpdateGpRbDto)
+  data?: UpdateGpRbDto;
 }

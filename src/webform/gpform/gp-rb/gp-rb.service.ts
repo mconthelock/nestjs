@@ -10,40 +10,60 @@ import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
+import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 
 // สำหรับดึงข้อมูลแสดงในหน้า show-gp-rb by Plankton
 @Injectable()
 export class ShowstampGpRbService {
     private readonly logger = new Logger(ShowstampGpRbService.name);
-    constructor(private readonly repo: ShowstampGpRbRepository) {}
+    constructor(private readonly repo: ShowstampGpRbRepository,
+                // private readonly showStampservice: ShowstampGpRbService,
+                private readonly doactionService: DoactionFlowService,
+    ) {}
     findAll() {
         return this.repo.findAll();
     }
     async findOne(dto: FormDto) {
         return this.repo.findOne(dto);
     }
-    async Editname(dto: UpdateNamestampdto, ip: string){
+    
+    async doaction(dto: UpdateNamestampdto, ip: string){
         try{
-            if (!dto.NAME_STAMP) {
+            const form = {
+                NFRMNO: dto.NFRMNO,
+                VORGNO: dto.VORGNO,
+                CYEAR: dto.CYEAR,
+                CYEAR2: dto.CYEAR2,
+                NRUNNO: dto.NRUNNO,
+            };
+            if (!dto.data?.NAME_STAMP) {
                 throw new BadRequestException('NAME_STAMP is required');
             }
-
-            const updateResult = await this.repo.updateNameStamp(dto);
+            const updateResult = await this.repo.updateNameStamp(form, dto.data);
 
             if (!updateResult.affected) {
                 throw new BadRequestException('GP-RB stamp request not found');
             }
-
+            const doAction = await this.doactionService.doAction(
+                {
+                    ...form,
+                    EMPNO: dto.EMPNO,
+                    ACTION: dto.ACTION,
+                    REMARK: dto.REMARK,
+                },
+                ip,
+            );
+            if (!doAction.status) {
+                throw new Error(doAction.message);
+            }
             return {
                 status: true,
                 message: 'NAME_STAMP updated successfully',
-                data: updateResult,
             };
         }catch(error){
-            throw error;
+            throw new Error(`Failed to action: ${error.message}`);
         }
     }
-    
     
 }
 
@@ -51,7 +71,9 @@ export class ShowstampGpRbService {
 @Injectable()
 export class ShowCusstampGpRbService {
     private readonly logger = new Logger(ShowCusstampGpRbService.name);
-    constructor(private readonly repo: ShowCusStampGpRbRepository) {}
+    constructor(private readonly repo: ShowCusStampGpRbRepository,
+                // private readonly showCusstampservice: ShowCusstampGpRbService,
+    ) {}
     findAll() {
         return this.repo.findAll();
     }

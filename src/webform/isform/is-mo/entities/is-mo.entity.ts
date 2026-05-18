@@ -44,14 +44,4 @@ export class IsMo {
 
     @Column()
     DPEDATE: string;
-
-    @OneToOne(() => FORM, (form) => form.isdev)
-    @JoinColumn([
-        { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
-        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
-        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
-        { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
-        { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
-    ])
-    form: FORM;
 }

@@ -18,7 +18,7 @@ export class ShowstampGpRbService {
     private readonly logger = new Logger(ShowstampGpRbService.name);
     constructor(private readonly repo: ShowstampGpRbRepository,
                 // private readonly showStampservice: ShowstampGpRbService,
-                // private readonly doactionService: DoactionFlowService,
+                private readonly doactionService: DoactionFlowService,
     ) {}
     findAll() {
         return this.repo.findAll();
@@ -29,16 +29,33 @@ export class ShowstampGpRbService {
     
     async doaction(dto: UpdateNamestampdto, ip: string){
         try{
-            if (!dto.NAME_STAMP) {
+            const form = {
+                NFRMNO: dto.NFRMNO,
+                VORGNO: dto.VORGNO,
+                CYEAR: dto.CYEAR,
+                CYEAR2: dto.CYEAR2,
+                NRUNNO: dto.NRUNNO,
+            };
+            if (!dto.data?.NAME_STAMP) {
                 throw new BadRequestException('NAME_STAMP is required');
             }
-
-            const updateResult = await this.repo.updateNameStamp(dto);
+            const updateResult = await this.repo.updateNameStamp(form, dto.data);
 
             if (!updateResult.affected) {
                 throw new BadRequestException('GP-RB stamp request not found');
             }
-
+            const doAction = await this.doactionService.doAction(
+                {
+                    ...form,
+                    EMPNO: dto.EMPNO,
+                    ACTION: dto.ACTION,
+                    REMARK: dto.REMARK,
+                },
+                ip,
+            );
+            if (!doAction.status) {
+                throw new Error(doAction.message);
+            }
             return {
                 status: true,
                 message: 'NAME_STAMP updated successfully',

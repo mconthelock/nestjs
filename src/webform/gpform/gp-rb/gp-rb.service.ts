@@ -10,19 +10,24 @@ import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
+import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 
 // สำหรับดึงข้อมูลแสดงในหน้า show-gp-rb by Plankton
 @Injectable()
 export class ShowstampGpRbService {
     private readonly logger = new Logger(ShowstampGpRbService.name);
-    constructor(private readonly repo: ShowstampGpRbRepository) {}
+    constructor(private readonly repo: ShowstampGpRbRepository,
+                // private readonly showStampservice: ShowstampGpRbService,
+                // private readonly doactionService: DoactionFlowService,
+    ) {}
     findAll() {
         return this.repo.findAll();
     }
     async findOne(dto: FormDto) {
         return this.repo.findOne(dto);
     }
-    async Editname(dto: UpdateNamestampdto, ip: string){
+    
+    async doaction(dto: UpdateNamestampdto, ip: string){
         try{
             if (!dto.NAME_STAMP) {
                 throw new BadRequestException('NAME_STAMP is required');
@@ -37,13 +42,11 @@ export class ShowstampGpRbService {
             return {
                 status: true,
                 message: 'NAME_STAMP updated successfully',
-                data: updateResult,
             };
         }catch(error){
-            throw error;
+            throw new Error(`Failed to action: ${error.message}`);
         }
     }
-    
     
 }
 
@@ -51,7 +54,9 @@ export class ShowstampGpRbService {
 @Injectable()
 export class ShowCusstampGpRbService {
     private readonly logger = new Logger(ShowCusstampGpRbService.name);
-    constructor(private readonly repo: ShowCusStampGpRbRepository) {}
+    constructor(private readonly repo: ShowCusStampGpRbRepository,
+                // private readonly showCusstampservice: ShowCusstampGpRbService,
+    ) {}
     findAll() {
         return this.repo.findAll();
     }

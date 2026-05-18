@@ -22,20 +22,20 @@ import { Redis } from 'ioredis';
 import * as oracledb from 'oracledb';
 
 async function bootstrap() {
-    // if (process.env.HOST != 'HOME') {
-    //     oracledb.initOracleClient({
-    //         libDir:
-    //             process.env.ORACLE_CLIENT_LIB_DIR ||
-    //             'C:/oracle/instantclient_23_0', // ปรับ path ตามที่ติดตั้ง Oracle Instant Client
-    //     });
-    // }
+    if (process.env.HOST != 'HOME') {
+        oracledb.initOracleClient({
+            libDir:
+                process.env.ORACLE_CLIENT_LIB_DIR ||
+                'C:/oracle/instantclient_23_0', // ปรับ path ตามที่ติดตั้ง Oracle Instant Client
+        });
+    }
 
     // ✅ สร้างโฟลเดอร์ก่อนเริ่มเซิร์ฟเวอร์
     const uploadPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
     await fs.mkdir(uploadPath, { recursive: true });
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
         // logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
-        //logger: ['error', 'warn'], // เปิดเฉพาะ log ระดับ error และ warn ของ NestJS เพื่อให้ winston จัดการ log ทั้งหมด
+        logger: ['error', 'warn'], // เปิดเฉพาะ log ระดับ error และ warn ของ NestJS เพื่อให้ winston จัดการ log ทั้งหมด
     });
 
     app.enableCors({

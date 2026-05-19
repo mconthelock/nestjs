@@ -178,6 +178,14 @@ export class GpRbService {
                     PURPOSE_ID: dto.PURPOSE_ID,
                     PURPOSE_OTHER: dto.PURPOSE_OTHER,
                 });
+                const save = await this.handleFileFormService.insertFiles(
+                    {
+                        ...form,
+                        FORM_TYPE: 'GP',
+                        CREATEBY: dto.REQBY,
+                    },
+                    file,
+                );
                 console.log(insert);
             } else {
                 throw new BadRequestException(
@@ -185,14 +193,6 @@ export class GpRbService {
                 );
             }
 
-            const save = await this.handleFileFormService.insertFiles(
-                {
-                    ...form,
-                    FORM_TYPE: 'GP',
-                    CREATEBY: dto.REQBY,
-                },
-                file,
-            );
             // throw new Error('test');
 
             return {

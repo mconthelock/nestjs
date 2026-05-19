@@ -15,48 +15,52 @@ export class StaticTestService {
     ) {}
 
     async getStaticTestResult(machine: string, serial: string): Promise<StaticTestResponseDto | null> {
+        machine = machine?.trim();
+        serial  = serial?.trim();
         const basePath  = await this.getPath('TSTM-001');
         const machineNo = this.formatMachine(machine);
-        const now   = new Date();
-        const year  = now.getFullYear();
-        const month = now.getMonth() + 1;
-        const folderPath = path.join(
-            basePath,
-            `Year ${year}`,
-            this.formatMonth(month, year),
-            'Static no.1,2'
-        );
 
-        const fileName = `(Static${machineNo})_${year}${this.pad(month)}.csv`;
-        const fullPath = path.join(folderPath, fileName);
-        if (!fs.existsSync(fullPath)) {
-            return {
-                status: 'ERROR',
-                message: `File not found: ${fileName}`,
-                data: null,
-            };
-        }
+        // Check last 2 months for the test result
+        for (let i = 0; i < 2; i++) {
+            const targetDate = new Date();
+            targetDate.setMonth(targetDate.getMonth() - i);
 
-        const content = fs.readFileSync(fullPath, 'utf-8');
-        const lines   = content.split(/\r?\n/).reverse();
-        for (const line of lines) {
-            if (!line.trim()) continue;
+            const year  = targetDate.getFullYear();
+            const month = targetDate.getMonth() + 1;
+            const folderPath = path.join(
+                basePath,
+                `Year ${year}`,
+                this.formatMonth(month, year),
+                'Static no.1,2'
+            );
 
-            const cols = line.split(',');
-            const serialCol = cols[4]?.trim();
-            const statusCol = cols[cols.length - 2]?.trim();
-            if (serialCol === serial && statusCol === 'OK') {
-                return {
-                    status: 'SUCCESS',
-                    message: null,
-                    data: {
-                        resistanceMotorU: cols[15],
-                        resistanceMotorV: cols[20],
-                        resistanceMotorW: cols[25],
-                        resistanceBrakeL: cols[55],
-                        resistanceBrakeR: cols[40],
-                    },
-                };
+            const fileName = `(Static${machineNo})_${year}${this.pad(month)}.csv`;
+            const fullPath = path.join(folderPath, fileName);
+            if (!fs.existsSync(fullPath)) {
+                continue;
+            }
+
+            const content = fs.readFileSync(fullPath, 'utf-8');
+            const lines   = content.split(/\r?\n/).reverse();
+            for (const line of lines) {
+                if (!line.trim()) continue;
+
+                const cols = line.split(',');
+                const serialCol = cols[4]?.trim();
+                const statusCol = cols[cols.length - 2]?.trim();
+                if (serialCol?.trim() === serial && statusCol?.trim() === 'OK') {
+                    return {
+                        status: 'SUCCESS',
+                        message: null,
+                        data: {
+                            resistanceMotorU: cols[15],
+                            resistanceMotorV: cols[20],
+                            resistanceMotorW: cols[25],
+                            resistanceBrakeL: cols[55],
+                            resistanceBrakeR: cols[40],
+                        },
+                    };
+                }
             }
         }
 

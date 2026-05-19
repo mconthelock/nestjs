@@ -7,7 +7,6 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 import { partials } from 'handlebars';
 
-
 export class UpdateNamestampdto extends PickType(doactionFlowDto, [
   'NFRMNO',
   'VORGNO',

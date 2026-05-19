@@ -17,7 +17,7 @@ import {
     ShowstampGpRbService,
 } from './gp-rb.service';
 import { CreateGpRbDto } from './dto/create-gp-rb.dto';
-import { UpdateGpRbDto, UpdateNamestampdto } from './dto/update-gp-rb.dto';
+import { UpdateNamestampdto } from './dto/update-gp-rb.dto';
 import {
     UseForceTransaction,
     UseTransaction,
@@ -72,17 +72,10 @@ export class ShowstampGpRbController {
         });
     }
 
-    @Patch('/:fno/:orgno/:cyear/:cyear2/:nrunno/:empno/:action')
+    @Patch()
     @UseTransaction('webformConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ webformConnection
     @UseForceTransaction()
     update(
-        @Param('fno') fno: number,
-        @Param('orgno') orgno: string,
-        @Param('cyear') cyear: string,
-        @Param('cyear2') cyear2: string,
-        @Param('nrunno') nrunno: number,
-        @Param('empno') empno: string,
-        @Param('action') action: string,
         @Body() dto: UpdateNamestampdto,
         @Req() req: Request,
     ) {

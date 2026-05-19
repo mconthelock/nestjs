@@ -5,9 +5,10 @@ import { IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validato
 import { Type } from 'class-transformer';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+import { partials } from 'handlebars';
 
-export class UpdateGpRbDto {
-  @IsNotEmpty()
+export class UpdateGpRbDto extends PartialType(CreateGpRbDto){
+  @IsOptional()
   @IsString()
   @Type(() => String)
   NAME_STAMP: string;

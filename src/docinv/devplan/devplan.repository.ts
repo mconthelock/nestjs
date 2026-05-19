@@ -15,6 +15,7 @@ export class DevplanRepository extends BaseRepository {
         const qb = this.manager
             .createQueryBuilder(ISDEV_REQUEST, 'dev')
             .leftJoinAndSelect('dev.category', 'ISDEV_CATEGORY')
+            .leftJoinAndSelect('dev.formmaster', 'FORMMST')
             .leftJoinAndSelect('dev.obj', 'ISDEV_OBJECTIVE')
             .leftJoinAndSelect('dev.type', 'ISDEV_TYPE')
             .leftJoinAndSelect('dev.requester', 'USER')
@@ -25,7 +26,13 @@ export class DevplanRepository extends BaseRepository {
                 'ISDEV_STATUS',
                 `ISDEV_STATUS.STATUS_CLASS = 'PLAN'`,
             );
-        this.applyFilters(qb, 'dev', dto, ['CYEAR2', 'NRUNNO']);
+        this.applyFilters(qb, 'dev', dto, [
+            'NFRMNO',
+            'VORGNO',
+            'CYEAR',
+            'CYEAR2',
+            'NRUNNO',
+        ]);
         return qb.getMany();
     }
 }

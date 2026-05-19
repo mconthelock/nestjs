@@ -1,24 +1,18 @@
-services:
-    amecweb:
-        image: keymetrics/pm2:22-alpine
-        container_name: amecweb_api
-        restart: always
-        ports:
-            - "3005:3001"
-        volumes:
-            - ./amecweb:/var/www/
-        working_dir: /var/www
-        environment:
-            - TZ=Asia/Bangkok
-            - HTTP_PROXY=http://192.168.3.1:3128
-            - HTTPS_PROXY=http://192.168.3.1:3128
-            - http_proxy=http://192.168.3.1:3128
-            - https_proxy=http://192.168.3.1:3128
-            - NO_PROXY=localhost,127.0.0.1,webhub.mitsubishielevatorasia.co.th,172.21.251.42,.mitsubishielevatorasia.co.th
-            - no_proxy=localhost,127.0.0.1,webhub.mitsubishielevatorasia.co.th,172.21.251.42,.mitsubishielevatorasia.co.th
-        networks:
-            - devops_net
+version: '3.9'
 
-networks:
-    devops_net:
-        external: true
+services:
+  api:
+    container_name: nest-api
+
+    build: .
+
+    restart: unless-stopped
+
+    ports:
+      - "3010:3010"
+
+    env_file:
+      - .env
+    
+    extra_hosts:
+      - "pdmapp4:172.21.255.5"

@@ -7,13 +7,6 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 import { partials } from 'handlebars';
 
-export class UpdateGpRbDto extends PartialType(CreateGpRbDto){
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  NAME_STAMP: string;
-}
-
 export class UpdateNamestampdto extends PickType(doactionFlowDto, [
   'NFRMNO',
   'VORGNO',
@@ -25,7 +18,7 @@ export class UpdateNamestampdto extends PickType(doactionFlowDto, [
   'REMARK',
 ] as const) {
   @IsOptional()
-  @ValidateNested()
-  @Type(() => UpdateGpRbDto)
-  data?: UpdateGpRbDto;
+  @IsString()
+  @Type(() => String)
+  NAME_STAMP: string;
 }

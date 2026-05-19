@@ -87,17 +87,7 @@ export class ShowstampGpRbController {
         @Req() req: Request,
     ) {
         const ip = getClientIP(req);
-        const updateDto = {
-          ...dto,
-            NFRMNO: fno,
-            VORGNO: orgno,
-            CYEAR: cyear,
-            CYEAR2: cyear2,
-            NRUNNO: nrunno,
-            EMPNO: empno,
-            ACTION: action,
-        };
-        return this.gpRbServicee.doaction(updateDto, ip);
+        return this.gpRbServicee.doaction(dto, ip);
     }
 }
 

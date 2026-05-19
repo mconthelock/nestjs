@@ -49,19 +49,18 @@ export class ShowstampGpRbRepository extends BaseRepository {
         });
     }
 
-    async updateNameStamp(form: FormDto, dto: UpdateGpRbDto) {
+    async updateNameStamp(form: FormDto, dto: RB_STAMP_REQ) {
         return this.getRepository(RB_STAMP_REQ).update(
-            form, dto
-            // {
-            //     NFRMNO: dto.NFRMNO,
-            //     VORGNO: dto.VORGNO,
-            //     CYEAR: dto.CYEAR,
-            //     CYEAR2: dto.CYEAR2,
-            //     NRUNNO: dto.NRUNNO,
-            // },
-            // {
-            //     NAME_STAMP: dto.NAME_STAMP,
-            // },
+            {
+                NFRMNO: form.NFRMNO,
+                VORGNO: form.VORGNO,
+                CYEAR: form.CYEAR,
+                CYEAR2: form.CYEAR2,
+                NRUNNO: form.NRUNNO,
+            },
+            {
+                NAME_STAMP: dto.NAME_STAMP,
+            },
         );
     }
 }

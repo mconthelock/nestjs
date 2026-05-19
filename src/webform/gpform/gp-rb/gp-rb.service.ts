@@ -36,10 +36,7 @@ export class ShowstampGpRbService {
                 CYEAR2: dto.CYEAR2,
                 NRUNNO: dto.NRUNNO,
             };
-            if (!dto.data?.NAME_STAMP) {
-                throw new BadRequestException('NAME_STAMP is required');
-            }
-            const updateResult = await this.repo.updateNameStamp(form, dto.data);
+            const updateResult = await this.repo.updateNameStamp(form, NAME_STAMP);
 
             if (!updateResult.affected) {
                 throw new BadRequestException('GP-RB stamp request not found');

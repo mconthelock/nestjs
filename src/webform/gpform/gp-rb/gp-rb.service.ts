@@ -1,6 +1,6 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { CreateGpRbDto } from './dto/create-gp-rb.dto';
-import { UpdateGpRbDto, UpdateNamestampdto } from './dto/update-gp-rb.dto';
+import { UpdateNamestampdto } from './dto/update-gp-rb.dto';
 import {
     GpRbRepository,
     ShowCusStampGpRbRepository,
@@ -16,9 +16,10 @@ import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 @Injectable()
 export class ShowstampGpRbService {
     private readonly logger = new Logger(ShowstampGpRbService.name);
-    constructor(private readonly repo: ShowstampGpRbRepository,
-                // private readonly showStampservice: ShowstampGpRbService,
-                private readonly doactionService: DoactionFlowService,
+    constructor(
+        private readonly repo: ShowstampGpRbRepository,
+        // private readonly showStampservice: ShowstampGpRbService,
+        private readonly doactionService: DoactionFlowService,
     ) {}
     findAll() {
         return this.repo.findAll();
@@ -26,9 +27,9 @@ export class ShowstampGpRbService {
     async findOne(dto: FormDto) {
         return this.repo.findOne(dto);
     }
-    
-    async doaction(dto: UpdateNamestampdto, ip: string){
-        try{
+
+    async doaction(dto: UpdateNamestampdto, ip: string) {
+        try {
             const form = {
                 NFRMNO: dto.NFRMNO,
                 VORGNO: dto.VORGNO,
@@ -36,10 +37,13 @@ export class ShowstampGpRbService {
                 CYEAR2: dto.CYEAR2,
                 NRUNNO: dto.NRUNNO,
             };
-            if (!dto.data?.NAME_STAMP) {
-                throw new BadRequestException('NAME_STAMP is required');
-            }
-            const updateResult = await this.repo.updateNameStamp(form, dto.data);
+            // if (!dto.NAME_STAMP) {
+            //     throw new BadRequestException('NAME_STAMP is required');
+            // }
+            const updateResult = await this.repo.updateNameStamp(
+                form,
+                dto.NAME_STAMP,
+            );
 
             if (!updateResult.affected) {
                 throw new BadRequestException('GP-RB stamp request not found');
@@ -60,19 +64,19 @@ export class ShowstampGpRbService {
                 status: true,
                 message: 'NAME_STAMP updated successfully',
             };
-        }catch(error){
+        } catch (error) {
             throw new Error(`Failed to action: ${error.message}`);
         }
     }
-    
 }
 
 // สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton
 @Injectable()
 export class ShowCusstampGpRbService {
     private readonly logger = new Logger(ShowCusstampGpRbService.name);
-    constructor(private readonly repo: ShowCusStampGpRbRepository,
-                // private readonly showCusstampservice: ShowCusstampGpRbService,
+    constructor(
+        private readonly repo: ShowCusStampGpRbRepository,
+        // private readonly showCusstampservice: ShowCusstampGpRbService,
     ) {}
     findAll() {
         return this.repo.findAll();
@@ -174,6 +178,14 @@ export class GpRbService {
                     PURPOSE_ID: dto.PURPOSE_ID,
                     PURPOSE_OTHER: dto.PURPOSE_OTHER,
                 });
+                const save = await this.handleFileFormService.insertFiles(
+                    {
+                        ...form,
+                        FORM_TYPE: 'GP',
+                        CREATEBY: dto.REQBY,
+                    },
+                    file,
+                );
                 console.log(insert);
             } else {
                 throw new BadRequestException(
@@ -200,6 +212,4 @@ export class GpRbService {
             throw error;
         }
     }
-    
-
 }

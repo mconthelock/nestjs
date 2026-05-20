@@ -73,6 +73,7 @@
     "mysql2": "^3.14.0",
     "nest-winston": "^1.10.2",
     "node-sql-parser": "^5.3.11",
+    "node-windows": "^1.0.0-beta.8",
     "nodemailer": "^7.0.5",
     "odbc": "^2.4.9",
     "oracledb": "^6.8.0",

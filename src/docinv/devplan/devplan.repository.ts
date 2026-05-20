@@ -35,4 +35,8 @@ export class DevplanRepository extends BaseRepository {
         ]);
         return qb.getMany();
     }
+
+    async getCategory() {
+        return this.manager.find('ISDEV_CATEGORY');
+    }
 }

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateFinDDto, CreateFinDFormdto } from './dto/create-fin-d.dto';
-import { UpdateFinDDto } from './dto/update-fin-d.dto';
+import { CreateFinDFormdto } from './dto/create-fin-d.dto';
 import { FinDsRepository } from './fin-ds.repository';
 
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
+import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
 
 @Injectable()
 export class FinDsService {
@@ -12,12 +12,13 @@ export class FinDsService {
         private readonly repo: FinDsRepository,
         private readonly FormmstService: FormmstService,
         private readonly FormCreateService: FormCreateService,
+        private readonly handleFileFormService: HandleFileFormService,
     ) {}
 
     findAll() {
         return this.repo.findall();
     }
-    // create(createFinDDto: CreateFinDFormdto,files:Express.Multer.File[]) {
+
     async findAllHeadForShow() {
         const data = await this.repo.findAllHead();
 
@@ -55,6 +56,10 @@ export class FinDsService {
             data,
         };
     }
+    async findFileById(fileId: number) {
+    return this.repo.findFileById(fileId);
+}
+
     async create(
         createFinDDto: CreateFinDFormdto,
         files: Express.Multer.File[],
@@ -62,9 +67,12 @@ export class FinDsService {
     ) {
         try {
             console.log('dto', createFinDDto);
+            console.log('files', files);
 
+      
             const formmst =
                 await this.FormmstService.getFormMasterByVaname('FIN-DS');
+
             console.log('form master', formmst);
 
             const createForm = await this.FormCreateService.create(
@@ -78,14 +86,15 @@ export class FinDsService {
                 },
                 ip,
             );
-            console.log(createForm);
+
+            console.log('createForm', createForm);
 
             const form = {
                 NFRMNO: createForm.data.NFRMNO,
                 VORGNO: createForm.data.VORGNO,
                 CYEAR: createForm.data.CYEAR,
-                CYEAR2: createForm.data.CYEAR, // x
-                NRUNNO: createForm.data.NRUNNO, // x
+                CYEAR2: createForm.data.CYEAR2 || createForm.data.CYEAR,
+                NRUNNO: createForm.data.NRUNNO,
             };
 
             const head = await this.repo.createHead({
@@ -95,21 +104,82 @@ export class FinDsService {
                 DATE_RECEIVE: createFinDDto.DATE_RECEIVE,
                 LOCATION: createFinDDto.LOCATION,
             });
+
             console.log('Created head:', head);
 
-            for (const DetailDATA of createFinDDto.DATA) {
-                console.log('DetailDATA', DetailDATA);
-                const detail = await this.repo.createdetail({
-                    ...form,
-                    LINEID: DetailDATA.LINE_ID,
-                    REASON: DetailDATA.REASON,
-                    DUTY_VALUE: DetailDATA.DUTY_VALUE,
-                    QTY: DetailDATA.QTY,
-                });
+ console.log('RAW DATA:', createFinDDto.DATA);
+console.log('RAW DATA TYPE:', typeof createFinDDto.DATA);
+
+const detailData =
+    typeof createFinDDto.DATA === 'string'
+        ? JSON.parse(createFinDDto.DATA || '[]')
+        : createFinDDto.DATA;
+
+console.log('detailData parsed:', detailData);
+
+if (!Array.isArray(detailData) || detailData.length === 0) {
+    throw new Error('FIN-DS detail data is required');
+}
+
+for (const DetailDATA of detailData) {
+    console.log('DetailDATA:', DetailDATA);
+
+    const lineId = Number(
+        DetailDATA.LINE_ID ??
+        DetailDATA.LINEID
+    );
+
+    if (!lineId || Number.isNaN(lineId)) {
+        throw new Error(
+            `LINEID is required: ${JSON.stringify(DetailDATA)}`
+        );
+    }
+
+    await this.repo.createdetail({
+        ...form,
+        LINEID: lineId,
+        REASON: DetailDATA.REASON,
+        DUTY_VALUE: Number(DetailDATA.DUTY_VALUE),
+        QTY: Number(DetailDATA.QTY),
+    });
+}
+
+            let fileResult = null;
+
+            if (files && files.length > 0) {
+                fileResult = await this.handleFileFormService.insertFiles(
+                    {
+                        NFRMNO: form.NFRMNO,
+                        VORGNO: form.VORGNO,
+                        CYEAR: form.CYEAR,
+                        CYEAR2: form.CYEAR2,
+                        NRUNNO: form.NRUNNO,
+
+         
+                        FORM_TYPE: 'FIN',                        
+                        CREATEBY: createFinDDto.INPUTBY,
+                    },
+                    files,
+                );
+
+                if (!fileResult.status) {
+                    throw new Error(fileResult.message);
+                }
             }
+
+            return {
+                status: true,
+                message: 'Create FIN-DS success',
+                data: {
+                    form,
+                    head,
+                    files: fileResult,
+                },
+            };
         } catch (error) {
             console.error('Error creating FinD form:', error);
-            throw error; // Rethrow the error to be handled by the controller or global exception filter
+            throw error;
         }
     }
+    
 }

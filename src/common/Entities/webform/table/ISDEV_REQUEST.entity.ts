@@ -12,6 +12,7 @@ import { ISDEV_CATEGORY } from './ISDEV_CATEGORY.entity';
 import { ISDEV_OBJECTIVE } from './ISDEV_OBJECTIVE.entity';
 import { ISDEV_STATUS } from './ISDEV_STATUS.entity';
 import { ISDEV_TYPE } from './ISDEV_TYPE.entity';
+import { FORMMST } from './FORMMST.entity';
 import { User } from 'src/amec/users/entities/user.entity';
 import { ISDEV_DEVELOPER } from './ISDEV_DEVELOPER.entity';
 
@@ -114,6 +115,14 @@ export class ISDEV_REQUEST {
     @ManyToOne(() => User)
     @JoinColumn([{ name: 'REQ_PIC', referencedColumnName: 'SEMPNO' }])
     requester: User;
+
+    @ManyToOne(() => FORMMST)
+    @JoinColumn([
+        { name: 'NFRMNO', referencedColumnName: 'NNO' },
+        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+    ])
+    formmaster: FORMMST;
 
     @OneToMany(() => ISDEV_DEVELOPER, (dev) => dev.request)
     @JoinColumn([

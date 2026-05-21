@@ -101,4 +101,27 @@ export class FinDsController {
 
         return this.finDsService.create(dto, files, ip);
     }
+
+    // @create()
+    //  create2(
+    //     @Body() dto: CreateFinDFormdto,
+    //     @UploadedFiles() files: Express.Multer.File[]
+    // ) {
+    //     return this.finDsService.create(dto,files);
+    // }
+
+    // @Get(':id')
+    // findOne(@Param('id') id: string) {
+    //   return this.finDsService.findOne(+id);
+    // }
+
+    // @Patch(':id')
+    // update(@Param('id') id: string, @Body() updateFinDDto: UpdateFinDDto) {
+    //   return this.finDsService.update(+id, updateFinDDto);
+    // }
+
+    // @Delete(':id')
+    // remove(@Param('id') id: string) {
+    //   return this.finDsService.remove(+id);
+    // }
 }

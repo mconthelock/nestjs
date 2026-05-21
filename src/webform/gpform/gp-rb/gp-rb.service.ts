@@ -193,14 +193,6 @@ export class GpRbService {
                 );
             }
 
-            const save = await this.handleFileFormService.insertFiles(
-                {
-                    ...form,
-                    FORM_TYPE: 'GP',
-                    CREATEBY: dto.REQBY,
-                },
-                file,
-            );
             // throw new Error('test');
 
             return {

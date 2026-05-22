@@ -13,4 +13,12 @@ export class DevplanService {
             throw new Error(error);
         }
     }
+
+    async getCategory() {
+        try {
+            return await this.repo.getCategory();
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
 }

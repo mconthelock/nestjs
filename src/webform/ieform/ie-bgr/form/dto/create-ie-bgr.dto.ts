@@ -153,6 +153,11 @@ export class CreateIeBgrDto {
     @IsNotEmpty()
     @IsDate()
     @Type(() => Date)
+    PAYMENT_PLAN: Date;
+
+    @IsNotEmpty()
+    @IsDate()
+    @Type(() => Date)
     FINDATE: Date;
 
     @IsOptional()

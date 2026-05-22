@@ -49,7 +49,7 @@ export class LoadLessTestService {
                 const header = cols[0]?.trim();
                 if (!header) continue;
 
-                const parts = header.split('|');
+                const parts = header.split(/\s*[|-]\s*/);
                 if (parts.length < 3) continue;
 
                 const serialCol = parts[1]?.trim();

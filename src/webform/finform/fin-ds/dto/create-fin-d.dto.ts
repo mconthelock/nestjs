@@ -6,7 +6,8 @@ import {
     IsNumber,
     IsOptional,
     IsString,
-    ValidateNested,IsDate
+    ValidateNested,
+    IsDate,
 } from 'class-validator';
 
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
@@ -31,7 +32,6 @@ export class CreateFinDDto {
     @Type(() => Number)
     QTY: number;
 }
-
 export class CreateFinDFormdto extends PickType(CreateFormDto, [
     'INPUTBY',
     'REQBY',
@@ -42,22 +42,23 @@ export class CreateFinDFormdto extends PickType(CreateFormDto, [
     @Transform(({ value }) => String(value))
     OPTION_CODE: string;
 
-      @IsNotEmpty()
+    @IsNotEmpty()
     @IsDate()
-    @Type(()=> Date)
+    @Type(() => Date)
     EFFECTIVE_DATE: Date;
 
     @IsNotEmpty()
     @IsDate()
-    @Type(()=> Date)
+    @Type(() => Date)
     DATE_RECEIVE: Date;
-
 
     @IsNotEmpty()
     @IsString()
     @Transform(({ value }) => String(value))
+    @Transform(({ value }) => String(value))
     LOCATION: string;
 
+    /*@IsArray()
     /*@IsArray()
     @ValidateNested({ each: true })
     @Type(() => CreateFinDDto)
@@ -72,6 +73,6 @@ export class CreateFinDFormdto extends PickType(CreateFormDto, [
 
         return value;
     })*/
-   @IsNotEmpty()
+    @IsNotEmpty()
     DATA: CreateFinDDto[];
 }

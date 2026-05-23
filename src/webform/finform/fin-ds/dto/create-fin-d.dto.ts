@@ -18,9 +18,9 @@ export class CreateFinDDto {
     @Type(() => Number)
     LINE_ID: number;
 
-  @IsNotEmpty()
-  @IsString()
-  REASON: string;
+    @IsNotEmpty()
+    @IsString()
+    REASON: string;
 
     @IsNotEmpty()
     @IsNumber()
@@ -39,6 +39,7 @@ export class CreateFinDFormdto extends PickType(CreateFormDto, [
 ] as const) {
     @IsNotEmpty()
     @IsString()
+    @Transform(({ value }) => String(value))
     @Transform(({ value }) => String(value))
     OPTION_CODE: string;
 

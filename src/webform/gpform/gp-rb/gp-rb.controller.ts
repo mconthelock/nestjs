@@ -71,12 +71,20 @@ export class ShowstampGpRbController {
         });
     }
 
-    @Patch()
+    @Patch('/:fno/:orgno/:cyear/:cyear2/:nrunno')
     @UseTransaction('webformConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ webformConnection
     @UseForceTransaction()
     update(@Body() dto: UpdateNamestampdto, @Req() req: Request) {
         const ip = getClientIP(req);
-        return this.gpRbServicee.doaction(dto, ip);
+        const updateDto = {
+            NFRMNO: fno,
+            VORGNO: orgno,
+            CYEAR: cyear,
+            CYEAR2: cyear2,
+            NRUNNO: nrunno,
+            ...dto,
+        };
+        return this.gpRbServicee.doaction(updateDto, ip);
     }
 }
 

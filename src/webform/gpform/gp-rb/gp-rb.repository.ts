@@ -18,31 +18,11 @@ export class GpRbRepository extends BaseRepository {
     constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds);
     }
-    findAll() {
+
+    findPurpose() {
         return this.getRepository(RB_PURPOSE).find();
     }
 
-    async CreateStampReq(dto: CreateStampReqDto) {
-        return this.getRepository(RB_STAMP_REQ).save(dto);
-    }
-
-    async CreateCusStampReq(dto: CreateCusStampReqDto) {
-        return this.getRepository(RB_CUS_STAMP_REQ).save({
-            ...dto,
-            REMARK: dto.STAMPCUS_REMARK,
-        });
-    }
-}
-
-// สำหรับดึงข้อมูลแสดงในหน้า show-gp-rb by Plankton
-@Injectable()
-export class ShowstampGpRbRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
-        super(ds);
-    }
-    findAll() {
-        return this.getRepository(RB_STAMP_REQ).find();
-    }
     async findOne(dto: FormDto) {
         return this.getRepository(RB_STAMP_REQ).findOne({
             where: {
@@ -55,6 +35,17 @@ export class ShowstampGpRbRepository extends BaseRepository {
         });
     }
 
+    async CreateStampReq(dto: CreateStampReqDto) {
+        return this.getRepository(RB_STAMP_REQ).save(dto);
+    }
+
+    async CreateCusStampReq(dto: CreateCusStampReqDto) {
+        return this.getRepository(RB_CUS_STAMP_REQ).save({
+            ...dto,
+            REMARK: dto.STAMPCUS_REMARK,
+        });
+    }
+
     async updateNameStamp(form: FormDto, name: string) {
         return this.getRepository(RB_STAMP_REQ).update(form, {
             NAME_STAMP: name,
@@ -62,24 +53,41 @@ export class ShowstampGpRbRepository extends BaseRepository {
     }
 }
 
+// สำหรับดึงข้อมูลแสดงในหน้า show-gp-rb by Plankton
+// @Injectable()
+// export class ShowstampGpRbRepository extends BaseRepository {
+//     constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+//         super(ds);
+//     }
+//     findAll() {
+//         return this.getRepository(RB_STAMP_REQ).find();
+//     }
+
+//     async updateNameStamp(form: FormDto, name: string) {
+//         return this.getRepository(RB_STAMP_REQ).update(form, {
+//             NAME_STAMP: name,
+//         });
+//     }
+// }
+
 // สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton
-@Injectable()
-export class ShowCusStampGpRbRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
-        super(ds);
-    }
-    findAll() {
-        return this.getRepository(RB_CUS_STAMP_REQ).find();
-    }
-    async findOne(dto: FormDto) {
-        return this.getRepository(RB_CUS_STAMP_REQ).findOne({
-            where: {
-                NFRMNO: dto.NFRMNO,
-                VORGNO: dto.VORGNO,
-                CYEAR: dto.CYEAR,
-                CYEAR2: dto.CYEAR2,
-                NRUNNO: dto.NRUNNO,
-            },
-        });
-    }
-}
+// @Injectable()
+// export class ShowCusStampGpRbRepository extends BaseRepository {
+//     constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+//         super(ds);
+//     }
+//     findAll() {
+//         return this.getRepository(RB_CUS_STAMP_REQ).find();
+//     }
+//     async findOne(dto: FormDto) {
+//         return this.getRepository(RB_CUS_STAMP_REQ).findOne({
+//             where: {
+//                 NFRMNO: dto.NFRMNO,
+//                 VORGNO: dto.VORGNO,
+//                 CYEAR: dto.CYEAR,
+//                 CYEAR2: dto.CYEAR2,
+//                 NRUNNO: dto.NRUNNO,
+//             },
+//         });
+//     }
+// }

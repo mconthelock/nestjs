@@ -18,10 +18,9 @@ export class CreateFinDDto {
     @Type(() => Number)
     LINE_ID: number;
 
-    // @IsNotEmpty()
-    @IsString()
-    @Type(()=> String)
-    REASON: string;
+  @IsNotEmpty()
+  @IsString()
+  REASON: string;
 
     @IsNotEmpty()
     @IsNumber()

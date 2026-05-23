@@ -45,6 +45,9 @@ export class EBGREQFORM {
     PIC: string;
 
     @Column()
+    PAYMENT_PLAN: Date;
+
+    @Column()
     FINDATE: Date;
 
     @Column()

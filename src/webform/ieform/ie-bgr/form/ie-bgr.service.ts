@@ -258,6 +258,7 @@ export class IeBgrService {
                 REQAMT: dto.REQAMT,
                 RESORG: dto.RESORG,
                 PIC: dto.PIC,
+                PAYMENT_PLAN: dto.PAYMENT_PLAN,
                 FINDATE: dto.FINDATE,
                 ITMNAME: dto.ITMNAME,
                 PURPOSE: dto.PURPOSE,

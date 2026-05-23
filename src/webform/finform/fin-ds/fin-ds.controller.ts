@@ -19,14 +19,12 @@ import {
     UseForceTransaction,
 } from 'src/common/decorator/transaction.decorator';
 
-
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { getClientIP } from 'src/common/utils/ip.utils';
 
 import { Request, Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
-
 
 @Controller('finform/fin-ds')
 export class FinDsController {
@@ -100,4 +98,27 @@ export class FinDsController {
 
         return this.finDsService.create(dto, files, ip);
     }
+
+    // @create()
+    //  create2(
+    //     @Body() dto: CreateFinDFormdto,
+    //     @UploadedFiles() files: Express.Multer.File[]
+    // ) {
+    //     return this.finDsService.create(dto,files);
+    // }
+
+    // @Get(':id')
+    // findOne(@Param('id') id: string) {
+    //   return this.finDsService.findOne(+id);
+    // }
+
+    // @Patch(':id')
+    // update(@Param('id') id: string, @Body() updateFinDDto: UpdateFinDDto) {
+    //   return this.finDsService.update(+id, updateFinDDto);
+    // }
+
+    // @Delete(':id')
+    // remove(@Param('id') id: string) {
+    //   return this.finDsService.remove(+id);
+    // }
 }

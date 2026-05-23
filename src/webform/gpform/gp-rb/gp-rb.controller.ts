@@ -74,15 +74,7 @@ export class ShowstampGpRbController {
     @Patch('/:fno/:orgno/:cyear/:cyear2/:nrunno')
     @UseTransaction('webformConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ webformConnection
     @UseForceTransaction()
-    update(
-        @Param('fno') fno: number,
-        @Param('orgno') orgno: string,
-        @Param('cyear') cyear: string,
-        @Param('cyear2') cyear2: string,
-        @Param('nrunno') nrunno: number,
-        @Body() dto: UpdateNamestampdto,
-        @Req() req: Request,
-    ) {
+    update(@Body() dto: UpdateNamestampdto, @Req() req: Request) {
         const ip = getClientIP(req);
         const updateDto = {
             NFRMNO: fno,

@@ -26,7 +26,10 @@ export class StInpService {
 
     async createForm(dto: CreateFormDto, ip: string, owner: string) {
         try {
-            const createForm = await this.createFormService.create(dto, ip);
+            const createForm = await this.createFormService.create(dto, ip, {
+                CEXTDATA: 'R',
+                CAPPLYALL: '0',
+            });
             if (!createForm.status) {
                 throw new Error(createForm.message.message);
             }
@@ -46,7 +49,7 @@ export class StInpService {
 
     async setOwnerFlow(form: FormDto, owner: string) {
         try {
-             for (const step of ['06', '19']) {
+            for (const step of ['06', '19']) {
                 const update = await this.flowService.updateFlow({
                     condition: {
                         ...form,
@@ -59,7 +62,6 @@ export class StInpService {
             throw new Error(`Failed to set owner flow: ${error.message}`);
         }
     }
-
 
     async insertList({
         form,

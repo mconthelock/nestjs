@@ -100,11 +100,14 @@ export class GpRbService {
     }
     async create(dto: CreateGpRbDto, ip: string, file: Express.Multer.File) {
         try {
-            const stampFormatGroup = dto.stampFormatGroup?.toLowerCase();
-            // ตรวจสอบว่า stampFormatGroup ได้รับค่าแล้ว
-            if (!stampFormatGroup) {
+            const stampFormatGroup = (dto.stampFormatGroup ?? '').trim().toLowerCase();
+            const purposeId = dto.PURPOSE_ID != null ? String(dto.PURPOSE_ID).trim() : '';
+            
+            // ตรวจสอบว่า stampFormatGroup ได้รับค่าแล้ว // ถ้าไม่ใช่ PURPOSE_ID = 2 ต้องมี stampFormatGroup
+            if (!stampFormatGroup && purposeId !== '2') {
                 throw new BadRequestException(
-                    'stampFormatGroup is required (standard or other)',
+                    // 'stampFormatGroup is required (standard or other)',
+                    'stampFormatGroup is required when PURPOSE_ID is not 2'
                 );
             }
 
@@ -187,7 +190,14 @@ export class GpRbService {
                     file,
                 );
                 console.log(insert);
-            } else {
+            }else if(!stampFormatGroup && purposeId === '2'){
+                insert = await this.repo.CreateStampReq({
+                    ...form,
+                    PURPOSE_ID: dto.PURPOSE_ID,
+                    SPOSCODE: dto.SPOSCODE,
+                });
+            }
+             else {
                 throw new BadRequestException(
                     `Invalid stampFormatGroup: "${stampFormatGroup}". Must be "standard" or "other"`,
                 );

@@ -44,7 +44,6 @@ export class CreateFinDFormdto extends PickType(CreateFormDto, [
     OPTION_CODE: string;
 
     @IsNotEmpty()
-    @IsNotEmpty()
     @IsDate()
     @Type(() => Date)
     EFFECTIVE_DATE: Date;

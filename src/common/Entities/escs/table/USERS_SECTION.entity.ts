@@ -22,6 +22,9 @@ export class USERS_SECTION {
     @Column()
     SSECCODE: string;
 
+    @Column()
+    MASTER_PATH: string;
+
     @OneToMany(() => ITEM_MFG, (i) => i.USER_SECTION)
     ITEM_MFG: ITEM_MFG[];
 

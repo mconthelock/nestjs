@@ -4,6 +4,7 @@ import { DataSource, Like, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { ISDEV_REQUEST } from 'src/common/Entities/webform/table/ISDEV_REQUEST.entity';
+import { IS_FILE } from 'src/common/Entities/webform/table/IS_FILE.entity';
 
 @Injectable()
 export class DevplanRepository extends BaseRepository {
@@ -19,6 +20,7 @@ export class DevplanRepository extends BaseRepository {
             .leftJoinAndSelect('dev.obj', 'ISDEV_OBJECTIVE')
             .leftJoinAndSelect('dev.type', 'ISDEV_TYPE')
             .leftJoinAndSelect('dev.requester', 'USER')
+            .leftJoinAndSelect('dev.files', 'IS_FILE')
             .leftJoinAndSelect('dev.developers', 'ISDEV_DEVELOPER')
             .leftJoinAndSelect('ISDEV_DEVELOPER.info', 'USER_INFO')
             .leftJoinAndSelect(

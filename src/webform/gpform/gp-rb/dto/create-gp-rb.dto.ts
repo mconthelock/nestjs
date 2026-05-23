@@ -93,9 +93,9 @@ export class CreateGpRbDto extends IntersectionType(
         'STAMPCUS_REMARK',
     ] as const),
 ) {
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    @IsEnum(['standard', 'other'])
+    @IsEnum(['standard', 'other', ''])
     @Type(() => String)
-    stampFormatGroup: string;
+    stampFormatGroup?: string;
 }

@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
 import {
     GpRbService,
-    ShowCusstampGpRbService,
-    ShowstampGpRbService,
+    // ShowCusstampGpRbService,
+    // ShowstampGpRbService,
 } from './gp-rb.service';
 import {
     GpRbController,
-    ShowCusStampGpRbController,
-    ShowstampGpRbController,
+    // ShowCusStampGpRbController,
+    // ShowstampGpRbController,
 } from './gp-rb.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
     GpRbRepository,
-    ShowCusStampGpRbRepository,
-    ShowstampGpRbRepository,
+    // ShowCusStampGpRbRepository,
+    // ShowstampGpRbRepository,
 } from './gp-rb.repository';
 import { FormmstModule } from 'src/webform/formmst/formmst.module';
 import { FormModule } from 'src/webform/form/form.module';
@@ -25,9 +25,13 @@ import { FlowModule } from 'src/webform/flow/flow.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([RB_PURPOSE], 'webformConnection'),
+        TypeOrmModule.forFeature(
+            [RB_PURPOSE, RB_STAMP_REQ, RB_CUS_STAMP_REQ],
+            'webformConnection',
+        ),
         FormmstModule,
         FormModule,
+        FlowModule,
         HandleFileFormModule,
     ],
     controllers: [GpRbController],
@@ -37,24 +41,24 @@ import { FlowModule } from 'src/webform/flow/flow.module';
 export class GpRbModule {}
 
 // สำหรับดึงข้อมูลแสดงในหน้า show-gp-rb by Plankton
-@Module({
-    imports: [
-        TypeOrmModule.forFeature([RB_STAMP_REQ], 'webformConnection'),
-        FlowModule,
-    ],
-    controllers: [ShowstampGpRbController],
-    providers: [ShowstampGpRbService, ShowstampGpRbRepository],
-    exports: [ShowstampGpRbService],
-})
-export class ShowstampGpRbModule {}
+// @Module({
+//     imports: [
+//         TypeOrmModule.forFeature([RB_STAMP_REQ], 'webformConnection'),
+//         FlowModule,
+//     ],
+//     controllers: [ShowstampGpRbController],
+//     providers: [ShowstampGpRbService, ShowstampGpRbRepository],
+//     exports: [ShowstampGpRbService],
+// })
+// export class ShowstampGpRbModule {}
 
 // สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton
-@Module({
-    imports: [
-        TypeOrmModule.forFeature([RB_CUS_STAMP_REQ], 'webformConnection'),
-    ],
-    controllers: [ShowCusStampGpRbController],
-    providers: [ShowCusstampGpRbService, ShowCusStampGpRbRepository],
-    exports: [ShowCusstampGpRbService],
-})
-export class ShowCusStampGpRbModule {}
+// @Module({
+//     imports: [
+//         TypeOrmModule.forFeature([RB_CUS_STAMP_REQ], 'webformConnection'),
+//     ],
+//     controllers: [ShowCusStampGpRbController],
+//     providers: [ShowCusstampGpRbService, ShowCusStampGpRbRepository],
+//     exports: [ShowCusstampGpRbService],
+// })
+// export class ShowCusStampGpRbModule {}

@@ -7,7 +7,7 @@ import { UpdatePtermcodeDto } from './dto/update-ptermcode.dto';
 export class PtermcodeController {
   constructor(private readonly ptermcodeService: PtermcodeService) {}
 
-  @Get('ptermcode')
+  @Get('termcode')
   findTermcode() {
     return this.ptermcodeService.findTermcode();
   }

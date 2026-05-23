@@ -15,9 +15,9 @@ export class PtermcodeRepository extends BaseRepository {
 
     async findTermcode() {
         return this.manager.createQueryBuilder(PTERMCODE, 'T')
-            .select(['T.STERMDESC as STERMDESC'])
+            .select(['T.STERMDESC as TERMNAME , T.STERMCODE as TERMCODE'])
             .distinct(true)
-            .orderBy('T.STERMDESC', 'ASC')
+            .orderBy('T.STERMCODE', 'ASC')
             .getRawMany();
     }
 }

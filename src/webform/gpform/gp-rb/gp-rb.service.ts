@@ -1,17 +1,14 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { CreateGpRbDto } from './dto/create-gp-rb.dto';
-import { UpdateNamestampdto } from './dto/update-gp-rb.dto';
-import {
-    GpRbRepository,
-    // ShowCusStampGpRbRepository,
-    // ShowstampGpRbRepository,
-} from './gp-rb.repository';
+
+import { GpRbRepository } from './gp-rb.repository';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 
+import { CreateStampReqFormDto } from './dto/create-gp-rb.dto';
+import { UpdateNamestampdto } from './dto/update-gp-rb.dto';
 //Main service สำหรับจัดการ GP-RB form
 @Injectable()
 export class GpRbService {
@@ -27,22 +24,16 @@ export class GpRbService {
         return this.repo.findPurpose();
     }
 
-    async create(dto: CreateGpRbDto, ip: string, file: Express.Multer.File) {
+    findConfig() {
+        return this.repo.findConfig();
+    }
+
+    async create(
+        dto: CreateStampReqFormDto,
+        ip: string,
+        file: Express.Multer.File,
+    ) {
         try {
-            const stampFormatGroup = (dto.stampFormatGroup ?? '')
-                .trim()
-                .toLowerCase();
-            const purposeId =
-                dto.PURPOSE_ID != null ? String(dto.PURPOSE_ID).trim() : '';
-
-            // ตรวจสอบว่า stampFormatGroup ได้รับค่าแล้ว // ถ้าไม่ใช่ PURPOSE_ID = 2 ต้องมี stampFormatGroup
-            if (!stampFormatGroup && purposeId !== '2') {
-                throw new BadRequestException(
-                    // 'stampFormatGroup is required (standard or other)',
-                    'stampFormatGroup is required when PURPOSE_ID is not 2',
-                );
-            }
-
             // ดึงข้อมูล Form Master
             const formmst =
                 await this.formmstService.getFormMasterByVaname('GP-RB');
@@ -80,59 +71,84 @@ export class GpRbService {
                 CYEAR: createForm.data.CYEAR,
                 CYEAR2: createForm.data.CYEAR2,
                 NRUNNO: createForm.data.NRUNNO,
+                PURPOSE_ID: dto.PURPOSE_ID ? Number(dto.PURPOSE_ID) : null,
+                PURPOSE_OTHER: dto.PURPOSE_OTHER
+                    ? dto.PURPOSE_OTHER.trim()
+                    : null,
+                SPOSCODE: dto.SPOSCODE ? dto.SPOSCODE.trim() : null,
+                NAME_STAMP: dto.NAME_STAMP ? dto.NAME_STAMP.trim() : null,
+                REMARK: dto.REMARK ? dto.REMARK.trim() : null,
+                REQ_TYPE: dto.REQ_TYPE ? dto.REQ_TYPE.trim() : null,
+                REQ_QTY: dto.REQ_QTY ? Number(dto.REQ_QTY) : null,
             };
-            let insert;
-            // บันทึกข้อมูล Stamp Request ตามประเภท
-            if (stampFormatGroup === 'standard') {
-                /*      if(!dto.PURPOSE_ID || !dto.PURPOSE_OTHER || !dto.SPOSCODE|| !dto.NAME_STAMP ) {
-                    throw new BadRequestException('PURPOSE_ID and NAME_STAMP are required for standard stamp group');
-                } */
-                insert = await this.repo.CreateStampReq({
-                    ...form,
-                    PURPOSE_ID: dto.PURPOSE_ID,
-                    PURPOSE_OTHER: dto.PURPOSE_OTHER,
-                    SPOSCODE: dto.SPOSCODE,
-                    NAME_STAMP: dto.NAME_STAMP,
-                    REMARK: dto.STAMP_REMARK,
-                });
-                console.log(insert);
-            } else if (stampFormatGroup === 'other') {
-                if (!dto.QTY) {
-                    throw new BadRequestException(
-                        'QTY are required for other stamp group',
-                    );
-                }
-                insert = await this.repo.CreateCusStampReq({
-                    ...form,
+            const insert = await this.repo.CreateStampReq(form);
 
-                    QTY: dto.QTY,
-                    STAMPCUS_REMARK: dto.STAMPCUS_REMARK,
-                });
-                insert = await this.repo.CreateStampReq({
-                    ...form,
-                    PURPOSE_ID: dto.PURPOSE_ID,
-                    PURPOSE_OTHER: dto.PURPOSE_OTHER,
-                });
-                const save = await this.handleFileFormService.insertFiles(
-                    {
-                        ...form,
-                        FORM_TYPE: 'GP',
-                        CREATEBY: dto.REQBY,
-                    },
-                    file,
-                );
-                console.log(insert);
-            } else if (!stampFormatGroup && purposeId === '2') {
-                insert = await this.repo.CreateStampReq({
-                    ...form,
-                    PURPOSE_ID: dto.PURPOSE_ID,
-                    SPOSCODE: dto.SPOSCODE,
-                });
-            } else {
-                throw new BadRequestException(
-                    `Invalid stampFormatGroup: "${stampFormatGroup}". Must be "standard" or "other"`,
-                );
-            }
+            // const stampFormatGroup = (dto.stampFormatGroup ?? '')
+            //     .trim()
+            //     .toLowerCase();
+            // const purposeId =
+            //     dto.PURPOSE_ID != null ? String(dto.PURPOSE_ID).trim() : '';
+
+            // // ตรวจสอบว่า stampFormatGroup ได้รับค่าแล้ว // ถ้าไม่ใช่ PURPOSE_ID = 2 ต้องมี stampFormatGroup
+            // if (!stampFormatGroup && purposeId !== '2') {
+            //     throw new BadRequestException(
+            //         // 'stampFormatGroup is required (standard or other)',
+            //         'stampFormatGroup is required when PURPOSE_ID is not 2',
+            //     );
+            // }
+
+            // let insert;
+            // // บันทึกข้อมูล Stamp Request ตามประเภท
+            // if (stampFormatGroup === 'standard') {
+            //     /*      if(!dto.PURPOSE_ID || !dto.PURPOSE_OTHER || !dto.SPOSCODE|| !dto.NAME_STAMP ) {
+            //         throw new BadRequestException('PURPOSE_ID and NAME_STAMP are required for standard stamp group');
+            //     } */
+            //     insert = await this.repo.CreateStampReq({
+            //         ...form,
+            //         PURPOSE_ID: dto.PURPOSE_ID,
+            //         PURPOSE_OTHER: dto.PURPOSE_OTHER,
+            //         SPOSCODE: dto.SPOSCODE,
+            //         NAME_STAMP: dto.NAME_STAMP,
+            //         REMARK: dto.STAMP_REMARK,
+            //     });
+            //     console.log(insert);
+            // } else if (stampFormatGroup === 'other') {
+            //     if (!dto.QTY) {
+            //         throw new BadRequestException(
+            //             'QTY are required for other stamp group',
+            //         );
+            //     }
+            //     insert = await this.repo.CreateCusStampReq({
+            //         ...form,
+
+            //         QTY: dto.QTY,
+            //         STAMPCUS_REMARK: dto.STAMPCUS_REMARK,
+            //     });
+            //     insert = await this.repo.CreateStampReq({
+            //         ...form,
+            //         PURPOSE_ID: dto.PURPOSE_ID,
+            //         PURPOSE_OTHER: dto.PURPOSE_OTHER,
+            //     });
+            //     const save = await this.handleFileFormService.insertFiles(
+            //         {
+            //             ...form,
+            //             FORM_TYPE: 'GP',
+            //             CREATEBY: dto.REQBY,
+            //         },
+            //         file,
+            //     );
+            //     console.log(insert);
+            // } else if (!stampFormatGroup && purposeId === '2') {
+            //     insert = await this.repo.CreateStampReq({
+            //         ...form,
+            //         PURPOSE_ID: dto.PURPOSE_ID,
+            //         SPOSCODE: dto.SPOSCODE,
+            //     });
+            // } else {
+            //     throw new BadRequestException(
+            //         `Invalid stampFormatGroup: "${stampFormatGroup}". Must be "standard" or "other"`,
+            //     );
+            // }
 
             const save = await this.handleFileFormService.insertFiles(
                 {

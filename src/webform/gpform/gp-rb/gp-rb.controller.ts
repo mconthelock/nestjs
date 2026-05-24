@@ -15,7 +15,7 @@ import {
     // ShowCusstampGpRbService,
     // ShowstampGpRbService,
 } from './gp-rb.service';
-import { CreateGpRbDto } from './dto/create-gp-rb.dto';
+import { CreateStampReqFormDto } from './dto/create-gp-rb.dto';
 import { UpdateNamestampdto } from './dto/update-gp-rb.dto';
 import {
     UseForceTransaction,
@@ -24,14 +24,19 @@ import {
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
-import { FormService } from 'src/webform/form/form.service';
 
 @Controller('gpform/gp-rb')
 export class GpRbController {
     constructor(private readonly gpRbServicee: GpRbService) {}
+
     @Get('purpose')
     findPurpose() {
         return this.gpRbServicee.findPurpose();
+    }
+
+    @Get('config')
+    findConfig() {
+        return this.gpRbServicee.findConfig();
     }
 
     @Get('/:fno/:orgno/:cyear/:cyear2/:nrunno')
@@ -56,7 +61,7 @@ export class GpRbController {
     @UseTransaction('webformConnection')
     @UseInterceptors(getFileUploadInterceptor('otherAttachment'))
     create(
-        @Body() dto: CreateGpRbDto,
+        @Body() dto: CreateStampReqFormDto,
         @Req() req: Request,
         @UploadedFile() file: Express.Multer.File,
     ) {

@@ -1,32 +1,22 @@
 import { Module } from '@nestjs/common';
-import {
-    GpRbService,
-    // ShowCusstampGpRbService,
-    // ShowstampGpRbService,
-} from './gp-rb.service';
-import {
-    GpRbController,
-    // ShowCusStampGpRbController,
-    // ShowstampGpRbController,
-} from './gp-rb.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import {
-    GpRbRepository,
-    // ShowCusStampGpRbRepository,
-    // ShowstampGpRbRepository,
-} from './gp-rb.repository';
+
+import { GpRbService } from './gp-rb.service';
+import { GpRbController } from './gp-rb.controller';
+import { GpRbRepository } from './gp-rb.repository';
+
 import { FormmstModule } from 'src/webform/formmst/formmst.module';
 import { FormModule } from 'src/webform/form/form.module';
-import { RB_PURPOSE } from 'src/common/Entities/webform/table/GPRB_PURPOSE.entity';
-import { RB_STAMP_REQ } from 'src/common/Entities/webform/table/GPRB_STAMP_REQ.entity';
-import { RB_CUS_STAMP_REQ } from 'src/common/Entities/webform/table/GPRB_CUS_STAMP_REQ.entity';
-import { HandleFileFormModule } from 'src/webform/handle-file-form/handle-file-form.module';
 import { FlowModule } from 'src/webform/flow/flow.module';
+import { HandleFileFormModule } from 'src/webform/handle-file-form/handle-file-form.module';
 
+import { GPRB_PURPOSE } from 'src/common/Entities/webform/table/GPRB_PURPOSE.entity';
+import { GPRB_STAMP_CONFIG } from 'src/common/Entities/webform/table/GPRB_STAMP_CONFIG.entity';
+import { GPRB_STAMP_REQ } from 'src/common/Entities/webform/table/GPRB_STAMP_REQ.entity';
 @Module({
     imports: [
         TypeOrmModule.forFeature(
-            [RB_PURPOSE, RB_STAMP_REQ, RB_CUS_STAMP_REQ],
+            [GPRB_PURPOSE, GPRB_STAMP_CONFIG, GPRB_STAMP_REQ],
             'webformConnection',
         ),
         FormmstModule,

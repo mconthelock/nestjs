@@ -2,45 +2,51 @@ import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'EBUDGET_QUOTATION', schema: 'EBUDGET' })
 export class EBUDGET_QUOTATION {
-  @PrimaryGeneratedColumn()
-  ID: number;
+    @PrimaryGeneratedColumn()
+    ID: number;
 
-  @Column()
-  NFRMNO: number;
+    @Column()
+    NFRMNO: number;
 
-  @Column()
-  VORGNO: string;
+    @Column()
+    VORGNO: string;
 
-  @Column()
-  CYEAR: string;
+    @Column()
+    CYEAR: string;
 
-  @Column()
-  CYEAR2: string;
+    @Column()
+    CYEAR2: string;
 
-  @Column()
-  NRUNNO: number;
+    @Column()
+    NRUNNO: number;
 
-  @Column()
-  QTA_FORM: string;
+    @Column()
+    QTA_FORM: string;
 
-  @Column()
-  QTA_VALID_DATE: Date;
+    @Column()
+    QTA_VALID_DATE: Date;
 
-  @Column({type: 'decimal', precision: 10, scale: 2 })
-  TOTAL: number;
+    @Column()
+    SVENDNAME: string;
 
-  @Column()
-  DATE_CREATE: Date;
+    @Column()
+    SVENDCODE: string;
 
-  @Column()
-  DATE_UPDATE: Date;
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
+    TOTAL: number;
 
-  @Column()
-  CREATE_BY: string;
+    @Column()
+    DATE_CREATE: Date;
 
-  @Column()
-  UPDATE_BY: string;
+    @Column()
+    DATE_UPDATE: Date;
 
-  @Column()
-  STATUS: number;
+    @Column()
+    CREATE_BY: string;
+
+    @Column()
+    UPDATE_BY: string;
+
+    @Column()
+    STATUS: number;
 }

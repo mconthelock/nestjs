@@ -149,7 +149,7 @@ export class GpRbService {
             //         `Invalid stampFormatGroup: "${stampFormatGroup}". Must be "standard" or "other"`,
             //     );
             // }
-
+    if(file){
             const save = await this.handleFileFormService.insertFiles(
                 {
                     ...form,
@@ -158,6 +158,7 @@ export class GpRbService {
                 },
                 file,
             );
+        }
             // throw new Error('test');
 
             return {

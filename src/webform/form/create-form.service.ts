@@ -15,6 +15,7 @@ import { RepService } from '../rep/rep.service';
 import { DeleteFlowStepService } from '../flow/delete-flow-step.service';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
+import { UpdateFlowDto } from '../flow/dto/update-flow.dto';
 
 interface FormContext {
     ip: string;
@@ -59,7 +60,11 @@ export class FormCreateService extends FormService {
     ) {
         super(form, flow, formmstService, flowService, repo);
     }
-    async create(dto: CreateFormDto, ip: string) {
+    async create(
+        dto: CreateFormDto,
+        ip: string,
+        managerData: UpdateFlowDto = { CEXTDATA: 'MG', CAPPLYALL: '3' },
+    ) {
         try {
             const context: FormContext = {
                 ip: ip,
@@ -119,7 +124,7 @@ export class FormCreateService extends FormService {
                 await this.firstflow(first, context);
                 // add manager
                 if (context.flag == 1) {
-                    await this.managerStep(context);
+                    await this.managerStep(context, managerData);
                 }
                 context.query.CSTEPST = '0';
                 const notuse = await this.flowService.getFlow(context.query);
@@ -181,7 +186,7 @@ export class FormCreateService extends FormService {
             VORGNO: context.vorgno,
             CYEAR: context.cyear,
         });
-        
+
         const today = new Date();
         // Set formDate to current date with time 00:00:00
         const formDateWithZeroTime = new Date(
@@ -343,7 +348,7 @@ export class FormCreateService extends FormService {
         await this.flowService.insertFlow(flow);
     }
 
-    async managerStep(context: FormContext) {
+    async managerStep(context: FormContext, managerData?: UpdateFlowDto) {
         const manager = await this.sequenceOrgService.getManager(context.empno);
         const query = {
             NFRMNO: context.nfrmno,
@@ -383,11 +388,16 @@ export class FormCreateService extends FormService {
                 CAPVTIME: null,
                 DAPVDATE: null,
                 CAPVTYPE: '1',
+                CEXTDATA: managerData?.CEXTDATA ?? null,
                 CREJTYPE: '1',
-                CAPPLYALL: '3',
+                CAPPLYALL: managerData?.CAPPLYALL ?? '3',
                 VURL: url[0].VFORMPAGE,
                 VREMARK: null,
             };
+            console.log(managerData, managerData?.CEXTDATA, managerData?.CAPPLYALL);
+            
+            console.log(flow);
+            
             await this.flowService.insertFlow(flow);
 
             //Update creater flow for set next step to manager
@@ -434,7 +444,10 @@ export class FormCreateService extends FormService {
                 VREALAPV: null,
                 CAPVSTNO: '0',
             };
-            await this.flowService.updateFlow({ condition: formDraft, ...data });
+            await this.flowService.updateFlow({
+                condition: formDraft,
+                ...data,
+            });
         }
     }
 }

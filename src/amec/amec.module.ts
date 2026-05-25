@@ -12,6 +12,7 @@ import { PproductModule } from './pproduct/pproduct.module';
 import { PvenderModule } from './pvender/pvender.module';
 import { BrcurrencyModule } from './brcurrency/brcurrency.module';
 import { AmecUserAllModule } from './amecuserall/amecuserall.module';
+import { PtermcodeModule } from './ptermcode/ptermcode.module';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { AmecUserAllModule } from './amecuserall/amecuserall.module';
         PvenderModule,
         BrcurrencyModule,
         AmecUserAllModule,
+        PtermcodeModule,
     ],
 })
 export class AmecModule {}

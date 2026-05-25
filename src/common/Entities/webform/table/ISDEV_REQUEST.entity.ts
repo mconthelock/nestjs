@@ -15,6 +15,7 @@ import { ISDEV_TYPE } from './ISDEV_TYPE.entity';
 import { FORMMST } from './FORMMST.entity';
 import { User } from 'src/amec/users/entities/user.entity';
 import { ISDEV_DEVELOPER } from './ISDEV_DEVELOPER.entity';
+import { IS_FILE } from './IS_FILE.entity';
 
 @Entity({ name: 'ISDEV_REQUEST', schema: 'WEBFORM' })
 export class ISDEV_REQUEST {
@@ -133,4 +134,14 @@ export class ISDEV_REQUEST {
         { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
     ])
     developers: ISDEV_DEVELOPER[];
+
+    @OneToMany(() => IS_FILE, (file) => file.devreq)
+    @JoinColumn([
+        { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+        { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+        { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+    ])
+    files: IS_FILE[];
 }

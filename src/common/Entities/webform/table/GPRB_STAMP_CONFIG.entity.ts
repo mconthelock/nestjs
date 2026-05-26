@@ -1,14 +1,19 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({
-    name:"GPRB_STAMP_CONFIG",
-    schema:"WEBFORM"
+    name: 'GPRB_STAMP_CONFIG',
+    schema: 'WEBFORM',
 })
-export class RB_STAMP_CONFIG {
+export class GPRB_STAMP_CONFIG {
     @PrimaryColumn()
-    SPOSCODE:string;
+    SPOSCODE: string;
+
     @Column()
-    SIZE_MM:number;
+    SIZE_MM: number;
+
     @Column()
-    ACTIVE:string;
+    ACTIVE: string;
+
+    @Column()
+    STAMP_TYPE: string;
 }

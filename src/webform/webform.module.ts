@@ -22,6 +22,7 @@ import { MarFormModule } from './marform/marform.module';
 import { STFormModule } from './stform/stform.module';
 import { PurFormModule } from './purform/purform.module';
 import { PsFormModule } from './psform/psform.module';
+import { RqflistModule } from './rqflist/rqflist.module';
 
 @Module({
     imports: [
@@ -48,6 +49,7 @@ import { PsFormModule } from './psform/psform.module';
         MarFormModule,
         PsFormModule,
         STFormModule,
+        RqflistModule,
     ],
 })
 export class WebformModule {}

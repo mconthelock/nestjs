@@ -1,6 +1,6 @@
 import { PartialType, PickType } from '@nestjs/swagger';
-import { CreateGpRbDto, CreateStampReqDto } from './create-gp-rb.dto';
-import { ShowstampGpRbRepository } from '../gp-rb.repository';
+// import { CreateGpRbDto, CreateStampReqDto } from './create-gp-rb.dto';
+// import { ShowstampGpRbRepository } from '../gp-rb.repository';
 import {
     IsNotEmpty,
     IsOptional,

@@ -1,14 +1,19 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({
-    name:"GPRB_PURPOSE",
-    schema:"WEBFORM"
+    name: 'GPRB_PURPOSE',
+    schema: 'WEBFORM',
 })
-export class RB_PURPOSE {
+export class GPRB_PURPOSE {
     @PrimaryColumn()
-    PURPOSE_ID:number;
-    @Column()    
-    PURPOSE_TH:string;
+    PURPOSE_ID: number;
+
     @Column()
-    PURPOSE_EN:string;
+    PURPOSE_TH: string;
+
+    @Column()
+    PURPOSE_EN: string;
+
+    @Column()
+    PURPOSE_GROUP: string;
 }

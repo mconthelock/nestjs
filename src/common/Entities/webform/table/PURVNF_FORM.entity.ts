@@ -7,6 +7,7 @@ import {
     PrimaryColumn,
 } from 'typeorm';
 import { PUR_FILE } from './PUR_FILE.entity';
+import { PURNVF_LIST } from './PURVNF_LIST.entity';
 
 @Entity({ name: 'PURVNF_FORM', schema: 'WEBFORM' })
 export class PURNVF_FORM {
@@ -33,7 +34,10 @@ export class PURNVF_FORM {
 
     @Column()
     ATTOTH: string;
-    
+
     @OneToMany(() => PUR_FILE, (s) => s.MASTER)
     FILES: PUR_FILE[];
+
+    @OneToMany(() => PURNVF_LIST, (l) => l.MASTER_NVFLIST)
+    LISTS: PURNVF_LIST[];
 }

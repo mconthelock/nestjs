@@ -149,16 +149,16 @@ export class GpRbService {
             //         `Invalid stampFormatGroup: "${stampFormatGroup}". Must be "standard" or "other"`,
             //     );
             // }
-            if (file) {
-                const save = await this.handleFileFormService.insertFiles(
-                    {
-                        ...form,
-                        FORM_TYPE: 'GP',
-                        CREATEBY: dto.REQBY,
-                    },
-                    file,
-                );  
-            }
+    if(file){
+            const save = await this.handleFileFormService.insertFiles(
+                {
+                    ...form,
+                    FORM_TYPE: 'GP',
+                    CREATEBY: dto.REQBY,
+                },
+                file,
+            );
+        }
             // throw new Error('test');
 
             return {

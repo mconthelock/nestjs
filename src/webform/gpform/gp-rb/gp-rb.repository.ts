@@ -31,6 +31,7 @@ export class GpRbRepository extends BaseRepository {
         const qb = this.manager
             .createQueryBuilder(GPRB_STAMP_REQ, 'req')
             .leftJoinAndSelect('req.form', 'form')
+            .leftJoinAndSelect('req.formmaster', 'formmst')
             .where('req.NFRMNO = :NFRMNO', { NFRMNO: dto.NFRMNO })
             .andWhere('req.VORGNO = :VORGNO', { VORGNO: dto.VORGNO })
             .andWhere('req.CYEAR = :CYEAR', { CYEAR: dto.CYEAR })

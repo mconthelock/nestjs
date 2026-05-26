@@ -18,9 +18,9 @@ export class CreateFinDDto {
     @Type(() => Number)
     LINE_ID: number;
 
-  @IsNotEmpty()
-  @IsString()
-  REASON: string;
+    @IsNotEmpty()
+    @IsString()
+    REASON: string;
 
     @IsNotEmpty()
     @IsNumber()
@@ -47,10 +47,10 @@ export class CreateFinDFormdto extends PickType(CreateFormDto, [
     @Type(() => Date)
     EFFECTIVE_DATE: Date;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
-    DATE_RECEIVE: Date;
+    DATE_RECEIVE?: Date;
 
     @IsNotEmpty()
     @IsString()

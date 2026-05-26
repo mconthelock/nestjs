@@ -13,6 +13,7 @@ import {
 
 import { FinDsService } from './fin-ds.service';
 import { CreateFinDFormdto } from './dto/create-fin-d.dto';
+import { ActionFinDDto } from './dto/action-fin-d.dto';
 
 import {
     UseTransaction,
@@ -67,12 +68,6 @@ export class FinDsController {
             throw new NotFoundException('File not found');
         }
 
-        /*
-         * สมมติว่า FIN_FILE เก็บ:
-         * FILE_PATH = path folder
-         * FILE_FNAME = ชื่อไฟล์จริงที่ system generate
-         * FILE_ONAME = ชื่อไฟล์เดิมที่ user upload
-         */
         const fullPath = path.join(file.FILE_PATH, file.FILE_FNAME);
 
         if (!fs.existsSync(fullPath)) {
@@ -97,6 +92,15 @@ export class FinDsController {
         const ip = getClientIP(req);
 
         return this.finDsService.create(dto, files, ip);
+    }
+
+    @Post('action')
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
+    action(@Body() dto: ActionFinDDto, @Req() req: Request) {
+        const ip = getClientIP(req);
+
+        return this.finDsService.action(dto, ip);
     }
 
     // @create()

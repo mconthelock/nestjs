@@ -274,96 +274,6 @@ export class GpRbService {
 // }
 //}
 
-<<<<<<< HEAD
-            // สร้าง Form
-            const createForm = await this.formCreateService.create(
-                {
-                    NFRMNO: formmst.NNO,
-                    VORGNO: formmst.VORGNO,
-                    CYEAR: formmst.CYEAR,
-                    REQBY: dto.REQBY,
-                    INPUTBY: dto.INPUTBY,
-                    REMARK: dto.REMARK,
-                },
-                ip,
-            );
-
-            // ตรวจสอบผลการสร้าง Form
-            if (!createForm?.status) {
-                const errMsg =
-                    createForm?.message?.message ||
-                    createForm?.message ||
-                    'Unknown error';
-                throw new Error(`Form creation failed: ${errMsg}`);
-            }
-
-            const form = {
-                NFRMNO: createForm.data.NFRMNO,
-                VORGNO: createForm.data.VORGNO,
-                CYEAR: createForm.data.CYEAR,
-                CYEAR2: createForm.data.CYEAR2,
-                NRUNNO: createForm.data.NRUNNO,
-            };
-            let insert;
-            // บันทึกข้อมูล Stamp Request ตามประเภท
-            if (stampFormatGroup === 'standard') {
-                /*      if(!dto.PURPOSE_ID || !dto.PURPOSE_OTHER || !dto.SPOSCODE|| !dto.NAME_STAMP ) {
-                    throw new BadRequestException('PURPOSE_ID and NAME_STAMP are required for standard stamp group');
-                } */
-                insert = await this.repo.CreateStampReq({
-                    ...form,
-                    PURPOSE_ID: dto.PURPOSE_ID,
-                    PURPOSE_OTHER: dto.PURPOSE_OTHER,
-                    SPOSCODE: dto.SPOSCODE,
-                    NAME_STAMP: dto.NAME_STAMP,
-                    REMARK: dto.STAMP_REMARK,
-                });
-                console.log(insert);
-            } else if (stampFormatGroup === 'other') {
-                if (!dto.QTY) {
-                    throw new BadRequestException(
-                        'QTY are required for other stamp group',
-                    );
-                }
-                insert = await this.repo.CreateCusStampReq({
-                    ...form,
-
-                    QTY: dto.QTY,
-                    STAMPCUS_REMARK: dto.STAMPCUS_REMARK,
-                });
-                insert = await this.repo.CreateStampReq({
-                    ...form,
-                    PURPOSE_ID: dto.PURPOSE_ID,
-                    PURPOSE_OTHER: dto.PURPOSE_OTHER,
-                });
-                const save = await this.handleFileFormService.insertFiles(
-                    {
-                        ...form,
-                        FORM_TYPE: 'GP',
-                        CREATEBY: dto.REQBY,
-                    },
-                    file,
-                );
-                console.log(insert);
-            } else {
-                throw new BadRequestException(
-                    `Invalid stampFormatGroup: "${stampFormatGroup}". Must be "standard" or "other"`,
-                );
-            }
-
-            // throw new Error('test');
-
-            return {
-                status: true,
-                message: 'GP-RB form created successfully',
-                data: insert,
-            };
-        } catch (error) {
-            throw error;
-        }
-    }
-}
-=======
 // สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton
 // @Injectable()
 // export class ShowCusstampGpRbService {
@@ -379,4 +289,3 @@ export class GpRbService {
 //         return this.repo.findOne(dto);
 //     }
 // }
->>>>>>> 75f351ca7b5f70a8e7f75cac74c93f5eef7d612a

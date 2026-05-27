@@ -51,12 +51,12 @@ export class PURNVF_ADDRESS{
     @Column()
     POSTCODE: string;
 
-@ManyToOne(() => PURNVF_FORM, (nvf) => nvf.ADDRESSES)
-  @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
-  @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
-  @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
-  @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
-  @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
-  MASTER_NVFADDR : PURNVF_FORM;
+    @ManyToOne(() => PURNVF_FORM, (nvf) => nvf.ADDRESSES)
+    @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+    @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
+    @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
+    @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+    @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+    MASTER_NVFADDR: PURNVF_FORM;
 
 }

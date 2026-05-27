@@ -9,7 +9,7 @@ import { PurnvfFormRepository } from '../purnvf_form/purnvf_form.repository';
 @Module({
   imports: [TypeOrmModule.forFeature([PURNVF_ADDRESS], 'webformConnection')],
   controllers: [PurnvfAddressController],
-  providers: [PurnvfAddressService,PurnvfFormRepository],
+  providers: [PurnvfAddressService,PurnvfAddressRepository],
   exports: [PurnvfAddressService],
 })
 export class PurnvfAddressModule {}

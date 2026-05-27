@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { PUR_FILE } from './PUR_FILE.entity';
 import { PURNVF_LIST } from './PURVNF_LIST.entity';
+import { PURNVF_ADDRESS } from './PURVNF_ADDRESS.entity';
 
 @Entity({ name: 'PURVNF_FORM', schema: 'WEBFORM' })
 export class PURNVF_FORM {
@@ -40,4 +41,7 @@ export class PURNVF_FORM {
 
     @OneToMany(() => PURNVF_LIST, (l) => l.MASTER_NVFLIST)
     LISTS: PURNVF_LIST[];
+
+    @OneToMany(() => PURNVF_ADDRESS, (a) => a.MASTER_NVFADDR)
+    ADDRESSES: PURNVF_ADDRESS[];
 }

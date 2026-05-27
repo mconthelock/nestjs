@@ -17,10 +17,6 @@ export class CreatePurnvfListDto extends PickType(FormDto,[
   'CYEAR2',
   'NRUNNO',
 ] as const) {    
-    @IsNotEmpty()
-    @IsNumber()
-    LID: number;
-
     @IsString()
     PURPOSE: string;
 
@@ -31,9 +27,11 @@ export class CreatePurnvfListDto extends PickType(FormDto,[
     SERVICE: string;   
 
     @IsString()
+    @IsOptional()
     REASON: string;   
 
     @IsString()
+     @IsOptional()
     VENDCODE: string;
 
     @IsString()
@@ -55,6 +53,7 @@ export class CreatePurnvfListDto extends PickType(FormDto,[
     TELNO: string;
 
     @IsString()
+    @IsOptional()
     FAX: string;
 
     @IsString()

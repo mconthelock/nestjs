@@ -20,7 +20,7 @@ export class PurnvfListRepository extends BaseRepository {
         return this.getRepository(PURNVF_LIST).save(dto);
     }
 
-    async deleteById(dto: CreatePurnvfListDto) {
-        return this.getRepository(PURNVF_LIST).delete({ NFRMNO: dto.NFRMNO, VORGNO: dto.VORGNO, CYEAR: dto.CYEAR ,CYEAR2: dto.CYEAR2, NRUNNO: dto.NRUNNO , LID : dto.LID });
+    async deleteById(dto: CreatePurnvfListDto , LID: number) {
+        return this.getRepository(PURNVF_LIST).delete({ NFRMNO: dto.NFRMNO, VORGNO: dto.VORGNO, CYEAR: dto.CYEAR ,CYEAR2: dto.CYEAR2, NRUNNO: dto.NRUNNO , LID : LID });
     }
 }

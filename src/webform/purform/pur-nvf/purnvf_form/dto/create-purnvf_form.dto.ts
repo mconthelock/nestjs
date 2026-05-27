@@ -7,15 +7,20 @@ import {
     IsNumber,
     IsOptional,
     IsString,
+    ValidateNested,
 } from 'class-validator';
-import { FormDto }  from "src/webform/form/dto/form.dto";
+import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
+import { CreatePurnvfListDto } from "../../purnvf_list/dto/create-purnvf_list.dto";
+import { CreatePurnvfAddressDto } from "../../purnvf_address/dto/create-purnvf_address.dto";
 
-export class CreatePurnvfFormDto extends PickType(FormDto,[
-  'NFRMNO',
-  'VORGNO',
-  'CYEAR',
-  'CYEAR2',
-  'NRUNNO',
+
+export class CreatePurnvfFormDto extends PickType(CreateFormDto,[
+'NFRMNO',
+'VORGNO',
+'CYEAR',
+'REQBY',
+'INPUTBY',
+'REMARK',
 ] as const) {    
     @IsNotEmpty()
     @IsString()
@@ -27,4 +32,14 @@ export class CreatePurnvfFormDto extends PickType(FormDto,[
     @IsOptional()
     @IsString()
     ATTOTH?: string;
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => CreatePurnvfListDto)
+    LISTS: CreatePurnvfListDto[];   
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => CreatePurnvfAddressDto)
+    ADDRESSES: CreatePurnvfAddressDto[];    
 }

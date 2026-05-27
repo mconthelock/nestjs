@@ -75,15 +75,8 @@ export class GpRbController {
     @UseForceTransaction()
     update(@Body() dto: UpdateNamestampdto, @Req() req: Request) {
         const ip = getClientIP(req);
-        const updateDto = {
-            NFRMNO: dto.NFRMNO,
-            VORGNO: dto.VORGNO,
-            CYEAR: dto.CYEAR,
-            CYEAR2: dto.CYEAR2,
-            NRUNNO: dto.NRUNNO,
-            ...dto,
-        };
-        return this.gpRbServicee.doaction(updateDto, ip);
+        
+        return this.gpRbServicee.doaction(dto, ip);
     }
 }
 

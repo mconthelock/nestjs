@@ -11,6 +11,7 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 
+import { DS_STAMP_REPORT } from 'src/common/Entities/webform/views/FINDS_STAMP_REPORT.entity';
 import { FinDsService } from './fin-ds.service';
 import { CreateFinDFormdto } from './dto/create-fin-d.dto';
 import { ActionFinDDto } from './dto/action-fin-d.dto';
@@ -31,6 +32,15 @@ import * as path from 'path';
 export class FinDsController {
     constructor(private readonly finDsService: FinDsService) {}
 
+    @Get('report/:fyear')
+    findForShowReport(
+        @Param('fyear') fyear: string,
+    ) {
+        return this.finDsService.findForShowReport(Number(fyear));
+    }
+
+
+
     @Get()
     findAll() {
         return this.finDsService.findAll();
@@ -42,6 +52,7 @@ export class FinDsController {
     findAllHeadForShow() {
         return this.finDsService.findAllHeadForShow();
     }
+
 
     // ดึงรายการเดียว พร้อม head/detail/files
     // ดึงรายการเดียว พร้อม head/detail/files

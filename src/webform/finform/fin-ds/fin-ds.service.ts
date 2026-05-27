@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateFinDFormdto } from './dto/create-fin-d.dto';
 import { ActionFinDDto } from './dto/action-fin-d.dto';
 import { FinDsRepository } from './fin-ds.repository';
+import { DS_STAMP_REPORT } from 'src/common/Entities/webform/views/FINDS_STAMP_REPORT.entity';
 
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
@@ -243,4 +244,19 @@ export class FinDsService {
             throw error;
         }
     }
+    async findForShowReport(FYEAR: number) {
+    const datareport = await this.repo.findReport(FYEAR);
+
+    return {
+        status: true,
+        message: 'Get FIN-DS report success',
+        datareport,
+    };
+}
+
+
+
+
+
+
 }

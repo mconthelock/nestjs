@@ -11,8 +11,10 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 
+import { DS_STAMP_REPORT } from 'src/common/Entities/webform/views/FINDS_STAMP_REPORT.entity';
 import { FinDsService } from './fin-ds.service';
 import { CreateFinDFormdto } from './dto/create-fin-d.dto';
+import { ActionFinDDto } from './dto/action-fin-d.dto';
 
 import {
     UseTransaction,
@@ -30,6 +32,15 @@ import * as path from 'path';
 export class FinDsController {
     constructor(private readonly finDsService: FinDsService) {}
 
+    @Get('report/:fyear')
+    findForShowReport(
+        @Param('fyear') fyear: string,
+    ) {
+        return this.finDsService.findForShowReport(Number(fyear));
+    }
+
+
+
     @Get()
     findAll() {
         return this.finDsService.findAll();
@@ -41,6 +52,7 @@ export class FinDsController {
     findAllHeadForShow() {
         return this.finDsService.findAllHeadForShow();
     }
+
 
     // ดึงรายการเดียว พร้อม head/detail/files
     // ดึงรายการเดียว พร้อม head/detail/files
@@ -67,12 +79,6 @@ export class FinDsController {
             throw new NotFoundException('File not found');
         }
 
-        /*
-         * สมมติว่า FIN_FILE เก็บ:
-         * FILE_PATH = path folder
-         * FILE_FNAME = ชื่อไฟล์จริงที่ system generate
-         * FILE_ONAME = ชื่อไฟล์เดิมที่ user upload
-         */
         const fullPath = path.join(file.FILE_PATH, file.FILE_FNAME);
 
         if (!fs.existsSync(fullPath)) {
@@ -97,6 +103,15 @@ export class FinDsController {
         const ip = getClientIP(req);
 
         return this.finDsService.create(dto, files, ip);
+    }
+
+    @Post('action')
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
+    action(@Body() dto: ActionFinDDto, @Req() req: Request) {
+        const ip = getClientIP(req);
+
+        return this.finDsService.action(dto, ip);
     }
 
     // @create()

@@ -40,7 +40,6 @@ export class CreateFinDFormdto extends PickType(CreateFormDto, [
     @IsNotEmpty()
     @IsString()
     @Transform(({ value }) => String(value))
-    @Transform(({ value }) => String(value))
     OPTION_CODE: string;
 
     @IsNotEmpty()
@@ -48,10 +47,10 @@ export class CreateFinDFormdto extends PickType(CreateFormDto, [
     @Type(() => Date)
     EFFECTIVE_DATE: Date;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
-    DATE_RECEIVE: Date;
+    DATE_RECEIVE?: Date;
 
     @IsNotEmpty()
     @IsString()

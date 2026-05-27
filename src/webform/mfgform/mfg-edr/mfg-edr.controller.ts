@@ -64,9 +64,9 @@ export class MfgEdrController {
     return this.mfgEdrService.getMfgEdr(dto);
   }
 
-  @Post('update-why-effect')
-  async updateWhyEffect(@Body() dto: any) {
-    return this.mfgEdrService.updateWhyEffect(dto);
+  @Post('update-cause4m')
+  async updateCause4M(@Body() dto: any) {
+    return this.mfgEdrService.updateCause4M(dto);
   }
 
 }

@@ -1,38 +1,37 @@
-import { Injectable } from "@nestjs/common";
-import { InjectDataSource } from "@nestjs/typeorm";
+import { Injectable } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
 
+import { DS_STAMP_REPORT } from "src/common/Entities/webform/views/FINDS_STAMP_REPORT.entity";
 import { DSDUTYSTAMP } from 'src/common/Entities/webform/table/FINDS_DUTY_STAMP.entity';
 import { DSREQDETAIL } from 'src/common/Entities/webform/table/FINDS_REQ_DETAIL.entity';
 import { DSREQHEAD } from 'src/common/Entities/webform/table/FINDS_REQ_HEAD.entity';
-import { FIN_FILE } from "src/common/Entities/webform/table/FIN_FILE.entity";
+import { FIN_FILE } from 'src/common/Entities/webform/table/FIN_FILE.entity';
 
-import { BaseRepository } from "src/common/repositories/base-repository";
-import { DataSource } from "typeorm";
+import { BaseRepository } from 'src/common/repositories/base-repository';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class FinDsRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-    ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds);
     }
 
     findall() {
         return this.getRepository(DSDUTYSTAMP).find({
             where: {
-                ACTIVE: "1"
+                ACTIVE: '1',
             },
             order: {
-                DUTY_VALUE: 'asc'
-            }
+                DUTY_VALUE: 'asc',
+            },
         });
     }
 
     async findAllHead() {
         return this.getRepository(DSREQHEAD).find({
             order: {
-                NRUNNO: 'desc'
-            }
+                NRUNNO: 'desc',
+            },
         });
     }
 
@@ -48,7 +47,7 @@ export class FinDsRepository extends BaseRepository {
                 VORGNO: vorgno,
                 CYEAR: cyear,
                 NRUNNO: nrunno,
-            }
+            },
         });
     }
 
@@ -66,8 +65,8 @@ export class FinDsRepository extends BaseRepository {
                 NRUNNO: nrunno,
             },
             order: {
-                LINEID: 'asc'
-            }
+                LINEID: 'asc',
+            },
         });
     }
 
@@ -106,12 +105,7 @@ export class FinDsRepository extends BaseRepository {
         cyear: string,
         nrunno: number,
     ) {
-        const head = await this.findHeadByForm(
-            nfrmno,
-            vorgno,
-            cyear,
-            nrunno,
-        );
+        const head = await this.findHeadByForm(nfrmno, vorgno, cyear, nrunno);
 
         const detail = await this.findDetailByForm(
             nfrmno,
@@ -120,12 +114,7 @@ export class FinDsRepository extends BaseRepository {
             nrunno,
         );
 
-        const files = await this.findFilesByForm(
-            nfrmno,
-            vorgno,
-            cyear,
-            nrunno,
-        );
+        const files = await this.findFilesByForm(nfrmno, vorgno, cyear, nrunno);
 
         return {
             head,
@@ -134,11 +123,50 @@ export class FinDsRepository extends BaseRepository {
         };
     }
 
-    async createHead(data: DSREQHEAD) {
+    async createHead(data: Partial<DSREQHEAD>) {
         return this.getRepository(DSREQHEAD).save(data);
+    }
+
+    async updateDateReceiveToToday(form: {
+        NFRMNO: number;
+        VORGNO: string;
+        CYEAR: string;
+        CYEAR2: string;
+        NRUNNO: number;
+    }) {
+        return this.getRepository(DSREQHEAD)
+            .createQueryBuilder()
+            .update(DSREQHEAD)
+            .set({
+                DATE_RECEIVE: () => 'SYSDATE',
+            } as any)
+            .where('NFRMNO = :NFRMNO', { NFRMNO: form.NFRMNO })
+            .andWhere('VORGNO = :VORGNO', { VORGNO: form.VORGNO })
+            .andWhere('CYEAR = :CYEAR', { CYEAR: form.CYEAR })
+            .andWhere('CYEAR2 = :CYEAR2', { CYEAR2: form.CYEAR2 })
+            .andWhere('NRUNNO = :NRUNNO', { NRUNNO: form.NRUNNO })
+            .execute();
     }
 
     async createdetail(data: DSREQDETAIL) {
         return this.getRepository(DSREQDETAIL).save(data);
     }
+
+    async findReport(FYEAR: number) {
+    return this.getRepository(DS_STAMP_REPORT).find({
+        where: {
+            FYEAR: FYEAR,
+        },
+        order: {
+            DATE_RECEIVE: 'asc',
+            NRUNNO: 'asc',
+        },
+    });
+}
+
+
+
+
+
+
 }

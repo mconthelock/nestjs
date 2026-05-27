@@ -14,10 +14,7 @@ import { EdrProcessMst } from '../../../common/Entities/webform/table/edr_proces
 import { MfgEdrFormHead } from '../../../common/Entities/webform/table/mfg_edr_form_head.entity';
 import { MfgEdrFormList } from '../../../common/Entities/webform/table/mfg_edr_form_list.entity';
 import { MfgEdrFormAtt } from '../../../common/Entities/webform/table/mfg_edr_form_att.entity';
-import { MfgEdrFormCorrective } from '../../../common/Entities/webform/table/mfg_edr_form_corrective.entity';
-import { MfgEdrFormPreventive } from '../../../common/Entities/webform/table/mfg_edr_form_preventive.entity';
-import { MfgEdrFormWhy } from '../../../common/Entities/webform/table/mfg_edr_form_why.entity';
-
+import { MfgEdrFormCause4m } from '../../../common/Entities/webform/table/mfg_edr_form_cause4m.entity';
 
 import { AmecOrders } from 'src/common/Entities/workload/table/amecorders.entity';
 import { AmecOrdersSchedule } from 'src/common/Entities/workload/table/amecorders_schedule.entity';
@@ -57,14 +54,8 @@ export class MfgEdrService {
     @InjectRepository(MfgEdrFormAtt, 'webformConnection')
     private readonly formAttRepo: Repository<MfgEdrFormAtt>,
 
-    @InjectRepository(MfgEdrFormCorrective, 'webformConnection')
-    private readonly formCorrectiveRepo: Repository<MfgEdrFormCorrective>,
-
-    @InjectRepository(MfgEdrFormPreventive, 'webformConnection')
-    private readonly formPreventiveRepo: Repository<MfgEdrFormPreventive>,
-
-    @InjectRepository(MfgEdrFormWhy, 'webformConnection')
-    private readonly formWhyRepo: Repository<MfgEdrFormWhy>,
+    @InjectRepository(MfgEdrFormCause4m, 'webformConnection')
+    private readonly formCause4mRepo: Repository<MfgEdrFormCause4m>,
 
     @InjectRepository(FORM, 'webformConnection')
     private readonly formRepo: Repository<FORM>,
@@ -150,13 +141,14 @@ export class MfgEdrService {
 
       if (!REQBY) throw new Error('REQBY is required');
 
-      const requesterSseccode = await this.getRequesterSseccode(manager, REQBY);
-      if (!requesterSseccode) throw new Error('Requester SSECCODE not found');
+      const requester = await this.getRequesterInfo(manager, REQBY);
+      if (!requester.SSECCODE) throw new Error('Requester SSECCODE not found');
 
-      dto.SSECCODE = requesterSseccode;
+      dto.SSECCODE = requester.SSECCODE;
+      dto.SDEPCODE = requester.SDEPCODE;
 
       await this.insertFormHead(manager, key, dto);
-      await this.syncApproveFlowStep18(manager, key, dto);
+      await this.syncApproveFlow(manager, key, dto);
 
       const listCount = await this.insertFormList(manager, key, dto.list ?? []);
       const attCount = await this.insertFormAtt(manager, key, dto.att ?? []);
@@ -183,6 +175,160 @@ export class MfgEdrService {
     };
   }
 
+
+  private async syncApproveFlow(
+    manager: EntityManager,
+    key: FormKey,
+    dto: CreateMfgEdrDto,
+  ) {
+    const flowKey = this.getFormKey(key as CreateMfgEdrDto);
+
+    const SSECCODE = String(dto.SSECCODE || '').trim();
+    const SDEPCODE = String((dto as any).SDEPCODE || '').trim();
+
+    if (!SSECCODE) throw new Error('Requester SSECCODE not found');
+
+    const step61 = await this.findFlowStep(manager, flowKey, '61');
+    const step18 = await this.findFlowStep(manager, flowKey, '18');
+
+    if (!step61 && !step18) return;
+
+    const emp61 = step61 && SDEPCODE ? await this.findApprover(manager, 'SDEPCODE', SDEPCODE, '35') : '';
+    const emp18 = step18 ? await this.findApprover(manager, 'SSECCODE', SSECCODE, '33'): '';
+
+    if (emp61) await this.updateApprover(manager, flowKey, '61', emp61);
+    if (emp18) await this.updateApprover(manager, flowKey, '18', emp18);
+
+    if (emp61 && emp18) return;
+
+    if (step61 && !emp61) {
+      await this.bypassStep(manager, flowKey, '61', emp18 ? '18' : String(step18?.CSTEPNEXTNO || '').trim());
+      await this.deleteFlowStep(manager, flowKey, '61');
+    }
+
+    if (step18 && !emp18) {
+      if (emp61) {
+        await this.updateStepNext(manager, flowKey, '61', String(step18.CSTEPNEXTNO || '').trim());
+      } else {
+        await this.bypassStep(manager, flowKey, '18', String(step18.CSTEPNEXTNO || '').trim());
+      }
+
+      await this.deleteFlowStep(manager, flowKey, '18');
+    }
+  }
+
+  private async findFlowStep(
+    manager: EntityManager,
+    flowKey: FormKey,
+    stepNo: string,
+  ) {
+    return manager
+      .createQueryBuilder(FLOW, 'F')
+      .select(['F.CSTEPNO AS CSTEPNO', 'F.CSTEPNEXTNO AS CSTEPNEXTNO'])
+      .where('F.NFRMNO = :NFRMNO', flowKey)
+      .andWhere('F.VORGNO = :VORGNO', flowKey)
+      .andWhere('F.CYEAR = :CYEAR', flowKey)
+      .andWhere('F.CYEAR2 = :CYEAR2', flowKey)
+      .andWhere('F.NRUNNO = :NRUNNO', flowKey)
+      .andWhere('TO_CHAR(F.CSTEPNO) = :stepNo', { stepNo })
+      .getRawOne();
+  }
+
+  private async findApprover(
+    manager: EntityManager,
+    field: 'SSECCODE' | 'SDEPCODE',
+    code: string,
+    posCode: string,
+  ) {
+    const row = await manager
+      .createQueryBuilder(AMECUSERALL, 'U')
+      .select('TRIM(U.SEMPNO)', 'SEMPNO')
+      .where(`TRIM(U.${field}) = :code`, { code })
+      .andWhere('TO_CHAR(U.SPOSCODE) = :posCode', { posCode })
+      .andWhere("TO_CHAR(U.CSTATUS) = '1'")
+      .getRawOne();
+
+    return String(row?.SEMPNO || '').trim();
+  }
+
+  private async updateApprover(
+    manager: EntityManager,
+    flowKey: FormKey,
+    stepNo: string,
+    empno: string,
+  ) {
+    return manager
+      .createQueryBuilder()
+      .update(FLOW)
+      .set({ VAPVNO: empno, VREPNO: empno } as any)
+      .where('NFRMNO = :NFRMNO', flowKey)
+      .andWhere('VORGNO = :VORGNO', flowKey)
+      .andWhere('CYEAR = :CYEAR', flowKey)
+      .andWhere('CYEAR2 = :CYEAR2', flowKey)
+      .andWhere('NRUNNO = :NRUNNO', flowKey)
+      .andWhere('TO_CHAR(CSTEPNO) = :stepNo', { stepNo })
+      .execute();
+  }
+
+  private async updateStepNext(
+    manager: EntityManager,
+    flowKey: FormKey,
+    stepNo: string,
+    nextStepNo: string,
+  ) {
+    if (!nextStepNo) throw new Error(`Next step of step ${stepNo} not found`);
+
+    return manager
+      .createQueryBuilder()
+      .update(FLOW)
+      .set({ CSTEPNEXTNO: nextStepNo } as any)
+      .where('NFRMNO = :NFRMNO', flowKey)
+      .andWhere('VORGNO = :VORGNO', flowKey)
+      .andWhere('CYEAR = :CYEAR', flowKey)
+      .andWhere('CYEAR2 = :CYEAR2', flowKey)
+      .andWhere('NRUNNO = :NRUNNO', flowKey)
+      .andWhere('TO_CHAR(CSTEPNO) = :stepNo', { stepNo })
+      .execute();
+  }
+
+  private async bypassStep(
+    manager: EntityManager,
+    flowKey: FormKey,
+    oldStepNo: string,
+    newStepNo: string,
+  ) {
+    if (!newStepNo) throw new Error(`Next step of step ${oldStepNo} not found`);
+    return manager
+      .createQueryBuilder()
+      .update(FLOW)
+      .set({ CSTEPNEXTNO: newStepNo } as any)
+      .where('NFRMNO = :NFRMNO', flowKey)
+      .andWhere('VORGNO = :VORGNO', flowKey)
+      .andWhere('CYEAR = :CYEAR', flowKey)
+      .andWhere('CYEAR2 = :CYEAR2', flowKey)
+      .andWhere('NRUNNO = :NRUNNO', flowKey)
+      .andWhere('TO_CHAR(CSTEPNEXTNO) = :oldStepNo', { oldStepNo })
+      .execute();
+  }
+
+  private async deleteFlowStep(
+    manager: EntityManager,
+    flowKey: FormKey,
+    stepNo: string,
+  ) {
+    return manager
+      .createQueryBuilder()
+      .delete()
+      .from(FLOW)
+      .where('NFRMNO = :NFRMNO', flowKey)
+      .andWhere('VORGNO = :VORGNO', flowKey)
+      .andWhere('CYEAR = :CYEAR', flowKey)
+      .andWhere('CYEAR2 = :CYEAR2', flowKey)
+      .andWhere('NRUNNO = :NRUNNO', flowKey)
+      .andWhere('TO_CHAR(CSTEPNO) = :stepNo', { stepNo })
+      .execute();
+  }
+/*
  private async syncApproveFlowStep18(
   manager: EntityManager,
   key: FormKey,
@@ -243,7 +389,6 @@ export class MfgEdrService {
   }
 
   const nextStepNo = String(step18.CSTEPNEXTNO || '').trim();
-
   await manager
     .createQueryBuilder()
     .update(FLOW)
@@ -270,19 +415,26 @@ export class MfgEdrService {
     .andWhere("TO_CHAR(CSTEPNO) = :CSTEPNO", { CSTEPNO: '18' })
     .execute();
 }
+*/
 
-  private async getRequesterSseccode(
-    manager: EntityManager,
+  private async getRequesterInfo(
+      manager: EntityManager,
     reqby: string,
   ) {
     const requester = await manager
       .createQueryBuilder(AMECUSERALL, 'R')
-      .select('TRIM(R.SSECCODE)', 'SSECCODE')
+      .select([
+        'TRIM(R.SSECCODE) AS SSECCODE',
+        'TRIM(R.SDEPCODE) AS SDEPCODE',
+      ])
       .where('TRIM(R.SEMPNO) = :REQBY', { REQBY: reqby })
       .andWhere("TO_CHAR(R.CSTATUS) = :CSTATUS", { CSTATUS: '1' })
       .getRawOne();
 
-    return String(requester?.SSECCODE || '').trim();
+    return {
+      SSECCODE: String(requester?.SSECCODE || '').trim(),
+      SDEPCODE: String(requester?.SDEPCODE || '').trim(),
+    };
   }
 
   private async insertFormHead(
@@ -508,20 +660,11 @@ export class MfgEdrService {
       order: { ID: 'ASC' },
     });
 
-    const corrective = await this.formCorrectiveRepo.find({
+    const cause4m = await this.formCause4mRepo.find({
       where: key,
       order: { ID: 'ASC' },
     });
 
-    const preventive = await this.formPreventiveRepo.find({
-      where: key,
-      order: { ID: 'ASC' },
-    });
-
-    const why = await this.formWhyRepo.find({
-      where: key,
-      order: { ID: 'ASC' },
-    });
 
     return {
       status: true,
@@ -531,15 +674,13 @@ export class MfgEdrService {
         head,
         list,
         att,
-        corrective,
-        preventive,
-        why,
+        cause4m,
       },
     };
   }
 
 
-  async updateWhyEffect(dto: any) {
+  async updateCause4M(dto: any) {
     const key = {
       NFRMNO: Number(dto.NFRMNO),
       VORGNO: String(dto.VORGNO),
@@ -549,83 +690,29 @@ export class MfgEdrService {
     };
 
     return await this.dataSource.transaction(async (manager) => {
-      if (Array.isArray(dto.DETAIL_LIST)) {
-        for (const row of dto.DETAIL_LIST) {
-          if (!row.ID) continue;
-
-          await manager.update(
-            MfgEdrFormList,
-            {
-              ...key,
-              ID: Number(row.ID),
-            },
-            {
-              LV_EFFECT: row.LV_EFFECT || null,
-              EFFECT: row.EFFECT || null,
-            },
-          );
-        }
-      }
-
-      await manager.delete(MfgEdrFormWhy, key);
-      if (Array.isArray(dto.WHY_LIST)) {
-        const whyRows = dto.WHY_LIST
-          .filter((row) => row.WHY)
+      await manager.delete(MfgEdrFormCause4m, key);
+      if (Array.isArray(dto.CAUSE4M_LIST)) {
+        const cause4mRows = dto.CAUSE4M_LIST
+          .filter((row) => row.CAUSE)
           .map((row, index) =>
-            manager.create(MfgEdrFormWhy, {
+            manager.create(MfgEdrFormCause4m, {
               ...key,
               ID: index + 1,
-              WHY: row.WHY,
-            }),
-          );
-
-        if (whyRows.length) {
-          await manager.save(MfgEdrFormWhy, whyRows);
-        }
-      }
-
-      await manager.delete(MfgEdrFormCorrective, key);
-      if (Array.isArray(dto.CORRECTIVE_LIST)) {
-        const correctiveRows = dto.CORRECTIVE_LIST
-          .filter((row) => row.CORRECTIVE)
-          .map((row, index) =>
-            manager.create(MfgEdrFormCorrective, {
-              ...key,
-              ID: index + 1,
-              CORRECTIVE: row.CORRECTIVE,
+              CAUSE: row.CAUSE,
+              DETAIL: row.DETAIL,
               DUE_DATE: row.DUE_DATE || null,
               PIC: row.PIC || null,
             }),
           );
 
-        if (correctiveRows.length) {
-          await manager.save(MfgEdrFormCorrective, correctiveRows);
-        }
-      }
-
-      await manager.delete(MfgEdrFormPreventive, key);
-
-      if (Array.isArray(dto.PREVENTIVE_LIST)) {
-        const preventiveRows = dto.PREVENTIVE_LIST
-          .filter((row) => row.PREVENTIVE)
-          .map((row, index) =>
-            manager.create(MfgEdrFormPreventive, {
-              ...key,
-              ID: index + 1,
-              PREVENTIVE: row.PREVENTIVE,
-              DUE_DATE: row.DUE_DATE || null,
-              PIC: row.PIC || null,
-            }),
-          );
-
-        if (preventiveRows.length) {
-          await manager.save(MfgEdrFormPreventive, preventiveRows);
+        if (cause4mRows.length) {
+          await manager.save(MfgEdrFormCause4m, cause4mRows);
         }
       }
 
       return {
         status: true,
-        message: 'Update why/effect success',
+        message: 'Update Cause 4 M success',
       };
     });
   }

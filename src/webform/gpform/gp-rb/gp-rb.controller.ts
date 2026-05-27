@@ -70,7 +70,7 @@ export class GpRbController {
     }
     /*stampFormatGroup ถูกแก้ไขเข้ามาเพื่อจะเลือกข้อมูลไป insert เข้าตาราง */
 
-    @Patch('/:fno/:orgno/:cyear/:cyear2/:nrunno')
+    @Patch()
     @UseTransaction('webformConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ webformConnection
     @UseForceTransaction()
     update(@Body() dto: UpdateNamestampdto, @Req() req: Request) {

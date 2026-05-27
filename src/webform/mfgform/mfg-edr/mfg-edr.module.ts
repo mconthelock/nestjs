@@ -12,9 +12,7 @@ import { EdrProcessMst } from '../../../common/Entities/webform/table/edr_proces
 import { MfgEdrFormHead } from '../../../common/Entities/webform/table/mfg_edr_form_head.entity';
 import { MfgEdrFormList } from '../../../common/Entities/webform/table/mfg_edr_form_list.entity';
 import { MfgEdrFormAtt } from '../../../common/Entities/webform/table/mfg_edr_form_att.entity';
-import { MfgEdrFormCorrective } from '../../../common/Entities/webform/table/mfg_edr_form_corrective.entity';
-import { MfgEdrFormPreventive } from '../../../common/Entities/webform/table/mfg_edr_form_preventive.entity';
-import { MfgEdrFormWhy } from '../../../common/Entities/webform/table/mfg_edr_form_why.entity';
+import { MfgEdrFormCause4m } from '../../../common/Entities/webform/table/mfg_edr_form_cause4m.entity';
 
 import { AmecOrders } from 'src/common/Entities/workload/table/amecorders.entity';
 import { AmecOrdersSchedule } from 'src/common/Entities/workload/table/amecorders_schedule.entity';
@@ -34,9 +32,7 @@ import { AMECUSERALL } from '../../../common/Entities/amec/views/AMECUSERALL.ent
       MfgEdrFormHead,
       MfgEdrFormList,
       MfgEdrFormAtt,
-      MfgEdrFormCorrective,
-      MfgEdrFormPreventive,
-      MfgEdrFormWhy,
+      MfgEdrFormCause4m,
       FORM,
       FLOW,
       AMECUSERALL,

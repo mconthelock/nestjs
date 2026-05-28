@@ -18,53 +18,65 @@ export class CreatePurnvfListDto extends PickType(FormDto,[
   'NRUNNO',
 ] as const) {    
     @IsString()
-    PURPOSE: string;
-
-    @IsString()
-    TYPEJOB: string;
-
-    @IsString()
-    SERVICE: string;   
+    @IsOptional()
+    PURPOSE?: string;
 
     @IsString()
     @IsOptional()
-    REASON: string;   
+    TYPEJOB?: string;
 
     @IsString()
-     @IsOptional()
-    VENDCODE: string;
+    @IsOptional()
+    SERVICE?: string;   
 
     @IsString()
-    VENDTYPE: string;
+    @IsOptional()
+    REASON?: string;   
+
+    @IsString()
+    @IsOptional()
+    VENDCODE?: string;
+
+    @IsString()
+    @IsOptional()
+    VENDTYPE?: string;
 
     @IsString()
     COMNAME: string;
 
     @IsString()
-    CONTACT: string;
-
-    @IsString()
-    EMAIL: string;
-    
-    @IsString()
-    WEBSITE: string;
-
-    @IsString()
-    TELNO: string;
+    @IsOptional()
+    CONTACT?: string;
 
     @IsString()
     @IsOptional()
-    FAX: string;
+    EMAIL?: string;
+    
+    @IsString()
+    @IsOptional()
+    WEBSITE?: string;
 
     @IsString()
-    BANKNAME: string;
+    @IsOptional()
+    TELNO?: string;
 
     @IsString()
-    BRANCH: string;
+    @IsOptional()
+    FAX?: string;
 
     @IsString()
-    ACCNUMBER: string;
+    @IsOptional()
+    BANKNAME?: string;
 
     @IsString()
-    TERMCODE: string;
+    @IsOptional()
+    BRANCH?: string;
+
+    @IsString()
+    @IsOptional()
+    ACCNUMBER?: string;
+
+    @IsString()
+    @IsOptional()
+    TERMCODE?: string;
 }

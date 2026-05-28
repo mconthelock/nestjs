@@ -21,6 +21,7 @@ export class CreatePurnvfAddressDto extends PickType(FormDto,[
     @IsString()
     ADDRTYPE: string;
 
+    @IsNotEmpty()
     @IsString()
     ADDR: string;
 

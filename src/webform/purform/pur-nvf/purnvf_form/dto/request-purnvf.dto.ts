@@ -4,19 +4,27 @@ import {
     IsArray,
     IsDate,
     IsNotEmpty,
+    IsNotEmptyObject,
     IsNumber,
     IsOptional,
     IsString,
     ValidateNested,
+    ArrayMinSize,
+    Validate
 } from 'class-validator';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
+import { CreatePurnvfFormDto } from "./create-purnvf_form.dto";
+import { CreatePurnvfListDto } from "../../purnvf_list/dto/create-purnvf_list.dto";
+import { CreatePurnvfAddressDto } from "../../purnvf_address/dto/create-purnvf_address.dto";
 
-export class CreatePurnvfFormDto extends PickType(FormDto,[
+
+export class RequestPurnvfFormDto extends PickType(CreateFormDto,[
 'NFRMNO',
 'VORGNO',
 'CYEAR',
-'CYEAR2',
-'NRUNNO',
+'REQBY',
+'INPUTBY',
+'REMARK',
 ] as const) {    
     @IsNotEmpty()
     @IsString()
@@ -33,5 +41,5 @@ export class CreatePurnvfFormDto extends PickType(FormDto,[
     @IsString()
     ATTACH_OTHER?: string;
 
-
+ 
 }

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PurnvfFormService } from './purnvf_form/purnvf_form.service';
+import { RequestPurnvfFormDto } from './purnvf_form/dto/request-purnvf.dto';
 import { CreatePurnvfFormDto } from './purnvf_form/dto/create-purnvf_form.dto';
 import { PurnvfFormRepository } from './purnvf_form/purnvf_form.repository';
 import { PurnvfListService } from './purnvf_list/purnvf_list.service';
@@ -38,12 +39,13 @@ export class PurNvfRequestService  {
     ) {}
   
     async request(
-        dto: CreatePurnvfFormDto,
+        dto: RequestPurnvfFormDto,
         files: Express.Multer.File[],
         ip: string,
         path: string,
     ) {
         let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
+
         try {
             const { REQBY, INPUTBY, REMARK, ...data } = dto;
 
@@ -71,18 +73,19 @@ export class PurNvfRequestService  {
             };
 
             // 2. หากมี THIRD_PARTY ให้เพิ่ม flow cstepno 40
-            if (dto.THIRD_PARTY) {
-                await this.insertThridPartyStep(form, dto.THIRD_PARTY);
-            }
+           // if (dto.THIRD_PARTY) {
+            //    await this.insertThridPartyStep(form, dto.THIRD_PARTY);
+           // }
             // 3. เมื่อ PAYMENT ต่ำกว่า 10,000 ให้ลบ flow ddim, dim ออก
-            if (data.PAYMENT < 10000) {
-                await this.deleteStep(form, ['03', '02']);
-            }
-            // 4. บันทึกข้อมูล PUR-CPM
-            await this.insert({
-                ...data,
-                CYEAR2: form.CYEAR2,
-                NRUNNO: form.NRUNNO,
+            //if (data.PAYMENT < 10000) {
+             //   await this.deleteStep(form, ['03', '02']);
+           // }
+            // 4. บันทึกข้อมูล PUR-NVF form
+            await this.repo.insert({
+                ...form,
+                REQTYPE: data.REQTYPE,
+                ATTACH_TYPE: data.ATTACH_TYPE,
+                ATTACH_OTHER: data.ATTACH_OTHER,
             });
             // 5. ย้ายไฟล์ไปยังปลายทางและ Insert ข้อมูลไฟล์ใหม่ (ถ้ามี)
             if (files && files.length > 0) {
@@ -102,7 +105,7 @@ export class PurNvfRequestService  {
                 ...movedTargets.map((p) => deleteFile(p)), // - ลบไฟล์ที่ "ปลายทาง" ทั้งหมดที่ย้ายสำเร็จไปแล้ว (กัน orphan file)
                 ...files.map((f) => deleteFile(f.path)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
             ]);
-            throw new Error('Request PUR-CPM Form Error: ' + error.message);
+            throw new Error('Request PUR-NVF Form Error: ' + error.message);
         }
     }
     
@@ -130,6 +133,9 @@ export class PurNvfRequestService  {
             }
             return movedTargets; // คืนรายชื่อไฟล์ที่ย้ายสำเร็จ (ถ้าต้องการ)
         }
+        
+   
+     
 }
 
 

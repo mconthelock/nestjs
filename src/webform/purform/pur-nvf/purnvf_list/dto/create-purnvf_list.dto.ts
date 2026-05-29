@@ -17,55 +17,66 @@ export class CreatePurnvfListDto extends PickType(FormDto,[
   'CYEAR2',
   'NRUNNO',
 ] as const) {    
-    @IsNotEmpty()
-    @IsNumber()
-    LID: number;
+    @IsString()
+    @IsOptional()
+    PURPOSE?: string;
 
     @IsString()
-    PURPOSE: string;
+    @IsOptional()
+    TYPEJOB?: string;
 
     @IsString()
-    TYPEJOB: string;
+    @IsOptional()
+    SERVICE?: string;   
 
     @IsString()
-    SERVICE: string;   
+    @IsOptional()
+    REASON?: string;   
 
     @IsString()
-    REASON: string;   
+    @IsOptional()
+    VENDCODE?: string;
 
     @IsString()
-    VENDCODE: string;
-
-    @IsString()
-    VENDTYPE: string;
+    @IsOptional()
+    VENDTYPE?: string;
 
     @IsString()
     COMNAME: string;
 
     @IsString()
-    CONTACT: string;
+    @IsOptional()
+    CONTACT?: string;
 
     @IsString()
-    EMAIL: string;
+    @IsOptional()
+    EMAIL?: string;
     
     @IsString()
-    WEBSITE: string;
+    @IsOptional()
+    WEBSITE?: string;
 
     @IsString()
-    TELNO: string;
+    @IsOptional()
+    TELNO?: string;
 
     @IsString()
-    FAX: string;
+    @IsOptional()
+    FAX?: string;
 
     @IsString()
-    BANKNAME: string;
+    @IsOptional()
+    BANKNAME?: string;
 
     @IsString()
-    BRANCH: string;
+    @IsOptional()
+    BRANCH?: string;
 
     @IsString()
-    ACCNUMBER: string;
+    @IsOptional()
+    ACCNUMBER?: string;
 
     @IsString()
-    TERMCODE: string;
+    @IsOptional()
+    TERMCODE?: string;
 }

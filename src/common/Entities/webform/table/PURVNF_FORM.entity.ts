@@ -10,7 +10,7 @@ import { PUR_FILE } from './PUR_FILE.entity';
 import { PURNVF_LIST } from './PURVNF_LIST.entity';
 import { PURNVF_ADDRESS } from './PURVNF_ADDRESS.entity';
 
-@Entity({ name: 'PURVNF_FORM', schema: 'WEBFORM' })
+@Entity({ name: 'PURNVF_FORM', schema: 'WEBFORM' })
 export class PURNVF_FORM {
     @PrimaryColumn()
     NFRMNO: number;
@@ -31,10 +31,10 @@ export class PURNVF_FORM {
     REQTYPE: string;
 
     @Column()
-    ATTTYPE: string;
+    ATTACH_TYPE: string;
 
     @Column()
-    ATTOTH: string;
+    ATTACH_OTHER: string;
 
     @OneToMany(() => PUR_FILE, (s) => s.MASTER)
     FILES: PUR_FILE[];

@@ -15,55 +15,59 @@ export class LoadLessTestService {
     ) {}
 
     async getLoadLessTestResult(serial: string, order: string): Promise<LoadLessTestResponseDto | null> {
+        serial = serial?.trim();
+        order  = order?.trim();
         const basePath = await this.getPath('TSTM-001');
-        const now   = new Date();
-        const year  = now.getFullYear();
-        const month = now.getMonth() + 1;
-        const day   = now.getDate();
-        const folderPath = path.join(
-            basePath,
-            `Year ${year}`,
-            this.formatMonth(month, year),
-            'Load less'
-        );
 
-        const fileName = `${year}_${this.pad(month)}${this.pad(day)}.csv`;
-        const fullPath = path.join(folderPath, fileName);
-        if (!fs.existsSync(fullPath)) {
-            return {
-                status: 'ERROR',
-                message: `File not found: ${fileName}`,
-                data: null,
-            };
-        }
+        // Check last 7 days for the test result
+        for (let i = 0; i < 7; i++) {
+            const targetDate = new Date();
+            targetDate.setDate(targetDate.getDate() - i);
 
-        const content = fs.readFileSync(fullPath, 'utf-8');
-        const lines = content.split(/\r?\n/).reverse();
-        for (const line of lines) {
-            if (!line.trim()) continue;
+            const year  = targetDate.getFullYear();
+            const month = targetDate.getMonth() + 1;
+            const day   = targetDate.getDate();
+            const folderPath = path.join(
+                basePath,
+                `Year ${year}`,
+                this.formatMonth(month, year),
+                'Load less'
+            );
 
-            const cols   = line.split(',');
-            const header = cols[0]?.trim();
-            if (!header) continue;
+            const fileName = `${year}_${this.pad(month)}${this.pad(day)}.csv`;
+            const fullPath = path.join(folderPath, fileName);
+            if (!fs.existsSync(fullPath)) {
+                continue;
+            }
 
-            const parts = header.split('|');
-            if (parts.length < 3) continue;
+            const content = fs.readFileSync(fullPath, 'utf-8');
+            const lines   = content.split(/\r?\n/).reverse();
+            for (const line of lines) {
+                if (!line.trim()) continue;
 
-            const serialCol = parts[1]?.trim();
-            const orderCol  = parts[2]?.trim();
-            const statusCol = cols[cols.length - 1]?.trim();
-            if (serialCol === serial && orderCol === order && statusCol === 'OK') {
-                return {
-                    status: 'SUCCESS',
-                    message: null,
-                    data: {
-                        suctionSoundDb: cols[5],
-                        fallingSoundDb: cols[6],
-                        runningSoundDb: cols[7],
-                        housingTemp: cols[8],
-                        inducedVoltageConstant: cols[9],
-                    },
-                };
+                const cols   = line.split(',');
+                const header = cols[0]?.trim();
+                if (!header) continue;
+
+                const parts = header.split(/\s*[|-]\s*/);
+                if (parts.length < 3) continue;
+
+                const serialCol = parts[1]?.trim();
+                const orderCol  = parts[2]?.trim();
+                const statusCol = cols[cols.length - 1]?.trim();
+                if (serialCol === serial && orderCol === order &&statusCol === 'OK') {
+                    return {
+                        status: 'SUCCESS',
+                        message: null,
+                        data: {
+                            suctionSoundDb: cols[5],
+                            fallingSoundDb: cols[6],
+                            runningSoundDb: cols[7],
+                            housingTemp: cols[8],
+                            inducedVoltageConstant: cols[9],
+                        },
+                    };
+                }
             }
         }
 

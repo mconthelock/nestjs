@@ -3,6 +3,8 @@ import {PurVendorsCodeModule} from './pur_vendors_code/pur_vendors_code.module';
 import {PurVendorsModule} from './pur_vendors/pur_vendors.module';
 import { PurVendorsAttfileModule } from './pur_vendors_attfile/pur_vendors_attfile.module';
 import { PurVendorsAddressModule } from './pur_vendors_address/pur_vendors_address.module';
+import { ProductsModule } from './products/products.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -10,6 +12,8 @@ import { PurVendorsAddressModule } from './pur_vendors_address/pur_vendors_addre
     PurVendorsCodeModule,
     PurVendorsAttfileModule,
     PurVendorsAddressModule,
+    ProductsModule,
+    CategoriesModule,
   ],
 })
 export class PursysModule {}

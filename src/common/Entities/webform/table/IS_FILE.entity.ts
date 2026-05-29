@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, PrimaryColumn, ManyToOne } from 'typeorm';
 
+import { ISDEV_REQUEST } from './ISDEV_REQUEST.entity';
 @Entity({
     name: 'IS_FILE',
     schema: 'WEBFORM',
@@ -49,4 +50,15 @@ export class IS_FILE {
 
     @Column()
     FILE_PATH: string;
+
+    //IS-DEV: Development Request Form
+    @ManyToOne(() => ISDEV_REQUEST, (file) => file.files)
+    @JoinColumn([
+        { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+        { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+        { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+    ])
+    devreq: ISDEV_REQUEST;
 }

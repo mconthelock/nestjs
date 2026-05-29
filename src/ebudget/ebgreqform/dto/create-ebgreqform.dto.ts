@@ -71,6 +71,11 @@ export class CreateEbgreqformDto extends PickType(FormDto, [
   @IsOptional()
   @IsDate()
   @Type(() => Date)
+  PAYMENT_PLAN?: Date;
+  
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
   FINDATE?: Date;
 
   @IsOptional()

@@ -1,65 +1,17 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { CreateGpRbDto } from './dto/create-gp-rb.dto';
-import { UpdateGpRbDto, UpdateNamestampdto } from './dto/update-gp-rb.dto';
-import {
-    GpRbRepository,
-    ShowCusStampGpRbRepository,
-    ShowstampGpRbRepository,
-} from './gp-rb.repository';
+
+import { GpRbRepository } from './gp-rb.repository';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
+import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 
-// สำหรับดึงข้อมูลแสดงในหน้า show-gp-rb by Plankton
-@Injectable()
-export class ShowstampGpRbService {
-    private readonly logger = new Logger(ShowstampGpRbService.name);
-    constructor(private readonly repo: ShowstampGpRbRepository) {}
-    findAll() {
-        return this.repo.findAll();
-    }
-    async findOne(dto: FormDto) {
-        return this.repo.findOne(dto);
-    }
-    async Editname(dto: UpdateNamestampdto, ip: string){
-        try{
-            if (!dto.NAME_STAMP) {
-                throw new BadRequestException('NAME_STAMP is required');
-            }
-
-            const updateResult = await this.repo.updateNameStamp(dto);
-
-            if (!updateResult.affected) {
-                throw new BadRequestException('GP-RB stamp request not found');
-            }
-
-            return {
-                status: true,
-                message: 'NAME_STAMP updated successfully',
-                data: updateResult,
-            };
-        }catch(error){
-            throw error;
-        }
-    }
-    
-    
-}
-
-// สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton
-@Injectable()
-export class ShowCusstampGpRbService {
-    private readonly logger = new Logger(ShowCusstampGpRbService.name);
-    constructor(private readonly repo: ShowCusStampGpRbRepository) {}
-    findAll() {
-        return this.repo.findAll();
-    }
-    findOne(dto: FormDto) {
-        return this.repo.findOne(dto);
-    }
-}
-
+import { CreateStampReqFormDto } from './dto/create-gp-rb.dto';
+import { UpdateNamestampdto } from './dto/update-gp-rb.dto';
+import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
+import { FlowProducer } from 'bullmq';
+//Main service สำหรับจัดการ GP-RB form
 @Injectable()
 export class GpRbService {
     constructor(
@@ -67,21 +19,24 @@ export class GpRbService {
         private readonly formmstService: FormmstService,
         private readonly formCreateService: FormCreateService,
         private readonly handleFileFormService: HandleFileFormService,
+        private readonly doactionService: DoactionFlowService,
+        private readonly deleteFlowStepService:DeleteFlowStepService
     ) {}
 
-    findAll() {
-        return this.repo.findAll();
+    findPurpose() {
+        return this.repo.findPurpose();
     }
-    async create(dto: CreateGpRbDto, ip: string, file: Express.Multer.File) {
-        try {
-            const stampFormatGroup = dto.stampFormatGroup?.toLowerCase();
-            // ตรวจสอบว่า stampFormatGroup ได้รับค่าแล้ว
-            if (!stampFormatGroup) {
-                throw new BadRequestException(
-                    'stampFormatGroup is required (standard or other)',
-                );
-            }
 
+    findConfig() {
+        return this.repo.findConfig();
+    }
+
+    async create(
+        dto: CreateStampReqFormDto,
+        ip: string,
+        file: Express.Multer.File,
+    ) {
+        try {
             // ดึงข้อมูล Form Master
             const formmst =
                 await this.formmstService.getFormMasterByVaname('GP-RB');
@@ -112,7 +67,6 @@ export class GpRbService {
                     'Unknown error';
                 throw new Error(`Form creation failed: ${errMsg}`);
             }
-
             const form = {
                 NFRMNO: createForm.data.NFRMNO,
                 VORGNO: createForm.data.VORGNO,
@@ -120,53 +74,42 @@ export class GpRbService {
                 CYEAR2: createForm.data.CYEAR2,
                 NRUNNO: createForm.data.NRUNNO,
             };
-            let insert;
-            // บันทึกข้อมูล Stamp Request ตามประเภท
-            if (stampFormatGroup === 'standard') {
-                /*      if(!dto.PURPOSE_ID || !dto.PURPOSE_OTHER || !dto.SPOSCODE|| !dto.NAME_STAMP ) {
-                    throw new BadRequestException('PURPOSE_ID and NAME_STAMP are required for standard stamp group');
-                } */
-                insert = await this.repo.CreateStampReq({
-                    ...form,
-                    PURPOSE_ID: dto.PURPOSE_ID,
-                    PURPOSE_OTHER: dto.PURPOSE_OTHER,
-                    SPOSCODE: dto.SPOSCODE,
-                    NAME_STAMP: dto.NAME_STAMP,
-                    REMARK: dto.STAMP_REMARK,
-                });
-                console.log(insert);
-            } else if (stampFormatGroup === 'other') {
-                if (!dto.QTY) {
-                    throw new BadRequestException(
-                        'QTY are required for other stamp group',
-                    );
-                }
-                insert = await this.repo.CreateCusStampReq({
-                    ...form,
 
-                    QTY: dto.QTY,
-                    STAMPCUS_REMARK: dto.STAMPCUS_REMARK,
-                });
-                insert = await this.repo.CreateStampReq({
+            const sposcode = Number(dto.SPOSCODE);
+            if(!Number.isNaN(sposcode) && sposcode < 33){
+                await this.deleteFlowStepService.deleteFlowStep({
                     ...form,
-                    PURPOSE_ID: dto.PURPOSE_ID,
-                    PURPOSE_OTHER: dto.PURPOSE_OTHER,
+                        CSTEPNO: '14' //SUCHART 
                 });
-                console.log(insert);
-            } else {
-                throw new BadRequestException(
-                    `Invalid stampFormatGroup: "${stampFormatGroup}". Must be "standard" or "other"`,
-                );
             }
 
-            const save = await this.handleFileFormService.insertFiles(
-                {
-                    ...form,
-                    FORM_TYPE: 'GP',
-                    CREATEBY: dto.REQBY,
-                },
-                file,
-            );
+            const data = {
+                ...form,
+                PURPOSE_ID: dto.PURPOSE_ID ? Number(dto.PURPOSE_ID) : null,
+                PURPOSE_OTHER: dto.PURPOSE_OTHER
+                    ? dto.PURPOSE_OTHER.trim()
+                    : null,
+                SPOSCODE: dto.SPOSCODE ? dto.SPOSCODE.trim() : null,
+                NAME_STAMP: dto.NAME_STAMP ? dto.NAME_STAMP.trim() : null,
+                REMARK: dto.REMARK ? dto.REMARK.trim() : null,
+                REQ_TYPE: dto.REQ_TYPE ? dto.REQ_TYPE.trim() : null,
+                REQ_QTY: dto.REQ_QTY ? Number(dto.REQ_QTY) : null,
+            };
+            const insert = await this.repo.CreateStampReq(data);
+
+
+            if(file){
+                const save = await this.handleFileFormService.insertFiles(
+                    {
+                        ...form,
+                        FORM_TYPE: 'GP',
+                        CREATEBY: dto.REQBY,
+                    },
+                    file,
+                );
+            }
+        
+       
             // throw new Error('test');
 
             return {
@@ -178,6 +121,50 @@ export class GpRbService {
             throw error;
         }
     }
-    
 
+    async doaction(dto: UpdateNamestampdto, ip: string) {
+        try {
+            const form = {
+                NFRMNO: dto.NFRMNO,
+                VORGNO: dto.VORGNO,
+                CYEAR: dto.CYEAR,
+                CYEAR2: dto.CYEAR2,
+                NRUNNO: dto.NRUNNO,
+            };
+            // if (!dto.NAME_STAMP) {
+            //     throw new BadRequestException('NAME_STAMP is required');
+            // }
+            const updateResult = await this.repo.updateNameStamp(
+                form,
+                dto.NAME_STAMP,
+            );
+
+            if (!updateResult.affected) {
+                throw new BadRequestException('GP-RB stamp request not found');
+            }
+            const doAction = await this.doactionService.doAction(
+                {
+                    ...form,
+                    EMPNO: dto.EMPNO,
+                    ACTION: dto.ACTION,
+                    REMARK: dto.REMARK,
+                },
+                ip,
+            );
+            if (!doAction.status) {
+                throw new Error(doAction.message);
+            }
+            return {
+                status: true,
+                message: 'NAME_STAMP updated successfully',
+            };
+        } catch (error) {
+            throw new Error(`Failed to action: ${error.message}`);
+        }
+    }
+
+    async findOne(dto: FormDto) {
+        return this.repo.findOne(dto);
+    }
 }
+

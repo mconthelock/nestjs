@@ -258,6 +258,7 @@ export class IeBgrService {
                 REQAMT: dto.REQAMT,
                 RESORG: dto.RESORG,
                 PIC: dto.PIC,
+                PAYMENT_PLAN: dto.PAYMENT_PLAN ?? null,
                 FINDATE: dto.FINDATE,
                 ITMNAME: dto.ITMNAME,
                 PURPOSE: dto.PURPOSE,
@@ -493,6 +494,8 @@ export class IeBgrService {
                     QTA_FORM: q.QTA_FORM,
                     QTA_VALID_DATE: q.QTA_VALID_DATE,
                     TOTAL: q.TOTAL,
+                    SVENDNAME: q.SVENDNAME,
+                    SVENDCODE: q.SVENDCODE,
                     CREATE_BY: createBy,
                 });
                 // 3. บันทึกข้อมูล Quotation Product

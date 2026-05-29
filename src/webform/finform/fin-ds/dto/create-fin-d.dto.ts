@@ -1,92 +1,78 @@
 import { PickType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsArray, IsDate, IsNotEmpty, IsNumber, isNumber, IsString, ValidateNested } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+    IsArray,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+    ValidateNested,
+    IsDate,
+} from 'class-validator';
+
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
 
 export class CreateFinDDto {
-
-  @IsNotEmpty()
-  @IsNumber()
-  @Type(() => Number)
-  LINE_ID: number;
-
-  @IsNotEmpty()
-  @IsString()
-  REASON: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @Type(() => Number)
-  DUTY_VALUE: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @Type(() => Number)
-  QTY: number;
-
-
-}
-
-// export class CreateFinDFormdto extends PickType(FormDto, [
- export class CreateFinDFormdto extends PickType(CreateFormDto, [
-
-    'INPUTBY',
-    'REQBY',
-    'REMARK',
-//   'NFRMNO',
-//   'VORGNO',
-//   'CYEAR',
-//   'CYEAR2',
-//   'NRUNNO',
-]as const) {
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    LINE_ID: number;
 
     @IsNotEmpty()
     @IsString()
-    @Type(()=> String)
+    REASON: string;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    DUTY_VALUE: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    QTY: number;
+}
+export class CreateFinDFormdto extends PickType(CreateFormDto, [
+    'INPUTBY',
+    'REQBY',
+    'REMARK',
+] as const) {
+    @IsNotEmpty()
+    @IsString()
+    @Transform(({ value }) => String(value))
     OPTION_CODE: string;
 
     @IsNotEmpty()
     @IsDate()
-    @Type(()=> Date)
+    @Type(() => Date)
     EFFECTIVE_DATE: Date;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsDate()
-    @Type(()=> Date)
-    DATE_RECEIVE: Date;
+    @Type(() => Date)
+    DATE_RECEIVE?: Date;
 
     @IsNotEmpty()
     @IsString()
-    @Type(()=> String)
+    @Transform(({ value }) => String(value))
+    @Transform(({ value }) => String(value))
     LOCATION: string;
 
-    @IsArray()
+    /*@IsArray()
+    /*@IsArray()
     @ValidateNested({ each: true })
-    @Type(()=> CreateFinDDto)
+    @Type(() => CreateFinDDto)
+    @Transform(({ value }) => {
+        if (typeof value === 'string') {
+            try {
+                return JSON.parse(value);
+            } catch {
+                return [];
+            }
+        }
+
+        return value;
+    })*/
+    @IsNotEmpty()
     DATA: CreateFinDDto[];
-
-    // @IsNotEmpty()
-    // @IsNumber()
-    // @Type(()=> Number)
-    // NFRMNO: number;
-
-    // @IsNotEmpty()
-    // @IsNumber()
-    // @Type(()=> String)
-    // VORGNO: string;
-
-    // @IsNotEmpty()
-    // @IsNumber()
-    // @Type(()=> String)
-    // CYEAR: string;
-
-    // @IsNotEmpty()
-    // @IsNumber()
-    // @Type(()=> String)
-    // CYEAR2: string;
-
-    // ---------
-
-
 }

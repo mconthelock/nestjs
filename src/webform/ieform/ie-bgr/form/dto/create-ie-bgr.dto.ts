@@ -150,6 +150,11 @@ export class CreateIeBgrDto {
     @Type(() => String)
     PIC: string;
 
+    @IsOptional()
+    @IsDate()
+    @Type(() => Date)
+    PAYMENT_PLAN?: Date;
+  
     @IsNotEmpty()
     @IsDate()
     @Type(() => Date)
@@ -211,6 +216,16 @@ export class BGRQuotationDto {
     @IsDate()
     @Type(() => Date)
     QTA_VALID_DATE?: Date;
+
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
+    SVENDNAME: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
+    SVENDCODE: string;
 
     @IsOptional()
     @Type(() => Number)

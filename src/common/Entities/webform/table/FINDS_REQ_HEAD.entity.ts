@@ -24,8 +24,8 @@ export class DSREQHEAD {
     @Column()
     EFFECTIVE_DATE: Date;
 
-    @Column()
-    DATE_RECEIVE: Date;
+    @Column({ nullable: true })
+    DATE_RECEIVE?: Date;
 
     @Column()
     LOCATION: string;

@@ -28,6 +28,10 @@ export class CreateMfgEdrDto {
   SSECCODE?: string | null;
 
   @IsOptional()
+  @IsString()
+  SDEPCODE?: string | null;
+
+  @IsOptional()
   @IsNumber()
   CID?: number | null;
 
@@ -55,8 +59,6 @@ export class CreateMfgEdrDto {
     ITEM?: string | null;
     QTY?: number | null;
     DETAIL?: string | null;
-    LV_EFFECT?: string | null;
-    EFFECT?: string | null;
     LID?: number | null;
     PID?: number | null;
     LOT?: string | null;

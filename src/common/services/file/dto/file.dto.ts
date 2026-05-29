@@ -60,4 +60,8 @@ export class SaveFileDto {
   @IsBoolean()
   @Type(() => Boolean)
   isPhp: boolean;
+
+  @IsOptional()
+  filename?: string[] | string; // ถ้าเป็น string แปลว่าใช้ชื่อเดียวกันสำหรับทุกไฟล์ ถ้าเป็น array แปลว่าใช้ชื่อแยกตาม index ของไฟล์
+
 }

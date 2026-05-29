@@ -1,47 +1,47 @@
 import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  StreamableFile,
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+    StreamableFile,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { createReadStream, promises as fs } from 'fs'; // ฟังก์ชันอ่านไฟล์และ promise API ของ fs
 import * as path from 'path';
 import {
-  buildContentDisposition,
-  deleteFile,
-  getMimeType,
-  moveFileFromMulter,
-  safeJoin,
+    buildContentDisposition,
+    deleteFile,
+    getMimeType,
+    moveFileFromMulter,
+    safeJoin,
 } from 'src/common/utils/files.utils';
 import { FileDto, ListDto, SaveFileDto } from './dto/file.dto';
 
 @Injectable()
 export class FileService {
-  private readonly skip = ['thumbs.db', 'desktop.ini'];
-  async downloadOrOpenFile(args: FileDto): Promise<StreamableFile> {
-    const fullPath = safeJoin(args.baseDir, args.storedName); // รวม path ให้ปลอดภัย
+    private readonly skip = ['thumbs.db', 'desktop.ini'];
+    async downloadOrOpenFile(args: FileDto): Promise<StreamableFile> {
+        const fullPath = safeJoin(args.baseDir, args.storedName); // รวม path ให้ปลอดภัย
 
-    try {
-      await fs.access(fullPath); // เช็คว่าไฟล์มีอยู่จริงหรือไม่
-    } catch {
-      throw new NotFoundException('File not found on disk'); // ถ้าไม่มีไฟล์ ให้ throw 404
+        try {
+            await fs.access(fullPath); // เช็คว่าไฟล์มีอยู่จริงหรือไม่
+        } catch {
+            throw new NotFoundException('File not found on disk'); // ถ้าไม่มีไฟล์ ให้ throw 404
+        }
+
+        const oname = args.originalName || args.storedName; // ตั้งชื่อไฟล์ที่จะแสดงตอนโหลด (ถ้าไม่ส่ง originalName จะใช้ชื่อที่เก็บจริง)
+        // res.setHeader('Content-Type', getMimeType(oname)); // set header ประเภทไฟล์
+        // res.setHeader('Content-Disposition', buildContentDisposition(oname, args.mode)); // set header สำหรับ download/open
+
+        const stream = createReadStream(fullPath); // สร้าง stream สำหรับอ่านไฟล์
+        // return new StreamableFile(stream); // ส่ง stream กลับไปให้ NestJS จัดการ response
+        return new StreamableFile(stream, {
+            type: getMimeType(oname),
+            disposition: buildContentDisposition(oname, args.mode),
+        });
     }
 
-    const oname = args.originalName || args.storedName; // ตั้งชื่อไฟล์ที่จะแสดงตอนโหลด (ถ้าไม่ส่ง originalName จะใช้ชื่อที่เก็บจริง)
-    // res.setHeader('Content-Type', getMimeType(oname)); // set header ประเภทไฟล์
-    // res.setHeader('Content-Disposition', buildContentDisposition(oname, args.mode)); // set header สำหรับ download/open
-
-    const stream = createReadStream(fullPath); // สร้าง stream สำหรับอ่านไฟล์
-    // return new StreamableFile(stream); // ส่ง stream กลับไปให้ NestJS จัดการ response
-    return new StreamableFile(stream, {
-      type: getMimeType(oname),
-      disposition: buildContentDisposition(oname, args.mode),
-    });
-  }
-
-  //prettier-ignore
-  async listDir(dto: ListDto) {
+    //prettier-ignore
+    async listDir(dto: ListDto) {
     const dirPath = safeJoin(dto.baseDir, dto.path ?? ''); // กัน traversal
 
     const stat = await fs.stat(dirPath);
@@ -113,8 +113,8 @@ export class FileService {
     return filtered;
   }
 
-  //prettier-ignore
-  async listAllRecursively(dto: ListDto) {
+    //prettier-ignore
+    async listAllRecursively(dto: ListDto) {
     const root = safeJoin(dto.baseDir, dto.path ?? '');
     const allowEts = dto.allow?.filter(e => e.trim() !== '').map(e => e.toLowerCase());
 
@@ -174,28 +174,44 @@ export class FileService {
     return results;
   }
 
-  async saveFile(files: Express.Multer.File[], dto: SaveFileDto) {
-    let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
-    try {
-      const data = [];
-      for (const file of files) {
-        const moved = dto.isPhp
-          ? await moveFileFromMulter({
-              file,
-              destination: dto.path,
-              isPhp: dto.isPhp,
-            })
-          : await moveFileFromMulter({ file, destination: dto.path });
-        movedTargets.push(moved.path);
-        movedTargets.push(file.path);
-        data.push(moved);
-      }
-      return { status: true, data };
-    } catch (err) {
-      for (const filePath of movedTargets) {
-        await deleteFile(filePath); // ลบไฟล์ที่ย้ายสำเร็จไปแล้ว
-      }
-      throw err;
+    async saveFile(files: Express.Multer.File[], dto: SaveFileDto) {
+        let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
+        try {
+            const data = [];
+            const filenames = Array.isArray(dto.filename)
+                ? dto.filename
+                : [dto.filename];
+
+                console.log(filenames);
+                
+            for (const file of files) {
+                const extendtion = path.extname(file.originalname);
+                const shifted = filenames.shift();
+                const filename = shifted && shifted.includes('.')
+                    ? shifted
+                    : shifted + extendtion; // ถ้า filename ที่ส่งมาไม่มีนามสกุล ให้เติมนามสกุลเดิมของไฟล์ที่อัพโหลดมาให้
+                const moved = dto.isPhp
+                    ? await moveFileFromMulter({
+                          file,
+                          newName: filename,
+                          destination: dto.path,
+                          isPhp: dto.isPhp,
+                      })
+                    : await moveFileFromMulter({
+                          file,
+                          destination: dto.path,
+                          newName: filename, // ถ้าเป็น array จะใช้ชื่อแยกตาม index ของไฟล์ ถ้าเป็น string จะใช้ชื่อเดียวกันสำหรับทุกไฟล์
+                      });
+                movedTargets.push(moved.path);
+                movedTargets.push(file.path);
+                data.push(moved);
+            }
+            return { status: true, data };
+        } catch (err) {
+            for (const filePath of movedTargets) {
+                await deleteFile(filePath); // ลบไฟล์ที่ย้ายสำเร็จไปแล้ว
+            }
+            throw err;
+        }
     }
-  }
 }

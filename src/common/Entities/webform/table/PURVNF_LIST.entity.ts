@@ -10,7 +10,7 @@ import {
 import { PURNVF_FORM } from './PURVNF_FORM.entity';
 import { PTERMCODE } from '../../amec/table/PTERMCODE.entity';
 
-@Entity({ name: 'PURVNF_LIST', schema: 'WEBFORM' })
+@Entity({ name: 'PURNVF_LIST', schema: 'WEBFORM' })
 export class PURNVF_LIST {
     @PrimaryColumn()
     NFRMNO: number;

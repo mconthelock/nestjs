@@ -72,14 +72,54 @@ export class PurNvfRequestService  {
                 NRUNNO: createForm.data.NRUNNO,
             };
 
-            // 2. หากมี THIRD_PARTY ให้เพิ่ม flow cstepno 40
-           // if (dto.THIRD_PARTY) {
-            //    await this.insertThridPartyStep(form, dto.THIRD_PARTY);
-           // }
-            // 3. เมื่อ PAYMENT ต่ำกว่า 10,000 ให้ลบ flow ddim, dim ออก
-            //if (data.PAYMENT < 10000) {
-             //   await this.deleteStep(form, ['03', '02']);
-           // }
+            const datalist = 
+            {
+                LID : 1,
+                PURPOSE : data.PURPOSE,
+                TYPEJOB : data.TYPEJOB,
+                SERVICE : data.SERVICE,
+                VENDTYPE : data.VENDOR_LOCATION,
+                COMNAME : data.COMPANY_NAME,
+                CONTACT : data.CONTACT,
+                EMAIL : data.EMAIL,
+                WEBSITE : data.WEBSITE,
+                TELNO : data.TELNO,
+                FAX : data.FAX,
+                BANKNAME : data.BANKNAME,
+                BRANCH : data.BRANCH,
+                ACCNUMBER : data.ACCNUMBER,
+                TERMCODE : data.TERMCODE
+            }
+            const addr = [];
+            let addid = 0;
+            if(data.ADDRESS_EN && data.ADDRESS_EN.trim().length > 0){
+                addid++;
+                addr.push({
+                    ADDRID : addid,
+                    ADDRTYPE : 'E',
+                    ADDR : data.ADDRESS_EN,
+                    SUBDISTRICT : data.SUB_DISTRICT_EN,
+                    DISTRICT : data.DISTRICT_EN,
+                    PROVINCE : data.PROVINCE_EN,
+                    COUNTRY : data.COUNTRY_EN,
+                    POSTCODE : data.POSTCODE_EN
+
+                })
+            }
+            if(data.ADDRESS_TH && data.ADDRESS_TH.trim().length > 0){
+                addid++;
+                addr.push({
+                    ADDRID : addid,
+                    ADDRTYPE : 'T',
+                    ADDR : data.ADDRESS_TH,
+                    SUBDISTRICT : data.SUB_DISTRICT_TH,
+                    DISTRICT : data.DISTRICT_TH,
+                    PROVINCE : data.PROVINCE_TH,
+                    COUNTRY : data.COUNTRY_TH,
+                    POSTCODE : data.POSTCODE_TH
+                })
+            }
+
             // 4. บันทึกข้อมูล PUR-NVF form
             await this.repo.insert({
                 ...form,
@@ -87,6 +127,16 @@ export class PurNvfRequestService  {
                 ATTACH_TYPE: data.ATTACH_TYPE,
                 ATTACH_OTHER: data.ATTACH_OTHER,
             });
+            await this.repolst.insert({
+                ...form,...datalist
+                
+            });
+            for(const a of addr){
+                await this.repoaddr.insert({
+                    ...form,
+                    ...a
+                })
+            }
             // 5. ย้ายไฟล์ไปยังปลายทางและ Insert ข้อมูลไฟล์ใหม่ (ถ้ามี)
             if (files && files.length > 0) {
                 movedTargets = await this.moveFiles(

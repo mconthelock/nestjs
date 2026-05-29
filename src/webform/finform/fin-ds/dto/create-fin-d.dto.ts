@@ -40,7 +40,6 @@ export class CreateFinDFormdto extends PickType(CreateFormDto, [
     @IsNotEmpty()
     @IsString()
     @Transform(({ value }) => String(value))
-    @Transform(({ value }) => String(value))
     OPTION_CODE: string;
 
     @IsNotEmpty()

@@ -1,8 +1,8 @@
 import { Column, Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { MfgEdrFormHead } from './mfg_edr_form_head.entity';
 
-@Entity({ name: 'MFG_EDR_FORM_CORRECTIVE' })
-export class MfgEdrFormCorrective {
+@Entity({ name: 'MFG_EDR_FORM_CAUSE4M' })
+export class MfgEdrFormCause4m {
   @PrimaryColumn()
   NFRMNO: number;
 
@@ -22,7 +22,10 @@ export class MfgEdrFormCorrective {
   ID: number;
 
   @Column()
-  CORRECTIVE: string | null;
+  CAUSE: string;
+
+  @Column()
+  DETAIL: string | null;
 
   @Column()
   DUE_DATE: string | null;
@@ -30,7 +33,7 @@ export class MfgEdrFormCorrective {
   @Column()
   PIC: string | null;
 
-  @ManyToOne(() => MfgEdrFormHead, (head) => head.corrective)
+  @ManyToOne(() => MfgEdrFormHead, (head) => head.cause4m)
   @JoinColumn([
     { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
     { name: 'VORGNO', referencedColumnName: 'VORGNO' },

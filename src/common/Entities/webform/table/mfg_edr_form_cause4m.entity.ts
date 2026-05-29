@@ -33,7 +33,7 @@ export class MfgEdrFormCause4m {
   @Column()
   PIC: string | null;
 
-  @ManyToOne(() => MfgEdrFormHead, (head) => head.corrective)
+  @ManyToOne(() => MfgEdrFormHead, (head) => head.cause4m)
   @JoinColumn([
     { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
     { name: 'VORGNO', referencedColumnName: 'VORGNO' },

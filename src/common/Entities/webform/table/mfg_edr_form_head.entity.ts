@@ -1,11 +1,9 @@
 import { Column, Entity, OneToMany, PrimaryColumn, JoinColumn, ManyToOne } from 'typeorm';
 import { MfgEdrFormList } from './mfg_edr_form_list.entity';
 import { MfgEdrFormAtt } from './mfg_edr_form_att.entity';
-import { MfgEdrFormCorrective } from './mfg_edr_form_corrective.entity';
-import { MfgEdrFormPreventive } from './mfg_edr_form_preventive.entity';
-import { MfgEdrFormWhy } from './mfg_edr_form_why.entity';
 import { EdrCauseMst } from './edr_cause_mst.entity';
 import { EdrWorktypeMst } from './edr_worktype_mst.entity';
+import { MfgEdrFormCause4m } from './mfg_edr_form_cause4m.entity';
 
 @Entity({ name: 'MFG_EDR_FORM_HEAD' })
 export class MfgEdrFormHead {
@@ -51,14 +49,8 @@ export class MfgEdrFormHead {
     @OneToMany(() => MfgEdrFormAtt, (att) => att.head)
     att: MfgEdrFormAtt[];
 
-    @OneToMany(() => MfgEdrFormCorrective, (corrective) => corrective.head)
-    corrective: MfgEdrFormCorrective[];
-
-    @OneToMany(() => MfgEdrFormPreventive, (preventive) => preventive.head)
-    preventive: MfgEdrFormPreventive[];
-
-    @OneToMany(() => MfgEdrFormWhy, (why) => why.head)
-    why: MfgEdrFormWhy[];
+    @OneToMany(() => MfgEdrFormCause4m, (cause4m) => cause4m.head)
+    cause4m: MfgEdrFormCause4m[];
 
     @ManyToOne(() => EdrCauseMst)
     @JoinColumn({ name: 'CID', referencedColumnName: 'CID' })

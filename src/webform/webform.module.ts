@@ -4,7 +4,6 @@ import { FlowModule } from './flow/flow.module';
 import { ISFormModule } from './isform/isform.module';
 import { FlowmstModule } from './flowmst/flowmst.module';
 import { FormmstModule } from './formmst/formmst.module';
-import { GpOtModule } from './gpform/gp-ot/gp-ot.module';
 import { QAFormModule } from './qaform/qaform.module';
 import { OrgposModule } from './orgpos/orgpos.module';
 import { OrgTreeModule } from './org-tree/org-tree.module';
@@ -26,29 +25,30 @@ import { RqflistModule } from './rqflist/rqflist.module';
 
 @Module({
     imports: [
+        //Dept from modules
+        GpformModule,
         IEFormModule,
         ISFormModule,
+        QAFormModule,
+        PurFormModule,
+        FinformModule,
+        FeformModule,
+        PsFormModule,
+        STFormModule,
+        MarFormModule,
+        //Form Master and Form Center Modules
         FormModule,
         FlowModule,
         FlowmstModule,
         FormmstModule,
-        GpOtModule,
-        QAFormModule,
         OrgposModule,
         OrgTreeModule,
         SequenceOrgModule,
         RepModule,
-        RqffrmModule,
-        PurFormModule,
         OrganizationsModule,
-        GpformModule,
-        FinformModule,
         HandleFileFormModule,
         FormAttachmentTypeModule,
-        FeformModule,
-        MarFormModule,
-        PsFormModule,
-        STFormModule,
+        RqffrmModule,
         RqflistModule,
     ],
 })

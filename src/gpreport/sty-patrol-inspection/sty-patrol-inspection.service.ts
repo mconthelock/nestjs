@@ -3,7 +3,7 @@ import { CreateStyPatrolInspectionDto } from './dto/create-sty-patrol-inspection
 import { UpdateStyPatrolInspectionDto } from './dto/update-sty-patrol-inspection.dto';
 import { StyPatrolInspectionRepository } from './sty-patrol-inspection.repository';
 import { ReportStyPatrolInspectionDto } from './dto/report-sty-patrol-inspection.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 
 @Injectable()
 export class StyPatrolInspectionService {
@@ -178,11 +178,7 @@ export class StyPatrolInspectionService {
         }
     }
 
-    async summaryItemBySec(
-        fyear: string,
-        month: number,
-        sseccode?: string,
-    ) {
+    async summaryItemBySec(fyear: string, month: number, sseccode?: string) {
         try {
             const res = await this.repo.summaryItemBySec(
                 fyear,
@@ -209,17 +205,9 @@ export class StyPatrolInspectionService {
         }
     }
 
-    async summarySection(
-        fyear: string,
-        month: number,
-        deptcode: string,
-    ){
+    async summarySection(fyear: string, month: number, deptcode: string) {
         try {
-            const res = await this.repo.summarySection(
-                fyear,
-                month,
-                deptcode,
-            );
+            const res = await this.repo.summarySection(fyear, month, deptcode);
             const length = res.length;
             if (length === 0) {
                 return {

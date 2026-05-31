@@ -5,14 +5,12 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { QAINS_OPERATOR_AUDITOR } from 'src/common/Entities/webform/table/QAINS_OPERATOR_AUDITOR.entity';
 import { CreateQainsOADto } from './dto/create-qains_operator_auditor.dto';
 import { SearchQainsOADto } from './dto/search-qains_operator_auditor.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { UpdateQainsOADto } from './dto/update-qains_operator_auditor.dto';
 
 @Injectable()
 export class QainsOARepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

@@ -3,13 +3,11 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { ISADP_FORM } from 'src/common/Entities/webform/table/ISADP_FORM.entity';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 
 @Injectable()
 export class IsAdpRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

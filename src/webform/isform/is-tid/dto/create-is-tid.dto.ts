@@ -9,8 +9,8 @@ import {
     IsString,
     ValidateNested,
 } from 'class-validator';
-import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { CreateFormDto } from 'src/webform/center/form/dto/create-form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 
 export class CreateIsTidDto extends PickType(FormDto, [
     'NFRMNO',

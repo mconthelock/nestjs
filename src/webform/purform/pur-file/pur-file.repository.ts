@@ -5,7 +5,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { SearchPurFileDto } from './dto/search-pur-file.dto';
 import { PUR_FILE } from 'src/common/Entities/webform/table/PUR_FILE.entity';
 import { CreatePurFileDto } from './dto/create-pur-file.dto';
-import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
+import { QueryHandleFileFormDto } from 'src/webform/center/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class PurFileRepository extends BaseRepository {

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreatePurFileDto } from './dto/create-pur-file.dto';
 import { SearchPurFileDto } from './dto/search-pur-file.dto';
 import { PurFileRepository } from './pur-file.repository';
-import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
+import { QueryHandleFileFormDto } from 'src/webform/center/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class PurFileService {

@@ -10,7 +10,7 @@ import {
     IsDate,
 } from 'class-validator';
 
-import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
+import { CreateFormDto } from 'src/webform/center/form/dto/create-form.dto';
 
 export class CreateFinDDto {
     @IsNotEmpty()

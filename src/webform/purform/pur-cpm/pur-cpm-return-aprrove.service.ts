@@ -3,15 +3,15 @@ import { PurCpmService } from './pur-cpm.service';
 import { ReturnArppoveDto } from './dto/update-pur-cpm.dto';
 import { deleteFile, joinPaths } from 'src/common/utils/files.utils';
 import { PurCpmRepository } from './pur-cpm.repository';
-import { FlowService } from 'src/webform/flow/flow.service';
-import { FormService } from 'src/webform/form/form.service';
-import { FormmstService } from 'src/webform/formmst/formmst.service';
+import { FlowService } from 'src/webform/center/flow/flow.service';
+import { FormService } from 'src/webform/center/form/form.service';
+import { FormmstService } from 'src/webform/center/formmst/formmst.service';
 import { PurFileService } from '../pur-file/pur-file.service';
-import { RepService } from 'src/webform/rep/rep.service';
-import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
+import { RepService } from 'src/webform/center/rep/rep.service';
+import { DeleteFlowStepService } from 'src/webform/center/flow/delete-flow-step.service';
 import { FLOWMST } from 'src/common/Entities/webform/table/FLOWMST.entity';
-import { InsertFlowStepService } from 'src/webform/flow/insert-flow-step.service';
-import { DoactionFlowService } from 'src/webform/flow/doaction.service';
+import { InsertFlowStepService } from 'src/webform/center/flow/insert-flow-step.service';
+import { DoactionFlowService } from 'src/webform/center/flow/doaction.service';
 
 @Injectable()
 export class PurCpmReturnAprroveService extends PurCpmService {

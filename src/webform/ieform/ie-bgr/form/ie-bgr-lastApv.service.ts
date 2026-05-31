@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { LastApvIeBgrDto } from './dto/lastapv-ie-bgr.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { IeBgrService } from './ie-bgr.service';
 
 @Injectable()

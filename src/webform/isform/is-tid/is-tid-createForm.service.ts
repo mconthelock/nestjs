@@ -5,18 +5,18 @@ import {
     CreateIsTidFormDto,
     IsTidUserData,
 } from './dto/create-is-tid.dto';
-import { FormService } from 'src/webform/form/form.service';
+import { FormService } from 'src/webform/center/form/form.service';
 import { IsTidRepository } from './is-tid.repository';
-import { FormCreateService } from 'src/webform/form/create-form.service';
-import { FormDto } from 'src/webform/form/dto/form.dto';
-import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
-import { FlowService } from 'src/webform/flow/flow.service';
+import { FormCreateService } from 'src/webform/center/form/create-form.service';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
+import { SequenceOrgService } from 'src/webform/center/sequence-org/sequence-org.service';
+import { FlowService } from 'src/webform/center/flow/flow.service';
 import {
     CreateFormDto,
     FormWebformDto,
-} from 'src/webform/form/dto/create-form.dto';
-import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
-import { DoactionFlowService } from 'src/webform/flow/doaction.service';
+} from 'src/webform/center/form/dto/create-form.dto';
+import { DeleteFlowStepService } from 'src/webform/center/flow/delete-flow-step.service';
+import { DoactionFlowService } from 'src/webform/center/flow/doaction.service';
 import { formatDate, now } from 'src/common/utils/dayjs.utils';
 import { IsCfsCreateFormService } from '../is-cfs/is-cfs-createForm.service';
 
@@ -225,12 +225,9 @@ export class IsTidCreateFormService extends IsTidService {
                         CSTEPNO: s.CSTEPNO,
                         VREALAPV: s.apv,
                     },
-                    CAPVTIME: formatDate(
-                        new Date(Date.now() + ms),
-                        'HH:mm:ss',
-                    ), // ตั้งเวลาอนุมัติเป็น 1 นาทีข้างหน้าเพื่อหลีกเลี่ยงปัญหาเวลาที่อาจเกิดขึ้น
+                    CAPVTIME: formatDate(new Date(Date.now() + ms), 'HH:mm:ss'), // ตั้งเวลาอนุมัติเป็น 1 นาทีข้างหน้าเพื่อหลีกเลี่ยงปัญหาเวลาที่อาจเกิดขึ้น
                 });
-                ms+= 60000; // เพิ่มเวลาให้แต่ละ step ถัดไปอีก 1 นาทีเพื่อให้แน่ใจว่าเวลาที่ตั้งไว้ไม่ซ้ำกันและเพียงพอสำหรับการประมวลผลแต่ละ step
+                ms += 60000; // เพิ่มเวลาให้แต่ละ step ถัดไปอีก 1 นาทีเพื่อให้แน่ใจว่าเวลาที่ตั้งไว้ไม่ซ้ำกันและเพียงพอสำหรับการประมวลผลแต่ละ step
             }
         } catch (error) {
             throw new Error('Auto approve Failed: ' + error.message);

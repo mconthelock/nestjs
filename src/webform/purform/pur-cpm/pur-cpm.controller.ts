@@ -15,7 +15,7 @@ import { ReturnArppoveDto } from './dto/update-pur-cpm.dto';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import {
     UseForceTransaction,
     UseTransaction,

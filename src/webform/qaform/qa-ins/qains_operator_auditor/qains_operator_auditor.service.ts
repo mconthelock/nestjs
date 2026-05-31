@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateQainsOADto } from './dto/create-qains_operator_auditor.dto';
 import { SearchQainsOADto } from './dto/search-qains_operator_auditor.dto';
 import { UpdateQainsOADto } from './dto/update-qains_operator_auditor.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { QainsOARepository } from './qains_operator_auditor.repository';
 
 @Injectable()

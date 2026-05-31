@@ -1,7 +1,7 @@
 import { IsOptional, IsString, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PickType } from '@nestjs/swagger';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 export class insertFlowDto extends PickType(FormDto, [
     'NFRMNO',
     'VORGNO',

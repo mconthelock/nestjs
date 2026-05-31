@@ -2,8 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { CreatePsFileDto } from './dto/create-ps-file.dto';
 import { UpdatePsFileDto } from './dto/update-ps-file.dto';
 import { PsFileRepository } from './ps-file.repository';
-import { CreateHandleFileFormDto } from 'src/webform/handle-file-form/dto/create-handle-file-form.dto';
-import { QueryHandleFileFormDto, SearchHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
+import { CreateHandleFileFormDto } from 'src/webform/center/handle-file-form/dto/create-handle-file-form.dto';
+import {
+    QueryHandleFileFormDto,
+    SearchHandleFileFormDto,
+} from 'src/webform/center/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class PsFileService {

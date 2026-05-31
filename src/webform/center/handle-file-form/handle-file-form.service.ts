@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InsertAndMoveHandleFileFormDto } from './dto/create-handle-file-form.dto';
 import { joinPaths, moveFileFromMulter } from 'src/common/utils/files.utils';
-import { FormmstService } from '../formmst/formmst.service';
-import { FormService } from '../form/form.service';
-import { IsFileService } from '../isform/is-file/is-file.service';
+import { FormmstService } from 'src/webform/center/formmst/formmst.service';
+import { FormService } from 'src/webform/center/form/form.service';
+import { IsFileService } from '../../isform/is-file/is-file.service';
 import { FormDto } from '../form/dto/form.dto';
-import { PurFileService } from '../purform/pur-file/pur-file.service';
-import { GpFileService } from '../gpform/gp-file/gp-file.service';
-import { FinFileService } from '../finform/fin-file/fin-file.service';
+import { PurFileService } from '../../purform/pur-file/pur-file.service';
+import { GpFileService } from '../../gpform/gp-file/gp-file.service';
+import { FinFileService } from '../../finform/fin-file/fin-file.service';
 import { FormAttachmentTypeService } from '../form-attachment-type/form-attachment-type.service';
-import { IeFileService } from '../ieform/ie-file/ie-file.service';
-import { FeFileService } from '../feform/fe-file/fe-file.service';
-import { MarFileService } from '../marform/mar-file/mar-file.service';
-import { MfgFileService } from '../mfgform/mfg-file/mfg-file.service';
-import { PsFileService } from '../psform/ps-file/ps-file.service';
+import { IeFileService } from '../../ieform/ie-file/ie-file.service';
+import { FeFileService } from '../../feform/fe-file/fe-file.service';
+import { MarFileService } from '../../marform/mar-file/mar-file.service';
+import { MfgFileService } from '../../mfgform/mfg-file/mfg-file.service';
+import { PsFileService } from '../../psform/ps-file/ps-file.service';
 import { SearchHandleFileFormDto } from './dto/search-handle-file-form.dto';
 
 @Injectable()
@@ -216,9 +216,9 @@ export class HandleFileFormService {
     }
 
     async getFile(dto: SearchHandleFileFormDto) {
-        const { FORM_TYPE, FILE_CODE, ...d} = dto;
+        const { FORM_TYPE, FILE_CODE, ...d } = dto;
         console.log(dto);
-        
+
         try {
             let res: any;
             let fileType: number | undefined;
@@ -237,7 +237,7 @@ export class HandleFileFormService {
             const data = {
                 ...d,
                 FILE_TYPE: fileType, // ส่งค่า NID ของประเภทไฟล์ถ้ามี FILE_CODE และพบข้อมูลในฐานข้อมูล
-            }
+            };
             switch (FORM_TYPE) {
                 case 'FE':
                     res = await this.feFileService.getFile(data);
@@ -269,7 +269,7 @@ export class HandleFileFormService {
                 default:
                     throw new Error(`Unsupported form type: ${FORM_TYPE}`);
             }
-            if(res.length === 0) {
+            if (res.length === 0) {
                 throw new Error('File not found with given criteria');
             }
             return {
@@ -278,9 +278,7 @@ export class HandleFileFormService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Get File Record ${FORM_TYPE} : ${error.message}`,
-            );
+            throw new Error(`Get File Record ${FORM_TYPE} : ${error.message}`);
         }
     }
 }

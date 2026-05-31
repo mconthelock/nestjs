@@ -3,13 +3,13 @@ import { QainsFormService } from './qains_form.service';
 import { QainsFormController } from './qains_form.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { FormModule } from 'src/webform/form/form.module';
+import { FormModule } from 'src/webform/center/form/form.module';
 import { QainsOAModule } from '../qains_operator_auditor/qains_operator_auditor.module';
 import { QaFileModule } from '../../qa_file/qa_file.module';
 
-import { FlowModule } from 'src/webform/flow/flow.module';
-import { SequenceOrgModule } from 'src/webform/sequence-org/sequence-org.module';
-import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
+import { FlowModule } from 'src/webform/center/flow/flow.module';
+import { SequenceOrgModule } from 'src/webform/center/sequence-org/sequence-org.module';
+import { OrgposModule } from 'src/webform/center/orgpos/orgpos.module';
 import { UsersModule } from 'src/escs/user/user.module';
 import { UserItemModule } from 'src/escs/user-item/user-item.module';
 import { ItemStationModule } from 'src/escs/item-station/item-station.module';

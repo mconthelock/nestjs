@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { QAINS_FORM } from 'src/common/Entities/webform/table/QAINS_FORM.entity';
 import { SearchQainsFormDto } from './dto/search-qains_form.dto';
 import { UpdateQainsFormDto } from './dto/update-qains_form.dto';
@@ -10,9 +10,7 @@ import { CreateQainsFormDto } from './dto/create-qains_form.dto';
 
 @Injectable()
 export class QainsFormRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

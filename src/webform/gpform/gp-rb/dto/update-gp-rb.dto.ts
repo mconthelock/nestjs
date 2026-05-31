@@ -8,8 +8,8 @@ import {
     ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { FormDto } from 'src/webform/form/dto/form.dto';
-import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
+import { doactionFlowDto } from 'src/webform/center/flow/dto/doaction-flow.dto';
 import { partials } from 'handlebars';
 
 export class UpdateNamestampdto extends PickType(doactionFlowDto, [

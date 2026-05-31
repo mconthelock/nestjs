@@ -13,7 +13,7 @@ import {
 import { QainsFormService } from './qains_form.service';
 import { CreateQainsFormDto } from './dto/create-qains_form.dto';
 import { SearchQainsFormDto } from './dto/search-qains_form.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { Request } from 'express';
 
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
@@ -22,7 +22,7 @@ import { ApiTags, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { QcConfQainsFormDto } from './dto/qcConfirm-qains_form.dto';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
-import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+import { doactionFlowDto } from 'src/webform/center/flow/dto/doaction-flow.dto';
 import {
     ReturnQainsFormDto,
     setInchargeQainsFormDto,

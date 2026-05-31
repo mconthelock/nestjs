@@ -5,9 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ISTID_FORM } from 'src/common/Entities/webform/table/ISTID_FORM.entity';
 import { IsTidRepository } from './is-tid.repository';
 import { IsTidCreateFormService } from './is-tid-createForm.service';
-import { FormModule } from 'src/webform/form/form.module';
-import { SequenceOrgModule } from 'src/webform/sequence-org/sequence-org.module';
-import { FlowModule } from 'src/webform/flow/flow.module';
+import { FormModule } from 'src/webform/center/form/form.module';
+import { SequenceOrgModule } from 'src/webform/center/sequence-org/sequence-org.module';
+import { FlowModule } from 'src/webform/center/flow/flow.module';
 import { IsCfsModule } from '../is-cfs/is-cfs.module';
 import { IsTidActionService } from './is-tid-updateForm.service';
 

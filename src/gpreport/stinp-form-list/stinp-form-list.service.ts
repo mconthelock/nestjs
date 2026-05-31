@@ -5,7 +5,7 @@ import {
 } from './dto/create-stinp-form-list.dto';
 import { UpdateStinpFormListDto } from './dto/update-stinp-form-list.dto';
 import { StinpFormListRepository } from './stinp-form-list.repository';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 
 @Injectable()
 export class StinpFormListService {

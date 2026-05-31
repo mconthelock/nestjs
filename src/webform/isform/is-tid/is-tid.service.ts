@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateIsTidDto } from './dto/create-is-tid.dto';
 import { UpdateIsTidDto } from './dto/update-is-tid.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { IsTidRepository } from './is-tid.repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 

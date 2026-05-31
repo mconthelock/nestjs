@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateEbgreqformDto } from './dto/create-ebgreqform.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { EbgreqformRepository } from './ebgreqform.repository';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class EbgreqformService {
     async create(dto: CreateEbgreqformDto) {
         try {
             const res = await this.repo.create(dto);
-            if(!res){
+            if (!res) {
                 throw new Error('Failed to insert EBGREQFORM');
             }
             return {

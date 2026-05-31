@@ -7,7 +7,7 @@ import {
     IsOptional,
     IsString,
 } from 'class-validator';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 
 export class CreateEbudgetQuotationDto extends PickType(FormDto, [
     'NFRMNO',

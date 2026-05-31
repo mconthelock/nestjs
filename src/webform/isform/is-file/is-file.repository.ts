@@ -5,7 +5,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { SearchIsFileDto } from './dto/search-is-file.dto';
 import { IS_FILE } from 'src/common/Entities/webform/table/IS_FILE.entity';
 import { CreateIsFileDto } from './dto/create-is-file.dto';
-import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
+import { QueryHandleFileFormDto } from 'src/webform/center/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class IsFileRepository extends BaseRepository {

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateIsFileDto } from './dto/create-is-file.dto';
 import { SearchIsFileDto } from './dto/search-is-file.dto';
 import { IsFileRepository } from './is-file.repository';
-import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
+import { QueryHandleFileFormDto } from 'src/webform/center/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class IsFileService {

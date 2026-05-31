@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { CreateStInpDto } from './dto/create-st-inp.dto';
-import { FormCreateService } from 'src/webform/form/create-form.service';
-import { FormmstService } from 'src/webform/formmst/formmst.service';
-import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
+import { FormCreateService } from 'src/webform/center/form/create-form.service';
+import { FormmstService } from 'src/webform/center/formmst/formmst.service';
+import { CreateFormDto } from 'src/webform/center/form/dto/create-form.dto';
 import { StyImageService } from 'src/gpreport/sty-image/sty-image.service';
 import { StyTypeService } from 'src/gpreport/sty-type/sty-type.service';
-import { FormDto } from 'src/webform/form/dto/form.dto';
-import { FlowService } from 'src/webform/flow/flow.service';
-import { FormService } from 'src/webform/form/form.service';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
+import { FlowService } from 'src/webform/center/flow/flow.service';
+import { FormService } from 'src/webform/center/form/form.service';
 import { StinpFormService } from 'src/gpreport/stinp-form/stinp-form.service';
 import { StinpFormListService } from 'src/gpreport/stinp-form-list/stinp-form-list.service';
 

@@ -1,6 +1,6 @@
 import { PartialType, PickType } from '@nestjs/swagger';
 import { CreateIsTidDto } from './create-is-tid.dto';
-import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+import { doactionFlowDto } from 'src/webform/center/flow/dto/doaction-flow.dto';
 import {
     IsDate,
     IsNotEmpty,

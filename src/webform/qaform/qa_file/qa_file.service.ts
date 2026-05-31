@@ -5,7 +5,7 @@ import { CreateQaFileDto } from './dto/create-qa_file.dto';
 import { UpdateQaFileDto } from './dto/update-qa_file.dto';
 import { SearchQaFileDto } from './dto/search-qa_file.dto';
 import { joinPaths, moveFileFromMulter } from 'src/common/utils/files.utils';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { QaFileRepository } from './qa_file.repository';
 
 @Injectable()

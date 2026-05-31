@@ -5,7 +5,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { STY_PATROL_INSPECTION } from 'src/common/Entities/gpreport/views/STY_PATROL_INSPECTION.entity';
 import { ReportStyPatrolInspectionDto } from './dto/report-sty-patrol-inspection.dto';
 import { STY_ITEMS } from 'src/common/Entities/gpreport/table/STY_ITEMS.entity';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { STY_TYPE } from 'src/common/Entities/gpreport/table/STY_TYPE.entity';
 
 @Injectable()
@@ -136,7 +136,7 @@ export class StyPatrolInspectionRepository extends BaseRepository {
                 SELECT TYPE_NAME AS CLASS, TYPE_NO  FROM STY_TYPE
                 WHERE TYPE_CODE = 'PTC' AND TYPE_NO IN (1,2)
             )
-            SELECT 
+            SELECT
                 C.CLASS,
                 NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 1 THEN 1 END), 0) JAN,
                 NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 2 THEN 1 END), 0) FEB,
@@ -151,7 +151,7 @@ export class StyPatrolInspectionRepository extends BaseRepository {
                 NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 11 THEN 1 END), 0) NOV,
                 NVL(SUM(CASE WHEN EXTRACT(MONTH FROM S.PA_DATE) = 12 THEN 1 END), 0) DEC,
                 NVL(COUNT(S.TYPE_NO), 0) TOTAL
-            FROM CLASS_LIST C 
+            FROM CLASS_LIST C
             LEFT JOIN (
                 SELECT * FROM STY_PATROL_INSPECTION
                 ${seccode ? 'WHERE PA_SECTION = :1' : ''}
@@ -180,7 +180,7 @@ export class StyPatrolInspectionRepository extends BaseRepository {
             CROSS JOIN CLASS_LIST C
             LEFT JOIN (
                 SELECT SDEPCODE, SDEPT, CLASS, COUNT(CLASS) AS AMOUNT
-                FROM STY_PATROL_INSPECTION	
+                FROM STY_PATROL_INSPECTION
                 WHERE CST = '2'
                 AND PA_DATE >= TO_DATE(:1 || '-04-01', 'YYYY-MM-DD')
                 AND PA_DATE < ADD_MONTHS(
@@ -247,10 +247,10 @@ export class StyPatrolInspectionRepository extends BaseRepository {
             SELECT O.SSECCODE, O.SSEC, C.CLASS, NVL(P.AMOUNT,0) AS AMOUNT
             FROM ORGANIZATIONS O
             CROSS JOIN CLASS_LIST C
-            LEFT JOIN 
+            LEFT JOIN
             (
                 SELECT SSECCODE, CLASS, COUNT(CLASS) AS AMOUNT
-                FROM STY_PATROL_INSPECTION	
+                FROM STY_PATROL_INSPECTION
                 WHERE CST = '2'
                 AND PA_DATE >= TO_DATE(:1 || '-04-01', 'YYYY-MM-DD')
                 AND PA_DATE < ADD_MONTHS(

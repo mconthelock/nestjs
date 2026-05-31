@@ -5,7 +5,7 @@ import {
     PickType,
 } from '@nestjs/swagger';
 import { CreatePurCpmDto, InsertPurCpmDto } from './create-pur-cpm.dto';
-import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+import { doactionFlowDto } from 'src/webform/center/flow/dto/doaction-flow.dto';
 import { IsArray, IsOptional } from 'class-validator';
 
 export class UpdatePurCpmDto extends PartialType(CreatePurCpmDto) {}

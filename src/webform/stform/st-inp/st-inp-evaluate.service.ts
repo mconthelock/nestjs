@@ -3,13 +3,13 @@ import { CreateStInpDto } from './dto/create-st-inp.dto';
 import { StInpService } from './st-inp.service';
 import { deleteFile } from 'src/common/utils/files.utils';
 import { EvaluateStInpDto } from './dto/evaluate-st-inp.dto';
-import { DoactionFlowService } from 'src/webform/flow/doaction.service';
-import { FormService } from 'src/webform/form/form.service';
-import { FlowService } from 'src/webform/flow/flow.service';
+import { DoactionFlowService } from 'src/webform/center/flow/doaction.service';
+import { FormService } from 'src/webform/center/form/form.service';
+import { FlowService } from 'src/webform/center/flow/flow.service';
 import { StyTypeService } from 'src/gpreport/sty-type/sty-type.service';
 import { StyImageService } from 'src/gpreport/sty-image/sty-image.service';
-import { FormmstService } from 'src/webform/formmst/formmst.service';
-import { FormCreateService } from 'src/webform/form/create-form.service';
+import { FormmstService } from 'src/webform/center/formmst/formmst.service';
+import { FormCreateService } from 'src/webform/center/form/create-form.service';
 import { StinpFormListService } from 'src/gpreport/stinp-form-list/stinp-form-list.service';
 import { StinpFormService } from 'src/gpreport/stinp-form/stinp-form.service';
 

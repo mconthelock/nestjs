@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateStinpFormDto } from './dto/create-stinp-form.dto';
 import { UpdateStinpFormDto } from './dto/update-stinp-form.dto';
 import { StinpFormRepository } from './stinp-form.repository';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 
 @Injectable()
 export class StinpFormService {

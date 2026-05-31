@@ -5,11 +5,11 @@ import {
 } from './dto/create-qains_audit.dto';
 import { UpdateQainsAuditDto } from './dto/update-qains_audit.dto';
 import { QainsOAService } from '../qains_operator_auditor/qains_operator_auditor.service';
-import { FormService } from 'src/webform/form/form.service';
+import { FormService } from 'src/webform/center/form/form.service';
 import { QaFileService } from '../../qa_file/qa_file.service';
 import { deleteFile, joinPaths } from 'src/common/utils/files.utils';
 import { QainsAuditRepository } from './qains_audit.repository';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 
 @Injectable()
 export class QainsAuditService {

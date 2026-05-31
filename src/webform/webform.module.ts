@@ -1,32 +1,35 @@
 import { Module } from '@nestjs/common';
-import { FormModule } from './form/form.module';
-import { FlowModule } from './flow/flow.module';
-import { ISFormModule } from './isform/isform.module';
-import { FlowmstModule } from './flowmst/flowmst.module';
-import { FormmstModule } from './formmst/formmst.module';
-import { QAFormModule } from './qaform/qaform.module';
-import { OrgposModule } from './orgpos/orgpos.module';
-import { OrgTreeModule } from './org-tree/org-tree.module';
-import { SequenceOrgModule } from './sequence-org/sequence-org.module';
-import { RepModule } from './rep/rep.module';
-import { IEFormModule } from './ieform/ie.module';
-import { RqffrmModule } from './rqffrm/rqffrm.module';
-import { OrganizationsModule } from './organizations/organizations.module';
-import { GpformModule } from './gpform/gpform.module';
-import { FinformModule } from './finform/finform.module';
-import { HandleFileFormModule } from './handle-file-form/handle-file-form.module';
-import { FormAttachmentTypeModule } from './form-attachment-type/form-attachment-type.module';
+//Center Modules
+import { FlowModule } from './center/flow/flow.module';
+import { FlowmstModule } from './center/flowmst/flowmst.module';
+import { FormModule } from './center/form/form.module';
+import { FormAttachmentTypeModule } from './center/form-attachment-type/form-attachment-type.module';
+import { FormmstGroupModule } from './center/formmst-group/formmst-group.module';
+import { FormmstModule } from './center/formmst/formmst.module';
+import { HandleFileFormModule } from './center/handle-file-form/handle-file-form.module';
+import { OrganizationsModule } from './center/organizations/organizations.module';
+import { OrgposModule } from './center/orgpos/orgpos.module';
+import { OrgTreeModule } from './center/org-tree/org-tree.module';
+import { RepModule } from './center/rep/rep.module';
+import { RqffrmModule } from './center/rqffrm/rqffrm.module';
+import { RqflistModule } from './center/rqflist/rqflist.module';
+import { SequenceOrgModule } from './center/sequence-org/sequence-org.module';
+
+//Dept Modules
 import { FeformModule } from './feform/feform.module';
+import { FinformModule } from './finform/finform.module';
+import { GpformModule } from './gpform/gpform.module';
+import { IEFormModule } from './ieform/ie.module';
+import { ISFormModule } from './isform/isform.module';
 import { MarFormModule } from './marform/marform.module';
-import { STFormModule } from './stform/stform.module';
-import { PurFormModule } from './purform/purform.module';
 import { PsFormModule } from './psform/psform.module';
-import { RqflistModule } from './rqflist/rqflist.module';
-import { FormmstGroupModule } from './formmst-group/formmst-group.module';
+import { PurFormModule } from './purform/purform.module';
+import { QAFormModule } from './qaform/qaform.module';
+import { STFormModule } from './stform/stform.module';
 
 @Module({
     imports: [
-        //Dept from modules
+        //Dept modules
         GpformModule,
         IEFormModule,
         ISFormModule,
@@ -37,7 +40,7 @@ import { FormmstGroupModule } from './formmst-group/formmst-group.module';
         PsFormModule,
         STFormModule,
         MarFormModule,
-        //Form Master and Form Center Modules
+        //Center Modules
         FormModule,
         FlowModule,
         FlowmstModule,

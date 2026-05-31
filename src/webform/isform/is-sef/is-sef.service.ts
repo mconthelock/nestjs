@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CreateIsSefDto } from './dto/create-is-sef.dto';
 import { CreateIsSefEmptyDto } from './dto/create-is-sef-empty.dto';
 import { UpdateIsSefDto } from './dto/update-is-sef.dto';
-import { FormmstService } from 'src/webform/formmst/formmst.service';
-import { FormCreateService } from 'src/webform/form/create-form.service';
+import { FormmstService } from 'src/webform/center/formmst/formmst.service';
+import { FormCreateService } from 'src/webform/center/form/create-form.service';
 import { IsSefRepository } from './is-sef.repository';
 import { WorkPlan } from 'src/common/Entities/docinv/table/work-plan.entity';
 

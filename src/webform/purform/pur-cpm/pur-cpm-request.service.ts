@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { PurCpmService } from './pur-cpm.service';
 import { CreatePurCpmDto } from './dto/create-pur-cpm.dto';
 import { PurCpmRepository } from './pur-cpm.repository';
-import { FormService } from 'src/webform/form/form.service';
-import { FlowService } from 'src/webform/flow/flow.service';
-import { FormmstService } from 'src/webform/formmst/formmst.service';
+import { FormService } from 'src/webform/center/form/form.service';
+import { FlowService } from 'src/webform/center/flow/flow.service';
+import { FormmstService } from 'src/webform/center/formmst/formmst.service';
 import { PurFileService } from '../pur-file/pur-file.service';
-import { RepService } from 'src/webform/rep/rep.service';
-import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
-import { FormCreateService } from 'src/webform/form/create-form.service';
+import { RepService } from 'src/webform/center/rep/rep.service';
+import { DeleteFlowStepService } from 'src/webform/center/flow/delete-flow-step.service';
+import { FormCreateService } from 'src/webform/center/form/create-form.service';
 import { deleteFile } from 'src/common/utils/files.utils';
-import { InsertFlowStepService } from 'src/webform/flow/insert-flow-step.service';
+import { InsertFlowStepService } from 'src/webform/center/flow/insert-flow-step.service';
 
 @Injectable()
 export class PurCpmRequestService extends PurCpmService {

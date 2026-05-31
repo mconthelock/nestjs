@@ -5,7 +5,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { CreateStinpFormDto } from './dto/create-stinp-form.dto';
 import { STINP_FORM } from 'src/common/Entities/gpreport/table/STINP_FORM.entity';
 import { UpdateStinpFormDto } from './dto/update-stinp-form.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 @Injectable()
 export class StinpFormRepository extends BaseRepository {
     constructor(@InjectDataSource('gpreportConnection') ds: DataSource) {

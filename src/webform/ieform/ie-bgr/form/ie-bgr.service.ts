@@ -8,27 +8,27 @@ import {
 import { ReportIeBgrDto, UpdateIeBgrDto } from './dto/update-ie-bgr.dto';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Like, QueryRunner, Repository } from 'typeorm';
-import { FormService } from 'src/webform/form/form.service';
+import { FormService } from 'src/webform/center/form/form.service';
 import {
     deleteFile,
     joinPaths,
     moveFileFromMulter,
 } from 'src/common/utils/files.utils';
-import { FormmstService } from 'src/webform/formmst/formmst.service';
+import { FormmstService } from 'src/webform/center/formmst/formmst.service';
 import { EbgreqformService } from 'src/ebudget/ebgreqform/ebgreqform.service';
 import { EbgreqattfileService } from 'src/ebudget/ebgreqattfile/ebgreqattfile.service';
 import { EbgreqcolImageService } from 'src/ebudget/ebgreqcol-image/ebgreqcol-image.service';
-import { FlowService } from 'src/webform/flow/flow.service';
+import { FlowService } from 'src/webform/center/flow/flow.service';
 import { EbudgetQuotationService } from 'src/ebudget/ebudget-quotation/ebudget-quotation.service';
 import { EbudgetQuotationProductService } from 'src/ebudget/ebudget-quotation-product/ebudget-quotation-product.service';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { PprbiddingService } from 'src/amec/pprbidding/pprbidding.service';
 import { MailService } from 'src/common/services/mail/mail.service';
-import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
+import { CreateFormDto } from 'src/webform/center/form/dto/create-form.dto';
 import { IEBGR_REPORT_VIEW } from 'src/common/Entities/webform/views/IEBGR_REPORT_VIEW.entity';
 import { PpoService } from 'src/amec/ppo/ppo.service';
-import { DoactionFlowService } from 'src/webform/flow/doaction.service';
-import { FormCreateService } from 'src/webform/form/create-form.service';
+import { DoactionFlowService } from 'src/webform/center/flow/doaction.service';
+import { FormCreateService } from 'src/webform/center/form/create-form.service';
 
 @Injectable()
 export class IeBgrService {
@@ -46,10 +46,10 @@ export class IeBgrService {
         private readonly ppoService: PpoService,
         protected readonly flowService: FlowService,
         private readonly formCreateService: FormCreateService,
-        
+
         // create form
         protected readonly doactionFlowService: DoactionFlowService,
-        
+
         // last approve
         protected readonly formService: FormService,
         protected readonly mailService: MailService,

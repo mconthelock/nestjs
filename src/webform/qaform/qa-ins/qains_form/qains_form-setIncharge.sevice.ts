@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { QainsFormService } from './qains_form.service';
 import { setInchargeQainsFormDto } from './dto/return-qains_form.dot';
-import { FormDto } from 'src/webform/form/dto/form.dto';
-import { FlowService } from 'src/webform/flow/flow.service';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
+import { FlowService } from 'src/webform/center/flow/flow.service';
 import { QainsFormRepository } from './qains_form.repository';
 import { MailService } from 'src/common/services/mail/mail.service';
-import { DoactionFlowService } from 'src/webform/flow/doaction.service';
+import { DoactionFlowService } from 'src/webform/center/flow/doaction.service';
 
 @Injectable()
 export class QainsFormSetInchargeService extends QainsFormService {
@@ -45,13 +45,10 @@ export class QainsFormSetInchargeService extends QainsFormService {
             );
 
             // update ojt date and training date
-            await this.update(
-                {
-                    ...form,
-                    QA_INCHARGE_EMPNO: dto.QA_INCHARGE_EMPNO,
-                },
-            );
-
+            await this.update({
+                ...form,
+                QA_INCHARGE_EMPNO: dto.QA_INCHARGE_EMPNO,
+            });
 
             // do action
             await this.doactionFlowService.doAction(

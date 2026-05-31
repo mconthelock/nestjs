@@ -4,13 +4,13 @@ import {
     CorrectiveStInpDetailDto,
     CorrectiveStInpDto,
 } from './dto/corrective-st-inp.dto';
-import { FlowService } from 'src/webform/flow/flow.service';
+import { FlowService } from 'src/webform/center/flow/flow.service';
 import { StyTypeService } from 'src/gpreport/sty-type/sty-type.service';
 import { StyImageService } from 'src/gpreport/sty-image/sty-image.service';
-import { FormmstService } from 'src/webform/formmst/formmst.service';
-import { FormCreateService } from 'src/webform/form/create-form.service';
-import { DoactionFlowService } from 'src/webform/flow/doaction.service';
-import { FormService } from 'src/webform/form/form.service';
+import { FormmstService } from 'src/webform/center/formmst/formmst.service';
+import { FormCreateService } from 'src/webform/center/form/create-form.service';
+import { DoactionFlowService } from 'src/webform/center/flow/doaction.service';
+import { FormService } from 'src/webform/center/form/form.service';
 import { StinpFormListService } from 'src/gpreport/stinp-form-list/stinp-form-list.service';
 import { StinpFormService } from 'src/gpreport/stinp-form/stinp-form.service';
 
@@ -135,7 +135,6 @@ export class StInpCorrectiveService extends StInpService {
                         existing.data.NIMAGE_AFTER,
                     ); // ลบไฟล์เก่า
                 }
-                
             }
 
             if (dto.ACTION !== 'save') {

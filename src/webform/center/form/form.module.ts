@@ -5,7 +5,7 @@ import { FormController } from './form.controller';
 import { FormmstModule } from '../formmst/formmst.module';
 import { FlowmstModule } from '../flowmst/flowmst.module';
 import { UsersModule } from 'src/amec/users/users.module';
-import { OrgTreeModule } from 'src/webform/org-tree/org-tree.module';
+import { OrgTreeModule } from 'src/webform/center/org-tree/org-tree.module';
 import { RepModule } from '../rep/rep.module';
 import { FlowModule } from '../flow/flow.module';
 import { OrgposModule } from '../orgpos/orgpos.module';

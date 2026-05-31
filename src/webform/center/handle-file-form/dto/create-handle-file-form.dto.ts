@@ -8,7 +8,7 @@ import {
     IsString,
     ValidateNested,
 } from 'class-validator';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 
 export class InsertAndMoveHandleFileFormDto extends PickType(FormDto, [
     'NFRMNO',

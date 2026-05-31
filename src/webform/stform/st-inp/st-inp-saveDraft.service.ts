@@ -4,13 +4,13 @@ import {
     CorrectiveStInpDetailDto,
     CorrectiveStInpDto,
 } from './dto/corrective-st-inp.dto';
-import { FlowService } from 'src/webform/flow/flow.service';
+import { FlowService } from 'src/webform/center/flow/flow.service';
 import { StyTypeService } from 'src/gpreport/sty-type/sty-type.service';
 import { StyImageService } from 'src/gpreport/sty-image/sty-image.service';
-import { FormmstService } from 'src/webform/formmst/formmst.service';
-import { FormCreateService } from 'src/webform/form/create-form.service';
-import { DoactionFlowService } from 'src/webform/flow/doaction.service';
-import { FormService } from 'src/webform/form/form.service';
+import { FormmstService } from 'src/webform/center/formmst/formmst.service';
+import { FormCreateService } from 'src/webform/center/form/create-form.service';
+import { DoactionFlowService } from 'src/webform/center/flow/doaction.service';
+import { FormService } from 'src/webform/center/form/form.service';
 import { StinpFormListService } from 'src/gpreport/stinp-form-list/stinp-form-list.service';
 import { StinpFormService } from 'src/gpreport/stinp-form/stinp-form.service';
 import { DraftStInpDto } from './dto/create-st-inp.dto';
@@ -71,7 +71,7 @@ export class StInpSaveDraftService extends StInpService {
                 flagReset = true;
                 await this.setOwnerFlow(form, dto.PA_OWNER);
             }
-            // update ข้อมูลฟอร์มหลักก่อน เพราะข้อมูลใน list จะต้องอ้างอิงกับฟอร์มหลักเสมอ   
+            // update ข้อมูลฟอร์มหลักก่อน เพราะข้อมูลใน list จะต้องอ้างอิงกับฟอร์มหลักเสมอ
             await this.stinpFormService.update(form, {
                 VOWNER: dto.PA_OWNER,
                 DDATE: dto.PA_DATE,
@@ -121,20 +121,23 @@ export class StInpSaveDraftService extends StInpService {
                                 `Form list item not found with ID: ${newlist.PA_ID}`,
                             ); // ป้องกันกรณีที่มี PA_ID แต่ไม่เจอใน DB
                         }
-                        if(!listDelImg.includes(existing.data.NIMAGE)) {
+                        if (!listDelImg.includes(existing.data.NIMAGE)) {
                             listDelImg.push(existing.data.NIMAGE); // เก็บไฟล์เก่าไว้ลบทีหลัง
                         }
-                         const existingOld =
+                        const existingOld =
                             await this.stinpFormListService.findOne({
                                 ...form,
                                 NID: index + 1,
                             });
-                        if (existingOld.status && !listDelImg.includes(existingOld.data.NIMAGE)) {
+                        if (
+                            existingOld.status &&
+                            !listDelImg.includes(existingOld.data.NIMAGE)
+                        ) {
                             listDelImg.push(existingOld.data.NIMAGE); // เก็บไฟล์เก่าไว้ลบทีหลัง
                         }
                         // update ข้อมูลแถวใหม่
                         await this.stinpFormListService.update(
-                            { ...form, NID: index+1 },
+                            { ...form, NID: index + 1 },
                             {
                                 NITEM: newlist.PA_ITEMS,
                                 VAREA: newlist.PA_AREA,
@@ -152,7 +155,10 @@ export class StInpSaveDraftService extends StInpService {
                                 ...form,
                                 NID: index + 1,
                             });
-                        if (existing.status && !listDelImg.includes(existing.data.NIMAGE)) {
+                        if (
+                            existing.status &&
+                            !listDelImg.includes(existing.data.NIMAGE)
+                        ) {
                             listDelImg.push(existing.data.NIMAGE); // เก็บไฟล์เก่าไว้ลบทีหลัง
                         }
                         // ถ้าเป็นรายการใหม่ ให้สร้างแถวใหม่ด้วย NID ที่เพิ่มขึ้นจากแถวสุดท้ายในที่นี้หากมี primary key มันจะ update
@@ -167,7 +173,6 @@ export class StInpSaveDraftService extends StInpService {
                             NMAT: newlist.PA_MAT,
                             NIMAGE: movedFile.data.IMAGE_ID,
                         });
-                        
                     }
                 }
                 if (list.status) {

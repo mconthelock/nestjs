@@ -7,7 +7,7 @@ import { getBase64ImageFromUrl } from 'src/common/utils/files.utils';
 import { formatDate } from 'src/common/utils/dayjs.utils';
 import { FlowRepository } from './flow.repository';
 import { RepService } from '../rep/rep.service';
-import { FormService } from '../form/form.service';
+import { FormService } from 'src/webform/center/form/form.service';
 
 @Injectable()
 export class ShowFlowService extends FlowService {
@@ -15,7 +15,7 @@ export class ShowFlowService extends FlowService {
         protected readonly repService: RepService,
         protected readonly repo: FlowRepository,
         private readonly formService: FormService,
-    ){
+    ) {
         super(repService, repo);
     }
 

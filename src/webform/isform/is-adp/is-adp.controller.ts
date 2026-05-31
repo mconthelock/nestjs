@@ -16,8 +16,11 @@ import { UpdateIsAdpDto } from './dto/update-is-adp.dto';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { Request } from 'express';
 import { getClientIP } from 'src/common/utils/ip.utils';
-import { FormDto } from 'src/webform/form/dto/form.dto';
-import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
+import {
+    UseForceTransaction,
+    UseTransaction,
+} from 'src/common/decorator/transaction.decorator';
 
 @Controller('isform/is-adp')
 export class IsAdpController {

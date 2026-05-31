@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { FormService } from 'src/webform/form/form.service';
+import { FormService } from 'src/webform/center/form/form.service';
 import { joinPaths, moveFileFromMulter } from 'src/common/utils/files.utils';
 import { PurFileService } from '../pur-file/pur-file.service';
-import { FlowService } from 'src/webform/flow/flow.service';
-import { RepService } from 'src/webform/rep/rep.service';
-import { FormmstService } from 'src/webform/formmst/formmst.service';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FlowService } from 'src/webform/center/flow/flow.service';
+import { RepService } from 'src/webform/center/rep/rep.service';
+import { FormmstService } from 'src/webform/center/formmst/formmst.service';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { PurCpmRepository } from './pur-cpm.repository';
-import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
+import { DeleteFlowStepService } from 'src/webform/center/flow/delete-flow-step.service';
 import { InsertPurCpmDto } from './dto/create-pur-cpm.dto';
 import { UpdatePurCpmDto } from './dto/update-pur-cpm.dto';
-import { InsertFlowStepService } from 'src/webform/flow/insert-flow-step.service';
+import { InsertFlowStepService } from 'src/webform/center/flow/insert-flow-step.service';
 
 @Injectable()
 export class PurCpmService {

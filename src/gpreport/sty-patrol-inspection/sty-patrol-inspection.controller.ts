@@ -11,7 +11,7 @@ import { StyPatrolInspectionService } from './sty-patrol-inspection.service';
 import { CreateStyPatrolInspectionDto } from './dto/create-sty-patrol-inspection.dto';
 import { UpdateStyPatrolInspectionDto } from './dto/update-sty-patrol-inspection.dto';
 import { ReportStyPatrolInspectionDto } from './dto/report-sty-patrol-inspection.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 
 @Controller('gpreport/sty-patrol-inspection')
 export class StyPatrolInspectionController {
@@ -92,7 +92,6 @@ export class StyPatrolInspectionController {
             sseccode,
         );
     }
-
 
     @Get('summary/section/:fyear/:month/:deptcode')
     summarySection(

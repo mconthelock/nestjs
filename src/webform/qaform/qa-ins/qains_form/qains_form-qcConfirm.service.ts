@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { QainsFormService } from './qains_form.service';
 import { QcConfQainsFormDto } from './dto/qcConfirm-qains_form.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { MailService } from 'src/common/services/mail/mail.service';
 import { QainsFormRepository } from './qains_form.repository';
-import { FlowService } from 'src/webform/flow/flow.service';
+import { FlowService } from 'src/webform/center/flow/flow.service';
 import { AmecUserAllService } from 'src/amec/amecuserall/amecuserall.service';
-import { OrgposService } from 'src/webform/orgpos/orgpos.service';
+import { OrgposService } from 'src/webform/center/orgpos/orgpos.service';
 import { QainsOAService } from '../qains_operator_auditor/qains_operator_auditor.service';
-import { DoactionFlowService } from 'src/webform/flow/doaction.service';
+import { DoactionFlowService } from 'src/webform/center/flow/doaction.service';
 import { formatDate } from 'src/common/utils/dayjs.utils';
 
 @Injectable()
@@ -151,15 +151,15 @@ export class QainsFormQcConfirmService extends QainsFormService {
 
             html += `<b>Dear ${semInfo.data.SNAME}</b>
         <p>
-            I'm writing to arrange a time for 
+            I'm writing to arrange a time for
             <span style="font-weight:bold; color:#0000FF;">
-                quality built in for item ${item} on ${data.QA_OJT_DATE ? formatDate(data.QA_OJT_DATE, 'DD-MMM-YY') : '-'} ${data.QA_OJT_DATE ? formatDate(data.QA_OJT_DATE, 'HH:mm') : '00:00'} 
+                quality built in for item ${item} on ${data.QA_OJT_DATE ? formatDate(data.QA_OJT_DATE, 'DD-MMM-YY') : '-'} ${data.QA_OJT_DATE ? formatDate(data.QA_OJT_DATE, 'HH:mm') : '00:00'}
             </span>.
             <br>
             Please prepare part orders for quality built in.
         </p>
 
-        <table cellpadding="6" cellspacing="0" border="1" 
+        <table cellpadding="6" cellspacing="0" border="1"
         style="border: 1px solid #aaa; width: 100%; padding: 0px; font-size: 0.85em;">
             <thead>
                 <tr style="background:#fce4ec; text-align:left; padding: 10px 0px;">

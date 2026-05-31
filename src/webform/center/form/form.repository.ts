@@ -3,7 +3,7 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { FiltersDto } from 'src/common/dto/filter.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { FormWebformDto, GetNextRunNoDto } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
 import { formDetailQb } from 'src/common/utils/qb-form-detail';
@@ -11,9 +11,7 @@ import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
 @Injectable()
 export class FormRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

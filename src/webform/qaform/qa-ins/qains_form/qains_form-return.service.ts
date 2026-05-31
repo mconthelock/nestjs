@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { QainsFormService } from './qains_form.service';
 import { ReturnQainsFormDto } from './dto/return-qains_form.dot';
-import { FormDto } from 'src/webform/form/dto/form.dto';
-import { FlowService } from 'src/webform/flow/flow.service';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
+import { FlowService } from 'src/webform/center/flow/flow.service';
 import { QainsFormRepository } from './qains_form.repository';
 import { MailService } from 'src/common/services/mail/mail.service';
-import { OrgposService } from 'src/webform/orgpos/orgpos.service';
+import { OrgposService } from 'src/webform/center/orgpos/orgpos.service';
 import { QainsOAService } from '../qains_operator_auditor/qains_operator_auditor.service';
-import { DoactionFlowService } from 'src/webform/flow/doaction.service';
+import { DoactionFlowService } from 'src/webform/center/flow/doaction.service';
 import { QaFileService } from '../../qa_file/qa_file.service';
 import { UsersSectionService } from 'src/escs/user_section/user_section.service';
-import { FormService } from 'src/webform/form/form.service';
+import { FormService } from 'src/webform/center/form/form.service';
 import { moveFileFromMulter } from 'src/common/utils/files.utils';
 
 @Injectable()

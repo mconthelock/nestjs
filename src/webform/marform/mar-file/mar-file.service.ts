@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CreateMarFileDto } from './dto/create-mar-file.dto';
 import { UpdateMarFileDto } from './dto/update-mar-file.dto';
 import { MarFileRepository } from './mar-file.repository';
-import { CreateHandleFileFormDto } from 'src/webform/handle-file-form/dto/create-handle-file-form.dto';
-import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
+import { CreateHandleFileFormDto } from 'src/webform/center/handle-file-form/dto/create-handle-file-form.dto';
+import { QueryHandleFileFormDto } from 'src/webform/center/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class MarFileService {

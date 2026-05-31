@@ -1,22 +1,22 @@
 import { PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  IsArray,
-  IsDateString,
+    IsOptional,
+    IsString,
+    IsNumber,
+    IsArray,
+    IsDateString,
 } from 'class-validator';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 export class SearchIsFileDto extends PickType(FormDto, [
-  'NFRMNO',
-  'VORGNO',
-  'CYEAR',
-  'CYEAR2',
-  'NRUNNO',
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'CYEAR2',
+    'NRUNNO',
 ] as const) {
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  FILE_ID?: number;
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber()
+    FILE_ID?: number;
 }

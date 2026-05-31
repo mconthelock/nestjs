@@ -1,6 +1,6 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { EbudgetQuotationService } from './ebudget-quotation.service';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 
 @Controller('ebudget/quotation')
 export class EbudgetQuotationController {

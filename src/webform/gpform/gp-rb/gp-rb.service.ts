@@ -1,11 +1,11 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 
 import { GpRbRepository } from './gp-rb.repository';
-import { FormmstService } from 'src/webform/formmst/formmst.service';
-import { FormCreateService } from 'src/webform/form/create-form.service';
-import { FormDto } from 'src/webform/form/dto/form.dto';
-import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
-import { DoactionFlowService } from 'src/webform/flow/doaction.service';
+import { FormmstService } from 'src/webform/center/formmst/formmst.service';
+import { FormCreateService } from 'src/webform/center/form/create-form.service';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
+import { HandleFileFormService } from 'src/webform/center/handle-file-form/handle-file-form.service';
+import { DoactionFlowService } from 'src/webform/center/flow/doaction.service';
 
 import { CreateStampReqFormDto } from './dto/create-gp-rb.dto';
 import { UpdateNamestampdto } from './dto/update-gp-rb.dto';
@@ -149,16 +149,16 @@ export class GpRbService {
             //         `Invalid stampFormatGroup: "${stampFormatGroup}". Must be "standard" or "other"`,
             //     );
             // }
-    if(file){
-            const save = await this.handleFileFormService.insertFiles(
-                {
-                    ...form,
-                    FORM_TYPE: 'GP',
-                    CREATEBY: dto.REQBY,
-                },
-                file,
-            );
-        }
+            if (file) {
+                const save = await this.handleFileFormService.insertFiles(
+                    {
+                        ...form,
+                        FORM_TYPE: 'GP',
+                        CREATEBY: dto.REQBY,
+                    },
+                    file,
+                );
+            }
             // throw new Error('test');
 
             return {

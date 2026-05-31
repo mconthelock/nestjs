@@ -4,15 +4,13 @@ import { DataSource, Like, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { ISTID_FORM } from 'src/common/Entities/webform/table/ISTID_FORM.entity';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { UpdateIsTidDto } from './dto/update-is-tid.dto';
 import { CreateIsTidDto, CreateIsTidFormDto } from './dto/create-is-tid.dto';
 
 @Injectable()
 export class IsTidRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

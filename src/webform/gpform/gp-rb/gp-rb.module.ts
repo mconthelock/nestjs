@@ -5,10 +5,10 @@ import { GpRbService } from './gp-rb.service';
 import { GpRbController } from './gp-rb.controller';
 import { GpRbRepository } from './gp-rb.repository';
 
-import { FormmstModule } from 'src/webform/formmst/formmst.module';
-import { FormModule } from 'src/webform/form/form.module';
-import { FlowModule } from 'src/webform/flow/flow.module';
-import { HandleFileFormModule } from 'src/webform/handle-file-form/handle-file-form.module';
+import { FormmstModule } from 'src/webform/center/formmst/formmst.module';
+import { FormModule } from 'src/webform/center/form/form.module';
+import { FlowModule } from 'src/webform/center/flow/flow.module';
+import { HandleFileFormModule } from 'src/webform/center/handle-file-form/handle-file-form.module';
 
 import { GPRB_PURPOSE } from 'src/common/Entities/webform/table/GPRB_PURPOSE.entity';
 import { GPRB_STAMP_CONFIG } from 'src/common/Entities/webform/table/GPRB_STAMP_CONFIG.entity';

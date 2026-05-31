@@ -3,7 +3,7 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { PURCPM_FORM } from 'src/common/Entities/webform/table/PURCPM_FORM.entity';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { InsertPurCpmDto } from './dto/create-pur-cpm.dto';
 import { UpdatePurCpmDto } from './dto/update-pur-cpm.dto';
 
@@ -40,7 +40,6 @@ export class PurCpmRepository extends BaseRepository {
     }
 
     async update(condition: FormDto, data: UpdatePurCpmDto) {
-        return await this.getRepository(PURCPM_FORM)
-            .update(condition, data);
+        return await this.getRepository(PURCPM_FORM).update(condition, data);
     }
 }

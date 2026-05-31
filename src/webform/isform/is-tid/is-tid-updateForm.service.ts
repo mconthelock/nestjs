@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { IsTidService } from './is-tid.service';
-import { DoactionFlowService } from 'src/webform/flow/doaction.service';
+import { DoactionFlowService } from 'src/webform/center/flow/doaction.service';
 import { IsTidRepository } from './is-tid.repository';
 import { ActionIsTidDto } from './dto/update-is-tid.dto';
 
@@ -40,7 +40,7 @@ export class IsTidActionService extends IsTidService {
             return {
                 status: true,
                 message: 'Action Form successfully',
-            }
+            };
         } catch (error) {
             throw new Error('Action Form Failed: ' + error.message);
         }

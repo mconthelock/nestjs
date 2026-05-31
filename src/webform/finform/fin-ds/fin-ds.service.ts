@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { CreateFinDFormdto } from './dto/create-fin-d.dto';
 import { FinDsRepository } from './fin-ds.repository';
 
-import { FormmstService } from 'src/webform/formmst/formmst.service';
-import { FormCreateService } from 'src/webform/form/create-form.service';
-import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
+import { FormmstService } from 'src/webform/center/formmst/formmst.service';
+import { FormCreateService } from 'src/webform/center/form/create-form.service';
+import { HandleFileFormService } from 'src/webform/center/handle-file-form/handle-file-form.service';
 
 @Injectable()
 export class FinDsService {
@@ -57,8 +57,8 @@ export class FinDsService {
         };
     }
     async findFileById(fileId: number) {
-    return this.repo.findFileById(fileId);
-}
+        return this.repo.findFileById(fileId);
+    }
 
     async create(
         createFinDDto: CreateFinDFormdto,
@@ -69,7 +69,6 @@ export class FinDsService {
             console.log('dto', createFinDDto);
             console.log('files', files);
 
-      
             const formmst =
                 await this.FormmstService.getFormMasterByVaname('FIN-DS');
 
@@ -107,42 +106,39 @@ export class FinDsService {
 
             console.log('Created head:', head);
 
- console.log('RAW DATA:', createFinDDto.DATA);
-console.log('RAW DATA TYPE:', typeof createFinDDto.DATA);
+            console.log('RAW DATA:', createFinDDto.DATA);
+            console.log('RAW DATA TYPE:', typeof createFinDDto.DATA);
 
-const detailData =
-    typeof createFinDDto.DATA === 'string'
-        ? JSON.parse(createFinDDto.DATA || '[]')
-        : createFinDDto.DATA;
+            const detailData =
+                typeof createFinDDto.DATA === 'string'
+                    ? JSON.parse(createFinDDto.DATA || '[]')
+                    : createFinDDto.DATA;
 
-console.log('detailData parsed:', detailData);
+            console.log('detailData parsed:', detailData);
 
-if (!Array.isArray(detailData) || detailData.length === 0) {
-    throw new Error('FIN-DS detail data is required');
-}
+            if (!Array.isArray(detailData) || detailData.length === 0) {
+                throw new Error('FIN-DS detail data is required');
+            }
 
-for (const DetailDATA of detailData) {
-    console.log('DetailDATA:', DetailDATA);
+            for (const DetailDATA of detailData) {
+                console.log('DetailDATA:', DetailDATA);
 
-    const lineId = Number(
-        DetailDATA.LINE_ID ??
-        DetailDATA.LINEID
-    );
+                const lineId = Number(DetailDATA.LINE_ID ?? DetailDATA.LINEID);
 
-    if (!lineId || Number.isNaN(lineId)) {
-        throw new Error(
-            `LINEID is required: ${JSON.stringify(DetailDATA)}`
-        );
-    }
+                if (!lineId || Number.isNaN(lineId)) {
+                    throw new Error(
+                        `LINEID is required: ${JSON.stringify(DetailDATA)}`,
+                    );
+                }
 
-    await this.repo.createdetail({
-        ...form,
-        LINEID: lineId,
-        REASON: DetailDATA.REASON,
-        DUTY_VALUE: Number(DetailDATA.DUTY_VALUE),
-        QTY: Number(DetailDATA.QTY),
-    });
-}
+                await this.repo.createdetail({
+                    ...form,
+                    LINEID: lineId,
+                    REASON: DetailDATA.REASON,
+                    DUTY_VALUE: Number(DetailDATA.DUTY_VALUE),
+                    QTY: Number(DetailDATA.QTY),
+                });
+            }
 
             let fileResult = null;
 
@@ -155,8 +151,7 @@ for (const DetailDATA of detailData) {
                         CYEAR2: form.CYEAR2,
                         NRUNNO: form.NRUNNO,
 
-         
-                        FORM_TYPE: 'FIN',                        
+                        FORM_TYPE: 'FIN',
                         CREATEBY: createFinDDto.INPUTBY,
                     },
                     files,
@@ -181,5 +176,4 @@ for (const DetailDATA of detailData) {
             throw error;
         }
     }
-    
 }

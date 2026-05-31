@@ -1,7 +1,7 @@
 import { PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, ValidateNested } from 'class-validator';
-import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+import { doactionFlowDto } from 'src/webform/center/flow/dto/doaction-flow.dto';
 
 class ListEvaluateDto {
     @IsNotEmpty()

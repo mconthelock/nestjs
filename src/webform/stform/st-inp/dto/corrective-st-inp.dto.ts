@@ -8,7 +8,7 @@ import {
     ValidateNested,
 } from 'class-validator';
 import { StringToDate } from 'src/common/utils/transform';
-import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+import { doactionFlowDto } from 'src/webform/center/flow/dto/doaction-flow.dto';
 
 export class CorrectiveStInpDto extends PickType(doactionFlowDto, [
     'NFRMNO',

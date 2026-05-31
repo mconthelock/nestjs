@@ -8,7 +8,7 @@ import {
 } from './dto/create-stinp-form-list.dto';
 import { STINP_FORM_LIST } from 'src/common/Entities/gpreport/table/STINP_FORM_LIST.entity';
 import { UpdateStinpFormListDto } from './dto/update-stinp-form-list.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 @Injectable()
 export class StinpFormListRepository extends BaseRepository {
     constructor(@InjectDataSource('gpreportConnection') ds: DataSource) {

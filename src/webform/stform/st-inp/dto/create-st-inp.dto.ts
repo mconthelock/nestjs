@@ -10,8 +10,8 @@ import {
     ValidateNested,
 } from 'class-validator';
 import { StringToDate } from 'src/common/utils/transform';
-import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
-import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
+import { doactionFlowDto } from 'src/webform/center/flow/dto/doaction-flow.dto';
+import { CreateFormDto } from 'src/webform/center/form/dto/create-form.dto';
 
 export class PatrolListDto {
     @IsOptional()

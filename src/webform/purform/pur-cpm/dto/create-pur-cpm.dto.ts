@@ -8,7 +8,7 @@ import {
     IsOptional,
     IsString,
 } from 'class-validator';
-import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
+import { CreateFormDto } from 'src/webform/center/form/dto/create-form.dto';
 
 export class CreatePurCpmDto extends PickType(CreateFormDto, [
     'NFRMNO',
@@ -167,7 +167,6 @@ export class InsertPurCpmDto extends PickType(CreatePurCpmDto, [
     'THIRD_PARTY',
     'CURRENCY',
 ] as const) {
-
     @IsNotEmpty()
     @IsString()
     CYEAR2: string;

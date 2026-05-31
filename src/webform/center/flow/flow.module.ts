@@ -3,9 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FlowService } from './flow.service';
 import { FlowController } from './flow.controller';
 import { RepModule } from '../rep/rep.module';
-import { FormModule } from '../form/form.module';
+import { FormModule } from 'src/webform/center/form/form.module';
 import { UsersModule } from 'src/amec/users/users.module';
-import { FormmstModule } from '../formmst/formmst.module';
+import { FormmstModule } from 'src/webform/center/formmst/formmst.module';
+import { FlowmstModule } from 'src/webform/center/flowmst/flowmst.module';
 import { MailModule } from 'src/common/services/mail/mail.module';
 import { FlowRepository } from './flow.repository';
 import { ShowFlowService } from './show-flow.service';
@@ -15,7 +16,6 @@ import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 import { InsertFlowStepService } from './insert-flow-step.service';
 import { OrgposModule } from '../orgpos/orgpos.module';
 import { OrgTreeModule } from '../org-tree/org-tree.module';
-import { FlowmstModule } from '../flowmst/flowmst.module';
 
 @Module({
     imports: [

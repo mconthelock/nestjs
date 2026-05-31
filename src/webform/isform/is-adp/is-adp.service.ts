@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CreateIsAdpDto, insertIsAdpDto } from './dto/create-is-adp.dto';
-import { FormService } from 'src/webform/form/form.service';
+import { FormService } from 'src/webform/center/form/form.service';
 import { deleteFile, moveFileFromMulter } from 'src/common/utils/files.utils';
 import { IsFileService } from '../is-file/is-file.service';
-import { FormDto } from 'src/webform/form/dto/form.dto';
-import { FormCreateService } from 'src/webform/form/create-form.service';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
+import { FormCreateService } from 'src/webform/center/form/create-form.service';
 import { IsAdpRepository } from './is-adp.repository';
 
 @Injectable()

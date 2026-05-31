@@ -9,7 +9,7 @@ import { GPRB_STAMP_REQ } from 'src/common/Entities/webform/table/GPRB_STAMP_REQ
 
 import { RB_CUS_STAMP_REQ } from 'src/common/Entities/webform/table/GPRB_CUS_STAMP_REQ.entity';
 
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { UpdateNamestampdto } from './dto/update-gp-rb.dto';
 import { CreateStampReqDto } from './dto/create-gp-rb.dto';
 

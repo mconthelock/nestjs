@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { FlowService } from 'src/webform/flow/flow.service';
+import { FlowService } from 'src/webform/center/flow/flow.service';
 import { SearchQainsFormDto } from './dto/search-qains_form.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import { UpdateQainsFormDto } from './dto/update-qains_form.dto';
 import { QainsFormRepository } from './qains_form.repository';
 import { CreateQainsFormDto } from './dto/create-qains_form.dto';

@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CreateIeFileDto } from './dto/create-ie-file.dto';
 import { UpdateIeFileDto } from './dto/update-ie-file.dto';
 import { IeFileRepository } from './ie-file.repository';
-import { CreateHandleFileFormDto } from 'src/webform/handle-file-form/dto/create-handle-file-form.dto';
-import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
+import { CreateHandleFileFormDto } from 'src/webform/center/handle-file-form/dto/create-handle-file-form.dto';
+import { QueryHandleFileFormDto } from 'src/webform/center/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class IeFileService {

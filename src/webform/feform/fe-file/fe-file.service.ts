@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFeFileDto } from './dto/create-fe-file.dto';
 import { UpdateFeFileDto } from './dto/update-fe-file.dto';
-import { CreateHandleFileFormDto } from 'src/webform/handle-file-form/dto/create-handle-file-form.dto';
+import { CreateHandleFileFormDto } from 'src/webform/center/handle-file-form/dto/create-handle-file-form.dto';
 import { FeFileRepository } from './fe-file.repository';
-import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
+import { QueryHandleFileFormDto } from 'src/webform/center/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class FeFileService {

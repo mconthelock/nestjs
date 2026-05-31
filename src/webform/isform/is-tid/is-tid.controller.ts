@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Req, Patch } from '@nestjs/common';
 import { IsTidService } from './is-tid.service';
 import { CreateIsTidFormDto } from './dto/create-is-tid.dto';
 import { ActionIsTidDto } from './dto/update-is-tid.dto';
-import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/center/form/dto/form.dto';
 import {
     UseForceTransaction,
     UseTransaction,

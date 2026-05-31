@@ -10,7 +10,7 @@ import {
     IsString,
     ValidateNested,
 } from 'class-validator';
-import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+import { doactionFlowDto } from 'src/webform/center/flow/dto/doaction-flow.dto';
 
 export class BGRDelImageDto {
     @IsNotEmpty()
@@ -154,7 +154,7 @@ export class CreateIeBgrDto {
     @IsDate()
     @Type(() => Date)
     PAYMENT_PLAN?: Date;
-  
+
     @IsNotEmpty()
     @IsDate()
     @Type(() => Date)

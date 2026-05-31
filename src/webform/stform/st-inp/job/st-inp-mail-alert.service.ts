@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { StInpRepository } from '../st-inp.repository';
-import { FormmstService } from 'src/webform/formmst/formmst.service';
+import { FormmstService } from 'src/webform/center/formmst/formmst.service';
 import { MailService } from 'src/common/services/mail/mail.service';
-import { FormService } from 'src/webform/form/form.service';
-import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
+import { FormService } from 'src/webform/center/form/form.service';
+import { SequenceOrgService } from 'src/webform/center/sequence-org/sequence-org.service';
 import { MailList } from './st-inp-mail-alert.interface';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class StInpJobAlertService {
                 formmst.CYEAR,
                 date,
             );
-            if(list.length === 0){
+            if (list.length === 0) {
                 throw new Error(`No pending items found for alert.`);
             }
             const ddem = await this.sequenceOrgService.getByPosition({
@@ -53,19 +53,19 @@ export class StInpJobAlertService {
                     NRUNNO: l.NRUNNO,
                 });
                 if (!semList[l.SEM]) {
-                    semList[l.SEM] = {  
+                    semList[l.SEM] = {
                         mail: l.SEM_MAIL,
                         name: l.NAME,
                         list: [
                             {
                                 formno: formDetail.FORMNO,
-                                link: formDetail.link,// + l.SEM,
+                                link: formDetail.link, // + l.SEM,
                                 diffDay: l.DIFF_DAY,
                                 diffWeek: l.DIFF_WEEK,
                             },
                         ],
                     };
-                }else{
+                } else {
                     semList[l.SEM].list.push({
                         formno: formDetail.FORMNO,
                         link: formDetail.link + l.SEM,
@@ -75,18 +75,20 @@ export class StInpJobAlertService {
                 }
                 demList.list.push({
                     formno: formDetail.FORMNO,
-                    link: formDetail.link,// + ddem.data.EMPINFO.SEMPNO,
+                    link: formDetail.link, // + ddem.data.EMPINFO.SEMPNO,
                     diffDay: l.DIFF_DAY,
                     diffWeek: l.DIFF_WEEK,
                 });
             }
-            for(const sem of Object.values(semList)){
+            for (const sem of Object.values(semList)) {
                 await this.mailService.sendMail({
                     from: `Safety System<${process.env.MAIL_FROM}>`,
-                    to:process.env.NODE_ENV != 'production'
-                        ? process.env.MAIL_ADMIN
-                        : sem.mail,
-                    subject: 'Pending Form SAFETY INSPECTION REPORT Notification',
+                    to:
+                        process.env.NODE_ENV != 'production'
+                            ? process.env.MAIL_ADMIN
+                            : sem.mail,
+                    subject:
+                        'Pending Form SAFETY INSPECTION REPORT Notification',
                     template: 'safety/patrol/pending-form',
                     context: sem,
                     bcc: process.env.MAIL_ADMIN,

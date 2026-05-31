@@ -9,8 +9,7 @@ export class FormmstGroupController {
 
     @Get()
     findAll() {
-        //return this.group.findAll();
-        return 'Group List';
+        return this.group.findAll();
     }
 
     @Post()

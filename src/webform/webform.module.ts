@@ -22,6 +22,7 @@ import { STFormModule } from './stform/stform.module';
 import { PurFormModule } from './purform/purform.module';
 import { PsFormModule } from './psform/psform.module';
 import { RqflistModule } from './rqflist/rqflist.module';
+import { FormmstGroupModule } from './formmst-group/formmst-group.module';
 
 @Module({
     imports: [
@@ -50,6 +51,7 @@ import { RqflistModule } from './rqflist/rqflist.module';
         FormAttachmentTypeModule,
         RqffrmModule,
         RqflistModule,
+        FormmstGroupModule,
     ],
 })
 export class WebformModule {}

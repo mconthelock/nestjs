@@ -1,4 +1,4 @@
-import { DatacenterController } from "src/docinv/datacenter/datacenter.controller";
+
 import { Column, Entity, PrimaryColumn } from "typeorm";
 @Entity({name:'GPGAR_FORM',schema:'WEBFORM'})
 export class GPGAR_FORM{

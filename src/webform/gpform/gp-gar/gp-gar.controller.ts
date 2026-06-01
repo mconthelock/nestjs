@@ -1,10 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseInterceptors, UploadedFile,UploadedFiles } from '@nestjs/common';
 import { GpGarService } from './gp-gar.service';
 import { CreateGpGarDto } from './dto/create-gp-gar.dto';
-import { UseTransaction } from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
+import { UpdateGpGarDto } from './dto/update-gp-gar.dto';
 
 @Controller('gpform/gp-gar')
 export class GpGarController {
@@ -37,6 +38,19 @@ export class GpGarController {
   ){
     return this.gpGarService.findOne({NFRMNO: fno, VORGNO: orgno, CYEAR: cyear, CYEAR2: cyear2, NRUNNO: nrunno});
   }
+
+  @Patch()
+  @UseTransaction('webformConnection')
+  @UseForceTransaction()
+  update(@Body() dto: UpdateGpGarDto, @Req() req: Request) {
+        const ip = getClientIP(req);
+        
+        return this.gpGarService.doaction(dto, ip);
+    }
+
+
+
+
 }
 
 @Controller('gpform/gp-gar')

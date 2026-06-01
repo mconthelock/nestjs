@@ -4,10 +4,10 @@ import { UpdateGpGarDto } from './dto/update-gp-gar.dto';
 import { GpGarRepository } from './gp-gar-repository';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
-import { error } from 'winston';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
-
+import { DoactionFlowService } from 'src/webform/flow/doaction.service';
+import { FlowService } from 'src/webform/flow/flow.service';
 
 @Injectable()
 export class GpGarService {
@@ -16,6 +16,8 @@ export class GpGarService {
         private readonly formmstService: FormmstService,
         private readonly formCreateService: FormCreateService,
         private readonly handleFileFormService: HandleFileFormService,
+        private readonly doactionService: DoactionFlowService,
+        private readonly flowService: FlowService,
     ) {}
 
     findAll() {
@@ -67,14 +69,12 @@ export class GpGarService {
                 CYEAR2: createForm.data.CYEAR2,
                 NRUNNO: createForm.data.NRUNNO,
             };
-            let insert01;
-                if(dto.REQBY) {
-                insert01 = await this.repo.CreateGpGarDto({
-                    ...form,
-                });
-            };
-            let insert02;
-                 insert02 = await this.handleFileFormService.insertFiles(
+            const insert01 = await this.repo.CreateGpGarDto({
+                ...form,
+            });
+            console.log(insert01);
+            if (file) {
+                const insert02 = await this.handleFileFormService.insertFiles(
                     {
                         ...form01,
                         FORM_TYPE: 'GP',
@@ -82,8 +82,8 @@ export class GpGarService {
                     },
                     file,
                 );
-                console.log(insert01);
                 console.log(insert02);
+            }
             // throw new Error('test');
             return {
                 status: true,
@@ -92,11 +92,48 @@ export class GpGarService {
             // console.log(createForm);
             // return createForm;
         } catch (error) {
-            throw new Error('Failed to create GA-REQ from');
+            throw new Error('Failed to create GA-REQ from:' + error.message);
         }
     }
-};
 
+    async doaction(dto: UpdateGpGarDto, ip: string) {
+        try {
+            const form = {
+                NFRMNO: dto.NFRMNO,
+                VORGNO: dto.VORGNO,
+                CYEAR: dto.CYEAR,
+                CYEAR2: dto.CYEAR2,
+                NRUNNO: dto.NRUNNO,
+            };
+            await this.flowService.updateFlow({
+                condition: {
+                    ...form,
+                    CEXTDATA: '02'
+                },
+                VAPVNO: dto.CONTROLLER
+            })
+
+            const doAction = await this.doactionService.doAction(
+                {
+                    ...form,
+                    EMPNO: dto.EMPNO,
+                    ACTION: dto.ACTION,
+                    REMARK: dto.REMARK,
+                },
+                ip,
+            );
+            if (!doAction.status) {
+                throw new Error(doAction.message);
+            }
+            return {
+                status: true,
+                message: 'Controller updated successfully',
+            };
+        } catch (error) {
+            throw new Error(`Failed to action: ${error.message}`);
+        }
+    }
+}
 
 @Injectable()
 export class GpService {
@@ -104,7 +141,6 @@ export class GpService {
         private readonly repo: GpGarRepository,
         private readonly formmstService: FormmstService,
         private readonly formCreateService: FormCreateService,
-        
     ) {}
 
     findAll() {
@@ -112,7 +148,6 @@ export class GpService {
     }
     async create(dto: CreateGpGarDto, ip: string) {
         try {
-
             // ดึงข้อมูล Form Master
             const formmst =
                 await this.formmstService.getFormMasterByVaname('GP-GAR');
@@ -150,7 +185,6 @@ export class GpService {
                 CYEAR2: createForm.data.CYEAR2,
                 NRUNNO: createForm.data.NRUNNO,
             };
-            
         } catch (error) {
             throw error;
         }

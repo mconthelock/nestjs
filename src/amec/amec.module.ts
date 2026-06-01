@@ -13,6 +13,8 @@ import { PvenderModule } from './pvender/pvender.module';
 import { BrcurrencyModule } from './brcurrency/brcurrency.module';
 import { AmecUserAllModule } from './amecuserall/amecuserall.module';
 import { PtermcodeModule } from './ptermcode/ptermcode.module';
+import { PappflowModule } from './pappflow/pappflow.module';
+import { PappstepModule } from './pappstep/pappstep.module';
 
 @Module({
     imports: [
@@ -30,6 +32,8 @@ import { PtermcodeModule } from './ptermcode/ptermcode.module';
         BrcurrencyModule,
         AmecUserAllModule,
         PtermcodeModule,
+        PappflowModule,
+        PappstepModule,
     ],
 })
 export class AmecModule {}

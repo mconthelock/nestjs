@@ -13,6 +13,8 @@ import { FlowmstModule } from 'src/webform/flowmst/flowmst.module';
 import { PurnvfFormRepository } from './purnvf_form/purnvf_form.repository';
 import { PurnvfListRepository } from './purnvf_list/purnvf_list.repository';
 import { PurnvfAddressRepository } from './purnvf_address/purnvf_address.repository';
+import { UsersModule } from 'src/amec/users/users.module';
+import { PappflowModule } from 'src/amec/pappflow/pappflow.module';
 
 @Module({
     imports: [
@@ -23,6 +25,8 @@ import { PurnvfAddressRepository } from './purnvf_address/purnvf_address.reposit
         FlowmstModule,
         PurFileModule,
         RepModule,
+        UsersModule,
+        PappflowModule
     ],
     controllers: [PurNvfController],
     providers: [

@@ -69,12 +69,14 @@ export class GpGarService {
                 CYEAR2: createForm.data.CYEAR2,
                 NRUNNO: createForm.data.NRUNNO,
             };
-            const insert01 = await this.repo.CreateGpGarDto({
-                ...form,
-            });
+            // const insert01 = await this.repo.CreateGpGarDto({
+            //     ...form,
+            // });
+            const insert01 = await this.repo.CreateGpGarDto(form);
+            
             console.log(insert01);
             if (file) {
-                const insert02 = await this.handleFileFormService.insertFiles(
+            const insert02 = await this.handleFileFormService.insertFiles(
                     {
                         ...form01,
                         FORM_TYPE: 'GP',

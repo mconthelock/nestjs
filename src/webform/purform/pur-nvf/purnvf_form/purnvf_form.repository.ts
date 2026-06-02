@@ -12,6 +12,19 @@ export class PurnvfFormRepository extends BaseRepository {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
+    async getData(dto: FormDto) {
+            return await this.getRepository(PURNVF_FORM).findOne({
+                where: {
+                    ...dto,
+                },
+                relations: {
+                    LISTS: true,
+                    ADDRESSES: true,
+                    FILES: true,
+                },
+            });
+    }
+
     async insert(dto: CreatePurnvfFormDto) {
         return this.getRepository(PURNVF_FORM).insert(dto);
     }

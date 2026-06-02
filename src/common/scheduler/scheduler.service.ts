@@ -197,6 +197,44 @@ export class SchedulerService implements OnModuleInit {
         return this.jobRepo.find();
     }
 
+    async getRuntimeJobs() {
+        const cronJobs = this.schedulerRegistry.getCronJobs();
+        const jobs = Array.from(cronJobs.entries()).map(([name, cronJob]) => {
+            let nextRunAt: string | null = null;
+            let lastRunAt: string | null = null;
+
+            try {
+                // cron v4: nextDates() returns DateTime[] (luxon)
+                const nextList = cronJob.nextDates(1);
+                nextRunAt = nextList[0]?.toISO() ?? null;
+            } catch (error) {
+                nextRunAt = null;
+            }
+
+            try {
+                // cron v4: lastDate() returns Date | null
+                const last = cronJob.lastDate();
+                lastRunAt = last ? last.toISOString() : null;
+            } catch (error) {
+                lastRunAt = null;
+            }
+
+            return {
+                name,
+                isActive: cronJob.isActive,
+                cronExpression:
+                    (cronJob as any)?.cronTime?.source ?? 'unknown-expression',
+                lastRunAt,
+                nextRunAt,
+            };
+        });
+
+        return {
+            total: jobs.length,
+            jobs,
+        };
+    }
+
     async getLogs(dto: SearchSchedulerDto) {
         const qb = this.logRepo
             .createQueryBuilder('logs')

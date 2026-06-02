@@ -44,9 +44,7 @@ export class SchedulerService implements OnModuleInit {
 
     async onModuleInit() {
         await this.loadAndScheduleJobs();
-
-        // เพิ่ม cron job บีบอัด logs เก่าทุกวันเวลา 00:30
-        this.addLogCompressionJob();
+        this.addLogCompressionJob(); // เพิ่ม cron job บีบอัด logs เก่าทุกวันเวลา 00:30
     }
 
     /** Cron job สำหรับบีบอัด logs เก่าอัตโนมัติ */
@@ -241,17 +239,6 @@ export class SchedulerService implements OnModuleInit {
             .leftJoinAndSelect('logs.job', 'job');
         await applyDynamicFilters(qb, dto, 'logs');
         return qb.getMany();
-        // if (jobId) {
-        //   return this.logRepo.find({
-        //     where: { job: { ID: jobId } },
-        //     order: { START_TIME: 'DESC' },
-        //     take: 100,
-        //   });
-        // }
-        // return this.logRepo.find({
-        //   order: { START_TIME: 'DESC' },
-        //   take: 100,
-        // });
     }
 
     async manualTrigger(id: string) {

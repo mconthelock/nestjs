@@ -1,18 +1,20 @@
 import {
     Injectable,
     OnModuleInit,
-    Logger,
+    Inject,
     NotFoundException,
     BadRequestException,
 } from '@nestjs/common';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 import { SchedulerRegistry } from '@nestjs/schedule';
-import { CronJob } from 'cron';
 import { HttpService } from '@nestjs/axios';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CronJob } from 'cron';
 import Redis from 'ioredis';
-import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 
+import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 import { JobExecutionLog } from 'src/common/Entities/docinv/table/job-log.entity';
 import { ScheduledJob } from 'src/common/Entities/docinv/table/scheduled-job.entity';
 
@@ -22,10 +24,10 @@ import { SearchSchedulerDto } from './dto/search-scheduler.dto';
 
 @Injectable()
 export class SchedulerService implements OnModuleInit {
-    private readonly logger = new Logger(SchedulerService.name);
     private redisClient: Redis;
 
     constructor(
+        @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
         private schedulerRegistry: SchedulerRegistry,
         private httpService: HttpService,
 
@@ -50,7 +52,7 @@ export class SchedulerService implements OnModuleInit {
     /** Cron job สำหรับบีบอัด logs เก่าอัตโนมัติ */
     private addLogCompressionJob() {
         const job = new CronJob('30 0 * * *', async () => {
-            this.logger.log('Running automatic log compression...');
+            this.logger.info('Running automatic log compression...');
             try {
                 const response = await this.httpService.axiosRef.post(
                     'http://localhost:3000/logger/compress-old-logs',
@@ -59,7 +61,7 @@ export class SchedulerService implements OnModuleInit {
                         proxy: false, // ปิดการใช้ proxy เพื่อหลีกเลี่ยงปัญหาในบางสภาพแวดล้อม (เช่น Docker) ที่อาจทำให้การตรวจสอบ endpoint ล้มเหลวโดยไม่จำเป็น
                     },
                 );
-                this.logger.log(
+                this.logger.info(
                     `Log compression completed: ${JSON.stringify(response.data.summary)}`,
                 );
             } catch (error) {
@@ -69,7 +71,9 @@ export class SchedulerService implements OnModuleInit {
 
         this.schedulerRegistry.addCronJob('log-compression', job);
         job.start();
-        this.logger.log('Log compression cron job registered (daily at 00:30)');
+        this.logger.info(
+            'Log compression cron job registered (daily at 00:30)',
+        );
     }
 
     /*** ตรวจสอบว่า URL endpoint มีอยู่จริงหรือไม่*/
@@ -282,12 +286,14 @@ export class SchedulerService implements OnModuleInit {
         } catch (e) {}
 
         const cronJob = new CronJob(cronExpression, async () => {
+            console.log(`Executing job: ${job.NAME}`);
+
             await this.handleJobExecution(job);
         });
 
         this.schedulerRegistry.addCronJob(job.NAME, cronJob);
         cronJob.start();
-        this.logger.log(`Scheduled job: ${job.NAME}`);
+        this.logger.info(`Scheduled job: ${job.NAME}`);
     }
 
     private normalizeCronExpression(expression: string): string {
@@ -342,7 +348,7 @@ export class SchedulerService implements OnModuleInit {
             }
         }
 
-        this.logger.log(`Executing job: ${job.NAME}`);
+        this.logger.debug(`Executing job: ${job.NAME}`);
         const startTime = new Date();
         let status = 'SUCCESS';
         let message = '';
@@ -365,6 +371,7 @@ export class SchedulerService implements OnModuleInit {
             );
             message = JSON.stringify(response.data);
             responseCode = response.status;
+            this.logger.debug(`Job ${job.NAME} ${response.status}`);
         } catch (error) {
             status = 'FAILED';
             message = error.message;

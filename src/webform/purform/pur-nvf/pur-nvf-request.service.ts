@@ -20,6 +20,8 @@ import { FormCreateService } from 'src/webform/form/create-form.service';
 import { deleteFile } from 'src/common/utils/files.utils';
 import { InsertFlowStepService } from 'src/webform/flow/insert-flow-step.service';
 import { FormDto } from 'src/webform/form/dto/form.dto';
+import { UsersService } from 'src/amec/users/users.service';
+import { PappflowService } from 'src/amec/pappflow/pappflow.service';
 
 
 @Injectable()
@@ -36,6 +38,8 @@ export class PurNvfRequestService  {
         protected readonly deleteFlowStepService: DeleteFlowStepService,
         protected readonly insertFlowStepService: InsertFlowStepService,
         private readonly formCreateService: FormCreateService,
+        private readonly usrService: UsersService,
+        private readonly pappFlowService: PappflowService
     ) {}
   
     async request(
@@ -64,6 +68,30 @@ export class PurNvfRequestService  {
             if (!createForm.status) {
                 throw new Error(createForm.message.message);
             }
+            const user =  await this.usrService.findEmp(dto.REQBY);
+            if (user && Object.keys(user).length > 0) {
+              const slevel = user.SSECCODE !== "00" 
+                ? user.SSECCODE 
+                : (user.SDEPCODE && user.SDEPCODE !== "00" ? user.SDEPCODE : user.SDIVCODE);
+              const pappflow = await this.pappFlowService.findFlowWithSteps(slevel, 35);
+              if (pappflow && pappflow.length > 0 && pappflow[0].STEPS && pappflow[0].STEPS.length > 0) {
+                const buyer = pappflow[0].STEPS[0].SEMPNO;
+                const buyerrep = pappflow[0].STEPS[0].SEMPAPP;
+                await this.flowService.updateFlow({
+                            condition: {
+                                NFRMNO: dto.NFRMNO,
+                                VORGNO: dto.VORGNO,
+                                CYEAR:  dto.CYEAR,
+                                CYEAR2: createForm.data.CYEAR2,
+                                NRUNNO: createForm.data.NRUNNO,
+                                CEXTDATA: '02'
+                            },
+                                VAPVNO: buyer,
+                                VREPNO: buyerrep,
+                        });
+            }
+           }
+           // throw new Error('Test Error After Create Form'); // - ทดสอบ error handling (ถ้า create form สำเร็จแล้ว จะเห็นว่ามีการลบไฟล์ที่ย้ายไปแล้วด้วย)
             const form = {
                 NFRMNO: dto.NFRMNO,
                 VORGNO: dto.VORGNO,

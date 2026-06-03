@@ -18,7 +18,9 @@ export class PurnvfFormRepository extends BaseRepository {
                     ...dto,
                 },
                 relations: {
-                    LISTS: true,
+                    LISTS: {
+                        TERM: true
+                    },
                     ADDRESSES: true,
                     FILES: true,
                 },

@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn , OneToMany } from 'typeorm';
-import { PURNVF_LIST } from '../../webform/table/PURVNF_LIST.entity'; 
+import { PURNVF_LIST } from '../../webform/table/PURNVF_LIST.entity'; 
 
 @Entity({ name: 'PTERMCODE', schema: 'AMEC' })
 export class PTERMCODE {

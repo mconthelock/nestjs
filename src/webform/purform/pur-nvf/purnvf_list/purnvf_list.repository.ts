@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { PURNVF_LIST } from 'src/common/Entities/webform/table/PURVNF_LIST.entity';
+import { PURNVF_LIST } from 'src/common/Entities/webform/table/PURNVF_LIST.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FormDto} from 'src/webform/form/dto/form.dto';
 import { DataSource } from 'typeorm';

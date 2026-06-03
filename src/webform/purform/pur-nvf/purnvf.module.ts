@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { PurNvfRequestService } from './pur-nvf-request.service';
 import { PurNvfController } from './pur-nvf-controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PURNVF_FORM } from 'src/common/Entities/webform/table/PURVNF_FORM.entity';
+import { PURNVF_FORM } from 'src/common/Entities/webform/table/PURNVF_FORM.entity';
 import { FormModule } from 'src/webform/form/form.module';
 import { PurFileModule } from '../pur-file/pur-file.module';
 import { FlowModule } from 'src/webform/flow/flow.module';

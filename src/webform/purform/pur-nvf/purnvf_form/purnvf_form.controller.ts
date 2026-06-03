@@ -4,19 +4,19 @@ import { CreatePurnvfFormDto } from './dto/create-purnvf_form.dto';
 import { UpdatePurnvfFormDto } from './dto/update-purnvf_form.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
-@Controller('purnvf-form')
+@Controller('purform/purnvf-form')
 export class PurnvfFormController {
   constructor(private readonly purnvfFormService: PurnvfFormService) {}
 
-  @Post()
-  create(@Body() createPurnvfFormDto: CreatePurnvfFormDto) {
-    return this.purnvfFormService.create(createPurnvfFormDto);
-  }
+  // @Post()
+  // create(@Body() createPurnvfFormDto: CreatePurnvfFormDto) {
+  //   return this.purnvfFormService.create(createPurnvfFormDto);
+  // }
 
-   @Post('data')
-      getData(@Body() dto: FormDto) {
+  @Post('data')
+  getData(@Body() dto: FormDto) {
           return this.purnvfFormService.getData(dto);
-      }
+  }
 
   @Get()
   findAll() {

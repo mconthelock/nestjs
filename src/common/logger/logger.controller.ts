@@ -2,7 +2,6 @@ import { Controller, Get, Query, Inject, Post, Body } from '@nestjs/common';
 import { LoggerService } from './logger.service';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as glob from 'glob';
 import * as zlib from 'zlib';
 
 @Controller('logger')

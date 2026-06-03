@@ -28,6 +28,7 @@ import { DesignerModule } from './designer/designer.module';
 import { ItemsCategoryModule } from './items-category/items-category.module';
 import { PartcategoryModule } from './partcategory/partcategory.module';
 import { PrebmModule } from './prebm/prebm.module';
+import { TaskscheduleModule } from './taskschedule/taskschedule.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { PrebmModule } from './prebm/prebm.module';
     ItemsCategoryModule,
     PartcategoryModule,
     PrebmModule,
+    TaskscheduleModule,
   ],
 })
 export class SpModule {}

@@ -35,7 +35,12 @@ export class PurnvfFormRepository extends BaseRepository {
         return this.getRepository(PURNVF_FORM).save(dto);
     }
 
-    async deleteById(dto: CreatePurnvfFormDto) {
+    async updateById(data: CreatePurnvfFormDto) {
+            const { NFRMNO, VORGNO, CYEAR , CYEAR2 , NRUNNO, ...updateData } = data;
+            return this.getRepository(PURNVF_FORM).update({ NFRMNO: NFRMNO, VORGNO:VORGNO, CYEAR:CYEAR, CYEAR2:CYEAR2, NRUNNO:NRUNNO }, updateData );
+    }
+
+    async deleteById(dto: FormDto) {
         return this.getRepository(PURNVF_FORM).delete({ NFRMNO: dto.NFRMNO, VORGNO: dto.VORGNO, CYEAR: dto.CYEAR ,CYEAR2: dto.CYEAR2, NRUNNO: dto.NRUNNO });
     }
 }

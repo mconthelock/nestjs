@@ -23,4 +23,9 @@ export class PurnvfListRepository extends BaseRepository {
     async deleteById(dto: CreatePurnvfListDto , LID: number) {
         return this.getRepository(PURNVF_LIST).delete({ NFRMNO: dto.NFRMNO, VORGNO: dto.VORGNO, CYEAR: dto.CYEAR ,CYEAR2: dto.CYEAR2, NRUNNO: dto.NRUNNO , LID : LID });
     }
+
+    async deleteByAll(dto: FormDto ) {
+        return this.getRepository(PURNVF_LIST).delete({ NFRMNO: dto.NFRMNO, VORGNO: dto.VORGNO, CYEAR: dto.CYEAR ,CYEAR2: dto.CYEAR2, NRUNNO: dto.NRUNNO  });
+    }
+
 }

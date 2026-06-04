@@ -6,6 +6,12 @@ export class DPMS_PACKING_LIST{
     TURNOVER_STATUS: number;
 
     @PrimaryColumn()
+    PRODUCTION: string;
+
+    @PrimaryColumn()
+    MFGBM: string;
+
+    @PrimaryColumn()
     PROD: string;
 
     @PrimaryColumn()
@@ -58,6 +64,18 @@ export class DPMS_PACKING_LIST{
 
     @Column()
     REQUEST_PARTIAL: string;
+
+    @Column()
+    SHOP_ORDER_NO: string;
+
+    @Column()
+    SUBJECT: string;
+
+    @Column()
+    NAME_OF_BLDG: string;
+
+    @Column()
+    SOLD_TO: string;
 
     @Column()
     MODEL_SPEC: string;

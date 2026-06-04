@@ -373,11 +373,13 @@ export class InquiryService {
                     );
                     Object.assign(dto, dt);
                     const safeDto = sanitizeDetailPayload(dto);
+                    delete safeDto.INQD_ID;
                     await runner.manager.update(InquiryDetail, dt_id, safeDto);
                 } else {
                     //Create new detail
                     dt.CREATE_AT = new Date();
                     dt.CREATE_BY = header.UPDATE_BY;
+                    delete dt.INQD_ID;
                     const dto: createDetailDto = Object.assign(
                         {} as createDetailDto,
                         dt,

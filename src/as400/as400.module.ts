@@ -8,11 +8,15 @@ import { M008kpModule } from './rtnlibf/m008kp/m008kp.module';
 import { Q141kpModule } from './rtnlibf/q141kp/q141kp.module';
 import { T016kpModule } from './rtnlibf/t016kp/t016kp.module';
 import { R027mp1Module } from './rtnlibf/r027mp1/r027mp1.module';
+import { S026kpModule } from './rtnlibf/s026kp/s026kp.module';
+import { S030kpModule } from './rtnlibf/s030kp/s030kp.module';
 
 @Module({
   imports: [
     ConectionModule,
     R027mp1Module,
+    S026kpModule,
+    S030kpModule,
     // F001kpModule,
     // F002kpModule,
     // F003kpModule,

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PurNvfRequestService } from './pur-nvf-request.service';
+import { PurNvfReturnApproveService } from './pur-nvf-return-approve.service'
 import { PurNvfController } from './pur-nvf-controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PURNVF_FORM } from 'src/common/Entities/webform/table/PURNVF_FORM.entity';
@@ -33,8 +34,9 @@ import { PappflowModule } from 'src/amec/pappflow/pappflow.module';
         PurNvfRequestService,
         PurnvfFormRepository,
         PurnvfListRepository,
-        PurnvfAddressRepository
+        PurnvfAddressRepository,
+        PurNvfReturnApproveService
     ],
-    exports: [PurNvfRequestService],
+    exports: [PurNvfRequestService,PurNvfReturnApproveService],
 })
 export class PurNvfModule {}

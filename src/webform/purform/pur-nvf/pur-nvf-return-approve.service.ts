@@ -52,7 +52,6 @@ export class PurNvfReturnApproveService  {
         path: string,
     ) {
         let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
-
         try {
             const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, ACTION, EMPNO, REMARK, DELETE_FILES, ...data } = dto;
             const form = {

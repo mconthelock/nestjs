@@ -66,8 +66,8 @@ export class PurNvfController {
             return this.purNvfReturnFormService.returnApprove(
                 dto,
                 files,
-                this.path,
                 ip,
+                this.path,
             );
     }
 }

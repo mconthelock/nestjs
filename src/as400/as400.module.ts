@@ -10,6 +10,7 @@ import { T016kpModule } from './rtnlibf/t016kp/t016kp.module';
 import { R027mp1Module } from './rtnlibf/r027mp1/r027mp1.module';
 import { S026kpModule } from './rtnlibf/s026kp/s026kp.module';
 import { S030kpModule } from './rtnlibf/s030kp/s030kp.module';
+import { S001kpModule } from './rtnlibf/s001kp/s001kp.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { S030kpModule } from './rtnlibf/s030kp/s030kp.module';
     R027mp1Module,
     S026kpModule,
     S030kpModule,
+    S001kpModule,
     // F001kpModule,
     // F002kpModule,
     // F003kpModule,

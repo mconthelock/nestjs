@@ -12,9 +12,9 @@ export class DpmsPackingListRepository extends BaseRepository {
 
     findAll(){
         return this.getRepository(DPMS_PACKING_LIST).find({
-            where : {
-                PL_PLAN : MoreThan(new Date('2026-01-01'))
-            },
+            // where : {
+            //     PL_PLAN : MoreThan(new Date('2026-01-01'))
+            // },
             order : {
                 DELAY: 'DESC',
                 PROD: 'ASC',

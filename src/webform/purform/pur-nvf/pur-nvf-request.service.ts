@@ -106,6 +106,7 @@ export class PurNvfRequestService  {
                 PURPOSE : data.PURPOSE,
                 TYPEJOB : data.TYPEJOB,
                 SERVICE : data.SERVICE,
+                VENDCODE : (data.REQTYPE === 'U') ? data.VENDORCODE:"",
                 VENDTYPE : data.VENDOR_LOCATION,
                 COMNAME : data.COMPANY_NAME,
                 CONTACT : data.CONTACT,

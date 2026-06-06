@@ -39,6 +39,7 @@ import { WorkloadModule } from './workload/workload.module';
 import { DatacenterModule } from './datacenter/datacenter.module';
 import { GeneralPartListModule } from './general-part-list/general-part-list.module';
 import { MfgEdrModule } from './webform/mfgform/mfg-edr/mfg-edr.module';
+import { MfgReportModule } from './mfgreport/mfgreport.module';
 
 @Module({
     imports: [
@@ -74,6 +75,7 @@ import { MfgEdrModule } from './webform/mfgform/mfg-edr/mfg-edr.module';
         DatacenterModule,
         GeneralPartListModule,
         MfgEdrModule,
+        MfgReportModule,
     ],
     providers: [
         HttpLoggingInterceptor,

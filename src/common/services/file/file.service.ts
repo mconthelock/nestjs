@@ -15,6 +15,7 @@ import {
     safeJoin,
 } from 'src/common/utils/files.utils';
 import { FileDto, ListDto, SaveFileDto } from './dto/file.dto';
+import { formatDate } from 'src/common/utils/dayjs.utils';
 
 @Injectable()
 export class FileService {
@@ -40,139 +41,167 @@ export class FileService {
         });
     }
 
-    //prettier-ignore
     async listDir(dto: ListDto) {
-    const dirPath = safeJoin(dto.baseDir, dto.path ?? ''); // กัน traversal
+        const dirPath = safeJoin(dto.baseDir, dto.path ?? ''); // กัน traversal
 
-    const stat = await fs.stat(dirPath);
-    if (!stat.isDirectory()) {
-      throw new BadRequestException('Not a directory');
-    }
-
-    const names = await fs.readdir(dirPath);
-    const items = await Promise.all(
-      names.map(async (name) => {
-        const full = safeJoin(dirPath, name);
-        const s = await fs.stat(full);
-
-        return {
-          name,
-          isDir: s.isDirectory(),
-          size: s.isFile() ? s.size : undefined,
-          path: full, // เก็บ relative path เอาไปใช้ตอนเปิดไฟล์
-          mimeType: s.isFile() ? getMimeType(name) : undefined,
-          extension: s.isFile() ? path.extname(name).slice(1) : undefined, // เอา . ออก
-        };
-      }),
-    );
-
-    // จะ sort folder ขึ้นก่อนก็ได้
-    items.sort((a, b) => {
-      if (a.isDir && !b.isDir) return -1;
-      if (!a.isDir && b.isDir) return 1;
-      return a.name.localeCompare(b.name);
-    });
-
-    // กรองตามนามสกุลที่อนุญาต
-    const allowEts = dto.allow?.filter(e => e.trim() !== '').map(e => e.toLowerCase());
-
-    const mode = dto.mode ?? 'all'; // 'all' | 'file' | 'dir'
-    
-    
-    const filtered = items.filter(e => {
-        const commonCheck =
-            !e.name.startsWith('~$') &&
-            !e.name.startsWith('.') &&
-            !this.skip.includes(e.name.toLowerCase());
-
-        if (!commonCheck) return false;
-
-        // mode filter
-        if (mode === 'file' && e.isDir) return false;
-        if (mode === 'dir' && !e.isDir) return false;
-
-         // extension filter (ใช้กับไฟล์เท่านั้น)
-        if (
-            mode !== 'dir' &&
-            allowEts &&
-            allowEts.length > 0 &&
-            !e.isDir
-        ) {
-            return e.extension && allowEts.includes(e.extension);
+        const stat = await fs.stat(dirPath);
+        if (!stat.isDirectory()) {
+            throw new BadRequestException('Not a directory');
         }
 
-        return true;
+        const names = await fs.readdir(dirPath);
+        const items = await Promise.all(
+            names.map(async (name) => {
+                const full = safeJoin(dirPath, name);
+                const s = await fs.stat(full);
 
-        if(allowEts && allowEts.length > 0) {
-            return (e.isDir || (e.extension && allowEts.includes(e.extension.toLowerCase()))) && !e.name.startsWith('~$') && !e.name.startsWith('.') && !this.skip.includes(e.name.toLowerCase()) ;
-        }else{
-            return !e.name.startsWith('~$') && !e.name.startsWith('.') && !this.skip.includes(e.name.toLowerCase()) ;
-        }
-    });
+                return {
+                    name,
+                    isDir: s.isDirectory(),
+                    size: s.isFile() ? this.calSize(s.size) : undefined,
+                    path: full, // เก็บ relative path เอาไปใช้ตอนเปิดไฟล์
+                    mimeType: s.isFile() ? getMimeType(name) : undefined,
+                    extension: s.isFile()
+                        ? path.extname(name).slice(1)
+                        : undefined, // เอา . ออก
+                    dateModified: formatDate(s.mtime, 'DD/MM/YYYY HH:mm A'),
+                };
+            }),
+        );
 
-    return filtered;
-  }
+        // จะ sort folder ขึ้นก่อนก็ได้
+        items.sort((a, b) => {
+            if (a.isDir && !b.isDir) return -1;
+            if (!a.isDir && b.isDir) return 1;
+            return a.name.localeCompare(b.name);
+        });
 
-    //prettier-ignore
-    async listAllRecursively(dto: ListDto) {
-    const root = safeJoin(dto.baseDir, dto.path ?? '');
-    const allowEts = dto.allow?.filter(e => e.trim() !== '').map(e => e.toLowerCase());
+        // กรองตามนามสกุลที่อนุญาต
+        const allowEts = dto.allow
+            ?.filter((e) => e.trim() !== '')
+            .map((e) => e.toLowerCase());
 
-    const stat = await fs.stat(root);
-    if (!stat.isDirectory()) {
-      throw new BadRequestException('Not a directory');
-    }
+        const mode = dto.mode ?? 'all'; // 'all' | 'file' | 'dir'
 
-    const results: any[] = [];
+        const filtered = items.filter((e) => {
+            const commonCheck =
+                !e.name.startsWith('~$') &&
+                !e.name.startsWith('.') &&
+                !this.skip.includes(e.name.toLowerCase());
 
-    // recursive internal function
-    const walk = async (dir: string, rel: string) => {
-      const entries = await fs.readdir(dir, { withFileTypes: true });
+            if (!commonCheck) return false;
 
-      for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name);
-        const relPath = path.posix.join(rel, entry.name);
+            // mode filter
+            if (mode === 'file' && e.isDir) return false;
+            if (mode === 'dir' && !e.isDir) return false;
 
-        // ข้ามไฟล์ซ่อนตามกติกาเราเอง
-        if (
-          entry.name.startsWith('~$') || // ไฟล์ชั่วคราวของ Excel
-          entry.name.startsWith('.') || // พวก .git, .DS_Store ฯลฯ (ถ้าอยากตัด)
-          this.skip.includes(entry.name.toLowerCase())
-        ) {
-          continue;
-        }
-
-        if (entry.isDirectory()) {
-          // push folder
-          results.push({
-            name: entry.name,
-            path: relPath,
-            isDir: true,
-          });
-
-          // dive deeper
-          await walk(fullPath, relPath);
-        } else {
-            if( allowEts && allowEts.length > 0 ) {
-                const ext = path.extname(entry.name).slice(1).toLowerCase();
-                if( !allowEts.includes(ext) ) continue;
+            // extension filter (ใช้กับไฟล์เท่านั้น)
+            if (mode !== 'dir' && allowEts && allowEts.length > 0 && !e.isDir) {
+                return e.extension && allowEts.includes(e.extension);
             }
-          // push file
-          results.push({
-            name: entry.name,
-            path: relPath,
-            isDir: false,
-            mimeType: getMimeType(entry.name),
-            size: (await fs.stat(fullPath)).size,
-            extension: path.extname(entry.name).slice(1), // เอา . ออก
-          });
-        }
-      }
-    };
 
-    await walk(root, dto.path);
-    return results;
-  }
+            return true;
+
+            if (allowEts && allowEts.length > 0) {
+                return (
+                    (e.isDir ||
+                        (e.extension &&
+                            allowEts.includes(e.extension.toLowerCase()))) &&
+                    !e.name.startsWith('~$') &&
+                    !e.name.startsWith('.') &&
+                    !this.skip.includes(e.name.toLowerCase())
+                );
+            } else {
+                return (
+                    !e.name.startsWith('~$') &&
+                    !e.name.startsWith('.') &&
+                    !this.skip.includes(e.name.toLowerCase())
+                );
+            }
+        });
+
+        return filtered;
+    }
+
+    private calSize(size: number): string {
+        if (size < 1024) return size + ' B';
+        else if (size < 1024 * 1024)
+            return (size / 1024).toFixed(2).replace(/\.00$/, '') + ' KB';
+        else if (size < 1024 * 1024 * 1024)
+            return (
+                (size / (1024 * 1024)).toFixed(2).replace(/\.00$/, '') + ' MB'
+            );
+        else
+            return (
+                (size / (1024 * 1024 * 1024)).toFixed(2).replace(/\.00$/, '') +
+                ' GB'
+            );
+    }
+
+    async listAllRecursively(dto: ListDto) {
+        const root = safeJoin(dto.baseDir, dto.path ?? '');
+        const allowEts = dto.allow
+            ?.filter((e) => e.trim() !== '')
+            .map((e) => e.toLowerCase());
+
+        const stat = await fs.stat(root);
+        if (!stat.isDirectory()) {
+            throw new BadRequestException('Not a directory');
+        }
+
+        const results: any[] = [];
+
+        // recursive internal function
+        const walk = async (dir: string, rel: string) => {
+            const entries = await fs.readdir(dir, { withFileTypes: true });
+
+            for (const entry of entries) {
+                const fullPath = path.join(dir, entry.name);
+                const relPath = path.posix.join(rel, entry.name);
+
+                // ข้ามไฟล์ซ่อนตามกติกาเราเอง
+                if (
+                    entry.name.startsWith('~$') || // ไฟล์ชั่วคราวของ Excel
+                    entry.name.startsWith('.') || // พวก .git, .DS_Store ฯลฯ (ถ้าอยากตัด)
+                    this.skip.includes(entry.name.toLowerCase())
+                ) {
+                    continue;
+                }
+
+                if (entry.isDirectory()) {
+                    // push folder
+                    results.push({
+                        name: entry.name,
+                        path: relPath,
+                        isDir: true,
+                    });
+
+                    // dive deeper
+                    await walk(fullPath, relPath);
+                } else {
+                    if (allowEts && allowEts.length > 0) {
+                        const ext = path
+                            .extname(entry.name)
+                            .slice(1)
+                            .toLowerCase();
+                        if (!allowEts.includes(ext)) continue;
+                    }
+                    // push file
+                    results.push({
+                        name: entry.name,
+                        path: relPath,
+                        isDir: false,
+                        mimeType: getMimeType(entry.name),
+                        size: (await fs.stat(fullPath)).size,
+                        extension: path.extname(entry.name).slice(1), // เอา . ออก
+                    });
+                }
+            }
+        };
+
+        await walk(root, dto.path);
+        return results;
+    }
 
     async saveFile(files: Express.Multer.File[], dto: SaveFileDto) {
         let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
@@ -182,14 +211,15 @@ export class FileService {
                 ? dto.filename
                 : [dto.filename];
 
-                console.log(filenames);
-                
+            console.log(filenames);
+
             for (const file of files) {
                 const extendtion = path.extname(file.originalname);
                 const shifted = filenames.shift();
-                const filename = shifted && shifted.includes('.')
-                    ? shifted
-                    : shifted + extendtion; // ถ้า filename ที่ส่งมาไม่มีนามสกุล ให้เติมนามสกุลเดิมของไฟล์ที่อัพโหลดมาให้
+                const filename =
+                    shifted && shifted.includes('.')
+                        ? shifted
+                        : shifted + extendtion; // ถ้า filename ที่ส่งมาไม่มีนามสกุล ให้เติมนามสกุลเดิมของไฟล์ที่อัพโหลดมาให้
                 const moved = dto.isPhp
                     ? await moveFileFromMulter({
                           file,

@@ -27,6 +27,7 @@ export class DpmsPlIssueRevRepository extends BaseRepository {
             },
             order: {
                 NREV: 'DESC',
+                NROUND: 'DESC',
             },
         });
     }

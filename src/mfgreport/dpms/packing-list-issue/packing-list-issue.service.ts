@@ -7,17 +7,31 @@ import { joinPaths } from 'src/common/utils/files.utils';
 import { now } from 'src/common/utils/dayjs.utils';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import * as fs from 'fs/promises';
+import { DpmsPlIssueRevService } from 'src/workload/dpms_pl_issue_rev/dpms_pl_issue_rev.service';
+import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
+import {
+    DPMS_PL_ISSUE_PK,
+    generatePDFParams,
+} from './packing-list-issue.interface';
+import { DpmsPlFileService } from 'src/workload/dpms_pl_file/dpms_pl_file.service';
 
 @Injectable()
 export class PackingListIssueService {
     constructor(
-        private readonly dpmsPlIssueService: DpmsPlIssueService,
         private readonly PDFService: PDFService,
+        private readonly dpmsPlIssueService: DpmsPlIssueService,
+        private readonly dpmsPlIssueRevService: DpmsPlIssueRevService,
+        private readonly dpmsPlFileService: DpmsPlFileService,
     ) {}
+
+    private readonly tempDir = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
+    private readonly finalDir = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/test/`;
+
     async issue(dto: CreatePackingListIssueDto) {
         try {
+            const issueDate = now('DD/MM/YYYY');
             // 1. Check if PL Issue exists, if not create new PL Issue
-            const plIssueData = {
+            const plIssueData: DPMS_PL_ISSUE_PK = {
                 VPROD: dto.VPROD,
                 VP: dto.VP,
                 VORDERS: dto.VORDERS,
@@ -28,9 +42,60 @@ export class PackingListIssueService {
             if (!checkPlIssue.status) {
                 await this.dpmsPlIssueService.create(plIssueData);
             }
-            // 2.
-            const fileName = `${dto.HEADER.VNAMEOFBLDG.split(' ')[0] ?? ''}_${dto.VORDERS}.pdf`;
-            await this.generatePDF(dto.VORDERS, dto.HTML, fileName);
+            // 2. Get next revision number
+            const revision: number =
+                await this.dpmsPlIssueRevService.getNextRevision({
+                    ...plIssueData,
+                    NISSUE_TYPE: dto.ISSUETYPE,
+                });
+            const revisionText: string = numberToAlphabetRevision(revision);
+
+            // 3. create PDF file
+            const fileName: string = `${dto.HEADER.VNAMEOFBLDG.split(' ')[0] ?? ''}_${dto.VORDERS}.pdf`;
+            await this.generatePDF({
+                order: dto.VORDERS,
+                html: dto.HTML,
+                fileName,
+                revision: revisionText,
+                issueDate,
+            });
+
+            // 3. add file Data to DB
+            const insertFile = await this.dpmsPlFileService.create({
+                VFILE_ONAME: fileName,
+                VFILE_FNAME: fileName,
+                VFILE_USERCREATE: 'system',
+                NFILE_TYPE: dto.ISSUETYPE,
+                VFILE_PATH: this.finalDir,
+            });
+
+            if (insertFile.status === false) {
+                throw new Error('Failed to insert packing list file record');
+            }
+
+            // 4. create PL Issue Revision record
+            // const insertIssueRev = await this.dpmsPlIssueRevService.create({
+            //     ...plIssueData,
+            //     NISSUE_TYPE: dto.ISSUETYPE,
+            //     NREV: revision,
+            //     VREVTEXT: revisionText,
+            //     NFILEID: insertFile.data.NFILEID,
+            //     VSHOPORDERNO: dto.HEADER.VSHOPORDERNO,
+            //     VSUBJECT: dto.HEADER.VSUBJECT,
+            //     VNAMEOFBLDG: dto.HEADER.VNAMEOFBLDG,
+            //     VSOLDTO: dto.HEADER.VSOLDTO,
+            //     VSHIPPINGMARK: dto.HEADER.VSHIPPINGMARK,
+            // });
+
+            // switch (dto.ISSUETYPE) {
+            //     case 1: //draft
+            //     case 2: // Partial
+            //     case 3: // Balance
+            //         break;
+            //     case 4: // Complete
+            //     case 5: // Combine
+            //         break;
+            // }
             return {
                 status: true,
                 message: 'Packing list issued successfully',
@@ -40,11 +105,17 @@ export class PackingListIssueService {
         }
     }
 
-    private async generatePDF(order: string, html: string, fileName: string) {
-        const orderText = order.replace(/^(.)(..)(.....)(.)$/, '$1-$2-$3-$4')
-        const tempFileName = `temp_${fileName}`;
-        const tempPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
-        const finalPath = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/test/`
+    private async generatePDF({
+        order,
+        html,
+        fileName,
+        revision,
+        issueDate,
+    }: generatePDFParams) {
+        const orderText = order.replace(/^(.)(..)(.....)(.)$/, '$1-$2-$3-$4');
+        const tempFileName = `tempPL_${now('YYYYMMDDHHmm')}_${fileName}`;
+        const tempFilePath = await joinPaths(this.tempDir, tempFileName);
+        const finalFilePath = await joinPaths(this.finalDir, fileName);
         await this.PDFService.generatePDF({
             html: `<!doctype html>
                 <html lang="th">
@@ -156,10 +227,7 @@ export class PackingListIssueService {
                     </body>
                 </html>`,
             options: {
-                path: await joinPaths(
-                    tempPath,
-                    tempFileName,
-                ),
+                path: tempFilePath,
                 printBackground: true,
                 displayHeaderFooter: true,
                 headerTemplate: ` 
@@ -177,9 +245,9 @@ export class PackingListIssueService {
                     <div style="
                         width:100%;
                         font-size:10px;
-                        padding:0 20px;
+                        padding-right: 100px;
                         text-align:right;
-                    "><span>${now('DD/MM/YYYY')} REV.</span>
+                    "><span>${issueDate} REV. ${revision}</span>
                     </div>`,
                 margin: {
                     top: '10mm',
@@ -190,13 +258,13 @@ export class PackingListIssueService {
             },
         });
         // 2. ใช้ pdf-lib เพิ่ม header ในหน้า 2 เป็นต้นไป
-        await this.addHeaderToPDF(tempPath, finalPath, orderText);
+        await this.addHeaderToPDF(tempFilePath, finalFilePath, orderText);
 
         // 3. ลบ temp file
-        await fs.unlink(tempPath);
+        await fs.unlink(tempFilePath);
     }
 
-     private async addHeaderToPDF(
+    private async addHeaderToPDF(
         inputPath: string,
         outputPath: string,
         orderText: string,
@@ -205,29 +273,39 @@ export class PackingListIssueService {
             // อ่าน PDF file
             const existingPdfBytes = await fs.readFile(inputPath);
             const pdfDoc = await PDFDocument.load(existingPdfBytes);
-            
+
             // โหลด font
             const font = await pdfDoc.embedFont(StandardFonts.Courier);
-            
+
             const pages = pdfDoc.getPages();
             const totalPages = pages.length;
 
             // เพิ่ม header ในทุกหน้ายกเว้นหน้าแรก (index 0)
-            for (let i = 1; i < pages.length; i++) {
+            for (let i = 0; i < totalPages; i++) {
                 const page = pages[i];
                 const { width, height } = page.getSize();
-                const headerText = `${orderText}`;
-                
-                // วาด text ที่มุมขวาบน
-                page.drawText(headerText, {
-                    x: width - 100, // ปรับตำแหน่ง
-                    y: height - 20, // ปรับตำแหน่ง (20px จากบน)
-                    size: 10,
-                    font: font,
-                    color: rgb(0, 0, 0),
-                });
 
-                // page.drawText();
+                // วาด text ที่มุมขวาบน
+                if (i > 0) {
+                    page.drawText(orderText, {
+                        x: width - 150, // ปรับตำแหน่ง
+                        y: height - 21.5, // ปรับตำแหน่ง (20px จากบน)
+                        size: 9,
+                        font: font,
+                        color: rgb(0, 0, 0),
+                    });
+                }
+                // footer table
+                page.drawText(
+                    i === totalPages - 1 ? '-- END --' : ' - CONTINUE -',
+                    {
+                        x: width / 2 - 30, // ปรับตำแหน่ง
+                        y: 20, // ปรับตำแหน่ง (20px จากล่าง)
+                        size: 9,
+                        font: font,
+                        color: rgb(0, 0, 0),
+                    },
+                );
             }
 
             // บันทึก PDF

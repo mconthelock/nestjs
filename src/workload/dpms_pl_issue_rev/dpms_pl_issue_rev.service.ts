@@ -10,13 +10,16 @@ export class DpmsPlIssueRevService {
     constructor(private readonly repo: DpmsPlIssueRevRepository) {}
     async create(dto: CreateDpmsPlIssueRevDto) {
         try {
-            const revision = await this.getNextRevision({
-                VPROD: dto.VPROD,
-                VP: dto.VP,
-                VTYPE: dto.VTYPE,
-                VORDERS: dto.VORDERS,
-                NISSUE_TYPE: dto.NISSUE_TYPE,
-            });
+            let revision = dto.NREV;
+            if(!revision){
+                revision = await this.getNextRevision({
+                    VPROD: dto.VPROD,
+                    VP: dto.VP,
+                    VTYPE: dto.VTYPE,
+                    VORDERS: dto.VORDERS,
+                    NISSUE_TYPE: dto.NISSUE_TYPE,
+                });
+            }
             const res = await this.repo.create({
                 ...dto,
                 NREV: revision,

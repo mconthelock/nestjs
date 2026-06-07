@@ -7,4 +7,7 @@ export class ISDEV_TYPE {
 
     @Column()
     TYPE_DESC: string;
+
+    @Column()
+    TYPE_GROUP: string;
 }

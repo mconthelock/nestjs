@@ -1,34 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body } from '@nestjs/common';
 import { IsOffService } from './is-off.service';
 import { CreateIsOffDto } from './dto/create-is-off.dto';
 import { UpdateIsOffDto } from './dto/update-is-off.dto';
+import { SearchIsOffDto } from './dto/search-is-off.dto';
 
-@Controller('is-off')
+@Controller('isform/is-off')
 export class IsOffController {
-  constructor(private readonly isOffService: IsOffService) {}
+    constructor(private readonly off: IsOffService) {}
 
-  @Post()
-  create(@Body() createIsOffDto: CreateIsOffDto) {
-    return this.isOffService.create(createIsOffDto);
-  }
+    @Post('create')
+    create(@Body() createIsOffDto: CreateIsOffDto) {
+        return this.off.create(createIsOffDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.isOffService.findAll();
-  }
+    @Post('search')
+    search(@Body() searchIsOffDto: SearchIsOffDto) {
+        return this.off.search(searchIsOffDto);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.isOffService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateIsOffDto: UpdateIsOffDto) {
-    return this.isOffService.update(+id, updateIsOffDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.isOffService.remove(+id);
-  }
+    @Get('reason')
+    findReason() {
+        return this.off.findReason();
+    }
 }

@@ -1,26 +1,57 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { LOGIN_REASON } from 'src/common/Entities/webform/table/LOGIN_REASON.entity';
+import { ISOFF_VARIEDOFF } from 'src/common/Entities/webform/table/ISOFF_VARIEDOFF.entity';
+
 import { CreateIsOffDto } from './dto/create-is-off.dto';
 import { UpdateIsOffDto } from './dto/update-is-off.dto';
+import { SearchIsOffDto } from './dto/search-is-off.dto';
 
 @Injectable()
 export class IsOffService {
-  create(createIsOffDto: CreateIsOffDto) {
-    return 'This action adds a new isOff';
-  }
+    constructor(
+        @InjectRepository(LOGIN_REASON, 'webformConnection')
+        private readonly reason: Repository<LOGIN_REASON>,
 
-  findAll() {
-    return `This action returns all isOff`;
-  }
+        @InjectRepository(ISOFF_VARIEDOFF, 'webformConnection')
+        private readonly off: Repository<ISOFF_VARIEDOFF>,
+    ) {}
 
-  findOne(id: number) {
-    return `This action returns a #${id} isOff`;
-  }
+    async create(createIsOffDto: CreateIsOffDto) {
+        return await this.off.save(createIsOffDto);
+    }
 
-  update(id: number, updateIsOffDto: UpdateIsOffDto) {
-    return `This action updates a #${id} isOff`;
-  }
+    async search(data: SearchIsOffDto) {
+        const { query, startDate, endDate } = data;
+        const queryBuilder = this.off.createQueryBuilder('off');
+        if (query) {
+            queryBuilder.andWhere('off.OFF_DISPLAYNAME LIKE :query', {
+                query: `%${query}%`,
+            });
+        }
 
-  remove(id: number) {
-    return `This action removes a #${id} isOff`;
-  }
+        // if (empNo) {
+        //     queryBuilder.andWhere('off.OFF_EMPNO = :empNo', {
+        //         empNo,
+        //     });
+        // }
+
+        if (startDate) {
+            queryBuilder.andWhere('off.OFF_DATE >= :startDate', {
+                startDate,
+            });
+        }
+
+        if (endDate) {
+            queryBuilder.andWhere('off.OFF_DATE <= :endDate', {
+                endDate,
+            });
+        }
+        return await queryBuilder.getMany();
+    }
+
+    async findReason() {
+        return await this.reason.find();
+    }
 }

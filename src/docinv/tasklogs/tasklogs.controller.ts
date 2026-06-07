@@ -11,9 +11,4 @@ export class TasklogsController {
     async search(@Body() data: searchTasklogs) {
         return this.task.search(data);
     }
-
-    @Post('saveAction')
-    async saveAction(@Body() dto: updateTasklogs) {
-        return this.task.saveAction(dto);
-    }
 }

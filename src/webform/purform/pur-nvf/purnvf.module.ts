@@ -16,6 +16,8 @@ import { PurnvfListRepository } from './purnvf_list/purnvf_list.repository';
 import { PurnvfAddressRepository } from './purnvf_address/purnvf_address.repository';
 import { UsersModule } from 'src/amec/users/users.module';
 import { PappflowModule } from 'src/amec/pappflow/pappflow.module';
+import { PurnvfLocationModule } from './purnvf_location/purnvf_location.module';
+import { PurnvfLocationService } from './purnvf_location/purnvf_location.service';
 
 @Module({
     imports: [
@@ -27,7 +29,8 @@ import { PappflowModule } from 'src/amec/pappflow/pappflow.module';
         PurFileModule,
         RepModule,
         UsersModule,
-        PappflowModule
+        PappflowModule,
+        PurnvfLocationModule
     ],
     controllers: [PurNvfController],
     providers: [
@@ -35,8 +38,9 @@ import { PappflowModule } from 'src/amec/pappflow/pappflow.module';
         PurnvfFormRepository,
         PurnvfListRepository,
         PurnvfAddressRepository,
-        PurNvfReturnApproveService
+        PurNvfReturnApproveService,
+        PurnvfLocationService
     ],
-    exports: [PurNvfRequestService,PurNvfReturnApproveService],
+    exports: [PurNvfRequestService,PurNvfReturnApproveService,  PurnvfLocationService],
 })
 export class PurNvfModule {}

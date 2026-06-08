@@ -5,11 +5,35 @@ import * as odbc from 'odbc';
 export class ConectionService {
     private connection: odbc.Connection;
     private isConnecting = false;
-    private readonly connectionConfig =
-        'DRIVER={iSeries Access ODBC Driver};SYSTEM=AMEC400;UID=OGGUSER;PWD=OGGUSER';
+
+    private getConnectionConfig(): string {
+        const dsn = process.env.AS400_ODBC_DSN;
+        if (dsn) {
+            return `DSN=${dsn};UID=${process.env.AS400_USER || ''};PWD=${process.env.AS400_PASSWORD || ''}`;
+        }
+
+        const driver =
+            process.env.AS400_ODBC_DRIVER || 'IBM i Access ODBC Driver';
+        const system = process.env.AS400_HOST || 'AMEC400';
+        const uid = process.env.AS400_USER || 'OGGUSER';
+        const pwd = process.env.AS400_PASSWORD || 'OGGUSER';
+
+        return `DRIVER={${driver}};SYSTEM=${system};UID=${uid};PWD=${pwd}`;
+    }
 
     async onModuleInit() {
-        await this.connect();
+        try {
+            await this.connect();
+        } catch (error) {
+            // Do not crash app startup if AS400 is temporarily unavailable.
+            console.error(
+                '⚠️ AS400 initial connection failed. The app will continue and retry on demand.',
+                {
+                    message: error?.message,
+                    odbcErrors: error?.odbcErrors,
+                },
+            );
+        }
     }
 
     async onModuleDestroy() {
@@ -24,7 +48,7 @@ export class ConectionService {
 
         try {
             this.isConnecting = true;
-            this.connection = await odbc.connect(this.connectionConfig);
+            this.connection = await odbc.connect(this.getConnectionConfig());
             console.log('✅ Connected to IBM AS400');
         } catch (error) {
             console.error('❌ Connection failed:', error);

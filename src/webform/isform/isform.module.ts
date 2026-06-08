@@ -11,6 +11,8 @@ import { IsAdpModule } from './is-adp/is-adp.module';
 import { IsFileModule } from './is-file/is-file.module';
 import { IsCfsModule } from './is-cfs/is-cfs.module';
 import { IsSefModule } from './is-sef/is-sef.module';
+import { IsOffModule } from './is-off/is-off.module';
+import { IsJdrModule } from './is-jdr/is-jdr.module';
 
 @Module({
     imports: [
@@ -26,6 +28,8 @@ import { IsSefModule } from './is-sef/is-sef.module';
         IsFileModule,
         IsCfsModule,
         IsSefModule,
+        IsOffModule,
+        IsJdrModule,
     ],
 })
 export class ISFormModule {}

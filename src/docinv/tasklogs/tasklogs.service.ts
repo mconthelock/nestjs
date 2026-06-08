@@ -7,7 +7,6 @@ import { formatDate } from 'src/common/utils/dayjs.utils';
 
 import { WSDTaskLog } from '../../common/Entities/docinv/views/wsdtasklog.entity';
 import { AASTaskLog } from '../../common/Entities/docinv/views/aastasklog.entity';
-import { TaskLogs } from '../../common/Entities/docinv/table/tasklogs.entity';
 
 import { searchTasklogs } from './dto/search.dto';
 import { updateTasklogs } from './dto/update.dto';
@@ -20,9 +19,6 @@ export class TasklogsService {
 
         @InjectRepository(AASTaskLog, 'docinvConnection')
         private readonly aas: Repository<AASTaskLog>,
-
-        @InjectRepository(TaskLogs, 'webformConnection')
-        private readonly tsk: Repository<TaskLogs>,
     ) {}
 
     async search(data: searchTasklogs) {
@@ -66,28 +62,5 @@ export class TasklogsService {
             queryBuilder.andWhere('logs.JOBSTATUS = :status', { status });
         }
         return await queryBuilder.getMany();
-    }
-
-    async saveAction(dto: updateTasklogs) {
-        const data = this.tsk.findOne({
-            where: {
-                RC_SECTION: dto.RC_SECTION,
-                RC_DATETIME: dto.RC_DATETIME,
-                RC_JOBNO: dto.RC_JOBNO,
-            },
-        });
-        if (data) {
-            await this.tsk.update(
-                {
-                    RC_SECTION: dto.RC_SECTION,
-                    RC_DATETIME: dto.RC_DATETIME,
-                    RC_JOBNO: dto.RC_JOBNO,
-                },
-                dto,
-            );
-        } else {
-            await this.tsk.save(dto);
-        }
-        return { message: 'Action saved successfully' };
     }
 }

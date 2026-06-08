@@ -443,8 +443,34 @@ export class InquiryService {
             }
             await runner.commitTransaction();
             // await runner.rollbackTransaction();
+            await this.reAlign(inquiry.INQ_ID);
         } catch (err) {
             await runner.rollbackTransaction();
+            throw err;
+        } finally {
+            await runner.release();
+        }
+    }
+
+    async reAlign(id: number) {
+        const runner = this.ds.createQueryRunner();
+        await runner.connect();
+        try {
+            // Get all inquiry details ordered by INQD_SEQ
+            const details = await runner.manager.find(InquiryDetail, {
+                where: { INQID: id, INQD_LATEST: 1 },
+                order: { INQD_SEQ: 'ASC' },
+            });
+
+            // Update INQD_RUNNO as sequence number
+            for (let i = 0; i < details.length; i++) {
+                await runner.manager.update(
+                    InquiryDetail,
+                    { INQD_ID: details[i].INQD_ID },
+                    { INQD_RUNNO: i + 1 },
+                );
+            }
+        } catch (err) {
             throw err;
         } finally {
             await runner.release();
@@ -503,6 +529,7 @@ export class InquiryService {
                 delete detail.INQD_ID;
             }
             await runner.manager.save(InquiryDetail, inquiry_detail);
+            //await this.reAlign(newinq.INQ_ID);
             console.log('Inserted Inquiry Detail');
             await runner.manager.update(
                 InquiryDetail,
@@ -519,6 +546,7 @@ export class InquiryService {
             await runner.manager.save(Timeline, timeline);
             console.log('Inserted Inquiry Timeline');
             if (localRunner) await localRunner.commitTransaction();
+            await this.reAlign(newinq.INQ_ID);
             return newinq;
         } catch (error) {
             console.error('Error update flow:', error);

@@ -4,26 +4,31 @@ import { PartialType } from '@nestjs/mapped-types';
 import { createInqDto } from './create-inquiry.dto';
 
 export class updateInqDto extends PartialType(createInqDto) {
-  @IsNumber()
-  @Type(() => Number)
-  @IsIn([0, 1])
-  INQ_LATEST: number;
+    @IsNumber()
+    @Type(() => Number)
+    @IsIn([0, 1])
+    INQ_LATEST: number;
 
-  @IsNumber()
-  @Type(() => Number)
-  @IsIn([0, 1])
-  @IsOptional()
-  INQ_SALE_FORWARD?: number;
+    @IsNumber()
+    @Type(() => Number)
+    @IsIn([0, 1])
+    @IsOptional()
+    INQ_SALE_FORWARD?: number;
 
-  @IsString()
-  @IsOptional()
-  INQ_SALE_REMARK?: string;
+    @IsString()
+    @IsOptional()
+    INQ_SALE_REMARK?: string;
 
-  @IsString()
-  @IsOptional()
-  INQ_DE_REMARK?: string;
+    @IsString()
+    @IsOptional()
+    INQ_DE_REMARK?: string;
 
-  @IsString()
-  @IsOptional()
-  INQ_FIN_REMARK?: string;
+    @IsString()
+    @IsOptional()
+    INQ_FIN_REMARK?: string;
+
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    INQ_STATUS?: number;
 }

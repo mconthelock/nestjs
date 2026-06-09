@@ -70,6 +70,8 @@ export class PurNvfReturnApproveService  {
                 TYPEJOB : data.TYPEJOB,
                 SERVICE : data.SERVICE,
                 VENDTYPE : data.VENDOR_LOCATION,
+                VENDCODE : (data.REQTYPE === 'U' || data.REQTYPE === 'D') ? data.VENDORCODE:"",
+                REASON : (data.REQTYPE === 'D') ? data.REASON:"",
                 COMNAME : data.COMPANY_NAME,
                 CONTACT : data.CONTACT,
                 EMAIL : data.EMAIL,

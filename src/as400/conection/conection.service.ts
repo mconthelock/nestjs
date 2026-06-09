@@ -13,7 +13,7 @@ export class ConectionService {
         }
 
         const driver =
-            process.env.AS400_ODBC_DRIVER || 'IBM i Access ODBC Driver';
+            process.env.AS400_ODBC_DRIVER || 'iSeries Access ODBC Drive';
         const system = process.env.AS400_HOST || 'AMEC400';
         const uid = process.env.AS400_USER || 'OGGUSER';
         const pwd = process.env.AS400_PASSWORD || 'OGGUSER';

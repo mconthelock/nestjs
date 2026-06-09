@@ -25,4 +25,25 @@ export class DpmsPlIssueTypeService {
             );
         }
     }
+
+    async findById(id: number) {
+        try {
+            const result = await this.repo.findById(id);
+            if (!result) {
+                return {
+                    status: false,
+                    message: `Issue type with ID ${id} not found.`,
+                };
+            }
+            return {
+                status: true,
+                message: `Issue type with ID ${id} found.`,
+                data: result,
+            };
+        } catch (error) {
+            throw new Error(
+                `Failed to find issue type by ID ${id}. Error: ${error.message}`,
+            );
+        }
+    }
 }

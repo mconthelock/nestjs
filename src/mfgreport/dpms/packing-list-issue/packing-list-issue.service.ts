@@ -14,6 +14,10 @@ import {
     generatePDFParams,
 } from './packing-list-issue.interface';
 import { DpmsPlFileService } from 'src/workload/dpms_pl_file/dpms_pl_file.service';
+import { DpmsPlCaseListService } from 'src/workload/dpms_pl_case_list/dpms_pl_case_list.service';
+import { DpmsPlCaseListDetailService } from 'src/workload/dpms_pl_case_list_detail/dpms_pl_case_list_detail.service';
+import { MailService } from 'src/common/services/mail/mail.service';
+import { DpmsPlIssueTypeService } from 'src/workload/dpms_pl_issue_type/dpms_pl_issue_type.service';
 
 @Injectable()
 export class PackingListIssueService {
@@ -22,6 +26,10 @@ export class PackingListIssueService {
         private readonly dpmsPlIssueService: DpmsPlIssueService,
         private readonly dpmsPlIssueRevService: DpmsPlIssueRevService,
         private readonly dpmsPlFileService: DpmsPlFileService,
+        private readonly dpmsPlCaseListService: DpmsPlCaseListService,
+        private readonly dpmsPlCaseListDetailService: DpmsPlCaseListDetailService,
+        private readonly dpmsPlIssueTypeService: DpmsPlIssueTypeService,
+        private readonly mailService: MailService,
     ) {}
 
     private readonly tempDir = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
@@ -30,6 +38,9 @@ export class PackingListIssueService {
     async issue(dto: CreatePackingListIssueDto) {
         try {
             const issueDate = now('DD/MM/YYYY');
+            const issueType = await this.dpmsPlIssueTypeService.findById(
+                dto.ISSUETYPE,
+            );
             // 1. Check if PL Issue exists, if not create new PL Issue
             const plIssueData: DPMS_PL_ISSUE_PK = {
                 VPROD: dto.VPROD,
@@ -51,8 +62,8 @@ export class PackingListIssueService {
             const revisionText: string = numberToAlphabetRevision(revision);
 
             // 3. create PDF file
-            const fileName: string = `${dto.HEADER.VNAMEOFBLDG.split(' ')[0] ?? ''}_${dto.VORDERS}.pdf`;
-            await this.generatePDF({
+            const fileName: string = `${dto.HEADER.VNAMEOFBLDG.split(' ')[0] ?? ''}_${dto.VORDERS}${revision > 0 ? `_${revisionText}` : ''}.pdf`;
+            const pdf = await this.generatePDF({
                 order: dto.VORDERS,
                 html: dto.HTML,
                 fileName,
@@ -74,28 +85,65 @@ export class PackingListIssueService {
             }
 
             // 4. create PL Issue Revision record
-            // const insertIssueRev = await this.dpmsPlIssueRevService.create({
-            //     ...plIssueData,
-            //     NISSUE_TYPE: dto.ISSUETYPE,
-            //     NREV: revision,
-            //     VREVTEXT: revisionText,
-            //     NFILEID: insertFile.data.NFILEID,
-            //     VSHOPORDERNO: dto.HEADER.VSHOPORDERNO,
-            //     VSUBJECT: dto.HEADER.VSUBJECT,
-            //     VNAMEOFBLDG: dto.HEADER.VNAMEOFBLDG,
-            //     VSOLDTO: dto.HEADER.VSOLDTO,
-            //     VSHIPPINGMARK: dto.HEADER.VSHIPPINGMARK,
-            // });
+            const insertIssueRev = await this.dpmsPlIssueRevService.create({
+                ...plIssueData,
+                NISSUE_TYPE: dto.ISSUETYPE,
+                NREV: revision,
+                VREVTEXT: revisionText,
+                NFILEID: insertFile.data.NFILE_ID,
+                VSHOPORDERNO: dto.HEADER.VSHOPORDERNO,
+                VSUBJECT: dto.HEADER.VSUBJECT,
+                VNAMEOFBLDG: dto.HEADER.VNAMEOFBLDG,
+                VSOLDTO: dto.HEADER.VSOLDTO,
+                VSHIPPINGMARK: dto.SHIPPING_MARK,
+            });
 
-            // switch (dto.ISSUETYPE) {
-            //     case 1: //draft
-            //     case 2: // Partial
-            //     case 3: // Balance
-            //         break;
-            //     case 4: // Complete
-            //     case 5: // Combine
-            //         break;
-            // }
+            // 5. Create PL Issue List record
+            for (const list of dto.LIST) {
+                const seq = dto.LIST.indexOf(list) + 1;
+                const insertIssueList = await this.dpmsPlCaseListService.create(
+                    {
+                        ...list,
+                        NISSUEREV_ID: insertIssueRev.data.NID,
+                        NSEQ: seq,
+                    },
+                );
+                // 6. Create PL Issue List Detail record
+                for (const detail of list.DETAILS) {
+                    await this.dpmsPlCaseListDetailService.create({
+                        ...detail,
+                        NCASELIST_ID: insertIssueList.data.NID,
+                    });
+                }
+            }
+            // 7. send email notification to user
+            const email =
+                process.env.NODE_ENV != 'production'
+                    ? process.env.MAIL_ADMIN
+                    : process.env.MAIL_ADMIN;
+            await this.mailService.sendMail({
+                from: `MFG REPORT System<${process.env.MAIL_FROM}>`,
+                to: email,
+                subject: 'Packing list issue notification',
+                template: 'mfgreport/dpms/packing-list',
+                context: {
+                    name: email,
+                    issueType: issueType.data.VDESCRIPTION,
+                    shopOrderNo: dto.HEADER.VSHOPORDERNO,
+                    subject: dto.HEADER.VSUBJECT,
+                    nameOfBldg: dto.HEADER.VNAMEOFBLDG,
+                    soldTo: dto.HEADER.VSOLDTO,
+                    path: pdf.path,
+                },
+                bcc: process.env.MAIL_ADMIN,
+                attachments: [
+                    {
+                        filename: fileName,
+                        content: pdf.data,
+                    },
+                ],
+            });
+            // throw new Error('Test error');
             return {
                 status: true,
                 message: 'Packing list issued successfully',
@@ -116,7 +164,7 @@ export class PackingListIssueService {
         const tempFileName = `tempPL_${now('YYYYMMDDHHmm')}_${fileName}`;
         const tempFilePath = await joinPaths(this.tempDir, tempFileName);
         const finalFilePath = await joinPaths(this.finalDir, fileName);
-        await this.PDFService.generatePDF({
+        const pdf = await this.PDFService.generatePDF({
             html: `<!doctype html>
                 <html lang="th">
                     <head>
@@ -262,6 +310,7 @@ export class PackingListIssueService {
 
         // 3. ลบ temp file
         await fs.unlink(tempFilePath);
+        return { ...pdf, path: finalFilePath };
     }
 
     private async addHeaderToPDF(

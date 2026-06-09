@@ -4,7 +4,7 @@ import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { CreateDpmsPlIssueRevDto } from './dto/create-dpms_pl_issue_rev.dto';
 import { DPMS_PL_ISSUE_REV } from 'src/common/Entities/workload/table/DPMS_PL_ISSUE_REV.entity';
-import type { dpmsPlIssueRevFindLatestRevision } from './dpms_pl_issue_rev.interface';
+import { dpmsPlIssueRevFindLatestRevision } from './dpms_pl_issue_rev.interface';
 
 @Injectable()
 export class DpmsPlIssueRevRepository extends BaseRepository {
@@ -13,7 +13,10 @@ export class DpmsPlIssueRevRepository extends BaseRepository {
     }
 
     create(dto: CreateDpmsPlIssueRevDto) {
-        return this.getRepository(DPMS_PL_ISSUE_REV).save(dto);
+        return this.getRepository(DPMS_PL_ISSUE_REV).save({
+            ...dto,
+            DISSUEDATE: new Date(),
+        });
     }
 
     findLatestRevision(condition: dpmsPlIssueRevFindLatestRevision) {

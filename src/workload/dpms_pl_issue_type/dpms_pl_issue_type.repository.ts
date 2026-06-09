@@ -12,9 +12,13 @@ export class DpmsPlIssueTypeRepository extends BaseRepository {
 
     async findAll(): Promise<DPMS_PL_ISSUE_TYPE[]> {
         return this.getRepository(DPMS_PL_ISSUE_TYPE).find({
-            order:{
+            order: {
                 NSEQ: 'ASC',
-            }
+            },
         });
+    }
+
+    findById(id: number): Promise<DPMS_PL_ISSUE_TYPE> {
+        return this.getRepository(DPMS_PL_ISSUE_TYPE).findOneBy({ NID: id });
     }
 }

@@ -82,4 +82,28 @@ export class DPMS_PACKING_LIST{
 
     @Column()
     DELAY: string;
+
+    @Column()
+    DFINISHALL: Date;
+
+    @Column()
+    DCOMPLETE: Date;
+
+    @Column()
+    DDRAFT: Date;
+
+    @Column()
+    DPARTIAL: Date;
+
+    @Column()
+    DCOMBINE: Date;
+
+    @Column()
+    DBALANCE: Date;
+
+    @Column()
+    VPROBLEM: string;
+
+    @Column()
+    VREASON: string;
 }

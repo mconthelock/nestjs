@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateDpmsPlIssueRevDto } from './dto/create-dpms_pl_issue_rev.dto';
 import { UpdateDpmsPlIssueRevDto } from './dto/update-dpms_pl_issue_rev.dto';
 import { DpmsPlIssueRevRepository } from './dpms_pl_issue_rev.repository';
-import type { dpmsPlIssueRevFindLatestRevision } from './dpms_pl_issue_rev.interface';
+import { dpmsPlIssueRevFindLatestRevision } from './dpms_pl_issue_rev.interface';
 import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
 
 @Injectable()

@@ -14,16 +14,17 @@ import { InquiryDetailModule } from '../inquiry-detail/inquiry-detail.module';
 import { HistoryModule } from '../history/history.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature(
-      [Inquiry, Orderpart, Spcalsheet, User, Partcategory],
-      'spsysConnection',
-    ),
-    InquiryGroupModule,
-    InquiryDetailModule,
-    HistoryModule,
-  ],
-  controllers: [InquiryController],
-  providers: [InquiryService],
+    imports: [
+        TypeOrmModule.forFeature(
+            [Inquiry, Orderpart, Spcalsheet, User, Partcategory],
+            'spsysConnection',
+        ),
+        InquiryGroupModule,
+        InquiryDetailModule,
+        HistoryModule,
+    ],
+    controllers: [InquiryController],
+    providers: [InquiryService],
+    exports: [InquiryService],
 })
 export class InquiryModule {}

@@ -9,4 +9,9 @@ export class TaskscheduleController {
     create() {
         return this.task.sendMail();
     }
+
+    @Post('check-prebm')
+    checkPrebm() {
+        return this.task.checkPrebm();
+    }
 }

@@ -9,6 +9,7 @@ import { DpmsPlFileModule } from './dpms_pl_file/dpms_pl_file.module';
 import { DpmsPlCaseListModule } from './dpms_pl_case_list/dpms_pl_case_list.module';
 import { DpmsPlCaseListDetailModule } from './dpms_pl_case_list_detail/dpms_pl_case_list_detail.module';
 import { DpmsPlIssueDateModule } from './dpms_pl_issue_date/dpms_pl_issue_date.module';
+import { AmecordersScheduleModule } from './amecorders_schedule/amecorders_schedule.module';
 
 @Module({
     imports: [
@@ -22,6 +23,7 @@ import { DpmsPlIssueDateModule } from './dpms_pl_issue_date/dpms_pl_issue_date.m
         DpmsPlCaseListModule,
         DpmsPlCaseListDetailModule,
         DpmsPlIssueDateModule,
+        AmecordersScheduleModule,
     ],
 })
 export class WorkloadModule {}

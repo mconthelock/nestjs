@@ -1,67 +1,67 @@
 import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  OneToOne,
-  JoinColumn,
-  OneToMany,
+    Entity,
+    PrimaryColumn,
+    Column,
+    OneToOne,
+    JoinColumn,
+    OneToMany,
 } from 'typeorm';
-import
-{
-  Tmaintaintype
-} from '../../tmaintaintype/entities/tmaintaintype.entity'; 
+import { Tmaintaintype } from '../../tmaintaintype/entities/tmaintaintype.entity';
 
 @Entity('TMARKET_TEMP')
 export class Ordermain {
-  @Column()
-  SERIES: string;
+    @Column()
+    SERIES: string;
 
-  @Column()
-  AGENT: string;
+    @Column()
+    AGENT: string;
 
-  @Column()
-  PRJ_NO: string;
+    @Column()
+    PRJ_NO: string;
 
-  @Column()
-  PRJ_NAME: string;
+    @Column()
+    PRJ_NAME: string;
 
-  @Column()
-  DSTN: string;
+    @Column()
+    DSTN: string;
 
-  @Column()
-  ORDER_NO: string;
+    @Column()
+    ORDER_NO: string;
 
-  @Column()
-  SPEC: string;
+    @Column()
+    SPEC: string;
 
-  @Column()
-  OPERATION: string;
+    @Column()
+    OPERATION: string;
 
-  @PrimaryColumn()
-  MFGNO: string;
+    @PrimaryColumn()
+    MFGNO: string;
 
-  @Column()
-  CAR_NO: string;
+    @Column()
+    CAR_NO: string;
 
-  @Column()
-  IDS_DATE: string;
+    @Column()
+    IDS_DATE: string;
 
-  @Column()
-  CUST_RQS: string;
+    @Column()
+    CUST_RQS: string;
 
-  @PrimaryColumn()
-  EDIT_DATE: Date;
+    @PrimaryColumn()
+    EDIT_DATE: Date;
 
-  @PrimaryColumn()
-  REVISION_CODE: string;
+    @PrimaryColumn()
+    REVISION_CODE: string;
 
-  @PrimaryColumn()
-  REVISION_EDIT: string;
+    @PrimaryColumn()
+    REVISION_EDIT: string;
 
-  @Column()
-  AMEC_SCHDL: Date;
+    @Column()
+    AMEC_SCHDL: Date;
 
-  @OneToOne(() => Tmaintaintype, (ord) => ord.seriestype)
-  @JoinColumn({ name: 'SERIES', referencedColumnName: 'ABBREVIATION' })
-  orderseries: Tmaintaintype;
+    @Column()
+    QTY: number;
+
+    @OneToOne(() => Tmaintaintype, (ord) => ord.seriestype)
+    @JoinColumn({ name: 'SERIES', referencedColumnName: 'ABBREVIATION' })
+    orderseries: Tmaintaintype;
 }

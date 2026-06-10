@@ -50,4 +50,7 @@ export class TMARKET_TEMP {
 
     @Column()
     AMEC_SCHDL: Date;
+
+    @Column()
+    QTY: number;
 }

@@ -47,7 +47,7 @@ export class TaskscheduleService {
                 IS_TIMELINE: '1',
             });
             const filteredInquiries = inquiries.filter(
-                (dt) => dt.INQ_STATUS >= 30,
+                (dt) => dt.INQ_STATUS >= 30 && dt.timeline.BM_CONFIRM == null,
             );
             for (const inq of filteredInquiries) {
                 const as400inq = await this.prebm.findAll({

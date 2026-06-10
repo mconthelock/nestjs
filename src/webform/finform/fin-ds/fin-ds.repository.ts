@@ -39,22 +39,39 @@ export class FinDsRepository extends BaseRepository {
         nfrmno: number,
         vorgno: string,
         cyear: string,
+        cyear2: string,
         nrunno: number,
     ) {
-        return this.getRepository(DSREQHEAD).findOne({
-            where: {
-                NFRMNO: nfrmno,
-                VORGNO: vorgno,
-                CYEAR: cyear,
-                NRUNNO: nrunno,
-            },
-        });
+        return this.getRepository(DSREQHEAD)
+            .createQueryBuilder('HEAD')
+            .select('HEAD.NFRMNO', 'NFRMNO')
+            .addSelect('HEAD.VORGNO', 'VORGNO')
+            .addSelect('HEAD.CYEAR', 'CYEAR')
+            .addSelect('HEAD.CYEAR2', 'CYEAR2')
+            .addSelect('HEAD.NRUNNO', 'NRUNNO')
+            .addSelect('HEAD.OPTION_CODE', 'OPTION_CODE')
+            .addSelect(
+                "TO_CHAR(HEAD.EFFECTIVE_DATE, 'YYYY-MM-DD')",
+                'EFFECTIVE_DATE',
+            )
+            .addSelect(
+                "TO_CHAR(HEAD.DATE_RECEIVE, 'YYYY-MM-DD')",
+                'DATE_RECEIVE',
+            )
+            .addSelect('HEAD.LOCATION', 'LOCATION')
+            .where('HEAD.NFRMNO = :NFRMNO', { NFRMNO: nfrmno })
+            .andWhere('HEAD.VORGNO = :VORGNO', { VORGNO: vorgno })
+            .andWhere('HEAD.CYEAR = :CYEAR', { CYEAR: cyear })
+            .andWhere('HEAD.CYEAR2 = :CYEAR2', { CYEAR2: cyear2 })
+            .andWhere('HEAD.NRUNNO = :NRUNNO', { NRUNNO: nrunno })
+            .getRawOne();
     }
 
     async findDetailByForm(
         nfrmno: number,
         vorgno: string,
         cyear: string,
+        cyear2: string,
         nrunno: number,
     ) {
         return this.getRepository(DSREQDETAIL).find({
@@ -62,6 +79,7 @@ export class FinDsRepository extends BaseRepository {
                 NFRMNO: nfrmno,
                 VORGNO: vorgno,
                 CYEAR: cyear,
+                CYEAR2: cyear2,
                 NRUNNO: nrunno,
             },
             order: {
@@ -75,6 +93,7 @@ export class FinDsRepository extends BaseRepository {
         nfrmno: number,
         vorgno: string,
         cyear: string,
+        cyear2: string,
         nrunno: number,
     ) {
         return this.getRepository(FIN_FILE).find({
@@ -82,6 +101,7 @@ export class FinDsRepository extends BaseRepository {
                 NFRMNO: nfrmno,
                 VORGNO: vorgno,
                 CYEAR: cyear,
+                CYEAR2: cyear2,
                 NRUNNO: nrunno,
             },
             order: {
@@ -103,18 +123,20 @@ export class FinDsRepository extends BaseRepository {
         nfrmno: number,
         vorgno: string,
         cyear: string,
+        cyear2: string,
         nrunno: number,
     ) {
-        const head = await this.findHeadByForm(nfrmno, vorgno, cyear, nrunno);
+        const head = await this.findHeadByForm(nfrmno, vorgno, cyear, cyear2, nrunno);
 
         const detail = await this.findDetailByForm(
             nfrmno,
             vorgno,
             cyear,
+            cyear2,
             nrunno,
         );
 
-        const files = await this.findFilesByForm(nfrmno, vorgno, cyear, nrunno);
+        const files = await this.findFilesByForm(nfrmno, vorgno, cyear, cyear2, nrunno);
 
         return {
             head,
@@ -127,24 +149,25 @@ export class FinDsRepository extends BaseRepository {
         return this.getRepository(DSREQHEAD).save(data);
     }
 
-    async updateDateReceiveToToday(form: {
+    async updateDateReceive(form: {
         NFRMNO: number;
         VORGNO: string;
         CYEAR: string;
         CYEAR2: string;
         NRUNNO: number;
-    }) {
+    }, dateReceive: string) {
         return this.getRepository(DSREQHEAD)
             .createQueryBuilder()
             .update(DSREQHEAD)
             .set({
-                DATE_RECEIVE: () => 'SYSDATE',
+                DATE_RECEIVE: () => "TO_DATE(:DATE_RECEIVE, 'YYYY-MM-DD')",
             } as any)
             .where('NFRMNO = :NFRMNO', { NFRMNO: form.NFRMNO })
             .andWhere('VORGNO = :VORGNO', { VORGNO: form.VORGNO })
             .andWhere('CYEAR = :CYEAR', { CYEAR: form.CYEAR })
             .andWhere('CYEAR2 = :CYEAR2', { CYEAR2: form.CYEAR2 })
             .andWhere('NRUNNO = :NRUNNO', { NRUNNO: form.NRUNNO })
+            .setParameter('DATE_RECEIVE', dateReceive)
             .execute();
     }
 
@@ -153,16 +176,50 @@ export class FinDsRepository extends BaseRepository {
     }
 
     async findReport(FYEAR: number) {
-    return this.getRepository(DS_STAMP_REPORT).find({
-        where: {
-            FYEAR: FYEAR,
-        },
-        order: {
-            DATE_RECEIVE: 'asc',
-            NRUNNO: 'asc',
-        },
-    });
-}
+        return this.getRepository(DS_STAMP_REPORT)
+            .createQueryBuilder('REPORT')
+            .select('REPORT.FYEAR', 'FYEAR')
+            .addSelect("TO_CHAR(HEAD.DATE_RECEIVE, 'YYYY-MM-DD')", 'DATE_RECEIVE')
+            .addSelect('REPORT.NFRMNO', 'NFRMNO')
+            .addSelect('REPORT.VORGNO', 'VORGNO')
+            .addSelect('REPORT.CYEAR', 'CYEAR')
+            .addSelect('REPORT.CYEAR2', 'CYEAR2')
+            .addSelect('REPORT.NRUNNO', 'NRUNNO')
+            .addSelect('REPORT.REASON', 'REASON')
+            .addSelect('REPORT.VREQNO', 'VREQNO')
+            .addSelect('REPORT.REQUESTER', 'REQUESTER')
+            .addSelect('REPORT.BUY_1_QTY', 'BUY_1_QTY')
+            .addSelect('REPORT.BUY_1_AMT', 'BUY_1_AMT')
+            .addSelect('REPORT.BUY_5_QTY', 'BUY_5_QTY')
+            .addSelect('REPORT.BUY_5_AMT', 'BUY_5_AMT')
+            .addSelect('REPORT.BUY_10_QTY', 'BUY_10_QTY')
+            .addSelect('REPORT.BUY_10_AMT', 'BUY_10_AMT')
+            .addSelect('REPORT.BUY_20_QTY', 'BUY_20_QTY')
+            .addSelect('REPORT.BUY_20_AMT', 'BUY_20_AMT')
+            .addSelect('REPORT.WD_1_QTY', 'WD_1_QTY')
+            .addSelect('REPORT.WD_1_AMT', 'WD_1_AMT')
+            .addSelect('REPORT.WD_5_QTY', 'WD_5_QTY')
+            .addSelect('REPORT.WD_5_AMT', 'WD_5_AMT')
+            .addSelect('REPORT.WD_10_QTY', 'WD_10_QTY')
+            .addSelect('REPORT.WD_10_AMT', 'WD_10_AMT')
+            .addSelect('REPORT.WD_20_QTY', 'WD_20_QTY')
+            .addSelect('REPORT.WD_20_AMT', 'WD_20_AMT')
+            .innerJoin(
+                DSREQHEAD,
+                'HEAD',
+                [
+                    'HEAD.NFRMNO = REPORT.NFRMNO',
+                    'HEAD.VORGNO = REPORT.VORGNO',
+                    'HEAD.CYEAR = REPORT.CYEAR',
+                    'HEAD.CYEAR2 = REPORT.CYEAR2',
+                    'HEAD.NRUNNO = REPORT.NRUNNO',
+                ].join(' AND '),
+            )
+            .where('REPORT.FYEAR = :FYEAR', { FYEAR })
+            .orderBy('HEAD.DATE_RECEIVE', 'ASC')
+            .addOrderBy('REPORT.NRUNNO', 'ASC')
+            .getRawMany();
+    }
 
 
 

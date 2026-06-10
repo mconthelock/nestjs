@@ -24,7 +24,7 @@ export class DSREQDETAIL {
     @Column()
     REASON: string;
 
-    @Column()
+    @PrimaryColumn()
     DUTY_VALUE: number;
     
     @Column()

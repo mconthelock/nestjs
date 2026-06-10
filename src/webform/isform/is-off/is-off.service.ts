@@ -1,3 +1,7 @@
+import * as dayjsModule from 'dayjs';
+const dayjs = (dayjsModule as any).default ?? (dayjsModule as any);
+import * as utcModule from 'dayjs/plugin/utc';
+import * as timezoneModule from 'dayjs/plugin/timezone';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -8,6 +12,10 @@ import { CreateIsOffDto } from './dto/create-is-off.dto';
 import { UpdateIsOffDto } from './dto/update-is-off.dto';
 import { SearchIsOffDto } from './dto/search-is-off.dto';
 
+const utc = (utcModule as any).default ?? (utcModule as any);
+const timezone = (timezoneModule as any).default ?? (timezoneModule as any);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 @Injectable()
 export class IsOffService {
     constructor(
@@ -38,14 +46,21 @@ export class IsOffService {
         // }
 
         if (startDate) {
+            const startOfDayBangkok = dayjs(startDate)
+                .tz('Asia/Bangkok')
+                .startOf('day');
             queryBuilder.andWhere('off.OFF_DATE >= :startDate', {
-                startDate,
+                startDate: startOfDayBangkok.toDate(),
             });
         }
 
         if (endDate) {
+            const endOfRangeBangkok = dayjs(endDate)
+                .tz('Asia/Bangkok')
+                .startOf('day')
+                .add(1, 'day');
             queryBuilder.andWhere('off.OFF_DATE <= :endDate', {
-                endDate,
+                endDate: endOfRangeBangkok.toDate(),
             });
         }
         return await queryBuilder.getMany();

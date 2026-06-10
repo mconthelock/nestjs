@@ -56,17 +56,19 @@ export class FinDsController {
 
     // ดึงรายการเดียว พร้อม head/detail/files
     // ดึงรายการเดียว พร้อม head/detail/files
-    @Get('show/:nfrmno/:vorgno/:cyear/:nrunno')
+    @Get('show/:nfrmno/:vorgno/:cyear/:cyear2/:nrunno')
     findOneForShow(
         @Param('nfrmno') nfrmno: string,
         @Param('vorgno') vorgno: string,
         @Param('cyear') cyear: string,
+        @Param('cyear2') cyear2: string,
         @Param('nrunno') nrunno: string,
     ) {
         return this.finDsService.findOneForShow(
             Number(nfrmno),
             vorgno,
             cyear,
+            cyear2,
             Number(nrunno),
         );
     }

@@ -1,4 +1,5 @@
 import { PickType } from '@nestjs/swagger';
+import { IsDateString, ValidateIf } from 'class-validator';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 
 export class ActionFinDDto extends PickType(doactionFlowDto, [
@@ -11,4 +12,8 @@ export class ActionFinDDto extends PickType(doactionFlowDto, [
     'ACTION',
     'REMARK',
     'CEXTDATA',
-] as const) {}
+] as const) {
+    @ValidateIf((_, value) => value !== undefined && value !== null && value !== '')
+    @IsDateString()
+    DATE_RECEIVE?: string;
+}

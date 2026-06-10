@@ -8,6 +8,7 @@ import { DpmsPlIssueRevModule } from './dpms_pl_issue_rev/dpms_pl_issue_rev.modu
 import { DpmsPlFileModule } from './dpms_pl_file/dpms_pl_file.module';
 import { DpmsPlCaseListModule } from './dpms_pl_case_list/dpms_pl_case_list.module';
 import { DpmsPlCaseListDetailModule } from './dpms_pl_case_list_detail/dpms_pl_case_list_detail.module';
+import { DpmsPlIssueDateModule } from './dpms_pl_issue_date/dpms_pl_issue_date.module';
 
 @Module({
     imports: [
@@ -20,6 +21,7 @@ import { DpmsPlCaseListDetailModule } from './dpms_pl_case_list_detail/dpms_pl_c
         DpmsPlFileModule,
         DpmsPlCaseListModule,
         DpmsPlCaseListDetailModule,
+        DpmsPlIssueDateModule,
     ],
 })
 export class WorkloadModule {}

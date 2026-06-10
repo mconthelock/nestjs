@@ -2,21 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { CreateDpmsPlIssueDto } from './dto/create-dpms_pl_issue.dto';
 import { UpdateDpmsPlIssueDto } from './dto/update-dpms_pl_issue.dto';
 import { DpmsPlIssueRepository } from './dpms_pl_issue.repository';
+import { DPMS_PL_ISSUE_PK } from 'src/mfgreport/dpms/packing-list-issue/packing-list-issue.interface';
 
 @Injectable()
 export class DpmsPlIssueService {
-    constructor(
-        private readonly repo: DpmsPlIssueRepository,
-    ) {}
+    constructor(private readonly repo: DpmsPlIssueRepository) {}
 
-    async findOne(dto: UpdateDpmsPlIssueDto){
+    async findOne(dto: UpdateDpmsPlIssueDto) {
         try {
-            const res =  await this.repo.findOne(dto);
-            if(!res) {
+            const res = await this.repo.findOne(dto);
+            if (!res) {
                 return {
                     status: false,
                     message: 'DPMS PL Issue not found',
-                }
+                };
             }
             return {
                 status: true,
@@ -30,7 +29,7 @@ export class DpmsPlIssueService {
     async create(dto: CreateDpmsPlIssueDto) {
         try {
             const res = await this.repo.create(dto);
-            if(!res) {
+            if (!res) {
                 return {
                     status: false,
                     message: 'Failed to create DPMS PL Issue',
@@ -43,6 +42,24 @@ export class DpmsPlIssueService {
             };
         } catch (error) {
             throw new Error(`Failed to create DPMS PL Issue: ${error.message}`);
+        }
+    }
+
+    async update(condition: DPMS_PL_ISSUE_PK, dto: UpdateDpmsPlIssueDto) {
+        try {
+            const res = await this.repo.update(condition, dto);
+            if (!res.affected) {
+                return {
+                    status: false,
+                    message: 'DPMS PL Issue not found or no changes made',
+                };
+            }
+            return {
+                status: true,
+                message: 'DPMS PL Issue updated successfully',
+            };
+        } catch (error) {
+            throw new Error(`Failed to update DPMS PL Issue: ${error.message}`);
         }
     }
 }

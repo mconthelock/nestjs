@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePackingListIssueDto } from './dto/create-packing-list-issue.dto';
-import { UpdatePackingListIssueDto } from './dto/update-packing-list-issue.dto';
+import {
+    UpdatePackingListIssueDto,
+    UpdatePlIssueProblemReasonDto,
+} from './dto/update-packing-list-issue.dto';
 import { DpmsPlIssueService } from 'src/workload/dpms_pl_issue/dpms_pl_issue.service';
 import { PDFService } from 'src/common/services/pdf/pdf.service';
 import { joinPaths } from 'src/common/utils/files.utils';
@@ -18,6 +21,7 @@ import { DpmsPlCaseListService } from 'src/workload/dpms_pl_case_list/dpms_pl_ca
 import { DpmsPlCaseListDetailService } from 'src/workload/dpms_pl_case_list_detail/dpms_pl_case_list_detail.service';
 import { MailService } from 'src/common/services/mail/mail.service';
 import { DpmsPlIssueTypeService } from 'src/workload/dpms_pl_issue_type/dpms_pl_issue_type.service';
+import { DpmsPlIssueDateService } from 'src/workload/dpms_pl_issue_date/dpms_pl_issue_date.service';
 
 @Injectable()
 export class PackingListIssueService {
@@ -29,11 +33,38 @@ export class PackingListIssueService {
         private readonly dpmsPlCaseListService: DpmsPlCaseListService,
         private readonly dpmsPlCaseListDetailService: DpmsPlCaseListDetailService,
         private readonly dpmsPlIssueTypeService: DpmsPlIssueTypeService,
+        private readonly dpmsPlIssueDateService: DpmsPlIssueDateService,
         private readonly mailService: MailService,
     ) {}
 
     private readonly tempDir = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
     private readonly finalDir = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/test/`;
+
+    async updateProblemReason(dto: UpdatePlIssueProblemReasonDto) {
+        try {
+            const { VPROD, VP, VORDERS, VTYPE, ...data } = dto;
+            const condition = {
+                VPROD,
+                VP,
+                VORDERS,
+                VTYPE,
+            };
+            const checkPlIssue =
+                await this.dpmsPlIssueService.findOne(condition);
+            if (!checkPlIssue.status) {
+                return await this.dpmsPlIssueService.create({
+                    ...condition,
+                    ...data,
+                });
+            } else {
+                return await this.dpmsPlIssueService.update(condition, data);
+            }
+        } catch (error) {
+            throw new Error(
+                `Failed to update problem reason: ${error.message}`,
+            );
+        }
+    }
 
     async issue(dto: CreatePackingListIssueDto) {
         try {
@@ -143,10 +174,16 @@ export class PackingListIssueService {
                     },
                 ],
             });
+            const issueData =
+                await this.dpmsPlIssueDateService.findOne(plIssueData);
+            if (!issueData.status) {
+                throw new Error('Failed to find DPMS PL Issue Date');
+            }
             // throw new Error('Test error');
             return {
                 status: true,
                 message: 'Packing list issued successfully',
+                data: issueData.data,
             };
         } catch (error) {
             throw new Error(`Failed to issue packing list: ${error.message}`);

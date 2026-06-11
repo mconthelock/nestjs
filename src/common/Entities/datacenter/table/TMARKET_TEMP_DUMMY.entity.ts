@@ -2,48 +2,51 @@ import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity({ name: 'TMARKET_TEMP_DUMMY', schema: 'AMECMFG' })
 export class TMARKET_TEMP_DUMMY {
-  @Column()
-  RECON_PARTS: string;
+    @Column()
+    RECON_PARTS: string;
 
-  @Column()
-  SERIES: string;
+    @Column()
+    SERIES: string;
 
-  @Column()
-  AGENT: string;
+    @Column()
+    AGENT: string;
 
-  @Column()
-  PRJ_NO: string;
+    @Column()
+    PRJ_NO: string;
 
-  @Column()
-  PRJ_NAME: string;
+    @Column()
+    PRJ_NAME: string;
 
-  @Column()
-  DSTN: string;
+    @Column()
+    DSTN: string;
 
-  @Column()
-  ORDER_NO: string;
+    @Column()
+    ORDER_NO: string;
 
-  @Column()
-  SPEC: string;
+    @Column()
+    SPEC: string;
 
-  @Column()
-  OPERATION: string;
+    @Column()
+    OPERATION: string;
 
-  @PrimaryColumn()
-  MFGNO: string;
+    @PrimaryColumn()
+    MFGNO: string;
 
-  @Column()
-  CAR_NO: string;
+    @Column()
+    CAR_NO: string;
 
-  @Column()
-  IDS_DATE: string;
+    @Column()
+    IDS_DATE: string;
 
-  @PrimaryColumn()
-  EDIT_DATE: Date;
+    @PrimaryColumn()
+    EDIT_DATE: Date;
 
-  @PrimaryColumn()
-  REVISION_CODE: string;
+    @PrimaryColumn()
+    REVISION_CODE: string;
 
-  @PrimaryColumn()
-  REVISION_EDIT: string;
+    @PrimaryColumn()
+    REVISION_EDIT: string;
+
+    @Column()
+    QTY: number;
 }

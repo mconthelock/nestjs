@@ -210,7 +210,7 @@ export class StInpSaveDraftService extends StInpService {
                         ACTION: dto.ACTION,
                         REMARK: dto.REMARK
                             ? dto.REMARK
-                            : 'เปลี่ยนแผนกรับผิดชอบ',
+                            : flagReset ? 'เปลี่ยนแผนกรับผิดชอบ' : '',
                     },
                     ip,
                 );

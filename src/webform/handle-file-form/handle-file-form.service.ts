@@ -270,7 +270,10 @@ export class HandleFileFormService {
                     throw new Error(`Unsupported form type: ${FORM_TYPE}`);
             }
             if(res.length === 0) {
-                throw new Error('File not found with given criteria');
+                return {
+                    status: false,
+                    message: 'File not found with given criteria',
+                }
             }
             return {
                 status: true,

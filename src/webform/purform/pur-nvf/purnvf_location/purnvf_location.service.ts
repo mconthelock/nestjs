@@ -10,8 +10,9 @@ export class PurnvfLocationService {
   private loadJsonFile(fileName: string): any[] {
     try {
       // ดึง path จาก root ของโปรเจกต์ที่กำลังทำงานอยู่ (รันตรงไหนก็เจอ ไม่ขึ้นกับ dist)
-      const filePath = path.join(process.cwd(), 'src', 'common', 'json', fileName);
-      
+     // const filePath = path.join(process.cwd(), 'src', 'common', 'json', fileName);
+     // const filePath = path.join(__dirname, '..', '..', '..', 'common', 'json', fileName);
+    const filePath = path.join(__dirname, '..', '..', '..', '..', 'common', 'json', fileName);
       // อ่านไฟล์ออกมาเป็นข้อความ แล้วแปลงเป็น Array object
       const fileContent = fs.readFileSync(filePath, 'utf8');
       return JSON.parse(fileContent);

@@ -7,8 +7,8 @@ import {
     PrimaryColumn,
 } from 'typeorm';
 import { PUR_FILE } from './PUR_FILE.entity';
-import { PURNVF_LIST } from './PURVNF_LIST.entity';
-import { PURNVF_ADDRESS } from './PURVNF_ADDRESS.entity';
+import { PURNVF_LIST } from './PURNVF_LIST.entity';
+import { PURNVF_ADDRESS } from './PURNVF_ADDRESS.entity';
 
 @Entity({ name: 'PURNVF_FORM', schema: 'WEBFORM' })
 export class PURNVF_FORM {

@@ -135,7 +135,7 @@ export class InquiryDetail {
     @Column()
     UPDATE_CODE: string;
 
-    @Column()
+    @Column('decimal', { precision: 15, scale: 4 })
     INQD_EXRATE: number;
 
     @Column()

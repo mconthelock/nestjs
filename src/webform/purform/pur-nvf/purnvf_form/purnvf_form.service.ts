@@ -21,6 +21,13 @@ export class PurnvfFormService {
             throw new Error('Insert PURVNFFORM Error: ' + error.message);
         }
   }
+    async getData(dto: FormDto) {
+        try {
+            return await this.repo.getData(dto);
+        } catch (error) {
+            throw new Error('Get PUR-NVF Form Error: ' + error.message);
+        }
+    }
 
   findAll() {
     return `This action returns all purnvfForm`;

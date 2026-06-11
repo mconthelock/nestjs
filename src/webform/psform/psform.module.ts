@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { PsFileModule } from './ps-file/ps-file.module';
-import { PsRPModule } from './ps-rp/ps-rp.module';
+import { PsCiModule } from './ps-ci/ps-ci.module';
 
 @Module({
-    imports: [PsFileModule, PsRPModule],
+    imports: [PsFileModule, PsCiModule],
 })
 export class PsFormModule {}

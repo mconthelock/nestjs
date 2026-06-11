@@ -9,7 +9,7 @@ import { FormCreateService } from 'src/webform/form/create-form.service';
 import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 
-const JOB_CONTROLLER_CEXTDATA = ['01', '1'];
+const JOB_CONTROLLER_CEXTDATA = ['01'];
 
 @Injectable()
 export class FinDsService {
@@ -39,12 +39,14 @@ export class FinDsService {
         nfrmno: number,
         vorgno: string,
         cyear: string,
+        cyear2: string,
         nrunno: number,
     ) {
         const data = await this.repo.findOneForShow(
             nfrmno,
             vorgno,
             cyear,
+            cyear2,
             nrunno,
         );
 
@@ -67,11 +69,6 @@ export class FinDsService {
     }
 
     async action(dto: ActionFinDDto, ip: string) {
-        console.log('FIN-DS action payload:', {
-            ACTION: dto.ACTION,
-            EMPNO: dto.EMPNO,
-            CEXTDATA: dto.CEXTDATA,
-        });
 
         const form = {
             NFRMNO: Number(dto.NFRMNO),
@@ -95,16 +92,18 @@ export class FinDsService {
 
         const isJobController = this.isJobControllerCextData(dto.CEXTDATA);
 
-        console.log('FIN-DS DATE_RECEIVE check:', {
-            action: dto.ACTION,
-            cextData: dto.CEXTDATA,
-            jobControllerCextData: JOB_CONTROLLER_CEXTDATA,
-            isApprove: dto.ACTION === 'approve',
-            isJobController,
-        });
 
         if (dto.ACTION === 'approve' && isJobController) {
-            const updateResult = await this.repo.updateDateReceiveToToday(form);
+            const dateReceive = this.normalizeDateReceive(dto.DATE_RECEIVE);
+
+            if (!dateReceive) {
+                throw new Error('DATE_RECEIVE is required');
+            }
+
+            const updateResult = await this.repo.updateDateReceive(
+                form,
+                dateReceive,
+            );
 
             if (!updateResult.affected) {
                 throw new Error(
@@ -123,19 +122,42 @@ export class FinDsService {
         return JOB_CONTROLLER_CEXTDATA.includes(String(cextData || '').trim());
     }
 
+    private normalizeDateReceive(value?: Date | string) {
+        if (!value) return null;
+
+        if (value instanceof Date) {
+            if (Number.isNaN(value.getTime())) return null;
+
+            return value.toISOString().substring(0, 10);
+        }
+
+        const text = String(value).trim();
+
+        if (!text) return null;
+
+        const dateText = text.substring(0, 10);
+
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateText)) {
+            return dateText;
+        }
+
+        const date = new Date(text);
+
+        return Number.isNaN(date.getTime())
+            ? null
+            : date.toISOString().substring(0, 10);
+    }
+
     async create(
         createFinDDto: CreateFinDFormdto,
         files: Express.Multer.File[],
         ip: string,
     ) {
         try {
-            console.log('dto', createFinDDto);
-            console.log('files', files);
 
             const formmst =
                 await this.FormmstService.getFormMasterByVaname('FIN-DS');
 
-            console.log('form master', formmst);
 
             const createForm = await this.FormCreateService.create(
                 {
@@ -148,8 +170,6 @@ export class FinDsService {
                 },
                 ip,
             );
-
-            console.log('createForm', createForm);
 
             const form = {
                 NFRMNO: createForm.data.NFRMNO,
@@ -172,25 +192,17 @@ export class FinDsService {
 
             const head = await this.repo.createHead(headData);
 
-            console.log('Created head:', head);
-
-            console.log('RAW DATA:', createFinDDto.DATA);
-            console.log('RAW DATA TYPE:', typeof createFinDDto.DATA);
 
             const detailData =
                 typeof createFinDDto.DATA === 'string'
                     ? JSON.parse(createFinDDto.DATA || '[]')
                     : createFinDDto.DATA;
 
-            console.log('detailData parsed:', detailData);
-
             if (!Array.isArray(detailData) || detailData.length === 0) {
                 throw new Error('FIN-DS detail data is required');
             }
 
             for (const DetailDATA of detailData) {
-                console.log('DetailDATA:', DetailDATA);
-
                 const lineId = Number(DetailDATA.LINE_ID ?? DetailDATA.LINEID);
 
                 if (!lineId || Number.isNaN(lineId)) {

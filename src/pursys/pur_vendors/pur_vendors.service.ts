@@ -24,6 +24,7 @@ export class PurVendorsService {
         const qb = this.purVendorRepo
             .createQueryBuilder('vendor')
             .leftJoinAndSelect('vendor.VENDOR_CODES', 'code')
+            .leftJoinAndSelect('code.TERM', 'term')
             .leftJoinAndSelect('vendor.VENDOR_ADDRESS', 'address')
             .leftJoinAndSelect('vendor.VENDOR_ATTFILE', 'attfile');
 
@@ -35,9 +36,13 @@ export class PurVendorsService {
                             KEYWORD: `%${KEYWORD}%`,
                         })
                         .orWhere(
-                            'LOWER(vendor.VND_LONGNAME) LIKE LOWER(:KEYWORD)',
+                            'LOWER(vendor.VND_TNAME) LIKE LOWER(:KEYWORD)',
                             { KEYWORD: `%${KEYWORD}%` },
-                        );
+                        )
+                        .orWhere('LOWER(code.CODE_NUM) LIKE LOWER(:KEYWORD)', { 
+                        KEYWORD: `%${KEYWORD}%` 
+                        })
+                        ;
                     if (!isNaN(Number(KEYWORD))) {
                         qbInner.orWhere('vendor.VND_ID = :id', {
                             id: Number(KEYWORD),

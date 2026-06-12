@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { PurNvfRequestService } from './pur-nvf-request.service';
+import { PurNvfReturnApproveService } from './pur-nvf-return-approve.service'
 import { PurNvfController } from './pur-nvf-controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PURNVF_FORM } from 'src/common/Entities/webform/table/PURVNF_FORM.entity';
+import { PURNVF_FORM } from 'src/common/Entities/webform/table/PURNVF_FORM.entity';
 import { FormModule } from 'src/webform/form/form.module';
 import { PurFileModule } from '../pur-file/pur-file.module';
 import { FlowModule } from 'src/webform/flow/flow.module';
@@ -15,6 +16,8 @@ import { PurnvfListRepository } from './purnvf_list/purnvf_list.repository';
 import { PurnvfAddressRepository } from './purnvf_address/purnvf_address.repository';
 import { UsersModule } from 'src/amec/users/users.module';
 import { PappflowModule } from 'src/amec/pappflow/pappflow.module';
+import { PurnvfLocationModule } from './purnvf_location/purnvf_location.module';
+import { PurnvfLocationService } from './purnvf_location/purnvf_location.service';
 
 @Module({
     imports: [
@@ -26,15 +29,18 @@ import { PappflowModule } from 'src/amec/pappflow/pappflow.module';
         PurFileModule,
         RepModule,
         UsersModule,
-        PappflowModule
+        PappflowModule,
+        PurnvfLocationModule
     ],
     controllers: [PurNvfController],
     providers: [
         PurNvfRequestService,
         PurnvfFormRepository,
         PurnvfListRepository,
-        PurnvfAddressRepository
+        PurnvfAddressRepository,
+        PurNvfReturnApproveService,
+        PurnvfLocationService
     ],
-    exports: [PurNvfRequestService],
+    exports: [PurNvfRequestService,PurNvfReturnApproveService,  PurnvfLocationService],
 })
 export class PurNvfModule {}

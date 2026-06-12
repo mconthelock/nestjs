@@ -28,6 +28,9 @@ export class PurVendorsAddress {
     ADDR_LINE3: string;
 
     @Column()
+    ADDR_SUB_CITY: string;
+
+    @Column()
     ADDR_CITY: string;
 
     @Column()

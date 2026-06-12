@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { STY_IMAGE } from './STY_IMAGE.entity';
 
 @Entity({ name: 'STINP_FORM_LIST', schema: 'GPREPORT' })
 export class STINP_FORM_LIST {
@@ -64,4 +65,8 @@ export class STINP_FORM_LIST {
 
 	@Column()
 	DDATECREATE: Date;
+
+    @OneToOne(() => STY_IMAGE)
+    @JoinColumn({ name: 'NIMAGE', referencedColumnName: 'IMAGE_ID' })
+    IMAGE: STY_IMAGE;
 }

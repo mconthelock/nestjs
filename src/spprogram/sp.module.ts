@@ -29,6 +29,7 @@ import { ItemsCategoryModule } from './items-category/items-category.module';
 import { PartcategoryModule } from './partcategory/partcategory.module';
 import { PrebmModule } from './prebm/prebm.module';
 import { TaskscheduleModule } from './taskschedule/taskschedule.module';
+import { VpccostModule } from './vpccost/vpccost.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { TaskscheduleModule } from './taskschedule/taskschedule.module';
     PartcategoryModule,
     PrebmModule,
     TaskscheduleModule,
+    VpccostModule,
   ],
 })
 export class SpModule {}

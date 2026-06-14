@@ -1,22 +1,37 @@
-import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    Tree,
+    TreeParent,
+    TreeChildren,
+    OneToMany,
+} from 'typeorm';
+import { CATEGORY_ATTRIBUTES } from './CATEGORY_ATTRIBUTES.entity';
 
 @Entity({
     schema: 'PURSYS',
     name: 'CATEGORIES',
 })
+@Tree('adjacency-list')
 export class CATEGORIES {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     CATEGORY_ID: number;
-
-    @Column()
-    PARENT_CATEGORY_ID: number;
-
-    @Column()
-    CATEGORY_CODE: string;
 
     @Column()
     CATEGORY_NAME: string;
 
-    @Column()
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     CREATED_AT: Date;
+
+    @TreeParent()
+    PARENT: CATEGORIES;
+
+    @TreeChildren()
+    CHILDREN: CATEGORIES[];
+
+    @OneToMany(() => CATEGORY_ATTRIBUTES, (attribute) => attribute.category, {
+        cascade: true,
+    })
+    attributes: CATEGORY_ATTRIBUTES[];
 }

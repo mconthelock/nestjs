@@ -11,4 +11,5 @@ export interface generatePDFParams {
     fileName: string;
     revision: string;
     issueDate: string;
+    finalPath: string;
 }

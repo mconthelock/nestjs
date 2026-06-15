@@ -21,6 +21,12 @@ export class DPMS_PACKING_LIST_DETAIL {
     @Column()
     NQTY: string;
 
+    @Column()
+    NROUND: number;
+
+    @Column()
+    VSELECTED: string;
+
     @ManyToOne(() => DPMS_PACKING_LIST_MAIN, (main) => main.DETAILS)
     @JoinColumn([
         { name: 'VMFGNO', referencedColumnName: 'VMFGNO' },

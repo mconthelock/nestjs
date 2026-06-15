@@ -24,8 +24,5 @@ export class DPMS_PL_CASE_LIST_DETAIL {
     VDRAWING: string;
 
     @Column()
-    VDRAWINGL: string;
-
-    @Column()
     NQTY: number;
 }

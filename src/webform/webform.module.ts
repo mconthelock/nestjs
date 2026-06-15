@@ -23,6 +23,7 @@ import { STFormModule } from './stform/stform.module';
 import { PurFormModule } from './purform/purform.module';
 import { PsFormModule } from './psform/psform.module';
 import { RqflistModule } from './rqflist/rqflist.module';
+import { VorgmstModule } from './vorgmst/vorgmst.module';
 
 @Module({
     imports: [
@@ -50,6 +51,7 @@ import { RqflistModule } from './rqflist/rqflist.module';
         PsFormModule,
         STFormModule,
         RqflistModule,
+        VorgmstModule,
     ],
 })
 export class WebformModule {}

@@ -141,6 +141,21 @@ export class InquiryDetail {
     @Column()
     INQD_DE: string;
 
+    @Column('decimal', { precision: 15, scale: 4 })
+    INQD_VPC_COST: number;
+
+    @Column('decimal', { precision: 15, scale: 4 })
+    INQD_VPC_BASE: number;
+
+    @Column('decimal', { precision: 15, scale: 4 })
+    INQD_VPC_UNITPRICE: number;
+
+    @Column()
+    INQD_VPC_PURCODE: string;
+
+    @Column()
+    INQD_VPC_DATE: string;
+
     @ManyToOne(() => Inquiry, (inq) => inq.details)
     @JoinColumn({ name: 'INQID', referencedColumnName: 'INQ_ID' })
     inqs: Inquiry;

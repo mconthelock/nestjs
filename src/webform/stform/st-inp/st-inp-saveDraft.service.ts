@@ -14,6 +14,7 @@ import { FormService } from 'src/webform/form/form.service';
 import { StinpFormListService } from 'src/gpreport/stinp-form-list/stinp-form-list.service';
 import { StinpFormService } from 'src/gpreport/stinp-form/stinp-form.service';
 import { DraftStInpDto } from './dto/create-st-inp.dto';
+import { deleteFile, joinPaths } from 'src/common/utils/files.utils';
 
 @Injectable()
 export class StInpSaveDraftService extends StInpService {
@@ -49,7 +50,8 @@ export class StInpSaveDraftService extends StInpService {
         try {
             let flagReset = false;
             const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
-
+            const pathDelete: string[] = [];
+            const listDelImg: number[] = [];
             const styType = await this.styTypeService.findByTypeCode('PT');
             if (!styType.status) {
                 throw new Error('STY Type not found for code PT');
@@ -71,17 +73,28 @@ export class StInpSaveDraftService extends StInpService {
                 flagReset = true;
                 await this.setOwnerFlow(form, dto.PA_OWNER);
             }
-            // update ข้อมูลฟอร์มหลักก่อน เพราะข้อมูลใน list จะต้องอ้างอิงกับฟอร์มหลักเสมอ   
+            // update ข้อมูลฟอร์มหลักก่อน เพราะข้อมูลใน list จะต้องอ้างอิงกับฟอร์มหลักเสมอ
             await this.stinpFormService.update(form, {
                 VOWNER: dto.PA_OWNER,
                 DDATE: dto.PA_DATE,
                 VSECTION: dto.PA_SECTION,
                 VAUDIT: dto.PA_AUDIT,
             });
-
+            // เก็บไฟล์เก่าทั้งหมด เพื่อเตรียมลบ
             const list = await this.stinpFormListService.find(form);
+            if (list.status) {
+                for (const l of list.data) {
+                    const fullPath = await joinPaths(
+                        l.IMAGE.IMAGE_PATH,
+                        l.IMAGE.IMAGE_FNAME,
+                    );
+                    listDelImg.push(l.NIMAGE); // เก็บไฟล์เก่าไว้ลบทีหลัง
+                    pathDelete.push(fullPath); // เก็บ path ไว้ลบทีหลัง
+                }
+            }
             // ถ้าไม่มีรายการเลย และมีรายการเดิมอยู่ ให้ลบรายการเดิมทั้งหมด (กรณีที่ผู้ใช้ลบรายการในฟอร์มจนหมด)
-            if (!dto.PA_LIST || dto.PA_LIST.length === 0) {
+            const lengthOfList = dto.PA_LIST ? dto.PA_LIST.length : 0;
+            if (!dto.PA_LIST || lengthOfList === 0) {
                 if (list.status) {
                     for (const l of list.data) {
                         await this.stinpFormListService.delete({
@@ -92,10 +105,9 @@ export class StInpSaveDraftService extends StInpService {
                     }
                 }
             } else {
-                const listIds: number[] = [];
-                const listDelImg: number[] = [];
                 for (const newlist of dto.PA_LIST) {
                     const index = dto.PA_LIST.indexOf(newlist);
+                    const newId = index + 1;
                     // insert and move image
                     const movedFile =
                         await this.styImageService.moveAndInsertFiles({
@@ -106,87 +118,33 @@ export class StInpSaveDraftService extends StInpService {
                             folder: formno,
                         });
                     movedTargets.push(...movedFile.path);
-                    // ถ้ามี PA_ID แสดงว่าเป็นรายการที่มีอยู่แล้ว ให้ update แต่ถ้าไม่มี PA_ID แสดงว่าเป็นรายการใหม่ ให้ create
-                    listIds.push(index + 1);
-                    if (newlist.PA_ID) {
-                        // listIds.push(newlist.PA_ID);
-                        // ถ้าเป็นรายการที่มีอยู่แล้ว ให้ลบไฟล์เก่าแล้ว update ด้วยไฟล์ใหม่
-                        const existing =
-                            await this.stinpFormListService.findOne({
-                                ...form,
-                                NID: newlist.PA_ID,
-                            });
-                        if (!existing.status) {
-                            throw new Error(
-                                `Form list item not found with ID: ${newlist.PA_ID}`,
-                            ); // ป้องกันกรณีที่มี PA_ID แต่ไม่เจอใน DB
-                        }
-                        if(!listDelImg.includes(existing.data.NIMAGE)) {
-                            listDelImg.push(existing.data.NIMAGE); // เก็บไฟล์เก่าไว้ลบทีหลัง
-                        }
-                         const existingOld =
-                            await this.stinpFormListService.findOne({
-                                ...form,
-                                NID: index + 1,
-                            });
-                        if (existingOld.status && !listDelImg.includes(existingOld.data.NIMAGE)) {
-                            listDelImg.push(existingOld.data.NIMAGE); // เก็บไฟล์เก่าไว้ลบทีหลัง
-                        }
-                        // update ข้อมูลแถวใหม่
-                        await this.stinpFormListService.update(
-                            { ...form, NID: index+1 },
-                            {
-                                NITEM: newlist.PA_ITEMS,
-                                VAREA: newlist.PA_AREA,
-                                VDETECTED: newlist.PA_DETECTED,
-                                NCLASS: newlist.PA_CLASS,
-                                VSUGGESTION: newlist.PA_SUGGESTION || null,
-                                NMAT: newlist.PA_MAT,
-                                NIMAGE: movedFile.data.IMAGE_ID,
-                            },
-                        );
-                    } else {
-                        // ตรวจสอบกรณีที่เปลี่ยนรูปแต่ยังมีข้อมูลอยู่ ให้ลบไฟล์เก่า
-                        const existing =
-                            await this.stinpFormListService.findOne({
-                                ...form,
-                                NID: index + 1,
-                            });
-                        if (existing.status && !listDelImg.includes(existing.data.NIMAGE)) {
-                            listDelImg.push(existing.data.NIMAGE); // เก็บไฟล์เก่าไว้ลบทีหลัง
-                        }
-                        // ถ้าเป็นรายการใหม่ ให้สร้างแถวใหม่ด้วย NID ที่เพิ่มขึ้นจากแถวสุดท้ายในที่นี้หากมี primary key มันจะ update
-                        await this.stinpFormListService.create({
-                            ...form,
-                            NID: index + 1,
-                            NITEM: newlist.PA_ITEMS,
-                            VAREA: newlist.PA_AREA,
-                            VDETECTED: newlist.PA_DETECTED,
-                            NCLASS: newlist.PA_CLASS,
-                            VSUGGESTION: newlist.PA_SUGGESTION || null,
-                            NMAT: newlist.PA_MAT,
-                            NIMAGE: movedFile.data.IMAGE_ID,
-                        });
-                        
-                    }
+                    await this.stinpFormListService.create({
+                        ...form,
+                        NID: newId,
+                        NITEM: newlist.PA_ITEMS,
+                        VAREA: newlist.PA_AREA,
+                        VDETECTED: newlist.PA_DETECTED,
+                        NCLASS: newlist.PA_CLASS,
+                        VSUGGESTION: newlist.PA_SUGGESTION || null,
+                        NMAT: newlist.PA_MAT,
+                        NIMAGE: movedFile.data.IMAGE_ID,
+                    });
                 }
                 if (list.status) {
-                    // ลบรายการที่ถูกลบออกจากฟอร์ม โดยตรวจสอบจาก NID ที่ส่งมาว่ายังมีอยู่ไหม ถ้าไม่มีแสดงว่าถูกลบไปแล้ว ให้ลบออกจาก DB และลบไฟล์ด้วย
-                    const diff = list.data.filter(
-                        (x) => !listIds.includes(x.NID),
-                    );
-                    for (const d of diff) {
-                        await this.stinpFormListService.delete({
-                            ...form,
-                            NID: d.NID,
-                        });
-                        await this.styImageService.delete(d.NIMAGE); // ลบไฟล์เก่า
+                    const lists = await this.stinpFormListService.find(form);
+                    // ถ้าเจอรายการที่มี NID เกินกว่า length ของ list ที่ส่งมา แสดงว่ารายการนั้นถูกลบไปแล้ว ให้ทำการลบรายการนั้นทิ้ง
+                    if (lists.data.some((l) => l.NID > lengthOfList)) {
+                        await this.stinpFormListService.deleteMoreThanId(
+                            form,
+                            lengthOfList,
+                        ); // ลบรายการที่เกินจากที่ส่งมา (กรณีที่มีการลบรายการบางส่วนในฟอร์ม แต่ไม่ลบจนหมด)
                     }
                     for (const imgId of listDelImg) {
                         await this.styImageService.delete(imgId); // ลบไฟล์เก่า
                     }
                 }
             }
+            // throw new Error('Debugging: Check oldLists value');
 
             if (flagReset) {
                 await this.doactionService.doAction(
@@ -210,10 +168,18 @@ export class StInpSaveDraftService extends StInpService {
                         ACTION: dto.ACTION,
                         REMARK: dto.REMARK
                             ? dto.REMARK
-                            : 'เปลี่ยนแผนกรับผิดชอบ',
+                            : flagReset
+                              ? 'เปลี่ยนแผนกรับผิดชอบ'
+                              : '',
                     },
                     ip,
                 );
+            }
+            // ลบไฟล์หลังจากทำทุกอย่างเสร็จ กันไม่ให้เกิดปัญหาไฟล์หายระหว่างการบันทึกข้อมูล เพราะถ้าเกิด error ระหว่างการบันทึกข้อมูลแล้วไฟล์ถูกลบไปแล้วจะทำให้ข้อมูลกับไฟล์ไม่ตรงกัน และอาจทำให้เกิดปัญหาในการแก้ไขภายหลังได้
+            if (pathDelete.length > 0) {
+                for (const p of pathDelete) {
+                    await deleteFile(p); // ลบไฟล์เก่า
+                }
             }
             return {
                 status: true,

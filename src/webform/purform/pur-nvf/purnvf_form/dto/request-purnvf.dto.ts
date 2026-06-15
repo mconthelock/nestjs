@@ -1,4 +1,4 @@
-import { PickType } from '@nestjs/swagger';
+import { IntersectionType, OmitType,PartialType, PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
     IsArray,
@@ -16,7 +16,7 @@ import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 import { CreatePurnvfFormDto } from "./create-purnvf_form.dto";
 import { CreatePurnvfListDto } from "../../purnvf_list/dto/create-purnvf_list.dto";
 import { CreatePurnvfAddressDto } from "../../purnvf_address/dto/create-purnvf_address.dto";
-
+import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 
 export class RequestPurnvfFormDto extends PickType(CreateFormDto,[
 'NFRMNO',
@@ -153,4 +153,29 @@ export class RequestPurnvfFormDto extends PickType(CreateFormDto,[
     @IsString()
     TERMCODE?: string;   
 
+}
+
+export class PurnvfReturnArppoveDto extends IntersectionType(
+    PickType(doactionFlowDto, [
+        'NFRMNO',
+        'VORGNO',
+        'CYEAR',
+        'CYEAR2',
+        'NRUNNO',
+        'ACTION',
+        'EMPNO',
+        'REMARK',
+    ]),
+    PartialType(
+        OmitType(RequestPurnvfFormDto, [
+            'NFRMNO',
+            'VORGNO',
+            'CYEAR',
+            'REMARK'
+        ]),
+    ),
+) {
+    @IsOptional()
+    @IsArray()
+    DELETE_FILES?: string[];
 }

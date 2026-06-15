@@ -22,6 +22,7 @@ import { DpmsPlCaseListDetailService } from 'src/workload/dpms_pl_case_list_deta
 import { MailService } from 'src/common/services/mail/mail.service';
 import { DpmsPlIssueTypeService } from 'src/workload/dpms_pl_issue_type/dpms_pl_issue_type.service';
 import { DpmsPlIssueDateService } from 'src/workload/dpms_pl_issue_date/dpms_pl_issue_date.service';
+import { buffer } from 'stream/consumers';
 
 @Injectable()
 export class PackingListIssueService {
@@ -305,6 +306,19 @@ export class PackingListIssueService {
                             .text-right {
                                 text-align: right;
                             }
+                            #remark{
+                                margin-top: 1.25rem;
+                            }
+                            #combine-block{
+                                display: grid;
+                                grid-template-columns: 60px 90px 40px 20px 80px 100px 1fr;
+                                gap: 0.5rem;
+                            }
+                            #change-block{
+                                display: grid;
+                                grid-template-columns: 60px 60px 30px 40px 30px 20px 20px 1fr;
+                                gap: 0.5rem;
+                            }
                         </style>
                     </head>
                     <body>
@@ -343,11 +357,15 @@ export class PackingListIssueService {
             },
         });
         // 2. ใช้ pdf-lib เพิ่ม header ในหน้า 2 เป็นต้นไป
-        await this.addHeaderToPDF(tempFilePath, finalFilePath, orderText);
+        const newPdf = await this.addHeaderToPDF(
+            tempFilePath,
+            finalFilePath,
+            orderText,
+        );
 
         // 3. ลบ temp file
         await fs.unlink(tempFilePath);
-        return { ...pdf, path: finalFilePath };
+        return newPdf;
     }
 
     private async addHeaderToPDF(
@@ -397,6 +415,7 @@ export class PackingListIssueService {
             // บันทึก PDF
             const pdfBytes = await pdfDoc.save();
             await fs.writeFile(outputPath, pdfBytes);
+            return { path: outputPath, data: Buffer.from(pdfBytes) };
         } catch (error) {
             throw new Error(`Failed to add header to PDF: ${error.message}`);
         }

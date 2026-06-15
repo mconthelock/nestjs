@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { PURNVF_FORM } from 'src/common/Entities/webform/table/PURVNF_FORM.entity';
+import { PURNVF_FORM } from 'src/common/Entities/webform/table/PURNVF_FORM.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FormDto} from 'src/webform/form/dto/form.dto';
 import { DataSource } from 'typeorm';
@@ -12,6 +12,21 @@ export class PurnvfFormRepository extends BaseRepository {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
+    async getData(dto: FormDto) {
+            return await this.getRepository(PURNVF_FORM).findOne({
+                where: {
+                    ...dto,
+                },
+                relations: {
+                    LISTS: {
+                        TERM: true
+                    },
+                    ADDRESSES: true,
+                    FILES: true,
+                },
+            });
+    }
+
     async insert(dto: CreatePurnvfFormDto) {
         return this.getRepository(PURNVF_FORM).insert(dto);
     }
@@ -20,7 +35,12 @@ export class PurnvfFormRepository extends BaseRepository {
         return this.getRepository(PURNVF_FORM).save(dto);
     }
 
-    async deleteById(dto: CreatePurnvfFormDto) {
+    async updateById(data: CreatePurnvfFormDto) {
+            const { NFRMNO, VORGNO, CYEAR , CYEAR2 , NRUNNO, ...updateData } = data;
+            return this.getRepository(PURNVF_FORM).update({ NFRMNO: NFRMNO, VORGNO:VORGNO, CYEAR:CYEAR, CYEAR2:CYEAR2, NRUNNO:NRUNNO }, updateData );
+    }
+
+    async deleteById(dto: FormDto) {
         return this.getRepository(PURNVF_FORM).delete({ NFRMNO: dto.NFRMNO, VORGNO: dto.VORGNO, CYEAR: dto.CYEAR ,CYEAR2: dto.CYEAR2, NRUNNO: dto.NRUNNO });
     }
 }

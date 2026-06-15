@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource } from 'typeorm';
+import { DataSource, MoreThan } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import {
     CreateStinpFormListDto,
@@ -35,10 +35,20 @@ export class StinpFormListRepository extends BaseRepository {
     async find(form: FormDto) {
         return this.getRepository(STINP_FORM_LIST).find({
             where: form,
+            relations: {
+                IMAGE: true,
+            }
         });
     }
 
     async delete(condition: PrimaryKeyStinpFormListDto) {
         return this.getRepository(STINP_FORM_LIST).delete(condition);
+    }
+
+    async deleteMoreThanId(form: FormDto, id: number) {
+        return this.getRepository(STINP_FORM_LIST).delete({
+            ...form,
+            NID: MoreThan(id),
+        });
     }
 }

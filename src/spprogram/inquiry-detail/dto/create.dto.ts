@@ -183,4 +183,28 @@ export class createDetailDto {
     @IsString()
     @IsOptional()
     INQD_DE: string;
+
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    INQD_VPC_COST: number;
+
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    INQD_VPC_BASE: number;
+
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    INQD_VPC_UNITPRICE: number;
+
+    @IsString()
+    @IsOptional()
+    INQD_VPC_PURCODE: string;
+
+    @IsDate()
+    @IsOptional()
+    @Type(() => Date)
+    INQD_VPC_DATE?: Date | null;
 }

@@ -11,7 +11,7 @@ import { now } from 'src/common/utils/dayjs.utils';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import * as fs from 'fs/promises';
 import { DpmsPlIssueRevService } from 'src/workload/dpms_pl_issue_rev/dpms_pl_issue_rev.service';
-import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
+import { convertJung, numberToAlphabetRevision } from 'src/common/utils/format.utils';
 import {
     DPMS_PL_ISSUE_PK,
     generatePDFParams,
@@ -22,7 +22,8 @@ import { DpmsPlCaseListDetailService } from 'src/workload/dpms_pl_case_list_deta
 import { MailService } from 'src/common/services/mail/mail.service';
 import { DpmsPlIssueTypeService } from 'src/workload/dpms_pl_issue_type/dpms_pl_issue_type.service';
 import { DpmsPlIssueDateService } from 'src/workload/dpms_pl_issue_date/dpms_pl_issue_date.service';
-import { buffer } from 'stream/consumers';
+import path from 'path';
+
 
 @Injectable()
 export class PackingListIssueService {
@@ -39,7 +40,7 @@ export class PackingListIssueService {
     ) {}
 
     private readonly tempDir = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
-    private readonly finalDir = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/test/`;
+    private readonly finalDir = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/mfgreport/packing-list/`;
 
     async updateProblemReason(dto: UpdatePlIssueProblemReasonDto) {
         try {
@@ -67,12 +68,23 @@ export class PackingListIssueService {
         }
     }
 
+   
+
     async issue(dto: CreatePackingListIssueDto) {
         try {
             const issueDate = now('DD/MM/YYYY');
             const issueType = await this.dpmsPlIssueTypeService.findById(
                 dto.ISSUETYPE,
             );
+
+            const converted = convertJung(dto.VPROD);
+            if(!converted){
+                throw new Error('Invalid VPROD format for converting Jung');
+            }
+            const fyear = converted.substring(0, 4);
+            const jung = converted.slice(4);
+            const finalPath = await joinPaths(this.finalDir, fyear, jung, dto.VORDERS, issueType.data.VDESCRIPTION);
+            
             // 1. Check if PL Issue exists, if not create new PL Issue
             const plIssueData: DPMS_PL_ISSUE_PK = {
                 VPROD: dto.VPROD,
@@ -85,11 +97,18 @@ export class PackingListIssueService {
             if (!checkPlIssue.status) {
                 await this.dpmsPlIssueService.create(plIssueData);
             }
+            // ถ้าเป็น complete, combine, balance ให้ set DFINISHALL เป็นวันที่ issue เลย
+            if([3, 4, 5].includes(issueType.data.NSEQ)){
+                await this.dpmsPlIssueService.update(plIssueData, {
+                    DFINISHALL: new Date(),
+                });
+            }
             // 2. Get next revision number
             const revision: number =
                 await this.dpmsPlIssueRevService.getNextRevision({
                     ...plIssueData,
                     NISSUE_TYPE: dto.ISSUETYPE,
+                    NROUND: dto.NROUND,
                 });
             const revisionText: string = numberToAlphabetRevision(revision);
 
@@ -101,6 +120,7 @@ export class PackingListIssueService {
                 fileName,
                 revision: revisionText,
                 issueDate,
+                finalPath,
             });
 
             // 3. add file Data to DB
@@ -109,7 +129,7 @@ export class PackingListIssueService {
                 VFILE_FNAME: fileName,
                 VFILE_USERCREATE: 'system',
                 NFILE_TYPE: dto.ISSUETYPE,
-                VFILE_PATH: this.finalDir,
+                VFILE_PATH: finalPath,
             });
 
             if (insertFile.status === false) {
@@ -128,6 +148,7 @@ export class PackingListIssueService {
                 VNAMEOFBLDG: dto.HEADER.VNAMEOFBLDG,
                 VSOLDTO: dto.HEADER.VSOLDTO,
                 VSHIPPINGMARK: dto.SHIPPING_MARK,
+                NROUND: dto.NROUND,
             });
 
             // 5. Create PL Issue List record
@@ -153,10 +174,11 @@ export class PackingListIssueService {
                 process.env.NODE_ENV != 'production'
                     ? process.env.MAIL_ADMIN
                     : process.env.MAIL_ADMIN;
+            const state = process.env.STATE != 'production' ? '(TEST)' : '';
             await this.mailService.sendMail({
                 from: `MFG REPORT System<${process.env.MAIL_FROM}>`,
                 to: email,
-                subject: 'Packing list issue notification',
+                subject: 'Packing list issue notification ' + state,
                 template: 'mfgreport/dpms/packing-list',
                 context: {
                     name: email,
@@ -197,11 +219,12 @@ export class PackingListIssueService {
         fileName,
         revision,
         issueDate,
+        finalPath,
     }: generatePDFParams) {
         const orderText = order.replace(/^(.)(..)(.....)(.)$/, '$1-$2-$3-$4');
         const tempFileName = `tempPL_${now('YYYYMMDDHHmm')}_${fileName}`;
         const tempFilePath = await joinPaths(this.tempDir, tempFileName);
-        const finalFilePath = await joinPaths(this.finalDir, fileName);
+        const finalFilePath = await joinPaths(finalPath, fileName);
         const pdf = await this.PDFService.generatePDF({
             html: `<!doctype html>
                 <html lang="th">
@@ -233,6 +256,11 @@ export class PackingListIssueService {
                                 font-weight: bold;
                                 // font-size: 1.125rem;
                                 text-align: center;
+                            }
+                            #pl-header #pl-title #pl-type {
+                                display: flex;
+                                justify-content: center;
+                                gap: .75rem;
                             }
                             #pl-header #pl-info {
                                 display: grid;
@@ -414,6 +442,8 @@ export class PackingListIssueService {
 
             // บันทึก PDF
             const pdfBytes = await pdfDoc.save();
+            const destination = path.dirname(outputPath);
+            await fs.mkdir(destination, { recursive: true });
             await fs.writeFile(outputPath, pdfBytes);
             return { path: outputPath, data: Buffer.from(pdfBytes) };
         } catch (error) {

@@ -1,11 +1,11 @@
-import { ViewColumn, ViewEntity } from 'typeorm';
+import { ViewColumn, ViewEntity , PrimaryColumn } from 'typeorm';
 
 @ViewEntity({
     name: 'VORGMST',
     schema: 'WEBFORM',
 })
 export class VORGMST {
-    @ViewColumn()
+    @PrimaryColumn()
     VORGNO: string;
 
     @ViewColumn()
@@ -17,3 +17,4 @@ export class VORGMST {
     @ViewColumn()
     CTYPE: string;
 }
+

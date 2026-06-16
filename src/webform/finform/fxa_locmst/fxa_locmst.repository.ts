@@ -23,7 +23,9 @@ export class FXALOCMSTRepository extends BaseRepository {
     async search(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(FXA_LOCMST, 'L');
         qb.leftJoinAndSelect('L.ORG', 'org')
-          .leftJoinAndSelect('L.POS', 'pos');
+          .leftJoinAndSelect('L.POS', 'pos')
+          .leftJoinAndSelect('L.INC', 'orgpos')
+          .leftJoinAndSelect('orgpos.EMPINFO', 'userall');
         this.applyFilters(qb, 'L', dto, [
             'LOCCODE',
             'LOCNAME',

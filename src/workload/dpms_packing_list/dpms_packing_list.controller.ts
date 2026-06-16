@@ -11,4 +11,14 @@ export class DpmsPackingListController {
     findAll() {
         return this.service.findAll();
     }
+
+    @Get('current')
+    getCurrentTasks() {
+        return this.service.getCurrentTasks();
+    }
+
+    @Get('finish')
+    getFinishTasks() {
+        return this.service.getFinishTasks();
+    }
 }

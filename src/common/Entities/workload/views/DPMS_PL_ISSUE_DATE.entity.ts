@@ -24,17 +24,17 @@ export class DPMS_PL_ISSUE_DATE {
     DFINISHALL: Date;
 
     @Column()
-    DCOMPLETE: Date;
+    DCOMPLETE: string;
 
     @Column()
-    DDRAFT: Date;
+    DDRAFT: string;
 
     @Column()
-    DPARTIAL: Date;
+    DPARTIAL: string;
 
     @Column()
-    DCOMBINE: Date;
+    DCOMBINE: string;
 
     @Column()
-    DBALANCE: Date;
+    DBALANCE: string;
 }

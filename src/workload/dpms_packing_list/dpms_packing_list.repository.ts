@@ -10,17 +10,48 @@ export class DpmsPackingListRepository extends BaseRepository {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
-    findAll(){
+    findAll() {
         return this.getRepository(DPMS_PACKING_LIST).find({
             // where : {
             //     PL_PLAN : MoreThan(new Date('2026-01-01'))
             // },
-            order : {
+            order: {
+                REVISE: 'DESC',
                 DELAY: 'DESC',
                 PROD: 'ASC',
                 P: 'ASC',
                 ORDERS: 'ASC',
-            }
+            },
         });
+    }
+
+    getCurrentTasks() {
+        return this.manager
+            .createQueryBuilder(DPMS_PACKING_LIST, 'L')
+            .where(
+                '(TRUNC(L.DFINISHALL) >= TRUNC(SYSDATE) OR L.DFINISHALL IS NULL)',
+            )
+            .orderBy({
+                'L.REVISE': 'DESC',
+                'L.DELAY': 'DESC',
+                'L.PROD': 'ASC',
+                'L.P': 'ASC',
+                'L.ORDERS': 'ASC',
+            })
+            .getMany();
+    }
+
+    getFinishTasks() {
+        return this.manager
+            .createQueryBuilder(DPMS_PACKING_LIST, 'L')
+            .where('L.DFINISHALL IS NOT NULL')
+            .orderBy({
+                'L.REVISE': 'DESC',
+                'L.DELAY': 'DESC',
+                'L.PROD': 'ASC',
+                'L.P': 'ASC',
+                'L.ORDERS': 'ASC',
+            })
+            .getMany();
     }
 }

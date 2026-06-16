@@ -11,9 +11,23 @@ export class MfgOrService {
     private readonly dataSource: DataSource,
   ) {}
 
+  private getKey(dto: GetMfgOrDto) {
+    return {
+      NFRMNO: Number(dto.NFRMNO),
+      VORGNO: dto.VORGNO,
+      CYEAR: dto.CYEAR,
+      CYEAR2: dto.CYEAR2,
+      NRUNNO: Number(dto.NRUNNO),
+    };
+  }
+
+  private getTodayText() {
+    const today = new Date();
+    return (String(today.getDate()).padStart(2, '0') + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + today.getFullYear());
+  }
+
   async createorform(dto: CreateMfgOrDto) {
     return this.dataSource.transaction(async manager => {
-
       await manager
         .createQueryBuilder()
         .insert()
@@ -39,7 +53,6 @@ export class MfgOrService {
         .execute();
 
       if (dto.att?.length) {
-
         const attRows = dto.att.map((file, index) => ({
           NFRMNO: dto.NFRMNO,
           VORGNO: dto.VORGNO,
@@ -66,14 +79,7 @@ export class MfgOrService {
   }
 
   async getMfgOr(dto: GetMfgOrDto) {
-    const key = {
-      NFRMNO: Number(dto.NFRMNO),
-      VORGNO: dto.VORGNO,
-      CYEAR: dto.CYEAR,
-      CYEAR2: dto.CYEAR2,
-      NRUNNO: Number(dto.NRUNNO),
-    };
-
+    const key = this.getKey(dto);
     const form = await this.dataSource
       .createQueryBuilder()
       .select([
@@ -140,60 +146,33 @@ export class MfgOrService {
     };
   }
 
-  async generateOrNo(dto: GetMfgOrDto) {
-    const year2 = String(new Date().getFullYear()).slice(-2);
+  async generateOrNo(dto: GetMfgOrDto & { FORMNO?: string }) {
+    return this.dataSource.transaction(async manager => {
+      const form = await this.getMfgOrFormByKey(manager, dto);
 
-    const result = await this.dataSource
-      .createQueryBuilder()
-      .select('MAX(A.SEQNO)', 'MAXSEQNO')
-      .from('MFGOR_FORM', 'A')
-      .where('A.CYEAR2 = :cyear2', { cyear2: dto.CYEAR2 })
-      .getRawOne();
+      if (!form) {
+        throw new Error('MFGOR_FORM not found');
+      }
 
-    const maxSeqNo = Number(result?.MAXSEQNO || 0);
-    const nextSeqNo = maxSeqNo + 1;
-
-    const seqText = String(nextSeqNo).padStart(3, '0');
-    const orno = `OR-MFG-${year2}${seqText}`;
-
-    await this.dataSource
-      .createQueryBuilder()
-      .update('MFGOR_FORM')
-      .set({
-        SEQNO: nextSeqNo,
-        ORNO: orno,
-      })
-      .where('NFRMNO = :NFRMNO', { NFRMNO: Number(dto.NFRMNO) })
-      .andWhere('VORGNO = :VORGNO', { VORGNO: dto.VORGNO })
-      .andWhere('CYEAR = :CYEAR', { CYEAR: dto.CYEAR })
-      .andWhere('CYEAR2 = :CYEAR2', { CYEAR2: dto.CYEAR2 })
-      .andWhere('NRUNNO = :NRUNNO', { NRUNNO: Number(dto.NRUNNO) })
-      .execute();
-
-    return {
-      status: true,
-      SEQNO: nextSeqNo,
-      ORNO: orno,
-    };
+      return this.generateNewOrNo(manager, dto, form);
+    });
   }
 
-  private getKey(dto: GetMfgOrDto) {
-    return {
-      NFRMNO: dto.NFRMNO,
-      VORGNO: dto.VORGNO,
-      CYEAR: dto.CYEAR,
-      CYEAR2: dto.CYEAR2,
-      NRUNNO: Number(dto.NRUNNO),
-    };
-  }
+  async updateReviseCenter(dto: GetMfgOrDto & { FORMNO?: string }) {
+    return this.dataSource.transaction(async manager => {
+      const form = await this.getMfgOrFormByKey(manager, dto);
 
-  private getTodayText() {
-    const today = new Date();
-    return ( String(today.getDate()).padStart(2, '0') +'/' + String(today.getMonth() + 1).padStart(2, '0') +'/' +today.getFullYear());
+      if (!form) {
+        throw new Error('MFGOR_FORM not found');
+      }
+
+      return this.updateMfgOrCenterForRevise(manager, dto, form);
+    });
   }
 
   private async getMfgOrFormByKey(manager: any, dto: GetMfgOrDto) {
     const key = this.getKey(dto);
+
     return manager
       .createQueryBuilder()
       .select('A.*')
@@ -206,7 +185,11 @@ export class MfgOrService {
       .getRawOne();
   }
 
-  private async generateNewOrNo(manager: any, dto: GetMfgOrDto & { FORMNO?: string }, form: any) {
+  private async generateNewOrNo(
+    manager: any,
+    dto: GetMfgOrDto & { FORMNO?: string },
+    form: any,
+  ) {
     const key = this.getKey(dto);
     const year2 = String(new Date().getFullYear()).slice(-2);
     const issueDate = this.getTodayText();
@@ -261,11 +244,17 @@ export class MfgOrService {
     };
   }
 
-  private async updateMfgOrCenterForRevise( manager: any, dto: GetMfgOrDto & { FORMNO?: string }, form: any, ) {
+  private async updateMfgOrCenterForRevise(
+    manager: any,
+    dto: GetMfgOrDto & { FORMNO?: string },
+    form: any,
+  ) {
     const reviseDate = this.getTodayText();
     const orno = form.ORNO;
 
-    if (!orno) { throw new Error('ORNO not found for revise'); }
+    if (!orno) {
+      throw new Error('ORNO not found for revise');
+    }
 
     await manager
       .createQueryBuilder()
@@ -285,5 +274,4 @@ export class MfgOrService {
       ORNO: orno,
     };
   }
-
 }

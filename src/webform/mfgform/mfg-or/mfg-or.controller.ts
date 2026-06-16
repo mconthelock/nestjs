@@ -24,7 +24,6 @@ export class MfgOrController {
 
   @Post('update-revise-center')
   updateReviseCenter(@Body() dto: GetMfgOrDto & { FORMNO?: string }) {
-    return this.service.updateMfgOrCenterForRevise(dto);
+    return this.service.updateReviseCenter(dto);
   }
-
 }

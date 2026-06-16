@@ -87,23 +87,26 @@ export class DPMS_PACKING_LIST{
     DFINISHALL: Date;
 
     @Column()
-    DCOMPLETE: Date;
+    DCOMPLETE: string;
 
     @Column()
-    DDRAFT: Date;
+    DDRAFT: string;
 
     @Column()
-    DPARTIAL: Date;
+    DPARTIAL: string;
 
     @Column()
-    DCOMBINE: Date;
+    DCOMBINE: string;
 
     @Column()
-    DBALANCE: Date;
+    DBALANCE: string;
 
     @Column()
     VPROBLEM: string;
 
     @Column()
     VREASON: string;
+    
+    @Column()
+    REVISE: string;
 }

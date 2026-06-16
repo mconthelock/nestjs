@@ -27,6 +27,7 @@ export class DpmsPlIssueRevRepository extends BaseRepository {
                 VTYPE: condition.VTYPE,
                 VORDERS: condition.VORDERS,
                 NISSUE_TYPE: condition.NISSUE_TYPE,
+                NROUND: condition.NROUND,
             },
             order: {
                 NREV: 'DESC',

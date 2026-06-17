@@ -13,27 +13,12 @@ export class PsCiRepository extends BaseRepository {
     }
 
     async getDataForm(dto: GetDataFormDto) {
-        const { nfrmno, vorgno, cyear, cyear2, nrunno } = dto;
+        const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO } = dto;
 
         const sql = `
             SELECT
-                icr.ID,
-                icr.GROUP_CODE,
-                icr.CREATED_AT,
-                icr.CHECK_DATE,
-                ii.IBUYC,
-                ii.IPROD,
-                ii.IDESC,
-                ii.IDRAW,
-                ii.IABBT,
-                icr.CONTROLLER_ID,
-                icr.ON_HAND,
-                ii.IUMS,
-                icr.ACTUAL_QTY,
-                icr.RANDOM_CHECK,
-                icr.REMARK,
-                icr.LEADER_REMARK,
-                icr.ASSIGN_ID,
+                icr.*,
+                ii.*,
                 ii.ZONE || '-' || SUBSTR(ii.USER_TNAME, 1, INSTR(ii.USER_TNAME || ' ', ' ') - 1) AS STNAME,
                 a.STNAME AS LEADER_NAME
             FROM PSCI_FORM p
@@ -49,11 +34,11 @@ export class PsCiRepository extends BaseRepository {
         `;
 
         const data = await this.manager.query(sql, [
-            nfrmno,
-            vorgno,
-            cyear,
-            cyear2,
-            nrunno,
+            NFRMNO,
+            VORGNO,
+            CYEAR,
+            CYEAR2,
+            NRUNNO,
         ]);
 
         const assignId = data?.[0]?.ASSIGN_ID;
@@ -104,6 +89,8 @@ export class PsCiRepository extends BaseRepository {
                     RANDOM_CHECK: item.RANDOM_CHECK,
                     REMARK: item.REMARK,
                     LEADER_REMARK: item.LEADER_REMARK,
+                    RECHECK_QTY: item.RECHECK_QTY,
+                    RECHECK_REMARK: item.RECHECK_REMARK,
                     LAST_UPDATED: new Date(),
                 };
                 return this.getRepository(INV_CHECK_RESULT).update(keys, result);

@@ -204,8 +204,8 @@ export class createDetailDto {
     @IsOptional()
     INQD_COMPARE_DATE: Date;
 
-    @IsDate()
-    @IsOptional()
-    @Type(() => Date)
-    INQD_VPC_DATE?: Date;
+    // @IsDate()
+    // @IsOptional()
+    // @Type(() => Date)
+    // INQD_VPC_DATE?: Date;
 }

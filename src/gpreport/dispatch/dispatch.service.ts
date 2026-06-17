@@ -177,7 +177,7 @@ export class DispatchService {
               ON STOP_CAD.STOP_ID = CAD.BUSSTOPNO
           WHERE OT.WORKDATE = :1
             AND OT.TIMEIN >= :2
-            AND OT.TIMEOUT <= :3
+            AND OT.TIMEOUT = :3
             AND F.CST <> '3'
         )
         `,
@@ -971,7 +971,7 @@ export class DispatchService {
                 timeout_from: '1730',
                 timeout_to: '2130',
                 update_by: updateBy,
-                shift: 'D',
+                shift: 'S',
             },
             {
                 workdate: tomorrow.startOf('day').toDate(),
@@ -979,7 +979,7 @@ export class DispatchService {
                 timeout_from: '0530',
                 timeout_to: '0730',
                 update_by: updateBy,
-                shift: 'D',
+                shift: 'N',
             },
         ];
 

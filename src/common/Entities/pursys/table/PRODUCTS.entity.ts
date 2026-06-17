@@ -5,11 +5,8 @@ import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
     name: 'PRODUCTS',
 })
 export class PRODUCTS {
-    @PrimaryColumn()
-    PRODUCT_ID: string;
-
-    @Column()
-    CATEGORY_ID: string;
+    @PrimaryGeneratedColumn()
+    ID: number;
 
     @Column()
     SKU: string;
@@ -18,14 +15,20 @@ export class PRODUCTS {
     NAME: string;
 
     @Column()
-    BASE_PRICE: string;
+    DESCRIPTION: string;
 
     @Column()
-    CATEGORY_SPECS: string;
+    CATEGORY_ID: number;
 
     @Column()
     CREATED_AT: string;
 
     @Column()
-    IS_STOCK_MANAGED: string;
+    UPDATED_AT: string;
+
+    @Column()
+    DELETED_AT: string;
+
+    @Column({ type: 'simple-json', nullable: true, default: {} })
+    EXTRA_ATTRIBUTES: Record<string, any>;
 }

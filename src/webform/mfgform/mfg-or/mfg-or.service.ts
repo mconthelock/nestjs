@@ -22,25 +22,21 @@ export class MfgOrService {
     };
   }
 
-  private getTodayText() {
-    const today = new Date();
-    return (String(today.getDate()).padStart(2, '0') + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + today.getFullYear());
+
+
+  private async getMfgOrFormByKey(manager: any, dto: GetMfgOrDto) {
+    const key = this.getKey(dto);
+    return manager
+      .createQueryBuilder()
+      .select('A.*')
+      .from('MFGOR_FORM', 'A')
+      .where('A.NFRMNO = :NFRMNO', key)
+      .andWhere('A.VORGNO = :VORGNO', key)
+      .andWhere('A.CYEAR = :CYEAR', key)
+      .andWhere('A.CYEAR2 = :CYEAR2', key)
+      .andWhere('A.NRUNNO = :NRUNNO', key)
+      .getRawOne();
   }
-
-    private async getMfgOrFormByKey(manager: any, dto: GetMfgOrDto) {
-      const key = this.getKey(dto);
-
-      return manager
-        .createQueryBuilder()
-        .select('A.*')
-        .from('MFGOR_FORM', 'A')
-        .where('A.NFRMNO = :NFRMNO', key)
-        .andWhere('A.VORGNO = :VORGNO', key)
-        .andWhere('A.CYEAR = :CYEAR', key)
-        .andWhere('A.CYEAR2 = :CYEAR2', key)
-        .andWhere('A.NRUNNO = :NRUNNO', key)
-        .getRawOne();
-    }
 
   async createorform(dto: CreateMfgOrDto) {
     return this.dataSource.transaction(async manager => {

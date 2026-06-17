@@ -90,6 +90,48 @@ export class CreatePsrpListDto {
     @IsString()
     @Type(() => String)
     REMARKTABLE?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    ISSUETO?: string;
+}
+
+export class PsrReportDto{
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    fromDate?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    toDate?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    pItem?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    issueNo?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    issueTo?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    fromSch?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    toSch?: string;
 }
 
 

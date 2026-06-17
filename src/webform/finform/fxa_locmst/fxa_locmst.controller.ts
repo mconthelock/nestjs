@@ -8,10 +8,18 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 export class FxaLocmstController {
   constructor(private readonly fxaLocmstService: FxaLocmstService) {}
 
-  @Post()
-  create(@Body() createFxaLocmstDto: CreateFxaLocmstDto) {
-    return this.fxaLocmstService.create(createFxaLocmstDto);
+  @Post('create')
+  async createLocation(@Body() createDto: CreateFxaLocmstDto) {
+    console.log(createDto);
+    
+    const result = await this.fxaLocmstService.create(createDto);
+    return result;
   }
+
+  // @Post()
+  // create(@Body() createFxaLocmstDto: CreateFxaLocmstDto) {
+  //   return this.fxaLocmstService.create(createFxaLocmstDto);
+  // }
 
   @Get()
   async findAll() {

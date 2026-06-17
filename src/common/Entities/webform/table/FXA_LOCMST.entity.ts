@@ -16,6 +16,9 @@ export class FXA_LOCMST {
     @Column()
     SPOSCODE:string;
 
+    @Column({ name: 'VORGNO' })
+    VORGNO: string;
+
     @ManyToOne(() => VORGMST)
     @JoinColumn([
          { name: 'VORGNO', referencedColumnName: 'VORGNO' }

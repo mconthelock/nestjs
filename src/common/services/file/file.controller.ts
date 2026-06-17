@@ -52,6 +52,10 @@ export class FilesController {
         @Body() body: { path: string; name: string },
         @Res() res: Response,
     ) {
+        console.log(
+            body.path
+        );
+        
         if (!fs.existsSync(body.path)) {
             throw new BadRequestException('File not found on disk');
         }

@@ -3,12 +3,39 @@ import { CreateFxaLocmstDto } from './dto/create-fxa_locmst.dto';
 import { UpdateFxaLocmstDto } from './dto/update-fxa_locmst.dto';
 import { FXALOCMSTRepository } from './fxa_locmst.repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+
 
 @Injectable()
 export class FxaLocmstService {
-  constructor(private readonly repo: FXALOCMSTRepository) {}
-  create(createFxaLocmstDto: CreateFxaLocmstDto) {
-    return 'This action adds a new fxaLocmst';
+  constructor(
+    private readonly repo: FXALOCMSTRepository
+) {}
+
+
+  async create(dto: CreateFxaLocmstDto) {
+    
+    const isExist = await this.repo.findOne(dto.LOCCODE);
+    if (isExist) {
+        return {
+                    status: false,
+                    message: 'Location code is conflict',
+            };
+    }
+    try {
+            const res = await this.repo.insertLocation(dto);
+            if(!res){
+                throw new Error('Failed to insert Location Master');
+            }
+            return { 
+                status: true,
+                message: 'Insert Location Master Successfully',
+            };
+        } catch (error) {
+            throw new Error('Insert Location Master Error: ' + error.message);
+        }
+    
+
   }
 
   async findAll() {

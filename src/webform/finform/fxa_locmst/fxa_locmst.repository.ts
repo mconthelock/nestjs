@@ -4,6 +4,7 @@ import { DataSource, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { FXA_LOCMST } from 'src/common/Entities/webform/table/FXA_LOCMST.entity';
+import { CreateFxaLocmstDto } from './dto/create-fxa_locmst.dto';
 
 @Injectable()
 export class FXALOCMSTRepository extends BaseRepository {
@@ -19,6 +20,21 @@ export class FXALOCMSTRepository extends BaseRepository {
         relations: ['ORG', 'POS'] 
         });
     }
+
+    async findOne(locCode: string): Promise<FXA_LOCMST | null> {
+        return await this.manager.findOne(FXA_LOCMST, {
+            where: { LOCCODE: locCode }
+        });
+    }
+
+    async insertLocation(dto: CreateFxaLocmstDto): Promise<FXA_LOCMST> {
+        // ใช้ this.manager.create เพื่อขึ้นรูป Object ตาม Entity
+        const newLocation = this.manager.create(FXA_LOCMST, dto);
+        
+        // สั่งเซฟลงฐานข้อมูล Oracle ผ่าน manager
+        return await this.manager.save(FXA_LOCMST, newLocation);
+    }
+
 
     async search(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(FXA_LOCMST, 'L');

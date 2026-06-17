@@ -95,7 +95,7 @@ export class DispatchService {
     }
 
     private pickPlanTime(shift: string, r: any): string | null {
-        if (shift === 'D')
+        if (shift === 'D' || shift === 'S')
             return r.WORKDAY_TIMEIN ? String(r.WORKDAY_TIMEIN).trim() : null;
         if (shift === 'N')
             return r.NIGHT_TIMEIN ? String(r.NIGHT_TIMEIN).trim() : null;

@@ -3,6 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { CreateMfgOrDto } from './dto/create-mfg-or.dto';
 import { GetMfgOrDto } from './dto/get-mfg-or.dto';
+import { SearchMfgOrCenterDto } from './dto/search-mfg-or-center.dto';
 
 @Injectable()
 export class MfgOrService {
@@ -251,5 +252,20 @@ export class MfgOrService {
     });
   }
 
+  async searchMfgOrCenter(dto: SearchMfgOrCenterDto) {
+    const data = await this.dataSource
+      .createQueryBuilder()
+      .select('A.*')
+      .from('MFGOR_CENTER', 'A')
+      .where('UPPER(A.ORNO) = :ORNO', {
+        ORNO: String(dto.ORNO).trim().toUpperCase(),
+      })
+      .getRawOne();
+
+    return {
+      status: !!data,
+      data,
+    };
+  }
 
 }

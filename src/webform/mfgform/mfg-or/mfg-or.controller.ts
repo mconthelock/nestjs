@@ -2,6 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { MfgOrService } from './mfg-or.service';
 import { CreateMfgOrDto } from './dto/create-mfg-or.dto';
 import { GetMfgOrDto } from './dto/get-mfg-or.dto';
+import { SearchMfgOrCenterDto } from './dto/search-mfg-or-center.dto';
 
 @Controller('mfg-or')
 export class MfgOrController {
@@ -25,5 +26,10 @@ export class MfgOrController {
   @Post('update-revise-center')
   updateReviseCenter(@Body() dto: GetMfgOrDto & { FORMNO?: string }) {
     return this.service.updateMfgOrCenterForRevise(dto);
+  }
+
+  @Post('search-mfg-or-center')
+  searchMfgOrCenter(@Body() dto: SearchMfgOrCenterDto) {
+    return this.service.searchMfgOrCenter(dto);
   }
 }

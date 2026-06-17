@@ -203,8 +203,8 @@ export class createDetailDto {
     @IsOptional()
     INQD_VPC_PURCODE: string;
 
-    @IsDate()
-    @IsOptional()
-    @Type(() => Date)
-    INQD_VPC_DATE?: Date | null;
+    // @IsDate()
+    // @IsOptional()
+    // @Type(() => Date)
+    // INQD_VPC_DATE?: Date | null;
 }

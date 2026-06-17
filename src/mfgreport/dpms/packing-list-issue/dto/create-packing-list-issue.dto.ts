@@ -123,6 +123,11 @@ export class CreatePackingListIssueDto {
     @IsString()
     VTYPE: string;
 
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    NROUND?: number;
+
     @IsNotEmpty()
     @ValidateNested({ message: 'HEADER must be a valid HeaderPLDto' })
     @Type(() => HeaderPLDto)

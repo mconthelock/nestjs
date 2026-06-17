@@ -91,7 +91,7 @@ export class createDetailDto {
 
     @IsString()
     @IsOptional()
-    INQD_MAR_REMARK: string;
+    INQD_MAR_REMARK?: string;
 
     @IsString()
     @IsOptional()
@@ -103,7 +103,7 @@ export class createDetailDto {
 
     @IsString()
     @IsOptional()
-    INQD_FIN_REMARK: string;
+    INQD_FIN_REMARK?: string;
 
     @IsNumber()
     @IsOptional()
@@ -114,19 +114,9 @@ export class createDetailDto {
     @IsOptional()
     INQD_OWNER: string;
 
-    @IsDate()
-    @IsOptional()
-    @Type(() => Date)
-    CREATE_AT: Date;
-
     @IsString()
     @IsOptional()
     CREATE_BY: string;
-
-    @IsDate()
-    @IsOptional()
-    @Type(() => Date)
-    UPDATE_AT: Date;
 
     @IsString()
     @IsOptional()
@@ -135,10 +125,6 @@ export class createDetailDto {
     @IsString()
     @IsOptional()
     INQD_COMPARE: string;
-
-    @IsString()
-    @IsOptional()
-    INQD_COMPARE_DATE: string;
 
     @IsString()
     @IsOptional()
@@ -183,4 +169,43 @@ export class createDetailDto {
     @IsString()
     @IsOptional()
     INQD_DE: string;
+
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    INQD_VPC_COST: number;
+
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    INQD_VPC_BASE: number;
+
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    INQD_VPC_UNITPRICE: number;
+
+    @IsString()
+    @IsOptional()
+    INQD_VPC_PURCODE: string;
+
+    // Date column
+    @IsDate()
+    @IsOptional()
+    @Type(() => Date)
+    CREATE_AT: Date;
+
+    @IsDate()
+    @IsOptional()
+    @Type(() => Date)
+    UPDATE_AT: Date;
+
+    @IsString()
+    @IsOptional()
+    INQD_COMPARE_DATE: Date;
+
+    @IsDate()
+    @IsOptional()
+    @Type(() => Date)
+    INQD_VPC_DATE?: Date;
 }

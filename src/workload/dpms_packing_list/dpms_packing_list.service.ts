@@ -25,4 +25,42 @@ export class DpmsPackingListService {
             throw new Error('Find Packing list data Failed: ' + error.message);
         }
     }
+
+    async getCurrentTasks() {
+        try {
+            const res = await this.repo.getCurrentTasks();
+            if (res.length === 0) {
+                return {
+                    status: false,
+                    message: 'No current packing list tasks found',
+                };
+            }
+            return {
+                status: true,
+                message: `Current packing list tasks found ${res.length} record(s)`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error('Failed to get current packing list tasks: ' + error.message);
+        }
+    }
+
+    async getFinishTasks() {
+        try {
+            const res = await this.repo.getFinishTasks();
+            if (res.length === 0) {
+                return {
+                    status: false,
+                    message: 'No finished packing list tasks found',
+                };
+            }
+            return {
+                status: true,
+                message: `Finished packing list tasks found ${res.length} record(s)`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error('Failed to get finished packing list tasks: ' + error.message);
+        }
+    }
 }

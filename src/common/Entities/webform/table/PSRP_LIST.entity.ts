@@ -60,5 +60,8 @@ export class PSRP_LIST {
     @Column()
     REMARK: string;
 
+    @Column()
+    ISSUETO: string;
+
     
 }

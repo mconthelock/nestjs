@@ -21,6 +21,15 @@ import { createAttDto } from './dto/create.dto';
 export class AttachmentsController {
     constructor(private readonly atth: AttachmentsService) {}
 
+    private encodeRFC5987ValueChars(value: string): string {
+        return encodeURIComponent(value)
+            .replace(
+                /['()]/g,
+                (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`,
+            )
+            .replace(/\*/g, '%2A');
+    }
+
     @Post('create')
     @UseInterceptors(
         FilesInterceptor('files', 10, {
@@ -128,10 +137,12 @@ export class AttachmentsController {
         if (!fs.existsSync(filePath)) {
             throw new BadRequestException('File not found on disk');
         }
-        const encodedFilename = encodeURIComponent(file.FILE_ORIGINAL_NAME);
+        const encodedFilename = this.encodeRFC5987ValueChars(
+            file.FILE_ORIGINAL_NAME,
+        );
         res.setHeader(
             'Content-Disposition',
-            `attachment; filename*=UTF-8''${encodedFilename};"`,
+            `attachment; filename*=UTF-8''${encodedFilename}`,
         );
         res.setHeader('Content-Type', 'application/octet-stream');
         return res.sendFile(filePath);

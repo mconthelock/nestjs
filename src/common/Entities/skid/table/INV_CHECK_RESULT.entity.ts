@@ -52,4 +52,10 @@ export class INV_CHECK_RESULT {
 
     @Column({ type: 'date', nullable: true })
     LAST_UPDATED: Date;
+
+    @Column({ type: 'float', nullable: true })
+    RECHECK_QTY: number;
+
+    @Column({ nullable: true })
+    RECHECK_REMARK: string;
 }

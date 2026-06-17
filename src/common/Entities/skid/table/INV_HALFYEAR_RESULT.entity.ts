@@ -81,6 +81,9 @@ export class INV_HALFYEAR_RESULT {
     ITEM_DETAIL: MV_IMM_ITEMMST;
 
     @OneToMany(() => INV_CHECK_LOG, (f2) => f2.RESULT)
-    @JoinColumn([{ name: 'REPORT_ID', referencedColumnName: 'REPORT_ID' }])
-    LOGS: INV_CHECK_LOG[];
+    @JoinColumn([
+        { name: 'REPORT_ID', referencedColumnName: 'REPORT_ID' },
+        { name: 'ITEM_CODE', referencedColumnName: 'ITEM_CODE' },
+    ])
+    LOG_EDIT: INV_CHECK_LOG[];
 }

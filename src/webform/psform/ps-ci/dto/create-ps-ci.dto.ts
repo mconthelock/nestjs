@@ -6,20 +6,20 @@ export class CreatePsCiDto {}
 export class GetDataFormDto {
 	@Type(() => Number)
     @IsNumber()
-	nfrmno: number;
+	NFRMNO: number;
 
     @IsString()
-	vorgno: string;
+	VORGNO: string;
 
     @Type(() => String)
 	@IsString()
-	cyear: string;
+	CYEAR: string;
 
 	@Type(() => String)
 	@IsString()
-	cyear2: string;
+	CYEAR2: string;
 
 	@Type(() => Number)
     @IsNumber()
-	nrunno: number;
+	NRUNNO: number;
 }

@@ -24,4 +24,13 @@ export class CheckinventoryController {
     getReportAssign(@Body() body: { REPORT_ID: number }) {
         return this.cs.getReportAssign(body.REPORT_ID);
     }
+
+    @Post('createReport')
+    createReport(@Body() body: {
+        empno: string;
+        periods: string;
+        formData: { NFRMNO: number; VORGNO: string; CYEAR: string; CYEAR2: string; NRUNNO: number };
+    }) {
+        return this.cs.createReportWithForm(body.empno, body.periods, body.formData);
+    }
 }

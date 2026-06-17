@@ -33,7 +33,10 @@ export class INV_CHECK_LOG {
     @Column({ type: 'date', default: () => 'SYSDATE' })
     EDIT_AT: Date;
 
-    @ManyToOne(() => INV_HALFYEAR_RESULT, (f2) => f2.LOGS)
-    @JoinColumn([{ name: 'REPORT_ID', referencedColumnName: 'ID' }])
+    @ManyToOne(() => INV_HALFYEAR_RESULT, (f2) => f2.LOG_EDIT)
+    @JoinColumn([
+        { name: 'REPORT_ID', referencedColumnName: 'REPORT_ID' },
+        { name: 'ITEM_CODE', referencedColumnName: 'ITEM_CODE' },
+    ])
     RESULT: INV_HALFYEAR_RESULT;
 }

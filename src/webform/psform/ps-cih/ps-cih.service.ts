@@ -5,12 +5,15 @@ import { PsCihRepository } from './ps-cih.repository';
 import { CreateLogDto } from '../ps-ci/dto/createlog.dto';
 import { PsCiRepository } from '../ps-ci/ps-ci.repository';
 import { FormDto } from 'src/webform/form/dto/form.dto';
+import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
+import { InsertAndMoveHandleFileFormDto } from 'src/webform/handle-file-form/dto/create-handle-file-form.dto';
 
 @Injectable()
 export class PsCihService {
     constructor(
         private readonly psCihRepo: PsCihRepository,
         private readonly psCiRepo: PsCiRepository,
+        private readonly handleFileFormService: HandleFileFormService,
     ) {}
 
     async getDataForm(dto: GetDataFormDto) {
@@ -25,7 +28,7 @@ export class PsCihService {
                 console.log('มี IS_RANDOM_EDITED');
                 data.push({
                     REPORT_ID: row.REPORT_ID,
-                    ITEM_CODE: row.IPROD,
+                    ITEM_CODE: row.ITEM_CODE,
                     OLD_VALUE: row.OLD_RANDOM_CHECK ?? '',
                     NEW_VALUE: row.RANDOM_CHECK ?? '',
                     EDIT_BY: empno,
@@ -38,7 +41,7 @@ export class PsCihService {
                 console.log('มี IS_ACTUAL_EDITED');
                 data.push({
                     REPORT_ID: row.REPORT_ID,
-                    ITEM_CODE: row.IPROD,
+                    ITEM_CODE: row.ITEM_CODE,
                     OLD_VALUE: row.OLD_ACTUAL_QTY ?? 0,
                     NEW_VALUE: row.ACTUAL_QTY ?? 0,
                     EDIT_BY: empno,
@@ -50,12 +53,20 @@ export class PsCihService {
         });
 
         await this.psCiRepo.saveLogs(dataToInsert);
+        await this.psCihRepo.updateCheckResult(editedRows, empno);
         console.log('Data to insert:', dataToInsert);
 
         // console.log('Inserting log with data:', body);
     }
 
-    async getReportData(dto: FormDto){
+    async getReportData(dto: FormDto) {
         return this.psCihRepo.getReportData(dto);
+    }
+
+    async uploadFile(
+        body: InsertAndMoveHandleFileFormDto,
+        file: Express.Multer.File[],
+    ) {
+        return this.handleFileFormService.insertFiles(body, file);
     }
 }

@@ -200,9 +200,9 @@ export class createDetailDto {
     @Type(() => Date)
     UPDATE_AT: Date;
 
-    @IsString()
-    @IsOptional()
-    INQD_COMPARE_DATE: Date;
+    // @IsString()
+    // @IsOptional()
+    // INQD_COMPARE_DATE: Date;
 
     // @IsDate()
     // @IsOptional()

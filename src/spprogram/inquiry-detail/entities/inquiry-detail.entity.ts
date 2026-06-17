@@ -150,11 +150,11 @@ export class InquiryDetail {
     @Column()
     UPDATE_AT: Date;
 
-    @Column()
-    INQD_COMPARE_DATE: Date;
+    // @Column()
+    // INQD_COMPARE_DATE: Date;
 
-    /*@Column()
-    INQD_VPC_DATE: Date;*/
+    // @Column()
+    // INQD_VPC_DATE: Date;
 
     @ManyToOne(() => Inquiry, (inq) => inq.details)
     @JoinColumn({ name: 'INQID', referencedColumnName: 'INQ_ID' })

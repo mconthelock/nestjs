@@ -225,11 +225,6 @@ export class MfgOrService {
   async updateMfgOrCenterForRevise(dto: GetMfgOrDto & { FORMNO?: string }) {
     return this.dataSource.transaction(async manager => {
       const form = await this.getMfgOrFormByKey(manager, dto);
-
-      if (!form) {
-        throw new Error('MFGOR_FORM not found');
-      }
-
       const orno = form.ORNO;
 
       if (!orno) {

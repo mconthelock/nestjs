@@ -7,7 +7,7 @@ import {
     OneToOne,
     PrimaryColumn,
 } from 'typeorm';
-import { PURNVF_FORM } from './PURVNF_FORM.entity';
+import { PURNVF_FORM } from './PURNVF_FORM.entity';
 import { PTERMCODE } from '../../amec/table/PTERMCODE.entity';
 
 @Entity({ name: 'PURNVF_LIST', schema: 'WEBFORM' })

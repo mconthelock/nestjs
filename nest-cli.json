@@ -8,6 +8,10 @@
             {
                 "include": "common/services/mail/templates/**/*",
                 "outDir": "dist/src"
+            },
+            {
+                "include": "common/json/*",
+                "outDir": "dist/src"
             }
         ],
         "watchAssets": true

@@ -7,7 +7,7 @@ import {
     OneToOne,
     PrimaryColumn,
 } from 'typeorm';
-import { PURNVF_FORM } from './PURVNF_FORM.entity';
+import { PURNVF_FORM } from './PURNVF_FORM.entity';
 
 
 @Entity({ name: 'PURNVF_ADDRESS', schema: 'WEBFORM' })

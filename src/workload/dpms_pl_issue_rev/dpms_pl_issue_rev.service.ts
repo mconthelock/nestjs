@@ -18,6 +18,7 @@ export class DpmsPlIssueRevService {
                     VTYPE: dto.VTYPE,
                     VORDERS: dto.VORDERS,
                     NISSUE_TYPE: dto.NISSUE_TYPE,
+                    NROUND: dto.NROUND,
                 });
             }
             const res = await this.repo.create({

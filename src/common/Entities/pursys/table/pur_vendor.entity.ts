@@ -39,6 +39,22 @@ export class PurVendor {
 
     @Column()
     ADDR_WEB: string;
+
+    @Column()
+    EMAIL: string;
+
+    @Column()
+    FAX: string;
+
+    @Column()
+    BANKNAME: string;
+
+    @Column()
+    BRANCH: string;
+
+    @Column()
+    ACCNUMBER: string;
+
     @OneToMany(() => PurVendorsCode, (code) => code.vendor, {
         cascade: true,
     })

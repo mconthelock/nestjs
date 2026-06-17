@@ -118,4 +118,25 @@ export class StinpFormListService {
             );
         }
     }
+
+    async deleteMoreThanId(form: FormDto, id: number) {
+        try {
+            const res = await this.repo.deleteMoreThanId(form, id);
+            if (res.affected === 0) {
+                return {
+                    status: false,
+                    message: 'Failed to delete Safety inspection report list',
+                };
+            }
+            return {
+                status: true,
+                message: 'Safety inspection report list deleted successfully',
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(
+                `Failed to delete Safety inspection report list: ${error.message}`,
+            );
+        }
+    }
 }

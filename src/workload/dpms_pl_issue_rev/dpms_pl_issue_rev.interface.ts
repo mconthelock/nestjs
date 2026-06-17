@@ -4,4 +4,5 @@ export interface dpmsPlIssueRevFindLatestRevision {
     VTYPE: string;
     VORDERS: string;
     NISSUE_TYPE: number;
+    NROUND?: number;
 }

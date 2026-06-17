@@ -18,7 +18,7 @@ export class DPMS_PACKING_LIST_DETAIL {
     @PrimaryColumn()
     VDRAWING: string;
 
-    @Column()
+    @PrimaryColumn()
     NQTY: string;
 
     @Column()

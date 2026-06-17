@@ -26,6 +26,21 @@ export class MfgOrService {
     return (String(today.getDate()).padStart(2, '0') + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + today.getFullYear());
   }
 
+    private async getMfgOrFormByKey(manager: any, dto: GetMfgOrDto) {
+      const key = this.getKey(dto);
+
+      return manager
+        .createQueryBuilder()
+        .select('A.*')
+        .from('MFGOR_FORM', 'A')
+        .where('A.NFRMNO = :NFRMNO', key)
+        .andWhere('A.VORGNO = :VORGNO', key)
+        .andWhere('A.CYEAR = :CYEAR', key)
+        .andWhere('A.CYEAR2 = :CYEAR2', key)
+        .andWhere('A.NRUNNO = :NRUNNO', key)
+        .getRawOne();
+    }
+
   async createorform(dto: CreateMfgOrDto) {
     return this.dataSource.transaction(async manager => {
       await manager
@@ -146,7 +161,7 @@ export class MfgOrService {
     };
   }
 
-  async generateOrNo(dto: GetMfgOrDto & { FORMNO?: string }) {
+  async generateNewOrNo(dto: GetMfgOrDto & { FORMNO?: string }) {
     return this.dataSource.transaction(async manager => {
       const form = await this.getMfgOrFormByKey(manager, dto);
 
@@ -154,124 +169,92 @@ export class MfgOrService {
         throw new Error('MFGOR_FORM not found');
       }
 
-      return this.generateNewOrNo(manager, dto, form);
-    });
-  }
+      const key = this.getKey(dto);
+      const year2 = String(new Date().getFullYear()).slice(-2);
 
-  async updateReviseCenter(dto: GetMfgOrDto & { FORMNO?: string }) {
-    return this.dataSource.transaction(async manager => {
-      const form = await this.getMfgOrFormByKey(manager, dto);
+      const result = await manager
+        .createQueryBuilder()
+        .select('MAX(A.SEQNO)', 'MAXSEQNO')
+        .from('MFGOR_FORM', 'A')
+        .where('A.CYEAR2 = :cyear2', { cyear2: dto.CYEAR2 })
+        .getRawOne();
 
-      if (!form) {
-        throw new Error('MFGOR_FORM not found');
-      }
+      const maxSeqNo = Number(result?.MAXSEQNO || 0);
+      const nextSeqNo = maxSeqNo + 1;
+      const seqText = String(nextSeqNo).padStart(3, '0');
+      const orno = `OR-MFG-${year2}${seqText}`;
 
-      return this.updateMfgOrCenterForRevise(manager, dto, form);
-    });
-  }
+      await manager
+        .createQueryBuilder()
+        .update('MFGOR_FORM')
+        .set({
+          SEQNO: nextSeqNo,
+          ORNO: orno,
+        })
+        .where('NFRMNO = :NFRMNO', key)
+        .andWhere('VORGNO = :VORGNO', key)
+        .andWhere('CYEAR = :CYEAR', key)
+        .andWhere('CYEAR2 = :CYEAR2', key)
+        .andWhere('NRUNNO = :NRUNNO', key)
+        .execute();
 
-  private async getMfgOrFormByKey(manager: any, dto: GetMfgOrDto) {
-    const key = this.getKey(dto);
+      await manager
+        .createQueryBuilder()
+        .insert()
+        .into('MFGOR_CENTER')
+        .values({
+          ORNO: orno,
+          CYEAR: String(dto.CYEAR2).slice(-2),
+          SEQ: nextSeqNo,
+          TOPIC: form.TOPIC,
+          REVNO: form.REV,
+          ISSUE_DATE: () => 'SYSDATE',
+          FORMNO: dto.FORMNO || null,
+        })
+        .execute();
 
-    return manager
-      .createQueryBuilder()
-      .select('A.*')
-      .from('MFGOR_FORM', 'A')
-      .where('A.NFRMNO = :NFRMNO', key)
-      .andWhere('A.VORGNO = :VORGNO', key)
-      .andWhere('A.CYEAR = :CYEAR', key)
-      .andWhere('A.CYEAR2 = :CYEAR2', key)
-      .andWhere('A.NRUNNO = :NRUNNO', key)
-      .getRawOne();
-  }
-
-  private async generateNewOrNo(
-    manager: any,
-    dto: GetMfgOrDto & { FORMNO?: string },
-    form: any,
-  ) {
-    const key = this.getKey(dto);
-    const year2 = String(new Date().getFullYear()).slice(-2);
-    const issueDate = this.getTodayText();
-
-    const result = await manager
-      .createQueryBuilder()
-      .select('MAX(A.SEQNO)', 'MAXSEQNO')
-      .from('MFGOR_FORM', 'A')
-      .where('A.CYEAR2 = :cyear2', { cyear2: dto.CYEAR2 })
-      .getRawOne();
-
-    const maxSeqNo = Number(result?.MAXSEQNO || 0);
-    const nextSeqNo = maxSeqNo + 1;
-
-    const seqText = String(nextSeqNo).padStart(3, '0');
-    const orno = `OR-MFG-${year2}${seqText}`;
-
-    await manager
-      .createQueryBuilder()
-      .update('MFGOR_FORM')
-      .set({
+      return {
+        status: true,
+        TYPEFORM: 'NEW',
         SEQNO: nextSeqNo,
         ORNO: orno,
-      })
-      .where('NFRMNO = :NFRMNO', key)
-      .andWhere('VORGNO = :VORGNO', key)
-      .andWhere('CYEAR = :CYEAR', key)
-      .andWhere('CYEAR2 = :CYEAR2', key)
-      .andWhere('NRUNNO = :NRUNNO', key)
-      .execute();
+      };
+    });
+  }
 
-    await manager
-      .createQueryBuilder()
-      .insert()
-      .into('MFGOR_CENTER')
-      .values({
+  async updateMfgOrCenterForRevise(dto: GetMfgOrDto & { FORMNO?: string }) {
+    return this.dataSource.transaction(async manager => {
+      const form = await this.getMfgOrFormByKey(manager, dto);
+
+      if (!form) {
+        throw new Error('MFGOR_FORM not found');
+      }
+
+      const orno = form.ORNO;
+
+      if (!orno) {
+        throw new Error('ORNO not found for revise');
+      }
+
+      await manager
+        .createQueryBuilder()
+        .update('MFGOR_CENTER')
+        .set({
+          TOPIC: form.TOPIC,
+          REVISE_DATE: () => 'SYSDATE',
+          REVNO: form.REV,
+          FORMNO: dto.FORMNO || null,
+        })
+        .where('ORNO = :ORNO', { ORNO: orno })
+        .execute();
+
+      return {
+        status: true,
+        TYPEFORM: 'REVISE',
         ORNO: orno,
-        CYEAR: dto.CYEAR2,
-        SEQ: nextSeqNo,
-        TOPIC: form.TOPIC,
-        REVNO: form.REV,
-        ISSUE_DATE: issueDate,
-        FORMNO: dto.FORMNO || null,
-      })
-      .execute();
-
-    return {
-      status: true,
-      TYPEFORM: 'NEW',
-      SEQNO: nextSeqNo,
-      ORNO: orno,
-    };
+      };
+    });
   }
 
-  private async updateMfgOrCenterForRevise(
-    manager: any,
-    dto: GetMfgOrDto & { FORMNO?: string },
-    form: any,
-  ) {
-    const reviseDate = this.getTodayText();
-    const orno = form.ORNO;
 
-    if (!orno) {
-      throw new Error('ORNO not found for revise');
-    }
-
-    await manager
-      .createQueryBuilder()
-      .update('MFGOR_CENTER')
-      .set({
-        TOPIC: form.TOPIC,
-        REVISE_DATE: reviseDate,
-        REVNO: form.REV,
-        FORMNO: dto.FORMNO || null,
-      })
-      .where('ORNO = :ORNO', { ORNO: orno })
-      .execute();
-
-    return {
-      status: true,
-      TYPEFORM: 'REVISE',
-      ORNO: orno,
-    };
-  }
 }

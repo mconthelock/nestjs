@@ -19,9 +19,6 @@ export class Mfgor_center {
   REVNO: string | null;
 
   @Column()
-  SEC: string | null;
-
-  @Column()
   ISSUE_DATE: Date | null;
 
   @Column()
@@ -30,7 +27,5 @@ export class Mfgor_center {
   @Column()
   FORMNO: string | null;
 
-  @Column()
-  STATUS: string | null;
 }
 

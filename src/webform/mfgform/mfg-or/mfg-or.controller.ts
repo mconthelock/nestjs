@@ -19,11 +19,11 @@ export class MfgOrController {
 
   @Post('generate-or-no')
   generateOrNo(@Body() dto: GetMfgOrDto & { FORMNO?: string }) {
-    return this.service.generateOrNo(dto);
+    return this.service.generateNewOrNo(dto);
   }
 
   @Post('update-revise-center')
   updateReviseCenter(@Body() dto: GetMfgOrDto & { FORMNO?: string }) {
-    return this.service.updateReviseCenter(dto);
+    return this.service.updateMfgOrCenterForRevise(dto);
   }
 }

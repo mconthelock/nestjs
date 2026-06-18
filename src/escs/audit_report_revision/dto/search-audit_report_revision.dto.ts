@@ -9,6 +9,11 @@ export class SearchAuditReportRevisionDto extends PartialType(
     @IsOptional()
     @Type(() => Number)
     @IsNumber()
+    ARR_SECID?: number;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber()
     ARR_REV?: number;
 
     @IsOptional()

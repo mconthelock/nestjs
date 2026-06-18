@@ -27,14 +27,42 @@ export class FXALOCMSTRepository extends BaseRepository {
         });
     }
 
-    async insertLocation(dto: CreateFxaLocmstDto): Promise<FXA_LOCMST> {
-        // ใช้ this.manager.create เพื่อขึ้นรูป Object ตาม Entity
-        const newLocation = this.manager.create(FXA_LOCMST, dto);
+    async insertLocation(dto: CreateFxaLocmstDto | CreateFxaLocmstDto[]): Promise<FXA_LOCMST| FXA_LOCMST[]> {
+      if (Array.isArray(dto)) {
+            const newLocations = this.manager.create(FXA_LOCMST, dto);
+            return await this.manager.save(FXA_LOCMST, newLocations);
+        } 
         
-        // สั่งเซฟลงฐานข้อมูล Oracle ผ่าน manager
+        // 2. กรณีส่งมาแค่ Object เดียว
+        const newLocation = this.manager.create(FXA_LOCMST, dto);
         return await this.manager.save(FXA_LOCMST, newLocation);
     }
 
+
+    async importLocation(dtos: CreateFxaLocmstDto[])
+    {
+       return await this.manager.transaction(async (transactionManager) => {
+            await transactionManager.createQueryBuilder()
+                .delete()
+                .from(FXA_LOCMST)
+                .execute();
+            const newLocations = transactionManager.create(FXA_LOCMST, dtos);
+            await transactionManager.save(FXA_LOCMST, newLocations);
+
+            return true;
+        });
+    }
+
+    async updateLocation(locCode: string, dto: Partial<CreateFxaLocmstDto>): Promise<boolean> {
+        const result = await this.manager.update(
+            FXA_LOCMST, 
+            { LOCCODE: locCode }, // เงื่อนไขในการ Update (WHERE LOCCODE = locCode)
+            dto                   // ข้อมูลใหม่ที่จะนำไปอัปเดต (SET ...)
+        );
+
+        // เช็คว่ามีแถวใน Database ถูกแก้ไขไปจริงๆ ใช่ไหม (ถ้า > 0 คือสำเร็จ ถ้าเป็น 0 คือไม่พบ LOCCODE นี้)
+        return result.affected > 0;
+    }
 
     async search(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(FXA_LOCMST, 'L');

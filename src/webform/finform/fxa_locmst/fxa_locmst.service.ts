@@ -25,7 +25,7 @@ export class FxaLocmstService {
     try {
             const res = await this.repo.insertLocation(dto);
             if(!res){
-                throw new Error('Failed to insert Location Master');
+                throw new Error('Failed to Insert Location Master');
             }
             return { 
                 status: true,
@@ -35,6 +35,22 @@ export class FxaLocmstService {
             throw new Error('Insert Location Master Error: ' + error.message);
         }
     
+
+  }
+
+  async import(dtos: CreateFxaLocmstDto[]){
+        try {
+            const res = await this.repo.importLocation(dtos);
+            if(!res){
+                throw new Error('Failed to Import Location Master');
+            }
+            return { 
+                status: true,
+                message: 'Import Location Master Successfully',
+            };
+        } catch (error) {
+            throw new Error('Import Location Master Error: ' + error.message);
+        }
 
   }
 
@@ -67,9 +83,34 @@ export class FxaLocmstService {
     return `This action returns a #${id} fxaLocmst`;
   }
 
-  update(id: number, updateFxaLocmstDto: UpdateFxaLocmstDto) {
-    return `This action updates a #${id} fxaLocmst`;
-  }
+  async update(locCode: string, updateDto: UpdateFxaLocmstDto) {
+    try {
+      // เรียกใช้ Repository ที่เราเพิ่งเขียนไป
+      const isSuccess = await this.repo.updateLocation(locCode, updateDto);
+      
+      if (!isSuccess) {
+        return {
+            status: false,
+            message: `Location Code ${locCode} not found`,
+        };
+      }
+
+      return { 
+          status: true,
+          message: 'Update Location Master Successfully',
+      };
+
+    } catch (error) {
+      return {
+          status: false,
+          message: 'Update Location Master Error: ' + error.message,
+      };
+    }
+}
+
+//   update(id: number, updateFxaLocmstDto: UpdateFxaLocmstDto) {
+//     return `This action updates a #${id} fxaLocmst`;
+//   }
 
   remove(id: number) {
     return `This action removes a #${id} fxaLocmst`;

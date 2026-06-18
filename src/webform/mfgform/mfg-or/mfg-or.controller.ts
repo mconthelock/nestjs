@@ -32,4 +32,10 @@ export class MfgOrController {
   searchMfgOrCenter(@Body() dto: SearchMfgOrCenterDto) {
     return this.service.searchMfgOrCenter(dto);
   }
+
+  @Post('stamp-pdf')
+  stampPdf(@Body() dto: GetMfgOrDto & { FORMNO?: string }) {
+    return this.service.stampPdf(dto);
+  }
+  
 }

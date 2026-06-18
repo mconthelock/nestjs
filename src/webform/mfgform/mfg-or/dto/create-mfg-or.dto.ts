@@ -46,23 +46,7 @@ export class CreateMfgOrDto {
   @IsOptional()
   @IsString()
   TOPIC?: string | null;
-
-  @IsOptional()
-  @IsString()
-  DWGNO?: string | null;
-
-  @IsOptional()
-  @IsString()
-  SHOPNO?: string | null;
-
-  @IsOptional()
-  @IsString()
-  ITEMNO?: string | null;
-
-  @IsOptional()
-  @IsString()
-  APPLY_FOR?: string | null;
-
+  
   @IsOptional()
   @IsNumber()
   SEQNO?: number | null;

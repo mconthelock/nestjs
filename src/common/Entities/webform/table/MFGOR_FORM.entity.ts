@@ -27,18 +27,6 @@ export class Mfgor_form {
   TOPIC: string | null;
 
   @Column()
-  DWGNO: string | null;
-
-  @Column()
-  SHOPNO: string | null;
-
-  @Column()
-  ITEMNO: string | null;
-
-  @Column()
-  APPLY_FOR: string | null;
-
-  @Column()
   SEQNO: number | null;
 
   @Column()

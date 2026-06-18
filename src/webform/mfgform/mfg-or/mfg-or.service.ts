@@ -4,6 +4,8 @@ import { DataSource } from 'typeorm';
 import { CreateMfgOrDto } from './dto/create-mfg-or.dto';
 import { GetMfgOrDto } from './dto/get-mfg-or.dto';
 import { SearchMfgOrCenterDto } from './dto/search-mfg-or-center.dto';
+import * as fs from 'fs';
+import { PDFDocument } from 'pdf-lib';
 
 @Injectable()
 export class MfgOrService {
@@ -21,8 +23,6 @@ export class MfgOrService {
       NRUNNO: Number(dto.NRUNNO),
     };
   }
-
-
 
   private async getMfgOrFormByKey(manager: any, dto: GetMfgOrDto) {
     const key = this.getKey(dto);
@@ -54,10 +54,6 @@ export class MfgOrService {
           TYPEFORM: dto.TYPEFORM,
           CLASS: dto.CLASS,
           TOPIC: dto.TOPIC,
-          DWGNO: dto.DWGNO,
-          SHOPNO: dto.SHOPNO,
-          ITEMNO: dto.ITEMNO,
-          APPLY_FOR: dto.APPLY_FOR,
           SEQNO: dto.SEQNO,
           ORNO: dto.ORNO,
           REV: dto.REV,
@@ -262,6 +258,85 @@ export class MfgOrService {
       status: !!data,
       data,
     };
+  }
+
+
+  async stampPdf(dto: GetMfgOrDto & { FORMNO?: string }) {
+    const formno = String(dto.FORMNO || '').trim();
+    if (!formno) {
+      throw new Error('FORMNO not found');
+    }
+
+    const result = await this.getMfgOr(dto);
+    const form = result.data.form;
+    const flow = result.data.flow;
+    const head = result.data.head;
+    const att = result.data.att;
+
+    if (!form) {
+      throw new Error('FORM not found');
+    }
+
+    if (!head) {
+      throw new Error('MFGOR_FORM not found');
+    }
+
+    const pdfPath = this.getPdfPath(formno);
+    const outputPath = await this.fillMfgOrPdf({
+      pdfPath,
+      formno,
+      form,
+      flow,
+      head,
+      att,
+    });
+
+    return {
+      status: true,
+      formno,
+      filepath: outputPath,
+    };
+  }
+
+
+  private async fillMfgOrPdf(params: {
+    pdfPath: string;
+    formno: string;
+    form: any;
+    flow: any[];
+    head: any;
+    att: any[];
+  }): Promise<string> {
+    const { pdfPath, formno, form, flow, head, att } = params;
+
+    const pdfBytes = fs.readFileSync(pdfPath);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+    
+    console.log('Page count =',pdfDoc.getPageCount());
+    // เอา logic stamp PDF ที่ทำได้แล้วมาใส่ตรงนี้
+    // ใช้ formno เป็นชื่อไฟล์
+    // ใช้ head เติมข้อมูล MFGOR_FORM
+    // ใช้ flow เติมข้อมูล approve
+
+    return pdfPath;
+  }
+
+  private getBasePath(): string {
+    const env = process.env.HOSTNAME === 'amecweb' ? 'production' : 'development';
+    return `${process.env.AMEC_FILE_PATH}${env}/Form/MFG/MFG-OR/`;
+  }
+
+  private getPdfPath(formno: string): string {
+    const safeFormno = String(formno || '').trim();
+
+    if (!safeFormno) {
+      throw new Error('FORMNO not found');
+    }
+
+    const pathtest = "O:\\Public\\golf\\A_TempFile\\MFG\\MFG-OR\\" + safeFormno + "\\" + safeFormno + ".pdf";
+    console.log('PDF Path:', pathtest);
+    return pathtest;
+    //return `${this.getBasePath()}${safeFormno}/${safeFormno}.pdf`;
   }
 
 }

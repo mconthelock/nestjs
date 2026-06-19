@@ -11,6 +11,7 @@ import {
   PdfDocumentHelper,
   PdfFontHelper,
   PdfFileHelper,
+  Optiongetdata
 } from 'src/common/helpers/pdf_stamp';
 
 @Injectable()
@@ -325,10 +326,10 @@ export class MfgOrService {
 
     const dim = flow.find(f => String(f.CSTEPNO) === '02');
     const sem = flow.find(f => String(f.CSTEPNO) === '06');
-    const dimName = this.getStampName(dim?.VAPVNO,dim?.APV_NAME,);
-    const semName = this.getStampName(sem?.VAPVNO, sem?.APV_NAME,);
-    const dimDate = this.getStampDate(dim?.DAPVDATE);
-    const semDate = this.getStampDate(sem?.DAPVDATE);
+    const dimName = Optiongetdata.getStampName(dim?.VAPVNO,dim?.APV_NAME,);
+    const semName = Optiongetdata.getStampName(sem?.VAPVNO, sem?.APV_NAME,);
+    const dimDate = Optiongetdata.getStampDate(dim?.DAPVDATE);
+    const semDate = Optiongetdata.getStampDate(sem?.DAPVDATE);
 
     // \ DIM
     PdfDrawer.drawCircleStamp(page, font, {
@@ -357,32 +358,6 @@ export class MfgOrService {
 
     await PdfFileHelper.save(pdfDoc, outputPath);
     return outputPath;
-  }
-
-  private getStampName(vapvno: string, fullname: string): string {
-    const name = String(fullname || '').trim();
-    if (!name) {return '';}
-    const parts = name.split(/\s+/);
-
-    // Japanese employee
-    if (String(vapvno || '').toUpperCase().startsWith('J')) {
-      return parts.length >= 2 ? parts[1] : parts[0];
-    }
-
-    return parts[0];
-  }
-
-  private getStampDate(value: any): string {
-    if (!value) {return '';}
-
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) { return '';}
-
-    return date.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    }).replace(',', '');
   }
 
   private getPdfPath(formno: string): string {

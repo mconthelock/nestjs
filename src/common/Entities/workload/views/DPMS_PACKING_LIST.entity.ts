@@ -57,7 +57,7 @@ export class DPMS_PACKING_LIST{
     SHIPPING_MARK: Date;
 
     @Column()
-    WEIGTH: string;
+    WEIGHT: string;
 
     @Column()
     COMBINE: string;

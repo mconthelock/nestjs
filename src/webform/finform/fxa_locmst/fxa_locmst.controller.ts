@@ -58,7 +58,7 @@ export class FxaLocmstController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateFxaLocmstDto: UpdateFxaLocmstDto) {
-    return this.fxaLocmstService.update(+id, updateFxaLocmstDto);
+    return this.fxaLocmstService.update(id, updateFxaLocmstDto);
   }
 
   @Delete(':id')

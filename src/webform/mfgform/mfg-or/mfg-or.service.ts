@@ -313,7 +313,7 @@ export class MfgOrService {
       head,
     });
 
-    //await this.updateStampedPdfAtt(dto, `${formno}_stamp.pdf`);
+    await this.updateStampedPdfAtt(dto, `${formno}_stamp.pdf`);
 
     return {
       status: true,
@@ -408,8 +408,8 @@ export class MfgOrService {
       throw new Error('FORMNO not found');
     }
 
-    const pdfPath = 'O:\\Public\\golf\\A_TempFile\\MFG\\MFG-OR\\' + safeFormno + '\\' + safeFormno +'.pdf';
-    //const pdfPath = `${this.getBasePath()}${safeFormno}/${safeFormno}.pdf`;
+    //const pdfPath = 'O:\\Public\\golf\\A_TempFile\\MFG\\MFG-OR\\' + safeFormno + '\\' + safeFormno +'.pdf';
+    const pdfPath = `${this.getBasePath()}${safeFormno}/${safeFormno}.pdf`;
     console.log('PDF Path:', pdfPath);
     return pdfPath;
   }

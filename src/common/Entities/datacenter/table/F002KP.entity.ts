@@ -5,7 +5,7 @@ export class F002KP {
   @PrimaryColumn()
   F02R01: string;
 
-  @Column()
+  @PrimaryColumn()
   F02R02: number;
 
   @Column()

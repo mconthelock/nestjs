@@ -8,6 +8,8 @@ import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
 import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
+import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
+import { FlowService } from 'src/webform/flow/flow.service';
 
 const JOB_CONTROLLER_CEXTDATA = ['01'];
 
@@ -19,6 +21,8 @@ export class FinDsService {
         private readonly FormCreateService: FormCreateService,
         private readonly handleFileFormService: HandleFileFormService,
         private readonly doactionFlowService: DoactionFlowService,
+        private readonly deleteflowservice: DeleteFlowStepService,
+        private readonly flowservice: FlowService,
     ) {}
 
     findAll() {
@@ -178,6 +182,22 @@ export class FinDsService {
                 CYEAR2: createForm.data.CYEAR2 || createForm.data.CYEAR,
                 NRUNNO: createForm.data.NRUNNO,
             };
+            if (createFinDDto.OPTION_CODE === "1"){
+                for (const step of ['05','04','03','02','06']) {
+                    await this.deleteflowservice.deleteFlowStep({
+                        ...form,
+                        CSTEPNO: step,
+                    })
+                }
+                await  this.flowservice.updateFlow({
+                     condition: {
+                        ...form,
+                        CEXTDATA: '01',
+                    },
+                    CSTEPST: '3',
+                    VAPVNO: "92077"
+                });
+            }
 
             const headData = {
                 ...form,

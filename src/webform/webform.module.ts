@@ -24,6 +24,7 @@ import { PurFormModule } from './purform/purform.module';
 import { PsFormModule } from './psform/psform.module';
 import { RqflistModule } from './rqflist/rqflist.module';
 import { MfgOrModule } from './mfgform/mfg-or/mfg-or.module';
+import { VorgmstModule } from './vorgmst/vorgmst.module';
 
 @Module({
     imports: [
@@ -51,6 +52,7 @@ import { MfgOrModule } from './mfgform/mfg-or/mfg-or.module';
         PsFormModule,
         STFormModule,
         RqflistModule,
+        VorgmstModule,
         MfgOrModule
     ],
 })

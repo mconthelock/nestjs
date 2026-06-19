@@ -94,22 +94,13 @@ export class InquiryDetail {
     INQD_OWNER: string;
 
     @Column()
-    CREATE_AT: Date;
-
-    @Column()
     CREATE_BY: string;
-
-    @Column()
-    UPDATE_AT: Date;
 
     @Column()
     UPDATE_BY: string;
 
     @Column()
     INQD_COMPARE: string;
-
-    @Column()
-    INQD_COMPARE_DATE: string;
 
     @Column()
     INQD_OWNER_GROUP: string;
@@ -154,7 +145,16 @@ export class InquiryDetail {
     INQD_VPC_PURCODE: string;
 
     @Column()
-    INQD_VPC_DATE: string;
+    CREATE_AT: Date;
+
+    @Column()
+    UPDATE_AT: Date;
+
+    // @Column()
+    // INQD_COMPARE_DATE: Date;
+
+    // @Column()
+    // INQD_VPC_DATE: Date;
 
     @ManyToOne(() => Inquiry, (inq) => inq.details)
     @JoinColumn({ name: 'INQID', referencedColumnName: 'INQ_ID' })

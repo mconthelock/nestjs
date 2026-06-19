@@ -41,7 +41,28 @@ export class PsCihRepository extends BaseRepository {
     async getReportData(dto: FormDto) {
         return this.getRepository(PSCIH_FORM).find({
             where: dto,
-            relations: { RESULT: { ITEM_DETAIL: true, LOGS: true } },
+            relations: { RESULT: { ITEM_DETAIL: true, LOG_EDIT: true } },
+            order: { RESULT: { ITEM_CODE: 'ASC' } },
         });
+    }
+
+    async updateCheckResult(data: any[], empno: string) {
+        return Promise.all(
+            data.map((item) => {
+                const keys = { ID: item.ID };
+                const result = {
+                    ACTUAL_QTY: item.ACTUAL_QTY,
+                    RANDOM_CHECK: item.RANDOM_CHECK,
+                    REMARK: item.REMARK,
+                    LEADER_REMARK: item.LEADER_REMARK,
+                    LAST_UPDATED: empno,
+                    UPDATED_AT: () => 'SYSDATE',
+                };
+                return this.getRepository(INV_HALFYEAR_RESULT).update(
+                    keys,
+                    result,
+                );
+            }),
+        );
     }
 }

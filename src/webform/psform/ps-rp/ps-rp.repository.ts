@@ -74,27 +74,29 @@ export class PsRPRepository extends BaseRepository {
                 FORM,
                 'F',
                 `list.NFRMNO = F.NFRMNO
-        AND list.VORGNO = F.VORGNO
-        AND list.CYEAR = F.CYEAR
-        AND list.CYEAR2 = F.CYEAR2
-        AND list.NRUNNO = F.NRUNNO`,
+                    AND list.VORGNO = F.VORGNO
+                    AND list.CYEAR = F.CYEAR
+                    AND list.CYEAR2 = F.CYEAR2
+                    AND list.NRUNNO = F.NRUNNO`,
             )
             .innerJoin(
                 FORMMST,
                 'FM',
                 `list.NFRMNO = FM.NNO
-        AND list.VORGNO = FM.VORGNO
-        AND list.CYEAR = FM.CYEAR`,
+                    AND list.VORGNO = FM.VORGNO
+                    AND list.CYEAR = FM.CYEAR`,
             )
             .innerJoin(
                 FLOW,
                 'FL',
                 `list.NFRMNO = FL.NFRMNO
-        AND list.VORGNO = FL.VORGNO
-        AND list.CYEAR = FL.CYEAR
-        AND list.CYEAR2 = FL.CYEAR2
-        AND list.NRUNNO = FL.NRUNNO
-        AND FL.CEXTDATA = '02'`,
+                    AND list.VORGNO = FL.VORGNO
+                    AND list.CYEAR = FL.CYEAR
+                    AND list.CYEAR2 = FL.CYEAR2
+                    AND list.NRUNNO = FL.NRUNNO
+                    AND FL.CEXTDATA = '02'
+                    AND FL.CAPVSTNO = '1'
+                    AND FL.DAPVDATE IS NOT NULL`,
             )
             .addSelect('FM.VANAME', 'VANAME')
             .addSelect('FL.DAPVDATE', 'DAPVDATE');

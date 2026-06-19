@@ -9,10 +9,15 @@ export class EditedRowDto {
     ACTUAL_QTY?: number;
     OLD_RANDOM_CHECK?: string;
     RANDOM_CHECK?: string;
+    OLD_RECHECK_QTY?: number;
+    RECHECK_QTY?: number;
     REMARK?: string;
     LEADER_REMARK?: string;
+    RECHECK_REMARK?: string;
+    ITEM_CODE: string;
     IS_RANDOM_EDITED?: string;
     IS_ACTUAL_EDITED?: string;
+    IS_RECHECK_EDITED?: boolean;
 }
 
 export class CreateLogDto {

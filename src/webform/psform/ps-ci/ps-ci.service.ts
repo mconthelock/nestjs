@@ -24,15 +24,14 @@ export class PsCiService {
             const oldData = row.OLD_ACTUAL_QTY !== undefined ? row.OLD_ACTUAL_QTY : null;
             const newData = row.ACTUAL_QTY !== undefined ? row.ACTUAL_QTY : null;
 
-            console.log('Comparing values:', { oldData, newData });
-            if (row.OLD_ACTUAL_QTY !== undefined && oldData !== newData) {
+            if (row.IS_ACTUAL_EDITED) {
                 entries.push({
                     ASSIGN_ID: row.ASSIGN_ID,
                     ITEM_CODE: row.IPROD,
                     OLD_VALUE: row.OLD_ACTUAL_QTY ?? 0,
                     NEW_VALUE: row.ACTUAL_QTY ?? 0,
                     EDIT_BY: empno,
-                    REMARK: row.REMARK ?? '',
+                    REMARK: row.LEADER_REMARK ?? '',
                     TYPE: 1,
                 });
             }
@@ -40,7 +39,7 @@ export class PsCiService {
             const oldRandomCheck = row.OLD_RANDOM_CHECK !== undefined ? row.OLD_RANDOM_CHECK : null;
             const newRandomCheck = row.RANDOM_CHECK !== undefined ? row.RANDOM_CHECK : null;
 
-            if (row.OLD_RANDOM_CHECK !== undefined && oldRandomCheck !== newRandomCheck) {
+            if (row.IS_RANDOM_EDITED) {
                 entries.push({
                     ASSIGN_ID: row.ASSIGN_ID,
                     ITEM_CODE: row.IPROD,
@@ -49,6 +48,18 @@ export class PsCiService {
                     EDIT_BY: empno,
                     REMARK: row.LEADER_REMARK ?? '',
                     TYPE: 2,
+                });
+            }
+
+            if(row.IS_RECHECK_EDITED){
+                entries.push({
+                    ASSIGN_ID: row.ASSIGN_ID,
+                    ITEM_CODE: row.IPROD,
+                    OLD_VALUE: row.OLD_RECHECK_QTY ?? 0,
+                    NEW_VALUE: row.RECHECK_QTY ?? 0,
+                    EDIT_BY: empno,
+                    REMARK: row.RECHECK_REMARK ?? '',
+                    TYPE: 3,
                 });
             }
 

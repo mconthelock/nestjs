@@ -4,8 +4,14 @@ import { DataSource } from 'typeorm';
 import { CreateMfgOrDto } from './dto/create-mfg-or.dto';
 import { GetMfgOrDto } from './dto/get-mfg-or.dto';
 import { SearchMfgOrCenterDto } from './dto/search-mfg-or-center.dto';
-import * as fs from 'fs';
-import { PDFDocument } from 'pdf-lib';
+import * as path from 'path';
+import { PDFDocument, PDFPage, PDFFont } from 'pdf-lib';
+import {
+  PdfDrawer,
+  PdfDocumentHelper,
+  PdfFontHelper,
+  PdfFileHelper,
+} from 'src/common/helpers/pdf_stamp';
 
 @Injectable()
 export class MfgOrService {
@@ -110,8 +116,9 @@ export class MfgOrService {
 
     const flow = await this.dataSource
       .createQueryBuilder()
-      .select('F.*')
+      .select([ 'F.*', 'U.SNAME AS APV_NAME',])
       .from('FLOW', 'F')
+      .leftJoin('AMECUSERALL', 'U', 'F.VAPVNO = U.SEMPNO')
       .where('F.NFRMNO = :NFRMNO', key)
       .andWhere('F.VORGNO = :VORGNO', key)
       .andWhere('F.CYEAR = :CYEAR', key)
@@ -260,22 +267,19 @@ export class MfgOrService {
     };
   }
 
-
+  //* ************************************* STAMP PDF *****************************************//
+ 
   async stampPdf(dto: GetMfgOrDto & { FORMNO?: string }) {
     const formno = String(dto.FORMNO || '').trim();
+
     if (!formno) {
       throw new Error('FORMNO not found');
     }
 
     const result = await this.getMfgOr(dto);
-    const form = result.data.form;
+
     const flow = result.data.flow;
     const head = result.data.head;
-    const att = result.data.att;
-
-    if (!form) {
-      throw new Error('FORM not found');
-    }
 
     if (!head) {
       throw new Error('MFGOR_FORM not found');
@@ -285,10 +289,8 @@ export class MfgOrService {
     const outputPath = await this.fillMfgOrPdf({
       pdfPath,
       formno,
-      form,
       flow,
       head,
-      att,
     });
 
     return {
@@ -298,26 +300,111 @@ export class MfgOrService {
     };
   }
 
-
   private async fillMfgOrPdf(params: {
     pdfPath: string;
     formno: string;
-    form: any;
     flow: any[];
     head: any;
-    att: any[];
   }): Promise<string> {
-    const { pdfPath, formno, form, flow, head, att } = params;
+    const { pdfPath, formno, head, flow  } = params;
 
-    const pdfBytes = fs.readFileSync(pdfPath);
-    const pdfDoc = await PDFDocument.load(pdfBytes);
+    const pdfDoc = await PdfDocumentHelper.load(pdfPath);
+    const font = await PdfFontHelper.loadThaiFont(pdfDoc);
+
+    const page = pdfDoc.getPages()[0];
+    const { width, height } = page.getSize();
+    const isLandscape = width > height;
+
+    const data = {
+      topic: String(head.TOPIC || '').trim(),
+      orno: String(head.ORNO || '').trim(),
+      rev: String(head.REV || '').trim(),
+    };
+
+
+    if (isLandscape) { // แนวนอน
+      PdfDrawer.drawText(page, font, data.topic, { x: 530, y: height - 90, size: 16, maxWidth: 500, });
+      PdfDrawer.drawText(page, font, data.orno, {x: 530,y: height - 115,size: 16,maxWidth: 500,});
+      PdfDrawer.drawText(page, font, data.rev, {x: 1380,y: height - 90, size: 16, maxWidth: 60,});
+      
+    } else { // แนวตั้ง
+      PdfDrawer.drawText(page, font, data.topic, { x: 550, y: height - 24,size: 14,maxWidth: 400,});
+      PdfDrawer.drawText(page, font, data.orno, { x: 550,y: height - 52,size: 16, maxWidth: 400,});
+      PdfDrawer.drawText(page, font, data.rev, {x: 870, y: height - 52,size: 16, maxWidth: 60,});
+    }
+
+    const dim = flow.find(f => String(f.CSTEPNO) === '02');
+    const sem = flow.find(f => String(f.CSTEPNO) === '06');
+    const dimName = this.getStampName(dim?.VAPVNO,dim?.APV_NAME,);
+    const semName = this.getStampName(sem?.VAPVNO, sem?.APV_NAME,);
+    const dimDate = this.getStampDate(dim?.DAPVDATE);
+    const semDate = this.getStampDate(sem?.DAPVDATE);
+
+    // DEM / DIM
+    PdfDrawer.drawCircleStamp(page, font, {
+      x: isLandscape ? width - 210 : width - 260,
+      y: isLandscape ? 200 : 68,
+      r: 36,
+
+      topText: 'AMEC',
+      middleText: dimDate,
+      bottomText: dimName,
+    });
+
+    // SEM
+    PdfDrawer.drawCircleStamp(page, font, {
+      x: isLandscape ? width - 80 : width - 140,
+      y: isLandscape ? 200 : 68,
+      r: 36,
+
+      topText: 'AMEC',
+      middleText: semDate,
+      bottomText: semName,
+
+    });
+
+    const outputPath = path.join(path.dirname(pdfPath), `${formno}_stamp.pdf`);
+
+    await PdfFileHelper.save(pdfDoc, outputPath);
+    return outputPath;
+  }
+
+  private getStampName(vapvno: string, fullname: string): string {
+    const name = String(fullname || '').trim();
+    if (!name) {return '';}
+    const parts = name.split(/\s+/);
+
+    // Japanese employee
+    if (String(vapvno || '').toUpperCase().startsWith('J')) {
+      return parts.length >= 2 ? parts[1] : parts[0];
+    }
+
+    return parts[0];
+  }
+
+  private getStampDate(value: any): string {
+    if (!value) {return '';}
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) { return '';}
+
+    return date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }).replace(',', '');
+  }
+
+  private getPdfPath(formno: string): string {
+    const safeFormno = String(formno || '').trim();
+    if (!safeFormno) {
+      throw new Error('FORMNO not found');
+    }
+
+    //const pdfPath = 'O:\\Public\\golf\\A_TempFile\\MFG\\MFG-OR\\' + safeFormno + '\\' + safeFormno +'.pdf';
     
-    console.log('Page count =',pdfDoc.getPageCount());
-    // เอา logic stamp PDF ที่ทำได้แล้วมาใส่ตรงนี้
-    // ใช้ formno เป็นชื่อไฟล์
-    // ใช้ head เติมข้อมูล MFGOR_FORM
-    // ใช้ flow เติมข้อมูล approve
-
+    const pdfPath = `${this.getBasePath()}${safeFormno}/${safeFormno}.pdf`;
+    console.log('PDF Path:', pdfPath);
     return pdfPath;
   }
 
@@ -326,17 +413,7 @@ export class MfgOrService {
     return `${process.env.AMEC_FILE_PATH}${env}/Form/MFG/MFG-OR/`;
   }
 
-  private getPdfPath(formno: string): string {
-    const safeFormno = String(formno || '').trim();
 
-    if (!safeFormno) {
-      throw new Error('FORMNO not found');
-    }
 
-    const pathtest = "O:\\Public\\golf\\A_TempFile\\MFG\\MFG-OR\\" + safeFormno + "\\" + safeFormno + ".pdf";
-    console.log('PDF Path:', pathtest);
-    return pathtest;
-    //return `${this.getBasePath()}${safeFormno}/${safeFormno}.pdf`;
-  }
 
 }

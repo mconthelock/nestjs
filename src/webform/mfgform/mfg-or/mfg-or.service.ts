@@ -271,19 +271,9 @@ export class MfgOrService {
  
   async stampPdf(dto: GetMfgOrDto & { FORMNO?: string }) {
     const formno = String(dto.FORMNO || '').trim();
-
-    if (!formno) {
-      throw new Error('FORMNO not found');
-    }
-
     const result = await this.getMfgOr(dto);
-
     const flow = result.data.flow;
     const head = result.data.head;
-
-    if (!head) {
-      throw new Error('MFGOR_FORM not found');
-    }
 
     const pdfPath = this.getPdfPath(formno);
     const outputPath = await this.fillMfgOrPdf({
@@ -340,7 +330,7 @@ export class MfgOrService {
     const dimDate = this.getStampDate(dim?.DAPVDATE);
     const semDate = this.getStampDate(sem?.DAPVDATE);
 
-    // DEM / DIM
+    // \ DIM
     PdfDrawer.drawCircleStamp(page, font, {
       x: isLandscape ? width - 210 : width - 260,
       y: isLandscape ? 200 : 68,
@@ -412,7 +402,6 @@ export class MfgOrService {
     const env = process.env.HOSTNAME === 'amecweb' ? 'production' : 'development';
     return `${process.env.AMEC_FILE_PATH}${env}/Form/MFG/MFG-OR/`;
   }
-
 
 
 

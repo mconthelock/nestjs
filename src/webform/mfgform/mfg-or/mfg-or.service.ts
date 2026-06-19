@@ -355,7 +355,7 @@ export class MfgOrService {
 
 
     if (isLandscape) { // แนวนอน
-      PdfDrawer.drawText(page, font, data.topic, { x: 530, y: height - 90, size: 16, maxWidth: 500, });
+      //PdfDrawer.drawText(page, font, data.topic, { x: 530, y: height - 90, size: 16, maxWidth: 500, });
       PdfDrawer.drawText(page, font, data.orno, {x: 530,y: height - 117,size: 16,maxWidth: 500,});
       PdfDrawer.drawText(page, font, data.rev, {x: 1370,y: height - 90, size: 16, maxWidth: 60,});
       
@@ -364,7 +364,7 @@ export class MfgOrService {
       PdfDrawer.drawText(page, font, dimDate, {x: 1370,y: height - 117, size: 16, maxWidth: 500,});
       
     } else { // แนวตั้ง
-      PdfDrawer.drawText(page, font, data.topic, { x: 540, y: height - 22,size: 14,maxWidth: 400,});
+      //PdfDrawer.drawText(page, font, data.topic, { x: 540, y: height - 22,size: 14,maxWidth: 400,});
       PdfDrawer.drawText(page, font, data.orno, { x: 540,y: height - 53,size: 16, maxWidth: 400,});
       PdfDrawer.drawText(page, font, data.rev, {x: 870, y: height - 53,size: 16, maxWidth: 60,});
 

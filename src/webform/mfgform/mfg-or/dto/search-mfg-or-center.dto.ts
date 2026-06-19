@@ -1,7 +1,26 @@
 // dto/search-mfg-or-center.dto.ts
-import { IsString } from 'class-validator';
+
+import { IsOptional, IsString } from 'class-validator';
 
 export class SearchMfgOrCenterDto {
+
+  @IsOptional()
   @IsString()
-  ORNO: string;
+  ORNO?: string;
+
+  @IsOptional()
+  @IsString()
+  TOPIC?: string;
+
+  @IsOptional()
+  @IsString()
+  CLASS?: string;
+
+  @IsOptional()
+  @IsString()
+  CYEAR?: string;
+
+  @IsOptional()
+  @IsString()
+  FORMNO?: string;
 }

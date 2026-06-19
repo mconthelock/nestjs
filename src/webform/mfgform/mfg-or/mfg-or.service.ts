@@ -262,17 +262,60 @@ export class MfgOrService {
   }
 
   async searchMfgOrCenter(dto: SearchMfgOrCenterDto) {
-    const data = await this.dataSource
+    const orno = String(dto.ORNO || '').trim().toUpperCase();
+    const topic = String(dto.TOPIC || '').trim().toUpperCase();
+    const classValue = String(dto.CLASS || '').trim();
+    const cyear = String(dto.CYEAR || '').trim();
+
+    const query = this.dataSource
       .createQueryBuilder()
-      .select('A.*')
-      .from('MFGOR_CENTER', 'A')
-      .where('UPPER(A.ORNO) = :ORNO', {
-        ORNO: String(dto.ORNO).trim().toUpperCase(),
-      })
-      .getRawOne();
+      .select([
+        'C.ORNO AS ORNO',
+        'C.TOPIC AS TOPIC',
+        'C.REVNO AS REVNO',
+        'C.CYEAR AS CYEAR',
+        'C.SEQ AS SEQ',
+        'C.ISSUE_DATE AS ISSUE_DATE',
+        'C.REVISE_DATE AS REVISE_DATE',
+        'C.FORMNO AS FORMNO',
+        'F.CLASS AS CLASS',
+      ])
+      .from('MFGOR_CENTER', 'C')
+      .leftJoin('MFGOR_FORM','F', `F.NFRMNO || F.VORGNO || F.CYEAR || F.CYEAR2 || F.NRUNNO = C.FORMNO`)
+      .where('1 = 1');
+
+    if (cyear) {
+      query.andWhere('C.CYEAR = :CYEAR', {
+        CYEAR: cyear.slice(-2),
+      });
+    }
+
+    if (orno) {
+      query.andWhere('UPPER(C.ORNO) LIKE :ORNO', {
+        ORNO: `%${orno}%`,
+      });
+    }
+
+    if (topic) {
+      query.andWhere('UPPER(C.TOPIC) LIKE :TOPIC', {
+        TOPIC: `%${topic}%`,
+      });
+    }
+
+    if (classValue) {
+      query.andWhere('F.CLASS = :CLASS', {
+        CLASS: classValue,
+      });
+    }
+
+    const data = await query
+      .orderBy('C.CYEAR', 'DESC')
+      .addOrderBy('C.SEQ', 'DESC')
+      .getRawMany();
 
     return {
-      status: !!data,
+      status: true,
+      count: data.length,
       data,
     };
   }

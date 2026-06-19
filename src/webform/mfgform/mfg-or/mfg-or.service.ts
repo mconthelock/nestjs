@@ -5,7 +5,6 @@ import { CreateMfgOrDto } from './dto/create-mfg-or.dto';
 import { GetMfgOrDto } from './dto/get-mfg-or.dto';
 import { SearchMfgOrCenterDto } from './dto/search-mfg-or-center.dto';
 import * as path from 'path';
-import { PDFDocument, PDFPage, PDFFont } from 'pdf-lib';
 import {
   PdfDrawer,
   PdfDocumentHelper,
@@ -166,8 +165,17 @@ export class MfgOrService {
     return this.dataSource.transaction(async manager => {
       const form = await this.getMfgOrFormByKey(manager, dto);
 
-      if (!form) {
-        throw new Error('MFGOR_FORM not found');
+      if (!form) { throw new Error('MFGOR_FORM not found');}
+
+      if (String(form.ORNO || '').trim()) {
+        return {
+          status: true,
+          TYPEFORM: 'NEW',
+          skipped: true,
+          message: 'ORNO already generated',
+          SEQNO: form.SEQNO,
+          ORNO: form.ORNO,
+        };
       }
 
       const key = this.getKey(dto);
@@ -197,6 +205,7 @@ export class MfgOrService {
         .andWhere('CYEAR = :CYEAR', key)
         .andWhere('CYEAR2 = :CYEAR2', key)
         .andWhere('NRUNNO = :NRUNNO', key)
+        .andWhere('(ORNO IS NULL OR TRIM(ORNO) = \'\')')
         .execute();
 
       await manager
@@ -268,6 +277,26 @@ export class MfgOrService {
     };
   }
 
+  private async updateStampedPdfAtt(
+    dto: GetMfgOrDto & { FORMNO?: string },
+    filename: string,
+  ) {
+    const key = this.getKey(dto);
+    await this.dataSource
+      .createQueryBuilder()
+      .update('MFGOR_ATT')
+      .set({
+        FILENAME: filename,
+      })
+      .where('NFRMNO = :NFRMNO', key)
+      .andWhere('VORGNO = :VORGNO', key)
+      .andWhere('CYEAR = :CYEAR', key)
+      .andWhere('CYEAR2 = :CYEAR2', key)
+      .andWhere('NRUNNO = :NRUNNO', key)
+      .andWhere('ID = :ID', { ID: 2 })
+      .execute();
+  }
+
   //* ************************************* STAMP PDF *****************************************//
  
   async stampPdf(dto: GetMfgOrDto & { FORMNO?: string }) {
@@ -283,6 +312,8 @@ export class MfgOrService {
       flow,
       head,
     });
+
+    await this.updateStampedPdfAtt(dto, `${formno}_stamp.pdf`);
 
     return {
       status: true,

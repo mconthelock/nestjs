@@ -313,7 +313,7 @@ export class MfgOrService {
       head,
     });
 
-    await this.updateStampedPdfAtt(dto, `${formno}_stamp.pdf`);
+    //await this.updateStampedPdfAtt(dto, `${formno}_stamp.pdf`);
 
     return {
       status: true,
@@ -343,26 +343,37 @@ export class MfgOrService {
       rev: String(head.REV || '').trim(),
     };
 
-
-    if (isLandscape) { // แนวนอน
-      PdfDrawer.drawText(page, font, data.topic, { x: 530, y: height - 90, size: 16, maxWidth: 500, });
-      PdfDrawer.drawText(page, font, data.orno, {x: 530,y: height - 115,size: 16,maxWidth: 500,});
-      PdfDrawer.drawText(page, font, data.rev, {x: 1380,y: height - 90, size: 16, maxWidth: 60,});
-      
-    } else { // แนวตั้ง
-      PdfDrawer.drawText(page, font, data.topic, { x: 550, y: height - 24,size: 14,maxWidth: 400,});
-      PdfDrawer.drawText(page, font, data.orno, { x: 550,y: height - 52,size: 16, maxWidth: 400,});
-      PdfDrawer.drawText(page, font, data.rev, {x: 870, y: height - 52,size: 16, maxWidth: 60,});
-    }
-
+    const req = flow.find(f => String(f.CSTEPNO) === '--');
     const dim = flow.find(f => String(f.CSTEPNO) === '02');
     const sem = flow.find(f => String(f.CSTEPNO) === '06');
+    const reqName = Optiongetdata.getStampName(req?.VAPVNO,req?.APV_NAME,);
     const dimName = Optiongetdata.getStampName(dim?.VAPVNO,dim?.APV_NAME,);
     const semName = Optiongetdata.getStampName(sem?.VAPVNO, sem?.APV_NAME,);
+    const reqDate = Optiongetdata.getStampDate(req?.DAPVDATE);
     const dimDate = Optiongetdata.getStampDate(dim?.DAPVDATE);
     const semDate = Optiongetdata.getStampDate(sem?.DAPVDATE);
 
-    // \ DIM
+
+    if (isLandscape) { // แนวนอน
+      PdfDrawer.drawText(page, font, data.topic, { x: 530, y: height - 90, size: 16, maxWidth: 500, });
+      PdfDrawer.drawText(page, font, data.orno, {x: 530,y: height - 117,size: 16,maxWidth: 500,});
+      PdfDrawer.drawText(page, font, data.rev, {x: 1370,y: height - 90, size: 16, maxWidth: 60,});
+      
+      PdfDrawer.drawText(page, font, reqName, { x: 1000, y: height - 90, size: 16, maxWidth: 500, });
+      PdfDrawer.drawText(page, font, reqDate, {x: 1000,y: height - 117,size: 16,maxWidth: 500,});
+      PdfDrawer.drawText(page, font, dimDate, {x: 1370,y: height - 117, size: 16, maxWidth: 500,});
+      
+    } else { // แนวตั้ง
+      PdfDrawer.drawText(page, font, data.topic, { x: 540, y: height - 22,size: 14,maxWidth: 400,});
+      PdfDrawer.drawText(page, font, data.orno, { x: 540,y: height - 53,size: 16, maxWidth: 400,});
+      PdfDrawer.drawText(page, font, data.rev, {x: 870, y: height - 53,size: 16, maxWidth: 60,});
+
+      PdfDrawer.drawText(page, font, reqName, { x: 870, y: height - 22, size: 14,maxWidth: 400,});
+      PdfDrawer.drawText(page, font, reqDate, {x: 870,y: height - 85,size: 16,maxWidth: 500,});
+      PdfDrawer.drawText(page, font, dimDate, {x: 870,y: height - 120, size: 16, maxWidth: 500,});
+    }
+
+    //  DIM
     PdfDrawer.drawCircleStamp(page, font, {
       x: isLandscape ? width - 210 : width - 260,
       y: isLandscape ? 200 : 68,
@@ -397,9 +408,8 @@ export class MfgOrService {
       throw new Error('FORMNO not found');
     }
 
-    //const pdfPath = 'O:\\Public\\golf\\A_TempFile\\MFG\\MFG-OR\\' + safeFormno + '\\' + safeFormno +'.pdf';
-    
-    const pdfPath = `${this.getBasePath()}${safeFormno}/${safeFormno}.pdf`;
+    const pdfPath = 'O:\\Public\\golf\\A_TempFile\\MFG\\MFG-OR\\' + safeFormno + '\\' + safeFormno +'.pdf';
+    //const pdfPath = `${this.getBasePath()}${safeFormno}/${safeFormno}.pdf`;
     console.log('PDF Path:', pdfPath);
     return pdfPath;
   }

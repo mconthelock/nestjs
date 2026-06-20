@@ -1,16 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
 import { FinPckService } from './fin-pck.service';
 import { CreateFinPckDto } from './dto/create-fin-pck.dto';
 import { UpdateFinPckDto } from './dto/update-fin-pck.dto';
+import { RequestFinpckFormDto } from './dto/request-fin-pck.dto';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
+import { getClientIP } from 'src/common/utils/ip.utils';
+import { Request } from 'express';
 
-@Controller('fin-pck')
+@Controller('finform/fin-pck')
 export class FinPckController {
   constructor(private readonly finPckService: FinPckService) {}
 
+  
   @Post()
-  create(@Body() createFinPckDto: CreateFinPckDto) {
-    return this.finPckService.create(createFinPckDto);
-  }
+  @UseTransaction('webformConnection')
+  @UseForceTransaction()
+     create(
+          @Body() dto: RequestFinpckFormDto,
+          @Req() req: Request,
+      ) {
+          const ip = getClientIP(req);
+          return this.finPckService.request(dto, ip);
+      }
 
   @Get()
   findAll() {

@@ -216,6 +216,7 @@ export class MfgOrService {
           ORNO: orno,
           CYEAR: String(dto.CYEAR2).slice(-2),
           SEQ: nextSeqNo,
+          CLASS: form.CLASS,
           TOPIC: form.TOPIC,
           REVNO: form.REV,
           ISSUE_DATE: () => 'SYSDATE',
@@ -245,6 +246,7 @@ export class MfgOrService {
         .createQueryBuilder()
         .update('MFGOR_CENTER')
         .set({
+          CLASS: form.CLASS,
           TOPIC: form.TOPIC,
           REVISE_DATE: () => 'SYSDATE',
           REVNO: form.REV,
@@ -261,27 +263,27 @@ export class MfgOrService {
     });
   }
 
+
   async searchMfgOrCenter(dto: SearchMfgOrCenterDto) {
     const orno = String(dto.ORNO || '').trim().toUpperCase();
     const topic = String(dto.TOPIC || '').trim().toUpperCase();
-    const classValue = String(dto.CLASS || '').trim();
+    const classValue = String(dto.CLASS || '').trim().toUpperCase();
     const cyear = String(dto.CYEAR || '').trim();
 
     const query = this.dataSource
       .createQueryBuilder()
       .select([
         'C.ORNO AS ORNO',
-        'C.TOPIC AS TOPIC',
-        'C.REVNO AS REVNO',
         'C.CYEAR AS CYEAR',
         'C.SEQ AS SEQ',
+        'C.CLASS AS CLASS',
+        'C.TOPIC AS TOPIC',
+        'C.REVNO AS REVNO',
         'C.ISSUE_DATE AS ISSUE_DATE',
         'C.REVISE_DATE AS REVISE_DATE',
         'C.FORMNO AS FORMNO',
-        'F.CLASS AS CLASS',
       ])
       .from('MFGOR_CENTER', 'C')
-      .leftJoin('MFGOR_FORM','F', `F.NFRMNO || F.VORGNO || F.CYEAR || F.CYEAR2 || F.NRUNNO = C.FORMNO`)
       .where('1 = 1');
 
     if (cyear) {
@@ -303,8 +305,8 @@ export class MfgOrService {
     }
 
     if (classValue) {
-      query.andWhere('F.CLASS = :CLASS', {
-        CLASS: classValue,
+      query.andWhere('UPPER(C.CLASS) LIKE :CLASS', {
+        CLASS: `${classValue}%`,
       });
     }
 

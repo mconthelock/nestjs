@@ -447,9 +447,7 @@ export class MfgOrService {
 
   private getPdfPath(formno: string): string {
     const safeFormno = String(formno || '').trim();
-    if (!safeFormno) {
-      throw new Error('FORMNO not found');
-    }
+    if (!safeFormno) {throw new Error('FORMNO not found');}
 
     //const pdfPath = 'O:\\Public\\golf\\A_TempFile\\MFG\\MFG-OR\\' + safeFormno + '\\' + safeFormno +'.pdf';
     const pdfPath = `${this.getBasePath()}${safeFormno}/${safeFormno}.pdf`;

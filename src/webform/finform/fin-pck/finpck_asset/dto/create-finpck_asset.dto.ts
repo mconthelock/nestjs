@@ -35,6 +35,13 @@ export class CreateFinpckAssetDto extends PickType(FormDto,[
     ASSETDESC: string;
 
     @IsOptional()
+    @Transform(({ value }) => {
+    if (!value) return value;
+    // สร้าง Date และบังคับให้ชี้ไปที่เที่ยงวัน (ป้องกันปัญหา Timezone เปลี่ยนวัน)
+    const date = new Date(value);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  })
     @IsDate()
     @Type(() => Date)
     DOCDATE?: Date; 
@@ -49,6 +56,12 @@ export class CreateFinpckAssetDto extends PickType(FormDto,[
     INITVAL?: number;
     
     @IsOptional()
+    @Transform(({ value }) => {
+    if (!value) return value;
+    const date = new Date(value);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  })
     @IsDate()
     @Type(() => Date)
     STARTDP?: Date; 

@@ -47,6 +47,15 @@ export class GroupedDataInputDto {
   @IsString()
   INC?: string;
 
+  @IsOptional()
+  @IsString()
+  SPOSCODE?: string;
+
+  
+  @IsOptional()
+  @IsString()
+  INCVORGNO?: string;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => AssetItemInputDto) // โยงไปหา DTO ข้อ 1

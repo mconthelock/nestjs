@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { FinpckFormRepository } from './finpck_form/finpck_form.repository';
-import { FinpckAssetRepository } from './finpck_asset/finpck_asset.repository';
+// import { FinpckFormRepository } from './finpck_form/finpck_form.repository';
+// import { FinpckAssetRepository } from './finpck_asset/finpck_asset.repository';
+import { FinpckFormService } from './finpck_form/finpck_form.service';
+import { FinpckAssetService } from './finpck_asset/finpck_asset.service';
 import { FormService } from 'src/webform/form/form.service';
 import { FlowService } from 'src/webform/flow/flow.service';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
@@ -12,13 +14,18 @@ import { UsersService } from 'src/amec/users/users.service';
 import { PappflowService } from 'src/amec/pappflow/pappflow.service';
 import { RequestFinpckFormDto } from './dto/request-fin-pck.dto';
 import { UpdateFinPckDto } from './dto/update-fin-pck.dto';
+import { In } from 'typeorm';
+import { OrgTreeService } from 'src/webform/org-tree/org-tree.service';
+import { log } from 'console';
 
 
 @Injectable()
 export class FinPckService {
   constructor(
-        private readonly formRepo: FinpckFormRepository,
-        private readonly assetRepo: FinpckAssetRepository,
+        // private readonly formRepo: FinpckFormRepository,
+        // private readonly assetRepo: FinpckAssetRepository,
+         private readonly formpckService: FinpckFormService,
+         private readonly assetService: FinpckAssetService,
          protected readonly formService: FormService ,
          protected readonly flowService: FlowService,
          protected readonly formmstService: FormmstService,
@@ -27,7 +34,8 @@ export class FinPckService {
          protected readonly insertFlowStepService: InsertFlowStepService,
          private readonly formCreateService: FormCreateService,
          private readonly usrService: UsersService,
-         private readonly pappFlowService: PappflowService
+         private readonly pappFlowService: PappflowService,
+         private readonly orgtree:OrgTreeService
      ) {}
    
      async request(
@@ -38,133 +46,155 @@ export class FinPckService {
              const { formData, groupedData } = dto;
 
              const { REQBY, INPUTBY, REMARK, ...data } = formData;
- 
-             // 1. สร้าง Form ก่อน
-             const createForm = await this.formCreateService.create(
-                 {
-                     NFRMNO: data.NFRMNO,
-                     VORGNO: data.VORGNO,
-                     CYEAR:  data.CYEAR,
-                     REQBY:  REQBY,
-                     INPUTBY: INPUTBY,
-                     REMARK: REMARK,
-                 },
-                 ip,
-             );
-             if (!createForm.status) {
-                 throw new Error(createForm.message.message);
-             }
-            //  const user =  await this.usrService.findEmp(REQBY);
-            //  if (user && Object.keys(user).length > 0) {
-            //    const slevel = user.SSECCODE !== "00" 
-            //      ? user.SSECCODE 
-            //      : (user.SDEPCODE && user.SDEPCODE !== "00" ? user.SDEPCODE : user.SDIVCODE);
-            //    const pappflow = await this.pappFlowService.findFlowWithSteps(slevel, 35);
-            //    if (pappflow && pappflow.length > 0 && pappflow[0].STEPS && pappflow[0].STEPS.length > 0) {
-            //      const buyer = pappflow[0].STEPS[0].SEMPNO;
-            //      const buyerrep = pappflow[0].STEPS[0].SEMPAPP;
-            //      await this.flowService.updateFlow({
-            //                  condition: {
-            //                      NFRMNO: dto.NFRMNO,
-            //                      VORGNO: dto.VORGNO,
-            //                      CYEAR:  dto.CYEAR,
-            //                      CYEAR2: createForm.data.CYEAR2,
-            //                      NRUNNO: createForm.data.NRUNNO,
-            //                      CEXTDATA: '02'
-            //                  },
-            //                      VAPVNO: buyer,
-            //                      VREPNO: buyerrep,
-            //              });
-            //  }
-            // }
-            // // throw new Error('Test Error After Create Form'); // - ทดสอบ error handling (ถ้า create form สำเร็จแล้ว จะเห็นว่ามีการลบไฟล์ที่ย้ายไปแล้วด้วย)
-            //  const form = {
-            //      NFRMNO: dto.NFRMNO,
-            //      VORGNO: dto.VORGNO,
-            //      CYEAR: dto.CYEAR,
-            //      CYEAR2: createForm.data.CYEAR2,
-            //      NRUNNO: createForm.data.NRUNNO,
-            //  };
- 
-            //  const datalist = 
-            //  {
-            //      LID : 1,
-            //      PURPOSE : data.PURPOSE,
-            //      TYPEJOB : data.TYPEJOB,
-            //      SERVICE : data.SERVICE,
-            //      VENDCODE : (data.REQTYPE === 'U' || data.REQTYPE === 'D') ? data.VENDORCODE:"",
-            //      REASON : (data.REQTYPE === 'D') ? data.REASON:"",
-            //      VENDTYPE : data.VENDOR_LOCATION,
-            //      COMNAME : data.COMPANY_NAME,
-            //      CONTACT : data.CONTACT,
-            //      EMAIL : data.EMAIL,
-            //      WEBSITE : data.WEBSITE,
-            //      TELNO : data.TELNO,
-            //      FAX : data.FAX,
-            //      BANKNAME : data.BANKNAME,
-            //      BRANCH : data.BRANCH,
-            //      ACCNUMBER : data.ACCNUMBER,
-            //      TERMCODE : data.TERMCODE
-            //  }
-            //  const addr = [];
-            //  let addid = 0;
-            //  if(data.ADDRESS_EN && data.ADDRESS_EN.trim().length > 0){
-            //      addid++;
-            //      addr.push({
-            //          ADDRID : addid,
-            //          ADDRTYPE : 'E',
-            //          ADDR : data.ADDRESS_EN,
-            //          SUBDISTRICT : data.SUB_DISTRICT_EN,
-            //          DISTRICT : data.DISTRICT_EN,
-            //          PROVINCE : data.PROVINCE_EN,
-            //          COUNTRY : data.COUNTRY_EN,
-            //          POSTCODE : data.POSTCODE_EN
- 
-            //      })
-            //  }
-            //  if(data.ADDRESS_TH && data.ADDRESS_TH.trim().length > 0){
-            //      addid++;
-            //      addr.push({
-            //          ADDRID : addid,
-            //          ADDRTYPE : 'T',
-            //          ADDR : data.ADDRESS_TH,
-            //          SUBDISTRICT : data.SUB_DISTRICT_TH,
-            //          DISTRICT : data.DISTRICT_TH,
-            //          PROVINCE : data.PROVINCE_TH,
-            //          COUNTRY : data.COUNTRY_TH,
-            //          POSTCODE : data.POSTCODE_TH
-            //      })
-            //  }
- 
-            //  // 4. บันทึกข้อมูล PUR-NVF form
-            //  await this.repo.insert({
-            //      ...form,
-            //      REQTYPE: data.REQTYPE,
-            //      ATTACH_TYPE: data.ATTACH_TYPE,
-            //      ATTACH_OTHER: data.ATTACH_OTHER,
-            //  });
-            //  await this.repolst.insert({
-            //      ...form,...datalist
-                 
-            //  });
-            //  for(const a of addr){
-            //      await this.repoaddr.insert({
-            //          ...form,
-            //          ...a
-            //      })
-            //  }
-            //  // 5. ย้ายไฟล์ไปยังปลายทางและ Insert ข้อมูลไฟล์ใหม่ (ถ้ามี)
-            //  if (files && files.length > 0) {
-            //      movedTargets = await this.moveFiles(
-            //          files,
-            //          form,
-            //          path,
-            //          dto.REQBY,
-            //      );
-            //  }
+
+             const FormResults = [];
+
+            for(const [index,group] of groupedData.entries())
+            {
+                    // 1. สร้าง Form ก่อน
+                    const createForm = await this.formCreateService.create(
+                        {
+                            NFRMNO: data.NFRMNO,
+                            VORGNO: data.VORGNO,
+                            CYEAR:  data.CYEAR,
+                            REQBY:  REQBY,
+                            INPUTBY: INPUTBY,
+                            REMARK: REMARK,
+                        },
+                        ip,
+                    );
+                    if (!createForm.status) {
+                        throw new Error(createForm.message.message);
+                    }
+                    // create form success
+                    const currentForm = {
+                        NFRMNO: data.NFRMNO,
+                        VORGNO: data.VORGNO,
+                        CYEAR: data.CYEAR,
+                        CYEAR2: createForm.data.CYEAR2,
+                        NRUNNO: createForm.data.NRUNNO,
+                    };
+                    const finpckForm = {
+                        ...currentForm,
+                        CCCODE:  group.CCCODE,
+                        CCDESC:  group.CCDESC,
+                        LOCCODE: group.LOCCODE,
+                        LOCNAME: group.LOCNAME,
+                    };
+                    await this.formpckService.create(finpckForm);
+                    await this.assetService.createMultipleAssets(currentForm,group.ASSETS);
+                    if (group.INC && String(group.INC).trim() !== '')
+                    {
+                        let repinc = await this.repService.getRepresent({NFRMNO: data.NFRMNO,
+                        VORGNO: data.VORGNO,
+                        CYEAR: data.CYEAR,
+                        VEMPNO: group.INC});
+                        const sposCode =  Number(group.SPOSCODE);
+                        await this.flowService.updateFlow({
+                             condition: {
+                                ...currentForm,
+                                 CEXTDATA: '01'
+                             },
+                                 VAPVNO: group.INC,
+                                 VREPNO: repinc,
+                        });
+                        if(sposCode == 30)
+                        {
+                            await this.flowService.updateFlow({
+                                condition: {
+                                    ...currentForm,
+                                    CEXTDATA: '02'
+                                },
+                                    VAPVNO: group.INC,
+                                    VREPNO: repinc,
+                            });
+                           const orgtree = await this.orgtree.getOrgTree(group.INCVORGNO , '21' , group.INC, '30' );
+                           if(orgtree && orgtree.length > 0)
+                           {
+                                repinc = await this.repService.getRepresent({NFRMNO: data.NFRMNO,
+                                VORGNO: data.VORGNO,
+                                CYEAR: data.CYEAR,
+                                VEMPNO: orgtree[0].VEMPNO});
+                                await this.flowService.updateFlow({
+                                condition: {
+                                    ...currentForm,
+                                    CEXTDATA: '04'
+                                },
+                                    VAPVNO: orgtree[0].VEMPNO,
+                                    VREPNO: repinc,
+                            });
+                           }else{
+                               await this.deleteFlowStepService.deleteFlowStep({...currentForm,CSTEPNO:'13' });
+                           }
+                           const orgtree1 = await this.orgtree.getOrgTree(group.INCVORGNO , '20' , group.INC, '30' );
+                           if(orgtree1 && orgtree1.length > 0)
+                           {
+                                repinc = await this.repService.getRepresent({NFRMNO: data.NFRMNO,
+                                VORGNO: data.VORGNO,
+                                CYEAR: data.CYEAR,
+                                VEMPNO: orgtree1[0].VEMPNO});
+                                await this.flowService.updateFlow({
+                                condition: {
+                                    ...currentForm,
+                                    CEXTDATA: '05'
+                                },
+                                    VAPVNO: orgtree1[0].VEMPNO,
+                                    VREPNO: repinc,
+                            });
+                           }
+                        }else if(sposCode == 21)
+                        {
+                            //delete step Form SEM
+                            await this.deleteFlowStepService.deleteFlowStep({...currentForm,CSTEPNO:'10' });
+                            await this.flowService.updateFlow({
+                                condition: {
+                                    ...currentForm,
+                                    CEXTDATA: '04'
+                                },
+                                    VAPVNO: group.INC,
+                                    VREPNO: repinc,
+                            });
+                          const orgtree = await this.orgtree.getOrgTree(group.INCVORGNO , '20' , group.INC, '21' );
+                           if(orgtree && orgtree.length > 0)
+                           {
+                                repinc = await this.repService.getRepresent({NFRMNO: data.NFRMNO,
+                                VORGNO: data.VORGNO,
+                                CYEAR: data.CYEAR,
+                                VEMPNO: orgtree[0].VEMPNO});
+                                await this.flowService.updateFlow({
+                                condition: {
+                                    ...currentForm,
+                                    CEXTDATA: '05'
+                                },
+                                    VAPVNO: orgtree[0].VEMPNO,
+                                    VREPNO: repinc,
+                            });
+                           }
+
+                        }else if(sposCode <= 20)
+                        {
+                            //delete step Form SEM
+                            await this.deleteFlowStepService.deleteFlowStep({...currentForm,CSTEPNO:'10' });
+                            //delete step Form DDEM
+                            await this.deleteFlowStepService.deleteFlowStep({...currentForm,CSTEPNO:'11' });
+                            await this.flowService.updateFlow({
+                                condition: {
+                                    ...currentForm,
+                                    CEXTDATA: '05'
+                                },
+                                    VAPVNO: group.INC,
+                                    VREPNO: repinc,
+                            });
+
+                        }
+                    }
+                    FormResults.push(currentForm);
+
+            }
              return {
                  status: true,
                  message: 'Request successful',
+                 createdForms:FormResults
              };
          } catch (error) {
       

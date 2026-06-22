@@ -41,8 +41,9 @@ import { GeneralPartListModule } from './general-part-list/general-part-list.mod
 import { MfgEdrModule } from './webform/mfgform/mfg-edr/mfg-edr.module';
 import { MfgOrModule } from './webform/mfgform/mfg-or/mfg-or.module';
 import { MfgReportModule } from './mfgreport/mfgreport.module';
-import { FinpckFormModule } from './finform/fin-pck/finpck_form/finpck_form.module';
-import { FinpckAssetModule } from './finform/fin-pck/finpck_asset/finpck_asset.module';
+// FIN-PCK
+import { FinpckFormModule } from './webform/finform/fin-pck/finpck_form/finpck_form.module';
+import { FinpckAssetModule } from './webform/finform/fin-pck/finpck_asset/finpck_asset.module';
 
 @Module({
     imports: [
@@ -82,6 +83,7 @@ import { FinpckAssetModule } from './finform/fin-pck/finpck_asset/finpck_asset.m
         MfgEdrModule,
         MfgReportModule,
         MfgOrModule,
+        //FIN-PCK
         FinpckFormModule,
         FinpckAssetModule,
     ],

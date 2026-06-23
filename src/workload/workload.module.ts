@@ -10,6 +10,7 @@ import { DpmsPlCaseListModule } from './dpms_pl_case_list/dpms_pl_case_list.modu
 import { DpmsPlCaseListDetailModule } from './dpms_pl_case_list_detail/dpms_pl_case_list_detail.module';
 import { DpmsPlIssueDateModule } from './dpms_pl_issue_date/dpms_pl_issue_date.module';
 import { AmecordersScheduleModule } from './amecorders_schedule/amecorders_schedule.module';
+import { DpmsPlMailModule } from './dpms_pl_mail/dpms_pl_mail.module';
 
 @Module({
     imports: [
@@ -24,6 +25,7 @@ import { AmecordersScheduleModule } from './amecorders_schedule/amecorders_sched
         DpmsPlCaseListDetailModule,
         DpmsPlIssueDateModule,
         AmecordersScheduleModule,
+        DpmsPlMailModule,
     ],
 })
 export class WorkloadModule {}

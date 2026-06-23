@@ -60,6 +60,9 @@ export class DPMS_PACKING_LIST{
     WEIGHT: string;
 
     @Column()
+    PO: string;
+
+    @Column()
     COMBINE: string;
 
     @Column()

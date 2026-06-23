@@ -19,6 +19,8 @@ export class J002mpRepository extends BaseRepository {
             J2ODR: dto.ISSUENO,
             J2MTH: dto.SCHEDULE,
             J2TO: dto.ISSUETO,
+            J2CUS: dto.ORDER,
+            J2IINO: dto.ITEM,
             J2SEQ: Not(0),
         }});
       }

@@ -14,4 +14,17 @@ export class FinpckFormRepository extends BaseRepository {
     async createForm(dto: CreateFinpckFormDto){
         return await this.getRepository(FINPCK_FORM).save(dto);
     }
+
+    async getData(dto: FormDto) {
+                return await this.getRepository(FINPCK_FORM).findOne({
+                    where: {
+                        ...dto,
+                    },
+                    relations: {
+                        ASSETS: {
+                            GRP: true
+                        }
+                    },
+                });
+    }
 }

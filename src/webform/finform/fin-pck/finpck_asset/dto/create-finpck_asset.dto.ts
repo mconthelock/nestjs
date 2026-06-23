@@ -167,7 +167,7 @@ export class CreateFinpckAssetDto extends PickType(FormDto,[
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    MOVEMNET?: number; 
+    MOVEMENT?: number; 
 
     @IsOptional()
     @IsNumber()

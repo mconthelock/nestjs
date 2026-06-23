@@ -38,7 +38,7 @@ export class FINPCK_FORM {
     LOCNAME: string;
 
     @OneToMany(() => FINPCK_ASSET, (l) => l.MASTER_PCKFORM)
-    PCKFORM: FINPCK_ASSET[];
+    ASSETS: FINPCK_ASSET[];
     // @OneToMany(() => PURNVF_ADDRESS, (a) => a.MASTER_NVFADDR)
     // ADDRESSES: PURNVF_ADDRESS[];
 }

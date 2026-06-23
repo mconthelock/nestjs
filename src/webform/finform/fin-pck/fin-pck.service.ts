@@ -103,7 +103,7 @@ export class FinPckService {
                             await this.flowService.updateFlow({
                                 condition: {
                                     ...currentForm,
-                                    CEXTDATA: '02'
+                                    CEXTDATA: '03'
                                 },
                                     VAPVNO: group.INC,
                                     VREPNO: repinc,
@@ -176,7 +176,7 @@ export class FinPckService {
                             //delete step Form SEM
                             await this.deleteFlowStepService.deleteFlowStep({...currentForm,CSTEPNO:'10' });
                             //delete step Form DDEM
-                            await this.deleteFlowStepService.deleteFlowStep({...currentForm,CSTEPNO:'11' });
+                            await this.deleteFlowStepService.deleteFlowStep({...currentForm,CSTEPNO:'13' });
                             await this.flowService.updateFlow({
                                 condition: {
                                     ...currentForm,

@@ -22,6 +22,14 @@ export class FinpckFormService {
         }
   }
 
+  async getData(dto: FormDto) {
+        try {
+            return await this.repo.getData(dto);
+        } catch (error) {
+            throw new Error('Get PUR-NVF Form Error: ' + error.message);
+        }
+    }
+
   
 
   findAll() {

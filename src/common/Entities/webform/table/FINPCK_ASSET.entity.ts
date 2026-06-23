@@ -117,7 +117,7 @@ export class FINPCK_ASSET {
     DAMAGE: number;
 
     @Column()
-    MOVEMNET: number;
+    MOVEMENT: number;
 
     @Column()
     OTHCAUSE: number;
@@ -128,7 +128,7 @@ export class FINPCK_ASSET {
     @Column()
     PIC : string;   
 
-  @ManyToOne(() => FINPCK_FORM, (pckf) => pckf.PCKFORM)
+  @ManyToOne(() => FINPCK_FORM, (pckf) => pckf.ASSETS)
   @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
   @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
   @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })

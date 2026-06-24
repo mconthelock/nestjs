@@ -5,6 +5,7 @@ import { DataSource } from 'typeorm';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { INV_HALFYEAR_RESULT } from 'src/common/Entities/skid/table/INV_HALFYEAR_RESULT.entity';
 import { PSCIH_FORM } from 'src/common/Entities/webform/table/PSCIH_FORM.entity';
+import { INV_CHECK_LOG } from 'src/common/Entities/skid/table/PSINV_CHECK_LOG.entity';
 
 @Injectable()
 export class PsCihRepository extends BaseRepository {
@@ -25,6 +26,7 @@ export class PsCihRepository extends BaseRepository {
             LEFT JOIN SKIDCNTRL.INV_HALFYEAR_RESULT ihr ON pf.REPORT_ID = ihr.REPORT_ID 
             LEFT JOIN SKIDCNTRL.MV_IMM_ITEMMST ii ON ii.IPROD = ihr.ITEM_CODE
             WHERE pf.NFRMNO = :1 AND pf.VORGNO = :2 AND pf.CYEAR = :3 AND pf.CYEAR2 = :4 AND pf.NRUNNO = :5
+            ORDER BY ihr.GROUP_CODE,ihr.CONTROLLER_ID,ii.IABBT
         `;
 
         const data = await this.manager.query(sql, [
@@ -34,6 +36,32 @@ export class PsCihRepository extends BaseRepository {
             CYEAR2,
             NRUNNO,
         ]);
+
+        const report_id = data?.[0]?.REPORT_ID;
+
+        const logs = await this.getRepository(INV_CHECK_LOG).find({
+            where: { REPORT_ID: report_id },
+            order: { EDIT_AT: 'DESC' },
+        });
+
+        const logMap = logs.reduce(
+            (acc, log) => {
+                const key = log.ITEM_CODE;
+                if (!acc[key]) {
+                    acc[key] = [];
+                }
+                acc[key].push(log);
+                return acc;
+            },
+            {} as Record<string, INV_CHECK_LOG[]>,
+        );
+
+        return data.map((row) => ({
+            ...row,
+            LOG_EDIT: logMap[row.IPROD] ?? [],
+        }));
+
+        console.log('Logs:', logs);
 
         return data;
     }

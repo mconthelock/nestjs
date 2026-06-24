@@ -16,6 +16,7 @@ module.exports = {
             wait_ready: true,
             listen_timeout: 60000,
             kill_timeout: 5000,
+            node_args: '--inspect',
             env: {
                 NEST_DEBUG: 'true', // เปิดใช้งานตัว Debug Logger
             },

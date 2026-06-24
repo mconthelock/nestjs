@@ -21,4 +21,14 @@ export class getData {
     @IsString()
     @Type(() => String)
     ISSUETO?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    ITEM?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    ORDER?: string;
 }

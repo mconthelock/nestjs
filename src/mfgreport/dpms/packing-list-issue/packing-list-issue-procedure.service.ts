@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { PackingListIssueProcedureRepository } from './packing-list-issue.repository';
+import { PackingListIssueProcedureWorkloadRepository, PackinglistIssueProcedureDataCenterRepository } from './packing-list-issue.repository';
 
 @Injectable()
 export class PackingListIssueProcedureService {
     constructor(
-        private readonly procedureRepo: PackingListIssueProcedureRepository,
+        private readonly workloadRepo: PackingListIssueProcedureWorkloadRepository,
+        private readonly dataCenterRepo: PackinglistIssueProcedureDataCenterRepository,
     ) {}
 
     async getReportProdList(prod: string) {
         try {
-            const res = await this.procedureRepo.getReportProdList(prod);
+            const res = await this.workloadRepo.getReportProdList(prod);
             if (res.length === 0) {
                 return {
                     status: false,
@@ -29,7 +30,7 @@ export class PackingListIssueProcedureService {
 
     async getReportDayList(day: string) {
         try {
-            const res = await this.procedureRepo.getReportDayList(day);
+            const res = await this.workloadRepo.getReportDayList(day);
             if (res.length === 0) {
                 return {
                     status: false,
@@ -42,6 +43,24 @@ export class PackingListIssueProcedureService {
             };
         } catch (error) {
             throw new Error(`Failed to get report day list: ${error.message}`);
+        }
+    }
+
+    async getShopOrder(ordermain: string) {
+        try {
+            const res = await this.dataCenterRepo.getShopOrder(ordermain);
+            if (res.length === 0 || !res[0].SHOP_ORDER) {
+                return {
+                    status: false,
+                    message: 'No data found',
+                };
+            }
+            return {
+                status: true,
+                data: res[0].SHOP_ORDER,
+            };
+        } catch (error) {
+            throw new Error(`Failed to get shop order: ${error.message}`);
         }
     }
 }

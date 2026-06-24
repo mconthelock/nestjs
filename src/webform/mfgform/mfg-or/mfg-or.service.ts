@@ -5,7 +5,6 @@ import { CreateMfgOrDto } from './dto/create-mfg-or.dto';
 import { GetMfgOrDto } from './dto/get-mfg-or.dto';
 import { SearchMfgOrCenterDto } from './dto/search-mfg-or-center.dto';
 import * as path from 'path';
-import { PDFDocument, PDFPage, PDFFont } from 'pdf-lib';
 import {
   PdfDrawer,
   PdfDocumentHelper,
@@ -166,8 +165,17 @@ export class MfgOrService {
     return this.dataSource.transaction(async manager => {
       const form = await this.getMfgOrFormByKey(manager, dto);
 
-      if (!form) {
-        throw new Error('MFGOR_FORM not found');
+      if (!form) { throw new Error('MFGOR_FORM not found');}
+
+      if (String(form.ORNO || '').trim()) {
+        return {
+          status: true,
+          TYPEFORM: 'NEW',
+          skipped: true,
+          message: 'ORNO already generated',
+          SEQNO: form.SEQNO,
+          ORNO: form.ORNO,
+        };
       }
 
       const key = this.getKey(dto);
@@ -197,6 +205,7 @@ export class MfgOrService {
         .andWhere('CYEAR = :CYEAR', key)
         .andWhere('CYEAR2 = :CYEAR2', key)
         .andWhere('NRUNNO = :NRUNNO', key)
+        .andWhere('(ORNO IS NULL OR TRIM(ORNO) = \'\')')
         .execute();
 
       await manager
@@ -207,6 +216,7 @@ export class MfgOrService {
           ORNO: orno,
           CYEAR: String(dto.CYEAR2).slice(-2),
           SEQ: nextSeqNo,
+          CLASS: form.CLASS,
           TOPIC: form.TOPIC,
           REVNO: form.REV,
           ISSUE_DATE: () => 'SYSDATE',
@@ -236,6 +246,7 @@ export class MfgOrService {
         .createQueryBuilder()
         .update('MFGOR_CENTER')
         .set({
+          CLASS: form.CLASS,
           TOPIC: form.TOPIC,
           REVISE_DATE: () => 'SYSDATE',
           REVNO: form.REV,
@@ -252,20 +263,83 @@ export class MfgOrService {
     });
   }
 
+
   async searchMfgOrCenter(dto: SearchMfgOrCenterDto) {
-    const data = await this.dataSource
+    const orno = String(dto.ORNO || '').trim().toUpperCase();
+    const topic = String(dto.TOPIC || '').trim().toUpperCase();
+    const classValue = String(dto.CLASS || '').trim().toUpperCase();
+    const cyear = String(dto.CYEAR || '').trim();
+
+    const query = this.dataSource
       .createQueryBuilder()
-      .select('A.*')
-      .from('MFGOR_CENTER', 'A')
-      .where('UPPER(A.ORNO) = :ORNO', {
-        ORNO: String(dto.ORNO).trim().toUpperCase(),
-      })
-      .getRawOne();
+      .select([
+        'C.ORNO AS ORNO',
+        'C.CYEAR AS CYEAR',
+        'C.SEQ AS SEQ',
+        'C.CLASS AS CLASS',
+        'C.TOPIC AS TOPIC',
+        'C.REVNO AS REVNO',
+        'C.ISSUE_DATE AS ISSUE_DATE',
+        'C.REVISE_DATE AS REVISE_DATE',
+        'C.FORMNO AS FORMNO',
+      ])
+      .from('MFGOR_CENTER', 'C')
+      .where('1 = 1');
+
+    if (cyear) {
+      query.andWhere('C.CYEAR = :CYEAR', {
+        CYEAR: cyear.slice(-2),
+      });
+    }
+
+    if (orno) {
+      query.andWhere('UPPER(C.ORNO) LIKE :ORNO', {
+        ORNO: `%${orno}%`,
+      });
+    }
+
+    if (topic) {
+      query.andWhere('UPPER(C.TOPIC) LIKE :TOPIC', {
+        TOPIC: `%${topic}%`,
+      });
+    }
+
+    if (classValue) {
+      query.andWhere('UPPER(C.CLASS) LIKE :CLASS', {
+        CLASS: `${classValue}%`,
+      });
+    }
+
+    const data = await query
+      .orderBy('C.CYEAR', 'DESC')
+      .addOrderBy('C.SEQ', 'DESC')
+      .getRawMany();
 
     return {
-      status: !!data,
+      status: true,
+      count: data.length,
       data,
     };
+  }
+
+  private async updateStampedPdfAtt(
+    dto: GetMfgOrDto & { FORMNO?: string },
+    filename: string,
+  ) {
+    const key = this.getKey(dto);
+    await this.dataSource
+      .createQueryBuilder()
+      .update('MFGOR_ATT')
+      .set({
+        FILENAME: filename,
+      })
+      .where('NFRMNO = :NFRMNO', key)
+      .andWhere('VORGNO = :VORGNO', key)
+      .andWhere('CYEAR = :CYEAR', key)
+      .andWhere('CYEAR2 = :CYEAR2', key)
+      .andWhere('NRUNNO = :NRUNNO', key)
+      .andWhere('ID = :ID', { ID: 2 })
+      .execute();
   }
 
   //* ************************************* STAMP PDF *****************************************//
@@ -283,6 +357,8 @@ export class MfgOrService {
       flow,
       head,
     });
+
+    await this.updateStampedPdfAtt(dto, `${formno}_stamp.pdf`);
 
     return {
       status: true,
@@ -312,26 +388,37 @@ export class MfgOrService {
       rev: String(head.REV || '').trim(),
     };
 
-
-    if (isLandscape) { // แนวนอน
-      PdfDrawer.drawText(page, font, data.topic, { x: 530, y: height - 90, size: 16, maxWidth: 500, });
-      PdfDrawer.drawText(page, font, data.orno, {x: 530,y: height - 115,size: 16,maxWidth: 500,});
-      PdfDrawer.drawText(page, font, data.rev, {x: 1380,y: height - 90, size: 16, maxWidth: 60,});
-      
-    } else { // แนวตั้ง
-      PdfDrawer.drawText(page, font, data.topic, { x: 550, y: height - 24,size: 14,maxWidth: 400,});
-      PdfDrawer.drawText(page, font, data.orno, { x: 550,y: height - 52,size: 16, maxWidth: 400,});
-      PdfDrawer.drawText(page, font, data.rev, {x: 870, y: height - 52,size: 16, maxWidth: 60,});
-    }
-
+    const req = flow.find(f => String(f.CSTEPNO) === '--');
     const dim = flow.find(f => String(f.CSTEPNO) === '02');
     const sem = flow.find(f => String(f.CSTEPNO) === '06');
+    const reqName = Optiongetdata.getStampName(req?.VAPVNO,req?.APV_NAME,);
     const dimName = Optiongetdata.getStampName(dim?.VAPVNO,dim?.APV_NAME,);
     const semName = Optiongetdata.getStampName(sem?.VAPVNO, sem?.APV_NAME,);
+    const reqDate = Optiongetdata.getStampDate(req?.DAPVDATE);
     const dimDate = Optiongetdata.getStampDate(dim?.DAPVDATE);
     const semDate = Optiongetdata.getStampDate(sem?.DAPVDATE);
 
-    // \ DIM
+
+    if (isLandscape) { // แนวนอน
+      //PdfDrawer.drawText(page, font, data.topic, { x: 530, y: height - 90, size: 16, maxWidth: 500, });
+      PdfDrawer.drawText(page, font, data.orno, {x: 530,y: height - 117,size: 16,maxWidth: 500,});
+      PdfDrawer.drawText(page, font, data.rev, {x: 1370,y: height - 90, size: 16, maxWidth: 60,});
+      
+      PdfDrawer.drawText(page, font, reqName, { x: 1000, y: height - 90, size: 16, maxWidth: 500, });
+      PdfDrawer.drawText(page, font, reqDate, {x: 1000,y: height - 117,size: 16,maxWidth: 500,});
+      PdfDrawer.drawText(page, font, dimDate, {x: 1370,y: height - 117, size: 16, maxWidth: 500,});
+      
+    } else { // แนวตั้ง
+      //PdfDrawer.drawText(page, font, data.topic, { x: 540, y: height - 22,size: 14,maxWidth: 400,});
+      PdfDrawer.drawText(page, font, data.orno, { x: 540,y: height - 53,size: 16, maxWidth: 400,});
+      PdfDrawer.drawText(page, font, data.rev, {x: 870, y: height - 53,size: 16, maxWidth: 60,});
+
+      PdfDrawer.drawText(page, font, reqName, { x: 870, y: height - 22, size: 14,maxWidth: 400,});
+      PdfDrawer.drawText(page, font, reqDate, {x: 870,y: height - 85,size: 16,maxWidth: 500,});
+      PdfDrawer.drawText(page, font, dimDate, {x: 870,y: height - 120, size: 16, maxWidth: 500,});
+    }
+
+    //  DIM
     PdfDrawer.drawCircleStamp(page, font, {
       x: isLandscape ? width - 210 : width - 260,
       y: isLandscape ? 200 : 68,
@@ -362,12 +449,9 @@ export class MfgOrService {
 
   private getPdfPath(formno: string): string {
     const safeFormno = String(formno || '').trim();
-    if (!safeFormno) {
-      throw new Error('FORMNO not found');
-    }
+    if (!safeFormno) {throw new Error('FORMNO not found');}
 
     //const pdfPath = 'O:\\Public\\golf\\A_TempFile\\MFG\\MFG-OR\\' + safeFormno + '\\' + safeFormno +'.pdf';
-    
     const pdfPath = `${this.getBasePath()}${safeFormno}/${safeFormno}.pdf`;
     console.log('PDF Path:', pdfPath);
     return pdfPath;

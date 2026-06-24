@@ -26,7 +26,7 @@
                 <mj-text color="#555">{{message}}</mj-text>
 
                 <!-- Table -->
-                {{#if table}}
+                {{#if showTable}}
                 <mj-table width="100%" table-layout="fixed">
 
                     <tr style="background:#e5e7eb; font-weight:bold;">
@@ -37,7 +37,7 @@
                     {{#each tableRows}}
                     <tr style="border-bottom:1px solid #eee;">
                         {{#each this}}
-                        <td style="padding:8px;">{{this}}</td>
+                        <td style="padding:8px;">{{{this}}}</td>
                         {{/each}}
                     </tr>
                     {{/each}}

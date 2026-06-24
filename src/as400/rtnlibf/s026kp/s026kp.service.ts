@@ -21,7 +21,7 @@ export class S026kpService {
                     COALESCE(CASE WHEN TRIM(MRKLN9) <> '' THEN TRIM(MRKLN9) || '|' END, '') ||
                     COALESCE(CASE WHEN TRIM(MRKLN0) <> '' THEN TRIM(MRKLN0) || '|' END, '')
                 , '|') AS SHIPPING_MARK
-            FROM RTNLIBF.S026KP WHERE PROJCT LIKE '%${projno}%'`,
+            FROM RTNLIBF.S026KP WHERE TRIM(PROJCT) = TRIM('${projno}')`,
         );
         return result;
     }

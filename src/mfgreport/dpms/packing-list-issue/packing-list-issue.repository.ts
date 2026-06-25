@@ -4,7 +4,7 @@ import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 
 @Injectable()
-export class PackingListIssueProcedureRepository extends OracleRepository {
+export class PackingListIssueProcedureWorkloadRepository extends OracleRepository {
     constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
@@ -15,5 +15,15 @@ export class PackingListIssueProcedureRepository extends OracleRepository {
 
     async getReportDayList(day: string) {
         return this.execCursor('DPMS_PL_DAY_REPORT', { day }, ['day']);
+    }
+}
+
+export class PackinglistIssueProcedureDataCenterRepository extends OracleRepository {
+    constructor(@InjectDataSource('datacenterConnection') ds: DataSource) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
+    }
+
+    async getShopOrder(ordermain: string) {
+        return this.execCursor('DPMS_PL_SHOP_ORDER', { ordermain }, ['ordermain']);
     }
 }

@@ -24,6 +24,8 @@ import { PurFormModule } from './purform/purform.module';
 import { PsFormModule } from './psform/psform.module';
 import { RqflistModule } from './rqflist/rqflist.module';
 import { MfgOrModule } from './mfgform/mfg-or/mfg-or.module';
+import { VorgmstModule } from './vorgmst/vorgmst.module';
+import { GrpmstModule } from './grpmst/grpmst.module';
 
 @Module({
     imports: [
@@ -51,7 +53,9 @@ import { MfgOrModule } from './mfgform/mfg-or/mfg-or.module';
         PsFormModule,
         STFormModule,
         RqflistModule,
-        MfgOrModule
+        VorgmstModule,
+        MfgOrModule,
+        GrpmstModule
     ],
 })
 export class WebformModule {}

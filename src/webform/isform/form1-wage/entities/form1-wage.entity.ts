@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import { Pposition } from 'src/amec/pposition/entities/pposition.entity';
+import { PPOSITION } from 'src/common/Entities/amec/table/PPOSITION.entity';
 
 @Entity('FORM1_WAGE')
 export class Form1Wage {
@@ -15,7 +15,7 @@ export class Form1Wage {
   @Column()
   CSTATUS: string;
 
-  @OneToOne(() => Pposition, (pos) => pos.wage)
+  @OneToOne(() => PPOSITION, (pos) => pos.wage)
   @JoinColumn({ name: 'POSITION', referencedColumnName: 'SPOSCODE' })
-  pposition: Pposition;
+  pposition: PPOSITION;
 }

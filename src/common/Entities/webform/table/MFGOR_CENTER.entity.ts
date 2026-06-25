@@ -13,6 +13,9 @@ export class Mfgor_center {
   SEQ: number;
 
   @Column()
+  CLASS: string | null;
+
+  @Column()
   TOPIC: string | null;
 
   @Column()

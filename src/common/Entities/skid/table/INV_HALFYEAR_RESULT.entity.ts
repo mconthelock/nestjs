@@ -1,4 +1,12 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    OneToOne,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 import { PSCIH_FORM } from '../../webform/table/PSCIH_FORM.entity';
 import { INV_CHECK_LOG } from './PSINV_CHECK_LOG.entity';
 import { ImmItemmst } from '../views/imm_itemmst.entity';
@@ -71,6 +79,24 @@ export class INV_HALFYEAR_RESULT {
 
     @Column({ type: 'date', nullable: true })
     UPDATED_AT: Date;
+
+    @Column()
+    ORIGINAL_RECHECK_QTY: number;
+
+    @Column()
+    RECHECK_QTY: number;
+
+    @Column({ nullable: true })
+    ORIGINAL_RECHECK_REMARK: string;
+
+    @Column({ nullable: true })
+    RECHECK_REMARK: string;
+
+    @Column()
+    FINAL_QTY: number;
+
+    @Column({ type: 'float', nullable: true })
+    PRICE : number;
 
     @ManyToOne(() => PSCIH_FORM, (f) => f.RESULT)
     @JoinColumn([{ name: 'REPORT_ID', referencedColumnName: 'REPORT_ID' }])

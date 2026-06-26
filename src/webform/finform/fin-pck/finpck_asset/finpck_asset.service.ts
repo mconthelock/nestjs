@@ -51,6 +51,10 @@ export class FinpckAssetService {
 
   }
 
+  update(id: number, updateFinpckAssetDto: UpdateFinpckAssetDto) {
+    return `This action updates a #${id} finpckAsset`;
+  }
+
   create(createFinpckAssetDto: CreateFinpckAssetDto) {
     return 'This action adds a new finpckAsset';
   }
@@ -63,9 +67,7 @@ export class FinpckAssetService {
     return `This action returns a #${id} finpckAsset`;
   }
 
-  update(id: number, updateFinpckAssetDto: UpdateFinpckAssetDto) {
-    return `This action updates a #${id} finpckAsset`;
-  }
+
 
   remove(id: number) {
     return `This action removes a #${id} finpckAsset`;

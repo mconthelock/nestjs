@@ -5,6 +5,7 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FormDto} from 'src/webform/form/dto/form.dto';
 import { DataSource } from 'typeorm';
 import { CreateFinpckAssetDto } from './dto/create-finpck_asset.dto';
+import { UpdateFinpckAssetDto } from './dto/update-finpck_asset.dto';
 
 @Injectable()
 export class FinpckAssetRepository extends BaseRepository {
@@ -37,5 +38,26 @@ async bulkInsertAssets(assets: CreateFinpckAssetDto[]){
             .values(assets)
             .execute();
        return result;
+    }
+    
+    async upsertAssets(assets: UpdateFinpckAssetDto[]) {
+        if (!assets || assets.length === 0) return;
+        const conflictKeys = ['NFRMNO', 'VORGNO', 'CYEAR', 'CYEAR2', 'NRUNNO', 'ID'];
+        const updateColumns = Object.keys(assets[0]).filter(
+            (key) => !conflictKeys.includes(key)
+        );
+        if (updateColumns.length === 0) return;
+        const result = await this.getRepository(FINPCK_ASSET)
+            .createQueryBuilder()
+            .insert()
+            .into(FINPCK_ASSET)
+            .values(assets)
+            .orUpdate(
+                updateColumns, // ใช้ตัวแปรนี้แทนการระบุ ['QTY', 'REMARK', ...] เอง
+                conflictKeys   // ระบุคีย์เพื่อบอก Database ว่าจะเช็คข้อมูลซ้ำจากฟิลด์ไหน
+            )
+            .execute();
+
+        return result;
     }
 }

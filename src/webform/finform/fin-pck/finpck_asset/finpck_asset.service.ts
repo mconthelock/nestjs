@@ -51,6 +51,28 @@ export class FinpckAssetService {
 
   }
 
+  async updateMultipleAssets(assetsDto:UpdateFinpckAssetDto[])
+  {
+    try {
+      if (!assetsDto || assetsDto.length === 0) {
+        return {
+          status: true,
+          message: 'No Assets update',
+        };
+      }
+      const result = await this.repo.upsertAssets(assetsDto);
+      return {
+        status: true,
+        message: 'Updaet Assets success',
+        data: result, 
+      };
+
+    } catch (error) {
+       throw new Error('Updaet FINPCK_ASSET Error: ' + error.message);
+    }
+    
+  }
+
   update(id: number, updateFinpckAssetDto: UpdateFinpckAssetDto) {
     return `This action updates a #${id} finpckAsset`;
   }

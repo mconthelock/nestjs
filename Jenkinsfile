@@ -37,9 +37,8 @@ pipeline {
                     }
                     // กรณีอื่นๆ (เช่น GitLab Webhook ผลักมา หรือกดมือแต่เลือก development)
                     else {
-                        //env.TARGET_DIR = '/var/amecweb/wwwroot/development/api'
+                        env.TARGET_DIR = '/var/amecweb/wwwroot/development/api'
                         //env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\development"
-                        env.TARGET_DIR = 'D:\\\\wwwroot\\\\api'
                         env.NAS_PATH = "D:\\\\wwwroot"
                         env.REMOTE_HOST = 'amecwebtest'
                         env.ENV_CRED_ID = 'api-env-file'

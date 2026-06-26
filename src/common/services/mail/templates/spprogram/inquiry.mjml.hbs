@@ -23,32 +23,26 @@
                     Dear {{recipientName}},
                 </mj-text>
 
-                <mj-text color="#555">
-                    This is to inform you that there are pending forms that have not been processed or responded to
-                    within the specified period (2–3 weeks).
-                    Please review the pending items listed below and follow up with the responsible users accordingly.
-                </mj-text>
+                <mj-text color="#555">{{message}}</mj-text>
 
                 <!-- Table -->
+                {{#if showTable}}
                 <mj-table width="100%" table-layout="fixed">
 
                     <tr style="background:#e5e7eb; font-weight:bold;">
-                        <th width="12%" style="padding:8px;">Inquiry No.</th>
-                        <th width="10%" style="padding:8px;">Revision</th>
-                        <th width="20%" style="padding:8px;">Link</th>
+                        {{#each tableHeaders}}
+                        <th width="12%" style="padding:8px;">{{this}}</th>
+                        {{/each}}
                     </tr>
-
-
+                    {{#each tableRows}}
                     <tr style="border-bottom:1px solid #eee;">
-                        <td style="padding:8px;">Alabaka</td>
-                        <td style="padding:8px;">melomelo weeks</td>
-                        <td style="padding:8px; text-align:center;">
-                            <a href="#">
-                                View Form
-                            </a>
-                        </td>
+                        {{#each this}}
+                        <td style="padding:8px;">{{{this}}}</td>
+                        {{/each}}
                     </tr>
+                    {{/each}}
                 </mj-table>
+                {{/if}}
             </mj-column>
         </mj-section>
 

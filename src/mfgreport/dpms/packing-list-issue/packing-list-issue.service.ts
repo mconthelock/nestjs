@@ -113,11 +113,12 @@ export class PackingListIssueService {
             const revisionText: string = numberToAlphabetRevision(revision);
 
             // 3. create PDF file
-            const fileName: string = `${dto.HEADER.VNAMEOFBLDG.split(' ')[0] ?? ''}_${dto.VORDERS}${revision > 0 ? `_${revisionText}` : ''}.pdf`;
+            const fileName: string = `${dto.HEADER.VNAMEOFBLDG}_${dto.VORDERS}${revision > 0 ? `_${revisionText}` : ''}.pdf`;
+            const newFileName : string = fileName.replace(/[\\/:*?"<>|]/g, '_')
             const pdf = await this.generatePDF({
                 order: dto.VORDERS,
                 html: dto.HTML,
-                fileName,
+                fileName: newFileName,
                 revision: revisionText,
                 issueDate,
                 finalPath,
@@ -125,8 +126,8 @@ export class PackingListIssueService {
 
             // 3. add file Data to DB
             const insertFile = await this.dpmsPlFileService.create({
-                VFILE_ONAME: fileName,
-                VFILE_FNAME: fileName,
+                VFILE_ONAME: newFileName,
+                VFILE_FNAME: newFileName,
                 VFILE_USERCREATE: 'system',
                 NFILE_TYPE: dto.ISSUETYPE,
                 VFILE_PATH: finalPath,
@@ -192,7 +193,7 @@ export class PackingListIssueService {
                 bcc: process.env.MAIL_ADMIN,
                 attachments: [
                     {
-                        filename: fileName,
+                        filename: newFileName,
                         content: pdf.data,
                     },
                 ],
@@ -264,12 +265,12 @@ export class PackingListIssueService {
                             }
                             #pl-header #pl-info {
                                 display: grid;
-                                grid-template-columns: auto auto 1fr;
+                                grid-template-columns: 65% 35%;
                                 gap: 1rem;
                             }
                             #pl-header #pl-info div:not(#shipping-mark) {
-                                display: flex;
-                                flex-direction: column;
+                                display: grid;
+                                grid-template-columns: 20% 80%;
                                 gap: 1.25rem;
                                 padding-top: 3.75rem;
                             }
@@ -284,6 +285,7 @@ export class PackingListIssueService {
                                 padding-top: 0;
                                 padding-right: 20%;
                                 gap: 0;
+                                width: 100%;
                             }
                             #pl-header #pl-summary {
                                 display: grid;

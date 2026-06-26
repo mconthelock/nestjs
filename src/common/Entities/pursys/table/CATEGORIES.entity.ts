@@ -5,16 +5,16 @@ import {
     Tree,
     TreeParent,
     TreeChildren,
+    JoinColumn,
     OneToMany,
 } from 'typeorm';
-import { CATEGORY_ATTRIBUTES } from './CATEGORY_ATTRIBUTES.entity';
-
+import { CategoryAttributes } from './CATEGORY_ATTRIBUTES.entity';
 @Entity({
     schema: 'PURSYS',
     name: 'CATEGORIES',
 })
 @Tree('adjacency-list')
-export class CATEGORIES {
+export class Categories {
     @PrimaryGeneratedColumn()
     CATEGORY_ID: number;
 
@@ -25,13 +25,14 @@ export class CATEGORIES {
     CREATED_AT: Date;
 
     @TreeParent()
-    PARENT: CATEGORIES;
+    @JoinColumn({ name: 'PARENT_ID', referencedColumnName: 'CATEGORY_ID' })
+    PARENT_ID: Categories;
 
     @TreeChildren()
-    CHILDREN: CATEGORIES[];
+    CHILDREN: Categories[];
 
-    @OneToMany(() => CATEGORY_ATTRIBUTES, (attribute) => attribute.category, {
+    @OneToMany(() => CategoryAttributes, (attribute) => attribute.category, {
         cascade: true,
     })
-    attributes: CATEGORY_ATTRIBUTES[];
+    attributes: CategoryAttributes[];
 }

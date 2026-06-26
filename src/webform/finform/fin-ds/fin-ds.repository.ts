@@ -185,6 +185,7 @@ export class FinDsRepository extends BaseRepository {
             .addSelect('REPORT.CYEAR', 'CYEAR')
             .addSelect('REPORT.CYEAR2', 'CYEAR2')
             .addSelect('REPORT.NRUNNO', 'NRUNNO')
+            .addSelect('HEAD.OPTION_CODE', 'OPTION_CODE')
             .addSelect('REPORT.REASON', 'REASON')
             .addSelect('REPORT.VREQNO', 'VREQNO')
             .addSelect('REPORT.REQUESTER', 'REQUESTER')

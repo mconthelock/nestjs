@@ -7,7 +7,12 @@ export class TaskscheduleController {
 
     @Post('powerbi-report')
     create() {
-        return this.task.sendMail();
+        return null; //this.task.sendMail();
+    }
+
+    @Post('mails')
+    mails(@Body() body: any) {
+        return this.task.sendMail(body);
     }
 
     @Post('check-prebm')

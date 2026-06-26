@@ -27,13 +27,18 @@ export class CategoryAttributes {
     @Column()
     ATTNAME: string;
 
-    @Column({ type: 'enum', enum: AttributeType, default: AttributeType.TEXT })
-    DATA_TYPE: AttributeType;
+    // @Column({ type: 'enum', enum: AttributeType, default: AttributeType.TEXT })
+    // DATA_TYPE: AttributeType;
+    @Column()
+    DATA_TYPE: string;
 
     @Column()
     IS_REQUIRED: boolean;
 
-    @Column({ type: 'enum', enum: OptionSource, default: OptionSource.NONE })
+    // @Column({ type: 'enum', enum: OptionSource, default: OptionSource.NONE })
+    // OPTION_SOURCE: string;
+
+    @Column()
     OPTION_SOURCE: string;
 
     @Column()

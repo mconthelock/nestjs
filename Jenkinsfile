@@ -38,8 +38,7 @@ pipeline {
                     // กรณีอื่นๆ (เช่น GitLab Webhook ผลักมา หรือกดมือแต่เลือก development)
                     else {
                         env.TARGET_DIR = '/var/amecweb/wwwroot/development/api'
-                        //env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\development"
-                        env.NAS_PATH = "D:\\wwwroot"
+                        env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\development"
                         env.REMOTE_HOST = 'amecwebtest'
                         env.ENV_CRED_ID = 'api-env-file'
                         env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.development'
@@ -177,8 +176,9 @@ pipeline {
                                     Set-Location Z:
 
                                     \$env:NODE_ENV='development'
-                                    cd api
-                                    robocopy "\\\\172.21.255.188\\amecweb\\wwwroot\\development\\api\\dist" . /E
+                                    cd D:\\wwwroot\\api
+                                    robocopy "Z:\\api\\dist" . /E
+                                    pm2 reload api_local
                                     Remove-PSDrive -Name 'Z' -Force
                                     "
                                 EOF

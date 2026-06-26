@@ -1,5 +1,7 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Req } from '@nestjs/common';
 import { VpsService } from './vps.service';
+import { getClientIP } from 'src/common/utils/ip.utils';
+import { Request } from 'express';
 
 @Controller('vps')
 export class VpsController {
@@ -23,6 +25,33 @@ export class VpsController {
         return {
             success: true,
             data,
+        };
+    }
+
+    @Post('get-vps-detail')
+    async getVPSDetail(
+        @Body('order') order: string,
+        @Body('packing') packing: string,
+    ) {
+        const data = await this.vpsService.getVPSDetail(order, packing);
+        return {
+            success: true,
+            data,
+        };
+    }
+
+    @Post('insert-print-vps')
+    async insertPrintVPS(
+        @Body('order') order: string,
+        @Body('packing') packing: string,
+        @Body('qtyPrint') qtyPrint: number,
+        @Body('empno') empno: string,
+        @Req() req: Request
+    ) {
+        const ip = getClientIP(req);
+        await this.vpsService.insertPrintVPS(order, packing, qtyPrint, empno, ip);
+        return {
+            success: true,
         };
     }
 }

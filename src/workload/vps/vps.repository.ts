@@ -6,11 +6,11 @@ import { DataSource } from 'typeorm';
 @Injectable()
 export class VpsRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('workloadConnection') private readonly ds: DataSource,
+        @InjectDataSource('workloadConnection') private readonly wk: DataSource,
         @InjectDataSource('packingConnection')
         private readonly packingDs: DataSource,
     ) {
-        super(ds);
+        super(wk);
     }
 
     async chkPrint(order: string, packing: string): Promise<boolean> {
@@ -24,6 +24,170 @@ export class VpsRepository extends BaseRepository {
             .getRawOne();
 
         return !!result;
+    }
+
+    async chkOrder(order: string, packing: string): Promise<boolean> {
+        const result = await this.packingDs
+            .createQueryBuilder()
+            .select('1')
+            .from('PACKORDDTL', 'p')
+            .where('p.ORDERNO = :order', { order })
+            .andWhere('p.PACKNO = :packing', { packing })
+            .getRawOne();
+
+        return !!result;
+    }
+
+    async chkItemMas(order: string, packing: string): Promise<boolean> {
+        const result = await this.packingDs
+            .createQueryBuilder()
+            .select('1')
+            .from('ItemMas', 'im')
+            .where('im.orderno = :order', { order })
+            .andWhere('im.packno = :packing', { packing })
+            .getRawOne();
+
+        return !!result;
+    }
+
+    // เทียบเท่า chk_ItemQty()
+    async chkItemQty(order: string, packing: string): Promise<boolean> {
+        const result = await this.packingDs
+            .createQueryBuilder()
+            .select('1')
+            .from('ItemQty', 'iq')
+            .where('iq.ordrno = :order', { order })
+            .andWhere('iq.itemno = :packing', { packing })
+            .getRawOne();
+
+        return !!result;
+    }
+
+    async chkPISinfo(order: string, subPacking: string): Promise<boolean> {
+        const result = await this.packingDs
+            .createQueryBuilder()
+            .select('1')
+            .from('PISInfo', 'pi')
+            .where('pi.orderno = :order', { order })
+            .andWhere('pi.item = :subPacking', { subPacking })
+            .getRawOne();
+
+        return !!result;
+    }
+
+    async insertPrintHistory(data: {
+        orderNo: string;
+        packingNo: string;
+        quantity: number;
+        users: string;
+    }): Promise<void> {
+        await this.wk
+            .createQueryBuilder()
+            .insert()
+            .into('PRINT_HISTORY')
+            .values({
+                ORDER_NO: data.orderNo,
+                PACKING_NO: data.packingNo,
+                QUANTITY: data.quantity,
+                USERS: data.users,
+            })
+            .execute();
+    }
+
+    async insertPrintlogVps(data: {
+        orderNo: string;
+        packingNo: string;
+        qty: number;
+        ip: string;
+        users: string;
+    }): Promise<void> {
+        await this.wk
+            .createQueryBuilder()
+            .insert()
+            .into('PRINT_LOG_VPS_OTHER')
+            .values({
+                ORDER_NO: data.orderNo,
+                PACKING_NO: data.packingNo,
+                PRINT_QTY: data.qty,
+                PRINTER: data.ip,
+                USERS: data.users,
+            })
+            .execute();
+    }
+
+    async insPackorddtlByManual(order: string, packing: string): Promise<void> {
+        await this.packingDs.query('EXEC InsPackorddtlByManual ?, ?', [
+            order,
+            packing,
+        ]);
+    }
+
+    async updatePrintStatus(order: string, packing: string): Promise<void> {
+        await this.packingDs
+            .createQueryBuilder()
+            .update('PACKORDDTL')
+            .set({ PRINTSTA: '1' })
+            .where('ORDERNO = :order', { order })
+            .andWhere('PACKNO = :packing', { packing })
+            .execute();
+    }
+
+    async insertItemMas(data: Record<string, any>): Promise<void> {
+        await this.packingDs
+            .createQueryBuilder()
+            .insert()
+            .into('ItemMas')
+            .values(data)
+            .execute();
+    }
+
+    async insertItemQty(data: Record<string, any>): Promise<void> {
+        await this.packingDs
+            .createQueryBuilder()
+            .insert()
+            .into('ItemQty')
+            .values(data)
+            .execute();
+    }
+
+    async insertPISInfo(data: Record<string, any>): Promise<void> {
+        await this.packingDs
+            .createQueryBuilder()
+            .insert()
+            .into('PISInfo')
+            .values(data)
+            .execute();
+    }
+
+    async insertVPSInfo(data: Record<string, any>): Promise<void> {
+        await this.packingDs
+            .createQueryBuilder()
+            .insert()
+            .into('VPSInfo')
+            .values(data)
+            .execute();
+    }
+
+    async insertItemQtyHistory(data: Record<string, any>): Promise<void> {
+        await this.packingDs
+            .createQueryBuilder()
+            .insert()
+            .into('ItemQtyHistory')
+            .values(data)
+            .execute();
+    }
+
+    async getVPSDetail(order: string, packing: string) {
+        const sql = `SELECT S01M01,S01M04,S01M09,M8K02,S01M06,S01M05,S01M08,F_CPROD(S01M09) AS SCHEDULE
+                FROM S010MP s01
+                JOIN M008KP mk ON mk.M8K03 = s01.S01M01
+                WHERE (S01M01 = :1 OR S01M01 LIKE :2)
+                AND S01M04 LIKE :3`;
+        return await this.wk.query(sql, [
+            `${order}`,
+            `_${order}_`,
+            `%${packing}%`,
+        ]);
     }
 
     async getDetailPIS(packing: string): Promise<any[]> {
@@ -74,6 +238,6 @@ export class VpsRepository extends BaseRepository {
                         mk.M8K02 ASC,
                         mk.M8K04 ASC
                         `;
-        return await this.ds.query(sql, [ packing ]);
+        return await this.wk.query(sql, [packing]);
     }
 }

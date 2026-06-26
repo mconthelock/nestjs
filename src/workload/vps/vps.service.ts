@@ -47,7 +47,7 @@ export class VpsService {
         console.log('chkItemMas:', chkItemMas);
         console.log('chkItemQty:', chkItemQty);
         console.log('chkPISinfo:', chkPISinfo);
-        return;
+        // return;
 
         await this.vpsRepository.insertPrintlogVps({
             orderNo: order,

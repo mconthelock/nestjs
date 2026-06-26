@@ -39,7 +39,7 @@ pipeline {
                     else {
                         env.TARGET_DIR = '/var/amecweb/wwwroot/development/api'
                         //env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\development"
-                        env.NAS_PATH = "D:\\\\wwwroot"
+                        env.NAS_PATH = "D:\\wwwroot"
                         env.REMOTE_HOST = 'amecwebtest'
                         env.ENV_CRED_ID = 'api-env-file'
                         env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.development'
@@ -178,7 +178,7 @@ pipeline {
 
                                     \$env:NODE_ENV='development'
                                     cd api
-                                    pm2 reload ecosystem.config.js
+
 
                                     Remove-PSDrive -Name 'Z' -Force
                                     "

@@ -178,8 +178,7 @@ pipeline {
 
                                     \$env:NODE_ENV='development'
                                     cd api
-
-
+                                    robocopy "\\\\172.21.255.188\\amecweb\\wwwroot\\development\\api\\dist" . /E
                                     Remove-PSDrive -Name 'Z' -Force
                                     "
                                 EOF

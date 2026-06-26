@@ -12,8 +12,8 @@ import { CategoriesModule } from './categories/categories.module';
         PurVendorsCodeModule,
         PurVendorsAttfileModule,
         PurVendorsAddressModule,
-        ProductsModule,
-        CategoriesModule,
+        //ProductsModule,
+        //CategoriesModule,
     ],
 })
 export class PursysModule {}

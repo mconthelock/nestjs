@@ -71,54 +71,36 @@ pipeline {
             }
         }
 
-        stage('Install & Build') {
+        stage('Check package.json Changes') {
             steps {
                 script {
-                    env.START_TIME_BUILD = System.currentTimeMillis()
-                    echo "⏱️ [START] Install & Build : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
-                }
-                sh '''
-                    cp ${ENV_DIR} .env
-                    NODE_ENV=development
-                    npm install
-                    npm run build
-                '''
-                script {
-                    def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
-                    echo "✅ [END] Install & Build ใช้เวลาทั้งหมด: ${duration} วินาที"
-                }
-            }
-        }
+                    env.START_TIME_CHANGE = System.currentTimeMillis()
+                    echo "⏱️ [START] Check package.json Changes : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
 
-        stage('Deploy to NAS') {
-            steps {
-                script {
-                    // เช็ค package.json ก่อน deploy
-                    def packageChanged = sh(
-                        script: """
-                            if [ -f ${TARGET_DIR}/package.json ]; then
-                                OLD_HASH=\$(md5sum ${TARGET_DIR}/package.json | cut -d' ' -f1)
-                                NEW_HASH=\$(md5sum package.json | cut -d' ' -f1)
-                                if [ "\$OLD_HASH" != "\$NEW_HASH" ]; then
-                                    echo "CHANGED"
-                                else
-                                    echo "UNCHANGED"
-                                fi
-                            else
-                                echo "NEW"
-                            fi
-                        """,
-                        returnStdout: true
-                    ).trim()
+                    // 1. กำหนดชื่อไฟล์ Hash ตาม Environment ที่กำลังจะ Deploy
+                    def hashFileName = ".package_hash_${params.DEPLOY_ENV}"
 
-                    env.PACKAGE_STATUS = packageChanged
+                    // 2. คำนวณ Hash ของ package.json ตัวปัจจุบันที่เพิ่ง Checkout มา
+                    def currentHash = sh(script: "md5sum package.json | cut -d' ' -f1", returnStdout: true).trim()
 
-                    if (packageChanged == "CHANGED") {
+                    // 3. ตรวจสอบสถานะการเปลี่ยนแปลง
+                    if (fileExists(hashFileName)) {
+                        def oldHash = readFile(hashFileName).trim()
+                        if (currentHash != oldHash) {
+                            env.PACKAGE_STATUS = "CHANGED"
+                        } else {
+                            env.PACKAGE_STATUS = "UNCHANGED"
+                        }
+                    } else {
+                        env.PACKAGE_STATUS = "NEW"
+                    }
+
+                    if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
                         echo "⚠️  WARNING: package.json has changed!"
                         echo "⚠️  You need to run: npm install manually"
                         mail (
                             to: 'sec_wsd@MitsubishiElevatorAsia.co.th',
-                            subject: "⚠️WARNING: package.json has changed! You need to run: npm install manually (${params.DEPLOY_ENV})",
+                            subject: "WARNING: package.json has changed! You need to run: npm install manually (${params.DEPLOY_ENV})",
                             from: 'jenkins-notify@MitsubishiElevatorAsia.co.th',
                             body: """
                                 Dear Team,
@@ -132,14 +114,43 @@ pipeline {
                                 5. รันคำสั่ง: pm2 reload api
                             """
                         )
-                    } else if (packageChanged == "NEW") {
-                        echo "ℹ️  First deployment detected"
-                    } else {
-                        echo "✓ package.json unchanged"
+                    }else {
+                        echo "✅ package.json has not changed."
                     }
+
+                    // 4. เมื่อ Deploy เสร็จแล้ว ค่อยบันทึก Hash ปัจจุบันทับลงไป
+                    writeFile(file: hashFileName, text: currentHash)
+
+                    def duration = (System.currentTimeMillis() - env.START_TIME_CHANGE.toLong()) / 1000
+                    echo "✅ [END] Check package.json Changes ใช้เวลาทั้งหมด: ${duration} วินาที"
                 }
             }
         }
+
+        stage('Install & Build') {
+            steps {
+                script {
+                    env.START_TIME_BUILD = System.currentTimeMillis()
+                    echo "⏱️ [START] Install & Build : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+                }
+                sh '''
+                    cp ${ENV_DIR} .env
+                    NODE_ENV=development
+                    if [ "${PACKAGE_STATUS}" = "CHANGED" ] || [ "${PACKAGE_STATUS}" = "NEW" ]; then
+                        npm install
+                    else
+                        echo "package.json unchanged, skip npm install"
+                    fi
+                    npm run build
+                '''
+                script {
+                    def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
+                    echo "✅ [END] Install & Build ใช้เวลาทั้งหมด: ${duration} วินาที"
+                }
+            }
+        }
+
+
 
         stage('Restart Application on NAS for Development') {
             when { expression { params.DEPLOY_ENV == 'development' }}

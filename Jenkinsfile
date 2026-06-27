@@ -260,7 +260,7 @@ pipeline {
 
 
                                 \$startTimePm2 = Get-Date
-                                # pm2 reload api
+                                pm2 reload api
                                 \$endTimePm2 = Get-Date
                                 \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds
                                 Write-Host '🎯 [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'
@@ -309,7 +309,7 @@ pipeline {
 
 
                                 \$startTimePm2 = Get-Date
-                                # pm2 reload api
+                                pm2 reload api
                                 \$endTimePm2 = Get-Date
                                 \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds
                                 Write-Host '🎯 [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'

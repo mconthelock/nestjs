@@ -176,6 +176,7 @@ pipeline {
                                     \$env:NODE_ENV='development'
                                     cd api
                                     robocopy ./dist d:\\wwwroot\\api\\dist /MIR /MT:8 /R:1 /W:1 /NDL /NFL /NP
+                                    pm2 reload api_local
                                     Remove-PSDrive -Name 'Z' -Force
                                     "
                                 EOF

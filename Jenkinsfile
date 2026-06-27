@@ -215,72 +215,114 @@ pipeline {
             }
         }
 
-        stage('Restart Application on NAS for Production') {
+        stage('Restart Application on Production Servers') {
             when { expression { params.DEPLOY_ENV == 'production'} }
             steps {
                 script {
-                    if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
-                        echo "================================================"
-                        echo "⚠️  WARNING: package.json has changed!"
-                        echo "⚠️  Please run manually:"
-                        echo "    1. CD ไปที่ ${TARGET_DIR}"
-                        echo "    2. รันคำสั่ง: npm install"
-                        echo "    3. Remote Desktop ไปที่ ${REMOTE_HOST}"
-                        echo "    4. เปิด Terminal"
-                        echo "    5. รันคำสั่ง: pm2 reload api"
-                        echo "================================================"
-                        echo "Skipping automatic PM2 reload..."
-                    } else {
-                        // ==================== Restart Application on AMECWEB ==================== //
-                        env.START_TIME_BUILD1 = System.currentTimeMillis()
-                        echo "⏱️ [START] Restart Application AMECWEB1 : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+                    env.START_TIME_RESTART = System.currentTimeMillis()
+                    echo "⏱️ [START] Restart Application : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
 
-                        sh "tar -czf dist.tar.gz dist/"
+                    // ==================== Restart Application on AMECWEB1 ==================== //
+                    sshagent(credentials: ['ssh-amecweb1']) {
+                        sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecweb1:D:/wwwroot/api/"
 
-                        sshagent(credentials: ['ssh-amecweb1']) {
-                            sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecweb1:D:/wwwroot/api/"
-
+                        if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
                             sh """
                                 ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
                                 powershell "
+                                \$startTime = Get-Date
                                 \$env:NODE_ENV='development'
                                 cd D:\\wwwroot\\api
                                 tar -xzf dist.tar.gz
                                 Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '✅ [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+                                "
+                                EOF
+                            """
+
+                            echo "================================================"
+                            echo "⚠️  WARNING: package.json has changed!, Please install dependencies manually on ${REMOTE_HOST}"
+                            echo "Skipping automatic PM2 reload..."
+                            echo "================================================"
+                        } else {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
+                                powershell "
+                                \$startTime = Get-Date
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '🎉 [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+
+
+                                \$startTimePm2 = Get-Date
                                 # pm2 reload api
+                                \$endTimePm2 = Get-Date
+                                \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds
+                                Write-Host '🎯 [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'
                                 "
                                 EOF
                             """
                         }
+                    }
 
-                        def duration = (System.currentTimeMillis() - env.START_TIME_BUILD1.toLong()) / 1000
-                        echo "✅ [END] Restart Application AMECWEB1 ใช้เวลาทั้งหมด: ${duration} วินาที"
+                    // ==================== Restart Application on AMECWEB2 ==================== //
+                    sshagent(credentials: ['ssh-amecweb2']) {
+                        sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecweb2:D:/wwwroot/api/"
 
-                        // ==================== Restart Application on AMECWEB2 ==================== //
-                        env.START_TIME_BUILD2 = System.currentTimeMillis()
-                        echo "⏱️ [START] Restart Application AMECWEB2 : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
-
-                        sshagent(credentials: ['ssh-amecweb2']) {
-                            sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecweb2:D:/wwwroot/api/"
-
+                        if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
                             sh """
                                 ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
                                 powershell "
+                                \$startTime = Get-Date
                                 \$env:NODE_ENV='development'
                                 cd D:\\wwwroot\\api
                                 tar -xzf dist.tar.gz
                                 Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '✅ [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+                                "
+                                EOF
+                            """
+
+                            echo "================================================"
+                            echo "⚠️  WARNING: package.json has changed!, Please install dependencies manually on ${REMOTE_HOST}"
+                            echo "Skipping automatic PM2 reload..."
+                            echo "================================================"
+                        } else {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
+                                powershell "
+                                \$startTime = Get-Date
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '🎉 [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+
+
+                                \$startTimePm2 = Get-Date
                                 # pm2 reload api
+                                \$endTimePm2 = Get-Date
+                                \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds
+                                Write-Host '🎯 [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'
                                 "
                                 EOF
                             """
                         }
-
-                        def duration2 = (System.currentTimeMillis() - env.START_TIME_BUILD2.toLong()) / 1000
-                        echo "✅ [END] Restart Application AMECWEB2 ใช้เวลาทั้งหมด: ${duration} วินาที"
-
-                        sh "rm -f dist.tar.gz"
+                        sh "tar -czf dist.tar.gz dist/"
                     }
+
+                    def duration = (System.currentTimeMillis() - env.START_TIME_RESTART.toLong()) / 1000
+                    echo "✅ [END] Restart Application ใช้เวลาทั้งหมด: ${duration} วินาที"
                 }
             }
         }

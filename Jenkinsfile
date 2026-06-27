@@ -31,7 +31,7 @@ pipeline {
                         env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.production'
                         env.NODE_ENV = 'production'
                         env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\production"
-                        echo ">>> MANUAL BUILD: Deploying to PRODUCTION"
+                        echo "👹 MANUAL BUILD: PRODUCTION"
                     }
                     // กรณีอื่นๆ (เช่น GitLab Webhook ผลักมา หรือกดมือแต่เลือก development)
                     else {
@@ -43,12 +43,11 @@ pipeline {
                         env.NODE_ENV = 'development'
 
                         if (!isManualTrigger) {
-                            echo ">>> WEBHOOK DETECTED: Auto-deploying to DEVELOPMENT"
+                            echo "🚀 WEBHOOK DETECTED: Auto-deploying to DEVELOPMENT"
                         } else {
-                            echo ">>> MANUAL BUILD: Selected DEVELOPMENT"
+                            echo "🌼 MANUAL BUILD: DEVELOPMENT"
                         }
                     }
-                    echo "Target Directory: ${env.TARGET_DIR}"
                 }
             }
         }

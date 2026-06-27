@@ -176,8 +176,8 @@ pipeline {
                                     Set-Location Z:
 
                                     \$env:NODE_ENV='development'
-                                    cd D:\\wwwroot\\api
-                                    robocopy "Z:\\api\\dist" . /E
+                                    cd api
+                                    robocopy ./dist d:\\wwwroot\\api /E
                                     Remove-PSDrive -Name 'Z' -Force
                                     "
                                 EOF

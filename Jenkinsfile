@@ -144,6 +144,7 @@ pipeline {
                     fi
                     npm run build
                 '''
+                sh "tar -czf dist.tar.gz dist/"
                 script {
                     def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
                     echo "✅ [END] Install & Build ใช้เวลาทั้งหมด: ${duration} วินาที"
@@ -159,7 +160,6 @@ pipeline {
                     echo "⏱️ [START] Restart Application : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
 
                     sshagent(credentials: ['ssh-amecwebtest1']) {
-                        sh "tar -czf dist.tar.gz dist/"
                         sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecwebtest1:D:/wwwroot/api/"
 
                         if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {

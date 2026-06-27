@@ -247,7 +247,7 @@ pipeline {
                             """
                         }
 
-                        def duration = (System.currentTimeMillis() - env.START_TIME_BUILD2.toLong()) / 1000
+                        def duration2 = (System.currentTimeMillis() - env.START_TIME_BUILD2.toLong()) / 1000
                         echo "✅ [END] Restart Application AMECWEB2 ใช้เวลาทั้งหมด: ${duration} วินาที"
 
                         sh "rm -f dist.tar.gz"

@@ -133,10 +133,8 @@ pipeline {
 
                 sh '''
                     mkdir -p ${TARGET_DIR}
-                    rsync -rlptz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
-                    rsync -av public/ ${TARGET_DIR}/public/
-                    rsync -vpt package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env ${TARGET_DIR}/
-
+                    rsync -rlptc --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
+                    rsync -avpt public package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env ${TARGET_DIR}/
                     echo "Deploy completed"
                 '''
             }

@@ -140,7 +140,7 @@ pipeline {
                     if [ "${PACKAGE_STATUS}" = "CHANGED" ] || [ "${PACKAGE_STATUS}" = "NEW" ]; then
                         npm install
                     else
-                        echo "package.json unchanged, skip npm install"
+                        echo "✅ package.json unchanged, skip npm install"
                     fi
                     npm run build
                 '''
@@ -166,16 +166,11 @@ pipeline {
                             sh """
                                 ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
                                 powershell "
-                                # 1. พิมพ์ข้อความและเก็บเวลาเริ่มต้น
-                                Write-Host '⏱️ [START] Extracting files on Server...'
                                 \$startTime = Get-Date
-
                                 \$env:NODE_ENV='development'
                                 cd D:\\wwwroot\\api
                                 tar -xzf dist.tar.gz
                                 Remove-Item -Path dist.tar.gz -Force
-
-                                # 3. เก็บเวลาสิ้นสุด คำนวณ และพิมพ์สรุป
                                 \$endTime = Get-Date
                                 \$duration = (\$endTime - \$startTime).TotalSeconds
                                 Write-Host '✅ [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
@@ -191,27 +186,21 @@ pipeline {
                             sh """
                                 ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
                                 powershell "
-                                # 1. พิมพ์ข้อความและเก็บเวลาเริ่มต้น
-                                Write-Host '⏱️ [START] Extracting files on Server...'
                                 \$startTime = Get-Date
-
-
                                 \$env:NODE_ENV='development'
                                 cd D:\\wwwroot\\api
                                 tar -xzf dist.tar.gz
                                 Remove-Item -Path dist.tar.gz -Force
-
-                                # 3. เก็บเวลาสิ้นสุด คำนวณ และพิมพ์สรุป
                                 \$endTime = Get-Date
                                 \$duration = (\$endTime - \$startTime).TotalSeconds
-                                Write-Host '✅ [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+                                Write-Host '🎉 [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
 
 
                                 \$startTimePm2 = Get-Date
                                 pm2 reload api
                                 \$endTimePm2 = Get-Date
                                 \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds
-                                Write-Host '✅ [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'
+                                Write-Host '🎯 [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'
                                 "
                                 EOF
                             """

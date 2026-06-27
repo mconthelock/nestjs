@@ -104,14 +104,15 @@ pipeline {
                             from: 'jenkins-notify@MitsubishiElevatorAsia.co.th',
                             body: """
                                 Dear Team,
-                                The package.json file has changed in the latest deployment to ${params.DEPLOY_ENV} environment. Please log in to the NAS server and run 'npm install' in the target directory to ensure all dependencies are up to date.
+                                The package.json file has changed in the latest deployment to '${params.DEPLOY_ENV}' environment. Please run 'npm install' in the target directory to ensure all dependencies are up to date.
                                 -------------------------------------------
-                                ขั้นตอนที่ต้องทำ:
-                                1. CD ไปที่ ${TARGET_DIR}
-                                2. รันคำสั่ง: npm install
-                                3. Remote Desktop ไปที่ ${REMOTE_HOST}
-                                4. เปิด Terminal
-                                5. รันคำสั่ง: pm2 reload api
+                                How to procedure:
+                                1. Map Network Drive to target directory on ${REMOTE_HOST}
+                                2. Open Command Prompt or PowerShell and CD to api/
+                                3. run: npm install
+                                4. Remote Desktop at ${REMOTE_HOST}
+                                5. Open Terminal and run: pm2 reload api
+                                -------------------------------------------
                             """
                         )
                     }else {
@@ -149,8 +150,6 @@ pipeline {
                 }
             }
         }
-
-
 
         stage('Restart Application on NAS for Development') {
             when { expression { params.DEPLOY_ENV == 'development' }}

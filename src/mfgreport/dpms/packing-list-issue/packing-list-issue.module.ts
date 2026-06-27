@@ -12,6 +12,7 @@ import { DpmsPlIssueTypeModule } from 'src/workload/dpms_pl_issue_type/dpms_pl_i
 import { DpmsPlIssueDateModule } from 'src/workload/dpms_pl_issue_date/dpms_pl_issue_date.module';
 import { PackinglistIssueProcedureDataCenterRepository, PackingListIssueProcedureWorkloadRepository } from './packing-list-issue.repository';
 import { PackingListIssueProcedureService } from './packing-list-issue-procedure.service';
+import { DpmsPlMailModule } from 'src/workload/dpms_pl_mail/dpms_pl_mail.module';
 
 @Module({
     imports: [
@@ -23,6 +24,7 @@ import { PackingListIssueProcedureService } from './packing-list-issue-procedure
         DpmsPlCaseListDetailModule,
         DpmsPlIssueTypeModule,
         DpmsPlIssueDateModule,
+        DpmsPlMailModule,
         MailModule,
     ],
     controllers: [PackingListIssueController],

@@ -175,10 +175,12 @@ pipeline {
                                 cd D:\\wwwroot\\api
                                 tar -xzf dist.tar.gz
                                 Remove-Item -Path dist.tar.gz -Force
-                                pm2 reload api_local
+                                pm2 reload api
                                 "
                                 EOF
                             """
+
+                            sh "rm -f dist.tar.gz"
                         }
                     }
 

@@ -151,17 +151,17 @@ pipeline {
             }
         }
 
-        stage('Restart Application on NAS for Development') {
+        stage('Restart Application on Development Server') {
             when { expression { params.DEPLOY_ENV == 'development' }}
             steps {
                 script {
                     env.START_TIME_BUILD = System.currentTimeMillis()
                     echo "⏱️ [START] Restart Application : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
 
-                    sh "tar -czf dist.tar.gz dist/"
-                    sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecwebtest1:D:/wwwroot/api/"
-
                     sshagent(credentials: ['ssh-amecwebtest1']) {
+                        sh "tar -czf dist.tar.gz dist/"
+                        sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecwebtest1:D:/wwwroot/api/"
+
                         if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
                             sh """
                                 ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
@@ -216,9 +216,10 @@ pipeline {
                                 EOF
                             """
                         }
+                        sh "rm -f dist.tar.gz"
                     }
 
-                    sh "rm -f dist.tar.gz"
+
                     def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
                     echo "✅ [END] Restart Application ใช้เวลาทั้งหมด: ${duration} วินาที"
                 }

@@ -96,7 +96,7 @@ pipeline {
         stage('Deploy to NAS') {
             steps {
                 script {
-                    env.START_TIME_BUILD = System.currentTimeMillis()
+                    env.START_TIME_DEPLOY = System.currentTimeMillis()
                     echo "⏱️ [START] Deploy to NAS : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
                     // เช็ค package.json ก่อน deploy
                     def packageChanged = sh(
@@ -151,7 +151,7 @@ pipeline {
                     echo "Deploy completed"
                 '''
 
-                def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
+                def duration = (System.currentTimeMillis() - env.START_TIME_DEPLOY.toLong()) / 1000
                 echo "✅ [END] Deploy to NAS ใช้เวลาทั้งหมด: ${duration} วินาที"
             }
         }
@@ -160,7 +160,7 @@ pipeline {
             when { expression { params.DEPLOY_ENV == 'development' }}
             steps {
                 script {
-                    env.START_TIME_BUILD = System.currentTimeMillis()
+                    env.START_TIME_RELOAD = System.currentTimeMillis()
                     echo "⏱️ [START] Restart Application : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
 
                     if (env.PACKAGE_STATUS == "CHANGED") {
@@ -206,7 +206,7 @@ pipeline {
                         }
                     }
 
-                    def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
+                    def duration = (System.currentTimeMillis() - env.START_TIME_RELOAD.toLong()) / 1000
                     echo "✅ [END] Restart Application ใช้เวลาทั้งหมด: ${duration} วินาที"
                 }
             }

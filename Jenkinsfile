@@ -145,10 +145,7 @@ pipeline {
             when { expression { params.DEPLOY_ENV == 'development' }}
             steps {
                 script {
-                    env.START_TIME_BUILD = System.currentTimeMillis()
-                    echo "⏱️ [START] Install & Build : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
-
-                    if (env.PACKAGE_STATUS == "CHANGED") {
+                    if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
                         echo "================================================"
                         echo "⚠️  WARNING: package.json has changed!"
                         echo "⚠️  Please run manually:"
@@ -160,14 +157,15 @@ pipeline {
                         echo "================================================"
                         echo "Skipping automatic PM2 reload..."
                     } else {
-                        sshagent(credentials: ['ssh-amecwebtest1']) {
-                           // 1. บีบอัดโฟลเดอร์ dist เป็นไฟล์เดียวบน Jenkins ก่อน (ใช้ tar)
-                            sh "tar -czf dist.tar.gz dist/"
+                        env.START_TIME_BUILD = System.currentTimeMillis()
+                        echo "⏱️ [START] Restart Application : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
 
-                            // 2. ส่งไฟล์ dist.tar.gz ที่บีบอัดแล้ว พร้อมกับ Config อื่นๆ ไปที่ Windows (ส่งไฟล์เดียวจะเร็วมาก)
+                        sh "tar -czf dist.tar.gz dist/"
+                        sshagent(credentials: ['ssh-amecwebtest1']) {
+                            // 1. ส่งไฟล์ dist.tar.gz ที่บีบอัดแล้ว พร้อมกับ Config อื่นๆ ไปที่ Windows (ส่งไฟล์เดียวจะเร็วมาก)
                             sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecwebtest1:D:/wwwroot/api/"
 
-                            // 3. SSH เข้าไปสั่งแตกไฟล์ และรันแอปพลิเคชันบน Windows โดยตรง (ไม่ต้องยุ่งกับ NAS แล้ว)
+                            // 2. SSH เข้าไปสั่งแตกไฟล์ และรันแอปพลิเคชันบน Windows โดยตรง (ไม่ต้องยุ่งกับ NAS แล้ว)
                             sh """
                                 ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
                                 powershell "
@@ -179,14 +177,11 @@ pipeline {
                                 "
                                 EOF
                             """
-
-                            sh "rm -f dist.tar.gz"
                         }
+                        sh "rm -f dist.tar.gz"
+                        def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
+                        echo "✅ [END] Restart Application ใช้เวลาทั้งหมด: ${duration} วินาที"
                     }
-
-                    def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
-                    echo "✅ [END] Install & Build ใช้เวลาทั้งหมด: ${duration} วินาที"
-
                 }
             }
         }
@@ -195,7 +190,7 @@ pipeline {
             when { expression { params.DEPLOY_ENV == 'production'} }
             steps {
                 script {
-                    if (env.PACKAGE_STATUS == "CHANGED") {
+                    if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
                         echo "================================================"
                         echo "⚠️  WARNING: package.json has changed!"
                         echo "⚠️  Please run manually:"
@@ -207,55 +202,55 @@ pipeline {
                         echo "================================================"
                         echo "Skipping automatic PM2 reload..."
                     } else {
-                        withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
-                            sshagent(credentials: ['ssh-amecweb1']) {
-                                sh "date '+%Y-%m-%d %H:%M:%S'"
-                                sh """
-                                    ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
-                                    powershell "
-                                    \$pass = '${NAS_PASS}'
-                                    \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
-                                    \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
+                        // ==================== Restart Application on AMECWEB ==================== //
+                        env.START_TIME_BUILD1 = System.currentTimeMillis()
+                        echo "⏱️ [START] Restart Application AMECWEB1 : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
 
-                                    if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
-                                        Remove-PSDrive -Name 'Z' -Force
-                                    }
+                        sh "tar -czf dist.tar.gz dist/"
 
-                                    New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
-                                    Set-Location Z:\\\\api
+                        sshagent(credentials: ['ssh-amecweb1']) {
+                            sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecweb1:D:/wwwroot/api/"
 
-                                    \$env:NODE_ENV = 'production'
-                                    pm2 reload ecosystem.config.js
-                                    Remove-PSDrive -Name Z -Force
-                                    "
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
+                                powershell "
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                # pm2 reload api
+                                "
                                 EOF
-                                """
-                                sh "date '+%Y-%m-%d %H:%M:%S'"
-                            }
-                            sshagent(credentials: ['ssh-amecweb2']) {
-                                sh "date '+%Y-%m-%d %H:%M:%S'"
-                                sh """
-                                    ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
-                                    powershell "
-                                    \$pass = '${NAS_PASS}'
-                                    \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
-                                    \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
-
-                                    if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
-                                        Remove-PSDrive -Name 'Z' -Force
-                                    }
-
-                                    New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
-                                    Set-Location Z:\\\\api
-
-                                    pm2 reload ecosystem.config.js
-                                    Remove-PSDrive -Name 'Z' -Force
-                                    "
-                                EOF
-                                """
-                                sh "date '+%Y-%m-%d %H:%M:%S'"
-                            }
+                            """
                         }
+
+                        def duration = (System.currentTimeMillis() - env.START_TIME_BUILD1.toLong()) / 1000
+                        echo "✅ [END] Restart Application AMECWEB1 ใช้เวลาทั้งหมด: ${duration} วินาที"
+
+                        // ==================== Restart Application on AMECWEB2 ==================== //
+                        env.START_TIME_BUILD2 = System.currentTimeMillis()
+                        echo "⏱️ [START] Restart Application AMECWEB2 : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+
+                        sshagent(credentials: ['ssh-amecweb2']) {
+                            sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecweb2:D:/wwwroot/api/"
+
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
+                                powershell "
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                # pm2 reload api
+                                "
+                                EOF
+                            """
+                        }
+
+                        def duration = (System.currentTimeMillis() - env.START_TIME_BUILD2.toLong()) / 1000
+                        echo "✅ [END] Restart Application AMECWEB2 ใช้เวลาทั้งหมด: ${duration} วินาที"
+
+                        sh "rm -f dist.tar.gz"
                     }
                 }
             }

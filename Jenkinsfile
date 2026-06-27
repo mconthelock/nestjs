@@ -150,9 +150,10 @@ pipeline {
                     rsync -avpt public package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env ${TARGET_DIR}/
                     echo "Deploy completed"
                 '''
-
-                def duration = (System.currentTimeMillis() - env.START_TIME_DEPLOY.toLong()) / 1000
-                echo "✅ [END] Deploy to NAS ใช้เวลาทั้งหมด: ${duration} วินาที"
+                script {
+                    def duration = (System.currentTimeMillis() - env.START_TIME_DEPLOY.toLong()) / 1000
+                    echo "✅ [END] Deploy to NAS ใช้เวลาทั้งหมด: ${duration} วินาที"
+                }
             }
         }
 

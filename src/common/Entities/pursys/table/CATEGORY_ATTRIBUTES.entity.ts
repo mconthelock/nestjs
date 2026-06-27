@@ -1,11 +1,23 @@
-import { CATEGORIES } from './CATEGORIES.entity';
+import { Categories } from './CATEGORIES.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+
+export enum AttributeType {
+    TEXT = 'text',
+    NUMBER = 'number',
+    OPTION = 'option', // เป็นตัวเลือก (Dropdown/Radio)
+}
+
+export enum OptionSource {
+    NONE = 'none',
+    FIXED = 'fixed',
+    FUNCTION = 'function', // กำหนดให้เรียกใช้ Function ที่ Dev ลงทะเบียนไว้
+}
 
 @Entity({
     schema: 'PURSYS',
     name: 'CATEGORY_ATTRIBUTES',
 })
-export class CATEGORY_ATTRIBUTES {
+export class CategoryAttributes {
     @PrimaryGeneratedColumn()
     ID: number;
 
@@ -15,13 +27,18 @@ export class CATEGORY_ATTRIBUTES {
     @Column()
     ATTNAME: string;
 
-    @Column()
-    DATA_TYPE: string;
+    @Column({ type: 'varchar', length: 20, default: AttributeType.TEXT })
+    DATA_TYPE: AttributeType;
 
     @Column()
     IS_REQUIRED: boolean;
 
-    @Column()
+    @Column({
+        type: 'varchar',
+        length: 20,
+        enum: OptionSource,
+        default: OptionSource.NONE,
+    })
     OPTION_SOURCE: string;
 
     @Column()
@@ -30,8 +47,8 @@ export class CATEGORY_ATTRIBUTES {
     @Column()
     FUNCTION_NAME: string;
 
-    @ManyToOne(() => CATEGORIES, (category) => category.CATEGORY_ID, {
+    @ManyToOne(() => Categories, (category) => category.CATEGORY_ID, {
         onDelete: 'CASCADE',
     })
-    category: CATEGORIES;
+    category: Categories;
 }

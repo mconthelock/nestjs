@@ -3,6 +3,11 @@
         <mj-attributes>
             <mj-text font-family="Arial, Helvetica, sans-serif" font-size="14px" />
         </mj-attributes>
+        <mj-style inline="inline">
+            th, td {
+                vertical-align: top;
+            }
+        </mj-style>
     </mj-head>
 
     <mj-body background-color="#f4f6f8" width="800px">
@@ -20,9 +25,9 @@
         <mj-section padding="0">
             <mj-column background-color="#ffffff" padding="20px" border-radius="6px">
 
-                <mj-text>
+                {{!-- <mj-text>
                     Dear {{name}},
-                </mj-text>
+                </mj-text> --}}
 
                 <mj-text color="#555">
                     Please be informed that the packing list has been issued successfully.
@@ -40,8 +45,8 @@
                         <th width="30%" style="padding:8px;">SOLD TO</th>
                     </tr>
                     <tr style="border-bottom:1px solid #eee;">
-                        <td style="padding:8px; white-space:nowrap;">{{issueType}}</td>
-                        <td style="padding:8px; white-space:nowrap;">{{shopOrderNo}}</td>
+                        <td style="padding:8px; white-space:nowrap; ali">{{issueType}}</td>
+                        <td style="padding:8px; ">{{shopOrderNo}}</td>
                         <td style="padding:8px; white-space:nowrap;">{{subject}}</td>
                         <td style="padding:8px;">{{nameOfBldg}}</td>
                         <td style="padding:8px;">{{soldTo}}</td>

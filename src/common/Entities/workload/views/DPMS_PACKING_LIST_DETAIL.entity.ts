@@ -27,6 +27,9 @@ export class DPMS_PACKING_LIST_DETAIL {
     @Column()
     VSELECTED: string;
 
+    @Column()
+    VORDER_COMBINE: string;
+
     @ManyToOne(() => DPMS_PACKING_LIST_MAIN, (main) => main.DETAILS)
     @JoinColumn([
         { name: 'VMFGNO', referencedColumnName: 'VMFGNO' },

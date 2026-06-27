@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { MailService } from 'src/common/services/mail/mail.service';
-import { MailList } from './sp-mail-alert.interface';
 import { InquiryService } from '../inquiry/inquiry.service';
 import { PrebmService } from '../prebm/prebm.service';
 import { TimelineService } from '../timeline/timeline.service';
@@ -14,14 +13,22 @@ export class TaskscheduleService {
         private readonly timeline: TimelineService,
     ) {}
 
-    async sendMail() {
+    async sendMail(data?: any) {
         try {
             await this.mailService.sendMail({
+                template: 'spprogram/inquiry',
                 from: `SP Program <${process.env.MAIL_FROM}>`,
                 to: `chalorms@MitsubishiElevatorAsia.co.th`,
-                subject: 'Pending Form SAFETY INSPECTION REPORT Notification',
-                template: 'spprogram/powerbi',
-                context: [],
+                subject: data?.subject || 'SP Program Notification',
+                context: {
+                    recipientName: data?.recipientName || 'All Concerned',
+                    message:
+                        data?.message ||
+                        ` This is a test email for pending form notification.`,
+                    table: data?.showTable || false,
+                    tableHeaders: data?.tableHeaders || [],
+                    tableRows: data?.tableRows || [],
+                },
             });
             return true;
         } catch (error) {
@@ -47,8 +54,12 @@ export class TaskscheduleService {
                 IS_TIMELINE: '1',
             });
             const filteredInquiries = inquiries.filter(
-                (dt) => dt.INQ_STATUS >= 30 && dt.timeline.BM_CONFIRM == null,
+                (dt) =>
+                    dt.INQ_STATUS >= 30 &&
+                    dt.INQ_STATUS != 50 &&
+                    dt.timeline.BM_CONFIRM == null,
             );
+
             for (const inq of filteredInquiries) {
                 const as400inq = await this.prebm.findAll({
                     filters: [{ field: 'Q6K101', op: 'eq', value: inq.INQ_NO }],
@@ -70,9 +81,6 @@ export class TaskscheduleService {
                             INQ_REV: inq.INQ_REV,
                             BM_CONFIRM: new Date(bmConfirmDateTime),
                         });
-
-                        console.log(inq.INQ_STATUS);
-
                         if (inq.INQ_STATUS == 30) {
                             await this.inqs.updatestatus(inq.INQ_ID, 31);
                         }

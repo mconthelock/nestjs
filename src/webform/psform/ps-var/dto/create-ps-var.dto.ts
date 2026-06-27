@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class CreatePsVarDto {
     @IsString()
@@ -6,4 +6,7 @@ export class CreatePsVarDto {
 
     @IsString()
     INPUTBY: string;
+
+    @IsNumber()
+    REPORT_ID: number;
 }

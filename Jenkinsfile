@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     parameters {
-        // เผื่อไว้ในกรณีที่อยากกดเลือกเองตอนสั่ง Build แบบ Manual
         choice(name: 'DEPLOY_ENV', choices: ['development', 'production'], description: 'Select Environment to deploy')
     }
 
@@ -18,19 +17,18 @@ pipeline {
         stage('Setup Environment') {
             steps {
                 script {
-                    // 1. ตรวจสอบว่าเป็นการกด Build เองจากหน้าเว็บหรือไม่
+                    // --- 1. ตรวจสอบว่าเป็นการกด Build เองจากหน้าเว็บหรือไม่
                     // currentBuild.getBuildCauses() จะคืนค่า list ของสาเหตุการ Build
                     // ถ้ามี 'UserIdCause' แสดงว่ามีคนมากดปุ่ม Build ใน Jenkins
                     def isManualTrigger = currentBuild.getBuildCauses().toString().contains('UserIdCause')
 
-                    // 2. ตรวจสอบเงื่อนไข
+                    // --- 2. ตรวจสอบเงื่อนไข
                     // จะไป Production ได้ต้อง: กดมือเอง (Manual) AND เลือก Parameter เป็น production
                     if (isManualTrigger && params.DEPLOY_ENV == 'production') {
                         env.TARGET_DIR = '/var/amecweb/wwwroot/production/api'
                         env.REMOTE_HOST = 'amecweb1, amecweb2'
                         env.ENV_CRED_ID = 'api-env-prod'
                         env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.production'
-                        // env.ENV_CRED_ID = 'apitest-env-prod'
                         env.NODE_ENV = 'production'
                         env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\production"
                         echo ">>> MANUAL BUILD: Deploying to PRODUCTION"
@@ -38,11 +36,11 @@ pipeline {
                     // กรณีอื่นๆ (เช่น GitLab Webhook ผลักมา หรือกดมือแต่เลือก development)
                     else {
                         env.TARGET_DIR = '/var/amecweb/wwwroot/development/api'
+                        env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\development"
                         env.REMOTE_HOST = 'amecwebtest'
                         env.ENV_CRED_ID = 'api-env-file'
                         env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.development'
                         env.NODE_ENV = 'development'
-                        env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\development"
 
                         if (!isManualTrigger) {
                             echo ">>> WEBHOOK DETECTED: Auto-deploying to DEVELOPMENT"
@@ -50,7 +48,6 @@ pipeline {
                             echo ">>> MANUAL BUILD: Selected DEVELOPMENT"
                         }
                     }
-
                     echo "Target Directory: ${env.TARGET_DIR}"
                 }
             }
@@ -58,27 +55,38 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                // checkout scmGit(
-                //     branches: [[name: '*/main']],
-                //     userRemoteConfigs: [[
-                //         url: 'https://webhub.mitsubishielevatorasia.co.th/wsd/api.git',
-                //         credentialsId: 'gitlab-auth-id']
-                //     ]
-                // )
+                script {
+                    env.START_TIME_CHECKOUT = System.currentTimeMillis()
+                    echo "⏱️ [START] Checkout : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+                }
+
+                // ================== โค้ดเดิมของคุณ ==================
                 checkout scm
+                // =================================================
+
+                script {
+                    def duration = (System.currentTimeMillis() - env.START_TIME_CHECKOUT.toLong()) / 1000
+                    echo "✅ [END] Checkout ใช้เวลาทั้งหมด: ${duration} วินาที"
+                }
             }
         }
 
         stage('Install & Build') {
             steps {
-                //withCredentials([file(credentialsId: "${env.ENV_CRED_ID}", variable: 'ENV_FILE')]) {
-                    sh '''
-                        cp ${ENV_DIR} .env
-                        NODE_ENV=development
-                        npm install
-                        npm run build
-                    '''
-                //}
+                script {
+                    env.START_TIME_BUILD = System.currentTimeMillis()
+                    echo "⏱️ [START] Install & Build : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+                }
+                sh '''
+                    cp ${ENV_DIR} .env
+                    NODE_ENV=development
+                    npm install
+                    npm run build
+                '''
+                script {
+                    def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
+                    echo "✅ [END] Install & Build ใช้เวลาทั้งหมด: ${duration} วินาที"
+                }
             }
         }
 
@@ -130,15 +138,6 @@ pipeline {
                         echo "✓ package.json unchanged"
                     }
                 }
-
-                sh '''
-                    mkdir -p ${TARGET_DIR}
-                    rsync -rlptz --delete --no-perms --no-owner --no-group dist/ ${TARGET_DIR}/dist/
-                    rsync -av public/ ${TARGET_DIR}/public/
-                    rsync -vpt package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env ${TARGET_DIR}/
-
-                    echo "Deploy completed"
-                '''
             }
         }
 
@@ -146,6 +145,9 @@ pipeline {
             when { expression { params.DEPLOY_ENV == 'development' }}
             steps {
                 script {
+                    env.START_TIME_BUILD = System.currentTimeMillis()
+                    echo "⏱️ [START] Install & Build : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+
                     if (env.PACKAGE_STATUS == "CHANGED") {
                         echo "================================================"
                         echo "⚠️  WARNING: package.json has changed!"
@@ -159,35 +161,32 @@ pipeline {
                         echo "Skipping automatic PM2 reload..."
                     } else {
                         sshagent(credentials: ['ssh-amecwebtest1']) {
-                            withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
-                                sh "date '+%Y-%m-%d %H:%M:%S'"
-                                sh """
-                                    ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
-                                    powershell "
-                                    \$pass = '${NAS_PASS}'
-                                    \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
-                                    \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
+                           // 1. บีบอัดโฟลเดอร์ dist เป็นไฟล์เดียวบน Jenkins ก่อน (ใช้ tar)
+                            sh "tar -czf dist.tar.gz dist/"
 
-                                    if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
-                                        Remove-PSDrive -Name 'Z' -Force
-                                    }
+                            // 2. ส่งไฟล์ dist.tar.gz ที่บีบอัดแล้ว พร้อมกับ Config อื่นๆ ไปที่ Windows (ส่งไฟล์เดียวจะเร็วมาก)
+                            sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecwebtest1:D:/wwwroot/api/"
 
-                                    New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
-                                    Set-Location Z:
-
-                                    \$env:NODE_ENV='development'
-                                    cd api
-                                    pm2 reload ecosystem.config.js
-
-                                    Remove-PSDrive -Name 'Z' -Force
-                                    "
+                            // 3. SSH เข้าไปสั่งแตกไฟล์ และรันแอปพลิเคชันบน Windows โดยตรง (ไม่ต้องยุ่งกับ NAS แล้ว)
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
+                                powershell "
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                pm2 reload api
+                                "
                                 EOF
-                                """
+                            """
 
-                                sh "date '+%Y-%m-%d %H:%M:%S'"
-                            }
+                            sh "rm -f dist.tar.gz"
                         }
                     }
+
+                    def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
+                    echo "✅ [END] Install & Build ใช้เวลาทั้งหมด: ${duration} วินาที"
+
                 }
             }
         }

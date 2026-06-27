@@ -1,10 +1,18 @@
-import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Entity,
+    Column,
+    PrimaryColumn,
+    PrimaryGeneratedColumn,
+    JoinColumn,
+    ManyToOne,
+} from 'typeorm';
+import { Categories } from './CATEGORIES.entity';
 
 @Entity({
     schema: 'PURSYS',
     name: 'PRODUCTS',
 })
-export class PRODUCTS {
+export class Products {
     @PrimaryGeneratedColumn()
     ID: number;
 
@@ -31,4 +39,8 @@ export class PRODUCTS {
 
     @Column({ type: 'simple-json', nullable: true, default: {} })
     EXTRA_ATTRIBUTES: Record<string, any>;
+
+    @ManyToOne(() => Categories, { onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'category_id' })
+    category: Categories;
 }

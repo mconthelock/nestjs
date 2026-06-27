@@ -36,4 +36,9 @@ export class PackingListIssueController {
     getReportDayList(@Param('day') day: string) {
         return this.procedureService.getReportDayList(day);
     }
+
+    @Get('shoporder/:ordermain')
+    getShopOrder(@Param('ordermain') ordermain: string) {
+        return this.procedureService.getShopOrder(ordermain);
+    }
 }

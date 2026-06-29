@@ -26,6 +26,10 @@ import { RqflistModule } from './rqflist/rqflist.module';
 import { MfgOrModule } from './mfgform/mfg-or/mfg-or.module';
 import { VorgmstModule } from './vorgmst/vorgmst.module';
 import { GrpmstModule } from './grpmst/grpmst.module';
+import { MfgEdrModule } from './mfgform/mfg-edr/mfg-edr.module';
+// FIN-PCK
+import { FinpckFormModule } from './finform/fin-pck/finpck_form/finpck_form.module';
+import { FinpckAssetModule } from './finform/fin-pck/finpck_asset/finpck_asset.module';
 
 @Module({
     imports: [
@@ -55,7 +59,13 @@ import { GrpmstModule } from './grpmst/grpmst.module';
         RqflistModule,
         VorgmstModule,
         MfgOrModule,
-        GrpmstModule
+        GrpmstModule,
+        // OMG
+        MfgEdrModule,
+        MfgOrModule,
+        //FIN-PCK
+        FinpckFormModule,
+        FinpckAssetModule,
     ],
 })
 export class WebformModule {}

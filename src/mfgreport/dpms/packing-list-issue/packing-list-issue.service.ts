@@ -90,7 +90,7 @@ export class PackingListIssueService {
                 fyear,
                 jung,
                 dto.VORDERS,
-                issueType.data.VDESCRIPTION,
+                // issueType.data.VDESCRIPTION,
             );
 
             // 1. Check if PL Issue exists, if not create new PL Issue
@@ -112,16 +112,19 @@ export class PackingListIssueService {
                 });
             }
             // 2. Get next revision number
+            // 2026-06-27 เปลี่ยนเอา type และ round ออกจาก condition เพราะ revision จะไม่ขึ้นกับ type และ round แล้ว รันต่อเนื่องได้เลย
             const revision: number =
                 await this.dpmsPlIssueRevService.getNextRevision({
                     ...plIssueData,
-                    NISSUE_TYPE: dto.ISSUETYPE,
-                    NROUND: dto.NROUND,
+                    // NISSUE_TYPE: dto.ISSUETYPE,
+                    // NROUND: dto.NROUND,
                 });
             const revisionText: string = numberToAlphabetRevision(revision);
 
             // 3. create PDF file
-            const fileName: string = `${dto.HEADER.VNAMEOFBLDG}_${dto.VORDERS}${revision > 0 ? `_${revisionText}` : ''}.pdf`;
+            const fileName: string = `${dto.HEADER.VNAMEOFBLDG}_${dto.VORDERS}${revision > 0 ? `_${revisionText}` : ''}_${issueType.data.VDESCRIPTION}.pdf`;
+            console.log('filename', fileName);
+            
             const newFileName: string = fileName.replace(/[\\/:*?"<>|]/g, '_');
             const pdf = await this.generatePDF({
                 order: dto.VORDERS,
@@ -195,6 +198,7 @@ export class PackingListIssueService {
                     template: 'mfgreport/dpms/packing-list',
                     context: {
                         // name: email,
+                        rev: revisionText,
                         issueType: issueType.data.VDESCRIPTION,
                         shopOrderNo: dto.HEADER.VSHOPORDERNO,
                         subject: dto.HEADER.VSUBJECT,
@@ -217,7 +221,7 @@ export class PackingListIssueService {
             if (!issueData.status) {
                 throw new Error('Failed to find DPMS PL Issue Date');
             }
-            throw new Error('Test error');
+            // throw new Error('Test error');
             return {
                 status: true,
                 message: 'Packing list issued successfully',

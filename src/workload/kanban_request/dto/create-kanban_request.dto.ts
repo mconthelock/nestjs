@@ -27,12 +27,16 @@ export class CreateKanbanRequestDetailDto {
 }
 
 export class CreateKanbanRequestDto {
-	@IsNumber()
-	EMPNO: number;
+	@IsString()
+	EMPNO: string;
 
 	@IsNotEmpty()
 	@IsString()
 	REQ_SECTION: string;
+
+	@IsNotEmpty()
+	@IsNumber()
+	PRODUCT_CAT: number;
 
 	@IsNotEmpty()
 	@IsString()

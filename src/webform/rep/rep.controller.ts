@@ -14,8 +14,6 @@ import { SearchRepDto } from './dto/search-rep.dto';
 export class RepController {
   constructor(private readonly repService: RepService) {}
 
-  @Post()
-
   @Post('search')
   search(@Body() searchRepDto: SearchRepDto) {
     return this.repService.getRep(searchRepDto);

@@ -1,11 +1,13 @@
 import { Type } from 'class-transformer';
 import {
+    IsBoolean,
     IsNotEmpty,
     IsNumber,
     IsOptional,
     IsString,
     ValidateNested,
 } from 'class-validator';
+import { ToBoolean } from 'src/common/utils/transform';
 
 class HeaderPLDto {
     @IsNotEmpty()
@@ -141,4 +143,13 @@ export class CreatePackingListIssueDto {
     @IsNotEmpty()
     @IsString()
     HTML: string;
+
+    @IsOptional()
+    @IsString()
+    HTMLPO?: string;
+
+    @IsNotEmpty()
+    @IsBoolean()
+    @ToBoolean()
+    SENDMAIL: boolean;
 }

@@ -11,7 +11,10 @@ import { now } from 'src/common/utils/dayjs.utils';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import * as fs from 'fs/promises';
 import { DpmsPlIssueRevService } from 'src/workload/dpms_pl_issue_rev/dpms_pl_issue_rev.service';
-import { convertJung, numberToAlphabetRevision } from 'src/common/utils/format.utils';
+import {
+    convertJung,
+    numberToAlphabetRevision,
+} from 'src/common/utils/format.utils';
 import {
     DPMS_PL_ISSUE_PK,
     generatePDFParams,
@@ -23,7 +26,7 @@ import { MailService } from 'src/common/services/mail/mail.service';
 import { DpmsPlIssueTypeService } from 'src/workload/dpms_pl_issue_type/dpms_pl_issue_type.service';
 import { DpmsPlIssueDateService } from 'src/workload/dpms_pl_issue_date/dpms_pl_issue_date.service';
 import path from 'path';
-
+import { DpmsPlMailService } from 'src/workload/dpms_pl_mail/dpms_pl_mail.service';
 
 @Injectable()
 export class PackingListIssueService {
@@ -36,6 +39,7 @@ export class PackingListIssueService {
         private readonly dpmsPlCaseListDetailService: DpmsPlCaseListDetailService,
         private readonly dpmsPlIssueTypeService: DpmsPlIssueTypeService,
         private readonly dpmsPlIssueDateService: DpmsPlIssueDateService,
+        private readonly dpmsPlMailService: DpmsPlMailService,
         private readonly mailService: MailService,
     ) {}
 
@@ -68,8 +72,6 @@ export class PackingListIssueService {
         }
     }
 
-   
-
     async issue(dto: CreatePackingListIssueDto) {
         try {
             const issueDate = now('DD/MM/YYYY');
@@ -78,13 +80,19 @@ export class PackingListIssueService {
             );
 
             const converted = convertJung(dto.VPROD);
-            if(!converted){
+            if (!converted) {
                 throw new Error('Invalid VPROD format for converting Jung');
             }
             const fyear = converted.substring(0, 4);
             const jung = converted.slice(4);
-            const finalPath = await joinPaths(this.finalDir, fyear, jung, dto.VORDERS, issueType.data.VDESCRIPTION);
-            
+            const finalPath = await joinPaths(
+                this.finalDir,
+                fyear,
+                jung,
+                dto.VORDERS,
+                // issueType.data.VDESCRIPTION,
+            );
+
             // 1. Check if PL Issue exists, if not create new PL Issue
             const plIssueData: DPMS_PL_ISSUE_PK = {
                 VPROD: dto.VPROD,
@@ -98,23 +106,26 @@ export class PackingListIssueService {
                 await this.dpmsPlIssueService.create(plIssueData);
             }
             // ถ้าเป็น complete, combine, balance ให้ set DFINISHALL เป็นวันที่ issue เลย
-            if([3, 4, 5].includes(issueType.data.NSEQ)){
+            if ([3, 4, 5].includes(issueType.data.NSEQ)) {
                 await this.dpmsPlIssueService.update(plIssueData, {
                     DFINISHALL: new Date(),
                 });
             }
             // 2. Get next revision number
+            // 2026-06-27 เปลี่ยนเอา type และ round ออกจาก condition เพราะ revision จะไม่ขึ้นกับ type และ round แล้ว รันต่อเนื่องได้เลย
             const revision: number =
                 await this.dpmsPlIssueRevService.getNextRevision({
                     ...plIssueData,
-                    NISSUE_TYPE: dto.ISSUETYPE,
-                    NROUND: dto.NROUND,
+                    // NISSUE_TYPE: dto.ISSUETYPE,
+                    // NROUND: dto.NROUND,
                 });
             const revisionText: string = numberToAlphabetRevision(revision);
 
             // 3. create PDF file
-            const fileName: string = `${dto.HEADER.VNAMEOFBLDG}_${dto.VORDERS}${revision > 0 ? `_${revisionText}` : ''}.pdf`;
-            const newFileName : string = fileName.replace(/[\\/:*?"<>|]/g, '_')
+            const fileName: string = `${dto.HEADER.VNAMEOFBLDG}_${dto.VORDERS}${revision > 0 ? `_${revisionText}` : ''}_${issueType.data.VDESCRIPTION}.pdf`;
+            console.log('filename', fileName);
+            
+            const newFileName: string = fileName.replace(/[\\/:*?"<>|]/g, '_');
             const pdf = await this.generatePDF({
                 order: dto.VORDERS,
                 html: dto.HTML,
@@ -171,33 +182,40 @@ export class PackingListIssueService {
                 }
             }
             // 7. send email notification to user
-            const email =
-                process.env.NODE_ENV != 'production'
+            if (dto.SENDMAIL) {
+                const mails = await this.dpmsPlMailService.findAll();
+                if (!mails.status) {
+                    throw new Error('Failed to retrieve email addresses');
+                }
+                const email = process.env.NODE_ENV != 'production'
                     ? process.env.MAIL_ADMIN
-                    : process.env.MAIL_ADMIN;
-            const state = process.env.STATE != 'production' ? '(TEST)' : '';
-            await this.mailService.sendMail({
-                from: `MFG REPORT System<${process.env.MAIL_FROM}>`,
-                to: email,
-                subject: 'Packing list issue notification ' + state,
-                template: 'mfgreport/dpms/packing-list',
-                context: {
-                    name: email,
-                    issueType: issueType.data.VDESCRIPTION,
-                    shopOrderNo: dto.HEADER.VSHOPORDERNO,
-                    subject: dto.HEADER.VSUBJECT,
-                    nameOfBldg: dto.HEADER.VNAMEOFBLDG,
-                    soldTo: dto.HEADER.VSOLDTO,
-                    path: pdf.path,
-                },
-                bcc: process.env.MAIL_ADMIN,
-                attachments: [
-                    {
-                        filename: newFileName,
-                        content: pdf.data,
+                    : mails.data.map((mail) => mail.VEMAIL_ADDRESS);
+                const state = process.env.STATE != 'production' ? '(TEST)' : '';
+                await this.mailService.sendMail({
+                    from: `MFG REPORT System<${process.env.MAIL_FROM}>`,
+                    to: email,
+                    subject: 'Packing list issue notification ' + state,
+                    template: 'mfgreport/dpms/packing-list',
+                    context: {
+                        // name: email,
+                        rev: revisionText,
+                        issueType: issueType.data.VDESCRIPTION,
+                        shopOrderNo: dto.HEADER.VSHOPORDERNO,
+                        subject: dto.HEADER.VSUBJECT,
+                        nameOfBldg: dto.HEADER.VNAMEOFBLDG,
+                        soldTo: dto.HEADER.VSOLDTO,
+                        path: pdf.path,
                     },
-                ],
-            });
+                    bcc: process.env.MAIL_ADMIN,
+                    attachments: [
+                        {
+                            filename: newFileName,
+                            content: pdf.data,
+                        },
+                    ],
+                });
+            }
+            // 8. Get issue date from DPMS_PL_ISSUE_DATE view for update dataTable
             const issueData =
                 await this.dpmsPlIssueDateService.findOne(plIssueData);
             if (!issueData.status) {

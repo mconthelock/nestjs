@@ -13,6 +13,7 @@ import { AmecordersScheduleModule } from './amecorders_schedule/amecorders_sched
 import { DpmsPlMailModule } from './dpms_pl_mail/dpms_pl_mail.module';
 import { VpsModule } from './vps/vps.module';
 import { KanbanRequestModule } from './kanban_request/kanban_request.module';
+import { DpmsPlLastRevisionViewModule } from './dpms_pl_last_revision_view/dpms_pl_last_revision_view.module';
 
 @Module({
     imports: [
@@ -30,6 +31,7 @@ import { KanbanRequestModule } from './kanban_request/kanban_request.module';
         DpmsPlMailModule,
         VpsModule,
         KanbanRequestModule,
+        DpmsPlLastRevisionViewModule,
     ],
 })
 export class WorkloadModule {}

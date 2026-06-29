@@ -44,6 +44,7 @@ import { MfgReportModule } from './mfgreport/mfgreport.module';
 // FIN-PCK
 import { FinpckFormModule } from './webform/finform/fin-pck/finpck_form/finpck_form.module';
 import { FinpckAssetModule } from './webform/finform/fin-pck/finpck_asset/finpck_asset.module';
+import { FxaGrpmstModule } from './webform/finform/fxa_grpmst/fxa_grpmst.module';
 
 @Module({
     imports: [
@@ -86,6 +87,7 @@ import { FinpckAssetModule } from './webform/finform/fin-pck/finpck_asset/finpck
         //FIN-PCK
         FinpckFormModule,
         FinpckAssetModule,
+        FxaGrpmstModule,
     ],
     providers: [
         HttpLoggingInterceptor,

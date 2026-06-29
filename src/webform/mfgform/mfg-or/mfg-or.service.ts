@@ -269,7 +269,6 @@ export class MfgOrService {
     const topic = String(dto.TOPIC || '').trim().toUpperCase();
     const classValue = String(dto.CLASS || '').trim().toUpperCase();
     const cyear = String(dto.CYEAR || '').trim();
-
     const query = this.dataSource
       .createQueryBuilder()
       .select([
@@ -349,7 +348,6 @@ export class MfgOrService {
     const result = await this.getMfgOr(dto);
     const flow = result.data.flow;
     const head = result.data.head;
-
     const pdfPath = this.getPdfPath(formno);
     const outputPath = await this.fillMfgOrPdf({
       pdfPath,

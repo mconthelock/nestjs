@@ -27,7 +27,9 @@ export class CreateKanbanRequestDetailDto {
 }
 
 export class CreateKanbanRequestDto {
+
 	@IsString()
+	@Type(() => String)
 	EMPNO: string;
 
 	@IsNotEmpty()

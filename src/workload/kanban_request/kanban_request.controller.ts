@@ -22,6 +22,7 @@ export class KanbanRequestController {
     async insertIssueKanban(@Body() dto: CreateKanbanRequestDto) {
         // Implement the logic to insert issue kanban here
         // For now, just return the received body for demonstration
-        return { message: 'Insert Issue Kanban functionality is not implemented yet.', receivedData: dto };
+        const data =await this.kanbanRequestService.insertIssueKanban(dto);
+        // return { message: 'Insert Issue Kanban functionality is implemented.', receivedData: dto };
     }
 }

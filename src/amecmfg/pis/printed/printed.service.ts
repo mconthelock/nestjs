@@ -202,7 +202,7 @@ export class PrintedService {
             queuedJobs.push({ jobId, data: pisFiles });
 
             // Process PDF jobs concurrently with a bounded worker pool.
-            this.enqueuePdfProcessJob(async () => {
+            await this.enqueuePdfProcessJob(async () => {
                 try {
                     await this.runPdfProcessJob(
                         {
@@ -213,6 +213,11 @@ export class PrintedService {
                             logFileName: pdfContext.logFileName,
                         },
                         jobId,
+                    );
+                    await this.writeLog(
+                        `[${jobId}] Background queue registered successfully`,
+                        null,
+                        pdfContext.logFileName,
                     );
                 } catch (error) {
                     this.pdfJobStatusMap.set(jobId, {

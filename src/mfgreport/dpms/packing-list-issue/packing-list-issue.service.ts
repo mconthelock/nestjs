@@ -18,6 +18,7 @@ import {
 import {
     DPMS_PL_ISSUE_PK,
     generatePDFParams,
+    sendMailParams,
 } from './packing-list-issue.interface';
 import { DpmsPlFileService } from 'src/workload/dpms_pl_file/dpms_pl_file.service';
 import { DpmsPlCaseListService } from 'src/workload/dpms_pl_case_list/dpms_pl_case_list.service';
@@ -27,6 +28,7 @@ import { DpmsPlIssueTypeService } from 'src/workload/dpms_pl_issue_type/dpms_pl_
 import { DpmsPlIssueDateService } from 'src/workload/dpms_pl_issue_date/dpms_pl_issue_date.service';
 import path from 'path';
 import { DpmsPlMailService } from 'src/workload/dpms_pl_mail/dpms_pl_mail.service';
+import { DpmsPlDocRevService } from 'src/workload/dpms_pl_doc_rev/dpms_pl_doc_rev.service';
 
 @Injectable()
 export class PackingListIssueService {
@@ -40,6 +42,7 @@ export class PackingListIssueService {
         private readonly dpmsPlIssueTypeService: DpmsPlIssueTypeService,
         private readonly dpmsPlIssueDateService: DpmsPlIssueDateService,
         private readonly dpmsPlMailService: DpmsPlMailService,
+        private readonly dpmsPlDocRevService: DpmsPlDocRevService,
         private readonly mailService: MailService,
     ) {}
 
@@ -105,13 +108,36 @@ export class PackingListIssueService {
             if (!checkPlIssue.status) {
                 await this.dpmsPlIssueService.create(plIssueData);
             }
-            // ถ้าเป็น complete, combine, balance ให้ set DFINISHALL เป็นวันที่ issue เลย
-            if ([3, 4, 5].includes(issueType.data.NSEQ)) {
+            // 2. ถ้าเป็น complete, combine, balance ให้ set DFINISHALL เป็นวันที่ issue เลย
+            if (['CP', 'CB', 'BL'].includes(issueType.data.VCODE)) {
+                const finishDate = new Date();
                 await this.dpmsPlIssueService.update(plIssueData, {
-                    DFINISHALL: new Date(),
+                    DFINISHALL: finishDate,
                 });
+                // ดึงข้อมูล revision ถัดไปของเอกสาร เพื่อเตรียมสร้าง record ใน DPMS_PL_DOC_REV
+                const docRevision =
+                    await this.dpmsPlDocRevService.getNextRevision(plIssueData);
+                // ดึงรายการ ที่ยังไม่เก็บ record ใน DPMS_PL_DOC_REV ของเอกสารนี้ เพื่อสร้าง record ใหม่
+                const pendingRecord =
+                    await this.dpmsPlDocRevService.getPendingRecord(
+                        plIssueData,
+                    );
+                // ถ้าไม่สามารถดึงรายการที่ยังไม่เก็บ record ได้ ให้ throw error เพราะแสดงว่าข้อมูลไม่ถูกต้องหรือมีปัญหาในการดึงข้อมูล
+                if (!pendingRecord.status) {
+                    throw new Error(
+                        'Failed to retrieve pending records for finishing document revision',
+                    );
+                }
+                for (const record of pendingRecord.data) {
+                    await this.dpmsPlDocRevService.create({
+                        ...plIssueData,
+                        NISSUEREV_ID: record.NID,
+                        NREV: docRevision,
+                        DFINISHALL: finishDate,
+                    });
+                }
             }
-            // 2. Get next revision number
+            // 3. Get next revision number
             // 2026-06-27 เปลี่ยนเอา type และ round ออกจาก condition เพราะ revision จะไม่ขึ้นกับ type และ round แล้ว รันต่อเนื่องได้เลย
             const revision: number =
                 await this.dpmsPlIssueRevService.getNextRevision({
@@ -121,10 +147,10 @@ export class PackingListIssueService {
                 });
             const revisionText: string = numberToAlphabetRevision(revision);
 
-            // 3. create PDF file
+            // 4. create PDF file
             const fileName: string = `${dto.HEADER.VNAMEOFBLDG}_${dto.VORDERS}${revision > 0 ? `_${revisionText}` : ''}_${issueType.data.VDESCRIPTION}.pdf`;
             console.log('filename', fileName);
-            
+
             const newFileName: string = fileName.replace(/[\\/:*?"<>|]/g, '_');
             const pdf = await this.generatePDF({
                 order: dto.VORDERS,
@@ -135,7 +161,7 @@ export class PackingListIssueService {
                 finalPath,
             });
 
-            // 3. add file Data to DB
+            // 5. add file Data to DB
             const insertFile = await this.dpmsPlFileService.create({
                 VFILE_ONAME: newFileName,
                 VFILE_FNAME: newFileName,
@@ -148,7 +174,7 @@ export class PackingListIssueService {
                 throw new Error('Failed to insert packing list file record');
             }
 
-            // 4. create PL Issue Revision record
+            // 6. create PL Issue Revision record
             const insertIssueRev = await this.dpmsPlIssueRevService.create({
                 ...plIssueData,
                 NISSUE_TYPE: dto.ISSUETYPE,
@@ -161,9 +187,10 @@ export class PackingListIssueService {
                 VSOLDTO: dto.HEADER.VSOLDTO,
                 VSHIPPINGMARK: dto.SHIPPING_MARK,
                 NROUND: dto.NROUND,
+                VISSUEBY: dto.VISSUEBY,
             });
 
-            // 5. Create PL Issue List record
+            // 7. Create PL Issue List record
             for (const list of dto.LIST) {
                 const seq = dto.LIST.indexOf(list) + 1;
                 const insertIssueList = await this.dpmsPlCaseListService.create(
@@ -173,7 +200,7 @@ export class PackingListIssueService {
                         NSEQ: seq,
                     },
                 );
-                // 6. Create PL Issue List Detail record
+                // 8. Create PL Issue List Detail record
                 for (const detail of list.DETAILS) {
                     await this.dpmsPlCaseListDetailService.create({
                         ...detail,
@@ -181,41 +208,27 @@ export class PackingListIssueService {
                     });
                 }
             }
-            // 7. send email notification to user
-            if (dto.SENDMAIL) {
-                const mails = await this.dpmsPlMailService.findAll();
-                if (!mails.status) {
-                    throw new Error('Failed to retrieve email addresses');
-                }
-                const email = process.env.NODE_ENV != 'production'
-                    ? process.env.MAIL_ADMIN
-                    : mails.data.map((mail) => mail.VEMAIL_ADDRESS);
-                const state = process.env.STATE != 'production' ? '(TEST)' : '';
-                await this.mailService.sendMail({
-                    from: `MFG REPORT System<${process.env.MAIL_FROM}>`,
-                    to: email,
-                    subject: 'Packing list issue notification ' + state,
-                    template: 'mfgreport/dpms/packing-list',
-                    context: {
-                        // name: email,
-                        rev: revisionText,
-                        issueType: issueType.data.VDESCRIPTION,
-                        shopOrderNo: dto.HEADER.VSHOPORDERNO,
-                        subject: dto.HEADER.VSUBJECT,
-                        nameOfBldg: dto.HEADER.VNAMEOFBLDG,
-                        soldTo: dto.HEADER.VSOLDTO,
-                        path: pdf.path,
+            // 9. send email notification to admin
+            await this.sendMail({
+                subject: `${now('YYYY-MM-DD HH:mm:ss')} Packing list issue notification [${dto.VORDERS}] REV. ${revisionText} (${issueType.data.VDESCRIPTION})`,
+                maillist: [process.env.MAIL_ADMIN],
+                context: {
+                    rev: revisionText,
+                    issueType: issueType.data.VDESCRIPTION,
+                    shopOrderNo: dto.HEADER.VSHOPORDERNO,
+                    subject: dto.HEADER.VSUBJECT,
+                    nameOfBldg: dto.HEADER.VNAMEOFBLDG,
+                    soldTo: dto.HEADER.VSOLDTO,
+                    path: pdf.path,
+                },
+                attachments: [
+                    {
+                        filename: newFileName,
+                        content: pdf.data,
                     },
-                    bcc: process.env.MAIL_ADMIN,
-                    attachments: [
-                        {
-                            filename: newFileName,
-                            content: pdf.data,
-                        },
-                    ],
-                });
-            }
-            // 8. Get issue date from DPMS_PL_ISSUE_DATE view for update dataTable
+                ],
+            });
+            // 10. Get issue date from DPMS_PL_ISSUE_DATE view for update dataTable
             const issueData =
                 await this.dpmsPlIssueDateService.findOne(plIssueData);
             if (!issueData.status) {
@@ -230,6 +243,41 @@ export class PackingListIssueService {
         } catch (error) {
             throw new Error(`Failed to issue packing list: ${error.message}`);
         }
+    }
+
+    protected async sendMail({
+        maillist,
+        context,
+        attachments,
+        subject = `Packing list issue notification`,
+    }: sendMailParams) {
+        const mails = await this.dpmsPlMailService.findAll();
+        if (!mails.status) {
+            throw new Error('Failed to retrieve email addresses');
+        }
+        const email =
+            process.env.NODE_ENV != 'production'
+                ? process.env.MAIL_ADMIN
+                : maillist; //mails.data.map((mail) => mail.VEMAIL_ADDRESS);
+        const state = process.env.STATE != 'production' ? '(TEST)' : '';
+        await this.mailService.sendMail({
+            from: `MFG REPORT System<${process.env.MAIL_FROM}>`,
+            to: email,
+            subject: `${subject} ${state}`,
+            template: 'mfgreport/dpms/packing-list',
+            context: {
+                // name: email,
+                rev: context.rev,
+                issueType: context.issueType,
+                shopOrderNo: context.shopOrderNo,
+                subject: context.subject,
+                nameOfBldg: context.nameOfBldg,
+                soldTo: context.soldTo,
+                path: context.path,
+            },
+            bcc: process.env.MAIL_ADMIN,
+            attachments: attachments,
+        });
     }
 
     private async generatePDF({

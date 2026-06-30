@@ -49,4 +49,7 @@ export class DPMS_PL_ISSUE_REV {
 
     @Column()
     DISSUEDATE: Date;
+
+    @Column()
+    VISSUEBY: string;
 }

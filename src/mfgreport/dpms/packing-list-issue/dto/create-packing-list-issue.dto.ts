@@ -148,8 +148,12 @@ export class CreatePackingListIssueDto {
     @IsString()
     HTMLPO?: string;
 
+    // @IsNotEmpty()
+    // @IsBoolean()
+    // @ToBoolean()
+    // SENDMAIL: boolean;
+
     @IsNotEmpty()
-    @IsBoolean()
-    @ToBoolean()
-    SENDMAIL: boolean;
+    @IsString()
+    VISSUEBY: string;
 }

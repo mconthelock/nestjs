@@ -7,6 +7,7 @@ import {
 } from './dto/update-packing-list-issue.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { PackingListIssueProcedureService } from './packing-list-issue-procedure.service';
+import { SearchDpmsPlIssueDto } from 'src/workload/dpms_pl_issue/dto/search-dpms_pl_issue.dto';
 
 @Controller('mfgreport/dpms/packing-list-issue')
 export class PackingListIssueController {
@@ -40,5 +41,10 @@ export class PackingListIssueController {
     @Get('shoporder/:ordermain')
     getShopOrder(@Param('ordermain') ordermain: string) {
         return this.procedureService.getShopOrder(ordermain);
+    }
+
+    @Post('revise-list')
+    getReviseList(@Body() dto: SearchDpmsPlIssueDto) {
+        return this.procedureService.getReviseList(dto);
     }
 }

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PackingListIssueProcedureWorkloadRepository, PackinglistIssueProcedureDataCenterRepository } from './packing-list-issue.repository';
+import { SearchDpmsPlIssueDto } from 'src/workload/dpms_pl_issue/dto/search-dpms_pl_issue.dto';
 
 @Injectable()
 export class PackingListIssueProcedureService {
@@ -61,6 +62,26 @@ export class PackingListIssueProcedureService {
             };
         } catch (error) {
             throw new Error(`Failed to get shop order: ${error.message}`);
+        }
+    }
+
+    async getReviseList(dto: SearchDpmsPlIssueDto) {
+        try {
+            const res = await this.workloadRepo.getReviseList(dto);
+            if (res.length === 0) {
+                return {
+                    status: false,
+                    message: 'No data found',
+                };
+            }
+            return {
+                status: true,
+                message: `Get revise list ${res.length} records`,
+                data: res,
+            };
+        }
+        catch (error) {
+            throw new Error(`Failed to get revise list: ${error.message}`);
         }
     }
 }

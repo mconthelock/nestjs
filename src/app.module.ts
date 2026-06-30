@@ -1,11 +1,13 @@
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 //Middleware & Interceptor
 import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
 import { IpLoggerMiddleware } from './middleware/ip-logger.middleware';
 import { RequestIdMiddleware } from './middleware/request-id.middleware';
 import { RequestContextMiddleware } from './middleware/request-context.middleware';
+import { TransactionInterceptor } from './common/interceptors/transaction.interceptor';
 
 //Modules List
 import { CommonModule } from './common/common.module';
@@ -32,14 +34,11 @@ import { EarlyHeadMiddleware } from './middleware/early-head.middleware';
 import { SafetyModule } from './safety/safety.module';
 import { EbudgetModule } from './ebudget/ebudget.module';
 import { WarehouseModule } from './warehouse/warehouse.module';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { TransactionInterceptor } from './common/interceptors/transaction.interceptor';
+
 import { PursysModule } from './pursys/pursys.module';
 import { WorkloadModule } from './workload/workload.module';
 import { DatacenterModule } from './datacenter/datacenter.module';
 import { GeneralPartListModule } from './general-part-list/general-part-list.module';
-import { MfgEdrModule } from './webform/mfgform/mfg-edr/mfg-edr.module';
-import { MfgOrModule } from './webform/mfgform/mfg-or/mfg-or.module';
 import { MfgReportModule } from './mfgreport/mfgreport.module';
 // FIN-PCK
 import { FinpckFormModule } from './webform/finform/fin-pck/finpck_form/finpck_form.module';
@@ -79,11 +78,8 @@ import { FxaGrpmstModule } from './webform/finform/fxa_grpmst/fxa_grpmst.module'
         WorkloadModule,
         DatacenterModule,
         GeneralPartListModule,
-
-        // OMG
-        MfgEdrModule,
         MfgReportModule,
-        MfgOrModule,
+      //  MfgOrModule,
         //FIN-PCK
         FinpckFormModule,
         FinpckAssetModule,

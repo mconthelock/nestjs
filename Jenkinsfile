@@ -31,7 +31,7 @@ pipeline {
                         env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.production'
                         env.NODE_ENV = 'production'
                         env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\production"
-                        echo ">>> MANUAL BUILD: Deploying to PRODUCTION"
+                        echo "👹 MANUAL BUILD: PRODUCTION"
                     }
                     // กรณีอื่นๆ (เช่น GitLab Webhook ผลักมา หรือกดมือแต่เลือก development)
                     else {
@@ -43,12 +43,11 @@ pipeline {
                         env.NODE_ENV = 'development'
 
                         if (!isManualTrigger) {
-                            echo ">>> WEBHOOK DETECTED: Auto-deploying to DEVELOPMENT"
+                            echo "🚀 WEBHOOK DETECTED: Auto-deploying to DEVELOPMENT"
                         } else {
-                            echo ">>> MANUAL BUILD: Selected DEVELOPMENT"
+                            echo "🌼 MANUAL BUILD: DEVELOPMENT"
                         }
                     }
-                    echo "Target Directory: ${env.TARGET_DIR}"
                 }
             }
         }
@@ -71,6 +70,63 @@ pipeline {
             }
         }
 
+        stage('Check package.json Changes') {
+            steps {
+                script {
+                    env.START_TIME_CHANGE = System.currentTimeMillis()
+                    echo "⏱️ [START] Check package.json Changes : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+
+                    // 1. กำหนดชื่อไฟล์ Hash ตาม Environment ที่กำลังจะ Deploy
+                    def hashFileName = ".package_hash_${params.DEPLOY_ENV}"
+
+                    // 2. คำนวณ Hash ของ package.json ตัวปัจจุบันที่เพิ่ง Checkout มา
+                    def currentHash = sh(script: "md5sum package.json | cut -d' ' -f1", returnStdout: true).trim()
+
+                    // 3. ตรวจสอบสถานะการเปลี่ยนแปลง
+                    if (fileExists(hashFileName)) {
+                        def oldHash = readFile(hashFileName).trim()
+                        if (currentHash != oldHash) {
+                            env.PACKAGE_STATUS = "CHANGED"
+                        } else {
+                            env.PACKAGE_STATUS = "UNCHANGED"
+                        }
+                    } else {
+                        env.PACKAGE_STATUS = "NEW"
+                    }
+
+                    if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
+                        echo "⚠️  WARNING: package.json has changed!"
+                        echo "⚠️  You need to run: npm install manually"
+                        mail (
+                            to: 'sec_wsd@MitsubishiElevatorAsia.co.th',
+                            subject: "WARNING: package.json has changed! You need to run: npm install manually (${params.DEPLOY_ENV})",
+                            from: 'jenkins-notify@MitsubishiElevatorAsia.co.th',
+                            body: """
+                                Dear Team,
+                                The package.json file has changed in the latest deployment to '${params.DEPLOY_ENV}' environment. Please run 'npm install' in the target directory to ensure all dependencies are up to date.
+                                -------------------------------------------
+                                How to procedure:
+                                1. Map Network Drive to target directory on ${REMOTE_HOST}
+                                2. Open Command Prompt or PowerShell and CD to api/
+                                3. run: npm install
+                                4. Remote Desktop at ${REMOTE_HOST}
+                                5. Open Terminal and run: pm2 reload api
+                                -------------------------------------------
+                            """
+                        )
+                    }else {
+                        echo "✅ package.json has not changed."
+                    }
+
+                    // 4. เมื่อ Deploy เสร็จแล้ว ค่อยบันทึก Hash ปัจจุบันทับลงไป
+                    writeFile(file: hashFileName, text: currentHash)
+
+                    def duration = (System.currentTimeMillis() - env.START_TIME_CHANGE.toLong()) / 1000
+                    echo "✅ [END] Check package.json Changes ใช้เวลาทั้งหมด: ${duration} วินาที"
+                }
+            }
+        }
+
         stage('Install & Build') {
             steps {
                 script {
@@ -80,9 +136,14 @@ pipeline {
                 sh '''
                     cp ${ENV_DIR} .env
                     NODE_ENV=development
-                    npm install
+                    if [ "${PACKAGE_STATUS}" = "CHANGED" ] || [ "${PACKAGE_STATUS}" = "NEW" ]; then
+                        npm install
+                    else
+                        echo "✅ package.json unchanged, skip npm install"
+                    fi
                     npm run build
                 '''
+                sh "tar -czf dist.tar.gz dist/"
                 script {
                     def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
                     echo "✅ [END] Install & Build ใช้เวลาทั้งหมด: ${duration} วินาที"
@@ -90,173 +151,177 @@ pipeline {
             }
         }
 
-        stage('Deploy to NAS') {
-            steps {
-                script {
-                    // เช็ค package.json ก่อน deploy
-                    def packageChanged = sh(
-                        script: """
-                            if [ -f ${TARGET_DIR}/package.json ]; then
-                                OLD_HASH=\$(md5sum ${TARGET_DIR}/package.json | cut -d' ' -f1)
-                                NEW_HASH=\$(md5sum package.json | cut -d' ' -f1)
-                                if [ "\$OLD_HASH" != "\$NEW_HASH" ]; then
-                                    echo "CHANGED"
-                                else
-                                    echo "UNCHANGED"
-                                fi
-                            else
-                                echo "NEW"
-                            fi
-                        """,
-                        returnStdout: true
-                    ).trim()
-
-                    env.PACKAGE_STATUS = packageChanged
-
-                    if (packageChanged == "CHANGED") {
-                        echo "⚠️  WARNING: package.json has changed!"
-                        echo "⚠️  You need to run: npm install manually"
-                        mail (
-                            to: 'sec_wsd@MitsubishiElevatorAsia.co.th',
-                            subject: "⚠️WARNING: package.json has changed! You need to run: npm install manually (${params.DEPLOY_ENV})",
-                            from: 'jenkins-notify@MitsubishiElevatorAsia.co.th',
-                            body: """
-                                Dear Team,
-                                The package.json file has changed in the latest deployment to ${params.DEPLOY_ENV} environment. Please log in to the NAS server and run 'npm install' in the target directory to ensure all dependencies are up to date.
-                                -------------------------------------------
-                                ขั้นตอนที่ต้องทำ:
-                                1. CD ไปที่ ${TARGET_DIR}
-                                2. รันคำสั่ง: npm install
-                                3. Remote Desktop ไปที่ ${REMOTE_HOST}
-                                4. เปิด Terminal
-                                5. รันคำสั่ง: pm2 reload api
-                            """
-                        )
-                    } else if (packageChanged == "NEW") {
-                        echo "ℹ️  First deployment detected"
-                    } else {
-                        echo "✓ package.json unchanged"
-                    }
-                }
-            }
-        }
-
-        stage('Restart Application on NAS for Development') {
+        stage('Restart Application on Development Server') {
             when { expression { params.DEPLOY_ENV == 'development' }}
             steps {
                 script {
                     env.START_TIME_BUILD = System.currentTimeMillis()
-                    echo "⏱️ [START] Install & Build : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+                    echo "⏱️ [START] Restart Application : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
 
-                    if (env.PACKAGE_STATUS == "CHANGED") {
-                        echo "================================================"
-                        echo "⚠️  WARNING: package.json has changed!"
-                        echo "⚠️  Please run manually:"
-                        echo "    1. CD ไปที่ ${TARGET_DIR}"
-                        echo "    2. รันคำสั่ง: npm install"
-                        echo "    3. Remote Desktop ไปที่ ${REMOTE_HOST}"
-                        echo "    4. เปิด Terminal"
-                        echo "    5. รันคำสั่ง: pm2 reload api"
-                        echo "================================================"
-                        echo "Skipping automatic PM2 reload..."
-                    } else {
-                        sshagent(credentials: ['ssh-amecwebtest1']) {
-                           // 1. บีบอัดโฟลเดอร์ dist เป็นไฟล์เดียวบน Jenkins ก่อน (ใช้ tar)
-                            sh "tar -czf dist.tar.gz dist/"
+                    sshagent(credentials: ['ssh-amecwebtest1']) {
+                        sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecwebtest1:D:/wwwroot/api/"
 
-                            // 2. ส่งไฟล์ dist.tar.gz ที่บีบอัดแล้ว พร้อมกับ Config อื่นๆ ไปที่ Windows (ส่งไฟล์เดียวจะเร็วมาก)
-                            sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecwebtest1:D:/wwwroot/api/"
-
-                            // 3. SSH เข้าไปสั่งแตกไฟล์ และรันแอปพลิเคชันบน Windows โดยตรง (ไม่ต้องยุ่งกับ NAS แล้ว)
+                        if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
                             sh """
                                 ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
                                 powershell "
+                                \$startTime = Get-Date
                                 \$env:NODE_ENV='development'
                                 cd D:\\wwwroot\\api
                                 tar -xzf dist.tar.gz
                                 Remove-Item -Path dist.tar.gz -Force
-                                pm2 reload api
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '✅ [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
                                 "
                                 EOF
                             """
 
-                            sh "rm -f dist.tar.gz"
+                            echo "================================================"
+                            echo "⚠️  WARNING: package.json has changed!, Please install dependencies manually on ${REMOTE_HOST}"
+                            echo "Skipping automatic PM2 reload..."
+                            echo "================================================"
+                        } else {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
+                                powershell "
+                                \$startTime = Get-Date
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '🎉 [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+
+
+                                \$startTimePm2 = Get-Date
+                                pm2 reload api
+                                \$endTimePm2 = Get-Date
+                                \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds
+                                Write-Host '🎯 [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'
+                                "
+                                EOF
+                            """
                         }
+                        sh "rm -f dist.tar.gz"
                     }
 
-                    def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
-                    echo "✅ [END] Install & Build ใช้เวลาทั้งหมด: ${duration} วินาที"
 
+                    def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
+                    echo "✅ [END] Restart Application ใช้เวลาทั้งหมด: ${duration} วินาที"
                 }
             }
         }
 
-        stage('Restart Application on NAS for Production') {
+        stage('Restart Application on Production Servers') {
             when { expression { params.DEPLOY_ENV == 'production'} }
             steps {
                 script {
-                    if (env.PACKAGE_STATUS == "CHANGED") {
-                        echo "================================================"
-                        echo "⚠️  WARNING: package.json has changed!"
-                        echo "⚠️  Please run manually:"
-                        echo "    1. CD ไปที่ ${TARGET_DIR}"
-                        echo "    2. รันคำสั่ง: npm install"
-                        echo "    3. Remote Desktop ไปที่ ${REMOTE_HOST}"
-                        echo "    4. เปิด Terminal"
-                        echo "    5. รันคำสั่ง: pm2 reload api"
-                        echo "================================================"
-                        echo "Skipping automatic PM2 reload..."
-                    } else {
-                        withCredentials([usernamePassword(credentialsId: 'nas-auth-id', passwordVariable: 'NAS_PASS', usernameVariable: 'NAS_USER')]) {
-                            sshagent(credentials: ['ssh-amecweb1']) {
-                                sh "date '+%Y-%m-%d %H:%M:%S'"
-                                sh """
-                                    ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
-                                    powershell "
-                                    \$pass = '${NAS_PASS}'
-                                    \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
-                                    \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
+                    env.START_TIME_RESTART = System.currentTimeMillis()
+                    echo "⏱️ [START] Restart Application : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
 
-                                    if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
-                                        Remove-PSDrive -Name 'Z' -Force
-                                    }
+                    // ==================== Restart Application on AMECWEB1 ==================== //
+                    sshagent(credentials: ['ssh-amecweb1']) {
+                        sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecweb1:D:/wwwroot/api/"
 
-                                    New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
-                                    Set-Location Z:\\\\api
-
-                                    \$env:NODE_ENV = 'production'
-                                    pm2 reload ecosystem.config.js
-                                    Remove-PSDrive -Name Z -Force
-                                    "
+                        if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
+                                powershell "
+                                \$startTime = Get-Date
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '✅ [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+                                "
                                 EOF
-                                """
-                                sh "date '+%Y-%m-%d %H:%M:%S'"
-                            }
-                            sshagent(credentials: ['ssh-amecweb2']) {
-                                sh "date '+%Y-%m-%d %H:%M:%S'"
-                                sh """
-                                    ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
-                                    powershell "
-                                    \$pass = '${NAS_PASS}'
-                                    \$secPass = ConvertTo-SecureString \$pass -AsPlainText -Force
-                                    \$cred = New-Object System.Management.Automation.PSCredential('${NAS_USER}', \$secPass)
+                            """
 
-                                    if (Get-PSDrive -Name 'Z' -ErrorAction SilentlyContinue) {
-                                        Remove-PSDrive -Name 'Z' -Force
-                                    }
+                            echo "================================================"
+                            echo "⚠️  WARNING: package.json has changed!, Please install dependencies manually on ${REMOTE_HOST}"
+                            echo "Skipping automatic PM2 reload..."
+                            echo "================================================"
+                        } else {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
+                                powershell "
+                                \$startTime = Get-Date
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '🎉 [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
 
-                                    New-PSDrive -Name 'Z' -PSProvider FileSystem -Root '${env.NAS_PATH}' -Credential \$cred -Scope Global -ErrorAction Stop
-                                    Set-Location Z:\\\\api
 
-                                    pm2 reload ecosystem.config.js
-                                    Remove-PSDrive -Name 'Z' -Force
-                                    "
+                                \$startTimePm2 = Get-Date
+                                pm2 reload api
+                                \$endTimePm2 = Get-Date
+                                \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds
+                                Write-Host '🎯 [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'
+                                "
                                 EOF
-                                """
-                                sh "date '+%Y-%m-%d %H:%M:%S'"
-                            }
+                            """
                         }
                     }
+
+                    // ==================== Restart Application on AMECWEB2 ==================== //
+                    sshagent(credentials: ['ssh-amecweb2']) {
+                        sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecweb2:D:/wwwroot/api/"
+
+                        if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
+                                powershell "
+                                \$startTime = Get-Date
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '✅ [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+                                "
+                                EOF
+                            """
+
+                            echo "================================================"
+                            echo "⚠️  WARNING: package.json has changed!, Please install dependencies manually on ${REMOTE_HOST}"
+                            echo "Skipping automatic PM2 reload..."
+                            echo "================================================"
+                        } else {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
+                                powershell "
+                                \$startTime = Get-Date
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '🎉 [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+
+
+                                \$startTimePm2 = Get-Date
+                                pm2 reload api
+                                \$endTimePm2 = Get-Date
+                                \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds
+                                Write-Host '🎯 [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'
+                                "
+                                EOF
+                            """
+                        }
+                        sh "tar -czf dist.tar.gz dist/"
+                    }
+
+                    def duration = (System.currentTimeMillis() - env.START_TIME_RESTART.toLong()) / 1000
+                    echo "✅ [END] Restart Application ใช้เวลาทั้งหมด: ${duration} วินาที"
                 }
             }
         }

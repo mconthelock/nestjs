@@ -3,6 +3,6 @@ export interface dpmsPlIssueRevFindLatestRevision {
     VP: string;
     VTYPE: string;
     VORDERS: string;
-    NISSUE_TYPE: number;
+    NISSUE_TYPE?: number;
     NROUND?: number;
 }

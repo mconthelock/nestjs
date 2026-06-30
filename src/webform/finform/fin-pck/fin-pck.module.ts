@@ -10,11 +10,13 @@ import { RepModule } from 'src/webform/rep/rep.module';
 import { UsersModule } from 'src/amec/users/users.module';
 import { PappflowModule } from 'src/amec/pappflow/pappflow.module';
 import { OrgTreeModule } from 'src/webform/org-tree/org-tree.module';
+import { FinpckVwdetailModule } from './finpck-vwdetail/finpck-vwdetail.module';
+import { FinpckVwstatusModule } from './finpck-vwstatus/finpck-vwstatus.module';
 
 
 @Module({
   controllers: [FinPckController],
   providers: [FinPckService],
-  imports: [FinpckAssetModule, FinpckFormModule , FormModule , FlowModule , FormmstModule, RepModule, UsersModule,PappflowModule,OrgTreeModule],
+  imports: [FinpckAssetModule, FinpckFormModule , FormModule , FlowModule , FormmstModule, RepModule, UsersModule,PappflowModule,OrgTreeModule, FinpckVwdetailModule, FinpckVwstatusModule],
 })
 export class FinPckModule {}

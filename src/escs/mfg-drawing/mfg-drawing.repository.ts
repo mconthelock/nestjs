@@ -77,7 +77,7 @@ export class MfgDrawingRepository extends BaseRepository {
             })
             .leftJoinAndSelect('A.STATUS', 'AS')
             .leftJoinAndSelect('A.USERS', 'AU')
-            .orderBy('M.NID, M.NBLOCKID, M.NITEMID, M.VPIS, M.VDRAWING', 'ASC')
+            .orderBy('M.NID, M.NBLOCKID, M.NITEMID, M.VPIS, M.VDRAWING, MS.VSERIALNO', 'ASC')
             .getMany();
     }
 

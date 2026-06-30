@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Inject, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { LoggerService } from './logger.service';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -7,8 +7,9 @@ import * as zlib from 'zlib';
 @Controller('logger')
 export class LoggerController {
     //private logDir = path.join(process.cwd(), 'logs');
-    private logDir = '//amecnas/amecweb/wwwroot/production/api/logs';
+    //private logDir = '//amecnas/amecweb/wwwroot/production/api/logs';
     //private logDir = '//amecnas/amecweb/wwwroot/development/api/logs';
+    private logDir = process.env.LOGGER_DIR || 'logs/';
     constructor(private readonly logger: LoggerService) {}
 
     @Post('daily')

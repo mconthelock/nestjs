@@ -19,11 +19,10 @@ export class VpsController {
         };
     }
 
-    @Post('get-detail-pis')
-    async getDetailPIS(@Body('packing') packing: string) {
-        const data = await this.vpsService.getDetailPIS(packing);
+    @Post('get-list-order')
+    async getListOrder(@Body('packing') packing: string) {
+        const data = await this.vpsService.getListOrder(packing);
         return {
-            success: true,
             data,
         };
     }
@@ -52,6 +51,18 @@ export class VpsController {
         await this.vpsService.insertPrintVPS(order, packing, qtyPrint, empno, ip);
         return {
             success: true,
+        };
+    }
+
+    @Post('get-order-detail')
+    async getOrderDetail(
+        @Body('order') order: string,
+        @Body('packing') packing: string,
+    ) {
+        const data = await this.vpsService.getOrderDetail(order, packing);
+        
+        return {
+            data,
         };
     }
 }

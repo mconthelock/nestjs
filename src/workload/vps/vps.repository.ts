@@ -254,7 +254,8 @@ export class VpsRepository extends BaseRepository {
                 SUBSTR(F_CPROD(M8K01), -5) AS JUN, 
                 M8K02,
                 J2INO as PUR_CODE,
-                ap.PACKSHOP
+                ap.PACKSHOP,
+                CASE WHEN U.MFGNO IS NOT NULL THEN 1 ELSE NULL END AS URGENT
             FROM S011MP A
             LEFT JOIN (
                 SELECT S11M01, S11M08, S11M02, S11M03, S11M04, LISTAGG(SUBSTR(S11M06, -3), '') WITHIN GROUP (ORDER BY S11M06) AS LVAL 
@@ -268,6 +269,12 @@ export class VpsRepository extends BaseRepository {
                 ON j.J2CUS = A.S11M01 AND (j.J2DRAW = REPLACE(A.S11M06, ' ', '') OR J2DES = REPLACE(A.S11M06, ' ', ''))
             LEFT JOIN AMECORDERS ao ON ao.MFGNO = S.S01M01
             LEFT JOIN AMECORDERS_PACKNO ap ON ap.ORDERNO = S.S01M01 AND ap.PACKNO = S.S01M04
+            LEFT JOIN (
+                SELECT MFGNO
+                FROM WEBFORM.URGENT_ORDER_LIST A
+                JOIN WEBFORM.FORM B ON A.NFRMNO = B.NFRMNO AND A.VORGNO = B.VORGNO AND A.CYEAR = B.CYEAR AND A.CYEAR2 = B.CYEAR2 AND A.NRUNNO = B.NRUNNO
+                WHERE B.CST != 3
+            ) U ON U.MFGNO = S.S01M01
             WHERE A.S11M01 = :2 
             AND A.S11M02 = :3 
             AND A.S11M07 = 0

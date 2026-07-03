@@ -172,7 +172,7 @@ export class PackingListIssueService {
      * @param prepareDocRevisionDataParams
      * @returns
      * @example
-     * const { docRevData, updateDocFinishAll } = await this.prepareDocRevisionData({
+     * const docRevData = await this.prepareDocRevisionData({
      *      typeCode: 'CP',
      *      plIssueData: {
      *          VPROD: '2026021',
@@ -191,34 +191,69 @@ export class PackingListIssueService {
         docRevision,
     }: prepareDocRevisionDataParams): Promise<{
         docRevData: any;
-        updateDocFinishAll: any[];
     }> {
         let docRevData: any = plIssueData;
-        let updateDocFinishAll = [];
         // 2. ถ้าเป็น complete, combine, balance ให้ set DFINISHALL เป็นวันที่ issue เลย
         if (['CP', 'CB', 'BL'].includes(typeCode)) {
-            await this.dpmsPlIssueService.update(plIssueData, {
-                DFINISHALL: finishDate,
-                NDOCREV: docRevision,
-            });
             docRevData = {
                 ...docRevData,
                 NREV: docRevision,
                 DFINISHALL: finishDate,
             };
-            // ดึงรายการ ที่ยังไม่ finish ของเอกสารนี้ เพื่อ update DFINISHALL เป็นวันที่ issue
-            const pendingRecord =
-                await this.dpmsPlDocRevService.getPendingRecord(plIssueData);
-            if (pendingRecord.status) {
-                updateDocFinishAll = pendingRecord.data;
-            }
         } else {
             docRevData = {
                 ...docRevData,
                 NREV: docRevision,
             };
         }
-        return { docRevData, updateDocFinishAll };
+        return docRevData;
+    }
+
+    protected async saveDocRevision({
+        typeCode,
+        finishDate,
+        docRevData,
+        issueRevID,
+    }: {
+        typeCode: string;
+        finishDate: Date;
+        docRevData: any;
+        issueRevID: number;
+    }) {
+        const plIssueData = {
+            VPROD: docRevData.VPROD,
+            VP: docRevData.VP,
+            VORDERS: docRevData.VORDERS,
+            VTYPE: docRevData.VTYPE,
+        };
+        // ถ้า typeCode ไม่ใช่ Draft ให้สร้าง record ใน DPMS_PL_DOC_REV และ update DFINISHALL ของ record ที่ยังไม่ finish ของเอกสารนี้
+        if (typeCode !== 'DF') {
+            await this.dpmsPlDocRevService.create({
+                ...docRevData,
+                NISSUEREV_ID: issueRevID,
+            });
+
+            // 8. update DFINISHALL for pending records if any
+            if (['CP', 'CB', 'BL'].includes(typeCode)) {
+                // ดึงรายการ ที่ยังไม่ finish ของเอกสารนี้ เพื่อ update DFINISHALL เป็นวันที่ issue
+                const pendingRecord =
+                    await this.dpmsPlDocRevService.getPendingRecord(
+                        plIssueData,
+                    );
+                if (pendingRecord.status) {
+                    for (const record of pendingRecord.data) {
+                        await this.dpmsPlDocRevService.create({
+                            ...record,
+                            DFINISHALL: finishDate,
+                        });
+                    }
+                }
+                await this.dpmsPlIssueService.update(plIssueData, {
+                    DFINISHALL: finishDate,
+                    NDOCREV: docRevData.NREV,
+                });
+            }
+        }
     }
 
     /**
@@ -280,7 +315,7 @@ export class PackingListIssueService {
      * await this.sendMail({
      *      maillist: ['sutthipongt@MitsubishiElevatorAsia.co.th'],
      *      context: {
-     *          rev: 'A', 
+     *          rev: 'A',
      *          issueType: 'Partial',
      *          shopOrderNo: 'E-XS-91601-3',
      *          subject: 'ELEVATOR (02X)G11L11',

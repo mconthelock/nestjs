@@ -70,7 +70,7 @@ export class PackingListCreateService extends PackingListIssueService {
                 await this.syncDocRevisionAndPlIssue(plIssueData);
 
             // 2. เตรียมข้อมูลสำหรับการสร้าง record ใน DPMS_PL_DOC_REV และ update DFINISHALL ของ record ที่ยังไม่ finish ของเอกสารนี้
-            const { docRevData, updateDocFinishAll } =
+            const docRevData =
                 await this.prepareDocRevisionData({
                     typeCode: issueType.data.VCODE,
                     plIssueData,
@@ -134,20 +134,12 @@ export class PackingListCreateService extends PackingListIssueService {
             }
 
             // 7. insert record to DPMS_PL_DOC_REV for this issue
-            await this.dpmsPlDocRevService.create({
-                ...docRevData,
-                NISSUEREV_ID: insertIssueRev.data.NID,
-            });
-
-            // 8. update DFINISHALL for pending records if any
-            if (updateDocFinishAll.length > 0) {
-                for (const record of updateDocFinishAll) {
-                    await this.dpmsPlDocRevService.create({
-                        ...record,
-                        DFINISHALL: finishDate,
-                    });
-                }
-            }
+            await this.saveDocRevision({
+                typeCode: issueType.data.VCODE,
+                finishDate,
+                docRevData,
+                issueRevID: insertIssueRev.data.NID,
+            })
 
             // 9. Create PL Issue List record
             for (const list of dto.LIST) {

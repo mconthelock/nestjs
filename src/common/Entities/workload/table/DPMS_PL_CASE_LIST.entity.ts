@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { DPMS_PL_CASE_LIST_DETAIL } from './DPMS_PL_CASE_LIST_DETAIL.entity';
 
 @Entity({ name: 'DPMS_PL_CASE_LIST', schema: 'WORKLOAD' })
 export class DPMS_PL_CASE_LIST {
@@ -34,4 +35,7 @@ export class DPMS_PL_CASE_LIST {
 
     @Column()
     VHEIGHT: string;
+
+    @OneToMany(() => DPMS_PL_CASE_LIST_DETAIL, (detail) => detail.MAIN)
+    DETAILS: DPMS_PL_CASE_LIST_DETAIL[];
 }

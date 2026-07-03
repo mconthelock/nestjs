@@ -13,19 +13,9 @@ export class DpmsPlDocRevService {
 
     async create(dto: CreateDpmsPlDocRevDto) {
         try {
-            let revision = dto.NREV;
-            if (!revision) {
-                revision = await this.getNextRevision({
-                    VPROD: dto.VPROD,
-                    VP: dto.VP,
-                    VTYPE: dto.VTYPE,
-                    VORDERS: dto.VORDERS,
-                });
-            }
             const res = await this.repo.create({
                 ...dto,
-                NREV: revision,
-                VREVTEXT: numberToAlphabetRevision(revision),
+                VREVTEXT: numberToAlphabetRevision(dto.NREV),
             });
             if (!res) {
                 return {
@@ -62,17 +52,6 @@ export class DpmsPlDocRevService {
                 'Get document revision list Error: ' + error.message,
             );
         }
-    }
-
-    /**
-     * @author Sutthipong tangmongkhonchatoen
-     * @since 2026-06-30
-     * @param condition
-     * @returns
-     */
-    async getNextRevision(condition: DPMS_PL_ISSUE_PK): Promise<number> {
-        const lastRevision = await this.repo.findLatestRevision(condition);
-        return lastRevision ? lastRevision.NREV + 1 : 0;
     }
 
     async getPendingRecord(condition: DPMS_PL_ISSUE_PK) {

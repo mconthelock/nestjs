@@ -22,4 +22,7 @@ export class DPMS_PL_ISSUE {
 
     @Column()
     DFINISHALL: Date;
+
+    @Column()
+    NDOCREV: number;
 }

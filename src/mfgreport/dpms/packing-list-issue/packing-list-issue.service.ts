@@ -103,40 +103,66 @@ export class PackingListIssueService {
                 VORDERS: dto.VORDERS,
                 VTYPE: dto.VTYPE,
             };
+            let docRevision: number = 0;
+            const finishDate = new Date();
+            let docRevData: any = plIssueData;
+            let updateDocFinishAll = [];
+
             const checkPlIssue =
                 await this.dpmsPlIssueService.findOne(plIssueData);
+            console.log('check pl issue', checkPlIssue);
+            
+            // ถ้าไม่มี record ให้สร้างใหม่ และ set NDOCREV เป็น 0
             if (!checkPlIssue.status) {
-                await this.dpmsPlIssueService.create(plIssueData);
+                console.log('condition 1 ');
+                
+                await this.dpmsPlIssueService.create({
+                    ...plIssueData,
+                    NDOCREV: docRevision,
+                });
             }
+            // ถ้ามี record อยู่แล้ว ให้เช็คว่า DFINISHALL เป็น null หรือไม่ ถ้าไม่เป็น null ให้เพิ่ม docRevision ขึ้น 1 และ set DFINISHALL เป็น null และ update NDOCREV เป็น docRevision ใหม่
+            else if (checkPlIssue.data.DFINISHALL) {
+                console.log('condition 2 ');
+                docRevision = checkPlIssue.data.NDOCREV + 1; // เพิ่ม revision ของเอกสาร
+                await this.dpmsPlIssueService.update(plIssueData, {
+                    DFINISHALL: null,
+                    NDOCREV: docRevision,
+                });
+            } else {
+                console.log('condition 3 ');
+                docRevision = checkPlIssue.data.NDOCREV;
+            }
+            // throw new Error('Test error');
             // 2. ถ้าเป็น complete, combine, balance ให้ set DFINISHALL เป็นวันที่ issue เลย
             if (['CP', 'CB', 'BL'].includes(issueType.data.VCODE)) {
-                const finishDate = new Date();
                 await this.dpmsPlIssueService.update(plIssueData, {
                     DFINISHALL: finishDate,
+                    NDOCREV: docRevision,
                 });
-                // ดึงข้อมูล revision ถัดไปของเอกสาร เพื่อเตรียมสร้าง record ใน DPMS_PL_DOC_REV
-                const docRevision =
-                    await this.dpmsPlDocRevService.getNextRevision(plIssueData);
-                // ดึงรายการ ที่ยังไม่เก็บ record ใน DPMS_PL_DOC_REV ของเอกสารนี้ เพื่อสร้าง record ใหม่
+                docRevData = {
+                    ...docRevData,
+                    NREV: docRevision,
+                    DFINISHALL: finishDate,
+                };
+                // ดึงรายการ ที่ยังไม่ finish ของเอกสารนี้ เพื่อ update DFINISHALL เป็นวันที่ issue
                 const pendingRecord =
                     await this.dpmsPlDocRevService.getPendingRecord(
                         plIssueData,
                     );
-                // ถ้าไม่สามารถดึงรายการที่ยังไม่เก็บ record ได้ ให้ throw error เพราะแสดงว่าข้อมูลไม่ถูกต้องหรือมีปัญหาในการดึงข้อมูล
-                if (!pendingRecord.status) {
-                    throw new Error(
-                        'Failed to retrieve pending records for finishing document revision',
-                    );
+                if (pendingRecord.status) {
+                    updateDocFinishAll = pendingRecord.data;
                 }
-                for (const record of pendingRecord.data) {
-                    await this.dpmsPlDocRevService.create({
-                        ...plIssueData,
-                        NISSUEREV_ID: record.NID,
-                        NREV: docRevision,
-                        DFINISHALL: finishDate,
-                    });
-                }
+            } else {
+                docRevData = {
+                    ...docRevData,
+                    NREV: docRevision,
+                };
             }
+            console.log('docrev data', docRevData);
+            // throw new Error('Test error');
+            
+
             // 3. Get next revision number
             // 2026-06-27 เปลี่ยนเอา type และ round ออกจาก condition เพราะ revision จะไม่ขึ้นกับ type และ round แล้ว รันต่อเนื่องได้เลย
             const revision: number =
@@ -189,6 +215,27 @@ export class PackingListIssueService {
                 NROUND: dto.NROUND,
                 VISSUEBY: dto.VISSUEBY,
             });
+            if (insertIssueRev.status === false) {
+                throw new Error(
+                    'Failed to insert packing list issue revision record',
+                );
+            }
+
+            // 7. insert record to DPMS_PL_DOC_REV for this issue
+            await this.dpmsPlDocRevService.create({
+                ...docRevData,
+                NISSUEREV_ID: insertIssueRev.data.NID,
+            });
+
+            // 8. update DFINISHALL for pending records if any
+            if (updateDocFinishAll.length > 0) {
+                for (const record of updateDocFinishAll) {
+                    await this.dpmsPlDocRevService.create({
+                        ...record,
+                        DFINISHALL: finishDate,
+                    });
+                }
+            }
 
             // 7. Create PL Issue List record
             for (const list of dto.LIST) {

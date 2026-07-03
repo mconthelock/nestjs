@@ -26,4 +26,24 @@ export class DpmsPlCaseListService {
             );
         }
     }
+    async findByRevId(revId: number) {
+        try {
+            const res = await this.repo.findByRevId(revId);
+            if (res.length === 0) {
+                return {
+                    status: false,
+                    message: 'Failed to find DPMS PL Case List',
+                };
+            }
+            return {
+                status: true,
+                message: `DPMS PL Case List found ${res.length} records`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(
+                `Failed to find DPMS PL Case List: ${error.message}`,
+            );
+        }
+    }
 }

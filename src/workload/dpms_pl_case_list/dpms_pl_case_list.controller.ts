@@ -9,4 +9,9 @@ export class DpmsPlCaseListController {
     findByRevId(@Param('id') id: string) {
         return this.service.findByRevId(+id);
     }
+
+    @Get('partial-selection/:id')
+    findPartialSelectionByRevId(@Param('id') id: string) {
+        return this.service.findPartialSelectionByRevId(+id);
+    }
 }

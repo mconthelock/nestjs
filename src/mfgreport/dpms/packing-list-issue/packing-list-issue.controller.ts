@@ -8,18 +8,28 @@ import {
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { PackingListIssueProcedureService } from './packing-list-issue-procedure.service';
 import { SearchDpmsPlIssueDto } from 'src/workload/dpms_pl_issue/dto/search-dpms_pl_issue.dto';
+import { PackingListCreateService } from './packing-list-create.service';
+import { PackingListReviseService } from './packing-list-revise.service';
 
 @Controller('mfgreport/dpms/packing-list-issue')
 export class PackingListIssueController {
     constructor(
         private readonly service: PackingListIssueService,
+        private readonly createService: PackingListCreateService,
+        private readonly reviseService: PackingListReviseService,
         private readonly procedureService: PackingListIssueProcedureService,
     ) {}
 
     @Post()
     @UseTransaction('workloadConnection')
     issue(@Body() dto: CreatePackingListIssueDto) {
-        return this.service.issue(dto);
+        return this.createService.issue(dto);
+    }
+
+    @Post('revise')
+    @UseTransaction('workloadConnection')
+    revise(@Body() dto: CreatePackingListIssueDto) {
+        return this.reviseService.revise(dto);
     }
 
     @Patch('problem-reason')

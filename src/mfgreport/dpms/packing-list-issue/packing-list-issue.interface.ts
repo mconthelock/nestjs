@@ -30,3 +30,18 @@ export interface sendMailParams {
     attachments: { filename: string; content: Buffer }[];
     subject?: string;
 }
+
+export interface prepareDocRevisionDataParams {
+    typeCode: string;
+    plIssueData: DPMS_PL_ISSUE_PK;
+    finishDate: Date;
+    docRevision: number;
+}
+
+export interface generateFilenameParams {
+    revision: number;
+    revisionText: string;
+    issueType: string;
+    orders: string;
+    projectName: string;
+}

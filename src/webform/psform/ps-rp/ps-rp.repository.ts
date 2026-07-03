@@ -98,6 +98,7 @@ export class PsRPRepository extends BaseRepository {
                     // AND FL.CAPVSTNO = '1'
                     // AND FL.DAPVDATE IS NOT NULL
             )
+            .addSelect('F.VREQNO', 'VREQNO')
             .addSelect('FM.VANAME', 'VANAME')
             .addSelect('FL.DAPVDATE', 'DAPVDATE');
 

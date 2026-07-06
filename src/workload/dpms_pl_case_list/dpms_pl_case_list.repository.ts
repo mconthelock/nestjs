@@ -22,12 +22,23 @@ export class DpmsPlCaseListRepository extends BaseRepository {
             order: {
                 VCASE: 'ASC',
                 DETAILS: {
-                    VMFGNO: 'ASC', 
+                    VMFGNO: 'ASC',
                     VCASE: 'ASC',
                     VITEM: 'ASC',
                     VDRAWING: 'ASC',
                 },
-            }
+            },
         });
+    }
+
+    findPartialSelectionByRevId(revId: number) {
+        return this.manager.query(
+            `SELECT D.VCASE AS CASENO, D.VITEM AS ITEM, D.VDRAWING AS DRAWING
+            FROM DPMS_PL_ISSUE_REV R
+            JOIN DPMS_PL_CASE_LIST L ON R.NID = L.NISSUEREV_ID 
+            JOIN DPMS_PL_CASE_LIST_DETAIL D ON L.NID = D.NCASELIST_ID 
+            WHERE R.NID = :1`,
+            [revId],
+        );
     }
 }

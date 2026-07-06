@@ -5,6 +5,10 @@ export interface DPMS_PL_ISSUE_PK {
     VORDERS: string;
 }
 
+export interface getPendingRecordParams extends DPMS_PL_ISSUE_PK {
+    NREV: number;
+}
+
 export interface generatePDFParams {
     order: string;
     html: string;

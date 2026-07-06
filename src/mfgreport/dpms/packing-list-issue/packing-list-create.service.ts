@@ -67,7 +67,7 @@ export class PackingListCreateService extends PackingListIssueService {
             };
             // 1. หา revision ของชุดเอกสาร และทำการเพิ่มหรืออัปเดต DPMS_PL_ISSUE ตามเงื่อนไขที่กำหนด
             let docRevision: number =
-                await this.syncDocRevisionAndPlIssue(plIssueData);
+                await this.syncDocRevisionAndPlIssue(plIssueData, dto.CHANGETYPE);
 
             // 2. เตรียมข้อมูลสำหรับการสร้าง record ใน DPMS_PL_DOC_REV และ update DFINISHALL ของ record ที่ยังไม่ finish ของเอกสารนี้
             const docRevData =

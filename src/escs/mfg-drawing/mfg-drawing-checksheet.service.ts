@@ -43,10 +43,8 @@ export class MfgDrawingCreateChecksheetService {
             }
 
             const itemData: ITEM_MFG = item.data;
-            const blockName = itemData.BLOCK_MASTER
-                ? itemData.BLOCK_MASTER.VNAME
-                : null;
-            const itemName = itemData.VITEM_NAME;
+            const blockName = itemData.BLOCK_MASTER ? itemData.BLOCK_MASTER.VNAME : null;
+            const itemName  = itemData.VITEM_NAME;
             const itemLists: ITEM_MFG_LIST[] = itemData.ITEM_LIST;
             const deleteLists: ITEM_MFG_DELETE[] = itemData.DELETE_LIST;
             const controlLists: CONTROL_DRAWING_PIS[] = itemData.CONTROL_LIST;
@@ -81,10 +79,7 @@ export class MfgDrawingCreateChecksheetService {
                 case 'multi':
                     newfileName = controlNo; //dto.ASERIALNO[0];
                     fileName = itemData.VFILE;
-                    drawing =
-                        await this.drawingResolverHelper.getDrawingByControlNo(
-                            controlNo,
-                        );
+                    drawing  = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
                     serialList = dto.ASERIALNO.map((sn, index) => ({
                         VSERIALNO: sn,
                         NTYPE: 1, // กำหนด type เป็น 1 สำหรับ serial no ทั้งหมดในกรณี multi
@@ -92,14 +87,8 @@ export class MfgDrawingCreateChecksheetService {
                     break;
                 case 'pisMulti':
                     newfileName = dto.VPIS;
-                    drawing = await this.drawingResolverHelper.getDrawingByPis(
-                        dto.VPIS,
-                        controlList,
-                    );
-                    listOfCS = this.drawingMatcherHelper.getDataListOfCS(
-                        itemLists,
-                        drawing,
-                    );
+                    drawing  = await this.drawingResolverHelper.getDrawingByPis(dto.VPIS, controlList);
+                    listOfCS = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawing);
                     fileName = listOfCS.VNUMBER_FILE;
                     serialList = dto.ASERIALNO.map((sn, index) => ({
                         VSERIALNO: sn,
@@ -107,21 +96,12 @@ export class MfgDrawingCreateChecksheetService {
                     }));
                     break;
                 case 'feederParts':
-                    drawing =
-                        await this.drawingResolverHelper.getDrawingByControlNo(
-                            controlNo,
-                        );
+                    drawing = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
                     break;
                 default:
                     newfileName = controlNo; //dto.ASERIALNO[0];
-                    drawing =
-                        await this.drawingResolverHelper.getDrawingByControlNo(
-                            controlNo,
-                        );
-                    listOfCS = this.drawingMatcherHelper.getDataListOfCS(
-                        itemLists,
-                        drawing,
-                    );
+                    drawing  = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
+                    listOfCS = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawing);
                     fileName = listOfCS.VNUMBER_FILE;
                     serialList = dto.ASERIALNO.map((sn, index) => ({
                         VSERIALNO: sn,
@@ -152,20 +132,9 @@ export class MfgDrawingCreateChecksheetService {
                 });
             }
 
-            const destination = await this.drawingFileHelper.getDestinationPath(
-                blockName,
-                itemName,
-            );
-
-            await this.drawingFileHelper.createFile(
-                insertData,
-                masterPath,
-                destination,
-                fileName,
-                newfileName,
-            );
-
-            const res = await this.mfgDrawingService.findOne(insertData.NID);
+            const destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
+            await this.drawingFileHelper.createFile(insertData, masterPath, destination, fileName, newfileName);
+            const res = await this.mfgDrawingService.findOne(insertData.NID);    
             return {
                 data: res.data,
                 message: dto.REVISE ? 'Revise Checksheet Success' : message,

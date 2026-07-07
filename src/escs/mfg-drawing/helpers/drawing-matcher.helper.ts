@@ -6,7 +6,7 @@ import { DrawingParserHelper } from './drawing-parser.helper';
 @Injectable()
 export class DrawingMatcherHelper {
     constructor(
-        private readonly drawingParserHelper: DrawingParserHelper,
+        private readonly parser: DrawingParserHelper,
     ) {}
 
     /**
@@ -74,7 +74,7 @@ export class DrawingMatcherHelper {
         const mapList = list
             .filter((l) => l.NSTATUS == 1)
             .map((l) => ({
-                VDRAWING: this.drawingParserHelper.explodeGL(l.VDRAWING),
+                VDRAWING: this.parser.explodeGL(l.VDRAWING),
                 VNUMBER_FILE: l.VNUMBER_FILE,
             }));
 
@@ -104,7 +104,7 @@ export class DrawingMatcherHelper {
             const master = this.readMaster(list);
 
             // Set dwg from "general part list" to variable array.
-            const dwg = this.drawingParserHelper.extractDrawing(drawing);
+            const dwg = this.parser.extractDrawing(drawing);
             for (let i = 0; i < master.length; i++) {
                 const masterDwg = master[i].VDRAWING;
                 const cStepTemp = this.matchDrawing(dwg, masterDwg);
@@ -146,10 +146,10 @@ export class DrawingMatcherHelper {
         if (!drawing) return false;
 
         const master = deleteDwg.map((d) => ({
-            VDRAWING: this.drawingParserHelper.explodeGL(d),
+            VDRAWING: this.parser.explodeGL(d),
         }));
 
-        const dwg = this.drawingParserHelper.extractDrawing(drawing);
+        const dwg = this.parser.extractDrawing(drawing);
 
         for (const m of master) {
             const masterDwg = m.VDRAWING;

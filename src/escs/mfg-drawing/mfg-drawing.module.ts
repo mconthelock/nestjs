@@ -39,8 +39,8 @@ import { DrawingFileHelper } from './helpers/drawing-file.helper';
         MfgDrawingCreateChecksheetService,
         DrawingFileHelper,
         DrawingResolverHelper,
-        DrawingParserHelper,
         DrawingMatcherHelper, 
+        DrawingParserHelper,
     ],
     exports: [
         MfgDrawingService, 

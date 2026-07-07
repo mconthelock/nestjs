@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { basename } from 'path';
 import { CreateMfgDrawingCheckSheetDto } from './dto/create-mfg-drawing.dto';
 import { MfgDrawingService } from './mfg-drawing.service';
 import { ItemMfgService } from '../item-mfg/item-mfg.service';
@@ -10,13 +9,9 @@ import { ITEM_MFG_LIST } from 'src/common/Entities/escs/table/ITEM_MFG_LIST.enti
 import { ITEM_MFG_DELETE } from 'src/common/Entities/escs/table/ITEM_MFG_DELETE.entity';
 import { CONTROL_DRAWING_PIS } from 'src/common/Entities/escs/table/CONTROL_DRAWING_PIS.entity';
 import { MFG_DRAWING } from 'src/common/Entities/escs/table/MFG_DRAWING.entity';
-import { FileService } from 'src/common/services/file/file.service';
-import { ListMode } from 'src/common/services/file/dto/file.dto';
-import { copyFile, deleteFile, joinPaths } from 'src/common/utils/files.utils';
-import { F110kpService } from 'src/datacenter/f110kp/f110kp.service';
+import { deleteFile, joinPaths } from 'src/common/utils/files.utils';
 import { DrawingFileHelper } from './helpers/drawing-file.helper';
 import { DrawingResolverHelper } from './helpers/drawing-resolver.helper';
-import { DrawingParserHelper } from './helpers/drawing-parser.helper';
 import { DrawingMatcherHelper } from './helpers/drawing-matcher.helper';
 
 @Injectable()
@@ -24,13 +19,10 @@ export class MfgDrawingCreateChecksheetService {
     constructor(
         private readonly mfgDrawingService: MfgDrawingService,
         private readonly itemMfgService: ItemMfgService,
-        private readonly f110kpService: F110kpService,
-        private readonly fileService: FileService,
         private readonly mfgSerialService: MfgSerialService,
         private readonly mfgDrawingActionService: MfgDrawingActionService,
         private readonly drawingFileHelper: DrawingFileHelper,
         private readonly drawingResolverHelper: DrawingResolverHelper,
-        private readonly drawingParserHelper: DrawingParserHelper,
         private readonly drawingMatcherHelper: DrawingMatcherHelper,
     ) {}
 
@@ -164,12 +156,6 @@ export class MfgDrawingCreateChecksheetService {
                 blockName,
                 itemName,
             );
-
-            // console.log('insertData', insertData);
-            // console.log('masterPath', masterPath);
-            // console.log('destination', destination);
-            // console.log('fileName', fileName);
-            // console.log('newfileName', newfileName);
 
             await this.drawingFileHelper.createFile(
                 insertData,

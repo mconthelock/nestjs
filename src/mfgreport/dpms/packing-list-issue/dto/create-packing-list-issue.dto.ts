@@ -156,4 +156,9 @@ export class CreatePackingListIssueDto {
     @IsNotEmpty()
     @IsString()
     VISSUEBY: string;
+
+    @IsNotEmpty()
+    @IsBoolean()    
+    @ToBoolean()
+    CHANGETYPE: boolean;
 }

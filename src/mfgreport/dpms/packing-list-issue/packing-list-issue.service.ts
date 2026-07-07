@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePackingListIssueDto } from './dto/create-packing-list-issue.dto';
-import {
-    UpdatePackingListIssueDto,
-    UpdatePlIssueProblemReasonDto,
-} from './dto/update-packing-list-issue.dto';
+import { UpdatePlIssueProblemReasonDto } from './dto/update-packing-list-issue.dto';
 import { DpmsPlIssueService } from 'src/workload/dpms_pl_issue/dpms_pl_issue.service';
 import { PDFService } from 'src/common/services/pdf/pdf.service';
 import { joinPaths } from 'src/common/utils/files.utils';
@@ -137,6 +133,7 @@ export class PackingListIssueService {
      */
     protected async syncDocRevisionAndPlIssue(
         plIssueData: DPMS_PL_ISSUE_PK,
+        changeIssueType: boolean = false,
     ): Promise<number> {
         let docRevision: number = 0;
 
@@ -144,22 +141,23 @@ export class PackingListIssueService {
 
         // ถ้าไม่มี record ให้สร้างใหม่ และ set NDOCREV เป็น 0
         if (!checkPlIssue.status) {
-            console.log('condition 1 ');
             await this.dpmsPlIssueService.create({
                 ...plIssueData,
                 NDOCREV: docRevision,
             });
         }
         // ถ้ามี record อยู่แล้ว ให้เช็คว่า DFINISHALL เป็น null หรือไม่ ถ้าไม่เป็น null ให้เพิ่ม docRevision ขึ้น 1 และ set DFINISHALL เป็น null และ update NDOCREV เป็น docRevision ใหม่
-        else if (checkPlIssue.data.DFINISHALL) {
-            console.log('condition 2 ');
+        // 2026-03-06 ถ้า DFINISHALL เป็น null และมีการเปลี่ยนประเภทการออกเอกสาร
+        else if (
+            checkPlIssue.data.DFINISHALL ||
+            (checkPlIssue.data.DFINISHALL === null && changeIssueType)
+        ) {
             docRevision = checkPlIssue.data.NDOCREV + 1; // เพิ่ม revision ของเอกสาร
             await this.dpmsPlIssueService.update(plIssueData, {
                 DFINISHALL: null,
                 NDOCREV: docRevision,
             });
         } else {
-            console.log('condition 3 ');
             docRevision = checkPlIssue.data.NDOCREV;
         }
         return docRevision;
@@ -237,9 +235,11 @@ export class PackingListIssueService {
             if (['CP', 'CB', 'BL'].includes(typeCode)) {
                 // ดึงรายการ ที่ยังไม่ finish ของเอกสารนี้ เพื่อ update DFINISHALL เป็นวันที่ issue
                 const pendingRecord =
-                    await this.dpmsPlDocRevService.getPendingRecord(
-                        plIssueData,
-                    );
+                    await this.dpmsPlDocRevService.getPendingRecord({
+                        ...plIssueData,
+                        NREV: docRevData.NREV,
+                    });
+
                 if (pendingRecord.status) {
                     for (const record of pendingRecord.data) {
                         await this.dpmsPlDocRevService.create({

@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource } from 'typeorm';
+import { DataSource, IsNull } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import {
     CreateDpmsPlDocRevDto,
     SearchDpmsPlDocRevDto,
 } from './dto/create-dpms_pl_doc_rev.dto';
 import { DPMS_PL_DOC_REV } from 'src/common/Entities/workload/table/DPMS_PL_DOC_REV.entity';
-import { DPMS_PL_ISSUE_PK } from 'src/mfgreport/dpms/packing-list-issue/packing-list-issue.interface';
+import { getPendingRecordParams } from 'src/mfgreport/dpms/packing-list-issue/packing-list-issue.interface';
 
 @Injectable()
 export class DpmsPlDocRevRepository extends BaseRepository {
@@ -25,15 +25,16 @@ export class DpmsPlDocRevRepository extends BaseRepository {
         });
     }
 
-    async getPendingRecord(condition: DPMS_PL_ISSUE_PK) {
+    async getPendingRecord(condition: getPendingRecordParams) {
         return this.getRepository(DPMS_PL_DOC_REV).find({
             where: {
                 VPROD: condition.VPROD,
                 VP: condition.VP,
                 VTYPE: condition.VTYPE,
                 VORDERS: condition.VORDERS,
-                DFINISHALL: null,
-            }
+                NREV: condition.NREV,
+                DFINISHALL: IsNull(),
+            },
         });
         // return this.manager.query(
         //     `SELECT * FROM DPMS_PL_ISSUE_REV A
@@ -44,7 +45,7 @@ export class DpmsPlDocRevRepository extends BaseRepository {
         //         AND  NOT EXISTS (
         //             SELECT 1
         //             FROM DPMS_PL_DOC_REV B
-        //             WHERE A.VPROD = B.VPROD AND A.VP = B.VP AND A.VTYPE  = B.VTYPE AND A.VORDERS = B.VORDERS 
+        //             WHERE A.VPROD = B.VPROD AND A.VP = B.VP AND A.VTYPE  = B.VTYPE AND A.VORDERS = B.VORDERS
         //         )`,
         //     [condition.VPROD, condition.VP, condition.VTYPE, condition.VORDERS],
         // );

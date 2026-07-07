@@ -5,7 +5,7 @@ import {
 } from './dto/create-dpms_pl_doc_rev.dto';
 import { DpmsPlDocRevRepository } from './dpms_pl_doc_rev.repository';
 import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
-import { DPMS_PL_ISSUE_PK } from 'src/mfgreport/dpms/packing-list-issue/packing-list-issue.interface';
+import { getPendingRecordParams } from 'src/mfgreport/dpms/packing-list-issue/packing-list-issue.interface';
 
 @Injectable()
 export class DpmsPlDocRevService {
@@ -54,7 +54,7 @@ export class DpmsPlDocRevService {
         }
     }
 
-    async getPendingRecord(condition: DPMS_PL_ISSUE_PK) {
+    async getPendingRecord(condition: getPendingRecordParams) {
         try {
             const res = await this.repo.getPendingRecord(condition);
             if (res.length == 0) {

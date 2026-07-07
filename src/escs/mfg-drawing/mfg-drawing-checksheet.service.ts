@@ -27,7 +27,7 @@ export class MfgDrawingCreateChecksheetService {
         private readonly f110kpService: F110kpService,
         private readonly fileService: FileService,
         private readonly mfgSerialService: MfgSerialService,
-        private readonly mfgDrawingActionService: MfgDrawingActionService, 
+        private readonly mfgDrawingActionService: MfgDrawingActionService,
         private readonly drawingFileHelper: DrawingFileHelper,
         private readonly drawingResolverHelper: DrawingResolverHelper,
         private readonly drawingParserHelper: DrawingParserHelper,
@@ -38,7 +38,7 @@ export class MfgDrawingCreateChecksheetService {
         1: 'default',
         2: 'pisMulti',
         3: 'multi',
-        4: "feederParts"
+        4: 'feederParts',
     };
 
     async create(dto: CreateMfgDrawingCheckSheetDto) {
@@ -51,8 +51,10 @@ export class MfgDrawingCreateChecksheetService {
             }
 
             const itemData: ITEM_MFG = item.data;
-            const blockName = itemData.BLOCK_MASTER ? itemData.BLOCK_MASTER.VNAME : null;
-            const itemName  = itemData.VITEM_NAME;
+            const blockName = itemData.BLOCK_MASTER
+                ? itemData.BLOCK_MASTER.VNAME
+                : null;
+            const itemName = itemData.VITEM_NAME;
             const itemLists: ITEM_MFG_LIST[] = itemData.ITEM_LIST;
             const deleteLists: ITEM_MFG_DELETE[] = itemData.DELETE_LIST;
             const controlLists: CONTROL_DRAWING_PIS[] = itemData.CONTROL_LIST;
@@ -85,9 +87,12 @@ export class MfgDrawingCreateChecksheetService {
             let dataByidTag: { controlNo: string; drawing: string };
             switch (typeName) {
                 case 'multi':
-                    newfileName = controlNo //dto.ASERIALNO[0];
+                    newfileName = controlNo; //dto.ASERIALNO[0];
                     fileName = itemData.VFILE;
-                    drawing = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);;
+                    drawing =
+                        await this.drawingResolverHelper.getDrawingByControlNo(
+                            controlNo,
+                        );
                     serialList = dto.ASERIALNO.map((sn, index) => ({
                         VSERIALNO: sn,
                         NTYPE: 1, // กำหนด type เป็น 1 สำหรับ serial no ทั้งหมดในกรณี multi
@@ -95,8 +100,14 @@ export class MfgDrawingCreateChecksheetService {
                     break;
                 case 'pisMulti':
                     newfileName = dto.VPIS;
-                    drawing = await this.drawingResolverHelper.getDrawingByPis(dto.VPIS, controlList);
-                    listOfCS = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawing);
+                    drawing = await this.drawingResolverHelper.getDrawingByPis(
+                        dto.VPIS,
+                        controlList,
+                    );
+                    listOfCS = this.drawingMatcherHelper.getDataListOfCS(
+                        itemLists,
+                        drawing,
+                    );
                     fileName = listOfCS.VNUMBER_FILE;
                     serialList = dto.ASERIALNO.map((sn, index) => ({
                         VSERIALNO: sn,
@@ -104,12 +115,21 @@ export class MfgDrawingCreateChecksheetService {
                     }));
                     break;
                 case 'feederParts':
-                    drawing = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);;
+                    drawing =
+                        await this.drawingResolverHelper.getDrawingByControlNo(
+                            controlNo,
+                        );
                     break;
                 default:
-                    newfileName = controlNo //dto.ASERIALNO[0];
-                    drawing = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);;
-                    listOfCS = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawing);
+                    newfileName = controlNo; //dto.ASERIALNO[0];
+                    drawing =
+                        await this.drawingResolverHelper.getDrawingByControlNo(
+                            controlNo,
+                        );
+                    listOfCS = this.drawingMatcherHelper.getDataListOfCS(
+                        itemLists,
+                        drawing,
+                    );
                     fileName = listOfCS.VNUMBER_FILE;
                     serialList = dto.ASERIALNO.map((sn, index) => ({
                         VSERIALNO: sn,
@@ -133,20 +153,23 @@ export class MfgDrawingCreateChecksheetService {
 
             if (this.isEditable(insertData.NINSPECTOR_STATUS)) {
                 message = 'Create Checksheet Success';
-                // const insertSerial = await this.insertSerial({
-                //     drawingId: insertData.NID,
-                //     serialList: serialList,
-                //     userCreate: dto.NUSERCREATE,
-                // });
+                const insertSerial = await this.insertSerial({
+                    drawingId: insertData.NID,
+                    serialList: serialList,
+                    userCreate: dto.NUSERCREATE,
+                });
             }
 
-            const destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
+            const destination = await this.drawingFileHelper.getDestinationPath(
+                blockName,
+                itemName,
+            );
 
-            console.log('insertData', insertData);
-            console.log('masterPath', masterPath);
-            console.log('destination', destination);
-            console.log('fileName', fileName);
-            console.log('newfileName', newfileName);
+            // console.log('insertData', insertData);
+            // console.log('masterPath', masterPath);
+            // console.log('destination', destination);
+            // console.log('fileName', fileName);
+            // console.log('newfileName', newfileName);
 
             await this.drawingFileHelper.createFile(
                 insertData,
@@ -196,7 +219,10 @@ export class MfgDrawingCreateChecksheetService {
                 blockId,
                 itemId,
                 drawing,
+                pis,
+                controlNo
             );
+            
             // สร้างใหม่ ถ้าไม่มีข้อมูลหรือมีแต่ inspector status = 1 แต่ถ้ามีข้อมูลให้ return ข้อมูลนั้นแทน
             const data: any = {
                 NBLOCKID: blockId,
@@ -229,8 +255,11 @@ export class MfgDrawingCreateChecksheetService {
                 // ถ้าไม่ใช่ multi และ drawing อยู่ใน delete list ให้ตั้ง status เป็น 3
                 if (
                     typeName != 'multi' &&
-                    this.drawingMatcherHelper.checkDeleteDrawing(deleteList, drawing) &&
-                    [1,3].includes(isDataExist.data.NSTATUS) &&
+                    this.drawingMatcherHelper.checkDeleteDrawing(
+                        deleteList,
+                        drawing,
+                    ) &&
+                    [1, 3].includes(isDataExist.data.NSTATUS) &&
                     isDataExist.data.NINSPECTOR_STATUS === 1
                 ) {
                     data.NSTATUS = 3;
@@ -275,14 +304,23 @@ export class MfgDrawingCreateChecksheetService {
         blockId: number,
         itemId: number,
         drawing: string,
+        vis?: string,
+        controlNo?: string,
     ): Promise<{ status: boolean; data: MFG_DRAWING | null; message: string }> {
         try {
+            const condition = [
+                { field: 'NBLOCKID', op: 'eq', value: blockId },
+                { field: 'NITEMID', op: 'eq', value: itemId },
+                { field: 'VDRAWING', op: 'eq', value: drawing },
+            ];
+            if(vis){
+                condition.push({ field: 'VPIS', op: 'eq', value: vis });
+            }
+            if(controlNo){
+                condition.push({ field: 'VCONTROLNO', op: 'eq', value: controlNo });
+            }
             const drawingData = await this.mfgDrawingService.search({
-                filters: [
-                    { field: 'NBLOCKID', op: 'eq', value: blockId },
-                    { field: 'NITEMID', op: 'eq', value: itemId },
-                    { field: 'VDRAWING', op: 'eq', value: drawing },
-                ],
+                filters: condition,
             });
             return {
                 status: drawingData.data.length > 0,

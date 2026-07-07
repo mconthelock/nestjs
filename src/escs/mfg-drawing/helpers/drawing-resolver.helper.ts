@@ -109,7 +109,7 @@ export class DrawingResolverHelper {
         );
 
         if (!drawing) {
-            throw new Error(`Drawing No not found in ID-Tag`);
+            throw new Error(`ไม่พบ Drawing ใน ID-Tag`);
         }
 
         return drawing;

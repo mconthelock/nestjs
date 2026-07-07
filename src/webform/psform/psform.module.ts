@@ -4,8 +4,9 @@ import { PsCiModule } from './ps-ci/ps-ci.module';
 import { PsCihModule } from './ps-cih/ps-cih.module';
 import { PsRPModule } from './ps-rp/ps-rp.module';
 import { PsVarModule } from './ps-var/ps-var.module';
+import { PSDLCModule } from './ps-dlc/ps-dlc.module';
 
 @Module({
-    imports: [PsFileModule, PsCiModule, PsCihModule, PsRPModule, PsVarModule],
+    imports: [PsFileModule, PsCiModule, PsCihModule, PsRPModule, PsVarModule, PSDLCModule],
 })
 export class PsFormModule {}

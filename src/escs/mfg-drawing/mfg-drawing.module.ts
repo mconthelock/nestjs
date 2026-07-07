@@ -14,6 +14,10 @@ import { MfgSerialModule } from '../mfg-serial/mfg-serial.module';
 import { MfgDrawingActionModule } from '../mfg-drawing-action/mfg-drawing-action.module';
 import { F001kpModule } from 'src/datacenter/f001kp/f001kp.module';
 import { GeneralPartListModule } from 'src/general-part-list/general-part-list.module';
+import { DrawingResolverHelper } from './helpers/drawing-resolver.helper';
+import { DrawingMatcherHelper } from './helpers/drawing-matcher.helper';
+import { DrawingParserHelper } from './helpers/drawing-parser.helper';
+import { DrawingFileHelper } from './helpers/drawing-file.helper';
 
 @Module({
     imports: [
@@ -33,7 +37,14 @@ import { GeneralPartListModule } from 'src/general-part-list/general-part-list.m
         MfgDrawingService,
         MfgDrawingRepository,
         MfgDrawingCreateChecksheetService,
+        DrawingFileHelper,
+        DrawingResolverHelper,
+        DrawingParserHelper,
+        DrawingMatcherHelper, 
     ],
-    exports: [MfgDrawingService, MfgDrawingCreateChecksheetService],
+    exports: [
+        MfgDrawingService, 
+        MfgDrawingCreateChecksheetService,
+    ],
 })
 export class MfgDrawingModule {}

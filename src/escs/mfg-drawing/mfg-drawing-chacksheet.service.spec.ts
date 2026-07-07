@@ -10,9 +10,14 @@ import { FileService } from 'src/common/services/file/file.service';
 import { MfgSerialService } from '../mfg-serial/mfg-serial.service';
 import { MfgDrawingActionService } from '../mfg-drawing-action/mfg-drawing-action.service';
 import { GeneralPartListService } from 'src/general-part-list/general-part-list.service';
+import { DrawingParserHelper } from './helpers/drawing-parser.helper';
+import { DrawingMatcherHelper } from './helpers/drawing-matcher.helper';
+import { DrawingFileHelper } from './helpers/drawing-file.helper';
 
 describe('MfgDrawingCreateChecksheetService', () => {
     let service: MfgDrawingCreateChecksheetService;
+    let parser: DrawingParserHelper;
+    let matcher: DrawingMatcherHelper;
 
     // beforeEach(async () => {
     //     const module: TestingModule = await Test.createTestingModule({
@@ -36,17 +41,19 @@ describe('MfgDrawingCreateChecksheetService', () => {
     //     );
     // });
     beforeEach(() => {
+        parser  = new DrawingParserHelper(); 
+        matcher = new DrawingMatcherHelper(parser);
         service = new MfgDrawingCreateChecksheetService(
-            {} as any, // MfgDrawingService
-            {} as any, // ItemMfgService
-            {} as any, // IdtagEfacLogService
-            {} as any, // F110kpService
-            {} as any, // F001kpService
-            {} as any, // S011mpService
-            {} as any, // FileService
-            {} as any, // MfgSerialService
-            {} as any, // MfgDrawingActionService
-            {} as any, // GeneralPartListService
+            {} as any,
+            {} as any,
+            {} as any,
+            {} as any,
+            {} as any,
+            {} as any,
+            {} as any,
+            {} as any,
+            parser,
+            matcher,
         );
     });
 
@@ -60,7 +67,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 { NSTATUS: 0, VDRAWING: 'BS999 G02 L01~L02' },
             ];
 
-            const result = service.readMaster(mockList as any);
+            const result = matcher.readMaster(mockList as any);
             expect(result).toHaveLength(1);
         });
 
@@ -73,7 +80,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 },
             ];
 
-            const result = service.readMaster(mockList as any);
+            const result = matcher.readMaster(mockList as any);
 
             expect(result[0]).toEqual({
                 VDRAWING: {
@@ -88,7 +95,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
         it('should return empty array if no valid items', () => {
             const mockList = [{ NSTATUS: 0, VDRAWING: 'BS999 G02 L01~L02' }];
 
-            const result = service.readMaster(mockList as any);
+            const result = matcher.readMaster(mockList as any);
 
             expect(result).toEqual([]);
         });
@@ -99,12 +106,12 @@ describe('MfgDrawingCreateChecksheetService', () => {
     // =========================
     describe('splitGPL', () => {
         it('should split G/L string into array', () => {
-            const result = service.splitGPL('G01G05G07L01');
+            const result = parser.splitGPL('G01G05G07L01');
             expect(result).toEqual(['G01', 'G05', 'G07', 'L01']);
         });
 
         it('should return empty array for empty string', () => {
-            const result = service.splitGPL('');
+            const result = parser.splitGPL('');
             expect(result).toEqual([]);
         });
     });
@@ -114,13 +121,13 @@ describe('MfgDrawingCreateChecksheetService', () => {
     // =========================
     describe('expandGLRange', () => {
         it('should expand L range correctly', () => {
-            const result = service.expandGLRange(
+            const result = parser.expandGLRange(
                 'BS123A571 G01 L01~L04 L12~L14',
             );
             expect(result).toEqual('BS123A571 G01 L01L02L03L04 L12L13L14');
         });
         it('should return single item if no range', () => {
-            const result = service.expandGLRange('BS123A571 G01 L01');
+            const result = parser.expandGLRange('BS123A571 G01 L01');
             expect(result).toEqual('BS123A571 G01 L01');
         });
     });
@@ -131,7 +138,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
     describe('parseGLSegments', () => {
         it('should parse G and L segments correctly', () => {
             const split = ['BS123A571', 'G05', 'L20L21', 'L50L51L52'];
-            const result = service.parseGLSegments(split);
+            const result = parser.parseGLSegments(split);
 
             expect(result).toEqual({
                 G: ['G05'],
@@ -143,7 +150,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
         });
         it('should return empty arrays if no G or L segments', () => {
             const split = ['BS123A571'];
-            const result = service.parseGLSegments(split);
+            const result = parser.parseGLSegments(split);
             expect(result).toEqual({
                 G: [],
                 L: [],
@@ -151,7 +158,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
         });
         it('should throw error if multiple G segments found', () => {
             const split = ['BS123A571', 'G05', 'G06', 'L20L21'];
-            expect(() => service.parseGLSegments(split)).toThrow(
+            expect(() => parser.parseGLSegments(split)).toThrow(
                 'Invalid format: multiple G groups found',
             );
         });
@@ -162,7 +169,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
     // =========================
     describe('explodeGL', () => {
         it('should parse drawing and G/L correctly', () => {
-            const result = service.explodeGL('BS123 G01 L01');
+            const result = parser.explodeGL('BS123 G01 L01');
 
             expect(result).toEqual({
                 DRAWING: 'BS123',
@@ -172,7 +179,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
         });
 
         it('should expand L range correctly', () => {
-            const result = service.explodeGL('BS123 G01 L01~L03');
+            const result = parser.explodeGL('BS123 G01 L01~L03');
 
             expect(result).toEqual({
                 DRAWING: 'BS123',
@@ -182,7 +189,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
         });
 
         it('should handle multiple L groups', () => {
-            const result = service.explodeGL('BS123 G01 L01~L02 L05');
+            const result = parser.explodeGL('BS123 G01 L01~L02 L05');
 
             expect(result).toEqual({
                 DRAWING: 'BS123',
@@ -193,7 +200,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
 
         it('should throw error when multiple G found', () => {
             expect(() => {
-                service.explodeGL('BS123 G01 G02 L01');
+                parser.explodeGL('BS123 G01 G02 L01');
             }).toThrow('Invalid format: multiple G groups found');
         });
     });
@@ -203,7 +210,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
     // =========================
     describe('extractDrawing', () => {
         it('should return correct data list for given drawing', () => {
-            expect(service.extractDrawing('BA105A280 G01L21L85L92')).toEqual([
+            expect(parser.extractDrawing('BA105A280 G01L21L85L92')).toEqual([
                 'BA105A280',
                 'G01',
                 'L21',
@@ -231,7 +238,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 },
             ];
             expect(
-                service.getDataListOfCS(
+                matcher.getDataListOfCS(
                     mockList as any,
                     'BA105A280 G01L21L85L92',
                 ),
@@ -263,7 +270,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 },
             ];
             expect(() => {
-                service.getDataListOfCS(
+                matcher.getDataListOfCS(
                     mockList as any,
                     'BA105A280 G01L21L85L92',
                 );
@@ -285,7 +292,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 },
             ];
             expect(() => {
-                service.getDataListOfCS(mockList as any, 'BA105A280 G03L01');
+                matcher.getDataListOfCS(mockList as any, 'BA105A280 G03L01');
             }).toThrow(
                 'No matching drawing found in Master for drawing BA105A280 G03L01',
             );
@@ -306,12 +313,12 @@ describe('MfgDrawingCreateChecksheetService', () => {
             ['missing G', 'BA212B768 G06'],
         ])('should return false when %s', (_, input, empty = false) => {
             const deleteList = empty ? [] : ['BA212B768 G01 L03~L05'];
-            expect(service.checkDeleteDrawing(deleteList, input)).toBe(false);
+            expect(matcher.checkDeleteDrawing(deleteList, input)).toBe(false);
         });
         it('should return true if drawing is in delete list', () => {
             const deleteList = ['BA212B768 G01 L03~L05'];
             expect(
-                service.checkDeleteDrawing(deleteList, 'BA212B768 G01L03'),
+                matcher.checkDeleteDrawing(deleteList, 'BA212B768 G01L03'),
             ).toBe(true);
         });
     });

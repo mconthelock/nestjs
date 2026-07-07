@@ -6,6 +6,7 @@ import { S011mpService } from 'src/datacenter/s011mp/s011mp.service';
 import { F001KP } from 'src/common/Entities/datacenter/table/F001KP.entity';
 import { S011MP } from 'src/common/Entities/datacenter/table/S011MP.entity';
 import { IDTAG_EFAC_LOG } from 'src/common/Entities/workload/table/IDTAG_EFAC_LOG.entity';
+import { DrawingParserHelper } from './drawing-parser.helper';
 
 @Injectable()
 export class DrawingResolverHelper {
@@ -14,6 +15,7 @@ export class DrawingResolverHelper {
         private readonly generalPartListService: GeneralPartListService,
         private readonly idtagEfacLogService: IdtagEfacLogService,
         private readonly s011mpService: S011mpService,
+        private readonly parser: DrawingParserHelper,
     ) {}
 
     async getDrawingByControlNo(controlNo: string): Promise<string> {
@@ -94,6 +96,23 @@ export class DrawingResolverHelper {
         controlNo = idtagLog.data[0].CONTROL_NO;
         const drawing = await this.getDrawingByControlNo(controlNo);
         return { controlNo, drawing };
+    }
+
+    async getDrawingByFeeder(controlNo: string): Promise<string> {
+        const result = await this.f001kpService.findOne(controlNo);
+        if (!result.status) {
+            throw new Error(`Control No not found in ID-Tag`);
+        }
+
+        const drawing = this.parser.normalizeDrawing(
+            result.data?.F01R04 ?? ''
+        );
+
+        if (!drawing) {
+            throw new Error(`Drawing No not found in ID-Tag`);
+        }
+
+        return drawing;
     }
 
     async getDrawingByPis(pis: string, controls: string[]): Promise<string> {

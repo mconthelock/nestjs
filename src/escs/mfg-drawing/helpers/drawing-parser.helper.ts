@@ -130,4 +130,14 @@ export class DrawingParserHelper {
 
         return result;
     }
+
+    /**
+     * Normalize drawing format by removing spaces before L groups.
+     * @example normalizeDrawing('YA239B388') => 'YA239B388'
+     *          normalizeDrawing('YA239B388 G01') => 'YA239B388 G01'
+     *          normalizeDrawing('YA239B388 G01 L01') => 'YA239B388 G01L01'
+     */
+    normalizeDrawing(drawing: string): string {
+        return drawing.trim().replace(/\s+(L\d+)/g, '$1');
+    }
 }

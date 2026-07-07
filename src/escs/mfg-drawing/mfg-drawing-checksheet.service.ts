@@ -30,12 +30,11 @@ export class MfgDrawingCreateChecksheetService {
         1: 'default',
         2: 'pisMulti',
         3: 'multi',
-        4: 'feederParts',
+        4: 'feeder',
     };
 
     async create(dto: CreateMfgDrawingCheckSheetDto) {
         try {
-            // หา item mfg ด้วย NITEMID
             let message: string = 'Search Checksheet Success';
             const item = await this.itemMfgService.findOne(dto.NITEMID);
             if (!item.status) {
@@ -50,19 +49,22 @@ export class MfgDrawingCreateChecksheetService {
             const controlLists: CONTROL_DRAWING_PIS[] = itemData.CONTROL_LIST;
             const typeName: string = this.mapType[itemData.NTYPE] || 'unknown';
             const masterPath: string = itemData.VPATH;
-            // let itemList: ITEM_MFG_LIST = null;
+
             let listOfCS: {
                 VDRAWING: { DRAWING: string; G: string[]; L: string[][] };
                 VNUMBER_FILE: string;
             } = null;
+
             const deleteList: string[] =
                 deleteLists
                     .filter((d) => d.NSTATUS == 1)
                     .map((d) => d.VDRAWING) || [];
+
             const controlList: string[] =
                 controlLists
                     .filter((c) => c.NSTATUS == 1)
                     .map((c) => c.VDRAWING) || [];
+
             if (!masterPath) {
                 throw new Error(
                     `Master path not found for item ${itemData.VITEM_NAME}`,
@@ -75,9 +77,10 @@ export class MfgDrawingCreateChecksheetService {
             let newfileName: string;
             let serialList: { VSERIALNO: string; NTYPE: number }[];
             let dataByidTag: { controlNo: string; drawing: string };
+
             switch (typeName) {
                 case 'multi':
-                    newfileName = controlNo; //dto.ASERIALNO[0];
+                    newfileName = controlNo;
                     fileName = itemData.VFILE;
                     drawing  = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
                     serialList = dto.ASERIALNO.map((sn, index) => ({
@@ -95,11 +98,11 @@ export class MfgDrawingCreateChecksheetService {
                         NTYPE: 2, // กำหนด type เป็น 2 สำหรับ serial no ทั้งหมดในกรณี pisMulti
                     }));
                     break;
-                case 'feederParts':
-                    drawing = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
+                case 'feeder':
+                    drawing = await this.drawingResolverHelper.getDrawingByFeeder(controlNo);
                     break;
                 default:
-                    newfileName = controlNo; //dto.ASERIALNO[0];
+                    newfileName = controlNo;
                     drawing  = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
                     listOfCS = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawing);
                     fileName = listOfCS.VNUMBER_FILE;

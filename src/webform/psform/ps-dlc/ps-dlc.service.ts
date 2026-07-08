@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 import { FlowService } from 'src/webform/flow/flow.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
@@ -6,6 +6,11 @@ import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { CreatePsdlcReqFormDto } from './dto/create-ps-dlc.dto';
 import { PSDLCRepository } from './ps-dlc.repository';
 import { FormDto } from 'src/webform/form/dto/form.dto';
+import { PSDLCReportDto } from './dto/report-ps-dlc.dto';
+import {
+    UpdatedataPSDLCDto,
+    UpdateflowPSDLCDto,
+} from './dto/update-ps-dlc.dto';
 
 @Injectable()
 export class PSDLCService {
@@ -123,5 +128,83 @@ export class PSDLCService {
 
     async findOne(dto: FormDto) {
         return this.repo.findOneList(dto);
+    }
+
+    async searchReport(dto: PSDLCReportDto) {
+        return this.repo.search(dto);
+    }
+
+    async doaction(dto: UpdateflowPSDLCDto, ip: string) {
+        try {
+            const form = {
+                NFRMNO: dto.NFRMNO,
+                VORGNO: dto.VORGNO,
+                CYEAR: dto.CYEAR,
+                CYEAR2: dto.CYEAR2,
+                NRUNNO: dto.NRUNNO,
+            };
+            await this.flowService.updateFlow({
+                condition: {
+                    ...form,
+                    CEXTDATA: '02',
+                },
+                VAPVNO: dto.CONTROLLER,
+            });
+
+            const doAction = await this.doactionService.doAction(
+                {
+                    ...form,
+                    EMPNO: dto.EMPNO,
+                    ACTION: dto.ACTION,
+                    REMARK: dto.REMARK,
+                },
+                ip,
+            );
+            if (!doAction.status) {
+                throw new Error(doAction.message);
+            }
+            return {
+                status: true,
+                message: 'Controller updated successfully',
+            };
+        } catch (error) {
+            throw new Error(`Failed to action: ${error.message}`);
+        }
+    }
+
+    async updateForm(dto: UpdatedataPSDLCDto, ip: string) {
+        try {
+            const form = {
+                NFRMNO: dto.NFRMNO,
+                VORGNO: dto.VORGNO,
+                CYEAR: dto.CYEAR,
+                CYEAR2: dto.CYEAR2,
+                NRUNNO: dto.NRUNNO,
+            };
+            await this.repo.updateDLCform(
+                form,
+                dto.CHANGE_STATUS,
+                dto.ACTUAL_DATE,
+                dto.ACTUAL_UPDATEBY,
+            );
+            const doActi0n = await this.doactionService.doAction(
+                {
+                    ...form,
+                    EMPNO: dto.EMPNO,
+                    ACTION: dto.ACTION,
+                    REMARK: dto.REMARK,
+                },
+                ip,
+            );
+            if (!doActi0n.status) {
+                throw new Error(doActi0n.message);
+            }
+            return {
+                status: true,
+                message: 'PS-DLC FORM updated successfully',
+            };
+        } catch (error) {
+            throw new Error(`Failed to action: ${error.message}`);
+        }
     }
 }

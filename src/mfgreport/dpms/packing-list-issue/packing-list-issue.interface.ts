@@ -9,6 +9,10 @@ export interface getPendingRecordParams extends DPMS_PL_ISSUE_PK {
     NREV: number;
 }
 
+export interface findPreviousRevisionExcludingIssueRevParams extends getPendingRecordParams {
+    NISSUEREV_ID: number;
+}
+
 export interface generatePDFParams {
     order: string;
     html: string;
@@ -40,6 +44,8 @@ export interface prepareDocRevisionDataParams {
     plIssueData: DPMS_PL_ISSUE_PK;
     finishDate: Date;
     docRevision: number;
+    revise: boolean;
+    recreatedIssue: boolean;
 }
 
 export interface generateFilenameParams {
@@ -48,4 +54,21 @@ export interface generateFilenameParams {
     issueType: string;
     orders: string;
     projectName: string;
+}
+
+export interface syncDocRevisionAndPlIssueParams {
+    plIssueData: DPMS_PL_ISSUE_PK;
+    changeIssueType: boolean;
+    revise: boolean;
+    typeCode: string;
+    recreatedIssue: boolean;
+}
+
+export interface saveDocRevisionParams {
+    typeCode: string;
+    docRevData: any;
+    issueRevID: number;
+    revise: boolean;
+    reviseID?: number;
+    recreatedIssue: boolean;
 }

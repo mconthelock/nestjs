@@ -5,7 +5,10 @@ import {
 } from './dto/create-dpms_pl_doc_rev.dto';
 import { DpmsPlDocRevRepository } from './dpms_pl_doc_rev.repository';
 import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
-import { getPendingRecordParams } from 'src/mfgreport/dpms/packing-list-issue/packing-list-issue.interface';
+import {
+    getPendingRecordParams,
+    findPreviousRevisionExcludingIssueRevParams,
+} from 'src/mfgreport/dpms/packing-list-issue/packing-list-issue.interface';
 
 @Injectable()
 export class DpmsPlDocRevService {
@@ -71,6 +74,27 @@ export class DpmsPlDocRevService {
         } catch (error) {
             throw new Error(
                 'Get pending document revision record Error: ' + error.message,
+            );
+        }
+    }
+
+    async findPreviousRevisionExcludingIssueRev(condition: findPreviousRevisionExcludingIssueRevParams) {
+        try {
+            const res = await this.repo.findPreviousRevisionExcludingIssueRev(condition);
+            if (res.length == 0) {
+                return {
+                    status: false,
+                    message: 'No previous document revision record found',
+                };
+            }
+            return {
+                status: true,
+                message: `Get previous document revision record ${res.length} records`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(
+                'Get previous document revision record Error: ' + error.message,
             );
         }
     }

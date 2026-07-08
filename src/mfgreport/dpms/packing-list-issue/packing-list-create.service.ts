@@ -66,17 +66,24 @@ export class PackingListCreateService extends PackingListIssueService {
                 VTYPE: dto.VTYPE,
             };
             // 1. หา revision ของชุดเอกสาร และทำการเพิ่มหรืออัปเดต DPMS_PL_ISSUE ตามเงื่อนไขที่กำหนด
-            let docRevision: number =
-                await this.syncDocRevisionAndPlIssue(plIssueData, dto.CHANGETYPE);
+            let docRevision: number = await this.syncDocRevisionAndPlIssue({
+                plIssueData,
+                changeIssueType: dto.CHANGETYPE,
+                revise: dto.REVISE,
+                typeCode: issueType.data.VCODE,
+                recreatedIssue: dto.CHANGELIST || dto.NEWLIST, // ถ้ามีการเปลี่ยนแปลงรายการหรือมีรายการใหม่ ให้ set recreatedIssue เป็น true
+            });
+            console.log('docRevision:', docRevision);
 
             // 2. เตรียมข้อมูลสำหรับการสร้าง record ใน DPMS_PL_DOC_REV และ update DFINISHALL ของ record ที่ยังไม่ finish ของเอกสารนี้
-            const docRevData =
-                await this.prepareDocRevisionData({
-                    typeCode: issueType.data.VCODE,
-                    plIssueData,
-                    finishDate,
-                    docRevision,
-                });
+            const docRevData = await this.prepareDocRevisionData({
+                typeCode: issueType.data.VCODE,
+                plIssueData,
+                finishDate,
+                docRevision,
+                revise: dto.REVISE,
+                recreatedIssue: dto.CHANGELIST || dto.NEWLIST, // ถ้ามีการเปลี่ยนแปลงรายการหรือมีรายการใหม่ ให้ set recreatedIssue เป็น true
+            });
 
             // 3. หา revision ของเอกสาร Packing List Issue สำหรับการสร้าง record ใน DPMS_PL_ISSUE_REV
             const { revision, revisionText } =
@@ -136,10 +143,15 @@ export class PackingListCreateService extends PackingListIssueService {
             // 7. insert record to DPMS_PL_DOC_REV for this issue
             await this.saveDocRevision({
                 typeCode: issueType.data.VCODE,
-                finishDate,
                 docRevData,
                 issueRevID: insertIssueRev.data.NID,
-            })
+                revise: dto.REVISE,
+                reviseID: dto.REVISEID,
+                recreatedIssue: dto.CHANGELIST || dto.NEWLIST, // ถ้ามีการเปลี่ยนแปลงรายการหรือมีรายการใหม่ ให้ set recreatedIssue เป็น true
+            });
+
+            // throw new Error('test');
+
 
             // 9. Create PL Issue List record
             for (const list of dto.LIST) {
@@ -159,6 +171,7 @@ export class PackingListCreateService extends PackingListIssueService {
                     });
                 }
             }
+
             // 11. send email notification to admin
             await this.sendMail({
                 subject: `${now('YYYY-MM-DD HH:mm:ss')} Packing list issue notification [${dto.VORDERS}] REV. ${revisionText} (${issueType.data.VDESCRIPTION})`,

@@ -17,7 +17,7 @@ export class DPMS_PL_DOC_REV {
     @PrimaryColumn()
     NISSUEREV_ID: number;
 
-    @Column()
+    @PrimaryColumn()
     NREV: number;
 
     @Column()

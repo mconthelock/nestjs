@@ -31,6 +31,9 @@ export class DPMS_PL_CASE_LIST_DETAIL {
     VDRAWING: string;
 
     @Column()
+    VDRAWINGL: string;
+
+    @Column()
     NQTY: number;
 
     @ManyToOne(() => DPMS_PL_CASE_LIST, (main) => main.DETAILS)

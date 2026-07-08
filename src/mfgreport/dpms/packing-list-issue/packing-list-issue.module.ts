@@ -18,7 +18,6 @@ import { PackingListIssueProcedureService } from './packing-list-issue-procedure
 import { DpmsPlMailModule } from 'src/workload/dpms_pl_mail/dpms_pl_mail.module';
 import { DpmsPlDocRevModule } from 'src/workload/dpms_pl_doc_rev/dpms_pl_doc_rev.module';
 import { PackingListCreateService } from './packing-list-create.service';
-import { PackingListReviseService } from './packing-list-revise.service';
 
 @Module({
     imports: [
@@ -40,8 +39,7 @@ import { PackingListReviseService } from './packing-list-revise.service';
         PackingListIssueProcedureWorkloadRepository,
         PackinglistIssueProcedureDataCenterRepository,
         PackingListIssueProcedureService,
-        PackingListCreateService,
-        PackingListReviseService,
+        PackingListCreateService
     ],
     exports: [PackingListIssueService, PackingListIssueProcedureService],
 })

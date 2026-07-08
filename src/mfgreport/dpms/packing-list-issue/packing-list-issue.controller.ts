@@ -45,8 +45,8 @@ export class PackingListIssueController {
         return this.procedureService.getShopOrder(ordermain);
     }
 
-    @Post('revise-list')
-    getReviseList(@Body() dto: SearchDpmsPlIssueDto) {
-        return this.procedureService.getReviseList(dto);
+    @Post('last-rev-document')
+    getLastRevDocument(@Body() dto: SearchDpmsPlIssueDto) {
+        return this.procedureService.getLastRevDocument(dto);
     }
 }

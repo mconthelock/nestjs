@@ -261,7 +261,7 @@ export class PackingListIssueService {
             console.log('revise:', revise);
             console.log('typeCode:', typeCode);
             console.log('recreatedIssue:', recreatedIssue);
-            if (revise && ['PT', 'SP'].includes(typeCode) && !recreatedIssue) {
+            if (revise && ['PT', 'SP', 'BL'].includes(typeCode) && !recreatedIssue) {
                 const  previousRevision = await this.dpmsPlDocRevService.findPreviousRevisionExcludingIssueRev({
                     ...plIssueData,
                     NREV: docRevData.NREV,

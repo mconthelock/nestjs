@@ -64,15 +64,20 @@ export class DrawingFileHelper {
         return drawingFile;
     }
 
-    async getDestinationPath(
-        blockName: string,
-        itemName: string,
-    ): Promise<string> {
+    async getDestinationPath(blockName: string, itemName: string): Promise<string> {
         return await joinPaths(
             process.env.CHECKSHEET_MFG_FILE_PATH,
             'temp',
             `block_${blockName}`,
             `station_${itemName}`,
+        );
+    }
+
+    async getPathFeeder(folderPath: string): Promise<string> {
+        return await joinPaths(
+            process.env.CHECKSHEET_MFG_FILE_PATH,
+            'feeder',
+            folderPath,
         );
     }
 }

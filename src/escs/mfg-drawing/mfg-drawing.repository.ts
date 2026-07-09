@@ -57,6 +57,7 @@ export class MfgDrawingRepository extends BaseRepository {
             'VPIS',
             'VDRAWING',
             'VCONTROLNO',
+            'VPROCESSNO',
             'NINSPECTOR_STATUS',
             'NFORELEAD_STATUS',
             'NSTATUS',

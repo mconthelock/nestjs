@@ -98,21 +98,38 @@ export class DrawingResolverHelper {
         return { controlNo, drawing };
     }
 
-    async getDrawingByFeeder(controlNo: string): Promise<string> {
+    async getFeederInfo(controlNo: string): Promise<{
+        drawing: string;
+        folderPath: string;
+    }> {
         const result = await this.f001kpService.findOne(controlNo);
         if (!result.status) {
-            throw new Error(`Control No not found in ID-Tag`);
+            throw new Error('ไม่พบข้อมูล ID-Tag');
         }
 
-        const drawing = this.parser.normalizeDrawing(
-            result.data?.F01R04 ?? ''
-        );
-
+        const drawing = this.parser.normalizeDrawing(result.data.F01R04?.trim());
         if (!drawing) {
-            throw new Error(`ไม่พบ Drawing ใน ID-Tag`);
+            throw new Error('ไม่พบ Drawing ใน ID-Tag');
         }
 
-        return drawing;
+        const yearMonth = result.data.F01R02?.trim();
+        const item = result.data.F01R03?.trim();
+        if (!yearMonth || yearMonth.length < 6) {
+            throw new Error('ข้อมูลปี/เดือนไม่ถูกต้องใน ID-Tag');
+        }
+
+        const folderPath = [
+            '',
+            yearMonth.substring(0, 4),
+            yearMonth.substring(4, 6),
+            item,
+            '',
+        ].join('\\');
+
+        return {
+            drawing,
+            folderPath,
+        };
     }
 
     async getDrawingByPis(pis: string, controls: string[]): Promise<string> {

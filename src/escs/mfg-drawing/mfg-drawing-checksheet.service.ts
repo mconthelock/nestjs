@@ -13,6 +13,7 @@ import { deleteFile, joinPaths } from 'src/common/utils/files.utils';
 import { DrawingFileHelper } from './helpers/drawing-file.helper';
 import { DrawingResolverHelper } from './helpers/drawing-resolver.helper';
 import { DrawingMatcherHelper } from './helpers/drawing-matcher.helper';
+import { DrawingParserHelper } from './helpers/drawing-parser.helper';
 
 @Injectable()
 export class MfgDrawingCreateChecksheetService {
@@ -23,6 +24,7 @@ export class MfgDrawingCreateChecksheetService {
         private readonly mfgDrawingActionService: MfgDrawingActionService,
         private readonly drawingFileHelper: DrawingFileHelper,
         private readonly drawingResolverHelper: DrawingResolverHelper,
+        private readonly drawingParserHelper: DrawingParserHelper,
         private readonly drawingMatcherHelper: DrawingMatcherHelper,
     ) {}
 
@@ -41,7 +43,7 @@ export class MfgDrawingCreateChecksheetService {
             if (!item.status) {
                 throw new Error(`Item Mfg with id ${dto.NITEMID} not found`);
             }
-
+            
             const itemData: ITEM_MFG = item.data;
             const blockName = itemData.BLOCK_MASTER ? itemData.BLOCK_MASTER.VNAME : null;
             const itemName  = itemData.VITEM_NAME;
@@ -53,7 +55,7 @@ export class MfgDrawingCreateChecksheetService {
 
             if (!masterPath) {
                 throw new Error(
-                    `Master path not found for item ${itemData.VITEM_NAME}`,
+                    `Master path not found for item ${itemName}`,
                 );
             }
 
@@ -76,8 +78,8 @@ export class MfgDrawingCreateChecksheetService {
                     NTYPE: type,
                 }));
 
-            let shouldGenerateChecksheet = true;
             let controlNo: string = dto.VCONTROLNO;
+            let processNo: string = dto.VPROCESSNO;
             let drawing: string;
             let fileName: string;
             let newfileName: string;
@@ -86,28 +88,33 @@ export class MfgDrawingCreateChecksheetService {
 
             switch (typeName) {
                 case 'multi':
-                    newfileName = controlNo;
-                    fileName    = itemData.VFILE;
+                    destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
                     drawing     = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
+                    fileName    = itemData.VFILE; 
+                    newfileName = controlNo;
                     serialList  = createSerialList(1);
                     break;
                 case 'pisMulti':
-                    newfileName = dto.VPIS;
+                    destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
                     drawing     = await this.drawingResolverHelper.getDrawingByPis(dto.VPIS, controlList);
                     listOfCS    = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawing);
-                    fileName    = listOfCS.VNUMBER_FILE;
+                    fileName    = listOfCS.VNUMBER_FILE; 
+                    newfileName = dto.VPIS; 
                     serialList  = createSerialList(2);
                     break;
                 case 'feeder':
-                    shouldGenerateChecksheet = false;
-                    drawing = await this.drawingResolverHelper.getDrawingByFeeder(controlNo);
-                    // destination = await this.drawingFileHelper.getPathFeeder(blockName, itemName);
+                    const info  = await this.drawingResolverHelper.getFeederInfo(controlNo); 
+                    destination = await this.drawingFileHelper.getPathFeeder(info.folderPath);
+                    drawing     = this.drawingParserHelper.extractDrawingNo(info.drawing);
+                    processNo   = this.drawingParserHelper.extractProcessCode(processNo);
+                    newfileName = drawing + '-' + processNo;
                     break;
                 default:
-                    newfileName = controlNo;
+                    destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
                     drawing     = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
                     listOfCS    = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawing);
                     fileName    = listOfCS.VNUMBER_FILE;
+                    newfileName = controlNo;
                     serialList  = createSerialList(1);
                     break;
             }
@@ -117,6 +124,7 @@ export class MfgDrawingCreateChecksheetService {
                 itemId: itemData.NID,
                 drawing: drawing,
                 controlNo: controlNo,
+                processNo: processNo,
                 pis: dto.VPIS,
                 usercreate: dto.NUSERCREATE,
                 typeName: typeName,
@@ -128,30 +136,33 @@ export class MfgDrawingCreateChecksheetService {
             if (this.isEditable(insertData.NINSPECTOR_STATUS)) {
                 message = 'Create Checksheet Success';
 
-                if (shouldGenerateChecksheet) {
-                    destination = await this.drawingFileHelper.getDestinationPath(
-                        blockName, 
-                        itemName,
-                    );
-
+                if (['default', 'pisMulti', 'multi'].includes(typeName)) {
                     await this.insertSerial({
                         drawingId: insertData.NID,
                         serialList: serialList,
                         userCreate: dto.NUSERCREATE,
                     });
 
-                    await this.drawingFileHelper.createFile(
-                        insertData,
-                        masterPath,
-                        destination,
-                        fileName,
-                        newfileName,
-                    );
                 }
-            }
+            } 
+            
+            
+            // console.log('insertData: ', insertData);
+            // console.log('masterPath: ', masterPath);
+            // console.log('destination: ', destination);
+            // console.log('fileName: ', fileName);
+            // console.log('newfileName: ', newfileName);
+
+
+            await this.drawingFileHelper.createFile(
+                insertData,
+                masterPath,
+                destination,
+                fileName,
+                newfileName,
+            );
 
             const res = await this.mfgDrawingService.findOne(insertData.NID);    
-            
             return {
                 data: res.data,
                 message: dto.REVISE ? 'Revise Checksheet Success' : message,
@@ -167,6 +178,7 @@ export class MfgDrawingCreateChecksheetService {
         itemId,
         drawing,
         controlNo,
+        processNo,
         pis,
         usercreate,
         typeName,
@@ -178,6 +190,7 @@ export class MfgDrawingCreateChecksheetService {
         itemId: number;
         drawing: string;
         controlNo: string;
+        processNo: string;
         pis: string;
         usercreate: number;
         typeName: string;
@@ -192,9 +205,10 @@ export class MfgDrawingCreateChecksheetService {
                 itemId,
                 drawing,
                 pis,
-                controlNo
+                controlNo,
+                processNo
             );
-            
+
             // สร้างใหม่ ถ้าไม่มีข้อมูลหรือมีแต่ inspector status = 1 แต่ถ้ามีข้อมูลให้ return ข้อมูลนั้นแทน
             const data: any = {
                 NBLOCKID: blockId,
@@ -202,12 +216,14 @@ export class MfgDrawingCreateChecksheetService {
                 VPIS: pis,
                 VDRAWING: drawing,
                 VCONTROLNO: controlNo,
+                VPROCESSNO: processNo,
                 NINSPECTOR_STATUS: 1,
                 NFORELEAD_STATUS: 4,
                 VFILE_NAME: null,
                 NSTATUS: 1,
                 NUSERCREATE: usercreate,
             };
+
             if (isDataExist.status) {
                 data.NID = isDataExist.data.NID;
                 data.NUSERUPDATE = usercreate;
@@ -227,10 +243,7 @@ export class MfgDrawingCreateChecksheetService {
                 // ถ้าไม่ใช่ multi และ drawing อยู่ใน delete list ให้ตั้ง status เป็น 3
                 if (
                     typeName != 'multi' &&
-                    this.drawingMatcherHelper.checkDeleteDrawing(
-                        deleteList,
-                        drawing,
-                    ) &&
+                    this.drawingMatcherHelper.checkDeleteDrawing(deleteList, drawing) &&
                     [1, 3].includes(isDataExist.data.NSTATUS) &&
                     isDataExist.data.NINSPECTOR_STATUS === 1
                 ) {
@@ -244,6 +257,7 @@ export class MfgDrawingCreateChecksheetService {
                     }
                 }
             }
+
             if (
                 !isDataExist.status ||
                 this.isEditable(isDataExist.data?.NINSPECTOR_STATUS) ||
@@ -256,6 +270,7 @@ export class MfgDrawingCreateChecksheetService {
                         `Insert MFG_DRAWING Failed: ${insert.message}`,
                     );
                 }
+                
                 return insert.data;
             } else {
                 return isDataExist.data;
@@ -276,8 +291,9 @@ export class MfgDrawingCreateChecksheetService {
         blockId: number,
         itemId: number,
         drawing: string,
-        vis?: string,
+        pis?: string,
         controlNo?: string,
+        processNo?: string,
     ): Promise<{ status: boolean; data: MFG_DRAWING | null; message: string }> {
         try {
             const condition = [
@@ -285,15 +301,23 @@ export class MfgDrawingCreateChecksheetService {
                 { field: 'NITEMID', op: 'eq', value: itemId },
                 { field: 'VDRAWING', op: 'eq', value: drawing },
             ];
-            if(vis){
-                condition.push({ field: 'VPIS', op: 'eq', value: vis });
+
+            if(pis){
+                condition.push({ field: 'VPIS', op: 'eq', value: pis });
             }
+
             if(controlNo){
                 condition.push({ field: 'VCONTROLNO', op: 'eq', value: controlNo });
             }
+
+            if(processNo){
+                condition.push({ field: 'VPROCESSNO', op: 'eq', value: processNo });
+            }
+
             const drawingData = await this.mfgDrawingService.search({
                 filters: condition,
             });
+
             return {
                 status: drawingData.data.length > 0,
                 data: drawingData.data?.[0] || null,

@@ -65,9 +65,9 @@ export class PackingListIssueProcedureService {
         }
     }
 
-    async getReviseList(dto: SearchDpmsPlIssueDto) {
+    async getLastRevDocument(dto: SearchDpmsPlIssueDto) {
         try {
-            const res = await this.workloadRepo.getReviseList(dto);
+            const res = await this.workloadRepo.getLastRevDocument(dto);
             if (res.length === 0) {
                 return {
                     status: false,

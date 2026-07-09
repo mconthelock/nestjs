@@ -161,4 +161,24 @@ export class CreatePackingListIssueDto {
     @IsBoolean()    
     @ToBoolean()
     CHANGETYPE: boolean;
+
+    @IsNotEmpty()
+    @IsBoolean()    
+    @ToBoolean()
+    REVISE: boolean;
+
+    @IsOptional()
+    @IsNumber()    
+    @Type(() => Number)
+    REVISEID: number;
+
+    @IsNotEmpty()
+    @IsBoolean()    
+    @ToBoolean()
+    CHANGELIST: boolean;
+
+    @IsNotEmpty()
+    @IsBoolean()    
+    @ToBoolean()
+    NEWLIST: boolean;
 }

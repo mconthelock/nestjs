@@ -35,6 +35,18 @@ export class KanbanRequestRepository extends BaseRepository {
         return result;
     }
 
+    async getProductDetail(itemcode: string) {
+        const result = await this.ds.query(
+            `
+            SELECT * 
+            FROM PKC_PRODUCTS
+            WHERE ITEM_CODE = :1
+            `,
+            [itemcode],
+        );
+        return result;
+    }
+
     async insertIssueKanban(data: Partial<ISSUE_KANBAN>[]) {
         const result = await this.ds.query(`
             SELECT SEQ_ISSUE_KANBAN.NEXTVAL AS ID

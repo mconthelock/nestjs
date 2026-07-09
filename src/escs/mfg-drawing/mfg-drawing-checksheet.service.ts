@@ -90,16 +90,16 @@ export class MfgDrawingCreateChecksheetService {
                 case 'multi':
                     destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
                     drawing     = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
-                    fileName    = itemData.VFILE; 
-                    newfileName = controlNo;
+                    fileName    = itemData.VFILE;
+                    newfileName = controlNo; 
                     serialList  = createSerialList(1);
                     break;
                 case 'pisMulti':
                     destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
                     drawing     = await this.drawingResolverHelper.getDrawingByPis(dto.VPIS, controlList);
                     listOfCS    = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawing);
-                    fileName    = listOfCS.VNUMBER_FILE; 
-                    newfileName = dto.VPIS; 
+                    fileName    = listOfCS.VNUMBER_FILE;  
+                    newfileName = dto.VPIS;
                     serialList  = createSerialList(2);
                     break;
                 case 'feeder':
@@ -107,7 +107,9 @@ export class MfgDrawingCreateChecksheetService {
                     destination = await this.drawingFileHelper.getPathFeeder(info.folderPath);
                     drawing     = this.drawingParserHelper.extractDrawingNo(info.drawing);
                     processNo   = this.drawingParserHelper.extractProcessCode(processNo);
-                    newfileName = drawing + '-' + processNo;
+                    fileName    = await this.drawingFileHelper.findFeederFileName(drawing, processNo, masterPath);
+                    const rev   = await this.drawingFileHelper.getRevisionCheckSheetFeeder(masterPath, fileName);
+                    newfileName = `${drawing}-${processNo}-${rev}`;
                     break;
                 default:
                     destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
@@ -135,24 +137,14 @@ export class MfgDrawingCreateChecksheetService {
 
             if (this.isEditable(insertData.NINSPECTOR_STATUS)) {
                 message = 'Create Checksheet Success';
-
                 if (['default', 'pisMulti', 'multi'].includes(typeName)) {
                     await this.insertSerial({
                         drawingId: insertData.NID,
                         serialList: serialList,
                         userCreate: dto.NUSERCREATE,
                     });
-
                 }
             } 
-            
-            
-            // console.log('insertData: ', insertData);
-            // console.log('masterPath: ', masterPath);
-            // console.log('destination: ', destination);
-            // console.log('fileName: ', fileName);
-            // console.log('newfileName: ', newfileName);
-
 
             await this.drawingFileHelper.createFile(
                 insertData,
@@ -160,6 +152,7 @@ export class MfgDrawingCreateChecksheetService {
                 destination,
                 fileName,
                 newfileName,
+                typeName,
             );
 
             const res = await this.mfgDrawingService.findOne(insertData.NID);    

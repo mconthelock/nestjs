@@ -60,6 +60,7 @@ export class MfgDrawingRepository extends BaseRepository {
             'VPROCESSNO',
             'NINSPECTOR_STATUS',
             'NFORELEAD_STATUS',
+            'VFULL_PATH',
             'NSTATUS',
             'A.NUSERACT'
         ]);

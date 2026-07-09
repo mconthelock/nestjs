@@ -6,7 +6,9 @@ import { CreatePsdlcReqFormDto } from './dto/create-ps-dlc.dto';
 import { PSDLC_DETAIL } from 'src/common/Entities/webform/table/PSDLC_DETAIL.entity';
 import { PSDLC_FORM } from 'src/common/Entities/webform/table/PSDLC_FORM.entity';
 import { FormDto } from 'src/webform/form/dto/form.dto';
-import { PSRP_FORM } from 'src/common/Entities/webform/table/PSRP_FORM.entity';
+import { PSDLCReportDto } from './dto/report-ps-dlc.dto';
+import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
+import { FORMMST } from 'src/common/Entities/webform/table/FORMMST.entity';
 
 @Injectable()
 export class PSDLCRepository extends BaseRepository {
@@ -55,5 +57,68 @@ export class PSDLCRepository extends BaseRepository {
             ...form,
             DETAILS: list,
         };
+    }
+
+    async search(dto: PSDLCReportDto) {
+        const query = this.manager
+            .createQueryBuilder(PSDLC_FORM, 'f')
+            .innerJoin(
+                PSDLC_DETAIL,
+                'd',
+                'f.NFRMNO = d.NFRMNO AND f.VORGNO = d.VORGNO AND f.CYEAR = d.CYEAR AND f.CYEAR2 = d.CYEAR2 AND f.NRUNNO = d.NRUNNO',
+            )
+            .innerJoin(
+                FORM,
+                'F',
+                `f.NFRMNO = F.NFRMNO
+                                AND f.VORGNO = F.VORGNO
+                                AND f.CYEAR = F.CYEAR
+                                AND f.CYEAR2 = F.CYEAR2
+                                AND f.NRUNNO = F.NRUNNO`,
+            )
+            .innerJoin(
+                FORMMST,
+                'FM',
+                `f.NFRMNO = FM.NNO
+                                AND f.VORGNO = FM.VORGNO
+                                AND f.CYEAR = FM.CYEAR`,
+            )
+            .addSelect('F.VREQNO', 'VREQNO')
+            .addSelect('FM.VANAME', 'VANAME')
+            .addSelect('d');
+        if (dto.DRAWING) {
+            query.andWhere('d.DRAWING LIKE :DRAWING', {
+                DRAWING: `%${dto.DRAWING || ''}%`,
+            });
+        }
+        if (dto.NEWCODE) {
+            query.andWhere('d.NEWCODE LIKE :NEWCODE', {
+                NEWCODE: `%${dto.NEWCODE || ''}%`,
+            });
+        }
+        if (dto.OLDCODE) {
+            query.andWhere('d.OLDCODE LIKE :OLDCODE', {
+                OLDCODE: `%${dto.OLDCODE || ''}%`,
+            });
+        }
+        if (dto.CHANGE_SCHD) {
+            query.andWhere('f.CHANGE_SCHD LIKE :CHANGE_SCHD', {
+                CHANGE_SCHD: `%${dto.CHANGE_SCHD || ''}%`,
+            });
+        }
+        return query.getRawMany();
+    }
+
+    async updateDLCform(
+        form: FormDto,
+        status: string,
+        date: Date,
+        updateby: string,
+    ) {
+        return this.getRepository(PSDLC_FORM).update(form, {
+            CHANGE_STATUS: status,
+            ACTUAL_DATE: date,
+            ACTUAL_UPDATEBY: updateby,
+        });
     }
 }

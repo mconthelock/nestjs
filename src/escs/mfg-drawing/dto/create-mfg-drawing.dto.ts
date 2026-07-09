@@ -31,6 +31,11 @@ export class CreateMfgDrawingDto {
     @Type(() => String)
     VCONTROLNO?: string;
 
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    VPROCESSNO?: string;
+
     @IsNotEmpty()
     @IsString()
     @Type(() => String)
@@ -97,6 +102,11 @@ export class CreateMfgDrawingCheckSheetDto {
     @IsString()
     @Type(() => String)
     VCONTROLNO?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    VPROCESSNO?: string;
 
     @IsNotEmpty()
     @IsArray()

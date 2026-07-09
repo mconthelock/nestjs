@@ -1,8 +1,14 @@
-import { PartialType, PickType } from "@nestjs/swagger";
-import { Type } from "class-transformer";
-import { IsEmpty, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
-import { CreateFormDto } from "src/webform/form/dto/create-form.dto";
-import { Timestamp } from "typeorm";
+import { PartialType, PickType } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import {
+    IsDate,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+} from 'class-validator';
+import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
+import { Timestamp } from 'typeorm';
 
 export class CreatepsdlcFormDto extends PickType(CreateFormDto, [
     'NFRMNO',
@@ -11,22 +17,25 @@ export class CreatepsdlcFormDto extends PickType(CreateFormDto, [
     'REQBY',
     'INPUTBY',
     'REMARK',
-] as const){
+] as const) {
     @IsNotEmpty()
+    @IsDate()
     @Type(() => Date)
     CHANGE_DATE: Date;
 
+    @IsNotEmpty()
     @IsString()
     @Type(() => String)
     CHANGE_SCHD: string;
-    
+
     @IsString()
     @Type(() => String)
     CHANGE_STATUS: string;
 
     @IsOptional()
-    @Type(() => Timestamp)
-    ACTUAL_DATE?: Timestamp;
+    @IsDate()
+    @Type(() => Date)
+    ACTUAL_DATE?: Date;
 
     @IsOptional()
     @IsString()
@@ -37,7 +46,7 @@ export class CreatepsdlcFormDto extends PickType(CreateFormDto, [
     DETAILS: CreatepsdlcDetailDto[];
 }
 
-export class CreatepsdlcDetailDto{
+export class CreatepsdlcDetailDto {
     @IsNumber()
     @Type(() => Number)
     SEQNO: number;

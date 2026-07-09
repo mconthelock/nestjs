@@ -14,4 +14,31 @@ export class DpmsPlCaseListRepository extends BaseRepository {
     create(dto: CreateDpmsPlCaseListDto) {
         return this.getRepository(DPMS_PL_CASE_LIST).save(dto);
     }
+
+    findByRevId(revId: number) {
+        return this.getRepository(DPMS_PL_CASE_LIST).find({
+            where: { NISSUEREV_ID: revId },
+            relations: ['DETAILS'], // ดึงข้อมูลรายละเอียดที่เกี่ยวข้องด้วย
+            order: {
+                VCASE: 'ASC',
+                DETAILS: {
+                    VMFGNO: 'ASC',
+                    VCASE: 'ASC',
+                    VITEM: 'ASC',
+                    VDRAWING: 'ASC',
+                },
+            },
+        });
+    }
+
+    findPartialSelectionByRevId(revId: number) {
+        return this.manager.query(
+            `SELECT D.VCASE, D.VITEM, D.VDRAWING
+            FROM DPMS_PL_ISSUE_REV R
+            JOIN DPMS_PL_CASE_LIST L ON R.NID = L.NISSUEREV_ID 
+            JOIN DPMS_PL_CASE_LIST_DETAIL D ON L.NID = D.NCASELIST_ID 
+            WHERE R.NID = :1`,
+            [revId],
+        );
+    }
 }

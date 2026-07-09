@@ -366,6 +366,9 @@ export class InquiryService {
                 dt.UPDATE_BY = header.UPDATE_BY;
                 dt.INQG_GROUP = group_id;
                 dt.INQID = inquiry.INQ_ID;
+                dt.INQD_VPC_DATE = dt.INQD_VPC_DATE
+                    ? new Date(dt.INQD_VPC_DATE)
+                    : null;
 
                 if (db_detail) {
                     const dto: createDetailDto = Object.assign(
@@ -380,6 +383,9 @@ export class InquiryService {
                     //Create new detail
                     dt.CREATE_AT = new Date();
                     dt.CREATE_BY = header.UPDATE_BY;
+                    dt.INQD_VPC_DATE = dt.INQD_VPC_DATE
+                        ? new Date(dt.INQD_VPC_DATE)
+                        : null;
                     delete dt.INQD_ID;
                     const dto: createDetailDto = Object.assign(
                         {} as createDetailDto,

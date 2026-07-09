@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePackingListIssueDto } from './dto/create-packing-list-issue.dto';
-import {
-    UpdatePackingListIssueDto,
-    UpdatePlIssueProblemReasonDto,
-} from './dto/update-packing-list-issue.dto';
+import { UpdatePlIssueProblemReasonDto } from './dto/update-packing-list-issue.dto';
 import { DpmsPlIssueService } from 'src/workload/dpms_pl_issue/dpms_pl_issue.service';
 import { PDFService } from 'src/common/services/pdf/pdf.service';
 import { joinPaths } from 'src/common/utils/files.utils';
@@ -19,6 +15,10 @@ import {
     DPMS_PL_ISSUE_PK,
     generatePDFParams,
     sendMailParams,
+    generateFilenameParams,
+    prepareDocRevisionDataParams,
+    syncDocRevisionAndPlIssueParams,
+    saveDocRevisionParams,
 } from './packing-list-issue.interface';
 import { DpmsPlFileService } from 'src/workload/dpms_pl_file/dpms_pl_file.service';
 import { DpmsPlCaseListService } from 'src/workload/dpms_pl_case_list/dpms_pl_case_list.service';
@@ -33,17 +33,17 @@ import { DpmsPlDocRevService } from 'src/workload/dpms_pl_doc_rev/dpms_pl_doc_re
 @Injectable()
 export class PackingListIssueService {
     constructor(
-        private readonly PDFService: PDFService,
-        private readonly dpmsPlIssueService: DpmsPlIssueService,
-        private readonly dpmsPlIssueRevService: DpmsPlIssueRevService,
-        private readonly dpmsPlFileService: DpmsPlFileService,
-        private readonly dpmsPlCaseListService: DpmsPlCaseListService,
-        private readonly dpmsPlCaseListDetailService: DpmsPlCaseListDetailService,
-        private readonly dpmsPlIssueTypeService: DpmsPlIssueTypeService,
-        private readonly dpmsPlIssueDateService: DpmsPlIssueDateService,
-        private readonly dpmsPlMailService: DpmsPlMailService,
-        private readonly dpmsPlDocRevService: DpmsPlDocRevService,
-        private readonly mailService: MailService,
+        protected readonly PDFService: PDFService,
+        protected readonly dpmsPlIssueService: DpmsPlIssueService,
+        protected readonly dpmsPlIssueRevService: DpmsPlIssueRevService,
+        protected readonly dpmsPlFileService: DpmsPlFileService,
+        protected readonly dpmsPlCaseListService: DpmsPlCaseListService,
+        protected readonly dpmsPlCaseListDetailService: DpmsPlCaseListDetailService,
+        protected readonly dpmsPlIssueTypeService: DpmsPlIssueTypeService,
+        protected readonly dpmsPlIssueDateService: DpmsPlIssueDateService,
+        protected readonly dpmsPlMailService: DpmsPlMailService,
+        protected readonly dpmsPlDocRevService: DpmsPlDocRevService,
+        protected readonly mailService: MailService,
     ) {}
 
     private readonly tempDir = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
@@ -75,176 +75,314 @@ export class PackingListIssueService {
         }
     }
 
-    async issue(dto: CreatePackingListIssueDto) {
-        try {
-            const issueDate = now('DD/MM/YYYY');
-            const issueType = await this.dpmsPlIssueTypeService.findById(
-                dto.ISSUETYPE,
-            );
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-07-03
+     * @description Generate final path for PDF file based on VPROD and VORDERS
+     * @typedef genaratePdfPath
+     * @property {string} prod e.g. 2026021
+     * @property {string} order e.g. EXS916013
+     * @returns {Promise<string>} finalPath e.g. \\amecnas\AMECWEB\File\development\mfgreport\packing-list\2026\02X\EXS916013
+     * @example
+     * const finalPath = await this.genaratePdfPath({
+     *   prod: '2026021',
+     *   orders: 'EXS916013',
+     * });
+     * console.log(finalPath);  // \\amecnas\AMECWEB\File\development\mfgreport\packing-list\2026\02X\EXS916013
+     */
+    protected async genaratePdfPath({
+        prod,
+        orders,
+    }: {
+        prod: string;
+        orders: string;
+    }): Promise<string> {
+        const converted = convertJung(prod);
+        if (!converted) {
+            throw new Error('Invalid VPROD format for converting Jung');
+        }
+        const fyear = converted.substring(0, 4);
+        const jung = converted.slice(4);
+        const finalPath = await joinPaths(
+            this.finalDir,
+            fyear,
+            jung,
+            orders,
+            // issueType.data.VDESCRIPTION,
+        );
+        return finalPath;
+    }
 
-            const converted = convertJung(dto.VPROD);
-            if (!converted) {
-                throw new Error('Invalid VPROD format for converting Jung');
-            }
-            const fyear = converted.substring(0, 4);
-            const jung = converted.slice(4);
-            const finalPath = await joinPaths(
-                this.finalDir,
-                fyear,
-                jung,
-                dto.VORDERS,
-                // issueType.data.VDESCRIPTION,
-            );
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-07-03
+     * @description
+     * เช็คเอกสาร Packing List Issue ว่ามี record อยู่แล้วหรือไม่
+     * ถ้าไม่มีให้สร้างใหม่ และ set NDOCREV เป็น 0
+     * ถ้ามีอยู่แล้ว ให้เช็คว่า DFINISHALL เป็น null หรือไม่
+     *      ถ้าไม่เป็น null ให้เพิ่ม docRevision ขึ้น 1 และ set DFINISHALL เป็น null และ update NDOCREV เป็น docRevision ใหม่
+     *      ถ้าเป็น null ให้ใช้ docRevision เดิม
+     * @param plIssueData
+     * @param changeIssueType ถ้าเป็น true ให้เพิ่ม docRevision ขึ้น 1 และ set DFINISHALL เป็น null และ update NDOCREV เป็น docRevision ใหม่
+     * @param revise ถ้าเป็น true ให้เพิ่ม docRevision ขึ้น 1 และ set DFINISHALL เป็น null และ update NDOCREV เป็น docRevision ใหม่
+     * @param typeCode ถ้าเป็น 'PT', 'SP', 'BL' ให้เพิ่ม docRevision ขึ้น 1 และ set DFINISHALL เป็น null และ update NDOCREV เป็น docRevision ใหม่
+     * @returns
+     * @example
+     * const docRevision = await this.syncDocRevisionAndPlIssue({
+     *      plIssueData: {
+     *          VPROD: '2026021',
+     *          VP: 'P3',
+     *          VORDERS: 'EXS916013',
+     *          VTYPE: 'ELE',
+     *      },
+     *      changeIssueType: true,
+     *      revise: true,
+     *      typeCode: 'PT',
+     *      recreatedIssue: true,
+     * });
+     *
+     */
+    protected async syncDocRevisionAndPlIssue({
+        plIssueData,
+        changeIssueType = false,
+        revise = false,
+        typeCode,
+        recreatedIssue,
+    }: syncDocRevisionAndPlIssueParams): Promise<number> {
+        let docRevision: number = 0;
 
-            // 1. Check if PL Issue exists, if not create new PL Issue
-            const plIssueData: DPMS_PL_ISSUE_PK = {
-                VPROD: dto.VPROD,
-                VP: dto.VP,
-                VORDERS: dto.VORDERS,
-                VTYPE: dto.VTYPE,
-            };
-            const checkPlIssue =
-                await this.dpmsPlIssueService.findOne(plIssueData);
-            if (!checkPlIssue.status) {
-                await this.dpmsPlIssueService.create(plIssueData);
-            }
-            // 2. ถ้าเป็น complete, combine, balance ให้ set DFINISHALL เป็นวันที่ issue เลย
-            if (['CP', 'CB', 'BL'].includes(issueType.data.VCODE)) {
-                const finishDate = new Date();
+        const checkPlIssue = await this.dpmsPlIssueService.findOne(plIssueData);
+        // ถ้าเป็นการแก้ไขเอกสาร และ typeCode เป็น 'PT', 'SP', 'BL' ให้เพิ่ม docRevision ขึ้น 1
+        if (revise && ['PT', 'SP', 'BL'].includes(typeCode)) {
+            docRevision = checkPlIssue.data.NDOCREV + 1; // เพิ่ม revision ของเอกสาร
+            // ถ้ารายการที่เคยเลือกมีการเปลี่ยนแปลง หรือมีรายการใหม่ ให้ set DFINISHALL เป็น null และ update NDOCREV เป็น docRevision ใหม่
+            if (recreatedIssue) {
                 await this.dpmsPlIssueService.update(plIssueData, {
-                    DFINISHALL: finishDate,
+                    DFINISHALL: null,
+                    NDOCREV: docRevision,
                 });
-                // ดึงข้อมูล revision ถัดไปของเอกสาร เพื่อเตรียมสร้าง record ใน DPMS_PL_DOC_REV
-                const docRevision =
-                    await this.dpmsPlDocRevService.getNextRevision(plIssueData);
-                // ดึงรายการ ที่ยังไม่เก็บ record ใน DPMS_PL_DOC_REV ของเอกสารนี้ เพื่อสร้าง record ใหม่
-                const pendingRecord =
-                    await this.dpmsPlDocRevService.getPendingRecord(
-                        plIssueData,
-                    );
-                // ถ้าไม่สามารถดึงรายการที่ยังไม่เก็บ record ได้ ให้ throw error เพราะแสดงว่าข้อมูลไม่ถูกต้องหรือมีปัญหาในการดึงข้อมูล
-                if (!pendingRecord.status) {
-                    throw new Error(
-                        'Failed to retrieve pending records for finishing document revision',
-                    );
-                }
-                for (const record of pendingRecord.data) {
-                    await this.dpmsPlDocRevService.create({
-                        ...plIssueData,
-                        NISSUEREV_ID: record.NID,
-                        NREV: docRevision,
-                        DFINISHALL: finishDate,
-                    });
-                }
             }
-            // 3. Get next revision number
-            // 2026-06-27 เปลี่ยนเอา type และ round ออกจาก condition เพราะ revision จะไม่ขึ้นกับ type และ round แล้ว รันต่อเนื่องได้เลย
-            const revision: number =
-                await this.dpmsPlIssueRevService.getNextRevision({
+        } else {
+            // ถ้าไม่มี record ให้สร้างใหม่ และ set NDOCREV เป็น 0
+            if (!checkPlIssue.status) {
+                await this.dpmsPlIssueService.create({
                     ...plIssueData,
-                    // NISSUE_TYPE: dto.ISSUETYPE,
-                    // NROUND: dto.NROUND,
+                    NDOCREV: docRevision,
                 });
-            const revisionText: string = numberToAlphabetRevision(revision);
-
-            // 4. create PDF file
-            const fileName: string = `${dto.HEADER.VNAMEOFBLDG}_${dto.VORDERS}${revision > 0 ? `_${revisionText}` : ''}_${issueType.data.VDESCRIPTION}.pdf`;
-            console.log('filename', fileName);
-
-            const newFileName: string = fileName.replace(/[\\/:*?"<>|]/g, '_');
-            const pdf = await this.generatePDF({
-                order: dto.VORDERS,
-                html: dto.HTML,
-                fileName: newFileName,
-                revision: revisionText,
-                issueDate,
-                finalPath,
-            });
-
-            // 5. add file Data to DB
-            const insertFile = await this.dpmsPlFileService.create({
-                VFILE_ONAME: newFileName,
-                VFILE_FNAME: newFileName,
-                VFILE_USERCREATE: 'system',
-                NFILE_TYPE: dto.ISSUETYPE,
-                VFILE_PATH: finalPath,
-            });
-
-            if (insertFile.status === false) {
-                throw new Error('Failed to insert packing list file record');
             }
+            // ถ้ามี record อยู่แล้ว ให้เช็คว่า DFINISHALL เป็น null หรือไม่ ถ้าไม่เป็น null ให้เพิ่ม docRevision ขึ้น 1 และ set DFINISHALL เป็น null และ update NDOCREV เป็น docRevision ใหม่
+            // 2026-03-06 ถ้า DFINISHALL เป็น null และมีการเปลี่ยนประเภทการออกเอกสาร
+            else if (
+                checkPlIssue.data.DFINISHALL ||
+                (checkPlIssue.data.DFINISHALL === null && changeIssueType)
+            ) {
+                docRevision = checkPlIssue.data.NDOCREV + 1; // เพิ่ม revision ของเอกสาร
+                await this.dpmsPlIssueService.update(plIssueData, {
+                    DFINISHALL: null,
+                    NDOCREV: docRevision,
+                });
+            } else {
+                docRevision = checkPlIssue.data.NDOCREV;
+            }
+        }
 
-            // 6. create PL Issue Revision record
-            const insertIssueRev = await this.dpmsPlIssueRevService.create({
-                ...plIssueData,
-                NISSUE_TYPE: dto.ISSUETYPE,
-                NREV: revision,
-                VREVTEXT: revisionText,
-                NFILEID: insertFile.data.NFILE_ID,
-                VSHOPORDERNO: dto.HEADER.VSHOPORDERNO,
-                VSUBJECT: dto.HEADER.VSUBJECT,
-                VNAMEOFBLDG: dto.HEADER.VNAMEOFBLDG,
-                VSOLDTO: dto.HEADER.VSOLDTO,
-                VSHIPPINGMARK: dto.SHIPPING_MARK,
-                NROUND: dto.NROUND,
-                VISSUEBY: dto.VISSUEBY,
+        return docRevision;
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-07-03
+     * @description เตรียมข้อมูลสำหรับการสร้าง record ใน DPMS_PL_DOC_REV และ update DFINISHALL ของ record ที่ยังไม่ finish ของเอกสารนี้
+     * @param prepareDocRevisionDataParams
+     * @returns
+     * @example
+     * const docRevData = await this.prepareDocRevisionData({
+     *      typeCode: 'CP',
+     *      plIssueData: {
+     *          VPROD: '2026021',
+     *          VP: 'P3',
+     *          VORDERS: 'EXS916013',
+     *          VTYPE: 'ELE',
+     *      },
+     *      finishDate: new Date(),
+     *      docRevision: 0
+     * });
+     */
+    protected async prepareDocRevisionData({
+        typeCode,
+        plIssueData,
+        finishDate,
+        docRevision,
+        revise,
+        recreatedIssue
+    }: prepareDocRevisionDataParams): Promise<{
+        docRevData: any;
+    }> {
+        let docRevData: any = plIssueData;
+        // 2. ถ้าเป็น complete, combine, balance ให้ set DFINISHALL เป็นวันที่ issue เลย
+        if (['CP', 'CB', 'BL'].includes(typeCode) || (revise && ['PT', 'SP'].includes(typeCode) && !recreatedIssue) ) {
+            docRevData = {
+                ...docRevData,
+                NREV: docRevision,
+                DFINISHALL: finishDate,
+            };
+        } else {
+            docRevData = {
+                ...docRevData,
+                NREV: docRevision,
+            };
+        }
+        return docRevData;
+    }
+
+    protected async saveDocRevision({
+        typeCode,
+        docRevData,
+        issueRevID,
+        revise,
+        reviseID,
+        recreatedIssue
+    }: saveDocRevisionParams) {
+        const plIssueData = {
+            VPROD: docRevData.VPROD,
+            VP: docRevData.VP,
+            VORDERS: docRevData.VORDERS,
+            VTYPE: docRevData.VTYPE,
+        };
+        // ถ้า typeCode ไม่ใช่ Draft ให้สร้าง record ใน DPMS_PL_DOC_REV และ update DFINISHALL ของ record ที่ยังไม่ finish ของเอกสารนี้
+        if (typeCode !== 'DF') {
+            await this.dpmsPlDocRevService.create({
+                ...docRevData,
+                NISSUEREV_ID: issueRevID,
             });
-
-            // 7. Create PL Issue List record
-            for (const list of dto.LIST) {
-                const seq = dto.LIST.indexOf(list) + 1;
-                const insertIssueList = await this.dpmsPlCaseListService.create(
-                    {
-                        ...list,
-                        NISSUEREV_ID: insertIssueRev.data.NID,
-                        NSEQ: seq,
-                    },
-                );
-                // 8. Create PL Issue List Detail record
-                for (const detail of list.DETAILS) {
-                    await this.dpmsPlCaseListDetailService.create({
-                        ...detail,
-                        NCASELIST_ID: insertIssueList.data.NID,
+            // หากเป็น Partial หรือ Separate และไม่มีการเปลี่ยนแปลงรายการ
+            // ให้ update DFINISHALL และ ดึงรายการอื่นนอกจากรายการที่แก้ไขมาด้วย
+            console.log('doc rev data ', docRevData);
+            console.log('revise:', revise);
+            console.log('typeCode:', typeCode);
+            console.log('recreatedIssue:', recreatedIssue);
+            if (revise && ['PT', 'SP', 'BL'].includes(typeCode) && !recreatedIssue) {
+                const  previousRevision = await this.dpmsPlDocRevService.findPreviousRevisionExcludingIssueRev({
+                    ...plIssueData,
+                    NREV: docRevData.NREV,
+                    NISSUEREV_ID: reviseID,
+                });
+                console.log('previousRevision:', previousRevision);
+                for (const record of previousRevision.data) {
+                    console.log('record:', record);
+                    await this.dpmsPlDocRevService.create({
+                        ...record,
+                        NREV: docRevData.NREV,
+                        DFINISHALL: docRevData.DFINISHALL ?? null,
                     });
                 }
+                console.log('docRevData.DFINISHALL:', docRevData.DFINISHALL);
+                if(docRevData.DFINISHALL) {
+                    await this.dpmsPlIssueService.update(plIssueData, {
+                        DFINISHALL: docRevData.DFINISHALL,
+                        NDOCREV: docRevData.NREV,
+                    });
+                }
+                
+                return;
             }
-            // 9. send email notification to admin
-            await this.sendMail({
-                subject: `${now('YYYY-MM-DD HH:mm:ss')} Packing list issue notification [${dto.VORDERS}] REV. ${revisionText} (${issueType.data.VDESCRIPTION})`,
-                maillist: [process.env.MAIL_ADMIN],
-                context: {
-                    rev: revisionText,
-                    issueType: issueType.data.VDESCRIPTION,
-                    shopOrderNo: dto.HEADER.VSHOPORDERNO,
-                    subject: dto.HEADER.VSUBJECT,
-                    nameOfBldg: dto.HEADER.VNAMEOFBLDG,
-                    soldTo: dto.HEADER.VSOLDTO,
-                    path: pdf.path,
-                },
-                attachments: [
-                    {
-                        filename: newFileName,
-                        content: pdf.data,
-                    },
-                ],
-            });
-            // 10. Get issue date from DPMS_PL_ISSUE_DATE view for update dataTable
-            const issueData =
-                await this.dpmsPlIssueDateService.findOne(plIssueData);
-            if (!issueData.status) {
-                throw new Error('Failed to find DPMS PL Issue Date');
+            // update DFINISHALL for pending records if any
+            if (['CP', 'CB', 'BL'].includes(typeCode)) {
+                // ดึงรายการ ที่ยังไม่ finish ของเอกสารนี้ เพื่อ update DFINISHALL เป็นวันที่ issue
+                const pendingRecord =
+                    await this.dpmsPlDocRevService.getPendingRecord({
+                        ...plIssueData,
+                        NREV: docRevData.NREV,
+                    });
+
+                if (pendingRecord.status) {
+                    for (const record of pendingRecord.data) {
+                        await this.dpmsPlDocRevService.create({
+                            ...record,
+                            DFINISHALL: docRevData.DFINISHALL,
+                        });
+                    }
+                }
+                await this.dpmsPlIssueService.update(plIssueData, {
+                    DFINISHALL: docRevData.DFINISHALL,
+                    NDOCREV: docRevData.NREV,
+                });
             }
-            // throw new Error('Test error');
-            return {
-                status: true,
-                message: 'Packing list issued successfully',
-                data: issueData.data,
-            };
-        } catch (error) {
-            throw new Error(`Failed to issue packing list: ${error.message}`);
         }
     }
 
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-07-03
+     * @description หา revision ของเอกสาร Packing List Issue สำหรับการสร้าง record ใน DPMS_PL_ISSUE_REV
+     * @param plIssueData
+     * @returns
+     */
+    protected async getNextPlRevision(
+        plIssueData: DPMS_PL_ISSUE_PK,
+    ): Promise<{ revision: number; revisionText: string }> {
+        // 2026-06-27 เปลี่ยนเอา type และ round ออกจาก condition เพราะ revision จะไม่ขึ้นกับ type และ round แล้ว รันต่อเนื่องได้เลย
+        const revision: number =
+            await this.dpmsPlIssueRevService.getNextRevision({
+                ...plIssueData,
+                // NISSUE_TYPE: dto.ISSUETYPE,
+                // NROUND: dto.NROUND,
+            });
+        const revisionText: string = numberToAlphabetRevision(revision);
+        return { revision, revisionText };
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-07-03
+     * @description สร้างชื่อไฟล์สำหรับเอกสาร Packing List Issue
+     * @param generateFilenameParams
+     * @returns
+     * @example
+     * const fileName = this.generateFilename({
+     *      revision: 0,
+     *      revisionText: 'A',
+     *      issueType: 'Partial',
+     *      orders: 'EXS916013',
+     *      projectName: 'GR425-25A IATRIKO MAROUSI'
+     * });
+     * console.log(fileName); // GR425-25A IATRIKO MAROUSI_EXS916013_A_Partial.pdf
+     */
+    protected generateFilename({
+        revision,
+        revisionText,
+        issueType,
+        orders,
+        projectName,
+    }: generateFilenameParams): string {
+        const fileName: string = `${projectName}_${orders}${revision > 0 ? `_${revisionText}` : ''}_${issueType}.pdf`;
+        const newFileName: string = fileName.replace(/[\\/:*?"<>|]/g, '_');
+        return newFileName;
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-07-03
+     * @description ส่งอีเมลแจ้งเตือนการออกเอกสาร Packing List Issue
+     * @param sendMailParams
+     * @returns
+     * @example
+     * await this.sendMail({
+     *      maillist: ['sutthipongt@MitsubishiElevatorAsia.co.th'],
+     *      context: {
+     *          rev: 'A',
+     *          issueType: 'Partial',
+     *          shopOrderNo: 'E-XS-91601-3',
+     *          subject: 'ELEVATOR (02X)G11L11',
+     *          nameOfBldg: 'GR425-25A IATRIKO MAROUSI',
+     *          soldTo: 'GR425-25A IATRIKO MAROUSI',
+     *          path: '\\amecnas\AMECWEB\File\development\mfgreport\packing-list\2026\02X\EXS916013\GR425-25A IATRIKO MAROUSI_EXS916013_A_Partial.pdf',
+     *      },
+     *      attachments: [
+     *        { filename: 'GR425-25A IATRIKO MAROUSI_EXS916013_A_Partial.pdf', content: <Buffer> },
+     *      ],
+     * });
+     */
     protected async sendMail({
         maillist,
         context,
@@ -280,7 +418,7 @@ export class PackingListIssueService {
         });
     }
 
-    private async generatePDF({
+    protected async generatePDF({
         order,
         html,
         fileName,

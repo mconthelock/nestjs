@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateDpmsPlIssueDto {
     @IsNotEmpty()
@@ -30,4 +30,9 @@ export class CreateDpmsPlIssueDto {
     @Type(() => Date)
     @IsDate()
     DFINISHALL?: Date;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber()
+    NDOCREV?: number;
 }

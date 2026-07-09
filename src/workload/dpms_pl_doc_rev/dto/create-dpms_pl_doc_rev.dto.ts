@@ -14,19 +14,19 @@ export class CreateDpmsPlDocRevDto extends PickType(CreateDpmsPlIssueDto, [
     @Type(() => Number)
     NISSUEREV_ID: number;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    NREV?: number;
+    NREV: number;
 
     @IsOptional()
     @IsString()
     VREVTEXT?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
-    DFINISHALL: Date;
+    DFINISHALL?: Date;
 }
 
 export class SearchDpmsPlDocRevDto extends PickType(CreateDpmsPlDocRevDto, [

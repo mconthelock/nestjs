@@ -14,10 +14,10 @@ export class DPMS_PL_DOC_REV {
     @PrimaryColumn()
     VORDERS: string;
 
-    @Column()
+    @PrimaryColumn()
     NISSUEREV_ID: number;
 
-    @Column()
+    @PrimaryColumn()
     NREV: number;
 
     @Column()

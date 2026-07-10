@@ -42,7 +42,6 @@ export class MfgDrawingCreateChecksheetService {
         1: 'default',
         2: 'pisMulti',
         3: 'multi',
-        4: "feederParts"
     };
 
     async create(dto: CreateMfgDrawingCheckSheetDto) {
@@ -53,10 +52,11 @@ export class MfgDrawingCreateChecksheetService {
             if (!item.status) {
                 throw new Error(`Item Mfg with id ${dto.NITEMID} not found`);
             }
-
             const itemData: ITEM_MFG = item.data;
-            const blockName = itemData.BLOCK_MASTER ? itemData.BLOCK_MASTER.VNAME : null;
-            const itemName  = itemData.VITEM_NAME;
+            const blockName = itemData.BLOCK_MASTER
+                ? itemData.BLOCK_MASTER.VNAME
+                : null;
+            const itemName = itemData.VITEM_NAME;
             const itemLists: ITEM_MFG_LIST[] = itemData.ITEM_LIST;
             const deleteLists: ITEM_MFG_DELETE[] = itemData.DELETE_LIST;
             const controlLists: CONTROL_DRAWING_PIS[] = itemData.CONTROL_LIST;
@@ -80,7 +80,6 @@ export class MfgDrawingCreateChecksheetService {
                     `Master path not found for item ${itemData.VITEM_NAME}`,
                 );
             }
-
             let drawing: string;
             let controlNo: string = dto.VCONTROLNO;
             let fileName: string;
@@ -110,9 +109,6 @@ export class MfgDrawingCreateChecksheetService {
                         VSERIALNO: sn,
                         NTYPE: 2, // กำหนด type เป็น 2 สำหรับ serial no ทั้งหมดในกรณี pisMulti
                     }));
-                    break;
-                case 'feederParts':
-                    drawing = await this.getDrawingByControlNo(controlNo);
                     break;
                 default:
                     newfileName = controlNo //dto.ASERIALNO[0];
@@ -158,7 +154,6 @@ export class MfgDrawingCreateChecksheetService {
                 'block_' + blockName,
                 'station_' + itemName,
             );
-
             await this.createFile(
                 insertData,
                 masterPath,
@@ -166,7 +161,6 @@ export class MfgDrawingCreateChecksheetService {
                 fileName,
                 newfileName,
             );
-
             const res = await this.mfgDrawingService.findOne(insertData.NID);
             return {
                 data: res.data,

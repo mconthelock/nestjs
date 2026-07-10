@@ -69,6 +69,36 @@ export class DrawingResolverHelper {
         return match.DRAWING;
     }
 
+    /**
+     * @author Sutthipong Tangmongkhoncharoen (24008)
+     * @since 2026-07-10
+     * @description ตรวจสอบและเพิ่มข้อมูลด้านข้างให้กับ drawing ของ break assembly
+     * หากพบว่าเป็น break assembly จะทำการตรวจสอบ description ของ F001KP ว่ามี (L) หรือ (R) อยู่ใน description หรือไม่ หากพบจะทำการเพิ่ม (L) หรือ (R) เข้าไปใน drawing
+     * @param controlNo C60526001PH
+     * @param drawing BA118A742 G03
+     * @returns BA118A742(R) G03
+     * @example
+     * checkBreakAssyDrawing('C60526001PH', 'BA118A742 G03') => 'BA118A742(R) G03'
+     * checkBreakAssyDrawing('C60526001NV', 'BA118A742 G03') => 'BA118A742(L) G03'
+     * checkBreakAssyDrawing('S1909110234', 'BS127C197 G01') => 'BS127C197 G01'
+     */
+    async checkBreakAssyDrawing(controlNo: string, drawing: string): Promise<string> {
+        const f001kp: { status: boolean; data?: F001KP; message: string } = await this.f001kpService.findOne(controlNo);
+        if (!f001kp.status) {
+            throw new Error(`F001KP with control no ${controlNo} not found`);
+        }
+        const description = f001kp.data.F01R09?.trim();
+        if (description && description.toUpperCase().replace(/\s/g, '').includes('BRAKEASSY')) {
+            const side = description.match(/\(([LR])\)/i);
+            if (side) {
+                const explode = this.parser.explodeGL(drawing);
+                drawing = drawing.replace(explode.DRAWING, explode.DRAWING + side[0].toUpperCase());
+            }
+        }
+        return drawing;
+
+    }
+
     async getDrawingByIdTag(
         serialNo: string,
     ): Promise<{ controlNo: string; drawing: string }> {
@@ -98,21 +128,38 @@ export class DrawingResolverHelper {
         return { controlNo, drawing };
     }
 
-    async getDrawingByFeeder(controlNo: string): Promise<string> {
+    async getFeederInfo(controlNo: string): Promise<{
+        drawing: string;
+        folderPath: string;
+    }> {
         const result = await this.f001kpService.findOne(controlNo);
         if (!result.status) {
-            throw new Error(`Control No not found in ID-Tag`);
+            throw new Error('ไม่พบข้อมูล ID-Tag');
         }
 
-        const drawing = this.parser.normalizeDrawing(
-            result.data?.F01R04 ?? ''
-        );
-
+        const drawing = this.parser.normalizeDrawing(result.data.F01R04?.trim());
         if (!drawing) {
-            throw new Error(`ไม่พบ Drawing ใน ID-Tag`);
+            throw new Error('ไม่พบ Drawing ใน ID-Tag');
         }
 
-        return drawing;
+        const yearMonth = result.data.F01R02?.trim();
+        const item = result.data.F01R03?.trim();
+        if (!yearMonth || yearMonth.length < 6) {
+            throw new Error('ข้อมูลปี/เดือนไม่ถูกต้องใน ID-Tag');
+        }
+
+        const folderPath = [
+            '',
+            yearMonth.substring(0, 4),
+            yearMonth.substring(4, 6),
+            item,
+            '',
+        ].join('\\');
+
+        return {
+            drawing,
+            folderPath,
+        };
     }
 
     async getDrawingByPis(pis: string, controls: string[]): Promise<string> {

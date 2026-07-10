@@ -79,18 +79,18 @@ export class PackingListIssueService {
      * @author Sutthipong Tangmongkhoncharoen(24008)
      * @since 2026-07-03
      * @description Generate final path for PDF file based on VPROD and VORDERS
-     * @typedef genaratePdfPath
+     * @typedef genaratePath
      * @property {string} prod e.g. 2026021
      * @property {string} order e.g. EXS916013
      * @returns {Promise<string>} finalPath e.g. \\amecnas\AMECWEB\File\development\mfgreport\packing-list\2026\02X\EXS916013
      * @example
-     * const finalPath = await this.genaratePdfPath({
+     * const finalPath = await this.genaratePath({
      *   prod: '2026021',
      *   orders: 'EXS916013',
      * });
      * console.log(finalPath);  // \\amecnas\AMECWEB\File\development\mfgreport\packing-list\2026\02X\EXS916013
      */
-    protected async genaratePdfPath({
+    protected async genaratePath({
         prod,
         orders,
     }: {
@@ -150,6 +150,9 @@ export class PackingListIssueService {
         recreatedIssue,
     }: syncDocRevisionAndPlIssueParams): Promise<number> {
         let docRevision: number = 0;
+        if(typeCode === 'DF'){
+            return docRevision; // ถ้าเป็น Draft ให้ return 0 เพราะไม่ใช้
+        }
 
         const checkPlIssue = await this.dpmsPlIssueService.findOne(plIssueData);
         // ถ้าเป็นการแก้ไขเอกสาร และ typeCode เป็น 'PT', 'SP', 'BL' ให้เพิ่ม docRevision ขึ้น 1
@@ -214,13 +217,16 @@ export class PackingListIssueService {
         finishDate,
         docRevision,
         revise,
-        recreatedIssue
+        recreatedIssue,
     }: prepareDocRevisionDataParams): Promise<{
         docRevData: any;
     }> {
         let docRevData: any = plIssueData;
         // 2. ถ้าเป็น complete, combine, balance ให้ set DFINISHALL เป็นวันที่ issue เลย
-        if (['CP', 'CB', 'BL'].includes(typeCode) || (revise && ['PT', 'SP'].includes(typeCode) && !recreatedIssue) ) {
+        if (
+            ['CP', 'CB', 'BL'].includes(typeCode) ||
+            (revise && ['PT', 'SP'].includes(typeCode) && !recreatedIssue)
+        ) {
             docRevData = {
                 ...docRevData,
                 NREV: docRevision,
@@ -241,7 +247,7 @@ export class PackingListIssueService {
         issueRevID,
         revise,
         reviseID,
-        recreatedIssue
+        recreatedIssue,
     }: saveDocRevisionParams) {
         const plIssueData = {
             VPROD: docRevData.VPROD,
@@ -261,12 +267,19 @@ export class PackingListIssueService {
             console.log('revise:', revise);
             console.log('typeCode:', typeCode);
             console.log('recreatedIssue:', recreatedIssue);
-            if (revise && ['PT', 'SP', 'BL'].includes(typeCode) && !recreatedIssue) {
-                const  previousRevision = await this.dpmsPlDocRevService.findPreviousRevisionExcludingIssueRev({
-                    ...plIssueData,
-                    NREV: docRevData.NREV,
-                    NISSUEREV_ID: reviseID,
-                });
+            if (
+                revise &&
+                ['PT', 'SP', 'BL'].includes(typeCode) &&
+                !recreatedIssue
+            ) {
+                const previousRevision =
+                    await this.dpmsPlDocRevService.findPreviousRevisionExcludingIssueRev(
+                        {
+                            ...plIssueData,
+                            NREV: docRevData.NREV,
+                            NISSUEREV_ID: reviseID,
+                        },
+                    );
                 console.log('previousRevision:', previousRevision);
                 for (const record of previousRevision.data) {
                     console.log('record:', record);
@@ -277,13 +290,12 @@ export class PackingListIssueService {
                     });
                 }
                 console.log('docRevData.DFINISHALL:', docRevData.DFINISHALL);
-                if(docRevData.DFINISHALL) {
+                if (docRevData.DFINISHALL) {
                     await this.dpmsPlIssueService.update(plIssueData, {
                         DFINISHALL: docRevData.DFINISHALL,
                         NDOCREV: docRevData.NREV,
                     });
                 }
-                
                 return;
             }
             // update DFINISHALL for pending records if any
@@ -318,12 +330,23 @@ export class PackingListIssueService {
      * @param plIssueData
      * @returns
      */
-    protected async getNextPlRevision(
-        plIssueData: DPMS_PL_ISSUE_PK,
-    ): Promise<{ revision: number; revisionText: string }> {
+    protected async getNextPlRevision({
+        plIssueData,
+        typeCode,
+        typeId,
+    }: {
+        plIssueData: DPMS_PL_ISSUE_PK;
+        typeCode: string;
+        typeId: number;
+    }): Promise<{ revision: number; revisionText: string }> {
         // 2026-06-27 เปลี่ยนเอา type และ round ออกจาก condition เพราะ revision จะไม่ขึ้นกับ type และ round แล้ว รันต่อเนื่องได้เลย
-        const revision: number =
-            await this.dpmsPlIssueRevService.getNextRevision({
+        // 2026-07-09 เพิ่ม typeId เพื่อใช้ในการหา revision ของ typeCode เป็น 'DF' (Draft) เพราะ Draft จะมี revision ต่อเนื่องแยกตาม typeId
+        const revision: number = typeCode === 'DF' 
+            ? await this.dpmsPlIssueRevService.getNextRevision({
+                ...plIssueData,
+                NISSUE_TYPE: typeId,
+            })
+            : await this.dpmsPlIssueRevService.getNextRevision({
                 ...plIssueData,
                 // NISSUE_TYPE: dto.ISSUETYPE,
                 // NROUND: dto.NROUND,

@@ -2,8 +2,8 @@ import { Controller, Post, Body, Patch, Get, Param } from '@nestjs/common';
 import { PackingListIssueService } from './packing-list-issue.service';
 import { CreatePackingListIssueDto } from './dto/create-packing-list-issue.dto';
 import {
-    UpdatePackingListIssueDto,
     UpdatePlIssueProblemReasonDto,
+    GetDocForShowDto,
 } from './dto/update-packing-list-issue.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { PackingListIssueProcedureService } from './packing-list-issue-procedure.service';
@@ -48,5 +48,10 @@ export class PackingListIssueController {
     @Post('last-rev-document')
     getLastRevDocument(@Body() dto: SearchDpmsPlIssueDto) {
         return this.procedureService.getLastRevDocument(dto);
+    }
+
+    @Post('doc-for-show')
+    getDocforShow(@Body() dto: GetDocForShowDto) {
+        return this.procedureService.getDocforShow(dto);
     }
 }

@@ -127,6 +127,14 @@ export class DrawingFileHelper {
             throw new Error(`ไม่พบ Active Sheet ในไฟล์ ${file.name}`);
         }
 
+        const headerA18 = worksheet.getCell('A18').text.trim().toLowerCase();
+        const headerG18 = worksheet.getCell('G18').text.trim().toLowerCase();
+        if (headerA18 !== 'no.' || headerG18 !== 'mc no.') {
+            throw new Error(
+                `ไฟล์ ${file.name} ไม่ใช่ Template Checksheet Feeder`,
+            );
+        }
+
         let revision = worksheet.getCell('E3').text.trim();
         if (revision === '*') {
             revision = '0';

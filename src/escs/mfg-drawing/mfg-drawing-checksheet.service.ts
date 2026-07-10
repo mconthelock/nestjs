@@ -114,7 +114,8 @@ export class MfgDrawingCreateChecksheetService {
                 default:
                     destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
                     drawing     = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
-                    listOfCS    = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawing);
+                    const drawingCheck = await this.drawingResolverHelper.checkBreakAssyDrawing(controlNo, drawing);
+                    listOfCS    = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawingCheck);
                     fileName    = listOfCS.VNUMBER_FILE;
                     newfileName = controlNo;
                     serialList  = createSerialList(1);

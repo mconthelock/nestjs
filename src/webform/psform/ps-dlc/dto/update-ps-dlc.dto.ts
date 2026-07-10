@@ -1,7 +1,41 @@
 import { PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+    IsArray,
+    IsDate,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    ValidateNested,
+} from 'class-validator';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+
+export class UpdatePsdlcDetailDto {
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    PNZUBA?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    PNHING?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    NEWCODE?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    NEWFLAG?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    REFERENCE?: string;
+}
 
 export class UpdateflowPSDLCDto extends PickType(doactionFlowDto, [
     'NFRMNO',
@@ -43,4 +77,10 @@ export class UpdatedataPSDLCDto extends PickType(doactionFlowDto, [
     @IsString()
     @Type(() => String)
     ACTUAL_UPDATEBY: string;
+
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => UpdatePsdlcDetailDto)
+    DETAILS?: UpdatePsdlcDetailDto[];
 }

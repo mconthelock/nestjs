@@ -15,6 +15,7 @@ import { AmecUserAllModule } from './amecuserall/amecuserall.module';
 import { PtermcodeModule } from './ptermcode/ptermcode.module';
 import { PappflowModule } from './pappflow/pappflow.module';
 import { PappstepModule } from './pappstep/pappstep.module';
+import { PcurrencyModule } from './pcurrency/pcurrency.module';
 
 @Module({
     imports: [
@@ -34,6 +35,7 @@ import { PappstepModule } from './pappstep/pappstep.module';
         PtermcodeModule,
         PappflowModule,
         PappstepModule,
+        PcurrencyModule,
     ],
 })
 export class AmecModule {}

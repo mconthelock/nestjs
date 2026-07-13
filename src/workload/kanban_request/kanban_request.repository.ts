@@ -35,6 +35,18 @@ export class KanbanRequestRepository extends BaseRepository {
         return result;
     }
 
+    async getProductDetail(itemcode: string) {
+        const result = await this.ds.query(
+            `
+            SELECT * 
+            FROM PKC_PRODUCTS
+            WHERE ITEM_CODE = :1
+            `,
+            [itemcode],
+        );
+        return result;
+    }
+
     async insertIssueKanban(data: Partial<ISSUE_KANBAN>[]) {
         const result = await this.ds.query(`
             SELECT SEQ_ISSUE_KANBAN.NEXTVAL AS ID
@@ -56,22 +68,26 @@ export class KanbanRequestRepository extends BaseRepository {
     }
 
     async insertIssueKanbanDetail(data: Partial<ISSUE_KANBAN_DETAIL>[]) {
-        const result = await this.ds.query(`
-            SELECT SEQ_ISSUE_KANBAN_DETAIL.NEXTVAL AS ID
-            FROM DUAL
-        `);
+        const seqResult = await this.ds.query(
+            `
+                SELECT SEQ_ISSUE_KANBAN_DETAIL.NEXTVAL AS ID
+                FROM DUAL
+                CONNECT BY LEVEL <= :1
+            `,
+            [data.length],
+        );
 
-        const id = result[0].ID;
-
-        const records = data.map((item) => ({
-            IKD_ID: id,
+        const records = data.map((item, index) => ({
+            IKD_ID: seqResult[index].ID,
             IK_ID: item.IK_ID,
             ITEM_CODE: item.ITEM_CODE,
             QTY_REQ: item.QTY_REQ,
             REMARK: item.REMARK,
             QTY_PR: item.QTY_PR,
         }));
+
         await this.getRepository(ISSUE_KANBAN_DETAIL).save(records);
-        return id;
+
+        return records.map((r) => r.IKD_ID);
     }
 }

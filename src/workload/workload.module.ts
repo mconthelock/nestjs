@@ -14,6 +14,7 @@ import { DpmsPlMailModule } from './dpms_pl_mail/dpms_pl_mail.module';
 import { VpsModule } from './vps/vps.module';
 import { KanbanRequestModule } from './kanban_request/kanban_request.module';
 import { DpmsPlLastRevisionViewModule } from './dpms_pl_last_revision_view/dpms_pl_last_revision_view.module';
+import { DpmsPlDocRevModule } from './dpms_pl_doc_rev/dpms_pl_doc_rev.module';
 
 @Module({
     imports: [
@@ -32,6 +33,7 @@ import { DpmsPlLastRevisionViewModule } from './dpms_pl_last_revision_view/dpms_
         VpsModule,
         KanbanRequestModule,
         DpmsPlLastRevisionViewModule,
+        DpmsPlDocRevModule,
     ],
 })
 export class WorkloadModule {}

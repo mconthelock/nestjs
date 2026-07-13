@@ -52,7 +52,9 @@ export class SchedulerService implements OnModuleInit {
     /** Cron job สำหรับบีบอัด logs เก่าอัตโนมัติ */
     private addLogCompressionJob() {
         const job = new CronJob('30 0 * * *', async () => {
-            this.logger.info('Running automatic log compression...');
+            this.logger.info('Running automatic log compression...', {
+                context: 'SchedulerService',
+            });
             try {
                 const response = await this.httpService.axiosRef.post(
                     'http://localhost:3000/logger/compress-old-logs',
@@ -63,9 +65,12 @@ export class SchedulerService implements OnModuleInit {
                 );
                 this.logger.info(
                     `Log compression completed: ${JSON.stringify(response.data.summary)}`,
+                    { context: 'SchedulerService' },
                 );
             } catch (error) {
-                this.logger.error(`Log compression failed: ${error.message}`);
+                this.logger.error(`Log compression failed: ${error.message}`, {
+                    context: 'SchedulerService',
+                });
             }
         });
 
@@ -73,6 +78,7 @@ export class SchedulerService implements OnModuleInit {
         job.start();
         this.logger.info(
             'Log compression cron job registered (daily at 00:30)',
+            { context: 'SchedulerService' },
         );
     }
 
@@ -130,6 +136,7 @@ export class SchedulerService implements OnModuleInit {
             } catch (optionsError) {
                 this.logger.warn(
                     `Endpoint validation failed for ${url}: ${optionsError.message}`,
+                    { context: 'SchedulerService' },
                 );
                 return false;
             }
@@ -256,7 +263,10 @@ export class SchedulerService implements OnModuleInit {
 
     async loadAndScheduleJobs() {
         const jobs = await this.jobRepo.find({ where: { IS_ACTIVE: 1 } });
-        jobs.forEach((job) => this.addCronJob(job));
+        console.log('Jobs:', jobs.length);
+        jobs.forEach((job) => {
+            this.addCronJob(job);
+        });
         console.log(`Job Schedule was loaded`);
     }
 
@@ -267,6 +277,7 @@ export class SchedulerService implements OnModuleInit {
         if (!cronExpression) {
             this.logger.warn(
                 `Skip scheduling job ${job.NAME} (${job.ID}): CRON_EXPRESSION is empty`,
+                { context: 'SchedulerService' },
             );
             return;
         }
@@ -274,6 +285,7 @@ export class SchedulerService implements OnModuleInit {
         if (!this.isValidCronExpression(cronExpression)) {
             this.logger.warn(
                 `Skip scheduling job ${job.NAME} (${job.ID}): invalid cron expression "${cronExpression}"`,
+                { context: 'SchedulerService' },
             );
             return;
         }
@@ -286,14 +298,21 @@ export class SchedulerService implements OnModuleInit {
         } catch (e) {}
 
         const cronJob = new CronJob(cronExpression, async () => {
-            console.log(`Executing job: ${job.NAME}`);
+            this.logger.info(`Executing job: ${job.NAME}`, {
+                context: 'SchedulerService',
+            });
 
             await this.handleJobExecution(job);
         });
 
         this.schedulerRegistry.addCronJob(job.NAME, cronJob);
         cronJob.start();
-        this.logger.info(`Scheduled job: ${job.NAME}`);
+        this.logger.info(`Scheduled job: ${job.NAME}`, {
+            context: 'SchedulerService',
+        });
+        this.logger.info(`Scheduled Expression: ${job.CRON_EXPRESSION}`, {
+            context: 'SchedulerService',
+        });
     }
 
     private normalizeCronExpression(expression: string): string {
@@ -341,14 +360,17 @@ export class SchedulerService implements OnModuleInit {
             );
 
             if (!acquired) {
-                this.logger.debug(
+                this.logger.info(
                     `Job ${job.NAME} skipped - already running in another instance`,
+                    { context: 'SchedulerService' },
                 );
                 return;
             }
         }
 
-        this.logger.debug(`Executing job: ${job.NAME}`);
+        this.logger.info(`Executing job: ${job.NAME}`, {
+            context: 'SchedulerService',
+        });
         const startTime = new Date();
         let status = 'SUCCESS';
         let message = '';
@@ -361,7 +383,10 @@ export class SchedulerService implements OnModuleInit {
                     payload = JSON.parse(job.PARAMETES);
                 }
             } catch (e) {
-                this.logger.warn(`Invalid JSON parameters for job ${job.NAME}`);
+                this.logger.warn(
+                    `Invalid JSON parameters for job ${job.NAME}`,
+                    { context: 'SchedulerService' },
+                );
             }
 
             const response = await this.httpService.axiosRef.post(
@@ -371,14 +396,17 @@ export class SchedulerService implements OnModuleInit {
             );
             message = JSON.stringify(response.data);
             responseCode = response.status;
-            this.logger.debug(`Job ${job.NAME} ${response.status}`);
+            this.logger.info(`Job ${job.NAME} ${response.status}`, {
+                context: 'SchedulerService',
+            });
         } catch (error) {
             status = 'FAILED';
             message = error.message;
             responseCode = error.response?.status || 500;
-            //this.logger.error(`Job failed: ${message}`);
+            this.logger.error(`Job failed: ${message}`, { context: 'SchedulerService' });
             throw new Error(`Job ${job.NAME} failed: ${message}`);
         } finally {
+            this.logger.info(`Job ${job.NAME} finally`, { context: 'SchedulerService' });
             const endTime = new Date();
             await this.logRepo.save({
                 job: job,
@@ -390,6 +418,7 @@ export class SchedulerService implements OnModuleInit {
                 OUTPUT_MESSAGE: message,
             });
             await this.jobRepo.update(job.ID, { LAST_RUN_AT: endTime });
+            this.logger.info(`Job ${job.NAME} insert log`, { context: 'SchedulerService' });
         }
     }
 }

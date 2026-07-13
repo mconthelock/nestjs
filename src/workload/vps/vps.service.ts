@@ -11,8 +11,8 @@ export class VpsService {
         return await this.vpsRepository.chkPrint(order, packing);
     }
 
-    async getDetailPIS(packing: string): Promise<any[]> {
-        return await this.vpsRepository.getDetailPIS(packing);
+    async getListOrder(packing: string): Promise<any[]> {
+        return await this.vpsRepository.getListOrder(packing);
     }
 
     async insertPrintVPS(
@@ -170,5 +170,25 @@ export class VpsService {
 
     async getVPSDetail(order: string, packing: string) {
         return await this.vpsRepository.getVPSDetail(order, packing);
+    }
+
+    async getOrderDetail(order: string, packing: string): Promise<any[]> {
+        const orderDetails = await this.vpsRepository.getOrderDetail(order, packing);
+
+        if (!orderDetails || orderDetails.length === 0) {
+            return [];
+        }
+
+        const remark = await this.vpsRepository.getQ46054OL(order, packing);
+        orderDetails[0].REMARK = remark && remark.length > 0 ? remark : '';
+
+        for (const detail of orderDetails) {
+            const dwgNo = detail.S11M04 ? detail.S11M04.replace(/\s/g, '') : '';
+            const masterPacking = await this.vpsRepository.getMasterPacking(dwgNo);
+            
+            detail.MASTER_PACKING = masterPacking && masterPacking.length > 0 ? masterPacking : '';
+        }
+
+        return orderDetails;
     }
 }

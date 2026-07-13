@@ -2,11 +2,53 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { ISDEV_DEVELOPER } from 'src/common/Entities/webform/table/ISDEV_DEVELOPER.entity';
+
+import { CreateDeveloperDto } from './dto/create-developer.dto';
+import { UpdateDeveloperDto } from './dto/update-developer';
+
 @Injectable()
 export class IsDevService {
-    constructor() // @InjectRepository(IsDev, 'webformConnection')
-    // private readonly isdev: Repository<IsDev>,
-    {}
+    constructor(
+        @InjectRepository(ISDEV_DEVELOPER, 'webformConnection')
+        private readonly developer: Repository<ISDEV_DEVELOPER>,
+    ) {}
+
+    async createDev(dto: CreateDeveloperDto) {
+        const newDev = this.developer.create(dto as unknown as ISDEV_DEVELOPER);
+        await this.developer.save(newDev);
+        return await this.developer.findOne({
+            where: {
+                NFRMNO: dto.NFRMNO,
+                VORGNO: dto.VORGNO,
+                CYEAR: dto.CYEAR,
+                CYEAR2: dto.CYEAR2,
+                NRUNNO: dto.NRUNNO,
+                DEV_SEQ: dto.DEV_SEQ,
+            },
+            relations: ['info'],
+        });
+    }
+
+    async deleteDev(dto: UpdateDeveloperDto) {
+        const devToDelete = await this.developer.findOne({
+            where: {
+                NFRMNO: dto.NFRMNO,
+                VORGNO: dto.VORGNO,
+                CYEAR: dto.CYEAR,
+                CYEAR2: dto.CYEAR2,
+                NRUNNO: dto.NRUNNO,
+                DEV_SEQ: dto.DEV_SEQ,
+            },
+        });
+
+        if (devToDelete) {
+            await this.developer.remove(devToDelete);
+            return { message: 'Developer deleted successfully' };
+        } else {
+            return { message: 'Developer not found' };
+        }
+    }
 
     //   async search(year: string, keyword: string) {
     //     const results = await this.isdev

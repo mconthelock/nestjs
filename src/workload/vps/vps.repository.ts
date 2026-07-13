@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
+import { ConectionService } from 'src/as400/conection/conection.service';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 
@@ -7,8 +8,8 @@ import { DataSource } from 'typeorm';
 export class VpsRepository extends BaseRepository {
     constructor(
         @InjectDataSource('workloadConnection') private readonly wk: DataSource,
-        @InjectDataSource('packingConnection')
-        private readonly packingDs: DataSource,
+        @InjectDataSource('packingConnection') private readonly packingDs: DataSource,
+        private as400: ConectionService
     ) {
         super(wk);
     }
@@ -190,7 +191,7 @@ export class VpsRepository extends BaseRepository {
         ]);
     }
 
-    async getDetailPIS(packing: string): Promise<any[]> {
+    async getListOrder(packing: string): Promise<any[]> {
         const sql = `
                 SELECT
                     mk.M8K03,
@@ -239,5 +240,59 @@ export class VpsRepository extends BaseRepository {
                         mk.M8K04 ASC
                         `;
         return await this.wk.query(sql, [packing]);
+    }
+
+    async getOrderDetail(order: string, packing: string): Promise<any[]> {
+        const sql = `
+            SELECT 
+                A.*, 
+                B.LVAL, 
+                S.*, 
+                ao.PRODTYPE as PRODTYPE,
+                ao.COUNTRY as COUNTRY,
+                SUBSTR(F_CPROD(M8K01), -3) AS SCHEDULE,
+                SUBSTR(F_CPROD(M8K01), -5) AS JUN, 
+                M8K02,
+                J2INO as PUR_CODE,
+                ap.PACKSHOP,
+                CASE WHEN U.MFGNO IS NOT NULL THEN 1 ELSE NULL END AS URGENT
+            FROM S011MP A
+            LEFT JOIN (
+                SELECT S11M01, S11M08, S11M02, S11M03, S11M04, LISTAGG(SUBSTR(S11M06, -3), '') WITHIN GROUP (ORDER BY S11M06) AS LVAL 
+                FROM S011MP 
+                WHERE S11M07 = 1
+                GROUP BY S11M01, S11M08, S11M02, S11M03, S11M04, S11M09
+            ) B ON A.S11M01 = B.S11M01 AND A.S11M02 = B.S11M02 AND A.S11M06 = B.S11M04
+            JOIN S010MP S ON A.S11M01 = S.S01M01 AND A.S11M02 = S.S01M04
+            JOIN M008KP M ON A.S11M01 = M.M8K03
+            LEFT JOIN (SELECT DISTINCT J2CUS, J2DRAW, J2INO, J2DES FROM J002MP WHERE J2CUS = :1 AND J2SEQ != 0) j 
+                ON j.J2CUS = A.S11M01 AND (j.J2DRAW = REPLACE(A.S11M06, ' ', '') OR J2DES = REPLACE(A.S11M06, ' ', ''))
+            LEFT JOIN AMECORDERS ao ON ao.MFGNO = S.S01M01
+            LEFT JOIN AMECORDERS_PACKNO ap ON ap.ORDERNO = S.S01M01 AND ap.PACKNO = S.S01M04
+            LEFT JOIN (
+                SELECT MFGNO
+                FROM WEBFORM.URGENT_ORDER_LIST A
+                JOIN WEBFORM.FORM B ON A.NFRMNO = B.NFRMNO AND A.VORGNO = B.VORGNO AND A.CYEAR = B.CYEAR AND A.CYEAR2 = B.CYEAR2 AND A.NRUNNO = B.NRUNNO
+                WHERE B.CST != 3
+            ) U ON U.MFGNO = S.S01M01
+            WHERE A.S11M01 = :2 
+            AND A.S11M02 = :3 
+            AND A.S11M07 = 0
+            ORDER BY A.S11M03, A.S11M06 ASC
+        `;
+
+        return await this.wk.query(sql, [order, order, packing]);
+    }
+
+    async getQ46054OL(order: string, packing: string): Promise<any[]> {
+        const sql = `SELECT * FROM RTNLIBF.Q46054OL WHERE Q46O01 = '${order}' AND Q46O02 = '${packing}'`;
+        // หาก query ชุดนี้ต้องการดึงจาก AS400 Connection สามารถเปลี่ยนจาก this.wk เป็น DataSource ของ AS400 ที่ Inject เอาไว้ได้เลย
+        return await this.as400.runQuery(sql);
+    }
+
+    async getMasterPacking(dwgNo: string): Promise<any[]> {
+        // สมมติชื่อ Table เป็น MASTER_PACKING รบกวนตรวจสอบชื่อ Table หรือ Store Procedure อีกทีหากมีการเรียกใช้โครงสร้างอื่นครับ
+        const sql = `SELECT * FROM MASTER_PACKLIST WHERE DWGNO = :1`;
+        return await this.wk.query(sql, [dwgNo]);
     }
 }

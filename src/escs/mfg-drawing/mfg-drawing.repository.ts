@@ -44,7 +44,7 @@ export class MfgDrawingRepository extends BaseRepository {
             })
             .leftJoinAndSelect('A.STATUS', 'AS')
             .leftJoinAndSelect('A.USERS', 'AU')
-            .orderBy('M.NID, M.NBLOCKID, M.NITEMID, M.VPIS, M.VDRAWING', 'ASC')
+            .orderBy('M.NID, M.NBLOCKID, M.NITEMID, M.VPIS, M.VDRAWING, A.DACTDATE', 'ASC')
             .getOne();
     }
 
@@ -57,8 +57,10 @@ export class MfgDrawingRepository extends BaseRepository {
             'VPIS',
             'VDRAWING',
             'VCONTROLNO',
+            'VPROCESSNO',
             'NINSPECTOR_STATUS',
             'NFORELEAD_STATUS',
+            'VFULL_PATH',
             'NSTATUS',
             'A.NUSERACT'
         ]);
@@ -77,7 +79,7 @@ export class MfgDrawingRepository extends BaseRepository {
             })
             .leftJoinAndSelect('A.STATUS', 'AS')
             .leftJoinAndSelect('A.USERS', 'AU')
-            .orderBy('M.NID, M.NBLOCKID, M.NITEMID, M.VPIS, M.VDRAWING', 'ASC')
+            .orderBy('M.NID, M.NBLOCKID, M.NITEMID, M.VPIS, M.VDRAWING, MS.VSERIALNO, A.DACTDATE', 'ASC')
             .getMany();
     }
 

@@ -10,9 +10,14 @@ import { DpmsPlCaseListDetailModule } from 'src/workload/dpms_pl_case_list_detai
 import { MailModule } from 'src/common/services/mail/mail.module';
 import { DpmsPlIssueTypeModule } from 'src/workload/dpms_pl_issue_type/dpms_pl_issue_type.module';
 import { DpmsPlIssueDateModule } from 'src/workload/dpms_pl_issue_date/dpms_pl_issue_date.module';
-import { PackinglistIssueProcedureDataCenterRepository, PackingListIssueProcedureWorkloadRepository } from './packing-list-issue.repository';
+import {
+    PackinglistIssueProcedureDataCenterRepository,
+    PackingListIssueProcedureWorkloadRepository,
+} from './packing-list-issue.repository';
 import { PackingListIssueProcedureService } from './packing-list-issue-procedure.service';
 import { DpmsPlMailModule } from 'src/workload/dpms_pl_mail/dpms_pl_mail.module';
+import { DpmsPlDocRevModule } from 'src/workload/dpms_pl_doc_rev/dpms_pl_doc_rev.module';
+import { PackingListCreateService } from './packing-list-create.service';
 
 @Module({
     imports: [
@@ -25,6 +30,7 @@ import { DpmsPlMailModule } from 'src/workload/dpms_pl_mail/dpms_pl_mail.module'
         DpmsPlIssueTypeModule,
         DpmsPlIssueDateModule,
         DpmsPlMailModule,
+        DpmsPlDocRevModule,
         MailModule,
     ],
     controllers: [PackingListIssueController],
@@ -33,6 +39,7 @@ import { DpmsPlMailModule } from 'src/workload/dpms_pl_mail/dpms_pl_mail.module'
         PackingListIssueProcedureWorkloadRepository,
         PackinglistIssueProcedureDataCenterRepository,
         PackingListIssueProcedureService,
+        PackingListCreateService
     ],
     exports: [PackingListIssueService, PackingListIssueProcedureService],
 })

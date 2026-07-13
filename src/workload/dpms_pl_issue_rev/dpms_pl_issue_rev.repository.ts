@@ -21,14 +21,15 @@ export class DpmsPlIssueRevRepository extends BaseRepository {
 
     findLatestRevision(condition: dpmsPlIssueRevFindLatestRevision) {
         return this.getRepository(DPMS_PL_ISSUE_REV).findOne({
-            where: {
-                VPROD: condition.VPROD,
-                VP: condition.VP,
-                VTYPE: condition.VTYPE,
-                VORDERS: condition.VORDERS,
-                // NISSUE_TYPE: condition.NISSUE_TYPE,
-                // NROUND: condition.NROUND,
-            },
+            where: condition,
+            // {
+            //     VPROD: condition.VPROD,
+            //     VP: condition.VP,
+            //     VTYPE: condition.VTYPE,
+            //     VORDERS: condition.VORDERS,
+            //     // NISSUE_TYPE: condition.NISSUE_TYPE,
+            //     // NROUND: condition.NROUND,
+            // },
             order: {
                 NREV: 'DESC',
                 NROUND: 'DESC',

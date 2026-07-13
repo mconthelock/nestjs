@@ -79,10 +79,6 @@ import { FinpckAssetModule } from './webform/finform/fin-pck/finpck_asset/finpck
         DatacenterModule,
         GeneralPartListModule,
 
-        // OMG
-        MfgEdrModule,
-        MfgReportModule,
-        MfgOrModule,
         //FIN-PCK
         FinpckFormModule,
         FinpckAssetModule,

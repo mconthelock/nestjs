@@ -14,6 +14,7 @@ import { DpmsPlIssueDateService } from 'src/workload/dpms_pl_issue_date/dpms_pl_
 import { DpmsPlMailService } from 'src/workload/dpms_pl_mail/dpms_pl_mail.service';
 import { DpmsPlDocRevService } from 'src/workload/dpms_pl_doc_rev/dpms_pl_doc_rev.service';
 import { PackingListIssueService } from './packing-list-issue.service';
+import { joinPaths } from 'src/common/utils/files.utils';
 
 @Injectable()
 export class PackingListCreateService extends PackingListIssueService {
@@ -54,10 +55,16 @@ export class PackingListCreateService extends PackingListIssueService {
                 dto.ISSUETYPE,
             );
 
-            const finalPath: string = await this.genaratePdfPath({
+            let finalPath: string = await this.genaratePath({
                 prod: dto.VPROD,
                 orders: dto.VORDERS,
             });
+
+            if(issueType.data.VCODE === 'DF'){
+                finalPath = await joinPaths(finalPath, 'Draft');
+            }
+
+            const pdfPath = await joinPaths(finalPath, 'pdf');
 
             const plIssueData: DPMS_PL_ISSUE_PK = {
                 VPROD: dto.VPROD,
@@ -73,7 +80,6 @@ export class PackingListCreateService extends PackingListIssueService {
                 typeCode: issueType.data.VCODE,
                 recreatedIssue: dto.CHANGELIST || dto.NEWLIST, // ถ้ามีการเปลี่ยนแปลงรายการหรือมีรายการใหม่ ให้ set recreatedIssue เป็น true
             });
-            console.log('docRevision:', docRevision);
 
             // 2. เตรียมข้อมูลสำหรับการสร้าง record ใน DPMS_PL_DOC_REV และ update DFINISHALL ของ record ที่ยังไม่ finish ของเอกสารนี้
             const docRevData = await this.prepareDocRevisionData({
@@ -86,8 +92,11 @@ export class PackingListCreateService extends PackingListIssueService {
             });
 
             // 3. หา revision ของเอกสาร Packing List Issue สำหรับการสร้าง record ใน DPMS_PL_ISSUE_REV
-            const { revision, revisionText } =
-                await this.getNextPlRevision(plIssueData);
+            const { revision, revisionText } = await this.getNextPlRevision({
+                plIssueData,
+                typeCode: issueType.data.VCODE,
+                typeId: dto.ISSUETYPE,
+            });
 
             // 4. create PDF file
             const fileName = this.generateFilename({
@@ -103,16 +112,16 @@ export class PackingListCreateService extends PackingListIssueService {
                 fileName: fileName,
                 revision: revisionText,
                 issueDate,
-                finalPath,
+                finalPath: pdfPath,
             });
 
             // 5. add file Data to DB
             const insertFile = await this.dpmsPlFileService.create({
                 VFILE_ONAME: fileName,
                 VFILE_FNAME: fileName,
-                VFILE_USERCREATE: 'system',
+                VFILE_USERCREATE: dto.VISSUEBY,
                 NFILE_TYPE: dto.ISSUETYPE,
-                VFILE_PATH: finalPath,
+                VFILE_PATH: pdfPath,
             });
 
             if (insertFile.status === false) {
@@ -125,7 +134,7 @@ export class PackingListCreateService extends PackingListIssueService {
                 NISSUE_TYPE: dto.ISSUETYPE,
                 NREV: revision,
                 VREVTEXT: revisionText,
-                NFILEID: insertFile.data.NFILE_ID,
+                NPDFID: insertFile.data.NFILE_ID,
                 VSHOPORDERNO: dto.HEADER.VSHOPORDERNO,
                 VSUBJECT: dto.HEADER.VSUBJECT,
                 VNAMEOFBLDG: dto.HEADER.VNAMEOFBLDG,
@@ -151,7 +160,6 @@ export class PackingListCreateService extends PackingListIssueService {
             });
 
             // throw new Error('test');
-
 
             // 9. Create PL Issue List record
             for (const list of dto.LIST) {

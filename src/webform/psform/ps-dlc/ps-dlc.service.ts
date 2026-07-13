@@ -187,11 +187,16 @@ export class PSDLCService {
                 dto.ACTUAL_DATE,
                 dto.ACTUAL_UPDATEBY,
             );
+
+            if (dto.DETAILS && dto.DETAILS.length > 0) {
+                await this.repo.updateQ008mp(dto.DETAILS);
+            }
+
             const doActi0n = await this.doactionService.doAction(
                 {
                     ...form,
                     EMPNO: dto.EMPNO,
-                    ACTION: dto.ACTION,
+                    ACTION: dto.ACTION, 
                     REMARK: dto.REMARK,
                 },
                 ip,

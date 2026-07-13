@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConectionModule } from 'src/as400/conection/conection.module';
 import { PSDLC_DETAIL } from 'src/common/Entities/webform/table/PSDLC_DETAIL.entity';
 import { PSDLC_FORM } from 'src/common/Entities/webform/table/PSDLC_FORM.entity';
 import { FlowModule } from 'src/webform/flow/flow.module';
@@ -18,6 +19,7 @@ import { PSDLCRepository } from './ps-dlc.repository';
         FormmstModule,
         FormModule,
         FlowModule,
+        ConectionModule,
     ],
     controllers: [PSDLCController],
     providers: [PSDLCService, PSDLCRepository],

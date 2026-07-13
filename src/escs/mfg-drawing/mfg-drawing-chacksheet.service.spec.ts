@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MfgDrawingCreateChecksheetService } from './mfg-drawing-checksheet.service';
 import { MfgDrawingService } from './mfg-drawing.service';
 import { F110kpService } from 'src/datacenter/f110kp/f110kp.service';
-import { F001kpService } from 'src/as400/shopf/f001kp/f001kp.service';
 import { IdtagEfacLogService } from 'src/workload/idtag-efac-log/idtag-efac-log.service';
 import { S011mpService } from 'src/datacenter/s011mp/s011mp.service';
 import { ItemMfgService } from '../item-mfg/item-mfg.service';
@@ -13,11 +12,18 @@ import { GeneralPartListService } from 'src/general-part-list/general-part-list.
 import { DrawingParserHelper } from './helpers/drawing-parser.helper';
 import { DrawingMatcherHelper } from './helpers/drawing-matcher.helper';
 import { DrawingFileHelper } from './helpers/drawing-file.helper';
+import { F001KP } from 'src/as400/shopf/f001kp/entities/f001kp.entity';
+import { DrawingResolverHelper } from './helpers/drawing-resolver.helper';
 
 describe('MfgDrawingCreateChecksheetService', () => {
     let service: MfgDrawingCreateChecksheetService;
     let parser: DrawingParserHelper;
     let matcher: DrawingMatcherHelper;
+    let resove: DrawingResolverHelper;
+
+    const f001kpService = {
+        findOne: jest.fn(),
+    };
 
     // beforeEach(async () => {
     //     const module: TestingModule = await Test.createTestingModule({
@@ -41,7 +47,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
     //     );
     // });
     beforeEach(() => {
-        parser  = new DrawingParserHelper(); 
+        parser = new DrawingParserHelper();
         matcher = new DrawingMatcherHelper(parser);
         service = new MfgDrawingCreateChecksheetService(
             {} as any,
@@ -53,6 +59,14 @@ describe('MfgDrawingCreateChecksheetService', () => {
             parser,
             matcher,
         );
+        resove = new DrawingResolverHelper(
+            f001kpService as any,
+            {} as any,
+            {} as any,
+            {} as any,
+            parser,
+        );
+        jest.clearAllMocks();
     });
 
     // =========================
@@ -318,6 +332,61 @@ describe('MfgDrawingCreateChecksheetService', () => {
             expect(
                 matcher.checkDeleteDrawing(deleteList, 'BA212B768 G01L03'),
             ).toBe(true);
+        });
+    });
+
+    describe('checkBreakAssyDrawing', () => {
+        it('should append R', async () => {
+            jest.spyOn(resove['f001kpService'], 'findOne').mockResolvedValue({
+                status: true,
+                message: '',
+                data: {
+                    F01R09: 'BRAKE ASSY(R)',
+                } as F001KP,
+            });
+
+            const result = await resove.checkBreakAssyDrawing('C60526001PH', 'BA118A742 G03');
+
+            expect(result).toBe('BA118A742(R) G03');
+        });
+
+        it('should append L', async () => {
+            jest.spyOn(resove['f001kpService'], 'findOne').mockResolvedValue({
+                status: true,
+                message: '',
+                data: {
+                    F01R09: 'BRAKE ASSY(L)',
+                } as F001KP,
+            });
+
+            const result = await resove.checkBreakAssyDrawing('C60526001NV', 'BA118A742 G03');
+
+            expect(result).toBe('BA118A742(L) G03');
+        });
+
+        it('should not append side', async () => {
+            jest.spyOn(resove['f001kpService'], 'findOne').mockResolvedValue({
+                status: true,
+                message: '',
+                data: {
+                    F01R09: 'SHAFT ASS\'Y',
+                } as F001KP,
+            });
+
+            const result = await resove.checkBreakAssyDrawing('S1909110234', 'BS127C197 G01');
+
+            expect(result).toBe('BS127C197 G01');
+        });
+
+        it('should throw when control no not found', async () => {
+            jest.spyOn(resove['f001kpService'], 'findOne').mockResolvedValue({
+                status: false,
+                message: 'not found',
+            });
+
+            await expect(
+                resove.checkBreakAssyDrawing('123', 'DWG001'),
+            ).rejects.toThrow('F001KP with control no 123 not found');
         });
     });
 });

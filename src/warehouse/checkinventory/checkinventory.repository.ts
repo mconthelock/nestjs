@@ -1,15 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import * as oracledb from 'oracledb';
+import { BaseRepository } from 'src/common/repositories/base-repository';
+import {
+    DataSource,
+    FindOptionsWhere,
+    IsNull,
+    QueryDeepPartialEntity,
+} from 'typeorm';
+import { UpdateYearlyDto } from './dto/update-yearly.dto';
+import { CreateYearlyFormDto } from './dto/create-yearlyform.dto';
 import { INV_HALFYEAR_REPORT } from 'src/common/Entities/skid/table/INV_HALFYEAR_REPORT.entity';
 import { INV_HALFYEAR_REPORT_ASSIGN } from 'src/common/Entities/skid/table/INV_HALFYEAR_REPORT_ASSIGN.entity';
 import { PSCIH_FORM } from 'src/common/Entities/webform/table/PSCIH_FORM.entity';
-import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource, IsNull } from 'typeorm';
-import { UpdateYearlyDto } from './dto/update-yearly.dto';
-import { CreateYearlyFormDto } from './dto/create-yearlyform.dto';
 import { PSYIC_FORM } from 'src/common/Entities/webform/table/PSYIC_FORM.entity';
 import { INV_YEARLY_RESULT } from 'src/common/Entities/skid/table/INV_YEARLY_RESULT.entity';
+import { INV_YEARLY_ASSIGN } from 'src/common/Entities/skid/table/INV_YEARLY_ASSIGN.entity';
 
 @Injectable()
 export class CheckinventoryRepository extends BaseRepository {
@@ -19,19 +25,19 @@ export class CheckinventoryRepository extends BaseRepository {
         super(ds);
     }
 
-    async getReportData() {
+    async getHalfyearReport() {
         return this.getRepository(INV_HALFYEAR_REPORT).find({
             relations: ['ASSIGN_LIST', 'ASSIGN_LIST.PSCI_FORM', 'PSCIH_FORM'],
         });
     }
 
-    async getReportAssign(REPORT_ID: number) {
+    async getHalfyearReportAssign(REPORT_ID: number) {
         return this.getRepository(INV_HALFYEAR_REPORT_ASSIGN).find({
             where: { REPORT_ID },
         });
     }
 
-    async insertPscihForm(data: {
+    async insertHalfyearForm(data: {
         NFRMNO: number;
         VORGNO: string;
         CYEAR: string;
@@ -71,6 +77,12 @@ export class CheckinventoryRepository extends BaseRepository {
         }
     }
 
+    async getYearlyAssign() {
+        return this.getRepository(INV_YEARLY_ASSIGN).find({
+            relations: ['RESULT', 'USER'],
+        });
+    }
+
     async createYearlyReport(
         YEAR: string,
         PERIOD: string,
@@ -86,19 +98,28 @@ export class CheckinventoryRepository extends BaseRepository {
                     SKIDCNTRL.SP_CREATE_YEARLY_RESULT(
                         P_YEAR      => :year,
                         P_PERIOD    => :period,
-                        P_CREATE_BY => :empno
+                        P_CREATE_BY => :empno,
+                        P_IYA_ID    => :iyaId
                     );
                 END;`,
                 {
                     year: YEAR,
                     period: PERIOD,
                     empno: EMPNO,
+                    iyaId: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
                 },
             );
-            return result.outBinds.reportId;
+            return result.outBinds.iyaId as number;
         } finally {
             await runner.release();
         }
+    }
+
+    async updateYearlyAssign(
+        where: FindOptionsWhere<INV_YEARLY_ASSIGN>,
+        data: QueryDeepPartialEntity<INV_YEARLY_ASSIGN>,
+    ): Promise<void> {
+        await this.getRepository(INV_YEARLY_ASSIGN).update(where, data);
     }
 
     // async updateYearlyReport(dto: UpdateYearlyDto) {
@@ -135,6 +156,7 @@ export class CheckinventoryRepository extends BaseRepository {
                 TAG_NO: item.TAG_NO,
                 ITEM_CODE: item.ITEM_CODE,
                 ACTUAL: item.ACTUAL,
+                EMPNO: item.EMPNO,
             })),
         );
 
@@ -145,14 +167,16 @@ export class CheckinventoryRepository extends BaseRepository {
                 SELECT
                     jt.TAG_NO,
                     jt.ITEM_CODE,
-                    jt.ACTUAL
+                    jt.ACTUAL,
+                    jt.EMPNO
                 FROM JSON_TABLE(
                     :payload,
                     '$[*]'
                     COLUMNS (
                         TAG_NO    VARCHAR2(50) PATH '$.TAG_NO',
                         ITEM_CODE VARCHAR2(50) PATH '$.ITEM_CODE',
-                        ACTUAL    NUMBER       PATH '$.ACTUAL'
+                        ACTUAL    NUMBER       PATH '$.ACTUAL',
+                        EMPNO    VARCHAR2(50) PATH '$.EMPNO'
                     )
                 ) jt
             ) source
@@ -162,7 +186,9 @@ export class CheckinventoryRepository extends BaseRepository {
                 AND target.ITEM_CODE = source.ITEM_CODE
             )
             WHEN MATCHED THEN
-                UPDATE SET target.ACTUAL_QTY = source.ACTUAL
+                UPDATE SET target.ACTUAL_QTY = source.ACTUAL,
+                           target.CHECKED_BY = source.EMPNO,
+                           target.CHECKED_AT = SYSDATE
             `,
             [{ type: oracledb.CLOB, val: payload }, reportID],
         );
@@ -174,7 +200,7 @@ export class CheckinventoryRepository extends BaseRepository {
     }
 
     // function check checked all actual
-    async checkAllActualChecked(
+    async checkYearlyActualChecked(
         reportID: number,
     ): Promise<{ success: boolean }> {
         const result = await this.getRepository(INV_YEARLY_RESULT).count({
@@ -183,7 +209,7 @@ export class CheckinventoryRepository extends BaseRepository {
                 ACTUAL_QTY: IsNull(),
             },
         });
-        console.log('checkAllActualChecked result:', result);
+        console.log('checkYearlyActualChecked result:', result);
         return { success: result === 0 };
     }
 
@@ -200,7 +226,7 @@ export class CheckinventoryRepository extends BaseRepository {
                     THEN mii.ZONE || '-' || REGEXP_SUBSTR(a.STNAME, '\\S+', 1, 1)
                     ELSE '**OFFICE'
                 END AS USER_NAME, 
-                mii.ZONE
+                mii.*
             FROM SKIDCNTRL.INV_YEARLY_RESULT iyr
             LEFT JOIN AMECUSERALL a ON iyr.USER_ID = a.SEMPNO
             LEFT JOIN SKIDCNTRL.MV_IMM_ITEMMST mii ON iyr.ITEM_CODE = mii.IPROD

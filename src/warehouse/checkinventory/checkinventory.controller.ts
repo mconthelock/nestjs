@@ -14,23 +14,30 @@ import { CreateCheckinventoryDto } from './dto/create-checkinventory.dto';
 import { UpdateYearlyDto } from './dto/update-yearly.dto';
 import { CreateYearlyFormDto } from './dto/create-yearlyform.dto';
 import { getClientIP } from 'src/common/utils/ip.utils';
+import { INV_YEARLY_RESULT } from 'src/common/Entities/skid/table/INV_YEARLY_RESULT.entity';
+import { FindOptionsWhere, QueryDeepPartialEntity } from 'typeorm';
 
 @Controller('checkinventory')
 export class CheckinventoryController {
     constructor(private readonly cs: CheckinventoryService) {}
 
-    @Get('getReport')
-    getReport() {
-        return this.cs.getReport();
+    @Get('getHalfyearReport')
+    getHalfyearReport() {
+        return this.cs.getHalfyearReport();
     }
 
-    @Post('getReportAssign')
-    getReportAssign(@Body() body: { REPORT_ID: number }) {
-        return this.cs.getReportAssign(body.REPORT_ID);
+    @Post('getHalfyearReportAssign')
+    getHalfyearReportAssign(@Body() body: { REPORT_ID: number }) {
+        return this.cs.getHalfyearReportAssign(body.REPORT_ID);
     }
 
-    @Post('createReport')
-    createReport(
+    @Get('getYearlyAssign')
+    getYearlyAssign() {
+        return this.cs.getYearlyAssign();
+    }
+
+    @Post('createHalfyearReportWithForm')
+    createHalfyearReportWithForm(
         @Body()
         body: {
             empno: string;
@@ -44,7 +51,7 @@ export class CheckinventoryController {
             };
         },
     ) {
-        return this.cs.createReportWithForm(
+        return this.cs.createHalfyearReportWithForm(
             body.empno,
             body.periods,
             body.formData,
@@ -63,9 +70,9 @@ export class CheckinventoryController {
         return this.cs.updateYearlyReport(body);
     }
 
-    @Post('checkAllActualChecked')
-    checkAllActualChecked(@Body() body: { reportID: number }) {
-        return this.cs.checkAllActualChecked(body.reportID);
+    @Post('checkYearlyActualChecked')
+    checkYearlyActualChecked(@Body() body: { reportID: number }) {
+        return this.cs.checkYearlyActualChecked(body.reportID);
     }
 
     @Post('insertYearlyForm')
@@ -78,4 +85,6 @@ export class CheckinventoryController {
     getYearlyResult(@Body() body: { reportID: number }) {
         return this.cs.getYearlyResult(body.reportID);
     }
+
+    
 }

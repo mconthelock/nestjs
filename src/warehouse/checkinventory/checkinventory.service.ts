@@ -5,6 +5,8 @@ import { CheckinventoryRepository } from './checkinventory.repository';
 import { CreateYearlyFormDto } from './dto/create-yearlyform.dto';
 import { FormCreateService } from 'src/webform/form/create-form.service';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
+import { INV_YEARLY_RESULT } from 'src/common/Entities/skid/table/INV_YEARLY_RESULT.entity';
+import { FindOptionsWhere, QueryDeepPartialEntity } from 'typeorm';
 
 @Injectable()
 export class CheckinventoryService {
@@ -14,19 +16,31 @@ export class CheckinventoryService {
         private readonly formmstService: FormmstService,
     ) {}
 
-    async getReport() {
-        return this.chkrepo.getReportData();
+    async getHalfyearReport() {
+        try {
+            return await this.chkrepo.getHalfyearReport();
+        } catch (error) {
+            throw error;
+        }
     }
 
-    async getReportAssign(REPORT_ID: number) {
-        return this.chkrepo.getReportAssign(REPORT_ID);
+    async getHalfyearReportAssign(REPORT_ID: number) {
+        try {
+            return await this.chkrepo.getHalfyearReportAssign(REPORT_ID);
+        } catch (error) {
+            throw error;
+        }
     }
 
     async createHalfyearReport(empno: string, periods: string) {
-        return this.chkrepo.createHalfyearReport(empno, periods);
+        try {
+            return await this.chkrepo.createHalfyearReport(empno, periods);
+        } catch (error) {
+            throw error;
+        }
     }
 
-    async createReportWithForm(
+    async createHalfyearReportWithForm(
         empno: string,
         periods: string,
         formData: {
@@ -37,24 +51,38 @@ export class CheckinventoryService {
             NRUNNO: number;
         },
     ) {
-        const REPORT_ID = await this.chkrepo.createHalfyearReport(
-            empno,
-            periods,
-        );
-        await this.chkrepo.insertPscihForm({ ...formData, REPORT_ID });
-        return { REPORT_ID };
+        try {
+            const REPORT_ID = await this.chkrepo.createHalfyearReport(
+                empno,
+                periods,
+            );
+            await this.chkrepo.insertHalfyearForm({ ...formData, REPORT_ID });
+            return { REPORT_ID };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getYearlyAssign() {
+        return await this.chkrepo.getYearlyAssign();
     }
 
     async createYearlyReport(YEAR: string, PERIOD: string, EMPNO: string) {
-        return this.chkrepo.createYearlyReport(YEAR, PERIOD, EMPNO);
+        try {
+            return {
+                id: await this.chkrepo.createYearlyReport(YEAR, PERIOD, EMPNO),
+            };
+        } catch (error) {
+            throw error;
+        }
     }
 
     async updateYearlyReport(dto: UpdateYearlyDto) {
         return this.chkrepo.updateYearlyReport(dto);
     }
 
-    async checkAllActualChecked(reportID: number) {
-        return this.chkrepo.checkAllActualChecked(reportID);
+    async checkYearlyActualChecked(reportID: number) {
+        return this.chkrepo.checkYearlyActualChecked(reportID);
     }
 
     async insertYearlyForm(dto: CreateYearlyFormDto, ip: string) {
@@ -90,7 +118,14 @@ export class CheckinventoryService {
             CYEAR: createForm.data.CYEAR,
             CYEAR2: createForm.data.CYEAR2,
             NRUNNO: createForm.data.NRUNNO,
-        }
+            DRAFT: 1,
+        };
+
+        await this.chkrepo.updateYearlyAssign(
+            { ID: dto.ID, STATUS: 1 },
+            { STATUS: 2 },
+        );
+
         return this.chkrepo.insertYearlyForm({ ...dto, ...form });
     }
 

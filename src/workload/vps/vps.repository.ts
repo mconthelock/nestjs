@@ -117,7 +117,7 @@ export class VpsRepository extends BaseRepository {
     }
 
     async insPackorddtlByManual(order: string, packing: string): Promise<void> {
-        await this.packingDs.query('EXEC InsPackorddtlByManual ?, ?', [
+        await this.packingDs.query('EXEC InsPackorddtlByManual @0, @1', [
             order,
             packing,
         ]);

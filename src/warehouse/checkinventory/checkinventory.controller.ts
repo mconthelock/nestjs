@@ -86,5 +86,8 @@ export class CheckinventoryController {
         return this.cs.getYearlyResult(body.reportID);
     }
 
-    
+    @Post('getYearlyForm')
+    getYearlyForm(@Body() body: { reportID: number }) {
+        return this.cs.getYearlyForm(body.reportID);
+    }
 }

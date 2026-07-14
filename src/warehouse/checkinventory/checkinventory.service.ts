@@ -101,6 +101,7 @@ export class CheckinventoryService {
                 REQBY: dto.REQBY,
                 INPUTBY: dto.INPUTBY,
                 REMARK: '',
+                DRAFT: "1",
             },
             ip,
         );
@@ -118,7 +119,6 @@ export class CheckinventoryService {
             CYEAR: createForm.data.CYEAR,
             CYEAR2: createForm.data.CYEAR2,
             NRUNNO: createForm.data.NRUNNO,
-            DRAFT: 1,
         };
 
         await this.chkrepo.updateYearlyAssign(
@@ -131,5 +131,9 @@ export class CheckinventoryService {
 
     async getYearlyResult(reportID: number) {
         return this.chkrepo.getYearlyResult(reportID);
+    }
+
+    async getYearlyForm(reportID: number) {
+        return this.chkrepo.getYearlyForm(reportID);
     }
 }

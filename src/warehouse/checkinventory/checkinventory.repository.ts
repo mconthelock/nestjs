@@ -235,4 +235,10 @@ export class CheckinventoryRepository extends BaseRepository {
         `;
         return this.ds.query(sql, [reportID]);
     }
+
+    async getYearlyForm(reportID: number) {
+        return this.getRepository(PSYIC_FORM).findOne({
+            where: { IYA_ID: reportID },
+        });
+    }
 }

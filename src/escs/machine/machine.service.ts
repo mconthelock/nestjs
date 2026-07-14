@@ -1,11 +1,13 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { MachineRepository } from './machine.repository';
 import { SearchMachineDto } from './dto/search-machine.dto';
 import { MachineResponseDto } from './dto/machine-response.dto';
 
 @Injectable()
 export class MachineService {
-    constructor(private readonly repo: MachineRepository) {}
+    constructor(
+        private readonly repo: MachineRepository,
+    ) {}
 
     async search(dto: SearchMachineDto): Promise<MachineResponseDto> {
         try {
@@ -14,27 +16,27 @@ export class MachineService {
                 return {
                     status: 'ERROR',
                     message: 'ไม่พบข้อมูลเครื่องจักร',
-                    data: null
+                    data: null,
                 };
             }
 
             return {
                 status: 'SUCCESS',
-                message: null,
+                message: 'Search Machine Success',
                 data: {
                     mcType: res.MC_TYPE,
                     mcNo: res.MC_NO,
                     mcDatasource: res.MC_DATASOURCE,
-                    mcName: res.MC_NAME
-                }
+                    mcName: res.MC_NAME,
+                },
             };
-        } catch (err) {
-            if (err instanceof NotFoundException) throw err;
 
-            throw new InternalServerErrorException({
-                message: 'SEARCH_MACHINE failed',
-                error: err?.message
-            });
+        } catch (err) {
+            return {
+                status: 'ERROR',
+                message: err?.message || 'SEARCH_MACHINE failed',
+                data: null,
+            };
         }
     }
 }

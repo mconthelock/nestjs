@@ -11,7 +11,6 @@ import { PSYIC_FORM } from '../../webform/table/PSYIC_FORM.entity';
 import { MV_IMM_ITEMMST } from './MV_IMM_ITEMMST.entity';
 import { INV_YEARLY_ASSIGN } from './INV_YEARLY_ASSIGN.entity';
 
-
 @Entity({ name: 'INV_YEARLY_RESULT', schema: 'SKIDCNTRL' })
 export class INV_YEARLY_RESULT {
     @PrimaryGeneratedColumn({ name: 'ID' })
@@ -41,7 +40,7 @@ export class INV_YEARLY_RESULT {
     @Column()
     TYPE: string;
 
-    @Column({ type: 'number', scale: 2 })
+    @Column({ type: 'decimal', scale: 2 })
     PRICE: number;
 
     @Column()
@@ -50,7 +49,7 @@ export class INV_YEARLY_RESULT {
     @Column()
     CREATE_AT: Date;
 
-    @Column({ type: 'number', precision: 10, scale: 2 })
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
     ACTUAL_QTY: number;
 
     @Column()

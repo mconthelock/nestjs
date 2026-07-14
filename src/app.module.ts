@@ -40,10 +40,6 @@ import { WorkloadModule } from './workload/workload.module';
 import { DatacenterModule } from './datacenter/datacenter.module';
 import { GeneralPartListModule } from './general-part-list/general-part-list.module';
 import { MfgReportModule } from './mfgreport/mfgreport.module';
-// FIN-PCK
-import { FinpckFormModule } from './webform/finform/fin-pck/finpck_form/finpck_form.module';
-import { FinpckAssetModule } from './webform/finform/fin-pck/finpck_asset/finpck_asset.module';
-import { FxaGrpmstModule } from './webform/finform/fxa_grpmst/fxa_grpmst.module';
 
 @Module({
     imports: [
@@ -80,10 +76,7 @@ import { FxaGrpmstModule } from './webform/finform/fxa_grpmst/fxa_grpmst.module'
         GeneralPartListModule,
         MfgReportModule,
       //  MfgOrModule,
-        //FIN-PCK
-        FinpckFormModule,
-        FinpckAssetModule,
-        FxaGrpmstModule,
+   
     ],
     providers: [
         HttpLoggingInterceptor,

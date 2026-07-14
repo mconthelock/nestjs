@@ -366,9 +366,14 @@ export class InquiryService {
                 dt.UPDATE_BY = header.UPDATE_BY;
                 dt.INQG_GROUP = group_id;
                 dt.INQID = inquiry.INQ_ID;
-                dt.INQD_VPC_DATE = dt.INQD_VPC_DATE
-                    ? new Date(dt.INQD_VPC_DATE)
-                    : null;
+
+                if (
+                    dt.INQD_VPC_DATE != undefined &&
+                    dt.INQD_VPC_DATE != null &&
+                    dt.INQD_VPC_DATE != ''
+                )
+                    dt.INQD_VPC_DATE = new Date(dt.INQD_VPC_DATE);
+                else delete dt.INQD_VPC_DATE;
 
                 if (db_detail) {
                     const dto: createDetailDto = Object.assign(
@@ -378,20 +383,23 @@ export class InquiryService {
                     Object.assign(dto, dt);
                     const safeDto = sanitizeDetailPayload(dto);
                     delete safeDto.INQD_ID;
+                    console.log(
+                        `Updating detail with ID: ${db_detail.INQD_ID}`,
+                    );
+                    console.log(safeDto);
                     await runner.manager.update(InquiryDetail, dt_id, safeDto);
                 } else {
                     //Create new detail
                     dt.CREATE_AT = new Date();
                     dt.CREATE_BY = header.UPDATE_BY;
-                    dt.INQD_VPC_DATE = dt.INQD_VPC_DATE
-                        ? new Date(dt.INQD_VPC_DATE)
-                        : null;
                     delete dt.INQD_ID;
                     const dto: createDetailDto = Object.assign(
                         {} as createDetailDto,
                         dt,
                     );
                     const safeDto = sanitizeDetailPayload(dto);
+                    console.log(`Creating new detail with ID: ${dt.INQD_ID}`);
+                    console.log(safeDto);
                     await runner.manager.save(InquiryDetail, safeDto);
                 }
             }
@@ -447,9 +455,9 @@ export class InquiryService {
             if (history !== undefined) {
                 runner.manager.insert(History, history);
             }
-            await runner.commitTransaction();
-            // await runner.rollbackTransaction();
-            await this.reAlign(inquiry.INQ_ID);
+            //await runner.commitTransaction();
+            await runner.rollbackTransaction();
+            //await this.reAlign(inquiry.INQ_ID);
         } catch (err) {
             await runner.rollbackTransaction();
             throw err;

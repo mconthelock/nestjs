@@ -76,8 +76,7 @@ import { MfgReportModule } from './mfgreport/mfgreport.module';
         DatacenterModule,
         GeneralPartListModule,
         MfgReportModule,
-      //  MfgOrModule,
-   
+        //  MfgOrModule,
     ],
     providers: [
         HttpLoggingInterceptor,

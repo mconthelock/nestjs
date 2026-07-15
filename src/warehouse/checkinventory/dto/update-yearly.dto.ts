@@ -17,6 +17,9 @@ export class InventoryDetailDto {
 
     @IsNumber()
     ACTUAL: number;
+
+    @IsString()
+    EMPNO: string;
 }
 
 export class UpdateYearlyDto {

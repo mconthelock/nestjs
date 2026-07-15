@@ -366,9 +366,14 @@ export class InquiryService {
                 dt.UPDATE_BY = header.UPDATE_BY;
                 dt.INQG_GROUP = group_id;
                 dt.INQID = inquiry.INQ_ID;
-                dt.INQD_VPC_DATE = dt.INQD_VPC_DATE
-                    ? new Date(dt.INQD_VPC_DATE)
-                    : null;
+
+                if (
+                    dt.INQD_VPC_DATE != undefined &&
+                    dt.INQD_VPC_DATE != null &&
+                    dt.INQD_VPC_DATE != ''
+                )
+                    dt.INQD_VPC_DATE = new Date(dt.INQD_VPC_DATE);
+                else delete dt.INQD_VPC_DATE;
 
                 if (db_detail) {
                     const dto: createDetailDto = Object.assign(
@@ -383,9 +388,6 @@ export class InquiryService {
                     //Create new detail
                     dt.CREATE_AT = new Date();
                     dt.CREATE_BY = header.UPDATE_BY;
-                    dt.INQD_VPC_DATE = dt.INQD_VPC_DATE
-                        ? new Date(dt.INQD_VPC_DATE)
-                        : null;
                     delete dt.INQD_ID;
                     const dto: createDetailDto = Object.assign(
                         {} as createDetailDto,
@@ -439,9 +441,6 @@ export class InquiryService {
                         { INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV },
                         timeline,
                     );
-                    //   console.log('Update Timeline');
-                    //   console.log({ INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV });
-                    //   console.log(timeline);
                 }
             }
             if (history !== undefined) {
@@ -535,13 +534,13 @@ export class InquiryService {
                 delete detail.INQD_ID;
             }
             await runner.manager.save(InquiryDetail, inquiry_detail);
-            //await this.reAlign(newinq.INQ_ID);
-            console.log('Inserted Inquiry Detail');
+            // await this.reAlign(newinq.INQ_ID);
+            // console.log('Inserted Inquiry Detail');
             await runner.manager.update(
                 InquiryDetail,
                 { INQID: id },
                 { INQD_LATEST: 0 },
-            ); //Update INQD_LATEST
+            );
 
             //Inquiry Timeline
             const timeline = await runner.manager.create(Timeline, {
@@ -561,39 +560,6 @@ export class InquiryService {
         } finally {
             if (localRunner) await localRunner.release();
         }
-
-        // return newinq;
-        // const runner = this.ds.createQueryRunner();
-        // const header = data;
-        // const dbdetail = await runner.manager.find(InquiryDetail, {
-        //   where: { INQID: data.INQ_ID, INQD_LATEST: 1 },
-        // });
-        // values.forEach((el) => {
-        //   //console.log(el);
-        //   const val = dbdetail.find((db) => el.INQD_ID == db.INQD_ID);
-        //   if (val !== undefined) Object.assign(val, el);
-        //   el.INQD_PREV = el.INQD_ID;
-        //   el.CREATE_AT = new Date(data.UPDATE_AT);
-        //   el.CREATE_BY = data.UPDATE_BY;
-        //   el.UPDATE_AT = new Date(data.UPDATE_AT);
-        //   el.UPDATE_BY = data.UPDATE_BY;
-        //   delete el.INQD_ID;
-        //   delete el.INQG_GROUP;
-        //   delete el.INQID;
-        // });
-        // await this.create(header, values);
-        // await runner.manager.update(Inquiry, { INQ_ID: id }, { INQ_LATEST: 0 });
-        // await runner.manager.update(
-        //   InquiryGroup,
-        //   { INQ_ID: id },
-        //   { INQG_LATEST: 0 },
-        // );
-        // await runner.manager.update(
-        //   InquiryDetail,
-        //   { INQID: id },
-        //   { INQD_LATEST: 0 },
-        // );
-        // return 0;
     }
 
     async revision_code(current) {

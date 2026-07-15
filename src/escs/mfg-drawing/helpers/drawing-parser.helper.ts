@@ -78,13 +78,10 @@ export class DrawingParserHelper {
         const pattern = /[GL-]{1}\d{2,3}~[GL]{1}\d{2,3}/g;
         const matches = drawing.match(pattern) || [];
         matches.forEach((val) => {
-            let GL = val.split('~');
-
-            let min = GL[0].replace(/[GL]{1}/g, '');
-            let max = GL[1].replace(/[GL]{1}/g, '');
-
+            const GL  = val.split('~');
+            const min = GL[0].replace(/[GL]{1}/g, '');
+            const max = GL[1].replace(/[GL]{1}/g, '');
             const prefix = GL[0].replace(/\d+/g, '');
-
             let tmpGL = '';
             for (let i = parseInt(min); i <= parseInt(max); i++) {
                 tmpGL += prefix + String(i).padStart(min.length, '0');

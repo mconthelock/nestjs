@@ -11,6 +11,7 @@ import {
     UpdatedataPSDLCDto,
     UpdateflowPSDLCDto,
 } from './dto/update-ps-dlc.dto';
+import { MailService } from 'src/common/services/mail/mail.service';
 
 @Injectable()
 export class PSDLCService {
@@ -20,6 +21,7 @@ export class PSDLCService {
         private readonly formCreateService: FormCreateService,
         private readonly doactionService: DoactionFlowService,
         private readonly flowService: FlowService,
+        private readonly mailService: MailService,
     ) {}
 
     async create(dto: CreatePsdlcReqFormDto, ip: string) {
@@ -112,6 +114,25 @@ export class PSDLCService {
                 insertList.push(await this.repo.createDetails(dataTable));
             }
 
+            
+            const formNo = `${formmst.VANAME}${createForm.data.CYEAR2.slice(-2)}-${("000000" + createForm.data.NRUNNO).slice(-6)}`
+            await this.mailService.sendMail({
+                to: [
+                    // "viyada@MitsubishiElevatorAsia.co.th",
+                    // "anucha@MitsubishiElevatorAsia.co.th",
+                    // "chatchawarnk@MitsubishiElevatorAsia.co.th",
+                    // "chakkritv@MitsubishiElevatorAsia.co.th",
+                    'punnawichs@mitsubishielevatorasia.co.th',
+                ],
+                subject:
+                    'Form Drawing list for change PN Production create Complete',
+                html: `<p>Dear PP Sect.</p>
+                        <p style="text-indent: 2em;">Form No: ${formNo} </p>
+                        <p style="text-indent: 2em;">New issue Drawing List for change PN production</p>
+                        <p>Please update data in PN Master.</p>
+                        <p>Best Regards,</p>`,
+            });
+
             return {
                 status: true,
                 message: 'PS-DLC form created successfully',
@@ -196,7 +217,7 @@ export class PSDLCService {
                 {
                     ...form,
                     EMPNO: dto.EMPNO,
-                    ACTION: dto.ACTION, 
+                    ACTION: dto.ACTION,
                     REMARK: dto.REMARK,
                 },
                 ip,

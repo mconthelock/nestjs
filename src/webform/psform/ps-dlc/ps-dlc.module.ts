@@ -9,6 +9,7 @@ import { FormmstModule } from 'src/webform/formmst/formmst.module';
 import { PSDLCController } from './ps-dlc.controller';
 import { PSDLCService } from './ps-dlc.service';
 import { PSDLCRepository } from './ps-dlc.repository';
+import { MailModule } from 'src/common/services/mail/mail.module';
 
 @Module({
     imports: [
@@ -20,6 +21,7 @@ import { PSDLCRepository } from './ps-dlc.repository';
         FormModule,
         FlowModule,
         ConectionModule,
+        MailModule,
     ],
     controllers: [PSDLCController],
     providers: [PSDLCService, PSDLCRepository],

@@ -54,6 +54,7 @@ export class IeBgrController {
             { name: 'fileE[]', maxCount: 10 },
             { name: 'fileU[]', maxCount: 10 },
             { name: 'fileO[]', maxCount: 10 },
+            { name: 'fileF[]', maxCount: 10 },
         ]),
     )
     create(
@@ -73,6 +74,7 @@ export class IeBgrController {
             fileE?: Express.Multer.File[];
             fileU?: Express.Multer.File[];
             fileO?: Express.Multer.File[];
+            fileF?: Express.Multer.File[];
         },
         @Req() req: Request,
     ) {
@@ -98,6 +100,7 @@ export class IeBgrController {
             { name: 'fileE[]', maxCount: 10 },
             { name: 'fileU[]', maxCount: 10 },
             { name: 'fileO[]', maxCount: 10 },
+            { name: 'fileF[]', maxCount: 10 },
         ]),
     )
     draft(
@@ -117,6 +120,7 @@ export class IeBgrController {
             fileE?: Express.Multer.File[];
             fileU?: Express.Multer.File[];
             fileO?: Express.Multer.File[];
+            fileF?: Express.Multer.File[];
         },
         @Req() req: Request,
     ) {

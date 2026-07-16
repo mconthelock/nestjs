@@ -45,6 +45,8 @@ import { FinpckFormModule } from './webform/finform/fin-pck/finpck_form/finpck_f
 import { FinpckAssetModule } from './webform/finform/fin-pck/finpck_asset/finpck_asset.module';
 import { FxaGrpmstModule } from './webform/finform/fxa_grpmst/fxa_grpmst.module';
 
+import { MfgReportModule } from './mfgreport/mfgreport.module';
+
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
@@ -69,6 +71,7 @@ import { FxaGrpmstModule } from './webform/finform/fxa_grpmst/fxa_grpmst.module'
         PackingModule,
         InvoiceModule,
         IdsModule,
+        MfgReportModule,
         // ItgcModule,
         SafetyModule,
         HbdModule,

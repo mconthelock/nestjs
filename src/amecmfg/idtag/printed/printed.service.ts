@@ -189,7 +189,7 @@ export class PrintedService {
 
             //Register PDF processing job in memory
             const jobId = `pdf_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-            this.pdfJobStatusMap.set(jobId, {
+            await this.pdfJobStatusMap.set(jobId, {
                 jobId,
                 data: tagData,
                 status: 'queued',
@@ -199,7 +199,7 @@ export class PrintedService {
             queuedJobs.push({ jobId, data: tagData });
 
             // Process PDF jobs concurrently with a bounded worker pool.
-            this.enqueuePdfProcessJob(async () => {
+            await this.enqueuePdfProcessJob(async () => {
                 try {
                     await this.queue.runPdfProcessJob(
                         {

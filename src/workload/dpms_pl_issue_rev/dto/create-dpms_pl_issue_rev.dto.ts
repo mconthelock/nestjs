@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, isString, IsString } from 'class-validator';
 
 export class CreateDpmsPlIssueRevDto {
     @IsNotEmpty()
@@ -40,7 +40,12 @@ export class CreateDpmsPlIssueRevDto {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    NFILEID: number;
+    NPDFID: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    NEXCELID?: number;
 
     @IsNotEmpty()
     @IsString()
@@ -61,4 +66,8 @@ export class CreateDpmsPlIssueRevDto {
     @IsNotEmpty()
     @IsString()
     VSHIPPINGMARK: string;
+
+    @IsNotEmpty()
+    @IsString()
+    VISSUEBY: string;
 }

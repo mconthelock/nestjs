@@ -12,7 +12,7 @@ import { User } from 'src/amec/users/entities/user.entity';
 @Entity({ name: 'ISDEV_DEVELOPER', schema: 'WEBFORM' })
 export class ISDEV_DEVELOPER {
     @PrimaryColumn()
-    NFRMNO: string;
+    NFRMNO: number;
 
     @PrimaryColumn()
     VORGNO: string;
@@ -24,31 +24,31 @@ export class ISDEV_DEVELOPER {
     CYEAR2: string;
 
     @PrimaryColumn()
-    NRUNNO: string;
+    NRUNNO: number;
 
     @PrimaryColumn()
-    DEV_SEQ: string;
+    DEV_SEQ: number;
 
     @Column()
     DEV_PIC: string;
 
-    @Column()
-    DEV_PLANTIME: string;
+    @Column({ type: 'decimal', precision: 7, scale: 2 })
+    DEV_PLANTIME: number;
 
     @Column()
-    DEV_PLANSTART: string;
+    DEV_PLANSTART: Date;
 
     @Column()
-    DEV_PLANEEND: string;
+    DEV_PLANEND: Date;
+
+    @Column({ type: 'decimal', precision: 7, scale: 2 })
+    DEV_ACTUALTIME: number;
 
     @Column()
-    DEV_ACTUALTIME: string;
+    DEV_ACTUALSTART: Date;
 
     @Column()
-    DEV_ACTUALSTART: string;
-
-    @Column()
-    DEV_ACTUALEND: string;
+    DEV_ACTUALEND: Date;
 
     @Column()
     DEV_TITLE: string;

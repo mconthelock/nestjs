@@ -1,0 +1,34 @@
+
+Opened new report file at 2026-07-05 00:02:00.
+
+
+***********************************************************************
+**                     Run Time Messages                             **
+***********************************************************************
+
+
+***********************************************************************
+*                   ** Run Time Statistics **                         *
+***********************************************************************
+
+
+Report at 2026-07-06 00:00:00 (activity since 2026-07-05 00:00:00)
+
+Output to ./dirdat/cc:
+
+No records extracted.
+
+
+***********************************************************************
+**                     Run Time Warnings                             **
+***********************************************************************
+
+             1960493 records processed as of 2026-07-06 07:58:00 (rate 4,delta 0)
+             1960679 records processed as of 2026-07-06 08:29:10 (rate 4,delta 0)
+             1961657 records processed as of 2026-07-06 08:59:44 (rate 4,delta 0)
+             1961807 records processed as of 2026-07-06 09:32:39 (rate 4,delta 0)
+             1963341 records processed as of 2026-07-06 10:12:23 (rate 4,delta 0)
+             1964181 records processed as of 2026-07-06 10:43:09 (rate 4,delta 0)
+             1972611 records processed as of 2026-07-06 11:13:13 (rate 4,delta 4)
+             1976787 records processed as of 2026-07-06 11:48:04 (rate 4,delta 1)
+             1985578 records processed as of 2026-07-06 13:02:11 (rate 4,delta 1)

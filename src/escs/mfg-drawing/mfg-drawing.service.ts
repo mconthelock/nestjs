@@ -7,24 +7,25 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 @Injectable()
 export class MfgDrawingService {
   constructor(private readonly repo: MfgDrawingRepository) {}
+  
   async create(dto: CreateMfgDrawingDto) {
-    try {
-      const res = await this.repo.create(dto);
-      if (!res) {
-        return {
-          status: false,
-          message: 'Insert MFG_DRAWING Failed',
-          data: dto,
-        };
-      }
-      return {
-        status: true,
-        message: 'Insert MFG_DRAWING Successfully',
-        data: res,
-      };
-    } catch (error) {
-      throw new Error('Insert MFG_DRAWING Error: ' + error.message);
-    }
+        try {
+            const res = await this.repo.create(dto);
+            if (!res) {
+                return {
+                    status: false,
+                    message: 'Insert MFG_DRAWING Failed',
+                    data: dto,
+                };
+            }
+            return {
+                status: true,
+                message: 'Insert MFG_DRAWING Successfully',
+                data: res,
+            };
+        } catch (error) {
+            throw new Error('Insert MFG_DRAWING Error: ' + error.message);
+        }
   }
 
   async findAll() {

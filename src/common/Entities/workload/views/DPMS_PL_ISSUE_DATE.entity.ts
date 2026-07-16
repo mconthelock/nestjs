@@ -21,6 +21,9 @@ export class DPMS_PL_ISSUE_DATE {
     VREASON: string;
 
     @Column()
+    DELAY: string;
+
+    @Column()
     DFINISHALL: Date;
 
     @Column()

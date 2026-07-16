@@ -65,6 +65,7 @@ import { MfgReportModule } from './mfgreport/mfgreport.module';
         PackingModule,
         InvoiceModule,
         IdsModule,
+        MfgReportModule,
         // ItgcModule,
         SafetyModule,
         HbdModule,

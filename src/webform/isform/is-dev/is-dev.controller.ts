@@ -1,18 +1,23 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Delete } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { IsDevService } from './is-dev.service';
-import { SearchIsDevDto } from './dto/search-is-dev.dto';
+import { CreateDeveloperDto } from './dto/create-developer.dto';
+import { UpdateDeveloperDto } from './dto/update-developer';
 
 @ApiTags('IS-DEV')
 @Controller('form/is/is-dev')
 export class IsDevController {
     constructor(private readonly dev: IsDevService) {}
 
-    //   @Post('/search')
-    //   async search(@Body() searchDto: SearchIsDevDto) {
-    //     const year = '2014';
-    //     return this.dev.search(year, searchDto.keyword);
-    //   }
+    @Post('assignment/add')
+    async addDeveloper(@Body() dto: CreateDeveloperDto) {
+        return this.dev.createDev(dto);
+    }
+
+    @Post('assignment/delete')
+    async deleteDeveloper(@Body() dto: UpdateDeveloperDto) {
+        return this.dev.deleteDev(dto);
+    }
 
     //   @Get('/year/:year')
     //   @ApiOperation({

@@ -173,21 +173,21 @@ export class createDetailDto {
     @IsNumber()
     @IsOptional()
     @Type(() => Number)
-    INQD_VPC_COST: number;
+    INQD_VPC_COST?: number;
 
     @IsNumber()
     @IsOptional()
     @Type(() => Number)
-    INQD_VPC_BASE: number;
+    INQD_VPC_BASE?: number;
 
     @IsNumber()
     @IsOptional()
     @Type(() => Number)
-    INQD_VPC_UNITPRICE: number;
+    INQD_VPC_UNITPRICE?: number;
 
     @IsString()
     @IsOptional()
-    INQD_VPC_PURCODE: string;
+    INQD_VPC_PURCODE?: string;
 
     // Date column
     @IsDate()
@@ -204,8 +204,10 @@ export class createDetailDto {
     // @IsOptional()
     // INQD_COMPARE_DATE: Date;
 
-    // @IsDate()
-    // @IsOptional()
-    // @Type(() => Date)
-    // INQD_VPC_DATE?: Date;
+    @IsDate()
+    @IsOptional()
+    @Type(() => Date)
+    INQD_VPC_DATE?: Date;
+
+    //This is test to commit and set new Branch
 }

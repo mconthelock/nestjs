@@ -30,7 +30,10 @@ export class DPMS_PL_ISSUE_REV {
     NROUND: number;
 
     @Column()
-    NFILEID: number;
+    NPDFID: number;
+
+    @Column()
+    NEXCELID: number;
 
     @Column()
     VSHOPORDERNO: string;
@@ -49,4 +52,7 @@ export class DPMS_PL_ISSUE_REV {
 
     @Column()
     DISSUEDATE: Date;
+
+    @Column()
+    VISSUEBY: string;
 }

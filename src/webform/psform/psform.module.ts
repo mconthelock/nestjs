@@ -6,8 +6,9 @@ import { PsRPModule } from './ps-rp/ps-rp.module';
 import { PsVarModule } from './ps-var/ps-var.module';
 import { PsYicModule } from './ps-yic/ps-yic.module';
 import { PSDLCModule } from './ps-dlc/ps-dlc.module';
+import { PsClmModule } from './ps-clm/ps-clm.module';
 
 @Module({
-    imports: [PsFileModule, PsCiModule, PsCihModule, PsRPModule, PsVarModule, PSDLCModule, PsYicModule],
+    imports: [PsFileModule, PsCiModule, PsCihModule, PsRPModule, PsVarModule, PSDLCModule, PsYicModule, PsClmModule],
 })
 export class PsFormModule {}

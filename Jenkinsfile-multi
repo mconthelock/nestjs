@@ -60,7 +60,7 @@ pipeline {
                     echo "⏱️ [START] Check package.json Changes : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
 
                     // 1. กำหนดชื่อไฟล์ Hash ตาม Environment ที่กำลังจะ Deploy
-                    def hashFileName = ".package_hash_${params.DEPLOY_ENV}"
+                    def hashFileName = ".package_hash_${env.DEPLOY_ENV}"
 
                     // 2. คำนวณ Hash ของ package.json ตัวปัจจุบันที่เพิ่ง Checkout มา
                     def currentHash = sh(script: "md5sum package.json | cut -d' ' -f1", returnStdout: true).trim()
@@ -81,12 +81,12 @@ pipeline {
                         echo "⚠️  WARNING: package.json has changed!"
                         echo "⚠️  You need to run: npm install manually"
                         mail (
-                            to: 'sec_wsd@MitsubishiElevatorAsia.co.th',
-                            subject: "WARNING: package.json has changed! You need to run: npm install manually (${params.DEPLOY_ENV})",
+                            to: 'sutthipongt@MitsubishiElevatorAsia.co.th',
+                            subject: "WARNING: package.json has changed! You need to run: npm install manually (${env.DEPLOY_ENV})",
                             from: 'jenkins-notify@MitsubishiElevatorAsia.co.th',
                             body: """
                                 Dear Team,
-                                The package.json file has changed in the latest deployment to '${params.DEPLOY_ENV}' environment. Please run 'npm install' in the target directory to ensure all dependencies are up to date.
+                                The package.json file has changed in the latest deployment to '${env.DEPLOY_ENV}' environment. Please run 'npm install' in the target directory to ensure all dependencies are up to date.
                                 -------------------------------------------
                                 How to procedure:
                                 1. Map Network Drive to target directory on ${REMOTE_HOST}
@@ -135,7 +135,7 @@ pipeline {
         }
 
         stage('Restart Application on Development Server') {
-            when { expression { params.DEPLOY_ENV == 'development' }}
+            when { expression { env.DEPLOY_ENV == 'development' }}
             steps {
                 script {
                     env.START_TIME_BUILD = System.currentTimeMillis()
@@ -198,7 +198,7 @@ pipeline {
         }
 
         stage('Restart Application on Production Servers') {
-            when { expression { params.DEPLOY_ENV == 'production'} }
+            when { expression { env.DEPLOY_ENV == 'production'} }
             steps {
                 script {
                     env.START_TIME_RESTART = System.currentTimeMillis()

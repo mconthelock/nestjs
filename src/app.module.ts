@@ -39,12 +39,6 @@ import { PursysModule } from './pursys/pursys.module';
 import { WorkloadModule } from './workload/workload.module';
 import { DatacenterModule } from './datacenter/datacenter.module';
 import { GeneralPartListModule } from './general-part-list/general-part-list.module';
-
-// FIN-PCK
-import { FinpckFormModule } from './webform/finform/fin-pck/finpck_form/finpck_form.module';
-import { FinpckAssetModule } from './webform/finform/fin-pck/finpck_asset/finpck_asset.module';
-import { FxaGrpmstModule } from './webform/finform/fxa_grpmst/fxa_grpmst.module';
-
 import { MfgReportModule } from './mfgreport/mfgreport.module';
 
 @Module({
@@ -81,11 +75,9 @@ import { MfgReportModule } from './mfgreport/mfgreport.module';
         WorkloadModule,
         DatacenterModule,
         GeneralPartListModule,
-
-        //FIN-PCK
-        FinpckFormModule,
-        FinpckAssetModule,
-        FxaGrpmstModule,
+        MfgReportModule,
+      //  MfgOrModule,
+   
     ],
     providers: [
         HttpLoggingInterceptor,

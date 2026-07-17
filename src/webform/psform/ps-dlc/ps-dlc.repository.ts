@@ -163,44 +163,6 @@ export class PSDLCRepository extends BaseRepository {
 
         return null;
     }
-    // private buildPndataExpressionForRow0(
-    //     detail: UpdatePsdlcDetailDto,
-    // ): string | null {
-    //     const flag = detail.NEWFLAG?.trim().toUpperCase();
-    //     const code = detail.NEWCODE?.trim();
-
-    //     if (!flag && !code) {
-    //         return null;
-    //     }
-
-    //     const flagPos = flag ? this.getFlagPosition(flag) : null;
-
-    //     // กรณีมีทั้ง Flag (ที่ถูกต้อง) และ Code
-    //     if (flagPos !== null && code) {
-    //         const betweenLength = 45 - flagPos - 1;
-    //         const codeValue = this.escapeSql(
-    //             code.padEnd(7, ' ').substring(0, 7),
-    //         );
-    //         const flagValue = this.escapeSql(flag);
-    //         return `SUBSTR(PNDATA,1,${flagPos - 1}) || '${flagValue}' || SUBSTR(PNDATA,${flagPos + 1},${betweenLength}) || '${codeValue}' || SUBSTR(PNDATA,52)`;
-    //     }
-
-    //     // กรณีมีแต่ Flag (ที่ถูกต้อง)
-    //     if (flagPos !== null) {
-    //         const flagValue = this.escapeSql(flag);
-    //         return `SUBSTR(PNDATA,1,${flagPos - 1}) || '${flagValue}' || SUBSTR(PNDATA,${flagPos + 1})`;
-    //     }
-
-    //     // กรณีมีแต่ Code หรือมี Flag ที่ส่งค่ามาผิด (เลยทำแค่ Code แทน)
-    //     if (code) {
-    //         const codeValue = this.escapeSql(
-    //             code.padEnd(7, ' ').substring(0, 7),
-    //         );
-    //         return `SUBSTR(PNDATA,1,44) || '${codeValue}' || SUBSTR(PNDATA,52)`;
-    //     }
-
-    //     return null;
-    // }
 
     private buildPndataExpressionForReference(
         detail: UpdatePsdlcDetailDto,

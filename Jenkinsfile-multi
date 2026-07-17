@@ -1,0 +1,359 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'DEPLOY_ENV', choices: ['development', 'production'], description: 'Select Environment to deploy')
+    }
+
+    environment {
+        GIT_SSL_NO_VERIFY = 'true'
+    }
+
+    tools {
+        nodejs 'node'
+    }
+
+    stages {
+        stage('Setup Environment') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'develop') {
+                        env.REMOTE_HOST = 'amecweb1, amecweb2'
+                        env.NODE_ENV = 'development'
+                        env.DEPLOY_ENV = 'development'
+                        env.ENV_DIR = '/var/amecweb/file/env/mfgreport/.env.api.development'
+
+                        echo ">>> MR merged → develop → DEPLOY DEVELOPMENT"
+
+                        env.REMOTE_HOST = 'amecwebtest'
+                        env.NODE_ENV = 'development'
+                        env.DEPLOY_ENV = 'production'
+                        env.ENV_DIR = '/var/amecweb/file/env/mfgreport/.env.api.development'
+
+                        echo ">>> MR merged → main → DEPLOY PRODUCTION"
+
+                    } else {
+                        error "❌ Branch ${env.BRANCH_NAME} is not deployable"
+                    }
+                }
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                script {
+                    env.START_TIME_CHECKOUT = System.currentTimeMillis()
+                    echo "⏱️ [START] Checkout : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+                }
+
+                // ================== โค้ดเดิมของคุณ ==================
+                checkout scm
+                // =================================================
+
+                script {
+                    def duration = (System.currentTimeMillis() - env.START_TIME_CHECKOUT.toLong()) / 1000
+                    echo "✅ [END] Checkout ใช้เวลาทั้งหมด: ${duration} วินาที"
+                }
+            }
+        }
+
+        stage('Check package.json Changes') {
+            steps {
+                script {
+                    env.START_TIME_CHANGE = System.currentTimeMillis()
+                    echo "⏱️ [START] Check package.json Changes : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+
+                    // 1. กำหนดชื่อไฟล์ Hash ตาม Environment ที่กำลังจะ Deploy
+                    def hashFileName = ".package_hash_${params.DEPLOY_ENV}"
+
+                    // 2. คำนวณ Hash ของ package.json ตัวปัจจุบันที่เพิ่ง Checkout มา
+                    def currentHash = sh(script: "md5sum package.json | cut -d' ' -f1", returnStdout: true).trim()
+
+                    // 3. ตรวจสอบสถานะการเปลี่ยนแปลง
+                    if (fileExists(hashFileName)) {
+                        def oldHash = readFile(hashFileName).trim()
+                        if (currentHash != oldHash) {
+                            env.PACKAGE_STATUS = "CHANGED"
+                        } else {
+                            env.PACKAGE_STATUS = "UNCHANGED"
+                        }
+                    } else {
+                        env.PACKAGE_STATUS = "NEW"
+                    }
+
+                    if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
+                        echo "⚠️  WARNING: package.json has changed!"
+                        echo "⚠️  You need to run: npm install manually"
+                        mail (
+                            to: 'sec_wsd@MitsubishiElevatorAsia.co.th',
+                            subject: "WARNING: package.json has changed! You need to run: npm install manually (${params.DEPLOY_ENV})",
+                            from: 'jenkins-notify@MitsubishiElevatorAsia.co.th',
+                            body: """
+                                Dear Team,
+                                The package.json file has changed in the latest deployment to '${params.DEPLOY_ENV}' environment. Please run 'npm install' in the target directory to ensure all dependencies are up to date.
+                                -------------------------------------------
+                                How to procedure:
+                                1. Map Network Drive to target directory on ${REMOTE_HOST}
+                                2. Open Command Prompt or PowerShell and CD to api/
+                                3. run: npm install
+                                4. Remote Desktop at ${REMOTE_HOST}
+                                5. Open Terminal and run: pm2 reload api
+                                -------------------------------------------
+                            """
+                        )
+                    }else {
+                        echo "✅ package.json has not changed."
+                    }
+
+                    // 4. เมื่อ Deploy เสร็จแล้ว ค่อยบันทึก Hash ปัจจุบันทับลงไป
+                    writeFile(file: hashFileName, text: currentHash)
+
+                    def duration = (System.currentTimeMillis() - env.START_TIME_CHANGE.toLong()) / 1000
+                    echo "✅ [END] Check package.json Changes ใช้เวลาทั้งหมด: ${duration} วินาที"
+                }
+            }
+        }
+
+        stage('Install & Build') {
+            steps {
+                script {
+                    env.START_TIME_BUILD = System.currentTimeMillis()
+                    echo "⏱️ [START] Install & Build : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+                }
+                sh '''
+                    cp ${ENV_DIR} .env
+                    NODE_ENV=development
+                    if [ "${PACKAGE_STATUS}" = "CHANGED" ] || [ "${PACKAGE_STATUS}" = "NEW" ]; then
+                        npm install
+                    else
+                        echo "✅ package.json unchanged, skip npm install"
+                    fi
+                    npm run build
+                '''
+                sh "tar -czf dist.tar.gz dist/"
+                script {
+                    def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
+                    echo "✅ [END] Install & Build ใช้เวลาทั้งหมด: ${duration} วินาที"
+                }
+            }
+        }
+
+        stage('Restart Application on Development Server') {
+            when { expression { params.DEPLOY_ENV == 'development' }}
+            steps {
+                script {
+                    env.START_TIME_BUILD = System.currentTimeMillis()
+                    echo "⏱️ [START] Restart Application : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+
+                    sshagent(credentials: ['ssh-amecwebtest1']) {
+                        sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecwebtest1:D:/wwwroot/api/"
+
+                        if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
+                                powershell "
+                                \$startTime = Get-Date
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '✅ [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+                                "
+                                EOF
+                            """
+
+                            echo "================================================"
+                            echo "⚠️  WARNING: package.json has changed!, Please install dependencies manually on ${REMOTE_HOST}"
+                            echo "Skipping automatic PM2 reload..."
+                            echo "================================================"
+                        } else {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
+                                powershell "
+                                \$startTime = Get-Date
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '🎉 [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+
+
+                                \$startTimePm2 = Get-Date
+                                pm2 reload api
+                                \$endTimePm2 = Get-Date
+                                \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds
+                                Write-Host '🎯 [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'
+                                "
+                                EOF
+                            """
+                        }
+                        sh "rm -f dist.tar.gz"
+                    }
+
+
+                    def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
+                    echo "✅ [END] Restart Application ใช้เวลาทั้งหมด: ${duration} วินาที"
+                }
+            }
+        }
+
+        stage('Restart Application on Production Servers') {
+            when { expression { params.DEPLOY_ENV == 'production'} }
+            steps {
+                script {
+                    env.START_TIME_RESTART = System.currentTimeMillis()
+                    echo "⏱️ [START] Restart Application : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+
+                    // ==================== Restart Application on AMECWEB1 ==================== //
+                    sshagent(credentials: ['ssh-amecweb1']) {
+                        sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecweb1:D:/wwwroot/api/"
+
+                        if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
+                                powershell "
+                                \$startTime = Get-Date
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '✅ [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+                                "
+                                EOF
+                            """
+
+                            echo "================================================"
+                            echo "⚠️  WARNING: package.json has changed!, Please install dependencies manually on ${REMOTE_HOST}"
+                            echo "Skipping automatic PM2 reload..."
+                            echo "================================================"
+                        } else {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecweb1 << 'EOF'
+                                powershell "
+                                \$startTime = Get-Date
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '🎉 [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+
+
+                                \$startTimePm2 = Get-Date
+                                pm2 reload api
+                                \$endTimePm2 = Get-Date
+                                \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds
+                                Write-Host '🎯 [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'
+                                "
+                                EOF
+                            """
+                        }
+                    }
+
+                    // ==================== Restart Application on AMECWEB2 ==================== //
+                    sshagent(credentials: ['ssh-amecweb2']) {
+                        sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecweb2:D:/wwwroot/api/"
+
+                        if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
+                                powershell "
+                                \$startTime = Get-Date
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '✅ [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+                                "
+                                EOF
+                            """
+
+                            echo "================================================"
+                            echo "⚠️  WARNING: package.json has changed!, Please install dependencies manually on ${REMOTE_HOST}"
+                            echo "Skipping automatic PM2 reload..."
+                            echo "================================================"
+                        } else {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no Administrator@amecweb2 << 'EOF'
+                                powershell "
+                                \$startTime = Get-Date
+                                \$env:NODE_ENV='development'
+                                cd D:\\wwwroot\\api
+                                tar -xzf dist.tar.gz
+                                Remove-Item -Path dist.tar.gz -Force
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '🎉 [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+
+
+                                \$startTimePm2 = Get-Date
+                                pm2 reload api
+                                \$endTimePm2 = Get-Date
+                                \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds
+                                Write-Host '🎯 [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'
+                                "
+                                EOF
+                            """
+                        }
+                        sh "tar -czf dist.tar.gz dist/"
+                    }
+
+                    def duration = (System.currentTimeMillis() - env.START_TIME_RESTART.toLong()) / 1000
+                    echo "✅ [END] Restart Application ใช้เวลาทั้งหมด: ${duration} วินาที"
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                // 1. หาชื่อคนสั่ง Build (ดึงจาก Build Causes)
+                def buildCauses = currentBuild.getBuildCauses()
+                def buildUser = ""
+                for (cause in buildCauses) {
+                    if (cause.shortDescription.contains('Started by user')) {
+                        buildUser = cause.shortDescription.replace('Started by user ', '')
+                    }else{
+                        buildUser = cause.shortDescription.replace('Started by GitLab push by ', '')
+                    }
+                }
+
+                // 2. จัดการเรื่องเวลา (แปลงจาก milliseconds เป็นวันที่ที่อ่านออก)
+                def startTime = new Date(currentBuild.startTimeInMillis).format("dd/MM/yyyy HH:mm:ss", TimeZone.getTimeZone('Asia/Bangkok'))
+                def endTime = new Date().format("dd/MM/yyyy HH:mm:ss", TimeZone.getTimeZone('Asia/Bangkok'))
+
+                mail (
+                    to: 'sutthipongt@MitsubishiElevatorAsia.co.th',
+                    subject: "Build ${currentBuild.currentResult}: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
+                    from: 'jenkins-notify@MitsubishiElevatorAsia.co.th',
+                    body: """
+                        ข้อมูลการ Build เบื้องต้น:
+                        -------------------------------------------
+                        ผลการทำงาน: ${currentBuild.currentResult}
+                        ผู้ดำเนินการ: ${buildUser}
+                        เวลาที่เริ่ม: ${startTime}
+                        เวลาที่เสร็จ: ${endTime}
+                        ระยะเวลาทั้งหมด: ${currentBuild.durationString.replace(' and counting', '')}
+
+                        รายละเอียดสภาพแวดล้อม:
+                        -------------------------------------------
+                        Environment: ${env.DEPLOY_ENV}
+
+                        สามารถตรวจสอบ Log อย่างละเอียดได้ที่:
+                        ${env.BUILD_URL}console
+                        -------------------------------------------
+                    """
+                )
+            }
+        }
+    }
+}

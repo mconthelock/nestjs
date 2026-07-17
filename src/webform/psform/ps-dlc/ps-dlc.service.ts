@@ -122,7 +122,7 @@ export class PSDLCService {
                     "anucha@MitsubishiElevatorAsia.co.th",
                     "chatchawarnk@MitsubishiElevatorAsia.co.th",
                     "chakkritv@MitsubishiElevatorAsia.co.th",
-                    'punnawichs@mitsubishielevatorasia.co.th',
+                    // 'punnawichs@mitsubishielevatorasia.co.th',
                 ],
                 subject:
                     'Form Drawing list for change PN Production create Complete',

@@ -17,14 +17,14 @@ pipeline {
                         env.REMOTE_HOST = 'amecweb1, amecweb2'
                         env.NODE_ENV = 'development'
                         env.DEPLOY_ENV = 'development'
-                        env.ENV_DIR = '/var/amecweb/file/env/mfgreport/.env.api.development'
+                        env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.development'
 
                         echo ">>> MR merged → develop → DEPLOY DEVELOPMENT"
 
                         env.REMOTE_HOST = 'amecwebtest'
                         env.NODE_ENV = 'development'
                         env.DEPLOY_ENV = 'production'
-                        env.ENV_DIR = '/var/amecweb/file/env/mfgreport/.env.api.development'
+                        env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.development'
 
                         echo ">>> MR merged → main → DEPLOY PRODUCTION"
 

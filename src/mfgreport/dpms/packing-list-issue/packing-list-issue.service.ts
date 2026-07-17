@@ -412,10 +412,10 @@ export class PackingListIssueService {
         attachments,
         subject = `Packing list issue notification`,
     }: sendMailParams) {
-        const mails = await this.dpmsPlMailService.findAll();
-        if (!mails.status) {
-            throw new Error('Failed to retrieve email addresses');
-        }
+        // const mails = await this.dpmsPlMailService.findAll();
+        // if (!mails.status) {
+        //     throw new Error('Failed to retrieve email addresses');
+        // }
         const email =
             process.env.NODE_ENV != 'production'
                 ? process.env.MAIL_ADMIN

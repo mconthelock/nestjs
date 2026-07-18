@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateFinDFormdto } from './dto/create-fin-d.dto';
 import { ActionFinDDto } from './dto/action-fin-d.dto';
 import { FinDsRepository } from './fin-ds.repository';
@@ -12,6 +12,23 @@ import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service
 import { FlowService } from 'src/webform/flow/flow.service';
 
 const JOB_CONTROLLER_CEXTDATA = ['01'];
+
+export function calculateDutyBalances(
+    reportRows: Record<string, unknown>[],
+    dutyValues: number[],
+) {
+    return dutyValues.map((dutyValue) => {
+        const key = String(Number(dutyValue));
+        const balance = reportRows.reduce((total, row) => {
+            const buy = Number(row[`BUY_${key}_QTY`]) || 0;
+            const withdraw = Number(row[`WD_${key}_QTY`]) || 0;
+
+            return total + buy - withdraw;
+        }, 0);
+
+        return { DUTY_VALUE: Number(dutyValue), BAL_QTY: balance };
+    });
+}
 
 @Injectable()
 export class FinDsService {
@@ -27,6 +44,25 @@ export class FinDsService {
 
     findAll() {
         return this.repo.findall();
+    }
+
+    async findBalance(fyear: number) {
+        if (!Number.isInteger(fyear) || fyear < 1900 || fyear > 2100) {
+            throw new BadRequestException('Invalid fiscal year');
+        }
+
+        const [reportRows, stamps] = await Promise.all([
+            this.repo.findReport(fyear),
+            this.repo.findall(),
+        ]);
+
+        return {
+            status: true,
+            data: calculateDutyBalances(
+                reportRows,
+                stamps.map((stamp) => Number(stamp.DUTY_VALUE)),
+            ),
+        };
     }
 
     async findAllHeadForShow() {
@@ -159,6 +195,52 @@ export class FinDsService {
     ) {
         try {
 
+            const detailData =
+                typeof createFinDDto.DATA === 'string'
+                    ? JSON.parse(createFinDDto.DATA || '[]')
+                    : createFinDDto.DATA;
+
+            if (!Array.isArray(detailData) || detailData.length === 0) {
+                throw new BadRequestException('FIN-DS detail data is required');
+            }
+
+            const requestedByDuty = new Map<number, number>();
+
+            for (const detail of detailData) {
+                const dutyValue = Number(detail.DUTY_VALUE);
+                const qty = Number(detail.QTY);
+
+                if (!Number.isFinite(dutyValue) || !Number.isFinite(qty) || qty <= 0) {
+                    throw new BadRequestException('Invalid duty stamp quantity');
+                }
+
+                requestedByDuty.set(
+                    dutyValue,
+                    (requestedByDuty.get(dutyValue) || 0) + qty,
+                );
+            }
+
+            if (createFinDDto.OPTION_CODE === '0') {
+                // ponytail: report snapshot can race; lock the real stock row once FINDS_STOCK is confirmed.
+                const balance = await this.findBalance(new Date().getFullYear());
+                const availableByDuty = new Map(
+                    balance.data.map((item) => [item.DUTY_VALUE, item.BAL_QTY]),
+                );
+
+                for (const [dutyValue, requested] of requestedByDuty) {
+                    const available = Math.max(
+                        0,
+                        availableByDuty.get(dutyValue) || 0,
+                    );
+
+                    if (requested > available) {
+                        throw new BadRequestException(
+                            `Duty stamp ${dutyValue} Baht has only ${available} remaining (requested ${requested})`,
+                        );
+                    }
+                }
+            }
+
             const formmst =
                 await this.FormmstService.getFormMasterByVaname('FIN-DS');
 
@@ -212,15 +294,6 @@ export class FinDsService {
 
             const head = await this.repo.createHead(headData);
 
-
-            const detailData =
-                typeof createFinDDto.DATA === 'string'
-                    ? JSON.parse(createFinDDto.DATA || '[]')
-                    : createFinDDto.DATA;
-
-            if (!Array.isArray(detailData) || detailData.length === 0) {
-                throw new Error('FIN-DS detail data is required');
-            }
 
             for (const DetailDATA of detailData) {
                 const lineId = Number(DetailDATA.LINE_ID ?? DetailDATA.LINEID);

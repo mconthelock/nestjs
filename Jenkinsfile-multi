@@ -116,6 +116,7 @@ pipeline {
                     env.START_TIME_BUILD = System.currentTimeMillis()
                     echo "⏱️ [START] Install & Build : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
                 }
+                sh 'apt-get update && apt-get install -y python3 make g++'
                 sh '''
                     cp ${ENV_DIR} .env
                     NODE_ENV=development

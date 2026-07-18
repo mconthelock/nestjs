@@ -27,7 +27,6 @@ import { createDetailDto } from '../inquiry-detail/dto/create.dto';
 import { createTimelineDto } from '../timeline/dto/create-dto';
 import { updateTimelineDto } from '../timeline/dto/update-dto';
 import { createHistoryDto } from '../history/dto/create.dto';
-
 @Injectable()
 export class InquiryService {
     constructor(

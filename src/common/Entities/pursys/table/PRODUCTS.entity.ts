@@ -1,7 +1,6 @@
 import {
     Entity,
     Column,
-    PrimaryColumn,
     PrimaryGeneratedColumn,
     JoinColumn,
     ManyToOne,
@@ -17,30 +16,66 @@ export class Products {
     ID: number;
 
     @Column()
-    SKU: string;
+    SPRODCODE: string;
 
     @Column()
-    NAME: string;
+    SPRODID: string;
 
     @Column()
-    DESCRIPTION: string;
+    SEPRODNAME: string;
+
+    @Column()
+    SEDESC: string;
+
+    @Column()
+    SEUNITCODE: string;
+
+    @Column()
+    STPRODNAME: string;
+
+    @Column()
+    STDESC: string;
+
+    @Column()
+    STUNITCODE: string;
+
+    @Column()
+    ACCCODE: string;
+
+    @Column()
+    HAZARDNO: string;
+
+    @Column()
+    HAZARDSTATUS: string;
 
     @Column()
     CATEGORY_ID: number;
 
     @Column()
-    CREATED_AT: string;
+    IS_ACTIVE: string;
+
+    @Column({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP',
+    })
+    CREATED_AT: Date;
 
     @Column()
-    UPDATED_AT: string;
+    CREATED_BY: string;
+
+    @Column({
+        type: 'timestamp',
+        onUpdate: 'CURRENT_TIMESTAMP',
+    })
+    UPDATE_AT: Date;
 
     @Column()
-    DELETED_AT: string;
+    UPDATE_BY: string;
 
     @Column({ type: 'simple-json', nullable: true, default: {} })
     EXTRA_ATTRIBUTES: Record<string, any>;
 
     @ManyToOne(() => Categories, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'category_id' })
+    @JoinColumn({ name: 'CATEGORY_ID' })
     category: Categories;
 }

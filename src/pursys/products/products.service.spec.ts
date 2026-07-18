@@ -4,6 +4,7 @@ import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
 import { ProductsService } from './products.service';
 import { CategoriesService } from '../categories/categories.service';
 import { OptionRegistryService } from './option-registry.service';
+import { CreateProductDto } from './dto/create-product.dto';
 import { Products } from 'src/common/Entities/pursys/table/PRODUCTS.entity';
 
 describe('ProductsService - Dynamic Attributes Validation', () => {
@@ -92,13 +93,37 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
         jest.clearAllMocks();
     });
 
+    const buildDto = (
+        overrides: Partial<CreateProductDto> = {},
+    ): CreateProductDto => ({
+        SPRODCODE: 'PC-001',
+        SPRODID: 'P-001',
+        SEPRODNAME: 'Desktop PC',
+        SEDESC: 'Desktop PC description',
+        SEUNITCODE: 'PC',
+        STPRODNAME: 'เดสก์ท็อปพีซี',
+        STDESC: 'รายละเอียดสินค้า',
+        STUNITCODE: 'เครื่อง',
+        ACCCODE: 'ACC-001',
+        HAZARDNO: 'HZ-001',
+        HAZARDSTATUS: 'N',
+        IS_ACTIVE: '1',
+        CREATED_AT: new Date(),
+        CREATED_BY: 'tester',
+        UPDATE_AT: new Date(),
+        UPDATE_BY: 'tester',
+        CATEGORY_ID: 1,
+        EXTRA_ATTRIBUTES: {},
+        ...overrides,
+    });
+
     it('ควรสร้างสินค้าได้สำเร็จ เมื่อส่งข้อมูล Attributes ครบและถูกต้อง', async () => {
         // จำลองให้ Function Registry คืนค่าว่า "ผ่าน" (true)
         mockOptionRegistry.execute.mockResolvedValueOnce(true);
-
-        const dto = {
-            SKU: 'PC-001',
-            NAME: 'Desktop PC',
+        const dto = buildDto({
+            SPRODCODE: 'PC-001',
+            SEPRODNAME: 'Desktop PC',
+            SEUNITCODE: 'PC',
             CATEGORY_ID: 1,
             EXTRA_ATTRIBUTES: {
                 brand: 'Dell',
@@ -106,11 +131,11 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
                 case_color: 'Black',
                 supplier: 'SUP-999',
             },
-        };
+        });
 
         const result: any = await service.create(dto);
 
-        expect(result.SKU).toBe('PC-001');
+        expect(result.SPRODCODE).toBe('PC-001');
         expect(result.EXTRA_ATTRIBUTES.brand).toBe('Dell');
         expect(mockProductRepository.save).toHaveBeenCalled();
         expect(mockOptionRegistry.execute).toHaveBeenCalledWith(
@@ -120,15 +145,15 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
     });
 
     it('ควรแจ้งเตือน (BadRequest) เมื่อไม่ส่ง Attribute ที่เป็นฟิลด์บังคับ (isRequired)', async () => {
-        const dto = {
-            SKU: 'PC-002',
-            NAME: 'Desktop PC',
+        const dto = buildDto({
+            SPRODCODE: 'PC-002',
+            SEPRODNAME: 'Desktop PC',
             CATEGORY_ID: 10,
             EXTRA_ATTRIBUTES: {
                 brand: 'Dell',
                 // ตั้งใจลบ ram_gb, case_color, และ supplier ออก
             },
-        };
+        });
 
         await expect(service.create(dto)).rejects.toThrow(BadRequestException);
         await expect(service.create(dto)).rejects.toThrow(
@@ -137,9 +162,9 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
     });
 
     it('ควรแจ้งเตือน (BadRequest) เมื่อส่งข้อมูลผิดประเภท (เช่น ส่งตัวอักษรเข้าฟิลด์ Number)', async () => {
-        const dto = {
-            SKU: 'PC-003',
-            NAME: 'Desktop PC',
+        const dto = buildDto({
+            SPRODCODE: 'PC-003',
+            SEPRODNAME: 'Desktop PC',
             CATEGORY_ID: 10,
             EXTRA_ATTRIBUTES: {
                 brand: 'Dell',
@@ -147,7 +172,7 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
                 case_color: 'Black',
                 supplier: 'SUP-999',
             },
-        };
+        });
 
         await expect(service.create(dto)).rejects.toThrow(BadRequestException);
         await expect(service.create(dto)).rejects.toThrow(
@@ -156,9 +181,9 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
     });
 
     it('ควรแจ้งเตือน (BadRequest) เมื่อเลือก Option แบบ Fixed ไม่ตรงกับค่าที่กำหนดไว้', async () => {
-        const dto = {
-            SKU: 'PC-004',
-            NAME: 'Desktop PC',
+        const dto = buildDto({
+            SPRODCODE: 'PC-004',
+            SEPRODNAME: 'Desktop PC',
             CATEGORY_ID: 10,
             EXTRA_ATTRIBUTES: {
                 brand: 'Dell',
@@ -166,7 +191,7 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
                 case_color: 'Pink', // สีนี้ไม่มีใน ['Black', 'White']
                 supplier: 'SUP-999',
             },
-        };
+        });
 
         await expect(service.create(dto)).rejects.toThrow(BadRequestException);
         await expect(service.create(dto)).rejects.toThrow(
@@ -178,9 +203,9 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
         // จำลองให้ Function Registry คืนค่าว่า "ไม่ผ่าน" (false) เช่น หาซัพพลายเออร์ไม่เจอ
         mockOptionRegistry.execute.mockResolvedValueOnce(false);
 
-        const dto = {
-            SKU: 'PC-005',
-            NAME: 'Desktop PC',
+        const dto = buildDto({
+            SPRODCODE: 'PC-005',
+            SEPRODNAME: 'Desktop PC',
             CATEGORY_ID: 10,
             EXTRA_ATTRIBUTES: {
                 brand: 'Dell',
@@ -188,7 +213,7 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
                 case_color: 'White',
                 supplier: 'INVALID-SUP',
             },
-        };
+        });
 
         await expect(service.create(dto)).rejects.toThrow(BadRequestException);
         await expect(service.create(dto)).rejects.toThrow(

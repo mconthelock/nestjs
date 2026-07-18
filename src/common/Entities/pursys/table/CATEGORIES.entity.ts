@@ -34,5 +34,6 @@ export class Categories {
     @OneToMany(() => CategoryAttributes, (attribute) => attribute.category, {
         cascade: true,
     })
+    @JoinColumn([{ name: 'CATEGORY_ID', referencedColumnName: 'CATEGORY_ID' }])
     attributes: CategoryAttributes[];
 }

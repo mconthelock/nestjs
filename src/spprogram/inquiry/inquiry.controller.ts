@@ -60,8 +60,49 @@ export class InquiryController {
     }
 
     @Get('designprocess')
-    @UseGuards(AuthGuard('jwt'))
+    // @UseGuards(AuthGuard('jwt'))
     async designProcess() {
-        return this.inq.designProcess();
+        //return this.inq.designProcess();
+        const data = await this.inq.search({
+            INQ_STATUS: '< 26',
+            IS_DETAILS: '1',
+        });
+
+        const source = Array.isArray(data) ? data : [];
+        let totalRows = 0;
+
+        for (let i = 0; i < source.length; i++) {
+            const rawDetails = source[i]?.details;
+            const details = Array.isArray(rawDetails)
+                ? rawDetails
+                : rawDetails
+                  ? [rawDetails]
+                  : [];
+            totalRows += details.length;
+        }
+
+        const rows = new Array(totalRows);
+        let cursor = 0;
+
+        for (let i = 0; i < source.length; i++) {
+            const inquiry = source[i];
+            const rawDetails = inquiry?.details;
+            const details = Array.isArray(rawDetails)
+                ? rawDetails
+                : rawDetails
+                  ? [rawDetails]
+                  : [];
+            if (details.length === 0) continue;
+
+            const { details: _omitDetails, ...header } = inquiry;
+            for (let j = 0; j < details.length; j++) {
+                rows[cursor++] = {
+                    ...header,
+                    details: [details[j]],
+                };
+            }
+        }
+
+        return rows;
     }
 }

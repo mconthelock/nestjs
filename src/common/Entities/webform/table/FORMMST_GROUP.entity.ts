@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity({ name: 'FORMMST_GROUP', schema: 'WEBFORM' })
 export class FORMMST_GROUP {
@@ -8,6 +8,6 @@ export class FORMMST_GROUP {
     @PrimaryColumn()
     VGROUP: string;
 
-    @PrimaryColumn()
+    @Column()
     VGROUPNAME: string;
 }

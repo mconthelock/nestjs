@@ -6,6 +6,7 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 import { SearchFormmstDto } from './dto/searchFormmst.dto';
 import { getSafeFields } from 'src/common/utils/Fields.utils';
 import { FORMMST } from 'src/common/Entities/webform/table/FORMMST.entity';
+import { FORMMST_GROUP } from 'src/common/Entities/webform/table/FORMMST_GROUP.entity';
 
 @Injectable()
 export class FormmstRepository extends BaseRepository {
@@ -75,5 +76,12 @@ export class FormmstRepository extends BaseRepository {
             query.addSelect(`A.${f}`, f);
         });
         return query.getRawMany();
+    }
+
+    // Form Group section
+    async findAllGroup() {
+        return this.manager
+            .createQueryBuilder(FORMMST_GROUP, 'FORMMST_GROUP')
+            .getMany();
     }
 }

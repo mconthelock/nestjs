@@ -4,9 +4,7 @@ import { FormmstRepository } from './formmst.repository';
 
 @Injectable()
 export class FormmstService {
-    constructor(
-        private readonly repo: FormmstRepository,
-    ) {}
+    constructor(private readonly repo: FormmstRepository) {}
 
     getFormMasterAll() {
         return this.repo.findAll();
@@ -41,5 +39,36 @@ export class FormmstService {
         } catch (error) {
             throw new Error('Get Form master Error: ' + error.message);
         }
+    }
+
+    async createFormMaster(groupData: any) {
+        // Implement the logic to create a new form master in the database
+        // You can use the FormmstRepository to handle the creation logic
+        //return this.repo.createFormMaster(groupData);
+        return '';
+    }
+
+    async updateFormMaster(
+        NNO: number,
+        VORGNO: string,
+        CYEAR: string,
+        groupData: any,
+    ) {
+        // Implement the logic to update an existing form master in the database
+        // You can use the FormmstRepository to handle the update logic
+        //return this.repo.updateFormMaster(NNO, VORGNO, CYEAR, groupData);
+        return '';
+    }
+
+    // Form master group methods
+    async getAllGroup() {
+        return this.repo.findAllGroup();
+    }
+
+    async createFormMasterGroup(groupData: any) {
+        // Implement the logic to create a new group in the database
+        // You can use the FormmstRepository to handle the creation logic
+        //return this.repo.createFormMasterGroup(groupData);
+        return '';
     }
 }

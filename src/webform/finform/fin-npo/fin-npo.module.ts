@@ -14,6 +14,7 @@ import { FINNPOVENDOR } from 'src/common/Entities/webform/table/FINNPO_VENDOR.en
 import { FINNPOEXPENSE } from 'src/common/Entities/webform/table/FINNPO_EXPENSE.entity';
 import { FINNPOCOSTCENTER } from 'src/common/Entities/webform/table/FINNPO_COSTCENTER.entity';
 import { FINNPOCURRENCY } from 'src/common/Entities/webform/table/FINNPO_Currency.entity';
+import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
 
 import {DSDUTYSTAMP } from  'src/common/Entities/webform/table/FINDS_DUTY_STAMP.entity'
@@ -27,7 +28,15 @@ import { HandleFileFormModule } from "src/webform/handle-file-form/handle-file-f
 @Module({
   imports:[
       TypeOrmModule.forFeature(
-          [FINNPOFORM, FINNPOINVOICE, FINNPOEXPENSE, FINNPOVENDOR, FINNPOCURRENCY],
+          [
+              FORM,
+              FINNPOFORM,
+              FINNPOINVOICE,
+              FINNPOEXPENSE,
+              FINNPOVENDOR,
+              FINNPOCOSTCENTER,
+              FINNPOCURRENCY,
+          ],
           'webformConnection',
       ),
       FormModule,

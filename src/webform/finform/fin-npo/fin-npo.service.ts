@@ -37,6 +37,16 @@ export interface ActionFinnpoDto {
     CEXTDATA?: string;
 }
 
+export interface FinnpoReportFilterDto {
+    formDateFrom?: string;
+    formDateTo?: string;
+    invoiceDateFrom?: string;
+    invoiceDateTo?: string;
+    expenseCode?: number | string;
+    vendorCode?: string;
+    costCenter?: string;
+}
+
 @Injectable()
 export class FinnpoService {
     constructor(
@@ -101,6 +111,57 @@ export class FinnpoService {
             status: true,
             message: 'Get FIN-NPO data success',
             data,
+        };
+    }
+
+    async findReport(dto: FinnpoReportFilterDto = {}) {
+        const filters = {
+            formDateFrom: this.validateReportDate(dto.formDateFrom, 'formDateFrom'),
+            formDateTo: this.validateReportDate(dto.formDateTo, 'formDateTo'),
+            invoiceDateFrom: this.validateReportDate(
+                dto.invoiceDateFrom,
+                'invoiceDateFrom',
+            ),
+            invoiceDateTo: this.validateReportDate(dto.invoiceDateTo, 'invoiceDateTo'),
+            expenseCode:
+                dto.expenseCode === undefined ||
+                dto.expenseCode === null ||
+                dto.expenseCode === ''
+                    ? undefined
+                    : Number(dto.expenseCode),
+            vendorCode: String(dto.vendorCode || '').trim() || undefined,
+            costCenter: String(dto.costCenter || '').trim() || undefined,
+        };
+
+        if (
+            filters.expenseCode !== undefined &&
+            !Number.isFinite(filters.expenseCode)
+        ) {
+            throw new BadRequestException('expenseCode must be a number');
+        }
+        if (
+            filters.formDateFrom &&
+            filters.formDateTo &&
+            filters.formDateFrom > filters.formDateTo
+        ) {
+            throw new BadRequestException(
+                'formDateFrom must not be later than formDateTo',
+            );
+        }
+        if (
+            filters.invoiceDateFrom &&
+            filters.invoiceDateTo &&
+            filters.invoiceDateFrom > filters.invoiceDateTo
+        ) {
+            throw new BadRequestException(
+                'invoiceDateFrom must not be later than invoiceDateTo',
+            );
+        }
+
+        return {
+            status: true,
+            message: 'Get FIN-NPO report success',
+            data: await this.repo.findReport(filters),
         };
     }
 
@@ -252,5 +313,19 @@ export class FinnpoService {
         ) {
             throw new BadRequestException('EXPENSE_CODE is required');
         }
+    }
+
+    private validateReportDate(value: string | undefined, field: string) {
+        if (!value) return undefined;
+        const date = String(value).trim();
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+            throw new BadRequestException(`${field} must use YYYY-MM-DD format`);
+        }
+
+        const parsed = new Date(`${date}T00:00:00Z`);
+        if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date) {
+            throw new BadRequestException(`${field} is not a valid date`);
+        }
+        return date;
     }
 }

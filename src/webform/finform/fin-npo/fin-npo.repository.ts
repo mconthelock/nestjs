@@ -16,6 +16,7 @@ import { FIN_FILE } from 'src/common/Entities/webform/table/FIN_FILE.entity';
 import { FINNPOEXPENSE } from 'src/common/Entities/webform/table/FINNPO_EXPENSE.entity';
 import { FINNPOVENDOR } from 'src/common/Entities/webform/table/FINNPO_VENDOR.entity';
 import { FINNPOCURRENCY } from 'src/common/Entities/webform/table/FINNPO_Currency.entity';
+import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
@@ -182,6 +183,122 @@ export class FinnpoRepository extends BaseRepository {
             vendor,
             expense,
         };
+    }
+
+    async findReport(filters: {
+        formDateFrom?: string;
+        formDateTo?: string;
+        invoiceDateFrom?: string;
+        invoiceDateTo?: string;
+        expenseCode?: number;
+        vendorCode?: string;
+        costCenter?: string;
+    }) {
+        const query = this.getRepository(FINNPOFORM)
+            .createQueryBuilder('HEAD')
+            .innerJoin(
+                FORM,
+                'FORM',
+                [
+                    'FORM.NFRMNO = HEAD.NFRMNO',
+                    'FORM.VORGNO = HEAD.VORGNO',
+                    'FORM.CYEAR = HEAD.CYEAR',
+                    'FORM.CYEAR2 = HEAD.CYEAR2',
+                    'FORM.NRUNNO = HEAD.NRUNNO',
+                ].join(' AND '),
+            )
+            .innerJoin(
+                FINNPOINVOICE,
+                'INVOICE',
+                'INVOICE.CYEAR2 = HEAD.CYEAR2 AND INVOICE.NRUNNO = HEAD.NRUNNO',
+            )
+            .leftJoin(
+                FINNPOEXPENSE,
+                'EXPENSE',
+                'EXPENSE.EXPENSE_CODE = HEAD.EXPENSE_CODE',
+            )
+            .leftJoin(
+                FINNPOVENDOR,
+                'VENDOR',
+                'VENDOR.VENDOR_CODE = HEAD.VENDOR_CODE',
+            )
+            .select('HEAD.NFRMNO', 'NFRMNO')
+            .addSelect('HEAD.VORGNO', 'VORGNO')
+            .addSelect('HEAD.CYEAR', 'CYEAR')
+            .addSelect('HEAD.CYEAR2', 'CYEAR2')
+            .addSelect('HEAD.NRUNNO', 'NRUNNO')
+            .addSelect("TO_CHAR(FORM.DREQDATE, 'YYYY-MM-DD')", 'FORM_DATE')
+            .addSelect('FORM.VREQNO', 'REQUEST_BY')
+            .addSelect('FORM.CST', 'STATUS')
+            .addSelect('HEAD.SUBJECT', 'SUBJECT')
+            .addSelect('HEAD.EXPENSE_CODE', 'EXPENSE_CODE')
+            .addSelect('EXPENSE.EXPENSE_ENAME', 'EXPENSE_TYPE')
+            .addSelect('HEAD.VENDOR_CODE', 'VENDOR_CODE')
+            .addSelect('VENDOR.VENDOR_NAME', 'VENDOR')
+            .addSelect("TO_CHAR(INVOICE.INVOICE_DATE, 'YYYY-MM-DD')", 'INVOICE_DATE')
+            .addSelect('INVOICE.INVOICE_NO', 'INVOICE_NO')
+            .addSelect('INVOICE.NET_PRICE', 'NET_PRICE')
+            .addSelect('INVOICE.TOTAL_AMT', 'TOTAL_AMOUNT')
+            .addSelect('INVOICE.SCURCODE', 'CURRENCY')
+            .addSelect(
+                `(SELECT LISTAGG(CC.COSTCODE, ', ') WITHIN GROUP (ORDER BY CC.COSTCODE)
+                    FROM WEBFORM.FINNPO_COSTCENTER CC
+                   WHERE CC.CYEAR2 = HEAD.CYEAR2
+                     AND CC.NRUNNO = HEAD.NRUNNO)`,
+                'COST_CENTER',
+            );
+
+        if (filters.formDateFrom) {
+            query.andWhere(
+                "TRUNC(FORM.DREQDATE) >= TO_DATE(:formDateFrom, 'YYYY-MM-DD')",
+                { formDateFrom: filters.formDateFrom },
+            );
+        }
+        if (filters.formDateTo) {
+            query.andWhere(
+                "TRUNC(FORM.DREQDATE) <= TO_DATE(:formDateTo, 'YYYY-MM-DD')",
+                { formDateTo: filters.formDateTo },
+            );
+        }
+        if (filters.invoiceDateFrom) {
+            query.andWhere(
+                "TRUNC(INVOICE.INVOICE_DATE) >= TO_DATE(:invoiceDateFrom, 'YYYY-MM-DD')",
+                { invoiceDateFrom: filters.invoiceDateFrom },
+            );
+        }
+        if (filters.invoiceDateTo) {
+            query.andWhere(
+                "TRUNC(INVOICE.INVOICE_DATE) <= TO_DATE(:invoiceDateTo, 'YYYY-MM-DD')",
+                { invoiceDateTo: filters.invoiceDateTo },
+            );
+        }
+        if (filters.expenseCode !== undefined) {
+            query.andWhere('HEAD.EXPENSE_CODE = :expenseCode', {
+                expenseCode: filters.expenseCode,
+            });
+        }
+        if (filters.vendorCode) {
+            query.andWhere('HEAD.VENDOR_CODE = :vendorCode', {
+                vendorCode: filters.vendorCode,
+            });
+        }
+        if (filters.costCenter) {
+            query.andWhere(
+                `EXISTS (
+                    SELECT 1 FROM WEBFORM.FINNPO_COSTCENTER FILTER_CC
+                     WHERE FILTER_CC.CYEAR2 = HEAD.CYEAR2
+                       AND FILTER_CC.NRUNNO = HEAD.NRUNNO
+                       AND UPPER(FILTER_CC.COSTCODE) LIKE :costCenter
+                )`,
+                { costCenter: `%${filters.costCenter.toUpperCase()}%` },
+            );
+        }
+
+        return query
+            .orderBy('FORM.DREQDATE', 'DESC')
+            .addOrderBy('HEAD.NRUNNO', 'DESC')
+            .addOrderBy('INVOICE.ID', 'ASC')
+            .getRawMany();
     }
 
 

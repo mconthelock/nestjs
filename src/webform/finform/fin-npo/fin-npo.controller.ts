@@ -9,6 +9,7 @@ import { getClientIP } from 'src/common/utils/ip.utils';
 import {
     ActionFinnpoDto,
     CreateFinnpoDto,
+    FinnpoReportFilterDto,
     FinnpoService,
 } from './fin-npo.service';
 
@@ -34,6 +35,11 @@ export class FinnpoController {
     @Get('currency')
     findAllCurrencyForShow() {
         return this.finnpoService.findAllCurrencyForShow();
+    }
+
+    @Post('report')
+    findReport(@Body() dto: FinnpoReportFilterDto) {
+        return this.finnpoService.findReport(dto);
     }
 
     @Get('show/:nfrmno/:vorgno/:cyear/:cyear2/:nrunno')

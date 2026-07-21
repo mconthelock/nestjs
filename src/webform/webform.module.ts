@@ -37,6 +37,7 @@ import { RnlistPpModule } from './rnlist_pp/rnlist_pp.module';
 import { RnwasteModule } from './rnwaste/rnwaste.module';
 import { RnsolveModule } from './rnsolve/rnsolve.module';
 import { RnfrmPartModule } from './rnfrm_part/rnfrm_part.module';
+import { WtypeModule } from './wtype/wtype.module';
 
 @Module({
     imports: [
@@ -81,6 +82,7 @@ import { RnfrmPartModule } from './rnfrm_part/rnfrm_part.module';
         RnwasteModule,
         RnsolveModule,
         RnfrmPartModule,
+        WtypeModule,
     ],
 })
 export class WebformModule {}

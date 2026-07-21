@@ -120,6 +120,7 @@ export class PackingListCreateService extends PackingListIssueService {
                     revision = nextRevision.revision;
                     revisionText = nextRevision.revisionText;
                 }
+                console.log('revision', revision, 'revisionText', revisionText);
 
                 let NDOCTYPE: number = 0;
                 let html: string = dto.HTML;
@@ -249,6 +250,8 @@ export class PackingListCreateService extends PackingListIssueService {
                     ],
                 });
             }
+            // throw new Error('Test error'); // ลองทดสอบ error handling
+
             for (const mail of mailObject) {
                 await this.sendMail(mail);
             }

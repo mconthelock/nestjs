@@ -344,17 +344,22 @@ export class PackingListIssueService {
     }): Promise<{ revision: number; revisionText: string }> {
         // 2026-06-27 เปลี่ยนเอา type และ round ออกจาก condition เพราะ revision จะไม่ขึ้นกับ type และ round แล้ว รันต่อเนื่องได้เลย
         // 2026-07-09 เพิ่ม typeId เพื่อใช้ในการหา revision ของ typeCode เป็น 'DF' (Draft) เพราะ Draft จะมี revision ต่อเนื่องแยกตาม typeId
+        const draftTypeId =
+            await this.dpmsPlIssueTypeService.findByTypeCode('DF');
         const revision: number =
             typeCode === 'DF'
                 ? await this.dpmsPlIssueRevService.getNextRevision({
                       ...plIssueData,
                       NISSUE_TYPE: typeId,
                   })
-                : await this.dpmsPlIssueRevService.getNextRevision({
-                      ...plIssueData,
-                      // NISSUE_TYPE: dto.ISSUETYPE,
-                      // NROUND: dto.NROUND,
-                  });
+                : await this.dpmsPlIssueRevService.getNextRevisionWithoutType(
+                      {
+                          ...plIssueData,
+                          // NISSUE_TYPE: dto.ISSUETYPE,
+                          // NROUND: dto.NROUND,
+                      },
+                      draftTypeId.data.NID,
+                  );
         const revisionText: string = numberToAlphabetRevision(revision);
         return { revision, revisionText };
     }

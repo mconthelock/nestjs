@@ -11,16 +11,6 @@ export class DpmsPlIssueRevService {
     async create(dto: CreateDpmsPlIssueRevDto) {
         try {
             let revision = dto.NREV;
-            if(!revision){
-                revision = await this.getNextRevision({
-                    VPROD: dto.VPROD,
-                    VP: dto.VP,
-                    VTYPE: dto.VTYPE,
-                    VORDERS: dto.VORDERS,
-                    // NISSUE_TYPE: dto.NISSUE_TYPE,
-                    // NROUND: dto.NROUND,
-                });
-            }
             const res = await this.repo.create({
                 ...dto,
                 NREV: revision,
@@ -46,6 +36,14 @@ export class DpmsPlIssueRevService {
         condition: dpmsPlIssueRevFindLatestRevision,
     ): Promise<number> {
         const lastRevision = await this.repo.findLatestRevision(condition);
+        return lastRevision ? lastRevision.NREV + 1 : 0;
+    }
+
+    async getNextRevisionWithoutType(
+        condition: dpmsPlIssueRevFindLatestRevision,
+        withOutType: number,    
+    ): Promise<number> {
+        const lastRevision = await this.repo.findLatestRevisionWithoutType(condition, withOutType);
         return lastRevision ? lastRevision.NREV + 1 : 0;
     }
 }

@@ -118,6 +118,29 @@ export class FinDsService {
             NRUNNO: Number(dto.NRUNNO),
         };
 
+        if (dto.ACTION === 'approve') {
+            const empno = String(dto.EMPNO || '').trim();
+            const flow = await this.flowservice.getFlowTree(form);
+            const isJobController = flow.some(
+                (step) =>
+                    this.isJobControllerCextData(step.CEXTDATA) &&
+                    [step.VAPVNO, step.VREPNO].some(
+                        (value) => String(value || '').trim() === empno,
+                    ),
+            );
+
+            if (isJobController) {
+                await this.flowservice.updateFlow({
+                    condition: { ...form, CSTEPST: '3', VAPVNO: empno },
+                    CAPPLYALL: '0',
+                });
+                await this.flowservice.updateFlow({
+                    condition: { ...form, CSTEPST: '3', VREPNO: empno },
+                    CAPPLYALL: '0',
+                });
+            }
+        }
+
         const doAction = await this.doactionFlowService.doAction(
             {
                 ...dto,

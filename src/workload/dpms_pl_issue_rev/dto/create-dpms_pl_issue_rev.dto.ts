@@ -70,4 +70,9 @@ export class CreateDpmsPlIssueRevDto {
     @IsNotEmpty()
     @IsString()
     VISSUEBY: string;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    NDOCTYPE: number;
 }

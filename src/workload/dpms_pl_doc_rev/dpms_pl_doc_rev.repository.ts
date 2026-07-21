@@ -7,7 +7,10 @@ import {
     SearchDpmsPlDocRevDto,
 } from './dto/create-dpms_pl_doc_rev.dto';
 import { DPMS_PL_DOC_REV } from 'src/common/Entities/workload/table/DPMS_PL_DOC_REV.entity';
-import { getPendingRecordParams, findPreviousRevisionExcludingIssueRevParams } from 'src/mfgreport/dpms/packing-list-issue/packing-list-issue.interface';
+import {
+    getPendingRecordParams,
+    findPreviousRevisionExcludingIssueRevParams,
+} from 'src/mfgreport/dpms/packing-list-issue/packing-list-issue.interface';
 
 @Injectable()
 export class DpmsPlDocRevRepository extends BaseRepository {
@@ -17,6 +20,19 @@ export class DpmsPlDocRevRepository extends BaseRepository {
 
     async create(dto: CreateDpmsPlDocRevDto) {
         return this.getRepository(DPMS_PL_DOC_REV).save(dto);
+    }
+
+    async update(
+        condition: {
+            VPROD: string;
+            VP: string;
+            VTYPE: string;
+            VORDERS: string;
+            NISSUEREV_ID: number;
+        },
+        data: Partial<CreateDpmsPlDocRevDto>,
+    ) {
+        return this.getRepository(DPMS_PL_DOC_REV).update(condition, data);
     }
 
     async getList(dto: SearchDpmsPlDocRevDto) {
@@ -51,7 +67,9 @@ export class DpmsPlDocRevRepository extends BaseRepository {
         // );
     }
 
-    async findPreviousRevisionExcludingIssueRev(condition: findPreviousRevisionExcludingIssueRevParams) {
+    async findPreviousRevisionExcludingIssueRev(
+        condition: findPreviousRevisionExcludingIssueRevParams,
+    ) {
         return this.getRepository(DPMS_PL_DOC_REV).find({
             where: {
                 VPROD: condition.VPROD,

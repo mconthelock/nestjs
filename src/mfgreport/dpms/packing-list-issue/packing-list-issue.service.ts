@@ -19,6 +19,7 @@ import {
     prepareDocRevisionDataParams,
     syncDocRevisionAndPlIssueParams,
     saveDocRevisionParams,
+    IdocRevData,
 } from './packing-list-issue.interface';
 import { DpmsPlFileService } from 'src/workload/dpms_pl_file/dpms_pl_file.service';
 import { DpmsPlCaseListService } from 'src/workload/dpms_pl_case_list/dpms_pl_case_list.service';
@@ -82,20 +83,24 @@ export class PackingListIssueService {
      * @typedef genaratePath
      * @property {string} prod e.g. 2026021
      * @property {string} order e.g. EXS916013
+     * @property {string} folderPath e.g. 'AMEC'
      * @returns {Promise<string>} finalPath e.g. \\amecnas\AMECWEB\File\development\mfgreport\packing-list\2026\02X\EXS916013
      * @example
      * const finalPath = await this.genaratePath({
      *   prod: '2026021',
      *   orders: 'EXS916013',
+     *   folderPath: 'AMEC',
      * });
-     * console.log(finalPath);  // \\amecnas\AMECWEB\File\development\mfgreport\packing-list\2026\02X\EXS916013
+     * console.log(finalPath);  // \\amecnas\AMECWEB\File\development\mfgreport\packing-list\2026\02X\EXS916013\AMEC
      */
     protected async genaratePath({
         prod,
         orders,
+        folderPath,
     }: {
         prod: string;
         orders: string;
+        folderPath: string;
     }): Promise<string> {
         const converted = convertJung(prod);
         if (!converted) {
@@ -108,6 +113,7 @@ export class PackingListIssueService {
             fyear,
             jung,
             orders,
+            folderPath,
             // issueType.data.VDESCRIPTION,
         );
         return finalPath;
@@ -150,7 +156,7 @@ export class PackingListIssueService {
         recreatedIssue,
     }: syncDocRevisionAndPlIssueParams): Promise<number> {
         let docRevision: number = 0;
-        if(typeCode === 'DF'){
+        if (typeCode === 'DF') {
             return docRevision; // ถ้าเป็น Draft ให้ return 0 เพราะไม่ใช้
         }
 
@@ -218,27 +224,23 @@ export class PackingListIssueService {
         docRevision,
         revise,
         recreatedIssue,
-    }: prepareDocRevisionDataParams): Promise<{
-        docRevData: any;
-    }> {
-        let docRevData: any = plIssueData;
+    }: prepareDocRevisionDataParams): Promise<IdocRevData> {
         // 2. ถ้าเป็น complete, combine, balance ให้ set DFINISHALL เป็นวันที่ issue เลย
         if (
             ['CP', 'CB', 'BL'].includes(typeCode) ||
             (revise && ['PT', 'SP'].includes(typeCode) && !recreatedIssue)
         ) {
-            docRevData = {
-                ...docRevData,
+            return {
+                ...plIssueData,
                 NREV: docRevision,
                 DFINISHALL: finishDate,
             };
         } else {
-            docRevData = {
-                ...docRevData,
+            return {
+                ...plIssueData,
                 NREV: docRevision,
             };
         }
-        return docRevData;
     }
 
     protected async saveDocRevision({
@@ -257,10 +259,11 @@ export class PackingListIssueService {
         };
         // ถ้า typeCode ไม่ใช่ Draft ให้สร้าง record ใน DPMS_PL_DOC_REV และ update DFINISHALL ของ record ที่ยังไม่ finish ของเอกสารนี้
         if (typeCode !== 'DF') {
-            await this.dpmsPlDocRevService.create({
+            const docData = {
                 ...docRevData,
                 NISSUEREV_ID: issueRevID,
-            });
+            };
+            await this.dpmsPlDocRevService.create(docData);
             // หากเป็น Partial หรือ Separate และไม่มีการเปลี่ยนแปลงรายการ
             // ให้ update DFINISHALL และ ดึงรายการอื่นนอกจากรายการที่แก้ไขมาด้วย
             console.log('doc rev data ', docRevData);
@@ -341,16 +344,17 @@ export class PackingListIssueService {
     }): Promise<{ revision: number; revisionText: string }> {
         // 2026-06-27 เปลี่ยนเอา type และ round ออกจาก condition เพราะ revision จะไม่ขึ้นกับ type และ round แล้ว รันต่อเนื่องได้เลย
         // 2026-07-09 เพิ่ม typeId เพื่อใช้ในการหา revision ของ typeCode เป็น 'DF' (Draft) เพราะ Draft จะมี revision ต่อเนื่องแยกตาม typeId
-        const revision: number = typeCode === 'DF' 
-            ? await this.dpmsPlIssueRevService.getNextRevision({
-                ...plIssueData,
-                NISSUE_TYPE: typeId,
-            })
-            : await this.dpmsPlIssueRevService.getNextRevision({
-                ...plIssueData,
-                // NISSUE_TYPE: dto.ISSUETYPE,
-                // NROUND: dto.NROUND,
-            });
+        const revision: number =
+            typeCode === 'DF'
+                ? await this.dpmsPlIssueRevService.getNextRevision({
+                      ...plIssueData,
+                      NISSUE_TYPE: typeId,
+                  })
+                : await this.dpmsPlIssueRevService.getNextRevision({
+                      ...plIssueData,
+                      // NISSUE_TYPE: dto.ISSUETYPE,
+                      // NROUND: dto.NROUND,
+                  });
         const revisionText: string = numberToAlphabetRevision(revision);
         return { revision, revisionText };
     }
@@ -377,8 +381,9 @@ export class PackingListIssueService {
         issueType,
         orders,
         projectName,
+        PO,
     }: generateFilenameParams): string {
-        const fileName: string = `${projectName}_${orders}${revision > 0 ? `_${revisionText}` : ''}_${issueType}.pdf`;
+        const fileName: string = `${projectName}_${orders}${revision > 0 ? `_${revisionText}` : ''}_${issueType}${PO ? `_(PO)` : ''}.pdf`;
         const newFileName: string = fileName.replace(/[\\/:*?"<>|]/g, '_');
         return newFileName;
     }

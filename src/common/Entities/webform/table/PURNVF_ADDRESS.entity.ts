@@ -8,6 +8,7 @@ import {
     PrimaryColumn,
 } from 'typeorm';
 import { PURNVF_FORM } from './PURNVF_FORM.entity';
+import { PUREVA_FORM } from './PUREVA_FORM.entity';
 
 
 @Entity({ name: 'PURNVF_ADDRESS', schema: 'WEBFORM' })
@@ -58,5 +59,13 @@ export class PURNVF_ADDRESS{
     @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
     @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
     MASTER_NVFADDR: PURNVF_FORM;
+
+    @ManyToOne(() => PUREVA_FORM, (eva) => eva.ADDRESSES)
+    @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+    @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
+    @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
+    @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+    @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+    MASTER_EVAADDR: PUREVA_FORM;
 
 }

@@ -30,6 +30,7 @@ import { MfgEdrModule } from './mfgform/mfg-edr/mfg-edr.module';
 // FIN-PCK
 import { FinpckFormModule } from './finform/fin-pck/finpck_form/finpck_form.module';
 import { FinpckAssetModule } from './finform/fin-pck/finpck_asset/finpck_asset.module';
+import { RnfrmModule } from './rnfrm/rnfrm.module';
 
 @Module({
     imports: [
@@ -66,6 +67,7 @@ import { FinpckAssetModule } from './finform/fin-pck/finpck_asset/finpck_asset.m
         //FIN-PCK
         FinpckFormModule,
         FinpckAssetModule,
+        RnfrmModule,
     ],
 })
 export class WebformModule {}

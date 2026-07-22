@@ -133,7 +133,8 @@ export class CreateIeBgrDto {
     @IsNumber()
     REQAMT: number;
 
-    @IsNotEmpty()
+    // @IsNotEmpty()
+    @IsOptional()
     @Transform(({ value }) =>
         typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
     )

@@ -68,7 +68,6 @@ import { WtypeSecpicModule } from './wtype_secpic/wtype_secpic.module';
         STFormModule,
         RqflistModule,
         VorgmstModule,
-        MfgOrModule,
         GrpmstModule,
         // OMG
         MfgEdrModule,

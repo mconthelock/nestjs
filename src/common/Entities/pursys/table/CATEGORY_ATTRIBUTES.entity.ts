@@ -1,5 +1,11 @@
 import { Categories } from './CATEGORIES.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    ManyToOne,
+    JoinColumn,
+} from 'typeorm';
 
 export enum AttributeType {
     TEXT = 'text',
@@ -50,5 +56,6 @@ export class CategoryAttributes {
     @ManyToOne(() => Categories, (category) => category.CATEGORY_ID, {
         onDelete: 'CASCADE',
     })
+    @JoinColumn([{ name: 'CATEGORY_ID', referencedColumnName: 'CATEGORY_ID' }])
     category: Categories;
 }

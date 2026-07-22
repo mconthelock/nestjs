@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { WTYPE_SECPIC } from 'src/common/Entities/webform/table/WTYPE_SECPIC.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
+import { SECPIC } from 'src/common/Entities/webform/table/SECPIC.entity';
 
 @Injectable()
 export class WtypeSecpicRepository extends BaseRepository {
@@ -41,15 +41,14 @@ export class WtypeSecpicRepository extends BaseRepository {
 
   findSectionsByWtype(tid: number) {
     return this.manager
-      .createQueryBuilder()
-      .select('S.SEC', 'SEC')
-      .addSelect('S.SECCODE', 'SECCODE')
-      .from('WEBFORM.WTYPE_SECPIC', 'W')
+      .createQueryBuilder(WTYPE_SECPIC, 'W')
       .innerJoin(
-        'WEBFORM.SECPIC',
+        SECPIC,
         'S',
         'S.SECID = W.SECID',
       )
+      .select('S.SEC', 'SEC')
+      .addSelect('S.SECCODE', 'SECCODE')
       .where('W.TID = :tid', {
         tid: Number(tid),
       })

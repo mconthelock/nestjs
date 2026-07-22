@@ -1,8 +1,6 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { FiltersDto } from 'src/common/dto/filter.dto';
-
 import { WtypeSecpicService } from './wtype_secpic.service';
 
 @Controller('webform/wtype-secpic')
@@ -14,6 +12,13 @@ export class WtypeSecpicController {
   @Get()
   findAll() {
     return this.wtypeSecpicService.findAll();
+  }
+
+  @Get('sections/:tid')
+  findSectionsByWtype(
+    @Param('tid') tid: number,
+  ) {
+    return this.wtypeSecpicService.findSectionsByWtype(tid);
   }
 
   @Get(':tid/:secid')
@@ -29,4 +34,6 @@ export class WtypeSecpicController {
   search(@Body() dto: FiltersDto) {
     return this.wtypeSecpicService.search(dto);
   }
+
+
 }

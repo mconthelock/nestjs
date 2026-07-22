@@ -38,6 +38,8 @@ import { RnwasteModule } from './rnwaste/rnwaste.module';
 import { RnsolveModule } from './rnsolve/rnsolve.module';
 import { RnfrmPartModule } from './rnfrm_part/rnfrm_part.module';
 import { WtypeModule } from './wtype/wtype.module';
+import { SecpicModule } from './secpic/secpic.module';
+import { WtypeSecpicModule } from './wtype_secpic/wtype_secpic.module';
 
 @Module({
     imports: [
@@ -83,6 +85,8 @@ import { WtypeModule } from './wtype/wtype.module';
         RnsolveModule,
         RnfrmPartModule,
         WtypeModule,
+        SecpicModule,
+        WtypeSecpicModule,
     ],
 })
 export class WebformModule {}

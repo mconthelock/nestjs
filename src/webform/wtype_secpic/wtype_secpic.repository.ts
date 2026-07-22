@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { FiltersDto } from 'src/common/dto/filter.dto';
-import { WTYPE_SECPIC } from 'src/common/Entities/webform/table/WTYPE_SECPIC.entity';
+import { WTYPE_SECPIC } from 'src/webform/wtype_secpic/entities/wtype_secpic.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { SECPIC } from 'src/common/Entities/webform/table/SECPIC.entity';
+import { SECPIC } from 'src/webform/secpic/entities/secpic.entity';
 
 @Injectable()
 export class WtypeSecpicRepository extends BaseRepository {

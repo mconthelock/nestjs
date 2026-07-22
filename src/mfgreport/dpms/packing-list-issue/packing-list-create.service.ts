@@ -18,6 +18,7 @@ import { DpmsPlMailService } from 'src/workload/dpms_pl_mail/dpms_pl_mail.servic
 import { DpmsPlDocRevService } from 'src/workload/dpms_pl_doc_rev/dpms_pl_doc_rev.service';
 import { PackingListIssueService } from './packing-list-issue.service';
 import { joinPaths } from 'src/common/utils/files.utils';
+import { ExcelService } from './services/excel.service';
 
 @Injectable()
 export class PackingListCreateService extends PackingListIssueService {
@@ -33,6 +34,7 @@ export class PackingListCreateService extends PackingListIssueService {
         protected readonly dpmsPlMailService: DpmsPlMailService,
         protected readonly dpmsPlDocRevService: DpmsPlDocRevService,
         protected readonly mailService: MailService,
+        private readonly excelService: ExcelService,
     ) {
         super(
             PDFService,
@@ -88,6 +90,7 @@ export class PackingListCreateService extends PackingListIssueService {
                 }
 
                 const pdfPath: string = await joinPaths(finalPath, 'pdf');
+                const excelPath: string = await joinPaths(finalPath, 'excel');
 
                 if (r == 1) {
                     // 1. หา revision ของชุดเอกสาร และทำการเพิ่มหรืออัปเดต DPMS_PL_ISSUE ตามเงื่อนไขที่กำหนด
@@ -149,6 +152,17 @@ export class PackingListCreateService extends PackingListIssueService {
                         issueDate,
                         finalPath: pdfPath,
                     });
+                
+                const excel = await this.excelService.generateExcelFile({
+                    list: plList,
+                    shippingMark: dto.SHIPPING_MARK,
+                    path: excelPath,
+                    fileName: fileName,
+                    order: dto.VORDERS,
+                    subject: dto.HEADER.VSUBJECT,
+                    project: dto.HEADER.VNAMEOFBLDG
+                });
+                throw new Error('test');
 
                 // 5. add file Data to DB
                 const insertFile = await this.dpmsPlFileService.create({

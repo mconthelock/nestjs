@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { SECPIC } from 'src/common/Entities/webform/table/SECPIC.entity';
+import { SECPIC } from 'src/webform/secpic/entities/secpic.entity';
 
 import { SecpicController } from './secpic.controller';
 import { SecpicRepository } from './secpic.repository';

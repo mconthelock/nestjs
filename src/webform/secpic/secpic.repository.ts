@@ -4,7 +4,7 @@ import { DataSource } from 'typeorm';
 
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
-import { SECPIC } from 'src/common/Entities/webform/table/SECPIC.entity';
+import { SECPIC } from 'src/webform/secpic/entities/secpic.entity';
 
 @Injectable()
 export class SecpicRepository extends BaseRepository {

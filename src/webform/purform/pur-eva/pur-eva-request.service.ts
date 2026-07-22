@@ -84,6 +84,35 @@ export class PurNvfRequestService  {
                 ...purevadata
             };
             await this.repo.create(purevaForm);
+            const addr = [];
+            let addid = 0;
+            if(ADDRESS_EN && ADDRESS_EN.trim().length > 0){
+                addid++;
+                addr.push({
+                    ADDRID : addid,
+                    ADDRTYPE : 'E',
+                    ADDR : ADDRESS_EN,
+                    SUBDISTRICT : SUB_DISTRICT_EN,
+                    DISTRICT : DISTRICT_EN,
+                    PROVINCE : PROVINCE_EN,
+                    COUNTRY : COUNTRY_EN,
+                    POSTCODE : POSTCODE_EN
+
+                })
+            }
+            if(data.ADDRESS_TH && data.ADDRESS_TH.trim().length > 0){
+                addid++;
+                addr.push({
+                    ADDRID : addid,
+                    ADDRTYPE : 'T',
+                    ADDR : data.ADDRESS_TH,
+                    SUBDISTRICT : data.SUB_DISTRICT_TH,
+                    DISTRICT : data.DISTRICT_TH,
+                    PROVINCE : data.PROVINCE_TH,
+                    COUNTRY : data.COUNTRY_TH,
+                    POSTCODE : data.POSTCODE_TH
+                })
+            }
 
 
 

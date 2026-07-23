@@ -113,11 +113,20 @@ export class PurNvfRequestService  {
                     POSTCODE : data.POSTCODE_TH
                 })
             }
+            for(const a of addr){
+                await this.repoaddr.insert({
+                    ...form,
+                    ...a
+                })
+            }
+            await this.reposcore.createMultipleScores(form,SCORES);
+            await this.repoprofit.createMultipleProfits(form,PROFIT_TURNOVERS);
+            await this.reporelation.createMultipleRelations(form,RELATIONS);
 
-
-
-
-
+        return {
+                status: true,
+                message: 'Request successful',
+        };
         } catch (error) {
             await Promise.allSettled([
                 ...movedTargets.map((p) => deleteFile(p)), // - ลบไฟล์ที่ "ปลายทาง" ทั้งหมดที่ย้ายสำเร็จไปแล้ว (กัน orphan file)

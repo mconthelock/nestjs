@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { setListForHtml } from '../builders/list.builder';
-import { GenerateExcelParam } from '../interface/excel.interface';
+import { GenerateExcelParam, GenerateExcelResult } from '../interface/excel.interface';
 import { CreateDataForHTMLResult } from '../interface/list-builder.interface';
 import {
     defaultExcel,
     getBufferFromExcel,
     saveExcelFile,
 } from 'src/common/utils/exceljs';
+import { joinPaths, makeDirIfNotExists } from 'src/common/utils/files.utils';
 
 @Injectable()
 export class ExcelService {
@@ -18,9 +19,7 @@ export class ExcelService {
         order,
         subject,
         project,
-    }: GenerateExcelParam): Promise<{
-        data: Buffer;
-    }> {
+    }: GenerateExcelParam): Promise<GenerateExcelResult> {
         const listForHtml: CreateDataForHTMLResult = setListForHtml(
             list,
             'excel',
@@ -40,12 +39,14 @@ export class ExcelService {
                 { key: 'VPART', header: 'DESCRIPTION' },
                 { key: 'VDRAWING', header: 'DRAWING NO.' },
                 { key: 'NQTY', header: 'QTY' },
-                { key: 'VDNETRAWING', header: 'NET' },
+                { key: 'NET', header: 'NET' },
                 { key: 'GROSS', header: 'GRS' },
                 { key: 'DIMENSION', header: 'DIMENSION(CM)' },
                 { key: 'VOLUME', header: 'VOLUME' },
             ],
             font: { bold: false },
+            alignment: { body: undefined },
+            extraWidth: 2,
             startRow: startRow,
             manual: true,
             manualActions: (sheet) => {
@@ -80,18 +81,19 @@ export class ExcelService {
         const buffer = await getBufferFromExcel(workbook);
 
         // กำหนด path ที่ต้องการบันทึก
-        const filePath = `${path}/${fileName}.xlsx`;
+        const fileNameWithoutExt = fileName.replace(/\.(pdf|PDF)$/i, '');
+        const fileNameWithExt = `${fileNameWithoutExt}.xlsx`;
+        const filePath = await joinPaths(path, fileNameWithExt);
+
+        await makeDirIfNotExists(path); // ตรวจสอบและสร้างโฟลเดอร์ถ้าไม่อยู่
 
         // บันทึกไฟล์ลง path
         await saveExcelFile(workbook, filePath);
 
         return {
             data: buffer,
+            fileName: fileNameWithExt,
+            filePath: path,
         };
-    }
-
-    private setListForExcel(listForHtml: CreateDataForHTMLResult): any[] {
-        const data = listForHtml.data.flatMap((item) => item.DETAILS);
-        return data;
     }
 }

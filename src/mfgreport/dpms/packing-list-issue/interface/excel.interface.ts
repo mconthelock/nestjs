@@ -9,3 +9,9 @@ export interface GenerateExcelParam {
     subject: string;
     project: string;
 }
+
+export interface GenerateExcelResult {
+    data: Buffer;
+    fileName: string;
+    filePath: string;
+}

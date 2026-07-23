@@ -42,10 +42,10 @@ export class CreateDpmsPlIssueRevDto {
     @Type(() => Number)
     NPDFID: number;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    NEXCELID?: number;
+    NEXCELID: number;
 
     @IsNotEmpty()
     @IsString()

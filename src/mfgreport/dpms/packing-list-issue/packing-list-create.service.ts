@@ -17,8 +17,9 @@ import { DpmsPlIssueDateService } from 'src/workload/dpms_pl_issue_date/dpms_pl_
 import { DpmsPlMailService } from 'src/workload/dpms_pl_mail/dpms_pl_mail.service';
 import { DpmsPlDocRevService } from 'src/workload/dpms_pl_doc_rev/dpms_pl_doc_rev.service';
 import { PackingListIssueService } from './packing-list-issue.service';
-import { joinPaths } from 'src/common/utils/files.utils';
+import { joinPaths, deleteFile } from 'src/common/utils/files.utils';
 import { ExcelService } from './services/excel.service';
+import { GenerateExcelResult } from './interface/excel.interface';
 
 @Injectable()
 export class PackingListCreateService extends PackingListIssueService {
@@ -52,6 +53,11 @@ export class PackingListCreateService extends PackingListIssueService {
     }
 
     async issue(dto: CreatePackingListIssueDto) {
+        const listFilePath: {
+            fileName: string;
+            filePath: string;
+            type: 'pdf' | 'excel';
+        }[] = [];
         try {
             const issueDate: string = now('DD/MM/YYYY');
             const finishDate: Date = new Date();
@@ -152,31 +158,52 @@ export class PackingListCreateService extends PackingListIssueService {
                         issueDate,
                         finalPath: pdfPath,
                     });
-                
-                const excel = await this.excelService.generateExcelFile({
-                    list: plList,
-                    shippingMark: dto.SHIPPING_MARK,
-                    path: excelPath,
+
+                listFilePath.push({
                     fileName: fileName,
-                    order: dto.VORDERS,
-                    subject: dto.HEADER.VSUBJECT,
-                    project: dto.HEADER.VNAMEOFBLDG
+                    filePath: pdfPath,
+                    type: 'pdf',
                 });
-                throw new Error('test');
+
+                const excel: GenerateExcelResult =
+                    await this.excelService.generateExcelFile({
+                        list: plList,
+                        shippingMark: dto.SHIPPING_MARK,
+                        path: excelPath,
+                        fileName: fileName,
+                        order: dto.VORDERS,
+                        subject: dto.HEADER.VSUBJECT,
+                        project: dto.HEADER.VNAMEOFBLDG,
+                    });
+
+                listFilePath.push({
+                    fileName: excel.fileName,
+                    filePath: excel.filePath,
+                    type: 'excel',
+                });
 
                 // 5. add file Data to DB
-                const insertFile = await this.dpmsPlFileService.create({
-                    VFILE_ONAME: fileName,
-                    VFILE_FNAME: fileName,
-                    VFILE_USERCREATE: dto.VISSUEBY,
-                    NFILE_TYPE: dto.ISSUETYPE,
-                    VFILE_PATH: pdfPath,
-                });
-
-                if (insertFile.status === false) {
-                    throw new Error(
-                        'Failed to insert packing list file record',
-                    );
+                let pdfID: number = null;
+                let excelID: number = null;
+                for (const file of listFilePath) {
+                    const insertFile = await this.dpmsPlFileService.create({
+                        VFILE_ONAME: file.fileName,
+                        VFILE_FNAME: file.fileName,
+                        VFILE_USERCREATE: dto.VISSUEBY,
+                        NFILE_TYPE: dto.ISSUETYPE,
+                        VFILE_PATH: file.filePath,
+                    });
+                    if (insertFile.status === false) {
+                        throw new Error(
+                            'Failed to insert packing list file record',
+                        );
+                    }
+                    pdfID =
+                        file.type === 'pdf' ? insertFile.data.NFILE_ID : pdfID;
+                    excelID =
+                        file.type === 'excel'
+                            ? insertFile.data.NFILE_ID
+                            : excelID;
                 }
 
                 // 6. create PL Issue Revision record
@@ -185,7 +212,8 @@ export class PackingListCreateService extends PackingListIssueService {
                     NISSUE_TYPE: dto.ISSUETYPE,
                     NREV: revision,
                     VREVTEXT: revisionText,
-                    NPDFID: insertFile.data.NFILE_ID,
+                    NPDFID: pdfID,
+                    NEXCELID: excelID,
                     VSHOPORDERNO: dto.HEADER.VSHOPORDERNO,
                     VSUBJECT: dto.HEADER.VSUBJECT,
                     VNAMEOFBLDG: dto.HEADER.VNAMEOFBLDG,
@@ -201,6 +229,7 @@ export class PackingListCreateService extends PackingListIssueService {
                     );
                 }
                 console.log('insert Issue rev', insertIssueRev.data);
+                // throw new Error('Test error'); // ลองทดสอบ error handling
 
                 // 7. insert record to DPMS_PL_DOC_REV for this issue
                 if (r == 1) {
@@ -223,7 +252,6 @@ export class PackingListCreateService extends PackingListIssueService {
                         { NPOID: insertIssueRev.data.NID },
                     );
                 }
-
 
                 // 9. Create PL Issue List record
                 for (const list of plList) {
@@ -261,19 +289,23 @@ export class PackingListCreateService extends PackingListIssueService {
                             filename: fileName,
                             content: pdf.data,
                         },
+                        {
+                            filename: excel.fileName,
+                            content: excel.data,
+                        },
                     ],
                 });
             }
-            // throw new Error('Test error'); // ลองทดสอบ error handling
 
-            for (const mail of mailObject) {
-                await this.sendMail(mail);
-            }
+            // throw new Error('Test error'); // ลองทดสอบ error handling
             // 12. Get issue date from DPMS_PL_ISSUE_DATE view for update dataTable
             const issueData =
                 await this.dpmsPlIssueDateService.findOne(plIssueData);
             if (!issueData.status) {
                 throw new Error('Failed to find DPMS PL Issue Date');
+            }
+            for (const mail of mailObject) {
+                await this.sendMail(mail);
             }
             return {
                 status: true,
@@ -281,6 +313,14 @@ export class PackingListCreateService extends PackingListIssueService {
                 data: issueData.data,
             };
         } catch (error) {
+            for (const file of listFilePath) {
+                const filePath: string = await joinPaths(
+                    file.filePath,
+                    file.fileName,
+                );
+                console.log('Deleting file:', filePath);
+                await deleteFile(filePath);
+            }
             throw new Error(`Failed to issue packing list: ${error.message}`);
         }
     }

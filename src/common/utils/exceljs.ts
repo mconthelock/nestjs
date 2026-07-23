@@ -1,23 +1,59 @@
 import * as ExcelJS from 'exceljs';
 import { toExcelDate } from './dayjs.utils';
 
-export async function defaultExcel({
-    data = [],
-    column = [],
-    sheetName = 'Sheet1',
-    font = { bold: true }, // ทำให้ตัวหนา
-    alignment = {
-        vertical: 'middle' as const,
-        horizontal: 'center' as const,
-        body: { vertical: 'top' as const, horizontal: 'left' as const, wrapText: true },
-    }, // จัดข้อความให้อยู่ตรงกลาง
-    extraWidth = 8,
-    manual = false,
-    manualActions = (sheet: ExcelJS.Worksheet) => {},
-    autoWidth = true,
-    autoHeight = true,
-    startRow = 1,
-} = {}) {
+export async function defaultExcel(
+    options: {
+        data?: any[];
+        column?: {
+            key: string;
+            header: string;
+            type?: 'string' | 'number' | 'date';
+            numFmt?: string;
+            bullet?: boolean;
+            join?: string;
+            width?: number;
+        }[];
+        sheetName?: string;
+        font?: { bold: boolean };
+        alignment?: {
+            vertical?: 'top' | 'middle' | 'bottom';
+            horizontal?: 'left' | 'center' | 'right';
+            body?: {
+                vertical?: 'top' | 'middle' | 'bottom';
+                horizontal?: 'left' | 'center' | 'right';
+                wrapText?: boolean;
+            };
+        };
+        extraWidth?: number;
+        manual?: boolean;
+        manualActions?: (sheet: ExcelJS.Worksheet) => void;
+        autoWidth?: boolean;
+        autoHeight?: boolean;
+        startRow?: number;
+    } = {},
+) {
+    const {
+        data = [],
+        column = [],
+        sheetName = 'Sheet1',
+        font = { bold: true }, // ทำให้ตัวหนา
+        alignment = {
+            vertical: 'middle' as const,
+            horizontal: 'center' as const,
+            body: {
+                vertical: 'top' as const,
+                horizontal: 'left' as const,
+                wrapText: true,
+            },
+        }, // จัดข้อความให้อยู่ตรงกลาง
+        extraWidth = 8,
+        manual = false,
+        manualActions = (sheet: ExcelJS.Worksheet) => {},
+        autoWidth = true,
+        autoHeight = true,
+        startRow = 1,
+    } = options;
+
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet(sheetName); // เพื่มชีท และตั้งชื่อชีท
     const alignments = {
@@ -28,17 +64,38 @@ export async function defaultExcel({
             horizontal: alignment?.body?.horizontal ?? 'left',
             wrapText: alignment?.body?.wrapText ?? true,
         },
+        ...alignment,
     };
 
-    // ตั้งชื่อ column และ key เพื่อให้สอดคล้องกับข้อมูล
-    sheet.columns = column.map((col) => {
-        const formatted = { ...col };
-        if (col.type === 'date')
-            formatted.style = { numFmt: col.numFmt || 'yyyy-mm-dd' };
-        if (col.type === 'number')
-            formatted.style = { numFmt: col.numFmt || '0' };
-        return formatted;
+    // เว้นแถวว่าง
+    for (let i = 1; i < startRow; i++) {
+        sheet.addRow([]);
+    }
+
+    // เพิ่มหัวด้วยตัวเอง แทนการใช้ sheet.columns
+    const headerRow = sheet.addRow(column.map((col) => col.header));
+    headerRow.font = font;
+    headerRow.alignment = alignments;
+
+    // กำหนด key ให้แต่ละคอลัมน์
+    column.forEach((col, index) => {
+        const excelCol = sheet.getColumn(index + 1);
+        excelCol.key = col.key;
+        if (col.type === 'date') {
+            excelCol.numFmt = col.numFmt || 'yyyy-mm-dd';
+        } else if (col.type === 'number') {
+            excelCol.numFmt = col.numFmt || '0';
+        }
     });
+    // ตั้งชื่อ column และ key เพื่อให้สอดคล้องกับข้อมูล
+    // sheet.columns = column.map((col) => {
+    //     const formatted = { ...col };
+    //     if (col.type === 'date')
+    //         formatted.style = { numFmt: col.numFmt || 'yyyy-mm-dd' };
+    //     if (col.type === 'number')
+    //         formatted.style = { numFmt: col.numFmt || '0' };
+    //     return formatted;
+    // });
 
     const typedRows = data.map((row) => {
         const o = {};
@@ -66,17 +123,9 @@ export async function defaultExcel({
         return o;
     });
 
-    // เว้นแถวว่าง
-    for (let i = 1; i < startRow; i++) {
-        sheet.addRow([]);
-    }
-
     // เพิ่มข้อมูลใน Sheet
     sheet.addRows(typedRows);
 
-    const headerRow = sheet.getRow(1);
-    headerRow.font = font;
-    headerRow.alignment = alignments;
     // ตรวจสอบว่ามีฟังก์ชัน manualActions หรือไม่
     if (manual) {
         manualActions(sheet); // ส่ง sheet เพื่อให้ปรับแต่งตามที่กำหนด
@@ -111,7 +160,7 @@ export async function defaultExcel({
             let maxLines = 1;
             row.eachCell({ includeEmpty: true }, (cell) => {
                 const lines = cell.value
-                    ? cell.value.toString().split("\n").length
+                    ? cell.value.toString().split('\n').length
                     : 1;
                 if (lines > maxLines) {
                     maxLines = lines;
@@ -124,12 +173,16 @@ export async function defaultExcel({
     return workbook;
 }
 
-
-export async function saveExcelFile(workbook: ExcelJS.Workbook, filePath: string) {
+export async function saveExcelFile(
+    workbook: ExcelJS.Workbook,
+    filePath: string,
+) {
     await workbook.xlsx.writeFile(filePath);
 }
 
-export async function getBufferFromExcel(workbook: ExcelJS.Workbook): Promise<Buffer> {
+export async function getBufferFromExcel(
+    workbook: ExcelJS.Workbook,
+): Promise<Buffer> {
     const excelBuffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(excelBuffer);
 }

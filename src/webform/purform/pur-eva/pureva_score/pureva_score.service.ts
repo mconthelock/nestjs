@@ -29,7 +29,7 @@ async createMultipleScores(formDto:FormDto , scores:RequestPurevaScoreDto[]) {
                 // ใช้ค่าจาก FormDto เป็นหัวขบวน
                 ...formDto,
                 ...item,
-                ID: runningId, 
+                EVAID: runningId, 
               };
             });
 

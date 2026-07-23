@@ -29,7 +29,7 @@ import { PurevaVendorRelationService } from './pureva_vendor_relation/pureva_ven
 
 
 @Injectable()
-export class PurNvfRequestService  {
+export class PurEvaRequestService  {
     constructor(
         protected readonly repo: PurevaFormService,
         protected readonly repoaddr: PurnvfAddressRepository,

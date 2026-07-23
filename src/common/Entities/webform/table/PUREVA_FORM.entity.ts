@@ -173,7 +173,7 @@ export class PUREVA_FORM {
 
     // รักษาตัวสะกดตาม SQL 原ฉบับ (FATORY)
     @Column({ type: 'number', precision: 10, scale: 2 })
-    FATORY: number;
+    FACTORY: number;
 
     @Column()
     JUDGEMENT: string;

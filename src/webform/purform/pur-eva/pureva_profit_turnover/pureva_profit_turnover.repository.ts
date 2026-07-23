@@ -20,7 +20,7 @@ export class PurevaProfitTurnoverRepository extends BaseRepository {
             .select('MAX(profit.ID)', 'maxId')
             .where('profit.NFRMNO = :nfrmno', { nfrmno })
             .andWhere('profit.VORGNO = :vorgno', { vorgno })
-            .andWhere('asprofitset.CYEAR = :cyear', { cyear })
+            .andWhere('profit.CYEAR = :cyear', { cyear })
             .andWhere('profit.CYEAR2 = :cyear2', { cyear2 })
             .andWhere('profit.NRUNNO = :nrunno', { nrunno })
             .andWhere('profit.RECORD_TYPE = :reqtype', { reqtype })

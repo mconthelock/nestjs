@@ -36,6 +36,9 @@ export class PUREVA_FORM {
     OPERATION: string;
 
     @Column()
+    VENDCODE: string;
+
+    @Column()
     VENDGROUP: string;  
 
     @Column()
@@ -130,6 +133,9 @@ export class PUREVA_FORM {
     CAPITAL_CUR: string;
 
     @Column()
+    ESTABLISHED: string;
+
+    @Column()
     COM_TYPE: string;
 
     @Column()
@@ -166,7 +172,7 @@ export class PUREVA_FORM {
     LABOR_STATUS: string;
 
     @Column()
-    ESTABLISHED: string;
+    LABOR_ESTABLISH_DATE: Date;
 
     @Column({ type: 'number', precision: 10, scale: 2 })
     LAND: number;

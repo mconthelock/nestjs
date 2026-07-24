@@ -50,11 +50,20 @@ export class PurEvaRequestService  {
   
     async request(
         dto: RequestPurevaFormDto,
-        files: Express.Multer.File[],
+        files: {'fileCer[]'?: Express.Multer.File[], 'fileVat[]'?: Express.Multer.File[] , 'fileIe[]'?: Express.Multer.File[] , 'fileQa[]'?: Express.Multer.File[], 'fileOther[]'?: Express.Multer.File[] }, // <--- เปลี่ยนตรงนี้
         ip: string,
         path: string,
     ) {
         let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
+      const allFilesWithType = [
+        ...(files['fileCer[]'] || []).map(file => ({ file, type: 11 })),
+        ...(files['fileVat[]'] || []).map(file => ({ file, type: 12 })),
+        ...(files['fileIe[]'] || []).map(file => ({ file, type: 13 })),
+        ...(files['fileQa[]'] || []).map(file => ({ file, type: 14 })),
+        ...(files['fileOther[]'] || []).map(file => ({ file, type: 2 })),
+    ];
+        
+
         try {
             const { REQBY, INPUTBY, REMARK, SCORES, PROFIT_TURNOVERS , RELATIONS , ...data } = dto;
             const createForm = await this.formCreateService.create(
@@ -121,23 +130,34 @@ export class PurEvaRequestService  {
             }
             await this.reposcore.createMultipleScores(form,SCORES);
             await this.repoprofit.createMultipleProfits(form,PROFIT_TURNOVERS);
-            await this.reporelation.createMultipleRelations(form,RELATIONS);
+            if (RELATIONS && RELATIONS.length > 0) {
+                await this.reporelation.createMultipleRelations(form, RELATIONS);
+            }
+            if (allFilesWithType && allFilesWithType.length > 0) {
+             movedTargets = await this.moveFiles(
+                allFilesWithType, // ส่งตัวแปรที่รวบรวมไฟล์+type ไปแทน
+                form, // (ต้องมีตัวแปร form ของคุณ)
+                path,
+                dto.REQBY,
+            );
+    }
 
         return {
                 status: true,
                 message: 'Request successful',
         };
         } catch (error) {
+            const tmpFilePaths = allFilesWithType.map(item => item.file.path);
             await Promise.allSettled([
                 ...movedTargets.map((p) => deleteFile(p)), // - ลบไฟล์ที่ "ปลายทาง" ทั้งหมดที่ย้ายสำเร็จไปแล้ว (กัน orphan file)
-                ...files.map((f) => deleteFile(f.path)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
+                ...tmpFilePaths.map((f) => deleteFile(f)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
             ]);
-            throw new Error('Request PUR-NVF Form Error: ' + error.message);
+            throw new Error('Request PUR-EVA Form Error: ' + error.message);
         }
     }
     
     async moveFiles(
-            files: Express.Multer.File[],
+            filesList: { file: Express.Multer.File; type: number }[],
             form: FormDto,
             path: string,
             userCreate: string,
@@ -146,7 +166,10 @@ export class PurEvaRequestService  {
             const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
             const formNo = await this.formService.getFormno(form); // Get the form number
             const destination = await joinPaths(path, formNo); // Get the destination path
-            for (const file of files) {
+            for (const item of filesList) {
+                const file = item.file;
+                const fileType = item.type;
+
                 const moved = await moveFileFromMulter({ file, destination });
                 movedTargets.push(moved.path);
                 // 6. บันทึก DB (ใช้ชื่อไฟล์ที่ "ปลายทางจริง" เพื่อความตรงกัน)
@@ -156,6 +179,7 @@ export class PurEvaRequestService  {
                     FILE_FNAME: moved.newName, // ชื่อไฟล์ที่ใช้เก็บจริง
                     FILE_USERCREATE: userCreate,
                     FILE_PATH: destination, // โฟลเดอร์ปลายทาง
+                    FILE_TYPE:fileType
                 });
             }
             return movedTargets; // คืนรายชื่อไฟล์ที่ย้ายสำเร็จ (ถ้าต้องการ)

@@ -154,6 +154,10 @@ export class CreatePurevaFormDto extends PickType(FormDto,[
 
     @IsOptional()
     @IsString()
+    ESTABLISHED?: string;
+
+    @IsOptional()
+    @IsString()
     COM_TYPE?: string;
 
     @IsOptional()
@@ -203,8 +207,9 @@ export class CreatePurevaFormDto extends PickType(FormDto,[
     LABOR_STATUS?: string;
 
     @IsOptional()
-    @IsString()
-    ESTABLISHED?: string;
+    @IsDate()
+    @Type(() => Date)
+    LABOR_ESTABLISH_DATE?: Date;
 
     @IsOptional()
     @IsNumber()

@@ -3,13 +3,16 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { ConectionService } from 'src/as400/conection/conection.service';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
+import { InsertCartonDto, InsertListCartonDto } from './dto/insertCarton.dto';
+import { PKC_CARTON_DETAIL } from 'src/common/Entities/workload/table/PKC_CARTON_DETAIL.entity';
 
 @Injectable()
 export class VpsRepository extends BaseRepository {
     constructor(
         @InjectDataSource('workloadConnection') private readonly wk: DataSource,
-        @InjectDataSource('packingConnection') private readonly packingDs: DataSource,
-        private as400: ConectionService
+        @InjectDataSource('packingConnection')
+        private readonly packingDs: DataSource,
+        private as400: ConectionService,
     ) {
         super(wk);
     }
@@ -117,10 +120,7 @@ export class VpsRepository extends BaseRepository {
     }
 
     async insPackorddtlByManual(order: string, packing: string): Promise<void> {
-        await this.packingDs.query('EXEC InsPackorddtlByManual @0, @1', [
-            order,
-            packing,
-        ]);
+        await this.packingDs.query('EXEC InsPackorddtlByManual @0, @1', [order, packing]);
     }
 
     async updatePrintStatus(order: string, packing: string): Promise<void> {
@@ -134,39 +134,19 @@ export class VpsRepository extends BaseRepository {
     }
 
     async insertItemMas(data: Record<string, any>): Promise<void> {
-        await this.packingDs
-            .createQueryBuilder()
-            .insert()
-            .into('ItemMas')
-            .values(data)
-            .execute();
+        await this.packingDs.createQueryBuilder().insert().into('ItemMas').values(data).execute();
     }
 
     async insertItemQty(data: Record<string, any>): Promise<void> {
-        await this.packingDs
-            .createQueryBuilder()
-            .insert()
-            .into('ItemQty')
-            .values(data)
-            .execute();
+        await this.packingDs.createQueryBuilder().insert().into('ItemQty').values(data).execute();
     }
 
     async insertPISInfo(data: Record<string, any>): Promise<void> {
-        await this.packingDs
-            .createQueryBuilder()
-            .insert()
-            .into('PISInfo')
-            .values(data)
-            .execute();
+        await this.packingDs.createQueryBuilder().insert().into('PISInfo').values(data).execute();
     }
 
     async insertVPSInfo(data: Record<string, any>): Promise<void> {
-        await this.packingDs
-            .createQueryBuilder()
-            .insert()
-            .into('VPSInfo')
-            .values(data)
-            .execute();
+        await this.packingDs.createQueryBuilder().insert().into('VPSInfo').values(data).execute();
     }
 
     async insertItemQtyHistory(data: Record<string, any>): Promise<void> {
@@ -184,11 +164,7 @@ export class VpsRepository extends BaseRepository {
                 JOIN M008KP mk ON mk.M8K03 = s01.S01M01
                 WHERE (S01M01 = :1 OR S01M01 LIKE :2)
                 AND S01M04 LIKE :3`;
-        return await this.wk.query(sql, [
-            `${order}`,
-            `_${order}_`,
-            `%${packing}%`,
-        ]);
+        return await this.wk.query(sql, [`${order}`, `_${order}_`, `%${packing}%`]);
     }
 
     async getListOrder(packing: string): Promise<any[]> {
@@ -242,6 +218,38 @@ export class VpsRepository extends BaseRepository {
         return await this.wk.query(sql, [packing]);
     }
 
+    async getListOrder_88_89() {
+        const sql = `SELECT SUBSTR(F_CPROD(M8K01), -3) AS SCHEDULE,mk.*,sm.*,p.*,sch.max_date,a.AGENT,pl.* FROM M008KP mk 
+                JOIN S010MP sm ON mk.M8K03 = sm.S01M01 
+                JOIN PACKORDDTL p ON mk.M8K03 = p.ORDERNO AND sm.S01M04 = p.PACKNO
+                LEFT JOIN (SELECT NEXTWORKDAY(max(workid) , 1) AS max_date,schdnumber FROM AMECCALENDAR a group by schdnumber) sch ON sch.schdnumber = sm.S01M09
+                LEFT JOIN AMECORDERS a ON sm.S01M01 = a.MFGNO
+                LEFT JOIN ( 
+	                SELECT pl.NFRMNO,pl.VORGNO,pl.CYEAR,pl.CYEAR2,pl.NRUNNO,ORDERNO,PACKNO,f.VREALAPV,f.CSTEPST,pl.STATUS as FORM_TYPE
+					FROM WEBFORM.PKRN_LIST pl 
+					LEFT JOIN WEBFORM.FLOW f ON  pl.NFRMNO = f.NFRMNO AND pl.VORGNO = f.VORGNO AND pl.CYEAR = f.CYEAR AND pl.CYEAR2 = f.CYEAR2 AND pl.NRUNNO = f.NRUNNO
+					WHERE CSTEPNO = '10' AND CSTEPST = '5'
+					GROUP BY pl.NFRMNO,pl.VORGNO,pl.CYEAR,pl.CYEAR2,pl.NRUNNO,ORDERNO,PACKNO,f.VREALAPV,f.CSTEPST,pl.STATUS
+                )  pl ON sm.S01M01 = pl.ORDERNO AND sm.S01M04 = pl.PACKNO AND sm.S01M09 > '2026025'              
+                WHERE SUBSTR(sm.S01M04,-2) IN ('88','89')
+                AND mk.M8K01 >= '20250000'
+                AND (
+				      PRINTSTA = 0 
+				      OR 
+				      (PRINTSTA = 1 AND (sm.S01M18 IS NULL OR pl.ORDERNO IS NOT NULL))
+				  )
+                AND NOT EXISTS (
+					    SELECT 1 FROM REV_CONFIRM rc 
+					    WHERE rc.\"ORDER\" = sm.S01M01 
+					    AND rc.PACKING = sm.S01M04 
+					    AND rc.CYEAR2 = pl.CYEAR2 
+					    AND rc.NRUNNO = pl.NRUNNO
+                        AND rc.CONFIRM_AT IS NOT NULL
+					)
+                ORDER BY max_date DESC`;
+        return await this.wk.query(sql);
+    }
+
     async getOrderDetail(order: string, packing: string): Promise<any[]> {
         const sql = `
             SELECT 
@@ -255,7 +263,8 @@ export class VpsRepository extends BaseRepository {
                 M8K02,
                 J2INO as PUR_CODE,
                 ap.PACKSHOP,
-                CASE WHEN U.MFGNO IS NOT NULL THEN 1 ELSE NULL END AS URGENT
+                CASE WHEN U.MFGNO IS NOT NULL THEN 1 ELSE NULL END AS URGENT,
+                avo.ORDERNUMBER
             FROM S011MP A
             LEFT JOIN (
                 SELECT S11M01, S11M08, S11M02, S11M03, S11M04, LISTAGG(SUBSTR(S11M06, -3), '') WITHIN GROUP (ORDER BY S11M06) AS LVAL 
@@ -269,6 +278,7 @@ export class VpsRepository extends BaseRepository {
                 ON j.J2CUS = A.S11M01 AND (j.J2DRAW = REPLACE(A.S11M06, ' ', '') OR J2DES = REPLACE(A.S11M06, ' ', ''))
             LEFT JOIN AMECORDERS ao ON ao.MFGNO = S.S01M01
             LEFT JOIN AMECORDERS_PACKNO ap ON ap.ORDERNO = S.S01M01 AND ap.PACKNO = S.S01M04
+            LEFT JOIN AMECVPCORDER avo ON avo.MFGNO = S.S01M01
             LEFT JOIN (
                 SELECT MFGNO
                 FROM WEBFORM.URGENT_ORDER_LIST A
@@ -294,5 +304,10 @@ export class VpsRepository extends BaseRepository {
         // สมมติชื่อ Table เป็น MASTER_PACKING รบกวนตรวจสอบชื่อ Table หรือ Store Procedure อีกทีหากมีการเรียกใช้โครงสร้างอื่นครับ
         const sql = `SELECT * FROM MASTER_PACKLIST WHERE DWGNO = :1`;
         return await this.wk.query(sql, [dwgNo]);
+    }
+
+    // Repository
+    async insertCartonBox(items: InsertCartonDto[]) {
+        return this.getRepository(PKC_CARTON_DETAIL).insert(items);
     }
 }

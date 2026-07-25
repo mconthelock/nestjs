@@ -58,4 +58,10 @@ export class IsDevController {
     findAllDevice() {
         return this.dev.findAllDeviceMst();
     }
+
+    //LABORCOST
+    @Get('laborcost/all')
+    findAllLaborcost() {
+        return this.dev.findAllLaborcost();
+    }
 }

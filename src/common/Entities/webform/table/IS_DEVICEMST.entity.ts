@@ -19,4 +19,7 @@ export class IS_DEVICEMST {
 
     @Column()
     TYPE_BRINGOUT: string;
+
+    @Column()
+    STANDARD_COST: number;
 }

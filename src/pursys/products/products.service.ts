@@ -18,7 +18,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 export class ProductsService {
     constructor(
         @InjectRepository(Products, 'purConnection')
-        private productRepository: Repository<Products>,
+        private prod: Repository<Products>,
         @InjectDataSource('purConnection')
         private ds: DataSource,
         private cate: CategoriesService,
@@ -26,8 +26,6 @@ export class ProductsService {
     ) {}
 
     async create(dto: CreateProductDto) {
-        // const { CATEGORY_ID, EXTRA_ATTRIBUTES, ...productData } =
-        // createProductDto;
         const attributes = dto.EXTRA_ATTRIBUTES ?? {};
         const requiredSchema = await this.cate.getInheritedAttributes(
             dto.CATEGORY_ID,
@@ -108,19 +106,19 @@ export class ProductsService {
             }
         }
 
-        const newProduct = this.productRepository.create({
+        const newProduct = this.prod.create({
             ...dto,
             EXTRA_ATTRIBUTES: attributes,
         });
-        return await this.productRepository.save(newProduct);
+        return await this.prod.save(newProduct);
     }
 
     async findAll(): Promise<Products[]> {
-        return await this.productRepository.find();
+        return await this.prod.find();
     }
 
     async findOne(id: number): Promise<Products> {
-        const product = await this.productRepository.findOne({
+        const product = await this.prod.findOne({
             where: { ID: id },
         });
         if (!product) {
@@ -136,24 +134,27 @@ export class ProductsService {
         const product = await this.findOne(id); // เช็คว่ามีของไหมก่อน
 
         // ถ้ามีการเปลี่ยน SKU ต้องเช็คซ้ำด้วย
-        if (updateProductDto.SKU && updateProductDto.SKU !== product.SKU) {
-            const existingProduct = await this.productRepository.findOne({
-                where: { SKU: updateProductDto.SKU },
+        if (
+            updateProductDto.SPRODCODE &&
+            updateProductDto.SPRODCODE !== product.SPRODCODE
+        ) {
+            const existingProduct = await this.prod.findOne({
+                where: { SPRODCODE: updateProductDto.SPRODCODE },
             });
             if (existingProduct) {
                 throw new ConflictException(
-                    `รหัส SKU: ${updateProductDto.SKU} มีอยู่ในระบบแล้ว`,
+                    `รหัส SKU: ${updateProductDto.SPRODCODE} มีอยู่ในระบบแล้ว`,
                 );
             }
         }
 
         Object.assign(product, updateProductDto);
-        return await this.productRepository.save(product);
+        return await this.prod.save(product);
     }
 
     async remove(id: number): Promise<{ success: boolean }> {
         const product = await this.findOne(id);
-        await this.productRepository.softRemove(product); // ทำ Soft Delete
+        await this.prod.softRemove(product); // ทำ Soft Delete
         return { success: true };
     }
 }

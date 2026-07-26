@@ -12,6 +12,7 @@ import { Partcategory } from 'src/spprogram/partcategory/entities/partcategory.e
 import { InquiryGroupModule } from '../inquiry-group/inquiry-group.module';
 import { InquiryDetailModule } from '../inquiry-detail/inquiry-detail.module';
 import { HistoryModule } from '../history/history.module';
+import { StatusModule } from '../status/status.module';
 
 @Module({
     imports: [
@@ -22,6 +23,7 @@ import { HistoryModule } from '../history/history.module';
         InquiryGroupModule,
         InquiryDetailModule,
         HistoryModule,
+        StatusModule,
     ],
     controllers: [InquiryController],
     providers: [InquiryService],

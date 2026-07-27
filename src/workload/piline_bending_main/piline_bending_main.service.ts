@@ -68,7 +68,7 @@ export class PilineBendingMainService {
 
   async create(dto: CreatePilineBendingMainDto) {
     try {
-      const IDTAG = dto.IDTAG?.trim();
+      const IDTAG = dto.IDTAG;
 
       if (!IDTAG) {
         return {

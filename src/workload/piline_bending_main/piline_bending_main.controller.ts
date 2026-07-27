@@ -36,8 +36,8 @@ export class PilineBendingMainController {
   }
 
   @Post()
-  @UseTransaction('workloadConnection')
   create(@Body() dto: CreatePilineBendingMainDto) {
+    console.log('Controller DTO:', dto);
     return this.pilineBendingMainService.create(dto);
   }
 }

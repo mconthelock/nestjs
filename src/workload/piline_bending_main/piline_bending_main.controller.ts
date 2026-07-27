@@ -24,9 +24,9 @@ export class PilineBendingMainController {
     return this.pilineBendingMainService.findAll();
   }
 
-  @Get(':idtag')
-  findOne(@Param('idtag') idtag: string) {
-    return this.pilineBendingMainService.findOne(idtag);
+  @Get(':IDTAG')
+  findOne(@Param('IDTAG') IDTAG: string) {
+    return this.pilineBendingMainService.findOne(IDTAG);
   }
 
   @Post('search')

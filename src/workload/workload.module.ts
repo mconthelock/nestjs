@@ -15,6 +15,7 @@ import { VpsModule } from './vps/vps.module';
 import { KanbanRequestModule } from './kanban_request/kanban_request.module';
 import { DpmsPlLastRevisionViewModule } from './dpms_pl_last_revision_view/dpms_pl_last_revision_view.module';
 import { DpmsPlDocRevModule } from './dpms_pl_doc_rev/dpms_pl_doc_rev.module';
+import { PilineBendingMainModule } from './piline_bending_main/piline_bending_main.module';
 import { ShortageModule } from './shortage/shortage.module';
 import { LabelconfirmModule } from './labelconfirm/labelconfirm.module';
 
@@ -36,6 +37,7 @@ import { LabelconfirmModule } from './labelconfirm/labelconfirm.module';
         KanbanRequestModule,
         DpmsPlLastRevisionViewModule,
         DpmsPlDocRevModule,
+        PilineBendingMainModule,
         ShortageModule,
         LabelconfirmModule,
     ],

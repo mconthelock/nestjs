@@ -38,16 +38,16 @@ export class PilineBendingMainService {
     }
   }
 
-  async findOne(idtag: string) {
+  async findOne(IDTAG: string) {
     try {
-      const res = await this.repo.findOne(idtag);
+      const res = await this.repo.findOne(IDTAG);
 
       if (!res) {
         return {
           status: false,
           message:
             `Search PILINE_BENDING_MAIN by IDTAG ` +
-            `${idtag} Failed: No data found`,
+            `${IDTAG} Failed: No data found`,
         };
       }
 
@@ -55,42 +55,42 @@ export class PilineBendingMainService {
         status: true,
         message:
           `Search PILINE_BENDING_MAIN by IDTAG ` +
-          `${idtag} data found 1 record(s)`,
+          `${IDTAG} data found 1 record(s)`,
         data: res,
       };
     } catch (error) {
       throw new Error(
         `Search PILINE_BENDING_MAIN by IDTAG ` +
-          `${idtag} Error: ${error.message}`,
+          `${IDTAG} Error: ${error.message}`,
       );
     }
   }
 
   async create(dto: CreatePilineBendingMainDto) {
     try {
-      const idtag = dto.IDTAG?.trim();
+      const IDTAG = dto.IDTAG?.trim();
 
-      if (!idtag) {
+      if (!IDTAG) {
         return {
           status: false,
           message: 'IDTAG is required',
         };
       }
 
-      const existing = await this.repo.findOne(idtag);
+      const existing = await this.repo.findOne(IDTAG);
 
       if (existing) {
         return {
           status: false,
           message:
             `Create PILINE_BENDING_MAIN Failed: ` +
-            `IDTAG ${idtag} already exists`,
+            `IDTAG ${IDTAG} already exists`,
         };
       }
 
       const res = await this.repo.create({
         ...dto,
-        IDTAG: idtag,
+        IDTAG: IDTAG,
       });
 
       return {

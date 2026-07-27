@@ -12,7 +12,7 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 import { CreatePilineBendingMainDto } from './dto/create_piline_bending_main.dto';
 import { PilineBendingMainService } from './piline_bending_main.service';
 
-@Controller('workload/piline-bending-main')
+@Controller('workload/piline_bending_main')
 export class PilineBendingMainController {
   constructor(
     private readonly pilineBendingMainService:

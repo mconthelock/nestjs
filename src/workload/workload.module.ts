@@ -16,6 +16,7 @@ import { KanbanRequestModule } from './kanban_request/kanban_request.module';
 import { DpmsPlLastRevisionViewModule } from './dpms_pl_last_revision_view/dpms_pl_last_revision_view.module';
 import { DpmsPlDocRevModule } from './dpms_pl_doc_rev/dpms_pl_doc_rev.module';
 import { PilineBendingMainModule } from './piline_bending_main/piline_bending_main.module';
+import { PilineBendingAttModule } from './piline_bending_att/piline_bending_att.module';
 import { ShortageModule } from './shortage/shortage.module';
 import { LabelconfirmModule } from './labelconfirm/labelconfirm.module';
 
@@ -38,6 +39,7 @@ import { LabelconfirmModule } from './labelconfirm/labelconfirm.module';
         DpmsPlLastRevisionViewModule,
         DpmsPlDocRevModule,
         PilineBendingMainModule,
+        PilineBendingAttModule,
         ShortageModule,
         LabelconfirmModule,
     ],

@@ -27,25 +27,21 @@ export class PilineBendingMainRepository
     });
   }
 
-  findOne(idtag: string) {
+  findOne(IDTAG: string) {
     return this.getRepository(
       piline_bending_main,
     ).findOneBy({
-      IDTAG: idtag,
+      IDTAG: IDTAG,
     });
   }
 
   create(dto: CreatePilineBendingMainDto) {
-    const repository = this.getRepository(
-      piline_bending_main,
-    );
+    const repository = this.getRepository(piline_bending_main,);
 
     const entity = repository.create({
       ...dto,
       IDTAG: dto.IDTAG.trim(),
-      RECORD_DATE: dto.RECORD_DATE
-        ? new Date(dto.RECORD_DATE)
-        : new Date(),
+      RECORD_DATE: dto.RECORD_DATE ? new Date(dto.RECORD_DATE) : new Date(),
     });
 
     return repository.save(entity);

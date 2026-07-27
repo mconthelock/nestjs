@@ -10,6 +10,7 @@ import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 
 import { PilineBendingAttService } from './piline_bending_att.service';
+import { piline_bending_att } from 'src/common/Entities/workload/table/piline_bending_att.entity';
 
 @Controller('workload/piline_bending_att')
 export class PilineBendingAttController {
@@ -31,5 +32,11 @@ export class PilineBendingAttController {
   @UseTransaction('workloadConnection')
   search(@Body() dto: FiltersDto) {
     return this.pilineBendingAttService.search(dto);
+  }
+
+  @Post()
+  @UseTransaction('workloadConnection')
+  create(@Body() dto: piline_bending_att) {
+    return this.pilineBendingAttService.create(dto);
   }
 }

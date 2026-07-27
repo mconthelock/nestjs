@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-
 import { FiltersDto } from 'src/common/dto/filter.dto';
-
 import { PilineBendingAttRepository } from './piline_bending_att.repository';
+import { piline_bending_att } from 'src/common/Entities/workload/table/piline_bending_att.entity';
 
 @Injectable()
 export class PilineBendingAttService {
@@ -80,6 +79,22 @@ export class PilineBendingAttService {
     } catch (error) {
       throw new Error(
         'Search PILINE_BENDING_ATT Error: ' + error.message,
+      );
+    }
+  }
+
+  async create(data: piline_bending_att) {
+    try {
+      const res = await this.repo.create(data);
+
+      return {
+        status: true,
+        message: 'Create PILINE_BENDING_ATT successfully',
+        data: res,
+      };
+    } catch (error) {
+      throw new Error(
+        'Create PILINE_BENDING_ATT Error: ' + error.message,
       );
     }
   }

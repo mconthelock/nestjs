@@ -42,4 +42,10 @@ export class PilineBendingAttRepository extends BaseRepository {
 
     return qb.getMany();
   }
+
+  create(data: piline_bending_att) {
+    const repository = this.getRepository(piline_bending_att);
+    const entity = repository.create(data);
+    return repository.save(entity);
+  }
 }

@@ -5,7 +5,7 @@ export class piline_bending_att {
   @PrimaryColumn()
   IDTAG: string;
 
-  @Column({ name: 'ID', nullable: true })
+  @PrimaryColumn()
   ID: number;
 
   @Column({ nullable: true })

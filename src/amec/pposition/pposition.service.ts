@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class PpositionService {
     constructor(
-        @InjectRepository(PPOSITION, 'webformConnection')
+        @InjectRepository(PPOSITION, 'amecConnection')
         private readonly spos: Repository<PPOSITION>,
     ) {}
 

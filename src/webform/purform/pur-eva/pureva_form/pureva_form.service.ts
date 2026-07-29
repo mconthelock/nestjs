@@ -22,6 +22,14 @@ export class PurevaFormService {
         }
   }
 
+    async getData(dto: FormDto) {
+        try {
+            return await this.repo.getData(dto);
+        } catch (error) {
+            throw new Error('Get PUR-EVA Form Error: ' + error.message);
+        }
+    }
+
   findAll() {
     return `This action returns all purevaForm`;
   }

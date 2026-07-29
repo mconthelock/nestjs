@@ -2,15 +2,21 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PurevaFormService } from './pureva_form.service';
 import { CreatePurevaFormDto } from './dto/create-pureva_form.dto';
 import { UpdatePurevaFormDto } from './dto/update-pureva_form.dto';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
-@Controller('pureva-form')
+@Controller('purform/pureva-form')
 export class PurevaFormController {
   constructor(private readonly purevaFormService: PurevaFormService) {}
 
-  @Post()
-  create(@Body() createPurevaFormDto: CreatePurevaFormDto) {
-    return this.purevaFormService.create(createPurevaFormDto);
+  @Post('data')
+  create(@Body() dto: FormDto) {
+    return this.purevaFormService.getData(dto);
   }
+
+    // @Post('data')
+    // getData(@Body() dto: FormDto) {
+    //         return this.purnvfFormService.getData(dto);
+    // }
 
   @Get()
   findAll() {

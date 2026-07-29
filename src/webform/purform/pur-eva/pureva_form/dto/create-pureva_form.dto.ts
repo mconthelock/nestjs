@@ -40,6 +40,10 @@ export class CreatePurevaFormDto extends PickType(FormDto,[
 
     @IsOptional()
     @IsString()
+    VENDTYPE?: string;
+
+    @IsOptional()
+    @IsString()
     VENDPURPOSE?: string;
 
     @IsOptional()

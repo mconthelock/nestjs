@@ -32,7 +32,7 @@ export class PUREVA_VENDOR_RELATION {
     ENTITY_NAME: string;
 
 
-    @Column({ type: 'number', precision: 2, scale: 0 })
+    @Column({ type: 'number', precision: 3, scale: 0 })
     PERCENT: number;
 
     @ManyToOne(() => PUREVA_FORM, (eva) => eva.RELATIONS)

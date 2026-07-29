@@ -13,6 +13,21 @@ export class PurevaFormRepository extends BaseRepository {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
+    async getData(dto: FormDto) {
+                return await this.getRepository(PUREVA_FORM).findOne({
+                    where: {
+                        ...dto,
+                    },
+                    relations: {
+                        PROFIT_TURNOVERS:true,
+                        SCORES:true,
+                        RELATIONS:true,
+                        ADDRESSES: true,
+                        FILES: true,
+                    },
+                });
+        }
+
     async insert(dto: CreatePurevaFormDto) {
         return this.getRepository(PUREVA_FORM).insert(dto);
     }

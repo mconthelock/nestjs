@@ -49,6 +49,10 @@ export class PUREVA_FORM {
 
     @Column()
     COMNAME: string;  
+    
+
+    @Column()
+    VENDTYPE: string; 
 
     @Column()
     CONTACT: string;  

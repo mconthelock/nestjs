@@ -50,22 +50,21 @@ export class PurEvaRequestService  {
   
     async request(
         dto: RequestPurevaFormDto,
-        files: {'fileCer[]'?: Express.Multer.File[], 'fileVat[]'?: Express.Multer.File[] , 'fileIe[]'?: Express.Multer.File[] , 'fileQa[]'?: Express.Multer.File[], 'fileOther[]'?: Express.Multer.File[] }, // <--- เปลี่ยนตรงนี้
+        files: {'fileCer[]'?: Express.Multer.File[], 'fileIe[]'?: Express.Multer.File[] , 'fileQa[]'?: Express.Multer.File[], 'fileOther[]'?: Express.Multer.File[] }, // <--- เปลี่ยนตรงนี้
         ip: string,
         path: string,
     ) {
         let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
       const allFilesWithType = [
         ...(files['fileCer[]'] || []).map(file => ({ file, type: 11 })),
-        ...(files['fileVat[]'] || []).map(file => ({ file, type: 12 })),
-        ...(files['fileIe[]'] || []).map(file => ({ file, type: 13 })),
-        ...(files['fileQa[]'] || []).map(file => ({ file, type: 14 })),
+        ...(files['fileIe[]'] || []).map(file => ({ file, type: 12 })),
+        ...(files['fileQa[]'] || []).map(file => ({ file, type: 13 })),
         ...(files['fileOther[]'] || []).map(file => ({ file, type: 2 })),
     ];
         
 
         try {
-            const { REQBY, INPUTBY, REMARK, SCORES, PROFIT_TURNOVERS , RELATIONS , ...data } = dto;
+            const { REQBY, INPUTBY , DRAFT , REMARK, SCORES, PROFIT_TURNOVERS , RELATIONS , ...data } = dto;
             const createForm = await this.formCreateService.create(
                 {
                     NFRMNO: dto.NFRMNO,
@@ -74,6 +73,7 @@ export class PurEvaRequestService  {
                     REQBY: REQBY,
                     INPUTBY: INPUTBY,
                     REMARK: REMARK,
+                    ...(DRAFT !== undefined && { DRAFT: DRAFT })
                 },
                 ip,
             );

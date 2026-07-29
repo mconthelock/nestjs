@@ -12,7 +12,7 @@ export class PurevaRelationRepository extends BaseRepository {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
-    async getMaxId(nfrmno: number, vorgno: string, cyear: string, cyear2: string, nrunno: number , entity_type:string ){
+    async getMaxId(nfrmno: number, vorgno: string, cyear: string, cyear2: string, nrunno: number  ){
         const result = await this.getRepository(PUREVA_VENDOR_RELATION)
             .createQueryBuilder('relation')
             .select('MAX(relation.ID)', 'maxId')
@@ -21,7 +21,6 @@ export class PurevaRelationRepository extends BaseRepository {
             .andWhere('relation.CYEAR = :cyear', { cyear })
             .andWhere('relation.CYEAR2 = :cyear2', { cyear2 })
             .andWhere('relation.NRUNNO = :nrunno', { nrunno })
-            .andWhere('relation.ENTITY_TYPE = :entity_type', { nrunno })
             .getRawOne();
 
         return result?.maxId ? Number(result.maxId) : 0;

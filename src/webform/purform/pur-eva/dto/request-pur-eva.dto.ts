@@ -23,6 +23,7 @@ export class RequestPurevaFormDto extends PickType(CreateFormDto,[
 'VORGNO',
 'CYEAR',
 'REQBY',
+'DRAFT',
 'INPUTBY',
 'REMARK',
 ] as const) {  
@@ -46,6 +47,10 @@ export class RequestPurevaFormDto extends PickType(CreateFormDto,[
     @IsOptional()
     @IsString()
     VENDPURPOSE?: string;
+
+    @IsOptional()
+    @IsString()
+    VENDTYPE?: string;
 
     @IsNotEmpty()
     @IsString()

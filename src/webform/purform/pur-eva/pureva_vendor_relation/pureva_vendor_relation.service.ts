@@ -5,37 +5,33 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 import { PurevaRelationRepository } from './pureva_vendor_relation.repository';
 import { RequestPurevaVendorRelationDto } from './dto/request-pureva_vendor_relation.dto';
 
+
 @Injectable()
 export class PurevaVendorRelationService {
  constructor(private readonly repo: PurevaRelationRepository) {}
 
 async createMultipleRelations(formDto:FormDto , relations:RequestPurevaVendorRelationDto[]) {
       try {
+            
             const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO } = formDto;
-            const typeentity = relations[0].ENTITY_TYPE;
             const currentMaxId = await this.repo.getMaxId(
-            NFRMNO, 
-            VORGNO, 
-            CYEAR, 
-            CYEAR2, 
-            NRUNNO,
-            typeentity
+            NFRMNO,
+            VORGNO,
+            CYEAR,
+            CYEAR2,
+            NRUNNO
             );
             let runningId = currentMaxId;
-                // 3. วนลูปสร้างข้อมูล
-            const  relationToInsert = relations.map((item) => {
-              runningId += 1; // รันเลข ID ต่อจากค่า Max
-              
-              return {
-                // ใช้ค่าจาก FormDto เป็นหัวขบวน
+            const allRelationsToInsert = relations.map((item) => {
+            runningId += 1;
+            return {
                 ...formDto,
                 ...item,
-                ID: runningId, 
-              };
-            });
+                ID: runningId,
+            };
+        });
 
-
-            const res = await this.repo.InsertRelations(relationToInsert);
+            const res = await this.repo.InsertRelations(allRelationsToInsert);
             if(!res){
                 throw new Error('Failed to insert PUREVAVENDORRELATION');
             }

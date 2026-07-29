@@ -12,14 +12,14 @@ export class PsYicRepository extends BaseRepository {
         super(ds);
     }
 
-    async getFormData(dto: FormDto){
+    async getFormData(dto: FormDto) {
         return this.getRepository(PSYIC_FORM).find({
             where: {
                 NFRMNO: dto.NFRMNO,
                 VORGNO: dto.VORGNO,
                 CYEAR: dto.CYEAR,
                 CYEAR2: dto.CYEAR2,
-                NRUNNO: dto.NRUNNO
+                NRUNNO: dto.NRUNNO,
             },
             relations: { RESULT: { ITEM: true }, ASSIGN: true },
         });
@@ -30,5 +30,12 @@ export class PsYicRepository extends BaseRepository {
         data: QueryDeepPartialEntity<INV_YEARLY_RESULT>,
     ): Promise<void> {
         await this.getRepository(INV_YEARLY_RESULT).update(where, data);
+    }
+
+    async updateFormData(
+        where: FindOptionsWhere<PSYIC_FORM>,
+        data: QueryDeepPartialEntity<PSYIC_FORM>,
+    ): Promise<void> {
+        await this.getRepository(PSYIC_FORM).update(where, data);
     }
 }

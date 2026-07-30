@@ -5,6 +5,7 @@ import { Repository, DataSource, EntityManager  } from 'typeorm';
 import { CreateMfgEdrDto } from './dto/create-mfg-edr.dto';
 import { SearchCauseDto } from './dto/search-cause.dto';
 import { GetMfgEdrDto } from './dto/get-mfg-edr.dto';
+import { SearchMfgEdrReportDto } from './dto/search-mfg-edr-report.dto';
 
 import { EdrWorktypeMst } from '../../../common/Entities/webform/table/edr_worktype_mst.entity';
 import { EdrCauseMst } from '../../../common/Entities/webform/table/edr_cause_mst.entity';
@@ -21,6 +22,9 @@ import { AmecOrdersSchedule } from 'src/common/Entities/workload/table/amecorder
 import { FORM } from '../../../common/Entities/webform/table/FORM.entity';
 import { FLOW } from '../../../common/Entities/webform/table/FLOW.entity';
 import { AMECUSERALL } from '../../../common/Entities/amec/views/AMECUSERALL.entity';
+
+import { VIEW_MFG_EDR_REPORT } from '../../../common/Entities/webform/views/VIEW_MFG_EDR_REPORT.entity';
+
 
 type FormKey = Pick<CreateMfgEdrDto, 'NFRMNO' | 'VORGNO' | 'CYEAR' | 'CYEAR2' | 'NRUNNO'>;
 
@@ -65,6 +69,9 @@ export class MfgEdrService {
 
     @InjectDataSource('webformConnection')
     private readonly dataSource: DataSource,
+
+    @InjectRepository(VIEW_MFG_EDR_REPORT, 'webformConnection')
+    private readonly reportRepository: Repository<VIEW_MFG_EDR_REPORT>,
   ) {}
 
 
@@ -628,6 +635,97 @@ export class MfgEdrService {
         message: 'Update Cause 4 M success',
       };
     });
+  }
+
+  async searchReport(dto: SearchMfgEdrReportDto) {
+    const query = this.reportRepository
+      .createQueryBuilder('R');
+
+    if (dto.REQUEST_BY) {
+      query.andWhere('R.REPAIR_BY = :REQUEST_BY', {
+        REQUEST_BY: dto.REQUEST_BY.trim(),
+      });
+    }
+
+    if (dto.DAILY_REPORT_NO) {
+      query.andWhere(
+        'UPPER(R.DAILY_REPORT_NO) LIKE :DAILY_REPORT_NO',
+        {
+          DAILY_REPORT_NO: `%${dto.DAILY_REPORT_NO.trim().toUpperCase()}%`,
+        },
+      );
+    }
+
+    if (dto.TID !== undefined) {
+      query.andWhere('R.TID = :TID', {
+        TID: dto.TID,
+      });
+    }
+
+    if (dto.CID !== undefined) {
+      query.andWhere('R.CID = :CID', {
+        CID: dto.CID,
+      });
+    }
+
+    if (dto.SSECCODE) {
+      query.andWhere('R.SSECCODE = :SSECCODE', {
+        SSECCODE: dto.SSECCODE.trim(),
+      });
+    }
+
+    if (dto.ORDERNO) {
+      query.andWhere(
+        'UPPER(R.ORDERNO) LIKE :ORDERNO',
+        {
+          ORDERNO: `%${dto.ORDERNO.trim().toUpperCase()}%`,
+        },
+      );
+    }
+
+    if (dto.DWGNO) {
+      query.andWhere(
+        'UPPER(R.DWGNO) LIKE :DWGNO',
+        {
+          DWGNO: `%${dto.DWGNO.trim().toUpperCase()}%`,
+        },
+      );
+    }
+
+    if (dto.ITEM) {
+      query.andWhere('R.ITEM = :ITEM', {
+        ITEM: dto.ITEM.trim(),
+      });
+    }
+
+    if (dto.ISSUE_DATE_FROM) {
+      query.andWhere(
+        `TO_DATE(R.ISSUE_DATE, 'DD/MM/YYYY') >= TO_DATE(:ISSUE_DATE_FROM, 'YYYY-MM-DD')`,
+        {
+          ISSUE_DATE_FROM: dto.ISSUE_DATE_FROM,
+        },
+      );
+    }
+
+    if (dto.ISSUE_DATE_TO) {
+      query.andWhere(
+        `TO_DATE(R.ISSUE_DATE, 'DD/MM/YYYY') < TO_DATE(:ISSUE_DATE_TO, 'YYYY-MM-DD') + 1`,
+        {
+          ISSUE_DATE_TO: dto.ISSUE_DATE_TO,
+        },
+      );
+    }
+
+    if (dto.CST && dto.CST !== 'ALL') {
+      query.andWhere('R.CST = :CST', {
+        CST: dto.CST,
+      });
+    }
+
+    return query
+      .orderBy('R.CYEAR2', 'DESC')
+      .addOrderBy('R.NRUNNO', 'DESC')
+      .getMany();
   }
       
 

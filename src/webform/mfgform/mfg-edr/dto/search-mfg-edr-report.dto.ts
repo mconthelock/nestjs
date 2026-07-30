@@ -1,14 +1,14 @@
 import { Type } from 'class-transformer';
-import {
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class SearchMfgEdrReportDto {
   @IsOptional()
   @IsString()
-  REQUEST_BY?: string;
+  VREQNO?: string;
+
+  @IsOptional()
+  @IsString()
+  REPAIR_BY?: string;
 
   @IsOptional()
   @IsString()

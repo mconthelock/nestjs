@@ -21,25 +21,12 @@ export class PilineBendingAttRepository extends BaseRepository {
   }
 
   findOne(idtag: string) {
-    return this.getRepository(
-      piline_bending_att,
-    ).findBy({
-      IDTAG: idtag,
-    });
+    return this.getRepository(piline_bending_att,).findBy({ IDTAG: idtag, });
   }
 
   async search(dto: FiltersDto) {
-    const qb = this.manager.createQueryBuilder(
-      piline_bending_att,
-      'A',
-    );
-
-    this.applyFilters(qb, 'A', dto, [
-      'IDTAG',
-      'ID',
-      'FILE_NAME',
-    ]);
-
+    const qb = this.manager.createQueryBuilder(piline_bending_att, 'A',);
+    this.applyFilters(qb, 'A', dto, ['IDTAG', 'ID', 'FILE_NAME',]);
     return qb.getMany();
   }
 

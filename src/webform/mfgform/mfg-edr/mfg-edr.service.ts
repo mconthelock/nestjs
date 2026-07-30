@@ -25,7 +25,6 @@ import { AMECUSERALL } from '../../../common/Entities/amec/views/AMECUSERALL.ent
 
 import { VIEW_MFG_EDR_REPORT } from '../../../common/Entities/webform/views/VIEW_MFG_EDR_REPORT.entity';
 
-
 type FormKey = Pick<CreateMfgEdrDto, 'NFRMNO' | 'VORGNO' | 'CYEAR' | 'CYEAR2' | 'NRUNNO'>;
 
 @Injectable()
@@ -74,22 +73,13 @@ export class MfgEdrService {
     private readonly reportRepository: Repository<VIEW_MFG_EDR_REPORT>,
   ) {}
 
-
-  findAll() {
-    return `This action returns all mfgEdr`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} mfgEdr`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} mfgEdr`;
-  }
+  findAll() { return `This action returns all mfgEdr`; }
+  findOne(id: number) { return `This action returns a #${id} mfgEdr`; }
+  remove(id: number) { return `This action removes a #${id} mfgEdr`; }
 
   async getCause(dto: SearchCauseDto) {
     const causeGroup = (dto as any).CAUSE_GROUP;
-    if (!causeGroup) {throw new Error('CAUSE_GROUP is required');}
+    if (!causeGroup) { throw new Error('CAUSE_GROUP is required'); }
     return this.causeRepo
       .createQueryBuilder('cause')
       .where('cause.FOR_MFG = :forMfg', { forMfg: '1' })
@@ -99,28 +89,19 @@ export class MfgEdrService {
   }
 
   async getWorktype() {
-    return this.worktypeRepo.find({
-      where: { FOR_MFG: '1',},
-      order: { TID: 'ASC',},
-    });
+    return this.worktypeRepo.find({ where: { FOR_MFG: '1', }, order: { TID: 'ASC', }, });
   }
 
   async getProcess() {
-    return this.processRepo.find({
-      order: { PID: 'ASC',},
-    });
+    return this.processRepo.find({ order: { PID: 'ASC', }, });
   }
 
   async getLine() {
-    return this.lineRepo.find({
-      order: { LID: 'ASC',},
-    });
+    return this.lineRepo.find({ order: { LID: 'ASC', }, });
   }
 
   async getOrderDetail(order: string) {
-    if (!order) {
-      throw new Error('MFGNO is required');
-    }
+    if (!order) { throw new Error('MFGNO is required'); }
 
     return this.amecOrdersRepo
       .createQueryBuilder('A')
@@ -129,14 +110,8 @@ export class MfgEdrService {
         'A.SERIES AS MODEL',
         'B.MFGBM AS PROD',
       ])
-      .leftJoin(
-        AmecOrdersSchedule,
-        'B',
-        'A.MFGNO = B.REFMFGNO'
-      )
-      .where('UPPER(A.MFGNO) = :order', {
-        order: order.toUpperCase(),
-      })
+      .leftJoin(AmecOrdersSchedule, 'B', 'A.MFGNO = B.REFMFGNO')
+      .where('UPPER(A.MFGNO) = :order', { order: order.toUpperCase(), })
       .getRawOne();
   }
 
@@ -163,11 +138,7 @@ export class MfgEdrService {
       return {
         status: true,
         message: 'Create MFG EDR form success',
-        data: {
-          key,
-          list_count: listCount,
-          att_count: attCount,
-        },
+        data: { key, list_count: listCount, att_count: attCount, },
       };
     });
   }
@@ -182,12 +153,7 @@ export class MfgEdrService {
     };
   }
 
-
-  private async syncApproveFlow(
-    manager: EntityManager,
-    key: FormKey,
-    dto: CreateMfgEdrDto,
-  ) {
+  private async syncApproveFlow(manager: EntityManager, key: FormKey, dto: CreateMfgEdrDto) {
     const flowKey = this.getFormKey(key as CreateMfgEdrDto);
 
     const SSECCODE = String(dto.SSECCODE || '').trim();
@@ -224,11 +190,7 @@ export class MfgEdrService {
     }
   }
 
-  private async findFlowStep(
-    manager: EntityManager,
-    flowKey: FormKey,
-    stepNo: string,
-  ) {
+  private async findFlowStep(manager: EntityManager, flowKey: FormKey, stepNo: string) {
     return manager
       .createQueryBuilder(FLOW, 'F')
       .select(['F.CSTEPNO AS CSTEPNO', 'F.CSTEPNEXTNO AS CSTEPNEXTNO'])
@@ -241,12 +203,7 @@ export class MfgEdrService {
       .getRawOne();
   }
 
-  private async findApprover(
-    manager: EntityManager,
-    field: 'SSECCODE' | 'SDEPCODE',
-    code: string,
-    posCode: string,
-  ) {
+  private async findApprover(manager: EntityManager, field: 'SSECCODE' | 'SDEPCODE', code: string, posCode: string) {
     const row = await manager
       .createQueryBuilder(AMECUSERALL, 'U')
       .select('TRIM(U.SEMPNO)', 'SEMPNO')
@@ -258,12 +215,7 @@ export class MfgEdrService {
     return String(row?.SEMPNO || '').trim();
   }
 
-  private async updateApprover(
-    manager: EntityManager,
-    flowKey: FormKey,
-    stepNo: string,
-    empno: string,
-  ) {
+  private async updateApprover(manager: EntityManager, flowKey: FormKey, stepNo: string, empno: string) {
     return manager
       .createQueryBuilder()
       .update(FLOW)
@@ -277,12 +229,7 @@ export class MfgEdrService {
       .execute();
   }
 
-  private async updateStepNext(
-    manager: EntityManager,
-    flowKey: FormKey,
-    stepNo: string,
-    nextStepNo: string,
-  ) {
+  private async updateStepNext(manager: EntityManager, flowKey: FormKey, stepNo: string, nextStepNo: string) {
     if (!nextStepNo) throw new Error(`Next step of step ${stepNo} not found`);
 
     return manager
@@ -298,12 +245,7 @@ export class MfgEdrService {
       .execute();
   }
 
-  private async bypassStep(
-    manager: EntityManager,
-    flowKey: FormKey,
-    oldStepNo: string,
-    newStepNo: string,
-  ) {
+  private async bypassStep(manager: EntityManager, flowKey: FormKey, oldStepNo: string, newStepNo: string) {
     if (!newStepNo) throw new Error(`Next step of step ${oldStepNo} not found`);
     return manager
       .createQueryBuilder()
@@ -318,11 +260,7 @@ export class MfgEdrService {
       .execute();
   }
 
-  private async deleteFlowStep(
-    manager: EntityManager,
-    flowKey: FormKey,
-    stepNo: string,
-  ) {
+  private async deleteFlowStep(manager: EntityManager, flowKey: FormKey, stepNo: string) {
     return manager
       .createQueryBuilder()
       .delete()
@@ -336,11 +274,7 @@ export class MfgEdrService {
       .execute();
   }
 
-
-  private async getRequesterInfo(
-      manager: EntityManager,
-    reqby: string,
-  ) {
+  private async getRequesterInfo(manager: EntityManager, reqby: string) {
     const requester = await manager
       .createQueryBuilder(AMECUSERALL, 'R')
       .select([
@@ -351,17 +285,10 @@ export class MfgEdrService {
       .andWhere("TO_CHAR(R.CSTATUS) = :CSTATUS", { CSTATUS: '1' })
       .getRawOne();
 
-    return {
-      SSECCODE: String(requester?.SSECCODE || '').trim(),
-      SDEPCODE: String(requester?.SDEPCODE || '').trim(),
-    };
+    return { SSECCODE: String(requester?.SSECCODE || '').trim(), SDEPCODE: String(requester?.SDEPCODE || '').trim(), };
   }
 
-  private async insertFormHead(
-    manager: EntityManager,
-    key: FormKey,
-    dto: CreateMfgEdrDto,
-  ) {
+  private async insertFormHead(manager: EntityManager, key: FormKey, dto: CreateMfgEdrDto) {
     const exists = await manager.exists(MfgEdrFormHead, { where: key });
     if (exists) throw new Error('MFG EDR form already exists');
 
@@ -372,8 +299,6 @@ export class MfgEdrService {
       REPAIR_BY = null,
       REASON_CAUSE = null,
     } = dto;
-
-
 
     const DAILY_MONTH = new Date().toLocaleString('en-US', { month: 'short' }).toUpperCase();
     const lastRun = await manager
@@ -400,11 +325,7 @@ export class MfgEdrService {
     );
   }
 
-  private async insertFormList(
-    manager: EntityManager,
-    key: FormKey,
-    list: CreateMfgEdrDto['list'] = [],
-  ) {
+  private async insertFormList(manager: EntityManager, key: FormKey, list: CreateMfgEdrDto['list'] = []) {
     if (!list.length) return 0;
 
     const rows = list.map((row, i) =>
@@ -419,11 +340,7 @@ export class MfgEdrService {
     return rows.length;
   }
 
-  private async insertFormAtt(
-    manager: EntityManager,
-    key: FormKey,
-    att: CreateMfgEdrDto['att'] = [],
-  ) {
+  private async insertFormAtt(manager: EntityManager, key: FormKey, att: CreateMfgEdrDto['att'] = []) {
     const rows = att
       .filter((row) => row.FILENAME)
       .map((row, i) =>
@@ -454,13 +371,9 @@ export class MfgEdrService {
     return this.dataSource.transaction(async (manager) => {
       const key = this.getFormKey(dto);
 
-      const head = await manager.findOne(MfgEdrFormHead, {
-        where: key,
-      });
+      const head = await manager.findOne(MfgEdrFormHead, { where: key, });
 
-      if (!head) {
-        throw new Error('MFG EDR form head not found');
-      }
+      if (!head) { throw new Error('MFG EDR form head not found'); }
 
       const listCount = await this.replaceFormList(manager, key, dto.list ?? []);
       const attCount = await this.replaceFormAtt(manager, key, dto.att ?? []);
@@ -468,11 +381,7 @@ export class MfgEdrService {
       return {
         status: true,
         message: 'Update MFG EDR detail success',
-        data: {
-          key,
-          list_count: listCount,
-          att_count: attCount,
-        },
+        data: { key, list_count: listCount, att_count: attCount, },
       };
     });
   }
@@ -490,7 +399,7 @@ export class MfgEdrService {
     };
 
     console.log('KEY =', key);
-    
+
     const form = await this.formRepo
       .createQueryBuilder('A')
       .leftJoin(AMECUSERALL,'B', 'A.VREQNO = B.SEMPNO', )
@@ -575,30 +484,12 @@ export class MfgEdrService {
       .orderBy('L.ID', 'ASC')
       .getRawMany();
 
-    const att = await this.formAttRepo.find({
-      where: key,
-      order: { ID: 'ASC' },
-    });
+    const att = await this.formAttRepo.find({ where: key, order: { ID: 'ASC' }, });
 
-    const cause4m = await this.formCause4mRepo.find({
-      where: key,
-      order: { ID: 'ASC' },
-    });
+    const cause4m = await this.formCause4mRepo.find({ where: key, order: { ID: 'ASC' }, });
 
-
-    return {
-      status: true,
-      data: {
-        form,
-        flow,
-        head,
-        list,
-        att,
-        cause4m,
-      },
-    };
+    return { status: true, data: { form, flow, head, list, att, cause4m, }, };
   }
-
 
   async updateCause4M(dto: any) {
     const key = {
@@ -630,27 +521,19 @@ export class MfgEdrService {
         }
       }
 
-      return {
-        status: true,
-        message: 'Update Cause 4 M success',
-      };
+      return { status: true, message: 'Update Cause 4 M success', };
     });
   }
 
   async searchReport(dto: SearchMfgEdrReportDto) {
-    const query = this.reportRepository
-      .createQueryBuilder('R');
+    const query = this.reportRepository.createQueryBuilder('R');
 
     if (dto.VREQNO?.trim()) {
-      query.andWhere('TRIM(R.VREQNO) = :REQUEST_BY', {
-        REQUEST_BY: dto.VREQNO.trim(),
-      });
+      query.andWhere('TRIM(R.VREQNO) = :REQUEST_BY', { REQUEST_BY: dto.VREQNO.trim() });
     }
 
     if (dto.REPAIR_BY?.trim()) {
-      query.andWhere('TRIM(R.REPAIR_BY) = :REPAIR_BY', {
-        REPAIR_BY: dto.REPAIR_BY.trim(),
-      });
+      query.andWhere('TRIM(R.REPAIR_BY) = :REPAIR_BY', { REPAIR_BY: dto.REPAIR_BY.trim() });
     }
 
     if (dto.DAILY_REPORT_NO) {
@@ -663,21 +546,15 @@ export class MfgEdrService {
     }
 
     if (dto.TID !== undefined) {
-      query.andWhere('R.TID = :TID', {
-        TID: dto.TID,
-      });
+      query.andWhere('R.TID = :TID', { TID: dto.TID });
     }
 
     if (dto.CID !== undefined) {
-      query.andWhere('R.CID = :CID', {
-        CID: dto.CID,
-      });
+      query.andWhere('R.CID = :CID', { CID: dto.CID });
     }
 
     if (dto.SSECCODE) {
-      query.andWhere('R.SSECCODE = :SSECCODE', {
-        SSECCODE: dto.SSECCODE.trim(),
-      });
+      query.andWhere('R.SSECCODE = :SSECCODE', { SSECCODE: dto.SSECCODE.trim() });
     }
 
     if (dto.ORDERNO) {
@@ -699,9 +576,7 @@ export class MfgEdrService {
     }
 
     if (dto.ITEM) {
-      query.andWhere('R.ITEM = :ITEM', {
-        ITEM: dto.ITEM.trim(),
-      });
+      query.andWhere('R.ITEM = :ITEM', { ITEM: dto.ITEM.trim() });
     }
 
     if (dto.ISSUE_DATE_FROM) {
@@ -713,28 +588,13 @@ export class MfgEdrService {
       );
     }
 
-    if (dto.ISSUE_DATE_TO) {
-      query.andWhere(
-        `TO_DATE(R.ISSUE_DATE, 'DD/MM/YYYY') < TO_DATE(:ISSUE_DATE_TO, 'YYYY-MM-DD') + 1`,
-        {
-          ISSUE_DATE_TO: dto.ISSUE_DATE_TO,
-        },
-      );
-    }
+    if (dto.ISSUE_DATE_TO) { query.andWhere(`TO_DATE(R.ISSUE_DATE, 'DD/MM/YYYY') < TO_DATE(:ISSUE_DATE_TO, 'YYYY-MM-DD') + 1`, { ISSUE_DATE_TO: dto.ISSUE_DATE_TO, },); }
 
     if (dto.CST && dto.CST !== 'ALL') {
-      query.andWhere('R.CST = :CST', {
-        CST: dto.CST,
-      });
+      query.andWhere('R.CST = :CST', { CST: dto.CST });
     }
 
-    return query
-      .orderBy('R.CYEAR2', 'DESC')
-      .addOrderBy('R.NRUNNO', 'DESC')
-      .getMany();
+    return query.orderBy('R.CYEAR2', 'DESC').addOrderBy('R.NRUNNO', 'DESC').getMany();
   }
-      
 
-
-    
 }

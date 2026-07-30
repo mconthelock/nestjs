@@ -8,8 +8,8 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PSYIC_FORM } from '../../webform/table/PSYIC_FORM.entity';
-import { MV_IMM_ITEMMST } from './MV_IMM_ITEMMST.entity';
 import { INV_YEARLY_ASSIGN } from './INV_YEARLY_ASSIGN.entity';
+import { IMM_ITEMMST } from '../views/IMM_ITEMMST.entity';
 
 @Entity({ name: 'INV_YEARLY_RESULT', schema: 'SKIDCNTRL' })
 export class INV_YEARLY_RESULT {
@@ -72,7 +72,7 @@ export class INV_YEARLY_RESULT {
     @JoinColumn([{ name: 'IYA_ID', referencedColumnName: 'IYA_ID' }])
     FORM: PSYIC_FORM;
 
-    @OneToOne(() => MV_IMM_ITEMMST, (i) => i.YEARLY_RESULT)
+    @OneToOne(() => IMM_ITEMMST, (i) => i.YEARLY_RESULT)
     @JoinColumn([{ name: 'ITEM_CODE', referencedColumnName: 'IPROD' }])
-    ITEM: MV_IMM_ITEMMST;
+    ITEM: IMM_ITEMMST;
 }

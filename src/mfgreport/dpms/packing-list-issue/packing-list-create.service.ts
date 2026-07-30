@@ -230,7 +230,7 @@ export class PackingListCreateService extends PackingListIssueService {
                 }
                 console.log('insert Issue rev', insertIssueRev.data);
                 // throw new Error('Test error'); // ลองทดสอบ error handling
-
+                console.log('docRevData', docRevData);
                 // 7. insert record to DPMS_PL_DOC_REV for this issue
                 if (r == 1) {
                     issueRevID = insertIssueRev.data.NID;

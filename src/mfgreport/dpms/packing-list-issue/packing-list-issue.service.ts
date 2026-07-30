@@ -185,13 +185,13 @@ export class PackingListIssueService {
                 checkPlIssue.data.DFINISHALL ||
                 (checkPlIssue.data.DFINISHALL === null && changeIssueType)
             ) {
-                docRevision = checkPlIssue.data.NDOCREV + 1; // เพิ่ม revision ของเอกสาร
+                docRevision = (checkPlIssue.data.NDOCREV ?? 0) + 1; // เพิ่ม revision ของเอกสาร
                 await this.dpmsPlIssueService.update(plIssueData, {
                     DFINISHALL: null,
                     NDOCREV: docRevision,
                 });
             } else {
-                docRevision = checkPlIssue.data.NDOCREV;
+                docRevision = checkPlIssue.data.NDOCREV ?? 0; // กรณีเป็น null
             }
         }
 

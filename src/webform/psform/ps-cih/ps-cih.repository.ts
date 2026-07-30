@@ -24,7 +24,7 @@ export class PsCihRepository extends BaseRepository {
                 ii.ZONE || '-' || SUBSTR(ii.USER_TNAME , 1, INSTR(ii.USER_TNAME || ' ', ' ') - 1) AS STNAME
             FROM PSCIH_FORM pf
             LEFT JOIN SKIDCNTRL.INV_HALFYEAR_RESULT ihr ON pf.REPORT_ID = ihr.REPORT_ID 
-            LEFT JOIN SKIDCNTRL.MV_IMM_ITEMMST ii ON ii.IPROD = ihr.ITEM_CODE
+            LEFT JOIN SKIDCNTRL.IMM_ITEMMST ii ON ii.IPROD = ihr.ITEM_CODE
             WHERE pf.NFRMNO = :1 AND pf.VORGNO = :2 AND pf.CYEAR = :3 AND pf.CYEAR2 = :4 AND pf.NRUNNO = :5
             ORDER BY ihr.GROUP_CODE,ihr.CONTROLLER_ID,ii.IABBT
         `;

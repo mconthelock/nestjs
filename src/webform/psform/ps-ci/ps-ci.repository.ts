@@ -23,7 +23,7 @@ export class PsCiRepository extends BaseRepository {
                 a.STNAME AS LEADER_NAME
             FROM PSCI_FORM p
             LEFT JOIN SKIDCNTRL.INV_CHECK_RESULT icr ON p.ASSIGN_ID = icr.ASSIGN_ID
-            LEFT JOIN SKIDCNTRL.MV_IMM_ITEMMST ii ON icr.ITEM_CODE = ii.IPROD
+            LEFT JOIN SKIDCNTRL.IMM_ITEMMST ii ON icr.ITEM_CODE = ii.IPROD
             LEFT JOIN AMEC.AMECUSERALL a ON icr.LEADER_ID = a.SEMPNO
             WHERE p.NFRMNO = :1
               AND p.VORGNO = :2

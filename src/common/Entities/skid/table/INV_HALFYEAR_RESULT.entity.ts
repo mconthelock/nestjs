@@ -9,8 +9,7 @@ import {
 } from 'typeorm';
 import { PSCIH_FORM } from '../../webform/table/PSCIH_FORM.entity';
 import { INV_CHECK_LOG } from './PSINV_CHECK_LOG.entity';
-import { ImmItemmst } from '../views/imm_itemmst.entity';
-import { MV_IMM_ITEMMST } from './MV_IMM_ITEMMST.entity';
+import { IMM_ITEMMST } from '../views/IMM_ITEMMST.entity';
 
 @Entity({ name: 'INV_HALFYEAR_RESULT', schema: 'SKIDCNTRL' })
 export class INV_HALFYEAR_RESULT {
@@ -102,9 +101,9 @@ export class INV_HALFYEAR_RESULT {
     @JoinColumn([{ name: 'REPORT_ID', referencedColumnName: 'REPORT_ID' }])
     FORM: PSCIH_FORM;
 
-    @OneToOne(() => MV_IMM_ITEMMST, (i) => i.RESULT)
+    @OneToOne(() => IMM_ITEMMST, (i) => i.RESULT)
     @JoinColumn([{ name: 'ITEM_CODE', referencedColumnName: 'IPROD' }])
-    ITEM_DETAIL: MV_IMM_ITEMMST;
+    ITEM_DETAIL: IMM_ITEMMST;
 
     @OneToMany(() => INV_CHECK_LOG, (f2) => f2.RESULT)
     @JoinColumn([

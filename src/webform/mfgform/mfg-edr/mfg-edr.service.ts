@@ -647,6 +647,12 @@ export class MfgEdrService {
       });
     }
 
+    if (dto.REPAIR_BY?.trim()) {
+      query.andWhere('TRIM(R.REPAIR_BY) = :REPAIR_BY', {
+        REPAIR_BY: dto.REPAIR_BY.trim(),
+      });
+    }
+
     if (dto.DAILY_REPORT_NO) {
       query.andWhere(
         'UPPER(R.DAILY_REPORT_NO) LIKE :DAILY_REPORT_NO',

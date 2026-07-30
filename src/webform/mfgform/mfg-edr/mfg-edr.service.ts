@@ -641,8 +641,8 @@ export class MfgEdrService {
     const query = this.reportRepository
       .createQueryBuilder('R');
 
-    if (dto.REQUEST_BY) {
-      query.andWhere('R.REPAIR_BY = :REQUEST_BY', {
+    if (dto.REQUEST_BY?.trim()) {
+      query.andWhere('TRIM(R.VREQNO) = :REQUEST_BY', {
         REQUEST_BY: dto.REQUEST_BY.trim(),
       });
     }

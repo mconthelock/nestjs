@@ -58,6 +58,9 @@ export class VIEW_MFG_EDR_REPORT {
   REPAIR_BY_NAME: string;
 
   @ViewColumn()
+  REQUESTER: string;
+
+  @ViewColumn()
   TYPENAME: string;
 
   @ViewColumn()

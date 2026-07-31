@@ -24,6 +24,8 @@ export class PurevaFormRepository extends BaseRepository {
                         RELATIONS:true,
                         ADDRESSES: true,
                         FILES: true,
+                        TERM:true,
+                        STDCUR:true,
                     },
                 });
         }

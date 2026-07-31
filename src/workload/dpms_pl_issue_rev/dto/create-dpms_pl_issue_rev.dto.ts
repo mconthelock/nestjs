@@ -42,10 +42,10 @@ export class CreateDpmsPlIssueRevDto {
     @Type(() => Number)
     NPDFID: number;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    NEXCELID?: number;
+    NEXCELID: number;
 
     @IsNotEmpty()
     @IsString()
@@ -70,4 +70,9 @@ export class CreateDpmsPlIssueRevDto {
     @IsNotEmpty()
     @IsString()
     VISSUEBY: string;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    NDOCTYPE: number;
 }

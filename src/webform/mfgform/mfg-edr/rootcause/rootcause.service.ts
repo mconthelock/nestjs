@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { SearchRootcauseDto } from './dto/search-rootcause.dto';
 import { RootcauseRepository } from './rootcause.repository';
 
 @Injectable()
@@ -8,11 +9,7 @@ export class RootcauseService {
     private readonly rootcauseRepository: RootcauseRepository,
   ) {}
 
-  findAll() {
-    return this.rootcauseRepository.findAll();
-  }
-
-  findByFiscalYear(fyear: number) {
-    return this.rootcauseRepository.findByFiscalYear(fyear);
+  search(dto: SearchRootcauseDto) {
+    return this.rootcauseRepository.search(dto);
   }
 }

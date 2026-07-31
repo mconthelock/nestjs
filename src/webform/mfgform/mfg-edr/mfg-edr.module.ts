@@ -21,7 +21,7 @@ import { FLOW } from '../../../common/Entities/webform/table/FLOW.entity';
 import { AMECUSERALL } from '../../../common/Entities/amec/views/AMECUSERALL.entity';
 
 import { VIEW_MFG_EDR_REPORT } from '../../../common/Entities/webform/views/VIEW_MFG_EDR_REPORT.entity';
-
+import { RootcauseModule } from './rootcause/rootcause.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -39,6 +39,7 @@ import { VIEW_MFG_EDR_REPORT } from '../../../common/Entities/webform/views/VIEW
       FLOW,
       AMECUSERALL,
       VIEW_MFG_EDR_REPORT,
+      RootcauseModule,
     ], 'webformConnection'),
   ],
   controllers: [MfgEdrController],

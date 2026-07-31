@@ -6,7 +6,7 @@ import {
   IsString,
 } from 'class-validator';
 
-export class SearchRootcause {
+export class SearchRootcauseDto {
   @Type(() => Number)
   @IsNumber()
   FYEAR: number;

@@ -7,6 +7,7 @@ import { RootcauseController } from './rootcause.controller';
 import { RootcauseRepository } from './rootcause.repository';
 import { RootcauseService } from './rootcause.service';
 
+
 @Module({
   imports: [
     TypeOrmModule.forFeature(

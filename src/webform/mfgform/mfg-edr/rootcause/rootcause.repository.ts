@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { VIEW_MFG_EDR_HEAD_ROOTCAUSE } from 'src/common/Entities/webform/views/VIEW_MFG_EDR_HEAD_ROOTCAUSE.entity';
-import { SearchRootcause } from './dto/search-rootcause.dto';
+import { SearchRootcauseDto } from './dto/search-rootcause.dto';
 
 @Injectable()
 export class RootcauseRepository {
@@ -35,7 +35,7 @@ export class RootcauseRepository {
     });
   }
 
-  async search(dto: SearchRootcause) {
+  async search(dto: SearchRootcauseDto) {
     const qb = this.repository.createQueryBuilder('A');
 
     qb.where('A.FYEAR = :FYEAR', {

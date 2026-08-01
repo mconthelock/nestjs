@@ -26,6 +26,7 @@ export class PurevaFormRepository extends BaseRepository {
                         FILES: true,
                         TERM:true,
                         STDCUR:true,
+                        VORG:true,
                     },
                 });
         }

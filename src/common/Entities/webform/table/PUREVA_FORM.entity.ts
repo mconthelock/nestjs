@@ -13,6 +13,7 @@ import { PUREVA_VENDOR_RELATION } from './PUREVA_VENDOR_RELATION.entity';
 import { PURNVF_ADDRESS } from './PURNVF_ADDRESS.entity';
 import { PTERMCODE } from '../../amec/table/PTERMCODE.entity';
 import { PCURRENCY } from '../../amec/table/PCURRENCY.entity';
+import { VORGMST } from '../views/VORGMST.entity';
 
 @Entity({ name: 'PUREVA_FORM', schema: 'WEBFORM' })
 export class PUREVA_FORM {
@@ -222,5 +223,9 @@ export class PUREVA_FORM {
     @OneToOne(() => PCURRENCY)
     @JoinColumn({ name: 'CURCODE', referencedColumnName: 'SCURCODE' })
     STDCUR: PCURRENCY;  
+
+    @OneToOne(() => VORGMST)
+    @JoinColumn({ name: 'CONCERNEDORG', referencedColumnName: 'VORGNO' })
+    VORG: VORGMST;
     
 }

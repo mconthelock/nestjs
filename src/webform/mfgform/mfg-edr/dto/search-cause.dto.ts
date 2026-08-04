@@ -1,6 +1,10 @@
-import { IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 
 export class SearchCauseDto {
-  @IsString()
+  @Transform(({ value }) => Array.isArray(value) ? value : [value])
+  @IsArray()
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
   CAUSE_GROUP: string[];
 }

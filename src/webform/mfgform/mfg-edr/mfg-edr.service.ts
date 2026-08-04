@@ -78,9 +78,9 @@ export class MfgEdrService {
   remove(id: number) { return `This action removes a #${id} mfgEdr`; }
 
   async getCause(dto: SearchCauseDto) {
-    const causeGroups = Array.isArray(dto.CAUSE_GROUP)? dto.CAUSE_GROUP: [dto.CAUSE_GROUP];
+    const causeGroups = dto.CAUSE_GROUP;
 
-    if (!causeGroups.length) {
+    if (!causeGroups?.length) {
       throw new Error('CAUSE_GROUP is required');
     }
 

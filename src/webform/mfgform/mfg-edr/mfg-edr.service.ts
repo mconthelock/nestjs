@@ -78,17 +78,19 @@ export class MfgEdrService {
   remove(id: number) { return `This action removes a #${id} mfgEdr`; }
 
   async getCause(dto: SearchCauseDto) {
-    const causeGroup = (dto as any).CAUSE_GROUP;
-    if (!causeGroup) { throw new Error('CAUSE_GROUP is required'); }
+    const causeGroups = Array.isArray(dto.CAUSE_GROUP)? dto.CAUSE_GROUP: [dto.CAUSE_GROUP];
+
+    if (!causeGroups.length) {
+      throw new Error('CAUSE_GROUP is required');
+    }
+
     return this.causeRepo
       .createQueryBuilder('cause')
       .where('cause.FOR_MFG = :forMfg', { forMfg: '1' })
-      //.andWhere('cause.CAUSE_GROUP = :causeGroup', { causeGroup })
-      .andWhere('cause.CAUSE_GROUP IN (:...causeGroups)', { causeGroup })
+      .andWhere('cause.CAUSE_GROUP IN (:...causeGroups)', { causeGroups })
       .orderBy('cause.CID', 'ASC')
       .getMany();
   }
-
   async getWorktype() {
     return this.worktypeRepo.find({ where: { FOR_MFG: '1', }, order: { TID: 'ASC', }, });
   }

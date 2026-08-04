@@ -91,6 +91,7 @@ export class MfgEdrService {
       .orderBy('cause.CID', 'ASC')
       .getMany();
   }
+  
   async getWorktype() {
     return this.worktypeRepo.find({ where: { FOR_MFG: '1', }, order: { TID: 'ASC', }, });
   }

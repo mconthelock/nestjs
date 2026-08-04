@@ -22,8 +22,4 @@ export class SearchRootcauseDto {
   @IsString({ each: true })
   SSECCODE?: string[];
 
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  ITEM?: string[];
 }

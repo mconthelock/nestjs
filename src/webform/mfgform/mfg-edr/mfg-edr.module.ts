@@ -22,25 +22,30 @@ import { AMECUSERALL } from '../../../common/Entities/amec/views/AMECUSERALL.ent
 
 import { VIEW_MFG_EDR_REPORT } from '../../../common/Entities/webform/views/VIEW_MFG_EDR_REPORT.entity';
 import { RootcauseModule } from './rootcause/rootcause.module';
+
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      EdrWorktypeMst,
-      EdrLineMst,
-      EdrProcessMst,
-      EdrCauseMst,
-      AmecOrders,
-      AmecOrdersSchedule,
-      MfgEdrFormHead,
-      MfgEdrFormList,
-      MfgEdrFormAtt,
-      MfgEdrFormCause4m,
-      FORM,
-      FLOW,
-      AMECUSERALL,
-      VIEW_MFG_EDR_REPORT,
-      RootcauseModule,
-    ], 'webformConnection'),
+    TypeOrmModule.forFeature(
+      [
+        EdrWorktypeMst,
+        EdrLineMst,
+        EdrProcessMst,
+        EdrCauseMst,
+        AmecOrders,
+        AmecOrdersSchedule,
+        MfgEdrFormHead,
+        MfgEdrFormList,
+        MfgEdrFormAtt,
+        MfgEdrFormCause4m,
+        FORM,
+        FLOW,
+        AMECUSERALL,
+        VIEW_MFG_EDR_REPORT,
+      ],
+      'webformConnection',
+    ),
+
+    RootcauseModule,
   ],
   controllers: [MfgEdrController],
   providers: [MfgEdrService],

@@ -54,11 +54,6 @@ export class RootcauseRepository {
         });
     }
 
-    if (dto.ITEM?.length) {
-        qb.andWhere('A.ITEM IN (:...ITEM)', {
-        ITEM: dto.ITEM,
-        });
-    }
 
     return qb
         .orderBy('A.CYEAR2', 'ASC')

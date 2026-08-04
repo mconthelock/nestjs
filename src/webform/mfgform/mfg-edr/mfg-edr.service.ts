@@ -83,7 +83,8 @@ export class MfgEdrService {
     return this.causeRepo
       .createQueryBuilder('cause')
       .where('cause.FOR_MFG = :forMfg', { forMfg: '1' })
-      .andWhere('cause.CAUSE_GROUP = :causeGroup', { causeGroup })
+      //.andWhere('cause.CAUSE_GROUP = :causeGroup', { causeGroup })
+      .andWhere('cause.CAUSE_GROUP IN (:...causeGroups)', { causeGroup })
       .orderBy('cause.CID', 'ASC')
       .getMany();
   }

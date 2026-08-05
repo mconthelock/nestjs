@@ -38,9 +38,9 @@ export class PurevaFormService {
     return `This action returns a #${id} purevaForm`;
   }
 
-  update(con: FormDto , dto: UpdatePurevaFormDto) {
+  async update(con: FormDto , dto: UpdatePurevaFormDto) {
     try {
-        const res = this.repo.update(con, dto); 
+        const res = await this.repo.update(con, dto);
         if(!res){
             throw new Error('Failed to update PUREVAFORM');
         }

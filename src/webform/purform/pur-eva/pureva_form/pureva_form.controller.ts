@@ -28,10 +28,10 @@ export class PurevaFormController {
     return this.purevaFormService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePurevaFormDto: UpdatePurevaFormDto) {
-    return this.purevaFormService.update(+id, updatePurevaFormDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updatePurevaFormDto: UpdatePurevaFormDto) {
+  //   return this.purevaFormService.update(+id, updatePurevaFormDto);
+  // }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

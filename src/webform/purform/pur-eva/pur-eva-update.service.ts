@@ -67,7 +67,7 @@ export class PurEvaUpdateService  {
         
 
         try {
-            const { REQBY, INPUTBY , DRAFT , REMARK, ACTION , SCORES, PROFIT_TURNOVERS , RELATIONS , ...data } = dto;
+            const { REQBY, INPUTBY , DRAFT , REMARK, ACTION , EMPNO , SCORES, PROFIT_TURNOVERS , RELATIONS , DELETE_FILES, ...data } = dto;
             const form = {
                 NFRMNO: dto.NFRMNO,
                 VORGNO: dto.VORGNO,
@@ -125,6 +125,17 @@ export class PurEvaUpdateService  {
             if (RELATIONS && RELATIONS.length > 0) {
                 await this.reporelation.createMultipleRelations(form, RELATIONS);
             }
+            if (DELETE_FILES && DELETE_FILES.length > 0) {
+                for (const id of DELETE_FILES) {
+                    const file = await this.purFileService.getFileById(+id);
+                    await this.purFileService.deleteFileByID(+id);
+                    const destination = await joinPaths(
+                        file.FILE_PATH,
+                        file.FILE_FNAME,
+                    );
+                    await deleteFile(destination);
+                }
+            }
             if (allFilesWithType && allFilesWithType.length > 0) {
              movedTargets = await this.moveFiles(
                 allFilesWithType, // ส่งตัวแปรที่รวบรวมไฟล์+type ไปแทน
@@ -134,13 +145,12 @@ export class PurEvaUpdateService  {
             );
             }
             
-        
-
-            await this.doactionService.doAction(
-                { ...form, ACTION: 'approve', EMPNO, REMARK },
+            if(ACTION== 'approve'){
+                await this.doactionService.doAction(
+                { ...form, ACTION: ACTION, EMPNO, REMARK },
                 ip,
-            );
-
+                );
+            }
 
         return {
                 status: true,

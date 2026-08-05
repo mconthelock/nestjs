@@ -64,12 +64,13 @@ export class M001kpService {
             values.push(code, value);
         });
         return this.conn.runQuery(
-            `SELECT DISTINCT TRIM(M1K02) AS ORDERNO,
-                             TRIM(M1K03) AS ITEMNO,
-                             TRIM(M1K41) AS PARTNAME
-             FROM ${this.library}.M001KP
-             WHERE ${fields.map((field) => `${field} = ?`).join(' AND ')}
-               AND (M1K02 LIKE 'E%' OR M1K02 LIKE 'S%')
+            `SELECT DISTINCT TRIM(M.M1K02) AS ORDERNO,
+                             TRIM(M.M1K03) AS ITEMNO,
+                             COALESCE(NULLIF(TRIM(Q.BMZTIT), ''), 'NOTFO') AS PARTNAME
+             FROM ${this.library}.M001KP M
+             LEFT JOIN ${this.library}.Q001MP Q ON Q.BMZUBA = M.M1K19
+             WHERE ${fields.map((field) => `M.${field} = ?`).join(' AND ')}
+               AND (M.M1K02 LIKE 'E%' OR M.M1K02 LIKE 'S%')
              ORDER BY ORDERNO, ITEMNO, PARTNAME`,
             values,
         );

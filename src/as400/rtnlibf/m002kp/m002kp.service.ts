@@ -1,10 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { ConectionService } from 'src/as400/conection/conection.service';
+import { convertJung } from 'src/common/utils/format.utils';
 import { Connection } from 'odbc';
+
+export function buildScheduleRows(
+    newOrder: string,
+    schedule: string,
+    priority: string,
+) {
+    const mfgSchedule = convertJung(`20${schedule}`);
+    if (!mfgSchedule) throw new Error(`Invalid Schedule: ${schedule}`);
+
+    return {
+        m008: [
+            {
+                M8K01: mfgSchedule,
+                M8K02: priority,
+                M8K03: newOrder,
+                M8K04: 0,
+            },
+        ],
+        m012: [
+            {
+                M12K1: mfgSchedule,
+                M12K2: priority,
+                M12K3: newOrder,
+                M12K4: 0,
+            },
+        ],
+    };
+}
 
 @Injectable()
 export class M002kpService {
     private readonly library = 'RTNLIBF';
+    private readonly sourceTable = 'M002KPBM';
     private readonly fields = Array.from(
         { length: 65 },
         (_, index) => `M2K${String(index + 1).padStart(2, '0')}`,
@@ -15,7 +45,7 @@ export class M002kpService {
     findByOrder(order: string) {
         return this.conn.runQuery(
             `SELECT *
-             FROM ${this.library}.M002KP
+             FROM ${this.library}.${this.sourceTable}
              WHERE M2K02 = ?
              ORDER BY M2K02`,
             [order],
@@ -26,7 +56,7 @@ export class M002kpService {
         return this.conn.runQuery(
             `SELECT DISTINCT TRIM(M2K02) AS ORDERNO,
                              TRIM(M2K04) AS CLAIMSLIPNO
-             FROM ${this.library}.M002KP
+             FROM ${this.library}.${this.sourceTable}
              WHERE M2K02 = ?
              ORDER BY CLAIMSLIPNO`,
             [originalOrder],
@@ -38,6 +68,7 @@ export class M002kpService {
         originalOrder: string,
         newOrder: string,
         schedule: string,
+        priority: string,
         claimSlipNo: string,
         libraries: string[],
     ) {
@@ -46,21 +77,18 @@ export class M002kpService {
             (sql, parameters) => connection.query(sql, parameters) as any,
             originalOrder,
         );
-        const schedules = await this.previewScheduleRows(
-            (sql, parameters) => connection.query(sql, parameters) as any,
-            originalOrder,
-            newOrder,
-        );
+        const schedules = buildScheduleRows(newOrder, schedule, priority);
         for (const library of libraries) {
+            const table = this.tableForLibrary(library);
             const existing = (await connection.query(
                 `SELECT COUNT(*) AS CNT
-                 FROM ${library}.M002KP
+                 FROM ${library}.${table}
                  WHERE M2K02 = ?`,
                 [newOrder],
             )) as any[];
             if (Number(existing[0]?.CNT || 0)) {
                 throw new Error(
-                    `${newOrder} already exists in ${library}.M002KP`,
+                    `${newOrder} already exists in ${library}.${table}`,
                 );
             }
             for (const [table, field, rows] of [
@@ -83,7 +111,8 @@ export class M002kpService {
         }
 
         for (const library of libraries) {
-            const sql = `INSERT INTO ${library}.M002KP
+            const table = this.tableForLibrary(library);
+            const sql = `INSERT INTO ${library}.${table}
                 (${this.fields.join(', ')}) VALUES (${this.fields.map(() => '?').join(', ')})`;
             for (const row of source) {
                 await connection.query(
@@ -127,6 +156,7 @@ export class M002kpService {
         originalOrder: string,
         newOrder: string,
         schedule: string,
+        priority: string,
         claimSlipNo: string,
     ) {
         claimSlipNo = this.claimSlipNo(claimSlipNo);
@@ -134,11 +164,7 @@ export class M002kpService {
             (sql, parameters) => this.conn.runQuery(sql, parameters),
             originalOrder,
         );
-        const schedules = await this.previewScheduleRows(
-            (sql, parameters) => this.conn.runQuery(sql, parameters),
-            originalOrder,
-            newOrder,
-        );
+        const schedules = buildScheduleRows(newOrder, schedule, priority);
         const m002 = source.map((sourceRow) =>
             Object.fromEntries(
                 this.fields.map((field) => [
@@ -162,7 +188,7 @@ export class M002kpService {
     ) {
         const source = await query(
             `SELECT ${this.fields.join(', ')}
-             FROM ${this.library}.M002KP
+             FROM ${this.library}.${this.sourceTable}
              WHERE M2K02 = ?`,
             [originalOrder],
         );
@@ -171,56 +197,10 @@ export class M002kpService {
         return source;
     }
 
-    private async previewScheduleRows(
-        query: (sql: string, parameters: (string | number)[]) => Promise<any[]>,
-        originalOrder: string,
-        newOrder: string,
-    ) {
-        const m008Source = await query(
-            `SELECT M8K01, M8K02
-             FROM ${this.library}.M008KP
-             WHERE M8K03 = ?`,
-            [originalOrder],
-        );
-        const m012Source = await query(
-            `SELECT M12K1, M12K2
-             FROM ${this.library}.M012KP
-             WHERE M12K3 = ?`,
-            [originalOrder],
-        );
-        if (m008Source.length > 1 || m012Source.length > 1) {
-            throw new Error(
-                `Multiple M008/M012 schedules found for ${originalOrder}`,
-            );
-        }
-        if (m012Source.length && !m008Source.length) {
-            throw new Error(
-                `M012 found but M008 schedule/priority not found for ${originalOrder}`,
-            );
-        }
-        const schedule = m008Source[0];
-        return {
-            m008: schedule
-                ? [
-                      {
-                          M8K01: schedule.M8K01,
-                          M8K02: schedule.M8K02,
-                          M8K03: newOrder,
-                          M8K04: 0,
-                      },
-                  ]
-                : [],
-            m012: m012Source.length
-                ? [
-                      {
-                          M12K1: schedule.M8K01,
-                          M12K2: schedule.M8K02,
-                          M12K3: newOrder,
-                          M12K4: 0,
-                      },
-                  ]
-                : [],
-        };
+    private tableForLibrary(library: string) {
+        if (library === 'RTNLIBF') return 'M002KPBM';
+        if (library === 'DBGDEV14') return 'M002KP';
+        throw new Error(`Unsupported M002 library: ${library}`);
     }
 
     private claimSlipNo(value: string) {

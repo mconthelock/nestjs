@@ -62,6 +62,21 @@ async createMultipleScores(formDto:FormDto , scores:RequestPurevaScoreDto[]) {
         }
   }
 
+async deleteByAll(dto: FormDto) {
+    try {
+        const res = await this.repo.deleteByAll(dto);       
+        if(!res){
+                throw new Error('Failed to Delete PUREVASCORE');
+            }
+            return {
+                status: true,
+                message: 'Delete PUREVASCORE Successfully',
+            };
+        } catch (error) {
+            throw new Error('Delete PUREVASCORE Error: ' + error.message);
+        }
+  }
+
   findAll() {
     return `This action returns all PUREVASCORE`;
   }

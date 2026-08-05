@@ -38,8 +38,19 @@ export class PurevaFormService {
     return `This action returns a #${id} purevaForm`;
   }
 
-  update(id: number, updatePurevaFormDto: UpdatePurevaFormDto) {
-    return `This action updates a #${id} purevaForm`;
+  update(con: FormDto , dto: UpdatePurevaFormDto) {
+    try {
+        const res = this.repo.update(con, dto); 
+        if(!res){
+            throw new Error('Failed to update PUREVAFORM');
+        }
+        return {
+            status: true,
+            message: 'Update PUREVAFORM Successfully',
+        };
+    } catch (error) {
+        throw new Error('Update PUREVAFORM Error: ' + error.message);
+    }
   }
 
   remove(id: number) {

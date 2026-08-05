@@ -48,6 +48,21 @@ export class PurevaProfitTurnoverService {
         }
   }
 
+  async deleteByAll(dto: FormDto) {
+    try {
+        const res = await this.repo.deleteByAll(dto);       
+        if(!res){
+                throw new Error('Failed to Delete PUREVAPROFITTURNOVER');
+            }
+            return {
+                status: true,
+                message: 'Delete PUREVAPROFITTURNOVER Successfully',
+            };
+        } catch (error) {
+            throw new Error('Delete PUREVAPROFITTURNOVER Error: ' + error.message);
+        }
+  }
+
   create(createPurevaProfitTurnoverDto: CreatePurevaProfitTurnoverDto) {
       return 'This action adds a new finpckAsset';
   }

@@ -235,7 +235,7 @@ export class CheckinventoryRepository extends BaseRepository {
                 mii.*
             FROM SKIDCNTRL.INV_YEARLY_RESULT iyr
             LEFT JOIN AMECUSERALL a ON iyr.USER_ID = a.SEMPNO
-            LEFT JOIN SKIDCNTRL.IMM_ITEMMST mii ON iyr.ITEM_CODE = mii.IPROD
+            LEFT JOIN SKIDCNTRL.MV_IMM_ITEMMST mii ON iyr.ITEM_CODE = mii.IPROD
             WHERE iyr.IYA_ID = :id
             ORDER BY TAG_NO
         `;

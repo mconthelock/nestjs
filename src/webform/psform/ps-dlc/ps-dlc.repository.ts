@@ -39,12 +39,17 @@ export class PSDLCRepository extends BaseRepository {
         const currentDateStr = dayjs().format('YYYYMMDD');
 
         for (const detail of details) {
-            if (!detail.PNZUBA || !detail.PNHING) {
+            // เช็คว่าต้องมี PNZUBA เสมอ และ PNHING ต้องไม่เป็น null/undefined (แต่เป็น "" ได้)
+            if (
+                !detail.PNZUBA ||
+                detail.PNHING === undefined ||
+                detail.PNHING === null
+            ) {
                 continue;
             }
 
             const zuba = this.escapeSql(detail.PNZUBA.trim());
-            const hing = this.escapeSql(detail.PNHING.trim());
+            const hing = this.escapeSql(String(detail.PNHING).trim()); // บังคับเป็น String ป้องกัน Error
 
             // --------------------------------------------------
             // 1. จัดการ PNRKUB = '0' (ทำ UPDATE ตามปกติ)
@@ -52,7 +57,7 @@ export class PSDLCRepository extends BaseRepository {
             const q008mpRow0 = this.buildPndataExpressionForRow0(detail);
             if (q008mpRow0) {
                 // เพิ่ม PNDATE ใน SET clause
-                const query = `UPDATE RTNLIBF.Q008MP SET PNDATA = ${q008mpRow0}, PNDATE = '${currentDateStr}' WHERE PNZUBA = '${zuba}' AND PNHING = '${hing}' AND PNRKUB = '0'`;
+                const query = `UPDATE RTNLIBF.Q008MP SET PNDATA = ${q008mpRow0}, PNDATE = '${currentDateStr}' WHERE TRIM(PNZUBA) = '${zuba}' AND TRIM(PNHING) = '${hing}' AND PNRKUB = '0'`;
                 await this.conn.runQuery(query);
             }
 
@@ -124,8 +129,8 @@ export class PSDLCRepository extends BaseRepository {
 
         // ลบ detail.NEWCODE !== null ออก เพื่อให้รับค่า null เข้ามาทำงานต่อได้
         const hasCode = detail.NEWCODE !== undefined;
-        // ถ้าค่าเป็น null หรือ undefined จะให้เป็น string ว่างไปเลย
-        const code = (detail.NEWCODE || '').trim();
+        // บังคับให้เป็น String ก่อน เพื่อให้ใช้ .trim() ได้อย่างปลอดภัย
+        const code = String(detail.NEWCODE || '').trim();
 
         if (!flag && !hasCode) {
             return null;

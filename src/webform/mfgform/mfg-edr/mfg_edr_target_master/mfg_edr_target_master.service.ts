@@ -47,17 +47,34 @@ export class MfgEdrTargetMasterService {
     });
   }
 
-  async search(
-    dto: SearchMfgEdrTargetMasterDto,
-  ): Promise<MfgEdrTargetMaster[]> {
-    return this.targetMasterRepository.find({
-      where: {
-        FYEAR: dto.FYEAR,
-      },
-      order: {
-        SSECCODE: 'ASC',
-      },
-    });
+  async search(dto: SearchMfgEdrTargetMasterDto): Promise<any[]> {
+    return this.targetMasterRepository
+      .createQueryBuilder('A')
+      .innerJoin(
+        'ORGANIZATIONS',
+        'B',
+        'A.SSECCODE = B.SSECCODE',
+      )
+      .select([
+        'A.FYEAR AS "FYEAR"',
+        'A.SSECCODE AS "SSECCODE"',
+        'A.JAN AS "JAN"',
+        'A.FEB AS "FEB"',
+        'A.MAR AS "MAR"',
+        'A.APR AS "APR"',
+        'A.MAY AS "MAY"',
+        'A.JUN AS "JUN"',
+        'A.JUL AS "JUL"',
+        'A.AUG AS "AUG"',
+        'A.SEP AS "SEP"',
+        'A.OCT AS "OCT"',
+        'A.NOV AS "NOV"',
+        'A.DEC AS "DEC"',
+        'B.SDEPCODE AS "SDEPCODE"',
+      ])
+      .where('A.FYEAR = :FYEAR', { FYEAR: dto.FYEAR })
+      .orderBy('A.SSECCODE', 'ASC')
+      .getRawMany();
   }
 
   async findOne(

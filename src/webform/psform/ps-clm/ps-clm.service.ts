@@ -23,6 +23,7 @@ const ORDER_PREFIXES = { E: 'ET2C', S: 'ST2C' } as const;
 const AS400_PRIMARY_LIBRARY = 'RTNLIBF';
 const AS400_DEBUG_LIBRARY = 'DBGDEV14';
 const M002_TABLE = 'M002KPBM';
+const REQUEST_MAIL_CC_EMPNO = '25020';
 
 function getOrderType(orderNo: string) {
     const type = String(orderNo || '')
@@ -502,6 +503,7 @@ export class PsClmService {
             ...new Set(
                 flows
                     .flatMap((flow) => [flow.VAPVNO, flow.VREPNO])
+                    .concat(REQUEST_MAIL_CC_EMPNO)
                     .map((empno) => String(empno || '').trim())
                     .filter(Boolean),
             ),
@@ -509,6 +511,12 @@ export class PsClmService {
         const users = await Promise.all(
             empnos.map((empno) => this.usersService.findEmp(empno)),
         );
+        const requiredCc = users[empnos.indexOf(REQUEST_MAIL_CC_EMPNO)];
+        if (!requiredCc?.SRECMAIL) {
+            throw new Error(
+                `PS-CLM email not found for CC: ${REQUEST_MAIL_CC_EMPNO}`,
+            );
+        }
         const requester = requesterEmail.trim().toLowerCase();
 
         return [

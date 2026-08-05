@@ -22,6 +22,8 @@ const ASSIGN_CONTROLLERS = ['12177', '14036', '16066'];
 const ORDER_PREFIXES = { E: 'ET2C', S: 'ST2C' } as const;
 const AS400_PRIMARY_LIBRARY = 'RTNLIBF';
 const AS400_DEBUG_LIBRARY = 'DBGDEV14';
+const M002_TABLE = 'M002KPBM';
+const REQUEST_MAIL_CC_EMPNO = '25020';
 
 function getOrderType(orderNo: string) {
     const type = String(orderNo || '')
@@ -252,13 +254,20 @@ export class PsClmService {
     }
 
     async previewAs400(dto: SendPsClmAs400Dto) {
-        const { newOrder, details, originalOrder, schedule, claimSlipNo } =
-            await this.getAs400WriteContext(dto);
+        const {
+            newOrder,
+            details,
+            originalOrder,
+            schedule,
+            priority,
+            claimSlipNo,
+        } = await this.getAs400WriteContext(dto);
 
         const related = await this.m002kpService.previewInsert(
             originalOrder,
             newOrder,
             schedule,
+            priority,
             claimSlipNo,
         );
         const m001 = this.m001kpService.previewInsert(newOrder, details);
@@ -275,8 +284,14 @@ export class PsClmService {
     }
 
     async sendToAs400(dto: SendPsClmAs400Dto) {
-        const { newOrder, details, originalOrder, schedule, claimSlipNo } =
-            await this.getAs400WriteContext(dto);
+        const {
+            newOrder,
+            details,
+            originalOrder,
+            schedule,
+            priority,
+            claimSlipNo,
+        } = await this.getAs400WriteContext(dto);
         await this.updateDetailSchedules(this.pickForm(dto), dto.DETAILS);
 
         const result = await this.as400.withTransaction(async (connection) => {
@@ -285,6 +300,7 @@ export class PsClmService {
                 originalOrder,
                 newOrder,
                 schedule,
+                priority,
                 claimSlipNo,
                 this.as400WriteLibraries,
             );
@@ -310,10 +326,10 @@ export class PsClmService {
         return {
             status: true,
             message: rows.length
-                ? `Order found in ${this.as400PrimaryLibrary}.M002KP`
-                : `Order not found in ${this.as400PrimaryLibrary}.M002KP`,
+                ? `Order found in ${this.as400PrimaryLibrary}.${M002_TABLE}`
+                : `Order not found in ${this.as400PrimaryLibrary}.${M002_TABLE}`,
             data: {
-                library: `${this.as400PrimaryLibrary}.M002KP`,
+                library: `${this.as400PrimaryLibrary}.${M002_TABLE}`,
                 condition: `M2K02 = ${originalOrder}`,
                 rows,
             },
@@ -384,6 +400,23 @@ export class PsClmService {
         ) {
             throw new Error('Schedule and P are required for every item');
         }
+        const schedules = [
+            ...new Set(
+                context.details.map((detail) =>
+                    String(detail.SCHDNUM).trim().toUpperCase(),
+                ),
+            ),
+        ];
+        const priorities = [
+            ...new Set(
+                context.details.map((detail) =>
+                    String(detail.SCHDP).trim().toUpperCase(),
+                ),
+            ),
+        ];
+        if (schedules.length !== 1 || priorities.length !== 1) {
+            throw new Error('All details must use one Schedule and P');
+        }
         const claimSlipNumbers = [
             ...new Set(
                 context.details.map((detail) =>
@@ -399,7 +432,8 @@ export class PsClmService {
             .filter(Boolean);
         return {
             ...context,
-            schedule: String(context.details[0].SCHDNUM).trim(),
+            schedule: schedules[0],
+            priority: priorities[0],
             claimSlipNo: formatPsClmProject(claimSlipNumbers[0], claimTypes),
         };
     }
@@ -446,12 +480,56 @@ export class PsClmService {
         if (!user?.SRECMAIL)
             throw new Error(`PS-CLM email not found for requester: ${empno}`);
 
+        const cc = await this.getRequestMailCc(form, user.SRECMAIL);
+
         const formNo = `PS-CLM${String(form.CYEAR2).slice(-2)}-${String(form.NRUNNO).padStart(6, '0')}`;
         return {
             to: user.SRECMAIL,
+            cc,
             subject: `${formNo} created`,
             html: `<p>${formNo} has been created.</p><p>New Order: ${newOrder}</p><p>This is an automated email.</p>`,
         };
+    }
+
+    private async getRequestMailCc(form: FormDto, requesterEmail: string) {
+        const flows = (
+            await Promise.all(
+                ['01', '02'].map((CEXTDATA) =>
+                    this.flowService.getFlow({ ...form, CEXTDATA }),
+                ),
+            )
+        ).flat();
+        const empnos = [
+            ...new Set(
+                flows
+                    .flatMap((flow) => [flow.VAPVNO, flow.VREPNO])
+                    .concat(REQUEST_MAIL_CC_EMPNO)
+                    .map((empno) => String(empno || '').trim())
+                    .filter(Boolean),
+            ),
+        ];
+        const users = await Promise.all(
+            empnos.map((empno) => this.usersService.findEmp(empno)),
+        );
+        const requiredCc = users[empnos.indexOf(REQUEST_MAIL_CC_EMPNO)];
+        if (!requiredCc?.SRECMAIL) {
+            throw new Error(
+                `PS-CLM email not found for CC: ${REQUEST_MAIL_CC_EMPNO}`,
+            );
+        }
+        const requester = requesterEmail.trim().toLowerCase();
+
+        return [
+            ...new Map(
+                users
+                    .map((user) => String(user?.SRECMAIL || '').trim())
+                    .filter(
+                        (email) =>
+                            email && email.toLowerCase() !== requester,
+                    )
+                    .map((email) => [email.toLowerCase(), email]),
+            ).values(),
+        ];
     }
 
     private saveDetails(

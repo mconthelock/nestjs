@@ -14,7 +14,7 @@ import { SearchMfgEdrTargetMasterDto } from './dto/search_mfg_edr_target_master.
 import { UpdateMfgEdrTargetMasterDto } from './dto/update_mfg_edr_target_master.dto';
 import { MfgEdrTargetMasterService } from './mfg_edr_target_master.service';
 
-@Controller('mfg-edr-target-master')
+@Controller('mfg-edr/target-master')
 export class MfgEdrTargetMasterController {
   constructor(
     private readonly mfgEdrTargetMasterService: MfgEdrTargetMasterService,

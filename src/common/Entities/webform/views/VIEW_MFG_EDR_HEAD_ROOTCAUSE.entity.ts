@@ -48,8 +48,17 @@ export class VIEW_MFG_EDR_HEAD_ROOTCAUSE {
   SSEC: string;
 
   @Column({ nullable: true })
+  SDEPCODE: string;
+
+  @Column({ nullable: true })
+  SDEPT: string;
+
+  @Column({ nullable: true })
   CAUSE: string;
 
   @Column({ nullable: true })
   CAUSENAME: string;
+
+  @Column({ nullable: true })
+  ITEM: string;
 }

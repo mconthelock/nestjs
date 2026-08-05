@@ -71,6 +71,8 @@ export class MfgEdrTargetMasterService {
         'A.NOV AS "NOV"',
         'A.DEC AS "DEC"',
         'B.SDEPCODE AS "SDEPCODE"',
+        'B.SSEC AS "SSEC"',
+        'B.SDEPT AS "SDEPT"',
       ])
       .where('A.FYEAR = :FYEAR', { FYEAR: dto.FYEAR })
       .orderBy('A.SSECCODE', 'ASC')

@@ -22,4 +22,10 @@ export class SearchRootcauseDto {
   @IsString({ each: true })
   SSECCODE?: string[];
 
+  @IsOptional()
+  @IsArray()
+  @Type(() => Number)
+  @IsNumber({}, { each: true })
+  ITEM?: number[];
+
 }

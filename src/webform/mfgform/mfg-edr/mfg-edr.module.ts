@@ -22,6 +22,7 @@ import { AMECUSERALL } from '../../../common/Entities/amec/views/AMECUSERALL.ent
 
 import { VIEW_MFG_EDR_REPORT } from '../../../common/Entities/webform/views/VIEW_MFG_EDR_REPORT.entity';
 import { RootcauseModule } from './rootcause/rootcause.module';
+import { MfgEdrTargetMasterModule } from './mfg_edr_target_master/mfg_edr_target_master.module';
 
 @Module({
   imports: [
@@ -44,8 +45,8 @@ import { RootcauseModule } from './rootcause/rootcause.module';
       ],
       'webformConnection',
     ),
-
     RootcauseModule,
+    MfgEdrTargetMasterModule,
   ],
   controllers: [MfgEdrController],
   providers: [MfgEdrService],

@@ -78,16 +78,20 @@ export class MfgEdrService {
   remove(id: number) { return `This action removes a #${id} mfgEdr`; }
 
   async getCause(dto: SearchCauseDto) {
-    const causeGroup = (dto as any).CAUSE_GROUP;
-    if (!causeGroup) { throw new Error('CAUSE_GROUP is required'); }
+    const causeGroups = dto.CAUSE_GROUP;
+
+    if (!causeGroups?.length) {
+      throw new Error('CAUSE_GROUP is required');
+    }
+
     return this.causeRepo
       .createQueryBuilder('cause')
       .where('cause.FOR_MFG = :forMfg', { forMfg: '1' })
-      .andWhere('cause.CAUSE_GROUP = :causeGroup', { causeGroup })
+      .andWhere('cause.CAUSE_GROUP IN (:...causeGroups)', { causeGroups })
       .orderBy('cause.CID', 'ASC')
       .getMany();
   }
-
+  
   async getWorktype() {
     return this.worktypeRepo.find({ where: { FOR_MFG: '1', }, order: { TID: 'ASC', }, });
   }
@@ -527,15 +531,12 @@ export class MfgEdrService {
 
   async searchReport(dto: SearchMfgEdrReportDto) {
     const query = this.reportRepository.createQueryBuilder('R');
-
     if (dto.VREQNO?.trim()) {
       query.andWhere('TRIM(R.VREQNO) = :REQUEST_BY', { REQUEST_BY: dto.VREQNO.trim() });
     }
-
     if (dto.REPAIR_BY?.trim()) {
       query.andWhere('TRIM(R.REPAIR_BY) = :REPAIR_BY', { REPAIR_BY: dto.REPAIR_BY.trim() });
     }
-
     if (dto.DAILY_REPORT_NO) {
       query.andWhere(
         'UPPER(R.DAILY_REPORT_NO) LIKE :DAILY_REPORT_NO',
@@ -544,56 +545,31 @@ export class MfgEdrService {
         },
       );
     }
-
     if (dto.TID !== undefined) {
       query.andWhere('R.TID = :TID', { TID: dto.TID });
     }
-
     if (dto.CID !== undefined) {
       query.andWhere('R.CID = :CID', { CID: dto.CID });
     }
-
     if (dto.SSECCODE) {
       query.andWhere('R.SSECCODE = :SSECCODE', { SSECCODE: dto.SSECCODE.trim() });
     }
-
     if (dto.ORDERNO) {
-      query.andWhere(
-        'UPPER(R.ORDERNO) LIKE :ORDERNO',
-        {
-          ORDERNO: `%${dto.ORDERNO.trim().toUpperCase()}%`,
-        },
-      );
+      query.andWhere('UPPER(R.ORDERNO) LIKE :ORDERNO',{ORDERNO: `%${dto.ORDERNO.trim().toUpperCase()}%`,},);
     }
 
     if (dto.DWGNO) {
-      query.andWhere(
-        'UPPER(R.DWGNO) LIKE :DWGNO',
-        {
-          DWGNO: `%${dto.DWGNO.trim().toUpperCase()}%`,
-        },
-      );
+      query.andWhere('UPPER(R.DWGNO) LIKE :DWGNO', { DWGNO: `%${dto.DWGNO.trim().toUpperCase()}%`,},);
     }
-
-    if (dto.ITEM) {
-      query.andWhere('R.ITEM = :ITEM', { ITEM: dto.ITEM.trim() });
-    }
-
+    if (dto.ITEM) {query.andWhere('R.ITEM = :ITEM', { ITEM: dto.ITEM.trim() });}
     if (dto.ISSUE_DATE_FROM) {
-      query.andWhere(
-        `TO_DATE(R.ISSUE_DATE, 'DD/MM/YYYY') >= TO_DATE(:ISSUE_DATE_FROM, 'YYYY-MM-DD')`,
-        {
-          ISSUE_DATE_FROM: dto.ISSUE_DATE_FROM,
-        },
-      );
+      query.andWhere(`TO_DATE(R.ISSUE_DATE, 'DD/MM/YYYY') >= TO_DATE(:ISSUE_DATE_FROM, 'YYYY-MM-DD')`,{ISSUE_DATE_FROM: dto.ISSUE_DATE_FROM,},);
     }
 
     if (dto.ISSUE_DATE_TO) { query.andWhere(`TO_DATE(R.ISSUE_DATE, 'DD/MM/YYYY') < TO_DATE(:ISSUE_DATE_TO, 'YYYY-MM-DD') + 1`, { ISSUE_DATE_TO: dto.ISSUE_DATE_TO, },); }
-
     if (dto.CST && dto.CST !== 'ALL') {
       query.andWhere('R.CST = :CST', { CST: dto.CST });
     }
-
     return query.orderBy('R.CYEAR2', 'DESC').addOrderBy('R.NRUNNO', 'DESC').getMany();
   }
 

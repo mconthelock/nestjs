@@ -48,13 +48,9 @@ export class MfgEdrTargetMasterService {
   }
 
   async search(dto: SearchMfgEdrTargetMasterDto): Promise<any[]> {
-    return this.targetMasterRepository
+    const query = this.targetMasterRepository
       .createQueryBuilder('A')
-      .innerJoin(
-        'ORGANIZATIONS',
-        'B',
-        'A.SSECCODE = B.SSECCODE',
-      )
+      .innerJoin('ORGANIZATIONS', 'B', 'A.SSECCODE = B.SSECCODE')
       .select([
         'A.FYEAR AS "FYEAR"',
         'A.SSECCODE AS "SSECCODE"',
@@ -74,7 +70,15 @@ export class MfgEdrTargetMasterService {
         'B.SSEC AS "SSEC"',
         'B.SDEPT AS "SDEPT"',
       ])
-      .where('A.FYEAR = :FYEAR', { FYEAR: dto.FYEAR })
+      .where('A.FYEAR = :FYEAR', { FYEAR: dto.FYEAR });
+
+    if (dto.SSECCODE) {
+      query.andWhere('A.SSECCODE = :SSECCODE', {
+        SSECCODE: dto.SSECCODE,
+      });
+    }
+
+    return query
       .orderBy('A.SSECCODE', 'ASC')
       .getRawMany();
   }

@@ -80,9 +80,11 @@ export class CheckinventoryRepository extends BaseRepository {
     }
 
     async getYearlyAssign() {
-        return this.getRepository(INV_YEARLY_ASSIGN).find({
-            relations: ['RESULT', 'USER'],
-        });
+        return this.getRepository(INV_YEARLY_ASSIGN)
+            .createQueryBuilder('a')
+            .leftJoinAndSelect('a.RESULT', 'r')
+            .leftJoinAndSelect('a.USER', 'u')
+            .getMany();
     }
 
     async createYearlyReport(

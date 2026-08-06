@@ -1,12 +1,13 @@
 import * as ExcelJS from 'exceljs';
 import { toExcelDate } from './dayjs.utils';
+import { Response } from 'express';
 
 export async function defaultExcel(
     options: {
         data?: any[];
         column?: {
             key: string;
-            header: string;
+            header?: string;
             type?: 'string' | 'number' | 'date';
             numFmt?: string;
             bullet?: boolean;
@@ -30,6 +31,7 @@ export async function defaultExcel(
         autoWidth?: boolean;
         autoHeight?: boolean;
         startRow?: number;
+        templatePath?: string;
     } = {},
 ) {
     const {
@@ -55,7 +57,14 @@ export async function defaultExcel(
     } = options;
 
     const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet(sheetName); // เพื่มชีท และตั้งชื่อชีท
+    let sheet: ExcelJS.Worksheet;
+    // 2026-08-05 เปิดไฟล์ template 
+    if(options.templatePath) {
+        await workbook.xlsx.readFile(options.templatePath);
+        sheet = workbook.getWorksheet(sheetName);
+    } else {
+        sheet = workbook.addWorksheet(sheetName); // เพื่มชีท และตั้งชื่อชีท
+    }
     const alignments = {
         vertical: alignment?.vertical ?? 'middle',
         horizontal: alignment?.horizontal ?? 'center',
@@ -73,9 +82,11 @@ export async function defaultExcel(
     }
 
     // เพิ่มหัวด้วยตัวเอง แทนการใช้ sheet.columns
-    const headerRow = sheet.addRow(column.map((col) => col.header));
-    headerRow.font = font;
-    headerRow.alignment = alignments;
+    if(column.length > 0 && column.some((col) => col.header)) {
+        const headerRow = sheet.addRow(column.map((col) => col.header));
+        headerRow.font = font;
+        headerRow.alignment = alignments;
+    }
 
     // กำหนด key ให้แต่ละคอลัมน์
     column.forEach((col, index) => {
@@ -185,4 +196,37 @@ export async function getBufferFromExcel(
 ): Promise<Buffer> {
     const excelBuffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(excelBuffer);
+}
+
+/**
+ * @author Sutthipong tangmongkhoncharoen(24008)
+ * @since 2026-08-05
+ * @description ส่งไฟล์ Excel ให้กับผู้ใช้ผ่าน Response ของ Express ใช้ใน Controller
+ * @param res 
+ * @param buffer 
+ * @param filename 
+ * @example
+ * sendExcel(res, buffer, 'example.xlsx');
+ */
+export function sendExcel(
+    res: Response,
+    buffer: Buffer,
+    filename: string,
+): void {
+    res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+
+    res.setHeader(
+        'Content-Disposition',
+        `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`,
+    );
+
+    res.setHeader(
+        'Access-Control-Expose-Headers',
+        'Content-Disposition',
+    );
+
+    res.send(buffer);
 }

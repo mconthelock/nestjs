@@ -4,12 +4,16 @@ import { ExportExcelDto } from './dto/export-excel.dto';
 import { SendVgmMeltService } from './service/send-vgm-melt.service';
 import { ExportExcelService } from './service/export-excel.service';
 import { sendExcel } from 'src/common/utils/exceljs';
+import { SendMailManualService } from './service/send-mail-manual.service';
+import { SendMailManualDto } from './dto/send-mail-manual.dto';
+import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 @Controller('mfgreport/dpms/send-vgm-melt')
 export class SendVgmMeltController {
     constructor(
         private readonly service: SendVgmMeltService,
         private readonly exportExcelService: ExportExcelService,
+        private readonly manualService: SendMailManualService,
     ) {}
 
     @Get('list')
@@ -22,5 +26,16 @@ export class SendVgmMeltController {
         const { buffer, filename } =
             await this.exportExcelService.exportExcel(dto);
         sendExcel(res, buffer, filename);
+    }
+
+    // @Post('manual/:vanndate')
+    // async manual(@Param('vanndate') vanndate: string) {
+    //     return await this.service.manual(vanndate);
+    // }
+
+    @Post('send-mail')
+    @UseTransaction('workloadConnection')
+    async sendMail(@Body() dto: SendMailManualDto) {
+        return await this.manualService.sendManualByUser(dto);
     }
 }

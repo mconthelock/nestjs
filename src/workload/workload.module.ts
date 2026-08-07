@@ -19,6 +19,7 @@ import { TurnoverunitModule } from './turnoverunit/turnoverunit.module';
 import { ProblemMasterModule } from './dpms/problem_master/problem_master.module';
 import { OrdersModule } from './dpms/orders/orders.module';
 import { OrdersItemModule } from './dpms/orders_item/orders_item.module';
+import { VannplanModule } from './dpms/vannplan/vannplan.module';
 
 @Module({
     imports: [
@@ -42,6 +43,7 @@ import { OrdersItemModule } from './dpms/orders_item/orders_item.module';
         ProblemMasterModule,
         OrdersModule,
         OrdersItemModule,
+        VannplanModule,
     ],
 })
 export class WorkloadModule {}

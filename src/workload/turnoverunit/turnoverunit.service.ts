@@ -1,26 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { applyDynamicFilters } from 'src/common/helpers/query.helper';
+
 import { CreateTurnoverunitDto } from './dto/create-turnoverunit.dto';
 import { UpdateTurnoverunitDto } from './dto/update-turnoverunit.dto';
+import { SearchTurnoverunitDto } from './dto/search-turnoverunit.dto';
 
+import { Turnoverunit } from 'src/common/Entities/workload/table/TURNOVER_UNIT.entity';
 @Injectable()
 export class TurnoverunitService {
-  create(createTurnoverunitDto: CreateTurnoverunitDto) {
-    return 'This action adds a new turnoverunit';
-  }
+    constructor(
+        @InjectRepository(Turnoverunit, 'workloadConnection')
+        private readonly turnover: Repository<Turnoverunit>,
+    ) {}
 
-  findAll() {
-    return `This action returns all turnoverunit`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} turnoverunit`;
-  }
-
-  update(id: number, updateTurnoverunitDto: UpdateTurnoverunitDto) {
-    return `This action updates a #${id} turnoverunit`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} turnoverunit`;
-  }
+    async search(dto: SearchTurnoverunitDto): Promise<Turnoverunit[]> {
+        const qb = this.turnover.createQueryBuilder('turnover');
+        await applyDynamicFilters(qb, dto, 'turnover');
+        return qb.getMany();
+    }
 }

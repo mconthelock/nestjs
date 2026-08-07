@@ -12,8 +12,8 @@ export class SendMailManualService extends SendVgmMeltService {
     constructor(
         protected readonly repo: SendVgmMeltRepository,
         protected readonly mailService: MailService,
-        private readonly excelService: ExportExcelService,
-        private readonly logService: DpmsPlMeltLogService,
+        protected readonly excelService: ExportExcelService,
+        protected readonly logService: DpmsPlMeltLogService,
     ) {
         super(repo, mailService);
     }
@@ -40,7 +40,6 @@ export class SendMailManualService extends SendVgmMeltService {
             const totalSent = await this.logService.getList(
                 formatDate(dto.VANNDATE),
             );
-            console.log('Total sent logs:', totalSent);
             if (!totalSent.status) {
                 throw new Error(
                     `Failed to retrieve total sent logs: ${totalSent.message}`,

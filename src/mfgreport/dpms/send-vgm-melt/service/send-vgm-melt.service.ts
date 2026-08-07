@@ -3,6 +3,7 @@ import { SendVgmMeltRepository } from '../send-vgm-melt.repository';
 import { MailService } from 'src/common/services/mail/mail.service';
 import { formatDate } from 'src/common/utils/dayjs.utils';
 import { sendMailParams } from '../interface/mail.interface';
+import { ListReport } from '../interface/main.interface';
 
 @Injectable()
 export class SendVgmMeltService {
@@ -11,7 +12,12 @@ export class SendVgmMeltService {
         protected readonly mailService: MailService,
     ) {}
 
-    async getList(vanndate: string) {
+    /**
+     * Get list of send VGM melt based on the provided vanndate.
+     * @param vanndate e.g. 20260804
+     * @returns
+     */
+    async getList(vanndate: string): Promise<ListReport> {
         try {
             const res = await this.repo.getList(vanndate);
             if (res.length === 0) {

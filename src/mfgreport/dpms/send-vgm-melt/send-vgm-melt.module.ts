@@ -6,6 +6,7 @@ import { ExportExcelService } from './service/export-excel.service';
 import { MailModule } from 'src/common/services/mail/mail.module';
 import { SendMailManualService } from './service/send-mail-manual.service';
 import { DpmsPlMeltLogModule } from 'src/workload/dpms_pl_melt_log/dpms_pl_melt_log.module';
+import { JobService } from './service/job.service';
 
 @Module({
     imports: [MailModule, DpmsPlMeltLogModule],
@@ -14,6 +15,7 @@ import { DpmsPlMeltLogModule } from 'src/workload/dpms_pl_melt_log/dpms_pl_melt_
         SendVgmMeltService,
         ExportExcelService,
         SendMailManualService,
+        JobService,
         SendVgmMeltRepository,
     ],
     exports: [SendVgmMeltService],

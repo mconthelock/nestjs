@@ -126,4 +126,31 @@ export class MfgEdrTargetMasterService {
       message: `Target FYEAR ${FYEAR} and SSECCODE ${SSECCODE} deleted successfully`,
     };
   }
+
+  async save(dto: CreateMfgEdrTargetMasterDto) {
+    return this.targetMasterRepository.manager.transaction(async manager => {
+      const repository = manager.getRepository(MfgEdrTargetMaster);
+
+      const existing = await repository.findOne({
+        where: { FYEAR: dto.FYEAR, SSECCODE: dto.SSECCODE },
+      });
+
+      if (existing) {
+        await repository.delete({
+          FYEAR: dto.FYEAR,
+          SSECCODE: dto.SSECCODE,
+        });
+      }
+
+      const target = repository.create(dto);
+      const result = await repository.save(target);
+
+      return {
+        status: true,
+        action: existing ? 'REPLACE' : 'INSERT',
+        message: 'บันทึกข้อมูลเรียบร้อยแล้ว',
+        data: result,
+      };
+    });
+  }
 }

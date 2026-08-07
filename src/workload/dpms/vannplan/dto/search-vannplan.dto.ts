@@ -5,4 +5,8 @@ import { CreateVannplanDto } from './create-vannplan.dto';
 const OmitInqFields = ['ORDERTYPE'] as const;
 class SearchBase extends OmitType(CreateVannplanDto, OmitInqFields) {}
 
-export class SearchVannplanDto extends PartialType(SearchBase) {}
+export class SearchVannplanDto extends PartialType(SearchBase) {
+    @IsString()
+    @IsOptional()
+    ORDERTYPE?: string;
+}

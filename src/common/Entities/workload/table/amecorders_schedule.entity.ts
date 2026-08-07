@@ -99,7 +99,7 @@ export class AmecOrdersSchedule {
     ORDSTATUS: number;
 
     @Column()
-    MFG_FINISHDATE: Date;
+    MFG_FINISDATE: Date;
     @Column()
     LAST_UPDATE: Date;
     @Column()

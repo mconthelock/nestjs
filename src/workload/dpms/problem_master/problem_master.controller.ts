@@ -1,24 +1,19 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body } from '@nestjs/common';
 import { ProblemMasterService } from './problem_master.service';
 
-import { CreateProblemMasterDto } from './dto/create-problem_master.dto';
-import { UpdateProblemMasterDto } from './dto/update-problem_master.dto';
-import { SearchProblemMasterDto } from './dto/search-problem_master.dto';
+import { SearchOrdersItemDto } from 'src/workload/dpms/orders_item/dto/search-orders_item.dto';
 
 @Controller('workload/problem-master')
 export class ProblemMasterController {
     constructor(private readonly problemMasterService: ProblemMasterService) {}
 
+    @Get()
+    findAll() {
+        return this.problemMasterService.findAll();
+    }
+
     @Post('search')
-    search(@Body() dto: SearchProblemMasterDto) {
+    search(@Body() dto: SearchOrdersItemDto) {
         return this.problemMasterService.search(dto);
     }
 }

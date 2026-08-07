@@ -1,93 +1,94 @@
-import { Column, PrimaryColumn } from 'typeorm';
+import { ViewColumn, ViewEntity } from 'typeorm';
 
+@ViewEntity({ name: 'VANNPLAN', schema: 'WORKLOAD' })
 export class Vannplan {
-    @PrimaryColumn()
+    @ViewColumn()
     PRODUCTION: string;
 
-    @PrimaryColumn()
+    @ViewColumn()
     ORDERNO: string;
 
-    @Column()
+    @ViewColumn()
     SELECTION: string;
 
-    @Column()
+    @ViewColumn()
     ORDERTYPE: number;
 
-    @Column()
+    @ViewColumn()
     URGENTLY: number;
 
-    @Column()
+    @ViewColumn()
     MFG_QC_PLAN: string;
 
-    @Column()
+    @ViewColumn()
     POSTPONEVAN: string;
 
-    @Column()
+    @ViewColumn()
     MASTERCY: string;
 
-    @Column()
+    @ViewColumn()
     VANNDATE: string;
 
-    @Column()
+    @ViewColumn()
     POSTPONEREM: string;
 
-    @Column()
+    @ViewColumn()
     REMARK: string;
 
-    @Column()
+    @ViewColumn()
     PROJECT: string;
 
-    @Column()
+    @ViewColumn()
     MODEL: string;
 
-    @Column()
+    @ViewColumn()
     P: string;
 
-    @Column()
+    @ViewColumn()
     MARCOMPLETESET: string;
 
-    @Column()
+    @ViewColumn()
     MARIMPORTANT: string;
 
-    @Column()
+    @ViewColumn()
     WHDATA: string;
 
-    @Column()
+    @ViewColumn()
     ISSUEPL: string;
 
-    @Column()
+    @ViewColumn()
     ACTUALPL: string;
 
-    @Column()
+    @ViewColumn()
     CONFIRMDATE: string;
 
-    @Column()
+    @ViewColumn()
     SHIPBAL: string;
 
-    @Column()
+    @ViewColumn()
     ACLVAN: string;
 
-    @Column()
+    @ViewColumn()
     VANNSTATUS: number;
 
-    @Column()
+    @ViewColumn()
     USERUPDATE: string;
 
-    @Column()
+    @ViewColumn()
     LASTUPDATE: Date;
 
-    @Column()
+    @ViewColumn()
     MARKCOLOR: number;
 
-    @Column()
+    @ViewColumn()
     MELTPLAN: number;
 
-    @Column()
+    @ViewColumn()
     LASTUPDATEVANNDATE: Date;
 
-    @Column()
+    @ViewColumn()
     MOVETOMELTACT: string;
 
-    @Column()
+    @ViewColumn()
     MASTERVANNINGPLAN: string;
 }

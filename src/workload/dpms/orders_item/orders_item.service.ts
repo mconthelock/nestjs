@@ -1,26 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { applyDynamicFilters } from 'src/common/helpers/query.helper';
+
 import { CreateOrdersItemDto } from './dto/create-orders_item.dto';
 import { UpdateOrdersItemDto } from './dto/update-orders_item.dto';
+import { SearchOrdersItemDto } from './dto/search-orders_item.dto';
 
+import { DpmsOrdersItem } from 'src/common/Entities/workload/table/DPMS_ORDERS_ITEM.entity';
 @Injectable()
 export class OrdersItemService {
-  create(createOrdersItemDto: CreateOrdersItemDto) {
-    return 'This action adds a new ordersItem';
-  }
+    constructor(
+        @InjectRepository(DpmsOrdersItem, 'workloadConnection')
+        private readonly dpmsitem: Repository<DpmsOrdersItem>,
+    ) {}
 
-  findAll() {
-    return `This action returns all ordersItem`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} ordersItem`;
-  }
-
-  update(id: number, updateOrdersItemDto: UpdateOrdersItemDto) {
-    return `This action updates a #${id} ordersItem`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} ordersItem`;
-  }
+    async search(dto: SearchOrdersItemDto) {
+        const qb = this.dpmsitem.createQueryBuilder('dpmsitem');
+        await applyDynamicFilters(qb, dto, 'dpmsitem');
+        return qb.getMany();
+    }
 }

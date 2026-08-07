@@ -15,6 +15,10 @@ import { VpsModule } from './vps/vps.module';
 import { KanbanRequestModule } from './kanban_request/kanban_request.module';
 import { DpmsPlLastRevisionViewModule } from './dpms_pl_last_revision_view/dpms_pl_last_revision_view.module';
 import { DpmsPlDocRevModule } from './dpms_pl_doc_rev/dpms_pl_doc_rev.module';
+import { TurnoverunitModule } from './turnoverunit/turnoverunit.module';
+import { ProblemMasterModule } from './dpms/problem_master/problem_master.module';
+import { OrdersModule } from './dpms/orders/orders.module';
+import { OrdersItemModule } from './dpms/orders_item/orders_item.module';
 
 @Module({
     imports: [
@@ -34,6 +38,10 @@ import { DpmsPlDocRevModule } from './dpms_pl_doc_rev/dpms_pl_doc_rev.module';
         KanbanRequestModule,
         DpmsPlLastRevisionViewModule,
         DpmsPlDocRevModule,
+        TurnoverunitModule,
+        ProblemMasterModule,
+        OrdersModule,
+        OrdersItemModule,
     ],
 })
 export class WorkloadModule {}

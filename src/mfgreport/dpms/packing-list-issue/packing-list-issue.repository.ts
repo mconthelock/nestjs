@@ -26,6 +26,10 @@ export class PackingListIssueProcedureWorkloadRepository extends OracleRepositor
     async getDocforShow(dto: GetDocForShowDto){
         return this.execCursor('DPMS_PL_DOC', dto, ['VPROD', 'VP', 'VTYPE', 'VORDERS', 'NDRAFT']);
     }
+
+    async getMarReport(date: string, round: number) {
+        return this.execCursor('DPMS_PL_MAR_REPORT', { date, round }, ['date', 'round']);
+    }
 }
 
 export class PackinglistIssueProcedureDataCenterRepository extends OracleRepository {

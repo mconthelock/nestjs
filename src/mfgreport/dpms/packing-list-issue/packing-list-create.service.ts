@@ -273,7 +273,7 @@ export class PackingListCreateService extends PackingListIssueService {
 
                 // 11. send email notification to admin
                 mailObject.push({
-                    subject: `${now('YYYY-MM-DD HH:mm:ss')} Packing list issue notification [${dto.VORDERS}] REV. ${revisionText} (${issueType.data.VDESCRIPTION})`,
+                    subject: `${now('YYYY-MM-DD HH:mm:ss')} Packing list issue notification Admin [${dto.VORDERS}] REV. ${revisionText} (${issueType.data.VDESCRIPTION})`,
                     maillist: [process.env.MAIL_ADMIN],
                     context: {
                         rev: revisionText,

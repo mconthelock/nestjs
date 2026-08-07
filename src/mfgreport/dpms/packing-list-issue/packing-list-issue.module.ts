@@ -19,6 +19,8 @@ import { DpmsPlMailModule } from 'src/workload/dpms_pl_mail/dpms_pl_mail.module'
 import { DpmsPlDocRevModule } from 'src/workload/dpms_pl_doc_rev/dpms_pl_doc_rev.module';
 import { PackingListCreateService } from './packing-list-create.service';
 import { ExcelService } from './services/excel.service';
+import { JobController } from './controller/job.controller';
+import { MarReportService } from './job/mar-report.service';
 
 @Module({
     imports: [
@@ -34,7 +36,7 @@ import { ExcelService } from './services/excel.service';
         DpmsPlDocRevModule,
         MailModule,
     ],
-    controllers: [PackingListIssueController],
+    controllers: [PackingListIssueController, JobController],
     providers: [
         PackingListIssueService,
         PackingListIssueProcedureWorkloadRepository,
@@ -42,6 +44,7 @@ import { ExcelService } from './services/excel.service';
         PackingListIssueProcedureService,
         PackingListCreateService,
         ExcelService,
+        MarReportService,
     ],
     exports: [PackingListIssueService, PackingListIssueProcedureService],
 })

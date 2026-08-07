@@ -103,4 +103,31 @@ export class PackingListIssueProcedureService {
             throw new Error(`Failed to get document for show: ${error.message}`);
         }
     }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-08-07
+     * @description รายการ packing list issue ตามวันและรอบที่กำหนด สำหรับส่งให้ marketing
+     * @param date e.g. 2026-08-07
+     * @param round e.g. 1
+     * @returns 
+     */
+    async getMarReport(date: string, round: number) {
+        try {
+            const res = await this.workloadRepo.getMarReport(date, round);
+            if (res.length === 0) {
+                return {
+                    status: false,
+                    message: 'No data found',
+                };
+            }
+            return {
+                status: true,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(`Failed to get MAR report: ${error.message}`);
+        }
+    }
+
 }

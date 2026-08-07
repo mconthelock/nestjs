@@ -20,7 +20,8 @@ import { DpmsPlDocRevModule } from 'src/workload/dpms_pl_doc_rev/dpms_pl_doc_rev
 import { PackingListCreateService } from './packing-list-create.service';
 import { ExcelService } from './services/excel.service';
 import { JobController } from './controller/job.controller';
-import { MarReportService } from './job/mar-report.service';
+import { MarReportService } from './services/mar-report.service';
+import { ReviseVgmService } from './services/revise-vgm.service';
 
 @Module({
     imports: [
@@ -45,6 +46,7 @@ import { MarReportService } from './job/mar-report.service';
         PackingListCreateService,
         ExcelService,
         MarReportService,
+        ReviseVgmService,
     ],
     exports: [PackingListIssueService, PackingListIssueProcedureService],
 })

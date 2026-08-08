@@ -120,12 +120,16 @@ export class PurEvaUpdateService  {
             await this.reposcore.deleteByAll(form);
             await this.repoprofit.deleteByAll(form);
             await this.reporelation.deleteByAll(form);
-            await this.reposcore.createMultipleScores(form,SCORES);
-            await this.repoprofit.createMultipleProfits(form,PROFIT_TURNOVERS);
-            if (RELATIONS && RELATIONS.length > 0) {
+            if(SCORES && SCORES.length > 0) {
+                await this.reposcore.createMultipleScores(form,SCORES);
+            }
+            if(PROFIT_TURNOVERS && PROFIT_TURNOVERS.length > 0) {
+                await this.repoprofit.createMultipleProfits(form,PROFIT_TURNOVERS);
+            }
+            if(RELATIONS && RELATIONS.length > 0) {
                 await this.reporelation.createMultipleRelations(form, RELATIONS);
             }
-            if (DELETE_FILES && DELETE_FILES.length > 0) {
+            if(DELETE_FILES && DELETE_FILES.length > 0) {
                 for (const id of DELETE_FILES) {
                     const file = await this.purFileService.getFileById(+id);
                     await this.purFileService.deleteFileByID(+id);
@@ -146,6 +150,7 @@ export class PurEvaUpdateService  {
             }
             
             if(ACTION== 'approve'){
+                await this.formService.updateForm({condition: { ...form },CST:"1"});
                 await this.doactionService.doAction(
                 { ...form, ACTION: ACTION, EMPNO, REMARK },
                 ip,

@@ -128,8 +128,13 @@ export class PurEvaRequestService  {
                     ...a
                 })
             }
-            await this.reposcore.createMultipleScores(form,SCORES);
-            await this.repoprofit.createMultipleProfits(form,PROFIT_TURNOVERS);
+            if (SCORES && SCORES.length > 0) {
+                 await this.reposcore.createMultipleScores(form,SCORES);
+            }
+            if(PROFIT_TURNOVERS && PROFIT_TURNOVERS.length > 0)
+            {
+                 await this.repoprofit.createMultipleProfits(form,PROFIT_TURNOVERS);
+            }
             if (RELATIONS && RELATIONS.length > 0) {
                 await this.reporelation.createMultipleRelations(form, RELATIONS);
             }

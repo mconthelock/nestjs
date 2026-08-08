@@ -306,11 +306,11 @@ export class RequestPurevaFormDto extends PickType(CreateFormDto,[
     @IsString()
     ATTACH_OTHER?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsArray()
     @ValidateNested({each:true})
     @Type(() => RequestPurevaScoreDto)
-    SCORES: RequestPurevaScoreDto[];
+    SCORES?: RequestPurevaScoreDto[];
 
     @IsOptional()
     @IsArray()

@@ -16,9 +16,12 @@ import { KanbanRequestModule } from './kanban_request/kanban_request.module';
 import { DpmsPlLastRevisionViewModule } from './dpms_pl_last_revision_view/dpms_pl_last_revision_view.module';
 import { DpmsPlDocRevModule } from './dpms_pl_doc_rev/dpms_pl_doc_rev.module';
 import { TurnoverunitModule } from './turnoverunit/turnoverunit.module';
-import { ProblemMasterModule } from './dpms/problem_master/problem_master.module';
-import { OrdersModule } from './dpms/orders/orders.module';
-import { OrdersItemModule } from './dpms/orders_item/orders_item.module';
+import { InventoryModule } from './inventory/inventory.module';
+
+//DPMS Modules (BY BB8)
+import { ProblemModule } from './dpms/problem/problem.module';
+import { DpmsOrdersModule } from './dpms/orders/orders.module';
+import { DpmsOrdersItemModule } from './dpms/orders_item/orders_item.module';
 import { VannplanModule } from './dpms/vannplan/vannplan.module';
 
 @Module({
@@ -40,10 +43,11 @@ import { VannplanModule } from './dpms/vannplan/vannplan.module';
         DpmsPlLastRevisionViewModule,
         DpmsPlDocRevModule,
         TurnoverunitModule,
-        ProblemMasterModule,
-        OrdersModule,
-        OrdersItemModule,
+        ProblemModule,
+        DpmsOrdersModule,
+        DpmsOrdersItemModule,
         VannplanModule,
+        InventoryModule,
     ],
 })
 export class WorkloadModule {}

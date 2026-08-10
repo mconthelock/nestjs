@@ -1,13 +1,6 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { UniformService } from './uniform.service';
+
 import { CreateUniformDto } from './dto/create-uniform.dto';
 import { UpdateUniformDto } from './dto/update-uniform.dto';
 
@@ -18,5 +11,10 @@ export class UniformController {
     @Get('master')
     findAll() {
         return this.uniformService.findAll();
+    }
+
+    @Get('rights')
+    findRights() {
+        return this.uniformService.findRights();
     }
 }

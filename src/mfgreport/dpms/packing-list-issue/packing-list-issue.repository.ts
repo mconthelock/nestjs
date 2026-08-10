@@ -6,7 +6,7 @@ import { SearchDpmsPlIssueDto } from 'src/workload/dpms_pl_issue/dto/search-dpms
 import { GetDocForShowDto } from './dto/update-packing-list-issue.dto';
 
 @Injectable()
-export class PackingListIssueProcedureWorkloadRepository extends OracleRepository {
+export class ProcedureWorkloadRepository extends OracleRepository {
     constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
@@ -32,7 +32,7 @@ export class PackingListIssueProcedureWorkloadRepository extends OracleRepositor
     }
 }
 
-export class PackinglistIssueProcedureDataCenterRepository extends OracleRepository {
+export class ProcedureDataCenterRepository extends OracleRepository {
     constructor(@InjectDataSource('datacenterConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

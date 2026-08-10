@@ -1,21 +1,21 @@
 import { Controller, Post, Body, Patch, Get, Param } from '@nestjs/common';
-import { PackingListIssueService } from './packing-list-issue.service';
-import { CreatePackingListIssueDto } from './dto/create-packing-list-issue.dto';
+import { PackingListIssueService } from '../packing-list-issue.service';
+import { CreatePackingListIssueDto } from '../dto/create-packing-list-issue.dto';
 import {
     UpdatePlIssueProblemReasonDto,
     GetDocForShowDto,
-} from './dto/update-packing-list-issue.dto';
+} from '../dto/update-packing-list-issue.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
-import { PackingListIssueProcedureService } from './packing-list-issue-procedure.service';
+import { ProcedureService } from '../services/procedure.service';
 import { SearchDpmsPlIssueDto } from 'src/workload/dpms_pl_issue/dto/search-dpms_pl_issue.dto';
-import { PackingListCreateService } from './packing-list-create.service';
+import { PackingListCreateService } from '../packing-list-create.service';
 
 @Controller('mfgreport/dpms/packing-list-issue')
-export class PackingListIssueController {
+export class MainController {
     constructor(
         private readonly service: PackingListIssueService,
         private readonly createService: PackingListCreateService,
-        private readonly procedureService: PackingListIssueProcedureService,
+        private readonly procedureService: ProcedureService,
     ) {}
 
     @Post()

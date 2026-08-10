@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PackingListIssueProcedureService } from '../packing-list-issue-procedure.service';
+import { ProcedureService } from './procedure.service';
 import { log_message, IlogMessage } from 'src/common/utils/transform';
 import { now } from 'src/common/utils/dayjs.utils';
 import { MailService } from 'src/common/services/mail/mail.service';
@@ -9,7 +9,7 @@ import { joinPaths } from 'src/common/utils/files.utils';
 @Injectable()
 export class MarReportService {
     constructor(
-        private readonly procedure: PackingListIssueProcedureService,
+        private readonly procedure: ProcedureService,
         private readonly mailService: MailService,
         private readonly dpmsPlMailService: DpmsPlMailService,
     ) {}

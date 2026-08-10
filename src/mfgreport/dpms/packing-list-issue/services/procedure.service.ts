@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { PackingListIssueProcedureWorkloadRepository, PackinglistIssueProcedureDataCenterRepository } from './packing-list-issue.repository';
+import { ProcedureWorkloadRepository, ProcedureDataCenterRepository } from '../packing-list-issue.repository';
 import { SearchDpmsPlIssueDto } from 'src/workload/dpms_pl_issue/dto/search-dpms_pl_issue.dto';
-import { GetDocForShowDto } from './dto/update-packing-list-issue.dto';
+import { GetDocForShowDto } from '../dto/update-packing-list-issue.dto';
 
 @Injectable()
-export class PackingListIssueProcedureService {
+export class ProcedureService {
     constructor(
-        private readonly workloadRepo: PackingListIssueProcedureWorkloadRepository,
-        private readonly dataCenterRepo: PackinglistIssueProcedureDataCenterRepository,
+        private readonly workloadRepo: ProcedureWorkloadRepository,
+        private readonly dataCenterRepo: ProcedureDataCenterRepository,
     ) {}
 
     async getReportProdList(prod: string) {

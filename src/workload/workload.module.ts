@@ -23,6 +23,7 @@ import { ProblemModule } from './dpms/problem/problem.module';
 import { DpmsOrdersModule } from './dpms/orders/orders.module';
 import { DpmsOrdersItemModule } from './dpms/orders_item/orders_item.module';
 import { VannplanModule } from './dpms/vannplan/vannplan.module';
+import { BlockmasterModule } from './blockmaster/blockmaster.module';
 
 @Module({
     imports: [
@@ -48,6 +49,7 @@ import { VannplanModule } from './dpms/vannplan/vannplan.module';
         DpmsOrdersItemModule,
         VannplanModule,
         InventoryModule,
+        BlockmasterModule,
     ],
 })
 export class WorkloadModule {}

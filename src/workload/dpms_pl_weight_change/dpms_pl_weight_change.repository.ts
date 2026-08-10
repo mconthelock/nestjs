@@ -10,7 +10,15 @@ export class DpmsPlWeightChangeRepository extends BaseRepository {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
-    getChangeWeight() {
-        return this.getRepository(DPMS_PL_WEIGHT_CHANGE).find();
+    getChangeWeight(vanndate?: string) {
+        const query = this.getRepository(
+            DPMS_PL_WEIGHT_CHANGE,
+        ).createQueryBuilder('C');
+        if (vanndate) {
+            query.where("TRUNC(C.VANNING) = TO_DATE(:vanndate, 'YYYY-MM-DD')", {
+                vanndate,
+            });
+        }
+        return query.getMany();
     }
 }

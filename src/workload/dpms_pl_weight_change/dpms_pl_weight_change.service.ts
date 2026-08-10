@@ -4,9 +4,9 @@ import { DpmsPlWeightChangeRepository } from './dpms_pl_weight_change.repository
 export class DpmsPlWeightChangeService {
     constructor(private readonly repo: DpmsPlWeightChangeRepository) {}
 
-    async getChangeWeight() {
+    async getChangeWeight(vanndate?: string) {
         try {
-            const res = await this.repo.getChangeWeight();
+            const res = await this.repo.getChangeWeight(vanndate);
             if (res.length === 0) {
                 return {
                     status: false,

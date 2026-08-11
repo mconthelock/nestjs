@@ -15,6 +15,8 @@ import { IdtagService } from './idtag.service';
 import { PrintedService } from './printed/printed.service';
 import { PrintedNcService } from './printed/printedNc.service';
 import { PrintedTopLabelService } from './printed/printedTopLabel.service';
+import { PrintedMergeService } from './printed/printedMerge.service';
+import { PrintedCnService } from './printed/printedCn.service';
 
 import { SearchIdtagFilesDto } from './printed/dto/search-idtag-file.dto';
 
@@ -26,6 +28,8 @@ export class IdtagController {
         private readonly printed: PrintedService,
         private readonly nc: PrintedNcService,
         private readonly label: PrintedTopLabelService,
+        private readonly merge: PrintedMergeService,
+        private readonly cn: PrintedCnService,
     ) {}
 
     @Post('schd')
@@ -145,5 +149,23 @@ export class IdtagController {
     @Get('process-nc-detail')
     async processNcDetail() {
         return this.nc.processNcDetail();
+    }
+
+    // Test Printed
+    @Get('compress')
+    async compressPdf() {
+        return this.merge.compressPdfWithGhostscript(
+            '\\\\amecnas\\AMECWEB\\IDTAG\\PRINT\\202608CP4\\SUB\\TAGSUB\\1786358989242-200045879.pdf',
+        );
+    }
+
+    @Get('lable/:fileID')
+    async printLabel(@Param('fileID') fileID: number) {
+        return this.label.processLabelDetail(fileID);
+    }
+
+    @Get('cn/:fileID')
+    async printCn(@Param('fileID') fileID: number) {
+        return this.cn.putCNNo(fileID);
     }
 }

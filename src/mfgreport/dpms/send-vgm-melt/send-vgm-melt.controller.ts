@@ -30,18 +30,21 @@ export class SendVgmMeltController {
         sendExcel(res, buffer, filename);
     }
 
+    // สำหรับ Admin ใช้สรัน job แบบ manual โดยเลือกวัน vanndate ที่ต้องการ
     @Get('manual/:vanndate')
     @UseTransaction('workloadConnection')
     async manual(@Param('vanndate') vanndate: string) {
         return await this.jobService.job(vanndate);
     }
 
+    // สำหรับ run job แบบอัตโนมัติ โดยไม่ต้องส่ง vanndate เข้ามา
     @Get('job')
     @UseTransaction('workloadConnection')
     async job(){
         return await this.jobService.job();
     }
 
+    // สำหรับ user ส่งมาจากหน้า website
     @Post('send-mail')
     @UseTransaction('workloadConnection')
     async sendMail(@Body() dto: SendMailManualDto) {

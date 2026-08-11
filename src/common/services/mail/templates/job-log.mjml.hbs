@@ -20,9 +20,15 @@
         <mj-section padding="0">
             <mj-column background-color="#ffffff" padding="20px" border-radius="6px">
                 {{#each this}}
-                    <mj-text>
-                        {{DATE}} - {{MESSAGE}}
-                    </mj-text>
+                    {{#if ERROR}}
+                        <mj-text color="#ff0000" font-weight="bold">
+                            {{DATE}} - {{MESSAGE}}
+                        </mj-text>
+                    {{else}}
+                        <mj-text>
+                            {{DATE}} - {{MESSAGE}}
+                        </mj-text>
+                    {{/if}}
                 {{/each}}
             </mj-column>
         </mj-section>

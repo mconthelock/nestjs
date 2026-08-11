@@ -31,11 +31,13 @@ export class SendVgmMeltController {
     }
 
     @Get('manual/:vanndate')
+    @UseTransaction('workloadConnection')
     async manual(@Param('vanndate') vanndate: string) {
         return await this.jobService.job(vanndate);
     }
 
     @Get('job')
+    @UseTransaction('workloadConnection')
     async job(){
         return await this.jobService.job();
     }

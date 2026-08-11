@@ -10,21 +10,34 @@ import {
 
 @Injectable()
 export class HtmlService {
-    generate({
+    async generate({
         revData,
         shippingMark,
+        lists,
         plList,
         issueDate,
-        remank,
-    }: IgenerateParams): string {
+        combine,
+        changeBlock,
+    }: IgenerateParams): Promise<string> {
         const shippingMarkHtml = this.setShippingMark(shippingMark);
+
+        const issueType = revData.ISSUE_TYPE;
+        // กำหนดหัวกระดาษของ PL
+        let headerTypePl = issueType.VDESCRIPTION;
+        switch (issueType.VCODE) {
+            case 'CB':
+                headerTypePl = 'COMPLETE';
+                break;
+            case 'SP':
+                headerTypePl = 'PARTIAL';
+        }
 
         const headerHtml = this.setHeader({
             VSHOPORDERNO: revData.VSHOPORDERNO,
             VSUBJECT: revData.VSUBJECT,
             VNAMEOFBLDG: revData.VNAMEOFBLDG,
             VSOLDTO: revData.VSOLDTO,
-            type: revData.ISSUE_TYPE.VDESCRIPTION,
+            type: headerTypePl,
             shippingMark: shippingMarkHtml,
             totalNet: plList.totalNet,
             totalGross: plList.totalGross,
@@ -42,9 +55,29 @@ export class HtmlService {
             totalGross: plList.totalGross,
             totalDimention: plList.totalDimention,
             totalPackList: plList.totalPackList,
-            typeCode: revData.ISSUE_TYPE.VCODE,
+            typeCode: issueType.VCODE,
         });
-        return headerHtml + tableHtml + (remank ?? '');
+
+        let filterCombine = combine;
+        let filterChangeBlock = changeBlock;
+        if (['DF', 'PT', 'SP'].includes(issueType.VCODE)) {
+            const items = new Set(
+                lists.flatMap((e) => e.DETAILS.map((d) => d.VITEM)),
+            );
+            if (combine && combine.length > 0) {
+                filterCombine = combine.filter((c) => {
+                    return c.S20K02 && items.has(c.S20K02.trim());
+                });
+            }
+
+            if (changeBlock && changeBlock.length > 0) {
+                filterChangeBlock = changeBlock.filter((c) => {
+                    return c.S49K02 && items.has(c.S49K02.trim());
+                });
+            }
+        }
+        const remarkHtml = this.setRemark(filterCombine, filterChangeBlock);
+        return headerHtml + tableHtml + remarkHtml;
     }
 
     /**
@@ -256,7 +289,6 @@ export class HtmlService {
                 ${list
                     .map((l, i) => {
                         let item = '';
-                        console.log('l', Array.isArray(l), typeof l, l);
                         return l.DETAILS.map((d, j) => {
                             let html = '';
                             if ((d.VITEM && d.VITEM != item) || j == 0) {

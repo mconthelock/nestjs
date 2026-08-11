@@ -44,7 +44,7 @@ export class JobService extends SendMailManualService {
                 formatDate(vanndate, 'YYYYMMDD'),
             );
             if (!lists.status) {
-                logMessage.push(log_message(`No data found`));
+                logMessage.push(log_message(`No data found`, 'error'));
                 return {
                     status: false,
                     message: `No data found`,
@@ -57,7 +57,7 @@ export class JobService extends SendMailManualService {
             );
 
             if (pendingList.length === 0) {
-                logMessage.push(log_message(`No pending melt report found`));
+                logMessage.push(log_message(`No pending melt report found`, 'error'));
                 return {
                     status: false,
                     message: `No pending melt report found`,
@@ -73,7 +73,7 @@ export class JobService extends SendMailManualService {
 
             if (!sendMail.status) {
                 logMessage.push(
-                    log_message(`Failed to send mail: ${sendMail.message}`),
+                    log_message(`Failed to send mail: ${sendMail.message}`, 'error'),
                 );
                 throw new Error(`Failed to send mail: ${sendMail.message}`);
             }
@@ -83,7 +83,7 @@ export class JobService extends SendMailManualService {
                 message: `Job executed successfully`,
             };
         } catch (error) {
-            logMessage.push(log_message(`Error occurred: ${error.message}`));
+            logMessage.push(log_message(`Error occurred: ${error.message}`, 'error'));
             throw new Error(`Failed to execute job: ${error.message}`);
         } finally {
             logMessage.push(log_message('Job finished'));

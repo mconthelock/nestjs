@@ -56,7 +56,7 @@ export class MarReportService {
             // ดึงรายการ packing list issue ตามวันและรอบที่กำหนด
             const list = await this.procedure.getMarReport(date, round);
             if (!list.status) {
-                logMessage.push(log_message(list.message));
+                logMessage.push(log_message(list.message, 'error'));
                 return {
                     status: false,
                     message: list.message,
@@ -77,7 +77,7 @@ export class MarReportService {
             // ดึงรายชื่ออีเมลจากฐานข้อมูล
             const mails = await this.dpmsPlMailService.findAll();
             if (!mails.status) {
-                logMessage.push(log_message(mails.message));
+                logMessage.push(log_message(mails.message, 'error'));
                 throw new Error('Failed to retrieve email addresses');
             }
 

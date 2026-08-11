@@ -26,6 +26,8 @@ import { GenPdfService } from './services/pdf.service';
 import { IssueService } from './services/issue.service';
 import { HtmlService } from './services/html.service';
 import { PackingListCreateService } from './packing-list-create.service';
+import { S020kpModule } from 'src/datacenter/s020kp/s020kp.module';
+import { S049kpModule } from 'src/datacenter/s049kp/s049kp.module';
 
 @Module({
     imports: [
@@ -41,6 +43,8 @@ import { PackingListCreateService } from './packing-list-create.service';
         DpmsPlDocRevModule,
         DpmsPlWeightChangeModule,
         MailModule,
+        S020kpModule,
+        S049kpModule,
     ],
     controllers: [MainController, JobController],
     providers: [

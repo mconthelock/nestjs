@@ -1,5 +1,10 @@
-import type { DPMS_PL_ISSUE_REV } from "src/common/Entities/workload/table/DPMS_PL_ISSUE_REV.entity";
 import { CreateDataForHTMLResult, ListForCreateHtml } from "./list-builder.interface";
+
+import { DPMS_PL_ISSUE_REV } from "src/common/Entities/workload/table/DPMS_PL_ISSUE_REV.entity";
+import { S020KP } from "src/common/Entities/datacenter/table/S020KP.entity";
+import { S049KP } from "src/common/Entities/datacenter/table/S049KP.entity";
+import { DPMS_PL_CASE_REVISE_VGM } from "src/common/Entities/workload/views/DPMS_PL_CASE_REVISE_VGM.entity";
+import { DPMS_PL_CASE_LIST } from "src/common/Entities/workload/table/DPMS_PL_CASE_LIST.entity";
 
 export interface IplHeader {
     VSHOPORDERNO: string;
@@ -34,7 +39,9 @@ export interface IsetTableParams {
 export interface IgenerateParams {
     revData: DPMS_PL_ISSUE_REV;
     shippingMark: string;
+    lists: DPMS_PL_CASE_LIST[] | DPMS_PL_CASE_REVISE_VGM[];
     plList: CreateDataForHTMLResult;
     issueDate: string;
-    remank?: string;
+    combine?: S020KP[];
+    changeBlock?: S049KP[];
 }

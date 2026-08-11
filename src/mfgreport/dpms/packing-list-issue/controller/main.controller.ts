@@ -8,13 +8,13 @@ import {
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { ProcedureService } from '../services/procedure.service';
 import { SearchDpmsPlIssueDto } from 'src/workload/dpms_pl_issue/dto/search-dpms_pl_issue.dto';
-import { PackingListCreateService } from '../packing-list-create.service';
+import { IssueService } from '../services/issue.service';
 
 @Controller('mfgreport/dpms/packing-list-issue')
 export class MainController {
     constructor(
         private readonly service: PackingListIssueService,
-        private readonly createService: PackingListCreateService,
+        private readonly createService: IssueService,
         private readonly procedureService: ProcedureService,
     ) {}
 

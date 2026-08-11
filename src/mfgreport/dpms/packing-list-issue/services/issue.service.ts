@@ -30,14 +30,14 @@ export class IssueService extends PackingListIssueService {
         protected readonly dpmsPlIssueService: DpmsPlIssueService,
         protected readonly dpmsPlIssueRevService: DpmsPlIssueRevService,
         protected readonly dpmsPlIssueTypeService: DpmsPlIssueTypeService,
-        protected readonly dpmsPlIssueDateService: DpmsPlIssueDateService,
         protected readonly dpmsPlDocRevService: DpmsPlDocRevService,
         protected readonly mailService: MailService,
-        private readonly dpmsPlFileService: DpmsPlFileService,
-        private readonly dpmsPlCaseListService: DpmsPlCaseListService,
-        private readonly dpmsPlCaseListDetailService: DpmsPlCaseListDetailService,
-        private readonly excelService: ExcelService,
-        private readonly pdfService: GenPdfService,
+        protected readonly dpmsPlIssueDateService: DpmsPlIssueDateService,
+        protected readonly dpmsPlFileService: DpmsPlFileService,
+        protected readonly dpmsPlCaseListService: DpmsPlCaseListService,
+        protected readonly dpmsPlCaseListDetailService: DpmsPlCaseListDetailService,
+        protected readonly excelService: ExcelService,
+        protected readonly pdfService: GenPdfService,
     ) {
         super(
             dpmsPlIssueService,
@@ -48,7 +48,7 @@ export class IssueService extends PackingListIssueService {
         );
     }
 
-    async issue(dto: CreatePackingListIssueDto) {
+    async issue(dto: CreatePackingListIssueDto, mailAdmin: boolean = true) {
         const listFilePath: {
             fileName: string;
             filePath: string;
@@ -300,13 +300,16 @@ export class IssueService extends PackingListIssueService {
             if (!issueData.status) {
                 throw new Error('Failed to find DPMS PL Issue Date');
             }
-            for (const mail of mailObject) {
-                await this.sendMail(mail);
+            if(mailAdmin){
+                for (const mail of mailObject) {
+                    await this.sendMail(mail);
+                }
             }
             return {
                 status: true,
                 message: 'Packing list issued successfully',
                 data: issueData.data,
+                listFilePath: listFilePath,
             };
         } catch (error) {
             for (const file of listFilePath) {

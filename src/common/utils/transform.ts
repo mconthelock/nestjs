@@ -51,11 +51,13 @@ export function StringToDate() {
 export interface IlogMessage {
     DATE: string;
     MESSAGE: string;
+    ERROR: boolean;
 }
 
-export function log_message(message: string): IlogMessage {
+export function log_message(message: string, type = 'info'): IlogMessage {
     return {
         DATE: formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss'),
         MESSAGE: message,
+        ERROR: type == 'error' ? true : false,
     };
 }

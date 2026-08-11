@@ -2,6 +2,7 @@ import { Controller, Get, Body, Post } from '@nestjs/common';
 import { LabelconfirmService } from './labelconfirm.service';
 import { CreateLabelconfirmDto } from './dto/create-labelconfirm.dto';
 import { UpdateLabelconfirmDto } from './dto/update-labelconfirm.dto';
+import { InsertErrLogDto } from './dto/insert-err_log.dto';
 
 @Controller('labelconfirm')
 export class LabelconfirmController {
@@ -21,5 +22,15 @@ export class LabelconfirmController {
         @Body('empno') empno: string,
     ) {
         return this.ls.confirm(qrCode, empno);
+    }
+
+    @Post('err_log')
+    async errLog(@Body() dto: InsertErrLogDto) {
+        return this.ls.errLog(dto);
+    }
+
+    @Get('kitting-label-history')
+    async getKittingLabelHistory() {
+        return this.ls.getKittingLabelHistory();
     }
 }

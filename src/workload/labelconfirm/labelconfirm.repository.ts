@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
+import { KITTING_EVENT_LOG } from 'src/common/Entities/workload/views/V_KITTING_EVENT_LOG.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 
@@ -14,12 +15,9 @@ export class LabelconfirmRepository extends BaseRepository {
     async getLabelList(order: string, packing: string) {
         const sql = `
             SELECT kl.*
-            FROM KITTING_LABEL kl
-            INNER JOIN S010MP s
-                ON kl.ORDER_NO = s.S01M01
-            AND kl.PACKING_NO = s.S01M04
-            WHERE s.S01M01 LIKE :1
-            AND s.S01M04 = :2
+            FROM KITTING_LABEL kl          
+            WHERE kl.ORDER_NO LIKE :1
+            AND kl.PACKING_NO = :2
         `;
 
         return await this.ds.query(sql, [`_${order}_`, packing]);
@@ -35,5 +33,26 @@ export class LabelconfirmRepository extends BaseRepository {
         `;
 
         return await this.ds.query(sql, [empno, qrCode]);
+    }
+
+    async errLog(
+        order: string,
+        packing: string,
+        qrCode: string,
+        empno: string,
+    ) {
+        const sql = `
+            INSERT INTO KIT_ERR_LOG (ORDER_NO, PACKING_NO, QR_ERR, CREATE_BY, CREATE_AT)
+            VALUES (:1, :2, :3, :4, SYSDATE)
+        `;
+        return await this.ds.query(sql, [order, packing, qrCode, empno]);
+    }
+
+    async getKittingLabelHistory() {
+        return this.getRepository(KITTING_EVENT_LOG).find({
+            relations: {
+                KITTINGLABEL: true,
+            },
+        });
     }
 }

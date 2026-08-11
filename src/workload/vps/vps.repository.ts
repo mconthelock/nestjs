@@ -186,7 +186,7 @@ export class VpsRepository extends BaseRepository {
                 FROM M008KP mk
                 JOIN S010MP sm
                     ON sm.S01M01 = mk.M8K03
-                JOIN PACKORDDTL p
+                LEFT JOIN PACKORDDTL p
                     ON p.ORDERNO = mk.M8K03
                     AND p.PACKNO  = sm.S01M04
                 LEFT JOIN (

@@ -254,17 +254,10 @@ export class PsClmService {
     }
 
     async previewAs400(dto: SendPsClmAs400Dto) {
-        const {
-            newOrder,
-            details,
-            originalOrder,
-            schedule,
-            priority,
-            claimSlipNo,
-        } = await this.getAs400WriteContext(dto);
+        const { newOrder, details, schedule, priority, claimSlipNo } =
+            await this.getAs400WriteContext(dto);
 
         const related = await this.m002kpService.previewInsert(
-            originalOrder,
             newOrder,
             schedule,
             priority,
@@ -284,20 +277,13 @@ export class PsClmService {
     }
 
     async sendToAs400(dto: SendPsClmAs400Dto) {
-        const {
-            newOrder,
-            details,
-            originalOrder,
-            schedule,
-            priority,
-            claimSlipNo,
-        } = await this.getAs400WriteContext(dto);
+        const { newOrder, details, schedule, priority, claimSlipNo } =
+            await this.getAs400WriteContext(dto);
         await this.updateDetailSchedules(this.pickForm(dto), dto.DETAILS);
 
         const result = await this.as400.withTransaction(async (connection) => {
             const related = await this.m002kpService.copyToLibraries(
                 connection,
-                originalOrder,
                 newOrder,
                 schedule,
                 priority,

@@ -50,8 +50,14 @@ export async function protectedFile(opt) {
 
     const input = path.join(winPath, opt.input);
     const output = path.join(winPath, opt.output);
-    const command =
-        '\\\\amecnas\\AMECWEB\\wwwroot\\production\\cdn\\Application\\gs\\gs10.00.0\\bin\\gswin32c.exe';
+    const command = path.resolve(
+        process.cwd(),
+        'public',
+        'gs',
+        'gs10.07.1',
+        'bin',
+        'gswin64c.exe',
+    );
     await new Promise<void>((resolve, reject) => {
         const stderrChunks: Buffer[] = [];
         const child = spawn(command, [

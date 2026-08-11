@@ -565,8 +565,14 @@ export class PrintedService {
     }
 
     async compressPdfWithGhostscript(inputPath: string) {
-        const command =
-            '\\\\amecnas\\AMECWEB\\wwwroot\\production\\cdn\\Application\\gs\\gs10.00.0\\bin\\gswin32c.exe';
+        const command = path.resolve(
+            process.cwd(),
+            'public',
+            'gs',
+            'gs10.00.0',
+            'bin',
+            'gswin32c.exe',
+        );
         const parsedPath = path.parse(inputPath);
         // `${parsedPath.name}.compressed${parsedPath.ext}`,
         const compressedPath = path.join(parsedPath.dir, `output.pdf`);

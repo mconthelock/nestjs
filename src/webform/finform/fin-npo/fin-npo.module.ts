@@ -23,6 +23,7 @@ import {DSSTOCK } from  'src/common/Entities/webform/table/FINDS_STOCK.entity'
 import {DSREQHEAD } from  'src/common/Entities/webform/table/FINDS_REQ_HEAD.entity'
 import { FormmstModule } from 'src/webform/formmst/formmst.module';
 import { HandleFileFormModule } from "src/webform/handle-file-form/handle-file-form.module";
+import { UsersModule } from 'src/amec/users/users.module';
 
 
 @Module({
@@ -41,7 +42,7 @@ import { HandleFileFormModule } from "src/webform/handle-file-form/handle-file-f
       ),
       FormModule,
       FlowModule,
-      FormmstModule,HandleFileFormModule
+      FormmstModule,HandleFileFormModule,UsersModule
   ],
 
   controllers: [FinnpoController],

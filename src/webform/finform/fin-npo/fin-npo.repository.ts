@@ -71,8 +71,22 @@ export class FinnpoRepository extends BaseRepository {
         });
     }
 
+    findAllCostCenter() {
+        return this.getRepository(FINNPOCOSTCENTER).find({
+            order: {
+                CYEAR2: 'desc',
+                NRUNNO: 'desc',
+                REQNO: 'asc',
+            },
+        });
+    }
+
     async createInvoices(data: Partial<FINNPOINVOICE>[]) {
         return this.getRepository(FINNPOINVOICE).save(data);
+    }
+
+    async createCostCenters(data: Partial<FINNPOCOSTCENTER>[]) {
+        return this.getRepository(FINNPOCOSTCENTER).save(data);
     }
 
     async findHeadByForm(
@@ -231,6 +245,7 @@ export class FinnpoRepository extends BaseRepository {
             .addSelect('FORM.VREQNO', 'REQUEST_BY')
             .addSelect('FORM.CST', 'STATUS')
             .addSelect('HEAD.SUBJECT', 'SUBJECT')
+            .addSelect('HEAD.REMARK', 'REMARK')
             .addSelect('HEAD.EXPENSE_CODE', 'EXPENSE_CODE')
             .addSelect('EXPENSE.EXPENSE_ENAME', 'EXPENSE_TYPE')
             .addSelect('HEAD.VENDOR_CODE', 'VENDOR_CODE')

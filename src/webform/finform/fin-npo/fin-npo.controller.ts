@@ -37,6 +37,11 @@ export class FinnpoController {
         return this.finnpoService.findAllCurrencyForShow();
     }
 
+    @Get('costcenter')
+    findAllCostCenterForShow() {
+        return this.finnpoService.findAllCostCenterForShow();
+    }
+
     @Post('report')
     findReport(@Body() dto: FinnpoReportFilterDto) {
         return this.finnpoService.findReport(dto);

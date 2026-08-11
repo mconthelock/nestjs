@@ -13,11 +13,8 @@ export class FINNPOCOSTCENTER {
     @PrimaryColumn()
     REQNO: string;    
 
-    @PrimaryColumn()
+    @Column()
     COSTCODE: string;
-
-
-
 }
 
 // NFRMNO

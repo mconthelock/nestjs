@@ -3,6 +3,7 @@ import { FormCreateService } from 'src/webform/form/create-form.service';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 import { FinnpoRepository } from './fin-npo.repository';
+import { UsersService } from 'src/amec/users/users.service';
 
 export interface CreateFinnpoInvoiceDto {
     INVOICE_DATE: string;
@@ -23,6 +24,7 @@ export interface CreateFinnpoDto {
     EXPENSE_CODE: number;
     REMARK?: string;
     DATA: CreateFinnpoInvoiceDto[] | string;
+    AIR_SALES_BY?: string[] | string;
 }
 
 export interface ActionFinnpoDto {
@@ -54,6 +56,7 @@ export class FinnpoService {
         private readonly formmstService: FormmstService,
         private readonly formCreateService: FormCreateService,
         private readonly doactionFlowService: DoactionFlowService,
+        private readonly usersService: UsersService,
     ) {}
 
     findAll() {
@@ -81,6 +84,14 @@ export class FinnpoService {
             status: true,
             message: 'Get FIN-NPO currency success',
             data: await this.repo.findAllCurrency(),
+        };
+    }
+
+    async findAllCostCenterForShow() {
+        return {
+            status: true,
+            message: 'Get FIN-NPO cost center success',
+            data: await this.repo.findAllCostCenter(),
         };
     }
 
@@ -193,6 +204,7 @@ export class FinnpoService {
         this.validateCreateDto(dto);
 
         const invoices = this.parseInvoices(dto.DATA);
+        const airSalesBy = this.parseAirSalesBy(dto.AIR_SALES_BY);
         const vendorCode = String(dto.VENDOR_CODE);
         const expenseCode = Number(dto.EXPENSE_CODE);
         const vendor = await this.repo.findVendorByCode(vendorCode);
@@ -252,11 +264,58 @@ export class FinnpoService {
         }));
         const savedInvoices = await this.repo.createInvoices(invoiceEntities);
 
+        const costCenterEntities = await Promise.all(
+            airSalesBy.map(async (reqno) => {
+                const employee = await this.usersService.findEmp(reqno);
+                const employeeCostCodes = [
+                    employee?.SSECCODE,
+                    employee?.SDEPCODE,
+                    employee?.SDIVCODE,
+                ].map((value) => String(value ?? '').trim());
+                const costCode =
+                    employeeCostCodes.find(
+                        (value) => value !== '' && !/^0+$/.test(value),
+                    ) || '';
+
+                if (!employee || !costCode) {
+                    throw new BadRequestException(
+                        `Employee ${reqno} or employee cost center was not found`,
+                    );
+                }
+
+                return {
+                    CYEAR2: form.CYEAR2,
+                    NRUNNO: form.NRUNNO,
+                    REQNO: reqno,
+                    COSTCODE: costCode,
+                };
+            }),
+        );
+        const savedCostCenters = costCenterEntities.length
+            ? await this.repo.createCostCenters(costCenterEntities)
+            : [];
+
         return {
             status: true,
             message: 'Create FIN-NPO success',
-            data: { form, head, invoices: savedInvoices },
+            data: {
+                form,
+                head,
+                invoices: savedInvoices,
+                costCenters: savedCostCenters,
+            },
         };
+    }
+
+    private parseAirSalesBy(data: CreateFinnpoDto['AIR_SALES_BY']) {
+        const values = Array.isArray(data) ? data : data ? [data] : [];
+        return [
+            ...new Set(
+                values
+                    .map((value) => String(value || '').trim())
+                    .filter(Boolean),
+            ),
+        ];
     }
 
     private parseInvoices(data: CreateFinnpoDto['DATA']) {

@@ -17,12 +17,15 @@ import {
 import { ProcedureService } from './services/procedure.service';
 import { DpmsPlMailModule } from 'src/workload/dpms_pl_mail/dpms_pl_mail.module';
 import { DpmsPlDocRevModule } from 'src/workload/dpms_pl_doc_rev/dpms_pl_doc_rev.module';
-import { PackingListCreateService } from './packing-list-create.service';
 import { ExcelService } from './services/excel.service';
 import { JobController } from './controller/job.controller';
 import { MarReportService } from './services/mar-report.service';
 import { ReviseVgmService } from './services/revise-vgm.service';
 import { DpmsPlWeightChangeModule } from 'src/workload/dpms_pl_weight_change/dpms_pl_weight_change.module';
+import { GenPdfService } from './services/pdf.service';
+import { IssueService } from './services/issue.service';
+import { HtmlService } from './services/html.service';
+import { PackingListCreateService } from './packing-list-create.service';
 
 @Module({
     imports: [
@@ -46,7 +49,10 @@ import { DpmsPlWeightChangeModule } from 'src/workload/dpms_pl_weight_change/dpm
         ProcedureDataCenterRepository,
         ProcedureService,
         PackingListCreateService,
+        IssueService,
+        HtmlService,
         ExcelService,
+        GenPdfService,
         MarReportService,
         ReviseVgmService,
     ],

@@ -15,10 +15,12 @@ import { PurnvfAddressService } from '../pur-nvf/purnvf_address/purnvf_address.s
 import { PurnvfAddressRepository } from '../pur-nvf/purnvf_address/purnvf_address.repository';
 import { PurEvaRequestService } from './pur-eva-request.service';
 import { PurFileModule } from '../pur-file/pur-file.module';
+import { PurEvaUpdateService } from './pur-eva-update.service';
+
 
 @Module({
   controllers: [PurEvaController ],
-  providers: [PurEvaService  , PurEvaRequestService , PurnvfAddressService , PurnvfAddressRepository],
+  providers: [PurEvaService  , PurEvaRequestService , PurnvfAddressService , PurnvfAddressRepository ,PurEvaUpdateService,],
   imports: [ PurFileModule , PurevaFormModule , PurevaProfitTurnoverModule , PurevaScoreModule , PurevaVendorRelationModule, FormModule , FlowModule , FormmstModule, RepModule, UsersModule,PappflowModule],
 })
 export class PurEvaModule {}

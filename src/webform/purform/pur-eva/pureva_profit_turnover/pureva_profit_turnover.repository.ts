@@ -50,5 +50,7 @@ export class PurevaProfitTurnoverRepository extends BaseRepository {
         return this.getRepository(PUREVA_PROFIT_TURNOVER).save(dto);
     }
 
-
+    async deleteByAll(dto: FormDto) {
+                return this.getRepository(PUREVA_PROFIT_TURNOVER).delete(dto);
+    }
 }

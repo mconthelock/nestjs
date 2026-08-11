@@ -48,5 +48,9 @@ export class PurevaScoreRepository extends BaseRepository {
         return this.getRepository(PUREVA_SCORE).save(dto);
     }
 
+    async deleteByAll(dto: FormDto) {
+        return this.getRepository(PUREVA_SCORE).delete(dto);
+    }
+
 
 }

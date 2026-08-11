@@ -59,6 +59,22 @@ async createMultipleRelations(formDto:FormDto , relations:RequestPurevaVendorRel
         }
   }
 
+async deleteByAll(dto: FormDto) {
+    try {
+        const res = await this.repo.deleteByAll(dto);       
+        if(!res){
+                throw new Error('Failed to Delete PUREVAVENDORRELATION');
+            }
+            return {
+                status: true,
+                message: 'Delete PUREVAVENDORRELATION Successfully',
+            };
+        } catch (error) {
+            throw new Error('Delete PUREVAVENDORRELATION Error: ' + error.message);
+        }
+  }
+  
+
   findAll() {
     return `This action returns all PUREVAVENDORRELATION`;
   }

@@ -48,5 +48,9 @@ export class PurevaRelationRepository extends BaseRepository {
         return this.getRepository(PUREVA_VENDOR_RELATION).save(dto);
     }
 
+    async deleteByAll(dto: FormDto) {
+            return this.getRepository(PUREVA_VENDOR_RELATION).delete(dto);
+    }
+
 
 }

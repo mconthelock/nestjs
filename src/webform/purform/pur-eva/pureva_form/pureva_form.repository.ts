@@ -5,6 +5,9 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FormDto} from 'src/webform/form/dto/form.dto';
 import { Brackets, DataSource } from 'typeorm';
 import { CreatePurevaFormDto } from './dto/create-pureva_form.dto';
+import { UpdatePurevaFormDto } from './dto/update-pureva_form.dto';
+
+
 
 
 @Injectable()
@@ -37,6 +40,11 @@ export class PurevaFormRepository extends BaseRepository {
 
     async create(dto: CreatePurevaFormDto) {
         return this.getRepository(PUREVA_FORM).save(dto);
+    }
+
+    async update(con: FormDto, dto: UpdatePurevaFormDto): Promise<boolean> {
+        const result = await this.getRepository(PUREVA_FORM).update(con, dto);
+        return (result.affected ?? 0) > 0;
     }
 
 

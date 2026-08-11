@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PurevaFormService } from './pureva_form/pureva_form.service';
-import { RequestPurevaFormDto } from './dto/request-pur-eva.dto';
 import { CreatePurevaFormDto } from './pureva_form/dto/create-pureva_form.dto';
 import { PurevaFormRepository } from './pureva_form/pureva_form.repository';
 import { PurevaProfitTurnoverService } from './pureva_profit_turnover/pureva_profit_turnover.service';
@@ -26,10 +25,13 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 import { UsersService } from 'src/amec/users/users.service';
 import { PappflowService } from 'src/amec/pappflow/pappflow.service';
 import { PurevaVendorRelationService } from './pureva_vendor_relation/pureva_vendor_relation.service';
+import { UpdatePurEvaDto } from './dto/update-pur-eva.dto';
+import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 
 
 @Injectable()
-export class PurEvaRequestService  {
+export class PurEvaUpdateService  {
     constructor(
         protected readonly repo: PurevaFormService,
         protected readonly repoaddr: PurnvfAddressRepository,
@@ -45,11 +47,12 @@ export class PurEvaRequestService  {
         protected readonly insertFlowStepService: InsertFlowStepService,
         private readonly formCreateService: FormCreateService,
         private readonly usrService: UsersService,
-        private readonly pappFlowService: PappflowService
+        private readonly pappFlowService: PappflowService,
+        private readonly doactionService: DoactionFlowService,
     ) {}
   
-    async request(
-        dto: RequestPurevaFormDto,
+    async update(
+        dto: UpdatePurEvaDto,
         files: {'fileCer[]'?: Express.Multer.File[], 'fileIe[]'?: Express.Multer.File[] , 'fileQa[]'?: Express.Multer.File[], 'fileOther[]'?: Express.Multer.File[] }, // <--- เปลี่ยนตรงนี้
         ip: string,
         path: string,
@@ -64,35 +67,20 @@ export class PurEvaRequestService  {
         
 
         try {
-            const { REQBY, INPUTBY , DRAFT , REMARK, SCORES, PROFIT_TURNOVERS , RELATIONS , ...data } = dto;
-            const createForm = await this.formCreateService.create(
-                {
-                    NFRMNO: dto.NFRMNO,
-                    VORGNO: dto.VORGNO,
-                    CYEAR: dto.CYEAR,
-                    REQBY: REQBY,
-                    INPUTBY: INPUTBY,
-                    REMARK: REMARK,
-                    ...(DRAFT !== undefined && { DRAFT: DRAFT })
-                },
-                ip,
-            );
-            if (!createForm.status) {
-                throw new Error(createForm.message.message);
-            }
+            const { REQBY, INPUTBY , DRAFT , REMARK, ACTION , EMPNO , SCORES, PROFIT_TURNOVERS , RELATIONS , DELETE_FILES, ...data } = dto;
             const form = {
                 NFRMNO: dto.NFRMNO,
                 VORGNO: dto.VORGNO,
                 CYEAR: dto.CYEAR,
-                CYEAR2: createForm.data.CYEAR2,
-                NRUNNO: createForm.data.NRUNNO,
+                CYEAR2: data.CYEAR2,
+                NRUNNO: data.NRUNNO,
             };
             const {  ADDRESS_EN , SUB_DISTRICT_EN , DISTRICT_EN , PROVINCE_EN , COUNTRY_EN , POSTCODE_EN  , ADDRESS_TH , SUB_DISTRICT_TH , DISTRICT_TH , PROVINCE_TH , COUNTRY_TH , POSTCODE_TH , ...purevadata } = data;
             const purevaForm = {
                 ...form,
                 ...purevadata
             };
-            await this.repo.create(purevaForm);
+            await this.repo.update(form, purevaForm);
             const addr = [];
             let addid = 0;
             if(ADDRESS_EN && ADDRESS_EN.trim().length > 0){
@@ -122,21 +110,35 @@ export class PurEvaRequestService  {
                     POSTCODE : data.POSTCODE_TH
                 })
             }
+            await this.repoaddr.deleteByAll(form);
             for(const a of addr){
                 await this.repoaddr.insert({
                     ...form,
                     ...a
                 })
             }
-            if (SCORES && SCORES.length > 0) {
-                 await this.reposcore.createMultipleScores(form,SCORES);
+            await this.reposcore.deleteByAll(form);
+            await this.repoprofit.deleteByAll(form);
+            await this.reporelation.deleteByAll(form);
+            if(SCORES && SCORES.length > 0) {
+                await this.reposcore.createMultipleScores(form,SCORES);
             }
-            if(PROFIT_TURNOVERS && PROFIT_TURNOVERS.length > 0)
-            {
-                 await this.repoprofit.createMultipleProfits(form,PROFIT_TURNOVERS);
+            if(PROFIT_TURNOVERS && PROFIT_TURNOVERS.length > 0) {
+                await this.repoprofit.createMultipleProfits(form,PROFIT_TURNOVERS);
             }
-            if (RELATIONS && RELATIONS.length > 0) {
+            if(RELATIONS && RELATIONS.length > 0) {
                 await this.reporelation.createMultipleRelations(form, RELATIONS);
+            }
+            if(DELETE_FILES && DELETE_FILES.length > 0) {
+                for (const id of DELETE_FILES) {
+                    const file = await this.purFileService.getFileById(+id);
+                    await this.purFileService.deleteFileByID(+id);
+                    const destination = await joinPaths(
+                        file.FILE_PATH,
+                        file.FILE_FNAME,
+                    );
+                    await deleteFile(destination);
+                }
             }
             if (allFilesWithType && allFilesWithType.length > 0) {
              movedTargets = await this.moveFiles(
@@ -145,11 +147,19 @@ export class PurEvaRequestService  {
                 path,
                 dto.REQBY,
             );
-    }
+            }
+            
+            if(ACTION== 'approve'){
+                await this.formService.updateForm({condition: { ...form },CST:"1"});
+                await this.doactionService.doAction(
+                { ...form, ACTION: ACTION, EMPNO, REMARK },
+                ip,
+                );
+            }
 
         return {
                 status: true,
-                message: 'Request successful',
+                message: 'Update PUR-EVA Form successful',
         };
         } catch (error) {
             const tmpFilePaths = allFilesWithType.map(item => item.file.path);
@@ -157,7 +167,7 @@ export class PurEvaRequestService  {
                 ...movedTargets.map((p) => deleteFile(p)), // - ลบไฟล์ที่ "ปลายทาง" ทั้งหมดที่ย้ายสำเร็จไปแล้ว (กัน orphan file)
                 ...tmpFilePaths.map((f) => deleteFile(f)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
             ]);
-            throw new Error('Request PUR-EVA Form Error: ' + error.message);
+            throw new Error('Update PUR-EVA Form Error: ' + error.message);
         }
     }
     

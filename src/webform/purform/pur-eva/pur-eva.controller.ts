@@ -8,11 +8,13 @@ import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transa
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
+import { PurEvaUpdateService } from './pur-eva-update.service';
 
 
 @Controller('purform/pur-eva')
 export class PurEvaController {
-  constructor(private readonly purEvaService: PurEvaRequestService) {}
+  constructor(private readonly purEvaService: PurEvaRequestService ,   private readonly purEvaUpdateService : PurEvaUpdateService) {}
+  
 
      private readonly path =
           `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/PUR/PUREVA/` as string;
@@ -41,6 +43,33 @@ export class PurEvaController {
           const ip = getClientIP(req);
           return this.purEvaService.request(dto, files, ip, this.path);
       }
+    @Patch()
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
+    @UseInterceptors(getFileUploadInterceptor([
+        { name: 'fileCer[]', maxCount: 10 },
+        { name: 'fileVat[]', maxCount: 10 },
+        { name: 'fileIe[]', maxCount: 10 },
+        { name: 'fileQa[]', maxCount: 10 },
+        { name: 'fileOther[]', maxCount: 10 },
+    ]))
+    update(
+        @Body() dto: UpdatePurEvaDto, // หรือ RequestPurevaFormDto
+        @UploadedFiles()
+        files: { 
+            'fileCer[]'?: Express.Multer.File[], 
+            'fileVat[]'?: Express.Multer.File[], 
+            'fileIe[]'?: Express.Multer.File[], 
+            'fileQa[]'?: Express.Multer.File[], 
+            'fileOther[]'?: Express.Multer.File[] 
+        },
+        @Req() req: Request,
+    ) {
+        const ip = getClientIP(req);
+        return this.purEvaUpdateService.update(dto, files, ip, this.path);
+    }
    
 
 }
+
+

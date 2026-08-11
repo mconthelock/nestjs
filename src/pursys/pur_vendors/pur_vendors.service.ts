@@ -25,6 +25,7 @@ export class PurVendorsService {
             .createQueryBuilder('vendor')
             .leftJoinAndSelect('vendor.VENDOR_CODES', 'code')
             .leftJoinAndSelect('code.TERM', 'term')
+            .leftJoinAndSelect('code.STDCUR', 'stdcur')
             .leftJoinAndSelect('vendor.VENDOR_ADDRESS', 'address')
             .leftJoinAndSelect('vendor.VENDOR_ATTFILE', 'attfile');
 

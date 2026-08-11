@@ -11,9 +11,10 @@ import { PUREVA_PROFIT_TURNOVER } from './PUREVA_PROFIT_TURNOVER.entity';
 import { PUREVA_SCORE } from './PUREVA_SCORE.entity';
 import { PUREVA_VENDOR_RELATION } from './PUREVA_VENDOR_RELATION.entity';
 import { PURNVF_ADDRESS } from './PURNVF_ADDRESS.entity';
-import { PTERMCODE } from '../../amec/table/PTERMCODE.entity';
 import { PCURRENCY } from '../../amec/table/PCURRENCY.entity';
 import { VORGMST } from '../views/VORGMST.entity';
+import { TERMCODE } from '../../pursys/table/TERMCODE.entity';
+
 
 @Entity({ name: 'PUREVA_FORM', schema: 'WEBFORM' })
 export class PUREVA_FORM {
@@ -216,9 +217,9 @@ export class PUREVA_FORM {
     @OneToMany(() => PURNVF_ADDRESS, (a) => a.MASTER_EVAADDR)
     ADDRESSES: PURNVF_ADDRESS[];
 
-    @OneToOne(() => PTERMCODE)
+    @OneToOne(() => TERMCODE)
     @JoinColumn({ name: 'TERMCODE', referencedColumnName: 'STERMCODE' })
-    TERM: PTERMCODE;  
+    TERM: TERMCODE;  
 
     @OneToOne(() => PCURRENCY)
     @JoinColumn({ name: 'CURCODE', referencedColumnName: 'SCURCODE' })

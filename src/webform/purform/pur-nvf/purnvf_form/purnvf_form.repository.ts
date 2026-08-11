@@ -3,7 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { PURNVF_FORM } from 'src/common/Entities/webform/table/PURNVF_FORM.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FormDto} from 'src/webform/form/dto/form.dto';
-import { DataSource } from 'typeorm';
+import { Brackets, DataSource } from 'typeorm';
 import { CreatePurnvfFormDto } from './dto/create-purnvf_form.dto';
 
 @Injectable()
@@ -25,6 +25,26 @@ export class PurnvfFormRepository extends BaseRepository {
                     FILES: true,
                 },
             });
+    }
+
+    async searchForms(keyword: string) {
+        const searchParam = `%${keyword.trim().toLowerCase()}%`;
+
+        return await this.getRepository(PURNVF_FORM)
+            .createQueryBuilder('NVFFORM')
+            .leftJoinAndSelect('NVFFORM.LISTS', 'list')
+            .leftJoinAndSelect('NVFFORM.ADDRESSES', 'address')
+            .leftJoinAndSelect('NVFFORM.FILES', 'file')
+            .where(
+                new Brackets((qb) => {
+                    qb.where("LOWER('PUR-NVF' || SUBSTR(NVFFORM.CYEAR2, -2) || '-' || LPAD(TO_CHAR(NVFFORM.NRUNNO), 6, '0')) LIKE :keyword", { keyword: searchParam })
+                      .orWhere('LOWER(list.COMNAME) LIKE :keyword', { keyword: searchParam });
+                }),
+            )
+            // ถ้าอยากจำกัดข้อมูลเพื่อความปลอดภัย ใส่ .take(50) แทรกตรงนี้ได้ครับ
+            .orderBy('NVFFORM.CYEAR', 'DESC')
+            .addOrderBy('NVFFORM.NRUNNO', 'DESC')
+            .getMany();
     }
 
     async insert(dto: CreatePurnvfFormDto) {

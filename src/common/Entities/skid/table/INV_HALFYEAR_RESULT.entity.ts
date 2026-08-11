@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { PSCIH_FORM } from '../../webform/table/PSCIH_FORM.entity';
 import { INV_CHECK_LOG } from './PSINV_CHECK_LOG.entity';
-import { ImmItemmst } from '../views/imm_itemmst.entity';
+import { IMM_ITEMMST } from '../views/IMM_ITEMMST.entity';
 import { MV_IMM_ITEMMST } from './MV_IMM_ITEMMST.entity';
 
 @Entity({ name: 'INV_HALFYEAR_RESULT', schema: 'SKIDCNTRL' })

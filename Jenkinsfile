@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    parameters {
-        choice(name: 'DEPLOY_ENV', choices: ['development', 'production'], description: 'Select Environment to deploy')
-    }
-
     environment {
         GIT_SSL_NO_VERIFY = 'true'
     }
@@ -17,36 +13,23 @@ pipeline {
         stage('Setup Environment') {
             steps {
                 script {
-                    // --- 1. ตรวจสอบว่าเป็นการกด Build เองจากหน้าเว็บหรือไม่
-                    // currentBuild.getBuildCauses() จะคืนค่า list ของสาเหตุการ Build
-                    // ถ้ามี 'UserIdCause' แสดงว่ามีคนมากดปุ่ม Build ใน Jenkins
-                    def isManualTrigger = currentBuild.getBuildCauses().toString().contains('UserIdCause')
-
-                    // --- 2. ตรวจสอบเงื่อนไข
-                    // จะไป Production ได้ต้อง: กดมือเอง (Manual) AND เลือก Parameter เป็น production
-                    if (isManualTrigger && params.DEPLOY_ENV == 'production') {
-                        env.TARGET_DIR = '/var/amecweb/wwwroot/production/api'
-                        env.REMOTE_HOST = 'amecweb1, amecweb2'
-                        env.ENV_CRED_ID = 'api-env-prod'
-                        env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.production'
-                        env.NODE_ENV = 'production'
-                        env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\production"
-                        echo "👹 MANUAL BUILD: PRODUCTION"
-                    }
-                    // กรณีอื่นๆ (เช่น GitLab Webhook ผลักมา หรือกดมือแต่เลือก development)
-                    else {
-                        env.TARGET_DIR = '/var/amecweb/wwwroot/development/api'
-                        env.NAS_PATH = "\\\\172.21.255.188\\amecweb\\wwwroot\\development"
+                    if (env.BRANCH_NAME == 'develop') {
                         env.REMOTE_HOST = 'amecwebtest'
-                        env.ENV_CRED_ID = 'api-env-file'
-                        env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.development'
                         env.NODE_ENV = 'development'
+                        env.DEPLOY_ENV = 'development'
+                        env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.development'
 
-                        if (!isManualTrigger) {
-                            echo "🚀 WEBHOOK DETECTED: Auto-deploying to DEVELOPMENT"
-                        } else {
-                            echo "🌼 MANUAL BUILD: DEVELOPMENT"
-                        }
+                        echo ">>> MR merged → develop → DEPLOY DEVELOPMENT"
+                    } else if (env.BRANCH_NAME == 'main') {
+                        env.REMOTE_HOST = 'amecweb1, amecweb2'
+                        env.NODE_ENV = 'development'
+                        env.DEPLOY_ENV = 'production'
+                        env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.production'
+
+                        echo ">>> MR merged → main → DEPLOY PRODUCTION"
+
+                    } else {
+                        error "❌ Branch ${env.BRANCH_NAME} is not deployable"
                     }
                 }
             }
@@ -77,7 +60,7 @@ pipeline {
                     echo "⏱️ [START] Check package.json Changes : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
 
                     // 1. กำหนดชื่อไฟล์ Hash ตาม Environment ที่กำลังจะ Deploy
-                    def hashFileName = ".package_hash_${params.DEPLOY_ENV}"
+                    def hashFileName = ".package_hash_${env.DEPLOY_ENV}"
 
                     // 2. คำนวณ Hash ของ package.json ตัวปัจจุบันที่เพิ่ง Checkout มา
                     def currentHash = sh(script: "md5sum package.json | cut -d' ' -f1", returnStdout: true).trim()
@@ -98,12 +81,12 @@ pipeline {
                         echo "⚠️  WARNING: package.json has changed!"
                         echo "⚠️  You need to run: npm install manually"
                         mail (
-                            to: 'sec_wsd@MitsubishiElevatorAsia.co.th',
-                            subject: "WARNING: package.json has changed! You need to run: npm install manually (${params.DEPLOY_ENV})",
+                            to: 'sutthipongt@MitsubishiElevatorAsia.co.th',
+                            subject: "WARNING: package.json has changed! You need to run: npm install manually (${env.DEPLOY_ENV})",
                             from: 'jenkins-notify@MitsubishiElevatorAsia.co.th',
                             body: """
                                 Dear Team,
-                                The package.json file has changed in the latest deployment to '${params.DEPLOY_ENV}' environment. Please run 'npm install' in the target directory to ensure all dependencies are up to date.
+                                The package.json file has changed in the latest deployment to '${env.DEPLOY_ENV}' environment. Please run 'npm install' in the target directory to ensure all dependencies are up to date.
                                 -------------------------------------------
                                 How to procedure:
                                 1. Map Network Drive to target directory on ${REMOTE_HOST}
@@ -133,10 +116,12 @@ pipeline {
                     env.START_TIME_BUILD = System.currentTimeMillis()
                     echo "⏱️ [START] Install & Build : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
                 }
+                // Add missing dependencies installation for build process
+                // sh 'apt-get update && apt-get install -y python3 make g++'
                 sh '''
                     cp ${ENV_DIR} .env
                     NODE_ENV=development
-                    if [ "${PACKAGE_STATUS}" = "CHANGED" ] || [ "${PACKAGE_STATUS}" = "NEW" ]; then
+                    if [ "${PACKAGE_STATUS}" = "CHANGED" ] || [ "${PACKAGE_STATUS}" = "NEW" ] || [ ! -x "node_modules/.bin/nest" ]; then
                         npm install
                     else
                         echo "✅ package.json unchanged, skip npm install"
@@ -152,7 +137,7 @@ pipeline {
         }
 
         stage('Restart Application on Development Server') {
-            when { expression { params.DEPLOY_ENV == 'development' }}
+            when { expression { env.DEPLOY_ENV == 'development' }}
             steps {
                 script {
                     env.START_TIME_BUILD = System.currentTimeMillis()
@@ -215,7 +200,7 @@ pipeline {
         }
 
         stage('Restart Application on Production Servers') {
-            when { expression { params.DEPLOY_ENV == 'production'} }
+            when { expression { env.DEPLOY_ENV == 'production'} }
             steps {
                 script {
                     env.START_TIME_RESTART = System.currentTimeMillis()
@@ -323,6 +308,49 @@ pipeline {
                     def duration = (System.currentTimeMillis() - env.START_TIME_RESTART.toLong()) / 1000
                     echo "✅ [END] Restart Application ใช้เวลาทั้งหมด: ${duration} วินาที"
                 }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                // 1. หาชื่อคนสั่ง Build (ดึงจาก Build Causes)
+                def buildCauses = currentBuild.getBuildCauses()
+                def buildUser = ""
+                for (cause in buildCauses) {
+                    if (cause.shortDescription.contains('Started by user')) {
+                        buildUser = cause.shortDescription.replace('Started by user ', '')
+                    }else{
+                        buildUser = cause.shortDescription.replace('Started by GitLab push by ', '')
+                    }
+                }
+
+                // 2. จัดการเรื่องเวลา (แปลงจาก milliseconds เป็นวันที่ที่อ่านออก)
+                def startTime = new Date(currentBuild.startTimeInMillis).format("dd/MM/yyyy HH:mm:ss", TimeZone.getTimeZone('Asia/Bangkok'))
+                def endTime = new Date().format("dd/MM/yyyy HH:mm:ss", TimeZone.getTimeZone('Asia/Bangkok'))
+
+                mail (
+                    to: 'sutthipongt@MitsubishiElevatorAsia.co.th',
+                    subject: "Build ${currentBuild.currentResult}: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
+                    from: 'jenkins-notify@MitsubishiElevatorAsia.co.th',
+                    body: """
+                        ข้อมูลการ Build เบื้องต้น:
+                        -------------------------------------------
+                        ผลการทำงาน: ${currentBuild.currentResult}
+                        ผู้ดำเนินการ: ${buildUser}
+                        เวลาที่เริ่ม: ${startTime}
+                        เวลาที่เสร็จ: ${endTime}
+                        ระยะเวลาทั้งหมด: ${currentBuild.durationString.replace(' and counting', '')}
+
+                        รายละเอียดสภาพแวดล้อม:
+                        -------------------------------------------
+                        Environment: ${env.DEPLOY_ENV}
+
+                        สามารถตรวจสอบ Log อย่างละเอียดได้ที่:
+                        ${env.BUILD_URL}console
+                        -------------------------------------------
+                    """
+                )
             }
         }
     }

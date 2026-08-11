@@ -30,6 +30,7 @@ import { OrdersDrawingModule } from './orders-drawing/orders-drawing.module';
 import { ChecksheetModule } from './checksheet/checksheet.module';
 import { GetOrderModule } from './get-order/get-order.module';
 import { MachineModule } from './machine/machine.module';
+import { MfgFeederModule } from './mfg-feeder/mfg-feeder.module';
 
 @Module({
     imports: [
@@ -63,7 +64,8 @@ import { MachineModule } from './machine/machine.module';
         OrdersDrawingModule,
         ChecksheetModule,
         GetOrderModule,
-        MachineModule
+        MachineModule,
+        MfgFeederModule,
     ],
 })
 export class ESCSModule {}

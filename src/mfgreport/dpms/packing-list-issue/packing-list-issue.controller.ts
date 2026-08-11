@@ -2,21 +2,19 @@ import { Controller, Post, Body, Patch, Get, Param } from '@nestjs/common';
 import { PackingListIssueService } from './packing-list-issue.service';
 import { CreatePackingListIssueDto } from './dto/create-packing-list-issue.dto';
 import {
-    UpdatePackingListIssueDto,
     UpdatePlIssueProblemReasonDto,
+    GetDocForShowDto,
 } from './dto/update-packing-list-issue.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { PackingListIssueProcedureService } from './packing-list-issue-procedure.service';
 import { SearchDpmsPlIssueDto } from 'src/workload/dpms_pl_issue/dto/search-dpms_pl_issue.dto';
 import { PackingListCreateService } from './packing-list-create.service';
-import { PackingListReviseService } from './packing-list-revise.service';
 
 @Controller('mfgreport/dpms/packing-list-issue')
 export class PackingListIssueController {
     constructor(
         private readonly service: PackingListIssueService,
         private readonly createService: PackingListCreateService,
-        private readonly reviseService: PackingListReviseService,
         private readonly procedureService: PackingListIssueProcedureService,
     ) {}
 
@@ -24,12 +22,6 @@ export class PackingListIssueController {
     @UseTransaction('workloadConnection')
     issue(@Body() dto: CreatePackingListIssueDto) {
         return this.createService.issue(dto);
-    }
-
-    @Post('revise')
-    @UseTransaction('workloadConnection')
-    revise(@Body() dto: CreatePackingListIssueDto) {
-        return this.reviseService.revise(dto);
     }
 
     @Patch('problem-reason')
@@ -53,8 +45,13 @@ export class PackingListIssueController {
         return this.procedureService.getShopOrder(ordermain);
     }
 
-    @Post('revise-list')
-    getReviseList(@Body() dto: SearchDpmsPlIssueDto) {
-        return this.procedureService.getReviseList(dto);
+    @Post('last-rev-document')
+    getLastRevDocument(@Body() dto: SearchDpmsPlIssueDto) {
+        return this.procedureService.getLastRevDocument(dto);
+    }
+
+    @Post('doc-for-show')
+    getDocforShow(@Body() dto: GetDocForShowDto) {
+        return this.procedureService.getDocforShow(dto);
     }
 }

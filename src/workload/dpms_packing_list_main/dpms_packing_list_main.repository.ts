@@ -27,4 +27,21 @@ export class DpmsPackingListMainRepository extends BaseRepository {
             }
         });
     }
+    async findPackingListPoByMfgNo(mfgNo: string): Promise<DPMS_PACKING_LIST_MAIN[]> {
+        return this.getRepository(DPMS_PACKING_LIST_MAIN).find({
+            where: {
+                VMFGNO: mfgNo,
+            },
+            relations: ['DETAILS_PO'], // ดึงข้อมูลรายละเอียดที่เกี่ยวข้องด้วย
+            order: {
+                VCASE: 'ASC',
+                DETAILS_PO: {
+                    VMFGNO: 'ASC', 
+                    VCASE: 'ASC',
+                    VITEM: 'ASC',
+                    VDRAWING: 'ASC',
+                },
+            }
+        });
+    }
 }

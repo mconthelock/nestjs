@@ -109,6 +109,12 @@ export class DPMS_PACKING_LIST{
 
     @Column()
     VREASON: string;
+
+    @Column()
+    ISSUE: string;
+
+    @Column()
+    LASTISSUEDATE: Date;
     
     @Column()
     REVISE: string;

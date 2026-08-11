@@ -3,5 +3,11 @@
     "editor.insertSpaces": true,
     "prettier.printWidth": 160,
     "js/ts.tsdk.path": "node_modules/typescript/lib",
-    "ibm-i-acs.host": ""
+    "favorites.resources": [
+        {
+            "filePath": "src\\common\\Entities",
+            "group": "Default"
+        }
+    ],
+    "favorites.sortOrder": "FILETYPE"
 }

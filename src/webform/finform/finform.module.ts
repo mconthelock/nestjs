@@ -5,8 +5,11 @@ import { FinPckModule } from './fin-pck/fin-pck.module';
 import { FxaLocmstModule } from './fxa_locmst/fxa_locmst.module';
 import { FxaGrpmstModule } from './fxa_grpmst/fxa_grpmst.module';
 import { FinNpoModule } from './fin-npo/fin-npo.module';
+import { FinpckFormModule } from './fin-pck/finpck_form/finpck_form.module';
+import { FinpckAssetModule } from './fin-pck/finpck_asset/finpck_asset.module';
+
 
 @Module({
-  imports: [FinDsModule, FinNpoModule, FinFileModule, FinPckModule, FxaLocmstModule, FxaGrpmstModule]
+  imports: [FinDsModule, FinFileModule, FinPckModule, FxaLocmstModule, FxaGrpmstModule , FinpckFormModule , FinpckAssetModule, FinNpoModule,]
 })
 export class FinformModule {}

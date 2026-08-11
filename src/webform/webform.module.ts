@@ -30,6 +30,16 @@ import { MfgEdrModule } from './mfgform/mfg-edr/mfg-edr.module';
 // FIN-PCK
 import { FinpckFormModule } from './finform/fin-pck/finpck_form/finpck_form.module';
 import { FinpckAssetModule } from './finform/fin-pck/finpck_asset/finpck_asset.module';
+import { RnfrmModule } from './rnfrm/rnfrm.module';
+import { RncauseModule } from './rncause/rncause.module';
+import { RnlistModule } from './rnlist/rnlist.module';
+import { RnlistPpModule } from './rnlist_pp/rnlist_pp.module';
+import { RnwasteModule } from './rnwaste/rnwaste.module';
+import { RnsolveModule } from './rnsolve/rnsolve.module';
+import { RnfrmPartModule } from './rnfrm_part/rnfrm_part.module';
+import { WtypeModule } from './wtype/wtype.module';
+import { SecpicModule } from './secpic/secpic.module';
+import { WtypeSecpicModule } from './wtype_secpic/wtype_secpic.module';
 
 @Module({
     imports: [
@@ -58,7 +68,6 @@ import { FinpckAssetModule } from './finform/fin-pck/finpck_asset/finpck_asset.m
         STFormModule,
         RqflistModule,
         VorgmstModule,
-        MfgOrModule,
         GrpmstModule,
         // OMG
         MfgEdrModule,
@@ -66,6 +75,17 @@ import { FinpckAssetModule } from './finform/fin-pck/finpck_asset/finpck_asset.m
         //FIN-PCK
         FinpckFormModule,
         FinpckAssetModule,
+        //RN Reject Notice
+        RnfrmModule,
+        RncauseModule,
+        RnlistModule,
+        RnlistPpModule,
+        RnwasteModule,
+        RnsolveModule,
+        RnfrmPartModule,
+        WtypeModule,
+        SecpicModule,
+        WtypeSecpicModule,
     ],
 })
 export class WebformModule {}

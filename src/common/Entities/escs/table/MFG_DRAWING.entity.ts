@@ -67,6 +67,9 @@ export class MFG_DRAWING {
     @Column()
     DDATEUPDATE: Date;
 
+    @Column()
+    VPROCESSNO: string;
+
     @OneToMany(() => MFG_SERIAL, (m) => m.MFG_DRAWING)
     MFG_SERIAL: MFG_SERIAL[];
 

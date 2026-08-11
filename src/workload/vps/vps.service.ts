@@ -72,7 +72,18 @@ export class VpsService {
 
         // ถ้ายังไม่มี order ใน PACKORDDTL -> เรียก stored proc สร้างให้
         if (!chkOrder) {
-            await this.vpsRepository.insPackorddtlByManual(order, packing);
+            // await this.vpsRepository.insPackorddtlByManual(order, packing);
+            await this.vpsRepository.insertPackorddtl({
+                production: produciton,
+                orderno: order,
+                itemno: item,
+                packno: packing,
+                partname: partname,
+                projectno: project,
+                packshop: 'PC',
+                printsta: '1',
+                updatedate: now,
+            });
         } else {
             await this.vpsRepository.updatePrintStatus(order, packing);
         }

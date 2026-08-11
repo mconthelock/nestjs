@@ -133,6 +133,10 @@ export class VpsRepository extends BaseRepository {
             .execute();
     }
 
+    async insertPackorddtl(data: Record<string, any>): Promise<void> {
+        await this.packingDs.createQueryBuilder().insert().into('packorddtl').values(data).execute();
+    }
+
     async insertItemMas(data: Record<string, any>): Promise<void> {
         await this.packingDs.createQueryBuilder().insert().into('ItemMas').values(data).execute();
     }

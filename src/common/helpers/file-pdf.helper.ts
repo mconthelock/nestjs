@@ -11,6 +11,7 @@ export async function writeLineBox(opt) {
     const yTop = height - opt.boxY;
     const fontHeight = fontstyle.heightAtSize(opt.fontsize);
     const fontColor = opt.fontColor || rgb(0, 0, 0);
+    const textOpacity = opt.textOpacity ?? 1;
 
     // วาดเส้นกรอบถ้าต้องการ
     if (opt.drawBorder) {
@@ -22,6 +23,7 @@ export async function writeLineBox(opt) {
             borderColor: opt.drawBorder.color || rgb(0, 0, 0),
             borderWidth: opt.drawBorder.width || 0.5,
             color: opt.drawBorder.bgColor || rgb(1, 1, 1),
+            borderOpacity: opt.drawBorder.borderOpacity ?? 1,
         });
     }
 
@@ -39,6 +41,7 @@ export async function writeLineBox(opt) {
         size: opt.fontsize,
         font: fontstyle,
         color: fontColor,
+        opacity: textOpacity,
     });
 }
 

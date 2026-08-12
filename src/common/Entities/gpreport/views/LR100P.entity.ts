@@ -11,7 +11,7 @@
 // LR111	VARCHAR2 [leave value]
 
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-@Entity({ name: 'LR100P', schema: 'AMECMFG' })
+@Entity({ name: 'LR100P', schema: 'GPREPORT' })
 export class LR100P {
     @Column()
     LR101: string;

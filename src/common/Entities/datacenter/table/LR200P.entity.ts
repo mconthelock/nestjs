@@ -22,7 +22,7 @@ export class LR200P {
     @Column()
     LR202: string;
 
-    @Column()
+    @PrimaryColumn()
     LR203: string;
 
     @Column()
@@ -40,7 +40,7 @@ export class LR200P {
     @Column()
     LR208: string;
 
-    @Column()
+    @PrimaryColumn()
     LR209: string;
 
     @Column()

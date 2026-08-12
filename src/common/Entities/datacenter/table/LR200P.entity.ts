@@ -1,18 +1,18 @@
-// LR201	CHAR
-// LR202	VARCHAR2
-// LR203	CHAR
-// LR204	VARCHAR2
-// LR205	VARCHAR2
-// LR206	VARCHAR2
-// LR207	VARCHAR2
-// LR208	VARCHAR2
-// LR209	CHAR
-// LR210	CHAR
-// LR211	CHAR
-// LR212	CHAR
-// LR213	CHAR
-// LR214	CHAR
-// LR215	CHAR
+// LR201	CHAR [Dept code]
+// LR202	VARCHAR2 [Dept name]
+// LR203	CHAR [employee code]
+// LR204	VARCHAR2 [pre-name]
+// LR205	VARCHAR2 [name]
+// LR206	VARCHAR2 [pre en]
+// LR207	VARCHAR2 [name en]
+// LR208	VARCHAR2 [position name]
+// LR209	CHAR [work date]
+// LR210	CHAR [time in]
+// LR211	CHAR [time out]
+// LR212	CHAR [time ot]
+// LR213	CHAR [x1.3]
+// LR214	CHAR [x1.5]
+// LR215	CHAR [x3.0]
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 @Entity({ name: 'LR200P', schema: 'AMECMFG' })
 export class LR200P {

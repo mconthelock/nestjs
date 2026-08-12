@@ -1,14 +1,14 @@
-// LR101	CHAR
-// LR102	VARCHAR2
-// LR103	CHAR
-// LR104	VARCHAR2
-// LR105	VARCHAR2
-// LR106	VARCHAR2
-// LR107	VARCHAR2
-// LR108	VARCHAR2
-// LR109	CHAR
-// LR110	CHAR
-// LR111	VARCHAR2
+// LR101	CHAR [Dept code]
+// LR102	VARCHAR2 [Dept name]
+// LR103	CHAR [employee code]
+// LR104	VARCHAR2 [pre-name]
+// LR105	VARCHAR2 [name]
+// LR106	VARCHAR2 [pre en]
+// LR107	VARCHAR2 [name en]
+// LR108	VARCHAR2 [position name]
+// LR109	CHAR [type code]
+// LR110	CHAR [leave date]
+// LR111	VARCHAR2 [leave value]
 
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 @Entity({ name: 'LR100P', schema: 'AMECMFG' })

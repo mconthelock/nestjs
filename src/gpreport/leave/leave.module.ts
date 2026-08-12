@@ -7,11 +7,12 @@ import { LeaveController } from './leave.controller';
 import { LeaveType } from 'src/common/Entities/gpreport/table/LEAVE_TYPE.entity';
 import { LVAPP } from 'src/common/Entities/webform/table/LVAPP.entity';
 import { LR100P } from 'src/common/Entities/datacenter/table/LR100P.entity';
+import { User } from 'src/common/Entities/webform/views/AMECUSERALL.entity';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature(
-            [LeaveType, LVAPP, LR100P],
+            [LeaveType, LVAPP, LR100P, User],
             'gpreportConnection',
         ),
     ],

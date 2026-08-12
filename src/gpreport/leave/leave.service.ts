@@ -1,12 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import { Repository } from 'typeorm';
 
-import { CreateLeaveDto } from './dto/create-leave.dto';
-import { UpdateLeaveDto } from './dto/update-leave.dto';
-
-import { LeaveType } from 'src/common/Entities/gpreport/table/LEAVE_TYPE.entity';
-import { LR100P } from 'src/common/Entities/datacenter/table/LR100P.entity';
 import { LVAPP } from 'src/common/Entities/webform/table/LVAPP.entity';
 
 @Injectable()
@@ -25,11 +20,9 @@ export class LeaveService {
         return leaves;
     }
 
-    async findBySection(empId: string) {
+    async findBySection(seccode: string) {
         const leaves = await this.lvapp.find({
-            where: {
-                EMPNO: empId,
-            },
+            where: {user.SSECCODE: seccode},
         });
         return leaves;
     }

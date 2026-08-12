@@ -14,7 +14,9 @@ export class LeaveService {
     ) {}
 
     async search(searchLeaveDto: SearchLeaveDto) {
-        const qb = this.lvapp.createQueryBuilder('lvapp');
+        const qb = this.lvapp
+            .createQueryBuilder('lvapp')
+            .leftJoinAndSelect('lvapp.user', 'user');
         await applyDynamicFilters(qb, searchLeaveDto, 'lvapp');
         return qb.getMany();
     }

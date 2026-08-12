@@ -1,26 +1,54 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+
 import { CreateLeaveDto } from './dto/create-leave.dto';
 import { UpdateLeaveDto } from './dto/update-leave.dto';
 
+import { LeaveType } from 'src/common/Entities/gpreport/table/LEAVE_TYPE.entity';
+import { LVAPP } from 'src/common/Entities/webform/table/LVAPP.entity';
+import { LR100P } from 'src/common/Entities/datacenter/table/LR100P.entity';
+
 @Injectable()
 export class LeaveService {
-  create(createLeaveDto: CreateLeaveDto) {
-    return 'This action adds a new leave';
-  }
+    constructor(
+        @InjectRepository(LVAPP, 'gpreportConnection')
+        private readonly lvapp: Repository<LVAPP>,
+    ) {}
 
-  findAll() {
-    return `This action returns all leave`;
-  }
+    async findByEmployee(empId: string) {
+        const leaves = await this.lvapp.find({
+            where: {
+                EMPNO: empId,
+            },
+        });
+        return leaves;
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} leave`;
-  }
+    async findBySection(empId: string) {
+        const leaves = await this.lvapp.find({
+            where: {
+                EMPNO: empId,
+            },
+        });
+        return leaves;
+    }
 
-  update(id: number, updateLeaveDto: UpdateLeaveDto) {
-    return `This action updates a #${id} leave`;
-  }
+    async findByDepartment(empId: string) {
+        const leaves = await this.lvapp.find({
+            where: {
+                EMPNO: empId,
+            },
+        });
+        return leaves;
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} leave`;
-  }
+    async findByDivision(empId: string) {
+        const leaves = await this.lvapp.find({
+            where: {
+                EMPNO: empId,
+            },
+        });
+        return leaves;
+    }
 }

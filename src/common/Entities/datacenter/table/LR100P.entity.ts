@@ -40,8 +40,29 @@ export class LR100P {
     @Column()
     LR109: string;
 
-    @Column()
-    LR110: string;
+    @Column({
+        type: 'date',
+        transformer: {
+            to: (value: Date | string | null | undefined) => {
+                if (value === null || value === undefined) return value;
+                if (value instanceof Date) return value;
+                return new Date(
+                    `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`,
+                );
+            },
+            from: (value: Date | string | null | undefined) => {
+                if (value === null || value === undefined) return value;
+                if (value instanceof Date) return value;
+                if (typeof value === 'string' && value.length === 8) {
+                    return new Date(
+                        `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`,
+                    );
+                }
+                return new Date(value);
+            },
+        },
+    })
+    LR110: Date;
 
     @Column()
     LR111: string;

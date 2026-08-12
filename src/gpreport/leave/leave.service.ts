@@ -6,8 +6,8 @@ import { CreateLeaveDto } from './dto/create-leave.dto';
 import { UpdateLeaveDto } from './dto/update-leave.dto';
 
 import { LeaveType } from 'src/common/Entities/gpreport/table/LEAVE_TYPE.entity';
-import { LVAPP } from 'src/common/Entities/webform/table/LVAPP.entity';
 import { LR100P } from 'src/common/Entities/datacenter/table/LR100P.entity';
+import { LVAPP } from 'src/common/Entities/webform/table/LVAPP.entity';
 
 @Injectable()
 export class LeaveService {

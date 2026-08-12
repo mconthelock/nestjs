@@ -106,9 +106,8 @@ export class LVAPP {
     LEAVE_TYPE: LeaveType;
 
     @OneToOne(() => LR100P, (lr100p) => lr100p)
-    @JoinColumn({
-        name: 'EMPNO',
-        referencedColumnName: 'LR103',
-    })
+    @JoinColumn({ name: 'EMPNO', referencedColumnName: 'LR103' })
+    @JoinColumn({ name: 'TYPENO', referencedColumnName: 'LR109' })
+    @JoinColumn({ name: 'FRMLVTIME', referencedColumnName: 'LR110' })
     LR100P: LR100P;
 }

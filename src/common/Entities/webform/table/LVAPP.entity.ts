@@ -27,8 +27,6 @@ import {
     PrimaryColumn,
 } from 'typeorm';
 
-import { LeaveType } from '../../gpreport/table/LEAVE_TYPE.entity';
-import { LR100P } from '../../gpreport/views/LR100P.entity';
 import { User } from '../../webform/views/AMECUSERALL.entity';
 
 @Entity({ name: 'LVAPP', schema: 'WEBFORM' })
@@ -66,19 +64,8 @@ export class LVAPP {
     @Column()
     TOLVTIME: string;
 
-    @Column({
-        transformer: {
-            to: (value: number | string | null | undefined) => {
-                if (value === null || value === undefined) return value;
-                return String(value).padStart(2, '0');
-            },
-            from: (value: number | string | null | undefined) => {
-                if (value === null || value === undefined) return value;
-                return String(value).padStart(2, '0');
-            },
-        },
-    })
-    TYPENO: string;
+    @Column()
+    TYPENO: number;
 
     @Column()
     REASON: string;
@@ -101,20 +88,7 @@ export class LVAPP {
     @Column()
     CAPPROVE: string;
 
-    @ManyToOne(() => LeaveType, (leaveType) => leaveType.LV_CODE)
-    @JoinColumn({
-        name: 'TYPENO',
-        referencedColumnName: 'LV_CODE',
-    })
-    types: LeaveType;
-
-    @OneToOne(() => LR100P, (lr100p) => lr100p)
-    @JoinColumn({ name: 'EMPNO', referencedColumnName: 'LR103' })
-    @JoinColumn({ name: 'TYPENO', referencedColumnName: 'LR109' })
-    @JoinColumn({ name: 'FRMLVTIME', referencedColumnName: 'LR110' })
-    actual: LR100P;
-
-    @OneToOne(() => User, (user) => user.SEMPNO)
+    @ManyToOne(() => User, (user) => user.SEMPNO)
     @JoinColumn({ name: 'EMPNO', referencedColumnName: 'SEMPNO' })
     user: User;
 }

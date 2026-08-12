@@ -27,4 +27,9 @@ export class LeaveController {
     findDivision(@Param('id') id: string) {
         return this.leave.findByDivision(id);
     }
+
+    // @Get('actual/person/:id')
+    // findActualPerson(@Param('id') id: string) {
+    //     return this.leave.findActualById(id);
+    // }
 }

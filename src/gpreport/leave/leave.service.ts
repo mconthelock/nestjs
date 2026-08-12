@@ -16,7 +16,7 @@ export class LeaveService {
             where: {
                 EMPNO: empId,
             },
-            relations: ['types', 'actual', 'user'],
+            relations: ['user'],
         });
         return leaves;
     }
@@ -28,7 +28,7 @@ export class LeaveService {
                     SSECCODE: seccode,
                 },
             },
-            relations: ['types', 'actual', 'user'],
+            relations: ['user'],
         });
         return leaves;
     }
@@ -40,7 +40,7 @@ export class LeaveService {
                     SDEPCODE: depcode,
                 },
             },
-            relations: ['types', 'actual', 'user'],
+            relations: ['user'],
         });
         return leaves;
     }
@@ -52,7 +52,7 @@ export class LeaveService {
                     SDIVCODE: divcode,
                 },
             },
-            relations: ['types', 'actual', 'user'],
+            relations: ['user'],
         });
         return leaves;
     }

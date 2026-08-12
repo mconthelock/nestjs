@@ -16,6 +16,7 @@ export class LeaveService {
             where: {
                 EMPNO: empId,
             },
+            relations: ['types', 'actual'],
         });
         return leaves;
     }

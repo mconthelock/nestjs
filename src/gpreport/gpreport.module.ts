@@ -13,6 +13,11 @@ import { StyPatrolInspectionModule } from './sty-patrol-inspection/sty-patrol-in
 import { StinpFormModule } from './stinp-form/stinp-form.module';
 import { StinpFormListModule } from './stinp-form-list/stinp-form-list.module';
 import { UniformModule } from './uniform/uniform.module';
+import { LeaveModule } from './leave/leave.module';
+import { AttendanceModule } from './attendance/attendance.module';
+import { MedicalModule } from './medical/medical.module';
+import { TaxModule } from './tax/tax.module';
+import { LoanModule } from './loan/loan.module';
 
 @Module({
     imports: [
@@ -30,6 +35,11 @@ import { UniformModule } from './uniform/uniform.module';
         StinpFormModule,
         StinpFormListModule,
         UniformModule,
+        LeaveModule,
+        AttendanceModule,
+        MedicalModule,
+        TaxModule,
+        LoanModule,
     ],
 })
 export class gpreportModule {}

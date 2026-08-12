@@ -1,4 +1,15 @@
+import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
-import { CreateLeaveDto } from './create-leave.dto';
+import { IsOptional, ValidateNested } from 'class-validator';
 
-export class SearchLeaveDto extends PartialType(CreateLeaveDto) {}
+import { CreateLeaveDto } from './create-leave.dto';
+import { searchDto } from 'src/amec/users/dto/search-user.dto';
+
+export class UsersDto extends PartialType(searchDto) {}
+
+export class SearchLeaveDto extends PartialType(CreateLeaveDto) {
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => UsersDto)
+    user?: UsersDto;
+}

@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 
 import { LVAPP } from 'src/common/Entities/webform/table/LVAPP.entity';
+import { SearchLeaveDto } from './dto/search-leave.dto';
 
 @Injectable()
 export class LeaveService {
@@ -10,6 +12,12 @@ export class LeaveService {
         @InjectRepository(LVAPP, 'gpreportConnection')
         private readonly lvapp: Repository<LVAPP>,
     ) {}
+
+    async search(searchLeaveDto: SearchLeaveDto) {
+        const qb = this.lvapp.createQueryBuilder('lvapp');
+        await applyDynamicFilters(qb, searchLeaveDto, 'lvapp');
+        return qb.getMany();
+    }
 
     async findByEmployee(empId: string) {
         const leaves = await this.lvapp.find({

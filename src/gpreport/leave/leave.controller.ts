@@ -1,12 +1,18 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body } from '@nestjs/common';
 import { LeaveService } from './leave.service';
 
 import { CreateLeaveDto } from './dto/create-leave.dto';
 import { UpdateLeaveDto } from './dto/update-leave.dto';
+import { SearchLeaveDto } from './dto/search-leave.dto';
 
 @Controller('gpreport/leave')
 export class LeaveController {
     constructor(private readonly leave: LeaveService) {}
+
+    @Post('search')
+    search(@Body() dto: SearchLeaveDto) {
+        return this.leave.search(dto);
+    }
 
     @Get('person/:id')
     findOne(@Param('id') id: string) {

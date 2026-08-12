@@ -26,8 +26,11 @@ import {
     OneToOne,
     PrimaryColumn,
 } from 'typeorm';
+
 import { LeaveType } from '../../gpreport/table/LEAVE_TYPE.entity';
 import { LR100P } from '../../gpreport/views/LR100P.entity';
+import { User } from '../../webform/views/AMECUSERALL.entity';
+
 @Entity({ name: 'LVAPP', schema: 'WEBFORM' })
 export class LVAPP {
     @PrimaryColumn()
@@ -110,4 +113,8 @@ export class LVAPP {
     @JoinColumn({ name: 'TYPENO', referencedColumnName: 'LR109' })
     @JoinColumn({ name: 'FRMLVTIME', referencedColumnName: 'LR110' })
     actual: LR100P;
+
+    @OneToOne(() => User, (user) => user.SEMPNO)
+    @JoinColumn({ name: 'EMPNO', referencedColumnName: 'SEMPNO' })
+    user: User;
 }

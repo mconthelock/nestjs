@@ -7,6 +7,7 @@ import { LeaveController } from './leave.controller';
 import { LeaveType } from 'src/common/Entities/gpreport/table/LEAVE_TYPE.entity';
 import { LR100P } from 'src/common/Entities/gpreport/views/LR100P.entity';
 import { LVAPP } from 'src/common/Entities/webform/table/LVAPP.entity';
+import { User } from 'src/common/Entities/webform/views/AMECUSERALL.entity';
 
 @Module({
     imports: [

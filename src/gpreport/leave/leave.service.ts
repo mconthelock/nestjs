@@ -16,32 +16,43 @@ export class LeaveService {
             where: {
                 EMPNO: empId,
             },
-            relations: ['types', 'actual'],
+            relations: ['types', 'actual', 'user'],
         });
         return leaves;
     }
 
     async findBySection(seccode: string) {
         const leaves = await this.lvapp.find({
-            where: {user.SSECCODE: seccode},
+            where: {
+                user: {
+                    SSECCODE: seccode,
+                },
+            },
+            relations: ['types', 'actual', 'user'],
         });
         return leaves;
     }
 
-    async findByDepartment(empId: string) {
+    async findByDepartment(depcode: string) {
         const leaves = await this.lvapp.find({
             where: {
-                EMPNO: empId,
+                user: {
+                    SDEPCODE: depcode,
+                },
             },
+            relations: ['types', 'actual', 'user'],
         });
         return leaves;
     }
 
-    async findByDivision(empId: string) {
+    async findByDivision(divcode: string) {
         const leaves = await this.lvapp.find({
             where: {
-                EMPNO: empId,
+                user: {
+                    SDIVCODE: divcode,
+                },
             },
+            relations: ['types', 'actual', 'user'],
         });
         return leaves;
     }

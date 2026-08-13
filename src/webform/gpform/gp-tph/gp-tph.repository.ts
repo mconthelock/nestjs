@@ -11,9 +11,13 @@ export class GpTphRepository extends BaseRepository {
         super(ds);
     }
     findAllAreas() {
-        return this.getRepository(GPTPH_AREAS).find();
+        return this.getRepository(GPTPH_AREAS).find({
+            relations: ['LOCATION']
+        });
     }
     findAllLocations() {
-        return this.getRepository(GPTPH_LOCATION).find();
+        return this.getRepository(GPTPH_LOCATION).find({
+            relations: ['AREAS']
+        });
     }
 }

@@ -20,7 +20,7 @@ export class GpTphController {
       return this.gpTphService.findAllAreas();
     }
 
-    @Get('location')
+    @Get('locations')
     findAllLocations() {
       return this.gpTphService.findAllLocations();
     }

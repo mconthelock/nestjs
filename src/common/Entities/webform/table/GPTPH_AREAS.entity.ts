@@ -1,5 +1,6 @@
 import e from 'express';
-import { Column, Entity, PrimaryColumn } from 'typeorm';   
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';   
+import { GPTPH_LOCATION } from './GPTPH_LOCATION.entity';
 
 @Entity({
     name: 'GPTPH_AREAS',
@@ -21,5 +22,8 @@ export class GPTPH_AREAS {
     AREA_OWNER_POSCODE: string;
     @Column()
     AREA_STATUS: string;
-}
 
+    @ManyToOne(() => GPTPH_LOCATION, (location) => location.AREAS)
+    @JoinColumn({ name: 'LOCATION_ID', referencedColumnName: 'LOCATION_ID' })
+    LOCATION: GPTPH_LOCATION;
+}

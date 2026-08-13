@@ -10,4 +10,8 @@ export class GpTphService {
     findAllAreas() {
         return this.repo.findAllAreas();
     }
+
+    findAllLocations() {
+        return this.repo.findAllLocations();
+    }
 }

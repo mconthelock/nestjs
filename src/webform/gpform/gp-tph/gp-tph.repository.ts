@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { GPTPH_AREAS } from 'src/common/Entities/webform/table/GPTPH_AREAS.entity';
+import { GPTPH_LOCATION } from 'src/common/Entities/webform/table/GPTPH_LOCATION.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 
@@ -11,5 +12,8 @@ export class GpTphRepository extends BaseRepository {
     }
     findAllAreas() {
         return this.getRepository(GPTPH_AREAS).find();
+    }
+    findAllLocations() {
+        return this.getRepository(GPTPH_LOCATION).find();
     }
 }

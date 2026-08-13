@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, OneToMany } from 'typeorm';
+import { GPTPH_AREAS } from './GPTPH_AREAS.entity';
 
 @Entity({
     name: 'GPTPH_LOCATION',
@@ -8,5 +9,7 @@ export class GPTPH_LOCATION {
     @PrimaryColumn()
     LOCATION_ID: number;
     @Column()
-    Location_NAME: string;
+    LOCATION_NAME: string;
+    @OneToMany(() => GPTPH_AREAS, (area) => area.LOCATION)
+    AREAS: GPTPH_AREAS[];
 }    

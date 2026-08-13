@@ -15,8 +15,13 @@ import { UpdateGpTphDto } from './dto/update-gp-tph.dto';
 export class GpTphController {
     constructor(private readonly gpTphService: GpTphService) {}
 
-    @Get('area')
+    @Get('areas')
     findAllAreas() {
       return this.gpTphService.findAllAreas();
+    }
+
+    @Get('location')
+    findAllLocations() {
+      return this.gpTphService.findAllLocations();
     }
 }

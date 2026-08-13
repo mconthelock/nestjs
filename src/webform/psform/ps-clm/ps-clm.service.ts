@@ -23,7 +23,7 @@ const ORDER_PREFIXES = { E: 'ET2C', S: 'ST2C' } as const;
 const AS400_PRIMARY_LIBRARY = 'RTNLIBF';
 const AS400_DEBUG_LIBRARY = 'DBGDEV14';
 const M002_TABLE = 'M002KPBM';
-const REQUEST_MAIL_CC_EMPNO = '25020';
+const REQUEST_MAIL_CC_EMPNOS = ['96024', ...ASSIGN_CONTROLLERS, '25020'];
 
 function getOrderType(orderNo: string) {
     const type = String(orderNo || '')
@@ -135,6 +135,22 @@ export class PsClmService {
         }
 
         const details = this.parseDetails(dto.DETAILS);
+        const claimSlipNumbers = [
+            ...new Set(
+                details.map((detail) =>
+                    String(
+                        (detail as any).SCLNO ??
+                            (detail as any).ISSUECARD ??
+                            '',
+                    )
+                        .trim()
+                        .toUpperCase(),
+                ),
+            ),
+        ].filter(Boolean);
+        if (claimSlipNumbers.length !== 1) {
+            throw new Error('One request/order must use one Claim Slip No.');
+        }
         const originalOrder = String(
             details.find(
                 (detail) => ORDER_PREFIXES[getOrderType(detail.ORDERNO)],
@@ -406,7 +422,9 @@ export class PsClmService {
         const claimSlipNumbers = [
             ...new Set(
                 context.details.map((detail) =>
-                    String(detail.SCLNO || '').trim(),
+                    String(detail.SCLNO || '')
+                        .trim()
+                        .toUpperCase(),
                 ),
             ),
         ].filter(Boolean);
@@ -466,7 +484,7 @@ export class PsClmService {
         if (!user?.SRECMAIL)
             throw new Error(`PS-CLM email not found for requester: ${empno}`);
 
-        const cc = await this.getRequestMailCc(form, user.SRECMAIL);
+        const cc = await this.getRequestMailCc(user.SRECMAIL);
 
         const formNo = `PS-CLM${String(form.CYEAR2).slice(-2)}-${String(form.NRUNNO).padStart(6, '0')}`;
         return {
@@ -477,30 +495,15 @@ export class PsClmService {
         };
     }
 
-    private async getRequestMailCc(form: FormDto, requesterEmail: string) {
-        const flows = (
-            await Promise.all(
-                ['01', '02'].map((CEXTDATA) =>
-                    this.flowService.getFlow({ ...form, CEXTDATA }),
-                ),
-            )
-        ).flat();
-        const empnos = [
-            ...new Set(
-                flows
-                    .flatMap((flow) => [flow.VAPVNO, flow.VREPNO])
-                    .concat(REQUEST_MAIL_CC_EMPNO)
-                    .map((empno) => String(empno || '').trim())
-                    .filter(Boolean),
-            ),
-        ];
+    private async getRequestMailCc(requesterEmail: string) {
+        const empnos = [...new Set(REQUEST_MAIL_CC_EMPNOS)];
         const users = await Promise.all(
             empnos.map((empno) => this.usersService.findEmp(empno)),
         );
-        const requiredCc = users[empnos.indexOf(REQUEST_MAIL_CC_EMPNO)];
-        if (!requiredCc?.SRECMAIL) {
+        const missing = empnos.filter((_, index) => !users[index]?.SRECMAIL);
+        if (missing.length) {
             throw new Error(
-                `PS-CLM email not found for CC: ${REQUEST_MAIL_CC_EMPNO}`,
+                `PS-CLM email not found for CC: ${missing.join(', ')}`,
             );
         }
         const requester = requesterEmail.trim().toLowerCase();
@@ -510,8 +513,7 @@ export class PsClmService {
                 users
                     .map((user) => String(user?.SRECMAIL || '').trim())
                     .filter(
-                        (email) =>
-                            email && email.toLowerCase() !== requester,
+                        (email) => email && email.toLowerCase() !== requester,
                     )
                     .map((email) => [email.toLowerCase(), email]),
             ).values(),

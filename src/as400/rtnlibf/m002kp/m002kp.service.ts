@@ -38,6 +38,7 @@ export function buildM002Row(
 ) {
     return {
         M2K02: newOrder,
+        M2K03: String(newOrder).slice(6, 8),
         M2K04: claimSlipNo,
         M2K12: schedule,
         M2K13: schedule,
@@ -117,7 +118,7 @@ export class M002kpService {
         for (const library of libraries) {
             const table = this.tableForLibrary(library);
             const sql = `INSERT INTO ${library}.${table}
-                (${Object.keys(m002).join(', ')}) VALUES (?, ?, ?, ?)`;
+                (${Object.keys(m002).join(', ')}) VALUES (?, ?, ?, ?, ?)`;
             await connection.query(sql, Object.values(m002));
             if (schedules.m008.length) {
                 await connection.query(

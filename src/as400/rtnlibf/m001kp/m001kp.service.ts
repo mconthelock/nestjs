@@ -1,8 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { ConectionService } from 'src/as400/conection/conection.service';
 import { PSCLM_DETAIL } from 'src/common/Entities/webform/table/PSCLM_DETAIL.entity';
-import { now } from 'src/common/utils/dayjs.utils';
 import { Connection } from 'odbc';
+
+export function scheduleToDate(schedule: string) {
+    const value = String(schedule || '')
+        .trim()
+        .toUpperCase();
+    const day = { X: '05', A: '10', Y: '15', B: '20', Z: '25', C: '30' }[
+        value.slice(-1)
+    ];
+    if (!/^\d{4}[XAYBZC]$/.test(value) || !day) {
+        throw new Error(`Invalid Schedule: ${value || 'blank'}`);
+    }
+    return `${value.slice(0, 4)}${day}`;
+}
 
 @Injectable()
 export class M001kpService {
@@ -83,15 +95,16 @@ export class M001kpService {
         libraries: string[],
     ) {
         for (const library of libraries) {
+            const table = this.tableForLibrary(library);
             const existing = (await connection.query(
                 `SELECT COUNT(*) AS CNT
-                 FROM ${library}.M001KP
+                 FROM ${library}.${table}
                  WHERE M1K02 = ?`,
                 [newOrder],
             )) as any[];
             if (Number(existing[0]?.CNT || 0)) {
                 throw new Error(
-                    `${newOrder} already exists in ${library}.M001KP`,
+                    `${newOrder} already exists in ${library}.${table}`,
                 );
             }
         }
@@ -102,7 +115,8 @@ export class M001kpService {
             (_, index) => `M1K${String(index + 1).padStart(2, '0')}`,
         );
         for (const library of libraries) {
-            const sql = `INSERT INTO ${library}.M001KP
+            const table = this.tableForLibrary(library);
+            const sql = `INSERT INTO ${library}.${table}
                 (${fields.join(', ')}) VALUES (${fields.map(() => '?').join(', ')})`;
             for (const row of rows) {
                 await connection.query(
@@ -132,6 +146,7 @@ export class M001kpService {
         for (const detail of details) {
             const item = this.fit(detail.ITEM, 4, 'Item');
             const schedule = this.fit(detail.SCHDNUM, 5, 'Schedule');
+            const scheduleDate = scheduleToDate(schedule);
             const drawing = this.drawingFields(detail.DRAWING);
             const variables = this.variableFields(detail.VARIABLE);
             let quantity = Number(detail.QTY);
@@ -156,8 +171,8 @@ export class M001kpService {
                     M1K06: 'M',
                     M1K07: 'BO',
                     M1K08: 'Y',
-                    M1K09: now('YYMMDD'),
-                    M1K10: now('YYMMDD'),
+                    M1K09: scheduleDate,
+                    M1K10: scheduleDate,
                     M1K11: this.block(item),
                     M1K12: this.block(item),
                     M1K17: '0',
@@ -182,6 +197,12 @@ export class M001kpService {
             }
         }
         return rows;
+    }
+
+    private tableForLibrary(library: string) {
+        if (library === 'RTNLIBF') return 'M001KPBM';
+        if (library === 'DBGDEV14') return 'M001KP';
+        throw new Error(`Unsupported M001 library: ${library}`);
     }
 
     private drawingFields(value: string) {

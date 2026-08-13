@@ -31,15 +31,24 @@ export function buildScheduleRows(
     };
 }
 
+export function buildM002Row(
+    newOrder: string,
+    schedule: string,
+    claimSlipNo: string,
+) {
+    return {
+        M2K02: newOrder,
+        M2K03: String(newOrder).slice(6, 8),
+        M2K04: claimSlipNo,
+        M2K12: schedule,
+        M2K13: schedule,
+    };
+}
+
 @Injectable()
 export class M002kpService {
     private readonly library = 'RTNLIBF';
     private readonly sourceTable = 'M002KPBM';
-    private readonly fields = Array.from(
-        { length: 65 },
-        (_, index) => `M2K${String(index + 1).padStart(2, '0')}`,
-    );
-
     constructor(private readonly conn: ConectionService) {}
 
     findByOrder(order: string) {
@@ -65,7 +74,6 @@ export class M002kpService {
 
     async copyToLibraries(
         connection: Connection,
-        originalOrder: string,
         newOrder: string,
         schedule: string,
         priority: string,
@@ -73,10 +81,7 @@ export class M002kpService {
         libraries: string[],
     ) {
         claimSlipNo = this.claimSlipNo(claimSlipNo);
-        const source = await this.findSourceRows(
-            (sql, parameters) => connection.query(sql, parameters) as any,
-            originalOrder,
-        );
+        const m002 = buildM002Row(newOrder, schedule, claimSlipNo);
         const schedules = buildScheduleRows(newOrder, schedule, priority);
         for (const library of libraries) {
             const table = this.tableForLibrary(library);
@@ -113,21 +118,8 @@ export class M002kpService {
         for (const library of libraries) {
             const table = this.tableForLibrary(library);
             const sql = `INSERT INTO ${library}.${table}
-                (${this.fields.join(', ')}) VALUES (${this.fields.map(() => '?').join(', ')})`;
-            for (const row of source) {
-                await connection.query(
-                    sql,
-                    this.fields.map((field) =>
-                        field === 'M2K02'
-                            ? newOrder
-                            : field === 'M2K04'
-                              ? claimSlipNo
-                              : field === 'M2K12' || field === 'M2K13'
-                                ? schedule
-                                : row[field],
-                    ),
-                );
-            }
+                (${Object.keys(m002).join(', ')}) VALUES (?, ?, ?, ?, ?)`;
+            await connection.query(sql, Object.values(m002));
             if (schedules.m008.length) {
                 await connection.query(
                     `INSERT INTO ${library}.M008KP
@@ -146,55 +138,22 @@ export class M002kpService {
             }
         }
         return {
-            m002: source.length,
+            m002: 1,
             m008: schedules.m008.length,
             m012: schedules.m012.length,
         };
     }
 
     async previewInsert(
-        originalOrder: string,
         newOrder: string,
         schedule: string,
         priority: string,
         claimSlipNo: string,
     ) {
         claimSlipNo = this.claimSlipNo(claimSlipNo);
-        const source = await this.findSourceRows(
-            (sql, parameters) => this.conn.runQuery(sql, parameters),
-            originalOrder,
-        );
         const schedules = buildScheduleRows(newOrder, schedule, priority);
-        const m002 = source.map((sourceRow) =>
-            Object.fromEntries(
-                this.fields.map((field) => [
-                    field,
-                    field === 'M2K02'
-                        ? newOrder
-                        : field === 'M2K04'
-                          ? claimSlipNo
-                          : field === 'M2K12' || field === 'M2K13'
-                            ? schedule
-                            : (sourceRow[field] ?? ''),
-                ]),
-            ),
-        );
+        const m002 = [buildM002Row(newOrder, schedule, claimSlipNo)];
         return { m002, ...schedules };
-    }
-
-    private async findSourceRows(
-        query: (sql: string, parameters: (string | number)[]) => Promise<any[]>,
-        originalOrder: string,
-    ) {
-        const source = await query(
-            `SELECT ${this.fields.join(', ')}
-             FROM ${this.library}.${this.sourceTable}
-             WHERE M2K02 = ?`,
-            [originalOrder],
-        );
-        if (!source.length)
-            throw new Error(`M002 not found for ${originalOrder}`);
-        return source;
     }
 
     private tableForLibrary(library: string) {

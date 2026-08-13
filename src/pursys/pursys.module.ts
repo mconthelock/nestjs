@@ -6,7 +6,8 @@ import { PurVendorsAddressModule } from './pur_vendors_address/pur_vendors_addre
 import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CurrencyModule } from './currency/currency.module';
-import { TurmcodeModule } from './turmcode/turmcode.module';
+import { TermcodeModule } from './termcode/termcode.module';
+import { VendorsModule } from './vendors/vendors.module';
 
 @Module({
     imports: [
@@ -17,7 +18,8 @@ import { TurmcodeModule } from './turmcode/turmcode.module';
         ProductsModule,
         CategoriesModule,
         CurrencyModule,
-        TurmcodeModule,
+        TermcodeModule,
+        VendorsModule,
     ],
 })
 export class PursysModule {}

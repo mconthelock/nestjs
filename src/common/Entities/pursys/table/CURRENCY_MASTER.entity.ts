@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
 
 @Entity({ name: 'CURRENCY_MASTER', schema: 'PURSYS' })
 export class CurrencyMaster {
-    @Column()
+    @PrimaryColumn()
     CURR_CODE: string;
 
     @Column()

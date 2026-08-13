@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { CurrencyMaster } from 'src/common/Entities/pursys/table/CURRENCY_MASTER.entity';
+import { CurrencyExchange } from 'src/common/Entities/pursys/table/CURRENCY_EXCHANGE.entity';
+
 import { CreateCurrencyDto } from './dto/create-currency.dto';
 import { UpdateCurrencyDto } from './dto/update-currency.dto';
 
 @Injectable()
 export class CurrencyService {
-  create(createCurrencyDto: CreateCurrencyDto) {
-    return 'This action adds a new currency';
-  }
+    constructor(
+        @InjectRepository(CurrencyMaster, 'purConnection')
+        private readonly curr: Repository<CurrencyMaster>,
+        @InjectRepository(CurrencyExchange, 'purConnection')
+        private readonly exch: Repository<CurrencyExchange>,
+    ) {}
 
-  findAll() {
-    return `This action returns all currency`;
-  }
+    findAllMaster() {
+        return this.curr.find();
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} currency`;
-  }
-
-  update(id: number, updateCurrencyDto: UpdateCurrencyDto) {
-    return `This action updates a #${id} currency`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} currency`;
-  }
+    findAllExchange() {
+        return this.exch.find({ relations: ['master'] });
+    }
 }

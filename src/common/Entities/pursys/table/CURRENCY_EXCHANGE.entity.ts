@@ -1,15 +1,22 @@
-import { Entity, Column, PrimaryColumn, OneToMany, ManyToOne } from 'typeorm';
+import {
+    Entity,
+    Column,
+    PrimaryColumn,
+    OneToMany,
+    ManyToOne,
+    JoinColumn,
+} from 'typeorm';
 import { CurrencyMaster } from './CURRENCY_MASTER.entity';
 
 @Entity({ name: 'CURRENCY_EXCHANGE', schema: 'PURSYS' })
 export class CurrencyExchange {
-    @Column()
+    @PrimaryColumn()
     FYEAR: number;
 
-    @Column()
+    @PrimaryColumn()
     PERIOD: number;
 
-    @Column()
+    @PrimaryColumn()
     CURR_CODE: string;
 
     @Column()
@@ -22,5 +29,6 @@ export class CurrencyExchange {
     CREATE_BY: string;
 
     @ManyToOne(() => CurrencyMaster, (mst) => mst.CURR_CODE)
+    @JoinColumn({ name: 'CURR_CODE', referencedColumnName: 'CURR_CODE' })
     master: CurrencyMaster;
 }

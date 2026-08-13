@@ -1,34 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+} from '@nestjs/common';
 import { CurrencyService } from './currency.service';
 import { CreateCurrencyDto } from './dto/create-currency.dto';
 import { UpdateCurrencyDto } from './dto/update-currency.dto';
 
-@Controller('currency')
+@Controller('pursys/currency')
 export class CurrencyController {
-  constructor(private readonly currencyService: CurrencyService) {}
+    constructor(private readonly currencyService: CurrencyService) {}
 
-  @Post()
-  create(@Body() createCurrencyDto: CreateCurrencyDto) {
-    return this.currencyService.create(createCurrencyDto);
-  }
+    @Get('master')
+    findAll() {
+        return this.currencyService.findAllMaster();
+    }
 
-  @Get()
-  findAll() {
-    return this.currencyService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.currencyService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCurrencyDto: UpdateCurrencyDto) {
-    return this.currencyService.update(+id, updateCurrencyDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.currencyService.remove(+id);
-  }
+    @Get('exchange')
+    findAllExchange() {
+        return this.currencyService.findAllExchange();
+    }
 }

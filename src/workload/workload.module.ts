@@ -17,6 +17,7 @@ import { DpmsPlLastRevisionViewModule } from './dpms_pl_last_revision_view/dpms_
 import { DpmsPlDocRevModule } from './dpms_pl_doc_rev/dpms_pl_doc_rev.module';
 import { DpmsPlMeltLogModule } from './dpms_pl_melt_log/dpms_pl_melt_log.module';
 import { DpmsPlWeightChangeModule } from './dpms_pl_weight_change/dpms_pl_weight_change.module';
+import { CountryOriginModule } from './country_origin/country_origin.module';
 
 @Module({
     imports: [
@@ -38,6 +39,7 @@ import { DpmsPlWeightChangeModule } from './dpms_pl_weight_change/dpms_pl_weight
         DpmsPlDocRevModule,
         DpmsPlMeltLogModule,
         DpmsPlWeightChangeModule,
+        CountryOriginModule,
     ],
 })
 export class WorkloadModule {}

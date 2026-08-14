@@ -195,7 +195,19 @@ export class VpsService {
         }
 
         const remark = await this.vpsRepository.getQ46054OL(order, packing);
-        orderDetails[0].REMARK = remark && remark.length > 0 ? remark : '';
+        if (orderDetails[0].PRODTYPE === 'DUM') {
+            const originalOrder = await this.vpsRepository.getOriginalOrder(
+                order,
+                orderDetails[0].S01M06,
+            );
+
+            orderDetails[0].REMARK = [
+                ...(remark ?? []),
+                ...(originalOrder ?? []),
+            ];
+        } else {
+            orderDetails[0].REMARK = remark && remark.length > 0 ? remark : '';
+        }
 
         for (const detail of orderDetails) {
             const dwgNo = detail.S11M04 ? detail.S11M04.replace(/\s/g, '') : '';

@@ -109,7 +109,6 @@ export class PrintedTopLabelService {
             fontsize: 14,
             boxHeight: 15,
             fontColor: rgb(1, 0, 0),
-            textOpacity: 0.5,
         };
 
         await writeLineBox({

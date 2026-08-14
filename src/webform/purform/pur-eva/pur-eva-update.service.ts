@@ -75,7 +75,7 @@ export class PurEvaUpdateService  {
                 CYEAR2: data.CYEAR2,
                 NRUNNO: data.NRUNNO,
             };
-            const {  ADDRESS_EN , SUB_DISTRICT_EN , DISTRICT_EN , PROVINCE_EN , COUNTRY_EN , POSTCODE_EN  , ADDRESS_TH , SUB_DISTRICT_TH , DISTRICT_TH , PROVINCE_TH , COUNTRY_TH , POSTCODE_TH , ...purevadata } = data;
+            const {  ADDRESS_EN , CITY_EN , STATE_EN , COUNTRY_EN , POSTCODE_EN  , ADDRESS_TH  , ...purevadata } = data;
             const purevaForm = {
                 ...form,
                 ...purevadata
@@ -89,9 +89,8 @@ export class PurEvaUpdateService  {
                     ADDRID : addid,
                     ADDRTYPE : 'E',
                     ADDR : ADDRESS_EN,
-                    SUBDISTRICT : SUB_DISTRICT_EN,
-                    DISTRICT : DISTRICT_EN,
-                    PROVINCE : PROVINCE_EN,
+                    CITY : CITY_EN,
+                    STATE : STATE_EN,
                     COUNTRY : COUNTRY_EN,
                     POSTCODE : POSTCODE_EN
 
@@ -103,11 +102,6 @@ export class PurEvaUpdateService  {
                     ADDRID : addid,
                     ADDRTYPE : 'T',
                     ADDR : data.ADDRESS_TH,
-                    SUBDISTRICT : data.SUB_DISTRICT_TH,
-                    DISTRICT : data.DISTRICT_TH,
-                    PROVINCE : data.PROVINCE_TH,
-                    COUNTRY : data.COUNTRY_TH,
-                    POSTCODE : data.POSTCODE_TH
                 })
             }
             await this.repoaddr.deleteByAll(form);

@@ -38,13 +38,10 @@ export class PURNVF_ADDRESS{
     ADDR: string;
 
     @Column()
-    SUBDISTRICT: string;
+    CITY: string;
 
     @Column()
-    DISTRICT: string;
-
-    @Column()
-    PROVINCE: string;
+    STATE: string;
 
     @Column()
     COUNTRY: string;

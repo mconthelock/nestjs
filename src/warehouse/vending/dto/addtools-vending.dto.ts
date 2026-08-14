@@ -1,7 +1,15 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsOptional, ValidateNested } from 'class-validator';
+import {
+    IsArray,
+    IsNotEmpty,
+    IsOptional,
+    ValidateNested,
+} from 'class-validator';
 
 export class AddToolItemDto {
+    @IsNotEmpty()
+    ID: number;
+
     @IsNotEmpty()
     SPRODID: string;
 }

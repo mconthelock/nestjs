@@ -1,9 +1,8 @@
 import { Controller, Get, Param, Post, Body } from '@nestjs/common';
 import { LeaveService } from './leave.service';
 
-import { CreateLeaveDto } from './dto/create-leave.dto';
-import { UpdateLeaveDto } from './dto/update-leave.dto';
 import { SearchLeaveDto } from './dto/search-leave.dto';
+import { SearchActualLeaveDto } from './dto/lr100p.dto';
 
 @Controller('gpreport/leave')
 export class LeaveController {
@@ -14,28 +13,8 @@ export class LeaveController {
         return this.leave.search(dto);
     }
 
-    @Get('person/:id')
-    findOne(@Param('id') id: string) {
-        return this.leave.findByEmployee(id);
+    @Post('actual')
+    findActual(@Body() dto: SearchActualLeaveDto) {
+        return this.leave.findActual(dto);
     }
-
-    @Get('section/:id')
-    findSection(@Param('id') id: string) {
-        return this.leave.findBySection(id);
-    }
-
-    @Get('department/:id')
-    findDepartment(@Param('id') id: string) {
-        return this.leave.findByDepartment(id);
-    }
-
-    @Get('division/:id')
-    findDivision(@Param('id') id: string) {
-        return this.leave.findByDivision(id);
-    }
-
-    // @Get('actual/person/:id')
-    // findActualPerson(@Param('id') id: string) {
-    //     return this.leave.findActualById(id);
-    // }
 }

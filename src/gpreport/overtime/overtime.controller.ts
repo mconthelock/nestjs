@@ -1,21 +1,14 @@
 import { Controller, Post, Body, Param, Get } from '@nestjs/common';
 
 import { OvertimeService } from './overtime.service';
-
-import { CreateOvertimeDto } from './dto/create-overtime.dto';
-import { UpdateOvertimeDto } from './dto/update-overtime.dto';
+import { SearchOvertimeDto } from './dto/search-overtime.dto';
 
 @Controller('overtime')
 export class OvertimeController {
     constructor(private readonly overtimeService: OvertimeService) {}
 
-    @Get('request')
-    async findRequest() {
-        return await this.overtimeService.findRequest();
-    }
-
     @Post('search')
-    search(@Body() q: UpdateOvertimeDto) {
+    search(@Body() q: SearchOvertimeDto) {
         return this.overtimeService.findAll(q);
     }
 

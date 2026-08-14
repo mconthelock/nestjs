@@ -16,23 +16,32 @@
 // SPECIAL	CHAR
 // SPECIAL_REASON	VARCHAR2
 
-import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToOne,
+    PrimaryColumn,
+} from 'typeorm';
 import { FORM } from './FORM.entity';
+import { User } from '../../webform/views/AMECUSERALL.entity';
+
 @Entity({ name: 'OTFORM', schema: 'WEBFORM' })
 export class OTFORM {
     @PrimaryColumn()
     NFRMNO: number;
 
-    @Column()
+    @PrimaryColumn()
     VORGNO: string;
 
-    @Column()
+    @PrimaryColumn()
     CYEAR: string;
 
-    @Column()
+    @PrimaryColumn()
     CYEAR2: string;
 
-    @Column()
+    @PrimaryColumn()
     NRUNNO: number;
 
     @Column()
@@ -71,7 +80,7 @@ export class OTFORM {
     @Column()
     SPECIAL_REASON: string;
 
-    @OneToMany(() => FORM, (form) => form)
+    @OneToOne(() => FORM)
     @JoinColumn([
         { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
         { name: 'VORGNO', referencedColumnName: 'VORGNO' },
@@ -79,5 +88,9 @@ export class OTFORM {
         { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
         { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
     ])
-    form: FORM[];
+    form: FORM;
+
+    @ManyToOne(() => User, (user) => user.SEMPNO)
+    @JoinColumn({ name: 'EMPNO', referencedColumnName: 'SEMPNO' })
+    user: User;
 }

@@ -2,8 +2,6 @@ import { DataSource, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 
-import { CreateOvertimeDto } from './dto/create-overtime.dto';
-import { UpdateOvertimeDto } from './dto/update-overtime.dto';
 import { SearchOvertimeDto } from './dto/search-overtime.dto';
 
 import { Overtime } from 'src/common/Entities/gpreport/table/overtime.entity';
@@ -22,12 +20,8 @@ export class OvertimeService {
         private readonly dataSource: DataSource,
     ) {}
 
-    async findRequest() {
-        return await this.form.find();
-    }
-
     async findAll(q: SearchOvertimeDto) {
-        return await this.otRepo.find({ where: q });
+        return await this.form.find({ where: q, relations: ['form', 'user'] });
     }
 
     async getOtByWorkdate(workdate: string) {

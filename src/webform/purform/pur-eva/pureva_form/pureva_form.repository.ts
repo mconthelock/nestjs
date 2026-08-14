@@ -30,6 +30,7 @@ export class PurevaFormRepository extends BaseRepository {
                         TERM:true,
                         STDCUR:true,
                         VORG:true,
+                        CAPCUR:true,
                     },
                 });
         }

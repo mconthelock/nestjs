@@ -250,16 +250,11 @@ export class RequestPurevaFormDto extends PickType(CreateFormDto,[
 
     @IsOptional()
     @IsString()
-    PROVINCE_EN?: string;  
-
-
-    @IsOptional()
-    @IsString()
-    DISTRICT_EN?: string;     
+    CITY_EN?: string;  
 
     @IsOptional()
     @IsString()
-    SUB_DISTRICT_EN?: string;   
+    STATE_EN?: string;     
 
     @IsOptional()
     @IsString()
@@ -272,28 +267,7 @@ export class RequestPurevaFormDto extends PickType(CreateFormDto,[
     @IsOptional()
     @IsString()
     ADDRESS_TH?: string;  
-
-    @IsOptional()
-    @IsString()
-    PROVINCE_TH?: string;  
-
-    @IsOptional()
-    @IsString()
-    DISTRICT_TH?: string;     
-
-    @IsOptional()
-    @IsString()
-    SUB_DISTRICT_TH?: string;   
-
-    @IsOptional()
-    @IsString()
-    POSTCODE_TH?: string; 
-
-    @IsOptional()
-    @IsString()
-    COUNTRY_TH?: string; 
-
-      
+  
 
     @IsString()
     @Transform(

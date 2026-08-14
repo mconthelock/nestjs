@@ -91,9 +91,8 @@ export class PurNvfReturnApproveService  {
                     ADDRID : addid,
                     ADDRTYPE : 'E',
                     ADDR : data.ADDRESS_EN,
-                    SUBDISTRICT : data.SUB_DISTRICT_EN,
-                    DISTRICT : data.DISTRICT_EN,
-                    PROVINCE : data.PROVINCE_EN,
+                    CITY : data.CITY_EN,
+                    STATE : data.STATE_EN,
                     COUNTRY : data.COUNTRY_EN,
                     POSTCODE : data.POSTCODE_EN
 
@@ -105,11 +104,6 @@ export class PurNvfReturnApproveService  {
                     ADDRID : addid,
                     ADDRTYPE : 'T',
                     ADDR : data.ADDRESS_TH,
-                    SUBDISTRICT : data.SUB_DISTRICT_TH,
-                    DISTRICT : data.DISTRICT_TH,
-                    PROVINCE : data.PROVINCE_TH,
-                    COUNTRY : data.COUNTRY_TH,
-                    POSTCODE : data.POSTCODE_TH
                 })
             }
 

@@ -61,4 +61,7 @@ export class VIEW_MFG_EDR_HEAD_ROOTCAUSE {
 
   @Column({ nullable: true })
   ITEM: string;
+
+  @Column({ nullable: true })
+  PRODTYPE: string;
 }

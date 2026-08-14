@@ -119,8 +119,17 @@ export class PrintedCnService {
 
         let lotCount = 0;
         for (const data of firstData) {
-            const cdir = await this.printed.getCurrentPdfDirectory();
-            const pdfPath = path.join(cdir, `${data.R27M11}.pdf`);
+            let pdfDirectory = '';
+            try {
+                pdfDirectory = await this.printed.getCurrentPdfDirectory();
+            } catch {
+                await this.printed.writeLog(
+                    `Skip First Lot update for ${data.R27M11} because PDF runtime context is not initialized for BMDate ${bmdateStr}`,
+                );
+                continue;
+            }
+
+            const pdfPath = path.join(pdfDirectory, `${data.R27M11}.pdf`);
             try {
                 await this.embedFirstToPdf(pdfPath, data.R27M09);
                 await this.printed.writeLog(

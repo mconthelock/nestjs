@@ -162,7 +162,7 @@ export class PrintedCnService {
             drawBorder: {
                 color: rgb(0.9, 0.9, 0.9),
                 width: 0,
-                bgColor: rgb(0.9, 0.9, 0.9),
+                //bgColor: rgb(0.9, 0.9, 0.9),
             },
         });
 

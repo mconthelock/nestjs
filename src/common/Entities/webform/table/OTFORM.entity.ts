@@ -15,7 +15,9 @@
 // OT3	VARCHAR2
 // SPECIAL	CHAR
 // SPECIAL_REASON	VARCHAR2
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+
+import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn } from 'typeorm';
+import { FORM } from './FORM.entity';
 @Entity({ name: 'OTFORM', schema: 'WEBFORM' })
 export class OTFORM {
     @PrimaryColumn()
@@ -68,4 +70,14 @@ export class OTFORM {
 
     @Column()
     SPECIAL_REASON: string;
+
+    @OneToMany(() => FORM, (form) => form)
+    @JoinColumn([
+        { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+        { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+        { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+    ])
+    form: FORM[];
 }

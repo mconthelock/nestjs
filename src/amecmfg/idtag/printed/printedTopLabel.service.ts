@@ -20,26 +20,39 @@ export class PrintedTopLabelService {
             filters: [{ field: 'FILES_ID', op: 'eq', value: fileID }],
         });
         try {
-            if (!data.length) return;
+            if (!data.length) {
+                await this.printed.writeLog(
+                    `No label data to put in PDF for FILES_ID ${fileID}`,
+                );
+                return;
+            }
 
             for (const row of data) {
-                const pdfContext = await this.printed.setPdfPath({
-                    schd_txt: row.SCHDCHAR,
-                    schd_p: row.SCHDP,
-                    filedir: row.FILE_FOLDER,
-                    filename: row.FILE_ONAME,
-                });
-                const pdfPath = path.join(
-                    pdfContext.pdfDirectory,
-                    `${row.PAGE_TAG}.pdf`,
-                );
-                //console.log(pdfPath);
+                let pdfDirectory = '';
+                let logFileName: string | undefined;
+
+                try {
+                    pdfDirectory = await this.printed.getCurrentPdfDirectory();
+                    logFileName = undefined;
+                } catch {
+                    const pdfContext = await this.printed.setPdfPath({
+                        schd_txt: row.SCHDCHAR,
+                        schd_p: row.SCHDP,
+                        filedir: row.FILE_FOLDER,
+                        filename: row.FILE_ONAME,
+                    });
+                    pdfDirectory = pdfContext.pdfDirectory;
+                    logFileName = pdfContext.logFileName;
+                }
+
+                const pdfPath = path.join(pdfDirectory, `${row.PAGE_TAG}.pdf`);
+
                 if (row.URGETNT > 0) {
                     await this.embedUrgentToPdf(pdfPath);
                     await this.printed.writeLog(
                         `Put Label Urgent to ${row.PAGE_TAG}`,
                         null,
-                        pdfContext.logFileName,
+                        logFileName,
                     );
                 }
 
@@ -52,25 +65,31 @@ export class PrintedTopLabelService {
                     text += 'MET EARTHQUAKE ';
                 }
 
-                if (text === '') {
-                    continue;
+                if (row.URGETNT > 0) {
+                    text += 'URGENT ';
                 }
 
-                // const cdir = await this.printed.getCurrentPdfDirectory();
-                // const pdfPath = path.join(cdir, `${row.PAGE_TAG}.pdf`);
+                if (text === '') {
+                    await this.printed.writeLog(
+                        `No label text to apply for ${row.PAGE_TAG}`,
+                        null,
+                        logFileName,
+                    );
+                    continue;
+                }
 
                 try {
                     await this.embedLabelToPdf(pdfPath, text.trim());
                     await this.printed.writeLog(
                         `Put Label ${text.trim()} to ${row.PAGE_TAG}`,
                         null,
-                        pdfContext.logFileName,
+                        logFileName,
                     );
                 } catch (error) {
                     await this.printed.writeLog(
                         `Error processing Label for tag ${row.PAGE_TAG}`,
                         error instanceof Error ? error.message : String(error),
-                        pdfContext.logFileName,
+                        logFileName,
                     );
                 }
             }

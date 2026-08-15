@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class DrawingParserHelper {
-
     /**
      * Extract drawing from string.
      * @since 2026-03-21
@@ -50,12 +49,12 @@ export class DrawingParserHelper {
         G: string[];
         L: string[][];
     } {
-        // replace space ซ้ำให้เหลือช่องเดียว
-        drawing = this.expandGLRange(drawing);
-        const split: string[] = drawing.split(' ');
+        const safeDrawing = String(drawing ?? '').trim();
+        const expanded = this.expandGLRange(safeDrawing);
+        const split = expanded.split(/\s+/).filter(Boolean);
         const parsed = this.parseGLSegments(split);
         return {
-            DRAWING: split[0],
+            DRAWING: split[0] ?? '',
             G: parsed.G,
             L: parsed.L,
         };
@@ -78,7 +77,7 @@ export class DrawingParserHelper {
         const pattern = /[GL-]{1}\d{2,3}~[GL]{1}\d{2,3}/g;
         const matches = drawing.match(pattern) || [];
         matches.forEach((val) => {
-            const GL  = val.split('~');
+            const GL = val.split('~');
             const min = GL[0].replace(/[GL]{1}/g, '');
             const max = GL[1].replace(/[GL]{1}/g, '');
             const prefix = GL[0].replace(/\d+/g, '');
@@ -159,8 +158,9 @@ export class DrawingParserHelper {
      */
     extractProcessCode(value: string): string {
         if (!value || value.length !== 6) {
-            throw new Error(`Process No "${value}" ไม่ถูกต้อง กรุณาตรวจสอบข้อมูลใน ID-Tag`);
-            
+            throw new Error(
+                `Process No "${value}" ไม่ถูกต้อง กรุณาตรวจสอบข้อมูลใน ID-Tag`,
+            );
         }
 
         return value.substring(2);

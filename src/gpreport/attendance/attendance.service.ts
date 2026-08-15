@@ -1,26 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAttendanceDto } from './dto/create-attendance.dto';
-import { UpdateAttendanceDto } from './dto/update-attendance.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { applyDynamicFilters } from 'src/common/helpers/query.helper';
+
+import { UsersService } from 'src/amec/users/users.service';
+import { AttendanceIn } from 'src/common/Entities/figerdb/views/ATTENDANCEIN.entity';
+import { AttendanceOut } from 'src/common/Entities/figerdb/views/ATTENDANCEOUT.entity';
+import { SearchAttendanceDto } from './dto/search-attendance.dto';
 
 @Injectable()
 export class AttendanceService {
-  create(createAttendanceDto: CreateAttendanceDto) {
-    return 'This action adds a new attendance';
-  }
+    constructor(
+        @InjectRepository(AttendanceIn, 'fingerConnection')
+        private readonly timein: Repository<AttendanceIn>,
 
-  findAll() {
-    return `This action returns all attendance`;
-  }
+        @InjectRepository(AttendanceOut, 'fingerConnection')
+        private readonly timeout: Repository<AttendanceOut>,
 
-  findOne(id: number) {
-    return `This action returns a #${id} attendance`;
-  }
+        private readonly usersService: UsersService,
+    ) {}
 
-  update(id: number, updateAttendanceDto: UpdateAttendanceDto) {
-    return `This action updates a #${id} attendance`;
-  }
+    async search(searchCriteria: SearchAttendanceDto) {
+        const qtimein = this.timein.createQueryBuilder('timein');
+        await applyDynamicFilters(qtimein, searchCriteria, 'timein');
+        const attendanceIn = await qtimein.getMany();
 
-  remove(id: number) {
-    return `This action removes a #${id} attendance`;
-  }
+        const qtimeout = this.timein.createQueryBuilder('timein');
+        await applyDynamicFilters(qtimeout, searchCriteria, 'timein');
+        const attendanceOut = await qtimeout.getMany();
+
+        return {
+            attendanceIn,
+            attendanceOut,
+        };
+    }
 }

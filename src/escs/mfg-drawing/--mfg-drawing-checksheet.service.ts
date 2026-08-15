@@ -88,7 +88,7 @@ export class MfgDrawingCreateChecksheetService {
             let dataByidTag: { controlNo: string; drawing: string };
             switch (typeName) {
                 case 'multi':
-                    newfileName = controlNo //dto.ASERIALNO[0];
+                    newfileName = controlNo; //dto.ASERIALNO[0];
                     fileName = itemData.VFILE;
                     // dataByidTag = await this.getDrawingByIdTag(
                     //     dto.ASERIALNO[0],
@@ -111,7 +111,7 @@ export class MfgDrawingCreateChecksheetService {
                     }));
                     break;
                 default:
-                    newfileName = controlNo //dto.ASERIALNO[0];
+                    newfileName = controlNo; //dto.ASERIALNO[0];
                     // dataByidTag = await this.getDrawingByIdTag(
                     //     dto.ASERIALNO[0],
                     // );
@@ -577,12 +577,12 @@ export class MfgDrawingCreateChecksheetService {
         G: string[];
         L: string[][];
     } {
-        // replace space ซ้ำให้เหลือช่องเดียว
-        drawing = this.expandGLRange(drawing);
-        const split: string[] = drawing.split(' ');
+        const safeDrawing = String(drawing ?? '').trim();
+        const expanded = this.expandGLRange(safeDrawing);
+        const split = expanded.split(/\s+/).filter(Boolean);
         const parsed = this.parseGLSegments(split);
         return {
-            DRAWING: split[0],
+            DRAWING: split[0] ?? '',
             G: parsed.G,
             L: parsed.L,
         };
@@ -724,7 +724,7 @@ export class MfgDrawingCreateChecksheetService {
                 if (
                     typeName != 'multi' &&
                     this.checkDeleteDrawing(deleteList, drawing) &&
-                    [1,3].includes(isDataExist.data.NSTATUS) &&
+                    [1, 3].includes(isDataExist.data.NSTATUS) &&
                     isDataExist.data.NINSPECTOR_STATUS === 1
                 ) {
                     data.NSTATUS = 3;

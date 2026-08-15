@@ -605,7 +605,7 @@ export class MfgDrawingCreateChecksheetService {
         const pattern = /[GL-]{1}\d{2,3}~[GL]{1}\d{2,3}/g;
         const matches = drawing.match(pattern) || [];
         matches.forEach((val) => {
-            let GL = val.split('~');
+            let GL = String(val).split('~');
 
             let min = GL[0].replace(/[GL]{1}/g, '');
             let max = GL[1].replace(/[GL]{1}/g, '');

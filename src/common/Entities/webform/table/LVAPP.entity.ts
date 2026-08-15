@@ -27,6 +27,7 @@ import {
     PrimaryColumn,
 } from 'typeorm';
 
+import { FORM } from './FORM.entity';
 import { User } from '../../webform/views/AMECUSERALL.entity';
 
 @Entity({ name: 'LVAPP', schema: 'WEBFORM' })
@@ -87,6 +88,16 @@ export class LVAPP {
 
     @Column()
     CAPPROVE: string;
+
+    @OneToOne(() => FORM)
+    @JoinColumn([
+        { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+        { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+        { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+    ])
+    form: FORM;
 
     @ManyToOne(() => User, (user) => user.SEMPNO)
     @JoinColumn({ name: 'EMPNO', referencedColumnName: 'SEMPNO' })

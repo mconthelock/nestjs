@@ -1,10 +1,13 @@
 import { DataSource, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 
 import { SearchOvertimeDto } from './dto/search-overtime.dto';
+import { SearchActualOvertimeDto } from './dto/lr200p.dto';
 
 import { Overtime } from 'src/common/Entities/gpreport/table/overtime.entity';
+import { LR200P } from 'src/common/Entities/gpreport/table/LR200P.entity';
 import { OTFORM } from 'src/common/Entities/webform/table/OTFORM.entity';
 
 @Injectable()
@@ -13,15 +16,30 @@ export class OvertimeService {
         @InjectRepository(Overtime, 'gpreportConnection')
         private readonly otRepo: Repository<Overtime>,
 
-        @InjectRepository(OTFORM, 'webformConnection')
-        private readonly form: Repository<OTFORM>,
+        @InjectRepository(OTFORM, 'gpreportConnection')
+        private readonly otform: Repository<OTFORM>,
+
+        @InjectRepository(LR200P, 'gpreportConnection')
+        private readonly lr200: Repository<LR200P>,
 
         @InjectDataSource('gpreportConnection')
         private readonly dataSource: DataSource,
     ) {}
 
     async findAll(q: SearchOvertimeDto) {
-        return await this.form.find({ where: q, relations: ['form', 'user'] });
+        const qb = this.otform
+            .createQueryBuilder('otform')
+            .leftJoinAndSelect('otform.user', 'user')
+            .leftJoinAndSelect('otform.form', 'form')
+            .leftJoinAndSelect('form.flow', 'form_flow');
+        await applyDynamicFilters(qb, q, 'otform');
+        return qb.getMany();
+    }
+
+    async findActual(q: SearchActualOvertimeDto) {
+        const qb = this.lr200.createQueryBuilder('lr200');
+        await applyDynamicFilters(qb, q, 'lr200');
+        return qb.getMany();
     }
 
     async getOtByWorkdate(workdate: string) {

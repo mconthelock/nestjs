@@ -19,11 +19,13 @@ export class LeaveService {
         private readonly lr100: Repository<LR100P>,
     ) {}
 
-    async search(searchLeaveDto: SearchLeaveDto) {
+    async search(q: SearchLeaveDto) {
         const qb = this.lvapp
             .createQueryBuilder('lvapp')
-            .leftJoinAndSelect('lvapp.user', 'user');
-        await applyDynamicFilters(qb, searchLeaveDto, 'lvapp');
+            .leftJoinAndSelect('lvapp.user', 'user')
+            .leftJoinAndSelect('lvapp.form', 'form')
+            .leftJoinAndSelect('form.flow', 'form_flow');
+        await applyDynamicFilters(qb, q, 'lvapp');
         return qb.getMany();
     }
 

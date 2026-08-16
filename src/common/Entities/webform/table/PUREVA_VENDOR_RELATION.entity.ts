@@ -1,9 +1,8 @@
-import { Entity, PrimaryColumn, Column , ManyToOne , JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { PUREVA_FORM } from './PUREVA_FORM.entity';
 
 @Entity({ name: 'PUREVA_VENDOR_RELATION', schema: 'WEBFORM' })
 export class PUREVA_VENDOR_RELATION {
-
     // --- Primary Keys (Composite Key 6 ตัว) ---
 
     @PrimaryColumn()
@@ -24,15 +23,13 @@ export class PUREVA_VENDOR_RELATION {
     @PrimaryColumn()
     ID: number;
 
-
     @Column()
     ENTITY_TYPE: string;
 
     @Column()
     ENTITY_NAME: string;
 
-
-    @Column({ type: 'number', precision: 3, scale: 0 })
+    @Column({ type: 'decimal', precision: 3, scale: 0 })
     PERCENT: number;
 
     @ManyToOne(() => PUREVA_FORM, (eva) => eva.RELATIONS)

@@ -5,14 +5,12 @@ import {
     OneToMany,
     OneToOne,
     PrimaryColumn,
-    ManyToOne
+    ManyToOne,
 } from 'typeorm';
 import { PUREVA_FORM } from './PUREVA_FORM.entity';
 
-
 @Entity({ name: 'PUREVA_PROFIT_TURNOVER', schema: 'WEBFORM' })
 export class PUREVA_PROFIT_TURNOVER {
-
     // --- Primary Keys (Composite Key 6 ตัว) ---
 
     @PrimaryColumn()
@@ -36,13 +34,12 @@ export class PUREVA_PROFIT_TURNOVER {
     @Column()
     RECORD_TYPE: string;
 
-
-    @Column({ type: 'number', precision: 4, scale: 0 })
+    @Column({ type: 'decimal', precision: 4, scale: 0 })
     MYEAR: number;
 
-    @Column({ type: 'number', precision: 14, scale: 2 })
+    @Column({ type: 'decimal', precision: 14, scale: 2 })
     AMOUNT: number;
-    
+
     @ManyToOne(() => PUREVA_FORM, (eva) => eva.PROFIT_TURNOVERS)
     @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
     @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
@@ -50,5 +47,4 @@ export class PUREVA_PROFIT_TURNOVER {
     @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
     @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
     Profit_Turnover: PUREVA_FORM;
-    
 }

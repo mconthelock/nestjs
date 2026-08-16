@@ -122,7 +122,7 @@ export class PUREVA_FORM {
     FY_AMOUNT: string;
 
     // Type Number with Precision & Scale
-    @Column({ type: 'number', precision: 12, scale: 2 })
+    @Column({ type: 'decimal', precision: 12, scale: 2 })
     AMOUNT: number;
 
     @Column()
@@ -134,7 +134,7 @@ export class PUREVA_FORM {
     @Column()
     VENDCAT: string;
 
-    @Column({ type: 'number', precision: 14, scale: 2 })
+    @Column({ type: 'decimal', precision: 14, scale: 2 })
     CAPITAL: number;
 
     @Column()
@@ -149,10 +149,10 @@ export class PUREVA_FORM {
     @Column()
     COM_OTHER: string;
 
-    @Column({ type: 'number', precision: 6, scale: 0 })
+    @Column({ type: 'decimal', precision: 6, scale: 0 })
     EMPDIRECT: number;
 
-    @Column({ type: 'number', precision: 6, scale: 0 })
+    @Column({ type: 'decimal', precision: 6, scale: 0 })
     EMPINDIRECT: number;
 
     @Column()
@@ -182,11 +182,11 @@ export class PUREVA_FORM {
     @Column()
     LABOR_ESTABLISH_DATE: Date;
 
-    @Column({ type: 'number', precision: 10, scale: 2 })
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
     LAND: number;
 
     // รักษาตัวสะกดตาม SQL 原ฉบับ (FATORY)
-    @Column({ type: 'number', precision: 10, scale: 2 })
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
     FACTORY: number;
 
     @Column()

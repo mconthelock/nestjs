@@ -15,10 +15,8 @@ import { PCURRENCY } from '../../amec/table/PCURRENCY.entity';
 import { VORGMST } from '../views/VORGMST.entity';
 import { TERMCODE } from '../../pursys/table/TERMCODE.entity';
 
-
 @Entity({ name: 'PUREVA_FORM', schema: 'WEBFORM' })
 export class PUREVA_FORM {
-    
     // --- Primary Keys ---
 
     @PrimaryColumn()
@@ -43,29 +41,28 @@ export class PUREVA_FORM {
     VENDCODE: string;
 
     @Column()
-    VENDGROUP: string;  
+    VENDGROUP: string;
 
     @Column()
     UPSTATUS: string;
 
     @Column()
-    VENDPURPOSE: string;  
+    VENDPURPOSE: string;
 
     @Column()
-    COMNAME: string;  
-    
+    COMNAME: string;
 
     @Column()
-    VENDTYPE: string; 
+    VENDTYPE: string;
 
     @Column()
-    CONTACT: string;  
+    CONTACT: string;
 
     @Column()
-    EMAIL: string;  
+    EMAIL: string;
 
     @Column()
-    WEBSITE: string;  
+    WEBSITE: string;
 
     @Column()
     TELNO: string;
@@ -122,7 +119,7 @@ export class PUREVA_FORM {
     FY_AMOUNT: string;
 
     // Type Number with Precision & Scale
-    @Column({ type: 'number', precision: 12, scale: 2})
+    @Column({ type: 'decimal', precision: 12, scale: 2 })
     AMOUNT: number;
 
     @Column()
@@ -134,7 +131,7 @@ export class PUREVA_FORM {
     @Column()
     VENDCAT: string;
 
-    @Column({ type: 'number', precision: 14, scale: 2 })
+    @Column({ type: 'decimal', precision: 14, scale: 2 })
     CAPITAL: number;
 
     @Column()
@@ -149,10 +146,10 @@ export class PUREVA_FORM {
     @Column()
     COM_OTHER: string;
 
-    @Column({ type: 'number', precision: 6, scale: 0})
+    @Column({ type: 'decimal', precision: 6, scale: 0 })
     EMPDIRECT: number;
 
-    @Column({ type: 'number', precision: 6, scale: 0})
+    @Column({ type: 'decimal', precision: 6, scale: 0 })
     EMPINDIRECT: number;
 
     @Column()
@@ -182,11 +179,11 @@ export class PUREVA_FORM {
     @Column()
     LABOR_ESTABLISH_DATE: Date;
 
-    @Column({ type: 'number', precision: 10, scale: 2 })
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
     LAND: number;
 
     // รักษาตัวสะกดตาม SQL 原ฉบับ (FATORY)
-    @Column({ type: 'number', precision: 10, scale: 2 })
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
     FACTORY: number;
 
     @Column()
@@ -203,14 +200,13 @@ export class PUREVA_FORM {
 
     @OneToMany(() => PUR_FILE, (f) => f.MASTER)
     FILES: PUR_FILE[];
-    
+
     @OneToMany(() => PUREVA_PROFIT_TURNOVER, (p) => p.Profit_Turnover)
     PROFIT_TURNOVERS: PUREVA_PROFIT_TURNOVER[];
 
     @OneToMany(() => PUREVA_SCORE, (s) => s.Scores)
     SCORES: PUREVA_SCORE[];
 
-    
     @OneToMany(() => PUREVA_VENDOR_RELATION, (r) => r.Relations)
     RELATIONS: PUREVA_VENDOR_RELATION[];
 
@@ -219,14 +215,13 @@ export class PUREVA_FORM {
 
     @OneToOne(() => TERMCODE)
     @JoinColumn({ name: 'TERMCODE', referencedColumnName: 'STERMCODE' })
-    TERM: TERMCODE;  
+    TERM: TERMCODE;
 
     @OneToOne(() => PCURRENCY)
     @JoinColumn({ name: 'CURCODE', referencedColumnName: 'SCURCODE' })
-    STDCUR: PCURRENCY;  
+    STDCUR: PCURRENCY;
 
     @OneToOne(() => VORGMST)
     @JoinColumn({ name: 'CONCERNEDORG', referencedColumnName: 'VORGNO' })
     VORG: VORGMST;
-    
 }

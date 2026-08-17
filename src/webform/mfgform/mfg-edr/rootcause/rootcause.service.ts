@@ -12,4 +12,8 @@ export class RootcauseService {
   search(dto: SearchRootcauseDto) {
     return this.rootcauseRepository.search(dto);
   }
+
+  getProductionUnit(fyear: number) {
+    return this.rootcauseRepository.findProductionUnit(fyear);
+  }
 }

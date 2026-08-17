@@ -67,7 +67,7 @@ export class RootcauseRepository {
     }
 
 
-  async findProductionUnit(fyear: number, months?: string[]) {
+  async findProductionUnit(fyear: number) {
     const qb = this.amecOrdersRepository
       .createQueryBuilder('A')
       .select([
@@ -98,23 +98,6 @@ export class RootcauseRepository {
         `,
         { FYEAR: fyear },
       );
-
-    if (months?.length) {
-      qb.andWhere(
-        `
-        UPPER(
-          TO_CHAR(
-            A.IDS_DATE,
-            'MON',
-            'NLS_DATE_LANGUAGE = AMERICAN'
-          )
-        ) IN (:...MONTHS)
-        `,
-        {
-          MONTHS: months.map(month => month.toUpperCase()),
-        },
-      );
-    }
 
     return qb
       .orderBy('A.IDS_DATE', 'ASC')

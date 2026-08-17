@@ -22,6 +22,7 @@ export class PrintedMergeService {
             fileName: string;
             filePath: string;
             pageNumber: number;
+            fileMfgNo: string;
         }[],
     ) {
         const splitStartTime = Date.now();
@@ -39,6 +40,7 @@ export class PrintedMergeService {
                 const textContent = parsedData.text;
                 const tagData = textContent.split('\n');
                 const tagNo = tagData[0].substring(0, 12).replace(/\s/g, '');
+                const mfgno = tagData[9].substring(0, 9).replace(/\s/g, '');
                 const newFileName = `${tagNo}.pdf`;
                 const outputPath = path.join(outputDirectory, newFileName);
                 await fs.writeFile(outputPath, singlePageBytes);
@@ -46,6 +48,7 @@ export class PrintedMergeService {
                     fileName: tagNo,
                     filePath: outputPath,
                     pageNumber: i,
+                    fileMfgNo: mfgno,
                 });
             } finally {
                 await parser.destroy();

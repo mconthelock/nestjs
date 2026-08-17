@@ -1,5 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { PDFParse } from 'pdf-parse';
 
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -7,6 +8,7 @@ import { PDFDocument } from 'pdf-lib';
 import { moveFileFromMulter } from 'src/common/utils/files.utils';
 import { FileLoggerService } from 'src/common/services/file-logger/file-logger.service';
 import { PrintedQueueService } from './PrintedQueue.service';
+import { PrintedMergeService } from './printedMerge.service';
 import { IdTagRepository } from './idtag.repository';
 import { SearchIdtagFilesDto } from './dto/search-idtag-file.dto';
 
@@ -31,6 +33,7 @@ export interface filesData {
         fileName: string;
         filePath: string;
         pageNumber: number;
+        fileMfgNo: string;
     }[];
 }
 
@@ -62,6 +65,7 @@ export class PrintedService {
         private readonly repo: IdTagRepository,
         @Inject(forwardRef(() => PrintedQueueService))
         private readonly queue: PrintedQueueService,
+        private readonly merge: PrintedMergeService,
     ) {}
 
     async setPdfPath(data): Promise<PdfProcessContext> {
@@ -263,6 +267,7 @@ export class PrintedService {
                 .map((fileData) => ({
                     PAGE_NUM: fileData.pageNumber,
                     PAGE_TAG: fileData.fileName,
+                    PAGE_MFGNO: fileData.fileMfgNo,
                     PAGE_STATUS: '0',
                 })),
         );
@@ -371,6 +376,58 @@ export class PrintedService {
             throw new Error(
                 `Error updating print file status for FILES_ID ${filesId}`,
             );
+        }
+    }
+
+    async readPdfDocument(
+        body: {
+            schd_number: string;
+            schd_txt: string;
+            schd_p: string;
+            filedir: string;
+            bmdate: string;
+        },
+        files: Express.Multer.File[],
+    ) {
+        for (const file of files) {
+            const pdfContext = await this.setPdfPath({
+                ...body,
+                filename: file.originalname,
+            });
+            const moved = await moveFileFromMulter({
+                file,
+                destination: pdfContext.pdfDirectory,
+            });
+
+            const pdfBytes = await fs.readFile(moved.path);
+            const pdfDoc = await PDFDocument.load(pdfBytes);
+            const pageCount = pdfDoc.getPageCount();
+
+            for (let i = 1; i < pageCount; i++) {
+                const singlePageDoc = await PDFDocument.create();
+                const [copiedPage] = await singlePageDoc.copyPages(pdfDoc, [i]);
+                singlePageDoc.addPage(copiedPage);
+                const singlePageBytes = await singlePageDoc.save();
+                const parser = new PDFParse({
+                    data: Buffer.from(singlePageBytes),
+                });
+                let parsedData;
+                try {
+                    parsedData = await parser.getText();
+                    const textContent = parsedData.text;
+                    const tagData = textContent.split('\n');
+                    const tagNo = tagData[9].substring(0, 9).replace(/\s/g, '');
+                    console.log(tagNo);
+                } finally {
+                    await parser.destroy();
+                }
+            }
+            // await this.merge.splitFiles(
+            //     pdfDoc,
+            //     outputDirectory,
+            //     pageCount,
+            //     splitFilesData,
+            // );
         }
     }
 }

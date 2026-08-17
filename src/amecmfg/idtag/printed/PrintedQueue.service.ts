@@ -70,6 +70,7 @@ export class PrintedQueueService {
                         fileName: string;
                         filePath: string;
                         pageNumber: number;
+                        fileMfgNo: string;
                     }[] = [];
 
                     // ขั้นตอนที่ 2: แบ่งหน้า, อ่านข้อความ และตั้งชื่อไฟล์

@@ -28,9 +28,6 @@ export class FINNPOFORM {
     @Column()
     EXPENSE_CODE: number;
     
-    @Column()
-    REMARK: string;
-
 }
 
 // NFRMNO

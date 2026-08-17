@@ -28,6 +28,9 @@ export class FINNPOINVOICE {
     
     @Column()
     TOTAL_AMT: number;
+
+    @Column({ type: 'number', nullable: true })
+    WHT: number | null;
     
     @PrimaryColumn()
     SCURCODE: string;

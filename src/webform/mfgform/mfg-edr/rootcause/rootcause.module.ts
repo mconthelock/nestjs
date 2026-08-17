@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { VIEW_MFG_EDR_HEAD_ROOTCAUSE } from 'src/common/Entities/webform/views/VIEW_MFG_EDR_HEAD_ROOTCAUSE.entity';
+import { AmecOrders } from 'src/common/Entities/workload/table/amecorders.entity';
 
 import { RootcauseController } from './rootcause.controller';
 import { RootcauseRepository } from './rootcause.repository';
@@ -11,7 +12,7 @@ import { RootcauseService } from './rootcause.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature(
-      [VIEW_MFG_EDR_HEAD_ROOTCAUSE],
+      [VIEW_MFG_EDR_HEAD_ROOTCAUSE, AmecOrders],
       'webformConnection',
     ),
   ],

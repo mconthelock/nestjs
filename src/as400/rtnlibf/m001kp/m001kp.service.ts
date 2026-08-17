@@ -32,6 +32,18 @@ export class M001kpService {
         );
     }
 
+    async findOrderNumbersByPrefix(prefix: string): Promise<string[]> {
+        const rows = await this.conn.runQuery(
+            `SELECT DISTINCT TRIM(M1K02) AS ORDERNO
+             FROM ${this.library}.M001KPBM
+             WHERE M1K02 LIKE ?`,
+            [`${prefix}%`],
+        );
+        return rows
+            .map((row) => String(row.ORDERNO || '').trim())
+            .filter(Boolean);
+    }
+
     findOrdersByDrawing(
         drawing: string,
         qty: string | number,

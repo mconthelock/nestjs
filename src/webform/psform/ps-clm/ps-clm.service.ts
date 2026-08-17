@@ -18,12 +18,12 @@ import {
 import { SendPsClmAs400Dto, UpdatePsClmDto } from './dto/update-ps-clm.dto';
 import { PsClmRepository } from './ps-clm.repository';
 
-const ASSIGN_CONTROLLERS = ['12177', '14036', '16066'];
+const ASSIGN_CONTROLLERS = ['12177', '14036', '16066', '96024'];
 const ORDER_PREFIXES = { E: 'ET2C', S: 'ST2C' } as const;
 const AS400_PRIMARY_LIBRARY = 'RTNLIBF';
 const AS400_DEBUG_LIBRARY = 'DBGDEV14';
 const M002_TABLE = 'M002KPBM';
-const REQUEST_MAIL_CC_EMPNOS = ['96024', ...ASSIGN_CONTROLLERS, '25020'];
+const REQUEST_MAIL_CC_EMPNOS = [...ASSIGN_CONTROLLERS, '25020'];
 
 function getOrderType(orderNo: string) {
     const type = String(orderNo || '')
@@ -161,11 +161,8 @@ export class PsClmService {
         }
 
         await this.repo.lockForms();
-        const type = getOrderType(originalOrder);
-        const newOrderNo = nextPsClmOrderNo(
-            originalOrder,
-            await this.repo.findNewOrders(ORDER_PREFIXES[type]),
-        );
+        const { newOrderNo, duplicateOrderNo } =
+            await this.allocateNewOrder(originalOrder);
 
         const createForm = await this.formCreateService.create(
             {
@@ -211,7 +208,12 @@ export class PsClmService {
               )
             : null;
         await this.mailService.sendMail(
-            await this.getRequestMail(form, dto.REQBY, newOrderNo),
+            await this.getRequestMail(
+                form,
+                dto.REQBY,
+                newOrderNo,
+                duplicateOrderNo,
+            ),
         );
 
         return {
@@ -232,12 +234,27 @@ export class PsClmService {
         if (!ORDER_PREFIXES[type]) {
             throw new Error('Original Order must start with E or S');
         }
+        const { newOrderNo } = await this.allocateNewOrder(orderNo);
         return {
             status: true,
-            newOrderNo: nextPsClmOrderNo(
-                orderNo,
-                await this.repo.findNewOrders(ORDER_PREFIXES[type]),
-            ),
+            newOrderNo,
+        };
+    }
+
+    private async allocateNewOrder(orderNo: string) {
+        const prefix = ORDER_PREFIXES[getOrderType(orderNo)];
+        const [formOrders, as400Orders] = await Promise.all([
+            this.repo.findNewOrders(prefix),
+            this.m001kpService.findOrderNumbersByPrefix(prefix),
+        ]);
+        const formOrderNo = nextPsClmOrderNo(orderNo, formOrders);
+        const newOrderNo = nextPsClmOrderNo(orderNo, [
+            ...formOrders,
+            ...as400Orders,
+        ]);
+        return {
+            newOrderNo,
+            duplicateOrderNo: formOrderNo === newOrderNo ? '' : formOrderNo,
         };
     }
 
@@ -478,6 +495,7 @@ export class PsClmService {
         form: FormDto,
         requester: string,
         newOrder: string,
+        duplicateOrderNo = '',
     ) {
         const empno = String(requester || '').trim();
         const user = empno && (await this.usersService.findEmp(empno));
@@ -487,11 +505,14 @@ export class PsClmService {
         const cc = await this.getRequestMailCc(user.SRECMAIL);
 
         const formNo = `PS-CLM${String(form.CYEAR2).slice(-2)}-${String(form.NRUNNO).padStart(6, '0')}`;
+        const duplicateNotice = duplicateOrderNo
+            ? `<p><strong>Duplicate New Order detected in RTNLIBF.M001KPBM.</strong></p><p>New Order changed from ${duplicateOrderNo} to ${newOrder}.</p>`
+            : '';
         return {
             to: user.SRECMAIL,
             cc,
-            subject: `${formNo} created`,
-            html: `<p>${formNo} has been created.</p><p>New Order: ${newOrder}</p><p>This is an automated email.</p>`,
+            subject: `${formNo} created${duplicateOrderNo ? ' - duplicate New Order changed' : ''}`,
+            html: `<p>${formNo} has been created.</p>${duplicateNotice}<p>New Order: ${newOrder}</p><p>This is an automated email.</p>`,
         };
     }
 

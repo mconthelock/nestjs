@@ -15,12 +15,8 @@ import { VORGMST } from '../views/VORGMST.entity';
 import { TERMCODE } from '../../pursys/table/TERMCODE.entity';
 import { CurrencyMaster } from '../../pursys/table/CURRENCY_MASTER.entity';
 
-
-
-
 @Entity({ name: 'PUREVA_FORM', schema: 'WEBFORM' })
 export class PUREVA_FORM {
-    
     // --- Primary Keys ---
 
     @PrimaryColumn()
@@ -45,29 +41,28 @@ export class PUREVA_FORM {
     VENDCODE: string;
 
     @Column()
-    VENDGROUP: string;  
+    VENDGROUP: string;
 
     @Column()
     UPSTATUS: string;
 
     @Column()
-    VENDPURPOSE: string;  
+    VENDPURPOSE: string;
 
     @Column()
-    COMNAME: string;  
-    
+    COMNAME: string;
 
     @Column()
-    VENDTYPE: string; 
+    VENDTYPE: string;
 
     @Column()
-    CONTACT: string;  
+    CONTACT: string;
 
     @Column()
-    EMAIL: string;  
+    EMAIL: string;
 
     @Column()
-    WEBSITE: string;  
+    WEBSITE: string;
 
     @Column()
     TELNO: string;
@@ -109,6 +104,9 @@ export class PUREVA_FORM {
     PRODCAT: string;
 
     @Column()
+    PRODCAT_OTHER: string;
+
+    @Column()
     LEGAL_STATUS: string;
 
     @Column()
@@ -124,7 +122,7 @@ export class PUREVA_FORM {
     FY_AMOUNT: string;
 
     // Type Number with Precision & Scale
-    @Column({ type: 'number', precision: 12, scale: 2})
+    @Column({ type: 'number', precision: 12, scale: 2 })
     AMOUNT: number;
 
     @Column()
@@ -151,10 +149,10 @@ export class PUREVA_FORM {
     @Column()
     COM_OTHER: string;
 
-    @Column({ type: 'number', precision: 6, scale: 0})
+    @Column({ type: 'number', precision: 6, scale: 0 })
     EMPDIRECT: number;
 
-    @Column({ type: 'number', precision: 6, scale: 0})
+    @Column({ type: 'number', precision: 6, scale: 0 })
     EMPINDIRECT: number;
 
     @Column()
@@ -205,14 +203,13 @@ export class PUREVA_FORM {
 
     @OneToMany(() => PUR_FILE, (f) => f.MASTER)
     FILES: PUR_FILE[];
-    
+
     @OneToMany(() => PUREVA_PROFIT_TURNOVER, (p) => p.Profit_Turnover)
     PROFIT_TURNOVERS: PUREVA_PROFIT_TURNOVER[];
 
     @OneToMany(() => PUREVA_SCORE, (s) => s.Scores)
     SCORES: PUREVA_SCORE[];
 
-    
     @OneToMany(() => PUREVA_VENDOR_RELATION, (r) => r.Relations)
     RELATIONS: PUREVA_VENDOR_RELATION[];
 
@@ -221,18 +218,17 @@ export class PUREVA_FORM {
 
     @OneToOne(() => TERMCODE)
     @JoinColumn({ name: 'TERMCODE', referencedColumnName: 'STERMCODE' })
-    TERM: TERMCODE;  
+    TERM: TERMCODE;
 
     @OneToOne(() => CurrencyMaster)
     @JoinColumn({ name: 'CURCODE', referencedColumnName: 'CURR_CODE' })
-    STDCUR: CurrencyMaster;  
+    STDCUR: CurrencyMaster;
 
     @OneToOne(() => CurrencyMaster)
     @JoinColumn({ name: 'CAPITAL_CUR', referencedColumnName: 'CURR_CODE' })
-    CAPCUR: CurrencyMaster; 
+    CAPCUR: CurrencyMaster;
 
     @OneToOne(() => VORGMST)
     @JoinColumn({ name: 'CONCERNEDORG', referencedColumnName: 'VORGNO' })
     VORG: VORGMST;
-    
 }

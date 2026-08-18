@@ -4,66 +4,34 @@ import { Repository } from 'typeorm';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 
 import { LVAPP } from 'src/common/Entities/webform/table/LVAPP.entity';
+import { LR100P } from 'src/common/Entities/gpreport/table/LR100P.entity';
+
 import { SearchLeaveDto } from './dto/search-leave.dto';
+import { SearchActualLeaveDto } from './dto/lr100p.dto';
 
 @Injectable()
 export class LeaveService {
     constructor(
         @InjectRepository(LVAPP, 'gpreportConnection')
         private readonly lvapp: Repository<LVAPP>,
+
+        @InjectRepository(LR100P, 'gpreportConnection')
+        private readonly lr100: Repository<LR100P>,
     ) {}
 
-    async search(searchLeaveDto: SearchLeaveDto) {
+    async search(q: SearchLeaveDto) {
         const qb = this.lvapp
             .createQueryBuilder('lvapp')
-            .leftJoinAndSelect('lvapp.user', 'user');
-        await applyDynamicFilters(qb, searchLeaveDto, 'lvapp');
+            .leftJoinAndSelect('lvapp.user', 'user')
+            .leftJoinAndSelect('lvapp.form', 'form')
+            .leftJoinAndSelect('form.flow', 'form_flow');
+        await applyDynamicFilters(qb, q, 'lvapp');
         return qb.getMany();
     }
 
-    async findByEmployee(empId: string) {
-        const leaves = await this.lvapp.find({
-            where: {
-                EMPNO: empId,
-            },
-            relations: ['user'],
-        });
-        return leaves;
-    }
-
-    async findBySection(seccode: string) {
-        const leaves = await this.lvapp.find({
-            where: {
-                user: {
-                    SSECCODE: seccode,
-                },
-            },
-            relations: ['user'],
-        });
-        return leaves;
-    }
-
-    async findByDepartment(depcode: string) {
-        const leaves = await this.lvapp.find({
-            where: {
-                user: {
-                    SDEPCODE: depcode,
-                },
-            },
-            relations: ['user'],
-        });
-        return leaves;
-    }
-
-    async findByDivision(divcode: string) {
-        const leaves = await this.lvapp.find({
-            where: {
-                user: {
-                    SDIVCODE: divcode,
-                },
-            },
-            relations: ['user'],
-        });
-        return leaves;
+    async findActual(dto: SearchActualLeaveDto) {
+        const qb = this.lr100.createQueryBuilder('lr100');
+        await applyDynamicFilters(qb, dto, 'lr100');
+        return qb.getMany();
     }
 }

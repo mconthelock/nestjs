@@ -1,39 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Search } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get } from '@nestjs/common';
+
 import { OvertimeService } from './overtime.service';
-import { CreateOvertimeDto } from './dto/create-overtime.dto';
-import { UpdateOvertimeDto } from './dto/update-overtime.dto';
+import { SearchOvertimeDto } from './dto/search-overtime.dto';
+import { SearchActualOvertimeDto } from './dto/lr200p.dto';
 
 @Controller('overtime')
 export class OvertimeController {
-  constructor(private readonly overtimeService: OvertimeService) {}
+    constructor(private readonly overtimeService: OvertimeService) {}
 
-  @Post('search')
-  search(@Body() q: UpdateOvertimeDto) {
-    return this.overtimeService.findAll(q);
-  }
-  
-  @Post()
-  create(@Body() createOvertimeDto: CreateOvertimeDto) {
-    return this.overtimeService.create(createOvertimeDto);
-  }
+    @Post('search')
+    search(@Body() q: SearchOvertimeDto) {
+        return this.overtimeService.findAll(q);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.overtimeService.findOne(+id);
-  }
+    @Post('actual')
+    searchActual(@Body() q: SearchActualOvertimeDto) {
+        return this.overtimeService.findActual(q);
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOvertimeDto: UpdateOvertimeDto) {
-    return this.overtimeService.update(+id, updateOvertimeDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.overtimeService.remove(+id);
-  }
-
-  @Post('searchot/:workdate')
-  async getOtByWorkdate(@Param('workdate') workdate: string) {
-    return await this.overtimeService.getOtByWorkdate(workdate);
-  }
+    @Post('searchot/:workdate')
+    async getOtByWorkdate(@Param('workdate') workdate: string) {
+        return await this.overtimeService.getOtByWorkdate(workdate);
+    }
 }

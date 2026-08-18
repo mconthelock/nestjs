@@ -5,7 +5,7 @@ import { spawn } from 'child_process';
 import { PDFDocument } from 'pdf-lib';
 import { PDFParse } from 'pdf-parse';
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
-import { PrintedService } from './printed.service';
+import { OrderInfo, PrintedService } from './printed.service';
 
 @Injectable()
 export class PrintedMergeService {
@@ -22,10 +22,11 @@ export class PrintedMergeService {
             fileName: string;
             filePath: string;
             pageNumber: number;
+            fileMfgNo: OrderInfo[] | null;
         }[],
     ) {
         const splitStartTime = Date.now();
-        for (let i = 1; i < pageCount; i++) {
+        for (let i = 1; i < pageCount - 1; i++) {
             const singlePageDoc = await PDFDocument.create();
             const [copiedPage] = await singlePageDoc.copyPages(pdfDoc, [i]);
             singlePageDoc.addPage(copiedPage);
@@ -39,6 +40,7 @@ export class PrintedMergeService {
                 const textContent = parsedData.text;
                 const tagData = textContent.split('\n');
                 const tagNo = tagData[0].substring(0, 12).replace(/\s/g, '');
+                const orderEntries = this.extractOrderEntries(textContent);
                 const newFileName = `${tagNo}.pdf`;
                 const outputPath = path.join(outputDirectory, newFileName);
                 await fs.writeFile(outputPath, singlePageBytes);
@@ -46,6 +48,7 @@ export class PrintedMergeService {
                     fileName: tagNo,
                     filePath: outputPath,
                     pageNumber: i,
+                    fileMfgNo: orderEntries,
                 });
             } finally {
                 await parser.destroy();
@@ -81,10 +84,15 @@ export class PrintedMergeService {
     }
 
     async compressPdfWithGhostscript(inputPath: string) {
-        const command =
-            '\\\\amecnas\\AMECWEB\\wwwroot\\production\\cdn\\Application\\gs\\gs10.00.0\\bin\\gswin32c.exe';
+        const command = path.resolve(
+            process.cwd(),
+            'public',
+            'gs',
+            'gs10.07.1',
+            'bin',
+            'gswin64c.exe',
+        );
         const parsedPath = path.parse(inputPath);
-        // `${parsedPath.name}.compressed${parsedPath.ext}`,
         const compressedPath = path.join(parsedPath.dir, `output.pdf`);
         await new Promise<void>((resolve, reject) => {
             const stderrChunks: Buffer[] = [];
@@ -117,5 +125,21 @@ export class PrintedMergeService {
         });
 
         return compressedPath;
+    }
+
+    private extractOrderEntries(
+        text: string,
+    ): Array<{ orderNo: string; qty: number }> {
+        const normalizedText = text.replace(/\r/g, '').replace(/\u00a0/g, ' ');
+        const matches = [
+            ...normalizedText.matchAll(
+                /(?<![A-Z0-9])([A-Z0-9]{9})\s+(\d+)(?![A-Z0-9])/g,
+            ),
+        ];
+
+        return matches.map(([, orderNo, qty]) => ({
+            orderNo,
+            qty: Number(qty),
+        }));
     }
 }

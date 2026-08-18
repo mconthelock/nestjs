@@ -10,7 +10,7 @@ import { CreatePurevaScoreDto } from './pureva_score/dto/create-pureva_score.dto
 import { PurevaScoreRepository } from './pureva_score/pureva_score.repository';
 import { PurnvfAddressService } from '../pur-nvf/purnvf_address/purnvf_address.service';
 import { CreatePurnvfAddressDto } from '../pur-nvf/purnvf_address/dto/create-purnvf_address.dto';
-import { PurnvfAddressRepository } from '../pur-nvf/purnvf_address/purnvf_address.repository';  
+import { PurnvfAddressRepository } from '../pur-nvf/purnvf_address/purnvf_address.repository';
 import { FormService } from 'src/webform/form/form.service';
 import { FlowService } from 'src/webform/flow/flow.service';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
@@ -29,14 +29,13 @@ import { UpdatePurEvaDto } from './dto/update-pur-eva.dto';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 
-
 @Injectable()
-export class PurEvaUpdateService  {
+export class PurEvaUpdateService {
     constructor(
         protected readonly repo: PurevaFormService,
         protected readonly repoaddr: PurnvfAddressRepository,
         protected readonly repoprofit: PurevaProfitTurnoverService,
-        protected readonly reposcore:PurevaScoreService,
+        protected readonly reposcore: PurevaScoreService,
         protected readonly reporelation: PurevaVendorRelationService,
         protected readonly formService: FormService,
         protected readonly flowService: FlowService,
@@ -50,24 +49,40 @@ export class PurEvaUpdateService  {
         private readonly pappFlowService: PappflowService,
         private readonly doactionService: DoactionFlowService,
     ) {}
-  
+
     async update(
         dto: UpdatePurEvaDto,
-        files: {'fileCer[]'?: Express.Multer.File[], 'fileIe[]'?: Express.Multer.File[] , 'fileQa[]'?: Express.Multer.File[], 'fileOther[]'?: Express.Multer.File[] }, // <--- เปลี่ยนตรงนี้
+        files: {
+            'fileCer[]'?: Express.Multer.File[];
+            'fileIe[]'?: Express.Multer.File[];
+            'fileQa[]'?: Express.Multer.File[];
+            'fileOther[]'?: Express.Multer.File[];
+        }, // <--- เปลี่ยนตรงนี้
         ip: string,
         path: string,
     ) {
         let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
-      const allFilesWithType = [
-        ...(files['fileCer[]'] || []).map(file => ({ file, type: 11 })),
-        ...(files['fileIe[]'] || []).map(file => ({ file, type: 12 })),
-        ...(files['fileQa[]'] || []).map(file => ({ file, type: 13 })),
-        ...(files['fileOther[]'] || []).map(file => ({ file, type: 2 })),
-    ];
-        
+        const allFilesWithType = [
+            ...(files['fileCer[]'] || []).map((file) => ({ file, type: 11 })),
+            ...(files['fileIe[]'] || []).map((file) => ({ file, type: 12 })),
+            ...(files['fileQa[]'] || []).map((file) => ({ file, type: 13 })),
+            ...(files['fileOther[]'] || []).map((file) => ({ file, type: 2 })),
+        ];
 
         try {
-            const { REQBY, INPUTBY , DRAFT , REMARK, ACTION , EMPNO , SCORES, PROFIT_TURNOVERS , RELATIONS , DELETE_FILES, ...data } = dto;
+            const {
+                REQBY,
+                INPUTBY,
+                DRAFT,
+                REMARK,
+                ACTION,
+                EMPNO,
+                SCORES,
+                PROFIT_TURNOVERS,
+                RELATIONS,
+                DELETE_FILES,
+                ...data
+            } = dto;
             const form = {
                 NFRMNO: dto.NFRMNO,
                 VORGNO: dto.VORGNO,
@@ -75,55 +90,68 @@ export class PurEvaUpdateService  {
                 CYEAR2: data.CYEAR2,
                 NRUNNO: data.NRUNNO,
             };
-            const {  ADDRESS_EN , CITY_EN , STATE_EN , COUNTRY_EN , POSTCODE_EN  , ADDRESS_TH  , ...purevadata } = data;
+            const {
+                ADDRESS_EN,
+                CITY_EN,
+                STATE_EN,
+                COUNTRY_EN,
+                POSTCODE_EN,
+                ADDRESS_TH,
+                ...purevadata
+            } = data;
             const purevaForm = {
                 ...form,
-                ...purevadata
+                ...purevadata,
             };
             await this.repo.update(form, purevaForm);
             const addr = [];
             let addid = 0;
-            if(ADDRESS_EN && ADDRESS_EN.trim().length > 0){
+            if (ADDRESS_EN && ADDRESS_EN.trim().length > 0) {
                 addid++;
                 addr.push({
-                    ADDRID : addid,
-                    ADDRTYPE : 'E',
-                    ADDR : ADDRESS_EN,
-                    CITY : CITY_EN,
-                    STATE : STATE_EN,
-                    COUNTRY : COUNTRY_EN,
-                    POSTCODE : POSTCODE_EN
-
-                })
+                    ADDRID: addid,
+                    ADDRTYPE: 'E',
+                    ADDR: ADDRESS_EN,
+                    CITY: CITY_EN,
+                    STATE: STATE_EN,
+                    COUNTRY: COUNTRY_EN,
+                    POSTCODE: POSTCODE_EN,
+                });
             }
-            if(data.ADDRESS_TH && data.ADDRESS_TH.trim().length > 0){
+            if (data.ADDRESS_TH && data.ADDRESS_TH.trim().length > 0) {
                 addid++;
                 addr.push({
-                    ADDRID : addid,
-                    ADDRTYPE : 'T',
-                    ADDR : data.ADDRESS_TH,
-                })
+                    ADDRID: addid,
+                    ADDRTYPE: 'T',
+                    ADDR: data.ADDRESS_TH,
+                });
             }
             await this.repoaddr.deleteByAll(form);
-            for(const a of addr){
+            for (const a of addr) {
                 await this.repoaddr.insert({
                     ...form,
-                    ...a
-                })
+                    ...a,
+                });
             }
             await this.reposcore.deleteByAll(form);
             await this.repoprofit.deleteByAll(form);
             await this.reporelation.deleteByAll(form);
-            if(SCORES && SCORES.length > 0) {
-                await this.reposcore.createMultipleScores(form,SCORES);
+            if (SCORES && SCORES.length > 0) {
+                await this.reposcore.createMultipleScores(form, SCORES);
             }
-            if(PROFIT_TURNOVERS && PROFIT_TURNOVERS.length > 0) {
-                await this.repoprofit.createMultipleProfits(form,PROFIT_TURNOVERS);
+            if (PROFIT_TURNOVERS && PROFIT_TURNOVERS.length > 0) {
+                await this.repoprofit.createMultipleProfits(
+                    form,
+                    PROFIT_TURNOVERS,
+                );
             }
-            if(RELATIONS && RELATIONS.length > 0) {
-                await this.reporelation.createMultipleRelations(form, RELATIONS);
+            if (RELATIONS && RELATIONS.length > 0) {
+                await this.reporelation.createMultipleRelations(
+                    form,
+                    RELATIONS,
+                );
             }
-            if(DELETE_FILES && DELETE_FILES.length > 0) {
+            if (DELETE_FILES && DELETE_FILES.length > 0) {
                 for (const id of DELETE_FILES) {
                     const file = await this.purFileService.getFileById(+id);
                     await this.purFileService.deleteFileByID(+id);
@@ -135,28 +163,31 @@ export class PurEvaUpdateService  {
                 }
             }
             if (allFilesWithType && allFilesWithType.length > 0) {
-             movedTargets = await this.moveFiles(
-                allFilesWithType, // ส่งตัวแปรที่รวบรวมไฟล์+type ไปแทน
-                form, // (ต้องมีตัวแปร form ของคุณ)
-                path,
-                dto.REQBY,
-            );
-            }
-            
-            if(ACTION== 'approve'){
-                await this.formService.updateForm({condition: { ...form },CST:"1"});
-                await this.doactionService.doAction(
-                { ...form, ACTION: ACTION, EMPNO, REMARK },
-                ip,
+                movedTargets = await this.moveFiles(
+                    allFilesWithType, // ส่งตัวแปรที่รวบรวมไฟล์+type ไปแทน
+                    form, // (ต้องมีตัวแปร form ของคุณ)
+                    path,
+                    dto.REQBY,
                 );
             }
 
-        return {
+            if (ACTION == 'approve') {
+                await this.formService.updateForm({
+                    condition: { ...form },
+                    CST: '1',
+                });
+                await this.doactionService.doAction(
+                    { ...form, ACTION: ACTION, EMPNO, REMARK },
+                    ip,
+                );
+            }
+
+            return {
                 status: true,
                 message: 'Update PUR-EVA Form successful',
-        };
+            };
         } catch (error) {
-            const tmpFilePaths = allFilesWithType.map(item => item.file.path);
+            const tmpFilePaths = allFilesWithType.map((item) => item.file.path);
             await Promise.allSettled([
                 ...movedTargets.map((p) => deleteFile(p)), // - ลบไฟล์ที่ "ปลายทาง" ทั้งหมดที่ย้ายสำเร็จไปแล้ว (กัน orphan file)
                 ...tmpFilePaths.map((f) => deleteFile(f)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
@@ -164,40 +195,33 @@ export class PurEvaUpdateService  {
             throw new Error('Update PUR-EVA Form Error: ' + error.message);
         }
     }
-    
+
     async moveFiles(
-            filesList: { file: Express.Multer.File; type: number }[],
-            form: FormDto,
-            path: string,
-            userCreate: string,
-        ) {
-            // 5. ย้ายไฟล์ไปยังปลายทาง
-            const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
-            const formNo = await this.formService.getFormno(form); // Get the form number
-            const destination = await joinPaths(path, formNo); // Get the destination path
-            for (const item of filesList) {
-                const file = item.file;
-                const fileType = item.type;
+        filesList: { file: Express.Multer.File; type: number }[],
+        form: FormDto,
+        path: string,
+        userCreate: string,
+    ) {
+        // 5. ย้ายไฟล์ไปยังปลายทาง
+        const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
+        const formNo = await this.formService.getFormno(form); // Get the form number
+        const destination = await joinPaths(path, formNo); // Get the destination path
+        for (const item of filesList) {
+            const file = item.file;
+            const fileType = item.type;
 
-                const moved = await moveFileFromMulter({ file, destination });
-                movedTargets.push(moved.path);
-                // 6. บันทึก DB (ใช้ชื่อไฟล์ที่ "ปลายทางจริง" เพื่อความตรงกัน)
-                await this.purFileService.insert({
-                    ...form,
-                    FILE_ONAME: file.originalname, // ชื่อเดิมฝั่ง client
-                    FILE_FNAME: moved.newName, // ชื่อไฟล์ที่ใช้เก็บจริง
-                    FILE_USERCREATE: userCreate,
-                    FILE_PATH: destination, // โฟลเดอร์ปลายทาง
-                    FILE_TYPE:fileType
-                });
-            }
-            return movedTargets; // คืนรายชื่อไฟล์ที่ย้ายสำเร็จ (ถ้าต้องการ)
+            const moved = await moveFileFromMulter({ file, destination });
+            movedTargets.push(moved.path);
+            // 6. บันทึก DB (ใช้ชื่อไฟล์ที่ "ปลายทางจริง" เพื่อความตรงกัน)
+            await this.purFileService.insert({
+                ...form,
+                FILE_ONAME: file.originalname, // ชื่อเดิมฝั่ง client
+                FILE_FNAME: moved.newName, // ชื่อไฟล์ที่ใช้เก็บจริง
+                FILE_USERCREATE: userCreate,
+                FILE_PATH: destination, // โฟลเดอร์ปลายทาง
+                FILE_TYPE: fileType,
+            });
         }
-        
-   
-     
+        return movedTargets; // คืนรายชื่อไฟล์ที่ย้ายสำเร็จ (ถ้าต้องการ)
+    }
 }
-
-
-
-

@@ -75,15 +75,12 @@ export class RequestPurnvfFormDto extends PickType(CreateFormDto,[
 
     @IsOptional()
     @IsString()
-    PROVINCE_EN?: string;  
+    CITY_EN?: string;  
 
     @IsOptional()
     @IsString()
-    DISTRICT_EN?: string;     
+    STATE_EN?: string;     
 
-    @IsOptional()
-    @IsString()
-    SUB_DISTRICT_EN?: string;   
 
     @IsOptional()
     @IsString()

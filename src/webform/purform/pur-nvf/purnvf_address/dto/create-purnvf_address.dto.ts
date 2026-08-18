@@ -26,13 +26,10 @@ export class CreatePurnvfAddressDto extends PickType(FormDto,[
     ADDR: string;
 
     @IsString()
-    SUBDISTRICT: string;
+    CITY: string;
 
     @IsString()
-    DISTRICT: string;
-
-    @IsString()
-    PROVINCE: string;
+    STATE: string;
 
     @IsString()
     COUNTRY: string;

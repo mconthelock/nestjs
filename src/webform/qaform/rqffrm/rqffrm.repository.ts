@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { FormDto } from '../form/dto/form.dto';
+import { FormDto } from '../../form/dto/form.dto';
 import { RQFFRM } from 'src/common/Entities/webform/table/RQFFRM.entity';
 
 @Injectable()
@@ -15,15 +15,15 @@ export class RqffrmRepository extends BaseRepository {
         return this.getRepository(RQFFRM).findOneBy(form);
     }
 
-    findFromYear(FYear: string){
+    findFromYear(FYear: string) {
         return this.getRepository(RQFFRM).find({
             where: {
                 FYEAR: FYear,
             },
-            relations:{
+            relations: {
                 RQFLIST: {
-                    PVENDER: true
-                }
+                    PVENDER: true,
+                },
             },
         });
     }

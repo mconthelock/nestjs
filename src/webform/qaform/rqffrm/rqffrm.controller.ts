@@ -1,12 +1,6 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Param,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { RqffrmService } from './rqffrm.service';
-import { FormDto } from '../form/dto/form.dto';
+import { FormDto } from '../../form/dto/form.dto';
 
 @Controller('rqffrm')
 export class RqffrmController {

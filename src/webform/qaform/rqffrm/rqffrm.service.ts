@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { FormDto } from '../form/dto/form.dto';
-import { FormService } from '../form/form.service';
+import { FormDto } from '../../form/dto/form.dto';
+import { FormService } from '../../form/form.service';
 import { RqffrmRepository } from './rqffrm.repository';
 import { RqflistService } from '../rqflist/rqflist.service';
 

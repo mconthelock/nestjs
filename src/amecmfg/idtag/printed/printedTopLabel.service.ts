@@ -61,6 +61,10 @@ export class PrintedTopLabelService {
                     text += 'JAPAN ';
                 }
 
+                if (row.URGETNT > 0) {
+                    text += 'URGENT ';
+                }
+
                 if (row.EARTHQ > 0) {
                     text += 'MET EARTHQUAKE ';
                 }

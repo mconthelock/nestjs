@@ -35,4 +35,7 @@ export class CreateIdtagPagesDto {
     @IsOptional()
     @IsString()
     PAGE_STATUS?: string;
+
+    @IsString()
+    PAGE_MFGNO?: string;
 }

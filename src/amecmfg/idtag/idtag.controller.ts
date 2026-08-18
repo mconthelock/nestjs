@@ -168,4 +168,20 @@ export class IdtagController {
     async printCn(@Param('fileID') fileID: number) {
         return this.cn.putCNNo(fileID);
     }
+
+    @Post('read-pdf')
+    @UseInterceptors(getFileUploadInterceptor('files[]', true, 20))
+    async readPdfDocument(
+        @UploadedFiles() files: Express.Multer.File[],
+        @Body()
+        body: {
+            schd_number: string;
+            schd_txt: string;
+            schd_p: string;
+            filedir: string;
+            bmdate: string;
+        },
+    ) {
+        return this.printed.readPdfDocument(body, files);
+    }
 }

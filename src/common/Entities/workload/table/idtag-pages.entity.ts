@@ -25,4 +25,7 @@ export class IdtagPages {
 
     @Column()
     PAGE_STATUS: string;
+
+    @Column()
+    PAGE_MFGNO: string;
 }

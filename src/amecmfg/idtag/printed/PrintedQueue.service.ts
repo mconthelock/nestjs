@@ -5,6 +5,7 @@ import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { PDFDocument } from 'pdf-lib';
 import { IdTagRepository } from './idtag.repository';
 import {
+    OrderInfo,
     PrintedService,
     filesData,
     PdfProcessContext,
@@ -70,6 +71,7 @@ export class PrintedQueueService {
                         fileName: string;
                         filePath: string;
                         pageNumber: number;
+                        fileMfgNo: OrderInfo[] | null;
                     }[] = [];
 
                     // ขั้นตอนที่ 2: แบ่งหน้า, อ่านข้อความ และตั้งชื่อไฟล์

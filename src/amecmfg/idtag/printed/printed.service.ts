@@ -22,6 +22,17 @@ export interface OrderInfo {
     qty: number;
 }
 
+export interface ItemPackingInfo {
+    item: string;
+    itemPacking: string;
+    lineText: string;
+}
+
+export interface ProcessListInfo {
+    processCode: string;
+    lineText: string;
+}
+
 export interface filesData {
     bmdate: Date;
     folder: string;
@@ -133,6 +144,84 @@ export class PrintedService {
             orderNo,
             qty: Number(qty),
         }));
+    }
+
+    private extractItemPackingEntries(text: string): ItemPackingInfo[] {
+        return text
+            .replace(/\r/g, '')
+            .split('\n')
+            .map((line) => line.replace(/\u00a0/g, ' ').trim())
+            .flatMap((lineText) => {
+                if (!lineText) {
+                    return [];
+                }
+
+                const match = lineText.match(
+                    /[A-Z0-9]{9}\s+G\d{2}\s+(\d{3})\s+(\d{5})\s+[A-Z0-9]+$/,
+                );
+
+                if (!match) {
+                    return [];
+                }
+
+                const [, item, itemPacking] = match;
+                return [{ item, itemPacking, lineText }];
+            });
+    }
+
+    private extractProcessListEntries(text: string): ProcessListInfo[] {
+        const normalizedLines = text
+            .replace(/\r/g, '')
+            .split('\n')
+            .map((line) => line.replace(/\u00a0/g, ' ').trim())
+            .filter(Boolean);
+
+        const orderLinePattern = /^(?:[A-Z0-9]{9}\s+\d+\s*)+$/;
+        const processCodePattern = /^[A-Z0-9]{6}$/;
+
+        const firstOrderLineIndex = normalizedLines.findIndex((line) =>
+            orderLinePattern.test(line),
+        );
+
+        let processStartIndex = 0;
+        if (firstOrderLineIndex >= 0) {
+            processStartIndex = firstOrderLineIndex;
+            while (
+                processStartIndex < normalizedLines.length &&
+                orderLinePattern.test(normalizedLines[processStartIndex])
+            ) {
+                processStartIndex += 1;
+            }
+        }
+
+        const processEntries: ProcessListInfo[] = [];
+        for (
+            let index = processStartIndex;
+            index < normalizedLines.length;
+            index += 1
+        ) {
+            const lineText = normalizedLines[index];
+            const processCodes = lineText.split(/\s+/).filter(Boolean);
+
+            if (
+                processCodes.length === 0 ||
+                !processCodes.every((code) => processCodePattern.test(code))
+            ) {
+                if (processEntries.length > 0) {
+                    break;
+                }
+                continue;
+            }
+
+            processEntries.push(
+                ...processCodes.map((processCode) => ({
+                    processCode,
+                    lineText,
+                })),
+            );
+        }
+
+        return processEntries;
     }
 
     private resolveMaxParallelPdfJobs(raw?: string): number {
@@ -448,16 +537,19 @@ export class PrintedService {
                 try {
                     parsedData = await parser.getText();
                     const textContent = parsedData.text;
-                    const orderEntries = this.extractOrderEntries(textContent);
-                    const tagNo = orderEntries[0]?.orderNo ?? '';
+                    const tagData = textContent.split('\n');
+                    console.log(tagData);
 
-                    // if (orderEntries.length > 0) {
-                    // console.log(
-                    //     `Page ${i}: orderEntries=${JSON.stringify(orderEntries)}`,
-                    // );
-                    console.log(orderEntries);
-
-                    // }
+                    // const orderEntries = this.extractOrderEntries(textContent);
+                    // const itemPackingEntries =
+                    //     this.extractItemPackingEntries(textContent);
+                    // const processListEntries =
+                    //     this.extractProcessListEntries(textContent);
+                    // console.log({
+                    //     orderEntries,
+                    //     itemPackingEntries,
+                    //     processListEntries,
+                    // });
                 } finally {
                     await parser.destroy();
                 }

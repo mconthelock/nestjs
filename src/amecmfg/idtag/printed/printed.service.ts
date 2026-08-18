@@ -17,6 +17,11 @@ export interface PdfProcessContext {
     pdfDirectory: string;
 }
 
+export interface OrderInfo {
+    orderNo: string;
+    qty: number;
+}
+
 export interface filesData {
     bmdate: Date;
     folder: string;
@@ -33,7 +38,7 @@ export interface filesData {
         fileName: string;
         filePath: string;
         pageNumber: number;
-        fileMfgNo: string;
+        fileMfgNo?: OrderInfo[] | null;
     }[];
 }
 
@@ -112,6 +117,22 @@ export class PrintedService {
         if (minutes > 0) return `${minutes} min ${seconds} sec ${ms} ms`;
         if (seconds > 0) return `${seconds} sec ${ms} ms`;
         return `${ms} ms`;
+    }
+
+    private extractOrderEntries(
+        text: string,
+    ): Array<{ orderNo: string; qty: number }> {
+        const normalizedText = text.replace(/\r/g, '').replace(/\u00a0/g, ' ');
+        const matches = [
+            ...normalizedText.matchAll(
+                /(?<![A-Z0-9])([A-Z0-9]{9})\s+(\d+)(?![A-Z0-9])/g,
+            ),
+        ];
+
+        return matches.map(([, orderNo, qty]) => ({
+            orderNo,
+            qty: Number(qty),
+        }));
     }
 
     private resolveMaxParallelPdfJobs(raw?: string): number {
@@ -267,9 +288,21 @@ export class PrintedService {
                 .map((fileData) => ({
                     PAGE_NUM: fileData.pageNumber,
                     PAGE_TAG: fileData.fileName,
-                    PAGE_MFGNO: fileData.fileMfgNo,
                     PAGE_STATUS: '0',
                 })),
+            (splitFilesData ?? []).flatMap((fileData) => {
+                const fileMfgNos = fileData.fileMfgNo;
+                if (!fileMfgNos?.length) {
+                    return [];
+                }
+
+                return fileMfgNos.map((fileMfgNo) => ({
+                    FILE_PAGE: fileData.pageNumber,
+                    FILE_TAG: fileData.fileName,
+                    FILE_ORDER: fileMfgNo.orderNo,
+                    FILE_ORDER_QTY: Number(fileMfgNo.qty ?? 0),
+                }));
+            }),
         );
     }
 
@@ -403,7 +436,7 @@ export class PrintedService {
             const pdfDoc = await PDFDocument.load(pdfBytes);
             const pageCount = pdfDoc.getPageCount();
 
-            for (let i = 1; i < pageCount; i++) {
+            for (let i = 1; i < pageCount - 1; i++) {
                 const singlePageDoc = await PDFDocument.create();
                 const [copiedPage] = await singlePageDoc.copyPages(pdfDoc, [i]);
                 singlePageDoc.addPage(copiedPage);
@@ -415,9 +448,16 @@ export class PrintedService {
                 try {
                     parsedData = await parser.getText();
                     const textContent = parsedData.text;
-                    const tagData = textContent.split('\n');
-                    const tagNo = tagData[9].substring(0, 9).replace(/\s/g, '');
-                    console.log(tagNo);
+                    const orderEntries = this.extractOrderEntries(textContent);
+                    const tagNo = orderEntries[0]?.orderNo ?? '';
+
+                    // if (orderEntries.length > 0) {
+                    // console.log(
+                    //     `Page ${i}: orderEntries=${JSON.stringify(orderEntries)}`,
+                    // );
+                    console.log(orderEntries);
+
+                    // }
                 } finally {
                     await parser.destroy();
                 }

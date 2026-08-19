@@ -1,56 +1,73 @@
-import { Injectable } from '@nestjs/common';
-import { CreateOvertimeDto } from './dto/create-overtime.dto';
-import { UpdateOvertimeDto } from './dto/update-overtime.dto';
-import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { applyDynamicFilters } from 'src/common/helpers/query.helper';
+
 import { SearchOvertimeDto } from './dto/search-overtime.dto';
+import { SearchActualOvertimeDto } from './dto/lr200p.dto';
+
 import { Overtime } from 'src/common/Entities/gpreport/table/overtime.entity';
+import { LR200P } from 'src/common/Entities/gpreport/table/LR200P.entity';
+import { OTFORM } from 'src/common/Entities/webform/table/OTFORM.entity';
 
 @Injectable()
 export class OvertimeService {
-  constructor(
-    @InjectRepository(Overtime, 'gpreportConnection')
-    private readonly otRepo: Repository<Overtime>,
+    constructor(
+        @InjectRepository(Overtime, 'gpreportConnection')
+        private readonly otRepo: Repository<Overtime>,
 
-    @InjectDataSource('gpreportConnection')
-      private readonly dataSource: DataSource,
-  ) {}
+        @InjectRepository(OTFORM, 'gpreportConnection')
+        private readonly otform: Repository<OTFORM>,
 
- 
-  create(createOvertimeDto: CreateOvertimeDto) {
-    return 'This action adds a new overtime';
-  }
-  
+        @InjectRepository(LR200P, 'gpreportConnection')
+        private readonly lr200: Repository<LR200P>,
 
-  async findAll(q: SearchOvertimeDto) {
-    return await this.otRepo.find({ where: q });
-  }
+        @InjectDataSource('gpreportConnection')
+        private readonly dataSource: DataSource,
+    ) {}
 
+    async findAll(q: SearchOvertimeDto) {
+        const qb = this.otform
+            .createQueryBuilder('otform')
+            .leftJoinAndSelect('otform.user', 'user')
+            .leftJoinAndSelect('otform.form', 'form')
+            .leftJoinAndSelect('form.flow', 'form_flow');
+        await applyDynamicFilters(qb, q, 'otform');
+        return qb.getMany();
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} overtime`;
-  }
+    async findActual(q: SearchActualOvertimeDto) {
+        const qb = this.lr200.createQueryBuilder('lr200');
+        await applyDynamicFilters(qb, q, 'lr200');
+        return qb.getMany();
+    }
 
-  update(id: number, updateOvertimeDto: UpdateOvertimeDto) {
-    return `This action updates a #${id} overtime`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} overtime`;
-  }
-
-  async getOtByWorkdate(workdate: string) {
-    return await this.dataSource
-      .createQueryBuilder()
-      .select(['A.CYEAR2 AS CYEAR2, A.NRUNNO AS NRUNNO, A.EMPNO AS EMPNO',`TO_CHAR(A.WORKDATE,'DD-MM-YYYY') AS WORKDATE`,'A.TIMEIN AS TIMEIN', 'A.TIMEOUT AS TIMEOUT',
-         'A.WKTYPENO AS WKTYPENO' ,'B.CST AS CST','C.SNAME AS SNAME','C.SSEC AS SSEC','C.SDEPT AS SDEPT','C.SDIV AS SDIV',])
-      .from('OTFORM', 'A')
-      .innerJoin('FORM', 'B',`A.NFRMNO = B.NFRMNO AND A.VORGNO = B.VORGNO AND A.CYEAR = B.CYEAR AND A.CYEAR2 = B.CYEAR2 AND A.NRUNNO = B.NRUNNO`,)
-      .leftJoin('AMECUSERALL', 'C', 'A.EMPNO = C.SEMPNO')
-      .where(`(A.WORKDATE) = TO_DATE(:workdate,'DD-MM-YYYY')`, { workdate })
-      .andWhere('B.CST IN (1,2)')
-      .getRawMany();
-  }
-
-
+    async getOtByWorkdate(workdate: string) {
+        return await this.dataSource
+            .createQueryBuilder()
+            .select([
+                'A.CYEAR2 AS CYEAR2, A.NRUNNO AS NRUNNO, A.EMPNO AS EMPNO',
+                `TO_CHAR(A.WORKDATE,'DD-MM-YYYY') AS WORKDATE`,
+                'A.TIMEIN AS TIMEIN',
+                'A.TIMEOUT AS TIMEOUT',
+                'A.WKTYPENO AS WKTYPENO',
+                'B.CST AS CST',
+                'C.SNAME AS SNAME',
+                'C.SSEC AS SSEC',
+                'C.SDEPT AS SDEPT',
+                'C.SDIV AS SDIV',
+            ])
+            .from('OTFORM', 'A')
+            .innerJoin(
+                'FORM',
+                'B',
+                `A.NFRMNO = B.NFRMNO AND A.VORGNO = B.VORGNO AND A.CYEAR = B.CYEAR AND A.CYEAR2 = B.CYEAR2 AND A.NRUNNO = B.NRUNNO`,
+            )
+            .leftJoin('AMECUSERALL', 'C', 'A.EMPNO = C.SEMPNO')
+            .where(`(A.WORKDATE) = TO_DATE(:workdate,'DD-MM-YYYY')`, {
+                workdate,
+            })
+            .andWhere('B.CST IN (1,2)')
+            .getRawMany();
+    }
 }

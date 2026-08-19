@@ -32,4 +32,29 @@ export class DpmsPackingListController {
     search(@Body() dto: searchDpmsPackingListDto) {
         return this.service.getPackingList('search', dto);
     }
+
+    @Post('mar/current')
+    getMarketingCurrentTasks() {
+        return this.service.getPackingListMar('current');
+    }
+
+    @Post('mar/all')
+    getMarketingAllTasks() {
+        return this.service.getPackingListMar('all');
+    }
+
+    @Post('mar/finish')
+    getMarketingFinishTasks() {
+        return this.service.getPackingListMar('finish');
+    }
+
+    @Post('mar/inprogress')
+    getMarketingInProgressTasks() {
+        return this.service.getPackingListMar('inprogress');
+    }
+
+    @Get('mar/for-search')
+    getMarForSearch() {
+        return this.service.getForSearch('mar');
+    }
 }

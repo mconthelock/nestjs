@@ -76,14 +76,17 @@ export class ConectionService {
         }
     }
 
-    async runQuery(sql: string): Promise<any[]> {
+    async runQuery(
+        sql: string,
+        parameters: (string | number)[] = [],
+    ): Promise<any[]> {
         const maxRetries = 2;
         let lastError: any;
 
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 await this.ensureConnection();
-                const result = await this.connection.query(sql);
+                const result = await this.connection.query(sql, parameters);
                 return result;
             } catch (err) {
                 lastError = err;
@@ -115,6 +118,23 @@ export class ConectionService {
         }
 
         throw lastError;
+    }
+
+    async withTransaction<T>(
+        work: (connection: odbc.Connection) => Promise<T>,
+    ): Promise<T> {
+        const connection = await odbc.connect(this.getConnectionConfig());
+        try {
+            await connection.beginTransaction();
+            const result = await work(connection);
+            await connection.commit();
+            return result;
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            await connection.close();
+        }
     }
 
     async close() {

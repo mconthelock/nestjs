@@ -3,7 +3,7 @@ import { MfgEdrService } from './mfg-edr.service';
 import { CreateMfgEdrDto } from './dto/create-mfg-edr.dto';
 import { SearchCauseDto } from './dto/search-cause.dto';
 import { GetMfgEdrDto } from './dto/get-mfg-edr.dto';
-
+import { SearchMfgEdrReportDto } from './dto/search-mfg-edr-report.dto';
 
 @Controller('mfg-edr')
 export class MfgEdrController {
@@ -67,6 +67,13 @@ export class MfgEdrController {
   @Post('update-cause4m')
   async updateCause4M(@Body() dto: any) {
     return this.mfgEdrService.updateCause4M(dto);
+  }
+
+  @Post('report/search')
+  searchReport(
+    @Body() dto: SearchMfgEdrReportDto,
+  ) {
+    return this.mfgEdrService.searchReport(dto);
   }
 
 }

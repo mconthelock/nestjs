@@ -2,9 +2,9 @@ import { Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'TASKS_TAG', schema: 'DOCINV' })
 export class TasksTag {
-    @PrimaryColumn({ name: 'TASK_ID' })
+    @PrimaryColumn()
     TASK_ID: number;
 
-    @PrimaryColumn({ name: 'TAG_ID' })
+    @PrimaryColumn()
     TAG_ID: number;
 }

@@ -27,6 +27,19 @@ export class PrintedQueueService {
         private readonly label: PrintedTopLabelService,
     ) {}
 
+    private async markPdfJobFailed(fileId?: number) {
+        if (!fileId) {
+            return;
+        }
+
+        await this.repo.updateFiles({
+            FILES: fileId,
+            FILE_STATUS: 4,
+            PRINTED_DATE: null,
+            FILE_PRINTEDPAGE: 0,
+        });
+    }
+
     async runPdfProcessJob(body: filesData & PdfProcessContext, jobId: string) {
         return this.printed.runWithPdfContext(
             {
@@ -71,6 +84,10 @@ export class PrintedQueueService {
                         fileName: string;
                         filePath: string;
                         pageNumber: number;
+                        item: string;
+                        packing: string;
+                        process: string;
+                        drawing: string;
                         fileMfgNo: OrderInfo[] | null;
                     }[] = [];
 
@@ -189,6 +206,7 @@ export class PrintedQueueService {
                                 ? error.message
                                 : String(error),
                     });
+                    await this.markPdfJobFailed(body.fileid);
                     await this.printed.writeLog(
                         `[${jobId}] Background processing failed`,
                         error instanceof Error ? error.message : String(error),

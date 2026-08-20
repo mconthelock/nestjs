@@ -6,12 +6,14 @@ import { PDFDocument } from 'pdf-lib';
 import { PDFParse } from 'pdf-parse';
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { OrderInfo, PrintedService } from './printed.service';
+import { PrintedExtractService } from './printedExtract.service';
 
 @Injectable()
 export class PrintedMergeService {
     constructor(
         @Inject(forwardRef(() => PrintedService))
         private readonly printed: PrintedService,
+        private readonly extract: PrintedExtractService,
     ) {}
 
     async splitFiles(
@@ -22,6 +24,10 @@ export class PrintedMergeService {
             fileName: string;
             filePath: string;
             pageNumber: number;
+            item: string;
+            packing: string;
+            process: string;
+            drawing: string;
             fileMfgNo: OrderInfo[] | null;
         }[],
     ) {
@@ -40,7 +46,12 @@ export class PrintedMergeService {
                 const textContent = parsedData.text;
                 const tagData = textContent.split('\n');
                 const tagNo = tagData[0].substring(0, 12).replace(/\s/g, '');
-                const orderEntries = this.extractOrderEntries(textContent);
+                const mfgno = this.extract.extractOrderEntries(textContent);
+                const itemno =
+                    this.extract.extractItemPackingEntries(textContent);
+                const process =
+                    this.extract.extractProcessListEntries(textContent);
+                const dwgno = this.extract.extractDrawingEntries(textContent);
                 const newFileName = `${tagNo}.pdf`;
                 const outputPath = path.join(outputDirectory, newFileName);
                 await fs.writeFile(outputPath, singlePageBytes);
@@ -48,7 +59,11 @@ export class PrintedMergeService {
                     fileName: tagNo,
                     filePath: outputPath,
                     pageNumber: i,
-                    fileMfgNo: orderEntries,
+                    item: itemno.item,
+                    packing: itemno.itemPacking,
+                    process: process,
+                    drawing: dwgno,
+                    fileMfgNo: mfgno,
                 });
             } finally {
                 await parser.destroy();
@@ -125,21 +140,5 @@ export class PrintedMergeService {
         });
 
         return compressedPath;
-    }
-
-    private extractOrderEntries(
-        text: string,
-    ): Array<{ orderNo: string; qty: number }> {
-        const normalizedText = text.replace(/\r/g, '').replace(/\u00a0/g, ' ');
-        const matches = [
-            ...normalizedText.matchAll(
-                /(?<![A-Z0-9])([A-Z0-9]{9})\s+(\d+)(?![A-Z0-9])/g,
-            ),
-        ];
-
-        return matches.map(([, orderNo, qty]) => ({
-            orderNo,
-            qty: Number(qty),
-        }));
     }
 }

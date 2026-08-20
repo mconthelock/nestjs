@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Tasks } from './TASKS.entity';
 
 @Entity({ name: 'TAGS', schema: 'DOCINV' })
 export class Tags {
@@ -10,4 +11,7 @@ export class Tags {
 
     @Column()
     TAG_STYLE: string;
+
+    @ManyToMany(() => Tasks, (task) => task.tags)
+    tasks: Tasks[];
 }

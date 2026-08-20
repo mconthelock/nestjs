@@ -36,7 +36,7 @@ export class Tasks {
     @Column({ default: () => 'CURRENT_TIMESTAMP' })
     UPDATED_AT: Date;
 
-    @ManyToMany(() => Tags, (tag) => tag.TAG_ID, { cascade: true })
+    @ManyToMany(() => Tags, (tag) => tag.tasks, { cascade: true })
     @JoinTable({
         name: 'TASKS_TAG',
         schema: 'DOCINV',

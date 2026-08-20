@@ -61,23 +61,24 @@ export class CreatePurTrackingDto {
   COMMENT_PUR?: string;
   
   @IsOptional()
-  @IsString()
-  NEXT_REPLY?: string;
+  @IsDate()
+  @Type(() => Date)
+  NEXT_REPLY?: Date; //NEXT_REPLY
 
   @IsOptional()
   @IsString()
-  CAUSE_OF?: string;
+  CAUSE_OF?: string; //CAUSE_OF
 
   @IsString()
   @IsOptional()
-  REMARK?: string;
+  REMARK?: string; //REMARK
 
   @IsDate()
   @IsOptional()
   @Type(() => Date)
-  UPDATE_DATE?: Date;
+  UPDATE_DATE?: Date; //UPDATE_DATE
 
   @IsString()
   @IsOptional()
-  USER_UPDATE?: string;
+  USER_UPDATE?: string; //USER_UPDATE
 }

@@ -1,18 +1,12 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 
-export interface ProcessListInfo {
-    processCode: string;
-    lineText: string;
-}
-
 export interface ItemPackingInfo {
     item: string;
     itemPacking: string;
-    lineText: string;
 }
 
 @Injectable()
-export class PrintedExtract {
+export class PrintedExtractService {
     extractOrderEntries(text: string): Array<{ orderNo: string; qty: number }> {
         const normalizedText = text.replace(/\r/g, '').replace(/\u00a0/g, ' ');
         const matches = [
@@ -27,7 +21,7 @@ export class PrintedExtract {
         }));
     }
 
-    extractItemPackingEntries(text: string): ItemPackingInfo[] {
+    extractItemPackingEntries(text: string) {
         return text
             .replace(/\r/g, '')
             .split('\n')
@@ -46,7 +40,7 @@ export class PrintedExtract {
                 }
 
                 const [, item, itemPacking] = match;
-                return [{ item, itemPacking, lineText }];
+                return { item, itemPacking };
             });
     }
 
@@ -58,8 +52,6 @@ export class PrintedExtract {
             .filter(Boolean);
 
         const orderLinePattern = /^(?:[A-Z0-9]{9}\s+\d+\s*)+$/;
-        const processCodePattern = /^[A-Z0-9]{6}$/;
-
         const firstOrderLineIndex = normalizedLines.findIndex((line) =>
             orderLinePattern.test(line),
         );
@@ -74,33 +66,40 @@ export class PrintedExtract {
                 processStartIndex += 1;
             }
         }
-
-        const processEntries: ProcessListInfo[] = [];
-        // for (
-        //     let index = processStartIndex;
-        //     index < normalizedLines.length;
-        //     index += 1
-        // ) {
         const lineText = normalizedLines[processStartIndex];
-        const processCodes = lineText.split(/\s+/).filter(Boolean);
-
-        // if (
-        //     processCodes.length === 0 || !processCodes.every((code) => processCodePattern.test(code))
-        // ) {
-        //     if (processEntries.length > 0) {
-        //         break;
-        //     }
-        //     continue;
-        // }
-
-        // processEntries.push(
-        //     ...processCodes.map((processCode) => ({
-        //         processCode,
-        //         lineText,
-        //     })),
-        // );
-        // }
-
         return lineText;
+    }
+
+    extractDrawingEntries(text: string) {
+        const normalizedLines = text
+            .replace(/\r/g, '')
+            .split('\n')
+            .map((line) => line.replace(/\u00a0/g, ' ').trim())
+            .filter(Boolean);
+
+        const itemPattern =
+            /[A-Z0-9]{9}\s+G\d{2}\s+(\d{3})\s+(\d{5})\s+[A-Z0-9]+$/;
+
+        const firstItemLineIndex = normalizedLines.findIndex((line) =>
+            itemPattern.test(line),
+        );
+
+        let dwgStartIndex = 0;
+        if (firstItemLineIndex >= 0) {
+            dwgStartIndex = firstItemLineIndex;
+            while (
+                dwgStartIndex < normalizedLines.length &&
+                itemPattern.test(normalizedLines[dwgStartIndex])
+            ) {
+                dwgStartIndex += 1;
+            }
+        }
+
+        const regex =
+            /\b(?![A-Z]+\b)[A-Z0-9]{5,9}(?:\s?[G\-]\d+)?(?:\sL\d+)?\b/i;
+        const lineText = normalizedLines[dwgStartIndex];
+        const match = lineText.match(regex);
+        const extractedDrawing = match ? match[0] : null;
+        return extractedDrawing;
     }
 }

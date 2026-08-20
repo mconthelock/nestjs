@@ -8,9 +8,9 @@ import { PDFDocument } from 'pdf-lib';
 import { moveFileFromMulter } from 'src/common/utils/files.utils';
 import { FileLoggerService } from 'src/common/services/file-logger/file-logger.service';
 import { PrintedQueueService } from './PrintedQueue.service';
-import { PrintedMergeService } from './printedMerge.service';
 import { IdTagRepository } from './idtag.repository';
 import { SearchIdtagFilesDto } from './dto/search-idtag-file.dto';
+import { PrintedExtractService } from './printedExtract.service';
 
 export interface PdfProcessContext {
     logFileName: string;
@@ -77,11 +77,11 @@ export class PrintedService {
     private readonly pendingPdfJobs: Array<() => Promise<void>> = [];
 
     constructor(
-        private readonly fileLogger: FileLoggerService,
-        private readonly repo: IdTagRepository,
         @Inject(forwardRef(() => PrintedQueueService))
         private readonly queue: PrintedQueueService,
-        private readonly merge: PrintedMergeService,
+        private readonly extract: PrintedExtractService,
+        private readonly fileLogger: FileLoggerService,
+        private readonly repo: IdTagRepository,
     ) {}
 
     async setPdfPath(data): Promise<PdfProcessContext> {
@@ -130,146 +130,146 @@ export class PrintedService {
         return `${ms} ms`;
     }
 
-    private extractOrderEntries(
-        text: string,
-    ): Array<{ orderNo: string; qty: number }> {
-        const normalizedText = text.replace(/\r/g, '').replace(/\u00a0/g, ' ');
-        const matches = [
-            ...normalizedText.matchAll(
-                /(?<![A-Z0-9])([A-Z0-9]{9})\s+(\d+)(?![A-Z0-9])/g,
-            ),
-        ];
+    // private extractOrderEntries(
+    //     text: string,
+    // ): Array<{ orderNo: string; qty: number }> {
+    //     const normalizedText = text.replace(/\r/g, '').replace(/\u00a0/g, ' ');
+    //     const matches = [
+    //         ...normalizedText.matchAll(
+    //             /(?<![A-Z0-9])([A-Z0-9]{9})\s+(\d+)(?![A-Z0-9])/g,
+    //         ),
+    //     ];
 
-        return matches.map(([, orderNo, qty]) => ({
-            orderNo,
-            qty: Number(qty),
-        }));
-    }
+    //     return matches.map(([, orderNo, qty]) => ({
+    //         orderNo,
+    //         qty: Number(qty),
+    //     }));
+    // }
 
-    private extractItemPackingEntries(text: string): ItemPackingInfo[] {
-        return text
-            .replace(/\r/g, '')
-            .split('\n')
-            .map((line) => line.replace(/\u00a0/g, ' ').trim())
-            .flatMap((lineText) => {
-                if (!lineText) {
-                    return [];
-                }
+    // private extractItemPackingEntries(text: string): ItemPackingInfo[] {
+    //     return text
+    //         .replace(/\r/g, '')
+    //         .split('\n')
+    //         .map((line) => line.replace(/\u00a0/g, ' ').trim())
+    //         .flatMap((lineText) => {
+    //             if (!lineText) {
+    //                 return [];
+    //             }
 
-                const match = lineText.match(
-                    /[A-Z0-9]{9}\s+G\d{2}\s+(\d{3})\s+(\d{5})\s+[A-Z0-9]+$/,
-                );
+    //             const match = lineText.match(
+    //                 /[A-Z0-9]{9}\s+G\d{2}\s+(\d{3})\s+(\d{5})\s+[A-Z0-9]+$/,
+    //             );
 
-                if (!match) {
-                    return [];
-                }
+    //             if (!match) {
+    //                 return [];
+    //             }
 
-                const [, item, itemPacking] = match;
-                return [{ item, itemPacking, lineText }];
-            });
-    }
+    //             const [, item, itemPacking] = match;
+    //             return [{ item, itemPacking, lineText }];
+    //         });
+    // }
 
-    private extractDrawing(text: string) {
-        const normalizedLines = text
-            .replace(/\r/g, '')
-            .split('\n')
-            .map((line) => line.replace(/\u00a0/g, ' ').trim())
-            .filter(Boolean);
+    // private extractDrawing(text: string) {
+    //     const normalizedLines = text
+    //         .replace(/\r/g, '')
+    //         .split('\n')
+    //         .map((line) => line.replace(/\u00a0/g, ' ').trim())
+    //         .filter(Boolean);
 
-        const itemPattern =
-            /[A-Z0-9]{9}\s+G\d{2}\s+(\d{3})\s+(\d{5})\s+[A-Z0-9]+$/;
+    //     const itemPattern =
+    //         /[A-Z0-9]{9}\s+G\d{2}\s+(\d{3})\s+(\d{5})\s+[A-Z0-9]+$/;
 
-        const firstItemLineIndex = normalizedLines.findIndex((line) =>
-            itemPattern.test(line),
-        );
+    //     const firstItemLineIndex = normalizedLines.findIndex((line) =>
+    //         itemPattern.test(line),
+    //     );
 
-        let dwgStartIndex = 0;
-        if (firstItemLineIndex >= 0) {
-            dwgStartIndex = firstItemLineIndex;
-            while (
-                dwgStartIndex < normalizedLines.length &&
-                itemPattern.test(normalizedLines[dwgStartIndex])
-            ) {
-                dwgStartIndex += 1;
-            }
-        }
-        const lineText = normalizedLines[dwgStartIndex];
+    //     let dwgStartIndex = 0;
+    //     if (firstItemLineIndex >= 0) {
+    //         dwgStartIndex = firstItemLineIndex;
+    //         while (
+    //             dwgStartIndex < normalizedLines.length &&
+    //             itemPattern.test(normalizedLines[dwgStartIndex])
+    //         ) {
+    //             dwgStartIndex += 1;
+    //         }
+    //     }
+    //     const lineText = normalizedLines[dwgStartIndex];
 
-        // return text
-        //     .replace(/\r/g, '')
-        //     .split('\n')
-        //     .map((line) => line.replace(/\u00a0/g, ' ').trim())
-        //     .flatMap((lineText) => {
-        //         if (!lineText) {
-        //             return [];
-        //         }
+    //     // return text
+    //     //     .replace(/\r/g, '')
+    //     //     .split('\n')
+    //     //     .map((line) => line.replace(/\u00a0/g, ' ').trim())
+    //     //     .flatMap((lineText) => {
+    //     //         if (!lineText) {
+    //     //             return [];
+    //     //         }
 
-        //         const match = lineText.match(
-        //             /[A-Z0-9]{9}\s+G\d{2}\s+(\d{3})\s+(\d{5})\s+[A-Z0-9]+$/,
-        //         );
+    //     //         const match = lineText.match(
+    //     //             /[A-Z0-9]{9}\s+G\d{2}\s+(\d{3})\s+(\d{5})\s+[A-Z0-9]+$/,
+    //     //         );
 
-        //         if (!match) {
-        //             return [];
-        //         }
+    //     //         if (!match) {
+    //     //             return [];
+    //     //         }
 
-        //         const [, item, itemPacking] = match;
-        //         return [{ item, itemPacking, lineText }];
-        //     });
-    }
+    //     //         const [, item, itemPacking] = match;
+    //     //         return [{ item, itemPacking, lineText }];
+    //     //     });
+    // }
 
-    private extractProcessListEntries(text: string): ProcessListInfo[] {
-        const normalizedLines = text
-            .replace(/\r/g, '')
-            .split('\n')
-            .map((line) => line.replace(/\u00a0/g, ' ').trim())
-            .filter(Boolean);
+    // private extractProcessListEntries(text: string): ProcessListInfo[] {
+    //     const normalizedLines = text
+    //         .replace(/\r/g, '')
+    //         .split('\n')
+    //         .map((line) => line.replace(/\u00a0/g, ' ').trim())
+    //         .filter(Boolean);
 
-        const orderLinePattern = /^(?:[A-Z0-9]{9}\s+\d+\s*)+$/;
-        const processCodePattern = /^[A-Z0-9]{6}$/;
+    //     const orderLinePattern = /^(?:[A-Z0-9]{9}\s+\d+\s*)+$/;
+    //     const processCodePattern = /^[A-Z0-9]{6}$/;
 
-        const firstOrderLineIndex = normalizedLines.findIndex((line) =>
-            orderLinePattern.test(line),
-        );
+    //     const firstOrderLineIndex = normalizedLines.findIndex((line) =>
+    //         orderLinePattern.test(line),
+    //     );
 
-        let processStartIndex = 0;
-        if (firstOrderLineIndex >= 0) {
-            processStartIndex = firstOrderLineIndex;
-            while (
-                processStartIndex < normalizedLines.length &&
-                orderLinePattern.test(normalizedLines[processStartIndex])
-            ) {
-                processStartIndex += 1;
-            }
-        }
+    //     let processStartIndex = 0;
+    //     if (firstOrderLineIndex >= 0) {
+    //         processStartIndex = firstOrderLineIndex;
+    //         while (
+    //             processStartIndex < normalizedLines.length &&
+    //             orderLinePattern.test(normalizedLines[processStartIndex])
+    //         ) {
+    //             processStartIndex += 1;
+    //         }
+    //     }
 
-        const processEntries: ProcessListInfo[] = [];
-        // for (
-        //     let index = processStartIndex;
-        //     index < normalizedLines.length;
-        //     index += 1
-        // ) {
-        const lineText = normalizedLines[processStartIndex];
-        const processCodes = lineText.split(/\s+/).filter(Boolean);
+    //     const processEntries: ProcessListInfo[] = [];
+    //     // for (
+    //     //     let index = processStartIndex;
+    //     //     index < normalizedLines.length;
+    //     //     index += 1
+    //     // ) {
+    //     const lineText = normalizedLines[processStartIndex];
+    //     const processCodes = lineText.split(/\s+/).filter(Boolean);
 
-        // if (
-        //     processCodes.length === 0 ||!processCodes.every((code) => processCodePattern.test(code))
-        // ) {
-        //     if (processEntries.length > 0) {
-        //         break;
-        //     }
-        //     continue;
-        // }
+    //     // if (
+    //     //     processCodes.length === 0 ||!processCodes.every((code) => processCodePattern.test(code))
+    //     // ) {
+    //     //     if (processEntries.length > 0) {
+    //     //         break;
+    //     //     }
+    //     //     continue;
+    //     // }
 
-        processEntries.push(
-            ...processCodes.map((processCode) => ({
-                processCode,
-                lineText,
-            })),
-        );
-        // }
+    //     processEntries.push(
+    //         ...processCodes.map((processCode) => ({
+    //             processCode,
+    //             lineText,
+    //         })),
+    //     );
+    //     // }
 
-        return processEntries;
-    }
+    //     return processEntries;
+    // }
 
     private resolveMaxParallelPdfJobs(raw?: string): number {
         const fallback = 3;
@@ -585,17 +585,22 @@ export class PrintedService {
                     parsedData = await parser.getText();
                     const textContent = parsedData.text;
                     const tagData = textContent.split('\n');
-                    console.log(tagData);
-
-                    // const orderEntries = this.extractOrderEntries(textContent);
-                    // const itemPackingEntries =
-                    //     this.extractItemPackingEntries(textContent);
-                    const processListEntries =
-                        this.extractProcessListEntries(textContent);
+                    const tagNo = tagData[0]
+                        .substring(0, 12)
+                        .replace(/\s/g, '');
+                    const mfgno = this.extract.extractOrderEntries(textContent);
+                    const itemno =
+                        this.extract.extractItemPackingEntries(textContent);
+                    const process =
+                        this.extract.extractProcessListEntries(textContent);
+                    const dwgno =
+                        this.extract.extractDrawingEntries(textContent);
                     console.log({
-                        // orderEntries,
-                        // itemPackingEntries,
-                        processListEntries,
+                        tagNo,
+                        mfgno,
+                        itemno,
+                        process,
+                        dwgno,
                     });
                 } finally {
                     await parser.destroy();

@@ -169,6 +169,54 @@ export class PrintedService {
             });
     }
 
+    private extractDrawing(text: string) {
+        const normalizedLines = text
+            .replace(/\r/g, '')
+            .split('\n')
+            .map((line) => line.replace(/\u00a0/g, ' ').trim())
+            .filter(Boolean);
+
+        const itemPattern =
+            /[A-Z0-9]{9}\s+G\d{2}\s+(\d{3})\s+(\d{5})\s+[A-Z0-9]+$/;
+
+        const firstItemLineIndex = normalizedLines.findIndex((line) =>
+            itemPattern.test(line),
+        );
+
+        let dwgStartIndex = 0;
+        if (firstItemLineIndex >= 0) {
+            dwgStartIndex = firstItemLineIndex;
+            while (
+                dwgStartIndex < normalizedLines.length &&
+                itemPattern.test(normalizedLines[dwgStartIndex])
+            ) {
+                dwgStartIndex += 1;
+            }
+        }
+        const lineText = normalizedLines[dwgStartIndex];
+
+        // return text
+        //     .replace(/\r/g, '')
+        //     .split('\n')
+        //     .map((line) => line.replace(/\u00a0/g, ' ').trim())
+        //     .flatMap((lineText) => {
+        //         if (!lineText) {
+        //             return [];
+        //         }
+
+        //         const match = lineText.match(
+        //             /[A-Z0-9]{9}\s+G\d{2}\s+(\d{3})\s+(\d{5})\s+[A-Z0-9]+$/,
+        //         );
+
+        //         if (!match) {
+        //             return [];
+        //         }
+
+        //         const [, item, itemPacking] = match;
+        //         return [{ item, itemPacking, lineText }];
+        //     });
+    }
+
     private extractProcessListEntries(text: string): ProcessListInfo[] {
         const normalizedLines = text
             .replace(/\r/g, '')
@@ -195,31 +243,30 @@ export class PrintedService {
         }
 
         const processEntries: ProcessListInfo[] = [];
-        for (
-            let index = processStartIndex;
-            index < normalizedLines.length;
-            index += 1
-        ) {
-            const lineText = normalizedLines[index];
-            const processCodes = lineText.split(/\s+/).filter(Boolean);
+        // for (
+        //     let index = processStartIndex;
+        //     index < normalizedLines.length;
+        //     index += 1
+        // ) {
+        const lineText = normalizedLines[processStartIndex];
+        const processCodes = lineText.split(/\s+/).filter(Boolean);
 
-            if (
-                processCodes.length === 0 ||
-                !processCodes.every((code) => processCodePattern.test(code))
-            ) {
-                if (processEntries.length > 0) {
-                    break;
-                }
-                continue;
-            }
+        // if (
+        //     processCodes.length === 0 ||!processCodes.every((code) => processCodePattern.test(code))
+        // ) {
+        //     if (processEntries.length > 0) {
+        //         break;
+        //     }
+        //     continue;
+        // }
 
-            processEntries.push(
-                ...processCodes.map((processCode) => ({
-                    processCode,
-                    lineText,
-                })),
-            );
-        }
+        processEntries.push(
+            ...processCodes.map((processCode) => ({
+                processCode,
+                lineText,
+            })),
+        );
+        // }
 
         return processEntries;
     }
@@ -543,13 +590,13 @@ export class PrintedService {
                     // const orderEntries = this.extractOrderEntries(textContent);
                     // const itemPackingEntries =
                     //     this.extractItemPackingEntries(textContent);
-                    // const processListEntries =
-                    //     this.extractProcessListEntries(textContent);
-                    // console.log({
-                    //     orderEntries,
-                    //     itemPackingEntries,
-                    //     processListEntries,
-                    // });
+                    const processListEntries =
+                        this.extractProcessListEntries(textContent);
+                    console.log({
+                        // orderEntries,
+                        // itemPackingEntries,
+                        processListEntries,
+                    });
                 } finally {
                     await parser.destroy();
                 }

@@ -69,10 +69,6 @@ export class PrintedTopLabelService {
                     text += 'MET EARTHQUAKE ';
                 }
 
-                if (row.URGETNT > 0) {
-                    text += 'URGENT ';
-                }
-
                 if (text === '') {
                     await this.printed.writeLog(
                         `No label text to apply for ${row.PAGE_TAG}`,

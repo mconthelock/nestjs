@@ -21,29 +21,6 @@ export class PrintedExtractService {
         }));
     }
 
-    extractItemPackingEntries(text: string) {
-        return text
-            .replace(/\r/g, '')
-            .split('\n')
-            .map((line) => line.replace(/\u00a0/g, ' ').trim())
-            .flatMap((lineText) => {
-                if (!lineText) {
-                    return [];
-                }
-
-                const match = lineText.match(
-                    /[A-Z0-9]{9}\s+G\d{2}\s+(\d{3})\s+(\d{5})\s+[A-Z0-9]+$/,
-                );
-
-                if (!match) {
-                    return [];
-                }
-
-                const [, item, itemPacking] = match;
-                return { item, itemPacking };
-            });
-    }
-
     extractProcessListEntries(text: string) {
         const normalizedLines = text
             .replace(/\r/g, '')
@@ -70,6 +47,30 @@ export class PrintedExtractService {
         return lineText;
     }
 
+    extractItemPackingEntries(text: string) {
+        const normalizedLines = text
+            .replace(/\r/g, '')
+            .split('\n')
+            .map((line) => line.replace(/\u00a0/g, ' ').trim())
+            .filter(Boolean);
+
+        const line = normalizedLines[3];
+        if (!line) {
+            return { item: '', itemPacking: '' };
+        }
+
+        const match = line.match(
+            /(?<![A-Z0-9])([A-Z0-9]{5,9})\s+(?:G|-)?\d{2}\s+(?:[A-Z])?\s*(\d{3})\s+((?:\d{5}|[A-Z0-9*]{2,6}|\d{3}[A-Z0-9]{2}))(?![A-Z0-9])/i,
+        );
+
+        if (!match) {
+            return { item: '', itemPacking: '', line };
+        }
+
+        const [, , item, itemPacking] = match;
+        return { item, itemPacking };
+    }
+
     extractDrawingEntries(text: string) {
         const normalizedLines = text
             .replace(/\r/g, '')
@@ -77,28 +78,14 @@ export class PrintedExtractService {
             .map((line) => line.replace(/\u00a0/g, ' ').trim())
             .filter(Boolean);
 
-        const itemPattern =
-            /[A-Z0-9]{9}\s+G\d{2}\s+(\d{3})\s+(\d{5})\s+[A-Z0-9]+$/;
-
-        const firstItemLineIndex = normalizedLines.findIndex((line) =>
-            itemPattern.test(line),
-        );
-
-        let dwgStartIndex = 0;
-        if (firstItemLineIndex >= 0) {
-            dwgStartIndex = firstItemLineIndex;
-            while (
-                dwgStartIndex < normalizedLines.length &&
-                itemPattern.test(normalizedLines[dwgStartIndex])
-            ) {
-                dwgStartIndex += 1;
-            }
+        const line = normalizedLines[4];
+        if (!line) {
+            return '';
         }
 
         const regex =
             /\b(?![A-Z]+\b)[A-Z0-9]{5,9}(?:\s?[G\-]\d+)?(?:\sL\d+)?\b/i;
-        const lineText = normalizedLines[dwgStartIndex];
-        const match = lineText.match(regex);
+        const match = line.match(regex);
         const extractedDrawing = match ? match[0] : null;
         return extractedDrawing;
     }

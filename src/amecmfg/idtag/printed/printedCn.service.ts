@@ -65,23 +65,24 @@ export class PrintedCnService {
         }
 
         for (const data of cnData) {
-            const pdfPath = path.join(
-                runtimeContext.pdfDirectory,
-                `${data.PAGE_TAG}.pdf`,
-            );
-            console.log(pdfPath);
-
+            // console.log(pdfPath);
             try {
-                await this.embedCNToPdf(pdfPath, {
-                    cnno: data.DOCNO,
-                    sendto: data.SENTTO,
-                    senddate: data.PRDCTNAME,
-                });
-                await this.printed.writeLog(
-                    `Put CN No. ${data.DOCNO} to ${data.PAGE_TAG}`,
-                    undefined,
-                    runtimeContext.logFileName,
+                const pdfPath = path.join(
+                    runtimeContext.pdfDirectory,
+                    `${data.PAGE_TAG}.pdf`,
                 );
+                if (data.DOCNO != null) {
+                    await this.embedCNToPdf(pdfPath, {
+                        cnno: data.DOCNO,
+                        sendto: data.SENTTO,
+                        senddate: data.PRDCTNAME,
+                    });
+                    await this.printed.writeLog(
+                        `Put CN No. ${data.DOCNO} to ${data.PAGE_TAG}`,
+                        undefined,
+                        runtimeContext.logFileName,
+                    );
+                }
             } catch (error) {
                 await this.printed.writeLog(
                     `Error processing CN Data for tag ${data.PAGE_TAG}`,

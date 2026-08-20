@@ -37,18 +37,22 @@ INV_NO?: string;
 @Column({ nullable: true })
 COMMENT_PUR?: string;
 
-@Column({ nullable: true })
-NEXT_REPLY?: string;
+@Column({ type: 'date', nullable: true })
+NEXT_REPLY?: Date;
 
 @Column({ nullable: true })
 CAUSE_OF?: string;
 
 @Column({ nullable: true })
 REMARK?: string;
-// --- ให้ TypeORM จัดการเวลาแก้ไขให้โดยอัตโนมัติ ---
-@UpdateDateColumn({ type: 'timestamp', nullable: true })
+
+//ลงข้อมูลวันที่ update ล่าสุด เก็๋บวันที่และเวลา update ล่าสุด
+@UpdateDateColumn({
+    type: 'timestamp',
+})
 UPDATE_DATE?: Date;
 
 @Column({ nullable: true })
 USER_UPDATE?: string;
+
 }

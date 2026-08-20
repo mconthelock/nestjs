@@ -86,4 +86,40 @@ export class VW_SHORTAGE_REPORT {
 
   @ViewColumn()
   ETA: Date;
+
+  @ViewColumn()
+  SHIP_MODE: string;
+
+  @ViewColumn()
+  ARV_AMEC: Date;
+
+  @ViewColumn()
+  ARV_QTY: number;
+
+  @ViewColumn()
+  INV_NO: string;
+  //COMMENT
+  @ViewColumn()
+  COMMENT_PUR: string;
+  
+  //NEXT_REPLY
+  @ViewColumn()
+  NEXT_REPLY: Date;
+  
+  //CAUSE_OF
+  @ViewColumn()
+  CAUSE_OF: string;
+  
+  //REMARK
+  @ViewColumn()
+  REMARK: string;
+
+  //UPDATE DATE
+  @ViewColumn()
+  UPDATE_DATE: Date;
+  
+  //USER UPDATE
+  @ViewColumn()
+  USER_UPDATE: string;
+
 }

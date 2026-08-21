@@ -12,6 +12,7 @@ import { StyItemsModule } from './sty-items/sty-items.module';
 import { StyPatrolInspectionModule } from './sty-patrol-inspection/sty-patrol-inspection.module';
 import { StinpFormModule } from './stinp-form/stinp-form.module';
 import { StinpFormListModule } from './stinp-form-list/stinp-form-list.module';
+import { ExpatModule } from './expat/expat.module';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { StinpFormListModule } from './stinp-form-list/stinp-form-list.module';
         StyPatrolInspectionModule,
         StinpFormModule,
         StinpFormListModule,
+        ExpatModule,
     ],
 })
 export class gpreportModule {}

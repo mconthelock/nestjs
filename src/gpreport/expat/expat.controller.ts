@@ -120,10 +120,7 @@ export class ExpatController {
     }
 
     @Post('employee/:sempno/files')
-    createEmployeeFile(
-        @Param('sempno') sempno: string,
-        @Body() dto: CreateExpatEmployeeFileDto,
-    ) {
+    createEmployeeFile(@Param('sempno') sempno: string, @Body() dto: CreateExpatEmployeeFileDto,) {
         return this.expatService.createEmployeeFile(
             sempno,
             dto,
@@ -136,27 +133,12 @@ export class ExpatController {
         @Param('fileType') fileType: string,
         @Param('fileId', ParseIntPipe) fileId: number,
     ) {
-        return this.expatService.deleteEmployeeFile(
-            sempno,
-            fileType,
-            fileId,
-        );
+        return this.expatService.deleteEmployeeFile(sempno,fileType,fileId,);
     }
 
-
-    // =====================================================
-    // FAMILY FILE
-    // =====================================================
-
     @Get('employee/:sempno/family/:fid/files')
-    findFamilyFiles(
-        @Param('sempno') sempno: string,
-        @Param('fid', ParseIntPipe) fid: number,
-    ) {
-        return this.expatService.findFamilyFiles(
-            sempno,
-            fid,
-        );
+    findFamilyFiles(@Param('sempno') sempno: string,@Param('fid', ParseIntPipe) fid: number,) {
+        return this.expatService.findFamilyFiles(sempno,fid,);
     }
 
     @Post('employee/:sempno/family/:fid/files')
@@ -167,9 +149,7 @@ export class ExpatController {
     ) {
         return this.expatService.createFamilyFile(
             sempno,
-            fid,
-            dto,
-        );
+            fid,dto,);
     }
 
     @Delete(
@@ -187,5 +167,12 @@ export class ExpatController {
             fileType,
             fileId,
         );
+    }
+
+    @Get('employee-master/:sempno')
+    findAmecEmployee(
+        @Param('sempno') sempno: string,
+    ) {
+        return this.expatService.findAmecEmployee(sempno);
     }
 }

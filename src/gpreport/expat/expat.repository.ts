@@ -4,6 +4,9 @@ import { DataSource } from 'typeorm';
 
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { ExpatEmployee } from 'src/common/Entities/gpreport/table/expat_employee.entity';
+import { ExpatFamily } from 'src/common/Entities/gpreport/table/expat_family.entity';
+import { ExpatEmployeeFile } from 'src/common/Entities/gpreport/table/expat_employee_file.entity';
+import { ExpatFamilyFile } from 'src/common/Entities/gpreport/table/expat_family_file.entity';
 
 @Injectable()
 export class ExpatRepository extends BaseRepository {
@@ -140,5 +143,177 @@ export class ExpatRepository extends BaseRepository {
         );
 
         return this.findOneEmployee(sempno);
+    }
+
+    // =====================================================
+    // FAMILY
+    // =====================================================
+
+    findFamily(sempno: string) {
+        return this.getRepository(ExpatFamily).find({
+            where: {
+                SEMPNO: sempno,
+            },
+            order: {
+                FID: 'ASC',
+            },
+        });
+    }
+
+    findOneFamily(sempno: string, fid: number) {
+        return this.getRepository(ExpatFamily).findOne({
+            where: {
+                SEMPNO: sempno,
+                FID: fid,
+            },
+        });
+    }
+
+    async getNextFamilyId(sempno: string) {
+        const result = await this.getRepository(ExpatFamily)
+            .createQueryBuilder('F')
+            .select('NVL(MAX(F.FID), 0) + 1', 'FID')
+            .where('F.SEMPNO = :sempno', { sempno })
+            .getRawOne();
+
+        return Number(result.FID);
+    }
+
+    createFamily(data: Partial<ExpatFamily>) {
+        const repository = this.getRepository(ExpatFamily);
+        const family = repository.create(data);
+
+        return repository.save(family);
+    }
+
+    async updateFamily(
+        sempno: string,
+        fid: number,
+        data: Partial<ExpatFamily>,
+    ) {
+        await this.getRepository(ExpatFamily).update(
+            {
+                SEMPNO: sempno,
+                FID: fid,
+            },
+            data,
+        );
+
+        return this.findOneFamily(sempno, fid);
+    }
+
+    deleteFamily(sempno: string, fid: number) {
+        return this.getRepository(ExpatFamily).delete({
+            SEMPNO: sempno,
+            FID: fid,
+        });
+    }
+
+
+    // =====================================================
+    // EMPLOYEE FILE
+    // =====================================================
+
+    findEmployeeFiles(sempno: string) {
+        return this.getRepository(ExpatEmployeeFile).find({
+            where: {
+                SEMPNO: sempno,
+            },
+            order: {
+                FILE_TYPE: 'ASC',
+                FILE_ID: 'ASC',
+            },
+        });
+    }
+
+    async getNextEmployeeFileId(
+        sempno: string,
+        fileType: string,
+    ) {
+        const result = await this.getRepository(ExpatEmployeeFile)
+            .createQueryBuilder('F')
+            .select('NVL(MAX(F.FILE_ID), 0) + 1', 'FILE_ID')
+            .where('F.SEMPNO = :sempno', { sempno })
+            .andWhere('F.FILE_TYPE = :fileType', { fileType })
+            .getRawOne();
+
+        return Number(result.FILE_ID);
+    }
+
+    createEmployeeFile(data: Partial<ExpatEmployeeFile>) {
+        const repository = this.getRepository(ExpatEmployeeFile);
+        const file = repository.create(data);
+
+        return repository.save(file);
+    }
+
+    deleteEmployeeFile(
+        sempno: string,
+        fileType: string,
+        fileId: number,
+    ) {
+        return this.getRepository(ExpatEmployeeFile).delete({
+            SEMPNO: sempno,
+            FILE_TYPE: fileType,
+            FILE_ID: fileId,
+        });
+    }
+
+
+    // =====================================================
+    // FAMILY FILE
+    // =====================================================
+
+    findFamilyFiles(
+        sempno: string,
+        fid: number,
+    ) {
+        return this.getRepository(ExpatFamilyFile).find({
+            where: {
+                SEMPNO: sempno,
+                FID: fid,
+            },
+            order: {
+                FILE_TYPE: 'ASC',
+                FILE_ID: 'ASC',
+            },
+        });
+    }
+
+    async getNextFamilyFileId(
+        sempno: string,
+        fid: number,
+        fileType: string,
+    ) {
+        const result = await this.getRepository(ExpatFamilyFile)
+            .createQueryBuilder('F')
+            .select('NVL(MAX(F.FILE_ID), 0) + 1', 'FILE_ID')
+            .where('F.SEMPNO = :sempno', { sempno })
+            .andWhere('F.FID = :fid', { fid })
+            .andWhere('F.FILE_TYPE = :fileType', { fileType })
+            .getRawOne();
+
+        return Number(result.FILE_ID);
+    }
+
+    createFamilyFile(data: Partial<ExpatFamilyFile>) {
+        const repository = this.getRepository(ExpatFamilyFile);
+        const file = repository.create(data);
+
+        return repository.save(file);
+    }
+
+    deleteFamilyFile(
+        sempno: string,
+        fid: number,
+        fileType: string,
+        fileId: number,
+    ) {
+        return this.getRepository(ExpatFamilyFile).delete({
+            SEMPNO: sempno,
+            FID: fid,
+            FILE_TYPE: fileType,
+            FILE_ID: fileId,
+        });
     }
 }

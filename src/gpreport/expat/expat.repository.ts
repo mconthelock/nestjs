@@ -7,14 +7,17 @@ import { ExpatEmployee } from 'src/common/Entities/gpreport/table/expat_employee
 import { ExpatFamily } from 'src/common/Entities/gpreport/table/expat_family.entity';
 import { ExpatEmployeeFile } from 'src/common/Entities/gpreport/table/expat_employee_file.entity';
 import { ExpatFamilyFile } from 'src/common/Entities/gpreport/table/expat_family_file.entity';
-
+import { AMECUSERALL } from 'src/common/Entities/amec/views/AMECUSERALL.entity';
 @Injectable()
 export class ExpatRepository extends BaseRepository {
     constructor(
         @InjectDataSource('gpreportConnection')
-        ds: DataSource,
+        private readonly gpreportDs: DataSource,
+
+        @InjectDataSource('amecConnection')
+        private readonly amecDs: DataSource,
     ) {
-        super(ds);
+        super(gpreportDs);
     }
 
     findOneEmployee(sempno: string) {
@@ -315,5 +318,22 @@ export class ExpatRepository extends BaseRepository {
             FILE_TYPE: fileType,
             FILE_ID: fileId,
         });
+    }
+
+    findAmecEmployee(sempno: string) {
+        return this.amecDs
+            .getRepository(AMECUSERALL)
+            .createQueryBuilder('U')
+            .select([
+                'U.SEMPNO',
+                'U.SNAME',
+                'U.BIRTHDAY',
+                'U.SDIVCODE',
+                'U.SDIV',
+                'U.SRECMAIL',
+                'U.SPOSITION',
+            ])
+            .where('U.SEMPNO = :sempno', { sempno })
+            .getOne();
     }
 }

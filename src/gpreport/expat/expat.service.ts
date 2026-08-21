@@ -366,18 +366,22 @@ export class ExpatService {
         }
 
         if (dto.VISA_EXP_DATE !== undefined) {
-            data.VISA_EXP_DATE = dto.VISA_EXP_DATE
-                ? new Date(dto.VISA_EXP_DATE)
-                : null;
+            data.VISA_EXP_DATE = dto.VISA_EXP_DATE ? new Date(dto.VISA_EXP_DATE) : null;
         }
 
         if (dto.LAST_ARRIVAL_DATE !== undefined) {
-            data.LAST_ARRIVAL_DATE =
-                dto.LAST_ARRIVAL_DATE
-                    ? new Date(dto.LAST_ARRIVAL_DATE)
-                    : null;
+            data.LAST_ARRIVAL_DATE = dto.LAST_ARRIVAL_DATE ? new Date(dto.LAST_ARRIVAL_DATE) : null;
         }
 
         return data;
+    }
+
+    async findAmecEmployee(sempno: string) {
+        const employee = await this.expatRepository.findAmecEmployee(sempno);
+        if (!employee) {
+            throw new NotFoundException('EMPLOYEE_NOT_FOUND',);
+        }
+
+        return employee;
     }
 }

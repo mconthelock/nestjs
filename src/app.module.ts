@@ -46,6 +46,7 @@ import { FinpckAssetModule } from './webform/finform/fin-pck/finpck_asset/finpck
 import { FxaGrpmstModule } from './webform/finform/fxa_grpmst/fxa_grpmst.module';
 
 import { MfgReportModule } from './mfgreport/mfgreport.module';
+import { CountriesModule } from './countries/countries.module';
 
 @Module({
     imports: [
@@ -86,6 +87,7 @@ import { MfgReportModule } from './mfgreport/mfgreport.module';
         FinpckFormModule,
         FinpckAssetModule,
         FxaGrpmstModule,
+        CountriesModule,
     ],
     providers: [
         HttpLoggingInterceptor,

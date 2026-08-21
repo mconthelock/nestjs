@@ -35,8 +35,8 @@ export class CountriesService {
     }) {
         const countries = await this.getAllCountries();
         
-        // ถ้าไม่มี filter ใดๆ ให้คืนทั้งหมด
-        const hasFilters = Object.values(filters).some(value => value);
+        // ถ้าไม่มี filter ใดๆ หรือทุกค่าเป็น empty string ให้คืนทั้งหมด
+        const hasFilters = Object.values(filters).some(value => value && value.trim());
         if (!hasFilters) return countries;
         
         return countries.filter((country: any) => {

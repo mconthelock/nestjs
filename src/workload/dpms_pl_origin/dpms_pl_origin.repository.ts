@@ -11,7 +11,10 @@ export class DpmsPlOriginRepository extends BaseRepository {
     }
 
     findById(id: number) {
-        return this.getRepository(DPMS_PL_ORIGIN).find({where: { NISSUEREV_ID: id }});
+        return this.getRepository(DPMS_PL_ORIGIN).find({
+            where: { NISSUEREV_ID: id },
+            order: { NSEQ: 'ASC', VCASE: 'ASC', VITEM: 'ASC', VDRAWING: 'ASC' },
+        });
     }
 
     findByOrder(id: number) {

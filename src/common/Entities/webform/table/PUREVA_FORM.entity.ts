@@ -11,9 +11,12 @@ import { PUREVA_PROFIT_TURNOVER } from './PUREVA_PROFIT_TURNOVER.entity';
 import { PUREVA_SCORE } from './PUREVA_SCORE.entity';
 import { PUREVA_VENDOR_RELATION } from './PUREVA_VENDOR_RELATION.entity';
 import { PURNVF_ADDRESS } from './PURNVF_ADDRESS.entity';
-import { PCURRENCY } from '../../amec/table/PCURRENCY.entity';
 import { VORGMST } from '../views/VORGMST.entity';
 import { TERMCODE } from '../../pursys/table/TERMCODE.entity';
+<<<<<<< HEAD
+=======
+import { CurrencyMaster } from '../../pursys/table/CURRENCY_MASTER.entity';
+>>>>>>> fa21ef66295b34ebd7a001042751515b8a5a6f26
 
 @Entity({ name: 'PUREVA_FORM', schema: 'WEBFORM' })
 export class PUREVA_FORM {
@@ -102,6 +105,9 @@ export class PUREVA_FORM {
 
     @Column()
     PRODCAT: string;
+
+    @Column()
+    PRODCAT_OTHER: string;
 
     @Column()
     LEGAL_STATUS: string;
@@ -217,9 +223,19 @@ export class PUREVA_FORM {
     @JoinColumn({ name: 'TERMCODE', referencedColumnName: 'STERMCODE' })
     TERM: TERMCODE;
 
+<<<<<<< HEAD
     @OneToOne(() => PCURRENCY)
     @JoinColumn({ name: 'CURCODE', referencedColumnName: 'SCURCODE' })
     STDCUR: PCURRENCY;
+=======
+    @OneToOne(() => CurrencyMaster)
+    @JoinColumn({ name: 'CURCODE', referencedColumnName: 'CURR_CODE' })
+    STDCUR: CurrencyMaster;
+
+    @OneToOne(() => CurrencyMaster)
+    @JoinColumn({ name: 'CAPITAL_CUR', referencedColumnName: 'CURR_CODE' })
+    CAPCUR: CurrencyMaster;
+>>>>>>> fa21ef66295b34ebd7a001042751515b8a5a6f26
 
     @OneToOne(() => VORGMST)
     @JoinColumn({ name: 'CONCERNEDORG', referencedColumnName: 'VORGNO' })

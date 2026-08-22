@@ -1,4 +1,9 @@
-import { IntersectionType, OmitType,PartialType, PickType } from '@nestjs/swagger';
+import {
+    IntersectionType,
+    OmitType,
+    PartialType,
+    PickType,
+} from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
     IsArray,
@@ -10,7 +15,7 @@ import {
     IsString,
     ValidateNested,
     ArrayMinSize,
-    Validate
+    Validate,
 } from 'class-validator';
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
@@ -18,16 +23,15 @@ import { RequestPurevaScoreDto } from '../pureva_score/dto/request-pureva_score.
 import { RequestPurevaProfitTurnoverDto } from '../pureva_profit_turnover/dto/request-pureva_profit_turnover.dto';
 import { RequestPurevaVendorRelationDto } from '../pureva_vendor_relation/dto/request-pureva_vendor_relation.dto';
 
-export class RequestPurevaFormDto extends PickType(CreateFormDto,[
-'NFRMNO',
-'VORGNO',
-'CYEAR',
-'REQBY',
-'DRAFT',
-'INPUTBY',
-'REMARK',
-] as const) {  
-    
+export class RequestPurevaFormDto extends PickType(CreateFormDto, [
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'REQBY',
+    'DRAFT',
+    'INPUTBY',
+    'REMARK',
+] as const) {
     @IsNotEmpty()
     @IsString()
     OPERATION: string;
@@ -39,7 +43,7 @@ export class RequestPurevaFormDto extends PickType(CreateFormDto,[
     @IsOptional()
     @IsString()
     UPSTATUS?: string;
- 
+
     @IsNotEmpty()
     @IsString()
     VENDGROUP: string;
@@ -74,152 +78,158 @@ export class RequestPurevaFormDto extends PickType(CreateFormDto,[
 
     @IsOptional()
     @IsString()
-    FAX?: string; 
+    FAX?: string;
 
     @IsOptional()
     @IsString()
-    BANKNAME?: string; 
+    BANKNAME?: string;
 
     @IsOptional()
     @IsString()
-    BRANCH?: string;  
+    BRANCH?: string;
 
     @IsOptional()
     @IsString()
-    BANKADDR?: string;  
+    BANKADDR?: string;
 
     @IsOptional()
     @IsString()
-    ACCNUMBER?: string;  
+    ACCNUMBER?: string;
 
     @IsOptional()
     @IsString()
-    TERMCODE?: string;  
-    
-    @IsOptional()
-    @IsString()
-    CURCODE?: string;   
+    TERMCODE?: string;
 
     @IsOptional()
     @IsString()
-    COMPLIANCE?: string;   
+    CURCODE?: string;
 
     @IsOptional()
     @IsString()
-    COMPLIANCE_OTHER?: string;  
+    COMPLIANCE?: string;
 
     @IsOptional()
     @IsString()
-    BUSTYPE_REG?: string;  
+    COMPLIANCE_OTHER?: string;
 
     @IsOptional()
     @IsString()
-    BUSTYPE_SUB?: string;  
+    BUSTYPE_REG?: string;
 
     @IsOptional()
     @IsString()
-    PRODCAT?: string;  
+    BUSTYPE_SUB?: string;
 
     @IsOptional()
     @IsString()
-    LEGAL_STATUS?: string;  
+    PRODCAT?: string;
 
     @IsOptional()
     @IsString()
-    CORPORATE_ID?: string; 
-   
-    @IsOptional()
-    @Transform(({ value }) => (value !== undefined && value !== null ? String(value) : value))
-    @IsString()
-    TAX_ID?: string; 
-    
-    @IsOptional()
-    @IsString()
-    CONCERNEDORG?: string; 
+    PRODCAT_OTHER?: string;
 
     @IsOptional()
     @IsString()
-    FY_AMOUNT?: string;    
-
-    @IsOptional()
-    @IsNumber()
-    @Type(() => Number)
-    AMOUNT?: number;   
-    
-    @IsOptional()
-    @IsString()
-    PUR_LEVEL?: string;  
+    LEGAL_STATUS?: string;
 
     @IsOptional()
     @IsString()
-    PUR_STATUS?: string; 
+    CORPORATE_ID?: string;
+
+    @IsOptional()
+    @Transform(({ value }) =>
+        value !== undefined && value !== null ? String(value) : value,
+    )
+    @IsString()
+    TAX_ID?: string;
 
     @IsOptional()
     @IsString()
-    VENDCAT?: string; 
+    CONCERNEDORG?: string;
+
+    @IsOptional()
+    @IsString()
+    FY_AMOUNT?: string;
 
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    CAPITAL?: number;  
+    AMOUNT?: number;
 
     @IsOptional()
     @IsString()
-    CAPITAL_CUR?: string; 
+    PUR_LEVEL?: string;
 
     @IsOptional()
     @IsString()
-    ESTABLISHED?: string; 
+    PUR_STATUS?: string;
 
     @IsOptional()
     @IsString()
-    COM_TYPE?: string;    
-
-    @IsOptional()
-    @IsString()
-    COM_OTHER?: string;   
+    VENDCAT?: string;
 
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    EMPDIRECT?: number;  
+    CAPITAL?: number;
+
+    @IsOptional()
+    @IsString()
+    CAPITAL_CUR?: string;
+
+    @IsOptional()
+    @IsString()
+    ESTABLISHED?: string;
+
+    @IsOptional()
+    @IsString()
+    COM_TYPE?: string;
+
+    @IsOptional()
+    @IsString()
+    COM_OTHER?: string;
 
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    EMPINDIRECT?: number; 
+    EMPDIRECT?: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    EMPINDIRECT?: number;
 
     @IsOptional()
     @IsString()
-    AVGAGE?: string;  
+    AVGAGE?: string;
 
     @IsOptional()
     @IsString()
-    QM_STATUS?: string;  
+    QM_STATUS?: string;
 
     @IsOptional()
     @IsString()
-    QM_REASON?: string;  
+    QM_REASON?: string;
 
     @IsOptional()
     @IsString()
-    CSR_STATUS?: string;  
-    
-    @IsOptional()
-    @IsString()
-    CSR_REASON?: string;  
+    CSR_STATUS?: string;
 
     @IsOptional()
     @IsString()
-    ENV_STATUS?: string; 
+    CSR_REASON?: string;
 
     @IsOptional()
     @IsString()
-    ENV_REASON?: string;  
-    
+    ENV_STATUS?: string;
+
     @IsOptional()
     @IsString()
-    LABOR_STATUS?: string; 
+    ENV_REASON?: string;
+
+    @IsOptional()
+    @IsString()
+    LABOR_STATUS?: string;
 
     @IsOptional()
     @IsDate()
@@ -229,76 +239,47 @@ export class RequestPurevaFormDto extends PickType(CreateFormDto,[
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    LAND?: number; 
+    LAND?: number;
 
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    FACTORY?: number; 
+    FACTORY?: number;
 
     @IsOptional()
     @IsString()
-    JUDGEMENT?: string; 
+    JUDGEMENT?: string;
 
     @IsOptional()
     @IsString()
-    MJUDGEMENT?: string; 
+    MJUDGEMENT?: string;
 
     @IsOptional()
     @IsString()
-    ADDRESS_EN?: string; 
+    ADDRESS_EN?: string;
 
     @IsOptional()
     @IsString()
-    PROVINCE_EN?: string;  
-
-
-    @IsOptional()
-    @IsString()
-    DISTRICT_EN?: string;     
+    CITY_EN?: string;
 
     @IsOptional()
     @IsString()
-    SUB_DISTRICT_EN?: string;   
+    STATE_EN?: string;
 
     @IsOptional()
     @IsString()
-    POSTCODE_EN?: string; 
+    POSTCODE_EN?: string;
 
     @IsOptional()
     @IsString()
-    COUNTRY_EN?: string; 
+    COUNTRY_EN?: string;
 
     @IsOptional()
     @IsString()
-    ADDRESS_TH?: string;  
-
-    @IsOptional()
-    @IsString()
-    PROVINCE_TH?: string;  
-
-    @IsOptional()
-    @IsString()
-    DISTRICT_TH?: string;     
-
-    @IsOptional()
-    @IsString()
-    SUB_DISTRICT_TH?: string;   
-
-    @IsOptional()
-    @IsString()
-    POSTCODE_TH?: string; 
-
-    @IsOptional()
-    @IsString()
-    COUNTRY_TH?: string; 
-
-      
+    ADDRESS_TH?: string;
 
     @IsString()
-    @Transform(
-        ({ value }) => (Array.isArray(value) ? value.join('|') : value), 
-    )
+    @Transform(({ value }) => (Array.isArray(value) ? value.join('|') : value))
     @IsOptional()
     ATTACH_TYPE?: string;
 
@@ -308,21 +289,19 @@ export class RequestPurevaFormDto extends PickType(CreateFormDto,[
 
     @IsOptional()
     @IsArray()
-    @ValidateNested({each:true})
+    @ValidateNested({ each: true })
     @Type(() => RequestPurevaScoreDto)
     SCORES?: RequestPurevaScoreDto[];
 
     @IsOptional()
     @IsArray()
-    @ValidateNested({each:true})
+    @ValidateNested({ each: true })
     @Type(() => RequestPurevaProfitTurnoverDto)
     PROFIT_TURNOVERS?: RequestPurevaProfitTurnoverDto[];
 
     @IsOptional()
     @IsArray()
-    @ValidateNested({each:true})
-    @Type(() => RequestPurevaVendorRelationDto )
+    @ValidateNested({ each: true })
+    @Type(() => RequestPurevaVendorRelationDto)
     RELATIONS?: RequestPurevaVendorRelationDto[];
-
 }
-

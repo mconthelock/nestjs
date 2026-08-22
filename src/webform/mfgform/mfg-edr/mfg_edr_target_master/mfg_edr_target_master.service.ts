@@ -48,13 +48,9 @@ export class MfgEdrTargetMasterService {
   }
 
   async search(dto: SearchMfgEdrTargetMasterDto): Promise<any[]> {
-    return this.targetMasterRepository
+    const query = this.targetMasterRepository
       .createQueryBuilder('A')
-      .innerJoin(
-        'ORGANIZATIONS',
-        'B',
-        'A.SSECCODE = B.SSECCODE',
-      )
+      .innerJoin('ORGANIZATIONS', 'B', 'A.SSECCODE = B.SSECCODE')
       .select([
         'A.FYEAR AS "FYEAR"',
         'A.SSECCODE AS "SSECCODE"',
@@ -74,7 +70,15 @@ export class MfgEdrTargetMasterService {
         'B.SSEC AS "SSEC"',
         'B.SDEPT AS "SDEPT"',
       ])
-      .where('A.FYEAR = :FYEAR', { FYEAR: dto.FYEAR })
+      .where('A.FYEAR = :FYEAR', { FYEAR: dto.FYEAR });
+
+    if (dto.SSECCODE) {
+      query.andWhere('A.SSECCODE = :SSECCODE', {
+        SSECCODE: dto.SSECCODE,
+      });
+    }
+
+    return query
       .orderBy('A.SSECCODE', 'ASC')
       .getRawMany();
   }
@@ -121,5 +125,32 @@ export class MfgEdrTargetMasterService {
     return {
       message: `Target FYEAR ${FYEAR} and SSECCODE ${SSECCODE} deleted successfully`,
     };
+  }
+
+  async save(dto: CreateMfgEdrTargetMasterDto) {
+    return this.targetMasterRepository.manager.transaction(async manager => {
+      const repository = manager.getRepository(MfgEdrTargetMaster);
+
+      const existing = await repository.findOne({
+        where: { FYEAR: dto.FYEAR, SSECCODE: dto.SSECCODE },
+      });
+
+      if (existing) {
+        await repository.delete({
+          FYEAR: dto.FYEAR,
+          SSECCODE: dto.SSECCODE,
+        });
+      }
+
+      const target = repository.create(dto);
+      const result = await repository.save(target);
+
+      return {
+        status: true,
+        action: existing ? 'REPLACE' : 'INSERT',
+        message: 'บันทึกข้อมูลเรียบร้อยแล้ว',
+        data: result,
+      };
+    });
   }
 }

@@ -5,13 +5,15 @@ import { spawn } from 'child_process';
 import { PDFDocument } from 'pdf-lib';
 import { PDFParse } from 'pdf-parse';
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
-import { PrintedService } from './printed.service';
+import { OrderInfo, PrintedService } from './printed.service';
+import { PrintedExtractService } from './printedExtract.service';
 
 @Injectable()
 export class PrintedMergeService {
     constructor(
         @Inject(forwardRef(() => PrintedService))
         private readonly printed: PrintedService,
+        private readonly extract: PrintedExtractService,
     ) {}
 
     async splitFiles(
@@ -22,10 +24,15 @@ export class PrintedMergeService {
             fileName: string;
             filePath: string;
             pageNumber: number;
+            item: string;
+            packing: string;
+            process: string;
+            drawing: string;
+            fileMfgNo: OrderInfo[] | null;
         }[],
     ) {
         const splitStartTime = Date.now();
-        for (let i = 1; i < pageCount; i++) {
+        for (let i = 1; i < pageCount - 1; i++) {
             const singlePageDoc = await PDFDocument.create();
             const [copiedPage] = await singlePageDoc.copyPages(pdfDoc, [i]);
             singlePageDoc.addPage(copiedPage);
@@ -39,6 +46,12 @@ export class PrintedMergeService {
                 const textContent = parsedData.text;
                 const tagData = textContent.split('\n');
                 const tagNo = tagData[0].substring(0, 12).replace(/\s/g, '');
+                const mfgno = this.extract.extractOrderEntries(textContent);
+                const itemno =
+                    this.extract.extractItemPackingEntries(textContent);
+                const process =
+                    this.extract.extractProcessListEntries(textContent);
+                const dwgno = this.extract.extractDrawingEntries(textContent);
                 const newFileName = `${tagNo}.pdf`;
                 const outputPath = path.join(outputDirectory, newFileName);
                 await fs.writeFile(outputPath, singlePageBytes);
@@ -46,6 +59,11 @@ export class PrintedMergeService {
                     fileName: tagNo,
                     filePath: outputPath,
                     pageNumber: i,
+                    item: itemno.item,
+                    packing: itemno.itemPacking,
+                    process: process,
+                    drawing: dwgno,
+                    fileMfgNo: mfgno,
                 });
             } finally {
                 await parser.destroy();

@@ -120,7 +120,10 @@ export class VpsRepository extends BaseRepository {
     }
 
     async insPackorddtlByManual(order: string, packing: string): Promise<void> {
-        await this.packingDs.query('EXEC InsPackorddtlByManual @0, @1', [order, packing]);
+        await this.packingDs.query('EXEC InsPackorddtlByManual @0, @1', [
+            order,
+            packing,
+        ]);
     }
 
     async updatePrintStatus(order: string, packing: string): Promise<void> {
@@ -134,23 +137,48 @@ export class VpsRepository extends BaseRepository {
     }
 
     async insertPackorddtl(data: Record<string, any>): Promise<void> {
-        await this.packingDs.createQueryBuilder().insert().into('packorddtl').values(data).execute();
+        await this.packingDs
+            .createQueryBuilder()
+            .insert()
+            .into('packorddtl')
+            .values(data)
+            .execute();
     }
 
     async insertItemMas(data: Record<string, any>): Promise<void> {
-        await this.packingDs.createQueryBuilder().insert().into('ItemMas').values(data).execute();
+        await this.packingDs
+            .createQueryBuilder()
+            .insert()
+            .into('ItemMas')
+            .values(data)
+            .execute();
     }
 
     async insertItemQty(data: Record<string, any>): Promise<void> {
-        await this.packingDs.createQueryBuilder().insert().into('ItemQty').values(data).execute();
+        await this.packingDs
+            .createQueryBuilder()
+            .insert()
+            .into('ItemQty')
+            .values(data)
+            .execute();
     }
 
     async insertPISInfo(data: Record<string, any>): Promise<void> {
-        await this.packingDs.createQueryBuilder().insert().into('PISInfo').values(data).execute();
+        await this.packingDs
+            .createQueryBuilder()
+            .insert()
+            .into('PISInfo')
+            .values(data)
+            .execute();
     }
 
     async insertVPSInfo(data: Record<string, any>): Promise<void> {
-        await this.packingDs.createQueryBuilder().insert().into('VPSInfo').values(data).execute();
+        await this.packingDs
+            .createQueryBuilder()
+            .insert()
+            .into('VPSInfo')
+            .values(data)
+            .execute();
     }
 
     async insertItemQtyHistory(data: Record<string, any>): Promise<void> {
@@ -168,7 +196,11 @@ export class VpsRepository extends BaseRepository {
                 JOIN M008KP mk ON mk.M8K03 = s01.S01M01
                 WHERE (S01M01 = :1 OR S01M01 LIKE :2)
                 AND S01M04 LIKE :3`;
-        return await this.wk.query(sql, [`${order}`, `_${order}_`, `%${packing}%`]);
+        return await this.wk.query(sql, [
+            `${order}`,
+            `_${order}_`,
+            `%${packing}%`,
+        ]);
     }
 
     async getListOrder(packing: string): Promise<any[]> {
@@ -302,6 +334,11 @@ export class VpsRepository extends BaseRepository {
         const sql = `SELECT * FROM RTNLIBF.Q46054OL WHERE Q46O01 = '${order}' AND Q46O02 = '${packing}'`;
         // หาก query ชุดนี้ต้องการดึงจาก AS400 Connection สามารถเปลี่ยนจาก this.wk เป็น DataSource ของ AS400 ที่ Inject เอาไว้ได้เลย
         return await this.as400.runQuery(sql);
+    }
+
+    async getOriginalOrder(order: string, item: string): Promise<any[]> {
+        const sql = `SELECT DISTINCT(Q47K01) FROM Q147KP WHERE Q47K18 = :1 AND Q47K02 = :2`;
+        return await this.wk.query(sql, [order, item]);
     }
 
     async getMasterPacking(dwgNo: string): Promise<any[]> {

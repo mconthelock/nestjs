@@ -8,6 +8,8 @@ import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 import { IdtagList } from '../../../common/Entities/workload/table/idtag-list.entity';
 import { IdtagFiles } from '../../../common/Entities/workload/table/idtag-files.entity';
 import { IdtagPages } from '../../../common/Entities/workload/table/idtag-pages.entity';
+import { IdtagOrders } from '../../../common/Entities/workload/table/IDTAGS_ORDERS.entity';
+
 import { IdtagImages } from '../../../common/Entities/workload/views/idtag-images.entity';
 import { IdtagCnData } from '../../../common/Entities/workload/views/idtag-cndata.entity';
 import { IdtagNcDetail } from '../../../common/Entities/workload/views/idtag-ncdetail.entity';
@@ -21,9 +23,7 @@ import { UpadateIdtagPagesDto } from './dto/update-idtag-pages.dto';
 
 @Injectable()
 export class IdTagRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('workloadConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
         super(ds);
     }
 
@@ -83,6 +83,7 @@ export class IdTagRepository extends BaseRepository {
     async createPrintedFile(
         fileData: CreateIdtagFilesDto,
         pagesData: Omit<CreateIdtagPagesDto, 'FILES_ID'>[],
+        orderData: Omit<IdtagOrders, 'FILE_ID'>[] = [],
     ) {
         const savedFile = await this.manager.save(IdtagFiles, fileData);
         const pageEntities = pagesData.map((pageData) =>
@@ -91,16 +92,37 @@ export class IdTagRepository extends BaseRepository {
                 FILES_ID: savedFile.FILES,
                 PAGE_NUM: Number(pageData.PAGE_NUM),
                 PAGE_STATUS: pageData.PAGE_STATUS ?? '0',
+                PAGE_ITEM: pageData.PAGE_ITEM,
+                PAGE_ITEMPACKING: pageData.PAGE_ITEMPACKING,
+                PAGE_PROCESS: pageData.PAGE_PROCESS,
+                PAGE_DRAWING: pageData.PAGE_DRAWING,
             }),
         );
 
         if (pageEntities.length)
             await this.manager.insert(IdtagPages, pageEntities);
+
+        const orderEntities = orderData.map((row) =>
+            this.manager.create(IdtagOrders, {
+                ...row,
+                FILE_ID: savedFile.FILES,
+                FILE_PAGE: Number(row.FILE_PAGE),
+                FILE_ORDER_QTY: Number(row.FILE_ORDER_QTY),
+            }),
+        );
+
+        if (orderEntities.length)
+            await this.manager.insert(IdtagOrders, orderEntities);
+
         return savedFile;
     }
 
     async createFiles(fileData: CreateIdtagFilesDto) {
         return await this.manager.save(IdtagFiles, fileData);
+    }
+
+    async createIdtagsOrder(orderData: Partial<IdtagOrders>) {
+        return await this.manager.save(IdtagOrders, orderData);
     }
 
     async updateFiles(fileData: UpdateIdtagFilesDto) {

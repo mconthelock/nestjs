@@ -61,12 +61,12 @@ export class PrintedTopLabelService {
                     text += 'JAPAN ';
                 }
 
-                if (row.EARTHQ > 0) {
-                    text += 'MET EARTHQUAKE ';
-                }
-
                 if (row.URGETNT > 0) {
                     text += 'URGENT ';
+                }
+
+                if (row.EARTHQ > 0) {
+                    text += 'MET EARTHQUAKE ';
                 }
 
                 if (text === '') {

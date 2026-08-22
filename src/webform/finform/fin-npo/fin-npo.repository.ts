@@ -19,7 +19,7 @@ import { FINNPOCURRENCY } from 'src/common/Entities/webform/table/FINNPO_Currenc
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 
 @Injectable()
 export class FinnpoRepository extends BaseRepository {
@@ -85,8 +85,47 @@ export class FinnpoRepository extends BaseRepository {
         return this.getRepository(FINNPOINVOICE).save(data);
     }
 
+    async updateInvoices(
+        cyear2: string,
+        nrunno: number,
+        invoices: Array<{ ID: number } & Partial<FINNPOINVOICE>>,
+    ) {
+        await Promise.all(
+            invoices.map(({ ID, ...data }) =>
+                this.getRepository(FINNPOINVOICE).update(
+                    { CYEAR2: cyear2, NRUNNO: nrunno, ID },
+                    data,
+                ),
+            ),
+        );
+    }
+
+    async updateHead(
+        nfrmno: number,
+        vorgno: string,
+        cyear: string,
+        cyear2: string,
+        nrunno: number,
+        data: Partial<FINNPOFORM>,
+    ) {
+        return this.getRepository(FINNPOFORM).update(
+            { NFRMNO: nfrmno, VORGNO: vorgno, CYEAR: cyear, CYEAR2: cyear2, NRUNNO: nrunno },
+            data,
+        );
+    }
+
     async createCostCenters(data: Partial<FINNPOCOSTCENTER>[]) {
         return this.getRepository(FINNPOCOSTCENTER).save(data);
+    }
+
+    async replaceCostCenters(
+        cyear2: string,
+        nrunno: number,
+        data: Partial<FINNPOCOSTCENTER>[],
+    ) {
+        const repository = this.getRepository(FINNPOCOSTCENTER);
+        await repository.delete({ CYEAR2: cyear2, NRUNNO: nrunno });
+        return data.length ? repository.save(data) : [];
     }
 
     async findHeadByForm(
@@ -106,7 +145,7 @@ export class FinnpoRepository extends BaseRepository {
             .addSelect('HEAD.SUBJECT', 'SUBJECT')
             .addSelect('HEAD.VENDOR_CODE', 'VENDOR_CODE')
             .addSelect('HEAD.EXPENSE_CODE', 'EXPENSE_CODE')
-            .addSelect('HEAD.REMARK', 'REMARK')
+            .addSelect("CAST(NULL AS VARCHAR2(1000))", 'REMARK')
             .where('HEAD.NFRMNO = :NFRMNO', { NFRMNO: nfrmno })
             .andWhere('HEAD.VORGNO = :VORGNO', { VORGNO: vorgno })
             .andWhere('HEAD.CYEAR = :CYEAR', { CYEAR: cyear })
@@ -162,6 +201,11 @@ export class FinnpoRepository extends BaseRepository {
                 FILE_ID: fileId,
             },
         });
+    }
+
+    async deleteFilesByIds(fileIds: number[]) {
+        if (!fileIds.length) return;
+        await this.getRepository(FIN_FILE).delete({ FILE_ID: In(fileIds) });
     }
 
     async findOneForShow(
@@ -245,7 +289,7 @@ export class FinnpoRepository extends BaseRepository {
             .addSelect('FORM.VREQNO', 'REQUEST_BY')
             .addSelect('FORM.CST', 'STATUS')
             .addSelect('HEAD.SUBJECT', 'SUBJECT')
-            .addSelect('HEAD.REMARK', 'REMARK')
+            .addSelect("CAST(NULL AS VARCHAR2(1000))", 'REMARK')
             .addSelect('HEAD.EXPENSE_CODE', 'EXPENSE_CODE')
             .addSelect('EXPENSE.EXPENSE_ENAME', 'EXPENSE_TYPE')
             .addSelect('HEAD.VENDOR_CODE', 'VENDOR_CODE')
@@ -255,6 +299,7 @@ export class FinnpoRepository extends BaseRepository {
             .addSelect('INVOICE.NET_PRICE', 'NET_PRICE')
             .addSelect('INVOICE.TOTAL_AMT', 'TOTAL_AMOUNT')
             .addSelect('INVOICE.SCURCODE', 'CURRENCY')
+            .addSelect('INVOICE.WHT', 'WHT')
             .addSelect(
                 `(SELECT LISTAGG(CC.COSTCODE, ', ') WITHIN GROUP (ORDER BY CC.COSTCODE)
                     FROM WEBFORM.FINNPO_COSTCENTER CC

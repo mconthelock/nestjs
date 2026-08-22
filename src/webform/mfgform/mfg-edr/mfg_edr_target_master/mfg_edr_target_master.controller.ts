@@ -66,4 +66,9 @@ export class MfgEdrTargetMasterController {
       SSECCODE,
     );
   }
+
+  @Post('save')
+  save(@Body() dto: CreateMfgEdrTargetMasterDto) {
+      return this.mfgEdrTargetMasterService.save(dto);
+  }
 }

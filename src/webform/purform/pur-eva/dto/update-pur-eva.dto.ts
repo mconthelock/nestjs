@@ -1,8 +1,13 @@
 import { PartialType } from '@nestjs/swagger';
 import { RequestPurevaFormDto } from './request-pur-eva.dto';
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+    IsArray,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+} from 'class-validator';
 import { Type, Transform } from 'class-transformer';
-
 
 export class UpdatePurEvaDto extends PartialType(RequestPurevaFormDto) {
     // กำหนดฟิลด์บังคับเฉพาะตอน Update ที่ส่งมาจาก FormData / Flow
@@ -17,7 +22,9 @@ export class UpdatePurEvaDto extends PartialType(RequestPurevaFormDto) {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    @Transform(({ value }) => (value !== undefined && value !== null ? Number(value) : value))
+    @Transform(({ value }) =>
+        value !== undefined && value !== null ? Number(value) : value,
+    )
     NFRMNO: number;
 
     @IsNotEmpty()
@@ -35,7 +42,9 @@ export class UpdatePurEvaDto extends PartialType(RequestPurevaFormDto) {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    @Transform(({ value }) => (value !== undefined && value !== null ? Number(value) : value))
+    @Transform(({ value }) =>
+        value !== undefined && value !== null ? Number(value) : value,
+    )
     NRUNNO: number;
 
     @IsArray()

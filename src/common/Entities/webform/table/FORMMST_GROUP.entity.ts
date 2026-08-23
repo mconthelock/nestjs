@@ -6,7 +6,7 @@ export class FORMMST_GROUP {
     VGROUPORG: string;
 
     @PrimaryColumn()
-    VGROUP: string;
+    VGROUP: number;
 
     @Column()
     VGROUPNAME: string;

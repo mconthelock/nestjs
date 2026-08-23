@@ -5,10 +5,9 @@ export class CreateFormmstGroupDto {
     @IsString()
     VGROUPORG: string;
 
-    @IsNumber()
+    @IsString()
     @IsOptional()
-    @Type(() => Number)
-    VGROUP?: number;
+    VGROUP?: string;
 
     @IsString()
     VGROUPNAME: string;

@@ -92,6 +92,7 @@ export class FormmstRepository extends BaseRepository {
         data: UpdateFormmstDto,
         query: { NNO: number; VORGNO: string; CYEAR: string },
     ) {
+        console.log('Update Form Master:', data, query);
         return this.getRepository(FORMMST).update(query, data);
     }
 
@@ -108,7 +109,7 @@ export class FormmstRepository extends BaseRepository {
 
     async updateGroup(
         name: string,
-        query: { VGROUPORG: string; VGROUP: number },
+        query: { VGROUPORG: string; VGROUP: string },
     ) {
         return this.getRepository(FORMMST_GROUP).update(query, {
             VGROUPNAME: name,

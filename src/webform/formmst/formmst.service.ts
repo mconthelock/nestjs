@@ -71,6 +71,7 @@ export class FormmstService {
             CYEAR: data.CYEAR,
             NNO: data.NNO,
         });
+
         if (forms.length === 0)
             throw new NotFoundException('Form master not found');
         return this.repo.updateFormMaster(data, {
@@ -91,11 +92,11 @@ export class FormmstService {
             //console.log(g);
             return g.VGROUPORG === data.VGROUPORG;
         });
-        data.VGROUP =
+        const id =
             maxGroupId.length > 0
-                ? Math.max(...maxGroupId.map((g) => g.VGROUP)) + 1
+                ? Math.max(...maxGroupId.map((g) => parseInt(g.VGROUP))) + 1
                 : 1;
-
+        data.VGROUP = id.toString();
         const result = await this.repo.createGroup(data);
         return result;
     }

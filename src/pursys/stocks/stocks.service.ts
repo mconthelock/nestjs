@@ -17,8 +17,10 @@ export class StocksService {
     constructor(
         @InjectRepository(StockMovements, 'purConnection')
         private readonly stockMovements: Repository<StockMovements>,
+
         @InjectRepository(StockMovementItems, 'purConnection')
         private readonly stockMovementItems: Repository<StockMovementItems>,
+
         @InjectRepository(InventoryBalances, 'purConnection')
         private readonly inventoryBalances: Repository<InventoryBalances>,
     ) {}

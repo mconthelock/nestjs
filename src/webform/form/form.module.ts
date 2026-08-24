@@ -14,10 +14,14 @@ import { FormCreateService } from './create-form.service';
 import { FormRepository } from './form.repository';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
+import { FormCounter } from 'src/common/Entities/webform/table/FORM_COUNTER.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([FORM, FLOW], 'webformConnection'),
+        TypeOrmModule.forFeature(
+            [FORM, FLOW, FormCounter],
+            'webformConnection',
+        ),
         FormmstModule,
         UsersModule,
         FlowmstModule,

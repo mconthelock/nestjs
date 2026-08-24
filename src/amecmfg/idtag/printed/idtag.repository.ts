@@ -164,6 +164,9 @@ export class IdTagRepository extends BaseRepository {
         const pages = await this.manager.delete(IdtagPages, {
             FILES_ID: filesId,
         });
+        const orders = await this.manager.delete(IdtagOrders, {
+            FILE_ID: filesId,
+        });
         return { file, pages };
     }
 

@@ -307,12 +307,14 @@ export class PrintedService {
                     return [];
                 }
 
-                return fileMfgNos.map((fileMfgNo) => ({
-                    FILE_PAGE: fileData.pageNumber,
-                    FILE_TAG: fileData.fileName,
-                    FILE_ORDER: fileMfgNo.orderNo,
-                    FILE_ORDER_QTY: Number(fileMfgNo.qty ?? 0),
-                }));
+                return fileMfgNos
+                    .filter((fileMfgNo) => fileMfgNo.orderNo !== 'XXXXXXXXX')
+                    .map((fileMfgNo) => ({
+                        FILE_PAGE: fileData.pageNumber,
+                        FILE_TAG: fileData.fileName,
+                        FILE_ORDER: fileMfgNo.orderNo,
+                        FILE_ORDER_QTY: Number(fileMfgNo.qty ?? 0),
+                    }));
             }),
         );
     }

@@ -21,26 +21,27 @@ export class CreateVendorDto {
     VND_TERM: string;
 
     @IsString()
-    VND_TYPE1: string;
+    @IsOptional()
+    VND_TYPE1?: string;
 
     @IsString()
     @IsOptional()
-    VND_TYPE2: string;
+    VND_TYPE2?: string;
 
     @IsString()
     @IsOptional()
-    VND_CURRENCY: string;
+    VND_CURRENCY?: string;
 
     @IsString()
     @IsOptional()
     VND_PAYMENT?: string;
 
     @IsString()
-    VND_ADDRESS1: string;
+    VND_ADDRESS1?: string;
 
     @IsString()
     @IsOptional()
-    VND_ADDRESS2: string;
+    VND_ADDRESS2?: string;
 
     @IsString()
     @IsOptional()

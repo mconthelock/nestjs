@@ -36,27 +36,28 @@ export class PSDLCRepository extends BaseRepository {
         }
 
         // สร้างวันที่ปัจจุบันในรูปแบบ YYYYMMDD
-        // const today = new Date();
-        // const yyyy = today.getFullYear().toString();
-        // const mm = String(today.getMonth() + 1).padStart(2, '0');
-        // const dd = String(today.getDate()).padStart(2, '0');
-        // const currentDateStr = `${yyyy}${mm}${dd}`;
         const currentDateStr = dayjs().format('YYYYMMDD');
 
         for (const detail of details) {
-            if (!detail.PNZUBA || !detail.PNHING) {
+            // เช็คว่าต้องมี PNZUBA เสมอ และ PNHING ต้องไม่เป็น null/undefined (แต่เป็น "" ได้)
+            if (
+                !detail.PNZUBA ||
+                detail.PNHING === undefined ||
+                detail.PNHING === null
+            ) {
                 continue;
             }
 
             const zuba = this.escapeSql(detail.PNZUBA.trim());
-            const hing = this.escapeSql(detail.PNHING.trim());
+            const hing = this.escapeSql(String(detail.PNHING).trim()); // บังคับเป็น String ป้องกัน Error
 
             // --------------------------------------------------
             // 1. จัดการ PNRKUB = '0' (ทำ UPDATE ตามปกติ)
             // --------------------------------------------------
             const q008mpRow0 = this.buildPndataExpressionForRow0(detail);
             if (q008mpRow0) {
-                const query = `UPDATE RTNLIBF.Q008MP SET PNDATA = ${q008mpRow0} WHERE PNZUBA = '${zuba}' AND PNHING = '${hing}' AND PNRKUB = '0'`;
+                // เพิ่ม PNDATE ใน SET clause
+                const query = `UPDATE RTNLIBF.Q008MP SET PNDATA = ${q008mpRow0}, PNDATE = '${currentDateStr}' WHERE TRIM(PNZUBA) = '${zuba}' AND TRIM(PNHING) = '${hing}' AND PNRKUB = '0'`;
                 await this.conn.runQuery(query);
             }
 
@@ -77,11 +78,12 @@ export class PSDLCRepository extends BaseRepository {
 
                 if (recordCount > 0) {
                     // ขั้นที่ 2A: เจอข้อมูล -> UPDATE
-                    const updateQuery = `UPDATE RTNLIBF.Q008MP SET PNDATA = ${q008mpReference} WHERE PNZUBA = '${zuba}' AND PNHING = '${hing}' AND PNRKUB = '2'`;
+                    // เพิ่ม PNDATE ใน SET clause
+                    const updateQuery = `UPDATE RTNLIBF.Q008MP SET PNDATA = ${q008mpReference}, PNDATE = '${currentDateStr}' WHERE PNZUBA = '${zuba}' AND PNHING = '${hing}' AND PNRKUB = '2'`;
                     await this.conn.runQuery(updateQuery);
                 } else {
                     // ขั้นที่ 2B: ไม่เจอข้อมูล -> INSERT
-                    // เพิ่ม PNDATE เข้าไปและใส่ค่า PNRKUB เป็น '2'
+                    // เพิ่ม PNDATE เข้าไปและใส่ค่า PNRKUB เป็น '2' (ส่วนนี้มีอยู่แล้ว)
                     const insertQuery = `INSERT INTO RTNLIBF.Q008MP (PNZUBA, PNHING, PNRKUB, PNDATA, PNDATE) VALUES ('${zuba}', '${hing}', '2', ${q008mpReference}, '${currentDateStr}')`;
                     await this.conn.runQuery(insertQuery);
                 }
@@ -125,9 +127,10 @@ export class PSDLCRepository extends BaseRepository {
     ): string | null {
         const flag = detail.NEWFLAG?.trim().toUpperCase();
 
-        // เช็คว่า property NEWCODE ถูกส่งมาหรือไม่ (อนุญาตให้เป็น '' ได้)
-        const hasCode = detail.NEWCODE !== undefined && detail.NEWCODE !== null;
-        const code = hasCode ? detail.NEWCODE.trim() : null;
+        // ลบ detail.NEWCODE !== null ออก เพื่อให้รับค่า null เข้ามาทำงานต่อได้
+        const hasCode = detail.NEWCODE !== undefined;
+        // บังคับให้เป็น String ก่อน เพื่อให้ใช้ .trim() ได้อย่างปลอดภัย
+        const code = String(detail.NEWCODE || '').trim();
 
         if (!flag && !hasCode) {
             return null;
@@ -140,7 +143,7 @@ export class PSDLCRepository extends BaseRepository {
             const betweenLength = 45 - flagPos - 1;
             // ถ้า code เป็น '' การใช้ padEnd จะทำให้ได้ช่องว่างยาว 7 ตัวไปอัปเดตทับ ('       ')
             const codeValue = this.escapeSql(
-                code!.padEnd(7, ' ').substring(0, 7),  
+                code!.padEnd(7, ' ').substring(0, 7),
             );
             const flagValue = this.escapeSql(flag);
             return `SUBSTR(PNDATA,1,${flagPos - 1}) || '${flagValue}' || SUBSTR(PNDATA,${flagPos + 1},${betweenLength}) || '${codeValue}' || SUBSTR(PNDATA,52)`;
@@ -162,44 +165,6 @@ export class PSDLCRepository extends BaseRepository {
 
         return null;
     }
-    // private buildPndataExpressionForRow0(
-    //     detail: UpdatePsdlcDetailDto,
-    // ): string | null {
-    //     const flag = detail.NEWFLAG?.trim().toUpperCase();
-    //     const code = detail.NEWCODE?.trim();
-
-    //     if (!flag && !code) {
-    //         return null;
-    //     }
-
-    //     const flagPos = flag ? this.getFlagPosition(flag) : null;
-
-    //     // กรณีมีทั้ง Flag (ที่ถูกต้อง) และ Code
-    //     if (flagPos !== null && code) {
-    //         const betweenLength = 45 - flagPos - 1;
-    //         const codeValue = this.escapeSql(
-    //             code.padEnd(7, ' ').substring(0, 7),
-    //         );
-    //         const flagValue = this.escapeSql(flag);
-    //         return `SUBSTR(PNDATA,1,${flagPos - 1}) || '${flagValue}' || SUBSTR(PNDATA,${flagPos + 1},${betweenLength}) || '${codeValue}' || SUBSTR(PNDATA,52)`;
-    //     }
-
-    //     // กรณีมีแต่ Flag (ที่ถูกต้อง)
-    //     if (flagPos !== null) {
-    //         const flagValue = this.escapeSql(flag);
-    //         return `SUBSTR(PNDATA,1,${flagPos - 1}) || '${flagValue}' || SUBSTR(PNDATA,${flagPos + 1})`;
-    //     }
-
-    //     // กรณีมีแต่ Code หรือมี Flag ที่ส่งค่ามาผิด (เลยทำแค่ Code แทน)
-    //     if (code) {
-    //         const codeValue = this.escapeSql(
-    //             code.padEnd(7, ' ').substring(0, 7),
-    //         );
-    //         return `SUBSTR(PNDATA,1,44) || '${codeValue}' || SUBSTR(PNDATA,52)`;
-    //     }
-
-    //     return null;
-    // }
 
     private buildPndataExpressionForReference(
         detail: UpdatePsdlcDetailDto,

@@ -118,11 +118,11 @@ export class PSDLCService {
             const formNo = `${formmst.VANAME}${createForm.data.CYEAR2.slice(-2)}-${("000000" + createForm.data.NRUNNO).slice(-6)}`
             await this.mailService.sendMail({
                 to: [
-                    // "viyada@MitsubishiElevatorAsia.co.th",
-                    // "anucha@MitsubishiElevatorAsia.co.th",
-                    // "chatchawarnk@MitsubishiElevatorAsia.co.th",
-                    // "chakkritv@MitsubishiElevatorAsia.co.th",
-                    'punnawichs@mitsubishielevatorasia.co.th',
+                    "viyada@MitsubishiElevatorAsia.co.th",
+                    "anucha@MitsubishiElevatorAsia.co.th",
+                    "chatchawarnk@MitsubishiElevatorAsia.co.th",
+                    "chakkritv@MitsubishiElevatorAsia.co.th",
+                    // 'punnawichs@mitsubishielevatorasia.co.th',
                 ],
                 subject:
                     'Form Drawing list for change PN Production create Complete',

@@ -1,34 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { VendorsService } from './vendors.service';
+
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
+import { SearchVendorDto } from './dto/search-vendor.dto';
 
-@Controller('vendors')
+@Controller('pursys/vendors')
 export class VendorsController {
-  constructor(private readonly vendorsService: VendorsService) {}
+    constructor(private readonly vnd: VendorsService) {}
 
-  @Post()
-  create(@Body() createVendorDto: CreateVendorDto) {
-    return this.vendorsService.create(createVendorDto);
-  }
+    @Post('search')
+    findAll(@Body() dto: SearchVendorDto) {
+        return this.vnd.search(dto);
+    }
 
-  @Get()
-  findAll() {
-    return this.vendorsService.findAll();
-  }
+    @Post('create')
+    create(@Body() dto: CreateVendorDto) {
+        return this.vnd.create(dto);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.vendorsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVendorDto: UpdateVendorDto) {
-    return this.vendorsService.update(+id, updateVendorDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.vendorsService.remove(+id);
-  }
+    @Post('next-vendor')
+    nextVendor(@Body('code') code: { first: number; second?: number }) {
+        return this.vnd.nextVendor(code.first, code?.second);
+    }
 }

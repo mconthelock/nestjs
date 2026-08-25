@@ -11,7 +11,6 @@ import { PUREVA_FORM } from './PUREVA_FORM.entity';
 
 @Entity({ name: 'PUREVA_SCORE', schema: 'WEBFORM' })
 export class PUREVA_SCORE {
-
     // --- Primary Keys (Composite Key 6 ตัว) ---
 
     @PrimaryColumn()
@@ -38,13 +37,11 @@ export class PUREVA_SCORE {
     @Column()
     TOPIC_DESC: string;
 
-    @Column({ type: 'number', precision: 2, scale: 0 })
+    @Column({ type: 'decimal', precision: 2, scale: 0 })
     SCORE: number;
 
     @Column()
     SLEVEL: string;
-
-   
 
     @ManyToOne(() => PUREVA_FORM, (eva) => eva.SCORES)
     @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
@@ -53,6 +50,4 @@ export class PUREVA_SCORE {
     @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
     @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
     Scores: PUREVA_FORM;
-
-
 }

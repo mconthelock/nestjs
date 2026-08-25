@@ -66,7 +66,6 @@ import { MfgReportModule } from './mfgreport/mfgreport.module';
         InvoiceModule,
         IdsModule,
         MfgReportModule,
-        // ItgcModule,
         SafetyModule,
         HbdModule,
         EbudgetModule,
@@ -75,9 +74,6 @@ import { MfgReportModule } from './mfgreport/mfgreport.module';
         WorkloadModule,
         DatacenterModule,
         GeneralPartListModule,
-        MfgReportModule,
-      //  MfgOrModule,
-   
     ],
     providers: [
         HttpLoggingInterceptor,

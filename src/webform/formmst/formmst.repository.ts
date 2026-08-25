@@ -2,10 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
+import { getSafeFields } from 'src/common/utils/Fields.utils';
+
+import { FORMMST } from 'src/common/Entities/webform/table/FORMMST.entity';
+import { FORMMST_GROUP } from 'src/common/Entities/webform/table/FORMMST_GROUP.entity';
+
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { SearchFormmstDto } from './dto/searchFormmst.dto';
-import { getSafeFields } from 'src/common/utils/Fields.utils';
-import { FORMMST } from 'src/common/Entities/webform/table/FORMMST.entity';
+import { CreateFormmstDto } from './dto/create-formmst.dto';
+import { UpdateFormmstDto } from './dto/update-formmst.dto';
+import { CreateFormmstGroupDto } from './dto/create-formmst-group.dto';
+import { UpdateFormmstGroupDto } from './dto/update-formmst-group.dto';
 
 @Injectable()
 export class FormmstRepository extends BaseRepository {
@@ -75,5 +82,36 @@ export class FormmstRepository extends BaseRepository {
             query.addSelect(`A.${f}`, f);
         });
         return query.getRawMany();
+    }
+
+    createFormMaster(data: CreateFormmstDto) {
+        return this.getRepository(FORMMST).save(data);
+    }
+
+    updateFormMaster(
+        data: UpdateFormmstDto,
+        query: { NNO: number; VORGNO: string; CYEAR: string },
+    ) {
+        return this.getRepository(FORMMST).update(query, data);
+    }
+
+    // Form Group section
+    async findAllGroup() {
+        return this.manager
+            .createQueryBuilder(FORMMST_GROUP, 'FORMMST_GROUP')
+            .getMany();
+    }
+
+    async createGroup(data: CreateFormmstGroupDto) {
+        return this.getRepository(FORMMST_GROUP).save(data);
+    }
+
+    async updateGroup(
+        name: string,
+        query: { VGROUPORG: string; VGROUP: string },
+    ) {
+        return this.getRepository(FORMMST_GROUP).update(query, {
+            VGROUPNAME: name,
+        });
     }
 }

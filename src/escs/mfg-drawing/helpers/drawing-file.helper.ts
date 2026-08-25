@@ -127,9 +127,12 @@ export class DrawingFileHelper {
             throw new Error(`ไม่พบ Active Sheet ในไฟล์ ${file.name}`);
         }
 
-        const headerA18 = worksheet.getCell('A18').text.trim().toLowerCase();
-        const headerG18 = worksheet.getCell('G18').text.trim().toLowerCase();
-        if (headerA18 !== 'no.' || headerG18 !== 'mc no.') {
+        const A18 = worksheet.getCell('A18').text.trim().toLowerCase();
+        const G18 = worksheet.getCell('G18').text.trim().toLowerCase();
+        const G8  = worksheet.getCell('G8').text.trim().toLowerCase();
+        const G13 = worksheet.getCell('G13').text.trim().toLowerCase();
+        const isFeederTemplate = A18 === 'no.' && G18 === 'mc no.' && G8 === 'x' && G13 === 'c';
+        if (!isFeederTemplate) {
             throw new Error(`ไฟล์ ${file.name} ไม่ใช่ Template Checksheet Feeder`);
         }
 

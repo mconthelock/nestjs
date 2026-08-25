@@ -31,7 +31,7 @@ export class VendorsService {
             dto.VENDGROUP,
             dto.VENDPURPOSE,
         );
-        dto = { ...dto, VND_CODE: nextVendorCode };
+        dto = { ...dto, VND_CODE: nextVendorCode, CREATE_AT: new Date() };
         delete dto.VENDGROUP;
         delete dto.VENDPURPOSE;
         const vendor = this.vnd.create(dto);

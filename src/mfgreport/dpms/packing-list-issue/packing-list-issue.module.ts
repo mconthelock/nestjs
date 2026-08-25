@@ -28,6 +28,9 @@ import { HtmlService } from './services/html.service';
 import { PackingListCreateService } from './packing-list-create.service';
 import { S020kpModule } from 'src/datacenter/s020kp/s020kp.module';
 import { S049kpModule } from 'src/datacenter/s049kp/s049kp.module';
+import { DpmsPlOriginModule } from 'src/workload/dpms_pl_origin/dpms_pl_origin.module';
+import { ReviseShippingMarkService } from './services/revise-shipping-mark.service';
+import { ReviseMainService } from './services/revise-main.service';
 
 @Module({
     imports: [
@@ -42,6 +45,7 @@ import { S049kpModule } from 'src/datacenter/s049kp/s049kp.module';
         DpmsPlMailModule,
         DpmsPlDocRevModule,
         DpmsPlWeightChangeModule,
+        DpmsPlOriginModule,
         MailModule,
         S020kpModule,
         S049kpModule,
@@ -58,7 +62,9 @@ import { S049kpModule } from 'src/datacenter/s049kp/s049kp.module';
         ExcelService,
         GenPdfService,
         MarReportService,
+        ReviseMainService,
         ReviseVgmService,
+        ReviseShippingMarkService,
     ],
     exports: [PackingListIssueService, ProcedureService],
 })

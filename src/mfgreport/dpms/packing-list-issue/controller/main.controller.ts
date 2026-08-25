@@ -1,14 +1,18 @@
 import { Controller, Post, Body, Patch, Get, Param } from '@nestjs/common';
-import { PackingListIssueService } from '../packing-list-issue.service';
+import { UseTransaction } from 'src/common/decorator/transaction.decorator';
+
+import { ReviseShippingMarkDto } from '../dto/revise-shipping-mark.dto';
 import { CreatePackingListIssueDto } from '../dto/create-packing-list-issue.dto';
 import {
     UpdatePlIssueProblemReasonDto,
     GetDocForShowDto,
 } from '../dto/update-packing-list-issue.dto';
-import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { ProcedureService } from '../services/procedure.service';
 import { SearchDpmsPlIssueDto } from 'src/workload/dpms_pl_issue/dto/search-dpms_pl_issue.dto';
+
+import { PackingListIssueService } from '../packing-list-issue.service';
 import { IssueService } from '../services/issue.service';
+import { ReviseShippingMarkService } from '../services/revise-shipping-mark.service';
 
 @Controller('mfgreport/dpms/packing-list-issue')
 export class MainController {
@@ -16,6 +20,7 @@ export class MainController {
         private readonly service: PackingListIssueService,
         private readonly createService: IssueService,
         private readonly procedureService: ProcedureService,
+        private readonly reviseShippingMarkService: ReviseShippingMarkService,
     ) {}
 
     @Post()
@@ -53,5 +58,11 @@ export class MainController {
     @Post('doc-for-show')
     getDocforShow(@Body() dto: GetDocForShowDto) {
         return this.procedureService.getDocforShow(dto);
+    }
+
+    @Post('shippingMark-revise')
+    @UseTransaction('workloadConnection')
+    reviseShippingMark(@Body() dto: ReviseShippingMarkDto) {
+        return this.reviseShippingMarkService.reviseShippingMark(dto);
     }
 }

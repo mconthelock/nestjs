@@ -1,12 +1,24 @@
 import { ViewColumn, ViewEntity } from 'typeorm';
 
-@ViewEntity({ name: 'DPMS_PL_ORIGIN', schema: 'WORKLOAD' })
-export class DPMS_PL_ORIGIN {
+@ViewEntity({ name: 'DPMS_PL_ORIGIN_VIEW', schema: 'WORKLOAD' })
+export class DPMS_PL_ORIGIN_VIEW {
     @ViewColumn()
     NISSUEREV_ID: number;
 
     @ViewColumn()
+    NPOID: number;
+
+    @ViewColumn()
     DISSUEDATE: Date;
+
+    @ViewColumn()
+    VPROD: string;
+
+    @ViewColumn()
+    VP: string;
+
+    @ViewColumn()
+    VTYPE: string;
 
     @ViewColumn()
     VMFGNO: string;
@@ -55,4 +67,7 @@ export class DPMS_PL_ORIGIN {
 
     @ViewColumn()
     VSHIPPINGMARK: string;
+
+    @ViewColumn()
+    LAST_REVISION: number;
 }

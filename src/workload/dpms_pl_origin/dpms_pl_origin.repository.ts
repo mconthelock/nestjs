@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { createQueryBuilder, DataSource } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DPMS_PL_ORIGIN } from 'src/common/Entities/workload/views/DPMS_PL_ORIGIN.entity';
+import { DPMS_PL_ORIGIN_VIEW } from 'src/common/Entities/workload/views/DPMS_PL_ORIGIN_VIEW.entity';
+import { CreateDpmsPlOriginDto } from './dto/create-dpms_pl_origin.dto';
+import { DPMS_PL_ORIGIN } from 'src/common/Entities/workload/table/DPMS_PL_ORIGIN.entity';
 
 @Injectable()
 export class DpmsPlOriginRepository extends BaseRepository {
@@ -10,15 +12,15 @@ export class DpmsPlOriginRepository extends BaseRepository {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
-    findById(id: number) {
-        return this.getRepository(DPMS_PL_ORIGIN).find({
+    getOriginById(id: number) {
+        return this.getRepository(DPMS_PL_ORIGIN_VIEW).find({
             where: { NISSUEREV_ID: id },
             order: { NSEQ: 'ASC', VCASE: 'ASC', VITEM: 'ASC', VDRAWING: 'ASC' },
         });
     }
 
-    findByOrder(id: number) {
-        return this.getRepository(DPMS_PL_ORIGIN)
+    getOrderOrigin(order: string) {
+        return this.getRepository(DPMS_PL_ORIGIN_VIEW)
             .createQueryBuilder('O')
             .select(
                 `
@@ -31,13 +33,13 @@ export class DpmsPlOriginRepository extends BaseRepository {
                     VORIGIN
                 ) AS SHIPPINGMARK_ON_PACKAGE`,
             )
-            .where('NISSUEREV_ID = :id', { id })
+            .where('VMFGNO = :order AND LAST_REVISION = 1', { order })
             .groupBy('VMFGNO')
-            .getRawMany();
+            .getRawOne();
     }
 
-    findByCase(id: number) {
-        return this.getRepository(DPMS_PL_ORIGIN)
+    getCaseOrigin(order: string) {
+        return this.getRepository(DPMS_PL_ORIGIN_VIEW)
             .createQueryBuilder('O')
             .select(
                 `
@@ -58,7 +60,7 @@ export class DpmsPlOriginRepository extends BaseRepository {
                 VORIGIN
             ) AS SHIPPINGMARK_ON_PACKAGE`,
             )
-            .where('NISSUEREV_ID = :id', { id })
+            .where('VMFGNO = :order AND LAST_REVISION = 1', { order })
             .groupBy(
                 'VMFGNO, NSEQ, VCASE, VPACKSTYLE, NNETWEIGHT, NGROSSWEIGHT, VWIDTH, VLENGTH, VHEIGHT',
             )
@@ -66,8 +68,8 @@ export class DpmsPlOriginRepository extends BaseRepository {
             .getRawMany();
     }
 
-    findByDetail(id: number) {
-        return this.getRepository(DPMS_PL_ORIGIN)
+    getDetailOrigin(order: string) {
+        return this.getRepository(DPMS_PL_ORIGIN_VIEW)
             .createQueryBuilder('O')
             .select(
                 `
@@ -80,8 +82,17 @@ export class DpmsPlOriginRepository extends BaseRepository {
             NQTY,
             VORIGIN`,
             )
-            .where('NISSUEREV_ID = :id', { id })
+            .where('VMFGNO = :order AND LAST_REVISION = 1', { order })
             .orderBy('VCASE, VITEM, VDRAWING', 'ASC')
             .getRawMany();
+    }
+
+    create(data: CreateDpmsPlOriginDto | CreateDpmsPlOriginDto[]) {
+        if (Array.isArray(data)) {
+            return this.getRepository(DPMS_PL_ORIGIN).save(data, {
+                chunk: 500, // แบ่งการบันทึกเป็นกลุ่มละ 500 แถว
+            });
+        }
+        return this.getRepository(DPMS_PL_ORIGIN).save(data);
     }
 }

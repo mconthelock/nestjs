@@ -1,27 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { DpmsPlOriginRepository } from './dpms_pl_origin.repository';
+import { CreateDpmsPlOriginDto } from './dto/create-dpms_pl_origin.dto';
 
 @Injectable()
 export class DpmsPlOriginService {
     constructor(private readonly repo: DpmsPlOriginRepository) {}
 
-    async find(id: number, type?: 1 | 2 | 3) {
+    async find({
+        order,
+        type,
+        id,
+    }: {
+        order?: string;
+        type?: 'order' | 'case' | 'detail';
+        id?: number;
+    }) {
         try {
             let res = null;
             switch (type) {
-                case 1:
-                    res = await this.repo.findByOrder(id);
+                case 'order':
+                    res = await this.repo.getOrderOrigin(order);
                     break;
-                case 2:
-                    res = await this.repo.findByCase(id);
+                case 'case':
+                    res = await this.repo.getCaseOrigin(order);
                     break;
-                case 3:
-                    res = await this.repo.findByDetail(id);
+                case 'detail':
+                    res = await this.repo.getDetailOrigin(order);
                     break;
                 default:
-                    res = await this.repo.findById(id);
+                    res = await this.repo.getOriginById(id);
             }
-            if (res.length == 0) {
+            if (!res || (Array.isArray(res) && res.length === 0)) {
                 return {
                     status: false,
                     message: 'No data found',
@@ -29,7 +38,7 @@ export class DpmsPlOriginService {
             }
             return {
                 status: true,
-                message: `Data found ${res.length} records`,
+                message: `Data found ${Array.isArray(res) ? res.length : 1} records`,
                 data: res,
             };
         } catch (error) {
@@ -37,34 +46,52 @@ export class DpmsPlOriginService {
         }
     }
 
-    async editOrigin(id: number) {
+    async create(dto: CreateDpmsPlOriginDto | CreateDpmsPlOriginDto[]) {
         try {
-            const caseRes = await this.find(id, 2);
-            if(!caseRes.status){
-                return caseRes;
-            }
-            const detailRes = await this.find(id, 3);
-            if(!detailRes.status){
-                return detailRes;
-            }
-            const caseLists = caseRes.data;
-            const details = detailRes.data;
-            const data = caseLists.map((caseItem) => {
-                const caseDetails = details.filter(
-                    (detailItem) => detailItem.VCASE === caseItem.VCASE,
-                );
+            const res = await this.repo.create(dto);
+            if (!res) {
                 return {
-                    ...caseItem,
-                    DETAILS: caseDetails,
+                    status: false,
+                    message: 'Failed to create origin data',
                 };
-            });
+            }
             return {
                 status: true,
-                message: `Data found ${data.length} records`,
-                data: data,
+                message: 'Data created successfully',
+                data: res,
             };
         } catch (error) {
             throw new Error(error.message);
         }
     }
+    // async editOrigin(id: number) {
+    //     try {
+    //         const caseRes = await this.find({ type: 2, id });
+    //         if (!caseRes.status) {
+    //             return caseRes;
+    //         }
+    //         const detailRes = await this.find({ type: 3, id });
+    //         if (!detailRes.status) {
+    //             return detailRes;
+    //         }
+    //         const caseLists = caseRes.data;
+    //         const details = detailRes.data;
+    //         const data = caseLists.map((caseItem) => {
+    //             const caseDetails = details.filter(
+    //                 (detailItem) => detailItem.VCASE === caseItem.VCASE,
+    //             );
+    //             return {
+    //                 ...caseItem,
+    //                 DETAILS: caseDetails,
+    //             };
+    //         });
+    //         return {
+    //             status: true,
+    //             message: `Data found ${data.length} records`,
+    //             data: data,
+    //         };
+    //     } catch (error) {
+    //         throw new Error(error.message);
+    //     }
+    // }
 }

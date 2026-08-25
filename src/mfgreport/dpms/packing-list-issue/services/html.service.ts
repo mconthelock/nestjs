@@ -7,9 +7,70 @@ import {
     IsetTableParams,
     IgenerateParams,
 } from '../interface/html.interface';
+import { IlogMessage, log_message } from 'src/common/utils/transform';
+import { S049kpService } from 'src/datacenter/s049kp/s049kp.service';
+import { S020kpService } from 'src/datacenter/s020kp/s020kp.service';
+import { DpmsPlCaseListService } from 'src/workload/dpms_pl_case_list/dpms_pl_case_list.service';
+import { setListForHtml } from '../builders/list.builder';
 
 @Injectable()
 export class HtmlService {
+    constructor(
+        private readonly caseListService: DpmsPlCaseListService,
+        private readonly s020kpService: S020kpService,
+        private readonly s049kpService: S049kpService,
+    ) {}
+
+    async main({
+        id,
+        logMessage,
+        revData,
+        issueDate,
+    }: {
+        id: number;
+        logMessage?: IlogMessage[];
+        revData: any;
+        issueDate: string;
+    }) {
+        try {
+            const lists = await this.caseListService.findByRevId(id, true);
+            const combine = await this.s020kpService.find(revData.VORDERS);
+            const changeBlock = await this.s049kpService.find(revData.VORDERS);
+            const listsData = lists.data.map(({ NID, ...list }) => {
+                const details = list.DETAILS.map(({ NID, ...item }) => item);
+                return { ...list, DETAILS: details };
+            });
+
+            logMessage?.push(log_message(`Set list for HTML`));
+            const plList = setListForHtml(lists.data, 'pdf');
+            logMessage?.push(log_message(`Generated HTML`));
+            const html = await this.generate({
+                revData: revData,
+                shippingMark: revData.VSHIPPINGMARK,
+                lists: lists.data,
+                plList: plList,
+                issueDate: issueDate,
+                combine: combine.data,
+                changeBlock: changeBlock.data,
+            });
+            return {
+                status: true,
+                message: 'HTML generated successfully',
+                html: html,
+                plList: plList,
+                lists: listsData,
+            };
+        } catch (error) {
+            logMessage?.push(
+                log_message(`Error revising: ${error.message}`),
+            );
+            return {
+                status: false,
+                message: `Error revising: ${error.message}`,
+            };
+        }
+    }
+
     async generate({
         revData,
         shippingMark,

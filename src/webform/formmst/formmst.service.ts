@@ -125,6 +125,16 @@ export class FormmstService {
         });
     }
 
+    async getFormAuthByEmpno(EMPNO: string) {
+        const auth = await this.repo.findAuth(
+            undefined,
+            undefined,
+            undefined,
+            EMPNO,
+        );
+        return auth;
+    }
+
     async upsertFormAuth(authData: {
         NFRMNO: number;
         VORGNO: string;

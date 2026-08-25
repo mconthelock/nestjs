@@ -73,6 +73,11 @@ export class FormmstController {
         return await this.formmstService.getFormAuth(NFRMNO, VORGNO, CYEAR);
     }
 
+    @Get('auth/:EMPNO')
+    async getFormAuthByEmpno(@Param('EMPNO') EMPNO: string) {
+        return await this.formmstService.getFormAuthByEmpno(EMPNO);
+    }
+
     @Post('auth/update')
     async upsertFormAuth(
         @Body()

@@ -16,6 +16,9 @@ import { CreateExpatEmployeeFileDto } from './dto/create-expat-employee-file.dto
 import { CreateExpatFamilyFileDto } from './dto/create-expat-family-file.dto';
 import { ExpatEmployee } from 'src/common/Entities/gpreport/table/expat_employee.entity';
 import { ExpatFamily } from 'src/common/Entities/gpreport/table/expat_family.entity';
+import { CreateExpatTravelDto } from './dto/create-expat-travel.dto';
+import { UpdateExpatTravelDto } from './dto/update-expat-travel.dto';
+import { ExpatTravel } from 'src/common/Entities/gpreport/table/expat_travel.entity';
 
 @Injectable()
 export class ExpatService {
@@ -226,46 +229,52 @@ export class ExpatService {
         return employee;
     }
 
-    async uploadFamilyFileExpat(sempno: string, fid: number, fileType: string, file: Express.Multer.File, ) {
-        if (!file) throw new BadRequestException('FILE_REQUIRED');
-        if (!await this.expatRepository.findOneFamily(sempno, fid))throw new NotFoundException('EXPAT_FAMILY_NOT_FOUND');
-
-        fileType = fileType.toUpperCase();
-        const typeMap: Record<string, string> = {
-            PASSPORT: 'passport',
-            '90DAY_RECEIPT': '90dayreceipt',
-        };
-
-        const typeName = typeMap[fileType];
-        if (!typeName) throw new BadRequestException('INVALID_FILE_TYPE');
-
-        const ext = path.extname(file.originalname).toLowerCase();
-        if (!['.pdf', '.jpg', '.jpeg', '.png', '.xls', '.xlsx'].includes(ext))throw new BadRequestException('INVALID_FILE_EXTENSION');
-
-        const basePath = process.env.EXPAT_FILE_PATH;
-        if (!basePath) throw new BadRequestException('EXPAT_FILE_PATH_NOT_CONFIGURED');
-
-        const folderPath = path.join(basePath, sempno, 'family');
-        if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
-
-        const oldFile = await this.expatRepository.findFamilyFileByType(sempno, fid, fileType);
-        if (oldFile?.FILE_PATH && fs.existsSync(oldFile.FILE_PATH))fs.unlinkSync(oldFile.FILE_PATH);
-
-        const fileName = `${sempno}_F${fid}_${typeName}${ext}`;
-        const filePath = path.join(folderPath, fileName);
-        fs.writeFileSync(filePath, file.buffer);
-
-        const data = {
-            SEMPNO: sempno,
-            FID: fid,
-            FILE_ID: oldFile?.FILE_ID ?? 1,
-            FILE_TYPE: fileType,
-            FILE_NAME: fileName,
-            FILE_PATH: filePath,
-            FILE_DATE: new Date(),
-        };
-
-        if (oldFile)return this.expatRepository.updateFamilyFile(sempno, fid, fileType, data);
-        return this.expatRepository.createFamilyFile(data);
+    // TRAVEL
+    findEmployeeTravels(sempno: string) {
+        return this.expatRepository.findTravels(sempno);
     }
+
+    findFamilyTravels(sempno: string, fid: number) {
+        return this.expatRepository.findTravels(sempno, fid);
+    }
+
+    async createEmployeeTravel(sempno: string, dto: CreateExpatTravelDto) {
+        if (!await this.expatRepository.findOneEmployee(sempno))throw new NotFoundException('EXPAT_EMPLOYEE_NOT_FOUND');
+        return this.expatRepository.createTravel({
+            TRAVEL_ID: await this.expatRepository.getNextTravelId(),
+            SEMPNO: sempno,
+            FID: null,
+            ...this.mapTravelData(dto),
+        });
+    }
+
+    async createFamilyTravel(sempno: string, fid: number, dto: CreateExpatTravelDto) {
+        if (!await this.expatRepository.findOneFamily(sempno, fid))throw new NotFoundException('EXPAT_FAMILY_NOT_FOUND');
+        return this.expatRepository.createTravel({TRAVEL_ID: await this.expatRepository.getNextTravelId(),SEMPNO: sempno,FID: fid,...this.mapTravelData(dto),});
+    }
+
+    async updateTravel(travelId: number, dto: UpdateExpatTravelDto) {
+        if (!await this.expatRepository.findOneTravel(travelId))throw new NotFoundException('EXPAT_TRAVEL_NOT_FOUND');
+        return this.expatRepository.updateTravel(travelId, {
+            ...this.mapTravelData(dto),
+            UPDATE_DATE: new Date(),
+        });
+    }
+
+    async deleteTravel(travelId: number) {
+        if (!await this.expatRepository.findOneTravel(travelId))throw new NotFoundException('EXPAT_TRAVEL_NOT_FOUND');
+        return this.expatRepository.deleteTravel(travelId);
+    }
+
+    private mapTravelData(dto: CreateExpatTravelDto | UpdateExpatTravelDto): Partial<ExpatTravel> {
+        const data: Partial<ExpatTravel> = {};
+        if (dto.FLIGHT_NO !== undefined) data.FLIGHT_NO = dto.FLIGHT_NO;
+        if (dto.FROM_DEST !== undefined) data.FROM_DEST = dto.FROM_DEST;
+        if (dto.DEPARTURE_DATE !== undefined) data.DEPARTURE_DATE = dto.DEPARTURE_DATE ? new Date(dto.DEPARTURE_DATE) : null;
+        if (dto.ARRIVAL_DATE !== undefined) data.ARRIVAL_DATE = dto.ARRIVAL_DATE ? new Date(dto.ARRIVAL_DATE) : null;
+        if (dto.STATUS !== undefined) data.STATUS = dto.STATUS;
+        return data;
+    }
+
+
 }

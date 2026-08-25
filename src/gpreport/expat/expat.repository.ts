@@ -7,6 +7,7 @@ import { ExpatFamily } from 'src/common/Entities/gpreport/table/expat_family.ent
 import { ExpatEmployeeFile } from 'src/common/Entities/gpreport/table/expat_employee_file.entity';
 import { ExpatFamilyFile } from 'src/common/Entities/gpreport/table/expat_family_file.entity';
 import { User } from 'src/amec/users/entities/user.entity';
+import { ExpatTravel } from 'src/common/Entities/gpreport/table/expat_travel.entity';
 
 @Injectable()
 export class ExpatRepository extends BaseRepository {
@@ -233,14 +234,42 @@ export class ExpatRepository extends BaseRepository {
         return this.findEmployeeFileByType(sempno, fileType);
     }
 
-    findFamilyFileByType(sempno: string, fid: number, fileType: string) {
-        return this.getRepository(ExpatFamilyFile).findOne({
-            where: { SEMPNO: sempno, FID: fid, FILE_TYPE: fileType },
-        });
+    // TRAVEL
+    findTravels(sempno: string, fid?: number) {
+        const qb = this.getRepository(ExpatTravel)
+            .createQueryBuilder('T')
+            .where('T.SEMPNO = :sempno', { sempno });
+
+        if (fid !== undefined) qb.andWhere('T.FID = :fid', { fid });
+        else qb.andWhere('T.FID IS NULL');
+
+        return qb.orderBy('T.ARRIVAL_DATE', 'DESC').getMany();
     }
 
-    async updateFamilyFile(sempno: string, fid: number, fileType: string, data: Partial<ExpatFamilyFile>,) {
-        await this.getRepository(ExpatFamilyFile).update({ SEMPNO: sempno, FID: fid, FILE_TYPE: fileType }, data,);
-        return this.findFamilyFileByType(sempno, fid, fileType);
+    findOneTravel(travelId: number) {
+        return this.getRepository(ExpatTravel).findOne({ where: { TRAVEL_ID: travelId } });
     }
+
+    async getNextTravelId() {
+        const result = await this.getRepository(ExpatTravel)
+            .createQueryBuilder('T')
+            .select('NVL(MAX(T.TRAVEL_ID), 0) + 1', 'TRAVEL_ID')
+            .getRawOne();
+        return Number(result.TRAVEL_ID);
+    }
+
+    createTravel(data: Partial<ExpatTravel>) {
+        const repo = this.getRepository(ExpatTravel);
+        return repo.save(repo.create(data));
+    }
+
+    async updateTravel(travelId: number, data: Partial<ExpatTravel>) {
+        await this.getRepository(ExpatTravel).update({ TRAVEL_ID: travelId }, data);
+        return this.findOneTravel(travelId);
+    }
+
+    deleteTravel(travelId: number) {
+        return this.getRepository(ExpatTravel).delete({ TRAVEL_ID: travelId });
+    }
+
 }

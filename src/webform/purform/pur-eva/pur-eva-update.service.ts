@@ -91,7 +91,8 @@ export class PurEvaUpdateService {
                 NRUNNO: data.NRUNNO,
             };
             const {
-                ADDRESS_EN,
+                ADDRESS1_EN,
+                ADDRESS2_EN,
                 CITY_EN,
                 STATE_EN,
                 COUNTRY_EN,
@@ -106,12 +107,13 @@ export class PurEvaUpdateService {
             await this.repo.update(form, purevaForm);
             const addr = [];
             let addid = 0;
-            if (ADDRESS_EN && ADDRESS_EN.trim().length > 0) {
+            if (ADDRESS1_EN && ADDRESS1_EN.trim().length > 0) {
                 addid++;
                 addr.push({
                     ADDRID: addid,
                     ADDRTYPE: 'E',
-                    ADDR: ADDRESS_EN,
+                    ADDR1: ADDRESS1_EN,
+                    ADDR2: ADDRESS2_EN,
                     CITY: CITY_EN,
                     STATE: STATE_EN,
                     COUNTRY: COUNTRY_EN,

@@ -25,6 +25,8 @@ import { CreateExpatEmployeeFileDto } from './dto/create-expat-employee-file.dto
 import { CreateExpatFamilyFileDto } from './dto/create-expat-family-file.dto';
 import { Res } from '@nestjs/common';
 import { Response } from 'express';
+import { CreateExpatTravelDto } from './dto/create-expat-travel.dto';
+import { UpdateExpatTravelDto } from './dto/update-expat-travel.dto';
 
 
 @Controller('expat')
@@ -143,15 +145,38 @@ export class ExpatController {
         return this.expatService.viewFileExpat(sempno, fileType, download === '1', res);
     }
 
-    @Post('uploadfamilyfile/:sempno/:fid/:fileType')
-    @UseInterceptors(FileInterceptor('file'))
-    uploadFamilyFileExpat(
-        @Param('sempno') sempno: string,
-        @Param('fid', ParseIntPipe) fid: number,
-        @Param('fileType') fileType: string,
-        @UploadedFile() file: Express.Multer.File,
-    ) {
-        return this.expatService.uploadFamilyFileExpat(sempno, fid, fileType, file);
+    // TRAVEL
+    @Get('employee/:sempno/travel')
+    findEmployeeTravels(@Param('sempno') sempno: string) {
+        return this.expatService.findEmployeeTravels(sempno);
     }
 
+    @Post('employee/:sempno/travel')
+    createEmployeeTravel(@Param('sempno') sempno: string, @Body() dto: CreateExpatTravelDto) {
+        return this.expatService.createEmployeeTravel(sempno, dto);
+    }
+
+    @Get('employee/:sempno/family/:fid/travel')
+    findFamilyTravels(@Param('sempno') sempno: string, @Param('fid', ParseIntPipe) fid: number) {
+        return this.expatService.findFamilyTravels(sempno, fid);
+    }
+
+    @Post('employee/:sempno/family/:fid/travel')
+    createFamilyTravel(
+        @Param('sempno') sempno: string,
+        @Param('fid', ParseIntPipe) fid: number,
+        @Body() dto: CreateExpatTravelDto,
+    ) {
+        return this.expatService.createFamilyTravel(sempno, fid, dto);
+    }
+
+    @Patch('travel/:travelId')
+    updateTravel(@Param('travelId', ParseIntPipe) travelId: number, @Body() dto: UpdateExpatTravelDto) {
+        return this.expatService.updateTravel(travelId, dto);
+    }
+
+    @Delete('travel/:travelId')
+    deleteTravel(@Param('travelId', ParseIntPipe) travelId: number) {
+        return this.expatService.deleteTravel(travelId);
+    }
 }

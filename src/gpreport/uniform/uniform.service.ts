@@ -44,4 +44,7 @@ export class UniformService {
         });
         return data;
     }
+
+    //Annual Request
+    async findAnnualRequest(userId: string, year: string) {}
 }

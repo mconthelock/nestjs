@@ -225,4 +225,47 @@ export class ExpatService {
         if (!employee) throw new NotFoundException('EMPLOYEE_NOT_FOUND');
         return employee;
     }
+
+    async uploadFamilyFileExpat(sempno: string, fid: number, fileType: string, file: Express.Multer.File, ) {
+        if (!file) throw new BadRequestException('FILE_REQUIRED');
+        if (!await this.expatRepository.findOneFamily(sempno, fid))throw new NotFoundException('EXPAT_FAMILY_NOT_FOUND');
+
+        fileType = fileType.toUpperCase();
+        const typeMap: Record<string, string> = {
+            PASSPORT: 'passport',
+            '90DAY_RECEIPT': '90dayreceipt',
+        };
+
+        const typeName = typeMap[fileType];
+        if (!typeName) throw new BadRequestException('INVALID_FILE_TYPE');
+
+        const ext = path.extname(file.originalname).toLowerCase();
+        if (!['.pdf', '.jpg', '.jpeg', '.png', '.xls', '.xlsx'].includes(ext))throw new BadRequestException('INVALID_FILE_EXTENSION');
+
+        const basePath = process.env.EXPAT_FILE_PATH;
+        if (!basePath) throw new BadRequestException('EXPAT_FILE_PATH_NOT_CONFIGURED');
+
+        const folderPath = path.join(basePath, sempno, 'family');
+        if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
+
+        const oldFile = await this.expatRepository.findFamilyFileByType(sempno, fid, fileType);
+        if (oldFile?.FILE_PATH && fs.existsSync(oldFile.FILE_PATH))fs.unlinkSync(oldFile.FILE_PATH);
+
+        const fileName = `${sempno}_F${fid}_${typeName}${ext}`;
+        const filePath = path.join(folderPath, fileName);
+        fs.writeFileSync(filePath, file.buffer);
+
+        const data = {
+            SEMPNO: sempno,
+            FID: fid,
+            FILE_ID: oldFile?.FILE_ID ?? 1,
+            FILE_TYPE: fileType,
+            FILE_NAME: fileName,
+            FILE_PATH: filePath,
+            FILE_DATE: new Date(),
+        };
+
+        if (oldFile)return this.expatRepository.updateFamilyFile(sempno, fid, fileType, data);
+        return this.expatRepository.createFamilyFile(data);
+    }
 }

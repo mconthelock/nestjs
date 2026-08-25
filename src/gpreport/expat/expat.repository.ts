@@ -232,4 +232,15 @@ export class ExpatRepository extends BaseRepository {
         );
         return this.findEmployeeFileByType(sempno, fileType);
     }
+
+    findFamilyFileByType(sempno: string, fid: number, fileType: string) {
+        return this.getRepository(ExpatFamilyFile).findOne({
+            where: { SEMPNO: sempno, FID: fid, FILE_TYPE: fileType },
+        });
+    }
+
+    async updateFamilyFile(sempno: string, fid: number, fileType: string, data: Partial<ExpatFamilyFile>,) {
+        await this.getRepository(ExpatFamilyFile).update({ SEMPNO: sempno, FID: fid, FILE_TYPE: fileType }, data,);
+        return this.findFamilyFileByType(sempno, fid, fileType);
+    }
 }

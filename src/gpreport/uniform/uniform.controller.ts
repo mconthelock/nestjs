@@ -6,16 +6,16 @@ import { UpdateUniformDto } from './dto/update-uniform.dto';
 
 @Controller('gpreport/uniform')
 export class UniformController {
-    constructor(private readonly uniformService: UniformService) {}
+    constructor(private readonly unf: UniformService) {}
 
     @Get('master')
     findAll() {
-        return this.uniformService.findAll();
+        return this.unf.findAll();
     }
 
     @Get('rights')
     findRights() {
-        return this.uniformService.findRights();
+        return this.unf.findRights();
     }
 
     @Get('annual/request/:userId/:year')
@@ -23,6 +23,6 @@ export class UniformController {
         @Param('userId') userId: string,
         @Param('year') year: string,
     ) {
-        //return this.uniformService.findRightsByUserId(userId, year);
+        return this.unf.findAnnualRequest(userId, year);
     }
 }

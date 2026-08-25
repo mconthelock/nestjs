@@ -20,7 +20,7 @@ export class VendorsController {
     }
 
     @Post('next-vendor')
-    nextVendor(@Body('code') code: any) {
+    nextVendor(@Body('code') code: { first: number; second?: number }) {
         return this.vnd.nextVendor(code.first, code?.second);
     }
 }

@@ -26,6 +26,7 @@ import { CreateExpatFamilyFileDto } from './dto/create-expat-family-file.dto';
 import { Res } from '@nestjs/common';
 import { Response } from 'express';
 
+
 @Controller('expat')
 export class ExpatController {
     constructor(private readonly expatService: ExpatService) {}
@@ -140,6 +141,17 @@ export class ExpatController {
         @Res() res: Response,
     ) {
         return this.expatService.viewFileExpat(sempno, fileType, download === '1', res);
+    }
+
+    @Post('uploadfamilyfile/:sempno/:fid/:fileType')
+    @UseInterceptors(FileInterceptor('file'))
+    uploadFamilyFileExpat(
+        @Param('sempno') sempno: string,
+        @Param('fid', ParseIntPipe) fid: number,
+        @Param('fileType') fileType: string,
+        @UploadedFile() file: Express.Multer.File,
+    ) {
+        return this.expatService.uploadFamilyFileExpat(sempno, fid, fileType, file);
     }
 
 }

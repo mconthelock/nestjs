@@ -23,7 +23,8 @@ import { CreateExpatFamilyDto } from './dto/create-expat-family.dto';
 import { UpdateExpatFamilyDto } from './dto/update-expat-family.dto';
 import { CreateExpatEmployeeFileDto } from './dto/create-expat-employee-file.dto';
 import { CreateExpatFamilyFileDto } from './dto/create-expat-family-file.dto';
-
+import { Res } from '@nestjs/common';
+import { Response } from 'express';
 
 @Controller('expat')
 export class ExpatController {
@@ -129,6 +130,16 @@ export class ExpatController {
         @UploadedFile() file: Express.Multer.File,
     ) {
         return this.expatService.uploadFileExpat(sempno, fileType, file);
+    }
+
+    @Get('viewfile/:sempno/:fileType')
+    viewFileExpat(
+        @Param('sempno') sempno: string,
+        @Param('fileType') fileType: string,
+        @Query('download') download: string,
+        @Res() res: Response,
+    ) {
+        return this.expatService.viewFileExpat(sempno, fileType, download === '1', res);
     }
 
 }

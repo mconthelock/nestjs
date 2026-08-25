@@ -44,8 +44,7 @@ export class PurVmmService {
         const datavmmfrm = {
             ...form,
             REQTYPE: dataeva.OPERATION === 'N' ? 'A' : 'U',
-            // VENDCODE: dataeva.VENDCODE,
-            VENDCODE: '10002',
+            VENDCODE: dataeva.VENDCODE,
             VENDNAME: dataeva.COMNAME,
             VENDGROUPTYPE:
                 dataeva.VENDGROUP === '6:Non-Production (6)'
@@ -66,7 +65,8 @@ export class PurVmmService {
                     ...form,
                     ADDRID: item.ADDRID,
                     ADDRTYPE: item.ADDRTYPE,
-                    ADDR: item.ADDR,
+                    ADDR1: item.ADDR1,
+                    ADDR2: item.ADDR2,
                     CITY: item.CITY,
                     STATE: item.STATE,
                     COUNTRY: item.COUNTRY,

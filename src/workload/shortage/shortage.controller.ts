@@ -7,7 +7,7 @@ import { CreatePurTrackingDto } from './dto/create-purtracking.dto';
 
 @Controller('shortage')
 export class ShortageController {
-  constructor(private readonly shortageService: ShortageService) {}
+  constructor(private readonly shortageService: ShortageService) { }
 
   @Post()
   create(@Body() createShortageDto: CreateShortageDto) {
@@ -23,17 +23,17 @@ export class ShortageController {
   getHeadProd5() {
     return this.shortageService.getHeadProd5();
   }
-  
+
   @Get('report')
   getShortageReport() {
     return this.shortageService.getShortageReport();
   }
 
-  @Get('report-noentity')
+  /*@Get('report-noentity')
   getshortageReportNoEntity() {
     return this.shortageService.getshortageReportNoEntity();
-  }
-  
+  }*/
+
   //insert short_pur_tracking
   @Post('short-pur-tracking')
   createShortPurTracking(@Body() data: CreatePurTrackingDto) {
@@ -46,10 +46,11 @@ export class ShortageController {
     return this.shortageService.updateShortPurTracking(data);
   }
 
-  /*@Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.shortageService.findOne(+id);
-  }*/
+  //get shortage report with invoice data
+  @Get('report-inv')
+  getShortageReport_inv() {
+    return this.shortageService.getShortageReport_inv();
+  }
 
   /*@Patch(':id')
   update(@Param('id') id: string, @Body() updateShortageDto: UpdateShortageDto) {

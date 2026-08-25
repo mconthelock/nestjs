@@ -31,6 +31,9 @@ export class FINNPOINVOICE {
 
     @Column({ type: 'number', nullable: true })
     WHT: number | null;
+
+    @Column({ nullable: true })
+    REFERENCE: string | null;
     
     @PrimaryColumn()
     SCURCODE: string;

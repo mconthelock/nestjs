@@ -1,4 +1,10 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { 
+    ConflictException, 
+    Injectable, 
+    NotFoundException,
+    BadRequestException,
+} 
+from '@nestjs/common';
 import { ExpatRepository } from './expat.repository';
 import { CreateExpatEmployeeDto } from './dto/create-expat-employee.dto';
 import { UpdateExpatEmployeeDto } from './dto/update-expat-employee.dto';
@@ -8,6 +14,8 @@ import { CreateExpatEmployeeFileDto } from './dto/create-expat-employee-file.dto
 import { CreateExpatFamilyFileDto } from './dto/create-expat-family-file.dto';
 import { ExpatEmployee } from 'src/common/Entities/gpreport/table/expat_employee.entity';
 import { ExpatFamily } from 'src/common/Entities/gpreport/table/expat_family.entity';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class ExpatService {
@@ -156,5 +164,46 @@ export class ExpatService {
         const employee = await this.expatRepository.findAmecEmployee(sempno);
         if (!employee) throw new NotFoundException('EMPLOYEE_NOT_FOUND');
         return employee;
+    }
+
+    async uploadFileExpat(sempno: string, fileType: string, file: Express.Multer.File,) {
+        if (!file) throw new BadRequestException('FILE_REQUIRED');
+
+        const employee = await this.expatRepository.findOneEmployee(sempno);
+        if (!employee) throw new NotFoundException('EXPAT_EMPLOYEE_NOT_FOUND');
+        const typeMap = {
+            WORK_PERMIT: 'workpermit',
+            '90DAY_RECEIPT': '90dayreceipt',
+        };
+
+        const typeName = typeMap[fileType?.toUpperCase()];
+        if (!typeName) throw new BadRequestException('INVALID_FILE_TYPE');
+
+        const ext = path.extname(file.originalname).toLowerCase();
+        if (!['.pdf', '.jpg', '.jpeg', '.png', '.xls', '.xlsx'].includes(ext))throw new BadRequestException('INVALID_FILE_EXTENSION');
+
+        const basePath = process.env.EXPAT_FILE_PATH;
+        const folderPath = path.join(basePath, sempno);
+        if (!fs.existsSync(folderPath)) fs.mkdirSync(folderPath, { recursive: true });
+
+        const oldFile = await this.expatRepository.findEmployeeFileByType(sempno,fileType.toUpperCase(),);
+
+        if (oldFile?.FILE_PATH && fs.existsSync(oldFile.FILE_PATH))fs.unlinkSync(oldFile.FILE_PATH);
+
+        const fileName = `${sempno}_${typeName}${ext}`;
+        const filePath = path.join(folderPath, fileName);
+
+        fs.writeFileSync(filePath, file.buffer);
+        const data = {
+            SEMPNO: sempno,
+            FILE_ID: 1,
+            FILE_TYPE: fileType.toUpperCase(),
+            FILE_NAME: fileName,
+            FILE_PATH: filePath,
+            FILE_DATE: new Date(),
+        };
+
+        if (oldFile)return this.expatRepository.updateEmployeeFile(sempno,fileType.toUpperCase(),data,);
+        return this.expatRepository.createEmployeeFile(data);
     }
 }

@@ -1,4 +1,21 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import { 
+    Body, 
+    Controller, 
+    Delete, 
+    Get, 
+    Param, 
+    ParseIntPipe, 
+    Patch, 
+    Post, 
+    Query,
+    UploadedFile, 
+    UseInterceptors,
+} 
+from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
+
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ExpatService } from './expat.service';
 import { CreateExpatEmployeeDto } from './dto/create-expat-employee.dto';
 import { UpdateExpatEmployeeDto } from './dto/update-expat-employee.dto';
@@ -6,6 +23,7 @@ import { CreateExpatFamilyDto } from './dto/create-expat-family.dto';
 import { UpdateExpatFamilyDto } from './dto/update-expat-family.dto';
 import { CreateExpatEmployeeFileDto } from './dto/create-expat-employee-file.dto';
 import { CreateExpatFamilyFileDto } from './dto/create-expat-family-file.dto';
+
 
 @Controller('expat')
 export class ExpatController {
@@ -102,4 +120,15 @@ export class ExpatController {
     findAmecEmployee(@Param('sempno') sempno: string) {
         return this.expatService.findAmecEmployee(sempno);
     }
+
+    @Post('uploadfile/:sempno/:fileType')
+    @UseInterceptors(FileInterceptor('file'))
+    uploadFileExpat(
+        @Param('sempno') sempno: string,
+        @Param('fileType') fileType: string,
+        @UploadedFile() file: Express.Multer.File,
+    ) {
+        return this.expatService.uploadFileExpat(sempno, fileType, file);
+    }
+
 }

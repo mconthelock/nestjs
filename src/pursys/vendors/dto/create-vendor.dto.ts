@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsDate } from 'class-validator';
+import { IsOptional, IsString, IsDate, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateVendorDto {
@@ -17,15 +17,18 @@ export class CreateVendorDto {
     VND_STATUS: string;
 
     @IsString()
+    @IsOptional()
     VND_TERM: string;
 
     @IsString()
     VND_TYPE1: string;
 
     @IsString()
+    @IsOptional()
     VND_TYPE2: string;
 
     @IsString()
+    @IsOptional()
     VND_CURRENCY: string;
 
     @IsString()
@@ -36,6 +39,7 @@ export class CreateVendorDto {
     VND_ADDRESS1: string;
 
     @IsString()
+    @IsOptional()
     VND_ADDRESS2: string;
 
     @IsString()
@@ -80,16 +84,18 @@ export class CreateVendorDto {
 
     @IsDate()
     @Type(() => Date)
-    CREATE_AT: Date;
-
-    @IsString()
     @IsOptional()
-    CREATE_BY?: string;
+    CREATE_AT?: Date;
 
     @IsString()
-    VENDGROUP: string;
+    CREATE_BY: string;
 
-    @IsString()
+    @IsNumber()
+    @Type(() => Number)
+    VENDGROUP: number;
+
+    @IsNumber()
     @IsOptional()
-    VENDPURPOSE?: string;
+    @Type(() => Number)
+    VENDPURPOSE?: number;
 }

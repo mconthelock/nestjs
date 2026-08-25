@@ -49,15 +49,15 @@ export class VendorsService {
         return this.vnd.save(vendor);
     }
 
-    async nextVendor(first: string, second?: string) {
+    async nextVendor(first: number, second?: number) {
         let minCode: number;
         let maxCode: number;
-        if (first == '6') {
+        if (first == 6) {
             minCode = parseInt(`${first}${second ? second : '0'}000`);
             maxCode = parseInt(`${first}${second ? second : '8'}999`);
         } else {
-            minCode = parseInt(`${first}${first == '8' ? '0' : second}000`);
-            maxCode = parseInt(`${first}${first == '8' ? '9' : second}999`);
+            minCode = parseInt(`${first}${first == 8 ? '0' : second}000`);
+            maxCode = parseInt(`${first}${first == 8 ? '9' : second}999`);
         }
         const vendors = await this.vnd.find();
         const nextVendor = vendors

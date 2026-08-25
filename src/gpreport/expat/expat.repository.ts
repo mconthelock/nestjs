@@ -212,4 +212,24 @@ export class ExpatRepository extends BaseRepository {
             .where('TRIM(U.SEMPNO) = TRIM(:sempno)', { sempno })
             .getOne();
     }
+
+    findEmployeeFileByType(sempno: string, fileType: string) {
+        return this.getRepository(ExpatEmployeeFile).findOne({
+            where: {
+                SEMPNO: sempno,
+                FILE_TYPE: fileType,
+            },
+        });
+    }
+
+    async updateEmployeeFile(sempno: string, fileType: string, data: Partial<ExpatEmployeeFile>,) {
+        await this.getRepository(ExpatEmployeeFile).update(
+            {
+                SEMPNO: sempno,
+                FILE_TYPE: fileType,
+            },
+            data,
+        );
+        return this.findEmployeeFileByType(sempno, fileType);
+    }
 }

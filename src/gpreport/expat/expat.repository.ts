@@ -54,7 +54,6 @@ export class ExpatRepository extends BaseRepository {
                 `CASE WHEN U.SDIVCODE = '140101' THEN 'RHQ' ELSE 'AMEC' END AS "COMPANY"`,
             ])
             .orderBy('E.SEMPNO', 'ASC');
-
         if (company?.toUpperCase() === 'RHQ') qb.andWhere(`U.SDIVCODE = '140101'`);
         if (company?.toUpperCase() === 'AMEC') qb.andWhere(`U.SDIVCODE <> '140101'`);
         return qb.getRawMany();

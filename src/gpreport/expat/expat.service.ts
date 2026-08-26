@@ -272,7 +272,6 @@ export class ExpatService {
         if (dto.FROM_DEST !== undefined) data.FROM_DEST = dto.FROM_DEST;
         if (dto.DEPARTURE_DATE !== undefined) data.DEPARTURE_DATE = dto.DEPARTURE_DATE ? new Date(dto.DEPARTURE_DATE) : null;
         if (dto.ARRIVAL_DATE !== undefined) data.ARRIVAL_DATE = dto.ARRIVAL_DATE ? new Date(dto.ARRIVAL_DATE) : null;
-        if (dto.STATUS !== undefined) data.STATUS = dto.STATUS;
         return data;
     }
 

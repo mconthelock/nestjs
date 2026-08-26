@@ -128,7 +128,7 @@ export class PurNvfReturnApproveService {
                 addr.push({
                     ADDRID: addid,
                     ADDRTYPE: 'T',
-                    ADDR: data.ADDRESS_TH,
+                    ADDR1: data.ADDRESS_TH,
                 });
             }
 

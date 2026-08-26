@@ -179,6 +179,7 @@ export class FinDsRepository extends BaseRepository {
         return this.getRepository(DS_STAMP_REPORT)
             .createQueryBuilder('REPORT')
             .select('REPORT.FYEAR', 'FYEAR')
+            .addSelect("TO_CHAR(HEAD.EFFECTIVE_DATE, 'YYYY-MM-DD')", 'EFFECTIVE_DATE')
             .addSelect("TO_CHAR(HEAD.DATE_RECEIVE, 'YYYY-MM-DD')", 'DATE_RECEIVE')
             .addSelect('REPORT.NFRMNO', 'NFRMNO')
             .addSelect('REPORT.VORGNO', 'VORGNO')

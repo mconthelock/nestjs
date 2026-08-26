@@ -33,7 +33,7 @@ export class DpmsPlCaseListRepository extends BaseRepository {
 
     findPartialSelectionByRevId(revId: number) {
         return this.manager.query(
-            `SELECT D.VCASE AS CASENO, D.VITEM AS ITEM, D.VDRAWING AS DRAWING
+            `SELECT D.VCASE, D.VITEM, D.VDRAWING
             FROM DPMS_PL_ISSUE_REV R
             JOIN DPMS_PL_CASE_LIST L ON R.NID = L.NISSUEREV_ID 
             JOIN DPMS_PL_CASE_LIST_DETAIL D ON L.NID = D.NCASELIST_ID 

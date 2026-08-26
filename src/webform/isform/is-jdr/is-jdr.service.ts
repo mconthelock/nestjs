@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { formatDate } from 'src/common/utils/dayjs.utils';
 import { ISJDR_RESULT } from 'src/common/Entities/webform/table/ISJDR_RESULT.entity';
 import { CreateIsJdrDto } from './dto/create-is-jdr.dto';
 import { UpdateIsJdrDto } from './dto/update-is-jdr.dto';
@@ -51,13 +50,13 @@ export class IsJdrService {
 
         if (startDate) {
             queryBuilder.andWhere('jobs.RC_DATETIME >= :startDate', {
-                startDate: formatDate(startDate),
+                startDate,
             });
         }
 
         if (endDate) {
             queryBuilder.andWhere('jobs.RC_DATETIME <= :endDate', {
-                endDate: formatDate(endDate),
+                endDate,
             });
         }
 

@@ -56,9 +56,22 @@ class DetailPLDto {
     @IsNumber()
     @Type(() => Number)
     NQTY: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    NPOSEQ?: number;
+
+    @IsOptional()
+    @IsString()
+    VORDER_PACK?: string;
+
+    @IsOptional()
+    @IsString()
+    VDRAWING_PACKING?: string;
 }
 
-class ListPLDto {
+export class ListPLDto {
     @IsNotEmpty()
     @IsString()
     VCASE: string;
@@ -139,6 +152,16 @@ export class CreatePackingListIssueDto {
     @ValidateNested({ each: true, message: 'Each item in LIST must be a valid ListPLDto' })
     @Type(() => ListPLDto)
     LIST: ListPLDto[];
+    
+    @IsNotEmpty()
+    @ValidateNested({ each: true, message: 'Each item in PO LIST must be a valid ListPLDto' })
+    @Type(() => ListPLDto)
+    POLIST: ListPLDto[];
+
+    @IsNotEmpty()
+    @IsBoolean()    
+    @ToBoolean()
+    PO: boolean;
 
     @IsNotEmpty()
     @IsString()
@@ -146,7 +169,7 @@ export class CreatePackingListIssueDto {
 
     @IsOptional()
     @IsString()
-    HTMLPO?: string;
+    POHTML?: string;
 
     // @IsNotEmpty()
     // @IsBoolean()
@@ -161,4 +184,24 @@ export class CreatePackingListIssueDto {
     @IsBoolean()    
     @ToBoolean()
     CHANGETYPE: boolean;
+
+    @IsNotEmpty()
+    @IsBoolean()    
+    @ToBoolean()
+    REVISE: boolean;
+
+    @IsOptional()
+    @IsNumber()    
+    @Type(() => Number)
+    REVISEID: number;
+
+    @IsNotEmpty()
+    @IsBoolean()    
+    @ToBoolean()
+    CHANGELIST: boolean;
+
+    @IsNotEmpty()
+    @IsBoolean()    
+    @ToBoolean()
+    NEWLIST: boolean;
 }

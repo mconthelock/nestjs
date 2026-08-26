@@ -1,44 +1,65 @@
-import {
-  Controller,
-  Req,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { FormmstService } from './formmst.service';
 import { SearchFormmstDto } from './dto/searchFormmst.dto';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { CreateFormmstDto } from './dto/create-formmst.dto';
+import { UpdateFormmstDto } from './dto/update-formmst.dto';
+import { CreateFormmstGroupDto } from './dto/create-formmst-group.dto';
+import { UpdateFormmstGroupDto } from './dto/update-formmst-group.dto';
 
 @ApiTags('Form master')
 @Controller('formmst')
 export class FormmstController {
-  constructor(private readonly formmstService: FormmstService) {}
+    constructor(private readonly formmstService: FormmstService) {}
 
-  @Get()
-  @ApiOperation({
-    summary: 'Get All Form master',
-  })
-  getFormMasterAll() {
-    return this.formmstService.getFormMasterAll();
-  }
+    @Get()
+    @ApiOperation({
+        summary: 'Get All Form master',
+    })
+    getFormMasterAll() {
+        return this.formmstService.getFormMasterAll();
+    }
 
-  @Get(':vaname')
-  @ApiOperation({
-    summary: 'Get Form master by vaname',
-  })
-  @ApiParam({ name: 'vaname', example: 'IS-TID', required: true })
-  getFormMasterByVaname(@Param('vaname') vaname: string) {
-    return this.formmstService.getFormMasterByVaname(vaname);
-  }
+    @Get(':vaname')
+    @ApiOperation({
+        summary: 'Get Form master by vaname',
+    })
+    @ApiParam({ name: 'vaname', example: 'IS-TID', required: true })
+    getFormMasterByVaname(@Param('vaname') vaname: string) {
+        return this.formmstService.getFormMasterByVaname(vaname);
+    }
 
-  @Post('getFormmst')
-  @ApiOperation({
-    summary: 'Get Form master',
-  })
-  async getFormmst(@Body() searchDto: SearchFormmstDto) {
-    return await this.formmstService.getFormmst(searchDto);
-  }
+    @Post('getFormmst')
+    @ApiOperation({
+        summary: 'Get Form master',
+    })
+    async getFormmst(@Body() searchDto: SearchFormmstDto) {
+        return await this.formmstService.getFormmst(searchDto);
+    }
+
+    @Post('create')
+    async createFormMaster(@Body() data: CreateFormmstDto) {
+        return await this.formmstService.createFormMaster(data);
+    }
+
+    @Post('update')
+    async updateFormMaster(@Body() data: UpdateFormmstDto) {
+        return await this.formmstService.updateFormMaster(data);
+    }
+
+    // Form Group section
+    @Get('group/master')
+    async getFormMasterGroup() {
+        return await this.formmstService.getAllGroup();
+    }
+
+    @Post('group/create')
+    async createFormMasterGroup(@Body() groupData: CreateFormmstGroupDto) {
+        return await this.formmstService.createFormMasterGroup(groupData);
+    }
+
+    @Post('group/update')
+    async updateFormMasterGroup(@Body() groupData: UpdateFormmstGroupDto) {
+        return await this.formmstService.updateFormMasterGroup(groupData);
+    }
 }

@@ -5,6 +5,7 @@ import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { PDFDocument } from 'pdf-lib';
 import { IdTagRepository } from './idtag.repository';
 import {
+    OrderInfo,
     PrintedService,
     filesData,
     PdfProcessContext,
@@ -25,6 +26,19 @@ export class PrintedQueueService {
         private readonly merge: PrintedMergeService,
         private readonly label: PrintedTopLabelService,
     ) {}
+
+    private async markPdfJobFailed(fileId?: number) {
+        if (!fileId) {
+            return;
+        }
+
+        await this.repo.updateFiles({
+            FILES: fileId,
+            FILE_STATUS: 4,
+            PRINTED_DATE: null,
+            FILE_PRINTEDPAGE: 0,
+        });
+    }
 
     async runPdfProcessJob(body: filesData & PdfProcessContext, jobId: string) {
         return this.printed.runWithPdfContext(
@@ -70,6 +84,11 @@ export class PrintedQueueService {
                         fileName: string;
                         filePath: string;
                         pageNumber: number;
+                        item: string;
+                        packing: string;
+                        process: string;
+                        drawing: string;
+                        fileMfgNo: OrderInfo[] | null;
                     }[] = [];
 
                     // ขั้นตอนที่ 2: แบ่งหน้า, อ่านข้อความ และตั้งชื่อไฟล์
@@ -114,27 +133,203 @@ export class PrintedQueueService {
                         `${dbdata.filename}`,
                     );
                     const mergeStartTime = Date.now();
-                    await this.merge.mergePdfsFast(splitFilesData, outFilePath);
                     await this.printed.writeLog(
-                        `Merged PDF in ${this.printed.formatElapsedTime(mergeStartTime)}`,
+                        `[${jobId}] Step 7/9: starting merge to ${outFilePath}`,
                     );
+                    await this.printed.writeLog(
+                        `[${jobId}] Step 7/9: merge input fragments=${splitFilesData.length}, outputDir=${outputDirectory}`,
+                    );
+                    try {
+                        for (const file of splitFilesData) {
+                            const stat = await fs
+                                .stat(file.filePath)
+                                .catch(() => null);
+                            await this.printed.writeLog(
+                                `[${jobId}] Step 7/9: fragment check path=${file.filePath}, exists=${Boolean(stat)}, size=${stat?.size ?? 0}`,
+                            );
+                        }
+                        await this.merge.mergePdfsFast(
+                            splitFilesData,
+                            outFilePath,
+                        );
+                        const mergedStat = await fs
+                            .stat(outFilePath)
+                            .catch(() => null);
+                        await this.printed.writeLog(
+                            `[${jobId}] Step 7/9: merged PDF successfully in ${this.printed.formatElapsedTime(mergeStartTime)} -> ${outFilePath}, exists=${Boolean(mergedStat)}, size=${mergedStat?.size ?? 0}`,
+                        );
+                    } catch (error) {
+                        const message =
+                            error instanceof Error
+                                ? error.message
+                                : String(error);
+                        await this.printed.writeLog(
+                            `[${jobId}] Step 7/9 failed during merge: ${outFilePath}`,
+                            message,
+                        );
+                        try {
+                            const dirStat = await fs.stat(outputDirectory);
+                            await this.printed.writeLog(
+                                `[${jobId}] Step 7/9: output dir exists=${true}, writable=${dirStat.isDirectory()}`,
+                            );
+                        } catch (dirError) {
+                            await this.printed.writeLog(
+                                `[${jobId}] Step 7/9: output dir access failed for ${outputDirectory}`,
+                                dirError instanceof Error
+                                    ? dirError.message
+                                    : String(dirError),
+                            );
+                        }
+                        throw new Error(
+                            `Merge failed for ${outFilePath}: ${message}`,
+                        );
+                    }
 
                     // ขั้นตอนที่ 8: ลดขนาด PDF ด้วย Ghostscript
                     const compressStartTime = Date.now();
-                    const filnalFilePath =
-                        await this.merge.compressPdfWithGhostscript(
-                            outFilePath,
-                        );
                     await this.printed.writeLog(
-                        `Compressed PDF in ${this.printed.formatElapsedTime(compressStartTime)}`,
+                        `[${jobId}] Step 8/9: starting Ghostscript compression for ${outFilePath}`,
                     );
+                    try {
+                        const inputStat = await fs.stat(outFilePath);
+                        await this.printed.writeLog(
+                            `[${jobId}] Step 8/9: source file before compression exists=${true}, size=${inputStat.size} bytes, path=${outFilePath}`,
+                        );
+                    } catch (error) {
+                        await this.printed.writeLog(
+                            `[${jobId}] Step 8/9: source file before compression not readable: ${outFilePath}`,
+                            error instanceof Error
+                                ? error.message
+                                : String(error),
+                        );
+                        throw error;
+                    }
+                    let filnalFilePath: string;
+                    try {
+                        filnalFilePath =
+                            await this.merge.compressPdfWithGhostscript(
+                                outFilePath,
+                            );
+                        await this.printed.writeLog(
+                            `[${jobId}] Step 8/9: compressed PDF successfully in ${this.printed.formatElapsedTime(compressStartTime)} -> ${filnalFilePath}`,
+                        );
+                    } catch (error) {
+                        const message =
+                            error instanceof Error
+                                ? error.message
+                                : String(error);
+                        await this.printed.writeLog(
+                            `[${jobId}] Step 8/9 failed during Ghostscript compression: input=${outFilePath}`,
+                            message,
+                        );
+                        try {
+                            const dirCheck = await fs
+                                .access(
+                                    outputDirectory,
+                                    fs.constants.W_OK | fs.constants.X_OK,
+                                )
+                                .then(() => 'OK')
+                                .catch(
+                                    (dirError) =>
+                                        `DENIED: ${dirError instanceof Error ? dirError.message : String(dirError)}`,
+                                );
+                            await this.printed.writeLog(
+                                `[${jobId}] Step 8/9: output dir permission check=${dirCheck}, dir=${outputDirectory}`,
+                            );
+                        } catch (dirCheckError) {
+                            await this.printed.writeLog(
+                                `[${jobId}] Step 8/9: permission check raised exception for ${outputDirectory}`,
+                                dirCheckError instanceof Error
+                                    ? dirCheckError.message
+                                    : String(dirCheckError),
+                            );
+                        }
+                        throw new Error(
+                            `Ghostscript compression failed for ${outFilePath}: ${message}`,
+                        );
+                    }
 
                     // ขั้นตอนที่ 9: Rename ไฟล์ PDF เป็นชื่อตาม originalfilename
                     const finalPath = path.join(
                         outputDirectory,
                         dbdata.originalfilename,
                     );
-                    await fs.rename(filnalFilePath, finalPath);
+                    try {
+                        const sourceStat = await fs.stat(filnalFilePath);
+                        await this.printed.writeLog(
+                            `[${jobId}] Step 9/9: source before rename exists=${true}, size=${sourceStat.size} bytes, path=${filnalFilePath}`,
+                        );
+                    } catch (error) {
+                        await this.printed.writeLog(
+                            `[${jobId}] Step 9/9: source before rename missing or unreadable: ${filnalFilePath}`,
+                            error instanceof Error
+                                ? error.message
+                                : String(error),
+                        );
+                        throw error;
+                    }
+                    try {
+                        await fs.access(
+                            outputDirectory,
+                            fs.constants.W_OK | fs.constants.X_OK,
+                        );
+                        await this.printed.writeLog(
+                            `[${jobId}] Step 9/9: target directory writable: ${outputDirectory}`,
+                        );
+                    } catch (error) {
+                        const message =
+                            error instanceof Error
+                                ? error.message
+                                : String(error);
+                        await this.printed.writeLog(
+                            `[${jobId}] Step 9/9: target directory permission denied: ${outputDirectory}`,
+                            message,
+                        );
+                        throw new Error(
+                            `Rename target directory not writable: ${outputDirectory} (${message})`,
+                        );
+                    }
+                    await this.printed.writeLog(
+                        `[${jobId}] Step 9/9: renaming ${filnalFilePath} -> ${finalPath}`,
+                    );
+                    try {
+                        await fs.rename(filnalFilePath, finalPath);
+                        await this.printed.writeLog(
+                            `[${jobId}] Step 9/9: rename completed successfully -> ${finalPath}`,
+                        );
+                    } catch (error) {
+                        const message =
+                            error instanceof Error
+                                ? error.message
+                                : String(error);
+                        await this.printed.writeLog(
+                            `[${jobId}] Step 9/9 failed during rename: from=${filnalFilePath} to=${finalPath}`,
+                            message,
+                        );
+                        try {
+                            const finalExist = await fs
+                                .stat(finalPath)
+                                .then(() => true)
+                                .catch(() => false);
+                            const sourceExist = await fs
+                                .stat(filnalFilePath)
+                                .then(() => true)
+                                .catch(() => false);
+                            await this.printed.writeLog(
+                                `[${jobId}] Step 9/9: rename pre-check finalExists=${finalExist}, sourceExists=${sourceExist}, dir=${outputDirectory}`,
+                            );
+                        } catch (checkError) {
+                            await this.printed.writeLog(
+                                `[${jobId}] Step 9/9: rename pre-check failed`,
+                                checkError instanceof Error
+                                    ? checkError.message
+                                    : String(checkError),
+                            );
+                        }
+                        throw new Error(
+                            `Rename failed from ${filnalFilePath} to ${finalPath}: ${message}`,
+                        );
+                    }
 
                     // ขั้นตอนที่ 10: เช็คอนุญาตให้พิมพ์ PDF ได้โดยการอัพเดทสถานะใน Database
                     await this.allowPrint(
@@ -187,6 +382,7 @@ export class PrintedQueueService {
                                 ? error.message
                                 : String(error),
                     });
+                    await this.markPdfJobFailed(body.fileid);
                     await this.printed.writeLog(
                         `[${jobId}] Background processing failed`,
                         error instanceof Error ? error.message : String(error),

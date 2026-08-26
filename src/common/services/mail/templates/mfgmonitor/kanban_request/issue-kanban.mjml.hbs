@@ -1,0 +1,77 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-all font-family="Segoe UI, Tahoma, Arial, sans-serif" />
+    </mj-attributes>
+    <mj-style>
+      .header-title {
+        letter-spacing: 0.3px;
+      }
+      .table-header {
+        letter-spacing: 0.5px;
+      }
+    </mj-style>
+  </mj-head>
+
+  <mj-body background-color="#ffffff" width="800px">
+
+    <!-- Card container -->
+    <mj-wrapper padding="0" background-color="#ffffff">
+      <mj-section background-color="#ffffff" padding="0" css-class="header-title">
+
+        <!-- Top accent bar -->
+        <mj-column>
+          <mj-divider border-width="4px" border-color="#0d6efd" padding="0" />
+        </mj-column>
+      </mj-section>
+
+      <mj-section background-color="#ffffff" padding="36px 44px 10px 44px">
+        <mj-column>
+          <mj-text font-size="30px" font-weight="700" color="#111827" line-height="1.4">
+            ข้อมูลการเบิก <span style="color:#0d6efd;">ISSUE KANBAN</span>
+          </mj-text>
+          <mj-text font-size="18px" color="#4b5563" padding-top="8px">
+            ข้อมูลการเบิกของจากแผนก <strong>{{department}}</strong> โดยมีรายละเอียดดังนี้:
+          </mj-text>
+        </mj-column>
+      </mj-section>
+
+      <!-- Table -->
+      <mj-section background-color="#ffffff" padding="16px 44px 12px 44px">
+        <mj-column>
+          <mj-table css-class="table-header" font-size="14px" line-height="1.7" padding="0">
+            <tr style="background-color:#0d6efd; color:#ffffff; text-transform:uppercase; font-size:13px;">
+              <th style="padding:16px 14px; border-radius:8px 0 0 8px; text-align:left;">Item Code</th>
+              <th style="padding:16px 14px; text-align:left;">Item Name</th>
+              <th style="padding:16px 14px; text-align:center;">จำนวน</th>
+              <th style="padding:16px 14px; border-radius:0 8px 8px 0; text-align:center;">วันที่เบิก</th>
+            </tr>
+            {{#each items}}
+            <tr style="border-bottom:1px solid #e5e7eb;">
+              <td style="padding:14px; color:#111827;">{{this.itemCode}}</td>
+              <td style="padding:14px; color:#111827;">{{this.itemName}}</td>
+              <td style="padding:14px; text-align:center; color:#111827;">{{this.quantity}}</td>
+              <td style="padding:14px; text-align:center; color:#374151;">{{this.issueDate}}</td>
+            </tr>
+            {{/each}}
+          </mj-table>
+        </mj-column>
+      </mj-section>
+
+      <!-- Footer note -->
+      <mj-section background-color="#ffffff" padding="10px 44px 36px 44px">
+        <mj-column>
+          <mj-divider border-width="1px" border-color="#e5e7eb" padding="20px 0" />
+          <mj-text font-size="13px" color="#9ca3af">
+            อีเมลนี้ถูกส่งโดยระบบอัตโนมัติ กรุณาอย่าตอบกลับอีเมลฉบับนี้
+          </mj-text>
+          <mj-text font-size="13px" color="#9ca3af" padding-top="4px">
+            หากมีข้อสงสัยเกี่ยวกับรายการเบิก กรุณาติดต่อแผนกที่เกี่ยวข้อง
+          </mj-text>
+        </mj-column>
+      </mj-section>
+
+    </mj-wrapper>
+
+  </mj-body>
+</mjml>

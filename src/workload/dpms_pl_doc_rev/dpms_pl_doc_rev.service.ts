@@ -5,7 +5,11 @@ import {
 } from './dto/create-dpms_pl_doc_rev.dto';
 import { DpmsPlDocRevRepository } from './dpms_pl_doc_rev.repository';
 import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
-import { getPendingRecordParams } from 'src/mfgreport/dpms/packing-list-issue/packing-list-issue.interface';
+import {
+    getPendingRecordParams,
+    findPreviousRevisionExcludingIssueRevParams,
+} from 'src/mfgreport/dpms/packing-list-issue/packing-list-issue.interface';
+import type { UpdateDpmsPlDocRevDto } from './dto/update-dpms_pl_doc_rev.dto';
 
 @Injectable()
 export class DpmsPlDocRevService {
@@ -30,6 +34,34 @@ export class DpmsPlDocRevService {
             };
         } catch (error) {
             throw new Error('Insert document revision Error: ' + error.message);
+        }
+    }
+
+    async update(
+        condition: {
+            VPROD: string;
+            VP: string;
+            VTYPE: string;
+            VORDERS: string;
+            NISSUEREV_ID: number;
+        },
+        data: UpdateDpmsPlDocRevDto,
+    ) {
+        try {
+            const res = await this.repo.update(condition, data);
+            if (!res) {
+                return {
+                    status: false,
+                    message: 'Update document revision failed',
+                };
+            }
+            return {
+                status: true,
+                message: 'Update document revision successfully',
+                data: res,
+            };
+        } catch (error) {
+            throw new Error('Update document revision Error: ' + error.message);
         }
     }
 
@@ -71,6 +103,32 @@ export class DpmsPlDocRevService {
         } catch (error) {
             throw new Error(
                 'Get pending document revision record Error: ' + error.message,
+            );
+        }
+    }
+
+    async findPreviousRevisionExcludingIssueRev(
+        condition: findPreviousRevisionExcludingIssueRevParams,
+    ) {
+        try {
+            const res =
+                await this.repo.findPreviousRevisionExcludingIssueRev(
+                    condition,
+                );
+            if (res.length == 0) {
+                return {
+                    status: false,
+                    message: 'No previous document revision record found',
+                };
+            }
+            return {
+                status: true,
+                message: `Get previous document revision record ${res.length} records`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(
+                'Get previous document revision record Error: ' + error.message,
             );
         }
     }

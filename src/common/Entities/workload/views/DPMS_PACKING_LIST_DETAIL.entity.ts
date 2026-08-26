@@ -25,10 +25,10 @@ export class DPMS_PACKING_LIST_DETAIL {
     NROUND: number;
 
     @Column()
-    VSELECTED: string;
+    VISSUE_SELECTED: string;
 
     @Column()
-    VORDER_COMBINE: string;
+    NEW_LIST: string;
 
     @ManyToOne(() => DPMS_PACKING_LIST_MAIN, (main) => main.DETAILS)
     @JoinColumn([

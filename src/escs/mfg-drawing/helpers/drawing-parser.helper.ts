@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class DrawingParserHelper {
-
     /**
      * Extract drawing from string.
      * @since 2026-03-21
@@ -15,8 +14,11 @@ export class DrawingParserHelper {
     extractDrawing(drawing: string): string[] {
         const split = drawing.split(' ');
         const dwg: string[] = [split[0]];
-        const gl = this.splitGPL(split[1]);
-        dwg.push(...gl);
+        if (split[1]) {
+            const gl = this.splitGPL(split[1]);
+            dwg.push(...gl);
+        }
+
         return dwg;
     }
 
@@ -47,12 +49,12 @@ export class DrawingParserHelper {
         G: string[];
         L: string[][];
     } {
-        // replace space ซ้ำให้เหลือช่องเดียว
-        drawing = this.expandGLRange(drawing);
-        const split: string[] = drawing.split(' ');
+        const safeDrawing = String(drawing ?? '').trim();
+        const expanded = this.expandGLRange(safeDrawing);
+        const split = expanded.split(/\s+/).filter(Boolean);
         const parsed = this.parseGLSegments(split);
         return {
-            DRAWING: split[0],
+            DRAWING: split[0] ?? '',
             G: parsed.G,
             L: parsed.L,
         };
@@ -75,13 +77,10 @@ export class DrawingParserHelper {
         const pattern = /[GL-]{1}\d{2,3}~[GL]{1}\d{2,3}/g;
         const matches = drawing.match(pattern) || [];
         matches.forEach((val) => {
-            let GL = val.split('~');
-
-            let min = GL[0].replace(/[GL]{1}/g, '');
-            let max = GL[1].replace(/[GL]{1}/g, '');
-
+            const GL = val.split('~');
+            const min = GL[0].replace(/[GL]{1}/g, '');
+            const max = GL[1].replace(/[GL]{1}/g, '');
             const prefix = GL[0].replace(/\d+/g, '');
-
             let tmpGL = '';
             for (let i = parseInt(min); i <= parseInt(max); i++) {
                 tmpGL += prefix + String(i).padStart(min.length, '0');
@@ -133,11 +132,37 @@ export class DrawingParserHelper {
 
     /**
      * Normalize drawing format by removing spaces before L groups.
-     * @example normalizeDrawing('YA239B388') => 'YA239B388'
-     *          normalizeDrawing('YA239B388 G01') => 'YA239B388 G01'
+     * @example normalizeDrawing('YA239B388')         => 'YA239B388'
+     *          normalizeDrawing('YA239B388 G01')     => 'YA239B388 G01'
      *          normalizeDrawing('YA239B388 G01 L01') => 'YA239B388 G01L01'
      */
     normalizeDrawing(drawing: string): string {
         return drawing.trim().replace(/\s+(L\d+)/g, '$1');
+    }
+
+    /**
+     * Extract drawing number without G/L suffix.
+     *
+     * @example extractDrawingNo('YA239B388 G01L01') => 'YA239B388'
+     *          extractDrawingNo('YA239B388 G01')    => 'YA239B388'
+     *          extractDrawingNo('YA239B388')        => 'YA239B388'
+     */
+    extractDrawingNo(drawing: string): string {
+        return drawing.trim().split(/\s+/)[0];
+    }
+
+    /**
+     * Extract process code from process number.
+     * @param value Full process number (6 characters)
+     * @returns Process code (last 4 characters)
+     */
+    extractProcessCode(value: string): string {
+        if (!value || value.length !== 6) {
+            throw new Error(
+                `Process No "${value}" ไม่ถูกต้อง กรุณาตรวจสอบข้อมูลใน ID-Tag`,
+            );
+        }
+
+        return value.substring(2);
     }
 }

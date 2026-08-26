@@ -23,7 +23,6 @@ export interface CreateFinnpoInvoiceDto {
 export interface CreateFinnpoDto {
     INPUTBY: string;
     REQBY: string;
-    SUBJECT: string;
     VENDOR_CODE: string | number;
     EXPENSE_CODE: number;
     REMARK?: string;
@@ -41,7 +40,6 @@ export interface ActionFinnpoDto {
     ACTION: string;
     REMARK?: string;
     CEXTDATA?: string;
-    SUBJECT?: string;
     EXPENSE_CODE?: number;
     VENDOR_CODE?: string | number;
     AIR_SALES_BY?: string[] | string;
@@ -286,7 +284,6 @@ export class FinnpoService {
         }
 
         if (
-            dto.SUBJECT !== undefined ||
             dto.EXPENSE_CODE !== undefined ||
             dto.VENDOR_CODE !== undefined
         ) {
@@ -297,9 +294,6 @@ export class FinnpoService {
                 dto.CYEAR2 || dto.CYEAR,
                 Number(dto.NRUNNO),
                 {
-                    ...(dto.SUBJECT !== undefined && {
-                        SUBJECT: String(dto.SUBJECT).trim(),
-                    }),
                     ...(dto.EXPENSE_CODE !== undefined && {
                         EXPENSE_CODE: Number(dto.EXPENSE_CODE),
                     }),
@@ -394,7 +388,6 @@ export class FinnpoService {
 
         const head = await this.repo.createHead({
             ...form,
-            SUBJECT: dto.SUBJECT,
             VENDOR_CODE: vendorCode,
             EXPENSE_CODE: expenseCode,
         });
@@ -584,9 +577,9 @@ export class FinnpoService {
     }
 
     private validateCreateDto(dto: CreateFinnpoDto) {
-        if (!dto?.INPUTBY || !dto?.REQBY || !dto?.SUBJECT) {
+        if (!dto?.INPUTBY || !dto?.REQBY) {
             throw new BadRequestException(
-                'INPUTBY, REQBY and SUBJECT are required',
+                'INPUTBY and REQBY are required',
             );
         }
 

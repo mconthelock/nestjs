@@ -20,9 +20,14 @@ export class VendorsService {
         private readonly vnd: Repository<Vendors>,
     ) {}
 
-    async search(q: SearchVendorDto) {
-        const qb = this.vnd.createQueryBuilder('vnd');
-        await applyDynamicFilters(qb, q, 'vnd');
+    async search(q?: SearchVendorDto) {
+        const qb = this.vnd
+            .createQueryBuilder('vnd')
+            .leftJoinAndSelect('vnd.PURVMM', 'history')
+            .leftJoinAndSelect('history.FORM', 'form')
+            .leftJoinAndSelect('history.ADDRESSES', 'addr')
+            .leftJoinAndSelect('form.flow', 'flow');
+        if (q) await applyDynamicFilters(qb, q, 'vnd');
         return qb.getMany();
     }
 

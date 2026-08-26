@@ -116,7 +116,7 @@ export class PurVmmService {
     }
 
     async initForm() {
-        const vendors = await this.vnd.find({ where: { VND_STATUS: '1' } });
+        const vendors = await this.vnd.find({ where: { VND_CODE: '60533' } });
         const formvmnno = await this.repomst.getFormMasterByVaname('PUR-VMM');
 
         for (const vendor of vendors) {
@@ -145,7 +145,19 @@ export class PurVmmService {
                 VENDNAME: vendor.VND_NAME,
                 VENDGROUPTYPE: vendor.VND_TYPE1 == '1' ? 'Direct' : 'Indirect',
             };
-            const res = await this.vmmrepo.create(datavmmfrm);
+            await this.vmmrepo.create(datavmmfrm);
+            const addressDto = {
+                ...form,
+                ADDRID: 1,
+                ADDRTYPE: 'E',
+                ADDR1: vendor.VND_ADDRESS1,
+                ADDR2: vendor.VND_ADDRESS2,
+                CITY: vendor.VND_CITY,
+                STATE: vendor.VND_STATE,
+                COUNTRY: vendor.VND_COUNTRY,
+                POSTCODE: '',
+            };
+            await this.repaddr.create(addressDto);
         }
 
         return vendors;

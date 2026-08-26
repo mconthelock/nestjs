@@ -1,36 +1,29 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateMfgVtrDto } from './create-mfg-vtr.dto';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class UpdateMfgVtrDto {
+export class FormDetailDto {
     @IsNotEmpty()
     @Type(() => Number)
     @IsNumber()
     NFRMNO: number;
 
     @IsNotEmpty()
-    @Type(() => String)
     @IsString()
+    @Type(() => String)
     VORGNO: string;
 
     @IsNotEmpty()
-    @Type(() => String)
     @IsString()
+    @Type(() => String)
     CYEAR: string;
 
     @IsNotEmpty()
-    @Type(() => String)
     @IsString()
+    @Type(() => String)
     CYEAR2: string;
 
     @IsNotEmpty()
     @Type(() => Number)
     @IsNumber()
     NRUNNO: number;
-
-    @IsNotEmpty()
-    @Type(() => String)
-    @IsString()
-    STATUS: string;
 }

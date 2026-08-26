@@ -23,10 +23,9 @@ import { STFormModule } from './stform/stform.module';
 import { PurFormModule } from './purform/purform.module';
 import { PsFormModule } from './psform/psform.module';
 import { RqflistModule } from './rqflist/rqflist.module';
-import { MfgOrModule } from './mfgform/mfg-or/mfg-or.module';
 import { VorgmstModule } from './vorgmst/vorgmst.module';
 import { GrpmstModule } from './grpmst/grpmst.module';
-import { MfgEdrModule } from './mfgform/mfg-edr/mfg-edr.module';
+import { mfgformModule } from './mfgform/mfgform.module';
 
 @Module({
     imports: [
@@ -55,11 +54,8 @@ import { MfgEdrModule } from './mfgform/mfg-edr/mfg-edr.module';
         STFormModule,
         RqflistModule,
         VorgmstModule,
-        MfgOrModule,
         GrpmstModule,
-        // OMG
-        MfgEdrModule,
-        MfgOrModule,
+        mfgformModule,
     
     ],
 })

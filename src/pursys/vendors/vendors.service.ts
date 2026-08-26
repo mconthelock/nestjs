@@ -21,12 +21,15 @@ export class VendorsService {
     ) {}
 
     async search(q?: SearchVendorDto) {
-        const qb = this.vnd
-            .createQueryBuilder('vnd')
-            .leftJoinAndSelect('vnd.PURVMM', 'history')
-            .leftJoinAndSelect('history.FORM', 'form')
-            .leftJoinAndSelect('history.ADDRESSES', 'addr')
-            .leftJoinAndSelect('form.flow', 'flow');
+        const qb = this.vnd.createQueryBuilder('vnd');
+
+        if (q.IS_DETAIL) {
+            qb.leftJoinAndSelect('vnd.PURVMM', 'history')
+                .leftJoinAndSelect('history.FORM', 'form')
+                .leftJoinAndSelect('history.ADDRESSES', 'addr')
+                .leftJoinAndSelect('form.flow', 'flow');
+            delete q.IS_DETAIL;
+        }
         if (q) await applyDynamicFilters(qb, q, 'vnd');
         return qb.getMany();
     }

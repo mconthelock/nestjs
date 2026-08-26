@@ -5,6 +5,7 @@ import { DataSource } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { RNLIST_PP } from 'src/common/Entities/webform/table/RNLIST_PP.entity';
+import { CreateRnlistDto } from '../rnlist/dto/create-rnlist.dto';
 
 @Injectable()
 export class RnlistPpRepository extends BaseRepository {
@@ -63,4 +64,13 @@ export class RnlistPpRepository extends BaseRepository {
 
     return qb.getMany();
   }
+
+    create(dto: CreateRnlistDto) {
+      return this.manager.save(RNLIST_PP, dto);
+    }
+
+    createMany(dto: CreateRnlistDto[]) {
+      return this.manager.save(RNLIST_PP, dto);
+    }
+  
 }

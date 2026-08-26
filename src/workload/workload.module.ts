@@ -17,6 +17,8 @@ import { DpmsPlLastRevisionViewModule } from './dpms_pl_last_revision_view/dpms_
 import { DpmsPlDocRevModule } from './dpms_pl_doc_rev/dpms_pl_doc_rev.module';
 import { LabelconfirmModule } from './labelconfirm/labelconfirm.module';
 import { ShortageModule } from './shortage/shortage.module';
+import { PilineBendingMainModule } from './piline_bending_main/piline_bending_main.module';
+import { PilineBendingAttModule } from './piline_bending_att/piline_bending_att.module';
 
 @Module({
         imports: [
@@ -38,6 +40,8 @@ import { ShortageModule } from './shortage/shortage.module';
                 DpmsPlDocRevModule,
                 LabelconfirmModule,
                 ShortageModule,
-        ],
+            PilineBendingMainModule,
+        PilineBendingAttModule,
+    ],
 })
 export class WorkloadModule { }

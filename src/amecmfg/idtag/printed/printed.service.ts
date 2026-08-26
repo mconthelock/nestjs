@@ -8,9 +8,9 @@ import { PDFDocument } from 'pdf-lib';
 import { moveFileFromMulter } from 'src/common/utils/files.utils';
 import { FileLoggerService } from 'src/common/services/file-logger/file-logger.service';
 import { PrintedQueueService } from './PrintedQueue.service';
-import { PrintedMergeService } from './printedMerge.service';
 import { IdTagRepository } from './idtag.repository';
 import { SearchIdtagFilesDto } from './dto/search-idtag-file.dto';
+import { PrintedExtractService } from './printedExtract.service';
 
 export interface PdfProcessContext {
     logFileName: string;
@@ -49,6 +49,10 @@ export interface filesData {
         fileName: string;
         filePath: string;
         pageNumber: number;
+        item: string;
+        packing: string;
+        process: string;
+        drawing: string;
         fileMfgNo?: OrderInfo[] | null;
     }[];
 }
@@ -77,11 +81,11 @@ export class PrintedService {
     private readonly pendingPdfJobs: Array<() => Promise<void>> = [];
 
     constructor(
-        private readonly fileLogger: FileLoggerService,
-        private readonly repo: IdTagRepository,
         @Inject(forwardRef(() => PrintedQueueService))
         private readonly queue: PrintedQueueService,
-        private readonly merge: PrintedMergeService,
+        private readonly extract: PrintedExtractService,
+        private readonly fileLogger: FileLoggerService,
+        private readonly repo: IdTagRepository,
     ) {}
 
     async setPdfPath(data): Promise<PdfProcessContext> {
@@ -128,100 +132,6 @@ export class PrintedService {
         if (minutes > 0) return `${minutes} min ${seconds} sec ${ms} ms`;
         if (seconds > 0) return `${seconds} sec ${ms} ms`;
         return `${ms} ms`;
-    }
-
-    private extractOrderEntries(
-        text: string,
-    ): Array<{ orderNo: string; qty: number }> {
-        const normalizedText = text.replace(/\r/g, '').replace(/\u00a0/g, ' ');
-        const matches = [
-            ...normalizedText.matchAll(
-                /(?<![A-Z0-9])([A-Z0-9]{9})\s+(\d+)(?![A-Z0-9])/g,
-            ),
-        ];
-
-        return matches.map(([, orderNo, qty]) => ({
-            orderNo,
-            qty: Number(qty),
-        }));
-    }
-
-    private extractItemPackingEntries(text: string): ItemPackingInfo[] {
-        return text
-            .replace(/\r/g, '')
-            .split('\n')
-            .map((line) => line.replace(/\u00a0/g, ' ').trim())
-            .flatMap((lineText) => {
-                if (!lineText) {
-                    return [];
-                }
-
-                const match = lineText.match(
-                    /[A-Z0-9]{9}\s+G\d{2}\s+(\d{3})\s+(\d{5})\s+[A-Z0-9]+$/,
-                );
-
-                if (!match) {
-                    return [];
-                }
-
-                const [, item, itemPacking] = match;
-                return [{ item, itemPacking, lineText }];
-            });
-    }
-
-    private extractProcessListEntries(text: string): ProcessListInfo[] {
-        const normalizedLines = text
-            .replace(/\r/g, '')
-            .split('\n')
-            .map((line) => line.replace(/\u00a0/g, ' ').trim())
-            .filter(Boolean);
-
-        const orderLinePattern = /^(?:[A-Z0-9]{9}\s+\d+\s*)+$/;
-        const processCodePattern = /^[A-Z0-9]{6}$/;
-
-        const firstOrderLineIndex = normalizedLines.findIndex((line) =>
-            orderLinePattern.test(line),
-        );
-
-        let processStartIndex = 0;
-        if (firstOrderLineIndex >= 0) {
-            processStartIndex = firstOrderLineIndex;
-            while (
-                processStartIndex < normalizedLines.length &&
-                orderLinePattern.test(normalizedLines[processStartIndex])
-            ) {
-                processStartIndex += 1;
-            }
-        }
-
-        const processEntries: ProcessListInfo[] = [];
-        for (
-            let index = processStartIndex;
-            index < normalizedLines.length;
-            index += 1
-        ) {
-            const lineText = normalizedLines[index];
-            const processCodes = lineText.split(/\s+/).filter(Boolean);
-
-            if (
-                processCodes.length === 0 ||
-                !processCodes.every((code) => processCodePattern.test(code))
-            ) {
-                if (processEntries.length > 0) {
-                    break;
-                }
-                continue;
-            }
-
-            processEntries.push(
-                ...processCodes.map((processCode) => ({
-                    processCode,
-                    lineText,
-                })),
-            );
-        }
-
-        return processEntries;
     }
 
     private resolveMaxParallelPdfJobs(raw?: string): number {
@@ -339,6 +249,14 @@ export class PrintedService {
                                 ? error.message
                                 : String(error),
                     });
+                    if (tagData?.FILES) {
+                        await this.repo.updateFiles({
+                            FILES: tagData.FILES,
+                            FILE_STATUS: 4,
+                            PRINTED_DATE: null,
+                            FILE_PRINTEDPAGE: 0,
+                        });
+                    }
                     await this.writeLog(
                         `[${jobId}] Background queue error`,
                         error instanceof Error ? error.message : String(error),
@@ -378,6 +296,10 @@ export class PrintedService {
                     PAGE_NUM: fileData.pageNumber,
                     PAGE_TAG: fileData.fileName,
                     PAGE_STATUS: '0',
+                    PAGE_ITEM: fileData.item,
+                    PAGE_ITEMPACKING: fileData.packing,
+                    PAGE_PROCESS: fileData.process,
+                    PAGE_DRAWING: fileData.drawing,
                 })),
             (splitFilesData ?? []).flatMap((fileData) => {
                 const fileMfgNos = fileData.fileMfgNo;
@@ -385,12 +307,14 @@ export class PrintedService {
                     return [];
                 }
 
-                return fileMfgNos.map((fileMfgNo) => ({
-                    FILE_PAGE: fileData.pageNumber,
-                    FILE_TAG: fileData.fileName,
-                    FILE_ORDER: fileMfgNo.orderNo,
-                    FILE_ORDER_QTY: Number(fileMfgNo.qty ?? 0),
-                }));
+                return fileMfgNos
+                    .filter((fileMfgNo) => fileMfgNo.orderNo !== 'XXXXXXXXX')
+                    .map((fileMfgNo) => ({
+                        FILE_PAGE: fileData.pageNumber,
+                        FILE_TAG: fileData.fileName,
+                        FILE_ORDER: fileMfgNo.orderNo,
+                        FILE_ORDER_QTY: Number(fileMfgNo.qty ?? 0),
+                    }));
             }),
         );
     }
@@ -525,7 +449,8 @@ export class PrintedService {
             const pdfDoc = await PDFDocument.load(pdfBytes);
             const pageCount = pdfDoc.getPageCount();
 
-            for (let i = 1; i < pageCount - 1; i++) {
+            // for (let i = 1; i < pageCount - 1; i++) {
+            for (let i = 1; i < 50; i++) {
                 const singlePageDoc = await PDFDocument.create();
                 const [copiedPage] = await singlePageDoc.copyPages(pdfDoc, [i]);
                 singlePageDoc.addPage(copiedPage);
@@ -538,17 +463,29 @@ export class PrintedService {
                     parsedData = await parser.getText();
                     const textContent = parsedData.text;
                     const tagData = textContent.split('\n');
-                    console.log(tagData);
+                    // console.log(tagData);
+                    const tagNo = tagData[0]
+                        .substring(0, 12)
+                        .replace(/\s/g, '');
+                    const mfgno = this.extract.extractOrderEntries(textContent);
+                    const itemno =
+                        this.extract.extractItemPackingEntries(textContent);
+                    const process =
+                        this.extract.extractProcessListEntries(textContent);
+                    const dwgno =
+                        this.extract.extractDrawingEntries(textContent);
+                    console.log({ i, process });
 
-                    // const orderEntries = this.extractOrderEntries(textContent);
-                    // const itemPackingEntries =
-                    //     this.extractItemPackingEntries(textContent);
-                    // const processListEntries =
-                    //     this.extractProcessListEntries(textContent);
+                    // if (itemno.item == '') {
+                    //     console.log({ i, itemno });
+                    // }
+
                     // console.log({
-                    //     orderEntries,
-                    //     itemPackingEntries,
-                    //     processListEntries,
+                    //     tagNo,
+                    //     mfgno,
+                    //      itemno[0].item,
+                    //     process,
+                    //     dwgno,
                     // });
                 } finally {
                     await parser.destroy();

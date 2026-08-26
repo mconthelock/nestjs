@@ -54,7 +54,7 @@ export class PrintedNcService {
                     },
                 ],
             });
-            console.log(mailSent);
+            // console.log(mailSent);
         } catch (error) {
             throw new Error(
                 `Error generating NC Detail Excel: ${error instanceof Error ? error.message : String(error)}`,

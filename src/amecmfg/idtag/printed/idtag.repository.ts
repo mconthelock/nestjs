@@ -92,6 +92,10 @@ export class IdTagRepository extends BaseRepository {
                 FILES_ID: savedFile.FILES,
                 PAGE_NUM: Number(pageData.PAGE_NUM),
                 PAGE_STATUS: pageData.PAGE_STATUS ?? '0',
+                PAGE_ITEM: pageData.PAGE_ITEM,
+                PAGE_ITEMPACKING: pageData.PAGE_ITEMPACKING,
+                PAGE_PROCESS: pageData.PAGE_PROCESS,
+                PAGE_DRAWING: pageData.PAGE_DRAWING,
             }),
         );
 
@@ -159,6 +163,9 @@ export class IdTagRepository extends BaseRepository {
         const file = await this.manager.delete(IdtagFiles, { FILES: filesId });
         const pages = await this.manager.delete(IdtagPages, {
             FILES_ID: filesId,
+        });
+        const orders = await this.manager.delete(IdtagOrders, {
+            FILE_ID: filesId,
         });
         return { file, pages };
     }

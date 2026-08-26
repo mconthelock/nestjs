@@ -17,6 +17,7 @@ export interface CreateFinnpoInvoiceDto {
     VAT_RATE_ID: number;
     TOTAL_AMT: number;
     SCURCODE: string;
+    REFERENCE?: string;
 }
 
 export interface CreateFinnpoDto {
@@ -54,6 +55,7 @@ export interface ActionFinnpoDto {
         TOTAL_AMT?: number;
         SCURCODE?: string;
         WHT?: number | null;
+        REFERENCE?: string | null;
     }> | string;
 }
 
@@ -407,6 +409,9 @@ export class FinnpoService {
             VAT_RATE_ID: Number(invoice.VAT_RATE_ID),
             TOTAL_AMT: Number(invoice.TOTAL_AMT),
             SCURCODE: invoice.SCURCODE,
+            REFERENCE: invoice.REFERENCE == null
+                ? null
+                : String(invoice.REFERENCE).trim() || null,
         }));
         const savedInvoices = await this.repo.createInvoices(invoiceEntities);
 
@@ -500,6 +505,11 @@ export class FinnpoService {
             return {
                 ID: id,
                 ...(wht !== undefined && { WHT: wht }),
+                ...(invoice.REFERENCE !== undefined && {
+                    REFERENCE: invoice.REFERENCE === null
+                        ? null
+                        : String(invoice.REFERENCE).trim() || null,
+                }),
                 ...(invoice.INVOICE_DATE !== undefined && {
                     INVOICE_DATE: new Date(invoice.INVOICE_DATE),
                     INVOICE_NO: String(invoice.INVOICE_NO || '').trim(),

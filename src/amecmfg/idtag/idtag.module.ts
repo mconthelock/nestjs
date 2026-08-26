@@ -23,6 +23,7 @@ import { PrintedCnService } from './printed/printedCn.service';
 import { PrintedMergeService } from './printed/printedMerge.service';
 import { PrintedNcService } from './printed/printedNc.service';
 import { PrintedTopLabelService } from './printed/printedTopLabel.service';
+import { PrintedExtractService } from './printed/printedExtract.service';
 
 @Module({
     imports: [
@@ -46,6 +47,7 @@ import { PrintedTopLabelService } from './printed/printedTopLabel.service';
         PrintedMergeService,
         PrintedNcService,
         PrintedTopLabelService,
+        PrintedExtractService,
     ],
 })
 export class IdtagModule {}

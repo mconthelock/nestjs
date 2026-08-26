@@ -75,4 +75,24 @@ export class TasksService {
 
         return { ...savedTask, tags };
     }
+
+    async update(id: string, dto: UpdateTaskDto) {
+        const task = await this.tasks.findOne({ where: { TASK_ID: +id } });
+        if (!task) {
+            throw new Error(`Task with ID ${id} not found`);
+        }
+
+        Object.assign(task, dto);
+        return this.tasks.save(task);
+    }
+
+    async delete(id: string) {
+        const task = await this.tasks.findOne({ where: { TASK_ID: +id } });
+        if (!task) {
+            throw new Error(`Task with ID ${id} not found`);
+        }
+
+        await this.tasksTag.delete({ TASK_ID: +id });
+        return this.tasks.remove(task);
+    }
 }

@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+
+import { PURVMM_FORM } from 'src/common/Entities/webform/table/PURVMM_FORM.entity';
 
 @Entity({ name: 'VENDORS', schema: 'PURSYS' })
 export class Vendors {
@@ -76,4 +78,7 @@ export class Vendors {
 
     @Column()
     UPDATE_BY: string;
+
+    @OneToMany(() => PURVMM_FORM, (history) => history.VENDER)
+    PURVMM: PURVMM_FORM[];
 }

@@ -289,7 +289,7 @@ export class FinnpoRepository extends BaseRepository {
             .addSelect('FORM.VREQNO', 'REQUEST_BY')
             .addSelect('FORM.CST', 'STATUS')
             .addSelect('HEAD.SUBJECT', 'SUBJECT')
-            .addSelect("CAST(NULL AS VARCHAR2(1000))", 'REMARK')
+            .addSelect('INVOICE.REFERENCE', 'REMARK')
             .addSelect('HEAD.EXPENSE_CODE', 'EXPENSE_CODE')
             .addSelect('EXPENSE.EXPENSE_ENAME', 'EXPENSE_TYPE')
             .addSelect('HEAD.VENDOR_CODE', 'VENDOR_CODE')

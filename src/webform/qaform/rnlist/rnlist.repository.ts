@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
+import { CreateRnlistDto } from './dto/create-rnlist.dto';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { RNLIST } from 'src/common/Entities/webform/table/RNLIST.entity';
@@ -59,5 +60,13 @@ export class RnlistRepository extends BaseRepository {
     ]);
 
     return qb.getMany();
+  }
+
+  create(dto: CreateRnlistDto) {
+    return this.manager.save(RNLIST, dto);
+  }
+
+  createMany(dto: CreateRnlistDto[]) {
+    return this.manager.save(RNLIST, dto);
   }
 }

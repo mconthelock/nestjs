@@ -1,4 +1,16 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+    Entity,
+    PrimaryColumn,
+    Column,
+    ManyToOne,
+    JoinColumn,
+    OneToOne,
+    OneToMany,
+} from 'typeorm';
+
+import { Vendors } from 'src/common/Entities/pursys/table/VENDORS.entity';
+import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
+import { PURNVF_ADDRESS } from './PURNVF_ADDRESS.entity';
 
 @Entity({ name: 'PURVMM_FORM', schema: 'WEBFORM' })
 export class PURVMM_FORM {
@@ -70,4 +82,24 @@ export class PURVMM_FORM {
 
     @Column()
     BRANCH: string;
+
+    @ManyToOne(() => Vendors, (vendor) => vendor.PURVMM)
+    @JoinColumn({ name: 'VENDCODE', referencedColumnName: 'VND_CODE' })
+    VENDER: Vendors;
+
+    @OneToOne(() => FORM)
+    @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+    @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
+    @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
+    @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+    @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+    FORM: FORM;
+
+    @OneToMany(() => PURNVF_ADDRESS, (address) => address.purvmmForm)
+    @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+    @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
+    @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
+    @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+    @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+    ADDRESSES: PURNVF_ADDRESS[];
 }

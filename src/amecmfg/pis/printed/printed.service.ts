@@ -614,11 +614,12 @@ export class PrintedService {
             'gswin64c.exe',
         );
         const parsedPath = path.parse(inputPath);
-        const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-        const compressedPath = path.join(
-            parsedPath.dir,
-            `${parsedPath.name}.compressed-${uniqueSuffix}${parsedPath.ext}`,
-        );
+        // const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        // const compressedPath = path.join(
+        //     parsedPath.dir,
+        //     `${parsedPath.name}.compressed-${uniqueSuffix}${parsedPath.ext}`,
+        // );
+        const compressedPath = path.join(parsedPath.dir, `output.pdf`);
         await new Promise<void>((resolve, reject) => {
             const stderrChunks: Buffer[] = [];
             const child = spawn(command, [

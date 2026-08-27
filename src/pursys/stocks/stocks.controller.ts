@@ -1,19 +1,22 @@
 import { Controller, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { UseTransaction } from 'src/common/decorator/transaction.decorator';
+
 import { StocksService } from './stocks.service';
-import { CreateStockDto } from './dto/create-stock.dto';
-import { UpdateStockDto } from './dto/update-stock.dto';
+import { CreateTransactionDto } from './dto/create-transaction.dto';
 
 @Controller('pursys/stocks')
 export class StocksController {
     constructor(private readonly stocks: StocksService) {}
 
     @Post('issue')
-    issueStock(@Body() createStockDto: CreateStockDto) {
-        return this.stocks.issueStock(createStockDto);
+    @UseTransaction('purConnection')
+    issueStock(@Body() trns: CreateTransactionDto) {
+        return this.stocks.createStockTransaction(trns, 1);
     }
 
     @Post('receive')
-    receiveStock(@Body() createStockDto: CreateStockDto) {
-        return this.stocks.receiveStock(createStockDto);
+    @UseTransaction('purConnection')
+    receiveStock(@Body() trns: CreateTransactionDto) {
+        return this.stocks.createStockTransaction(trns, 2);
     }
 }

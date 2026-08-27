@@ -7,10 +7,14 @@ import { UpdateFormmstDto } from './dto/update-formmst.dto';
 import { CreateFormmstGroupDto } from './dto/create-formmst-group.dto';
 import { UpdateFormmstGroupDto } from './dto/update-formmst-group.dto';
 import { FormmstRepository } from './formmst.repository';
+import { UsersService } from 'src/amec/users/users.service';
 
 @Injectable()
 export class FormmstService {
-    constructor(private readonly repo: FormmstRepository) {}
+    constructor(
+        private readonly repo: FormmstRepository,
+        private usr: UsersService,
+    ) {}
 
     getFormMasterAll() {
         return this.repo.findAll();
@@ -81,7 +85,7 @@ export class FormmstService {
         });
     }
 
-    // Form master group methods
+    //Form master group methods
     async getAllGroup() {
         return this.repo.findAllGroup();
     }
@@ -106,5 +110,60 @@ export class FormmstService {
             VGROUPORG: data.VGROUPORG,
             VGROUP: data.VGROUP,
         });
+    }
+
+    //Form master auth methods
+    async getFormAuth(NFRMNO: number, VORGNO: string, CYEAR: string) {
+        const users = await this.usr.search({ CSTATUS: '1' });
+        const auth = await this.repo.findAuth(NFRMNO, VORGNO, CYEAR);
+        return users.map((user) => {
+            const userAuth = auth.filter((a) => a.VEMPNO === user.SEMPNO);
+            return {
+                ...user,
+                auth: userAuth,
+            };
+        });
+    }
+
+    async getFormAuthByEmpno(EMPNO: string) {
+        const auth = await this.repo.findAuth(
+            undefined,
+            undefined,
+            undefined,
+            EMPNO,
+        );
+        return auth;
+    }
+
+    async upsertFormAuth(authData: {
+        NFRMNO: number;
+        VORGNO: string;
+        CYEAR: string;
+        VEMPNO: string;
+        CAUTHNO: string;
+    }) {
+        //console.log('Upsert Form Auth:', authData); // Debugging line
+        const { NFRMNO, VORGNO, CYEAR, VEMPNO } = authData;
+        const existingAuth = await this.repo.findAuth(
+            NFRMNO,
+            VORGNO,
+            CYEAR,
+            VEMPNO,
+        );
+        //console.log(existingAuth);
+        if (existingAuth.length > 0) {
+            // Update existing auth
+            //console.log('Update Form Auth:', authData);
+            return this.repo.updateAuth(authData.CAUTHNO, {
+                NFRMNO,
+                VORGNO,
+                CYEAR,
+                VEMPNO,
+            });
+        } else {
+            // Insert new auth
+            //console.log('Create Form Auth:', authData);
+            return this.repo.createAuth(authData);
+        }
     }
 }

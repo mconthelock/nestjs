@@ -10,8 +10,9 @@ export class VendorsController {
     constructor(private readonly vnd: VendorsService) {}
 
     @Post('search')
-    findAll(@Body() dto: SearchVendorDto) {
-        return this.vnd.search(dto);
+    async findAll(@Body() dto: SearchVendorDto) {
+        const result = await this.vnd.search(dto);
+        return { ...result, evaluation: {}, cover: {} };
     }
 
     @Post('create')
@@ -20,7 +21,7 @@ export class VendorsController {
     }
 
     @Post('next-vendor')
-    nextVendor(@Body('code') code: any) {
+    nextVendor(@Body('code') code: { first: number; second?: number }) {
         return this.vnd.nextVendor(code.first, code?.second);
     }
 }

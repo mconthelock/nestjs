@@ -5,132 +5,33 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { StocksRepository } from './stocks.repository';
+import { StockTransactions } from 'src/common/Entities/pursys/table/STOCK_TRANSACTIONS.entity';
 
-import { StockMovements } from 'src/common/Entities/pursys/table/STOCK_MOVEMENTS.entity';
-import { StockMovementItems } from 'src/common/Entities/pursys/table/STOCK_MOVEMENT_ITEMS.entity';
-import { InventoryBalances } from 'src/common/Entities/pursys/table/INVENTORY_BALANCES.entity';
-import { CreateStockDto } from './dto/create-stock.dto';
-import { UpdateStockDto } from './dto/update-stock.dto';
+import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { StockTransactionItems } from 'src/common/Entities/pursys/table/STOCK_TRANSACTION_ITEMS.entity';
+// import { UpdateStockDto } from './dto/update-transaction.dto';
 
 @Injectable()
 export class StocksService {
-    constructor(
-        @InjectRepository(StockMovements, 'purConnection')
-        private readonly stockMovements: Repository<StockMovements>,
+    constructor(protected readonly repo: StocksRepository) {}
 
-        @InjectRepository(StockMovementItems, 'purConnection')
-        private readonly stockMovementItems: Repository<StockMovementItems>,
+    async searchStockTransaction(q?: any) {}
 
-        @InjectRepository(InventoryBalances, 'purConnection')
-        private readonly inventoryBalances: Repository<InventoryBalances>,
-    ) {}
-
-    async issueStock(data: CreateStockDto) {
-        const { warehouseId, productId, lotId, quantity, remark } = data;
-
-        const balance = await this.inventoryBalances.findOneBy({
-            WAREHOUSE_ID: warehouseId,
-            PRODUCT_ID: productId,
-            LOT_ID: lotId,
-        });
-
-        if (!balance) {
-            throw new NotFoundException(
-                `Inventory not found for warehouse ${warehouseId}, product ${productId}, lot ${lotId}`,
-            );
-        }
-
-        if (balance.QUANTITY < quantity) {
-            throw new BadRequestException(
-                `Insufficient stock: available ${balance.QUANTITY}, requested ${quantity}`,
-            );
-        }
-
-        const movement = await this.stockMovements.save({
-            DOCUMENT_NO: `ISS-${Date.now()}`,
-            MOVEMENT_TYPE: 'ISSUE',
-            SOURCE_STORAGE: warehouseId,
-            DEST_STORAGE: 0,
-            STATUS: 'POSTED',
-            CREATED_AT: new Date(),
-        });
-
-        await this.stockMovementItems.save({
-            MOVEMENT_ID: movement.MOVEMENT_ID,
-            PRODUCT_ID: productId,
-            LOT_ID: lotId,
-            QUANTITY: quantity,
-            UNIT_COST: 0,
-            REMARK: remark ?? '',
-        });
-
-        const remainingQuantity = balance.QUANTITY - quantity;
-        await this.inventoryBalances.save({
-            ...balance,
-            QUANTITY: remainingQuantity,
-            UPDATED_AT: new Date(),
-        });
-
-        return {
-            movementId: movement.MOVEMENT_ID,
-            documentNo: movement.DOCUMENT_NO,
-            warehouseId,
-            productId,
-            lotId,
-            quantity,
-            remainingQuantity,
+    async createStockTransaction(data: CreateTransactionDto, type: number) {
+        const transactionData: Partial<StockTransactions> = {
+            DOCUMENT_NO: data.DOCUMENT_NO,
+            TRNTYPE: type,
+            STORAGE_FROM: data.STORAGE_FROM,
+            STORAGE_TO: data.STORAGE_TO,
+            CSTATUS: data.CSTATUS,
+            CREATED_AT: data.CREATED_AT,
+            CREATED_BY: data.CREATED_BY,
         };
-    }
-
-    async receiveStock(data: CreateStockDto) {
-        const { warehouseId, productId, lotId, quantity, remark } = data;
-
-        const balance = (await this.inventoryBalances.findOneBy({
-            WAREHOUSE_ID: warehouseId,
-            PRODUCT_ID: productId,
-            LOT_ID: lotId,
-        })) ?? {
-            WAREHOUSE_ID: warehouseId,
-            PRODUCT_ID: productId,
-            LOT_ID: lotId,
-            QUANTITY: 0,
-            RESERVED_QUANTITY: 0,
-            UPDATED_AT: new Date(),
-        };
-
-        const movement = await this.stockMovements.save({
-            DOCUMENT_NO: `RCV-${Date.now()}`,
-            MOVEMENT_TYPE: 'RECEIVE',
-            SOURCE_STORAGE: 0,
-            DEST_STORAGE: warehouseId,
-            STATUS: 'POSTED',
-            CREATED_AT: new Date(),
-        });
-
-        await this.stockMovementItems.save({
-            MOVEMENT_ID: movement.MOVEMENT_ID,
-            PRODUCT_ID: productId,
-            LOT_ID: lotId,
-            QUANTITY: quantity,
-            UNIT_COST: 0,
-            REMARK: remark ?? '',
-        });
-
-        const newQuantity = balance.QUANTITY + quantity;
-        await this.inventoryBalances.save({
-            ...balance,
-            QUANTITY: newQuantity,
-            UPDATED_AT: new Date(),
-        });
-
-        return {
-            movementId: movement.MOVEMENT_ID,
-            documentNo: movement.DOCUMENT_NO,
-            warehouseId,
-            productId,
-            lotId,
-            quantity,
-            newQuantity,
-        };
+        const transactionItems: Partial<StockTransactionItems>[] = data.ITEMS;
+        return this.repo.createStockTransaction(
+            transactionData,
+            transactionItems,
+        );
     }
 }

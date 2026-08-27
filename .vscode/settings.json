@@ -9,5 +9,6 @@
             "group": "Default"
         }
     ],
-    "favorites.sortOrder": "FILETYPE"
+    "favorites.sortOrder": "FILETYPE",
+    "ibm-i-acs.host": ""
 }

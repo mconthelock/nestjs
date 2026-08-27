@@ -173,6 +173,33 @@ export class ExpatRepository extends BaseRepository {
         });
     }
 
+    findFamilyFileByType(sempno: string, fid: number, fileType: string) {
+        return this.getRepository(ExpatFamilyFile).findOne({
+            where: {
+                SEMPNO: sempno,
+                FID: fid,
+                FILE_TYPE: fileType,
+            },
+        });
+    }
+
+    async updateFamilyFile(
+        sempno: string,
+        fid: number,
+        fileType: string,
+        data: Partial<ExpatFamilyFile>,
+    ) {
+        await this.getRepository(ExpatFamilyFile).update(
+            {
+                SEMPNO: sempno,
+                FID: fid,
+                FILE_TYPE: fileType,
+            },
+            data,
+        );
+        return this.findFamilyFileByType(sempno, fid, fileType);
+    }
+
     async getNextFamilyFileId(sempno: string, fid: number, fileType: string) {
         const result = await this.getRepository(ExpatFamilyFile).createQueryBuilder('F')
             .select('NVL(MAX(F.FILE_ID), 0) + 1', 'FILE_ID')
@@ -267,8 +294,21 @@ export class ExpatRepository extends BaseRepository {
         return this.findOneTravel(travelId);
     }
 
+    updateEmployeeLastArrival(sempno: string, arrivalDate: Date) {
+        return this.getRepository(ExpatEmployee)
+            .createQueryBuilder()
+            .update()
+            .set({
+                LAST_ARRIVAL_DATE: arrivalDate,
+                LAST_ARRIVAL_UPD_DATE: () => 'SYSDATE',
+            })
+            .where('SEMPNO = :sempno', { sempno })
+            .execute();
+    }
+
     deleteTravel(travelId: number) {
         return this.getRepository(ExpatTravel).delete({ TRAVEL_ID: travelId });
     }
+
 
 }

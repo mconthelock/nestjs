@@ -1,21 +1,22 @@
-import { 
-    Body, 
-    Controller, 
-    Delete, 
-    Get, 
-    Param, 
-    ParseIntPipe, 
-    Patch, 
-    Post, 
+import {
+    Controller,
+    Get,
+    Post,
+    Patch,
+    Delete,
+    Body,
+    Param,
     Query,
-    UploadedFile, 
+    Res,
+    UploadedFile,
     UseInterceptors,
-} 
-from '@nestjs/common';
+    ParseIntPipe,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { FileInterceptor } from '@nestjs/platform-express';
 import { ExpatService } from './expat.service';
 import { CreateExpatEmployeeDto } from './dto/create-expat-employee.dto';
 import { UpdateExpatEmployeeDto } from './dto/update-expat-employee.dto';
@@ -23,8 +24,6 @@ import { CreateExpatFamilyDto } from './dto/create-expat-family.dto';
 import { UpdateExpatFamilyDto } from './dto/update-expat-family.dto';
 import { CreateExpatEmployeeFileDto } from './dto/create-expat-employee-file.dto';
 import { CreateExpatFamilyFileDto } from './dto/create-expat-family-file.dto';
-import { Res } from '@nestjs/common';
-import { Response } from 'express';
 import { CreateExpatTravelDto } from './dto/create-expat-travel.dto';
 import { UpdateExpatTravelDto } from './dto/update-expat-travel.dto';
 
@@ -178,5 +177,38 @@ export class ExpatController {
     @Delete('travel/:travelId')
     deleteTravel(@Param('travelId', ParseIntPipe) travelId: number) {
         return this.expatService.deleteTravel(travelId);
+    }
+
+    @Post('upload-family-file/:sempno/:fid')
+    @UseInterceptors(FileInterceptor('file'))
+    uploadFamilyFileExpat(
+        @Param('sempno') sempno: string,
+        @Param('fid', ParseIntPipe) fid: number,
+        @Body('fileType') fileType: string,
+        @UploadedFile() file: Express.Multer.File,
+    ) {
+        return this.expatService.uploadFamilyFileExpat(
+            sempno,
+            fid,
+            fileType,
+            file,
+        );
+    }
+
+    @Get('family-file/:sempno/:fid/:fileType')
+    viewFamilyFileExpat(
+        @Param('sempno') sempno: string,
+        @Param('fid', ParseIntPipe) fid: number,
+        @Param('fileType') fileType: string,
+        @Query('download') download: string,
+        @Res() res: Response,
+    ) {
+        return this.expatService.viewFamilyFileExpat(
+            sempno,
+            fid,
+            fileType,
+            download === '1',
+            res,
+        );
     }
 }

@@ -240,12 +240,14 @@ export class ExpatService {
 
     async createEmployeeTravel(sempno: string, dto: CreateExpatTravelDto) {
         if (!await this.expatRepository.findOneEmployee(sempno))throw new NotFoundException('EXPAT_EMPLOYEE_NOT_FOUND');
-        return this.expatRepository.createTravel({
+        const travel = await this.expatRepository.createTravel({
             TRAVEL_ID: await this.expatRepository.getNextTravelId(),
             SEMPNO: sempno,
             FID: null,
             ...this.mapTravelData(dto),
         });
+        await this.expatRepository.updateEmployeeLastArrival(sempno, new Date(dto.ARRIVAL_DATE));
+        return travel;
     }
 
     async createFamilyTravel(sempno: string, fid: number, dto: CreateExpatTravelDto) {
@@ -273,6 +275,61 @@ export class ExpatService {
         if (dto.DEPARTURE_DATE !== undefined) data.DEPARTURE_DATE = dto.DEPARTURE_DATE ? new Date(dto.DEPARTURE_DATE) : null;
         if (dto.ARRIVAL_DATE !== undefined) data.ARRIVAL_DATE = dto.ARRIVAL_DATE ? new Date(dto.ARRIVAL_DATE) : null;
         return data;
+    }
+
+    async uploadFamilyFileExpat(sempno: string, fid: number, fileType: string, file: Express.Multer.File,) {
+        if (!file) throw new BadRequestException('FILE_REQUIRED');
+
+        const family = await this.expatRepository.findOneFamily(sempno, fid);
+        if (!family) throw new NotFoundException('EXPAT_FAMILY_NOT_FOUND');
+
+        fileType = fileType.toUpperCase();
+        if (fileType !== '90DAY_RECEIPT')throw new BadRequestException('INVALID_FILE_TYPE');
+
+        const ext = path.extname(file.originalname).toLowerCase();
+        if (!['.pdf', '.jpg', '.jpeg', '.png', '.xls', '.xlsx'].includes(ext))throw new BadRequestException('INVALID_FILE_EXTENSION');
+
+        const basePath = process.env.EXPAT_FILE_PATH;
+        if (!basePath)throw new BadRequestException('EXPAT_FILE_PATH_NOT_CONFIGURED');
+
+        const folderPath = path.join(basePath, sempno);
+        if (!fs.existsSync(folderPath))
+            fs.mkdirSync(folderPath, { recursive: true });
+
+        const oldFile = await this.expatRepository.findFamilyFileByType(sempno,fid,fileType,);
+
+        if (oldFile?.FILE_PATH && fs.existsSync(oldFile.FILE_PATH))fs.unlinkSync(oldFile.FILE_PATH);
+
+        const relation = String(family.RELATION || 'FAMILY').trim().toUpperCase().replace(/\s+/g, '_');
+        const fileName = `${sempno}_90dayreceipt_${relation}_${fid}${ext}`;
+        const filePath = path.join(folderPath, fileName);
+
+        fs.writeFileSync(filePath, file.buffer);
+
+        const data = {
+            SEMPNO: sempno,
+            FID: fid,
+            FILE_ID: oldFile?.FILE_ID ?? 1,
+            FILE_TYPE: fileType,
+            FILE_NAME: fileName,
+            FILE_PATH: filePath,
+            FILE_DATE: new Date(),
+        };
+
+        if (oldFile)return this.expatRepository.updateFamilyFile(sempno,fid,fileType,data,);
+
+        return this.expatRepository.createFamilyFile(data);
+    }
+
+    async viewFamilyFileExpat(sempno: string,fid: number,fileType: string,download: boolean,res: Response,) {
+        const file = await this.expatRepository.findFamilyFileByType(sempno,fid,fileType.toUpperCase(),);
+
+        if (!file || !fs.existsSync(file.FILE_PATH))throw new NotFoundException('FILE_NOT_FOUND');
+
+        res.setHeader('Content-Type', this.getFileMime(file.FILE_NAME));
+        res.setHeader('Content-Disposition',`${download ? 'attachment' : 'inline'}; filename="${file.FILE_NAME}"`,);
+        res.setHeader('Content-Length', fs.statSync(file.FILE_PATH).size);
+        fs.createReadStream(file.FILE_PATH).pipe(res);
     }
 
 

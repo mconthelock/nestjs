@@ -3,27 +3,28 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { StocksService } from './stocks.service';
 import { StocksController } from './stocks.controller';
+import { StocksRepository } from './stocks.repository';
 
 import { Warehouses } from 'src/common/Entities/pursys/table/WAREHOUSES.entity';
-import { StockMovements } from 'src/common/Entities/pursys/table/STOCK_MOVEMENTS.entity';
-import { StockMovementItems } from 'src/common/Entities/pursys/table/STOCK_MOVEMENT_ITEMS.entity';
+import { StockTransactions } from 'src/common/Entities/pursys/table/STOCK_TRANSACTIONS.entity';
+import { StockTransactionItems } from 'src/common/Entities/pursys/table/STOCK_TRANSACTION_ITEMS.entity';
+import { StockBalances } from 'src/common/Entities/pursys/table/STOCK_BALANCES.entity';
 import { ProductsLots } from 'src/common/Entities/pursys/table/PRODUCTS_LOTS.entity';
-import { InventoryBalances } from 'src/common/Entities/pursys/table/INVENTORY_BALANCES.entity';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature(
             [
                 Warehouses,
-                StockMovements,
-                StockMovementItems,
                 ProductsLots,
-                InventoryBalances,
+                StockTransactions,
+                StockTransactionItems,
+                StockBalances,
             ],
             'purConnection',
         ),
     ],
     controllers: [StocksController],
-    providers: [StocksService],
+    providers: [StocksService, StocksRepository],
 })
 export class StocksModule {}

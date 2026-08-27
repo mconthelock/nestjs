@@ -132,7 +132,7 @@ export class DrawingFileHelper {
         const G8  = worksheet.getCell('G8').text.trim().toLowerCase().replace(/\s+/g, '');
         const G13 = worksheet.getCell('G13').text.trim().toLowerCase().replace(/\s+/g, '');
         const I7  = worksheet.getCell('I7').text.trim().toLowerCase().replace(/\s+/g, '');
-        const isFeederTemplate = (A18 === 'no.') && (G18 === 'mcno.') && (G8 === 'x') && (G13 === 'c') && (I7 === 'inpsectionpoint');
+        const isFeederTemplate = (A18 === 'no.') && (G18 === 'mcno.') && (G8 === 'x') && (G13 === 'c') && ((I7 === 'inpsectionpoint') || (I7 === 'inspectionpoint'));
         if (!isFeederTemplate) {
             throw new Error(`ไฟล์ ${file.name} ไม่ใช่ Template Checksheet Feeder`);
         }

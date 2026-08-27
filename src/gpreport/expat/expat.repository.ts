@@ -168,8 +168,14 @@ export class ExpatRepository extends BaseRepository {
     // FAMILY FILE
     findFamilyFiles(sempno: string, fid: number) {
         return this.getRepository(ExpatFamilyFile).find({
-            where: { SEMPNO: sempno, FID: fid },
-            order: { FILE_TYPE: 'ASC', FILE_ID: 'ASC' },
+            where: {
+                SEMPNO: sempno,
+                FID: fid,
+            },
+            order: {
+                FILE_TYPE: 'ASC',
+                FILE_ID: 'ASC',
+            },
         });
     }
 

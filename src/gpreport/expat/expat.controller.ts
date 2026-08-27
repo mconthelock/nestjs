@@ -96,7 +96,10 @@ export class ExpatController {
     }
 
     @Get('employee/:sempno/family/:fid/files')
-    findFamilyFiles(@Param('sempno') sempno: string, @Param('fid', ParseIntPipe) fid: number) {
+    findFamilyFiles(
+        @Param('sempno') sempno: string,
+        @Param('fid', ParseIntPipe) fid: number,
+    ) {
         return this.expatService.findFamilyFiles(sempno, fid);
     }
 

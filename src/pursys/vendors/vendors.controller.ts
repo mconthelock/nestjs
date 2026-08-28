@@ -11,8 +11,7 @@ export class VendorsController {
 
     @Post('search')
     async findAll(@Body() dto: SearchVendorDto) {
-        const result = await this.vnd.search(dto);
-        return { ...result, evaluation: {}, cover: {} };
+        return await this.vnd.search(dto);
     }
 
     @Post('create')

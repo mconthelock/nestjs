@@ -33,6 +33,8 @@ export class TransactionInterceptor implements NestInterceptor {
         private elmesDS: DataSource,
         @InjectDataSource('purConnection')
         private purDS: DataSource,
+        @InjectDataSource('gpreportConnection')
+        private gpDS: DataSource,
         private readonly reflector: Reflector,
     ) {
         // เพิ่ม data sources ที่นี่เมื่อมีการเพิ่ม connection ใหม่
@@ -43,6 +45,7 @@ export class TransactionInterceptor implements NestInterceptor {
             datacenterConnection: this.datacenterDS,
             elmesConnection: this.elmesDS,
             purConnection: this.purDS,
+            gpreportConnection: this.gpDS,
         };
     }
 

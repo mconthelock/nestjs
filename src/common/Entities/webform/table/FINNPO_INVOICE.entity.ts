@@ -32,7 +32,7 @@ export class FINNPOINVOICE {
 
     @Column({ nullable: true })
     REFERENCE: string | null;
-    
+
     @PrimaryColumn()
     SCURCODE: string;
 }

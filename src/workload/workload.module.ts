@@ -21,27 +21,27 @@ import { PilineBendingMainModule } from './piline_bending_main/piline_bending_ma
 import { PilineBendingAttModule } from './piline_bending_att/piline_bending_att.module';
 
 @Module({
-        imports: [
-                IdtagEfacLogModule,
-                DpmsPackingListModule,
-                DpmsPackingListMainModule,
-                DpmsPlIssueTypeModule,
-                DpmsPlIssueModule,
-                DpmsPlIssueRevModule,
-                DpmsPlFileModule,
-                DpmsPlCaseListModule,
-                DpmsPlCaseListDetailModule,
-                DpmsPlIssueDateModule,
-                AmecordersScheduleModule,
-                DpmsPlMailModule,
-                VpsModule,
-                KanbanRequestModule,
-                DpmsPlLastRevisionViewModule,
-                DpmsPlDocRevModule,
-                LabelconfirmModule,
-                ShortageModule,
-            PilineBendingMainModule,
+    imports: [
+        IdtagEfacLogModule,
+        DpmsPackingListModule,
+        DpmsPackingListMainModule,
+        DpmsPlIssueTypeModule,
+        DpmsPlIssueModule,
+        DpmsPlIssueRevModule,
+        DpmsPlFileModule,
+        DpmsPlCaseListModule,
+        DpmsPlCaseListDetailModule,
+        DpmsPlIssueDateModule,
+        AmecordersScheduleModule,
+        DpmsPlMailModule,
+        VpsModule,
+        KanbanRequestModule,
+        DpmsPlLastRevisionViewModule,
+        DpmsPlDocRevModule,
+        LabelconfirmModule,
+        ShortageModule,
+        PilineBendingMainModule,
         PilineBendingAttModule,
     ],
 })
-export class WorkloadModule { }
+export class WorkloadModule {}

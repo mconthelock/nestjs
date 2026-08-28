@@ -87,4 +87,12 @@ export class CreatePurvmmFormDto extends PickType(FormDto, [
     @IsOptional()
     @IsString()
     BRANCH?: string;
+
+    @IsOptional()
+    @IsString()
+    EMAIL?: string;
+
+    @IsOptional()
+    @IsString()
+    WEBSITE?: string;
 }

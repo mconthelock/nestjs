@@ -292,6 +292,10 @@ export class RequestPurevaFormDto extends PickType(CreateFormDto, [
     ATTACH_OTHER?: string;
 
     @IsOptional()
+    @IsString()
+    NVFNO?: string;
+
+    @IsOptional()
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => RequestPurevaScoreDto)

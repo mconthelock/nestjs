@@ -25,8 +25,11 @@ export class VendorsService {
 
         if (q.IS_DETAIL) {
             qb.leftJoinAndSelect('vnd.PURVMM', 'history')
+                .leftJoinAndSelect('vnd.PUREVA', 'eva')
+                .leftJoinAndSelect('vnd.STDCUR', 'currency')
                 .leftJoinAndSelect('history.FORM', 'form')
                 .leftJoinAndSelect('history.ADDRESSES', 'addr')
+                .leftJoinAndSelect('eva.FORM', 'evaform')
                 .leftJoinAndSelect('form.flow', 'flow');
             delete q.IS_DETAIL;
         }

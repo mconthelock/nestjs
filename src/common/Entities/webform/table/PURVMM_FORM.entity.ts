@@ -83,6 +83,12 @@ export class PURVMM_FORM {
     @Column()
     BRANCH: string;
 
+    @Column()
+    WEBSITE: string;
+
+    @Column()
+    EMAIL: string;
+
     @ManyToOne(() => Vendors, (vendor) => vendor.PURVMM)
     @JoinColumn({ name: 'VENDCODE', referencedColumnName: 'VND_CODE' })
     VENDER: Vendors;

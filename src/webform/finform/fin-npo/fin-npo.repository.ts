@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 
-import { DS_STAMP_REPORT } from "src/common/Entities/webform/views/FINDS_STAMP_REPORT.entity";
+import { DS_STAMP_REPORT } from 'src/common/Entities/webform/views/FINDS_STAMP_REPORT.entity';
 import { DSDUTYSTAMP } from 'src/common/Entities/webform/table/FINDS_DUTY_STAMP.entity';
 import { DSREQDETAIL } from 'src/common/Entities/webform/table/FINDS_REQ_DETAIL.entity';
 import { DSREQHEAD } from 'src/common/Entities/webform/table/FINDS_REQ_HEAD.entity';
@@ -10,7 +10,6 @@ import { FINNPOCOSTCENTER } from 'src/common/Entities/webform/table/FINNPO_COSTC
 
 import { FINNPOFORM } from 'src/common/Entities/webform/table/FINNPO_FORM.entity';
 import { FINNPOINVOICE } from 'src/common/Entities/webform/table/FINNPO_INVOICE.entity';
-
 
 import { FIN_FILE } from 'src/common/Entities/webform/table/FIN_FILE.entity';
 import { FINNPOEXPENSE } from 'src/common/Entities/webform/table/FINNPO_EXPENSE.entity';
@@ -109,7 +108,13 @@ export class FinnpoRepository extends BaseRepository {
         data: Partial<FINNPOFORM>,
     ) {
         return this.getRepository(FINNPOFORM).update(
-            { NFRMNO: nfrmno, VORGNO: vorgno, CYEAR: cyear, CYEAR2: cyear2, NRUNNO: nrunno },
+            {
+                NFRMNO: nfrmno,
+                VORGNO: vorgno,
+                CYEAR: cyear,
+                CYEAR2: cyear2,
+                NRUNNO: nrunno,
+            },
             data,
         );
     }
@@ -144,7 +149,7 @@ export class FinnpoRepository extends BaseRepository {
             .addSelect('HEAD.NRUNNO', 'NRUNNO')
             .addSelect('HEAD.VENDOR_CODE', 'VENDOR_CODE')
             .addSelect('HEAD.EXPENSE_CODE', 'EXPENSE_CODE')
-            .addSelect("CAST(NULL AS VARCHAR2(1000))", 'REMARK')
+            .addSelect('CAST(NULL AS VARCHAR2(1000))', 'REMARK')
             .where('HEAD.NFRMNO = :NFRMNO', { NFRMNO: nfrmno })
             .andWhere('HEAD.VORGNO = :VORGNO', { VORGNO: vorgno })
             .andWhere('HEAD.CYEAR = :CYEAR', { CYEAR: cyear })
@@ -214,7 +219,13 @@ export class FinnpoRepository extends BaseRepository {
         cyear2: string,
         nrunno: number,
     ) {
-        const head = await this.findHeadByForm(nfrmno, vorgno, cyear, cyear2, nrunno);
+        const head = await this.findHeadByForm(
+            nfrmno,
+            vorgno,
+            cyear,
+            cyear2,
+            nrunno,
+        );
 
         const invoices = await this.findDetailByForm(
             nfrmno,
@@ -224,7 +235,13 @@ export class FinnpoRepository extends BaseRepository {
             nrunno,
         );
 
-        const files = await this.findFilesByForm(nfrmno, vorgno, cyear, cyear2, nrunno);
+        const files = await this.findFilesByForm(
+            nfrmno,
+            vorgno,
+            cyear,
+            cyear2,
+            nrunno,
+        );
 
         const vendor = head?.VENDOR_CODE
             ? await this.findVendorByCode(String(head.VENDOR_CODE))
@@ -292,7 +309,10 @@ export class FinnpoRepository extends BaseRepository {
             .addSelect('EXPENSE.EXPENSE_ENAME', 'EXPENSE_TYPE')
             .addSelect('HEAD.VENDOR_CODE', 'VENDOR_CODE')
             .addSelect('VENDOR.VENDOR_NAME', 'VENDOR')
-            .addSelect("TO_CHAR(INVOICE.INVOICE_DATE, 'YYYY-MM-DD')", 'INVOICE_DATE')
+            .addSelect(
+                "TO_CHAR(INVOICE.INVOICE_DATE, 'YYYY-MM-DD')",
+                'INVOICE_DATE',
+            )
             .addSelect('INVOICE.INVOICE_NO', 'INVOICE_NO')
             .addSelect('INVOICE.NET_PRICE', 'NET_PRICE')
             .addSelect('INVOICE.TOTAL_AMT', 'TOTAL_AMOUNT')
@@ -359,12 +379,9 @@ export class FinnpoRepository extends BaseRepository {
             .getRawMany();
     }
 
-
     async createHead(data: Partial<FINNPOFORM>) {
         return this.getRepository(FINNPOFORM).save(data);
     }
-
-
 
     // async updateDateReceive(form: {
     //     NFRMNO: number;
@@ -438,10 +455,4 @@ export class FinnpoRepository extends BaseRepository {
     //         .addOrderBy('REPORT.NRUNNO', 'ASC')
     //         .getRawMany();
     // }
-
-
-
-
-
-
 }

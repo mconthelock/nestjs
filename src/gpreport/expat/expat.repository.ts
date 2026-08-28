@@ -316,5 +316,18 @@ export class ExpatRepository extends BaseRepository {
         return this.getRepository(ExpatTravel).delete({ TRAVEL_ID: travelId });
     }
 
+    deleteFamilyFilesByFamily(sempno: string, fid: number) {
+        return this.getRepository(ExpatFamilyFile).delete({
+            SEMPNO: sempno,
+            FID: fid,
+        });
+    }
+
+    deleteFamilyTravels(sempno: string, fid: number) {
+        return this.getRepository(ExpatTravel).delete({
+            SEMPNO: sempno,
+            FID: fid,
+        });
+    }
 
 }

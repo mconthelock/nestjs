@@ -91,9 +91,22 @@ export class ExpatService {
     }
 
     async deleteFamily(sempno: string, fid: number) {
-        if (!await this.expatRepository.findOneFamily(sempno, fid))
-            throw new NotFoundException('EXPAT_FAMILY_NOT_FOUND');
-        return this.expatRepository.deleteFamily(sempno, fid);
+        const family = await this.expatRepository.findOneFamily(sempno, fid);
+        if (!family) throw new NotFoundException('EXPAT_FAMILY_NOT_FOUND');
+
+        const files = await this.expatRepository.findFamilyFiles(sempno, fid);
+
+        for (const file of files) {
+            if (file.FILE_PATH && fs.existsSync(file.FILE_PATH)) {
+                fs.unlinkSync(file.FILE_PATH);
+            }
+        }
+
+        await this.expatRepository.deleteFamilyFilesByFamily(sempno, fid);
+        await this.expatRepository.deleteFamilyTravels(sempno, fid);
+        await this.expatRepository.deleteFamily(sempno, fid);
+
+        return { message: 'FAMILY_DELETED' };
     }
 
     private mapFamilyData(dto: CreateExpatFamilyDto | UpdateExpatFamilyDto): Partial<ExpatFamily> {

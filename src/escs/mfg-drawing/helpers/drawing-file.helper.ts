@@ -138,12 +138,12 @@ export class DrawingFileHelper {
         }
 
         let revision = worksheet.getCell('E3').text.trim();
-        if (revision === '*') {
-            revision = '0';
+        if (!/^(\*|[A-Z]{1,2})$/.test(revision)) {
+            throw new Error(`Revision "${revision}" ไม่ถูกต้องในไฟล์ ${file.name} (อนุญาตเฉพาะ *, A-Z, AA-ZZ)`);
         }
 
-        if (!revision) {
-            throw new Error(`ไม่พบข้อมูล Revision ในเซลล์ E3 ของไฟล์ ${file.name}`);
+        if (revision === '*') {
+            revision = '0';
         }
 
         return revision;

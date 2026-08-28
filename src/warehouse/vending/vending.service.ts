@@ -4,6 +4,7 @@ import { UpdateVendingDto } from './dto/update-vending.dto';
 import { AddToolsVendingDto } from './dto/addtools-vending.dto';
 import { VendingRepository } from './vending.repository';
 import { CreateImportDto } from './dto/import-vending.dto';
+import { VENDING_USER } from 'src/common/Entities/skid/table/VENDING_USER.entity';
 
 @Injectable()
 export class VendingService {
@@ -61,6 +62,22 @@ export class VendingService {
     async deleteImport(importId: number) {
         try {
             return await this.vendingrepo.deleteImport(importId);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getUserVending() {
+        try {
+            return await this.vendingrepo.getUserVending();
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async saveUserVending(EMPNO: string[]) {
+        try {
+            return await this.vendingrepo.saveUserVending({ EMPNO });
         } catch (error) {
             throw error;
         }

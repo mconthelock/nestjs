@@ -4,6 +4,7 @@ import { CreateVendingDto } from './dto/create-vending.dto';
 import { UpdateVendingDto } from './dto/update-vending.dto';
 import { AddToolsVendingDto } from './dto/addtools-vending.dto';
 import { CreateImportDto } from './dto/import-vending.dto';
+import { VENDING_USER } from 'src/common/Entities/skid/table/VENDING_USER.entity';
 
 @Controller('vending')
 export class VendingController {
@@ -46,5 +47,15 @@ export class VendingController {
     @Delete('deleteImport/:importId')
     deleteImport(@Param('importId') importId: number) {
         return this.vendingService.deleteImport(importId);
+    }
+
+    @Get('getUserVending')
+    getUserVending() {
+        return this.vendingService.getUserVending();
+    }
+
+    @Post('addUserVending')
+    saveUserVending(@Body() { EMPNO }: { EMPNO: string[] }) {
+        return this.vendingService.saveUserVending(EMPNO);
     }
 }

@@ -8,6 +8,8 @@ import { Products } from 'src/common/Entities/pursys/table/PRODUCTS.entity';
 import { TOOL_IMPORT_HISTORY } from 'src/common/Entities/skid/table/TOOL_IMPORT_HISTORY.entity';
 import { TOOL_WITHDRAWAL } from 'src/common/Entities/skid/table/TOOL_WITHDRAWAL.entity';
 import { TOOL_REFILL } from 'src/common/Entities/skid/table/TOOL_REFILL.entity';
+import { VENDING_USER } from 'src/common/Entities/skid/table/VENDING_USER.entity';
+import { AMECUSERALL } from 'src/common/Entities/amec/views/AMECUSERALL.entity';
 
 @Injectable()
 export class VendingRepository extends BaseRepository {
@@ -126,7 +128,27 @@ export class VendingRepository extends BaseRepository {
     async deleteImport(importId: number) {
         return this.ds.transaction(async (manager) => {
             await manager.delete(TOOL_WITHDRAWAL, { IMPORT_ID: importId });
+            await manager.delete(TOOL_REFILL, { IMPORT_ID: importId });
             await manager.delete(TOOL_IMPORT_HISTORY, { IMPORT_ID: importId });
         });
+    }
+
+    async getUserVending() {
+        return this.getRepository(VENDING_USER)
+            .createQueryBuilder('vendingUser')
+            .leftJoinAndMapOne(
+                'vendingUser.EMPDATA',
+                AMECUSERALL,
+                'EMPDATA',
+                'EMPDATA.SEMPNO = vendingUser.EMPNO',
+            )
+            .where('vendingUser.STATUS = 1')
+            .getMany();
+    }
+
+    async saveUserVending({ EMPNO }: { EMPNO: string[] }) {
+        return this.getRepository(VENDING_USER).save(
+            EMPNO.map(empno => ({ EMPNO: empno }))
+        );
     }
 }

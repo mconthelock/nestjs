@@ -36,7 +36,10 @@ export class UniformController {
 
     @Delete('annual/request/:userId/:year')
     @UseTransaction('gpreportConnection')
-    deleteRequest(@Body() data: CreateAnnualDto) {
-        return this.uniform.createAnnualRequest(data);
+    deleteRequest(
+        @Param('userId') userId: string,
+        @Param('year') year: number,
+    ) {
+        return this.uniform.deleteRequest(userId, +year);
     }
 }

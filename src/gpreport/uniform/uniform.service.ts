@@ -4,8 +4,6 @@ import { Repository } from 'typeorm';
 import { UsersService } from '../../amec/users/users.service';
 import { AnnualUniformRepository } from './annual.repository';
 
-import { CreateUniformDto } from './dto/create-uniform.dto';
-import { UpdateUniformDto } from './dto/update-uniform.dto';
 import { CreateAnnualDto } from './dto/create-annual.dto';
 
 import { UNIFORM } from '../../common/Entities/gpreport/table/UNIFORM.entity';
@@ -64,5 +62,13 @@ export class UniformService {
 
         const detail: Partial<AnnualUniformDetail>[] = DETAILS;
         return this.repo.create(header as Partial<AnnualUniform>, detail);
+    }
+
+    async deleteRequest(userId: string, year: number) {
+        const existingRequests = await this.repo.search(userId, year);
+        if (!existingRequests.length) {
+            throw new BadRequestException('No requests found to delete');
+        }
+        return this.repo.delete(userId, year);
     }
 }

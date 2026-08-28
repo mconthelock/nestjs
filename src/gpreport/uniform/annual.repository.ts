@@ -37,4 +37,16 @@ export class AnnualUniformRepository extends BaseRepository {
             });
         }
     }
+
+    async delete(userId: string, year: number) {
+        await this.getRepository(AnnualUniformDetail).delete({
+            REQL_USER: userId,
+            REQL_YEAR: year,
+        });
+        await this.getRepository(AnnualUniform).delete({
+            REQ_USER: userId,
+            REQ_YEAR: year,
+        });
+        return { status: true, message: 'Annual request deleted successfully' };
+    }
 }

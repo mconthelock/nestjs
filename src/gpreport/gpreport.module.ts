@@ -12,7 +12,6 @@ import { StyItemsModule } from './sty-items/sty-items.module';
 import { StyPatrolInspectionModule } from './sty-patrol-inspection/sty-patrol-inspection.module';
 import { StinpFormModule } from './stinp-form/stinp-form.module';
 import { StinpFormListModule } from './stinp-form-list/stinp-form-list.module';
-import { ExpatModule } from './expat/expat.module';
 import { UniformModule } from './uniform/uniform.module';
 import { LeaveModule } from './leave/leave.module';
 import { AttendanceModule } from './attendance/attendance.module';

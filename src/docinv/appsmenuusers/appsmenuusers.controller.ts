@@ -7,7 +7,7 @@ export class AppsmenuusersController {
   constructor(private readonly appsmenuusersService: AppsmenuusersService) {}
 
   @Get('program/:pgm/user/:group')
-  getGroup(@Param('pgm') pgm: number, @Param('user') group: number) {
+  getGroup(@Param('pgm') pgm: number, @Param('group') group: number) {
     return this.appsmenuusersService.getUserMenu(+pgm, +group);
   }
 

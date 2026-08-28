@@ -8,7 +8,10 @@ import { Reflector } from '@nestjs/core';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Observable, catchError, concatMap, finalize } from 'rxjs';
 import { DataSource } from 'typeorm';
-import { FORCE_TX_KEY, TX_CONNECTION_KEY } from '../decorator/transaction.decorator';
+import {
+    FORCE_TX_KEY,
+    TX_CONNECTION_KEY,
+} from '../decorator/transaction.decorator';
 import { transactionContext } from './transaction-context';
 
 export const ENTITY_MANAGER_KEY = 'ENTITY_MANAGER';
@@ -28,6 +31,8 @@ export class TransactionInterceptor implements NestInterceptor {
         private datacenterDS: DataSource,
         @InjectDataSource('elmesConnection')
         private elmesDS: DataSource,
+        @InjectDataSource('purConnection')
+        private purDS: DataSource,
         private readonly reflector: Reflector,
     ) {
         // เพิ่ม data sources ที่นี่เมื่อมีการเพิ่ม connection ใหม่
@@ -37,6 +42,7 @@ export class TransactionInterceptor implements NestInterceptor {
             workloadConnection: this.workloadDS,
             datacenterConnection: this.datacenterDS,
             elmesConnection: this.elmesDS,
+            purConnection: this.purDS,
         };
     }
 

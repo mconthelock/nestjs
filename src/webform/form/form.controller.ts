@@ -86,6 +86,11 @@ export class FormController {
         return result;
     }
 
+    @Get('counter/:empno')
+    async counter(@Param('empno') empno: string) {
+        return this.formService.counter(empno);
+    }
+
     @Get('waitforapprove/:empno')
     @ApiOperation({
         summary: 'Get forms status running and flow step as "wait for approve"',

@@ -55,4 +55,7 @@ export class DPMS_PL_ISSUE_REV {
 
     @Column()
     VISSUEBY: string;
+
+    @Column()
+    NDOCTYPE: number;
 }

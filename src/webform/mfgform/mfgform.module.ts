@@ -4,8 +4,7 @@ import { MfgFileModule } from './mfg-file/mfg-file.module';
 import { MfgOrModule } from './mfg-or/mfg-or.module';
 import { MfgVtrModule } from './mfg-vtr/mfg-vtr.module';
 
-
 @Module({
-  imports: [MfgEdrModule, MfgFileModule, MfgOrModule, MfgVtrModule],
+    imports: [MfgEdrModule, MfgFileModule, MfgOrModule, MfgVtrModule],
 })
-export class mfgformModule {}
+export class MfgformModule {}

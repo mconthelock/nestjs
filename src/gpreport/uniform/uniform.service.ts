@@ -2,9 +2,12 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from '../../amec/users/users.service';
+import { FormmstService } from 'src/webform/formmst/formmst.service';
+import { FormCreateService } from 'src/webform/form/create-form.service';
 import { AnnualUniformRepository } from './annual.repository';
 
 import { CreateAnnualDto } from './dto/create-annual.dto';
+import { CreateUNAFormDto } from './dto/create-una-form.dto';
 
 import { UNIFORM } from '../../common/Entities/gpreport/table/UNIFORM.entity';
 import { UNIFORM_RIGHT } from '../../common/Entities/gpreport/table/UNIFORM_RIGHT.entity';
@@ -21,6 +24,9 @@ export class UniformService {
         private readonly right: Repository<UNIFORM_RIGHT>,
 
         private UsersService: UsersService,
+        private readonly frmmst: FormmstService,
+        private readonly frmcrt: FormCreateService,
+
         protected readonly repo: AnnualUniformRepository,
     ) {}
 
@@ -53,7 +59,7 @@ export class UniformService {
         return this.repo.search(userId, year);
     }
 
-    async createAnnualRequest(data: CreateAnnualDto) {
+    async createAnnualRequest(data: CreateAnnualDto, ip: string) {
         const { DETAILS, ...header } = data ?? {};
 
         if (!Array.isArray(DETAILS)) {
@@ -61,7 +67,43 @@ export class UniformService {
         }
 
         const detail: Partial<AnnualUniformDetail>[] = DETAILS;
-        return this.repo.create(header as Partial<AnnualUniform>, detail);
+        const result = await this.repo.create(
+            header as Partial<AnnualUniform>,
+            detail,
+        );
+
+        if (data.PAID) {
+            const formmst = await this.frmmst.getFormMasterByVaname('GP-UNA');
+            if (!formmst) {
+                throw new Error(
+                    'Form master not found for GP-TPH. Check FORMMST table.',
+                );
+            }
+
+            const createForm = await this.frmcrt.create(
+                {
+                    NFRMNO: formmst.NNO,
+                    VORGNO: formmst.VORGNO,
+                    CYEAR: formmst.CYEAR,
+                    REQBY: data.REQ_USER,
+                    INPUTBY: data.REQ_USER,
+                },
+                ip,
+            );
+
+            for (const item of DETAILS) {
+                const form: CreateUNAFormDto = {
+                    ...createForm.data,
+                    PRODUCT: item.PRODUCT,
+                    QTY: item.REQUEST_QTY,
+                    UNITPRICE: 0,
+                    DISCOUNT: 0,
+                    CSTATUS: '1',
+                };
+                this.repo.createForm(form);
+            }
+        }
+        return result;
     }
 
     async deleteRequest(userId: string, year: number) {

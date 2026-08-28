@@ -4,6 +4,7 @@ import { DataSource, Like, Not } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 import { FiltersDto } from 'src/common/dto/filter.dto';
+import { CreateUNAFormDto } from './dto/create-una-form.dto';
 
 import { AnnualUniform } from 'src/common/Entities/gpreport/table/UNIFORM_ANNUAL.entity';
 import { AnnualUniformDetail } from 'src/common/Entities/gpreport/table/UNIFORM_ANNUAL_DETAIL.entity';
@@ -49,4 +50,6 @@ export class AnnualUniformRepository extends BaseRepository {
         });
         return { status: true, message: 'Annual request deleted successfully' };
     }
+
+    async createForm(data: CreateUNAFormDto) {}
 }

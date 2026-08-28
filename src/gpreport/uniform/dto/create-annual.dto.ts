@@ -56,6 +56,10 @@ export class CreateAnnualDto {
     @IsOptional()
     REMARK?: string;
 
+    @IsString()
+    @IsOptional()
+    PAID?: string;
+
     @IsNotEmpty()
     @Type(() => CreateAnnualDetailDto)
     DETAILS: CreateAnnualDetailDto[];

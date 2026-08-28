@@ -19,6 +19,7 @@ import { AttendanceModule } from './attendance/attendance.module';
 import { MedicalModule } from './medical/medical.module';
 import { TaxModule } from './tax/tax.module';
 import { LoanModule } from './loan/loan.module';
+import { ExpatModule } from './expat/expat.module';
 
 @Module({
     imports: [
@@ -42,6 +43,7 @@ import { LoanModule } from './loan/loan.module';
         MedicalModule,
         TaxModule,
         LoanModule,
+        ExpatModule,
     ],
 })
 export class gpreportModule {}

@@ -6,6 +6,7 @@ import { getSafeFields } from 'src/common/utils/Fields.utils';
 
 import { FORMMST } from 'src/common/Entities/webform/table/FORMMST.entity';
 import { FORMMST_GROUP } from 'src/common/Entities/webform/table/FORMMST_GROUP.entity';
+import { USRAUTH } from 'src/common/Entities/webform/table/USRAUTH.entity';
 
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { SearchFormmstDto } from './dto/searchFormmst.dto';
@@ -113,5 +114,37 @@ export class FormmstRepository extends BaseRepository {
         return this.getRepository(FORMMST_GROUP).update(query, {
             VGROUPNAME: name,
         });
+    }
+
+    // Form Auth section
+    async findAuth(
+        NFRMNO: number,
+        VORGNO: string,
+        CYEAR: string,
+        VEMPNO?: string,
+    ) {
+        return this.getRepository(USRAUTH).find({
+            where: { NFRMNO, VORGNO, CYEAR, ...(VEMPNO && { VEMPNO }) },
+        });
+    }
+
+    async createAuth(authData: any) {
+        return this.getRepository(USRAUTH).save(authData);
+    }
+
+    async updateAuth(
+        authData: string,
+        query: {
+            NFRMNO: number;
+            VORGNO: string;
+            CYEAR: string;
+            VEMPNO: string;
+        },
+    ) {
+        const { NFRMNO, VORGNO, CYEAR, VEMPNO } = query;
+        return this.getRepository(USRAUTH).update(
+            { NFRMNO, VORGNO, CYEAR, VEMPNO },
+            { CAUTHNO: authData },
+        );
     }
 }

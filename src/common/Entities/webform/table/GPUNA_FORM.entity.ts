@@ -2,22 +2,22 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'GPUNA_FORM', schema: 'WEBFORM' })
 export class GPUNA_FORM {
-    @Column()
+    @PrimaryColumn()
     NFRMNO: number;
 
-    @Column()
+    @PrimaryColumn()
     VORGNO: string;
 
-    @Column()
+    @PrimaryColumn()
     CYEAR: string;
 
-    @Column()
+    @PrimaryColumn()
     CYEAR2: string;
 
-    @Column()
+    @PrimaryColumn()
     NRUNNO: number;
 
-    @Column()
+    @PrimaryColumn()
     PRODUCT: number;
 
     @Column()

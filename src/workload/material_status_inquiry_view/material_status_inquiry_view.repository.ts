@@ -13,7 +13,7 @@ export class MaterialStatusInquiryViewRepository extends BaseRepository {
 
     async findByDataTableServerside(params: IfindByDataTableServerside) {
         try {
-            const { start, length, order, condition } = params;
+            const { start, length, order, search, columns, condition } = params;
             const query = this.getRepository(
                 MATERIAL_STATUS_INQUIRY_VIEW,
             ).createQueryBuilder('M');
@@ -26,13 +26,28 @@ export class MaterialStatusInquiryViewRepository extends BaseRepository {
                 MATERIAL_STATUS_INQUIRY_VIEW,
             ).count();
 
-            // if(order && order.length > 0) {
-            //     order.forEach((o) => {
-            //         const columnName = o.name;
-            //         const direction = o.dir.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-            //         query.addOrderBy(`M.${columnName}`, direction);
-            //     });
-            // }
+            if(order && order.length > 0) {
+                order.forEach((o) => {
+                    const columnName = o.name;
+                    const direction = o.dir.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+                    query.addOrderBy(`M.${columnName}`, direction);
+                });
+            }
+
+            if(search.value) {
+                const searchValue = `%${search.value}%`;
+                for (const column of params.columns) {
+                    if (column.searchable) {
+                        query.orWhere(`LOWER(M.${column.data}) LIKE :search`, { search: searchValue.toLowerCase() });
+                    }
+                }
+            }
+            for(const col of columns){
+                if(col.search && col.search.value){
+                    const searchValue = `%${col.search.value}%`;
+                    query.andWhere(`LOWER(M.${col.data}) LIKE :search`, { search: searchValue.toLowerCase() });
+                }
+            }
             const [data, count] = await query.getManyAndCount();
             return {
                 recordsTotal: total,

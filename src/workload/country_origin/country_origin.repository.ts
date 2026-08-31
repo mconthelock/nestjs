@@ -23,4 +23,12 @@ export class CountryOriginRepository extends BaseRepository {
     delete(code: string) {
         return this.getRepository(COUNTRY_ORIGIN).delete({ BULKCODE: code });
     }
+
+    getCountry(){
+        return this.getRepository(COUNTRY_ORIGIN).createQueryBuilder('C')
+            .distinct()
+            .select('C.COUNTRY', 'COUNTRY')
+            .orderBy('C.COUNTRY', 'ASC')
+            .getRawMany();
+    }
 }

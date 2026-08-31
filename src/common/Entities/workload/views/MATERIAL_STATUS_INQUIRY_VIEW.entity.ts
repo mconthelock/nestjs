@@ -3,6 +3,9 @@ import { ViewColumn, ViewEntity } from 'typeorm';
 @ViewEntity({ name: 'MATERIAL_STATUS_INQUIRY_VIEW', schema: 'WORKLOAD' })
 export class MATERIAL_STATUS_INQUIRY_VIEW {
     @ViewColumn()
+    STATUS: string;
+
+    @ViewColumn()
     ITEM: string;
 
     @ViewColumn()
@@ -127,6 +130,9 @@ export class MATERIAL_STATUS_INQUIRY_VIEW {
 
     @ViewColumn()
     BUYER: string;
+
+    @ViewColumn()
+    BUYERNAME: string;
 
     @ViewColumn()
     PLANNER: string;

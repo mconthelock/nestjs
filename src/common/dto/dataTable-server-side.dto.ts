@@ -1,5 +1,6 @@
 import { Type } from "class-transformer";
-import { IsEnum, IsNotEmpty, IsNumber, IsString, ValidateNested } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
+import { ToBoolean } from "../utils/transform";
 
 class DataTableOrderingDto {
     @IsNotEmpty()
@@ -18,6 +19,42 @@ class DataTableOrderingDto {
     name: string;
 }
 
+class DataTableSearchDto {
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    value?: string;
+
+    @IsOptional()
+    @ToBoolean()
+    regex?: boolean;
+}
+
+class DataTableColumnDto {
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    data?: string | null;
+
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
+    name: string;
+
+    @IsNotEmpty()
+    @ToBoolean()
+    searchable: boolean;
+
+    @IsNotEmpty()
+    @ToBoolean()
+    orderable: boolean;
+
+    @IsNotEmpty()
+    @Type(() => DataTableSearchDto)
+    @ValidateNested()
+    search: DataTableSearchDto;
+}
+
 export class DataTableServerSideDto {
     // draw: number;
     @IsNotEmpty()
@@ -29,22 +66,19 @@ export class DataTableServerSideDto {
     @IsNumber()
     @Type(() => Number)
     length: number;
-    // search: {
-    //     value: string;
-    //     regex: boolean;
-    // };
+
+    @IsNotEmpty()
+    @Type(() => DataTableSearchDto)
+    @ValidateNested()
+    search: DataTableSearchDto;
+
     @IsNotEmpty()
     @Type(() => DataTableOrderingDto)
     @ValidateNested({ each: true })
     order: DataTableOrderingDto[];
-    // columns: {
-    //     data: string;
-    //     name: string;
-    //     searchable: boolean;
-    //     orderable: boolean;
-    //     search: {
-    //         value: string;
-    //         regex: boolean;
-    //     };
-    // }[];
+
+    @IsNotEmpty()
+    @Type(() => DataTableColumnDto)
+    @ValidateNested({ each: true })
+    columns: DataTableColumnDto[];
 }

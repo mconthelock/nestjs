@@ -15,4 +15,9 @@ export class CountryOriginController {
     migrate() {
         return this.migrateService.migrateCountryOrigin();
     }
+
+    @Get('country')
+    getCountry() {
+        return this.service.getCountry();
+    }
 }

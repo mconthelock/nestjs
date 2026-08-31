@@ -233,18 +233,16 @@ export class ExpatRepository extends BaseRepository {
     findAmecEmployee(sempno: string) {
         return this.userRepo
             .createQueryBuilder('U')
-            .select([
-                'U.SEMPNO',
-                'U.SNAME',
-                'U.BIRTHDAY',
-                'U.SDIVCODE',
-                'U.SDIV',
-                'U.SRECMAIL',
-                'U.SPOSITION',
-                `TO_CHAR(U.STARTDATE, 'DD/MM/YYYY') AS "STARTDATE"`,
-            ])
+            .select('U.SEMPNO', 'SEMPNO')
+            .addSelect('U.SNAME', 'SNAME')
+            .addSelect('U.BIRTHDAY', 'BIRTHDAY')
+            .addSelect('U.SDIVCODE', 'SDIVCODE')
+            .addSelect('U.SDIV', 'SDIV')
+            .addSelect('U.SRECMAIL', 'SRECMAIL')
+            .addSelect('U.SPOSITION', 'SPOSITION')
+            .addSelect(`TO_CHAR(U.STARTDATE, 'DD/MM/YYYY')`, 'STARTDATE')
             .where('TRIM(U.SEMPNO) = TRIM(:sempno)', { sempno })
-            .getOne();
+            .getRawOne();
     }
 
     findEmployeeFileByType(sempno: string, fileType: string) {

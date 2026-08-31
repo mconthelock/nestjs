@@ -19,15 +19,13 @@ export class UniformService {
     constructor(
         @InjectRepository(UNIFORM, 'gpreportConnection')
         private readonly uniform: Repository<UNIFORM>,
-
         @InjectRepository(UNIFORM_RIGHT, 'gpreportConnection')
         private readonly right: Repository<UNIFORM_RIGHT>,
 
-        private UsersService: UsersService,
-        //private readonly frmmst: FormmstService,
-        //private readonly frmcrt: FormCreateService,
-
         protected readonly repo: AnnualUniformRepository,
+        private UsersService: UsersService,
+        private readonly frmmst: FormmstService,
+        private readonly frmcrt: FormCreateService,
     ) {}
 
     findAll() {
@@ -73,33 +71,33 @@ export class UniformService {
         );
 
         if (data.PAID) {
-            // const formmst = await this.frmmst.getFormMasterByVaname('GP-UNA');
-            // if (!formmst) {
-            //     throw new Error(
-            //         'Form master not found for GP-TPH. Check FORMMST table.',
-            //     );
-            // }
-            // const createForm = await this.frmcrt.create(
-            //     {
-            //         NFRMNO: formmst.NNO,
-            //         VORGNO: formmst.VORGNO,
-            //         CYEAR: formmst.CYEAR,
-            //         REQBY: data.REQ_USER,
-            //         INPUTBY: data.REQ_USER,
-            //     },
-            //     ip,
-            // );
-            // for (const item of DETAILS) {
-            //     const form: CreateUNAFormDto = {
-            //         ...createForm.data,
-            //         PRODUCT: item.PRODUCT,
-            //         QTY: item.REQUEST_QTY,
-            //         UNITPRICE: 0,
-            //         DISCOUNT: 0,
-            //         CSTATUS: '1',
-            //     };
-            //     this.repo.createForm(form);
-            // }
+            const formmst = await this.frmmst.getFormMasterByVaname('GP-UNA');
+            if (!formmst) {
+                throw new Error(
+                    'Form master not found for GP-TPH. Check FORMMST table.',
+                );
+            }
+            const createForm = await this.frmcrt.create(
+                {
+                    NFRMNO: formmst.NNO,
+                    VORGNO: formmst.VORGNO,
+                    CYEAR: formmst.CYEAR,
+                    REQBY: data.REQ_USER,
+                    INPUTBY: data.REQ_USER,
+                },
+                ip,
+            );
+            for (const item of DETAILS) {
+                const form: CreateUNAFormDto = {
+                    ...createForm.data,
+                    PRODUCT: item.PRODUCT,
+                    QTY: item.REQUEST_QTY,
+                    UNITPRICE: 0,
+                    DISCOUNT: 0,
+                    CSTATUS: '1',
+                };
+                this.repo.createForm(form);
+            }
         }
         return result;
     }

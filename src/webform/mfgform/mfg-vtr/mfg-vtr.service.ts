@@ -33,7 +33,7 @@ export class MfgVtrService {
                 VORGNO: formmst.VORGNO,
                 CYEAR: formmst.CYEAR,
                 REQBY: data.REQBY,
-                INPUTBY: data.REQBY,
+                INPUTBY: data.INPUTBY,
             },
             ip,
         );
@@ -47,6 +47,7 @@ export class MfgVtrService {
                 NRUNNO: createForm.data.NRUNNO,
                 EMPNO: data.REQBY,
                 STATUS: '1',
+                REQUEST_DATE: data.REQUEST_DATE,
             },
             data.DETAILS,
         );

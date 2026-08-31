@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Query, Delete } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Param,
+    Query,
+    Delete,
+} from '@nestjs/common';
 import { VendingService } from './vending.service';
 import { CreateVendingDto } from './dto/create-vending.dto';
 import { UpdateVendingDto } from './dto/update-vending.dto';
@@ -55,7 +63,26 @@ export class VendingController {
     }
 
     @Post('addUserVending')
-    saveUserVending(@Body() { EMPNO }: { EMPNO: string[] }) {
-        return this.vendingService.saveUserVending(EMPNO);
+    saveUserVending(
+        @Body()
+        {
+            EMPNO,
+            CREATED_BY,
+        }: { EMPNO: string[]; CREATED_BY: string },
+    ) {
+        return this.vendingService.saveUserVending(EMPNO, CREATED_BY);
+    }
+
+    @Delete('users/:empno')
+    deleteUserVending(
+        @Param('empno') empno: string,
+        @Body() { UPDATED_BY }: { UPDATED_BY: string },
+    ) {
+        return this.vendingService.deleteUserVending(empno, UPDATED_BY);
+    }
+
+    @Get('getToolWithdrawalWithRequest')
+    getToolWithdrawalWithRequest() {
+        return this.vendingService.getToolWithdrawalWithRequest();
     }
 }

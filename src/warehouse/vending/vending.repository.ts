@@ -65,6 +65,31 @@ export class VendingRepository extends BaseRepository {
         });
     }
 
+    async getToolWithdrawalWithRequest() {
+        return this.manager.query(`
+            SELECT *
+            FROM SKIDCNTRL.TOOL_WITHDRAWAL tw
+            LEFT JOIN (
+                SELECT 
+                    mf.EMPNO,
+                    mf.REQUEST_DATE,
+                    md.PRODUCT_ID,
+                    SUM(md.QTY) AS QTY
+                FROM MFGVTR_FORM mf 
+                JOIN MFGVTR_DETAIL md ON mf.ID = md.FORM_ID 
+                WHERE mf.STATUS = '2'
+                GROUP BY 
+                    mf.EMPNO,
+                    mf.REQUEST_DATE,
+                    md.PRODUCT_ID
+            ) a
+                ON TRUNC(a.REQUEST_DATE) = tw.RECORD_DATE
+                AND a.PRODUCT_ID = tw.PRODUCT_ID
+            LEFT JOIN AMEC.AMECUSERALL u ON u.SEMPNO = tw.EMPLOYEE_CODE
+            LEFT JOIN PURSYS.PRODUCTS p ON p.SPRODID = tw.PRODUCT_ID
+        `);
+    }
+
     async importVending(dto: CreateImportDto) {
         const { importHistory, withdrawals, refills } = dto;
         console.log('importHistory:', importHistory);
@@ -95,7 +120,7 @@ export class VendingRepository extends BaseRepository {
             relations: {
                 WITHDRAWALS: true,
                 REFILLS: true,
-            }
+            },
         });
     }
 
@@ -146,9 +171,24 @@ export class VendingRepository extends BaseRepository {
             .getMany();
     }
 
-    async saveUserVending({ EMPNO }: { EMPNO: string[] }) {
+    async saveUserVending({
+        EMPNO,
+        CREATED_BY,
+    }: {
+        EMPNO: string[];
+        CREATED_BY: string;
+    }) {
         return this.getRepository(VENDING_USER).save(
-            EMPNO.map(empno => ({ EMPNO: empno }))
+            EMPNO.map((empno) => ({ EMPNO: empno, CREATED_BY })),
         );
     }
+
+    async deleteUserVending(EMPNO: string, UPDATED_BY: string) {
+        return this.getRepository(VENDING_USER).update(
+            { EMPNO },
+            { STATUS: 0, UPDATED_BY, UPDATED_AT: new Date() },
+        );
+    }
+
+    
 }

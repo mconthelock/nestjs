@@ -5,10 +5,14 @@ import { AddToolsVendingDto } from './dto/addtools-vending.dto';
 import { VendingRepository } from './vending.repository';
 import { CreateImportDto } from './dto/import-vending.dto';
 import { VENDING_USER } from 'src/common/Entities/skid/table/VENDING_USER.entity';
+import { FormService } from 'src/webform/form/form.service';
 
 @Injectable()
 export class VendingService {
-    constructor(private readonly vendingrepo: VendingRepository) {}
+    constructor(
+        private readonly vendingrepo: VendingRepository,
+        private readonly formService: FormService,
+    ) {}
 
     async getProduct() {
         try {
@@ -75,9 +79,55 @@ export class VendingService {
         }
     }
 
-    async saveUserVending(EMPNO: string[]) {
+    async saveUserVending(EMPNO: string[], CREATED_BY: string) {
         try {
-            return await this.vendingrepo.saveUserVending({ EMPNO });
+            return await this.vendingrepo.saveUserVending({
+                EMPNO,
+                CREATED_BY,
+            });
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async deleteUserVending(EMPNO: string, UPDATED_BY: string) {
+        try {
+            return await this.vendingrepo.deleteUserVending(EMPNO, UPDATED_BY);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getToolWithdrawalWithRequest() {
+        try {
+            // return await this.vendingrepo.getToolWithdrawalWithRequest();
+            const request =
+                await this.vendingrepo.getToolWithdrawalWithRequest();
+            return await Promise.all(
+                request.map(async (item) => {
+                    const formValues = [
+                        item.NFRMNO,
+                        item.VORGNO,
+                        item.CYEAR,
+                        item.CYEAR2,
+                        item.NRUNNO,
+                    ];
+
+                    if (formValues.some((value) => value == null)) {
+                        item.FORMNO = null;
+                        return item;
+                    }
+
+                    item.FORMNO = await this.formService.getFormno({
+                        NFRMNO: item.NFRMNO,
+                        VORGNO: item.VORGNO,
+                        CYEAR: item.CYEAR,
+                        CYEAR2: item.CYEAR2,
+                        NRUNNO: item.NRUNNO,
+                    });
+                    return item;
+                }),
+            );
         } catch (error) {
             throw error;
         }

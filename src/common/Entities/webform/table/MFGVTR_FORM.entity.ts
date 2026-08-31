@@ -36,6 +36,9 @@ export class MFGVTR_FORM {
     @Column()
     STATUS: string;
 
+    @Column()
+    REQUEST_DATE: Date;
+
     @OneToMany(() => MFGVTR_DETAIL, (detail) => detail.FORM)
     DETAILS: MFGVTR_DETAIL[];
 }

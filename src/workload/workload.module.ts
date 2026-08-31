@@ -20,6 +20,7 @@ import { DpmsPlWeightChangeModule } from './dpms_pl_weight_change/dpms_pl_weight
 import { CountryOriginModule } from './country_origin/country_origin.module';
 import { DpmsPlOriginModule } from './dpms_pl_origin/dpms_pl_origin.module';
 import { OriginMasterMarViewModule } from './origin_master_mar_view/origin_master_mar_view.module';
+import { MaterialStatusInquiryViewModule } from './material_status_inquiry_view/material_status_inquiry_view.module';
 
 @Module({
     imports: [
@@ -44,6 +45,7 @@ import { OriginMasterMarViewModule } from './origin_master_mar_view/origin_maste
         CountryOriginModule,
         DpmsPlOriginModule,
         OriginMasterMarViewModule,
+        MaterialStatusInquiryViewModule,
     ],
 })
 export class WorkloadModule {}

@@ -42,6 +42,9 @@ export class PURVMM_FORM {
     VENDGROUPTYPE: string;
 
     @Column()
+    VENDCAT: string;
+
+    @Column()
     TAXID: string;
 
     @Column()
@@ -54,25 +57,37 @@ export class PURVMM_FORM {
     CURCODE: string;
 
     @Column()
-    PAYMENTTYPE: string;
+    VPAYTO: string;
 
     @Column()
-    VENDHOLD: string;
+    VTYPE: string;
 
     @Column()
-    VENDONETIME: string;
-
-    @Column()
-    VEND1099: string;
+    VPAYTY: string;
 
     @Column()
     TERMCODE: string;
 
     @Column()
-    SEARCHKEY: string;
+    V1TIME: string;
 
     @Column()
-    FISCALCODE: string;
+    VNALPH: string;
+
+    @Column()
+    CONTACT: string;
+
+    @Column()
+    EMAIL: string;
+
+    @Column()
+    WEBSITE: string;
+
+    @Column()
+    TELNO: string;
+
+    @Column()
+    FAX: string;
 
     @Column()
     ACCNUMBER: string;
@@ -84,10 +99,10 @@ export class PURVMM_FORM {
     BRANCH: string;
 
     @Column()
-    WEBSITE: string;
+    BANKADDR: string;
 
     @Column()
-    EMAIL: string;
+    ATTACH_OTHER: string;
 
     @ManyToOne(() => Vendors, (vendor) => vendor.PURVMM)
     @JoinColumn({ name: 'VENDCODE', referencedColumnName: 'VND_CODE' })

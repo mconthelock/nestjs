@@ -34,6 +34,10 @@ export class CreatePurvmmFormDto extends PickType(FormDto, [
 
     @IsOptional()
     @IsString()
+    VENDCAT?: string;
+
+    @IsOptional()
+    @IsString()
     TAXID?: string;
 
     @IsOptional()
@@ -50,19 +54,15 @@ export class CreatePurvmmFormDto extends PickType(FormDto, [
 
     @IsOptional()
     @IsString()
-    PAYMENTTYPE?: string;
+    VPAYTO?: string;
 
     @IsOptional()
     @IsString()
-    VENDHOLD?: string;
+    VTYPE?: string;
 
     @IsOptional()
     @IsString()
-    VENDONETIME?: string;
-
-    @IsOptional()
-    @IsString()
-    VEND1099?: string;
+    VPAYTY?: string;
 
     @IsOptional()
     @IsString()
@@ -70,11 +70,31 @@ export class CreatePurvmmFormDto extends PickType(FormDto, [
 
     @IsOptional()
     @IsString()
-    SEARCHKEY?: string;
+    V1TIME?: string;
 
     @IsOptional()
     @IsString()
-    FISCALCODE?: string;
+    VNALPH?: string;
+
+    @IsOptional()
+    @IsString()
+    CONTACT?: string;
+
+    @IsOptional()
+    @IsString()
+    EMAIL?: string;
+
+    @IsOptional()
+    @IsString()
+    WEBSITE?: string;
+
+    @IsOptional()
+    @IsString()
+    TELNO?: string;
+
+    @IsOptional()
+    @IsString()
+    FAX?: string;
 
     @IsOptional()
     @IsString()
@@ -90,9 +110,9 @@ export class CreatePurvmmFormDto extends PickType(FormDto, [
 
     @IsOptional()
     @IsString()
-    EMAIL?: string;
+    BANKADDR?: string;
 
     @IsOptional()
     @IsString()
-    WEBSITE?: string;
+    ATTACH_OTHER?: string;
 }

@@ -12,8 +12,10 @@ import { PurvmmFormService } from './purvmm_form/purvmm_form.service';
 import { PurnvfAddressRepository } from '../pur-nvf/purnvf_address/purnvf_address.repository';
 import { FormCreateService } from 'src/webform/form/create-form.service';
 import { PurvmmFormRepository } from './purvmm_form/purvmm_form.repository';
-
 import { Vendors } from 'src/common/Entities/pursys/table/VENDORS.entity';
+import { PurFileService } from '../pur-file/pur-file.service';
+import { PurFileModule } from '../pur-file/pur-file.module';
+import { PurFileRepository } from '../pur-file/pur-file.repository';
 
 @Module({
     controllers: [PurVmmController],
@@ -22,6 +24,8 @@ import { Vendors } from 'src/common/Entities/pursys/table/VENDORS.entity';
         PurvmmFormService, // <--- ต้องมีตัวนี้อยู่ใน providers
         PurnvfAddressRepository,
         PurvmmFormRepository,
+        PurFileService,
+        PurFileRepository,
     ],
     imports: [
         PurvmmScmusrModule,
@@ -29,6 +33,7 @@ import { Vendors } from 'src/common/Entities/pursys/table/VENDORS.entity';
         PurevaFormModule,
         FormModule,
         FormmstModule,
+        PurFileModule,
         TypeOrmModule.forFeature([Vendors], 'purConnection'),
     ],
 })

@@ -241,6 +241,7 @@ export class ExpatRepository extends BaseRepository {
                 'U.SDIV',
                 'U.SRECMAIL',
                 'U.SPOSITION',
+                `TO_CHAR(U.STARTDATE, 'DD/MM/YYYY') AS "STARTDATE"`,
             ])
             .where('TRIM(U.SEMPNO) = TRIM(:sempno)', { sempno })
             .getOne();

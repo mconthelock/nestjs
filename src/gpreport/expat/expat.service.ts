@@ -19,10 +19,15 @@ import { ExpatFamily } from 'src/common/Entities/gpreport/table/expat_family.ent
 import { CreateExpatTravelDto } from './dto/create-expat-travel.dto';
 import { UpdateExpatTravelDto } from './dto/update-expat-travel.dto';
 import { ExpatTravel } from 'src/common/Entities/gpreport/table/expat_travel.entity';
+import { SendMailDto } from 'src/common/services/mail/dto/send-mail.dto';
+import { MailService } from 'src/common/services/mail/mail.service';
 
 @Injectable()
 export class ExpatService {
-    constructor(private readonly expatRepository: ExpatRepository) {}
+    constructor(
+        private readonly expatRepository: ExpatRepository,
+        private readonly mailService: MailService,
+    ) {}
 
     findAllEmployees(company?: string) {
         return this.expatRepository.findAllEmployees(company);
@@ -343,6 +348,39 @@ export class ExpatService {
         res.setHeader('Content-Disposition',`${download ? 'attachment' : 'inline'}; filename="${file.FILE_NAME}"`,);
         res.setHeader('Content-Length', fs.statSync(file.FILE_PATH).size);
         fs.createReadStream(file.FILE_PATH).pipe(res);
+    }
+
+    async send90DayReceiptEmail(sempno: string) {
+        const employee = await this.expatRepository.findOneEmployee(sempno);
+        if (!employee) {throw new NotFoundException('EXPAT_EMPLOYEE_NOT_FOUND');}
+        const master = await this.expatRepository.findAmecEmployee(sempno);
+        const email = employee.EMAIL || master?.SRECMAIL;
+
+        if (!email) {throw new NotFoundException('EMPLOYEE_EMAIL_NOT_FOUND');}
+        await this.mailService.sendMail({
+            to: email,
+            subject: '90-day Report Receipt Updated',
+            html: `
+                <p>Dear ${master?.SNAME || sempno},</p>
+                <p>
+                    Your latest <strong>90-day Report Receipt</strong>
+                    has been updated.
+                </p>
+                <p>Please download the latest receipt and<strong>KEEP IN PASSPORT</strong>.</p>
+
+                <p>Employee No.: ${sempno}</p>
+                <p>
+                    Best regards,<br>
+                    Expat Management System
+                </p>
+            `,
+        });
+
+        return {
+            success: true,
+            emailSent: true,
+            email,
+        };
     }
 
 

@@ -126,7 +126,7 @@ export class ExpatController {
     findAmecEmployee(@Param('sempno') sempno: string) {
         return this.expatService.findAmecEmployee(sempno);
     }
-
+/*
     @Post('uploadfile/:sempno/:fileType')
     @UseInterceptors(FileInterceptor('file'))
     uploadFileExpat(
@@ -135,6 +135,23 @@ export class ExpatController {
         @UploadedFile() file: Express.Multer.File,
     ) {
         return this.expatService.uploadFileExpat(sempno, fileType, file);
+    }
+*/
+
+    @Post('uploadfile/:sempno/:fileType')
+    @UseInterceptors(FileInterceptor('file'))
+    uploadFileExpat(
+        @Param('sempno') sempno: string,
+        @Param('fileType') fileType: string,
+        @Body('SEND_EMAIL') sendEmail: string,
+        @UploadedFile() file: Express.Multer.File,
+    ) {
+        return this.expatService.uploadFileExpat(
+            sempno,
+            fileType,
+            file,
+            sendEmail,
+        );
     }
 
     @Get('viewfile/:sempno/:fileType')

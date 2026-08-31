@@ -1,21 +1,53 @@
 import { PartialType, PickType } from "@nestjs/swagger";
-import { Type } from "class-transformer";
-import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { Transform, Type } from "class-transformer";
+import {
+    IsArray,
+    IsDate,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+    ValidateNested,
+} from "class-validator";
 import { FormDto } from "src/webform/form/dto/form.dto";
+
+function ParseJsonArray() {
+    return Transform(({ value }) => {
+        if (typeof value === "string") {
+            try {
+                return JSON.parse(value);
+            } catch {
+                return value;
+            }
+        }
+        return value;
+    });
+}
 
 export class CreateGpTphReqFormDto extends PickType(FormDto, [
     'NFRMNO',
     'VORGNO',
     'CYEAR',
 ] as const) {
+    @IsString()
+    REQBY: string;
+
+    @IsString()
+    @IsNotEmpty()
+    INPUTBY: string;
+
+    @IsString()
+    REMARK?: string;
+
     @IsOptional()
     @IsString()
     REQUEST_TYPE?: string;
 
+    @IsNotEmpty()
     @IsString()
     REQUEST_SUB_TYPE?: string;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     PURPOSE?: string;
 
@@ -39,15 +71,48 @@ export class CreateGpTphReqFormDto extends PickType(FormDto, [
     @IsString()
     PHOTO_PERMIT_BADGE?: string;
 
-    @IsString()
-    REQBY: string;
-
-    @IsString()
     @IsNotEmpty()
-    INPUTBY: string;
+    DETAILS: CreateGpTphlistApplicantDto[];
 
+    @IsNotEmpty()
+    @Type(() => Number)
+    @IsArray()
+    @IsNumber({}, { each: true })
+    AREA_ID: number[];
+
+}
+export class CreateGpTphlistApplicantDto {
+
+    @IsOptional()
     @IsString()
-    REMARK?: string;
+    CYEAR2?: string;
+
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    NRUNNO?: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    SEQ_NO?: number;
+
+    @IsOptional()
+    @IsString()
+    APPLICANT_TYPE?: string;
+
+    @IsOptional()
+    @IsString()
+    EMP_CODE?: string;
+
+    @IsOptional()
+    @IsString()
+    APPLICANT_NAME?: string;
+
+    @IsOptional()
+    @IsString()
+    COMPANY_NAME?: string;
+
 }
 
 export class CreateGpTphReqDto extends PartialType(CreateGpTphReqFormDto) { }

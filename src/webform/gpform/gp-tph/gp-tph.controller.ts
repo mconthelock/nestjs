@@ -8,6 +8,7 @@ import {
     Delete,
     UseInterceptors,
     Req,
+    ParseIntPipe,
 } from '@nestjs/common';
 import { GpTphService } from './gp-tph.service';
 import { CreateGpTphReqDto } from './dto/create-gp-tph.dto';
@@ -47,6 +48,23 @@ export class GpTphController {
             NRUNNO: nrunno,
         });
     }
+
+        @Get('/list/:fno/:orgno/:cyear/:cyear2/:nrunno')
+        findList(
+            @Param('fno', ParseIntPipe) fno: number,
+            @Param('orgno') orgno: string,
+            @Param('cyear') cyear: string,
+            @Param('cyear2') cyear2: string,
+            @Param('nrunno', ParseIntPipe) nrunno: number,
+        ) {
+            return this.gpTphService.findList({
+                NFRMNO: fno,
+                VORGNO: orgno,
+                CYEAR: cyear,
+                CYEAR2: cyear2,
+                NRUNNO: nrunno,
+            });
+        }
 
         @Post()
         @UseTransaction('webformConnection')

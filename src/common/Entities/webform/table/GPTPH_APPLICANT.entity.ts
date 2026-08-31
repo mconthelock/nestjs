@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { GPTPH_REQ_HEADER } from "./GPTPH_REQ_HEADER.entity";
 
 @Entity({
     name: 'GPTPH_APPLICANT',
@@ -8,16 +9,23 @@ export class GPTPH_APPLICANT {
     @PrimaryColumn()
     CYEAR2: string;
     @PrimaryColumn()
-    NFRMNO: number;
+    NRUNNO: number;
     @PrimaryColumn()
     SEQ_NO: number;
     @Column()
     APPLICANT_TYPE: string;
     @Column()
-    EMPCODE: string;
+    EMP_CODE: string;
     @Column()
-    VISTOR_NAME: string;
+    APPLICANT_NAME: string;
     @Column()
-    COMPANY_NAME: string;
+    COMPANY_NAME: string; 
 
+
+    @ManyToOne(() => GPTPH_REQ_HEADER)
+    @JoinColumn([
+        { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+        { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+    ])
+    form: GPTPH_REQ_HEADER;
 }

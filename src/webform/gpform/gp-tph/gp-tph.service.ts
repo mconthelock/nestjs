@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateGpTphReqDto } from './dto/create-gp-tph.dto';
 import { UpdateGpTphDto } from './dto/update-gp-tph.dto';
 import { GpTphRepository } from './gp-tph.repository';
@@ -11,7 +11,7 @@ export class GpTphService {
     constructor(
         private readonly repo: GpTphRepository,
         private readonly formmstService: FormmstService,
-        private readonly  formCreateService: FormCreateService,
+        private readonly formCreateService: FormCreateService,
     ) { }
 
     findAllAreas() {
@@ -29,6 +29,14 @@ export class GpTphService {
     ) {
         try {
             console.log('CreateGpTphReqDto:', dto);
+            const areaIds = (Array.isArray(dto.AREA_ID)
+                ? dto.AREA_ID
+                : [dto.AREA_ID]).filter(
+                (areaId) => Number.isFinite(Number(areaId)) && Number(areaId) > 0,
+            );
+            if (areaIds.length === 0) {
+                throw new BadRequestException('AREA_ID must contain at least one area');
+            }
             //ดึงข้อมูล Form Master
             const formmst =
                 await this.formmstService.getFormMasterByVaname('GP-TPH');
@@ -72,21 +80,55 @@ export class GpTphService {
                 PERMIT_START_DATE: dto.PERMIT_START_DATE ?? null,
                 PERMIT_END_DATE: dto.PERMIT_END_DATE ?? null,
                 HELMET_STICKER: dto.HELMET_STICKER ? dto.HELMET_STICKER.trim() : null,
-                PHOTO_PERMIT_BADGE: dto.PHOTO_PERMIT_BADGE ? dto.PHOTO_PERMIT_BADGE.trim() : null
+                PHOTO_PERMIT_BADGE: dto.PHOTO_PERMIT_BADGE ? dto.PHOTO_PERMIT_BADGE.trim() : null,
+
             };
             const insert = await this.repo.CreateGpTphReq(data);
 
 
+            const insertList = [];
+            for (const detail of dto.DETAILS) {
+                const detailData = {
+                    CYEAR2: form.CYEAR2,
+                    NRUNNO: form.NRUNNO,
+                    SEQ_NO: Number(detail.SEQ_NO),
+                    APPLICANT_TYPE: detail.APPLICANT_TYPE ?? null,
+                    EMP_CODE: detail.EMP_CODE ?? null,
+                    APPLICANT_NAME: detail.APPLICANT_NAME ?? null,
+                    COMPANY_NAME: detail.COMPANY_NAME ?? null,
+                };
+                const insertedDetail = await this.repo.CreateGpTphApplicant(detailData);
+                insertList.push(insertedDetail);
+            }
+
+            const insertAreaRecordList = [];
+            for (const id of areaIds) {
+                const areaRecordData = {
+                    CYEAR2: form.CYEAR2,
+                    NRUNNO: form.NRUNNO,
+                    AREA_ID: id,
+                };
+                const insertedAreaRecord = await this.repo.CreateGpTphArearecord(areaRecordData);
+                insertAreaRecordList.push(insertedAreaRecord);
+            }
+
+
             return {
                 status: true,
-                message: 'Form created successfully',
-                data: insert
-            }
+                message: 'GP-TPH Form created successfully',
+                data: insert,
+                details: insertList,
+                areaRecords: insertAreaRecordList,
+            };
         } catch (error) {
             throw error;
         }
     }
+
     async findOne(dto: FormDto) {
         return this.repo.findOne(dto);
+    }
+    async findList(dto: FormDto) {
+        return this.repo.findList(dto);
     }
 }

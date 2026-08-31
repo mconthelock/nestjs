@@ -103,7 +103,7 @@ export class PurVmmService {
                 for (const f of fs) {
                     const formNo = await this.formservice.getFormno(form); // Get the form number
                     const destination = await joinPaths(path, formNo); // Get the destination path
-                    throw new Error(destination);
+                    //throw new Error(destination);
                     await copyFile(f.FILE_PATH, destination);
                     await this.filesv.insert({
                         ...form,

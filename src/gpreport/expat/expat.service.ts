@@ -370,16 +370,16 @@ export class ExpatService {
         if (!email) {throw new NotFoundException('EMPLOYEE_EMAIL_NOT_FOUND');}
         await this.mailService.sendMail({
             to: email,
-            subject: '90-day Report Receipt Updated',
+            subject: 'Document : 90-day Report Receipt Updated',
             html: `
-                <p>Dear ${master?.SNAME || sempno},</p>
+                <p>Dear ${master?.SNAME || sempno} San</p>
                 <p>
                     Your latest <strong>90-day Report Receipt</strong>
                     has been updated.
                 </p>
-                <p>Please download the latest receipt and<strong>KEEP IN PASSPORT</strong>.</p>
+                <p>You can check or download the latest receipt via the menu <strong>Travel Info</strong> on GP System.</p>
 
-                <p>Employee No.: ${sempno}</p>
+                <p>Employee No : ${sempno}</p>
                 <p>
                     Best regards,<br>
                     Expat Management System

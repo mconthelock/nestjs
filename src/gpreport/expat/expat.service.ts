@@ -377,7 +377,7 @@ export class ExpatService {
                     Your latest <strong>90-day Report Receipt</strong>
                     has been updated.
                 </p>
-                <p>You can check or download the latest receipt via the menu <strong>Travel Info</strong> on GP System.</p>
+                <p>You can check or download the latest receipt via the menu <strong>Travel Info</strong> on HR System.</p>
 
                 <p>Employee No : ${sempno}</p>
                 <p>

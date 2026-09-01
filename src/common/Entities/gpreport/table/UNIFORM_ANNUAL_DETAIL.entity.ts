@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { AnnualUniform } from './UNIFORM_ANNUAL.entity';
+import { UNIFORM } from 'src/common/Entities/gpreport/table/UNIFORM.entity';
 
 @Entity({ name: 'UNIFORM_ANNUAL_DETAIL', schema: 'GPREPORT' })
 export class AnnualUniformDetail {
@@ -33,4 +34,8 @@ export class AnnualUniformDetail {
         { name: 'REQL_USER', referencedColumnName: 'REQ_USER' },
     ])
     annual: AnnualUniform;
+
+    @ManyToOne(() => UNIFORM, (u) => u.PROD_ID)
+    @JoinColumn([{ name: 'PRODUCT', referencedColumnName: 'PROD_ID' }])
+    uniform: UNIFORM;
 }

@@ -70,35 +70,35 @@ export class UniformService {
             detail,
         );
 
-        if (data.PAID) {
-            const formmst = await this.frmmst.getFormMasterByVaname('GP-UNA');
-            if (!formmst) {
-                throw new Error(
-                    'Form master not found for GP-TPH. Check FORMMST table.',
-                );
-            }
-            const createForm = await this.frmcrt.create(
-                {
-                    NFRMNO: formmst.NNO,
-                    VORGNO: formmst.VORGNO,
-                    CYEAR: formmst.CYEAR,
-                    REQBY: data.REQ_USER,
-                    INPUTBY: data.REQ_USER,
-                },
-                ip,
-            );
-            for (const item of DETAILS) {
-                const form: CreateUNAFormDto = {
-                    ...createForm.data,
-                    PRODUCT: item.PRODUCT,
-                    QTY: item.REQUEST_QTY,
-                    UNITPRICE: 0,
-                    DISCOUNT: 0,
-                    CSTATUS: '1',
-                };
-                this.repo.createForm(form);
-            }
-        }
+        // if (data.PAID) {
+        //     const formmst = await this.frmmst.getFormMasterByVaname('GP-UNA');
+        //     if (!formmst) {
+        //         throw new Error(
+        //             'Form master not found for GP-TPH. Check FORMMST table.',
+        //         );
+        //     }
+        //     const createForm = await this.frmcrt.create(
+        //         {
+        //             NFRMNO: formmst.NNO,
+        //             VORGNO: formmst.VORGNO,
+        //             CYEAR: formmst.CYEAR,
+        //             REQBY: data.REQ_USER,
+        //             INPUTBY: data.REQ_USER,
+        //         },
+        //         ip,
+        //     );
+        //     for (const item of DETAILS) {
+        //         const form: CreateUNAFormDto = {
+        //             ...createForm.data,
+        //             PRODUCT: item.PRODUCT,
+        //             QTY: item.REQUEST_QTY,
+        //             UNITPRICE: 0,
+        //             DISCOUNT: 0,
+        //             CSTATUS: '1',
+        //         };
+        //         this.repo.createForm(form);
+        //     }
+        // }
         return result;
     }
 

@@ -19,6 +19,8 @@ export class AnnualUniformRepository extends BaseRepository {
         return this.manager
             .createQueryBuilder(AnnualUniform, 'annual')
             .leftJoinAndSelect('annual.details', 'details')
+            .leftJoinAndSelect('details.uniform', 'uniform')
+            .leftJoinAndSelect('uniform.category', 'category')
             .where('annual.REQ_USER = :userId', { userId })
             .andWhere('annual.REQ_YEAR = :year', { year })
             .getMany();

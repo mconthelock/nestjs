@@ -32,7 +32,6 @@ export class ExpatRepository extends BaseRepository {
                 'E.THAI_ADDR AS "THAI_ADDR"',
                 'E.TELNO AS "TELNO"',
                 'E.EMAIL AS "EMAIL"',
-                'E.START_WORK_DATE AS "START_WORK_DATE"',
                 'E.SINGLE_WIN_DATE AS "SINGLE_WIN_DATE"',
                 'E.VISA_APPT_DATE AS "VISA_APPT_DATE"',
                 'E.VISA_EXP_DATE AS "VISA_EXP_DATE"',
@@ -51,6 +50,7 @@ export class ExpatRepository extends BaseRepository {
                 'U.SDEPT AS "SDEPT"',
                 'U.SDIVCODE AS "SDIVCODE"',
                 'U.SDIV AS "SDIV"',
+                'U.STARTDATE AS "STARTDATE"',
                 `CASE WHEN U.SDIVCODE = '140101' THEN 'RHQ' ELSE 'AMEC' END AS "COMPANY"`,
             ])
             .orderBy('E.SEMPNO', 'ASC');

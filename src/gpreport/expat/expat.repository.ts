@@ -50,7 +50,7 @@ export class ExpatRepository extends BaseRepository {
                 'U.SDEPT AS "SDEPT"',
                 'U.SDIVCODE AS "SDIVCODE"',
                 'U.SDIV AS "SDIV"',
-                'U.STARTDATE AS "STARTDATE"',
+                `TO_CHAR(U.STARTDATE, 'DD/MM/YYYY') AS "STARTDATE"`,
                 `CASE WHEN U.SDIVCODE = '140101' THEN 'RHQ' ELSE 'AMEC' END AS "COMPANY"`,
             ])
             .orderBy('E.SEMPNO', 'ASC');
@@ -88,6 +88,7 @@ export class ExpatRepository extends BaseRepository {
                 'U.SDEPT AS "SDEPT"',
                 'U.SDIVCODE AS "SDIVCODE"',
                 'U.SDIV AS "SDIV"',
+                `TO_CHAR(U.STARTDATE, 'DD/MM/YYYY') AS "STARTDATE"`,
                 `CASE WHEN U.SDIVCODE = '140101' THEN 'RHQ' ELSE 'AMEC' END AS "COMPANY"`,
             ])
             .where('E.SEMPNO = :sempno', { sempno })

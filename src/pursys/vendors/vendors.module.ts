@@ -10,5 +10,6 @@ import { Vendors } from 'src/common/Entities/pursys/table/VENDORS.entity';
     imports: [TypeOrmModule.forFeature([Vendors], 'purConnection')],
     controllers: [VendorsController],
     providers: [VendorsService],
+    exports: [VendorsService],
 })
 export class VendorsModule {}

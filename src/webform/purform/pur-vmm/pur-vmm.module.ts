@@ -36,5 +36,6 @@ import { PurFileRepository } from '../pur-file/pur-file.repository';
         PurFileModule,
         TypeOrmModule.forFeature([Vendors], 'purConnection'),
     ],
+    exports: [PurVmmService],
 })
 export class PurVmmModule {}

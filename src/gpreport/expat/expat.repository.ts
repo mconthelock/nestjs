@@ -32,7 +32,6 @@ export class ExpatRepository extends BaseRepository {
                 'E.THAI_ADDR AS "THAI_ADDR"',
                 'E.TELNO AS "TELNO"',
                 'E.EMAIL AS "EMAIL"',
-                'E.START_WORK_DATE AS "START_WORK_DATE"',
                 'E.SINGLE_WIN_DATE AS "SINGLE_WIN_DATE"',
                 'E.VISA_APPT_DATE AS "VISA_APPT_DATE"',
                 'E.VISA_EXP_DATE AS "VISA_EXP_DATE"',
@@ -51,6 +50,7 @@ export class ExpatRepository extends BaseRepository {
                 'U.SDEPT AS "SDEPT"',
                 'U.SDIVCODE AS "SDIVCODE"',
                 'U.SDIV AS "SDIV"',
+                `TO_CHAR(U.STARTDATE, 'DD/MM/YYYY') AS "STARTDATE"`,
                 `CASE WHEN U.SDIVCODE = '140101' THEN 'RHQ' ELSE 'AMEC' END AS "COMPANY"`,
             ])
             .orderBy('E.SEMPNO', 'ASC');
@@ -88,6 +88,7 @@ export class ExpatRepository extends BaseRepository {
                 'U.SDEPT AS "SDEPT"',
                 'U.SDIVCODE AS "SDIVCODE"',
                 'U.SDIV AS "SDIV"',
+                `TO_CHAR(U.STARTDATE, 'DD/MM/YYYY') AS "STARTDATE"`,
                 `CASE WHEN U.SDIVCODE = '140101' THEN 'RHQ' ELSE 'AMEC' END AS "COMPANY"`,
             ])
             .where('E.SEMPNO = :sempno', { sempno })
@@ -168,9 +169,42 @@ export class ExpatRepository extends BaseRepository {
     // FAMILY FILE
     findFamilyFiles(sempno: string, fid: number) {
         return this.getRepository(ExpatFamilyFile).find({
-            where: { SEMPNO: sempno, FID: fid },
-            order: { FILE_TYPE: 'ASC', FILE_ID: 'ASC' },
+            where: {
+                SEMPNO: sempno,
+                FID: fid,
+            },
+            order: {
+                FILE_TYPE: 'ASC',
+                FILE_ID: 'ASC',
+            },
         });
+    }
+
+    findFamilyFileByType(sempno: string, fid: number, fileType: string) {
+        return this.getRepository(ExpatFamilyFile).findOne({
+            where: {
+                SEMPNO: sempno,
+                FID: fid,
+                FILE_TYPE: fileType,
+            },
+        });
+    }
+
+    async updateFamilyFile(
+        sempno: string,
+        fid: number,
+        fileType: string,
+        data: Partial<ExpatFamilyFile>,
+    ) {
+        await this.getRepository(ExpatFamilyFile).update(
+            {
+                SEMPNO: sempno,
+                FID: fid,
+                FILE_TYPE: fileType,
+            },
+            data,
+        );
+        return this.findFamilyFileByType(sempno, fid, fileType);
     }
 
     async getNextFamilyFileId(sempno: string, fid: number, fileType: string) {
@@ -200,17 +234,16 @@ export class ExpatRepository extends BaseRepository {
     findAmecEmployee(sempno: string) {
         return this.userRepo
             .createQueryBuilder('U')
-            .select([
-                'U.SEMPNO',
-                'U.SNAME',
-                'U.BIRTHDAY',
-                'U.SDIVCODE',
-                'U.SDIV',
-                'U.SRECMAIL',
-                'U.SPOSITION',
-            ])
+            .select('U.SEMPNO', 'SEMPNO')
+            .addSelect('U.SNAME', 'SNAME')
+            .addSelect('U.BIRTHDAY', 'BIRTHDAY')
+            .addSelect('U.SDIVCODE', 'SDIVCODE')
+            .addSelect('U.SDIV', 'SDIV')
+            .addSelect('U.SRECMAIL', 'SRECMAIL')
+            .addSelect('U.SPOSITION', 'SPOSITION')
+            .addSelect(`TO_CHAR(U.STARTDATE, 'DD/MM/YYYY')`, 'STARTDATE')
             .where('TRIM(U.SEMPNO) = TRIM(:sempno)', { sempno })
-            .getOne();
+            .getRawOne();
     }
 
     findEmployeeFileByType(sempno: string, fileType: string) {
@@ -267,8 +300,34 @@ export class ExpatRepository extends BaseRepository {
         return this.findOneTravel(travelId);
     }
 
+    updateEmployeeLastArrival(sempno: string, arrivalDate: Date) {
+        return this.getRepository(ExpatEmployee)
+            .createQueryBuilder()
+            .update()
+            .set({
+                LAST_ARRIVAL_DATE: arrivalDate,
+                LAST_ARRIVAL_UPD_DATE: () => 'SYSDATE',
+            })
+            .where('SEMPNO = :sempno', { sempno })
+            .execute();
+    }
+
     deleteTravel(travelId: number) {
         return this.getRepository(ExpatTravel).delete({ TRAVEL_ID: travelId });
+    }
+
+    deleteFamilyFilesByFamily(sempno: string, fid: number) {
+        return this.getRepository(ExpatFamilyFile).delete({
+            SEMPNO: sempno,
+            FID: fid,
+        });
+    }
+
+    deleteFamilyTravels(sempno: string, fid: number) {
+        return this.getRepository(ExpatTravel).delete({
+            SEMPNO: sempno,
+            FID: fid,
+        });
     }
 
 }

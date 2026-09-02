@@ -129,13 +129,13 @@ export class MATERIAL_STATUS_INQUIRY_VIEW {
     BUYER_CODE: string;
 
     @ViewColumn()
-    BUYER: string;
-
-    @ViewColumn()
-    BUYERNAME: string;
-
-    @ViewColumn()
     PLANNER: string;
+
+    @ViewColumn()
+    PLANNERNAME: string;
+
+    @ViewColumn()
+    PLANNER_CODE: string;
 
     @ViewColumn()
     ONHAND: number;

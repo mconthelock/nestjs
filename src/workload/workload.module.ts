@@ -21,6 +21,7 @@ import { CountryOriginModule } from './country_origin/country_origin.module';
 import { DpmsPlOriginModule } from './dpms_pl_origin/dpms_pl_origin.module';
 import { OriginMasterMarViewModule } from './origin_master_mar_view/origin_master_mar_view.module';
 import { MaterialStatusInquiryViewModule } from './material_status_inquiry_view/material_status_inquiry_view.module';
+import { CountryOriginBulkListViewModule } from './country_origin_bulk_list_view/country_origin_bulk_list_view.module';
 
 @Module({
     imports: [
@@ -46,6 +47,7 @@ import { MaterialStatusInquiryViewModule } from './material_status_inquiry_view/
         DpmsPlOriginModule,
         OriginMasterMarViewModule,
         MaterialStatusInquiryViewModule,
+        CountryOriginBulkListViewModule,
     ],
 })
 export class WorkloadModule {}

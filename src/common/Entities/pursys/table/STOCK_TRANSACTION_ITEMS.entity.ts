@@ -9,7 +9,7 @@ export class StockTransactionItems {
     TRANSACTION_ID: number;
 
     @Column()
-    PRODUCT_ID: number;
+    PRODUCT_ID: string;
 
     @Column()
     LOT_ID: number;

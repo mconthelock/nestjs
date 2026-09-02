@@ -1,5 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository, In, IsNull, Or, Equal } from 'typeorm';
+import {
+    DataSource,
+    Repository,
+    In,
+    IsNull,
+    Or,
+    Equal,
+    Between,
+} from 'typeorm';
 import { AddToolsVendingDto } from './dto/addtools-vending.dto';
 import { CreateImportDto } from './dto/import-vending.dto';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -109,7 +117,19 @@ export class VendingRepository extends BaseRepository {
             IMPORT_ID: headId,
         }));
 
-        await this.getRepository(TOOL_REFILL).save(refillData);
+        for (const refill of refillData) {
+            const exists = await this.getRepository(TOOL_REFILL).exists({
+                where: {
+                    REFILL_DATETIME: refill.REFILL_DATETIME,
+                    PRODUCT_ID: refill.PRODUCT_ID,
+                    REFILL_QTY: refill.REFILL_QTY,
+                },
+            });
+
+            if (!exists) {
+                await this.getRepository(TOOL_REFILL).insert(refill);
+            }
+        }
     }
 
     async importHistory() {
@@ -190,5 +210,12 @@ export class VendingRepository extends BaseRepository {
         );
     }
 
-    
+    async getRequestWithdrawal() {
+        return this.manager.query(`
+            SELECT * FROM  MFGVTR_FORM mf 
+            JOIN MFGVTR_DETAIL md ON mf.ID = md.FORM_ID 
+            LEFT JOIN AMECUSERALL a ON mf.EMPNO = a.SEMPNO
+            WHERE mf.STATUS = '2'  
+        `);
+    }
 }

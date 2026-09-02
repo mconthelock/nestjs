@@ -64,11 +64,7 @@ export class VendingController {
 
     @Post('addUserVending')
     saveUserVending(
-        @Body()
-        {
-            EMPNO,
-            CREATED_BY,
-        }: { EMPNO: string[]; CREATED_BY: string },
+        @Body() { EMPNO, CREATED_BY }: { EMPNO: string[]; CREATED_BY: string },
     ) {
         return this.vendingService.saveUserVending(EMPNO, CREATED_BY);
     }
@@ -84,5 +80,15 @@ export class VendingController {
     @Get('getToolWithdrawalWithRequest')
     getToolWithdrawalWithRequest() {
         return this.vendingService.getToolWithdrawalWithRequest();
+    }
+
+    @Get('getRequestWithdrawal')
+    getRequestWithdrawal() {
+        return this.vendingService.getRequestWithdrawal();
+    }
+
+    @Get('getIssueWithdrawal')
+    getIssueWithdrawal() {
+        return this.vendingService.getIssueWithdrawal();
     }
 }

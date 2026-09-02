@@ -25,4 +25,41 @@ export class PurvmmScmuserRepository extends BaseRepository {
         const result = await this.getRepository(PURVMM_SCMUSR).update(con, dto);
         return (result.affected ?? 0) > 0;
     }
+
+    async getMaxId(
+        nfrmno: number,
+        vorgno: string,
+        cyear: string,
+        cyear2: string,
+        nrunno: number,
+    ) {
+        const result = await this.getRepository(PURVMM_SCMUSR)
+            .createQueryBuilder('usr')
+            .select('MAX(usr.ID)', 'maxId')
+            .where('usr.NFRMNO = :nfrmno', { nfrmno })
+            .andWhere('usr.VORGNO = :vorgno', { vorgno })
+            .andWhere('usr.CYEAR = :cyear', { cyear })
+            .andWhere('usr.CYEAR2 = :cyear2', { cyear2 })
+            .andWhere('usr.NRUNNO = :nrunno', { nrunno })
+            .getRawOne();
+
+        return result?.maxId ? Number(result.maxId) : 0;
+    }
+
+    async InsertUsers(users: CreatePurVmmScmusrDto[]) {
+        if (!users || users.length === 0) return;
+
+        // ใช้ this.getRepository() สำหรับ Insert ก็ได้เหมือนกันค่ะ
+        const result = await this.getRepository(PURVMM_SCMUSR)
+            .createQueryBuilder()
+            .insert()
+            .into(PURVMM_SCMUSR)
+            .values(users)
+            .execute();
+        return result;
+    }
+
+    async deleteByAll(dto: FormDto) {
+        return this.getRepository(PURVMM_SCMUSR).delete(dto);
+    }
 }

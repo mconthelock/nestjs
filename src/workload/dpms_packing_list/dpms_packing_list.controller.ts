@@ -53,6 +53,12 @@ export class DpmsPackingListController {
         return this.service.getPackingListMar('inprogress');
     }
 
+    @Post('mar/search')
+    @UseInterceptors(getFileUploadInterceptor())
+    getMarketingSearchTasks(@Body() dto: searchDpmsPackingListDto) {
+        return this.service.getPackingListMar('search', dto);
+    }
+
     @Get('mar/for-search')
     getMarForSearch() {
         return this.service.getForSearch('mar');

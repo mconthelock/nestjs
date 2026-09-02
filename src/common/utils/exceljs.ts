@@ -1,12 +1,13 @@
 import * as ExcelJS from 'exceljs';
 import { toExcelDate } from './dayjs.utils';
+import { Response } from 'express';
 
 export async function defaultExcel(
     options: {
         data?: any[];
         column?: {
             key: string;
-            header: string;
+            header?: string;
             type?: 'string' | 'number' | 'date';
             numFmt?: string;
             bullet?: boolean;
@@ -30,6 +31,7 @@ export async function defaultExcel(
         autoWidth?: boolean;
         autoHeight?: boolean;
         startRow?: number;
+        templatePath?: string;
     } = {},
 ) {
     const {
@@ -55,7 +57,14 @@ export async function defaultExcel(
     } = options;
 
     const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet(sheetName); // เพื่มชีท และตั้งชื่อชีท
+    let sheet: ExcelJS.Worksheet;
+    // 2026-08-05 เปิดไฟล์ template
+    if (options.templatePath) {
+        await workbook.xlsx.readFile(options.templatePath);
+        sheet = workbook.getWorksheet(sheetName);
+    } else {
+        sheet = workbook.addWorksheet(sheetName); // เพื่มชีท และตั้งชื่อชีท
+    }
     const alignments = {
         vertical: alignment?.vertical ?? 'middle',
         horizontal: alignment?.horizontal ?? 'center',
@@ -73,9 +82,11 @@ export async function defaultExcel(
     }
 
     // เพิ่มหัวด้วยตัวเอง แทนการใช้ sheet.columns
-    const headerRow = sheet.addRow(column.map((col) => col.header));
-    headerRow.font = font;
-    headerRow.alignment = alignments;
+    if (column.length > 0 && column.some((col) => col.header)) {
+        const headerRow = sheet.addRow(column.map((col) => col.header));
+        headerRow.font = font;
+        headerRow.alignment = alignments;
+    }
 
     // กำหนด key ให้แต่ละคอลัมน์
     column.forEach((col, index) => {
@@ -185,4 +196,290 @@ export async function getBufferFromExcel(
 ): Promise<Buffer> {
     const excelBuffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(excelBuffer);
+}
+
+/**
+ * @author Sutthipong tangmongkhoncharoen(24008)
+ * @since 2026-08-05
+ * @description ส่งไฟล์ Excel ให้กับผู้ใช้ผ่าน Response ของ Express ใช้ใน Controller
+ * @param res
+ * @param buffer
+ * @param filename
+ * @example
+ * sendExcel(res, buffer, 'example.xlsx');
+ */
+export function sendExcel(
+    res: Response,
+    buffer: Buffer,
+    filename: string,
+): void {
+    res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+
+    res.setHeader(
+        'Content-Disposition',
+        `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`,
+    );
+
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+
+    res.send(buffer);
+}
+
+/**
+ * Read file excel
+ * @author Sutthipong tangmongkhoncharoen(24008)
+ * @since 2026-08-13
+ * @description ฟังก์ชันอ่านไฟล์ Excel และส่งออกเป็น Array ของ Object โดยสามารถกำหนดคอลัมน์ที่ต้องการอ่านได้
+ * @example 
+ * 1. custom function to read file
+ *      readInput({
+ *          file: file,
+            readCustom: true,
+            customSheet: (wb) => {
+                const ws = wb.worksheets[0];
+                const data = [];
+                let indexHeader = [];
+                let headerList = ['Order No.', 'PO No.', 'P/O Line', 'PurConfirm'];
+                let rowHeader = 0;
+                ws.eachRow((row, rowNumber) => {
+                    // หาชื่อคอลัมน์เพื่อเอา index
+                    headerList.forEach((header) => {
+                        const check = row.values.find((v => v && v.toString().trim() === header));
+                        if (check) {
+                            rowHeader = rowNumber;
+                            indexHeader.push(row.values.indexOf(check));
+                        }
+                    });
+                    // หากมีแล้วก็เอาข้อมูลคอลัมน์นั้นมา
+                    if(indexHeader.length > 0 && rowNumber != rowHeader) {
+                        data[data.length] = {
+                            MFGNO: row.values[indexHeader[0]].toString().trim(),
+                            PONO: row.values[indexHeader[1]].toString().trim(),
+                            LINENO: row.values[indexHeader[2]].toString().trim(),
+                            CONFIRMDATE: formatDate(row.values[indexHeader[3]].toString().trim())
+                        }
+                    }
+                });
+                return data;
+            }
+        });
+    2. read file by header name
+        การส่ง headerName เป็น array ของ object ที่มี key, header และ column โดย key คือชื่อคีย์ที่ต้องการใช้ใน object, header คือชื่อหัวข้อใน Excel และ column คือคอลัมน์ที่ต้องการอ่านข้อมูล
+        โดยสามารถส่งได้ 3 วิธีคือ
+        1. ส่งเป็น array ของ string โดยชื่อที่ส่งมาจะใช้เป้น key ของ object ผลลัพท์ซึ่งจะทำการอ่านข้อมูลตาม index ของ array ที่ส่งมา 
+        *** ต้องส่งมาให้ครบทุกคอลัมน์ที่ต้องการอ่านข้อมูลตามจำนวน startCol ถึง endCol ด้วย เช่น A ถึง M  ต้องส่งมาทั้งสิ้น 13 ตัว ไม่งั้นข้อมูลจะไม่ตรง ***
+        headerName: [
+            'NO',
+            'PLANNER',
+            'BULK_CODE',
+            'DRAWING',
+            'PARTNAME',
+            'VENDOR',
+            'VENDOR_NAME',
+            'TRADING',
+            'PROCESSING',
+            'MANUFACTURER',
+            'COUNTRY_OF_ORIGIN',
+            'MFG_NAME',
+            'MFG_ADDRESS',
+        ],
+        2. ส่งเป็น array ของ object โดยมี key และ header โดย key คือชื่อคีย์ที่ต้องการใช้ใน object ผลลัพท์ และ header คือชื่อหัวข้อใน Excel ซึ่งจะทำการอ่านข้อมูลตามชื่อหัวข้อที่ส่งมา 
+        *** ต้องส่ง headerRow ด้วย ***
+        headerName: [
+            { key: 'BULK_CODE', header: 'BULK Code'},
+            { key: 'TRADING', header: 'Trading'},
+            { key: 'PROCESSING', header: 'Processing'},
+            { key: 'MANUFACTURER', header: 'Manufacturer'},
+            { key: 'COUNTRY_OF_ORIGIN', header: 'Country of Origin'},
+            { key: 'MFG_NAME', header: 'Manufacturer Name'},
+            { key: 'MFG_ADDRESS', header: 'Manufacturer Address'},
+        ],
+        3. ส่งเป็น array ของ object โดยมี key และ column โดย key คือชื่อคีย์ที่ต้องการใช้ใน object ผลลัพท์ และ column คือคอลัมน์ที่ต้องการอ่านข้อมูล ซึ่งจะทำการอ่านข้อมูลตามคอลัมน์ที่ส่งมา
+        headerName: [
+            { key: 'BULK_CODE', header: 'BULK Code', column: 'C' },
+            { key: 'TRADING', header: 'Trading', column: 'H' },
+            { key: 'PROCESSING', header: 'Processing', column: 'I' },
+            { key: 'MANUFACTURER', header: 'Manufacturer', column: 'J' },
+            { key: 'COUNTRY_OF_ORIGIN', header: 'Country of Origin', column: 'K' },
+            { key: 'MFG_NAME', header: 'Manufacturer Name', column: 'L' },
+            { key: 'MFG_ADDRESS', header: 'Manufacturer Address', column: 'M' },
+        ],
+        @example
+        readInput({
+            path: 'src/workload/country_origin/files/master.xlsx',
+            headerName: [
+                { key: 'BULK_CODE', header: 'BULK Code', column: 'C' },
+                { key: 'TRADING', header: 'Trading', column: 'H' },
+                { key: 'PROCESSING', header: 'Processing', column: 'I' },
+                { key: 'MANUFACTURER', header: 'Manufacturer', column: 'J' },
+                { key: 'COUNTRY_OF_ORIGIN', header: 'Country of Origin', column: 'K' },
+                { key: 'MFG_NAME', header: 'Manufacturer Name', column: 'L' },
+                { key: 'MFG_ADDRESS', header: 'Manufacturer Address', column: 'M' },
+            ],
+            headerRow: 3,
+            startRow: 4,
+            endRow: 4260,
+            startCol: colToNumber('A'),
+            endCol: colToNumber('M'),
+        });
+    3. read file all data in sheet
+        ไม่ต้องส่ง headerName และ headerRow จะทำการอ่านข้อมูลทั้งหมดในชีทตาม startRow, endRow, startCol, endCol ที่ส่งมา
+ */
+export async function readFile({
+    path = '',
+    file = null,
+    startRow = 1,
+    endRow = 500,
+    startCol = 1, // A
+    endCol = 1, // A
+    sheetName = 1, // string
+    headerRow = null,
+    headerName = [],
+    skipRow = 0,
+    customSheet = null,
+}: {
+    path?: string;
+    file?: ArrayBuffer | null;
+    startRow?: number;
+    endRow?: number;
+    startCol?: number;
+    endCol?: number;
+    sheetName?: number | string;
+    headerRow?: number;
+    headerName?: string[] | { key: string; header?: string; column?: string }[];
+    skipRow?: number;
+    readCustom?: boolean;
+    customSheet?: (workbook: ExcelJS.Workbook) => any;
+} = {}): Promise<any[]> {
+    var data: any[] = [];
+    const workbook: ExcelJS.Workbook = new ExcelJS.Workbook();
+    if (!file && !path) throw new Error('Please provide file or path');
+    if (path) {
+        await workbook.xlsx.readFile(path);
+    }
+    if (file) {
+        await workbook.xlsx.load(file);
+    }
+
+    if (customSheet && typeof customSheet === 'function') {
+        // read file custom option
+        console.log('read custom');
+
+        data = customSheet(workbook);
+    } else if (headerName.length > 0) {
+        // read file by header name
+        console.log('read header');
+
+        const worksheet: ExcelJS.Worksheet =
+            sheetName == 1
+                ? workbook.worksheets[0]
+                : workbook.getWorksheet(sheetName);
+        const headerRowData = worksheet.getRow(headerRow);
+        let headerType = 'string';
+        if (headerName.length > 0 && typeof headerName[0] === 'string') {
+            headerName = ['', ...headerName] as string[];
+        } else {
+            headerType = 'object';
+        }
+        let rowIndex: number = 0;
+        worksheet.eachRow((row, rowNumber) => {
+            if (rowNumber < startRow) return;
+            if (rowNumber > endRow) return;
+            // console.log('rowNumber', rowNumber, row.values);
+            if (headerType === 'string') {
+                for (let colIndex = startCol; colIndex <= endCol; colIndex++) {
+                    if (!headerName[colIndex]) continue;
+                    const headerItem: string = headerName[colIndex] as string;
+                    if (!data[rowIndex]) {
+                        data[rowIndex] = {};
+                    }
+                    data[rowIndex][headerItem] = row.values[colIndex] || null;
+                }
+            } else {
+                for (const headerItem of headerName as {
+                    key: string;
+                    header: string;
+                    column: string;
+                }[]) {
+                    let colIndex: number;
+                    if (!headerItem.column && !headerItem.header) {
+                        throw new Error(
+                            'Please provide column or header in headerName when using object type',
+                        );
+                    }
+                    if (headerItem.column) {
+                        colIndex = colToNumber(headerItem.column);
+                    } else {
+                        if (!headerRow)
+                            throw new Error(
+                                'Please provide headerRow when using headerName',
+                            );
+                        const values =
+                            headerRowData.values as ExcelJS.CellValue[];
+                        colIndex = values.findIndex(
+                            (v) => v === headerItem.header,
+                        );
+                    }
+                    if (!data[rowIndex]) {
+                        data[rowIndex] = {};
+                    }
+                    data[rowIndex][headerItem.key] =
+                        row.values[colIndex] || null;
+                }
+            }
+            rowIndex++;
+        });
+    } else {
+        // read file all data in sheet
+        console.log('read default');
+
+        const worksheet: ExcelJS.Worksheet =
+            sheetName == 1
+                ? workbook.worksheets[0]
+                : workbook.getWorksheet(sheetName);
+        let rowIndex: number = 0;
+        worksheet.eachRow((row, rowNumber) => {
+            if (rowNumber < startRow) return;
+            if (rowNumber > endRow) return;
+            if (skipRow > 0 && rowNumber <= skipRow) return;
+            if (!data[rowIndex]) data[rowIndex] = {};
+
+            if (endCol == 1) {
+                row.eachCell(function (cell, colNumber) {
+                    data[rowIndex][colNumber - 1] = cell.value;
+                });
+            } else {
+                let index = 0;
+                for (
+                    let colIndex = startCol;
+                    colIndex <= endCol;
+                    colIndex++, index++
+                ) {
+                    data[rowIndex][index] = row.values[colIndex] || '';
+                }
+            }
+            rowIndex++;
+        });
+    }
+    return data;
+}
+
+/**
+ * ฟังก์ชันแปลงตัวอักษรคอลัมน์เป็นตัวเลขคอลัมน์
+ * @param {string} col
+ * @returns {number}
+ * @example
+ * colToNumber('A') // 1
+ * colToNumber('AB') // 28
+ * colToNumber('ZZ') // 702
+ */
+export function colToNumber(col: string): number {
+    let number = 0;
+    for (let i = 0; i < col.length; i++) {
+        number = number * 26 + (col.charCodeAt(i) - 'A'.charCodeAt(0) + 1);
+    }
+    return number;
 }

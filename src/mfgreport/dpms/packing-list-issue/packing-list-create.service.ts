@@ -4,7 +4,6 @@ import {
     ListPLDto,
 } from './dto/create-packing-list-issue.dto';
 import { DpmsPlIssueService } from 'src/workload/dpms_pl_issue/dpms_pl_issue.service';
-import { PDFService } from 'src/common/services/pdf/pdf.service';
 import { now } from 'src/common/utils/dayjs.utils';
 import { DpmsPlIssueRevService } from 'src/workload/dpms_pl_issue_rev/dpms_pl_issue_rev.service';
 import { DPMS_PL_ISSUE_PK, IdocRevData } from './packing-list-issue.interface';
@@ -14,39 +13,32 @@ import { DpmsPlCaseListDetailService } from 'src/workload/dpms_pl_case_list_deta
 import { MailService } from 'src/common/services/mail/mail.service';
 import { DpmsPlIssueTypeService } from 'src/workload/dpms_pl_issue_type/dpms_pl_issue_type.service';
 import { DpmsPlIssueDateService } from 'src/workload/dpms_pl_issue_date/dpms_pl_issue_date.service';
-import { DpmsPlMailService } from 'src/workload/dpms_pl_mail/dpms_pl_mail.service';
 import { DpmsPlDocRevService } from 'src/workload/dpms_pl_doc_rev/dpms_pl_doc_rev.service';
 import { PackingListIssueService } from './packing-list-issue.service';
 import { joinPaths, deleteFile } from 'src/common/utils/files.utils';
 import { ExcelService } from './services/excel.service';
 import { GenerateExcelResult } from './interface/excel.interface';
+import { GenPdfService } from './services/pdf.service';
 
 @Injectable()
 export class PackingListCreateService extends PackingListIssueService {
     constructor(
-        protected readonly PDFService: PDFService,
         protected readonly dpmsPlIssueService: DpmsPlIssueService,
         protected readonly dpmsPlIssueRevService: DpmsPlIssueRevService,
-        protected readonly dpmsPlFileService: DpmsPlFileService,
-        protected readonly dpmsPlCaseListService: DpmsPlCaseListService,
-        protected readonly dpmsPlCaseListDetailService: DpmsPlCaseListDetailService,
         protected readonly dpmsPlIssueTypeService: DpmsPlIssueTypeService,
         protected readonly dpmsPlIssueDateService: DpmsPlIssueDateService,
-        protected readonly dpmsPlMailService: DpmsPlMailService,
         protected readonly dpmsPlDocRevService: DpmsPlDocRevService,
         protected readonly mailService: MailService,
+        private readonly dpmsPlFileService: DpmsPlFileService,
+        private readonly dpmsPlCaseListService: DpmsPlCaseListService,
+        private readonly dpmsPlCaseListDetailService: DpmsPlCaseListDetailService,
         private readonly excelService: ExcelService,
+        private readonly pdfService: GenPdfService,
     ) {
         super(
-            PDFService,
             dpmsPlIssueService,
             dpmsPlIssueRevService,
-            dpmsPlFileService,
-            dpmsPlCaseListService,
-            dpmsPlCaseListDetailService,
             dpmsPlIssueTypeService,
-            dpmsPlIssueDateService,
-            dpmsPlMailService,
             dpmsPlDocRevService,
             mailService,
         );
@@ -150,7 +142,7 @@ export class PackingListCreateService extends PackingListIssueService {
                     PO: NDOCTYPE === 1,
                 });
                 const pdf: { path: string; data: Buffer } =
-                    await this.generatePDF({
+                    await this.pdfService.generatePDF({
                         order: dto.VORDERS,
                         html: html,
                         fileName: fileName,
@@ -273,7 +265,7 @@ export class PackingListCreateService extends PackingListIssueService {
 
                 // 11. send email notification to admin
                 mailObject.push({
-                    subject: `${now('YYYY-MM-DD HH:mm:ss')} Packing list issue notification [${dto.VORDERS}] REV. ${revisionText} (${issueType.data.VDESCRIPTION})`,
+                    subject: `${now('YYYY-MM-DD HH:mm:ss')} Packing list issue notification Admin [${dto.VORDERS}] REV. ${revisionText} (${issueType.data.VDESCRIPTION})`,
                     maillist: [process.env.MAIL_ADMIN],
                     context: {
                         rev: revisionText,

@@ -6,6 +6,7 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { DPMS_PL_CASE_LIST } from './DPMS_PL_CASE_LIST.entity';
+import { DPMS_PL_CASE_REVISE_VGM } from '../views/DPMS_PL_CASE_REVISE_VGM.entity';
 
 @Entity({ name: 'DPMS_PL_CASE_LIST_DETAIL', schema: 'WORKLOAD' })
 export class DPMS_PL_CASE_LIST_DETAIL {
@@ -50,4 +51,10 @@ export class DPMS_PL_CASE_LIST_DETAIL {
         { name: 'NCASELIST_ID', referencedColumnName: 'NID' },
     ])
     MAIN: DPMS_PL_CASE_LIST;
+
+    @ManyToOne(() => DPMS_PL_CASE_REVISE_VGM, (main) => main.DETAILS)
+    @JoinColumn([
+        { name: 'NCASELIST_ID', referencedColumnName: 'NID' },
+    ])
+    REVISEVGM: DPMS_PL_CASE_REVISE_VGM;
 }

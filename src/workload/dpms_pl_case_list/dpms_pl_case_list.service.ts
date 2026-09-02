@@ -26,9 +26,11 @@ export class DpmsPlCaseListService {
             );
         }
     }
-    async findByRevId(revId: number) {
+    async findByRevId(revId: number, revise: boolean = false) {
         try {
-            const res = await this.repo.findByRevId(revId);
+            const res = revise
+                ? await this.repo.getDataReviseVgmByRevId(revId)
+                : await this.repo.findByRevId(revId);
             if (res.length === 0) {
                 return {
                     status: false,

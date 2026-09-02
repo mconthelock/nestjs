@@ -7,8 +7,9 @@ import { M001KpbmModule } from './m001-kpbm/m001-kpbm.module';
 import { S020kpModule } from './s020kp/s020kp.module';
 import { S049kpModule } from './s049kp/s049kp.module';
 import { J002mpModule } from './j002mp/j002mp.module';
+import { K850mpModule } from './k850mp/k850mp.module';
 
 @Module({
-  imports: [F110kpModule, S011mpModule, F001kpModule, F002kpModule, M001KpbmModule, S020kpModule, S049kpModule, J002mpModule],
+  imports: [F110kpModule, S011mpModule, F001kpModule, F002kpModule, M001KpbmModule, S020kpModule, S049kpModule, J002mpModule, K850mpModule],
 })
 export class DatacenterModule {}

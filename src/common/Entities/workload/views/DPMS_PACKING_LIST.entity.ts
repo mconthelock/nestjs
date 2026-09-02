@@ -27,6 +27,9 @@ export class DPMS_PACKING_LIST{
     IS_ORIGIN_EDITABLE: string;
 
     @Column()
+    SHIPPING_MARK_EDITABLE: string;
+
+    @Column()
     SERIES: string;
 
     @PrimaryColumn()

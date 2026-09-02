@@ -37,6 +37,7 @@ export class CreateVendorDto {
     VND_PAYMENT?: string;
 
     @IsString()
+    @IsOptional()
     VND_ADDRESS1?: string;
 
     @IsString()
@@ -89,6 +90,7 @@ export class CreateVendorDto {
     CREATE_AT?: Date;
 
     @IsString()
+    @IsOptional()
     CREATE_BY: string;
 
     @IsNumber()

@@ -8,16 +8,15 @@ import {
     IsOptional,
     IsString,
 } from 'class-validator';
-import { FormDto }  from "src/webform/form/dto/form.dto";
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
-export class CreatePurevaFormDto extends PickType(FormDto,[
-  'NFRMNO',
-  'VORGNO',
-  'CYEAR',
-  'CYEAR2',
-  'NRUNNO',
-] as const) { 
-
+export class CreatePurevaFormDto extends PickType(FormDto, [
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'CYEAR2',
+    'NRUNNO',
+] as const) {
     @IsOptional()
     @IsString()
     VENDCODE?: string;
@@ -32,7 +31,7 @@ export class CreatePurevaFormDto extends PickType(FormDto,[
 
     @IsNotEmpty()
     @IsString()
-    COMNAME: string; 
+    COMNAME: string;
 
     @IsOptional()
     @IsString()
@@ -241,6 +240,7 @@ export class CreatePurevaFormDto extends PickType(FormDto,[
     @IsString()
     ATTACH_OTHER?: string;
 
+    @IsOptional()
+    @IsString()
+    NFVNO?: string;
 }
-
-

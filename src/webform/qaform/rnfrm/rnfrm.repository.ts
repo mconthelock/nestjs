@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
+import { CreateRnfrmDto } from './dto/create-rnfrm.dto';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { RNFRM } from 'src/common/Entities/webform/table/RNFRM.entity';
@@ -42,5 +43,9 @@ export class RnfrmRepository extends BaseRepository {
             'STATUS',
         ]);
         return qb.getMany();
+    }
+
+    create(dto: CreateRnfrmDto) {
+        return this.manager.save(RNFRM, dto);
     }
 }

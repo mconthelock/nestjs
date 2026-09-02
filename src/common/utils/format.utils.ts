@@ -37,12 +37,12 @@ export function convertJung(text: string): string | null {
         '4': 'B',
         '5': 'Z',
         '6': 'C',
-        'X': '1',
-        'A': '2',
-        'Y': '3',
-        'B': '4',
-        'Z': '5',
-        'C': '6',
+        X: '1',
+        A: '2',
+        Y: '3',
+        B: '4',
+        Z: '5',
+        C: '6',
     };
 
     const lastChar = value.slice(-1);
@@ -85,7 +85,7 @@ export function setRound(
         }
     }
     if (flage) {
-        value = value.toFixed(digit); 
+        value = value.toFixed(digit);
     } else {
         value = value.toString();
     }
@@ -102,4 +102,48 @@ export function setRound(
  */
 export function removeComma(d: string): string {
     return d.replace(/,/g, '');
+}
+
+/**
+ * Obtain the ordinal indicator for a given number.
+ * @since 2026-01-22
+ * @author Sutthipong Tangmongkhoncharoen(24008)
+ * @param {number} number - ตัวเลขที่ต้องการแปลงเป็นรูปแบบมีตัวบ่งชี้ลำดับ (เช่น 1, 2, 3, ...)
+ * @param {boolean} supperScript - กำหนดให้ indicator เป็น superscript หรือไม่ (เช่น 1st หรือ 1<sup>st</sup>)
+ * @param {boolean} upperCase - กำหนดให้ indicator เป็นตัวพิมพ์ใหญ่หรือไม่ (เช่น 1ST)
+ * @returns {string} number with ordinal indicator
+ * @example
+ * const result = ordinalIndicator(1); // "1st"
+ */
+export function ordinalIndicator(
+    number: number,
+    supperScript: boolean = false,
+    upperCase: boolean = false,
+): string {
+    const lastDigit: number = number % 10;
+    const lastTwoDigit: number = number % 100;
+    let indicator = '';
+    if (lastTwoDigit >= 11 && lastTwoDigit <= 13) {
+        indicator = 'th';
+    } else {
+        switch (lastDigit) {
+            case 1:
+                indicator = 'st';
+                break;
+            case 2:
+                indicator = 'nd';
+                break;
+            case 3:
+                indicator = 'rd';
+                break;
+            default:
+                indicator = 'th';
+                break;
+        }
+    }
+    const finalIndicator: string = upperCase ? indicator.toUpperCase() : indicator;
+    return (
+        number +
+        (supperScript ? `<sup>${finalIndicator}</sup>` : finalIndicator)
+    );
 }

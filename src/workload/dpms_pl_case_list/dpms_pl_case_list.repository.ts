@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DPMS_PL_CASE_LIST } from 'src/common/Entities/workload/table/DPMS_PL_CASE_LIST.entity';
 import { CreateDpmsPlCaseListDto } from './dto/create-dpms_pl_case_list.dto';
+import { DPMS_PL_CASE_REVISE_VGM } from 'src/common/Entities/workload/views/DPMS_PL_CASE_REVISE_VGM.entity';
 
 @Injectable()
 export class DpmsPlCaseListRepository extends BaseRepository {
@@ -17,6 +18,22 @@ export class DpmsPlCaseListRepository extends BaseRepository {
 
     findByRevId(revId: number) {
         return this.getRepository(DPMS_PL_CASE_LIST).find({
+            where: { NISSUEREV_ID: revId },
+            relations: ['DETAILS'], // ดึงข้อมูลรายละเอียดที่เกี่ยวข้องด้วย
+            order: {
+                VCASE: 'ASC',
+                DETAILS: {
+                    VMFGNO: 'ASC',
+                    VCASE: 'ASC',
+                    VITEM: 'ASC',
+                    VDRAWING: 'ASC',
+                },
+            },
+        });
+    }
+
+    getDataReviseVgmByRevId(revId: number) {
+         return this.getRepository(DPMS_PL_CASE_REVISE_VGM).find({
             where: { NISSUEREV_ID: revId },
             relations: ['DETAILS'], // ดึงข้อมูลรายละเอียดที่เกี่ยวข้องด้วย
             order: {

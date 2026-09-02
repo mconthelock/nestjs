@@ -20,9 +20,6 @@ export class FINNPOFORM {
     NRUNNO: number;
  
     @Column()
-    SUBJECT: string;
-
-    @Column()
     VENDOR_CODE: string;
 
     @Column()

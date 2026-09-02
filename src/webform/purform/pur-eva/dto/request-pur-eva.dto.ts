@@ -256,7 +256,11 @@ export class RequestPurevaFormDto extends PickType(CreateFormDto, [
 
     @IsOptional()
     @IsString()
-    ADDRESS_EN?: string;
+    ADDRESS1_EN?: string;
+
+    @IsOptional()
+    @IsString()
+    ADDRESS2_EN?: string;
 
     @IsOptional()
     @IsString()
@@ -286,6 +290,10 @@ export class RequestPurevaFormDto extends PickType(CreateFormDto, [
     @IsOptional()
     @IsString()
     ATTACH_OTHER?: string;
+
+    @IsOptional()
+    @IsString()
+    NVFNO?: string;
 
     @IsOptional()
     @IsArray()

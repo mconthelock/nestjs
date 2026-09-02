@@ -110,12 +110,13 @@ export class PurNvfReturnApproveService {
             };
             const addr = [];
             let addid = 0;
-            if (data.ADDRESS_EN && data.ADDRESS_EN.trim().length > 0) {
+            if (data.ADDRESS1_EN && data.ADDRESS1_EN.trim().length > 0) {
                 addid++;
                 addr.push({
                     ADDRID: addid,
                     ADDRTYPE: 'E',
-                    ADDR: data.ADDRESS_EN,
+                    ADDR1: data.ADDRESS1_EN,
+                    ADDR2: data.ADDRESS2_EN,
                     CITY: data.CITY_EN,
                     STATE: data.STATE_EN,
                     COUNTRY: data.COUNTRY_EN,
@@ -127,7 +128,7 @@ export class PurNvfReturnApproveService {
                 addr.push({
                     ADDRID: addid,
                     ADDRTYPE: 'T',
-                    ADDR: data.ADDRESS_TH,
+                    ADDR1: data.ADDRESS_TH,
                 });
             }
 

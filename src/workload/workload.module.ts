@@ -16,6 +16,9 @@ import { KanbanRequestModule } from './kanban_request/kanban_request.module';
 import { DpmsPlLastRevisionViewModule } from './dpms_pl_last_revision_view/dpms_pl_last_revision_view.module';
 import { DpmsPlDocRevModule } from './dpms_pl_doc_rev/dpms_pl_doc_rev.module';
 import { LabelconfirmModule } from './labelconfirm/labelconfirm.module';
+import { ShortageModule } from './shortage/shortage.module';
+import { PilineBendingMainModule } from './piline_bending_main/piline_bending_main.module';
+import { PilineBendingAttModule } from './piline_bending_att/piline_bending_att.module';
 import { DpmsPlMeltLogModule } from './dpms_pl_melt_log/dpms_pl_melt_log.module';
 import { DpmsPlWeightChangeModule } from './dpms_pl_weight_change/dpms_pl_weight_change.module';
 import { CountryOriginModule } from './country_origin/country_origin.module';
@@ -23,6 +26,7 @@ import { DpmsPlOriginModule } from './dpms_pl_origin/dpms_pl_origin.module';
 import { OriginMasterMarViewModule } from './origin_master_mar_view/origin_master_mar_view.module';
 import { MaterialStatusInquiryViewModule } from './material_status_inquiry_view/material_status_inquiry_view.module';
 import { CountryOriginBulkListViewModule } from './country_origin_bulk_list_view/country_origin_bulk_list_view.module';
+import { BlockPackingModule } from './block_packing/block_packing.module';
 
 @Module({
     imports: [
@@ -43,6 +47,9 @@ import { CountryOriginBulkListViewModule } from './country_origin_bulk_list_view
         DpmsPlLastRevisionViewModule,
         DpmsPlDocRevModule,
         LabelconfirmModule,
+        ShortageModule,
+        PilineBendingMainModule,
+        PilineBendingAttModule,
         DpmsPlMeltLogModule,
         DpmsPlWeightChangeModule,
         CountryOriginModule,
@@ -50,6 +57,7 @@ import { CountryOriginBulkListViewModule } from './country_origin_bulk_list_view
         OriginMasterMarViewModule,
         MaterialStatusInquiryViewModule,
         CountryOriginBulkListViewModule,
+        BlockPackingModule,
     ],
 })
 export class WorkloadModule {}

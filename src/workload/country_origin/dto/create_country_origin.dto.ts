@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+    IsDate,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+} from 'class-validator';
 
 export class CreateCountryOriginDto {
     @IsNotEmpty()
@@ -22,4 +28,17 @@ export class CreateCountryOriginDto {
     @IsOptional()
     @IsString()
     MFG_ADDRESS?: string;
+
+    @IsOptional()
+    @IsString()
+    CREATEBY?: string;
+
+    @IsOptional()
+    @IsString()
+    UPDATEBY?: string;
+
+    @IsOptional()
+    @Type(() => Date)
+    @IsDate()
+    UPDATEDATE?: Date;
 }

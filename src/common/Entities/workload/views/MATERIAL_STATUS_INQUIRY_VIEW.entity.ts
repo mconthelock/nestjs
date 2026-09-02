@@ -150,6 +150,9 @@ export class MATERIAL_STATUS_INQUIRY_VIEW {
     COUNTRY: string;
 
     @ViewColumn()
+    ORIGIN_TYPE: number;
+
+    @ViewColumn()
     MFG_NAME: string;
 
     @ViewColumn()

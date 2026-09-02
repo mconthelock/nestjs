@@ -69,9 +69,9 @@ export class MigrateService extends CountryOriginService {
                     if (country === 'PHILIPINES') {
                         country = 'PHILIPPINES';
                     }
-                    if (country === 'KOREA') {
-                        country = 'SOUTH KOREA';
-                    }
+                    // if (country === 'KOREA') {
+                    //     country = 'SOUTH KOREA';
+                    // }
                     if (country === 'CZECH') {
                         country = 'CZECH REPUBLIC';
                     }
@@ -79,6 +79,7 @@ export class MigrateService extends CountryOriginService {
                         ...item,
                         ORIGIN_TYPE: originType,
                         COUNTRY: country,
+                        CREATEBY: 'SYSTEM',
                     };
                 })
                 .filter(

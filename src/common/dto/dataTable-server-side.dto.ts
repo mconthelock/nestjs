@@ -36,10 +36,10 @@ class DataTableColumnDto {
     @Type(() => String)
     data?: string | null;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Type(() => String)
-    name: string;
+    name?: string;
 
     @IsNotEmpty()
     @ToBoolean()

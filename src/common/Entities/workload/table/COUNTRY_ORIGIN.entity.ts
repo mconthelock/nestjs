@@ -16,4 +16,16 @@ export class COUNTRY_ORIGIN {
 
     @Column()
     MFG_ADDRESS: string;
+
+    @Column()
+    CREATEBY: string;
+
+    @Column()
+    CREATEDATE: Date;
+
+    @Column()
+    UPDATEBY: string;
+
+    @Column()
+    UPDATEDATE: Date;
 }

@@ -45,7 +45,7 @@ export class MaterialStatusInquiryViewRepository extends BaseRepository {
             for(const col of columns){
                 if(col.search && col.search.value){
                     const searchValue = `%${col.search.value}%`;
-                    query.andWhere(`LOWER(M.${col.data}) LIKE :search`, { search: searchValue.toLowerCase() });
+                    query.andWhere(`LOWER(M.${col.data}) LIKE :${col.name}`, { [col.name]: searchValue.toLowerCase() });
                 }
             }
             const [data, count] = await query.getManyAndCount();

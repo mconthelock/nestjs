@@ -6,7 +6,7 @@ export class UNIFORM_RIGHT {
     EMPCOD: string;
 
     @Column()
-    RIGHTQTY: string;
+    RIGHTQTY: number;
 
     @Column()
     POLOSUIT: string;
@@ -22,4 +22,7 @@ export class UNIFORM_RIGHT {
 
     @Column()
     JUMPSUIT: string;
+
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
+    DISCOUNT: number;
 }

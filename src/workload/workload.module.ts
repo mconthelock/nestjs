@@ -16,6 +16,7 @@ import { KanbanRequestModule } from './kanban_request/kanban_request.module';
 import { DpmsPlLastRevisionViewModule } from './dpms_pl_last_revision_view/dpms_pl_last_revision_view.module';
 import { DpmsPlDocRevModule } from './dpms_pl_doc_rev/dpms_pl_doc_rev.module';
 import { LabelconfirmModule } from './labelconfirm/labelconfirm.module';
+import { BlockPackingModule } from './block_packing/block_packing.module';
 
 @Module({
     imports: [
@@ -36,6 +37,7 @@ import { LabelconfirmModule } from './labelconfirm/labelconfirm.module';
         DpmsPlLastRevisionViewModule,
         DpmsPlDocRevModule,
         LabelconfirmModule,
+        BlockPackingModule,
     ],
 })
 export class WorkloadModule {}

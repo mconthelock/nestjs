@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { FormService } from './form.service';
 import { CreateFormDto } from './dto/create-form.dto';
 import { FlowmstService } from '../flowmst/flowmst.service';
@@ -82,6 +82,19 @@ export class FormCreateService extends FormService {
                 CSTEPSTDX: 4,
             };
 
+            const checkReq = await this.usersService.findEmp(context.empno);
+            const checkInput = await this.usersService.findEmp(context.inputempno);
+            if(!checkReq) {
+                throw new NotFoundException(
+                    `Requester ${context.empno} not found`
+                );
+            }
+            if(!checkInput) {
+                throw new NotFoundException(
+                    `Inputer ${context.empno} not found`
+                );
+            }
+
             this.setQuery(context);
             await this.setFormNo(context);
             const formData = await this.setFormValue(context);
@@ -162,7 +175,8 @@ export class FormCreateService extends FormService {
                 throw new Error('Failed to insert form'); // Throw an error to trigger rollback
             }
         } catch (error) {
-            throw new Error(error.message);
+            throw error;
+            // throw new Error(error.message);
         }
     }
 

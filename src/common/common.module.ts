@@ -64,6 +64,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
         TypeOrmModule.forRootAsync(purConfig),
         TypeOrmModule.forRootAsync(fingerConfig),
         TypeOrmModule.forRootAsync(iedocConfig),
+
         RedisModule,
         SchedulerModule,
         LoggerModule,

@@ -1,46 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { BaseRepository } from 'src/common/repositories/base-repository';
 import { JigMaster } from 'src/common/Entities/iedoc/table/jig_master.entity';
 import { JigInspection } from 'src/common/Entities/iedoc/table/jig_inspection.entity';
+import { User } from 'src/amec/users/entities/user.entity';
 
 @Injectable()
-export class JigRepository {
+export class JigRepository extends BaseRepository {
     constructor(
-        @InjectRepository(JigMaster)
-        private readonly jigMasterRepo: Repository<JigMaster>,
-
-        @InjectRepository(JigInspection)
-        private readonly jigInspectionRepo: Repository<JigInspection>,
-
-        private readonly dataSource: DataSource,
-    ) {}
+        @InjectDataSource('iedocConnection')
+        private readonly iedocDs: DataSource,
+    ) {
+        super(iedocDs);
+    }
 
     findMaster(jigNo: string) {
-        return this.jigMasterRepo.findOne({
+        return this.getRepository(JigMaster).findOne({
             where: { JIG_NO: jigNo },
         });
     }
 
     findInspection(inspecId: number) {
-        return this.jigInspectionRepo.findOne({
+        return this.getRepository(JigInspection).findOne({
             where: { INSPEC_ID: inspecId },
         });
     }
 
     createMaster(data: Partial<JigMaster>) {
-        const entity = this.jigMasterRepo.create(data);
-        return this.jigMasterRepo.save(entity);
+        const repo = this.getRepository(JigMaster);
+        const entity = repo.create(data);
+        return repo.save(entity);
     }
 
     getDashboardMaster() {
-        return this.jigMasterRepo
+        return this.getRepository(JigMaster)
             .createQueryBuilder('J')
-            .leftJoin(
-                'AMECUSERALL',
-                'U',
-                'TRIM(U.SEMPNO) = TRIM(J.PIC_EMPNO)',
-            )
+            .leftJoin(User, 'U', 'TRIM(U.SEMPNO) = TRIM(J.PIC_EMPNO)')
             .select([
                 'J.JIG_NO AS "JIG_NO"',
                 'J.JIG_NAME AS "JIG_NAME"',
@@ -66,7 +62,7 @@ export class JigRepository {
     }
 
     getInspectionByPeriod(startDate: Date, endDate: Date) {
-        return this.jigInspectionRepo
+        return this.getRepository(JigInspection)
             .createQueryBuilder('I')
             .select([
                 'I.INSPEC_ID AS "INSPEC_ID"',
@@ -81,11 +77,8 @@ export class JigRepository {
             .getRawMany();
     }
 
-    async finishInspection(
-        inspecId: number,
-        inspecDate?: Date,
-    ) {
-        return this.dataSource.transaction(async manager => {
+    async finishInspection(inspecId: number, inspecDate?: Date) {
+        return this.iedocDs.transaction(async manager => {
             const inspection = await manager.findOne(JigInspection, {
                 where: { INSPEC_ID: inspecId },
             });
@@ -105,9 +98,7 @@ export class JigRepository {
             await manager.save(JigInspection, inspection);
 
             const nextDate = new Date(inspection.SCHEDULE_DATE);
-            nextDate.setMonth(
-                nextDate.getMonth() + Number(jig.INSPEC_PERIOD),
-            );
+            nextDate.setMonth(nextDate.getMonth() + Number(jig.INSPEC_PERIOD));
             nextDate.setDate(1);
 
             jig.NEXT_INSPEC_DATE = nextDate;
@@ -115,10 +106,7 @@ export class JigRepository {
 
             await manager.save(JigMaster, jig);
 
-            return {
-                inspection,
-                jig,
-            };
+            return { inspection, jig };
         });
     }
 }

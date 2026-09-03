@@ -15,7 +15,7 @@ export class MigrateService extends CountryOriginService {
             // await workbook.xlsx.readFile('../files/master.xlsx');
             // const sheet = workbook.getWorksheet('master');
             const data = await readFile({
-                path: 'src/workload/country_origin/files/master.xlsx',
+                path: 'dist/src/workload/country_origin/files/master.xlsx',
                 headerName: [
                     { key: 'BULKCODE', header: 'BULK Code', column: 'C' },
                     { key: 'TRADING', header: 'Trading', column: 'H' },

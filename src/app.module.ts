@@ -40,7 +40,7 @@ import { WorkloadModule } from './workload/workload.module';
 import { DatacenterModule } from './datacenter/datacenter.module';
 import { GeneralPartListModule } from './general-part-list/general-part-list.module';
 import { MfgReportModule } from './mfgreport/mfgreport.module';
-
+import { IedocModule } from './iedoc/iedoc.module';
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
@@ -74,6 +74,7 @@ import { MfgReportModule } from './mfgreport/mfgreport.module';
         WorkloadModule,
         DatacenterModule,
         GeneralPartListModule,
+        IedocModule,
     ],
     providers: [
         HttpLoggingInterceptor,

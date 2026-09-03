@@ -28,6 +28,7 @@ import sdsysConfig from './databases/sdsys.config';
 import spsysConfig from './databases/spsys.config';
 import webformConfig from './databases/webform.config';
 import workloadConfig from './databases/workload.config';
+import iedocConfig from './databases/iedoc.config';
 
 //Other Services
 import { FilesModule } from './services/file/file.module';
@@ -38,7 +39,7 @@ import { PDFModule } from './services/pdf/pdf.module';
 import { QrcodeModule } from './services/qrcode/qrcode.module';
 import { RedisModule } from './redis/redis.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
-import iedocConfig from './databases/iedoc.config';
+
 @Module({
     imports: [
         ScheduleModule.forRoot(),

@@ -30,6 +30,11 @@ export class UniformController {
         return this.uniform.findRights();
     }
 
+    @Get('annual/request/:year')
+    findRightsByYear(@Param('year') year: number) {
+        return this.uniform.findAnnualRequestYear(+year);
+    }
+
     @Get('annual/request/:userId/:year')
     findRightsByUserId(
         @Param('userId') userId: string,

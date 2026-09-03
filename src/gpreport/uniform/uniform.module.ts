@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UsersModule } from 'src/amec/users/users.module';
-import { FormModule } from 'src/webform/form/form.module';
-import { FormmstModule } from 'src/webform/formmst/formmst.module';
 
 import { UniformService } from './uniform.service';
 import { UniformController } from './uniform.controller';
@@ -28,8 +26,6 @@ import { AnnualUniformDetail } from 'src/common/Entities/gpreport/table/UNIFORM_
             'gpreportConnection',
         ),
         UsersModule,
-        FormModule,
-        FormmstModule,
     ],
     controllers: [UniformController],
     providers: [UniformService, AnnualUniformRepository],

@@ -26,6 +26,16 @@ export class AnnualUniformRepository extends BaseRepository {
             .getMany();
     }
 
+    async findYear(year: number) {
+        return this.manager
+            .createQueryBuilder(AnnualUniform, 'annual')
+            .leftJoinAndSelect('annual.details', 'details')
+            .leftJoinAndSelect('details.uniform', 'uniform')
+            .leftJoinAndSelect('uniform.category', 'category')
+            .where('annual.REQ_YEAR = :year', { year })
+            .getMany();
+    }
+
     async create(
         header: Partial<AnnualUniform>,
         details: Partial<AnnualUniformDetail>[] = [],

@@ -2,8 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from '../../amec/users/users.service';
-import { FormmstService } from 'src/webform/formmst/formmst.service';
-import { FormCreateService } from 'src/webform/form/create-form.service';
 import { AnnualUniformRepository } from './annual.repository';
 
 import { CreateAnnualDto } from './dto/create-annual.dto';
@@ -24,8 +22,6 @@ export class UniformService {
 
         protected readonly repo: AnnualUniformRepository,
         private UsersService: UsersService,
-        private readonly frmmst: FormmstService,
-        private readonly frmcrt: FormCreateService,
     ) {}
 
     findAll() {
@@ -53,6 +49,24 @@ export class UniformService {
     }
 
     //Annual Request
+    async findAnnualRequestYear(year: number) {
+        const users = await this.UsersService.search();
+        const userFiltered = users.filter(
+            (u) => u.CSTATUS === '1' && parseInt(u.SPOSCODE) < 80,
+        );
+        const request = await this.repo.findYear(year);
+        const data = userFiltered.map((user) => {
+            const userRreq = request.filter(
+                (req) => req.REQ_USER === user.SEMPNO,
+            );
+            return {
+                ...user,
+                result: userRreq,
+            };
+        });
+        return data;
+    }
+
     async findAnnualRequest(userId: string, year: number) {
         return this.repo.search(userId, year);
     }

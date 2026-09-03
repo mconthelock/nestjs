@@ -13,6 +13,23 @@ export class PurvmmFormRepository extends BaseRepository {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
+    async getData(dto: FormDto) {
+        return await this.getRepository(PURVMM_FORM).findOne({
+            where: {
+                ...dto,
+            },
+            relations: {
+                ADDRESSES: true,
+                FILES: true,
+                VENDER: true,
+                SCMUSER: true,
+                FORM: true,
+                TERM: true,
+                CURRENCY: true,
+            },
+        });
+    }
+
     async insert(dto: CreatePurvmmFormDto) {
         return this.getRepository(PURVMM_FORM).insert(dto);
     }

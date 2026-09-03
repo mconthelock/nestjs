@@ -51,15 +51,12 @@ export class PurVmmController {
         return this.purVmmService.request(dto, files, ip, this.path);
     }
 
-    @Patch()
+    @Patch('update')
     @UseTransaction('webformConnection')
     @UseForceTransaction()
     @UseInterceptors(
         getFileUploadInterceptor([
             { name: 'fileCer[]', maxCount: 10 },
-            { name: 'fileVat[]', maxCount: 10 },
-            { name: 'fileIe[]', maxCount: 10 },
-            { name: 'fileQa[]', maxCount: 10 },
             { name: 'fileOther[]', maxCount: 10 },
         ]),
     )
@@ -68,9 +65,6 @@ export class PurVmmController {
         @UploadedFiles()
         files: {
             'fileCer[]'?: Express.Multer.File[];
-            'fileVat[]'?: Express.Multer.File[];
-            'fileIe[]'?: Express.Multer.File[];
-            'fileQa[]'?: Express.Multer.File[];
             'fileOther[]'?: Express.Multer.File[];
         },
         @Req() req: Request,

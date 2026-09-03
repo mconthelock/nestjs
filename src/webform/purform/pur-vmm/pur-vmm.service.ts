@@ -12,6 +12,7 @@ import { FormService } from 'src/webform/form/form.service';
 import { PurvmmFormService } from './purvmm_form/purvmm_form.service';
 import { PurnvfAddressRepository } from '../pur-nvf/purnvf_address/purnvf_address.repository';
 import { PurvmmFormRepository } from '../pur-vmm/purvmm_form/purvmm_form.repository';
+import { PurvmmScmusrService } from './purvmm_scmusr/purvmm_scmusr.service';
 import { PurvmmScmuserRepository } from './purvmm_scmusr/purvmm_scmusr.repository';
 import { Vendors } from 'src/common/Entities/pursys/table/VENDORS.entity';
 import { PurFileService } from '../pur-file/pur-file.service';
@@ -37,6 +38,7 @@ export class PurVmmService {
         private readonly vmmrepo: PurvmmFormRepository,
         private readonly purFileService: PurFileService,
         private readonly reposcmuser: PurvmmScmuserRepository,
+        private readonly scmuserService: PurvmmScmusrService,
         private readonly doactionService: DoactionFlowService,
 
         @InjectRepository(Vendors, 'purConnection')
@@ -230,7 +232,8 @@ export class PurVmmService {
             }
 
             if (SCMUSER && SCMUSER.length > 0) {
-                await this.reposcmuser.InsertUsers(SCMUSER);
+                //wait this.reposcmuser.InsertUsers(SCMUSER);
+                await this.scmuserService.createMultipleUsers(form, SCMUSER);
             }
 
             if (allFilesWithType && allFilesWithType.length > 0) {
@@ -304,6 +307,8 @@ export class PurVmmService {
             //     ...form,
             //     ...purvmmdata,
             // };
+            //console.log(purvmmdata);
+            //return false;
 
             await this.vmmrepo.update(form, purvmmdata);
             const addr = [];
@@ -339,7 +344,7 @@ export class PurVmmService {
 
             await this.reposcmuser.deleteByAll(form);
             if (SCMUSER && SCMUSER.length > 0) {
-                await this.reposcmuser.InsertUsers(SCMUSER);
+                await this.scmuserService.createMultipleUsers(form, SCMUSER);
             }
 
             if (DELETE_FILES && DELETE_FILES.length > 0) {
@@ -375,7 +380,7 @@ export class PurVmmService {
 
             return {
                 status: true,
-                message: 'Update PUR-EVA Form successful',
+                message: 'Update PUR-VMM Form successful',
             };
         } catch (error) {
             const tmpFilePaths = allFilesWithType.map((item) => item.file.path);
@@ -383,7 +388,7 @@ export class PurVmmService {
                 ...movedTargets.map((p) => deleteFile(p)), // - ลบไฟล์ที่ "ปลายทาง" ทั้งหมดที่ย้ายสำเร็จไปแล้ว (กัน orphan file)
                 ...tmpFilePaths.map((f) => deleteFile(f)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
             ]);
-            throw new Error('Update PUR-EVA Form Error: ' + error.message);
+            throw new Error('Update PUR-VMM Form Error: ' + error.message);
         }
     }
 

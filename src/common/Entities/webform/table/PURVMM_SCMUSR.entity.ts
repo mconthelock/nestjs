@@ -27,6 +27,9 @@ export class PURVMM_SCMUSR {
     @Column()
     EMAIL: string;
 
+    @Column()
+    USERNAME: string;
+
     @ManyToOne(() => PURVMM_FORM, (vmm) => vmm.SCMUSER)
     @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
     @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })

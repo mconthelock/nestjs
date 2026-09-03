@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePurVmmScmusrDto } from './dto/create-purvmm_scmusr.dto';
 import { UpdatePurvmmScmusrDto } from './dto/update-purvmm_scmusr.dto';
+import { RequestPurvmmScmuserDto } from './dto/request-purvmm_scmusr.dto';
 import { PurvmmScmuserRepository } from './purvmm_scmusr.repository';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
@@ -13,7 +14,7 @@ export class PurvmmScmusrService {
 
     async createMultipleUsers(
         formDto: FormDto,
-        users: CreatePurVmmScmusrDto[],
+        users: RequestPurvmmScmuserDto[],
     ) {
         try {
             const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO } = formDto;

@@ -20,6 +20,7 @@ import {
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 import { CreatePurVmmScmusrDto } from '../purvmm_scmusr/dto/create-purvmm_scmusr.dto';
+import { RequestPurvmmScmuserDto } from '../purvmm_scmusr/dto/request-purvmm_scmusr.dto';
 
 export class RequestPurvmmFormDto extends PickType(CreateFormDto, [
     'NFRMNO',
@@ -161,6 +162,6 @@ export class RequestPurvmmFormDto extends PickType(CreateFormDto, [
     @IsOptional()
     @IsArray()
     @ValidateNested({ each: true })
-    @Type(() => CreatePurVmmScmusrDto)
-    SCMUSER?: CreatePurVmmScmusrDto[];
+    @Type(() => RequestPurvmmScmuserDto)
+    SCMUSER?: RequestPurvmmScmuserDto[];
 }

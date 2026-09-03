@@ -11,6 +11,7 @@ import { PurevaFormModule } from '../pur-eva/pureva_form/pureva_form.module';
 import { PurvmmFormService } from './purvmm_form/purvmm_form.service';
 import { PurnvfAddressRepository } from '../pur-nvf/purnvf_address/purnvf_address.repository';
 import { FormCreateService } from 'src/webform/form/create-form.service';
+import { PurvmmScmusrService } from './purvmm_scmusr/purvmm_scmusr.service';
 import { PurvmmScmuserRepository } from './purvmm_scmusr/purvmm_scmusr.repository';
 import { PurvmmFormRepository } from './purvmm_form/purvmm_form.repository';
 import { Vendors } from 'src/common/Entities/pursys/table/VENDORS.entity';
@@ -28,6 +29,7 @@ import { FlowModule } from 'src/webform/flow/flow.module';
         PurvmmFormRepository,
         PurFileService,
         PurFileRepository,
+        PurvmmScmusrService,
         PurvmmScmuserRepository,
     ],
     imports: [

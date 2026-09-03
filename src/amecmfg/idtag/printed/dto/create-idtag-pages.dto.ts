@@ -35,4 +35,16 @@ export class CreateIdtagPagesDto {
     @IsOptional()
     @IsString()
     PAGE_STATUS?: string;
+
+    @IsString()
+    PAGE_ITEM: string;
+
+    @IsString()
+    PAGE_ITEMPACKING: string;
+
+    @IsString()
+    PAGE_PROCESS: string;
+
+    @IsString()
+    PAGE_DRAWING: string;
 }

@@ -90,4 +90,14 @@ export class CheckinventoryController {
     getYearlyForm(@Body() body: { reportID: number }) {
         return this.cs.getYearlyForm(body.reportID);
     }
+
+    @Post('insertTagAs400')
+    insertTagAs400(@Body() body: { reportID: number }) {
+        return this.cs.insertTagAs400(body.reportID);
+    }
+
+    @Post('insertActualAs400')
+    insertActualAs400(@Body() body: { reportID: number }) {
+        return this.cs.insertActualAs400(body.reportID);
+    }
 }

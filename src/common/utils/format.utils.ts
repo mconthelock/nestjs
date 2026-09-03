@@ -54,3 +54,52 @@ export function convertJung(text: string): string | null {
 
     return value.slice(0, -1) + converted;
 }
+
+/**
+ * Convert float to comma.
+ * @author Mr.Pathanapong Sokpukeaw
+ * @since 2021-12-11
+ * @param float d the value
+ * @param int digit the number digit to cal
+ * @param bool flage the fixed digit, true is fixed and false is not fixed
+ * @return string
+ */
+export function setRound(
+    d: number | string,
+    digit: number = 2,
+    flage: boolean = true,
+): string {
+    if (!d) {
+        return flage ? (0).toFixed(digit) : '0';
+    }
+    flage = flage || false;
+    const cDigit = Math.pow(10, digit);
+    let value: string | number = d.toString();
+    value = removeComma(value);
+    value = Math.round(Number(value) * cDigit) / cDigit;
+    if (isNaN(value)) {
+        if (flage) {
+            return (0).toFixed(digit);
+        } else {
+            return '0';
+        }
+    }
+    if (flage) {
+        value = value.toFixed(digit); 
+    } else {
+        value = value.toString();
+    }
+
+    const parts = value.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
+}
+
+/**
+ * Remove comma from string.
+ * @param {string} d
+ * @returns
+ */
+export function removeComma(d: string): string {
+    return d.replace(/,/g, '');
+}

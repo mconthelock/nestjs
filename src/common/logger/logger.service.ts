@@ -8,7 +8,7 @@ import * as zlib from 'zlib';
 
 @Injectable()
 export class LoggerService {
-    private logDir = path.join(process.cwd(), 'logs');
+    //private logDir = path.join(process.cwd(), 'logs');
 
     async readLogFile(filePath: string): Promise<any[]> {
         let content: string;

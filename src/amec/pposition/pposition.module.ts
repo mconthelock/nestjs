@@ -5,8 +5,8 @@ import { PPOSITION } from 'src/common/Entities/amec/table/PPOSITION.entity';
 import { PpositionController } from './pposition.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PPOSITION], 'webformConnection')],
-  controllers: [PpositionController],
-  providers: [PpositionService],
+    imports: [TypeOrmModule.forFeature([PPOSITION], 'amecConnection')],
+    controllers: [PpositionController],
+    providers: [PpositionService],
 })
 export class PpositionModule {}

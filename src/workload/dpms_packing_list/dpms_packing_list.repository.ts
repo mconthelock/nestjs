@@ -61,24 +61,58 @@ export class DpmsPackingListRepository extends BaseRepository {
         const query = this.manager
             .createQueryBuilder(DPMS_PACKING_LIST, 'L')
             .where(cond);
-        if(TYPE == 'MAIN'){
+        if (TYPE == 'MAIN') {
             query.andWhere('L.TYPE IN (:...TYPES)', { TYPES: ['ELE', 'ESC'] });
-        }else if(TYPE){
+        } else if (TYPE) {
             query.andWhere('L.TYPE = :TYPE', { TYPE });
         }
         if (PL_PLAN) {
-            query.andWhere('TRUNC(L.PL_PLAN) = TRUNC(TO_DATE(:PL_PLAN, \'YYYY-MM-DD\'))', { PL_PLAN });
+            query.andWhere(
+                "TRUNC(L.PL_PLAN) = TRUNC(TO_DATE(:PL_PLAN, 'YYYY-MM-DD'))",
+                { PL_PLAN },
+            );
         }
         if (FINISH_DATE) {
-            query.andWhere('TRUNC(L.DFINISHALL) = TRUNC(TO_DATE(:FINISH_DATE, \'YYYY-MM-DD\'))', {
-                FINISH_DATE,
-            });
+            query.andWhere(
+                "TRUNC(L.DFINISHALL) = TRUNC(TO_DATE(:FINISH_DATE, 'YYYY-MM-DD'))",
+                {
+                    FINISH_DATE,
+                },
+            );
         }
         if (DFINISHALL == 'Y') {
             query.andWhere('L.DFINISHALL IS NOT NULL');
-        }else if (DFINISHALL == 'N') {
+        } else if (DFINISHALL == 'N') {
             query.andWhere('L.DFINISHALL IS NULL');
         }
+        return query
+            .orderBy({
+                'L.REVISE': 'DESC',
+                'L.DELAY': 'DESC',
+                'L.PROD': 'ASC',
+                'L.P': 'ASC',
+                'L.ORDERS': 'ASC',
+            })
+            .getMany();
+    }
+
+    getMarketingTasks(
+        type: 'all' | 'current' | 'finish' | 'inprogress' | 'search',
+        condition?: searchDpmsPackingListDto,
+    ) {
+        const query = this.manager
+            .createQueryBuilder(DPMS_PACKING_LIST, 'L')
+            .where("L.ISSUE = 'Y'", { ISSUE: 'Y' });
+        if (type === 'current') {
+            query.andWhere('(TRUNC(L.LASTISSUEDATE) >= TRUNC(SYSDATE))');
+        }
+        if (type === 'finish') {
+            query.andWhere('L.DFINISHALL IS NOT NULL');
+        }
+        if (type === 'inprogress') {
+            query.andWhere('L.DFINISHALL IS NULL');
+        }
+
         return query
             .orderBy({
                 'L.REVISE': 'DESC',

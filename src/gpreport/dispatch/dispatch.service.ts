@@ -1072,7 +1072,6 @@ export class DispatchService {
         const timeStamp = dayjs().format('YYYYMMDD_HHmmss');
         const fileName1 = `OT_Daily_Transportation_Route_${timeStamp}.xlsx`;
         const fileName2 = `List_of_Employee_unable_arrange_transportation_${timeStamp}.xlsx`;
-
         const filePath1 = path.join(folderPath, fileName1);
         const filePath2 = path.join(folderPath, fileName2);
 
@@ -1080,28 +1079,16 @@ export class DispatchService {
         await workbook2.xlsx.writeFile(filePath2);
 
         await this.dispatchMailService.sendDispatchMail({
-            to: [
-                'warawuts@MitsubishiElevatorAsia.co.th',
-                'nathawu@MitsubishiElevatorAsia.co.th',
-            ],
-            cc: [
-                'rewepong@MitsubishiElevatorAsia.co.th',
-                'supamid@mitsubishielevatorasia.co.th',
-            ],
+            to: ['warawuts@MitsubishiElevatorAsia.co.th', 'nathawu@MitsubishiElevatorAsia.co.th',],
+            cc: ['rewepong@MitsubishiElevatorAsia.co.th', 'supamid@mitsubishielevatorasia.co.th',],
             bcc: ['kallaya@MitsubishiElevatorAsia.co.th'],
             subject: `แจ้งแผนการจัดรถพนักงาน (${dto.workdate})`,
             html: this.dispatchMailService.buildDispatchMailHtml(dto),
             attachments: [filePath1, filePath2],
         });
 
-        const updateDto: SaveDispatchDto = {
-            dispatch_id: dispatchId,
-            status: 'F',
-            update_by: dto.update_by,
-        };
-
+        const updateDto: SaveDispatchDto = {dispatch_id: dispatchId, status: 'F', update_by: dto.update_by,};
         const updateRes = await this.updateDispatchStatusHead(updateDto);
-
         return {
             status: true,
             message: 'สร้างไฟล์ Excel และส่งอีเมลสำเร็จ',
@@ -1118,14 +1105,10 @@ export class DispatchService {
         const result = await this.dataSource
             .createQueryBuilder()
             .update(BusDispatchHead)
-            .set({
-                STATUS: 'F',
-                UPDATE_DATE: new Date(),
-            })
+            .set({STATUS: 'F', UPDATE_DATE: new Date(),})
             .where("NVL(STATUS, 'N') <> :finalStatus", { finalStatus: 'F' })
             .andWhere('TRUNC(DISPATCH_DATE) = TRUNC(SYSDATE) - 1')
             .execute();
-
         return {
             status: true,
             message: 'Auto finalize completed',

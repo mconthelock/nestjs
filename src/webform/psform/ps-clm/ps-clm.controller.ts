@@ -8,6 +8,7 @@ import {
     Post,
     Query,
     Req,
+    UploadedFiles,
     UseInterceptors,
 } from '@nestjs/common';
 import { Request } from 'express';
@@ -18,7 +19,7 @@ import {
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { CreatePsClmReqFormDto } from './dto/create-ps-clm.dto';
-import { UpdatePsClmDto } from './dto/update-ps-clm.dto';
+import { SendPsClmAs400Dto, UpdatePsClmDto } from './dto/update-ps-clm.dto';
 import { PsClmService } from './ps-clm.service';
 
 @Controller('psform/ps-clm')
@@ -28,8 +29,29 @@ export class PsClmController {
     @Post()
     @UseTransaction('webformConnection')
     @UseInterceptors(getFileUploadInterceptor())
-    create(@Body() dto: CreatePsClmReqFormDto, @Req() req: Request) {
-        return this.psClmService.create(dto, getClientIP(req));
+    create(
+        @Body() dto: CreatePsClmReqFormDto,
+        @UploadedFiles() files: Express.Multer.File[],
+        @Req() req: Request,
+    ) {
+        return this.psClmService.create(dto, files, getClientIP(req));
+    }
+
+    @Post('preview-as400')
+    previewAs400(@Body() dto: SendPsClmAs400Dto) {
+        return this.psClmService.previewAs400(dto);
+    }
+
+    @Post('send-as400')
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
+    sendToAs400(@Body() dto: SendPsClmAs400Dto) {
+        return this.psClmService.sendToAs400(dto);
+    }
+
+    @Post('preview-as400/check-order')
+    checkAs400Order(@Body() dto: SendPsClmAs400Dto) {
+        return this.psClmService.checkAs400Order(dto);
     }
 
     @Patch()

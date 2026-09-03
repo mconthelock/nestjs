@@ -3,6 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { ISDEV_DEVELOPER } from 'src/common/Entities/webform/table/ISDEV_DEVELOPER.entity';
+import { ISDEV_OBJECTIVE } from 'src/common/Entities/webform/table/ISDEV_OBJECTIVE.entity';
+import { IS_DEVICEMST } from 'src/common/Entities/webform/table/IS_DEVICEMST.entity';
+import { LABORCOST } from 'src/common/Entities/webform/table/LABORCOST.entity';
 
 import { CreateDeveloperDto } from './dto/create-developer.dto';
 import { UpdateDeveloperDto } from './dto/update-developer';
@@ -12,6 +15,15 @@ export class IsDevService {
     constructor(
         @InjectRepository(ISDEV_DEVELOPER, 'webformConnection')
         private readonly developer: Repository<ISDEV_DEVELOPER>,
+
+        @InjectRepository(ISDEV_OBJECTIVE, 'webformConnection')
+        private readonly obj: Repository<ISDEV_OBJECTIVE>,
+
+        @InjectRepository(IS_DEVICEMST, 'webformConnection')
+        private readonly device: Repository<IS_DEVICEMST>,
+
+        @InjectRepository(LABORCOST, 'webformConnection')
+        private readonly laborcost: Repository<LABORCOST>,
     ) {}
 
     async createDev(dto: CreateDeveloperDto) {
@@ -102,4 +114,19 @@ export class IsDevService {
     //       },
     //     });
     //   }
+
+    //ISDEV_OBJECTIVE
+    async findAllObjective() {
+        return await this.obj.find();
+    }
+
+    //IS_DEVICEMST
+    async findAllDeviceMst() {
+        return await this.device.find();
+    }
+
+    //LABORCOST
+    async findAllLaborcost() {
+        return await this.laborcost.find();
+    }
 }

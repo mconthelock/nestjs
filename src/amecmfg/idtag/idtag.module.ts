@@ -14,6 +14,7 @@ import { IdtagList } from '../../common/Entities/workload/table/idtag-list.entit
 import { IdtagFiles } from '../../common/Entities/workload/table/idtag-files.entity';
 import { IdtagPages } from '../../common/Entities/workload/table/idtag-pages.entity';
 import { IdtagImages } from '../../common/Entities/workload/views/idtag-images.entity';
+import { IdtagOrders } from '../../common/Entities/workload/table/IDTAGS_ORDERS.entity';
 
 import { PrintedService } from './printed/printed.service';
 import { PrintedQueueService } from './printed/PrintedQueue.service';
@@ -22,6 +23,7 @@ import { PrintedCnService } from './printed/printedCn.service';
 import { PrintedMergeService } from './printed/printedMerge.service';
 import { PrintedNcService } from './printed/printedNc.service';
 import { PrintedTopLabelService } from './printed/printedTopLabel.service';
+import { PrintedExtractService } from './printed/printedExtract.service';
 
 @Module({
     imports: [
@@ -30,7 +32,7 @@ import { PrintedTopLabelService } from './printed/printedTopLabel.service';
         MailModule,
         TypeOrmModule.forFeature([M008KP, F110KP, F001KP], 'amecConnection'),
         TypeOrmModule.forFeature(
-            [IdtagFiles, IdtagPages, IdtagImages, IdtagList],
+            [IdtagFiles, IdtagPages, IdtagImages, IdtagList, IdtagOrders],
             'workloadConnection',
         ),
     ],
@@ -45,6 +47,7 @@ import { PrintedTopLabelService } from './printed/printedTopLabel.service';
         PrintedMergeService,
         PrintedNcService,
         PrintedTopLabelService,
+        PrintedExtractService,
     ],
 })
 export class IdtagModule {}

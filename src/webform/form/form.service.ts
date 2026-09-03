@@ -15,6 +15,7 @@ import { formDetailQb } from 'src/common/utils/qb-form-detail';
 import { FormRepository } from './form.repository';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
+import { FormCounter } from 'src/common/Entities/webform/table/FORM_COUNTER.entity';
 
 // interface FormContext {
 //     ip: string;
@@ -44,6 +45,9 @@ export class FormService {
 
         @InjectRepository(FLOW, 'webformConnection')
         protected readonly flow: Repository<FLOW>,
+
+        @InjectRepository(FormCounter, 'webformConnection')
+        protected readonly count: Repository<FormCounter>,
 
         protected readonly formmstService: FormmstService,
         protected readonly flowService: FlowService,
@@ -147,6 +151,13 @@ export class FormService {
         ]);
 
         return { count, minDate: minDateResult?.minDate };
+    }
+
+    async counter(empno: string) {
+        const result = await this.count.findOne({
+            where: { EMPNO: empno },
+        });
+        return result;
     }
 
     waitforapprove(empno) {

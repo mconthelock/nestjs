@@ -6,7 +6,7 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 import { FormService } from 'src/webform/form/form.service';
 import { EbudgetQuotationService } from 'src/ebudget/ebudget-quotation/ebudget-quotation.service';
 import { EbudgetQuotationProductService } from 'src/ebudget/ebudget-quotation-product/ebudget-quotation-product.service';
-import { RqffrmService } from 'src/webform/rqffrm/rqffrm.service';
+import { RqffrmService } from 'src/webform/qaform/rqffrm/rqffrm.service';
 
 @Injectable()
 export class QuotationService {

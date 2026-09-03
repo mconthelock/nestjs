@@ -3,20 +3,23 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { User } from './entities/user.entity';
+import { searchDto } from './dto/search-user.dto';
+import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 
 @Injectable()
 export class UsersRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('amecConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('amecConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
-    findAll() {
-        // ใช้ได้ทั้งหมด
-        // return this.manager.query(`select * from AMECUSERALL`);
-        // return this.getRepository(AMECUSERALL).find();
-        return this.manager.find(User);
+    async findAll(q?: searchDto) {
+        const qb = this.getRepository(User).createQueryBuilder('user');
+
+        if (q) {
+            await applyDynamicFilters(qb, q, 'user');
+        }
+
+        return qb.getMany();
     }
 
     findEmpEncode(empno: string) {

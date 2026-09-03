@@ -18,8 +18,36 @@ export class PrintedCnService {
         private r027: R027mp1Service,
     ) {}
 
+    private async resolvePdfRuntimeContext(filesId: number) {
+        try {
+            const pdfDirectory = await this.printed.getCurrentPdfDirectory();
+            return {
+                pdfDirectory,
+                logFileName: undefined as string | undefined,
+            };
+        } catch {
+            const fileData = await this.repo.findAllFiles({ FILES: filesId });
+            if (!fileData || fileData.length === 0) {
+                throw new Error(`File not found for FILES_ID ${filesId}`);
+            }
+
+            const context = await this.printed.setPdfPath({
+                schd_number: fileData[0].SCHDNUMBER,
+                schd_txt: fileData[0].SCHDCHAR,
+                schd_p: fileData[0].SCHDP,
+                filedir: fileData[0].FILE_FOLDER,
+                filename:
+                    fileData[0].FILES_PARENT != null
+                        ? fileData[0].FILE_NAME
+                        : fileData[0].FILE_ONAME,
+            });
+            return context;
+        }
+    }
+
     async putCNNo(filesId: number) {
         const cnStartTime = Date.now();
+        const runtimeContext = await this.resolvePdfRuntimeContext(filesId);
         const cnData = await this.repo.findAllCn({
             filters: [
                 { field: 'FILES_ID', op: 'eq', value: filesId },
@@ -30,32 +58,44 @@ export class PrintedCnService {
         if (cnData.length === 0) {
             await this.printed.writeLog(
                 `No CN data to put in PDF for FILES_ID ${filesId}`,
+                undefined,
+                runtimeContext.logFileName,
             );
             return;
         }
 
         for (const data of cnData) {
-            const cdir = await this.printed.getCurrentPdfDirectory();
-            const pdfPath = path.join(cdir, `${data.PAGE_TAG}.pdf`);
+            // console.log(pdfPath);
             try {
-                await this.embedCNToPdf(pdfPath, {
-                    cnno: data.DOCNO,
-                    sendto: data.SENTTO,
-                    senddate: data.PRDCTNAME,
-                });
-                await this.printed.writeLog(
-                    `Put CN No. ${data.DOCNO} to ${data.PAGE_TAG}`,
+                const pdfPath = path.join(
+                    runtimeContext.pdfDirectory,
+                    `${data.PAGE_TAG}.pdf`,
                 );
+                if (data.DOCNO != null) {
+                    await this.embedCNToPdf(pdfPath, {
+                        cnno: data.DOCNO,
+                        sendto: data.SENTTO,
+                        senddate: data.PRDCTNAME,
+                    });
+                    await this.printed.writeLog(
+                        `Put CN No. ${data.DOCNO} to ${data.PAGE_TAG}`,
+                        undefined,
+                        runtimeContext.logFileName,
+                    );
+                }
             } catch (error) {
                 await this.printed.writeLog(
                     `Error processing CN Data for tag ${data.PAGE_TAG}`,
                     error instanceof Error ? error.message : String(error),
+                    runtimeContext.logFileName,
                 );
             }
         }
 
         await this.printed.writeLog(
             `Put CN No. in complete PDF in ${this.printed.formatElapsedTime(cnStartTime)}`,
+            undefined,
+            runtimeContext.logFileName,
         );
     }
 
@@ -80,8 +120,17 @@ export class PrintedCnService {
 
         let lotCount = 0;
         for (const data of firstData) {
-            const cdir = await this.printed.getCurrentPdfDirectory();
-            const pdfPath = path.join(cdir, `${data.R27M11}.pdf`);
+            let pdfDirectory = '';
+            try {
+                pdfDirectory = await this.printed.getCurrentPdfDirectory();
+            } catch {
+                await this.printed.writeLog(
+                    `Skip First Lot update for ${data.R27M11} because PDF runtime context is not initialized for BMDate ${bmdateStr}`,
+                );
+                continue;
+            }
+
+            const pdfPath = path.join(pdfDirectory, `${data.R27M11}.pdf`);
             try {
                 await this.embedFirstToPdf(pdfPath, data.R27M09);
                 await this.printed.writeLog(
@@ -123,7 +172,7 @@ export class PrintedCnService {
             drawBorder: {
                 color: rgb(0.9, 0.9, 0.9),
                 width: 0,
-                bgColor: rgb(0.9, 0.9, 0.9),
+                //bgColor: rgb(0.9, 0.9, 0.9),
             },
         });
 

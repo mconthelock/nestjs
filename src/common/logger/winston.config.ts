@@ -1,12 +1,16 @@
 import * as winston from 'winston';
+import path from 'node:path';
 import stripAnsi from 'strip-ansi'; // npm i strip-ansi
 import chalk from 'chalk';
 import { requestNamespace } from '../../middleware/request-id.middleware';
 import { shouldIgnoreEndpoint } from './logger-ignore.config';
 const DailyRotateFile = require('winston-daily-rotate-file');
+const configuredLogDir = process.env.LOGGER_DIR?.trim();
 
-const logDir = process.env.LOGGER_DIR || 'logs/';
-
+const logDir = configuredLogDir
+    ? path.win32.normalize(configuredLogDir)
+    : path.resolve(process.cwd(), 'logs');
+console.log('Winston log directory:', logDir);
 const addRequestId = winston.format((info) => {
     const requestId = requestNamespace.get('requestId');
     if (requestId) {

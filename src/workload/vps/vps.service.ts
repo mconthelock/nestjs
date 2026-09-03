@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CreateVpDto } from './dto/create-vp.dto';
 import { UpdateVpDto } from './dto/update-vp.dto';
 import { VpsRepository } from './vps.repository';
+import { InsertCartonDto, InsertListCartonDto } from './dto/insertCarton.dto';
+import { PKC_CARTON_DETAIL } from 'src/common/Entities/workload/table/PKC_CARTON_DETAIL.entity';
 
 @Injectable()
 export class VpsService {
@@ -13,6 +15,10 @@ export class VpsService {
 
     async getListOrder(packing: string): Promise<any[]> {
         return await this.vpsRepository.getListOrder(packing);
+    }
+
+    async getListOrder_88_89(): Promise<any[]> {
+        return await this.vpsRepository.getListOrder_88_89();
     }
 
     async insertPrintVPS(
@@ -35,13 +41,12 @@ export class VpsService {
         const now = new Date();
 
         // เช็คข้อมูลซ้ำทั้งหมดก่อน insert
-        const [chkOrder, chkItemMas, chkItemQty, chkPISinfo] =
-            await Promise.all([
-                this.vpsRepository.chkOrder(order, packing),
-                this.vpsRepository.chkItemMas(order, packing),
-                this.vpsRepository.chkItemQty(order, packing),
-                this.vpsRepository.chkPISinfo(order, subPacking),
-            ]);
+        const [chkOrder, chkItemMas, chkItemQty, chkPISinfo] = await Promise.all([
+            this.vpsRepository.chkOrder(order, packing),
+            this.vpsRepository.chkItemMas(order, packing),
+            this.vpsRepository.chkItemQty(order, packing),
+            this.vpsRepository.chkPISinfo(order, subPacking),
+        ]);
 
         console.log('chkOrder:', chkOrder);
         console.log('chkItemMas:', chkItemMas);
@@ -64,12 +69,22 @@ export class VpsService {
             quantity: qtyPrint,
             users: empno,
         });
-        
 
         // ถ้ายังไม่มี order ใน PACKORDDTL -> เรียก stored proc สร้างให้
         if (!chkOrder) {
-            await this.vpsRepository.insPackorddtlByManual(order, packing);
-        }else{
+            // await this.vpsRepository.insPackorddtlByManual(order, packing);
+            await this.vpsRepository.insertPackorddtl({
+                production: produciton,
+                orderno: order,
+                itemno: item,
+                packno: packing,
+                partname: partname,
+                projectno: project,
+                packshop: 'PC',
+                printsta: '1',
+                updatedate: now,
+            });
+        } else {
             await this.vpsRepository.updatePrintStatus(order, packing);
         }
 
@@ -180,15 +195,32 @@ export class VpsService {
         }
 
         const remark = await this.vpsRepository.getQ46054OL(order, packing);
-        orderDetails[0].REMARK = remark && remark.length > 0 ? remark : '';
+        if (orderDetails[0].PRODTYPE === 'DUM') {
+            const originalOrder = await this.vpsRepository.getOriginalOrder(
+                order,
+                orderDetails[0].S01M06,
+            );
+
+            orderDetails[0].REMARK = [
+                ...(remark ?? []),
+                ...(originalOrder ?? []),
+            ];
+        } else {
+            orderDetails[0].REMARK = remark && remark.length > 0 ? remark : '';
+        }
 
         for (const detail of orderDetails) {
             const dwgNo = detail.S11M04 ? detail.S11M04.replace(/\s/g, '') : '';
             const masterPacking = await this.vpsRepository.getMasterPacking(dwgNo);
-            
+
             detail.MASTER_PACKING = masterPacking && masterPacking.length > 0 ? masterPacking : '';
         }
 
         return orderDetails;
+    }
+
+    async insertCartonBox(dto: InsertListCartonDto) {
+        // console.log('dto.items:', dto.items);
+        return this.vpsRepository.insertCartonBox(dto.items);
     }
 }

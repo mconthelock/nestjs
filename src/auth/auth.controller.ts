@@ -12,14 +12,15 @@ import {
     HttpStatus,
     UnauthorizedException,
 } from '@nestjs/common';
+import { ApiTags, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
-import { directLoginDto } from './dto/direct.dto';
 import { Response } from 'express';
 import * as CryptoJS from 'crypto-js';
-import * as bcrypt from 'bcrypt';
-import { ApiTags, ApiOperation, ApiExcludeEndpoint } from '@nestjs/swagger';
+
+import { LoginDto } from './dto/login.dto';
+import { directLoginDto } from './dto/direct.dto';
+import { CreateResetPasswordDto } from './dto/create-reset-password.dto';
 
 interface encryptObj {
     text: string;
@@ -29,9 +30,7 @@ interface encryptObj {
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-    constructor(
-        private authService: AuthService,
-    ) {}
+    constructor(private authService: AuthService) {}
     @HttpCode(HttpStatus.OK)
     @UseGuards(AuthGuard('local'))
     @Post('login')
@@ -111,5 +110,10 @@ export class AuthController {
     decryptText(@Body() encrypt: encryptObj) {
         const decryptedBytes = CryptoJS.AES.decrypt(encrypt.text, encrypt.key);
         return decryptedBytes.toString(CryptoJS.enc.Utf8);
+    }
+
+    @Post('resetpassword')
+    async resetPassword(@Body() reset: CreateResetPasswordDto) {
+        return this.authService.resetPassword(reset);
     }
 }

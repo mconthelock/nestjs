@@ -14,6 +14,31 @@ export class PrintedImagesService {
         private readonly repo: IdTagRepository,
     ) {}
 
+    private async resolvePdfRuntimeContext(filesId: number) {
+        try {
+            return {
+                pdfDirectory: await this.printed.getCurrentPdfDirectory(),
+                logFileName: undefined as string | undefined,
+            };
+        } catch {
+            const fileData = await this.repo.findAllFiles({ FILES: filesId });
+            if (!fileData || fileData.length === 0) {
+                throw new Error(`File not found for FILES_ID ${filesId}`);
+            }
+
+            return this.printed.setPdfPath({
+                schd_number: fileData[0].SCHDNUMBER,
+                schd_txt: fileData[0].SCHDCHAR,
+                schd_p: fileData[0].SCHDP,
+                filedir: fileData[0].FILE_FOLDER,
+                filename:
+                    fileData[0].FILES_PARENT != null
+                        ? fileData[0].FILE_NAME
+                        : fileData[0].FILE_ONAME,
+            });
+        }
+    }
+
     private async setImagePath(img: string) {
         const image = path.join(process.env.IDTAG_FILE_PATH, `images/`, img);
         const thumb = path.join(process.env.IDTAG_FILE_PATH, `thumbnail/`, img);
@@ -43,6 +68,7 @@ export class PrintedImagesService {
 
     async putImages(filesId: number) {
         const putImagesStartTime = Date.now();
+        const runtimeContext = await this.resolvePdfRuntimeContext(filesId);
         const imageData = await this.repo.findAllImage({
             filters: [
                 { field: 'FILES_ID', op: 'eq', value: filesId },
@@ -53,6 +79,8 @@ export class PrintedImagesService {
         if (imageData.length === 0) {
             await this.printed.writeLog(
                 `No images to put in PDF for FILES_ID ${filesId}`,
+                undefined,
+                runtimeContext.logFileName,
             );
             return;
         }
@@ -63,8 +91,10 @@ export class PrintedImagesService {
                 const imagePath = await this.setImagePath(img.DWG_IMG);
                 if (imagePath == null) continue;
 
-                const cdir = await this.printed.getCurrentPdfDirectory();
-                const pdfPath = path.join(cdir, `${img.PAGE_TAG}.pdf`);
+                const pdfPath = path.join(
+                    runtimeContext.pdfDirectory,
+                    `${img.PAGE_TAG}.pdf`,
+                );
                 await this.embedImageToPdf(
                     pdfPath,
                     imagePath,
@@ -72,6 +102,8 @@ export class PrintedImagesService {
                 );
                 await this.printed.writeLog(
                     `Put image ${img.DWG_IMG} to ${img.PAGE_TAG}`,
+                    undefined,
+                    runtimeContext.logFileName,
                 );
                 await this.repo.updatePages([
                     {
@@ -84,12 +116,15 @@ export class PrintedImagesService {
                 await this.printed.writeLog(
                     `Error processing image for tag ${img.PAGE_TAG}`,
                     error instanceof Error ? error.message : '',
+                    runtimeContext.logFileName,
                 );
             }
         }
 
         await this.printed.writeLog(
             `Put images in complete PDF in ${await this.printed.formatElapsedTime(putImagesStartTime)}`,
+            undefined,
+            runtimeContext.logFileName,
         );
     }
 

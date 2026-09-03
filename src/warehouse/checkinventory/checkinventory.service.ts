@@ -101,7 +101,7 @@ export class CheckinventoryService {
                 REQBY: dto.REQBY,
                 INPUTBY: dto.INPUTBY,
                 REMARK: '',
-                DRAFT: "1",
+                DRAFT: '1',
             },
             ip,
         );
@@ -135,5 +135,13 @@ export class CheckinventoryService {
 
     async getYearlyForm(reportID: number) {
         return this.chkrepo.getYearlyForm(reportID);
+    }
+
+    async insertTagAs400(reportID: number) {
+        return this.chkrepo.insertTagAs400(reportID);
+    }
+
+    async insertActualAs400(reportID: number) {
+        return this.chkrepo.insertActualAs400(reportID);
     }
 }

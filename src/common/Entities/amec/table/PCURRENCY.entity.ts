@@ -1,4 +1,7 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { PUREVA_FORM } from '../../webform/table/PUREVA_FORM.entity';
+
+
 
 @Entity({ name: 'PCURRENCY', schema: 'AMEC' })
 export class PCURRENCY {
@@ -7,5 +10,8 @@ export class PCURRENCY {
 
     @Column()
     SCURRENCY: string;
+
+    @OneToMany(() => PUREVA_FORM, (l) => l.STDCUR)
+    LISTSPUREVA: PUREVA_FORM[];
 
 }

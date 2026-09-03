@@ -23,3 +23,13 @@ export class UpdatePsClmDto extends PickType(doactionFlowDto, [
     @IsOptional()
     DETAILS?: CreatePsClmReqFormDto['DETAILS'];
 }
+
+export class SendPsClmAs400Dto extends PickType(UpdatePsClmDto, [
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'CYEAR2',
+    'NRUNNO',
+    'EMPNO',
+    'DETAILS',
+] as const) {}

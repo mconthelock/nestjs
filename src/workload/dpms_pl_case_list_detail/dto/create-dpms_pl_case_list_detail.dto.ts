@@ -35,4 +35,17 @@ export class CreateDpmsPlCaseListDetailDto {
     @IsNumber()
     @Type(() => Number)
     NQTY: number;
+
+    @IsOptional()
+    @IsString()
+    VORDER_PACK?: string;
+
+    @IsOptional()
+    @IsString()
+    VDRAWING_PACKING?: string;
+
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    NPOSEQ?: number;
 }

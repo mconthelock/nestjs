@@ -46,4 +46,26 @@ export class DpmsPlIssueTypeService {
             );
         }
     }
+
+    async findByTypeCode(typeCode: string) {
+        try {
+            const result = await this.repo.findByTypeCode(typeCode);
+            if (!result) {
+                return {
+                    status: false,
+                    message: `Issue type with code ${typeCode} not found.`,
+                };
+            }
+            return {
+                status: true,
+                message: `Issue type with code ${typeCode} found.`,
+                data: result,
+            };
+        } catch (error) {
+            throw new Error(
+                `Failed to find issue type by code ${typeCode}. Error: ${error.message}`,
+            );
+        }
+    }
+
 }

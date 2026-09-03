@@ -15,6 +15,7 @@ import { RepService } from '../rep/rep.service';
 import { DeleteFlowStepService } from '../flow/delete-flow-step.service';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
+import { FormCounter } from 'src/common/Entities/webform/table/FORM_COUNTER.entity';
 import { UpdateFlowDto } from '../flow/dto/update-flow.dto';
 
 interface FormContext {
@@ -45,6 +46,9 @@ export class FormCreateService extends FormService {
 
         @InjectRepository(FLOW, 'webformConnection')
         protected readonly flow: Repository<FLOW>,
+
+        @InjectRepository(FormCounter, 'webformConnection')
+        protected readonly count: Repository<FormCounter>,
         protected readonly formmstService: FormmstService,
         protected readonly flowService: FlowService,
         protected readonly repo: FormRepository,
@@ -58,7 +62,7 @@ export class FormCreateService extends FormService {
         private readonly repService: RepService,
         private readonly deleteFlowStepService: DeleteFlowStepService,
     ) {
-        super(form, flow, formmstService, flowService, repo);
+        super(form, flow, count, formmstService, flowService, repo);
     }
     async create(
         dto: CreateFormDto,
@@ -394,10 +398,14 @@ export class FormCreateService extends FormService {
                 VURL: url[0].VFORMPAGE,
                 VREMARK: null,
             };
-            console.log(managerData, managerData?.CEXTDATA, managerData?.CAPPLYALL);
-            
+            console.log(
+                managerData,
+                managerData?.CEXTDATA,
+                managerData?.CAPPLYALL,
+            );
+
             console.log(flow);
-            
+
             await this.flowService.insertFlow(flow);
 
             //Update creater flow for set next step to manager

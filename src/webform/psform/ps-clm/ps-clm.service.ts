@@ -5,27 +5,42 @@ import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { UsersService } from 'src/amec/users/users.service';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 import { FlowService } from 'src/webform/flow/flow.service';
+import { ConectionService } from 'src/as400/conection/conection.service';
+import { M001kpService } from 'src/as400/rtnlibf/m001kp/m001kp.service';
+import { M002kpService } from 'src/as400/rtnlibf/m002kp/m002kp.service';
+import { PSCLM_DETAIL } from 'src/common/Entities/webform/table/PSCLM_DETAIL.entity';
+import { MailService } from 'src/common/services/mail/mail.service';
+import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
 import {
     CreatePsClmDetailDto,
     CreatePsClmReqFormDto,
 } from './dto/create-ps-clm.dto';
-import { UpdatePsClmDto } from './dto/update-ps-clm.dto';
+import { SendPsClmAs400Dto, UpdatePsClmDto } from './dto/update-ps-clm.dto';
 import { PsClmRepository } from './ps-clm.repository';
 
-const ASSIGN_CONTROLLERS = ['12177', '14036', '16066'];
-const ORDER_PREFIXES = { ET: 'ET2C', ST: 'ST2C' } as const;
+const ASSIGN_CONTROLLERS = ['12177', '14036', '16066', '96024'];
+const ORDER_PREFIXES = { E: 'ET2C', S: 'ST2C' } as const;
+const AS400_PRIMARY_LIBRARY = 'RTNLIBF';
+const AS400_DEBUG_LIBRARY = 'DBGDEV14';
+const M002_TABLE = 'M002KPBM';
+const REQUEST_MAIL_CC_EMPNOS = [...ASSIGN_CONTROLLERS, '25020'];
 
-export function formatPsClmOrderNo(orderNo: string, sequence: number) {
+function getOrderType(orderNo: string) {
     const type = String(orderNo || '')
         .trim()
-        .slice(0, 2)
+        .charAt(0)
         .toUpperCase();
+    return type === 'E' || type === 'S' ? type : '';
+}
+
+export function formatPsClmOrderNo(orderNo: string, sequence: number) {
+    const type = getOrderType(orderNo);
     const prefix = ORDER_PREFIXES[type];
     if (!prefix) return '';
 
     const index = sequence - 1;
     const suffix =
-        type === 'ET'
+        type === 'E'
             ? `${letterAt(Math.floor(index / 999))}${String((index % 999) + 1).padStart(3, '0')}`
             : `${letterAt(Math.floor(index / 234))}0${letterAt(Math.floor(index / 9) % 26)}${(index % 9) + 1}`;
     return addOrderCheckBit(`${prefix}${suffix}`);
@@ -35,19 +50,27 @@ export function nextPsClmOrderNo(
     orderNo: string,
     usedOrders: Iterable<string>,
 ) {
-    const type = String(orderNo || '')
-        .trim()
-        .slice(0, 2)
-        .toUpperCase();
+    const type = getOrderType(orderNo);
     if (!ORDER_PREFIXES[type]) return '';
 
     const used = new Set(usedOrders);
-    const limit = type === 'ET' ? 26 * 999 : 26 * 234;
+    const limit = type === 'E' ? 26 * 999 : 26 * 234;
     for (let sequence = 1; sequence <= limit; sequence++) {
         const candidate = formatPsClmOrderNo(orderNo, sequence);
         if (!used.has(candidate)) return candidate;
     }
     throw new Error(`New order number range for ${type} is full`);
+}
+
+export function formatPsClmProject(
+    claimSlipNo: string,
+    claimTypes: Iterable<string>,
+) {
+    const types = [...new Set(claimTypes)];
+    if (types.length !== 1 || !['1', '2'].includes(types[0])) {
+        throw new Error('All details must use one Claim Type');
+    }
+    return `${String(claimSlipNo).trim().toUpperCase()} ${types[0] === '1' ? '#VENDOR' : '#SUBCON'}`;
 }
 
 function letterAt(index: number) {
@@ -79,6 +102,11 @@ function addOrderCheckBit(orderNo: string) {
 
 @Injectable()
 export class PsClmService {
+    private readonly as400PrimaryLibrary = AS400_PRIMARY_LIBRARY;
+    private readonly as400WriteLibraries = [
+        ...new Set([this.as400PrimaryLibrary, AS400_DEBUG_LIBRARY]),
+    ];
+
     constructor(
         private readonly repo: PsClmRepository,
         private readonly formmstService: FormmstService,
@@ -86,9 +114,18 @@ export class PsClmService {
         private readonly doactionService: DoactionFlowService,
         private readonly flowService: FlowService,
         private readonly usersService: UsersService,
+        private readonly as400: ConectionService,
+        private readonly m001kpService: M001kpService,
+        private readonly m002kpService: M002kpService,
+        private readonly mailService: MailService,
+        private readonly handleFileFormService: HandleFileFormService,
     ) {}
 
-    async create(dto: CreatePsClmReqFormDto, ip: string) {
+    async create(
+        dto: CreatePsClmReqFormDto,
+        files: Express.Multer.File[],
+        ip: string,
+    ) {
         const formmst =
             await this.formmstService.getFormMasterByVaname('PS-CLM');
         if (!formmst) {
@@ -98,27 +135,34 @@ export class PsClmService {
         }
 
         const details = this.parseDetails(dto.DETAILS);
+        const claimSlipNumbers = [
+            ...new Set(
+                details.map((detail) =>
+                    String(
+                        (detail as any).SCLNO ??
+                            (detail as any).ISSUECARD ??
+                            '',
+                    )
+                        .trim()
+                        .toUpperCase(),
+                ),
+            ),
+        ].filter(Boolean);
+        if (claimSlipNumbers.length !== 1) {
+            throw new Error('One request/order must use one Claim Slip No.');
+        }
         const originalOrder = String(
             details.find(
-                (detail) =>
-                    ORDER_PREFIXES[
-                        String(detail.ORDERNO || '')
-                            .trim()
-                            .slice(0, 2)
-                            .toUpperCase()
-                    ],
+                (detail) => ORDER_PREFIXES[getOrderType(detail.ORDERNO)],
             )?.ORDERNO || '',
         );
         if (!originalOrder) {
-            throw new Error('Original Order must start with ET or ST');
+            throw new Error('Original Order must start with E or S');
         }
 
         await this.repo.lockForms();
-        const type = originalOrder.trim().slice(0, 2).toUpperCase();
-        const newOrderNo = nextPsClmOrderNo(
-            originalOrder,
-            await this.repo.findNewOrders(ORDER_PREFIXES[type]),
-        );
+        const { newOrderNo, duplicateOrderNo } =
+            await this.allocateNewOrder(originalOrder);
 
         const createForm = await this.formCreateService.create(
             {
@@ -153,28 +197,64 @@ export class PsClmService {
         });
 
         const list = await this.saveDetails(form, details);
+        const attachments = files?.length
+            ? await this.handleFileFormService.insertFiles(
+                  {
+                      ...form,
+                      FORM_TYPE: 'PS',
+                      CREATEBY: dto.INPUTBY || dto.REQBY,
+                  },
+                  files,
+              )
+            : null;
+        await this.mailService.sendMail(
+            await this.getRequestMail(
+                form,
+                dto.REQBY,
+                newOrderNo,
+                duplicateOrderNo,
+            ),
+        );
 
         return {
             status: true,
             message: 'PS-CLM form created successfully',
-            data: { form, psclmForm, list, NEWORDER: newOrderNo },
+            data: {
+                form,
+                psclmForm,
+                list,
+                attachments,
+                NEWORDER: newOrderNo,
+            },
         };
     }
 
     async nextOrder(orderNo: string) {
-        const type = String(orderNo || '')
-            .trim()
-            .slice(0, 2)
-            .toUpperCase();
+        const type = getOrderType(orderNo);
         if (!ORDER_PREFIXES[type]) {
-            throw new Error('Original Order must start with ET or ST');
+            throw new Error('Original Order must start with E or S');
         }
+        const { newOrderNo } = await this.allocateNewOrder(orderNo);
         return {
             status: true,
-            newOrderNo: nextPsClmOrderNo(
-                orderNo,
-                await this.repo.findNewOrders(ORDER_PREFIXES[type]),
-            ),
+            newOrderNo,
+        };
+    }
+
+    private async allocateNewOrder(orderNo: string) {
+        const prefix = ORDER_PREFIXES[getOrderType(orderNo)];
+        const [formOrders, as400Orders] = await Promise.all([
+            this.repo.findNewOrders(prefix),
+            this.m001kpService.findOrderNumbersByPrefix(prefix),
+        ]);
+        const formOrderNo = nextPsClmOrderNo(orderNo, formOrders);
+        const newOrderNo = nextPsClmOrderNo(orderNo, [
+            ...formOrders,
+            ...as400Orders,
+        ]);
+        return {
+            newOrderNo,
+            duplicateOrderNo: formOrderNo === newOrderNo ? '' : formOrderNo,
         };
     }
 
@@ -206,6 +286,75 @@ export class PsClmService {
         };
     }
 
+    async previewAs400(dto: SendPsClmAs400Dto) {
+        const { newOrder, details, schedule, priority, claimSlipNo } =
+            await this.getAs400WriteContext(dto);
+
+        const related = await this.m002kpService.previewInsert(
+            newOrder,
+            schedule,
+            priority,
+            claimSlipNo,
+        );
+        const m001 = this.m001kpService.previewInsert(newOrder, details);
+
+        return {
+            status: true,
+            message: `Preview only: no data was written to ${this.as400WriteLibraries.join(' or ')}`,
+            data: {
+                libraries: this.as400WriteLibraries,
+                m001,
+                ...related,
+            },
+        };
+    }
+
+    async sendToAs400(dto: SendPsClmAs400Dto) {
+        const { newOrder, details, schedule, priority, claimSlipNo } =
+            await this.getAs400WriteContext(dto);
+        await this.updateDetailSchedules(this.pickForm(dto), dto.DETAILS);
+
+        const result = await this.as400.withTransaction(async (connection) => {
+            const related = await this.m002kpService.copyToLibraries(
+                connection,
+                newOrder,
+                schedule,
+                priority,
+                claimSlipNo,
+                this.as400WriteLibraries,
+            );
+            const m001 = await this.m001kpService.addToLibraries(
+                connection,
+                newOrder,
+                details,
+                this.as400WriteLibraries,
+            );
+            return { m001, ...related };
+        });
+
+        return {
+            status: true,
+            message: `${newOrder} sent to ${this.as400WriteLibraries.join(' and ')} successfully`,
+            data: result,
+        };
+    }
+
+    async checkAs400Order(dto: SendPsClmAs400Dto) {
+        const { originalOrder } = await this.getAs400PreviewContext(dto);
+        const rows = await this.m002kpService.checkOrder(originalOrder);
+        return {
+            status: true,
+            message: rows.length
+                ? `Order found in ${this.as400PrimaryLibrary}.${M002_TABLE}`
+                : `Order not found in ${this.as400PrimaryLibrary}.${M002_TABLE}`,
+            data: {
+                library: `${this.as400PrimaryLibrary}.${M002_TABLE}`,
+                condition: `M2K02 = ${originalOrder}`,
+                rows,
+            },
+        };
+    }
+
     findOne(dto: FormDto) {
         return this.repo.findOneWithList(dto);
     }
@@ -217,6 +366,96 @@ export class PsClmService {
             status: true,
             message: 'Get PS-CLM report success',
             datareport,
+        };
+    }
+
+    private async getAs400PreviewContext(dto: SendPsClmAs400Dto) {
+        const form = this.pickForm(dto);
+        const ready = await this.flowService.getEmpFlowStepReady({
+            ...form,
+            EMPNO: dto.EMPNO,
+        });
+        if (
+            !ready.some((flow) => String(flow.CEXTDATA || '').trim() === '02')
+        ) {
+            throw new Error('Only the assigned controller can check AS400');
+        }
+
+        const data = await this.repo.findOneWithList(form);
+        const details = this.parseDetails(dto.DETAILS).map((detail) =>
+            this.toDetailEntity(form, detail),
+        ) as PSCLM_DETAIL[];
+        const originalOrders = [
+            ...new Set(
+                details.map((detail) =>
+                    String(detail.ORDERNO || '')
+                        .trim()
+                        .toUpperCase(),
+                ),
+            ),
+        ].filter(Boolean);
+        if (originalOrders.length !== 1) {
+            throw new Error('All details must use one Original Order');
+        }
+        return {
+            newOrder: String(data?.NEWORDER || '')
+                .trim()
+                .toUpperCase(),
+            details,
+            originalOrder: originalOrders[0],
+        };
+    }
+
+    private async getAs400WriteContext(dto: SendPsClmAs400Dto) {
+        const context = await this.getAs400PreviewContext(dto);
+        if (!context.newOrder) throw new Error('New Order not found');
+        if (
+            context.details.some(
+                (detail) =>
+                    !/^[A-Z0-9]{5}$/i.test(
+                        String(detail.SCHDNUM || '').trim(),
+                    ) || !/^P\d+$/i.test(String(detail.SCHDP || '').trim()),
+            )
+        ) {
+            throw new Error('Schedule and P are required for every item');
+        }
+        const schedules = [
+            ...new Set(
+                context.details.map((detail) =>
+                    String(detail.SCHDNUM).trim().toUpperCase(),
+                ),
+            ),
+        ];
+        const priorities = [
+            ...new Set(
+                context.details.map((detail) =>
+                    String(detail.SCHDP).trim().toUpperCase(),
+                ),
+            ),
+        ];
+        if (schedules.length !== 1 || priorities.length !== 1) {
+            throw new Error('All details must use one Schedule and P');
+        }
+        const claimSlipNumbers = [
+            ...new Set(
+                context.details.map((detail) =>
+                    String(detail.SCLNO || '')
+                        .trim()
+                        .toUpperCase(),
+                ),
+            ),
+        ].filter(Boolean);
+        if (claimSlipNumbers.length !== 1) {
+            throw new Error('All details must use one Claim Slip No.');
+        }
+        const claimTypes = context.details
+            .map((detail) => String(detail.SCLTYPE || '').trim())
+            .filter(Boolean);
+        return {
+            ...context,
+            schedule: schedules[0],
+            priority: priorities[0],
+            claimSlipNo: formatPsClmProject(claimSlipNumbers[0], claimTypes),
         };
     }
 
@@ -250,6 +489,56 @@ export class PsClmService {
             VAPVNO: empno,
         });
         if (!update.status) throw new Error(update.message);
+    }
+
+    private async getRequestMail(
+        form: FormDto,
+        requester: string,
+        newOrder: string,
+        duplicateOrderNo = '',
+    ) {
+        const empno = String(requester || '').trim();
+        const user = empno && (await this.usersService.findEmp(empno));
+        if (!user?.SRECMAIL)
+            throw new Error(`PS-CLM email not found for requester: ${empno}`);
+
+        const cc = await this.getRequestMailCc(user.SRECMAIL);
+
+        const formNo = `PS-CLM${String(form.CYEAR2).slice(-2)}-${String(form.NRUNNO).padStart(6, '0')}`;
+        const duplicateNotice = duplicateOrderNo
+            ? `<p><strong>Duplicate New Order detected in RTNLIBF.M001KPBM.</strong></p><p>New Order changed from ${duplicateOrderNo} to ${newOrder}.</p>`
+            : '';
+        return {
+            to: user.SRECMAIL,
+            cc,
+            subject: `${formNo} created${duplicateOrderNo ? ' - duplicate New Order changed' : ''}`,
+            html: `<p>${formNo} has been created.</p>${duplicateNotice}<p>New Order: ${newOrder}</p><p>This is an automated email.</p>`,
+        };
+    }
+
+    private async getRequestMailCc(requesterEmail: string) {
+        const empnos = [...new Set(REQUEST_MAIL_CC_EMPNOS)];
+        const users = await Promise.all(
+            empnos.map((empno) => this.usersService.findEmp(empno)),
+        );
+        const missing = empnos.filter((_, index) => !users[index]?.SRECMAIL);
+        if (missing.length) {
+            throw new Error(
+                `PS-CLM email not found for CC: ${missing.join(', ')}`,
+            );
+        }
+        const requester = requesterEmail.trim().toLowerCase();
+
+        return [
+            ...new Map(
+                users
+                    .map((user) => String(user?.SRECMAIL || '').trim())
+                    .filter(
+                        (email) => email && email.toLowerCase() !== requester,
+                    )
+                    .map((email) => [email.toLowerCase(), email]),
+            ).values(),
+        ];
     }
 
     private saveDetails(

@@ -1,7 +1,36 @@
 import { FiltersDto } from 'src/common/dto/filter.dto';
 
+function normalizeDateFilter(value: any, isEnd = false) {
+    if (value instanceof Date) {
+        const date = new Date(value);
+        if (isEnd) {
+            date.setHours(23, 59, 59, 999);
+        } else {
+            date.setHours(0, 0, 0, 0);
+        }
+        return date;
+    }
+
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value)) {
+        const [year, month, day] = value.split('-').map(Number);
+        const date = new Date(year, month - 1, day);
+        if (isEnd) {
+            date.setHours(23, 59, 59, 999);
+        } else {
+            date.setHours(0, 0, 0, 0);
+        }
+        return date;
+    }
+
+    return value;
+}
+
 export async function applyDynamicFilters(qb, filters: any, alias: string) {
     if (!filters) return;
+
+    const directFilters: Array<{ key: string; value: any }> = [];
+    const rangeFilters = new Map<string, { start?: any; end?: any }>();
+
     for (const key of Object.keys(filters)) {
         const value = filters[key];
 
@@ -11,48 +40,78 @@ export async function applyDynamicFilters(qb, filters: any, alias: string) {
             !Array.isArray(value) &&
             Object.prototype.toString.call(value) === '[object Object]'
         ) {
-            // Case 1: Nested Relation (e.g., "timeline": { ... })
             await applyDynamicFilters(qb, value, key);
-        } else {
-            // Case 2: Actual Condition (e.g., "INQ_STATUS": ">20")
-            let visual_key = key;
-            if (key.startsWith('START_') || key.startsWith('END_')) {
-                visual_key = key.replace('START_', '').replace('END_', '');
-            }
-            const paramName = `${alias}_${visual_key}_${Math.random().toString(36).substring(7)}`;
-            const { sql, params } = await parseCondition(
-                alias,
-                visual_key,
-                value,
-                paramName,
-            );
+            continue;
+        }
 
-            if (sql) {
-                // Convert date string parameters to Date objects
-                const processedParams = {};
-                for (const [paramKey, paramValue] of Object.entries(params)) {
-                    // Check if the value looks like a date string (YYYY-MM-DD format)
-                    if (
-                        typeof paramValue === 'string' &&
-                        /^\d{4}-\d{2}-\d{2}/.test(paramValue)
-                    ) {
-                        //processedParams[paramKey] = new Date(paramValue);
-                        const [year, month, day] = paramValue
-                            .split('-')
-                            .map(Number);
-                        const localDate = new Date(year, month - 1, day);
-                        if (key.startsWith('END_')) {
-                            localDate.setHours(23, 59, 59, 999);
-                        } else {
-                            localDate.setHours(0, 0, 0, 0);
-                        }
-                        processedParams[paramKey] = localDate;
-                    } else {
-                        processedParams[paramKey] = paramValue;
-                    }
+        if (key.startsWith('START_') || key.startsWith('END_')) {
+            const field = key.replace(/^START_/, '').replace(/^END_/, '');
+            const currentRange = rangeFilters.get(field) ?? {};
+
+            if (key.startsWith('START_')) currentRange.start = value;
+            else currentRange.end = value;
+
+            rangeFilters.set(field, currentRange);
+            continue;
+        }
+
+        directFilters.push({ key, value });
+    }
+
+    for (const { key, value } of directFilters) {
+        const visual_key = key;
+        const paramName = `${alias}_${visual_key}_${Math.random().toString(36).substring(7)}`;
+        const { sql, params } = await parseCondition(
+            alias,
+            visual_key,
+            value,
+            paramName,
+        );
+
+        if (sql) {
+            const processedParams = {};
+            for (const [paramKey, paramValue] of Object.entries(params)) {
+                if (
+                    typeof paramValue === 'string' &&
+                    /^\d{4}-\d{2}-\d{2}/.test(paramValue)
+                ) {
+                    processedParams[paramKey] = normalizeDateFilter(
+                        paramValue,
+                        paramKey.includes('_end') || key.startsWith('END_'),
+                    );
+                } else {
+                    processedParams[paramKey] = paramValue;
                 }
-                qb.andWhere(sql, processedParams);
             }
+            qb.andWhere(sql, processedParams);
+        }
+    }
+
+    for (const [field, range] of rangeFilters.entries()) {
+        const hasStart = range.start !== undefined && range.start !== null;
+        const hasEnd = range.end !== undefined && range.end !== null;
+
+        if (!hasStart && !hasEnd) continue;
+
+        const paramName = `${alias}_${field}_${Math.random().toString(36).substring(7)}`;
+        const params: Record<string, any> = {};
+        const conditions: string[] = [];
+
+        if (hasStart) {
+            params[`${paramName}_start`] = normalizeDateFilter(
+                range.start,
+                false,
+            );
+            conditions.push(`${alias}.${field} >= :${paramName}_start`);
+        }
+
+        if (hasEnd) {
+            params[`${paramName}_end`] = normalizeDateFilter(range.end, true);
+            conditions.push(`${alias}.${field} <= :${paramName}_end`);
+        }
+
+        if (conditions.length > 0) {
+            qb.andWhere(conditions.join(' AND '), params);
         }
     }
 }

@@ -4,7 +4,7 @@ import { DataSource } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { JigMaster } from 'src/common/Entities/iedoc/table/jig_master.entity';
 import { JigInspection } from 'src/common/Entities/iedoc/table/jig_inspection.entity';
-import { User } from 'src/amec/users/entities/user.entity';
+
 
 @Injectable()
 export class JigRepository extends BaseRepository {
@@ -36,7 +36,6 @@ export class JigRepository extends BaseRepository {
     getDashboardMaster() {
         return this.getRepository(JigMaster)
             .createQueryBuilder('J')
-            .leftJoin(User, 'U', 'TRIM(U.SEMPNO) = TRIM(J.PIC_EMPNO)')
             .select([
                 'J.JIG_NO AS "JIG_NO"',
                 'J.JIG_NAME AS "JIG_NAME"',
@@ -49,7 +48,6 @@ export class JigRepository extends BaseRepository {
                 'J.PARTS AS "PARTS"',
                 'J.PROCESS_CODE AS "PROCESS_CODE"',
                 'J.PIC_EMPNO AS "PIC_EMPNO"',
-                'U.SNAME AS "PIC_NAME"',
                 'J.INSPEC_PERIOD AS "INSPEC_PERIOD"',
                 'J.NEXT_INSPEC_DATE AS "NEXT_INSPEC_DATE"',
                 'J.JIG_STATUS AS "JIG_STATUS"',
@@ -77,24 +75,21 @@ export class JigRepository extends BaseRepository {
             .getRawMany();
     }
 
-    async finishInspection(inspecId: number, inspecDate?: Date) {
+    async finishInspection(inspecId: number, inspecDate?: Date, updateBy?: string) {
         return this.iedocDs.transaction(async manager => {
             const inspection = await manager.findOne(JigInspection, {
                 where: { INSPEC_ID: inspecId },
             });
-
             if (!inspection) return null;
 
             const jig = await manager.findOne(JigMaster, {
                 where: { JIG_NO: inspection.JIG_NO },
             });
-
             if (!jig) return null;
 
             inspection.INSPEC_STATUS = 'FINISH';
             inspection.INSPEC_DATE = inspecDate || new Date();
             inspection.UPDATE_DATE = new Date();
-
             await manager.save(JigInspection, inspection);
 
             const nextDate = new Date(inspection.SCHEDULE_DATE);
@@ -102,8 +97,8 @@ export class JigRepository extends BaseRepository {
             nextDate.setDate(1);
 
             jig.NEXT_INSPEC_DATE = nextDate;
+            jig.UPDATE_BY = updateBy || null;
             jig.UPDATE_DATE = new Date();
-
             await manager.save(JigMaster, jig);
 
             return { inspection, jig };

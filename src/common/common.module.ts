@@ -38,6 +38,7 @@ import { PDFModule } from './services/pdf/pdf.module';
 import { QrcodeModule } from './services/qrcode/qrcode.module';
 import { RedisModule } from './redis/redis.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
+import iedocConfig from './databases/iedoc.config';
 @Module({
     imports: [
         ScheduleModule.forRoot(),
@@ -61,6 +62,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
         TypeOrmModule.forRootAsync(workloadConfig),
         TypeOrmModule.forRootAsync(purConfig),
         TypeOrmModule.forRootAsync(fingerConfig),
+        TypeOrmModule.forRootAsync(iedocConfig),
         RedisModule,
         SchedulerModule,
         LoggerModule,

@@ -192,6 +192,7 @@ export class JigService {
                 dto.INSPEC_DATE
                     ? new Date(dto.INSPEC_DATE)
                     : undefined,
+                dto.UPDATE_BY,
             );
 
         if (!result) {

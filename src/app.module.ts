@@ -41,6 +41,7 @@ import { DatacenterModule } from './datacenter/datacenter.module';
 import { GeneralPartListModule } from './general-part-list/general-part-list.module';
 import { MfgReportModule } from './mfgreport/mfgreport.module';
 import { CountriesModule } from './countries/countries.module';
+import { InnovatModule } from './innovat/innovat.module';
 
 @Module({
     imports: [
@@ -76,6 +77,7 @@ import { CountriesModule } from './countries/countries.module';
         DatacenterModule,
         GeneralPartListModule,
         CountriesModule,
+        InnovatModule,
     ],
     providers: [
         HttpLoggingInterceptor,

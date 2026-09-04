@@ -49,8 +49,9 @@ export class JigRepository extends BaseRepository {
                 J.PIC_EMPNO AS "PIC_EMPNO",
                 U.SNAME AS "PIC_NAME",
                 J.INSPEC_PERIOD AS "INSPEC_PERIOD",
-                J.NEXT_INSPEC_DATE AS "NEXT_INSPEC_DATE",
+                TO_CHAR(J.NEXT_INSPEC_DATE, 'DD/MM/YYYY') AS "NEXT_INSPEC_DATE",
                 J.JIG_STATUS AS "JIG_STATUS",
+                TO_CHAR(J.CREATE_DATE, 'DD/MM/YYYY') AS "CREATE_DATE",
                 J.REMARK AS "REMARK"
             FROM JIG_MASTER J
             LEFT JOIN AMEC.AMECUSERALL U ON TRIM(U.SEMPNO) = TRIM(J.PIC_EMPNO)

@@ -53,12 +53,8 @@ export class JigService {
     }
 
     async getDashboard(fyear?: number) {
-        const fiscalYear =
-            fyear || this.getCurrentFiscalYear();
-
-        const { startDate, endDate } =
-            this.getFiscalPeriod(fiscalYear);
-
+        const fiscalYear = fyear || this.getCurrentFiscalYear();
+        const { startDate, endDate } = this.getFiscalPeriod(fiscalYear);
         const [masters, inspections] =
             await Promise.all([
                 this.jigRepository.getDashboardMaster(),
@@ -69,39 +65,26 @@ export class JigService {
             ]);
 
         const items = masters.map(jig => {
-            const jigInspections = inspections.filter(
-                inspection =>
-                    inspection.JIG_NO === jig.JIG_NO,
-            );
-
-            const status = this.getDashboardStatus(
-                jig.NEXT_INSPEC_DATE,
-            );
+            const jigInspections = inspections.filter(inspection => inspection.JIG_NO === jig.JIG_NO, );
+            const status = this.getDashboardStatus(jig.NEXT_INSPEC_DATE,);
+            const createDate = jig.CREATE_DATE ? new Date(jig.CREATE_DATE) : null;
+            const isNewJig =
+                createDate &&
+                createDate >= startDate &&
+                createDate < endDate;
 
             return {
                 ...jig,
                 DASHBOARD_STATUS: status,
+                IS_NEW_JIG: !!isNewJig,
                 INSPECTIONS: jigInspections,
             };
         });
 
-        const completed = items.filter(item =>
-            item.INSPECTIONS.some(
-                inspection =>
-                    inspection.INSPEC_STATUS === 'FINISH',
-            ),
-        ).length;
-
-        const dueSoon = items.filter(
-            item =>
-                item.DASHBOARD_STATUS === 'DUE_SOON',
-        ).length;
-
-        const overdue = items.filter(
-            item =>
-                item.DASHBOARD_STATUS === 'OVERDUE',
-        ).length;
-
+        const completed = items.filter(item => item.INSPECTIONS.some(inspection => inspection.INSPEC_STATUS === 'FINISH',),).length;
+        const dueSoon = items.filter( item => item.DASHBOARD_STATUS === 'DUE_SOON',).length;
+        const overdue = items.filter(item => item.DASHBOARD_STATUS === 'OVERDUE',).length;
+        const newJig = items.filter(item => item.IS_NEW_JIG,).length;
         return {
             fyear: fiscalYear,
             period: {
@@ -116,28 +99,20 @@ export class JigService {
                 remain: items.length - completed,
                 dueSoon,
                 overdue,
+                newJig,
             },
             items,
         };
     }
 
     async createJig(dto: CreateJigDto) {
-        const exists =
-            await this.jigRepository.findMaster(
-                dto.JIG_NO,
-            );
-
+        const exists = await this.jigRepository.findMaster(dto.JIG_NO,);
         if (exists) {
-            throw new ConflictException(
-                `JIG_NO ${dto.JIG_NO} already exists`,
-            );
+            throw new ConflictException(`JIG_NO ${dto.JIG_NO} already exists`,);
         }
 
-        const nextInspection =
-            new Date(dto.NEXT_INSPEC_DATE);
-
+        const nextInspection = new Date(dto.NEXT_INSPEC_DATE);
         nextInspection.setDate(1);
-
         return this.jigRepository.createMaster({
             JIG_NO: dto.JIG_NO,
             JIG_NAME: dto.JIG_NAME,
@@ -145,9 +120,7 @@ export class JigService {
             JIG_QTY: dto.JIG_QTY ?? null,
             PRICE: dto.PRICE ?? null,
             MAKER: dto.MAKER || null,
-            START_USE_DATE: dto.START_USE_DATE
-                ? new Date(dto.START_USE_DATE)
-                : null,
+            START_USE_DATE: dto.START_USE_DATE ? new Date(dto.START_USE_DATE) : null,
             ITEMNO: dto.ITEMNO || null,
             PARTS: dto.PARTS || null,
             PROCESS_CODE: dto.PROCESS_CODE || null,
@@ -163,54 +136,34 @@ export class JigService {
         });
     }
 
-    async finishInspection(
-        inspecId: number,
-        dto: FinishInspectionDto,
-    ) {
-        const inspection =
-            await this.jigRepository.findInspection(
-                inspecId,
-            );
-
+    async finishInspection(inspecId: number, dto: FinishInspectionDto, ) {
+        const inspection = await this.jigRepository.findInspection(inspecId,);
         if (!inspection) {
-            throw new NotFoundException(
-                `INSPEC_ID ${inspecId} not found`,
-            );
+            throw new NotFoundException(`INSPEC_ID ${inspecId} not found`,);
         }
 
-        if (
-            inspection.INSPEC_STATUS === 'FINISH'
-        ) {
-            throw new ConflictException(
-                `INSPEC_ID ${inspecId} is already FINISH`,
-            );
+        if (inspection.INSPEC_STATUS === 'FINISH') {
+            throw new ConflictException(`INSPEC_ID ${inspecId} is already FINISH`,);
         }
 
         const result =
             await this.jigRepository.finishInspection(
                 inspecId,
-                dto.INSPEC_DATE
-                    ? new Date(dto.INSPEC_DATE)
-                    : undefined,
+                dto.INSPEC_DATE ? new Date(dto.INSPEC_DATE) : undefined,
                 dto.UPDATE_BY,
             );
 
         if (!result) {
-            throw new NotFoundException(
-                'JIG or Inspection not found',
-            );
+            throw new NotFoundException('JIG or Inspection not found',);
         }
 
         return {
             message: 'Inspection finished successfully',
             INSPEC_ID: result.inspection.INSPEC_ID,
             JIG_NO: result.jig.JIG_NO,
-            INSPEC_STATUS:
-                result.inspection.INSPEC_STATUS,
-            INSPEC_DATE:
-                result.inspection.INSPEC_DATE,
-            NEXT_INSPEC_DATE:
-                result.jig.NEXT_INSPEC_DATE,
+            INSPEC_STATUS: result.inspection.INSPEC_STATUS,
+            INSPEC_DATE: result.inspection.INSPEC_DATE,
+            NEXT_INSPEC_DATE: result.jig.NEXT_INSPEC_DATE,
         };
     }
 }

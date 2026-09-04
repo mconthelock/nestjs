@@ -28,6 +28,7 @@ import sdsysConfig from './databases/sdsys.config';
 import spsysConfig from './databases/spsys.config';
 import webformConfig from './databases/webform.config';
 import workloadConfig from './databases/workload.config';
+import innovatConfig from './databases/innovat.config';
 
 //Other Services
 import { FilesModule } from './services/file/file.module';
@@ -61,6 +62,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
         TypeOrmModule.forRootAsync(workloadConfig),
         TypeOrmModule.forRootAsync(purConfig),
         TypeOrmModule.forRootAsync(fingerConfig),
+        TypeOrmModule.forRootAsync(innovatConfig),
         RedisModule,
         SchedulerModule,
         LoggerModule,

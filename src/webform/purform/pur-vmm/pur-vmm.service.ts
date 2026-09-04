@@ -80,6 +80,7 @@ export class PurVmmService {
             CURCODE: dataeva.CURCODE,
             TERMCODE: dataeva.TERMCODE,
             VNALPH: dataeva.COMNAME.slice(0, 10),
+            VPAYTO: dataeva.VENDCODE,
             CONTACT: dataeva.CONTACT,
             EMAIL: dataeva.EMAIL,
             WEBSITE: dataeva.WEBSITE,

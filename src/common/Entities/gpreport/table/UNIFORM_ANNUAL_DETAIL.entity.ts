@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { AnnualUniform } from './UNIFORM_ANNUAL.entity';
 
 @Entity({ name: 'UNIFORM_ANNUAL_DETAIL', schema: 'GPREPORT' })
-export class UNIFORM_ANNUAL_DETAIL {
+export class AnnualUniformDetail {
     @PrimaryColumn()
     REQL_YEAR: number;
 
@@ -25,4 +26,11 @@ export class UNIFORM_ANNUAL_DETAIL {
 
     @Column()
     DISCOUNT: number;
+
+    @ManyToOne(() => AnnualUniform, (annual) => annual.details)
+    @JoinColumn([
+        { name: 'REQL_YEAR', referencedColumnName: 'REQ_YEAR' },
+        { name: 'REQL_USER', referencedColumnName: 'REQ_USER' },
+    ])
+    annual: AnnualUniform;
 }

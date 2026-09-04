@@ -75,6 +75,9 @@ export class Products {
     @Column({ type: 'simple-json', nullable: true, default: {} })
     EXTRA_ATTRIBUTES: Record<string, any>;
 
+    @Column()
+    IS_VENDING: string;
+
     @ManyToOne(() => Categories, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'CATEGORY_ID' })
     category: Categories;

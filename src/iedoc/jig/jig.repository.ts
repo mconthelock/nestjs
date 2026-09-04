@@ -36,6 +36,7 @@ export class JigRepository extends BaseRepository {
     getDashboardMaster() {
         return this.getRepository(JigMaster)
             .createQueryBuilder('J')
+            .leftJoin('AMECUSERALL', 'U', 'TRIM(U.SEMPNO) = TRIM(J.PIC_EMPNO)')
             .select([
                 'J.JIG_NO AS "JIG_NO"',
                 'J.JIG_NAME AS "JIG_NAME"',
@@ -48,6 +49,7 @@ export class JigRepository extends BaseRepository {
                 'J.PARTS AS "PARTS"',
                 'J.PROCESS_CODE AS "PROCESS_CODE"',
                 'J.PIC_EMPNO AS "PIC_EMPNO"',
+                'U.SNAME AS "PIC_NAME"',
                 'J.INSPEC_PERIOD AS "INSPEC_PERIOD"',
                 'J.NEXT_INSPEC_DATE AS "NEXT_INSPEC_DATE"',
                 'J.JIG_STATUS AS "JIG_STATUS"',

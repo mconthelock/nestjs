@@ -1,4 +1,16 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+    Entity,
+    PrimaryColumn,
+    Column,
+    ManyToOne,
+    JoinColumn,
+    OneToOne,
+    OneToMany,
+} from 'typeorm';
+
+import { Vendors } from 'src/common/Entities/pursys/table/VENDORS.entity';
+import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
+import { PURNVF_ADDRESS } from './PURNVF_ADDRESS.entity';
 
 @Entity({ name: 'PURVMM_FORM', schema: 'WEBFORM' })
 export class PURVMM_FORM {
@@ -30,6 +42,9 @@ export class PURVMM_FORM {
     VENDGROUPTYPE: string;
 
     @Column()
+    VENDCAT: string;
+
+    @Column()
     TAXID: string;
 
     @Column()
@@ -42,25 +57,37 @@ export class PURVMM_FORM {
     CURCODE: string;
 
     @Column()
-    PAYMENTTYPE: string;
+    VPAYTO: string;
 
     @Column()
-    VENDHOLD: string;
+    VTYPE: string;
 
     @Column()
-    VENDONETIME: string;
-
-    @Column()
-    VEND1099: string;
+    VPAYTY: string;
 
     @Column()
     TERMCODE: string;
 
     @Column()
-    SEARCHKEY: string;
+    V1TIME: string;
 
     @Column()
-    FISCALCODE: string;
+    VNALPH: string;
+
+    @Column()
+    CONTACT: string;
+
+    @Column()
+    EMAIL: string;
+
+    @Column()
+    WEBSITE: string;
+
+    @Column()
+    TELNO: string;
+
+    @Column()
+    FAX: string;
 
     @Column()
     ACCNUMBER: string;
@@ -70,4 +97,30 @@ export class PURVMM_FORM {
 
     @Column()
     BRANCH: string;
+
+    @Column()
+    BANKADDR: string;
+
+    @Column()
+    ATTACH_OTHER: string;
+
+    @ManyToOne(() => Vendors, (vendor) => vendor.PURVMM)
+    @JoinColumn({ name: 'VENDCODE', referencedColumnName: 'VND_CODE' })
+    VENDER: Vendors;
+
+    @OneToOne(() => FORM)
+    @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+    @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
+    @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
+    @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+    @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+    FORM: FORM;
+
+    @OneToMany(() => PURNVF_ADDRESS, (address) => address.purvmmForm)
+    @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+    @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
+    @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
+    @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+    @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+    ADDRESSES: PURNVF_ADDRESS[];
 }

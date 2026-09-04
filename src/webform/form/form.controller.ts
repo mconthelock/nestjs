@@ -44,51 +44,16 @@ export class FormController {
         return this.formService.findOne(+fno, orgno, cyear, cyear2, +nrunno);
     }
 
-    @Get('count/waitforapprove/:empno')
-    countwaitforapprove(@Param('empno') empno: string) {
-        return this.formService.countFlow({
-            flow: { VREPNO: empno, CSTEPST: '3' },
-        });
-    }
-
-    @Get('count/coming/:empno')
-    countcoming(@Param('empno') empno: string) {
-        return this.formService.countFlow({
-            flow: { VREPNO: empno, CSTEPST: '2' },
-        });
-    }
-
-    @Get('count/approved/:empno/:year')
-    countapproved(@Param('empno') empno: string, @Param('year') year: string) {
-        return this.formService.countFlow({
-            flow: { VREALAPV: empno, CSTEPST: '> 3' },
-            //   form: { CYEAR2: year },
-        });
-    }
-
-    @Get('count/underprepare/:empno')
-    countunderprepare(@Param('empno') empno: string) {
-        return this.formService.countForm({
-            form: { VINPUTER: empno, CST: '0' },
-            flow: { CSTEPNO: '--' },
-        });
-    }
-
-    @Get('count/mine/:empno')
-    async countmine(@Param('empno') empno: string) {
-        const result = await this.formService.countForm({
-            flow: { CSTEPNO: '--' },
-            form: { VINPUTER: empno, CST: '1' },
-        });
-        const count = Array.isArray(result) ? result.length : 0;
-        console.log('Count of mine forms:', count);
-
-        return result;
-    }
-
     @Get('counter/:empno')
     async counter(@Param('empno') empno: string) {
         return this.formService.counter(empno);
+    }
+
+    //Get form list by status
+    @Get('underprepare/:empno')
+    @ApiOperation({ summary: "Get draft's form list" })
+    underprepare(@Param('empno') empno: string) {
+        return this.formService.underprepare(empno);
     }
 
     @Get('waitforapprove/:empno')
@@ -99,6 +64,14 @@ export class FormController {
         return this.formService.waitforapprove(empno);
     }
 
+    @Get('comming/:empno')
+    @ApiOperation({
+        summary: 'Get forms status running and flow step as "wait for approve"',
+    })
+    comming(@Param('empno') empno: string) {
+        return this.formService.comming(empno);
+    }
+
     @Get('mine/:empno')
     @ApiOperation({
         summary: 'Get forms status running and have empno as requester',
@@ -107,22 +80,30 @@ export class FormController {
         return this.formService.mine(empno);
     }
 
-    @Get('finish/:empno/:year')
+    @Get('approved/:empno')
+    @ApiOperation({
+        summary: 'Get forms status running and have empno as requester',
+    })
+    approved(@Param('empno') empno: string) {
+        return this.formService.approved(empno);
+    }
+
+    @Get('represent/:empno')
+    @ApiOperation({
+        summary: 'Get forms status running and have empno as requester',
+    })
+    represent(@Param('empno') empno: string) {
+        return this.formService.represent(empno);
+    }
+
+    @Get('finish/:empno')
     @ApiOperation({
         summary: 'Get forms status finished and have empno as requester',
     })
-    finish(@Param('empno') empno: string, @Param('year') year: string) {
-        return this.formService.finish(empno, year);
+    finish(@Param('empno') empno: string) {
+        return this.formService.finish(empno);
     }
-
-    @Get('underprepare/:empno')
-    @ApiOperation({
-        summary:
-            'Get forms status under preparation and have empno as requester',
-    })
-    underprepare(@Param('empno') empno: string) {
-        return this.formService.underprepare(empno);
-    }
+    // End get form list by status
 
     @Post('getFormno')
     @ApiOperation({

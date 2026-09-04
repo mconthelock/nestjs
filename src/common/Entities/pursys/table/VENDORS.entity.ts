@@ -1,4 +1,15 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    OneToMany,
+    OneToOne,
+    PrimaryColumn,
+} from 'typeorm';
+
+import { PURVMM_FORM } from 'src/common/Entities/webform/table/PURVMM_FORM.entity';
+import { PUREVA_FORM } from 'src/common/Entities/webform/table/PUREVA_FORM.entity';
+import { CurrencyMaster } from './CURRENCY_MASTER.entity';
 
 @Entity({ name: 'VENDORS', schema: 'PURSYS' })
 export class Vendors {
@@ -76,4 +87,14 @@ export class Vendors {
 
     @Column()
     UPDATE_BY: string;
+
+    @OneToOne(() => CurrencyMaster)
+    @JoinColumn({ name: 'VND_CURRENCY', referencedColumnName: 'CURR_CODE' })
+    STDCUR: CurrencyMaster;
+
+    @OneToMany(() => PURVMM_FORM, (history) => history.VENDER)
+    PURVMM: PURVMM_FORM[];
+
+    @OneToMany(() => PUREVA_FORM, (eva) => eva.VENDER)
+    PUREVA: PUREVA_FORM[];
 }

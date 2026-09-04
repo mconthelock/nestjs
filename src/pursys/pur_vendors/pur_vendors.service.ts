@@ -40,10 +40,9 @@ export class PurVendorsService {
                             'LOWER(vendor.VND_TNAME) LIKE LOWER(:KEYWORD)',
                             { KEYWORD: `%${KEYWORD}%` },
                         )
-                        .orWhere('LOWER(code.CODE_NUM) LIKE LOWER(:KEYWORD)', { 
-                        KEYWORD: `%${KEYWORD}%` 
-                        })
-                        ;
+                        .orWhere('LOWER(code.CODE_NUM) LIKE LOWER(:KEYWORD)', {
+                            KEYWORD: `%${KEYWORD}%`,
+                        });
                     if (!isNaN(Number(KEYWORD))) {
                         qbInner.orWhere('vendor.VND_ID = :id', {
                             id: Number(KEYWORD),

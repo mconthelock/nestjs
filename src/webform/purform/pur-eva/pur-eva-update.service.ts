@@ -125,7 +125,7 @@ export class PurEvaUpdateService {
                 addr.push({
                     ADDRID: addid,
                     ADDRTYPE: 'T',
-                    ADDR: data.ADDRESS_TH,
+                    ADDR1: data.ADDRESS_TH,
                 });
             }
             await this.repoaddr.deleteByAll(form);

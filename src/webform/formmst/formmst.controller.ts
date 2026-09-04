@@ -48,7 +48,7 @@ export class FormmstController {
     }
 
     // Form Group section
-    @Get('group/master')
+    @Get('group/all')
     async getFormMasterGroup() {
         return await this.formmstService.getAllGroup();
     }
@@ -61,5 +61,34 @@ export class FormmstController {
     @Post('group/update')
     async updateFormMasterGroup(@Body() groupData: UpdateFormmstGroupDto) {
         return await this.formmstService.updateFormMasterGroup(groupData);
+    }
+
+    // Form Auth section
+    @Get('auth/:NFRMNO/:VORGNO/:CYEAR')
+    async getFormAuth(
+        @Param('NFRMNO') NFRMNO: number,
+        @Param('VORGNO') VORGNO: string,
+        @Param('CYEAR') CYEAR: string,
+    ) {
+        return await this.formmstService.getFormAuth(NFRMNO, VORGNO, CYEAR);
+    }
+
+    @Get('auth/:EMPNO')
+    async getFormAuthByEmpno(@Param('EMPNO') EMPNO: string) {
+        return await this.formmstService.getFormAuthByEmpno(EMPNO);
+    }
+
+    @Post('auth/update')
+    async upsertFormAuth(
+        @Body()
+        authData: {
+            NFRMNO: number;
+            VORGNO: string;
+            CYEAR: string;
+            VEMPNO: string;
+            CAUTHNO: string;
+        },
+    ) {
+        return await this.formmstService.upsertFormAuth(authData);
     }
 }

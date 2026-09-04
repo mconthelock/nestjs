@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn } from 'typeorm';
+import { AnnualUniformDetail } from './UNIFORM_ANNUAL_DETAIL.entity';
 
 @Entity({ name: 'UNIFORM_ANNUAL', schema: 'GPREPORT' })
-export class UNIFORM_ANNUAL {
+export class AnnualUniform {
     @PrimaryColumn()
     REQ_YEAR: number;
 
@@ -9,7 +10,7 @@ export class UNIFORM_ANNUAL {
     REQ_USER: string;
 
     @Column()
-    CREATE_DATE: string;
+    CREATE_DATE: Date;
 
     @Column()
     CREATE_BY: string;
@@ -19,4 +20,11 @@ export class UNIFORM_ANNUAL {
 
     @Column()
     REMARK: string;
+
+    @OneToMany(() => AnnualUniformDetail, (d) => d.annual)
+    @JoinColumn([
+        { name: 'REQ_YEAR', referencedColumnName: 'REQL_YEAR' },
+        { name: 'REQ_USER', referencedColumnName: 'REQL_USER' },
+    ])
+    details: AnnualUniformDetail[];
 }

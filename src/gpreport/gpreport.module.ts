@@ -35,6 +35,7 @@ import { ExpatModule } from './expat/expat.module';
         StyPatrolInspectionModule,
         StinpFormModule,
         StinpFormListModule,
+        ExpatModule,
         UniformModule,
         LeaveModule,
         AttendanceModule,

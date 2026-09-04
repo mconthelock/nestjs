@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PackingListIssueService } from './packing-list-issue.service';
-import { PackingListIssueController } from './packing-list-issue.controller';
+import { MainController } from './controller/main.controller';
 import { DpmsPlIssueModule } from 'src/workload/dpms_pl_issue/dpms_pl_issue.module';
 import { PDFModule } from 'src/common/services/pdf/pdf.module';
 import { DpmsPlIssueRevModule } from 'src/workload/dpms_pl_issue_rev/dpms_pl_issue_rev.module';
@@ -11,14 +11,26 @@ import { MailModule } from 'src/common/services/mail/mail.module';
 import { DpmsPlIssueTypeModule } from 'src/workload/dpms_pl_issue_type/dpms_pl_issue_type.module';
 import { DpmsPlIssueDateModule } from 'src/workload/dpms_pl_issue_date/dpms_pl_issue_date.module';
 import {
-    PackinglistIssueProcedureDataCenterRepository,
-    PackingListIssueProcedureWorkloadRepository,
+    ProcedureDataCenterRepository,
+    ProcedureWorkloadRepository,
 } from './packing-list-issue.repository';
-import { PackingListIssueProcedureService } from './packing-list-issue-procedure.service';
+import { ProcedureService } from './services/procedure.service';
 import { DpmsPlMailModule } from 'src/workload/dpms_pl_mail/dpms_pl_mail.module';
 import { DpmsPlDocRevModule } from 'src/workload/dpms_pl_doc_rev/dpms_pl_doc_rev.module';
-import { PackingListCreateService } from './packing-list-create.service';
 import { ExcelService } from './services/excel.service';
+import { JobController } from './controller/job.controller';
+import { MarReportService } from './services/mar-report.service';
+import { ReviseVgmService } from './services/revise-vgm.service';
+import { DpmsPlWeightChangeModule } from 'src/workload/dpms_pl_weight_change/dpms_pl_weight_change.module';
+import { GenPdfService } from './services/pdf.service';
+import { IssueService } from './services/issue.service';
+import { HtmlService } from './services/html.service';
+import { PackingListCreateService } from './packing-list-create.service';
+import { S020kpModule } from 'src/datacenter/s020kp/s020kp.module';
+import { S049kpModule } from 'src/datacenter/s049kp/s049kp.module';
+import { DpmsPlOriginModule } from 'src/workload/dpms_pl_origin/dpms_pl_origin.module';
+import { ReviseShippingMarkService } from './services/revise-shipping-mark.service';
+import { ReviseMainService } from './services/revise-main.service';
 
 @Module({
     imports: [
@@ -32,17 +44,28 @@ import { ExcelService } from './services/excel.service';
         DpmsPlIssueDateModule,
         DpmsPlMailModule,
         DpmsPlDocRevModule,
+        DpmsPlWeightChangeModule,
+        DpmsPlOriginModule,
         MailModule,
+        S020kpModule,
+        S049kpModule,
     ],
-    controllers: [PackingListIssueController],
+    controllers: [MainController, JobController],
     providers: [
         PackingListIssueService,
-        PackingListIssueProcedureWorkloadRepository,
-        PackinglistIssueProcedureDataCenterRepository,
-        PackingListIssueProcedureService,
+        ProcedureWorkloadRepository,
+        ProcedureDataCenterRepository,
+        ProcedureService,
         PackingListCreateService,
+        IssueService,
+        HtmlService,
         ExcelService,
+        GenPdfService,
+        MarReportService,
+        ReviseMainService,
+        ReviseVgmService,
+        ReviseShippingMarkService,
     ],
-    exports: [PackingListIssueService, PackingListIssueProcedureService],
+    exports: [PackingListIssueService, ProcedureService],
 })
 export class PackingListIssueModule {}

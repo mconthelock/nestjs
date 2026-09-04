@@ -2,6 +2,7 @@ import {
     Column,
     Entity,
     JoinColumn,
+    ManyToOne,
     OneToMany,
     OneToOne,
     PrimaryColumn,
@@ -14,6 +15,8 @@ import { PURNVF_ADDRESS } from './PURNVF_ADDRESS.entity';
 import { VORGMST } from '../views/VORGMST.entity';
 import { TERMCODE } from '../../pursys/table/TERMCODE.entity';
 import { CurrencyMaster } from '../../pursys/table/CURRENCY_MASTER.entity';
+import { Vendors } from '../../pursys/table/VENDORS.entity';
+import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
 @Entity({ name: 'PUREVA_FORM', schema: 'WEBFORM' })
 export class PUREVA_FORM {
@@ -201,6 +204,9 @@ export class PUREVA_FORM {
     @Column()
     ATTACH_OTHER: string;
 
+    @Column()
+    NVFNO: string;
+
     @OneToMany(() => PUR_FILE, (f) => f.MASTER)
     FILES: PUR_FILE[];
 
@@ -231,4 +237,16 @@ export class PUREVA_FORM {
     @OneToOne(() => VORGMST)
     @JoinColumn({ name: 'CONCERNEDORG', referencedColumnName: 'VORGNO' })
     VORG: VORGMST;
+
+    @ManyToOne(() => Vendors, (vendor) => vendor.PUREVA)
+    @JoinColumn({ name: 'VENDCODE', referencedColumnName: 'VND_CODE' })
+    VENDER: Vendors;
+
+    @OneToOne(() => FORM)
+    @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+    @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
+    @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
+    @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+    @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+    FORM: FORM;
 }

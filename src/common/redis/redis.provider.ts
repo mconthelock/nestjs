@@ -28,14 +28,13 @@ const createRedisClient = () => {
     },
   });
 
-  client.on('connect', () => console.log(`[Redis:${process.pid}] connected`));
+  client.on('connect', () => console.log(`[Redis:${process.pid}][DB:${process.env.REDIS_DB}] connected`));
   client.on('error', (err) =>
-    console.error(`[Redis:${process.pid}] error`, err),
+    console.error(`[Redis:${process.pid}][DB:${process.env.REDIS_DB}] error`, err),
   );
   client.on('reconnecting', (delay) =>
-    console.log(`[Redis:${process.pid}] reconnecting in ${delay}ms`),
+    console.log(`[Redis:${process.pid}][DB:${process.env.REDIS_DB}] reconnecting in ${delay}ms`),
   );
-
   return client;
 };
 

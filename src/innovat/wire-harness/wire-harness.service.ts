@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { AS400Repository } from './as400.repository';
+import { WireHarnessAs400Repository } from './wire-harness-as400.repository';
 import { WireHarnessRepository } from './wire-harness.repository';
 
 @Injectable()
 export class WireHarnessService {
     constructor(
-        private readonly as400: AS400Repository,
+        private readonly as400: WireHarnessAs400Repository,
         private readonly repo: WireHarnessRepository,
     ) {}
 

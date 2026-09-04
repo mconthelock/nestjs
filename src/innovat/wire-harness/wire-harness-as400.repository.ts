@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConectionService } from 'src/as400/conection/conection.service';
 
 @Injectable()
-export class AS400Repository {
+export class WireHarnessAs400Repository {
     constructor(
         private readonly as400: ConectionService,
     ) {}

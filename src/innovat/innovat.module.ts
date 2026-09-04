@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
+import { WireHarnessModule } from './wire-harness/wire-harness.module';
 
 @Module({
-    imports: [],
+    imports: [
+        WireHarnessModule,
+    ],
 })
 export class InnovatModule {}

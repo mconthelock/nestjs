@@ -34,31 +34,29 @@ export class JigRepository extends BaseRepository {
     }
 
     getDashboardMaster() {
-        return this.getRepository(JigMaster)
-            .createQueryBuilder('J')
-            .leftJoin('AMECUSERALL', 'U', 'TRIM(U.SEMPNO) = TRIM(J.PIC_EMPNO)')
-            .select([
-                'J.JIG_NO AS "JIG_NO"',
-                'J.JIG_NAME AS "JIG_NAME"',
-                'J.DRAWING_NO AS "DRAWING_NO"',
-                'J.JIG_QTY AS "JIG_QTY"',
-                'J.PRICE AS "PRICE"',
-                'J.MAKER AS "MAKER"',
-                'J.START_USE_DATE AS "START_USE_DATE"',
-                'J.ITEMNO AS "ITEMNO"',
-                'J.PARTS AS "PARTS"',
-                'J.PROCESS_CODE AS "PROCESS_CODE"',
-                'J.PIC_EMPNO AS "PIC_EMPNO"',
-                'U.SNAME AS "PIC_NAME"',
-                'J.INSPEC_PERIOD AS "INSPEC_PERIOD"',
-                'J.NEXT_INSPEC_DATE AS "NEXT_INSPEC_DATE"',
-                'J.JIG_STATUS AS "JIG_STATUS"',
-                'J.REMARK AS "REMARK"',
-            ])
-            .where(`J.JIG_STATUS = 'ACTIVE'`)
-            .orderBy('J.NEXT_INSPEC_DATE', 'ASC')
-            .addOrderBy('J.JIG_NO', 'ASC')
-            .getRawMany();
+        return this.getRepository(JigMaster).query(`
+            SELECT 
+                J.JIG_NO AS "JIG_NO",
+                J.JIG_NAME AS "JIG_NAME",
+                J.DRAWING_NO AS "DRAWING_NO",
+                J.JIG_QTY AS "JIG_QTY",
+                J.PRICE AS "PRICE",
+                J.MAKER AS "MAKER",
+                J.START_USE_DATE AS "START_USE_DATE",
+                J.ITEMNO AS "ITEMNO",
+                J.PARTS AS "PARTS",
+                J.PROCESS_CODE AS "PROCESS_CODE",
+                J.PIC_EMPNO AS "PIC_EMPNO",
+                U.SNAME AS "PIC_NAME",
+                J.INSPEC_PERIOD AS "INSPEC_PERIOD",
+                J.NEXT_INSPEC_DATE AS "NEXT_INSPEC_DATE",
+                J.JIG_STATUS AS "JIG_STATUS",
+                J.REMARK AS "REMARK"
+            FROM JIG_MASTER J
+            LEFT JOIN AMEC.AMECUSERALL U ON TRIM(U.SEMPNO) = TRIM(J.PIC_EMPNO)
+            WHERE J.JIG_STATUS = 'ACTIVE'
+            ORDER BY J.NEXT_INSPEC_DATE ASC, J.JIG_NO ASC
+        `);
     }
 
     getInspectionByPeriod(startDate: Date, endDate: Date) {

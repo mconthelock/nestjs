@@ -48,6 +48,7 @@ export class JigRepository extends BaseRepository {
                 J.PROCESS_CODE AS "PROCESS_CODE",
                 J.PIC_EMPNO AS "PIC_EMPNO",
                 U.SNAME AS "PIC_NAME",
+                U.SSEC AS "PIC_SECTION",
                 J.INSPEC_PERIOD AS "INSPEC_PERIOD",
                 TO_CHAR(J.NEXT_INSPEC_DATE, 'DD/MM/YYYY') AS "NEXT_INSPEC_DATE",
                 J.JIG_STATUS AS "JIG_STATUS",

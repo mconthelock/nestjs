@@ -22,10 +22,10 @@ export class AnnualUniformDetail {
     @Column()
     ADJUST: string;
 
-    @Column()
+    @PrimaryColumn()
     EXTRA: string;
 
-    @Column()
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
     DISCOUNT: number;
 
     @ManyToOne(() => AnnualUniform, (annual) => annual.details)

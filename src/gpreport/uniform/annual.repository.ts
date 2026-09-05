@@ -63,5 +63,12 @@ export class AnnualUniformRepository extends BaseRepository {
         return { status: true, message: 'Annual request deleted successfully' };
     }
 
-    async createForm(data: CreateUNAFormDto) {}
+    async deleteDetail(userId: string, year: number) {
+        await this.getRepository(AnnualUniformDetail).delete({
+            REQL_USER: userId,
+            REQL_YEAR: year,
+            EXTRA: '1',
+        });
+        return { status: true, message: 'Annual request deleted successfully' };
+    }
 }

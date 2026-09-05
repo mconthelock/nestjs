@@ -10,6 +10,7 @@ import { AnnualUniformRepository } from './annual.repository';
 import { UNIFORM } from 'src/common/Entities/gpreport/table/UNIFORM.entity';
 import { UNIFORM_CATEGORY } from 'src/common/Entities/gpreport/table/UNIFORM_CATEGORY.entity';
 import { UNIFORM_RIGHT } from 'src/common/Entities/gpreport/table/UNIFORM_RIGHT.entity';
+import { UniformCalendar } from 'src/common/Entities/gpreport/table/UNIFORM_CALENDAR.entity';
 import { AnnualUniform } from 'src/common/Entities/gpreport/table/UNIFORM_ANNUAL.entity';
 import { AnnualUniformDetail } from 'src/common/Entities/gpreport/table/UNIFORM_ANNUAL_DETAIL.entity';
 
@@ -22,6 +23,7 @@ import { AnnualUniformDetail } from 'src/common/Entities/gpreport/table/UNIFORM_
                 UNIFORM_RIGHT,
                 AnnualUniform,
                 AnnualUniformDetail,
+                UniformCalendar,
             ],
             'gpreportConnection',
         ),

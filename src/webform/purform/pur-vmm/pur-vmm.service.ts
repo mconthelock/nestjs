@@ -80,6 +80,7 @@ export class PurVmmService {
             CURCODE: dataeva.CURCODE,
             TERMCODE: dataeva.TERMCODE,
             VNALPH: dataeva.COMNAME.slice(0, 10),
+            VPAYTO: dataeva.VENDCODE,
             CONTACT: dataeva.CONTACT,
             EMAIL: dataeva.EMAIL,
             WEBSITE: dataeva.WEBSITE,
@@ -389,6 +390,30 @@ export class PurVmmService {
                 ...tmpFilePaths.map((f) => deleteFile(f)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
             ]);
             throw new Error('Update PUR-VMM Form Error: ' + error.message);
+        }
+    }
+
+    async approve(dto: UpdatePurVmmDto, ip: string) {
+        const { REMARK, ACTION, EMPNO, ...data } = dto;
+        const form = {
+            NFRMNO: dto.NFRMNO,
+            VORGNO: dto.VORGNO,
+            CYEAR: dto.CYEAR,
+            CYEAR2: data.CYEAR2,
+            NRUNNO: data.NRUNNO,
+        };
+        console.log(form);
+        try {
+            await this.doactionService.doAction(
+                { ...form, ACTION: ACTION, EMPNO, REMARK },
+                ip,
+            );
+            return {
+                status: true,
+                message: 'Approve PUR-VMM Form successful',
+            };
+        } catch (error) {
+            throw new Error('Approve PUR-VMM Form Error: ' + error.message);
         }
     }
 

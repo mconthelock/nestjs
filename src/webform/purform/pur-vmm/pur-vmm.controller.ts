@@ -73,6 +73,17 @@ export class PurVmmController {
         return this.purVmmService.update(dto, files, ip, this.path);
     }
 
+    @Patch('approve')
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
+    approve(
+        @Body() dto: UpdatePurVmmDto, // หรือ RequestPurevaFormDto
+        @Req() req: Request,
+    ) {
+        const ip = getClientIP(req);
+        return this.purVmmService.approve(dto, ip);
+    }
+
     @Post('createauto')
     @UseTransaction('webformConnection')
     @UseForceTransaction()

@@ -29,4 +29,14 @@ export class S011mpController {
     async search(@Body() dto: FiltersDto) {
         return this.s011mpService.search(dto);
     }
+
+    @Post('packing')
+    async findPacking(@Body('order') order: string) {
+        return this.s011mpService.findPacking(order);
+    }
+
+    @Post('packing-diff')
+    async findPackingDiff(@Body('order') order: string) {
+        return this.s011mpService.findPackingDiff(order);
+    }
 }

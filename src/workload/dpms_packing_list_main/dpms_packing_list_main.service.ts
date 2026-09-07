@@ -27,6 +27,7 @@ export class DpmsPackingListMainService {
                 };
             }
             const packingDiff = await this.s011mpService.findPacking(mfgNo);
+            // const packingDiff = await this.s011mpService.findPackingDiff(mfgNo);
             // const drawingL = await this.as400S001kpService.packinglist(mfgNo);
             // const drawingMap = new Map();
 

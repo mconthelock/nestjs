@@ -1,8 +1,8 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'REPORT_MASTER', schema: 'WEBFORM' })
 export class ReportMaster {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     ID: number;
 
     @Column()
@@ -15,5 +15,5 @@ export class ReportMaster {
     VURL: string;
 
     @Column()
-    CSTAUS: string;
+    CSTATUS: string;
 }

@@ -46,6 +46,15 @@ export class S011mpRepository extends BaseRepository {
         });
     }
 
+    findOrderItems(order: string, item: string) {
+        return this.getRepository(S011MP).find({
+            where: {
+                S11M01: order,
+                S11M02: item,
+            },
+        });
+    }
+
     findQtyDiff(order: string) {
         return this.manager.query(`
             SELECT  *

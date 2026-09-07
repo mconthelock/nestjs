@@ -10,6 +10,7 @@ import {
 import { S011mpService } from './s011mp.service';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { FiltersDto } from 'src/common/dto/filter.dto';
+import { SearchPackingDto, SearchPackingItemsDto } from './dto/search-s011mp.dto';
 
 @Controller('datacenter/s011mp')
 export class S011mpController {
@@ -31,12 +32,17 @@ export class S011mpController {
     }
 
     @Post('packing')
-    async findPacking(@Body('order') order: string) {
-        return this.s011mpService.findPacking(order);
+    async findPacking(@Body() dto: SearchPackingDto) {
+        return this.s011mpService.findPacking(dto.ORDER);
     }
 
     @Post('packing-diff')
-    async findPackingDiff(@Body('order') order: string) {
-        return this.s011mpService.findPackingDiff(order);
+    async findPackingDiff(@Body() dto: SearchPackingDto) {
+        return this.s011mpService.findPackingDiff(dto.ORDER);
+    }
+
+    @Post('packing-items')
+    async findOrderItems(@Body() dto: SearchPackingItemsDto) {
+        return this.s011mpService.findPacking(dto.ORDER, dto.ITEM);
     }
 }

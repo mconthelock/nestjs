@@ -70,9 +70,14 @@ export class S011mpService {
         }
     }
 
-    async findPacking(order: string) {
+    async findPacking(order: string, item?: string) {
         try {
-            const res = await this.repo.findByOrder(order);
+            let res: S011MP[];
+            if (item) {
+                res = await this.repo.findOrderItems(order, item);
+            } else {
+                res = await this.repo.findByOrder(order);
+            }
             if (res.length === 0) {
                 return {
                     status: false,

@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { DpmsPackingListMainRepository } from './dpms_packing_list_main.repository';
-import { S001kpService } from 'src/as400/rtnlibf/s001kp/s001kp.service';
+// import { S001kpService } from 'src/as400/rtnlibf/s001kp/s001kp.service';
 import { S011mpService } from 'src/datacenter/s011mp/s011mp.service';
 
 @Injectable()
 export class DpmsPackingListMainService {
     constructor(
         private readonly repo: DpmsPackingListMainRepository,
-        private readonly as400S001kpService: S001kpService,
+        // private readonly as400S001kpService: S001kpService,
         private readonly s011mpService: S011mpService,
     ) {}
 
@@ -26,26 +26,26 @@ export class DpmsPackingListMainService {
                     message: `No packing list found for MFG No: ${mfgNo}`,
                 };
             }
-            // const packingDiff = await this.s011mpService.findPacking(mfgNo);
-            const packingDiff = await this.s011mpService.findPackingDiff(mfgNo);
-            const drawingL = await this.as400S001kpService.packinglist(mfgNo);
-            const drawingMap = new Map();
+            const packingDiff = await this.s011mpService.findPacking(mfgNo);
+            // const packingDiff = await this.s011mpService.findPackingDiff(mfgNo);
+            // const drawingL = await this.as400S001kpService.packinglist(mfgNo);
+            // const drawingMap = new Map();
 
-            drawingL.forEach((d: any) => {
-                drawingMap.set(`${d.VMFGNO}_${d.VDRAWING}`, d.VDRAWINGL);
-            });
-            res.map((item) => {
-                const details = po ? item.DETAILS_PO : item.DETAILS;
-                hasDetails = details && details.length > 0;
-                item.DETAILS = details.map((detail: any) => {
-                    const key = `${item.VMFGNO}_${detail.VDRAWING}`;
-                    const drawingLValue = drawingMap.get(key);
-                    if (drawingLValue) {
-                        detail.VDRAWINGL = drawingLValue;
-                    }
-                    return detail;
-                });
-            });
+            // drawingL.forEach((d: any) => {
+            //     drawingMap.set(`${d.VMFGNO}_${d.VDRAWING}`, d.VDRAWINGL);
+            // });
+            // res.map((item) => {
+            //     const details = po ? item.DETAILS_PO : item.DETAILS;
+            //     hasDetails = details && details.length > 0;
+            //     item.DETAILS = details.map((detail: any) => {
+            //         const key = `${item.VMFGNO}_${detail.VDRAWING}`;
+            //         const drawingLValue = drawingMap.get(key);
+            //         if (drawingLValue) {
+            //             detail.VDRAWINGL = drawingLValue;
+            //         }
+            //         return detail;
+            //     });
+            // });
             if (packingDiff.status) {
                 res = res.map((item) => {
                     const details = po ? item.DETAILS_PO : item.DETAILS;

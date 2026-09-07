@@ -21,9 +21,7 @@ class DataTableOrderingDto {
 
 class DataTableSearchDto {
     @IsOptional()
-    @IsString()
-    @Type(() => String)
-    value?: string;
+    value?: string | string[];
 
     @IsOptional()
     @ToBoolean()

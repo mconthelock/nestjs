@@ -121,7 +121,7 @@ export class GenPdfService {
                             }
                             td .description {
                                 display: grid;
-                                grid-template-columns: 50px 130px 140px;
+                                grid-template-columns: 50px 130px 135px;
                                 gap: 0.5rem;    
                             }
                             td .description .drawing {

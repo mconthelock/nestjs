@@ -393,6 +393,30 @@ export class PurVmmService {
         }
     }
 
+    async approve(dto: UpdatePurVmmDto, ip: string) {
+        const { REMARK, ACTION, EMPNO, ...data } = dto;
+        const form = {
+            NFRMNO: dto.NFRMNO,
+            VORGNO: dto.VORGNO,
+            CYEAR: dto.CYEAR,
+            CYEAR2: data.CYEAR2,
+            NRUNNO: data.NRUNNO,
+        };
+        console.log(form);
+        try {
+            await this.doactionService.doAction(
+                { ...form, ACTION: ACTION, EMPNO, REMARK },
+                ip,
+            );
+            return {
+                status: true,
+                message: 'Approve PUR-VMM Form successful',
+            };
+        } catch (error) {
+            throw new Error('Approve PUR-VMM Form Error: ' + error.message);
+        }
+    }
+
     async moveFiles(
         filesList: { file: Express.Multer.File; type: number }[],
         form: FormDto,

@@ -314,6 +314,6 @@ export class VpsService {
     async getDataCartonBox() {
         const cartonBox = await this.vpsRepository.getDataCartonBox();
         const specialBox = await this.vpsRepository.getSpecialCarton();
-        return [...cartonBox, ...specialBox];
+        return [...specialBox, ...cartonBox];
     }
 }

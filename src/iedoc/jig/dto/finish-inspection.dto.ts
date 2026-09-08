@@ -1,11 +1,7 @@
-import { IsDateString, IsOptional, IsString } from 'class-validator';
-
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 export class FinishInspectionDto {
     @IsOptional()
-    @IsDateString()
-    INSPEC_DATE?: string;
-
-    @IsOptional()
     @IsString()
+    @MaxLength(10)
     UPDATE_BY?: string;
 }

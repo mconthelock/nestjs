@@ -108,6 +108,9 @@ export class PURVMM_FORM {
     @Column()
     ATTACH_OTHER: string;
 
+    @Column()
+    EVANO: string;
+
     @OneToOne(() => TERMCODE)
     @JoinColumn({ name: 'TERMCODE', referencedColumnName: 'STERMCODE' })
     TERM: TERMCODE;

@@ -25,6 +25,7 @@ import {
 import { log } from 'console';
 import { RequestPurvmmFormDto } from './dto/request-pur-vmm.dto';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
+import { MailService } from 'src/common/services/mail/mail.service';
 
 @Injectable()
 export class PurVmmService {
@@ -40,6 +41,7 @@ export class PurVmmService {
         private readonly reposcmuser: PurvmmScmuserRepository,
         private readonly scmuserService: PurvmmScmusrService,
         private readonly doactionService: DoactionFlowService,
+        private readonly mailService: MailService,
 
         @InjectRepository(Vendors, 'purConnection')
         private readonly vnd: Repository<Vendors>,
@@ -48,6 +50,7 @@ export class PurVmmService {
     async createauto(formEva: FormDto, ip: string, path: string) {
         const formvmnno = await this.repomst.getFormMasterByVaname('PUR-VMM');
         const formreqeva = await this.formService.getFormData(formEva);
+        const formevano = await this.formService.getFormno(formEva);
         const dataeva = await this.repoeva.getData(formEva);
         const formvmm = await this.formcreateservice.create(
             {
@@ -75,7 +78,9 @@ export class PurVmmService {
             VENDGROUPTYPE:
                 dataeva.VENDGROUP === '6:Non-Production (6)'
                     ? 'Indirect'
-                    : 'Direct',
+                    : dataeva.VENDGROUP === '8:Sub-Contractor (8)'
+                      ? 'Subcon'
+                      : 'Direct',
             TAXID: dataeva.TAX_ID,
             CURCODE: dataeva.CURCODE,
             TERMCODE: dataeva.TERMCODE,
@@ -91,6 +96,7 @@ export class PurVmmService {
             BRANCH: dataeva.BRANCH,
             BANKADDR: dataeva.BANKADDR,
             ATTACH_OTHER: dataeva.ATTACH_OTHER,
+            EVANO: formevano,
         };
         try {
             const res = await this.repovmmfrm.create(datavmmfrm);
@@ -408,6 +414,9 @@ export class PurVmmService {
                 { ...form, ACTION: ACTION, EMPNO, REMARK },
                 ip,
             );
+            const cst = await this.formService.getFormStatus({ ...form });
+            if (cst == '2') {
+            }
             return {
                 status: true,
                 message: 'Approve PUR-VMM Form successful',

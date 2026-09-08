@@ -20,6 +20,8 @@ import { PurFileModule } from '../pur-file/pur-file.module';
 import { PurFileRepository } from '../pur-file/pur-file.repository';
 import { FlowModule } from 'src/webform/flow/flow.module';
 
+import { MailModule } from 'src/common/services/mail/mail.module';
+
 @Module({
     controllers: [PurVmmController],
     providers: [
@@ -41,6 +43,7 @@ import { FlowModule } from 'src/webform/flow/flow.module';
         PurFileModule,
         TypeOrmModule.forFeature([Vendors], 'purConnection'),
         FlowModule,
+        MailModule,
     ],
     exports: [PurVmmService],
 })

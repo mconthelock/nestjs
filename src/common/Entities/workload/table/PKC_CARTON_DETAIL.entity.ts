@@ -22,4 +22,7 @@ export class PKC_CARTON_DETAIL {
         default: () => 'SYSDATE',
     })
     CREATED_AT: Date;
+
+    @Column({ default: 1 })
+    STATUS: number;
 }

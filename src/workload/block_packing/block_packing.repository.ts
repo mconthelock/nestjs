@@ -64,7 +64,7 @@ export class BlockPackingRepository extends BaseRepository {
 
     async getDataCartonBox() {
         return this.ds.query(`
-            SELECT * FROM PKC_CARTON_DETAIL
+            SELECT * FROM PKC_CARTON_DETAIL WHERE STATUS = 1
         `);
     }
 

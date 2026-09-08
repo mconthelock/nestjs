@@ -2,6 +2,7 @@ import {
     IsArray,
     IsNotEmpty,
     IsNumber,
+    IsOptional,
     IsString,
     ValidateNested,
 } from 'class-validator';
@@ -27,6 +28,10 @@ export class InsertCartonDto {
     @IsNotEmpty()
     @IsString()
     CREATED_BY: string;
+
+    @IsOptional()
+    @IsNumber()
+    STATUS?: number;
 }
 
 export class InsertListCartonDto {

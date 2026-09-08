@@ -51,3 +51,13 @@ export class UpdatePurVmmDto extends PartialType(RequestPurvmmFormDto) {
     @IsOptional()
     DELETE_FILES?: string[];
 }
+
+export class ApprovePurVmmDto extends PartialType(UpdatePurVmmDto) {
+    @IsOptional()
+    @IsString()
+    EVANO?: string;
+
+    @IsNotEmpty()
+    @IsString()
+    BUYER: string;
+}

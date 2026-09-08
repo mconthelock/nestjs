@@ -22,6 +22,7 @@ import {
 } from 'src/common/decorator/transaction.decorator';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { RequestPurvmmFormDto } from './dto/request-pur-vmm.dto';
+import { ApprovePurVmmDto } from './dto/update-pur-vmm.dto';
 
 @Controller('purform/pur-vmm')
 export class PurVmmController {
@@ -77,7 +78,7 @@ export class PurVmmController {
     @UseTransaction('webformConnection')
     @UseForceTransaction()
     approve(
-        @Body() dto: UpdatePurVmmDto, // หรือ RequestPurevaFormDto
+        @Body() dto: ApprovePurVmmDto, // หรือ RequestPurevaFormDto
         @Req() req: Request,
     ) {
         const ip = getClientIP(req);

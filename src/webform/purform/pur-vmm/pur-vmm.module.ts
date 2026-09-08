@@ -21,6 +21,7 @@ import { PurFileRepository } from '../pur-file/pur-file.repository';
 import { FlowModule } from 'src/webform/flow/flow.module';
 
 import { MailModule } from 'src/common/services/mail/mail.module';
+import { AmecUserAllModule } from 'src/amec/amecuserall/amecuserall.module';
 
 @Module({
     controllers: [PurVmmController],
@@ -44,6 +45,7 @@ import { MailModule } from 'src/common/services/mail/mail.module';
         TypeOrmModule.forFeature([Vendors], 'purConnection'),
         FlowModule,
         MailModule,
+        AmecUserAllModule,
     ],
     exports: [PurVmmService],
 })

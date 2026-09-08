@@ -26,6 +26,8 @@ import { log } from 'console';
 import { RequestPurvmmFormDto } from './dto/request-pur-vmm.dto';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 import { MailService } from 'src/common/services/mail/mail.service';
+import { ApprovePurVmmDto } from './dto/update-pur-vmm.dto';
+import { AmecUserAllService } from 'src/amec/amecuserall/amecuserall.service';
 
 @Injectable()
 export class PurVmmService {
@@ -42,6 +44,7 @@ export class PurVmmService {
         private readonly scmuserService: PurvmmScmusrService,
         private readonly doactionService: DoactionFlowService,
         private readonly mailService: MailService,
+        private readonly userService: AmecUserAllService,
 
         @InjectRepository(Vendors, 'purConnection')
         private readonly vnd: Repository<Vendors>,
@@ -81,6 +84,7 @@ export class PurVmmService {
                     : dataeva.VENDGROUP === '8:Sub-Contractor (8)'
                       ? 'Subcon'
                       : 'Direct',
+            VENDCAT: dataeva.VENDCAT,
             TAXID: dataeva.TAX_ID,
             CURCODE: dataeva.CURCODE,
             TERMCODE: dataeva.TERMCODE,
@@ -399,7 +403,7 @@ export class PurVmmService {
         }
     }
 
-    async approve(dto: UpdatePurVmmDto, ip: string) {
+    async approve(dto: ApprovePurVmmDto, ip: string) {
         const { REMARK, ACTION, EMPNO, ...data } = dto;
         const form = {
             NFRMNO: dto.NFRMNO,
@@ -408,7 +412,10 @@ export class PurVmmService {
             CYEAR2: data.CYEAR2,
             NRUNNO: data.NRUNNO,
         };
-        console.log(form);
+        // console.log(form);
+        // console.log(data);
+        // console.log(dto);
+        // return false;
         try {
             await this.doactionService.doAction(
                 { ...form, ACTION: ACTION, EMPNO, REMARK },
@@ -416,7 +423,25 @@ export class PurVmmService {
             );
             const cst = await this.formService.getFormStatus({ ...form });
             if (cst == '2') {
+                const subject = 'VENDOR MASTER MAINTENANCE';
+                //  const to = "Accounting@MitsubishiElevatorAsia.co.th";
+                const to = 'kanittha@MitsubishiElevatorAsia.co.th';
+                let cc = '';
+                if (data.VENDGROUPTYPE == 'Direct') {
+                    if (data.REQTYPE == 'Add') {
+                        cc = '';
+                    } else if (data.REQTYPE == 'Update') {
+                        cc = 'SPU_BUYER SPU_BUYER@mitsubishielevatorasia.co.th';
+                    } else {
+                        cc = 'SPU_BUYER@mitsubishielevatorasia.co.th';
+                    }
+                } else if (data.VENDGROUPTYPE == 'Indirect') {
+                    cc = 'PADmember@MitsubishiElevatorAsia.co.th';
+                } else {
+                    cc = 'SCmember@MitsubishiElevatorAsia.co.th';
+                }
             }
+
             return {
                 status: true,
                 message: 'Approve PUR-VMM Form successful',

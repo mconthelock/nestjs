@@ -75,7 +75,16 @@ export class VendingRepository extends BaseRepository {
 
     async getToolWithdrawalWithRequest() {
         return this.manager.query(`
-            SELECT *
+            SELECT 
+                u.SSEC,
+                u.SEMPNO,
+                u.STNAME,
+                NVL(tw.RECORD_DATE,a.REQUEST_DATE) AS RECORD_DATE,
+                NVL(tw.PRODUCT_ID,a.PRODUCT_ID) AS PRODUCT_ID,
+                p.SEPRODNAME,
+                a.QTY,
+                tw.QUANTITY,
+                tw.UNIT_PRICE
             FROM SKIDCNTRL.TOOL_WITHDRAWAL tw
             FULL JOIN (
                 SELECT 
@@ -93,7 +102,7 @@ export class VendingRepository extends BaseRepository {
             ) a
                 ON TRUNC(a.REQUEST_DATE) = tw.RECORD_DATE
                 AND a.PRODUCT_ID = tw.PRODUCT_ID
-            LEFT JOIN AMEC.AMECUSERALL u ON u.SEMPNO = tw.EMPLOYEE_CODE
+            LEFT JOIN AMEC.AMECUSERALL u ON u.SEMPNO = NVL(tw.EMPLOYEE_CODE, a.EMPNO) 
             LEFT JOIN PURSYS.PRODUCTS p ON p.SPRODID = tw.PRODUCT_ID OR p.SPRODID = a.PRODUCT_ID
         `);
     }

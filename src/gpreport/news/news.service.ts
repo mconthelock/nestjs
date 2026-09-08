@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
-import { News } from './entities/news.entity';
+import { News } from 'src/common/Entities/gpreport/table/NEWS.entity';
 
 @Injectable()
 export class NewsService {
@@ -21,6 +21,6 @@ export class NewsService {
     }
 
     findAll() {
-        return this.repo.find();
+        return this.repo.find({ relations: ['attachments'] });
     }
 }

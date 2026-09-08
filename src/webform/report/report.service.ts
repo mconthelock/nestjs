@@ -65,10 +65,23 @@ export class ReportService {
     }
 
     findAuthUser(userId: string) {
-        return this.reportAuth.find({ where: { VEMPNO: userId } });
+        return this.reportAuth.find({
+            where: { VEMPNO: userId },
+            relations: ['REPORT_MASTER'],
+        });
     }
 
     async updateAuth(updateReportAuthDto: CreateReportAuthDto) {
+        const existingAuth = await this.reportAuth.findOne({
+            where: {
+                REPORT: updateReportAuthDto.REPORT,
+                VEMPNO: updateReportAuthDto.VEMPNO,
+            },
+        });
+        if (!existingAuth) {
+            const newAuth = this.reportAuth.create(updateReportAuthDto);
+            return this.reportAuth.save(newAuth);
+        }
         await this.reportAuth.update(
             {
                 REPORT: updateReportAuthDto.REPORT,

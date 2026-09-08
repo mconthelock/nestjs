@@ -1,4 +1,5 @@
-import { IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsNumber, IsString } from 'class-validator';
 export class CreateReportDto {
     @IsString()
     VORGNO: string;
@@ -11,4 +12,8 @@ export class CreateReportDto {
 
     @IsString()
     CSTATUS: string;
+
+    @IsNumber()
+    @Type(() => Number)
+    NSEQ: number;
 }

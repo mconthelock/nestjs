@@ -16,4 +16,7 @@ export class ReportMaster {
 
     @Column()
     CSTATUS: string;
+
+    @Column()
+    NSEQ: number;
 }

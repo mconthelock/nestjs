@@ -77,7 +77,7 @@ export class VendingRepository extends BaseRepository {
         return this.manager.query(`
             SELECT *
             FROM SKIDCNTRL.TOOL_WITHDRAWAL tw
-            LEFT JOIN (
+            FULL JOIN (
                 SELECT 
                     mf.EMPNO,
                     mf.REQUEST_DATE,
@@ -94,7 +94,7 @@ export class VendingRepository extends BaseRepository {
                 ON TRUNC(a.REQUEST_DATE) = tw.RECORD_DATE
                 AND a.PRODUCT_ID = tw.PRODUCT_ID
             LEFT JOIN AMEC.AMECUSERALL u ON u.SEMPNO = tw.EMPLOYEE_CODE
-            LEFT JOIN PURSYS.PRODUCTS p ON p.SPRODID = tw.PRODUCT_ID
+            LEFT JOIN PURSYS.PRODUCTS p ON p.SPRODID = tw.PRODUCT_ID OR p.SPRODID = a.PRODUCT_ID
         `);
     }
 

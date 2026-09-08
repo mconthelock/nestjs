@@ -9,7 +9,7 @@ export class COUNTRY_ORIGIN {
     ORIGIN_TYPE: number;
 
     @Column()
-    COUNTRY: string;
+    COUNTRY_MODE: number;
 
     @Column()
     MFG_NAME: string;

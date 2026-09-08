@@ -17,17 +17,19 @@ export class CountryOriginController {
         return this.migrateService.migrateCountryOrigin();
     }
 
-    @Get('country')
-    getCountry() {
-        return this.service.getCountry();
-    }
+    // @Get('country')
+    // getCountry() {
+    //     return this.service.getCountry();
+    // }
 
     @Post()
+    @UseTransaction('workloadConnection')
     create(@Body() dto: CreateCountryOriginDto) {
         return this.service.create(dto);
     }
 
     @Post('upload-excel')
+    @UseTransaction('workloadConnection')
     uploadExcel(@Body() dto: CreateCountryOriginDto[]) {
         return this.service.create(dto);
     }

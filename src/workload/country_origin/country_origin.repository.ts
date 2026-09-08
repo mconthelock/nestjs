@@ -26,12 +26,12 @@ export class CountryOriginRepository extends BaseRepository {
         return this.getRepository(COUNTRY_ORIGIN).delete({ BULKCODE: code });
     }
 
-    getCountry() {
-        return this.getRepository(COUNTRY_ORIGIN)
-            .createQueryBuilder('C')
-            .distinct()
-            .select('C.COUNTRY', 'COUNTRY')
-            .orderBy('C.COUNTRY', 'ASC')
-            .getRawMany();
-    }
+    // getCountry() {
+    //     return this.getRepository(COUNTRY_ORIGIN)
+    //         .createQueryBuilder('C')
+    //         .distinct()
+    //         .select('C.COUNTRY', 'COUNTRY')
+    //         .orderBy('C.COUNTRY', 'ASC')
+    //         .getRawMany();
+    // }
 }

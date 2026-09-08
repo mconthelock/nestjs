@@ -415,7 +415,11 @@ export class PurVmmService {
         // console.log(form);
         // console.log(data);
         // console.log(dto);
-        // return false;
+
+        //console.log(buyinfo);
+
+        //return false;
+
         try {
             await this.doactionService.doAction(
                 { ...form, ACTION: ACTION, EMPNO, REMARK },
@@ -426,19 +430,26 @@ export class PurVmmService {
                 const subject = 'VENDOR MASTER MAINTENANCE';
                 //  const to = "Accounting@MitsubishiElevatorAsia.co.th";
                 const to = 'kanittha@MitsubishiElevatorAsia.co.th';
-                let cc = '';
+                let cc = [];
                 if (data.VENDGROUPTYPE == 'Direct') {
                     if (data.REQTYPE == 'Add') {
-                        cc = '';
+                        const buyinfo = await this.userService.findEmp(
+                            data.BUYER,
+                        );
+                        cc.push(buyinfo.data.SRECMAIL);
+                        cc.push('pimporan@MitsubishiElevatorAsia.co.th');
+                        cc.push('kanokrat@MitsubishiElevatorAsia.co.th');
                     } else if (data.REQTYPE == 'Update') {
-                        cc = 'SPU_BUYER SPU_BUYER@mitsubishielevatorasia.co.th';
+                        cc.push(
+                            'SPU_BUYER SPU_BUYER@mitsubishielevatorasia.co.th',
+                        );
                     } else {
-                        cc = 'SPU_BUYER@mitsubishielevatorasia.co.th';
+                        cc.push('SPU_BUYER@mitsubishielevatorasia.co.th');
                     }
                 } else if (data.VENDGROUPTYPE == 'Indirect') {
-                    cc = 'PADmember@MitsubishiElevatorAsia.co.th';
+                    cc.push('PADmember@MitsubishiElevatorAsia.co.th');
                 } else {
-                    cc = 'SCmember@MitsubishiElevatorAsia.co.th';
+                    cc.push('SCmember@MitsubishiElevatorAsia.co.th');
                 }
             }
 

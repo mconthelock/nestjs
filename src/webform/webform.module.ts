@@ -27,6 +27,7 @@ import { PsFormModule } from './psform/psform.module';
 import { PurFormModule } from './purform/purform.module';
 import { QAFormModule } from './qaform/qaform.module';
 import { STFormModule } from './stform/stform.module';
+import { ReportModule } from './report/report.module';
 
 @Module({
     imports: [
@@ -56,6 +57,7 @@ import { STFormModule } from './stform/stform.module';
         GrpmstModule,
         DedformModule,
         EplformModule,
+        ReportModule,
     ],
 })
 export class WebformModule {}

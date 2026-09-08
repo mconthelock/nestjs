@@ -6,7 +6,7 @@ import { CreateCountryOriginDto } from '../dto/create_country_origin.dto';
 export class CountryOriginService {
     constructor(protected readonly repo: CountryOriginRepository) {}
 
-    async create(dto: CreateCountryOriginDto) {
+    async create(dto: CreateCountryOriginDto | CreateCountryOriginDto[]) {
         try {
             const res = await this.repo.save(dto);
             if (!res) {

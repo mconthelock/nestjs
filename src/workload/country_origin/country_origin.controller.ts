@@ -26,4 +26,10 @@ export class CountryOriginController {
     create(@Body() dto: CreateCountryOriginDto) {
         return this.service.create(dto);
     }
+
+    @Post('upload-excel')
+    uploadExcel(@Body() dto: CreateCountryOriginDto[]) {
+        return this.service.create(dto);
+    }
+
 }

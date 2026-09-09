@@ -1,4 +1,4 @@
-import { Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Controller, HttpCode, HttpStatus, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WireHarnessService } from './wire-harness.service';
 
@@ -23,5 +23,13 @@ export class WireHarnessController {
     @ApiResponse({ status: 200, description: 'Production plan list' })
     async productionPlan() {
         return this.service.productionPlan();
+    }
+
+    @Get('items')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Get item list' })
+    @ApiResponse({ status: 200, description: 'Item list' })
+    async items() {
+        return this.service.items();
     }
 }

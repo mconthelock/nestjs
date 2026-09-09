@@ -37,4 +37,12 @@ export class WireHarnessService {
     async productionPlan() {
         return this.repo.getProductionPlan('B4CC06');
     }
+
+    async items() {
+        const items = await this.repo.getItems();
+        return items.map(item => ({
+            item: `${item.ITEM_NO.substring(0, 3)}-${item.ITEM_NO.substring(3)}`,
+            process: item.ITEM_PROCESS,
+        }));
+    }
 }

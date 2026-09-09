@@ -3,6 +3,12 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
 @Entity({name: 'DPMS_PACKING_LIST', schema: 'WORKLOAD'})
 export class DPMS_PACKING_LIST{
     @Column()
+    AGENT: string;
+
+    @Column()
+    DSTN: string;
+
+    @Column()
     TURNOVER_STATUS: number;
 
     @PrimaryColumn()

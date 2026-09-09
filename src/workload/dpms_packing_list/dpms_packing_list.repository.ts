@@ -112,9 +112,7 @@ export class DpmsPackingListRepository extends BaseRepository {
         if (type === 'inprogress') {
             query.andWhere('L.DFINISHALL IS NULL');
         }
-        console.log('type', type);
         if (type === 'search' && condition) {
-            console.log('condition', condition);
             const { TYPE, DFINISHALL, FINISH_DATE, PL_PLAN, ...cond } =
                 condition;
             query.andWhere(cond);

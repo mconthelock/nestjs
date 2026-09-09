@@ -155,9 +155,28 @@ export class S011mpService {
                         },
                     ];
                 }
+                const values = [max - min, min];
+                const maxLevels = groupLevels.filter((l) => l.S11M09 == max);
+                const minLevels = groupLevels.filter((l) => l.S11M09 == min);
+
+                // กรณี min-level มี 2 ตัว: แยกเป็น 2 rows โดยแต่ละ row เก็บ min-level คนละตัว
+                if (minLevels.length == 2) {
+                    return values.map((value, index) => {
+                        const rowLevels = [...maxLevels, minLevels[index]];
+                        return {
+                            ...main,
+                            S11M09: value,
+                            LEVEL: rowLevels
+                                .map((l) => this.getLevel(l.S11M06))
+                                .join(''),
+                            DRAWING_GROUP: drawingGroup,
+                            MAXQTY: max,
+                        };
+                    });
+                }
 
                 // สร้าง 2 รายการ: ส่วนต่าง (diff) และค่าต่ำสุด (min)
-                return [max - min, min].map((value) => ({
+                return values.map((value) => ({
                     ...main,
                     S11M09: value,
                     // ตัด 3 ตัวท้ายของ S11M06 (เฉพาะที่ S11M09 เท่ากับ max หรือ value) มาต่อกัน

@@ -5,9 +5,13 @@ import { CountryOriginRepository } from './country_origin.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { COUNTRY_ORIGIN } from 'src/common/Entities/workload/table/COUNTRY_ORIGIN.entity';
 import { MigrateService } from './service/migrate.service';
+import { CountryOriginCountryModule } from '../country_origin_country/country_origin_country.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([COUNTRY_ORIGIN], 'workloadConnection')],
+    imports: [
+        TypeOrmModule.forFeature([COUNTRY_ORIGIN], 'workloadConnection'),
+        CountryOriginCountryModule,
+    ],
     controllers: [CountryOriginController],
     providers: [CountryOriginService, MigrateService, CountryOriginRepository],
 })

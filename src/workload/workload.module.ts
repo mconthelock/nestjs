@@ -28,6 +28,7 @@ import { MaterialStatusInquiryViewModule } from './material_status_inquiry_view/
 import { CountryOriginBulkListViewModule } from './country_origin_bulk_list_view/country_origin_bulk_list_view.module';
 import { BlockPackingModule } from './block_packing/block_packing.module';
 import { CountryOriginCountryModule } from './country_origin_country/country_origin_country.module';
+import { CountryOriginNotSetViewModule } from './country_origin_not_set_view/country_origin_not_set_view.module';
 
 @Module({
     imports: [
@@ -60,6 +61,7 @@ import { CountryOriginCountryModule } from './country_origin_country/country_ori
         CountryOriginBulkListViewModule,
         BlockPackingModule,
         CountryOriginCountryModule,
+        CountryOriginNotSetViewModule,
     ],
 })
 export class WorkloadModule {}

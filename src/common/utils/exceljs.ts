@@ -1,6 +1,18 @@
 import * as ExcelJS from 'exceljs';
 import { toExcelDate } from './dayjs.utils';
 import { Response } from 'express';
+// import {DataValidation } from 'exceljs';
+
+declare module 'exceljs' {
+    export interface DataValidations {
+        add(range: string, validation: DataValidation): void;
+        readonly model: Record<string, DataValidation>;
+    }
+
+    export interface Worksheet {
+        dataValidations: DataValidations;
+    }
+}
 
 export async function defaultExcel(
     options: {

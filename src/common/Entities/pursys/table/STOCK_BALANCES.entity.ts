@@ -3,7 +3,7 @@ import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 @Entity({ name: 'STOCK_BALANCES', schema: 'PURSYS' })
 export class StockBalances {
     @PrimaryColumn()
-    PRODUCT_ID: number;
+    PRODUCT_ID: string;
 
     @PrimaryColumn()
     STORAGENO: number;

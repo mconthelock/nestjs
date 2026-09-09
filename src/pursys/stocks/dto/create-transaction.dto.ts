@@ -13,8 +13,8 @@ export class CreateTransactionItemsDto {
     @IsNumber()
     TRANSACTION_ID: number;
 
-    @IsNumber()
-    PRODUCT_ID: number;
+    @IsString()
+    PRODUCT_ID: string;
 
     @IsNumber()
     @IsOptional()
@@ -54,9 +54,9 @@ export class CreateTransactionDto {
     @IsString()
     CSTATUS: string;
 
-    @IsDate()
-    @Type(() => Date)
-    CREATED_AT: Date;
+    // @IsDate()
+    // @Type(() => Date)
+    // CREATED_AT: Date;
 
     @IsString()
     CREATED_BY: string;

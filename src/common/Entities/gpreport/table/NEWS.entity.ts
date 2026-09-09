@@ -1,9 +1,9 @@
-import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
+import { Entity, Column, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { NewsFiles } from './NEWS_FILES.entity';
 
 @Entity({ name: 'NEWS', schema: 'GPREPORT' })
 export class News {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     NEWS_ID: number;
 
     @Column()
@@ -17,6 +17,9 @@ export class News {
 
     @Column()
     NEWS_IMG: string;
+
+    @Column()
+    NEWS_HEADER: string;
 
     @Column()
     NEWS_ADDDATE: Date;

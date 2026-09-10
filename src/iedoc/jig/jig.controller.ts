@@ -36,6 +36,16 @@ const formPath = 'forms/:NFRMNO/:VORGNO/:CYEAR/:CYEAR2/:NRUNNO';
 export class JigController {
     constructor(private readonly jigService: JigService) {}
 
+    @Get('mfg-processes')
+    getMfgProcesses() {
+        return this.jigService.getMfgProcesses();
+    }
+
+    @Get('locations')
+    getLocations() {
+        return this.jigService.getLocations();
+    }
+
     @Get('dashboard')
     getDashboard(@Query('fyear') fyear?: string) {
         return this.jigService.getDashboard(

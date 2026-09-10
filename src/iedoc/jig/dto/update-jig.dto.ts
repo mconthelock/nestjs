@@ -1,10 +1,23 @@
 import { OmitType, PartialType } from '@nestjs/mapped-types';
-import { IsOptional, IsString, MaxLength, IsIn } from 'class-validator';
+import {
+    IsOptional,
+    IsString,
+    MaxLength,
+    IsIn,
+    ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { JigFormKeyDto } from './jig-form.dto';
 import { CreateJigDto } from './create-jig.dto';
 export class UpdateJigDto extends PartialType(
     OmitType(CreateJigDto, ['JIG_NO', 'CREATE_BY'] as const),
     { skipNullProperties: false },
 ) {
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => JigFormKeyDto)
+    FORM_KEY?: JigFormKeyDto;
+
     @IsOptional()
     @IsString()
     @MaxLength(10)

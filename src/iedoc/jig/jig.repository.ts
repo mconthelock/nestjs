@@ -13,6 +13,8 @@ import { JigForm } from 'src/common/Entities/iedoc/table/jig_form.entity';
 import { JigFormDetail } from 'src/common/Entities/iedoc/table/jig_form_detail.entity';
 import { JigFormNg } from 'src/common/Entities/iedoc/table/jig_form_ng.entity';
 import { JigFormFile } from 'src/common/Entities/iedoc/table/jig_form_file.entity';
+import { MachineAbilityProcess } from 'src/common/Entities/iedoc/table/machine_ability_process.entity';
+import { ShopCodeMst } from 'src/common/Entities/iedoc/table/shopcodemst.entity';
 import {
     CreateJigFormDto,
     JigFormKeyDto,
@@ -43,6 +45,20 @@ export class JigRepository extends BaseRepository {
 
     findMaster(jigNo: string) {
         return this.getRepository(JigMaster).findOneBy({ JIG_NO: jigNo });
+    }
+
+    getMfgProcesses() {
+        return this.getRepository(MachineAbilityProcess).find({
+            where: { ACTION_STATUS: '1' },
+            order: { PROCESS: 'ASC', MA_CODE: 'ASC', MID: 'ASC' },
+        });
+    }
+
+    getLocations() {
+        return this.getRepository(ShopCodeMst).find({
+            where: { STATUS: '1' },
+            order: { SHOPCODE: 'ASC' },
+        });
     }
 
     async createMaster(data: Partial<JigMaster>) {
@@ -123,10 +139,43 @@ export class JigRepository extends BaseRepository {
             );
     }
 
-    async updateMaster(jigNo: string, changes: Partial<JigMaster>) {
+    async updateMaster(
+        jigNo: string,
+        changes: Partial<JigMaster>,
+        referenceKey?: JigFormKeyDto,
+    ) {
         return this.iedocDs.transaction(async (manager) => {
             const jig = await this.lockMaster(manager, jigNo);
             const forms = await this.getFormStates(jigNo, manager);
+            if (forms.length && !referenceKey) {
+                throw new BadRequestException(
+                    'FORM_KEY is required when updating a jig with linked forms',
+                );
+            }
+            let referenceForm: JigForm | null = null;
+            if (referenceKey) {
+                referenceForm = await manager.findOneBy(
+                    JigForm,
+                    formKey(referenceKey),
+                );
+                if (!referenceForm)
+                    throw new NotFoundException('Reference JIG_FORM not found');
+                if (referenceForm.JIG_NO !== jigNo)
+                    throw new ConflictException(
+                        'Reference form belongs to another jig',
+                    );
+                if (
+                    (await this.webformStatus(
+                        manager,
+                        formKey(referenceForm),
+                        true,
+                    )) !== '2'
+                ) {
+                    throw new ConflictException(
+                        'The reference form must be fully approved before updating master',
+                    );
+                }
+            }
             if (
                 forms.some(
                     (f) => !['2', '3'].includes(String(f.FORM_STATUS).trim()),
@@ -158,6 +207,10 @@ export class JigRepository extends BaseRepository {
                 );
             }
             Object.assign(jig, changes, { UPDATE_DATE: new Date() });
+            if (referenceForm) {
+                jig.REF_CYEAR2 = referenceForm.CYEAR2;
+                jig.REF_NRUNNO = referenceForm.NRUNNO;
+            }
             return manager.save(JigMaster, jig);
         });
     }
@@ -280,6 +333,8 @@ export class JigRepository extends BaseRepository {
             );
             if (dto.FORM_TYPE === 'CREATE') {
                 jig.JIG_STATUS = 'PENDING';
+                jig.REF_CYEAR2 = form.CYEAR2;
+                jig.REF_NRUNNO = form.NRUNNO;
                 jig.UPDATE_BY = dto.CREATE_BY ?? null;
                 jig.UPDATE_DATE = new Date();
                 await manager.save(JigMaster, jig);
@@ -416,6 +471,11 @@ export class JigRepository extends BaseRepository {
 
     async finishForm(key: JigFormKeyDto, updateBy?: string) {
         return this.withForm(key, async (manager, form, jig, status) => {
+            if (!['CREATE', 'INSPECTION'].includes(form.FORM_TYPE)) {
+                throw new ConflictException(
+                    'Use master update with FORM_KEY for review/revision forms; these do not advance inspection rounds',
+                );
+            }
             if (status !== '2')
                 throw new ConflictException(
                     'The WEBFORM approval flow is not complete',
@@ -459,6 +519,8 @@ export class JigRepository extends BaseRepository {
                         'Set a first inspection schedule before registration approval',
                     );
                 jig.JIG_STATUS = 'ACTIVE';
+                jig.REF_CYEAR2 = form.CYEAR2;
+                jig.REF_NRUNNO = form.NRUNNO;
             } else {
                 if (jig.JIG_STATUS !== 'ACTIVE')
                     throw new ConflictException('Jig is not active');

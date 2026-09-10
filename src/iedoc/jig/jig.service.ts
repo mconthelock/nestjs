@@ -20,6 +20,14 @@ import { monthKey, monthStart, nextRound } from './jig.utils';
 export class JigService {
     constructor(private readonly jigRepository: JigRepository) {}
 
+    getMfgProcesses() {
+        return this.jigRepository.getMfgProcesses();
+    }
+
+    getLocations() {
+        return this.jigRepository.getLocations();
+    }
+
     private dueStatus(date: Date | null, today: Date) {
         if (!date) return 'UNSCHEDULED';
         const due = monthStart(date);
@@ -208,6 +216,8 @@ export class JigService {
                 ? new Date(dto.START_USE_DATE)
                 : null,
             JIG_STATUS: 'DRAFT',
+            REF_CYEAR2: null,
+            REF_NRUNNO: null,
             CREATE_DATE: new Date(),
             UPDATE_BY: null,
             UPDATE_DATE: null,
@@ -215,24 +225,28 @@ export class JigService {
     }
 
     updateJig(jigNo: string, dto: UpdateJigDto) {
-        const { NEXT_INSPEC_DATE, START_USE_DATE, ...fields } = dto;
-        return this.jigRepository.updateMaster(jigNo, {
-            ...fields,
-            ...(NEXT_INSPEC_DATE !== undefined
-                ? {
-                      NEXT_INSPEC_DATE: NEXT_INSPEC_DATE
-                          ? monthStart(NEXT_INSPEC_DATE)
-                          : null,
-                  }
-                : {}),
-            ...(START_USE_DATE !== undefined
-                ? {
-                      START_USE_DATE: START_USE_DATE
-                          ? new Date(START_USE_DATE)
-                          : null,
-                  }
-                : {}),
-        });
+        const { NEXT_INSPEC_DATE, START_USE_DATE, FORM_KEY, ...fields } = dto;
+        return this.jigRepository.updateMaster(
+            jigNo,
+            {
+                ...fields,
+                ...(NEXT_INSPEC_DATE !== undefined
+                    ? {
+                          NEXT_INSPEC_DATE: NEXT_INSPEC_DATE
+                              ? monthStart(NEXT_INSPEC_DATE)
+                              : null,
+                      }
+                    : {}),
+                ...(START_USE_DATE !== undefined
+                    ? {
+                          START_USE_DATE: START_USE_DATE
+                              ? new Date(START_USE_DATE)
+                              : null,
+                      }
+                    : {}),
+            },
+            FORM_KEY,
+        );
     }
 
     async getCheckpoints(jigNo: string) {

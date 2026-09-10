@@ -22,6 +22,8 @@ import { JigForm } from 'src/common/Entities/iedoc/table/jig_form.entity';
 import { JigFormDetail } from 'src/common/Entities/iedoc/table/jig_form_detail.entity';
 import { JigFormNg } from 'src/common/Entities/iedoc/table/jig_form_ng.entity';
 import { JigFormFile } from 'src/common/Entities/iedoc/table/jig_form_file.entity';
+import { MachineAbilityProcess } from 'src/common/Entities/iedoc/table/machine_ability_process.entity';
+import { ShopCodeMst } from 'src/common/Entities/iedoc/table/shopcodemst.entity';
 
 const key = {
     NFRMNO: 1,
@@ -30,6 +32,30 @@ const key = {
     CYEAR2: '2026',
     NRUNNO: 1,
 };
+
+describe('Jig lookup filters', () => {
+    it('uses ACTION_STATUS for processes and STATUS for locations, both as string 1', async () => {
+        const processes = { find: jest.fn().mockResolvedValue([]) };
+        const locations = { find: jest.fn().mockResolvedValue([]) };
+        const ds: any = {
+            manager: {
+                getRepository: (entity) =>
+                    entity === MachineAbilityProcess ? processes : locations,
+            },
+        };
+        const repo = new JigRepository(ds);
+        await repo.getMfgProcesses();
+        await repo.getLocations();
+        expect(processes.find).toHaveBeenCalledWith({
+            where: { ACTION_STATUS: '1' },
+            order: { PROCESS: 'ASC', MA_CODE: 'ASC', MID: 'ASC' },
+        });
+        expect(locations.find).toHaveBeenCalledWith({
+            where: { STATUS: '1' },
+            order: { SHOPCODE: 'ASC' },
+        });
+    });
+});
 function fixture(period = 6) {
     const jig: any = {
         JIG_NO: 'J-001',
@@ -102,6 +128,57 @@ function fixture(period = 6) {
 }
 
 describe('Jig dictionary and validation', () => {
+    it('maps reference columns and lookup primary keys with the supplied Oracle sizes', async () => {
+        const ds = new DataSource({
+            type: 'oracle',
+            entities: [JigMaster, MachineAbilityProcess, ShopCodeMst],
+        });
+        await (ds as any).buildMetadatas();
+        const master = ds.getMetadata(JigMaster);
+        expect(
+            master.columns.find((c) => c.propertyName === 'REF_CYEAR2'),
+        ).toMatchObject({ type: 'varchar2', length: '4', isNullable: true });
+        expect(
+            master.columns.find((c) => c.propertyName === 'REF_NRUNNO'),
+        ).toMatchObject({
+            type: 'number',
+            precision: 6,
+            scale: 0,
+            isNullable: true,
+        });
+        expect(
+            ds
+                .getMetadata(MachineAbilityProcess)
+                .primaryColumns.map((c) => c.propertyName),
+        ).toEqual(['MID', 'MA_CODE', 'PROCESS']);
+        expect(
+            ds
+                .getMetadata(MachineAbilityProcess)
+                .columns.find((c) => c.propertyName === 'NRUNNO_REF').precision,
+        ).toBe(7);
+        expect(
+            ds
+                .getMetadata(ShopCodeMst)
+                .primaryColumns.map((c) => c.propertyName),
+        ).toEqual(['SHOPCODE']);
+    });
+
+    it('validates the complete reference form key on master updates', async () => {
+        expect(
+            await validate(
+                plainToInstance(UpdateJigDto, { REV: 'B', FORM_KEY: key }),
+            ),
+        ).toHaveLength(0);
+        expect(
+            (
+                await validate(
+                    plainToInstance(UpdateJigDto, {
+                        FORM_KEY: { CYEAR2: '2026', NRUNNO: 1 },
+                    }),
+                )
+            ).length,
+        ).toBeGreaterThan(0);
+    });
     it('builds Oracle metadata for six tables with complete composite foreign keys', async () => {
         const ds = new DataSource({
             type: 'oracle',
@@ -219,6 +296,97 @@ describe('Jig dictionary and validation', () => {
 });
 
 describe('Jig approval and form data', () => {
+    it('does not treat a review form as a recurring inspection', async () => {
+        const { repo, jig, form, manager } = fixture();
+        form.FORM_TYPE = 'REVIEW';
+        await expect(repo.finishForm(key)).rejects.toThrow(ConflictException);
+        expect(jig.NEXT_INSPEC_DATE).toEqual(new Date(2026, 1, 1));
+        expect(manager.save).not.toHaveBeenCalled();
+    });
+    it('stores a CREATE form reference when attaching the registration', async () => {
+        const { repo, jig, manager, state } = fixture();
+        jig.JIG_STATUS = 'DRAFT';
+        state.status = '1';
+        manager.findOneBy.mockResolvedValue(null);
+        jest.spyOn(repo, 'getForm').mockResolvedValue({} as any);
+        await repo.createForm(jig.JIG_NO, { ...key, FORM_TYPE: 'CREATE' });
+        expect(jig).toMatchObject({
+            REF_CYEAR2: '2026',
+            REF_NRUNNO: 1,
+            JIG_STATUS: 'PENDING',
+        });
+    });
+
+    it.each(['REVIEW', 'REVISE'])(
+        'copies the actual %s form reference on an approved master edit',
+        async (type) => {
+            const { repo, jig, form, manager } = fixture();
+            form.FORM_TYPE = type;
+            form.CYEAR2 = '2027';
+            form.NRUNNO = 42;
+            await repo.updateMaster(
+                jig.JIG_NO,
+                { REV: 'B' },
+                { ...key, CYEAR2: '2027', NRUNNO: 42 },
+            );
+            expect(jig).toMatchObject({
+                REV: 'B',
+                REF_CYEAR2: '2027',
+                REF_NRUNNO: 42,
+            });
+            expect(manager.findOneBy).toHaveBeenCalledWith(JigForm, {
+                ...key,
+                CYEAR2: '2027',
+                NRUNNO: 42,
+            });
+        },
+    );
+
+    it('does not let a form from another jig or an unapproved form change master', async () => {
+        const { repo, jig, form, state, manager } = fixture();
+        form.JIG_NO = 'OTHER';
+        await expect(
+            repo.updateMaster(jig.JIG_NO, { REV: 'B' }, key),
+        ).rejects.toThrow(ConflictException);
+        form.JIG_NO = jig.JIG_NO;
+        state.status = '1';
+        await expect(
+            repo.updateMaster(jig.JIG_NO, { REV: 'B' }, key),
+        ).rejects.toThrow(ConflictException);
+        expect(manager.save).not.toHaveBeenCalled();
+    });
+
+    it('requires an explicit form key instead of guessing the latest form', async () => {
+        const { repo, jig, form, state } = fixture();
+        state.forms = [{ ...form, FORM_STATUS: '2' }];
+        await expect(
+            repo.updateMaster(jig.JIG_NO, { REV: 'B' }),
+        ).rejects.toThrow(BadRequestException);
+    });
+
+    it('keeps the registration/revision reference when completing an inspection', async () => {
+        const { repo, jig } = fixture();
+        jig.REF_CYEAR2 = '2025';
+        jig.REF_NRUNNO = 37;
+        await repo.finishForm(key);
+        expect(jig).toMatchObject({ REF_CYEAR2: '2025', REF_NRUNNO: 37 });
+    });
+
+    it('initializes an unlinked draft reference to null', async () => {
+        const repo: any = { createMaster: jest.fn(async (value) => value) };
+        const result = await new JigService(repo).createJig({
+            JIG_NO: 'A',
+            JIG_NAME: 'New',
+            INSPEC_PERIOD: 6,
+        });
+        expect(result).toMatchObject({ REF_CYEAR2: null, REF_NRUNNO: null });
+    });
+
+    it('keeps FORM_KEY out of columns sent to master persistence', async () => {
+        const repo: any = { updateMaster: jest.fn() };
+        new JigService(repo).updateJig('A', { REV: 'B', FORM_KEY: key });
+        expect(repo.updateMaster).toHaveBeenCalledWith('A', { REV: 'B' }, key);
+    });
     it.each([6, 12])(
         'advances the original February round by %i months, regardless of a March check date, once only',
         async (period) => {
@@ -369,17 +537,15 @@ describe('Jig dashboard and calendar', () => {
                         CHECKPOINT_COUNT: 0,
                     },
                 ]),
-                getFormStates: jest
-                    .fn()
-                    .mockResolvedValue([
-                        {
-                            ...key,
-                            JIG_NO: 'A',
-                            FORM_TYPE: 'INSPECTION',
-                            SCHEDULE_DATE: new Date(2026, 3, 1),
-                            FORM_STATUS: '2',
-                        },
-                    ]),
+                getFormStates: jest.fn().mockResolvedValue([
+                    {
+                        ...key,
+                        JIG_NO: 'A',
+                        FORM_TYPE: 'INSPECTION',
+                        SCHEDULE_DATE: new Date(2026, 3, 1),
+                        FORM_STATUS: '2',
+                    },
+                ]),
             };
             const dashboard = await new JigService(repo).getDashboard(2026);
             expect(dashboard.summary).toMatchObject({
@@ -413,6 +579,16 @@ describe('Jig HTTP contracts', () => {
         finishForm: jest.fn().mockResolvedValue({ applied: true }),
         deleteFile: jest.fn().mockResolvedValue({ deleted: true }),
         createJig: jest.fn().mockResolvedValue({ JIG_STATUS: 'DRAFT' }),
+        getMfgProcesses: jest
+            .fn()
+            .mockResolvedValue([
+                { MID: 1, MA_CODE: 'A', PROCESS: 'H6AS', ACTION_STATUS: '1' },
+            ]),
+        getLocations: jest
+            .fn()
+            .mockResolvedValue([
+                { SHOPCODE: '01', SHOPDESC: 'Shop 1', STATUS: '1' },
+            ]),
     };
     beforeAll(async () => {
         const module = await Test.createTestingModule({
@@ -427,6 +603,17 @@ describe('Jig HTTP contracts', () => {
     });
     afterAll(async () => {
         await app.close();
+    });
+
+    it('routes dropdown lookups before the dynamic jig number route', async () => {
+        const processes = await request(app.getHttpServer())
+            .get('/iedoc/jig/mfg-processes')
+            .expect(200);
+        expect(processes.body[0].PROCESS).toBe('H6AS');
+        const locations = await request(app.getHttpServer())
+            .get('/iedoc/jig/locations')
+            .expect(200);
+        expect(locations.body[0].SHOPCODE).toBe('01');
     });
 
     it('binds the composite form key on finish and file deletion routes', async () => {

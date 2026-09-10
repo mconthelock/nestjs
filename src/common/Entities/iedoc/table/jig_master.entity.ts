@@ -64,4 +64,10 @@ export class JigMaster {
 
     @Column({ type: 'date', nullable: true })
     UPDATE_DATE: Date | null;
+
+    @Column({ type: 'varchar2', length: 4, nullable: true })
+    REF_CYEAR2: string | null;
+
+    @Column({ type: 'number', precision: 6, scale: 0, nullable: true })
+    REF_NRUNNO: number | null;
 }

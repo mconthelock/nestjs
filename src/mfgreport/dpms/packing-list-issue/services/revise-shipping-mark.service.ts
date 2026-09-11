@@ -25,6 +25,7 @@ export class ReviseShippingMarkService {
 
             if (dto.IS_REVISE) {
                 const issueRevId = dto.ID;
+                const poId = dto.POID || null;
                 // ดึงข้อมูลจากตาราง dpms_pl_issue_rev โดยใช้ ID ที
                 const revDataRes = await this.revService.findByRevId(dto.ID);
                 if (!revDataRes.status) {
@@ -57,7 +58,7 @@ export class ReviseShippingMarkService {
                     );
                     const revise = await this.reviseMainService.revise({
                         revid: issueRevId,
-                        poid: revData.NID,
+                        poid: poId,
                         order: revData.VORDERS,
                         issueDate: issueDate,
                         newShippingMark: newShippingMark,

@@ -21,6 +21,11 @@ export class DpmsPlOriginController {
         return this.service.find({order, type: 'detail'});
     }
 
+    @Get('pl/:id')
+    pl(@Param('id') id: string) {
+        return this.service.find({id: +id, type: 'id'});
+    }
+
     @Get('id/:id')
     id(@Param('id') id: string) {
         return this.service.find({id: +id});

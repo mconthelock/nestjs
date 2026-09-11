@@ -25,6 +25,7 @@ export class ReviseShippingMarkService {
 
             if (dto.IS_REVISE) {
                 const issueRevId = dto.ID;
+                const poId = dto.POID || null;
                 // ดึงข้อมูลจากตาราง dpms_pl_issue_rev โดยใช้ ID ที
                 const revDataRes = await this.revService.findByRevId(dto.ID);
                 if (!revDataRes.status) {
@@ -38,14 +39,14 @@ export class ReviseShippingMarkService {
                     .find((item) => /^made\s+in/i.test(item))
                     ?.replace(/^made\s+in\s*/i, '');
                 // ดึงข้อมูล origin จากตาราง dpms_pl_origin โดยใช้ order
-                const originByOrder = await this.originService.find({
-                    order: revData.VORDERS,
-                    type: 'order',
+                const originById = await this.originService.find({
+                    id: revData.NID,
+                    type: 'id',
                 });
-                if (!originByOrder.status) {
+                if (!originById.status) {
                     throw new Error('No origin data found for the given order');
                 }
-                const newOrigin = originByOrder.data.SHIPPINGMARK_ON_PACKAGE;
+                const newOrigin = originById.data.SHIPPINGMARK_ON_PACKAGE;
                 // เปรียบเทียบ origin เดิมกับ origin ใหม่ เพื่อ revise shipping mark ของ pl
                 if (origin && origin != newOrigin) {
                     message =
@@ -57,7 +58,7 @@ export class ReviseShippingMarkService {
                     );
                     const revise = await this.reviseMainService.revise({
                         revid: issueRevId,
-                        poid: revData.NID,
+                        poid: poId,
                         order: revData.VORDERS,
                         issueDate: issueDate,
                         newShippingMark: newShippingMark,

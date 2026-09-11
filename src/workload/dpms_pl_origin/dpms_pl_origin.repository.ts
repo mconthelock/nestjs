@@ -33,7 +33,7 @@ export class DpmsPlOriginRepository extends BaseRepository {
                     VORIGIN
                 ) AS SHIPPINGMARK_ON_PACKAGE`,
             )
-            .where('NISSUEREV_ID = :id AND LAST_REVISION = 1', { id })
+            .where('NISSUEREV_ID = :id', { id })
             .groupBy('VMFGNO')
             .getRawOne();
     }

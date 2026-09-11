@@ -1,6 +1,7 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('WHN_ITEM', {
+@Entity({
+    name: 'WHN_ITEM',
     schema: 'INNOVAT',
 })
 export class WHN_ITEM {

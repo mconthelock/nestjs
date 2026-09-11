@@ -1,59 +1,58 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: 'AMECORDERS' })
+@Entity({ name: 'AMECORDERS', schema: 'WORKLOAD' })
 export class AmecOrders {
+    @PrimaryColumn()
+    MFGNO: string;
 
-  @PrimaryColumn()
-  MFGNO: string;
+    @Column()
+    REVISION: string;
 
-  @Column()
-  REVISION: string;
+    @Column()
+    PONO: string;
 
-  @Column()
-  PONO: string;
+    @Column()
+    PRODTYPE: string;
 
-  @Column()
-  PRODTYPE: string;
+    @Column()
+    SERIES: string;
 
-  @Column()
-  SERIES: string;
+    @Column()
+    IDS_DATE: Date;
 
-  @Column()
-  IDS_DATE: Date;
+    @Column()
+    CUSTOMER_REQ: Date;
 
-  @Column()
-  CUSTOMER_REQ: Date;
+    @Column()
+    MAINQTY: number;
 
-  @Column()
-  MAINQTY: number;
+    @Column()
+    PARTQTY: number;
 
-  @Column()
-  PARTQTY: number;
+    @Column()
+    PRJ_NO: string;
 
-  @Column()
-  PRJ_NO: string;
+    @Column()
+    PRJ_NAME: string;
 
-  @Column()
-  PRJ_NAME: string;
+    @Column()
+    AGENT: string;
 
-  @Column()
-  AGENT: string;
+    @Column()
+    COUNTRY: string;
 
-  @Column()
-  COUNTRY: string;
+    @Column()
+    SALE_COMPANY: string;
 
-  @Column()
-  SALE_COMPANY: string;
+    @Column()
+    PORT: string;
 
-  @Column()
-  PORT: string;
+    @Column()
+    STATUS: number;
 
-  @Column()
-  STATUS: number;
+    @Column()
+    REMARK: string;
 
-  @Column()
-  REMARK: string;
-
-  @Column()
-  SPEC: string;
+    @Column()
+    SPEC: string;
 }

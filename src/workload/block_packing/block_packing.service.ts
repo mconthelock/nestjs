@@ -35,4 +35,9 @@ export class BlockPackingService {
 
         return result;
     }
+
+    async issuePISMFG(createBlockPackingDto: CreateBlockPackingDto) {
+        const result = '';
+        return result;
+    }
 }

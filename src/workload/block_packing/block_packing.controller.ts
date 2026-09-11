@@ -27,4 +27,9 @@ export class BlockPackingController {
     ) {
         return this.blockPackingService.getOrderMainCombine(order, block);
     }
+
+    @Post('issue-pis')
+    async issuePISMFG(@Body() createBlockPackingDto: CreateBlockPackingDto) {
+        return this.blockPackingService.issuePISMFG(createBlockPackingDto);
+    }
 }

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: 'AMECORDERS_SCHEDULE' })
+@Entity({ name: 'AMECORDERS_SCHEDULE', schema: 'WORKLOAD' })
 export class AmecOrdersSchedule {
     @PrimaryColumn()
     REFMFGNO: string;

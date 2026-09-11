@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { WireHarnessAs400Repository } from './wire-harness-as400.repository';
 import { WireHarnessRepository } from './wire-harness.repository';
+import { GetAutoPlanDto } from './dto/get-auto-plan.dto';
 
 @Injectable()
 export class WireHarnessService {
@@ -34,7 +35,19 @@ export class WireHarnessService {
         };
     }
 
-    async productionPlan() {
-        return this.repo.getProductionPlan('B4CC06');
+    async autoPlan(dto: GetAutoPlanDto) {
+        return this.repo.getAutoPlan(dto);
+    }
+
+    async item() {
+        const data = await this.repo.getItem();
+        return data.map(item => ({
+            ITEM: `${item.ITEM_NO.substring(0, 3)}-${item.ITEM_NO.substring(3)}`,
+            PROCESS: item.ITEM_PROCESS,
+        }));
+    }
+
+    async production() {
+        return this.repo.getProduction();
     }
 }

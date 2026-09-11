@@ -19,6 +19,25 @@ export class DpmsPlOriginRepository extends BaseRepository {
         });
     }
 
+    getIdOrigin(id: number) {
+        return this.getRepository(DPMS_PL_ORIGIN_VIEW)
+            .createQueryBuilder('O')
+            .select(
+                `
+                VMFGNO, 
+                LISTAGG(DISTINCT VORIGIN, '/') WITHIN GROUP (
+                    ORDER BY CASE
+                        WHEN VORIGIN = 'THAILAND' THEN 0
+                        ELSE 1
+                    END,
+                    VORIGIN
+                ) AS SHIPPINGMARK_ON_PACKAGE`,
+            )
+            .where('NISSUEREV_ID = :id AND LAST_REVISION = 1', { id })
+            .groupBy('VMFGNO')
+            .getRawOne();
+    }
+
     getOrderOrigin(order: string) {
         return this.getRepository(DPMS_PL_ORIGIN_VIEW)
             .createQueryBuilder('O')

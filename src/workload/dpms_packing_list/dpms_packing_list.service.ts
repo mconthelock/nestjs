@@ -104,6 +104,7 @@ export class DpmsPackingListService {
             const serie = Array.from(new Set(data.filter((item) => item.SERIES).map((item) => item.SERIES)));
             const model = Array.from(new Set(data.filter((item) => item.MODEL_SPEC).map((item) => item.MODEL_SPEC)));
             const proj = Array.from(new Set(data.filter((item) => item.PROJECT).map((item) => item.PROJECT)));
+            const agent = Array.from(new Set(data.filter((item) => item.AGENT).map((item) => item.AGENT))); 
             return {
                 status: true,
                 PROD: prod,
@@ -112,6 +113,7 @@ export class DpmsPackingListService {
                 SERIES: serie,
                 MODEL: model,
                 PROJECT: proj,
+                AGENT: agent,
             };
         } catch (error) {
             throw new Error(

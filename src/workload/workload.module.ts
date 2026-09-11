@@ -30,6 +30,7 @@ import { BlockPackingModule } from './block_packing/block_packing.module';
 import { CountryOriginCountryModule } from './country_origin_country/country_origin_country.module';
 import { CountryOriginNotSetViewModule } from './country_origin_not_set_view/country_origin_not_set_view.module';
 import { DpmsCountryConditionModule } from './dpms_country_condition/dpms_country_condition.module';
+import { DpmsPackingListDetailModule } from './dpms_packing_list_detail/dpms_packing_list_detail.module';
 
 @Module({
     imports: [
@@ -64,6 +65,7 @@ import { DpmsCountryConditionModule } from './dpms_country_condition/dpms_countr
         CountryOriginCountryModule,
         CountryOriginNotSetViewModule,
         DpmsCountryConditionModule,
+        DpmsPackingListDetailModule,
     ],
 })
 export class WorkloadModule {}

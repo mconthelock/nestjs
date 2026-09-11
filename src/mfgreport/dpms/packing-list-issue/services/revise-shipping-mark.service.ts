@@ -38,14 +38,14 @@ export class ReviseShippingMarkService {
                     .find((item) => /^made\s+in/i.test(item))
                     ?.replace(/^made\s+in\s*/i, '');
                 // ดึงข้อมูล origin จากตาราง dpms_pl_origin โดยใช้ order
-                const originByOrder = await this.originService.find({
-                    order: revData.VORDERS,
-                    type: 'order',
+                const originById = await this.originService.find({
+                    id: revData.NID,
+                    type: 'id',
                 });
-                if (!originByOrder.status) {
+                if (!originById.status) {
                     throw new Error('No origin data found for the given order');
                 }
-                const newOrigin = originByOrder.data.SHIPPINGMARK_ON_PACKAGE;
+                const newOrigin = originById.data.SHIPPINGMARK_ON_PACKAGE;
                 // เปรียบเทียบ origin เดิมกับ origin ใหม่ เพื่อ revise shipping mark ของ pl
                 if (origin && origin != newOrigin) {
                     message =

@@ -16,11 +16,38 @@ import { PurnvfAddressRepository } from '../pur-nvf/purnvf_address/purnvf_addres
 import { PurEvaRequestService } from './pur-eva-request.service';
 import { PurFileModule } from '../pur-file/pur-file.module';
 import { PurEvaUpdateService } from './pur-eva-update.service';
-
+import { PurEvaApproveService } from './pur-eva-approve.service';
+import { PurevaFormService } from './pureva_form/pureva_form.service';
+import { PurevaFormRepository } from './pureva_form/pureva_form.repository';
+import { VendorsModule } from 'src/pursys/vendors/vendors.module';
+import { PurVmmModule } from '../pur-vmm/pur-vmm.module';
 
 @Module({
-  controllers: [PurEvaController ],
-  providers: [PurEvaService  , PurEvaRequestService , PurnvfAddressService , PurnvfAddressRepository ,PurEvaUpdateService,],
-  imports: [ PurFileModule , PurevaFormModule , PurevaProfitTurnoverModule , PurevaScoreModule , PurevaVendorRelationModule, FormModule , FlowModule , FormmstModule, RepModule, UsersModule,PappflowModule],
+    controllers: [PurEvaController],
+    providers: [
+        PurEvaService,
+        PurEvaRequestService,
+        PurnvfAddressService,
+        PurnvfAddressRepository,
+        PurEvaUpdateService,
+        PurEvaApproveService,
+        PurevaFormService,
+        PurevaFormRepository,
+    ],
+    imports: [
+        PurFileModule,
+        PurevaFormModule,
+        PurevaProfitTurnoverModule,
+        PurevaScoreModule,
+        PurevaVendorRelationModule,
+        FormModule,
+        FlowModule,
+        FormmstModule,
+        RepModule,
+        UsersModule,
+        PappflowModule,
+        VendorsModule,
+        PurVmmModule,
+    ],
 })
 export class PurEvaModule {}

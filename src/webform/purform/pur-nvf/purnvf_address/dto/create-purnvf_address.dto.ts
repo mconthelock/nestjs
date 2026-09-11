@@ -8,22 +8,26 @@ import {
     IsOptional,
     IsString,
 } from 'class-validator';
-import { FormDto }  from "src/webform/form/dto/form.dto";
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
-export class CreatePurnvfAddressDto extends PickType(FormDto,[
-  'NFRMNO',
-  'VORGNO',
-  'CYEAR',
-  'CYEAR2',
-  'NRUNNO',
-] as const) {    
+export class CreatePurnvfAddressDto extends PickType(FormDto, [
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'CYEAR2',
+    'NRUNNO',
+] as const) {
     @IsNotEmpty()
     @IsString()
     ADDRTYPE: string;
 
     @IsNotEmpty()
     @IsString()
-    ADDR: string;
+    ADDR1: string;
+
+    @IsNotEmpty()
+    @IsString()
+    ADDR2: string;
 
     @IsString()
     CITY: string;

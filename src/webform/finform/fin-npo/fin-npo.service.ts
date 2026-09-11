@@ -17,12 +17,12 @@ export interface CreateFinnpoInvoiceDto {
     VAT_RATE_ID: number;
     TOTAL_AMT: number;
     SCURCODE: string;
+    REFERENCE?: string;
 }
 
 export interface CreateFinnpoDto {
     INPUTBY: string;
     REQBY: string;
-    SUBJECT: string;
     VENDOR_CODE: string | number;
     EXPENSE_CODE: number;
     REMARK?: string;
@@ -40,10 +40,10 @@ export interface ActionFinnpoDto {
     ACTION: string;
     REMARK?: string;
     CEXTDATA?: string;
-    SUBJECT?: string;
     EXPENSE_CODE?: number;
     VENDOR_CODE?: string | number;
     AIR_SALES_BY?: string[] | string;
+    DELETE_FILE_IDS?: number[] | string;
     DATA?: Array<{
         ID?: number;
         LINE_ID?: number;
@@ -54,6 +54,7 @@ export interface ActionFinnpoDto {
         TOTAL_AMT?: number;
         SCURCODE?: string;
         WHT?: number | null;
+        REFERENCE?: string | null;
     }> | string;
 }
 
@@ -228,21 +229,26 @@ export class FinnpoService {
     async update(dto: ActionFinnpoDto, files: Express.Multer.File[] = []) {
         await this.updateData(dto);
 
+        const form = {
+            NFRMNO: Number(dto.NFRMNO),
+            VORGNO: dto.VORGNO,
+            CYEAR: dto.CYEAR,
+            CYEAR2: dto.CYEAR2 || dto.CYEAR,
+            NRUNNO: Number(dto.NRUNNO),
+        };
+        const existingFiles = await this.repo.findFilesByForm(
+            form.NFRMNO,
+            form.VORGNO,
+            form.CYEAR,
+            form.CYEAR2,
+            form.NRUNNO,
+        );
+        const deletedFileIds = this.parseFileIds(dto.DELETE_FILE_IDS);
+        const deletedFiles = existingFiles.filter((file) =>
+            deletedFileIds.includes(Number(file.FILE_ID)),
+        );
+
         if (files.length) {
-            const form = {
-                NFRMNO: Number(dto.NFRMNO),
-                VORGNO: dto.VORGNO,
-                CYEAR: dto.CYEAR,
-                CYEAR2: dto.CYEAR2 || dto.CYEAR,
-                NRUNNO: Number(dto.NRUNNO),
-            };
-            const existingFiles = await this.repo.findFilesByForm(
-                form.NFRMNO,
-                form.VORGNO,
-                form.CYEAR,
-                form.CYEAR2,
-                form.NRUNNO,
-            );
             const savedFiles = await this.handleFileFormService.insertFiles(
                 {
                     ...form,
@@ -255,12 +261,14 @@ export class FinnpoService {
             if (!savedFiles?.status) {
                 throw new BadRequestException('Cannot update FIN-NPO attachment');
             }
+        }
 
+        if (deletedFiles.length) {
             await this.repo.deleteFilesByIds(
-                existingFiles.map((file) => Number(file.FILE_ID)),
+                deletedFiles.map((file) => Number(file.FILE_ID)),
             );
             await Promise.allSettled(
-                existingFiles.map((file) =>
+                deletedFiles.map((file) =>
                     deleteFile(path.join(file.FILE_PATH, file.FILE_FNAME)),
                 ),
             );
@@ -270,6 +278,18 @@ export class FinnpoService {
             status: true,
             message: 'Update FIN-NPO success',
         };
+    }
+
+    private parseFileIds(value?: number[] | string) {
+        if (Array.isArray(value)) return value.map(Number);
+        if (!value) return [];
+
+        try {
+            const parsed = JSON.parse(value);
+            return Array.isArray(parsed) ? parsed.map(Number) : [];
+        } catch {
+            return [];
+        }
     }
 
     private async updateData(dto: ActionFinnpoDto) {
@@ -284,7 +304,6 @@ export class FinnpoService {
         }
 
         if (
-            dto.SUBJECT !== undefined ||
             dto.EXPENSE_CODE !== undefined ||
             dto.VENDOR_CODE !== undefined
         ) {
@@ -295,9 +314,6 @@ export class FinnpoService {
                 dto.CYEAR2 || dto.CYEAR,
                 Number(dto.NRUNNO),
                 {
-                    ...(dto.SUBJECT !== undefined && {
-                        SUBJECT: String(dto.SUBJECT).trim(),
-                    }),
                     ...(dto.EXPENSE_CODE !== undefined && {
                         EXPENSE_CODE: Number(dto.EXPENSE_CODE),
                     }),
@@ -392,7 +408,6 @@ export class FinnpoService {
 
         const head = await this.repo.createHead({
             ...form,
-            SUBJECT: dto.SUBJECT,
             VENDOR_CODE: vendorCode,
             EXPENSE_CODE: expenseCode,
         });
@@ -407,6 +422,9 @@ export class FinnpoService {
             VAT_RATE_ID: Number(invoice.VAT_RATE_ID),
             TOTAL_AMT: Number(invoice.TOTAL_AMT),
             SCURCODE: invoice.SCURCODE,
+            REFERENCE: invoice.REFERENCE == null
+                ? null
+                : String(invoice.REFERENCE).trim() || null,
         }));
         const savedInvoices = await this.repo.createInvoices(invoiceEntities);
 
@@ -500,6 +518,11 @@ export class FinnpoService {
             return {
                 ID: id,
                 ...(wht !== undefined && { WHT: wht }),
+                ...(invoice.REFERENCE !== undefined && {
+                    REFERENCE: invoice.REFERENCE === null
+                        ? null
+                        : String(invoice.REFERENCE).trim() || null,
+                }),
                 ...(invoice.INVOICE_DATE !== undefined && {
                     INVOICE_DATE: new Date(invoice.INVOICE_DATE),
                     INVOICE_NO: String(invoice.INVOICE_NO || '').trim(),
@@ -574,9 +597,9 @@ export class FinnpoService {
     }
 
     private validateCreateDto(dto: CreateFinnpoDto) {
-        if (!dto?.INPUTBY || !dto?.REQBY || !dto?.SUBJECT) {
+        if (!dto?.INPUTBY || !dto?.REQBY) {
             throw new BadRequestException(
-                'INPUTBY, REQBY and SUBJECT are required',
+                'INPUTBY and REQBY are required',
             );
         }
 

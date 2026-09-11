@@ -5,9 +5,20 @@ import { S020kpRepository } from './s020kp.repository';
 export class S020kpService {
     constructor(private readonly repo: S020kpRepository) {}
 
-    async find(order: string) {
+    async find(order: string, type?: 'from-order' | 'to-order' | 'all') {
         try {
-            const res = await this.repo.find(order);
+            let res = null;
+            switch (type) {
+                case 'from-order':
+                    res = await this.repo.findFromOrder(order);
+                    break;
+                case 'to-order':
+                    res = await this.repo.findToOrder(order);
+                    break;
+                case 'all':
+                default:
+                    res = await this.repo.findAll(order);
+            }
             if (res.length === 0) {
                 return {
                     status: false,

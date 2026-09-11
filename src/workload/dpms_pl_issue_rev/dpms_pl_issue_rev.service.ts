@@ -41,9 +41,31 @@ export class DpmsPlIssueRevService {
 
     async getNextRevisionWithoutType(
         condition: dpmsPlIssueRevFindLatestRevision,
-        withOutType: number,    
+        withOutType: number,
     ): Promise<number> {
-        const lastRevision = await this.repo.findLatestRevisionWithoutType(condition, withOutType);
+        const lastRevision = await this.repo.findLatestRevisionWithoutType(
+            condition,
+            withOutType,
+        );
         return lastRevision ? lastRevision.NREV + 1 : 0;
+    }
+
+    async findByRevId(revId: number) {
+        try {
+            const res = await this.repo.findByRevId(revId);
+            if (res.length === 0) {
+                return {
+                    status: false,
+                    message: 'Failed to find DPMS PL Issue',
+                };
+            }
+            return {
+                status: true,
+                message: `DPMS PL Issue found ${res.length} records`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(`Failed to find DPMS PL Issue: ${error.message}`);
+        }
     }
 }

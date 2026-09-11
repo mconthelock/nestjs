@@ -46,4 +46,14 @@ export class DpmsPlIssueRevRepository extends BaseRepository {
             },
         });
     }
+
+    findByRevId(revId: number) {
+        return this.getRepository(DPMS_PL_ISSUE_REV).find({
+            where: { NID: revId },
+            relations: ['ISSUE_TYPE'],
+            order: {
+                NROUND: 'ASC',
+            },
+        });
+    }
 }

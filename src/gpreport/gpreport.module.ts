@@ -19,6 +19,7 @@ import { MedicalModule } from './medical/medical.module';
 import { TaxModule } from './tax/tax.module';
 import { LoanModule } from './loan/loan.module';
 import { EmployeeModule } from './employee/employee.module';
+import { ExpatModule } from './expat/expat.module';
 
 @Module({
     imports: [
@@ -35,6 +36,7 @@ import { EmployeeModule } from './employee/employee.module';
         StyPatrolInspectionModule,
         StinpFormModule,
         StinpFormListModule,
+        ExpatModule,
         UniformModule,
         LeaveModule,
         AttendanceModule,
@@ -42,6 +44,7 @@ import { EmployeeModule } from './employee/employee.module';
         TaxModule,
         LoanModule,
         EmployeeModule,
+        ExpatModule
     ],
 })
 export class gpreportModule {}

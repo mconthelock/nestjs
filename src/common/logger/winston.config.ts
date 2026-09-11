@@ -11,6 +11,7 @@ const logDir = configuredLogDir
     ? path.win32.normalize(configuredLogDir)
     : path.resolve(process.cwd(), 'logs');
 console.log('Winston log directory:', logDir);
+
 const addRequestId = winston.format((info) => {
     const requestId = requestNamespace.get('requestId');
     if (requestId) {

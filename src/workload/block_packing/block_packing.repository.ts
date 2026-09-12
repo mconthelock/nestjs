@@ -3,6 +3,14 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import * as oracledb from 'oracledb';
+import { applyDynamicFilters } from 'src/common/helpers/query.helper';
+
+import { AmecOrders } from 'src/common/Entities/workload/table/amecorders.entity';
+import { AmecOrdersSchedule } from 'src/common/Entities/workload/table/amecorders_schedule.entity';
+import { AmecOrdersPackNo } from 'src/common/Entities/workload/table/amecorders_packno.entity';
+import { PisPages } from 'src/common/Entities/workload/table/pis-pages.entity';
+
+import { SearchPackingDto } from './dto/search-packing.dto';
 
 @Injectable()
 export class BlockPackingRepository extends BaseRepository {
@@ -72,5 +80,16 @@ export class BlockPackingRepository extends BaseRepository {
         return this.ds.query(`
             SELECT * FROM S010MP
         `);
+    }
+
+    async getPisPages(searchDto: SearchPackingDto) {
+        console.log(searchDto);
+
+        const qb = this.ds
+            .createQueryBuilder(AmecOrdersPackNo, 'packing')
+            .leftJoinAndSelect('packing.detail', 'detail')
+            .leftJoinAndSelect('detail.schedule', 'schedule');
+        await applyDynamicFilters(qb, searchDto, 'packing');
+        return qb.getMany();
     }
 }

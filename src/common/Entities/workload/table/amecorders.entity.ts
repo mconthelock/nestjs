@@ -1,4 +1,13 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import {
+    Entity,
+    Column,
+    PrimaryColumn,
+    OneToMany,
+    JoinColumn,
+    OneToOne,
+} from 'typeorm';
+import { AmecOrdersPackNo } from './AMECORDERS_PACKNO.entity';
+import { AmecOrdersSchedule } from './amecorders_schedule.entity';
 
 @Entity({ name: 'AMECORDERS', schema: 'WORKLOAD' })
 export class AmecOrders {
@@ -55,4 +64,12 @@ export class AmecOrders {
 
     @Column()
     SPEC: string;
+
+    @OneToOne(() => AmecOrdersSchedule, (schedule) => schedule.ord)
+    @JoinColumn({ name: 'MFGNO', referencedColumnName: 'REFMFGNO' })
+    schedule: AmecOrdersSchedule;
+
+    @OneToMany(() => AmecOrdersPackNo, (pack) => pack.detail)
+    @JoinColumn({ name: 'MFGNO', referencedColumnName: 'ORDERNO' })
+    packing: AmecOrdersPackNo[];
 }

@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreateBlockPackingDto } from './dto/create-block_packing.dto';
 import { UpdateBlockPackingDto } from './dto/update-block_packing.dto';
+import { SearchPackingDto } from './dto/search-packing.dto';
+
 import { BlockPackingRepository } from './block_packing.repository';
 
 @Injectable()
@@ -36,8 +38,8 @@ export class BlockPackingService {
         return result;
     }
 
-    async issuePISMFG(createBlockPackingDto: CreateBlockPackingDto) {
-        const result = '';
+    async issuePISMFG(dto: SearchPackingDto) {
+        const result = await this.blockPackingRepository.getPisPages(dto);
         return result;
     }
 }

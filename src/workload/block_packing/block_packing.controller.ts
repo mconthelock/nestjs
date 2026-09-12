@@ -10,6 +10,7 @@ import {
 import { BlockPackingService } from './block_packing.service';
 import { CreateBlockPackingDto } from './dto/create-block_packing.dto';
 import { UpdateBlockPackingDto } from './dto/update-block_packing.dto';
+import { SearchPackingDto } from './dto/search-packing.dto';
 
 @Controller('block-packing')
 export class BlockPackingController {
@@ -29,7 +30,7 @@ export class BlockPackingController {
     }
 
     @Post('issue-pis')
-    async issuePISMFG(@Body() createBlockPackingDto: CreateBlockPackingDto) {
-        return this.blockPackingService.issuePISMFG(createBlockPackingDto);
+    async issuePISMFG(@Body() SearchPackingDto: SearchPackingDto) {
+        return this.blockPackingService.issuePISMFG(SearchPackingDto);
     }
 }

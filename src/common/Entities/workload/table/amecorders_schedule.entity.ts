@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToOne } from 'typeorm';
+import { AmecOrders } from './amecorders.entity';
 
 @Entity({ name: 'AMECORDERS_SCHEDULE', schema: 'WORKLOAD' })
 export class AmecOrdersSchedule {
@@ -99,9 +100,12 @@ export class AmecOrdersSchedule {
     ORDSTATUS: number;
 
     @Column()
-    MFG_FINISHDATE: Date;
+    MFG_FINISDATE: Date;
     @Column()
     LAST_UPDATE: Date;
     @Column()
     SHIPMENT_DATE: Date;
+
+    @OneToOne(() => AmecOrders, (ord) => ord.schedule)
+    ord: AmecOrders;
 }

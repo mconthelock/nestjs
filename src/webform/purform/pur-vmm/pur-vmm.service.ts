@@ -412,13 +412,14 @@ export class PurVmmService {
             CYEAR2: data.CYEAR2,
             NRUNNO: data.NRUNNO,
         };
-        // console.log(form);
-        // console.log(data);
-        // console.log(dto);
-
-        //console.log(buyinfo);
-
-        //return false;
+        const buyinfo = await this.userService.findEmp(data.BUYER);
+        let to = '';
+        let cc = [];
+        let cc2 = '';
+        let subject = '';
+        let html = '';
+        let from = 'webflow_admin@MitsubishiElevatorAsia.co.th';
+        let status;
 
         try {
             await this.doactionService.doAction(
@@ -426,16 +427,16 @@ export class PurVmmService {
                 ip,
             );
             const cst = await this.formService.getFormStatus({ ...form });
-            if (cst == '2') {
-                const subject = 'VENDOR MASTER MAINTENANCE';
+            status = cst == '2' ? 'Approved' : 'Rejected';
+            const statusColor = cst == '2' ? '#28a745' : '#dc3545';
+
+            if (cst == '2' || cst == '3') {
+                subject = 'VENDOR MASTER MAINTENANCE';
                 //  const to = "Accounting@MitsubishiElevatorAsia.co.th";
-                const to = 'kanittha@MitsubishiElevatorAsia.co.th';
-                let cc = [];
+                to = 'kanittha@MitsubishiElevatorAsia.co.th';
+
                 if (data.VENDGROUPTYPE == 'Direct') {
                     if (data.REQTYPE == 'Add') {
-                        const buyinfo = await this.userService.findEmp(
-                            data.BUYER,
-                        );
                         cc.push(buyinfo.data.SRECMAIL);
                         cc.push('pimporan@MitsubishiElevatorAsia.co.th');
                         cc.push('kanokrat@MitsubishiElevatorAsia.co.th');
@@ -450,6 +451,161 @@ export class PurVmmService {
                     cc.push('PADmember@MitsubishiElevatorAsia.co.th');
                 } else {
                     cc.push('SCmember@MitsubishiElevatorAsia.co.th');
+                }
+                // แยก Link ออกมาเพื่อให้จัดการง่ายขึ้น
+                const formLink = `https://amecweb.mitsubishielevatorasia.co.th/form/purform/PUR-VMM/form/main?no=${form.NFRMNO}&orgNo=${form.VORGNO}&y=${form.CYEAR}&y2=${form.CYEAR2}&runNo=${form.NRUNNO}`;
+
+                // ใช้ Backtick (`) เพื่อสร้าง Template Literal แบบหลายบรรทัด
+                html = `
+<div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #333333; max-width: 700px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+
+    <!-- ส่วนหัวอีเมล -->
+    <div style="padding: 20px 20px 0 20px; text-align: left;">
+        <h2 style="margin: 0 0 20px 0; font-size: 18px; letter-spacing: 0.5px; color: #333333; text-transform: uppercase;">VENDOR MASTER MAINTENANCE</h2>
+    </div>
+
+    <!-- เนื้อหาอีเมล -->
+    <div style="padding: 0 20px 20px 20px; background-color: #ffffff;">
+        <p style="margin-top: 0; font-size: 15px;"><strong>Dear All Concerned,</strong></p>
+        <p style="font-size: 14px; line-height: 1.6;">Please be informed that the following information is related to the Vendor Master Maintenance process.</p>
+
+        <p style="font-size: 14px; line-height: 1.6;">For further details, please access the following link <a href="${formLink}" style="color: #0056b3; text-decoration: underline; word-break: break-all;">${formLink}</a> proceed with the next steps accordingly:
+        </p>
+
+        <!-- ตารางข้อมูลสไตล์โมเดิร์น -->
+        <div style="margin: 25px 0; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px; background-color: #ffffff;">
+                <thead>
+                    <tr>
+                        <th style="width: 15%; padding: 5px 5px; text-align: left; background-color: #f1f3f5; border-bottom: 2px solid #dee2e6; color: #475569; font-weight: 600;  font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Mode</th>
+                        <th style="width: 25%;  padding: 5px 5px;  text-align: left; background-color: #f1f3f5; border-bottom: 2px solid #dee2e6; color: #475569; font-weight: 600;  font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Vendor Code</th>
+                        <th style="width: 40%;  padding: 5px 5px;   text-align: left; background-color: #f1f3f5; border-bottom: 2px solid #dee2e6; color: #475569; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Vendor Name</th>
+                        <th style="width: 20%;   padding: 5px 5px;  text-align: left; background-color: #f1f3f5; border-bottom: 2px solid #dee2e6; color: #475569; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style=" padding: 5px 5px;  text-align: left; border-bottom: 1px solid #e2e8f0; color: #334155;">${data.REQTYPE?.charAt(0)}</td>
+                        <td style="  padding: 5px 5px;  text-align: left; border-bottom: 1px solid #e2e8f0; color: #334155;">${data.VENDCODE}</td>
+                        <td style="  padding: 5px 5px;  text-align: left; border-bottom: 1px solid #e2e8f0; color: #334155;">${data.VENDNAME}</td>
+                        <td style="padding: 5px 5px;  text-align: left; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: ${statusColor};">${status}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ส่วนท้ายอีเมล -->
+    <div style="background-color: #f8f9fa; padding: 15px; text-align: center; font-size: 12px; color: #6c757d; border-top: 1px solid #e0e0e0;">
+        This is an automated message from the system. Please do not reply to this email.
+    </div>
+</div>
+`;
+
+                this.mailService.sendMail({
+                    from: from,
+                    to: to,
+                    subject,
+                    html,
+                    cc: cc,
+                });
+                if (data.EVANO) {
+                    const regex = /^([A-Z-]+)(\d{2})-(\d+)$/;
+                    const match = data.EVANO.match(regex);
+                    if (match) {
+                        let frmtype = match[1];
+                        let year = '20' + match[2];
+                        let runningNo = parseInt(match[3], 10);
+                        const formeva =
+                            await this.repomst.getFormMasterByVaname(frmtype);
+                        const formdata = await this.repoeva.getData({
+                            NFRMNO: formeva.NNO,
+                            VORGNO: formeva.VORGNO,
+                            CYEAR: formeva.CYEAR,
+                            CYEAR2: year,
+                            NRUNNO: runningNo,
+                        });
+
+                        if (formdata.NVFNO) {
+                            const matchnvf = formdata.NVFNO.match(regex);
+                            frmtype = matchnvf[1];
+                            year = '20' + matchnvf[2];
+                            runningNo = parseInt(matchnvf[3], 10);
+                            const formnvf =
+                                await this.repomst.getFormMasterByVaname(
+                                    frmtype,
+                                );
+                            const forminf = await this.formService.getFormData({
+                                NFRMNO: formnvf.NNO,
+                                VORGNO: formnvf.VORGNO,
+                                CYEAR: formnvf.CYEAR,
+                                CYEAR2: year,
+                                NRUNNO: runningNo,
+                            });
+                            const reqinfo = await this.userService.findEmp(
+                                forminf.VREQNO,
+                            );
+                            to = reqinfo.data.SRECMAIL;
+                            cc2 = buyinfo.data.SRECMAIL;
+                            subject =
+                                'NEW VENDOR REQUISITION : VENDOR MASTER (CODE)';
+                            html = `
+<div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #333333; max-width: 700px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+
+    <!-- ส่วนหัวอีเมล -->
+    <div style="padding: 20px 20px 0 20px; text-align: left;">
+        <h2 style="margin: 0 0 20px 0; font-size: 18px; letter-spacing: 0.5px; color: #333333; text-transform: uppercase;">VENDOR MASTER (<font color="#FF0000">CODE</font>)</h2>
+    </div>
+
+    <!-- เนื้อหาอีเมล -->
+    <div style="padding: 0 20px 20px 20px; background-color: #ffffff;">
+        <p style="margin-top: 0; font-size: 15px;"><strong>Dear All Concerned,</strong></p>
+        <p style="font-size: 14px; line-height: 1.6;">Please be informed that the following information is related to the Vendor Master Maintenance process.</p>
+
+
+
+        <!-- ตารางข้อมูลสไตล์โมเดิร์น -->
+        <div style="margin: 25px 0; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px; background-color: #ffffff;">
+                <thead>
+                    <tr>
+					 <th style="width: 20%; padding: 5px 5px; text-align: left; background-color: #f1f3f5; border-bottom: 2px solid #dee2e6; color: #475569; font-weight: 600;  font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">NVF FORM</th>
+
+                        <th style="width: 10%; padding: 5px 5px; text-align: left; background-color: #f1f3f5; border-bottom: 2px solid #dee2e6; color: #475569; font-weight: 600;  font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Mode</th>
+                        <th style="width: 20%;  padding: 5px 5px;  text-align: left; background-color: #f1f3f5; border-bottom: 2px solid #dee2e6; color: #475569; font-weight: 600;  font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Vendor Code</th>
+                        <th style="width: 40%;  padding: 5px 5px;   text-align: left; background-color: #f1f3f5; border-bottom: 2px solid #dee2e6; color: #475569; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Vendor Name</th>
+                        <th style="width: 15%;   padding: 5px 5px;  text-align: left; background-color: #f1f3f5; border-bottom: 2px solid #dee2e6; color: #475569; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td style=" padding: 5px 5px;  text-align: left; border-bottom: 1px solid #e2e8f0; color: #334155;">${formdata.NVFNO}</td>
+					<td style=" padding: 5px 5px;  text-align: left; border-bottom: 1px solid #e2e8f0; color: #334155;">${data.REQTYPE?.charAt(0)}</td>
+                        <td style="  padding: 5px 5px;  text-align: left; border-bottom: 1px solid #e2e8f0; color: #334155;">${data.VENDCODE}</td>
+                        <td style="  padding: 5px 5px;  text-align: left; border-bottom: 1px solid #e2e8f0; color: #334155;">${data.VENDNAME}</td>
+                        <td style="padding: 5px 5px;  text-align: left; border-bottom: 1px solid #e2e8f0; font-weight: bold;">${status}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ส่วนท้ายอีเมล -->
+    <div style="background-color: #f8f9fa; padding: 15px; text-align: center; font-size: 12px; color: #6c757d; border-top: 1px solid #e0e0e0;">
+        This is an automated message from the system. Please do not reply to this email.
+    </div>
+</div>
+`;
+
+                            this.mailService.sendMail({
+                                from: from,
+                                to: to,
+                                subject,
+                                html,
+                                cc: cc2,
+                            });
+                        }
+                    }
                 }
             }
 

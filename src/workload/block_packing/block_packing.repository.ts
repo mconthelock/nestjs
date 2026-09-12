@@ -11,6 +11,10 @@ import { AmecOrdersPackNo } from 'src/common/Entities/workload/table/amecorders_
 import { PisPages } from 'src/common/Entities/workload/table/pis-pages.entity';
 
 import { SearchPackingDto } from './dto/search-packing.dto';
+import {
+    UpdateBlockPackingDto,
+    UpdateRemarkByOrderDto,
+} from './dto/update-block_packing.dto';
 
 @Injectable()
 export class BlockPackingRepository extends BaseRepository {
@@ -83,13 +87,32 @@ export class BlockPackingRepository extends BaseRepository {
     }
 
     async getPisPages(searchDto: SearchPackingDto) {
-        console.log(searchDto);
-
         const qb = this.ds
             .createQueryBuilder(AmecOrdersPackNo, 'packing')
             .leftJoinAndSelect('packing.detail', 'detail')
-            .leftJoinAndSelect('detail.schedule', 'schedule');
+            .leftJoinAndSelect('detail.schedule', 'schedule')
+            .leftJoinAndSelect('packing.printed', 'printed');
         await applyDynamicFilters(qb, searchDto, 'packing');
         return qb.getMany();
+    }
+
+    async updateRemarkPacking(dto: UpdateBlockPackingDto) {
+        return this.ds.query(
+            `UPDATE AMECORDERS_PACKNO
+             SET REMARK = :1
+             WHERE ORDERNO = :2 AND PACKNO = :3`,
+            [dto.REMARK, dto.ORDERNO, dto.PACKNO],
+        );
+    }
+
+    async updateRemarkByOrder(dto: UpdateRemarkByOrderDto) {
+        const orderBinds = dto.ORDERSNO.map((_, index) => `:${index + 2}`);
+
+        return this.ds.query(
+            `UPDATE AMECORDERS_PACKNO
+             SET REMARK = :1
+             WHERE ORDERNO IN (${orderBinds.join(', ')})`,
+            [dto.REMARK, ...dto.ORDERSNO],
+        );
     }
 }

@@ -1,6 +1,13 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+    Entity,
+    Column,
+    PrimaryColumn,
+    ManyToOne,
+    JoinColumn,
+    OneToOne,
+} from 'typeorm';
 import { AmecOrders } from './amecorders.entity';
-import { AmecOrdersSchedule } from './amecorders_schedule.entity';
+import { PisPages } from './pis-pages.entity';
 
 @Entity({ name: 'AMECORDERS_PACKNO', schema: 'WORKLOAD' })
 export class AmecOrdersPackNo {
@@ -35,10 +42,8 @@ export class AmecOrdersPackNo {
     @JoinColumn({ name: 'ORDERNO', referencedColumnName: 'MFGNO' })
     detail: AmecOrders;
 
-    // @ManyToOne(
-    //     () => AmecOrdersSchedule,
-    //     (amecOrdersSchedule) => amecOrdersSchedule,
-    // )
-    // @JoinColumn({ name: 'ORDERNO', referencedColumnName: 'REFMFGNO' })
-    // schedule: AmecOrdersSchedule;
+    @OneToOne(() => PisPages, (pisPages) => pisPages)
+    @JoinColumn({ name: 'ORDERNO', referencedColumnName: 'PAGE_MFGNO' })
+    @JoinColumn({ name: 'PACKNO', referencedColumnName: 'PAGE_PACKING' })
+    printed: PisPages;
 }

@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { PurVendor } from './pur_vendor.entity';
 import { CurrencyMaster } from './CURRENCY_MASTER.entity';
-import { TERMCODE } from './TERMCODE.entity';
+import { TermPayment } from './TERM_PAYMENT.entity';
 
 @Entity({
     schema: 'PURSYS',
@@ -49,12 +49,11 @@ export class PurVendorsCode {
     @JoinColumn({ name: 'VENDOR_ID' })
     vendor: PurVendor;
 
-    @OneToOne(() => TERMCODE)
+    @OneToOne(() => TermPayment)
     @JoinColumn({ name: 'CODE_PAY', referencedColumnName: 'STERMCODE' })
-    TERM: TERMCODE;  
+    TERM: TermPayment;
 
     @OneToOne(() => CurrencyMaster)
-    @JoinColumn({ name:'CODE_CURRENCY',referencedColumnName:'CURR_CODE'})
-    STDCUR:CurrencyMaster
-
+    @JoinColumn({ name: 'CODE_CURRENCY', referencedColumnName: 'CURR_CODE' })
+    STDCUR: CurrencyMaster;
 }

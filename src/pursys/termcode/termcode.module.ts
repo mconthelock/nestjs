@@ -4,10 +4,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TermcodeService } from './termcode.service';
 import { TermcodeController } from './termcode.controller';
 
-import { TERMCODE } from 'src/common/Entities/pursys/table/TERMCODE.entity';
+import { TermPayment } from 'src/common/Entities/pursys/table/TERM_PAYMENT.entity';
+import { TermTrade } from 'src/common/Entities/pursys/table/TERM_TRADE.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([TERMCODE], 'purConnection')],
+    imports: [
+        TypeOrmModule.forFeature([TermPayment, TermTrade], 'purConnection'),
+    ],
     controllers: [TermcodeController],
     providers: [TermcodeService],
 })

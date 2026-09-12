@@ -13,7 +13,7 @@ import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 import { PURNVF_ADDRESS } from './PURNVF_ADDRESS.entity';
 import { PUR_FILE } from './PUR_FILE.entity';
 import { PURVMM_SCMUSR } from './PURVMM_SCMUSR.entity';
-import { TERMCODE } from '../../pursys/table/TERMCODE.entity';
+import { TermPayment } from '../../pursys/table/TERM_PAYMENT.entity';
 import { CurrencyMaster } from '../../pursys/table/CURRENCY_MASTER.entity';
 
 @Entity({ name: 'PURVMM_FORM', schema: 'WEBFORM' })
@@ -111,9 +111,9 @@ export class PURVMM_FORM {
     @Column()
     EVANO: string;
 
-    @OneToOne(() => TERMCODE)
+    @OneToOne(() => TermPayment)
     @JoinColumn({ name: 'TERMCODE', referencedColumnName: 'STERMCODE' })
-    TERM: TERMCODE;
+    TERM: TermPayment;
 
     @OneToOne(() => CurrencyMaster)
     @JoinColumn({ name: 'CURCODE', referencedColumnName: 'CURR_CODE' })

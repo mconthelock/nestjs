@@ -17,6 +17,7 @@ export class WireHarnessAs400Repository {
                     F2.F02R03 AS PROCESS,
                     S.M8K01 AS PROD,
                     S.M8K02 AS P,
+                    S.M8K04 AS SEQBM,
                     S.M8K03 AS MFGNO,
                     F1.F01R08 AS PROJ,
                     Q9.Q9TYP AS MODEL,
@@ -51,7 +52,7 @@ export class WireHarnessAs400Repository {
                     AND Q1.Q41K04 = Q3.Q43K04
                     AND Q1.Q41K05 = Q3.Q43K05
                 WHERE F2.F02R03 = 'B4CC06'
-                AND S.M8K01 >= VARCHAR_FORMAT(CURRENT DATE - 1 MONTH, 'YYYYMM')
+                    AND S.M8K01 >= VARCHAR_FORMAT(CURRENT DATE - 1 MONTH, 'YYYYMM')
             ) X
             WHERE X.RN = 1
         `);

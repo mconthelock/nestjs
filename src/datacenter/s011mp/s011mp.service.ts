@@ -70,10 +70,20 @@ export class S011mpService {
         }
     }
 
-    async findPacking(order: string, item?: string) {
+    async findPacking({
+        order,
+        item,
+        combine = false,
+    }: {
+        order: string;
+        item?: string;
+        combine?: boolean;
+    }) {
         try {
             let res: S011MP[];
-            if (item) {
+            if (combine) {
+                res = await this.repo.findByOrderCombine(order, item);
+            } else if (item) {
                 res = await this.repo.findOrderItems(order, item);
             } else {
                 res = await this.repo.findByOrder(order);
@@ -89,6 +99,7 @@ export class S011mpService {
             return {
                 status: true,
                 message: `Found ${data.length} packing data(s) for order: ${order}`,
+                res: res,
                 data: data,
             };
         } catch (error) {
@@ -132,8 +143,16 @@ export class S011mpService {
             .map((main) => {
                 const drawingGroup = this.getGroup(main.S11M06);
                 const groupLevels = levels.filter(
-                    (l) => this.getGroup(l.S11M06) === drawingGroup,
+                    (l) =>
+                        this.getGroup(l.S11M06) === drawingGroup &&
+                        l.S11M04 === main.S11M04 &&
+                        l.S11M01 === main.S11M01 &&
+                        l.S11M02 === main.S11M02,
+                    // (l) => l.S11M04 === main.S11M04,
                 );
+
+                // console.log('drawingGroup:', drawingGroup);
+                // console.log('groupLevels:', groupLevels);
 
                 const max: number = main.S11M09;
                 const minRes: number = groupLevels.reduce(
@@ -142,12 +161,24 @@ export class S011mpService {
                 );
                 const min = minRes == Infinity ? max : minRes;
 
+                const values = [max - min, min];
+                const maxLevels = groupLevels.filter((l) => l.S11M09 == max);
+                const minLevels = groupLevels.filter((l) => l.S11M09 == min);
+                if (max - min == 0) {
+                    console.log('max:', max);
+                    console.log('min:', min);
+                    console.log('max - min:', max - min);
+                    console.log('maxLevels:', maxLevels);
+                    console.log('minLevels:', minLevels);
+                    console.log('---------------------------');
+                }
                 if (max - min == 0) {
                     return [
                         {
                             ...main,
                             S11M09: max,
                             LEVEL: groupLevels
+                                .sort((a, b) => a.S11M06.localeCompare(b.S11M06))
                                 .map((l) => this.getLevel(l.S11M06))
                                 .join(''),
                             DRAWING_GROUP: drawingGroup,
@@ -155,18 +186,16 @@ export class S011mpService {
                         },
                     ];
                 }
-                const values = [max - min, min];
-                const maxLevels = groupLevels.filter((l) => l.S11M09 == max);
-                const minLevels = groupLevels.filter((l) => l.S11M09 == min);
 
                 // กรณี min-level มี 2 ตัว: แยกเป็น 2 rows โดยแต่ละ row เก็บ min-level คนละตัว
-                if (minLevels.length == 2) {
+                if (minLevels.length == 2 && max == 2) {
                     return values.map((value, index) => {
                         const rowLevels = [...maxLevels, minLevels[index]];
                         return {
                             ...main,
                             S11M09: value,
                             LEVEL: rowLevels
+                                .sort((a, b) => a.S11M06.localeCompare(b.S11M06))
                                 .map((l) => this.getLevel(l.S11M06))
                                 .join(''),
                             DRAWING_GROUP: drawingGroup,
@@ -181,6 +210,7 @@ export class S011mpService {
                     S11M09: value,
                     // ตัด 3 ตัวท้ายของ S11M06 (เฉพาะที่ S11M09 เท่ากับ max หรือ value) มาต่อกัน
                     LEVEL: groupLevels
+                        .sort((a, b) => a.S11M06.localeCompare(b.S11M06))
                         .filter((l) => l.S11M09 == max || l.S11M09 == value)
                         .map((l) => this.getLevel(l.S11M06))
                         .join(''),

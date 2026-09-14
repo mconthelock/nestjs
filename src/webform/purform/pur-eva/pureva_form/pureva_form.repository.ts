@@ -6,6 +6,8 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 import { Brackets, DataSource } from 'typeorm';
 import { CreatePurevaFormDto } from './dto/create-pureva_form.dto';
 import { UpdatePurevaFormDto } from './dto/update-pureva_form.dto';
+import { SearchPurevaFormDto } from './dto/search-pureva_form.dto';
+import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 
 @Injectable()
 export class PurevaFormRepository extends BaseRepository {
@@ -44,5 +46,22 @@ export class PurevaFormRepository extends BaseRepository {
     async update(con: FormDto, dto: UpdatePurevaFormDto): Promise<boolean> {
         const result = await this.getRepository(PUREVA_FORM).update(con, dto);
         return (result.affected ?? 0) > 0;
+    }
+
+    async search(dto: SearchPurevaFormDto) {
+        const qb = this.getRepository(PUREVA_FORM)
+            .createQueryBuilder('eva')
+            .leftJoinAndSelect('eva.FORM', 'evaform')
+            .leftJoinAndSelect('evaform.reqtor', 'reqtor')
+            .leftJoinAndSelect('eva.PROFIT_TURNOVERS', 'turnovers')
+            .leftJoinAndSelect('eva.ADDRESSES', 'addresses')
+            .leftJoinAndSelect('eva.SCORES', 'scores')
+            .leftJoinAndSelect('eva.TERM', 'term')
+            .leftJoinAndSelect('eva.STDCUR', 'stdcur')
+            .leftJoinAndSelect('eva.CAPCUR', 'capcur')
+            .leftJoinAndSelect('evaform.flow', 'flow');
+
+        if (dto) await applyDynamicFilters(qb, dto, 'eva');
+        return qb.getMany();
     }
 }

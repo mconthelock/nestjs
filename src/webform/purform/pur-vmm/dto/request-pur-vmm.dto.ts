@@ -164,6 +164,10 @@ export class RequestPurvmmFormDto extends PickType(CreateFormDto, [
     EVANO?: string;
 
     @IsOptional()
+    @IsString()
+    TRADE_CODE?: string;
+
+    @IsOptional()
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => RequestPurvmmScmuserDto)

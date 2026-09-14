@@ -99,6 +99,74 @@ export class FinnpoService {
         };
     }
 
+    async createVendor(dto: Record<string, unknown>) {
+        const vendor = this.normalizeVendor(dto);
+        if (await this.repo.findVendorByCode(vendor.VENDOR_CODE)) {
+            throw new BadRequestException(
+                `VENDOR_CODE ${vendor.VENDOR_CODE} already exists`,
+            );
+        }
+
+        return {
+            status: true,
+            message: 'Create vendor success',
+            data: await this.repo.createVendor(vendor),
+        };
+    }
+
+    async updateVendor(dto: Record<string, unknown>) {
+        const originalCode = String(dto.ORIGINAL_VENDOR_CODE || '').trim();
+        const originalName = String(dto.ORIGINAL_VENDOR_NAME || '').trim();
+        const vendor = this.normalizeVendor(dto);
+        if (!originalCode || !originalName) {
+            throw new BadRequestException('Original vendor key is required');
+        }
+
+        const existing = await this.repo.findVendor(originalCode, originalName);
+        if (!existing) throw new BadRequestException('Vendor was not found');
+
+        const duplicate = await this.repo.findVendorByCode(vendor.VENDOR_CODE);
+        if (duplicate && duplicate.VENDOR_CODE !== originalCode) {
+            throw new BadRequestException(
+                `VENDOR_CODE ${vendor.VENDOR_CODE} already exists`,
+            );
+        }
+
+        await this.repo.updateVendor(originalCode, originalName, vendor);
+        return { status: true, message: 'Update vendor success', data: vendor };
+    }
+
+    async deleteVendor(dto: Record<string, unknown>) {
+        const vendorCode = String(dto.VENDOR_CODE || '').trim();
+        const vendorName = String(dto.VENDOR_NAME || '').trim();
+        if (!vendorCode || !vendorName) {
+            throw new BadRequestException('Vendor key is required');
+        }
+        if (!(await this.repo.findVendor(vendorCode, vendorName))) {
+            throw new BadRequestException('Vendor was not found');
+        }
+        if (await this.repo.isVendorInUse(vendorCode)) {
+            throw new BadRequestException(
+                'Vendor is already used by a FIN-NPO form. Set it to inactive instead.',
+            );
+        }
+
+        await this.repo.deleteVendor(vendorCode, vendorName);
+        return { status: true, message: 'Delete vendor success' };
+    }
+
+    private normalizeVendor(dto: Record<string, unknown>) {
+        const VENDOR_CODE = String(dto.VENDOR_CODE || '').trim();
+        const VENDOR_NAME = String(dto.VENDOR_NAME || '').trim();
+        const ACTIVE = String(dto.ACTIVE) === '0' ? '0' : '1';
+        if (!VENDOR_CODE || !VENDOR_NAME) {
+            throw new BadRequestException(
+                'VENDOR_CODE and VENDOR_NAME are required',
+            );
+        }
+        return { VENDOR_CODE, VENDOR_NAME, ACTIVE };
+    }
+
     async findAllCurrencyForShow() {
         return {
             status: true,

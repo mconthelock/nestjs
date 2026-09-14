@@ -5,6 +5,7 @@ import { GpTphRepository } from './gp-tph.repository';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
 import { FormDto } from 'src/webform/form/dto/form.dto';
+import { CreateDataAreaDto } from './dto/create-data-area.dto';
 
 @Injectable()
 export class GpTphService {
@@ -32,8 +33,8 @@ export class GpTphService {
             const areaIds = (Array.isArray(dto.AREA_ID)
                 ? dto.AREA_ID
                 : [dto.AREA_ID]).filter(
-                (areaId) => Number.isFinite(Number(areaId)) && Number(areaId) > 0,
-            );
+                    (areaId) => Number.isFinite(Number(areaId)) && Number(areaId) > 0,
+                );
             if (areaIds.length === 0) {
                 throw new BadRequestException('AREA_ID must contain at least one area');
             }
@@ -124,7 +125,23 @@ export class GpTphService {
             throw error;
         }
     }
+    async createArea(dto: CreateDataAreaDto) {
+        const ownerValue = dto.AREA_OWNER?.trim();
+        const [posCode, ownerCode, ...extraParts] =
+            ownerValue?.split('+').map((part) => part.trim()) ?? [];
 
+        if (!posCode || !ownerCode || extraParts.length > 0) {
+            throw new BadRequestException(
+                'AREA_OWNER must have the format SPOSCODE+SDEPCODE/SDIVCODE',
+            );
+        }
+
+        if (posCode.length > 3 || ownerCode.length > 6) {
+            throw new BadRequestException(
+                'AREA_OWNER contains an invalid SPOSCODE or SDEPCODE/SDIVCODE length',
+            );
+        }
+    }
     async findOne(dto: FormDto) {
         return this.repo.findOne(dto);
     }

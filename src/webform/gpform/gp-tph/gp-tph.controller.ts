@@ -17,21 +17,24 @@ import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { Request } from 'express';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
+import { CreateDataAreaDto } from './dto/create-data-area.dto';
+import { updateDetailDto } from 'src/spprogram/inquiry-detail/dto/update.dto';
+import { UpdateAreaDto } from './dto/update-data-area.dto';
 
 @Controller('gpform/gp-tph')
 export class GpTphController {
-    constructor(private readonly gpTphService: GpTphService) {}
+    constructor(private readonly gpTphService: GpTphService) { }
 
     @Get('areas')
     findAllAreas() {
-      return this.gpTphService.findAllAreas();
+        return this.gpTphService.findAllAreas();
     }
 
     @Get('locations')
     findAllLocations() {
-      return this.gpTphService.findAllLocations();
+        return this.gpTphService.findAllLocations();
     }
-    
+
     @Get('/:fno/:orgno/:cyear/:cyear2/:nrunno')
     findOne(
         @Param('fno') fno: number,
@@ -49,35 +52,50 @@ export class GpTphController {
         });
     }
 
-        @Get('/list/:fno/:orgno/:cyear/:cyear2/:nrunno')
-        findList(
-            @Param('fno', ParseIntPipe) fno: number,
-            @Param('orgno') orgno: string,
-            @Param('cyear') cyear: string,
-            @Param('cyear2') cyear2: string,
-            @Param('nrunno', ParseIntPipe) nrunno: number,
-        ) {
-            return this.gpTphService.findList({
-                NFRMNO: fno,
-                VORGNO: orgno,
-                CYEAR: cyear,
-                CYEAR2: cyear2,
-                NRUNNO: nrunno,
-            });
-        }
+    @Get('/list/:fno/:orgno/:cyear/:cyear2/:nrunno')
+    findList(
+        @Param('fno', ParseIntPipe) fno: number,
+        @Param('orgno') orgno: string,
+        @Param('cyear') cyear: string,
+        @Param('cyear2') cyear2: string,
+        @Param('nrunno', ParseIntPipe) nrunno: number,
+    ) {
+        return this.gpTphService.findList({
+            NFRMNO: fno,
+            VORGNO: orgno,
+            CYEAR: cyear,
+            CYEAR2: cyear2,
+            NRUNNO: nrunno,
+        });
+    }
 
-        @Post()
-        @UseTransaction('webformConnection')
-        @UseInterceptors(getFileUploadInterceptor())
-        create(
-            @Body() dto: CreateGpTphReqDto,
-            @Req() req: Request,
-  
-        ) {
-            console.log('CreateGpTphReqDto:', dto);
-            const ip = getClientIP(req);
-            return this.gpTphService.create(dto, ip);
-        }
+    @Post()
+    @UseTransaction('webformConnection')
+    @UseInterceptors(getFileUploadInterceptor())
+    create(
+        @Body() dto: CreateGpTphReqDto,
+        @Req() req: Request,
+    ) {
+        console.log('CreateGpTphReqDto:', dto);
+        const ip = getClientIP(req);
+        return this.gpTphService.create(dto, ip);
+    }
+
+    @Post('areas')
+    createArea(
+        @Body() dto: CreateDataAreaDto,
+    ) {
+        console.log('CreateDataAreaDto:', dto);
+        return this.gpTphService.createArea(dto);
+    }
+    /*@Patch(':id')
+    updateArea(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() dto: UpdateAreaDto,
+    ) {
+        console.log('UpdateDataAreaDto:', dto);
+        return this.gpTphService.updateArea(dto);
+    }*/
 }
 
 

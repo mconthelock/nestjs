@@ -16,7 +16,7 @@ export class GPTPH_AREAS {
     AREA_LEVEL: number;
     @Column()
     LOCATION_ID: number;
-    @Column()
+    @Column({ length: 6 })
     AREA_OWNER: string;
     @Column()
     AREA_OWNER_POSCODE: string;

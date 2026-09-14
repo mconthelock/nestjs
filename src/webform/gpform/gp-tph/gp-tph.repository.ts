@@ -9,6 +9,7 @@ import { GPTPH_REQ_HEADER } from 'src/common/Entities/webform/table/GPTPH_REQ_HE
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { GPTPH_APPLICANT } from 'src/common/Entities/webform/table/GPTPH_APPLICANT.entity';
 import { GPTPH_AREA_RECORD } from 'src/common/Entities/webform/table/GPTPH_AREA_RECORD.entity';
+import { CreateDataAreaDto } from './dto/create-data-area.dto';
 @Injectable()
 export class GpTphRepository extends BaseRepository {
 
@@ -25,29 +26,29 @@ export class GpTphRepository extends BaseRepository {
             relations: ['AREAS']
         });
     }
-        async findOne(dto: FormDto) {
-            const qb = this.manager
-                .createQueryBuilder(GPTPH_REQ_HEADER, 'req')
-                .leftJoinAndSelect('req.form', 'form')
-                .leftJoinAndSelect('req.formmaster', 'formmst')
-                .where('req.NFRMNO = :NFRMNO', { NFRMNO: dto.NFRMNO })
-                .andWhere('req.VORGNO = :VORGNO', { VORGNO: dto.VORGNO })
-                .andWhere('req.CYEAR = :CYEAR', { CYEAR: dto.CYEAR })
-                .andWhere('req.CYEAR2 = :CYEAR2', { CYEAR2: dto.CYEAR2 })
-                .andWhere('req.NRUNNO = :NRUNNO', { NRUNNO: dto.NRUNNO });
-            return qb.getOne();
-        }
+    async findOne(dto: FormDto) {
+        const qb = this.manager
+            .createQueryBuilder(GPTPH_REQ_HEADER, 'req')
+            .leftJoinAndSelect('req.form', 'form')
+            .leftJoinAndSelect('req.formmaster', 'formmst')
+            .where('req.NFRMNO = :NFRMNO', { NFRMNO: dto.NFRMNO })
+            .andWhere('req.VORGNO = :VORGNO', { VORGNO: dto.VORGNO })
+            .andWhere('req.CYEAR = :CYEAR', { CYEAR: dto.CYEAR })
+            .andWhere('req.CYEAR2 = :CYEAR2', { CYEAR2: dto.CYEAR2 })
+            .andWhere('req.NRUNNO = :NRUNNO', { NRUNNO: dto.NRUNNO });
+        return qb.getOne();
+    }
 
-        async findList(dto: FormDto) {
-            return this.manager
+    async findList(dto: FormDto) {
+        return this.manager
             .createQueryBuilder(GPTPH_APPLICANT, 'list')
-                .where('list.CYEAR2 = :CYEAR2', { CYEAR2: dto.CYEAR2 })
-                .andWhere('list.NRUNNO = :NRUNNO', { NRUNNO: dto.NRUNNO })
-                .orderBy('list.SEQ_NO', 'ASC')
-                .getMany();
-        }
+            .where('list.CYEAR2 = :CYEAR2', { CYEAR2: dto.CYEAR2 })
+            .andWhere('list.NRUNNO = :NRUNNO', { NRUNNO: dto.NRUNNO })
+            .orderBy('list.SEQ_NO', 'ASC')
+            .getMany();
+    }
 
-       /* async findOneWithList(dto: FormDto) {
+    /* async findOneWithList(dto: FormDto) {
             const form = await this.findOne(dto);
             const list = await this.findList(dto);
             return { 
@@ -55,16 +56,30 @@ export class GpTphRepository extends BaseRepository {
                 DETAILS: list,
             };
         }*/
-    
-        async CreateGpTphReq(dto: CreateGpTphReqDto) {
-            return this.getRepository(GPTPH_REQ_HEADER).save(dto)
-        }
-        
-        async CreateGpTphApplicant(dto: CreateGpTphlistApplicantDto) {
-            return this.getRepository(GPTPH_APPLICANT).save(dto)
-        }
 
-        async CreateGpTphArearecord(dto: GPTPH_AREA_RECORD) {
-            return this.getRepository(GPTPH_AREA_RECORD).save(dto)
-        }
+    async CreateGpTphReq(dto: CreateGpTphReqDto) {
+        return this.getRepository(GPTPH_REQ_HEADER).save(dto)
+    }
+
+    async CreateGpTphApplicant(dto: CreateGpTphlistApplicantDto) {
+        return this.getRepository(GPTPH_APPLICANT).save(dto)
+    }
+
+    async CreateGpTphArearecord(dto: GPTPH_AREA_RECORD) {
+        return this.getRepository(GPTPH_AREA_RECORD).save(dto)
+    }
+
+    async CreateGpTphArea(dto: CreateDataAreaDto) {
+        const areaRepository = this.getRepository(GPTPH_AREAS);
+        const [lastArea] = await areaRepository.find({
+            order: { AREA_ID: 'DESC' },
+            take: 1,
+        });
+
+        return areaRepository.save({
+            ...dto,
+            AREA_ID: lastArea ? lastArea.AREA_ID + 1 : 1,
+            AREA_STATUS: '1',
+        });
+    }
 }

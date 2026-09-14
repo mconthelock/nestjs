@@ -33,7 +33,7 @@ export class S011mpController {
 
     @Post('packing')
     async findPacking(@Body() dto: SearchPackingDto) {
-        return this.s011mpService.findPacking(dto.ORDER);
+        return this.s011mpService.findPacking({ order: dto.ORDER });
     }
 
     @Post('packing-diff')
@@ -41,8 +41,13 @@ export class S011mpController {
         return this.s011mpService.findPackingDiff(dto.ORDER);
     }
 
+    @Post('packing-combine')
+    async findPackingCombine(@Body() dto: SearchPackingDto) {
+        return this.s011mpService.findPacking({ order: dto.ORDER, item: dto.ITEM, combine: true });
+    }
+
     @Post('packing-items')
     async findOrderItems(@Body() dto: SearchPackingItemsDto) {
-        return this.s011mpService.findPacking(dto.ORDER, dto.ITEM);
+        return this.s011mpService.findPacking({ order: dto.ORDER, item: dto.ITEM });
     }
 }

@@ -52,4 +52,10 @@ export class WHN_AUTOPLAN {
 
     @ViewColumn()
     CABLE: string;
+
+    @ViewColumn()
+    VANPLAN: string;
+
+    @ViewColumn()
+    ACTION: number;
 }

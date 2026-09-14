@@ -18,6 +18,9 @@ export class WHN_PRODUCTION_PLAN {
     P: string;
 
     @Column()
+    SEQBM: number;
+
+    @Column()
     MFGNO: string;
 
     @Column()

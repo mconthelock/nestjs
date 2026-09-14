@@ -63,8 +63,9 @@ export class WithdrawalDto {
     @IsString()
     EMPLOYEE_CODE: string;
 
-    @IsString()
-    RECORD_DATE: string;
+    @Type(() => Date)
+    @IsDate()
+    RECORD_DATE: Date;
 
     @IsString()
     WITHDRAW_TIME: string;

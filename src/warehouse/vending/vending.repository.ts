@@ -111,6 +111,7 @@ export class VendingRepository extends BaseRepository {
         const { importHistory, withdrawals, refills } = dto;
         console.log('importHistory:', importHistory);
         console.log('withdrawals:', withdrawals);
+        const insertedRefills = [];
         const head =
             await this.getRepository(TOOL_IMPORT_HISTORY).save(importHistory);
         const headId = head.IMPORT_ID;
@@ -137,8 +138,29 @@ export class VendingRepository extends BaseRepository {
 
             if (!exists) {
                 await this.getRepository(TOOL_REFILL).insert(refill);
+                insertedRefills.push(refill);
             }
         }
+
+        return {
+            importHistory: head,
+            withdrawals: withdrawalData,
+            refills: insertedRefills,
+        };
+    }
+
+    async updateImportTransactionIds(
+        importId: number,
+        issueId: number,
+        receiveId: number | null,
+    ) {
+        return this.getRepository(TOOL_IMPORT_HISTORY).update(
+            { IMPORT_ID: importId },
+            {
+                ISSUE_ID: issueId,
+                RECEIVE_ID: receiveId,
+            },
+        );
     }
 
     async importHistory() {

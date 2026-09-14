@@ -13,7 +13,7 @@ import { PUREVA_SCORE } from './PUREVA_SCORE.entity';
 import { PUREVA_VENDOR_RELATION } from './PUREVA_VENDOR_RELATION.entity';
 import { PURNVF_ADDRESS } from './PURNVF_ADDRESS.entity';
 import { VORGMST } from '../views/VORGMST.entity';
-import { TERMCODE } from '../../pursys/table/TERMCODE.entity';
+import { TermPayment } from '../../pursys/table/TERM_PAYMENT.entity';
 import { CurrencyMaster } from '../../pursys/table/CURRENCY_MASTER.entity';
 import { Vendors } from '../../pursys/table/VENDORS.entity';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
@@ -222,9 +222,9 @@ export class PUREVA_FORM {
     @OneToMany(() => PURNVF_ADDRESS, (a) => a.MASTER_EVAADDR)
     ADDRESSES: PURNVF_ADDRESS[];
 
-    @OneToOne(() => TERMCODE)
+    @OneToOne(() => TermPayment)
     @JoinColumn({ name: 'TERMCODE', referencedColumnName: 'STERMCODE' })
-    TERM: TERMCODE;
+    TERM: TermPayment;
 
     @OneToOne(() => CurrencyMaster)
     @JoinColumn({ name: 'CURCODE', referencedColumnName: 'CURR_CODE' })

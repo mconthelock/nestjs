@@ -8,7 +8,9 @@ import { MailService } from 'src/common/services/mail/mail.service';
 import { FormmstService } from '../formmst/formmst.service';
 import { FormService } from '../form/form.service';
 import { UsersService } from 'src/amec/users/users.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { PERFORMANCE_LOGGER } from 'src/common/logger/performance-logger.provider';
+import { Logger } from 'winston';
 
 @Injectable()
 export class DoactionFlowService extends FlowService {
@@ -19,6 +21,7 @@ export class DoactionFlowService extends FlowService {
         private readonly formmstService: FormmstService,
         private readonly mailService: MailService,
         private readonly formService: FormService,
+        @Inject(PERFORMANCE_LOGGER) private readonly perfLogger: Logger,
     ) {
         super(repService, repo);
     }
@@ -54,7 +57,7 @@ export class DoactionFlowService extends FlowService {
             };
             // CHECK USER INFO
             const userInfo = await this.usersService.findEmp(dto.EMPNO);
-            
+
             if (!userInfo) {
                 throw new Error('User not found');
             }
@@ -221,7 +224,7 @@ export class DoactionFlowService extends FlowService {
             }
 
             await this.updateFromStatus(form);
-
+            this.perfLogger.info('Performance Log', { test: 'test' });
             return {
                 status: true,
                 message: 'Do action success!',

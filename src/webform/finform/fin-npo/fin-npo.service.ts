@@ -43,6 +43,7 @@ export interface ActionFinnpoDto {
     EXPENSE_CODE?: number;
     VENDOR_CODE?: string | number;
     AIR_SALES_BY?: string[] | string;
+    DELETE_FILE_IDS?: number[] | string;
     DATA?: Array<{
         ID?: number;
         LINE_ID?: number;
@@ -228,21 +229,26 @@ export class FinnpoService {
     async update(dto: ActionFinnpoDto, files: Express.Multer.File[] = []) {
         await this.updateData(dto);
 
+        const form = {
+            NFRMNO: Number(dto.NFRMNO),
+            VORGNO: dto.VORGNO,
+            CYEAR: dto.CYEAR,
+            CYEAR2: dto.CYEAR2 || dto.CYEAR,
+            NRUNNO: Number(dto.NRUNNO),
+        };
+        const existingFiles = await this.repo.findFilesByForm(
+            form.NFRMNO,
+            form.VORGNO,
+            form.CYEAR,
+            form.CYEAR2,
+            form.NRUNNO,
+        );
+        const deletedFileIds = this.parseFileIds(dto.DELETE_FILE_IDS);
+        const deletedFiles = existingFiles.filter((file) =>
+            deletedFileIds.includes(Number(file.FILE_ID)),
+        );
+
         if (files.length) {
-            const form = {
-                NFRMNO: Number(dto.NFRMNO),
-                VORGNO: dto.VORGNO,
-                CYEAR: dto.CYEAR,
-                CYEAR2: dto.CYEAR2 || dto.CYEAR,
-                NRUNNO: Number(dto.NRUNNO),
-            };
-            const existingFiles = await this.repo.findFilesByForm(
-                form.NFRMNO,
-                form.VORGNO,
-                form.CYEAR,
-                form.CYEAR2,
-                form.NRUNNO,
-            );
             const savedFiles = await this.handleFileFormService.insertFiles(
                 {
                     ...form,
@@ -255,12 +261,14 @@ export class FinnpoService {
             if (!savedFiles?.status) {
                 throw new BadRequestException('Cannot update FIN-NPO attachment');
             }
+        }
 
+        if (deletedFiles.length) {
             await this.repo.deleteFilesByIds(
-                existingFiles.map((file) => Number(file.FILE_ID)),
+                deletedFiles.map((file) => Number(file.FILE_ID)),
             );
             await Promise.allSettled(
-                existingFiles.map((file) =>
+                deletedFiles.map((file) =>
                     deleteFile(path.join(file.FILE_PATH, file.FILE_FNAME)),
                 ),
             );
@@ -270,6 +278,18 @@ export class FinnpoService {
             status: true,
             message: 'Update FIN-NPO success',
         };
+    }
+
+    private parseFileIds(value?: number[] | string) {
+        if (Array.isArray(value)) return value.map(Number);
+        if (!value) return [];
+
+        try {
+            const parsed = JSON.parse(value);
+            return Array.isArray(parsed) ? parsed.map(Number) : [];
+        } catch {
+            return [];
+        }
     }
 
     private async updateData(dto: ActionFinnpoDto) {

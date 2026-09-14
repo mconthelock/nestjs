@@ -100,11 +100,11 @@ export class PurEvaUpdateService {
                 ADDRESS_TH,
                 ...purevadata
             } = data;
-            const purevaForm = {
-                ...form,
-                ...purevadata,
-            };
-            await this.repo.update(form, purevaForm);
+            // const purevaForm = {
+            //     ...form,
+            //     ...purevadata,
+            // };
+            await this.repo.update(form, purevadata);
             const addr = [];
             let addid = 0;
             if (ADDRESS1_EN && ADDRESS1_EN.trim().length > 0) {

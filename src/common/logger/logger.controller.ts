@@ -1,16 +1,18 @@
-import { Controller, Post, Body } from '@nestjs/common';
-import { LoggerService } from './logger.service';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as zlib from 'zlib';
+import { Logger } from 'winston';
+import { Controller, Post, Body, Inject } from '@nestjs/common';
+import { LoggerService } from './logger.service';
+import { PERFORMANCE_LOGGER } from './performance-logger.provider';
 
 @Controller('logger')
 export class LoggerController {
-    //private logDir = path.join(process.cwd(), 'logs');
-    //private logDir = '//amecnas/amecweb/wwwroot/production/api/logs';
-    //private logDir = '//amecnas/amecweb/wwwroot/development/api/logs';
     private logDir = process.env.LOGGER_DIR || 'logs/';
-    constructor(private readonly logger: LoggerService) {}
+    constructor(
+        private readonly logger: LoggerService,
+        @Inject(PERFORMANCE_LOGGER) private readonly perfLogger: Logger,
+    ) {}
 
     @Post('daily')
     async getLogs(@Body() data: { sdate: string; edate?: string }) {
@@ -142,5 +144,11 @@ export class LoggerController {
             dates.push(`${year}-${month}-${day}`);
         }
         return dates;
+    }
+
+    @Post('form/performance')
+    async logPerformance(@Body() logData: any) {
+        this.perfLogger.info('Performance Log', logData);
+        return { success: true, message: 'Log saved successfully' };
     }
 }

@@ -3,10 +3,15 @@ import { TermcodeService } from './termcode.service';
 
 @Controller('pursys/termcode')
 export class TermcodeController {
-    constructor(private readonly turmcodeService: TermcodeService) {}
+    constructor(private readonly term: TermcodeService) {}
 
-    @Get()
-    findAll() {
-        return this.turmcodeService.findAll();
+    @Get('payment')
+    findPayment() {
+        return this.term.findPayment();
+    }
+
+    @Get('trade')
+    findTrade() {
+        return this.term.findTrade();
     }
 }

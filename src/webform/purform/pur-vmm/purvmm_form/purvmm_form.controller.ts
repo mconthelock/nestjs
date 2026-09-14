@@ -10,6 +10,7 @@ import {
 import { PurvmmFormService } from './purvmm_form.service';
 import { CreatePurvmmFormDto } from './dto/create-purvmm_form.dto';
 import { UpdatePurvmmFormDto } from './dto/update-purvmm_form.dto';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Controller('purform/purvmm-form')
 export class PurvmmFormController {
@@ -18,6 +19,11 @@ export class PurvmmFormController {
     @Post()
     create(@Body() createPurvmmFormDto: CreatePurvmmFormDto) {
         return this.purvmmFormService.create(createPurvmmFormDto);
+    }
+
+    @Post('data')
+    getData(@Body() dto: FormDto) {
+        return this.purvmmFormService.getData(dto);
     }
 
     @Get()

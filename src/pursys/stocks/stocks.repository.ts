@@ -28,8 +28,9 @@ export class StocksRepository extends BaseRepository {
         items: Partial<StockTransactionItems>[],
     ) {
         try {
-            const transaction =
-                await this.getRepository(StockTransactions).save(stock);
+            const transaction = await this.getRepository(
+                StockTransactions,
+            ).save({ ...stock, CREATED_AT: new Date() });
             for (const item of items) {
                 const itemData: Partial<StockTransactionItems> = {
                     TRANSACTION_ID: transaction.ID,

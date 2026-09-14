@@ -1,10 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, PrimaryColumn } from "typeorm";
 import { TOOL_IMPORT_HISTORY } from "./TOOL_IMPORT_HISTORY.entity";
 
 @Entity({ name: 'TOOL_REFILL', schema: 'SKIDCNTRL' })
 export class TOOL_REFILL {
-    @PrimaryGeneratedColumn()
-    REFILL_ID: number;
+    // @PrimaryGeneratedColumn()
+    // REFILL_ID: number;
 
     @Column()
     IMPORT_ID: number;
@@ -12,10 +12,10 @@ export class TOOL_REFILL {
     @Column()
     ROW_NO: number;
 
-    @Column()
+    @PrimaryColumn()
     REFILL_DATETIME: Date;
 
-    @Column()
+    @PrimaryColumn()
     PRODUCT_ID: string;
 
     @Column()
@@ -24,7 +24,7 @@ export class TOOL_REFILL {
     @Column()
     STORAGE_LOCATION: string;
 
-    @Column({ type: 'decimal', precision: 18, scale: 3 })
+    @PrimaryColumn({ type: 'decimal', precision: 18, scale: 3 })
     REFILL_QTY: number;
 
     @Column({ type: 'decimal', precision: 18, scale: 3 })

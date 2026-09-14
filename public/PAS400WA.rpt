@@ -1,0 +1,106 @@
+
+***********************************************************************
+                Oracle GoldenGate Capture for DB2 for i
+      Version 12.3.0.1.2 OGGCORE_12.3.0.1.0_PLATFORMS_171208.0005
+ IBM i, ppc, 64bit (optimized), IBM DB2 for i on Dec  8 2017 02:43:39
+ 
+Copyright (C) 1995, 2017, Oracle and/or its affiliates. All rights reserved.
+
+
+                    Starting at 2026-09-01 00:49:34
+***********************************************************************
+
+Operating System Version:
+OS400
+Version 7, Release 5
+Node: AMEC400
+Machine: 0078000D49B1
+                         soft limit   hard limit
+Address Space Size   :    unlimited    unlimited
+Heap Size            :    unlimited    unlimited
+File Size            :    unlimited    unlimited
+CPU Time             :    unlimited    unlimited
+
+Process id: 218513
+
+Description: 
+
+***********************************************************************
+**            Running with the following parameters                  **
+***********************************************************************
+
+2026-09-01 00:49:34  INFO    OGG-03059  Operating system character set identified as US-ASCII.
+
+2026-09-01 00:49:34  INFO    OGG-02695  ANSI SQL parameter syntax is used for parameter parsing.
+
+2026-09-01 00:49:34  INFO    OGG-01360  EXTRACT is running in Data Pump mode.
+
+2026-09-01 00:49:34  INFO    OGG-01889  Flush size (max message size) is set to 27985.
+EXTRACT PAS400WA
+SOURCEDB S78356F0, USERID OGGUSER, PASSWORD ***
+
+2026-09-01 00:49:35  INFO    OGG-01971  The previous message, 'INFO OGG-01889', repeated 1 times.
+
+2026-09-01 00:49:35  INFO    OGG-03036  Database character set identified as UTF-8. Locale: en_US_POSIX.
+
+2026-09-01 00:49:35  INFO    OGG-03037  Session character set identified as UTF-8.
+RMTHOST 172.21.255.88, MGRPORT 15002
+RMTHOSTOPTIONS NOSTREAMING
+RMTTRAIL ./dirdat/AS400/wa,FORMAT RELEASE 12.2
+
+2026-09-01 00:49:35  WARNING OGG-00254  FORMAT RELEASE is a deprecated parameter.
+DISCARDFILE ./dirrpt/PAS400WA.dsc, PURGE
+STATOPTIONS RESETREPORTSTATS
+REPORTCOUNT EVERY 30 MINUTES, RATE
+REPORT AT 00:00
+REPORTROLLOVER AT 00:02 ON SUNDAY
+TABLE RTNLIBF.S010MP;
+TABLE RTNLIBF.S001KP;
+TABLE RTNLIBF.PIDWEB;
+
+2026-09-01 00:49:35  INFO    OGG-01851  filecaching started: thread ID: 1029.
+
+2026-09-01 00:49:35  INFO    OGG-01815  Virtual Memory Facilities for: COM
+    anon alloc: mmap(MAP_ANON)  anon free: munmap
+    file alloc: mmap(MAP_SHARED)  file free: munmap
+    target directories:
+    /home/ogguser/oggos400/dirtmp.
+
+2026-09-01 00:49:35  WARNING OGG-01842  CACHESIZE PER DYNAMIC DETERMINATION (32G) LESS THAN RECOMMENDED: 64G (64bit system)
+vm found: 63.97G
+Check swap space. Recommended swap/extract: 128G (64bit system).
+
+Database Version:
+AS
+Version 07050
+ODBC Version 3.00
+
+Driver Information:
+QSQCLI.SRVPGM
+Version 07050
+ODBC Version 3.00
+
+2026-09-01 00:49:35  INFO    OGG-06569  Remote Collector/Server version 18.1 receiving data is a different version than this Extract 12.3 sending data.
+
+2026-09-01 00:49:41  WARNING OGG-01886  Error tuning TCP nework parameters, error 22 - Invalid argument.
+
+2026-09-01 00:49:41  INFO    OGG-01055  Recovery initialization completed for target file ./dirdat/AS400/wa000000148, at RBA 282347360.
+
+2026-09-01 00:49:51  INFO    OGG-01026  Rolling over remote file ./dirdat/AS400/wa000000149.
+
+2026-09-01 00:49:51  INFO    OGG-01053  Recovery completed for target file ./dirdat/AS400/wa000000149, at RBA 1350.
+
+2026-09-01 00:49:51  INFO    OGG-01057  Recovery completed for all targets.
+
+***********************************************************************
+**                     Run Time Messages                             **
+***********************************************************************
+
+
+2026-09-01 00:49:51  INFO    OGG-02243  Opened trail file /home/ogguser/oggos400/dirdat/ww000000038 at 2026-09-01 00:49:51.306805.
+
+2026-09-01 00:49:51  INFO    OGG-01478  Output file ./dirdat/AS400/wa is using format RELEASE 12.2.
+
+2026-09-01 00:49:51  INFO    OGG-02232  Switching to next trail file /home/ogguser/oggos400/dirdat/ww000000039 at 2026-09-01 00:49:51.812073 due to EOF. with current RBA 309405290.
+
+2026-09-01 11:33:53  INFO    OGG-02232  Switching to next trail file /home/ogguser/oggos400/dirdat/ww000000040 at 2026-09-01 11:33:53.850854 due to EOF. with current RBA 1291.

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreatePurvmmFormDto } from './dto/create-purvmm_form.dto';
 import { UpdatePurvmmFormDto } from './dto/update-purvmm_form.dto';
 import { PurvmmFormRepository } from './purvmm_form.repository';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Injectable()
 export class PurvmmFormService {
@@ -9,6 +10,14 @@ export class PurvmmFormService {
 
     create(createPurvmmFormDto: CreatePurvmmFormDto) {
         return this.repo.create(createPurvmmFormDto);
+    }
+
+    async getData(dto: FormDto) {
+        try {
+            return await this.repo.getData(dto);
+        } catch (error) {
+            throw new Error('Get PUR-VMM Form Error: ' + error.message);
+        }
     }
 
     findAll() {

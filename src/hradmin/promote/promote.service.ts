@@ -118,7 +118,7 @@ export class PromoteService {
         ];
         try {
             const templatePath = path.join(
-                `${process.env.GP_FILE_PATH}/Template/`,
+                `${process.env.TAX_FILE_PATH}/Template/`,
                 'Salary Adjustment Letter.pdf',
             );
             let dir = libs.find((e) => e.id == data.ASETYP).path;
@@ -126,7 +126,7 @@ export class PromoteService {
                 .locale('en')
                 .format('YYYY MMMM');
             if (!dir) dir = 'Non-Manager';
-            this.output_path = `${process.env.GP_FILE_PATH}/${dir}/Salary Adjustment Letter (หนังสือแจ้งปรับ)/${effdate}/`;
+            this.output_path = `${process.env.TAX_FILE_PATH}/${dir}/Salary Adjustment Letter (หนังสือแจ้งปรับ)/${effdate}/`;
             const fontPath = path.join(
                 process.cwd(),
                 'public/fonts/THSarabun.ttf',

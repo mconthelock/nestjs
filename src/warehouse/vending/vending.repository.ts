@@ -1,5 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository, In, IsNull, Or, Equal } from 'typeorm';
+import {
+    DataSource,
+    Repository,
+    In,
+    IsNull,
+    Or,
+    Equal,
+    Between,
+} from 'typeorm';
 import { AddToolsVendingDto } from './dto/addtools-vending.dto';
 import { CreateImportDto } from './dto/import-vending.dto';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -67,9 +75,18 @@ export class VendingRepository extends BaseRepository {
 
     async getToolWithdrawalWithRequest() {
         return this.manager.query(`
-            SELECT *
+            SELECT 
+                u.SSEC,
+                u.SEMPNO,
+                u.STNAME,
+                NVL(tw.RECORD_DATE,a.REQUEST_DATE) AS RECORD_DATE,
+                NVL(tw.PRODUCT_ID,a.PRODUCT_ID) AS PRODUCT_ID,
+                p.SEPRODNAME,
+                a.QTY,
+                tw.QUANTITY,
+                tw.UNIT_PRICE
             FROM SKIDCNTRL.TOOL_WITHDRAWAL tw
-            LEFT JOIN (
+            FULL JOIN (
                 SELECT 
                     mf.EMPNO,
                     mf.REQUEST_DATE,
@@ -85,8 +102,8 @@ export class VendingRepository extends BaseRepository {
             ) a
                 ON TRUNC(a.REQUEST_DATE) = tw.RECORD_DATE
                 AND a.PRODUCT_ID = tw.PRODUCT_ID
-            LEFT JOIN AMEC.AMECUSERALL u ON u.SEMPNO = tw.EMPLOYEE_CODE
-            LEFT JOIN PURSYS.PRODUCTS p ON p.SPRODID = tw.PRODUCT_ID
+            LEFT JOIN AMEC.AMECUSERALL u ON u.SEMPNO = NVL(tw.EMPLOYEE_CODE, a.EMPNO) 
+            LEFT JOIN PURSYS.PRODUCTS p ON p.SPRODID = tw.PRODUCT_ID OR p.SPRODID = a.PRODUCT_ID
         `);
     }
 
@@ -109,7 +126,19 @@ export class VendingRepository extends BaseRepository {
             IMPORT_ID: headId,
         }));
 
-        await this.getRepository(TOOL_REFILL).save(refillData);
+        for (const refill of refillData) {
+            const exists = await this.getRepository(TOOL_REFILL).exists({
+                where: {
+                    REFILL_DATETIME: refill.REFILL_DATETIME,
+                    PRODUCT_ID: refill.PRODUCT_ID,
+                    REFILL_QTY: refill.REFILL_QTY,
+                },
+            });
+
+            if (!exists) {
+                await this.getRepository(TOOL_REFILL).insert(refill);
+            }
+        }
     }
 
     async importHistory() {
@@ -190,5 +219,12 @@ export class VendingRepository extends BaseRepository {
         );
     }
 
-    
+    async getRequestWithdrawal() {
+        return this.manager.query(`
+            SELECT * FROM  MFGVTR_FORM mf 
+            JOIN MFGVTR_DETAIL md ON mf.ID = md.FORM_ID 
+            LEFT JOIN AMECUSERALL a ON mf.EMPNO = a.SEMPNO
+            WHERE mf.STATUS = '2'  
+        `);
+    }
 }

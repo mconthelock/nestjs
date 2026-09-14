@@ -39,7 +39,7 @@ export class VendingService {
     }
 
     async importVending(dto: CreateImportDto) {
-        console.log('importVending dto:', dto);
+        // console.log('importVending dto:', dto);
         try {
             return await this.vendingrepo.importVending(dto);
         } catch (error) {
@@ -103,33 +103,98 @@ export class VendingService {
             // return await this.vendingrepo.getToolWithdrawalWithRequest();
             const request =
                 await this.vendingrepo.getToolWithdrawalWithRequest();
-            return await Promise.all(
-                request.map(async (item) => {
-                    const formValues = [
-                        item.NFRMNO,
-                        item.VORGNO,
-                        item.CYEAR,
-                        item.CYEAR2,
-                        item.NRUNNO,
-                    ];
+            return request;
+            // return await Promise.all(
+            //     request.map(async (item) => {
+            //         const formValues = [
+            //             item.NFRMNO,
+            //             item.VORGNO,
+            //             item.CYEAR,
+            //             item.CYEAR2,
+            //             item.NRUNNO,
+            //         ];
 
-                    if (formValues.some((value) => value == null)) {
-                        item.FORMNO = null;
-                        return item;
-                    }
+            //         if (formValues.some((value) => value == null)) {
+            //             item.FORMNO = null;
+            //             return item;
+            //         }
 
-                    item.FORMNO = await this.formService.getFormno({
+            //         item.FORMNO = await this.formService.getFormno({
+            //             NFRMNO: item.NFRMNO,
+            //             VORGNO: item.VORGNO,
+            //             CYEAR: item.CYEAR,
+            //             CYEAR2: item.CYEAR2,
+            //             NRUNNO: item.NRUNNO,
+            //         });
+            //         return item;
+            //     }),
+            // );
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getRequestWithdrawal() {
+        const data = await this.vendingrepo.getRequestWithdrawal();
+
+        // Step 1: Group และ sum QTY พร้อมเก็บ form header ที่ไม่ซ้ำไว้เป็น array
+        const grouped = (data as any[]).reduce<Record<string, any>>(
+            (acc, item) => {
+                const key = `${item.EMPNO}|${item.REQUEST_DATE}|${item.PRODUCT_ID}`;
+
+                if (!acc[key]) {
+                    acc[key] = {
+                        ...item,
+                        QTY: 0,
+                        formHeaders: [], // เก็บ combo ของ NFRMNO/VORGNO/CYEAR/CYEAR2/NRUNNO ที่ไม่ซ้ำ
+                    };
+                }
+
+                acc[key].QTY += item.QTY;
+
+                const formKey = `${item.NFRMNO}|${item.VORGNO}|${item.CYEAR}|${item.CYEAR2}|${item.NRUNNO}`;
+                const exists = acc[key].formHeaders.some(
+                    (f: any) => f.key === formKey,
+                );
+                if (!exists) {
+                    acc[key].formHeaders.push({
+                        key: formKey,
                         NFRMNO: item.NFRMNO,
                         VORGNO: item.VORGNO,
                         CYEAR: item.CYEAR,
                         CYEAR2: item.CYEAR2,
                         NRUNNO: item.NRUNNO,
                     });
-                    return item;
-                }),
+                }
+
+                return acc;
+            },
+            {},
+        );
+
+        const resultArray = Object.values(grouped);
+
+        // Step 2: เรียก getFormno แยกตาม form header ที่ไม่ซ้ำ แล้วรวมเป็น array
+        for (const item of resultArray) {
+            item.FORMNO = await Promise.all(
+                item.formHeaders.map((f: any) =>
+                    this.formService.getFormno({
+                        NFRMNO: f.NFRMNO,
+                        VORGNO: f.VORGNO,
+                        CYEAR: f.CYEAR,
+                        CYEAR2: f.CYEAR2,
+                        NRUNNO: f.NRUNNO,
+                    }),
+                ),
             );
-        } catch (error) {
-            throw error;
+            delete item.formHeaders; // ลบ field ชั่วคราวออก ถ้าไม่ต้องการให้ปนมาใน response
         }
+
+        return resultArray;
+    }
+
+    async getIssueWithdrawal() {
+        const data = await this.vendingrepo.getRequestWithdrawal();
+        return data;
     }
 }

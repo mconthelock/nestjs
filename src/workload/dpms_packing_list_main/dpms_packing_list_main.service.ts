@@ -26,7 +26,10 @@ export class DpmsPackingListMainService {
                     message: `No packing list found for MFG No: ${mfgNo}`,
                 };
             }
-            const packingDiff = await this.s011mpService.findPacking(mfgNo);
+            const packingDiff = await this.s011mpService.findPacking({
+                order: mfgNo,
+                combine: true,
+            });
             // const packingDiff = await this.s011mpService.findPackingDiff(mfgNo);
             // const drawingL = await this.as400S001kpService.packinglist(mfgNo);
             // const drawingMap = new Map();
@@ -52,8 +55,24 @@ export class DpmsPackingListMainService {
                     hasDetails = details && details.length > 0;
                     item.DETAILS = details.flatMap((detail: any) => {
                         const match = packingDiff.data.filter((d: any) => {
+                            const mfgNo = detail.COMBINE || detail.VMFGNO;
+                            if (
+                                d.S11M01 === mfgNo &&
+                                d.S11M02 === detail.VITEM &&
+                                d.S11M06 === detail.VDRAWING &&
+                                d.LEVEL === detail.VDRAWINGL &&
+                                d.S11M09 == detail.NQTY
+                            ) {
+                                return (
+                                    d.S11M01 === mfgNo &&
+                                    d.S11M02 === detail.VITEM &&
+                                    d.S11M06 === detail.VDRAWING &&
+                                    d.LEVEL === detail.VDRAWINGL &&
+                                    d.S11M09 == detail.NQTY
+                                );
+                            }
                             return (
-                                d.S11M01 === detail.VMFGNO &&
+                                d.S11M01 === mfgNo &&
                                 d.S11M02 === detail.VITEM &&
                                 d.S11M06 === detail.VDRAWING &&
                                 d.MAXQTY === detail.NQTY
@@ -68,6 +87,9 @@ export class DpmsPackingListMainService {
                         }
                         return detail;
                     });
+                    if(!po){
+                        item.DETAILS = this.groupDetails(item.DETAILS);
+                    }
                     return item;
                 });
             }
@@ -88,5 +110,27 @@ export class DpmsPackingListMainService {
                 `Failed to find packing list for MFG No: ${mfgNo}. Error: ${error.message}`,
             );
         }
+    }
+
+    private groupDetails(details: any[]) {
+        const map = new Map<string, any>();
+        for (const d of details) {
+            const key = [
+                d.VMFGNO,
+                d.VPROD,
+                d.VITEM,
+                d.VPART,
+                d.VDRAWING,
+                d.VDRAWINGL,
+            ].join('|');
+
+            if (!map.has(key)) {
+                map.set(key, { ...d, NQTY: Number(d.NQTY) || 0 });
+            } else {
+                // ถ้า key ซ้ำ → รวม NQTY
+                map.get(key).NQTY += Number(d.NQTY) || 0;
+            }
+        }
+        return [...map.values()];
     }
 }

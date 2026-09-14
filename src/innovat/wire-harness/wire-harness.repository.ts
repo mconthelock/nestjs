@@ -6,7 +6,7 @@ import { WHN_PRODUCTION_PLAN } from 'src/common/Entities/innovat/table/WHN_PRODU
 import { WHN_ITEM } from 'src/common/Entities/innovat/table/WHN_ITEM.entity';
 import { WHN_PRODUCTION } from 'src/common/Entities/innovat/views/WHN_ITEM.entity';
 import { WHN_AUTOPLAN } from 'src/common/Entities/innovat/views/WHN_AUTOPLAN.entity';
-import { GetAutoPlanDto } from './dto/get-auto-plan.dto';
+import { FiltersDto } from 'src/common/dto/filter.dto';
 
 @Injectable()
 export class WireHarnessRepository extends BaseRepository {
@@ -37,18 +37,22 @@ export class WireHarnessRepository extends BaseRepository {
         });
     }
 
-    getAutoPlan(dto: GetAutoPlanDto) {
-        const where: any = {
-            ITEM_NO: dto.item,
-            PRODNO: dto.prod,
-        };
-
-        if (dto.p?.trim()) {
-            where.P = dto.p.trim();
-        }
-
-        return this.getRepository(WHN_AUTOPLAN).find({
-            where,
-        });
+    getAutoPlan(condition: FiltersDto) {
+        const qb = this.getRepository(WHN_AUTOPLAN).createQueryBuilder('A');
+        return this.applyFilters(
+            qb,
+            'A',
+            condition,
+            [
+                'ITEM_NO',
+                'PRODNO',
+                'P',
+            ],
+        ).orderBy('A.PRODNO', 'ASC')
+        .addOrderBy('A.P', 'ASC')
+        .addOrderBy('A.SEQBM', 'ASC')
+        .addOrderBy('A.MFGNO', 'ASC')
+        .addOrderBy('A.RNO', 'DESC')
+        .getMany();
     }
 }

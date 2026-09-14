@@ -1,6 +1,6 @@
-//Cremation fund->Beneficiary Information
+//Cremation fund->Beneficiary Information (Synonyms)
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-@Entity({ name: 'MHMBNF00', schema: 'AMECMFG' })
+@Entity({ name: 'MHMBNF00', schema: 'GPREPORT' })
 export class MHMBNF00 {
     @PrimaryColumn()
     EMPCOD: string;

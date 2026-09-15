@@ -1,6 +1,6 @@
-//Employee Physical File for Japan
+//Employee Physical File for Japan (Synonyms)
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-@Entity({ name: 'MHMEMJ00', schema: 'AMECMFG' })
+@Entity({ name: 'MHMEMJ00', schema: 'GPREPORT' })
 export class MHMEMJ00 {
     @PrimaryColumn()
     EMPCOD: string;

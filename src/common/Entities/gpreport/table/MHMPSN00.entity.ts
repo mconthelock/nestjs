@@ -1,6 +1,6 @@
-//Personnel Inf. Physical File
+//Personnel Inf. Physical File (Synonyms)
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-@Entity({ name: 'MHMPSN00', schema: 'AMECMFG' })
+@Entity({ name: 'MHMPSN00', schema: 'GPREPORT' })
 export class MHMPSN00 {
     @PrimaryColumn()
     EMPCOD: string;

@@ -26,7 +26,7 @@ export class WireHarnessAs400Repository {
                     CB.Q41K14 AS MATERIAL,
                     CB.Q41K20 AS ITEMCODE,
                     DECIMAL(CB.Q41K16, 8, 0) / 1000 AS CUT,
-                    REPLACE(Q3.Q43K06, X'00', ' ') AS REMARK,
+                    REPLACE(Q3.Q43K06, X'00', '') AS REMARK,
                     ROW_NUMBER() OVER (PARTITION BY F1.F01R01 ORDER BY CB.Q41K05) AS RN
                 FROM RTNLIBF.M008KP S
                 JOIN RTNLIBF.Q90010P2 Q9

@@ -10,14 +10,6 @@ export class WireHarnessController {
         private readonly service: WireHarnessService,
     ) {}
 
-    @Post('sync-production-plan')
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Sync production plan data from AS400 to Oracle' })
-    @ApiResponse({ status: 200, description: 'Sync production plan success' })
-    async syncProductionPlan() {
-        return this.service.syncProductionPlan();
-    }
-
     @Get('item')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get item list' })

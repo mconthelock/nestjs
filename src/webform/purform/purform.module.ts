@@ -6,9 +6,18 @@ import { PurCpmModule } from './pur-cpm/pur-cpm.module';
 import { PurevaFormModule } from './pur-eva/pureva_form/pureva_form.module';
 import { PurEvaModule } from './pur-eva/pur-eva.module';
 import { PurVmmModule } from './pur-vmm/pur-vmm.module';
-
+import { CondComparisonPriceModule } from './pur-cpc/cond_comparison_price/cond_comparison_price.module';
 
 @Module({
-    imports: [PurFileModule, PurNvfModule, PurnvfFormModule, PurCpmModule, PurevaFormModule, PurEvaModule, PurVmmModule],
+    imports: [
+        PurFileModule,
+        PurNvfModule,
+        PurnvfFormModule,
+        PurCpmModule,
+        PurevaFormModule,
+        PurEvaModule,
+        PurVmmModule,
+        CondComparisonPriceModule,
+    ],
 })
 export class PurFormModule {}

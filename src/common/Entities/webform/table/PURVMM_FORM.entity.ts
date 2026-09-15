@@ -15,6 +15,7 @@ import { PUR_FILE } from './PUR_FILE.entity';
 import { PURVMM_SCMUSR } from './PURVMM_SCMUSR.entity';
 import { TermPayment } from '../../pursys/table/TERM_PAYMENT.entity';
 import { CurrencyMaster } from '../../pursys/table/CURRENCY_MASTER.entity';
+import { TermTrade } from '../../pursys/table/TERM_TRADE.entity';
 
 @Entity({ name: 'PURVMM_FORM', schema: 'WEBFORM' })
 export class PURVMM_FORM {
@@ -110,6 +111,13 @@ export class PURVMM_FORM {
 
     @Column()
     EVANO: string;
+
+    @Column()
+    TRADE_CODE: string;
+
+    @OneToOne(() => TermTrade)
+    @JoinColumn({ name: 'TRADE_CODE', referencedColumnName: 'TRADE_CODE' })
+    TRADE: TermTrade;
 
     @OneToOne(() => TermPayment)
     @JoinColumn({ name: 'TERMCODE', referencedColumnName: 'STERMCODE' })

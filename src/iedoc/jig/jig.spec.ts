@@ -34,7 +34,7 @@ const key = {
 };
 
 describe('Jig lookup filters', () => {
-    it('uses ACTION_STATUS for processes and STATUS for locations, both as string 1', async () => {
+    it('uses STATUS string 1 for both processes and locations', async () => {
         const processes = { find: jest.fn().mockResolvedValue([]) };
         const locations = { find: jest.fn().mockResolvedValue([]) };
         const ds: any = {
@@ -47,7 +47,7 @@ describe('Jig lookup filters', () => {
         await repo.getMfgProcesses();
         await repo.getLocations();
         expect(processes.find).toHaveBeenCalledWith({
-            where: { ACTION_STATUS: '1' },
+            where: { STATUS: '1' },
             order: { PROCESS: 'ASC', MA_CODE: 'ASC', MID: 'ASC' },
         });
         expect(locations.find).toHaveBeenCalledWith({
@@ -582,7 +582,7 @@ describe('Jig HTTP contracts', () => {
         getMfgProcesses: jest
             .fn()
             .mockResolvedValue([
-                { MID: 1, MA_CODE: 'A', PROCESS: 'H6AS', ACTION_STATUS: '1' },
+                { MID: 1, MA_CODE: 'A', PROCESS: 'H6AS', STATUS: '1', ACTION_STATUS: '0' },
             ]),
         getLocations: jest
             .fn()

@@ -49,7 +49,7 @@ export class JigRepository extends BaseRepository {
 
     getMfgProcesses() {
         return this.getRepository(MachineAbilityProcess).find({
-            where: { ACTION_STATUS: '1' },
+            where: { STATUS: '1' },
             order: { PROCESS: 'ASC', MA_CODE: 'ASC', MID: 'ASC' },
         });
     }

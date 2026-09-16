@@ -20,7 +20,6 @@ export class CondComparisonPriceService {
                 data: res,
             };
         } catch (error) {
-            console.error(error);
             throw error;
         }
     }

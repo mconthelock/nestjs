@@ -11,6 +11,7 @@ import { StringToDate } from 'src/common/utils/transform';
 export class searchFormDto extends PartialType(CreateFormDto) {
     @StringToDate()
     @IsDate()
+    @Type(() => Date)
     START_DREQDATE: Date;
 
     @StringToDate()

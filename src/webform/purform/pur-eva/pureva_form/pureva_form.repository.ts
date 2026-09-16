@@ -54,6 +54,7 @@ export class PurevaFormRepository extends BaseRepository {
             .createQueryBuilder('eva')
             .leftJoinAndSelect('eva.FORM', 'evaform')
             .leftJoinAndSelect('evaform.reqtor', 'reqtor')
+            .leftJoinAndSelect('evaform.creator', 'creator')
             .leftJoinAndSelect('eva.PROFIT_TURNOVERS', 'turnovers')
             .leftJoinAndSelect('eva.ADDRESSES', 'addresses')
             .leftJoinAndSelect('eva.SCORES', 'scores')
@@ -170,7 +171,6 @@ export class PurevaFormRepository extends BaseRepository {
                 value: '8:Sub-Contractor (8)',
             });
         }
-
         this.applyFilters(qb, 'eva', cond, [
             'NRUNNO',
             'VENDCODE',

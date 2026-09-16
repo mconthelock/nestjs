@@ -43,6 +43,14 @@ export class VpsController {
         };
     }
 
+    @Post('get-list-by-order')
+    async getListByOrder(@Body('order') order: string) {
+        const data = await this.vpsService.getListByOrder(order);
+        return {
+            data,
+        };
+    }
+
     @Get('get-list-order-88-89')
     async getListOrder_88_89() {
         const data = await this.vpsService.getListOrder_88_89();

@@ -346,4 +346,9 @@ export class VpsService {
         const specialBox = await this.vpsRepository.getSpecialCarton();
         return [...specialBox, ...cartonBox];
     }
+
+    async getListByOrder(order: string) {
+        const data = await this.vpsRepository.getListByOrder(order);
+        return data;
+    }
 }

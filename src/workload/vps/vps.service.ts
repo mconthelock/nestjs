@@ -273,7 +273,10 @@ export class VpsService {
             orderDetails[0].REMARK = remark && remark.length > 0 ? remark : '';
         }
 
-        const detail = await this.s011mpService.findPacking(order, packing);
+        const detail = await this.s011mpService.findPacking({
+            order,
+            item: packing,
+        });
 
         const isSpecialPacking =
             String(packing).endsWith('88') || String(packing).endsWith('89');

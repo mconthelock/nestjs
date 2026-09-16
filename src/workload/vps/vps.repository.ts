@@ -521,6 +521,38 @@ export class VpsRepository extends BaseRepository {
         return await this.wk.query(sql, [order, order, packing]);
     }
 
+    async getVPS(order: string, packing: string): Promise<any[]> {
+        const sql = `
+            SELECT 
+                S.*, 
+                ao.PRODTYPE as PRODTYPE,
+                ao.COUNTRY as COUNTRY,
+                SUBSTR(F_CPROD(M8K01), -3) AS SCHEDULE,
+                SUBSTR(F_CPROD(M8K01), -5) AS JUN, 
+                M8K02,
+                ap.PACKSHOP,
+                CASE WHEN U.MFGNO IS NOT NULL THEN 1 ELSE NULL END AS URGENT,
+                avo.ORDERNUMBER
+            FROM S010MP S
+            JOIN M008KP M ON S.S01M01 = M.M8K03
+            LEFT JOIN AMECORDERS ao ON ao.MFGNO = S.S01M01
+            LEFT JOIN AMECORDERS_PACKNO ap ON ap.ORDERNO = S.S01M01 AND ap.PACKNO = S.S01M04
+            LEFT JOIN AMECVPCORDER avo ON avo.MFGNO = S.S01M01
+            LEFT JOIN (
+                SELECT MFGNO
+                FROM WEBFORM.URGENT_ORDER_LIST A
+                JOIN WEBFORM.FORM B ON A.NFRMNO = B.NFRMNO AND A.VORGNO = B.VORGNO AND A.CYEAR = B.CYEAR AND A.CYEAR2 = B.CYEAR2 AND A.NRUNNO = B.NRUNNO
+                WHERE B.CST != 3
+            ) U ON U.MFGNO = S.S01M01
+            WHERE S.S01M01 = :1 AND S.S01M04 = :2`;
+        return await this.wk.query(sql, [order, packing]);
+    }
+
+    async getPURCode(order: string, dwg: string): Promise<any[]> {
+        const sql = `SELECT DISTINCT J2CUS, J2DRAW, J2INO, J2DES FROM J002MP WHERE J2CUS = :1 AND J2SEQ != 0 AND (J2DRAW = :2 OR J2DES = :3)`;
+        return await this.wk.query(sql, [order, dwg, dwg]);
+    }
+
     async getQ46054OL(order: string, packing: string): Promise<any[]> {
         const sql = `SELECT * FROM RTNLIBF.Q46054OL WHERE Q46O01 = '${order}' AND Q46O02 = '${packing}'`;
         // หาก query ชุดนี้ต้องการดึงจาก AS400 Connection สามารถเปลี่ยนจาก this.wk เป็น DataSource ของ AS400 ที่ Inject เอาไว้ได้เลย

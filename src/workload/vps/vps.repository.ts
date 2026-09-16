@@ -713,4 +713,13 @@ export class VpsRepository extends BaseRepository {
             .where('SC_STATUS = 1')
             .getRawMany();
     }
+
+    async getListByOrder(order: string) {
+        return this.wk
+            .createQueryBuilder()
+            .select('*')
+            .from('S010MP', 's')
+            .where('S01M01 LIKE :order', { order: `%${order}%` })
+            .getRawMany();
+    }
 }

@@ -18,22 +18,9 @@ export class BlockPackingRepository extends BaseRepository {
 
     async getTRNBarcode() {
         return this.datacenterDs.query(
-            `SELECT
-                t.*,
-                p.VPS03,
-                p.VPS04,
-                ct.VPS06 AS CASETYPE
+            `SELECT t.*,SUBSTR(S02K04,3) AS CASETYPE
             FROM TRNBARCODE t
-            JOIN PIDVPS p
-                ON t.ORDERNO = p.VPS01
-                AND t.BLOCK = p.VPS02
-                AND t.CASENO = p.VPS06
-                AND p.VPS03 = 'CASENO'
-            JOIN PIDVPS ct
-                ON ct.VPS01 = p.VPS01
-                AND ct.VPS02 = p.VPS02
-                AND ct.VPS03 = 'CASETYPE'
-                AND ct.VPS04 = p.VPS04
+            JOIN S002KP sk ON t.ORDERNO = S02K01 AND CASENO = TRIM(S02K02) AND BLOCK = SUBSTR(S02K02,3,2) 
             WHERE PRODUCTION > '2026000'`,
         );
     }

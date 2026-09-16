@@ -4,10 +4,14 @@ import { UpdateVpDto } from './dto/update-vp.dto';
 import { VpsRepository } from './vps.repository';
 import { InsertCartonDto, InsertListCartonDto } from './dto/insertCarton.dto';
 import { PKC_CARTON_DETAIL } from 'src/common/Entities/workload/table/PKC_CARTON_DETAIL.entity';
+import { S011mpService } from 'src/datacenter/s011mp/s011mp.service';
 
 @Injectable()
 export class VpsService {
-    constructor(private readonly vpsRepository: VpsRepository) {}
+    constructor(
+        private readonly vpsRepository: VpsRepository,
+        private readonly s011mpService: S011mpService,
+    ) {}
 
     async chkPrint(order: string, packing: string): Promise<boolean> {
         return await this.vpsRepository.chkPrint(order, packing);
@@ -243,10 +247,12 @@ export class VpsService {
     }
 
     async getOrderDetail(order: string, packing: string): Promise<any[]> {
-        const orderDetails = await this.vpsRepository.getOrderDetail(
-            order,
-            packing,
-        );
+        const orderDetails = await this.vpsRepository.getVPS(order, packing);
+
+        // const orderDetails = await this.vpsRepository.getOrderDetail(
+        //     order,
+        //     packing,
+        // );
 
         if (!orderDetails || orderDetails.length === 0) {
             return [];
@@ -267,14 +273,38 @@ export class VpsService {
             orderDetails[0].REMARK = remark && remark.length > 0 ? remark : '';
         }
 
-        for (const detail of orderDetails) {
-            const dwgNo = detail.S11M04 ? detail.S11M04.replace(/\s/g, '') : '';
-            const masterPacking =
-                await this.vpsRepository.getMasterPacking(dwgNo);
+        const detail = await this.s011mpService.findPacking(order, packing);
 
-            detail.MASTER_PACKING =
-                masterPacking && masterPacking.length > 0 ? masterPacking : '';
-        }
+        const isSpecialPacking =
+            String(packing).endsWith('88') || String(packing).endsWith('89');
+
+        const data = await Promise.all(
+            (detail.data ?? []).map(async (details) => {
+                // ถ้าไม่ใช่ 88 หรือ 89 ให้คืนข้อมูลเดิม
+                if (!isSpecialPacking) {
+                    return details;
+                }
+
+                const dwgNo = details.S11M04?.replace(/\s/g, '') ?? '';
+
+                const purCode = await this.vpsRepository.getPURCode(
+                    order,
+                    dwgNo,
+                );
+
+                const masterPacking =
+                    await this.vpsRepository.getMasterPacking(dwgNo);
+
+                return {
+                    ...details,
+                    MASTER_PACKING:
+                        masterPacking?.length > 0 ? masterPacking : '',
+                    PUR_CODE: purCode?.length > 0 ? purCode[0].J2INO : '',
+                };
+            }),
+        );
+
+        orderDetails[0].DETAIL = data;
 
         return orderDetails;
     }

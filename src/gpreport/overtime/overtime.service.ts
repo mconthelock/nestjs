@@ -7,7 +7,7 @@ import { SearchOvertimeDto } from './dto/search-overtime.dto';
 import { SearchActualOvertimeDto } from './dto/lr200p.dto';
 
 import { Overtime } from 'src/common/Entities/gpreport/table/overtime.entity';
-import { LR200P } from 'src/common/Entities/gpreport/table/LR200P.entity';
+import { LR200P } from 'src/common/Entities/gpreport/views/LR200P.entity';
 import { OTFORM } from 'src/common/Entities/webform/table/OTFORM.entity';
 
 @Injectable()

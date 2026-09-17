@@ -24,13 +24,25 @@ export class WHN_PRODUCTION_PLAN {
     MFGNO: string;
 
     @Column()
+    ITEMNO: string;
+
+    @Column()
+    PACKNO: string;
+
+    @Column()
     PROJ: string;
 
     @Column()
     MODEL: string;
+    
+    @Column()
+    PARENT_DRAWING: string;
 
     @Column()
-    DWG: string;
+    UPPER_DRAWING: string;
+
+    @Column()
+    DRAWING: string;
 
     @Column()
     QTY: number;

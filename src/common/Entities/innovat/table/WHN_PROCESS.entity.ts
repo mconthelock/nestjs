@@ -1,13 +1,13 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({
-    name: 'WHN_ITEM',
+    name: 'WHN_PROCESS',
     schema: 'INNOVAT',
 })
-export class WHN_ITEM {
+export class WHN_PROCESS {
     @PrimaryColumn()
-    ITEM_NO: string;
+    PRC_CODE: string;
 
     @Column()
-    ITEM_PROCESS: string;
+    GRP_ID: string;
 }

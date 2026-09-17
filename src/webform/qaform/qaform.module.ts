@@ -14,6 +14,7 @@ import { WtypeSecpicModule } from './wtype_secpic/wtype_secpic.module';
 import { SecpicModule } from './secpic/secpic.module';
 import { RqflistModule } from './rqflist/rqflist.module';
 import { RqffrmModule } from './rqffrm/rqffrm.module';
+import { QaCnModule } from './qa-cn/qa-cn.module';
 @Module({
     imports: [
         QaFileModule,
@@ -31,6 +32,7 @@ import { RqffrmModule } from './rqffrm/rqffrm.module';
         SecpicModule,
         RqflistModule,
         RqffrmModule,
+        QaCnModule,
     ],
 })
 export class QAFormModule {}

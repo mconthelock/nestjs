@@ -1,12 +1,8 @@
-//Employee Physical File for Japan
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-@Entity({ name: 'MHMEMJ00', schema: 'AMECMFG' })
-export class MHMEMJ00 {
+@Entity({ name: 'EMP01', schema: 'GPREPORT' })
+export class EMP01 {
     @PrimaryColumn()
     EMPCOD: string;
-
-    @Column()
-    EMPTYP: string;
 
     @Column()
     EMPPRT: string;
@@ -21,62 +17,68 @@ export class MHMEMJ00 {
     EMPNME: string;
 
     @Column()
-    EMPNMS: string;
-
-    @Column()
     EMPSEX: string;
 
     @Column()
-    EMPSTA: string;
+    EMPEDT: string;
 
     @Column()
     EMPDEP: string;
 
     @Column()
-    EMPPOS: string;
+    DEPART: string;
 
     @Column()
-    EMPEDT: number;
+    POSITN: string;
 
     @Column()
-    EMPPDT: number;
+    INCSLL: string;
 
     @Column()
-    EMPRDT: number;
+    SOSHOS: string;
 
     @Column()
-    EMPSHF: string;
-
-    @Column()
-    EMPCOS: string;
-
-    @Column()
-    EMPBNC: string;
+    BANK: string;
 
     @Column()
     EMPACN: string;
 
     @Column()
-    EMPDEW: number;
+    PADD1: string;
 
     @Column()
-    EMPREQ: string;
+    PADD2: string;
 
     @Column()
-    EMPAWO: number;
+    PTEL: string;
 
     @Column()
-    EMPLST: number;
+    PSNAD1: string;
 
     @Column()
-    EMPUSR: string;
+    PSNAD2: string;
 
     @Column()
     PSNIDN: string;
 
     @Column()
-    FAMSCO: string;
+    PSNBDT: string;
 
     @Column()
-    EMPTAX: string;
+    NATION: string;
+
+    @Column()
+    ETHNIC: string;
+
+    @Column()
+    RELIGN: string;
+
+    @Column()
+    PSNBLD: string;
+
+    @Column()
+    DESDST: string;
+
+    @Column()
+    PROMDTE: string;
 }

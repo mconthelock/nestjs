@@ -19,9 +19,13 @@ export class WireHarnessAs400Repository {
                     S.M8K02 AS P,
                     S.M8K04 AS SEQBM,
                     S.M8K03 AS MFGNO,
+                    F1.F01R03 AS ITEMNO,
+				    S11.S11M02 AS PACKNO,
                     F1.F01R08 AS PROJ,
                     Q9.Q9TYP AS MODEL,
-                    F1.F01R04 AS DWG,
+                    Q1.Q41K07 AS PARENT_DRAWING,
+                    F1.F01R05 AS UPPER_DRAWING,
+                    F1.F01R04 AS DRAWING,
                     F1.F01R10 AS QTY,
                     CB.Q41K14 AS MATERIAL,
                     CB.Q41K20 AS ITEMCODE,
@@ -51,6 +55,9 @@ export class WireHarnessAs400Repository {
                     AND Q1.Q41K03 = Q3.Q43K03
                     AND Q1.Q41K04 = Q3.Q43K04
                     AND Q1.Q41K05 = Q3.Q43K05
+                LEFT JOIN RTNLIBF.S011MP S11
+                    ON F1.F01R07 = S11.S11M01
+                    AND COALESCE(NULLIF(TRIM(F1.F01R05), ''), Q1.Q41K07) = S11.S11M06
                 WHERE F2.F02R03 = 'B4CC06'
                     AND S.M8K01 >= VARCHAR_FORMAT(CURRENT DATE - 1 MONTH, 'YYYYMM')
             ) X

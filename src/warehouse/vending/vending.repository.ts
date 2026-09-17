@@ -115,7 +115,7 @@ export class VendingRepository extends BaseRepository {
                     mf.REQUEST_DATE,
                     md.PRODUCT_ID
             ) a
-                ON TRUNC(a.REQUEST_DATE) = tw.RECORD_DATE
+                ON TRUNC(a.REQUEST_DATE) = TRUNC(tw.RECORD_DATE)
                 AND a.PRODUCT_ID = tw.PRODUCT_ID
             LEFT JOIN AMEC.AMECUSERALL u ON u.SEMPNO = NVL(tw.EMPLOYEE_CODE, a.EMPNO) 
             LEFT JOIN PURSYS.PRODUCTS p ON p.SPRODID = tw.PRODUCT_ID OR p.SPRODID = a.PRODUCT_ID

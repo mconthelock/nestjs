@@ -3,12 +3,12 @@ import { IimRepository } from './iim.repository';
 
 @Injectable()
 export class IimService {
-    constructor(private readonly repo: IimRepository){}
+    constructor(private readonly repo: IimRepository) {}
 
-    async findPlannerCompareSheet(planner: string) {
+    async findPlannerCompareSheet(planner: string | string[]) {
         try {
-            const res = await  this.repo.findPlannerCompareSheet(planner);
-            if(res.length == 0) {
+            const res = await this.repo.findPlannerCompareSheet(planner);
+            if (res.length == 0) {
                 return {
                     status: false,
                     message: 'No records found',

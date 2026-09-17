@@ -164,14 +164,14 @@ export class S011mpService {
                 const values = [max - min, min];
                 const maxLevels = groupLevels.filter((l) => l.S11M09 == max);
                 const minLevels = groupLevels.filter((l) => l.S11M09 == min);
-                if (max - min == 0) {
-                    console.log('max:', max);
-                    console.log('min:', min);
-                    console.log('max - min:', max - min);
-                    console.log('maxLevels:', maxLevels);
-                    console.log('minLevels:', minLevels);
-                    console.log('---------------------------');
-                }
+                // if (max - min == 0) {
+                //     console.log('max:', max);
+                //     console.log('min:', min);
+                //     console.log('max - min:', max - min);
+                //     console.log('maxLevels:', maxLevels);
+                //     console.log('minLevels:', minLevels);
+                //     console.log('---------------------------');
+                // }
                 if (max - min == 0) {
                     return [
                         {

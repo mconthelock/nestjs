@@ -23,13 +23,19 @@ export class IimRepository extends BaseRepository {
         });
     }
 
-    findPlannerCompareSheet(planner: string) {
+    findPlannerCompareSheet(planner: string| string[]) {
         return this.getRepository(IIM).find({
             select: ['IBUYC', 'IPROD', 'IDRAW', 'IVEND'],
             where: {
-                IBUYC: planner,
+                IBUYC: Array.isArray(planner) ? In(planner) : planner,
                 IITYP: In(['1', '3']),
             },
+            order: {
+                IBUYC: 'ASC',
+                IPROD: 'ASC',
+                IDRAW: 'ASC',
+                IVEND: 'ASC',
+            }
         });
     }
 }

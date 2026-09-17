@@ -10,12 +10,12 @@ export class WireHarnessController {
         private readonly service: WireHarnessService,
     ) {}
 
-    @Get('item')
+    @Get('process')
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Get item list' })
-    @ApiResponse({ status: 200, description: 'Item list' })
-    async item() {
-        return this.service.item();
+    @ApiOperation({ summary: 'Get process list' })
+    @ApiResponse({ status: 200, description: 'Process list' })
+    async process() {
+        return this.service.process();
     }
 
     @Get('production')

@@ -3,8 +3,8 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { WHN_PRODUCTION_PLAN } from 'src/common/Entities/innovat/table/WHN_PRODUCTION_PLAN.entity';
-import { WHN_ITEM } from 'src/common/Entities/innovat/table/WHN_ITEM.entity';
-import { WHN_PRODUCTION } from 'src/common/Entities/innovat/views/WHN_ITEM.entity';
+import { WHN_PROCESS } from 'src/common/Entities/innovat/table/WHN_PROCESS.entity';
+import { WHN_PRODUCTION } from 'src/common/Entities/innovat/views/WHN_PRODUCTION.entity';
 import { WHN_AUTOPLAN } from 'src/common/Entities/innovat/views/WHN_AUTOPLAN.entity';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 
@@ -21,10 +21,10 @@ export class WireHarnessRepository extends BaseRepository {
         return this.getRepository(WHN_PRODUCTION_PLAN).save(data);
     }
 
-    getItem() {
-        return this.getRepository(WHN_ITEM).find({
+    getProcess() {
+        return this.getRepository(WHN_PROCESS).find({
             order: {
-                ITEM_NO: 'ASC',
+                PRC_CODE: 'ASC',
             },
         });
     }
@@ -44,7 +44,9 @@ export class WireHarnessRepository extends BaseRepository {
             'A',
             condition,
             [
-                'ITEM_NO',
+                'ITEMNO',
+                'PACKNO',
+                'PROCESS',
                 'PRODNO',
                 'P',
             ],

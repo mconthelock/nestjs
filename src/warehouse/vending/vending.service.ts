@@ -6,12 +6,14 @@ import { VendingRepository } from './vending.repository';
 import { CreateImportDto } from './dto/import-vending.dto';
 import { VENDING_USER } from 'src/common/Entities/skid/table/VENDING_USER.entity';
 import { FormService } from 'src/webform/form/form.service';
+import { StocksService } from 'src/pursys/stocks/stocks.service';
 
 @Injectable()
 export class VendingService {
     constructor(
         private readonly vendingrepo: VendingRepository,
         private readonly formService: FormService,
+        private readonly stocksService: StocksService
     ) {}
 
     async getProduct() {
@@ -41,7 +43,60 @@ export class VendingService {
     async importVending(dto: CreateImportDto) {
         // console.log('importVending dto:', dto);
         try {
-            return await this.vendingrepo.importVending(dto);
+            const { importHistory, withdrawals } = dto;
+            const stockWithdrawalData = withdrawals.map((withdrawal) => ({
+                PRODUCT_ID: withdrawal.PRODUCT_ID,
+                QUANTITY: withdrawal.QUANTITY,
+                UNIT_COST: withdrawal.UNIT_PRICE,
+            }));
+
+            const stock_withdrawal = {
+                DOCUMENT_NO: importHistory.FILE_NAME,
+                STORAGE_FROM: 21,
+                CSTATUS: '1',
+                CREATED_BY: importHistory.IMPORT_BY ?? '',
+                ITEMS: stockWithdrawalData,
+            };
+
+            const issue = await this.stocksService.createStockTransaction(
+                stock_withdrawal,
+                1,
+            );
+            console.log('stock_withdrawal:', stock_withdrawal);
+
+            const importResult = await this.vendingrepo.importVending(dto);
+            let receiveId: number | null = null;
+            const stockReceiveData = importResult.refills.map((refill) => ({
+                PRODUCT_ID: refill.PRODUCT_ID,
+                QUANTITY: refill.REFILL_QTY,
+                UNIT_COST: 0,
+            }));
+
+            if (stockReceiveData.length) {
+                const stock_receive = {
+                    DOCUMENT_NO: importHistory.FILE_NAME,
+                    STORAGE_TO: 21,
+                    CSTATUS: '1',
+                    CREATED_BY: importHistory.IMPORT_BY ?? '',
+                    ITEMS: stockReceiveData,
+                };
+
+                const receive = await this.stocksService.createStockTransaction(
+                    stock_receive,
+                    2,
+                );
+                receiveId = receive.ID;
+            }
+
+            await this.vendingrepo.updateImportTransactionIds(
+                importResult.importHistory.IMPORT_ID,
+                issue.ID,
+                receiveId,
+            );
+            importResult.importHistory.ISSUE_ID = issue.ID;
+            importResult.importHistory.RECEIVE_ID = receiveId;
+
+            return importResult;
         } catch (error) {
             throw error;
         }
@@ -195,6 +250,11 @@ export class VendingService {
 
     async getIssueWithdrawal() {
         const data = await this.vendingrepo.getRequestWithdrawal();
+        return data;
+    }
+
+    async getTransactionHistory() {
+        const data = await this.vendingrepo.getTransactionHistory();
         return data;
     }
 }

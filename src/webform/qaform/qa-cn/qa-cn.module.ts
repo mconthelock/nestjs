@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+<<<<<<< HEAD
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { QaCnService } from './qa-cn.service';
 import { QaCnController } from './qa-cn.controller';
@@ -58,5 +59,13 @@ import { J736kpModule } from 'src/as400/rtnlibf/j736kp/j736kp.module';
 =======
 >>>>>>> 14243a62 (QA-CN)
     ],
+=======
+import { QaCnService } from './qa-cn.service';
+import { QaCnController } from './qa-cn.controller';
+
+@Module({
+  controllers: [QaCnController],
+  providers: [QaCnService],
+>>>>>>> 7c3a64c8 (QA-CN)
 })
 export class QaCnModule {}

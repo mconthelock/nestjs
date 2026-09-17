@@ -88,14 +88,54 @@ export class GpTphController {
         console.log('CreateDataAreaDto:', dto);
         return this.gpTphService.createArea(dto);
     }
-    /*@Patch(':id')
+
+    @Patch('/:fno/:orgno/:cyear/:cyear2/:nrunno')
+    @UseTransaction('webformConnection')
+    @UseInterceptors(getFileUploadInterceptor())
+    update(
+        @Param('fno', ParseIntPipe) fno: number,
+        @Param('orgno') orgno: string,
+        @Param('cyear') cyear: string,
+        @Param('cyear2') cyear2: string,
+        @Param('nrunno', ParseIntPipe) nrunno: number,
+        @Body() dto: UpdateGpTphDto,
+    ) {
+        return this.gpTphService.update(
+            { NFRMNO: fno, VORGNO: orgno, CYEAR: cyear, CYEAR2: cyear2, NRUNNO: nrunno },
+            dto,
+        );
+    }
+
+    @Delete('/:fno/:orgno/:cyear/:cyear2/:nrunno')
+    @UseTransaction('webformConnection')
+    delete(
+        @Param('fno', ParseIntPipe) fno: number,
+        @Param('orgno') orgno: string,
+        @Param('cyear') cyear: string,
+        @Param('cyear2') cyear2: string,
+        @Param('nrunno', ParseIntPipe) nrunno: number,
+    ) {
+        return this.gpTphService.delete({
+            NFRMNO: fno,
+            VORGNO: orgno,
+            CYEAR: cyear,
+            CYEAR2: cyear2,
+            NRUNNO: nrunno,
+        });
+    }
+
+    @Patch('areas/:id')
     updateArea(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateAreaDto,
     ) {
-        console.log('UpdateDataAreaDto:', dto);
-        return this.gpTphService.updateArea(dto);
-    }*/
+        return this.gpTphService.updateArea(id, dto);
+    }
+
+    @Delete('areas/:id')
+    deleteArea(@Param('id', ParseIntPipe) id: number) {
+        return this.gpTphService.deleteArea(id);
+    }
 }
 
 

@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+    BadRequestException,
+    ConflictException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { CreateGpTphReqDto } from './dto/create-gp-tph.dto';
 import { UpdateGpTphDto } from './dto/update-gp-tph.dto';
 import { GpTphRepository } from './gp-tph.repository';
@@ -6,6 +11,7 @@ import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { CreateDataAreaDto } from './dto/create-data-area.dto';
+import { UpdateAreaDto } from './dto/update-data-area.dto';
 
 @Injectable()
 export class GpTphService {
@@ -126,7 +132,115 @@ export class GpTphService {
         }
     }
     async createArea(dto: CreateDataAreaDto) {
-        const ownerValue = dto.AREA_OWNER?.trim();
+        return this.repo.CreateGpTphArea(this.normalizeArea(dto));
+    }
+
+    async update(form: FormDto, dto: UpdateGpTphDto) {
+        const existing = await this.repo.findOne(form);
+        if (!existing) {
+            throw new NotFoundException('GP-TPH request was not found');
+        }
+
+        const areaIds = (Array.isArray(dto.AREA_ID) ? dto.AREA_ID : [dto.AREA_ID])
+            .filter((areaId) => Number.isFinite(Number(areaId)) && Number(areaId) > 0)
+            .map(Number);
+        if (!areaIds.length) {
+            throw new BadRequestException('AREA_ID must contain at least one area');
+        }
+        if (!Array.isArray(dto.DETAILS) || !dto.DETAILS.length) {
+            throw new BadRequestException('DETAILS must contain at least one applicant');
+        }
+
+        const header = {
+            REQUEST_TYPE: dto.REQUEST_TYPE?.trim() ?? null,
+            REQUEST_SUB_TYPE: dto.REQUEST_SUB_TYPE?.trim() ?? null,
+            PURPOSE: dto.PURPOSE?.trim() ?? null,
+            LONGTERM_YEARS:
+                dto.LONGTERM_YEARS === undefined || dto.LONGTERM_YEARS === null
+                    ? null
+                    : Number(dto.LONGTERM_YEARS),
+            PERMIT_START_DATE: dto.PERMIT_START_DATE ?? null,
+            PERMIT_END_DATE: dto.PERMIT_END_DATE ?? null,
+            HELMET_STICKER: dto.HELMET_STICKER?.trim() ?? null,
+            PHOTO_PERMIT_BADGE: dto.PHOTO_PERMIT_BADGE?.trim() ?? null,
+        };
+        const details = dto.DETAILS.map((detail, index) => ({
+            CYEAR2: form.CYEAR2,
+            NRUNNO: form.NRUNNO,
+            SEQ_NO: Number(detail.SEQ_NO ?? index + 1),
+            APPLICANT_TYPE: detail.APPLICANT_TYPE ?? null,
+            EMP_CODE: detail.EMP_CODE ?? null,
+            APPLICANT_NAME: detail.APPLICANT_NAME ?? null,
+            COMPANY_NAME: detail.COMPANY_NAME ?? null,
+        }));
+
+        await this.repo.replaceRequest(form, header, details, areaIds, {
+            REQBY: dto.REQBY,
+            INPUTBY: dto.INPUTBY,
+            REMARK: dto.REMARK,
+        });
+        return { status: true, message: 'GP-TPH Form updated successfully' };
+    }
+
+    async delete(form: FormDto) {
+        const existing = await this.repo.findOne(form);
+        if (!existing) {
+            throw new NotFoundException('GP-TPH request was not found');
+        }
+
+        await this.repo.deleteRequest(form);
+        const result = await this.formCreateService.deleteFlowAndForm(form);
+
+        return {
+            status: result.status,
+            message: result.status
+                ? 'GP-TPH Form deleted successfully'
+                : 'Failed to delete GP-TPH Form',
+        };
+    }
+
+    async updateArea(id: number, dto: UpdateAreaDto) {
+        const area = await this.repo.findAreaById(id);
+        if (!area) {
+            throw new NotFoundException(`Area ${id} was not found`);
+        }
+
+        const data = this.normalizeArea(dto);
+        if (Object.keys(data).length === 0) {
+            throw new BadRequestException('Provide at least one area field to update');
+        }
+
+        return this.repo.updateArea(id, data);
+    }
+
+    async deleteArea(id: number) {
+        const area = await this.repo.findAreaById(id);
+        if (!area) {
+            throw new NotFoundException(`Area ${id} was not found`);
+        }
+
+        if (await this.repo.countAreaRecords(id)) {
+            throw new ConflictException(
+                'This area cannot be deleted because it is assigned to a GP-TPH request',
+            );
+        }
+
+        await this.repo.deleteArea(id);
+        return { status: true, message: 'Area deleted successfully' };
+    }
+
+    private normalizeArea(dto: CreateDataAreaDto | UpdateAreaDto) {
+        const data = { ...dto };
+
+        if (data.AREA_NAME !== undefined) {
+            data.AREA_NAME = data.AREA_NAME.trim();
+        }
+
+        if (data.AREA_OWNER === undefined) {
+            return data;
+        }
+
+        const ownerValue = data.AREA_OWNER.trim();
         const [posCode, ownerCode, ...extraParts] =
             ownerValue?.split('+').map((part) => part.trim()) ?? [];
 
@@ -141,9 +255,23 @@ export class GpTphService {
                 'AREA_OWNER contains an invalid SPOSCODE or SDEPCODE/SDIVCODE length',
             );
         }
+
+        // The UI submits the owner selection as "SPOSCODE+SDEPCODE/SDIVCODE".
+        // Store its two parts in the columns used by GPTPH_AREAS.
+        data.AREA_OWNER = ownerCode;
+        data.AREA_OWNER_POSCODE = posCode;
+        return data;
     }
     async findOne(dto: FormDto) {
-        return this.repo.findOne(dto);
+        const request = await this.repo.findOne(dto);
+        if (!request) {
+            return null;
+        }
+        const [details, areaRecords] = await Promise.all([
+            this.repo.findList(dto),
+            this.repo.findAreaRecords(dto),
+        ]);
+        return { ...request, DETAILS: details, AREA_RECORDS: areaRecords };
     }
     async findList(dto: FormDto) {
         return this.repo.findList(dto);

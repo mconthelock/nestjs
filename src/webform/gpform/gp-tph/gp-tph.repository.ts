@@ -3,13 +3,14 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { GPTPH_AREAS } from 'src/common/Entities/webform/table/GPTPH_AREAS.entity';
 import { GPTPH_LOCATION } from 'src/common/Entities/webform/table/GPTPH_LOCATION.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource } from 'typeorm';
+import { DataSource, DeepPartial } from 'typeorm';
 import { CreateGpTphReqDto, CreateGpTphlistApplicantDto } from './dto/create-gp-tph.dto';
 import { GPTPH_REQ_HEADER } from 'src/common/Entities/webform/table/GPTPH_REQ_HEADER.entity';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { GPTPH_APPLICANT } from 'src/common/Entities/webform/table/GPTPH_APPLICANT.entity';
 import { GPTPH_AREA_RECORD } from 'src/common/Entities/webform/table/GPTPH_AREA_RECORD.entity';
 import { CreateDataAreaDto } from './dto/create-data-area.dto';
+import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 @Injectable()
 export class GpTphRepository extends BaseRepository {
 
@@ -48,6 +49,13 @@ export class GpTphRepository extends BaseRepository {
             .getMany();
     }
 
+    findAreaRecords(dto: FormDto) {
+        return this.getRepository(GPTPH_AREA_RECORD).find({
+            where: { CYEAR2: dto.CYEAR2, NRUNNO: dto.NRUNNO },
+            relations: ['area', 'area.LOCATION'],
+        });
+    }
+
     /* async findOneWithList(dto: FormDto) {
             const form = await this.findOne(dto);
             const list = await this.findList(dto);
@@ -69,6 +77,49 @@ export class GpTphRepository extends BaseRepository {
         return this.getRepository(GPTPH_AREA_RECORD).save(dto)
     }
 
+    async replaceRequest(
+        form: FormDto,
+        header: DeepPartial<GPTPH_REQ_HEADER>,
+        details: DeepPartial<GPTPH_APPLICANT>[],
+        areaIds: number[],
+        formData: { REQBY?: string; INPUTBY?: string; REMARK?: string },
+    ) {
+        await this.getRepository(GPTPH_REQ_HEADER).update(form, header);
+        await this.getRepository(FORM).update(form, {
+            VREQNO: formData.REQBY,
+            VINPUTER: formData.INPUTBY,
+            VREMARK: formData.REMARK,
+        });
+        await this.getRepository(GPTPH_APPLICANT).delete({
+            CYEAR2: form.CYEAR2,
+            NRUNNO: form.NRUNNO,
+        });
+        await this.getRepository(GPTPH_AREA_RECORD).delete({
+            CYEAR2: form.CYEAR2,
+            NRUNNO: form.NRUNNO,
+        });
+        await this.getRepository(GPTPH_APPLICANT).save(details);
+        await this.getRepository(GPTPH_AREA_RECORD).save(
+            areaIds.map((AREA_ID) => ({
+                CYEAR2: form.CYEAR2,
+                NRUNNO: form.NRUNNO,
+                AREA_ID,
+            })),
+        );
+    }
+
+    async deleteRequest(form: FormDto) {
+        await this.getRepository(GPTPH_APPLICANT).delete({
+            CYEAR2: form.CYEAR2,
+            NRUNNO: form.NRUNNO,
+        });
+        await this.getRepository(GPTPH_AREA_RECORD).delete({
+            CYEAR2: form.CYEAR2,
+            NRUNNO: form.NRUNNO,
+        });
+        await this.getRepository(GPTPH_REQ_HEADER).delete(form);
+    }
+
     async CreateGpTphArea(dto: CreateDataAreaDto) {
         const areaRepository = this.getRepository(GPTPH_AREAS);
         const [lastArea] = await areaRepository.find({
@@ -81,5 +132,23 @@ export class GpTphRepository extends BaseRepository {
             AREA_ID: lastArea ? lastArea.AREA_ID + 1 : 1,
             AREA_STATUS: '1',
         });
+    }
+
+    findAreaById(id: number) {
+        return this.getRepository(GPTPH_AREAS).findOneBy({ AREA_ID: id });
+    }
+
+    async updateArea(id: number, dto: DeepPartial<GPTPH_AREAS>) {
+        const areaRepository = this.getRepository(GPTPH_AREAS);
+        await areaRepository.update({ AREA_ID: id }, dto);
+        return areaRepository.findOneByOrFail({ AREA_ID: id });
+    }
+
+    countAreaRecords(id: number) {
+        return this.getRepository(GPTPH_AREA_RECORD).countBy({ AREA_ID: id });
+    }
+
+    deleteArea(id: number) {
+        return this.getRepository(GPTPH_AREAS).delete({ AREA_ID: id });
     }
 }

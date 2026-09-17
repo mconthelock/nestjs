@@ -252,4 +252,9 @@ export class VendingService {
         const data = await this.vendingrepo.getRequestWithdrawal();
         return data;
     }
+
+    async getTransactionHistory() {
+        const data = await this.vendingrepo.getTransactionHistory();
+        return data;
+    }
 }

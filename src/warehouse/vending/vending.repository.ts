@@ -13,6 +13,7 @@ import { CreateImportDto } from './dto/import-vending.dto';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Products } from 'src/common/Entities/pursys/table/PRODUCTS.entity';
+import { StockBalances } from 'src/common/Entities/pursys/table/STOCK_BALANCES.entity';
 import { TOOL_IMPORT_HISTORY } from 'src/common/Entities/skid/table/TOOL_IMPORT_HISTORY.entity';
 import { TOOL_WITHDRAWAL } from 'src/common/Entities/skid/table/TOOL_WITHDRAWAL.entity';
 import { TOOL_REFILL } from 'src/common/Entities/skid/table/TOOL_REFILL.entity';
@@ -63,14 +64,28 @@ export class VendingRepository extends BaseRepository {
     }
 
     async getTools() {
-        return this.getRepository(Products).find({
-            where: {
-                IS_VENDING: '1',
-            },
-            relations: {
-                category: true,
-            },
-        });
+        return this.pur
+            .getRepository(Products)
+            .createQueryBuilder('product')
+            .leftJoinAndSelect('product.category', 'category')
+            .leftJoinAndMapMany(
+                'product.stockBalances',
+                StockBalances,
+                'stockBalance',
+                'stockBalance.PRODUCT_ID = product.SPRODID AND stockBalance.STORAGENO = :storageNo',
+                { storageNo: 21 },
+            )
+            .where('product.IS_VENDING = :isVending', { isVending: '1' })
+            .getMany();
+    }
+
+    async getTransactionHistory() {
+        return this.pur.query(`
+            SELECT sti.*,st.TRNTYPE 
+            FROM STOCK_TRANSACTIONS st 
+            JOIN STOCK_TRANSACTION_ITEMS sti ON st.ID = sti.TRANSACTION_ID
+            WHERE (STORAGE_FROM = '21' OR STORAGE_TO = '21')
+        `);
     }
 
     async getToolWithdrawalWithRequest() {

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 import { IMM_ITEMMST } from 'src/common/Entities/skid/views/IMM_ITEMMST.entity';
 import { PART_SHORTAGE_CONTROL } from 'src/common/Entities/skid/table/PART_SHORTAGE_CONTROL.entity';
@@ -15,6 +15,7 @@ export class ItemmasterService {
         private readonly itm: Repository<IMM_ITEMMST>,
         @InjectRepository(PART_SHORTAGE_CONTROL, 'webformConnection')
         private readonly psc: Repository<PART_SHORTAGE_CONTROL>,
+        @InjectDataSource('webformConnection') private readonly ds: DataSource,
     ) {}
 
     async findAll(dto: SearchItemmasterDto) {
@@ -34,5 +35,13 @@ export class ItemmasterService {
         } catch (error) {
             return error;
         }
+    }
+
+    async getHideShortage() {
+        return this.ds.query(`
+            SELECT p.*,i.IDESC,a.* FROM SKIDCNTRL.PART_SHORTAGE_CONTROL p
+            JOIN SKIDCNTRL.MV_IMM_ITEMMST i ON p.CODE = i.IPROD 
+            JOIN AMECUSERALL a ON a.SEMPNO = p.CREATED_BY 
+        `);
     }
 }

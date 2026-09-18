@@ -9,6 +9,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     imports: [TypeOrmModule.forFeature([CNFORM], 'webformConnection')],
     controllers: [CnformController],
     providers: [CnformService, CnFormRepository],
+<<<<<<< HEAD
     exports: [CnformService, CnFormRepository],
+=======
+    exports: [CnformService],
+>>>>>>> 67c79348 (PUR-EVA)
 })
 export class CnformModule {}

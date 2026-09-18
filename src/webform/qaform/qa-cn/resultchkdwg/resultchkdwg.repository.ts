@@ -21,6 +21,7 @@ export class ResultChkDwgRepository extends BaseRepository {
         return this.getRepository(RESULTCHKDWG).save(dto);
     }
 
+<<<<<<< HEAD
     async findByCondition(con: FormDto) {
         return this.getRepository(RESULTCHKDWG).find({
             where: {
@@ -29,6 +30,8 @@ export class ResultChkDwgRepository extends BaseRepository {
         });
     }
 
+=======
+>>>>>>> 67c79348 (PUR-EVA)
     async updateMultiple(
         con: FormDto,
         dtos: UpdateResultchkdwgDto[],
@@ -49,8 +52,11 @@ export class ResultChkDwgRepository extends BaseRepository {
             throw new Error('Update multiple failed: ' + error.message);
         }
     }
+<<<<<<< HEAD
 
     async deleteByAll(dto: FormDto) {
         return this.getRepository(RESULTCHKDWG).delete(dto);
     }
+=======
+>>>>>>> 67c79348 (PUR-EVA)
 }

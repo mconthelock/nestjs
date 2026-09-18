@@ -28,6 +28,7 @@ export class AttCnFrmRepository extends BaseRepository {
         });
     }
 
+<<<<<<< HEAD
     async getQaFileAll(dto: SearchAttCNFileDto) {
         return this.getRepository(ATTCNFRM).find({
             where: {
@@ -44,6 +45,8 @@ export class AttCnFrmRepository extends BaseRepository {
         });
     }
 
+=======
+>>>>>>> 67c79348 (PUR-EVA)
     async getNextSeq(dto: SearchAttCNFileDto) {
         return this.getRepository(ATTCNFRM).find({
             where: dto,
@@ -58,7 +61,11 @@ export class AttCnFrmRepository extends BaseRepository {
         return this.getRepository(ATTCNFRM).insert(dto);
     }
 
+<<<<<<< HEAD
     async deleteAll(dto: SearchAttCNFileDto) {
+=======
+    async delete(dto: SearchAttCNFileDto) {
+>>>>>>> 67c79348 (PUR-EVA)
         return this.getRepository(ATTCNFRM).delete(dto);
     }
 }

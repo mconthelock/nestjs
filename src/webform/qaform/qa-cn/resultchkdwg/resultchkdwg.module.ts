@@ -9,6 +9,10 @@ import { RESULTCHKDWG } from 'src/common/Entities/webform/table/RESULTCHKDWG.ent
     imports: [TypeOrmModule.forFeature([RESULTCHKDWG], 'webformConnection')],
     controllers: [ResultchkdwgController],
     providers: [ResultChkDwgService, ResultChkDwgRepository],
+<<<<<<< HEAD
     exports: [ResultChkDwgService, ResultChkDwgRepository],
+=======
+    exports: [ResultChkDwgService],
+>>>>>>> 67c79348 (PUR-EVA)
 })
 export class ResultchkdwgModule {}

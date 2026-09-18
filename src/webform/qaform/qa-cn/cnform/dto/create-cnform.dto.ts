@@ -9,9 +9,13 @@ import {
     IsString,
     ValidateNested,
 } from 'class-validator';
+<<<<<<< HEAD
 import { StringToDate } from 'src/common/utils/transform';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
+=======
+import { FormDto } from 'src/webform/form/dto/form.dto';
+>>>>>>> 67c79348 (PUR-EVA)
 export class CreateCnformDto extends PickType(FormDto, [
     'NFRMNO',
     'VORGNO',
@@ -62,17 +66,29 @@ export class CreateCnformDto extends PickType(FormDto, [
     AFTCHANGE?: string;
 
     @IsOptional()
+<<<<<<< HEAD
     @StringToDate()
+=======
+    @IsDate()
+>>>>>>> 67c79348 (PUR-EVA)
     @Type(() => Date)
     SUBMITDATE?: Date;
 
     @IsOptional()
+<<<<<<< HEAD
     @StringToDate()
+=======
+    @IsDate()
+>>>>>>> 67c79348 (PUR-EVA)
     @Type(() => Date)
     INSPECDATE?: Date;
 
     @IsOptional()
+<<<<<<< HEAD
     @StringToDate()
+=======
+    @IsDate()
+>>>>>>> 67c79348 (PUR-EVA)
     @Type(() => Date)
     EXPCHGDATE?: Date;
 

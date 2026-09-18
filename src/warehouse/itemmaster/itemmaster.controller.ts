@@ -1,4 +1,4 @@
-import { Controller, Body, Post } from '@nestjs/common';
+import { Controller, Body, Post, Get } from '@nestjs/common';
 import { ItemmasterService } from './itemmaster.service';
 import { CreateItemmasterDto } from './dto/create-itemmaster.dto';
 import { UpdateItemmasterDto } from './dto/update-itemmaster.dto';
@@ -17,5 +17,10 @@ export class ItemmasterController {
     @Post('add-hide-shortage')
     hideShortage(@Body() dto: PartShortageDto) {
         return this.itm.hideShortage(dto);
+    }
+
+    @Get('get-hide-shortage')
+    getHideShortage() {
+        return this.itm.getHideShortage();
     }
 }

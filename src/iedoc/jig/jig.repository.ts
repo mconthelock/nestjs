@@ -20,18 +20,20 @@ import {
     JigFormKeyDto,
     SaveJigFormDto,
     JigFileDto,
+    JigNgDto,
+    CreateJigDetailDto,
 } from './dto/jig-form.dto';
 import { ReplaceCheckpointsDto } from './dto/checkpoint.dto';
 import {
     FORM_KEYS,
     formKey,
-    monthStart,
     compareReference,
     masterReference,
     nextRound,
     overallResult,
     validateRange,
     jigSnapshot,
+    checkpointResult,
 } from './jig.utils';
 
 export type JigFormState = JigForm & {
@@ -79,19 +81,11 @@ export class JigRepository extends BaseRepository {
         );
     }
 
-    getDashboardMaster(): Promise<
-        (JigMaster & {
-            PIC_NAME: string;
-            PIC_SECTION: string;
-            CHECKPOINT_COUNT: number;
-        })[]
-    > {
-        return this.manager.query(
-            'SELECT J.*, U.SNAME AS PIC_NAME, U.SSEC AS PIC_SECTION, ' +
-                '(SELECT COUNT(*) FROM JIG_CHECKPOINT C WHERE C.JIG_NO = J.JIG_NO) AS CHECKPOINT_COUNT ' +
-                'FROM JIG_MASTER J LEFT JOIN AMEC.AMECUSERALL U ON TRIM(U.SEMPNO) = TRIM(J.PIC_EMPNO) ' +
-                'ORDER BY J.NEXT_INSPEC_DATE ASC, J.JIG_NO ASC',
-        );
+    getDashboardMaster(): Promise<JigMaster[]> {
+        return this.getRepository(JigMaster).find({
+            where: { JIG_STATUS: 'ACTIVE' },
+            order: { NEXT_INSPEC_DATE: 'ASC', JIG_NO: 'ASC' },
+        });
     }
 
     getFormStates(
@@ -254,12 +248,17 @@ export class JigRepository extends BaseRepository {
                 throw new ConflictException(
                     'Finish or reject the previous form before opening another round',
                 );
-            const points =
+            if (dto.DETAILS != null && dto.CHECKPOINTS != null)
+                throw new BadRequestException(
+                    'Send DETAILS or CHECKPOINTS, not both',
+                );
+            const points: CreateJigDetailDto[] =
+                dto.DETAILS ??
                 dto.CHECKPOINTS ??
                 (jig ? await this.getCheckpoints(jigNo, manager) : []);
             if (!points.length)
                 throw new BadRequestException(
-                    'CHECKPOINTS are required for a new jig',
+                    'Nonempty DETAILS (or CHECKPOINTS) are required for a new jig',
                 );
             points.forEach(validateRange);
             const form = manager.create(JigForm, {
@@ -279,9 +278,17 @@ export class JigRepository extends BaseRepository {
                     MIN: p.MIN ?? null,
                     MAX: p.MAX ?? null,
                     UNIT: p.UNIT ?? null,
-                    MEASURED_VALUE: null,
-                    RESULT: null,
+                    MEASURED_VALUE: p.MEASURED_VALUE ?? null,
+                    RESULT: checkpointResult(p),
                 })),
+            );
+            await this.writeFormExtras(
+                manager,
+                key,
+                dto.FILES,
+                dto.NG,
+                dto.CREATE_BY,
+                true,
             );
             return this.getForm(key, manager);
         });
@@ -341,62 +348,127 @@ export class JigRepository extends BaseRepository {
             const where = formKey(key);
             const details = await manager.findBy(JigFormDetail, where);
             for (const input of dto.DETAILS ?? []) {
-                const row = details.find(
-                    (d) => d.CHECK_SEQ === input.CHECK_SEQ,
-                );
-                if (!row)
-                    throw new BadRequestException(
-                        'Unknown CHECK_SEQ in form snapshot',
-                    );
-                if (input.MEASURED_VALUE !== undefined)
-                    row.MEASURED_VALUE = input.MEASURED_VALUE;
-                if (input.RESULT !== undefined) row.RESULT = input.RESULT;
-                if (
-                    row.MEASURED_VALUE != null &&
-                    (row.MIN != null || row.MAX != null)
-                ) {
-                    row.RESULT =
-                        (row.MIN != null && row.MEASURED_VALUE < row.MIN) ||
-                        (row.MAX != null && row.MEASURED_VALUE > row.MAX)
-                            ? 'NG'
-                            : 'OK';
+                let row = details.find((d) => d.CHECK_SEQ === input.CHECK_SEQ);
+                if (!row) {
+                    if (!input.CHECK_POINT)
+                        throw new BadRequestException(
+                            'A new CHECK_SEQ requires CHECK_POINT',
+                        );
+                    row = manager.create(JigFormDetail, {
+                        ...where,
+                        CHECK_SEQ: input.CHECK_SEQ,
+                        CHECK_POINT: input.CHECK_POINT,
+                        INSPECTION_TOOL: null,
+                        MIN: null,
+                        MAX: null,
+                        UNIT: null,
+                        MEASURED_VALUE: null,
+                        RESULT: null,
+                    });
+                    details.push(row);
                 }
+                for (const field of [
+                    'CHECK_POINT',
+                    'INSPECTION_TOOL',
+                    'MIN',
+                    'MAX',
+                    'UNIT',
+                    'MEASURED_VALUE',
+                    'RESULT',
+                ] as const) {
+                    if (input[field] !== undefined)
+                        Object.assign(row, { [field]: input[field] });
+                }
+                row.RESULT = checkpointResult(row);
             }
-            if (details.length) await manager.save(JigFormDetail, details);
-            const result = overallResult(details);
+            if (details.length > 20)
+                throw new BadRequestException(
+                    'At most 20 checkpoints are allowed',
+                );
             Object.assign(form, jigSnapshot(form, dto));
+            if (dto.DETAILS?.length) await manager.save(JigFormDetail, details);
             await manager.save(JigForm, form);
-            if (dto.NG === null || result === 'OK') {
-                await manager.delete(JigFormNg, where);
-            } else if (dto.NG !== undefined) {
-                const existing = await manager.findOneBy(JigFormNg, where);
-                await manager.save(JigFormNg, {
-                    ...existing,
-                    ...where,
-                    ...dto.NG,
-                    PLAN_DATE: new Date(dto.NG.PLAN_DATE),
-                    CREATE_BY: existing?.CREATE_BY ?? dto.UPDATE_BY ?? null,
-                    CREATE_DATE: existing?.CREATE_DATE ?? new Date(),
-                    UPDATE_BY: dto.UPDATE_BY ?? null,
-                    UPDATE_DATE: new Date(),
-                });
-            }
+            await this.writeFormExtras(
+                manager,
+                where,
+                dto.FILES,
+                dto.NG,
+                dto.UPDATE_BY,
+            );
             return this.getForm(where, manager);
         });
+    }
+
+    private async writeFormFile(
+        manager: EntityManager,
+        key: JigFormKeyDto,
+        dto: JigFileDto,
+        actor?: string,
+        insertOnly = false,
+    ) {
+        const where = { ...formKey(key), FILE_SEQ: dto.FILE_SEQ };
+        const existing = insertOnly
+            ? null
+            : await manager.findOneBy(JigFormFile, where);
+        const data = manager.create(JigFormFile, {
+            ...where,
+            FILE_NAME: dto.FILE_NAME,
+            FILE_PATH: dto.FILE_PATH,
+            FILE_TYPE:
+                dto.FILE_TYPE !== undefined
+                    ? dto.FILE_TYPE
+                    : (existing?.FILE_TYPE ?? null),
+            FILE_SIZE:
+                dto.FILE_SIZE !== undefined
+                    ? dto.FILE_SIZE
+                    : (existing?.FILE_SIZE ?? null),
+            CREATE_BY: existing?.CREATE_BY ?? dto.CREATE_BY ?? actor ?? null,
+            CREATE_DATE: existing?.CREATE_DATE ?? new Date(),
+        });
+        if (insertOnly) {
+            await manager.insert(JigFormFile, data);
+            return data;
+        }
+        return manager.save(JigFormFile, data);
+    }
+
+    private async writeFormExtras(
+        manager: EntityManager,
+        key: JigFormKeyDto,
+        files: JigFileDto[] | undefined,
+        ng: JigNgDto | null | undefined,
+        actor?: string,
+        insertOnly = false,
+    ) {
+        const where = formKey(key);
+        if (ng === null) {
+            if (!insertOnly) await manager.delete(JigFormNg, where);
+        } else if (ng !== undefined) {
+            const existing = insertOnly
+                ? null
+                : await manager.findOneBy(JigFormNg, where);
+            const data = manager.create(JigFormNg, {
+                ...where,
+                DEFECT_DETAIL: ng.DEFECT_DETAIL,
+                ACCESS_METHOD: ng.ACCESS_METHOD ?? null,
+                PLAN_DATE: new Date(ng.PLAN_DATE),
+                LOCATION: ng.LOCATION ?? null,
+                CREATE_BY: existing?.CREATE_BY ?? actor ?? null,
+                CREATE_DATE: existing?.CREATE_DATE ?? new Date(),
+                UPDATE_BY: insertOnly ? null : (actor ?? null),
+                UPDATE_DATE: insertOnly ? null : new Date(),
+            });
+            if (insertOnly) await manager.insert(JigFormNg, data);
+            else await manager.save(JigFormNg, data);
+        }
+        for (const file of files ?? [])
+            await this.writeFormFile(manager, where, file, actor, insertOnly);
     }
 
     async putFile(key: JigFormKeyDto, dto: JigFileDto) {
         return this.withForm(key, async (manager, _form, _jig, status) => {
             this.assertEditable(status);
-            const where = { ...formKey(key), FILE_SEQ: dto.FILE_SEQ };
-            const existing = await manager.findOneBy(JigFormFile, where);
-            return manager.save(JigFormFile, {
-                ...existing,
-                ...dto,
-                ...where,
-                CREATE_BY: existing?.CREATE_BY ?? dto.CREATE_BY ?? null,
-                CREATE_DATE: existing?.CREATE_DATE ?? new Date(),
-            });
+            return this.writeFormFile(manager, key, dto);
         });
     }
 

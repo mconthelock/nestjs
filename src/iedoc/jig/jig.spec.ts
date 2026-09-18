@@ -20,13 +20,7 @@ import {
     JigFormKeyDto,
     JigFormFileKeyDto,
 } from './dto/jig-form.dto';
-import {
-    monthStart,
-    nextRound,
-    validateRange,
-    jigSnapshot,
-    inspectionTimeline,
-} from './jig.utils';
+import { monthStart, nextRound, validateRange, jigSnapshot } from './jig.utils';
 import { JigMaster } from 'src/common/Entities/iedoc/table/jig_master.entity';
 import { JigCheckpoint } from 'src/common/Entities/iedoc/table/jig_checkpoint.entity';
 import { JigForm } from 'src/common/Entities/iedoc/table/jig_form.entity';
@@ -310,12 +304,26 @@ describe('Jig dictionary and validation', () => {
 describe('Jig form snapshots and approval', () => {
     it('requires START_USE_DATE for registration and preserves its day in history', async () => {
         const { repo, state, manager } = fixture();
-        state.master = null; state.status = '1';
+        state.master = null;
+        state.status = '1';
         manager.findOneBy.mockResolvedValue(null);
-        await expect(repo.createForm('NEW', { ...key, FORM_TYPE: 'CREATE', JIG_NAME: 'New',
-            INSPEC_PERIOD: 6, CHECKPOINTS: [{ CHECK_SEQ: 1, CHECK_POINT: 'Visual' }] })).rejects.toThrow('START_USE_DATE');
+        await expect(
+            repo.createForm('NEW', {
+                ...key,
+                FORM_TYPE: 'CREATE',
+                JIG_NAME: 'New',
+                INSPEC_PERIOD: 6,
+                CHECKPOINTS: [{ CHECK_SEQ: 1, CHECK_POINT: 'Visual' }],
+            }),
+        ).rejects.toThrow('START_USE_DATE');
         expect(manager.insert).not.toHaveBeenCalled();
-        expect(jigSnapshot({ JIG_NAME: 'New', INSPEC_PERIOD: 6, START_USE_DATE: '2026-02-19' }).START_USE_DATE).toEqual(new Date(2026, 1, 19));
+        expect(
+            jigSnapshot({
+                JIG_NAME: 'New',
+                INSPEC_PERIOD: 6,
+                START_USE_DATE: '2026-02-19',
+            }).START_USE_DATE,
+        ).toEqual(new Date(2026, 1, 19));
     });
 
     it('uses WEBFORM request date and all key columns when listing snapshots', async () => {
@@ -324,7 +332,9 @@ describe('Jig form snapshots and approval', () => {
         const [sql, params] = manager.query.mock.calls[0];
         expect(sql).toContain('W.DREQDATE AS FORM_DATE');
         expect(sql).not.toContain('F.CREATE_DATE');
-        Object.keys(key).forEach(k => expect(sql).toContain('W.' + k + ' = F.' + k));
+        Object.keys(key).forEach((k) =>
+            expect(sql).toContain('W.' + k + ' = F.' + k),
+        );
         expect(params).toEqual(['J-001']);
     });
 
@@ -564,7 +574,8 @@ describe('Jig form snapshots and approval', () => {
     it('re-reads master after waiting for another CREATE finish to commit', async () => {
         const { repo, jig, form, manager } = fixture();
         form.FORM_TYPE = 'CREATE';
-        jig.REF_CYEAR2 = '2026'; jig.REF_NRUNNO = 1;
+        jig.REF_CYEAR2 = '2026';
+        jig.REF_NRUNNO = 1;
         manager.findOne.mockResolvedValueOnce(null).mockResolvedValueOnce(jig);
         expect((await repo.finishForm(key)).applied).toBe(false);
         expect(manager.insert).not.toHaveBeenCalled();
@@ -650,158 +661,320 @@ describe('Jig form snapshots and approval', () => {
     });
 });
 
-describe('Jig dashboard and calendar', () => {
-    it('uses the calendar start-use month, including year rollovers', () => {
-        const snapshot = jigSnapshot({
-            JIG_NAME: 'A',
-            INSPEC_PERIOD: 6,
-            START_USE_DATE: '2026-09-01',
-        });
-        expect(snapshot.START_USE_DATE).toEqual(new Date(2026, 8, 1));
-        expect(nextRound(snapshot.START_USE_DATE, 6)).toEqual(
-            new Date(2027, 2, 1),
-        );
-    });
+describe('Jig complete form transactions', () => {
+    const payload: CreateJigFormDto = {
+        ...key,
+        FORM_TYPE: 'CREATE',
+        JIG_NAME: 'New jig',
+        INSPEC_PERIOD: 6,
+        START_USE_DATE: '2026-02-19',
+        CREATE_BY: 'J0144',
+        DETAILS: [
+            {
+                CHECK_SEQ: 1,
+                CHECK_POINT: 'Diameter',
+                MIN: 1,
+                MAX: 2,
+                MEASURED_VALUE: 3,
+                RESULT: 'OK',
+                UNIT: 'mm',
+            },
+        ],
+        NG: {
+            DEFECT_DETAIL: 'Oversize',
+            PLAN_DATE: '2026-03-01',
+            ACCESS_METHOD: 'Repair',
+            LOCATION: 'IE',
+        },
+        FILES: [
+            {
+                FILE_SEQ: 1,
+                FILE_NAME: 'drawing.pdf',
+                FILE_PATH: 'jig/drawing.pdf',
+                FILE_TYPE: 'application/pdf',
+                FILE_SIZE: 100,
+            },
+        ],
+    };
 
-    it('reconstructs applied rounds using each approved snapshot period and excludes rejected forms', () => {
-        const { jig, form } = fixture();
-        jig.REF_CYEAR2 = '2026';
-        jig.REF_NRUNNO = 2;
-        jig.NEXT_INSPEC_DATE = new Date(2027, 7, 1);
-        const history = inspectionTimeline(jig, [
-            { ...form, NRUNNO: 1, INSPEC_PERIOD: 6, FORM_STATUS: '2' },
-            { ...form, NRUNNO: 2, INSPEC_PERIOD: 12, FORM_STATUS: '2' },
-            { ...form, NRUNNO: 3, INSPEC_PERIOD: 12, FORM_STATUS: '3' },
-            { ...form, NRUNNO: 4, INSPEC_PERIOD: 12, FORM_STATUS: '1' },
+    it('inserts all four tables with the same form key, computes NG, and does not write master', async () => {
+        const { repo, state, manager } = fixture();
+        state.master = null;
+        state.status = '1';
+        manager.findOneBy.mockResolvedValue(null);
+        jest.spyOn(repo, 'getForm').mockResolvedValue({} as any);
+        await repo.createForm('NEW', payload);
+        expect(manager.insert.mock.calls.map((c) => c[0])).toEqual([
+            JigForm,
+            JigFormDetail,
+            JigFormNg,
+            JigFormFile,
         ]);
-        expect(history.find((f) => f.NRUNNO === 1).SCHEDULE_DATE).toEqual(
-            new Date(2026, 1, 1),
-        );
-        expect(history.find((f) => f.NRUNNO === 2).SCHEDULE_DATE).toEqual(
-            new Date(2026, 7, 1),
-        );
-        expect(history.find((f) => f.NRUNNO === 3).SCHEDULE_DATE).toBeNull();
-        expect(history.find((f) => f.NRUNNO === 4).SCHEDULE_DATE).toEqual(
-            new Date(2027, 7, 1),
-        );
+        for (const [, data] of manager.insert.mock.calls)
+            expect(Array.isArray(data) ? data[0] : data).toMatchObject(key);
+        const header = manager.insert.mock.calls[0][1];
+        expect(header).not.toHaveProperty('FILES');
+        expect(header).not.toHaveProperty('CREATE_BY');
+        expect(manager.insert.mock.calls[1][1][0]).toMatchObject({
+            RESULT: 'NG',
+            MEASURED_VALUE: 3,
+        });
+        expect(manager.insert.mock.calls[2][1]).toMatchObject({
+            CREATE_BY: 'J0144',
+            DEFECT_DETAIL: 'Oversize',
+        });
+        expect(manager.insert.mock.calls[3][1]).toMatchObject({
+            CREATE_BY: 'J0144',
+            FILE_SEQ: 1,
+        });
+        expect(manager.save).not.toHaveBeenCalled();
     });
 
-    it.each(['1', '2'])(
-        'shows a CREATE form with status %s on the dashboard before master exists',
-        async (status) => {
-            const { form } = fixture();
-            const repo: any = {
-                getDashboardMaster: jest.fn().mockResolvedValue([]),
-                getFormStates: jest
-                    .fn()
-                    .mockResolvedValue([
-                        {
-                            ...form,
-                            FORM_TYPE: 'CREATE',
-                            START_USE_DATE: new Date(2026, 1, 19),
-                            FORM_DATE: new Date(2026, 3, 1),
-                            FORM_STATUS: status,
-                            DETAIL_COUNT: 1,
-                        },
-                    ]),
-            };
-            const result = await new JigService(repo).getDashboard(2026);
-            expect(result.summary.total).toBe(1);
-            expect(result.items[0].NEXT_INSPEC_DATE).toEqual(
-                new Date(2026, 7, 1),
+    it.each([JigFormDetail, JigFormNg, JigFormFile])(
+        'propagates child write failures through the transaction without committing partial data (%p)',
+        async (failingEntity) => {
+            const { state, manager } = fixture();
+            state.master = null;
+            state.status = '1';
+            manager.findOneBy.mockResolvedValue(null);
+            let staged: any[] = [];
+            let committed: any[] = [];
+            let rolledBack = false;
+            manager.insert.mockImplementation(async (entity, data) => {
+                if (entity === failingEntity)
+                    throw new Error('Database write failed');
+                staged.push([entity, data]);
+            });
+            const transaction = jest.fn(async (callback) => {
+                try {
+                    const result = await callback(manager);
+                    committed = staged;
+                    return result;
+                } catch (error) {
+                    staged = [];
+                    rolledBack = true;
+                    throw error;
+                }
+            });
+            const repo = new JigRepository({
+                manager: {
+                    query: () => {
+                        throw new Error('Outside transaction');
+                    },
+                },
+                transaction,
+            } as any);
+            const read = jest.spyOn(repo, 'getForm');
+            await expect(repo.createForm('NEW', payload)).rejects.toThrow(
+                'Database write failed',
             );
-            expect(result.items[0].DASHBOARD_STATUS).toBe(
-                status === '2' ? 'AWAITING_SYNC' : 'PENDING',
-            );
-            expect(result.items[0].CURRENT_FORM.NRUNNO).toBe(1);
+            expect(transaction).toHaveBeenCalledTimes(1);
+            expect(rolledBack).toBe(true);
+            expect(committed).toEqual([]);
+            expect(read).not.toHaveBeenCalled();
         },
     );
-    it('normalizes month-end input and rolls across years', () => {
-        expect(monthStart('2026-01-31')).toEqual(new Date(2026, 0, 1));
-        expect(nextRound(new Date(2026, 7, 31), 6)).toEqual(
-            new Date(2027, 1, 1),
-        );
+
+    it('validates duplicate child keys, numeric precision and required NG fields', async () => {
+        const pipe = new ValidationPipe({
+            transform: true,
+            whitelist: true,
+            forbidNonWhitelisted: true,
+        });
+        const parse = (body) =>
+            pipe.transform(body, { type: 'body', metatype: CreateJigFormDto });
+        const parsed = await parse(payload);
+        expect(parsed.DETAILS[0].MEASURED_VALUE).toBe(3);
+        expect(parsed.NG.DEFECT_DETAIL).toBe('Oversize');
+        expect(parsed.FILES[0].FILE_NAME).toBe('drawing.pdf');
+        for (const invalid of [
+            { ...payload, DETAILS: [payload.DETAILS[0], payload.DETAILS[0]] },
+            { ...payload, FILES: [payload.FILES[0], payload.FILES[0]] },
+            { ...payload, NG: { DEFECT_DETAIL: 'Missing date' } },
+            {
+                ...payload,
+                DETAILS: [{ ...payload.DETAILS[0], MEASURED_VALUE: 1.12345 }],
+            },
+        ])
+            await expect(parse(invalid)).rejects.toThrow(BadRequestException);
     });
-    it('handles drafts with no due date and separates two inspection rounds in a fiscal year', async () => {
-        jest.useFakeTimers().setSystemTime(new Date(2026, 8, 8));
+
+    it('saves snapshot edits, new/updated details, NG and files together without changing master', async () => {
+        const { repo, state, jig, form, details, manager } = fixture();
+        state.status = '1';
+        await repo.saveForm(key, {
+            JIG_NAME: 'Edited',
+            DETAILS: [
+                {
+                    CHECK_SEQ: 1,
+                    CHECK_POINT: 'Revised diameter',
+                    MAX: 1.2,
+                    MEASURED_VALUE: 1.5,
+                },
+                { CHECK_SEQ: 2, CHECK_POINT: 'Visual', RESULT: 'OK' },
+            ],
+            FILES: payload.FILES,
+            NG: payload.NG,
+            UPDATE_BY: 'J0144',
+        });
+        expect(form.JIG_NAME).toBe('Edited');
+        expect(jig.JIG_NAME).toBe('Original jig');
+        expect(details).toHaveLength(2);
+        expect(details[0]).toMatchObject({
+            CHECK_POINT: 'Revised diameter',
+            RESULT: 'NG',
+        });
+        expect(manager.save.mock.calls.map((c) => c[0])).toEqual([
+            JigFormDetail,
+            JigForm,
+            JigFormNg,
+            JigFormFile,
+        ]);
+    });
+
+    it('clears a numerical result when its measurement is cleared and deletes NG only when requested', async () => {
+        const { repo, state, details, manager } = fixture();
+        state.status = '1';
+        await repo.saveForm(key, {
+            DETAILS: [{ CHECK_SEQ: 1, MEASURED_VALUE: null }],
+            NG: null,
+        });
+        expect(details[0].RESULT).toBeNull();
+        expect(manager.delete).toHaveBeenCalledWith(JigFormNg, key);
+    });
+});
+
+describe('Jig active dashboard and calendar', () => {
+    it('queries only active master records without joining form history', async () => {
+        const find = jest.fn().mockResolvedValue([]);
+        const repo = new JigRepository({
+            manager: { getRepository: () => ({ find }) },
+        } as any);
+        await repo.getDashboardMaster();
+        expect(find).toHaveBeenCalledWith({
+            where: { JIG_STATUS: 'ACTIVE' },
+            order: { NEXT_INSPEC_DATE: 'ASC', JIG_NO: 'ASC' },
+        });
+    });
+
+    it('reports all active jig due statuses with no fiscal-year or history dependency', async () => {
+        jest.useFakeTimers().setSystemTime(new Date('2026-08-31T17:10:00Z'));
         try {
             const repo: any = {
                 getDashboardMaster: jest.fn().mockResolvedValue([
                     {
                         JIG_NO: 'A',
                         JIG_STATUS: 'ACTIVE',
-                        INSPEC_PERIOD: 6,
-                        NEXT_INSPEC_DATE: new Date(2026, 9, 1),
-                        REF_CYEAR2: '2026',
-                        REF_NRUNNO: 1,
-                        CREATE_DATE: new Date(2025, 0, 1),
-                        CHECKPOINT_COUNT: 1,
+                        NEXT_INSPEC_DATE: new Date(2026, 7, 1),
                     },
                     {
                         JIG_NO: 'B',
-                        JIG_STATUS: 'DRAFT',
-                        INSPEC_PERIOD: 12,
-                        NEXT_INSPEC_DATE: null,
-                        CREATE_DATE: new Date(2026, 8, 1),
-                        CHECKPOINT_COUNT: 0,
+                        JIG_STATUS: 'ACTIVE',
+                        NEXT_INSPEC_DATE: new Date(2026, 8, 1),
                     },
-                ]),
-                getFormStates: jest.fn().mockResolvedValue([
                     {
-                        ...key,
-                        JIG_NO: 'A',
-                        FORM_TYPE: 'INSPECTION',
-                        INSPEC_PERIOD: 6,
-                        FORM_STATUS: '2',
+                        JIG_NO: 'C',
+                        JIG_STATUS: 'ACTIVE',
+                        NEXT_INSPEC_DATE: new Date(2026, 9, 1),
+                    },
+                    {
+                        JIG_NO: 'D',
+                        JIG_STATUS: 'ACTIVE',
+                        NEXT_INSPEC_DATE: new Date(2027, 3, 1),
+                    },
+                    {
+                        JIG_NO: 'E',
+                        JIG_STATUS: 'ACTIVE',
+                        NEXT_INSPEC_DATE: null,
                     },
                 ]),
+                getFormStates: jest
+                    .fn()
+                    .mockRejectedValue(new Error('Must not query history')),
             };
-            const dashboard = await new JigService(repo).getDashboard(2026);
-            expect(dashboard.summary).toMatchObject({
-                total: 2,
-                completed: 1,
-                completedRounds: 1,
+            const result = await new JigService(repo).getDashboard();
+            expect(result.asOf).toBe('2026-09-01');
+            expect(result.summary).toEqual({
+                total: 5,
+                overdue: 1,
+                dueToday: 1,
                 dueSoon: 1,
-                overdue: 0,
-                newJig: 1,
+                planned: 1,
+                unscheduled: 1,
             });
-            expect(
-                dashboard.items[0].SCHEDULES.map((s) => [
-                    s.SCHEDULE_DATE,
-                    s.STATUS,
-                ]),
-            ).toEqual([
-                ['2026-04-01', 'COMPLETED'],
-                ['2026-10-01', 'PLANNED'],
+            expect(result.items.map((j) => j.DASHBOARD_STATUS)).toEqual([
+                'OVERDUE',
+                'DUE',
+                'DUE_SOON',
+                'PLANNED',
+                'UNSCHEDULED',
             ]);
-            expect(dashboard.items[1].DASHBOARD_STATUS).toBe('DRAFT');
-            expect(dashboard.items[1].DUE_STATUS).toBeNull();
+            expect(result.items.map((j) => j.IS_DUE)).toEqual([
+                true,
+                true,
+                false,
+                false,
+                false,
+            ]);
+            expect(result.items[2].DAYS_UNTIL_DUE).toBe(30);
+            expect(result.items[4].DAYS_UNTIL_DUE).toBeNull();
+            expect(result).not.toHaveProperty('fyear');
+            expect(repo.getFormStates).not.toHaveBeenCalled();
         } finally {
             jest.useRealTimers();
         }
+    });
+
+    it('handles an empty master result without inventing pending registration rows', async () => {
+        const repo: any = {
+            getDashboardMaster: jest.fn().mockResolvedValue([]),
+        };
+        const result = await new JigService(repo).getDashboard();
+        expect(result.items).toEqual([]);
+        expect(result.summary.total).toBe(0);
+    });
+
+    it('uses the start-use month for CREATE and preserves anniversary months across years', () => {
+        const snapshot = jigSnapshot({
+            JIG_NAME: 'A',
+            INSPEC_PERIOD: 6,
+            START_USE_DATE: '2026-09-19',
+        });
+        expect(snapshot.START_USE_DATE).toEqual(new Date(2026, 8, 19));
+        expect(nextRound(snapshot.START_USE_DATE, 6)).toEqual(
+            new Date(2027, 2, 1),
+        );
+        expect(monthStart('2026-01-31')).toEqual(new Date(2026, 0, 1));
     });
 });
 
 describe('Jig HTTP contracts', () => {
     let app: any;
     const service = {
+        getDashboard: jest
+            .fn()
+            .mockResolvedValue({ summary: { total: 0 }, items: [] }),
         finishForm: jest.fn().mockResolvedValue({ applied: true }),
         deleteFile: jest.fn().mockResolvedValue({ deleted: true }),
         createJig: jest.fn().mockResolvedValue({ JIG_STATUS: 'DRAFT' }),
-        getIePics: jest.fn().mockResolvedValue([
-            { SEMPNO: 'J0144', SNAME: 'Example employee', SPOSNAME: 'Engineer' },
-        ]),
-        getMfgProcesses: jest
+        getIePics: jest
             .fn()
             .mockResolvedValue([
                 {
-                    MID: 1,
-                    MA_CODE: 'A',
-                    PROCESS: 'H6AS',
-                    STATUS: '1',
-                    ACTION_STATUS: '0',
+                    SEMPNO: 'J0144',
+                    SNAME: 'Example employee',
+                    SPOSNAME: 'Engineer',
                 },
             ]),
+        getMfgProcesses: jest.fn().mockResolvedValue([
+            {
+                MID: 1,
+                MA_CODE: 'A',
+                PROCESS: 'H6AS',
+                STATUS: '1',
+                ACTION_STATUS: '0',
+            },
+        ]),
         getLocations: jest
             .fn()
             .mockResolvedValue([
@@ -836,9 +1009,24 @@ describe('Jig HTTP contracts', () => {
             .get('/iedoc/jig/ie-pics')
             .expect(200);
         expect(pics.body).toEqual([
-            { SEMPNO: 'J0144', SNAME: 'Example employee', SPOSNAME: 'Engineer' },
+            {
+                SEMPNO: 'J0144',
+                SNAME: 'Example employee',
+                SPOSNAME: 'Engineer',
+            },
         ]);
         expect(service.getIePics).toHaveBeenCalledTimes(1);
+    });
+
+    it('serves the active dashboard with no FY argument', async () => {
+        await request(app.getHttpServer())
+            .get('/iedoc/jig/dashboard')
+            .expect(200);
+        expect(service.getDashboard).toHaveBeenLastCalledWith();
+        await request(app.getHttpServer())
+            .get('/iedoc/jig/dashboard?FYEAR=2026')
+            .expect(200);
+        expect(service.getDashboard).toHaveBeenLastCalledWith();
     });
 
     it('binds the composite form key on finish and file deletion routes', async () => {
@@ -869,5 +1057,33 @@ describe('Jig HTTP contracts', () => {
             .patch('/iedoc/jig/J-001/finish')
             .send({ SCHEDULE_DATE: '2026-02-01' })
             .expect(404);
+    });
+
+    it('accepts create data for all four tables through the HTTP validation pipe', async () => {
+        const body = {
+            ...key,
+            FORM_TYPE: 'CREATE',
+            JIG_NO: 'NEW',
+            JIG_NAME: 'New jig',
+            INSPEC_PERIOD: 6,
+            START_USE_DATE: '2026-02-19',
+            CREATE_BY: 'J0144',
+            DETAILS: [{ CHECK_SEQ: 1, CHECK_POINT: 'Visual', RESULT: 'NG' }],
+            NG: { DEFECT_DETAIL: 'Scratch', PLAN_DATE: '2026-03-01' },
+            FILES: [
+                {
+                    FILE_SEQ: 1,
+                    FILE_NAME: 'photo.jpg',
+                    FILE_PATH: 'jig/photo.jpg',
+                },
+            ],
+        };
+        await request(app.getHttpServer())
+            .post('/iedoc/jig')
+            .send(body)
+            .expect(201);
+        expect(service.createJig).toHaveBeenLastCalledWith(
+            expect.objectContaining(body),
+        );
     });
 });

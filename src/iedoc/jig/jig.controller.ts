@@ -7,7 +7,6 @@ import {
     Patch,
     Post,
     Put,
-    Query,
     UsePipes,
     ValidationPipe,
 } from '@nestjs/common';
@@ -52,11 +51,10 @@ export class JigController {
     }
 
     @Get('dashboard')
-    getDashboard(@Query('fyear') fyear?: string) {
-        return this.jigService.getDashboard(
-            fyear === undefined ? undefined : Number(fyear),
-        );
+    getDashboard() {
+        return this.jigService.getDashboard();
     }
+
     @Post()
     createJig(@Body() dto: CreateJigRequestDto) {
         return this.jigService.createJig(dto);

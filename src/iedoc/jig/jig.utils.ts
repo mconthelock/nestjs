@@ -1,7 +1,6 @@
 import { BadRequestException, ConflictException } from '@nestjs/common';
 import { JigFormKeyDto } from './dto/jig-form.dto';
 import { JigForm } from 'src/common/Entities/iedoc/table/jig_form.entity';
-import { JigMaster } from 'src/common/Entities/iedoc/table/jig_master.entity';
 
 export const SNAPSHOT_FIELDS = [
     'JIG_NAME',
@@ -19,6 +18,23 @@ export const SNAPSHOT_FIELDS = [
     'INSPEC_PERIOD',
     'REMARK',
 ] as const;
+
+export function checkpointResult(row: {
+    MIN?: number | null;
+    MAX?: number | null;
+    MEASURED_VALUE?: number | null;
+    RESULT?: string | null;
+}): string | null {
+    validateRange(row);
+    if (row.MIN != null || row.MAX != null) {
+        if (row.MEASURED_VALUE == null) return null;
+        return (row.MIN != null && row.MEASURED_VALUE < row.MIN) ||
+            (row.MAX != null && row.MEASURED_VALUE > row.MAX)
+            ? 'NG'
+            : 'OK';
+    }
+    return row.RESULT ?? null;
+}
 
 export type JigSnapshot = Pick<JigForm, (typeof SNAPSHOT_FIELDS)[number]>;
 
@@ -39,40 +55,6 @@ export function masterReference(
     return jig?.REF_CYEAR2 && jig.REF_NRUNNO != null
         ? { CYEAR2: jig.REF_CYEAR2.trim(), NRUNNO: Number(jig.REF_NRUNNO) }
         : null;
-}
-
-// Reconstruct completed rounds backwards from the applied master reference.
-// Each applied inspection advanced the previous due month by its snapshot period.
-export function inspectionTimeline<
-    T extends JigForm & { FORM_STATUS: string | null },
->(jig: JigMaster, history: T[]) {
-    const reference = masterReference(jig);
-    let cursor = jig.NEXT_INSPEC_DATE ? monthStart(jig.NEXT_INSPEC_DATE) : null;
-    return [...history]
-        .sort((a, b) => compareReference(b, a))
-        .map((f) => {
-            let schedule: Date | null = null;
-            if (f.FORM_TYPE === 'INSPECTION' && cursor) {
-                const applied =
-                    reference &&
-                    compareReference(f, reference) <= 0 &&
-                    String(f.FORM_STATUS).trim() === '2';
-                if (applied) {
-                    cursor = new Date(
-                        cursor.getFullYear(),
-                        cursor.getMonth() - Number(f.INSPEC_PERIOD),
-                        1,
-                    );
-                    schedule = new Date(cursor);
-                } else if (
-                    String(f.FORM_STATUS).trim() !== '3' &&
-                    (!reference || compareReference(f, reference) > 0)
-                ) {
-                    schedule = monthStart(jig.NEXT_INSPEC_DATE);
-                }
-            }
-            return { ...f, SCHEDULE_DATE: schedule };
-        });
 }
 
 export function snapshotChanges(value: object): Partial<JigSnapshot> {

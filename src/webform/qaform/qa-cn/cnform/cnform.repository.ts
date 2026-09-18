@@ -6,7 +6,10 @@ import { Brackets, DataSource } from 'typeorm';
 import { CreateCnformDto } from './dto/create-cnform.dto';
 import { UpdateCnformDto } from './dto/update-cnform.dto';
 import { CNFORM } from 'src/common/Entities/webform/table/CNFORM.entity';
+<<<<<<< HEAD
 import { CNITMINCHARGE } from 'src/common/Entities/webform/table/CNITMINCHARGE.entity';
+=======
+>>>>>>> 67c79348 (PUR-EVA)
 
 @Injectable()
 export class CnFormRepository extends BaseRepository {
@@ -22,6 +25,7 @@ export class CnFormRepository extends BaseRepository {
         return this.getRepository(CNFORM).save(dto);
     }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -49,10 +53,13 @@ export class CnFormRepository extends BaseRepository {
         return result ? result.INCHARGE : null;
     }
 
+=======
+>>>>>>> 67c79348 (PUR-EVA)
     async update(con: FormDto, dto: UpdateCnformDto): Promise<boolean> {
         const result = await this.getRepository(CNFORM).update(con, dto);
         return (result.affected ?? 0) > 0;
     }
+<<<<<<< HEAD
 
     async deleteAll(dto: FormDto) {
         return this.getRepository(CNFORM).delete(dto);
@@ -245,4 +252,6 @@ export class CnFormRepository extends BaseRepository {
         return res;
     }
 >>>>>>> 14243a62 (QA-CN)
+=======
+>>>>>>> 67c79348 (PUR-EVA)
 }

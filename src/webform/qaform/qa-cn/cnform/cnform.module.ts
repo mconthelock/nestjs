@@ -11,6 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     providers: [CnformService, CnFormRepository],
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     exports: [CnformService, CnFormRepository],
 =======
     exports: [CnformService],
@@ -18,5 +19,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 =======
     exports: [CnformService, CnFormRepository],
 >>>>>>> 093c063b (QA-CN)
+=======
+    exports: [CnformService],
+>>>>>>> 67c79348 (PUR-EVA)
 })
 export class CnformModule {}

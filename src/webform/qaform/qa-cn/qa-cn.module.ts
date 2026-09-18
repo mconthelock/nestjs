@@ -62,10 +62,17 @@ import { J736kpModule } from 'src/as400/rtnlibf/j736kp/j736kp.module';
 =======
 import { QaCnService } from './qa-cn.service';
 import { QaCnController } from './qa-cn.controller';
+import { CnformModule } from './cnform/cnform.module';
+import { ResultchkdwgModule } from './resultchkdwg/resultchkdwg.module';
+import { AttcnfrmModule } from './attcnfrm/attcnfrm.module';
 
 @Module({
   controllers: [QaCnController],
   providers: [QaCnService],
+<<<<<<< HEAD
 >>>>>>> 7c3a64c8 (QA-CN)
+=======
+  imports: [CnformModule, ResultchkdwgModule, AttcnfrmModule],
+>>>>>>> 67c79348 (PUR-EVA)
 })
 export class QaCnModule {}

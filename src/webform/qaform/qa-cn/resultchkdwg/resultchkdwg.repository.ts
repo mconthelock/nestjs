@@ -23,6 +23,7 @@ export class ResultChkDwgRepository extends BaseRepository {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 14243a62 (QA-CN)
     async findByCondition(con: FormDto) {
@@ -38,6 +39,8 @@ export class ResultChkDwgRepository extends BaseRepository {
 >>>>>>> 67c79348 (PUR-EVA)
 =======
 >>>>>>> 14243a62 (QA-CN)
+=======
+>>>>>>> 67c79348 (PUR-EVA)
     async updateMultiple(
         con: FormDto,
         dtos: UpdateResultchkdwgDto[],
@@ -60,6 +63,7 @@ export class ResultChkDwgRepository extends BaseRepository {
     }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 093c063b (QA-CN)
 
@@ -71,4 +75,6 @@ export class ResultChkDwgRepository extends BaseRepository {
 >>>>>>> 67c79348 (PUR-EVA)
 =======
 >>>>>>> 093c063b (QA-CN)
+=======
+>>>>>>> 67c79348 (PUR-EVA)
 }

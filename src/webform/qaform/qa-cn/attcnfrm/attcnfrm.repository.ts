@@ -30,6 +30,7 @@ export class AttCnFrmRepository extends BaseRepository {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 38e4fc7c (QA-CN)
     async getQaFileAll(dto: SearchAttCNFileDto) {
@@ -53,6 +54,8 @@ export class AttCnFrmRepository extends BaseRepository {
 >>>>>>> 67c79348 (PUR-EVA)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+>>>>>>> 67c79348 (PUR-EVA)
     async getNextSeq(dto: SearchAttCNFileDto) {
         return this.getRepository(ATTCNFRM).find({
             where: dto,
@@ -69,6 +72,7 @@ export class AttCnFrmRepository extends BaseRepository {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     async deleteAll(dto: SearchAttCNFileDto) {
 =======
     async delete(dto: SearchAttCNFileDto) {
@@ -76,6 +80,9 @@ export class AttCnFrmRepository extends BaseRepository {
 =======
     async deleteAll(dto: SearchAttCNFileDto) {
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+    async delete(dto: SearchAttCNFileDto) {
+>>>>>>> 67c79348 (PUR-EVA)
         return this.getRepository(ATTCNFRM).delete(dto);
     }
 }

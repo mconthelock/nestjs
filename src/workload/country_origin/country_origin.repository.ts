@@ -4,15 +4,17 @@ import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { CreateCountryOriginDto } from './dto/create_country_origin.dto';
 import { COUNTRY_ORIGIN } from 'src/common/Entities/workload/table/COUNTRY_ORIGIN.entity';
+import { CountryOriginSubscriber } from './country_origin.subscriber';
 
 @Injectable()
 export class CountryOriginRepository extends BaseRepository {
     constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ds.subscribers.push(new CountryOriginSubscriber()); // register Subscriber สำหรับ control การอัปเดต CREATEBY และ UPDATEBY
     }
 
-    save(data: CreateCountryOriginDto| CreateCountryOriginDto[]) {
-        if(Array.isArray(data)){
+    save(data: CreateCountryOriginDto | CreateCountryOriginDto[]) {
+        if (Array.isArray(data)) {
             return this.getRepository(COUNTRY_ORIGIN).save(data, {
                 chunk: 500, // แบ่งการบันทึกเป็นกลุ่มละ 500 แถว
             });
@@ -24,11 +26,12 @@ export class CountryOriginRepository extends BaseRepository {
         return this.getRepository(COUNTRY_ORIGIN).delete({ BULKCODE: code });
     }
 
-    getCountry(){
-        return this.getRepository(COUNTRY_ORIGIN).createQueryBuilder('C')
-            .distinct()
-            .select('C.COUNTRY', 'COUNTRY')
-            .orderBy('C.COUNTRY', 'ASC')
-            .getRawMany();
-    }
+    // getCountry() {
+    //     return this.getRepository(COUNTRY_ORIGIN)
+    //         .createQueryBuilder('C')
+    //         .distinct()
+    //         .select('C.COUNTRY', 'COUNTRY')
+    //         .orderBy('C.COUNTRY', 'ASC')
+    //         .getRawMany();
+    // }
 }

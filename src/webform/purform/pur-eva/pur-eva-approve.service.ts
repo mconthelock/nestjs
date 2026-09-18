@@ -66,13 +66,14 @@ export class PurEvaApproveService {
                         const resform = await this.purevaFormRepo.update(form, {
                             MJUDGEMENT: dto.MJUDGEMENT,
                         });
-                    } else {
-                        const deleteResult =
-                            await this.deleteFlowStepService.deleteFlowStep({
-                                ...form,
-                                CSTEPNO: '02',
-                            });
                     }
+                    // else {
+                    //     const deleteResult =
+                    //         await this.deleteFlowStepService.deleteFlowStep({
+                    //             ...form,
+                    //             CSTEPNO: '02',
+                    //         });
+                    // }
                 }
             }
             const resact = await this.doactionService.doAction(

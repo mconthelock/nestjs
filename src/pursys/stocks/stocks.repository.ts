@@ -28,8 +28,9 @@ export class StocksRepository extends BaseRepository {
         items: Partial<StockTransactionItems>[],
     ) {
         try {
-            const transaction =
-                await this.getRepository(StockTransactions).save(stock);
+            const transaction = await this.getRepository(
+                StockTransactions,
+            ).save({ ...stock, CREATED_AT: new Date() });
             for (const item of items) {
                 const itemData: Partial<StockTransactionItems> = {
                     TRANSACTION_ID: transaction.ID,
@@ -70,6 +71,8 @@ export class StocksRepository extends BaseRepository {
                     });
                     if (toBalance) {
                         toBalance.ONHAND = toBalance.ONHAND + item.QUANTITY;
+                        toBalance.UPDATE_AT = new Date();
+                        toBalance.UPDATE_BY = stock.CREATED_BY;
                         await this.getRepository(StockBalances).save(toBalance);
                     } else {
                         const newBalance: Partial<StockBalances> = {
@@ -80,7 +83,7 @@ export class StocksRepository extends BaseRepository {
                             ONHAND: item.QUANTITY,
                             ONRESERVE: 0,
                             UPDATE_AT: new Date(),
-                            UPDATE_BY: 'system',
+                            UPDATE_BY: stock.CREATED_BY,
                         };
                         await this.getRepository(StockBalances).save(
                             newBalance,

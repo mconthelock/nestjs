@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 
 import { LVAPP } from 'src/common/Entities/webform/table/LVAPP.entity';
-import { LR100P } from 'src/common/Entities/gpreport/table/LR100P.entity';
+import { LR100P } from 'src/common/Entities/gpreport/views/LR100P.entity';
 
 import { SearchLeaveDto } from './dto/search-leave.dto';
 import { SearchActualLeaveDto } from './dto/lr100p.dto';

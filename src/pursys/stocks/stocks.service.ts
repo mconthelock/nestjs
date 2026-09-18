@@ -25,7 +25,7 @@ export class StocksService {
             STORAGE_FROM: data.STORAGE_FROM,
             STORAGE_TO: data.STORAGE_TO,
             CSTATUS: data.CSTATUS,
-            CREATED_AT: data.CREATED_AT,
+            // CREATED_AT: data.CREATED_AT,
             CREATED_BY: data.CREATED_BY,
         };
         const transactionItems: Partial<StockTransactionItems>[] = data.ITEMS;

@@ -9,6 +9,12 @@ export class searchDto {
     @IsString()
     SEMPNO?: string;
 
+    @ApiPropertyOptional({ example: 'CHA' })
+    @Type(() => String)
+    @IsOptional()
+    @IsString()
+    SNAME?: string;
+
     @ApiPropertyOptional({ example: '050604' })
     @Type(() => String)
     @IsOptional()

@@ -1,12 +1,14 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { MarReportService } from '../services/mar-report.service';
 import { ReviseVgmService } from '../services/revise-vgm.service';
+import { MailAlertPurService } from '../services/mail-alert-pur.service';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 @Controller('mfgreport/dpms/packing-list-issue/job')
 export class JobController {
     constructor(private readonly marService: MarReportService,
-        private readonly reviseVgmService: ReviseVgmService
+        private readonly reviseVgmService: ReviseVgmService,
+        private readonly mailAlertPurService: MailAlertPurService
     ) {}
 
     // สำหรับ run job แบบอัตโนมัติ ช่วงเวลา 15:00-08:00
@@ -51,10 +53,17 @@ export class JobController {
         return this.reviseVgmService.reviseVgm();
     }
 
-    // สำหรับ Admin ใช้สรัน job แบบ manual โดยเลือกวัน vanndate ที่ต้องการ
+    // สำหรับ Admin ใช้รัน job แบบ manual โดยเลือกวัน vanndate ที่ต้องการ
     @Get('revise-vgm/manual/:vanndate')
     @UseTransaction('workloadConnection')
     async reviseVgmManual(@Param('vanndate') vanndate: string) {
         return this.reviseVgmService.reviseVgm(vanndate);
+    }
+
+    // สำหรับ spr เพื่อส่งเมลแจ้งเตือนทุกช่วงเย็นสำหรับรายการที่ยังไม่ได้มีการ set country of origin ใน procurement
+    @Get('mail-alert-pur')
+    @UseTransaction('workloadConnection')
+    async mailAlertPur() {
+        return this.mailAlertPurService.main();
     }
 }

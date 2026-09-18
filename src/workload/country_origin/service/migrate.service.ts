@@ -2,11 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { colToNumber, readFile } from 'src/common/utils/exceljs';
 import { CountryOriginService } from './country_origin.service';
 import { CountryOriginRepository } from '../country_origin.repository';
+import { CountryOriginCountryService } from 'src/workload/country_origin_country/country_origin_country.service';
 
 @Injectable()
 export class MigrateService extends CountryOriginService {
-    constructor(protected readonly repo: CountryOriginRepository) {
-        super(repo);
+    constructor(
+        protected readonly repo: CountryOriginRepository,
+        protected readonly countryService: CountryOriginCountryService,
+    ) {
+        super(repo, countryService);
     }
 
     async migrateCountryOrigin() {
@@ -80,6 +84,7 @@ export class MigrateService extends CountryOriginService {
                         ORIGIN_TYPE: originType,
                         COUNTRY: country,
                         CREATEBY: 'SYSTEM',
+                        COUNTRY_MODE: 0,
                     };
                 })
                 .filter(
@@ -92,6 +97,7 @@ export class MigrateService extends CountryOriginService {
                 .map((item) => item.COUNTRY)
                 .filter((item, index, self) => self.indexOf(item) === index);
 
+            await this.insertCountry(mapData);
             await this.repo.save(mapData);
             return {
                 length: mapData.length,

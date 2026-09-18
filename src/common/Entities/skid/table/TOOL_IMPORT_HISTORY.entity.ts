@@ -26,6 +26,12 @@ export class TOOL_IMPORT_HISTORY {
     @Column()
     UPDATED_AT: Date;
 
+    @Column({ nullable: true })
+    ISSUE_ID: number;
+
+    @Column({ nullable: true })
+    RECEIVE_ID: number;
+
     @OneToMany(() => TOOL_WITHDRAWAL, (wd) => wd.IMPORT_HISTORY)
     WITHDRAWALS: TOOL_WITHDRAWAL[];
 

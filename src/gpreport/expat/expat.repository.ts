@@ -53,6 +53,7 @@ export class ExpatRepository extends BaseRepository {
                 `TO_CHAR(U.STARTDATE, 'DD/MM/YYYY') AS "STARTDATE"`,
                 `CASE WHEN U.SDIVCODE = '140101' THEN 'RHQ' ELSE 'AMEC' END AS "COMPANY"`,
             ])
+            .where("U.CSTATUS = '1'")
             .orderBy('E.SEMPNO', 'ASC');
         if (company?.toUpperCase() === 'RHQ') qb.andWhere(`U.SDIVCODE = '140101'`);
         if (company?.toUpperCase() === 'AMEC') qb.andWhere(`U.SDIVCODE <> '140101'`);
@@ -92,6 +93,7 @@ export class ExpatRepository extends BaseRepository {
                 `CASE WHEN U.SDIVCODE = '140101' THEN 'RHQ' ELSE 'AMEC' END AS "COMPANY"`,
             ])
             .where('E.SEMPNO = :sempno', { sempno })
+            .andWhere("U.CSTATUS = '1'")
             .getRawOne();
     }
 
@@ -243,6 +245,7 @@ export class ExpatRepository extends BaseRepository {
             .addSelect('U.SPOSITION', 'SPOSITION')
             .addSelect(`TO_CHAR(U.STARTDATE, 'DD/MM/YYYY')`, 'STARTDATE')
             .where('TRIM(U.SEMPNO) = TRIM(:sempno)', { sempno })
+            .andWhere("U.CSTATUS = '1'")
             .getRawOne();
     }
 

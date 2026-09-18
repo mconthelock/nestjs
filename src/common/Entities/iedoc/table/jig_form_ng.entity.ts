@@ -3,10 +3,10 @@ import { JigForm } from './jig_form.entity';
 
 @Entity({ name: 'JIG_FORM_NG' })
 export class JigFormNg {
-    @PrimaryColumn({ type: 'number', precision: 3, scale: 0 })
+    @PrimaryColumn({ type: 'decimal', precision: 3, scale: 0 })
     NFRMNO: number;
 
-    @PrimaryColumn({ type: 'varchar2', length: 6 })
+    @PrimaryColumn({ length: 6 })
     VORGNO: string;
 
     @PrimaryColumn({ type: 'char', length: 2 })
@@ -15,28 +15,28 @@ export class JigFormNg {
     @PrimaryColumn({ type: 'char', length: 4 })
     CYEAR2: string;
 
-    @PrimaryColumn({ type: 'number', precision: 6, scale: 0 })
+    @PrimaryColumn({ type: 'decimal', precision: 6, scale: 0 })
     NRUNNO: number;
 
-    @Column({ type: 'varchar2', length: 1000, nullable: false })
+    @Column({ length: 1000, nullable: false })
     DEFECT_DETAIL: string;
 
-    @Column({ type: 'varchar2', length: 100, nullable: true })
+    @Column({ length: 100, nullable: true })
     ACCESS_METHOD: string | null;
 
     @Column({ type: 'date', nullable: false })
     PLAN_DATE: Date;
 
-    @Column({ type: 'varchar2', length: 200, nullable: true })
+    @Column({ length: 200, nullable: true })
     LOCATION: string | null;
 
-    @Column({ type: 'varchar2', length: 10, nullable: true })
+    @Column({ length: 10, nullable: true })
     CREATE_BY: string | null;
 
     @Column({ type: 'date', nullable: false, default: () => 'SYSDATE' })
     CREATE_DATE: Date;
 
-    @Column({ type: 'varchar2', length: 10, nullable: true })
+    @Column({ length: 10, nullable: true })
     UPDATE_BY: string | null;
 
     @Column({ type: 'date', nullable: true })

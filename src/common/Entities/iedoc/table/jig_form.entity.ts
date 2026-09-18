@@ -1,5 +1,4 @@
-import { Column, Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { JigMaster } from './jig_master.entity';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'JIG_FORM' })
 export class JigForm {
@@ -18,37 +17,51 @@ export class JigForm {
     @PrimaryColumn({ type: 'decimal', precision: 6, scale: 0 })
     NRUNNO: number;
 
-    @Column({ length: 20, nullable: true })
-    JIG_NO: string | null;
+    @Column({ type: 'varchar2', length: 20, nullable: false })
+    FORM_TYPE: 'CREATE' | 'INSPECTION';
 
-    @Column({ length: 20, nullable: false })
-    FORM_TYPE: string;
+    @Column({ type: 'varchar2', length: 20, nullable: false })
+    JIG_NO: string;
 
-    @Column({ type: 'date', nullable: true })
-    SCHEDULE_DATE: Date | null;
+    @Column({ type: 'varchar2', length: 200, nullable: false })
+    JIG_NAME: string;
 
-    @Column({ type: 'date', nullable: true })
-    CHECK_DATE: Date | null;
+    @Column({ type: 'varchar2', length: 100, nullable: true })
+    DWG: string | null;
 
-    @Column({ length: 5, nullable: true })
-    INSPECTOR_EMPNO: string | null;
+    @Column({ type: 'varchar2', length: 2, nullable: true })
+    REV: string | null;
 
-    @Column({ length: 10, nullable: true })
-    OVERALL_RESULT: string | null;
+    @Column({ type: 'number', precision: 5, scale: 0, nullable: true })
+    JIG_QTY: number | null;
 
-    @Column({ length: 10, nullable: true })
-    CREATE_BY: string | null;
+    @Column({ type: 'number', precision: 12, scale: 2, nullable: true })
+    PRICE: number | null;
 
-    @Column({ type: 'date', nullable: false, default: () => 'SYSDATE' })
-    CREATE_DATE: Date;
-
-    @Column({ length: 10, nullable: true })
-    UPDATE_BY: string | null;
+    @Column({ type: 'varchar2', length: 100, nullable: true })
+    MAKER: string | null;
 
     @Column({ type: 'date', nullable: true })
-    UPDATE_DATE: Date | null;
+    START_USE_DATE: Date | null;
 
-    @ManyToOne(() => JigMaster)
-    @JoinColumn({ name: 'JIG_NO', referencedColumnName: 'JIG_NO' })
-    jig: JigMaster;
+    @Column({ type: 'varchar2', length: 4, nullable: true })
+    ITEMNO: string | null;
+
+    @Column({ type: 'varchar2', length: 100, nullable: true })
+    JIG_DESC: string | null;
+
+    @Column({ type: 'varchar2', length: 50, nullable: true })
+    PROCESS_CODE: string | null;
+
+    @Column({ type: 'varchar2', length: 100, nullable: true })
+    LOCATION: string | null;
+
+    @Column({ type: 'varchar2', length: 5, nullable: true })
+    PIC_EMPNO: string | null;
+
+    @Column({ type: 'number', precision: 3, scale: 0, nullable: false })
+    INSPEC_PERIOD: number;
+
+    @Column({ type: 'varchar2', length: 1000, nullable: true })
+    REMARK: string | null;
 }

@@ -42,13 +42,7 @@ export class JigFormDetail {
     @Column({ length: 10, nullable: true })
     RESULT: string | null;
 
-    @Column({ length: 10, nullable: true })
-    UPDATE_BY: string | null;
-
-    @Column({ type: 'date', nullable: true })
-    UPDATE_DATE: Date | null;
-
-    @ManyToOne(() => JigForm)
+    @ManyToOne(() => JigForm, { createForeignKeyConstraints: false })
     @JoinColumn([
         { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
         { name: 'VORGNO', referencedColumnName: 'VORGNO' },

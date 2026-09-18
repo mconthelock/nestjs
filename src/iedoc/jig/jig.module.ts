@@ -9,6 +9,8 @@ import { JigForm } from 'src/common/Entities/iedoc/table/jig_form.entity';
 import { JigFormDetail } from 'src/common/Entities/iedoc/table/jig_form_detail.entity';
 import { JigFormNg } from 'src/common/Entities/iedoc/table/jig_form_ng.entity';
 import { JigFormFile } from 'src/common/Entities/iedoc/table/jig_form_file.entity';
+import { MachineAbilityProcess } from 'src/common/Entities/iedoc/table/machine_ability_process.entity';
+import { ShopCodeMst } from 'src/common/Entities/iedoc/table/shopcodemst.entity';
 @Module({
     imports: [
         TypeOrmModule.forFeature(
@@ -19,6 +21,8 @@ import { JigFormFile } from 'src/common/Entities/iedoc/table/jig_form_file.entit
                 JigFormDetail,
                 JigFormNg,
                 JigFormFile,
+                MachineAbilityProcess,
+                ShopCodeMst,
             ],
             'iedocConnection',
         ),

@@ -7,12 +7,11 @@ import {
     Patch,
     Post,
     Put,
-    Query,
     UsePipes,
     ValidationPipe,
 } from '@nestjs/common';
 import { JigService } from './jig.service';
-import { CreateJigDto } from './dto/create-jig.dto';
+import { CreateJigRequestDto } from './dto/create-jig-request.dto';
 import { UpdateJigDto } from './dto/update-jig.dto';
 import { ReplaceCheckpointsDto } from './dto/checkpoint.dto';
 import {
@@ -36,14 +35,28 @@ const formPath = 'forms/:NFRMNO/:VORGNO/:CYEAR/:CYEAR2/:NRUNNO';
 export class JigController {
     constructor(private readonly jigService: JigService) {}
 
-    @Get('dashboard')
-    getDashboard(@Query('fyear') fyear?: string) {
-        return this.jigService.getDashboard(
-            fyear === undefined ? undefined : Number(fyear),
-        );
+    @Get('mfg-processes')
+    getMfgProcesses() {
+        return this.jigService.getMfgProcesses();
     }
+
+    @Get('locations')
+    getLocations() {
+        return this.jigService.getLocations();
+    }
+
+    @Get('ie-pics')
+    getIePics() {
+        return this.jigService.getIePics();
+    }
+
+    @Get('dashboard')
+    getDashboard() {
+        return this.jigService.getDashboard();
+    }
+
     @Post()
-    createJig(@Body() dto: CreateJigDto) {
+    createJig(@Body() dto: CreateJigRequestDto) {
         return this.jigService.createJig(dto);
     }
 

@@ -9,7 +9,11 @@ import {
 } from '@nestjs/common';
 import { BlockPackingService } from './block_packing.service';
 import { CreateBlockPackingDto } from './dto/create-block_packing.dto';
-import { UpdateBlockPackingDto } from './dto/update-block_packing.dto';
+import {
+    UpdateBlockPackingDto,
+    UpdateRemarkByOrderDto,
+} from './dto/update-block_packing.dto';
+import { SearchPackingDto } from './dto/search-packing.dto';
 
 @Controller('block-packing')
 export class BlockPackingController {
@@ -26,5 +30,20 @@ export class BlockPackingController {
         @Body('block') block: string,
     ) {
         return this.blockPackingService.getOrderMainCombine(order, block);
+    }
+
+    @Post('issue-pis')
+    async issuePISMFG(@Body() SearchPackingDto: SearchPackingDto) {
+        return this.blockPackingService.issuePISMFG(SearchPackingDto);
+    }
+
+    @Post('update-remark-packing')
+    async updateRemarkPacking(@Body() dto: UpdateBlockPackingDto) {
+        return this.blockPackingService.updateRemarkPacking(dto);
+    }
+
+    @Post('update-orders-remark')
+    async updateRemarkOrders(@Body() dto: UpdateRemarkByOrderDto) {
+        return this.blockPackingService.updateRemarkOrders(dto);
     }
 }

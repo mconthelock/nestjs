@@ -18,8 +18,13 @@ export class CreateCountryOriginDto {
     ORIGIN_TYPE: number;
 
     @IsNotEmpty()
-    @IsString()
-    COUNTRY: string;
+    @IsNumber()
+    @Type(() => Number)
+    COUNTRY_MODE: number;
+
+    @IsNotEmpty()
+    @IsString({ each: true })
+    COUNTRY: string | string[];
 
     @IsOptional()
     @IsString()

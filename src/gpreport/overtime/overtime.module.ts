@@ -6,7 +6,7 @@ import { OvertimeController } from './overtime.controller';
 
 import { Overtime } from 'src/common/Entities/gpreport/table/overtime.entity';
 import { OTFORM } from 'src/common/Entities/webform/table/OTFORM.entity';
-import { LR200P } from 'src/common/Entities/gpreport/table/LR200P.entity';
+import { LR200P } from 'src/common/Entities/gpreport/views/LR200P.entity';
 
 @Module({
     imports: [

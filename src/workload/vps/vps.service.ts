@@ -4,13 +4,21 @@ import { UpdateVpDto } from './dto/update-vp.dto';
 import { VpsRepository } from './vps.repository';
 import { InsertCartonDto, InsertListCartonDto } from './dto/insertCarton.dto';
 import { PKC_CARTON_DETAIL } from 'src/common/Entities/workload/table/PKC_CARTON_DETAIL.entity';
+import { S011mpService } from 'src/datacenter/s011mp/s011mp.service';
 
 @Injectable()
 export class VpsService {
-    constructor(private readonly vpsRepository: VpsRepository) {}
+    constructor(
+        private readonly vpsRepository: VpsRepository,
+        private readonly s011mpService: S011mpService,
+    ) {}
 
     async chkPrint(order: string, packing: string): Promise<boolean> {
         return await this.vpsRepository.chkPrint(order, packing);
+    }
+
+    async lastPrintHistory(order: string, packing: string): Promise<any> {
+        return await this.vpsRepository.lastPrintHistory(order, packing);
     }
 
     async getListOrder(packing: string): Promise<any[]> {
@@ -41,12 +49,13 @@ export class VpsService {
         const now = new Date();
 
         // เช็คข้อมูลซ้ำทั้งหมดก่อน insert
-        const [chkOrder, chkItemMas, chkItemQty, chkPISinfo] = await Promise.all([
-            this.vpsRepository.chkOrder(order, packing),
-            this.vpsRepository.chkItemMas(order, packing),
-            this.vpsRepository.chkItemQty(order, packing),
-            this.vpsRepository.chkPISinfo(order, subPacking),
-        ]);
+        const [chkOrder, chkItemMas, chkItemQty, chkPISinfo] =
+            await Promise.all([
+                this.vpsRepository.chkOrder(order, packing),
+                this.vpsRepository.chkItemMas(order, packing),
+                this.vpsRepository.chkItemQty(order, packing),
+                this.vpsRepository.chkPISinfo(order, subPacking),
+            ]);
 
         console.log('chkOrder:', chkOrder);
         console.log('chkItemMas:', chkItemMas);
@@ -183,12 +192,67 @@ export class VpsService {
         });
     }
 
+    async reprintPackingOrder(
+        order: string,
+        packing: string,
+        qtyPrint: number,
+        empno: string,
+        reprintCause: string,
+        remark: string,
+        ip: string,
+    ): Promise<void> {
+        const vpsDetail = await this.vpsRepository.getVPSDetail(order, packing);
+        if (!vpsDetail || vpsDetail.length === 0) {
+            throw new Error('Order/Packing not found for reprint');
+        }
+
+        const produciton = vpsDetail[0].S01M09;
+        const p = vpsDetail[0].M8K02;
+        const partname = vpsDetail[0].S01M05;
+        const project = vpsDetail[0].S01M08;
+        const sche = String(vpsDetail[0].SCHEDULE ?? '');
+        const formattedSche =
+            sche.length >= 8
+                ? `${sche.substr(4, 2)}${sche.substr(6)}${sche.substr(2, 2)}`
+                : sche;
+        const piscode = `${order.substr(1, order.length - 2)}${packing}`;
+        const subPacking = `${packing.substr(0, 3)}-${packing.substr(3, 5)}`;
+
+        await this.vpsRepository.insertPrintlogVps({
+            orderNo: order,
+            packingNo: packing,
+            qty: qtyPrint,
+            ip: ip,
+            users: empno,
+            reprintCause: reprintCause,
+            remark: remark,
+        });
+        await this.vpsRepository.reprintPackingOrder({
+            order,
+            packing,
+            production: produciton,
+            p,
+            partname,
+            project,
+            schedl: formattedSche,
+            piscode,
+            qtyPrint,
+            empno,
+            subPacking,
+        });
+    }
+
     async getVPSDetail(order: string, packing: string) {
         return await this.vpsRepository.getVPSDetail(order, packing);
     }
 
     async getOrderDetail(order: string, packing: string): Promise<any[]> {
-        const orderDetails = await this.vpsRepository.getOrderDetail(order, packing);
+        const orderDetails = await this.vpsRepository.getVPS(order, packing);
+
+        // const orderDetails = await this.vpsRepository.getOrderDetail(
+        //     order,
+        //     packing,
+        // );
 
         if (!orderDetails || orderDetails.length === 0) {
             return [];
@@ -209,12 +273,41 @@ export class VpsService {
             orderDetails[0].REMARK = remark && remark.length > 0 ? remark : '';
         }
 
-        for (const detail of orderDetails) {
-            const dwgNo = detail.S11M04 ? detail.S11M04.replace(/\s/g, '') : '';
-            const masterPacking = await this.vpsRepository.getMasterPacking(dwgNo);
+        const detail = await this.s011mpService.findPacking({
+            order,
+            item: packing,
+        });
 
-            detail.MASTER_PACKING = masterPacking && masterPacking.length > 0 ? masterPacking : '';
-        }
+        const isSpecialPacking =
+            String(packing).endsWith('88') || String(packing).endsWith('89');
+
+        const data = await Promise.all(
+            (detail.data ?? []).map(async (details) => {
+                // ถ้าไม่ใช่ 88 หรือ 89 ให้คืนข้อมูลเดิม
+                if (!isSpecialPacking) {
+                    return details;
+                }
+
+                const dwgNo = details.S11M04?.replace(/\s/g, '') ?? '';
+
+                const purCode = await this.vpsRepository.getPURCode(
+                    order,
+                    dwgNo,
+                );
+
+                const masterPacking =
+                    await this.vpsRepository.getMasterPacking(dwgNo);
+
+                return {
+                    ...details,
+                    MASTER_PACKING:
+                        masterPacking?.length > 0 ? masterPacking : '',
+                    PUR_CODE: purCode?.length > 0 ? purCode[0].J2INO : '',
+                };
+            }),
+        );
+
+        orderDetails[0].DETAIL = data;
 
         return orderDetails;
     }
@@ -222,5 +315,38 @@ export class VpsService {
     async insertCartonBox(dto: InsertListCartonDto) {
         // console.log('dto.items:', dto.items);
         return this.vpsRepository.insertCartonBox(dto.items);
+    }
+
+    async getOrderReprint(
+        search: string | undefined,
+        page: string,
+        sect: string,
+    ) {
+        const pageNum = Number(page) || 1;
+        const { rows, hasMore } = await this.vpsRepository.getOrderReprint(
+            search,
+            pageNum,
+            sect,
+        );
+
+        // format ให้ตรงกับ Select2 (id/text)
+        return {
+            items: rows.map((r) => ({ id: r.ORDERNO, text: r.ORDERNO })),
+            hasMore,
+        };
+    }
+
+    async getPackNoReprint(orderno: string, sect: string) {
+        const rows = await this.vpsRepository.getPackNoReprint(orderno, sect);
+        return rows.map((r) => ({
+            id: r.PACKNO,
+            text: `${r.PACKNO}`,
+        }));
+    }
+
+    async getDataCartonBox() {
+        const cartonBox = await this.vpsRepository.getDataCartonBox();
+        const specialBox = await this.vpsRepository.getSpecialCarton();
+        return [...specialBox, ...cartonBox];
     }
 }

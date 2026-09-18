@@ -11,10 +11,11 @@ import {
 
 export class CreateTransactionItemsDto {
     @IsNumber()
-    TRANSACTION_ID: number;
+    @IsOptional()
+    TRANSACTION_ID?: number;
 
-    @IsNumber()
-    PRODUCT_ID: number;
+    @IsString()
+    PRODUCT_ID: string;
 
     @IsNumber()
     @IsOptional()
@@ -27,7 +28,8 @@ export class CreateTransactionItemsDto {
     UNIT_COST: number;
 
     @IsString()
-    REMARK: string;
+    @IsOptional()
+    REMARK?: string;
 }
 
 export class CreateTransactionDto {
@@ -54,9 +56,9 @@ export class CreateTransactionDto {
     @IsString()
     CSTATUS: string;
 
-    @IsDate()
-    @Type(() => Date)
-    CREATED_AT: Date;
+    // @IsDate()
+    // @Type(() => Date)
+    // CREATED_AT: Date;
 
     @IsString()
     CREATED_BY: string;

@@ -31,6 +31,8 @@ import { S049kpModule } from 'src/datacenter/s049kp/s049kp.module';
 import { DpmsPlOriginModule } from 'src/workload/dpms_pl_origin/dpms_pl_origin.module';
 import { ReviseShippingMarkService } from './services/revise-shipping-mark.service';
 import { ReviseMainService } from './services/revise-main.service';
+import { MailAlertPurService } from './services/mail-alert-pur.service';
+import { CountryOriginNotSetViewModule } from 'src/workload/country_origin_not_set_view/country_origin_not_set_view.module';
 
 @Module({
     imports: [
@@ -49,6 +51,7 @@ import { ReviseMainService } from './services/revise-main.service';
         MailModule,
         S020kpModule,
         S049kpModule,
+        CountryOriginNotSetViewModule,
     ],
     controllers: [MainController, JobController],
     providers: [
@@ -65,6 +68,7 @@ import { ReviseMainService } from './services/revise-main.service';
         ReviseMainService,
         ReviseVgmService,
         ReviseShippingMarkService,
+        MailAlertPurService,
     ],
     exports: [PackingListIssueService, ProcedureService],
 })

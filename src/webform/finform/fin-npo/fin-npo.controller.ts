@@ -1,5 +1,5 @@
 import {
-    Body, Controller, Get, NotFoundException, Param, Post, Req, Res,
+    Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Req, Res,
     UploadedFiles, UseInterceptors,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
@@ -36,6 +36,27 @@ export class FinnpoController {
     @Get('vendor')
     findAllVendorForShow() {
         return this.finnpoService.findAllVendorForShow();
+    }
+
+    @Post('vendor')
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
+    createVendor(@Body() dto: Record<string, unknown>) {
+        return this.finnpoService.createVendor(dto);
+    }
+
+    @Patch('vendor')
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
+    updateVendor(@Body() dto: Record<string, unknown>) {
+        return this.finnpoService.updateVendor(dto);
+    }
+
+    @Delete('vendor')
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
+    deleteVendor(@Body() dto: Record<string, unknown>) {
+        return this.finnpoService.deleteVendor(dto);
     }
 
     @Get('currency')

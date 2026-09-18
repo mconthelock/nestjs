@@ -78,6 +78,8 @@ import { IedocModule } from './iedoc/iedoc.module';
         DatacenterModule,
         GeneralPartListModule,
         IedocModule,
+        InnovatModule,
+        CountriesModule
     ],
     providers: [
         HttpLoggingInterceptor,

@@ -10,6 +10,7 @@ import {
 import { S011mpService } from './s011mp.service';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { FiltersDto } from 'src/common/dto/filter.dto';
+import { SearchPackingDto, SearchPackingItemsDto } from './dto/search-s011mp.dto';
 
 @Controller('datacenter/s011mp')
 export class S011mpController {
@@ -28,5 +29,25 @@ export class S011mpController {
     @UseTransaction('datacenterConnection')
     async search(@Body() dto: FiltersDto) {
         return this.s011mpService.search(dto);
+    }
+
+    @Post('packing')
+    async findPacking(@Body() dto: SearchPackingDto) {
+        return this.s011mpService.findPacking({ order: dto.ORDER });
+    }
+
+    @Post('packing-diff')
+    async findPackingDiff(@Body() dto: SearchPackingDto) {
+        return this.s011mpService.findPackingDiff(dto.ORDER);
+    }
+
+    @Post('packing-combine')
+    async findPackingCombine(@Body() dto: SearchPackingDto) {
+        return this.s011mpService.findPacking({ order: dto.ORDER, item: dto.ITEM, combine: true });
+    }
+
+    @Post('packing-items')
+    async findOrderItems(@Body() dto: SearchPackingItemsDto) {
+        return this.s011mpService.findPacking({ order: dto.ORDER, item: dto.ITEM });
     }
 }

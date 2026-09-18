@@ -115,4 +115,8 @@ export class CreatePurvmmFormDto extends PickType(FormDto, [
     @IsOptional()
     @IsString()
     ATTACH_OTHER?: string;
+
+    @IsOptional()
+    @IsString()
+    TRADE_CODE?: string;
 }

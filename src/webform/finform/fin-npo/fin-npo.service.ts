@@ -43,6 +43,7 @@ export interface ActionFinnpoDto {
     EXPENSE_CODE?: number;
     VENDOR_CODE?: string | number;
     AIR_SALES_BY?: string[] | string;
+    DELETE_FILE_IDS?: number[] | string;
     DATA?: Array<{
         ID?: number;
         LINE_ID?: number;
@@ -96,6 +97,74 @@ export class FinnpoService {
             message: 'Get FIN-NPO vendor success',
             data: await this.repo.findAllVendor(),
         };
+    }
+
+    async createVendor(dto: Record<string, unknown>) {
+        const vendor = this.normalizeVendor(dto);
+        if (await this.repo.findVendorByCode(vendor.VENDOR_CODE)) {
+            throw new BadRequestException(
+                `VENDOR_CODE ${vendor.VENDOR_CODE} already exists`,
+            );
+        }
+
+        return {
+            status: true,
+            message: 'Create vendor success',
+            data: await this.repo.createVendor(vendor),
+        };
+    }
+
+    async updateVendor(dto: Record<string, unknown>) {
+        const originalCode = String(dto.ORIGINAL_VENDOR_CODE || '').trim();
+        const originalName = String(dto.ORIGINAL_VENDOR_NAME || '').trim();
+        const vendor = this.normalizeVendor(dto);
+        if (!originalCode || !originalName) {
+            throw new BadRequestException('Original vendor key is required');
+        }
+
+        const existing = await this.repo.findVendor(originalCode, originalName);
+        if (!existing) throw new BadRequestException('Vendor was not found');
+
+        const duplicate = await this.repo.findVendorByCode(vendor.VENDOR_CODE);
+        if (duplicate && duplicate.VENDOR_CODE !== originalCode) {
+            throw new BadRequestException(
+                `VENDOR_CODE ${vendor.VENDOR_CODE} already exists`,
+            );
+        }
+
+        await this.repo.updateVendor(originalCode, originalName, vendor);
+        return { status: true, message: 'Update vendor success', data: vendor };
+    }
+
+    async deleteVendor(dto: Record<string, unknown>) {
+        const vendorCode = String(dto.VENDOR_CODE || '').trim();
+        const vendorName = String(dto.VENDOR_NAME || '').trim();
+        if (!vendorCode || !vendorName) {
+            throw new BadRequestException('Vendor key is required');
+        }
+        if (!(await this.repo.findVendor(vendorCode, vendorName))) {
+            throw new BadRequestException('Vendor was not found');
+        }
+        if (await this.repo.isVendorInUse(vendorCode)) {
+            throw new BadRequestException(
+                'Vendor is already used by a FIN-NPO form. Set it to inactive instead.',
+            );
+        }
+
+        await this.repo.deleteVendor(vendorCode, vendorName);
+        return { status: true, message: 'Delete vendor success' };
+    }
+
+    private normalizeVendor(dto: Record<string, unknown>) {
+        const VENDOR_CODE = String(dto.VENDOR_CODE || '').trim();
+        const VENDOR_NAME = String(dto.VENDOR_NAME || '').trim();
+        const ACTIVE = String(dto.ACTIVE) === '0' ? '0' : '1';
+        if (!VENDOR_CODE || !VENDOR_NAME) {
+            throw new BadRequestException(
+                'VENDOR_CODE and VENDOR_NAME are required',
+            );
+        }
+        return { VENDOR_CODE, VENDOR_NAME, ACTIVE };
     }
 
     async findAllCurrencyForShow() {
@@ -228,21 +297,26 @@ export class FinnpoService {
     async update(dto: ActionFinnpoDto, files: Express.Multer.File[] = []) {
         await this.updateData(dto);
 
+        const form = {
+            NFRMNO: Number(dto.NFRMNO),
+            VORGNO: dto.VORGNO,
+            CYEAR: dto.CYEAR,
+            CYEAR2: dto.CYEAR2 || dto.CYEAR,
+            NRUNNO: Number(dto.NRUNNO),
+        };
+        const existingFiles = await this.repo.findFilesByForm(
+            form.NFRMNO,
+            form.VORGNO,
+            form.CYEAR,
+            form.CYEAR2,
+            form.NRUNNO,
+        );
+        const deletedFileIds = this.parseFileIds(dto.DELETE_FILE_IDS);
+        const deletedFiles = existingFiles.filter((file) =>
+            deletedFileIds.includes(Number(file.FILE_ID)),
+        );
+
         if (files.length) {
-            const form = {
-                NFRMNO: Number(dto.NFRMNO),
-                VORGNO: dto.VORGNO,
-                CYEAR: dto.CYEAR,
-                CYEAR2: dto.CYEAR2 || dto.CYEAR,
-                NRUNNO: Number(dto.NRUNNO),
-            };
-            const existingFiles = await this.repo.findFilesByForm(
-                form.NFRMNO,
-                form.VORGNO,
-                form.CYEAR,
-                form.CYEAR2,
-                form.NRUNNO,
-            );
             const savedFiles = await this.handleFileFormService.insertFiles(
                 {
                     ...form,
@@ -255,12 +329,14 @@ export class FinnpoService {
             if (!savedFiles?.status) {
                 throw new BadRequestException('Cannot update FIN-NPO attachment');
             }
+        }
 
+        if (deletedFiles.length) {
             await this.repo.deleteFilesByIds(
-                existingFiles.map((file) => Number(file.FILE_ID)),
+                deletedFiles.map((file) => Number(file.FILE_ID)),
             );
             await Promise.allSettled(
-                existingFiles.map((file) =>
+                deletedFiles.map((file) =>
                     deleteFile(path.join(file.FILE_PATH, file.FILE_FNAME)),
                 ),
             );
@@ -270,6 +346,18 @@ export class FinnpoService {
             status: true,
             message: 'Update FIN-NPO success',
         };
+    }
+
+    private parseFileIds(value?: number[] | string) {
+        if (Array.isArray(value)) return value.map(Number);
+        if (!value) return [];
+
+        try {
+            const parsed = JSON.parse(value);
+            return Array.isArray(parsed) ? parsed.map(Number) : [];
+        } catch {
+            return [];
+        }
     }
 
     private async updateData(dto: ActionFinnpoDto) {

@@ -3,6 +3,13 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import * as oracledb from 'oracledb';
+import { applyDynamicFilters } from 'src/common/helpers/query.helper';
+import { AmecOrdersPackNo } from 'src/common/Entities/workload/table/AMECORDERS_PACKNO.entity';
+import { SearchPackingDto } from './dto/search-packing.dto';
+import {
+    UpdateBlockPackingDto,
+    UpdateRemarkByOrderDto,
+} from './dto/update-block_packing.dto';
 
 @Injectable()
 export class BlockPackingRepository extends BaseRepository {
@@ -17,8 +24,11 @@ export class BlockPackingRepository extends BaseRepository {
     }
 
     async getTRNBarcode() {
-        return this.manager.query(
-            `SELECT * FROM TRNBarcode where Production > '2026000'`,
+        return this.datacenterDs.query(
+            `SELECT t.*,SUBSTR(S02K04,3) AS CASETYPE
+            FROM TRNBARCODE t
+            JOIN S002KP sk ON t.ORDERNO = S02K01 AND CASENO = TRIM(S02K02) AND BLOCK = SUBSTR(S02K02,3,2) 
+            WHERE PRODUCTION > '2026000'`,
         );
     }
 
@@ -64,7 +74,7 @@ export class BlockPackingRepository extends BaseRepository {
 
     async getDataCartonBox() {
         return this.ds.query(`
-            SELECT * FROM PKC_CARTON_DETAIL
+            SELECT * FROM PKC_CARTON_DETAIL WHERE STATUS = 1
         `);
     }
 
@@ -72,5 +82,35 @@ export class BlockPackingRepository extends BaseRepository {
         return this.ds.query(`
             SELECT * FROM S010MP
         `);
+    }
+
+    async getPisPages(searchDto: SearchPackingDto) {
+        const qb = this.ds
+            .createQueryBuilder(AmecOrdersPackNo, 'packing')
+            .leftJoinAndSelect('packing.detail', 'detail')
+            .leftJoinAndSelect('detail.schedule', 'schedule')
+            .leftJoinAndSelect('packing.printed', 'printed');
+        await applyDynamicFilters(qb, searchDto, 'packing');
+        return qb.getMany();
+    }
+
+    async updateRemarkPacking(dto: UpdateBlockPackingDto) {
+        return this.ds.query(
+            `UPDATE AMECORDERS_PACKNO
+             SET REMARK = :1
+             WHERE ORDERNO = :2 AND PACKNO = :3`,
+            [dto.REMARK, dto.ORDERNO, dto.PACKNO],
+        );
+    }
+
+    async updateRemarkByOrder(dto: UpdateRemarkByOrderDto) {
+        const orderBinds = dto.ORDERSNO.map((_, index) => `:${index + 2}`);
+
+        return this.ds.query(
+            `UPDATE AMECORDERS_PACKNO
+             SET REMARK = :1
+             WHERE ORDERNO IN (${orderBinds.join(', ')})`,
+            [dto.REMARK, ...dto.ORDERSNO],
+        );
     }
 }

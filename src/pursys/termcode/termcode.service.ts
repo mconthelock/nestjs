@@ -2,16 +2,24 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { TERMCODE } from 'src/common/Entities/pursys/table/TERMCODE.entity';
+import { TermPayment } from 'src/common/Entities/pursys/table/TERM_PAYMENT.entity';
+import { TermTrade } from 'src/common/Entities/pursys/table/TERM_TRADE.entity';
 
 @Injectable()
 export class TermcodeService {
     constructor(
-        @InjectRepository(TERMCODE, 'purConnection')
-        private readonly term: Repository<TERMCODE>,
+        @InjectRepository(TermPayment, 'purConnection')
+        private readonly payment: Repository<TermPayment>,
+
+        @InjectRepository(TermTrade, 'purConnection')
+        private readonly trade: Repository<TermTrade>,
     ) {}
 
-    findAll() {
-        return this.term.find();
+    findPayment() {
+        return this.payment.find();
+    }
+
+    findTrade() {
+        return this.trade.find();
     }
 }

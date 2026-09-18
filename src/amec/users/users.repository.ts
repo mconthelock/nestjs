@@ -8,7 +8,7 @@ import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 
 @Injectable()
 export class UsersRepository extends BaseRepository {
-    constructor(@InjectDataSource('amecConnection') ds: DataSource) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

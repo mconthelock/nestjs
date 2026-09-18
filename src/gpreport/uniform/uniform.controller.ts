@@ -12,13 +12,27 @@ import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
 
-import { CreateUniformDto } from './dto/create-uniform.dto';
-import { UpdateUniformDto } from './dto/update-uniform.dto';
+import { CreateCalendarDto } from './dto/create-calendar.dto';
 import { CreateAnnualDto } from './dto/create-annual.dto';
 
 @Controller('gpreport/uniform')
 export class UniformController {
     constructor(private readonly uniform: UniformService) {}
+
+    @Get('calendar')
+    findCalendar() {
+        return this.uniform.findCalendar();
+    }
+
+    @Post('calendar')
+    upsertCalendar(@Body() data: CreateCalendarDto) {
+        return this.uniform.upsertCalendar(data);
+    }
+
+    @Delete('calendar/:year')
+    deleteCalendar(@Param('year') year: number) {
+        return this.uniform.deleteCalendar(year);
+    }
 
     @Get('master')
     findAll() {
@@ -28,6 +42,11 @@ export class UniformController {
     @Get('rights')
     findRights() {
         return this.uniform.findRights();
+    }
+
+    @Get('annual/request/:year')
+    findRightsByYear(@Param('year') year: number) {
+        return this.uniform.findAnnualRequestYear(+year);
     }
 
     @Get('annual/request/:userId/:year')
@@ -52,5 +71,14 @@ export class UniformController {
         @Param('year') year: number,
     ) {
         return this.uniform.deleteRequest(userId, +year);
+    }
+
+    @Delete('annual/request/:userId/:year/paid')
+    @UseTransaction('gpreportConnection')
+    deletePaidRequest(
+        @Param('userId') userId: string,
+        @Param('year') year: number,
+    ) {
+        return this.uniform.deleteRequestDetail(userId, +year);
     }
 }

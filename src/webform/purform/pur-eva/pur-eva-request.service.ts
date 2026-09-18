@@ -113,6 +113,13 @@ export class PurEvaRequestService {
                 ...form,
                 ...purevadata,
             };
+            if (dto.VENDGROUP === '6:Non-Production (6)') {
+                const deleteResult =
+                    await this.deleteFlowStepService.deleteFlowStep({
+                        ...form,
+                        CSTEPNO: '02',
+                    });
+            }
             await this.repo.create(purevaForm);
             const addr = [];
             let addid = 0;

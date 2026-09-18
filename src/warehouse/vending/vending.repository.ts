@@ -244,7 +244,7 @@ export class VendingRepository extends BaseRepository {
         EMPNO: string[];
         CREATED_BY: string;
     }) {
-        return this.getRepository(VENDING_USER).save(
+        return this.getRepository(VENDING_USER).insert(
             EMPNO.map((empno) => ({ EMPNO: empno, CREATED_BY })),
         );
     }

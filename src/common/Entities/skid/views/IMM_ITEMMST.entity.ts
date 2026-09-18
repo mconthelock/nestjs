@@ -91,6 +91,9 @@ export class IMM_ITEMMST {
     @Column()
     FOREMAN_TNAME: string;
 
+    @Column()
+    HIDE_SHORTAGE: string;
+
     @OneToOne(() => INV_HALFYEAR_RESULT, (r) => r.ITEM_DETAIL)
     RESULT: INV_HALFYEAR_RESULT;
 

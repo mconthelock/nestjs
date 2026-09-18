@@ -11,7 +11,6 @@ export class IimService {
         FUNC: number;
         ITEM: string | string[];
     }) {
-        console.log(FUNC, ITEM);
         const result = await this.conn.runQuery(
             `SELECT 
                 A.*,

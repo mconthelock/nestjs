@@ -29,6 +29,7 @@ export class IimRepository extends BaseRepository {
             where: {
                 IBUYC: Array.isArray(planner) ? In(planner) : planner,
                 IITYP: In(['1', '3']),
+                IID: 'IM'
             },
             order: {
                 IBUYC: 'ASC',

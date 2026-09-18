@@ -1,4 +1,7 @@
 import { Type } from 'class-transformer';
+import { IntersectionType } from '@nestjs/mapped-types';
+import { PatchJigSnapshotDto } from './jig-snapshot.dto';
+import { CheckpointDto } from './checkpoint.dto';
 import {
     IsDefined,
     IsString,
@@ -46,24 +49,20 @@ export class JigFormKeyDto {
     NRUNNO: number;
 }
 
-export class CreateJigFormDto extends JigFormKeyDto {
+export class CreateJigFormDto extends IntersectionType(
+    JigFormKeyDto,
+    PatchJigSnapshotDto,
+) {
     @IsDefined()
     @IsIn(['CREATE', 'INSPECTION'])
     FORM_TYPE: 'CREATE' | 'INSPECTION';
     @IsOptional()
-    @Matches(/^\d{4}-(0[1-9]|1[0-2])-01$/)
-    SCHEDULE_DATE?: string;
-    @IsOptional()
-    @IsDateString({ strict: true })
-    CHECK_DATE?: string;
-    @IsOptional()
-    @IsString()
-    @MaxLength(5)
-    INSPECTOR_EMPNO?: string;
-    @IsOptional()
-    @IsString()
-    @MaxLength(10)
-    CREATE_BY?: string;
+    @IsArray()
+    @ArrayMaxSize(20)
+    @ArrayUnique((item) => item.CHECK_SEQ)
+    @ValidateNested({ each: true })
+    @Type(() => CheckpointDto)
+    CHECKPOINTS?: CheckpointDto[];
 }
 
 export class JigResultDto {
@@ -101,25 +100,18 @@ export class JigNgDto {
     LOCATION?: string;
 }
 
-export class SaveJigFormDto {
-    @IsOptional()
-    @IsDateString({ strict: true })
-    CHECK_DATE?: string;
-    @IsOptional()
-    @IsString()
-    @MaxLength(5)
-    INSPECTOR_EMPNO?: string;
+export class SaveJigFormDto extends PatchJigSnapshotDto {
     @IsOptional()
     @IsString()
     @MaxLength(10)
     UPDATE_BY?: string;
-    @IsDefined()
+    @IsOptional()
     @IsArray()
     @ArrayMaxSize(20)
     @ArrayUnique((item) => item.CHECK_SEQ)
     @ValidateNested({ each: true })
     @Type(() => JigResultDto)
-    DETAILS: JigResultDto[];
+    DETAILS?: JigResultDto[];
     @IsOptional()
     @ValidateNested()
     @Type(() => JigNgDto)

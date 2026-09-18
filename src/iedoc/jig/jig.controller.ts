@@ -12,7 +12,7 @@ import {
     ValidationPipe,
 } from '@nestjs/common';
 import { JigService } from './jig.service';
-import { CreateJigDto } from './dto/create-jig.dto';
+import { CreateJigRequestDto } from './dto/create-jig-request.dto';
 import { UpdateJigDto } from './dto/update-jig.dto';
 import { ReplaceCheckpointsDto } from './dto/checkpoint.dto';
 import {
@@ -46,6 +46,11 @@ export class JigController {
         return this.jigService.getLocations();
     }
 
+    @Get('ie-pics')
+    getIePics() {
+        return this.jigService.getIePics();
+    }
+
     @Get('dashboard')
     getDashboard(@Query('fyear') fyear?: string) {
         return this.jigService.getDashboard(
@@ -53,7 +58,7 @@ export class JigController {
         );
     }
     @Post()
-    createJig(@Body() dto: CreateJigDto) {
+    createJig(@Body() dto: CreateJigRequestDto) {
         return this.jigService.createJig(dto);
     }
 

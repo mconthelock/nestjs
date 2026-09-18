@@ -49,12 +49,12 @@ export class CreateJigDto {
     START_USE_DATE?: string;
     @IsOptional()
     @IsString()
-    @MaxLength(50)
+    @MaxLength(4)
     ITEMNO?: string;
     @IsOptional()
     @IsString()
-    @MaxLength(200)
-    PARTS?: string;
+    @MaxLength(100)
+    JIG_DESC?: string;
     @IsOptional()
     @IsString()
     @MaxLength(50)
@@ -73,14 +73,7 @@ export class CreateJigDto {
     @Max(999)
     INSPEC_PERIOD: number;
     @IsOptional()
-    @IsDateString({ strict: true })
-    NEXT_INSPEC_DATE?: string;
-    @IsOptional()
     @IsString()
     @MaxLength(1000)
     REMARK?: string;
-    @IsOptional()
-    @IsString()
-    @MaxLength(10)
-    CREATE_BY?: string;
 }

@@ -26,11 +26,11 @@ export class JigMaster {
     @Column({ type: 'date', nullable: true })
     START_USE_DATE: Date | null;
 
-    @Column({ type: 'varchar2', length: 50, nullable: true })
+    @Column({ type: 'varchar2', length: 4, nullable: true })
     ITEMNO: string | null;
 
-    @Column({ type: 'varchar2', length: 200, nullable: true })
-    PARTS: string | null;
+    @Column({ type: 'varchar2', length: 100, nullable: true })
+    JIG_DESC: string | null;
 
     @Column({ type: 'varchar2', length: 50, nullable: true })
     PROCESS_CODE: string | null;

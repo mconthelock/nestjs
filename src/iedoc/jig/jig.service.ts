@@ -4,7 +4,7 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { JigRepository } from './jig.repository';
-import { CreateJigDto } from './dto/create-jig.dto';
+import { CreateJigRequestDto } from './dto/create-jig-request.dto';
 import { UpdateJigDto } from './dto/update-jig.dto';
 import { ReplaceCheckpointsDto } from './dto/checkpoint.dto';
 import {
@@ -14,7 +14,15 @@ import {
     JigFileDto,
 } from './dto/jig-form.dto';
 import { FinishInspectionDto } from './dto/finish-inspection.dto';
-import { monthKey, monthStart, nextRound } from './jig.utils';
+import {
+    monthKey,
+    monthStart,
+    nextRound,
+    inspectionTimeline,
+    masterReference,
+    compareReference,
+    jigSnapshot,
+} from './jig.utils';
 
 @Injectable()
 export class JigService {
@@ -26,6 +34,10 @@ export class JigService {
 
     getLocations() {
         return this.jigRepository.getLocations();
+    }
+
+    getIePics() {
+        return this.jigRepository.getIePics();
     }
 
     private dueStatus(date: Date | null, today: Date) {
@@ -63,8 +75,42 @@ export class JigService {
             rows.push(f);
             grouped.set(f.JIG_NO, rows);
         }
-        const items = masters.map((jig) => {
-            const history = grouped.get(jig.JIG_NO) ?? [];
+        // Registrations remain visible while their master row does not exist yet.
+        const dashboardRows = [...masters];
+        const registered = new Set(masters.map((j) => j.JIG_NO));
+        for (const [jigNo, history] of grouped) {
+            if (registered.has(jigNo)) continue;
+            const form = [...history]
+                .sort((a, b) => compareReference(b, a))
+                .find(
+                    (f) =>
+                        f.FORM_TYPE === 'CREATE' &&
+                        ['0', '1', '2'].includes(String(f.FORM_STATUS).trim()),
+                );
+            if (!form) continue;
+            dashboardRows.push({
+                ...jigSnapshot(form),
+                JIG_NO: jigNo,
+                JIG_STATUS: 'PENDING',
+                NEXT_INSPEC_DATE: form.START_USE_DATE
+                    ? nextRound(form.START_USE_DATE, form.INSPEC_PERIOD)
+                    : null,
+                REF_CYEAR2: null,
+                REF_NRUNNO: null,
+                CREATE_BY: form.INPUTER,
+                CREATE_DATE: form.FORM_DATE,
+                UPDATE_BY: null,
+                UPDATE_DATE: null,
+                CHECKPOINT_COUNT: Number(form.DETAIL_COUNT),
+                PIC_NAME: null,
+                PIC_SECTION: null,
+            });
+        }
+        const items = dashboardRows.map((jig) => {
+            const history = inspectionTimeline(
+                jig,
+                grouped.get(jig.JIG_NO) ?? [],
+            );
             const due = jig.NEXT_INSPEC_DATE
                 ? monthStart(jig.NEXT_INSPEC_DATE)
                 : null;
@@ -88,11 +134,14 @@ export class JigService {
             );
             const approvedCurrent = history.find(
                 (f) =>
-                    f.FORM_TYPE === 'INSPECTION' &&
                     String(f.FORM_STATUS).trim() === '2' &&
-                    due &&
-                    f.SCHEDULE_DATE &&
-                    monthKey(monthStart(f.SCHEDULE_DATE)) === monthKey(due),
+                    (!masterReference(jig) ||
+                        compareReference(f, masterReference(jig)) > 0) &&
+                    (f.FORM_TYPE === 'CREATE' ||
+                        (due &&
+                            f.SCHEDULE_DATE &&
+                            monthKey(monthStart(f.SCHEDULE_DATE)) ===
+                                monthKey(due))),
             );
             const schedules = new Map<
                 string,
@@ -150,15 +199,17 @@ export class JigService {
             return {
                 ...jig,
                 DUE_STATUS: dueStatus,
-                DASHBOARD_STATUS: !active
-                    ? jig.JIG_STATUS
-                    : Number(jig.CHECKPOINT_COUNT) === 0
-                      ? 'NO_SHEET'
-                      : approvedCurrent
-                        ? 'AWAITING_SYNC'
-                        : pending
-                          ? 'IN_PROGRESS'
-                          : dueStatus,
+                DASHBOARD_STATUS: approvedCurrent
+                    ? 'AWAITING_SYNC'
+                    : !active
+                      ? jig.JIG_STATUS
+                      : Number(jig.CHECKPOINT_COUNT) === 0
+                        ? 'NO_SHEET'
+                        : approvedCurrent
+                          ? 'AWAITING_SYNC'
+                          : pending
+                            ? 'IN_PROGRESS'
+                            : dueStatus,
                 IS_NEW_JIG:
                     !!jig.CREATE_DATE &&
                     jig.CREATE_DATE >= from &&
@@ -206,47 +257,20 @@ export class JigService {
         return jig;
     }
 
-    createJig(dto: CreateJigDto) {
-        return this.jigRepository.createMaster({
-            ...dto,
-            NEXT_INSPEC_DATE: dto.NEXT_INSPEC_DATE
-                ? monthStart(dto.NEXT_INSPEC_DATE)
-                : null,
-            START_USE_DATE: dto.START_USE_DATE
-                ? new Date(dto.START_USE_DATE)
-                : null,
-            JIG_STATUS: 'DRAFT',
-            REF_CYEAR2: null,
-            REF_NRUNNO: null,
-            CREATE_DATE: new Date(),
-            UPDATE_BY: null,
-            UPDATE_DATE: null,
-        });
+    createJig(dto: CreateJigRequestDto) {
+        if (dto.FORM_TYPE !== 'CREATE')
+            throw new BadRequestException(
+                'New jig registration requires FORM_TYPE CREATE',
+            );
+        return this.jigRepository.createForm(dto.JIG_NO, dto);
     }
 
-    updateJig(jigNo: string, dto: UpdateJigDto) {
-        const { NEXT_INSPEC_DATE, START_USE_DATE, FORM_KEY, ...fields } = dto;
-        return this.jigRepository.updateMaster(
-            jigNo,
-            {
-                ...fields,
-                ...(NEXT_INSPEC_DATE !== undefined
-                    ? {
-                          NEXT_INSPEC_DATE: NEXT_INSPEC_DATE
-                              ? monthStart(NEXT_INSPEC_DATE)
-                              : null,
-                      }
-                    : {}),
-                ...(START_USE_DATE !== undefined
-                    ? {
-                          START_USE_DATE: START_USE_DATE
-                              ? new Date(START_USE_DATE)
-                              : null,
-                      }
-                    : {}),
-            },
-            FORM_KEY,
-        );
+    async updateJig(jigNo: string, dto: UpdateJigDto) {
+        const { FORM_KEY, ...changes } = dto;
+        const form = await this.jigRepository.getForm(FORM_KEY);
+        if (form.JIG_NO !== jigNo)
+            throw new BadRequestException('The form belongs to another jig');
+        return this.jigRepository.saveForm(FORM_KEY, changes);
     }
 
     async getCheckpoints(jigNo: string) {
@@ -257,7 +281,6 @@ export class JigService {
         return this.jigRepository.replaceCheckpoints(jigNo, dto);
     }
     async listForms(jigNo: string) {
-        await this.getJig(jigNo);
         return this.jigRepository.getFormStates(jigNo);
     }
     createForm(jigNo: string, dto: CreateJigFormDto) {

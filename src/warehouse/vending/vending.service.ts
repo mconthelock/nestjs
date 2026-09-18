@@ -120,6 +120,54 @@ export class VendingService {
 
     async deleteImport(importId: number) {
         try {
+            const { importHistory, withdrawals, refills } =
+                await this.vendingrepo.getImportDetail(importId);
+
+            if (!importHistory) {
+                throw new Error(`Import history not found for IMPORT_ID ${importId}`);
+            }
+
+            const createdBy = importHistory.IMPORT_BY ?? '';
+            const rollbackDocumentNo = `${importHistory.FILE_NAME}-DEL-${importId}`;
+
+            const rollbackWithdrawalItems = withdrawals.map((withdrawal) => ({
+                PRODUCT_ID: withdrawal.PRODUCT_ID,
+                QUANTITY: Number(withdrawal.QUANTITY),
+                UNIT_COST: Number(withdrawal.UNIT_PRICE ?? 0),
+            }));
+
+            if (rollbackWithdrawalItems.length) {
+                await this.stocksService.createStockTransaction(
+                    {
+                        DOCUMENT_NO: `${rollbackDocumentNo}-ISSUE-REV`,
+                        STORAGE_TO: 21,
+                        CSTATUS: '1',
+                        CREATED_BY: createdBy,
+                        ITEMS: rollbackWithdrawalItems,
+                    },
+                    2,
+                );
+            }
+
+            const rollbackRefillItems = refills.map((refill) => ({
+                PRODUCT_ID: refill.PRODUCT_ID,
+                QUANTITY: Number(refill.REFILL_QTY),
+                UNIT_COST: 0,
+            }));
+
+            if (rollbackRefillItems.length) {
+                await this.stocksService.createStockTransaction(
+                    {
+                        DOCUMENT_NO: `${rollbackDocumentNo}-RECEIVE-REV`,
+                        STORAGE_FROM: 21,
+                        CSTATUS: '1',
+                        CREATED_BY: createdBy,
+                        ITEMS: rollbackRefillItems,
+                    },
+                    1,
+                );
+            }
+
             return await this.vendingrepo.deleteImport(importId);
         } catch (error) {
             throw error;

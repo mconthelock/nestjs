@@ -7,11 +7,12 @@ import { UsersModule } from 'src/amec/users/users.module';
 
 import { AttendanceIn } from 'src/common/Entities/figerdb/views/ATTENDANCEIN.entity';
 import { AttendanceOut } from 'src/common/Entities/figerdb/views/ATTENDANCEOUT.entity';
+import { WorkAdjust } from 'src/common/Entities/figerdb/table/WorkAdjust.entity';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature(
-            [AttendanceIn, AttendanceOut],
+            [AttendanceIn, AttendanceOut, WorkAdjust],
             'fingerConnection',
         ),
         UsersModule,

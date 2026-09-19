@@ -16,4 +16,10 @@ export class LeaveType {
 
     @Column()
     LV_SEQ: number;
+
+    @Column()
+    LV_NUM: number;
+
+    @Column()
+    LV_STATUS: string;
 }

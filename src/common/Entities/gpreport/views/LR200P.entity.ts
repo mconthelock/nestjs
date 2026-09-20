@@ -14,7 +14,7 @@
 // LR214	CHAR [x1.5]
 // LR215	CHAR [x3.0]
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-@Entity({ name: 'LR200P', schema: 'AMECMFG' })
+@Entity({ name: 'LR200P', schema: 'GPREPORT' })
 export class LR200P {
     @Column()
     LR201: string;

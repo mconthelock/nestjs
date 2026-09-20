@@ -4,7 +4,7 @@ import { OvertimeService } from './overtime.service';
 import { SearchOvertimeDto } from './dto/search-overtime.dto';
 import { SearchActualOvertimeDto } from './dto/lr200p.dto';
 
-@Controller('overtime')
+@Controller('gpreport/overtime')
 export class OvertimeController {
     constructor(private readonly overtimeService: OvertimeService) {}
 

@@ -20,6 +20,7 @@ import { TaxModule } from './tax/tax.module';
 import { LoanModule } from './loan/loan.module';
 import { EmployeeModule } from './employee/employee.module';
 import { ExpatModule } from './expat/expat.module';
+import { DiligentModule } from './diligent/diligent.module';
 
 @Module({
     imports: [
@@ -44,7 +45,8 @@ import { ExpatModule } from './expat/expat.module';
         TaxModule,
         LoanModule,
         EmployeeModule,
-        ExpatModule
+        ExpatModule,
+        DiligentModule
     ],
 })
 export class gpreportModule {}

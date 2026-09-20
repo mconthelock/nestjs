@@ -23,6 +23,36 @@ export class Diligent {
     EMPCOD: string;
 
     @ViewColumn()
+    SNAME: string;
+
+    @ViewColumn()
+    STNAME: string;
+
+    @ViewColumn()
+    SDIVCODE: string;
+
+    @ViewColumn()
+    SDEPCODE: string;
+
+    @ViewColumn()
+    SSECCODE: string;
+
+    @ViewColumn()
+    SDIV: string;
+
+    @ViewColumn()
+    SDEPT: string;
+
+    @ViewColumn()
+    SSEC: string;
+
+    @ViewColumn()
+    SPOSCODE: string;
+
+    @ViewColumn()
+    SPOSNAME: string;
+
+    @ViewColumn()
     DEHYAR: number;
 
     @ViewColumn()

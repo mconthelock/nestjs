@@ -6,6 +6,7 @@ import { Brackets, DataSource } from 'typeorm';
 import { CreateCnformDto } from './dto/create-cnform.dto';
 import { UpdateCnformDto } from './dto/update-cnform.dto';
 import { CNFORM } from 'src/common/Entities/webform/table/CNFORM.entity';
+import { CNITMINCHARGE } from 'src/common/Entities/webform/table/CNITMINCHARGE.entity';
 
 @Injectable()
 export class CnFormRepository extends BaseRepository {
@@ -19,6 +20,16 @@ export class CnFormRepository extends BaseRepository {
 
     async create(dto: CreateCnformDto) {
         return this.getRepository(CNFORM).save(dto);
+    }
+
+    async findInc(itm: number): Promise<string | null> {
+        const result = await this.getRepository(CNITMINCHARGE).findOne({
+            where: { ITEMNO: itm },
+            select: ['INCHARGE'], // เลือกดึงมาเฉพาะฟิลด์ที่ต้องการ
+        });
+
+        // คืนค่า INCHARGE หากค้นพบข้อมูล หากไม่พบจะคืนค่า null
+        return result ? result.INCHARGE : null;
     }
 
     async update(con: FormDto, dto: UpdateCnformDto): Promise<boolean> {

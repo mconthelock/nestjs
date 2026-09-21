@@ -846,15 +846,21 @@ describe('Jig complete form transactions', () => {
 
 describe('Jig active dashboard and calendar', () => {
     it('queries only active master records without joining form history', async () => {
-        const find = jest.fn().mockResolvedValue([]);
-        const repo = new JigRepository({
-            manager: { getRepository: () => ({ find }) },
-        } as any);
-        await repo.getDashboardMaster();
-        expect(find).toHaveBeenCalledWith({
-            where: { JIG_STATUS: 'ACTIVE' },
-            order: { NEXT_INSPEC_DATE: 'ASC', JIG_NO: 'ASC' },
-        });
+        const ds = new DataSource({ type: 'oracle', entities: [JigMaster] });
+        await (ds as any).buildMetadatas();
+        const repository = ds.getRepository(JigMaster);
+        const query = repository.createQueryBuilder('J');
+        jest.spyOn(repository, 'createQueryBuilder').mockReturnValue(query);
+        const rows = [{ JIG_NO: 'A', SNAME: 'Example employee' }, { JIG_NO: 'B', SNAME: null }];
+        jest.spyOn(query, 'getRawMany').mockResolvedValue(rows);
+        expect(await new JigRepository(ds).getDashboardMaster()).toEqual(rows);
+        const [sql, parameters] = query.getQueryAndParameters();
+        expect(sql).toContain('LEFT JOIN (SELECT E.SEMPNO AS "SEMPNO", E.SNAME AS "SNAME" FROM "AMEC"."AMECUSERALL" "E") "U"');
+        expect(sql).toContain('TRIM(U.SEMPNO) = TRIM("J"."PIC_EMPNO")');
+        expect(sql).toContain('U.SNAME AS "SNAME"');
+        expect(sql).not.toContain('JIG_FORM');
+        expect(sql).not.toContain('U.*');
+        expect(parameters).toEqual(['ACTIVE']);
     });
 
     it('reports all active jig due statuses with no fiscal-year or history dependency', async () => {

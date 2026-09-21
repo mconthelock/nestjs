@@ -41,4 +41,8 @@ export class ResultChkDwgRepository extends BaseRepository {
             throw new Error('Update multiple failed: ' + error.message);
         }
     }
+
+    async deleteByAll(dto: FormDto) {
+        return this.getRepository(RESULTCHKDWG).delete(dto);
+    }
 }

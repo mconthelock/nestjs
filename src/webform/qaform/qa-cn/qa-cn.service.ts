@@ -4,12 +4,14 @@ import { UpdateQaCnDto } from './dto/update-qa-cn.dto';
 import { In } from 'typeorm';
 
 import { RequestCNFormDto } from './dto/request-qa-cn.dto';
+import { ApproveQaCnDto } from './dto/approve-qa-cn.dto';
 import { FormCreateService } from 'src/webform/form/create-form.service';
 import { FlowService } from 'src/webform/flow/flow.service';
 import { OrgposRepository } from 'src/webform/orgpos/orgpos.repository';
 import { CnFormRepository } from './cnform/cnform.repository';
 import { ResultChkDwgRepository } from './resultchkdwg/resultchkdwg.repository';
 import { AttcnfrmService } from './attcnfrm/attcnfrm.service';
+import { HpoService } from 'src/as400/bpcsfvnew/hpo/hpo.service';
 
 @Injectable()
 export class QaCnService {
@@ -20,6 +22,7 @@ export class QaCnService {
         private readonly repoCnform: CnFormRepository,
         private readonly repoDwg: ResultChkDwgRepository,
         private readonly attcnfrmService: AttcnfrmService,
+        private readonly hpoService: HpoService,
     ) {}
 
     async request(
@@ -263,7 +266,144 @@ export class QaCnService {
                 }
             }
         } catch (error) {
-            throw new Error('Request FIN-PCK Form Error: ' + error.message);
+            throw new Error('Request QA-CN Form Error: ' + error.message);
+        }
+    }
+    async approve(
+        dto: ApproveQaCnDto,
+        files: {
+            'DWGFILE[]'?: Express.Multer.File[];
+            'MATFILE[]'?: Express.Multer.File[];
+            'MAKFILE[]'?: Express.Multer.File[];
+            'ROHFILE[]'?: Express.Multer.File[];
+            'PURFILE[]'?: Express.Multer.File[];
+            'SUBFILE[]'?: Express.Multer.File[];
+            'CHKFILE[]'?: Express.Multer.File[];
+            'JUDFILE[]'?: Express.Multer.File[];
+        },
+        ip: string,
+        path: string,
+    ) {
+        let condition = {};
+        try {
+            const {
+                APVNO,
+                CEXTDATA,
+                STEPREADY,
+                SELJINCHRG,
+                SELEINCHRG,
+                OPERATOR,
+                SELJOBTYPE,
+                REMARK,
+                ACTION,
+                DWGNo,
+                ...cndata
+            } = dto;
+            const currentForm = {
+                NFRMNO: cndata.NFRMNO,
+                VORGNO: cndata.VORGNO,
+                CYEAR: cndata.CYEAR,
+                CYEAR2: cndata.CYEAR2,
+                NRUNNO: cndata.NRUNNO,
+            };
+            const dwgToInsert = DWGNo.map((item) => {
+                return {
+                    // ใช้ค่าจาก FormDto เป็นหัวขบวน
+                    ...currentForm,
+                    ...item,
+                };
+            });
+            if (SELJINCHRG) {
+                condition = {
+                    ...currentForm,
+                    CEXTDATA: '02',
+                };
+                await this.flowService.updateFlow({
+                    condition: condition,
+                    VAPVNO: SELJINCHRG,
+                });
+            }
+            if (SELEINCHRG) {
+                condition = {
+                    ...currentForm,
+                    CEXTDATA: '03',
+                };
+                await this.flowService.updateFlow({
+                    condition: condition,
+                    VAPVNO: SELEINCHRG,
+                });
+            }
+            if (OPERATOR) {
+                condition = {
+                    ...currentForm,
+                    CEXTDATA: '07',
+                };
+                await this.flowService.updateFlow({
+                    condition: condition,
+                    VAPVNO: OPERATOR,
+                });
+            }
+            if (SELJOBTYPE && SELJOBTYPE == 'S') {
+                condition = {
+                    ...currentForm,
+                    CSTEPNO: In(['07', '61']),
+                };
+                await this.flowService.deleteFlow(condition);
+            }
+            if (CEXTDATA >= 2 && CEXTDATA < 8) {
+                await this.repoCnform.update(
+                    { ...currentForm },
+                    {
+                        JDGMNTNO: cndata.RADJUDGE
+                            ? Number(cndata.RADJUDGE)
+                            : null,
+                        JDGOTHER:
+                            cndata.RADJUDGE.toString() == '2.5'
+                                ? cndata.TXTJDGOTHER1
+                                : cndata.RADJUDGE.toString() == '4.2'
+                                  ? cndata.TXTJDGOTHER2
+                                  : '',
+                    },
+                );
+                if (ACTION != 'return') {
+                    await this.repoDwg.deleteByAll(currentForm);
+                    await this.repoDwg.insertMultiple(dwgToInsert);
+                }
+            }
+            if (ACTION == 'approve') {
+                if (STEPREADY == '--') {
+                    await this.repoCnform.update(
+                        { ...currentForm },
+                        { ...cndata },
+                    );
+                    await this.repoDwg.deleteByAll(currentForm);
+                    await this.repoDwg.insertMultiple(dwgToInsert);
+                }
+                if (CEXTDATA == 8 && cndata.CLSNO == 2) {
+                    if (cndata.INVNO && cndata.INVNO.length >= 8) {
+                        const pono = cndata.INVNO.substring(0, 8);
+                        const isNumber =
+                            pono.trim() !== '' && !isNaN(Number(pono));
+                        if (isNumber) {
+                            const pord =
+                                pono.toString().substring(0, 2) +
+                                pono.toString().substring(4, 4);
+                            const pprod = cndata.PURITEM;
+                            const formno =
+                                await this.formCreateService.getFormno(
+                                    currentForm,
+                                );
+                            await this.hpoService.updateByOrderProd(
+                                pord,
+                                pprod,
+                                formno,
+                            );
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            throw new Error('Approve QA-CN Form Error: ' + error.message);
         }
     }
 

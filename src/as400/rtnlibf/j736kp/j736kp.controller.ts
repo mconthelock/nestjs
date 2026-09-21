@@ -20,10 +20,14 @@ export class J736kpController {
         @Query('puritm') puritm: string,
     ) {
         if (!inv || !puritm) {
+<<<<<<< HEAD
             return {
                 success: true,
                 data: [], // ส่งเป็น Array ว่างกลับไป (หน้าบ้านจะได้เอาไปใช้งานต่อได้โดยไม่พัง)
             };
+=======
+            throw new Error('No parameter');
+>>>>>>> 093c063b (QA-CN)
         }
         const result = await this.j736kpService.findByInvPuritm(inv, puritm);
         return {

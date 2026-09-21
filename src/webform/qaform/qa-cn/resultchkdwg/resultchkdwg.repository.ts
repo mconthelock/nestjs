@@ -53,10 +53,16 @@ export class ResultChkDwgRepository extends BaseRepository {
         }
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 093c063b (QA-CN)
 
     async deleteByAll(dto: FormDto) {
         return this.getRepository(RESULTCHKDWG).delete(dto);
     }
+<<<<<<< HEAD
 =======
 >>>>>>> 67c79348 (PUR-EVA)
+=======
+>>>>>>> 093c063b (QA-CN)
 }

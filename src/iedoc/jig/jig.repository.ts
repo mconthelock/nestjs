@@ -81,12 +81,29 @@ export class JigRepository extends BaseRepository {
         );
     }
 
-    getDashboardMaster(): Promise<JigMaster[]> {
+    BK_getDashboardMaster(): Promise<JigMaster[]> {
         return this.getRepository(JigMaster).find({
             where: { JIG_STATUS: 'ACTIVE' },
             order: { NEXT_INSPEC_DATE: 'ASC', JIG_NO: 'ASC' },
         });
     }
+
+    async getDashboardMaster(): Promise<(JigMaster & { SNAME: string | null })[]> {
+        const { entities, raw } = await this.getRepository(JigMaster)
+            .createQueryBuilder('J')
+            .leftJoin('AMECUSERALL', 'U', 'U.SEMPNO = J.PIC_EMPNO')
+            .addSelect('U.SNAME', 'SNAME')
+            .where('J.JIG_STATUS = :status', { status: 'ACTIVE' })
+            .orderBy('J.NEXT_INSPEC_DATE', 'ASC')
+            .addOrderBy('J.JIG_NO', 'ASC')
+            .getRawAndEntities();
+
+        return entities.map((jig, i) => ({
+            ...jig,
+            SNAME: raw[i].SNAME ?? null,
+        }));
+    }
+    
 
     getFormStates(
         jigNo?: string,

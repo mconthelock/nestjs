@@ -5,7 +5,8 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource, EntityManager } from 'typeorm';
+import { DataSource, EntityManager, getMetadataArgsStorage } from 'typeorm';
+import { AMECUSERALL } from 'src/common/Entities/amec/views/AMECUSERALL.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { JigMaster } from 'src/common/Entities/iedoc/table/jig_master.entity';
 import { JigCheckpoint } from 'src/common/Entities/iedoc/table/jig_checkpoint.entity';
@@ -81,28 +82,34 @@ export class JigRepository extends BaseRepository {
         );
     }
 
-    BK_getDashboardMaster(): Promise<JigMaster[]> {
-        return this.getRepository(JigMaster).find({
-            where: { JIG_STATUS: 'ACTIVE' },
-            order: { NEXT_INSPEC_DATE: 'ASC', JIG_NO: 'ASC' },
-        });
-    }
-
-    async getDashboardMaster(): Promise<(JigMaster & { SNAME: string | null })[]> {
-        const { entities, raw } = await this.getRepository(JigMaster)
+    getDashboardMaster(): Promise<(JigMaster & { SNAME: string | null })[]> {
+        // IEDOC does not register AMEC's relation graph. Resolve the cross-schema
+        // view from its existing entity without loading unrelated repositories.
+        const employee = getMetadataArgsStorage().tables.find(
+            (table) => table.target === AMECUSERALL,
+        )!;
+        const employeePath = [employee.schema, employee.name]
+            .filter(Boolean)
+            .join('.');
+        return this.getRepository(JigMaster)
             .createQueryBuilder('J')
-            .leftJoin('AMECUSERALL', 'U', 'U.SEMPNO = J.PIC_EMPNO')
+            .select('J.*')
             .addSelect('U.SNAME', 'SNAME')
+            .leftJoin(
+                (query) => query
+                    .select('E.SEMPNO', 'SEMPNO')
+                    .addSelect('E.SNAME', 'SNAME')
+                    .from(employeePath, 'E'),
+                'U',
+                'TRIM(U.SEMPNO) = TRIM(J.PIC_EMPNO)',
+            )
             .where('J.JIG_STATUS = :status', { status: 'ACTIVE' })
             .orderBy('J.NEXT_INSPEC_DATE', 'ASC')
             .addOrderBy('J.JIG_NO', 'ASC')
-            .getRawAndEntities();
-
-        return entities.map((jig, i) => ({
-            ...jig,
-            SNAME: raw[i].SNAME ?? null,
-        }));
+            .getRawMany<JigMaster & { SNAME: string | null }>();
     }
+
+
     
 
     getFormStates(

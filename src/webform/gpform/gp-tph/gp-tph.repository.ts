@@ -152,3 +152,5 @@ export class GpTphRepository extends BaseRepository {
         return this.getRepository(GPTPH_AREAS).delete({ AREA_ID: id });
     }
 }
+
+

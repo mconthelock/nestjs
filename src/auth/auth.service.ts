@@ -14,6 +14,8 @@ import { CreateResetPasswordDto } from './dto/create-reset-password.dto';
 
 import { PasswordTokens } from 'src/common/Entities/webform/table/PASSWORD_RESET_TOKENS.entity';
 import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
+import { SLOGIN } from 'src/common/Entities/webform/table/SLOGIN.entity';
+import { DummyCard } from 'src/common/Entities/figerdb/views/DUMMYCARD.entity';
 
 interface logData {
     loguser: string;
@@ -31,10 +33,14 @@ export class AuthService {
         private Appsmenu: AppsmenuusersService,
         private logs: AccesslogService,
         private jwtService: JwtService,
-        @InjectRepository(PasswordTokens, 'webformConnection')
-        private readonly pwd: Repository<PasswordTokens>,
         private readonly mailService: MailService,
         private readonly seqno: SequenceOrgService,
+        @InjectRepository(PasswordTokens, 'webformConnection')
+        private readonly pwd: Repository<PasswordTokens>,
+        @InjectRepository(SLOGIN, 'webformConnection')
+        private readonly card: Repository<SLOGIN>,
+        @InjectRepository(DummyCard, 'fingerConnection')
+        private readonly dummy: Repository<DummyCard>,
     ) {}
 
     async login(user: any) {
@@ -333,4 +339,73 @@ export class AuthService {
             throw new Error(`Failed to alert: ${error.message}`);
         }
     }
+
+    async cardLogin(cardno: string, appid: number, ip: string) {
+        const log: logData = {
+            loguser: cardno,
+            logip: ip,
+            logstatus: 0,
+            logprogram: appid,
+            logmsg: 'Emp Card is not found',
+        };
+
+        let username = '';
+        const cardOwner = await this.card.findOne({ where: { SID: cardno } });
+        if (cardOwner) {
+            username = cardOwner.SEMPNO;
+        } else {
+            const cardDummyOwner = await this.dummy.findOne({
+                where: { DummyUID: cardno },
+            });
+            if (cardDummyOwner) {
+                username = cardDummyOwner.EmpCode;
+            } else {
+                this.logs.create(log);
+                throw new Error('Cannot login with the provided card number');
+            }
+        }
+
+        const user = await this.UsersService.findEmp(username);
+        if (!user) {
+            log.loguser = null;
+            this.logs.create(log);
+            throw new UnauthorizedException('You nave no authorization');
+        }
+
+        log.loguser = user.SEMPNO;
+        if (user.CSTATUS == '0') {
+            this.logs.create(log);
+            throw new UnauthorizedException('You nave no authorization');
+        }
+
+        const validUser = await this.Appsuser.verifyLogin(user.SEMPNO, appid);
+        if (!validUser) {
+            log.logmsg = 'User has no permission';
+            this.logs.create(log);
+            throw new UnauthorizedException('You nave no authorization');
+        }
+
+        const auth = await this.getAuthenlist(appid, validUser.group.GROUP_ID);
+        log.logstatus = 1;
+        log.logmsg = 'Logging in successful';
+        this.logs.create(log);
+
+        const appuser = await this.setUser(user);
+        return {
+            payload: {
+                users: user.SEMPNO,
+                group: validUser.group.GROUP_ID,
+                apps: validUser.application.APP_ID,
+                location: validUser.application.APP_LOCATION,
+            },
+            apps: validUser.application,
+            appuser: appuser,
+            appgroup: validUser.group,
+            auth: auth,
+        };
+    }
+
+    private async processCardLogin(empno: string) {}
+
+    private async processCardDummyLogin(empno: string) {}
 }

@@ -11,6 +11,7 @@ export class RequestResultChkDwgDto {
     @Type(() => Number)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     RESULT?: number;
 
     @IsOptional()
@@ -38,4 +39,15 @@ export class RequestResultChkDwgDto {
 =======
     REVNO?: string;
 >>>>>>> 90141e56 (QA-CN)
+=======
+    RESULT: number;
+
+    @IsOptional()
+    @IsString()
+    REMARK: string;
+
+    @IsOptional()
+    @IsString()
+    REVNO: string;
+>>>>>>> d7bc7b33 (QA-CN)
 }

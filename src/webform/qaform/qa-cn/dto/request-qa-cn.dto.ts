@@ -6,6 +6,7 @@ import {
 } from '@nestjs/swagger';
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Transform, Type, plainToInstance } from 'class-transformer';
 =======
 import { Transform, Type } from 'class-transformer';
@@ -13,6 +14,9 @@ import { Transform, Type } from 'class-transformer';
 =======
 import { Transform, Type, plainToInstance } from 'class-transformer';
 >>>>>>> 90141e56 (QA-CN)
+=======
+import { Transform, Type } from 'class-transformer';
+>>>>>>> d7bc7b33 (QA-CN)
 import {
     IsArray,
     IsDate,
@@ -30,12 +34,15 @@ import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 import { RequestResultChkDwgDto } from '../resultchkdwg/dto/request-resultchkdwg.dto';
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { StringToDate } from 'src/common/utils/transform';
 =======
 >>>>>>> d7bc7b33 (QA-CN)
 =======
 import { StringToDate } from 'src/common/utils/transform';
 >>>>>>> 6c278692 (QA-CN)
+=======
+>>>>>>> d7bc7b33 (QA-CN)
 
 export class RequestCNFormDto extends PickType(CreateFormDto, [
     'NFRMNO',
@@ -96,6 +103,7 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -105,6 +113,9 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 =======
     @StringToDate()
 >>>>>>> 6c278692 (QA-CN)
+=======
+    @IsDate()
+>>>>>>> d7bc7b33 (QA-CN)
     @Type(() => Date)
     SUBMITDATE?: Date;
 
@@ -112,6 +123,7 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -121,6 +133,9 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 =======
     @StringToDate()
 >>>>>>> 6c278692 (QA-CN)
+=======
+    @IsDate()
+>>>>>>> d7bc7b33 (QA-CN)
     @Type(() => Date)
     INSPECDATE?: Date;
 
@@ -128,6 +143,7 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -137,6 +153,9 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 =======
     @StringToDate()
 >>>>>>> 6c278692 (QA-CN)
+=======
+    @IsDate()
+>>>>>>> d7bc7b33 (QA-CN)
     @Type(() => Date)
     EXPCHGDATE?: Date;
 
@@ -218,6 +237,7 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
     @IsOptional()
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 90141e56 (QA-CN)
     @Transform(({ value }) => {
@@ -241,10 +261,13 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
     @Type(() => RequestResultChkDwgDto)
     DWGNO?: RequestResultChkDwgDto[];
 =======
+=======
+>>>>>>> d7bc7b33 (QA-CN)
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => RequestResultChkDwgDto)
     DWGNo?: RequestResultChkDwgDto[];
+<<<<<<< HEAD
 >>>>>>> d7bc7b33 (QA-CN)
 =======
     @IsArray()
@@ -252,4 +275,6 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
     @Type(() => RequestResultChkDwgDto)
     DWGNO?: RequestResultChkDwgDto[];
 >>>>>>> 90141e56 (QA-CN)
+=======
+>>>>>>> d7bc7b33 (QA-CN)
 }

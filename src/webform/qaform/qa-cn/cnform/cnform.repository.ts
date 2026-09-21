@@ -7,9 +7,13 @@ import { CreateCnformDto } from './dto/create-cnform.dto';
 import { UpdateCnformDto } from './dto/update-cnform.dto';
 import { CNFORM } from 'src/common/Entities/webform/table/CNFORM.entity';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { CNITMINCHARGE } from 'src/common/Entities/webform/table/CNITMINCHARGE.entity';
 =======
 >>>>>>> 67c79348 (PUR-EVA)
+=======
+import { CNITMINCHARGE } from 'src/common/Entities/webform/table/CNITMINCHARGE.entity';
+>>>>>>> d7bc7b33 (QA-CN)
 
 @Injectable()
 export class CnFormRepository extends BaseRepository {
@@ -28,6 +32,7 @@ export class CnFormRepository extends BaseRepository {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 00550f31 (QA-CN)
     async findByCondition(con: FormDto) {
@@ -43,6 +48,8 @@ export class CnFormRepository extends BaseRepository {
 >>>>>>> d7bc7b33 (QA-CN)
 =======
 >>>>>>> 00550f31 (QA-CN)
+=======
+>>>>>>> d7bc7b33 (QA-CN)
     async findInc(itm: number): Promise<string | null> {
         const result = await this.getRepository(CNITMINCHARGE).findOne({
             where: { ITEMNO: itm },
@@ -53,8 +60,11 @@ export class CnFormRepository extends BaseRepository {
         return result ? result.INCHARGE : null;
     }
 
+<<<<<<< HEAD
 =======
 >>>>>>> 67c79348 (PUR-EVA)
+=======
+>>>>>>> d7bc7b33 (QA-CN)
     async update(con: FormDto, dto: UpdateCnformDto): Promise<boolean> {
         const result = await this.getRepository(CNFORM).update(con, dto);
         return (result.affected ?? 0) > 0;

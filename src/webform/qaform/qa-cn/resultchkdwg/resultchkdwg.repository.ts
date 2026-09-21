@@ -64,6 +64,9 @@ export class ResultChkDwgRepository extends BaseRepository {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 093c063b (QA-CN)
 =======
 >>>>>>> 093c063b (QA-CN)
 
@@ -71,10 +74,13 @@ export class ResultChkDwgRepository extends BaseRepository {
         return this.getRepository(RESULTCHKDWG).delete(dto);
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 67c79348 (PUR-EVA)
 =======
 >>>>>>> 093c063b (QA-CN)
 =======
 >>>>>>> 67c79348 (PUR-EVA)
+=======
+>>>>>>> 093c063b (QA-CN)
 }

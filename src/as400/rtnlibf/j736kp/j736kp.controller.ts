@@ -22,6 +22,7 @@ export class J736kpController {
         if (!inv || !puritm) {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 38e4fc7c (QA-CN)
             return {
@@ -34,6 +35,9 @@ export class J736kpController {
 >>>>>>> 093c063b (QA-CN)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+            throw new Error('No parameter');
+>>>>>>> 093c063b (QA-CN)
         }
         const result = await this.j736kpService.findByInvPuritm(inv, puritm);
         return {

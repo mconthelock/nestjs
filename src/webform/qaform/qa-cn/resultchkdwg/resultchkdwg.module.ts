@@ -12,6 +12,7 @@ import { RESULTCHKDWG } from 'src/common/Entities/webform/table/RESULTCHKDWG.ent
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     exports: [ResultChkDwgService, ResultChkDwgRepository],
 =======
     exports: [ResultChkDwgService],
@@ -22,5 +23,8 @@ import { RESULTCHKDWG } from 'src/common/Entities/webform/table/RESULTCHKDWG.ent
 =======
     exports: [ResultChkDwgService],
 >>>>>>> 67c79348 (PUR-EVA)
+=======
+    exports: [ResultChkDwgService, ResultChkDwgRepository],
+>>>>>>> 093c063b (QA-CN)
 })
 export class ResultchkdwgModule {}

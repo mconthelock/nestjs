@@ -147,4 +147,8 @@ export class JigService {
     finishForm(key: JigFormKeyDto, dto: FinishInspectionDto) {
         return this.jigRepository.finishForm(key, dto.UPDATE_BY);
     }
+
+    applyFormToMaster(key: JigFormKeyDto, dto: FinishInspectionDto) {
+        return this.jigRepository.applyFormToMaster(key, dto.UPDATE_BY);
+    }
 }

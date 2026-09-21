@@ -76,6 +76,7 @@ function fixture(period = 6) {
         ...key,
         JIG_NO: jig.JIG_NO,
         FORM_TYPE: 'INSPECTION',
+        REV: '1',
     };
     const details: any[] = [
         {
@@ -124,6 +125,7 @@ function fixture(period = 6) {
         create: jest.fn((_entity, data) => data),
         insert: jest.fn(async () => ({})),
         save: jest.fn(async (_entity, data) => data),
+        update: jest.fn(async () => ({ affected: 1 })),
         delete: jest.fn(async () => ({ affected: 1 })),
     };
     const ds: any = {
@@ -132,6 +134,88 @@ function fixture(period = 6) {
     };
     return { repo: new JigRepository(ds), jig, form, details, state, manager };
 }
+
+describe('Jig REV application', () => {
+    it('accepts numeric zero as the VARCHAR revision value', async () => {
+        const dto = plainToInstance(CreateJigFormDto, { ...key, FORM_TYPE: 'CREATE', REV: 0 });
+        expect(await validate(dto)).toHaveLength(0);
+        expect(dto.REV).toBe('0');
+    });
+    it.each(['*', '0'])('inserts REV %s from the stored snapshot', async (revision) => {
+        const { repo, form, state, manager } = fixture();
+        state.master = null;
+        state.status = '1';
+        form.REV = revision;
+        // The mutation branch must follow REV, not FORM_TYPE.
+        const result = await repo.applyFormToMaster(key, '14077');
+        expect(result.applied).toBe(true);
+        expect(result.jig.NEXT_INSPEC_DATE).toEqual(new Date(2026, 1, 1));
+        expect(manager.insert).toHaveBeenCalledWith(JigMaster, expect.objectContaining({
+            JIG_NAME: form.JIG_NAME, REV: revision, REF_CYEAR2: key.CYEAR2,
+            REF_NRUNNO: key.NRUNNO,
+        }));
+        expect(manager.insert).toHaveBeenCalledWith(JigCheckpoint, expect.objectContaining({
+            JIG_NO: form.JIG_NO, CHECK_SEQ: 1, CHECK_POINT: 'Diameter',
+        }));
+        expect(manager.update).not.toHaveBeenCalled();
+        expect(manager.delete).not.toHaveBeenCalled();
+    });
+
+    it.each(['1', 'A', '01'])('updates REV %s and synchronizes template points', async (revision) => {
+        const { repo, form, state, details, manager } = fixture();
+        form.REV = revision;
+        form.FORM_TYPE = 'CREATE';
+        state.points.push({ CHECK_SEQ: 3, CHECK_POINT: 'Retired' });
+        details.push({ ...key, CHECK_SEQ: 2, CHECK_POINT: 'New visual', RESULT: 'OK' });
+        await repo.applyFormToMaster(key, '14077');
+        expect(manager.update).toHaveBeenCalledWith(JigMaster, { JIG_NO: form.JIG_NO },
+            expect.objectContaining({ REV: revision, NEXT_INSPEC_DATE: new Date(2026, 7, 1) }));
+        const pointUpdate = manager.update.mock.calls.find((c) => c[0] === JigCheckpoint);
+        expect(pointUpdate[1]).toEqual({ JIG_NO: form.JIG_NO, CHECK_SEQ: 1 });
+        expect(pointUpdate[2]).not.toHaveProperty('CREATE_DATE');
+        expect(pointUpdate[2]).not.toHaveProperty('MEASURED_VALUE');
+        expect(manager.insert).toHaveBeenCalledWith(JigCheckpoint,
+            expect.objectContaining({ CHECK_SEQ: 2, CHECK_POINT: 'New visual' }));
+        expect(manager.delete).toHaveBeenCalledTimes(1);
+        expect(manager.delete).toHaveBeenCalledWith(JigCheckpoint, { JIG_NO: form.JIG_NO, CHECK_SEQ: 3 });
+        expect(details).toHaveLength(2);
+    });
+
+    it.each(['*', '0'])('rejects a new REV %s when master already exists', async (revision) => {
+        const { repo, form, manager } = fixture();
+        form.REV = revision;
+        await expect(repo.applyFormToMaster(key)).rejects.toThrow('requires a new JIG_NO');
+        expect(manager.insert).not.toHaveBeenCalled();
+        expect(manager.update).not.toHaveBeenCalled();
+    });
+
+    it('rejects update without master and missing revision before writing', async () => {
+        const { repo, state, form, manager } = fixture();
+        state.master = null;
+        await expect(repo.applyFormToMaster(key)).rejects.toThrow('existing jig');
+        form.REV = null;
+        await expect(repo.applyFormToMaster(key)).rejects.toThrow('REV is required');
+        expect(manager.insert).not.toHaveBeenCalled();
+    });
+
+    it('propagates a checkpoint failure to the transaction and commits nothing', async () => {
+        const { manager } = fixture();
+        let committed = false;
+        manager.update.mockImplementation(async (entity) => {
+            if (entity === JigCheckpoint) throw new Error('Checkpoint failed');
+            return { affected: 1 };
+        });
+        const transaction = jest.fn(async (callback) => {
+            const result = await callback(manager);
+            committed = true;
+            return result;
+        });
+        const repo = new JigRepository({ manager, transaction } as any);
+        await expect(repo.applyFormToMaster(key)).rejects.toThrow('Checkpoint failed');
+        expect(transaction).toHaveBeenCalledTimes(1);
+        expect(committed).toBe(false);
+    });
+});
 
 describe('Jig dictionary and validation', () => {
     it('maps reference columns and lookup primary keys with the supplied Oracle sizes', async () => {
@@ -213,6 +297,16 @@ describe('Jig dictionary and validation', () => {
             master.columns.find((c) => c.propertyName === 'PRICE').scale,
         ).toBe(2);
         expect(ds.getMetadata(JigFormNg).primaryColumns).toHaveLength(5);
+        const ngColumns = ds.getMetadata(JigFormNg).columns;
+        expect(ngColumns.map((c) => c.propertyName).sort()).toEqual([
+            'NFRMNO', 'VORGNO', 'CYEAR', 'CYEAR2', 'NRUNNO',
+            'DEFECT_DETAIL', 'ACTION', 'CORRECTIVE', 'PLAN_DATE', 'LOCATION',
+        ].sort());
+        for (const [name, length] of [['DEFECT_DETAIL', '500'], ['ACTION', '100'], ['CORRECTIVE', '100']]) {
+            expect(ngColumns.find((c) => c.propertyName === name)).toMatchObject({
+                type: 'varchar2', length, isNullable: false,
+            });
+        }
         for (const entity of [JigFormDetail, JigFormFile])
             expect(ds.getMetadata(entity).primaryColumns).toHaveLength(6);
         for (const entity of [JigFormNg, JigFormFile])
@@ -502,7 +596,7 @@ describe('Jig form snapshots and approval', () => {
             JIG_NAME: 'Revised jig',
             JIG_DESC: 'New description',
             DETAILS: [{ CHECK_SEQ: 1, MEASURED_VALUE: 3, RESULT: 'OK' }],
-            NG: { DEFECT_DETAIL: 'Too large', PLAN_DATE: '2026-04-01' },
+            NG: { DEFECT_DETAIL: 'Too large', ACTION: 'Repair', CORRECTIVE: 'Adjust', PLAN_DATE: '2026-04-01' },
             UPDATE_BY: 'J0144',
         });
         expect(form.JIG_NAME).toBe('Revised jig');
@@ -533,6 +627,7 @@ describe('Jig form snapshots and approval', () => {
         state.master = null;
         form.FORM_TYPE = 'CREATE';
         form.START_USE_DATE = new Date(2026, 1, 19);
+        form.REV = '0';
         const result = await repo.finishForm(key, 'J0144');
         expect(result.jig).toMatchObject({
             NEXT_INSPEC_DATE: new Date(2026, 7, 1),
@@ -555,7 +650,7 @@ describe('Jig form snapshots and approval', () => {
             expect(jig.JIG_NAME).toBe('Approved snapshot');
             expect(jig).toMatchObject({ REF_CYEAR2: '2026', REF_NRUNNO: 1 });
             expect((await repo.finishForm(key)).applied).toBe(false);
-            expect(manager.save).toHaveBeenCalledTimes(1);
+            expect(manager.update.mock.calls.filter((c) => c[0] === JigMaster)).toHaveLength(1);
             expect(manager.findOne.mock.calls[0][1].lock.mode).toBe(
                 'pessimistic_write',
             );
@@ -683,7 +778,7 @@ describe('Jig complete form transactions', () => {
         NG: {
             DEFECT_DETAIL: 'Oversize',
             PLAN_DATE: '2026-03-01',
-            ACCESS_METHOD: 'Repair',
+            ACTION: 'Repair', CORRECTIVE: 'Adjust',
             LOCATION: 'IE',
         },
         FILES: [
@@ -720,13 +815,16 @@ describe('Jig complete form transactions', () => {
             MEASURED_VALUE: 3,
         });
         expect(manager.insert.mock.calls[2][1]).toMatchObject({
-            CREATE_BY: 'J0144',
+            ACTION: 'Repair', CORRECTIVE: 'Adjust',
             DEFECT_DETAIL: 'Oversize',
         });
         expect(manager.insert.mock.calls[3][1]).toMatchObject({
             CREATE_BY: 'J0144',
             FILE_SEQ: 1,
         });
+        expect(Object.keys(manager.insert.mock.calls[2][1]).sort()).toEqual([
+            ...Object.keys(key), 'DEFECT_DETAIL', 'ACTION', 'CORRECTIVE', 'PLAN_DATE', 'LOCATION',
+        ].sort());
         expect(manager.save).not.toHaveBeenCalled();
     });
 
@@ -791,6 +889,14 @@ describe('Jig complete form transactions', () => {
             { ...payload, DETAILS: [payload.DETAILS[0], payload.DETAILS[0]] },
             { ...payload, FILES: [payload.FILES[0], payload.FILES[0]] },
             { ...payload, NG: { DEFECT_DETAIL: 'Missing date' } },
+            ...[
+                { ACTION: undefined }, { ACTION: null }, { ACTION: '' },
+                { CORRECTIVE: undefined }, { CORRECTIVE: null }, { CORRECTIVE: '' },
+                { DEFECT_DETAIL: 'x'.repeat(501) }, { ACTION: 'x'.repeat(101) },
+                { CORRECTIVE: 'x'.repeat(101) }, { LOCATION: 'x'.repeat(201) },
+                { ACCESS_METHOD: 'Old field' }, { CREATE_BY: '14077' },
+                { UPDATE_DATE: '2026-01-01' },
+            ].map((change) => ({ ...payload, NG: { ...payload.NG, ...change } })),
             {
                 ...payload,
                 DETAILS: [{ ...payload.DETAILS[0], MEASURED_VALUE: 1.12345 }],
@@ -1075,7 +1181,7 @@ describe('Jig HTTP contracts', () => {
             START_USE_DATE: '2026-02-19',
             CREATE_BY: 'J0144',
             DETAILS: [{ CHECK_SEQ: 1, CHECK_POINT: 'Visual', RESULT: 'NG' }],
-            NG: { DEFECT_DETAIL: 'Scratch', PLAN_DATE: '2026-03-01' },
+            NG: { DEFECT_DETAIL: 'Scratch', ACTION: 'Repair', CORRECTIVE: 'Polish', PLAN_DATE: '2026-03-01' },
             FILES: [
                 {
                     FILE_SEQ: 1,

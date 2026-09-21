@@ -19,7 +19,6 @@ export class CheckpointDto {
     @IsDefined()
     @IsInt()
     @Min(1)
-    @Max(20)
     CHECK_SEQ: number;
     @IsDefined()
     @IsNotEmpty()
@@ -49,7 +48,6 @@ export class CheckpointDto {
 export class ReplaceCheckpointsDto {
     @IsDefined()
     @IsArray()
-    @ArrayMaxSize(20)
     @ArrayUnique((item) => item.CHECK_SEQ)
     @ValidateNested({ each: true })
     @Type(() => CheckpointDto)

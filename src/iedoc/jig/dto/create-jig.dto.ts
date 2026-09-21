@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
     IsDefined,
     IsString,
@@ -26,6 +27,7 @@ export class CreateJigDto {
     @IsString()
     @MaxLength(100)
     DWG?: string;
+    @Transform(({ value }) => typeof value === 'number' ? String(value) : value)
     @IsOptional()
     @IsString()
     @MaxLength(2)

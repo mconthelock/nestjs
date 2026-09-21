@@ -18,7 +18,7 @@ export class JigFormDetail {
     @PrimaryColumn({ type: 'decimal', precision: 6, scale: 0 })
     NRUNNO: number;
 
-    @PrimaryColumn({ type: 'decimal', precision: 2, scale: 0 })
+    @PrimaryColumn({ type: 'decimal', precision: 15, scale: 0 })
     CHECK_SEQ: number;
 
     @Column({ length: 200, nullable: false })

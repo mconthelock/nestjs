@@ -21,14 +21,21 @@ import {
     UseForceTransaction,
     UseTransaction,
 } from 'src/common/decorator/transaction.decorator';
+<<<<<<< HEAD
 import { ApproveQaCnDto } from './dto/approve-qa-cn.dto';
+=======
+>>>>>>> d7bc7b33 (QA-CN)
 
 @Controller('qaform/qa-cn')
 export class QaCnController {
     constructor(private readonly qaCnService: QaCnService) {}
     private readonly path =
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/QA/CN/` as string;
+<<<<<<< HEAD
     @Post('create')
+=======
+    @Post()
+>>>>>>> d7bc7b33 (QA-CN)
     @UseTransaction('webformConnection')
     @UseForceTransaction()
     @UseInterceptors(
@@ -61,6 +68,7 @@ export class QaCnController {
         const ip = getClientIP(req);
         return this.qaCnService.request(dto, files, ip, this.path);
     }
+<<<<<<< HEAD
 
     @Patch('approve')
     @UseTransaction('webformConnection')
@@ -111,6 +119,23 @@ export class QaCnController {
         return this.qaCnService.update(+id, updateQaCnDto);
     }
 
+=======
+    @Get()
+    findAll() {
+        return this.qaCnService.findAll();
+    }
+
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.qaCnService.findOne(+id);
+    }
+
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updateQaCnDto: UpdateQaCnDto) {
+        return this.qaCnService.update(+id, updateQaCnDto);
+    }
+
+>>>>>>> d7bc7b33 (QA-CN)
     @Delete(':id')
     remove(@Param('id') id: string) {
         return this.qaCnService.remove(+id);

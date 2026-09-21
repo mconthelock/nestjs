@@ -22,6 +22,7 @@ export class CnFormRepository extends BaseRepository {
         return this.getRepository(CNFORM).save(dto);
     }
 
+<<<<<<< HEAD
     async findByCondition(con: FormDto) {
         return this.getRepository(CNFORM).find({
             where: {
@@ -30,6 +31,8 @@ export class CnFormRepository extends BaseRepository {
         });
     }
 
+=======
+>>>>>>> d7bc7b33 (QA-CN)
     async findInc(itm: number): Promise<string | null> {
         const result = await this.getRepository(CNITMINCHARGE).findOne({
             where: { ITEMNO: itm },

@@ -8,6 +8,7 @@ import {
     UseGuards,
     Body,
     Res,
+    Req,
     HttpCode,
     HttpStatus,
     UnauthorizedException,
@@ -15,12 +16,13 @@ import {
 import { ApiTags, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
-import { Response } from 'express';
+import { Request as ExpressRequest, Response } from 'express';
 import * as CryptoJS from 'crypto-js';
 
 import { LoginDto } from './dto/login.dto';
 import { directLoginDto } from './dto/direct.dto';
 import { CreateResetPasswordDto } from './dto/create-reset-password.dto';
+import { getClientIP } from 'src/common/utils/ip.utils';
 
 interface encryptObj {
     text: string;
@@ -39,8 +41,6 @@ export class AuthController {
         @Body() loginDto: LoginDto,
         @Res({ passthrough: true }) response: Response,
     ) {
-        console.log('controller');
-
         const res = await this.loginResults(req.user, response);
         return res;
     }
@@ -99,6 +99,22 @@ export class AuthController {
         }
     }
 
+    @Post('cardlogin')
+    async cardlogin(
+        @Request() req,
+        @Body() direct: directLoginDto,
+        @Res({ passthrough: true }) response: Response,
+    ) {
+        const ip = String((req as any).clientIp);
+        const loginResult = await this.authService.cardLogin(
+            direct.username.substring(0, 8),
+            direct.appid,
+            ip,
+        );
+        const res = await this.loginResults(loginResult, response);
+        return res;
+    }
+
     @Post('encrypt')
     @ApiExcludeEndpoint()
     encryptText(@Body() encrypt: encryptObj) {
@@ -115,5 +131,11 @@ export class AuthController {
     @Post('resetpassword')
     async resetPassword(@Body() reset: CreateResetPasswordDto) {
         return this.authService.resetPassword(reset);
+    }
+
+    @Get('check-ip')
+    async checkIp(@Req() request: ExpressRequest): Promise<{ ip: string }> {
+        const ip = getClientIP(request);
+        return { ip };
     }
 }

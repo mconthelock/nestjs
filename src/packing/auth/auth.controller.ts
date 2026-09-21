@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Req, Res, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+    Controller,
+    Post,
+    Body,
+    Req,
+    Res,
+    HttpCode,
+    HttpStatus,
+    Get,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
@@ -22,11 +31,15 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Check user login by empno' })
     @ApiBody({ type: PackLoginDto })
-    @ApiResponse({ status: 200, description: 'Login result', type: PackLoginResponseDto })
+    @ApiResponse({
+        status: 200,
+        description: 'Login result',
+        type: PackLoginResponseDto,
+    })
     async login(
-        @Body() body: PackLoginDto, 
-        @Req() request: Request, 
-        @Res({ passthrough: true }) response: Response
+        @Body() body: PackLoginDto,
+        @Req() request: Request,
+        @Res({ passthrough: true }) response: Response,
     ): Promise<PackLoginResponseDto> {
         const ip = getClientIP(request);
         return this.service.validateUser(body.empno, ip);
@@ -42,11 +55,10 @@ export class AuthController {
     @ApiOperation({ summary: 'User logout and update session endtime' })
     async logout(
         @Body() body: PackLogoutDto,
-        @Req() request: Request, 
-        @Res({ passthrough: true }) response: Response
+        @Req() request: Request,
+        @Res({ passthrough: true }) response: Response,
     ): Promise<PackLogoutResponseDto> {
         await this.service.updateLogout(body.userId, body.sessionId);
         return { status: 'success', message: 'Logged out successfully' };
     }
 }
-

@@ -19,6 +19,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
 import { PasswordTokens } from 'src/common/Entities/webform/table/PASSWORD_RESET_TOKENS.entity';
+import { SLOGIN } from 'src/common/Entities/webform/table/SLOGIN.entity';
+import { DummyCard } from 'src/common/Entities/figerdb/views/DUMMYCARD.entity';
 
 @Module({
     imports: [
@@ -37,7 +39,8 @@ import { PasswordTokens } from 'src/common/Entities/webform/table/PASSWORD_RESET
             }),
             inject: [ConfigService],
         }),
-        TypeOrmModule.forFeature([PasswordTokens], 'webformConnection'),
+        TypeOrmModule.forFeature([PasswordTokens, SLOGIN], 'webformConnection'),
+        TypeOrmModule.forFeature([DummyCard], 'fingerConnection'),
     ],
     providers: [AuthService, JwtStrategy, LocalStrategy, KeyStrategy],
     controllers: [AuthController],

@@ -61,4 +61,12 @@ export class SearchActualOvertimeDto {
     @IsString()
     @IsOptional()
     LR215: string;
+
+    @IsString()
+    @IsOptional()
+    START_LR209: string;
+
+    @IsString()
+    @IsOptional()
+    END_LR209: string;
 }

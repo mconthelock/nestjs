@@ -62,6 +62,42 @@ export class FinnpoRepository extends BaseRepository {
         });
     }
 
+    findVendor(vendorCode: string, vendorName: string) {
+        return this.getRepository(FINNPOVENDOR).findOne({
+            where: { VENDOR_CODE: vendorCode, VENDOR_NAME: vendorName },
+        });
+    }
+
+    createVendor(data: Partial<FINNPOVENDOR>) {
+        return this.getRepository(FINNPOVENDOR).save(data);
+    }
+
+    updateVendor(
+        vendorCode: string,
+        vendorName: string,
+        data: Partial<FINNPOVENDOR>,
+    ) {
+        return this.getRepository(FINNPOVENDOR).update(
+            { VENDOR_CODE: vendorCode, VENDOR_NAME: vendorName },
+            data,
+        );
+    }
+
+    deleteVendor(vendorCode: string, vendorName: string) {
+        return this.getRepository(FINNPOVENDOR).delete({
+            VENDOR_CODE: vendorCode,
+            VENDOR_NAME: vendorName,
+        });
+    }
+
+    async isVendorInUse(vendorCode: string) {
+        return (
+            (await this.getRepository(FINNPOFORM).count({
+                where: { VENDOR_CODE: vendorCode },
+            })) > 0
+        );
+    }
+
     findAllCurrency() {
         return this.getRepository(FINNPOCURRENCY).find({
             order: {

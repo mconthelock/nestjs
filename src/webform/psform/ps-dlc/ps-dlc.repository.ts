@@ -64,10 +64,8 @@ export class PSDLCRepository extends BaseRepository {
             // --------------------------------------------------
             // 2. จัดการ PNRKUB = '2' (SELECT -> UPDATE / INSERT)
             // --------------------------------------------------
-            const q008mpReference =
-                this.buildPndataExpressionForReference(detail);
-
-            if (q008mpReference) {
+            if (detail.REFERENCE?.trim()) {
+                // เช็คก่อนว่ามีข้อมูลหรือไม่ เพื่อดูว่าต้อง UPDATE หรือ INSERT
                 const checkQuery = `SELECT COUNT(*) AS CNT FROM RTNLIBF.Q008MP WHERE PNZUBA = '${zuba}' AND PNHING = '${hing}' AND PNRKUB = '2'`;
                 const checkResult = await this.conn.runQuery(checkQuery);
 
@@ -76,16 +74,24 @@ export class PSDLCRepository extends BaseRepository {
                         ? Number(checkResult[0].CNT)
                         : 0;
 
-                if (recordCount > 0) {
-                    // ขั้นที่ 2A: เจอข้อมูล -> UPDATE
-                    // เพิ่ม PNDATE ใน SET clause
-                    const updateQuery = `UPDATE RTNLIBF.Q008MP SET PNDATA = ${q008mpReference}, PNDATE = '${currentDateStr}' WHERE PNZUBA = '${zuba}' AND PNHING = '${hing}' AND PNRKUB = '2'`;
-                    await this.conn.runQuery(updateQuery);
-                } else {
-                    // ขั้นที่ 2B: ไม่เจอข้อมูล -> INSERT
-                    // เพิ่ม PNDATE เข้าไปและใส่ค่า PNRKUB เป็น '2' (ส่วนนี้มีอยู่แล้ว)
-                    const insertQuery = `INSERT INTO RTNLIBF.Q008MP (PNZUBA, PNHING, PNRKUB, PNDATA, PNDATE) VALUES ('${zuba}', '${hing}', '2', ${q008mpReference}, '${currentDateStr}')`;
-                    await this.conn.runQuery(insertQuery);
+                const isUpdate = recordCount > 0;
+
+                // สร้าง Expression โดยส่งสถานะ isUpdate ไปด้วย
+                const q008mpReference = this.buildPndataExpressionForReference(
+                    detail,
+                    isUpdate,
+                );
+
+                if (q008mpReference) {
+                    if (isUpdate) {
+                        // ขั้นที่ 2A: เจอข้อมูล -> UPDATE
+                        const updateQuery = `UPDATE RTNLIBF.Q008MP SET PNDATA = ${q008mpReference}, PNDATE = '${currentDateStr}' WHERE PNZUBA = '${zuba}' AND PNHING = '${hing}' AND PNRKUB = '2'`;
+                        await this.conn.runQuery(updateQuery);
+                    } else {
+                        // ขั้นที่ 2B: ไม่เจอข้อมูล -> INSERT
+                        const insertQuery = `INSERT INTO RTNLIBF.Q008MP (PNZUBA, PNHING, PNRKUB, PNDATA, PNDATE) VALUES ('${zuba}', '${hing}', '2', ${q008mpReference}, '${currentDateStr}')`;
+                        await this.conn.runQuery(insertQuery);
+                    }
                 }
             }
         }
@@ -168,22 +174,33 @@ export class PSDLCRepository extends BaseRepository {
 
     private buildPndataExpressionForReference(
         detail: UpdatePsdlcDetailDto,
+        isUpdate: boolean,
     ): string | null {
         const reference = detail.REFERENCE?.trim();
         if (!reference) {
             return null;
         }
 
-        // กำหนดความยาวฟิกซ์ตายตัวตามขนาดคอลัมน์ใน AS400
+        const flag = detail.NEWFLAG?.trim().toUpperCase();
         const maxLength = 115;
+        const escapedRef = this.escapeSql(reference);
 
+        // กรณีเป็น UPDATE และเงื่อนไขคือ Flag = 'A'
+        // ต้องการให้อัปเดตต่อจากข้อความที่มีอยู่แล้ว (Append)
+        if (isUpdate && flag === 'A') {
+            // ใช้ TRIM เพื่อลบช่องว่างด้านหลังของข้อความเดิม แล้วนำข้อความใหม่มาต่อ (||)
+            // ใช้ SUBSTR คลุมอีกทีเพื่อป้องกันกรณีต่อกันแล้วความยาวเกิน 115 ตัว (Error ระดับ DB)
+            // หมายเหตุ: หากต้องการให้มีเว้นวรรค 1 เคาะระหว่างข้อความเดิมกับใหม่ ให้แก้เป็น:
+            // `SUBSTR(TRIM(PNDATA) || ' ' || '${escapedRef}', 1, ${maxLength})`
+            return `SUBSTR(TRIM(PNDATA) || '${escapedRef}', 1, ${maxLength})`;
+        }
+
+        // กรณีอื่นๆ (INSERT หรือ UPDATE แบบปกติทับค่าเดิม)
         // ทำความสะอาดข้อมูล เติมช่องว่างด้านหลังให้ครบ 115 ตัว และตัดส่วนเกินออก
-        const referenceValue = this.escapeSql(reference)
+        const referenceValue = escapedRef
             .padEnd(maxLength, ' ')
             .substring(0, maxLength);
 
-        // เนื่องจากเป็นการแทนที่ตั้งแต่ตำแหน่งแรกจนจบฟิลด์ (115 ตัว)
-        // สามารถคืนค่ากลับไปเป็น String ก้อนใหม่เพื่ออัปเดตทับได้เลย
         return `'${referenceValue}'`;
     }
 

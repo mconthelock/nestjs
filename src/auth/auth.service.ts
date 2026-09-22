@@ -351,7 +351,8 @@ export class AuthService {
 
         let username = '';
         const cardOwner = await this.card.findOne({ where: { SID: cardno } });
-        if (cardOwner) {
+        console.log(cardOwner);
+        if (cardOwner && cardOwner.SEMPNO.substring(0, 2) != '84') {
             username = cardOwner.SEMPNO;
         } else {
             const cardDummyOwner = await this.dummy.findOne({
@@ -359,6 +360,9 @@ export class AuthService {
             });
             if (cardDummyOwner) {
                 username = cardDummyOwner.EmpCode;
+                console.log(
+                    `Card dummy owner found: ${cardDummyOwner.EmpCode}`,
+                );
             } else {
                 this.logs.create(log);
                 throw new Error('Cannot login with the provided card number');

@@ -59,7 +59,7 @@ export class WireHarnessAs400Repository {
                     ON F1.F01R07 = S11.S11M01
                     AND COALESCE(NULLIF(TRIM(F1.F01R05), ''), Q1.Q41K07) = S11.S11M06
                 WHERE F2.F02R03 = 'B4CC06'
-                    AND S.M8K01 >= VARCHAR_FORMAT(CURRENT DATE - 1 MONTH, 'YYYYMM')
+                    AND S.M8K01 >= VARCHAR_FORMAT(CURRENT DATE - 3 MONTH, 'YYYYMM')||'1'
             ) X
             WHERE X.RN = 1
         `);

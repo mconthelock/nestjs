@@ -177,7 +177,10 @@ export class JigRepository extends BaseRepository {
                 this.assertEditable(await this.webformStatus(manager, key, true),);
                 await manager.query('LOCK TABLE JIG_FORM IN SHARE ROW EXCLUSIVE MODE',);
                 if (!jigNo) {
-                    const prefix = 'JIG' + String(dto.CYEAR2).slice(-2) + '-';
+                    const currentYear = new Intl.DateTimeFormat('en-US', {
+                        timeZone: 'Asia/Bangkok', year: '2-digit',
+                    }).format(new Date());
+                    const prefix = 'JIG' + currentYear + '-';
                     const values = await manager.query(
                         "SELECT NVL(MAX(TO_NUMBER(SUBSTR(JIG_NO, 7))), 0) AS LAST_NO FROM (SELECT JIG_NO FROM JIG_MASTER UNION ALL SELECT JIG_NO FROM JIG_FORM) WHERE REGEXP_LIKE(JIG_NO, :1)",
                         ['^' + prefix + '[0-9]{3}$'],

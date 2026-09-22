@@ -6,7 +6,7 @@ export class JigCheckpoint {
     @PrimaryColumn({ length: 20 })
     JIG_NO: string;
 
-    @PrimaryColumn({ type: 'decimal', precision: 15, scale: 0 })
+    @PrimaryColumn({ type: 'decimal', precision: 3, scale: 0 })
     CHECK_SEQ: number;
 
     @Column({ length: 200, nullable: false })

@@ -19,6 +19,7 @@ export class CheckpointDto {
     @IsDefined()
     @IsInt()
     @Min(1)
+    @Max(999)
     CHECK_SEQ: number;
     @IsDefined()
     @IsNotEmpty()

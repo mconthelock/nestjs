@@ -27,8 +27,9 @@ export class CreateJigDto {
     @IsString()
     @MaxLength(100)
     DWG?: string;
-    @Transform(({ value }) => typeof value === 'number' ? String(value) : value)
-    @IsOptional()
+    @Transform(({ value }) => typeof value === 'number' ? String(value) : typeof value === 'string' ? value.trim() : value)
+    @IsDefined()
+    @IsNotEmpty()
     @IsString()
     @MaxLength(2)
     REV?: string;
@@ -55,7 +56,7 @@ export class CreateJigDto {
     ITEMNO?: string;
     @IsOptional()
     @IsString()
-    @MaxLength(100)
+    @MaxLength(200)
     JIG_DESC?: string;
     @IsOptional()
     @IsString()

@@ -73,10 +73,17 @@ condition. It is not a new HTTP endpoint. The existing
 `POST /iedoc/jig/forms/:NFRMNO/:VORGNO/:CYEAR/:CYEAR2/:NRUNNO/finish` remains available
 and still requires WEBFORM CST 2 before calling the same application logic.
 
-- REV `*` or `0` inserts JIG_MASTER and JIG_CHECKPOINT. Numeric JSON REV 0 is
+- REV `0` inserts JIG_MASTER and JIG_CHECKPOINT. Numeric JSON REV 0 is
   normalized to string `0`. An existing JIG_NO is a conflict, not an overwrite.
 - Other nonempty revisions update an existing active master. Missing/blank REV
   or a missing master for the update case is rejected.
+- New forms without a master default to REV `0` when omitted. Explicit null,
+  empty or whitespace REV is rejected. New jig revisions other than `0`,
+  including `*`, are rejected. Create/save validates the revision before approval.
+- CHECK_SEQ is NUMBER(3), accepted from 1 to 999 in form and template inputs.
+- PUT /iedoc/jig/:jigNo/checkpoints replaces template rows without checking
+  workflow status; the JS caller handles that condition. An empty CHECKPOINTS
+  array clears the template. Data validation and transaction protection remain.
 - Main values come from stored JIG_FORM, and checkpoint definitions from stored
   JIG_FORM_DETAIL. Existing CHECK_SEQ rows are updated, new rows inserted, and
   retired template rows deleted. Historical form data remains unchanged.

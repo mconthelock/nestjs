@@ -153,8 +153,6 @@ export class JigRepository extends BaseRepository {
         dto.CHECKPOINTS.forEach(validateRange);
         return this.iedocDs.transaction(async (manager) => {
             await this.lockMaster(manager, jigNo);
-            const forms = await this.getFormStates(jigNo, manager);
-            if (forms.some((f) => !['2', '3'].includes(String(f.FORM_STATUS).trim()),)) throw new ConflictException('Cannot replace checkpoints while a form is pending',);
             await manager.delete(JigCheckpoint, { JIG_NO: jigNo });
             const points = dto.CHECKPOINTS.map((p) => ({
                 ...p,
@@ -198,7 +196,8 @@ export class JigRepository extends BaseRepository {
             if (await manager.findOneBy(JigForm, key)) throw new ConflictException('This WEBFORM key is already linked',);
             if (dto.FORM_TYPE === 'CREATE' && jig && !['DRAFT', 'PENDING'].includes(jig.JIG_STATUS)) throw new ConflictException('Jig is already registered');
             if (dto.FORM_TYPE === 'INSPECTION' &&(!jig || jig.JIG_STATUS !== 'ACTIVE')) throw new ConflictException('INSPECTION requires an active jig',);
-            const snapshot = jigSnapshot(jig ?? {}, dto);
+            const snapshot = jigSnapshot(jig ?? { REV: '0' }, dto);
+            this.validateRevision(snapshot.REV, !!jig);
             if (dto.FORM_TYPE === 'CREATE' && !snapshot.START_USE_DATE)throw new BadRequestException('START_USE_DATE is required for CREATE',);
             if (dto.FORM_TYPE === 'INSPECTION' && !jig.NEXT_INSPEC_DATE)throw new ConflictException('Missing master inspection schedule',);
             const forms = await this.getFormStates(jigNo, manager);
@@ -368,7 +367,9 @@ export class JigRepository extends BaseRepository {
                 row.RESULT = checkpointResult(row);
             }
 
-            Object.assign(form, jigSnapshot(form, dto));
+            const snapshot = jigSnapshot(form, dto);
+            this.validateRevision(snapshot.REV, !!_jig);
+            Object.assign(form, snapshot);
             if (dto.DETAILS?.length) await manager.save(JigFormDetail, details);
             await manager.save(JigForm, form);
             await this.writeFormExtras(
@@ -466,6 +467,14 @@ export class JigRepository extends BaseRepository {
         return this.applyForm(key, updateBy, true);
     }
 
+    private validateRevision(revision: string | null, hasMaster: boolean) {
+        if (!revision?.trim()) throw new BadRequestException('REV is required');
+        if (!hasMaster && revision !== '0')
+            throw new BadRequestException('A new jig must start with REV 0');
+        if (hasMaster && ['0', '*'].includes(revision))
+            throw new BadRequestException('An existing jig requires a revised REV');
+    }
+
     // For a caller that has already handled the finish condition.
     // Kept separate from the existing HTTP finish endpoint's workflow check.
     async applyFormToMaster(key: JigFormKeyDto, updateBy?: string) {
@@ -512,9 +521,10 @@ export class JigRepository extends BaseRepository {
             const revision = String(form.REV ?? '').trim();
             if (!revision)
                 throw new ConflictException('REV is required to apply the form');
-            const isNew = revision === '*' || revision === '0';
+            const isNew = revision === '0';
             if (isNew && jig)
-                throw new ConflictException('REV * or 0 requires a new JIG_NO');
+                throw new ConflictException('REV 0 requires a new JIG_NO');
+            if (revision === '*') throw new ConflictException('REV * is not supported; a new jig starts at 0');
             if (!isNew && !jig)
                 throw new ConflictException('A revised form requires an existing jig');
             const details = await manager.findBy(JigFormDetail, formKey(key));

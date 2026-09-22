@@ -54,6 +54,7 @@ export class JigResultDto {
     @IsDefined()
     @IsInt()
     @Min(1)
+    @Max(999)
     CHECK_SEQ: number;
     @IsOptional()
     @IsNumber({ maxDecimalPlaces: 4 })

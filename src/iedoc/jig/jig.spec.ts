@@ -65,6 +65,7 @@ function fixture(period = 6) {
     const jig: any = {
         JIG_NO: 'J-001',
         JIG_NAME: 'Original jig',
+        REV: '1',
         START_USE_DATE: new Date(2025, 7, 15),
         JIG_DESC: 'Original description',
         INSPEC_PERIOD: period,
@@ -136,12 +137,52 @@ function fixture(period = 6) {
 }
 
 describe('Jig REV application', () => {
+    it.each([null, '', '   '])('rejects blank REV %p on create and save', async (REV) => {
+        for (const dto of [CreateJigFormDto, SaveJigFormDto]) {
+            const value = plainToInstance(dto as any, { ...key, FORM_TYPE: 'CREATE', REV });
+            expect((await validate(value as object)).some((e) => e.property === 'REV')).toBe(true);
+        }
+    });
+
+    it('defaults a new form to REV 0 and rejects a different initial revision', async () => {
+        const { repo, state, manager } = fixture();
+        state.master = null;
+        state.status = '1';
+        manager.findOneBy.mockResolvedValue(null);
+        jest.spyOn(repo, 'getForm').mockResolvedValue({} as any);
+        const body: any = { ...key, FORM_TYPE: 'CREATE', JIG_NAME: 'New', START_USE_DATE: '2026-02-01', INSPEC_PERIOD: 6,
+            DETAILS: [{ CHECK_SEQ: 999, CHECK_POINT: 'Visual' }] };
+        for (const REV of ['*', '1', '', null])
+            await expect(repo.createForm('NEW', { ...body, REV })).rejects.toThrow(BadRequestException);
+        expect(manager.insert).not.toHaveBeenCalled();
+        await repo.createForm('NEW', body);
+        expect(manager.insert).toHaveBeenCalledWith(JigForm, expect.objectContaining({ REV: '0' }));
+    });
+
+    it('allows checkpoint replacement and clearing while a form is pending', async () => {
+        const { repo, state, manager } = fixture();
+        state.forms = [{ ...key, FORM_STATUS: '1' }];
+        await repo.replaceCheckpoints('J-001', { CHECKPOINTS: [{ CHECK_SEQ: 999, CHECK_POINT: 'Visual' }] });
+        await repo.replaceCheckpoints('J-001', { CHECKPOINTS: [] });
+        expect(manager.delete).toHaveBeenCalledTimes(2);
+        expect(manager.query).not.toHaveBeenCalled();
+    });
+
+    it('accepts CHECK_SEQ 999 and rejects 1000 in create, save and template inputs', async () => {
+        for (const [type, field] of [[CreateJigFormDto, 'DETAILS'], [SaveJigFormDto, 'DETAILS'], [ReplaceCheckpointsDto, 'CHECKPOINTS']] as const) {
+            for (const seq of [999, 1000]) {
+                const value = plainToInstance(type as any, { ...key, FORM_TYPE: 'CREATE', [field]: [{ CHECK_SEQ: seq, CHECK_POINT: 'Visual' }] });
+                const errors = await validate(value as object);
+                expect(errors.some((e) => e.property === field)).toBe(seq === 1000);
+            }
+        }
+    });
     it('accepts numeric zero as the VARCHAR revision value', async () => {
         const dto = plainToInstance(CreateJigFormDto, { ...key, FORM_TYPE: 'CREATE', REV: 0 });
         expect(await validate(dto)).toHaveLength(0);
         expect(dto.REV).toBe('0');
     });
-    it.each(['*', '0'])('inserts REV %s from the stored snapshot', async (revision) => {
+    it.each(['0'])('inserts REV %s from the stored snapshot', async (revision) => {
         const { repo, form, state, manager } = fixture();
         state.master = null;
         state.status = '1';
@@ -181,7 +222,7 @@ describe('Jig REV application', () => {
         expect(details).toHaveLength(2);
     });
 
-    it.each(['*', '0'])('rejects a new REV %s when master already exists', async (revision) => {
+    it.each(['0'])('rejects a new REV %s when master already exists', async (revision) => {
         const { repo, form, manager } = fixture();
         form.REV = revision;
         await expect(repo.applyFormToMaster(key)).rejects.toThrow('requires a new JIG_NO');
@@ -492,7 +533,7 @@ describe('Jig form snapshots and approval', () => {
                 ds
                     .getMetadata(entity)
                     .columns.find((c) => c.propertyName === 'JIG_DESC').length,
-            ).toBe('100');
+            ).toBe('200');
         }
         expect(ds.getMetadata(JigForm).foreignKeys).toHaveLength(0);
     });
@@ -504,9 +545,9 @@ describe('Jig form snapshots and approval', () => {
             forbidNonWhitelisted: true,
         });
         for (const body of [
-            { PARTS: 'old' },
+            { JIG_DESC: 'old' },
             { ITEMNO: '12345' },
-            { JIG_DESC: 'x'.repeat(101) },
+            { JIG_DESC: 'x'.repeat(201) },
             { CHECK_DATE: '2026-01-01' },
             { OVERALL_RESULT: 'OK' },
             { JIG_NAME: null },

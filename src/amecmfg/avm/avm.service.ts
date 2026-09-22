@@ -19,6 +19,10 @@ export class AvmService {
         .getMetadata(Avm)
         .columns.map((c) => c.propertyName);
 
+    async findAll() {
+        return this.avmRepository.find();
+    }
+
     async search(dto: SearchAvmDto, queryRunner?: QueryRunner) {
         const repo = queryRunner ? queryRunner.manager : this.dataSource;
         const {

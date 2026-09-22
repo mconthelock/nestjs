@@ -12,32 +12,33 @@ export class IimService {
         ITEM: string | string[];
     }) {
         const result = await this.conn.runQuery(
-            `SELECT 
+            `
+            SELECT 
                 A.*,
-                (A.QUANTITY_YEAR * A.PRICE_ETA_AMEC) / 1000 AS AMOUNT
+                (A.NQUANTITY_YEAR * A.NPRES_PRICE_ETA_AMEC) / 1000 AS NPRES_AMOUNT
             FROM (
                 SELECT 
-                    I.FUNCTIONS,
-                    TRIM(I.IPFDV) AS JOB_ITEMNO,
-                    TRIM(I.IDESC) AS PART_NAME,
-                    TRIM(I.IDRAW) AS DRAWING,
-                    TRIM(I.IPROD) AS ITEM_CODE,
-                    TRIM(I.IGLNO) AS SPEC,
-                    TRIM(I.ISITM) AS MATERIAL_CODE,
-                    TRIM(I.IVEND) AS VENDOR_CODE,
-                    TRIM(A.VNDNAM) AS VENDOR_NAME,
-                    CASE WHEN J.QUANTITY_YEAR <= 0 THEN 1 ELSE J.QUANTITY_YEAR END QUANTITY_YEAR,
-                    CASE WHEN TRIM(I2.IMKNM1) = '' THEN NULL ELSE I2.IMKNM1 END MAKER_NAME,
-                    CASE WHEN I.FUNCTIONS = 3 THEN NULL ELSE K.K26PRC END AS BASE_PRICE,
-                    CASE WHEN I.FUNCTIONS = 3 THEN NULL ELSE K.K26CUR END AS BASE_CURR,
-                    CASE WHEN I.FUNCTIONS = 3 THEN NULL ELSE K.BASE_CURRENCY END AS BASE_CURRENCY,
-                    CASE WHEN I.FUNCTIONS = 3 THEN NULL ELSE H.HQPR1 END AS PRICE,
-                    CASE WHEN I.FUNCTIONS = 3 THEN NULL ELSE H.HQCURR END AS CURR,
-                    CASE WHEN I.FUNCTIONS = 3 THEN NULL ELSE H.CURRENCY END AS CURRENCY,
+                    I.FUNCTIONS AS NFUNCTIONS,
+                    TRIM(I.IPFDV) AS VJOB_ITEMNO,
+                    TRIM(I.IDESC) AS VPART_NAME,
+                    TRIM(I.IDRAW) AS VDRAWING,
+                    TRIM(I.IPROD) AS VITEM_CODE,
+                    TRIM(I.IGLNO) AS VSPEC,
+                    TRIM(I.ISITM) AS VMATERIAL_CODE,
+                    CASE WHEN J.QUANTITY_YEAR <= 0 THEN 1 ELSE J.QUANTITY_YEAR END NQUANTITY_YEAR,
+                    TRIM(I.IVEND) AS VPRES_VENDOR,
+                    TRIM(A.VNDNAM) AS VPRES_VENDOR_NAME,
+                    CASE WHEN TRIM(I2.IMKNM1) = '' THEN NULL ELSE I2.IMKNM1 END VPRES_MAKER,
+                    CASE WHEN I.FUNCTIONS = 3 THEN NULL ELSE K.K26PRC END AS NPRES_BASE_PRICE,
+                    CASE WHEN I.FUNCTIONS = 3 THEN NULL ELSE K.K26CUR END AS VPRES_BASE_CURR,
+                    CASE WHEN I.FUNCTIONS = 3 THEN NULL ELSE K.BASE_CURRENCY END AS NPRES_BASE_CURRENCY,
+                    CASE WHEN I.FUNCTIONS = 3 THEN NULL ELSE H.HQPR1 END AS NPRES_PRICE,
+                    CASE WHEN I.FUNCTIONS = 3 THEN NULL ELSE H.HQCURR END AS VPRES_PRICE_CURR,
+                    CASE WHEN I.FUNCTIONS = 3 THEN NULL ELSE H.CURRENCY END AS NPRES_PRICE_CURRENCY,
                     CASE WHEN I.FUNCTIONS = 1      THEN K.K26PRC * K.BASE_CURRENCY
                         WHEN I.FUNCTIONS IN (2,3) THEN H.HQPR1 
                         WHEN I.FUNCTIONS IN (4,5) THEN H.HQPR1 * H.CURRENCY 
-                    END AS PRICE_ETA_AMEC
+                    END AS NPRES_PRICE_ETA_AMEC
                 FROM (SELECT ${FUNC} AS FUNCTIONS, I.* FROM BPCSFVNEW.IIM I) I
                 LEFT JOIN BPCSFVNEW.AVM A ON A.VENDOR = I.IVEND
                 LEFT JOIN (
@@ -73,7 +74,7 @@ export class IimService {
                     ) K ON H.HQCURR = K.CURRNAME
                 ) H ON H.HQPROD = I.IPROD AND H.HQVEND = I.IVEND
             ) A
-            WHERE ITEM_CODE ${Array.isArray(ITEM) ? `IN (${ITEM.map((code) => `'${code}'`).join(',')})` : `= '${ITEM}'`}`,
+            WHERE VITEM_CODE ${Array.isArray(ITEM) ? `IN (${ITEM.map((code) => `'${code}'`).join(',')})` : `= '${ITEM}'`}`,
         );
         return result;
     }

@@ -15,6 +15,9 @@ export class CondComparisonPriceRepository extends BaseRepository {
             where: {
                 STATUS: 1,
             },
+            order: {
+                NO: 'ASC'
+            }
         });
     }
 }

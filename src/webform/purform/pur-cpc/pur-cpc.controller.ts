@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Param, Body } from '@nestjs/common';
 import { PurCpcService } from './pur-cpc.service';
-// import { IimService } from 'src/datacenter/iim/iim.service';
 import { IimService as Iim400Service } from 'src/as400/bpcsfvnew/iim/iim.service';
 import { PriceComparisonDto } from './dto/price-comparison.dto';
 
@@ -8,7 +7,6 @@ import { PriceComparisonDto } from './dto/price-comparison.dto';
 export class PurCpcController {
     constructor(
         private readonly service: PurCpcService,
-        // private readonly iimService: IimService,
         private readonly iim400Service: Iim400Service,
     ) {}
 
@@ -22,5 +20,10 @@ export class PurCpcController {
     @Post('Price-Comparison')
     async priceComparison(@Body() data: PriceComparisonDto) {
         return await this.iim400Service.priceComparison(data);
+    }
+
+    @Post()
+    async create(@Body() data: any){
+        return await this.service.create(data);
     }
 }

@@ -11,4 +11,8 @@ export class PriceComparisonDto {
     @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
     @IsArray()
     ITEM: string[];
+
+    @IsNotEmpty()
+    @IsString()
+    DB: string;
 }

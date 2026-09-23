@@ -31,7 +31,8 @@ export class OvertimeService {
             .createQueryBuilder('otform')
             .leftJoinAndSelect('otform.user', 'user')
             .leftJoinAndSelect('otform.form', 'form')
-            .leftJoinAndSelect('form.flow', 'form_flow');
+            .leftJoinAndSelect('form.flow', 'form_flow')
+            .leftJoinAndSelect('otform.actual', 'actual');
         await applyDynamicFilters(qb, q, 'otform');
         return qb.getMany();
     }

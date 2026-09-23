@@ -154,4 +154,9 @@ export class VpsController {
     getDataCartonBox() {
         return this.vpsService.getDataCartonBox();
     }
+
+    @Get('get-subcon-item')
+    getSubconItem() {
+        return this.vpsService.getSubconItem();
+    }
 }

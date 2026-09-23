@@ -351,4 +351,21 @@ export class VpsService {
         const data = await this.vpsRepository.getListByOrder(order);
         return data;
     }
+
+    async getSubconItem() {
+        const data = await this.vpsRepository.getSubconItem();
+
+        await Promise.all(
+            data.map(async (item) => {
+                const detail = await this.s011mpService.findPacking({
+                    order: item.orderno,
+                    item: item.itemno,
+                });
+
+                item.DETAIL = detail.data[0];
+            }),
+        );
+
+        return {data : data};
+    }
 }

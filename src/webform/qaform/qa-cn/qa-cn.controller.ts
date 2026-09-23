@@ -22,9 +22,13 @@ import {
     UseTransaction,
 } from 'src/common/decorator/transaction.decorator';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { ApproveQaCnDto } from './dto/approve-qa-cn.dto';
 =======
 >>>>>>> d7bc7b33 (QA-CN)
+=======
+import { ApproveQaCnDto } from './dto/approve-qa-cn.dto';
+>>>>>>> 38e4fc7c (QA-CN)
 
 @Controller('qaform/qa-cn')
 export class QaCnController {
@@ -32,10 +36,14 @@ export class QaCnController {
     private readonly path =
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/QA/CN/` as string;
 <<<<<<< HEAD
+<<<<<<< HEAD
     @Post('create')
 =======
     @Post()
 >>>>>>> d7bc7b33 (QA-CN)
+=======
+    @Post('create')
+>>>>>>> 38e4fc7c (QA-CN)
     @UseTransaction('webformConnection')
     @UseForceTransaction()
     @UseInterceptors(
@@ -69,6 +77,9 @@ export class QaCnController {
         return this.qaCnService.request(dto, files, ip, this.path);
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 38e4fc7c (QA-CN)
 
     @Patch('approve')
     @UseTransaction('webformConnection')

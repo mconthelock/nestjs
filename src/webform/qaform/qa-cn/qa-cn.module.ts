@@ -9,12 +9,17 @@ import { FormModule } from 'src/webform/form/form.module';
 import { FlowModule } from 'src/webform/flow/flow.module';
 import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { HpoModule } from 'src/as400/bpcsfvnew/hpo/hpo.module';
 import { J736kpModule } from 'src/as400/rtnlibf/j736kp/j736kp.module';
 import { R027Mp1Module } from 'src/as400/datalibo/r027mp1/r027mp1.module';
 import { MailModule } from 'src/common/services/mail/mail.module';
 =======
 >>>>>>> 093c063b (QA-CN)
+=======
+import { HpoModule } from 'src/as400/bpcsfvnew/hpo/hpo.module';
+import { J736kpModule } from 'src/as400/rtnlibf/j736kp/j736kp.module';
+>>>>>>> 38e4fc7c (QA-CN)
 
 @Module({
     controllers: [QaCnController],
@@ -31,12 +36,17 @@ import { MailModule } from 'src/common/services/mail/mail.module';
         FlowModule,
         OrgposModule,
 <<<<<<< HEAD
+<<<<<<< HEAD
         HpoModule,
         J736kpModule,
         R027Mp1Module,
         MailModule,
 =======
 >>>>>>> 093c063b (QA-CN)
+=======
+        HpoModule,
+        J736kpModule,
+>>>>>>> 38e4fc7c (QA-CN)
     ],
 })
 export class QaCnModule {}

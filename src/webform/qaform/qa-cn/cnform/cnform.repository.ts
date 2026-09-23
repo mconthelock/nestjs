@@ -51,6 +51,7 @@ export class CnFormRepository extends BaseRepository {
     async deleteAll(dto: FormDto) {
         return this.getRepository(CNFORM).delete(dto);
     }
+<<<<<<< HEAD
 
     async getFirstNo(con: FormDto): Promise<any> {
         return await this.getRepository(CNFORM)
@@ -200,4 +201,6 @@ export class CnFormRepository extends BaseRepository {
 
         return res;
     }
+=======
+>>>>>>> 38e4fc7c (QA-CN)
 }

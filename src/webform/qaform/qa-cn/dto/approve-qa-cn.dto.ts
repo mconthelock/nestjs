@@ -62,6 +62,9 @@ export class ApproveQaCnDto extends PartialType(RequestCNFormDto) {
     @IsString()
     TXTJDGOTHER2: string;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 38e4fc7c (QA-CN)
 
     @IsOptional()
     @IsString()
@@ -70,6 +73,9 @@ export class ApproveQaCnDto extends PartialType(RequestCNFormDto) {
     @IsOptional()
     @IsString()
     PIC: string;
+<<<<<<< HEAD
 =======
 >>>>>>> 093c063b (QA-CN)
+=======
+>>>>>>> 38e4fc7c (QA-CN)
 }

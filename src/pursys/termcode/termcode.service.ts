@@ -17,7 +17,7 @@ export class TermcodeService {
 
     findPayment() {
         return this.payment.find({
-            order: { STERMDESC: 'ASC' },
+            order: { TERMSEQ: 'ASC' },
         });
     }
 

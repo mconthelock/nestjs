@@ -17,4 +17,9 @@ export class LeaveController {
     findActual(@Body() dto: SearchActualLeaveDto) {
         return this.leave.findActual(dto);
     }
+
+    @Get('master')
+    findMaster() {
+        return this.leave.findMaster();
+    }
 }

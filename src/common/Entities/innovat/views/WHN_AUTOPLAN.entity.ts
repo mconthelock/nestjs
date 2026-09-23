@@ -6,10 +6,13 @@ import { ViewColumn, ViewEntity } from 'typeorm';
 })
 export class WHN_AUTOPLAN {
     @ViewColumn()
-    ITEM_NO: string;
+    ITEMNO: string;
 
     @ViewColumn()
-    ITEM_PROCESS: string;
+    PACKNO: string;
+
+    @ViewColumn()
+    PROCESS: string;
 
     @ViewColumn()
     PRODNO: string;
@@ -19,6 +22,9 @@ export class WHN_AUTOPLAN {
 
     @ViewColumn()
     P: string;
+
+    @ViewColumn()
+    SEQBM: number;
 
     @ViewColumn()
     CTRLNO: string;
@@ -33,7 +39,7 @@ export class WHN_AUTOPLAN {
     MODEL: string;
 
     @ViewColumn()
-    DWG: string;
+    DRAWING: string;
 
     @ViewColumn()
     QTY: number;
@@ -52,4 +58,10 @@ export class WHN_AUTOPLAN {
 
     @ViewColumn()
     CABLE: string;
+
+    @ViewColumn()
+    VANPLAN: string;
+
+    @ViewColumn()
+    ACTION: number;
 }

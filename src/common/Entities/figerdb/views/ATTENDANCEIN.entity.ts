@@ -25,6 +25,12 @@ export class AttendanceIn {
     Lastname: string;
 
     @ViewColumn()
+    Division: string;
+
+    @ViewColumn()
+    Department: string;
+
+    @ViewColumn()
     FunctionKeyCode: string;
 
     @ViewColumn()

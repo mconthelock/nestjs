@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { FiltersDto } from 'src/common/dto/filter.dto';
 import { WireHarnessAs400Repository } from './wire-harness-as400.repository';
 import { WireHarnessRepository } from './wire-harness.repository';
-import { GetAutoPlanDto } from './dto/get-auto-plan.dto';
 
 @Injectable()
 export class WireHarnessService {
@@ -13,19 +13,24 @@ export class WireHarnessService {
     async syncProductionPlan() {
         const rows = await this.as400.getProductionPlan();
         const data = rows.map(row => ({
-            CTRLNO: row.CTRLNO?.trim(),
-            PROCESS: row.PROCESS?.trim(),
-            PROD: row.PROD?.trim(),
-            P: row.P?.trim(),
-            MFGNO: row.MFGNO?.trim(),
-            PROJ: row.PROJ?.trim(),
-            MODEL: row.MODEL?.trim(),
-            DWG: row.DWG?.trim(),
+            CTRLNO: row.CTRLNO.trim(),
+            PROCESS: row.PROCESS.trim(),
+            PROD: row.PROD.trim(),
+            P: row.P.trim(),
+            SEQBM: Number(row.SEQBM),
+            MFGNO: row.MFGNO.trim(),
+            ITEMNO: row.ITEMNO.trim(),
+            PACKNO: row.PACKNO.trim(),
+            PROJ: row.PROJ.trim(),
+            MODEL: row.MODEL.trim(),
+            PARENT_DRAWING: row.PARENT_DRAWING.trim(),
+            UPPER_DRAWING: row.UPPER_DRAWING.trim(),
+            DRAWING: row.DRAWING.trim(),
             QTY: Number(row.QTY),
-            MATERIAL: row.MATERIAL?.trim(),
-            ITEMCODE: row.ITEMCODE?.trim(),
+            MATERIAL: row.MATERIAL.trim(),
+            ITEMCODE: row.ITEMCODE.trim(),
             CUT: Number(row.CUT),
-            REMARK: row.REMARK?.trim(),
+            REMARK: row.REMARK.trim(),
         }));
 
         await this.repo.saveProductionPlan(data);
@@ -35,19 +40,15 @@ export class WireHarnessService {
         };
     }
 
-    async autoPlan(dto: GetAutoPlanDto) {
-        return this.repo.getAutoPlan(dto);
-    }
-
-    async item() {
-        const data = await this.repo.getItem();
-        return data.map(item => ({
-            ITEM: `${item.ITEM_NO.substring(0, 3)}-${item.ITEM_NO.substring(3)}`,
-            PROCESS: item.ITEM_PROCESS,
-        }));
+    async process() {
+        return this.repo.getProcess();
     }
 
     async production() {
         return this.repo.getProduction();
+    }
+
+    async autoPlan(condition: FiltersDto) {
+        return this.repo.getAutoPlan(condition);
     }
 }

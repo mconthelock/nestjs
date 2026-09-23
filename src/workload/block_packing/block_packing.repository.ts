@@ -24,8 +24,11 @@ export class BlockPackingRepository extends BaseRepository {
     }
 
     async getTRNBarcode() {
-        return this.manager.query(
-            `SELECT * FROM TRNBarcode where Production > '2026000'`,
+        return this.datacenterDs.query(
+            `SELECT t.*,SUBSTR(S02K04,3) AS CASETYPE
+            FROM TRNBARCODE t
+            JOIN S002KP sk ON t.ORDERNO = S02K01 AND CASENO = TRIM(S02K02) AND BLOCK = SUBSTR(S02K02,3,2) 
+            WHERE PRODUCTION > '2026000'`,
         );
     }
 

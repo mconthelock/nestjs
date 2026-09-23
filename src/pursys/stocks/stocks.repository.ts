@@ -71,6 +71,8 @@ export class StocksRepository extends BaseRepository {
                     });
                     if (toBalance) {
                         toBalance.ONHAND = toBalance.ONHAND + item.QUANTITY;
+                        toBalance.UPDATE_AT = new Date();
+                        toBalance.UPDATE_BY = stock.CREATED_BY;
                         await this.getRepository(StockBalances).save(toBalance);
                     } else {
                         const newBalance: Partial<StockBalances> = {
@@ -81,7 +83,7 @@ export class StocksRepository extends BaseRepository {
                             ONHAND: item.QUANTITY,
                             ONRESERVE: 0,
                             UPDATE_AT: new Date(),
-                            UPDATE_BY: 'system',
+                            UPDATE_BY: stock.CREATED_BY,
                         };
                         await this.getRepository(StockBalances).save(
                             newBalance,

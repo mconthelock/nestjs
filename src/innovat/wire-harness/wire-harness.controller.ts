@@ -1,7 +1,7 @@
 import { Controller, HttpCode, HttpStatus, Body, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FiltersDto } from 'src/common/dto/filter.dto';
 import { WireHarnessService } from './wire-harness.service';
-import { GetAutoPlanDto } from './dto/get-auto-plan.dto';
 
 @ApiTags('Wire Harness')
 @Controller('innovat/wire-harness')
@@ -10,20 +10,12 @@ export class WireHarnessController {
         private readonly service: WireHarnessService,
     ) {}
 
-    @Post('sync-production-plan')
+    @Get('process')
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Sync production plan data from AS400 to Oracle' })
-    @ApiResponse({ status: 200, description: 'Sync production plan success' })
-    async syncProductionPlan() {
-        return this.service.syncProductionPlan();
-    }
-
-    @Get('item')
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Get item list' })
-    @ApiResponse({ status: 200, description: 'Item list' })
-    async item() {
-        return this.service.item();
+    @ApiOperation({ summary: 'Get process list' })
+    @ApiResponse({ status: 200, description: 'Process list' })
+    async process() {
+        return this.service.process();
     }
 
     @Get('production')
@@ -38,7 +30,7 @@ export class WireHarnessController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get auto production plan from AutoPlan' })
     @ApiResponse({ status: 200, description: 'Auto production plan list' })
-    async autoPlan(@Body() dto: GetAutoPlanDto) {
-        return this.service.autoPlan(dto);
+    async autoPlan(@Body() condition: FiltersDto) {
+        return this.service.autoPlan(condition);
     }
 }

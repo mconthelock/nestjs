@@ -1,6 +1,10 @@
 import { Type } from 'class-transformer';
+import { IntersectionType, PartialType, OmitType } from '@nestjs/mapped-types';
+import { PatchJigSnapshotDto } from './jig-snapshot.dto';
+import { CheckpointDto } from './checkpoint.dto';
 import {
     IsDefined,
+    IsBoolean,
     IsString,
     IsNotEmpty,
     MaxLength,
@@ -46,31 +50,11 @@ export class JigFormKeyDto {
     NRUNNO: number;
 }
 
-export class CreateJigFormDto extends JigFormKeyDto {
-    @IsDefined()
-    @IsIn(['CREATE', 'INSPECTION'])
-    FORM_TYPE: 'CREATE' | 'INSPECTION';
-    @IsOptional()
-    @Matches(/^\d{4}-(0[1-9]|1[0-2])-01$/)
-    SCHEDULE_DATE?: string;
-    @IsOptional()
-    @IsDateString({ strict: true })
-    CHECK_DATE?: string;
-    @IsOptional()
-    @IsString()
-    @MaxLength(5)
-    INSPECTOR_EMPNO?: string;
-    @IsOptional()
-    @IsString()
-    @MaxLength(10)
-    CREATE_BY?: string;
-}
-
 export class JigResultDto {
     @IsDefined()
     @IsInt()
     @Min(1)
-    @Max(20)
+    @Max(999)
     CHECK_SEQ: number;
     @IsOptional()
     @IsNumber({ maxDecimalPlaces: 4 })
@@ -86,12 +70,18 @@ export class JigNgDto {
     @IsDefined()
     @IsNotEmpty()
     @IsString()
-    @MaxLength(1000)
+    @MaxLength(500)
     DEFECT_DETAIL: string;
-    @IsOptional()
+    @IsDefined()
+    @IsNotEmpty()
     @IsString()
     @MaxLength(100)
-    ACCESS_METHOD?: string;
+    ACTION: string;
+    @IsDefined()
+    @IsNotEmpty()
+    @IsString()
+    @MaxLength(100)
+    CORRECTIVE: string;
     @IsDefined()
     @IsDateString({ strict: true })
     PLAN_DATE: string;
@@ -99,31 +89,6 @@ export class JigNgDto {
     @IsString()
     @MaxLength(200)
     LOCATION?: string;
-}
-
-export class SaveJigFormDto {
-    @IsOptional()
-    @IsDateString({ strict: true })
-    CHECK_DATE?: string;
-    @IsOptional()
-    @IsString()
-    @MaxLength(5)
-    INSPECTOR_EMPNO?: string;
-    @IsOptional()
-    @IsString()
-    @MaxLength(10)
-    UPDATE_BY?: string;
-    @IsDefined()
-    @IsArray()
-    @ArrayMaxSize(20)
-    @ArrayUnique((item) => item.CHECK_SEQ)
-    @ValidateNested({ each: true })
-    @Type(() => JigResultDto)
-    DETAILS: JigResultDto[];
-    @IsOptional()
-    @ValidateNested()
-    @Type(() => JigNgDto)
-    NG?: JigNgDto | null;
 }
 
 export class JigFileDto {
@@ -163,4 +128,86 @@ export class JigFormFileKeyDto extends JigFormKeyDto {
     @Min(1)
     @Max(999999)
     FILE_SEQ: number;
+}
+
+export class CreateJigDetailDto extends IntersectionType(
+    CheckpointDto,
+    OmitType(JigResultDto, ['CHECK_SEQ'] as const),
+) {}
+
+export class SaveJigDetailDto extends IntersectionType(
+    JigResultDto,
+    PartialType(OmitType(CheckpointDto, ['CHECK_SEQ'] as const), {
+        skipNullProperties: false,
+    }),
+) {}
+
+export class CreateJigFormDto extends IntersectionType(
+    JigFormKeyDto,
+    PatchJigSnapshotDto,
+) {
+    // Workflow approver only; not a JIG_FORM or JIG_FORM_NG column.
+    @IsOptional()
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(10)
+    PICCODE?: string;
+    @IsDefined()
+    @IsIn(['CREATE', 'INSPECTION'])
+    FORM_TYPE: 'CREATE' | 'INSPECTION';
+    @IsOptional()
+    @IsString()
+    @MaxLength(10)
+    CREATE_BY?: string;
+    @IsOptional()
+    @IsArray()
+    @ArrayUnique((item) => item.CHECK_SEQ)
+    @ValidateNested({ each: true })
+    @Type(() => CreateJigDetailDto)
+    DETAILS?: CreateJigDetailDto[];
+    @IsOptional()
+    @IsArray()
+    @ArrayUnique((item) => item.FILE_SEQ)
+    @ValidateNested({ each: true })
+    @Type(() => JigFileDto)
+    FILES?: JigFileDto[];
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => JigNgDto)
+    NG?: JigNgDto | null;
+    @IsOptional()
+    @IsArray()
+    @ArrayUnique((item) => item.CHECK_SEQ)
+    @ValidateNested({ each: true })
+    @Type(() => CheckpointDto)
+    CHECKPOINTS?: CheckpointDto[];
+}
+
+export class SaveJigFormDto extends PatchJigSnapshotDto {
+    @IsOptional()
+    @IsBoolean()
+    REPLACE_DETAILS?: boolean;
+    @IsOptional()
+    @IsBoolean()
+    REPLACE_FILES?: boolean;
+    @IsOptional()
+    @IsString()
+    @MaxLength(10)
+    UPDATE_BY?: string;
+    @IsOptional()
+    @IsArray()
+    @ArrayUnique((item) => item.CHECK_SEQ)
+    @ValidateNested({ each: true })
+    @Type(() => SaveJigDetailDto)
+    DETAILS?: SaveJigDetailDto[];
+    @IsOptional()
+    @IsArray()
+    @ArrayUnique((item) => item.FILE_SEQ)
+    @ValidateNested({ each: true })
+    @Type(() => JigFileDto)
+    FILES?: JigFileDto[];
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => JigNgDto)
+    NG?: JigNgDto | null;
 }

@@ -18,7 +18,7 @@ export class JigFormDetail {
     @PrimaryColumn({ type: 'decimal', precision: 6, scale: 0 })
     NRUNNO: number;
 
-    @PrimaryColumn({ type: 'decimal', precision: 2, scale: 0 })
+    @PrimaryColumn({ type: 'decimal', precision: 3, scale: 0 })
     CHECK_SEQ: number;
 
     @Column({ length: 200, nullable: false })
@@ -42,13 +42,7 @@ export class JigFormDetail {
     @Column({ length: 10, nullable: true })
     RESULT: string | null;
 
-    @Column({ length: 10, nullable: true })
-    UPDATE_BY: string | null;
-
-    @Column({ type: 'date', nullable: true })
-    UPDATE_DATE: Date | null;
-
-    @ManyToOne(() => JigForm)
+    @ManyToOne(() => JigForm, { createForeignKeyConstraints: false })
     @JoinColumn([
         { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
         { name: 'VORGNO', referencedColumnName: 'VORGNO' },

@@ -48,7 +48,7 @@ export class OracleRepository {
     /**
      * Execute Oracle procedure with REF CURSOR
      */
-    protected async execCursor(
+    public async execCursor(
         procName: string,
         params: Record<string, any>,
         bindOrder: string[]
@@ -90,7 +90,7 @@ export class OracleRepository {
     /**
      * Execute Oracle procedure (no cursor)
      */
-    protected async execProcedure(
+    public async execProcedure(
         procName: string,
         params: Record<string, any>,
         bindOrder: string[]

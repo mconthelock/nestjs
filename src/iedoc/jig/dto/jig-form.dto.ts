@@ -146,6 +146,12 @@ export class CreateJigFormDto extends IntersectionType(
     JigFormKeyDto,
     PatchJigSnapshotDto,
 ) {
+    // Workflow approver only; not a JIG_FORM or JIG_FORM_NG column.
+    @IsOptional()
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(10)
+    PICCODE?: string;
     @IsDefined()
     @IsIn(['CREATE', 'INSPECTION'])
     FORM_TYPE: 'CREATE' | 'INSPECTION';

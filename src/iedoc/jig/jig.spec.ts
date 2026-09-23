@@ -258,6 +258,66 @@ describe('Jig REV application', () => {
     });
 });
 
+describe('Jig create workflow routing', () => {
+    function setup() {
+        const f = fixture();
+        f.state.master = null;
+        f.state.status = '1';
+        f.manager.findOneBy.mockResolvedValue(null);
+        jest.spyOn(f.repo, 'getForm').mockResolvedValue({} as any);
+        const body: any = { ...key, FORM_TYPE: 'CREATE', JIG_NAME: 'New', INSPEC_PERIOD: 6,
+            START_USE_DATE: '2026-02-01', DETAILS: [{ CHECK_SEQ: 1, CHECK_POINT: 'Visual', RESULT: 'OK' }] };
+        return { ...f, body };
+    }
+
+    it('sets both step 07 approvers using the full key including NRUNNO', async () => {
+        const { repo, manager, body } = setup();
+        body.DETAILS[0].RESULT = 'NG';
+        body.PICCODE = '14077';
+        await repo.createForm('NEW', body);
+        expect(manager.query).toHaveBeenCalledWith(
+            "UPDATE WEBFORM.FLOW SET VAPVNO = :1, VREPNO = :2 WHERE NFRMNO = :3 AND VORGNO = :4 AND CYEAR = :5 AND CYEAR2 = :6 AND NRUNNO = :7 AND CSTEPNO = '07'",
+            ['14077', '14077', 1, '000001', '26', '2026', 1],
+        );
+        expect(manager.query.mock.calls.some(([sql]) => sql.startsWith('DELETE FROM WEBFORM.FLOW'))).toBe(false);
+        expect(manager.insert.mock.calls[0][1]).not.toHaveProperty('PICCODE');
+    });
+
+    it('deletes 07 and redirects 06 to 04 when there is no NG', async () => {
+        const { repo, manager, body } = setup();
+        await repo.createForm('NEW', body);
+        const calls = manager.query.mock.calls.filter(([sql]) => sql.includes('WEBFORM.FLOW'));
+        expect(calls).toEqual([
+            ["DELETE FROM WEBFORM.FLOW WHERE NFRMNO = :1 AND VORGNO = :2 AND CYEAR = :3 AND CYEAR2 = :4 AND NRUNNO = :5 AND CSTEPNO = '07'", [1, '000001', '26', '2026', 1]],
+            ["UPDATE WEBFORM.FLOW SET CSTEPNEXTNO = '04' WHERE NFRMNO = :1 AND VORGNO = :2 AND CYEAR = :3 AND CYEAR2 = :4 AND NRUNNO = :5 AND CSTEPNO = '06'", [1, '000001', '26', '2026', 1]],
+        ]);
+    });
+
+    it('rejects NG without PICCODE before any insert', async () => {
+        const { repo, manager, body } = setup();
+        body.DETAILS[0].RESULT = 'NG';
+        await expect(repo.createForm('NEW', body)).rejects.toThrow('PICCODE is required');
+        expect(manager.insert).not.toHaveBeenCalled();
+    });
+
+    it('does not complete the transaction when FLOW update fails', async () => {
+        const { manager, body } = setup();
+        const original = manager.query.getMockImplementation();
+        manager.query.mockImplementation((sql, params) => {
+            if (sql.startsWith('UPDATE WEBFORM.FLOW')) throw new Error('FLOW failed');
+            return original(sql, params);
+        });
+        let committed = false;
+        const repo = new JigRepository({ manager, transaction: async (callback) => {
+            const result = await callback(manager);
+            committed = true;
+            return result;
+        } } as any);
+        await expect(repo.createForm('NEW', body)).rejects.toThrow('FLOW failed');
+        expect(committed).toBe(false);
+    });
+});
+
 describe('Jig dictionary and validation', () => {
     it('maps reference columns and lookup primary keys with the supplied Oracle sizes', async () => {
         const ds = new DataSource({
@@ -545,7 +605,7 @@ describe('Jig form snapshots and approval', () => {
             forbidNonWhitelisted: true,
         });
         for (const body of [
-            { JIG_DESC: 'old' },
+            { PARTS: 'old' },
             { ITEMNO: '12345' },
             { JIG_DESC: 'x'.repeat(201) },
             { CHECK_DATE: '2026-01-01' },
@@ -800,6 +860,7 @@ describe('Jig form snapshots and approval', () => {
 describe('Jig complete form transactions', () => {
     const payload: CreateJigFormDto = {
         ...key,
+        PICCODE: '14077',
         FORM_TYPE: 'CREATE',
         JIG_NAME: 'New jig',
         INSPEC_PERIOD: 6,

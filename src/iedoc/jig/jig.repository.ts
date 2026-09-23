@@ -7,6 +7,7 @@ import {
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, EntityManager, getMetadataArgsStorage } from 'typeorm';
 import { AMECUSERALL } from 'src/common/Entities/amec/views/AMECUSERALL.entity';
+import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { JigMaster } from 'src/common/Entities/iedoc/table/jig_master.entity';
 import { JigCheckpoint } from 'src/common/Entities/iedoc/table/jig_checkpoint.entity';
@@ -180,9 +181,9 @@ export class JigRepository extends BaseRepository {
                     const currentYear = new Intl.DateTimeFormat('en-US', {
                         timeZone: 'Asia/Bangkok', year: '2-digit',
                     }).format(new Date());
-                    const prefix = 'JIG' + currentYear + '-';
+                    const prefix = 'J' + currentYear + '-';
                     const values = await manager.query(
-                        "SELECT NVL(MAX(TO_NUMBER(SUBSTR(JIG_NO, 7))), 0) AS LAST_NO FROM (SELECT JIG_NO FROM JIG_MASTER UNION ALL SELECT JIG_NO FROM JIG_FORM) WHERE REGEXP_LIKE(JIG_NO, :1)",
+                        "SELECT NVL(MAX(TO_NUMBER(SUBSTR(JIG_NO, 5))), 0) AS LAST_NO FROM (SELECT JIG_NO FROM JIG_MASTER UNION ALL SELECT JIG_NO FROM JIG_FORM) WHERE REGEXP_LIKE(JIG_NO, :1)",
                         ['^' + prefix + '[0-9]{3}$'],
                     );
                     const next = Number(values[0].LAST_NO) + 1;
@@ -207,14 +208,10 @@ export class JigRepository extends BaseRepository {
             // The master has only a two-column reference. Never allow an ambiguous
             // pair, even if the remaining WEBFORM key columns differ.
             if (forms.some((f) => compareReference(f, key) >= 0))
-                throw new ConflictException(
-                    'Use a newer CYEAR2/NRUNNO pair for this jig',
-                );
+                throw new ConflictException('Use a newer CYEAR2/NRUNNO pair for this jig',);
             const reference = masterReference(jig);
             if (reference && compareReference(key, reference) <= 0)
-                throw new ConflictException(
-                    'The new form must follow the applied master reference',
-                );
+                throw new ConflictException('The new form must follow the applied master reference',);
             if (
                 forms.some(
                     (f) =>
@@ -225,22 +222,16 @@ export class JigRepository extends BaseRepository {
                             compareReference(f, reference) > 0),
                 )
             )
-                throw new ConflictException(
-                    'Finish or reject the previous form before opening another round',
-                );
+                throw new ConflictException('Finish or reject the previous form before opening another round',);
             if (dto.DETAILS != null && dto.CHECKPOINTS != null)
-                throw new BadRequestException(
-                    'Send DETAILS or CHECKPOINTS, not both',
-                );
-            const points: CreateJigDetailDto[] =
-                dto.DETAILS ??
-                dto.CHECKPOINTS ??
-                (jig ? await this.getCheckpoints(jigNo, manager) : []);
+                throw new BadRequestException('Send DETAILS or CHECKPOINTS, not both',);
+            const points: CreateJigDetailDto[] = dto.DETAILS ?? dto.CHECKPOINTS ?? (jig ? await this.getCheckpoints(jigNo, manager) : []);
             if (!points.length)
-                throw new BadRequestException(
-                    'Nonempty DETAILS (or CHECKPOINTS) are required for a new jig',
-                );
+                throw new BadRequestException('Nonempty DETAILS (or CHECKPOINTS) are required for a new jig',);
             points.forEach(validateRange);
+            const hasNg = dto.NG != null || points.some((p) => checkpointResult(p) === 'NG');
+            if (hasNg && !dto.PICCODE?.trim())
+                throw new BadRequestException('PICCODE is required when the form has NG');
             const form = manager.create(JigForm, {
                 ...key,
                 ...snapshot,
@@ -270,8 +261,28 @@ export class JigRepository extends BaseRepository {
                 dto.CREATE_BY,
                 true,
             );
+            await this.configureCreateFlow(manager, key, hasNg, dto.PICCODE);
             return this.getForm(key, manager);
         });
+    }
+
+    private async configureCreateFlow(manager: EntityManager, key: JigFormKeyDto, hasNg: boolean, picCode?: string) {
+        // Resolve the existing entity without registering WEBFORM's relation graph
+        // in IEDOC. All writes use the same connection and create transaction.
+        const table = getMetadataArgsStorage().tables.find((t) => t.target === FLOW)!;
+        const path = [table.schema, table.name].filter(Boolean).join('.');
+        const where = FORM_KEYS.map((k, i) => k + ' = :' + (i + 1)).join(' AND ');
+        const params = FORM_KEYS.map((k) => key[k]);
+        if (hasNg) {
+            const updateWhere = FORM_KEYS.map((k, i) => k + ' = :' + (i + 3)).join(' AND ');
+            await manager.query(
+                `UPDATE ${path} SET VAPVNO = :1, VREPNO = :2 WHERE ${updateWhere} AND CSTEPNO = '07'`,
+                [picCode.trim(), picCode.trim(), ...params],
+            );
+        } else {
+            await manager.query(`DELETE FROM ${path} WHERE ${where} AND CSTEPNO = '07'`, params);
+            await manager.query(`UPDATE ${path} SET CSTEPNEXTNO = '04' WHERE ${where} AND CSTEPNO = '06'`, params);
+        }
     }
 
     async getForm(key: JigFormKeyDto, manager = this.manager) {

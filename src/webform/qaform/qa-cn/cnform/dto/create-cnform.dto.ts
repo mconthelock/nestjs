@@ -60,18 +60,18 @@ export class CreateCnformDto extends PickType(FormDto, [
     AFTCHANGE?: string;
 
     @IsOptional()
-    @IsDate()
     @Type(() => Date)
+    @IsDate()
     SUBMITDATE?: Date;
 
     @IsOptional()
-    @IsDate()
     @Type(() => Date)
+    @IsDate()
     INSPECDATE?: Date;
 
     @IsOptional()
-    @IsDate()
     @Type(() => Date)
+    @IsDate()
     EXPCHGDATE?: Date;
 
     @IsOptional()

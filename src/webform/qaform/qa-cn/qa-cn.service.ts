@@ -11,7 +11,12 @@ import { OrgposRepository } from 'src/webform/orgpos/orgpos.repository';
 import { CnFormRepository } from './cnform/cnform.repository';
 import { ResultChkDwgRepository } from './resultchkdwg/resultchkdwg.repository';
 import { AttcnfrmService } from './attcnfrm/attcnfrm.service';
+import { AttCnFrmRepository } from './attcnfrm/attcnfrm.repository';
 import { HpoService } from 'src/as400/bpcsfvnew/hpo/hpo.service';
+import { J736kpService } from 'src/as400/rtnlibf/j736kp/j736kp.service';
+import { now } from 'src/common/utils/dayjs.utils';
+import { deleteFile, joinPaths } from 'src/common/utils/files.utils';
+import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 
 @Injectable()
 export class QaCnService {
@@ -22,7 +27,10 @@ export class QaCnService {
         private readonly repoCnform: CnFormRepository,
         private readonly repoDwg: ResultChkDwgRepository,
         private readonly attcnfrmService: AttcnfrmService,
+        private readonly attcnfrmrepo: AttCnFrmRepository,
         private readonly hpoService: HpoService,
+        private readonly j736kpService: J736kpService,
+        private readonly doactionService: DoactionFlowService,
     ) {}
 
     async request(
@@ -265,6 +273,10 @@ export class QaCnService {
                     });
                 }
             }
+            return {
+                status: true,
+                message: 'Request QA-CN Form successful',
+            };
         } catch (error) {
             throw new Error('Request QA-CN Form Error: ' + error.message);
         }
@@ -285,6 +297,16 @@ export class QaCnService {
         path: string,
     ) {
         let condition = {};
+        const fileMappings = [
+            { key: 'DWGFILE[]', TYPENO: 0 },
+            { key: 'MATFILE[]', TYPENO: 1 },
+            { key: 'MAKFILE[]', TYPENO: 2 },
+            { key: 'ROHFILE[]', TYPENO: 3 },
+            { key: 'PURFILE[]', TYPENO: 4 },
+            { key: 'CHKFILE[]', TYPENO: 6 },
+            { key: 'JUDFILE[]', TYPENO: 7 },
+            { key: 'SUBFILE[]', TYPENO: 8 },
+        ];
         try {
             const {
                 APVNO,
@@ -378,6 +400,28 @@ export class QaCnService {
                     );
                     await this.repoDwg.deleteByAll(currentForm);
                     await this.repoDwg.insertMultiple(dwgToInsert);
+                    for (const mapping of fileMappings) {
+                        const currentFiles = files[mapping.key];
+                        if (currentFiles && currentFiles.length > 0) {
+                            await this.attcnfrmService.moveAndInsertFiles({
+                                files: currentFiles,
+                                form: currentForm,
+                                path: path,
+                                folder:
+                                    currentForm.NFRMNO +
+                                    '_' +
+                                    currentForm.VORGNO +
+                                    '_' +
+                                    currentForm.CYEAR +
+                                    '_' +
+                                    currentForm.CYEAR2 +
+                                    '_' +
+                                    currentForm.NRUNNO,
+                                typeno: mapping.TYPENO,
+                                requestedBy: APVNO, // เปลี่ยนเป็นตัวแปรที่เก็บผู้ขอ/ผู้อัปโหลดใน dto ของคุณ
+                            });
+                        }
+                    }
                 }
                 if (CEXTDATA == 8 && cndata.CLSNO == 2) {
                     if (cndata.INVNO && cndata.INVNO.length >= 8) {
@@ -400,8 +444,164 @@ export class QaCnService {
                             );
                         }
                     }
+                } else if (CEXTDATA == 7) {
+                    const formno =
+                        await this.formCreateService.getFormno(currentForm);
+                    await this.j736kpService.updateByFormno(formno);
                 }
+                await this.doactionService.doAction(
+                    {
+                        ...currentForm,
+                        ACTION: 'approve',
+                        EMPNO: APVNO,
+                        REMARK: REMARK,
+                    },
+                    ip,
+                );
+            } else if (ACTION == 'reject') {
+                if (CEXTDATA == 7) {
+                    const formno =
+                        await this.formCreateService.getFormno(currentForm);
+                    await this.j736kpService.updateByFormno(formno);
+                }
+                if (CEXTDATA > 1 && CEXTDATA != 5) {
+                    const updatedata = {
+                        CSTEPST: '6',
+                        CAPVSTNO: '2',
+                    };
+                    await Promise.all([
+                        // เงื่อนไขที่ 1
+                        this.flowService
+                            .updateFlow({
+                                condition: { ...currentForm, VAPVNO: APVNO },
+                                ...updatedata, // ข้อมูลที่ต้องการอัปเดต
+                            })
+                            .catch((err) => {}), // .catch ใส่ไว้กันเหนียว กรณีที่ Database มีปัญหาจริงๆ จะได้ไม่พัง
+
+                        // เงื่อนไขที่ 2
+                        this.flowService
+                            .updateFlow({
+                                condition: { ...currentForm, VREPNO: APVNO },
+                                ...updatedata,
+                            })
+                            .catch((err) => {}),
+                    ]);
+                }
+                await this.doactionService.doAction(
+                    {
+                        ...currentForm,
+                        ACTION: 'reject',
+                        EMPNO: APVNO,
+                        REMARK: REMARK,
+                    },
+                    ip,
+                );
+                // if (CEXTDATA == 4) {
+                //     const res = await this;
+                // }
+            } else if (ACTION == 'sendApv') {
+                await this.repoCnform.update({ ...currentForm }, { ...cndata });
+                await this.repoDwg.deleteByAll(currentForm);
+                await this.repoDwg.insertMultiple(dwgToInsert);
+                for (const mapping of fileMappings) {
+                    const currentFiles = files[mapping.key];
+                    if (currentFiles && currentFiles.length > 0) {
+                        await this.attcnfrmService.moveAndInsertFiles({
+                            files: currentFiles,
+                            form: currentForm,
+                            path: path,
+                            folder:
+                                currentForm.NFRMNO +
+                                '_' +
+                                currentForm.VORGNO +
+                                '_' +
+                                currentForm.CYEAR +
+                                '_' +
+                                currentForm.CYEAR2 +
+                                '_' +
+                                currentForm.NRUNNO,
+                            typeno: mapping.TYPENO,
+                            requestedBy: APVNO, // เปลี่ยนเป็นตัวแปรที่เก็บผู้ขอ/ผู้อัปโหลดใน dto ของคุณ
+                        });
+                    }
+                }
+                if (STEPREADY != '--') {
+                    await this.flowService.updateFlow({
+                        condition: { ...currentForm, CSTEPNO: '--' },
+                        DAPVDATE: new Date(),
+                        CAPVTIME: now('HH:mm:ss'),
+                    });
+                }
+                await this.formCreateService.updateForm({
+                    condition: { ...currentForm },
+                    CST: '1',
+                });
+            } else if (ACTION == 'saveData') {
+                await this.repoCnform.update({ ...currentForm }, { ...cndata });
+                await this.repoDwg.deleteByAll(currentForm);
+                await this.repoDwg.insertMultiple(dwgToInsert);
+                for (const mapping of fileMappings) {
+                    const currentFiles = files[mapping.key];
+                    if (currentFiles && currentFiles.length > 0) {
+                        await this.attcnfrmService.moveAndInsertFiles({
+                            files: currentFiles,
+                            form: currentForm,
+                            path: path,
+                            folder:
+                                currentForm.NFRMNO +
+                                '_' +
+                                currentForm.VORGNO +
+                                '_' +
+                                currentForm.CYEAR +
+                                '_' +
+                                currentForm.CYEAR2 +
+                                '_' +
+                                currentForm.NRUNNO,
+                            typeno: mapping.TYPENO,
+                            requestedBy: APVNO, // เปลี่ยนเป็นตัวแปรที่เก็บผู้ขอ/ผู้อัปโหลดใน dto ของคุณ
+                        });
+                    }
+                }
+            } else if (ACTION == 'deleteApv') {
+                const resfile =
+                    await this.attcnfrmrepo.getQaFileAll(currentForm);
+                for (const f of resfile) {
+                    const destination = await joinPaths(
+                        path +
+                            currentForm.NFRMNO +
+                            '_' +
+                            currentForm.VORGNO +
+                            '_' +
+                            currentForm.CYEAR +
+                            '_' +
+                            currentForm.CYEAR2 +
+                            '_' +
+                            currentForm.NRUNNO,
+                        f.SFILE,
+                    );
+                    await deleteFile(destination);
+                }
+                await this.repoDwg.deleteByAll(currentForm);
+                await this.attcnfrmrepo.deleteAll(currentForm);
+                await this.repoCnform.deleteAll(currentForm);
+                await this.formCreateService.deleteFlowAndForm({
+                    condition: currentForm,
+                });
+            } else if (ACTION == 'change') {
+                await this.flowService.updateFlow({
+                    condition: { ...currentForm, CEXTDATA: In(['03', '06']) },
+                    VAPVNO: cndata.FOREMAN,
+                });
+            } else if (ACTION == 'changepic') {
+                await this.flowService.updateFlow({
+                    condition: { ...currentForm, CEXTDATA: CEXTDATA },
+                    VAPVNO: cndata.PIC,
+                });
             }
+            return {
+                status: true,
+                message: 'Approve QA-CN Form successful',
+            };
         } catch (error) {
             throw new Error('Approve QA-CN Form Error: ' + error.message);
         }

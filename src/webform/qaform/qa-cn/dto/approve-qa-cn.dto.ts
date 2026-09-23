@@ -53,4 +53,12 @@ export class ApproveQaCnDto extends PartialType(RequestCNFormDto) {
     @IsOptional()
     @IsString()
     TXTJDGOTHER2: string;
+
+    @IsOptional()
+    @IsString()
+    FOREMAN: string;
+
+    @IsOptional()
+    @IsString()
+    PIC: string;
 }

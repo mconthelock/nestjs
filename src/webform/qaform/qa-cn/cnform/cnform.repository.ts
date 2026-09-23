@@ -36,4 +36,8 @@ export class CnFormRepository extends BaseRepository {
         const result = await this.getRepository(CNFORM).update(con, dto);
         return (result.affected ?? 0) > 0;
     }
+
+    async deleteAll(dto: FormDto) {
+        return this.getRepository(CNFORM).delete(dto);
+    }
 }

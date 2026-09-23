@@ -77,18 +77,18 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
     AFTCHANGE?: string;
 
     @IsOptional()
-    @IsDate()
     @Type(() => Date)
+    @IsDate()
     SUBMITDATE?: Date;
 
     @IsOptional()
-    @IsDate()
     @Type(() => Date)
+    @IsDate()
     INSPECDATE?: Date;
 
     @IsOptional()
-    @IsDate()
     @Type(() => Date)
+    @IsDate()
     EXPCHGDATE?: Date;
 
     @IsOptional()

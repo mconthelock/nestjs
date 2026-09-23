@@ -28,6 +28,22 @@ export class AttCnFrmRepository extends BaseRepository {
         });
     }
 
+    async getQaFileAll(dto: SearchAttCNFileDto) {
+        return this.getRepository(ATTCNFRM).find({
+            where: {
+                NFRMNO: dto.NFRMNO,
+                VORGNO: dto.VORGNO,
+                CYEAR: dto.CYEAR,
+                CYEAR2: dto.CYEAR2,
+                NRUNNO: dto.NRUNNO,
+                TYPENO: dto.TYPENO,
+            },
+            order: {
+                ITEMNO: 'ASC',
+            },
+        });
+    }
+
     async getNextSeq(dto: SearchAttCNFileDto) {
         return this.getRepository(ATTCNFRM).find({
             where: dto,
@@ -42,7 +58,7 @@ export class AttCnFrmRepository extends BaseRepository {
         return this.getRepository(ATTCNFRM).insert(dto);
     }
 
-    async delete(dto: SearchAttCNFileDto) {
+    async deleteAll(dto: SearchAttCNFileDto) {
         return this.getRepository(ATTCNFRM).delete(dto);
     }
 }

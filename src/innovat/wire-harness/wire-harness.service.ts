@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { WireHarnessAs400Repository } from './wire-harness-as400.repository';
 import { WireHarnessRepository } from './wire-harness.repository';
+import { CreateDrumDto } from './dto/create-drum.dto';
 
 @Injectable()
 export class WireHarnessService {
@@ -50,5 +51,13 @@ export class WireHarnessService {
 
     async autoPlan(condition: FiltersDto) {
         return this.repo.getAutoPlan(condition);
+    }
+
+    async drumStock(condition: FiltersDto) {
+        return this.repo.getDrumStock(condition);
+    }
+
+    async createDrum(dto: CreateDrumDto) {
+        return this.repo.createDrum(dto);
     }
 }

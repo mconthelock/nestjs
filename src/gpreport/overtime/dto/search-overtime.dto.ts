@@ -17,19 +17,10 @@ export class FormDto extends PartialType(CreateFormDto) {
     @IsDate()
     END_DREQDATE?: Date;
 }
+
 export class UsersDto extends PartialType(searchDto) {}
 
-export class SearchOvertimeDto extends PartialType(CreateOvertimeDto) {
-    @IsOptional()
-    @ValidateNested()
-    @Type(() => FormDto)
-    form?: FormDto;
-
-    @IsOptional()
-    @ValidateNested()
-    @Type(() => UsersDto)
-    user?: UsersDto;
-
+export class OTFormDto extends PartialType(CreateOvertimeDto) {
     @Type(() => Date)
     @IsOptional()
     @IsDate()
@@ -39,4 +30,21 @@ export class SearchOvertimeDto extends PartialType(CreateOvertimeDto) {
     @IsOptional()
     @IsDate()
     END_WORKDATE?: Date;
+}
+
+export class SearchOvertimeDto {
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => OTFormDto)
+    otform?: OTFormDto;
+
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => FormDto)
+    form?: FormDto;
+
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => UsersDto)
+    user?: UsersDto;
 }

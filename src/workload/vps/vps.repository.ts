@@ -713,4 +713,20 @@ export class VpsRepository extends BaseRepository {
             .where('SC_STATUS = 1')
             .getRawMany();
     }
+
+    async getListByOrder(order: string) {
+        return this.wk
+            .createQueryBuilder()
+            .select('*')
+            .from('S010MP', 's')
+            .where('S01M01 LIKE :order', { order: `%${order}%` })
+            .getRawMany();
+    }
+
+    async getSubconItem() {
+        return this.packingDs.query(`
+            SELECT si.*,p.partname,p.projectno FROM SubconItem si 
+            JOIN packorddtl p ON si.orderno = p.orderno and si.itemno = p.packno 
+            where printsta = '0' and updatedte > '2026-01-01'`);
+    }
 }

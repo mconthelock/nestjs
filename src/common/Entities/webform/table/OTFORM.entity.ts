@@ -26,6 +26,7 @@ import {
 } from 'typeorm';
 import { FORM } from './FORM.entity';
 import { User } from '../../webform/views/AMECUSERALL.entity';
+import { LR200P } from '../../gpreport/views/LR200P.entity';
 
 @Entity({ name: 'OTFORM', schema: 'WEBFORM' })
 export class OTFORM {
@@ -93,4 +94,11 @@ export class OTFORM {
     @ManyToOne(() => User, (user) => user.SEMPNO)
     @JoinColumn({ name: 'EMPNO', referencedColumnName: 'SEMPNO' })
     user: User;
+
+    @OneToOne(() => LR200P)
+    @JoinColumn([
+        { name: 'EMPNO', referencedColumnName: 'LR203' },
+        { name: 'WORKDATE_STR', referencedColumnName: 'LR209' },
+    ])
+    actual: LR200P;
 }

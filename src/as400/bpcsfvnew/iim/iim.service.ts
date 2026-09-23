@@ -82,19 +82,19 @@ export class IimService {
     async findPlannerCompareSheet(planner: string | string[]) {
         const result = await this.conn.runQuery(`
                 SELECT 
-                    I.IBUYC AS IBUYC,
-                    TRIM(I.IPROD) AS IPROD,
-                    TRIM(I.IDRAW) AS IDRAW,
-                    TRIM(I.IDESC) AS IDESC,
-                    TRIM(I.IGLNO) AS IGLNO,
-                    TRIM(I.ISITM) AS ISITM,
-                    I.IVEND,
-                    A.VNDNAM
+                    I.IBUYC AS VPLANNER_CODE,
+                    TRIM(I.IPROD) AS VITEM_CODE,
+                    TRIM(I.IDRAW) AS VDRAWING,
+                    TRIM(I.IDESC) AS VPART_NAME,
+                    TRIM(I.IGLNO) AS VSPEC,
+                    TRIM(I.ISITM) AS VMATERIAL_CODE,
+                    I.IVEND AS VPRES_VENDOR,
+                    A.VNDNAM AS VPRES_VENDOR_NAME
                 FROM BPCSFVNEW.IIM I
                 LEFT JOIN BPCSFVNEW.AVM A ON A.VENDOR = I.IVEND 
                 WHERE I.IITYP IN ('1','3')
                 AND IID = 'IM'
-                AND IBUYC ${Array.isArray(planner) ? `IN (${planner.map((code) => `'${code}'`).join(',')})` : `= '${planner}'`}
+                AND I.IBUYC ${Array.isArray(planner) ? `IN (${planner.map((code) => `'${code}'`).join(',')})` : `= '${planner}'`}
                 ORDER BY I.IBUYC, I.IPROD, I.IDRAW, I.IVEND
             `);
         return result;

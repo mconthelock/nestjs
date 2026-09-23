@@ -47,7 +47,7 @@ export class JigForm {
     @Column({ type: 'varchar2', length: 4, nullable: true })
     ITEMNO: string | null;
 
-    @Column({ type: 'varchar2', length: 100, nullable: true })
+    @Column({ type: 'varchar2', length: 200, nullable: true })
     JIG_DESC: string | null;
 
     @Column({ type: 'varchar2', length: 50, nullable: true })

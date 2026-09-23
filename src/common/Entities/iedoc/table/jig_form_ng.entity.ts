@@ -18,29 +18,20 @@ export class JigFormNg {
     @PrimaryColumn({ type: 'decimal', precision: 6, scale: 0 })
     NRUNNO: number;
 
-    @Column({ length: 1000, nullable: false })
+    @Column({ type: 'varchar2', length: 500, nullable: false })
     DEFECT_DETAIL: string;
 
-    @Column({ length: 100, nullable: true })
-    ACCESS_METHOD: string | null;
+    @Column({ type: 'varchar2', length: 100, nullable: false })
+    ACTION: string;
+
+    @Column({ type: 'varchar2', length: 100, nullable: false })
+    CORRECTIVE: string;
 
     @Column({ type: 'date', nullable: false })
     PLAN_DATE: Date;
 
     @Column({ length: 200, nullable: true })
     LOCATION: string | null;
-
-    @Column({ length: 10, nullable: true })
-    CREATE_BY: string | null;
-
-    @Column({ type: 'date', nullable: false, default: () => 'SYSDATE' })
-    CREATE_DATE: Date;
-
-    @Column({ length: 10, nullable: true })
-    UPDATE_BY: string | null;
-
-    @Column({ type: 'date', nullable: true })
-    UPDATE_DATE: Date | null;
 
     @ManyToOne(() => JigForm)
     @JoinColumn([

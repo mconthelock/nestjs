@@ -104,10 +104,7 @@ export class JigService {
     }
 
     createJig(dto: CreateJigRequestDto) {
-        if (dto.FORM_TYPE !== 'CREATE')
-            throw new BadRequestException(
-                'New jig registration requires FORM_TYPE CREATE',
-            );
+        if (dto.FORM_TYPE !== 'CREATE')throw new BadRequestException('New jig registration requires FORM_TYPE CREATE',);
         return this.jigRepository.createForm(dto.JIG_NO, dto);
     }
 
@@ -146,5 +143,9 @@ export class JigService {
     }
     finishForm(key: JigFormKeyDto, dto: FinishInspectionDto) {
         return this.jigRepository.finishForm(key, dto.UPDATE_BY);
+    }
+
+    applyFormToMaster(key: JigFormKeyDto, dto: FinishInspectionDto) {
+        return this.jigRepository.applyFormToMaster(key, dto.UPDATE_BY);
     }
 }

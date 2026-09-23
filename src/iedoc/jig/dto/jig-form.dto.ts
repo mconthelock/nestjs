@@ -4,6 +4,7 @@ import { PatchJigSnapshotDto } from './jig-snapshot.dto';
 import { CheckpointDto } from './checkpoint.dto';
 import {
     IsDefined,
+    IsBoolean,
     IsString,
     IsNotEmpty,
     MaxLength,
@@ -53,7 +54,7 @@ export class JigResultDto {
     @IsDefined()
     @IsInt()
     @Min(1)
-    @Max(20)
+    @Max(999)
     CHECK_SEQ: number;
     @IsOptional()
     @IsNumber({ maxDecimalPlaces: 4 })
@@ -69,12 +70,18 @@ export class JigNgDto {
     @IsDefined()
     @IsNotEmpty()
     @IsString()
-    @MaxLength(1000)
+    @MaxLength(500)
     DEFECT_DETAIL: string;
-    @IsOptional()
+    @IsDefined()
+    @IsNotEmpty()
     @IsString()
     @MaxLength(100)
-    ACCESS_METHOD?: string;
+    ACTION: string;
+    @IsDefined()
+    @IsNotEmpty()
+    @IsString()
+    @MaxLength(100)
+    CORRECTIVE: string;
     @IsDefined()
     @IsDateString({ strict: true })
     PLAN_DATE: string;
@@ -139,6 +146,12 @@ export class CreateJigFormDto extends IntersectionType(
     JigFormKeyDto,
     PatchJigSnapshotDto,
 ) {
+    // Workflow approver only; not a JIG_FORM or JIG_FORM_NG column.
+    @IsOptional()
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(10)
+    PICCODE?: string;
     @IsDefined()
     @IsIn(['CREATE', 'INSPECTION'])
     FORM_TYPE: 'CREATE' | 'INSPECTION';
@@ -148,7 +161,6 @@ export class CreateJigFormDto extends IntersectionType(
     CREATE_BY?: string;
     @IsOptional()
     @IsArray()
-    @ArrayMaxSize(20)
     @ArrayUnique((item) => item.CHECK_SEQ)
     @ValidateNested({ each: true })
     @Type(() => CreateJigDetailDto)
@@ -165,7 +177,6 @@ export class CreateJigFormDto extends IntersectionType(
     NG?: JigNgDto | null;
     @IsOptional()
     @IsArray()
-    @ArrayMaxSize(20)
     @ArrayUnique((item) => item.CHECK_SEQ)
     @ValidateNested({ each: true })
     @Type(() => CheckpointDto)
@@ -174,12 +185,17 @@ export class CreateJigFormDto extends IntersectionType(
 
 export class SaveJigFormDto extends PatchJigSnapshotDto {
     @IsOptional()
+    @IsBoolean()
+    REPLACE_DETAILS?: boolean;
+    @IsOptional()
+    @IsBoolean()
+    REPLACE_FILES?: boolean;
+    @IsOptional()
     @IsString()
     @MaxLength(10)
     UPDATE_BY?: string;
     @IsOptional()
     @IsArray()
-    @ArrayMaxSize(20)
     @ArrayUnique((item) => item.CHECK_SEQ)
     @ValidateNested({ each: true })
     @Type(() => SaveJigDetailDto)

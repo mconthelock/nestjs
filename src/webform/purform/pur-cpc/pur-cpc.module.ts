@@ -1,18 +1,25 @@
 import { Module } from '@nestjs/common';
-import { PurCpcService } from './pur-cpc.service';
+import { PurCpcService } from './services/pur-cpc.service';
 import { PurCpcController } from './pur-cpc.controller';
-import { PurCpcRepository } from './pur-cpc.repository';
-import { CondComparisonPriceModule } from './cond_comparison_price/cond_comparison_price.module';
-// import { IimModule } from 'src/datacenter/iim/iim.module';
+import { PurCpcRepository } from './repository/pur-cpc.repository';
 import { IimModule as Iim400Module } from 'src/as400/bpcsfvnew/iim/iim.module';
+import { CondComparisonPriceService } from './services/cond_comparison_price.service';
+import { CondComparisonPriceRepository } from './repository/cond_comparison_price.repository';
+import { PurcpcProcPlanViewRepository } from './repository/purcpc_proc_list_view.repository';
+import { PurcpcProcCompareViewRepository } from './repository/purcpc_proc_compare_view.repository';
 
 @Module({
-    imports: [
-        CondComparisonPriceModule,
-        // IimModule,
-        Iim400Module,
-    ],
+    imports: [Iim400Module],
     controllers: [PurCpcController],
-    providers: [PurCpcService, PurCpcRepository],
+    providers: [
+        // service
+        PurCpcService,
+        CondComparisonPriceService,
+        // Repository
+        PurCpcRepository,
+        CondComparisonPriceRepository,
+        PurcpcProcPlanViewRepository,
+        PurcpcProcCompareViewRepository,
+    ],
 })
 export class PurCpcModule {}

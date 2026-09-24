@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CondComparisonPriceRepository } from './cond_comparison_price.repository';
+import { CondComparisonPriceRepository } from '../repository/cond_comparison_price.repository';
 @Injectable()
 export class CondComparisonPriceService {
     constructor(private readonly repo: CondComparisonPriceRepository) {}

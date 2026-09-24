@@ -15,11 +15,11 @@ export class PriceComparisonDto {
 
     @IsNotEmpty()
     @IsString()
-    DB: string;
+    SYSTEM: string;
 }
 
 export class PriceComparisonPlannerDto extends PickType(PriceComparisonDto, [
-    'DB',
+    'SYSTEM',
 ] as const) {
     @IsNotEmpty()
     @Transform(({ value }) => (Array.isArray(value) ? value : [value]))

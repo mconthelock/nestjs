@@ -9,7 +9,7 @@ export class COND_COMPARISON_PRICE {
     DESCRIPTION: string;
 
     @Column()
-    DB: string;
+    SYSTEM: string;
 
     @Column()
     STATUS: number;

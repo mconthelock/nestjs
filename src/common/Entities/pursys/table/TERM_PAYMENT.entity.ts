@@ -14,6 +14,9 @@ export class TermPayment {
     @Column()
     TERMMAP: string;
 
+    @Column()
+    TERMSEQ: number;
+
     @OneToMany(() => PURNVF_LIST, (l) => l.TERM)
     LISTS: PURNVF_LIST[];
 

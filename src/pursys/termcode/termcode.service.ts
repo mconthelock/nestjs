@@ -16,7 +16,9 @@ export class TermcodeService {
     ) {}
 
     findPayment() {
-        return this.payment.find();
+        return this.payment.find({
+            order: { TERMSEQ: 'ASC' },
+        });
     }
 
     findTrade() {

@@ -15,10 +15,15 @@ import {
 } from './dto/jig-form.dto';
 import { FinishInspectionDto } from './dto/finish-inspection.dto';
 import { monthStart } from './jig.utils';
+import { JigInspectionService } from './jig-inspection.service';
 
 @Injectable()
 export class JigService {
-    constructor(private readonly jigRepository: JigRepository) {}
+    constructor(private readonly jigRepository: JigRepository, private readonly inspection?: JigInspectionService) {}
+
+    autoCreateInspection(date: string, ip: string) {
+        return this.inspection.run(date, ip);
+    }
 
     getMfgProcesses() {
         return this.jigRepository.getMfgProcesses();

@@ -53,18 +53,6 @@ export class JigMaster {
     @Column({ length: 1000, nullable: true })
     REMARK: string | null;
 
-    @Column({ length: 10, nullable: true })
-    CREATE_BY: string | null;
-
-    @Column({ type: 'date', nullable: false, default: () => 'SYSDATE' })
-    CREATE_DATE: Date;
-
-    @Column({ length: 10, nullable: true })
-    UPDATE_BY: string | null;
-
-    @Column({ type: 'date', nullable: true })
-    UPDATE_DATE: Date | null;
-
     @Column({ type: 'varchar2', length: 4, nullable: true })
     REF_CYEAR2: string | null;
 

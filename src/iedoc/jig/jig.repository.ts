@@ -10,6 +10,7 @@ import { AMECUSERALL } from 'src/common/Entities/amec/views/AMECUSERALL.entity';
 import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { JigMaster } from 'src/common/Entities/iedoc/table/jig_master.entity';
+import { JigDefectNg } from 'src/common/Entities/iedoc/table/jig_defect_ng.entity';
 import { JigCheckpoint } from 'src/common/Entities/iedoc/table/jig_checkpoint.entity';
 import { JigForm } from 'src/common/Entities/iedoc/table/jig_form.entity';
 import { JigFormDetail } from 'src/common/Entities/iedoc/table/jig_form_detail.entity';
@@ -126,10 +127,17 @@ export class JigRepository extends BaseRepository {
         });
     }
 
-    private async lockMaster(manager: EntityManager, jigNo: string) {
-        const jig = await manager.findOne(JigMaster, {
+    private async findLockedMaster(manager: EntityManager, jigNo: string) {
+        // JIG_NO is unique. findOne adds FETCH NEXT 1, which Oracle cannot
+        // combine with FOR UPDATE. find keeps the lock without row limiting.
+        const rows = await manager.find(JigMaster, {
             where: { JIG_NO: jigNo }, lock: { mode: 'pessimistic_write' },
         });
+        return rows[0] ?? null;
+    }
+
+    private async lockMaster(manager: EntityManager, jigNo: string) {
+        const jig = await this.findLockedMaster(manager, jigNo);
         if (!jig) throw new NotFoundException('Jig not found');
         return jig;
     }
@@ -158,10 +166,7 @@ export class JigRepository extends BaseRepository {
             const points = dto.CHECKPOINTS.map((p) => ({
                 ...p,
                 JIG_NO: jigNo,
-                CREATE_BY: dto.UPDATE_BY ?? null,
-                CREATE_DATE: new Date(),
-                UPDATE_BY: null,
-                UPDATE_DATE: null,
+                MEASURED_VALUE: p.MEASURED_VALUE ?? null,
             }));
             if (points.length) await manager.insert(JigCheckpoint, points);
             return this.getCheckpoints(jigNo, manager);
@@ -191,17 +196,16 @@ export class JigRepository extends BaseRepository {
                     jigNo = prefix + String(next).padStart(3, '0');
                 }
             }
-            const jig = await manager.findOne(JigMaster, {
-                where: { JIG_NO: jigNo },
-                ...(dto.FORM_TYPE === 'INSPECTION' ? { lock: { mode: 'pessimistic_write' as const } } : {}),
-            });
+            const jig = dto.FORM_TYPE === 'INSPECTION'
+                ? await this.findLockedMaster(manager, jigNo)
+                : await manager.findOne(JigMaster, { where: { JIG_NO: jigNo } });
             if (dto.FORM_TYPE === 'INSPECTION')
                 this.assertEditable(await this.webformStatus(manager, key, true),);
             if (await manager.findOneBy(JigForm, key)) throw new ConflictException('This WEBFORM key is already linked',);
             if (dto.FORM_TYPE === 'CREATE' && jig && !['DRAFT', 'PENDING'].includes(jig.JIG_STATUS)) throw new ConflictException('Jig is already registered');
             if (dto.FORM_TYPE === 'INSPECTION' &&(!jig || jig.JIG_STATUS !== 'ACTIVE')) throw new ConflictException('INSPECTION requires an active jig',);
             const snapshot = jigSnapshot(jig ?? { REV: '0' }, dto);
-            this.validateRevision(snapshot.REV, !!jig);
+            this.validateRevision(snapshot.REV, !!jig, dto.FORM_TYPE);
             if (dto.FORM_TYPE === 'CREATE' && !snapshot.START_USE_DATE)throw new BadRequestException('START_USE_DATE is required for CREATE',);
             if (dto.FORM_TYPE === 'INSPECTION' && !jig.NEXT_INSPEC_DATE)throw new ConflictException('Missing master inspection schedule',);
             const forms = await this.getFormStates(jigNo, manager);
@@ -235,6 +239,7 @@ export class JigRepository extends BaseRepository {
             const form = manager.create(JigForm, {
                 ...key,
                 ...snapshot,
+                REV_OLD: snapshot.REV,
                 JIG_NO: jigNo,
                 FORM_TYPE: dto.FORM_TYPE,
             });
@@ -318,16 +323,10 @@ export class JigRepository extends BaseRepository {
         return this.iedocDs.transaction(async (manager) => {
             const form = await manager.findOneBy(JigForm, where);
             if (!form) throw new NotFoundException('Jig form not found');
-            let jig = await manager.findOne(JigMaster, {
-                where: { JIG_NO: form.JIG_NO },
-                lock: { mode: 'pessimistic_write' },
-            });
+            let jig = await this.findLockedMaster(manager, form.JIG_NO);
             const status = await this.webformStatus(manager, where, true);
             if (!jig)
-                jig = await manager.findOne(JigMaster, {
-                    where: { JIG_NO: form.JIG_NO },
-                    lock: { mode: 'pessimistic_write' },
-                });
+                jig = await this.findLockedMaster(manager, form.JIG_NO);
             const currentForm = await manager.findOneBy(JigForm, where);
             return callback(manager, currentForm, jig, status);
         });
@@ -382,7 +381,7 @@ export class JigRepository extends BaseRepository {
             }
 
             const snapshot = jigSnapshot(form, dto);
-            this.validateRevision(snapshot.REV, !!_jig);
+            this.validateRevision(snapshot.REV, !!_jig, form.FORM_TYPE);
             Object.assign(form, snapshot);
             if (dto.DETAILS?.length) await manager.save(JigFormDetail, details);
             await manager.save(JigForm, form);
@@ -477,25 +476,25 @@ export class JigRepository extends BaseRepository {
         });
     }
 
-    async finishForm(key: JigFormKeyDto, updateBy?: string) {
-        return this.applyForm(key, updateBy, true);
+    async finishForm(key: JigFormKeyDto, _updateBy?: string) {
+        return this.applyForm(key, true);
     }
 
-    private validateRevision(revision: string | null, hasMaster: boolean) {
+    private validateRevision(revision: string | null, hasMaster: boolean, formType?: string) {
         if (!revision?.trim()) throw new BadRequestException('REV is required');
         if (!hasMaster && revision !== '0')
             throw new BadRequestException('A new jig must start with REV 0');
-        if (hasMaster && ['0', '*'].includes(revision))
+        if (hasMaster && (revision === '*' || (revision === '0' && formType !== 'INSPECTION')))
             throw new BadRequestException('An existing jig requires a revised REV');
     }
 
     // For a caller that has already handled the finish condition.
     // Kept separate from the existing HTTP finish endpoint's workflow check.
-    async applyFormToMaster(key: JigFormKeyDto, updateBy?: string) {
-        return this.applyForm(key, updateBy, false);
+    async applyFormToMaster(key: JigFormKeyDto, _updateBy?: string) {
+        return this.applyForm(key, false);
     }
 
-    private async applyForm(key: JigFormKeyDto, updateBy: string | undefined, requireFinished: boolean) {
+    private async applyForm(key: JigFormKeyDto, requireFinished: boolean) {
         return this.withForm(key, async (manager, form, jig, status) => {
             if (!['CREATE', 'INSPECTION'].includes(form.FORM_TYPE))
                 throw new ConflictException('Unsupported form type');
@@ -535,7 +534,7 @@ export class JigRepository extends BaseRepository {
             const revision = String(form.REV ?? '').trim();
             if (!revision)
                 throw new ConflictException('REV is required to apply the form');
-            const isNew = revision === '0';
+            const isNew = form.FORM_TYPE === 'CREATE' && revision === '0';
             if (isNew && jig)
                 throw new ConflictException('REV 0 requires a new JIG_NO');
             if (revision === '*') throw new ConflictException('REV * is not supported; a new jig starts at 0');
@@ -554,10 +553,8 @@ export class JigRepository extends BaseRepository {
                 throw new ConflictException(
                     'All checkpoint results and required measurements must be completed',
                 );
-            if (
-                overallResult(details) === 'NG' &&
-                !(await manager.findOneBy(JigFormNg, formKey(key)))
-            )
+            const formNg = await manager.findOneBy(JigFormNg, formKey(key));
+            if (overallResult(details) === 'NG' && !formNg)
                 throw new ConflictException(
                     'NG result requires corrective action details',
                 );
@@ -588,8 +585,6 @@ export class JigRepository extends BaseRepository {
                 jig ??
                     manager.create(JigMaster, {
                         JIG_NO: form.JIG_NO,
-                        CREATE_BY: updateBy ?? null,
-                        CREATE_DATE: new Date(),
                     }),
                 snapshot,
                 {
@@ -597,8 +592,6 @@ export class JigRepository extends BaseRepository {
                     NEXT_INSPEC_DATE: next,
                     REF_CYEAR2: form.CYEAR2,
                     REF_NRUNNO: form.NRUNNO,
-                    UPDATE_BY: updateBy ?? null,
-                    UPDATE_DATE: new Date(),
                 },
             );
             // INSERT prevents a different registration from overwriting a winner.
@@ -609,8 +602,6 @@ export class JigRepository extends BaseRepository {
                 NEXT_INSPEC_DATE: next,
                 REF_CYEAR2: form.CYEAR2,
                 REF_NRUNNO: form.NRUNNO,
-                UPDATE_BY: jig.UPDATE_BY,
-                UPDATE_DATE: jig.UPDATE_DATE,
             });
             const existingPoints = isNew ? [] : await this.getCheckpoints(form.JIG_NO, manager);
             for (const d of details) {
@@ -621,17 +612,15 @@ export class JigRepository extends BaseRepository {
                     INSPECTION_TOOL: d.INSPECTION_TOOL,
                     MIN: d.MIN,
                     MAX: d.MAX,
+                    MEASURED_VALUE: d.MEASURED_VALUE ?? null,
                     UNIT: d.UNIT,
                 };
                 if (existingPoints.some((p) => p.CHECK_SEQ === d.CHECK_SEQ)) {
                     await manager.update(JigCheckpoint, {
                         JIG_NO: form.JIG_NO, CHECK_SEQ: d.CHECK_SEQ,
-                    }, { ...point, UPDATE_BY: updateBy ?? null, UPDATE_DATE: new Date() });
+                    }, point);
                 } else {
-                    await manager.insert(JigCheckpoint, {
-                        ...point, CREATE_BY: updateBy ?? null, CREATE_DATE: new Date(),
-                        UPDATE_BY: null, UPDATE_DATE: null,
-                    });
+                    await manager.insert(JigCheckpoint, point);
                 }
             }
             // Retire removed template points without touching form history.
@@ -640,6 +629,20 @@ export class JigRepository extends BaseRepository {
                     await manager.delete(JigCheckpoint, {
                         JIG_NO: form.JIG_NO, CHECK_SEQ: point.CHECK_SEQ,
                     });
+            }
+            if (formNg) {
+                // Only copy NG columns, never the source form's composite key.
+                await manager.save(JigDefectNg, {
+                    JIG_NO: form.JIG_NO,
+                    DEFECT_DETAIL: formNg.DEFECT_DETAIL,
+                    ACTION: formNg.ACTION,
+                    CORRECTIVE: formNg.CORRECTIVE,
+                    PLAN_DATE: formNg.PLAN_DATE,
+                    LOCATION: formNg.LOCATION ?? null,
+                });
+            } else {
+                // Master NG reflects the latest approved snapshot, not past defects.
+                await manager.delete(JigDefectNg, { JIG_NO: form.JIG_NO });
             }
             return { applied: true, jig };
         });

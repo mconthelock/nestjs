@@ -24,6 +24,9 @@ export class JigCheckpoint {
     @Column({ length: 20, nullable: true })
     UNIT: string | null;
 
+    @Column({ type: 'decimal', precision: 12, scale: 4, nullable: true })
+    MEASURED_VALUE: number | null;
+
     @ManyToOne(() => JigMaster)
     @JoinColumn({ name: 'JIG_NO', referencedColumnName: 'JIG_NO' })
     jig: JigMaster;

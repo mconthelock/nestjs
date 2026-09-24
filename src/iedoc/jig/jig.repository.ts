@@ -166,6 +166,7 @@ export class JigRepository extends BaseRepository {
             const points = dto.CHECKPOINTS.map((p) => ({
                 ...p,
                 JIG_NO: jigNo,
+                MEASURED_VALUE: p.MEASURED_VALUE ?? null,
             }));
             if (points.length) await manager.insert(JigCheckpoint, points);
             return this.getCheckpoints(jigNo, manager);
@@ -204,7 +205,7 @@ export class JigRepository extends BaseRepository {
             if (dto.FORM_TYPE === 'CREATE' && jig && !['DRAFT', 'PENDING'].includes(jig.JIG_STATUS)) throw new ConflictException('Jig is already registered');
             if (dto.FORM_TYPE === 'INSPECTION' &&(!jig || jig.JIG_STATUS !== 'ACTIVE')) throw new ConflictException('INSPECTION requires an active jig',);
             const snapshot = jigSnapshot(jig ?? { REV: '0' }, dto);
-            this.validateRevision(snapshot.REV, !!jig);
+            this.validateRevision(snapshot.REV, !!jig, dto.FORM_TYPE);
             if (dto.FORM_TYPE === 'CREATE' && !snapshot.START_USE_DATE)throw new BadRequestException('START_USE_DATE is required for CREATE',);
             if (dto.FORM_TYPE === 'INSPECTION' && !jig.NEXT_INSPEC_DATE)throw new ConflictException('Missing master inspection schedule',);
             const forms = await this.getFormStates(jigNo, manager);
@@ -379,7 +380,7 @@ export class JigRepository extends BaseRepository {
             }
 
             const snapshot = jigSnapshot(form, dto);
-            this.validateRevision(snapshot.REV, !!_jig);
+            this.validateRevision(snapshot.REV, !!_jig, form.FORM_TYPE);
             Object.assign(form, snapshot);
             if (dto.DETAILS?.length) await manager.save(JigFormDetail, details);
             await manager.save(JigForm, form);
@@ -478,11 +479,11 @@ export class JigRepository extends BaseRepository {
         return this.applyForm(key, true);
     }
 
-    private validateRevision(revision: string | null, hasMaster: boolean) {
+    private validateRevision(revision: string | null, hasMaster: boolean, formType?: string) {
         if (!revision?.trim()) throw new BadRequestException('REV is required');
         if (!hasMaster && revision !== '0')
             throw new BadRequestException('A new jig must start with REV 0');
-        if (hasMaster && ['0', '*'].includes(revision))
+        if (hasMaster && (revision === '*' || (revision === '0' && formType !== 'INSPECTION')))
             throw new BadRequestException('An existing jig requires a revised REV');
     }
 
@@ -532,7 +533,7 @@ export class JigRepository extends BaseRepository {
             const revision = String(form.REV ?? '').trim();
             if (!revision)
                 throw new ConflictException('REV is required to apply the form');
-            const isNew = revision === '0';
+            const isNew = form.FORM_TYPE === 'CREATE' && revision === '0';
             if (isNew && jig)
                 throw new ConflictException('REV 0 requires a new JIG_NO');
             if (revision === '*') throw new ConflictException('REV * is not supported; a new jig starts at 0');
@@ -610,6 +611,7 @@ export class JigRepository extends BaseRepository {
                     INSPECTION_TOOL: d.INSPECTION_TOOL,
                     MIN: d.MIN,
                     MAX: d.MAX,
+                    MEASURED_VALUE: d.MEASURED_VALUE ?? null,
                     UNIT: d.UNIT,
                 };
                 if (existingPoints.some((p) => p.CHECK_SEQ === d.CHECK_SEQ)) {

@@ -1,5 +1,6 @@
 import {
     Body,
+    Req,
     Controller,
     Delete,
     Get,
@@ -22,6 +23,9 @@ import {
 } from './dto/jig-form.dto';
 import { JigFormFileKeyDto } from './dto/jig-form.dto';
 import { FinishInspectionDto } from './dto/finish-inspection.dto';
+import { AutoInspectionDto } from './dto/auto-inspection.dto';
+import { Request } from 'express';
+import { getClientIP } from 'src/common/utils/ip.utils';
 const formPath = 'forms/:NFRMNO/:VORGNO/:CYEAR/:CYEAR2/:NRUNNO';
 
 @Controller('iedoc/jig')
@@ -58,6 +62,11 @@ export class JigController {
     @Post()
     createJig(@Body() dto: CreateJigRequestDto) {
         return this.jigService.createJig(dto);
+    }
+
+    @Post('auto-inspection')
+    autoInspection(@Body() dto: AutoInspectionDto, @Req() req: Request) {
+        return this.jigService.autoCreateInspection(dto.date, getClientIP(req));
     }
 
     @Get(formPath)

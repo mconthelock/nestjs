@@ -41,6 +41,11 @@ export class CheckpointDto {
     @Max(99999999.9999)
     MAX?: number;
     @IsOptional()
+    @IsNumber({ maxDecimalPlaces: 4 })
+    @Min(-99999999.9999)
+    @Max(99999999.9999)
+    MEASURED_VALUE?: number | null;
+    @IsOptional()
     @IsString()
     @MaxLength(20)
     UNIT?: string;

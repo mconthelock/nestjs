@@ -138,9 +138,27 @@ function fixture(period = 6) {
 }
 
 describe('Jig REV application', () => {
+    it.each([0, 1.2345, null])('accepts and persists checkpoint measurement %p', async (value) => {
+        const dto = plainToInstance(ReplaceCheckpointsDto, { CHECKPOINTS: [{
+            CHECK_SEQ: 1, CHECK_POINT: 'Diameter', MEASURED_VALUE: value,
+        }] });
+        expect(await validate(dto)).toHaveLength(0);
+        const { repo, manager, state } = fixture();
+        state.points[0].MEASURED_VALUE = value;
+        const rows = await repo.replaceCheckpoints('J-001', dto);
+        expect(manager.insert).toHaveBeenCalledWith(JigCheckpoint, [expect.objectContaining({ MEASURED_VALUE: value })]);
+        expect(rows[0].MEASURED_VALUE).toBe(value);
+    });
+
+    it.each([1.12345, 100000000, '1.2'])('rejects invalid checkpoint measurement %p', async (value) => {
+        const dto = plainToInstance(ReplaceCheckpointsDto, { CHECKPOINTS: [{
+            CHECK_SEQ: 1, CHECK_POINT: 'Diameter', MEASURED_VALUE: value,
+        }] });
+        expect((await validate(dto)).length).toBeGreaterThan(0);
+    });
     it.each([true, false])('copies form NG by JIG_NO on approval (new=%s), only once', async (isNew) => {
         const { repo, state, form, manager } = fixture();
-        if (isNew) { state.master = null; form.REV = '0'; }
+        if (isNew) { state.master = null; form.REV = '0'; form.FORM_TYPE = 'CREATE'; }
         state.ng = { ...key, DEFECT_DETAIL: 'Defect', ACTION: 'Repair', CORRECTIVE: 'Adjust',
             PLAN_DATE: new Date(2026, 9, 1), LOCATION: null };
         const result = await repo.finishForm(key);
@@ -178,7 +196,7 @@ describe('Jig REV application', () => {
     });
     it.each([true, false])('never writes removed master/checkpoint audit columns (new=%s)', async (isNew) => {
         const { repo, state, form, manager } = fixture();
-        if (isNew) { state.master = null; form.REV = '0'; }
+        if (isNew) { state.master = null; form.REV = '0'; form.FORM_TYPE = 'CREATE'; }
         state.master = (await repo.applyFormToMaster(key, '14077')).jig;
         await repo.replaceCheckpoints('J-001', { UPDATE_BY: '14077', CHECKPOINTS: [{ CHECK_SEQ: 1, CHECK_POINT: 'Visual' }] });
         const writes = [
@@ -241,7 +259,7 @@ describe('Jig REV application', () => {
         state.master = null;
         state.status = '1';
         form.REV = revision;
-        // The mutation branch must follow REV, not FORM_TYPE.
+        form.FORM_TYPE = 'CREATE';
         const result = await repo.applyFormToMaster(key, '14077');
         expect(result.applied).toBe(true);
         expect(result.jig.NEXT_INSPEC_DATE).toEqual(new Date(2026, 1, 1));
@@ -250,7 +268,7 @@ describe('Jig REV application', () => {
             REF_NRUNNO: key.NRUNNO,
         }));
         expect(manager.insert).toHaveBeenCalledWith(JigCheckpoint, expect.objectContaining({
-            JIG_NO: form.JIG_NO, CHECK_SEQ: 1, CHECK_POINT: 'Diameter',
+            JIG_NO: form.JIG_NO, CHECK_SEQ: 1, CHECK_POINT: 'Diameter', MEASURED_VALUE: 1.5,
         }));
         expect(manager.update).not.toHaveBeenCalled();
         expect(manager.delete).toHaveBeenCalledWith(JigDefectNg, { JIG_NO: form.JIG_NO });
@@ -269,7 +287,7 @@ describe('Jig REV application', () => {
         const pointUpdate = manager.update.mock.calls.find((c) => c[0] === JigCheckpoint);
         expect(pointUpdate[1]).toEqual({ JIG_NO: form.JIG_NO, CHECK_SEQ: 1 });
         expect(pointUpdate[2]).not.toHaveProperty('CREATE_DATE');
-        expect(pointUpdate[2]).not.toHaveProperty('MEASURED_VALUE');
+        expect(pointUpdate[2].MEASURED_VALUE).toBe(1.5);
         expect(manager.insert).toHaveBeenCalledWith(JigCheckpoint,
             expect.objectContaining({ CHECK_SEQ: 2, CHECK_POINT: 'New visual' }));
         expect(manager.delete.mock.calls.filter(([entity]) => entity === JigCheckpoint)).toHaveLength(1);
@@ -279,6 +297,7 @@ describe('Jig REV application', () => {
 
     it.each(['0'])('rejects a new REV %s when master already exists', async (revision) => {
         const { repo, form, manager } = fixture();
+        form.FORM_TYPE = 'CREATE';
         form.REV = revision;
         await expect(repo.applyFormToMaster(key)).rejects.toThrow('requires a new JIG_NO');
         expect(manager.insert).not.toHaveBeenCalled();
@@ -374,6 +393,13 @@ describe('Jig create workflow routing', () => {
 });
 
 describe('Jig dictionary and validation', () => {
+    it('applies an inspection of an existing REV 0 jig as an update', async () => {
+        const { repo, form, manager } = fixture();
+        form.REV = '0';
+        expect((await repo.finishForm(key)).applied).toBe(true);
+        expect(manager.update).toHaveBeenCalledWith(JigMaster, { JIG_NO: 'J-001' }, expect.objectContaining({ REV: '0' }));
+        expect(manager.insert.mock.calls.some(([entity]) => entity === JigMaster)).toBe(false);
+    });
     it('locks Oracle master by primary key without FETCH or pagination', async () => {
         const ds = new DataSource({ type: 'oracle', entities: [JigMaster] });
         await (ds as any).buildMetadatas();

@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { FormModule } from 'src/webform/form/form.module';
+import { JigInspectionService } from './jig-inspection.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JigController } from './jig.controller';
 import { JigService } from './jig.service';
@@ -14,6 +16,7 @@ import { MachineAbilityProcess } from 'src/common/Entities/iedoc/table/machine_a
 import { ShopCodeMst } from 'src/common/Entities/iedoc/table/shopcodemst.entity';
 @Module({
     imports: [
+        FormModule,
         TypeOrmModule.forFeature(
             [
                 JigMaster,
@@ -30,7 +33,7 @@ import { ShopCodeMst } from 'src/common/Entities/iedoc/table/shopcodemst.entity'
         ),
     ],
     controllers: [JigController],
-    providers: [JigService, JigRepository],
+    providers: [JigService, JigRepository, JigInspectionService],
     exports: [JigService, JigRepository],
 })
 export class JigModule {}

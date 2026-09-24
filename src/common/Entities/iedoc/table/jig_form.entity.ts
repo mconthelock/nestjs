@@ -30,6 +30,9 @@ export class JigForm {
     DWG: string | null;
 
     @Column({ type: 'varchar2', length: 2, nullable: true })
+    REV_OLD: string | null;
+
+    @Column({ type: 'varchar2', length: 2, nullable: true })
     REV: string | null;
 
     @Column({ type: 'number', precision: 5, scale: 0, nullable: true })

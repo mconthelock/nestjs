@@ -138,6 +138,14 @@ function fixture(period = 6) {
 }
 
 describe('Jig REV application', () => {
+    it('retains REV_OLD when the inspection revision changes', async () => {
+        const { repo, state, form } = fixture();
+        state.status = '1';
+        form.REV_OLD = '0';
+        await repo.saveForm(key, { REV: '2' });
+        expect(form.REV).toBe('2');
+        expect(form.REV_OLD).toBe('0');
+    });
     it.each([0, 1.2345, null])('accepts and persists checkpoint measurement %p', async (value) => {
         const dto = plainToInstance(ReplaceCheckpointsDto, { CHECKPOINTS: [{
             CHECK_SEQ: 1, CHECK_POINT: 'Diameter', MEASURED_VALUE: value,
@@ -646,6 +654,7 @@ describe('Jig form snapshots and approval', () => {
                 'JIG_NO',
                 'JIG_NAME',
                 'DWG',
+                'REV_OLD',
                 'REV',
                 'JIG_QTY',
                 'PRICE',
@@ -753,6 +762,7 @@ describe('Jig form snapshots and approval', () => {
         const snapshot = manager.insert.mock.calls.find(
             (c) => c[0] === JigForm,
         )[1];
+        expect(snapshot.REV_OLD).toBe(snapshot.REV);
         expect(snapshot).not.toHaveProperty('CREATE_DATE');
         expect(snapshot).not.toHaveProperty('SCHEDULE_DATE');
         expect(manager.insert.mock.calls.some((c) => c[0] === JigMaster)).toBe(

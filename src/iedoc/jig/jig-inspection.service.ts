@@ -83,7 +83,7 @@ export class JigInspectionService {
         const previous = [...history, ...(reference ? [reference] : [])];
         if (previous.some((f) => compareReference(key as any, f) <= 0))
             throw new BadRequestException('Generated form reference must follow existing jig history');
-        await this.insert(manager, 'JIG_FORM', { ...key, FORM_TYPE: 'INSPECTION', JIG_NO: jigNo,
+        await this.insert(manager, 'JIG_FORM', { ...key, FORM_TYPE: 'INSPECTION', JIG_NO: jigNo, REV_OLD: master.REV ?? null,
             ...Object.fromEntries(SNAPSHOT_FIELDS.map((field) => [field, master[field] ?? null])) });
         for (const point of points) {
             await this.insert(manager, 'JIG_FORM_DETAIL', { ...key,

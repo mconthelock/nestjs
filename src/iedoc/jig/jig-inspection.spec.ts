@@ -40,11 +40,14 @@ describe('Auto inspection', () => {
         const result = await service.run('01/03/2026', '127.0.0.1');
         expect(result.created).toBe(1);
         expect(state.committed).toBe(true);
-        expect(forms.create).toHaveBeenCalledWith(expect.objectContaining({ NFRMNO: 31, VORGNO: '051401', CYEAR: '26', REQBY: '14077', INPUTBY: '14077', DRAFT: '1' }), '127.0.0.1');
+        expect(forms.create).toHaveBeenCalledWith(expect.objectContaining({ NFRMNO: 31, VORGNO: '051401', CYEAR: '26', REQBY: '14077', INPUTBY: '14077', DRAFT: '0' }), '127.0.0.1');
         expect(query.mock.calls[0][1]).toEqual(['2026-03-01']);
         const inserts = query.mock.calls.filter(([sql]) => sql.startsWith('INSERT'));
         expect(inserts).toHaveLength(2);
         expect(inserts[0][1]).toContain('INSPECTION');
+        const headerColumns = inserts[0][0].match(/"([A-Z0-9_]+)"/g).map((c) => c.slice(1, -1));
+        expect(inserts[0][1][headerColumns.indexOf('REV_OLD')]).toBe('0');
+        expect(inserts[0][1][headerColumns.indexOf('REV')]).toBe('0');
         expect(inserts[1][0]).toContain('"MEASURED_VALUE"');
         expect(inserts[1][1].slice(-2)).toEqual([1.2345, null]);
         expect(query.mock.calls.some(([sql]) => /JIG_FORM_FILE|UPDATE IEDOC.JIG_MASTER|DELETE.*FLOW/.test(sql))).toBe(false);

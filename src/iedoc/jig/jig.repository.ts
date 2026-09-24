@@ -239,6 +239,7 @@ export class JigRepository extends BaseRepository {
             const form = manager.create(JigForm, {
                 ...key,
                 ...snapshot,
+                REV_OLD: snapshot.REV,
                 JIG_NO: jigNo,
                 FORM_TYPE: dto.FORM_TYPE,
             });

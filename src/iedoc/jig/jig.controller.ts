@@ -20,6 +20,7 @@ import {
     JigFormKeyDto,
     SaveJigFormDto,
     JigFileDto,
+    ConfigureJigFlowDto,
 } from './dto/jig-form.dto';
 import { JigFormFileKeyDto } from './dto/jig-form.dto';
 import { FinishInspectionDto } from './dto/finish-inspection.dto';
@@ -80,6 +81,10 @@ export class JigController {
     @Post(formPath + '/finish')
     finishForm(@Param() key: JigFormKeyDto, @Body() dto: FinishInspectionDto) {
         return this.jigService.finishForm(key, dto);
+    }
+    @Post(formPath + '/requester-flow')
+    configureRequesterFlow(@Param() key: JigFormKeyDto, @Body() dto: ConfigureJigFlowDto) {
+        return this.jigService.configureRequesterFlow(key, dto.PICCODE);
     }
     @Put(formPath + '/files')
     putFile(@Param() key: JigFormKeyDto, @Body() dto: JigFileDto) {

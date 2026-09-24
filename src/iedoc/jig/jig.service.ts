@@ -140,6 +140,9 @@ export class JigService {
     saveForm(key: JigFormKeyDto, dto: SaveJigFormDto) {
         return this.jigRepository.saveForm(key, dto);
     }
+    configureRequesterFlow(key: JigFormKeyDto, picCode?: string) {
+        return this.jigRepository.configureRequesterFlow(key, picCode);
+    }
     putFile(key: JigFormKeyDto, dto: JigFileDto) {
         return this.jigRepository.putFile(key, dto);
     }

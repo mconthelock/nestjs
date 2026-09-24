@@ -10,6 +10,7 @@ import { AMECUSERALL } from 'src/common/Entities/amec/views/AMECUSERALL.entity';
 import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { JigMaster } from 'src/common/Entities/iedoc/table/jig_master.entity';
+import { JigDefectNg } from 'src/common/Entities/iedoc/table/jig_defect_ng.entity';
 import { JigCheckpoint } from 'src/common/Entities/iedoc/table/jig_checkpoint.entity';
 import { JigForm } from 'src/common/Entities/iedoc/table/jig_form.entity';
 import { JigFormDetail } from 'src/common/Entities/iedoc/table/jig_form_detail.entity';
@@ -126,10 +127,17 @@ export class JigRepository extends BaseRepository {
         });
     }
 
-    private async lockMaster(manager: EntityManager, jigNo: string) {
-        const jig = await manager.findOne(JigMaster, {
+    private async findLockedMaster(manager: EntityManager, jigNo: string) {
+        // JIG_NO is unique. findOne adds FETCH NEXT 1, which Oracle cannot
+        // combine with FOR UPDATE. find keeps the lock without row limiting.
+        const rows = await manager.find(JigMaster, {
             where: { JIG_NO: jigNo }, lock: { mode: 'pessimistic_write' },
         });
+        return rows[0] ?? null;
+    }
+
+    private async lockMaster(manager: EntityManager, jigNo: string) {
+        const jig = await this.findLockedMaster(manager, jigNo);
         if (!jig) throw new NotFoundException('Jig not found');
         return jig;
     }
@@ -158,10 +166,6 @@ export class JigRepository extends BaseRepository {
             const points = dto.CHECKPOINTS.map((p) => ({
                 ...p,
                 JIG_NO: jigNo,
-                CREATE_BY: dto.UPDATE_BY ?? null,
-                CREATE_DATE: new Date(),
-                UPDATE_BY: null,
-                UPDATE_DATE: null,
             }));
             if (points.length) await manager.insert(JigCheckpoint, points);
             return this.getCheckpoints(jigNo, manager);
@@ -191,10 +195,9 @@ export class JigRepository extends BaseRepository {
                     jigNo = prefix + String(next).padStart(3, '0');
                 }
             }
-            const jig = await manager.findOne(JigMaster, {
-                where: { JIG_NO: jigNo },
-                ...(dto.FORM_TYPE === 'INSPECTION' ? { lock: { mode: 'pessimistic_write' as const } } : {}),
-            });
+            const jig = dto.FORM_TYPE === 'INSPECTION'
+                ? await this.findLockedMaster(manager, jigNo)
+                : await manager.findOne(JigMaster, { where: { JIG_NO: jigNo } });
             if (dto.FORM_TYPE === 'INSPECTION')
                 this.assertEditable(await this.webformStatus(manager, key, true),);
             if (await manager.findOneBy(JigForm, key)) throw new ConflictException('This WEBFORM key is already linked',);
@@ -318,16 +321,10 @@ export class JigRepository extends BaseRepository {
         return this.iedocDs.transaction(async (manager) => {
             const form = await manager.findOneBy(JigForm, where);
             if (!form) throw new NotFoundException('Jig form not found');
-            let jig = await manager.findOne(JigMaster, {
-                where: { JIG_NO: form.JIG_NO },
-                lock: { mode: 'pessimistic_write' },
-            });
+            let jig = await this.findLockedMaster(manager, form.JIG_NO);
             const status = await this.webformStatus(manager, where, true);
             if (!jig)
-                jig = await manager.findOne(JigMaster, {
-                    where: { JIG_NO: form.JIG_NO },
-                    lock: { mode: 'pessimistic_write' },
-                });
+                jig = await this.findLockedMaster(manager, form.JIG_NO);
             const currentForm = await manager.findOneBy(JigForm, where);
             return callback(manager, currentForm, jig, status);
         });
@@ -477,8 +474,8 @@ export class JigRepository extends BaseRepository {
         });
     }
 
-    async finishForm(key: JigFormKeyDto, updateBy?: string) {
-        return this.applyForm(key, updateBy, true);
+    async finishForm(key: JigFormKeyDto, _updateBy?: string) {
+        return this.applyForm(key, true);
     }
 
     private validateRevision(revision: string | null, hasMaster: boolean) {
@@ -491,11 +488,11 @@ export class JigRepository extends BaseRepository {
 
     // For a caller that has already handled the finish condition.
     // Kept separate from the existing HTTP finish endpoint's workflow check.
-    async applyFormToMaster(key: JigFormKeyDto, updateBy?: string) {
-        return this.applyForm(key, updateBy, false);
+    async applyFormToMaster(key: JigFormKeyDto, _updateBy?: string) {
+        return this.applyForm(key, false);
     }
 
-    private async applyForm(key: JigFormKeyDto, updateBy: string | undefined, requireFinished: boolean) {
+    private async applyForm(key: JigFormKeyDto, requireFinished: boolean) {
         return this.withForm(key, async (manager, form, jig, status) => {
             if (!['CREATE', 'INSPECTION'].includes(form.FORM_TYPE))
                 throw new ConflictException('Unsupported form type');
@@ -554,10 +551,8 @@ export class JigRepository extends BaseRepository {
                 throw new ConflictException(
                     'All checkpoint results and required measurements must be completed',
                 );
-            if (
-                overallResult(details) === 'NG' &&
-                !(await manager.findOneBy(JigFormNg, formKey(key)))
-            )
+            const formNg = await manager.findOneBy(JigFormNg, formKey(key));
+            if (overallResult(details) === 'NG' && !formNg)
                 throw new ConflictException(
                     'NG result requires corrective action details',
                 );
@@ -588,8 +583,6 @@ export class JigRepository extends BaseRepository {
                 jig ??
                     manager.create(JigMaster, {
                         JIG_NO: form.JIG_NO,
-                        CREATE_BY: updateBy ?? null,
-                        CREATE_DATE: new Date(),
                     }),
                 snapshot,
                 {
@@ -597,8 +590,6 @@ export class JigRepository extends BaseRepository {
                     NEXT_INSPEC_DATE: next,
                     REF_CYEAR2: form.CYEAR2,
                     REF_NRUNNO: form.NRUNNO,
-                    UPDATE_BY: updateBy ?? null,
-                    UPDATE_DATE: new Date(),
                 },
             );
             // INSERT prevents a different registration from overwriting a winner.
@@ -609,8 +600,6 @@ export class JigRepository extends BaseRepository {
                 NEXT_INSPEC_DATE: next,
                 REF_CYEAR2: form.CYEAR2,
                 REF_NRUNNO: form.NRUNNO,
-                UPDATE_BY: jig.UPDATE_BY,
-                UPDATE_DATE: jig.UPDATE_DATE,
             });
             const existingPoints = isNew ? [] : await this.getCheckpoints(form.JIG_NO, manager);
             for (const d of details) {
@@ -626,12 +615,9 @@ export class JigRepository extends BaseRepository {
                 if (existingPoints.some((p) => p.CHECK_SEQ === d.CHECK_SEQ)) {
                     await manager.update(JigCheckpoint, {
                         JIG_NO: form.JIG_NO, CHECK_SEQ: d.CHECK_SEQ,
-                    }, { ...point, UPDATE_BY: updateBy ?? null, UPDATE_DATE: new Date() });
+                    }, point);
                 } else {
-                    await manager.insert(JigCheckpoint, {
-                        ...point, CREATE_BY: updateBy ?? null, CREATE_DATE: new Date(),
-                        UPDATE_BY: null, UPDATE_DATE: null,
-                    });
+                    await manager.insert(JigCheckpoint, point);
                 }
             }
             // Retire removed template points without touching form history.
@@ -640,6 +626,20 @@ export class JigRepository extends BaseRepository {
                     await manager.delete(JigCheckpoint, {
                         JIG_NO: form.JIG_NO, CHECK_SEQ: point.CHECK_SEQ,
                     });
+            }
+            if (formNg) {
+                // Only copy NG columns, never the source form's composite key.
+                await manager.save(JigDefectNg, {
+                    JIG_NO: form.JIG_NO,
+                    DEFECT_DETAIL: formNg.DEFECT_DETAIL,
+                    ACTION: formNg.ACTION,
+                    CORRECTIVE: formNg.CORRECTIVE,
+                    PLAN_DATE: formNg.PLAN_DATE,
+                    LOCATION: formNg.LOCATION ?? null,
+                });
+            } else {
+                // Master NG reflects the latest approved snapshot, not past defects.
+                await manager.delete(JigDefectNg, { JIG_NO: form.JIG_NO });
             }
             return { applied: true, jig };
         });

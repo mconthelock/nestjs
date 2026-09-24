@@ -24,18 +24,6 @@ export class JigCheckpoint {
     @Column({ length: 20, nullable: true })
     UNIT: string | null;
 
-    @Column({ length: 10, nullable: true })
-    CREATE_BY: string | null;
-
-    @Column({ type: 'date', nullable: false, default: () => 'SYSDATE' })
-    CREATE_DATE: Date;
-
-    @Column({ length: 10, nullable: true })
-    UPDATE_BY: string | null;
-
-    @Column({ type: 'date', nullable: true })
-    UPDATE_DATE: Date | null;
-
     @ManyToOne(() => JigMaster)
     @JoinColumn({ name: 'JIG_NO', referencedColumnName: 'JIG_NO' })
     jig: JigMaster;

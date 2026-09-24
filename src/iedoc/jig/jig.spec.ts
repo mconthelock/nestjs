@@ -22,6 +22,7 @@ import {
 } from './dto/jig-form.dto';
 import { monthStart, nextRound, validateRange, jigSnapshot } from './jig.utils';
 import { JigMaster } from 'src/common/Entities/iedoc/table/jig_master.entity';
+import { JigDefectNg } from 'src/common/Entities/iedoc/table/jig_defect_ng.entity';
 import { JigCheckpoint } from 'src/common/Entities/iedoc/table/jig_checkpoint.entity';
 import { JigForm } from 'src/common/Entities/iedoc/table/jig_form.entity';
 import { JigFormDetail } from 'src/common/Entities/iedoc/table/jig_form_detail.entity';
@@ -117,7 +118,7 @@ function fixture(period = 6) {
         ),
         findBy: jest.fn(async () => details),
         find: jest.fn(async (entity: any) =>
-            entity === JigCheckpoint
+            entity === JigMaster ? (state.master ? [state.master] : []) : entity === JigCheckpoint
                 ? state.points
                 : entity === JigFormDetail
                   ? details
@@ -137,6 +138,59 @@ function fixture(period = 6) {
 }
 
 describe('Jig REV application', () => {
+    it.each([true, false])('copies form NG by JIG_NO on approval (new=%s), only once', async (isNew) => {
+        const { repo, state, form, manager } = fixture();
+        if (isNew) { state.master = null; form.REV = '0'; }
+        state.ng = { ...key, DEFECT_DETAIL: 'Defect', ACTION: 'Repair', CORRECTIVE: 'Adjust',
+            PLAN_DATE: new Date(2026, 9, 1), LOCATION: null };
+        const result = await repo.finishForm(key);
+        expect(manager.save).toHaveBeenCalledWith(JigDefectNg, {
+            JIG_NO: form.JIG_NO, DEFECT_DETAIL: 'Defect', ACTION: 'Repair', CORRECTIVE: 'Adjust',
+            PLAN_DATE: state.ng.PLAN_DATE, LOCATION: null,
+        });
+        state.master = result.jig;
+        expect((await repo.finishForm(key)).applied).toBe(false);
+        expect(manager.save.mock.calls.filter(([entity]) => entity === JigDefectNg)).toHaveLength(1);
+    });
+
+    it('deletes only this jig defect when the approved form has no NG, without replaying', async () => {
+        const { repo, manager } = fixture();
+        await repo.finishForm(key);
+        expect(manager.delete).toHaveBeenCalledWith(JigDefectNg, { JIG_NO: 'J-001' });
+        expect((await repo.finishForm(key)).applied).toBe(false);
+        expect(manager.delete.mock.calls.filter(([entity]) => entity === JigDefectNg)).toHaveLength(1);
+        for (const method of ['save', 'insert', 'update'])
+            expect(manager[method].mock.calls.some(([entity]) => entity === JigDefectNg)).toBe(false);
+    });
+
+    it('propagates NG master write errors through the approval transaction', async () => {
+        const { manager, state } = fixture();
+        state.ng = { DEFECT_DETAIL: 'Defect', ACTION: 'Repair', CORRECTIVE: 'Adjust', PLAN_DATE: new Date() };
+        manager.save.mockRejectedValue(new Error('NG write failed'));
+        let committed = false;
+        const repo = new JigRepository({ manager, transaction: async (callback) => {
+            const result = await callback(manager);
+            committed = true;
+            return result;
+        } } as any);
+        await expect(repo.finishForm(key)).rejects.toThrow('NG write failed');
+        expect(committed).toBe(false);
+    });
+    it.each([true, false])('never writes removed master/checkpoint audit columns (new=%s)', async (isNew) => {
+        const { repo, state, form, manager } = fixture();
+        if (isNew) { state.master = null; form.REV = '0'; }
+        state.master = (await repo.applyFormToMaster(key, '14077')).jig;
+        await repo.replaceCheckpoints('J-001', { UPDATE_BY: '14077', CHECKPOINTS: [{ CHECK_SEQ: 1, CHECK_POINT: 'Visual' }] });
+        const writes = [
+            ...manager.insert.mock.calls.map(([entity, data]) => ({ entity, data })),
+            ...manager.update.mock.calls.map(([entity, , data]) => ({ entity, data })),
+        ].filter(({ entity }) => [JigMaster, JigCheckpoint].includes(entity));
+        expect(writes.length).toBeGreaterThan(0);
+        for (const { data } of writes)
+            for (const row of Array.isArray(data) ? data : [data])
+                for (const column of ['CREATE_BY', 'CREATE_DATE', 'UPDATE_BY', 'UPDATE_DATE'])
+                    expect(row).not.toHaveProperty(column);
+    });
     it.each([null, '', '   '])('rejects blank REV %p on create and save', async (REV) => {
         for (const dto of [CreateJigFormDto, SaveJigFormDto]) {
             const value = plainToInstance(dto as any, { ...key, FORM_TYPE: 'CREATE', REV });
@@ -199,7 +253,8 @@ describe('Jig REV application', () => {
             JIG_NO: form.JIG_NO, CHECK_SEQ: 1, CHECK_POINT: 'Diameter',
         }));
         expect(manager.update).not.toHaveBeenCalled();
-        expect(manager.delete).not.toHaveBeenCalled();
+        expect(manager.delete).toHaveBeenCalledWith(JigDefectNg, { JIG_NO: form.JIG_NO });
+        expect(manager.delete.mock.calls.some(([entity]) => entity === JigCheckpoint)).toBe(false);
     });
 
     it.each(['1', 'A', '01'])('updates REV %s and synchronizes template points', async (revision) => {
@@ -217,7 +272,7 @@ describe('Jig REV application', () => {
         expect(pointUpdate[2]).not.toHaveProperty('MEASURED_VALUE');
         expect(manager.insert).toHaveBeenCalledWith(JigCheckpoint,
             expect.objectContaining({ CHECK_SEQ: 2, CHECK_POINT: 'New visual' }));
-        expect(manager.delete).toHaveBeenCalledTimes(1);
+        expect(manager.delete.mock.calls.filter(([entity]) => entity === JigCheckpoint)).toHaveLength(1);
         expect(manager.delete).toHaveBeenCalledWith(JigCheckpoint, { JIG_NO: form.JIG_NO, CHECK_SEQ: 3 });
         expect(details).toHaveLength(2);
     });
@@ -319,6 +374,20 @@ describe('Jig create workflow routing', () => {
 });
 
 describe('Jig dictionary and validation', () => {
+    it('locks Oracle master by primary key without FETCH or pagination', async () => {
+        const ds = new DataSource({ type: 'oracle', entities: [JigMaster] });
+        await (ds as any).buildMetadatas();
+        const statements: string[] = [];
+        jest.spyOn(ds.manager, 'find').mockImplementation(async (entity: any, options: any) => {
+            statements.push(ds.manager.createQueryBuilder(entity, 'J').setFindOptions(options).getSql());
+            return [];
+        });
+        const repo = new JigRepository(ds);
+        expect(await (repo as any).findLockedMaster(ds.manager, 'J26-017')).toBeNull();
+        expect(statements[0]).toContain('FOR UPDATE');
+        expect(statements[0]).toContain('"J"."JIG_NO" = :1');
+        expect(statements[0]).not.toMatch(/FETCH|OFFSET|ROWNUM/i);
+    });
     it('maps reference columns and lookup primary keys with the supplied Oracle sizes', async () => {
         const ds = new DataSource({
             type: 'oracle',
@@ -752,7 +821,7 @@ describe('Jig form snapshots and approval', () => {
             expect(jig).toMatchObject({ REF_CYEAR2: '2026', REF_NRUNNO: 1 });
             expect((await repo.finishForm(key)).applied).toBe(false);
             expect(manager.update.mock.calls.filter((c) => c[0] === JigMaster)).toHaveLength(1);
-            expect(manager.findOne.mock.calls[0][1].lock.mode).toBe(
+            expect(manager.find.mock.calls[0][1].lock.mode).toBe(
                 'pessimistic_write',
             );
         },
@@ -772,7 +841,7 @@ describe('Jig form snapshots and approval', () => {
         form.FORM_TYPE = 'CREATE';
         jig.REF_CYEAR2 = '2026';
         jig.REF_NRUNNO = 1;
-        manager.findOne.mockResolvedValueOnce(null).mockResolvedValueOnce(jig);
+        manager.find.mockResolvedValueOnce([]).mockResolvedValueOnce([jig]);
         expect((await repo.finishForm(key)).applied).toBe(false);
         expect(manager.insert).not.toHaveBeenCalled();
         expect(manager.save).not.toHaveBeenCalled();

@@ -130,6 +130,14 @@ export class JigFormFileKeyDto extends JigFormKeyDto {
     FILE_SEQ: number;
 }
 
+export class ConfigureJigFlowDto {
+    @IsOptional()
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(10)
+    PICCODE?: string;
+}
+
 export class CreateJigDetailDto extends IntersectionType(
     CheckpointDto,
     OmitType(JigResultDto, ['CHECK_SEQ'] as const),

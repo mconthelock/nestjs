@@ -174,6 +174,8 @@ export class JigRepository extends BaseRepository {
     }
 
     async createForm(jigNo: string, dto: CreateJigFormDto) {
+        if (!['CREATE'].includes(dto.FORM_TYPE))
+            throw new BadRequestException('createForm supports CREATE only; use auto-inspection for INSPECTION');
         if ((!jigNo && dto.FORM_TYPE !== 'CREATE') || (jigNo && jigNo.length > 20)) throw new BadRequestException('JIG_NO must contain 1 to 20 characters',);
         const key = formKey(dto);
         return this.iedocDs.transaction(async (manager) => {
@@ -196,18 +198,12 @@ export class JigRepository extends BaseRepository {
                     jigNo = prefix + String(next).padStart(3, '0');
                 }
             }
-            const jig = dto.FORM_TYPE === 'INSPECTION'
-                ? await this.findLockedMaster(manager, jigNo)
-                : await manager.findOne(JigMaster, { where: { JIG_NO: jigNo } });
-            if (dto.FORM_TYPE === 'INSPECTION')
-                this.assertEditable(await this.webformStatus(manager, key, true),);
+            const jig = await manager.findOne(JigMaster, { where: { JIG_NO: jigNo } });
             if (await manager.findOneBy(JigForm, key)) throw new ConflictException('This WEBFORM key is already linked',);
             if (dto.FORM_TYPE === 'CREATE' && jig && !['DRAFT', 'PENDING'].includes(jig.JIG_STATUS)) throw new ConflictException('Jig is already registered');
-            if (dto.FORM_TYPE === 'INSPECTION' &&(!jig || jig.JIG_STATUS !== 'ACTIVE')) throw new ConflictException('INSPECTION requires an active jig',);
             const snapshot = jigSnapshot(jig ?? { REV: '0' }, dto);
             this.validateRevision(snapshot.REV, !!jig, dto.FORM_TYPE);
             if (dto.FORM_TYPE === 'CREATE' && !snapshot.START_USE_DATE)throw new BadRequestException('START_USE_DATE is required for CREATE',);
-            if (dto.FORM_TYPE === 'INSPECTION' && !jig.NEXT_INSPEC_DATE)throw new ConflictException('Missing master inspection schedule',);
             const forms = await this.getFormStates(jigNo, manager);
             // The master has only a two-column reference. Never allow an ambiguous
             // pair, even if the remaining WEBFORM key columns differ.
@@ -266,12 +262,24 @@ export class JigRepository extends BaseRepository {
                 dto.CREATE_BY,
                 true,
             );
-            await this.configureCreateFlow(manager, key, hasNg, dto.PICCODE);
+            await this.configureNgFlow(manager, key, hasNg, dto.PICCODE);
             return this.getForm(key, manager);
         });
     }
 
-    private async configureCreateFlow(manager: EntityManager, key: JigFormKeyDto, hasNg: boolean, picCode?: string) {
+    async configureRequesterFlow(key: JigFormKeyDto, picCode?: string) {
+        return this.withForm(key, async (manager, _form, _jig, status) => {
+            this.assertEditable(status);
+            const where = formKey(key);
+            const ng = await manager.findOneBy(JigFormNg, where);
+            const details = await manager.findBy(JigFormDetail, where);
+            const hasNg = ng != null || details.some((p) => checkpointResult(p) === 'NG');
+            await this.configureNgFlow(manager, where, hasNg, picCode);
+            return { updated: true, hasNg, nextStep: hasNg ? '07' : '04' };
+        });
+    }
+
+    private async configureNgFlow(manager: EntityManager, key: JigFormKeyDto, hasNg: boolean, picCode?: string) {
         // Resolve the existing entity without registering WEBFORM's relation graph
         // in IEDOC. All writes use the same connection and create transaction.
         const table = getMetadataArgsStorage().tables.find((t) => t.target === FLOW)!;
@@ -279,11 +287,20 @@ export class JigRepository extends BaseRepository {
         const where = FORM_KEYS.map((k, i) => k + ' = :' + (i + 1)).join(' AND ');
         const params = FORM_KEYS.map((k) => key[k]);
         if (hasNg) {
+            if (!picCode?.trim()) throw new BadRequestException('PICCODE is required when the form has NG');
             const updateWhere = FORM_KEYS.map((k, i) => k + ' = :' + (i + 3)).join(' AND ');
-            await manager.query(
+            const existing = await manager.query(`SELECT CSTEPNO FROM ${path} WHERE ${where} AND CSTEPNO = '07'`, params);
+            if (existing.length) await manager.query(
                 `UPDATE ${path} SET VAPVNO = :1, VREPNO = :2 WHERE ${updateWhere} AND CSTEPNO = '07'`,
                 [picCode.trim(), picCode.trim(), ...params],
             );
+            else await manager.query(
+                `INSERT INTO ${path} (NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, CSTEPNO, CSTEPNEXTNO, CSTART, CSTEPST, CTYPE, VPOSNO, VAPVNO, VREPNO, VREALAPV, CAPVSTNO, DAPVDATE, CAPVTIME, CEXTDATA, CAPVTYPE, CREJTYPE, CAPPLYALL, VURL, VREMARK, VREMOTE) ` +
+                `SELECT F.NFRMNO, F.VORGNO, F.CYEAR, F.CYEAR2, F.NRUNNO, '07', '04', '0', '2', '3', NULL, :1, :2, NULL, '0', NULL, NULL, '02', '1', NULL, '0', F.VFORMPAGE, NULL, NULL FROM WEBFORM.FORM F WHERE ` +
+                FORM_KEYS.map((k, i) => `F.${k} = :${i + 3}`).join(' AND '),
+                [picCode.trim(), picCode.trim(), ...params],
+            );
+            await manager.query(`UPDATE ${path} SET CSTEPNEXTNO = '07' WHERE ${where} AND CSTEPNO = '06'`, params);
         } else {
             await manager.query(`DELETE FROM ${path} WHERE ${where} AND CSTEPNO = '07'`, params);
             await manager.query(`UPDATE ${path} SET CSTEPNEXTNO = '04' WHERE ${where} AND CSTEPNO = '06'`, params);

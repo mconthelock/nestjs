@@ -108,7 +108,7 @@ function fixture(period = 6) {
     };
     const manager: any = {
         query: jest.fn(async (sql: string) =>
-            sql.startsWith('SELECT CST')
+            sql.startsWith('SELECT CST FROM')
                 ? [{ CST: state.status }]
                 : state.forms,
         ),
@@ -341,6 +341,37 @@ describe('Jig REV application', () => {
 });
 
 describe('Jig create workflow routing', () => {
+    it.each(['CREATE', 'INSPECTION'])('inserts missing requester NG step for %s and reconnects 06', async (type) => {
+        const { repo, state, form, manager } = fixture();
+        form.FORM_TYPE = type;
+        state.status = '1';
+        state.ng = { DEFECT_DETAIL: 'Defect' };
+        await repo.configureRequesterFlow(key, '14077');
+        const insert = manager.query.mock.calls.find(([sql]) => sql.startsWith('INSERT INTO WEBFORM.FLOW'));
+        expect(insert[0]).toContain("'07', '04', '0', '2', '3'");
+        expect(insert[0]).toContain('F.VFORMPAGE');
+        expect(insert[1]).toEqual(['14077', '14077', 1, '000001', '26', '2026', 1]);
+        expect(manager.query).toHaveBeenCalledWith(expect.stringContaining("SET CSTEPNEXTNO = '07'"), [1, '000001', '26', '2026', 1]);
+    });
+
+    it('updates existing requester NG step without inserting a duplicate', async () => {
+        const { repo, state, manager } = fixture();
+        state.status = '1';
+        state.ng = { DEFECT_DETAIL: 'Defect' };
+        const original = manager.query.getMockImplementation();
+        manager.query.mockImplementation((sql, params) => sql.startsWith('SELECT CSTEPNO') ? [{ CSTEPNO: '07' }] : original(sql, params));
+        await repo.configureRequesterFlow(key, '14077');
+        expect(manager.query.mock.calls.some(([sql]) => sql.startsWith('INSERT INTO WEBFORM.FLOW'))).toBe(false);
+        expect(manager.query).toHaveBeenCalledWith(expect.stringContaining('SET VAPVNO = :1, VREPNO = :2'), ['14077', '14077', 1, '000001', '26', '2026', 1]);
+    });
+
+    it('removes requester NG step after NG is cleared from the saved form', async () => {
+        const { repo, state, manager } = fixture();
+        state.status = '1';
+        expect(await repo.configureRequesterFlow(key)).toMatchObject({ hasNg: false, nextStep: '04' });
+        expect(manager.query).toHaveBeenCalledWith(expect.stringContaining('DELETE FROM WEBFORM.FLOW'), [1, '000001', '26', '2026', 1]);
+        expect(manager.query).toHaveBeenCalledWith(expect.stringContaining("SET CSTEPNEXTNO = '04'"), [1, '000001', '26', '2026', 1]);
+    });
     function setup() {
         const f = fixture();
         f.state.master = null;
@@ -356,6 +387,8 @@ describe('Jig create workflow routing', () => {
         const { repo, manager, body } = setup();
         body.DETAILS[0].RESULT = 'NG';
         body.PICCODE = '14077';
+        const original = manager.query.getMockImplementation();
+        manager.query.mockImplementation((sql, params) => sql.startsWith('SELECT CSTEPNO') ? [{ CSTEPNO: '07' }] : original(sql, params));
         await repo.createForm('NEW', body);
         expect(manager.query).toHaveBeenCalledWith(
             "UPDATE WEBFORM.FLOW SET VAPVNO = :1, VREPNO = :2 WHERE NFRMNO = :3 AND VORGNO = :4 AND CYEAR = :5 AND CYEAR2 = :6 AND NRUNNO = :7 AND CSTEPNO = '07'",
@@ -771,28 +804,10 @@ describe('Jig form snapshots and approval', () => {
         expect(manager.save).not.toHaveBeenCalled();
     });
 
-    it('copies master fields and checkpoints once for inspection history', async () => {
-        const { repo, jig, state, manager } = fixture();
-        state.status = '1';
-        manager.findOneBy.mockResolvedValue(null);
-        jest.spyOn(repo, 'getForm').mockResolvedValue({} as any);
-        await repo.createForm(jig.JIG_NO, {
-            ...key,
-            FORM_TYPE: 'INSPECTION',
-            JIG_DESC: 'Reviewed',
-        });
-        jig.JIG_NAME = 'Later master';
-        state.points[0].CHECK_POINT = 'Later checkpoint';
-        const snapshot = manager.insert.mock.calls.find(
-            (c) => c[0] === JigForm,
-        )[1];
-        expect(snapshot.JIG_NAME).toBe('Original jig');
-        expect(snapshot.JIG_DESC).toBe('Reviewed');
-        const detail = manager.insert.mock.calls.find(
-            (c) => c[0] === JigFormDetail,
-        )[1][0];
-        expect(detail.CHECK_POINT).toBe('Diameter');
-        expect(detail).not.toHaveProperty('UPDATE_BY');
+    it('rejects manual INSPECTION creation before any writes', async () => {
+        const { repo, manager } = fixture();
+        await expect(repo.createForm('J-001', { ...key, FORM_TYPE: 'INSPECTION' })).rejects.toThrow('use auto-inspection');
+        expect(manager.insert).not.toHaveBeenCalled();
     });
 
     it('edits form data and results without altering master or persisting removed columns', async () => {
@@ -884,7 +899,7 @@ describe('Jig form snapshots and approval', () => {
     });
 
     it.each(['1', '2'])(
-        'blocks another round while the previous status %s is unapplied',
+        'rejects manual inspection even with previous status %s',
         async (status) => {
             const { repo, form, state, manager } = fixture();
             state.status = '1';
@@ -896,7 +911,7 @@ describe('Jig form snapshots and approval', () => {
                     NRUNNO: 2,
                     FORM_TYPE: 'INSPECTION',
                 }),
-            ).rejects.toThrow(ConflictException);
+            ).rejects.toThrow(BadRequestException);
             expect(manager.insert).not.toHaveBeenCalled();
         },
     );
@@ -1274,6 +1289,7 @@ describe('Jig HTTP contracts', () => {
             .fn()
             .mockResolvedValue({ summary: { total: 0 }, items: [] }),
         finishForm: jest.fn().mockResolvedValue({ applied: true }),
+        configureRequesterFlow: jest.fn().mockResolvedValue({ updated: true, hasNg: true, nextStep: '07' }),
         deleteFile: jest.fn().mockResolvedValue({ deleted: true }),
         createJig: jest.fn().mockResolvedValue({ JIG_STATUS: 'DRAFT' }),
         getIePics: jest
@@ -1346,6 +1362,14 @@ describe('Jig HTTP contracts', () => {
             .get('/iedoc/jig/dashboard?FYEAR=2026')
             .expect(200);
         expect(service.getDashboard).toHaveBeenLastCalledWith();
+    });
+
+    it('routes requester flow with validated form key and PICCODE', async () => {
+        await request(app.getHttpServer())
+            .post('/iedoc/jig/forms/1/000001/26/2026/1/requester-flow')
+            .send({ PICCODE: '14077' })
+            .expect(201);
+        expect(service.configureRequesterFlow).toHaveBeenCalledWith(key, '14077');
     });
 
     it('binds the composite form key on finish and file deletion routes', async () => {

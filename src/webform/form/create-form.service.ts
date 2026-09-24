@@ -252,7 +252,10 @@ export class FormCreateService extends FormService {
             context.empno,
             context.emppos,
         );
-        context.flag = 1; // หากไม่เจอตำแหน่งเช่น ใน ORGPOS ให้ไป set manager step โดยตรวจด้วย VPOSNO ของ FLOWMST ทีละ STEP
+        // * 2026-09-24 เปลี่ยนเป็นแบบ asp ตรวจก่อนว่าเคยมีการตั้งค่า flag หรือไม่
+        if(context.flag == 0){
+            context.flag = 1; // หากไม่เจอตำแหน่งเช่น ใน ORGPOS ให้ไป set manager step โดยตรวจด้วย VPOSNO ของ FLOWMST ทีละ STEP
+        }
         if (orgTree && orgTree.length > 0) {
             context.flag = 2;
             for (const row of orgTree) {
@@ -384,6 +387,8 @@ export class FormCreateService extends FormService {
             CYEAR: context.cyear,
         };
         const url = await this.formmstService.getFormmst(query2);
+        // Do only if requester has manager and requester is not directory and division manager
+        // ทำเฉพาะเมื่อผู้ร้องขอมีผู้จัดการและผู้ร้องขอไม่ใช่ผู้จัดการระดับไดเรกทอรีและผู้จัดการระดับแผนก
         if (manager.length > 0) {
             await this.getRepresent(manager[0].HEADNO, context);
             const flow = {

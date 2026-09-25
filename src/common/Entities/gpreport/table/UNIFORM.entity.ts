@@ -5,7 +5,9 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
+
 import { UNIFORM_CATEGORY } from './UNIFORM_CATEGORY.entity';
+
 @Entity({ name: 'UNIFORM', schema: 'GPREPORT' })
 export class UNIFORM {
     @PrimaryGeneratedColumn()

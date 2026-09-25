@@ -6,8 +6,10 @@ import { AnnualUniformRepository } from './annual.repository';
 
 import { CreateAnnualDto } from './dto/create-annual.dto';
 import { CreateUNAFormDto } from './dto/create-una-form.dto';
+import { UpdateUniformDto } from './dto/update-uniform.dto';
 
 import { UNIFORM } from 'src/common/Entities/gpreport/table/UNIFORM.entity';
+import { UNIFORM_CATEGORY } from 'src/common/Entities/gpreport/table/UNIFORM_CATEGORY.entity';
 import { UNIFORM_RIGHT } from 'src/common/Entities/gpreport/table/UNIFORM_RIGHT.entity';
 import { UniformCalendar } from 'src/common/Entities/gpreport/table/UNIFORM_CALENDAR.entity';
 import { AnnualUniform } from 'src/common/Entities/gpreport/table/UNIFORM_ANNUAL.entity';
@@ -19,8 +21,13 @@ export class UniformService {
     constructor(
         @InjectRepository(UNIFORM, 'gpreportConnection')
         private readonly uniform: Repository<UNIFORM>,
+
+        @InjectRepository(UNIFORM_CATEGORY, 'gpreportConnection')
+        private readonly category: Repository<UNIFORM_CATEGORY>,
+
         @InjectRepository(UniformCalendar, 'gpreportConnection')
         private readonly calendar: Repository<UniformCalendar>,
+
         @InjectRepository(UNIFORM_RIGHT, 'gpreportConnection')
         private readonly right: Repository<UNIFORM_RIGHT>,
 
@@ -34,6 +41,27 @@ export class UniformService {
         });
     }
 
+    async updateUniform(data: UpdateUniformDto) {
+        const existing = await this.uniform.findOne({
+            where: { PROD_ID: data.PROD_ID },
+        });
+        if (!existing) {
+            throw new BadRequestException('Uniform not found');
+        }
+        return await this.uniform.update({ PROD_ID: data.PROD_ID }, data);
+    }
+
+    async updateCategory(data: any) {
+        const existing = await this.category.findOne({
+            where: { CATID: data.CATID },
+        });
+        if (!existing) {
+            throw new BadRequestException('Category not found');
+        }
+        return await this.category.update({ CATID: data.CATID }, data);
+    }
+
+    //Calendar
     async findCalendar() {
         return this.calendar.find();
     }

@@ -14,11 +14,13 @@ import { Request } from 'express';
 
 import { CreateCalendarDto } from './dto/create-calendar.dto';
 import { CreateAnnualDto } from './dto/create-annual.dto';
+import { UpdateUniformDto } from './dto/update-uniform.dto';
 
 @Controller('gpreport/uniform')
 export class UniformController {
     constructor(private readonly uniform: UniformService) {}
 
+    //Calendar
     @Get('calendar')
     findCalendar() {
         return this.uniform.findCalendar();
@@ -34,9 +36,20 @@ export class UniformController {
         return this.uniform.deleteCalendar(year);
     }
 
+    //Product Master
     @Get('master')
     findAll() {
         return this.uniform.findAll();
+    }
+
+    @Post('product')
+    updateUniform(@Body() data: UpdateUniformDto) {
+        return this.uniform.updateUniform(data);
+    }
+
+    @Post('category')
+    updateCategory(@Body() data: any) {
+        return this.uniform.updateCategory(data);
     }
 
     @Get('rights')

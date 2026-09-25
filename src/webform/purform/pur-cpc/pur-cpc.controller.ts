@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Param, Body } from '@nestjs/common';
-import { PurCpcService } from './services/pur-cpc.service';
+import { PurCpcService } from './services/purcpc_form.service';
 import { CondComparisonPriceService } from './services/cond_comparison_price.service';
 import {
     PriceComparisonDto,

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { PurCpcService } from './services/pur-cpc.service';
+import { PurCpcService } from './services/purcpc_form.service';
 import { PurCpcController } from './pur-cpc.controller';
-import { PurCpcRepository } from './repository/pur-cpc.repository';
+import { PurCpcRepository } from './repository/pucpc_form.repository';
 import { IimModule as Iim400Module } from 'src/as400/bpcsfvnew/iim/iim.module';
 import { CondComparisonPriceService } from './services/cond_comparison_price.service';
 import { CondComparisonPriceRepository } from './repository/cond_comparison_price.repository';

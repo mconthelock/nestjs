@@ -10,12 +10,18 @@ import {
     ValidateNested,
 } from 'class-validator';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { StringToDate } from 'src/common/utils/transform';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
 =======
 import { FormDto } from 'src/webform/form/dto/form.dto';
 >>>>>>> 67c79348 (PUR-EVA)
+=======
+import { StringToDate } from 'src/common/utils/transform';
+import { FormDto } from 'src/webform/form/dto/form.dto';
+
+>>>>>>> 6c278692 (QA-CN)
 export class CreateCnformDto extends PickType(FormDto, [
     'NFRMNO',
     'VORGNO',
@@ -68,40 +74,49 @@ export class CreateCnformDto extends PickType(FormDto, [
     @IsOptional()
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
 >>>>>>> 67c79348 (PUR-EVA)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+    @StringToDate()
+>>>>>>> 6c278692 (QA-CN)
     @Type(() => Date)
-    @IsDate()
     SUBMITDATE?: Date;
 
     @IsOptional()
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
 >>>>>>> 67c79348 (PUR-EVA)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+    @StringToDate()
+>>>>>>> 6c278692 (QA-CN)
     @Type(() => Date)
-    @IsDate()
     INSPECDATE?: Date;
 
     @IsOptional()
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
 >>>>>>> 67c79348 (PUR-EVA)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+    @StringToDate()
+>>>>>>> 6c278692 (QA-CN)
     @Type(() => Date)
-    @IsDate()
     EXPCHGDATE?: Date;
 
     @IsOptional()

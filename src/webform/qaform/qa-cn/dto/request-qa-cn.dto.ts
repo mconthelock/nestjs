@@ -25,9 +25,13 @@ import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 import { RequestResultChkDwgDto } from '../resultchkdwg/dto/request-resultchkdwg.dto';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { StringToDate } from 'src/common/utils/transform';
 =======
 >>>>>>> d7bc7b33 (QA-CN)
+=======
+import { StringToDate } from 'src/common/utils/transform';
+>>>>>>> 6c278692 (QA-CN)
 
 export class RequestCNFormDto extends PickType(CreateFormDto, [
     'NFRMNO',
@@ -87,40 +91,49 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
     @IsOptional()
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
 >>>>>>> d7bc7b33 (QA-CN)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+    @StringToDate()
+>>>>>>> 6c278692 (QA-CN)
     @Type(() => Date)
-    @IsDate()
     SUBMITDATE?: Date;
 
     @IsOptional()
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
 >>>>>>> d7bc7b33 (QA-CN)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+    @StringToDate()
+>>>>>>> 6c278692 (QA-CN)
     @Type(() => Date)
-    @IsDate()
     INSPECDATE?: Date;
 
     @IsOptional()
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
 >>>>>>> d7bc7b33 (QA-CN)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+    @StringToDate()
+>>>>>>> 6c278692 (QA-CN)
     @Type(() => Date)
-    @IsDate()
     EXPCHGDATE?: Date;
 
     @IsOptional()

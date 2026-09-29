@@ -5,10 +5,14 @@ import {
     PickType,
 } from '@nestjs/swagger';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Transform, Type, plainToInstance } from 'class-transformer';
 =======
 import { Transform, Type } from 'class-transformer';
 >>>>>>> d7bc7b33 (QA-CN)
+=======
+import { Transform, Type, plainToInstance } from 'class-transformer';
+>>>>>>> 90141e56 (QA-CN)
 import {
     IsArray,
     IsDate,
@@ -213,6 +217,9 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 
     @IsOptional()
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 90141e56 (QA-CN)
     @Transform(({ value }) => {
         if (typeof value === 'string') {
             try {
@@ -228,6 +235,7 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
         }
         return value;
     })
+<<<<<<< HEAD
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => RequestResultChkDwgDto)
@@ -238,4 +246,10 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
     @Type(() => RequestResultChkDwgDto)
     DWGNo?: RequestResultChkDwgDto[];
 >>>>>>> d7bc7b33 (QA-CN)
+=======
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => RequestResultChkDwgDto)
+    DWGNO?: RequestResultChkDwgDto[];
+>>>>>>> 90141e56 (QA-CN)
 }

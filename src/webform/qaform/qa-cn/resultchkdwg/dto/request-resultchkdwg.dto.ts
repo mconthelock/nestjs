@@ -10,6 +10,7 @@ export class RequestResultChkDwgDto {
     @IsNumber()
     @Type(() => Number)
 <<<<<<< HEAD
+<<<<<<< HEAD
     RESULT?: number;
 
     @IsOptional()
@@ -21,13 +22,20 @@ export class RequestResultChkDwgDto {
     REVNO?: string;
 =======
     RESULT: number;
+=======
+    RESULT?: number;
+>>>>>>> 90141e56 (QA-CN)
 
     @IsOptional()
     @IsString()
-    REMARK: string;
+    REMARK?: string;
 
     @IsOptional()
     @IsString()
+<<<<<<< HEAD
     REVNO: string;
 >>>>>>> d7bc7b33 (QA-CN)
+=======
+    REVNO?: string;
+>>>>>>> 90141e56 (QA-CN)
 }

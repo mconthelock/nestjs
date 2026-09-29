@@ -186,9 +186,9 @@ export class PrintedTopLabelService {
             ...opt,
             text: `URGENT 202610B - P1`,
             align: 'center',
-            boxX: 400,
+            boxX: 200,
             boxY: 225,
-            boxWidth: 115,
+            boxWidth: 300,
             drawBorder: {
                 color: rgb(1, 0, 0),
                 width: 2,

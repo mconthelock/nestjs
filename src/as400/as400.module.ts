@@ -13,6 +13,8 @@ import { S030kpModule } from './rtnlibf/s030kp/s030kp.module';
 import { S001kpModule } from './rtnlibf/s001kp/s001kp.module';
 import { M001kpModule } from './rtnlibf/m001kp/m001kp.module';
 import { M002kpModule } from './rtnlibf/m002kp/m002kp.module';
+import { BpcsfvnewModule } from './bpcsfvnew/bpcsfvnew.module';
+import { rtnlibfModule } from './rtnlibf/rtnlibf.module';
 
 @Module({
     imports: [
@@ -23,6 +25,8 @@ import { M002kpModule } from './rtnlibf/m002kp/m002kp.module';
         S001kpModule,
         M001kpModule,
         M002kpModule,
+        BpcsfvnewModule,
+        rtnlibfModule,
         // F001kpModule,
         // F002kpModule,
         // F003kpModule,

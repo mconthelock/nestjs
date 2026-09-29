@@ -123,6 +123,7 @@ export class PrintedQueueService {
                     // ขั้นตอนที่ 6: ใส่ Label ด้านบนของ PDF (Japan/Urgent/Eathquake)
                     const labelStartTime = Date.now();
                     await this.label.processLabelDetail(fileID);
+                    await this.label.processLabelSpecial(fileID);
                     await this.printed.writeLog(
                         `Put Remark Lable PDF in ${this.printed.formatElapsedTime(labelStartTime)}`,
                     );

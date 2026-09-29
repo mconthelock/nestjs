@@ -537,7 +537,7 @@ export class PrintedService {
                     pdfContext.pdfDirectory,
                     `${row.PAGE_MFGNO}-${row.PAGE_PACKING}-${row.PAGE_NUM}.pdf`,
                 );
-                await this.embedLabelToPdf(pdfPath, `URGENT 2026-10B P1`);
+                await this.embedLabelToPdf(pdfPath, `URGENT 202610B P1`);
             }
         } catch (error) {
             throw new Error(

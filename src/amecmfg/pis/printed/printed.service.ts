@@ -307,6 +307,9 @@ export class PrintedService {
                 // ขั้นตอนที่ 4: ใส่ข้อมูล Label ลงในแต่ละหน้า PDF ตามเงื่อนไข
                 await this.processLabelDetail(fileID);
 
+                // ขั้นตอนที่ 4.1: ใส่ข้อมูล Label ลงในแต่ละหน้า PDF ตามเงื่อนไข
+                await this.processLableSpecial(fileID);
+
                 // ขั้นตอนที่ 5: รวมไฟล์ PDF กลับเป็นไฟล์เดียว
                 const outFilePath = path.join(
                     outputDirectory,
@@ -511,6 +514,30 @@ export class PrintedService {
                         error instanceof Error ? error.message : String(error),
                     );
                 }
+            }
+        } catch (error) {
+            throw new Error(
+                `Error processing label detail: ${error instanceof Error ? error.message : String(error)}`,
+            );
+        }
+    }
+
+    async processLableSpecial(id: number) {
+        const data = await this.repo.Special(id);
+        try {
+            for (const row of data) {
+                const pdfContext = await this.setPdfPath({
+                    schd_txt: row.SCHDCHAR,
+                    schd_p: row.SCHDP,
+                    filedir: row.FILE_FOLDER,
+                    filename: row.FILE_ONAME,
+                });
+
+                const pdfPath = path.join(
+                    pdfContext.pdfDirectory,
+                    `${row.PAGE_MFGNO}-${row.PAGE_PACKING}-${row.PAGE_NUM}.pdf`,
+                );
+                await this.embedLabelToPdf(pdfPath, `URGENT 202610B P1`);
             }
         } catch (error) {
             throw new Error(

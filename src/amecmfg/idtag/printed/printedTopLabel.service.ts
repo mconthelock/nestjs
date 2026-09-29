@@ -169,4 +169,69 @@ export class PrintedTopLabelService {
         });
         await fs.writeFile(pdfPath, await pdfDoc.save());
     }
+
+    private async embedUrgent10BToPdf(pdfPath: string) {
+        const pdfBytes = await fs.readFile(pdfPath);
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+        const [page] = pdfDoc.getPages();
+        //await drawGrid(page);
+        const opt = {
+            pdfpage: page,
+            fontsize: 24,
+            boxHeight: 25,
+            fontColor: rgb(1, 0, 0),
+            textOpacity: 0.5,
+        };
+        await writeLineBox({
+            ...opt,
+            text: `URGENT 202610B - P1`,
+            align: 'center',
+            boxX: 400,
+            boxY: 225,
+            boxWidth: 115,
+            drawBorder: {
+                color: rgb(1, 0, 0),
+                width: 2,
+                borderOpacity: 0.5,
+                //bgColor: rgb(0.9, 0.9, 0.9),
+            },
+        });
+        await fs.writeFile(pdfPath, await pdfDoc.save());
+    }
+
+    async processLabelSpecial(fileID: number) {
+        const data = await this.repo.Special(fileID);
+        try {
+            for (const row of data) {
+                let pdfDirectory = '';
+                let logFileName: string | undefined;
+
+                try {
+                    pdfDirectory = await this.printed.getCurrentPdfDirectory();
+                    logFileName = undefined;
+                } catch {
+                    const pdfContext = await this.printed.setPdfPath({
+                        schd_txt: row.SCHDCHAR,
+                        schd_p: row.SCHDP,
+                        filedir: row.FILE_FOLDER,
+                        filename: row.FILE_ONAME,
+                    });
+                    pdfDirectory = pdfContext.pdfDirectory;
+                    logFileName = pdfContext.logFileName;
+                }
+
+                const pdfPath = path.join(pdfDirectory, `${row.PAGE_TAG}.pdf`);
+                await this.embedUrgent10BToPdf(pdfPath);
+                await this.printed.writeLog(
+                    `Put Label Urgent to ${row.PAGE_TAG}`,
+                    null,
+                    logFileName,
+                );
+            }
+        } catch (error) {
+            throw new Error(
+                `Error processing label detail: ${error instanceof Error ? error.message : String(error)}`,
+            );
+        }
+    }
 }

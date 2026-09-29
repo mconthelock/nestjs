@@ -14,4 +14,8 @@ export class IsCboService {
     async getDevice(uid: string) {
         return this.cbo.getDevice(uid);
     }
+    
+    async saveLog(comname: string, empno: string) {
+        return this.cbo.saveLog(comname, empno);
+    }
 }

@@ -35,7 +35,7 @@ export class BiddingRepository extends BaseRepository {
         }
         if (dto.SDEPCODE) {
             where['REQDEPT'] = dto.SDEPCODE;
-            where['INPUTDEP'] = dto.SDEPCODE;
+            where['INPUTDEPT'] = dto.SDEPCODE;
         }
         if (dto.SDIVCODE) {
             where['REQDIV'] = dto.SDIVCODE;

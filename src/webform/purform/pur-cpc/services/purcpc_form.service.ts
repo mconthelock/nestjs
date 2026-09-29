@@ -82,7 +82,8 @@ export class PurCpcService {
 
     async create(dto: CreatePcpFormDto) {
         try {
-            const cyear2 = new Date().getFullYear().toString()
+            const cyear2 = new Date().getFullYear().toString();
+            const nrunno = await this.getFormNextRunNo(cyear2);
             return await this.repo.create(dto);
         } catch (error) {
             throw error;

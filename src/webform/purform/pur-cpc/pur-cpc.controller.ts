@@ -6,6 +6,7 @@ import {
     PriceComparisonPlannerDto,
 } from './dto/price-comparison.dto';
 import { CreatePcpFormDto } from './dto/create-pcp-form.dto';
+import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 @Controller('purform/pur-cpc')
 export class PurCpcController {
@@ -30,6 +31,7 @@ export class PurCpcController {
     }
 
     @Post()
+    @UseTransaction('webformConnection')
     async create(@Body() data: CreatePcpFormDto) {
         return await this.service.create(data);
     }

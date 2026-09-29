@@ -20,6 +20,7 @@ import {
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 import { RequestResultChkDwgDto } from '../resultchkdwg/dto/request-resultchkdwg.dto';
+import { StringToDate } from 'src/common/utils/transform';
 
 export class RequestCNFormDto extends PickType(CreateFormDto, [
     'NFRMNO',
@@ -77,18 +78,18 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
     AFTCHANGE?: string;
 
     @IsOptional()
+    @StringToDate()
     @Type(() => Date)
-    @IsDate()
     SUBMITDATE?: Date;
 
     @IsOptional()
+    @StringToDate()
     @Type(() => Date)
-    @IsDate()
     INSPECDATE?: Date;
 
     @IsOptional()
+    @StringToDate()
     @Type(() => Date)
-    @IsDate()
     EXPCHGDATE?: Date;
 
     @IsOptional()

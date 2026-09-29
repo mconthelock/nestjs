@@ -9,7 +9,9 @@ import {
     IsString,
     ValidateNested,
 } from 'class-validator';
+import { StringToDate } from 'src/common/utils/transform';
 import { FormDto } from 'src/webform/form/dto/form.dto';
+
 export class CreateCnformDto extends PickType(FormDto, [
     'NFRMNO',
     'VORGNO',
@@ -60,18 +62,18 @@ export class CreateCnformDto extends PickType(FormDto, [
     AFTCHANGE?: string;
 
     @IsOptional()
+    @StringToDate()
     @Type(() => Date)
-    @IsDate()
     SUBMITDATE?: Date;
 
     @IsOptional()
+    @StringToDate()
     @Type(() => Date)
-    @IsDate()
     INSPECDATE?: Date;
 
     @IsOptional()
+    @StringToDate()
     @Type(() => Date)
-    @IsDate()
     EXPCHGDATE?: Date;
 
     @IsOptional()

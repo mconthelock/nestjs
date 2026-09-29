@@ -7,6 +7,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 export class IsCboRepository extends BaseRepository {
     constructor(
         @InjectDataSource('webformConnection') private readonly ds: DataSource,
+        @InjectDataSource('gpreportConnection') private readonly gpreportDs: DataSource,
     ) {
         super(ds);
     }
@@ -33,5 +34,18 @@ export class IsCboRepository extends BaseRepository {
             `,
             [uid],
         );
+    }
+
+    async saveLog(comname: string, empno: string) {
+        return this.gpreportDs
+            .createQueryBuilder()
+            .insert()
+            .into('COM_GATE_CHECK')
+            .values({
+                COMNAME: comname,
+                EMPNO: empno,
+                DATECHECK: () => 'SYSDATE',
+            })
+            .execute();
     }
 }

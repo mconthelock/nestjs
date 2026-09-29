@@ -24,4 +24,12 @@ export class IsCboController {
     getDevice(@Body('uid') uid: string) {
         return this.isCboService.getDevice(uid);
     }
+
+    @Post('save-log')
+    saveLog(
+        @Body('comname') comname: string,
+        @Body('empno') empno: string
+    ) {
+        return this.isCboService.saveLog(comname, empno);
+    }
 }

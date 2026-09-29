@@ -27,9 +27,10 @@ describe('Jig NG tag template', () => {
     });
     it('handles names without spaces and keeps action boxes for unknown values', () => {
         const html = ngTagHtml({ ...data, ng: { ...data.ng, ACTION: 'Repair & check' },
-            stamps: [{ CSTEPNO: '07', CAPVSTNO: '1', DAPVDATE: '2026-04-21', SNAME: 'SOMCHAI' }] }, '', '');
+            stamps: [{ CSTEPNO: '07', CAPVSTNO: '1', DAPVDATE: '2026-04-21', SNAME: 'SOMCHAI', SSEC: 'MFG SEC.' }] }, '', '');
         expect(html).toContain('SOMCHAI');
-        expect(html).toContain('K4 LINE');
+        expect(html).toContain('MFG SEC.');
+        expect(html).not.toContain('K4 LINE');
         for (const action of ['ADJUST', 'MODIFY', 'REPLACE']) expect(html).toContain(`<i></i>${action}`);
     });
     it.each([

@@ -19,7 +19,7 @@ use all five keys including NRUNNO. Missing form/NG returns 404.
 
 Stamps: -- inspector / 06 approval / 07 foreman. Only CAPVSTNO 1 with DAPVDATE is
 stamped; otherwise the circle says PENDING. Uses actual approver VREALAPV, falling
-back to VAPVNO. Displays SSEC / fixed AMEC / JIG_FORM.LOCATION respectively,
+back to VAPVNO. Displays SSEC / fixed AMEC / SSEC respectively,
 approval date dd/mm/yyyy in Asia/Bangkok, and the first word of SNAME. If multiple
 approved rows exist for one step, the most recently dated row is selected.
 

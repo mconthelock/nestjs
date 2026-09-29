@@ -24,7 +24,7 @@ export function ngTagHtml(data: any, regular: string, bold: string): string {
     const stamp = (step: string, label: string, top: string | null) => {
         const row = stamps.find((s) => String(s.CSTEPNO).trim() === step && String(s.CAPVSTNO).trim() === '1' && s.DAPVDATE);
         const name = row?.SNAME?.trim().split(/\s+/)[0] || '-';
-        const heading = step === '--' ? row?.SSEC : top;
+        const heading = step === '--' || step === '07' ? row?.SSEC : top;
         return `<section class="sign"><div class="circle ${row ? '' : 'pending'}">${row
             ? `<div class="stamp-line fit">${e(heading || '-')}</div><div class="stamp-date">${e(tagDate(row.DAPVDATE))}</div><div class="stamp-line fit">${e(name)}</div>`
             : '<div class="pending-text">PENDING</div>'}</div><b>${label}</b></section>`;
@@ -54,7 +54,7 @@ export function ngTagHtml(data: any, regular: string, bold: string): string {
     <div class="actions"><b>ACTION :</b>${actionLine}</div>
     <section class="block corrective"><h2>CORRECTIVE ACTION :</h2><div class="copy fit">${e(ng.CORRECTIVE)}</div></section>
     <div class="plan fit"><b>PLAN :</b> Complete by ${e(tagDate(ng.PLAN_DATE))}</div>
-    <div class="signatures">${stamp('--', 'INSPECTOR', null)}${stamp('06', 'APPROVAL', 'AMEC')}${stamp('07', 'FOREMAN', form.LOCATION)}</div>
+    <div class="signatures">${stamp('--', 'INSPECTOR', null)}${stamp('06', 'APPROVAL', 'AMEC')}${stamp('07', 'FOREMAN', null)}</div>
     <footer>Auto e-Stamp - generated from recorded step approvals</footer></article></div></body></html>`;
 }
 

@@ -10,6 +10,7 @@ import {
 import { CreatePcpFormDto } from '../dto/create-pcp-form.dto';
 
 import { IimService as Iim400Service } from 'src/as400/bpcsfvnew/iim/iim.service';
+import { pkForm } from '../interface/create.interface';
 
 @Injectable()
 export class PurCpcService {
@@ -70,8 +71,18 @@ export class PurCpcService {
         }
     }
 
+    async getFormNextRunNo(cyear2: string) {
+        const form = await this.repo.getFormNextRunNo(cyear2);
+        if (form.length > 0) {
+            return form[0].NRUNNO + 1;
+        } else {
+            return 1;
+        }
+    }
+
     async create(dto: CreatePcpFormDto) {
         try {
+            const cyear2 = new Date().getFullYear().toString()
             return await this.repo.create(dto);
         } catch (error) {
             throw error;

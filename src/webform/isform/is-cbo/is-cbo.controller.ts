@@ -19,4 +19,9 @@ export class IsCboController {
     getListBringOut(@Body('empno') vreqno: string) {
         return this.isCboService.getListBringOut(vreqno);
     }
+
+    @Post('get-device')
+    getDevice(@Body('uid') uid: string) {
+        return this.isCboService.getDevice(uid);
+    }
 }

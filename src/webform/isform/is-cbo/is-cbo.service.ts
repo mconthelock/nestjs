@@ -10,4 +10,8 @@ export class IsCboService {
     async getListBringOut(vreqno: string) {
         return this.cbo.getListBringOut(vreqno);
     }
+    
+    async getDevice(uid: string) {
+        return this.cbo.getDevice(uid);
+    }
 }

@@ -12,6 +12,7 @@ import { IsCfsModule } from './is-cfs/is-cfs.module';
 import { IsSefModule } from './is-sef/is-sef.module';
 import { IsOffModule } from './is-off/is-off.module';
 import { IsJdrModule } from './is-jdr/is-jdr.module';
+import { IsCboModule } from './is-cbo/is-cbo.module';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { IsJdrModule } from './is-jdr/is-jdr.module';
         IsSefModule,
         IsOffModule,
         IsJdrModule,
+        IsCboModule,
     ],
 })
 export class ISFormModule {}

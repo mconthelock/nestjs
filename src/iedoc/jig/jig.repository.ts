@@ -327,6 +327,24 @@ export class JigRepository extends BaseRepository {
         };
     }
 
+    async getNgTagData(key: JigFormKeyDto) {
+        const where = formKey(key);
+        const form = await this.manager.findOneBy(JigForm, where);
+        if (!form) throw new NotFoundException('Jig form not found');
+        const ng = await this.manager.findOneBy(JigFormNg, where);
+        if (!ng) throw new NotFoundException('This form has no NG data');
+        const params = FORM_KEYS.map((k) => where[k]);
+        const rows = await this.manager.query('SELECT DREQDATE FROM WEBFORM.FORM WHERE ' +
+            FORM_KEYS.map((k, i) => `${k} = :${i + 1}`).join(' AND '), params);
+        if (!rows.length) throw new NotFoundException('WEBFORM.FORM not found');
+        const stamps = await this.manager.query(
+            'SELECT F.CSTEPNO, F.CAPVSTNO, F.DAPVDATE, U.SNAME, U.SSEC FROM WEBFORM.FLOW F ' +
+            'LEFT JOIN AMEC.AMECUSERALL U ON TRIM(U.SEMPNO) = COALESCE(TRIM(F.VREALAPV), TRIM(F.VAPVNO)) WHERE ' +
+            FORM_KEYS.map((k, i) => `F.${k} = :${i + 1}`).join(' AND ') +
+            " AND F.CSTEPNO IN ('--', '06', '07') ORDER BY F.DAPVDATE DESC NULLS LAST, F.CAPVTIME DESC NULLS LAST, F.VAPVNO", params);
+        return { form, ng, checkDate: rows[0].DREQDATE, stamps };
+    }
+
     private async withForm<T>(
         key: JigFormKeyDto,
         callback: (

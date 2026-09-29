@@ -1,5 +1,7 @@
 import {
     Body,
+    StreamableFile,
+    Header,
     Req,
     Controller,
     Delete,
@@ -27,6 +29,7 @@ import { FinishInspectionDto } from './dto/finish-inspection.dto';
 import { AutoInspectionDto } from './dto/auto-inspection.dto';
 import { Request } from 'express';
 import { getClientIP } from 'src/common/utils/ip.utils';
+import { JigNgTagService } from './jig-ng-tag.service';
 const formPath = 'forms/:NFRMNO/:VORGNO/:CYEAR/:CYEAR2/:NRUNNO';
 
 @Controller('iedoc/jig')
@@ -38,7 +41,7 @@ const formPath = 'forms/:NFRMNO/:VORGNO/:CYEAR/:CYEAR2/:NRUNNO';
     }),
 )
 export class JigController {
-    constructor(private readonly jigService: JigService) {}
+    constructor(private readonly jigService: JigService, private readonly ngTag: JigNgTagService) {}
 
     @Get('mfg-processes')
     getMfgProcesses() {
@@ -73,6 +76,13 @@ export class JigController {
     @Get(formPath)
     getForm(@Param() key: JigFormKeyDto) {
         return this.jigService.getForm(key);
+    }
+    @Get(formPath + '/ng-tag.pdf')
+    @Header('Cache-Control', 'no-store')
+    async ngTagPdf(@Param() key: JigFormKeyDto) {
+        const pdf = await this.ngTag.generate(key);
+        return new StreamableFile(pdf, { type: 'application/pdf',
+            disposition: `inline; filename="NG-TAG-${key.NFRMNO}-${key.VORGNO.replace(/[^a-zA-Z0-9_-]/g, '_')}-${key.CYEAR}-${key.CYEAR2}-${key.NRUNNO}.pdf"` });
     }
     @Patch(formPath)
     saveForm(@Param() key: JigFormKeyDto, @Body() dto: SaveJigFormDto) {

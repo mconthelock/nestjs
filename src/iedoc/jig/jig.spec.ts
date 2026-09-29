@@ -9,6 +9,7 @@ import { DataSource } from 'typeorm';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { JigController } from './jig.controller';
+import { JigNgTagService } from './jig-ng-tag.service';
 import { JigRepository } from './jig.repository';
 import { JigService } from './jig.service';
 import { CreateJigDto } from './dto/create-jig.dto';
@@ -434,6 +435,19 @@ describe('Jig create workflow routing', () => {
 });
 
 describe('Jig dictionary and validation', () => {
+    it('loads NG tag stamps with full form key and actual approver names', async () => {
+        const { repo, state, manager } = fixture();
+        state.ng = { DEFECT_DETAIL: 'Defect' };
+        manager.query.mockResolvedValueOnce([{ DREQDATE: '2026-04-18' }]).mockResolvedValueOnce([]);
+        expect((await repo.getNgTagData(key)).checkDate).toBe('2026-04-18');
+        expect(manager.query.mock.calls[1][0]).toContain('COALESCE(TRIM(F.VREALAPV), TRIM(F.VAPVNO))');
+        expect(manager.query.mock.calls[1][0]).toContain('F.NRUNNO = :5');
+        expect(manager.query.mock.calls[1][1]).toEqual([1, '000001', '26', '2026', 1]);
+    });
+    it('does not generate an NG tag for a form without NG', async () => {
+        const { repo } = fixture();
+        await expect(repo.getNgTagData(key)).rejects.toThrow('no NG data');
+    });
     it('applies an inspection of an existing REV 0 jig as an update', async () => {
         const { repo, form, manager } = fixture();
         form.REV = '0';
@@ -1319,7 +1333,8 @@ describe('Jig HTTP contracts', () => {
     beforeAll(async () => {
         const module = await Test.createTestingModule({
             controllers: [JigController],
-            providers: [{ provide: JigService, useValue: service }],
+            providers: [{ provide: JigService, useValue: service },
+                { provide: JigNgTagService, useValue: { generate: jest.fn().mockResolvedValue(Buffer.from('%PDF-1.7 test')) } }],
         }).compile();
         app = module.createNestApplication();
         app.useGlobalPipes(
@@ -1362,6 +1377,15 @@ describe('Jig HTTP contracts', () => {
             .get('/iedoc/jig/dashboard?FYEAR=2026')
             .expect(200);
         expect(service.getDashboard).toHaveBeenLastCalledWith();
+    });
+
+    it('returns an inline PDF on the NG tag route', async () => {
+        await request(app.getHttpServer())
+            .get('/iedoc/jig/forms/1/000001/26/2026/1/ng-tag.pdf')
+            .expect(200)
+            .expect('Content-Type', /application\/pdf/)
+            .expect('Content-Disposition', /inline; filename="NG-TAG-/)
+            .expect('Cache-Control', 'no-store');
     });
 
     it('routes requester flow with validated form key and PICCODE', async () => {

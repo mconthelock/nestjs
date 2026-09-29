@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { FormModule } from 'src/webform/form/form.module';
 import { JigInspectionService } from './jig-inspection.service';
+import { JigNgTagService } from './jig-ng-tag.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JigController } from './jig.controller';
 import { JigService } from './jig.service';
@@ -33,7 +34,7 @@ import { ShopCodeMst } from 'src/common/Entities/iedoc/table/shopcodemst.entity'
         ),
     ],
     controllers: [JigController],
-    providers: [JigService, JigRepository, JigInspectionService],
+    providers: [JigService, JigRepository, JigInspectionService, JigNgTagService],
     exports: [JigService, JigRepository],
 })
 export class JigModule {}

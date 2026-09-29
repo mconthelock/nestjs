@@ -9,13 +9,13 @@ export class RequestResultChkDwgDto {
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    RESULT: number;
+    RESULT?: number;
 
     @IsOptional()
     @IsString()
-    REMARK: string;
+    REMARK?: string;
 
     @IsOptional()
     @IsString()
-    REVNO: string;
+    REVNO?: string;
 }

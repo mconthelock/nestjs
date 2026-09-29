@@ -4,7 +4,7 @@ import {
     PartialType,
     PickType,
 } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+import { Transform, Type, plainToInstance } from 'class-transformer';
 import {
     IsArray,
     IsDate,
@@ -168,8 +168,23 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
     RADOBJ?: string;
 
     @IsOptional()
+    @Transform(({ value }) => {
+        if (typeof value === 'string') {
+            try {
+                // 1. แปลง String เป็น Array of Objects ธรรมดา
+                const parsedValue = JSON.parse(value);
+
+                // 2. แปลง Objects ธรรมดา ให้เป็น Class RequestResultChkDwgDto
+                // เพื่อให้ ValidationPipe มองเห็น Decorators (@IsString, etc.) และไม่ตัดข้อมูลทิ้ง
+                return plainToInstance(RequestResultChkDwgDto, parsedValue);
+            } catch (e) {
+                return value;
+            }
+        }
+        return value;
+    })
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => RequestResultChkDwgDto)
-    DWGNo?: RequestResultChkDwgDto[];
+    DWGNO?: RequestResultChkDwgDto[];
 }

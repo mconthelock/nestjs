@@ -17,6 +17,8 @@ import { J736kpService } from 'src/as400/rtnlibf/j736kp/j736kp.service';
 import { now } from 'src/common/utils/dayjs.utils';
 import { deleteFile, joinPaths } from 'src/common/utils/files.utils';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
+import { log } from 'node:console';
+import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
 
 @Injectable()
 export class QaCnService {
@@ -31,6 +33,7 @@ export class QaCnService {
         private readonly hpoService: HpoService,
         private readonly j736kpService: J736kpService,
         private readonly doactionService: DoactionFlowService,
+        private readonly deleteflowService: DeleteFlowStepService,
     ) {}
 
     async request(
@@ -49,7 +52,7 @@ export class QaCnService {
         path: string,
     ) {
         try {
-            const { REQBY, INPUTBY, REMARK, ACTION, DWGNo, ...cndata } = dto;
+            const { REQBY, INPUTBY, REMARK, ACTION, DWGNO, ...cndata } = dto;
             const createForm = await this.formCreateService.create(
                 {
                     NFRMNO: cndata.NFRMNO,
@@ -72,7 +75,7 @@ export class QaCnService {
                 CYEAR2: createForm.data.CYEAR2,
                 NRUNNO: createForm.data.NRUNNO,
             };
-            let condition = {};
+            let condition: any;
             let rsapv;
             //manage flow
             if (cndata.RADSEC == '1') {
@@ -98,11 +101,18 @@ export class QaCnService {
                         condition: condition,
                         VAPVNO: rsapv[0].VEMPNO,
                     });
+                    // condition = {
+                    //     ...currentForm,
+                    //     CSTEPNO: In(['07', '61']),
+                    // };
+                    //await this.flowService.deleteFlow(condition);
                     condition = {
                         ...currentForm,
-                        CSTEPNO: In(['07', '61']),
+                        CSTEPNO: '07',
                     };
-                    await this.flowService.deleteFlow({ condition: condition });
+                    await this.deleteflowService.deleteFlowStep(condition);
+                    condition.CSTEPNO = '61';
+                    await this.deleteflowService.deleteFlowStep(condition);
                 } else if (cndata.SEC == '3') {
                     condition = {
                         ...currentForm,
@@ -144,6 +154,10 @@ export class QaCnService {
                 let inc = await this.repoCnform.findInc(
                     Number(cndata.ITEMNO.charAt(0)),
                 );
+                console.log('>>>>>INC<<<<<');
+                console.log(inc);
+                console.log('>>>>>INC<<<<<');
+
                 if (inc) {
                     const items = [
                         '630',
@@ -178,7 +192,11 @@ export class QaCnService {
                         condition: condition,
                         VAPVNO: inc,
                     });
+                    console.log('>>>>>update<<<<<');
+                    console.log(condition);
+                    console.log('>>>>>update<<<<<');
                 }
+
                 if (cndata.RADPROCAMEC == '2') {
                     if (cndata.RADOBJ == '2' || cndata.RADOBJ == '3') {
                         condition = {
@@ -222,18 +240,26 @@ export class QaCnService {
                     VAPVNO: '05030',
                 });
                 if (rsqic.length == 0) {
+                    // condition = {
+                    //     ...currentForm,
+                    //     CSTEPNO: In(['07', '61']),
+                    // };
+
+                    // await this.flowService.deleteFlow(condition);
                     condition = {
                         ...currentForm,
-                        CSTEPNO: In(['07', '61']),
+                        CSTEPNO: '07',
                     };
-                    await this.flowService.deleteFlow({ condition: condition });
+                    await this.deleteflowService.deleteFlowStep(condition);
+                    condition.CSTEPNO = '61';
+                    await this.deleteflowService.deleteFlowStep(condition);
                 }
             }
             await this.repoCnform.insert({
                 ...currentForm,
                 ...cndata,
             });
-            const dwgToInsert = DWGNo.map((item) => {
+            const dwgToInsert = DWGNO.map((item) => {
                 return {
                     // ใช้ค่าจาก FormDto เป็นหัวขบวน
                     ...currentForm,
@@ -296,7 +322,7 @@ export class QaCnService {
         ip: string,
         path: string,
     ) {
-        let condition = {};
+        let condition: any;
         const fileMappings = [
             { key: 'DWGFILE[]', TYPENO: 0 },
             { key: 'MATFILE[]', TYPENO: 1 },
@@ -318,7 +344,7 @@ export class QaCnService {
                 SELJOBTYPE,
                 REMARK,
                 ACTION,
-                DWGNo,
+                DWGNO,
                 ...cndata
             } = dto;
             const currentForm = {
@@ -328,7 +354,7 @@ export class QaCnService {
                 CYEAR2: cndata.CYEAR2,
                 NRUNNO: cndata.NRUNNO,
             };
-            const dwgToInsert = DWGNo.map((item) => {
+            const dwgToInsert = DWGNO.map((item) => {
                 return {
                     // ใช้ค่าจาก FormDto เป็นหัวขบวน
                     ...currentForm,
@@ -366,11 +392,18 @@ export class QaCnService {
                 });
             }
             if (SELJOBTYPE && SELJOBTYPE == 'S') {
+                // condition = {
+                //     ...currentForm,
+                //     CSTEPNO: In(['07', '61']),
+                // };
+                // await this.flowService.deleteFlow(condition);
                 condition = {
                     ...currentForm,
-                    CSTEPNO: In(['07', '61']),
+                    CSTEPNO: '07',
                 };
-                await this.flowService.deleteFlow(condition);
+                await this.deleteflowService.deleteFlowStep(condition);
+                condition.CSTEPNO = '61';
+                await this.deleteflowService.deleteFlowStep(condition);
             }
             if (CEXTDATA >= 2 && CEXTDATA < 8) {
                 await this.repoCnform.update(

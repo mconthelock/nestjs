@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { PURCPC_FORM } from './PURCPC_FORM.entity';
 
 @Entity({ name: 'PURCPC_DETAILS', schema: 'WEBFORM' })
 export class PURCPC_DETAILS {
@@ -225,4 +226,9 @@ export class PURCPC_DETAILS {
 
     @Column()
     VCOMMENT: string;
+
+    @ManyToOne(() => PURCPC_FORM, form => form.DETAILS)
+    @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+    @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+    PURCPC_FORM: PURCPC_FORM;
 }

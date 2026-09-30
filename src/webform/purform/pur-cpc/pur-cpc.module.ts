@@ -8,6 +8,7 @@ import { CondComparisonPriceRepository } from './repository/cond_comparison_pric
 import { PurcpcProcPlanViewRepository } from './repository/purcpc_proc_list_view.repository';
 import { PurcpcProcCompareViewRepository } from './repository/purcpc_proc_compare_view.repository';
 import { PurCpcDetailRepository } from './repository/purcpc_details.repository';
+import { CreatePurCpcService } from './services/purcpc_create.service';
 
 @Module({
     imports: [Iim400Module],
@@ -15,6 +16,7 @@ import { PurCpcDetailRepository } from './repository/purcpc_details.repository';
     providers: [
         // service
         PurCpcService,
+        CreatePurCpcService,
         CondComparisonPriceService,
         // Repository
         PurCpcRepository,

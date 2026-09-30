@@ -6,6 +6,7 @@ import { PURCPC_FORM } from 'src/common/Entities/webform/table/PURCPC_FORM.entit
 import { CreatePcpFormDto } from '../dto/create-pcp-form.dto';
 import { PURCPC_FORM_LISTS_VIEW } from 'src/common/Entities/webform/views/PURCPC_FORM_LISTS_VIEW.entity';
 import { PriceComparisonListDto } from '../dto/price-comparison.dto';
+import { pkForm } from '../interface/create.interface';
 
 @Injectable()
 export class PurCpcRepository extends BaseRepository {
@@ -13,9 +14,16 @@ export class PurCpcRepository extends BaseRepository {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
-    getLists(data: PriceComparisonListDto){
+    getLists(data: PriceComparisonListDto) {
         return this.getRepository(PURCPC_FORM_LISTS_VIEW).find({
             where: data,
+        });
+    }
+
+    getForm(data: pkForm) {
+        return this.getRepository(PURCPC_FORM).find({
+            where: data,
+            relations: ['DETAILS'],
         });
     }
 

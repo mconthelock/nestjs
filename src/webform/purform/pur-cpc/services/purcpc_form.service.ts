@@ -9,19 +9,21 @@ import {
     PriceComparisonPlannerDto,
     PriceComparisonListDto,
 } from '../dto/price-comparison.dto';
-import { CreateFormDto } from '../dto/create-pcp-form.dto';
 
 import { IimService as Iim400Service } from 'src/as400/bpcsfvnew/iim/iim.service';
+import { CreatePurCpcService } from './purcpc_create.service';
 
 @Injectable()
-export class PurCpcService {
+export class PurCpcService extends CreatePurCpcService {
     constructor(
-        private readonly repo: PurCpcRepository,
-        private readonly detailsRepo: PurCpcDetailRepository,
+        protected readonly repo: PurCpcRepository,
+        protected readonly detailsRepo: PurCpcDetailRepository,
         private readonly iim400Service: Iim400Service,
         private readonly purcpcProcPlanViewRepo: PurcpcProcPlanViewRepository,
         private readonly purcpcProcCompareViewRepo: PurcpcProcCompareViewRepository,
-    ) {}
+    ) {
+        super(repo, detailsRepo);
+    }
 
     /**
      * @author Sutthipong Tangmongkhoncharoen(24008)
@@ -99,72 +101,27 @@ export class PurCpcService {
         }
     }
 
-    //---------------------------------------------------------------------------//
     /**
      * @author Sutthipong Tangmongkhoncharoen(24008)
-     * @since 2026-09-29
-     * @description ดึงหมายเลขรันถัดไปของฟอร์ม PUR-CPC ตามปีที่ระบุ
-     * @param cyear2
+     * @since 2026-09-30
+     * @description ดึงข้อมูลฟอร์ม PUR-CPC ตามหมายเลขฟอร์มที่ระบุ
+     * @param form หมายเลขฟอร์ม PUR-CPC ที่ต้องการดึงข้อมูล
      * @returns
      */
-    async getFormNextRunNo(cyear2: string): Promise<number> {
-        const form = await this.repo.getFormNextRunNo(cyear2);
-        if (form.length > 0) {
-            return form[0].NRUNNO + 1;
-        } else {
-            return 1;
-        }
-    }
-
-    /**
-     * @author Sutthipong Tangmongkhoncharoen(24008)
-     * @since 2026-09-29
-     * @description สร้างฟอร์ม PUR-CPC ใหม่หรือแก้ไขฟอร์มที่มีอยู่แล้ว
-     * @param dto
-     */
-    async create(dto: CreateFormDto) {
+    async getForm(form: string) {
         try {
-            let cyear2: string = new Date().getFullYear().toString();
-            let nrunno: number = 0;
-            const formData = {
-                VREQNO: dto.REQBY,
-                VINPUTER: dto.INPUTBY,
-                NFUNCTIONS: dto.FUNC,
-                NSTATUS: dto.STATUS,
-            };
-            // PUR-CPC26-000001
-            if (dto.ISEDIT) {
-                const split: string[] = dto.FORMEDIT.split('-');
-                cyear2 = '20' + split[1].replace(/[a-zA-Z]/g, '');
-                nrunno = parseInt(split[2]);
-                // clear details
-                await this.detailsRepo.delete({
-                    CYEAR2: cyear2,
-                    NRUNNO: nrunno,
-                });
-                delete formData.VINPUTER;
-            } else {
-                nrunno = await this.getFormNextRunNo(cyear2);
+            const pk = this.crackPrimaryKey(form);
+            const res = await this.repo.getForm(pk);
+            if (res.length == 0) {
+                return {
+                    status: false,
+                    message: 'No records found',
+                };
             }
-
-            const form = await this.repo.create({
-                ...formData,
-                CYEAR2: cyear2,
-                NRUNNO: nrunno,
-            });
-
-            await this.detailsRepo.create(
-                dto.DETAILS.map((detail) => ({
-                    ...detail,
-                    CYEAR2: cyear2,
-                    NRUNNO: nrunno,
-                })),
-            );
-            // throw new Error('test');
             return {
                 status: true,
-                message: 'Form created successfully',
-                data: form,
+                message: `found ${res.length} records`,
+                data: res,
             };
         } catch (error) {
             throw error;

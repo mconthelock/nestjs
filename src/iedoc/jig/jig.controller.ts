@@ -14,6 +14,7 @@ import {
     ValidationPipe,
 } from '@nestjs/common';
 import { JigService } from './jig.service';
+import { CreateJigDeleteFormDto, SaveJigDeleteFormDto } from './dto/jig-delete-form.dto';
 import { CreateJigRequestDto } from './dto/create-jig-request.dto';
 import { UpdateJigDto } from './dto/update-jig.dto';
 import { ReplaceCheckpointsDto } from './dto/checkpoint.dto';
@@ -31,6 +32,7 @@ import { Request } from 'express';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { JigNgTagService } from './jig-ng-tag.service';
 const formPath = 'forms/:NFRMNO/:VORGNO/:CYEAR/:CYEAR2/:NRUNNO';
+const deleteFormPath = 'delete-forms/:NFRMNO/:VORGNO/:CYEAR/:CYEAR2/:NRUNNO';
 
 @Controller('iedoc/jig')
 @UsePipes(
@@ -47,6 +49,28 @@ export class JigController {
     getMfgProcesses() {
         return this.jigService.getMfgProcesses();
     }
+
+    @Post('delete-forms')
+    createDeleteForm(@Body() dto: CreateJigDeleteFormDto) { return this.jigService.createDeleteForm(dto); }
+
+    @Get(deleteFormPath)
+    getDeleteForm(@Param() key: JigFormKeyDto) { return this.jigService.getDeleteForm(key); }
+
+    @Patch(deleteFormPath)
+    saveDeleteForm(@Param() key: JigFormKeyDto, @Body() dto: SaveJigDeleteFormDto) {
+        return this.jigService.saveDeleteForm(key, dto);
+    }
+
+    @Delete(deleteFormPath + '/files/:FILE_SEQ')
+    deleteDeleteFormFile(@Param() key: JigFormFileKeyDto) {
+        return this.jigService.deleteDeleteFormFile(key, key.FILE_SEQ);
+    }
+
+    @Post(deleteFormPath + '/finish')
+    finishDeleteForm(@Param() key: JigFormKeyDto) { return this.jigService.finishDeleteForm(key); }
+
+    @Post(deleteFormPath + '/reject')
+    rejectDeleteForm(@Param() key: JigFormKeyDto) { return this.jigService.rejectDeleteForm(key); }
 
     @Get('locations')
     getLocations() {
@@ -108,6 +132,10 @@ export class JigController {
     @Get(':jigNo/checkpoints')
     getCheckpoints(@Param('jigNo') jigNo: string) {
         return this.jigService.getCheckpoints(jigNo);
+    }
+    @Get(':jigNo/defect-ng')
+    getDefectNg(@Param('jigNo') jigNo: string) {
+        return this.jigService.getDefectNg(jigNo);
     }
     @Put(':jigNo/checkpoints')
     replaceCheckpoints(

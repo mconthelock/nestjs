@@ -10,6 +10,8 @@ import { AMECUSERALL } from 'src/common/Entities/amec/views/AMECUSERALL.entity';
 import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { JigMaster } from 'src/common/Entities/iedoc/table/jig_master.entity';
+import { JigDelForm } from 'src/common/Entities/iedoc/table/jigdel_form.entity';
+import { CreateJigDeleteFormDto, SaveJigDeleteFormDto } from './dto/jig-delete-form.dto';
 import { JigDefectNg } from 'src/common/Entities/iedoc/table/jig_defect_ng.entity';
 import { JigCheckpoint } from 'src/common/Entities/iedoc/table/jig_checkpoint.entity';
 import { JigForm } from 'src/common/Entities/iedoc/table/jig_form.entity';
@@ -57,6 +59,131 @@ export class JigRepository extends BaseRepository {
 
     findMaster(jigNo: string) {
         return this.getRepository(JigMaster).findOneBy({ JIG_NO: jigNo });
+    }
+
+    async getDeleteForm(key: JigFormKeyDto, manager = this.manager) {
+        const where = formKey(key);
+        const form = await manager.findOneBy(JigDelForm, where);
+        if (!form) throw new NotFoundException('JIGDEL_FORM not found');
+        const FILES = await manager.find(JigFormFile, { where, order: { FILE_SEQ: 'ASC' } });
+        return { ...form, FILES };
+    }
+
+    private validateDeleteFiles(key: JigFormKeyDto, files?: JigFileDto[]) {
+        if (files === undefined) return;
+        if (!Array.isArray(files)) throw new BadRequestException('FILES must be an array');
+        const folder = 'IE-DELJIG' + String(key.CYEAR2).slice(-2) + '-' + String(key.NRUNNO).padStart(6, '0');
+        if (files.length > 5 || new Set(files.map(file => file.FILE_SEQ)).size !== files.length ||
+            new Set(files.map(file => file.FILE_PATH)).size !== files.length)
+            throw new BadRequestException('Invalid or duplicate attachment list');
+        for (const file of files) {
+            if (!/^[\p{L}\p{M}\p{N}_-]+\.(jpg|jpeg|png|pdf)$/iu.test(file.FILE_NAME) ||
+                file.FILE_PATH !== folder + '/' + file.FILE_NAME)
+                throw new BadRequestException('Attachment path does not match delete form');
+        }
+    }
+
+    async saveDeleteForm(key: JigFormKeyDto, dto: SaveJigDeleteFormDto) {
+        const keys = formKey(key);
+        this.validateDeleteFiles(keys, dto.FILES);
+        return this.iedocDs.transaction(async manager => {
+            const form = await manager.findOneBy(JigDelForm, keys);
+            if (!form) throw new NotFoundException('JIGDEL_FORM not found');
+            const jig = await this.lockMaster(manager, form.JIG_NO);
+            this.assertEditable(await this.webformStatus(manager, keys, true));
+            if (jig.JIG_STATUS !== 'PENDING_DELETE') throw new ConflictException('JIG is not pending deletion');
+            const where = FORM_KEYS.map((k, i) => k + ' = :' + (i + 1)).join(' AND ');
+            const requester = await manager.query(
+                "SELECT CSTEPNO FROM WEBFORM.FLOW WHERE " + where +
+                " AND CSTEPNO = '--' AND CSTEPST = '3' AND (VAPVNO = :6 OR VREPNO = :7)",
+                [...FORM_KEYS.map(k => keys[k]), dto.UPDATE_BY, dto.UPDATE_BY],
+            );
+            if (!requester.length) throw new ConflictException('Only requester can edit delete form');
+            if (dto.REASON !== undefined) form.REASON = dto.REASON;
+            if (dto.DETAIL !== undefined) form.DETAIL = dto.DETAIL;
+            await manager.save(JigDelForm, form);
+            // Removed attachments use the DELETE endpoint, which also removes the physical file via PHP.
+            // Keep sequence numbers stable and only upsert the submitted attachments here.
+            if (dto.FILES !== undefined) {
+                const existing = await manager.find(JigFormFile, { where: keys });
+                if (existing.some(file => !dto.FILES.some(next => next.FILE_SEQ === file.FILE_SEQ && next.FILE_PATH === file.FILE_PATH)))
+                    throw new ConflictException('Attachments changed; reload the form before saving');
+                for (const file of dto.FILES) await this.writeFormFile(manager, keys, file, dto.UPDATE_BY);
+            }
+            return this.getDeleteForm(keys, manager);
+        });
+    }
+
+    async deleteDeleteFormFile(key: JigFormKeyDto, fileSeq: number) {
+        const keys = formKey(key);
+        return this.iedocDs.transaction(async manager => {
+            const form = await manager.findOneBy(JigDelForm, keys);
+            if (!form) throw new NotFoundException('JIGDEL_FORM not found');
+            const jig = await this.lockMaster(manager, form.JIG_NO);
+            this.assertEditable(await this.webformStatus(manager, keys, true));
+            if (jig.JIG_STATUS !== 'PENDING_DELETE') throw new ConflictException('JIG is not pending deletion');
+            const result = await manager.delete(JigFormFile, { ...keys, FILE_SEQ: fileSeq });
+            if (!result.affected) throw new NotFoundException('Attachment not found');
+            return { deleted: true };
+        });
+    }
+
+    async createDeleteForm(dto: CreateJigDeleteFormDto) {
+        const key = formKey(dto);
+        this.validateDeleteFiles(key, dto.FILES);
+        const where = FORM_KEYS.map((k, i) => `${k} = :${i + 1}`).join(' AND ');
+        const values = FORM_KEYS.map((k) => key[k]);
+        return this.iedocDs.transaction(async (manager) => {
+            const jig = await this.lockMaster(manager, dto.JIG_NO);
+            this.assertEditable(await this.webformStatus(manager, key, true));
+            if (await manager.findOneBy(JigDelForm, key)) throw new ConflictException('Delete form already exists');
+            if (jig.JIG_STATUS !== 'ACTIVE') throw new ConflictException('Only ACTIVE JIG can be requested for deletion');
+            // Webform persists INPUTBY as VINPUTER. Use the actual form creator,
+            // which can differ from the JIG's PIC.
+            const creators = await manager.query(`SELECT VINPUTER FROM WEBFORM.FORM WHERE ${where}`, values);
+            const inputBy = creators[0]?.VINPUTER?.trim();
+            if (!inputBy) throw new BadRequestException('WEBFORM.FORM VINPUTER (INPUTBY) is required');
+            const heads = await manager.query(
+                'SELECT DISTINCT TRIM(HEADNO) AS HEADNO FROM WEBFORM.SEQUENCEORG WHERE EMPNO = :1 AND TRIM(HEADNO) IS NOT NULL',
+                [inputBy],
+            );
+            if (heads.length !== 1) throw new BadRequestException('Expected exactly one HEADNO for form INPUTBY');
+            const flows = await manager.query(`SELECT CSTEPNO FROM WEBFORM.FLOW WHERE ${where} AND CEXTDATA = '02' FOR UPDATE`, values);
+            if (!flows.length) throw new ConflictException('Delete form FLOW with CEXTDATA 02 not found');
+            const form = { ...key, JIG_NO: jig.JIG_NO, REASON: dto.REASON ?? null, DETAIL: dto.DETAIL ?? null };
+            await manager.insert(JigDelForm, form);
+            for (const file of dto.FILES ?? []) await this.writeFormFile(manager, key, file, undefined, true);
+            // Oracle array binds follow SQL occurrence order, not placeholder numbers.
+            const updateWhere = FORM_KEYS.map((k, i) => `${k} = :${i + 3}`).join(' AND ');
+            await manager.query(`UPDATE WEBFORM.FLOW SET VAPVNO = :1, VREPNO = :2 WHERE ${updateWhere} AND CEXTDATA = '02'`, [heads[0].HEADNO, heads[0].HEADNO, ...values]);
+            await manager.update(JigMaster, { JIG_NO: jig.JIG_NO }, { JIG_STATUS: 'PENDING_DELETE' });
+            return { ...form, FILES: dto.FILES ?? [], JIG_STATUS: 'PENDING_DELETE' };
+        });
+    }
+
+    async completeDeleteForm(key: JigFormKeyDto, outcome: 'finish' | 'reject') {
+        const keys = formKey(key);
+        return this.iedocDs.transaction(async (manager) => {
+            const form = await manager.findOneBy(JigDelForm, keys);
+            if (!form) throw new NotFoundException('JIGDEL_FORM not found');
+            const jig = await this.lockMaster(manager, form.JIG_NO);
+            const status = await this.webformStatus(manager, keys, true);
+            if (status !== (outcome === 'finish' ? '2' : '3')) throw new ConflictException('WEBFORM status does not match the requested outcome');
+            const target = outcome === 'finish' ? 'DELETED' : 'ACTIVE';
+            if (jig.JIG_STATUS === target) return { JIG_NO: jig.JIG_NO, JIG_STATUS: target, updated: false };
+            if (jig.JIG_STATUS !== 'PENDING_DELETE') throw new ConflictException('JIG is not pending deletion');
+            // An old callback must not resolve a newer deletion request.
+            const others = await manager.query(
+                'SELECT D.NRUNNO FROM JIGDEL_FORM D JOIN WEBFORM.FORM W ON ' +
+                FORM_KEYS.map((k) => `D.${k} = W.${k}`).join(' AND ') +
+                ' WHERE D.JIG_NO = :1 AND NOT (' + FORM_KEYS.map((k, i) => `D.${k} = :${i + 2}`).join(' AND ') +
+                ") AND (W.CST IN ('0', '1', '2') OR W.CST IS NULL)",
+                [jig.JIG_NO, ...FORM_KEYS.map((k) => keys[k])],
+            );
+            if (others.length) throw new ConflictException('Another delete form owns this JIG deletion');
+            await manager.update(JigMaster, { JIG_NO: jig.JIG_NO }, { JIG_STATUS: target });
+            return { JIG_NO: jig.JIG_NO, JIG_STATUS: target, updated: true };
+        });
     }
 
     getMfgProcesses() {
@@ -125,6 +252,10 @@ export class JigRepository extends BaseRepository {
             where: { JIG_NO: jigNo },
             order: { CHECK_SEQ: 'ASC' },
         });
+    }
+
+    getDefectNg(jigNo: string) {
+        return this.getRepository(JigDefectNg).findOneBy({ JIG_NO: jigNo });
     }
 
     private async findLockedMaster(manager: EntityManager, jigNo: string) {

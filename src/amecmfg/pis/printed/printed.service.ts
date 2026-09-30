@@ -308,7 +308,7 @@ export class PrintedService {
                 await this.processLabelDetail(fileID);
 
                 // ขั้นตอนที่ 4.1: ใส่ข้อมูล Label ลงในแต่ละหน้า PDF ตามเงื่อนไข
-                await this.processLableSpecial(fileID);
+                // await this.processLableSpecial(fileID);
 
                 // ขั้นตอนที่ 5: รวมไฟล์ PDF กลับเป็นไฟล์เดียว
                 const outFilePath = path.join(

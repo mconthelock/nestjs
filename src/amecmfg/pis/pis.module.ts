@@ -8,11 +8,13 @@ import { FileLoggerModule } from 'src/common/services/file-logger/file-logger.mo
 import { PisFiles } from 'src/common/Entities/workload/table/pis-files.entity';
 import { PisPages } from 'src/common/Entities/workload/table/pis-pages.entity';
 import { PisRepository } from './printed/pis.repository';
+import { M008KP } from 'src/common/Entities/datacenter/table/M008KP.entity';
 
 @Module({
     imports: [
         FileLoggerModule,
         TypeOrmModule.forFeature([PisFiles, PisPages], 'workloadConnection'),
+        TypeOrmModule.forFeature([M008KP], 'datacenterConnection'),
     ],
     controllers: [PisController],
     providers: [PisService, PrintedService, PisRepository],

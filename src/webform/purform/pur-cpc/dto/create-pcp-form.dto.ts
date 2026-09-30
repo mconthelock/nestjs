@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
     IsArray,
     IsBoolean,
+    IsEnum,
     IsNotEmpty,
     IsNumber,
     IsOptional,
@@ -40,6 +41,37 @@ export class CreatePcpFormDto {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
+    NTOTAL_PRES: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    NTOTAL_NEW: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    NTOTAL_COST: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    NTOTAL_RATIO: number;
+
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
+    VVENDOR: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @IsEnum(['A', 'E'])
+    @Type(() => String)
+    CMODE: string;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
     NSTATUS: number;
 }
 
@@ -73,6 +105,37 @@ export class CreateFormDto {
     @IsString()
     @Type(() => String)
     FORMEDIT?: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @IsEnum(['A', 'E'])
+    @Type(() => String)
+    MODE: string;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    TOTAL_PRES: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    TOTAL_NEW: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    TOTAL_COST: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    TOTAL_RATIO: number;
+
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
+    VENDOR: string;
 
     @IsNotEmpty()
     @IsArray()

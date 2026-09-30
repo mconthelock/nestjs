@@ -16,10 +16,28 @@ export class PURCPC_FORM {
     VINPUTER: string;
 
     @Column()
-    DREQDATE: Date;
+    NFUNCTIONS: number;
 
     @Column()
-    NFUNCTIONS: number;
+    CMODE: string;
+
+    @Column()
+    NTOTAL_PRES: number;
+
+    @Column()
+    NTOTAL_NEW: number;
+
+    @Column()
+    NTOTAL_COST: number;
+
+    @Column()
+    NTOTAL_RATIO: number;
+
+    @Column()
+    VVENDOR: string;
+    
+    @Column()
+    DREQDATE: Date;
 
     @Column()
     NSTATUS: number;

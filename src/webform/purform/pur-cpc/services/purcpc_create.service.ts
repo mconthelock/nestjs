@@ -59,6 +59,12 @@ export class CreatePurCpcService {
                 VINPUTER: dto.INPUTBY,
                 NFUNCTIONS: dto.FUNC,
                 NSTATUS: dto.STATUS,
+                NTOTAL_PRES: dto.TOTAL_PRES,
+                NTOTAL_NEW: dto.TOTAL_NEW,
+                NTOTAL_COST: dto.TOTAL_COST,
+                NTOTAL_RATIO: dto.TOTAL_RATIO,
+                VVENDOR: dto.VENDOR,
+                CMODE: dto.MODE,
             };
             // PUR-CPC26-000001
             if (dto.ISEDIT) {
@@ -88,6 +94,11 @@ export class CreatePurCpcService {
                     NRUNNO: nrunno,
                 })),
             );
+
+            // สร้าง Price Approve Form
+            if(dto.STATUS === 2){
+
+            }
             // throw new Error('test');
             return {
                 status: true,

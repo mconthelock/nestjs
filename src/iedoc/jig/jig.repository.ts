@@ -228,7 +228,6 @@ export class JigRepository extends BaseRepository {
                 'U',
                 'TRIM(U.SEMPNO) = TRIM(J.PIC_EMPNO)',
             )
-            .where('J.JIG_STATUS = :status', { status: 'ACTIVE' })
             .orderBy('J.NEXT_INSPEC_DATE', 'ASC')
             .addOrderBy('J.JIG_NO', 'ASC')
             .getRawMany<JigMaster & { SNAME: string | null }>();

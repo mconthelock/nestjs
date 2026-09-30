@@ -46,7 +46,6 @@ export class JigService {
     }
 
     async getDashboard() {
-        // Status is a Thai business calendar date, independent of server timezone.
         const parts = new Intl.DateTimeFormat('en-GB', {
             timeZone: 'Asia/Bangkok',
             year: 'numeric',

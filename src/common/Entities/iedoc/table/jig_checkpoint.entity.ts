@@ -6,25 +6,25 @@ export class JigCheckpoint {
     @PrimaryColumn({ length: 20 })
     JIG_NO: string;
 
-    @PrimaryColumn({ type: 'decimal', precision: 3, scale: 0 })
+    @PrimaryColumn()
     CHECK_SEQ: number;
 
-    @Column({ length: 200, nullable: false })
+    @Column()
     CHECK_POINT: string;
 
-    @Column({ length: 100, nullable: true })
+    @Column()
     INSPECTION_TOOL: string | null;
 
-    @Column({ type: 'decimal', precision: 12, scale: 4, nullable: true })
+    @Column()
     MIN: number | null;
 
-    @Column({ type: 'decimal', precision: 12, scale: 4, nullable: true })
+    @Column()
     MAX: number | null;
 
-    @Column({ length: 20, nullable: true })
+    @Column()
     UNIT: string | null;
 
-    @Column({ type: 'decimal', precision: 12, scale: 4, nullable: true })
+    @Column()
     MEASURED_VALUE: number | null;
 
     @ManyToOne(() => JigMaster)

@@ -3,22 +3,22 @@ import { JigMaster } from './jig_master.entity';
 
 @Entity({ name: 'JIG_DEFECT_NG' })
 export class JigDefectNg {
-    @PrimaryColumn({ length: 20 })
+    @PrimaryColumn()
     JIG_NO: string;
     
-    @Column({ type: 'varchar2', length: 500, nullable: false })
+    @Column()
     DEFECT_DETAIL: string;
 
-    @Column({ type: 'varchar2', length: 100, nullable: false })
+    @Column()
     ACTION: string;
 
-    @Column({ type: 'varchar2', length: 100, nullable: false })
+    @Column()
     CORRECTIVE: string;
 
-    @Column({ type: 'date', nullable: false })
+    @Column()
     PLAN_DATE: Date;
 
-    @Column({ length: 200, nullable: true })
+    @Column()
     LOCATION: string | null;
 
     @ManyToOne(() => JigMaster)

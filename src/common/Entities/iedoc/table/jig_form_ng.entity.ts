@@ -3,34 +3,34 @@ import { JigForm } from './jig_form.entity';
 
 @Entity({ name: 'JIG_FORM_NG' })
 export class JigFormNg {
-    @PrimaryColumn({ type: 'decimal', precision: 3, scale: 0 })
+    @PrimaryColumn()
     NFRMNO: number;
 
-    @PrimaryColumn({ length: 6 })
+    @PrimaryColumn()
     VORGNO: string;
 
-    @PrimaryColumn({ type: 'char', length: 2 })
+    @PrimaryColumn()
     CYEAR: string;
 
-    @PrimaryColumn({ type: 'char', length: 4 })
+    @PrimaryColumn()
     CYEAR2: string;
 
-    @PrimaryColumn({ type: 'decimal', precision: 6, scale: 0 })
+    @PrimaryColumn()
     NRUNNO: number;
 
-    @Column({ type: 'varchar2', length: 500, nullable: false })
+    @Column()
     DEFECT_DETAIL: string;
 
-    @Column({ type: 'varchar2', length: 100, nullable: false })
+    @Column()
     ACTION: string;
 
-    @Column({ type: 'varchar2', length: 100, nullable: false })
+    @Column()
     CORRECTIVE: string;
 
-    @Column({ type: 'date', nullable: false })
+    @Column()
     PLAN_DATE: Date;
 
-    @Column({ length: 200, nullable: true })
+    @Column()
     LOCATION: string | null;
 
     @ManyToOne(() => JigForm)

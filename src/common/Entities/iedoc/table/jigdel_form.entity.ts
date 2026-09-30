@@ -3,20 +3,27 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 // The five-key foreign key to WEBFORM.FORM is managed by the database.
 @Entity({ name: 'JIGDEL_FORM' })
 export class JigDelForm {
-    @PrimaryColumn({ type: 'number', precision: 3, scale: 0 })
+    @PrimaryColumn()
     NFRMNO: number;
-    @PrimaryColumn({ type: 'varchar2', length: 6 })
+
+    @PrimaryColumn()
     VORGNO: string;
-    @PrimaryColumn({ type: 'char', length: 2 })
+
+    @PrimaryColumn()
     CYEAR: string;
-    @PrimaryColumn({ type: 'char', length: 4 })
+
+    @PrimaryColumn()
     CYEAR2: string;
-    @PrimaryColumn({ type: 'number', precision: 6, scale: 0 })
+
+    @PrimaryColumn()
     NRUNNO: number;
-    @Column({ type: 'varchar2', length: 20 })
+
+    @Column()
     JIG_NO: string;
-    @Column({ type: 'varchar2', length: 1000, nullable: true })
+
+    @Column()
     REASON: string | null;
-    @Column({ type: 'varchar2', length: 1000, nullable: true })
+
+    @Column()
     DETAIL: string | null;
 }

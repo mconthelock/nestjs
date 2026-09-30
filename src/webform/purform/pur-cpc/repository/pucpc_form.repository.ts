@@ -3,8 +3,9 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { PURCPC_FORM } from 'src/common/Entities/webform/table/PURCPC_FORM.entity';
-
-import { pkForm } from '../interface/create.interface';
+import { CreatePcpFormDto } from '../dto/create-pcp-form.dto';
+import { PURCPC_FORM_LISTS_VIEW } from 'src/common/Entities/webform/views/PURCPC_FORM_LISTS_VIEW.entity';
+import { PriceComparisonListDto } from '../dto/price-comparison.dto';
 
 @Injectable()
 export class PurCpcRepository extends BaseRepository {
@@ -12,7 +13,13 @@ export class PurCpcRepository extends BaseRepository {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
-    create(data: any) {
+    getLists(data: PriceComparisonListDto){
+        return this.getRepository(PURCPC_FORM_LISTS_VIEW).find({
+            where: data,
+        });
+    }
+
+    create(data: CreatePcpFormDto) {
         return this.getRepository(PURCPC_FORM).save(data);
     }
 

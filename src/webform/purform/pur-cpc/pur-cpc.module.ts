@@ -7,6 +7,7 @@ import { CondComparisonPriceService } from './services/cond_comparison_price.ser
 import { CondComparisonPriceRepository } from './repository/cond_comparison_price.repository';
 import { PurcpcProcPlanViewRepository } from './repository/purcpc_proc_list_view.repository';
 import { PurcpcProcCompareViewRepository } from './repository/purcpc_proc_compare_view.repository';
+import { PurCpcDetailRepository } from './repository/purcpc_details.repository';
 
 @Module({
     imports: [Iim400Module],
@@ -17,6 +18,7 @@ import { PurcpcProcCompareViewRepository } from './repository/purcpc_proc_compar
         CondComparisonPriceService,
         // Repository
         PurCpcRepository,
+        PurCpcDetailRepository,
         CondComparisonPriceRepository,
         PurcpcProcPlanViewRepository,
         PurcpcProcCompareViewRepository,

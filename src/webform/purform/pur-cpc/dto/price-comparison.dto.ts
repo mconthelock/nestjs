@@ -26,3 +26,14 @@ export class PriceComparisonPlannerDto extends PickType(PriceComparisonDto, [
     @IsArray()
     PLANNER: string[];
 }
+
+export class PriceComparisonListDto {
+    @IsNotEmpty()
+    @IsString()
+    VREQNO: string;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    NSTATUS: number;
+}

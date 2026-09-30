@@ -4,6 +4,7 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { JigRepository } from './jig.repository';
+import { CreateJigDeleteFormDto, SaveJigDeleteFormDto } from './dto/jig-delete-form.dto';
 import { CreateJigRequestDto } from './dto/create-jig-request.dto';
 import { UpdateJigDto } from './dto/update-jig.dto';
 import { ReplaceCheckpointsDto } from './dto/checkpoint.dto';
@@ -24,6 +25,13 @@ export class JigService {
     autoCreateInspection(date: string, ip: string) {
         return this.inspection.run(date, ip);
     }
+
+    createDeleteForm(dto: CreateJigDeleteFormDto) { return this.jigRepository.createDeleteForm(dto); }
+    getDeleteForm(key: JigFormKeyDto) { return this.jigRepository.getDeleteForm(key); }
+    saveDeleteForm(key: JigFormKeyDto, dto: SaveJigDeleteFormDto) { return this.jigRepository.saveDeleteForm(key, dto); }
+    deleteDeleteFormFile(key: JigFormKeyDto, seq: number) { return this.jigRepository.deleteDeleteFormFile(key, seq); }
+    finishDeleteForm(key: JigFormKeyDto) { return this.jigRepository.completeDeleteForm(key, 'finish'); }
+    rejectDeleteForm(key: JigFormKeyDto) { return this.jigRepository.completeDeleteForm(key, 'reject'); }
 
     getMfgProcesses() {
         return this.jigRepository.getMfgProcesses();
@@ -124,6 +132,11 @@ export class JigService {
     async getCheckpoints(jigNo: string) {
         await this.getJig(jigNo);
         return this.jigRepository.getCheckpoints(jigNo);
+    }
+    async getDefectNg(jigNo: string) {
+        await this.getJig(jigNo);
+        // Keep an explicit JSON response when the master has no NG record.
+        return { NG: await this.jigRepository.getDefectNg(jigNo) };
     }
     replaceCheckpoints(jigNo: string, dto: ReplaceCheckpointsDto) {
         return this.jigRepository.replaceCheckpoints(jigNo, dto);

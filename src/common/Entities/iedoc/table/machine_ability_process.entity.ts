@@ -2,33 +2,33 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'MACHINE_ABILITY_PROCESS' })
 export class MachineAbilityProcess {
-    @PrimaryColumn({ type: 'number', precision: 3, scale: 0 })
+    @PrimaryColumn()
     MID: number;
 
-    @PrimaryColumn({ type: 'varchar2', length: 5 })
+    @PrimaryColumn()
     MA_CODE: string;
 
-    @PrimaryColumn({ type: 'varchar2', length: 10 })
+    @PrimaryColumn()
     PROCESS: string;
 
-    @Column({ type: 'varchar2', length: 2000, nullable: true })
+    @Column()
     SPEC: string | null;
 
-    @Column({ type: 'varchar2', length: 2000, nullable: true })
+    @Column()
     USAGE: string | null;
 
-    @Column({ type: 'varchar2', length: 1, nullable: true })
+    @Column()
     STATUS: string | null;
 
-    @Column({ type: 'date', nullable: true })
+    @Column()
     LAST_UPDATE: Date | null;
 
-    @Column({ type: 'varchar2', length: 10, nullable: true })
+    @Column()
     ACTION_STATUS: string | null;
 
-    @Column({ type: 'char', length: 4, nullable: true })
+    @Column()
     CYEAR2_REF: string | null;
 
-    @Column({ type: 'number', precision: 7, scale: 0, nullable: true })
+    @Column()
     NRUNNO_REF: number | null;
 }

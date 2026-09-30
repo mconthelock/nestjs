@@ -2,60 +2,60 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'JIG_MASTER' })
 export class JigMaster {
-    @PrimaryColumn({ length: 20 })
+    @PrimaryColumn()
     JIG_NO: string;
 
-    @Column({ length: 200, nullable: false })
+    @Column()
     JIG_NAME: string;
 
-    @Column({ length: 100, nullable: true })
+    @Column()
     DWG: string | null;
 
-    @Column({ length: 2, nullable: true })
+    @Column()
     REV: string | null;
 
-    @Column({ type: 'decimal', precision: 5, scale: 0, nullable: true })
+    @Column()
     JIG_QTY: number | null;
 
-    @Column({ type: 'decimal', precision: 12, scale: 2, nullable: true })
+    @Column()
     PRICE: number | null;
 
-    @Column({ length: 100, nullable: true })
+    @Column()
     MAKER: string | null;
 
-    @Column({ type: 'date', nullable: true })
+    @Column()
     START_USE_DATE: Date | null;
 
-    @Column({ type: 'varchar2', length: 4, nullable: true })
+    @Column()
     ITEMNO: string | null;
 
-    @Column({ type: 'varchar2', length: 200, nullable: true })
+    @Column()
     JIG_DESC: string | null;
 
-    @Column({ length: 50, nullable: true })
+    @Column()
     PROCESS_CODE: string | null;
 
-    @Column({ length: 100, nullable: true })
+    @Column()
     LOCATION: string | null;
 
-    @Column({ length: 5, nullable: true })
+    @Column()
     PIC_EMPNO: string | null;
 
-    @Column({ type: 'decimal', precision: 3, scale: 0, nullable: false })
+    @Column()
     INSPEC_PERIOD: number;
 
-    @Column({ type: 'date', nullable: true })
+    @Column()
     NEXT_INSPEC_DATE: Date | null;
 
-    @Column({ length: 20, nullable: true, default: 'DRAFT' })
+    @Column()
     JIG_STATUS: string | null;
 
-    @Column({ length: 1000, nullable: true })
+    @Column()
     REMARK: string | null;
 
-    @Column({ type: 'varchar2', length: 4, nullable: true })
+    @Column()
     REF_CYEAR2: string | null;
 
-    @Column({ type: 'number', precision: 6, scale: 0, nullable: true })
+    @Column()
     REF_NRUNNO: number | null;
 }

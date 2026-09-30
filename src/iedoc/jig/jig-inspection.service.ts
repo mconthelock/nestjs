@@ -73,7 +73,7 @@ export class JigInspectionService {
             CYEAR: '26',
             REQBY: pic, 
             INPUTBY: pic, 
-            DRAFT: '0', 
+            DRAFT: '1', 
             REMARK: `[Auto Created] JIG inspection ${jigNo}; due ${due}` },
             ip
         );

@@ -92,7 +92,7 @@ export class JigInspectionService {
         }
         if (defects.length) {
             await this.insert(manager, 'JIG_FORM_NG', { ...key,
-                ...Object.fromEntries(['DEFECT_DETAIL', 'ACTION', 'CORRECTIVE', 'PLAN_DATE', 'LOCATION']
+                ...Object.fromEntries(['DEFECT_DETAIL', 'ACTION', 'CORRECTIVE', 'PLAN_DATE']
                     .map((field) => [field, defects[0][field] ?? null])) });
             await manager.query('UPDATE WEBFORM.FLOW SET VAPVNO = :1, VREPNO = :2 WHERE ' +
                 FORM_KEYS.map((k, i) => `${k} = :${i + 3}`).join(' AND ') + " AND CSTEPNO = '07'",

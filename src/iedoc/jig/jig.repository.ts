@@ -612,7 +612,6 @@ export class JigRepository extends BaseRepository {
                 ACTION: ng.ACTION,
                 CORRECTIVE: ng.CORRECTIVE,
                 PLAN_DATE: new Date(ng.PLAN_DATE),
-                LOCATION: ng.LOCATION ?? null,
             });
             if (insertOnly) await manager.insert(JigFormNg, data);
             else await manager.save(JigFormNg, data);
@@ -803,7 +802,6 @@ export class JigRepository extends BaseRepository {
                     ACTION: formNg.ACTION,
                     CORRECTIVE: formNg.CORRECTIVE,
                     PLAN_DATE: formNg.PLAN_DATE,
-                    LOCATION: formNg.LOCATION ?? null,
                 });
             } else {
                 // Master NG reflects the latest approved snapshot, not past defects.

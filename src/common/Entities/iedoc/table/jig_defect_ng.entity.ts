@@ -18,9 +18,6 @@ export class JigDefectNg {
     @Column()
     PLAN_DATE: Date;
 
-    @Column()
-    LOCATION: string | null;
-
     @ManyToOne(() => JigMaster)
     @JoinColumn({ name: 'JIG_NO', referencedColumnName: 'JIG_NO' })
     jig: JigMaster;

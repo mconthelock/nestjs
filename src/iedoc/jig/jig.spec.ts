@@ -169,11 +169,11 @@ describe('Jig REV application', () => {
         const { repo, state, form, manager } = fixture();
         if (isNew) { state.master = null; form.REV = '0'; form.FORM_TYPE = 'CREATE'; }
         state.ng = { ...key, DEFECT_DETAIL: 'Defect', ACTION: 'Repair', CORRECTIVE: 'Adjust',
-            PLAN_DATE: new Date(2026, 9, 1), LOCATION: null };
+            PLAN_DATE: new Date(2026, 9, 1) };
         const result = await repo.finishForm(key);
         expect(manager.save).toHaveBeenCalledWith(JigDefectNg, {
             JIG_NO: form.JIG_NO, DEFECT_DETAIL: 'Defect', ACTION: 'Repair', CORRECTIVE: 'Adjust',
-            PLAN_DATE: state.ng.PLAN_DATE, LOCATION: null,
+            PLAN_DATE: state.ng.PLAN_DATE,
         });
         state.master = result.jig;
         expect((await repo.finishForm(key)).applied).toBe(false);
@@ -551,7 +551,7 @@ describe('Jig dictionary and validation', () => {
         const ngColumns = ds.getMetadata(JigFormNg).columns;
         expect(ngColumns.map((c) => c.propertyName).sort()).toEqual([
             'NFRMNO', 'VORGNO', 'CYEAR', 'CYEAR2', 'NRUNNO',
-            'DEFECT_DETAIL', 'ACTION', 'CORRECTIVE', 'PLAN_DATE', 'LOCATION',
+            'DEFECT_DETAIL', 'ACTION', 'CORRECTIVE', 'PLAN_DATE',
         ].sort());
         for (const [name, length] of [['DEFECT_DETAIL', '500'], ['ACTION', '100'], ['CORRECTIVE', '100']]) {
             expect(ngColumns.find((c) => c.propertyName === name)).toMatchObject({
@@ -1015,7 +1015,6 @@ describe('Jig complete form transactions', () => {
             DEFECT_DETAIL: 'Oversize',
             PLAN_DATE: '2026-03-01',
             ACTION: 'Repair', CORRECTIVE: 'Adjust',
-            LOCATION: 'IE',
         },
         FILES: [
             {
@@ -1059,7 +1058,7 @@ describe('Jig complete form transactions', () => {
             FILE_SEQ: 1,
         });
         expect(Object.keys(manager.insert.mock.calls[2][1]).sort()).toEqual([
-            ...Object.keys(key), 'DEFECT_DETAIL', 'ACTION', 'CORRECTIVE', 'PLAN_DATE', 'LOCATION',
+            ...Object.keys(key), 'DEFECT_DETAIL', 'ACTION', 'CORRECTIVE', 'PLAN_DATE',
         ].sort());
         expect(manager.save).not.toHaveBeenCalled();
     });

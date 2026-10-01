@@ -69,7 +69,7 @@ describe('Auto inspection', () => {
     });
     it('copies NG and assigns the responsible person to step 07', async () => {
         const { service, query, state } = setup();
-        state.ng = [{ DEFECT_DETAIL: 'Defect', ACTION: 'Repair', CORRECTIVE: 'Adjust', PLAN_DATE: new Date(), LOCATION: null }];
+        state.ng = [{ DEFECT_DETAIL: 'Defect', ACTION: 'Repair', CORRECTIVE: 'Adjust', PLAN_DATE: new Date() }];
         expect((await service.run('01/03/2026')).created).toBe(1);
         expect(query.mock.calls.some(([sql]) => sql.startsWith('INSERT INTO IEDOC.JIG_FORM_NG'))).toBe(true);
         expect(query.mock.calls.find(([sql]) => sql.startsWith('UPDATE WEBFORM.FLOW'))[1]).toEqual(['14077', '14077', 31, '051401', '26', '2026', 2]);

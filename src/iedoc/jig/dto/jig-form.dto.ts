@@ -85,10 +85,6 @@ export class JigNgDto {
     @IsDefined()
     @IsDateString({ strict: true })
     PLAN_DATE: string;
-    @IsOptional()
-    @IsString()
-    @MaxLength(200)
-    LOCATION?: string;
 }
 
 export class JigFileDto {

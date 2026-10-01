@@ -2,7 +2,7 @@ import { ngTagHtml, tagDate } from './jig-ng-tag.service';
 
 const data = {
     form: { JIG_NO: 'J26-017', JIG_NAME: '<script>alert(1)</script>', PROCESS_CODE: 'K4', ITEMNO: '131', LOCATION: 'K4 LINE' },
-    ng: { DEFECT_DETAIL: 'Defect', ACTION: 'MODIFY', CORRECTIVE: 'Adjust', PLAN_DATE: '2026-04-30', LOCATION: 'Workshop' },
+    ng: { DEFECT_DETAIL: 'Defect', ACTION: 'MODIFY', CORRECTIVE: 'Adjust', PLAN_DATE: '2026-04-30' },
     checkDate: '2026-04-18',
     stamps: [
         { CSTEPNO: '--', CAPVSTNO: '1', DAPVDATE: '2026-04-18', SNAME: 'SAMART SURNAME', SSEC: 'IPE SEC.' },

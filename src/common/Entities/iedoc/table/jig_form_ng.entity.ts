@@ -30,9 +30,6 @@ export class JigFormNg {
     @Column()
     PLAN_DATE: Date;
 
-    @Column()
-    LOCATION: string | null;
-
     @ManyToOne(() => JigForm)
     @JoinColumn([
         { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },

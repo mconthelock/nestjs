@@ -350,7 +350,9 @@ export class AuthService {
         };
 
         let username = '';
-        const cardOwner = await this.card.findOne({ where: { SID: cardno } });
+        const cardOwner = await this.card.findOne({
+            where: { SID: cardno.toUpperCase() },
+        });
         console.log(cardOwner);
         if (cardOwner && cardOwner.SEMPNO.substring(0, 2) != '84') {
             username = cardOwner.SEMPNO;

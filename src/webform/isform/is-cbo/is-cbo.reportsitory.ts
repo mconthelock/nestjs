@@ -20,7 +20,7 @@ export class IsCboRepository extends BaseRepository {
                 JOIN CR_COM_REVISE_HEAD ccrh ON f.NFRMNO = ccrh.NFRMNO AND f.VORGNO = ccrh.VORGNO AND f.CYEAR = ccrh.CYEAR AND f.CYEAR2 = ccrh.cyear2 AND f.NRUNNO = ccrh.NRUNNO
                 LEFT JOIN CR_COM_REVISE_DETAIL_DEVICE crd ON  f.NFRMNO = crd.NFRMNO AND f.VORGNO = crd.VORGNO AND f.CYEAR = crd.CYEAR AND f.CYEAR2 = crd.cyear2 AND f.NRUNNO = crd.NRUNNO AND crd.DNO IN ('1','2')
                 LEFT JOIN CR_DEVICEMST cd ON crd.DNO = cd.DNO
-                WHERE (VREQNO = :1 OR VINPUTER = :1) AND CSTEPNO = '02' AND TRUNC(SYSDATE) BETWEEN TRUNC(ccrh.STARTDATE) AND TRUNC(ccrh.ENDDATE)
+                WHERE (VREQNO = :1 OR VINPUTER = :1) AND CSTEPNO = '02' AND TRUNC(SYSDATE) BETWEEN TRUNC(ccrh.STARTDATE) AND TRUNC(ccrh.ENDDATE) AND f.CST != '3'
             `,
             [vreqno],
         );

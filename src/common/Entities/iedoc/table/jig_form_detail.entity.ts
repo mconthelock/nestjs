@@ -27,13 +27,13 @@ export class JigFormDetail {
     @Column()
     INSPECTION_TOOL: string | null;
 
-    @Column()
+    @Column({ type: 'number', precision: 12, scale: 4, nullable: true })
     MIN: number | null;
 
-    @Column()
+    @Column({ type: 'number', precision: 12, scale: 4, nullable: true })
     MAX: number | null;
 
-    @Column()
+    @Column({ type: 'number', precision: 12, scale: 4, nullable: true })
     MEASURED_VALUE: number | null;
 
     @Column()

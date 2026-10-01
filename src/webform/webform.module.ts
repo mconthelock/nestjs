@@ -28,6 +28,7 @@ import { PurFormModule } from './purform/purform.module';
 import { QAFormModule } from './qaform/qaform.module';
 import { STFormModule } from './stform/stform.module';
 import { ReportModule } from './report/report.module';
+import { FormLinkModule } from './form-link/form-link.module';
 
 @Module({
     imports: [
@@ -58,6 +59,7 @@ import { ReportModule } from './report/report.module';
         DedformModule,
         EplformModule,
         ReportModule,
+        FormLinkModule,
     ],
 })
 export class WebformModule {}

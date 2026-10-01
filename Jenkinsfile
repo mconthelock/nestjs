@@ -122,7 +122,7 @@ pipeline {
                     cp ${ENV_DIR} .env
                     NODE_ENV=development
                     if [ "${PACKAGE_STATUS}" = "CHANGED" ] || [ "${PACKAGE_STATUS}" = "NEW" ] || [ ! -x "node_modules/.bin/nest" ]; then
-                        npm install
+                        npm install --ignore-scripts
                     else
                         echo "✅ package.json unchanged, skip npm install"
                     fi

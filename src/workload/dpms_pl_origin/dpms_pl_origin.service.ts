@@ -12,7 +12,7 @@ export class DpmsPlOriginService {
         id,
     }: {
         order?: string;
-        type?: 'order' | 'case' | 'detail';
+        type?: 'order' | 'case' | 'detail' | 'id';
         id?: number;
     }) {
         try {
@@ -27,8 +27,12 @@ export class DpmsPlOriginService {
                 case 'detail':
                     res = await this.repo.getDetailOrigin(order);
                     break;
+                case 'id':
+                    res = await this.repo.getIdOrigin(id);
+                    break;
                 default:
                     res = await this.repo.getOriginById(id);
+                    break;
             }
             if (!res || (Array.isArray(res) && res.length === 0)) {
                 return {

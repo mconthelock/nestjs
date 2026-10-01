@@ -1,21 +1,15 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-    Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { AvmService } from './avm.service';
-import { CreateAvmDto } from './dto/create-avm.dto';
-import { UpdateAvmDto } from './dto/update-avm.dto';
 import { SearchAvmDto } from './dto/search-avm.dto';
 
 @Controller('avm')
 export class AvmController {
     constructor(private readonly avmService: AvmService) {}
+
+    @Get()
+    findAll() {
+        return this.avmService.findAll();
+    }
 
     @Post('search')
     search(@Body() searchAvmDto: SearchAvmDto) {

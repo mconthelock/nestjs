@@ -26,11 +26,9 @@ export class FinnpoRepository extends BaseRepository {
         super(ds);
     }
 
-    findAllExpense() {
+    findAllExpense(includeInactive = false) {
         return this.getRepository(FINNPOEXPENSE).find({
-            where: {
-                ACTIVE: 1,
-            },
+            where: includeInactive ? undefined : { ACTIVE: 1 },
             order: {
                 EXPENSE_CODE: 'asc',
             },
@@ -44,6 +42,66 @@ export class FinnpoRepository extends BaseRepository {
                 ACTIVE: 1,
             },
         });
+    }
+
+    findExpenseByCodeAny(expenseCode: number) {
+        return this.getRepository(FINNPOEXPENSE).findOne({
+            where: { EXPENSE_CODE: expenseCode },
+        });
+    }
+
+    findExpense(
+        expenseCode: number,
+        expenseEname: string,
+        expenseTname: string,
+    ) {
+        return this.getRepository(FINNPOEXPENSE).findOne({
+            where: {
+                EXPENSE_CODE: expenseCode,
+                EXPENSE_ENAME: expenseEname,
+                EXPENSE_TNAME: expenseTname,
+            },
+        });
+    }
+
+    createExpense(data: Partial<FINNPOEXPENSE>) {
+        return this.getRepository(FINNPOEXPENSE).save(data);
+    }
+
+    updateExpense(
+        expenseCode: number,
+        expenseEname: string,
+        expenseTname: string,
+        data: Partial<FINNPOEXPENSE>,
+    ) {
+        return this.getRepository(FINNPOEXPENSE).update(
+            {
+                EXPENSE_CODE: expenseCode,
+                EXPENSE_ENAME: expenseEname,
+                EXPENSE_TNAME: expenseTname,
+            },
+            data,
+        );
+    }
+
+    deleteExpense(
+        expenseCode: number,
+        expenseEname: string,
+        expenseTname: string,
+    ) {
+        return this.getRepository(FINNPOEXPENSE).delete({
+            EXPENSE_CODE: expenseCode,
+            EXPENSE_ENAME: expenseEname,
+            EXPENSE_TNAME: expenseTname,
+        });
+    }
+
+    async isExpenseInUse(expenseCode: number) {
+        return (
+            (await this.getRepository(FINNPOFORM).count({
+                where: { EXPENSE_CODE: expenseCode },
+            })) > 0
+        );
     }
 
     findAllVendor() {
@@ -60,6 +118,42 @@ export class FinnpoRepository extends BaseRepository {
                 VENDOR_CODE: vendorCode,
             },
         });
+    }
+
+    findVendor(vendorCode: string, vendorName: string) {
+        return this.getRepository(FINNPOVENDOR).findOne({
+            where: { VENDOR_CODE: vendorCode, VENDOR_NAME: vendorName },
+        });
+    }
+
+    createVendor(data: Partial<FINNPOVENDOR>) {
+        return this.getRepository(FINNPOVENDOR).save(data);
+    }
+
+    updateVendor(
+        vendorCode: string,
+        vendorName: string,
+        data: Partial<FINNPOVENDOR>,
+    ) {
+        return this.getRepository(FINNPOVENDOR).update(
+            { VENDOR_CODE: vendorCode, VENDOR_NAME: vendorName },
+            data,
+        );
+    }
+
+    deleteVendor(vendorCode: string, vendorName: string) {
+        return this.getRepository(FINNPOVENDOR).delete({
+            VENDOR_CODE: vendorCode,
+            VENDOR_NAME: vendorName,
+        });
+    }
+
+    async isVendorInUse(vendorCode: string) {
+        return (
+            (await this.getRepository(FINNPOFORM).count({
+                where: { VENDOR_CODE: vendorCode },
+            })) > 0
+        );
     }
 
     findAllCurrency() {

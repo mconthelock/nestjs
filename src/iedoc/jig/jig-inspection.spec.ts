@@ -2,14 +2,14 @@ import { JigInspectionService, inspectionDate } from './jig-inspection.service';
 import { transactionContext } from 'src/common/interceptors/transaction-context';
 
 const key = { NFRMNO: 31, VORGNO: '051401', CYEAR: '26', CYEAR2: '2026', NRUNNO: 2 };
-function setup() {
+function setup(points = [{ CHECK_SEQ: 1, CHECK_POINT: 'Visual', MEASURED_VALUE: 1.2345 }] as any[]) {
     const state = { history: [] as any[], ng: [] as any[], fail: false, committed: false };
     const master = { JIG_NO: 'J26-001', PIC_EMPNO: '14077', REV: '0', JIG_NAME: 'Jig', INSPEC_PERIOD: 6 };
     const query = jest.fn(async (sql: string, params?: any[]) => {
         if (sql.startsWith('SELECT JIG_NO')) return [{ JIG_NO: master.JIG_NO }];
         if (sql.startsWith('SELECT * FROM IEDOC.JIG_MASTER')) return [master];
         if (sql.startsWith('SELECT F.CYEAR2')) return state.history;
-        if (sql.startsWith('SELECT * FROM IEDOC.JIG_CHECKPOINT')) return [{ CHECK_SEQ: 1, CHECK_POINT: 'Visual', MEASURED_VALUE: 1.2345 }];
+        if (sql.startsWith('SELECT * FROM IEDOC.JIG_CHECKPOINT')) return points;
         if (sql.startsWith('SELECT * FROM IEDOC.JIG_DEFECT_NG')) return state.ng;
         if (state.fail && sql.startsWith('INSERT INTO IEDOC.JIG_FORM_DETAIL')) throw new Error('Insert failed');
         return [];
@@ -28,6 +28,21 @@ function setup() {
 }
 
 describe('Auto inspection', () => {
+    it.each([
+        { MIN: -0.11, MAX: 0.11, MEASURED_VALUE: -0.11 },
+        { MIN: -1.2345, MAX: -0.0001, MEASURED_VALUE: -0.1234 },
+        { MIN: 0, MAX: 0, MEASURED_VALUE: 0 },
+        { MIN: -99999999.9999, MAX: 99999999.9999, MEASURED_VALUE: 99999999.9999 },
+        { MIN: null, MAX: null, MEASURED_VALUE: null },
+    ])('preserves checkpoint numeric values exactly in insert binds: %j', async (numeric) => {
+        const { service, query } = setup([{ CHECK_SEQ: 1, CHECK_POINT: 'Dimension', ...numeric }]);
+        expect((await service.run('01/03/2026')).created).toBe(1);
+        const [sql, binds] = query.mock.calls.find(([sql]) => sql.startsWith('INSERT INTO IEDOC.JIG_FORM_DETAIL'))!;
+        const columns = sql.match(/"([A-Z0-9_]+)"/g)!.map((c) => c.slice(1, -1));
+        for (const field of ['MIN', 'MAX', 'MEASURED_VALUE']) {
+            expect(binds![columns.indexOf(field)]).toBe(numeric[field]);
+        }
+    });
     it.each(['31/02/2026', '29/02/2025', '2026-03-01', '1/3/2026', '01/13/2026'])('rejects invalid date %s', (date) => {
         expect(() => inspectionDate(date)).toThrow();
     });
@@ -40,7 +55,7 @@ describe('Auto inspection', () => {
         const result = await service.run('01/03/2026', '127.0.0.1');
         expect(result.created).toBe(1);
         expect(state.committed).toBe(true);
-        expect(forms.create).toHaveBeenCalledWith(expect.objectContaining({ NFRMNO: 31, VORGNO: '051401', CYEAR: '26', REQBY: '14077', INPUTBY: '14077', DRAFT: '0' }), '127.0.0.1');
+        expect(forms.create).toHaveBeenCalledWith(expect.objectContaining({ NFRMNO: 31, VORGNO: '051401', CYEAR: '26', REQBY: '14077', INPUTBY: '14077', DRAFT: '1' }), '127.0.0.1');
         expect(query.mock.calls[0][1]).toEqual(['2026-03-01']);
         const inserts = query.mock.calls.filter(([sql]) => sql.startsWith('INSERT'));
         expect(inserts).toHaveLength(2);

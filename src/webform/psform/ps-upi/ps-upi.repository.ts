@@ -79,6 +79,7 @@ export class PsUpiRepository extends BaseRepository {
                 NFRMNO: formmst.NNO,
                 VORGNO: formmst.VORGNO,
                 CYEAR: formmst.CYEAR,
+                ...dto
             },
         });
     }

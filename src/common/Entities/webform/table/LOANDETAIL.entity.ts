@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    OneToMany,
+    OneToOne,
+    PrimaryColumn,
+} from 'typeorm';
+import { LOANFRM } from './LOANFRM.entity';
 
 @Entity({ name: 'LOANDETAIL', schema: 'WEBFORM' })
 export class LOANDETAIL {
@@ -13,4 +21,8 @@ export class LOANDETAIL {
 
     @Column()
     REMARK: string;
+
+    @OneToOne(() => LOANFRM, (loanDetail) => loanDetail.LOANNO)
+    @JoinColumn([{ name: 'LOANNO', referencedColumnName: 'LOANNO' }])
+    detail: LOANFRM;
 }

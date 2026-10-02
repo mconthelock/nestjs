@@ -19,6 +19,10 @@ import { deleteFile, joinPaths } from 'src/common/utils/files.utils';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 import { log } from 'node:console';
 import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
+import { FormDto } from 'src/webform/form/dto/form.dto';
+import { R027Mp1Service } from 'src/as400/datalibo/r027mp1/r027mp1.service';
+import { FormService } from 'src/webform/form/form.service';
+import { MailService } from 'src/common/services/mail/mail.service';
 
 @Injectable()
 export class QaCnService {
@@ -27,6 +31,7 @@ export class QaCnService {
         private readonly flowService: FlowService,
         private readonly repoOrgPos: OrgposRepository,
         private readonly repoCnform: CnFormRepository,
+        private readonly formService: FormService,
         private readonly repoDwg: ResultChkDwgRepository,
         private readonly attcnfrmService: AttcnfrmService,
         private readonly attcnfrmrepo: AttCnFrmRepository,
@@ -34,6 +39,8 @@ export class QaCnService {
         private readonly j736kpService: J736kpService,
         private readonly doactionService: DoactionFlowService,
         private readonly deleteflowService: DeleteFlowStepService,
+        private readonly r027Mp1Service: R027Mp1Service,
+        private readonly mailService: MailService,
     ) {}
 
     async request(
@@ -345,6 +352,7 @@ export class QaCnService {
                 REMARK,
                 ACTION,
                 DWGNO,
+                MSTATUS,
                 ...cndata
             } = dto;
             const currentForm = {
@@ -354,283 +362,155 @@ export class QaCnService {
                 CYEAR2: cndata.CYEAR2,
                 NRUNNO: cndata.NRUNNO,
             };
-            const dwgToInsert = DWGNO.map((item) => {
-                return {
-                    // ใช้ค่าจาก FormDto เป็นหัวขบวน
-                    ...currentForm,
-                    ...item,
-                };
-            });
-            if (SELJINCHRG) {
-                condition = {
-                    ...currentForm,
-                    CEXTDATA: '02',
-                };
-                await this.flowService.updateFlow({
-                    condition: condition,
-                    VAPVNO: SELJINCHRG,
-                });
-            }
-            if (SELEINCHRG) {
-                condition = {
-                    ...currentForm,
-                    CEXTDATA: '03',
-                };
-                await this.flowService.updateFlow({
-                    condition: condition,
-                    VAPVNO: SELEINCHRG,
-                });
-            }
-            if (OPERATOR) {
-                condition = {
-                    ...currentForm,
-                    CEXTDATA: '07',
-                };
-                await this.flowService.updateFlow({
-                    condition: condition,
-                    VAPVNO: OPERATOR,
-                });
-            }
-            if (SELJOBTYPE && SELJOBTYPE == 'S') {
-                // condition = {
-                //     ...currentForm,
-                //     CSTEPNO: In(['07', '61']),
-                // };
-                // await this.flowService.deleteFlow(condition);
-                condition = {
-                    ...currentForm,
-                    CSTEPNO: '07',
-                };
-                await this.deleteflowService.deleteFlowStep(condition);
-                condition.CSTEPNO = '61';
-                await this.deleteflowService.deleteFlowStep(condition);
-            }
-            if (CEXTDATA >= 2 && CEXTDATA < 8) {
-                await this.repoCnform.update(
-                    { ...currentForm },
-                    {
-                        JDGMNTNO: cndata.RADJUDGE
-                            ? Number(cndata.RADJUDGE)
-                            : null,
-                        JDGOTHER:
-                            cndata.RADJUDGE.toString() == '2.5'
-                                ? cndata.TXTJDGOTHER1
-                                : cndata.RADJUDGE.toString() == '4.2'
-                                  ? cndata.TXTJDGOTHER2
-                                  : '',
-                    },
-                );
-                if (ACTION != 'return') {
-                    await this.repoDwg.deleteByAll(currentForm);
-                    await this.repoDwg.insertMultiple(dwgToInsert);
+            if (ACTION == 'approve' || ACTION == 'reject') {
+                let act;
+                if (CEXTDATA > 1 && CEXTDATA != 5 && ACTION == 'reject') {
+                    act = 'approve';
+                } else {
+                    act = ACTION;
                 }
-            }
-            if (ACTION == 'approve') {
-                if (STEPREADY == '--') {
-                    await this.repoCnform.update(
-                        { ...currentForm },
-                        { ...cndata },
+                const confirm = await this.doactionService.doAction(
+                    {
+                        ...currentForm,
+                        ACTION: act,
+                        EMPNO: APVNO,
+                        REMARK: REMARK,
+                    },
+                    ip,
+                );
+                if (confirm.status) {
+                    await this.processApprovalActions(
+                        dto,
+                        currentForm,
+                        files,
+                        path,
+                        fileMappings,
                     );
-                    await this.repoDwg.deleteByAll(currentForm);
-                    await this.repoDwg.insertMultiple(dwgToInsert);
-                    for (const mapping of fileMappings) {
-                        const currentFiles = files[mapping.key];
-                        if (currentFiles && currentFiles.length > 0) {
-                            await this.attcnfrmService.moveAndInsertFiles({
-                                files: currentFiles,
-                                form: currentForm,
-                                path: path,
-                                folder:
-                                    currentForm.NFRMNO +
-                                    '_' +
-                                    currentForm.VORGNO +
-                                    '_' +
-                                    currentForm.CYEAR +
-                                    '_' +
-                                    currentForm.CYEAR2 +
-                                    '_' +
-                                    currentForm.NRUNNO,
-                                typeno: mapping.TYPENO,
-                                requestedBy: APVNO, // เปลี่ยนเป็นตัวแปรที่เก็บผู้ขอ/ผู้อัปโหลดใน dto ของคุณ
-                            });
-                        }
-                    }
-                }
-                if (CEXTDATA == 8 && cndata.CLSNO == 2) {
-                    if (cndata.INVNO && cndata.INVNO.length >= 8) {
-                        const pono = cndata.INVNO.substring(0, 8);
-                        const isNumber =
-                            pono.trim() !== '' && !isNaN(Number(pono));
-                        if (isNumber) {
-                            const pord =
-                                pono.toString().substring(0, 2) +
-                                pono.toString().substring(4, 4);
-                            const pprod = cndata.PURITEM;
-                            const formno =
-                                await this.formCreateService.getFormno(
-                                    currentForm,
-                                );
-                            await this.hpoService.updateByOrderProd(
-                                pord,
-                                pprod,
-                                formno,
-                            );
-                        }
-                    }
-                } else if (CEXTDATA == 7) {
-                    const formno =
-                        await this.formCreateService.getFormno(currentForm);
-                    await this.j736kpService.updateByFormno(formno);
-                }
-                await this.doactionService.doAction(
-                    {
-                        ...currentForm,
-                        ACTION: 'approve',
-                        EMPNO: APVNO,
-                        REMARK: REMARK,
-                    },
-                    ip,
-                );
-            } else if (ACTION == 'reject') {
-                if (CEXTDATA == 7) {
-                    const formno =
-                        await this.formCreateService.getFormno(currentForm);
-                    await this.j736kpService.updateByFormno(formno);
-                }
-                if (CEXTDATA > 1 && CEXTDATA != 5) {
-                    const updatedata = {
-                        CSTEPST: '6',
-                        CAPVSTNO: '2',
-                    };
-                    await Promise.all([
-                        // เงื่อนไขที่ 1
-                        this.flowService
-                            .updateFlow({
-                                condition: { ...currentForm, VAPVNO: APVNO },
-                                ...updatedata, // ข้อมูลที่ต้องการอัปเดต
-                            })
-                            .catch((err) => {}), // .catch ใส่ไว้กันเหนียว กรณีที่ Database มีปัญหาจริงๆ จะได้ไม่พัง
-
-                        // เงื่อนไขที่ 2
-                        this.flowService
-                            .updateFlow({
-                                condition: { ...currentForm, VREPNO: APVNO },
-                                ...updatedata,
-                            })
-                            .catch((err) => {}),
-                    ]);
-                }
-                await this.doactionService.doAction(
-                    {
-                        ...currentForm,
-                        ACTION: 'reject',
-                        EMPNO: APVNO,
-                        REMARK: REMARK,
-                    },
-                    ip,
-                );
-                // if (CEXTDATA == 4) {
-                //     const res = await this;
-                // }
-            } else if (ACTION == 'sendApv') {
-                await this.repoCnform.update({ ...currentForm }, { ...cndata });
-                await this.repoDwg.deleteByAll(currentForm);
-                await this.repoDwg.insertMultiple(dwgToInsert);
-                for (const mapping of fileMappings) {
-                    const currentFiles = files[mapping.key];
-                    if (currentFiles && currentFiles.length > 0) {
-                        await this.attcnfrmService.moveAndInsertFiles({
-                            files: currentFiles,
-                            form: currentForm,
-                            path: path,
-                            folder:
-                                currentForm.NFRMNO +
-                                '_' +
-                                currentForm.VORGNO +
-                                '_' +
-                                currentForm.CYEAR +
-                                '_' +
-                                currentForm.CYEAR2 +
-                                '_' +
-                                currentForm.NRUNNO,
-                            typeno: mapping.TYPENO,
-                            requestedBy: APVNO, // เปลี่ยนเป็นตัวแปรที่เก็บผู้ขอ/ผู้อัปโหลดใน dto ของคุณ
+                    const formStatus =
+                        await this.formCreateService.getFormStatus({
+                            ...currentForm,
                         });
+                    if (formStatus == '2' || formStatus == '3') {
+                        if (formStatus == '3' && MSTATUS == '1') {
+                            await this.createcnng(currentForm, ip);
+                        }
+                        let mstatus = MSTATUS == '1' ? 'PIC' : 'ALL';
+                        await this.buildmail(currentForm, mstatus, formStatus);
+                    } else if (STEPREADY == '06' && MSTATUS == '1') {
+                        await this.buildmail(
+                            currentForm,
+                            'FOREMAN',
+                            formStatus,
+                        );
                     }
                 }
-                if (STEPREADY != '--') {
+            } else if (ACTION == 'sendApv') {
+                if (STEPREADY == '--') {
+                    const confirm = await this.doactionService.doAction(
+                        {
+                            ...currentForm,
+                            ACTION: 'approve',
+                            EMPNO: APVNO,
+                            REMARK: REMARK,
+                        },
+                        ip,
+                    );
+                }
+                await this.processApprovalActions(
+                    dto,
+                    currentForm,
+                    files,
+                    path,
+                    fileMappings,
+                );
+            } else if (ACTION == 'returnb') {
+                const confirm = await this.doactionService.doAction(
+                    {
+                        ...currentForm,
+                        ACTION: ACTION,
+                        EMPNO: APVNO,
+                        REMARK: REMARK,
+                    },
+                    ip,
+                );
+            } else {
+                await this.processApprovalActions(
+                    dto,
+                    currentForm,
+                    files,
+                    path,
+                    fileMappings,
+                );
+                if (ACTION == 'return') {
+                    const confirm = await this.doactionService.doAction(
+                        {
+                            ...currentForm,
+                            ACTION: ACTION,
+                            EMPNO: APVNO,
+                            REMARK: REMARK,
+                        },
+                        ip,
+                    );
+                    await this.buildmail(currentForm, 'REQUESTER', '1');
+                } else if (ACTION == 'returnqastaff') {
                     await this.flowService.updateFlow({
-                        condition: { ...currentForm, CSTEPNO: '--' },
-                        DAPVDATE: new Date(),
-                        CAPVTIME: now('HH:mm:ss'),
+                        condition: {
+                            ...currentForm,
+                            CSTEPST: '2',
+                        },
+                        CSTEPST: '1',
+                    });
+                    await this.flowService.updateFlow({
+                        condition: {
+                            ...currentForm,
+                            CSTEPST: '3',
+                            REMARK: REMARK,
+                        },
+                        CSTEPST: '2',
+                    });
+                    await this.flowService.updateFlow({
+                        condition: {
+                            ...currentForm,
+                            CSTEPST: '3',
+                            REMARK: REMARK,
+                        },
+                        CEXTDATA: '03',
+                        CAPVSTNO: '',
+                        DAPVDATE: null,
+                        CAPVTIME: '',
+                        VREMARK: '',
+                    });
+                } else if (ACTION == 'returnass') {
+                    await this.flowService.updateFlow({
+                        condition: {
+                            ...currentForm,
+                            CSTEPST: '2',
+                        },
+                        CSTEPST: '1',
+                    });
+                    await this.flowService.updateFlow({
+                        condition: {
+                            ...currentForm,
+                            CSTEPST: '3',
+                            REMARK: REMARK,
+                        },
+                        CSTEPST: '2',
+                    });
+                    await this.flowService.updateFlow({
+                        condition: {
+                            ...currentForm,
+                            CSTEPST: '3',
+                            REMARK: REMARK,
+                        },
+                        CEXTDATA: '02',
+                        CAPVSTNO: '',
+                        DAPVDATE: null,
+                        CAPVTIME: '',
+                        VREMARK: '',
                     });
                 }
-                await this.formCreateService.updateForm({
-                    condition: { ...currentForm },
-                    CST: '1',
-                });
-            } else if (ACTION == 'saveData') {
-                await this.repoCnform.update({ ...currentForm }, { ...cndata });
-                await this.repoDwg.deleteByAll(currentForm);
-                await this.repoDwg.insertMultiple(dwgToInsert);
-                for (const mapping of fileMappings) {
-                    const currentFiles = files[mapping.key];
-                    if (currentFiles && currentFiles.length > 0) {
-                        await this.attcnfrmService.moveAndInsertFiles({
-                            files: currentFiles,
-                            form: currentForm,
-                            path: path,
-                            folder:
-                                currentForm.NFRMNO +
-                                '_' +
-                                currentForm.VORGNO +
-                                '_' +
-                                currentForm.CYEAR +
-                                '_' +
-                                currentForm.CYEAR2 +
-                                '_' +
-                                currentForm.NRUNNO,
-                            typeno: mapping.TYPENO,
-                            requestedBy: APVNO, // เปลี่ยนเป็นตัวแปรที่เก็บผู้ขอ/ผู้อัปโหลดใน dto ของคุณ
-                        });
-                    }
-                }
-            } else if (ACTION == 'deleteApv') {
-                const resfile =
-                    await this.attcnfrmrepo.getQaFileAll(currentForm);
-                for (const f of resfile) {
-                    const destination = await joinPaths(
-                        path +
-                            currentForm.NFRMNO +
-                            '_' +
-                            currentForm.VORGNO +
-                            '_' +
-                            currentForm.CYEAR +
-                            '_' +
-                            currentForm.CYEAR2 +
-                            '_' +
-                            currentForm.NRUNNO,
-                        f.SFILE,
-                    );
-                    await deleteFile(destination);
-                }
-                await this.repoDwg.deleteByAll(currentForm);
-                await this.attcnfrmrepo.deleteAll(currentForm);
-                await this.repoCnform.deleteAll(currentForm);
-                await this.formCreateService.deleteFlowAndForm({
-                    condition: currentForm,
-                });
-            } else if (ACTION == 'change') {
-                await this.flowService.updateFlow({
-                    condition: { ...currentForm, CEXTDATA: In(['03', '06']) },
-                    VAPVNO: cndata.FOREMAN,
-                });
-            } else if (ACTION == 'changepic') {
-                await this.flowService.updateFlow({
-                    condition: { ...currentForm, CEXTDATA: CEXTDATA },
-                    VAPVNO: cndata.PIC,
-                });
             }
+
             return {
                 status: true,
                 message: 'Approve QA-CN Form successful',
@@ -658,5 +538,529 @@ export class QaCnService {
 
     remove(id: number) {
         return `This action removes a #${id} qaCn`;
+    }
+
+    private async createcnng(dto: FormDto, ip: string) {
+        try {
+            const res = await this.repoCnform.getFirstNo(dto);
+            let newcnng: any[] = [];
+            if (res && res[0].FIRSTNO) {
+                newcnng = await this.r027Mp1Service.getnewcn(res[0].FIRSTNO);
+                if (newcnng && newcnng[0].R27M09) {
+                    await this.r027Mp1Service.insertNewCn(
+                        newcnng[0].R27M09,
+                        res[0].FIRSTNO,
+                    );
+                }
+            }
+            const cnform = await this.formService.getFormData(dto);
+            const cnformnew = {
+                NFRMNO: dto.NFRMNO,
+                VORGNO: dto.VORGNO,
+                CYEAR: dto.CYEAR,
+                REQBY: cnform[0].REQBY,
+                INPUTBY: cnform[0].INPUTBY,
+                REMARK: '',
+            };
+            const rsf = await this.formCreateService.create(
+                { ...cnformnew },
+                ip,
+            );
+            if (rsf.status) {
+                let condition: any = {
+                    NFRMNO: dto.NFRMNO,
+                    VORGNO: dto.VORGNO,
+                    CYEAR: dto.CYEAR,
+                    CYEAR2: rsf.data.CYEAR2,
+                    NRUNNO: rsf.data.NRUNNO,
+                    CSTEPNO: '04',
+                };
+                await this.deleteflowService.deleteFlowStep(condition);
+                condition.CSTEPNO = '19';
+                await this.deleteflowService.deleteFlowStep(condition);
+                condition.CSTEPNO = '26';
+                await this.deleteflowService.deleteFlowStep(condition);
+                condition.CSTEPNO = '10';
+                await this.deleteflowService.deleteFlowStep(condition);
+                condition.CSTEPNO = '11';
+                await this.deleteflowService.deleteFlowStep(condition);
+                if (cnform) {
+                    const datacn = {
+                        NFRMNO: dto.NFRMNO,
+                        VORGNO: dto.VORGNO,
+                        CYEAR: dto.CYEAR,
+                        CYEAR2: rsf.data.CYEAR2,
+                        NRUNNO: rsf.data.NRUNNO,
+                        TITLE: cnform[0].TITLE,
+                        SVENDNAME: cnform[0].SVENDNAME,
+                        CLSNO: cnform[0].CLSNO,
+                        RSNNO: cnform[0].RSNNO,
+                        RSNOTHER: '1 st No.,' + newcnng[0].R27M09,
+                        TRANSNO: cnform[0].TRANSNO,
+                        DETTRANS: cnform[0].DETTRANS,
+                        PRTNAME: cnform[0].PRTNAME,
+                        PURITEM: cnform[0].PURITEM,
+                        INVNO: cnform[0].INVNO,
+                        ITEMNO: cnform[0].ITEMNO,
+                        ORDERNO: cnform[0].ORDERNO,
+                        ORDQ: cnform[0].ORDQ,
+                        PRTLOC: cnform[0].PRTLOC,
+                        PRDCTNAME: cnform[0].PRDCTNAME,
+                        AFTCHANGE: cnform[0].AFTCHANGE,
+                        MSTATUS: '1',
+                    };
+                    await this.repoCnform.insert(datacn);
+                    const dwg = await this.repoDwg.findByCondition(dto);
+                    let dwgToInsert: any[] = [];
+                    if (dwg && dwg.length > 0) {
+                        dwgToInsert = dwg.map((item) => {
+                            return {
+                                ...datacn,
+                                DWGNO: item.DWGNO,
+                                REVNO: item.REVNO,
+                            };
+                        });
+                        await this.repoDwg.insertMultiple(dwgToInsert);
+                    }
+                    const cnflowpre = await this.flowService.getFlow({
+                        ...dto,
+                        CSTEPNO: '06',
+                    });
+                    if (cnflowpre && cnflowpre.length > 0) {
+                        delete condition.CSTEPNO;
+                        await this.flowService.updateFlow({
+                            condition: {
+                                ...condition,
+                                CEXTDATA: In(['03', '06']),
+                            },
+                            VAPVNO: cnflowpre[0].VAPVNO,
+                        });
+                    }
+                } else {
+                    return {
+                        status: 'error',
+                        message: 'create cn ng false',
+                    };
+                }
+            }
+
+            return {
+                status: 'success',
+                message: 'create cn ng success',
+            };
+        } catch (error) {
+            // ถ้า Insert ไม่สำเร็จ หรือพังในขั้นตอนใดๆ จะกระโดดมาที่นี่แทน
+            console.error('เกิดข้อผิดพลาด หยุดการทำงาน:', error.message);
+
+            return {
+                status: 'error',
+                message: 'create cn ng false',
+            };
+        }
+    }
+
+    private async buildmail(dto: FormDto, mtype: string, fstatus: string) {
+        const formno = await this.formCreateService.getFormno(dto);
+        let type =
+            mtype === 'FORMAN'
+                ? 'FOREMAN'
+                : mtype === 'PIC'
+                  ? 'PIC'
+                  : mtype === 'REQUESTER'
+                    ? 'REQUESTER'
+                    : 'ALL';
+        let rsEmail = await this.getApvEmail(dto, type);
+        let to = rsEmail.map((row) => row.EMAIL);
+        let rs = await this.getcnresult(dto);
+        const first = rs?.[0] ?? null;
+        let subject = '';
+        let html = '';
+        if (mtype == 'ALL') {
+            subject =
+                fstatus == '2'
+                    ? `E-Form ${formno} was approved`
+                    : fstatus == '3'
+                      ? `E-Form ${formno} was rejected`
+                      : '';
+            if (first) {
+                html = `
+                <div>Changing notice no.: ${formno} </div>
+<div>Supplier or Sub-contractor Name: ${first.SVENDNAME}</div>
+<div>Part Name: ${first.PRTNAME}</div> `;
+                for (const row of rs) {
+                    html += `<div>Drawing No.: ${row.DWGNO}</dic>`;
+                }
+                html += `<div>Status: ${first.JUDGEMENT}</div>`;
+            } else {
+                html = `<div>No data found</div>`;
+            }
+        } else if (mtype == 'FOREMAN') {
+            subject = `E-Form ${formno}`;
+            html = `<div>Changing notice no.: ${formno}</div>`;
+            if (first) {
+                html += `<div>First no.: ${first.FIRSTNO}</div>`;
+                html += `<div>Part Name: ${first.PRTNAME}</div>`;
+                let i = 1;
+                for (const row of rs) {
+                    if (i == 1) {
+                        html += `<div>Drawing No.: ${row.DWGNO}</div>`;
+                    } else {
+                        html += `<div>&nbsp;&nbsp;&nbsp;&nbsp; ${row.DWGNO}</div>`;
+                    }
+                    i++;
+                }
+            }
+        } else if (mtype == 'PIC') {
+            subject = `Result of ${formno}`;
+            html = `<div>Changing notice no.: ${formno}</div>`;
+            if (first) {
+                html += `<div>First no.: ${first.FIRSTNO}</div>`;
+                html += `<div>Part Name: ${first.PRTNAME}</div>`;
+                let i = 1;
+                for (const row of rs) {
+                    if (i == 1) {
+                        html += `<div>Drawing No.: ${row.DWGNO}</div>`;
+                    } else {
+                        html += `<div>&nbsp;&nbsp;&nbsp;&nbsp; ${row.DWGNO}</div>`;
+                    }
+                    html += `<div>Status: ${row.RESULT === '0' ? "<font color='green'>OK</font>" : row.RESULT === '1' ? "<font color='red'>NG</font>" : ''}</div>`;
+                    i++;
+                }
+            }
+        } else if (mtype == 'REQUESTER') {
+            subject = `E-Form ${formno} has been returned`;
+            html = `<div>Changing notice no.: ${formno}</div>`;
+            if (first) {
+                html += `<div>First no.: ${first.FIRSTNO}</div>`;
+                html += `<div>Part Name: ${first.PRTNAME}</div>`;
+                let i = 1;
+                for (const row of rs) {
+                    if (i == 1) {
+                        html += `<div>Drawing No.: ${row.DWGNO}</div>`;
+                    } else {
+                        html += `<div>&nbsp;&nbsp;&nbsp;&nbsp; ${row.DWGNO}</div>`;
+                    }
+                    i++;
+                }
+            }
+        }
+        if (!to || !subject || !html) {
+            throw new Error('Mail data is incomplete');
+        }
+        let objmail = {
+            from: 'noreplay@MitsubishiElevatorAsia.co.th',
+            to: to,
+            subject: subject,
+            html: html,
+        };
+        await this.mailService.sendMail(objmail);
+    }
+
+    private async getcnresult(dto: FormDto) {
+        const sql = `
+        SELECT
+            cnj.jdgmntno,
+            cnj.judgement,
+            cnf.jdgother,
+            cnf.svendname,
+            cnf.prtname,
+            resultChkDwg.dwgno,
+            resultChkDwg.result,
+            REGEXP_SUBSTR(cnf.RSNOTHER, 'F[0-9]+') AS FIRSTNO,
+            REGEXP_SUBSTR(DETTRANS, 'shop at\\s*(.*)', 1, 1, NULL, 1) AS SHOPNO
+        FROM cnform cnf
+        LEFT JOIN cnjudgement cnj
+               ON cnj.jdgmntno = cnf.jdgmntno
+        INNER JOIN resultChkDwg
+               ON resultChkDwg.nfrmno = cnf.nfrmno
+              AND resultChkDwg.vorgno = cnf.vorgno
+              AND resultChkDwg.cyear  = cnf.cyear
+              AND resultChkDwg.cyear2 = cnf.cyear2
+              AND resultChkDwg.nrunno = cnf.nrunno
+        WHERE cnf.nfrmno = ?
+          AND cnf.vorgno = ?
+          AND cnf.cyear  = ?
+          AND cnf.cyear2 = ?
+          AND cnf.nrunno = ?
+    `;
+
+        // แมปค่าจาก DTO เข้า Parameter (?) ตามลำดับ
+        const params = [
+            dto.NFRMNO,
+            dto.VORGNO,
+            dto.CYEAR,
+            dto.CYEAR2,
+            dto.NRUNNO,
+        ];
+
+        // คืนค่าเป็น Array ของ Object (คล้ายกับ ->result() ใน CodeIgniter)
+        return await this.repoCnform.executeRawSql(sql, params);
+    }
+
+    private async getApvEmail(dto: FormDto, type: string): Promise<any[]> {
+        let sql = '';
+        // ค่าพารามิเตอร์พื้นฐานที่จะใช้ใน WHERE clause
+        const baseParams = [
+            dto.NFRMNO,
+            dto.VORGNO,
+            dto.CYEAR,
+            dto.CYEAR2,
+            dto.NRUNNO,
+        ];
+
+        if (type === 'PIC') {
+            sql = `
+        SELECT DISTINCT e.SRECMAIL AS EMAIL
+        FROM FLOW f
+        JOIN AMEC.AEMPLOYEE e ON f.VAPVNO = e.SEMPNO
+        WHERE f.NFRMNO = ? AND f.VORGNO = ? AND f.CYEAR = ? AND f.CYEAR2 = ? AND f.NRUNNO = ?
+        AND e.CSTATUS = '1' AND f.CSTEPNO = '--'
+        UNION
+        SELECT DISTINCT e.SRECMAIL AS EMAIL
+        FROM FLOW f
+        JOIN AMEC.AEMPLOYEE e ON f.VREPNO = e.SEMPNO
+        WHERE f.NFRMNO = ? AND f.VORGNO = ? AND f.CYEAR = ? AND f.CYEAR2 = ? AND f.NRUNNO = ?
+        AND e.CSTATUS = '1' AND f.CSTEPNO = '--'
+        UNION
+        SELECT DISTINCT e.SRECMAIL AS EMAIL
+        FROM CNSHOPPIC c
+        JOIN AMEC.AEMPLOYEE e ON c.ENG = e.SEMPNO
+        WHERE c.FM IN (
+          SELECT VAPVNO FROM FLOW
+          WHERE NFRMNO = ? AND VORGNO = ? AND CYEAR = ? AND CYEAR2 = ? AND NRUNNO = ?
+          AND CEXTDATA ='06'
+        )
+      `;
+            // PIC ใช้ 3 ชุดคำสั่ง จึงต้องจำลอง baseParams 3 ครั้ง
+            const picParams = [...baseParams, ...baseParams, ...baseParams];
+            return await this.repoCnform.executeRawSql(sql, picParams);
+        } else if (type === 'REQUESTER') {
+            sql = `
+        SELECT DISTINCT e.SRECMAIL AS EMAIL
+        FROM FLOW f
+        JOIN AMEC.AEMPLOYEE e ON f.VREALAPV = e.SEMPNO
+        WHERE f.NFRMNO = ? AND f.VORGNO = ? AND f.CYEAR = ? AND f.CYEAR2 = ? AND f.NRUNNO = ?
+        AND e.CSTATUS = '1' AND f.CSTEPNO = '--'
+      `;
+            return await this.repoCnform.executeRawSql(sql, baseParams);
+        } else {
+            sql = `
+        SELECT DISTINCT e.SRECMAIL AS EMAIL
+        FROM FLOW f
+        JOIN AMEC.AEMPLOYEE e ON f.VREALAPV = e.SEMPNO
+        WHERE f.NFRMNO = ? AND f.VORGNO = ? AND f.CYEAR = ? AND f.CYEAR2 = ? AND f.NRUNNO = ?
+        AND e.CSTATUS = '1'
+      `;
+
+            if (type === 'FOREMAN') {
+                sql += ` AND f.CEXTDATA = '06'`;
+            } else if (type === 'ALL') {
+                sql += ` AND f.CSTEPNO NOT IN ('05','04','11')`;
+            }
+
+            return await this.repoCnform.executeRawSql(sql, baseParams);
+        }
+    }
+
+    private async processApprovalActions(
+        dto: ApproveQaCnDto,
+        currentForm: any,
+        files: any,
+        path: string,
+        fileMappings: any[],
+    ) {
+        let condition: any;
+
+        // Destructure ข้อมูลที่จำเป็นต้องใช้ในฟังก์ชันนี้
+        const {
+            APVNO,
+            CEXTDATA,
+            STEPREADY,
+            SELJINCHRG,
+            SELEINCHRG,
+            OPERATOR,
+            SELJOBTYPE,
+            ACTION,
+            DWGNO,
+            ...cndata
+        } = dto;
+
+        const dwgToInsert = DWGNO.map((item) => {
+            return {
+                ...currentForm,
+                ...item,
+            };
+        });
+
+        if (SELJINCHRG) {
+            condition = { ...currentForm, CEXTDATA: '02' };
+            await this.flowService.updateFlow({
+                condition: condition,
+                VAPVNO: SELJINCHRG,
+            });
+        }
+        if (SELEINCHRG) {
+            condition = { ...currentForm, CEXTDATA: '03' };
+            await this.flowService.updateFlow({
+                condition: condition,
+                VAPVNO: SELEINCHRG,
+            });
+        }
+        if (OPERATOR) {
+            condition = { ...currentForm, CEXTDATA: '07' };
+            await this.flowService.updateFlow({
+                condition: condition,
+                VAPVNO: OPERATOR,
+            });
+        }
+        if (SELJOBTYPE && SELJOBTYPE == 'S') {
+            condition = { ...currentForm, CSTEPNO: '07' };
+            await this.deleteflowService.deleteFlowStep(condition);
+            condition.CSTEPNO = '61';
+            await this.deleteflowService.deleteFlowStep(condition);
+        }
+
+        if (CEXTDATA >= 2 && CEXTDATA < 8) {
+            await this.repoCnform.update(
+                { ...currentForm },
+                {
+                    JDGMNTNO: cndata.RADJUDGE ? Number(cndata.RADJUDGE) : null,
+                    JDGOTHER:
+                        cndata.RADJUDGE.toString() == '2.5'
+                            ? cndata.TXTJDGOTHER1
+                            : cndata.RADJUDGE.toString() == '4.2'
+                              ? cndata.TXTJDGOTHER2
+                              : '',
+                },
+            );
+            if (ACTION != 'return') {
+                await this.repoDwg.deleteByAll(currentForm);
+                await this.repoDwg.insertMultiple(dwgToInsert);
+            }
+        }
+
+        if (ACTION == 'approve') {
+            if (STEPREADY == '--') {
+                await this.repoCnform.update({ ...currentForm }, { ...cndata });
+                await this.repoDwg.deleteByAll(currentForm);
+                await this.repoDwg.insertMultiple(dwgToInsert);
+                for (const mapping of fileMappings) {
+                    const currentFiles = files[mapping.key];
+                    if (currentFiles && currentFiles.length > 0) {
+                        await this.attcnfrmService.moveAndInsertFiles({
+                            files: currentFiles,
+                            form: currentForm,
+                            path: path,
+                            folder: `${currentForm.NFRMNO}_${currentForm.VORGNO}_${currentForm.CYEAR}_${currentForm.CYEAR2}_${currentForm.NRUNNO}`,
+                            typeno: mapping.TYPENO,
+                            requestedBy: APVNO,
+                        });
+                    }
+                }
+            }
+            if (CEXTDATA == 8 && cndata.CLSNO == 2) {
+                if (cndata.INVNO && cndata.INVNO.length >= 8) {
+                    const pono = cndata.INVNO.substring(0, 8);
+                    const isNumber = pono.trim() !== '' && !isNaN(Number(pono));
+                    if (isNumber) {
+                        const pord =
+                            pono.toString().substring(0, 2) +
+                            pono.toString().substring(4, 4);
+                        const pprod = cndata.PURITEM;
+                        const formno =
+                            await this.formCreateService.getFormno(currentForm);
+                        await this.hpoService.updateByOrderProd(
+                            pord,
+                            pprod,
+                            formno,
+                        );
+                    }
+                }
+            } else if (CEXTDATA == 7) {
+                const formno =
+                    await this.formCreateService.getFormno(currentForm);
+                await this.j736kpService.updateByFormno(formno);
+            }
+        } else if (ACTION == 'reject') {
+            if (CEXTDATA == 7) {
+                const formno =
+                    await this.formCreateService.getFormno(currentForm);
+                await this.j736kpService.updateByFormno(formno);
+            }
+            if (CEXTDATA > 1 && CEXTDATA != 5) {
+                const updatedata = { CSTEPST: '6', CAPVSTNO: '2' };
+                await Promise.all([
+                    this.flowService
+                        .updateFlow({
+                            condition: { ...currentForm, VAPVNO: APVNO },
+                            ...updatedata,
+                        })
+                        .catch(() => {}),
+                    this.flowService
+                        .updateFlow({
+                            condition: { ...currentForm, VREPNO: APVNO },
+                            ...updatedata,
+                        })
+                        .catch(() => {}),
+                ]);
+            }
+        } else if (ACTION == 'sendApv' || ACTION == 'saveData') {
+            // เนื่องจาก sendApv และ saveData โค้ดส่วนนี้เหมือนกันเป๊ะ สามารถรวบเงื่อนไขได้
+            await this.repoCnform.update({ ...currentForm }, { ...cndata });
+            await this.repoDwg.deleteByAll(currentForm);
+            await this.repoDwg.insertMultiple(dwgToInsert);
+            for (const mapping of fileMappings) {
+                const currentFiles = files[mapping.key];
+                if (currentFiles && currentFiles.length > 0) {
+                    await this.attcnfrmService.moveAndInsertFiles({
+                        files: currentFiles,
+                        form: currentForm,
+                        path: path,
+                        folder: `${currentForm.NFRMNO}_${currentForm.VORGNO}_${currentForm.CYEAR}_${currentForm.CYEAR2}_${currentForm.NRUNNO}`,
+                        typeno: mapping.TYPENO,
+                        requestedBy: APVNO,
+                    });
+                }
+            }
+            // เฉพาะของ sendApv ที่มีอัปเดต flow และ form
+            if (ACTION == 'sendApv') {
+                if (STEPREADY != '--') {
+                    await this.flowService.updateFlow({
+                        condition: { ...currentForm, CSTEPNO: '--' },
+                        DAPVDATE: new Date(),
+                        CAPVTIME: now('HH:mm:ss'),
+                    });
+                }
+                await this.formCreateService.updateForm({
+                    condition: { ...currentForm },
+                    CST: '1',
+                });
+            }
+        } else if (ACTION == 'deleteApv') {
+            const resfile = await this.attcnfrmrepo.getQaFileAll(currentForm);
+            for (const f of resfile) {
+                const destination = await joinPaths(
+                    `${path}${currentForm.NFRMNO}_${currentForm.VORGNO}_${currentForm.CYEAR}_${currentForm.CYEAR2}_${currentForm.NRUNNO}`,
+                    f.SFILE,
+                );
+                await deleteFile(destination);
+            }
+            await this.repoDwg.deleteByAll(currentForm);
+            await this.attcnfrmrepo.deleteAll(currentForm);
+            await this.repoCnform.deleteAll(currentForm);
+            await this.formCreateService.deleteFlowAndForm({
+                condition: currentForm,
+            });
+        } else if (ACTION == 'change') {
+            await this.flowService.updateFlow({
+                condition: { ...currentForm, CEXTDATA: In(['03', '06']) },
+                VAPVNO: cndata.FOREMAN,
+            });
+        } else if (ACTION == 'changepic') {
+            await this.flowService.updateFlow({
+                condition: { ...currentForm, CEXTDATA: CEXTDATA },
+                VAPVNO: cndata.PIC,
+            });
+        }
     }
 }

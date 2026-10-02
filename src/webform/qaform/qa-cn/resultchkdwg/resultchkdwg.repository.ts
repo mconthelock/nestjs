@@ -21,6 +21,14 @@ export class ResultChkDwgRepository extends BaseRepository {
         return this.getRepository(RESULTCHKDWG).save(dto);
     }
 
+    async findByCondition(con: FormDto) {
+        return this.getRepository(RESULTCHKDWG).find({
+            where: {
+                ...con,
+            },
+        });
+    }
+
     async updateMultiple(
         con: FormDto,
         dtos: UpdateResultchkdwgDto[],

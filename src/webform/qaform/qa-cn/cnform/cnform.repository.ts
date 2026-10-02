@@ -40,4 +40,22 @@ export class CnFormRepository extends BaseRepository {
     async deleteAll(dto: FormDto) {
         return this.getRepository(CNFORM).delete(dto);
     }
+
+    async getFirstNo(con: FormDto): Promise<any[]> {
+        return await this.getRepository(CNFORM)
+            .createQueryBuilder('cnform')
+            // ใช้ Raw Query สำหรับ REGEXP_SUBSTR และตั้งชื่อ AS ว่า FIRSTNO
+            .select("REGEXP_SUBSTR(cnform.RSNOTHER, 'F[0-9]+')", 'FIRSTNO')
+            .where('cnform.NFRMNO = :nfrmno', { nfrmno: con.NFRMNO })
+            .andWhere('cnform.VORGNO = :vorgno', { vorgno: con.VORGNO })
+            .andWhere('cnform.CYEAR = :cyear', { cyear: con.CYEAR })
+            .andWhere('cnform.CYEAR2 = :cyear2', { cyear2: con.CYEAR2 })
+            .andWhere('cnform.NRUNNO = :nrunno', { nrunno: con.NRUNNO })
+            // getRawMany() จะรีเทิร์นค่าออกมาเป็น Array Object คล้ายกับ result() ของ CodeIgniter
+            .getRawOne();
+    }
+    async executeRawSql(sql: string, params: any[]): Promise<any[]> {
+        // ในนี้เรียก this.query หรือ this.manager.query ได้ เพราะอยู่ในบ้านตัวเอง
+        return await this.manager.query(sql, params);
+    }
 }

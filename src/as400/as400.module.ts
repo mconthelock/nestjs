@@ -21,6 +21,7 @@ import { BpcsfvnewModule } from './bpcsfvnew/bpcsfvnew.module';
 import { rtnlibfModule } from './rtnlibf/rtnlibf.module';
 import { J736kpModule } from './rtnlibf/j736kp/j736kp.module';
 import { HpoModule } from './bpcsfvnew/hpo/hpo.module';
+import { R027Mp1Module } from './datalibo/r027mp1/r027mp1.module';
 
 
 @Module({
@@ -40,6 +41,7 @@ import { HpoModule } from './bpcsfvnew/hpo/hpo.module';
         rtnlibfModule,
         J736kpModule,
         HpoModule,
+        R027Mp1Module,
         // F001kpModule,
         // F002kpModule,
         // F003kpModule,

@@ -52,8 +52,13 @@ export class CnFormRepository extends BaseRepository {
         return this.getRepository(CNFORM).delete(dto);
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     async getFirstNo(con: FormDto): Promise<any> {
+=======
+
+    async getFirstNo(con: FormDto): Promise<any[]> {
+>>>>>>> 14243a62 (QA-CN)
         return await this.getRepository(CNFORM)
             .createQueryBuilder('cnform')
             // ใช้ Raw Query สำหรับ REGEXP_SUBSTR และตั้งชื่อ AS ว่า FIRSTNO
@@ -66,6 +71,7 @@ export class CnFormRepository extends BaseRepository {
             // getRawMany() จะรีเทิร์นค่าออกมาเป็น Array Object คล้ายกับ result() ของ CodeIgniter
             .getRawOne();
     }
+<<<<<<< HEAD
     async getQueryBuilderResult(dto: FormDto) {
         return await this.getRepository(CNFORM)
             // 1. เปลี่ยน Alias หลักเป็นตัวพิมพ์ใหญ่ (CNF)
@@ -203,4 +209,10 @@ export class CnFormRepository extends BaseRepository {
     }
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+    async executeRawSql(sql: string, params: any[]): Promise<any[]> {
+        // ในนี้เรียก this.query หรือ this.manager.query ได้ เพราะอยู่ในบ้านตัวเอง
+        return await this.manager.query(sql, params);
+    }
+>>>>>>> 14243a62 (QA-CN)
 }

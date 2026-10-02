@@ -14,21 +14,28 @@ import { HpoModule } from 'src/as400/bpcsfvnew/hpo/hpo.module';
 import { J736kpModule } from 'src/as400/rtnlibf/j736kp/j736kp.module';
 import { R027Mp1Module } from 'src/as400/datalibo/r027mp1/r027mp1.module';
 import { MailModule } from 'src/common/services/mail/mail.module';
+<<<<<<< HEAD
 =======
 >>>>>>> 093c063b (QA-CN)
 =======
 import { HpoModule } from 'src/as400/bpcsfvnew/hpo/hpo.module';
 import { J736kpModule } from 'src/as400/rtnlibf/j736kp/j736kp.module';
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+>>>>>>> 14243a62 (QA-CN)
 
 @Module({
     controllers: [QaCnController],
     providers: [QaCnService],
     imports: [
 <<<<<<< HEAD
+<<<<<<< HEAD
         TypeOrmModule,
 =======
 >>>>>>> 093c063b (QA-CN)
+=======
+        TypeOrmModule,
+>>>>>>> 14243a62 (QA-CN)
         CnformModule,
         ResultchkdwgModule,
         AttcnfrmModule,
@@ -41,12 +48,15 @@ import { J736kpModule } from 'src/as400/rtnlibf/j736kp/j736kp.module';
         J736kpModule,
         R027Mp1Module,
         MailModule,
+<<<<<<< HEAD
 =======
 >>>>>>> 093c063b (QA-CN)
 =======
         HpoModule,
         J736kpModule,
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+>>>>>>> 14243a62 (QA-CN)
     ],
 })
 export class QaCnModule {}

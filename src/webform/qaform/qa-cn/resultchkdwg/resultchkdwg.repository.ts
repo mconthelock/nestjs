@@ -22,6 +22,9 @@ export class ResultChkDwgRepository extends BaseRepository {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 14243a62 (QA-CN)
     async findByCondition(con: FormDto) {
         return this.getRepository(RESULTCHKDWG).find({
             where: {
@@ -30,8 +33,11 @@ export class ResultChkDwgRepository extends BaseRepository {
         });
     }
 
+<<<<<<< HEAD
 =======
 >>>>>>> 67c79348 (PUR-EVA)
+=======
+>>>>>>> 14243a62 (QA-CN)
     async updateMultiple(
         con: FormDto,
         dtos: UpdateResultchkdwgDto[],

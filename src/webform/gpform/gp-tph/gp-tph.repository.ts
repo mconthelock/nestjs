@@ -3,7 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { GPTPH_AREAS } from 'src/common/Entities/webform/table/GPTPH_AREAS.entity';
 import { GPTPH_LOCATION } from 'src/common/Entities/webform/table/GPTPH_LOCATION.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource, DeepPartial } from 'typeorm';
+import { DataSource, DeepPartial, In } from 'typeorm';
 import { CreateGpTphReqDto, CreateGpTphlistApplicantDto } from './dto/create-gp-tph.dto';
 import { GPTPH_REQ_HEADER } from 'src/common/Entities/webform/table/GPTPH_REQ_HEADER.entity';
 import { FormDto } from 'src/webform/form/dto/form.dto';
@@ -11,6 +11,7 @@ import { GPTPH_APPLICANT } from 'src/common/Entities/webform/table/GPTPH_APPLICA
 import { GPTPH_AREA_RECORD } from 'src/common/Entities/webform/table/GPTPH_AREA_RECORD.entity';
 import { CreateDataAreaDto } from './dto/create-data-area.dto';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
+import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 @Injectable()
 export class GpTphRepository extends BaseRepository {
 
@@ -20,6 +21,40 @@ export class GpTphRepository extends BaseRepository {
     findAllAreas() {
         return this.getRepository(GPTPH_AREAS).find({
             relations: ['LOCATION']
+        });
+    }
+
+    findAreasByIds(areaIds: number[]) {
+        return this.getRepository(GPTPH_AREAS).findBy({
+            AREA_ID: In(areaIds),
+        });
+    }
+
+    async replaceSystemApproverStep(
+        form: FormDto,
+        approvers: Array<{ VAPVNO: string; VREPNO: string }>,
+    ) {
+        await this.manager.transaction(async (manager) => {
+            const flowRepository = manager.getRepository(FLOW);
+            const systemSteps = await flowRepository.findBy({
+                ...form,
+                VAPVNO: 'SYSTEM',
+            });
+
+            if (systemSteps.length !== 1) {
+                throw new Error(
+                    'GP-TPH flow must contain exactly one SYSTEM Area Owner step',
+                );
+            }
+
+            const [systemStep] = systemSteps;
+            await flowRepository.remove(systemStep);
+            await flowRepository.save(
+                approvers.map((approver) => ({
+                    ...systemStep,
+                    ...approver,
+                })),
+            );
         });
     }
     findAllLocations() {
@@ -152,5 +187,4 @@ export class GpTphRepository extends BaseRepository {
         return this.getRepository(GPTPH_AREAS).delete({ AREA_ID: id });
     }
 }
-
 

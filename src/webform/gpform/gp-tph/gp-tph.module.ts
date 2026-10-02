@@ -11,15 +11,22 @@ import { FlowModule } from 'src/webform/flow/flow.module';
 import { GPTPH_REQ_HEADER } from 'src/common/Entities/webform/table/GPTPH_REQ_HEADER.entity';
 import { GPTPH_APPLICANT } from 'src/common/Entities/webform/table/GPTPH_APPLICANT.entity';
 import { GPTPH_AREA_RECORD } from 'src/common/Entities/webform/table/GPTPH_AREA_RECORD.entity';
+import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
+import { FlowmstModule } from 'src/webform/flowmst/flowmst.module';
+import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
+import { RepModule } from 'src/webform/rep/rep.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature(
-      [GPTPH_AREAS,GPTPH_LOCATION,GPTPH_REQ_HEADER,GPTPH_APPLICANT,GPTPH_AREA_RECORD],
+      [GPTPH_AREAS,GPTPH_LOCATION,GPTPH_REQ_HEADER,GPTPH_APPLICANT,GPTPH_AREA_RECORD,FLOW],
       'webformConnection',),
               FormmstModule,
               FormModule,
               FlowModule,
+              FlowmstModule,
+              OrgposModule,
+              RepModule,
   ],
   controllers: [GpTphController],
   providers: [GpTphService, GpTphRepository],

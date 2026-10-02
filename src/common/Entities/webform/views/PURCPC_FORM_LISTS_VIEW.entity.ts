@@ -6,6 +6,12 @@ export class PURCPC_FORM_LISTS_VIEW {
     VFORMNO: string;
 
     @ViewColumn()
+    CYEAR2: string;
+
+    @ViewColumn()
+    NRUNNO: number;
+
+    @ViewColumn()
     VREQNO: string;
 
     @ViewColumn()

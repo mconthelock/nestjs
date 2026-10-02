@@ -8,6 +8,7 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 import { SearchReportDto } from './dto/search-report.dto';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 import { FORMMST } from 'src/common/Entities/webform/table/FORMMST.entity';
+import { User } from 'src/common/Entities/webform/views/AMECUSERALL.entity';
 
 @Injectable()
 export class PsUpiRepository extends BaseRepository {
@@ -74,13 +75,15 @@ export class PsUpiRepository extends BaseRepository {
         const formmst = await this.getRepository(FORMMST).findOneBy({
             VANAME: 'PS-UPI',
         });
-        return this.getRepository(FORM).find({
-            where: {
-                NFRMNO: formmst.NNO,
-                VORGNO: formmst.VORGNO,
-                CYEAR: formmst.CYEAR,
-                ...dto
-            },
-        });
+        return this.getRepository(FORM)
+            .createQueryBuilder('F')
+            .select('F.*,REQ.*')
+            .addSelect('REQ.SNAME', 'VREQNAME')
+            .leftJoin(User, 'REQ', 'REQ.SEMPNO = F.VREQNO')
+            .where('F.NFRMNO = :NFRMNO', { NFRMNO: formmst.NNO })
+            .andWhere('F.VORGNO = :VORGNO', { VORGNO: formmst.VORGNO })
+            .andWhere('F.CYEAR = :CYEAR', { CYEAR: formmst.CYEAR })
+            .andWhere(dto)
+            .getRawMany();
     }
 }

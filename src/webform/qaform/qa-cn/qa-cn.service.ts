@@ -362,6 +362,8 @@ export class QaCnService {
                 CYEAR2: cndata.CYEAR2,
                 NRUNNO: cndata.NRUNNO,
             };
+            // console.log('============' + REMARK);
+
             if (ACTION == 'approve' || ACTION == 'reject') {
                 let act;
                 if (CEXTDATA > 1 && CEXTDATA != 5 && ACTION == 'reject') {
@@ -395,12 +397,30 @@ export class QaCnService {
                             await this.createcnng(currentForm, ip);
                         }
                         let mstatus = MSTATUS == '1' ? 'PIC' : 'ALL';
-                        await this.buildmail(currentForm, mstatus, formStatus);
+                        const toEmail = (
+                            await this.repoCnform.getApvEmail(
+                                currentForm,
+                                mstatus,
+                            )
+                        ).map((item) => item.EMAIL);
+                        await this.buildmail(
+                            currentForm,
+                            mstatus,
+                            formStatus,
+                            toEmail,
+                        );
                     } else if (STEPREADY == '06' && MSTATUS == '1') {
+                        const toEmail = (
+                            await this.repoCnform.getApvEmail(
+                                currentForm,
+                                'FOREMAN',
+                            )
+                        ).map((item) => item.EMAIL);
                         await this.buildmail(
                             currentForm,
                             'FOREMAN',
                             formStatus,
+                            toEmail,
                         );
                     }
                 }
@@ -451,7 +471,21 @@ export class QaCnService {
                         },
                         ip,
                     );
-                    await this.buildmail(currentForm, 'REQUESTER', '1');
+                    if (confirm.status) {
+                        const toEmail = (
+                            await this.repoCnform.getApvEmail(
+                                currentForm,
+                                'REQUESTER',
+                            )
+                        ).map((item) => item.EMAIL);
+
+                        await this.buildmail(
+                            currentForm,
+                            'REQUESTER',
+                            '1',
+                            toEmail,
+                        );
+                    }
                 } else if (ACTION == 'returnqastaff') {
                     await this.flowService.updateFlow({
                         condition: {
@@ -464,21 +498,19 @@ export class QaCnService {
                         condition: {
                             ...currentForm,
                             CSTEPST: '3',
-                            REMARK: REMARK,
                         },
                         CSTEPST: '2',
+                        VREMARK: REMARK,
                     });
                     await this.flowService.updateFlow({
                         condition: {
                             ...currentForm,
-                            CSTEPST: '3',
-                            REMARK: REMARK,
+                            CEXTDATA: '03',
                         },
-                        CEXTDATA: '03',
+                        CSTEPST: '3',
                         CAPVSTNO: '',
                         DAPVDATE: null,
                         CAPVTIME: '',
-                        VREMARK: '',
                     });
                 } else if (ACTION == 'returnass') {
                     await this.flowService.updateFlow({
@@ -488,25 +520,24 @@ export class QaCnService {
                         },
                         CSTEPST: '1',
                     });
+                    console.log('Remark ===' + REMARK);
                     await this.flowService.updateFlow({
                         condition: {
                             ...currentForm,
                             CSTEPST: '3',
-                            REMARK: REMARK,
                         },
                         CSTEPST: '2',
+                        VREMARK: REMARK,
                     });
                     await this.flowService.updateFlow({
                         condition: {
                             ...currentForm,
-                            CSTEPST: '3',
-                            REMARK: REMARK,
+                            CEXTDATA: '02',
                         },
-                        CEXTDATA: '02',
+                        CSTEPST: '3',
                         CAPVSTNO: '',
                         DAPVDATE: null,
                         CAPVTIME: '',
-                        VREMARK: '',
                     });
                 }
             }
@@ -542,24 +573,37 @@ export class QaCnService {
 
     private async createcnng(dto: FormDto, ip: string) {
         try {
+            console.log('creangffffffffffffff');
+
             const res = await this.repoCnform.getFirstNo(dto);
+            console.log('rrrrrrrrrrrrrrrrr');
+            console.log(res);
+            console.log('rrrrrrrrrrrrrrrrr');
+
             let newcnng: any[] = [];
-            if (res && res[0].FIRSTNO) {
-                newcnng = await this.r027Mp1Service.getnewcn(res[0].FIRSTNO);
+            if (res && res.FIRSTNO) {
+                newcnng = await this.r027Mp1Service.getnewcn(res.FIRSTNO);
+                console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA');
+                console.log(newcnng);
+                console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA');
                 if (newcnng && newcnng[0].R27M09) {
                     await this.r027Mp1Service.insertNewCn(
                         newcnng[0].R27M09,
-                        res[0].FIRSTNO,
+                        res.FIRSTNO,
                     );
                 }
             }
             const cnform = await this.formService.getFormData(dto);
+            const datacnfrm = await this.repoCnform.findByCondition(dto);
+            console.log('ccccccccccccccccccccccccccccc');
+            console.log(cnform);
+            console.log('ccccccccccccccccccccccccccccc');
             const cnformnew = {
                 NFRMNO: dto.NFRMNO,
                 VORGNO: dto.VORGNO,
                 CYEAR: dto.CYEAR,
-                REQBY: cnform[0].REQBY,
-                INPUTBY: cnform[0].INPUTBY,
+                REQBY: cnform.VREQNO,
+                INPUTBY: cnform.VINPUTER,
                 REMARK: '',
             };
             const rsf = await this.formCreateService.create(
@@ -591,22 +635,22 @@ export class QaCnService {
                         CYEAR: dto.CYEAR,
                         CYEAR2: rsf.data.CYEAR2,
                         NRUNNO: rsf.data.NRUNNO,
-                        TITLE: cnform[0].TITLE,
-                        SVENDNAME: cnform[0].SVENDNAME,
-                        CLSNO: cnform[0].CLSNO,
-                        RSNNO: cnform[0].RSNNO,
+                        TITLE: datacnfrm[0].TITLE,
+                        SVENDNAME: datacnfrm[0].SVENDNAME,
+                        CLSNO: datacnfrm[0].CLSNO,
+                        RSNNO: datacnfrm[0].RSNNO,
                         RSNOTHER: '1 st No.,' + newcnng[0].R27M09,
-                        TRANSNO: cnform[0].TRANSNO,
-                        DETTRANS: cnform[0].DETTRANS,
-                        PRTNAME: cnform[0].PRTNAME,
-                        PURITEM: cnform[0].PURITEM,
-                        INVNO: cnform[0].INVNO,
-                        ITEMNO: cnform[0].ITEMNO,
-                        ORDERNO: cnform[0].ORDERNO,
-                        ORDQ: cnform[0].ORDQ,
-                        PRTLOC: cnform[0].PRTLOC,
-                        PRDCTNAME: cnform[0].PRDCTNAME,
-                        AFTCHANGE: cnform[0].AFTCHANGE,
+                        TRANSNO: datacnfrm[0].TRANSNO,
+                        DETTRANS: datacnfrm[0].DETTRANS,
+                        PRTNAME: datacnfrm[0].PRTNAME,
+                        PURITEM: datacnfrm[0].PURITEM,
+                        INVNO: datacnfrm[0].INVNO,
+                        ITEMNO: datacnfrm[0].ITEMNO,
+                        ORDERNO: datacnfrm[0].ORDERNO,
+                        ORDQ: datacnfrm[0].ORDQ,
+                        PRTLOC: datacnfrm[0].PRTLOC,
+                        PRDCTNAME: datacnfrm[0].PRDCTNAME,
+                        AFTCHANGE: datacnfrm[0].AFTCHANGE,
                         MSTATUS: '1',
                     };
                     await this.repoCnform.insert(datacn);
@@ -624,7 +668,7 @@ export class QaCnService {
                     }
                     const cnflowpre = await this.flowService.getFlow({
                         ...dto,
-                        CSTEPNO: '06',
+                        CEXTDATA: '06',
                     });
                     if (cnflowpre && cnflowpre.length > 0) {
                         delete condition.CSTEPNO;
@@ -659,7 +703,12 @@ export class QaCnService {
         }
     }
 
-    private async buildmail(dto: FormDto, mtype: string, fstatus: string) {
+    private async buildmail(
+        dto: FormDto,
+        mtype: string,
+        fstatus: string,
+        to: string[],
+    ) {
         const formno = await this.formCreateService.getFormno(dto);
         let type =
             mtype === 'FORMAN'
@@ -669,9 +718,11 @@ export class QaCnService {
                   : mtype === 'REQUESTER'
                     ? 'REQUESTER'
                     : 'ALL';
-        let rsEmail = await this.getApvEmail(dto, type);
-        let to = rsEmail.map((row) => row.EMAIL);
-        let rs = await this.getcnresult(dto);
+        console.log('>>>>>>>>>');
+        console.log(to);
+        console.log('>>>>>>>>>');
+
+        let rs = await this.repoCnform.getQueryBuilderResult(dto);
         const first = rs?.[0] ?? null;
         let subject = '';
         let html = '';
@@ -690,7 +741,7 @@ export class QaCnService {
                 for (const row of rs) {
                     html += `<div>Drawing No.: ${row.DWGNO}</dic>`;
                 }
-                html += `<div>Status: ${first.JUDGEMENT}</div>`;
+                html += `<div>Status: ${first.JUDGEMENT || ''}</div>`;
             } else {
                 html = `<div>No data found</div>`;
             }
@@ -698,7 +749,9 @@ export class QaCnService {
             subject = `E-Form ${formno}`;
             html = `<div>Changing notice no.: ${formno}</div>`;
             if (first) {
-                html += `<div>First no.: ${first.FIRSTNO}</div>`;
+                if (first.FIRSTNO) {
+                    html += `<div>First no.: ${first.FIRSTNO}</div>`;
+                }
                 html += `<div>Part Name: ${first.PRTNAME}</div>`;
                 let i = 1;
                 for (const row of rs) {
@@ -714,7 +767,9 @@ export class QaCnService {
             subject = `Result of ${formno}`;
             html = `<div>Changing notice no.: ${formno}</div>`;
             if (first) {
-                html += `<div>First no.: ${first.FIRSTNO}</div>`;
+                if (first.FIRSTNO) {
+                    html += `<div>First no.: ${first.FIRSTNO}</div>`;
+                }
                 html += `<div>Part Name: ${first.PRTNAME}</div>`;
                 let i = 1;
                 for (const row of rs) {
@@ -731,7 +786,9 @@ export class QaCnService {
             subject = `E-Form ${formno} has been returned`;
             html = `<div>Changing notice no.: ${formno}</div>`;
             if (first) {
-                html += `<div>First no.: ${first.FIRSTNO}</div>`;
+                if (first.FIRSTNO) {
+                    html += `<div>First no.: ${first.FIRSTNO}</div>`;
+                }
                 html += `<div>Part Name: ${first.PRTNAME}</div>`;
                 let i = 1;
                 for (const row of rs) {
@@ -756,112 +813,6 @@ export class QaCnService {
         await this.mailService.sendMail(objmail);
     }
 
-    private async getcnresult(dto: FormDto) {
-        const sql = `
-        SELECT
-            cnj.jdgmntno,
-            cnj.judgement,
-            cnf.jdgother,
-            cnf.svendname,
-            cnf.prtname,
-            resultChkDwg.dwgno,
-            resultChkDwg.result,
-            REGEXP_SUBSTR(cnf.RSNOTHER, 'F[0-9]+') AS FIRSTNO,
-            REGEXP_SUBSTR(DETTRANS, 'shop at\\s*(.*)', 1, 1, NULL, 1) AS SHOPNO
-        FROM cnform cnf
-        LEFT JOIN cnjudgement cnj
-               ON cnj.jdgmntno = cnf.jdgmntno
-        INNER JOIN resultChkDwg
-               ON resultChkDwg.nfrmno = cnf.nfrmno
-              AND resultChkDwg.vorgno = cnf.vorgno
-              AND resultChkDwg.cyear  = cnf.cyear
-              AND resultChkDwg.cyear2 = cnf.cyear2
-              AND resultChkDwg.nrunno = cnf.nrunno
-        WHERE cnf.nfrmno = ?
-          AND cnf.vorgno = ?
-          AND cnf.cyear  = ?
-          AND cnf.cyear2 = ?
-          AND cnf.nrunno = ?
-    `;
-
-        // แมปค่าจาก DTO เข้า Parameter (?) ตามลำดับ
-        const params = [
-            dto.NFRMNO,
-            dto.VORGNO,
-            dto.CYEAR,
-            dto.CYEAR2,
-            dto.NRUNNO,
-        ];
-
-        // คืนค่าเป็น Array ของ Object (คล้ายกับ ->result() ใน CodeIgniter)
-        return await this.repoCnform.executeRawSql(sql, params);
-    }
-
-    private async getApvEmail(dto: FormDto, type: string): Promise<any[]> {
-        let sql = '';
-        // ค่าพารามิเตอร์พื้นฐานที่จะใช้ใน WHERE clause
-        const baseParams = [
-            dto.NFRMNO,
-            dto.VORGNO,
-            dto.CYEAR,
-            dto.CYEAR2,
-            dto.NRUNNO,
-        ];
-
-        if (type === 'PIC') {
-            sql = `
-        SELECT DISTINCT e.SRECMAIL AS EMAIL
-        FROM FLOW f
-        JOIN AMEC.AEMPLOYEE e ON f.VAPVNO = e.SEMPNO
-        WHERE f.NFRMNO = ? AND f.VORGNO = ? AND f.CYEAR = ? AND f.CYEAR2 = ? AND f.NRUNNO = ?
-        AND e.CSTATUS = '1' AND f.CSTEPNO = '--'
-        UNION
-        SELECT DISTINCT e.SRECMAIL AS EMAIL
-        FROM FLOW f
-        JOIN AMEC.AEMPLOYEE e ON f.VREPNO = e.SEMPNO
-        WHERE f.NFRMNO = ? AND f.VORGNO = ? AND f.CYEAR = ? AND f.CYEAR2 = ? AND f.NRUNNO = ?
-        AND e.CSTATUS = '1' AND f.CSTEPNO = '--'
-        UNION
-        SELECT DISTINCT e.SRECMAIL AS EMAIL
-        FROM CNSHOPPIC c
-        JOIN AMEC.AEMPLOYEE e ON c.ENG = e.SEMPNO
-        WHERE c.FM IN (
-          SELECT VAPVNO FROM FLOW
-          WHERE NFRMNO = ? AND VORGNO = ? AND CYEAR = ? AND CYEAR2 = ? AND NRUNNO = ?
-          AND CEXTDATA ='06'
-        )
-      `;
-            // PIC ใช้ 3 ชุดคำสั่ง จึงต้องจำลอง baseParams 3 ครั้ง
-            const picParams = [...baseParams, ...baseParams, ...baseParams];
-            return await this.repoCnform.executeRawSql(sql, picParams);
-        } else if (type === 'REQUESTER') {
-            sql = `
-        SELECT DISTINCT e.SRECMAIL AS EMAIL
-        FROM FLOW f
-        JOIN AMEC.AEMPLOYEE e ON f.VREALAPV = e.SEMPNO
-        WHERE f.NFRMNO = ? AND f.VORGNO = ? AND f.CYEAR = ? AND f.CYEAR2 = ? AND f.NRUNNO = ?
-        AND e.CSTATUS = '1' AND f.CSTEPNO = '--'
-      `;
-            return await this.repoCnform.executeRawSql(sql, baseParams);
-        } else {
-            sql = `
-        SELECT DISTINCT e.SRECMAIL AS EMAIL
-        FROM FLOW f
-        JOIN AMEC.AEMPLOYEE e ON f.VREALAPV = e.SEMPNO
-        WHERE f.NFRMNO = ? AND f.VORGNO = ? AND f.CYEAR = ? AND f.CYEAR2 = ? AND f.NRUNNO = ?
-        AND e.CSTATUS = '1'
-      `;
-
-            if (type === 'FOREMAN') {
-                sql += ` AND f.CEXTDATA = '06'`;
-            } else if (type === 'ALL') {
-                sql += ` AND f.CSTEPNO NOT IN ('05','04','11')`;
-            }
-
-            return await this.repoCnform.executeRawSql(sql, baseParams);
-        }
-    }
-
     private async processApprovalActions(
         dto: ApproveQaCnDto,
         currentForm: any,
@@ -882,10 +833,11 @@ export class QaCnService {
             SELJOBTYPE,
             ACTION,
             DWGNO,
+            REMARK,
             ...cndata
         } = dto;
 
-        const dwgToInsert = DWGNO.map((item) => {
+        const dwgToInsert = (DWGNO || []).map((item) => {
             return {
                 ...currentForm,
                 ...item,
@@ -926,9 +878,9 @@ export class QaCnService {
                 {
                     JDGMNTNO: cndata.RADJUDGE ? Number(cndata.RADJUDGE) : null,
                     JDGOTHER:
-                        cndata.RADJUDGE.toString() == '2.5'
+                        cndata.RADJUDGE?.toString() == '2.5'
                             ? cndata.TXTJDGOTHER1
-                            : cndata.RADJUDGE.toString() == '4.2'
+                            : cndata.RADJUDGE?.toString() == '4.2'
                               ? cndata.TXTJDGOTHER2
                               : '',
                 },
@@ -944,19 +896,6 @@ export class QaCnService {
                 await this.repoCnform.update({ ...currentForm }, { ...cndata });
                 await this.repoDwg.deleteByAll(currentForm);
                 await this.repoDwg.insertMultiple(dwgToInsert);
-                for (const mapping of fileMappings) {
-                    const currentFiles = files[mapping.key];
-                    if (currentFiles && currentFiles.length > 0) {
-                        await this.attcnfrmService.moveAndInsertFiles({
-                            files: currentFiles,
-                            form: currentForm,
-                            path: path,
-                            folder: `${currentForm.NFRMNO}_${currentForm.VORGNO}_${currentForm.CYEAR}_${currentForm.CYEAR2}_${currentForm.NRUNNO}`,
-                            typeno: mapping.TYPENO,
-                            requestedBy: APVNO,
-                        });
-                    }
-                }
             }
             if (CEXTDATA == 8 && cndata.CLSNO == 2) {
                 if (cndata.INVNO && cndata.INVNO.length >= 8) {
@@ -1048,9 +987,7 @@ export class QaCnService {
             await this.repoDwg.deleteByAll(currentForm);
             await this.attcnfrmrepo.deleteAll(currentForm);
             await this.repoCnform.deleteAll(currentForm);
-            await this.formCreateService.deleteFlowAndForm({
-                condition: currentForm,
-            });
+            await this.formCreateService.deleteFlowAndForm(currentForm);
         } else if (ACTION == 'change') {
             await this.flowService.updateFlow({
                 condition: { ...currentForm, CEXTDATA: In(['03', '06']) },
@@ -1061,6 +998,21 @@ export class QaCnService {
                 condition: { ...currentForm, CEXTDATA: CEXTDATA },
                 VAPVNO: cndata.PIC,
             });
+        }
+        if (ACTION != 'deleteApv') {
+            for (const mapping of fileMappings) {
+                const currentFiles = files[mapping.key];
+                if (currentFiles && currentFiles.length > 0) {
+                    await this.attcnfrmService.moveAndInsertFiles({
+                        files: currentFiles,
+                        form: currentForm,
+                        path: path,
+                        folder: `${currentForm.NFRMNO}_${currentForm.VORGNO}_${currentForm.CYEAR}_${currentForm.CYEAR2}_${currentForm.NRUNNO}`,
+                        typeno: mapping.TYPENO,
+                        requestedBy: APVNO,
+                    });
+                }
+            }
         }
     }
 }

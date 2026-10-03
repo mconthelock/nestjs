@@ -49,7 +49,7 @@ export class R027Mp1Service {
             L.R27M06,
             L.R27M07,
             L.R27M08,
-            ? AS R27M09,
+            CAST(? AS VARCHAR(50)) AS R27M09,
             L.R27M10,
             L.R27M11,
             L.R27M12,

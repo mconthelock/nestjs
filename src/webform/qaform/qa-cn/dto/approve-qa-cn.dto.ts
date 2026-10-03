@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/swagger';
 import { RequestCNFormDto } from './request-qa-cn.dto';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 
 export class ApproveQaCnDto extends PartialType(RequestCNFormDto) {
     @IsNotEmpty()
@@ -19,6 +19,7 @@ export class ApproveQaCnDto extends PartialType(RequestCNFormDto) {
 
     @IsOptional()
     @IsNumber()
+    @Transform(({ value }) => (value === '' ? undefined : Number(value)))
     @Type(() => Number)
     CEXTDATA?: number;
 

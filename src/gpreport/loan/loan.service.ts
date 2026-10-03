@@ -1,26 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { CreateLoanDto } from './dto/create-loan.dto';
-import { UpdateLoanDto } from './dto/update-loan.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { applyDynamicFilters } from 'src/common/helpers/query.helper';
+import { SearchLoanDto } from './dto/search-loan.dto';
+
+import { LOANFRM } from '../../common/Entities/webform/table/LOANFRM.entity';
 
 @Injectable()
 export class LoanService {
-  create(createLoanDto: CreateLoanDto) {
-    return 'This action adds a new loan';
-  }
-
-  findAll() {
-    return `This action returns all loan`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} loan`;
-  }
-
-  update(id: number, updateLoanDto: UpdateLoanDto) {
-    return `This action updates a #${id} loan`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} loan`;
-  }
+    constructor(
+        @InjectRepository(LOANFRM, 'gpreportConnection')
+        private readonly loan: Repository<LOANFRM>,
+    ) {}
+    async search(q: SearchLoanDto) {
+        const qb = this.loan
+            .createQueryBuilder('loan')
+            .leftJoinAndSelect('loan.detail', 'detail')
+            .leftJoinAndSelect('loan.guarantor', 'guarantor')
+            .leftJoinAndSelect('loan.paid', 'paid')
+            .leftJoinAndSelect('loan.form', 'form')
+            .leftJoinAndSelect('form.formmst', 'formmst');
+        await applyDynamicFilters(qb, q, 'loan');
+        return qb.getMany();
+    }
 }

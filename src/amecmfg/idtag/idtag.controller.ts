@@ -184,4 +184,9 @@ export class IdtagController {
     ) {
         return this.printed.readPdfDocument(body, files);
     }
+
+    @Get('update-pr')
+    async updatePr() {
+        return this.printed.updatePr();
+    }
 }

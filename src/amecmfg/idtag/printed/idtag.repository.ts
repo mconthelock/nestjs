@@ -184,6 +184,10 @@ export class IdTagRepository extends BaseRepository {
         //return this.manager.delete(IdtagOrders, { ORDER_ID: orderId });
     }
 
+    async getPr() {
+        return await this.manager.query(`SELECT * FROM PR202610B@DATACENTER`);
+    }
+
     // async updatePageImage(filesId: number, pageNum: number, pageImg: string) {
     //     return this.getRepository(IdtagPages).update(
     //         {

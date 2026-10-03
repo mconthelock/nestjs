@@ -7,7 +7,9 @@ import { F110KP } from 'src/amecmfg/f110kp/entities/f110kp.entity';
 import { F001KP } from 'src/as400/shopf/f001kp/entities/f001kp.entity';
 import { FileLoggerModule } from 'src/common/services/file-logger/file-logger.module';
 import { R027mp1Module } from 'src/as400/rtnlibf/r027mp1/r027mp1.module';
+import { T002kpModule } from 'src/as400/rtnlibf/t002kp/t002kp.module';
 import { MailModule } from 'src/common/services/mail/mail.module';
+import { ConectionModule } from 'src/as400/conection/conection.module';
 
 import { IdTagRepository } from './printed/idtag.repository';
 import { IdtagList } from '../../common/Entities/workload/table/idtag-list.entity';
@@ -29,7 +31,9 @@ import { PrintedExtractService } from './printed/printedExtract.service';
     imports: [
         FileLoggerModule,
         R027mp1Module,
+        T002kpModule,
         MailModule,
+        ConectionModule,
         TypeOrmModule.forFeature([M008KP, F110KP, F001KP], 'amecConnection'),
         TypeOrmModule.forFeature(
             [IdtagFiles, IdtagPages, IdtagImages, IdtagList, IdtagOrders],

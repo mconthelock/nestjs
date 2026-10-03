@@ -29,7 +29,7 @@ export class MedicalService {
     findForms(sempno: string, opdyear: string) {
         return this.form.find({
             where: {
-                SEMPNO_IN: sempno,
+                SEMPNO_REQ: sempno,
                 OPDYEAR: opdyear,
             },
         });

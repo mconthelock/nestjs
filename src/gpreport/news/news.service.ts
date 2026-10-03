@@ -16,14 +16,26 @@ export class NewsService {
         private readonly files: Repository<NewsFiles>,
     ) {}
 
-    getAvailable() {
+    async getAvailable() {
         const today = new Date();
-        return this.repo.find({
+        const news = await this.repo.find({
             where: {
                 NEWS_END: MoreThanOrEqual(today),
                 NEWS_START: LessThanOrEqual(today),
             },
         });
+
+        return Promise.all(
+            news.map(async (item) => ({
+                ...item,
+                NEWS_HEADER: item.NEWS_HEADER
+                    ? await this.fileNewsImage(item.NEWS_HEADER)
+                    : null,
+                NEWS_IMG: item.NEWS_IMG
+                    ? await this.fileNewsImage(item.NEWS_IMG)
+                    : null,
+            })),
+        );
     }
 
     async findOne(id: number) {

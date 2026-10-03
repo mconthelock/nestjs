@@ -20,7 +20,7 @@ export class LoanService {
             .leftJoinAndSelect('loan.paid', 'paid')
             .leftJoinAndSelect('loan.form', 'form')
             .leftJoinAndSelect('form.formmst', 'formmst')
-            .leftJoinAndSelect('form.requestor', 'user');
+            .leftJoinAndSelect('form.reqtor', 'user');
         await applyDynamicFilters(qb, q, 'loan');
         return qb.getMany();
     }

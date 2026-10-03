@@ -32,27 +32,30 @@ export class GpTphRepository extends BaseRepository {
 
     async replaceSystemApproverStep(
         form: FormDto,
+        stepNo: string,
         approvers: Array<{ VAPVNO: string; VREPNO: string }>,
     ) {
         await this.manager.transaction(async (manager) => {
             const flowRepository = manager.getRepository(FLOW);
-            const systemSteps = await flowRepository.findBy({
+            const areaOwnerSteps = await flowRepository.findBy({
                 ...form,
-                VAPVNO: 'SYSTEM',
+                CSTEPNO: stepNo,
             });
 
-            if (systemSteps.length !== 1) {
+            if (areaOwnerSteps.length !== 1) {
                 throw new Error(
-                    'GP-TPH flow must contain exactly one SYSTEM Area Owner step',
+                    `GP-TPH flow must contain exactly one Area Owner step ${stepNo}`,
                 );
             }
 
-            const [systemStep] = systemSteps;
-            await flowRepository.remove(systemStep);
+            const [areaOwnerStep] = areaOwnerSteps;
+            await flowRepository.delete({ ...form, CSTEPNO: stepNo });
             await flowRepository.save(
                 approvers.map((approver) => ({
-                    ...systemStep,
+                    ...areaOwnerStep,
                     ...approver,
+                    CAPVTYPE: '3',
+                    CAPPLYALL: '0',
                 })),
             );
         });

@@ -64,12 +64,14 @@ export class GpTphService {
                 ),
                 this.getAreaOwnerApprovers(areaIds, formmst),
             ]);
-            const systemSteps = flowMaster.filter(
-                (step) => step.VAPVNO === 'SYSTEM',
+            const areaOwnerSteps = flowMaster.filter(
+                (step) =>
+                    step.VAPVNO?.trim() === 'SYSTEM' &&
+                    step.CEXTDATA?.trim() === '01',
             );
-            if (systemSteps.length !== 1) {
+            if (areaOwnerSteps.length !== 1) {
                 throw new BadRequestException(
-                    'GP-TPH flow must contain exactly one SYSTEM Area Owner step',
+                    'GP-TPH flow must contain exactly one SYSTEM Area Owner step with CEXTDATA 01',
                 );
             }
             //สร้าง Form
@@ -99,7 +101,11 @@ export class GpTphService {
                 CYEAR2: createForm.data.CYEAR2,
                 NRUNNO: createForm.data.NRUNNO,
             };
-            await this.repo.replaceSystemApproverStep(form, areaOwnerApprovers);
+            await this.repo.replaceSystemApproverStep(
+                form,
+                areaOwnerSteps[0].CSTEPNO,
+                areaOwnerApprovers,
+            );
 
             const data = {
                 ...form,

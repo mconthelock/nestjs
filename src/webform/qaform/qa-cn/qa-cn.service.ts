@@ -853,6 +853,8 @@ export class QaCnService {
                 CYEAR2: cndata.CYEAR2,
                 NRUNNO: cndata.NRUNNO,
             };
+            // console.log('============' + REMARK);
+
             if (ACTION == 'approve' || ACTION == 'reject') {
                 let act;
                 if (CEXTDATA > 1 && CEXTDATA != 5 && ACTION == 'reject') {
@@ -886,12 +888,30 @@ export class QaCnService {
                             await this.createcnng(currentForm, ip);
                         }
                         let mstatus = MSTATUS == '1' ? 'PIC' : 'ALL';
-                        await this.buildmail(currentForm, mstatus, formStatus);
+                        const toEmail = (
+                            await this.repoCnform.getApvEmail(
+                                currentForm,
+                                mstatus,
+                            )
+                        ).map((item) => item.EMAIL);
+                        await this.buildmail(
+                            currentForm,
+                            mstatus,
+                            formStatus,
+                            toEmail,
+                        );
                     } else if (STEPREADY == '06' && MSTATUS == '1') {
+                        const toEmail = (
+                            await this.repoCnform.getApvEmail(
+                                currentForm,
+                                'FOREMAN',
+                            )
+                        ).map((item) => item.EMAIL);
                         await this.buildmail(
                             currentForm,
                             'FOREMAN',
                             formStatus,
+                            toEmail,
                         );
                     }
                 }
@@ -942,7 +962,21 @@ export class QaCnService {
                         },
                         ip,
                     );
-                    await this.buildmail(currentForm, 'REQUESTER', '1');
+                    if (confirm.status) {
+                        const toEmail = (
+                            await this.repoCnform.getApvEmail(
+                                currentForm,
+                                'REQUESTER',
+                            )
+                        ).map((item) => item.EMAIL);
+
+                        await this.buildmail(
+                            currentForm,
+                            'REQUESTER',
+                            '1',
+                            toEmail,
+                        );
+                    }
                 } else if (ACTION == 'returnqastaff') {
                     await this.flowService.updateFlow({
                         condition: {
@@ -955,21 +989,19 @@ export class QaCnService {
                         condition: {
                             ...currentForm,
                             CSTEPST: '3',
-                            REMARK: REMARK,
                         },
                         CSTEPST: '2',
+                        VREMARK: REMARK,
                     });
                     await this.flowService.updateFlow({
                         condition: {
                             ...currentForm,
-                            CSTEPST: '3',
-                            REMARK: REMARK,
+                            CEXTDATA: '03',
                         },
-                        CEXTDATA: '03',
+                        CSTEPST: '3',
                         CAPVSTNO: '',
                         DAPVDATE: null,
                         CAPVTIME: '',
-                        VREMARK: '',
                     });
                 } else if (ACTION == 'returnass') {
                     await this.flowService.updateFlow({
@@ -979,25 +1011,24 @@ export class QaCnService {
                         },
                         CSTEPST: '1',
                     });
+                    console.log('Remark ===' + REMARK);
                     await this.flowService.updateFlow({
                         condition: {
                             ...currentForm,
                             CSTEPST: '3',
-                            REMARK: REMARK,
                         },
                         CSTEPST: '2',
+                        VREMARK: REMARK,
                     });
                     await this.flowService.updateFlow({
                         condition: {
                             ...currentForm,
-                            CSTEPST: '3',
-                            REMARK: REMARK,
+                            CEXTDATA: '02',
                         },
-                        CEXTDATA: '02',
+                        CSTEPST: '3',
                         CAPVSTNO: '',
                         DAPVDATE: null,
                         CAPVTIME: '',
-                        VREMARK: '',
                     });
                 }
             }
@@ -1057,30 +1088,50 @@ export class QaCnService {
 
     private async createcnng(dto: FormDto, ip: string) {
         try {
+            console.log('creangffffffffffffff');
+
             const res = await this.repoCnform.getFirstNo(dto);
+            console.log('rrrrrrrrrrrrrrrrr');
+            console.log(res);
+            console.log('rrrrrrrrrrrrrrrrr');
+
             let newcnng: any[] = [];
-            if (res && res[0].FIRSTNO) {
-                newcnng = await this.r027Mp1Service.getnewcn(res[0].FIRSTNO);
+            if (res && res.FIRSTNO) {
+                newcnng = await this.r027Mp1Service.getnewcn(res.FIRSTNO);
+                console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA');
+                console.log(newcnng);
+                console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA');
                 if (newcnng && newcnng[0].R27M09) {
                     await this.r027Mp1Service.insertNewCn(
                         newcnng[0].R27M09,
+<<<<<<< HEAD
                         res[0].FIRSTNO,
 >>>>>>> 14243a62 (QA-CN)
+=======
+                        res.FIRSTNO,
+>>>>>>> 00550f31 (QA-CN)
                     );
                 }
             }
             const cnform = await this.formService.getFormData(dto);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 00550f31 (QA-CN)
             const datacnfrm = await this.repoCnform.findByCondition(dto);
             console.log('ccccccccccccccccccccccccccccc');
             console.log(cnform);
             console.log('ccccccccccccccccccccccccccccc');
+<<<<<<< HEAD
 =======
 >>>>>>> 14243a62 (QA-CN)
+=======
+>>>>>>> 00550f31 (QA-CN)
             const cnformnew = {
                 NFRMNO: dto.NFRMNO,
                 VORGNO: dto.VORGNO,
                 CYEAR: dto.CYEAR,
+<<<<<<< HEAD
 <<<<<<< HEAD
                 REQBY: cnform.VREQNO,
                 INPUTBY: cnform.VINPUTER,
@@ -1088,6 +1139,10 @@ export class QaCnService {
                 REQBY: cnform[0].REQBY,
                 INPUTBY: cnform[0].INPUTBY,
 >>>>>>> 14243a62 (QA-CN)
+=======
+                REQBY: cnform.VREQNO,
+                INPUTBY: cnform.VINPUTER,
+>>>>>>> 00550f31 (QA-CN)
                 REMARK: '',
             };
             const rsf = await this.formCreateService.create(
@@ -1120,10 +1175,14 @@ export class QaCnService {
                         CYEAR2: rsf.data.CYEAR2,
                         NRUNNO: rsf.data.NRUNNO,
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 00550f31 (QA-CN)
                         TITLE: datacnfrm[0].TITLE,
                         SVENDNAME: datacnfrm[0].SVENDNAME,
                         CLSNO: datacnfrm[0].CLSNO,
                         RSNNO: datacnfrm[0].RSNNO,
+<<<<<<< HEAD
                         RSNOTHER: '1 st No.,' + newcnng[0].R27M09,
                         TRANSNO: datacnfrm[0].TRANSNO,
                         DETTRANS: datacnfrm[0].DETTRANS,
@@ -1154,6 +1213,20 @@ export class QaCnService {
                         PRDCTNAME: cnform[0].PRDCTNAME,
                         AFTCHANGE: cnform[0].AFTCHANGE,
 >>>>>>> 14243a62 (QA-CN)
+=======
+                        RSNOTHER: '1 st No.,' + newcnng[0].R27M09,
+                        TRANSNO: datacnfrm[0].TRANSNO,
+                        DETTRANS: datacnfrm[0].DETTRANS,
+                        PRTNAME: datacnfrm[0].PRTNAME,
+                        PURITEM: datacnfrm[0].PURITEM,
+                        INVNO: datacnfrm[0].INVNO,
+                        ITEMNO: datacnfrm[0].ITEMNO,
+                        ORDERNO: datacnfrm[0].ORDERNO,
+                        ORDQ: datacnfrm[0].ORDQ,
+                        PRTLOC: datacnfrm[0].PRTLOC,
+                        PRDCTNAME: datacnfrm[0].PRDCTNAME,
+                        AFTCHANGE: datacnfrm[0].AFTCHANGE,
+>>>>>>> 00550f31 (QA-CN)
                         MSTATUS: '1',
                     };
                     await this.repoCnform.insert(datacn);
@@ -1172,10 +1245,14 @@ export class QaCnService {
                     const cnflowpre = await this.flowService.getFlow({
                         ...dto,
 <<<<<<< HEAD
+<<<<<<< HEAD
                         CEXTDATA: '06',
 =======
                         CSTEPNO: '06',
 >>>>>>> 14243a62 (QA-CN)
+=======
+                        CEXTDATA: '06',
+>>>>>>> 00550f31 (QA-CN)
                     });
                     if (cnflowpre && cnflowpre.length > 0) {
                         delete condition.CSTEPNO;
@@ -1211,15 +1288,21 @@ export class QaCnService {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 00550f31 (QA-CN)
     private async buildmail(
         dto: FormDto,
         mtype: string,
         fstatus: string,
         to: string[],
     ) {
+<<<<<<< HEAD
 =======
     private async buildmail(dto: FormDto, mtype: string, fstatus: string) {
 >>>>>>> 14243a62 (QA-CN)
+=======
+>>>>>>> 00550f31 (QA-CN)
         const formno = await this.formCreateService.getFormno(dto);
         let type =
             mtype === 'FORMAN'
@@ -1230,16 +1313,22 @@ export class QaCnService {
                     ? 'REQUESTER'
                     : 'ALL';
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 00550f31 (QA-CN)
         console.log('>>>>>>>>>');
         console.log(to);
         console.log('>>>>>>>>>');
 
         let rs = await this.repoCnform.getQueryBuilderResult(dto);
+<<<<<<< HEAD
 =======
         let rsEmail = await this.getApvEmail(dto, type);
         let to = rsEmail.map((row) => row.EMAIL);
         let rs = await this.getcnresult(dto);
 >>>>>>> 14243a62 (QA-CN)
+=======
+>>>>>>> 00550f31 (QA-CN)
         const first = rs?.[0] ?? null;
         let subject = '';
         let html = '';
@@ -1259,10 +1348,14 @@ export class QaCnService {
                     html += `<div>Drawing No.: ${row.DWGNO}</dic>`;
                 }
 <<<<<<< HEAD
+<<<<<<< HEAD
                 html += `<div>Status: ${first.JUDGEMENT || ''}</div>`;
 =======
                 html += `<div>Status: ${first.JUDGEMENT}</div>`;
 >>>>>>> 14243a62 (QA-CN)
+=======
+                html += `<div>Status: ${first.JUDGEMENT || ''}</div>`;
+>>>>>>> 00550f31 (QA-CN)
             } else {
                 html = `<div>No data found</div>`;
             }
@@ -1271,12 +1364,18 @@ export class QaCnService {
             html = `<div>Changing notice no.: ${formno}</div>`;
             if (first) {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 if (first.FIRSTNO) {
                     html += `<div>First no.: ${first.FIRSTNO}</div>`;
                 }
 =======
                 html += `<div>First no.: ${first.FIRSTNO}</div>`;
 >>>>>>> 14243a62 (QA-CN)
+=======
+                if (first.FIRSTNO) {
+                    html += `<div>First no.: ${first.FIRSTNO}</div>`;
+                }
+>>>>>>> 00550f31 (QA-CN)
                 html += `<div>Part Name: ${first.PRTNAME}</div>`;
                 let i = 1;
                 for (const row of rs) {
@@ -1293,12 +1392,18 @@ export class QaCnService {
             html = `<div>Changing notice no.: ${formno}</div>`;
             if (first) {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 if (first.FIRSTNO) {
                     html += `<div>First no.: ${first.FIRSTNO}</div>`;
                 }
 =======
                 html += `<div>First no.: ${first.FIRSTNO}</div>`;
 >>>>>>> 14243a62 (QA-CN)
+=======
+                if (first.FIRSTNO) {
+                    html += `<div>First no.: ${first.FIRSTNO}</div>`;
+                }
+>>>>>>> 00550f31 (QA-CN)
                 html += `<div>Part Name: ${first.PRTNAME}</div>`;
                 let i = 1;
                 for (const row of rs) {
@@ -1316,12 +1421,18 @@ export class QaCnService {
             html = `<div>Changing notice no.: ${formno}</div>`;
             if (first) {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 if (first.FIRSTNO) {
                     html += `<div>First no.: ${first.FIRSTNO}</div>`;
                 }
 =======
                 html += `<div>First no.: ${first.FIRSTNO}</div>`;
 >>>>>>> 14243a62 (QA-CN)
+=======
+                if (first.FIRSTNO) {
+                    html += `<div>First no.: ${first.FIRSTNO}</div>`;
+                }
+>>>>>>> 00550f31 (QA-CN)
                 html += `<div>Part Name: ${first.PRTNAME}</div>`;
                 let i = 1;
                 for (const row of rs) {
@@ -1346,6 +1457,7 @@ export class QaCnService {
         await this.mailService.sendMail(objmail);
     }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
     private async getcnresult(dto: FormDto) {
@@ -1455,6 +1567,8 @@ export class QaCnService {
     }
 
 >>>>>>> 14243a62 (QA-CN)
+=======
+>>>>>>> 00550f31 (QA-CN)
     private async processApprovalActions(
         dto: ApproveQaCnDto,
         currentForm: any,
@@ -1476,6 +1590,7 @@ export class QaCnService {
             ACTION,
             DWGNO,
 <<<<<<< HEAD
+<<<<<<< HEAD
             REMARK,
             ...cndata
         } = dto;
@@ -1487,6 +1602,13 @@ export class QaCnService {
 
         const dwgToInsert = DWGNO.map((item) => {
 >>>>>>> 14243a62 (QA-CN)
+=======
+            REMARK,
+            ...cndata
+        } = dto;
+
+        const dwgToInsert = (DWGNO || []).map((item) => {
+>>>>>>> 00550f31 (QA-CN)
             return {
                 ...currentForm,
                 ...item,
@@ -1528,6 +1650,7 @@ export class QaCnService {
                     JDGMNTNO: cndata.RADJUDGE ? Number(cndata.RADJUDGE) : null,
                     JDGOTHER:
 <<<<<<< HEAD
+<<<<<<< HEAD
                         cndata.RADJUDGE?.toString() == '2.5'
                             ? cndata.TXTJDGOTHER1
                             : cndata.RADJUDGE?.toString() == '4.2'
@@ -1536,6 +1659,11 @@ export class QaCnService {
                             ? cndata.TXTJDGOTHER1
                             : cndata.RADJUDGE.toString() == '4.2'
 >>>>>>> 14243a62 (QA-CN)
+=======
+                        cndata.RADJUDGE?.toString() == '2.5'
+                            ? cndata.TXTJDGOTHER1
+                            : cndata.RADJUDGE?.toString() == '4.2'
+>>>>>>> 00550f31 (QA-CN)
                               ? cndata.TXTJDGOTHER2
                               : '',
                 },
@@ -1552,6 +1680,7 @@ export class QaCnService {
                 await this.repoDwg.deleteByAll(currentForm);
                 await this.repoDwg.insertMultiple(dwgToInsert);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                 for (const mapping of fileMappings) {
                     const currentFiles = files[mapping.key];
@@ -1567,6 +1696,8 @@ export class QaCnService {
                     }
                 }
 >>>>>>> 14243a62 (QA-CN)
+=======
+>>>>>>> 00550f31 (QA-CN)
             }
             if (CEXTDATA == 8 && cndata.CLSNO == 2) {
                 if (cndata.INVNO && cndata.INVNO.length >= 8) {
@@ -1675,12 +1806,16 @@ export class QaCnService {
             await this.attcnfrmrepo.deleteAll(currentForm);
             await this.repoCnform.deleteAll(currentForm);
 <<<<<<< HEAD
+<<<<<<< HEAD
             await this.formCreateService.deleteFlowAndForm(currentForm);
 =======
             await this.formCreateService.deleteFlowAndForm({
                 condition: currentForm,
             });
 >>>>>>> 14243a62 (QA-CN)
+=======
+            await this.formCreateService.deleteFlowAndForm(currentForm);
+>>>>>>> 00550f31 (QA-CN)
         } else if (ACTION == 'change') {
             await this.flowService.updateFlow({
                 condition: { ...currentForm, CEXTDATA: In(['03', '06']) },
@@ -1693,6 +1828,9 @@ export class QaCnService {
             });
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 00550f31 (QA-CN)
         if (ACTION != 'deleteApv') {
             for (const mapping of fileMappings) {
                 const currentFiles = files[mapping.key];

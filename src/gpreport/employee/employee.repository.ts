@@ -29,7 +29,7 @@ export class EmployeeRepository extends BaseRepository {
 
         const emp01 = await this.getRepository(EMP01).findOne({
             where: { EMPCOD: id },
-            select: ['DESDST', 'PSNBLD', 'PTEL'],
+            select: ['DESDST', 'PSNBLD', 'PTEL', 'INCSLL', 'SOSHOS', 'EMPACN'],
         });
         const address = await this.findAddres(id);
         const email = await this.findEmail(id);
@@ -132,9 +132,7 @@ export class EmployeeRepository extends BaseRepository {
 
         if (data === null || data === undefined) return data;
         if (typeof data === 'string')
-            return data.trim() === ''
-                ? ''
-                : data.replace(/[^\s/@.]/g, 'x');
+            return data.trim() === '' ? '' : data.replace(/[^\s/@.]/g, 'x');
         if (typeof data === 'number' || typeof data === 'bigint') return 0;
         if (typeof data === 'boolean') return false;
         if (data instanceof Date) return 'xxx';

@@ -4,7 +4,8 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { JigRepository } from './jig.repository';
-import { CreateJigDto } from './dto/create-jig.dto';
+import { CreateJigDeleteFormDto, SaveJigDeleteFormDto } from './dto/jig-delete-form.dto';
+import { CreateJigRequestDto } from './dto/create-jig-request.dto';
 import { UpdateJigDto } from './dto/update-jig.dto';
 import { ReplaceCheckpointsDto } from './dto/checkpoint.dto';
 import {
@@ -14,179 +15,95 @@ import {
     JigFileDto,
 } from './dto/jig-form.dto';
 import { FinishInspectionDto } from './dto/finish-inspection.dto';
-import { monthKey, monthStart, nextRound } from './jig.utils';
+import { monthStart } from './jig.utils';
+import { JigInspectionService } from './jig-inspection.service';
 
 @Injectable()
 export class JigService {
-    constructor(private readonly jigRepository: JigRepository) {}
+    constructor(private readonly jigRepository: JigRepository, private readonly inspection?: JigInspectionService) {}
 
-    private dueStatus(date: Date | null, today: Date) {
-        if (!date) return 'UNSCHEDULED';
-        const due = monthStart(date);
-        const diff = Math.ceil((due.getTime() - today.getTime()) / 86400000);
-        return diff < 0 ? 'OVERDUE' : diff <= 30 ? 'DUE_SOON' : 'PLANNED';
+    autoCreateInspection(date: string, ip: string) {
+        return this.inspection.run(date, ip);
     }
 
-    async getDashboard(fyear?: number) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const fiscalYear =
-            fyear ??
-            (today.getMonth() >= 3
-                ? today.getFullYear()
-                : today.getFullYear() - 1);
-        if (
-            !Number.isInteger(fiscalYear) ||
-            fiscalYear < 1900 ||
-            fiscalYear > 9998
-        )
-            throw new BadRequestException(
-                'fyear must be an integer from 1900 to 9998',
-            );
-        const from = new Date(fiscalYear, 3, 1),
-            to = new Date(fiscalYear + 1, 3, 1);
-        const [masters, forms] = await Promise.all([
-            this.jigRepository.getDashboardMaster(),
-            this.jigRepository.getFormStates(),
-        ]);
-        const grouped = new Map<string, typeof forms>();
-        for (const f of forms) {
-            const rows = grouped.get(f.JIG_NO) ?? [];
-            rows.push(f);
-            grouped.set(f.JIG_NO, rows);
-        }
+    createDeleteForm(dto: CreateJigDeleteFormDto) { return this.jigRepository.createDeleteForm(dto); }
+    getDeleteForm(key: JigFormKeyDto) { return this.jigRepository.getDeleteForm(key); }
+    saveDeleteForm(key: JigFormKeyDto, dto: SaveJigDeleteFormDto) { return this.jigRepository.saveDeleteForm(key, dto); }
+    deleteDeleteFormFile(key: JigFormKeyDto, seq: number) { return this.jigRepository.deleteDeleteFormFile(key, seq); }
+    finishDeleteForm(key: JigFormKeyDto) { return this.jigRepository.completeDeleteForm(key, 'finish'); }
+    rejectDeleteForm(key: JigFormKeyDto) { return this.jigRepository.completeDeleteForm(key, 'reject'); }
+
+    getMfgProcesses() {
+        return this.jigRepository.getMfgProcesses();
+    }
+
+    getLocations() {
+        return this.jigRepository.getLocations();
+    }
+
+    getIePics() {
+        return this.jigRepository.getIePics();
+    }
+
+    async getDashboard() {
+        const parts = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Asia/Bangkok',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+        }).formatToParts(new Date());
+        const part = (type: string) => parts.find((p) => p.type === type).value;
+        const asOf = part('year') + '-' + part('month') + '-' + part('day');
+        const today = Date.UTC(
+            Number(part('year')),
+            Number(part('month')) - 1,
+            Number(part('day')),
+        );
+        const masters = await this.jigRepository.getDashboardMaster();
         const items = masters.map((jig) => {
-            const history = grouped.get(jig.JIG_NO) ?? [];
             const due = jig.NEXT_INSPEC_DATE
                 ? monthStart(jig.NEXT_INSPEC_DATE)
                 : null;
-            const active = jig.JIG_STATUS === 'ACTIVE';
-            const dueStatus = active ? this.dueStatus(due, today) : null;
-            const inYear = history.filter(
-                (f) =>
-                    f.FORM_TYPE === 'INSPECTION' &&
-                    f.SCHEDULE_DATE &&
-                    f.SCHEDULE_DATE >= from &&
-                    f.SCHEDULE_DATE < to,
-            );
-            const pending = history.find(
-                (f) =>
-                    ['0', '1'].includes(String(f.FORM_STATUS).trim()) &&
-                    (f.FORM_TYPE === 'CREATE' ||
-                        (due &&
-                            f.SCHEDULE_DATE &&
-                            monthKey(monthStart(f.SCHEDULE_DATE)) ===
-                                monthKey(due))),
-            );
-            const approvedCurrent = history.find(
-                (f) =>
-                    f.FORM_TYPE === 'INSPECTION' &&
-                    String(f.FORM_STATUS).trim() === '2' &&
-                    due &&
-                    f.SCHEDULE_DATE &&
-                    monthKey(monthStart(f.SCHEDULE_DATE)) === monthKey(due),
-            );
-            const schedules = new Map<
-                string,
-                { SCHEDULE_DATE: string; FORMS: typeof forms; STATUS: string }
-            >();
-            for (const f of inYear) {
-                const key = monthKey(monthStart(f.SCHEDULE_DATE));
-                const entry = schedules.get(key) ?? {
-                    SCHEDULE_DATE: key,
-                    FORMS: [],
-                    STATUS: 'PLANNED',
-                };
-                entry.FORMS.push(f);
-                schedules.set(key, entry);
-            }
-            if (due && active) {
-                let cursor = due;
-                const period = Number(jig.INSPEC_PERIOD);
-                if (Number.isInteger(period) && period > 0 && period <= 999) {
-                    if (cursor < from) {
-                        const months =
-                            (from.getFullYear() - cursor.getFullYear()) * 12 +
-                            from.getMonth() -
-                            cursor.getMonth();
-                        cursor = new Date(
-                            cursor.getFullYear(),
-                            cursor.getMonth() +
-                                Math.ceil(months / period) * period,
-                            1,
-                        );
-                    }
-                    while (cursor < to) {
-                        const key = monthKey(cursor);
-                        if (!schedules.has(key))
-                            schedules.set(key, {
-                                SCHEDULE_DATE: key,
-                                FORMS: [],
-                                STATUS: 'PLANNED',
-                            });
-                        cursor = nextRound(cursor, period);
-                    }
-                }
-            }
-            for (const entry of schedules.values()) {
-                entry.STATUS = entry.FORMS.some(
-                    (f) => String(f.FORM_STATUS).trim() === '2',
-                )
-                    ? 'COMPLETED'
-                    : entry.FORMS.some((f) =>
-                            ['0', '1'].includes(String(f.FORM_STATUS).trim()),
-                        )
-                      ? 'IN_PROGRESS'
+            const days = due
+                ? Math.round(
+                      (Date.UTC(
+                          due.getFullYear(),
+                          due.getMonth(),
+                          due.getDate(),
+                      ) -
+                          today) /
+                          86400000,
+                  )
+                : null;
+            const status = !due
+                ? 'UNSCHEDULED'
+                : days < 0
+                  ? 'OVERDUE'
+                  : days === 0
+                    ? 'DUE'
+                    : days <= 30
+                      ? 'DUE_SOON'
                       : 'PLANNED';
-            }
             return {
                 ...jig,
-                DUE_STATUS: dueStatus,
-                DASHBOARD_STATUS: !active
-                    ? jig.JIG_STATUS
-                    : Number(jig.CHECKPOINT_COUNT) === 0
-                      ? 'NO_SHEET'
-                      : approvedCurrent
-                        ? 'AWAITING_SYNC'
-                        : pending
-                          ? 'IN_PROGRESS'
-                          : dueStatus,
-                IS_NEW_JIG:
-                    !!jig.CREATE_DATE &&
-                    jig.CREATE_DATE >= from &&
-                    jig.CREATE_DATE < to,
-                CURRENT_FORM: pending ?? approvedCurrent ?? null,
-                SCHEDULES: [...schedules.values()].sort((a, b) =>
-                    a.SCHEDULE_DATE.localeCompare(b.SCHEDULE_DATE),
-                ),
-                COMPLETED_ROUNDS: inYear.filter(
-                    (f) => String(f.FORM_STATUS).trim() === '2',
-                ).length,
+                DUE_STATUS: status,
+                DASHBOARD_STATUS: status,
+                DAYS_UNTIL_DUE: days,
+                IS_DUE: days !== null && days <= 0,
             };
         });
         return {
-            fyear: fiscalYear,
-            period: { from, to: new Date(fiscalYear + 1, 2, 31) },
+            asOf,
+            dueSoonDays: 30,
             summary: {
                 total: items.length,
-                completed: items.filter((j) => j.COMPLETED_ROUNDS > 0).length,
-                completedRounds: items.reduce(
-                    (sum, j) => sum + j.COMPLETED_ROUNDS,
-                    0,
-                ),
+                dueToday: items.filter((j) => j.DUE_STATUS === 'DUE').length,
                 dueSoon: items.filter((j) => j.DUE_STATUS === 'DUE_SOON')
                     .length,
                 overdue: items.filter((j) => j.DUE_STATUS === 'OVERDUE').length,
-                inProgress: items.filter(
-                    (j) =>
-                        j.CURRENT_FORM &&
-                        ['0', '1'].includes(
-                            String(j.CURRENT_FORM.FORM_STATUS).trim(),
-                        ),
-                ).length,
-                noSheet: items.filter((j) => Number(j.CHECKPOINT_COUNT) === 0)
+                planned: items.filter((j) => j.DUE_STATUS === 'PLANNED').length,
+                unscheduled: items.filter((j) => j.DUE_STATUS === 'UNSCHEDULED')
                     .length,
-                newJig: items.filter((j) => j.IS_NEW_JIG).length,
             },
             items,
         };
@@ -198,52 +115,32 @@ export class JigService {
         return jig;
     }
 
-    createJig(dto: CreateJigDto) {
-        return this.jigRepository.createMaster({
-            ...dto,
-            NEXT_INSPEC_DATE: dto.NEXT_INSPEC_DATE
-                ? monthStart(dto.NEXT_INSPEC_DATE)
-                : null,
-            START_USE_DATE: dto.START_USE_DATE
-                ? new Date(dto.START_USE_DATE)
-                : null,
-            JIG_STATUS: 'DRAFT',
-            CREATE_DATE: new Date(),
-            UPDATE_BY: null,
-            UPDATE_DATE: null,
-        });
+    createJig(dto: CreateJigRequestDto) {
+        if (dto.FORM_TYPE !== 'CREATE')throw new BadRequestException('New jig registration requires FORM_TYPE CREATE',);
+        return this.jigRepository.createForm(dto.JIG_NO, dto);
     }
 
-    updateJig(jigNo: string, dto: UpdateJigDto) {
-        const { NEXT_INSPEC_DATE, START_USE_DATE, ...fields } = dto;
-        return this.jigRepository.updateMaster(jigNo, {
-            ...fields,
-            ...(NEXT_INSPEC_DATE !== undefined
-                ? {
-                      NEXT_INSPEC_DATE: NEXT_INSPEC_DATE
-                          ? monthStart(NEXT_INSPEC_DATE)
-                          : null,
-                  }
-                : {}),
-            ...(START_USE_DATE !== undefined
-                ? {
-                      START_USE_DATE: START_USE_DATE
-                          ? new Date(START_USE_DATE)
-                          : null,
-                  }
-                : {}),
-        });
+    async updateJig(jigNo: string, dto: UpdateJigDto) {
+        const { FORM_KEY, ...changes } = dto;
+        const form = await this.jigRepository.getForm(FORM_KEY);
+        if (form.JIG_NO !== jigNo)
+            throw new BadRequestException('The form belongs to another jig');
+        return this.jigRepository.saveForm(FORM_KEY, changes);
     }
 
     async getCheckpoints(jigNo: string) {
         await this.getJig(jigNo);
         return this.jigRepository.getCheckpoints(jigNo);
     }
+    async getDefectNg(jigNo: string) {
+        await this.getJig(jigNo);
+        // Keep an explicit JSON response when the master has no NG record.
+        return { NG: await this.jigRepository.getDefectNg(jigNo) };
+    }
     replaceCheckpoints(jigNo: string, dto: ReplaceCheckpointsDto) {
         return this.jigRepository.replaceCheckpoints(jigNo, dto);
     }
     async listForms(jigNo: string) {
-        await this.getJig(jigNo);
         return this.jigRepository.getFormStates(jigNo);
     }
     createForm(jigNo: string, dto: CreateJigFormDto) {
@@ -255,6 +152,9 @@ export class JigService {
     saveForm(key: JigFormKeyDto, dto: SaveJigFormDto) {
         return this.jigRepository.saveForm(key, dto);
     }
+    configureRequesterFlow(key: JigFormKeyDto, picCode?: string) {
+        return this.jigRepository.configureRequesterFlow(key, picCode);
+    }
     putFile(key: JigFormKeyDto, dto: JigFileDto) {
         return this.jigRepository.putFile(key, dto);
     }
@@ -263,5 +163,9 @@ export class JigService {
     }
     finishForm(key: JigFormKeyDto, dto: FinishInspectionDto) {
         return this.jigRepository.finishForm(key, dto.UPDATE_BY);
+    }
+
+    applyFormToMaster(key: JigFormKeyDto, dto: FinishInspectionDto) {
+        return this.jigRepository.applyFormToMaster(key, dto.UPDATE_BY);
     }
 }

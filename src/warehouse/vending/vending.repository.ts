@@ -13,6 +13,7 @@ import { CreateImportDto } from './dto/import-vending.dto';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Products } from 'src/common/Entities/pursys/table/PRODUCTS.entity';
+import { StockBalances } from 'src/common/Entities/pursys/table/STOCK_BALANCES.entity';
 import { TOOL_IMPORT_HISTORY } from 'src/common/Entities/skid/table/TOOL_IMPORT_HISTORY.entity';
 import { TOOL_WITHDRAWAL } from 'src/common/Entities/skid/table/TOOL_WITHDRAWAL.entity';
 import { TOOL_REFILL } from 'src/common/Entities/skid/table/TOOL_REFILL.entity';
@@ -63,14 +64,28 @@ export class VendingRepository extends BaseRepository {
     }
 
     async getTools() {
-        return this.getRepository(Products).find({
-            where: {
-                IS_VENDING: '1',
-            },
-            relations: {
-                category: true,
-            },
-        });
+        return this.pur
+            .getRepository(Products)
+            .createQueryBuilder('product')
+            .leftJoinAndSelect('product.category', 'category')
+            .leftJoinAndMapMany(
+                'product.stockBalances',
+                StockBalances,
+                'stockBalance',
+                'stockBalance.PRODUCT_ID = product.SPRODID AND stockBalance.STORAGENO = :storageNo',
+                { storageNo: 21 },
+            )
+            .where('product.IS_VENDING = :isVending', { isVending: '1' })
+            .getMany();
+    }
+
+    async getTransactionHistory() {
+        return this.pur.query(`
+            SELECT sti.*,st.TRNTYPE 
+            FROM STOCK_TRANSACTIONS st 
+            JOIN STOCK_TRANSACTION_ITEMS sti ON st.ID = sti.TRANSACTION_ID
+            WHERE (STORAGE_FROM = '21' OR STORAGE_TO = '21')
+        `);
     }
 
     async getToolWithdrawalWithRequest() {
@@ -100,7 +115,7 @@ export class VendingRepository extends BaseRepository {
                     mf.REQUEST_DATE,
                     md.PRODUCT_ID
             ) a
-                ON TRUNC(a.REQUEST_DATE) = tw.RECORD_DATE
+                ON TRUNC(a.REQUEST_DATE) = TRUNC(tw.RECORD_DATE)
                 AND a.PRODUCT_ID = tw.PRODUCT_ID
             LEFT JOIN AMEC.AMECUSERALL u ON u.SEMPNO = NVL(tw.EMPLOYEE_CODE, a.EMPNO) 
             LEFT JOIN PURSYS.PRODUCTS p ON p.SPRODID = tw.PRODUCT_ID OR p.SPRODID = a.PRODUCT_ID
@@ -111,6 +126,7 @@ export class VendingRepository extends BaseRepository {
         const { importHistory, withdrawals, refills } = dto;
         console.log('importHistory:', importHistory);
         console.log('withdrawals:', withdrawals);
+        const insertedRefills = [];
         const head =
             await this.getRepository(TOOL_IMPORT_HISTORY).save(importHistory);
         const headId = head.IMPORT_ID;
@@ -137,8 +153,29 @@ export class VendingRepository extends BaseRepository {
 
             if (!exists) {
                 await this.getRepository(TOOL_REFILL).insert(refill);
+                insertedRefills.push(refill);
             }
         }
+
+        return {
+            importHistory: head,
+            withdrawals: withdrawalData,
+            refills: insertedRefills,
+        };
+    }
+
+    async updateImportTransactionIds(
+        importId: number,
+        issueId: number,
+        receiveId: number | null,
+    ) {
+        return this.getRepository(TOOL_IMPORT_HISTORY).update(
+            { IMPORT_ID: importId },
+            {
+                ISSUE_ID: issueId,
+                RECEIVE_ID: receiveId,
+            },
+        );
     }
 
     async importHistory() {
@@ -207,7 +244,7 @@ export class VendingRepository extends BaseRepository {
         EMPNO: string[];
         CREATED_BY: string;
     }) {
-        return this.getRepository(VENDING_USER).save(
+        return this.getRepository(VENDING_USER).insert(
             EMPNO.map((empno) => ({ EMPNO: empno, CREATED_BY })),
         );
     }

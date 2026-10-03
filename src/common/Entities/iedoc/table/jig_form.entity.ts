@@ -1,54 +1,70 @@
-import { Column, Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { JigMaster } from './jig_master.entity';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'JIG_FORM' })
 export class JigForm {
-    @PrimaryColumn({ type: 'decimal', precision: 3, scale: 0 })
+    @PrimaryColumn()
     NFRMNO: number;
 
-    @PrimaryColumn({ length: 6 })
+    @PrimaryColumn()
     VORGNO: string;
 
-    @PrimaryColumn({ type: 'char', length: 2 })
+    @PrimaryColumn()
     CYEAR: string;
 
-    @PrimaryColumn({ type: 'char', length: 4 })
+    @PrimaryColumn()
     CYEAR2: string;
 
-    @PrimaryColumn({ type: 'decimal', precision: 6, scale: 0 })
+    @PrimaryColumn()
     NRUNNO: number;
 
-    @Column({ length: 20, nullable: true })
-    JIG_NO: string | null;
+    @Column()
+    FORM_TYPE: 'CREATE' | 'INSPECTION';
 
-    @Column({ length: 20, nullable: false })
-    FORM_TYPE: string;
+    @Column()
+    JIG_NO: string;
 
-    @Column({ type: 'date', nullable: true })
-    SCHEDULE_DATE: Date | null;
+    @Column()
+    JIG_NAME: string;
 
-    @Column({ type: 'date', nullable: true })
-    CHECK_DATE: Date | null;
+    @Column()
+    DWG: string | null;
 
-    @Column({ length: 5, nullable: true })
-    INSPECTOR_EMPNO: string | null;
+    @Column()
+    REV_OLD: string | null;
 
-    @Column({ length: 10, nullable: true })
-    OVERALL_RESULT: string | null;
+    @Column()
+    REV: string | null;
 
-    @Column({ length: 10, nullable: true })
-    CREATE_BY: string | null;
+    @Column()
+    JIG_QTY: number | null;
 
-    @Column({ type: 'date', nullable: false, default: () => 'SYSDATE' })
-    CREATE_DATE: Date;
+    @Column()
+    PRICE: number | null;
 
-    @Column({ length: 10, nullable: true })
-    UPDATE_BY: string | null;
+    @Column()
+    MAKER: string | null;
 
-    @Column({ type: 'date', nullable: true })
-    UPDATE_DATE: Date | null;
+    @Column()
+    START_USE_DATE: Date | null;
 
-    @ManyToOne(() => JigMaster)
-    @JoinColumn({ name: 'JIG_NO', referencedColumnName: 'JIG_NO' })
-    jig: JigMaster;
+    @Column()
+    ITEMNO: string | null;
+
+    @Column()
+    JIG_DESC: string | null;
+
+    @Column()
+    PROCESS_CODE: string | null;
+
+    @Column()
+    LOCATION: string | null;
+
+    @Column()
+    PIC_EMPNO: string | null;
+
+    @Column()
+    INSPEC_PERIOD: number;
+
+    @Column()
+    REMARK: string | null;
 }

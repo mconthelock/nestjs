@@ -3,52 +3,46 @@ import { JigForm } from './jig_form.entity';
 
 @Entity({ name: 'JIG_FORM_DETAIL' })
 export class JigFormDetail {
-    @PrimaryColumn({ type: 'decimal', precision: 3, scale: 0 })
+    @PrimaryColumn()
     NFRMNO: number;
 
-    @PrimaryColumn({ length: 6 })
+    @PrimaryColumn()
     VORGNO: string;
 
-    @PrimaryColumn({ type: 'char', length: 2 })
+    @PrimaryColumn()
     CYEAR: string;
 
-    @PrimaryColumn({ type: 'char', length: 4 })
+    @PrimaryColumn()
     CYEAR2: string;
 
-    @PrimaryColumn({ type: 'decimal', precision: 6, scale: 0 })
+    @PrimaryColumn()
     NRUNNO: number;
 
-    @PrimaryColumn({ type: 'decimal', precision: 2, scale: 0 })
+    @PrimaryColumn()
     CHECK_SEQ: number;
 
-    @Column({ length: 200, nullable: false })
+    @Column()
     CHECK_POINT: string;
 
-    @Column({ length: 100, nullable: true })
+    @Column()
     INSPECTION_TOOL: string | null;
 
-    @Column({ type: 'decimal', precision: 12, scale: 4, nullable: true })
+    @Column({ type: 'number', precision: 12, scale: 4, nullable: true })
     MIN: number | null;
 
-    @Column({ type: 'decimal', precision: 12, scale: 4, nullable: true })
+    @Column({ type: 'number', precision: 12, scale: 4, nullable: true })
     MAX: number | null;
 
-    @Column({ type: 'decimal', precision: 12, scale: 4, nullable: true })
+    @Column({ type: 'number', precision: 12, scale: 4, nullable: true })
     MEASURED_VALUE: number | null;
 
-    @Column({ length: 20, nullable: true })
+    @Column()
     UNIT: string | null;
 
-    @Column({ length: 10, nullable: true })
+    @Column()
     RESULT: string | null;
 
-    @Column({ length: 10, nullable: true })
-    UPDATE_BY: string | null;
-
-    @Column({ type: 'date', nullable: true })
-    UPDATE_DATE: Date | null;
-
-    @ManyToOne(() => JigForm)
+    @ManyToOne(() => JigForm, { createForeignKeyConstraints: false })
     @JoinColumn([
         { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
         { name: 'VORGNO', referencedColumnName: 'VORGNO' },

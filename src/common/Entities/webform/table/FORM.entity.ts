@@ -66,7 +66,7 @@ export class FORM {
 
     @OneToOne(() => User)
     @JoinColumn({ name: 'VREQNO', referencedColumnName: 'SEMPNO' })
-    requestor: User;
+    reqtor: User;
 
     @OneToOne(() => FORMMST, (mst) => mst.form)
     @JoinColumn([

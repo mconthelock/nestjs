@@ -17,6 +17,7 @@ import { TermPayment } from '../../pursys/table/TERM_PAYMENT.entity';
 import { CurrencyMaster } from '../../pursys/table/CURRENCY_MASTER.entity';
 import { Vendors } from '../../pursys/table/VENDORS.entity';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
+import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 
 @Entity({ name: 'PUREVA_FORM', schema: 'WEBFORM' })
 export class PUREVA_FORM {

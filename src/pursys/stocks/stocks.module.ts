@@ -26,5 +26,6 @@ import { ProductsLots } from 'src/common/Entities/pursys/table/PRODUCTS_LOTS.ent
     ],
     controllers: [StocksController],
     providers: [StocksService, StocksRepository],
+    exports: [StocksService],
 })
 export class StocksModule {}

@@ -91,4 +91,9 @@ export class VendingController {
     getIssueWithdrawal() {
         return this.vendingService.getIssueWithdrawal();
     }
+
+    @Get('getTransactionHistory')
+    getTransactionHistory() {
+        return this.vendingService.getTransactionHistory();
+    }
 }

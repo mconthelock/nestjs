@@ -1,5 +1,8 @@
 import {
     Body,
+    StreamableFile,
+    Header,
+    Req,
     Controller,
     Delete,
     Get,
@@ -7,12 +10,12 @@ import {
     Patch,
     Post,
     Put,
-    Query,
     UsePipes,
     ValidationPipe,
 } from '@nestjs/common';
 import { JigService } from './jig.service';
-import { CreateJigDto } from './dto/create-jig.dto';
+import { CreateJigDeleteFormDto, SaveJigDeleteFormDto } from './dto/jig-delete-form.dto';
+import { CreateJigRequestDto } from './dto/create-jig-request.dto';
 import { UpdateJigDto } from './dto/update-jig.dto';
 import { ReplaceCheckpointsDto } from './dto/checkpoint.dto';
 import {
@@ -20,10 +23,16 @@ import {
     JigFormKeyDto,
     SaveJigFormDto,
     JigFileDto,
+    ConfigureJigFlowDto,
 } from './dto/jig-form.dto';
 import { JigFormFileKeyDto } from './dto/jig-form.dto';
 import { FinishInspectionDto } from './dto/finish-inspection.dto';
+import { AutoInspectionDto } from './dto/auto-inspection.dto';
+import { Request } from 'express';
+import { getClientIP } from 'src/common/utils/ip.utils';
+import { JigNgTagService } from './jig-ng-tag.service';
 const formPath = 'forms/:NFRMNO/:VORGNO/:CYEAR/:CYEAR2/:NRUNNO';
+const deleteFormPath = 'delete-forms/:NFRMNO/:VORGNO/:CYEAR/:CYEAR2/:NRUNNO';
 
 @Controller('iedoc/jig')
 @UsePipes(
@@ -34,22 +43,70 @@ const formPath = 'forms/:NFRMNO/:VORGNO/:CYEAR/:CYEAR2/:NRUNNO';
     }),
 )
 export class JigController {
-    constructor(private readonly jigService: JigService) {}
+    constructor(private readonly jigService: JigService, private readonly ngTag: JigNgTagService) {}
+
+    @Get('mfg-processes')
+    getMfgProcesses() {
+        return this.jigService.getMfgProcesses();
+    }
+
+    @Post('delete-forms')
+    createDeleteForm(@Body() dto: CreateJigDeleteFormDto) { return this.jigService.createDeleteForm(dto); }
+
+    @Get(deleteFormPath)
+    getDeleteForm(@Param() key: JigFormKeyDto) { return this.jigService.getDeleteForm(key); }
+
+    @Patch(deleteFormPath)
+    saveDeleteForm(@Param() key: JigFormKeyDto, @Body() dto: SaveJigDeleteFormDto) {
+        return this.jigService.saveDeleteForm(key, dto);
+    }
+
+    @Delete(deleteFormPath + '/files/:FILE_SEQ')
+    deleteDeleteFormFile(@Param() key: JigFormFileKeyDto) {
+        return this.jigService.deleteDeleteFormFile(key, key.FILE_SEQ);
+    }
+
+    @Post(deleteFormPath + '/finish')
+    finishDeleteForm(@Param() key: JigFormKeyDto) { return this.jigService.finishDeleteForm(key); }
+
+    @Post(deleteFormPath + '/reject')
+    rejectDeleteForm(@Param() key: JigFormKeyDto) { return this.jigService.rejectDeleteForm(key); }
+
+    @Get('locations')
+    getLocations() {
+        return this.jigService.getLocations();
+    }
+
+    @Get('ie-pics')
+    getIePics() {
+        return this.jigService.getIePics();
+    }
 
     @Get('dashboard')
-    getDashboard(@Query('fyear') fyear?: string) {
-        return this.jigService.getDashboard(
-            fyear === undefined ? undefined : Number(fyear),
-        );
+    getDashboard() {
+        return this.jigService.getDashboard();
     }
+
     @Post()
-    createJig(@Body() dto: CreateJigDto) {
+    createJig(@Body() dto: CreateJigRequestDto) {
         return this.jigService.createJig(dto);
+    }
+
+    @Post('auto-inspection')
+    autoInspection(@Body() dto: AutoInspectionDto, @Req() req: Request) {
+        return this.jigService.autoCreateInspection(dto.date, getClientIP(req));
     }
 
     @Get(formPath)
     getForm(@Param() key: JigFormKeyDto) {
         return this.jigService.getForm(key);
+    }
+    @Get(formPath + '/ng-tag.pdf')
+    @Header('Cache-Control', 'no-store')
+    async ngTagPdf(@Param() key: JigFormKeyDto) {
+        const pdf = await this.ngTag.generate(key);
+        return new StreamableFile(pdf, { type: 'application/pdf',
+            disposition: `inline; filename="NG-TAG-${key.NFRMNO}-${key.VORGNO.replace(/[^a-zA-Z0-9_-]/g, '_')}-${key.CYEAR}-${key.CYEAR2}-${key.NRUNNO}.pdf"` });
     }
     @Patch(formPath)
     saveForm(@Param() key: JigFormKeyDto, @Body() dto: SaveJigFormDto) {
@@ -58,6 +115,10 @@ export class JigController {
     @Post(formPath + '/finish')
     finishForm(@Param() key: JigFormKeyDto, @Body() dto: FinishInspectionDto) {
         return this.jigService.finishForm(key, dto);
+    }
+    @Post(formPath + '/requester-flow')
+    configureRequesterFlow(@Param() key: JigFormKeyDto, @Body() dto: ConfigureJigFlowDto) {
+        return this.jigService.configureRequesterFlow(key, dto.PICCODE);
     }
     @Put(formPath + '/files')
     putFile(@Param() key: JigFormKeyDto, @Body() dto: JigFileDto) {
@@ -71,6 +132,10 @@ export class JigController {
     @Get(':jigNo/checkpoints')
     getCheckpoints(@Param('jigNo') jigNo: string) {
         return this.jigService.getCheckpoints(jigNo);
+    }
+    @Get(':jigNo/defect-ng')
+    getDefectNg(@Param('jigNo') jigNo: string) {
+        return this.jigService.getDefectNg(jigNo);
     }
     @Put(':jigNo/checkpoints')
     replaceCheckpoints(

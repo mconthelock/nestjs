@@ -19,7 +19,8 @@ export class LoanService {
             .leftJoinAndSelect('loan.guarantor', 'guarantor')
             .leftJoinAndSelect('loan.paid', 'paid')
             .leftJoinAndSelect('loan.form', 'form')
-            .leftJoinAndSelect('form.formmst', 'formmst');
+            .leftJoinAndSelect('form.formmst', 'formmst')
+            .leftJoinAndSelect('form.requestor', 'user');
         await applyDynamicFilters(qb, q, 'loan');
         return qb.getMany();
     }

@@ -6,11 +6,18 @@ import { ISDEV_DEVELOPER } from 'src/common/Entities/webform/table/ISDEV_DEVELOP
 import { ISDEV_OBJECTIVE } from 'src/common/Entities/webform/table/ISDEV_OBJECTIVE.entity';
 import { IS_DEVICEMST } from 'src/common/Entities/webform/table/IS_DEVICEMST.entity';
 import { LABORCOST } from 'src/common/Entities/webform/table/LABORCOST.entity';
+import { ISDEV_REQUEST } from 'src/common/Entities/webform/table/ISDEV_REQUEST.entity';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature(
-            [ISDEV_DEVELOPER, ISDEV_OBJECTIVE, IS_DEVICEMST, LABORCOST],
+            [
+                ISDEV_REQUEST,
+                ISDEV_DEVELOPER,
+                ISDEV_OBJECTIVE,
+                IS_DEVICEMST,
+                LABORCOST,
+            ],
             'webformConnection',
         ),
     ],

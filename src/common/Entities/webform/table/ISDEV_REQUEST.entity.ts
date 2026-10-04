@@ -6,6 +6,7 @@ import {
     ManyToOne,
     OneToMany,
     ManyToMany,
+    OneToOne,
 } from 'typeorm';
 
 import { ISDEV_CATEGORY } from './ISDEV_CATEGORY.entity';
@@ -16,6 +17,7 @@ import { FORMMST } from './FORMMST.entity';
 import { User } from 'src/amec/users/entities/user.entity';
 import { ISDEV_DEVELOPER } from './ISDEV_DEVELOPER.entity';
 import { IS_FILE } from './IS_FILE.entity';
+import { FORM } from './FORM.entity';
 
 @Entity({ name: 'ISDEV_REQUEST', schema: 'WEBFORM' })
 export class ISDEV_REQUEST {
@@ -97,33 +99,35 @@ export class ISDEV_REQUEST {
     @Column()
     IS_ITGC: string;
 
+    @OneToOne(() => FORM)
+    @JoinColumn([
+        { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+        { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+        { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+    ])
+    form: FORM;
+
     @ManyToOne(() => ISDEV_CATEGORY)
     @JoinColumn([{ name: 'CATEGORY', referencedColumnName: 'CATEGORY_ID' }])
     category: ISDEV_CATEGORY;
-
-    @ManyToOne(() => ISDEV_OBJECTIVE)
-    @JoinColumn([{ name: 'OBJECTIVE', referencedColumnName: 'OBJ_ID' }])
-    obj: ISDEV_OBJECTIVE;
-
-    @ManyToOne(() => ISDEV_STATUS)
-    @JoinColumn([{ name: 'STATUS', referencedColumnName: 'STATUS_ID' }])
-    status: ISDEV_STATUS;
 
     @ManyToOne(() => ISDEV_TYPE)
     @JoinColumn([{ name: 'JOBTYPE', referencedColumnName: 'TYPE_ID' }])
     type: ISDEV_TYPE;
 
+    @ManyToOne(() => ISDEV_OBJECTIVE)
+    @JoinColumn([{ name: 'OBJECTIVE', referencedColumnName: 'OBJ_ID' }])
+    objective: ISDEV_OBJECTIVE;
+
+    @ManyToOne(() => ISDEV_STATUS)
+    @JoinColumn([{ name: 'STATUS', referencedColumnName: 'STATUS_ID' }])
+    status: ISDEV_STATUS;
+
     @ManyToOne(() => User)
     @JoinColumn([{ name: 'REQ_PIC', referencedColumnName: 'SEMPNO' }])
     requester: User;
-
-    @ManyToOne(() => FORMMST)
-    @JoinColumn([
-        { name: 'NFRMNO', referencedColumnName: 'NNO' },
-        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
-        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
-    ])
-    formmaster: FORMMST;
 
     @OneToMany(() => ISDEV_DEVELOPER, (dev) => dev.request)
     @JoinColumn([

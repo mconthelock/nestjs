@@ -15,6 +15,7 @@ import { UniformCalendar } from 'src/common/Entities/gpreport/table/UNIFORM_CALE
 import { AnnualUniform } from 'src/common/Entities/gpreport/table/UNIFORM_ANNUAL.entity';
 import { AnnualUniformDetail } from 'src/common/Entities/gpreport/table/UNIFORM_ANNUAL_DETAIL.entity';
 import { CreateCalendarDto } from './dto/create-calendar.dto';
+import { UpdateUniformRightDto } from './dto/update-right.dto';
 
 @Injectable()
 export class UniformService {
@@ -102,11 +103,15 @@ export class UniformService {
         return this.calendar.delete({ FYEAR: year });
     }
 
+    //Rights Request
     async findRights() {
         const rights = await this.right.find();
         const users = await this.UsersService.search();
         const userFiltered = users.filter(
-            (u) => u.CSTATUS === '1' && parseInt(u.SPOSCODE) < 80,
+            (u) =>
+                u.CSTATUS === '1' &&
+                parseInt(u.SPOSCODE) < 97 &&
+                parseInt(u.SPOSCODE) != 80,
         );
         const data = userFiltered.map((user) => {
             const userRights = rights.filter(
@@ -118,6 +123,18 @@ export class UniformService {
             };
         });
         return data;
+    }
+
+    async updateRights(data: UpdateUniformRightDto) {
+        const existing = await this.right.find({
+            where: { EMPCOD: data.EMPCOD },
+        });
+        if (existing.length) {
+            await this.right.update({ EMPCOD: data.EMPCOD }, data);
+        } else {
+            await this.right.insert(data);
+        }
+        return this.right.find({ where: { EMPCOD: data.EMPCOD } });
     }
 
     //Annual Request

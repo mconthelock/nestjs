@@ -16,7 +16,7 @@ import { Accesslog } from 'src/common/Entities/docinv/table/accesslog.entity';
 import { Appsuser } from '../../../common/Entities/docinv/table/appsuser.entity';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
-@Entity({ name: 'AMECUSERALL', schema: 'WEBFORM' })
+@Entity('AMECUSERALL')
 export class User {
     @PrimaryColumn()
     SEMPNO: string;

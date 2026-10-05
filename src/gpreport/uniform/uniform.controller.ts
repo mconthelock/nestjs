@@ -15,6 +15,7 @@ import { Request } from 'express';
 import { CreateCalendarDto } from './dto/create-calendar.dto';
 import { CreateAnnualDto } from './dto/create-annual.dto';
 import { UpdateUniformDto } from './dto/update-uniform.dto';
+import { UpdateUniformRightDto } from './dto/update-right.dto';
 
 @Controller('gpreport/uniform')
 export class UniformController {
@@ -52,9 +53,15 @@ export class UniformController {
         return this.uniform.updateCategory(data);
     }
 
+    //Right
     @Get('rights')
     findRights() {
         return this.uniform.findRights();
+    }
+
+    @Post('rights')
+    updateRights(@Body() data: UpdateUniformRightDto) {
+        return this.uniform.updateRights(data);
     }
 
     @Get('annual/request/:year')

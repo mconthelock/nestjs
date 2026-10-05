@@ -3,11 +3,17 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { IsDevService } from './is-dev.service';
 import { CreateDeveloperDto } from './dto/create-developer.dto';
 import { UpdateDeveloperDto } from './dto/update-developer';
+import { SearchIsDevDto } from './dto/search-is-dev.dto';
 
 @ApiTags('IS-DEV')
 @Controller('form/is/is-dev')
 export class IsDevController {
     constructor(private readonly dev: IsDevService) {}
+
+    @Post('search')
+    search(@Body() dto: SearchIsDevDto) {
+        return this.dev.search(dto);
+    }
 
     @Post('assignment/add')
     async addDeveloper(@Body() dto: CreateDeveloperDto) {

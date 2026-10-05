@@ -232,9 +232,16 @@ export class RequestPurevaFormDto extends PickType(CreateFormDto, [
     LABOR_STATUS?: string;
 
     @IsOptional()
+    @Transform(({ value }) => {
+        // 1. ถ้าส่งค่าว่างหรือ null มา ให้คืนค่าเป็น null เพื่อลบวันที่ออก
+        if (value === '' || value === null) {
+            return null;
+        }
+        // 2. ถ้ามีวันทีส่งมาตามปกติ ให้แปลงเป็น Date Object
+        return new Date(value);
+    })
     @IsDate()
-    @Type(() => Date)
-    LABOR_ESTABLISH_DATE?: Date;
+    LABOR_ESTABLISH_DATE?: Date | null;
 
     @IsOptional()
     @IsNumber()

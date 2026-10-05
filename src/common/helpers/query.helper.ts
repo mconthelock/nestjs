@@ -294,3 +294,26 @@ export async function parseCreateString(condition: FiltersDto, table: string) {
     });
     return `INSERT INTO ${table} (${column}) VALUES (${values})`;
 }
+
+export async function parseUpdateString(
+    value: FiltersDto,
+    condition: FiltersDto,
+    table: string,
+) {
+    let column = '';
+    const conditionString = await parseConditionString(condition);
+    value.filters.forEach((f, i) => {
+        let sep;
+        switch (f.type) {
+            case 'number':
+                sep = '';
+                break;
+            default:
+                sep = `'`;
+                break;
+        }
+        column += `${i > 0 ? ', ' : ''}${f.field} = ${sep}${f.value}${sep}`;
+        //values += `${i > 0 ? ', ' : ''}${sep}${f.value}${sep}`;
+    });
+    return `UPDATE ${table}  SET ${column} ${conditionString}`;
+}

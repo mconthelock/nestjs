@@ -3,44 +3,32 @@ import { JigForm } from './jig_form.entity';
 
 @Entity({ name: 'JIG_FORM_NG' })
 export class JigFormNg {
-    @PrimaryColumn({ type: 'decimal', precision: 3, scale: 0 })
+    @PrimaryColumn()
     NFRMNO: number;
 
-    @PrimaryColumn({ length: 6 })
+    @PrimaryColumn()
     VORGNO: string;
 
-    @PrimaryColumn({ type: 'char', length: 2 })
+    @PrimaryColumn()
     CYEAR: string;
 
-    @PrimaryColumn({ type: 'char', length: 4 })
+    @PrimaryColumn()
     CYEAR2: string;
 
-    @PrimaryColumn({ type: 'decimal', precision: 6, scale: 0 })
+    @PrimaryColumn()
     NRUNNO: number;
 
-    @Column({ length: 1000, nullable: false })
+    @Column()
     DEFECT_DETAIL: string;
 
-    @Column({ length: 100, nullable: true })
-    ACCESS_METHOD: string | null;
+    @Column()
+    ACTION: string;
 
-    @Column({ type: 'date', nullable: false })
+    @Column()
+    CORRECTIVE: string;
+
+    @Column()
     PLAN_DATE: Date;
-
-    @Column({ length: 200, nullable: true })
-    LOCATION: string | null;
-
-    @Column({ length: 10, nullable: true })
-    CREATE_BY: string | null;
-
-    @Column({ type: 'date', nullable: false, default: () => 'SYSDATE' })
-    CREATE_DATE: Date;
-
-    @Column({ length: 10, nullable: true })
-    UPDATE_BY: string | null;
-
-    @Column({ type: 'date', nullable: true })
-    UPDATE_DATE: Date | null;
 
     @ManyToOne(() => JigForm)
     @JoinColumn([

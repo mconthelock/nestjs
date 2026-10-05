@@ -3,40 +3,40 @@ import { JigForm } from './jig_form.entity';
 
 @Entity({ name: 'JIG_FORM_FILE' })
 export class JigFormFile {
-    @PrimaryColumn({ type: 'decimal', precision: 3, scale: 0 })
+    @PrimaryColumn()
     NFRMNO: number;
 
-    @PrimaryColumn({ length: 6 })
+    @PrimaryColumn()
     VORGNO: string;
 
-    @PrimaryColumn({ type: 'char', length: 2 })
+    @PrimaryColumn()
     CYEAR: string;
 
-    @PrimaryColumn({ type: 'char', length: 4 })
+    @PrimaryColumn()
     CYEAR2: string;
 
-    @PrimaryColumn({ type: 'decimal', precision: 6, scale: 0 })
+    @PrimaryColumn()
     NRUNNO: number;
 
-    @PrimaryColumn({ type: 'decimal', precision: 6, scale: 0 })
+    @PrimaryColumn()
     FILE_SEQ: number;
 
-    @Column({ length: 255, nullable: false })
+    @Column()
     FILE_NAME: string;
 
-    @Column({ length: 1000, nullable: false })
+    @Column()
     FILE_PATH: string;
 
-    @Column({ length: 100, nullable: true })
+    @Column()
     FILE_TYPE: string | null;
 
-    @Column({ type: 'decimal', precision: 12, scale: 0, nullable: true })
+    @Column()
     FILE_SIZE: number | null;
 
-    @Column({ length: 10, nullable: true })
+    @Column()
     CREATE_BY: string | null;
 
-    @Column({ type: 'date', nullable: false, default: () => 'SYSDATE' })
+    @Column()
     CREATE_DATE: Date;
 
     @ManyToOne(() => JigForm)

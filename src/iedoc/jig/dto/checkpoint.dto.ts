@@ -19,7 +19,7 @@ export class CheckpointDto {
     @IsDefined()
     @IsInt()
     @Min(1)
-    @Max(20)
+    @Max(999)
     CHECK_SEQ: number;
     @IsDefined()
     @IsNotEmpty()
@@ -41,6 +41,11 @@ export class CheckpointDto {
     @Max(99999999.9999)
     MAX?: number;
     @IsOptional()
+    @IsNumber({ maxDecimalPlaces: 4 })
+    @Min(-99999999.9999)
+    @Max(99999999.9999)
+    MEASURED_VALUE?: number | null;
+    @IsOptional()
     @IsString()
     @MaxLength(20)
     UNIT?: string;
@@ -49,7 +54,6 @@ export class CheckpointDto {
 export class ReplaceCheckpointsDto {
     @IsDefined()
     @IsArray()
-    @ArrayMaxSize(20)
     @ArrayUnique((item) => item.CHECK_SEQ)
     @ValidateNested({ each: true })
     @Type(() => CheckpointDto)

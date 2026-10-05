@@ -5,12 +5,17 @@ import { PDFParse } from 'pdf-parse';
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { PDFDocument } from 'pdf-lib';
+
 import { moveFileFromMulter } from 'src/common/utils/files.utils';
 import { FileLoggerService } from 'src/common/services/file-logger/file-logger.service';
 import { PrintedQueueService } from './PrintedQueue.service';
 import { IdTagRepository } from './idtag.repository';
 import { SearchIdtagFilesDto } from './dto/search-idtag-file.dto';
 import { PrintedExtractService } from './printedExtract.service';
+import { T002kpService } from 'src/as400/rtnlibf/t002kp/t002kp.service';
+import { FiltersDto } from 'src/common/dto/filter.dto';
+import { ConectionService } from 'src/as400/conection/conection.service';
+import { parseUpdateString } from 'src/common/helpers/query.helper';
 
 export interface PdfProcessContext {
     logFileName: string;
@@ -86,6 +91,8 @@ export class PrintedService {
         private readonly extract: PrintedExtractService,
         private readonly fileLogger: FileLoggerService,
         private readonly repo: IdTagRepository,
+        private readonly t02: T002kpService,
+        private readonly conn: ConectionService,
     ) {}
 
     async setPdfPath(data): Promise<PdfProcessContext> {
@@ -498,5 +505,31 @@ export class PrintedService {
             //     splitFilesData,
             // );
         }
+    }
+
+    async updatePr() {
+        const data = await this.repo.getPr();
+        const results = [];
+
+        for (const item of data) {
+            const values = new FiltersDto();
+            const detail = new FiltersDto();
+            values.filters = [
+                { field: 'T02DUE', op: 'eq', value: item.CHANGEDATE },
+            ];
+            detail.filters = [
+                { field: 'T02PR', op: 'eq', value: item.T02PR },
+                { field: 'T02LIN', op: 'eq', value: item.T02LIN },
+            ];
+            const query = await parseUpdateString(
+                values,
+                detail,
+                'RTNLIBF.T002KP',
+            );
+            const result = await this.conn.runQuery(query);
+            results.push(result);
+        }
+
+        return results;
     }
 }

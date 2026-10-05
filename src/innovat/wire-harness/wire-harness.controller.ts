@@ -2,6 +2,7 @@ import { Controller, HttpCode, HttpStatus, Body, Get, Post } from '@nestjs/commo
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { WireHarnessService } from './wire-harness.service';
+import { CreateDrumDto } from './dto/create-drum.dto';
 
 @ApiTags('Wire Harness')
 @Controller('innovat/wire-harness')
@@ -10,12 +11,12 @@ export class WireHarnessController {
         private readonly service: WireHarnessService,
     ) {}
 
-    @Get('item')
+    @Get('process')
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Get item list' })
-    @ApiResponse({ status: 200, description: 'Item list' })
-    async item() {
-        return this.service.item();
+    @ApiOperation({ summary: 'Get process list' })
+    @ApiResponse({ status: 200, description: 'Process list' })
+    async process() {
+        return this.service.process();
     }
 
     @Get('production')
@@ -32,5 +33,21 @@ export class WireHarnessController {
     @ApiResponse({ status: 200, description: 'Auto production plan list' })
     async autoPlan(@Body() condition: FiltersDto) {
         return this.service.autoPlan(condition);
+    }
+
+    @Post('drum-stock')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Get available drum stock' })
+    @ApiResponse({ status: 200, description: 'Drum stock list' })
+    async drumStock(@Body() condition: FiltersDto) {
+        return this.service.drumStock(condition);
+    }
+
+    @Post('create-drum')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Create drum' })
+    @ApiResponse({ status: 200, description: 'Create drum success' })
+    async createDrum(@Body() dto: CreateDrumDto) {
+        return this.service.createDrum(dto);
     }
 }

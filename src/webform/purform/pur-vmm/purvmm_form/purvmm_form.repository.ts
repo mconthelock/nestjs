@@ -26,6 +26,7 @@ export class PurvmmFormRepository extends BaseRepository {
                 FORM: true,
                 TERM: true,
                 CURRENCY: true,
+                TRADE: true,
             },
         });
     }

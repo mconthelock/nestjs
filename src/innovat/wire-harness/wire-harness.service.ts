@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { WireHarnessAs400Repository } from './wire-harness-as400.repository';
 import { WireHarnessRepository } from './wire-harness.repository';
+import { CreateDrumDto } from './dto/create-drum.dto';
 
 @Injectable()
 export class WireHarnessService {
@@ -19,9 +20,13 @@ export class WireHarnessService {
             P: row.P.trim(),
             SEQBM: Number(row.SEQBM),
             MFGNO: row.MFGNO.trim(),
+            ITEMNO: row.ITEMNO.trim(),
+            PACKNO: row.PACKNO.trim(),
             PROJ: row.PROJ.trim(),
             MODEL: row.MODEL.trim(),
-            DWG: row.DWG.trim(),
+            PARENT_DRAWING: row.PARENT_DRAWING.trim(),
+            UPPER_DRAWING: row.UPPER_DRAWING.trim(),
+            DRAWING: row.DRAWING.trim(),
             QTY: Number(row.QTY),
             MATERIAL: row.MATERIAL.trim(),
             ITEMCODE: row.ITEMCODE.trim(),
@@ -36,13 +41,8 @@ export class WireHarnessService {
         };
     }
 
-    async item() {
-        const data = await this.repo.getItem();
-        return data.map(item => ({
-            INFO: `${item.ITEM_NO.substring(0, 3)}-${item.ITEM_NO.substring(3)}`,
-            VALUE: item.ITEM_NO,
-            PROCESS: item.ITEM_PROCESS,
-        }));
+    async process() {
+        return this.repo.getProcess();
     }
 
     async production() {
@@ -51,5 +51,13 @@ export class WireHarnessService {
 
     async autoPlan(condition: FiltersDto) {
         return this.repo.getAutoPlan(condition);
+    }
+
+    async drumStock(condition: FiltersDto) {
+        return this.repo.getDrumStock(condition);
+    }
+
+    async createDrum(dto: CreateDrumDto) {
+        return this.repo.createDrum(dto);
     }
 }

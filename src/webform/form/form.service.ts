@@ -185,8 +185,8 @@ export class FormService {
                 .innerJoinAndSelect('form.formmst', 'formmst')
                 .innerJoinAndSelect('form.flow', 'form_flow')
                 .where(
-                    '((flow.CSTEPST = :step AND flow.VAPVNO = :empno) OR (flow.CSTEPST = :step AND flow.VREPNO = :empno)) AND form.CST > :cst',
-                    { step: '3', empno, cst: '0' },
+                    'flow.CSTEPST = :step AND (flow.VAPVNO = :empno OR flow.VREPNO = :empno)  AND form.CST = :cst',
+                    { step: '3', empno, cst: '1' },
                 )
                 //.andWhere('flow.CSTEPNO = form_flow.CSTEPNEXTNO')
                 .getMany()

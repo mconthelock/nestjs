@@ -174,6 +174,20 @@ export class IdTagRepository extends BaseRepository {
         return this.manager.delete(IdtagPages, { PAGE_ID: pagesId });
     }
 
+    async Special(filesId: number) {
+        return await this.manager.query(`
+            select * from M008KP M
+            left join F001KP F ON M.M8K03 = F01R07
+            left join IDTAGS_PAGES P ON F.F01R01 = P.PAGE_TAG
+            left join IDTAGS_FILES S ON S.FILES = P.FILES_ID
+            where m8k01 = '2026104' AND M8K02 = 'P1' AND FILES_ID = ${filesId} `);
+        //return this.manager.delete(IdtagOrders, { ORDER_ID: orderId });
+    }
+
+    async getPr() {
+        return await this.manager.query(`SELECT * FROM PR202610B@DATACENTER`);
+    }
+
     // async updatePageImage(filesId: number, pageNum: number, pageImg: string) {
     //     return this.getRepository(IdtagPages).update(
     //         {

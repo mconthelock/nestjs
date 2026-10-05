@@ -7,9 +7,7 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class AmecUserAllRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

@@ -12,6 +12,9 @@ import { FormCreateService } from 'src/webform/form/create-form.service';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { CreateDataAreaDto } from './dto/create-data-area.dto';
 import { UpdateAreaDto } from './dto/update-data-area.dto';
+import { FlowmstService } from 'src/webform/flowmst/flowmst.service';
+import { OrgposService } from 'src/webform/orgpos/orgpos.service';
+import { RepService } from 'src/webform/rep/rep.service';
 
 @Injectable()
 export class GpTphService {
@@ -19,6 +22,9 @@ export class GpTphService {
         private readonly repo: GpTphRepository,
         private readonly formmstService: FormmstService,
         private readonly formCreateService: FormCreateService,
+        private readonly flowmstService: FlowmstService,
+        private readonly orgposService: OrgposService,
+        private readonly repService: RepService,
     ) { }
 
     findAllAreas() {
@@ -50,6 +56,24 @@ export class GpTphService {
             if (!formmst) {
                 throw new Error('Form master not found for GP-TPH. Check FORMMST table.');
             }
+            const [flowMaster, areaOwnerApprovers] = await Promise.all([
+                this.flowmstService.getFlowMaster(
+                    formmst.NNO,
+                    formmst.VORGNO,
+                    formmst.CYEAR,
+                ),
+                this.getAreaOwnerApprovers(areaIds, formmst),
+            ]);
+            const areaOwnerSteps = flowMaster.filter(
+                (step) =>
+                    step.VAPVNO?.trim() === 'SYSTEM' &&
+                    step.CEXTDATA?.trim() === '01',
+            );
+            if (areaOwnerSteps.length !== 1) {
+                throw new BadRequestException(
+                    'GP-TPH flow must contain exactly one SYSTEM Area Owner step with CEXTDATA 01',
+                );
+            }
             //สร้าง Form
             const createForm = await this.formCreateService.create(
                 {
@@ -77,6 +101,11 @@ export class GpTphService {
                 CYEAR2: createForm.data.CYEAR2,
                 NRUNNO: createForm.data.NRUNNO,
             };
+            await this.repo.replaceSystemApproverStep(
+                form,
+                areaOwnerSteps[0].CSTEPNO,
+                areaOwnerApprovers,
+            );
 
             const data = {
                 ...form,
@@ -130,6 +159,58 @@ export class GpTphService {
         } catch (error) {
             throw error;
         }
+    }
+
+    private async getAreaOwnerApprovers(
+        areaIds: number[],
+        formmst: { NNO: number; VORGNO: string; CYEAR: string },
+    ) {
+        const areas = await this.repo.findAreasByIds(areaIds);
+        const areasById = new Map(
+            areas.map((area) => [Number(area.AREA_ID), area]),
+        );
+        const missingAreaIds = areaIds.filter((areaId) => !areasById.has(areaId));
+        if (missingAreaIds.length > 0) {
+            throw new BadRequestException(
+                `Selected area IDs do not exist: ${missingAreaIds.join(', ')}`,
+            );
+        }
+
+        const ownerEmployees = new Set<string>();
+        for (const areaId of areaIds) {
+            const area = areasById.get(areaId);
+            const positionCode = area.AREA_OWNER_POSCODE?.trim();
+            const organizationCode = area.AREA_OWNER?.trim();
+            if (!positionCode || !organizationCode) {
+                throw new BadRequestException(
+                    `Area "${area.AREA_NAME}" has an invalid Area Owner assignment`,
+                );
+            }
+
+            const employees = await this.orgposService.getOrgPos({
+                VPOSNO: positionCode,
+                VORGNO: organizationCode,
+            });
+            if (employees.length === 0) {
+                throw new BadRequestException(
+                    `Area "${area.AREA_NAME}" has no active Area Owner`,
+                );
+            }
+
+            employees.forEach((employee) => ownerEmployees.add(employee.VEMPNO));
+        }
+
+        return Promise.all(
+            [...ownerEmployees].map(async (VAPVNO) => ({
+                VAPVNO,
+                VREPNO: await this.repService.getRepresent({
+                    NFRMNO: formmst.NNO,
+                    VORGNO: formmst.VORGNO,
+                    CYEAR: formmst.CYEAR,
+                    VEMPNO: VAPVNO,
+                }),
+            })),
+        );
     }
     async createArea(dto: CreateDataAreaDto) {
         return this.repo.CreateGpTphArea(this.normalizeArea(dto));

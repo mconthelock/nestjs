@@ -10,6 +10,7 @@ import {
 import { PurvmmFormService } from './purvmm_form.service';
 import { CreatePurvmmFormDto } from './dto/create-purvmm_form.dto';
 import { UpdatePurvmmFormDto } from './dto/update-purvmm_form.dto';
+import { SearchPurvmmFormDto } from './dto/search-purvmm_form.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Controller('purform/purvmm-form')
@@ -24,6 +25,11 @@ export class PurvmmFormController {
     @Post('data')
     getData(@Body() dto: FormDto) {
         return this.purvmmFormService.getData(dto);
+    }
+
+    @Post('search')
+    async search(@Body() dto: SearchPurvmmFormDto) {
+        return this.purvmmFormService.search(dto);
     }
 
     @Get()

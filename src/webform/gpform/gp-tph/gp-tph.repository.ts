@@ -182,12 +182,4 @@ export class GpTphRepository extends BaseRepository {
         return areaRepository.findOneByOrFail({ AREA_ID: id });
     }
 
-    countAreaRecords(id: number) {
-        return this.getRepository(GPTPH_AREA_RECORD).countBy({ AREA_ID: id });
-    }
-
-    deleteArea(id: number) {
-        return this.getRepository(GPTPH_AREAS).delete({ AREA_ID: id });
-    }
 }
-

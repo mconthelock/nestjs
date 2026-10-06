@@ -132,10 +132,5 @@ export class GpTphController {
         return this.gpTphService.updateArea(id, dto);
     }
 
-    @Delete('areas/:id')
-    deleteArea(@Param('id', ParseIntPipe) id: number) {
-        return this.gpTphService.deleteArea(id);
-    }
 }
-
 

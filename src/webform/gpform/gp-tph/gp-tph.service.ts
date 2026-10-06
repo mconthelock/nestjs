@@ -1,6 +1,5 @@
 import {
     BadRequestException,
-    ConflictException,
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
@@ -292,22 +291,6 @@ export class GpTphService {
         }
 
         return this.repo.updateArea(id, data);
-    }
-
-    async deleteArea(id: number) {
-        const area = await this.repo.findAreaById(id);
-        if (!area) {
-            throw new NotFoundException(`Area ${id} was not found`);
-        }
-
-        if (await this.repo.countAreaRecords(id)) {
-            throw new ConflictException(
-                'This area cannot be deleted because it is assigned to a GP-TPH request',
-            );
-        }
-
-        await this.repo.deleteArea(id);
-        return { status: true, message: 'Area deleted successfully' };
     }
 
     private normalizeArea(dto: CreateDataAreaDto | UpdateAreaDto) {

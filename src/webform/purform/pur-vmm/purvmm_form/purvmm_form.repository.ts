@@ -54,7 +54,8 @@ export class PurvmmFormRepository extends BaseRepository {
             .leftJoinAndSelect('vmmform.creator', 'creator')
             .leftJoinAndSelect('vmm.TRADE', 'trade')
             .leftJoinAndSelect('vmm.TERM', 'term')
-            .leftJoinAndSelect('vmmform.flow', 'flow');
+            .leftJoinAndSelect('vmmform.flow', 'flow')
+            .leftJoinAndSelect('vmm.ADDRESSES', 'addresses');
 
         const cond = {
             AND: [],

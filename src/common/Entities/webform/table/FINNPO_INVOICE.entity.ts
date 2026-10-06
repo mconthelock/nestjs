@@ -20,13 +20,13 @@ export class FINNPOINVOICE {
     @PrimaryColumn()
     INVOICE_NO: string;    
 
-    @Column()
+    @Column({ type: 'number' })
     NET_PRICE: number;
 
     @PrimaryColumn()
     VAT_RATE_ID: number;
     
-    @Column()
+    @Column({ type: 'number' })
     TOTAL_AMT: number;
 
     @Column({ type: 'number', nullable: true })

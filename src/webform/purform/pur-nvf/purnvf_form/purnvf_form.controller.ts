@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete , Query } from '@nestjs/common';
 import { PurnvfFormService } from './purnvf_form.service';
 import { CreatePurnvfFormDto } from './dto/create-purnvf_form.dto';
 import { UpdatePurnvfFormDto } from './dto/update-purnvf_form.dto';
@@ -17,6 +17,13 @@ export class PurnvfFormController {
   getData(@Body() dto: FormDto) {
           return this.purnvfFormService.getData(dto);
   }
+
+ 
+@Get('search')
+async seachByKeyword(@Query('keyword') keyword: string) {
+    return this.purnvfFormService.searchByKeyword(keyword);
+  }
+
 
   @Get()
   findAll() {

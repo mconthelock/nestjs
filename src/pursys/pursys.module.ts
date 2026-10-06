@@ -5,6 +5,11 @@ import { PurVendorsAttfileModule } from './pur_vendors_attfile/pur_vendors_attfi
 import { PurVendorsAddressModule } from './pur_vendors_address/pur_vendors_address.module';
 import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
+import { CurrencyModule } from './currency/currency.module';
+import { TermcodeModule } from './termcode/termcode.module';
+import { VendorsModule } from './vendors/vendors.module';
+import { StocksModule } from './stocks/stocks.module';
+import { WarehousesModule } from './warehouses/warehouses.module';
 
 @Module({
     imports: [
@@ -14,6 +19,11 @@ import { CategoriesModule } from './categories/categories.module';
         PurVendorsAddressModule,
         ProductsModule,
         CategoriesModule,
+        CurrencyModule,
+        TermcodeModule,
+        VendorsModule,
+        StocksModule,
+        WarehousesModule,
     ],
 })
 export class PursysModule {}

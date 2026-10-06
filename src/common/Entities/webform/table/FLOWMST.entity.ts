@@ -1,4 +1,5 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { STEPMST } from './STEPMST.entity';
 
 @Entity({ name: 'FLOWMST', schema: 'WEBFORM' })
 export class FLOWMST {
@@ -46,4 +47,8 @@ export class FLOWMST {
 
     @Column({ default: '0' })
     CAPPLYALL: string;
+
+    @ManyToOne(() => STEPMST, (stepmst) => stepmst.CNO)
+    @JoinColumn({ name: 'CSTEPNO', referencedColumnName: 'CNO' })
+    STEPMST: STEPMST;
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { FormService } from './form.service';
 import { CreateFormDto } from './dto/create-form.dto';
 import { FlowmstService } from '../flowmst/flowmst.service';
@@ -15,6 +15,7 @@ import { RepService } from '../rep/rep.service';
 import { DeleteFlowStepService } from '../flow/delete-flow-step.service';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
+import { FormCounter } from 'src/common/Entities/webform/table/FORM_COUNTER.entity';
 import { UpdateFlowDto } from '../flow/dto/update-flow.dto';
 
 interface FormContext {
@@ -45,6 +46,9 @@ export class FormCreateService extends FormService {
 
         @InjectRepository(FLOW, 'webformConnection')
         protected readonly flow: Repository<FLOW>,
+
+        @InjectRepository(FormCounter, 'webformConnection')
+        protected readonly count: Repository<FormCounter>,
         protected readonly formmstService: FormmstService,
         protected readonly flowService: FlowService,
         protected readonly repo: FormRepository,
@@ -58,7 +62,7 @@ export class FormCreateService extends FormService {
         private readonly repService: RepService,
         private readonly deleteFlowStepService: DeleteFlowStepService,
     ) {
-        super(form, flow, formmstService, flowService, repo);
+        super(form, flow, count, formmstService, flowService, repo);
     }
     async create(
         dto: CreateFormDto,
@@ -77,6 +81,19 @@ export class FormCreateService extends FormService {
                 cyear2: new Date().getFullYear().toString(),
                 CSTEPSTDX: 4,
             };
+
+            const checkReq = await this.usersService.findEmp(context.empno);
+            const checkInput = await this.usersService.findEmp(context.inputempno);
+            if(!checkReq) {
+                throw new NotFoundException(
+                    `Requester ${context.empno} not found`
+                );
+            }
+            if(!checkInput) {
+                throw new NotFoundException(
+                    `Inputer ${context.empno} not found`
+                );
+            }
 
             this.setQuery(context);
             await this.setFormNo(context);
@@ -158,7 +175,8 @@ export class FormCreateService extends FormService {
                 throw new Error('Failed to insert form'); // Throw an error to trigger rollback
             }
         } catch (error) {
-            throw new Error(error.message);
+            throw error;
+            // throw new Error(error.message);
         }
     }
 
@@ -234,7 +252,10 @@ export class FormCreateService extends FormService {
             context.empno,
             context.emppos,
         );
-        context.flag = 1; // หากไม่เจอตำแหน่งเช่น ใน ORGPOS ให้ไป set manager step โดยตรวจด้วย VPOSNO ของ FLOWMST ทีละ STEP
+        // * 2026-09-24 เปลี่ยนเป็นแบบ asp ตรวจก่อนว่าเคยมีการตั้งค่า flag หรือไม่
+        if(context.flag == 0){
+            context.flag = 1; // หากไม่เจอตำแหน่งเช่น ใน ORGPOS ให้ไป set manager step โดยตรวจด้วย VPOSNO ของ FLOWMST ทีละ STEP
+        }
         if (orgTree && orgTree.length > 0) {
             context.flag = 2;
             for (const row of orgTree) {
@@ -366,6 +387,8 @@ export class FormCreateService extends FormService {
             CYEAR: context.cyear,
         };
         const url = await this.formmstService.getFormmst(query2);
+        // Do only if requester has manager and requester is not directory and division manager
+        // ทำเฉพาะเมื่อผู้ร้องขอมีผู้จัดการและผู้ร้องขอไม่ใช่ผู้จัดการระดับไดเรกทอรีและผู้จัดการระดับแผนก
         if (manager.length > 0) {
             await this.getRepresent(manager[0].HEADNO, context);
             const flow = {
@@ -394,10 +417,14 @@ export class FormCreateService extends FormService {
                 VURL: url[0].VFORMPAGE,
                 VREMARK: null,
             };
-            console.log(managerData, managerData?.CEXTDATA, managerData?.CAPPLYALL);
-            
+            console.log(
+                managerData,
+                managerData?.CEXTDATA,
+                managerData?.CAPPLYALL,
+            );
+
             console.log(flow);
-            
+
             await this.flowService.insertFlow(flow);
 
             //Update creater flow for set next step to manager

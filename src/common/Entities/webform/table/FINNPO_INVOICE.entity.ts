@@ -15,30 +15,30 @@ export class FINNPOINVOICE {
 
     @PrimaryColumn()
     INVOICE_DATE: Date;
-    
+
 
     @PrimaryColumn()
-    INVOICE_NO: string;    
+    INVOICE_NO: string;
 
     @Column({ type: 'number' })
     NET_PRICE: number;
 
     @PrimaryColumn()
     VAT_RATE_ID: number;
-    
+
     @Column({ type: 'number' })
     TOTAL_AMT: number;
 
-    @Column({ type: 'number', nullable: true })
+    @Column({ type: 'decimal', nullable: true })
     WHT: number | null;
 
     @Column({ nullable: true })
     REFERENCE: string | null;
-    
+
     @PrimaryColumn()
     SCURCODE: string;
 
-
+    
 }
 
 // NFRMNO

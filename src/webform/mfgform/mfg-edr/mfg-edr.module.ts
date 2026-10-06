@@ -20,23 +20,33 @@ import { FORM } from '../../../common/Entities/webform/table/FORM.entity';
 import { FLOW } from '../../../common/Entities/webform/table/FLOW.entity';
 import { AMECUSERALL } from '../../../common/Entities/amec/views/AMECUSERALL.entity';
 
+import { VIEW_MFG_EDR_REPORT } from '../../../common/Entities/webform/views/VIEW_MFG_EDR_REPORT.entity';
+import { RootcauseModule } from './rootcause/rootcause.module';
+import { MfgEdrTargetMasterModule } from './mfg_edr_target_master/mfg_edr_target_master.module';
+
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      EdrWorktypeMst,
-      EdrLineMst,
-      EdrProcessMst,
-      EdrCauseMst,
-      AmecOrders,
-      AmecOrdersSchedule,
-      MfgEdrFormHead,
-      MfgEdrFormList,
-      MfgEdrFormAtt,
-      MfgEdrFormCause4m,
-      FORM,
-      FLOW,
-      AMECUSERALL,
-    ], 'webformConnection'),
+    TypeOrmModule.forFeature(
+      [
+        EdrWorktypeMst,
+        EdrLineMst,
+        EdrProcessMst,
+        EdrCauseMst,
+        AmecOrders,
+        AmecOrdersSchedule,
+        MfgEdrFormHead,
+        MfgEdrFormList,
+        MfgEdrFormAtt,
+        MfgEdrFormCause4m,
+        FORM,
+        FLOW,
+        AMECUSERALL,
+        VIEW_MFG_EDR_REPORT,
+      ],
+      'webformConnection',
+    ),
+    RootcauseModule,
+    MfgEdrTargetMasterModule,
   ],
   controllers: [MfgEdrController],
   providers: [MfgEdrService],

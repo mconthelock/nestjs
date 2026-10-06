@@ -38,6 +38,9 @@ export class EBGREQFORM {
     @Column({ type: 'decimal', precision: 10, scale: 2 })
     REQAMT: number;
 
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
+    ALLOCBG: number;
+
     @Column()
     RESORG: string;
 

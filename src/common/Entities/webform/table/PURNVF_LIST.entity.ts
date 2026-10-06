@@ -8,7 +8,7 @@ import {
     PrimaryColumn,
 } from 'typeorm';
 import { PURNVF_FORM } from './PURNVF_FORM.entity';
-import { PTERMCODE } from '../../amec/table/PTERMCODE.entity';
+import { TermPayment } from '../../pursys/table/TERM_PAYMENT.entity';
 
 @Entity({ name: 'PURNVF_LIST', schema: 'WEBFORM' })
 export class PURNVF_LIST {
@@ -76,18 +76,17 @@ export class PURNVF_LIST {
     ACCNUMBER: string;
 
     @Column()
-    TERMCODE : string;
-    
+    TERMCODE: string;
 
-  @ManyToOne(() => PURNVF_FORM, (nvf) => nvf.LISTS)
-  @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
-  @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
-  @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
-  @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
-  @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
-  MASTER_NVFLIST: PURNVF_FORM;
+    @ManyToOne(() => PURNVF_FORM, (nvf) => nvf.LISTS)
+    @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+    @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
+    @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
+    @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+    @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+    MASTER_NVFLIST: PURNVF_FORM;
 
-  @OneToOne(() => PTERMCODE)
-  @JoinColumn({ name: 'TERMCODE', referencedColumnName: 'STERMCODE' })
-  TERM: PTERMCODE;  
+    @OneToOne(() => TermPayment)
+    @JoinColumn({ name: 'TERMCODE', referencedColumnName: 'STERMCODE' })
+    TERM: TermPayment;
 }

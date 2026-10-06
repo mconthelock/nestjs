@@ -1,5 +1,6 @@
 import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
 import { INV_HALFYEAR_RESULT } from './INV_HALFYEAR_RESULT.entity';
+import { INV_YEARLY_RESULT } from './INV_YEARLY_RESULT.entity';
 
 @Entity({ name: 'MV_IMM_ITEMMST', schema: 'SKIDCNTRL' })
 export class MV_IMM_ITEMMST {
@@ -101,6 +102,9 @@ export class MV_IMM_ITEMMST {
 
     @OneToOne(() => INV_HALFYEAR_RESULT, (r) => r.ITEM_DETAIL)
     RESULT: INV_HALFYEAR_RESULT;
+
+    @OneToOne(() => INV_YEARLY_RESULT, (r) => r.ITEM)
+    YEARLY_RESULT: INV_YEARLY_RESULT;
 }
 // Column Name	#	Type	Type Mod	Not Null	Default	Comment
 // IID	1	VARCHAR2(2)	[NULL]	true	[NULL]

@@ -28,30 +28,6 @@ export class IdtagService {
         });
     }
 
-    // async findBySchd(schd: string, schdp?: string, item?: string) {
-    //   const qb = this.m08
-    //     .createQueryBuilder('m')
-    //     .leftJoinAndSelect('m.bmdate', 'b')
-    //     .leftJoinAndSelect('m.tags', 't')
-    //     .leftJoinAndSelect('t.process', 'p')
-    //     .leftJoinAndSelect('t.orders', 'o')
-    //     .leftJoinAndSelect('t.detail', 'd');
-
-    //   if (schd) {
-    //     qb.andWhere('m.M8K01 = :schd', { schd });
-    //   }
-
-    //   if (schdp) {
-    //     qb.andWhere('m.M8K02 = :schdp', { schdp });
-    //   }
-
-    //   if (item) {
-    //     qb.andWhere('TRIM(t.F01R03) = :item', { item: item.trim() });
-    //   }
-
-    //   return qb.getMany();
-    // }
-
     async findf110kpBySchd(schd: string, p?: string) {
         const where: any = {};
         // if (schd) where.tags = {F01R02: schd};

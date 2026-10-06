@@ -133,6 +133,15 @@ export class CreateIeBgrDto {
     @IsNumber()
     REQAMT: number;
 
+    // @IsNotEmpty()
+    @IsOptional()
+    @Transform(({ value }) =>
+        typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
+    )
+    //   @Type(() => Number)
+    @IsNumber()
+    ALLOCBG: number;
+
     @IsOptional()
     @Transform(({ value }) =>
         typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,

@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { DPMS_PL_ISSUE_TYPE } from './DPMS_PL_ISSUE_TYPE.entity';
 
 @Entity({ name: 'DPMS_PL_ISSUE_REV', schema: 'WORKLOAD' })
 export class DPMS_PL_ISSUE_REV {
@@ -30,7 +31,10 @@ export class DPMS_PL_ISSUE_REV {
     NROUND: number;
 
     @Column()
-    NFILEID: number;
+    NPDFID: number;
+
+    @Column()
+    NEXCELID: number;
 
     @Column()
     VSHOPORDERNO: string;
@@ -52,4 +56,11 @@ export class DPMS_PL_ISSUE_REV {
 
     @Column()
     VISSUEBY: string;
+
+    @Column()
+    NDOCTYPE: number;
+
+    @OneToOne(() => DPMS_PL_ISSUE_TYPE, (issueType) => issueType.NID)
+    @JoinColumn({ name: 'NISSUE_TYPE', referencedColumnName: 'NID' })
+    ISSUE_TYPE: DPMS_PL_ISSUE_TYPE;
 }

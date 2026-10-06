@@ -6,7 +6,15 @@ export class S020kpController {
     constructor(private readonly s020kpService: S020kpService) {}
 
     @Get(':order')
-    find(@Param('order') order: string) {
+    findboth(@Param('order') order: string) {
         return this.s020kpService.find(order);
+    }
+
+    @Get(':order/:type')
+    find(
+        @Param('order') order: string,
+        @Param('type') type: 'from-order' | 'to-order' | 'all',
+    ) {
+        return this.s020kpService.find(order, type);
     }
 }

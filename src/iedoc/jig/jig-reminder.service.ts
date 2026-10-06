@@ -4,6 +4,8 @@ import { isEmail } from 'class-validator';
 import { DataSource } from 'typeorm';
 import { MailService } from 'src/common/services/mail/mail.service';
 import { InspectionReminderDto } from './dto/inspection-reminder.dto';
+import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
+import { AMECUSERALL } from 'src/common/Entities/amec/views/AMECUSERALL.entity';
 
 const escapeHtml = (value: unknown) => String(value ?? '').replace(/[&<>"']/g,
     char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
@@ -17,6 +19,7 @@ export class JigReminderService {
     constructor(
         @InjectDataSource('iedocConnection') private readonly db: DataSource,
         private readonly mail: MailService,
+        @InjectDataSource('webformConnection') private readonly webformDb: DataSource,
     ) {}
 
     private runDate(input?: string): string {
@@ -33,11 +36,15 @@ export class JigReminderService {
 
     private async cc(org: string, position: string): Promise<Recipient[]> {
         if (!org) return [];
-        return this.db.query(`SELECT DISTINCT TRIM(P.VEMPNO) AS SEMPNO,
-            TRIM(U.SNAME) AS SNAME, TRIM(U.SRECMAIL) AS SRECMAIL
-            FROM WEBFORM.ORGPOS P
-            LEFT JOIN AMEC.AMECUSERALL U ON TRIM(U.SEMPNO) = TRIM(P.VEMPNO)
-            WHERE TRIM(P.VORGNO) = :1 AND TRIM(P.VPOSNO) = :2`, [org, position]);
+        return this.webformDb.getRepository(ORGPOS).createQueryBuilder('P')
+            .leftJoin(AMECUSERALL, 'U', 'TRIM(U.SEMPNO) = TRIM(P.VEMPNO)')
+            .select('TRIM(P.VEMPNO)', 'SEMPNO')
+            .addSelect('TRIM(U.SNAME)', 'SNAME')
+            .addSelect('TRIM(U.SRECMAIL)', 'SRECMAIL')
+            .distinct(true)
+            .where('TRIM(P.VORGNO) = :org', { org })
+            .andWhere('TRIM(P.VPOSNO) = :position', { position })
+            .getRawMany<Recipient>();
     }
 
     async send(dto: InspectionReminderDto = {}) {

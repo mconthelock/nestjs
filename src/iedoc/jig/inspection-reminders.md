@@ -178,7 +178,7 @@ Overdue ใช้ Subject:
 
 ## การตั้งค่าและแก้ปัญหา
 
-ใช้ `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM` ของ MailService เดิม บัญชี `iedocConnection` ต้องอ่าน IEDOC.JIG_MASTER, AMEC.AMECUSERALL และ WEBFORM.ORGPOS ได้
+ใช้ `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM` ของ MailService เดิม บัญชี `iedocConnection` อ่าน IEDOC.JIG_MASTER และ AMEC.AMECUSERALL ส่วนการค้น CC ใช้ entity ORGPOS ผ่าน `webformConnection` อ่าน WEBFORM.ORGPOS และ AMEC.AMECUSERALL ตามโมดูล ORGPOS เดิม
 
 | อาการ | ตรวจสอบ |
 |---|---|

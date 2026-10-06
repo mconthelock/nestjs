@@ -1,4 +1,5 @@
 import { JigReminderService } from './jig-reminder.service';
+import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
 
 describe('JIG inspection reminders', () => {
     const row = { JIG_NO: 'J26-001', JIG_NAME: '<JIG>', PIC_EMPNO: '12345',
@@ -7,16 +8,35 @@ describe('JIG inspection reminders', () => {
     let query: jest.Mock;
     let sendMail: jest.Mock;
     let service: JigReminderService;
+    let getRepository: jest.Mock;
+    let ccLookups: string[][];
     beforeEach(() => {
         query = jest.fn(async (sql: string, binds: string[]) => sql.includes('IEDOC.JIG_MASTER') ? [row]
             : [{ SEMPNO: binds[1], SNAME: `Manager ${binds[1]}`, SRECMAIL: `manager${binds[1]}@example.com` }]);
         sendMail = jest.fn().mockResolvedValue({ rejected: [] });
-        service = new JigReminderService({ query } as any, { sendMail } as any);
+        ccLookups = [];
+        getRepository = jest.fn(() => ({ createQueryBuilder: () => {
+            let org: string;
+            let position: string;
+            const builder = {
+                leftJoin: jest.fn().mockReturnThis(), select: jest.fn().mockReturnThis(),
+                addSelect: jest.fn().mockReturnThis(), distinct: jest.fn().mockReturnThis(),
+                where: (_sql: string, params: any) => { org = params.org; return builder; },
+                andWhere: (_sql: string, params: any) => { position = params.position; return builder; },
+                getRawMany: async () => {
+                    ccLookups.push([org, position]);
+                    return [{ SEMPNO: position, SNAME: `Manager ${position}`, SRECMAIL: `manager${position}@example.com` }];
+                },
+            };
+            return builder;
+        } }));
+        service = new JigReminderService({ query } as any, { sendMail } as any, { getRepository } as any);
     });
     it('resolves CC from the controller section/department and previews without sending', async () => {
         const result = await service.send({ date: '02/10/2026', dryRun: true });
-        expect(query.mock.calls[1][1]).toEqual(['SEC001', '30']);
-        expect(query.mock.calls[2][1]).toEqual(['DEP001', '20']);
+        expect(ccLookups).toEqual([['SEC001', '30'], ['DEP001', '20']]);
+        expect(getRepository).toHaveBeenCalledWith(ORGPOS);
+        expect(query).toHaveBeenCalledTimes(1);
         expect(query.mock.calls[0][1]).toEqual(['02/10/2026', '02/10/2026', '02/10/2026']);
         expect(result.summary.preview).toBe(1);
         expect(result.items[0].html).toContain('&lt;JIG&gt;');

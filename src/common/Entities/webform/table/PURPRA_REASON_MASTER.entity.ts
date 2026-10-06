@@ -25,10 +25,10 @@ export class PURPRA_REASON_MASTER {
     VNAME: string;
 
     @Column()
-    INPUT_TYPE: string;
+    VINPUT_TYPE: string;
 
     @Column()
-    VALUE_TYPE: string;
+    VVALUE_TYPE: string;
 
     @Column()
     NACTIVE: number;

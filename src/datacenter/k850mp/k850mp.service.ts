@@ -23,4 +23,23 @@ export class K850mpService {
             throw error;
         }
     }
+
+    async findByPlannerCode(plannerCode: string) {
+        try {
+            const res = await this.repo.findByPlannerCode(plannerCode);
+            if (res.length > 0) {
+                return {
+                    status: true,
+                    message: `Data found ${res.length} records`,
+                    data: res,
+                };
+            }
+            return {
+                status: false,
+                message: 'No data found',
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
 }

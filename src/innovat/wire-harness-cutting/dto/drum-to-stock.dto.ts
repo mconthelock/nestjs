@@ -31,5 +31,20 @@ export class DrumToStockDto {
         description: 'Drum ID',
     })
     @IsNumber()
+<<<<<<< HEAD:src/innovat/wire-harness-cutting/dto/drum-to-stock.dto.ts
+<<<<<<<< HEAD:src/innovat/wire-harness-cutting/dto/drum-to-stock.dto.ts
     drumId: number;
+========
+    cut: number;
+
+    @ApiProperty({
+        example: 1,
+        description: 'Cut type (1 = First Cut, 2 = Re-Cut)',
+    })
+    @IsNumber()
+    cutType: number;
+>>>>>>>> 9119de43 (wire-harness):src/innovat/wire-harness/dto/create-drum.dto.ts
+=======
+    drumId: number;
+>>>>>>> 9119de43 (wire-harness):src/innovat/wire-harness/dto/drum-to-stock.dto.ts
 }

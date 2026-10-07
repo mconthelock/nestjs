@@ -7,7 +7,11 @@
         {
             "filePath": "src\\common\\Entities",
             "group": "Default"
+        },
+        {
+            "filePath": "d:\\project\\php\\src\\api\\src\\webform\\isform\\crdevicemst\\entities\\crdevicemst.entity.ts",
+            "group": "Default"
         }
     ],
-    "favorites.sortOrder": "FILETYPE"
+    "favorites.sortOrder": "MANUAL"
 }

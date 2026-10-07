@@ -16,6 +16,7 @@ import { InsertFlowStepService } from './insert-flow-step.service';
 import { OrgposModule } from '../orgpos/orgpos.module';
 import { OrgTreeModule } from '../org-tree/org-tree.module';
 import { FlowmstModule } from '../flowmst/flowmst.module';
+import { PerformanceLoggerProvider } from 'src/common/logger/performance-logger.provider';
 
 @Module({
     imports: [
@@ -37,6 +38,7 @@ import { FlowmstModule } from '../flowmst/flowmst.module';
         DoactionFlowService,
         DeleteFlowStepService,
         InsertFlowStepService,
+        PerformanceLoggerProvider,
     ],
     exports: [
         FlowService,

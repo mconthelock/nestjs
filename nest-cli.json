@@ -12,6 +12,10 @@
             {
                 "include": "common/json/*",
                 "outDir": "dist/src"
+            },
+            {
+                "include": "workload/country_origin/**/*",
+                "outDir": "dist/src"
             }
         ],
         "watchAssets": true

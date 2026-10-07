@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
-@Entity('PIS_PAGES')
+@Entity({ name: 'PIS_PAGES', schema: 'WORKLOAD' })
 export class PisPages {
     @PrimaryColumn()
     FILES_ID: number;

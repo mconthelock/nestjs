@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource } from 'typeorm';
+import { DataSource, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { CreateDpmsPlIssueRevDto } from './dto/create-dpms_pl_issue_rev.dto';
 import { DPMS_PL_ISSUE_REV } from 'src/common/Entities/workload/table/DPMS_PL_ISSUE_REV.entity';
@@ -33,6 +33,26 @@ export class DpmsPlIssueRevRepository extends BaseRepository {
             order: {
                 NREV: 'DESC',
                 NROUND: 'DESC',
+            },
+        });
+    }
+
+    findLatestRevisionWithoutType(condition: dpmsPlIssueRevFindLatestRevision, withOutType: number) {
+        return this.getRepository(DPMS_PL_ISSUE_REV).findOne({
+            where: { ...condition, NISSUE_TYPE: Not(withOutType) },
+            order: {
+                NREV: 'DESC',
+                NROUND: 'DESC',
+            },
+        });
+    }
+
+    findByRevId(revId: number) {
+        return this.getRepository(DPMS_PL_ISSUE_REV).find({
+            where: { NID: revId },
+            relations: ['ISSUE_TYPE'],
+            order: {
+                NROUND: 'ASC',
             },
         });
     }

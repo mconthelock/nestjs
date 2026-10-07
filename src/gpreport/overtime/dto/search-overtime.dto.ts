@@ -1,5 +1,50 @@
+import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
-import { UpdateOvertimeDto } from './update-overtime.dto';
+import { IsDate, IsOptional, ValidateNested } from 'class-validator';
 
+import { CreateOvertimeDto } from './create-overtime.dto';
+import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
+import { searchDto } from 'src/amec/users/dto/search-user.dto';
 
-export class SearchOvertimeDto extends PartialType(UpdateOvertimeDto) {}
+export class FormDto extends PartialType(CreateFormDto) {
+    @Type(() => Date)
+    @IsOptional()
+    @IsDate()
+    START_DREQDATE?: Date;
+
+    @Type(() => Date)
+    @IsOptional()
+    @IsDate()
+    END_DREQDATE?: Date;
+}
+
+export class UsersDto extends PartialType(searchDto) {}
+
+export class OTFormDto extends PartialType(CreateOvertimeDto) {
+    @Type(() => Date)
+    @IsOptional()
+    @IsDate()
+    START_WORKDATE?: Date;
+
+    @Type(() => Date)
+    @IsOptional()
+    @IsDate()
+    END_WORKDATE?: Date;
+}
+
+export class SearchOvertimeDto {
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => OTFormDto)
+    otform?: OTFormDto;
+
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => FormDto)
+    form?: FormDto;
+
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => UsersDto)
+    user?: UsersDto;
+}

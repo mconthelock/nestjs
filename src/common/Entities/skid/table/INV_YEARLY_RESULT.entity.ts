@@ -8,8 +8,9 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PSYIC_FORM } from '../../webform/table/PSYIC_FORM.entity';
-import { MV_IMM_ITEMMST } from './MV_IMM_ITEMMST.entity';
 import { INV_YEARLY_ASSIGN } from './INV_YEARLY_ASSIGN.entity';
+import { IMM_ITEMMST } from '../views/IMM_ITEMMST.entity';
+import { MV_IMM_ITEMMST } from './MV_IMM_ITEMMST.entity';
 
 @Entity({ name: 'INV_YEARLY_RESULT', schema: 'SKIDCNTRL' })
 export class INV_YEARLY_RESULT {

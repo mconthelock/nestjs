@@ -21,7 +21,7 @@ export class FLOW {
     @PrimaryColumn()
     CSTEPNO: string;
 
-    @Column()
+    @PrimaryColumn()
     CSTEPNEXTNO: string;
 
     @Column()
@@ -36,10 +36,10 @@ export class FLOW {
     @Column()
     VPOSNO: string;
 
-    @Column()
+    @PrimaryColumn()
     VAPVNO: string;
 
-    @Column()
+    @PrimaryColumn()
     VREPNO: string;
 
     @Column()

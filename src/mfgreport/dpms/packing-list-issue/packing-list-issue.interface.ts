@@ -54,6 +54,7 @@ export interface generateFilenameParams {
     issueType: string;
     orders: string;
     projectName: string;
+    PO: boolean;
 }
 
 export interface syncDocRevisionAndPlIssueParams {
@@ -62,6 +63,11 @@ export interface syncDocRevisionAndPlIssueParams {
     revise: boolean;
     typeCode: string;
     recreatedIssue: boolean;
+}
+
+export interface IdocRevData extends DPMS_PL_ISSUE_PK {
+    NREV?: number;
+    DFINISHALL?: Date;
 }
 
 export interface saveDocRevisionParams {

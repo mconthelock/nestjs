@@ -7,6 +7,10 @@ export class searchDpmsPackingListDto {
 
     @IsOptional()
     @IsString()
+    AGENT?: string;
+
+    @IsOptional()
+    @IsString()
     PROD?: string;
 
     @IsOptional()

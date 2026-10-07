@@ -169,13 +169,13 @@ export class TwidocService {
 
         try {
             const templatePath = path.join(
-                `${process.env.GP_FILE_PATH}/Template/`,
+                `${process.env.TAX_FILE_PATH}/Template/`,
                 'Withholding Tax Certificate.pdf',
             );
 
             let dir = libs.find((e) => e.id == data.EMPPOSITION).path;
             if (!dir) dir = 'Non-Manager';
-            this.output_path = `${process.env.GP_FILE_PATH}/${dir}/Withholding Tax Certificate (50 ทวิ)/${data.TWIYEAR}/`;
+            this.output_path = `${process.env.TAX_FILE_PATH}/${dir}/Withholding Tax Certificate (50 ทวิ)/${data.TWIYEAR}/`;
             const fontPath = path.join(
                 process.cwd(),
                 'public/fonts/THSarabun.ttf',

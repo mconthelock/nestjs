@@ -25,4 +25,7 @@ export class DPMS_PL_DOC_REV {
 
     @Column()
     DFINISHALL: Date;
+
+    @Column()
+    NPOID: number;
 }

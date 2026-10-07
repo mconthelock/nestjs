@@ -269,7 +269,7 @@ export class IeBgrService {
                 EFFT: dto.EFFT,
                 SCHEDULE: dto.SCHEDULE,
                 REMARK: dto.REMARK,
-                PPRESDATE: dto.PREDATE,
+                PPRESDATE: dto.PREDATE || null,
                 GPBID: dto.GPBID || null,
                 CASETYPE: dto.CASETYPE,
                 AVALIABLE_BALANCE: avaliableBalance,

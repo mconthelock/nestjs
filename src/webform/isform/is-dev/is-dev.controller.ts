@@ -3,11 +3,17 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { IsDevService } from './is-dev.service';
 import { CreateDeveloperDto } from './dto/create-developer.dto';
 import { UpdateDeveloperDto } from './dto/update-developer';
+import { SearchIsDevDto } from './dto/search-is-dev.dto';
 
 @ApiTags('IS-DEV')
 @Controller('form/is/is-dev')
 export class IsDevController {
     constructor(private readonly dev: IsDevService) {}
+
+    @Post('search')
+    search(@Body() dto: SearchIsDevDto) {
+        return this.dev.search(dto);
+    }
 
     @Post('assignment/add')
     async addDeveloper(@Body() dto: CreateDeveloperDto) {
@@ -38,4 +44,30 @@ export class IsDevController {
     //   findById(@Param('year') year: string, @Param('id') id: number) {
     //     return this.dev.findById(year, id);
     //   }
+
+    //ISDEV_OBJECTIVE
+    @Get('objective/all')
+    @ApiOperation({
+        summary: 'Get all Objective',
+        description: 'Get all IS-DEV Objective',
+    })
+    findAllObjective() {
+        return this.dev.findAllObjective();
+    }
+
+    //ISDEV_OBJECTIVE
+    @Get('device/all')
+    @ApiOperation({
+        summary: 'Get all IS Device list',
+        description: 'Get all IS-DEV Device list',
+    })
+    findAllDevice() {
+        return this.dev.findAllDeviceMst();
+    }
+
+    //LABORCOST
+    @Get('laborcost/all')
+    findAllLaborcost() {
+        return this.dev.findAllLaborcost();
+    }
 }

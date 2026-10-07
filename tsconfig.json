@@ -20,5 +20,15 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true
-  }
+  },
+
+  "watchOptions": {
+    "watchFile": "fixedPollingInterval"
+  },
+
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+
 }

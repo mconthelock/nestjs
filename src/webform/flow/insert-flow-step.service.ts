@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 import { FlowService } from './flow.service';
 import { FormDto } from '../form/dto/form.dto';
 import { FlowRepository } from './flow.repository';
@@ -15,6 +17,7 @@ import { insertFlowDto } from './dto/insert-flow-step.dto';
 @Injectable()
 export class InsertFlowStepService extends FlowService {
     constructor(
+        @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
         protected readonly repService: RepService,
         protected readonly repo: FlowRepository,
         private readonly flowmstService: FlowmstService,
@@ -26,7 +29,7 @@ export class InsertFlowStepService extends FlowService {
         super(repService, repo);
     }
 
-     // ----- type = 1
+    // ----- type = 1
     // "CTYPE": "1",
     // "BEFORESTEPNO": "04",
     // "NEWSTEPNO": "90",
@@ -72,6 +75,10 @@ export class InsertFlowStepService extends FlowService {
             // 2. ตรวจสอบว่า step แรกมีอยู่จริงหรือไม่
             const startStep = flows.find((f: FLOW) => f.CSTART === '1');
             if (!startStep) {
+                this.logger.warn('Start step not found in flow', {
+                    context: 'InsertFlowStepService',
+                    logType: 'business'
+                });
                 throw new Error('Start step not found in flow');
             }
             // 2.1 หาตำแหน่งและแผนกของ step แรก
@@ -84,7 +91,12 @@ export class InsertFlowStepService extends FlowService {
                 (f: FLOW) => f.CSTEPNO === BEFORESTEPNO,
             );
             if (!beforeStep) {
-                throw new Error('Before step not found in flow master');
+                this.logger.info(`Before step ${BEFORESTEPNO} not found in flow`, {
+                    context: 'InsertFlowStepService',
+                    logType: 'business'
+                });
+                return;
+                // throw new Error('Before step not found in flow');
             }
             const CSTEPNEXTNO = beforeStep.CSTEPNEXTNO;
 
@@ -176,7 +188,7 @@ export class InsertFlowStepService extends FlowService {
                 status: true,
                 message: 'Insert flow step success',
                 flow: await this.getFlowTree(form),
-            }
+            };
         } catch (error) {
             throw new Error('Set Flow Step Error: ' + error.message);
         }
@@ -242,7 +254,7 @@ export class InsertFlowStepService extends FlowService {
             empPosition,
         );
 
-        if (orgTree) {
+        if (orgTree && orgTree.length > 0) {
             for (const row of orgTree) {
                 const flow = await this.setFlow(form, {
                     ...data,

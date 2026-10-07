@@ -12,6 +12,16 @@ import { StyItemsModule } from './sty-items/sty-items.module';
 import { StyPatrolInspectionModule } from './sty-patrol-inspection/sty-patrol-inspection.module';
 import { StinpFormModule } from './stinp-form/stinp-form.module';
 import { StinpFormListModule } from './stinp-form-list/stinp-form-list.module';
+import { UniformModule } from './uniform/uniform.module';
+import { LeaveModule } from './leave/leave.module';
+import { AttendanceModule } from './attendance/attendance.module';
+import { MedicalModule } from './medical/medical.module';
+import { TaxModule } from './tax/tax.module';
+import { LoanModule } from './loan/loan.module';
+import { EmployeeModule } from './employee/employee.module';
+import { ExpatModule } from './expat/expat.module';
+import { DiligentModule } from './diligent/diligent.module';
+import { ReportPermissionModule } from './report-permission/report-permission.module';
 
 @Module({
     imports: [
@@ -28,6 +38,17 @@ import { StinpFormListModule } from './stinp-form-list/stinp-form-list.module';
         StyPatrolInspectionModule,
         StinpFormModule,
         StinpFormListModule,
+        ExpatModule,
+        UniformModule,
+        LeaveModule,
+        AttendanceModule,
+        MedicalModule,
+        TaxModule,
+        LoanModule,
+        EmployeeModule,
+        ExpatModule,
+        DiligentModule,
+        ReportPermissionModule
     ],
 })
 export class gpreportModule {}

@@ -5,34 +5,34 @@ import { DataSource } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 
-import { piline_bending_att } from 'src/common/Entities/workload/table/PILINE_BENDING_ATT.entity';
+import { piline_bending_att } from 'src/common/Entities/workload/table/piline_bending_att.entity';
 
 @Injectable()
 export class PilineBendingAttRepository extends BaseRepository {
-  constructor(
-    @InjectDataSource('workloadConnection')
-    ds: DataSource,
-  ) {
-    super(ds);
-  }
+    constructor(
+        @InjectDataSource('workloadConnection')
+        ds: DataSource,
+    ) {
+        super(ds);
+    }
 
-  findAll() {
-    return this.manager.find(piline_bending_att);
-  }
+    findAll() {
+        return this.manager.find(piline_bending_att);
+    }
 
-  findOne(idtag: string) {
-    return this.getRepository(piline_bending_att,).findBy({ IDTAG: idtag, });
-  }
+    findOne(idtag: string) {
+        return this.getRepository(piline_bending_att).findBy({ IDTAG: idtag });
+    }
 
-  async search(dto: FiltersDto) {
-    const qb = this.manager.createQueryBuilder(piline_bending_att, 'A',);
-    this.applyFilters(qb, 'A', dto, ['IDTAG', 'ID', 'FILE_NAME',]);
-    return qb.getMany();
-  }
+    async search(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(piline_bending_att, 'A');
+        this.applyFilters(qb, 'A', dto, ['IDTAG', 'ID', 'FILE_NAME']);
+        return qb.getMany();
+    }
 
-  create(data: piline_bending_att) {
-    const repository = this.getRepository(piline_bending_att);
-    const entity = repository.create(data);
-    return repository.save(entity);
-  }
+    create(data: piline_bending_att) {
+        const repository = this.getRepository(piline_bending_att);
+        const entity = repository.create(data);
+        return repository.save(entity);
+    }
 }

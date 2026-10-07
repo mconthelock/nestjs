@@ -5,64 +5,64 @@ import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { TypeOrmWinstonLogger } from '../logger/typeorm-winston.logger';
 
-
 dotenv.config();
 let webformConfig: TypeOrmModuleAsyncOptions;
 if (process.env.HOST == 'AMEC') {
-  webformConfig = {
-    name: 'webformConnection',
-    imports: [],
-    inject: [ConfigService, WINSTON_MODULE_PROVIDER],
-    useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
-      // inject: [ConfigService],
-      // useFactory: async (config: ConfigService) => ({
-      type: 'oracle',
-      username: process.env.WEBFORM_USER,
-      password: process.env.WEBFORM_PASSWORD,
-      schema: process.env.WEBFORM_SCHEMA,
-      //connectString: `${process.env.WEBFORM_HOST}:${process.env.WEBFORM_PORT}/${process.env.WEBFORM_SERVICE}?expire_time=5`,
-      connectString: `(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=${process.env.WEBFORM_HOST})(PORT=${process.env.WEBFORM_PORT}))(CONNECT_DATA=(SID=${process.env.WEBFORM_SERVICE})))`,
-      entities: [
-        __dirname + '/../../**/**/*.entity{.ts,.js}',
-        __dirname + '/../../**/**/**/*.entity{.ts,.js}',
-        __dirname + '/../Entities/webform/**/*.entity{.ts,.js}',
-      ],
-      synchronize: false,
-      logger: new TypeOrmWinstonLogger(winstonLogger),
-      retryAttempts: 5,
-      retryDelay: 2000,
-      extra: {
-        keepAlive: true,
-        poolMax: +process.env.DB_POOL_MAX || 10,
-        poolMin: +process.env.DB_POOL_MIN || 1,
-        queueTimeout: 60000,
-        queueMax: 1000,
-        enableTCPSKeepAlive: true,
-        poolIncrement: 1,
-        poolTimeout: 300,
-        poolPingInterval: 60,
-        stmtCacheSize: 50,
-      },
-    }),
-  };
+    webformConfig = {
+        name: 'webformConnection',
+        imports: [],
+        inject: [ConfigService, WINSTON_MODULE_PROVIDER],
+        useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
+            // inject: [ConfigService],
+            // useFactory: async (config: ConfigService) => ({
+            type: 'oracle',
+            username: process.env.WEBFORM_USER,
+            password: process.env.WEBFORM_PASSWORD,
+            schema: process.env.WEBFORM_SCHEMA,
+            //connectString: `${process.env.WEBFORM_HOST}:${process.env.WEBFORM_PORT}/${process.env.WEBFORM_SERVICE}?expire_time=5`,
+            connectString: `(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=${process.env.WEBFORM_HOST})(PORT=${process.env.WEBFORM_PORT}))(CONNECT_DATA=(SID=${process.env.WEBFORM_SERVICE})))`,
+            entities: [
+                __dirname + '/../../**/**/*.entity{.ts,.js}',
+                __dirname + '/../../**/**/**/*.entity{.ts,.js}',
+                __dirname + '/../Entities/webform/**/*.entity{.ts,.js}',
+            ],
+            synchronize: false,
+            logger: new TypeOrmWinstonLogger(winstonLogger),
+            retryAttempts: 5,
+            retryDelay: 2000,
+            extra: {
+                keepAlive: true,
+                poolMax: +process.env.DB_POOL_MAX || 10,
+                poolMin: +process.env.DB_POOL_MIN || 1,
+                queueTimeout: 60000,
+                queueMax: 1000,
+                enableTCPSKeepAlive: true,
+                poolIncrement: 1,
+                poolTimeout: 300,
+                poolPingInterval: 60,
+                stmtCacheSize: 50,
+            },
+        }),
+    };
 } else {
-  webformConfig = {
-    name: 'webformConnection',
-    imports: [],
-    inject: [ConfigService],
-    useFactory: async (config: ConfigService) => ({
-      type: 'mysql',
-      host: process.env.HOME_HOST,
-      port: parseInt(process.env.HOME_PORT as string, 10),
-      username: process.env.HOME_USER,
-      password: process.env.HOME_PASSWORD,
-      database: process.env.WEBFORM_DATABASE,
-      entities: [
-        __dirname + '/../../**/**/*.entity{.ts,.js}',
-        __dirname + '/../../**/**/**/*.entity{.ts,.js}',
-      ],
-      synchronize: false,
-    }),
-  };
+    webformConfig = {
+        name: 'webformConnection',
+        imports: [],
+        inject: [ConfigService, WINSTON_MODULE_PROVIDER],
+        useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
+            type: 'mysql',
+            host: process.env.HOME_HOST,
+            port: parseInt(process.env.HOME_PORT as string, 10),
+            username: process.env.HOME_USER,
+            password: process.env.HOME_PASSWORD,
+            database: process.env.WEBFORM_DATABASE,
+            entities: [
+                __dirname + '/../../**/**/*.entity{.ts,.js}',
+                __dirname + '/../../**/**/**/*.entity{.ts,.js}',
+            ],
+            synchronize: false,
+            logger: new TypeOrmWinstonLogger(winstonLogger),
+        }),
+    };
 }
 export default webformConfig;

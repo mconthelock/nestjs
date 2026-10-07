@@ -8,6 +8,7 @@ import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 import { PisFiles } from 'src/common/Entities/workload/table/pis-files.entity';
 import { PisPages } from 'src/common/Entities/workload/table/pis-pages.entity';
 import { PisLabel } from 'src/common/Entities/workload/views/pis-label.entity';
+import { M008KP } from 'src/common/Entities/datacenter/table/M008KP.entity';
 
 import { SearchPisFilesDto } from './dto/search-pis-file.dto';
 import { CreatePisPagesDto } from './dto/create-pis-pages.dto';
@@ -17,9 +18,7 @@ import { UpadatePisPagesDto } from './dto/update-pis-pages.dto';
 
 @Injectable()
 export class PisRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('workloadConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
         super(ds);
     }
 
@@ -96,5 +95,15 @@ export class PisRepository extends BaseRepository {
 
     async deletePages(pagesId: number) {
         return this.manager.delete(PisPages, { PAGE_ID: pagesId });
+    }
+
+    async Special(id: number) {
+        return await this.manager.query(`
+            select *
+            from M008KP M
+            left join PIS_PAGES P ON P.PAGE_MFGNO = M.M8K03
+            left join PIS_FILES F ON F.FILES = P.FILES_ID
+            where m8k01 = '2026104' and m8k02 = 'P1' and FILES = ${id}
+        `);
     }
 }

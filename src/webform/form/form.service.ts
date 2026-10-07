@@ -15,6 +15,7 @@ import { formDetailQb } from 'src/common/utils/qb-form-detail';
 import { FormRepository } from './form.repository';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
+import { FormCounter } from 'src/common/Entities/webform/table/FORM_COUNTER.entity';
 
 // interface FormContext {
 //     ip: string;
@@ -44,6 +45,9 @@ export class FormService {
 
         @InjectRepository(FLOW, 'webformConnection')
         protected readonly flow: Repository<FLOW>,
+
+        @InjectRepository(FormCounter, 'webformConnection')
+        protected readonly count: Repository<FormCounter>,
 
         protected readonly formmstService: FormmstService,
         protected readonly flowService: FlowService,
@@ -149,61 +153,125 @@ export class FormService {
         return { count, minDate: minDateResult?.minDate };
     }
 
-    waitforapprove(empno) {
-        return this.flow
-            .createQueryBuilder('flow')
-            .leftJoinAndSelect('flow.form', 'form')
-            .leftJoinAndSelect('form.formmst', 'formmst')
-            .leftJoinAndSelect('form.flow', 'form_flow') // relation ใน entity ต้องตั้งชื่อถูก
-            .where(
-                '(flow.CSTEPST = :step AND flow.VAPVNO = :empno) OR (flow.CSTEPST = :step AND flow.VREPNO = :empno)',
-                { step: '3', empno },
-            )
-            .andWhere('flow.CSTEPNO = form_flow.CSTEPNEXTNO')
-            .getMany();
+    async counter(empno: string) {
+        const result = await this.count.findOne({
+            where: { EMPNO: empno },
+        });
+        return result;
     }
 
+    //Get Form List
     underprepare(empno) {
         return this.flow
             .createQueryBuilder('flow')
-            .leftJoinAndSelect('flow.form', 'form')
-            .leftJoinAndSelect('form.formmst', 'formmst')
-            .leftJoinAndSelect('form.flow', 'form_flow') // relation ใน entity ต้องตั้งชื่อถูก
+            .innerJoinAndSelect('flow.form', 'form')
+            .innerJoinAndSelect('form.formmst', 'formmst')
+            .innerJoinAndSelect('form.flow', 'form_flow')
             .where(
-                '(flow.CSTEPST = :step AND flow.VAPVNO = :empno) OR (flow.CSTEPST = :step AND flow.VREPNO = :empno)',
-                { step: '3', empno },
+                'form.CST = :cst and form.VREQNO = :empno and flow.VAPVNO = :empno',
+                {
+                    empno,
+                    cst: '0',
+                },
             )
-            .andWhere('flow.CSTEPNO = form_flow.CSTEPNEXTNO')
+            .getMany();
+    }
+
+    waitforapprove(empno) {
+        return (
+            this.flow
+                .createQueryBuilder('flow')
+                .innerJoinAndSelect('flow.form', 'form')
+                .innerJoinAndSelect('form.formmst', 'formmst')
+                .innerJoinAndSelect('form.flow', 'form_flow')
+                .where(
+                    'flow.CSTEPST = :step AND (flow.VAPVNO = :empno OR flow.VREPNO = :empno)  AND form.CST = :cst',
+                    { step: '3', empno, cst: '1' },
+                )
+                //.andWhere('flow.CSTEPNO = form_flow.CSTEPNEXTNO')
+                .getMany()
+        );
+    }
+
+    comming(empno) {
+        return this.flow
+            .createQueryBuilder('flow')
+            .innerJoinAndSelect('flow.form', 'form')
+            .innerJoinAndSelect('form.formmst', 'formmst')
+            .innerJoinAndSelect('form.flow', 'form_flow')
+            .where(
+                '((flow.CSTEPST = :step AND flow.VAPVNO = :empno) OR (flow.CSTEPST = :step AND flow.VREPNO = :empno)) AND form.CST > :cst',
+                { step: '2', empno, cst: '0' },
+            )
             .getMany();
     }
 
     mine(empno) {
         return this.flow
             .createQueryBuilder('flow')
-            .leftJoinAndSelect('flow.form', 'form')
-            .leftJoinAndSelect('form.formmst', 'formmst')
-            .leftJoinAndSelect('form.flow', 'form_flow') // relation ใน entity ต้องตั้งชื่อถูก
+            .innerJoinAndSelect('flow.form', 'form')
+            .innerJoinAndSelect('form.formmst', 'formmst')
+            .innerJoinAndSelect('form.flow', 'form_flow') // relation ใน entity ต้องตั้งชื่อถูก
             .where(
-                '(flow.CSTEPST = :step AND flow.VAPVNO = :empno) OR (flow.CSTEPST = :step AND flow.VREPNO = :empno)',
-                { step: '3', empno },
+                'form.CST = :cst and form.VREQNO = :empno and flow.VAPVNO = :empno and ((flow.CSTEPST > :step AND flow.VAPVNO = :empno) OR (flow.CSTEPST > :step AND flow.VREPNO = :empno))',
+                {
+                    empno,
+                    cst: '1',
+                    step: '3',
+                },
             )
-            .andWhere('flow.CSTEPNO = form_flow.CSTEPNEXTNO')
             .getMany();
     }
 
-    finish(empno, year) {
-        return this.flow
-            .createQueryBuilder('flow')
-            .leftJoinAndSelect('flow.form', 'form')
-            .leftJoinAndSelect('form.formmst', 'formmst')
-            .leftJoinAndSelect('form.flow', 'form_flow') // relation ใน entity ต้องตั้งชื่อถูก
-            .where(
-                '(flow.CSTEPST = :step AND flow.VAPVNO = :empno) OR (flow.CSTEPST = :step AND flow.VREPNO = :empno)',
-                { step: '3', empno },
-            )
-            .andWhere('flow.CSTEPNO = form_flow.CSTEPNEXTNO')
-            .getMany();
+    approved(empno) {
+        return (
+            this.flow
+                .createQueryBuilder('flow')
+                .innerJoinAndSelect('flow.form', 'form')
+                .innerJoinAndSelect('form.formmst', 'formmst')
+                .innerJoinAndSelect('form.flow', 'form_flow')
+                .where(
+                    '((flow.CSTEPST > :step AND flow.VAPVNO = :empno) OR (flow.CSTEPST > :step AND flow.VREPNO = :empno)) AND form.CST = :cst',
+                    { step: '4', empno, cst: '1' },
+                )
+                //.andWhere('flow.CSTEPNO = form_flow.CSTEPNEXTNO')
+                .getMany()
+        );
     }
+
+    represent(empno) {
+        return (
+            this.flow
+                .createQueryBuilder('flow')
+                .innerJoinAndSelect('flow.form', 'form')
+                .innerJoinAndSelect('form.formmst', 'formmst')
+                .innerJoinAndSelect('form.flow', 'form_flow')
+                .where(
+                    'flow.VAPVNO = :empno and flow.VAPVNO != flow.VREPNO and flow.VREALAPV != :empno and form.CST = :cst and flow.CSTEPST > :step',
+                    { empno, cst: '1', step: '3' },
+                )
+                //.andWhere('flow.CSTEPNO = form_flow.CSTEPNEXTNO')
+                .getMany()
+        );
+    }
+
+    finish(empno) {
+        return (
+            this.flow
+                .createQueryBuilder('flow')
+                .innerJoinAndSelect('flow.form', 'form')
+                .innerJoinAndSelect('form.formmst', 'formmst')
+                .innerJoinAndSelect('form.flow', 'form_flow') // relation ใน entity ต้องตั้งชื่อถูก
+                .where('form.CST = :cst and form.VREQNO = :empno', {
+                    cst: '2',
+                    empno,
+                })
+                //.andWhere('flow.CSTEPNO = form_flow.CSTEPNEXTNO')
+                .getMany()
+        );
+    }
+
+    //End Get Form List
 
     async getFormno(dto: FormDto): Promise<string> {
         const form = await this.formmstService.getFormmst({

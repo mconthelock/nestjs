@@ -4,10 +4,13 @@ import { DPMS_PACKING_LIST_MAIN } from './DPMS_PACKING_LIST_MAIN.entity';
 @Entity({ name: 'DPMS_PACKING_LIST_DETAIL_PO', schema: 'WORKLOAD' })
 export class DPMS_PACKING_LIST_DETAIL_PO {
     @PrimaryColumn()
-    RUNNO: number;
+    NPOSEQ: number;
     
     @Column()
     VMFGNO: string;
+
+    @Column()
+    VORDER_PACK: string;
 
     @Column()
     VCASE: string;
@@ -20,6 +23,9 @@ export class DPMS_PACKING_LIST_DETAIL_PO {
 
     @Column()
     VDRAWING: string;
+
+    @Column()
+    VDRAWING_PACKING: string;
 
     @Column()
     NQTY: string;

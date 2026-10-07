@@ -11,21 +11,38 @@ import { R027mp1Module } from './rtnlibf/r027mp1/r027mp1.module';
 import { S026kpModule } from './rtnlibf/s026kp/s026kp.module';
 import { S030kpModule } from './rtnlibf/s030kp/s030kp.module';
 import { S001kpModule } from './rtnlibf/s001kp/s001kp.module';
+import { M001kpModule } from './rtnlibf/m001kp/m001kp.module';
+import { M002kpModule } from './rtnlibf/m002kp/m002kp.module';
+import { J736kpModule } from './rtnlibf/j736kp/j736kp.module';
+import { HpoModule } from './bpcsfvnew/hpo/hpo.module';
+import { R027Mp1Module } from './datalibo/r027mp1/r027mp1.module';
+import { T002kpModule } from './rtnlibf/t002kp/t002kp.module';
+import { BpcsfvnewModule } from './bpcsfvnew/bpcsfvnew.module';
+import { rtnlibfModule } from './rtnlibf/rtnlibf.module';
+
 
 @Module({
-  imports: [
-    ConectionModule,
-    R027mp1Module,
-    S026kpModule,
-    S030kpModule,
-    S001kpModule,
-    // F001kpModule,
-    // F002kpModule,
-    // F003kpModule,
-    // Q90010p2Module,
-    // M008kpModule,
-    // Q141kpModule,
-    // T016kpModule,
-  ],
+    imports: [
+        ConectionModule,
+        R027mp1Module,
+        S026kpModule,
+        S030kpModule,
+        S001kpModule,
+        M001kpModule,
+        M002kpModule,
+        J736kpModule,
+        HpoModule,
+        R027Mp1Module,
+        T002kpModule,
+        BpcsfvnewModule,
+        rtnlibfModule,
+        // F001kpModule,
+        // F002kpModule,
+        // F003kpModule,
+        // Q90010p2Module,
+        // M008kpModule,
+        // Q141kpModule,
+        // T016kpModule,
+    ],
 })
 export class AS400Module {}

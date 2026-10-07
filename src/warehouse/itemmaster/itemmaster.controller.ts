@@ -1,8 +1,9 @@
-import { Controller, Body, Post } from '@nestjs/common';
+import { Controller, Body, Post, Get } from '@nestjs/common';
 import { ItemmasterService } from './itemmaster.service';
 import { CreateItemmasterDto } from './dto/create-itemmaster.dto';
 import { UpdateItemmasterDto } from './dto/update-itemmaster.dto';
 import { SearchItemmasterDto } from './dto/search-itemmaster.dto';
+import { PartShortageDto } from './dto/part-shortage.dto';
 
 @Controller('warehouse/itemmaster')
 export class ItemmasterController {
@@ -11,5 +12,15 @@ export class ItemmasterController {
     @Post('findall')
     create(@Body() dto: SearchItemmasterDto) {
         return this.itm.findAll(dto);
+    }
+
+    @Post('add-hide-shortage')
+    hideShortage(@Body() dto: PartShortageDto) {
+        return this.itm.hideShortage(dto);
+    }
+
+    @Get('get-hide-shortage')
+    getHideShortage() {
+        return this.itm.getHideShortage();
     }
 }

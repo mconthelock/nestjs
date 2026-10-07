@@ -127,22 +127,23 @@ export class DrawingFileHelper {
             throw new Error(`ไม่พบ Active Sheet ในไฟล์ ${file.name}`);
         }
 
-        const A18 = worksheet.getCell('A18').text.trim().toLowerCase();
-        const G18 = worksheet.getCell('G18').text.trim().toLowerCase();
-        const G8  = worksheet.getCell('G8').text.trim().toLowerCase();
-        const G13 = worksheet.getCell('G13').text.trim().toLowerCase();
-        const isFeederTemplate = A18 === 'no.' && G18 === 'mc no.' && G8 === 'x' && G13 === 'c';
+        const A18 = worksheet.getCell('A18').text.trim().toLowerCase().replace(/\s+/g, '');
+        const G18 = worksheet.getCell('G18').text.trim().toLowerCase().replace(/\s+/g, '');
+        const G8  = worksheet.getCell('G8').text.trim().toLowerCase().replace(/\s+/g, '');
+        const G13 = worksheet.getCell('G13').text.trim().toLowerCase().replace(/\s+/g, '');
+        const I7  = worksheet.getCell('I7').text.trim().toLowerCase().replace(/\s+/g, '');
+        const isFeederTemplate = (A18 === 'no.') && (G18 === 'mcno.') && (G8 === 'x') && (G13 === 'c') && ((I7 === 'inpsectionpoint') || (I7 === 'inspectionpoint'));
         if (!isFeederTemplate) {
             throw new Error(`ไฟล์ ${file.name} ไม่ใช่ Template Checksheet Feeder`);
         }
 
         let revision = worksheet.getCell('E3').text.trim();
-        if (revision === '*') {
-            revision = '0';
+        if (!/^(\*|[A-Z]{1,2})$/.test(revision)) {
+            throw new Error(`Revision "${revision}" ไม่ถูกต้องในไฟล์ ${file.name} (อนุญาตเฉพาะ *, A-Z, AA-ZZ)`);
         }
 
-        if (!revision) {
-            throw new Error(`ไม่พบข้อมูล Revision ในเซลล์ E3 ของไฟล์ ${file.name}`);
+        if (revision === '*') {
+            revision = '0';
         }
 
         return revision;

@@ -16,11 +16,13 @@ import { PSCIH_FORM } from 'src/common/Entities/webform/table/PSCIH_FORM.entity'
 import { PSYIC_FORM } from 'src/common/Entities/webform/table/PSYIC_FORM.entity';
 import { INV_YEARLY_RESULT } from 'src/common/Entities/skid/table/INV_YEARLY_RESULT.entity';
 import { INV_YEARLY_ASSIGN } from 'src/common/Entities/skid/table/INV_YEARLY_ASSIGN.entity';
+import { ConectionService } from 'src/as400/conection/conection.service';
 
 @Injectable()
 export class CheckinventoryRepository extends BaseRepository {
     constructor(
         @InjectDataSource('webformConnection') private readonly ds: DataSource,
+        private as400: ConectionService,
     ) {
         super(ds);
     }
@@ -78,9 +80,11 @@ export class CheckinventoryRepository extends BaseRepository {
     }
 
     async getYearlyAssign() {
-        return this.getRepository(INV_YEARLY_ASSIGN).find({
-            relations: ['RESULT', 'USER'],
-        });
+        return this.getRepository(INV_YEARLY_ASSIGN)
+            .createQueryBuilder('a')
+            .leftJoinAndSelect('a.RESULT', 'r')
+            .leftJoinAndSelect('a.USER', 'u')
+            .getMany();
     }
 
     async createYearlyReport(
@@ -109,7 +113,9 @@ export class CheckinventoryRepository extends BaseRepository {
                     iyaId: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
                 },
             );
-            return result.outBinds.iyaId as number;
+            const iyaId = result.outBinds.iyaId as number;
+            await this.insertTagAs400(iyaId);
+            return iyaId;
         } finally {
             await runner.release();
         }
@@ -215,6 +221,8 @@ export class CheckinventoryRepository extends BaseRepository {
 
     async insertYearlyForm(dto: CreateYearlyFormDto) {
         console.log('insertYearlyForm dto:', dto);
+
+        await this.insertActualAs400(dto.ID);
         await this.getRepository(PSYIC_FORM).insert({ ...dto, IYA_ID: dto.ID });
     }
 
@@ -240,5 +248,95 @@ export class CheckinventoryRepository extends BaseRepository {
         return this.getRepository(PSYIC_FORM).findOne({
             where: { IYA_ID: reportID },
         });
+    }
+
+    async insertTagAs400(reportID: number) {
+        const dataResult = await this.getYearlyResult(reportID);
+        const chunkSize = 1000;
+
+        const tagDataBulk = dataResult
+            .filter((item) => item.TYPE === '1')
+            .map((item) => [item.ITEM_CODE, item.TAG_NO]);
+
+        const tagDataStock = dataResult
+            .filter((item) => item.TYPE === 'A')
+            .map((item) => [item.ITEM_CODE, item.TAG_NO]);
+
+        await this.as400.runQuery(`DELETE FROM RTNLIBF.SONINV`);
+        await this.as400.runQuery(`DELETE FROM RTNLIBF.D40030P2`);
+
+        await this.bulkInsertAs400(
+            'RTNLIBF.SONINV',
+            ['S01', 'S02'],
+            tagDataBulk,
+            chunkSize,
+        );
+        await this.bulkInsertAs400(
+            'RTNLIBF.D40030P2',
+            ['CDE', 'SRT'],
+            tagDataStock,
+            chunkSize,
+        );
+    }
+
+    async insertActualAs400(reportID: number) {
+        const dataResult = await this.getYearlyResult(reportID);
+        const chunkSize = 1000;
+
+        const tagDataBulk = dataResult
+            .filter((item) => item.TYPE === '1')
+            .map((item) => [item.TAG_NO, item.ITEM_CODE, item.ACTUAL_QTY]);
+
+        const tagDataStock = dataResult
+            .filter((item) => item.TYPE === 'A')
+            .map((item) => [item.TAG_NO, item.ITEM_CODE, item.ACTUAL_QTY]);
+
+        await this.as400.runQuery(`DELETE FROM RTNLIBF.IPHWHI`);
+        await this.as400.runQuery(`DELETE FROM RTNLIBF.D043WHI`);
+
+        await this.bulkInsertAs400(
+            'RTNLIBF.IPHWHI',
+            ['IPH#01', 'IPH#02', 'IPH#03'],
+            tagDataBulk,
+            chunkSize,
+        );
+        await this.bulkInsertAs400(
+            'RTNLIBF.D043WHI',
+            ['D43#01', 'D43#02', 'D43#03'],
+            tagDataStock,
+            chunkSize,
+        );
+    }
+
+    private async bulkInsertAs400(
+        table: string,
+        columns: readonly string[],
+        rows: string[][],
+        chunkSize: number,
+    ) {
+        if (rows.length === 0) return;
+
+        for (let i = 0; i < rows.length; i += chunkSize) {
+            const chunk = rows.slice(i, i + chunkSize);
+
+            const values = chunk
+                .map(
+                    (row) =>
+                        `(${row.map((v) => `'${this.escapeSql(v)}'`).join(', ')})`,
+                )
+                .join(',\n');
+
+            const sql = `
+            INSERT INTO ${table} (${columns.join(', ')})
+            VALUES
+            ${values}
+        `;
+
+            await this.as400.runQuery(sql);
+        }
+    }
+
+    private escapeSql(value: string | number | null | undefined): string {
+        return String(value ?? '').replace(/'/g, "''");
     }
 }

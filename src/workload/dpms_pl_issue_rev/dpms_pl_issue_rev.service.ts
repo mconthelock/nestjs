@@ -11,16 +11,6 @@ export class DpmsPlIssueRevService {
     async create(dto: CreateDpmsPlIssueRevDto) {
         try {
             let revision = dto.NREV;
-            if(!revision){
-                revision = await this.getNextRevision({
-                    VPROD: dto.VPROD,
-                    VP: dto.VP,
-                    VTYPE: dto.VTYPE,
-                    VORDERS: dto.VORDERS,
-                    // NISSUE_TYPE: dto.NISSUE_TYPE,
-                    // NROUND: dto.NROUND,
-                });
-            }
             const res = await this.repo.create({
                 ...dto,
                 NREV: revision,
@@ -47,5 +37,35 @@ export class DpmsPlIssueRevService {
     ): Promise<number> {
         const lastRevision = await this.repo.findLatestRevision(condition);
         return lastRevision ? lastRevision.NREV + 1 : 0;
+    }
+
+    async getNextRevisionWithoutType(
+        condition: dpmsPlIssueRevFindLatestRevision,
+        withOutType: number,
+    ): Promise<number> {
+        const lastRevision = await this.repo.findLatestRevisionWithoutType(
+            condition,
+            withOutType,
+        );
+        return lastRevision ? lastRevision.NREV + 1 : 0;
+    }
+
+    async findByRevId(revId: number) {
+        try {
+            const res = await this.repo.findByRevId(revId);
+            if (res.length === 0) {
+                return {
+                    status: false,
+                    message: 'Failed to find DPMS PL Issue',
+                };
+            }
+            return {
+                status: true,
+                message: `DPMS PL Issue found ${res.length} records`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(`Failed to find DPMS PL Issue: ${error.message}`);
+        }
     }
 }

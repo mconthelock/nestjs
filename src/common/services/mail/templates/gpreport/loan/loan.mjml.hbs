@@ -1,0 +1,62 @@
+<mjml>
+    <mj-head>
+        <mj-attributes>
+            <mj-text font-family="Cordia New, sans-serif" font-size="18px" />
+            <mj-table font-family="Cordia New, sans-serif" font-size="20px" />
+        </mj-attributes>
+    </mj-head>
+
+    <mj-body background-color="#f4f6f8" width="800px">
+
+        <!-- Header -->
+        <mj-section background-color="#1447e6" padding="16px">
+            <mj-column>
+                <mj-text color="#ffffff" font-size="36px" font-weight="bold">
+                    HR System Notification
+                </mj-text>
+            </mj-column>
+        </mj-section>
+
+        <!-- Content Card -->
+        <mj-section padding="0">
+            <mj-column background-color="#ffffff" padding="20px" border-radius="6px">
+                <mj-text font-size="24px">
+                    Dear {{recipientName}},
+                </mj-text>
+
+                <mj-text color="#555" font-size="24px">{{{message}}}</mj-text>
+
+                <!-- Table -->
+                {{#if showTable}}
+                <mj-table width="100%" table-layout="fixed">
+
+                    <tr style="background:#e5e7eb; font-weight:bold;">
+                        {{#each tableHeaders}}
+                        <th width="12%" style="padding:8px;">{{this}}</th>
+                        {{/each}}
+                    </tr>
+                    {{#each tableRows}}
+                    <tr style="border-bottom:1px solid #eee;">
+                        {{#each this}}
+                        <td style="padding:8px;">{{{this}}}</td>
+                        {{/each}}
+                    </tr>
+                    {{/each}}
+                </mj-table>
+                {{/if}}
+
+                <mj-text color="#1447e6" font-size="24px">{{{message_ps}}}</mj-text>
+            </mj-column>
+        </mj-section>
+
+        <!-- Footer -->
+        <mj-section background-color="#f1f5f9" padding="10px">
+            <mj-column>
+                <mj-text font-size="18px" color="#999999" align="center">
+                    This is an automated email. Please do not reply.
+                </mj-text>
+            </mj-column>
+        </mj-section>
+
+    </mj-body>
+</mjml>

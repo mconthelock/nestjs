@@ -25,7 +25,8 @@ export class createDetailDto {
 
     @IsString()
     @IsOptional()
-    INQD_ITEM: string;
+    @Type(() => Number)
+    INQD_ITEM: number;
 
     @IsString()
     @IsOptional()

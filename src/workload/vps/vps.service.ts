@@ -2,17 +2,31 @@ import { Injectable } from '@nestjs/common';
 import { CreateVpDto } from './dto/create-vp.dto';
 import { UpdateVpDto } from './dto/update-vp.dto';
 import { VpsRepository } from './vps.repository';
+import { InsertCartonDto, InsertListCartonDto } from './dto/insertCarton.dto';
+import { PKC_CARTON_DETAIL } from 'src/common/Entities/workload/table/PKC_CARTON_DETAIL.entity';
+import { S011mpService } from 'src/datacenter/s011mp/s011mp.service';
 
 @Injectable()
 export class VpsService {
-    constructor(private readonly vpsRepository: VpsRepository) {}
+    constructor(
+        private readonly vpsRepository: VpsRepository,
+        private readonly s011mpService: S011mpService,
+    ) {}
 
     async chkPrint(order: string, packing: string): Promise<boolean> {
         return await this.vpsRepository.chkPrint(order, packing);
     }
 
+    async lastPrintHistory(order: string, packing: string): Promise<any> {
+        return await this.vpsRepository.lastPrintHistory(order, packing);
+    }
+
     async getListOrder(packing: string): Promise<any[]> {
         return await this.vpsRepository.getListOrder(packing);
+    }
+
+    async getListOrder_88_89(): Promise<any[]> {
+        return await this.vpsRepository.getListOrder_88_89();
     }
 
     async insertPrintVPS(
@@ -64,12 +78,22 @@ export class VpsService {
             quantity: qtyPrint,
             users: empno,
         });
-        
 
         // ถ้ายังไม่มี order ใน PACKORDDTL -> เรียก stored proc สร้างให้
         if (!chkOrder) {
-            await this.vpsRepository.insPackorddtlByManual(order, packing);
-        }else{
+            // await this.vpsRepository.insPackorddtlByManual(order, packing);
+            await this.vpsRepository.insertPackorddtl({
+                production: produciton,
+                orderno: order,
+                itemno: item,
+                packno: packing,
+                partname: partname,
+                projectno: project,
+                packshop: 'PC',
+                printsta: '1',
+                updatedate: now,
+            });
+        } else {
             await this.vpsRepository.updatePrintStatus(order, packing);
         }
 
@@ -168,27 +192,183 @@ export class VpsService {
         });
     }
 
+    async reprintPackingOrder(
+        order: string,
+        packing: string,
+        qtyPrint: number,
+        empno: string,
+        reprintCause: string,
+        remark: string,
+        ip: string,
+    ): Promise<void> {
+        const vpsDetail = await this.vpsRepository.getVPSDetail(order, packing);
+        if (!vpsDetail || vpsDetail.length === 0) {
+            throw new Error('Order/Packing not found for reprint');
+        }
+
+        const produciton = vpsDetail[0].S01M09;
+        const p = vpsDetail[0].M8K02;
+        const partname = vpsDetail[0].S01M05;
+        const project = vpsDetail[0].S01M08;
+        const sche = String(vpsDetail[0].SCHEDULE ?? '');
+        const formattedSche =
+            sche.length >= 8
+                ? `${sche.substr(4, 2)}${sche.substr(6)}${sche.substr(2, 2)}`
+                : sche;
+        const piscode = `${order.substr(1, order.length - 2)}${packing}`;
+        const subPacking = `${packing.substr(0, 3)}-${packing.substr(3, 5)}`;
+
+        await this.vpsRepository.insertPrintlogVps({
+            orderNo: order,
+            packingNo: packing,
+            qty: qtyPrint,
+            ip: ip,
+            users: empno,
+            reprintCause: reprintCause,
+            remark: remark,
+        });
+        await this.vpsRepository.reprintPackingOrder({
+            order,
+            packing,
+            production: produciton,
+            p,
+            partname,
+            project,
+            schedl: formattedSche,
+            piscode,
+            qtyPrint,
+            empno,
+            subPacking,
+        });
+    }
+
     async getVPSDetail(order: string, packing: string) {
         return await this.vpsRepository.getVPSDetail(order, packing);
     }
 
     async getOrderDetail(order: string, packing: string): Promise<any[]> {
-        const orderDetails = await this.vpsRepository.getOrderDetail(order, packing);
+        const orderDetails = await this.vpsRepository.getVPS(order, packing);
+
+        // const orderDetails = await this.vpsRepository.getOrderDetail(
+        //     order,
+        //     packing,
+        // );
 
         if (!orderDetails || orderDetails.length === 0) {
             return [];
         }
 
         const remark = await this.vpsRepository.getQ46054OL(order, packing);
-        orderDetails[0].REMARK = remark && remark.length > 0 ? remark : '';
+        if (orderDetails[0].PRODTYPE === 'DUM') {
+            const originalOrder = await this.vpsRepository.getOriginalOrder(
+                order,
+                orderDetails[0].S01M06,
+            );
 
-        for (const detail of orderDetails) {
-            const dwgNo = detail.S11M04 ? detail.S11M04.replace(/\s/g, '') : '';
-            const masterPacking = await this.vpsRepository.getMasterPacking(dwgNo);
-            
-            detail.MASTER_PACKING = masterPacking && masterPacking.length > 0 ? masterPacking : '';
+            orderDetails[0].REMARK = [
+                ...(remark ?? []),
+                ...(originalOrder ?? []),
+            ];
+        } else {
+            orderDetails[0].REMARK = remark && remark.length > 0 ? remark : '';
         }
 
+        const detail = await this.s011mpService.findPacking({
+            order,
+            item: packing,
+        });
+
+        const isSpecialPacking =
+            String(packing).endsWith('88') || String(packing).endsWith('89');
+
+        const data = await Promise.all(
+            (detail.data ?? []).map(async (details) => {
+                // ถ้าไม่ใช่ 88 หรือ 89 ให้คืนข้อมูลเดิม
+                if (!isSpecialPacking) {
+                    return details;
+                }
+
+                const dwgNo = details.S11M04?.replace(/\s/g, '') ?? '';
+
+                const purCode = await this.vpsRepository.getPURCode(
+                    order,
+                    dwgNo,
+                );
+
+                const masterPacking =
+                    await this.vpsRepository.getMasterPacking(dwgNo);
+
+                return {
+                    ...details,
+                    MASTER_PACKING:
+                        masterPacking?.length > 0 ? masterPacking : '',
+                    PUR_CODE: purCode?.length > 0 ? purCode[0].J2INO : '',
+                };
+            }),
+        );
+
+        orderDetails[0].DETAIL = data;
+
         return orderDetails;
+    }
+
+    async insertCartonBox(dto: InsertListCartonDto) {
+        // console.log('dto.items:', dto.items);
+        return this.vpsRepository.insertCartonBox(dto.items);
+    }
+
+    async getOrderReprint(
+        search: string | undefined,
+        page: string,
+        sect: string,
+    ) {
+        const pageNum = Number(page) || 1;
+        const { rows, hasMore } = await this.vpsRepository.getOrderReprint(
+            search,
+            pageNum,
+            sect,
+        );
+
+        // format ให้ตรงกับ Select2 (id/text)
+        return {
+            items: rows.map((r) => ({ id: r.ORDERNO, text: r.ORDERNO })),
+            hasMore,
+        };
+    }
+
+    async getPackNoReprint(orderno: string, sect: string) {
+        const rows = await this.vpsRepository.getPackNoReprint(orderno, sect);
+        return rows.map((r) => ({
+            id: r.PACKNO,
+            text: `${r.PACKNO}`,
+        }));
+    }
+
+    async getDataCartonBox() {
+        const cartonBox = await this.vpsRepository.getDataCartonBox();
+        const specialBox = await this.vpsRepository.getSpecialCarton();
+        return [...specialBox, ...cartonBox];
+    }
+
+    async getListByOrder(order: string) {
+        const data = await this.vpsRepository.getListByOrder(order);
+        return data;
+    }
+
+    async getSubconItem() {
+        const data = await this.vpsRepository.getSubconItem();
+
+        await Promise.all(
+            data.map(async (item) => {
+                const detail = await this.s011mpService.findPacking({
+                    order: item.orderno,
+                    item: item.itemno,
+                });
+
+                item.DETAIL = detail.data[0];
+            }),
+        );
+
+        return {data : data};
     }
 }

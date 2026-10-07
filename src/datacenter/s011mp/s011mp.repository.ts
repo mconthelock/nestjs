@@ -7,9 +7,7 @@ import { S011MP } from 'src/common/Entities/datacenter/table/S011MP.entity';
 
 @Injectable()
 export class S011mpRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('datacenterConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('datacenterConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -36,5 +34,61 @@ export class S011mpRepository extends BaseRepository {
             'S11M04',
         ]);
         return qb.getMany();
+    }
+
+    findByOrder(order: string) {
+        return this.getRepository(S011MP).find({
+            where: {
+                S11M01: order,
+            },
+        });
+    }
+
+    findOrderItems(order: string, item: string) {
+        return this.getRepository(S011MP).find({
+            where: {
+                S11M01: order,
+                S11M02: item,
+            },
+        });
+    }
+
+    findByOrderCombine(order: string, item?: string) {
+        return this.manager.query(`
+            SELECT 
+                B.*
+            FROM S011MP B
+            WHERE B.S11M01 = '${order}'
+            ${item ? `AND B.S11M02 = '${item}'` : ''}
+            UNION ALL
+            SELECT 
+                B.*
+            FROM S020KP A
+            JOIN S011MP B ON A.S20K01 = B.S11M01 AND TRIM(A.S20K02) = B.S11M02
+            WHERE A.S20K03 = '${order}'
+            ${item ? `AND B.S11M02 = '${item}'` : ''}
+            `);
+    }
+
+    findQtyDiff(order: string) {
+        return this.manager.query(
+            `
+            SELECT  *
+            FROM S011MP A
+            WHERE A.S11M01 = :1
+            AND EXISTS (
+                SELECT 1
+                FROM S011MP B
+                WHERE B.S11M01 = A.S11M01
+                    AND B.S11M02 = A.S11M02
+                    AND B.S11M03 = A.S11M03
+                    AND B.S11M04 = A.S11M04
+                    AND B.S11M05 = A.S11M05
+                    AND SUBSTR(B.S11M06, 1, 13) = SUBSTR(A.S11M06, 1, 13)
+                GROUP BY B.S11M02, B.S11M03, B.S11M04, B.S11M05, SUBSTR(B.S11M06, 1, 13)
+                HAVING COUNT(DISTINCT B.S11M09) > 1
+            )`,
+            [order],
+        );
     }
 }

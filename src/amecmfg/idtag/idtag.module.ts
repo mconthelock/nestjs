@@ -7,13 +7,16 @@ import { F110KP } from 'src/amecmfg/f110kp/entities/f110kp.entity';
 import { F001KP } from 'src/as400/shopf/f001kp/entities/f001kp.entity';
 import { FileLoggerModule } from 'src/common/services/file-logger/file-logger.module';
 import { R027mp1Module } from 'src/as400/rtnlibf/r027mp1/r027mp1.module';
+import { T002kpModule } from 'src/as400/rtnlibf/t002kp/t002kp.module';
 import { MailModule } from 'src/common/services/mail/mail.module';
+import { ConectionModule } from 'src/as400/conection/conection.module';
 
 import { IdTagRepository } from './printed/idtag.repository';
 import { IdtagList } from '../../common/Entities/workload/table/idtag-list.entity';
 import { IdtagFiles } from '../../common/Entities/workload/table/idtag-files.entity';
 import { IdtagPages } from '../../common/Entities/workload/table/idtag-pages.entity';
 import { IdtagImages } from '../../common/Entities/workload/views/idtag-images.entity';
+import { IdtagOrders } from '../../common/Entities/workload/table/IDTAGS_ORDERS.entity';
 
 import { PrintedService } from './printed/printed.service';
 import { PrintedQueueService } from './printed/PrintedQueue.service';
@@ -22,15 +25,18 @@ import { PrintedCnService } from './printed/printedCn.service';
 import { PrintedMergeService } from './printed/printedMerge.service';
 import { PrintedNcService } from './printed/printedNc.service';
 import { PrintedTopLabelService } from './printed/printedTopLabel.service';
+import { PrintedExtractService } from './printed/printedExtract.service';
 
 @Module({
     imports: [
         FileLoggerModule,
         R027mp1Module,
+        T002kpModule,
         MailModule,
+        ConectionModule,
         TypeOrmModule.forFeature([M008KP, F110KP, F001KP], 'amecConnection'),
         TypeOrmModule.forFeature(
-            [IdtagFiles, IdtagPages, IdtagImages, IdtagList],
+            [IdtagFiles, IdtagPages, IdtagImages, IdtagList, IdtagOrders],
             'workloadConnection',
         ),
     ],
@@ -45,6 +51,7 @@ import { PrintedTopLabelService } from './printed/printedTopLabel.service';
         PrintedMergeService,
         PrintedNcService,
         PrintedTopLabelService,
+        PrintedExtractService,
     ],
 })
 export class IdtagModule {}

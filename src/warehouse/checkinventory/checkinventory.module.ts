@@ -4,10 +4,11 @@ import { CheckinventoryController } from './checkinventory.controller';
 import { CheckinventoryRepository } from './checkinventory.repository';
 import { FormModule } from 'src/webform/form/form.module';
 import { FormmstModule } from 'src/webform/formmst/formmst.module';
+import { ConectionModule } from 'src/as400/conection/conection.module';
 
 @Module({
-  imports: [FormmstModule, FormModule],
-  controllers: [CheckinventoryController],
-  providers: [CheckinventoryService, CheckinventoryRepository],
+    imports: [FormmstModule, FormModule, ConectionModule],
+    controllers: [CheckinventoryController],
+    providers: [CheckinventoryService, CheckinventoryRepository],
 })
 export class CheckinventoryModule {}

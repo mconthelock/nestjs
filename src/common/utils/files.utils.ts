@@ -212,3 +212,12 @@ export async function getBase64ImageFromUrl(url: string): Promise<string> {
         return '';
     }
 }
+
+export async function makeDirIfNotExists(dirPath: string): Promise<void> {
+    try {
+        await fs.mkdir(dirPath, { recursive: true });
+    } catch (err) {
+        console.error(`Failed to create directory: ${dirPath}`, err);
+        throw err;
+    }
+}

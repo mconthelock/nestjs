@@ -58,4 +58,9 @@ export class PisController {
     async deletePdf(@Param('id') id: number) {
         return this.printed.deletePdf(id);
     }
+
+    // @Get('test')
+    // async test() {
+    //     return this.printed.processLableSpecial();
+    // }
 }

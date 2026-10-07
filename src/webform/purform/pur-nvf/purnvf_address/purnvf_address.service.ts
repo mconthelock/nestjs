@@ -6,12 +6,12 @@ import { PurnvfAddressRepository } from './purnvf_address.repository';
 
 @Injectable()
 export class PurnvfAddressService {
-  constructor(private readonly repo: PurnvfAddressRepository) {}
+    constructor(private readonly repo: PurnvfAddressRepository) {}
 
- async create(dto: CreatePurnvfAddressDto) {
-      try {
+    async create(dto: CreatePurnvfAddressDto) {
+        try {
             const res = await this.repo.create(dto);
-            if(!res){
+            if (!res) {
                 throw new Error('Failed to insert PURVNFADDRESS');
             }
             return {
@@ -21,20 +21,20 @@ export class PurnvfAddressService {
         } catch (error) {
             throw new Error('Insert PURVNFADDRESS Error: ' + error.message);
         }
-  }
-  findAll() {
-    return `This action returns all purnvfAddress`;
-  }
+    }
+    findAll() {
+        return `This action returns all purnvfAddress`;
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} purnvfAddress`;
-  }
+    findOne(id: number) {
+        return `This action returns a #${id} purnvfAddress`;
+    }
 
-  update(id: number, updatePurnvfAddressDto: UpdatePurnvfAddressDto) {
-    return `This action updates a #${id} purnvfAddress`;
-  }
+    update(id: number, updatePurnvfAddressDto: UpdatePurnvfAddressDto) {
+        return `This action updates a #${id} purnvfAddress`;
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} purnvfAddress`;
-  }
+    remove(id: number) {
+        return `This action removes a #${id} purnvfAddress`;
+    }
 }

@@ -64,11 +64,8 @@ export class AmecUserAllService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Error finding employee Error: ` + error.message,
-            );
+            throw new Error(`Error finding employee Error: ` + error.message);
         }
-        
     }
 
     findEmpBirth(month: string) {

@@ -307,6 +307,9 @@ export class PrintedService {
                 // ขั้นตอนที่ 4: ใส่ข้อมูล Label ลงในแต่ละหน้า PDF ตามเงื่อนไข
                 await this.processLabelDetail(fileID);
 
+                // ขั้นตอนที่ 4.1: ใส่ข้อมูล Label ลงในแต่ละหน้า PDF ตามเงื่อนไข
+                // await this.processLableSpecial(fileID);
+
                 // ขั้นตอนที่ 5: รวมไฟล์ PDF กลับเป็นไฟล์เดียว
                 const outFilePath = path.join(
                     outputDirectory,
@@ -462,22 +465,6 @@ export class PrintedService {
             if (!data.length) return;
 
             for (const row of data) {
-                let text = '';
-                if (row.JAPAN > 0) {
-                    text += 'JAPAN ';
-                }
-
-                if (row.URGETNT > 0) {
-                    text += 'URGENT ';
-                }
-
-                if (row.EARTHQ > 0) {
-                    text += 'MET EARTHQUAKE ';
-                }
-                if (text === '') {
-                    continue;
-                }
-
                 const pdfContext = await this.setPdfPath({
                     schd_txt: row.SCHDCHAR,
                     schd_p: row.SCHDP,
@@ -489,17 +476,68 @@ export class PrintedService {
                     pdfContext.pdfDirectory,
                     `${row.PAGE_MFGNO}-${row.PAGE_PACKING}-${row.PAGE_NUM}.pdf`,
                 );
+
+                //console.log(pdfPath);
+                if (row.URGETNT > 0) {
+                    await this.embedUrgentToPdf(pdfPath);
+                    await this.writeLog(
+                        `Put Label Urgent to ${row.PAGE_MFGNO}-${row.PAGE_PACKING}-${row.PAGE_NUM}.pdf`,
+                        null,
+                        pdfContext.logFileName,
+                    );
+                }
+
+                let text = '';
+                if (row.JAPAN > 0) {
+                    text += 'JAPAN ';
+                }
+
+                // if (row.URGETNT > 0) {
+                //     text += 'URGENT ';
+                // }
+
+                if (row.EARTHQ > 0) {
+                    text += 'MET EARTHQUAKE ';
+                }
+                if (text === '') {
+                    continue;
+                }
+
                 try {
                     await this.embedLabelToPdf(pdfPath, text.trim());
                     await this.writeLog(
-                        `Put Label to ${row.PAGE_MFGNO}-${row.PAGE_PACKING}`,
+                        `Put Label to ${row.PAGE_MFGNO}-${row.PAGE_PACKING}-${row.PAGE_NUM}.pdf`,
                     );
                 } catch (error) {
                     await this.writeLog(
-                        `Error processing Label for tag ${row.PAGE_MFGNO}-${row.PAGE_PACKING}`,
+                        `Error processing Label for tag ${row.PAGE_MFGNO}-${row.PAGE_PACKING}-${row.PAGE_NUM}.pdf`,
                         error instanceof Error ? error.message : String(error),
                     );
                 }
+            }
+        } catch (error) {
+            throw new Error(
+                `Error processing label detail: ${error instanceof Error ? error.message : String(error)}`,
+            );
+        }
+    }
+
+    async processLableSpecial(id: number) {
+        const data = await this.repo.Special(id);
+        try {
+            for (const row of data) {
+                const pdfContext = await this.setPdfPath({
+                    schd_txt: row.SCHDCHAR,
+                    schd_p: row.SCHDP,
+                    filedir: row.FILE_FOLDER,
+                    filename: row.FILE_ONAME,
+                });
+
+                const pdfPath = path.join(
+                    pdfContext.pdfDirectory,
+                    `${row.PAGE_MFGNO}-${row.PAGE_PACKING}-${row.PAGE_NUM}.pdf`,
+                );
+                await this.embedLabelToPdf(pdfPath, `URGENT 202610B P1`);
             }
         } catch (error) {
             throw new Error(
@@ -544,6 +582,35 @@ export class PrintedService {
         await fs.writeFile(pdfPath, await pdfDoc.save());
     }
 
+    private async embedUrgentToPdf(pdfPath: string) {
+        const pdfBytes = await fs.readFile(pdfPath);
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+        const [page] = pdfDoc.getPages();
+        //await drawGrid(page);
+        const opt = {
+            pdfpage: page,
+            fontsize: 24,
+            boxHeight: 25,
+            fontColor: rgb(1, 0, 0),
+            textOpacity: 0.5,
+        };
+        await writeLineBox({
+            ...opt,
+            text: `URGENT`,
+            align: 'center',
+            boxX: 400,
+            boxY: 225,
+            boxWidth: 115,
+            drawBorder: {
+                color: rgb(1, 0, 0),
+                width: 2,
+                borderOpacity: 0.5,
+                //bgColor: rgb(0.9, 0.9, 0.9),
+            },
+        });
+        await fs.writeFile(pdfPath, await pdfDoc.save());
+    }
+
     async mergePdfsFast(filesData: { filePath: string }[], outputPath: string) {
         const mergedPdf = await PDFDocument.create();
         const BATCH_SIZE = 100;
@@ -565,10 +632,20 @@ export class PrintedService {
     }
 
     async compressPdfWithGhostscript(inputPath: string) {
-        const command =
-            '\\\\amecnas\\AMECWEB\\wwwroot\\production\\cdn\\Application\\gs\\gs10.00.0\\bin\\gswin32c.exe';
+        const command = path.resolve(
+            process.cwd(),
+            'public',
+            'gs',
+            'gs10.07.1',
+            'bin',
+            'gswin64c.exe',
+        );
         const parsedPath = path.parse(inputPath);
-        // `${parsedPath.name}.compressed${parsedPath.ext}`,
+        // const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        // const compressedPath = path.join(
+        //     parsedPath.dir,
+        //     `${parsedPath.name}.compressed-${uniqueSuffix}${parsedPath.ext}`,
+        // );
         const compressedPath = path.join(parsedPath.dir, `output.pdf`);
         await new Promise<void>((resolve, reject) => {
             const stderrChunks: Buffer[] = [];

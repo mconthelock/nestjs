@@ -31,7 +31,7 @@ export class InquiryDetail {
     INQD_MFGORDER: string;
 
     @Column()
-    INQD_ITEM: string;
+    INQD_ITEM: number;
 
     @Column()
     INQD_CAR: string;

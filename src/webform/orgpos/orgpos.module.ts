@@ -9,6 +9,6 @@ import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
     imports: [TypeOrmModule.forFeature([ORGPOS], 'webformConnection')],
     controllers: [OrgposController],
     providers: [OrgposService, OrgposRepository],
-    exports: [OrgposService],
+    exports: [OrgposService, OrgposRepository],
 })
 export class OrgposModule {}

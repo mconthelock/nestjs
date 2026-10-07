@@ -25,4 +25,16 @@ export class IdtagPages {
 
     @Column()
     PAGE_STATUS: string;
+
+    @Column()
+    PAGE_ITEM: string;
+
+    @Column()
+    PAGE_ITEMPACKING: string;
+
+    @Column()
+    PAGE_PROCESS: string;
+
+    @Column()
+    PAGE_DRAWING: string;
 }

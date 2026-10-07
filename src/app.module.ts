@@ -40,6 +40,9 @@ import { WorkloadModule } from './workload/workload.module';
 import { DatacenterModule } from './datacenter/datacenter.module';
 import { GeneralPartListModule } from './general-part-list/general-part-list.module';
 import { MfgReportModule } from './mfgreport/mfgreport.module';
+import { CountriesModule } from './countries/countries.module';
+import { InnovatModule } from './innovat/innovat.module';
+import { IedocModule } from './iedoc/iedoc.module';
 
 @Module({
     imports: [
@@ -66,7 +69,6 @@ import { MfgReportModule } from './mfgreport/mfgreport.module';
         InvoiceModule,
         IdsModule,
         MfgReportModule,
-        // ItgcModule,
         SafetyModule,
         HbdModule,
         EbudgetModule,
@@ -75,8 +77,9 @@ import { MfgReportModule } from './mfgreport/mfgreport.module';
         WorkloadModule,
         DatacenterModule,
         GeneralPartListModule,
-        MfgReportModule,
-        //  MfgOrModule,
+        IedocModule,
+        InnovatModule,
+        CountriesModule
     ],
     providers: [
         HttpLoggingInterceptor,

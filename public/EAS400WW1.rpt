@@ -1,0 +1,83 @@
+
+Opened new report file at 2026-08-30 00:02:00.
+
+
+***********************************************************************
+**                     Run Time Messages                             **
+***********************************************************************
+
+              925939 records processed as of 2026-08-30 08:18:48 (rate 0,delta 0)
+              926360 records processed as of 2026-08-30 08:55:02 (rate 0,delta 0)
+              926399 records processed as of 2026-08-30 09:27:04 (rate 0,delta 0)
+              926528 records processed as of 2026-08-30 10:00:01 (rate 0,delta 0)
+              926570 records processed as of 2026-08-30 10:35:29 (rate 0,delta 0)
+              926629 records processed as of 2026-08-30 11:15:12 (rate 0,delta 0)
+              926732 records processed as of 2026-08-30 13:15:45 (rate 0,delta 0)
+              927310 records processed as of 2026-08-30 13:46:23 (rate 0,delta 0)
+              928335 records processed as of 2026-08-30 14:16:50 (rate 0,delta 0)
+              928542 records processed as of 2026-08-30 14:50:02 (rate 0,delta 0)
+              928574 records processed as of 2026-08-30 15:30:46 (rate 0,delta 0)
+              928764 records processed as of 2026-08-30 16:00:49 (rate 0,delta 0)
+              929700 records processed as of 2026-08-30 16:41:48 (rate 0,delta 0)
+              929935 records processed as of 2026-08-30 17:30:01 (rate 0,delta 0)
+
+***********************************************************************
+*                   ** Run Time Statistics **                         *
+***********************************************************************
+
+
+Report at 2026-08-31 00:00:00 (activity since 2026-08-30 00:00:00)
+
+Output to ./dirdat/ww:
+
+From Table RTNLIBF.S010MP:
+       #                   inserts:         0
+       #                   updates:       555
+       #                   deletes:         0
+       #                  discards:         0
+From Table RTNLIBF.PIDWEB:
+       #                   inserts:       727
+       #                   updates:         0
+       #                   deletes:      2701
+       #                  discards:         0
+From Table RTNLIBF.S001KP:
+       #                   inserts:        33
+       #                   updates:         0
+       #                   deletes:         0
+       #                  discards:         0
+
+
+***********************************************************************
+**                     Run Time Warnings                             **
+***********************************************************************
+
+              929955 records processed as of 2026-08-31 06:59:45 (rate 0,delta 0)
+              930057 records processed as of 2026-08-31 07:44:23 (rate 0,delta 0)
+              930079 records processed as of 2026-08-31 08:14:40 (rate 0,delta 0)
+              930834 records processed as of 2026-08-31 08:44:46 (rate 0,delta 0)
+              931773 records processed as of 2026-08-31 09:15:10 (rate 0,delta 0)
+              932893 records processed as of 2026-08-31 09:45:25 (rate 0,delta 0)
+              934783 records processed as of 2026-08-31 10:15:44 (rate 0,delta 1)
+              935405 records processed as of 2026-08-31 10:45:57 (rate 0,delta 0)
+              936331 records processed as of 2026-08-31 11:17:28 (rate 0,delta 0)
+              937829 records processed as of 2026-08-31 11:47:29 (rate 0,delta 0)
+              949339 records processed as of 2026-08-31 12:44:32 (rate 0,delta 3)
+              950124 records processed as of 2026-08-31 13:14:32 (rate 0,delta 0)
+              951402 records processed as of 2026-08-31 13:44:34 (rate 0,delta 0)
+              952172 records processed as of 2026-08-31 14:14:47 (rate 0,delta 0)
+              952599 records processed as of 2026-08-31 14:45:46 (rate 0,delta 0)
+              953064 records processed as of 2026-08-31 15:16:23 (rate 0,delta 0)
+              954663 records processed as of 2026-08-31 15:47:00 (rate 0,delta 0)
+              955256 records processed as of 2026-08-31 16:17:20 (rate 0,delta 0)
+              956020 records processed as of 2026-08-31 16:47:31 (rate 0,delta 0)
+              956133 records processed as of 2026-08-31 17:30:01 (rate 0,delta 0)
+              956228 records processed as of 2026-08-31 18:03:18 (rate 0,delta 0)
+              956245 records processed as of 2026-08-31 18:33:40 (rate 0,delta 0)
+              956335 records processed as of 2026-08-31 19:04:27 (rate 0,delta 0)
+              956370 records processed as of 2026-08-31 20:11:04 (rate 0,delta 0)
+
+2026-08-31 20:36:51  WARNING OGG-01223  Protocol driver not attached.
+
+2026-08-31 20:37:21  INFO    OGG-01971  The previous message, 'WARNING OGG-01223', repeated 29 times.
+
+2026-08-31 20:39:21  INFO    OGG-01971  The previous message, 'WARNING OGG-01223', repeated 116 times.

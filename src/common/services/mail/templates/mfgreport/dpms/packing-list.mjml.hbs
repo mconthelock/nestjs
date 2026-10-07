@@ -28,11 +28,12 @@
                 {{!-- <mj-text>
                     Dear {{name}},
                 </mj-text> --}}
-
-                <mj-text color="#555">
-                    Please be informed that the packing list has been issued successfully.
-                    <a href="{{path}}" style="color:#1e293b; text-decoration:none;">Click here</a> to view the details.
-                </mj-text>
+                {{#if path}}
+                    <mj-text color="#555">
+                        Please be informed that the packing list has been issued successfully.
+                        <a href="{{path}}" style="color:#1e293b; text-decoration:none;">Click here</a> to view the details.
+                    </mj-text>
+                {{/if}}
 
                 <!-- Table -->
                 <mj-table width="100%" table-layout="fixed">
@@ -45,14 +46,27 @@
                         <th width="30%" style="padding:8px;">NAME OF BLDG</th>
                         <th width="30%" style="padding:8px;">SOLD TO</th>
                     </tr>
-                    <tr style="border-bottom:1px solid #eee;">
-                        <td style="padding:8px; white-space:nowrap; ali">{{issueType}}</td>
-                        <td style="padding:8px; ">{{shopOrderNo}}</td>
-                        <td style="padding:8px; ">{{rev}}</td>
-                        <td style="padding:8px; white-space:nowrap;">{{subject}}</td>
-                        <td style="padding:8px;">{{nameOfBldg}}</td>
-                        <td style="padding:8px;">{{soldTo}}</td>
-                    </tr>
+                    {{#if list}}
+                        {{#each list}}
+                            <tr style="border-bottom:1px solid #eee;">
+                            <td style="padding:8px; white-space:nowrap; text-align:left;">{{VDESCRIPTION}}</td>
+                            <td style="padding:8px; ">{{VORDERS}}</td>
+                            <td style="padding:8px; ">{{VREVTEXT}}</td>
+                            <td style="padding:8px; white-space:nowrap;">{{VSUBJECT}}</td>
+                            <td style="padding:8px;">{{PROJECT}}</td>
+                            <td style="padding:8px;">{{PROJECT}}</td>
+                        </tr>
+                        {{/each}}
+                    {{else}}
+                        <tr style="border-bottom:1px solid #eee;">
+                            <td style="padding:8px; white-space:nowrap; text-align:left;">{{issueType}}</td>
+                            <td style="padding:8px; ">{{shopOrderNo}}</td>
+                            <td style="padding:8px; ">{{rev}}</td>
+                            <td style="padding:8px; white-space:nowrap;">{{subject}}</td>
+                            <td style="padding:8px;">{{nameOfBldg}}</td>
+                            <td style="padding:8px;">{{soldTo}}</td>
+                        </tr>
+                    {{/if}}
                 </mj-table>
 
             </mj-column>

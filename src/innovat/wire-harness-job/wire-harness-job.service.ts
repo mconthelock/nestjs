@@ -86,5 +86,12 @@ export class WireHarnessJobService {
     async drumToStock(dto: DrumToStockDto) {
         return this.repo.drumToStock(dto);
     }
+<<<<<<< HEAD:src/innovat/wire-harness-job/wire-harness-job.service.ts
 >>>>>>> 9119de43 (wire-harness):src/innovat/wire-harness/wire-harness.service.ts
+=======
+
+    async drumMaster(condition: FiltersDto) {
+        return this.repo.getDrumMaster(condition);
+    }
+>>>>>>> 640b6378 (wire-harness):src/innovat/wire-harness/wire-harness.service.ts
 }

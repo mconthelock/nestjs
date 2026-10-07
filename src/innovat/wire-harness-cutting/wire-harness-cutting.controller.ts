@@ -68,4 +68,12 @@ export class WireHarnessCuttingController {
     async drumToStock(@Body() dto: DrumToStockDto) {
         return this.service.drumToStock(dto);
     }
+
+    @Post('drum-master')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Get drum master' })
+    @ApiResponse({ status: 200, description: 'Drum master list' })
+    async drumMaster(@Body() condition: FiltersDto) {
+        return this.service.drumMaster(condition);
+    }
 }

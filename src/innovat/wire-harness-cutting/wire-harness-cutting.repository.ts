@@ -6,6 +6,7 @@ import { OracleRepository } from 'src/common/repositories/oracle-repository';
 import { WHN_PRODUCTION_PLAN } from 'src/common/Entities/innovat/table/WHN_PRODUCTION_PLAN.entity';
 import { WHN_PROCESS } from 'src/common/Entities/innovat/table/WHN_PROCESS.entity';
 import { WHN_DRUM_STOCK } from 'src/common/Entities/innovat/table/WHN_DRUM_STOCK.entity';
+import { WHN_DRUM_MASTER } from 'src/common/Entities/innovat/table/WHN_DRUM_MASTER.entity';
 import { WHN_PRODUCTION } from 'src/common/Entities/innovat/views/WHN_PRODUCTION.entity';
 import { WHN_AUTOPLAN } from 'src/common/Entities/innovat/views/WHN_AUTOPLAN.entity';
 import { WHN_REASON } from 'src/common/Entities/innovat/table/WHN_REASON.entity';
@@ -67,7 +68,7 @@ export class WireHarnessCuttingRepository extends BaseRepository {
         const paramOrder = ['empNo', 'itemCode', 'prodNo', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
 =======
     getDrumStock(condition: FiltersDto) {
-        const allowedFields = ['ST_ITEMCODE', 'ST_LENREMAIN', 'ST_DRUMTYPE'];
+        const allowedFields = ['ST_ITEMCODE', 'ST_LENREMAIN', 'ST_DRUMTYPE', 'ST_RECIVEDATE'];
         const qb = this.getRepository(WHN_DRUM_STOCK)
             .createQueryBuilder('A')
             .select([
@@ -128,10 +129,17 @@ export class WireHarnessCuttingRepository extends BaseRepository {
         );
     }
 <<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
+<<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
 
     reason(condition: FiltersDto) {
         const allowedFields = ['RS_ID', 'RS_NAME_TH', 'RS_STATUS'];
         const qb = this.getRepository(WHN_REASON)
+=======
+
+    getDrumMaster(condition: FiltersDto) {
+        const allowedFields = ['MT_ITEMCODE', 'MT_CABLECODE', 'GRP_ID'];
+        const qb = this.getRepository(WHN_DRUM_MASTER)
+>>>>>>> 640b6378 (wire-harness):src/innovat/wire-harness/wire-harness.repository.ts
             .createQueryBuilder('A');
 
         return this.applyFilters(
@@ -140,9 +148,15 @@ export class WireHarnessCuttingRepository extends BaseRepository {
             condition,
             allowedFields,
         )
+<<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
         .orderBy('A.RS_ID', 'ASC')
         .getMany();
     }
 =======
 >>>>>>> 9119de43 (wire-harness):src/innovat/wire-harness/wire-harness.repository.ts
+=======
+        .orderBy('A.MT_ITEMCODE', 'ASC')
+        .getMany();
+    }
+>>>>>>> 640b6378 (wire-harness):src/innovat/wire-harness/wire-harness.repository.ts
 }

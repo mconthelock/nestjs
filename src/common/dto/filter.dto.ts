@@ -58,6 +58,7 @@ export class FilterNodeDto {
         'endsWith',
         'in',
         'notIn',
+        'between',
         'isNull',
         'isNotNull',
     ])

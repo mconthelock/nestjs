@@ -4,6 +4,7 @@
 /build
 /dist
 /sql
+/artifacts
 
 # Logs
 logs
@@ -66,3 +67,4 @@ public/u02_gg/
 package-lock.json
 
 oracle
+

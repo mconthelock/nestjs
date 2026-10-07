@@ -80,4 +80,8 @@ export class WireHarnessService {
     async drumToStock(dto: DrumToStockDto) {
         return this.repo.drumToStock(dto);
     }
+
+    async drumMaster(condition: FiltersDto) {
+        return this.repo.getDrumMaster(condition);
+    }
 }

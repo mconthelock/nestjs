@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PurNvfRequestService } from './pur-nvf-request.service';
-import { PurNvfReturnApproveService } from './pur-nvf-return-approve.service'
+import { PurNvfReturnApproveService } from './pur-nvf-return-approve.service';
 import { PurNvfController } from './pur-nvf.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PURNVF_FORM } from 'src/common/Entities/webform/table/PURNVF_FORM.entity';
@@ -30,7 +30,7 @@ import { PurnvfLocationService } from './purnvf_location/purnvf_location.service
         RepModule,
         UsersModule,
         PappflowModule,
-        PurnvfLocationModule
+        PurnvfLocationModule,
     ],
     controllers: [PurNvfController],
     providers: [
@@ -39,8 +39,12 @@ import { PurnvfLocationService } from './purnvf_location/purnvf_location.service
         PurnvfListRepository,
         PurnvfAddressRepository,
         PurNvfReturnApproveService,
-        PurnvfLocationService
+        PurnvfLocationService,
     ],
-    exports: [PurNvfRequestService,PurNvfReturnApproveService,  PurnvfLocationService],
+    exports: [
+        PurNvfRequestService,
+        PurNvfReturnApproveService,
+        PurnvfLocationService,
+    ],
 })
 export class PurNvfModule {}

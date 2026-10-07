@@ -51,7 +51,7 @@ export class PurVmmService {
     ) {}
 
     async createauto(formEva: FormDto, ip: string, path: string) {
-        const formvmnno = await this.repomst.getFormMasterByVaname('PUR-VMM');
+        const formvmnno = await this.repomst.getFormMasterByVaname('PRO-VMM');
         const formreqeva = await this.formService.getFormData(formEva);
         const formevano = await this.formService.getFormno(formEva);
         const dataeva = await this.repoeva.getData(formEva);
@@ -146,7 +146,7 @@ export class PurVmmService {
                 }
             }
         } catch (error) {
-            throw new Error('Create PUR-VMM auto : ' + error.message);
+            throw new Error('Create PRO-VMM auto : ' + error.message);
         }
 
         return {
@@ -266,7 +266,7 @@ export class PurVmmService {
                 ...movedTargets.map((p) => deleteFile(p)), // - ลบไฟล์ที่ "ปลายทาง" ทั้งหมดที่ย้ายสำเร็จไปแล้ว (กัน orphan file)
                 ...tmpFilePaths.map((f) => deleteFile(f)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
             ]);
-            throw new Error('Request PUR-VMM Form Error: ' + error.message);
+            throw new Error('Request PRO-VMM Form Error: ' + error.message);
         }
     }
 
@@ -391,7 +391,7 @@ export class PurVmmService {
 
             return {
                 status: true,
-                message: 'Update PUR-VMM Form successful',
+                message: 'Update PRO-VMM Form successful',
             };
         } catch (error) {
             const tmpFilePaths = allFilesWithType.map((item) => item.file.path);
@@ -399,7 +399,7 @@ export class PurVmmService {
                 ...movedTargets.map((p) => deleteFile(p)), // - ลบไฟล์ที่ "ปลายทาง" ทั้งหมดที่ย้ายสำเร็จไปแล้ว (กัน orphan file)
                 ...tmpFilePaths.map((f) => deleteFile(f)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
             ]);
-            throw new Error('Update PUR-VMM Form Error: ' + error.message);
+            throw new Error('Update PRO-VMM Form Error: ' + error.message);
         }
     }
 
@@ -611,10 +611,10 @@ export class PurVmmService {
 
             return {
                 status: true,
-                message: 'Approve PUR-VMM Form successful',
+                message: 'Approve PRO-VMM Form successful',
             };
         } catch (error) {
-            throw new Error('Approve PUR-VMM Form Error: ' + error.message);
+            throw new Error('Approve PRO-VMM Form Error: ' + error.message);
         }
     }
 
@@ -664,7 +664,7 @@ export class PurVmmService {
 
     async initForm() {
         const vendors = await this.vnd.find({ where: { VND_CODE: '60533' } });
-        const formvmnno = await this.repomst.getFormMasterByVaname('PUR-VMM');
+        const formvmnno = await this.repomst.getFormMasterByVaname('PRO-VMM');
 
         for (const vendor of vendors) {
             const formvmm = await this.formcreateservice.create(

@@ -65,7 +65,7 @@ export class PurevaFormController {
             console.log('--------------------------------');
             return await this.purevaFormService.update(form, data);
         } catch (error) {
-            throw new Error('Update PUR-EVA Form Error: ' + error.message);
+            throw new Error('Update PRO-EVA Form Error: ' + error.message);
         }
     }
 

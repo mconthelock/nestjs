@@ -186,7 +186,7 @@ export class PurEvaUpdateService {
 
             return {
                 status: true,
-                message: 'Update PUR-EVA Form successful',
+                message: 'Update PRO-EVA Form successful',
             };
         } catch (error) {
             const tmpFilePaths = allFilesWithType.map((item) => item.file.path);
@@ -194,7 +194,7 @@ export class PurEvaUpdateService {
                 ...movedTargets.map((p) => deleteFile(p)), // - ลบไฟล์ที่ "ปลายทาง" ทั้งหมดที่ย้ายสำเร็จไปแล้ว (กัน orphan file)
                 ...tmpFilePaths.map((f) => deleteFile(f)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
             ]);
-            throw new Error('Update PUR-EVA Form Error: ' + error.message);
+            throw new Error('Update PRO-EVA Form Error: ' + error.message);
         }
     }
 

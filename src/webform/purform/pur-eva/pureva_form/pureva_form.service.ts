@@ -31,7 +31,7 @@ export class PurevaFormService {
         try {
             return await this.repo.getData(dto);
         } catch (error) {
-            throw new Error('Get PUR-EVA Form Error: ' + error.message);
+            throw new Error('Get PRO-EVA Form Error: ' + error.message);
         }
     }
 

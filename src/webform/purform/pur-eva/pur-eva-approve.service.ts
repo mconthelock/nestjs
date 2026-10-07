@@ -127,7 +127,7 @@ export class PurEvaApproveService {
                 message: 'Approve successful',
             };
         } catch (error) {
-            throw new Error('Approve PUR-EVA Form Error: ' + error.message);
+            throw new Error('Approve PRO-EVA Form Error: ' + error.message);
         }
     }
 }

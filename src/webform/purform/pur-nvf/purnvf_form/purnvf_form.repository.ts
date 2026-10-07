@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { PURNVF_FORM } from 'src/common/Entities/webform/table/PURNVF_FORM.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { FormDto} from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 import { Brackets, DataSource } from 'typeorm';
 import { CreatePurnvfFormDto } from './dto/create-purnvf_form.dto';
 
@@ -13,18 +13,18 @@ export class PurnvfFormRepository extends BaseRepository {
     }
 
     async getData(dto: FormDto) {
-            return await this.getRepository(PURNVF_FORM).findOne({
-                where: {
-                    ...dto,
+        return await this.getRepository(PURNVF_FORM).findOne({
+            where: {
+                ...dto,
+            },
+            relations: {
+                LISTS: {
+                    TERM: true,
                 },
-                relations: {
-                    LISTS: {
-                        TERM: true
-                    },
-                    ADDRESSES: true,
-                    FILES: true,
-                },
-            });
+                ADDRESSES: true,
+                FILES: true,
+            },
+        });
     }
 
     async searchForms(keyword: string) {
@@ -37,8 +37,12 @@ export class PurnvfFormRepository extends BaseRepository {
             .leftJoinAndSelect('NVFFORM.FILES', 'file')
             .where(
                 new Brackets((qb) => {
-                    qb.where("LOWER('PUR-NVF' || SUBSTR(NVFFORM.CYEAR2, -2) || '-' || LPAD(TO_CHAR(NVFFORM.NRUNNO), 6, '0')) LIKE :keyword", { keyword: searchParam })
-                      .orWhere('LOWER(list.COMNAME) LIKE :keyword', { keyword: searchParam });
+                    qb.where(
+                        "LOWER('PRO-NVF' || SUBSTR(NVFFORM.CYEAR2, -2) || '-' || LPAD(TO_CHAR(NVFFORM.NRUNNO), 6, '0')) LIKE :keyword",
+                        { keyword: searchParam },
+                    ).orWhere('LOWER(list.COMNAME) LIKE :keyword', {
+                        keyword: searchParam,
+                    });
                 }),
             )
             // ถ้าอยากจำกัดข้อมูลเพื่อความปลอดภัย ใส่ .take(50) แทรกตรงนี้ได้ครับ
@@ -56,11 +60,26 @@ export class PurnvfFormRepository extends BaseRepository {
     }
 
     async updateById(data: CreatePurnvfFormDto) {
-            const { NFRMNO, VORGNO, CYEAR , CYEAR2 , NRUNNO, ...updateData } = data;
-            return this.getRepository(PURNVF_FORM).update({ NFRMNO: NFRMNO, VORGNO:VORGNO, CYEAR:CYEAR, CYEAR2:CYEAR2, NRUNNO:NRUNNO }, updateData );
+        const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, ...updateData } = data;
+        return this.getRepository(PURNVF_FORM).update(
+            {
+                NFRMNO: NFRMNO,
+                VORGNO: VORGNO,
+                CYEAR: CYEAR,
+                CYEAR2: CYEAR2,
+                NRUNNO: NRUNNO,
+            },
+            updateData,
+        );
     }
 
     async deleteById(dto: FormDto) {
-        return this.getRepository(PURNVF_FORM).delete({ NFRMNO: dto.NFRMNO, VORGNO: dto.VORGNO, CYEAR: dto.CYEAR ,CYEAR2: dto.CYEAR2, NRUNNO: dto.NRUNNO });
+        return this.getRepository(PURNVF_FORM).delete({
+            NFRMNO: dto.NFRMNO,
+            VORGNO: dto.VORGNO,
+            CYEAR: dto.CYEAR,
+            CYEAR2: dto.CYEAR2,
+            NRUNNO: dto.NRUNNO,
+        });
     }
 }

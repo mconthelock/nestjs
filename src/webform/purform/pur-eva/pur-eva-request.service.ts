@@ -184,7 +184,7 @@ export class PurEvaRequestService {
                 ...movedTargets.map((p) => deleteFile(p)), // - ลบไฟล์ที่ "ปลายทาง" ทั้งหมดที่ย้ายสำเร็จไปแล้ว (กัน orphan file)
                 ...tmpFilePaths.map((f) => deleteFile(f)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
             ]);
-            throw new Error('Request PUR-EVA Form Error: ' + error.message);
+            throw new Error('Request PRO-EVA Form Error: ' + error.message);
         }
     }
 

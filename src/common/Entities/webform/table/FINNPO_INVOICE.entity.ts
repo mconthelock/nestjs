@@ -3,6 +3,7 @@ import { FORM } from './FORM.entity';
 
 @Entity({ name: 'FINNPO_INVOICE', schema: 'WEBFORM' })
 export class FINNPOINVOICE {
+
     @PrimaryColumn()
     CYEAR2: string;
 
@@ -14,6 +15,7 @@ export class FINNPOINVOICE {
 
     @PrimaryColumn()
     INVOICE_DATE: Date;
+
 
     @PrimaryColumn()
     INVOICE_NO: string;
@@ -35,6 +37,8 @@ export class FINNPOINVOICE {
 
     @PrimaryColumn()
     SCURCODE: string;
+
+    
 }
 
 // NFRMNO

@@ -59,12 +59,27 @@ export class PurCpmReturnAprroveService extends PurCpmService {
             const flowtree = await this.flowService.getFlowTree(form);
             let flagReset = false;
 
-            // 2. หากมี THIRD_PARTY ให้เพิ่ม flow cstepno 40
+            // 2. หากมี THIRD_PARTY ให้ตรวจสอบว่ามี step 40 หรือไม่ 
             const hasStep40 = flowtree.some((f: FLOWMST) => f.CSTEPNO === '40');
+            //  หากมี THIRD_PARTY และมี step 40 แต่ค่า VAPVNO ไม่ตรงกับ THIRD_PARTY ให้ปรับปรุงค่า VAPVNO ของ step 40
+            if (
+                THIRD_PARTY &&
+                hasStep40 &&
+                THIRD_PARTY !==
+                    flowtree.find((f: FLOWMST) => f.CSTEPNO === '40')?.VAPVNO
+            ) {
+                await this.flowService.updateFlow({
+                    condition: { ...form, CSTEPNO: '40' },
+                    VAPVNO: THIRD_PARTY,
+                });
+                flagReset = true;
+            }
+            //  หากมี THIRD_PARTY ให้ตรวจสอบว่ามี step 40 หรือไม่
             if (THIRD_PARTY && !hasStep40) {
                 await this.insertThridPartyStep(form, THIRD_PARTY);
                 flagReset = true;
             }
+            //  หากไม่มี THIRD_PARTY แต่มี step 40 ให้ลบ step 40
             if (!THIRD_PARTY && hasStep40) {
                 await this.deleteStep(form, ['40']);
                 flagReset = true;
@@ -116,6 +131,7 @@ export class PurCpmReturnAprroveService extends PurCpmService {
             // 6. update ข้อมูล PUR-CPM
             await this.update(form, {
                 ...data,
+                THIRD_PARTY: THIRD_PARTY,
             });
 
             // 7. ลบไฟล์ที่ถูกระบุให้ลบ (ถ้ามี)

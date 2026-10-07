@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class CreateDrumDto {
+export class UpdateDrumDto {
     @ApiProperty({
         example: '99999',
         description: 'Employee number',
@@ -25,6 +25,13 @@ export class CreateDrumDto {
     @IsString()
     @IsNotEmpty()
     prodNo: string;
+
+    @ApiProperty({
+        example: 1,
+        description: 'Drum ID',
+    })
+    @IsNumber()
+    drumId: number;
 
     @ApiProperty({
         example: 'C6071300JC4',

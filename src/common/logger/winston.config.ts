@@ -62,6 +62,9 @@ const skipSelectQuery = winston.format((info) => {
 });
 
 const skipBlankReqID = winston.format((info) => {
+    if (info.logType) {
+        return info;
+    }
     if (info.context === 'SchedulerService') return info;
     if (
         info.requestId === undefined ||

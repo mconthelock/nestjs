@@ -33,5 +33,5 @@ export class WHN_DRUM_STOCK {
     ST_DATEUPDATE: Date;
 
     @Column()
-    ST_STATUS: number;
+    ST_DRUMTYPE: number;
 }

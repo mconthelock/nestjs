@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class CreateDrumDto {
+export class DrumToStockDto {
     @ApiProperty({
-        example: '99999',
+        example: '15234',
         description: 'Employee number',
     })
     @IsString()
@@ -19,7 +19,7 @@ export class CreateDrumDto {
     itemCode: string;
 
     @ApiProperty({
-        example: '2026081',
+        example: '2026091',
         description: 'Production number',
     })
     @IsString()
@@ -27,24 +27,9 @@ export class CreateDrumDto {
     prodNo: string;
 
     @ApiProperty({
-        example: 'C6071300JC4',
-        description: 'Control number',
-    })
-    @IsString()
-    @IsNotEmpty()
-    ctrlNo: string;
-
-    @ApiProperty({
-        example: 100.9,
-        description: 'Cut length',
-    })
-    @IsNumber()
-    cut: number;
-
-    @ApiProperty({
         example: 1,
-        description: 'Cut type (1 = First Cut, 2 = Re-Cut)',
+        description: 'Drum ID',
     })
     @IsNumber()
-    cutType: number;
+    drumId: number;
 }

@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { WireHarnessAs400Repository } from './wire-harness-as400.repository';
 import { WireHarnessRepository } from './wire-harness.repository';
 import { CreateDrumDto } from './dto/create-drum.dto';
+import { UpdateDrumDto } from './dto/update-drum.dto';
+import { DrumToStockDto } from './dto/drum-to-stock.dto';
 
 @Injectable()
 export class WireHarnessService {
@@ -58,6 +60,24 @@ export class WireHarnessService {
     }
 
     async createDrum(dto: CreateDrumDto) {
-        return this.repo.createDrum(dto);
+        try {
+            return await this.repo.createDrum(dto);
+        } catch (error) {
+            const message = error.message.split('\n')[0].replace(/^ORA-\d+:\s*/, '');
+            throw new BadRequestException(message);
+        }
+    }
+
+    async updateDrum(dto: UpdateDrumDto) {
+        try {
+            return await this.repo.updateDrum(dto);
+        } catch (error) {
+            const message = error.message.split('\n')[0].replace(/^ORA-\d+:\s*/, '');
+            throw new BadRequestException(message);
+        }
+    }
+
+    async drumToStock(dto: DrumToStockDto) {
+        return this.repo.drumToStock(dto);
     }
 }

@@ -3,6 +3,8 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { WireHarnessService } from './wire-harness.service';
 import { CreateDrumDto } from './dto/create-drum.dto';
+import { UpdateDrumDto } from './dto/update-drum.dto';
+import { DrumToStockDto } from './dto/drum-to-stock.dto';
 
 @ApiTags('Wire Harness')
 @Controller('innovat/wire-harness')
@@ -49,5 +51,21 @@ export class WireHarnessController {
     @ApiResponse({ status: 200, description: 'Create drum success' })
     async createDrum(@Body() dto: CreateDrumDto) {
         return this.service.createDrum(dto);
+    }
+
+    @Post('update-drum')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Update drum' })
+    @ApiResponse({ status: 200, description: 'Update drum success' })
+    async updateDrum(@Body() dto: UpdateDrumDto) {
+        return this.service.updateDrum(dto);
+    }
+
+    @Post('drum-to-stock')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Move drum to stock' })
+    @ApiResponse({ status: 200, description: 'Move drum to stock success' })
+    async drumToStock(@Body() dto: DrumToStockDto) {
+        return this.service.drumToStock(dto);
     }
 }

@@ -11,7 +11,7 @@ export class CreateDrumDto {
     empNo: string;
 
     @ApiProperty({
-        example: 'F7318',
+        example: 'F9999',
         description: 'Item code',
     })
     @IsString()
@@ -40,4 +40,11 @@ export class CreateDrumDto {
     })
     @IsNumber()
     cut: number;
+
+    @ApiProperty({
+        example: 1,
+        description: 'Cut type (1 = First Cut, 2 = Re-Cut)',
+    })
+    @IsNumber()
+    cutType: number;
 }

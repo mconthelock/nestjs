@@ -120,10 +120,32 @@ export async function applyDynamicFilters(qb, filters: any, alias: string) {
 export async function parseCondition(
     alias: string,
     field: string,
-    val: string | number | boolean | Date | null | undefined,
+    val: string | number | boolean | Date | null | undefined | any[],
     pName: string,
-) {
+): Promise<{ sql: string; params: Record<string, any> }> {
     const column = `${alias}.${field}`;
+
+    // Array: each item is parsed as its own condition, combined with OR
+    if (Array.isArray(val)) {
+        const sqls: string[] = [];
+        let params: Record<string, any> = {};
+        for (let i = 0; i < val.length; i++) {
+            const r = await parseCondition(
+                alias,
+                field,
+                val[i],
+                `${pName}_a${i}`,
+            );
+            if (r.sql) {
+                sqls.push(r.sql);
+                params = { ...params, ...r.params };
+            }
+        }
+        return {
+            sql: sqls.length ? `(${sqls.join(' OR ')})` : '',
+            params,
+        };
+    }
 
     if (val === null || val === undefined) {
         return {
@@ -169,6 +191,17 @@ export async function parseCondition(
         };
     }
 
+    // BETWEEN check: "BETWEEN '20260907' AND '20261007'"
+    const between = val.match(
+        /^\s*BETWEEN\s+'?([^']+?)'?\s+AND\s+'?([^']+?)'?\s*$/i,
+    );
+    if (between) {
+        return {
+            sql: `${column} BETWEEN :${pName}_1 AND :${pName}_2`,
+            params: { [`${pName}_1`]: between[1], [`${pName}_2`]: between[2] },
+        };
+    }
+
     // LIKE check: "LIKE '445'"
     if (val.toUpperCase().includes('LIKE')) {
         const cleanVal = val
@@ -205,6 +238,15 @@ export async function extractOp(str: string) {
     return { op, val };
 }
 
+// Parses "BETWEEN '20260907' AND '20261007'" into ['20260907', '20261007']
+function parseBetweenValue(value: string): [string, string] {
+    const match = value.match(
+        /^\s*BETWEEN\s+'?([^']+?)'?\s+AND\s+'?([^']+?)'?\s*$/i,
+    );
+    if (match) return [match[1], match[2]];
+    return ['', ''];
+}
+
 export async function parseConditionString(condition: FiltersDto) {
     const operatorMap = {
         eq: '=',
@@ -226,6 +268,13 @@ export async function parseConditionString(condition: FiltersDto) {
             default:
                 sep = `'`;
                 break;
+        }
+
+        // Auto-detect raw "BETWEEN 'x' AND 'y'" value even if op wasn't set to 'between'
+        if (typeof f.value === 'string' && /^\s*BETWEEN\s+/i.test(f.value)) {
+            const [betweenStart, betweenEnd] = parseBetweenValue(f.value);
+            query += ` ${and} ${f.field} BETWEEN ${sep}${betweenStart}${sep} AND ${sep}${betweenEnd}${sep}`;
+            return;
         }
 
         switch (f.op) {
@@ -258,6 +307,12 @@ export async function parseConditionString(condition: FiltersDto) {
                         .join(', ');
                 query += ` ${and} ${f.field} NOT IN (${notInValues})`;
                 break;
+
+            case 'between': {
+                const [betweenStart, betweenEnd] = parseBetweenValue(f.value);
+                query += ` ${and} ${f.field} BETWEEN ${sep}${betweenStart}${sep} AND ${sep}${betweenEnd}${sep}`;
+                break;
+            }
 
             case 'isNull':
                 query += ` ${and} ${f.field} IS NULL`;

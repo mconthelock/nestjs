@@ -118,8 +118,8 @@ export class PurvmmFormRepository extends BaseRepository {
         if (dto.vmmform.reqtor && dto.vmmform.reqtor.SNAME) {
             cond.AND.push({
                 field: 'reqtor.SNAME',
-                op: 'eq',
-                value: dto.vmmform.reqtor.SNAME,
+                op: 'like',
+                value: dto.vmmform.reqtor.SNAME.toUpperCase(),
             });
         }
 

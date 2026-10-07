@@ -1,4 +1,27 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateCmSmDto } from './create-cm-sm.dto';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
-export class UpdateCmSmDto extends PartialType(CreateCmSmDto) {}
+export class UpdateCmSmDto {
+	@IsString()
+	TINO: string;
+
+	@IsString()
+	REVNO: string;
+
+	@IsString()
+	columnName: string;
+
+	@IsOptional()
+	@IsString()
+	columnTitle?: string;
+
+	@IsOptional()
+	@IsBoolean()
+	mapped?: boolean;
+
+	@IsOptional()
+	value: string | Date | null;
+
+	@IsOptional()
+	@IsString()
+	control?: string;
+}

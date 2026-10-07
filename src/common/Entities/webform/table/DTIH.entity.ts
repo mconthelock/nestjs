@@ -1,232 +1,236 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryColumn, Relation } from 'typeorm';
+import { CM_SM_FORM } from './CM_SM_FORM.entity';
 
 @Entity({ name: 'DTIH', schema: 'DAILYTECH' })
 export class DTIH {
-    @PrimaryColumn({ type: 'varchar2', length: 15 })
+    @PrimaryColumn()
     TINO: string;
 
-    @Column({ type: 'date', nullable: true })
-    RECDT: Date | null;
+    @OneToOne(() => CM_SM_FORM, (form) => form.DTIH)
+    CM_SM_FORM: Relation<CM_SM_FORM>;
 
-    @Column({ type: 'date', nullable: true })
-    TI_ISSUE_DT: Date | null;
+    @Column()
+    RECDT: Date;
 
-    @Column({ type: 'date', nullable: true })
-    SAE_RECDT: Date | null;
+    @Column()
+    TI_ISSUE_DT: Date;
 
-    @Column({ type: 'varchar2', length: 5, nullable: true })
-    SAE_PIC: string | null;
+    @Column()
+    SAE_RECDT: Date;
 
-    @Column({ type: 'varchar2', length: 6, nullable: true })
-    AGENT: string | null;
+    @Column()
+    SAE_PIC: string;
 
-    @Column({ type: 'varchar2', length: 25, nullable: true })
-    CTNAME: string | null;
+    @Column()
+    AGENT: string;
 
-    @Column({ type: 'varchar2', length: 150, nullable: true })
-    PROJ_DESC: string | null;
+    @Column()
+    CTNAME: string;
 
-    @Column({ type: 'number', nullable: true })
-    BLANKNO: number | null;
+    @Column()
+    PROJ_DESC: string;
 
-    @Column({ type: 'number', nullable: true })
-    UNIT: number | null;
+    @Column()
+    BLANKNO: number;
 
-    @Column({ type: 'varchar2', length: 11, nullable: true })
-    URGENT: string | null;
+    @Column()
+    UNIT: number;
 
-    @PrimaryColumn({ type: 'varchar2', length: 5 })
+    @Column()
+    URGENT: string;
+
+    @PrimaryColumn()
     REVNO: string;
 
-    @Column({ type: 'varchar2', length: 5, nullable: true })
-    PRODTY: string | null;
+    @Column()
+    PRODTY: string;
 
-    @Column({ type: 'varchar2', length: 15, nullable: true })
-    MODEL: string | null;
+    @Column()
+    MODEL: string;
 
-    @Column({ type: 'varchar2', length: 50, nullable: true })
-    REGT: string | null;
+    @Column()
+    REGT: string;
 
-    @Column({ type: 'varchar2', length: 5, nullable: true })
-    GATE: string | null;
+    @Column()
+    GATE: string;
 
-    @Column({ type: 'number', nullable: true })
-    CAPA: number | null;
+    @Column()
+    CAPA: number;
 
-    @Column({ type: 'number', nullable: true })
-    SPD: number | null;
+    @Column()
+    SPD: number;
 
-    @Column({ type: 'number', nullable: true })
-    TRAVEL: number | null;
+    @Column()
+    TRAVEL: number;
 
-    @Column({ type: 'varchar2', length: 10, nullable: true })
-    OBST: string | null;
+    @Column()
+    OBST: string;
 
-    @Column({ type: 'varchar2', length: 10, nullable: true })
-    CWTPT: string | null;
+    @Column()
+    CWTPT: string;
 
-    @Column({ type: 'number', nullable: true })
-    AA: number | null;
+    @Column()
+    AA: number;
 
-    @Column({ type: 'number', nullable: true })
-    BB: number | null;
+    @Column()
+    BB: number;
 
-    @Column({ type: 'number', nullable: true })
-    JJ: number | null;
+    @Column()
+    JJ: number;
 
-    @Column({ type: 'number', nullable: true })
-    HH: number | null;
+    @Column()
+    HH: number;
 
-    @Column({ type: 'varchar2', length: 5, nullable: true })
-    DOORTY: string | null;
+    @Column()
+    DOORTY: string;
 
-    @Column({ type: 'number', nullable: true })
-    HL: number | null;
+    @Column()
+    HL: number;
 
-    @Column({ type: 'varchar2', length: 20, nullable: true })
-    CEILINGTY: string | null;
+    @Column()
+    CEILINGTY: string;
 
-    @Column({ type: 'varchar2', length: 10, nullable: true })
-    EMERGENCYEXIT: string | null;
+    @Column()
+    EMERGENCYEXIT: string;
 
-    @Column({ type: 'varchar2', length: 10, nullable: true })
-    VENTILATIONFAN: string | null;
+    @Column()
+    VENTILATIONFAN: string;
 
-    @Column({ type: 'number', nullable: true })
-    DECORATIONWEIGHT: number | null;
+    @Column()
+    DECORATIONWEIGHT: number;
 
-    @Column({ type: 'number', nullable: true })
-    FLOORINGWEIGHT: number | null;
+    @Column()
+    FLOORINGWEIGHT: number;
 
-    @Column({ type: 'number', nullable: true })
-    PITDEPTH: number | null;
+    @Column()
+    PITDEPTH: number;
 
-    @Column({ type: 'number', nullable: true })
-    OVERHEAD: number | null;
+    @Column()
+    OVERHEAD: number;
 
-    @Column({ type: 'varchar2', length: 10, nullable: true })
-    CWTSAFETY: string | null;
+    @Column()
+    CWTSAFETY: string;
 
-    @Column({ type: 'varchar2', length: 10, nullable: true })
-    FIREPROOFDOOR: string | null;
+    @Column()
+    FIREPROOFDOOR: string;
 
-    @Column({ type: 'number', nullable: true })
-    SHAFTWIDTH: number | null;
+    @Column()
+    SHAFTWIDTH: number;
 
-    @Column({ type: 'number', nullable: true })
-    SHAFTDEPTH: number | null;
+    @Column()
+    SHAFTDEPTH: number;
 
-    @Column({ type: 'date', nullable: true })
-    SPEC_COMPLETED_DT: Date | null;
+    @Column()
+    SPEC_COMPLETED_DT: Date;
 
-    @Column({ type: 'date', nullable: true })
-    DEADLINE_JV: Date | null;
+    @Column()
+    DEADLINE_JV: Date;
 
-    @Column({ type: 'varchar2', length: 500, nullable: true })
-    SPLOUTOFSPEC: string | null;
+    @Column()
+    SPLOUTOFSPEC: string;
 
-    @Column({ type: 'varchar2', length: 500, nullable: true })
-    PENDINGSPEC: string | null;
+    @Column()
+    PENDINGSPEC: string;
 
-    @Column({ type: 'varchar2', length: 15, nullable: true })
-    TQI_STATUS: string | null;
+    @Column()
+    TQI_STATUS: string;
 
-    @Column({ type: 'varchar2', length: 15, nullable: true })
-    ACTION: string | null;
+    @Column()
+    ACTION: string;
 
-    @Column({ type: 'date', nullable: true })
-    ACTIONDT: Date | null;
+    @Column()
+    ACTIONDT: Date;
 
-    @Column({ type: 'date', nullable: true })
-    EXP_REPLY_MECH: Date | null;
+    @Column()
+    EXP_REPLY_MECH: Date;
 
-    @Column({ type: 'date', nullable: true })
-    EXP_REPLY_ELEC: Date | null;
+    @Column()
+    EXP_REPLY_ELEC: Date;
 
-    @Column({ type: 'date', nullable: true })
-    EXP_REPLY_APPR: Date | null;
+    @Column()
+    EXP_REPLY_APPR: Date;
 
-    @Column({ type: 'date', nullable: true })
-    MECH_REPLY_DT: Date | null;
+    @Column()
+    MECH_REPLY_DT: Date;
 
-    @Column({ type: 'date', nullable: true })
-    ELEC_REPLY_DT: Date | null;
+    @Column()
+    ELEC_REPLY_DT: Date;
 
-    @Column({ type: 'date', nullable: true })
-    APPR_REPLY_DT: Date | null;
+    @Column()
+    APPR_REPLY_DT: Date;
 
-    @Column({ type: 'varchar2', length: 5, nullable: true })
-    EME_PIC: string | null;
+    @Column()
+    EME_PIC: string;
 
-    @Column({ type: 'varchar2', length: 5, nullable: true })
-    EEL_PIC: string | null;
+    @Column()
+    EEL_PIC: string;
 
-    @Column({ type: 'varchar2', length: 5, nullable: true })
-    EAP_PIC: string | null;
+    @Column()
+    EAP_PIC: string;
 
-    @Column({ type: 'date', nullable: true })
-    MECH_INFORM_APPR_DT: Date | null;
+    @Column()
+    MECH_INFORM_APPR_DT: Date;
 
-    @Column({ type: 'date', nullable: true })
-    MECH_INFORM_ELEC_DT: Date | null;
+    @Column()
+    MECH_INFORM_ELEC_DT: Date;
 
-    @Column({ type: 'date', nullable: true })
-    ELEC_INFORM_APPR_DT: Date | null;
+    @Column()
+    ELEC_INFORM_APPR_DT: Date;
 
-    @Column({ type: 'date', nullable: true })
-    ELEC_INFORM_MECH_DT: Date | null;
+    @Column()
+    ELEC_INFORM_MECH_DT: Date;
 
-    @Column({ type: 'date', nullable: true })
-    APPR_INFORM_MECH_DT: Date | null;
+    @Column()
+    APPR_INFORM_MECH_DT: Date;
 
-    @Column({ type: 'date', nullable: true })
-    APPR_INFORM_EEL_DT: Date | null;
+    @Column()
+    APPR_INFORM_EEL_DT: Date;
 
-    @Column({ type: 'date', nullable: true })
-    EXP_REPLY_SAE: Date | null;
+    @Column()
+    EXP_REPLY_SAE: Date;
 
-    @Column({ type: 'date', nullable: true })
-    REPLY_DT: Date | null;
+    @Column()
+    REPLY_DT: Date;
 
-    @Column({ type: 'varchar2', length: 5, nullable: true })
-    ISSUED_TO_MELINA: string | null;
+    @Column()
+    ISSUED_TO_MELINA: string;
 
-    @Column({ type: 'varchar2', length: 500, nullable: true })
-    REMARK: string | null;
+    @Column()
+    REMARK: string;
 
-    @Column({ type: 'varchar2', length: 5, nullable: true })
-    LAST_USER: string | null;
+    @Column()
+    LAST_USER: string;
 
-    @Column({ type: 'varchar2', length: 15, nullable: true })
-    LAST_UPDATE: string | null;
+    @Column()
+    LAST_UPDATE: string;
 
-    @Column({ type: 'varchar2', length: 20, nullable: true })
-    ON_CONSULT: string | null;
+    @Column()
+    ON_CONSULT: string;
 
-    @Column({ type: 'varchar2', length: 4000, nullable: true })
-    CONSULT_DETAIL: string | null;
+    @Column()
+    CONSULT_DETAIL: string;
 
-    @Column({ type: 'date', nullable: true })
-    SEND_TO_MELINA_DT: Date | null;
+    @Column()
+    SEND_TO_MELINA_DT: Date;
 
-    @Column({ type: 'varchar2', length: 120, nullable: true })
-    CONSULTANT: string | null;
+    @Column()
+    CONSULTANT: string;
 
-    @Column({ type: 'varchar2', length: 50, nullable: true })
-    PRJNO: string | null;
+    @Column()
+    PRJNO: string;
 
-    @Column({ type: 'varchar2', length: 100, nullable: true })
-    PRJNAME: string | null;
+    @Column()
+    PRJNAME: string;
 
-    @Column({ type: 'varchar2', length: 30, nullable: true })
-    ORDERNO: string | null;
+    @Column()
+    ORDERNO: string;
 
-    @Column({ type: 'varchar2', length: 70, nullable: true })
-    PREPAREBY: string | null;
+    @Column()
+    PREPAREBY: string;
 
-    @Column({ type: 'varchar2', length: 100, nullable: true })
-    TYPEOFBULIDING: string | null;
+    @Column()
+    TYPEOFBULIDING: string;
 
-    @Column({ type: 'varchar2', length: 50, nullable: true })
-    INQTY: string | null;
+    @Column()
+    INQTY: string;
 }

@@ -82,8 +82,7 @@ export class WireHarnessCuttingRepository extends BaseRepository {
                 'A.ST_DATEUPDATE AS DATEUPDATE',
                 'A.ST_DRUMTYPE AS DRUMTYPE',
                 'CONVERT_PROD(A.ST_PROD) AS PROD',
-            ])
-            .addSelect('CONVERT_PROD(A.ST_PROD)', 'PROD');
+            ]);
 
         return this.applyFilters(
             qb,

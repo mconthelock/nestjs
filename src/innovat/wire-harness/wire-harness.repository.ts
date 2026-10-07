@@ -6,6 +6,7 @@ import { OracleRepository } from 'src/common/repositories/oracle-repository';
 import { WHN_PRODUCTION_PLAN } from 'src/common/Entities/innovat/table/WHN_PRODUCTION_PLAN.entity';
 import { WHN_PROCESS } from 'src/common/Entities/innovat/table/WHN_PROCESS.entity';
 import { WHN_DRUM_STOCK } from 'src/common/Entities/innovat/table/WHN_DRUM_STOCK.entity';
+import { WHN_DRUM_MASTER } from 'src/common/Entities/innovat/table/WHN_DRUM_MASTER.entity';
 import { WHN_PRODUCTION } from 'src/common/Entities/innovat/views/WHN_PRODUCTION.entity';
 import { WHN_AUTOPLAN } from 'src/common/Entities/innovat/views/WHN_AUTOPLAN.entity';
 import { FiltersDto } from 'src/common/dto/filter.dto';
@@ -62,7 +63,7 @@ export class WireHarnessRepository extends BaseRepository {
     }
 
     getDrumStock(condition: FiltersDto) {
-        const allowedFields = ['ST_ITEMCODE', 'ST_LENREMAIN', 'ST_DRUMTYPE'];
+        const allowedFields = ['ST_ITEMCODE', 'ST_LENREMAIN', 'ST_DRUMTYPE', 'ST_RECIVEDATE'];
         const qb = this.getRepository(WHN_DRUM_STOCK)
             .createQueryBuilder('A')
             .select([
@@ -116,5 +117,20 @@ export class WireHarnessRepository extends BaseRepository {
             dto,
             paramOrder,
         );
+    }
+
+    getDrumMaster(condition: FiltersDto) {
+        const allowedFields = ['MT_ITEMCODE', 'MT_CABLECODE', 'GRP_ID'];
+        const qb = this.getRepository(WHN_DRUM_MASTER)
+            .createQueryBuilder('A');
+
+        return this.applyFilters(
+            qb,
+            'A',
+            condition,
+            allowedFields,
+        )
+        .orderBy('A.MT_ITEMCODE', 'ASC')
+        .getMany();
     }
 }

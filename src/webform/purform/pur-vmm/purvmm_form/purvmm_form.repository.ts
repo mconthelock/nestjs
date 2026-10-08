@@ -84,6 +84,13 @@ export class PurvmmFormRepository extends BaseRepository {
                 value: dto.VENDNAME,
             });
         }
+        if (dto.VENDGROUPTYPE) {
+            cond.AND.push({
+                field: 'VENDGROUPTYPE',
+                op: 'eq',
+                value: dto.VENDGROUPTYPE,
+            });
+        }
         if (dto.vmmform.CST) {
             cond.AND.push({
                 field: 'vmmform.CST',
@@ -170,6 +177,7 @@ export class PurvmmFormRepository extends BaseRepository {
             'NRUNNO',
             'VENDCODE',
             'VENDNAME',
+            'VENDGROUPTYPE',
             'vmmform.CST',
             'vmmform.DREQDATE',
             'reqtor.SEMPNO',

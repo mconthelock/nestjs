@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class SendLoanMailDto {
-    @IsEmail()
+    @IsString()
     to: string;
 
     @IsOptional()

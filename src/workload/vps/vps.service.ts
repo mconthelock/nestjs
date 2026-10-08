@@ -371,4 +371,9 @@ export class VpsService {
 
         return {data : data};
     }
+
+    async checkQtyPrintBlock(order: string, block: string) {
+        const data = await this.vpsRepository.checkQtyPrintBlock(order, block);
+        return data;
+    }
 }

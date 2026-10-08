@@ -60,6 +60,42 @@ export class GpTphRepository extends BaseRepository {
             );
         });
     }
+    async approveGpTphConsecutiveSteps(form: FormDto, flow: FLOW, params: any) {
+        const visited = new Set([flow.CSTEPNO]);
+        let nextStep = flow.CSTEPNEXTNO;
+        while (nextStep && nextStep !== '00' && !visited.has(nextStep)) {
+            visited.add(nextStep);
+            const steps = await this.getRepository(FLOW).findBy({ ...form, CSTEPNO: nextStep });
+            const matching = steps.filter(
+                (step) =>
+                    step.CAPVSTNO === '0' &&
+                    ['1', '2', '3'].includes(step.CSTEPST) &&
+                    (step.VAPVNO?.trim() === params.VREALAPV.trim() ||
+                        step.VREPNO?.trim() === params.VREALAPV.trim()),
+            );
+            if (!matching.length) break;
+
+            // Reuse this action only for the same actor; other co-approvers remain pending.
+            await this.manager.query(
+                `UPDATE FLOW SET CAPVSTNO = :1, CSTEPST = :2,
+                    DAPVDATE = TO_DATE(:3, 'YYYY-MM-DD'), CAPVTIME = :4,
+                    VREMARK = :5, VREMOTE = :6, VREALAPV = :7
+                 WHERE NFRMNO = :8 AND VORGNO = :9 AND CYEAR = :10
+                    AND CYEAR2 = :11 AND NRUNNO = :12 AND CSTEPNO = :13
+                    AND CAPVSTNO = '0' AND CSTEPST IN ('1', '2', '3')
+                    AND (VAPVNO = :14 OR VREPNO = :15)`,
+                [
+                    '1', '5',
+                    params.DAPVDATE, params.CAPVTIME, params.VREMARK,
+                    params.VREMOTE, params.VREALAPV,
+                    form.NFRMNO, form.VORGNO, form.CYEAR, form.CYEAR2,
+                    form.NRUNNO, nextStep, params.VREALAPV, params.VREALAPV,
+                ],
+            );
+            nextStep = matching[0].CSTEPNEXTNO;
+        }
+    }
+
     findAllLocations() {
         return this.getRepository(GPTPH_LOCATION).find({
             relations: ['AREAS']

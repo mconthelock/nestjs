@@ -70,6 +70,7 @@ export class IeBgrService {
         fileE: 5,
         fileU: 6,
         fileO: 7,
+        fileF: 8,
     } as const;
 
     async report(dto: ReportIeBgrDto) {
@@ -256,6 +257,7 @@ export class IeBgrService {
                 USEDBG: dto.USEDBG,
                 REMBG: dto.REMBG,
                 REQAMT: dto.REQAMT,
+                ALLOCBG: dto.ALLOCBG,
                 RESORG: dto.RESORG,
                 PIC: dto.PIC,
                 PAYMENT_PLAN: dto.PAYMENT_PLAN ?? null,
@@ -267,7 +269,7 @@ export class IeBgrService {
                 EFFT: dto.EFFT,
                 SCHEDULE: dto.SCHEDULE,
                 REMARK: dto.REMARK,
-                PPRESDATE: dto.PREDATE,
+                PPRESDATE: dto.PREDATE || null,
                 GPBID: dto.GPBID || null,
                 CASETYPE: dto.CASETYPE,
                 AVALIABLE_BALANCE: avaliableBalance,

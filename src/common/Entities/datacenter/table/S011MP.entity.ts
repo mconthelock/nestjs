@@ -5,27 +5,27 @@ export class S011MP {
   @PrimaryColumn()
   S11M01: string;
 
-  @Column()
+  @PrimaryColumn()
   S11M02: string;
 
-  @Column()
+  @PrimaryColumn()
   S11M03: string;
 
-  @Column()
+  @PrimaryColumn()
   S11M04: string;
 
-  @Column()
+  @PrimaryColumn()
   S11M05: string;
 
-  @Column()
+  @PrimaryColumn()
   S11M06: string;
 
-  @Column()
+  @PrimaryColumn()
   S11M07: string;
 
-  @Column()
+  @PrimaryColumn()
   S11M08: string;
 
-  @Column()
-  S11M09: string;
+  @PrimaryColumn()
+  S11M09: number;
 }

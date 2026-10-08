@@ -19,16 +19,25 @@ export class DPMS_PACKING_LIST_DETAIL {
     VDRAWING: string;
 
     @PrimaryColumn()
+    VDRAWINGL: string;
+
+    @PrimaryColumn()
     NQTY: string;
 
     @Column()
     NROUND: number;
 
     @Column()
-    VSELECTED: string;
+    VISSUE_SELECTED: string;
 
     @Column()
-    VORDER_COMBINE: string;
+    NEW_LIST: string;
+
+    @Column()
+    VORIGIN: string;
+
+    @PrimaryColumn()
+    COMBINE: string;
 
     @ManyToOne(() => DPMS_PACKING_LIST_MAIN, (main) => main.DETAILS)
     @JoinColumn([

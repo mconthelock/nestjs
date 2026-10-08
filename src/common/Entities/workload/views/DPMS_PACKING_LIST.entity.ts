@@ -3,6 +3,12 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
 @Entity({name: 'DPMS_PACKING_LIST', schema: 'WORKLOAD'})
 export class DPMS_PACKING_LIST{
     @Column()
+    AGENT: string;
+
+    @Column()
+    DSTN: string;
+
+    @Column()
     TURNOVER_STATUS: number;
 
     @PrimaryColumn()
@@ -22,6 +28,12 @@ export class DPMS_PACKING_LIST{
 
     @Column()
     COUNTRY: string;
+
+    @Column()
+    IS_ORIGIN_EDITABLE: string;
+
+    @Column()
+    SHIPPING_MARK_EDITABLE: string;
 
     @Column()
     SERIES: string;
@@ -109,6 +121,12 @@ export class DPMS_PACKING_LIST{
 
     @Column()
     VREASON: string;
+
+    @Column()
+    ISSUE: string;
+
+    @Column()
+    LASTISSUEDATE: Date;
     
     @Column()
     REVISE: string;

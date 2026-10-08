@@ -7,49 +7,45 @@ import { UpdateAemployeeDto } from './dto/update-aemployee.dto';
 
 @Injectable()
 export class AemployeeService {
-  constructor(
-    @InjectRepository(AEmployee, 'amecConnection')
-    private readonly aemployeeRepository: Repository<AEmployee>,
-  ) {}
+    constructor(
+        @InjectRepository(AEmployee, 'amecConnection')
+        private readonly aemployeeRepository: Repository<AEmployee>,
+    ) {}
 
-  async create(createAemployeeDto: CreateAemployeeDto) {
-    const aemployee = this.aemployeeRepository.create(createAemployeeDto);
-    const result = await this.aemployeeRepository.save(aemployee);
-    return result;
-  }
+    async create(createAemployeeDto: CreateAemployeeDto) {
+        const aemployee = this.aemployeeRepository.create(createAemployeeDto);
+        const result = await this.aemployeeRepository.save(aemployee);
+        return result;
+    }
 
-  findAll() {
-    return this.aemployeeRepository.find();
-  }
+    findAll() {
+        return this.aemployeeRepository.find();
+    }
 
-  async findOne(id: string) {
-    const user = await this.aemployeeRepository.findOne({
-      where: { sempno: id },
-    });
-    return user;
-  }
+    async findOne(id: string) {
+        const user = await this.aemployeeRepository.findOne({
+            where: { sempno: id },
+        });
+        return user;
+    }
 
-  async findOneBySLogin(id: string) {
-    const user = await this.aemployeeRepository.findOne({
-      where: { sempno: id },
-      select: [
-        'sempno',
-        'sname',
-        'sdivcode',
-        'sdepcode',
-        'sseccode',
-        'sposcode',
-        'spassword1',
-      ],
-    });
-    return user;
-  }
+    async findOneBySLogin(id: string) {
+        const user = await this.aemployeeRepository.findOne({
+            where: { sempno: id },
+            select: [
+                'sempno',
+                'sname',
+                'sdivcode',
+                'sdepcode',
+                'sseccode',
+                'sposcode',
+                'spassword1',
+            ],
+        });
+        return user;
+    }
 
-  update(id: number, updateAemployeeDto: UpdateAemployeeDto) {
-    return `This action updates a #${id} aemployee`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} aemployee`;
-  }
+    async updatePassword(id: string, updateAemployeeDto: UpdateAemployeeDto) {
+        return;
+    }
 }

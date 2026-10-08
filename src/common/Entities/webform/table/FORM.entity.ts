@@ -64,6 +64,10 @@ export class FORM {
     @JoinColumn({ name: 'VINPUTER', referencedColumnName: 'SEMPNO' })
     creator: User;
 
+    @OneToOne(() => User)
+    @JoinColumn({ name: 'VREQNO', referencedColumnName: 'SEMPNO' })
+    reqtor: User;
+
     @OneToOne(() => FORMMST, (mst) => mst.form)
     @JoinColumn([
         { name: 'NFRMNO', referencedColumnName: 'NNO' },

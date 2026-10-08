@@ -13,6 +13,7 @@ import { deleteFile, joinPaths } from 'src/common/utils/files.utils';
 import { DrawingFileHelper } from './helpers/drawing-file.helper';
 import { DrawingResolverHelper } from './helpers/drawing-resolver.helper';
 import { DrawingMatcherHelper } from './helpers/drawing-matcher.helper';
+import { DrawingParserHelper } from './helpers/drawing-parser.helper';
 
 @Injectable()
 export class MfgDrawingCreateChecksheetService {
@@ -23,6 +24,7 @@ export class MfgDrawingCreateChecksheetService {
         private readonly mfgDrawingActionService: MfgDrawingActionService,
         private readonly drawingFileHelper: DrawingFileHelper,
         private readonly drawingResolverHelper: DrawingResolverHelper,
+        private readonly drawingParserHelper: DrawingParserHelper,
         private readonly drawingMatcherHelper: DrawingMatcherHelper,
     ) {}
 
@@ -36,11 +38,12 @@ export class MfgDrawingCreateChecksheetService {
     async create(dto: CreateMfgDrawingCheckSheetDto) {
         try {
             let message: string = 'Search Checksheet Success';
+
             const item = await this.itemMfgService.findOne(dto.NITEMID);
             if (!item.status) {
                 throw new Error(`Item Mfg with id ${dto.NITEMID} not found`);
             }
-
+            
             const itemData: ITEM_MFG = item.data;
             const blockName = itemData.BLOCK_MASTER ? itemData.BLOCK_MASTER.VNAME : null;
             const itemName  = itemData.VITEM_NAME;
@@ -50,66 +53,72 @@ export class MfgDrawingCreateChecksheetService {
             const typeName: string = this.mapType[itemData.NTYPE] || 'unknown';
             const masterPath: string = itemData.VPATH;
 
+            if (!masterPath) {
+                throw new Error(
+                    `Master path not found for item ${itemName}`,
+                );
+            }
+
             let listOfCS: {
                 VDRAWING: { DRAWING: string; G: string[]; L: string[][] };
                 VNUMBER_FILE: string;
             } = null;
 
-            const deleteList: string[] =
-                deleteLists
-                    .filter((d) => d.NSTATUS == 1)
-                    .map((d) => d.VDRAWING) || [];
+            const deleteList: string[] = deleteLists
+                .filter((d) => d.NSTATUS == 1)
+                .map((d) => d.VDRAWING) || [];
 
-            const controlList: string[] =
-                controlLists
-                    .filter((c) => c.NSTATUS == 1)
-                    .map((c) => c.VDRAWING) || [];
+            const controlList: string[] = controlLists
+                .filter((c) => c.NSTATUS == 1)
+                .map((c) => c.VDRAWING) || [];
 
-            if (!masterPath) {
-                throw new Error(
-                    `Master path not found for item ${itemData.VITEM_NAME}`,
-                );
-            }
+            const createSerialList = (type: number) =>
+                dto.ASERIALNO.map((sn) => ({
+                    VSERIALNO: sn,
+                    NTYPE: type,
+                }));
 
-            let drawing: string;
             let controlNo: string = dto.VCONTROLNO;
+            let processNo: string = dto.VPROCESSNO;
+            let drawing: string;
             let fileName: string;
             let newfileName: string;
+            let destination: string;
             let serialList: { VSERIALNO: string; NTYPE: number }[];
-            let dataByidTag: { controlNo: string; drawing: string };
 
             switch (typeName) {
                 case 'multi':
-                    newfileName = controlNo;
-                    fileName = itemData.VFILE;
-                    drawing  = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
-                    serialList = dto.ASERIALNO.map((sn, index) => ({
-                        VSERIALNO: sn,
-                        NTYPE: 1, // กำหนด type เป็น 1 สำหรับ serial no ทั้งหมดในกรณี multi
-                    }));
+                    destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
+                    drawing     = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
+                    fileName    = itemData.VFILE;
+                    newfileName = controlNo; 
+                    serialList  = createSerialList(1);
                     break;
                 case 'pisMulti':
+                    destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
+                    drawing     = await this.drawingResolverHelper.getDrawingByPis(dto.VPIS, controlList);
+                    listOfCS    = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawing);
+                    fileName    = listOfCS.VNUMBER_FILE;  
                     newfileName = dto.VPIS;
-                    drawing  = await this.drawingResolverHelper.getDrawingByPis(dto.VPIS, controlList);
-                    listOfCS = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawing);
-                    fileName = listOfCS.VNUMBER_FILE;
-                    serialList = dto.ASERIALNO.map((sn, index) => ({
-                        VSERIALNO: sn,
-                        NTYPE: 2, // กำหนด type เป็น 2 สำหรับ serial no ทั้งหมดในกรณี pisMulti
-                    }));
+                    serialList  = createSerialList(2);
                     break;
                 case 'feeder':
-                    drawing = await this.drawingResolverHelper.getDrawingByFeeder(controlNo);
+                    const info  = await this.drawingResolverHelper.getFeederInfo(controlNo); 
+                    destination = await this.drawingFileHelper.getPathFeeder(info.folderPath);
+                    drawing     = this.drawingParserHelper.extractDrawingNo(info.drawing);
+                    processNo   = this.drawingParserHelper.extractProcessCode(processNo);
+                    fileName    = await this.drawingFileHelper.findFeederFileName(drawing, processNo, masterPath);
+                    const rev   = await this.drawingFileHelper.getRevisionCheckSheetFeeder(masterPath, fileName);
+                    newfileName = `${drawing}-${processNo}-${rev}`;
                     break;
                 default:
+                    destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
+                    drawing     = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
+                    const drawingCheck = await this.drawingResolverHelper.checkBreakAssyDrawing(controlNo, drawing);
+                    listOfCS    = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawingCheck);
+                    fileName    = listOfCS.VNUMBER_FILE;
                     newfileName = controlNo;
-                    drawing  = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
-                    listOfCS = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawing);
-                    fileName = listOfCS.VNUMBER_FILE;
-                    serialList = dto.ASERIALNO.map((sn, index) => ({
-                        VSERIALNO: sn,
-                        NTYPE: 1, // กำหนด type เป็น 1 สำหรับ serial no ทั้งหมดในกรณี default
-                    }));
+                    serialList  = createSerialList(1);
                     break;
             }
 
@@ -118,6 +127,7 @@ export class MfgDrawingCreateChecksheetService {
                 itemId: itemData.NID,
                 drawing: drawing,
                 controlNo: controlNo,
+                processNo: processNo,
                 pis: dto.VPIS,
                 usercreate: dto.NUSERCREATE,
                 typeName: typeName,
@@ -128,15 +138,24 @@ export class MfgDrawingCreateChecksheetService {
 
             if (this.isEditable(insertData.NINSPECTOR_STATUS)) {
                 message = 'Create Checksheet Success';
-                const insertSerial = await this.insertSerial({
-                    drawingId: insertData.NID,
-                    serialList: serialList,
-                    userCreate: dto.NUSERCREATE,
-                });
-            }
+                if (['default', 'pisMulti', 'multi'].includes(typeName)) {
+                    await this.insertSerial({
+                        drawingId: insertData.NID,
+                        serialList: serialList,
+                        userCreate: dto.NUSERCREATE,
+                    });
+                }
+            } 
 
-            const destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
-            await this.drawingFileHelper.createFile(insertData, masterPath, destination, fileName, newfileName);
+            await this.drawingFileHelper.createFile(
+                insertData,
+                masterPath,
+                destination,
+                fileName,
+                newfileName,
+                typeName,
+            );
+
             const res = await this.mfgDrawingService.findOne(insertData.NID);    
             return {
                 data: res.data,
@@ -153,6 +172,7 @@ export class MfgDrawingCreateChecksheetService {
         itemId,
         drawing,
         controlNo,
+        processNo,
         pis,
         usercreate,
         typeName,
@@ -164,6 +184,7 @@ export class MfgDrawingCreateChecksheetService {
         itemId: number;
         drawing: string;
         controlNo: string;
+        processNo: string;
         pis: string;
         usercreate: number;
         typeName: string;
@@ -178,9 +199,10 @@ export class MfgDrawingCreateChecksheetService {
                 itemId,
                 drawing,
                 pis,
-                controlNo
+                controlNo,
+                processNo
             );
-            
+
             // สร้างใหม่ ถ้าไม่มีข้อมูลหรือมีแต่ inspector status = 1 แต่ถ้ามีข้อมูลให้ return ข้อมูลนั้นแทน
             const data: any = {
                 NBLOCKID: blockId,
@@ -188,12 +210,14 @@ export class MfgDrawingCreateChecksheetService {
                 VPIS: pis,
                 VDRAWING: drawing,
                 VCONTROLNO: controlNo,
+                VPROCESSNO: processNo,
                 NINSPECTOR_STATUS: 1,
                 NFORELEAD_STATUS: 4,
                 VFILE_NAME: null,
                 NSTATUS: 1,
                 NUSERCREATE: usercreate,
             };
+
             if (isDataExist.status) {
                 data.NID = isDataExist.data.NID;
                 data.NUSERUPDATE = usercreate;
@@ -213,10 +237,7 @@ export class MfgDrawingCreateChecksheetService {
                 // ถ้าไม่ใช่ multi และ drawing อยู่ใน delete list ให้ตั้ง status เป็น 3
                 if (
                     typeName != 'multi' &&
-                    this.drawingMatcherHelper.checkDeleteDrawing(
-                        deleteList,
-                        drawing,
-                    ) &&
+                    this.drawingMatcherHelper.checkDeleteDrawing(deleteList, drawing) &&
                     [1, 3].includes(isDataExist.data.NSTATUS) &&
                     isDataExist.data.NINSPECTOR_STATUS === 1
                 ) {
@@ -230,6 +251,7 @@ export class MfgDrawingCreateChecksheetService {
                     }
                 }
             }
+
             if (
                 !isDataExist.status ||
                 this.isEditable(isDataExist.data?.NINSPECTOR_STATUS) ||
@@ -242,6 +264,7 @@ export class MfgDrawingCreateChecksheetService {
                         `Insert MFG_DRAWING Failed: ${insert.message}`,
                     );
                 }
+                
                 return insert.data;
             } else {
                 return isDataExist.data;
@@ -262,8 +285,9 @@ export class MfgDrawingCreateChecksheetService {
         blockId: number,
         itemId: number,
         drawing: string,
-        vis?: string,
+        pis?: string,
         controlNo?: string,
+        processNo?: string,
     ): Promise<{ status: boolean; data: MFG_DRAWING | null; message: string }> {
         try {
             const condition = [
@@ -271,15 +295,23 @@ export class MfgDrawingCreateChecksheetService {
                 { field: 'NITEMID', op: 'eq', value: itemId },
                 { field: 'VDRAWING', op: 'eq', value: drawing },
             ];
-            if(vis){
-                condition.push({ field: 'VPIS', op: 'eq', value: vis });
+
+            if(pis){
+                condition.push({ field: 'VPIS', op: 'eq', value: pis });
             }
+
             if(controlNo){
                 condition.push({ field: 'VCONTROLNO', op: 'eq', value: controlNo });
             }
+
+            if(processNo){
+                condition.push({ field: 'VPROCESSNO', op: 'eq', value: processNo });
+            }
+
             const drawingData = await this.mfgDrawingService.search({
                 filters: condition,
             });
+
             return {
                 status: drawingData.data.length > 0,
                 data: drawingData.data?.[0] || null,

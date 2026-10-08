@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
+import { searchDto } from './dto/search-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -15,8 +16,8 @@ export class UsersService {
         return this.repo.findEmpEncode(empno);
     }
 
-    search() {
-        return this.repo.findAll();
+    search(q?: searchDto) {
+        return this.repo.findAll(q);
     }
 
     findBirthday(month: string) {

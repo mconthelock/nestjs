@@ -44,9 +44,54 @@ export class DpmsPackingListService {
         }
     }
 
-    async getForSearch() {
+    async getPackingListMar(type: 'all' | 'current' | 'finish' | 'inprogress' | 'search', condition?: searchDpmsPackingListDto) {
         try {
-            const data = await this.repo.findAll();
+            let res: DPMS_PACKING_LIST[] = [];
+            switch (type) {
+                case 'all':
+                    res = await this.repo.getMarketingTasks('all');
+                    break;
+                case 'current':
+                    res = await this.repo.getMarketingTasks('current');
+                    break;
+                case 'finish':
+                    res = await this.repo.getMarketingTasks('finish');
+                    break;
+                case 'inprogress':
+                    res = await this.repo.getMarketingTasks('inprogress');
+                    break;
+                case 'search':
+                    res = await this.repo.getMarketingTasks('search', condition);
+                    break;
+                default:
+                    throw new Error('Invalid packing list type');
+            }
+            if (res.length === 0) {
+                return {
+                    status: false,
+                    message: 'Get DPMS packing list Failed: No data found',
+                };
+            }
+            return {
+                status: true,
+                message: `Get DPMS packing list data found ${res.length} record(s)`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(
+                'Get DPMS packing list data Failed: ' + error.message,
+            );
+        }
+    }
+
+    async getForSearch(types: 'mar' | 'default' = 'default') {
+        try {
+            let data: DPMS_PACKING_LIST[] = [];
+            if(types === 'mar') {
+                data = await this.repo.getMarketingTasks('all');
+            } else {
+                data = await this.repo.findAll();
+            }
             if(data.length === 0) {
                 return {
                     status: false,
@@ -59,6 +104,7 @@ export class DpmsPackingListService {
             const serie = Array.from(new Set(data.filter((item) => item.SERIES).map((item) => item.SERIES)));
             const model = Array.from(new Set(data.filter((item) => item.MODEL_SPEC).map((item) => item.MODEL_SPEC)));
             const proj = Array.from(new Set(data.filter((item) => item.PROJECT).map((item) => item.PROJECT)));
+            const agent = Array.from(new Set(data.filter((item) => item.AGENT).map((item) => item.AGENT))); 
             return {
                 status: true,
                 PROD: prod,
@@ -67,6 +113,7 @@ export class DpmsPackingListService {
                 SERIES: serie,
                 MODEL: model,
                 PROJECT: proj,
+                AGENT: agent,
             };
         } catch (error) {
             throw new Error(

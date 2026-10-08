@@ -39,6 +39,11 @@ export class FinDsController {
         return this.finDsService.findForShowReport(Number(fyear));
     }
 
+    @Get('balance/:fyear')
+    findBalance(@Param('fyear') fyear: string) {
+        return this.finDsService.findBalance(Number(fyear));
+    }
+
 
 
     @Get()

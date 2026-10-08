@@ -3,5 +3,15 @@
     "editor.insertSpaces": true,
     "prettier.printWidth": 160,
     "js/ts.tsdk.path": "node_modules/typescript/lib",
-    "ibm-i-acs.host": ""
+    "favorites.resources": [
+        {
+            "filePath": "src\\common\\Entities",
+            "group": "Default"
+        },
+        {
+            "filePath": "d:\\project\\php\\src\\api\\src\\webform\\isform\\crdevicemst\\entities\\crdevicemst.entity.ts",
+            "group": "Default"
+        }
+    ],
+    "favorites.sortOrder": "MANUAL"
 }

@@ -25,4 +25,7 @@ export class EBUDGET_DATA_SN {
 
     @ViewColumn()
     CSTATUS: string;
+
+    @ViewColumn()
+    ALLOCATE: number;
 }

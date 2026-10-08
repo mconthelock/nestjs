@@ -9,6 +9,11 @@ export class DpmsPackingListMainController {
 
     @Get(':mfgNo')
     findPackingListByMfgNo(@Param('mfgNo') mfgNo: string) {
-        return this.service.findPackingListByMfgNo(mfgNo);
+        return this.service.findPackingListByMfgNo(mfgNo, false);
+    }
+
+    @Get('po/:mfgNo')
+    findPackingListPoByMfgNo(@Param('mfgNo') mfgNo: string) {
+        return this.service.findPackingListByMfgNo(mfgNo, true);
     }
 }

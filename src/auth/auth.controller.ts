@@ -8,18 +8,21 @@ import {
     UseGuards,
     Body,
     Res,
+    Req,
     HttpCode,
     HttpStatus,
     UnauthorizedException,
 } from '@nestjs/common';
+import { ApiTags, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
+import { Request as ExpressRequest, Response } from 'express';
+import * as CryptoJS from 'crypto-js';
+
 import { LoginDto } from './dto/login.dto';
 import { directLoginDto } from './dto/direct.dto';
-import { Response } from 'express';
-import * as CryptoJS from 'crypto-js';
-import * as bcrypt from 'bcrypt';
-import { ApiTags, ApiOperation, ApiExcludeEndpoint } from '@nestjs/swagger';
+import { CreateResetPasswordDto } from './dto/create-reset-password.dto';
+import { getClientIP } from 'src/common/utils/ip.utils';
 
 interface encryptObj {
     text: string;
@@ -29,9 +32,7 @@ interface encryptObj {
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-    constructor(
-        private authService: AuthService,
-    ) {}
+    constructor(private authService: AuthService) {}
     @HttpCode(HttpStatus.OK)
     @UseGuards(AuthGuard('local'))
     @Post('login')
@@ -40,8 +41,6 @@ export class AuthController {
         @Body() loginDto: LoginDto,
         @Res({ passthrough: true }) response: Response,
     ) {
-        console.log('controller');
-
         const res = await this.loginResults(req.user, response);
         return res;
     }
@@ -100,6 +99,22 @@ export class AuthController {
         }
     }
 
+    @Post('cardlogin')
+    async cardlogin(
+        @Request() req,
+        @Body() direct: directLoginDto,
+        @Res({ passthrough: true }) response: Response,
+    ) {
+        const ip = String((req as any).clientIp);
+        const loginResult = await this.authService.cardLogin(
+            direct.username.substring(0, 8),
+            direct.appid,
+            ip,
+        );
+        const res = await this.loginResults(loginResult, response);
+        return res;
+    }
+
     @Post('encrypt')
     @ApiExcludeEndpoint()
     encryptText(@Body() encrypt: encryptObj) {
@@ -111,5 +126,16 @@ export class AuthController {
     decryptText(@Body() encrypt: encryptObj) {
         const decryptedBytes = CryptoJS.AES.decrypt(encrypt.text, encrypt.key);
         return decryptedBytes.toString(CryptoJS.enc.Utf8);
+    }
+
+    @Post('resetpassword')
+    async resetPassword(@Body() reset: CreateResetPasswordDto) {
+        return this.authService.resetPassword(reset);
+    }
+
+    @Get('check-ip')
+    async checkIp(@Req() request: ExpressRequest): Promise<{ ip: string }> {
+        const ip = getClientIP(request);
+        return { ip };
     }
 }

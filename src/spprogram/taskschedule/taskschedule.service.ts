@@ -87,7 +87,10 @@ export class TaskscheduleService {
                     }
                 }
             }
-            return filteredInquiries;
+            return {
+                status: 'success',
+                message: 'Prebm check completed successfully.',
+            };
         } catch (error) {
             throw new Error(`Failed to check prebm: ${error.message}`);
         }

@@ -4,8 +4,12 @@ import { PsCiModule } from './ps-ci/ps-ci.module';
 import { PsCihModule } from './ps-cih/ps-cih.module';
 import { PsRPModule } from './ps-rp/ps-rp.module';
 import { PsVarModule } from './ps-var/ps-var.module';
+import { PsYicModule } from './ps-yic/ps-yic.module';
+import { PSDLCModule } from './ps-dlc/ps-dlc.module';
+import { PsClmModule } from './ps-clm/ps-clm.module';
+import { PsUpiModule } from './ps-upi/ps-upi.module';
 
 @Module({
-    imports: [PsFileModule, PsCiModule, PsCihModule, PsRPModule, PsVarModule],
+    imports: [PsFileModule, PsCiModule, PsCihModule, PsRPModule, PsVarModule, PSDLCModule, PsYicModule, PsClmModule, PsUpiModule],
 })
 export class PsFormModule {}

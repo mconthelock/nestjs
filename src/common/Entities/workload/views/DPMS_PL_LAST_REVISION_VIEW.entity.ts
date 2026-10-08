@@ -42,7 +42,7 @@ export class DPMS_PL_LAST_REVISION_VIEW {
     NROUND: number;
 
     @Column()
-    NFILEID: number;
+    NPDFID: number;
 
     @Column()
     VSHOPORDERNO: string;

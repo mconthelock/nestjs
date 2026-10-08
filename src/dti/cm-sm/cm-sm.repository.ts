@@ -46,7 +46,7 @@ export class CmSmRepository extends BaseRepository {
     findAll() {
         return this.getRepository(DTIH).find({
             // where: { RECDT: MoreThanOrEqual(new Date('2026-01-01')) },
-            where: { TINO: 'T-AGM-25-A0474' },
+            where: { TINO: 'T-MEU-26-A0015' },
             relations: { CM_SM_FORM: true },
         });
     }

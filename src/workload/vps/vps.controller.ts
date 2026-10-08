@@ -159,4 +159,16 @@ export class VpsController {
     getSubconItem() {
         return this.vpsService.getSubconItem();
     }
+
+    @Post('check-qty-print-block')
+    async checkQtyPrintBlock(
+        @Body('order') order: string,
+        @Body('block') block: string,
+    ) {
+        const data = await this.vpsService.checkQtyPrintBlock(order, block);
+        return {
+            success: true,
+            data,
+        };
+    }
 }

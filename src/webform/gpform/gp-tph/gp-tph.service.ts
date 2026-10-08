@@ -14,6 +14,11 @@ import { UpdateAreaDto } from './dto/update-data-area.dto';
 import { FlowmstService } from 'src/webform/flowmst/flowmst.service';
 import { OrgposService } from 'src/webform/orgpos/orgpos.service';
 import { RepService } from 'src/webform/rep/rep.service';
+import { UsersService } from 'src/amec/users/users.service';
+import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
+import { DoactionFlowService } from 'src/webform/flow/doaction.service';
+import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+import { now } from 'src/common/utils/dayjs.utils';
 
 @Injectable()
 export class GpTphService {
@@ -24,14 +29,68 @@ export class GpTphService {
         private readonly flowmstService: FlowmstService,
         private readonly orgposService: OrgposService,
         private readonly repService: RepService,
+        private readonly usersService: UsersService,
+        private readonly deleteFlowStepService: DeleteFlowStepService,
+        private readonly doactionFlowService: DoactionFlowService,
     ) { }
 
     findAllAreas() {
         return this.repo.findAllAreas();
     }
 
+    async doAction(dto: doactionFlowDto, ip: string) {
+        const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO } = dto;
+        const form = { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO };
+        if (!(await this.repo.findOne(form))) {
+            throw new NotFoundException('GP-TPH request not found');
+        }
+        if (dto.ACTION === 'approve') {
+            const readySteps = await this.doactionFlowService.getFlow({
+                ...form, CSTEPST: '3',
+            });
+            const flow = readySteps.find((step) =>
+                step.VAPVNO?.trim() === dto.EMPNO.trim() ||
+                step.VREPNO?.trim() === dto.EMPNO.trim(),
+            );
+            if (!flow) throw new BadRequestException('Ready step not found!');
+            await this.repo.approveGpTphConsecutiveSteps(form, flow, {
+                DAPVDATE: now(), CAPVTIME: now('HH:mm:ss'),
+                VREMARK: dto.REMARK ?? '', VREMOTE: ip, VREALAPV: dto.EMPNO,
+            });
+        }
+        return this.doactionFlowService.doAction(dto, ip);
+    }
+
     findAllLocations() {
         return this.repo.findAllLocations();
+    }
+
+    private async validateGroupApplicants(dto: CreateGpTphReqDto) {
+        if (dto.REQUEST_TYPE?.trim() !== 'E' || dto.REQUEST_SUB_TYPE?.trim() !== 'G') {
+            return;
+        }
+        if (!Array.isArray(dto.DETAILS) || !dto.DETAILS.length) {
+            throw new BadRequestException('DETAILS must contain at least one applicant');
+        }
+        const requestBy = dto.REQBY?.trim();
+        if (!requestBy) {
+            throw new BadRequestException('กรุณาระบุ Request By สำหรับ Group Request');
+        }
+        const employeeCodes = [requestBy, ...dto.DETAILS.map((detail) => detail.EMP_CODE?.trim())];
+        const departments = new Set<string>();
+        for (const employeeCode of employeeCodes) {
+            const employee = employeeCode
+                ? await this.usersService.findEmp(employeeCode)
+                : null;
+            const department = employee?.SDEPCODE?.trim();
+            if (!employee || String(employee.CSTATUS) !== '1' || !department) {
+                throw new BadRequestException(`ไม่สามารถตรวจสอบ Department ของพนักงาน ${employeeCode || '-'} ได้`);
+            }
+            departments.add(department);
+        }
+        if (departments.size > 1) {
+            throw new BadRequestException('รายชื่อใน Group Request ต้องอยู่ใน Department เดียวกับ Request By');
+        }
     }
 
     async create(
@@ -41,6 +100,7 @@ export class GpTphService {
     ) {
         try {
             console.log('CreateGpTphReqDto:', dto);
+            await this.validateGroupApplicants(dto);
             const areaIds = (Array.isArray(dto.AREA_ID)
                 ? dto.AREA_ID
                 : [dto.AREA_ID]).filter(
@@ -71,6 +131,21 @@ export class GpTphService {
             if (areaOwnerSteps.length !== 1) {
                 throw new BadRequestException(
                     'GP-TPH flow must contain exactly one SYSTEM Area Owner step with CEXTDATA 01',
+                );
+            }
+            const selectedAreas = await this.repo.findAreasByIds(areaIds.map(Number));
+            const highestLevel = Math.max(...selectedAreas.map((area) => Number(area.AREA_LEVEL)));
+            const positionsToSkip = [0, 1, 2].includes(highestLevel)
+                ? ['11', '10', '05', '02']
+                : [3, 4].includes(highestLevel) ? ['05', '02'] : [];
+            const terminalPositions = highestLevel === 0 || highestLevel === 1 || highestLevel === 2
+                ? ['20', '21']
+                : highestLevel === 3 || highestLevel === 4 ? ['10', '11'] : [];
+            if (terminalPositions.length && !flowMaster.some((step) =>
+                step.CTYPE?.trim() === '1' && terminalPositions.includes(step.VPOSNO?.trim()),
+            )) {
+                throw new BadRequestException(
+                    'GP-TPH FLOWMST does not contain the required requester approval position for this area level',
                 );
             }
             //สร้าง Form
@@ -106,6 +181,39 @@ export class GpTphService {
                 areaOwnerApprovers,
             );
 
+            const stepsToSkip = new Set<string>(
+                flowMaster
+                    .filter((step) => step.CTYPE?.trim() === '1' &&
+                        positionsToSkip.includes(step.VPOSNO?.trim()))
+                    .map((step) => step.CSTEPNO),
+            );
+            for (const stepNo of stepsToSkip) {
+                // The shared creator may already remove an unavailable requester step.
+                const step = await this.deleteFlowStepService.getFlow({ ...form, CSTEPNO: stepNo });
+                if (!step.length) continue;
+                const result = await this.deleteFlowStepService.deleteFlowStep({ ...form, CSTEPNO: stepNo });
+                if (!result.status) {
+                    throw new BadRequestException(result.message);
+                }
+                if (step.some((row) => row.CSTEPST === '3') && step[0].CSTEPNEXTNO !== '00') {
+                    const nextReady = await this.deleteFlowStepService.updateFlow({
+                        condition: { ...form, CSTEPNO: step[0].CSTEPNEXTNO },
+                        CSTEPST: '3',
+                    });
+                    if (!nextReady.status) throw new BadRequestException(nextReady.message);
+                    const nextSteps = await this.deleteFlowStepService.getFlow({
+                        ...form, CSTEPNO: step[0].CSTEPNEXTNO,
+                    });
+                    if (nextSteps[0].CSTEPNEXTNO !== '00') {
+                        const nextWaiting = await this.deleteFlowStepService.updateFlow({
+                            condition: { ...form, CSTEPNO: nextSteps[0].CSTEPNEXTNO },
+                            CSTEPST: '2',
+                        });
+                        if (!nextWaiting.status) throw new BadRequestException(nextWaiting.message);
+                    }
+                }
+            }
+
             const data = {
                 ...form,
                 REQUEST_TYPE: dto.REQUEST_TYPE ? dto.REQUEST_TYPE.trim() : null,
@@ -128,7 +236,9 @@ export class GpTphService {
                     NRUNNO: form.NRUNNO,
                     SEQ_NO: Number(detail.SEQ_NO),
                     APPLICANT_TYPE: detail.APPLICANT_TYPE ?? null,
-                    EMP_CODE: detail.EMP_CODE ?? null,
+                    EMP_CODE: dto.REQUEST_TYPE?.trim() === 'H'
+                        ? dto.REQBY?.trim()
+                        : detail.EMP_CODE?.trim() ?? null,
                     APPLICANT_NAME: detail.APPLICANT_NAME ?? null,
                     COMPANY_NAME: detail.COMPANY_NAME ?? null,
                 };
@@ -220,6 +330,7 @@ export class GpTphService {
         if (!existing) {
             throw new NotFoundException('GP-TPH request was not found');
         }
+        await this.validateGroupApplicants(dto);
 
         const areaIds = (Array.isArray(dto.AREA_ID) ? dto.AREA_ID : [dto.AREA_ID])
             .filter((areaId) => Number.isFinite(Number(areaId)) && Number(areaId) > 0)
@@ -249,7 +360,9 @@ export class GpTphService {
             NRUNNO: form.NRUNNO,
             SEQ_NO: Number(detail.SEQ_NO ?? index + 1),
             APPLICANT_TYPE: detail.APPLICANT_TYPE ?? null,
-            EMP_CODE: detail.EMP_CODE ?? null,
+            EMP_CODE: dto.REQUEST_TYPE?.trim() === 'H'
+                ? dto.REQBY?.trim()
+                : detail.EMP_CODE?.trim() ?? null,
             APPLICANT_NAME: detail.APPLICANT_NAME ?? null,
             COMPANY_NAME: detail.COMPANY_NAME ?? null,
         }));
@@ -300,6 +413,16 @@ export class GpTphService {
             data.AREA_NAME = data.AREA_NAME.trim();
         }
 
+        if (data.AREA_LEVEL !== undefined) {
+            const level = Number(data.AREA_LEVEL);
+            if (!Number.isInteger(level) || level < 0 || level > 4) {
+                throw new BadRequestException(
+                    'AREA_LEVEL must be an integer between 0 and 4',
+                );
+            }
+            data.AREA_LEVEL = level;
+        }
+
         if (data.AREA_OWNER === undefined) {
             return data;
         }
@@ -335,7 +458,23 @@ export class GpTphService {
             this.repo.findList(dto),
             this.repo.findAreaRecords(dto),
         ]);
-        return { ...request, DETAILS: details, AREA_RECORDS: areaRecords };
+        const ownersByArea = await Promise.all(
+            [...areaRecords]
+                .sort((a, b) => Number(a.AREA_ID) - Number(b.AREA_ID))
+                .map((record) => record.area?.AREA_OWNER_POSCODE && record.area?.AREA_OWNER
+                    ? this.orgposService.getOrgPos({
+                        VPOSNO: record.area.AREA_OWNER_POSCODE.trim(),
+                        VORGNO: record.area.AREA_OWNER.trim(),
+                    })
+                    : []),
+        );
+        const areaOwnerOrder = [...new Set(
+            ownersByArea.flatMap((employees) => employees.map((employee) => employee.VEMPNO.trim())),
+        )];
+        return {
+            ...request, DETAILS: details, AREA_RECORDS: areaRecords,
+            AREA_OWNER_ORDER: areaOwnerOrder,
+        };
     }
     async findList(dto: FormDto) {
         return this.repo.findList(dto);

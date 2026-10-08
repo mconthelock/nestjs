@@ -15,6 +15,7 @@ import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 import { FlowmstModule } from 'src/webform/flowmst/flowmst.module';
 import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
 import { RepModule } from 'src/webform/rep/rep.module';
+import { UsersModule } from 'src/amec/users/users.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { RepModule } from 'src/webform/rep/rep.module';
               FlowmstModule,
               OrgposModule,
               RepModule,
+              UsersModule,
   ],
   controllers: [GpTphController],
   providers: [GpTphService, GpTphRepository],

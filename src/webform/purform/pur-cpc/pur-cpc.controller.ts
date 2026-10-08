@@ -5,6 +5,7 @@ import {
     PriceComparisonDto,
     PriceComparisonPlannerDto,
     PriceComparisonListDto,
+    PriceComparisonItemDetailDto,
 } from './dto/price-comparison.dto';
 import { CreateFormDto } from './dto/create-pcp-form.dto';
 
@@ -83,5 +84,17 @@ export class PurCpcController {
     @Get('form/:form')
     async getForm(@Param('form') form: string) {
         return await this.service.getForm(form);
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-08
+     * @description ดึงข้อมูลรายละเอียด item จาก master ของแต่ละระบบ
+     * @param data
+     * @returns
+     */
+    @Post('item-detail')
+    async findItemDetail(@Body() data: PriceComparisonItemDetailDto) {
+        return await this.service.findItemDetail(data);
     }
 }

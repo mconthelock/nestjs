@@ -15,7 +15,7 @@ export class PURCPC_DETAILS {
     @Column()
     VMODEL: string;
 
-    @PrimaryColumn()
+    @Column()
     VITEM_CODE: string;
 
     @Column()
@@ -72,6 +72,24 @@ export class PURCPC_DETAILS {
         type: 'decimal',
     })
     NPRES_AMOUNT: number;
+
+    @PrimaryColumn()
+    VNEWITEM_CODE: string;
+
+    @Column()
+    VNEWJOB_ITEMNO: string;
+
+    @Column()
+    VNEWSPEC: string;
+
+    @Column()
+    VNEWMATERIAL_CODE: string;
+
+    @Column()
+    VNEWDRAWING: string;
+
+    @Column()
+    VNEWPART_NAME: string;
 
     @Column()
     VNEW_VENDOR: string;

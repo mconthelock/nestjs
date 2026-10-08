@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { pkForm } from '../interface/create.interface';
 import { PurCpcDetailRepository } from '../repository/purcpc_details.repository';
-import { PurCpcRepository } from '../repository/pucpc_form.repository';
+import { PurCpcRepository } from '../repository/purcpc_form.repository';
 import { CreateFormDto } from '../dto/create-pcp-form.dto';
 
 @Injectable()

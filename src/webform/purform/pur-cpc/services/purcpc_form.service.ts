@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PurCpcRepository } from '../repository/pucpc_form.repository';
+import { PurCpcRepository } from '../repository/purcpc_form.repository';
 import { PurcpcProcPlanViewRepository } from '../repository/purcpc_proc_list_view.repository';
 import { PurcpcProcCompareViewRepository } from '../repository/purcpc_proc_compare_view.repository';
 import { PurCpcDetailRepository } from '../repository/purcpc_details.repository';
@@ -8,10 +8,12 @@ import {
     PriceComparisonDto,
     PriceComparisonPlannerDto,
     PriceComparisonListDto,
+    PriceComparisonItemDetailDto,
 } from '../dto/price-comparison.dto';
 
 import { IimService as Iim400Service } from 'src/as400/bpcsfvnew/iim/iim.service';
 import { CreatePurCpcService } from './purcpc_create.service';
+import { PurcpcProcItemDetailRepository } from '../repository/purcpc_proc_item_detail.repository';
 
 @Injectable()
 export class PurCpcService extends CreatePurCpcService {
@@ -21,6 +23,7 @@ export class PurCpcService extends CreatePurCpcService {
         private readonly iim400Service: Iim400Service,
         private readonly purcpcProcPlanViewRepo: PurcpcProcPlanViewRepository,
         private readonly purcpcProcCompareViewRepo: PurcpcProcCompareViewRepository,
+        private readonly purcpcProcItemDetailRepo: PurcpcProcItemDetailRepository,
     ) {
         super(repo, detailsRepo);
     }
@@ -65,6 +68,30 @@ export class PurCpcService extends CreatePurCpcService {
                     return await this.iim400Service.priceComparison(data);
                 case 'PROCUREMENT':
                     return await this.purcpcProcCompareViewRepo.findByItemCode(
+                        data.ITEM,
+                    );
+                default:
+                    throw new Error(`Unsupported SYSTEM: ${data.SYSTEM}`);
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-08
+     * @description ดึงข้อมูลรายละเอียด item จาก master ของแต่ละระบบ
+     * @param data
+     * @returns
+     */
+    async findItemDetail(data: PriceComparisonItemDetailDto) {
+        try {
+            switch (data.SYSTEM) {
+                case 'AS400':
+                    return await this.iim400Service.findItemDetail(data.ITEM);
+                case 'PROCUREMENT':
+                    return await this.purcpcProcItemDetailRepo.findItemDetail(
                         data.ITEM,
                     );
                 default:

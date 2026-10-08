@@ -37,3 +37,8 @@ export class PriceComparisonListDto {
     @Type(() => Number)
     NSTATUS: number;
 }
+
+export class PriceComparisonItemDetailDto extends PickType(PriceComparisonDto, [
+    'SYSTEM',
+    'ITEM',
+] as const) {}

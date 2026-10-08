@@ -20,10 +20,10 @@ export class PcpDetailsDto {
     @Type(() => String)
     VMODEL?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     @Type(() => String)
-    VITEM_CODE: string;
+    VITEM_CODE?: string;
 
     @IsOptional()
     @IsString()
@@ -99,6 +99,36 @@ export class PcpDetailsDto {
     @IsNumber()
     @Type(() => Number)
     NPRES_AMOUNT?: number;
+
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
+    VNEWITEM_CODE: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    VNEWJOB_ITEMNO?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    VNEWSPEC?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    VNEWMATERIAL_CODE?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    VNEWDRAWING?: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    VNEWPART_NAME?: string;
 
     @IsOptional()
     @IsString()

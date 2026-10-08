@@ -94,6 +94,9 @@ export class PurvmmFormRepository extends BaseRepository {
             });
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 862dd947 (PUR-EVA)
         if (dto.VENDGROUPTYPE) {
             cond.AND.push({
                 field: 'VENDGROUPTYPE',
@@ -101,8 +104,11 @@ export class PurvmmFormRepository extends BaseRepository {
                 value: dto.VENDGROUPTYPE,
             });
         }
+<<<<<<< HEAD
 =======
 >>>>>>> 38502fd4 (PUR-EVA)
+=======
+>>>>>>> 862dd947 (PUR-EVA)
         if (dto.vmmform.CST) {
             cond.AND.push({
                 field: 'vmmform.CST',
@@ -200,9 +206,13 @@ export class PurvmmFormRepository extends BaseRepository {
             'VENDCODE',
             'VENDNAME',
 <<<<<<< HEAD
+<<<<<<< HEAD
             'VENDGROUPTYPE',
 =======
 >>>>>>> 38502fd4 (PUR-EVA)
+=======
+            'VENDGROUPTYPE',
+>>>>>>> 862dd947 (PUR-EVA)
             'vmmform.CST',
             'vmmform.DREQDATE',
             'reqtor.SEMPNO',

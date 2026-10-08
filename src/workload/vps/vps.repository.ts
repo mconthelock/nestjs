@@ -777,4 +777,28 @@ export class VpsRepository extends BaseRepository {
             [order, block],
         );
     }
+
+    async checkQtyPrintBlock(order: string, block: string) {
+        return this.wk.query(
+            `
+            SELECT ORDER_NO, PACKING_NO, PRINT_QTY, PRINTDATE
+            FROM (
+                SELECT
+                    ORDER_NO,
+                    PACKING_NO,
+                    PRINT_QTY,
+                    PRINTDATE,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY ORDER_NO,PACKING_NO
+                        ORDER BY PRINTDATE DESC
+                    ) AS RN
+                FROM PRINT_LOG_VPS_OTHER
+                WHERE ORDER_NO IN (:1)
+            ) plvo
+            JOIN AMECORDERS_PACKNO ap ON plvo.ORDER_NO = ap.ORDERNO AND plvo.PACKING_NO = ap.PACKNO  AND BLOCK_PACKING = :2
+            WHERE RN = 1
+            ORDER BY PACKING_NO ASC`,
+            [order, block],
+        );
+    }
 }

@@ -5,6 +5,26 @@ import { IimRepository } from './iim.repository';
 export class IimService {
     constructor(private readonly repo: IimRepository) {}
 
+    async findByProd(prod: string | string[]) {
+        try {
+            const res = await this.repo.findByProd(prod);
+            if (res.length == 0) {
+                return {
+                    status: false,
+                    message: 'No records found',
+                    data: [],
+                };
+            }
+            return {
+                status: true,
+                message: `Found ${res.length} records`,
+                data: res,      
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
     // async findPlannerCompareSheet(planner: string | string[]) {
     //     try {
     //         const res = await this.repo.findPlannerCompareSheet(planner);

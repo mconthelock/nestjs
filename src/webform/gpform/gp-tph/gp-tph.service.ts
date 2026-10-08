@@ -300,6 +300,16 @@ export class GpTphService {
             data.AREA_NAME = data.AREA_NAME.trim();
         }
 
+        if (data.AREA_LEVEL !== undefined) {
+            const level = Number(data.AREA_LEVEL);
+            if (!Number.isInteger(level) || level < 0 || level > 4) {
+                throw new BadRequestException(
+                    'AREA_LEVEL must be an integer between 0 and 4',
+                );
+            }
+            data.AREA_LEVEL = level;
+        }
+
         if (data.AREA_OWNER === undefined) {
             return data;
         }

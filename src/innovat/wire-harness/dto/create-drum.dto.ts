@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateDrumDto {
     @ApiProperty({
@@ -43,8 +44,19 @@ export class CreateDrumDto {
 
     @ApiProperty({
         example: 1,
-        description: 'Cut type (1 = First Cut, 2 = Re-Cut)',
+        description: 'Cut type (1 = First Cut, 2 = Rework)',
     })
     @IsNumber()
     cutType: number;
+
+    @ApiProperty({
+        example: 99,
+        description: 'Reason ID',
+        required: false,
+        nullable: true,
+    })
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber()
+    reasonId: number | null;
 }

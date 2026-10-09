@@ -98,8 +98,12 @@ export class WireHarnessCuttingRepository extends BaseRepository {
     }
 
     createDrum(dto: CreateDrumDto) {
+<<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
         const paramOrder = ['empNo', 'itemCode', 'prodNo', 'ctrlNo', 'cut', 'cutType'];
 >>>>>>> 9119de43 (wire-harness):src/innovat/wire-harness/wire-harness.repository.ts
+=======
+        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
+>>>>>>> ea37e1b8 (wire harness):src/innovat/wire-harness/wire-harness.repository.ts
         return this.orepo.execCursor(
             'WHN_CREATE_DRUM',
             dto,
@@ -109,10 +113,14 @@ export class WireHarnessCuttingRepository extends BaseRepository {
 
     updateDrum(dto: UpdateDrumDto) {
 <<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
+<<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
         const paramOrder = ['empNo', 'itemCode', 'prodNo', 'drumId', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
 =======
         const paramOrder = ['empNo', 'itemCode', 'prodNo', 'drumId', 'ctrlNo', 'cut', 'cutType'];
 >>>>>>> 9119de43 (wire-harness):src/innovat/wire-harness/wire-harness.repository.ts
+=======
+        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'drumId', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
+>>>>>>> ea37e1b8 (wire harness):src/innovat/wire-harness/wire-harness.repository.ts
         return this.orepo.execCursor(
             'WHN_UPDATE_DRUM',
             dto,
@@ -158,5 +166,23 @@ export class WireHarnessCuttingRepository extends BaseRepository {
         .orderBy('A.MT_ITEMCODE', 'ASC')
         .getMany();
     }
+<<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
 >>>>>>> 640b6378 (wire-harness):src/innovat/wire-harness/wire-harness.repository.ts
+=======
+
+    reason(condition: FiltersDto) {
+        const allowedFields = ['RS_ID', 'RS_NAME_TH', 'RS_STATUS'];
+        const qb = this.getRepository(WHN_REASON)
+            .createQueryBuilder('A');
+
+        return this.applyFilters(
+            qb,
+            'A',
+            condition,
+            allowedFields,
+        )
+        .orderBy('A.RS_ID', 'ASC')
+        .getMany();
+    }
+>>>>>>> ea37e1b8 (wire harness):src/innovat/wire-harness/wire-harness.repository.ts
 }

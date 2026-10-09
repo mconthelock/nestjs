@@ -2825,19 +2825,19 @@ export class QaCnService {
             await this.repoCnform.update({ ...currentForm }, { ...cndata });
             await this.repoDwg.deleteByAll(currentForm);
             await this.repoDwg.insertMultiple(dwgToInsert);
-            for (const mapping of fileMappings) {
-                const currentFiles = files[mapping.key];
-                if (currentFiles && currentFiles.length > 0) {
-                    await this.attcnfrmService.moveAndInsertFiles({
-                        files: currentFiles,
-                        form: currentForm,
-                        path: path,
-                        folder: `${currentForm.NFRMNO}_${currentForm.VORGNO}_${currentForm.CYEAR}_${currentForm.CYEAR2}_${currentForm.NRUNNO}`,
-                        typeno: mapping.TYPENO,
-                        requestedBy: APVNO,
-                    });
-                }
-            }
+            // for (const mapping of fileMappings) {
+            //     const currentFiles = files[mapping.key];
+            //     if (currentFiles && currentFiles.length > 0) {
+            //         await this.attcnfrmService.moveAndInsertFiles({
+            //             files: currentFiles,
+            //             form: currentForm,
+            //             path: path,
+            //             folder: `${currentForm.NFRMNO}_${currentForm.VORGNO}_${currentForm.CYEAR}_${currentForm.CYEAR2}_${currentForm.NRUNNO}`,
+            //             typeno: mapping.TYPENO,
+            //             requestedBy: APVNO,
+            //         });
+            //     }
+            // }
             // เฉพาะของ sendApv ที่มีอัปเดต flow และ form
             if (ACTION == 'sendApv') {
                 if (STEPREADY != '--') {

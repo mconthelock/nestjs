@@ -84,4 +84,8 @@ export class WireHarnessService {
     async drumMaster(condition: FiltersDto) {
         return this.repo.getDrumMaster(condition);
     }
+
+    async reason(condition: FiltersDto) {
+        return this.repo.reason(condition);
+    }
 }

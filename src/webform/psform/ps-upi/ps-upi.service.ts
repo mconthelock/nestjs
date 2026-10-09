@@ -7,6 +7,7 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 import { SearchReportDto } from './dto/search-report.dto';
 import { FormService } from 'src/webform/form/form.service';
+import { FlowService } from 'src/webform/flow/flow.service';
 
 @Injectable()
 export class PsUpiService {
@@ -16,6 +17,7 @@ export class PsUpiService {
         private readonly formCreateService: FormCreateService,
         private readonly doactionService: DoactionFlowService,
         private readonly formService: FormService,
+        private readonly flowService: FlowService,
     ) {}
 
     async getReason() {
@@ -136,7 +138,21 @@ export class PsUpiService {
         report = await Promise.all(
             report.map(async (item) => ({
                 ...item,
+                formdetail: await this.formService.getFormDetail({
+                    NFRMNO: item.NFRMNO,
+                    VORGNO: item.VORGNO,
+                    CYEAR: item.CYEAR,
+                    CYEAR2: item.CYEAR2,
+                    NRUNNO: item.NRUNNO,
+                }),
                 formno: await this.formService.getFormno({
+                    NFRMNO: item.NFRMNO,
+                    VORGNO: item.VORGNO,
+                    CYEAR: item.CYEAR,
+                    CYEAR2: item.CYEAR2,
+                    NRUNNO: item.NRUNNO,
+                }),
+                flow: await this.flowService.getFlowTree({
                     NFRMNO: item.NFRMNO,
                     VORGNO: item.VORGNO,
                     CYEAR: item.CYEAR,

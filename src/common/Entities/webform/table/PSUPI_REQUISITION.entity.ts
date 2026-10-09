@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
+import { FORM } from './FORM.entity';
+import { User } from '../views/AMECUSERALL.entity';
 
 @Entity({
     name: 'PSUPI_REQUISITION',
@@ -20,7 +22,7 @@ export class PSUPI_REQUISITION {
     @PrimaryColumn()
     NRUNNO: number;
 
-    @Column()
+    @PrimaryColumn()
     PUR_CODE: string;
 
     @Column()
@@ -58,4 +60,18 @@ export class PSUPI_REQUISITION {
 
     @Column()
     PLAN_RETURN_DATE: Date;
+
+    @ManyToOne(() => FORM)
+    @JoinColumn([
+        { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+        { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+        { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+    ])
+    form: FORM;
+
+    @OneToOne(() => User)
+    @JoinColumn({ name: 'WHI_USER', referencedColumnName: 'SEMPNO' })
+    whi_user: User;
 }

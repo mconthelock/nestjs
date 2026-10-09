@@ -1751,6 +1751,9 @@ export class QaCnService {
             await this.repoDwg.deleteByAll(currentForm);
             await this.repoDwg.insertMultiple(dwgToInsert);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dfbc8d8c (QA-CN)
             // for (const mapping of fileMappings) {
             //     const currentFiles = files[mapping.key];
             //     if (currentFiles && currentFiles.length > 0) {
@@ -1764,6 +1767,7 @@ export class QaCnService {
             //         });
             //     }
             // }
+<<<<<<< HEAD
 =======
             for (const mapping of fileMappings) {
                 const currentFiles = files[mapping.key];
@@ -1779,6 +1783,8 @@ export class QaCnService {
                 }
             }
 >>>>>>> 14243a62 (QA-CN)
+=======
+>>>>>>> dfbc8d8c (QA-CN)
             // เฉพาะของ sendApv ที่มีอัปเดต flow และ form
             if (ACTION == 'sendApv') {
                 if (STEPREADY != '--') {

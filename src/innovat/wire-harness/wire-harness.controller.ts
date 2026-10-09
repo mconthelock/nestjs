@@ -76,4 +76,12 @@ export class WireHarnessController {
     async drumMaster(@Body() condition: FiltersDto) {
         return this.service.drumMaster(condition);
     }
+
+    @Post('reason')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Get reason list' })
+    @ApiResponse({ status: 200, description: 'Reason list' })
+    async reason(@Body() condition: FiltersDto) {
+        return this.service.reason(condition);
+    }
 }

@@ -58,7 +58,7 @@ export class AmeccalendarController {
 
     @Post('generate')
     generate(
-        @Body() body: { year: number; startMonth: number; startId: number },
+        @Body() body: { year: string; startMonth: string; startId: string },
     ) {
         if (!body.year || !body.startMonth || !body.startId) {
             return {
@@ -66,9 +66,9 @@ export class AmeccalendarController {
             };
         }
         return this.calendar.generateYearlySchedule(
-            body.year,
-            body.startMonth,
-            body.startId,
+            +body.year,
+            +body.startMonth,
+            +body.startId,
         );
     }
 }

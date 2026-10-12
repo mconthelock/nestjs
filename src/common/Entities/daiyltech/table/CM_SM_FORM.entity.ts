@@ -1,5 +1,6 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, Relation } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn, Relation } from 'typeorm';
 import { DTIH } from './DTIH.entity';
+import { LOG_INFO_TIMEL } from './LOG_INFO_TIMEL.entity';
 
 @Entity({ name: 'CM_SM_FORM', schema: 'DAILYTECH' })
 export class CM_SM_FORM {

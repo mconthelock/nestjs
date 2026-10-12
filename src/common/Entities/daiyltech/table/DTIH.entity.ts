@@ -1,5 +1,6 @@
-import { Column, Entity, OneToOne, PrimaryColumn, Relation } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne, PrimaryColumn, Relation } from 'typeorm';
 import { CM_SM_FORM } from './CM_SM_FORM.entity';
+import { LOG_INFO_TIMEL } from './LOG_INFO_TIMEL.entity';
 
 @Entity({ name: 'DTIH', schema: 'DAILYTECH' })
 export class DTIH {
@@ -8,6 +9,9 @@ export class DTIH {
 
     @OneToOne(() => CM_SM_FORM, (form) => form.DTIH)
     CM_SM_FORM: Relation<CM_SM_FORM>;
+
+    @OneToMany(() => LOG_INFO_TIMEL, (logInfoTimel) => logInfoTimel.DTIH)
+    LOG_INFO_TIMEL: LOG_INFO_TIMEL[];
 
     @Column()
     RECDT: Date;

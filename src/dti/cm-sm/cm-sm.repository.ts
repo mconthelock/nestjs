@@ -2,8 +2,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource, MoreThanOrEqual } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DTIH } from 'src/common/Entities/webform/table/DTIH.entity';
-import { CM_SM_FORM } from 'src/common/Entities/webform/table/CM_SM_FORM.entity';
+import { DTIH } from 'src/common/Entities/daiyltech/table/DTIH.entity';
+import { CM_SM_FORM } from 'src/common/Entities/daiyltech/table/CM_SM_FORM.entity';
 import { UpdateCmSmDto } from './dto/update-cm-sm.dto';
 
 @Injectable()
@@ -16,7 +16,9 @@ export class CmSmRepository extends BaseRepository {
         const { TINO, REVNO, columnName, value } = payload;
 
         if (!TINO || !REVNO || !columnName) {
-            throw new BadRequestException('TINO, REVNO and columnName are required');
+            throw new BadRequestException(
+                'TINO, REVNO and columnName are required',
+            );
         }
 
         const repository = this.getRepository(CM_SM_FORM);
@@ -46,8 +48,8 @@ export class CmSmRepository extends BaseRepository {
     findAll() {
         return this.getRepository(DTIH).find({
             // where: { RECDT: MoreThanOrEqual(new Date('2026-01-01')) },
-            where: { TINO: 'T-MEU-26-A0015' },
-            relations: { CM_SM_FORM: true },
+            where: { TINO: 'T-ETA-17-A0006' },
+            relations: { CM_SM_FORM: true, LOG_INFO_TIMEL: true },
         });
     }
 }

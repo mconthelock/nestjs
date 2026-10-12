@@ -5,6 +5,8 @@
 /dist
 /sql
 /artifacts
+/output
+/tmp
 
 # Logs
 logs

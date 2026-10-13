@@ -48,10 +48,15 @@ export class DeleteFlowStepService extends FlowService {
                     ...form,
                     CSTEPST: this.STEP_READY,
                 });
-                await this.updateFlow({
-                    condition: { ...form, CSTEPNO: stepReady[0].CSTEPNEXTNO },
-                    CSTEPST: '2',
-                });
+                if (stepReady && stepReady.length > 0) {
+                    await this.updateFlow({
+                        condition: {
+                            ...form,
+                            CSTEPNO: stepReady[0].CSTEPNEXTNO,
+                        },
+                        CSTEPST: '2',
+                    });
+                }
                 const condition = {
                     ...form,
                     CSTEPNO: step.CSTEPNO,

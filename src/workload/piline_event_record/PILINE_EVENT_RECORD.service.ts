@@ -12,7 +12,7 @@ export class PilineEventRecordService {
     }
 
     create(dto: CreatePilineEventRecordDto) {
-        return this.repo.create(dto);
+        return this.repo.create({ ...dto, RECORD_STATUS: 'ACTIVE' });
     }
     update(key: KeyPilineEventRecordDto, dto: UpdatePilineEventRecordDto) {
         return this.repo.update(key, dto);

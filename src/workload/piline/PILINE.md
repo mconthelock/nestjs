@@ -100,3 +100,42 @@ GET piline_section_mst เชื่อมผลกับ PSECTION จาก amec
 NG lookup: GET /workload/piline_event_record/idtag/:idtag ตัด whitespace และตรวจความยาว 11 ตัว ค้น AMECMFG.F110KP WHERE F11K01 = :idtag; ส่ง F11K04/05/06/11/15/16/18 ให้ frontend, ไม่พบตอบ 404. ชื่อฟิลด์จริงใช้ prefix F11K ไม่ใช่ F1K
 
 ฟังก์ชันค้น ID Tag อยู่เฉพาะใน PILINE_IDTAG.controller.ts ของ PILINE ใช้ Entity F110KP แบบอ่านอย่างเดียว คืน f110kp.controller.ts และ f110kp.service.ts เป็นเดิม ห้ามแก้ไฟล์ F110KP ของระบบอื่น
+
+## Material Code ผ่าน Private DB Link
+- รัน `PILINE_PIIS_LINK.sql` ด้วย user จริงของ `workloadConnection` เพียงครั้งเดียว ผ่าน SQL*Plus/SQLcl หรือ SQL Developer Run Script; กรอกรหัสผ่าน PIISUSER เมื่อ script ถาม ไม่เก็บรหัสผ่านใน repository
+- Link ชื่อ `PILINE_PIIS_LINK` ไป Oracle 172.21.255.223:1521 ใช้ SERVICE_NAME `orcl.MitsubishiElevatorAsia.co.th`; ไม่เพิ่ม connection/entity และไม่แก้ F110KP
+- ผู้รันต้องมี CREATE DATABASE LINK; PIISUSER ต้องมี SELECT บน AMEC.F_D011_PROCESS_SCHEDULES และเครื่อง Oracle ต้นทางต้องเข้าถึงปลายทางได้
+- ชื่อ link นี้ใช้เมื่อ GLOBAL_NAMES=FALSE; ถ้าเป็น TRUE ให้ DBA เลือกชื่อตาม remote global name และแก้ query PILINE ให้ตรงกัน ไม่เปลี่ยนค่าฐานข้อมูลส่วนกลางเอง
+- GET `/workload/piline_event_record/idtag/:idtag` อ่าน F110KP ก่อน แล้ว trim F11K04 และตัด `-`; ค้น DISTINCT MATERIAL_ID ด้วย SHEAR_NC LIKE order-prefix ผ่าน workloadConnection ใช้ bind parameter และ escape wildcard ก่อนเติม `%`
+- Response เดิม `data` คงอยู่ เพิ่ม `materialCodes: string[]`; ไม่พบรหัสคืน array ว่าง; link ใช้ไม่ได้คืน 503 (ไม่ปลอมเป็นไม่พบ ID Tag); MySQL ไม่รองรับ link นี้
+- Frontend แสดง dropdown Material Code ปิดไว้ก่อนค้นหา/เมื่อเปลี่ยน ID Tag เปิดเมื่อมีตัวเลือก เรียงชื่อ และต้องเลือกก่อนบันทึก NG; ค่าที่เลือกส่งเป็น MAT_NO ตามเดิม
+- ผู้ใช้ติดตั้ง link แล้ว; ตรวจจริง 2026-10-12 ด้วย WORKLOAD พบ PILINE_PIIS_LINK และอ่านตารางปลายทางได้ รวมทั้งเรียก GET API ที่ frontend ใช้งานอยู่ได้ HTTP 200 พร้อม materialCodes 3 ค่า จาก ID Tag ตัวอย่างในรายการเดิม การตรวจนี้อ่านอย่างเดียว ไม่ได้ทดสอบบันทึก NG
+- อ้างอิง Oracle: https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/CREATE-DATABASE-LINK.html
+
+## รายการ Production Event Record (2026-10-13)
+- GET รายการใช้ LEFT JOIN PILINE_NG_RECORD ด้วย PILINE_NO ส่งเป็น NG; ไม่ตัดรายการที่ไม่มี NG; ยกเลิก take 200 เพื่อค้นหา/export ครบรายการ
+- CREATE_BY/UPDATE_BY จับคู่ AMECUSERALL.SEMPNO แล้วส่ง CREATE_BY_NAME/UPDATE_BY_NAME จาก SNAME; เนื่องจากคนละ connection จึงใช้ batch lookup และ merge แบบ left join ไม่กรองแถวที่หา user ไม่พบ
+- อ่านข้อมูลชิ้นงาน F110KP ด้วย NG.ID_TAG แบบ batch ผ่าน amecConnection (ไม่แก้ไฟล์ F110KP); ส่ง JUN/P/ORDER_NO/ITEM/PART_NAME/DRAWING/MATERIAL/THICKNESS ตาม mapping เดิม; Protective sheet ยังไม่มีต้นทาง
+- MAT_LOT ใน input DTO เป็น optional รับค่าว่างได้; frontend ซ่อนปุ่มแบบร่างและแสดงตาราง 25 คอลัมน์พร้อมกรอง/เรียงเมื่อ Search และ export XLSX ทุกแถวที่ผ่านตัวกรอง
+- TypeScript ผ่าน; browser ทดสอบข้อมูลจำลองผ่าน ไม่ได้ทดสอบเขียนฐานข้อมูล และ GET API รอบนี้เชื่อมต่อไม่ได้
+
+## ACTIVE / DELETE / Edit input (2026-10-13)
+- POST input และ POST CRUD รายการใหม่ตั้ง RECORD_STATUS=ACTIVE จาก server; PIYYMM### อ้าง EVENT_DATE ที่ผู้ใช้เลือก (คงวิธีเดิม ไม่ใช้วัน CREATE_DATE)
+- GET รายการใช้ WHERE event.RECORD_STATUS <> 'DELETE' โดยตรง จึงไม่คืน NULL เช่นกัน ไม่มีการแก้ข้อมูลเก่าหรือ backfill
+- เพิ่ม PATCH input/:number ใช้ multipart validation/transaction และ lock เดียวกับ create; โหลดแถวปัจจุบันจาก DB, ปฏิเสธ DELETE และ IS_NG=1 + QC_REJECT ก่อนเขียน
+- ล็อก EVENT_DATE เปรียบเทียบวันเขต Asia/Bangkok และคง PILINE_NO/RUN_NO/CREATE_BY/CREATE_DATE/RECORD_STATUS/Ref เดิม; ผู้ใช้ปัจจุบันใน payload CREATE_BY บันทึกเป็น UPDATE_BY แทน และ UPDATE_DATE จาก server
+- ข้อมูลอัตโนมัติไม่อยู่ใน whitelist DTO; update NG ใน transaction เดียวกัน (เมื่อไม่พบ NG ลบแถว NG เดิม) เก็บ ATT เดิมและเพิ่มไฟล์ใหม่โดยเลื่อน SEQ ไม่ชน รวมไม่เกิน 10 ไฟล์
+- Frontend เพิ่ม Ref และ Action, ล็อกวัน/readonly, คงไฟล์เดิม; freeze 2 คอลัมน์, paging นอก scroll และ datepicker Filter d/m/Y
+- ตรวจ API mock ผ่าน 32 cases รวม edit/date lock/QC_REJECT/DELETE/attachment append/ACTIVE/date-based numbering; frontend browser fixture ผ่าน ไม่ได้เขียนข้อมูล Oracle จริง
+
+## แสดงรายการเดิมที่สถานะว่าง
+- แก้ GET ให้ใช้ (RECORD_STATUS IS NULL OR RECORD_STATUS <> 'DELETE') เพื่อแสดงรายการเดิมที่ยังไม่มีสถานะ ซ่อนเฉพาะ DELETE โดยไม่แก้ข้อมูลจริง
+
+## ที่เก็บไฟล์ตาม PI Line Number
+- ใช้ PILINE_FILE_PATH เป็นลำดับแรก; fallback PILINE_UPLOAD_DIR/AMEC_FILE_PATH ตามเดิม
+- สร้างไฟล์หลังออกเลข PI ภายใน transaction ที่ lock แล้ว: <root>/<PILINE_NO>/<SEQ>-<ชื่อเดิม>-<UUID>.<ext> ใช้ UUID ในชื่อเพื่อไม่ชนไฟล์เดิม ไม่สร้างโฟลเดอร์ UUID
+- ATT.FILENAME เก็บ <PILINE_NO>/<ชื่อไฟล์>; แนบเพิ่มใช้โฟลเดอร์เดิมและลำดับถัดไป
+- Rollback ลบเฉพาะไฟล์ของรอบนั้น ไม่ลบทั้งโฟลเดอร์ จึงไม่กระทบไฟล์เก่า; กรณี commit ไม่ทราบผลยังเก็บไฟล์ไว้ตรวจสอบ
+- ไฟล์เก่าไม่ได้ย้ายตาม path ใหม่ ต้อง restart API ให้โหลด environment ใหม่; ทดสอบด้วย mock ไม่ได้เขียน NAS จริง
+
+- SEQ ไฟล์แยกตาม PILINE_NO + TYPEFILE: EVT และ NG เริ่ม 1 แยกกัน; แนบเพิ่มต่อจาก MAX(SEQ) ของประเภทนั้นเท่านั้น ไม่เรียงเลขใหม่ให้ไฟล์เก่า

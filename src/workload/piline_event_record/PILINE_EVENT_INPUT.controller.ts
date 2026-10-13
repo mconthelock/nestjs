@@ -3,6 +3,8 @@ import {
     Body,
     Controller,
     Post,
+    Patch,
+    Param,
     UploadedFiles,
     UseInterceptors,
     ValidationPipe,
@@ -43,6 +45,7 @@ export class PilineEventInputController {
     async save(
         @Body() body: PilineInputMultipartDto,
         @UploadedFiles() files: PilineInputFiles,
+        editNumber?: string,
     ) {
         let payload: unknown;
         try {
@@ -61,6 +64,28 @@ export class PilineEventInputController {
             metatype: SavePilineEventInputDto,
         });
         // This service owns the transaction, including commit and file cleanup. Do not add UseTransaction here.
-        return this.inputService.save(dto, files || {});
+        return this.inputService.save(dto, files || {}, editNumber);
     }
+    @Patch('input/:number')
+    @UseInterceptors(
+        FileFieldsInterceptor(
+            [
+                { name: 'eventFiles', maxCount: 10 },
+                { name: 'ngFiles', maxCount: 10 },
+            ],
+            {
+                storage: memoryStorage(),
+                limits: {
+                    files: 10,
+                    fileSize: 5 * 1024 * 1024,
+                    fields: 1,
+                    fieldSize: 65536,
+                },
+            },
+        ),
+    )
+    async edit(@Param('number') number: string, @Body() body: PilineInputMultipartDto, @UploadedFiles() files: PilineInputFiles) {
+        return this.save(body, files, number);
+    }
+
 }

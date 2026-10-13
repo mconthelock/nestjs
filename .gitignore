@@ -7,7 +7,7 @@
 /artifacts
 /output
 /tmp
-
+/src/workload/piline/PILINE.md
 # Logs
 logs
 *.log

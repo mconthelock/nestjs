@@ -2,6 +2,7 @@ import {
     BadRequestException,
     ConflictException,
     Injectable,
+    NotFoundException,
     Logger,
     ServiceUnavailableException,
 } from '@nestjs/common';
@@ -18,7 +19,7 @@ import { PILINE_INITIAL_MST } from 'src/common/Entities/workload/table/PILINE_IN
 import { PILINE_SECTION_MST } from 'src/common/Entities/workload/table/PILINE_SECTION_MST.entity';
 import { PILINE_EVENT_MST } from 'src/common/Entities/workload/table/PILINE_EVENT_MST.entity';
 import { SavePilineEventInputDto } from './dto/SAVE-PILINE_EVENT_INPUT.dto';
-import { PilineEventFilesService } from './PILINE_EVENT_FILES.service';
+import { PilineEventFilesService, PilineStagedFiles } from './PILINE_EVENT_FILES.service';
 
 export interface PilineInputFiles {
     eventFiles?: Express.Multer.File[];
@@ -107,7 +108,7 @@ export class PilineEventInputService {
             );
     }
 
-    async save(dto: SavePilineEventInputDto, uploads: PilineInputFiles) {
+    async save(dto: SavePilineEventInputDto, uploads: PilineInputFiles, editNumber?: string) {
         if (dto.IS_NG === '1' && !dto.NG)
             throw new BadRequestException(
                 'NG details are required when IS_NG is 1',
@@ -116,7 +117,8 @@ export class PilineEventInputService {
             throw new BadRequestException(
                 'NG data and files are only allowed when IS_NG is 1',
             );
-        const staged = await this.files.stage(uploads);
+        const checkedFiles = this.files.validate(uploads);
+        let staged: PilineStagedFiles = { attachments: [] };
         const runner = this.ds.createQueryRunner();
         let committed = false,
             commitAttempted = false,
@@ -130,6 +132,17 @@ export class PilineEventInputService {
             const manager = runner.manager;
             await this.validateMasters(manager, dto);
             const repo = manager.getRepository(PILINE_EVENT_RECORD);
+            const existing = editNumber ? await repo.findOneBy({ PILINE_NO: editNumber }) : null;
+            if (editNumber && (!existing || existing.RECORD_STATUS === 'DELETE')) throw new NotFoundException('Event not found');
+            if (existing?.IS_NG === '1' && existing.RECORD_STATUS === 'QC_REJECT') throw new ConflictException('QC_REJECT NG records cannot be edited');
+            if (existing) {
+                const date = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year:'numeric',month:'2-digit',day:'2-digit' }).format(existing.EVENT_DATE);
+                if (date !== dto.EVENT_DATE) throw new BadRequestException('Event date cannot be changed');
+            }
+            let PILINE_NO: string, RUN_NO: number;
+            const EVENT_DATE = existing?.EVENT_DATE || new Date(dto.EVENT_DATE + 'T00:00:00+07:00');
+            if (existing) { PILINE_NO = existing.PILINE_NO; RUN_NO = existing.RUN_NO; }
+            else {
             const prefix = `PI${dto.EVENT_DATE.slice(2, 4)}${dto.EVENT_DATE.slice(5, 7)}`;
             const monthly = await repo.find({
                 select: { PILINE_NO: true },
@@ -144,16 +157,16 @@ export class PilineEventInputService {
                 throw new ConflictException(
                     'Monthly PI Line number limit (999) reached',
                 );
-            const PILINE_NO = prefix + String(sequence).padStart(3, '0');
-            const EVENT_DATE = new Date(`${dto.EVENT_DATE}T00:00:00+07:00`);
+            PILINE_NO = prefix + String(sequence).padStart(3, '0');
             const daily = await repo
                 .createQueryBuilder('record')
                 .select('MAX(record.RUN_NO)', 'MAX_RUN')
                 .where('record.EVENT_DATE = :date', { date: EVENT_DATE })
                 .getRawOne();
-            const RUN_NO = Number(daily?.MAX_RUN || 0) + 1;
+            RUN_NO = Number(daily?.MAX_RUN || 0) + 1;
             if (RUN_NO > 999)
                 throw new ConflictException('Daily RUN_NO limit (999) reached');
+            }
             const START_TIME = new Date(
                 `${dto.EVENT_DATE}T${dto.START_TIME}:00+07:00`,
             );
@@ -177,10 +190,20 @@ export class PilineEventInputService {
                 DETAIL: dto.DETAIL.trim(),
                 IS_NG: dto.IS_NG,
                 REMARK: dto.REMARK?.trim() || null,
-                CREATE_BY: dto.CREATE_BY.trim(),
-                CREATE_DATE: new Date(),
+                ...(existing ? { UPDATE_BY: dto.CREATE_BY.trim(), UPDATE_DATE: new Date() } : {
+                    CREATE_BY: dto.CREATE_BY.trim(), CREATE_DATE: new Date(), RECORD_STATUS: 'ACTIVE',
+                }),
             };
-            await repo.insert(record);
+            if (existing) {
+                const { PILINE_NO: _number, EVENT_DATE: _date, RUN_NO: _run, ...changes } = record;
+                await repo.update({ PILINE_NO }, changes);
+            } else await repo.insert(record);
+            if (existing) await manager.getRepository(PILINE_NG_RECORD).delete({ PILINE_NO });
+            const previousFiles = existing ? await manager.getRepository(PILINE_ATT).findBy({ PILINE_NO }) : [];
+            if (previousFiles.length + checkedFiles.length > 10) throw new BadRequestException('Maximum 10 attachments including existing files');
+            const maxSeq: Record<string, number> = {};
+            for (const file of previousFiles) maxSeq[file.TYPEFILE] = Math.max(maxSeq[file.TYPEFILE] || 0, file.SEQ);
+            staged = await this.files.stage(uploads, PILINE_NO, maxSeq);
             if (dto.IS_NG === '1')
                 await manager
                     .getRepository(PILINE_NG_RECORD)

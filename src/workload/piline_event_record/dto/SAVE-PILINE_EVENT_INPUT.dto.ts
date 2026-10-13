@@ -25,10 +25,10 @@ export class PilineInputNgDto {
     @Max(999)
     QTY: number;
 
+    @IsOptional()
     @IsString()
-    @Matches(/\S/)
     @MaxLength(20)
-    MAT_LOT: string;
+    MAT_LOT?: string;
 
     @IsString()
     @Matches(/\S/)

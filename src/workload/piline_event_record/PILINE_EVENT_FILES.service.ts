@@ -5,6 +5,7 @@ import { join, resolve } from 'path';
 
 export interface PilineStagedFiles {
     directory?: string;
+    writtenPaths?: string[];
     attachments: { FILENAME: string; TYPEFILE: string; SEQ: number }[];
 }
 
@@ -41,10 +42,10 @@ export class PilineEventFilesService {
         );
     }
 
-    async stage(files: {
+    validate(files: {
         eventFiles?: Express.Multer.File[];
         ngFiles?: Express.Multer.File[];
-    }): Promise<PilineStagedFiles> {
+    }) {
         const entries = [
             ...(files.eventFiles || []).map((file) => ({ file, type: 'EVT' })),
             ...(files.ngFiles || []).map((file) => ({ file, type: 'NG' })),
@@ -61,8 +62,16 @@ export class PilineEventFilesService {
                 );
             return { ...entry, extension: this.extension(entry.file.buffer) };
         });
+        return checked;
+    }
+
+    async stage(files: { eventFiles?: Express.Multer.File[]; ngFiles?: Express.Multer.File[] }, pilineNo: string, startSeq: Record<string, number> = {}): Promise<PilineStagedFiles> {
+        const checked = this.validate(files);
+        if (!/^PI\d{7}$/.test(pilineNo)) throw new BadRequestException('Invalid PI Line number for upload folder');
         if (!checked.length) return { attachments: [] };
+
         const root =
+            process.env.PILINE_FILE_PATH ||
             process.env.PILINE_UPLOAD_DIR ||
             (process.env.AMEC_FILE_PATH
                 ? join(
@@ -71,29 +80,37 @@ export class PilineEventFilesService {
                       'piline',
                   )
                 : resolve('public', 'uploads', 'piline'));
-        const folder = randomUUID();
+        const nextSeq = { ...startSeq };
+        const folder = pilineNo;
         const result: PilineStagedFiles = {
             directory: resolve(root, folder),
             attachments: [],
+            writtenPaths: [],
         };
         await mkdir(result.directory, { recursive: true });
         try {
-            for (const [index, entry] of checked.entries()) {
+            for (const entry of checked) {
+                const seq = (nextSeq[entry.type] || 0) + 1;
+                nextSeq[entry.type] = seq;
                 const safeName =
                     entry.file.originalname
                         .replace(/[<>:"/\\|?*\x00-\x1f]/g, '_')
                         .replace(/\.[^.]*$/, '')
                         .slice(0, 100) || 'attachment';
-                const storedName = `${index + 1}-${safeName}${entry.extension}`;
-                await writeFile(
-                    join(result.directory, storedName),
-                    entry.file.buffer,
-                    { flag: 'wx' },
-                );
+                const storedName = `${seq}-${safeName}-${randomUUID()}${entry.extension}`;
+                const target = join(result.directory, storedName);
+                try {
+                    await writeFile(target, entry.file.buffer, { flag: 'wx' });
+                    result.writtenPaths.push(target);
+                } catch (error) {
+                    // Never remove a pre-existing file if exclusive creation fails.
+                    if (error.code !== 'EEXIST') result.writtenPaths.push(target);
+                    throw error;
+                }
                 result.attachments.push({
                     FILENAME: `${folder}/${storedName}`,
                     TYPEFILE: entry.type,
-                    SEQ: index + 1,
+                    SEQ: seq,
                 });
             }
             return result;
@@ -104,14 +121,10 @@ export class PilineEventFilesService {
     }
 
     async cleanup(files: PilineStagedFiles) {
-        if (!files.directory) return;
-        try {
-            await rm(files.directory, { recursive: true, force: true });
-        } catch (error) {
-            this.logger.error(
-                `Failed to clean uncommitted PILINE files: ${files.directory}`,
-                error.stack,
-            );
+        // The folder is shared by all uploads for this record. Remove only this attempt's files.
+        for (const path of files.writtenPaths || []) {
+            try { await rm(path, { force: true }); }
+            catch (error) { this.logger.error('Failed to clean uncommitted PILINE file: ' + path, error.stack); }
         }
     }
 }

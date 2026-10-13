@@ -76,6 +76,18 @@ export class PurCpcController {
 
     /**
      * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-13
+     * @description ดึงข้อมูลรายการเปรียบเทียบราคาสินค้าตามหมายเลขฟอร์ม
+     * @param form หมายเลขฟอร์ม PUR-CPC ที่ต้องการดึงข้อมูล
+     * @returns
+     */
+    @Get('lists/:form')
+    async getListByForm(@Param('form') form: string) {
+        return await this.service.getListByForm(form);
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
      * @since 2026-09-30
      * @description ดึงข้อมูลฟอร์ม PUR-CPC ตามหมายเลขฟอร์มที่ระบุ
      * @param form หมายเลขฟอร์ม PUR-CPC ที่ต้องการดึงข้อมูล

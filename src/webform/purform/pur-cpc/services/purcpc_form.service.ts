@@ -130,6 +130,29 @@ export class PurCpcService extends CreatePurCpcService {
 
     /**
      * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-13
+     * @description ดึงข้อมูลรายการเปรียบเทียบราคาสินค้าตามหมายเลขฟอร์ม
+     * @param form 
+     * @returns 
+     */
+    async getListByForm(form: string) {
+        try {
+            const res = await this.repo.getListByForm(form);
+                return !res ? {
+                    status: false,
+                    message: 'Price comparison record not found',
+                } : {
+                    status: true,
+                    message: `Price comparison record found`,
+                    data: res,
+                };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
      * @since 2026-09-30
      * @description ดึงข้อมูลฟอร์ม PUR-CPC ตามหมายเลขฟอร์มที่ระบุ
      * @param form หมายเลขฟอร์ม PUR-CPC ที่ต้องการดึงข้อมูล

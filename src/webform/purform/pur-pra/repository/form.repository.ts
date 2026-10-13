@@ -20,6 +20,7 @@ export class FormRepository extends BaseRepository {
             where: form,
             relations: {
                 FORM: true,
+                LINK_FORM: true,
                 GROUP: true,
                 COMMITTEE: true,
                 FILES: {

@@ -28,9 +28,12 @@ export class PURCPC_FORM_LISTS_VIEW {
 
     @ViewColumn()
     CMODE: string;
-    
+
     @ViewColumn()
     VVENDOR: string;
+
+    @ViewColumn()
+    VVENDOR_NAME: string;
 
     @ViewColumn()
     NAMOUNT_PRESENT: number;

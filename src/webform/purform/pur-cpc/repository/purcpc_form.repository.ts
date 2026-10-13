@@ -20,6 +20,14 @@ export class PurCpcRepository extends BaseRepository {
         });
     }
 
+    getListByForm(form: string) {
+        return this.getRepository(PURCPC_FORM_LISTS_VIEW).findOne({
+            where: {
+                VFORMNO: form,
+            },
+        });
+    }
+
     getForm(data: pkForm) {
         return this.getRepository(PURCPC_FORM).find({
             where: data,

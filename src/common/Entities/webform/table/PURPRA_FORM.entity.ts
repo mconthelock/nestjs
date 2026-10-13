@@ -11,6 +11,7 @@ import { PURPRA_GROUP } from './PURPRA_GROUP.entity';
 import { PURPRA_COMMITTEE } from './PURPRA_COMMITTEE.entity';
 import { PUR_FILE } from './PUR_FILE.entity';
 import { FORM } from './FORM.entity';
+import { PURPRA_LINK_KEY_VIEW } from '../views/PURPRA_LINK_KEY_VIEW.entity';
 
 @Entity({ name: 'PURPRA_FORM', schema: 'WEBFORM' })
 export class PURPRA_FORM {
@@ -107,4 +108,12 @@ export class PURPRA_FORM {
 
     @OneToMany(() => PUR_FILE, (p) => p.PURPRA_FORM)
     FILES?: PUR_FILE[];
+
+    @OneToOne(() => PURPRA_LINK_KEY_VIEW)
+    @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'PFRMNO' })
+    @JoinColumn({ name: 'VORGNO', referencedColumnName: 'PORGNO' })
+    @JoinColumn({ name: 'CYEAR', referencedColumnName: 'PYEAR' })
+    @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'PYEAR2' })
+    @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'PRUNNO' })
+    LINK_FORM?: PURPRA_LINK_KEY_VIEW;
 }

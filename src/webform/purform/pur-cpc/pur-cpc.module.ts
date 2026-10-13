@@ -27,5 +27,6 @@ import { PurcpcProcItemDetailRepository } from './repository/purcpc_proc_item_de
         PurcpcProcCompareViewRepository,
         PurcpcProcItemDetailRepository,
     ],
+    exports: [CreatePurCpcService]
 })
 export class PurCpcModule {}

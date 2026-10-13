@@ -1,4 +1,16 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    OneToMany,
+    OneToOne,
+    PrimaryColumn,
+} from 'typeorm';
+import { PURPRA_REASONS } from './PURPRA_REASONS.entity';
+import { PURPRA_GROUP } from './PURPRA_GROUP.entity';
+import { PURPRA_COMMITTEE } from './PURPRA_COMMITTEE.entity';
+import { PUR_FILE } from './PUR_FILE.entity';
+import { FORM } from './FORM.entity';
 
 @Entity({ name: 'PURPRA_FORM', schema: 'WEBFORM' })
 export class PURPRA_FORM {
@@ -73,4 +85,26 @@ export class PURPRA_FORM {
 
     @Column()
     VDETAIL?: string;
+
+    @OneToOne(() => FORM)
+    @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+    @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
+    @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
+    @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+    @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+    FORM?: FORM;
+
+    @OneToMany(() => PURPRA_REASONS, (p) => p.PURPRA_FORM)
+    REASONS?: PURPRA_REASONS[];
+
+    @OneToOne(() => PURPRA_GROUP)
+    @JoinColumn({ name: 'NGROUP', referencedColumnName: 'NID' })
+    GROUP?: PURPRA_GROUP;
+
+    @OneToOne(() => PURPRA_COMMITTEE)
+    @JoinColumn({ name: 'NCOMMITTEE', referencedColumnName: 'NID' })
+    COMMITTEE?: PURPRA_COMMITTEE;
+
+    @OneToMany(() => PUR_FILE, (p) => p.PURPRA_FORM)
+    FILES?: PUR_FILE[];
 }

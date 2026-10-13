@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CommitteeRepository } from '../repository/committe.repository';
 import { GroupRepository } from '../repository/group.repository';
 import { ReasonsMasterRepository } from '../repository/reasons-master.repository';
+import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormRepository } from '../repository/form.repository';
 
 @Injectable()
 export class PurPraService {
@@ -9,6 +11,7 @@ export class PurPraService {
         private readonly committeeRepo: CommitteeRepository,
         private readonly groupRepo: GroupRepository,
         private readonly reasonsRepo: ReasonsMasterRepository,
+        private readonly purPraFormRepo: FormRepository,
     ) {}
 
     /**
@@ -77,6 +80,31 @@ export class PurPraService {
                 : {
                       status: true,
                       message: `Reasons found for group ${groupCode} ${res.length} records`,
+                      data: res,
+                  };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-13
+     * @description ดึงข้อมูลแบบฟอร์ม Price Approval
+     * @param form 
+     * @returns 
+     */
+    async getPurPraForms(form: FormDto) {
+        try {
+            const res = await this.purPraFormRepo.findByForm(form);
+            return !res
+                ? {
+                      status: false,
+                      message: 'No price Approval form found',
+                  }
+                : {
+                      status: true,
+                      message: `Price Approval form found`,
                       data: res,
                   };
         } catch (error) {

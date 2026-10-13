@@ -109,4 +109,25 @@ export class CreatePurCpcService {
             throw error;
         }
     }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-13
+     * @description อัปเดตสถานะของฟอร์ม PUR-CPC ที่ระบุโดย formNo
+     * @param formNo PRO-CPC26-000001
+     * @param status 2
+     */
+    async updateStatus(formNo: string, status: number) {
+        try {
+            const pk = this.crackPrimaryKey(formNo);
+            const cyear2 = pk.CYEAR2;
+            const nrunno = pk.NRUNNO;
+            const result = await this.repo.updateStatus(cyear2, nrunno, status);
+            if (!result) {
+                throw new Error('Failed to update status');
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
 }

@@ -42,4 +42,16 @@ export class PurCpcRepository extends BaseRepository {
             take: 1,
         });
     }
+
+    updateStatus(cyear2: string, nrunno: number, status: number) {
+        return this.getRepository(PURCPC_FORM).update(
+            {
+                CYEAR2: cyear2,
+                NRUNNO: nrunno,
+            },
+            {
+                NSTATUS: status,
+            },
+        );
+    }
 }

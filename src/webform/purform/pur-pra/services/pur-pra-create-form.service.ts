@@ -10,6 +10,7 @@ import { ReasonRepository } from '../repository/reason.repository';
 import { FormService } from 'src/webform/form/form.service';
 import { FormLinkService } from 'src/webform/form-link/form-link.service';
 import { joinPaths } from 'src/common/utils/files.utils';
+import { CreatePurCpcService } from '../../pur-cpc/services/purcpc_create.service';
 
 @Injectable()
 export class PurPraCreateService {
@@ -21,6 +22,7 @@ export class PurPraCreateService {
         private readonly formLinkService: FormLinkService,
         private readonly praFormRepo: FormRepository,
         private readonly praReasonRepo: ReasonRepository,
+        private readonly purCpcService: CreatePurCpcService,
     ) {}
     protected readonly path =
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/PUR/PROPRA/` as string;
@@ -157,6 +159,8 @@ export class PurPraCreateService {
                 'Failed to insert link between price approval and price comparison',
             );
         }
+        // update status ของ price comparison = 2
+        await this.purCpcService.updateStatus(priceComparisonNo, 2);
     }
 
     /**
@@ -186,7 +190,6 @@ export class PurPraCreateService {
         const formNo = await this.formService.getFormno(form);
         const destination = await joinPaths(this.path, formNo);
         for (const file of files) {
-            console.log('processing file:', file);
             switch (file.fieldname) {
                 case 'IMAGE_DETAIL':
                     code = 'PURPRA_DTL';

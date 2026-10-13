@@ -11,9 +11,16 @@ import { FormRepository } from './repository/form.repository';
 import { FormModule } from 'src/webform/form/form.module';
 import { FormmstModule } from 'src/webform/formmst/formmst.module';
 import { FormLinkModule } from 'src/webform/form-link/form-link.module';
+import { PurCpcModule } from '../pur-cpc/pur-cpc.module';
 
 @Module({
-    imports: [HandleFileFormModule, FormModule, FormmstModule, FormLinkModule],
+    imports: [
+        HandleFileFormModule,
+        FormModule,
+        FormmstModule,
+        FormLinkModule,
+        PurCpcModule,
+    ],
     controllers: [PurPraController],
     providers: [
         //service

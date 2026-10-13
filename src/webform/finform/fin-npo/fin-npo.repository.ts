@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 
 import { DS_STAMP_REPORT } from 'src/common/Entities/webform/views/FINDS_STAMP_REPORT.entity';
@@ -183,14 +183,26 @@ export class FinnpoRepository extends BaseRepository {
         nrunno: number,
         invoices: Array<{ ID: number } & Partial<FINNPOINVOICE>>,
     ) {
-        await Promise.all(
-            invoices.map(({ ID, ...data }) =>
-                this.getRepository(FINNPOINVOICE).update(
-                    { CYEAR2: cyear2, NRUNNO: nrunno, ID },
-                    data,
-                ),
-            ),
-        );
+        const repository = this.getRepository(FINNPOINVOICE);
+
+        for (const { ID, ...data } of invoices) {
+            const criteria = { CYEAR2: cyear2, NRUNNO: nrunno, ID };
+            const existing = await repository.findOne({ where: criteria });
+
+            if (existing) {
+                await repository.update(criteria, data);
+            } else {
+                // Approval actions send only WHT; they must not create invoices.
+                if (
+                    !data.INVOICE_DATE || !data.INVOICE_NO || !data.SCURCODE ||
+                    data.NET_PRICE == null || data.VAT_RATE_ID == null ||
+                    data.TOTAL_AMT == null
+                ) {
+                    throw new BadRequestException(`Invoice ID ${ID} was not found`);
+                }
+                await repository.insert({ ...data, ...criteria });
+            }
+        }
     }
 
     async updateHead(

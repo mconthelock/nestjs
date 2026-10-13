@@ -5,7 +5,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { PURPRA_REASON_MASTER } from 'src/common/Entities/webform/table/PURPRA_REASON_MASTER.entity';
 
 @Injectable()
-export class ReasonsRepository extends BaseRepository {
+export class ReasonsMasterRepository extends BaseRepository {
     constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

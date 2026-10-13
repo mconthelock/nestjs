@@ -63,4 +63,19 @@ export class IsFileService {
             throw new Error('Insert IS File Error: ' + error.message);
         }
     }
+
+    async deleteFileByID(id: number) {
+        try {
+            const res = await this.repo.deleteById(id);
+            if (res.affected === 0) {
+                throw new Error('Delete IS File Failed: No record deleted');
+            }
+            return {
+                status: true,
+                message: 'Delete IS File Successfully',
+            };
+        } catch (error) {
+            throw new Error('Delete IS File Error: ' + error.message);
+        }
+    }
 }

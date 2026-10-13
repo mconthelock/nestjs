@@ -27,4 +27,20 @@ export class FeFileService {
     async getFile(dto: QueryHandleFileFormDto) {
         return this.repo.getFile(dto);
     }
+
+    
+    async deleteFileByID(id: number) {
+        try {
+            const res = await this.repo.deleteById(id);
+            if (res.affected === 0) {
+                throw new Error('Delete FE File Failed: No record deleted');
+            }
+            return {
+                status: true,
+                message: 'Delete FE File Successfully',
+            };
+        } catch (error) {
+            throw new Error('Delete FE File Error: ' + error.message);
+        }
+    }   
 }

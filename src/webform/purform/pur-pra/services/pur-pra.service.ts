@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CommitteeRepository } from '../repository/committe.repository';
 import { GroupRepository } from '../repository/group.repository';
-import { ReasonsRepository } from '../repository/reasons.repository';
+import { ReasonsMasterRepository } from '../repository/reasons-master.repository';
 
 @Injectable()
 export class PurPraService {
     constructor(
         private readonly committeeRepo: CommitteeRepository,
         private readonly groupRepo: GroupRepository,
-        private readonly reasonsRepo: ReasonsRepository,
+        private readonly reasonsRepo: ReasonsMasterRepository,
     ) {}
 
     /**

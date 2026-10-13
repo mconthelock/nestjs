@@ -24,4 +24,8 @@ export class FeFileRepository extends BaseRepository {
     async create(dto: CreateHandleFileFormDto) {
         return await this.getRepository(FE_FILE).save(dto);
     }
+
+    async deleteById(id: number) {
+        return this.getRepository(FE_FILE).delete({ FILE_ID: id });
+    }
 }

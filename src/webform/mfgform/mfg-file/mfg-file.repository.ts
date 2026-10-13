@@ -24,4 +24,8 @@ export class MfgFileRepository extends BaseRepository {
     async create(dto: CreateHandleFileFormDto) {
         return await this.getRepository(MFG_FILE).save(dto);
     }
+
+    async deleteById(id: number) {
+        return this.getRepository(MFG_FILE).delete({ FILE_ID: id });
+    }
 }

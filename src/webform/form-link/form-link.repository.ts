@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
-import { FORM_LINK } from 'src/common/Entities/webform/table/FROM_LINK.entitiy';
+import { FORM_LINK } from 'src/common/Entities/webform/table/FROM_LINK.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 
 @Injectable()

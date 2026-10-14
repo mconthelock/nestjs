@@ -1,12 +1,12 @@
 import { Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { WireHarnessService } from './wire-harness.service';
+import { WireHarnessJobService } from './wire-harness-job.service';
 
 @ApiTags('Wire Harness Job')
 @Controller('innovat/wire-harness-job')
 export class WireHarnessJobController {
     constructor(
-        private readonly service: WireHarnessService,
+        private readonly service: WireHarnessJobService,
     ) {}
 
     @Post('sync-production-plan')

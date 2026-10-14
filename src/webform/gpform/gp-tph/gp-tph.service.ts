@@ -34,8 +34,29 @@ export class GpTphService {
         private readonly doactionFlowService: DoactionFlowService,
     ) { }
 
-    findAllAreas() {
-        return this.repo.findAllAreas();
+    async findAllAreas() {
+        const areas = await this.repo.findAllAreas();
+        const ownerAvailability = new Map<string, boolean>();
+        const result = [];
+        for (const area of areas) {
+            const positionCode = area.AREA_OWNER_POSCODE?.trim();
+            const organizationCode = area.AREA_OWNER?.trim();
+            const ownerKey = `${positionCode}+${organizationCode}`;
+            if (!ownerAvailability.has(ownerKey)) {
+                const employees = positionCode && organizationCode
+                    ? await this.orgposService.getOrgPos({
+                        VPOSNO: positionCode,
+                        VORGNO: organizationCode,
+                    })
+                    : [];
+                ownerAvailability.set(ownerKey, employees.length > 0);
+            }
+            result.push({
+                ...area,
+                HAS_ACTIVE_AREA_OWNER: ownerAvailability.get(ownerKey),
+            });
+        }
+        return result;
     }
 
     async doAction(dto: doactionFlowDto, ip: string) {
@@ -58,7 +79,11 @@ export class GpTphService {
                 VREMARK: dto.REMARK ?? '', VREMOTE: ip, VREALAPV: dto.EMPNO,
             });
         }
-        return this.doactionFlowService.doAction(dto, ip);
+        const result = await this.doactionFlowService.doAction(dto, ip);
+        if (dto.ACTION === 'reject' && result.status) {
+            await this.repo.finalizeRejectedRequest(form);
+        }
+        return result;
     }
 
     findAllLocations() {

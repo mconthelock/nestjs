@@ -9,6 +9,7 @@ import { WHN_DRUM_STOCK } from 'src/common/Entities/innovat/table/WHN_DRUM_STOCK
 import { WHN_DRUM_MASTER } from 'src/common/Entities/innovat/table/WHN_DRUM_MASTER.entity';
 import { WHN_PRODUCTION } from 'src/common/Entities/innovat/views/WHN_PRODUCTION.entity';
 import { WHN_AUTOPLAN } from 'src/common/Entities/innovat/views/WHN_AUTOPLAN.entity';
+import { WHN_REASON } from 'src/common/Entities/innovat/table/WHN_REASON.entity';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { CreateDrumDto } from './dto/create-drum.dto';
 import { UpdateDrumDto } from './dto/update-drum.dto';
@@ -93,7 +94,7 @@ export class WireHarnessRepository extends BaseRepository {
     }
 
     createDrum(dto: CreateDrumDto) {
-        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'ctrlNo', 'cut', 'cutType'];
+        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
         return this.orepo.execCursor(
             'WHN_CREATE_DRUM',
             dto,
@@ -102,7 +103,7 @@ export class WireHarnessRepository extends BaseRepository {
     }
 
     updateDrum(dto: UpdateDrumDto) {
-        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'drumId', 'ctrlNo', 'cut', 'cutType'];
+        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'drumId', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
         return this.orepo.execCursor(
             'WHN_UPDATE_DRUM',
             dto,
@@ -131,6 +132,21 @@ export class WireHarnessRepository extends BaseRepository {
             allowedFields,
         )
         .orderBy('A.MT_ITEMCODE', 'ASC')
+        .getMany();
+    }
+
+    reason(condition: FiltersDto) {
+        const allowedFields = ['RS_ID', 'RS_NAME_TH', 'RS_STATUS'];
+        const qb = this.getRepository(WHN_REASON)
+            .createQueryBuilder('A');
+
+        return this.applyFilters(
+            qb,
+            'A',
+            condition,
+            allowedFields,
+        )
+        .orderBy('A.RS_ID', 'ASC')
         .getMany();
     }
 }

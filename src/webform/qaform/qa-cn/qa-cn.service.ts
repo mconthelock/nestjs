@@ -886,16 +886,20 @@ export class QaCnService {
                 },
             );
             if (ACTION != 'return') {
-                await this.repoDwg.deleteByAll(currentForm);
-                await this.repoDwg.insertMultiple(dwgToInsert);
+                if (dwgToInsert) {
+                    await this.repoDwg.deleteByAll(currentForm);
+                    await this.repoDwg.insertMultiple(dwgToInsert);
+                }
             }
         }
 
         if (ACTION == 'approve') {
             if (STEPREADY == '--') {
                 await this.repoCnform.update({ ...currentForm }, { ...cndata });
-                await this.repoDwg.deleteByAll(currentForm);
-                await this.repoDwg.insertMultiple(dwgToInsert);
+                if (dwgToInsert) {
+                    await this.repoDwg.deleteByAll(currentForm);
+                    await this.repoDwg.insertMultiple(dwgToInsert);
+                }
             }
             if (CEXTDATA == 8 && cndata.CLSNO == 2) {
                 if (cndata.INVNO && cndata.INVNO.length >= 8) {

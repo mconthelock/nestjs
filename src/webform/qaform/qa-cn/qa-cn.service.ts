@@ -95,7 +95,7 @@ export class QaCnService {
                         };
                     } else {
                         condition = {
-                            VORGNO: '000502',
+                            VORGNO: '000503',
                             VPOSNO: '30',
                         };
                     }

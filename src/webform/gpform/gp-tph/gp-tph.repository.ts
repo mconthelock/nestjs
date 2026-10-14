@@ -30,6 +30,14 @@ export class GpTphRepository extends BaseRepository {
         });
     }
 
+    async finalizeRejectedRequest(form: FormDto) {
+        await this.getRepository(FLOW).update(
+            { ...form, CAPVSTNO: '0', CSTEPST: In(['1', '2', '3']) },
+            { CAPVSTNO: '2', CSTEPST: '7' },
+        );
+        await this.getRepository(FORM).update(form, { CST: '3' });
+    }
+
     async replaceSystemApproverStep(
         form: FormDto,
         stepNo: string,

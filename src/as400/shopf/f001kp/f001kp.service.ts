@@ -16,7 +16,9 @@ export class F001kpService {
     async findTsAdjustData(month: string, dwgNo: string | string[]) {
         // 1. แปลงให้เป็น Array เสมอ (ถ้าส่งมาตัวเดียวก็จับใส่ [] ถ้าเป็น Array อยู่แล้วก็ใช้ได้เลย)
         const dwgArray = Array.isArray(dwgNo) ? dwgNo : [dwgNo];
-
+        console.log('DDDDDDDDDDDDDDDDD');
+        console.log(dwgNo);
+        console.log('DDDDDDDDDDDDDDDDD');
         // 2. วนลูปสร้างเงื่อนไข LIKE และเชื่อมด้วย OR
         const dwgConditions = dwgArray
             // แนะนำให้ใส่ TRIM() ป้องกันปัญหาเคาะวรรค (Space) ท้ายข้อความในฐานข้อมูล AS400

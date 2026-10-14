@@ -1,11 +1,21 @@
 import { Injectable } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import { ConectionService } from 'src/as400/conection/conection.service';
+import { BaseRepository } from 'src/common/repositories/base-repository';
+import { WHN_PRODUCTION_PLAN } from 'src/common/Entities/innovat/table/WHN_PRODUCTION_PLAN.entity';
 
 @Injectable()
-export class WireHarnessAs400Repository {
+export class WireHarnessJobRepository extends BaseRepository {
+   
     constructor(
+        @InjectDataSource('innovatConnection')
+        private readonly ds: DataSource,
+
         private readonly as400: ConectionService,
-    ) {}
+    ) {
+        super(ds);
+    }
 
     getProductionPlan() {
         return this.as400.runQuery(`
@@ -29,6 +39,8 @@ export class WireHarnessAs400Repository {
                     F1.F01R10 AS QTY,
                     CB.Q41K14 AS MATERIAL,
                     CB.Q41K20 AS ITEMCODE,
+                    Q1.Q41K05 AS SEQ_ORD,
+                    CB.Q41K05 AS SEQ_CABLE,
                     DECIMAL(CB.Q41K16, 8, 0) / 1000 AS CUT,
                     REPLACE(Q3.Q43K06, X'00', '') AS REMARK,
                     ROW_NUMBER() OVER (PARTITION BY F1.F01R01 ORDER BY CB.Q41K05) AS RN
@@ -47,6 +59,7 @@ export class WireHarnessAs400Repository {
                     AND Q1.Q41K02 = CB.Q41K02
                     AND Q1.Q41K03 = CB.Q41K03
                     AND Q1.Q41K04 = CB.Q41K04
+                    AND CB.Q41K05 > Q1.Q41K05
                     AND CB.Q41K10 LIKE 'CABLE%'
                     AND SUBSTR(Q1.Q41K08, 1, LOCATE(' ', Q1.Q41K08 || ' ') - 1) = SUBSTR(CB.Q41K08, 1, LOCATE(' ', CB.Q41K08 || ' ') - 1)
                 LEFT JOIN RTNLIBF.Q143KP Q3
@@ -63,5 +76,9 @@ export class WireHarnessAs400Repository {
             ) X
             WHERE X.RN = 1
         `);
+    }
+
+    saveProductionPlan(data: Partial<WHN_PRODUCTION_PLAN>[]) {
+        return this.getRepository(WHN_PRODUCTION_PLAN).save(data);
     }
 }

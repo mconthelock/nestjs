@@ -6,6 +6,9 @@ import { ViewColumn, ViewEntity } from 'typeorm';
 })
 export class WHN_AUTOPLAN {
     @ViewColumn()
+    GRPID: string;
+
+    @ViewColumn()
     ITEMNO: string;
 
     @ViewColumn()
@@ -46,6 +49,9 @@ export class WHN_AUTOPLAN {
 
     @ViewColumn()
     ITEMCODE: string;
+
+    @ViewColumn()
+    LMASTER: number;
 
     @ViewColumn()
     CUT: number;

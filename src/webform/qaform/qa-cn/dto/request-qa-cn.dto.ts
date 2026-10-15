@@ -7,6 +7,7 @@ import {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Transform, Type, plainToInstance } from 'class-transformer';
 =======
 import { Transform, Type } from 'class-transformer';
@@ -17,6 +18,9 @@ import { Transform, Type, plainToInstance } from 'class-transformer';
 =======
 import { Transform, Type } from 'class-transformer';
 >>>>>>> d7bc7b33 (QA-CN)
+=======
+import { Transform, Type, plainToInstance } from 'class-transformer';
+>>>>>>> 90141e56 (QA-CN)
 import {
     IsArray,
     IsDate,
@@ -263,6 +267,9 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 90141e56 (QA-CN)
 =======
 >>>>>>> 90141e56 (QA-CN)
     @Transform(({ value }) => {
@@ -280,6 +287,7 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
         }
         return value;
     })
+<<<<<<< HEAD
 <<<<<<< HEAD
     @IsArray()
     @ValidateNested({ each: true })
@@ -302,4 +310,10 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 >>>>>>> 90141e56 (QA-CN)
 =======
 >>>>>>> d7bc7b33 (QA-CN)
+=======
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => RequestResultChkDwgDto)
+    DWGNO?: RequestResultChkDwgDto[];
+>>>>>>> 90141e56 (QA-CN)
 }

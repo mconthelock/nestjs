@@ -56,6 +56,7 @@ export class PurvmmFormRepository extends BaseRepository {
             .leftJoinAndSelect('vmm.TERM', 'term')
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             .leftJoinAndSelect('vmmform.flow', 'flow')
             .leftJoinAndSelect('vmm.ADDRESSES', 'addresses');
 =======
@@ -65,6 +66,9 @@ export class PurvmmFormRepository extends BaseRepository {
             .leftJoinAndSelect('vmmform.flow', 'flow')
             .leftJoinAndSelect('vmm.ADDRESSES', 'addresses');
 >>>>>>> 1be37121 (PUR-EVA)
+=======
+            .leftJoinAndSelect('vmmform.flow', 'flow');
+>>>>>>> 38502fd4 (PUR-EVA)
 
         const cond = {
             AND: [],
@@ -95,6 +99,7 @@ export class PurvmmFormRepository extends BaseRepository {
         }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 862dd947 (PUR-EVA)
         if (dto.VENDGROUPTYPE) {
@@ -109,6 +114,8 @@ export class PurvmmFormRepository extends BaseRepository {
 >>>>>>> 38502fd4 (PUR-EVA)
 =======
 >>>>>>> 862dd947 (PUR-EVA)
+=======
+>>>>>>> 38502fd4 (PUR-EVA)
         if (dto.vmmform.CST) {
             cond.AND.push({
                 field: 'vmmform.CST',
@@ -145,6 +152,7 @@ export class PurvmmFormRepository extends BaseRepository {
                 field: 'reqtor.SNAME',
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 op: 'like',
                 value: dto.vmmform.reqtor.SNAME.toUpperCase(),
 =======
@@ -155,6 +163,10 @@ export class PurvmmFormRepository extends BaseRepository {
                 op: 'like',
                 value: dto.vmmform.reqtor.SNAME.toUpperCase(),
 >>>>>>> 28e6a315 (PUR-EVA)
+=======
+                op: 'eq',
+                value: dto.vmmform.reqtor.SNAME,
+>>>>>>> 38502fd4 (PUR-EVA)
             });
         }
 
@@ -207,12 +219,15 @@ export class PurvmmFormRepository extends BaseRepository {
             'VENDNAME',
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             'VENDGROUPTYPE',
 =======
 >>>>>>> 38502fd4 (PUR-EVA)
 =======
             'VENDGROUPTYPE',
 >>>>>>> 862dd947 (PUR-EVA)
+=======
+>>>>>>> 38502fd4 (PUR-EVA)
             'vmmform.CST',
             'vmmform.DREQDATE',
             'reqtor.SEMPNO',

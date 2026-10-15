@@ -16,7 +16,15 @@ export class PurCpcRepository extends BaseRepository {
 
     getLists(data: PriceComparisonListDto) {
         return this.getRepository(PURCPC_FORM_LISTS_VIEW).find({
-            where: data,
+            where: [
+                {
+                    VREQNO: data.VREQNO,
+                    NSTATUS: data.NSTATUS,
+                },
+                {
+                    VFORMNO: data.VFORMNO,
+                },
+            ],
         });
     }
 

@@ -7,8 +7,8 @@ import { KeyPilineEventRecordDto } from './dto/KEY-PILINE_EVENT_RECORD.dto';
 @Injectable()
 export class PilineEventRecordService {
     constructor(private readonly repo: PilineEventRecordRepository) {}
-    findAll() {
-        return this.repo.findAll();
+    findAll(issueOnly = false) {
+        return this.repo.findAll(issueOnly);
     }
 
     create(dto: CreatePilineEventRecordDto) {

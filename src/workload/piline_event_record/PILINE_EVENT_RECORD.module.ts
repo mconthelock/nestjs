@@ -1,3 +1,12 @@
+import { FlowModule } from 'src/webform/flow/flow.module';
+import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
+import { RepModule } from 'src/webform/rep/rep.module';
+import { UsersModule } from 'src/amec/users/users.module';
+import { PilineRejectDetailsService } from './PILINE_REJECT_DETAILS.service';
+import { PilineRejectFlowService } from './PILINE_REJECT_FLOW.service';
+import { PilineRejectRequestController, PilineRejectRequestService } from './PILINE_REJECT_REQUEST.controller';
+import { ConectionModule } from 'src/as400/conection/conection.module';
+import { PilineIssueController } from './PILINE_ISSUE.controller';
 import { PilineIdtagController, PilineIdtagService } from './PILINE_IDTAG.controller';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,10 +20,13 @@ import { PilineEventFilesService } from './PILINE_EVENT_FILES.service';
 
 @Module({
     imports: [
+        FlowModule, OrgposModule, RepModule, UsersModule,
+        ConectionModule,
         TypeOrmModule.forFeature([PILINE_EVENT_RECORD], 'workloadConnection'),
     ],
-    controllers: [PilineEventRecordController, PilineEventInputController, PilineIdtagController],
+    controllers: [PilineRejectRequestController, PilineIssueController, PilineEventRecordController, PilineEventInputController, PilineIdtagController],
     providers: [
+        PilineRejectDetailsService, PilineRejectFlowService, PilineRejectRequestService,
         PilineEventRecordService,
         PilineEventRecordRepository,
         PilineEventInputService,

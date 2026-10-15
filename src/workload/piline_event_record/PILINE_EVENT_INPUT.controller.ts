@@ -3,6 +3,9 @@ import {
     Body,
     Controller,
     Post,
+    Get,
+    Header,
+    StreamableFile,
     Patch,
     Param,
     UploadedFiles,
@@ -23,6 +26,15 @@ import {
 @Controller('workload/piline_event_record')
 export class PilineEventInputController {
     constructor(private readonly inputService: PilineEventInputService) {}
+
+    @Get('input/:number/files/:type/:seq')
+    @Header('Cache-Control', 'private, no-store')
+    @Header('X-Content-Type-Options', 'nosniff')
+    async preview(@Param('number') number: string, @Param('type') type: string, @Param('seq') seq: string) {
+        const file = await this.inputService.readAttachment(number,type,Number(seq));
+        return new StreamableFile(file.buffer, { type: file.type, length: file.buffer.length,
+            disposition: "inline; filename*=UTF-8''" + encodeURIComponent(file.name) });
+    }
 
     @Post('input')
     @UseInterceptors(

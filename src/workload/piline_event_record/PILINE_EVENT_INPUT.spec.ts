@@ -10,6 +10,7 @@ import { PilineEventFilesService } from './PILINE_EVENT_FILES.service';
 
 jest.mock('fs/promises', () => ({
     mkdir: jest.fn(),
+    readFile: jest.fn(),
     writeFile: jest.fn(),
     rm: jest.fn(),
 }));
@@ -39,6 +40,8 @@ const png = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 0]);
 
 describe('Production event input API', () => {
     let app: INestApplication;
+    const findAtt = jest.fn();
+    const deleteAtt = jest.fn();
     const findExisting = jest.fn(), updateEvent = jest.fn(), deleteNg = jest.fn(), findFiles = jest.fn();
     const insertEvent = jest.fn(),
         insertNg = jest.fn(),
@@ -72,7 +75,7 @@ describe('Production event input API', () => {
                     case 'PILINE_NG_RECORD':
                         return { insert: insertNg, delete: deleteNg };
                     case 'PILINE_ATT':
-                        return { insert: insertAtt, findBy: findFiles };
+                        return { insert: insertAtt, findBy: findFiles, delete: deleteAtt, findOneBy: findAtt };
                     case 'PILINE_MAPPING_MST':
                         return { findOneBy: mapping };
                     default:
@@ -81,7 +84,7 @@ describe('Production event input API', () => {
             },
         },
     };
-    const ds = { options: { type: 'oracle' }, createQueryRunner: () => runner };
+    const ds = { options: { type: 'oracle' }, createQueryRunner: () => runner, getRepository: runner.manager.getRepository };
     beforeAll(async () => {
         const module = await Test.createTestingModule({
             controllers: [PilineEventInputController],
@@ -102,6 +105,9 @@ describe('Production event input API', () => {
     });
     beforeEach(() => {
         jest.clearAllMocks();
+        findAtt.mockReset().mockResolvedValue({FILENAME:'PI2610001/existing.png'});
+        (disk.readFile as jest.Mock).mockReset().mockResolvedValue(png);
+        deleteAtt.mockReset().mockResolvedValue({affected:1});
         findExisting.mockReset().mockResolvedValue({PILINE_NO:'PI2610001',EVENT_DATE:new Date('2026-10-09T00:00:00+07:00'),RUN_NO:1,IS_NG:'0',RECORD_STATUS:'ACTIVE',CREATE_BY:'11111'});
         updateEvent.mockReset().mockResolvedValue({affected:1}); deleteNg.mockReset().mockResolvedValue({affected:1}); findFiles.mockReset().mockResolvedValue([]);
         for (const mock of [
@@ -134,9 +140,9 @@ describe('Production event input API', () => {
             .post('/workload/piline_event_record/input')
             .field('payload', JSON.stringify(data));
 
-    it('saves non-NG, generates the first monthly number and handles overnight times', async () => {
+    it('saves non-NG, generates the first daily number and handles overnight times', async () => {
         const res = await post(payload).expect(201);
-        expect(res.body.data.PILINE_NO).toBe('PI2610001');
+        expect(res.body.data.PILINE_NO).toBe('PI261009001');
         expect(res.body.data.RUN_NO).toBe(1);
         const record = insertEvent.mock.calls[0][0];
         expect(record.END_TIME.getTime() - record.START_TIME.getTime()).toBe(
@@ -152,7 +158,7 @@ describe('Production event input API', () => {
         expect(runner.commitTransaction).toHaveBeenCalledTimes(1);
         expect(runner.release).toHaveBeenCalledTimes(1);
     });
-    it('increments monthly document number separately from daily RUN_NO', async () => {
+    it('uses the daily RUN_NO as the document suffix', async () => {
         findMonthly.mockResolvedValue([
             { PILINE_NO: 'PI2610008' },
             { PILINE_NO: 'PI2610002' },
@@ -160,7 +166,7 @@ describe('Production event input API', () => {
         maxRun.mockResolvedValue({ MAX_RUN: 3 });
         const res = await post(payload).expect(201);
         expect(res.body.data).toMatchObject({
-            PILINE_NO: 'PI2610009',
+            PILINE_NO: 'PI261009004',
             RUN_NO: 4,
         });
     });
@@ -175,12 +181,12 @@ describe('Production event input API', () => {
         });
         expect(insertAtt.mock.calls[0][0]).toEqual([
             expect.objectContaining({
-                PILINE_NO: 'PI2610001',
+                PILINE_NO: 'PI261009001',
                 TYPEFILE: 'EVT',
                 SEQ: 1,
             }),
             expect.objectContaining({
-                PILINE_NO: 'PI2610001',
+                PILINE_NO: 'PI261009001',
                 TYPEFILE: 'NG',
                 SEQ: 1,
             }),
@@ -259,8 +265,8 @@ describe('Production event input API', () => {
         await post(payload).expect(400);
         expect(insertEvent).not.toHaveBeenCalled();
     });
-    it('stops at the three-digit monthly limit', async () => {
-        findMonthly.mockResolvedValue([{ PILINE_NO: 'PI2610999' }]);
+    it('stops at the three-digit daily limit', async () => {
+        maxRun.mockResolvedValue({ MAX_RUN: 999 });
         await post(payload).expect(409);
         expect(insertEvent).not.toHaveBeenCalled();
     });
@@ -286,9 +292,9 @@ describe('Production event input API', () => {
         );
     });
     it('accepts blank optional Material Lot', async () => { await post({ ...payload, IS_NG: '1', NG: { ...ng, MAT_LOT: '' } }).expect(201); });
-    it('creates ACTIVE numbers from selected event month', async () => {
+    it('creates ACTIVE numbers from selected event date', async () => {
         const res = await post({...payload,EVENT_DATE:'2025-02-10'}).expect(201);
-        expect(res.body.data).toMatchObject({PILINE_NO:'PI2502001',RECORD_STATUS:'ACTIVE'});
+        expect(res.body.data).toMatchObject({PILINE_NO:'PI250210001',RECORD_STATUS:'ACTIVE'});
     });
     const patch = (value: object) => request(app.getHttpServer()).patch('/workload/piline_event_record/input/PI2610001').field('payload',JSON.stringify(value));
     it('updates in one transaction and preserves generated fields',async()=>{
@@ -343,4 +349,56 @@ describe('Production event input API', () => {
         findFiles.mockResolvedValue([{TYPEFILE:'EVT',SEQ:3}]);
         await patch({ ...payload, IS_NG: '1', NG: ng }).attach('ngFiles',png,'a.png').expect(200);
         expect(insertAtt.mock.calls[0][0][0]).toMatchObject({TYPEFILE:'NG',SEQ:1});
-    });});
+    });
+    it('includes the selected day and restarts numbering for a new date', async () => {
+        maxRun.mockResolvedValueOnce({MAX_RUN:2}).mockResolvedValueOnce({MAX_RUN:0});
+        const first = await post({...payload,EVENT_DATE:'2026-10-12'}).expect(201);
+        const second = await post({...payload,EVENT_DATE:'2026-10-13'}).expect(201);
+        expect(first.body.data.PILINE_NO).toBe('PI261012003');
+        expect(second.body.data.PILINE_NO).toBe('PI261013001');
+        expect(qb.where).toHaveBeenCalledWith('record.EVENT_DATE = :date',{date:new Date('2026-10-13T00:00:00+07:00')});
+    });
+
+
+
+    it('deletes only selected existing file after commit, including matching SEQ in different types', async () => {
+        findFiles.mockResolvedValue([{TYPEFILE:'EVT',SEQ:1,FILENAME:'PI2610001/event.png'},{TYPEFILE:'NG',SEQ:1,FILENAME:'PI2610001/ng.png'}]);
+        await patch({...payload,DELETE_FILES:[{TYPEFILE:'NG',SEQ:1}]}).expect(200);
+        expect(deleteAtt).toHaveBeenCalledWith({PILINE_NO:'PI2610001',TYPEFILE:'NG',SEQ:1});
+        expect(deleteAtt).toHaveBeenCalledTimes(1);
+        expect(disk.rm).toHaveBeenCalledTimes(1);
+        expect(String((disk.rm as jest.Mock).mock.calls[0][0])).toMatch(/ng\.png$/);
+        expect((disk.rm as jest.Mock).mock.invocationCallOrder[0]).toBeGreaterThan(runner.commitTransaction.mock.invocationCallOrder[0]);
+    });
+    it('rejects deletion of an attachment not on this record',async()=>{
+        await patch({...payload,DELETE_FILES:[{TYPEFILE:'EVT',SEQ:9}]}).expect(409);
+        expect(deleteAtt).not.toHaveBeenCalled();expect(disk.rm).not.toHaveBeenCalled();expect(runner.rollbackTransaction).toHaveBeenCalled();
+    });
+    it('keeps old physical files if transaction fails',async()=>{
+        findFiles.mockResolvedValue([{TYPEFILE:'EVT',SEQ:1,FILENAME:'PI2610001/old.png'}]);
+        deleteAtt.mockRejectedValueOnce(new Error('delete failed'));
+        await patch({...payload,DELETE_FILES:[{TYPEFILE:'EVT',SEQ:1}]}).expect(500);
+        expect(disk.rm).not.toHaveBeenCalled();expect(runner.rollbackTransaction).toHaveBeenCalled();
+    });
+    it('does not accept file deletion on creation',async()=>{
+        await post({...payload,DELETE_FILES:[{TYPEFILE:'EVT',SEQ:1}]}).expect(400);
+        expect(disk.rm).not.toHaveBeenCalled();
+    });
+
+    it('serves an existing attachment through the record key',async()=>{
+        const res = await request(app.getHttpServer()).get('/workload/piline_event_record/input/PI2610001/files/EVT/1').expect(200);
+        expect(res.headers['content-type']).toMatch(/image\/png/);
+        expect(res.body).toEqual(png);
+        expect(findAtt).toHaveBeenCalledWith({PILINE_NO:'PI2610001',TYPEFILE:'EVT',SEQ:1});
+    });
+    it('returns 404 for a file not linked to the record',async()=>{
+        findAtt.mockResolvedValue(null);
+        await request(app.getHttpServer()).get('/workload/piline_event_record/input/PI2610001/files/EVT/1').expect(404);
+        expect(disk.readFile).not.toHaveBeenCalled();
+    });
+    it('refuses a stored path outside upload root',async()=>{
+        findAtt.mockResolvedValue({FILENAME:'../outside.png'});
+        await request(app.getHttpServer()).get('/workload/piline_event_record/input/PI2610001/files/EVT/1').expect(400);
+        expect(disk.readFile).not.toHaveBeenCalled();
+    });
+});

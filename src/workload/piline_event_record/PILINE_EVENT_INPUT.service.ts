@@ -7,7 +7,7 @@ import {
     ServiceUnavailableException,
 } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource, EntityManager, Like, QueryRunner } from 'typeorm';
+import { DataSource, EntityManager, QueryRunner } from 'typeorm';
 import { PILINE_EVENT_RECORD } from 'src/common/Entities/workload/table/PILINE_EVENT_RECORD.entity';
 import { PILINE_NG_RECORD } from 'src/common/Entities/workload/table/PILINE_NG_RECORD.entity';
 import { PILINE_ATT } from 'src/common/Entities/workload/table/PILINE_ATT.entity';
@@ -33,6 +33,15 @@ export class PilineEventInputService {
         @InjectDataSource('workloadConnection') private readonly ds: DataSource,
         private readonly files: PilineEventFilesService,
     ) {}
+
+    async readAttachment(number: string, type: string, seq: number) {
+        if (!/^PI(?:\d{7}|\d{9})$/.test(number) || !['EVT','NG'].includes(type) || !Number.isSafeInteger(seq) || seq < 1) throw new BadRequestException('Invalid attachment key');
+        const event = await this.ds.getRepository(PILINE_EVENT_RECORD).findOneBy({PILINE_NO:number});
+        if (!event || event.RECORD_STATUS === 'DELETE') throw new NotFoundException('Event not found');
+        const file = await this.ds.getRepository(PILINE_ATT).findOneBy({PILINE_NO:number,TYPEFILE:type,SEQ:seq});
+        if (!file) throw new NotFoundException('Attachment not found');
+        return this.files.readStored(file.FILENAME);
+    }
 
     private async lock(runner: QueryRunner) {
         if (this.ds.options.type === 'oracle') {
@@ -117,6 +126,7 @@ export class PilineEventInputService {
             throw new BadRequestException(
                 'NG data and files are only allowed when IS_NG is 1',
             );
+        if (!editNumber && dto.DELETE_FILES?.length) throw new BadRequestException('Files can only be deleted when editing an existing event');
         const checkedFiles = this.files.validate(uploads);
         let staged: PilineStagedFiles = { attachments: [] };
         const runner = this.ds.createQueryRunner();
@@ -143,21 +153,7 @@ export class PilineEventInputService {
             const EVENT_DATE = existing?.EVENT_DATE || new Date(dto.EVENT_DATE + 'T00:00:00+07:00');
             if (existing) { PILINE_NO = existing.PILINE_NO; RUN_NO = existing.RUN_NO; }
             else {
-            const prefix = `PI${dto.EVENT_DATE.slice(2, 4)}${dto.EVENT_DATE.slice(5, 7)}`;
-            const monthly = await repo.find({
-                select: { PILINE_NO: true },
-                where: { PILINE_NO: Like(`${prefix}%`) },
-            });
-            const numbers = monthly
-                .map((row) => row.PILINE_NO)
-                .filter((no) => new RegExp(`^${prefix}\\d{3}$`).test(no))
-                .map((no) => Number(no.slice(-3)));
-            const sequence = Math.max(0, ...numbers) + 1;
-            if (sequence > 999)
-                throw new ConflictException(
-                    'Monthly PI Line number limit (999) reached',
-                );
-            PILINE_NO = prefix + String(sequence).padStart(3, '0');
+            const prefix = 'PI' + dto.EVENT_DATE.slice(2).replace(/-/g, '');
             const daily = await repo
                 .createQueryBuilder('record')
                 .select('MAX(record.RUN_NO)', 'MAX_RUN')
@@ -166,6 +162,7 @@ export class PilineEventInputService {
             RUN_NO = Number(daily?.MAX_RUN || 0) + 1;
             if (RUN_NO > 999)
                 throw new ConflictException('Daily RUN_NO limit (999) reached');
+            PILINE_NO = prefix + String(RUN_NO).padStart(3, '0');
             }
             const START_TIME = new Date(
                 `${dto.EVENT_DATE}T${dto.START_TIME}:00+07:00`,
@@ -200,7 +197,11 @@ export class PilineEventInputService {
             } else await repo.insert(record);
             if (existing) await manager.getRepository(PILINE_NG_RECORD).delete({ PILINE_NO });
             const previousFiles = existing ? await manager.getRepository(PILINE_ATT).findBy({ PILINE_NO }) : [];
-            if (previousFiles.length + checkedFiles.length > 10) throw new BadRequestException('Maximum 10 attachments including existing files');
+            const deleteKeys = new Set((dto.DELETE_FILES || []).map(file => file.TYPEFILE + ':' + file.SEQ));
+            const deletedFiles = previousFiles.filter(file => deleteKeys.has(file.TYPEFILE + ':' + file.SEQ));
+            if (deletedFiles.length !== deleteKeys.size) throw new ConflictException('Attachment list changed. Reload the event before saving.');
+            for (const file of deletedFiles) await manager.getRepository(PILINE_ATT).delete({ PILINE_NO, TYPEFILE: file.TYPEFILE, SEQ: file.SEQ });
+            if (previousFiles.length - deletedFiles.length + checkedFiles.length > 10) throw new BadRequestException('Maximum 10 attachments including existing files');
             const maxSeq: Record<string, number> = {};
             for (const file of previousFiles) maxSeq[file.TYPEFILE] = Math.max(maxSeq[file.TYPEFILE] || 0, file.SEQ);
             staged = await this.files.stage(uploads, PILINE_NO, maxSeq);
@@ -220,9 +221,11 @@ export class PilineEventInputService {
             commitAttempted = true;
             await runner.commitTransaction();
             committed = true;
+            const failedDeletes = await this.files.removeStored(deletedFiles.map(file => file.FILENAME));
             return {
                 status: true,
                 message: 'Production event saved successfully',
+                warning: failedDeletes ? 'บันทึกข้อมูลแล้ว แต่ลบไฟล์จริงบางไฟล์ไม่สำเร็จ กรุณาแจ้งผู้ดูแลระบบ' : undefined,
                 data: { ...record, attachments: staged.attachments },
             };
         } catch (error) {

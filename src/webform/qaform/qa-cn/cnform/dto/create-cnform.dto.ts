@@ -12,6 +12,7 @@ import {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { StringToDate } from 'src/common/utils/transform';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
@@ -26,6 +27,11 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 =======
 import { FormDto } from 'src/webform/form/dto/form.dto';
 >>>>>>> 67c79348 (PUR-EVA)
+=======
+import { StringToDate } from 'src/common/utils/transform';
+import { FormDto } from 'src/webform/form/dto/form.dto';
+
+>>>>>>> 6c278692 (QA-CN)
 export class CreateCnformDto extends PickType(FormDto, [
     'NFRMNO',
     'VORGNO',
@@ -81,6 +87,7 @@ export class CreateCnformDto extends PickType(FormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -95,8 +102,10 @@ export class CreateCnformDto extends PickType(FormDto, [
 >>>>>>> 67c79348 (PUR-EVA)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+    @StringToDate()
+>>>>>>> 6c278692 (QA-CN)
     @Type(() => Date)
-    @IsDate()
     SUBMITDATE?: Date;
 
     @IsOptional()
@@ -105,6 +114,7 @@ export class CreateCnformDto extends PickType(FormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -119,8 +129,10 @@ export class CreateCnformDto extends PickType(FormDto, [
 >>>>>>> 67c79348 (PUR-EVA)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+    @StringToDate()
+>>>>>>> 6c278692 (QA-CN)
     @Type(() => Date)
-    @IsDate()
     INSPECDATE?: Date;
 
     @IsOptional()
@@ -129,6 +141,7 @@ export class CreateCnformDto extends PickType(FormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -143,8 +156,10 @@ export class CreateCnformDto extends PickType(FormDto, [
 >>>>>>> 67c79348 (PUR-EVA)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+    @StringToDate()
+>>>>>>> 6c278692 (QA-CN)
     @Type(() => Date)
-    @IsDate()
     EXPCHGDATE?: Date;
 
     @IsOptional()

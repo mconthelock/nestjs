@@ -35,6 +35,7 @@ import { RequestResultChkDwgDto } from '../resultchkdwg/dto/request-resultchkdwg
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { StringToDate } from 'src/common/utils/transform';
 =======
 >>>>>>> d7bc7b33 (QA-CN)
@@ -43,6 +44,9 @@ import { StringToDate } from 'src/common/utils/transform';
 >>>>>>> 6c278692 (QA-CN)
 =======
 >>>>>>> d7bc7b33 (QA-CN)
+=======
+import { StringToDate } from 'src/common/utils/transform';
+>>>>>>> 6c278692 (QA-CN)
 
 export class RequestCNFormDto extends PickType(CreateFormDto, [
     'NFRMNO',
@@ -105,6 +109,7 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -119,8 +124,10 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 >>>>>>> d7bc7b33 (QA-CN)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+    @StringToDate()
+>>>>>>> 6c278692 (QA-CN)
     @Type(() => Date)
-    @IsDate()
     SUBMITDATE?: Date;
 
     @IsOptional()
@@ -129,6 +136,7 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -143,8 +151,10 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 >>>>>>> d7bc7b33 (QA-CN)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+    @StringToDate()
+>>>>>>> 6c278692 (QA-CN)
     @Type(() => Date)
-    @IsDate()
     INSPECDATE?: Date;
 
     @IsOptional()
@@ -153,6 +163,7 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -167,8 +178,10 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 >>>>>>> d7bc7b33 (QA-CN)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
+=======
+    @StringToDate()
+>>>>>>> 6c278692 (QA-CN)
     @Type(() => Date)
-    @IsDate()
     EXPCHGDATE?: Date;
 
     @IsOptional()

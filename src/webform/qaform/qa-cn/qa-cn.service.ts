@@ -886,17 +886,23 @@ export class QaCnService {
                 },
             );
             if (ACTION != 'return') {
-                if (dwgToInsert) {
+                console.log('xxxxxxxxxxx');
+
+                console.log(dwgToInsert);
+                console.log('YYYYYYY');
+                if (dwgToInsert && dwgToInsert.length > 0) {
+                    console.log('infunction');
+
                     await this.repoDwg.deleteByAll(currentForm);
                     await this.repoDwg.insertMultiple(dwgToInsert);
                 }
             }
         }
-
+        return false;
         if (ACTION == 'approve') {
             if (STEPREADY == '--') {
                 await this.repoCnform.update({ ...currentForm }, { ...cndata });
-                if (dwgToInsert) {
+                if (dwgToInsert && dwgToInsert.length > 0) {
                     await this.repoDwg.deleteByAll(currentForm);
                     await this.repoDwg.insertMultiple(dwgToInsert);
                 }

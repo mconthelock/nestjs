@@ -33,6 +33,9 @@ export class CnFormRepository extends BaseRepository {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 00550f31 (QA-CN)
 =======
 >>>>>>> 00550f31 (QA-CN)
     async findByCondition(con: FormDto) {
@@ -44,12 +47,15 @@ export class CnFormRepository extends BaseRepository {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> d7bc7b33 (QA-CN)
 =======
 >>>>>>> 00550f31 (QA-CN)
 =======
 >>>>>>> d7bc7b33 (QA-CN)
+=======
+>>>>>>> 00550f31 (QA-CN)
     async findInc(itm: number): Promise<string | null> {
         const result = await this.getRepository(CNITMINCHARGE).findOne({
             where: { ITEMNO: itm },
@@ -93,8 +99,12 @@ export class CnFormRepository extends BaseRepository {
 >>>>>>> 00550f31 (QA-CN)
 =======
 
+<<<<<<< HEAD
     async getFirstNo(con: FormDto): Promise<any[]> {
 >>>>>>> 14243a62 (QA-CN)
+=======
+    async getFirstNo(con: FormDto): Promise<any> {
+>>>>>>> 00550f31 (QA-CN)
         return await this.getRepository(CNFORM)
             .createQueryBuilder('cnform')
             // ใช้ Raw Query สำหรับ REGEXP_SUBSTR และตั้งชื่อ AS ว่า FIRSTNO
@@ -110,6 +120,9 @@ export class CnFormRepository extends BaseRepository {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 00550f31 (QA-CN)
 =======
 >>>>>>> 00550f31 (QA-CN)
     async getQueryBuilderResult(dto: FormDto) {
@@ -230,6 +243,7 @@ export class CnFormRepository extends BaseRepository {
         return await qb.getRawMany();
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
     async executeRawSql(sql: string, params: any[]): Promise<any[]> {
         // console.log('DATABASE:', this.manager.connection.options);
         // const res = await this.manager.query(
@@ -277,9 +291,25 @@ export class CnFormRepository extends BaseRepository {
 =======
 >>>>>>> 38e4fc7c (QA-CN)
 =======
+=======
+>>>>>>> 00550f31 (QA-CN)
     async executeRawSql(sql: string, params: any[]): Promise<any[]> {
-        // ในนี้เรียก this.query หรือ this.manager.query ได้ เพราะอยู่ในบ้านตัวเอง
-        return await this.manager.query(sql, params);
+        // console.log('DATABASE:', this.manager.connection.options);
+        // const res = await this.manager.query(
+        //     `SELECT *
+        //  FROM "FLOW" T1
+        //  JOIN "AMEC"."AMECUSERALL" T2
+        //      ON T1.VREALAPV = T2.SEMPNO
+        //  WHERE T1.NFRMNO = 4
+        //    AND T1.VORGNO = '050301'
+        //    AND T1.CYEAR = '10'
+        //    AND T1.CYEAR2 = '2026'
+        //    AND T1.NRUNNO = 1389`,
+        // );
+        const res = await this.manager.query(sql, params);
+        console.log('***********', res);
+
+        return res;
     }
 >>>>>>> 14243a62 (QA-CN)
 }

@@ -52,6 +52,7 @@ export class R027Mp1Service {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             CAST(? AS VARCHAR(50)) AS R27M09,
 =======
             ? AS R27M09,
@@ -62,6 +63,9 @@ export class R027Mp1Service {
 =======
             ? AS R27M09,
 >>>>>>> 14243a62 (QA-CN)
+=======
+            CAST(? AS VARCHAR(50)) AS R27M09,
+>>>>>>> 00550f31 (QA-CN)
             L.R27M10,
             L.R27M11,
             L.R27M12,

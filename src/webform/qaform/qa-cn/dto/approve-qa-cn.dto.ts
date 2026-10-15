@@ -4,6 +4,7 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Type, Transform } from 'class-transformer';
 =======
 import { Type } from 'class-transformer';
@@ -14,6 +15,9 @@ import { Type, Transform } from 'class-transformer';
 =======
 import { Type } from 'class-transformer';
 >>>>>>> 093c063b (QA-CN)
+=======
+import { Type, Transform } from 'class-transformer';
+>>>>>>> 00550f31 (QA-CN)
 
 export class ApproveQaCnDto extends PartialType(RequestCNFormDto) {
     @IsNotEmpty()
@@ -34,6 +38,7 @@ export class ApproveQaCnDto extends PartialType(RequestCNFormDto) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @Transform(({ value }) => (value === '' ? undefined : Number(value)))
 =======
 >>>>>>> 093c063b (QA-CN)
@@ -42,6 +47,9 @@ export class ApproveQaCnDto extends PartialType(RequestCNFormDto) {
 >>>>>>> 00550f31 (QA-CN)
 =======
 >>>>>>> 093c063b (QA-CN)
+=======
+    @Transform(({ value }) => (value === '' ? undefined : Number(value)))
+>>>>>>> 00550f31 (QA-CN)
     @Type(() => Number)
     CEXTDATA?: number;
 

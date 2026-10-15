@@ -158,6 +158,7 @@ export class PurvmmFormRepository extends BaseRepository {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 op: 'like',
                 value: dto.vmmform.reqtor.SNAME.toUpperCase(),
 =======
@@ -172,6 +173,10 @@ export class PurvmmFormRepository extends BaseRepository {
                 op: 'eq',
                 value: dto.vmmform.reqtor.SNAME,
 >>>>>>> 38502fd4 (PUR-EVA)
+=======
+                op: 'like',
+                value: dto.vmmform.reqtor.SNAME.toUpperCase(),
+>>>>>>> 28e6a315 (PUR-EVA)
             });
         }
 

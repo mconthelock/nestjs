@@ -22,10 +22,14 @@ import { rtnlibfModule } from './rtnlibf/rtnlibf.module';
 import { J736kpModule } from './rtnlibf/j736kp/j736kp.module';
 import { HpoModule } from './bpcsfvnew/hpo/hpo.module';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { R027Mp1Module } from './datalibo/r027mp1/r027mp1.module';
 
 =======
 >>>>>>> 093c063b (QA-CN)
+=======
+import { R027Mp1Module } from './datalibo/r027mp1/r027mp1.module';
+>>>>>>> 14243a62 (QA-CN)
 
 @Module({
     imports: [
@@ -45,9 +49,13 @@ import { R027Mp1Module } from './datalibo/r027mp1/r027mp1.module';
         J736kpModule,
         HpoModule,
 <<<<<<< HEAD
+<<<<<<< HEAD
         R027Mp1Module,
 =======
 >>>>>>> 093c063b (QA-CN)
+=======
+        R027Mp1Module,
+>>>>>>> 14243a62 (QA-CN)
         // F001kpModule,
         // F002kpModule,
         // F003kpModule,

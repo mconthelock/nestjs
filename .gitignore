@@ -71,3 +71,5 @@ package-lock.json
 
 oracle
 
+artifacts/
+outputs/

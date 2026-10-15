@@ -17,7 +17,7 @@ export class PurvmmFormService {
         try {
             return await this.repo.getData(dto);
         } catch (error) {
-            throw new Error('Get PUR-VMM Form Error: ' + error.message);
+            throw new Error('Get PRO-VMM Form Error: ' + error.message);
         }
     }
 

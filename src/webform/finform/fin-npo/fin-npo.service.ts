@@ -17,6 +17,7 @@ export interface CreateFinnpoInvoiceDto {
     VAT_RATE_ID: number;
     TOTAL_AMT: number;
     SCURCODE: string;
+    WHT?: string | null;
     REFERENCE?: string;
 }
 
@@ -53,7 +54,7 @@ export interface ActionFinnpoDto {
         VAT_RATE_ID?: number;
         TOTAL_AMT?: number;
         SCURCODE?: string;
-        WHT?: number | null;
+        WHT?: string | null;
         REFERENCE?: string | null;
     }> | string;
 }
@@ -577,6 +578,7 @@ export class FinnpoService {
             VAT_RATE_ID: Number(invoice.VAT_RATE_ID),
             TOTAL_AMT: Number(invoice.TOTAL_AMT),
             SCURCODE: invoice.SCURCODE,
+            ...(invoice.WHT !== undefined && { WHT: invoice.WHT }),
             REFERENCE: invoice.REFERENCE == null
                 ? null
                 : String(invoice.REFERENCE).trim() || null,
@@ -653,21 +655,10 @@ export class FinnpoService {
 
         return invoices.map((invoice) => {
             const id = Number(invoice.ID ?? invoice.LINE_ID);
-            const wht = invoice.WHT === undefined
-                ? undefined
-                : invoice.WHT === null
-                  ? null
-                  : Number(invoice.WHT);
+            const wht = this.normalizeWht(invoice.WHT);
 
             if (!Number.isInteger(id) || id <= 0) {
                 throw new BadRequestException('Invoice ID is invalid');
-            }
-            if (
-                wht !== undefined &&
-                wht !== null &&
-                (!Number.isFinite(wht) || wht < 0)
-            ) {
-                throw new BadRequestException('WHT must be zero or a positive number');
             }
 
             return {
@@ -688,6 +679,19 @@ export class FinnpoService {
                 }),
             };
         });
+    }
+
+    private normalizeWht(value: unknown): string | null | undefined {
+        if (value === undefined) return undefined;
+        if (value === null) return null;
+        if (typeof value !== 'string') {
+            throw new BadRequestException('WHT must be a string');
+        }
+        const code = value.trim();
+        if (code && !/^[0-9]{3}([0-9]{4})?$/.test(code)) {
+            throw new BadRequestException('WHT must contain 3 or 7 digits');
+        }
+        return code || null;
     }
 
     private parseAirSalesBy(data: CreateFinnpoDto['AIR_SALES_BY']) {
@@ -728,7 +732,7 @@ export class FinnpoService {
             throw new BadRequestException('DATA must contain at least one invoice');
         }
 
-        invoices.forEach((invoice, index) => {
+        return invoices.map((invoice, index) => {
             const invoiceNo = invoice.INVOICE_NO || invoice.INVOICE_No;
             const date = new Date(invoice.INVOICE_DATE);
             const numericValues = [
@@ -746,9 +750,13 @@ export class FinnpoService {
             ) {
                 throw new BadRequestException(`Invalid invoice at DATA[${index}]`);
             }
+            return {
+                ...invoice,
+                ...(invoice.WHT !== undefined && {
+                    WHT: this.normalizeWht(invoice.WHT),
+                }),
+            };
         });
-
-        return invoices;
     }
 
     private validateCreateDto(dto: CreateFinnpoDto) {

@@ -25,12 +25,12 @@ export class FINNPOINVOICE {
 
     @PrimaryColumn()
     VAT_RATE_ID: number;
-
+    
     @Column({ type: 'number' })
     TOTAL_AMT: number;
 
-    @Column({ type: 'decimal', nullable: true })
-    WHT: number | null;
+    @Column({ type: 'varchar2', nullable: true })
+    WHT: string | null;
 
     @Column({ nullable: true })
     REFERENCE: string | null;

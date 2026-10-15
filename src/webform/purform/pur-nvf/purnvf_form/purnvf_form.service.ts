@@ -6,11 +6,11 @@ import { PurnvfFormRepository } from './purnvf_form.repository';
 
 @Injectable()
 export class PurnvfFormService {
-   constructor(private readonly repo: PurnvfFormRepository) {}
- async create(dto: CreatePurnvfFormDto) {
-      try {
+    constructor(private readonly repo: PurnvfFormRepository) {}
+    async create(dto: CreatePurnvfFormDto) {
+        try {
             const res = await this.repo.create(dto);
-            if(!res){
+            if (!res) {
                 throw new Error('Failed to insert PURVNFFORM');
             }
             return {
@@ -20,36 +20,36 @@ export class PurnvfFormService {
         } catch (error) {
             throw new Error('Insert PURVNFFORM Error: ' + error.message);
         }
-  }
-  async getData(dto: FormDto) {
+    }
+    async getData(dto: FormDto) {
         try {
             return await this.repo.getData(dto);
         } catch (error) {
-            throw new Error('Get PUR-NVF Form Error: ' + error.message);
+            throw new Error('Get PRO-NVF Form Error: ' + error.message);
         }
     }
 
-  async searchByKeyword(keyword: string) {
+    async searchByKeyword(keyword: string) {
         try {
             return await this.repo.searchForms(keyword);
         } catch (error) {
-            throw new Error('Get PUR-NVF Form Error: ' + error.message);
+            throw new Error('Get PRO-NVF Form Error: ' + error.message);
         }
     }
 
-  findAll() {
-    return `This action returns all purnvfForm`;
-  }
+    findAll() {
+        return `This action returns all purnvfForm`;
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} purnvfForm`;
-  }
+    findOne(id: number) {
+        return `This action returns a #${id} purnvfForm`;
+    }
 
-  update(id: number, updatePurnvfFormDto: UpdatePurnvfFormDto) {
-    return `This action updates a #${id} purnvfForm`;
-  }
+    update(id: number, updatePurnvfFormDto: UpdatePurnvfFormDto) {
+        return `This action updates a #${id} purnvfForm`;
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} purnvfForm`;
-  }
+    remove(id: number) {
+        return `This action removes a #${id} purnvfForm`;
+    }
 }

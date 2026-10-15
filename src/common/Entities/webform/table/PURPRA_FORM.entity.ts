@@ -79,10 +79,10 @@ export class PURPRA_FORM {
     DEFT_MONTH_END: Date;
 
     @Column()
-    VEFT_TYPE: string;
+    VEFT_TYPE?: string;
 
     @Column()
-    VEFT_TYPE_OTHER: string;
+    VEFT_TYPE_OTHER?: string;
 
     @Column()
     VDETAIL?: string;

@@ -11,6 +11,7 @@ import { FormService } from 'src/webform/form/form.service';
 import { FormLinkService } from 'src/webform/form-link/form-link.service';
 import { joinPaths } from 'src/common/utils/files.utils';
 import { CreatePurCpcService } from '../../pur-cpc/services/purcpc_create.service';
+import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 
 @Injectable()
 export class PurPraCreateService {
@@ -23,6 +24,7 @@ export class PurPraCreateService {
         private readonly praFormRepo: FormRepository,
         private readonly praReasonRepo: ReasonRepository,
         private readonly purCpcService: CreatePurCpcService,
+        private readonly doactionService: DoactionFlowService,
     ) {}
     protected readonly path =
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/PUR/PROPRA/` as string;
@@ -33,32 +35,43 @@ export class PurPraCreateService {
         ip: string,
     ) {
         try {
-            const formmst =
-                await this.formMstService.getFormMasterByVaname('PRO-PRA');
-            const createForm = await this.createFormService.create(
-                {
-                    NFRMNO: formmst.NNO,
-                    VORGNO: formmst.VORGNO,
-                    CYEAR: formmst.CYEAR,
-                    REQBY: dto.REQBY,
-                    INPUTBY: dto.INPUTBY,
-                    DRAFT: dto.DRAFT,
-                    REMARK: dto.REMARK,
-                },
-                ip,
-            );
-            const form = {
-                NFRMNO: createForm.data.NFRMNO,
-                VORGNO: createForm.data.VORGNO,
-                CYEAR: createForm.data.CYEAR,
-                CYEAR2: createForm.data.CYEAR2,
-                NRUNNO: createForm.data.NRUNNO,
-            };
-            // สร้างลิงก์ระหว่างฟอร์ม Price approval และ Price comparison
-            if (dto.NMODE == 1) {
-                const priceApvDetail = await this.formService.getFormno(form);
-                await this.insertLink(priceApvDetail, dto.PRICE_COMPARE_NO);
+            let form: FormDto;
+            let message: string = 'Price approval form created successfully';
+            if (dto.isReturn === true || dto.isSave === true) {
+                message = 'Price approval form retrieved successfully';
+                form = {
+                    NFRMNO: dto.NFRMNO,
+                    VORGNO: dto.VORGNO,
+                    CYEAR: dto.CYEAR,
+                    CYEAR2: dto.CYEAR2,
+                    NRUNNO: dto.NRUNNO,
+                };
+            } else {
+                const formmst =
+                    await this.formMstService.getFormMasterByVaname('PRO-PRA');
+                const createForm = await this.createFormService.create(
+                    {
+                        NFRMNO: formmst.NNO,
+                        VORGNO: formmst.VORGNO,
+                        CYEAR: formmst.CYEAR,
+                        REQBY: dto.REQBY,
+                        INPUTBY: dto.INPUTBY,
+                        ...(dto.isDraft ? { DRAFT: dto.DRAFT } : {}),
+                        REMARK: dto.REMARK,
+                    },
+                    ip,
+                );
+                form = {
+                    NFRMNO: createForm.data.NFRMNO,
+                    VORGNO: createForm.data.VORGNO,
+                    CYEAR: createForm.data.CYEAR,
+                    CYEAR2: createForm.data.CYEAR2,
+                    NRUNNO: createForm.data.NRUNNO,
+                };
             }
+            const deleteLists: number[] = dto.DELETE_LISTS || [];
+            // สร้างลิงก์ระหว่างฟอร์ม Price approval และ Price comparison
+            await this.insertLink(form, dto.PRICE_COMPARE_NO);
 
             // สร้าง Price approval form
             await this.createFormPRA(form, dto);
@@ -67,11 +80,29 @@ export class PurPraCreateService {
             await this.createReason(form, dto.REASONS);
 
             // Insert file
-            await this.insertFile(form, dto.INPUTBY, files);
+            await this.insertFile({
+                form,
+                createBy: dto.INPUTBY,
+                files,
+                deleteLists: deleteLists,
+                mode: dto.NMODE,
+            });
+
+            if (dto.isReturn === true) {
+                await this.doactionService.doAction(
+                    {
+                        ...form,
+                        EMPNO: dto.EMPNO,
+                        REMARK: dto.REMARK,
+                        ACTION: 'approve',
+                    },
+                    ip,
+                );
+            }
 
             return {
                 status: true,
-                message: 'Price approval form created successfully',
+                message: message,
             };
         } catch (error) {
             throw error;
@@ -89,24 +120,24 @@ export class PurPraCreateService {
         const data = {
             ...form,
             NMODE: dto.NMODE,
-            VVENDOR: dto.VVENDOR,
-            VPLANNER: dto.VPLANNER,
-            VMATERIAL_CODE: dto.VMATERIAL_CODE,
-            VMAKER: dto.VMAKER,
-            VPART_NAME: dto.VPART_NAME,
-            VMODEL_NAME: dto.VMODEL_NAME,
-            VJOB_ITEM: dto.VJOB_ITEM,
-            NCOMMITTEE: dto.NCOMMITTEE,
-            NGROUP: dto.NGROUP,
-            NTOTAL_PRES: dto.NTOTAL_PRES,
-            NTOTAL_NEW: dto.NTOTAL_NEW,
-            NTOTAL_COST: dto.NTOTAL_COST,
-            NTOTAL_RATIO: dto.NTOTAL_RATIO,
-            DEFT_MONTH_START: dto.DEFT_MONTH_START,
-            DEFT_MONTH_END: dto.DEFT_MONTH_END,
-            VEFT_TYPE: dto.VEFT_TYPE,
-            VEFT_TYPE_OTHER: dto.VEFT_TYPE_OTHER,
-            VDETAIL: dto.VDETAIL,
+            VVENDOR: dto.VVENDOR || null,
+            VPLANNER: dto.VPLANNER || null,
+            VMATERIAL_CODE: dto.VMATERIAL_CODE || null,
+            VMAKER: dto.VMAKER || null,
+            VPART_NAME: dto.VPART_NAME || null,
+            VMODEL_NAME: dto.VMODEL_NAME || null,
+            VJOB_ITEM: dto.VJOB_ITEM || null,
+            NCOMMITTEE: dto.NCOMMITTEE || null,
+            NGROUP: dto.NGROUP || null,
+            NTOTAL_PRES: dto.NTOTAL_PRES || null,
+            NTOTAL_NEW: dto.NTOTAL_NEW || null,
+            NTOTAL_COST: dto.NTOTAL_COST || null,
+            NTOTAL_RATIO: dto.NTOTAL_RATIO || null,
+            DEFT_MONTH_START: dto.DEFT_MONTH_START || null,
+            DEFT_MONTH_END: dto.DEFT_MONTH_END || null,
+            VEFT_TYPE: dto.VEFT_TYPE || null,
+            VEFT_TYPE_OTHER: dto.VEFT_TYPE_OTHER || null,
+            VDETAIL: dto.VDETAIL || null,
         };
         const createForm = await this.praFormRepo.create(data);
         if (!createForm) {
@@ -125,6 +156,11 @@ export class PurPraCreateService {
         form: FormDto,
         details: CreatePurPraReasonDto[],
     ) {
+        // ลบทิ้งทั้งหมด
+        if (!details || details.length === 0) {
+            await this.praReasonRepo.delete(form);
+            return;
+        }
         const createReason = await this.praReasonRepo.create(
             details.map((item) => ({
                 ...form,
@@ -143,12 +179,14 @@ export class PurPraCreateService {
      * @param priceApprovalNo
      * @param priceComparisonNo
      */
-    private async insertLink(
-        priceApprovalNo: string,
-        priceComparisonNo: string,
-    ) {
+    private async insertLink(form: FormDto, priceComparisonNo: string) {
+        const priceApprovalNo = await this.formService.getFormno(form);
         // ลบฟอร์มลิงก์เก่าที่เชื่อมโยงกับฟอร์ม Price comparison นี้ก่อนที่จะสร้างลิงก์ใหม่
         await this.formLinkService.delete(priceComparisonNo);
+        await this.formLinkService.delete(priceApprovalNo);
+        if (!priceApprovalNo || !priceComparisonNo) {
+            return;
+        }
         // สร้างลิงก์ใหม่ระหว่างฟอร์ม Price approval และ Price comparison
         const link = await this.formLinkService.create({
             VFORM1: priceApprovalNo,
@@ -160,32 +198,54 @@ export class PurPraCreateService {
             );
         }
         // update status ของ price comparison = 2
-        await this.purCpcService.updateStatus(priceComparisonNo, 2);
+        if (priceComparisonNo) {
+            await this.purCpcService.updateStatus(priceComparisonNo, 2);
+        }
     }
 
     /**
      * @author Sutthipong Tangmongkhoncharoen(24008)
      * @since 2026-10-12
      * @description Insert files for the given price approval form
-     * @param form 
-     * @param createBy 
-     * @param files 
-     * @param deleteLists 
+     * @param form
+     * @param createBy
+     * @param files
+     * @param deleteLists
      */
-    private async insertFile(
-        form: FormDto,
-        createBy: string,
-        files: Express.Multer.File[],
-        deleteLists: number[] = []
-    ) {
+    private async insertFile({
+        form,
+        createBy,
+        files,
+        deleteLists = [],
+        mode,
+    }: {
+        form: FormDto;
+        createBy: string;
+        files: Express.Multer.File[];
+        deleteLists?: number[];
+        mode: number;
+    }) {
         let code: string = '';
+        if (mode == 1) {
+            const files = await this.fileService.getFile({
+                ...form,
+                FORM_TYPE: 'PRO',
+                FILE_CODE: 'PURPRA_PCP',
+            });
+            if (files.status) {
+                deleteLists.push(...files.data.map((file) => file.FILE_ID));
+            }
+        }
 
         // ลบไฟล์ที่ถูกระบุให้ลบ (ถ้ามี)
         if (deleteLists && deleteLists.length > 0) {
-            await this.fileService.deleteFileByIds({
-                ...form,
-                FORM_TYPE: 'PRO',
-            }, deleteLists)
+            await this.fileService.deleteFileByIds(
+                {
+                    ...form,
+                    FORM_TYPE: 'PRO',
+                },
+                deleteLists,
+            );
         }
         const formNo = await this.formService.getFormno(form);
         const destination = await joinPaths(this.path, formNo);

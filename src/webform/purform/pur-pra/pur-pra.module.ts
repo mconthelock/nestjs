@@ -12,6 +12,7 @@ import { FormModule } from 'src/webform/form/form.module';
 import { FormmstModule } from 'src/webform/formmst/formmst.module';
 import { FormLinkModule } from 'src/webform/form-link/form-link.module';
 import { PurCpcModule } from '../pur-cpc/pur-cpc.module';
+import { FlowModule } from 'src/webform/flow/flow.module';
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import { PurCpcModule } from '../pur-cpc/pur-cpc.module';
         FormModule,
         FormmstModule,
         FormLinkModule,
+        FlowModule,
         PurCpcModule,
     ],
     controllers: [PurPraController],

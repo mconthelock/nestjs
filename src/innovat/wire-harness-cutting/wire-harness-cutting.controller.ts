@@ -1,16 +1,16 @@
 import { Controller, HttpCode, HttpStatus, Body, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FiltersDto } from 'src/common/dto/filter.dto';
-import { WireHarnessService } from './wire-harness.service';
+import { WireHarnessCuttingService } from './wire-harness-cutting.service';
 import { CreateDrumDto } from './dto/create-drum.dto';
 import { UpdateDrumDto } from './dto/update-drum.dto';
 import { DrumToStockDto } from './dto/drum-to-stock.dto';
 
 @ApiTags('Wire Harness')
 @Controller('innovat/wire-harness')
-export class WireHarnessController {
+export class WireHarnessCuttingController {
     constructor(
-        private readonly service: WireHarnessService,
+        private readonly service: WireHarnessCuttingService,
     ) {}
 
     @Get('process')
@@ -19,6 +19,14 @@ export class WireHarnessController {
     @ApiResponse({ status: 200, description: 'Process list' })
     async process() {
         return this.service.process();
+    }
+
+    @Post('reason')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Get reason list' })
+    @ApiResponse({ status: 200, description: 'Reason list' })
+    async reason(@Body() condition: FiltersDto) {
+        return this.service.reason(condition);
     }
 
     @Get('production')
@@ -35,14 +43,6 @@ export class WireHarnessController {
     @ApiResponse({ status: 200, description: 'Auto production plan list' })
     async autoPlan(@Body() condition: FiltersDto) {
         return this.service.autoPlan(condition);
-    }
-
-    @Post('drum-stock')
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Get available drum stock' })
-    @ApiResponse({ status: 200, description: 'Drum stock list' })
-    async drumStock(@Body() condition: FiltersDto) {
-        return this.service.drumStock(condition);
     }
 
     @Post('create-drum')
@@ -67,21 +67,5 @@ export class WireHarnessController {
     @ApiResponse({ status: 200, description: 'Move drum to stock success' })
     async drumToStock(@Body() dto: DrumToStockDto) {
         return this.service.drumToStock(dto);
-    }
-
-    @Post('drum-master')
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Get drum master' })
-    @ApiResponse({ status: 200, description: 'Drum master list' })
-    async drumMaster(@Body() condition: FiltersDto) {
-        return this.service.drumMaster(condition);
-    }
-
-    @Post('reason')
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Get reason list' })
-    @ApiResponse({ status: 200, description: 'Reason list' })
-    async reason(@Body() condition: FiltersDto) {
-        return this.service.reason(condition);
     }
 }

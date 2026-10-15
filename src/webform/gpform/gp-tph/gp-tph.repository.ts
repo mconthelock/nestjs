@@ -38,6 +38,14 @@ export class GpTphRepository extends BaseRepository {
         await this.getRepository(FORM).update(form, { CST: '3' });
     }
 
+    // Area Owner rejects only affect their own area; they must not reject the whole form.
+    async restoreStatusAfterPartialAreaOwnerReject(form: FormDto) {
+        const rejected = await this.getRepository(FLOW).findBy({ ...form, CAPVSTNO: '2' });
+        if (rejected.length && rejected.every((step) => step.CEXTDATA?.trim() === '01')) {
+            await this.getRepository(FORM).update({ ...form, CST: '3' }, { CST: '2' });
+        }
+    }
+
     async replaceSystemApproverStep(
         form: FormDto,
         stepNo: string,

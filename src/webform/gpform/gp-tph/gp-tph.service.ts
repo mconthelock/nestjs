@@ -65,26 +65,43 @@ export class GpTphService {
         if (!(await this.repo.findOne(form))) {
             throw new NotFoundException('GP-TPH request not found');
         }
+        const readySteps = await this.doactionFlowService.getFlow({
+            ...form, CSTEPST: '3',
+        });
+        const empNo = dto.EMPNO.trim();
+        const flow = readySteps.find((step) =>
+            step.VAPVNO?.trim() === empNo || step.VREPNO?.trim() === empNo,
+        );
         if (dto.ACTION === 'approve') {
-            const readySteps = await this.doactionFlowService.getFlow({
-                ...form, CSTEPST: '3',
-            });
-            const flow = readySteps.find((step) =>
-                step.VAPVNO?.trim() === dto.EMPNO.trim() ||
-                step.VREPNO?.trim() === dto.EMPNO.trim(),
-            );
             if (!flow) throw new BadRequestException('Ready step not found!');
             await this.repo.approveGpTphConsecutiveSteps(form, flow, {
                 DAPVDATE: now(), CAPVTIME: now('HH:mm:ss'),
                 VREMARK: dto.REMARK ?? '', VREMOTE: ip, VREALAPV: dto.EMPNO,
             });
         }
-        const result = await this.doactionFlowService.doAction(dto, ip);
-        if (dto.ACTION === 'reject' && result.status) {
-            await this.repo.finalizeRejectedRequest(form);
+        const isAreaOwnerStep = flow?.CEXTDATA?.trim() === '01';
+        const result = await this.doactionFlowService.doAction(dto, ip, {
+            holdUntilStepDone: dto.ACTION === 'reject' && isAreaOwnerStep,
+        });
+        if (!result.status) return result;
+        if (dto.ACTION === 'reject') {
+            if (!isAreaOwnerStep) {
+                await this.repo.finalizeRejectedRequest(form);
+            } else {
+                // Reject the form only when every Area Owner has rejected.
+                const owners = await this.doactionFlowService.getFlow({
+                    ...form, CSTEPNO: flow.CSTEPNO,
+                });
+                if (owners.every((owner) => owner.CAPVSTNO === '2')) {
+                    await this.repo.finalizeRejectedRequest(form);
+                }
+            }
+        } else if (dto.ACTION === 'approve') {
+            await this.repo.restoreStatusAfterPartialAreaOwnerReject(form);
         }
         return result;
     }
+
 
     findAllLocations() {
         return this.repo.findAllLocations();

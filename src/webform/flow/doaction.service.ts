@@ -26,6 +26,7 @@ export class DoactionFlowService extends FlowService {
     async doAction(
         dto: doactionFlowDto,
         ip: string,
+        options: { holdUntilStepDone?: boolean } = {},
     ): Promise<{
         status: boolean;
         message: string;
@@ -133,6 +134,15 @@ export class DoactionFlowService extends FlowService {
                         updateFlow = checkUpdate.length == 0 ? true : false;
                     } else {
                         updateFlow = true;
+                    }
+                    if (options.holdUntilStepDone && !updateFlow) {
+                        // Co-approvers of this step are still pending; do not open the next step yet.
+                        const pending = await this.repo.getFlow({
+                            ...form,
+                            CAPVSTNO: this.APV_NONE,
+                            CSTEPNO: flow.CSTEPNO,
+                        });
+                        if (pending.length > 0) break;
                     }
                     const stepNext:
                         | ''

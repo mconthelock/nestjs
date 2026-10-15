@@ -57,6 +57,7 @@ export class PurvmmFormRepository extends BaseRepository {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             .leftJoinAndSelect('vmmform.flow', 'flow')
             .leftJoinAndSelect('vmm.ADDRESSES', 'addresses');
 =======
@@ -69,6 +70,10 @@ export class PurvmmFormRepository extends BaseRepository {
 =======
             .leftJoinAndSelect('vmmform.flow', 'flow');
 >>>>>>> 38502fd4 (PUR-EVA)
+=======
+            .leftJoinAndSelect('vmmform.flow', 'flow')
+            .leftJoinAndSelect('vmm.ADDRESSES', 'addresses');
+>>>>>>> 1be37121 (PUR-EVA)
 
         const cond = {
             AND: [],

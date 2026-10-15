@@ -1963,7 +1963,7 @@ export class QaCnService {
                         };
                     } else {
                         condition = {
-                            VORGNO: '000502',
+                            VORGNO: '000503',
                             VPOSNO: '30',
                         };
                     }
@@ -2029,9 +2029,9 @@ export class QaCnService {
                 let inc = await this.repoCnform.findInc(
                     Number(cndata.ITEMNO.charAt(0)),
                 );
-                console.log('>>>>>INC<<<<<');
-                console.log(inc);
-                console.log('>>>>>INC<<<<<');
+                // console.log('>>>>>INC<<<<<');
+                // console.log(inc);
+                // console.log('>>>>>INC<<<<<');
 
                 if (inc) {
                     const items = [
@@ -2067,9 +2067,9 @@ export class QaCnService {
                         condition: condition,
                         VAPVNO: inc,
                     });
-                    console.log('>>>>>update<<<<<');
-                    console.log(condition);
-                    console.log('>>>>>update<<<<<');
+                    // console.log('>>>>>update<<<<<');
+                    // console.log(condition);
+                    // console.log('>>>>>update<<<<<');
                 }
 
                 if (cndata.RADPROCAMEC == '2') {
@@ -2388,7 +2388,7 @@ export class QaCnService {
                         },
                         CSTEPST: '1',
                     });
-                    console.log('Remark ===' + REMARK);
+                    // console.log('Remark ===' + REMARK);
                     await this.flowService.updateFlow({
                         condition: {
                             ...currentForm,
@@ -2450,19 +2450,19 @@ export class QaCnService {
 
     private async createcnng(dto: FormDto, ip: string) {
         try {
-            console.log('creangffffffffffffff');
+            //console.log('creangffffffffffffff');
 
             const res = await this.repoCnform.getFirstNo(dto);
-            console.log('rrrrrrrrrrrrrrrrr');
-            console.log(res);
-            console.log('rrrrrrrrrrrrrrrrr');
+            //console.log('rrrrrrrrrrrrrrrrr');
+            //console.log(res);
+            //console.log('rrrrrrrrrrrrrrrrr');
 
             let newcnng: any[] = [];
             if (res && res.FIRSTNO) {
                 newcnng = await this.r027Mp1Service.getnewcn(res.FIRSTNO);
-                console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA');
-                console.log(newcnng);
-                console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA');
+                //  console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA');
+                //  console.log(newcnng);
+                //  console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA');
                 if (newcnng && newcnng[0].R27M09) {
                     await this.r027Mp1Service.insertNewCn(
                         newcnng[0].R27M09,
@@ -2472,9 +2472,9 @@ export class QaCnService {
             }
             const cnform = await this.formService.getFormData(dto);
             const datacnfrm = await this.repoCnform.findByCondition(dto);
-            console.log('ccccccccccccccccccccccccccccc');
-            console.log(cnform);
-            console.log('ccccccccccccccccccccccccccccc');
+            // console.log('ccccccccccccccccccccccccccccc');
+            // console.log(cnform);
+            // console.log('ccccccccccccccccccccccccccccc');
             const cnformnew = {
                 NFRMNO: dto.NFRMNO,
                 VORGNO: dto.VORGNO,
@@ -2595,9 +2595,9 @@ export class QaCnService {
                   : mtype === 'REQUESTER'
                     ? 'REQUESTER'
                     : 'ALL';
-        console.log('>>>>>>>>>');
-        console.log(to);
-        console.log('>>>>>>>>>');
+        //console.log('>>>>>>>>>');
+        //console.log(to);
+        //console.log('>>>>>>>>>');
 
         let rs = await this.repoCnform.getQueryBuilderResult(dto);
         const first = rs?.[0] ?? null;
@@ -2763,16 +2763,26 @@ export class QaCnService {
                 },
             );
             if (ACTION != 'return') {
-                await this.repoDwg.deleteByAll(currentForm);
-                await this.repoDwg.insertMultiple(dwgToInsert);
+                //console.log('xxxxxxxxxxx');
+
+                //console.log(dwgToInsert);
+                //console.log('YYYYYYY');
+                if (dwgToInsert && dwgToInsert.length > 0) {
+                    //  console.log('infunction');
+
+                    await this.repoDwg.deleteByAll(currentForm);
+                    await this.repoDwg.insertMultiple(dwgToInsert);
+                }
             }
         }
-
+        return false;
         if (ACTION == 'approve') {
             if (STEPREADY == '--') {
                 await this.repoCnform.update({ ...currentForm }, { ...cndata });
-                await this.repoDwg.deleteByAll(currentForm);
-                await this.repoDwg.insertMultiple(dwgToInsert);
+                if (dwgToInsert && dwgToInsert.length > 0) {
+                    await this.repoDwg.deleteByAll(currentForm);
+                    await this.repoDwg.insertMultiple(dwgToInsert);
+                }
             }
             if (CEXTDATA == 8 && cndata.CLSNO == 2) {
                 if (cndata.INVNO && cndata.INVNO.length >= 8) {

@@ -104,6 +104,7 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -116,7 +117,10 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 =======
     @IsDate()
 >>>>>>> d7bc7b33 (QA-CN)
+=======
+>>>>>>> 38e4fc7c (QA-CN)
     @Type(() => Date)
+    @IsDate()
     SUBMITDATE?: Date;
 
     @IsOptional()
@@ -124,6 +128,7 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -136,7 +141,10 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 =======
     @IsDate()
 >>>>>>> d7bc7b33 (QA-CN)
+=======
+>>>>>>> 38e4fc7c (QA-CN)
     @Type(() => Date)
+    @IsDate()
     INSPECDATE?: Date;
 
     @IsOptional()
@@ -144,6 +152,7 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -156,7 +165,10 @@ export class RequestCNFormDto extends PickType(CreateFormDto, [
 =======
     @IsDate()
 >>>>>>> d7bc7b33 (QA-CN)
+=======
+>>>>>>> 38e4fc7c (QA-CN)
     @Type(() => Date)
+    @IsDate()
     EXPCHGDATE?: Date;
 
     @IsOptional()

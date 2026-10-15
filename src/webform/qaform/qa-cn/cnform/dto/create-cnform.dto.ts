@@ -80,6 +80,7 @@ export class CreateCnformDto extends PickType(FormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -92,7 +93,10 @@ export class CreateCnformDto extends PickType(FormDto, [
 =======
     @IsDate()
 >>>>>>> 67c79348 (PUR-EVA)
+=======
+>>>>>>> 38e4fc7c (QA-CN)
     @Type(() => Date)
+    @IsDate()
     SUBMITDATE?: Date;
 
     @IsOptional()
@@ -100,6 +104,7 @@ export class CreateCnformDto extends PickType(FormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -112,7 +117,10 @@ export class CreateCnformDto extends PickType(FormDto, [
 =======
     @IsDate()
 >>>>>>> 67c79348 (PUR-EVA)
+=======
+>>>>>>> 38e4fc7c (QA-CN)
     @Type(() => Date)
+    @IsDate()
     INSPECDATE?: Date;
 
     @IsOptional()
@@ -120,6 +128,7 @@ export class CreateCnformDto extends PickType(FormDto, [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     @StringToDate()
 =======
     @IsDate()
@@ -132,7 +141,10 @@ export class CreateCnformDto extends PickType(FormDto, [
 =======
     @IsDate()
 >>>>>>> 67c79348 (PUR-EVA)
+=======
+>>>>>>> 38e4fc7c (QA-CN)
     @Type(() => Date)
+    @IsDate()
     EXPCHGDATE?: Date;
 
     @IsOptional()

@@ -70,10 +70,14 @@ export class CnFormRepository extends BaseRepository {
         return (result.affected ?? 0) > 0;
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 38e4fc7c (QA-CN)
 
     async deleteAll(dto: FormDto) {
         return this.getRepository(CNFORM).delete(dto);
     }
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 
@@ -264,4 +268,6 @@ export class CnFormRepository extends BaseRepository {
 >>>>>>> 14243a62 (QA-CN)
 =======
 >>>>>>> 67c79348 (PUR-EVA)
+=======
+>>>>>>> 38e4fc7c (QA-CN)
 }

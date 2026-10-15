@@ -23,12 +23,16 @@ export class J736kpController {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 38e4fc7c (QA-CN)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
             return {
                 success: true,
                 data: [], // ส่งเป็น Array ว่างกลับไป (หน้าบ้านจะได้เอาไปใช้งานต่อได้โดยไม่พัง)
             };
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
             throw new Error('No parameter');
@@ -38,6 +42,8 @@ export class J736kpController {
 =======
             throw new Error('No parameter');
 >>>>>>> 093c063b (QA-CN)
+=======
+>>>>>>> 38e4fc7c (QA-CN)
         }
         const result = await this.j736kpService.findByInvPuritm(inv, puritm);
         return {

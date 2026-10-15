@@ -4,6 +4,7 @@ import { J736kpController } from './j736kp.controller';
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { ConectionService } from 'src/as400/conection/conection.service';
 
 @Module({
@@ -29,5 +30,13 @@ import { ConectionService } from 'src/as400/conection/conection.service';
 >>>>>>> 38e4fc7c (QA-CN)
 =======
 >>>>>>> 093c063b (QA-CN)
+=======
+import { ConectionService } from 'src/as400/conection/conection.service';
+
+@Module({
+    controllers: [J736kpController],
+    providers: [J736kpService, ConectionService],
+    exports: [J736kpService],
+>>>>>>> 38e4fc7c (QA-CN)
 })
 export class J736kpModule {}

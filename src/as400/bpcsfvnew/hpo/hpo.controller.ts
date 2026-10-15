@@ -1,6 +1,9 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 38e4fc7c (QA-CN)
 =======
 >>>>>>> 38e4fc7c (QA-CN)
 import {
@@ -12,6 +15,7 @@ import {
     Param,
     Delete,
 } from '@nestjs/common';
+<<<<<<< HEAD
 <<<<<<< HEAD
 import { HpoService } from './hpo.service';
 
@@ -56,24 +60,25 @@ export class HpoController {
 <<<<<<< HEAD
 =======
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+=======
+>>>>>>> 38e4fc7c (QA-CN)
 import { HpoService } from './hpo.service';
-import { CreateHpoDto } from './dto/create-hpo.dto';
-import { UpdateHpoDto } from './dto/update-hpo.dto';
 
 @Controller('hpo')
 export class HpoController {
-  constructor(private readonly hpoService: HpoService) {}
+    constructor(private readonly hpoService: HpoService) {}
 
-  @Post()
-  create(@Body() createHpoDto: CreateHpoDto) {
-    return this.hpoService.create(createHpoDto);
-  }
+    @Get()
+    findAll() {
+        return this.hpoService.findAll();
+    }
 
-  @Get()
-  findAll() {
-    return this.hpoService.findAll();
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.hpoService.findOne(+id);
+    }
 
+<<<<<<< HEAD
 >>>>>>> 093c063b (QA-CN)
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -92,11 +97,16 @@ export class HpoController {
 <<<<<<< HEAD
 >>>>>>> 093c063b (QA-CN)
 =======
+=======
+>>>>>>> 38e4fc7c (QA-CN)
     @Delete(':id')
     remove(@Param('id') id: string) {
         return this.hpoService.remove(+id);
     }
+<<<<<<< HEAD
 >>>>>>> 38e4fc7c (QA-CN)
 =======
 >>>>>>> 093c063b (QA-CN)
+=======
+>>>>>>> 38e4fc7c (QA-CN)
 }

@@ -14,7 +14,7 @@ export class MasterkeyService {
     async verify(user: string, pin: string) {
         const keys = await this.dbService.getMasterKey();
         const decryptedPin = await keys.find((k) => k.KEY_OWNER === user);
-        if (!decryptedPin) return { status: false, token: '' };
+        if (!decryptedPin) return { status: false, token: null };
         const users = this.dbService.decrypt(decryptedPin.KEY_CODE);
         const [pinuser, pinpasskey, pincode, pdfkey] = users.split(':');
         if (pinpasskey == pin) {
@@ -27,9 +27,12 @@ export class MasterkeyService {
             const token = this.jwtService.sign(payload);
             if (decryptedPin.KEY_EXPIRE < new Date())
                 return { status: 'expired', token };
-            return { status: true, token };
+
+            const allkey = await this.findAll();
+            const role = allkey.find((k) => k.KEY_OWNER === user)?.KEY_ROLE;
+            return { status: true, token, role: role };
         }
-        return { status: false, token: '' };
+        return { status: false, token: null };
     }
 
     async findAll() {

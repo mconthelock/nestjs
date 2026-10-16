@@ -886,8 +886,17 @@ export class QaCnService {
                 },
             );
             if (ACTION != 'return') {
-                await this.repoDwg.deleteByAll(currentForm);
-                await this.repoDwg.insertMultiple(dwgToInsert);
+                //console.log('xxxxxxxxxxx');
+
+                //console.log(dwgToInsert);
+                //console.log('YYYYYYY');
+                if (dwgToInsert && dwgToInsert.length > 0) {
+                    console.log(dwgToInsert);
+                    console.log('infunction');
+
+                    await this.repoDwg.deleteByAll(currentForm);
+                    await this.repoDwg.insertMultiple(dwgToInsert);
+                }
             }
         }
 

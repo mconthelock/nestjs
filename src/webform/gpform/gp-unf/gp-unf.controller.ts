@@ -19,6 +19,21 @@ export class GpUnfController {
         return this.gpUnfService.search(searchGpUnfDto);
     }
 
+    @Post('uniform-view')
+    getUniformView(@Body() options?: any) {
+        return this.gpUnfService.getUniformView(options);
+    }
+
+    @Get('category')
+    getCategory() {
+        return this.gpUnfService.getCategory();
+    }
+
+    @Post('size')
+    getSize(@Body() options?: any) {
+        return this.gpUnfService.getSize(options);
+    }
+
     // @Get()
     // findAll() {
     //     return this.gpUnfService.findAll();

@@ -25,7 +25,7 @@ export class FINNPOINVOICE {
 
     @PrimaryColumn()
     VAT_RATE_ID: number;
-
+    
     @Column({ type: 'number' })
     TOTAL_AMT: number;
 

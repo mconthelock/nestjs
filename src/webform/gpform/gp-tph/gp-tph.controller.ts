@@ -20,10 +20,17 @@ import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper'
 import { CreateDataAreaDto } from './dto/create-data-area.dto';
 import { updateDetailDto } from 'src/spprogram/inquiry-detail/dto/update.dto';
 import { UpdateAreaDto } from './dto/update-data-area.dto';
+import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 
 @Controller('gpform/gp-tph')
 export class GpTphController {
     constructor(private readonly gpTphService: GpTphService) { }
+
+    @Post('doaction')
+    @UseTransaction('webformConnection')
+    doAction(@Body() dto: doactionFlowDto, @Req() req: Request) {
+        return this.gpTphService.doAction(dto, getClientIP(req));
+    }
 
     @Get('areas')
     findAllAreas() {
@@ -132,10 +139,5 @@ export class GpTphController {
         return this.gpTphService.updateArea(id, dto);
     }
 
-    @Delete('areas/:id')
-    deleteArea(@Param('id', ParseIntPipe) id: number) {
-        return this.gpTphService.deleteArea(id);
-    }
 }
-
 

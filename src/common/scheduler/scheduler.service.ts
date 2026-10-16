@@ -46,8 +46,10 @@ export class SchedulerService implements OnModuleInit {
     }
 
     async onModuleInit() {
-        await this.loadAndScheduleJobs();
-        this.addLogCompressionJob(); // เพิ่ม cron job บีบอัด logs เก่าทุกวันเวลา 00:30
+        if (process.env.REDIS_DB == '1' || process.env.REDIS_DB == '2') {
+            await this.loadAndScheduleJobs();
+            this.addLogCompressionJob(); // เพิ่ม cron job บีบอัด logs เก่าทุกวันเวลา 00:30
+        }
     }
 
     /** Cron job สำหรับบีบอัด logs เก่าอัตโนมัติ */
@@ -404,10 +406,14 @@ export class SchedulerService implements OnModuleInit {
             status = 'FAILED';
             message = error.message;
             responseCode = error.response?.status || 500;
-            this.logger.error(`Job failed: ${message}`, { context: 'SchedulerService' });
+            this.logger.error(`Job failed: ${message}`, {
+                context: 'SchedulerService',
+            });
             throw new Error(`Job ${job.NAME} failed: ${message}`);
         } finally {
-            this.logger.info(`Job ${job.NAME} finally`, { context: 'SchedulerService' });
+            this.logger.info(`Job ${job.NAME} finally`, {
+                context: 'SchedulerService',
+            });
             const endTime = new Date();
             await this.logRepo.save({
                 job: job,
@@ -419,7 +425,9 @@ export class SchedulerService implements OnModuleInit {
                 OUTPUT_MESSAGE: message,
             });
             await this.jobRepo.update(job.ID, { LAST_RUN_AT: endTime });
-            this.logger.info(`Job ${job.NAME} insert log`, { context: 'SchedulerService' });
+            this.logger.info(`Job ${job.NAME} insert log`, {
+                context: 'SchedulerService',
+            });
         }
     }
 }

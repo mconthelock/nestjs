@@ -29,7 +29,7 @@ export class MasterkeyController {
 
         const isValid = await this.keys.verify(users, body.pin);
         if (!isValid)
-            throw new UnauthorizedException('You nave no authorization');
+            throw new UnauthorizedException('You nave no authorization [user]');
 
         if (isValid.status === 'expired') {
             return { status: 'expired' };
@@ -39,15 +39,16 @@ export class MasterkeyController {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
         });
-        return;
+        return { status: true, role: isValid.role };
     }
 
     @Get('all')
     @UseGuards(AuthGuard('jwt'))
     async findAll(@Request() req) {
         const { users, group, apps } = req.user.user;
-        if (!(group === 2 && apps === 20))
-            throw new UnauthorizedException('You nave no authorization');
+        //console.log(users, group, apps);
+        // if (!(group === 2 && apps === 20))
+        //     throw new UnauthorizedException('You nave no authorization');
         const data = await this.keys.findAll();
         return data.map((item) => {
             const { KEY_CODE, ...rest } = item;
@@ -62,8 +63,8 @@ export class MasterkeyController {
         @Body() body: { pin: string; newpin: string },
     ) {
         const { users, group, apps } = req.user.user;
-        if (!(group === 2 && apps === 20))
-            throw new UnauthorizedException('You nave no authorization');
+        // if (!(group === 2 && apps === 20))
+        //     throw new UnauthorizedException('You nave no authorization');
 
         const isValid = await this.keys.verify(users, body.pin);
         if (!isValid)

@@ -24,5 +24,13 @@ export class WHN_DRUM_MASTER {
     MT_USERUPDATE: string;
 
     @Column()
+<<<<<<< HEAD
+<<<<<<< HEAD
     MT_DATEUPDATE: Date;
+=======
+    MT_CREATEDATE: Date;
+>>>>>>> 640b6378 (wire-harness)
+=======
+    MT_CREATEDATE: Date;
+>>>>>>> 640b6378 (wire-harness)
 }

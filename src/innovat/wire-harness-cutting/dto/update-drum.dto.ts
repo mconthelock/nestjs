@@ -1,6 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
+<<<<<<< HEAD:src/innovat/wire-harness-cutting/dto/update-drum.dto.ts
 import { IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
+=======
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+>>>>>>> 9119de43 (wire-harness):src/innovat/wire-harness/dto/update-drum.dto.ts
 
 export class UpdateDrumDto {
     @ApiProperty({
@@ -51,6 +55,7 @@ export class UpdateDrumDto {
 
     @ApiProperty({
         example: 1,
+<<<<<<< HEAD:src/innovat/wire-harness-cutting/dto/update-drum.dto.ts
         description: 'Cut type (1 = First Cut, 2 = Rework)',
     })
     @IsNumber()
@@ -66,4 +71,10 @@ export class UpdateDrumDto {
     @Type(() => Number)
     @IsNumber()
     reasonId: number | null;
+=======
+        description: 'Cut type (1 = First Cut, 2 = Re-Cut)',
+    })
+    @IsNumber()
+    cutType: number;
+>>>>>>> 9119de43 (wire-harness):src/innovat/wire-harness/dto/update-drum.dto.ts
 }

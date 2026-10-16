@@ -21,6 +21,14 @@ export class ResultChkDwgRepository extends BaseRepository {
         return this.getRepository(RESULTCHKDWG).save(dto);
     }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 14243a62 (QA-CN)
+=======
+>>>>>>> 14243a62 (QA-CN)
     async findByCondition(con: FormDto) {
         return this.getRepository(RESULTCHKDWG).find({
             where: {
@@ -29,6 +37,16 @@ export class ResultChkDwgRepository extends BaseRepository {
         });
     }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 67c79348 (PUR-EVA)
+=======
+>>>>>>> 14243a62 (QA-CN)
+=======
+>>>>>>> 67c79348 (PUR-EVA)
+=======
+>>>>>>> 14243a62 (QA-CN)
     async updateMultiple(
         con: FormDto,
         dtos: UpdateResultchkdwgDto[],
@@ -49,8 +67,26 @@ export class ResultChkDwgRepository extends BaseRepository {
             throw new Error('Update multiple failed: ' + error.message);
         }
     }
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 093c063b (QA-CN)
+=======
+>>>>>>> 093c063b (QA-CN)
 
     async deleteByAll(dto: FormDto) {
         return this.getRepository(RESULTCHKDWG).delete(dto);
     }
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 67c79348 (PUR-EVA)
+=======
+>>>>>>> 093c063b (QA-CN)
+=======
+>>>>>>> 67c79348 (PUR-EVA)
+=======
+>>>>>>> 093c063b (QA-CN)
 }

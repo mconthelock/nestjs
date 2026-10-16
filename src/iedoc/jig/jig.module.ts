@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { MailModule } from 'src/common/services/mail/mail.module';
+import { JigReminderService } from './jig-reminder.service';
 import { FormModule } from 'src/webform/form/form.module';
 import { JigInspectionService } from './jig-inspection.service';
 import { JigNgTagService } from './jig-ng-tag.service';
@@ -18,6 +20,7 @@ import { MachineAbilityProcess } from 'src/common/Entities/iedoc/table/machine_a
 import { ShopCodeMst } from 'src/common/Entities/iedoc/table/shopcodemst.entity';
 @Module({
     imports: [
+        MailModule,
         FormModule,
         TypeOrmModule.forFeature(
             [
@@ -36,7 +39,7 @@ import { ShopCodeMst } from 'src/common/Entities/iedoc/table/shopcodemst.entity'
         ),
     ],
     controllers: [JigController],
-    providers: [JigService, JigRepository, JigInspectionService, JigNgTagService],
+    providers: [JigService, JigRepository, JigInspectionService, JigNgTagService, JigReminderService],
     exports: [JigService, JigRepository],
 })
 export class JigModule {}

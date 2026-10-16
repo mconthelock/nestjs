@@ -1,6 +1,14 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsString, MaxLength } from 'class-validator';
+import {
+    IsInt,
+    IsNotEmpty,
+    IsNumber,
+    IsString,
+    Max,
+    MaxLength,
+    Min,
+} from 'class-validator';
 
 export class CreateGpTphArearecordDto {
     @IsNumber()
@@ -13,6 +21,9 @@ export class CreateGpTphArearecordDto {
     AREA_NAME: string;
 
     @IsNumber()
+    @IsInt()
+    @Min(0)
+    @Max(4)
     @IsNotEmpty()
     @Type(() => Number)
     AREA_LEVEL: number;

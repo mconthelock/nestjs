@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { CmSmService } from './cm-sm.service';
 import { UpdateCmSmDto } from './dto/update-cm-sm.dto';
 
@@ -14,5 +14,14 @@ export class CmSmController {
   @Get()
   findAll() {
     return this.cmSmService.findAll();
+  }
+
+  @Post('alert-email')
+  alertEmail(
+    @Query('TINO') TINO: string,
+    @Query('REVNO') REVNO: string,
+    @Query('empno') empno: string,
+  ) {
+    return this.cmSmService.alertEmail(TINO, REVNO, empno);
   }
 }

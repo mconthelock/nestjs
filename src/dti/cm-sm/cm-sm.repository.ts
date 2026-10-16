@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource, MoreThanOrEqual } from 'typeorm';
+import { DataSource, MoreThanOrEqual, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DTIH } from 'src/common/Entities/daiyltech/table/DTIH.entity';
 import { CM_SM_FORM } from 'src/common/Entities/daiyltech/table/CM_SM_FORM.entity';
@@ -13,7 +13,7 @@ export class CmSmRepository extends BaseRepository {
     }
 
     async save(payload: UpdateCmSmDto) {
-        const { TINO, REVNO, columnName, value } = payload;
+        const { TINO, REVNO, columnName, value, empno } = payload;
 
         if (!TINO || !REVNO || !columnName) {
             throw new BadRequestException(
@@ -38,6 +38,8 @@ export class CmSmRepository extends BaseRepository {
             TINO,
             REVNO,
             [columnName]: value,
+            UPDATED_BY: empno,
+            UPDATED_AT: new Date(),
         });
 
         return repository.findOne({
@@ -47,9 +49,30 @@ export class CmSmRepository extends BaseRepository {
 
     findAll() {
         return this.getRepository(DTIH).find({
+            where: {
+                INQTY: Not('New construction'),
+            },
+            take: 50,
+            order: {
+                RECDT: 'DESC',
+            },
             // where: { RECDT: MoreThanOrEqual(new Date('2026-01-01')) },
-            where: { TINO: 'T-ETA-17-A0006' },
+            // where: { TINO: 'T-ETA-17-A0006' },
             relations: { CM_SM_FORM: true, LOG_INFO_TIMEL: true },
         });
+    }
+
+    findOne(TINO: string, REVNO: string) {
+        return this.getRepository(CM_SM_FORM).findOne({
+            where: { TINO, REVNO },
+            relations: { DTIH: true },
+        });
+    }
+
+    updateCountAlert(TINO: string, REVNO: string, count: number) {
+        return this.getRepository(CM_SM_FORM).update(
+            { TINO, REVNO },
+            { COUNT_ALERT: count },
+        );
     }
 }

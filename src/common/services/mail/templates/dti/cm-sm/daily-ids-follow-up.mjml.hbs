@@ -1,0 +1,62 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-all font-family="Arial, Helvetica, sans-serif" />
+      <mj-text color="#1f2937" font-size="14px" line-height="1.6" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#ffffff"{{!--  width="800px" --}}>
+    {{!-- <mj-section padding="24px 30px 12px" background-color="#ffffff">
+      <mj-column>
+        <mj-text color="#dc2626" font-size="13px" font-weight="700" padding-bottom="4px">
+          DAILY IDS FOR CM TI
+        </mj-text>
+        <mj-text color="#dc2626" font-size="23px" font-weight="700" padding-top="0">
+          CM TI NO. {{TINO}}
+        </mj-text>
+        <mj-divider border-color="#e5e7eb" padding="8px 0" />
+      </mj-column>
+    </mj-section> --}}
+
+    <mj-section padding="4px 30px 10px" background-color="#ffffff">
+      <mj-column>
+        <mj-table font-size="14px" cellpadding="6" cellspacing="0">
+          <tr><td style="width:110px;color:#6b7280;">To</td><td>{{toDepartment}}</td></tr>
+          <tr><td style="color:#6b7280;">Cc</td><td>{{ccDepartment}}</td></tr>
+          <tr><td style="color:#6b7280;">Sent By</td><td>{{sentBy}}</td></tr>
+          <tr><td style="color:#6b7280;">Date</td><td>{{issueDate}}</td></tr>
+        </mj-table>
+      </mj-column>
+    </mj-section>
+
+    <mj-section padding="8px 30px 20px" background-color="#ffffff">
+      <mj-column>
+        <mj-text color="#dc2626" padding-bottom="2px">
+          CM TI NO. / SM TI NO. : {{TINO}} ({{REVNO}})
+        </mj-text>
+        <mj-text color="#dc2626" padding-top="0">
+          SERIES : {{series}}
+        </mj-text>
+        <mj-text color="#dc2626" font-size="16px" font-weight="700" padding-top="14px">
+          {{reminderLabel}} FOLLOW UP
+        </mj-text>
+        <mj-text color="#dc2626" padding-top="0" padding-left="28px">
+          We would like your support to study the captioned TI as urgently.
+        </mj-text>
+        {{#if detailUrl}}
+        <mj-text padding-top="24px">
+          Link: <a href="{{detailUrl}}" style="color:#1677c8;">{{detailUrl}}</a>
+        </mj-text>
+        {{/if}}
+      </mj-column>
+    </mj-section>
+
+    <mj-section padding="12px 30px" background-color="#f8fafc">
+      <mj-column>
+        <mj-text color="#6b7280" font-size="12px">
+          This is an automated reminder. Please do not reply to this email.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

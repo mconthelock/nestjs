@@ -163,4 +163,7 @@ export class CM_SM_FORM {
 
     @Column()
     UPDATED_AT: Date;
+
+    @Column()
+    COUNT_ALERT: number;
 }

@@ -24,4 +24,7 @@ export class UpdateCmSmDto {
 	@IsOptional()
 	@IsString()
 	control?: string;
+
+	@IsString()
+	empno: string;
 }

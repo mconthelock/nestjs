@@ -70,7 +70,7 @@ export class JigNgDto {
     @IsDefined()
     @IsNotEmpty()
     @IsString()
-    @MaxLength(500)
+    @MaxLength(2000)
     DEFECT_DETAIL: string;
     @IsDefined()
     @IsNotEmpty()
@@ -88,6 +88,9 @@ export class JigNgDto {
 }
 
 export class JigFileDto {
+    @IsOptional()
+    @IsIn(['REFERENCE', 'BEFORE', 'AFTER'])
+    FILE_GROUP?: 'REFERENCE' | 'BEFORE' | 'AFTER';
     @IsDefined()
     @IsInt()
     @Min(1)

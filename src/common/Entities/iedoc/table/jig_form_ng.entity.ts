@@ -18,7 +18,7 @@ export class JigFormNg {
     @PrimaryColumn()
     NRUNNO: number;
 
-    @Column()
+    @Column({ type: 'varchar2', length: 2000 })
     DEFECT_DETAIL: string;
 
     @Column()
@@ -29,6 +29,12 @@ export class JigFormNg {
 
     @Column()
     PLAN_DATE: Date;
+
+    @Column({ type: 'date', nullable: true })
+    ACTUAL_FINNISH_DATE: Date | null;
+
+    @Column({ type: 'varchar2', length: 2000, nullable: true })
+    SUMMARY_DETAIL: string | null;
 
     @ManyToOne(() => JigForm)
     @JoinColumn([

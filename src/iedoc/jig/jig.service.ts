@@ -1,3 +1,4 @@
+import { SaveJigRecheckDto } from './dto/jig-recheck.dto';
 import {
     BadRequestException,
     Injectable,
@@ -32,6 +33,8 @@ export class JigService {
     deleteDeleteFormFile(key: JigFormKeyDto, seq: number) { return this.jigRepository.deleteDeleteFormFile(key, seq); }
     finishDeleteForm(key: JigFormKeyDto) { return this.jigRepository.completeDeleteForm(key, 'finish'); }
     rejectDeleteForm(key: JigFormKeyDto) { return this.jigRepository.completeDeleteForm(key, 'reject'); }
+
+    saveRecheck(key: JigFormKeyDto, dto: SaveJigRecheckDto) { return this.jigRepository.saveRecheck(key, dto); }
 
     getMfgProcesses() {
         return this.jigRepository.getMfgProcesses();
@@ -158,8 +161,8 @@ export class JigService {
     putFile(key: JigFormKeyDto, dto: JigFileDto) {
         return this.jigRepository.putFile(key, dto);
     }
-    deleteFile(key: JigFormKeyDto, fileSeq: number) {
-        return this.jigRepository.deleteFile(key, fileSeq);
+    deleteFile(key: JigFormKeyDto, fileSeq: number, actor?: string) {
+        return this.jigRepository.deleteFile(key, fileSeq, actor);
     }
     finishForm(key: JigFormKeyDto, dto: FinishInspectionDto) {
         return this.jigRepository.finishForm(key, dto.UPDATE_BY);

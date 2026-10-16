@@ -6,14 +6,7 @@ import { Brackets, DataSource } from 'typeorm';
 import { CreateCnformDto } from './dto/create-cnform.dto';
 import { UpdateCnformDto } from './dto/update-cnform.dto';
 import { CNFORM } from 'src/common/Entities/webform/table/CNFORM.entity';
-<<<<<<< HEAD
-<<<<<<< HEAD
 import { CNITMINCHARGE } from 'src/common/Entities/webform/table/CNITMINCHARGE.entity';
-=======
->>>>>>> 67c79348 (PUR-EVA)
-=======
-import { CNITMINCHARGE } from 'src/common/Entities/webform/table/CNITMINCHARGE.entity';
->>>>>>> d7bc7b33 (QA-CN)
 
 @Injectable()
 export class CnFormRepository extends BaseRepository {
@@ -29,15 +22,6 @@ export class CnFormRepository extends BaseRepository {
         return this.getRepository(CNFORM).save(dto);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 00550f31 (QA-CN)
-=======
->>>>>>> 00550f31 (QA-CN)
     async findByCondition(con: FormDto) {
         return this.getRepository(CNFORM).find({
             where: {
@@ -46,16 +30,6 @@ export class CnFormRepository extends BaseRepository {
         });
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> d7bc7b33 (QA-CN)
-=======
->>>>>>> 00550f31 (QA-CN)
-=======
->>>>>>> d7bc7b33 (QA-CN)
-=======
->>>>>>> 00550f31 (QA-CN)
     async findInc(itm: number): Promise<string | null> {
         const result = await this.getRepository(CNITMINCHARGE).findOne({
             where: { ITEMNO: itm },
@@ -66,45 +40,16 @@ export class CnFormRepository extends BaseRepository {
         return result ? result.INCHARGE : null;
     }
 
-<<<<<<< HEAD
-=======
->>>>>>> 67c79348 (PUR-EVA)
-=======
->>>>>>> d7bc7b33 (QA-CN)
     async update(con: FormDto, dto: UpdateCnformDto): Promise<boolean> {
         const result = await this.getRepository(CNFORM).update(con, dto);
         return (result.affected ?? 0) > 0;
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 38e4fc7c (QA-CN)
 
     async deleteAll(dto: FormDto) {
         return this.getRepository(CNFORM).delete(dto);
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 
     async getFirstNo(con: FormDto): Promise<any> {
-=======
-
-<<<<<<< HEAD
-    async getFirstNo(con: FormDto): Promise<any[]> {
->>>>>>> 14243a62 (QA-CN)
-=======
-    async getFirstNo(con: FormDto): Promise<any> {
->>>>>>> 00550f31 (QA-CN)
-=======
-
-<<<<<<< HEAD
-    async getFirstNo(con: FormDto): Promise<any[]> {
->>>>>>> 14243a62 (QA-CN)
-=======
-    async getFirstNo(con: FormDto): Promise<any> {
->>>>>>> 00550f31 (QA-CN)
         return await this.getRepository(CNFORM)
             .createQueryBuilder('cnform')
             // ใช้ Raw Query สำหรับ REGEXP_SUBSTR และตั้งชื่อ AS ว่า FIRSTNO
@@ -117,14 +62,6 @@ export class CnFormRepository extends BaseRepository {
             // getRawMany() จะรีเทิร์นค่าออกมาเป็น Array Object คล้ายกับ result() ของ CodeIgniter
             .getRawOne();
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 00550f31 (QA-CN)
-=======
->>>>>>> 00550f31 (QA-CN)
     async getQueryBuilderResult(dto: FormDto) {
         return await this.getRepository(CNFORM)
             // 1. เปลี่ยน Alias หลักเป็นตัวพิมพ์ใหญ่ (CNF)
@@ -242,8 +179,6 @@ export class CnFormRepository extends BaseRepository {
 
         return await qb.getRawMany();
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
     async executeRawSql(sql: string, params: any[]): Promise<any[]> {
         // console.log('DATABASE:', this.manager.connection.options);
         // const res = await this.manager.query(
@@ -262,54 +197,4 @@ export class CnFormRepository extends BaseRepository {
 
         return res;
     }
-=======
->>>>>>> 38e4fc7c (QA-CN)
-=======
-=======
->>>>>>> 00550f31 (QA-CN)
-    async executeRawSql(sql: string, params: any[]): Promise<any[]> {
-        // console.log('DATABASE:', this.manager.connection.options);
-        // const res = await this.manager.query(
-        //     `SELECT *
-        //  FROM "FLOW" T1
-        //  JOIN "AMEC"."AMECUSERALL" T2
-        //      ON T1.VREALAPV = T2.SEMPNO
-        //  WHERE T1.NFRMNO = 4
-        //    AND T1.VORGNO = '050301'
-        //    AND T1.CYEAR = '10'
-        //    AND T1.CYEAR2 = '2026'
-        //    AND T1.NRUNNO = 1389`,
-        // );
-        const res = await this.manager.query(sql, params);
-        console.log('***********', res);
-
-        return res;
-    }
->>>>>>> 14243a62 (QA-CN)
-=======
->>>>>>> 67c79348 (PUR-EVA)
-=======
->>>>>>> 38e4fc7c (QA-CN)
-=======
-=======
->>>>>>> 00550f31 (QA-CN)
-    async executeRawSql(sql: string, params: any[]): Promise<any[]> {
-        // console.log('DATABASE:', this.manager.connection.options);
-        // const res = await this.manager.query(
-        //     `SELECT *
-        //  FROM "FLOW" T1
-        //  JOIN "AMEC"."AMECUSERALL" T2
-        //      ON T1.VREALAPV = T2.SEMPNO
-        //  WHERE T1.NFRMNO = 4
-        //    AND T1.VORGNO = '050301'
-        //    AND T1.CYEAR = '10'
-        //    AND T1.CYEAR2 = '2026'
-        //    AND T1.NRUNNO = 1389`,
-        // );
-        const res = await this.manager.query(sql, params);
-        console.log('***********', res);
-
-        return res;
-    }
->>>>>>> 14243a62 (QA-CN)
 }

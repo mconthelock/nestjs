@@ -36,13 +36,6 @@ export class MasterkeyController {
         //     throw new UnauthorizedException(
         //         'You nave no authorization (App or Group)',
         //     );
-        const isValid = await this.keys.verify(users, body.pin);
-        if (!isValid) {
-            console.log('You nave no authorization (Invalid Pin)');
-            throw new UnauthorizedException(
-                'You nave no authorization (Invalid Pin)',
-            );
-        }
 
         if (isValid.status === 'expired') {
             return { status: 'expired' };

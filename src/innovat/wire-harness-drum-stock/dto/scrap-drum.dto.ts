@@ -11,11 +11,7 @@ export class ScrapDrumDto {
     empNo: string;
 
     @ApiProperty({
-<<<<<<< HEAD:src/innovat/wire-harness-drum-stock/dto/scrap-drum.dto.ts
         example: 'F73175',
-=======
-        example: 'F9999',
->>>>>>> 9119de43 (wire-harness):src/innovat/wire-harness/dto/create-drum.dto.ts
         description: 'Item code',
     })
     @IsString()
@@ -35,16 +31,5 @@ export class ScrapDrumDto {
         description: 'Drum ID',
     })
     @IsNumber()
-<<<<<<< HEAD:src/innovat/wire-harness-drum-stock/dto/scrap-drum.dto.ts
     drumId: number;
-=======
-    cut: number;
-
-    @ApiProperty({
-        example: 1,
-        description: 'Cut type (1 = First Cut, 2 = Re-Cut)',
-    })
-    @IsNumber()
-    cutType: number;
->>>>>>> 9119de43 (wire-harness):src/innovat/wire-harness/dto/create-drum.dto.ts
 }

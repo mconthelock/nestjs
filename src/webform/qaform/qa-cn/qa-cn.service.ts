@@ -891,14 +891,15 @@ export class QaCnService {
                 //console.log(dwgToInsert);
                 //console.log('YYYYYYY');
                 if (dwgToInsert && dwgToInsert.length > 0) {
-                    //  console.log('infunction');
+                    console.log(dwgToInsert);
+                    console.log('infunction');
 
                     await this.repoDwg.deleteByAll(currentForm);
                     await this.repoDwg.insertMultiple(dwgToInsert);
                 }
             }
         }
-        return false;
+
         if (ACTION == 'approve') {
             if (STEPREADY == '--') {
                 await this.repoCnform.update({ ...currentForm }, { ...cndata });

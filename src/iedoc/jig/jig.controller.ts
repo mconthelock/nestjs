@@ -1,3 +1,4 @@
+import { SaveJigRecheckDto } from './dto/jig-recheck.dto';
 import {
     Body,
     Head,
@@ -125,6 +126,10 @@ export class JigController {
     saveForm(@Param() key: JigFormKeyDto, @Body() dto: SaveJigFormDto) {
         return this.jigService.saveForm(key, dto);
     }
+    @Patch(formPath + '/recheck')
+    saveRecheck(@Param() key: JigFormKeyDto, @Body() dto: SaveJigRecheckDto) {
+        return this.jigService.saveRecheck(key, dto);
+    }
     @Post(formPath + '/finish')
     finishForm(@Param() key: JigFormKeyDto, @Body() dto: FinishInspectionDto) {
         return this.jigService.finishForm(key, dto);
@@ -138,8 +143,8 @@ export class JigController {
         return this.jigService.putFile(key, dto);
     }
     @Delete(formPath + '/files/:FILE_SEQ')
-    deleteFile(@Param() key: JigFormFileKeyDto) {
-        return this.jigService.deleteFile(key, key.FILE_SEQ);
+    deleteFile(@Param() key: JigFormFileKeyDto, @Req() req: Request) {
+        return this.jigService.deleteFile(key, key.FILE_SEQ, String(req.headers['x-jig-actor'] || ''));
     }
 
     @Get(':jigNo/checkpoints')

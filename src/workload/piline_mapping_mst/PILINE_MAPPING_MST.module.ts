@@ -1,3 +1,4 @@
+import { PilineMasterManagementController } from './PILINE_MASTER_MANAGEMENT.controller';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PILINE_MAPPING_MST } from 'src/common/Entities/workload/table/PILINE_MAPPING_MST.entity';
@@ -9,7 +10,7 @@ import { PilineMappingMstRepository } from './PILINE_MAPPING_MST.repository';
     imports: [
         TypeOrmModule.forFeature([PILINE_MAPPING_MST], 'workloadConnection'),
     ],
-    controllers: [PilineMappingMstController],
+    controllers: [PilineMappingMstController, PilineMasterManagementController],
     providers: [PilineMappingMstService, PilineMappingMstRepository],
     exports: [PilineMappingMstService],
 })

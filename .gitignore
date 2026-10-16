@@ -5,6 +5,7 @@
 /dist
 /sql
 /artifacts
+/outputs
 /output
 /tmp
 /src/workload/piline/PILINE.md
@@ -71,5 +72,3 @@ package-lock.json
 
 oracle
 
-artifacts/
-outputs/

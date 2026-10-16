@@ -1,6 +1,8 @@
 import { Type } from 'class-transformer';
 import {
     IsDateString,
+    IsArray,
+    ArrayMaxSize,
     IsDefined,
     IsIn,
     IsInt,
@@ -41,7 +43,23 @@ export class PilineInputNgDto {
     REMARK_NG?: string;
 }
 
+export class PilineDeleteFileDto {
+    @IsIn(['EVT','NG'])
+    TYPEFILE: string;
+    @IsInt()
+    @Min(1)
+    @Max(999)
+    SEQ: number;
+}
+
 export class SavePilineEventInputDto {
+    @IsOptional()
+    @IsArray()
+    @ArrayMaxSize(10)
+    @ValidateNested({ each: true })
+    @Type(() => PilineDeleteFileDto)
+    DELETE_FILES?: PilineDeleteFileDto[];
+
     @Matches(/^\d{4}-\d{2}-\d{2}$/)
     @IsDateString({ strict: true })
     EVENT_DATE: string;

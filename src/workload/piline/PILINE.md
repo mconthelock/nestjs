@@ -139,3 +139,22 @@ NG lookup: GET /workload/piline_event_record/idtag/:idtag ตัด whitespace �
 - ไฟล์เก่าไม่ได้ย้ายตาม path ใหม่ ต้อง restart API ให้โหลด environment ใหม่; ทดสอบด้วย mock ไม่ได้เขียน NAS จริง
 
 - SEQ ไฟล์แยกตาม PILINE_NO + TYPEFILE: EVT และ NG เริ่ม 1 แยกกัน; แนบเพิ่มต่อจาก MAX(SEQ) ของประเภทนั้นเท่านั้น ไม่เรียงเลขใหม่ให้ไฟล์เก่า
+
+## รูปแบบเลข PI ที่แก้ไขล่าสุด
+- รายการใหม่ใช้ PIYYMMDD### รวม 11 ตัว เช่น PI261012001 จาก EVENT_DATE 2026-10-12 และ RUN_NO=1
+- ใช้ MAX(RUN_NO)+1 ของ EVENT_DATE ภายใต้ lock เดิม เริ่มใหม่ในวันที่ยังไม่มีรายการ จำกัด 999 ต่อวัน; เลขรันรวมรายการเดิม/DELETE เพื่อไม่ใช้เลขซ้ำ
+- ไม่เปลี่ยนเลข/โฟลเดอร์ของรายการเก่า; เวลาแนบไฟล์รองรับทั้งเลขเก่า 9 ตัวและเลขใหม่ 11 ตัว
+
+## ลบไฟล์แนบในหน้าแก้ไข
+- GET leftJoinAndMapMany ATT ตาม PILINE_NO เพื่อแสดงไฟล์เดิม
+- Input DTO เพิ่ม DELETE_FILES?: {TYPEFILE: EVT|NG, SEQ: number}[] สูงสุด 10; รับเฉพาะโหมดแก้ไข และทุก key ต้องมีอยู่ในรายการปัจจุบัน มิฉะนั้น 409
+- ลบ ATT ใน transaction เดียวกับแก้ไข ตรวจจำนวน retained+new ไม่เกิน 10 และยังนับ SEQ แยก type จากลำดับเดิม
+- ลบไฟล์จริงหลัง commit ด้วย path จาก DB ที่อยู่ใต้ upload root เท่านั้น ไม่รับ path จาก client; rollback/commit ไม่ทราบผลไม่ลบไฟล์เดิม; ลบจริงไม่สำเร็จส่ง warning และ log โดยไม่รายงานว่าบันทึกล้มเหลว
+- ไม่ย้าย/ลบไฟล์ legacy ข้าม root โดยอัตโนมัติ; ผู้ดูแลต้องจัดการไฟล์ที่ยังอยู่ path เก่าเอง
+- API mock 41 กรณีผ่าน รวมลบตาม type+seq, ป้องกันไฟล์ต่างรายการ และคงไฟล์เมื่อ rollback ไม่ได้ลบ NAS จริง
+
+## ดูไฟล์แนบเดิม
+- GET /workload/piline_event_record/input/:number/files/:type/:seq ตรวจเลข PI/TYPEFILE/SEQ และค้น ATT ของรายการนั้นก่อนอ่านไฟล์ ไม่รับ path จาก client
+- จำกัด path อยู่ใต้ upload root ใช้ชนิดไฟล์จาก signature และส่ง StreamableFile พร้อม private/no-store และ nosniff; ไฟล์ไม่พบคืน 404
+- Frontend แสดงปุ่มดูไฟล์ในแถวเล็กของโซนอัปโหลด EVT/NG ใช้ preview รูป/PDF และดาวน์โหลดของเดิม
+- API mock 44 tests และ frontend preview fixture ผ่าน ไม่ได้อ่าน/เขียน NAS จริง

@@ -1,7 +1,7 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { mkdir, rm, writeFile } from 'fs/promises';
-import { join, resolve } from 'path';
+import { mkdir, rm, writeFile, readFile } from 'fs/promises';
+import { join, resolve, relative, isAbsolute, basename } from 'path';
 
 export interface PilineStagedFiles {
     directory?: string;
@@ -67,19 +67,10 @@ export class PilineEventFilesService {
 
     async stage(files: { eventFiles?: Express.Multer.File[]; ngFiles?: Express.Multer.File[] }, pilineNo: string, startSeq: Record<string, number> = {}): Promise<PilineStagedFiles> {
         const checked = this.validate(files);
-        if (!/^PI\d{7}$/.test(pilineNo)) throw new BadRequestException('Invalid PI Line number for upload folder');
+        if (!/^PI(?:\d{7}|\d{9})$/.test(pilineNo)) throw new BadRequestException('Invalid PI Line number for upload folder');
         if (!checked.length) return { attachments: [] };
 
-        const root =
-            process.env.PILINE_FILE_PATH ||
-            process.env.PILINE_UPLOAD_DIR ||
-            (process.env.AMEC_FILE_PATH
-                ? join(
-                      process.env.AMEC_FILE_PATH,
-                      process.env.STATE || 'development',
-                      'piline',
-                  )
-                : resolve('public', 'uploads', 'piline'));
+        const root = this.root();
         const nextSeq = { ...startSeq };
         const folder = pilineNo;
         const result: PilineStagedFiles = {
@@ -118,6 +109,51 @@ export class PilineEventFilesService {
             await this.cleanup(result);
             throw error;
         }
+    }
+
+    private root(): string {
+        return process.env.PILINE_FILE_PATH ||
+            process.env.PILINE_UPLOAD_DIR ||
+            (process.env.AMEC_FILE_PATH
+                ? join(
+                      process.env.AMEC_FILE_PATH,
+                      process.env.STATE || 'development',
+                      'piline',
+                  )
+                : resolve('public', 'uploads', 'piline'));
+    }
+
+    async readStored(filename: string) {
+        const root = resolve(this.root()), target = resolve(root, filename), rel = relative(root,target);
+        if (!rel || rel === '..' || rel.startsWith('../') || rel.startsWith('..' + String.fromCharCode(92)) || isAbsolute(rel)) throw new BadRequestException('Invalid attachment path');
+        try {
+            const buffer = await readFile(target);
+            const extension = this.extension(buffer);
+            const types = {'.pdf':'application/pdf','.png':'image/png','.jpg':'image/jpeg','.gif':'image/gif','.webp':'image/webp','.heic':'image/heic'};
+            return { buffer, type: types[extension] || 'application/octet-stream', name: basename(target) };
+        } catch (error) {
+            if (error.code === 'ENOENT') throw new NotFoundException('ไม่พบไฟล์ในพื้นที่จัดเก็บ กรุณาตรวจสอบ path ของไฟล์เดิม');
+            if (error instanceof BadRequestException) throw error;
+            this.logger.error('Cannot read PILINE attachment',error.stack);
+            throw new ServiceUnavailableException('ไม่สามารถอ่านไฟล์แนบ กรุณาตรวจสอบพื้นที่จัดเก็บ');
+        }
+    }
+
+    async removeStored(filenames: string[]): Promise<number> {
+        let failed = 0;
+        const root = resolve(this.root());
+        for (const filename of [...new Set(filenames)]) {
+            try {
+                const target = resolve(root, filename);
+                const rel = relative(root, target);
+                if (!rel || rel === '..' || rel.startsWith('..' + '/') || rel.startsWith('..' + String.fromCharCode(92)) || isAbsolute(rel)) throw new Error('Invalid attachment path');
+                await rm(target, { force: true });
+            } catch (error) {
+                failed++;
+                this.logger.error('Failed to remove deleted PILINE attachment: ' + filename, error.stack);
+            }
+        }
+        return failed;
     }
 
     async cleanup(files: PilineStagedFiles) {

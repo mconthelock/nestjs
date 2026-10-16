@@ -14,6 +14,11 @@ export class PilineEventRecordController {
         return this.service.findAll();
     }
 
+    @Get('issue')
+    findIssues() {
+        return this.service.findAll(true);
+    }
+
     @Post()
     @UseTransaction('workloadConnection')
     create(@Body() dto: CreatePilineEventRecordDto) {

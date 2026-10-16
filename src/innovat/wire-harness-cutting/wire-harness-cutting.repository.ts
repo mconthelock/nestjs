@@ -6,7 +6,6 @@ import { OracleRepository } from 'src/common/repositories/oracle-repository';
 import { WHN_PRODUCTION_PLAN } from 'src/common/Entities/innovat/table/WHN_PRODUCTION_PLAN.entity';
 import { WHN_PROCESS } from 'src/common/Entities/innovat/table/WHN_PROCESS.entity';
 import { WHN_DRUM_STOCK } from 'src/common/Entities/innovat/table/WHN_DRUM_STOCK.entity';
-import { WHN_DRUM_MASTER } from 'src/common/Entities/innovat/table/WHN_DRUM_MASTER.entity';
 import { WHN_PRODUCTION } from 'src/common/Entities/innovat/views/WHN_PRODUCTION.entity';
 import { WHN_AUTOPLAN } from 'src/common/Entities/innovat/views/WHN_AUTOPLAN.entity';
 import { WHN_REASON } from 'src/common/Entities/innovat/table/WHN_REASON.entity';
@@ -63,47 +62,8 @@ export class WireHarnessCuttingRepository extends BaseRepository {
         .getMany();
     }
 
-<<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
     createDrum(dto: CreateDrumDto) {
         const paramOrder = ['empNo', 'itemCode', 'prodNo', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
-=======
-    getDrumStock(condition: FiltersDto) {
-        const allowedFields = ['ST_ITEMCODE', 'ST_LENREMAIN', 'ST_DRUMTYPE', 'ST_RECIVEDATE'];
-        const qb = this.getRepository(WHN_DRUM_STOCK)
-            .createQueryBuilder('A')
-            .select([
-                'A.ST_ITEMCODE AS ITEMCODE',
-                'A.ST_PROD AS PRODNO',
-                'A.ST_ID AS DRUM_ID',
-                'A.ST_LENMASTER AS LENMASTER',
-                'A.ST_LENREMAIN AS LENREMAIN',
-                'A.ST_CABLECODE AS CABLECODE',
-                'A.ST_RECIVEDATE AS RECIVEDATE',
-                'A.ST_USERUPDATE AS USERUPDATE',
-                'A.ST_DATEUPDATE AS DATEUPDATE',
-                'A.ST_DRUMTYPE AS DRUMTYPE',
-                'CONVERT_PROD(A.ST_PROD) AS PROD',
-            ]);
-
-        return this.applyFilters(
-            qb,
-            'A',
-            condition,
-            allowedFields,
-        )
-        .orderBy('A.ST_LENREMAIN', 'ASC')
-        .addOrderBy('A.ST_PROD', 'ASC')
-        .addOrderBy('A.ST_ID', 'ASC')
-        .getRawMany();
-    }
-
-    createDrum(dto: CreateDrumDto) {
-<<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
-        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'ctrlNo', 'cut', 'cutType'];
->>>>>>> 9119de43 (wire-harness):src/innovat/wire-harness/wire-harness.repository.ts
-=======
-        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
->>>>>>> ea37e1b8 (wire harness):src/innovat/wire-harness/wire-harness.repository.ts
         return this.orepo.execCursor(
             'WHN_CREATE_DRUM',
             dto,
@@ -112,15 +72,7 @@ export class WireHarnessCuttingRepository extends BaseRepository {
     }
 
     updateDrum(dto: UpdateDrumDto) {
-<<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
-<<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
         const paramOrder = ['empNo', 'itemCode', 'prodNo', 'drumId', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
-=======
-        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'drumId', 'ctrlNo', 'cut', 'cutType'];
->>>>>>> 9119de43 (wire-harness):src/innovat/wire-harness/wire-harness.repository.ts
-=======
-        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'drumId', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
->>>>>>> ea37e1b8 (wire harness):src/innovat/wire-harness/wire-harness.repository.ts
         return this.orepo.execCursor(
             'WHN_UPDATE_DRUM',
             dto,
@@ -136,39 +88,6 @@ export class WireHarnessCuttingRepository extends BaseRepository {
             paramOrder,
         );
     }
-<<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
-<<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
-
-    reason(condition: FiltersDto) {
-        const allowedFields = ['RS_ID', 'RS_NAME_TH', 'RS_STATUS'];
-        const qb = this.getRepository(WHN_REASON)
-=======
-
-    getDrumMaster(condition: FiltersDto) {
-        const allowedFields = ['MT_ITEMCODE', 'MT_CABLECODE', 'GRP_ID'];
-        const qb = this.getRepository(WHN_DRUM_MASTER)
->>>>>>> 640b6378 (wire-harness):src/innovat/wire-harness/wire-harness.repository.ts
-            .createQueryBuilder('A');
-
-        return this.applyFilters(
-            qb,
-            'A',
-            condition,
-            allowedFields,
-        )
-<<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
-        .orderBy('A.RS_ID', 'ASC')
-        .getMany();
-    }
-=======
->>>>>>> 9119de43 (wire-harness):src/innovat/wire-harness/wire-harness.repository.ts
-=======
-        .orderBy('A.MT_ITEMCODE', 'ASC')
-        .getMany();
-    }
-<<<<<<< HEAD:src/innovat/wire-harness-cutting/wire-harness-cutting.repository.ts
->>>>>>> 640b6378 (wire-harness):src/innovat/wire-harness/wire-harness.repository.ts
-=======
 
     reason(condition: FiltersDto) {
         const allowedFields = ['RS_ID', 'RS_NAME_TH', 'RS_STATUS'];
@@ -184,5 +103,4 @@ export class WireHarnessCuttingRepository extends BaseRepository {
         .orderBy('A.RS_ID', 'ASC')
         .getMany();
     }
->>>>>>> ea37e1b8 (wire harness):src/innovat/wire-harness/wire-harness.repository.ts
 }

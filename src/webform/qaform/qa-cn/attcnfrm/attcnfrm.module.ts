@@ -9,14 +9,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     imports: [TypeOrmModule.forFeature([ATTCNFRM], 'webformConnection')],
     controllers: [AttcnfrmController],
     providers: [AttcnfrmService, AttCnFrmRepository],
-<<<<<<< HEAD
-<<<<<<< HEAD
     exports: [AttcnfrmService, AttCnFrmRepository],
-=======
-    exports: [AttcnfrmService],
->>>>>>> 67c79348 (PUR-EVA)
-=======
-    exports: [AttcnfrmService, AttCnFrmRepository],
->>>>>>> 093c063b (QA-CN)
 })
 export class AttcnfrmModule {}

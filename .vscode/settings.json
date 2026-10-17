@@ -11,6 +11,10 @@
         {
             "filePath": "d:\\project\\php\\src\\api\\src\\webform\\isform\\crdevicemst\\entities\\crdevicemst.entity.ts",
             "group": "Default"
+        },
+        {
+            "filePath": "src/common/Entities",
+            "group": "Default"
         }
     ],
     "favorites.sortOrder": "MANUAL"

@@ -1,7 +1,17 @@
 import { IsString, IsNumber, IsDate, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PickType } from '@nestjs/swagger';
+import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 
-export class CreateIsDevDto {
+export class CreateIsDevDto extends PickType(CreateFormDto, [
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'REQBY',
+    'DRAFT',
+    'INPUTBY',
+    'REMARK',
+] as const) {
     @IsNumber()
     @Type(() => Number)
     NFRMNO: number;

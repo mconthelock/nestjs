@@ -49,8 +49,7 @@ export class IsDevController {
         @Body() dto: CreateIsDevDto,
         @UploadedFiles()
         files: {
-            'fileCer[]'?: Express.Multer.File[];
-            'fileOther[]'?: Express.Multer.File[];
+            'additional[]'?: Express.Multer.File[];
         },
         @Req() req: Request,
     ) {

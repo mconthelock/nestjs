@@ -2,16 +2,19 @@ import { IsString, IsNumber, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateBenefitDto {
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    NFRMNO: number;
+    NFRMNO?: number;
 
     @IsString()
-    VORGNO: string;
+    @IsOptional()
+    VORGNO?: string;
 
     @IsString()
+    @IsOptional()
     @Type(() => String)
-    CYEAR: string;
+    CYEAR?: string;
 
     @IsOptional()
     @IsNumber()

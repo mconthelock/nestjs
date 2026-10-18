@@ -3,25 +3,28 @@ import { Type } from 'class-transformer';
 
 export class CreateManhoursDto {
     @IsNumber()
+    @IsOptional()
     @Type(() => Number)
-    NFRMNO: number;
+    NFRMNO?: number;
 
     @IsString()
-    VORGNO: string;
+    @IsOptional()
+    VORGNO?: string;
 
     @IsString()
+    @IsOptional()
     @Type(() => String)
-    CYEAR: string;
+    CYEAR?: string;
 
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    CYEAR2: number;
+    CYEAR2?: number;
 
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    NRUNNO: number;
+    NRUNNO?: number;
 
     @IsString()
     POSITION: string;

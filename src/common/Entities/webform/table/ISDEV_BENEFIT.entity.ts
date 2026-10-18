@@ -1,13 +1,28 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'ISDEV_BENEFIT', schema: 'WEBFORM' })
 export class ISDEV_BENEFIT {
-    @PrimaryGeneratedColumn()
-    CATEGORY_ID: number;
+    @PrimaryColumn()
+    NFRMNO: number;
+
+    @PrimaryColumn()
+    VORGNO: string;
+
+    @PrimaryColumn()
+    CYEAR: string;
+
+    @PrimaryColumn()
+    CYEAR2: number;
+
+    @PrimaryColumn()
+    NRUNNO: number;
+
+    @PrimaryColumn()
+    BENEFIT: number;
 
     @Column()
-    CATEGORY_NAME: string;
+    BENEFIT_CURRENT: number;
 
     @Column()
-    CATEGORY_STATUS: string;
+    BENEFIT_AFTER: number;
 }

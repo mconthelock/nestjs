@@ -54,8 +54,10 @@ export class IsDevController {
         },
         @Req() req: Request,
     ) {
-        const ip = getClientIP(req);
-        return this.dev.create(dto, files, ip, this.path);
+        // const ip = getClientIP(req);
+        // return this.dev.create(dto, files, ip, this.path);
+        console.log(dto);
+        return null;
     }
 
     // ISDEV_DEVELOPER: Set Developer

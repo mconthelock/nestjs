@@ -128,6 +128,10 @@ export class CreateIsDevDto extends PickType(CreateFormDto, [
     EXPECTED_WORKFLOW?: string;
 
     @IsOptional()
+    @IsString()
+    SYSTEM_TYPE?: string;
+
+    @IsOptional()
     @ValidateNested()
     @Type(() => CreateBenefitDto)
     benefit?: CreateBenefitDto;

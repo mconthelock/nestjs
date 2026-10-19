@@ -160,6 +160,8 @@ export class PurPraCreateService {
         if (!details || details.length === 0) {
             await this.praReasonRepo.delete(form);
             return;
+        }else{
+            await this.praReasonRepo.delete(form);
         }
         const createReason = await this.praReasonRepo.create(
             details.map((item) => ({

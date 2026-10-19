@@ -60,16 +60,16 @@ export class PURPRA_FORM {
     @Column()
     NGROUP: number;
 
-    @Column()
+    @Column({type: 'decimal'})
     NTOTAL_PRES: number;
 
-    @Column()
+    @Column({type: 'decimal'})
     NTOTAL_NEW: number;
 
-    @Column()
+    @Column({type: 'decimal'})
     NTOTAL_COST: number;
 
-    @Column()
+    @Column({type: 'decimal'})
     NTOTAL_RATIO: number;
 
     @Column()

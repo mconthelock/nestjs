@@ -83,7 +83,7 @@ export class PilineRejectRequestService {
             await this.flows.apply(k,prepared.flow);
             // Same Oracle transaction: RN + Flow + source status commit or roll back together.
             for (const number of selected) {
-                await manager.query("UPDATE WORKLOAD.PILINE_EVENT_RECORD SET RECORD_STATUS='QC_REJECT' WHERE PILINE_NO=:1",[number]);
+                await manager.query("UPDATE WORKLOAD.PILINE_EVENT_RECORD SET RECORD_STATUS='QC_REJECT', REF_RN_CYEAR2=:2, REF_RN_NRUNNO=:3 WHERE PILINE_NO=:1",[number,k.CYEAR2,k.NRUNNO]);
             }
             return {status:true,data:{...k,...reject}};
         }));
@@ -102,3 +102,4 @@ export class PilineRejectRequestController {
     @Post()
     save(@Body() body: SavePilineRejectDto) { return this.service.save(body); }
 }
+

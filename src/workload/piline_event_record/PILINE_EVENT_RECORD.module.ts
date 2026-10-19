@@ -1,3 +1,4 @@
+import { PilineRejectFilesController } from './PILINE_REJECT_FILES.controller';
 import { FlowModule } from 'src/webform/flow/flow.module';
 import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
 import { RepModule } from 'src/webform/rep/rep.module';
@@ -24,7 +25,7 @@ import { PilineEventFilesService } from './PILINE_EVENT_FILES.service';
         ConectionModule,
         TypeOrmModule.forFeature([PILINE_EVENT_RECORD], 'workloadConnection'),
     ],
-    controllers: [PilineRejectRequestController, PilineIssueController, PilineEventRecordController, PilineEventInputController, PilineIdtagController],
+    controllers: [PilineRejectFilesController, PilineRejectRequestController, PilineIssueController, PilineEventRecordController, PilineEventInputController, PilineIdtagController],
     providers: [
         PilineRejectDetailsService, PilineRejectFlowService, PilineRejectRequestService,
         PilineEventRecordService,
@@ -36,3 +37,4 @@ import { PilineEventFilesService } from './PILINE_EVENT_FILES.service';
     exports: [PilineEventRecordService],
 })
 export class PilineEventRecordModule {}
+

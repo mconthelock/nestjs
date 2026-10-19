@@ -1,7 +1,4 @@
-import {  Column, Entity, JoinColumn, OneToOne, PrimaryColumn} from 'typeorm';
-import { Form1Wage } from 'src/webform/isform/form1-wage/entities/form1-wage.entity';
-
-
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 @Entity({ name: 'PPOSITION', schema: 'AMEC' })
 export class PPOSITION {
     @PrimaryColumn()
@@ -15,9 +12,4 @@ export class PPOSITION {
 
     @Column()
     SSTARTLEVEL: string;
-
-    @OneToOne(() => Form1Wage, (pos) => pos.pposition)
-  @JoinColumn({ name: 'SPOSCODE', referencedColumnName: 'POSITION' })
-  wage: Form1Wage;
-
 }

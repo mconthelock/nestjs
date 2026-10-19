@@ -184,6 +184,10 @@ export class PurPraCreateService {
      */
     private async insertLink(form: FormDto, priceComparisonNo: string) {
         const priceApprovalNo = await this.formService.getFormno(form);
+        // อัปเดตสถานะของฟอร์ม Price comparison เป็น 1 (CREATE) ก่อนที่จะลบลิงก์เก่า
+        if (priceComparisonNo) {
+            await this.purCpcService.updateStatus(priceComparisonNo, 1);
+        }
         // ลบฟอร์มลิงก์เก่าที่เชื่อมโยงกับฟอร์ม Price comparison นี้ก่อนที่จะสร้างลิงก์ใหม่
         await this.formLinkService.delete(priceComparisonNo);
         await this.formLinkService.delete(priceApprovalNo);
@@ -200,7 +204,7 @@ export class PurPraCreateService {
                 'Failed to insert link between price approval and price comparison',
             );
         }
-        // update status ของ price comparison = 2
+        // update status ของ price comparison = 2 (USED)
         if (priceComparisonNo) {
             await this.purCpcService.updateStatus(priceComparisonNo, 2);
         }

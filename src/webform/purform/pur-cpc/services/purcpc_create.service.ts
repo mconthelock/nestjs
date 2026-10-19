@@ -3,12 +3,14 @@ import { pkForm } from '../interface/create.interface';
 import { PurCpcDetailRepository } from '../repository/purcpc_details.repository';
 import { PurCpcRepository } from '../repository/purcpc_form.repository';
 import { CreateFormDto } from '../dto/create-pcp-form.dto';
+import { PurPraCreateService } from '../../pur-pra/services/pur-pra-create-form.service';
 
 @Injectable()
 export class CreatePurCpcService {
     constructor(
         protected readonly repo: PurCpcRepository,
         protected readonly detailsRepo: PurCpcDetailRepository,
+        protected readonly prapvFormService: PurPraCreateService,
     ) {}
 
     /**
@@ -47,10 +49,10 @@ export class CreatePurCpcService {
     /**
      * @author Sutthipong Tangmongkhoncharoen(24008)
      * @since 2026-09-29
-     * @description สร้างฟอร์ม PUR-CPC ใหม่หรือแก้ไขฟอร์มที่มีอยู่แล้ว
+     * @description สร้างฟอร์ม PRO-CPC ใหม่หรือแก้ไขฟอร์มที่มีอยู่แล้ว
      * @param dto
      */
-    async create(dto: CreateFormDto) {
+    async create(dto: CreateFormDto, ip: string) {
         try {
             let cyear2: string = new Date().getFullYear().toString();
             let nrunno: number = 0;
@@ -66,7 +68,7 @@ export class CreatePurCpcService {
                 VVENDOR: dto.VENDOR,
                 CMODE: dto.MODE,
             };
-            // PUR-CPC26-000001
+            // PRO-CPC26-000001
             if (dto.ISEDIT) {
                 const pk = this.crackPrimaryKey(dto.FORMEDIT);
                 cyear2 = pk.CYEAR2;
@@ -96,8 +98,29 @@ export class CreatePurCpcService {
             );
 
             // สร้าง Price Approve Form
-            if(dto.STATUS === 2){
-
+            if (dto.STATUS === 2) {
+                // นำ vendor ที่มี planner ซ้ำออก แล้ววนเอามาต่อกันโดย G, A
+                const planner = dto.DETAILS.map((detail) => detail.VPLANNER)
+                    .filter((v, i, a) => a.indexOf(v) === i)
+                    .join(', ');
+                await this.prapvFormService.create(
+                    {
+                        isDraft: true,
+                        REQBY: dto.REQBY,
+                        INPUTBY: dto.INPUTBY,
+                        DRAFT: '0',
+                        PRICE_COMPARE_NO: `PRO-CPC${cyear2.substring(2)}-${nrunno.toString().padStart(6, '0')}`,
+                        VVENDOR: dto.VENDOR,
+                        NTOTAL_PRES: dto.TOTAL_PRES || 0,
+                        NTOTAL_NEW: dto.TOTAL_NEW || 0,
+                        NTOTAL_COST: dto.TOTAL_COST || 0,
+                        NTOTAL_RATIO: dto.TOTAL_RATIO || 0,
+                        NMODE: 1,
+                        VPLANNER: planner,
+                    },
+                    [],
+                    ip,
+                );
             }
             // throw new Error('test');
             return {

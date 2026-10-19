@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PurCpcService } from './services/purcpc_form.service';
 import { PurCpcController } from './pur-cpc.controller';
 import { PurCpcRepository } from './repository/purcpc_form.repository';
@@ -10,9 +10,10 @@ import { PurcpcProcCompareViewRepository } from './repository/purcpc_proc_compar
 import { PurCpcDetailRepository } from './repository/purcpc_details.repository';
 import { CreatePurCpcService } from './services/purcpc_create.service';
 import { PurcpcProcItemDetailRepository } from './repository/purcpc_proc_item_detail.repository';
+import { PurPraModule } from '../pur-pra/pur-pra.module';
 
 @Module({
-    imports: [Iim400Module],
+    imports: [Iim400Module, forwardRef(() => PurPraModule)],
     controllers: [PurCpcController],
     providers: [
         // service
@@ -27,6 +28,6 @@ import { PurcpcProcItemDetailRepository } from './repository/purcpc_proc_item_de
         PurcpcProcCompareViewRepository,
         PurcpcProcItemDetailRepository,
     ],
-    exports: [CreatePurCpcService]
+    exports: [CreatePurCpcService],
 })
 export class PurCpcModule {}

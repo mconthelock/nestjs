@@ -14,18 +14,21 @@ import {
 import { IimService as Iim400Service } from 'src/as400/bpcsfvnew/iim/iim.service';
 import { CreatePurCpcService } from './purcpc_create.service';
 import { PurcpcProcItemDetailRepository } from '../repository/purcpc_proc_item_detail.repository';
+import { PurPraCreateService } from '../../pur-pra/services/pur-pra-create-form.service';
 
 @Injectable()
 export class PurCpcService extends CreatePurCpcService {
     constructor(
         protected readonly repo: PurCpcRepository,
         protected readonly detailsRepo: PurCpcDetailRepository,
+        protected readonly prapvFormService: PurPraCreateService,
+
         private readonly iim400Service: Iim400Service,
         private readonly purcpcProcPlanViewRepo: PurcpcProcPlanViewRepository,
         private readonly purcpcProcCompareViewRepo: PurcpcProcCompareViewRepository,
         private readonly purcpcProcItemDetailRepo: PurcpcProcItemDetailRepository,
     ) {
-        super(repo, detailsRepo);
+        super(repo, detailsRepo, prapvFormService);
     }
 
     /**
@@ -132,20 +135,22 @@ export class PurCpcService extends CreatePurCpcService {
      * @author Sutthipong Tangmongkhoncharoen(24008)
      * @since 2026-10-13
      * @description ดึงข้อมูลรายการเปรียบเทียบราคาสินค้าตามหมายเลขฟอร์ม
-     * @param form 
-     * @returns 
+     * @param form
+     * @returns
      */
     async getListByForm(form: string) {
         try {
             const res = await this.repo.getListByForm(form);
-                return !res ? {
-                    status: false,
-                    message: 'Price comparison record not found',
-                } : {
-                    status: true,
-                    message: `Price comparison record found`,
-                    data: res,
-                };
+            return !res
+                ? {
+                      status: false,
+                      message: 'Price comparison record not found',
+                  }
+                : {
+                      status: true,
+                      message: `Price comparison record found`,
+                      data: res,
+                  };
         } catch (error) {
             throw error;
         }

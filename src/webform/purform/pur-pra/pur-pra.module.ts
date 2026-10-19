@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PurPraService } from './services/pur-pra.service';
 import { PurPraController } from './controller/pur-pra.controller';
 import { CommitteeRepository } from './repository/committe.repository';
@@ -21,7 +21,7 @@ import { FlowModule } from 'src/webform/flow/flow.module';
         FormmstModule,
         FormLinkModule,
         FlowModule,
-        PurCpcModule,
+        forwardRef(() => PurCpcModule),
     ],
     controllers: [PurPraController],
     providers: [
@@ -35,5 +35,9 @@ import { FlowModule } from 'src/webform/flow/flow.module';
         ReasonRepository,
         ReasonsMasterRepository,
     ],
+    exports: [
+        PurPraService,
+        PurPraCreateService,
+    ]
 })
 export class PurPraModule {}

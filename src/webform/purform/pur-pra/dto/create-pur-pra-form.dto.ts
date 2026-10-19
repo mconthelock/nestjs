@@ -66,108 +66,108 @@ export class CreatePurPraFormDto extends PickType(CreateFormDto, [
     @IsNotEmpty()
     @IsString()
     @Type(() => String)
-    EMPNO: string;
+    EMPNO?: string;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    NMODE: number;
+    NMODE?: number;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsString()
     @Type(() => String)
-    VVENDOR: string;
+    VVENDOR?: string;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsString()
     @Type(() => String)
-    VPLANNER: string;
+    VPLANNER?: string;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsString()
     @Type(() => String)
-    VMATERIAL_CODE: string;
+    VMATERIAL_CODE?: string;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsString()
     @Type(() => String)
-    VMAKER: string;
+    VMAKER?: string;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsString()
     @Type(() => String)
-    VPART_NAME: string;
+    VPART_NAME?: string;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsString()
     @Type(() => String)
-    VMODEL_NAME: string;
+    VMODEL_NAME?: string;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsString()
     @Type(() => String)
-    VJOB_ITEM: string;
+    VJOB_ITEM?: string;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    NCOMMITTEE: number;
+    NCOMMITTEE?: number;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    NGROUP: number;
+    NGROUP?: number;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    NTOTAL_PRES: number;
+    NTOTAL_PRES?: number;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    NTOTAL_NEW: number;
+    NTOTAL_NEW?: number;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    NTOTAL_COST: number;
+    NTOTAL_COST?: number;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    NTOTAL_RATIO: number;
+    NTOTAL_RATIO?: number;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsDate()
     @Type(() => Date)
-    DEFT_MONTH_START: Date;
+    DEFT_MONTH_START?: Date;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsDate()
     @Type(() => Date)
-    DEFT_MONTH_END: Date;
+    DEFT_MONTH_END?: Date;
 
     @ValidateIf((o) => o.isDraft !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsString()
-    VEFT_TYPE: string;
+    VEFT_TYPE?: string;
 
     @IsOptional()
     @IsString()

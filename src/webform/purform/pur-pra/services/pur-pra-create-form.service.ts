@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreatePurPraFormDto } from '../dto/create-pur-pra-form.dto';
 import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
@@ -23,6 +23,7 @@ export class PurPraCreateService {
         private readonly formLinkService: FormLinkService,
         private readonly praFormRepo: FormRepository,
         private readonly praReasonRepo: ReasonRepository,
+        @Inject(forwardRef(() => CreatePurCpcService))
         private readonly purCpcService: CreatePurCpcService,
         private readonly doactionService: DoactionFlowService,
     ) {}
@@ -129,10 +130,10 @@ export class PurPraCreateService {
             VJOB_ITEM: dto.VJOB_ITEM || null,
             NCOMMITTEE: dto.NCOMMITTEE || null,
             NGROUP: dto.NGROUP || null,
-            NTOTAL_PRES: dto.NTOTAL_PRES || null,
-            NTOTAL_NEW: dto.NTOTAL_NEW || null,
-            NTOTAL_COST: dto.NTOTAL_COST || null,
-            NTOTAL_RATIO: dto.NTOTAL_RATIO || null,
+            NTOTAL_PRES: dto.NTOTAL_PRES || 0,
+            NTOTAL_NEW: dto.NTOTAL_NEW || 0,
+            NTOTAL_COST: dto.NTOTAL_COST || 0,
+            NTOTAL_RATIO: dto.NTOTAL_RATIO || 0,
             DEFT_MONTH_START: dto.DEFT_MONTH_START || null,
             DEFT_MONTH_END: dto.DEFT_MONTH_END || null,
             VEFT_TYPE: dto.VEFT_TYPE || null,

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Req } from '@nestjs/common';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 import {
@@ -11,6 +11,8 @@ import { CreateFormDto } from './dto/create-pcp-form.dto';
 
 import { PurCpcService } from './services/purcpc_form.service';
 import { CondComparisonPriceService } from './services/cond_comparison_price.service';
+import { getClientIP } from 'src/common/utils/ip.utils';
+import { Request } from 'express';
 
 @Controller('purform/pur-cpc')
 export class PurCpcController {
@@ -59,8 +61,9 @@ export class PurCpcController {
      */
     @Post()
     @UseTransaction('webformConnection')
-    async create(@Body() data: CreateFormDto) {
-        return await this.service.create(data);
+    async create(@Body() data: CreateFormDto, @Req() req: Request,) {
+        const ip = getClientIP(req);
+        return await this.service.create(data, ip);
     }
 
     /**

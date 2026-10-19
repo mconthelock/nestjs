@@ -3,7 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { GPTPH_AREAS } from 'src/common/Entities/webform/table/GPTPH_AREAS.entity';
 import { GPTPH_LOCATION } from 'src/common/Entities/webform/table/GPTPH_LOCATION.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource, DeepPartial } from 'typeorm';
+import { DataSource, DeepPartial, In } from 'typeorm';
 import { CreateGpTphReqDto, CreateGpTphlistApplicantDto } from './dto/create-gp-tph.dto';
 import { GPTPH_REQ_HEADER } from 'src/common/Entities/webform/table/GPTPH_REQ_HEADER.entity';
 import { FormDto } from 'src/webform/form/dto/form.dto';
@@ -11,6 +11,7 @@ import { GPTPH_APPLICANT } from 'src/common/Entities/webform/table/GPTPH_APPLICA
 import { GPTPH_AREA_RECORD } from 'src/common/Entities/webform/table/GPTPH_AREA_RECORD.entity';
 import { CreateDataAreaDto } from './dto/create-data-area.dto';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
+import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 @Injectable()
 export class GpTphRepository extends BaseRepository {
 
@@ -22,6 +23,95 @@ export class GpTphRepository extends BaseRepository {
             relations: ['LOCATION']
         });
     }
+
+    findAreasByIds(areaIds: number[]) {
+        return this.getRepository(GPTPH_AREAS).findBy({
+            AREA_ID: In(areaIds),
+        });
+    }
+
+    async finalizeRejectedRequest(form: FormDto) {
+        await this.getRepository(FLOW).update(
+            { ...form, CAPVSTNO: '0', CSTEPST: In(['1', '2', '3']) },
+            { CAPVSTNO: '2', CSTEPST: '7' },
+        );
+        await this.getRepository(FORM).update(form, { CST: '3' });
+    }
+
+    // Area Owner rejects only affect their own area; they must not reject the whole form.
+    async restoreStatusAfterPartialAreaOwnerReject(form: FormDto) {
+        const rejected = await this.getRepository(FLOW).findBy({ ...form, CAPVSTNO: '2' });
+        if (rejected.length && rejected.every((step) => step.CEXTDATA?.trim() === '01')) {
+            await this.getRepository(FORM).update({ ...form, CST: '3' }, { CST: '2' });
+        }
+    }
+
+    async replaceSystemApproverStep(
+        form: FormDto,
+        stepNo: string,
+        approvers: Array<{ VAPVNO: string; VREPNO: string }>,
+    ) {
+        await this.manager.transaction(async (manager) => {
+            const flowRepository = manager.getRepository(FLOW);
+            const areaOwnerSteps = await flowRepository.findBy({
+                ...form,
+                CSTEPNO: stepNo,
+            });
+
+            if (areaOwnerSteps.length !== 1) {
+                throw new Error(
+                    `GP-TPH flow must contain exactly one Area Owner step ${stepNo}`,
+                );
+            }
+
+            const [areaOwnerStep] = areaOwnerSteps;
+            await flowRepository.delete({ ...form, CSTEPNO: stepNo });
+            await flowRepository.save(
+                approvers.map((approver) => ({
+                    ...areaOwnerStep,
+                    ...approver,
+                    CAPVTYPE: '3',
+                    CAPPLYALL: '0',
+                })),
+            );
+        });
+    }
+    async approveGpTphConsecutiveSteps(form: FormDto, flow: FLOW, params: any) {
+        const visited = new Set([flow.CSTEPNO]);
+        let nextStep = flow.CSTEPNEXTNO;
+        while (nextStep && nextStep !== '00' && !visited.has(nextStep)) {
+            visited.add(nextStep);
+            const steps = await this.getRepository(FLOW).findBy({ ...form, CSTEPNO: nextStep });
+            const matching = steps.filter(
+                (step) =>
+                    step.CAPVSTNO === '0' &&
+                    ['1', '2', '3'].includes(step.CSTEPST) &&
+                    (step.VAPVNO?.trim() === params.VREALAPV.trim() ||
+                        step.VREPNO?.trim() === params.VREALAPV.trim()),
+            );
+            if (!matching.length) break;
+
+            // Reuse this action only for the same actor; other co-approvers remain pending.
+            await this.manager.query(
+                `UPDATE FLOW SET CAPVSTNO = :1, CSTEPST = :2,
+                    DAPVDATE = TO_DATE(:3, 'YYYY-MM-DD'), CAPVTIME = :4,
+                    VREMARK = :5, VREMOTE = :6, VREALAPV = :7
+                 WHERE NFRMNO = :8 AND VORGNO = :9 AND CYEAR = :10
+                    AND CYEAR2 = :11 AND NRUNNO = :12 AND CSTEPNO = :13
+                    AND CAPVSTNO = '0' AND CSTEPST IN ('1', '2', '3')
+                    AND (VAPVNO = :14 OR VREPNO = :15)`,
+                [
+                    '1', '5',
+                    params.DAPVDATE, params.CAPVTIME, params.VREMARK,
+                    params.VREMOTE, params.VREALAPV,
+                    form.NFRMNO, form.VORGNO, form.CYEAR, form.CYEAR2,
+                    form.NRUNNO, nextStep, params.VREALAPV, params.VREALAPV,
+                ],
+            );
+            nextStep = matching[0].CSTEPNEXTNO;
+        }
+    }
+
     findAllLocations() {
         return this.getRepository(GPTPH_LOCATION).find({
             relations: ['AREAS']
@@ -144,13 +234,4 @@ export class GpTphRepository extends BaseRepository {
         return areaRepository.findOneByOrFail({ AREA_ID: id });
     }
 
-    countAreaRecords(id: number) {
-        return this.getRepository(GPTPH_AREA_RECORD).countBy({ AREA_ID: id });
-    }
-
-    deleteArea(id: number) {
-        return this.getRepository(GPTPH_AREAS).delete({ AREA_ID: id });
-    }
 }
-
-

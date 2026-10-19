@@ -26,10 +26,6 @@ export class PromoteController {
         const data = await this.docs.findAll(req.user.user, body);
         return data.map((item) => {
             const {
-                OLDPOSITION,
-                NEWPOSITION,
-                OLDLEVEL,
-                NEWLEVEL,
                 OLDSALARY,
                 NEWSALARY,
                 OLDJOBAW,
@@ -44,12 +40,6 @@ export class PromoteController {
         });
     }
 
-    //   @Post('id')
-    //   @UseGuards(AuthGuard('key'))
-    //   findById(@Request() req, @Body() body: any) {
-    //     return this.docs.findById(req.user.user, body);
-    //   }
-
     @Post('create-pdf')
     @UseGuards(AuthGuard('key'))
     async createPdf(@Request() req, @Body() body: any) {
@@ -59,7 +49,7 @@ export class PromoteController {
         let passkey = pdfkey;
         if (data.ASETYP !== 'MP')
             passkey = `${pdfkey.substring(4, 8)}${pdfkey.substring(0, 4)}`;
-        return this.docs.createFile({ ...data, passkey });
+        return await this.docs.createFile({ ...data, passkey });
     }
 
     @Post('export-excel')
@@ -76,5 +66,11 @@ export class PromoteController {
             'attachment; filename="report.xlsx"',
         );
         res.send(Buffer.from(buffer));
+    }
+
+    @Post('send-mail')
+    // @UseGuards(AuthGuard('key'))
+    async sendMail(@Request() req, @Body() body: any) {
+        return await this.docs.sendMail();
     }
 }

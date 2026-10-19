@@ -16,10 +16,6 @@ import { SpecialuserModule } from './specialuser/specialuser.module';
 
 //ITAdmin[Datacenter]
 import { DatacenterModule } from './datacenter/datacenter.module';
-
-//ITAdmin[Workload]
-import { DevplanModule } from './devplan/devplan.module';
-
 //Not use (Now)
 import { ProgramModule } from './program/program.module';
 import { RevisionModule } from './revision/revision.module';
@@ -39,7 +35,6 @@ import { TasksModule } from './tasks/tasks.module';
         TasklogsModule,
         SpecialuserModule,
         DatacenterModule,
-        DevplanModule,
         //Not use (Now)
         ProgramModule,
         RevisionModule,

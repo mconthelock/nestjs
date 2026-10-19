@@ -4,7 +4,10 @@
 /build
 /dist
 /sql
-
+/artifacts
+/output
+/tmp
+/src/workload/piline/PILINE.md
 # Logs
 logs
 *.log
@@ -67,3 +70,4 @@ public/gs/
 package-lock.json
 
 oracle
+

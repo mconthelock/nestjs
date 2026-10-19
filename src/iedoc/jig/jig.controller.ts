@@ -1,5 +1,6 @@
 import {
     Body,
+    Head,
     StreamableFile,
     Header,
     Req,
@@ -14,6 +15,8 @@ import {
     ValidationPipe,
 } from '@nestjs/common';
 import { JigService } from './jig.service';
+import { JigReminderService } from './jig-reminder.service';
+import { InspectionReminderDto } from './dto/inspection-reminder.dto';
 import { CreateJigDeleteFormDto, SaveJigDeleteFormDto } from './dto/jig-delete-form.dto';
 import { CreateJigRequestDto } from './dto/create-jig-request.dto';
 import { UpdateJigDto } from './dto/update-jig.dto';
@@ -43,7 +46,17 @@ const deleteFormPath = 'delete-forms/:NFRMNO/:VORGNO/:CYEAR/:CYEAR2/:NRUNNO';
     }),
 )
 export class JigController {
-    constructor(private readonly jigService: JigService, private readonly ngTag: JigNgTagService) {}
+    constructor(private readonly jigService: JigService, private readonly ngTag: JigNgTagService,
+        private readonly reminders: JigReminderService) {}
+
+    // Allows the existing Scheduler to validate this POST endpoint without sending mail.
+    @Head('inspection-reminders')
+    reminderHealth() { return; }
+
+    @Post('inspection-reminders')
+    sendInspectionReminders(@Body() dto: InspectionReminderDto) {
+        return this.reminders.send(dto);
+    }
 
     @Get('mfg-processes')
     getMfgProcesses() {

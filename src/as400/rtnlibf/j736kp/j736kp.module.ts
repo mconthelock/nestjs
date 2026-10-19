@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { J736kpService } from './j736kp.service';
 import { J736kpController } from './j736kp.controller';
-import { ConectionService } from 'src/as400/conection/conection.service';
+import { ConectionModule } from 'src/as400/conection/conection.module';
 
 @Module({
+    imports: [ConectionModule],
     controllers: [J736kpController],
-    providers: [J736kpService, ConectionService],
+    providers: [J736kpService],
     exports: [J736kpService],
 })
 export class J736kpModule {}

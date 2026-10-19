@@ -1,7 +1,27 @@
-import { IsString, IsNumber, IsDate, ValidateNested } from 'class-validator';
+import {
+    IsString,
+    IsNumber,
+    IsDate,
+    ValidateNested,
+    IsOptional,
+} from 'class-validator';
 import { Type } from 'class-transformer';
+import { PickType } from '@nestjs/swagger';
+import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 
-export class CreateIsDevDto {
+import { CreateBenefitDto } from './create-benefit.dto';
+import { CreateManhoursDto } from './create-manhours.dto';
+import { CreateInvestDto } from './create-invest.dto';
+
+export class CreateIsDevDto extends PickType(CreateFormDto, [
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'REQBY',
+    'DRAFT',
+    'INPUTBY',
+    'REMARK',
+] as const) {
     @IsNumber()
     @Type(() => Number)
     NFRMNO: number;
@@ -10,14 +30,18 @@ export class CreateIsDevDto {
     VORGNO: string;
 
     @IsString()
+    @Type(() => String)
     CYEAR: string;
 
-    @IsString()
-    CYEAR2: string;
-
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    NRUNNO: number;
+    CYEAR2?: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    NRUNNO?: number;
 
     @IsNumber()
     @Type(() => Number)
@@ -62,35 +86,63 @@ export class CreateIsDevDto {
     @Type(() => Date)
     SPEC_CONFIRM_PLAN: Date;
 
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
-    SPEC_CONFIRM_ACTUAL: Date;
+    SPEC_CONFIRM_ACTUAL?: Date;
 
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
-    DEV_START_PLAN: Date;
+    DEV_START_PLAN?: Date;
 
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
-    DEV_END_PLAN: Date;
+    DEV_END_PLAN?: Date;
 
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
-    DEV_START_ACTUAL: Date;
+    DEV_START_ACTUAL?: Date;
 
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
-    DEV_END_ACTUAL: Date;
+    DEV_END_ACTUAL?: Date;
 
+    @IsOptional()
+    @IsOptional()
     @IsString()
-    IS_ITGC: string;
+    IS_ITGC?: string;
 
     @IsString()
     PURPOSE: string;
 
     @IsString()
-    CURRENT_WORKFLOW: string;
+    @IsOptional()
+    CURRENT_WORKFLOW?: string;
 
     @IsString()
-    EXPECTED_WORKFLOW: string;
+    @IsOptional()
+    EXPECTED_WORKFLOW?: string;
+
+    @IsOptional()
+    @IsString()
+    SYSTEM_TYPE?: string;
+
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => CreateBenefitDto)
+    benefit?: CreateBenefitDto;
+
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => CreateManhoursDto)
+    manhours?: CreateManhoursDto;
+
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => CreateInvestDto)
+    invest?: CreateInvestDto;
 }

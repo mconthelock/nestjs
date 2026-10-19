@@ -1,0 +1,40 @@
+import { IsString, IsNumber, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class CreateBenefitDto {
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    NFRMNO?: number;
+
+    @IsString()
+    @IsOptional()
+    VORGNO?: string;
+
+    @IsString()
+    @IsOptional()
+    @Type(() => String)
+    CYEAR?: string;
+
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    CYEAR2?: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    NRUNNO?: number;
+
+    @IsNumber()
+    @Type(() => Number)
+    BENEFIT_TYPE: number;
+
+    @IsNumber()
+    @Type(() => Number)
+    BENEFIT_CURRENT: number;
+
+    @IsNumber()
+    @Type(() => Number)
+    BENEFIT_AFTER: number;
+}

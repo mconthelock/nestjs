@@ -1,6 +1,8 @@
 import { rgb, StandardFonts } from 'pdf-lib';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import * as os from 'os';
+import { randomUUID } from 'crypto';
 import { spawn } from 'child_process';
 
 export async function writeLineBox(opt) {
@@ -51,8 +53,12 @@ export async function protectedFile(opt) {
         winPath = '\\\\' + winPath.replace(/^\\+/, '');
     }
 
-    const input = path.join(winPath, opt.input);
-    const output = path.join(winPath, opt.output);
+    const networkInput = path.join(winPath, opt.input);
+    const finalOutput = path.join(winPath, opt.output);
+    // Ghostscript เปิดไฟล์บน UNC path ที่มีวรรณยุกต์/วงเล็บไม่ได้ จึงต้อง copy input/output ผ่าน local temp
+    const localInput = path.join(os.tmpdir(), `${randomUUID()}_${opt.input}`);
+    const localOutput = path.join(os.tmpdir(), `${randomUUID()}_${opt.output}`);
+    await fs.copyFile(networkInput, localInput);
     const command = path.resolve(
         process.cwd(),
         'public',
@@ -63,6 +69,7 @@ export async function protectedFile(opt) {
     );
     await new Promise<void>((resolve, reject) => {
         const stderrChunks: Buffer[] = [];
+        const stdoutChunks: Buffer[] = [];
         const child = spawn(command, [
             ...[],
             '-sDEVICE=pdfwrite',
@@ -76,10 +83,11 @@ export async function protectedFile(opt) {
             '-dQUIET',
             '-dBATCH',
             `-dPDFSETTINGS=/ebook`,
-            `-sOutputFile=${output}`,
-            input,
+            `-sOutputFile=${localOutput}`,
+            localInput,
         ]);
 
+        child.stdout.on('data', (chunk) => stdoutChunks.push(chunk));
         child.stderr.on('data', (chunk) => stderrChunks.push(chunk));
         child.on('error', (error) => reject(error));
         child.on('close', (code) => {
@@ -88,13 +96,21 @@ export async function protectedFile(opt) {
                 return;
             }
 
+            const output = Buffer.concat([...stdoutChunks, ...stderrChunks])
+                .toString()
+                .trim();
             reject(
-                new Error(
-                    `Ghostscript exited with code ${code}: ${Buffer.concat(stderrChunks).toString().trim()}`,
-                ),
+                new Error(`Ghostscript exited with code ${code}: ${output}`),
             );
         });
     });
+
+    try {
+        await fs.copyFile(localOutput, finalOutput);
+    } finally {
+        await fs.unlink(localInput).catch(() => {});
+        await fs.unlink(localOutput).catch(() => {});
+    }
 }
 
 export async function drawGrid(pdfpage, spacing = 50, labelSpacing = 50) {

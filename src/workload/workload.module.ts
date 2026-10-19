@@ -1,3 +1,13 @@
+import { PilineCauseMstModule } from './piline_cause_mst/PILINE_CAUSE_MST.module';
+import { PilineEventMstModule } from './piline_event_mst/PILINE_EVENT_MST.module';
+import { PilineSectionMstModule } from './piline_section_mst/PILINE_SECTION_MST.module';
+import { PilineProblemMstModule } from './piline_problem_mst/PILINE_PROBLEM_MST.module';
+import { PilineMappingMstModule } from './piline_mapping_mst/PILINE_MAPPING_MST.module';
+import { PilineLocationMstModule } from './piline_location_mst/PILINE_LOCATION_MST.module';
+import { PilineInitialMstModule } from './piline_initial_mst/PILINE_INITIAL_MST.module';
+import { PilineEventRecordModule } from './piline_event_record/PILINE_EVENT_RECORD.module';
+import { PilineNgRecordModule } from './piline_ng_record/PILINE_NG_RECORD.module';
+import { PilineAttModule } from './piline_att/PILINE_ATT.module';
 import { Module } from '@nestjs/common';
 import { IdtagEfacLogModule } from './idtag-efac-log/idtag-efac-log.module';
 import { DpmsPackingListModule } from './dpms_packing_list/dpms_packing_list.module';
@@ -34,6 +44,16 @@ import { DpmsPackingListDetailModule } from './dpms_packing_list_detail/dpms_pac
 
 @Module({
     imports: [
+        PilineCauseMstModule,
+        PilineEventMstModule,
+        PilineSectionMstModule,
+        PilineProblemMstModule,
+        PilineMappingMstModule,
+        PilineLocationMstModule,
+        PilineInitialMstModule,
+        PilineEventRecordModule,
+        PilineNgRecordModule,
+        PilineAttModule,
         IdtagEfacLogModule,
         DpmsPackingListModule,
         DpmsPackingListMainModule,

@@ -1,20 +1,65 @@
-import { Body, Controller, Get, Param, Post, Delete } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Post,
+    Req,
+    UseInterceptors,
+    UploadedFiles,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import {
+    UseForceTransaction,
+    UseTransaction,
+} from 'src/common/decorator/transaction.decorator';
+import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
+import { getClientIP } from 'src/common/utils/ip.utils';
+import { Request } from 'express';
+
 import { IsDevService } from './is-dev.service';
 import { CreateDeveloperDto } from './dto/create-developer.dto';
 import { UpdateDeveloperDto } from './dto/update-developer';
 import { SearchIsDevDto } from './dto/search-is-dev.dto';
+import { CreateIsDevDto } from './dto/create-is-dev.dto';
 
 @ApiTags('IS-DEV')
 @Controller('form/is/is-dev')
 export class IsDevController {
+    private readonly path =
+        `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/PUR/PURVMM/` as string;
+
     constructor(private readonly dev: IsDevService) {}
 
+    // ISDEV_REQUEST
     @Post('search')
     search(@Body() dto: SearchIsDevDto) {
         return this.dev.search(dto);
     }
 
+    @Post('create')
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
+    @UseInterceptors(
+        getFileUploadInterceptor([
+            { name: 'fileCer[]', maxCount: 10 },
+            { name: 'fileOther[]', maxCount: 10 },
+        ]),
+    )
+    create(
+        @Body() dto: CreateIsDevDto,
+        @UploadedFiles()
+        files: {
+            'additional[]'?: Express.Multer.File[];
+        },
+        @Req() req: Request,
+    ) {
+        // const ip = getClientIP(req);
+        // return this.dev.create(dto, files, ip, this.path);
+        console.log(dto);
+        return null;
+    }
+
+    // ISDEV_DEVELOPER: Set Developer
     @Post('assignment/add')
     async addDeveloper(@Body() dto: CreateDeveloperDto) {
         return this.dev.createDev(dto);
@@ -24,26 +69,6 @@ export class IsDevController {
     async deleteDeveloper(@Body() dto: UpdateDeveloperDto) {
         return this.dev.deleteDev(dto);
     }
-
-    //   @Get('/year/:year')
-    //   @ApiOperation({
-    //     summary: 'Get by Year',
-    //     description:
-    //       'Get all IS-DEV Form that request in specific Year, Data including Form/IS-DEV/Requestor (Exclude flow Data)',
-    //   })
-    //   findByYear(@Param('year') year: string) {
-    //     return this.dev.findByYear(year);
-    //   }
-
-    //   @Get('/year/:year/id/:id')
-    //   @ApiOperation({
-    //     summary: 'Get by id',
-    //     description:
-    //       'Get all IS-DEV Form that request in specific Year, Data including Form/IS-DEV/Requestor (Exclude flow Data)',
-    //   })
-    //   findById(@Param('year') year: string, @Param('id') id: number) {
-    //     return this.dev.findById(year, id);
-    //   }
 
     //ISDEV_OBJECTIVE
     @Get('objective/all')
@@ -55,7 +80,7 @@ export class IsDevController {
         return this.dev.findAllObjective();
     }
 
-    //ISDEV_OBJECTIVE
+    //ISDEV_DEVICE
     @Get('device/all')
     @ApiOperation({
         summary: 'Get all IS Device list',
@@ -69,5 +94,11 @@ export class IsDevController {
     @Get('laborcost/all')
     findAllLaborcost() {
         return this.dev.findAllLaborcost();
+    }
+
+    //Dev Category
+    @Get('category/all')
+    findAllCategory() {
+        return this.dev.findAllCategory();
     }
 }

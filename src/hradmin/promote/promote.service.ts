@@ -21,6 +21,7 @@ import { cloneRows } from 'src/common/helpers/file-excel.helper';
 import { DatabaseService } from '../shared/database.service';
 const fontkit = require('@pdf-lib/fontkit');
 import * as oracledb from 'oracledb';
+import { MailService } from 'src/common/services/mail/mail.service';
 
 @Injectable()
 export class PromoteService {
@@ -30,7 +31,10 @@ export class PromoteService {
     protected fontsize: number;
     protected output_path: string;
 
-    constructor(private dbService: DatabaseService) {}
+    constructor(
+        private dbService: DatabaseService,
+        private readonly mailService: MailService,
+    ) {}
 
     async findAll(credentials: any, body: any) {
         let hrAdminDataSource: DataSource;
@@ -126,7 +130,7 @@ export class PromoteService {
                 .locale('en')
                 .format('YYYY MMMM');
             if (!dir) dir = 'Non-Manager';
-            this.output_path = `${process.env.TAX_FILE_PATH}/${dir}/Salary Adjustment Letter (หนังสือแจ้งปรับ)/${effdate}/`;
+            this.output_path = `${process.env.TAX_FILE_PATH}${dir}/Salary Adjustment Letter (หนังสือแจ้งปรับ)/${effdate}/`;
             const fontPath = path.join(
                 process.cwd(),
                 'public/fonts/THSarabun.ttf',
@@ -148,7 +152,6 @@ export class PromoteService {
             await fs.mkdir(this.output_path, { recursive: true });
             const output = path.join(this.output_path, `_${data.ASECOD}.pdf`);
             await fs.writeFile(output, pdfBytes);
-
             // ป้องกันไฟล์ด้วยรหัสผ่าน
             await protectedFile({
                 output_path: this.output_path,
@@ -163,17 +166,19 @@ export class PromoteService {
             await fs.unlink(path.join(this.output_path, `_${data.ASECOD}.pdf`));
             return {
                 dir,
-                empno: data.ASECOD,
-                mail: data.MEMEML,
-                th_name: data.SEMPPRT + data.STNAME,
-                th_period: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
-                    .locale('th')
-                    .format('MMMM YYYY'),
-                en_name: data.SEMPPRE + data.SNAME,
-                en_period: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
-                    .locale('en')
-                    .format('MMMM YYYY'),
-                file: path.join(this.output_path, `${data.ASECOD}.pdf`),
+                folder: this.output_path,
+                filename: `${data.ASECOD}.pdf`,
+                // empno: data.ASECOD,
+                // mail: data.MEMEML,
+                // th_name: data.SEMPPRT + data.STNAME,
+                // th_period: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
+                //     .locale('th')
+                //     .format('MMMM YYYY'),
+                // en_name: data.SEMPPRE + data.SNAME,
+                // en_period: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
+                //     .locale('en')
+                //     .format('MMMM YYYY'),
+                // file: path.join(this.output_path, `${data.ASECOD}.pdf`),
             };
         } catch (error) {
             console.error('Error filling PDF template:', error);
@@ -292,5 +297,30 @@ export class PromoteService {
                 'Invalid template: Missing "Data" sheet.',
             );
         }
+    }
+
+    async sendMail() {
+        const escape = (s: unknown) =>
+            String(s ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        await this.mailService.sendMail({
+            template: 'gpreport/promote/promote',
+            from: `chalorms@MitsubishiElevatorAsia.co.th`,
+            to: `s.chalormsak@gmail.com`,
+            subject: `(SECRET) AMEC Electronic Letter of Annual Salary Increment / Position Promotion / Job Level Period XXXXXXX`,
+            context: {
+                th_name: 'All Concerned',
+                th_period: 'XXXXX',
+            },
+            attachments: [
+                // {
+                //     filename: file.originalname,
+                //     content: file.buffer,
+                // },
+            ],
+        });
+        return true;
     }
 }

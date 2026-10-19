@@ -1,0 +1,81 @@
+<mjml>
+    <mj-head>
+        <mj-attributes>
+            <mj-text font-family="Cordia New, sans-serif" font-size="18px" />
+            <mj-table font-family="Cordia New, sans-serif" font-size="20px" />
+        </mj-attributes>
+    </mj-head>
+
+    <mj-body background-color="#f4f6f8" width="800px">
+
+        <!-- Header -->
+        {{!-- <mj-section background-color="#1447e6" padding="16px">
+            <mj-column>
+                <mj-text color="#ffffff" font-size="36px" font-weight="bold">
+                    HR System Notification
+                </mj-text>
+            </mj-column>
+        </mj-section> --}}
+
+        <!-- Content Card -->
+        <mj-section padding="0">
+            <mj-column background-color="#ffffff" padding="20px" border-radius="6px">
+                <mj-text align="right">
+                    <span style="display:inline-block; border: 2px solid red; color: red; font-weight: bold; font-size: 28px; padding: 4px 10px;">SECRET</span>
+                </mj-text>
+
+                <mj-text>
+                    <p>เรียน <span style="color:blue">{{name}}</span></p>
+                </mj-text>
+
+                <mj-text>
+                    <p>บริษัท มิตซูบิชิ เอลเลเวเตอร์ เอเชีย จำกัด ขอนำส่ง<strong>หนังสือรับรองการหักภาษี ณ ที่จ่าย</strong> <span style="color:blue">ปีภาษี {{taxYear}}</span> มาพร้อม e-mail ฉบับนี้
+            โดยท่านสามารถดูโดยคลิกไฟล์แนบ (PDF) และเพื่อความปลอดภัยของข้อมูล กรุณาระบุรหัสผ่านของท่าน 8 หลัก โดยใช้ วัน
+            เดือน ปีเกิดของท่าน ในรูปแบบ “YYYYMMDD” (ต้องระบุเป็นปี ค.ศ.เท่านั้น)</p>
+                </mj-text>
+
+                <mj-text>
+                    <p><span style="text-decoration:underline;font-weight: bold;">ตัวอย่าง:</span> หาก วัน เดือน ปีเกิดของท่าน คือ
+                        1 มีนาคม ค.ศ.1990 รหัสผ่านของท่านคือ <span style="color:red">19900301</span></p>
+                </mj-text>
+
+                <mj-text>
+                    <div style="font-weight: bold;">หมายเหตุ</div>
+                    <ul>
+                        <li>E-mail ฉบับนี้เป็นการแจ้งข้อมูลโดยอัตโนมัติ กรุณาอย่าตอบกลับ</li>
+                        <li>หากท่านมีการเปลี่ยนแปลง e-mail address กรุณาทำการเปลี่ยนแปลงด้วยตนเองบนระบบ HR System
+                            เพื่อการจัดส่งที่ถูกต้อง</li>
+                        <li>หากตรวจสอบข้อมูลแล้วพบว่าไม่ถูกต้อง หรือต้องการสอบถามรายละเอียดเพิ่มเติมกรุณาติดต่อส่วนทรัพยากรมนุษย์
+                            โทร.1156 หรือ 1159</li>
+                    </ul>
+                </mj-text>
+
+                <mj-text>
+                    <p style="text-decoration: underline;font-weight: bold;">คำเตือน</p>
+                    <div><span style="font-style: italic; color:red;">ห้ามพนักงานแก้ไข ปลอมแปลงหนังสือแจ้งปรับเงินเดือน / ตำแหน่ง /
+                            ระดับงาน อิเล็กทรอนิกส์โดยเด็ดขาด
+                            เพราะถือเป็นการทุจริต</span>
+                        ตามระเบียบข้อบังคับ บทที่ 8 ข้อ 1.8, 1.8.1 “พนักงานต้องไม่เปลี่ยนแปลง ปลอม แก้ไข ตัดทอน หรือทำลายเอกสารต่างๆ
+                        ของบริษัทฯ หรือเอกสารที่มีการเกี่ยวข้องระหว่างบริษัทฯ กับพนักงาน โดยไม่มีอำนาจหน้าที่ที่จะกระทำการดังกล่าว”
+                        หากพบเห็นการกระทำผิดดังกล่าว บริษัทฯ จะพิจารณาโทษตามระเบียบ</div>
+                </mj-text>
+
+                <mj-text>
+                    <p>ขอแสดงความนับถือ<br />
+                        ส่วนทรัพยากรมนุษย์<br />
+                        บริษัท มิตซูบิชิ เอลเลเวเตอร์ เอเซีย จำกัด</p>
+                </mj-text>
+            </mj-column>
+        </mj-section>
+
+        <!-- Footer -->
+        <mj-section background-color="#f1f5f9" padding="10px">
+            <mj-column>
+                <mj-text font-size="18px" color="#999999" align="center">
+                    This is an automated email. Please do not reply.
+                </mj-text>
+            </mj-column>
+        </mj-section>
+
+    </mj-body>
+</mjml>

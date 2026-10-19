@@ -1,0 +1,81 @@
+<mjml>
+    <mj-head>
+        <mj-attributes>
+            <mj-text font-family="Cordia New, sans-serif" font-size="18px" />
+            <mj-table font-family="Cordia New, sans-serif" font-size="20px" />
+        </mj-attributes>
+    </mj-head>
+
+    <mj-body background-color="#f4f6f8" width="800px">
+
+        <!-- Header -->
+        {{!-- <mj-section background-color="#1447e6" padding="16px">
+            <mj-column>
+                <mj-text color="#ffffff" font-size="36px" font-weight="bold">
+                    HR System Notification
+                </mj-text>
+            </mj-column>
+        </mj-section> --}}
+
+        <!-- Content Card -->
+        <mj-section padding="0">
+            <mj-column background-color="#ffffff" padding="20px" border-radius="6px">
+                <mj-text align="right">
+                    <span style="display:inline-block; border: 2px solid red; color: red; font-weight: bold; font-size: 28px; padding: 4px 10px;">SECRET</span>
+                </mj-text>
+
+                <mj-text>
+                    <p>Dear <span style="color:blue">{{name}}</span></p>
+                </mj-text>
+
+                <mj-text>
+                    <p>Mitsubishi Elevator Asia Company Limited is sending with regard to Electronic Letter of Annual Salary
+            Increment / Position Promotion / Job Level Change period  <span style="color:blue">{{period}}</span> You
+            may review by downloading the attachment (PDF) and information security is top priority, please enter your
+            password 8 digits by using your date of birth via format “YYYYMMDD” </p>
+                </mj-text>
+
+                <mj-text>
+                    <p><span style="text-decoration:underline;font-weight: bold;">Example:</span> If your date of birth is 1st
+            March 1990, your password is <span style="color:red">19900301</span></p>
+                </mj-text>
+
+                <mj-text>
+                    <div style="font-weight: bold;">Remark</div>
+                    <ul>
+                        <li>This is an auto-generated email, please do not reply.</li>
+                        <li>If you would like to make any changes to your e-mail address, please edit on HR System by yourself.</li>
+                        <li>Please review and if find some incorrect information or any enquiries, please contact HR Dept. Tel.1156 or 1159</li>
+                    </ul>
+                </mj-text>
+
+                <mj-text>
+                    <p style="text-decoration: underline;font-weight: bold;">Caution</p>
+                    <div><span style="font-style: italic; color:red;">Employees are strictly prohibited from altering or forging
+                Electronic Letter of Annual Salary Increment / Position Promotion / Job Level Change as this is
+                considered fraud</span>
+                        According to the regulations, Chapter 8, Sections 1.8, 1.8.1, “Employees must not change, forge, edit,
+            shorten, or destroy any company documents or documents that are related between the company and employees
+            without having authority to do so.”
+            If such actions are found, the company will consider punishment follow the company’s regulations.</div>
+                </mj-text>
+
+                <mj-text>
+                    <p>Your sincerely,<br />
+                        Human Resource Department<br />
+                        Mitsubishi Elevator Asia Company Limited</p>
+                </mj-text>
+            </mj-column>
+        </mj-section>
+
+        <!-- Footer -->
+        <mj-section background-color="#f1f5f9" padding="10px">
+            <mj-column>
+                <mj-text font-size="18px" color="#999999" align="center">
+                    This is an automated email. Please do not reply.
+                </mj-text>
+            </mj-column>
+        </mj-section>
+
+    </mj-body>
+</mjml>

@@ -61,6 +61,7 @@ export class AttcnfrmService {
             : d.path; // Get the destination path
         const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
         for (const file of d.files) {
+            file.originalname = file.originalname.replace(/\s+/g, '');
             const moved = await moveFileFromMulter({
                 file,
                 destination,

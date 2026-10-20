@@ -69,8 +69,8 @@ export class PromoteController {
     }
 
     @Post('send-mail')
-    // @UseGuards(AuthGuard('key'))
+    @UseGuards(AuthGuard('key'))
     async sendMail(@Request() req, @Body() body: any) {
-        return await this.docs.sendMail();
+        return await this.docs.sendMail(body);
     }
 }

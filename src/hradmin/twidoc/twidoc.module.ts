@@ -4,10 +4,11 @@ import { TwidocController } from './twidoc.controller';
 import { JobTwiController } from './jobtwi.controller';
 import { MasterkeyModule } from '../masterkey/masterkey.module';
 import { DatabaseService } from '../shared/database.service';
+import { MailModule } from 'src/common/services/mail/mail.module';
 
 @Module({
-  imports: [MasterkeyModule],
-  controllers: [TwidocController, JobTwiController],
-  providers: [TwidocService, DatabaseService],
+    imports: [MasterkeyModule, MailModule],
+    controllers: [TwidocController, JobTwiController],
+    providers: [TwidocService, DatabaseService],
 })
 export class TwidocModule {}

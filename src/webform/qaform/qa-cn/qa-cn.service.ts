@@ -748,8 +748,16 @@ export class QaCnService {
         //console.log('>>>>>>>>>');
         //console.log(to);
         //console.log('>>>>>>>>>');
+        this.logger.info(`in builmail before getapv`, {
+            context: 'approve',
+            logType: 'TestQACN',
+        });
 
         let rs = await this.repoCnform.getQueryBuilderResult(dto);
+        this.logger.info(`in builmail after getapv`, {
+            context: 'approve',
+            logType: 'TestQACN',
+        });
         const first = rs?.[0] ?? null;
 
         //return false;
@@ -842,7 +850,15 @@ export class QaCnService {
             subject: subject,
             html: html,
         };
+        this.logger.info(`before send mail `, {
+            context: 'approve',
+            logType: 'TestQACN',
+        });
         await this.mailService.sendMail(objmail);
+        this.logger.info(`after send mail `, {
+            context: 'approve',
+            logType: 'TestQACN',
+        });
     }
 
     private async processApprovalActions(

@@ -171,7 +171,7 @@ export class PromoteService {
             };
         } catch (error) {
             console.error('Error filling PDF template:', error);
-            throw new Error('Failed to fill PDF template');
+            throw new Error(`Failed to fill PDF template ${error}`);
         }
     }
 
@@ -309,11 +309,12 @@ export class PromoteService {
                 : `April ${body.ASYEAR}`;
         await this.mailService.sendMail({
             template: isJapanese
-                ? 'gpreport/promote/promote_en'
-                : 'gpreport/promote/promote_th',
+                ? 'gpreport/promote/en'
+                : 'gpreport/promote/th',
             from: `ส่วนทรัพยากรมนุษย์ <AMECMS@MitsubishiElevatorAsia.co.th>`,
-            to: `chalorms@MitsubishiElevatorAsia.co.th`,
-            subject: `(SECRET) AMEC Electronic Letter of Annual Salary Increment / Position Promotion / Job Level Period ${!isJapanese ? thperiod : enperiod}`,
+            // to: `chalorms@MitsubishiElevatorAsia.co.th`,
+            to: `s.chalormsak@gmail.com`,
+            subject: `[SECRET] AMEC Electronic Letter of Annual Salary Increment / Position Promotion / Job Level Period ${!isJapanese ? thperiod : enperiod}`,
             context: {
                 name: !isJapanese ? body.STNAME : body.SNAME,
                 period: !isJapanese ? thperiod : enperiod,

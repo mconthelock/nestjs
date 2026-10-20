@@ -11,6 +11,7 @@ import { CnformService } from './cnform.service';
 import { CreateCnformDto } from './dto/create-cnform.dto';
 import { UpdateCnformDto } from './dto/update-cnform.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';
+import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 @Controller('cnform')
 export class CnformController {

@@ -46,7 +46,7 @@ export class CnformService {
     }
 
     async getApvEmail(con: FormDto, type: string) {
-        const res = await this.repo.getApvEmail(con, type);
+        return await this.repo.getApvEmail(con, type);
     }
 
     remove(id: number) {

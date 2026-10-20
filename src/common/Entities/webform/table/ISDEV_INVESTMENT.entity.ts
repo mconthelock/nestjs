@@ -12,7 +12,7 @@ export class ISDEV_INVESTMENT {
     CYEAR: string;
 
     @PrimaryColumn()
-    CYEAR2: number;
+    CYEAR2: string;
 
     @PrimaryColumn()
     NRUNNO: number;

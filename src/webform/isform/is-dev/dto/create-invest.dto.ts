@@ -16,10 +16,10 @@ export class CreateInvestDto {
     @Type(() => String)
     CYEAR?: string;
 
+    @IsString()
     @IsOptional()
-    @IsNumber()
-    @Type(() => Number)
-    CYEAR2?: number;
+    @Type(() => String)
+    CYEAR2?: string;
 
     @IsOptional()
     @IsNumber()

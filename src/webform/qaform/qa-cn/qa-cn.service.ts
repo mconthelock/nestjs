@@ -724,6 +724,8 @@ export class QaCnService {
 
         let rs = await this.repoCnform.getQueryBuilderResult(dto);
         const first = rs?.[0] ?? null;
+
+        //return false;
         let subject = '';
         let html = '';
         if (mtype == 'ALL') {
@@ -773,12 +775,14 @@ export class QaCnService {
                 html += `<div>Part Name: ${first.PRTNAME}</div>`;
                 let i = 1;
                 for (const row of rs) {
+                    console.log(row.RESULT);
+
                     if (i == 1) {
                         html += `<div>Drawing No.: ${row.DWGNO}</div>`;
                     } else {
                         html += `<div>&nbsp;&nbsp;&nbsp;&nbsp; ${row.DWGNO}</div>`;
                     }
-                    html += `<div>Status: ${row.RESULT === '0' ? "<font color='green'>OK</font>" : row.RESULT === '1' ? "<font color='red'>NG</font>" : ''}</div>`;
+                    html += `<div>Status: ${row.RESULT === 0 ? "<font color='green'>OK</font>" : row.RESULT === 1 ? "<font color='red'>NG</font>" : ''}</div>`;
                     i++;
                 }
             }
@@ -801,6 +805,7 @@ export class QaCnService {
                 }
             }
         }
+
         if (!to || !subject || !html) {
             throw new Error('Mail data is incomplete');
         }

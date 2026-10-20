@@ -69,6 +69,18 @@ export class CmSmRepository extends BaseRepository {
         });
     }
 
+    async createBlank(TINO: string, REVNO: string, empno?: string) {
+        const repository = this.getRepository(CM_SM_FORM);
+        await repository.insert({
+            TINO,
+            REVNO,
+            COUNT_ALERT: 0,
+            UPDATED_BY: empno,
+            UPDATED_AT: new Date(),
+        });
+        return this.findOne(TINO, REVNO);
+    }
+
     updateCountAlert(TINO: string, REVNO: string, count: number) {
         return this.getRepository(CM_SM_FORM).update(
             { TINO, REVNO },

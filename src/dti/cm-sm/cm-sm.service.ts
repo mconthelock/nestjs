@@ -33,7 +33,15 @@ export class CmSmService {
     }
 
     async alertEmail(TINO: string, REVNO: string, empno: string) {
-        const data = await this.cmSmRepository.findOne(TINO, REVNO);
+        if (!TINO || !REVNO) {
+            throw new BadRequestException('TINO and REVNO are required');
+        }
+
+        // CM_SM row may not exist yet (source data lives in DTIH); create a blank one to track the count
+        let data = await this.cmSmRepository.findOne(TINO, REVNO);
+        if (!data) {
+            data = await this.cmSmRepository.createBlank(TINO, REVNO, empno);
+        }
         if (!data) {
             throw new NotFoundException(`CM-SM record not found: ${TINO}/${REVNO}`);
         }
@@ -52,7 +60,7 @@ export class CmSmService {
             REVNO,
             series: data.DTIH?.MODEL ?? data.DTIH?.PRODTY ?? '',
             reminderLabel,
-            sentBy: empno,
+            sentBy: empno, 
             toDepartment: 'EME, EEL',
             ccDepartment: 'EAS',
             detailUrl: "http://localhost:8080/dtiprogram/CM_SM/main",

@@ -18,9 +18,9 @@ export class CmSmController {
 
   @Post('alert-email')
   alertEmail(
-    @Query('TINO') TINO: string,
-    @Query('REVNO') REVNO: string,
-    @Query('empno') empno: string,
+    @Body('TINO') TINO: string,
+    @Body('REVNO') REVNO: string,
+    @Body('empno') empno: string,
   ) {
     return this.cmSmService.alertEmail(TINO, REVNO, empno);
   }

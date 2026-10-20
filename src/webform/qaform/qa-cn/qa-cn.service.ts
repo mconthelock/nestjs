@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateQaCnDto } from './dto/create-qa-cn.dto';
 import { UpdateQaCnDto } from './dto/update-qa-cn.dto';
 import { In } from 'typeorm';
@@ -17,16 +17,18 @@ import { J736kpService } from 'src/as400/rtnlibf/j736kp/j736kp.service';
 import { now } from 'src/common/utils/dayjs.utils';
 import { deleteFile, joinPaths } from 'src/common/utils/files.utils';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
-import { log } from 'node:console';
 import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { R027Mp1Service } from 'src/as400/datalibo/r027mp1/r027mp1.service';
 import { FormService } from 'src/webform/form/form.service';
 import { MailService } from 'src/common/services/mail/mail.service';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Injectable()
 export class QaCnService {
     constructor(
+        @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
         private readonly formCreateService: FormCreateService,
         private readonly flowService: FlowService,
         private readonly repoOrgPos: OrgposRepository,
@@ -380,7 +382,15 @@ export class QaCnService {
                     },
                     ip,
                 );
+                this.logger.info(`do Action successs`, {
+                    context: 'approve',
+                    logType: 'TestQACN',
+                });
                 if (confirm.status) {
+                    this.logger.info(`before process `, {
+                        context: 'approve',
+                        logType: 'TestQACN',
+                    });
                     await this.processApprovalActions(
                         dto,
                         currentForm,
@@ -388,6 +398,10 @@ export class QaCnService {
                         path,
                         fileMappings,
                     );
+                    this.logger.info(` process success`, {
+                        context: 'approve',
+                        logType: 'TestQACN',
+                    });
                     const formStatus =
                         await this.formCreateService.getFormStatus({
                             ...currentForm,
@@ -396,19 +410,32 @@ export class QaCnService {
                         if (formStatus == '3' && MSTATUS == '1') {
                             await this.createcnng(currentForm, ip);
                         }
+
                         let mstatus = MSTATUS == '1' ? 'PIC' : 'ALL';
+                        this.logger.info(`Before sendmail`, {
+                            context: 'approve',
+                            logType: 'TestQACN',
+                        });
                         const toEmail = (
                             await this.repoCnform.getApvEmail(
                                 currentForm,
                                 mstatus,
                             )
                         ).map((item) => item.EMAIL);
+                        this.logger.info(`Before To sendmail`, {
+                            context: 'approve',
+                            logType: 'TestQACN',
+                        });
                         await this.buildmail(
                             currentForm,
                             mstatus,
                             formStatus,
                             toEmail,
                         );
+                        this.logger.info(`After  sendmail`, {
+                            context: 'approve',
+                            logType: 'TestQACN',
+                        });
                     } else if (STEPREADY == '06' && MSTATUS == '1') {
                         const toEmail = (
                             await this.repoCnform.getApvEmail(

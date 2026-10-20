@@ -25,6 +25,7 @@ import { cloneRows } from '../../common/helpers/file-excel.helper';
 import { DatabaseService } from '../shared/database.service';
 import * as oracledb from 'oracledb';
 const fontkit = require('@pdf-lib/fontkit');
+import { MailService } from 'src/common/services/mail/mail.service';
 
 @Injectable()
 export class TwidocService {
@@ -33,8 +34,16 @@ export class TwidocService {
     protected fontstyle: any;
     protected fontsize: number;
     protected output_path: string;
+    protected libs: { id: string; path: string }[] = [
+        { id: 'MP', path: 'Non-Manager' },
+        { id: 'MG', path: 'Manager' },
+        { id: 'JP', path: 'Japanese' },
+    ];
 
-    constructor(private dbService: DatabaseService) {}
+    constructor(
+        private dbService: DatabaseService,
+        private mailService: MailService,
+    ) {}
 
     async findAll(credentials: any, body: any) {
         let hrAdminDataSource: DataSource;
@@ -95,10 +104,10 @@ export class TwidocService {
                 await this.dbService.getHrAdminCredentials(credentials);
             const result = await conn.execute(
                 `DECLARE v_cursor SYS_REFCURSOR;
-        BEGIN
-            TWIEMPLOYEE(:KEYVALUE, :NYEAR, :EMPID, v_cursor);
-            :result := v_cursor;
-        END;`,
+                BEGIN
+                    TWIEMPLOYEE(:KEYVALUE, :NYEAR, :EMPID, v_cursor);
+                    :result := v_cursor;
+                END;`,
                 {
                     KEYVALUE: passcode,
                     NYEAR: body.year,
@@ -135,8 +144,8 @@ export class TwidocService {
                 await this.dbService.getHrAdminCredentials(credentials);
             const result = await conn.execute(
                 `UPDATE MHEPAYTWI
-          SET TWIADDINCOME = :income, TWIADDTAX= :tax, TWIADDUSER = :admin, TWIADDUPDATE = SYSDATE
-          WHERE TWIEMPCOD = :empno AND TWIYEAR = :year`,
+                SET TWIADDINCOME = :income, TWIADDTAX= :tax, TWIADDUSER = :admin, TWIADDUPDATE = SYSDATE
+                WHERE TWIEMPCOD = :empno AND TWIYEAR = :year`,
                 {
                     empno: body.empno,
                     year: body.year,
@@ -161,21 +170,15 @@ export class TwidocService {
     }
 
     async createFile(data: any) {
-        const libs = [
-            { id: 'MP', path: 'Non-Manager' },
-            { id: 'MG', path: 'Manager' },
-            { id: 'JP', path: 'Japanese' },
-        ];
-
         try {
             const templatePath = path.join(
                 `${process.env.TAX_FILE_PATH}/Template/`,
                 'Withholding Tax Certificate.pdf',
             );
 
-            let dir = libs.find((e) => e.id == data.EMPPOSITION).path;
+            let dir = this.libs.find((e) => e.id == data.TWITYPE).path;
             if (!dir) dir = 'Non-Manager';
-            this.output_path = `${process.env.TAX_FILE_PATH}/${dir}/Withholding Tax Certificate (50 ทวิ)/${data.TWIYEAR}/`;
+            this.output_path = `${process.env.TAX_FILE_PATH}${dir}/Withholding Tax Certificate (50 ทวิ)/${data.TWIYEAR}/`;
             const fontPath = path.join(
                 process.cwd(),
                 'public/fonts/THSarabun.ttf',
@@ -192,33 +195,28 @@ export class TwidocService {
             this.fontsize = 14;
             this.pdfpage = pages[0];
             await this.setPdfValue(data);
-            //   await drawGrid(this.pdfpage, 10);
+            // await drawGrid(this.pdfpage, 10);
             this.fontsize = 14;
             this.pdfpage = pages[1];
             await this.setPdfValue(data);
-
             const pdfBytes = await this.pdfdoc.save();
 
             await fs.mkdir(this.output_path, { recursive: true });
-            const output = path.join(this.output_path, `_${data.EMPCOD}.pdf`);
+            const output = path.join(this.output_path, `_${data.SEMPNO}.pdf`);
             await fs.writeFile(output, pdfBytes);
             await protectedFile({
                 output_path: this.output_path,
-                input: `_${data.EMPCOD}.pdf`,
-                output: `${data.EMPCOD}.pdf`,
+                input: `_${data.SEMPNO}.pdf`,
+                output: `${data.SEMPNO}.pdf`,
                 userpassword: data.PSNBDT,
                 adminpassword: data.passkey,
                 delete_input: true,
             });
+            await fs.unlink(path.join(this.output_path, `_${data.SEMPNO}.pdf`));
             return {
                 dir,
-                empno: data.EMPCOD,
-                mail: data.MEMEML,
-                th_name: data.EMPNMT,
-                th_period: data.TWIYEAR + 543,
-                en_name: data.SNAME,
-                en_period: data.TWIYEAR,
-                file: path.join(this.output_path, `${data.EMPCOD}.pdf`),
+                folder: this.output_path,
+                filename: `${data.SEMPNO}.pdf`,
             };
         } catch (error) {
             console.error('Error filling PDF template:', error);
@@ -246,9 +244,9 @@ export class TwidocService {
         const lastmonth = dayjs().month(month - 1).format('MMM');
         const periodText = data.TWIEND == 1 ? `ม.ค.` : `ม.ค. - ${lastmonth}`;
         writeLineBox({...lineOption, text: data.SEQ_NO.toString(), boxX: 505, boxY: 50, boxWidth: 50, boxHeight: 10, align: 'center'});
-        writeLineBox({...lineOption, text: data.EMPNMT, boxX: 60, boxY: 163, boxWidth: 200, boxHeight: 15, align: 'left'});
-        writeLineBox({...lineOption, text: this.formatPNID(data.PSNIDN), boxX: 450, boxY: 148, boxWidth: 120, boxHeight: 15, align: 'left'});
-        writeLineBox({...lineOption, text: this.formatPNID(data.PSNIDN), boxX: 450, boxY: 165, boxWidth: 120, boxHeight: 15, align: 'left'});
+        writeLineBox({...lineOption, text: `${data.SEMPPRT}${data.STNAME}`, boxX: 60, boxY: 163, boxWidth: 200, boxHeight: 15, align: 'left'});
+        writeLineBox({...lineOption, text: this.formatPNID(data.TWIEMPTAX), boxX: 450, boxY: 148, boxWidth: 120, boxHeight: 15, align: 'left'});
+        writeLineBox({...lineOption, text: this.formatPNID(data.TWIEMPTAX), boxX: 450, boxY: 165, boxWidth: 120, boxHeight: 15, align: 'left'});
         writeLineBox({...lineOption, text: data.EMPADDR, boxX: 60, boxY: 195, boxWidth: 400, boxHeight: 15, align: 'left'});
         writeLineBox({...lineOption, text: data.SEQ_NO.toString(), boxX: 70, boxY: 222, boxWidth: 60, boxHeight: 15, align: 'center'});
         writeLineBox({...lineOption, text: periodText, boxX: 365, boxY: 293, boxWidth: 65, boxHeight: 10, align: 'center'});
@@ -329,5 +327,27 @@ export class TwidocService {
                 'Invalid template: Missing "Data" sheet.',
             );
         }
+    }
+
+    async sendMail(body: any) {
+        let dir = this.libs.find((e) => e.id == body.TWITYPE).path;
+        if (!dir) dir = 'Non-Manager';
+        const output_path = `${process.env.TAX_FILE_PATH}${dir}/Withholding Tax Certificate (50 ทวิ)/${body.TWIYEAR}/`;
+        const buffer = await fs.readFile(
+            path.join(output_path, `${body.SEMPNO}.pdf`),
+        );
+        const isJapanese = body.SEMPNO.substr(0, 1) == 'J' ? true : false;
+        await this.mailService.sendMail({
+            template: isJapanese ? 'gpreport/twi/en' : 'gpreport/twi/th',
+            from: `ส่วนทรัพยากรมนุษย์ <AMECMS@MitsubishiElevatorAsia.co.th>`,
+            to: `chalorms@MitsubishiElevatorAsia.co.th`,
+            subject: `AMEC Electronic Withholding Tax Certificate Tax Year`,
+            context: {
+                name: !isJapanese ? body.STNAME : body.SNAME,
+                taxYear: 2026,
+            },
+            attachments: [{ filename: `${body.SEMPNO}.pdf`, content: buffer }],
+        });
+        return true;
     }
 }

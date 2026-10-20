@@ -121,19 +121,17 @@ export class CnFormRepository extends BaseRepository {
             .where("E.CSTATUS = '1'");
 
         if (type === 'PIC') {
-            qb.andWhere(
-                new Brackets((qb2) => {
-                    qb2.orWhere(`E.SEMPNO IN (
-                    SELECT F.VAPVNO FROM FLOW F
+            qb.innerJoin(`(
+                    SELECT F.VAPVNO  AS EMPNO FROM FLOW F
                     WHERE F.NFRMNO = :nfrmno AND F.VORGNO = :vorgno
                       AND F.CYEAR = :cyear AND F.CYEAR2 = :cyear2 AND F.NRUNNO = :nrunno
                       AND F.CSTEPNO = '--'
-                )`).orWhere(`E.SEMPNO IN (
+                    UNION
                     SELECT F.VREPNO FROM FLOW F
                     WHERE F.NFRMNO = :nfrmno AND F.VORGNO = :vorgno
                       AND F.CYEAR = :cyear AND F.CYEAR2 = :cyear2 AND F.NRUNNO = :nrunno
                       AND F.CSTEPNO = '--'
-                )`).orWhere(`E.SEMPNO IN (
+                    UNION
                     SELECT C.ENG FROM CNSHOPPIC C
                     WHERE C.FM IN (
                         SELECT F2.VAPVNO FROM FLOW F2
@@ -141,9 +139,7 @@ export class CnFormRepository extends BaseRepository {
                           AND F2.CYEAR = :cyear AND F2.CYEAR2 = :cyear2 AND F2.NRUNNO = :nrunno
                           AND F2.CEXTDATA = '06'
                     )
-                )`);
-                }),
-            );
+                )`, 'P', 'P.EMPNO = E.SEMPNO');
         } else {
             // -------------------------------------------------------------
             // 📍 จุดที่เปลี่ยน: หาอีเมลจาก VAPVNO หรือ VREPNO แทน VREALAPV

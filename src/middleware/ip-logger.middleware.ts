@@ -1,5 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
+import { requestNamespace } from './request-id.middleware';
 
 @Injectable()
 export class IpLoggerMiddleware implements NestMiddleware {
@@ -9,6 +10,7 @@ export class IpLoggerMiddleware implements NestMiddleware {
       req.socket.remoteAddress;
     const route = `${req.method} ${req.originalUrl}`;
     (req as any).clientIp = ip;
+    requestNamespace.set('ip', ip);
     next();
   }
 }

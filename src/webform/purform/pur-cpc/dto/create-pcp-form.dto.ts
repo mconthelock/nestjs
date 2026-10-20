@@ -142,4 +142,9 @@ export class CreateFormDto {
     @ValidateNested({ each: true })
     @Type(() => PcpDetailsDto)
     DETAILS: PcpDetailsDto[];
+
+    @IsOptional()
+    @IsBoolean()
+    @ToBoolean()
+    isReturn?: boolean;
 }

@@ -98,7 +98,7 @@ export class CreatePurCpcService {
             );
 
             // สร้าง Price Approve Form
-            if (dto.STATUS === 2) {
+            if (dto.STATUS === 2 && !dto.isReturn) {
                 // นำ vendor ที่มี planner ซ้ำออก แล้ววนเอามาต่อกันโดย G, A
                 const planner = dto.DETAILS.map((detail) => detail.VPLANNER)
                     .filter((v, i, a) => a.indexOf(v) === i)

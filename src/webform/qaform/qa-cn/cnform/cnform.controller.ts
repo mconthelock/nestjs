@@ -10,6 +10,7 @@ import {
 import { CnformService } from './cnform.service';
 import { CreateCnformDto } from './dto/create-cnform.dto';
 import { UpdateCnformDto } from './dto/update-cnform.dto';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Controller('cnform')
 export class CnformController {
@@ -38,5 +39,11 @@ export class CnformController {
     @Delete(':id')
     remove(@Param('id') id: string) {
         return this.cnformService.remove(+id);
+    }
+
+    @Post('getapv')
+    getApvEmail(@Body() con: Partial<FormDto> & { type: string }) {
+        const { type, ...form } = con;
+        return this.cnformService.getApvEmail(form as FormDto, type);
     }
 }

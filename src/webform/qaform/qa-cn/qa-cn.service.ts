@@ -528,6 +528,9 @@ export class QaCnService {
                         },
                         CSTEPST: '2',
                         VREMARK: REMARK,
+                        CAPVSTNO: '0',
+                        DAPVDATE: null,
+                        CAPVTIME: '',
                     });
                     await this.flowService.updateFlow({
                         condition: {
@@ -535,7 +538,7 @@ export class QaCnService {
                             CEXTDATA: '03',
                         },
                         CSTEPST: '3',
-                        CAPVSTNO: '',
+                        CAPVSTNO: '0',
                         DAPVDATE: null,
                         CAPVTIME: '',
                     });
@@ -555,6 +558,9 @@ export class QaCnService {
                         },
                         CSTEPST: '2',
                         VREMARK: REMARK,
+                        CAPVSTNO: '0',
+                        DAPVDATE: null,
+                        CAPVTIME: '',
                     });
                     await this.flowService.updateFlow({
                         condition: {
@@ -562,7 +568,7 @@ export class QaCnService {
                             CEXTDATA: '02',
                         },
                         CSTEPST: '3',
-                        CAPVSTNO: '',
+                        CAPVSTNO: '0',
                         DAPVDATE: null,
                         CAPVTIME: '',
                     });

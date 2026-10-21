@@ -28,6 +28,6 @@ import { PurPraModule } from '../pur-pra/pur-pra.module';
         PurcpcProcCompareViewRepository,
         PurcpcProcItemDetailRepository,
     ],
-    exports: [CreatePurCpcService],
+    exports: [CreatePurCpcService, PurCpcService],
 })
 export class PurCpcModule {}

@@ -1,4 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { FlowService } from 'src/webform/flow/flow.service';
 import { CreatePurPraFormDto } from '../dto/create-pur-pra-form.dto';
 import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
@@ -10,8 +11,11 @@ import { ReasonRepository } from '../repository/reason.repository';
 import { FormService } from 'src/webform/form/form.service';
 import { FormLinkService } from 'src/webform/form-link/form-link.service';
 import { joinPaths } from 'src/common/utils/files.utils';
-import { CreatePurCpcService } from '../../pur-cpc/services/purcpc_create.service';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
+import { PurCpcService } from '../../pur-cpc/services/purcpc_form.service';
+import { ImanageFlow, IinsertFile } from '../interface/create.interface';
+import { InsertFlowStepService } from 'src/webform/flow/insert-flow-step.service';
+import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
 
 @Injectable()
 export class PurPraCreateService {
@@ -23,9 +27,12 @@ export class PurPraCreateService {
         private readonly formLinkService: FormLinkService,
         private readonly praFormRepo: FormRepository,
         private readonly praReasonRepo: ReasonRepository,
-        @Inject(forwardRef(() => CreatePurCpcService))
-        private readonly purCpcService: CreatePurCpcService,
+        @Inject(forwardRef(() => PurCpcService))
+        private readonly purCpcService: PurCpcService,
         private readonly doactionService: DoactionFlowService,
+        private readonly flowService: FlowService,
+        private readonly insertFlowService: InsertFlowStepService,
+        private readonly deleteFlowService: DeleteFlowStepService,
     ) {}
     protected readonly path =
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/PUR/PROPRA/` as string;
@@ -73,6 +80,12 @@ export class PurPraCreateService {
             const deleteLists: number[] = dto.DELETE_LISTS || [];
             // สร้างลิงก์ระหว่างฟอร์ม Price approval และ Price comparison
             await this.insertLink(form, dto.PRICE_COMPARE_NO);
+
+            // ตรวจสอบรายการและผลรวมเพื่อจัดการ flow
+            await this.manageFlow({
+                form,
+                priceComparisonNo: dto.PRICE_COMPARE_NO,
+            });
 
             // สร้าง Price approval form
             await this.createFormPRA(form, dto);
@@ -161,7 +174,7 @@ export class PurPraCreateService {
         if (!details || details.length === 0) {
             await this.praReasonRepo.delete(form);
             return;
-        }else{
+        } else {
             await this.praReasonRepo.delete(form);
         }
         const createReason = await this.praReasonRepo.create(
@@ -225,13 +238,7 @@ export class PurPraCreateService {
         files,
         deleteLists = [],
         mode,
-    }: {
-        form: FormDto;
-        createBy: string;
-        files: Express.Multer.File[];
-        deleteLists?: number[];
-        mode: number;
-    }) {
+    }: IinsertFile) {
         let code: string = '';
         if (mode == 1) {
             const files = await this.fileService.getFile({
@@ -285,6 +292,62 @@ export class PurPraCreateService {
                 },
                 file,
             );
+        }
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-21
+     * @description จัดการ flow ของแบบฟอร์มตามรายการและผลรวมของการเปรียบเทียบราคา
+     * @param form
+     * @param priceComparisonNo
+     */
+    private async manageFlow({ form, priceComparisonNo }: ImanageFlow) {
+        // ตรวจสอบรายการและผลรวมเพื่อจัดการ flow
+        let insertFlow: boolean = false;
+
+        const dim = await this.flowService.getFlow({
+            ...form,
+            CSTEPNO: '02',
+        });
+        const hasDim = dim && dim.length > 0;
+        const priceComparison =
+            await this.purCpcService.getForm(priceComparisonNo);
+        if (priceComparison.status) {
+            const data = priceComparison.data;
+            outerLoop: for (const item of data) {
+                if (item.NTOTAL_PRES >= 1000000 || item.NTOTAL_NEW >= 1000000) {
+                    insertFlow = true;
+                    break;
+                }
+
+                for (const detail of item.DETAILS) {
+                    if (
+                        detail.NPRES_AMOUNT >= 10000 ||
+                        detail.NNEW_AMOUNT >= 10000
+                    ) {
+                        insertFlow = true;
+                        break outerLoop;
+                    }
+                }
+            }
+            // หากยังไม่มี dim และต้องการ insert flow
+            if (!hasDim && insertFlow) {
+                await this.insertFlowService.insertFlowStep({
+                    ...form,
+                    CTYPE: '1',
+                    BEFORESTEPNO: '57',
+                    NEWSTEPNO: '02',
+                    POSNO: '02',
+                });
+            }
+            // หากมี dim และต้องการลบ flow
+            else if (hasDim && !insertFlow) {
+                await this.deleteFlowService.deleteFlowStep({
+                    ...form,
+                    CSTEPNO: '02',
+                });
+            }
         }
     }
 }

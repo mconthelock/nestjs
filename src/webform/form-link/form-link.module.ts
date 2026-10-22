@@ -3,6 +3,7 @@ import { FormLinkService } from './form-link.service';
 import { FormLinkRepository } from './form-link.repository';
 
 @Module({
-  providers: [FormLinkService, FormLinkRepository],
+    providers: [FormLinkService, FormLinkRepository],
+    exports: [FormLinkService],
 })
 export class FormLinkModule {}

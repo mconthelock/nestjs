@@ -24,4 +24,8 @@ export class FinFileRepository extends BaseRepository {
     async create(dto: CreateHandleFileFormDto) {
         return await this.getRepository(FIN_FILE).save(dto);
     }
+
+    async deleteById(id: number) {
+        return this.getRepository(FIN_FILE).delete({ FILE_ID: id });
+    }
 }

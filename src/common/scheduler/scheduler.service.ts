@@ -46,7 +46,7 @@ export class SchedulerService implements OnModuleInit {
     }
 
     async onModuleInit() {
-        if (process.env.REDIS_DB == '1' || process.env.REDIS_DB == '2') {
+        if (process.env.REDIS_DB == '0' || process.env.REDIS_DB == '1') {
             await this.loadAndScheduleJobs();
             this.addLogCompressionJob(); // เพิ่ม cron job บีบอัด logs เก่าทุกวันเวลา 00:30
         }
@@ -57,6 +57,7 @@ export class SchedulerService implements OnModuleInit {
         const job = new CronJob('30 0 * * *', async () => {
             this.logger.info('Running automatic log compression...', {
                 context: 'SchedulerService',
+                logType: 'Scheduler',
             });
             try {
                 const response = await this.httpService.axiosRef.post(
@@ -68,11 +69,12 @@ export class SchedulerService implements OnModuleInit {
                 );
                 this.logger.info(
                     `Log compression completed: ${JSON.stringify(response.data.summary)}`,
-                    { context: 'SchedulerService' },
+                    { context: 'SchedulerService', logType: 'Scheduler' },
                 );
             } catch (error) {
                 this.logger.error(`Log compression failed: ${error.message}`, {
                     context: 'SchedulerService',
+                    logType: 'Scheduler',
                 });
             }
         });
@@ -81,7 +83,7 @@ export class SchedulerService implements OnModuleInit {
         job.start();
         this.logger.info(
             'Log compression cron job registered (daily at 00:30)',
-            { context: 'SchedulerService' },
+            { context: 'SchedulerService', logType: 'Scheduler' },
         );
     }
 
@@ -139,7 +141,7 @@ export class SchedulerService implements OnModuleInit {
             } catch (optionsError) {
                 this.logger.warn(
                     `Endpoint validation failed for ${url}: ${optionsError.message}`,
-                    { context: 'SchedulerService' },
+                    { context: 'SchedulerService', logType: 'Scheduler' },
                 );
                 return false;
             }
@@ -280,7 +282,7 @@ export class SchedulerService implements OnModuleInit {
         if (!cronExpression) {
             this.logger.warn(
                 `Skip scheduling job ${job.NAME} (${job.ID}): CRON_EXPRESSION is empty`,
-                { context: 'SchedulerService' },
+                { context: 'SchedulerService', logType: 'Scheduler' },
             );
             return;
         }
@@ -288,7 +290,7 @@ export class SchedulerService implements OnModuleInit {
         if (!this.isValidCronExpression(cronExpression)) {
             this.logger.warn(
                 `Skip scheduling job ${job.NAME} (${job.ID}): invalid cron expression "${cronExpression}"`,
-                { context: 'SchedulerService' },
+                { context: 'SchedulerService', logType: 'Scheduler' },
             );
             return;
         }
@@ -303,6 +305,7 @@ export class SchedulerService implements OnModuleInit {
         const cronJob = new CronJob(cronExpression, async () => {
             this.logger.info(`Executing job: ${job.NAME}`, {
                 context: 'SchedulerService',
+                logType: 'Scheduler',
             });
 
             await this.handleJobExecution(job);
@@ -312,9 +315,11 @@ export class SchedulerService implements OnModuleInit {
         cronJob.start();
         this.logger.info(`Scheduled job: ${job.NAME}`, {
             context: 'SchedulerService',
+            logType: 'Scheduler',
         });
         this.logger.info(`Scheduled Expression: ${job.CRON_EXPRESSION}`, {
             context: 'SchedulerService',
+            logType: 'Scheduler',
         });
     }
 
@@ -365,7 +370,7 @@ export class SchedulerService implements OnModuleInit {
             if (!acquired) {
                 this.logger.info(
                     `Job ${job.NAME} skipped - already running in another instance`,
-                    { context: 'SchedulerService' },
+                    { context: 'SchedulerService', logType: 'Scheduler' },
                 );
                 return;
             }
@@ -373,6 +378,7 @@ export class SchedulerService implements OnModuleInit {
 
         this.logger.info(`Executing job: ${job.NAME}`, {
             context: 'SchedulerService',
+            logType: 'Scheduler',
         });
         const startTime = new Date();
         let status = 'SUCCESS';
@@ -388,7 +394,7 @@ export class SchedulerService implements OnModuleInit {
             } catch (e) {
                 this.logger.warn(
                     `Invalid JSON parameters for job ${job.NAME}`,
-                    { context: 'SchedulerService' },
+                    { context: 'SchedulerService', logType: 'Scheduler' },
                 );
             }
 
@@ -401,6 +407,7 @@ export class SchedulerService implements OnModuleInit {
             responseCode = response.status;
             this.logger.info(`Job ${job.NAME} ${response.status}`, {
                 context: 'SchedulerService',
+                logType: 'Scheduler',
             });
         } catch (error) {
             status = 'FAILED';
@@ -408,11 +415,13 @@ export class SchedulerService implements OnModuleInit {
             responseCode = error.response?.status || 500;
             this.logger.error(`Job failed: ${message}`, {
                 context: 'SchedulerService',
+                logType: 'Scheduler',
             });
             throw new Error(`Job ${job.NAME} failed: ${message}`);
         } finally {
             this.logger.info(`Job ${job.NAME} finally`, {
                 context: 'SchedulerService',
+                logType: 'Scheduler',
             });
             const endTime = new Date();
             await this.logRepo.save({
@@ -427,6 +436,7 @@ export class SchedulerService implements OnModuleInit {
             await this.jobRepo.update(job.ID, { LAST_RUN_AT: endTime });
             this.logger.info(`Job ${job.NAME} insert log`, {
                 context: 'SchedulerService',
+                logType: 'Scheduler',
             });
         }
     }

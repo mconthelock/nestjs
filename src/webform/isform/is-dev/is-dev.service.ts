@@ -52,9 +52,9 @@ export class IsDevService {
     }
 
     async create(
-        dto: CreateIsDevDto,
-        files: Express.Multer.File[],
         ip: string,
+        dto: CreateIsDevDto,
+        files?: Express.Multer.File[],
     ) {
         try {
             let form: FormDto;
@@ -83,8 +83,8 @@ export class IsDevService {
             };
             await this.repo.create({ ...form, ...dto });
             // Insert file
-            for (const file of files) {
-                const createFile = await this.fileService.insertFiles(
+            for (const file of files ?? []) {
+                await this.fileService.insertFiles(
                     {
                         ...form,
                         FORM_TYPE: 'IS',
@@ -96,21 +96,28 @@ export class IsDevService {
             }
 
             if (dto.benefit) {
-                const benefitData = { ...form, ...dto?.benefit };
-                await this.repo.createBenefit(benefitData);
+                for (const bf of dto?.benefit) {
+                    const benefitData = { ...form, ...bf };
+                    await this.repo.createBenefit(benefitData);
+                }
             }
 
             if (dto.manhours) {
-                const manhoursData = { ...form, ...dto?.manhours };
-                await this.repo.createManhours(manhoursData);
+                for (const mh of dto?.manhours) {
+                    const manhoursData = { ...form, ...mh };
+                    await this.repo.createManhours(manhoursData);
+                }
             }
 
             if (dto.invest) {
-                const investData = { ...form, ...dto?.invest };
-                await this.repo.createInvest(investData);
+                for (const inv of dto?.invest) {
+                    const investData = { ...form, ...inv };
+                    await this.repo.createInvest(investData);
+                }
             }
         } catch (error) {
-            throw new Error('Request PRO-VMM Form Error: ' + error.message);
+            console.log(error);
+            throw new Error('Request IS-DEV Form Error: ' + error.message);
         }
     }
 

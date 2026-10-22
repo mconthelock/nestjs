@@ -28,7 +28,7 @@ export class CreateBenefitDto {
 
     @IsNumber()
     @Type(() => Number)
-    BENEFIT_TYPE: number;
+    BENEFIT: number;
 
     @IsNumber()
     @Type(() => Number)

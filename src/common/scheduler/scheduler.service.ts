@@ -46,7 +46,7 @@ export class SchedulerService implements OnModuleInit {
     }
 
     async onModuleInit() {
-        if (process.env.REDIS_DB == '1' || process.env.REDIS_DB == '2') {
+        if (process.env.REDIS_DB == '0' || process.env.REDIS_DB == '1') {
             await this.loadAndScheduleJobs();
             this.addLogCompressionJob(); // เพิ่ม cron job บีบอัด logs เก่าทุกวันเวลา 00:30
         }

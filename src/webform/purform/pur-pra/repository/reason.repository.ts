@@ -3,7 +3,7 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { PURPRA_REASONS } from 'src/common/Entities/webform/table/PURPRA_REASONS.entity';
-import type { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Injectable()
 export class ReasonRepository extends BaseRepository {

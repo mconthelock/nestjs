@@ -28,18 +28,27 @@ export class PriceComparisonPlannerDto extends PickType(PriceComparisonDto, [
 }
 
 export class PriceComparisonListDto {
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    VREQNO: string;
+    VREQNO?: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    NSTATUS: number;
+    NSTATUS?: number;
 
     @IsOptional()
     @IsString()
     VFORMNO?: string;
+
+    @IsOptional()
+    @IsString()
+    CYEAR2?: string;
+
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    NRUNNO?: number;
 }
 
 export class PriceComparisonItemDetailDto extends PickType(PriceComparisonDto, [

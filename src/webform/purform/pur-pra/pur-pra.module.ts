@@ -13,6 +13,7 @@ import { FormmstModule } from 'src/webform/formmst/formmst.module';
 import { FormLinkModule } from 'src/webform/form-link/form-link.module';
 import { PurCpcModule } from '../pur-cpc/pur-cpc.module';
 import { FlowModule } from 'src/webform/flow/flow.module';
+import { KeyLinkRepository } from './repository/keyLink.repository';
 
 @Module({
     imports: [
@@ -34,10 +35,8 @@ import { FlowModule } from 'src/webform/flow/flow.module';
         FormRepository,
         ReasonRepository,
         ReasonsMasterRepository,
+        KeyLinkRepository,
     ],
-    exports: [
-        PurPraService,
-        PurPraCreateService,
-    ]
+    exports: [PurPraService, PurPraCreateService],
 })
 export class PurPraModule {}

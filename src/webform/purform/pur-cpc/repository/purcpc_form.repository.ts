@@ -20,6 +20,8 @@ export class PurCpcRepository extends BaseRepository {
                 {
                     VREQNO: data.VREQNO,
                     NSTATUS: data.NSTATUS,
+                    CYEAR2: data.CYEAR2,
+                    NRUNNO: data.NRUNNO,
                 },
                 {
                     VFORMNO: data.VFORMNO,

@@ -4,6 +4,8 @@ import { GroupRepository } from '../repository/group.repository';
 import { ReasonsMasterRepository } from '../repository/reasons-master.repository';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { FormRepository } from '../repository/form.repository';
+import { KeyLinkRepository } from '../repository/keyLink.repository';
+import { KeyLinkDto } from '../dto/key-link.dto';
 
 @Injectable()
 export class PurPraService {
@@ -12,13 +14,14 @@ export class PurPraService {
         private readonly groupRepo: GroupRepository,
         private readonly reasonsRepo: ReasonsMasterRepository,
         private readonly purPraFormRepo: FormRepository,
+        private readonly keyLinkRepo: KeyLinkRepository,
     ) {}
 
     /**
      * @author Sutthipong Tangmongkhoncharoen(24008)
      * @since 2026-10-05
      * @description ดึงข้อมูลคณะกรรมการทั้งหมด
-     * @returns 
+     * @returns
      */
     async getCommittees() {
         try {
@@ -42,7 +45,7 @@ export class PurPraService {
      * @author Sutthipong Tangmongkhoncharoen(24008)
      * @since 2026-10-05
      * @description ดึงข้อมูลกลุ่มทั้งหมด
-     * @returns 
+     * @returns
      */
     async getGroups() {
         try {
@@ -67,7 +70,7 @@ export class PurPraService {
      * @since 2026-10-06
      * @description ดึงข้อมูลเหตุผลตามกลุ่ม
      * @param groupCode รหัสกลุ่ม
-     * @returns 
+     * @returns
      */
     async getReasonsByGroup(groupCode: string) {
         try {
@@ -91,8 +94,8 @@ export class PurPraService {
      * @author Sutthipong Tangmongkhoncharoen(24008)
      * @since 2026-10-13
      * @description ดึงข้อมูลแบบฟอร์ม Price Approval
-     * @param form 
-     * @returns 
+     * @param form
+     * @returns
      */
     async getPurPraForms(form: FormDto) {
         try {
@@ -105,6 +108,31 @@ export class PurPraService {
                 : {
                       status: true,
                       message: `Price Approval form found`,
+                      data: res,
+                  };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-21
+     * @description ดึงข้อมูล Key Link
+     * @param data
+     * @returns
+     */
+    async keyLink(data: KeyLinkDto) {
+        try {
+            const res = await this.keyLinkRepo.findOne(data);
+            return !res
+                ? {
+                      status: false,
+                      message: 'No key link found',
+                  }
+                : {
+                      status: true,
+                      message: `Key link found`,
                       data: res,
                   };
         } catch (error) {

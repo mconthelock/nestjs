@@ -15,12 +15,15 @@ import { CreatePurPraFormDto } from '../dto/create-pur-pra-form.dto';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
 import { FormDto } from 'src/webform/form/dto/form.dto';
+import { FormService } from 'src/webform/form/form.service';
+import { KeyLinkDto } from '../dto/key-link.dto';
 
 @Controller('purform/pur-pra')
 export class PurPraController {
     constructor(
         private readonly service: PurPraService,
         private readonly createService: PurPraCreateService,
+        private readonly formService: FormService,
     ) {}
 
     /**
@@ -118,7 +121,22 @@ export class PurPraController {
      * @returns ผลลัพธ์การค้นหาแบบฟอร์ม Price Approval
      */
     @Post('form')
-    getPurPraForms(@Body() form: FormDto) {
+    async getPurPraForms(@Body() form: FormDto | string) {
+        if (typeof form === 'string') {
+            form = await this.formService.getPkByFormno(form);
+        }
         return this.service.getPurPraForms(form);
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-21
+     * @description ดึงข้อมูล Key Link
+     * @param data
+     * @returns
+     */
+    @Post('key-link')
+    async keyLink(@Body() data: KeyLinkDto) {
+        return await this.service.keyLink(data);
     }
 }

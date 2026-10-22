@@ -61,4 +61,7 @@ export class PURCPC_FORM_LISTS_VIEW {
 
     @ViewColumn()
     VSYSTEM: string;
+
+    @ViewColumn()
+    PRICE_APV_FORM: string;
 }

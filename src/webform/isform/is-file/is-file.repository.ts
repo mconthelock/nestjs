@@ -39,4 +39,8 @@ export class IsFileRepository extends BaseRepository {
     async create(dto: CreateIsFileDto) {
         return await this.getRepository(IS_FILE).save(dto);
     }
+
+    async deleteById(id: number) {
+        return this.getRepository(IS_FILE).delete({ FILE_ID: id });
+    }
 }

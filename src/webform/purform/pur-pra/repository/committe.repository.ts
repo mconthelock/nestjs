@@ -2,15 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { PURCPC_FORM } from 'src/common/Entities/webform/table/PURCPC_FORM.entity';
+import { PURPRA_COMMITTEE } from 'src/common/Entities/webform/table/PURPRA_COMMITTEE.entity';
 
 @Injectable()
-export class PurCpcRepository extends BaseRepository {
+export class CommitteeRepository extends BaseRepository {
     constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
-    create(data: any){
-        return this.getRepository(PURCPC_FORM).save(data);
+    findAll() {
+        return this.getRepository(PURPRA_COMMITTEE).find({
+            order: {
+                NSEQ: 'ASC'
+            }
+        });
     }
 }

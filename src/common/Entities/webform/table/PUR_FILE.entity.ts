@@ -10,6 +10,8 @@ import { PURCPM_FORM } from './PURCPM_FORM.entity';
 import { PURNVF_FORM } from './PURNVF_FORM.entity';
 import { PUREVA_FORM } from './PUREVA_FORM.entity';
 import { PURVMM_FORM } from './PURVMM_FORM.entity';
+import { PURPRA_FORM } from './PURPRA_FORM.entity';
+import { FORM_ATTACHMENT_TYPE } from './FORM_ATTACHMENT_TYPE.entity';
 
 @Entity({ name: 'PUR_FILE', schema: 'WEBFORM' })
 export class PUR_FILE {
@@ -89,4 +91,16 @@ export class PUR_FILE {
     @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
     @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
     MASTER_VMM: PURVMM_FORM;
+
+    @ManyToOne(() => PURPRA_FORM, (pra) => pra.FILES)
+    @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+    @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
+    @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
+    @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+    @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+    PURPRA_FORM: PURPRA_FORM;
+
+    @OneToOne(() => FORM_ATTACHMENT_TYPE)
+    @JoinColumn({ name: 'FILE_TYPE', referencedColumnName: 'NID' })
+    TYPE: FORM_ATTACHMENT_TYPE;
 }

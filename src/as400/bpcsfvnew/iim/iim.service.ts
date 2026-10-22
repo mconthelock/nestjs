@@ -99,4 +99,24 @@ export class IimService {
             `);
         return result;
     }
+
+    async findItemDetail(iprod: string | string[]) {
+        const result = await this.conn.runQuery(`
+                SELECT 
+                    TRIM(I.IPROD) AS ITEM_CODE,
+                    TRIM(I.IPFDV) AS JOB_ITEMNO,
+                    TRIM(I.IDESC) AS PART_NAME,
+                    TRIM(I.IDRAW) AS DRAWING,
+                    TRIM(I.IGLNO) AS SPEC,
+                    TRIM(I.ISITM) AS MATERIAL_CODE,
+                    TRIM(I.IVEND) AS VENDOR,
+                    TRIM(A.VNDNAM) AS VENDOR_NAME,
+                    CASE WHEN TRIM(I2.IMKNM1) = '' THEN NULL ELSE I2.IMKNM1 END MAKER
+                FROM BPCSFVNEW.IIM I
+                LEFT JOIN BPCSFVNEW.AVM A ON A.VENDOR = I.IVEND
+                LEFT JOIN BPCSFVNEW.IIM2 I2 ON I2.IPROD = I.IPROD
+                WHERE I.IPROD ${Array.isArray(iprod) ? `IN (${iprod.map((code) => `'${code}'`).join(',')})` : `= '${iprod}'`}
+            `);
+        return result;
+    }
 }

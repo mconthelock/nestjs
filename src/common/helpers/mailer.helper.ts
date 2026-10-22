@@ -8,5 +8,7 @@ export function createMailTransporter(host?: string, port?: string | number) {
     tls: {
       rejectUnauthorized: false,
     },
+    // logger: true,
+    // debug: true,
   });
 }

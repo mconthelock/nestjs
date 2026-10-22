@@ -7,6 +7,7 @@ import { PurevaFormModule } from './pur-eva/pureva_form/pureva_form.module';
 import { PurEvaModule } from './pur-eva/pur-eva.module';
 import { PurVmmModule } from './pur-vmm/pur-vmm.module';
 import { PurCpcModule } from './pur-cpc/pur-cpc.module';
+import { PurPraModule } from './pur-pra/pur-pra.module';
 
 @Module({
     imports: [
@@ -17,7 +18,8 @@ import { PurCpcModule } from './pur-cpc/pur-cpc.module';
         PurevaFormModule,
         PurEvaModule,
         PurVmmModule,
-        PurCpcModule
+        PurCpcModule,
+        PurPraModule
     ],
 })
 export class PurFormModule {}

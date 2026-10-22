@@ -4,6 +4,12 @@ import { CondComparisonPriceRepository } from '../repository/cond_comparison_pri
 export class CondComparisonPriceService {
     constructor(private readonly repo: CondComparisonPriceRepository) {}
 
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-09-24
+     * @description รายการ functions
+     * @returns
+     */
     async getActive() {
         try {
             const res = await this.repo.getActive();

@@ -70,10 +70,6 @@ const skipSelectQuery = winston.format((info) => {
 });
 
 const skipBlankReqID = winston.format((info) => {
-    if (info.logType) {
-        return info;
-    }
-    if (info.context === 'SchedulerService') return info;
     if (
         info.requestId === undefined ||
         info.requestId === null ||
@@ -106,7 +102,13 @@ const onlyError = winston.format((info) => {
 });
 
 const onlyDebug = winston.format((info) => {
-    if (info.level === 'debug' && info.logType) return info;
+    if (info.level === 'debug' && info.logType && info.logType === 'debug')
+        return info;
+    return false;
+});
+
+const onlyScheduler = winston.format((info) => {
+    if (info.logType === 'Scheduler') return info;
     return false;
 });
 
@@ -210,6 +212,25 @@ export const winstonConfig = {
             format: winston.format.combine(
                 stripColors(),
                 onlyDebug(), // เขียนแค่ debug logs
+                ignoreTypeOrmEntities(),
+                addRequestId(),
+                addIp(),
+                winston.format.timestamp(),
+                winston.format.uncolorize(),
+                winston.format.json(),
+            ),
+        }),
+
+        new DailyRotateFile({
+            dirname: logDir,
+            filename: 'scheduler-%DATE%.log',
+            datePattern: 'YYYY-MM-DD',
+            zippedArchive: true,
+            maxFiles: '30d',
+            level: process.env.LOGGER_FILE,
+            format: winston.format.combine(
+                stripColors(),
+                onlyScheduler(), // เขียนแค่ scheduler logs
                 ignoreTypeOrmEntities(),
                 addRequestId(),
                 addIp(),

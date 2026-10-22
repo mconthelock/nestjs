@@ -1,6 +1,12 @@
 import { PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+    IsArray,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+} from 'class-validator';
 
 export class PriceComparisonDto {
     @IsNotEmpty()
@@ -49,6 +55,18 @@ export class PriceComparisonListDto {
     @IsNumber()
     @Type(() => Number)
     NRUNNO?: number;
+
+    @IsOptional()
+    @IsString()
+    VVENDOR?: string;
+
+    @IsOptional()
+    @IsString()
+    VSTATUS?: string;
+
+    @IsOptional()
+    @IsString()
+    VPLANNER_CODE?: string;
 }
 
 export class PriceComparisonItemDetailDto extends PickType(PriceComparisonDto, [

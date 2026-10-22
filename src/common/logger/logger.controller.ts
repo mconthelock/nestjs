@@ -8,7 +8,7 @@ import { PERFORMANCE_LOGGER } from './performance-logger.provider';
 
 @Controller('logger')
 export class LoggerController {
-    private logDir = process.env.LOGGER_DIR || 'logs/';
+    private logDir = process.env.LOGGER_READ_DIR ||process.env.LOGGER_DIR || 'logs/';
     constructor(
         private readonly logger: LoggerService,
         @Inject(PERFORMANCE_LOGGER) private readonly perfLogger: Logger,

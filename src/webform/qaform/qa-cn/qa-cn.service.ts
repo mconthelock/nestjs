@@ -384,12 +384,12 @@ export class QaCnService {
                 );
                 this.logger.debug(`do Action successs`, {
                     context: 'approve',
-                    logType: 'TestQACN',
+                    logType: 'debug',
                 });
                 if (confirm.status) {
                     this.logger.debug(`before process `, {
                         context: 'approve',
-                        logType: 'TestQACN',
+                        logType: 'debug',
                     });
                     await this.processApprovalActions(
                         dto,
@@ -400,7 +400,7 @@ export class QaCnService {
                     );
                     this.logger.debug(` process success`, {
                         context: 'approve',
-                        logType: 'TestQACN',
+                        logType: 'debug',
                     });
                     const formStatus =
                         await this.formCreateService.getFormStatus({
@@ -414,7 +414,7 @@ export class QaCnService {
                         let mstatus = MSTATUS == '1' ? 'PIC' : 'ALL';
                         this.logger.debug(`Before sendmail`, {
                             context: 'approve',
-                            logType: 'TestQACN',
+                            logType: 'debug',
                         });
                         const toEmail = (
                             await this.repoCnform.getApvEmail(
@@ -424,7 +424,7 @@ export class QaCnService {
                         ).map((item) => item.EMAIL);
                         this.logger.debug(`Before To sendmail`, {
                             context: 'approve',
-                            logType: 'TestQACN',
+                            logType: 'debug',
                         });
                         await this.buildmail(
                             currentForm,
@@ -434,7 +434,7 @@ export class QaCnService {
                         );
                         this.logger.debug(`After  sendmail`, {
                             context: 'approve',
-                            logType: 'TestQACN',
+                            logType: 'debug',
                         });
                     } else if (STEPREADY == '06' && MSTATUS == '1') {
                         const toEmail = (
@@ -756,13 +756,13 @@ export class QaCnService {
         //console.log('>>>>>>>>>');
         this.logger.debug(`in builmail before getapv`, {
             context: 'approve',
-            logType: 'TestQACN',
+            logType: 'debug',
         });
 
         let rs = await this.repoCnform.getQueryBuilderResult(dto);
         this.logger.debug(`in builmail after getapv`, {
             context: 'approve',
-            logType: 'TestQACN',
+            logType: 'debug',
         });
         const first = rs?.[0] ?? null;
 
@@ -858,12 +858,12 @@ export class QaCnService {
         };
         this.logger.debug(`before send mail `, {
             context: 'approve',
-            logType: 'TestQACN',
+            logType: 'debug',
         });
         await this.mailService.sendMail(objmail);
         this.logger.debug(`after send mail `, {
             context: 'approve',
-            logType: 'TestQACN',
+            logType: 'debug',
         });
     }
 

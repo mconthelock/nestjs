@@ -4,6 +4,7 @@ import { UpdateIetsDto } from './dto/update-ie-ts.dto';
 import { IetsFormRepository } from './iets_form/iets_form.repository';
 import { IetsListService } from './iets_list/iets_list.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
+import { VorgmstService } from 'src/webform/vorgmst/vorgmst.service';
 import { Request } from 'express';
 @Injectable()
 export class IeTsService {
@@ -11,10 +12,32 @@ export class IeTsService {
         protected readonly repotsf: IetsFormRepository,
         protected readonly servicetsl: IetsListService,
         private readonly formCreateService: FormCreateService,
+        private readonly orgService: VorgmstService,
     ) {}
     async request(dto: RequestIetsDto, ip: string) {
         try {
             const { REQBY, INPUTBY, DRAFT, REMARK, DWGLIST, ...data } = dto;
+            if (DWGLIST.length == 0) {
+                return {
+                    status: false,
+                    message: 'TP and TC not changed',
+                };
+            }
+
+            const uniqueItmNos = [
+                ...new Set(DWGLIST.map((item) => item.ITMNO)),
+            ];
+            if (uniqueItmNos.length == 0) {
+                return {
+                    status: false,
+                    message: 'Item no is empty',
+                };
+            }
+
+            const pic = await this.repotsf.getPicByItemNos(uniqueItmNos);
+            console.log(pic);
+
+            return false;
             const createForm = await this.formCreateService.create(
                 {
                     NFRMNO: dto.NFRMNO,
@@ -39,7 +62,7 @@ export class IeTsService {
             };
             const dataform = {
                 ...form,
-                JUN: dto.JUN,
+                JUN: dto.JUNG,
                 TSORGNO: dto.TSORGNO,
             };
             await this.repotsf.insert(dataform);
@@ -53,6 +76,18 @@ export class IeTsService {
         } catch (error) {
             throw new Error('Request IE-TS Form Error: ' + error.message);
         }
+    }
+
+    async getOrgMfg() {
+        const res = await this.orgService.findAllActive();
+        const filteredRes = res.filter(
+            (item) =>
+                item.VORGNO &&
+                item.VORGNO.startsWith('060') &&
+                item.VNAME &&
+                item.VNAME.includes('SEC'),
+        );
+        return filteredRes;
     }
 
     findAll() {

@@ -3,10 +3,12 @@ import { IeTsService } from './ie-ts.service';
 import { IeTsController } from './ie-ts.controller';
 import { IetsFormModule } from './iets_form/iets_form.module';
 import { IetsListModule } from './iets_list/iets_list.module';
+import { FormModule } from 'src/webform/form/form.module';
+import { VorgmstModule } from 'src/webform/vorgmst/vorgmst.module';
 
 @Module({
-  controllers: [IeTsController],
-  providers: [IeTsService],
-  imports: [IetsFormModule, IetsListModule],
+    controllers: [IeTsController],
+    providers: [IeTsService],
+    imports: [IetsFormModule, IetsListModule, FormModule, VorgmstModule],
 })
 export class IeTsModule {}

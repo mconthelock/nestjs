@@ -18,19 +18,24 @@ import {
 import { RequestIetsDto } from './dto/request-ie-ts.dto';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
-@Controller('ie-ts')
+@Controller('ieform/ie-ts')
 export class IeTsController {
     constructor(private readonly ieTsservice: IeTsService) {}
 
     private readonly path =
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/IE/IETS/` as string;
 
-    @Post()
+    @Post('create')
     @UseTransaction('webformConnection')
     @UseForceTransaction()
     create(@Body() dto: RequestIetsDto, @Req() req: Request) {
         const ip = getClientIP(req);
         return this.ieTsservice.request(dto, ip);
+    }
+
+    @Get('orgmfg')
+    getorbmfg() {
+        return this.ieTsservice.getOrgMfg();
     }
 
     @Get()

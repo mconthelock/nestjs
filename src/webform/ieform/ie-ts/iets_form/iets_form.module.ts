@@ -6,5 +6,6 @@ import { IetsFormRepository } from './iets_form.repository';
 @Module({
     controllers: [IetsFormController],
     providers: [IetsFormService, IetsFormRepository],
+    exports: [IetsFormRepository],
 })
 export class IetsFormModule {}

@@ -31,7 +31,7 @@ export class RequestIetsDto extends PickType(CreateFormDto, [
 ] as const) {
     @IsNotEmpty()
     @IsString()
-    JUN: string;
+    JUNG: string;
 
     @IsNotEmpty()
     @IsString()

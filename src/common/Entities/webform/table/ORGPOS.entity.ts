@@ -1,5 +1,5 @@
-import { Entity, PrimaryColumn, OneToOne } from 'typeorm';
-import { AMECUSERALL } from '../../amec/views/AMECUSERALL.entity';
+import { Entity, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
+import { User } from 'src/amec/users/entities/user.entity';
 
 @Entity({ name: 'ORGPOS', schema: 'WEBFORM' })
 export class ORGPOS {
@@ -12,6 +12,7 @@ export class ORGPOS {
     @PrimaryColumn()
     VEMPNO: string;
 
-    @OneToOne(() => AMECUSERALL, (u) => u.ORGPOS)
-    EMPINFO: AMECUSERALL;
+    @OneToOne(() => User, (u) => u.ORGPOS)
+    @JoinColumn({ name: 'VEMPNO', referencedColumnName: 'SEMPNO' })
+    EMPINFO: User;
 }

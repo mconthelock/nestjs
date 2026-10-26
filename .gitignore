@@ -8,6 +8,7 @@
 /output
 /tmp
 /src/workload/piline/PILINE.md
+/public/development
 # Logs
 logs
 *.log

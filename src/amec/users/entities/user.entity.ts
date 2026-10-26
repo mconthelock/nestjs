@@ -15,6 +15,7 @@ import { Buspassenger } from 'src/common/Entities/gpreport/table/buspassenger.en
 import { Accesslog } from 'src/common/Entities/docinv/table/accesslog.entity';
 import { Appsuser } from '../../../common/Entities/docinv/table/appsuser.entity';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
+import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
 
 @Entity('AMECUSERALL')
 export class User {
@@ -121,4 +122,8 @@ export class User {
     */
     @OneToMany(() => Buspassenger, (bp) => bp.Amecuserall)
     BUSPASSENGER: Buspassenger[];
+
+    @OneToOne(() => ORGPOS, (o) => o.EMPINFO)
+    @JoinColumn({ name: 'SEMPNO', referencedColumnName: 'VEMPNO' })
+    ORGPOS: ORGPOS;
 }

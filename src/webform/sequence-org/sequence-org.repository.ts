@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { SEQUENCEORG } from 'src/common/Entities/webform/table/SEQUENCEORG.entity';
 import { SearchSequenceOrgDto } from './dto/search-sequence-org.dto';
+import { AMECUSERALL } from 'src/common/Entities/amec/views/AMECUSERALL.entity';
 
 @Injectable()
 export class SequenceOrgRepository extends BaseRepository {
@@ -49,16 +50,56 @@ export class SequenceOrgRepository extends BaseRepository {
     }
 
     async getSubordinates(empno: string) {
-        const sql = `
-                 SELECT DISTINCT B.* FROM 
-                    (
-                        SELECT * FROM SEQUENCEORG
-                        START WITH HEADNO = :1 AND EMPNO != :2 CONNECT BY PRIOR EMPNO = HEADNO AND PRIOR CCO = CCO1
-                    ) A
-                    JOIN AMECUSERALL B ON A.EMPNO = B.SEMPNO
-                    WHERE B.SEMPNO != :3  AND B.CSTATUS = 1
-                `;
-        return await this.manager.query(sql, [empno, empno, empno]);
+        const allSubs = new Set<string>();
+        let currentQueue: Array<{ empNo: string; cco: string }> = [];
+
+        // 1. Initial subordinates where HEADNO = empno and EMPNO != empno
+        const roots = await this.getRepository(SEQUENCEORG).find({
+            where: { HEADNO: empno },
+        });
+
+        for (const r of roots) {
+            if (r.EMPNO && r.EMPNO !== empno) {
+                allSubs.add(r.EMPNO);
+                currentQueue.push({ empNo: r.EMPNO, cco: r.CCO });
+            }
+        }
+
+        const visited = new Set<string>();
+
+        // 2. BFS down the management tree
+        while (currentQueue.length > 0) {
+            const nextQueue: Array<{ empNo: string; cco: string }> = [];
+            for (const item of currentQueue) {
+                const key = `${item.empNo}_${item.cco}`;
+                if (visited.has(key)) continue;
+                visited.add(key);
+
+                const subs = await this.getRepository(SEQUENCEORG).find({
+                    where: { HEADNO: item.empNo, CCO1: item.cco },
+                });
+
+                for (const s of subs) {
+                    if (s.EMPNO && s.EMPNO !== empno) {
+                        allSubs.add(s.EMPNO);
+                        nextQueue.push({ empNo: s.EMPNO, cco: s.CCO });
+                    }
+                }
+            }
+            currentQueue = nextQueue;
+        }
+
+        if (allSubs.size === 0) {
+            return [];
+        }
+
+        // 3. Query AMECUSERALL
+        return await this.manager.getRepository(AMECUSERALL).find({
+            where: {
+                SEMPNO: In(Array.from(allSubs)),
+                CSTATUS: '1',
+            },
+        });
     }
 
     async search(dto: SearchSequenceOrgDto): Promise<SEQUENCEORG[]> {

@@ -31,19 +31,37 @@ export class FlowmstRepository extends BaseRepository {
         return qb.getMany();
     }
 
-    getFlowMaster(NFRMNO: number, VORGNO: string, CYEAR: string) {
-        return this.getRepository(FLOWMST).query(
-            `SELECT TO_CHAR(NFRMNO) AS NFRMNO, A.*
-            FROM FLOWMST A
-            START WITH NFRMNO = :1
-                AND vOrgNo = :2
-                AND cYear = :3
-                AND cStart = '1'
-            CONNECT BY NFRMNO = :4
-                AND vOrgNo = :5
-                AND cYear = :6
-                AND cStepNo = PRIOR cStepNextNo`,
-            [NFRMNO, VORGNO, CYEAR, NFRMNO, VORGNO, CYEAR],
-        );
+    async getFlowMaster(NFRMNO: number, VORGNO: string, CYEAR: string): Promise<FLOWMST[]> {
+        const allSteps = await this.getRepository(FLOWMST).find({
+            where: { NFRMNO, VORGNO, CYEAR },
+        });
+
+        if (!allSteps || allSteps.length === 0) {
+            return [];
+        }
+
+        const result: FLOWMST[] = [];
+        let currentBatch = allSteps.filter((s) => s.CSTART === '1');
+        const visited = new Set<string>();
+
+        while (currentBatch.length > 0) {
+            const nextBatch: FLOWMST[] = [];
+            for (const step of currentBatch) {
+                const key = `${step.CSTEPNO}->${step.CSTEPNEXTNO}->${step.VAPVNO ?? ''}`;
+                if (visited.has(key)) continue;
+                visited.add(key);
+                result.push(step);
+
+                if (step.CSTEPNEXTNO && step.CSTEPNEXTNO !== '00') {
+                    const nextSteps = allSteps.filter(
+                        (s) => s.CSTEPNO === step.CSTEPNEXTNO,
+                    );
+                    nextBatch.push(...nextSteps);
+                }
+            }
+            currentBatch = nextBatch;
+        }
+
+        return result;
     }
 }

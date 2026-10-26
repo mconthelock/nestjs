@@ -6,7 +6,7 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { FormWebformDto, GetNextRunNoDto } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
-import { formDetailQb } from 'src/common/utils/qb-form-detail';
+import { formDetailQb, formatFormDetail } from 'src/common/utils/qb-form-detail';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
 @Injectable()
@@ -81,27 +81,25 @@ export class FormRepository extends BaseRepository {
 
     async getFormDetail(form: FormDto) {
         const query = formDetailQb(this.manager.connection);
-        const formDetail = query
+        const formDetail = await query
             .where('F.NFRMNO = :NFRMNO', { NFRMNO: form.NFRMNO })
             .andWhere('F.VORGNO = :VORGNO', { VORGNO: form.VORGNO })
             .andWhere('F.CYEAR = :CYEAR', { CYEAR: form.CYEAR })
             .andWhere('F.CYEAR2 = :CYEAR2', { CYEAR2: form.CYEAR2 })
             .andWhere('F.NRUNNO = :NRUNNO', { NRUNNO: form.NRUNNO })
             .getRawOne();
-        return formDetail;
-        // return {
-        //   ...formDetail,
-        //   link: await this.createLink(form),
-        //   FORMNO: await this.getFormno(form),
-        // };
+        return formatFormDetail(formDetail);
     }
 
     async getFormData(form: FormDto) {
-        return await this.manager
+        const row = await this.manager
             .createQueryBuilder()
-            .select(
-                "C.VANAME || SUBSTR(F.CYEAR2,3,2) || '-' || LPAD(F.NRUNNO , 6, '0') AS FORMNO, F.*, A.SNAME AS VREQNAME, B.SNAME AS VINPUTNAME",
-            )
+            .select([
+                'F.*',
+                'C.VANAME AS VANAME',
+                'A.SNAME AS VREQNAME',
+                'B.SNAME AS VINPUTNAME',
+            ])
             .from('FORM', 'F')
             .innerJoin('AMECUSERALL', 'A', 'A.SEMPNO = F.VREQNO')
             .innerJoin('AMECUSERALL', 'B', 'B.SEMPNO = F.VINPUTER')
@@ -116,5 +114,13 @@ export class FormRepository extends BaseRepository {
             .andWhere('F.CYEAR2 = :CYEAR2', { CYEAR2: form.CYEAR2 })
             .andWhere('F.NRUNNO = :NRUNNO', { NRUNNO: form.NRUNNO })
             .getRawOne();
+
+        if (!row) return row;
+        const year2 = String(row.CYEAR2 ?? '').slice(2, 4);
+        const runNo = String(row.NRUNNO ?? '').padStart(6, '0');
+        return {
+            ...row,
+            FORMNO: `${row.VANAME ?? ''}${year2}-${runNo}`,
+        };
     }
 }

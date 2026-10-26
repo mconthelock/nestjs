@@ -70,10 +70,14 @@ export class FormCreateService extends FormService {
         managerData: UpdateFlowDto = { CEXTDATA: 'MG', CAPPLYALL: '3' },
     ) {
         try {
+            const inputEmpNo =
+                dto.INPUTBY && dto.INPUTBY.trim() !== ''
+                    ? dto.INPUTBY.trim()
+                    : dto.REQBY;
             const context: FormContext = {
                 ip: ip,
                 empno: dto.REQBY,
-                inputempno: dto.INPUTBY,
+                inputempno: inputEmpNo,
                 remark: dto.REMARK,
                 nfrmno: dto.NFRMNO,
                 vorgno: dto.VORGNO,
@@ -91,7 +95,7 @@ export class FormCreateService extends FormService {
             }
             if(!checkInput) {
                 throw new NotFoundException(
-                    `Inputer ${context.empno} not found`
+                    `Inputer ${context.inputempno} not found`
                 );
             }
 
@@ -192,7 +196,7 @@ export class FormCreateService extends FormService {
     async setFormNo(context: FormContext) {
         const form = await this.repo.getFormNextRunNo(context.query);
         if (form.length > 0) {
-            context.nrunno = form[0].NRUNNO + 1;
+            context.nrunno = Number(form[0].NRUNNO) + 1;
         } else {
             context.nrunno = 1;
         }
@@ -205,6 +209,12 @@ export class FormCreateService extends FormService {
             CYEAR: context.cyear,
         });
 
+        if (!formmst || formmst.length === 0) {
+            throw new NotFoundException(
+                `Form master not found for NFRMNO: ${context.nfrmno}, VORGNO: ${context.vorgno}, CYEAR: ${context.cyear}`,
+            );
+        }
+
         const today = new Date();
         // Set formDate to current date with time 00:00:00
         const formDateWithZeroTime = new Date(
@@ -212,6 +222,8 @@ export class FormCreateService extends FormService {
             today.getMonth(),
             today.getDate(),
         );
+
+        const formPage = formmst[0].VFORMPAGE ?? formmst[0].vformpage ?? '';
 
         return {
             NFRMNO: context.nfrmno,
@@ -226,7 +238,7 @@ export class FormCreateService extends FormService {
             DREQDATE: formDateWithZeroTime,
             CREQTIME: new Date().toTimeString().split(' ')[0], // HH:MM:SS
             CST: '1',
-            VFORMPAGE: formmst[0].VFORMPAGE,
+            VFORMPAGE: formPage,
             VREMOTE: context.ip,
         };
     }
@@ -390,7 +402,12 @@ export class FormCreateService extends FormService {
         // Do only if requester has manager and requester is not directory and division manager
         // ทำเฉพาะเมื่อผู้ร้องขอมีผู้จัดการและผู้ร้องขอไม่ใช่ผู้จัดการระดับไดเรกทอรีและผู้จัดการระดับแผนก
         if (manager.length > 0) {
-            await this.getRepresent(manager[0].HEADNO, context);
+            const headNo = manager[0].HEADNO ?? manager[0].headno;
+            await this.getRepresent(headNo, context);
+            const formPage =
+                url && url.length > 0
+                    ? url[0].VFORMPAGE ?? url[0].vformpage ?? ''
+                    : '';
             const flow = {
                 NFRMNO: context.nfrmno,
                 VORGNO: context.vorgno,
@@ -404,7 +421,7 @@ export class FormCreateService extends FormService {
                 CSTEPST: '4',
                 CTYPE: '0',
                 VPOSNO: null,
-                VAPVNO: manager[0].HEADNO,
+                VAPVNO: headNo,
                 VREPNO: context.represent,
                 VREALAPV: null,
                 CAPVSTNO: '0',
@@ -414,7 +431,7 @@ export class FormCreateService extends FormService {
                 CEXTDATA: managerData?.CEXTDATA ?? null,
                 CREJTYPE: '1',
                 CAPPLYALL: managerData?.CAPPLYALL ?? '3',
-                VURL: url[0].VFORMPAGE,
+                VURL: formPage,
                 VREMARK: null,
             };
             console.log(

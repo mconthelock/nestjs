@@ -60,6 +60,9 @@ export class FORM {
     @Column()
     VREMOTE: string;
 
+    @Column()
+    VTITLE: string;
+
     @OneToOne(() => User)
     @JoinColumn({ name: 'VINPUTER', referencedColumnName: 'SEMPNO' })
     creator: User;

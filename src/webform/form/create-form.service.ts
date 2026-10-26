@@ -28,6 +28,7 @@ interface FormContext {
     cyear: string;
     cyear2: string;
     CSTEPSTDX: number;
+    vtitle?: string;
     flag?: number;
     nrunno?: number;
     emppos?: string;
@@ -84,6 +85,7 @@ export class FormCreateService extends FormService {
                 cyear: dto.CYEAR,
                 cyear2: new Date().getFullYear().toString(),
                 CSTEPSTDX: 4,
+                vtitle: dto.VTITLE,
             };
 
             const checkReq = await this.usersService.findEmp(context.empno);
@@ -224,6 +226,11 @@ export class FormCreateService extends FormService {
         );
 
         const formPage = formmst[0].VFORMPAGE ?? formmst[0].vformpage ?? '';
+        const defaultTitle = formmst[0].VNAME ?? formmst[0].vname ?? '';
+        const formTitle =
+            context.vtitle && context.vtitle.trim() !== ''
+                ? context.vtitle.trim()
+                : defaultTitle;
 
         return {
             NFRMNO: context.nfrmno,
@@ -240,6 +247,7 @@ export class FormCreateService extends FormService {
             CST: '1',
             VFORMPAGE: formPage,
             VREMOTE: context.ip,
+            VTITLE: formTitle,
         };
     }
 

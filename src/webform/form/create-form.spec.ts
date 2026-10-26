@@ -1,6 +1,9 @@
 import { FlowmstRepository } from '../flowmst/flowmst.repository';
 import { OrgTreeRepository } from '../org-tree/org-tree.repository';
 import { FormCreateService } from './create-form.service';
+import { CreateFormDto } from './dto/create-form.dto';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
 import { formDetailQb, formatFormDetail } from 'src/common/utils/qb-form-detail';
 
 describe('webform/createForm Database-Agnostic (Pure TypeORM & TypeScript)', () => {
@@ -102,6 +105,115 @@ describe('webform/createForm Database-Agnostic (Pure TypeORM & TypeScript)', () 
             await service.setFormNo(context);
             expect(context.nrunno).toBe(6);
             expect(typeof context.nrunno).toBe('number');
+        });
+    });
+
+    describe('FormCreateService.setFormValue', () => {
+        const createServiceWithMockFormmst = (vname = 'Default Form Name') => {
+            const mockFormmstService: any = {
+                getFormmst: jest.fn().mockResolvedValue([
+                    {
+                        VFORMPAGE: '/form/test/index.asp',
+                        VNAME: vname,
+                    },
+                ]),
+            };
+            return new FormCreateService(
+                {} as any,
+                {} as any,
+                {} as any,
+                mockFormmstService,
+                {} as any,
+                {} as any,
+                {} as any,
+                {} as any,
+                {} as any,
+                {} as any,
+                {} as any,
+                {} as any,
+                {} as any,
+            );
+        };
+
+        it('should use VTITLE from context when provided', async () => {
+            const service = createServiceWithMockFormmst('Default Form Name');
+            const context: any = {
+                nfrmno: 1,
+                vorgno: '050601',
+                cyear: '25',
+                cyear2: '2025',
+                nrunno: 1,
+                empno: '12069',
+                inputempno: '12069',
+                remark: 'test',
+                ip: '127.0.0.1',
+                vtitle: 'Custom Form Title',
+            };
+
+            const res = await service.setFormValue(context);
+            expect(res.VTITLE).toBe('Custom Form Title');
+        });
+
+        it('should fallback to FORMMST.VNAME when VTITLE is not provided or empty', async () => {
+            const service = createServiceWithMockFormmst('Master Form Name');
+            const context: any = {
+                nfrmno: 1,
+                vorgno: '050601',
+                cyear: '25',
+                cyear2: '2025',
+                nrunno: 1,
+                empno: '12069',
+                inputempno: '12069',
+                remark: 'test',
+                ip: '127.0.0.1',
+                vtitle: '   ',
+            };
+
+            const res = await service.setFormValue(context);
+            expect(res.VTITLE).toBe('Master Form Name');
+        });
+
+        it('should fallback to FORMMST.VNAME when VTITLE is undefined in create()', async () => {
+            const service = createServiceWithMockFormmst('Master Form Name');
+            const context: any = {
+                nfrmno: 1,
+                vorgno: '050601',
+                cyear: '25',
+                cyear2: '2025',
+                nrunno: 1,
+                empno: '12069',
+                inputempno: '12069',
+                remark: 'test',
+                ip: '127.0.0.1',
+            };
+
+            const res = await service.setFormValue(context);
+            expect(res.VTITLE).toBe('Master Form Name');
+        });
+    });
+
+    describe('CreateFormDto Validation (VTITLE)', () => {
+        it('should pass validation with or without VTITLE', async () => {
+            const withTitle = plainToInstance(CreateFormDto, {
+                NFRMNO: 1,
+                VORGNO: '050601',
+                CYEAR: '25',
+                REQBY: '12069',
+                INPUTBY: '12069',
+                VTITLE: 'Request Special Budget',
+            });
+            const withoutTitle = plainToInstance(CreateFormDto, {
+                NFRMNO: 1,
+                VORGNO: '050601',
+                CYEAR: '25',
+                REQBY: '12069',
+                INPUTBY: '12069',
+            });
+
+            expect(await validate(withTitle)).toHaveLength(0);
+            expect(await validate(withoutTitle)).toHaveLength(0);
+            expect(withTitle.VTITLE).toBe('Request Special Budget');
+            expect(withoutTitle.VTITLE).toBeUndefined();
         });
     });
 

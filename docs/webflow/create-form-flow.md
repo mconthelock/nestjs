@@ -39,9 +39,9 @@ graph TD
 
 | ตาราง (Table) | Entity Class | หน้าที่ในระบบ |
 | :--- | :--- | :--- |
-| **`FORM`** | [`FORM`](../../src/common/Entities/webform/table/FORM.entity.ts) | ตาราง Header หลักของฟอร์ม เก็บข้อมูลเลขที่ฟอร์ม, ผู้ขอ, ผู้อิมพุต, วันที่ขอ, สถานะฟอร์ม (`CST`) |
+| **`FORM`** | [`FORM`](../../src/common/Entities/webform/table/FORM.entity.ts) | ตาราง Header หลักของฟอร์ม เก็บข้อมูลเลขที่ฟอร์ม, ชื่อเรื่อง (`VTITLE`), ผู้ขอ, ผู้อิมพุต, วันที่ขอ, สถานะฟอร์ม (`CST`) |
 | **`FLOW`** | [`FLOW`](../../src/common/Entities/webform/table/FLOW.entity.ts) | ตารางเก็บขั้นตอนการอนุมัติจริงของแต่ละฟอร์ม (`NRUNNO`) เก็บสถานะผู้อนุมัติแต่ละลำดับ (`CSTEPST`) |
-| **`FORMMST`** | [`FORMMST`](../../src/common/Entities/webform/table/FORMMST.entity.ts) | ตาราง Master ของประเภทฟอร์ม เก็บชื่อย่อฟอร์ม (`VANAME`), URL หน้าฟอร์ม (`VFORMPAGE`), อายุเอกสาร |
+| **`FORMMST`** | [`FORMMST`](../../src/common/Entities/webform/table/FORMMST.entity.ts) | ตาราง Master ของประเภทฟอร์ม เก็บชื่อเต็มฟอร์ม (`VNAME`), ชื่อย่อฟอร์ม (`VANAME`), URL หน้าฟอร์ม (`VFORMPAGE`), อายุเอกสาร |
 | **`FLOWMST`** | [`FLOWMST`](../../src/common/Entities/webform/table/FLOWMST.entity.ts) | ตาราง Master Template เส้นทางการอนุมัติของแต่ละฟอร์มและ Org ที่กำหนดไว้ล่วงหน้า |
 | **`ORGTREE`** | [`ORGTREE`](../../src/common/Entities/webform/table/ORGTREE.entity.ts) | โครงสร้างลำดับชั้นองค์กร (Section -> Department -> Division -> Company) สำหรับไต่หา Org แม่ |
 | **`ORGPOS`** | [`ORGPOS`](../../src/common/Entities/webform/table/ORGPOS.entity.ts) | แมปปิ้งผู้ถือตำแหน่งในแต่ละ Organization (`VORGNO` + `VPOSNO` -> `VEMPNO`) |
@@ -70,11 +70,13 @@ erDiagram
         number NRUNNO PK "เลข Running Number ฟอร์ม"
         string VREQNO "รหัสพนักงานผู้ขอ"
         string VINPUTER "รหัสพนักงานผู้กรอก"
+        string VREMARK "หมายเหตุประกอบการขอ"
         date DREQDATE "วันที่ขออนุมัติ"
         string CREQTIME "เวลาที่ขออนุมัติ (HH:MM:SS)"
         string CST "สถานะฟอร์ม (0=Draft, 1=Active, 2=Finish, 3=Reject)"
         string VFORMPAGE "URL หน้าฟอร์ม"
         string VREMOTE "IP Address ผู้ขอ"
+        string VTITLE "หัวข้อเรื่องของฟอร์ม (หากไม่ส่งมาจะใช้ FORMMST.VNAME)"
     }
 
     FLOW {
@@ -205,7 +207,7 @@ flowchart TD
 ### ขั้นตอนที่ 4: ตรวจสอบ Master Form (`FORMMST`)
 - เรียก `formmstService.getFormmst()` เพื่อดึง Template ของฟอร์ม
 - ตรวจสอบว่ามีข้อมูล Master หรือไม่ หากไม่มีจะแจ้งเตือน `Form master not found`
-- ดึง URL หน้าฟอร์ม (`VFORMPAGE`) เพื่อนำไปบันทึก
+- ดึง URL หน้าฟอร์ม (`VFORMPAGE`) และชื่อฟอร์มตั้งต้น (`VNAME`) เพื่อนำไปบันทึก
 
 ### ขั้นตอนที่ 5: บันทึกข้อมูล Header เอกสารลงตาราง `FORM`
 - สร้าง Object ข้อมูลฟอร์ม:
@@ -213,6 +215,7 @@ flowchart TD
   - กำหนดเวลา `CREQTIME` รูปแบบ `HH:MM:SS`
   - กำหนดสถานะ `CST = '1'` (Active)
   - กำหนด `VREMOTE` เป็น Client IP Address
+  - กำหนด `VTITLE`: หาก Frontend ส่งค่า `VTITLE` มา (และไม่ใช่ค่าว่าง) จะใช้ค่านั้น แต่หากไม่ได้ส่งมา ระบบจะนำค่า `VNAME` จาก `FORMMST` มาใส่ให้โดยอัตโนมัติ
 - บันทึกลงตาราง `FORM` ผ่าน `repo.create(formData)`
 
 ### ขั้นตอนที่ 6: โหลด Master Flow และจัดเรียง Linked List

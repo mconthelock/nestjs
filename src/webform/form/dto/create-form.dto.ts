@@ -34,6 +34,11 @@ export class CreateFormDto extends PickType(FormDto, [
   @IsString()
   @Type(() => String)
   DRAFT?: string;
+
+  @IsOptional()
+  @IsString()
+  @Type(() => String)
+  VTITLE?: string;
 }
 
 export class FormWebformDto extends PickType(FormDto, [
@@ -83,6 +88,11 @@ export class FormWebformDto extends PickType(FormDto, [
     @IsString()
     @Type(() => String)
     VREMOTE: string;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    VTITLE?: string;
 }
 
 export class GetNextRunNoDto extends PickType(FormDto, [

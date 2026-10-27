@@ -21,6 +21,7 @@ import { ProgramModule } from './program/program.module';
 import { RevisionModule } from './revision/revision.module';
 import { SourceModule } from './source/source.module';
 import { TasksModule } from './tasks/tasks.module';
+import { TourModule } from './tour/tour.module';
 @Module({
     imports: [
         ApplicationModule,
@@ -40,6 +41,7 @@ import { TasksModule } from './tasks/tasks.module';
         RevisionModule,
         SourceModule,
         TasksModule,
+        TourModule,
     ],
 })
 export class DocinvModule {}

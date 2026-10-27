@@ -30,7 +30,7 @@ export class IETS_FORM {
     NRUNNO: number;
 
     @Column()
-    JUN: string;
+    JUNG: string;
 
     @Column()
     TSORGNO: string;

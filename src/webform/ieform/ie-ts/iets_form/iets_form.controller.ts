@@ -1,34 +1,51 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+} from '@nestjs/common';
 import { IetsFormService } from './iets_form.service';
 import { CreateIetsFormDto } from './dto/create-iets_form.dto';
 import { UpdateIetsFormDto } from './dto/update-iets_form.dto';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
-@Controller('iets-form')
+@Controller('ieform/iets-form')
 export class IetsFormController {
-  constructor(private readonly ietsFormService: IetsFormService) {}
+    constructor(private readonly ietsFormService: IetsFormService) {}
 
-  @Post()
-  create(@Body() createIetsFormDto: CreateIetsFormDto) {
-    return this.ietsFormService.create(createIetsFormDto);
-  }
+    @Post('data')
+    getData(@Body() dto: FormDto) {
+        return this.ietsFormService.getData(dto);
+    }
 
-  @Get()
-  findAll() {
-    return this.ietsFormService.findAll();
-  }
+    @Post()
+    create(@Body() createIetsFormDto: CreateIetsFormDto) {
+        return this.ietsFormService.create(createIetsFormDto);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ietsFormService.findOne(+id);
-  }
+    @Get()
+    findAll() {
+        return this.ietsFormService.findAll();
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateIetsFormDto: UpdateIetsFormDto) {
-    return this.ietsFormService.update(+id, updateIetsFormDto);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.ietsFormService.findOne(+id);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ietsFormService.remove(+id);
-  }
+    @Patch(':id')
+    update(
+        @Param('id') id: string,
+        @Body() updateIetsFormDto: UpdateIetsFormDto,
+    ) {
+        return this.ietsFormService.update(+id, updateIetsFormDto);
+    }
+
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.ietsFormService.remove(+id);
+    }
 }

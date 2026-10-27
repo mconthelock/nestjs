@@ -48,9 +48,12 @@ export class IeTsController {
         return this.ieTsservice.findOne(+id);
     }
 
-    @Patch(':id')
-    update(@Param('id') id: string, @Body() updateIeTDto: UpdateIetsDto) {
-        return this.ieTsservice.update(+id, updateIeTDto);
+    @Patch('update')
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
+    update(@Body() dto: UpdateIetsDto, @Req() req: Request) {
+        const ip = getClientIP(req);
+        return this.ieTsservice.update(dto, ip);
     }
 
     @Delete(':id')

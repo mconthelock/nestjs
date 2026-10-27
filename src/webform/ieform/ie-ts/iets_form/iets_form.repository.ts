@@ -30,6 +30,21 @@ export class IetsFormRepository extends BaseRepository {
         return (result.affected ?? 0) > 0;
     }
 
+    async getData(dto: FormDto) {
+        return await this.getRepository(IETS_FORM).findOne({
+            where: {
+                ...dto,
+            },
+            relations: {
+                ORG: true,
+                FORM: {
+                    flow: true, // เพิ่มบรรทัดนี้เพื่อดึง FLOW ที่อยู่ใน FORM
+                },
+                LISTS: true,
+            },
+        });
+    }
+
     async getPicByItemNos(itemNos: string[]) {
         return this.getRepository(DWGNOTICEPICMST).find({
             where: {

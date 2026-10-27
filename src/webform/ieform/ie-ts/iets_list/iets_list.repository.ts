@@ -60,4 +60,8 @@ export class IetsListRepository extends BaseRepository {
         const result = await this.getRepository(IETS_LIST).update(con, dto);
         return (result.affected ?? 0) > 0;
     }
+
+    async deleteIets(dto: FormDto) {
+        return this.getRepository(IETS_LIST).delete(dto);
+    }
 }

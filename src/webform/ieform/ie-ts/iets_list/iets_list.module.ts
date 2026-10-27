@@ -6,6 +6,6 @@ import { IetsListRepository } from './iets_list.repository';
 @Module({
     controllers: [IetsListController],
     providers: [IetsListService, IetsListRepository],
-    exports: [IetsListService],
+    exports: [IetsListService, IetsListRepository],
 })
 export class IetsListModule {}

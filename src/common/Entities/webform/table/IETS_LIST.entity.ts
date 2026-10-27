@@ -43,22 +43,22 @@ export class IETS_LIST {
     @Column()
     PROCESS: string;
 
-    @Column()
+    @Column({ type: 'decimal', precision: 10, scale: 4, nullable: true })
     CUR_TP: number;
 
-    @Column()
+    @Column({ type: 'decimal', precision: 10, scale: 4, nullable: true })
     CUR_TC: number;
 
-    @Column()
+    @Column({ type: 'decimal', precision: 10, scale: 4, nullable: true })
     AF_TP: number;
 
-    @Column()
+    @Column({ type: 'decimal', precision: 10, scale: 4, nullable: true })
     AF_TC: number;
 
-    @Column()
+    @Column({ type: 'decimal', precision: 10, scale: 4, nullable: true })
     IE_TP: number;
 
-    @Column()
+    @Column({ type: 'decimal', precision: 10, scale: 4, nullable: true })
     IE_TC: number;
 
     @ManyToOne(() => IETS_FORM, (ief) => ief.LISTS)

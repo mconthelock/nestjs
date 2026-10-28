@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { IeTsService } from './ie-ts.service';
+import { IeTsApproveService } from './ie-ts-approve.service';
 import { IeTsController } from './ie-ts.controller';
 import { IetsFormModule } from './iets_form/iets_form.module';
 import { IetsListModule } from './iets_list/iets_list.module';
@@ -10,7 +11,7 @@ import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
 
 @Module({
     controllers: [IeTsController],
-    providers: [IeTsService],
+    providers: [IeTsService, IeTsApproveService],
     imports: [
         IetsFormModule,
         IetsListModule,

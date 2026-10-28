@@ -57,7 +57,15 @@ export class IetsListRepository extends BaseRepository {
     }
 
     async update(con: FormDto, dto: UpdateIetsListDto): Promise<boolean> {
-        const result = await this.getRepository(IETS_LIST).update(con, dto);
+        const { ID, ...updateData } = dto;
+        const conditions = {
+            ...con,
+            ID: ID,
+        };
+        const result = await this.getRepository(IETS_LIST).update(
+            conditions,
+            updateData,
+        );
         return (result.affected ?? 0) > 0;
     }
 

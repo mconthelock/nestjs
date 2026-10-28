@@ -8,6 +8,7 @@ import {
     PrimaryColumn,
 } from 'typeorm';
 import { IETS_FORM } from './IETS_FORM.entity';
+import { DWGNOTICEPICMST } from './DWGNOTICEPICMST.entity';
 @Entity({ name: 'IETS_LIST', schema: 'WEBFORM' })
 export class IETS_LIST {
     @PrimaryColumn()
@@ -68,4 +69,8 @@ export class IETS_LIST {
     @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
     @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
     IETSFRM: IETS_FORM;
+
+    @ManyToOne(() => DWGNOTICEPICMST)
+    @JoinColumn({ name: 'ITMNO', referencedColumnName: 'ITEMNO' })
+    PICMST: DWGNOTICEPICMST;
 }

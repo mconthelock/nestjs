@@ -48,7 +48,10 @@ export class CmSmService {
 
         const time_reminder = (data.COUNT_ALERT ?? 0) + 1;
         const reminderLabel = this.ordinal(time_reminder);
-        const to = 'perapatr@Mitsubishielevatorasia.co.th';
+        const to = [
+            'perapatr@Mitsubishielevatorasia.co.th',
+            'parichrt@MitsubishiElevatorAsia.co.th',
+        ];
         if (!to) {
             throw new BadRequestException('CM_SM_ALERT_TO is not configured');
         }

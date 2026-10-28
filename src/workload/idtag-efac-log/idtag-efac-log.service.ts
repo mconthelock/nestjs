@@ -14,9 +14,9 @@ export class IdtagEfacLogService {
             const length = res.length;
             if (length === 0) {
                 return {
-                status: false,
-                message: 'Search IDTAG_EFAC_LOG Failed: No data found',
-                data: [],
+                    status: false,
+                    message: 'Search IDTAG_EFAC_LOG Failed: No data found',
+                    data: [],
                 };
             }
             return {
@@ -34,8 +34,8 @@ export class IdtagEfacLogService {
             const res = await this.repo.findOne(id);
             if (res == null) {
                 return {
-                status: false,
-                message: `Search IDTAG_EFAC_LOG by id ${id} Failed: No data found`,
+                    status: false,
+                    message: `Search IDTAG_EFAC_LOG by id ${id} Failed: No data found`,
                 };
             }
             return {
@@ -56,9 +56,9 @@ export class IdtagEfacLogService {
             const length = res.length;
             if (length === 0) {
                 return {
-                status: false,
-                message: 'Search IDTAG_EFAC_LOG Failed: No data found',
-                data: [],
+                    status: false,
+                    message: 'Search IDTAG_EFAC_LOG Failed: No data found',
+                    data: [],
                 };
             }
             return {
@@ -73,8 +73,6 @@ export class IdtagEfacLogService {
 
     async maxRunno(dto: GetMaxRunnoDto) {
         try {
-              console.log('dto', dto);
-              console.log('process', dto.process);
             const sysdate = await this.repo.getSysdate();
             const month = Number(sysdate.MONTH);
             const year  = Number(sysdate.YEAR);
@@ -110,6 +108,27 @@ export class IdtagEfacLogService {
             };
         } catch (error) {
             throw new Error('Insert IDTAG_EFAC_LOG Error: ' + error.message);
+        }
+    }
+
+    async getLatest(ctrlno: string) {
+        try {
+            const res = await this.repo.findLatestByControlNo(ctrlno);
+
+            if (!res) {
+                return {
+                    status: false,
+                    message: `Control No ${ctrlno} not found`,
+                };
+            }
+
+            return {
+                status: true,
+                message: `Control No ${ctrlno} found`,
+                data: res,
+            };
+        } catch (error) {
+            throw new Error(`Get Latest Control No ${ctrlno} Error: ${error.message}`);
         }
     }
 }

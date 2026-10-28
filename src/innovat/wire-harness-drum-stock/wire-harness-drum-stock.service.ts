@@ -16,4 +16,8 @@ export class WireHarnessDrumStockService {
     scrapDrum(dto: ScrapDrumDto) {
         return this.repo.scrapDrum(dto);
     }
+
+    selectDrum(condition: FiltersDto) {
+        return this.repo.selectDrum(condition);
+    }
 }

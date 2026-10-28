@@ -26,4 +26,12 @@ export class WireHarnessDrumStockController {
     async scrapDrum(@Body() dto: ScrapDrumDto) {
         return this.service.scrapDrum(dto);
     }
+
+    @Post('select-drum')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Select drum' })
+    @ApiResponse({ status: 200, description: 'Select drum success' })
+    async selectDrum(@Body() condition: FiltersDto) {
+        return this.service.selectDrum(condition);
+    }
 }

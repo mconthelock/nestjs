@@ -69,4 +69,13 @@ import { IDTAG_EFAC_LOG } from 'src/common/Entities/workload/table/IDTAG_EFAC_LO
 
         return row;
     }
+
+    async findLatestByControlNo(ctrlno: string) {
+        return this.getRepository(IDTAG_EFAC_LOG)
+            .createQueryBuilder('I')
+            .where('I.CONTROL_NO = :ctrlno', { ctrlno })
+            .orderBy('I.PRINT_DATETIME', 'DESC')
+            .addOrderBy('I.RUNNO', 'DESC')
+            .getOne();
+    }
 }

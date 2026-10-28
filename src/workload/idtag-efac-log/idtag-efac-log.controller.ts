@@ -12,6 +12,7 @@ import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { GetMaxRunnoDto } from './dto/get-max-runno.dto';
 import { InsertLogDto } from './dto/insert-log.dto';
+import { GetLatestControlNoDto } from './dto/get-latest-control-no.dto';
 
 @Controller('workload/idtag-efac-log')
 export class IdtagEfacLogController {
@@ -43,5 +44,11 @@ export class IdtagEfacLogController {
     @UseTransaction('workloadConnection')
     async insertLog(@Body() dto: InsertLogDto) {
         return this.idtagEfacLogService.insertLog(dto);
+    }
+
+    @Post('latest')
+    @UseTransaction('workloadConnection')
+    async getLatest(@Body() dto: GetLatestControlNoDto) {
+        return this.idtagEfacLogService.getLatest(dto.ctrlno);
     }
 }

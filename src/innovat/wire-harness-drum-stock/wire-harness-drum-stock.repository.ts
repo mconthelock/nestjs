@@ -5,6 +5,7 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { WHN_DRUM_STOCK } from 'src/common/Entities/innovat/table/WHN_DRUM_STOCK.entity';
 import { WHN_DRUMSTOCK } from 'src/common/Entities/innovat/views/WHN_DRUMSTOCK.entity';
+import { WHN_DRUMORDER } from 'src/common/Entities/innovat/views/WHN_DRUMORDER.entity';
 import { ScrapDrumDto } from './dto/scrap-drum.dto';
 
 @Injectable()
@@ -46,5 +47,19 @@ export class WireHarnessDrumStockRepository extends BaseRepository {
                 ST_DATEUPDATE: new Date(),
             },
         );
+    }
+
+    selectDrum(condition: FiltersDto) {
+        const allowedFields = ['CTRLNO', 'RN'];
+        const qb = this.getRepository(WHN_DRUMORDER)
+            .createQueryBuilder('A');
+
+        return this.applyFilters(
+            qb,
+            'A',
+            condition,
+            allowedFields,
+        )
+        .getOne();
     }
 }

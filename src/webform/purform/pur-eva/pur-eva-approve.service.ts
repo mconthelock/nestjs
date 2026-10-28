@@ -60,7 +60,10 @@ export class PurEvaApproveService {
                 NRUNNO: dto.NRUNNO,
             };
             const res = await this.purevaFormRepo.getData(form);
-            if (dto.ACTION === 'approve' && dto.EXTDATA === '02') {
+            if (
+                dto.ACTION === 'approve' &&
+                (dto.EXTDATA === '01' || dto.EXTDATA === '02')
+            ) {
                 if (res) {
                     if (res.VENDGROUP != '6:Non-Production (6)') {
                         const resform = await this.purevaFormRepo.update(form, {

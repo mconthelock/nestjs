@@ -60,4 +60,28 @@ export class OrganizationsController {
     getOrgTree(@Param('org') org: string) {
         return this.organizationsService.getSubOrganizations(org, true);
     }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-29
+     * @description ดึงโครงสร้างหน่วยงานของพนักงานที่ระบุ
+     * @param empno รหัสพนักงานที่ต้องการค้นหาโครงสร้างหน่วยงาน
+     * @returns รายการโครงสร้างหน่วยงานของพนักงานที่ระบุ
+     */
+    @Get('subWithEmp/:empno')
+    getSubOrganizationsWithEmp(@Param('empno') empno: string) {
+        return this.organizationsService.getOrgTreeWithEmp(empno);
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-29
+     * @description ดึงโครงสร้างหน่วยงานของพนักงานที่ระบุ รวมถึงหน่วยงานต้นทาง
+     * @param empno รหัสพนักงานที่ต้องการค้นหาโครงสร้างหน่วยงาน
+     * @returns รายการโครงสร้างหน่วยงานของพนักงานที่ระบุ รวมถึงหน่วยงานต้นทาง
+     */
+    @Get('orgTreeWithEmp/:empno')
+    getOrgTreeWithEmp(@Param('empno') empno: string) {
+        return this.organizationsService.getOrgTreeWithEmp(empno, true);
+    }
 }

@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { OrganizationsRepository } from './organizations.repository';
+import { SEQUENCEORG } from 'src/common/Entities/webform/table/SEQUENCEORG.entity';
+import { SequenceOrgService } from '../sequence-org/sequence-org.service';
 
 @Injectable()
 export class OrganizationsService {
-    constructor(private readonly repo: OrganizationsRepository) {}
+    constructor(
+        private readonly repo: OrganizationsRepository,
+        private readonly sequenceOrgService: SequenceOrgService,
+    ) {}
     async findAll() {
         try {
             const res = await this.repo.findAll();
@@ -77,6 +82,7 @@ export class OrganizationsService {
     /**
      * @author Sutthipong Tangmongkhoncharoen(24008)
      * @since 2026-10-29
+     * @description ดึงรายการหน่วยงานย่อยของหน่วยงานที่ระบุ
      * @param org รหัสหน่วยงานที่ต้องการค้นหาหน่วยงานย่อย
      * @param parent กำหนดว่าให้รวมหน่วยงานต้นทางด้วยหรือไม่
      * @returns รายการหน่วยงานย่อยที่ตรงตามเงื่อนไข
@@ -113,7 +119,57 @@ export class OrganizationsService {
                         TYPE: 'SECTION',
                     };
                 })
-                .filter(o => parent ? true : o.CODE !== org);
+                .filter((o) => (parent ? true : o.CODE !== org));
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-29
+     * @description ดึงโครงสร้างหน่วยงานของพนักงานที่ระบุ
+     * @param empno รหัสพนักงานที่ต้องการค้นหาโครงสร้างหน่วยงาน
+     * @param parent กำหนดว่าให้รวมหน่วยงานต้นทางด้วยหรือไม่
+     * @returns รายการโครงสร้างหน่วยงานของพนักงานที่ระบุ
+     */
+    async getOrgTreeWithEmp(empno: string, parent: boolean = false) {
+        try {
+            const organize: SEQUENCEORG[] =
+                await this.sequenceOrgService.search({
+                    EMPNO: empno,
+                });
+            if (organize.length === 0) {
+                throw new Error(
+                    `No organization found for the given employee number ${empno}`,
+                );
+            }
+            const res = [];
+            for (const org of organize) {
+                const orgTree = await this.getSubOrganizations(
+                    org.VORGNO,
+                    parent,
+                );
+                if (orgTree.length > 0) {
+                    const orgTreeCode = res.map((t) => t.CODE);
+                    orgTree.forEach((o) => {
+                        if (!orgTreeCode.includes(o.CODE)) {
+                            res.push(o);
+                        }
+                    });
+                }
+            }
+            if (res.length === 0) {
+                throw new Error(
+                    `No organization tree found for the given employee number ${empno}`,
+                );
+            }
+            // เรียงตาม CODE
+            res.sort((a, b) => a.CODE.localeCompare(b.CODE));
+            return {
+                status: true,
+                data: res,
+            };
         } catch (error) {
             throw error;
         }

@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { FollowService } from './follow.service';
+import { FollowService } from '../services/follow.service';
 
 @Controller('safety/follow')
 export class FollowController {

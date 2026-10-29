@@ -11,7 +11,7 @@ export class FollowRepository extends BaseRepository {
     }
 
     getByFyear(fyear: string) {
-        return this.manager.getRepository(STY_CHEMICAL_FORM).find({
+        return this.getRepository(STY_CHEMICAL_FORM).find({
             where: {
                 CREATE_DATE: Raw(
                     (alias) => `TO_CHAR(${alias}, 'YYYY') = :fyear`,

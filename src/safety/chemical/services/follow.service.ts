@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FollowRepository } from './follow.repository';
+import { FollowRepository } from '../repository/follow.repository';
 import { FormService } from 'src/webform/form/form.service';
 
 @Injectable()

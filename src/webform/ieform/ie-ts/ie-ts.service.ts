@@ -1,277 +1,225 @@
-import { Injectable } from '@nestjs/common';
-import { RequestIetsDto } from './dto/request-ie-ts.dto';
-import { UpdateIetsDto } from './dto/update-ie-ts.dto';
-import { IetsFormRepository } from './iets_form/iets_form.repository';
-import { IetsListService } from './iets_list/iets_list.service';
-import { IetsListRepository } from './iets_list/iets_list.repository';
+import {
+    BadRequestException,
+    ConflictException,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+} from '@nestjs/common';
 import { FormCreateService } from 'src/webform/form/create-form.service';
-import { VorgmstService } from 'src/webform/vorgmst/vorgmst.service';
-import { OrgposRepository } from 'src/webform/orgpos/orgpos.repository';
-import { FlowService } from 'src/webform/flow/flow.service';
-import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
-import { DoactionFlowService } from 'src/webform/flow/doaction.service';
-import { FormService } from 'src/webform/form/form.service';
-import { Request } from 'express';
-import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
+import { IeTsRepository } from './ie-ts.repository';
+import {
+    AutoInsertTsProcessDto,
+    AutoTsProcessItemDto,
+    InsertTsProcessDto,
+    TsFormKeyDto,
+} from './dto/ts-process.dto';
+import {
+    buildTsRows,
+    groupTsForms,
+    processIdentity,
+} from './ts-process-auto.utils';
+
+export interface AutoTsResult {
+    form: {
+        NFRMNO: number;
+        VORGNO: string;
+        CYEAR: string;
+        REQUEST_BY: string;
+        INPUT_BY: string;
+    };
+    status: 'created' | 'skipped';
+    received: number;
+    inserted: number;
+    skipped: number;
+    key: TsFormKeyDto | null;
+}
+
 @Injectable()
 export class IeTsService {
     constructor(
-        protected readonly repotsf: IetsFormRepository,
-        private readonly repoorgpos: OrgposRepository,
-        protected readonly servicetsl: IetsListService,
-        protected readonly repotsl: IetsListRepository,
-        private readonly formCreateService: FormCreateService,
-        private readonly orgService: VorgmstService,
-        private readonly flowService: FlowService,
-        protected readonly delService: DeleteFlowStepService,
-        protected readonly doactionService: DoactionFlowService,
-        protected readonly formService: FormService,
+        private readonly repo: IeTsRepository,
+        private readonly forms: FormCreateService,
     ) {}
-    async request(dto: RequestIetsDto, ip: string) {
-        try {
-            const { REQBY, INPUTBY, DRAFT, REMARK, DWGLIST, ...data } = dto;
 
-            if (DWGLIST.length == 0) {
-                return {
-                    status: false,
-                    message: 'TP and TC not changed',
-                };
-            }
-
-            const uniqueItmNos = [
-                ...new Set(DWGLIST.map((item) => item.ITMNO)),
-            ];
-            if (uniqueItmNos.length == 0) {
-                return {
-                    status: false,
-                    message: 'Item no is empty',
-                };
-            }
-            const pic = await this.repotsf.getPicByItemNos(uniqueItmNos);
-            // console.log(pic);
-
-            const uniquePICs = [
-                ...new Set(pic.map((item) => item.PICINFO.SEMPNO)),
-            ];
-            const uniqueSections = [
-                ...new Set(pic.map((item) => item.PICINFO.SSECCODE)),
-            ];
-            if (uniquePICs.length == 0) {
-                return {
-                    status: false,
-                    message: 'IE PIC not found',
-                };
-            } else if (uniquePICs.length > 3) {
-                return {
-                    status: false,
-                    message: 'IE PIC more than system limit',
-                };
-            }
-            if (uniqueSections.length > 1) {
-                return {
-                    status: false,
-                    message: 'Section IE PIC more than one',
-                };
-            }
-
-            const createForm = await this.formCreateService.create(
-                {
-                    NFRMNO: dto.NFRMNO,
-                    VORGNO: dto.VORGNO,
-                    CYEAR: dto.CYEAR,
-                    REQBY: REQBY,
-                    INPUTBY: INPUTBY,
-                    REMARK: REMARK,
-                    ...(DRAFT !== undefined && { DRAFT: DRAFT }),
-                },
-                ip,
-            );
-            if (!createForm.status) {
-                throw new Error(createForm.message.message);
-            }
-            const form = {
-                NFRMNO: dto.NFRMNO,
-                VORGNO: dto.VORGNO,
-                CYEAR: dto.CYEAR,
-                CYEAR2: createForm.data.CYEAR2,
-                NRUNNO: createForm.data.NRUNNO,
-            };
-            if (uniqueSections[0] != '051403') {
-                const picsem = await this.repoorgpos.getOrgPos({
-                    VPOSNO: '30',
-                    VORGNO: uniqueSections[0],
-                });
-                await this.flowService.updateFlow({
-                    condition: {
-                        ...form,
-                        CEXTDATA: '03', // CSTEPNO = 10: Form SEM  => IE SEM
-                    },
-                    VAPVNO: picsem[0].VEMPNO,
-                });
-            }
-            //update step IE PIC
-            const stepie = ['57', '58', '59'];
-            let ind = 0;
-            for (const pic of uniquePICs) {
-                await this.flowService.updateFlow({
-                    condition: {
-                        ...form,
-                        CSTEPNO: stepie[ind], // PIC IE
-                    },
-                    VAPVNO: pic,
-                });
-                ind++;
-            }
-            const dataform = {
-                ...form,
-                JUNG: dto.JUNG,
-                TSORGNO: dto.TSORGNO,
-            };
-            await this.repotsf.insert(dataform);
-            if (DWGLIST && DWGLIST.length > 0) {
-                await this.servicetsl.createMultipleLists(form, DWGLIST);
-            }
-            return {
-                status: true,
-                message: 'Request successful',
-            };
-        } catch (error) {
-            throw new Error('Request IE-TS Form Error: ' + error.message);
-        }
+    async insert(dto: InsertTsProcessDto) {
+        this.validateRows(dto);
+        return this.write(() => this.insertRows(dto));
     }
 
-    async update(dto: UpdateIetsDto, ip: string) {
-        try {
-            const { ACTION, REQBY, INPUTBY, DRAFT, REMARK, DWGLIST, ...data } =
-                dto;
-            if (DWGLIST.length == 0) {
-                return {
-                    status: false,
-                    message: 'TP and TC not changed',
-                };
-            }
-
-            const uniqueItmNos = [
-                ...new Set(DWGLIST.map((item) => item.ITMNO)),
-            ];
-            if (uniqueItmNos.length == 0) {
-                return {
-                    status: false,
-                    message: 'Item no is empty',
-                };
-            }
-            const pic = await this.repotsf.getPicByItemNos(uniqueItmNos);
-            const uniquePICs = [
-                ...new Set(pic.map((item) => item.PICINFO.SEMPNO)),
-            ];
-            const uniqueSections = [
-                ...new Set(pic.map((item) => item.PICINFO.SSECCODE)),
-            ];
-            if (uniquePICs.length == 0) {
-                return {
-                    status: false,
-                    message: 'IE PIC not found',
-                };
-            } else if (uniquePICs.length > 3) {
-                return {
-                    status: false,
-                    message: 'IE PIC more than system limit',
-                };
-            }
-            if (uniqueSections.length > 1) {
-                return {
-                    status: false,
-                    message: 'Section IE PIC more than one',
-                };
-            }
-            const form = {
-                NFRMNO: dto.NFRMNO,
-                VORGNO: dto.VORGNO,
-                CYEAR: dto.CYEAR,
-                CYEAR2: dto.CYEAR2,
-                NRUNNO: dto.NRUNNO,
-            };
-            if (uniqueSections[0] != '051403') {
-                const picsem = await this.repoorgpos.getOrgPos({
-                    VPOSNO: '30',
-                    VORGNO: uniqueSections[0],
-                });
-                await this.flowService.updateFlow({
-                    condition: {
-                        ...form,
-                        CEXTDATA: '03', // CSTEPNO = 10: Form SEM  => IE SEM
-                    },
-                    VAPVNO: picsem[0].VEMPNO,
-                });
-            }
-            //update step IE PIC
-            const stepie = ['57', '58', '59'];
-            let ind = 0;
-            for (const pic of uniquePICs) {
-                await this.flowService.updateFlow({
-                    condition: {
-                        ...form,
-                        CSTEPNO: stepie[ind], // PIC IE
-                    },
-                    VAPVNO: pic,
-                });
-                ind++;
-            }
-            const dataform = {
-                JUNG: dto.JUNG,
-                TSORGNO: dto.TSORGNO,
-            };
-            await this.repotsf.update(form, dataform);
-            if (DWGLIST && DWGLIST.length > 0) {
-                await this.repotsl.deleteIets(form);
-                await this.servicetsl.createMultipleLists(form, DWGLIST);
-            }
-            //send approve
-            if (ACTION == 'request') {
-                await this.formService.updateForm({
-                    condition: { ...form },
-                    CST: '1',
-                });
-                const resact = await this.doactionService.doAction(
+    async autoInsert(dtos: AutoInsertTsProcessDto[], ip: string) {
+        if (!dtos.length)
+            throw new BadRequestException(
+                'At least one form group is required',
+            );
+        const groups = groupTsForms(dtos);
+        return this.write(async () => {
+            await this.repo.lockFormNumber();
+            await this.repo.lockTsProcesses();
+            const seen = new Set<string>();
+            const items: AutoTsResult[] = [];
+            for (const dto of groups) {
+                const retained: AutoTsProcessItemDto[] = [];
+                for (const row of dto.ITEMS) {
+                    const identity = processIdentity(row);
+                    if (seen.has(identity)) continue;
+                    seen.add(identity);
+                    if (!(await this.repo.processExists(row)))
+                        retained.push(row);
+                }
+                const { NFRMNO, VORGNO, CYEAR, REQUEST_BY, INPUT_BY } = dto;
+                const form = { NFRMNO, VORGNO, CYEAR, REQUEST_BY, INPUT_BY };
+                if (!retained.length) {
+                    items.push({
+                        form,
+                        status: 'skipped',
+                        received: dto.ITEMS.length,
+                        inserted: 0,
+                        skipped: dto.ITEMS.length,
+                        key: null,
+                    });
+                    continue;
+                }
+                // Allocate sequences after filtering. Validate PK collisions/limits before creating Form/Flow.
+                const rows = buildTsRows(retained);
+                const created = await this.forms.create(
                     {
-                        ...form,
-                        ACTION: 'approve',
-                        EMPNO: dto.EMPNO,
-                        REMARK: dto.REMARK,
+                        NFRMNO,
+                        VORGNO,
+                        CYEAR,
+                        REQBY: REQUEST_BY,
+                        INPUTBY: INPUT_BY,
                     },
                     ip,
                 );
+                const key = created?.data && this.key(created.data);
+                if (
+                    !created?.status ||
+                    !key ||
+                    Object.values(key).some((value) => value == null)
+                ) {
+                    throw new InternalServerErrorException(
+                        'Form creation returned an incomplete form key',
+                    );
+                }
+                // Only FORM, FLOW, PROC_TSHEADFORM and PROC_TSDETFORM are inserted in automatic mode.
+                await this.insertRows({ ...key, ...rows });
+                items.push({
+                    form,
+                    status: 'created',
+                    received: dto.ITEMS.length,
+                    inserted: retained.length,
+                    skipped: dto.ITEMS.length - retained.length,
+                    key,
+                });
             }
             return {
                 status: true,
-                message: 'Update successful',
+                total: groups.length,
+                created: items.filter((item) => item.status === 'created')
+                    .length,
+                skipped: items.filter((item) => item.status === 'skipped')
+                    .length,
+                items,
             };
-        } catch (error) {
-            throw new Error('Update IE-TS Form Error: ' + error.message);
+        });
+    }
+
+    async find(key: TsFormKeyDto) {
+        const data = await this.repo.read(key);
+        if (!data.HEADERS.length)
+            throw new NotFoundException('TS process not found');
+        return { status: true, key, data };
+    }
+
+    async update(dto: InsertTsProcessDto) {
+        this.validateRows(dto);
+        return this.write(async () => {
+            const key = this.key(dto);
+            await this.repo.requireForm(key);
+            await this.requireTs(key);
+            await this.repo.replace(dto);
+            return {
+                status: true,
+                message: 'Update TS process successfully',
+                key,
+            };
+        });
+    }
+
+    remove(key: TsFormKeyDto) {
+        return this.write(async () => {
+            await this.repo.requireForm(key);
+            await this.requireTs(key);
+            await this.repo.remove(key);
+            return {
+                status: true,
+                message: 'Delete TS process successfully',
+                key,
+            };
+        });
+    }
+
+    private async insertRows(dto: InsertTsProcessDto) {
+        const key = this.key(dto);
+        await this.repo.requireForm(key);
+        if (await this.repo.exists(key))
+            throw new ConflictException(
+                'TS process already exists; use update_ts_process',
+            );
+        await this.repo.insert(dto);
+        return { status: true, message: 'Insert TS process successfully', key };
+    }
+
+    private async requireTs(key: TsFormKeyDto) {
+        if (!(await this.repo.exists(key)))
+            throw new NotFoundException('TS process not found');
+    }
+
+    private validateRows(
+        dto: Pick<InsertTsProcessDto, 'HEADERS' | 'DETAILS' | 'FILES'>,
+    ) {
+        const headers = new Set<string>();
+        for (const row of dto.HEADERS) {
+            if (headers.has(row.SEQ))
+                throw new BadRequestException('Duplicate HEADERS.SEQ');
+            headers.add(row.SEQ);
+        }
+        const details = new Set<string>();
+        for (const row of dto.DETAILS ?? []) {
+            if (!headers.has(row.SEQ))
+                throw new BadRequestException(
+                    `DETAILS.SEQ ${row.SEQ} has no matching HEADERS.SEQ`,
+                );
+            const key = JSON.stringify([row.SEQ, row.PROCID]);
+            if (details.has(key))
+                throw new BadRequestException('Duplicate DETAILS.SEQ/PROCID');
+            details.add(key);
+        }
+        const files = new Set<number>();
+        for (const row of dto.FILES ?? []) {
+            if (files.has(row.ID))
+                throw new BadRequestException('Duplicate FILES.ID');
+            files.add(row.ID);
         }
     }
 
-    async getOrgMfg() {
-        const res = await this.orgService.findAllActive();
-        const filteredRes = res.filter(
-            (item) =>
-                item.VORGNO &&
-                item.VORGNO.startsWith('060') &&
-                item.VNAME &&
-                item.VNAME.includes('SEC'),
-        );
-        return filteredRes;
+    private key(dto: TsFormKeyDto): TsFormKeyDto {
+        const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO } = dto;
+        return { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO };
     }
 
-    findAll() {
-        return `This action returns all ieTs`;
-    }
-
-    findOne(id: number) {
-        return `This action returns a #${id} ieT`;
-    }
-
-    remove(id: number) {
-        return `This action removes a #${id} ieT`;
+    private async write<T>(work: () => Promise<T>): Promise<T> {
+        try {
+            return await this.repo.transaction(work);
+        } catch (error) {
+            const code = error?.driverError?.errorNum ?? error?.errorNum;
+            if (code === 1)
+                throw new ConflictException('Duplicate TS process or form key');
+            if (code === 2291)
+                throw new BadRequestException(
+                    'Referenced data not found; check TSFLAG in IEDOC.TSFLAGMST',
+                );
+            throw error;
+        }
     }
 }

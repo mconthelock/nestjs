@@ -272,3 +272,30 @@ describe('auto adjust request validation', () => {
         ).rejects.toMatchObject({ status: 400 });
     });
 });
+
+import { FormCreateService } from 'src/webform/form/create-form.service';
+describe('FormCreateService form master lookup', () => {
+    it('reports the missing form master key instead of reading undefined VFORMPAGE', async () => {
+        const service = Object.create(FormCreateService.prototype) as any;
+        service.formmstService = {
+            getFormmst: jest.fn().mockResolvedValue([]),
+        };
+        await expect(
+            service.setFormValue({ nfrmno: 1, vorgno: '050301', cyear: '26' }),
+        ).rejects.toThrow('FORMMST not found: NNO=1, VORGNO=050301, CYEAR=26');
+    });
+    it('uses VFORMPAGE from an existing form master', async () => {
+        const service = Object.create(FormCreateService.prototype) as any;
+        service.formmstService = {
+            getFormmst: jest.fn().mockResolvedValue([{ VFORMPAGE: 'ps-adj' }]),
+        };
+        const result = await service.setFormValue({
+            nfrmno: 1,
+            vorgno: '050301',
+            cyear: '26',
+            cyear2: '2026',
+            nrunno: 42,
+        });
+        expect(result.VFORMPAGE).toBe('ps-adj');
+    });
+});

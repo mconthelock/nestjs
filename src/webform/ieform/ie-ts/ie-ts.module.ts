@@ -1,33 +1,23 @@
 import { Module } from '@nestjs/common';
-import { IeTsService } from './ie-ts.service';
-import { IeTsApproveService } from './ie-ts-approve.service';
-import { IeTsController } from './ie-ts.controller';
-import { IetsFormModule } from './iets_form/iets_form.module';
-import { IetsListModule } from './iets_list/iets_list.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PROC_TSHEADFORM } from 'src/common/Entities/webform/table/PROC_TSHEADFORM.entity';
+import { PROC_TSDETFORM } from 'src/common/Entities/webform/table/PROC_TSDETFORM.entity';
+import { PROC_TSATTFILE } from 'src/common/Entities/webform/table/PROC_TSATTFILE.entity';
 import { FormModule } from 'src/webform/form/form.module';
-import { FormmstModule } from 'src/webform/formmst/formmst.module';
-import { FlowModule } from 'src/webform/flow/flow.module';
-import { VorgmstModule } from 'src/webform/vorgmst/vorgmst.module';
-import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
-import { IePtsModule } from '../IE-PTS/ie-pts.module';
-import { IeTsJobService } from './ie-ts-job.service';
-import { UsersModule } from 'src/amec/users/users.module';
-import { MailModule } from 'src/common/services/mail/mail.module';
+import { IeTsController } from './ie-ts.controller';
+import { IeTsRepository } from './ie-ts.repository';
+import { IeTsService } from './ie-ts.service';
 
 @Module({
-    controllers: [IeTsController],
-    providers: [IeTsService, IeTsApproveService, IeTsJobService],
     imports: [
-        IetsFormModule,
-        IetsListModule,
+        TypeOrmModule.forFeature(
+            [PROC_TSHEADFORM, PROC_TSDETFORM, PROC_TSATTFILE],
+            'webformConnection',
+        ),
         FormModule,
-        VorgmstModule,
-        OrgposModule,
-        FlowModule,
-        IePtsModule,
-        FormmstModule,
-        UsersModule,
-        MailModule,
     ],
+    controllers: [IeTsController],
+    providers: [IeTsRepository, IeTsService],
+    exports: [IeTsService, IeTsRepository],
 })
 export class IeTsModule {}

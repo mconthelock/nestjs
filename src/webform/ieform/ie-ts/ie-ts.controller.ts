@@ -1,86 +1,70 @@
 import {
-    Controller,
-    Post,
     Body,
-    Patch,
-    Param,
+    Controller,
     Delete,
     Get,
+    Post,
+    ParseArrayPipe,
+    Put,
+    Query,
     Req,
+    UsePipes,
+    ValidationPipe,
 } from '@nestjs/common';
-import { IeTsService } from './ie-ts.service';
-import { IeTsApproveService } from './ie-ts-approve.service';
-import { IeTsJobService } from './ie-ts-job.service';
-import { CreateIetsDto } from './dto/create-ie-ts.dto';
-import { UpdateIetsDto } from './dto/update-ie-ts.dto';
-import { ApproveIetsDto } from './dto/approve-ie-ts.dto';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
-import { RequestIetsDto } from './dto/request-ie-ts.dto';
-import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
+import { ApiTags } from '@nestjs/swagger';
+import { getClientIP } from 'src/common/utils/ip.utils';
+import {
+    AutoInsertTsProcessDto,
+    InsertTsProcessDto,
+    TsFormKeyDto,
+} from './dto/ts-process.dto';
+import { IeTsService } from './ie-ts.service';
+
+@ApiTags('IE TS process')
 @Controller('ieform/ie-ts')
+@UsePipes(
+    new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+    }),
+)
 export class IeTsController {
-    constructor(
-        private readonly ieTsservice: IeTsService,
-        private readonly ieTsApproveservice: IeTsApproveService,
-        private readonly ieTsJob: IeTsJobService,
-    ) {}
+    constructor(private readonly service: IeTsService) {}
 
-    private readonly path =
-        `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/IE/IETS/` as string;
-
-    @Post('create')
-    @UseTransaction('webformConnection')
-    @UseForceTransaction()
-    create(@Body() dto: RequestIetsDto, @Req() req: Request) {
-        const ip = getClientIP(req);
-        return this.ieTsservice.request(dto, ip);
+    @Post('insert_ts_process')
+    insert(@Body() dto: InsertTsProcessDto) {
+        return this.service.insert(dto);
     }
 
-    @Get('orgmfg')
-    getorbmfg() {
-        return this.ieTsservice.getOrgMfg();
-    }
-
-    @Get()
-    findAll() {
-        return this.ieTsservice.findAll();
-    }
-
-    @Patch('update')
-    @UseTransaction('webformConnection')
-    @UseForceTransaction()
-    update(@Body() dto: UpdateIetsDto, @Req() req: Request) {
-        const ip = getClientIP(req);
-        return this.ieTsservice.update(dto, ip);
-    }
-
-    @Patch('approve')
-    @UseTransaction('webformConnection')
-    @UseForceTransaction()
-    approve(
-        @Body() dto: ApproveIetsDto, // หรือ RequestPurevaFormDto
+    @Post('auto_insert_ts_process')
+    autoInsert(
+        @Body(
+            new ParseArrayPipe({
+                items: AutoInsertTsProcessDto,
+                whitelist: true,
+                forbidNonWhitelisted: true,
+            }),
+        )
+        dtos: AutoInsertTsProcessDto[],
         @Req() req: Request,
     ) {
-        const ip = getClientIP(req);
-        return this.ieTsApproveservice.approve(dto, ip);
+        return this.service.autoInsert(dtos, getClientIP(req));
     }
 
-    @Get('alert-approve')
-    async testAlert() {
-        // เรียกใช้งาน method ที่เราสร้างไว้
-        return await this.ieTsJob.alertaprove();
+    @Get('get_ts_process')
+    find(@Query() key: TsFormKeyDto) {
+        return this.service.find(key);
     }
 
-    @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.ieTsservice.remove(+id);
+    @Put('update_ts_process')
+    update(@Body() dto: InsertTsProcessDto) {
+        return this.service.update(dto);
     }
-    @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.ieTsservice.findOne(+id);
+
+    @Delete('delete_ts_process')
+    remove(@Query() key: TsFormKeyDto) {
+        return this.service.remove(key);
     }
 }

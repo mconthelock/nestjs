@@ -65,8 +65,8 @@ export class PsAdjService {
             await this.write(() => this.repo.deleteReason(key)),
         );
     }
-    async createOrder(dto: CreateOrderDto) {
-        await this.write(() => this.repo.createOrder(dto));
+    async insert_adjust(dto: CreateOrderDto) {
+        await this.write(() => this.repo.insert_adjust(dto));
         return { status: true };
     }
     findOrder(key: FindOrderDto) {
@@ -82,8 +82,8 @@ export class PsAdjService {
     async deleteOrder(key: OrderKeyDto) {
         return this.changed(await this.write(() => this.repo.deleteOrder(key)));
     }
-    async createFile(dto: CreateFileDto) {
-        await this.write(() => this.repo.createFile(dto));
+    async insert_files_adjust(dto: CreateFileDto) {
+        await this.write(() => this.repo.insert_files_adjust(dto));
         return { status: true };
     }
     findFile(key: FindFileDto) {

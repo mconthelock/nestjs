@@ -184,8 +184,8 @@ Content-Type: application/json
 | Field | ชนิด | จำเป็น | ความยาวสูงสุด / การบันทึก |
 | --- | --- | --- | --- |
 | DWG | string | ใช่ | 9; HEADFORM.DWGNO และ DETFORM.DWG |
-| GNO | string | ใช่ | 3; บันทึกทั้งหัวและรายละเอียด |
-| LNO | string | ใช่ | 3; จำกัดตาม HEADFORM.LNO แม้ DETFORM.LNO จะรองรับ 7 |
+| GNO | string/null | ไม่ | 3; ว่างได้ บันทึกทั้งหัวและรายละเอียด |
+| LNO | string/null | ไม่ | 3; ว่างได้ จำกัดตาม HEADFORM.LNO แม้ DETFORM.LNO จะรองรับ 7 |
 | ITEM | string | ใช่ | 3; บันทึก HEADFORM.ITEMNO |
 | PROCID_OLD | string | ใช่ | 6; process เดิม |
 | TP_OLD | string/null | ไม่ | 5 |
@@ -194,7 +194,7 @@ Content-Type: application/json
 | TP | string/null | ไม่ | 5 |
 | TC | string/null | ไม่ | 6 |
 
-ค่ารหัสส่งเป็น string เพื่อรักษาเลขศูนย์นำหน้า ระบบ trim ช่อง string ที่จำเป็นก่อนจัดกลุ่มและตรวจซ้ำ
+ค่ารหัสส่งเป็น string เพื่อรักษาเลขศูนย์นำหน้า ระบบ trim ช่อง string ที่จำเป็นก่อนจัดกลุ่มและตรวจซ้ำ สำหรับ GNO/LNO สามารถส่ง `""`, ช่องว่าง, `null` หรือไม่ส่ง field ได้ โดยถือว่าเป็นค่าเดียวกันและบันทึกเป็น NULL การตรวจซ้ำใช้ IS NULL เพื่อให้ตรงกับการเก็บค่าว่างของ Oracle
 
 ### เงื่อนไขตรวจซ้ำและการสร้าง sequence
 

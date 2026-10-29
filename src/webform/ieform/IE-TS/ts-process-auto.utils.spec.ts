@@ -28,6 +28,35 @@ const form = (values = {}) => ({
 });
 
 describe('TS automatic grouping and sequence allocation', () => {
+    it('treats empty, whitespace, null and omitted GNO/LNO as the same drawing and process', () => {
+        const empty = row({ GNO: '', LNO: '' });
+        for (const value of ['   ', null, undefined]) {
+            expect(processIdentity(row({ GNO: value, LNO: value }))).toEqual(
+                processIdentity(empty),
+            );
+        }
+        const result = buildTsRows([
+            empty,
+            row({
+                GNO: null,
+                LNO: undefined,
+                PROCID_OLD: 'OLD002',
+                PROCID: 'NEW002',
+            }),
+        ]);
+        expect(result.HEADERS).toHaveLength(1);
+        expect(result.HEADERS[0]).toMatchObject({ GNO: null, LNO: null });
+        expect(
+            result.DETAILS.map((detail) => [
+                detail.GNO,
+                detail.LNO,
+                detail.SEQ_PROC,
+            ]),
+        ).toEqual([
+            [null, null, '01'],
+            [null, null, '02'],
+        ]);
+    });
     it('groups repeated form identities while preserving item order', () => {
         const groups = groupTsForms([
             form(),

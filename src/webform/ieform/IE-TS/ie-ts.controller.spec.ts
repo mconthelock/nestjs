@@ -1,6 +1,8 @@
 import { ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { IeTsController } from './ie-ts.controller';
 import { IeTsService } from './ie-ts.service';
 
@@ -40,6 +42,23 @@ describe('IE-TS HTTP contract', () => {
         await app?.close();
     });
     beforeEach(() => jest.clearAllMocks());
+
+    it('accepts the provided six-process sample with blank LNO', async () => {
+        const sample = JSON.parse(
+            readFileSync(join(__dirname, 'auto-insert-ts.sample.json'), 'utf8'),
+        );
+        await request(app.getHttpServer())
+            .post(base + '/auto_insert_ts_process')
+            .send(sample)
+            .expect(201);
+        const received = service.autoInsert.mock.calls[0][0];
+        expect(received.map((form) => form.ITEMS.length)).toEqual([4, 2]);
+        expect(
+            received
+                .flatMap((form) => form.ITEMS)
+                .every((row) => row.LNO === null),
+        ).toBe(true);
+    });
 
     it('serves POST insert and PUT replacement at the documented URLs', async () => {
         const dto = { ...key, HEADERS: [{ SEQ: '001' }] };

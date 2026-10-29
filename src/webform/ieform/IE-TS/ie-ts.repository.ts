@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
+import { nullableTsCode } from './ts-process-auto.utils';
 import { transactionContext } from 'src/common/interceptors/transaction-context';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 import { PROC_TSHEADFORM } from 'src/common/Entities/webform/table/PROC_TSHEADFORM.entity';
@@ -43,10 +44,21 @@ export class IeTsRepository extends BaseRepository {
     }
 
     async processExists(row: AutoTsProcessItemDto): Promise<boolean> {
+        const binds: string[] = [row.DWG];
+        const conditions = ['TRIM(DWG) = :1'];
+        for (const column of ['GNO', 'LNO'] as const) {
+            const value = nullableTsCode(row[column]);
+            if (value === null) conditions.push(`TRIM(${column}) IS NULL`);
+            else {
+                binds.push(value);
+                conditions.push(`TRIM(${column}) = :${binds.length}`);
+            }
+        }
+        binds.push(row.PROCID_OLD);
+        conditions.push(`TRIM(PROCID_OLD) = :${binds.length}`);
         const result = await this.manager.query(
-            `SELECT COUNT(*) AS MATCH_COUNT FROM IEDOC.PROC_TSDETFORM
-             WHERE TRIM(DWG) = :1 AND TRIM(GNO) = :2 AND TRIM(LNO) = :3 AND TRIM(PROCID_OLD) = :4`,
-            [row.DWG, row.GNO, row.LNO, row.PROCID_OLD],
+            `SELECT COUNT(*) AS MATCH_COUNT FROM IEDOC.PROC_TSDETFORM WHERE ${conditions.join(' AND ')}`,
+            binds,
         );
         return Number(result[0]?.MATCH_COUNT ?? 0) > 0;
     }

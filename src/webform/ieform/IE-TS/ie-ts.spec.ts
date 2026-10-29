@@ -26,6 +26,45 @@ const check = (cls: any, data: unknown) =>
     });
 
 describe('TS request validation', () => {
+    it('trims all six process fields before checking database lengths', async () => {
+        const detail = {
+            SEQ: '001',
+            PROCID_OLD: ' G1SHE\t',
+            PROCID: '\tG1PR4 ',
+            TP_OLD: ' 0.05 ',
+            TP: '\t0.04 ',
+            TC_OLD: '\t0.0062 ',
+            TC: ' 0.0033\t',
+        };
+        const dto = plainToInstance(InsertTsProcessDto, {
+            ...payload(),
+            DETAILS: [detail],
+        });
+        expect(await validate(dto)).toHaveLength(0);
+        expect(dto.DETAILS[0]).toMatchObject({
+            PROCID_OLD: 'G1SHE',
+            PROCID: 'G1PR4',
+            TP_OLD: '0.05',
+            TP: '0.04',
+            TC_OLD: '0.0062',
+            TC: '0.0033',
+        });
+        const auto = plainToInstance(AutoInsertTsProcessDto, {
+            NFRMNO: 4,
+            VORGNO: '051401',
+            CYEAR: '21',
+            REQUEST_BY: '25009',
+            INPUT_BY: '25009',
+            ITEMS: [
+                { DWG: 'YA154D379', ITEM: '125', ...detail, SEQ: undefined },
+            ],
+        });
+        expect(auto.ITEMS[0]).toMatchObject({
+            PROCID_OLD: 'G1SHE',
+            TC_OLD: '0.0062',
+            TC: '0.0033',
+        });
+    });
     it.each(['', '   ', null, undefined])(
         'accepts blank GNO/LNO: %j',
         async (value) => {
@@ -147,6 +186,32 @@ describe('TS orchestration', () => {
             create: jest.fn().mockResolvedValue({ status: true, data: key }),
         };
         service = new IeTsService(repo, forms);
+    });
+    it('serializes normal insert/update/delete with the same lock as automatic insertion', async () => {
+        const dto = plainToInstance(InsertTsProcessDto, payload());
+        await service.insert(dto);
+        repo.exists.mockResolvedValue(true);
+        await service.update(dto);
+        await service.remove(key);
+        expect(repo.lockFormNumber).toHaveBeenCalledTimes(3);
+        expect(repo.lockFormNumber.mock.invocationCallOrder[0]).toBeLessThan(
+            repo.insert.mock.invocationCallOrder[0],
+        );
+        expect(repo.lockFormNumber.mock.invocationCallOrder[1]).toBeLessThan(
+            repo.replace.mock.invocationCallOrder[0],
+        );
+        expect(repo.lockFormNumber.mock.invocationCallOrder[2]).toBeLessThan(
+            repo.remove.mock.invocationCallOrder[0],
+        );
+    });
+    it('identifies the table in remaining Oracle privilege failures', async () => {
+        repo.insert.mockRejectedValue({
+            driverError: { errorNum: 1031 },
+            query: 'INSERT INTO "IEDOC"."PROC_TSHEADFORM" (...) VALUES (...)',
+        });
+        await expect(
+            service.insert(plainToInstance(InsertTsProcessDto, payload())),
+        ).rejects.toThrow('access IEDOC.PROC_TSHEADFORM');
     });
     it.each([
         { HEADERS: [{ SEQ: '001' }, { SEQ: '001' }] },

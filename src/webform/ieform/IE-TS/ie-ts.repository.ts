@@ -35,14 +35,6 @@ export class IeTsRepository extends BaseRepository {
         );
     }
 
-    lockTsProcesses() {
-        // Serialize duplicate detection with all TS detail writers, including normal CRUD.
-        // Call after lockFormNumber to preserve FORM -> TS lock order.
-        return this.manager.query(
-            'LOCK TABLE IEDOC.PROC_TSDETFORM IN SHARE ROW EXCLUSIVE MODE',
-        );
-    }
-
     async processExists(row: AutoTsProcessItemDto): Promise<boolean> {
         const binds: string[] = [row.DWG];
         const conditions = ['TRIM(DWG) = :1'];

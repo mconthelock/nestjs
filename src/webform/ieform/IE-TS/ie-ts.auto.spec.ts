@@ -34,7 +34,6 @@ describe('Automatic TS batch creation', () => {
         repo = {
             transaction: jest.fn((work) => work()),
             lockFormNumber: jest.fn(),
-            lockTsProcesses: jest.fn(),
             processExists: jest.fn().mockResolvedValue(false),
             requireForm: jest.fn(),
             exists: jest.fn().mockResolvedValue(false),
@@ -57,7 +56,7 @@ describe('Automatic TS batch creation', () => {
             },
             '127.0.0.1',
         );
-        expect(repo.lockTsProcesses.mock.invocationCallOrder[0]).toBeLessThan(
+        expect(repo.lockFormNumber.mock.invocationCallOrder[0]).toBeLessThan(
             repo.processExists.mock.invocationCallOrder[0],
         );
         expect(repo.processExists.mock.invocationCallOrder[0]).toBeLessThan(

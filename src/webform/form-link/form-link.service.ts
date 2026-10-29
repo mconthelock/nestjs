@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { FormLinkRepository } from './form-link.repository';
-import type { FORM_LINK } from 'src/common/Entities/webform/table/FROM_LINK.entitiy';
+import { FORM_LINK } from 'src/common/Entities/webform/table/FROM_LINK.entity';
 @Injectable()
 export class FormLinkService {
     constructor(private readonly repo: FormLinkRepository) {}

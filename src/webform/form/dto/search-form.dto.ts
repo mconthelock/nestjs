@@ -1,81 +1,85 @@
 import { Type } from 'class-transformer';
 import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  IsDateString,
-  IsNotEmpty,
-  isNotEmpty,
+    IsOptional,
+    IsString,
+    IsNumber,
+    IsDateString,
+    IsNotEmpty,
+    isNotEmpty,
+    IsDate,
 } from 'class-validator';
+import { StringToDate } from 'src/common/utils/transform';
 
 export class SearchFormDto {
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  readonly NFRMNO?: number;
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber()
+    readonly NFRMNO?: number;
 
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  readonly VORGNO?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    readonly VORGNO?: string;
 
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  readonly CYEAR?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    readonly CYEAR?: string;
 
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  readonly CYEAR2?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    readonly CYEAR2?: string;
 
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  readonly NRUNNO?: number;
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber()
+    readonly NRUNNO?: number;
 
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  readonly VREQNO?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    readonly VREQNO?: string;
 
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  readonly VINPUTER?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    readonly VINPUTER?: string;
 
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  readonly VREMARK?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    readonly VREMARK?: string;
 
-  @IsOptional()
-  @IsDateString()
-  @Type(() => Date)
-  readonly DREQDATE?: Date;
+    @IsOptional()
+    //   @IsDateString()
+    @StringToDate()
+    @IsDate()
+    // @Type(() => Date)
+    readonly DREQDATE?: Date;
 
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  readonly CREQTIME?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    readonly CREQTIME?: string;
 
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  readonly CST?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    readonly CST?: string;
 
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  readonly VFORMPAGE?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    readonly VFORMPAGE?: string;
 
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  readonly VREMOTE?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    readonly VREMOTE?: string;
 
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  readonly EMPNO?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    readonly EMPNO?: string;
 }

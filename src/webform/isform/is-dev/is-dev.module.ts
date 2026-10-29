@@ -7,6 +7,8 @@ import { ISDEV_OBJECTIVE } from 'src/common/Entities/webform/table/ISDEV_OBJECTI
 import { IS_DEVICEMST } from 'src/common/Entities/webform/table/IS_DEVICEMST.entity';
 import { LABORCOST } from 'src/common/Entities/webform/table/LABORCOST.entity';
 import { ISDEV_REQUEST } from 'src/common/Entities/webform/table/ISDEV_REQUEST.entity';
+import { IsDevFormRepository } from './is-dev.repositoty';
+import { FormModule } from 'src/webform/form/form.module';
 
 @Module({
     imports: [
@@ -20,8 +22,9 @@ import { ISDEV_REQUEST } from 'src/common/Entities/webform/table/ISDEV_REQUEST.e
             ],
             'webformConnection',
         ),
+        FormModule,
     ],
     controllers: [IsDevController],
-    providers: [IsDevService],
+    providers: [IsDevService, IsDevFormRepository],
 })
 export class IsDevModule {}

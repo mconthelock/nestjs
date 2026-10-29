@@ -20,6 +20,14 @@ const addRequestId = winston.format((info) => {
     return info;
 });
 
+const addIp = winston.format((info) => {
+    const ip = requestNamespace.get('ip');
+    if (ip) {
+        info.ip = ip;
+    }
+    return info;
+});
+
 const colors = {
     error: 'red',
     warn: 'yellow',
@@ -62,10 +70,6 @@ const skipSelectQuery = winston.format((info) => {
 });
 
 const skipBlankReqID = winston.format((info) => {
-    if (info.logType) {
-        return info;
-    }
-    if (info.context === 'SchedulerService') return info;
     if (
         info.requestId === undefined ||
         info.requestId === null ||
@@ -94,6 +98,17 @@ const skipError = winston.format((info) => {
 
 const onlyError = winston.format((info) => {
     if (info.level === 'error') return info;
+    return false;
+});
+
+const onlyDebug = winston.format((info) => {
+    if (info.level === 'debug' && info.logType && info.logType === 'debug')
+        return info;
+    return false;
+});
+
+const onlyScheduler = winston.format((info) => {
+    if (info.logType === 'Scheduler') return info;
     return false;
 });
 
@@ -183,6 +198,44 @@ export const winstonConfig = {
                 addRequestId(),
                 winston.format.timestamp(),
                 winston.format.uncolorize(), // ลบสีออก
+                winston.format.json(),
+            ),
+        }),
+
+        new DailyRotateFile({
+            dirname: logDir,
+            filename: 'debug-%DATE%.log',
+            datePattern: 'YYYY-MM-DD',
+            zippedArchive: true,
+            maxFiles: '30d',
+            level: process.env.LOGGER_FILE,
+            format: winston.format.combine(
+                stripColors(),
+                onlyDebug(), // เขียนแค่ debug logs
+                ignoreTypeOrmEntities(),
+                addRequestId(),
+                addIp(),
+                winston.format.timestamp(),
+                winston.format.uncolorize(),
+                winston.format.json(),
+            ),
+        }),
+
+        new DailyRotateFile({
+            dirname: logDir,
+            filename: 'scheduler-%DATE%.log',
+            datePattern: 'YYYY-MM-DD',
+            zippedArchive: true,
+            maxFiles: '30d',
+            level: process.env.LOGGER_FILE,
+            format: winston.format.combine(
+                stripColors(),
+                onlyScheduler(), // เขียนแค่ scheduler logs
+                ignoreTypeOrmEntities(),
+                addRequestId(),
+                addIp(),
+                winston.format.timestamp(),
+                winston.format.uncolorize(),
                 winston.format.json(),
             ),
         }),

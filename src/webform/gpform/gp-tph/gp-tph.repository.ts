@@ -30,6 +30,40 @@ export class GpTphRepository extends BaseRepository {
         });
     }
 
+    lockRequest(form: FormDto) {
+        return this.getRepository(GPTPH_REQ_HEADER).createQueryBuilder('request')
+            .setLock('pessimistic_write')
+            .where('request.NFRMNO = :NFRMNO', form)
+            .andWhere('request.VORGNO = :VORGNO', form)
+            .andWhere('request.CYEAR = :CYEAR', form)
+            .andWhere('request.CYEAR2 = :CYEAR2', form)
+            .andWhere('request.NRUNNO = :NRUNNO', form)
+            .getOne();
+    }
+
+    updateAreaApproval(form: FormDto, areaId: number, approved: '1' | '0' | null) {
+        return this.getRepository(GPTPH_AREA_RECORD).update(
+            { CYEAR2: form.CYEAR2, NRUNNO: form.NRUNNO, AREA_ID: areaId },
+            { AREA_APPROVED: approved },
+        );
+    }
+
+    async finalizeRejectedRequest(form: FormDto) {
+        await this.getRepository(FLOW).update(
+            { ...form, CAPVSTNO: '0', CSTEPST: In(['1', '2', '3']) },
+            { CAPVSTNO: '2', CSTEPST: '7' },
+        );
+        await this.getRepository(FORM).update(form, { CST: '3' });
+    }
+
+    // Area Owner rejects only affect their own area; they must not reject the whole form.
+    async restoreStatusAfterPartialAreaOwnerReject(form: FormDto) {
+        const rejected = await this.getRepository(FLOW).findBy({ ...form, CAPVSTNO: '2' });
+        if (rejected.length && rejected.every((step) => step.CEXTDATA?.trim() === '01')) {
+            await this.getRepository(FORM).update({ ...form, CST: '3' }, { CST: '2' });
+        }
+    }
+
     async replaceSystemApproverStep(
         form: FormDto,
         stepNo: string,
@@ -66,6 +100,7 @@ export class GpTphRepository extends BaseRepository {
         while (nextStep && nextStep !== '00' && !visited.has(nextStep)) {
             visited.add(nextStep);
             const steps = await this.getRepository(FLOW).findBy({ ...form, CSTEPNO: nextStep });
+            if (steps.some((step) => step.CEXTDATA?.trim() === '01')) break;
             const matching = steps.filter(
                 (step) =>
                     step.CAPVSTNO === '0' &&
@@ -157,6 +192,7 @@ export class GpTphRepository extends BaseRepository {
         details: DeepPartial<GPTPH_APPLICANT>[],
         areaIds: number[],
         formData: { REQBY?: string; INPUTBY?: string; REMARK?: string },
+        replaceAreas: boolean,
     ) {
         await this.getRepository(GPTPH_REQ_HEADER).update(form, header);
         await this.getRepository(FORM).update(form, {
@@ -168,18 +204,21 @@ export class GpTphRepository extends BaseRepository {
             CYEAR2: form.CYEAR2,
             NRUNNO: form.NRUNNO,
         });
-        await this.getRepository(GPTPH_AREA_RECORD).delete({
-            CYEAR2: form.CYEAR2,
-            NRUNNO: form.NRUNNO,
-        });
         await this.getRepository(GPTPH_APPLICANT).save(details);
-        await this.getRepository(GPTPH_AREA_RECORD).save(
-            areaIds.map((AREA_ID) => ({
+        if (replaceAreas) {
+            await this.getRepository(GPTPH_AREA_RECORD).delete({
                 CYEAR2: form.CYEAR2,
                 NRUNNO: form.NRUNNO,
-                AREA_ID,
-            })),
-        );
+            });
+            await this.getRepository(GPTPH_AREA_RECORD).save(
+                areaIds.map((AREA_ID) => ({
+                    CYEAR2: form.CYEAR2,
+                    NRUNNO: form.NRUNNO,
+                    AREA_ID,
+                    AREA_APPROVED: null,
+                })),
+            );
+        }
     }
 
     async deleteRequest(form: FormDto) {

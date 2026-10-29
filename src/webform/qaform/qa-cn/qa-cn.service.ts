@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateQaCnDto } from './dto/create-qa-cn.dto';
 import { UpdateQaCnDto } from './dto/update-qa-cn.dto';
 import { In } from 'typeorm';
@@ -17,16 +17,18 @@ import { J736kpService } from 'src/as400/rtnlibf/j736kp/j736kp.service';
 import { now } from 'src/common/utils/dayjs.utils';
 import { deleteFile, joinPaths } from 'src/common/utils/files.utils';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
-import { log } from 'node:console';
 import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { R027Mp1Service } from 'src/as400/datalibo/r027mp1/r027mp1.service';
 import { FormService } from 'src/webform/form/form.service';
 import { MailService } from 'src/common/services/mail/mail.service';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Injectable()
 export class QaCnService {
     constructor(
+        @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
         private readonly formCreateService: FormCreateService,
         private readonly flowService: FlowService,
         private readonly repoOrgPos: OrgposRepository,
@@ -95,7 +97,7 @@ export class QaCnService {
                         };
                     } else {
                         condition = {
-                            VORGNO: '000502',
+                            VORGNO: '000503',
                             VPOSNO: '30',
                         };
                     }
@@ -161,9 +163,9 @@ export class QaCnService {
                 let inc = await this.repoCnform.findInc(
                     Number(cndata.ITEMNO.charAt(0)),
                 );
-                console.log('>>>>>INC<<<<<');
-                console.log(inc);
-                console.log('>>>>>INC<<<<<');
+                // console.log('>>>>>INC<<<<<');
+                // console.log(inc);
+                // console.log('>>>>>INC<<<<<');
 
                 if (inc) {
                     const items = [
@@ -199,9 +201,9 @@ export class QaCnService {
                         condition: condition,
                         VAPVNO: inc,
                     });
-                    console.log('>>>>>update<<<<<');
-                    console.log(condition);
-                    console.log('>>>>>update<<<<<');
+                    // console.log('>>>>>update<<<<<');
+                    // console.log(condition);
+                    // console.log('>>>>>update<<<<<');
                 }
 
                 if (cndata.RADPROCAMEC == '2') {
@@ -380,7 +382,15 @@ export class QaCnService {
                     },
                     ip,
                 );
+                this.logger.debug(`do Action successs`, {
+                    context: 'approve',
+                    logType: 'debug',
+                });
                 if (confirm.status) {
+                    this.logger.debug(`before process `, {
+                        context: 'approve',
+                        logType: 'debug',
+                    });
                     await this.processApprovalActions(
                         dto,
                         currentForm,
@@ -388,6 +398,10 @@ export class QaCnService {
                         path,
                         fileMappings,
                     );
+                    this.logger.debug(` process success`, {
+                        context: 'approve',
+                        logType: 'debug',
+                    });
                     const formStatus =
                         await this.formCreateService.getFormStatus({
                             ...currentForm,
@@ -396,19 +410,32 @@ export class QaCnService {
                         if (formStatus == '3' && MSTATUS == '1') {
                             await this.createcnng(currentForm, ip);
                         }
+
                         let mstatus = MSTATUS == '1' ? 'PIC' : 'ALL';
+                        this.logger.debug(`Before sendmail`, {
+                            context: 'approve',
+                            logType: 'debug',
+                        });
                         const toEmail = (
                             await this.repoCnform.getApvEmail(
                                 currentForm,
                                 mstatus,
                             )
                         ).map((item) => item.EMAIL);
+                        this.logger.debug(`Before To sendmail`, {
+                            context: 'approve',
+                            logType: 'debug',
+                        });
                         await this.buildmail(
                             currentForm,
                             mstatus,
                             formStatus,
                             toEmail,
                         );
+                        this.logger.debug(`After  sendmail`, {
+                            context: 'approve',
+                            logType: 'debug',
+                        });
                     } else if (STEPREADY == '06' && MSTATUS == '1') {
                         const toEmail = (
                             await this.repoCnform.getApvEmail(
@@ -501,6 +528,9 @@ export class QaCnService {
                         },
                         CSTEPST: '2',
                         VREMARK: REMARK,
+                        CAPVSTNO: '0',
+                        DAPVDATE: null,
+                        CAPVTIME: '',
                     });
                     await this.flowService.updateFlow({
                         condition: {
@@ -508,7 +538,7 @@ export class QaCnService {
                             CEXTDATA: '03',
                         },
                         CSTEPST: '3',
-                        CAPVSTNO: '',
+                        CAPVSTNO: '0',
                         DAPVDATE: null,
                         CAPVTIME: '',
                     });
@@ -520,7 +550,7 @@ export class QaCnService {
                         },
                         CSTEPST: '1',
                     });
-                    console.log('Remark ===' + REMARK);
+                    // console.log('Remark ===' + REMARK);
                     await this.flowService.updateFlow({
                         condition: {
                             ...currentForm,
@@ -528,6 +558,9 @@ export class QaCnService {
                         },
                         CSTEPST: '2',
                         VREMARK: REMARK,
+                        CAPVSTNO: '0',
+                        DAPVDATE: null,
+                        CAPVTIME: '',
                     });
                     await this.flowService.updateFlow({
                         condition: {
@@ -535,7 +568,7 @@ export class QaCnService {
                             CEXTDATA: '02',
                         },
                         CSTEPST: '3',
-                        CAPVSTNO: '',
+                        CAPVSTNO: '0',
                         DAPVDATE: null,
                         CAPVTIME: '',
                     });
@@ -573,19 +606,19 @@ export class QaCnService {
 
     private async createcnng(dto: FormDto, ip: string) {
         try {
-            console.log('creangffffffffffffff');
+            //console.log('creangffffffffffffff');
 
             const res = await this.repoCnform.getFirstNo(dto);
-            console.log('rrrrrrrrrrrrrrrrr');
-            console.log(res);
-            console.log('rrrrrrrrrrrrrrrrr');
+            //console.log('rrrrrrrrrrrrrrrrr');
+            //console.log(res);
+            //console.log('rrrrrrrrrrrrrrrrr');
 
             let newcnng: any[] = [];
             if (res && res.FIRSTNO) {
                 newcnng = await this.r027Mp1Service.getnewcn(res.FIRSTNO);
-                console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA');
-                console.log(newcnng);
-                console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA');
+                //  console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA');
+                //  console.log(newcnng);
+                //  console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA');
                 if (newcnng && newcnng[0].R27M09) {
                     await this.r027Mp1Service.insertNewCn(
                         newcnng[0].R27M09,
@@ -595,9 +628,9 @@ export class QaCnService {
             }
             const cnform = await this.formService.getFormData(dto);
             const datacnfrm = await this.repoCnform.findByCondition(dto);
-            console.log('ccccccccccccccccccccccccccccc');
-            console.log(cnform);
-            console.log('ccccccccccccccccccccccccccccc');
+            // console.log('ccccccccccccccccccccccccccccc');
+            // console.log(cnform);
+            // console.log('ccccccccccccccccccccccccccccc');
             const cnformnew = {
                 NFRMNO: dto.NFRMNO,
                 VORGNO: dto.VORGNO,
@@ -718,12 +751,22 @@ export class QaCnService {
                   : mtype === 'REQUESTER'
                     ? 'REQUESTER'
                     : 'ALL';
-        console.log('>>>>>>>>>');
-        console.log(to);
-        console.log('>>>>>>>>>');
+        //console.log('>>>>>>>>>');
+        //console.log(to);
+        //console.log('>>>>>>>>>');
+        this.logger.debug(`in builmail before getapv`, {
+            context: 'approve',
+            logType: 'debug',
+        });
 
         let rs = await this.repoCnform.getQueryBuilderResult(dto);
+        this.logger.debug(`in builmail after getapv`, {
+            context: 'approve',
+            logType: 'debug',
+        });
         const first = rs?.[0] ?? null;
+
+        //return false;
         let subject = '';
         let html = '';
         if (mtype == 'ALL') {
@@ -773,12 +816,14 @@ export class QaCnService {
                 html += `<div>Part Name: ${first.PRTNAME}</div>`;
                 let i = 1;
                 for (const row of rs) {
+                    console.log(row.RESULT);
+
                     if (i == 1) {
                         html += `<div>Drawing No.: ${row.DWGNO}</div>`;
                     } else {
                         html += `<div>&nbsp;&nbsp;&nbsp;&nbsp; ${row.DWGNO}</div>`;
                     }
-                    html += `<div>Status: ${row.RESULT === '0' ? "<font color='green'>OK</font>" : row.RESULT === '1' ? "<font color='red'>NG</font>" : ''}</div>`;
+                    html += `<div>Status: ${row.RESULT === 0 ? "<font color='green'>OK</font>" : row.RESULT === 1 ? "<font color='red'>NG</font>" : ''}</div>`;
                     i++;
                 }
             }
@@ -801,6 +846,7 @@ export class QaCnService {
                 }
             }
         }
+
         if (!to || !subject || !html) {
             throw new Error('Mail data is incomplete');
         }
@@ -810,7 +856,15 @@ export class QaCnService {
             subject: subject,
             html: html,
         };
+        this.logger.debug(`before send mail `, {
+            context: 'approve',
+            logType: 'debug',
+        });
         await this.mailService.sendMail(objmail);
+        this.logger.debug(`after send mail `, {
+            context: 'approve',
+            logType: 'debug',
+        });
     }
 
     private async processApprovalActions(
@@ -886,16 +940,27 @@ export class QaCnService {
                 },
             );
             if (ACTION != 'return') {
-                await this.repoDwg.deleteByAll(currentForm);
-                await this.repoDwg.insertMultiple(dwgToInsert);
+                //console.log('xxxxxxxxxxx');
+
+                //console.log(dwgToInsert);
+                //console.log('YYYYYYY');
+                if (dwgToInsert && dwgToInsert.length > 0) {
+                    console.log(dwgToInsert);
+                    console.log('infunction');
+
+                    await this.repoDwg.deleteByAll(currentForm);
+                    await this.repoDwg.insertMultiple(dwgToInsert);
+                }
             }
         }
 
         if (ACTION == 'approve') {
             if (STEPREADY == '--') {
                 await this.repoCnform.update({ ...currentForm }, { ...cndata });
-                await this.repoDwg.deleteByAll(currentForm);
-                await this.repoDwg.insertMultiple(dwgToInsert);
+                if (dwgToInsert && dwgToInsert.length > 0) {
+                    await this.repoDwg.deleteByAll(currentForm);
+                    await this.repoDwg.insertMultiple(dwgToInsert);
+                }
             }
             if (CEXTDATA == 8 && cndata.CLSNO == 2) {
                 if (cndata.INVNO && cndata.INVNO.length >= 8) {

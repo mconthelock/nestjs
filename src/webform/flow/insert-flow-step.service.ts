@@ -77,7 +77,7 @@ export class InsertFlowStepService extends FlowService {
             if (!startStep) {
                 this.logger.warn('Start step not found in flow', {
                     context: 'InsertFlowStepService',
-                    logType: 'business'
+                    logType: 'debug'
                 });
                 throw new Error('Start step not found in flow');
             }
@@ -93,7 +93,7 @@ export class InsertFlowStepService extends FlowService {
             if (!beforeStep) {
                 this.logger.info(`Before step ${BEFORESTEPNO} not found in flow`, {
                     context: 'InsertFlowStepService',
-                    logType: 'business'
+                    logType: 'debug'
                 });
                 return;
                 // throw new Error('Before step not found in flow');

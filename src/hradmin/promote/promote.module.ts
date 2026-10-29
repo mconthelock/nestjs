@@ -4,10 +4,10 @@ import { PromoteController } from './promote.controller';
 import { MasterkeyModule } from '../masterkey/masterkey.module';
 import { DatabaseService } from '../shared/database.service';
 import { JobpromoteController } from './jobpromote.controller';
-
+import { MailModule } from 'src/common/services/mail/mail.module';
 @Module({
-  imports: [MasterkeyModule],
-  controllers: [PromoteController, JobpromoteController],
-  providers: [PromoteService, DatabaseService],
+    imports: [MasterkeyModule, MailModule],
+    controllers: [PromoteController, JobpromoteController],
+    providers: [PromoteService, DatabaseService],
 })
 export class PromoteModule {}

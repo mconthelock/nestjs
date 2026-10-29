@@ -1,24 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { PurCpcRepository } from '../repository/pucpc_form.repository';
+import { PurCpcRepository } from '../repository/purcpc_form.repository';
 import { PurcpcProcPlanViewRepository } from '../repository/purcpc_proc_list_view.repository';
 import { PurcpcProcCompareViewRepository } from '../repository/purcpc_proc_compare_view.repository';
+import { PurCpcDetailRepository } from '../repository/purcpc_details.repository';
 
 import {
     PriceComparisonDto,
     PriceComparisonPlannerDto,
+    PriceComparisonListDto,
+    PriceComparisonItemDetailDto,
 } from '../dto/price-comparison.dto';
-import { CreatePcpFormDto } from '../dto/create-pcp-form.dto';
 
 import { IimService as Iim400Service } from 'src/as400/bpcsfvnew/iim/iim.service';
+import { CreatePurCpcService } from './purcpc_create.service';
+import { PurcpcProcItemDetailRepository } from '../repository/purcpc_proc_item_detail.repository';
+import { PurPraCreateService } from '../../pur-pra/services/pur-pra-create-form.service';
 
 @Injectable()
-export class PurCpcService {
+export class PurCpcService extends CreatePurCpcService {
     constructor(
-        private readonly repo: PurCpcRepository,
+        protected readonly repo: PurCpcRepository,
+        protected readonly detailsRepo: PurCpcDetailRepository,
+        protected readonly prapvFormService: PurPraCreateService,
+
         private readonly iim400Service: Iim400Service,
         private readonly purcpcProcPlanViewRepo: PurcpcProcPlanViewRepository,
         private readonly purcpcProcCompareViewRepo: PurcpcProcCompareViewRepository,
-    ) {}
+        private readonly purcpcProcItemDetailRepo: PurcpcProcItemDetailRepository,
+    ) {
+        super(repo, detailsRepo, prapvFormService);
+    }
 
     /**
      * @author Sutthipong Tangmongkhoncharoen(24008)
@@ -70,9 +81,103 @@ export class PurCpcService {
         }
     }
 
-    async create(dto: CreatePcpFormDto) {
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-08
+     * @description ดึงข้อมูลรายละเอียด item จาก master ของแต่ละระบบ
+     * @param data
+     * @returns
+     */
+    async findItemDetail(data: PriceComparisonItemDetailDto) {
         try {
-            return await this.repo.create(dto);
+            switch (data.SYSTEM) {
+                case 'AS400':
+                    return await this.iim400Service.findItemDetail(data.ITEM);
+                case 'PROCUREMENT':
+                    return await this.purcpcProcItemDetailRepo.findItemDetail(
+                        data.ITEM,
+                    );
+                default:
+                    throw new Error(`Unsupported SYSTEM: ${data.SYSTEM}`);
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-09-29
+     * @description ดึงข้อมูลรายการเปรียบเทียบราคาสินค้า
+     * @param data
+     * @returns
+     */
+    async getLists(data: PriceComparisonListDto) {
+        try {
+            const res = await this.repo.getLists(data);
+            if (res.length == 0) {
+                return {
+                    status: false,
+                    message: 'No records found',
+                };
+            }
+            return {
+                status: true,
+                message: `found ${res.length} records`,
+                data: res,
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-13
+     * @description ดึงข้อมูลรายการเปรียบเทียบราคาสินค้าตามหมายเลขฟอร์ม
+     * @param form
+     * @returns
+     */
+    async getListByForm(form: string) {
+        try {
+            const res = await this.repo.getListByForm(form);
+            return !res
+                ? {
+                      status: false,
+                      message: 'Price comparison record not found',
+                  }
+                : {
+                      status: true,
+                      message: `Price comparison record found`,
+                      data: res,
+                  };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-09-30
+     * @description ดึงข้อมูลฟอร์ม PUR-CPC ตามหมายเลขฟอร์มที่ระบุ
+     * @param form หมายเลขฟอร์ม PUR-CPC ที่ต้องการดึงข้อมูล
+     * @returns
+     */
+    async getForm(form: string) {
+        try {
+            const pk = this.crackPrimaryKey(form);
+            const res = await this.repo.getForm(pk);
+            if (res.length == 0) {
+                return {
+                    status: false,
+                    message: 'No records found',
+                };
+            }
+            return {
+                status: true,
+                message: `found ${res.length} records`,
+                data: res,
+            };
         } catch (error) {
             throw error;
         }

@@ -64,6 +64,8 @@ export interface FinnpoReportFilterDto {
     formDateTo?: string;
     invoiceDateFrom?: string;
     invoiceDateTo?: string;
+    approveDateFrom?: string;
+    approveDateTo?: string;
     expenseCode?: number | string;
     vendorCode?: string;
     costCenter?: string;
@@ -310,6 +312,8 @@ export class FinnpoService {
                 'invoiceDateFrom',
             ),
             invoiceDateTo: this.validateReportDate(dto.invoiceDateTo, 'invoiceDateTo'),
+            approveDateFrom: this.validateReportDate(dto.approveDateFrom, 'approveDateFrom'),
+            approveDateTo: this.validateReportDate(dto.approveDateTo, 'approveDateTo'),
             expenseCode:
                 dto.expenseCode === undefined ||
                 dto.expenseCode === null ||
@@ -342,6 +346,16 @@ export class FinnpoService {
         ) {
             throw new BadRequestException(
                 'invoiceDateFrom must not be later than invoiceDateTo',
+            );
+        }
+
+        if (
+            filters.approveDateFrom &&
+            filters.approveDateTo &&
+            filters.approveDateFrom > filters.approveDateTo
+        ) {
+            throw new BadRequestException(
+                'approveDateFrom must not be later than approveDateTo',
             );
         }
 

@@ -27,4 +27,19 @@ export class IeFileService {
     async getFile(dto: QueryHandleFileFormDto) {
         return this.repo.getFile(dto);
     }
+
+    async deleteFileByID(id: number) {
+        try {
+            const res = await this.repo.deleteById(id);
+            if (res.affected === 0) {
+                throw new Error('Delete IE File Failed: No record deleted');
+            }
+            return {
+                status: true,
+                message: 'Delete IE File Successfully',
+            };
+        } catch (error) {
+            throw new Error('Delete IE File Error: ' + error.message);
+        }
+    }
 }

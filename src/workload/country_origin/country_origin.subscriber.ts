@@ -10,7 +10,7 @@ export class CountryOriginSubscriber implements EntitySubscriberInterface<COUNTR
     beforeUpdate(event: UpdateEvent<COUNTRY_ORIGIN>) {
         if (event.entity && event.databaseEntity) {
             // โยก CREATEBY ที่ส่งมา → UPDATEBY แล้วใช้ CREATEBY เดิมจาก DB
-            event.entity.UPDATEBY = event.entity.CREATEBY;
+            event.entity.UPDATEBY = event.entity.UPDATEBY || event.entity.CREATEBY;
             event.entity.CREATEBY = event.databaseEntity.CREATEBY;
             event.entity.UPDATEDATE = new Date();
         }

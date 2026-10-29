@@ -3,7 +3,10 @@ import { CreatePsFileDto } from './dto/create-ps-file.dto';
 import { UpdatePsFileDto } from './dto/update-ps-file.dto';
 import { PsFileRepository } from './ps-file.repository';
 import { CreateHandleFileFormDto } from 'src/webform/handle-file-form/dto/create-handle-file-form.dto';
-import { QueryHandleFileFormDto, SearchHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
+import {
+    QueryHandleFileFormDto,
+    SearchHandleFileFormDto,
+} from 'src/webform/handle-file-form/dto/search-handle-file-form.dto';
 
 @Injectable()
 export class PsFileService {
@@ -26,5 +29,20 @@ export class PsFileService {
 
     async getFile(dto: QueryHandleFileFormDto) {
         return this.repo.getFile(dto);
+    }
+
+    async deleteFileByID(id: number) {
+        try {
+            const res = await this.repo.deleteById(id);
+            if (res.affected === 0) {
+                throw new Error('Delete PS File Failed: No record deleted');
+            }
+            return {
+                status: true,
+                message: 'Delete PS File Successfully',
+            };
+        } catch (error) {
+            throw new Error('Delete PS File Error: ' + error.message);
+        }
     }
 }

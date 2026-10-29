@@ -7,13 +7,13 @@
 Base URL: `http://localhost:3000` (เปลี่ยน host/port ตาม deployment; PORT ตั้งค่าผ่าน environment) ไม่มี global prefix ในแอปปัจจุบัน หาก proxy เพิ่ม prefix ให้เติมเอง
 ส่ง JSON ด้วย Content-Type: application/json และใช้ชื่อ field ตัวพิมพ์ใหญ่
 
-| ตาราง         | URL             |
-| ------------- | --------------- |
-| ADJREASONMST  | /ps-adj/reasons |
-| ADJORDREQ     | /ps-adj/orders  |
-| ADJODRATTFILE | /ps-adj/files   |
+| ตาราง | POST (เพิ่ม) | GET / PATCH / DELETE |
+| --- | --- | --- |
+| ADJREASONMST | /ps-adj/reasons | /ps-adj/reasons |
+| ADJORDREQ | /ps-adj/insert_adjust | /ps-adj/orders |
+| ADJODRATTFILE | /ps-adj/insert_files_adjust | /ps-adj/files |
 
-ทุก URL รองรับ POST (เพิ่ม), GET (ค้นหา), PATCH (แก้ไข), DELETE (ลบ)
+ฟังก์ชันเพิ่มรายการใช้ชื่อ `insert_adjust` และเพิ่มข้อมูลไฟล์แนบใช้ชื่อ `insert_files_adjust` ตรงกันใน Controller, Service และ Repository
 POST ส่ง key และข้อมูลใน body; GET ส่ง key ที่ต้องการกรองผ่าน query string (ไม่ส่ง = 100 รายการแรก เรียงตาม primary key); PATCH และ DELETE ต้องส่ง key ครบผ่าน query string; PATCH ส่งเฉพาะข้อมูลที่แก้ใน body ห้ามเปลี่ยน primary key
 
 ## ชนิดข้อมูล
@@ -83,7 +83,7 @@ POST /ps-adj/reasons
 
 ### 2. เพิ่มรายการ adjust
 
-POST /ps-adj/orders
+POST /ps-adj/insert_adjust
 
 ```json
 {
@@ -111,7 +111,7 @@ POST /ps-adj/orders
 
 ### 3. เพิ่มข้อมูลไฟล์แนบ
 
-POST /ps-adj/files
+POST /ps-adj/insert_files_adjust
 
 ```json
 {
@@ -125,17 +125,8 @@ POST /ps-adj/files
 }
 ```
 
-SFILE เป็นชื่อไฟล์หรือ path ที่จัดเก็บเท่านั้น endpoint นี้ไม่ upload binary และไม่สร้างไฟล์บน disk
-ค่าตัวอย่างของ form key ต้องเปลี่ยนให้ตรงกับ FORM จริงก่อนเพิ่ม file
+Path upload file : \\amecnas\AMECWEB\Adjust
 
-## ตัวอย่าง curl
-
-```sh
-curl -X POST 'http://localhost:3000/ps-adj/reasons' -H 'Content-Type: application/json' -d '{"REASONNO":"1","REASON":"Quantity adjustment","CSTDESC":"Y"}'
-curl 'http://localhost:3000/ps-adj/orders?NFRMNO=1&VORGNO=050301&CYEAR=26&CYEAR2=2026&NRUNNO=1'
-curl -X PATCH 'http://localhost:3000/ps-adj/orders?NFRMNO=1&VORGNO=050301&CYEAR=26&CYEAR2=2026&NRUNNO=1&CNTLNO=00000000001' -H 'Content-Type: application/json' -d '{"REVQTY":"15","DESCRIBE":null}'
-curl -X DELETE 'http://localhost:3000/ps-adj/files?NFRMNO=1&VORGNO=050301&CYEAR=26&CYEAR2=2026&NRUNNO=1&ID=01'
-```
 
 สำหรับ reasons ใช้ query REASONNO=1; orders ใช้ form key 5 ช่อง + CNTLNO; files ใช้ form key 5 ช่อง + ID
 

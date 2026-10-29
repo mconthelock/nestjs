@@ -41,7 +41,7 @@ export class PsAdjRepository extends BaseRepository {
     deleteReason(key: ReasonKeyDto) {
         return this.getRepository(ADJREASONMST).delete(key);
     }
-    createOrder(dto: CreateOrderDto) {
+    insert_adjust(dto: CreateOrderDto) {
         return this.getRepository(ADJORDREQ).insert(dto);
     }
     findOrder(key: FindOrderDto) {
@@ -64,7 +64,7 @@ export class PsAdjRepository extends BaseRepository {
     deleteOrder(key: OrderKeyDto) {
         return this.getRepository(ADJORDREQ).delete(key);
     }
-    createFile(dto: CreateFileDto) {
+    insert_files_adjust(dto: CreateFileDto) {
         return this.getRepository(ADJODRATTFILE).insert(dto);
     }
     findFile(key: FindFileDto) {

@@ -45,9 +45,9 @@ export class PsAdjController {
     deleteReason(@Query() key: ReasonKeyDto) {
         return this.service.deleteReason(key);
     }
-    @Post('orders')
-    createOrder(@Body() dto: CreateOrderDto) {
-        return this.service.createOrder(dto);
+    @Post('insert_adjust')
+    insert_adjust(@Body() dto: CreateOrderDto) {
+        return this.service.insert_adjust(dto);
     }
     @Get('orders')
     findOrder(@Query() key: FindOrderDto) {
@@ -61,9 +61,9 @@ export class PsAdjController {
     deleteOrder(@Query() key: OrderKeyDto) {
         return this.service.deleteOrder(key);
     }
-    @Post('files')
-    createFile(@Body() dto: CreateFileDto) {
-        return this.service.createFile(dto);
+    @Post('insert_files_adjust')
+    insert_files_adjust(@Body() dto: CreateFileDto) {
+        return this.service.insert_files_adjust(dto);
     }
     @Get('files')
     findFile(@Query() key: FindFileDto) {

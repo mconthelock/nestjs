@@ -73,6 +73,26 @@ function setup() {
 }
 
 describe('TS repository transaction boundary', () => {
+    it('uses IS NULL to match Oracle empty GNO/LNO without binding undefined', async () => {
+        const { repo, manager } = setup();
+        manager.query.mockResolvedValue([{ MATCH_COUNT: 1 }]);
+        expect(
+            await repo.transaction(() =>
+                repo.processExists({
+                    DWG: 'YA154D379',
+                    GNO: '',
+                    LNO: undefined,
+                    ITEM: '125',
+                    PROCID_OLD: 'G1SHE',
+                    PROCID: 'G1SHE',
+                }),
+            ),
+        ).toBe(true);
+        const [sql, binds] = manager.query.mock.calls[0];
+        expect(sql).toContain('TRIM(GNO) IS NULL');
+        expect(sql).toContain('TRIM(LNO) IS NULL');
+        expect(binds).toEqual(['YA154D379', 'G1SHE']);
+    });
     it('checks only DWG/GNO/LNO/PROCID_OLD across existing details, excluding ITEM and form identity', async () => {
         const { repo, manager } = setup();
         manager.query.mockResolvedValue([{ MATCH_COUNT: '2' }]);

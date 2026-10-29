@@ -149,8 +149,16 @@ export class AutoTsProcessItemDto extends OmitType(TsDetailDto, [
     'LNO',
 ] as const) {
     @RequiredText(9) DWG: string;
-    @RequiredText(3) GNO: string;
-    @RequiredText(3) LNO: string;
+    @OptionalText(3)
+    @Transform(({ value }) =>
+        typeof value === 'string' ? value.trim() || null : value,
+    )
+    GNO?: string | null;
+    @OptionalText(3)
+    @Transform(({ value }) =>
+        typeof value === 'string' ? value.trim() || null : value,
+    )
+    LNO?: string | null;
     @RequiredText(3) ITEM: string;
 }
 

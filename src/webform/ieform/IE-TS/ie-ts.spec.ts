@@ -26,6 +26,29 @@ const check = (cls: any, data: unknown) =>
     });
 
 describe('TS request validation', () => {
+    it.each(['', '   ', null, undefined])(
+        'accepts blank GNO/LNO: %j',
+        async (value) => {
+            const data = {
+                NFRMNO: 4,
+                VORGNO: '051401',
+                CYEAR: '21',
+                REQUEST_BY: '25009',
+                INPUT_BY: '25009',
+                ITEMS: [
+                    {
+                        DWG: 'YA154D379',
+                        GNO: value,
+                        LNO: value,
+                        ITEM: '125',
+                        PROCID_OLD: 'G1SHE',
+                        PROCID: 'G1SHE',
+                    },
+                ],
+            };
+            expect(await check(AutoInsertTsProcessDto, data)).toHaveLength(0);
+        },
+    );
     it('accepts normal payload and rejects missing/oversized nested fields', async () => {
         expect(await check(InsertTsProcessDto, payload())).toHaveLength(0);
         expect(

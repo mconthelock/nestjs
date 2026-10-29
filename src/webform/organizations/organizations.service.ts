@@ -90,7 +90,7 @@ export class OrganizationsService {
     async getSubOrganizations(org: string, parent: boolean = false) {
         try {
             const orgs = await this.findAll();
-            return orgs.data
+            const res =  orgs.data
                 .filter(
                     (o) =>
                         (o.SDIVCODE === org ||
@@ -120,6 +120,18 @@ export class OrganizationsService {
                     };
                 })
                 .filter((o) => (parent ? true : o.CODE !== org));
+            if (res.length === 0) {
+                return {
+                    status: false,
+                    message: 'No sub-organizations found',
+                    data: [],
+                };
+            }
+            return {
+                status: true,
+                message: `Organization tree found ${res.length} items`,
+                data: res,
+            };
         } catch (error) {
             throw error;
         }
@@ -150,9 +162,9 @@ export class OrganizationsService {
                     org.VORGNO,
                     parent,
                 );
-                if (orgTree.length > 0) {
+                if (orgTree.status && orgTree.data.length > 0) {
                     const orgTreeCode = res.map((t) => t.CODE);
-                    orgTree.forEach((o) => {
+                    orgTree.data.forEach((o) => {
                         if (!orgTreeCode.includes(o.CODE)) {
                             res.push(o);
                         }
@@ -160,14 +172,16 @@ export class OrganizationsService {
                 }
             }
             if (res.length === 0) {
-                throw new Error(
-                    `No organization tree found for the given employee number ${empno}`,
-                );
+                return {
+                    status: false,
+                    message: `No organization tree found for the given employee number ${empno}`,
+                };
             }
             // เรียงตาม CODE
             res.sort((a, b) => a.CODE.localeCompare(b.CODE));
             return {
                 status: true,
+                message: `Organization tree found ${res.length} items`,
                 data: res,
             };
         } catch (error) {

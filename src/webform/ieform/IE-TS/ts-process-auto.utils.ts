@@ -6,11 +6,25 @@ import {
     TsHeaderDto,
 } from './dto/ts-process.dto';
 
+export const nullableTsCode = (
+    value: string | null | undefined,
+): string | null => value?.trim() || null;
+
 const drawingIdentity = (row: AutoTsProcessItemDto) =>
-    JSON.stringify([row.DWG, row.GNO, row.LNO, row.ITEM]);
+    JSON.stringify([
+        row.DWG,
+        nullableTsCode(row.GNO),
+        nullableTsCode(row.LNO),
+        row.ITEM,
+    ]);
 
 export const processIdentity = (row: AutoTsProcessItemDto) =>
-    JSON.stringify([row.DWG, row.GNO, row.LNO, row.PROCID_OLD]);
+    JSON.stringify([
+        row.DWG,
+        nullableTsCode(row.GNO),
+        nullableTsCode(row.LNO),
+        row.PROCID_OLD,
+    ]);
 
 export function groupTsForms(
     forms: AutoInsertTsProcessDto[],
@@ -54,8 +68,8 @@ export function buildTsRows(items: AutoTsProcessItemDto[]): {
             HEADERS.push({
                 SEQ: drawing.SEQ,
                 DWGNO: row.DWG,
-                GNO: row.GNO,
-                LNO: row.LNO,
+                GNO: nullableTsCode(row.GNO),
+                LNO: nullableTsCode(row.LNO),
                 ITEMNO: row.ITEM,
             });
         }
@@ -72,6 +86,8 @@ export function buildTsRows(items: AutoTsProcessItemDto[]): {
         const { ITEM, ...detail } = row;
         DETAILS.push({
             ...detail,
+            GNO: nullableTsCode(row.GNO),
+            LNO: nullableTsCode(row.LNO),
             SEQ: drawing.SEQ,
             SEQ_PROC: String(drawing.processes.size).padStart(2, '0'),
         });

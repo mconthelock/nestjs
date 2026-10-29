@@ -222,14 +222,24 @@ node node_modules/jest/bin/jest.js --runInBand --config src/webform/psform/ps-ad
 ```json
 [
     {
-        "NFRMNO": 1, "VORGNO": "050301", "CYEAR": "26",
-        "REQBY": "10001", "INPUTBY": "10002",
-        "CNTLNO": "00000000001", "DWGNO": "DWG001", "QTY": "10"
+        "NFRMNO": 1,
+        "VORGNO": "050301",
+        "CYEAR": "26",
+        "REQBY": "10001",
+        "INPUTBY": "10002",
+        "CNTLNO": "00000000001",
+        "DWGNO": "DWG001",
+        "QTY": "10"
     },
     {
-        "NFRMNO": 1, "VORGNO": "050301", "CYEAR": "26",
-        "REQBY": "10001", "INPUTBY": "10002",
-        "CNTLNO": "00000000002", "DWGNO": "DWG002", "QTY": "20"
+        "NFRMNO": 1,
+        "VORGNO": "050301",
+        "CYEAR": "26",
+        "REQBY": "10001",
+        "INPUTBY": "10002",
+        "CNTLNO": "00000000002",
+        "DWGNO": "DWG002",
+        "QTY": "20"
     }
 ]
 ```
@@ -252,10 +262,24 @@ node node_modules/jest/bin/jest.js --runInBand --config src/webform/psform/ps-ad
     "skipped": 1,
     "failed": 0,
     "items": [
-        { "index": 0, "DWGNO": "DWG001", "status": "skipped", "reason": "DWGNO already exists" },
         {
-            "index": 1, "DWGNO": "DWG002", "status": "created",
-            "data": { "NFRMNO": 1, "VORGNO": "050301", "CYEAR": "26", "CYEAR2": "2026", "NRUNNO": 42, "CNTLNO": "00000000002" }
+            "index": 0,
+            "DWGNO": "DWG001",
+            "status": "skipped",
+            "reason": "DWGNO already exists"
+        },
+        {
+            "index": 1,
+            "DWGNO": "DWG002",
+            "status": "created",
+            "data": {
+                "NFRMNO": 1,
+                "VORGNO": "050301",
+                "CYEAR": "26",
+                "CYEAR2": "2026",
+                "NRUNNO": 42,
+                "CNTLNO": "00000000002"
+            }
         }
     ]
 }
@@ -265,3 +289,26 @@ node node_modules/jest/bin/jest.js --runInBand --config src/webform/psform/ps-ad
 หากส่ง object ชุดเดียวและพบ DWGNO เดิม จะตอบ HTTP 201 พร้อม `{ "status": "skipped", "reason": "DWGNO already exists" }`; หากเพิ่มสำเร็จยังคืน `{ "status": true, "data": { ... } }` ตามรูปแบบเดิม
 
 การตรวจและ insert ใช้ table lock ของ FORM และ ADJORDREQ ภายใน transaction เพื่อป้องกันการตรวจผ่านพร้อมกันสองคำขอ จึงอาจรอ transaction อื่นที่กำลังเขียนตารางเหล่านี้; CRUD insert_adjust เดิมยังเป็นการ insert โดยตรงและไม่ได้เพิ่มเงื่อนไขข้าม DWGNO ซ้ำ
+
+### แก้ปัญหา FORMMST not found / VFORMPAGE
+
+หากชุดที่ไม่ซ้ำล้มเหลวด้วย `Cannot read properties of undefined (reading 'VFORMPAGE')` แสดงว่าขั้นตอนสร้าง Form ไม่พบ form master ตาม NFRMNO, VORGNO, CYEAR ที่ส่งมา โค้ดที่ปรับแล้วจะคืน `FORMMST not found: NNO=..., VORGNO=..., CYEAR=...` แทน
+
+ใช้ SQL นี้ตรวจสอบ (ตัวอย่างจาก payload ทดสอบ):
+
+```sql
+SELECT NNO, VORGNO, CYEAR, VANAME, VNAME, VFORMPAGE
+FROM WEBFORM.FORMMST
+WHERE NNO = 1 AND VORGNO = '050301' AND CYEAR = '26';
+```
+
+หากไม่พบ ให้ค้นหา form master ของ adjust ที่มีจริง แล้วนำ NNO ไปส่งเป็น NFRMNO พร้อม VORGNO และ CYEAR จากแถวนั้น ค่า 1 / 050301 / 26 ในตัวอย่างเป็นเพียงตัวอย่าง ไม่ได้ยืนยันว่ามีอยู่ในฐานข้อมูลของ deployment
+
+```sql
+SELECT NNO, VORGNO, CYEAR, VANAME, VNAME, VFORMPAGE
+FROM WEBFORM.FORMMST
+WHERE VORGNO = '050301'
+ORDER BY NNO, CYEAR;
+```
+
+CYEAR เป็นส่วนหนึ่งของรหัส form master ไม่ใช่ค่าที่ต้องเปลี่ยนตามปีปัจจุบันเสมอไป ส่วน CYEAR2 ระบบจะสร้างเอง หากยังไม่มี master สำหรับ adjust ต้องตั้งค่า form master และ flow master ให้ถูกต้องก่อนเรียก auto API

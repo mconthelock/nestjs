@@ -179,4 +179,134 @@ describe('S011mpService', () => {
             expect(result).toBeNull();
         });
     })
+
+    describe('Test case Data error bm by case', () => {
+        it('should return the quantity differences for the given order', async () => {
+            const data= [
+                {
+                    S11M01: 'EXIV53940',
+                    S11M08: '2026112',
+                    S11M02: '36201',
+                    S11M03: '02',
+                    S11M04: 'BA131A657 G01 L04',
+                    S11M05: 'HALL POSITION IN',
+                    S11M06: 'BA131A657 G01 L04',
+                    S11M07: '0',
+                    S11M09: 2,
+                },
+                {
+                    S11M01: 'EXIV53940',
+                    S11M08: '2026112',
+                    S11M02: '36201',
+                    S11M03: '02',
+                    S11M04: 'BA131A657 G01 L04',
+                    S11M05: 'HALL POSITION IN',
+                    S11M06: 'BA131A657 G01 L22',
+                    S11M07: '1',
+                    S11M09: 2,
+                },
+                {
+                    S11M01: 'EXIV53940',
+                    S11M08: '2026112',
+                    S11M02: '36201',
+                    S11M03: '02',
+                    S11M04: 'BA131A657 G01 L04',
+                    S11M05: 'HALL POSITION IN',
+                    S11M06: 'BA131A657 G01 L83',
+                    S11M07: '1',
+                    S11M09: 2,
+                },
+                {
+                    S11M01: 'EXIV53940',
+                    S11M08: '2026112',
+                    S11M02: '36201',
+                    S11M03: '01',
+                    S11M04: 'KA510A245 G03 L93',
+                    S11M05: 'JAMB ASS\'Y',
+                    S11M06: 'KA510A245 G03 L93',
+                    S11M07: '0',
+                    S11M09: 1,
+                },
+                {
+                    S11M01: 'EXIV53940',
+                    S11M08: '2026112',
+                    S11M02: '36201',
+                    S11M03: '01',
+                    S11M04: 'KA510A245 G03 L93',
+                    S11M05: 'JAMB ASS\'Y',
+                    S11M06: 'KA510A245 G03 L31',
+                    S11M07: '1',
+                    S11M09: 1,
+                },
+                {
+                    S11M01: 'EXIV53940',
+                    S11M08: '2026112',
+                    S11M02: '36201',
+                    S11M03: '01',
+                    S11M04: 'KA510A245 G03 L91',
+                    S11M05: 'JAMB ASS\'Y',
+                    S11M06: 'KA510A245 G03 L91',
+                    S11M07: '0',
+                    S11M09: 1,
+                },
+                {
+                    S11M01: 'EXIV53940',
+                    S11M08: '2026112',
+                    S11M02: '36201',
+                    S11M03: '01',
+                    S11M04: 'KA510A245 G03 L91',
+                    S11M05: 'JAMB ASS\'Y',
+                    S11M06: 'KA510A245 G03 L31',
+                    S11M07: '1',
+                    S11M09: 1,
+                },
+            ];
+
+            const result = await service.mappingLevel(data as any);
+            expect(result).toEqual([
+                {
+                    S11M01: 'EXIV53940',
+                    S11M08: '2026112',
+                    S11M02: '36201',
+                    S11M03: '02',
+                    S11M04: 'BA131A657 G01 L04',
+                    S11M05: 'HALL POSITION IN',
+                    S11M06: 'BA131A657 G01 L04',
+                    S11M07: '0',
+                    S11M09: 2,
+                    LEVEL: 'L22L83',
+                    DRAWING_GROUP: 'BA131A657G01',
+                    MAXQTY: 2,
+                },
+                {
+                    S11M01: 'EXIV53940',
+                    S11M08: '2026112',
+                    S11M02: '36201',
+                    S11M03: '01',
+                    S11M04: 'KA510A245 G03 L93',
+                    S11M05: 'JAMB ASS\'Y',
+                    S11M06: 'KA510A245 G03 L93',
+                    S11M07: '0',
+                    S11M09: 1,
+                    LEVEL: 'L31',
+                    DRAWING_GROUP: 'KA510A245G03',
+                    MAXQTY: 1,
+                },
+                {
+                    S11M01: 'EXIV53940',
+                    S11M08: '2026112',
+                    S11M02: '36201',
+                    S11M03: '01',
+                    S11M04: 'KA510A245 G03 L91',
+                    S11M05: 'JAMB ASS\'Y',
+                    S11M06: 'KA510A245 G03 L91',
+                    S11M07: '0',
+                    S11M09: 1,
+                    LEVEL: 'L31',
+                    DRAWING_GROUP: 'KA510A245G03',
+                    MAXQTY: 1,
+                }
+            ]);
+        });
+    });
 });

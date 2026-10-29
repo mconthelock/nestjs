@@ -41,6 +41,9 @@ export class PsAdjRepository extends BaseRepository {
     deleteReason(key: ReasonKeyDto) {
         return this.getRepository(ADJREASONMST).delete(key);
     }
+    existsByDrawing(DWGNO: string) {
+        return this.getRepository(ADJORDREQ).existsBy({ DWGNO });
+    }
     insert_adjust(dto: CreateOrderDto) {
         return this.getRepository(ADJORDREQ).insert(dto);
     }

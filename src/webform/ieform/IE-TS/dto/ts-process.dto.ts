@@ -34,6 +34,13 @@ const RequiredText = (max: number) =>
     );
 const OptionalText = (max: number) =>
     applyDecorators(IsOptional(), IsString(), MaxLength(max));
+const TrimmedOptionalText = (max: number) =>
+    applyDecorators(
+        OptionalText(max),
+        Transform(({ value }) =>
+            typeof value === 'string' ? value.trim() || null : value,
+        ),
+    );
 
 export class TsFormKeyDto {
     @IsDefined()
@@ -88,10 +95,10 @@ export class TsDetailDto {
     @RequiredText(3) SEQ: string;
     @RequiredText(6) PROCID: string;
     @RequiredText(6) PROCID_OLD: string;
-    @OptionalText(5) TP_OLD?: string | null;
-    @OptionalText(6) TC_OLD?: string | null;
-    @OptionalText(5) TP?: string | null;
-    @OptionalText(6) TC?: string | null;
+    @TrimmedOptionalText(5) TP_OLD?: string | null;
+    @TrimmedOptionalText(6) TC_OLD?: string | null;
+    @TrimmedOptionalText(5) TP?: string | null;
+    @TrimmedOptionalText(6) TC?: string | null;
     @OptionalText(2) SEQ_PROC?: string | null;
     @OptionalText(9) DWG?: string | null;
     @OptionalText(3) GNO?: string | null;

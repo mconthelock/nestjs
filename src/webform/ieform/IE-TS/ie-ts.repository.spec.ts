@@ -207,10 +207,12 @@ describe('TS repository transaction boundary', () => {
         expect(manager.query.mock.calls[0][0]).toBe(
             'LOCK TABLE WEBFORM.FORM IN SHARE ROW EXCLUSIVE MODE',
         );
-        expect(manager.query.mock.calls[1][0]).toBe(
-            'LOCK TABLE IEDOC.PROC_TSDETFORM IN SHARE ROW EXCLUSIVE MODE',
-        );
-        expect(manager.query.mock.calls[2][0]).toContain('SELECT COUNT(*)');
+        expect(manager.query.mock.calls[1][0]).toContain('SELECT COUNT(*)');
+        expect(
+            manager.query.mock.calls.some(([sql]) =>
+                /LOCK TABLE IEDOC\./.test(sql),
+            ),
+        ).toBe(false);
         expect(state).toEqual({ committed: true, rolledBack: false });
         expect(transactionContext.getStore()).toBeUndefined();
     });

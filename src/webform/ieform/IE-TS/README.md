@@ -205,7 +205,11 @@ Content-Type: application/json
 5. แต่ละ process ใช้ SEQ เดียวกับหัวของตน และกำหนด `SEQ_PROC=01,02,...` ตามลำดับที่พบ เริ่ม 01 ใหม่ในแต่ละหัว รองรับสูงสุด 99 processes ต่อหัว
 6. หาก process คนละ PROCID_OLD ที่เหลืออยู่ต้องใช้ PROCID ใหม่ตัวเดียวกันในหัวเดียวกัน จะตอบ 400 เพราะชน primary key `(key ฟอร์ม, SEQ, PROCID)` ไม่มีการทิ้งข้อมูลที่ขัดแย้งโดยเงียบ ๆ
 7. เรียก FormCreateService เพื่อ insert **WEBFORM.FORM และ WEBFORM.FLOW** แล้วใช้ CYEAR2/NRUNNO ที่ได้มา insert **IEDOC.PROC_TSHEADFORM และ IEDOC.PROC_TSDETFORM** ไม่มีการ insert PROC_TSATTFILE ใน endpoint นี้
-8. ทั้ง batch อยู่ใน transaction เดียว หากขั้นตอนใดล้มเหลว rollback ทุกฟอร์มในคำขอนั้น ล็อกตาราง FORM ก่อน PROC_TSDETFORM เพื่อให้การตรวจซ้ำและการบันทึกไม่ถูกแทรกโดย concurrent writers
+8. ทั้ง batch อยู่ใน transaction เดียว หากขั้นตอนใดล้มเหลว rollback ทุกฟอร์มในคำขอนั้น ทุก write endpoint ของ IE-TS ใช้ lock บน WEBFORM.FORM ร่วมกัน เพื่อ serialize การตรวจซ้ำและการบันทึกระหว่างคำขอ IE-TS โดยไม่ใช้ LOCK TABLE ข้าม schema ไปยัง IEDOC
+
+PROCID_OLD, PROCID, TP_OLD, TP, TC_OLD และ TC จะ trim ช่องว่าง/tab หัวท้ายก่อน validation และบันทึก โดยไม่แปลงเป็นตัวเลข จึงรักษาค่าเช่น `"0.0062"` ไว้ครบ หาก body มี tab จริงที่ไม่ได้ escape ภายใน string จะยังเป็น JSON ที่ผิด syntax; ให้ลบ tab นั้นหรือส่งด้วย JSON serializer
+
+หากพบ ORA-01031 ให้ตรวจข้อความ error ใหม่ว่าติดการ lock WEBFORM.FORM หรือ access ตารางใด บัญชี webformConnection ต้องมีสิทธิ์บน WEBFORM.FORM/FLOW ตามกระบวนการสร้างฟอร์มเดิม และสิทธิ์ SELECT/INSERT/UPDATE/DELETE บน IEDOC.PROC_TS* สำหรับ CRUD การแก้โค้ดไม่สามารถเพิ่ม database grants ให้บัญชีได้
 
 การตรวจซ้ำของข้อมูลเดิมใช้ TRIM ใน 4 คอลัมน์เพื่อเทียบรหัสที่อาจมีช่องว่างท้าย ค่า CYEAR คือปี master ที่ส่งมา ส่วน CYEAR2 มาจากปีปัจจุบันตาม FormCreateService ผู้เรียกควรเก็บ key ใน response ไว้ใช้อ่าน/แก้ไข/ลบ
 
@@ -236,8 +240,8 @@ Content-Type: application/json
     "REQUEST_BY": "24013",
     "INPUT_BY": "24013",
     "ITEMS": [
-      { "DWG": "BS011D184", "GNO": "-01", "LNO": "", "ITEM": "620", "PROCID_OLD": "H8BSA", "TP_OLD": "0.1", "TC_OLD": "	0.0038", "PROCID": "H8BSA", "TP": "0.1", "TC": "0.0038" },
-	  { "DWG": "BS011D184", "GNO": "-01", "LNO": "", "ITEM": "620", "PROCID_OLD": "H8MK", "TP_OLD": "0.04", "TC_OLD": "	0.0071", "PROCID": "H8MK", "TP": "0", "TC": "0" }
+      { "DWG": "BS011D184", "GNO": "-01", "LNO": "", "ITEM": "620", "PROCID_OLD": "H8BSA", "TP_OLD": "0.1", "TC_OLD": "0.0038", "PROCID": "H8BSA", "TP": "0.1", "TC": "0.0038" },
+	  { "DWG": "BS011D184", "GNO": "-01", "LNO": "", "ITEM": "620", "PROCID_OLD": "H8MK", "TP_OLD": "0.04", "TC_OLD": "0.0071", "PROCID": "H8MK", "TP": "0", "TC": "0" }
     ]
   }
 ]

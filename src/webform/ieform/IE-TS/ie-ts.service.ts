@@ -53,8 +53,6 @@ export class IeTsService {
             );
         const groups = groupTsForms(dtos);
         return this.write(async () => {
-            await this.repo.lockFormNumber();
-            await this.repo.lockTsProcesses();
             const seen = new Set<string>();
             const items: AutoTsResult[] = [];
             for (const dto of groups) {
@@ -210,9 +208,29 @@ export class IeTsService {
 
     private async write<T>(work: () => Promise<T>): Promise<T> {
         try {
-            return await this.repo.transaction(work);
+            return await this.repo.transaction(async () => {
+                // All IE-TS writes share the WEBFORM-owned lock. Cross-schema
+                // LOCK TABLE IEDOC.* would require additional Oracle privileges.
+                await this.repo.lockFormNumber();
+                return work();
+            });
         } catch (error) {
             const code = error?.driverError?.errorNum ?? error?.errorNum;
+            if (code === 1031) {
+                const sql: string = error?.query ?? '';
+                const operation = /LOCK TABLE WEBFORM\.FORM/i.test(sql)
+                    ? 'lock WEBFORM.FORM'
+                    : /PROC_TSHEADFORM/i.test(sql)
+                      ? 'access IEDOC.PROC_TSHEADFORM'
+                      : /PROC_TSDETFORM/i.test(sql)
+                        ? 'access IEDOC.PROC_TSDETFORM'
+                        : /PROC_TSATTFILE/i.test(sql)
+                          ? 'access IEDOC.PROC_TSATTFILE'
+                          : 'create Form/Flow or access TS data';
+                throw new InternalServerErrorException(
+                    `ORA-01031: webformConnection has insufficient privileges to ${operation}. Check database grants for this connection user.`,
+                );
+            }
             if (code === 1)
                 throw new ConflictException('Duplicate TS process or form key');
             if (code === 2291)

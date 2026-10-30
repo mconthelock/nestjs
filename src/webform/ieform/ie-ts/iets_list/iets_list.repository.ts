@@ -56,6 +56,52 @@ export class IetsListRepository extends BaseRepository {
         return result;
     }
 
+    // ใน IetsListRepository
+    async getLatestRequestsByDwgNos(
+        dwgNos: string[],
+        requestDate: string | Date,
+    ) {
+        if (!dwgNos || dwgNos.length === 0) return [];
+
+        const parsedRequestDate =
+            typeof requestDate === 'string'
+                ? new Date(requestDate)
+                : requestDate;
+
+        const query = await this.getRepository(IETS_LIST)
+            .createQueryBuilder('list')
+            .innerJoin('list.IETSFRM', 'ietsForm')
+            .innerJoin('ietsForm.FORM', 'form')
+            .innerJoin('form.flow', 'flow')
+            .select([
+                'list.DWGNO AS dwgNo',
+                // 1. เปลี่ยนจาก MAX(form.DREQDATE) เป็น MAX(flow.DAPVDATE)
+                'MAX(flow.DAPVDATE) AS maxApvDate',
+            ])
+            .where('list.DWGNO IN (:...dwgNos)', {
+                dwgNos: dwgNos.map((d) => d.trim()),
+            })
+            // 2. เพิ่มเงื่อนไข CSTEPNO = '04'
+            .andWhere('flow.CSTEPNO = :stepNo', { stepNo: '04' })
+            // 3. เปลี่ยนเงื่อนไขเปรียบเทียบวันที่มาใช้ flow.DAPVDATE แทน
+            .andWhere('flow.DAPVDATE <= :requestDate', {
+                requestDate: parsedRequestDate,
+            })
+            .andWhere('form.CST IN (:...cstatus)', { cstatus: ['1', '2'] })
+            .groupBy('list.DWGNO');
+
+        console.log('=== SQL History ===');
+        console.log(query.getSql());
+        console.log('=== Params History ===');
+        console.log(query.getParameters());
+
+        const result = await query.getRawMany();
+        console.log('=== Result History ===');
+        console.log(result);
+
+        return result;
+    }
+
     async update(con: FormDto, dto: UpdateIetsListDto): Promise<boolean> {
         const { ID, ...updateData } = dto;
         const conditions = {

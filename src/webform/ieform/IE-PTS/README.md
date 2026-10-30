@@ -6,13 +6,13 @@ API สำหรับบันทึกหัวฟอร์ม รายละ
 
 กำหนด `BASE_URL` เป็น root URL ของ API ที่ใช้งาน เช่น `http://localhost:3000` (เปลี่ยน host, port และ reverse proxy prefix ตาม deployment จริง) และส่ง `Content-Type: application/json` สำหรับ POST/PUT
 
-| Method | URL | หน้าที่ |
-| --- | --- | --- |
-| POST | `{{BASE_URL}}/ieform/ie-pts/insert_ts_process` | เพิ่ม TS ลงใน Form ที่สร้างไว้แล้ว |
-| POST | `{{BASE_URL}}/ieform/ie-pts/auto_insert_ts_process` | สร้าง Form/Flow แล้วเพิ่ม TS โดยใช้เลขฟอร์มที่ระบบสร้าง |
-| GET | `{{BASE_URL}}/ieform/ie-pts/get_ts_process` | อ่านข้อมูล TS ทั้ง 3 ตารางของฟอร์ม |
-| PUT | `{{BASE_URL}}/ieform/ie-pts/update_ts_process` | แทนที่ข้อมูล TS ทั้งชุดของฟอร์ม |
-| DELETE | `{{BASE_URL}}/ieform/ie-pts/delete_ts_process` | ลบข้อมูล TS ทั้ง 3 ตารางของฟอร์ม |
+| Method | URL                                                 | หน้าที่                                                 |
+| ------ | --------------------------------------------------- | ------------------------------------------------------- |
+| POST   | `{{BASE_URL}}/ieform/ie-pts/insert_ts_process`      | เพิ่ม TS ลงใน Form ที่สร้างไว้แล้ว                      |
+| POST   | `{{BASE_URL}}/ieform/ie-pts/auto_insert_ts_process` | สร้าง Form/Flow แล้วเพิ่ม TS โดยใช้เลขฟอร์มที่ระบบสร้าง |
+| GET    | `{{BASE_URL}}/ieform/ie-pts/get_ts_process`         | อ่านข้อมูล TS ทั้ง 3 ตารางของฟอร์ม                      |
+| PUT    | `{{BASE_URL}}/ieform/ie-pts/update_ts_process`      | แทนที่ข้อมูล TS ทั้งชุดของฟอร์ม                         |
+| DELETE | `{{BASE_URL}}/ieform/ie-pts/delete_ts_process`      | ลบข้อมูล TS ทั้ง 3 ตารางของฟอร์ม                        |
 
 ชื่อ field เป็น **ตัวพิมพ์ใหญ่ตามตัวอย่าง** และชื่อ route เป็นตัวพิมพ์เล็ก อ่านและลบใช้ query string; เพิ่มและแก้ไขใช้ JSON body
 
@@ -22,63 +22,63 @@ API สำหรับบันทึกหัวฟอร์ม รายละ
 
 ### Field ระดับบน
 
-| Field | ชนิด | จำเป็น | รายละเอียด |
-| --- | --- | --- | --- |
-| NFRMNO | integer | ใช่ | รหัสชนิดฟอร์ม 1–9999; ถ้ามี FILES ต้องไม่เกิน 999 เพราะ PROC_TSATTFILE ใช้ NUMBER(3) |
-| VORGNO | string | ใช่ | รหัสหน่วยงาน ไม่เกิน 6 ตัวอักษร |
-| CYEAR | string | ใช่ | ปีของ master ฟอร์ม ตัวเลข 2 หลัก เช่น `"26"`; ใช้ค่าที่ตั้งไว้ใน FORMMST |
-| CYEAR2 | string | ใช่ | ปีของเลขเอกสาร ตัวเลข 4 หลัก เช่น `"2026"` |
-| NRUNNO | integer | ใช่ | เลข running 1–999999 |
-| HEADERS | array of object | ใช่ | อย่างน้อย 1 รายการ; บันทึก PROC_TSHEADFORM |
-| DETAILS | array of object | ไม่ | บันทึก PROC_TSDETFORM; ไม่ส่ง/null/[] หมายถึงไม่มีรายละเอียด |
-| FILES | array of object | ไม่ | บันทึก PROC_TSATTFILE; ไม่ส่ง/null/[] หมายถึงไม่มีไฟล์ |
+| Field   | ชนิด            | จำเป็น | รายละเอียด                                                                           |
+| ------- | --------------- | ------ | ------------------------------------------------------------------------------------ |
+| NFRMNO  | integer         | ใช่    | รหัสชนิดฟอร์ม 1–9999; ถ้ามี FILES ต้องไม่เกิน 999 เพราะ PROC_TSATTFILE ใช้ NUMBER(3) |
+| VORGNO  | string          | ใช่    | รหัสหน่วยงาน ไม่เกิน 6 ตัวอักษร                                                      |
+| CYEAR   | string          | ใช่    | ปีของ master ฟอร์ม ตัวเลข 2 หลัก เช่น `"26"`; ใช้ค่าที่ตั้งไว้ใน FORMMST             |
+| CYEAR2  | string          | ใช่    | ปีของเลขเอกสาร ตัวเลข 4 หลัก เช่น `"2026"`                                           |
+| NRUNNO  | integer         | ใช่    | เลข running 1–999999                                                                 |
+| HEADERS | array of object | ใช่    | อย่างน้อย 1 รายการ; บันทึก PROC_TSHEADFORM                                           |
+| DETAILS | array of object | ไม่    | บันทึก PROC_TSDETFORM; ไม่ส่ง/null/[] หมายถึงไม่มีรายละเอียด                         |
+| FILES   | array of object | ไม่    | บันทึก PROC_TSATTFILE; ไม่ส่ง/null/[] หมายถึงไม่มีไฟล์                               |
 
 ห้ามส่ง key ฟอร์มซ้ำลงในแต่ละ object ของ HEADERS/DETAILS/FILES ระบบเติม key ทั้ง 5 ช่องจากระดับบนให้ทุกแถว
 
 ### HEADERS[]
 
-| Field | ชนิด | จำเป็น | ความยาวสูงสุด / ความหมาย |
-| --- | --- | --- | --- |
-| SEQ | string | ใช่ | 3; ลำดับรายการ เช่น `"001"`; ห้ามซ้ำในฟอร์มเดียวกัน |
-| DWGNO | string/null | ไม่ | 9 |
-| GNO | string/null | ไม่ | 3 |
-| LNO | string/null | ไม่ | 3 |
-| REVISION | string/null | ไม่ | 2 |
-| ITEMNO | string/null | ไม่ | 3 |
-| INPUTDATE | ISO date string/null | ไม่ | เช่น `"2026-10-29"` หรือ `"2026-10-29T09:00:00+07:00"`; ส่งเวลาพร้อม timezone เมื่อต้องการระบุเวลา |
-| EFFJUN | string/null | ไม่ | 5 |
-| IDTAGJUN | string/null | ไม่ | 5 |
-| VDETAIL | string/null | ไม่ | 4000 |
-| TSFLAG | string/null | ไม่ | 1; ถ้าระบุ ต้องมีอยู่ใน IEDOC.TSFLAGMST ตาม foreign key ของฐานข้อมูล |
-| LNO2 | string/null | ไม่ | 3 |
-| PLANJUN | string/null | ไม่ | 5 |
-| TSFLAG_DETAIL | string/null | ไม่ | 500 |
-| PNO | string/null | ไม่ | 2 |
+| Field         | ชนิด                 | จำเป็น | ความยาวสูงสุด / ความหมาย                                                                           |
+| ------------- | -------------------- | ------ | -------------------------------------------------------------------------------------------------- |
+| SEQ           | string               | ใช่    | 3; ลำดับรายการ เช่น `"001"`; ห้ามซ้ำในฟอร์มเดียวกัน                                                |
+| DWGNO         | string/null          | ไม่    | 9                                                                                                  |
+| GNO           | string/null          | ไม่    | 3                                                                                                  |
+| LNO           | string/null          | ไม่    | 3                                                                                                  |
+| REVISION      | string/null          | ไม่    | 2                                                                                                  |
+| ITEMNO        | string/null          | ไม่    | 3                                                                                                  |
+| INPUTDATE     | ISO date string/null | ไม่    | เช่น `"2026-10-29"` หรือ `"2026-10-29T09:00:00+07:00"`; ส่งเวลาพร้อม timezone เมื่อต้องการระบุเวลา |
+| EFFJUN        | string/null          | ไม่    | 5                                                                                                  |
+| IDTAGJUN      | string/null          | ไม่    | 5                                                                                                  |
+| VDETAIL       | string/null          | ไม่    | 4000                                                                                               |
+| TSFLAG        | string/null          | ไม่    | 1; ถ้าระบุ ต้องมีอยู่ใน IEDOC.TSFLAGMST ตาม foreign key ของฐานข้อมูล                               |
+| LNO2          | string/null          | ไม่    | 3                                                                                                  |
+| PLANJUN       | string/null          | ไม่    | 5                                                                                                  |
+| TSFLAG_DETAIL | string/null          | ไม่    | 500                                                                                                |
+| PNO           | string/null          | ไม่    | 2                                                                                                  |
 
 ### DETAILS[]
 
-| Field | ชนิด | จำเป็น | ความยาวสูงสุด / ความหมาย |
-| --- | --- | --- | --- |
-| SEQ | string | ใช่ | 3; ต้องตรงกับ SEQ ใน HEADERS ของคำขอเดียวกัน |
-| PROCID | string | ใช่ | 6; process ใหม่ |
-| PROCID_OLD | string | ใช่ | 6; process เดิม |
-| TP_OLD | string/null | ไม่ | 5 |
-| TC_OLD | string/null | ไม่ | 6 |
-| TP | string/null | ไม่ | 5 |
-| TC | string/null | ไม่ | 6 |
-| SEQ_PROC | string/null | ไม่ | 2 |
-| DWG | string/null | ไม่ | 9 |
-| GNO | string/null | ไม่ | 3 |
-| LNO | string/null | ไม่ | 7; ต่างจาก LNO ของ HEADERS ที่ยาวได้ 3 |
+| Field      | ชนิด        | จำเป็น | ความยาวสูงสุด / ความหมาย                     |
+| ---------- | ----------- | ------ | -------------------------------------------- |
+| SEQ        | string      | ใช่    | 3; ต้องตรงกับ SEQ ใน HEADERS ของคำขอเดียวกัน |
+| PROCID     | string      | ใช่    | 6; process ใหม่                              |
+| PROCID_OLD | string      | ใช่    | 6; process เดิม                              |
+| TP_OLD     | string/null | ไม่    | 5                                            |
+| TC_OLD     | string/null | ไม่    | 6                                            |
+| TP         | string/null | ไม่    | 5                                            |
+| TC         | string/null | ไม่    | 6                                            |
+| SEQ_PROC   | string/null | ไม่    | 2                                            |
+| DWG        | string/null | ไม่    | 9                                            |
+| GNO        | string/null | ไม่    | 3                                            |
+| LNO        | string/null | ไม่    | 7; ต่างจาก LNO ของ HEADERS ที่ยาวได้ 3       |
 
 คู่ `(SEQ, PROCID)` ห้ามซ้ำภายในฟอร์ม แต่ SEQ เดียวมีหลาย PROCID ได้
 
 ### FILES[]
 
-| Field | ชนิด | จำเป็น | รายละเอียด |
-| --- | --- | --- | --- |
-| ID | integer | ใช่ | 0–99; ผู้เรียกกำหนดเอง ห้ามซ้ำในฟอร์มเดียวกัน |
-| FILENAME | string/null | ไม่ | ไม่เกิน 200 ตัวอักษร |
+| Field    | ชนิด        | จำเป็น | รายละเอียด                                    |
+| -------- | ----------- | ------ | --------------------------------------------- |
+| ID       | integer     | ใช่    | 0–99; ผู้เรียกกำหนดเอง ห้ามซ้ำในฟอร์มเดียวกัน |
+| FILENAME | string/null | ไม่    | ไม่เกิน 200 ตัวอักษร                          |
 
 FILES เป็นข้อมูลชื่อไฟล์เท่านั้น API นี้รับ JSON ไม่รับ multipart และไม่อัปโหลด ย้าย ดาวน์โหลด หรือลบไฟล์จริง ผู้เรียกต้องจัดเก็บไฟล์ผ่านระบบจัดการไฟล์ที่ใช้งานอยู่ก่อน แล้วส่งชื่อไฟล์มา
 
@@ -88,48 +88,46 @@ FILES เป็นข้อมูลชื่อไฟล์เท่านั�
 
 ```json
 {
-  "NFRMNO": 31,
-  "VORGNO": "051401",
-  "CYEAR": "26",
-  "CYEAR2": "2026",
-  "NRUNNO": 42,
-  "HEADERS": [
-    {
-      "SEQ": "001",
-      "DWGNO": "DWG000001",
-      "GNO": "001",
-      "LNO": "001",
-      "REVISION": "01",
-      "ITEMNO": "001",
-      "INPUTDATE": "2026-10-29",
-      "EFFJUN": "26101",
-      "IDTAGJUN": "26101",
-      "VDETAIL": "เปลี่ยน process การผลิต",
-      "TSFLAG": null,
-      "LNO2": "002",
-      "PLANJUN": "26102",
-      "TSFLAG_DETAIL": "รายละเอียดการเปลี่ยนแปลง",
-      "PNO": "01"
-    }
-  ],
-  "DETAILS": [
-    {
-      "SEQ": "001",
-      "PROCID_OLD": "P00001",
-      "TP_OLD": "10",
-      "TC_OLD": "20",
-      "PROCID": "P00002",
-      "TP": "12",
-      "TC": "22",
-      "SEQ_PROC": "01",
-      "DWG": "DWG000001",
-      "GNO": "001",
-      "LNO": "0000001"
-    }
-  ],
-  "FILES": [
-    { "ID": 1, "FILENAME": "ts-process-drawing.pdf" }
-  ]
+    "NFRMNO": 31,
+    "VORGNO": "051401",
+    "CYEAR": "26",
+    "CYEAR2": "2026",
+    "NRUNNO": 42,
+    "HEADERS": [
+        {
+            "SEQ": "001",
+            "DWGNO": "DWG000001",
+            "GNO": "001",
+            "LNO": "001",
+            "REVISION": "01",
+            "ITEMNO": "001",
+            "INPUTDATE": "2026-10-29",
+            "EFFJUN": "26101",
+            "IDTAGJUN": "26101",
+            "VDETAIL": "เปลี่ยน process การผลิต",
+            "TSFLAG": null,
+            "LNO2": "002",
+            "PLANJUN": "26102",
+            "TSFLAG_DETAIL": "รายละเอียดการเปลี่ยนแปลง",
+            "PNO": "01"
+        }
+    ],
+    "DETAILS": [
+        {
+            "SEQ": "001",
+            "PROCID_OLD": "P00001",
+            "TP_OLD": "10",
+            "TC_OLD": "20",
+            "PROCID": "P00002",
+            "TP": "12",
+            "TC": "22",
+            "SEQ_PROC": "01",
+            "DWG": "DWG000001",
+            "GNO": "001",
+            "LNO": "0000001"
+        }
+    ],
+    "FILES": [{ "ID": 1, "FILENAME": "ts-process-drawing.pdf" }]
 }
 ```
 
@@ -145,15 +143,15 @@ curl -X POST "{{BASE_URL}}/ieform/ie-pts/insert_ts_process" \
 
 ```json
 {
-  "status": true,
-  "message": "Insert TS process successfully",
-  "key": {
-    "NFRMNO": 31,
-    "VORGNO": "051401",
-    "CYEAR": "26",
-    "CYEAR2": "2026",
-    "NRUNNO": 42
-  }
+    "status": true,
+    "message": "Insert TS process successfully",
+    "key": {
+        "NFRMNO": 31,
+        "VORGNO": "051401",
+        "CYEAR": "26",
+        "CYEAR2": "2026",
+        "NRUNNO": 42
+    }
 }
 ```
 
@@ -168,31 +166,31 @@ Content-Type: application/json
 
 ### ข้อมูลแต่ละชุดฟอร์ม
 
-| Field | ชนิด | จำเป็น | รายละเอียด |
-| --- | --- | --- | --- |
-| NFRMNO | integer | ใช่ | 1–9999; รหัสชนิดฟอร์ม TS ที่ตั้งไว้จริง |
-| VORGNO | string | ใช่ | หน่วยงาน ไม่เกิน 6 ตัวอักษร |
-| CYEAR | string | ใช่ | ปี master ตัวเลข 2 หลัก เช่น "26" |
-| REQUEST_BY | string | ใช่ | รหัสผู้ร้องขอ ไม่เกิน 6 ตัวอักษร ต้องมีในระบบพนักงาน |
-| INPUT_BY | string | ใช่ | รหัสผู้บันทึก ไม่เกิน 6 ตัวอักษร ต้องมีในระบบพนักงาน |
-| ITEMS | array of object | ใช่ | อย่างน้อย 1 process ตามตารางด้านล่าง |
+| Field      | ชนิด            | จำเป็น | รายละเอียด                                           |
+| ---------- | --------------- | ------ | ---------------------------------------------------- |
+| NFRMNO     | integer         | ใช่    | 1–9999; รหัสชนิดฟอร์ม TS ที่ตั้งไว้จริง              |
+| VORGNO     | string          | ใช่    | หน่วยงาน ไม่เกิน 6 ตัวอักษร                          |
+| CYEAR      | string          | ใช่    | ปี master ตัวเลข 2 หลัก เช่น "26"                    |
+| REQUEST_BY | string          | ใช่    | รหัสผู้ร้องขอ ไม่เกิน 6 ตัวอักษร ต้องมีในระบบพนักงาน |
+| INPUT_BY   | string          | ใช่    | รหัสผู้บันทึก ไม่เกิน 6 ตัวอักษร ต้องมีในระบบพนักงาน |
+| ITEMS      | array of object | ใช่    | อย่างน้อย 1 process ตามตารางด้านล่าง                 |
 
 ชุดที่ `NFRMNO/VORGNO/CYEAR/REQUEST_BY/INPUT_BY` และ `ITEM` เหมือนกันจะรวมเป็น **1 เลขฟอร์ม** โดยนำ ITEM จากแต่ละแถวใน ITEMS มาแยกกลุ่ม หาก ITEM ต่างกันจะสร้างคนละ FORM/FLOW และได้ CYEAR2/NRUNNO ของตนเอง แม้ข้อมูลผู้ร้องขอทั้ง 5 ช่องเหมือนกัน ทั้งนี้สร้างฟอร์มเฉพาะกลุ่ม ITEM ที่ยังมี process ใหม่หลังตรวจซ้ำ
 
 ### ITEMS[]
 
-| Field | ชนิด | จำเป็น | ความยาวสูงสุด / การบันทึก |
-| --- | --- | --- | --- |
-| DWG | string | ใช่ | 9; HEADFORM.DWGNO และ DETFORM.DWG |
-| GNO | string/null | ไม่ | 3; ว่างได้ บันทึกทั้งหัวและรายละเอียด |
-| LNO | string/null | ไม่ | 3; ว่างได้ จำกัดตาม HEADFORM.LNO แม้ DETFORM.LNO จะรองรับ 7 |
-| ITEM | string | ใช่ | 3; บันทึก HEADFORM.ITEMNO |
-| PROCID_OLD | string | ใช่ | 6; process เดิม |
-| TP_OLD | string/null | ไม่ | 5 |
-| TC_OLD | string/null | ไม่ | 6 |
-| PROCID | string | ใช่ | 6; process ใหม่ |
-| TP | string/null | ไม่ | 5 |
-| TC | string/null | ไม่ | 6 |
+| Field      | ชนิด        | จำเป็น | ความยาวสูงสุด / การบันทึก                                   |
+| ---------- | ----------- | ------ | ----------------------------------------------------------- |
+| DWG        | string      | ใช่    | 9; HEADFORM.DWGNO และ DETFORM.DWG                           |
+| GNO        | string/null | ไม่    | 3; ว่างได้ บันทึกทั้งหัวและรายละเอียด                       |
+| LNO        | string/null | ไม่    | 3; ว่างได้ จำกัดตาม HEADFORM.LNO แม้ DETFORM.LNO จะรองรับ 7 |
+| ITEM       | string      | ใช่    | 3; บันทึก HEADFORM.ITEMNO                                   |
+| PROCID_OLD | string      | ใช่    | 6; process เดิม                                             |
+| TP_OLD     | string/null | ไม่    | 5                                                           |
+| TC_OLD     | string/null | ไม่    | 6                                                           |
+| PROCID     | string      | ใช่    | 6; process ใหม่                                             |
+| TP         | string/null | ไม่    | 5                                                           |
+| TC         | string/null | ไม่    | 6                                                           |
 
 ค่ารหัสส่งเป็น string เพื่อรักษาเลขศูนย์นำหน้า ระบบ trim ช่อง string ที่จำเป็นก่อนจัดกลุ่มและตรวจซ้ำ สำหรับ GNO/LNO สามารถส่ง `""`, ช่องว่าง, `null` หรือไม่ส่ง field ได้ โดยถือว่าเป็นค่าเดียวกันและบันทึกเป็น NULL การตรวจซ้ำใช้ IS NULL เพื่อให้ตรงกับการเก็บค่าว่างของ Oracle
 
@@ -219,41 +217,106 @@ PROCID_OLD, PROCID, TP_OLD, TP, TC_OLD และ TC จะ trim ช่องว�
 
 ```json
 [
-  {
-    "NFRMNO": 4,
-    "VORGNO": "051401",
-    "CYEAR": "21",
-    "REQUEST_BY": "25009",
-    "INPUT_BY": "25009",
-    "ITEMS": [
-      { "DWG": "YA154D379", "GNO": "-01", "LNO": "", "ITEM": "125", "PROCID_OLD": "G1SHE", "TP_OLD": "0.05", "TC_OLD": "0.0062", "PROCID": "G1SHE", "TP": "0.04", "TC": "0.0062" },
-	  { "DWG": "YA154D379", "GNO": "-01", "LNO": "", "ITEM": "125", "PROCID_OLD": "G1PR4", "TP_OLD": "0.12", "TC_OLD": "0.0013", "PROCID": "G1PR4", "TP": "0.12", "TC": "0.0033" },
-	  { "DWG": "YA188D858", "GNO": "-01", "LNO": "", "ITEM": "125", "PROCID_OLD": "G1LZ3", "TP_OLD": "11", "TC_OLD": "21", "PROCID": "G1LZ3", "TP": "13", "TC": "23" },
-      { "DWG": "YA154D379", "GNO": "-02", "LNO": "", "ITEM": "125", "PROCID_OLD": "G1LZ3", "TP_OLD": "0.01", "TC_OLD": "0.0039", "PROCID": "G1LZ3", "TP": "0.1", "TC": "0.0003" }
-      
-    ]
-  },
-  {
-    "NFRMNO": 4,
-    "VORGNO": "051401",
-    "CYEAR": "21",
-    "REQUEST_BY": "24013",
-    "INPUT_BY": "24013",
-    "ITEMS": [
-      { "DWG": "BS011D184", "GNO": "-01", "LNO": "", "ITEM": "620", "PROCID_OLD": "H8BSA", "TP_OLD": "0.1", "TC_OLD": "0.0038", "PROCID": "H8BSA", "TP": "0.1", "TC": "0.0038" },
-	  { "DWG": "BS011D184", "GNO": "-01", "LNO": "", "ITEM": "620", "PROCID_OLD": "H8MK", "TP_OLD": "0.04", "TC_OLD": "0.0071", "PROCID": "H8MK", "TP": "0", "TC": "0" }
-    ]
-  }
+    {
+        "NFRMNO": 4,
+        "VORGNO": "051401",
+        "CYEAR": "21",
+        "REQUEST_BY": "25009",
+        "INPUT_BY": "25009",
+        "ITEMS": [
+            {
+                "DWG": "YA154D379",
+                "GNO": "-01",
+                "LNO": "",
+                "ITEM": "125",
+                "PROCID_OLD": "G1SHE",
+                "TP_OLD": "0.05",
+                "TC_OLD": "0.0062",
+                "PROCID": "G1SHE",
+                "TP": "0.04",
+                "TC": "0.0062"
+            },
+            {
+                "DWG": "YA154D379",
+                "GNO": "-01",
+                "LNO": "",
+                "ITEM": "125",
+                "PROCID_OLD": "G1PR4",
+                "TP_OLD": "0.12",
+                "TC_OLD": "0.0013",
+                "PROCID": "G1PR4",
+                "TP": "0.12",
+                "TC": "0.0033"
+            },
+            {
+                "DWG": "YA188D858",
+                "GNO": "-01",
+                "LNO": "",
+                "ITEM": "125",
+                "PROCID_OLD": "G1LZ3",
+                "TP_OLD": "11",
+                "TC_OLD": "21",
+                "PROCID": "G1LZ3",
+                "TP": "13",
+                "TC": "23"
+            },
+            {
+                "DWG": "YA154D379",
+                "GNO": "-02",
+                "LNO": "",
+                "ITEM": "125",
+                "PROCID_OLD": "G1LZ3",
+                "TP_OLD": "0.01",
+                "TC_OLD": "0.0039",
+                "PROCID": "G1LZ3",
+                "TP": "0.1",
+                "TC": "0.0003"
+            }
+        ]
+    },
+    {
+        "NFRMNO": 4,
+        "VORGNO": "051401",
+        "CYEAR": "21",
+        "REQUEST_BY": "24013",
+        "INPUT_BY": "24013",
+        "ITEMS": [
+            {
+                "DWG": "BS011D184",
+                "GNO": "-01",
+                "LNO": "",
+                "ITEM": "620",
+                "PROCID_OLD": "H8BSA",
+                "TP_OLD": "0.1",
+                "TC_OLD": "0.0038",
+                "PROCID": "H8BSA",
+                "TP": "0.1",
+                "TC": "0.0038"
+            },
+            {
+                "DWG": "BS011D184",
+                "GNO": "-01",
+                "LNO": "",
+                "ITEM": "620",
+                "PROCID_OLD": "H8MK",
+                "TP_OLD": "0.04",
+                "TC_OLD": "0.0071",
+                "PROCID": "H8MK",
+                "TP": "0",
+                "TC": "0"
+            }
+        ]
+    }
 ]
 ```
 
 ถ้าไม่มีข้อมูลซ้ำ ชุดแรกได้ 1 ฟอร์ม มี 2 headers และ 3 details:
 
-| DWG | PROCID_OLD | SEQ | SEQ_PROC |
-| --- | --- | --- | --- |
-| DWG000001 | P00001 | 001 | 01 |
-| DWG000001 | P00002 | 001 | 02 |
-| DWG000002 | P00003 | 002 | 01 |
+| DWG       | PROCID_OLD | SEQ | SEQ_PROC |
+| --------- | ---------- | --- | -------- |
+| DWG000001 | P00001     | 001 | 01       |
+| DWG000001 | P00002     | 001 | 02       |
+| DWG000002 | P00003     | 002 | 01       |
 
 ชุดที่สองได้อีก 1 ฟอร์ม และเริ่ม SEQ=001/SEQ_PROC=01 ใหม่
 
@@ -271,28 +334,46 @@ HTTP 201 แม้ทุกชุดจะถูกข้าม ตัวอย�
 
 ```json
 {
-  "status": true,
-  "total": 2,
-  "created": 1,
-  "skipped": 1,
-  "items": [
-    {
-      "form": { "NFRMNO": 31, "VORGNO": "051401", "CYEAR": "26", "REQUEST_BY": "12345", "INPUT_BY": "23456" },
-      "status": "created",
-      "received": 3,
-      "inserted": 3,
-      "skipped": 0,
-      "key": { "NFRMNO": 31, "VORGNO": "051401", "CYEAR": "26", "CYEAR2": "2026", "NRUNNO": 42 }
-    },
-    {
-      "form": { "NFRMNO": 31, "VORGNO": "051401", "CYEAR": "26", "REQUEST_BY": "34567", "INPUT_BY": "23456" },
-      "status": "skipped",
-      "received": 1,
-      "inserted": 0,
-      "skipped": 1,
-      "key": null
-    }
-  ]
+    "status": true,
+    "total": 2,
+    "created": 1,
+    "skipped": 1,
+    "items": [
+        {
+            "form": {
+                "NFRMNO": 31,
+                "VORGNO": "051401",
+                "CYEAR": "26",
+                "REQUEST_BY": "12345",
+                "INPUT_BY": "23456"
+            },
+            "status": "created",
+            "received": 3,
+            "inserted": 3,
+            "skipped": 0,
+            "key": {
+                "NFRMNO": 31,
+                "VORGNO": "051401",
+                "CYEAR": "26",
+                "CYEAR2": "2026",
+                "NRUNNO": 42
+            }
+        },
+        {
+            "form": {
+                "NFRMNO": 31,
+                "VORGNO": "051401",
+                "CYEAR": "26",
+                "REQUEST_BY": "34567",
+                "INPUT_BY": "23456"
+            },
+            "status": "skipped",
+            "received": 1,
+            "inserted": 0,
+            "skipped": 1,
+            "key": null
+        }
+    ]
 }
 ```
 
@@ -305,9 +386,9 @@ HTTP 201 แม้ทุกชุดจะถูกข้าม ตัวอย�
 เมื่อรายการอยู่ใน NFRMNO/VORGNO/CYEAR/REQUEST_BY/INPUT_BY ชุดเดียวกัน แต่มี ITEM 125 จำนวน 3 process และ ITEM 127 จำนวน 1 process ระบบแยกเป็น 2 ฟอร์ม:
 
 | ITEM | จำนวน process | ตัวอย่าง CYEAR2 | ตัวอย่าง NRUNNO |
-| --- | --- | --- | --- |
-| 125 | 3 | 2026 | 1 |
-| 127 | 1 | 2026 | 2 |
+| ---- | ------------- | --------------- | --------------- |
+| 125  | 3             | 2026            | 1               |
+| 127  | 1             | 2026            | 2               |
 
 เลขจริงมาจาก FormCreateService ไม่ได้กำหนดเป็น 1/2 ตายตัว แต่ละฟอร์มเริ่ม SEQ=001 และแต่ละหัวเริ่ม SEQ_PROC=01 ใหม่ ผลลัพธ์แต่ละ items มี form.ITEM เพิ่มเพื่อระบุ ITEM ของเลขฟอร์มนั้น การตรวจซ้ำยังใช้ DWG/GNO/LNO/PROCID_OLD ตามเดิม ไม่เพิ่ม ITEM เข้าไปใน duplicate key
 
@@ -331,14 +412,34 @@ GET {{BASE_URL}}/ieform/ie-pts/get_ts_process?NFRMNO=31&VORGNO=051401&CYEAR=26&C
 
 ```json
 {
-  "status": true,
-  "key": { "NFRMNO": 31, "VORGNO": "051401", "CYEAR": "26", "CYEAR2": "2026", "NRUNNO": 42 },
-  "data": {
-    "NFRMNO": 31, "VORGNO": "051401", "CYEAR": "26", "CYEAR2": "2026", "NRUNNO": 42,
-    "HEADERS": [{ "NFRMNO": 31, "VORGNO": "051401", "CYEAR": "26", "CYEAR2": "2026", "NRUNNO": 42, "SEQ": "001", "DWGNO": "DWG000001" }],
-    "DETAILS": [],
-    "FILES": []
-  }
+    "status": true,
+    "key": {
+        "NFRMNO": 31,
+        "VORGNO": "051401",
+        "CYEAR": "26",
+        "CYEAR2": "2026",
+        "NRUNNO": 42
+    },
+    "data": {
+        "NFRMNO": 31,
+        "VORGNO": "051401",
+        "CYEAR": "26",
+        "CYEAR2": "2026",
+        "NRUNNO": 42,
+        "HEADERS": [
+            {
+                "NFRMNO": 31,
+                "VORGNO": "051401",
+                "CYEAR": "26",
+                "CYEAR2": "2026",
+                "NRUNNO": 42,
+                "SEQ": "001",
+                "DWGNO": "DWG000001"
+            }
+        ],
+        "DETAILS": [],
+        "FILES": []
+    }
 }
 ```
 
@@ -371,12 +472,12 @@ DELETE {{BASE_URL}}/ieform/ie-pts/delete_ts_process?NFRMNO=31&VORGNO=051401&CYEA
 
 ## เงื่อนไขและข้อผิดพลาด
 
-| HTTP | เหตุผลที่พบบ่อย |
-| --- | --- |
-| 400 | key ไม่ครบ, ชนิดข้อมูล/ความยาวไม่ถูกต้อง, HEADERS ว่าง, SEQ หรือคู่ SEQ/PROCID หรือ ID ซ้ำ, DETAILS.SEQ ไม่มีใน HEADERS, ส่งเลขฟอร์มเองใน auto, sequence เกินขีดจำกัด, PROCID ใหม่ชนกันในหัวเดียวกัน, TSFLAG ไม่มีใน master |
-| 404 | ไม่พบ Form สำหรับ insert/update/delete, ไม่พบ TS สำหรับ get/update/delete หรือ FormCreateService ไม่พบ master/พนักงาน |
-| 409 | มี TS ของ key นี้แล้ว หรือชน primary key; insert ไม่ overwrite ข้อมูลเดิม |
-| 500 | ฐานข้อมูล/สิทธิ์/schema มีปัญหา หรือสร้าง Form ได้ key ไม่ครบ |
+| HTTP | เหตุผลที่พบบ่อย                                                                                                                                                                                                             |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 400  | key ไม่ครบ, ชนิดข้อมูล/ความยาวไม่ถูกต้อง, HEADERS ว่าง, SEQ หรือคู่ SEQ/PROCID หรือ ID ซ้ำ, DETAILS.SEQ ไม่มีใน HEADERS, ส่งเลขฟอร์มเองใน auto, sequence เกินขีดจำกัด, PROCID ใหม่ชนกันในหัวเดียวกัน, TSFLAG ไม่มีใน master |
+| 404  | ไม่พบ Form สำหรับ insert/update/delete, ไม่พบ TS สำหรับ get/update/delete หรือ FormCreateService ไม่พบ master/พนักงาน                                                                                                       |
+| 409  | มี TS ของ key นี้แล้ว หรือชน primary key; insert ไม่ overwrite ข้อมูลเดิม                                                                                                                                                   |
+| 500  | ฐานข้อมูล/สิทธิ์/schema มีปัญหา หรือสร้าง Form ได้ key ไม่ครบ                                                                                                                                                               |
 
 รูปแบบ error ใช้ exception filter ของโปรเจกต์ มี `statusCode`, `timestamp`, `path`, `message`; validation message อาจเป็น array ตาม global ValidationPipe
 

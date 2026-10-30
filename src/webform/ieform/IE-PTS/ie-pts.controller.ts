@@ -19,10 +19,10 @@ import {
     InsertTsProcessDto,
     TsFormKeyDto,
 } from './dto/ts-process.dto';
-import { IeTsService } from './ie-ts.service';
+import { IePtsService } from './ie-pts.service';
 
-@ApiTags('IE TS process')
-@Controller('ieform/ie-ts')
+@ApiTags('IE PTS process')
+@Controller('ieform/ie-pts')
 @UsePipes(
     new ValidationPipe({
         transform: true,
@@ -30,8 +30,8 @@ import { IeTsService } from './ie-ts.service';
         forbidNonWhitelisted: true,
     }),
 )
-export class IeTsController {
-    constructor(private readonly service: IeTsService) {}
+export class IePtsController {
+    constructor(private readonly service: IePtsService) {}
 
     @Post('insert_ts_process')
     insert(@Body() dto: InsertTsProcessDto) {

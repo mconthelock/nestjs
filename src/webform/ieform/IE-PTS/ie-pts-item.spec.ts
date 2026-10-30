@@ -1,6 +1,6 @@
 import { groupTsForms } from './ts-process-auto.utils';
-import { IeTsService } from './ie-ts.service';
-import { IeTsRepository } from './ie-ts.repository';
+import { IePtsService } from './ie-pts.service';
+import { IePtsRepository } from './ie-pts.repository';
 import { transactionContext } from 'src/common/interceptors/transaction-context';
 import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 const key = {
@@ -56,7 +56,7 @@ describe('PTS forms by ITEM', () => {
                 data: { ...key, NRUNNO: ++runno },
             })),
         };
-        return { repo, forms, service: new IeTsService(repo, forms) };
+        return { repo, forms, service: new IePtsService(repo, forms) };
     }
     it('creates the requested 3+1 process example as two forms, then updates each flow', async () => {
         const { repo, forms, service } = setup();
@@ -143,7 +143,7 @@ describe('PTS item approval assignment', () => {
         };
         const ds: any = { manager, transaction: async (work) => work(manager) };
         manager.connection = ds;
-        const repo = new IeTsRepository(ds);
+        const repo = new IePtsRepository(ds);
         return { repo, manager, update };
     }
     it('sets step20 from SEMPNO/SEMPNO2 and step10 from HEADNO using all five keys', async () => {

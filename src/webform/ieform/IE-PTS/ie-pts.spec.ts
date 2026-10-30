@@ -4,7 +4,7 @@ import {
     AutoInsertTsProcessDto,
     InsertTsProcessDto,
 } from './dto/ts-process.dto';
-import { IeTsService } from './ie-ts.service';
+import { IePtsService } from './ie-pts.service';
 
 const key = {
     NFRMNO: 31,
@@ -170,7 +170,7 @@ describe('TS request validation', () => {
 describe('TS orchestration', () => {
     let repo: any;
     let forms: any;
-    let service: IeTsService;
+    let service: IePtsService;
     beforeEach(() => {
         repo = {
             transaction: jest.fn((work) => work()),
@@ -185,7 +185,7 @@ describe('TS orchestration', () => {
         forms = {
             create: jest.fn().mockResolvedValue({ status: true, data: key }),
         };
-        service = new IeTsService(repo, forms);
+        service = new IePtsService(repo, forms);
     });
     it('serializes normal insert/update/delete with the same lock as automatic insertion', async () => {
         const dto = plainToInstance(InsertTsProcessDto, payload());

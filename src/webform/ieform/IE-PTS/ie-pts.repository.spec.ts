@@ -3,8 +3,8 @@ import { PROC_TSHEADFORM } from 'src/common/Entities/webform/table/PROC_TSHEADFO
 import { PROC_TSDETFORM } from 'src/common/Entities/webform/table/PROC_TSDETFORM.entity';
 import { PROC_TSATTFILE } from 'src/common/Entities/webform/table/PROC_TSATTFILE.entity';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
-import { IeTsRepository } from './ie-ts.repository';
-import { IeTsService } from './ie-ts.service';
+import { IePtsRepository } from './ie-pts.repository';
+import { IePtsService } from './ie-pts.service';
 import { DataSource, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'FORM', schema: 'WEBFORM' })
@@ -68,7 +68,7 @@ function setup() {
         }),
     };
     (manager as any).connection = ds;
-    const repo = new IeTsRepository(ds);
+    const repo = new IePtsRepository(ds);
     return { repositories, manager, ds, state, repo };
 }
 
@@ -157,7 +157,7 @@ describe('TS repository transaction boundary', () => {
                 return { status: true, data: key };
             }),
         };
-        const service = new IeTsService(repo, forms);
+        const service = new IePtsService(repo, forms);
         await service.autoInsert(
             [
                 {
@@ -221,7 +221,7 @@ describe('TS repository transaction boundary', () => {
         repositories
             .get(PROC_TSDETFORM)
             .insert.mockRejectedValue(new Error('detail insert failed'));
-        const service = new IeTsService(repo, {
+        const service = new IePtsService(repo, {
             create: jest.fn().mockResolvedValue({ status: true, data: key }),
         } as any);
         await expect(

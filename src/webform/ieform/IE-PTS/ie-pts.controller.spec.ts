@@ -3,8 +3,8 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { IeTsController } from './ie-ts.controller';
-import { IeTsService } from './ie-ts.service';
+import { IePtsController } from './ie-pts.controller';
+import { IePtsService } from './ie-pts.service';
 
 const key = {
     NFRMNO: 31,
@@ -13,9 +13,9 @@ const key = {
     CYEAR2: '2026',
     NRUNNO: 42,
 };
-const base = '/ieform/ie-ts';
+const base = '/ieform/ie-pts';
 
-describe('IE-TS HTTP contract', () => {
+describe('IE-PTS HTTP contract', () => {
     let app: any;
     let service: any;
     beforeAll(async () => {
@@ -28,8 +28,8 @@ describe('IE-TS HTTP contract', () => {
             ),
         );
         const module = await Test.createTestingModule({
-            controllers: [IeTsController],
-            providers: [{ provide: IeTsService, useValue: service }],
+            controllers: [IePtsController],
+            providers: [{ provide: IePtsService, useValue: service }],
         }).compile();
         app = module.createNestApplication();
         // Match the production global transform/whitelist before controller pipes.

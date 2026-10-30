@@ -4,9 +4,9 @@ import { PROC_TSHEADFORM } from 'src/common/Entities/webform/table/PROC_TSHEADFO
 import { PROC_TSDETFORM } from 'src/common/Entities/webform/table/PROC_TSDETFORM.entity';
 import { PROC_TSATTFILE } from 'src/common/Entities/webform/table/PROC_TSATTFILE.entity';
 import { FormModule } from 'src/webform/form/form.module';
-import { IeTsController } from './ie-ts.controller';
-import { IeTsRepository } from './ie-ts.repository';
-import { IeTsService } from './ie-ts.service';
+import { IePtsController } from './ie-pts.controller';
+import { IePtsRepository } from './ie-pts.repository';
+import { IePtsService } from './ie-pts.service';
 
 @Module({
     imports: [
@@ -16,8 +16,8 @@ import { IeTsService } from './ie-ts.service';
         ),
         FormModule,
     ],
-    controllers: [IeTsController],
-    providers: [IeTsRepository, IeTsService],
-    exports: [IeTsService, IeTsRepository],
+    controllers: [IePtsController],
+    providers: [IePtsRepository, IePtsService],
+    exports: [IePtsService, IePtsRepository],
 })
 export class IePtsModule {}

@@ -1,4 +1,4 @@
-# คู่มือเรียกใช้ TS Process API (IE-TS)
+# คู่มือเรียกใช้ TS Process API (IE-PTS)
 
 API สำหรับบันทึกหัวฟอร์ม รายละเอียด process และชื่อไฟล์แนบ โดยใช้ repository จัดการตาราง `IEDOC.PROC_TSHEADFORM`, `IEDOC.PROC_TSDETFORM`, `IEDOC.PROC_TSATTFILE`
 
@@ -8,11 +8,11 @@ API สำหรับบันทึกหัวฟอร์ม รายละ
 
 | Method | URL | หน้าที่ |
 | --- | --- | --- |
-| POST | `{{BASE_URL}}/ieform/ie-ts/insert_ts_process` | เพิ่ม TS ลงใน Form ที่สร้างไว้แล้ว |
-| POST | `{{BASE_URL}}/ieform/ie-ts/auto_insert_ts_process` | สร้าง Form/Flow แล้วเพิ่ม TS โดยใช้เลขฟอร์มที่ระบบสร้าง |
-| GET | `{{BASE_URL}}/ieform/ie-ts/get_ts_process` | อ่านข้อมูล TS ทั้ง 3 ตารางของฟอร์ม |
-| PUT | `{{BASE_URL}}/ieform/ie-ts/update_ts_process` | แทนที่ข้อมูล TS ทั้งชุดของฟอร์ม |
-| DELETE | `{{BASE_URL}}/ieform/ie-ts/delete_ts_process` | ลบข้อมูล TS ทั้ง 3 ตารางของฟอร์ม |
+| POST | `{{BASE_URL}}/ieform/ie-pts/insert_ts_process` | เพิ่ม TS ลงใน Form ที่สร้างไว้แล้ว |
+| POST | `{{BASE_URL}}/ieform/ie-pts/auto_insert_ts_process` | สร้าง Form/Flow แล้วเพิ่ม TS โดยใช้เลขฟอร์มที่ระบบสร้าง |
+| GET | `{{BASE_URL}}/ieform/ie-pts/get_ts_process` | อ่านข้อมูล TS ทั้ง 3 ตารางของฟอร์ม |
+| PUT | `{{BASE_URL}}/ieform/ie-pts/update_ts_process` | แทนที่ข้อมูล TS ทั้งชุดของฟอร์ม |
+| DELETE | `{{BASE_URL}}/ieform/ie-pts/delete_ts_process` | ลบข้อมูล TS ทั้ง 3 ตารางของฟอร์ม |
 
 ชื่อ field เป็น **ตัวพิมพ์ใหญ่ตามตัวอย่าง** และชื่อ route เป็นตัวพิมพ์เล็ก อ่านและลบใช้ query string; เพิ่มและแก้ไขใช้ JSON body
 
@@ -136,7 +136,7 @@ FILES เป็นข้อมูลชื่อไฟล์เท่านั�
 ตัวอย่าง cURL: บันทึก JSON ด้านบนเป็น `insert-ts.json` แล้วเรียก
 
 ```bash
-curl -X POST "{{BASE_URL}}/ieform/ie-ts/insert_ts_process" \
+curl -X POST "{{BASE_URL}}/ieform/ie-pts/insert_ts_process" \
   -H "Content-Type: application/json" \
   --data-binary "@insert-ts.json"
 ```
@@ -160,7 +160,7 @@ curl -X POST "{{BASE_URL}}/ieform/ie-ts/insert_ts_process" \
 ## 2. สร้าง Form/Flow และเพิ่ม TS แบบ batch: auto_insert_ts_process
 
 ```text
-POST {{BASE_URL}}/ieform/ie-ts/auto_insert_ts_process
+POST {{BASE_URL}}/ieform/ie-pts/auto_insert_ts_process
 Content-Type: application/json
 ```
 
@@ -205,7 +205,7 @@ Content-Type: application/json
 5. แต่ละ process ใช้ SEQ เดียวกับหัวของตน และกำหนด `SEQ_PROC=01,02,...` ตามลำดับที่พบ เริ่ม 01 ใหม่ในแต่ละหัว รองรับสูงสุด 99 processes ต่อหัว
 6. หาก process คนละ PROCID_OLD ที่เหลืออยู่ต้องใช้ PROCID ใหม่ตัวเดียวกันในหัวเดียวกัน จะตอบ 400 เพราะชน primary key `(key ฟอร์ม, SEQ, PROCID)` ไม่มีการทิ้งข้อมูลที่ขัดแย้งโดยเงียบ ๆ
 7. เรียก FormCreateService เพื่อ insert **WEBFORM.FORM และ WEBFORM.FLOW** แล้วใช้ CYEAR2/NRUNNO ที่ได้มา insert **IEDOC.PROC_TSHEADFORM และ IEDOC.PROC_TSDETFORM** ไม่มีการ insert PROC_TSATTFILE ใน endpoint นี้
-8. ทั้ง batch อยู่ใน transaction เดียว หากขั้นตอนใดล้มเหลว rollback ทุกฟอร์มในคำขอนั้น ทุก write endpoint ของ IE-TS ใช้ lock บน WEBFORM.FORM ร่วมกัน เพื่อ serialize การตรวจซ้ำและการบันทึกระหว่างคำขอ IE-TS โดยไม่ใช้ LOCK TABLE ข้าม schema ไปยัง IEDOC
+8. ทั้ง batch อยู่ใน transaction เดียว หากขั้นตอนใดล้มเหลว rollback ทุกฟอร์มในคำขอนั้น ทุก write endpoint ของ IE-PTS ใช้ lock บน WEBFORM.FORM ร่วมกัน เพื่อ serialize การตรวจซ้ำและการบันทึกระหว่างคำขอ IE-PTS โดยไม่ใช้ LOCK TABLE ข้าม schema ไปยัง IEDOC
 
 PROCID_OLD, PROCID, TP_OLD, TP, TC_OLD และ TC จะ trim ช่องว่าง/tab หัวท้ายก่อน validation และบันทึก โดยไม่แปลงเป็นตัวเลข จึงรักษาค่าเช่น `"0.0062"` ไว้ครบ หาก body มี tab จริงที่ไม่ได้ escape ภายใน string จะยังเป็น JSON ที่ผิด syntax; ให้ลบ tab นั้นหรือส่งด้วย JSON serializer
 
@@ -260,7 +260,7 @@ PROCID_OLD, PROCID, TP_OLD, TP, TC_OLD และ TC จะ trim ช่องว�
 บันทึก body เป็น `auto-insert-ts.json` แล้วเรียก:
 
 ```bash
-curl -X POST "{{BASE_URL}}/ieform/ie-ts/auto_insert_ts_process" \
+curl -X POST "{{BASE_URL}}/ieform/ie-pts/auto_insert_ts_process" \
   -H "Content-Type: application/json" \
   --data-binary "@auto-insert-ts.json"
 ```
@@ -324,7 +324,7 @@ HTTP 201 แม้ทุกชุดจะถูกข้าม ตัวอย�
 ## 3. อ่านข้อมูล
 
 ```text
-GET {{BASE_URL}}/ieform/ie-ts/get_ts_process?NFRMNO=31&VORGNO=051401&CYEAR=26&CYEAR2=2026&NRUNNO=42
+GET {{BASE_URL}}/ieform/ie-pts/get_ts_process?NFRMNO=31&VORGNO=051401&CYEAR=26&CYEAR2=2026&NRUNNO=42
 ```
 
 ต้องส่ง query key ครบทั้ง 5 ช่อง สำเร็จ HTTP 200:
@@ -347,7 +347,7 @@ GET {{BASE_URL}}/ieform/ie-ts/get_ts_process?NFRMNO=31&VORGNO=051401&CYEAR=26&CY
 ## 4. แก้ไขข้อมูล
 
 ```text
-PUT {{BASE_URL}}/ieform/ie-ts/update_ts_process
+PUT {{BASE_URL}}/ieform/ie-pts/update_ts_process
 Content-Type: application/json
 ```
 
@@ -364,7 +364,7 @@ Body ใช้รูปแบบเดียวกับ insert ปกติ **�
 ## 5. ลบข้อมูล
 
 ```text
-DELETE {{BASE_URL}}/ieform/ie-ts/delete_ts_process?NFRMNO=31&VORGNO=051401&CYEAR=26&CYEAR2=2026&NRUNNO=42
+DELETE {{BASE_URL}}/ieform/ie-pts/delete_ts_process?NFRMNO=31&VORGNO=051401&CYEAR=26&CYEAR2=2026&NRUNNO=42
 ```
 
 ลบทุกแถวของ key นี้ในตาราง TS ทั้ง 3 ตารางเท่านั้น ไม่ลบ Form/Flow และไม่ลบไฟล์จริง สำเร็จ HTTP 200 พร้อม `{ "status": true, "message": "Delete TS process successfully", "key": { ... } }` หากต้องยกเลิกหรือจัดการ workflow ให้ใช้ API ของระบบ Form/Flow ตามกระบวนการเดิม

@@ -16,7 +16,7 @@ import {
 } from './dto/ts-process.dto';
 
 @Injectable()
-export class IeTsRepository extends BaseRepository {
+export class IePtsRepository extends BaseRepository {
     constructor(
         @InjectDataSource('webformConnection') private readonly ds: DataSource,
     ) {

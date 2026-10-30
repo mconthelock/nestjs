@@ -6,7 +6,7 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { FormCreateService } from 'src/webform/form/create-form.service';
-import { IeTsRepository } from './ie-ts.repository';
+import { IePtsRepository } from './ie-pts.repository';
 import {
     AutoInsertTsProcessDto,
     AutoTsProcessItemDto,
@@ -36,9 +36,9 @@ export interface AutoTsResult {
 }
 
 @Injectable()
-export class IeTsService {
+export class IePtsService {
     constructor(
-        private readonly repo: IeTsRepository,
+        private readonly repo: IePtsRepository,
         private readonly forms: FormCreateService,
     ) {}
 
@@ -219,7 +219,7 @@ export class IeTsService {
     private async write<T>(work: () => Promise<T>): Promise<T> {
         try {
             return await this.repo.transaction(async () => {
-                // All IE-TS writes share the WEBFORM-owned lock. Cross-schema
+                // All IE-PTS writes share the WEBFORM-owned lock. Cross-schema
                 // LOCK TABLE IEDOC.* would require additional Oracle privileges.
                 await this.repo.lockFormNumber();
                 return work();

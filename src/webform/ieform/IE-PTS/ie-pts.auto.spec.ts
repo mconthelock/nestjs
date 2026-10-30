@@ -1,4 +1,4 @@
-import { IeTsService } from './ie-ts.service';
+import { IePtsService } from './ie-pts.service';
 
 const key = {
     NFRMNO: 31,
@@ -29,7 +29,7 @@ const auto = (values = {}) => ({
 describe('Automatic TS batch creation', () => {
     let repo: any;
     let forms: any;
-    let service: IeTsService;
+    let service: IePtsService;
     beforeEach(() => {
         repo = {
             transaction: jest.fn((work) => work()),
@@ -43,7 +43,7 @@ describe('Automatic TS batch creation', () => {
         forms = {
             create: jest.fn().mockResolvedValue({ status: true, data: key }),
         };
-        service = new IeTsService(repo, forms);
+        service = new IePtsService(repo, forms);
     });
     it('creates Form/Flow before inserting header/detail with generated keys and sequences', async () => {
         const result = await service.autoInsert([auto()], '127.0.0.1');

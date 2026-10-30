@@ -20,4 +20,4 @@ import { IeTsService } from './ie-ts.service';
     providers: [IeTsRepository, IeTsService],
     exports: [IeTsService, IeTsRepository],
 })
-export class IeTsModule {}
+export class IePtsModule {}

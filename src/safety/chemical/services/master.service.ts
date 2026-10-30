@@ -3,19 +3,17 @@ import { OwnOrgDto } from '../dto/master.dto';
 
 import { MasterRepository } from '../repository/master.repository';
 import { RevRepository } from '../repository/rev.repository';
+import { SectionRepository } from '../repository/section.repository';
 
-import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
 import { OrganizationsService } from 'src/webform/organizations/organizations.service';
-
-import { SEQUENCEORG } from 'src/common/Entities/webform/table/SEQUENCEORG.entity';
 
 @Injectable()
 export class MasterService {
     constructor(
+        private readonly orgService: OrganizationsService,
         private readonly masterRepo: MasterRepository,
         private readonly revRepo: RevRepository,
-        private readonly sequenceOrgService: SequenceOrgService,
-        private readonly orgService: OrganizationsService,
+        private readonly sectionRepo: SectionRepository,
     ) {}
 
     async getActive() {
@@ -28,9 +26,9 @@ export class MasterService {
         return { data: await this.masterRepo.getMaster(section, 0), section };
     }
 
-    async getOwnOrg(data: OwnOrgDto) {
+    async getOwnOrg(dto: OwnOrgDto) {
         try {
-            const { EMPNO, GROUP } = data;
+            const { EMPNO, GROUP } = dto;
 
             if (['ADM', 'DEV'].includes(GROUP)) {
                 const master = await this.getActive();
@@ -40,16 +38,21 @@ export class MasterService {
                 };
             }
 
-            const org = await this.orgService.getOrgTreeWithEmp(EMPNO);
+            const org = await this.orgService.getOrgTreeWithEmp(EMPNO, true);
             if (!org.status) {
                 throw new Error(org.message);
             }
+            let data = {};
             for (const o of org.data) {
-                
+                const masters = await this.sectionRepo.getMasterSection(o.CODE);
+                if (masters && masters.length > 0) {
+                    data[o.NAME] = masters;
+                }
             }
             return {
                 status: true,
-                data: org.data,
+                organizations: org.data,
+                data,
             };
         } catch (error) {
             throw error;

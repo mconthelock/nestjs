@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { MasterService } from '../services/master.service';
 import { OwnOrgDto } from '../dto/master.dto';
 
-@Controller('safety/master')
+@Controller('safety/chemical/master')
 export class MasterController {
     constructor(private readonly service: MasterService) {}
 

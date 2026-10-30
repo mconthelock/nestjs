@@ -16,6 +16,9 @@ export class RevRepository extends BaseRepository {
                 STATUS: 1,
                 OWNER: Not('MASTER'),
             },
+            order: {
+                OWNER: 'ASC',
+            }
         });
     }
 

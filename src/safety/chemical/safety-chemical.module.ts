@@ -10,14 +10,13 @@ import { MasterController } from './controllers/master.controller';
 import { MasterRepository } from './repository/master.repository';
 import { MasterService } from './services/master.service';
 import { RevRepository } from './repository/rev.repository';
-import { SequenceOrgModule } from 'src/webform/sequence-org/sequence-org.module';
 import { OrganizationsModule } from 'src/webform/organizations/organizations.module';
+import { SectionRepository } from './repository/section.repository';
 
 @Module({
     imports: [
         ChemicalSectionModule,
         FormModule,
-        SequenceOrgModule,
         OrganizationsModule,
     ],
     controllers: [FollowController, MasterController],
@@ -30,6 +29,7 @@ import { OrganizationsModule } from 'src/webform/organizations/organizations.mod
         FollowRepository,
         MasterRepository,
         RevRepository,
+        SectionRepository,
     ],
 })
 export class SafetyChemicalModule {}

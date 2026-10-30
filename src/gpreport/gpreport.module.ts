@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { FireModule } from './fire/fire.module';
 import { NewsModule } from './news/news.module';
 import { BuslineModule } from './busline/busline.module';
 import { BusstopModule } from './busstop/busstop.module';
@@ -26,6 +27,7 @@ import { BeneficiaryModule } from './beneficiary/beneficiary.module';
 
 @Module({
     imports: [
+        FireModule,
         NewsModule,
         BuslineModule,
         BusstopModule,

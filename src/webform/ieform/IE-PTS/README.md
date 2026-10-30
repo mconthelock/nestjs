@@ -177,7 +177,7 @@ Content-Type: application/json
 | INPUT_BY | string | ใช่ | รหัสผู้บันทึก ไม่เกิน 6 ตัวอักษร ต้องมีในระบบพนักงาน |
 | ITEMS | array of object | ใช่ | อย่างน้อย 1 process ตามตารางด้านล่าง |
 
-ชุดที่ `NFRMNO/VORGNO/CYEAR/REQUEST_BY/INPUT_BY` เหมือนกันทุกช่องจะรวม ITEMS เข้าด้วยกันและได้ **1 เลขฟอร์ม** หากเปลี่ยนช่องใดช่องหนึ่งจะเป็นคนละชุดฟอร์ม ทั้งนี้จะสร้างเลขฟอร์มเฉพาะชุดที่ยังมี process ใหม่หลังตรวจซ้ำ
+ชุดที่ `NFRMNO/VORGNO/CYEAR/REQUEST_BY/INPUT_BY` และ `ITEM` เหมือนกันจะรวมเป็น **1 เลขฟอร์ม** โดยนำ ITEM จากแต่ละแถวใน ITEMS มาแยกกลุ่ม หาก ITEM ต่างกันจะสร้างคนละ FORM/FLOW และได้ CYEAR2/NRUNNO ของตนเอง แม้ข้อมูลผู้ร้องขอทั้ง 5 ช่องเหมือนกัน ทั้งนี้สร้างฟอร์มเฉพาะกลุ่ม ITEM ที่ยังมี process ใหม่หลังตรวจซ้ำ
 
 ### ITEMS[]
 
@@ -296,9 +296,30 @@ HTTP 201 แม้ทุกชุดจะถูกข้าม ตัวอย�
 }
 ```
 
-`total/created/skipped` ระดับบนเป็น **จำนวนชุดฟอร์มหลังรวม identity** ส่วน `received/inserted/skipped` ใน items เป็น **จำนวน process** ตัวอย่างข้างบนสมมติว่า process ของชุดที่สองมีอยู่แล้วในฐานข้อมูล
+`total/created/skipped` ระดับบนเป็น **จำนวนชุดฟอร์มหลังรวม identity ทั้ง 5 ช่องและแยกตาม ITEM** ส่วน `received/inserted/skipped` ใน items เป็น **จำนวน process** ตัวอย่างข้างบนสมมติว่า process ของชุดที่สองมีอยู่แล้วในฐานข้อมูล
 
 เมื่อ retry ด้วยรายการเดิมที่ยังอยู่ในตาราง detail จะถูกข้ามตาม duplicate key 4 ช่องข้างต้น จึงไม่สร้าง Form/Flow ใหม่สำหรับข้อมูลเดิม
+
+## การแยก ITEM และกำหนดผู้อนุมัติ PTS
+
+เมื่อรายการอยู่ใน NFRMNO/VORGNO/CYEAR/REQUEST_BY/INPUT_BY ชุดเดียวกัน แต่มี ITEM 125 จำนวน 3 process และ ITEM 127 จำนวน 1 process ระบบแยกเป็น 2 ฟอร์ม:
+
+| ITEM | จำนวน process | ตัวอย่าง CYEAR2 | ตัวอย่าง NRUNNO |
+| --- | --- | --- | --- |
+| 125 | 3 | 2026 | 1 |
+| 127 | 1 | 2026 | 2 |
+
+เลขจริงมาจาก FormCreateService ไม่ได้กำหนดเป็น 1/2 ตายตัว แต่ละฟอร์มเริ่ม SEQ=001 และแต่ละหัวเริ่ม SEQ_PROC=01 ใหม่ ผลลัพธ์แต่ละ items มี form.ITEM เพิ่มเพื่อระบุ ITEM ของเลขฟอร์มนั้น การตรวจซ้ำยังใช้ DWG/GNO/LNO/PROCID_OLD ตามเดิม ไม่เพิ่ม ITEM เข้าไปใน duplicate key
+
+หลัง insert FORM/FLOW/PROC_TSHEADFORM/PROC_TSDETFORM ของแต่ละฟอร์มแล้ว ระบบตั้งค่า FLOW ภายใน transaction เดิม:
+
+1. ค้น WEBFORM.DWGNOTICEPICMST ด้วย ITEMNO=ITEM ถ้าพบ SEMPNO ให้ตั้ง step20: VAPVNO=SEMPNO และ VREPNO=SEMPNO2 หาก SEMPNO2 ว่าง/null ให้ใช้ SEMPNO แทน
+2. ใช้ SEMPNO ค้น WEBFORM.SEQUENCEORG ด้วย EMPNO แล้วตั้ง step10: VAPVNO=HEADNO และ VREPNO=HEADNO
+3. ทุก UPDATE ระบุ NFRMNO/VORGNO/CYEAR/CYEAR2/NRUNNO ของฟอร์มนั้นและ CSTEPNO จึงไม่แก้ flow ของฟอร์มอื่น
+4. ถ้าไม่พบ PIC/SEMPNO จะคงผู้อนุมัติจาก flow master ทั้งสอง step ถ้าพบ PIC แต่ไม่พบ HEADNO จะอัปเดตเฉพาะ step20 และคง step10 ตาม master หากพบ mapping หลายค่าที่ขัดแย้งกัน จะคงค่า master ของขั้นนั้นเพื่อไม่เลือกผู้อนุมัติโดยพลการ
+5. กลุ่มที่ซ้ำทั้งหมดจะไม่สร้างฟอร์มและไม่อัปเดต flow หากคำสั่งฐานข้อมูลล้มเหลวระหว่างตั้งผู้อนุมัติ จะ rollback ทั้ง batch รวมข้อมูลที่ insert ไปแล้ว
+
+บัญชี webformConnection ต้องมีสิทธิ์ SELECT บน DWGNOTICEPICMST/SEQUENCEORG และ UPDATE บน FLOW
 
 ## 3. อ่านข้อมูล
 

@@ -26,21 +26,26 @@ export const processIdentity = (row: AutoTsProcessItemDto) =>
         row.PROCID_OLD,
     ]);
 
+export type AutoTsFormGroup = AutoInsertTsProcessDto & { ITEM: string };
+
 export function groupTsForms(
     forms: AutoInsertTsProcessDto[],
-): AutoInsertTsProcessDto[] {
-    const groups = new Map<string, AutoInsertTsProcessDto>();
+): AutoTsFormGroup[] {
+    const groups = new Map<string, AutoTsFormGroup>();
     for (const form of forms) {
-        const key = JSON.stringify([
-            form.NFRMNO,
-            form.VORGNO,
-            form.CYEAR,
-            form.REQUEST_BY,
-            form.INPUT_BY,
-        ]);
-        const previous = groups.get(key);
-        if (previous) previous.ITEMS.push(...form.ITEMS);
-        else groups.set(key, { ...form, ITEMS: [...form.ITEMS] });
+        for (const row of form.ITEMS) {
+            const key = JSON.stringify([
+                form.NFRMNO,
+                form.VORGNO,
+                form.CYEAR,
+                form.REQUEST_BY,
+                form.INPUT_BY,
+                row.ITEM,
+            ]);
+            const previous = groups.get(key);
+            if (previous) previous.ITEMS.push(row);
+            else groups.set(key, { ...form, ITEM: row.ITEM, ITEMS: [row] });
+        }
     }
     return [...groups.values()];
 }

@@ -38,6 +38,7 @@ describe('Automatic TS batch creation', () => {
             requireForm: jest.fn(),
             exists: jest.fn().mockResolvedValue(false),
             insert: jest.fn(),
+            updateItemFlow: jest.fn(),
         };
         forms = {
             create: jest.fn().mockResolvedValue({ status: true, data: key }),

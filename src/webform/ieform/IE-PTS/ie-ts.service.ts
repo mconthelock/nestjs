@@ -26,6 +26,7 @@ export interface AutoTsResult {
         CYEAR: string;
         REQUEST_BY: string;
         INPUT_BY: string;
+        ITEM: string;
     };
     status: 'created' | 'skipped';
     received: number;
@@ -64,8 +65,16 @@ export class IeTsService {
                     if (!(await this.repo.processExists(row)))
                         retained.push(row);
                 }
-                const { NFRMNO, VORGNO, CYEAR, REQUEST_BY, INPUT_BY } = dto;
-                const form = { NFRMNO, VORGNO, CYEAR, REQUEST_BY, INPUT_BY };
+                const { NFRMNO, VORGNO, CYEAR, REQUEST_BY, INPUT_BY, ITEM } =
+                    dto;
+                const form = {
+                    NFRMNO,
+                    VORGNO,
+                    CYEAR,
+                    REQUEST_BY,
+                    INPUT_BY,
+                    ITEM,
+                };
                 if (!retained.length) {
                     items.push({
                         form,
@@ -101,6 +110,7 @@ export class IeTsService {
                 }
                 // Only FORM, FLOW, PROC_TSHEADFORM and PROC_TSDETFORM are inserted in automatic mode.
                 await this.insertRows({ ...key, ...rows });
+                await this.repo.updateItemFlow(key, ITEM);
                 items.push({
                     form,
                     status: 'created',

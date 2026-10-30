@@ -5,6 +5,7 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { nullableTsCode } from './ts-process-auto.utils';
 import { transactionContext } from 'src/common/interceptors/transaction-context';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
+import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 import { PROC_TSHEADFORM } from 'src/common/Entities/webform/table/PROC_TSHEADFORM.entity';
 import { PROC_TSDETFORM } from 'src/common/Entities/webform/table/PROC_TSDETFORM.entity';
 import { PROC_TSATTFILE } from 'src/common/Entities/webform/table/PROC_TSATTFILE.entity';
@@ -53,6 +54,39 @@ export class IeTsRepository extends BaseRepository {
             binds,
         );
         return Number(result[0]?.MATCH_COUNT ?? 0) > 0;
+    }
+
+    async updateItemFlow(key: TsFormKeyDto, item: string): Promise<void> {
+        const pics = await this.manager.query(
+            'SELECT DISTINCT SEMPNO, SEMPNO2 FROM WEBFORM.DWGNOTICEPICMST WHERE TRIM(ITEMNO) = :1',
+            [item],
+        );
+        // Missing or ambiguous mappings preserve the approvers from the flow master.
+        const pic = pics.length === 1 ? pics[0] : undefined;
+        const empno = nullableTsCode(pic?.SEMPNO);
+        if (!empno) return;
+        const representative = nullableTsCode(pic?.SEMPNO2) ?? empno;
+        await this.getRepository(FLOW).update(
+            { ...key, CSTEPNO: '20' },
+            { VAPVNO: empno, VREPNO: representative },
+        );
+        const heads = await this.manager.query(
+            'SELECT DISTINCT HEADNO FROM WEBFORM.SEQUENCEORG WHERE TRIM(EMPNO) = :1',
+            [empno],
+        );
+        const headNumbers = [
+            ...new Set<string>(
+                heads
+                    .map((row) => nullableTsCode(row.HEADNO))
+                    .filter((value): value is string => value !== null),
+            ),
+        ];
+        if (headNumbers.length === 1) {
+            await this.getRepository(FLOW).update(
+                { ...key, CSTEPNO: '10' },
+                { VAPVNO: headNumbers[0], VREPNO: headNumbers[0] },
+            );
+        }
     }
 
     async requireForm(key: TsFormKeyDto) {

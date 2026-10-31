@@ -98,6 +98,8 @@ export class IeTsApproveService {
                     });
                 }
             }
+            const cst = await this.formService.getFormStatus({ ...form });
+
             return {
                 status: true,
                 message: 'Approve successful',

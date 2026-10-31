@@ -48,6 +48,8 @@ export class IeTsService {
                 };
             }
             const pic = await this.repotsf.getPicByItemNos(uniqueItmNos);
+            // console.log(pic);
+
             const uniquePICs = [
                 ...new Set(pic.map((item) => item.PICINFO.SEMPNO)),
             ];

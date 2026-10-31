@@ -41,6 +41,7 @@ import { CountryOriginCountryModule } from './country_origin_country/country_ori
 import { CountryOriginNotSetViewModule } from './country_origin_not_set_view/country_origin_not_set_view.module';
 import { DpmsCountryConditionModule } from './dpms_country_condition/dpms_country_condition.module';
 import { DpmsPackingListDetailModule } from './dpms_packing_list_detail/dpms_packing_list_detail.module';
+import { StockPartFollowViewModule } from './stock_part_follow_view/stock_part_follow_view.module';
 
 @Module({
     imports: [
@@ -86,6 +87,7 @@ import { DpmsPackingListDetailModule } from './dpms_packing_list_detail/dpms_pac
         CountryOriginNotSetViewModule,
         DpmsCountryConditionModule,
         DpmsPackingListDetailModule,
+        StockPartFollowViewModule,
     ],
 })
 export class WorkloadModule {}

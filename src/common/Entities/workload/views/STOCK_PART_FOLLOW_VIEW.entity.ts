@@ -66,7 +66,7 @@ export class STOCK_PART_FOLLOW_VIEW {
     PROCESS: string;
 
     @ViewColumn()
-    PLAN: Date;
+    PLAN: number;
 
     @ViewColumn()
     ACTUAL: number;

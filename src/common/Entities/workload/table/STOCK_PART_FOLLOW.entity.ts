@@ -18,8 +18,8 @@ export class STOCK_PART_FOLLOW {
     PROCESS: string;
 
     @Column()
-    PLAN: Date;
+    PLAN?: number;
 
     @Column()
-    REMARK: string;
+    REMARK?: string;
 }

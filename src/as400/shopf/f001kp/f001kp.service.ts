@@ -86,7 +86,7 @@ export class F001kpService {
                 F01R03: row.F01R03,
                 QTY: row.QTY,
                 PROCESS: processMap[currentDwgNo] || [], // ดึงจาก Memory Map
-                HISTORY: historyMap[currentDwgNo].MAXAPVDATE
+                HISTORY: historyMap[currentDwgNo]?.MAXAPVDATE
                     ? formatDate(historyMap[currentDwgNo].MAXAPVDATE)
                     : null, // ดึงจาก Memory Map
             };

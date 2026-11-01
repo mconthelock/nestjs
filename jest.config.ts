@@ -20,6 +20,8 @@ const config: Config = {
   // 👇 อันนี้แหละที่แก้ปัญหาแจ๊บ
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
+    '^@nestjs/mapped-types$':
+      '<rootDir>/node_modules/@nestjs/swagger/node_modules/@nestjs/mapped-types',
   },
 };
 

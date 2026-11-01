@@ -34,9 +34,8 @@ export class CreateIsDevDto extends PickType(CreateFormDto, [
     CYEAR: string;
 
     @IsOptional()
-    @IsNumber()
-    @Type(() => Number)
-    CYEAR2?: number;
+    @IsString()
+    CYEAR2?: string;
 
     @IsOptional()
     @IsNumber()
@@ -134,15 +133,15 @@ export class CreateIsDevDto extends PickType(CreateFormDto, [
     @IsOptional()
     @ValidateNested()
     @Type(() => CreateBenefitDto)
-    benefit?: CreateBenefitDto;
+    benefit?: CreateBenefitDto[];
 
     @IsOptional()
     @ValidateNested()
     @Type(() => CreateManhoursDto)
-    manhours?: CreateManhoursDto;
+    manhours?: CreateManhoursDto[];
 
     @IsOptional()
     @ValidateNested()
     @Type(() => CreateInvestDto)
-    invest?: CreateInvestDto;
+    invest?: CreateInvestDto[];
 }

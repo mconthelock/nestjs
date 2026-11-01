@@ -59,6 +59,7 @@ if (process.env.HOST == 'AMEC') {
             entities: [
                 __dirname + '/../../**/**/*.entity{.ts,.js}',
                 __dirname + '/../../**/**/**/*.entity{.ts,.js}',
+                __dirname + '/../Entities/webform/**/*.entity{.ts,.js}',
             ],
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),

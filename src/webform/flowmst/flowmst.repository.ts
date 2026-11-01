@@ -7,9 +7,7 @@ import { FLOWMST } from 'src/common/Entities/webform/table/FLOWMST.entity';
 
 @Injectable()
 export class FlowmstRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -45,5 +43,43 @@ export class FlowmstRepository extends BaseRepository {
                 AND cStepNo = PRIOR cStepNextNo`,
             [NFRMNO, VORGNO, CYEAR, NFRMNO, VORGNO, CYEAR],
         );
+    }
+
+    async getFlowMasterNoSql(
+        NFRMNO: number,
+        VORGNO: string,
+        CYEAR: string,
+    ): Promise<FLOWMST[]> {
+        const allSteps = await this.getRepository(FLOWMST).find({
+            where: { NFRMNO, VORGNO, CYEAR },
+        });
+
+        if (!allSteps || allSteps.length === 0) {
+            return [];
+        }
+
+        const result: FLOWMST[] = [];
+        let currentBatch = allSteps.filter((s) => s.CSTART === '1');
+        const visited = new Set<string>();
+
+        while (currentBatch.length > 0) {
+            const nextBatch: FLOWMST[] = [];
+            for (const step of currentBatch) {
+                const key = `${step.CSTEPNO}->${step.CSTEPNEXTNO}->${step.VAPVNO ?? ''}`;
+                if (visited.has(key)) continue;
+                visited.add(key);
+                result.push(step);
+
+                if (step.CSTEPNEXTNO && step.CSTEPNEXTNO !== '00') {
+                    const nextSteps = allSteps.filter(
+                        (s) => s.CSTEPNO === step.CSTEPNEXTNO,
+                    );
+                    nextBatch.push(...nextSteps);
+                }
+            }
+            currentBatch = nextBatch;
+        }
+
+        return result;
     }
 }

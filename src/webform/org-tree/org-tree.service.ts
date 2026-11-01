@@ -11,6 +11,9 @@ export class OrgTreeService {
         empno: string,
         emppos: string,
     ) {
-        return await this.repo.getOrgTree(orgno, vposno, empno, emppos);
+        if (process.env.HOST == 'AMEC') {
+            return await this.repo.getOrgTree(orgno, vposno, empno, emppos);
+        }
+        return await this.repo.getOrgTreeNosql(orgno, vposno, empno, emppos);
     }
 }

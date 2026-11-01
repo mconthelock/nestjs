@@ -21,7 +21,7 @@ export class SequenceOrgRepository extends BaseRepository {
             .select('seq.HEADNO', 'HEADNO')
             .where('seq.EMPNO = :empno', { empno })
             .andWhere(
-                'seq.SPOSCODE = (select SPOSCODE from AMECUSERALL where sEmpNo = :empno2)',
+                'seq.SPOSCODE = (select SPOSCODE from AMECUSERALL where SEMPNO = :empno2)',
                 { empno2: empno },
             )
             .orderBy('seq.CCO', 'ASC');
@@ -50,7 +50,7 @@ export class SequenceOrgRepository extends BaseRepository {
 
     async getSubordinates(empno: string) {
         const sql = `
-                 SELECT DISTINCT B.* FROM 
+                 SELECT DISTINCT B.* FROM
                     (
                         SELECT * FROM SEQUENCEORG
                         START WITH HEADNO = :1 AND EMPNO != :2 CONNECT BY PRIOR EMPNO = HEADNO AND PRIOR CCO = CCO1
@@ -65,7 +65,7 @@ export class SequenceOrgRepository extends BaseRepository {
         return await this.getRepository(SEQUENCEORG).find({ where: dto });
     }
 
-     async getByPosition(VORGNO: string, SPOSCODE: string) {
+    async getByPosition(VORGNO: string, SPOSCODE: string) {
         return await this.getRepository(SEQUENCEORG).findOne({
             where: {
                 VORGNO: VORGNO,
@@ -74,5 +74,4 @@ export class SequenceOrgRepository extends BaseRepository {
             relations: ['EMPINFO'],
         });
     }
-
 }

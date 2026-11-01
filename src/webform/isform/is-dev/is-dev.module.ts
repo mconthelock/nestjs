@@ -9,6 +9,7 @@ import { LABORCOST } from 'src/common/Entities/webform/table/LABORCOST.entity';
 import { ISDEV_REQUEST } from 'src/common/Entities/webform/table/ISDEV_REQUEST.entity';
 import { IsDevFormRepository } from './is-dev.repositoty';
 import { FormModule } from 'src/webform/form/form.module';
+import { HandleFileFormModule } from 'src/webform/handle-file-form/handle-file-form.module';
 
 @Module({
     imports: [
@@ -23,6 +24,7 @@ import { FormModule } from 'src/webform/form/form.module';
             'webformConnection',
         ),
         FormModule,
+        HandleFileFormModule,
     ],
     controllers: [IsDevController],
     providers: [IsDevService, IsDevFormRepository],

@@ -7,16 +7,14 @@ import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
 
 @Injectable()
 export class OrgposRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     async getOrgPos(dto: SearchOrgpoDto) {
         return this.getRepository(ORGPOS).find({
             where: dto,
-            relations: ['EMPINFO'],
+            //relations: ['EMPINFO'],
             order: {
                 VEMPNO: 'ASC',
             },

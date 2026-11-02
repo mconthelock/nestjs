@@ -18,11 +18,17 @@ export class RevRepository extends BaseRepository {
             },
             order: {
                 OWNER: 'ASC',
-            }
+            },
         });
     }
 
-    findAll() {
-        return this.getRepository(STY_CHEMICAL_REV).find();
+    find(type: 'all' | 'active' | 'inactive') {
+        const where: any = {};
+        if (type === 'active') {
+            where.STATUS = 1;
+        } else if (type === 'inactive') {
+            where.STATUS = 0;
+        }
+        return this.getRepository(STY_CHEMICAL_REV).find({ where });
     }
 }

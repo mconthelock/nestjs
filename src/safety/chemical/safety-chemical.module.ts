@@ -12,18 +12,17 @@ import { MasterService } from './services/master.service';
 import { RevRepository } from './repository/rev.repository';
 import { OrganizationsModule } from 'src/webform/organizations/organizations.module';
 import { SectionRepository } from './repository/section.repository';
+import { RevService } from './services/rev.service';
+import { RevController } from './controllers/rev.controller';
 
 @Module({
-    imports: [
-        ChemicalSectionModule,
-        FormModule,
-        OrganizationsModule,
-    ],
-    controllers: [FollowController, MasterController],
+    imports: [ChemicalSectionModule, FormModule, OrganizationsModule],
+    controllers: [FollowController, MasterController, RevController],
     providers: [
         // Services
         FollowService,
         MasterService,
+        RevService,
 
         // Repository
         FollowRepository,

@@ -422,6 +422,26 @@ export class JigRepository extends BaseRepository {
             const where = formKey(key);
             const ng = await manager.findOneBy(JigFormNg, where);
             if (!ng) throw new BadRequestException('This form has no NG');
+
+            const details = await manager.findBy(JigFormDetail, where);
+            const originalNg = details.filter(detail => detail.RESULT === 'NG');
+            const originalNgSeq = new Set(originalNg.map(detail => detail.CHECK_SEQ));
+            if (dto.CONFIRMS.length !== originalNg.length)
+                throw new BadRequestException('Confirm Measured is required for every originally NG checkpoint');
+            for (const confirm of dto.CONFIRMS) {
+                if (!originalNgSeq.has(confirm.CHECK_SEQ))
+                    throw new BadRequestException('Confirmation is allowed only for an originally NG checkpoint');
+                const detail = originalNg.find(row => row.CHECK_SEQ === confirm.CHECK_SEQ)!;
+                detail.CONFIRM_VALUE = confirm.CONFIRM_VALUE;
+                detail.CONFIRM_RESULT = checkpointResult({
+                    MIN: detail.MIN,
+                    MAX: detail.MAX,
+                    MEASURED_VALUE: confirm.CONFIRM_VALUE,
+                    RESULT: null,
+                });
+                if (!['OK', 'NG'].includes(detail.CONFIRM_RESULT))
+                    throw new BadRequestException('Stored MIN/MAX are required to calculate Confirm Result');
+            }
             if (!dto.SUMMARY_DETAIL?.trim() || dto.SUMMARY_DETAIL.trim().length > 2000)
                 throw new BadRequestException('Summary Detail is required (maximum 2000 characters)');
             if (!/^\d{4}-\d{2}-\d{2}$/.test(dto.ACTUAL_FINNISH_DATE) ||
@@ -448,6 +468,7 @@ export class JigRepository extends BaseRepository {
             // Existing files must be deleted explicitly through the attachment endpoint.
             if (saved.some(f => ['BEFORE','AFTER'].includes(f.FILE_GROUP) && !dto.FILES.some(x => x.FILE_SEQ === f.FILE_SEQ)))
                 throw new ConflictException('Attachments have changed; reload the form');
+            await manager.save(JigFormDetail, originalNg);
             for (const file of dto.FILES) await this.writeFormFile(manager, where, file, dto.UPDATE_BY);
             await manager.update(JigFormNg, where, {
                 ACTUAL_FINNISH_DATE: new Date(dto.ACTUAL_FINNISH_DATE), SUMMARY_DETAIL: dto.SUMMARY_DETAIL.trim(),
@@ -761,6 +782,9 @@ export class JigRepository extends BaseRepository {
                     if (!formNg.ACTUAL_FINNISH_DATE || !formNg.SUMMARY_DETAIL?.trim() ||
                         !['BEFORE','AFTER'].every(group => evidence.some(f => f.FILE_GROUP === group)))
                         throw new BadRequestException('Complete Action Finish Date, Summary and BEFORE/AFTER evidence before finishing');
+                    if (details.some(detail => detail.RESULT === 'NG' &&
+                        (detail.CONFIRM_VALUE == null || !['OK', 'NG'].includes(detail.CONFIRM_RESULT))))
+                        throw new BadRequestException('Every originally NG checkpoint requires a Confirm Measured value');
                 }
             }
             if (overallResult(details) === 'NG' && !formNg)
@@ -821,7 +845,10 @@ export class JigRepository extends BaseRepository {
                     INSPECTION_TOOL: d.INSPECTION_TOOL,
                     MIN: d.MIN,
                     MAX: d.MAX,
-                    MEASURED_VALUE: d.MEASURED_VALUE ?? null,
+                    MEASURED_VALUE:
+                        d.RESULT === 'NG' && d.CONFIRM_VALUE != null
+                            ? d.CONFIRM_VALUE
+                            : (d.MEASURED_VALUE ?? null),
                     UNIT: d.UNIT,
                 };
                 if (existingPoints.some((p) => p.CHECK_SEQ === d.CHECK_SEQ)) {

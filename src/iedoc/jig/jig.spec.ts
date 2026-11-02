@@ -97,6 +97,8 @@ function fixture(period = 6) {
         status: '2',
         ng: null,
         forms: [],
+        recheckSteps: [],
+        files: [],
         points: [
             {
                 CHECK_SEQ: 1,
@@ -111,13 +113,16 @@ function fixture(period = 6) {
         query: jest.fn(async (sql: string) =>
             sql.startsWith('SELECT CST FROM')
                 ? [{ CST: state.status }]
-                : state.forms,
+                : sql.includes('FROM WEBFORM.FLOW')
+                  ? state.recheckSteps
+                  : state.forms,
         ),
         findOne: jest.fn(async () => state.master),
         findOneBy: jest.fn(async (entity: any) =>
             entity === JigForm ? form : entity === JigFormNg ? state.ng : null,
         ),
-        findBy: jest.fn(async () => details),
+        findBy: jest.fn(async (entity: any) =>
+            entity === JigFormDetail ? details : entity === JigFormFile ? state.files : details),
         find: jest.fn(async (entity: any) =>
             entity === JigMaster ? (state.master ? [state.master] : []) : entity === JigCheckpoint
                 ? state.points
@@ -179,6 +184,30 @@ describe('Jig REV application', () => {
         expect((await repo.finishForm(key)).applied).toBe(false);
         expect(manager.save.mock.calls.filter(([entity]) => entity === JigDefectNg)).toHaveLength(1);
     });
+
+    it.each([[1.5, 'OK'], [3, 'NG']] as const)(
+        'applies Confirm Measured %p to JIG_CHECKPOINT when confirmation result remains %s',
+        async (confirmValue, confirmResult) => {
+            const { repo, details, state, manager } = fixture();
+            details[0] = {
+                ...details[0], MEASURED_VALUE: 3, RESULT: 'NG',
+                CONFIRM_VALUE: confirmValue, CONFIRM_RESULT: confirmResult,
+            };
+            state.ng = {
+                DEFECT_DETAIL: 'Defect', ACTION: 'Repair', CORRECTIVE: 'Adjust',
+                PLAN_DATE: new Date(2026, 9, 1), ACTUAL_FINNISH_DATE: new Date(2026, 10, 2),
+                SUMMARY_DETAIL: 'Verified',
+            };
+            state.recheckSteps = [{ CSTEPNO: '19' }];
+            state.files = [{ FILE_GROUP: 'BEFORE' }, { FILE_GROUP: 'AFTER' }];
+
+            await repo.finishForm(key);
+
+            const checkpointWrite = manager.update.mock.calls.find(([entity]) => entity === JigCheckpoint);
+            expect(checkpointWrite[2].MEASURED_VALUE).toBe(confirmValue);
+            expect(details[0]).toMatchObject({ MEASURED_VALUE: 3, RESULT: 'NG', CONFIRM_VALUE: confirmValue, CONFIRM_RESULT: confirmResult });
+        },
+    );
 
     it('deletes only this jig defect when the approved form has no NG, without replaying', async () => {
         const { repo, manager } = fixture();

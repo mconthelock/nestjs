@@ -175,23 +175,28 @@ async function bootstrap() {
     app.useGlobalFilters(new AllExceptionsFilter(logger));
 
     // สร้าง config สำหรับ Swagger
-    const swaggerConfig = new DocumentBuilder()
-        .setTitle('AMEC API')
-        .setDescription('API documentation for AMEC API')
-        .setVersion(process.env.VERSION)
-        .addServer(process.env.APP_ENV)
-        //.addTag('Auth', 'ใช้สำหรับจัดการการเข้าสู่ระบบและระบบยืนยันตัวตน')
-        .addTag('IS-DEV', 'Manage a IS-DEV Request')
-        .build();
-    const document = SwaggerModule.createDocument(app, swaggerConfig);
-    //SwaggerModule.setup('apidocs', app, document);
-    app.use(
-        '/apidocs',
-        apiReference({
-            content: document,
-            theme: 'bluePlanet',
-        }),
-    );
+    if (
+        process.env.NODE_ENV !== 'production' &&
+        process.env.ENABLE_SWAGGER === 'true'
+    ) {
+        const swaggerConfig = new DocumentBuilder()
+            .setTitle('AMEC API')
+            .setDescription('API documentation for AMEC API')
+            .setVersion(process.env.VERSION)
+            .addServer(process.env.APP_ENV)
+            //.addTag('Auth', 'ใช้สำหรับจัดการการเข้าสู่ระบบและระบบยืนยันตัวตน')
+            .addTag('IS-DEV', 'Manage a IS-DEV Request')
+            .build();
+        const document = SwaggerModule.createDocument(app, swaggerConfig);
+        //SwaggerModule.setup('apidocs', app, document);
+        app.use(
+            '/apidocs',
+            apiReference({
+                content: document,
+                theme: 'bluePlanet',
+            }),
+        );
+    }
 
     // 🔗 ตั้ง WS adapter กลาง—ครอบทุก @WebSocketGateway
     const wsAdapter = new SocketIoAdapter(app);

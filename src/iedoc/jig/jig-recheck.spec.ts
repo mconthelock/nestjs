@@ -2,6 +2,7 @@ import { JigFlowService } from './jig-flow.service';
 import { JigRepository } from './jig.repository';
 import { JigFormNg } from 'src/common/Entities/iedoc/table/jig_form_ng.entity';
 import { JigFormFile } from 'src/common/Entities/iedoc/table/jig_form_file.entity';
+import { JigFormDetail } from 'src/common/Entities/iedoc/table/jig_form_detail.entity';
 import { transactionContext } from 'src/common/interceptors/transaction-context';
 const key = { NFRMNO: 31, VORGNO: '051401', CYEAR: '26', CYEAR2: '2026', NRUNNO: 4 };
 
@@ -83,17 +84,22 @@ describe('JIG NG flow via shared services', () => {
 function recheckFixture() {
     const ng = { DEFECT_DETAIL: 'Defect', ACTION: 'Adjust', CORRECTIVE: 'Repair' };
     const files: any[] = [{ FILE_SEQ: 1, FILE_GROUP: null, FILE_PATH: 'reference.jpg' }];
+    const details: any[] = [
+        { CHECK_SEQ: 1, MIN: 0, MAX: 2, MEASURED_VALUE: 1, RESULT: 'OK', CONFIRM_VALUE: null, CONFIRM_RESULT: null },
+        { CHECK_SEQ: 2, MIN: -1, MAX: 1, MEASURED_VALUE: 2, RESULT: 'NG', CONFIRM_VALUE: null, CONFIRM_RESULT: null },
+    ];
     const manager: any = { query: jest.fn().mockResolvedValue([{ CSTEPNO: '19' }]),
         findOneBy: jest.fn(async entity => entity === JigFormNg ? ng : null),
-        findBy: jest.fn(async entity => entity === JigFormFile ? files : []),
+        findBy: jest.fn(async entity => entity === JigFormFile ? files : entity === JigFormDetail ? details : []),
         create: jest.fn((_entity, row) => row), save: jest.fn(), update: jest.fn() };
     const repo = new JigRepository({} as any);
     (repo as any).withForm = async (_key, callback) => callback(manager, {}, {}, '1');
     const dto: any = { UPDATE_BY: 'R', ACTUAL_FINNISH_DATE: '2026-10-16', SUMMARY_DETAIL: 'Repaired and rechecked',
         FILES: ['BEFORE','AFTER'].map((group, i) => ({ FILE_SEQ: i + 2, FILE_GROUP: group,
-            FILE_NAME: 'photo.jpg', FILE_PATH: `IE-JIG26-000004/${group}/photo.jpg`, FILE_TYPE: 'image/jpeg', FILE_SIZE: 100 })) };
+            FILE_NAME: 'photo.jpg', FILE_PATH: `IE-JIG26-000004/${group}/photo.jpg`, FILE_TYPE: 'image/jpeg', FILE_SIZE: 100 })),
+        CONFIRMS: [{ CHECK_SEQ: 2, CONFIRM_VALUE: 0 }] };
     jest.spyOn(repo, 'getForm').mockResolvedValue({} as any);
-    return { repo, manager, dto, files };
+    return { repo, manager, dto, files, details };
 }
 describe('JIG Job Controller recheck', () => {
     it('writes only recheck data and grouped files, leaving Header and reference attachments intact', async () => {
@@ -101,7 +107,17 @@ describe('JIG Job Controller recheck', () => {
         await repo.saveRecheck(key, dto);
         expect(manager.update).toHaveBeenCalledTimes(1);
         expect(manager.update).toHaveBeenCalledWith(JigFormNg, key, { ACTUAL_FINNISH_DATE: new Date('2026-10-16'), SUMMARY_DETAIL: dto.SUMMARY_DETAIL });
-        expect(manager.save).toHaveBeenCalledTimes(2);
+        expect(manager.save).toHaveBeenCalledTimes(3);
+    });
+    it('stores confirmation separately and calculates the result from the stored range', async () => {
+        const { repo, dto, details } = recheckFixture();
+        await repo.saveRecheck(key, dto);
+        expect(details[0]).toMatchObject({ MEASURED_VALUE: 1, RESULT: 'OK', CONFIRM_VALUE: null, CONFIRM_RESULT: null });
+        expect(details[1]).toMatchObject({ MEASURED_VALUE: 2, RESULT: 'NG', CONFIRM_VALUE: 0, CONFIRM_RESULT: 'OK' });
+    });
+    it('requires confirmation for every originally NG checkpoint', async () => {
+        const { repo, dto } = recheckFixture(); dto.CONFIRMS = [];
+        await expect(repo.saveRecheck(key, dto)).rejects.toThrow('Confirm Measured');
     });
     it('rejects callers outside active step 19', async () => {
         const { repo, manager, dto } = recheckFixture(); manager.query.mockResolvedValue([]);

@@ -13,7 +13,11 @@ import { FormLinkService } from 'src/webform/form-link/form-link.service';
 import { joinPaths } from 'src/common/utils/files.utils';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 import { PurCpcService } from '../../pur-cpc/services/purcpc_form.service';
-import { ImanageFlow, IinsertFile } from '../interface/create.interface';
+import {
+    ImanageFlow,
+    IinsertFile,
+    IsetFlow,
+} from '../interface/create.interface';
 import { InsertFlowStepService } from 'src/webform/flow/insert-flow-step.service';
 import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
 
@@ -85,6 +89,7 @@ export class PurPraCreateService {
             await this.manageFlow({
                 form,
                 priceComparisonNo: dto.PRICE_COMPARE_NO,
+                dto,
             });
 
             // สร้าง Price approval form
@@ -301,8 +306,9 @@ export class PurPraCreateService {
      * @description จัดการ flow ของแบบฟอร์มตามรายการและผลรวมของการเปรียบเทียบราคา
      * @param form
      * @param priceComparisonNo
+     * @param dto
      */
-    private async manageFlow({ form, priceComparisonNo }: ImanageFlow) {
+    private async manageFlow({ form, priceComparisonNo, dto }: ImanageFlow) {
         // ตรวจสอบรายการและผลรวมเพื่อจัดการ flow
         let insertFlow: boolean = false;
 
@@ -311,6 +317,13 @@ export class PurPraCreateService {
             CSTEPNO: '02',
         });
         const hasDim = dim && dim.length > 0;
+        if (!priceComparisonNo) {
+            if (dto.NTOTAL_PRES >= 1000000 || dto.NTOTAL_NEW >= 1000000) {
+                insertFlow = true;
+            }
+            await this.setFlow({ hasDim, insertFlow, form });
+            return;
+        }
         const priceComparison =
             await this.purCpcService.getForm(priceComparisonNo);
         if (priceComparison.status) {
@@ -331,23 +344,35 @@ export class PurPraCreateService {
                     }
                 }
             }
-            // หากยังไม่มี dim และต้องการ insert flow
-            if (!hasDim && insertFlow) {
-                await this.insertFlowService.insertFlowStep({
-                    ...form,
-                    CTYPE: '1',
-                    BEFORESTEPNO: '57',
-                    NEWSTEPNO: '02',
-                    POSNO: '02',
-                });
-            }
-            // หากมี dim และต้องการลบ flow
-            else if (hasDim && !insertFlow) {
-                await this.deleteFlowService.deleteFlowStep({
-                    ...form,
-                    CSTEPNO: '02',
-                });
-            }
+            await this.setFlow({ hasDim, insertFlow, form });
+        }
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-11-02
+     * @description จัดการ flow ของแบบฟอร์มตามเงื่อนไข hasDim และ insertFlow
+     * @param hasDim
+     * @param insertFlow
+     * @param form
+     */
+    private async setFlow({ hasDim, insertFlow, form }: IsetFlow) {
+        // หากยังไม่มี dim และต้องการ insert flow
+        if (!hasDim && insertFlow) {
+            await this.insertFlowService.insertFlowStep({
+                ...form,
+                CTYPE: '1',
+                BEFORESTEPNO: '57',
+                NEWSTEPNO: '02',
+                POSNO: '02',
+            });
+        }
+        // หากมี dim และต้องการลบ flow
+        else if (hasDim && !insertFlow) {
+            await this.deleteFlowService.deleteFlowStep({
+                ...form,
+                CSTEPNO: '02',
+            });
         }
     }
 }

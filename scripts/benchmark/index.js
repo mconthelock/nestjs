@@ -202,9 +202,12 @@ async function runStartupBenchmark() {
     console.log('🚀 2. BENCHMARKING NESTJS APPLICATION STARTUP PHASES');
     console.log('======================================================\n');
 
-    const appModulePath = path.resolve(process.cwd(), 'dist/src/app.module.js');
+    let appModulePath = path.resolve(process.cwd(), 'dist/app.module.js');
     if (!fs.existsSync(appModulePath)) {
-        console.error('❌ ไม่พบไฟล์ dist/src/app.module.js กรุณารัน "npm run build" ก่อนเพื่อคอมไพล์โค้ดล่าสุด');
+        appModulePath = path.resolve(process.cwd(), 'dist/src/app.module.js');
+    }
+    if (!fs.existsSync(appModulePath)) {
+        console.error('❌ ไม่พบไฟล์ dist/app.module.js กรุณารัน "npm run build" ก่อนเพื่อคอมไพล์โค้ดล่าสุด');
         return;
     }
 

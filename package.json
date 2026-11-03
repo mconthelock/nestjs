@@ -25,7 +25,9 @@
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert",
     "postinstall": "playwright install chromium",
-    "benchmark": "node scripts/benchmark/index.js"
+    "benchmark": "node scripts/benchmark/benchmark-dev.js",
+    "benchmark:dev": "node scripts/benchmark/benchmark-dev.js",
+    "benchmark:prod": "node scripts/benchmark/index.js"
   },
   "dependencies": {
     "@nestjs/apollo": "^13.1.0",

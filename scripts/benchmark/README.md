@@ -1,43 +1,34 @@
-# System Benchmark Tools
+# Benchmark Tools สำหรับวัดประสิทธิภาพระบบ
 
-เครื่องมือสำหรับวัดประสิทธิภาพความเร็วของ Database Connections และขั้นตอนการ Boot ระบบของ NestJS Application
-
-## 📂 รายการไฟล์ในโฟลเดอร์นี้
-
-* `index.js`: สคริปต์หลักสำหรับรัน Benchmark ทั้งหมด (ทดสอบ Database ทั้ง 8 ตัว + วัดความเร็วแต่ละช่วงของ NestJS Startup)
+ชุดเครื่องมือวัดประสิทธิภาพความเร็วของ Application สำหรับทีมพัฒนา เพื่อใช้เปรียบเทียบเวลาในการบูตระบบระหว่างเครื่องต่างๆ ในทีม
 
 ---
 
-## 🚀 วิธีการใช้งาน
+## 🛠️ คำสั่งที่มีให้ใช้งาน
 
-### 1. Build โค้ดล่าสุดก่อน (หากเพิ่งมีการแก้ไขโค้ด)
+### 1. วัดความเร็วของ `npm run start:dev` จริง (โหมด Development) ⭐️
+คำสั่งนี้จะรัน `nest start --swc` จริงๆ โดยดักจับแต่ละ Milestone ตั้งแต่เริ่มเรียก SWC Compiler, โหลดไฟล์โค้ด, เชื่อมต่อ Database, จนกระทั่งเปิดพอร์ตพร้อมรับ Request:
 ```bash
-npm run build
+npm run benchmark:dev
 ```
+*(หรือ `npm run benchmark`)*
 
-### 2. รัน Benchmark
-สามารถสั่งรันผ่านคำสั่ง npm ได้ทันทีจาก Root directory:
-```bash
-npm run benchmark
-```
-หรือรันโดยตรงด้วย Node.js:
-```bash
-node scripts/benchmark/index.js
-```
+**สิ่งที่แสดงผล:**
+* ข้อมูลสเปกฮาร์ดแวร์ของเครื่อง (CPU Model, Cores, RAM, OS, Node version)
+* เวลาที่ใช้ใน **Phase 1: SWC Rust Compiler** (แปลงโค้ด 2,900+ ไฟล์)
+* เวลาที่ใช้ใน **Phase 2: Code Modules Import & DI Resolution** (Node.js โหลด 427 Modules)
+* เวลาที่ใช้ใน **Phase 3: Database & TypeORM Metadata** (เชื่อมต่อ 8 Database Pools + Redis)
+* เวลาที่ใช้ใน **Phase 4: HTTP Listen & Ready**
+* สรุปเปอร์เซ็นต์ (% Ratio) และคำแนะนำในการจูนแต่ละเครื่อง
 
 ---
 
-## 📊 ข้อมูลที่ได้จากรายงาน (Report Summary)
+### 2. วัดความเร็วของ Production / Docker Container (โหมด Production)
+คำสั่งนี้จะวัดความเร็วของตัว Application Runtime ล้วนๆ (บนโค้ดที่ build แล้วใน `dist/`) โดยไม่มี Overhead ของ Compiler และ Watcher:
+```bash
+npm run benchmark:prod
+```
 
-1. **Database Connections Table**:
-   * วัดเวลา Handshake/Init Connection ของแต่ละฐานข้อมูล (`Connect ms`)
-   * วัดเวลา Ping Query (`Ping ms`)
-   * เวลารวม และสถานะ `OK ✅` หรือ `FAILED ❌` พร้อม Error ชัดเจนกรณีต่อไม่ได้
-
-2. **Startup Phases Breakdown Table**:
-   * **Phase 1: Oracle Client Init** (เวลาเริ่ม Client lib)
-   * **Phase 2: Code Import & Modules Evaluation** (เวลาอ่านและโหลดไฟล์โค้ด ~2,900 ไฟล์ขึ้น RAM)
-   * **Phase 3: DI Resolution & NestFactory.create** (เวลาสร้าง Dependency Injection Container)
-   * **Phase 4: app.init()** (เวลาผูก TypeORM Pool, Metadata และ Lifecycle hooks)
-   * **Total Time**: เวลาสุทธิที่ระบบพร้อมรับ Request
-
+**สิ่งที่แสดงผล:**
+* ตารางทดสอบและจับเวลาของ Database ทั้ง 8 ตัวแยกย่อยรายตัว (`Connect ms` และ `Ping ms`)
+* เวลาที่ตัว NestJS Engine ใช้ในการบูตบน Server หรือ Docker จริง (ประมาณ ~8-10 วินาที)

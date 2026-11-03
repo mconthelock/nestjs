@@ -23,7 +23,6 @@ import { JobOrderModule } from './joborder/joborder.module';
 import { ESCSModule } from './escs/escs.module';
 import { AutomationModule } from './automation/automation.module';
 import { HradminModule } from './hradmin/hradmin.module';
-import { InvoiceModule } from './invoice/invoice.module';
 import { IdsModule } from './ids/ids.module';
 import { ElmesModule } from './elmes/elmes.module';
 // import { ItgcModule } from './itgc/itgc.module';
@@ -66,7 +65,6 @@ import { IedocModule } from './iedoc/iedoc.module';
         JobOrderModule,
         ESCSModule,
         PackingModule,
-        InvoiceModule,
         IdsModule,
         MfgReportModule,
         SafetyModule,
@@ -79,7 +77,7 @@ import { IedocModule } from './iedoc/iedoc.module';
         GeneralPartListModule,
         IedocModule,
         InnovatModule,
-        CountriesModule
+        CountriesModule,
     ],
     providers: [
         HttpLoggingInterceptor,

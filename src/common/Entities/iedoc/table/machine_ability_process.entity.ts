@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: 'MACHINE_ABILITY_PROCESS' })
+@Entity({ name: 'MACHINE_ABILITY_PROCESS', schema: 'IEDOC' })
 export class MachineAbilityProcess {
     @PrimaryColumn()
     MID: number;

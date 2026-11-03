@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: 'SHOPCODEMST' })
+@Entity({ name: 'SHOPCODEMST', schema: 'IEDOC' })
 export class ShopCodeMst {
     @PrimaryColumn()
     SHOPCODE: string;

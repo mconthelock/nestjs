@@ -35,11 +35,17 @@ import { ShopCodeMst } from 'src/common/Entities/iedoc/table/shopcodemst.entity'
                 MachineAbilityProcess,
                 ShopCodeMst,
             ],
-            'iedocConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [JigController],
-    providers: [JigService, JigRepository, JigInspectionService, JigNgTagService, JigReminderService],
+    providers: [
+        JigService,
+        JigRepository,
+        JigInspectionService,
+        JigNgTagService,
+        JigReminderService,
+    ],
     exports: [JigService, JigRepository],
 })
 export class JigModule {}

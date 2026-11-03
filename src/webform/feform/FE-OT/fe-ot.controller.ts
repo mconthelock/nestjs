@@ -44,7 +44,7 @@ export class FEOTController {
     }
 
     @Get()
-    getDataOTall(){
+    getDataOTall() {
         return this.feotService.getDataOTall();
     }
 
@@ -66,7 +66,7 @@ export class FEOTController {
     @Patch('/update')
     @UseTransaction('webformConnection')
     @UseForceTransaction()
-        update(@Body() dto: UpdatefeotDto, @Req() req: Request) {
-            return this.feotService.update(dto, getClientIP(req));
-        }
+    update(@Body() dto: UpdatefeotDto, @Req() req: Request) {
+        return this.feotService.update(dto, getClientIP(req));
+    }
 }

@@ -25,24 +25,15 @@ export class FEOTService {
         }
     }
 
-    async getDataOT(dto: {
-        PLANYEAR: number;
-        PLANMONTH: number;
-        SEMPNO: string;
-    }) {
+    async getDataOT(dto: { PLANYEAR: number; PLANMONTH: number; SEMPNO: string }) {
         return this.repo.getDataOT(dto);
     }
 
-    async getDataOTall(){
+    async getDataOTall() {
         return this.repo.getDataOTall();
     }
 
-    async remove(dto: {
-        PLANYEAR: number;
-        PLANMONTH: number;
-        SEMPNO: string;
-        WORKDATE: string;
-    }) {
+    async remove(dto: { PLANYEAR: number; PLANMONTH: number; SEMPNO: string; WORKDATE: string }) {
         const result = await this.repo.remove(dto);
 
         if (!result.affected) {

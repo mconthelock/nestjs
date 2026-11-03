@@ -1,10 +1,9 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 @Entity({
     name: 'FEOT_DETAILS',
     schema: 'WEBFORM',
 })
-
-export class FEOT_DETAILS{
+export class FEOT_DETAILS {
     @PrimaryColumn()
     PLANYEAR: number;
 

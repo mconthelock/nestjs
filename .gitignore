@@ -5,6 +5,7 @@
 /dist
 /sql
 /artifacts
+/docs
 /output
 /tmp
 /src/workload/piline/PILINE.md
@@ -16,6 +17,7 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+/docs
 
 # OS
 .DS_Store

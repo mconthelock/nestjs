@@ -1,3 +1,4 @@
+import { PsAdjModule } from './ps-adj/ps-adj.module';
 import { Module } from '@nestjs/common';
 import { PsFileModule } from './ps-file/ps-file.module';
 import { PsCiModule } from './ps-ci/ps-ci.module';
@@ -10,6 +11,17 @@ import { PsClmModule } from './ps-clm/ps-clm.module';
 import { PsUpiModule } from './ps-upi/ps-upi.module';
 
 @Module({
-    imports: [PsFileModule, PsCiModule, PsCihModule, PsRPModule, PsVarModule, PSDLCModule, PsYicModule, PsClmModule, PsUpiModule],
+    imports: [
+        PsAdjModule,
+        PsFileModule,
+        PsCiModule,
+        PsCihModule,
+        PsRPModule,
+        PsVarModule,
+        PSDLCModule,
+        PsYicModule,
+        PsClmModule,
+        PsUpiModule,
+    ],
 })
 export class PsFormModule {}

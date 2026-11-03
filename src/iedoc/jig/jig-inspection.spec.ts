@@ -65,7 +65,8 @@ describe('Auto inspection', () => {
         expect(inserts[0][1][headerColumns.indexOf('REV')]).toBe('0');
         expect(inserts[1][0]).toContain('"MEASURED_VALUE"');
         expect(inserts[1][1].slice(-2)).toEqual([1.2345, null]);
-        expect(query.mock.calls.some(([sql]) => /JIG_FORM_FILE|UPDATE IEDOC.JIG_MASTER|DELETE.*FLOW/.test(sql))).toBe(false);
+        expect(query.mock.calls.some(([sql]) => /JIG_FORM_FILE|DELETE.*FLOW/.test(sql))).toBe(false);
+        expect(query).toHaveBeenCalledWith("UPDATE IEDOC.JIG_MASTER SET JIG_STATUS = 'PENDING' WHERE JIG_NO = :1", [expect.any(String)]);
     });
     it('copies NG and assigns the responsible person to step 07', async () => {
         const { service, query, state } = setup();

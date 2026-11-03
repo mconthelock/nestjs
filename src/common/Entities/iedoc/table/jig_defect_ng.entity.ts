@@ -18,6 +18,12 @@ export class JigDefectNg {
     @Column()
     PLAN_DATE: Date;
 
+    @Column({ type: 'date', nullable: true })
+    ACTUAL_FINNISH_DATE: Date | null;
+
+    @Column({ type: 'varchar2', length: 2000, nullable: true })
+    SUMMARY_DETAIL: string | null;
+
     @ManyToOne(() => JigMaster)
     @JoinColumn({ name: 'JIG_NO', referencedColumnName: 'JIG_NO' })
     jig: JigMaster;

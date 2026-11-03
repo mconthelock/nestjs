@@ -1,3 +1,5 @@
+import { JigFlowService } from './jig-flow.service';
+import { SaveJigRecheckDto } from './dto/jig-recheck.dto';
 import {
     BadRequestException,
     ConflictException,
@@ -56,6 +58,7 @@ export class JigRepository extends BaseRepository {
     constructor(
         @InjectDataSource('mitsuConnection')
         private readonly iedocDs: DataSource,
+        private readonly ngFlow?: JigFlowService,
     ) {
         super(iedocDs);
     }
@@ -446,7 +449,7 @@ export class JigRepository extends BaseRepository {
                 'JIG_NO must contain 1 to 20 characters',
             );
         const key = formKey(dto);
-        return this.iedocDs.transaction(async (manager) => {
+        const saved = await this.iedocDs.transaction(async (manager) => {
             // A new jig has no master row to lock. Serialize registrations so two
             // WEBFORM keys cannot register the same JIG_NO concurrently.
             if (dto.FORM_TYPE === 'CREATE') {
@@ -568,9 +571,10 @@ export class JigRepository extends BaseRepository {
                 dto.CREATE_BY,
                 true,
             );
-            await this.configureNgFlow(manager, key, hasNg, dto.PICCODE);
             return this.getForm(key, manager);
         });
+        await this.configureRequesterFlow(key, dto.PICCODE);
+        return saved;
     }
 
     async configureRequesterFlow(key: JigFormKeyDto, picCode?: string) {
@@ -642,6 +646,80 @@ export class JigRepository extends BaseRepository {
                 params,
             );
         }
+
+        if (!this.ngFlow) throw new Error('JigFlowService is not configured');
+        return this.ngFlow.configure(formKey(key), picCode);
+    }
+
+    private async assertStepActor(manager: EntityManager, key: JigFormKeyDto, actor: string, step: string) {
+        if (!actor?.trim()) throw new BadRequestException('UPDATE_BY is required');
+        const rows = await manager.query('SELECT CSTEPNO FROM WEBFORM.FLOW WHERE ' +
+            FORM_KEYS.map((k, i) => `${k} = :${i + 1}`).join(' AND ') +
+            " AND CSTEPNO = :6 AND CSTEPST = '3' AND (TRIM(VAPVNO) = :7 OR TRIM(VREPNO) = :8)",
+            [...FORM_KEYS.map(k => key[k]), step, actor.trim(), actor.trim()]);
+        if (!rows.length) throw new BadRequestException(`Only the active step ${step} approver can edit this data`);
+    }
+
+    async saveRecheck(key: JigFormKeyDto, dto: SaveJigRecheckDto) {
+        return this.withForm(key, async (manager, _form, _jig, status) => {
+            this.assertEditable(status);
+            await this.assertStepActor(manager, key, dto.UPDATE_BY, '19');
+            const where = formKey(key);
+            const ng = await manager.findOneBy(JigFormNg, where);
+            if (!ng) throw new BadRequestException('This form has no NG');
+
+            const details = await manager.findBy(JigFormDetail, where);
+            const originalNg = details.filter(detail => detail.RESULT === 'NG');
+            const originalNgSeq = new Set(originalNg.map(detail => detail.CHECK_SEQ));
+            if (dto.CONFIRMS.length !== originalNg.length)
+                throw new BadRequestException('Confirm Measured is required for every originally NG checkpoint');
+            for (const confirm of dto.CONFIRMS) {
+                if (!originalNgSeq.has(confirm.CHECK_SEQ))
+                    throw new BadRequestException('Confirmation is allowed only for an originally NG checkpoint');
+                const detail = originalNg.find(row => row.CHECK_SEQ === confirm.CHECK_SEQ)!;
+                detail.CONFIRM_VALUE = confirm.CONFIRM_VALUE;
+                detail.CONFIRM_RESULT = checkpointResult({
+                    MIN: detail.MIN,
+                    MAX: detail.MAX,
+                    MEASURED_VALUE: confirm.CONFIRM_VALUE,
+                    RESULT: null,
+                });
+                if (!['OK', 'NG'].includes(detail.CONFIRM_RESULT))
+                    throw new BadRequestException('Stored MIN/MAX are required to calculate Confirm Result');
+            }
+            if (!dto.SUMMARY_DETAIL?.trim() || dto.SUMMARY_DETAIL.trim().length > 2000)
+                throw new BadRequestException('Summary Detail is required (maximum 2000 characters)');
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dto.ACTUAL_FINNISH_DATE) ||
+                !Number.isFinite(new Date(dto.ACTUAL_FINNISH_DATE).getTime()) ||
+                new Date(dto.ACTUAL_FINNISH_DATE).toISOString().slice(0, 10) !== dto.ACTUAL_FINNISH_DATE)
+                throw new BadRequestException('Invalid Action Finish Date');
+            const saved = await manager.findBy(JigFormFile, where);
+            for (const file of dto.FILES) {
+                if (!['BEFORE', 'AFTER'].includes(file.FILE_GROUP)) throw new BadRequestException('Recheck accepts BEFORE/AFTER files only');
+                const prefix = `IE-JIG${key.CYEAR2.slice(-2)}-${String(key.NRUNNO).padStart(6, '0')}/${file.FILE_GROUP}/`;
+                if (!file.FILE_PATH.startsWith(prefix) || file.FILE_PATH.slice(prefix.length) !== file.FILE_NAME ||
+                    !/^[\p{L}\p{M}\p{N}_-]+\.(jpe?g|png)$/iu.test(file.FILE_NAME) ||
+                    !['image/jpeg','image/png'].includes(file.FILE_TYPE) || !Number.isFinite(file.FILE_SIZE) ||
+                    file.FILE_SIZE < 0 || file.FILE_SIZE > 10 * 1024 * 1024)
+                    throw new BadRequestException('Invalid recheck image metadata');
+                const old = saved.find(f => f.FILE_SEQ === file.FILE_SEQ);
+                if (old && ((old.FILE_GROUP || 'REFERENCE') !== file.FILE_GROUP || old.FILE_PATH !== file.FILE_PATH))
+                    throw new ConflictException('Attachment sequence has changed; reload the form');
+            }
+            for (const group of ['BEFORE', 'AFTER']) {
+                const files = dto.FILES.filter(f => f.FILE_GROUP === group);
+                if (!files.length || files.length > 5) throw new BadRequestException(`${group} requires 1 to 5 files`);
+            }
+            // Existing files must be deleted explicitly through the attachment endpoint.
+            if (saved.some(f => ['BEFORE','AFTER'].includes(f.FILE_GROUP) && !dto.FILES.some(x => x.FILE_SEQ === f.FILE_SEQ)))
+                throw new ConflictException('Attachments have changed; reload the form');
+            await manager.save(JigFormDetail, originalNg);
+            for (const file of dto.FILES) await this.writeFormFile(manager, where, file, dto.UPDATE_BY);
+            await manager.update(JigFormNg, where, {
+                ACTUAL_FINNISH_DATE: new Date(dto.ACTUAL_FINNISH_DATE), SUMMARY_DETAIL: dto.SUMMARY_DETAIL.trim(),
+            });
+            return this.getForm(where, manager);
+        });
     }
 
     async getForm(key: JigFormKeyDto, manager = this.manager) {
@@ -711,6 +789,7 @@ export class JigRepository extends BaseRepository {
     async saveForm(key: JigFormKeyDto, dto: SaveJigFormDto) {
         return this.withForm(key, async (manager, form, _jig, status) => {
             this.assertEditable(status);
+            await this.assertStepActor(manager, key, dto.UPDATE_BY, '--');
             const where = formKey(key);
             if (dto.REPLACE_DETAILS) {
                 if (!dto.DETAILS?.length)
@@ -719,6 +798,7 @@ export class JigRepository extends BaseRepository {
                     );
                 await manager.delete(JigFormDetail, where);
             }
+
             if (dto.REPLACE_FILES) {
                 if (!dto.FILES?.length)
                     throw new BadRequestException(
@@ -726,6 +806,18 @@ export class JigRepository extends BaseRepository {
                     );
                 await manager.delete(JigFormFile, where);
             }
+
+            if (dto.FILES?.some(f => f.FILE_GROUP && f.FILE_GROUP !== 'REFERENCE'))
+                throw new BadRequestException('Use the recheck endpoint for BEFORE/AFTER files');
+            const existingFiles = await manager.findBy(JigFormFile, where);
+            if (dto.FILES?.some(f => existingFiles.some(old => old.FILE_SEQ === f.FILE_SEQ &&
+                (old.FILE_GROUP || 'REFERENCE') !== 'REFERENCE')))
+                throw new ConflictException('Attachment sequence belongs to recheck data');
+            if (dto.REPLACE_FILES && !dto.FILES?.length)
+                throw new BadRequestException('At least one reference attachment is required');
+            // Never replace all file rows: explicit deletion preserves other groups and history.
+
+
             const details = await manager.findBy(JigFormDetail, where);
             for (const input of dto.DETAILS ?? []) {
                 let row = details.find((d) => d.CHECK_SEQ === input.CHECK_SEQ);
@@ -791,6 +883,7 @@ export class JigRepository extends BaseRepository {
             : await manager.findOneBy(JigFormFile, where);
         const data = manager.create(JigFormFile, {
             ...where,
+            FILE_GROUP: dto.FILE_GROUP ?? existing?.FILE_GROUP ?? 'REFERENCE',
             FILE_NAME: dto.FILE_NAME,
             FILE_PATH: dto.FILE_PATH,
             FILE_TYPE:
@@ -840,13 +933,20 @@ export class JigRepository extends BaseRepository {
     async putFile(key: JigFormKeyDto, dto: JigFileDto) {
         return this.withForm(key, async (manager, _form, _jig, status) => {
             this.assertEditable(status);
+            if (dto.FILE_GROUP && dto.FILE_GROUP !== 'REFERENCE') throw new BadRequestException('Use the recheck endpoint');
+            const old = await manager.findOneBy(JigFormFile, { ...formKey(key), FILE_SEQ: dto.FILE_SEQ });
+            if (old && (old.FILE_GROUP || 'REFERENCE') !== 'REFERENCE') throw new BadRequestException('Use the recheck endpoint');
             return this.writeFormFile(manager, key, dto);
         });
     }
 
-    async deleteFile(key: JigFormKeyDto, fileSeq: number) {
+    async deleteFile(key: JigFormKeyDto, fileSeq: number, actor?: string) {
         return this.withForm(key, async (manager, _form, _jig, status) => {
             this.assertEditable(status);
+            const file = await manager.findOneBy(JigFormFile, { ...formKey(key), FILE_SEQ: fileSeq });
+            if (file && ['BEFORE', 'AFTER'].includes(file.FILE_GROUP))
+                await this.assertStepActor(manager, key, actor, '19');
+            else if (actor) await this.assertStepActor(manager, key, actor, '--');
             const result = await manager.delete(JigFormFile, {
                 ...formKey(key),
                 FILE_SEQ: fileSeq,
@@ -952,6 +1052,20 @@ export class JigRepository extends BaseRepository {
                     'All checkpoint results and required measurements must be completed',
                 );
             const formNg = await manager.findOneBy(JigFormNg, formKey(key));
+            if (formNg) {
+                const recheckSteps = await manager.query('SELECT CSTEPNO FROM WEBFORM.FLOW WHERE ' +
+                    FORM_KEYS.map((k, i) => `${k} = :${i + 1}`).join(' AND ') + " AND CSTEPNO = '19'",
+                    FORM_KEYS.map(k => key[k]));
+                if (recheckSteps.length) {
+                    const evidence = await manager.findBy(JigFormFile, formKey(key));
+                    if (!formNg.ACTUAL_FINNISH_DATE || !formNg.SUMMARY_DETAIL?.trim() ||
+                        !['BEFORE','AFTER'].every(group => evidence.some(f => f.FILE_GROUP === group)))
+                        throw new BadRequestException('Complete Action Finish Date, Summary and BEFORE/AFTER evidence before finishing');
+                    if (details.some(detail => detail.RESULT === 'NG' &&
+                        (detail.CONFIRM_VALUE == null || !['OK', 'NG'].includes(detail.CONFIRM_RESULT))))
+                        throw new BadRequestException('Every originally NG checkpoint requires a Confirm Measured value');
+                }
+            }
             if (overallResult(details) === 'NG' && !formNg)
                 throw new ConflictException(
                     'NG result requires corrective action details',
@@ -969,7 +1083,7 @@ export class JigRepository extends BaseRepository {
             } else {
                 if (
                     !jig ||
-                    jig.JIG_STATUS !== 'ACTIVE' ||
+                    !['ACTIVE', 'PENDING'].includes(jig.JIG_STATUS) ||
                     !jig.NEXT_INSPEC_DATE
                 )
                     throw new ConflictException(
@@ -1017,7 +1131,10 @@ export class JigRepository extends BaseRepository {
                     INSPECTION_TOOL: d.INSPECTION_TOOL,
                     MIN: d.MIN,
                     MAX: d.MAX,
-                    MEASURED_VALUE: d.MEASURED_VALUE ?? null,
+                    MEASURED_VALUE:
+                        d.RESULT === 'NG' && d.CONFIRM_VALUE != null
+                            ? d.CONFIRM_VALUE
+                            : (d.MEASURED_VALUE ?? null),
                     UNIT: d.UNIT,
                 };
                 if (existingPoints.some((p) => p.CHECK_SEQ === d.CHECK_SEQ)) {
@@ -1049,6 +1166,8 @@ export class JigRepository extends BaseRepository {
                     ACTION: formNg.ACTION,
                     CORRECTIVE: formNg.CORRECTIVE,
                     PLAN_DATE: formNg.PLAN_DATE,
+                    ACTUAL_FINNISH_DATE: formNg.ACTUAL_FINNISH_DATE,
+                    SUMMARY_DETAIL: formNg.SUMMARY_DETAIL,
                 });
             } else {
                 // Master NG reflects the latest approved snapshot, not past defects.

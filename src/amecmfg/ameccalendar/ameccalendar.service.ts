@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, Between, DataSource } from 'typeorm';
 import { Ameccalendar } from './entities/ameccalendar.entity';
+import { AmeccalendarRepository } from './ameccalendar.repository';
+import { GetProdDto } from './dto/GetProd.dto';
 
 export interface AmecCalendar {
     WORKID: number; // Format: YYYYMMDD (e.g., 20260401)
@@ -44,6 +46,7 @@ export class AmeccalendarService {
     constructor(
         @InjectRepository(Ameccalendar, 'amecConnection')
         private readonly calendar: Repository<Ameccalendar>,
+        private readonly repo: AmeccalendarRepository,
 
         @InjectDataSource('amecConnection')
         private dataSource: DataSource,
@@ -69,6 +72,50 @@ export class AmeccalendarService {
         );
 
         return result[0].NEXT_DATE;
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-11-03
+     * @description ดึงข้อมูลจุงการผลิตก่อนหน้า (Previous Production)
+     * @param dto
+     * @returns
+     */
+    async getPreviousProd(dto: GetProdDto) {
+        const res = await this.repo.getPreviousProd(dto);
+        return res.length > 0
+            ? {
+                  status: true,
+                  message: `Previous production found ${res.length} records`,
+                  data: res,
+              }
+            : {
+                  status: false,
+                  message: 'No previous production found',
+                  data: [],
+              };
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-11-03
+     * @description ดึงข้อมูลจุงการผลิตถัดไป (Next Production)
+     * @param dto
+     * @returns
+     */
+    async getNextProd(dto: GetProdDto) {
+        const res = await this.repo.getNextProd(dto);
+        return res.length > 0
+            ? {
+                  status: true,
+                  message: `Next production found ${res.length} records`,
+                  data: res,
+              }
+            : {
+                  status: false,
+                  message: 'No next production found',
+                  data: [],
+              };
     }
 
     transformDate(date: number | string | Date): number {

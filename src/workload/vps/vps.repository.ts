@@ -753,4 +753,19 @@ export class VpsRepository extends BaseRepository {
             [order, block],
         );
     }
+
+    async getImageErrors(){
+        return this.wk.query(
+            `
+            SELECT 
+                REGEXP_REPLACE(IMAGE_NAME, '\\.jpg$', '', 1, 1, 'i') AS PUR_CODE, 
+                IMAGE_NAME, 
+                CREATED_AT as ERROR_AT
+            FROM IMAGE_ERROR_LOG
+            WHERE CREATED_AT >= TRUNC(SYSDATE, 'IW') - 7
+            AND CREATED_AT <  TRUNC(SYSDATE, 'IW') - 2
+            ORDER BY CREATED_AT DESC
+            `
+        );
+    }
 }

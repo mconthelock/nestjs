@@ -205,6 +205,12 @@ export class FormCreateService extends FormService {
             CYEAR: context.cyear,
         });
 
+        if (!formmst?.[0]) {
+            throw new NotFoundException(
+                `FORMMST not found: NNO=${context.nfrmno}, VORGNO=${context.vorgno}, CYEAR=${context.cyear}`,
+            );
+        }
+
         const today = new Date();
         // Set formDate to current date with time 00:00:00
         const formDateWithZeroTime = new Date(

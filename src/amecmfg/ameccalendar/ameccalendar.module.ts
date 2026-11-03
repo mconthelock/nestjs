@@ -3,11 +3,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AmeccalendarService } from './ameccalendar.service';
 import { AmeccalendarController } from './ameccalendar.controller';
 import { Ameccalendar } from './entities/ameccalendar.entity';
+import { AmeccalendarRepository } from './ameccalendar.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Ameccalendar], 'amecConnection')],
-  controllers: [AmeccalendarController],
-  providers: [AmeccalendarService],
-  exports: [AmeccalendarService],
+    imports: [TypeOrmModule.forFeature([Ameccalendar], 'amecConnection')],
+    controllers: [AmeccalendarController],
+    providers: [AmeccalendarService, AmeccalendarRepository],
+    exports: [AmeccalendarService],
 })
 export class AmeccalendarModule {}

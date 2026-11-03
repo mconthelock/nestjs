@@ -1,11 +1,11 @@
 import { Column, Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { JigMaster } from './jig_master.entity';
 
-@Entity({ name: 'JIG_DEFECT_NG' })
+@Entity({ name: 'JIG_DEFECT_NG', schema: 'IEDOC' })
 export class JigDefectNg {
     @PrimaryColumn()
     JIG_NO: string;
-    
+
     @Column({ type: 'varchar2', length: 2000 })
     DEFECT_DETAIL: string;
 

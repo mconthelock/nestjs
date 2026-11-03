@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { JigForm } from './jig_form.entity';
 
-@Entity({ name: 'JIG_FORM_FILE' })
+@Entity({ name: 'JIG_FORM_FILE', schema: 'IEDOC' })
 export class JigFormFile {
     @PrimaryColumn()
     NFRMNO: number;

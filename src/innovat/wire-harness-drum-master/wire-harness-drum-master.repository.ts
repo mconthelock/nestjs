@@ -9,7 +9,7 @@ import { DrumMasterDto } from './dto/drum-master.dto';
 @Injectable()
 export class WireHarnessDrumMasterRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('innovatConnection')
+        @InjectDataSource('mitsuConnection')
         private readonly ds: DataSource,
     ) {
         super(ds);
@@ -17,32 +17,27 @@ export class WireHarnessDrumMasterRepository extends BaseRepository {
 
     list(condition: FiltersDto) {
         const allowedFields = ['MT_ITEMCODE', 'MT_CABLECODE', 'GRP_ID'];
-        const qb = this.getRepository(WHN_DRUM_MASTER)
-            .createQueryBuilder('A');
+        const qb = this.getRepository(WHN_DRUM_MASTER).createQueryBuilder('A');
 
-        return this.applyFilters(
-            qb,
-            'A',
-            condition,
-            allowedFields,
-        )
-        .orderBy('A.MT_ITEMCODE', 'ASC')
-        .getMany();
+        return this.applyFilters(qb, 'A', condition, allowedFields)
+            .orderBy('A.MT_ITEMCODE', 'ASC')
+            .getMany();
     }
 
     async save(dto: DrumMasterDto[]) {
         const repo = this.getRepository(WHN_DRUM_MASTER);
-        const groupId   = dto[0].groupId;
-        const itemCodes = dto.map(item => item.itemCode);
+        const groupId = dto[0].groupId;
+        const itemCodes = dto.map((item) => item.itemCode);
 
-        await repo.createQueryBuilder()
+        await repo
+            .createQueryBuilder()
             .delete()
             .from(WHN_DRUM_MASTER)
             .where('GRP_ID = :groupId', { groupId })
             .andWhere('MT_ITEMCODE NOT IN (:...itemCodes)', { itemCodes })
             .execute();
 
-        const data = dto.map(item => ({
+        const data = dto.map((item) => ({
             MT_ITEMCODE: item.itemCode,
             GRP_ID: item.groupId,
             MT_CABLECODE: item.cableCode,

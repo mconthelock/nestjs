@@ -5,9 +5,7 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 @Injectable()
 export class EbgreqcaseRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('ebudgetConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

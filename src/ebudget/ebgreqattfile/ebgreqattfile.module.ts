@@ -6,7 +6,7 @@ import { EBGREQATTFILE } from 'src/common/Entities/ebudget/table/EBGREQATTFILE.e
 import { EbgreqattfileRepository } from './ebgreqattfile.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([EBGREQATTFILE], 'ebudgetConnection')],
+    imports: [TypeOrmModule.forFeature([EBGREQATTFILE], 'mitsuConnection')],
     controllers: [EbgreqattfileController],
     providers: [EbgreqattfileService, EbgreqattfileRepository],
     exports: [EbgreqattfileService],

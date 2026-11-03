@@ -20,9 +20,9 @@ if (process.env.HOST == 'AMEC') {
             password: process.env.DATACENTER_PASSWORD,
             schema: process.env.DATACENTER_SCHEMA,
             connectString: `(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=${process.env.DATACENTER_HOST})(PORT=${process.env.DATACENTER_PORT}))(CONNECT_DATA=(SID=${process.env.DATACENTER_SERVICE})))`,
-            entities: [
-                __dirname + '/../Entities/datacenter/**/*.entity{.ts,.js}',
-            ],
+            // entities: [
+            //     __dirname + '/../Entities/datacenter/**/*.entity{.ts,.js}',
+            // ],
             autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),

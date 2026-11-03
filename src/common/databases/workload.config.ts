@@ -23,7 +23,7 @@ if (process.env.HOST == 'AMEC') {
             entities: [
                 __dirname + '/../Entities/workload/**/*.entity{.ts,.js}',
             ],
-            autoLoadEntities: true,
+            //autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),
             retryAttempts: 5,

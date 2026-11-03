@@ -6,9 +6,7 @@ import { DataSource, Like, MoreThanOrEqual } from 'typeorm';
 import { SearchEbudgetBiddingDto } from './dto/search-bidding.dto';
 @Injectable()
 export class BiddingRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('ebudgetConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

@@ -14,10 +14,11 @@ import packingConfig from './databases/packingsys.config';
 import fingerConfig from './databases/fingerdb.config';
 
 //ORACLE
+import mitsuConfig from './databases/mitsu.config';
 import amecConfig from './databases/amec.config';
 import datacenterConfig from './databases/datacenter.config';
 import docinvConfig from './databases/docinv.config';
-import ebudgetConfig from './databases/ebudget.config';
+// import ebudgetConfig from './databases/ebudget.config';
 import elmesConfig from './databases/elmes.config';
 import escsConfig from './databases/escs.config';
 import gpreportConfig from './databases/gpreport.config';
@@ -45,11 +46,12 @@ import { SchedulerModule } from './scheduler/scheduler.module';
     imports: [
         ScheduleModule.forRoot(),
         WinstonModule.forRoot(winstonConfig),
+        TypeOrmModule.forRootAsync(mitsuConfig),
         TypeOrmModule.forRootAsync(amecConfig),
         TypeOrmModule.forRootAsync(auditConfig),
         TypeOrmModule.forRootAsync(datacenterConfig),
         TypeOrmModule.forRootAsync(docinvConfig),
-        TypeOrmModule.forRootAsync(ebudgetConfig),
+        // TypeOrmModule.forRootAsync(ebudgetConfig),
         TypeOrmModule.forRootAsync(elmesConfig),
         TypeOrmModule.forRootAsync(escsConfig),
         TypeOrmModule.forRootAsync(gpreportConfig),

@@ -6,7 +6,7 @@ import { EBGREQCOL_IMAGE } from 'src/common/Entities/ebudget/table/EBGREQCOL_IMA
 import { EbgreqcolImageRepository } from './ebgreqcol-image.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([EBGREQCOL_IMAGE], 'ebudgetConnection')],
+    imports: [TypeOrmModule.forFeature([EBGREQCOL_IMAGE], 'mitsuConnection')],
     controllers: [EbgreqcolImageController],
     providers: [EbgreqcolImageService, EbgreqcolImageRepository],
     exports: [EbgreqcolImageService],

@@ -13,8 +13,6 @@ if (process.env.HOST == 'AMEC') {
         imports: [],
         inject: [ConfigService, WINSTON_MODULE_PROVIDER],
         useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
-            // inject: [ConfigService],
-            // useFactory: async (config: ConfigService) => ({
             type: 'oracle',
             username: process.env.WEBFORM_USER,
             password: process.env.WEBFORM_PASSWORD,
@@ -26,6 +24,7 @@ if (process.env.HOST == 'AMEC') {
                 __dirname + '/../../**/**/**/*.entity{.ts,.js}',
                 __dirname + '/../Entities/webform/**/*.entity{.ts,.js}',
             ],
+            //autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),
             retryAttempts: 5,

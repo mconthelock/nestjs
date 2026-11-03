@@ -9,7 +9,7 @@ import { EbudgetQuotationProductRepository } from './ebudget-quotation-product.r
     imports: [
         TypeOrmModule.forFeature(
             [EBUDGET_QUOTATION_PRODUCT],
-            'ebudgetConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [EbudgetQuotationProductController],

@@ -7,7 +7,7 @@ import { BiddingRepository } from './bidding.repository';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([EBUDGET_DATA_BIDDING], 'ebudgetConnection'),
+        TypeOrmModule.forFeature([EBUDGET_DATA_BIDDING], 'mitsuConnection'),
     ],
     controllers: [BiddingController],
     providers: [BiddingService, BiddingRepository],

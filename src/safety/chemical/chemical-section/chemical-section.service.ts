@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { CreateChemicalSectionDto } from './dto/create-chemical-section.dto';
 import { UpdateChemicalSectionDto } from './dto/update-chemical-section.dto';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
@@ -9,9 +9,9 @@ import { now } from 'src/common/utils/dayjs.utils';
 @Injectable()
 export class ChemicalSectionService {
   constructor(
-      @InjectRepository(ChemicalSection, 'gpreportConnection')
+      @InjectRepository(ChemicalSection, 'mitsuConnection')
       private readonly mtxRepo: Repository<ChemicalSection>,
-      @InjectDataSource('gpreportConnection')
+      @InjectDataSource('mitsuConnection')
       private readonly dataSource: DataSource,
     ) {}
 

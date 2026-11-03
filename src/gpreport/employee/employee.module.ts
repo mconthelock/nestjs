@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { EmployeeService } from './employee.service';
@@ -33,7 +33,7 @@ import { User } from 'src/common/Entities/webform/views/AMECUSERALL.entity';
                 EmailLogs,
                 User,
             ],
-            'gpreportConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [EmployeeController],

@@ -1,4 +1,4 @@
-import {
+﻿import {
     Controller,
     Get,
     Post,
@@ -20,13 +20,13 @@ export class ReturnApvListController {
     constructor(private readonly returnApvListService: ReturnApvListService) {}
 
     @Post()
-    @UseTransaction('escsConnection')
+    @UseTransaction('mitsuConnection')
     return(@Body() dto: CreateReturnApvListDto) {
         return this.returnApvListService.return(dto);
     }
 
     @Patch()
-    @UseTransaction('escsConnection')
+    @UseTransaction('mitsuConnection')
     actions(@Body() dto: ActionReturnApvListDto) {
         return this.returnApvListService.actions(dto);
     }

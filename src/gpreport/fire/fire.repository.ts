@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Brackets, DataSource } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -7,7 +7,7 @@ import { SearchFireItemDto } from './dto/search-fire-item.dto';
 
 @Injectable()
 export class FireRepository extends BaseRepository {
-    constructor(@InjectDataSource('gpreportConnection') dataSource: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') dataSource: DataSource) {
         super(dataSource);
     }
 

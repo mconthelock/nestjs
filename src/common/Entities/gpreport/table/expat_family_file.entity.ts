@@ -1,6 +1,6 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+﻿import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('EXPAT_FAMILY_FILE')
+@Entity({ name: 'EXPAT_FAMILY_FILE', schema: 'GPREPORT' })
 export class ExpatFamilyFile {
 
     @PrimaryColumn()

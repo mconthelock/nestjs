@@ -1,4 +1,4 @@
-import {
+﻿import {
     Controller,
     Get,
     Post,
@@ -18,7 +18,7 @@ export class MfgSerialController {
     constructor(private readonly mfgSerialService: MfgSerialService) {}
 
     @Post('search')
-    @UseTransaction('escsConnection')
+    @UseTransaction('mitsuConnection')
     async search(@Body() dto: FiltersDto) {
         return this.mfgSerialService.search(dto);
     }

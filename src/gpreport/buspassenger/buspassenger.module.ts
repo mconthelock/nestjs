@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BuspassengerService } from './buspassenger.service';
 import { BuspassengerController } from './buspassenger.controller';
@@ -6,7 +6,7 @@ import { Buspassenger } from 'src/common/Entities/gpreport/table/buspassenger.en
 import { User } from 'src/amec/users/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Buspassenger, User], 'gpreportConnection')],
+  imports: [TypeOrmModule.forFeature([Buspassenger, User], 'mitsuConnection')],
   controllers: [BuspassengerController],
   providers: [BuspassengerService],
 })

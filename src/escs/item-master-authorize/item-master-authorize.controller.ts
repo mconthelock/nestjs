@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
+﻿import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { ItemMasterAuthorizeService } from './item-master-authorize.service';
 import { CreateItemMasterAuthorizeDto } from './dto/create-item-master-authorize.dto';
 import { UpdateItemMasterAuthorizeDto } from './dto/update-item-master-authorize.dto';
@@ -12,7 +12,7 @@ export class ItemMasterAuthorizeController {
 
   @Post()
   @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('escsConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ escsConnection
+  @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
   async create(@Body() dto: CreateItemMasterAuthorizeDto) {
     return await this.itemMasterAuthorizeService.create(dto);
   }
@@ -23,7 +23,7 @@ export class ItemMasterAuthorizeController {
   }
 
   @Post('search')
-  @UseTransaction('escsConnection') 
+  @UseTransaction('mitsuConnection') 
   async search(@Body() dto: FiltersDto) {
     return this.itemMasterAuthorizeService.search(dto);
   }
@@ -35,13 +35,13 @@ export class ItemMasterAuthorizeController {
 
   @Patch(':id')
   @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('escsConnection')
+  @UseTransaction('mitsuConnection')
   update(@Param('id') id: string, @Body() dto: UpdateItemMasterAuthorizeDto) {
     return this.itemMasterAuthorizeService.update(+id, dto);
   }
 
   @Delete(':id')
-  @UseTransaction('escsConnection')
+  @UseTransaction('mitsuConnection')
   remove(@Param('id') id: string) {
     return this.itemMasterAuthorizeService.remove(+id);
   }

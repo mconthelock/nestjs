@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { AuditReportMasterService } from './audit_report_master.service';
 import { AuditReportMasterController } from './audit_report_master.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -10,7 +10,7 @@ import { AuditReportMasterRepository } from './audit_report_master.repository';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([AUDIT_REPORT_MASTER], 'escsConnection'),
+        TypeOrmModule.forFeature([AUDIT_REPORT_MASTER], 'mitsuConnection'),
         AuditReportRevisionModule,
         AuditReportHistoryModule,
         AuditReportMasterAllModule,

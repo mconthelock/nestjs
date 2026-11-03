@@ -1,4 +1,4 @@
-import {
+﻿import {
     Controller,
     Get,
     Param,
@@ -78,14 +78,14 @@ export class UniformController {
     }
 
     @Post('annual/request/')
-    @UseTransaction('gpreportConnection')
+    @UseTransaction('mitsuConnection')
     createRequest(@Body() data: CreateAnnualDto, @Req() req: Request) {
         const ip = getClientIP(req);
         return this.uniform.createAnnualRequest(data, ip);
     }
 
     @Delete('annual/request/:userId/:year')
-    @UseTransaction('gpreportConnection')
+    @UseTransaction('mitsuConnection')
     deleteRequest(
         @Param('userId') userId: string,
         @Param('year') year: number,
@@ -94,7 +94,7 @@ export class UniformController {
     }
 
     @Delete('annual/request/:userId/:year/paid')
-    @UseTransaction('gpreportConnection')
+    @UseTransaction('mitsuConnection')
     deletePaidRequest(
         @Param('userId') userId: string,
         @Param('year') year: number,

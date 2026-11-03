@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { ReturnApvListService } from './return-apv-list.service';
 import { ReturnApvListController } from './return-apv-list.controller';
 import { ReturnApvListRepository } from './return-apv-list.repository';
@@ -12,7 +12,7 @@ import { UsersSectionModule } from '../user_section/user_section.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([RETURN_APV_LIST], 'escsConnection'),
+        TypeOrmModule.forFeature([RETURN_APV_LIST], 'mitsuConnection'),
         OrdersDrawingModule,
         MailModule,
         GetOrderModule,

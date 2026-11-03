@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { StinpFormListService } from './stinp-form-list.service';
 import { StinpFormListController } from './stinp-form-list.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,7 +7,7 @@ import { StinpFormListRepository } from './stinp-form-list.repository';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([STINP_FORM_LIST], 'gpreportConnection'),
+        TypeOrmModule.forFeature([STINP_FORM_LIST], 'mitsuConnection'),
     ],
     controllers: [StinpFormListController],
     providers: [StinpFormListService, StinpFormListRepository],

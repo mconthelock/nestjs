@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
@@ -18,7 +18,7 @@ import { EmailLogs } from 'src/common/Entities/gpreport/table/EMPLOYEE_MAIL_LOG.
 
 @Injectable()
 export class EmployeeRepository extends BaseRepository {
-    constructor(@InjectDataSource('gpreportConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

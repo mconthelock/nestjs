@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -10,7 +10,7 @@ import { CreateAuditReportMasterDto } from './dto/create-audit_report_master.dto
 @Injectable()
 export class AuditReportMasterRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('escsConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
         ) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

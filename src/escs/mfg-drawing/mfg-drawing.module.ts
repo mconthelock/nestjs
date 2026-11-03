@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { MfgDrawingService } from './mfg-drawing.service';
 import { MfgDrawingController } from './mfg-drawing.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -21,7 +21,7 @@ import { DrawingFileHelper } from './helpers/drawing-file.helper';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([MFG_DRAWING], 'escsConnection'),
+        TypeOrmModule.forFeature([MFG_DRAWING], 'mitsuConnection'),
         ItemMfgModule,
         IdtagEfacLogModule,
         F110kpModule,

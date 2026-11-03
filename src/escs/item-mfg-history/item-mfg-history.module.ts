@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { ItemMfgHistoryService } from './item-mfg-history.service';
 import { ItemMfgHistoryController } from './item-mfg-history.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ItemMfgHistoryRepository } from './item-mfg-history.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([], 'escsConnection')],
+  imports: [TypeOrmModule.forFeature([], 'mitsuConnection')],
   controllers: [ItemMfgHistoryController],
   providers: [ItemMfgHistoryService, ItemMfgHistoryRepository],
   exports: [ItemMfgHistoryService],

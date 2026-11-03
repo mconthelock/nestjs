@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { ItemMasterAuthorizeService } from './item-master-authorize.service';
 import { ItemMasterAuthorizeController } from './item-master-authorize.controller';
 import { ITEM_MASTER_AUTHORIZE } from 'src/common/Entities/escs/table/ITEM_MASTER_AUTHORIZE.entity';
@@ -7,7 +7,7 @@ import { ItemMasterAuthorizeRepository } from './item-master-authorize.repositor
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ITEM_MASTER_AUTHORIZE], 'escsConnection'),
+    TypeOrmModule.forFeature([ITEM_MASTER_AUTHORIZE], 'mitsuConnection'),
   ],
   controllers: [ItemMasterAuthorizeController],
   providers: [ItemMasterAuthorizeService, ItemMasterAuthorizeRepository],

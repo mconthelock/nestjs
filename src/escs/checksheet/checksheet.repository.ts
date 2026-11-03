@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { OracleRepository } from 'src/common/repositories/oracle-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -9,7 +9,7 @@ import { ChecksheetProc } from './enums/proc.enum';
 @Injectable()
 export class ChecksheetRepository extends OracleRepository {
     constructor(
-        @InjectDataSource('escsConnection')
+        @InjectDataSource('mitsuConnection')
         ds: DataSource,
     ) {
         super(ds);

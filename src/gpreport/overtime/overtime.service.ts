@@ -1,4 +1,4 @@
-import { DataSource, Repository } from 'typeorm';
+﻿import { DataSource, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
@@ -13,16 +13,16 @@ import { OTFORM } from 'src/common/Entities/webform/table/OTFORM.entity';
 @Injectable()
 export class OvertimeService {
     constructor(
-        @InjectRepository(Overtime, 'gpreportConnection')
+        @InjectRepository(Overtime, 'mitsuConnection')
         private readonly otRepo: Repository<Overtime>,
 
-        @InjectRepository(OTFORM, 'gpreportConnection')
+        @InjectRepository(OTFORM, 'mitsuConnection')
         private readonly otform: Repository<OTFORM>,
 
-        @InjectRepository(LR200P, 'gpreportConnection')
+        @InjectRepository(LR200P, 'mitsuConnection')
         private readonly lr200: Repository<LR200P>,
 
-        @InjectDataSource('gpreportConnection')
+        @InjectDataSource('mitsuConnection')
         private readonly dataSource: DataSource,
     ) {}
 

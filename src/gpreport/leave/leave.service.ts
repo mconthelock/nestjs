@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
@@ -13,13 +13,13 @@ import { SearchActualLeaveDto } from './dto/lr100p.dto';
 @Injectable()
 export class LeaveService {
     constructor(
-        @InjectRepository(LVAPP, 'gpreportConnection')
+        @InjectRepository(LVAPP, 'mitsuConnection')
         private readonly lvapp: Repository<LVAPP>,
 
-        @InjectRepository(LR100P, 'gpreportConnection')
+        @InjectRepository(LR100P, 'mitsuConnection')
         private readonly lr100: Repository<LR100P>,
 
-        @InjectRepository(LeaveType, 'gpreportConnection')
+        @InjectRepository(LeaveType, 'mitsuConnection')
         private readonly type: Repository<LeaveType>,
     ) {}
 

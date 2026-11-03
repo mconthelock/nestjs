@@ -1,6 +1,6 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+﻿import { Entity, Column, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: 'OTFORM' })
+@Entity({ name: 'OTFORM', schema: 'GPREPORT' })
 export class Overtime {
     @PrimaryColumn()
     NFRMNO: number;

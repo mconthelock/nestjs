@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -12,8 +12,8 @@ import { ExpatTravel } from 'src/common/Entities/gpreport/table/expat_travel.ent
 @Injectable()
 export class ExpatRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('gpreportConnection') private readonly gpreportDs: DataSource,
-        @InjectRepository(User, 'gpreportConnection') private readonly userRepo: Repository<User>,
+        @InjectDataSource('mitsuConnection') private readonly gpreportDs: DataSource,
+        @InjectRepository(User, 'mitsuConnection') private readonly userRepo: Repository<User>,
     ) {
         super(gpreportDs);
     }

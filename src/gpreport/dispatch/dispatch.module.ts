@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { DispatchController } from './dispatch.controller';
@@ -16,7 +16,7 @@ import { BusDispatchPassenger } from '../../common/Entities/gpreport/table/bus_d
   imports: [
     TypeOrmModule.forFeature(
       [BusDispatchHead, BusDispatchLine, BusDispatchStop, BusDispatchPassenger],
-      'gpreportConnection',
+      'mitsuConnection',
     ),
   ],
   controllers: [DispatchController],

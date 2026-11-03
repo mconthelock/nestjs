@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -7,7 +7,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 export class IsCboRepository extends BaseRepository {
     constructor(
         @InjectDataSource('mitsuConnection') private readonly ds: DataSource,
-        @InjectDataSource('gpreportConnection') private readonly gpreportDs: DataSource,
+        @InjectDataSource('mitsuConnection') private readonly gpreportDs: DataSource,
     ) {
         super(ds);
     }

@@ -1,4 +1,4 @@
-import {
+﻿import {
     Column,
     Entity,
     JoinColumn,
@@ -9,7 +9,7 @@ import {
 import { BusDispatchHead } from './bus_dispatch_head.entity';
 import { BusDispatchStop } from './bus_dispatch_stop.entity';
 
-@Entity({ name: 'BUS_DISPATCH_LINE' })
+@Entity({ name: 'BUS_DISPATCH_LINE', schema: 'GPREPORT' })
 export class BusDispatchLine {
     @PrimaryColumn()
     DISPATCH_ID: number;

@@ -1,8 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+﻿import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { Buspassenger } from './buspassenger.entity';
 import { Busroute } from './busroute.entity';
 
-@Entity('BUS_STOP')
+@Entity({ name: 'BUS_STOP', schema: 'GPREPORT' })
 export class Busstop {
   //@PrimaryColumn()
   @PrimaryGeneratedColumn('increment')

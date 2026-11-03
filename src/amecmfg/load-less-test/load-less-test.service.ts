@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+﻿import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
 import { Injectable } from '@nestjs/common';
@@ -10,7 +10,7 @@ import { LoadLessTestResponseDto } from './dto/load-less-test-result.dto';
 @Injectable()
 export class LoadLessTestService {
     constructor(
-        @InjectRepository(SYS_FOLDER_PATH, 'escsConnection')
+        @InjectRepository(SYS_FOLDER_PATH, 'mitsuConnection')
         private readonly db: Repository<SYS_FOLDER_PATH>,
     ) {}
 

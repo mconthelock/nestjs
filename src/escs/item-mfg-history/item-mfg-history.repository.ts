@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { CreateItemMfgHistoryDto } from './dto/create-item-mfg-history.dto';
 import { UpdateItemMfgHistoryDto } from './dto/update-item-mfg-history.dto';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -10,7 +10,7 @@ import { ITEM_MFG_HISTORY } from 'src/common/Entities/escs/table/ITEM_MFG_HISTOR
 @Injectable()
 export class ItemMfgHistoryRepository extends BaseRepository {
   constructor(
-    @InjectDataSource('escsConnection') ds: DataSource,
+    @InjectDataSource('mitsuConnection') ds: DataSource,
     ) {
     super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
   }

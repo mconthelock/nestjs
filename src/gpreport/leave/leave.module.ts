@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { LeaveService } from './leave.service';
@@ -13,7 +13,7 @@ import { User } from 'src/common/Entities/webform/views/AMECUSERALL.entity';
     imports: [
         TypeOrmModule.forFeature(
             [LeaveType, LVAPP, LR100P, User],
-            'gpreportConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [LeaveController],

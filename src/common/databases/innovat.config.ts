@@ -13,8 +13,6 @@ if (process.env.HOST == 'AMEC') {
         imports: [],
         inject: [ConfigService, WINSTON_MODULE_PROVIDER],
         useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
-            // inject: [ConfigService],
-            // useFactory: async (config: ConfigService) => ({
             type: 'oracle',
             username: process.env.INVOVAT_USER,
             password: process.env.INVOVAT_PASSWORD,

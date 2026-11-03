@@ -8,7 +8,7 @@ import { winstonConfig } from './logger/winston.config';
 
 //MSSQL
 import auditConfig from './databases/auditDB.config';
-import invoiceConfig from './databases/invoice.config';
+// import invoiceConfig from './databases/invoice.config';
 import lnConfig from './databases/ln.config';
 import packingConfig from './databases/packingsys.config';
 import fingerConfig from './databases/fingerdb.config';
@@ -28,7 +28,7 @@ import sdsysConfig from './databases/sdsys.config';
 import spsysConfig from './databases/spsys.config';
 import webformConfig from './databases/webform.config';
 import workloadConfig from './databases/workload.config';
-import innovatConfig from './databases/innovat.config';
+// import innovatConfig from './databases/innovat.config';
 // import ebudgetConfig from './databases/ebudget.config';
 // import iedocConfig from './databases/iedoc.config';
 
@@ -67,8 +67,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
         // TypeOrmModule.forRootAsync(ebudgetConfig),
         // TypeOrmModule.forRootAsync(iedocConfig),
         // TypeOrmModule.forRootAsync(invoiceConfig),
-
-        TypeOrmModule.forRootAsync(innovatConfig),
+        // TypeOrmModule.forRootAsync(innovatConfig),
         RedisModule,
         SchedulerModule,
         LoggerModule,

@@ -17,9 +17,9 @@ import { DrumToStockDto } from './dto/drum-to-stock.dto';
 @Injectable()
 export class WireHarnessCuttingRepository extends BaseRepository {
     private readonly orepo: OracleRepository;
-    
+
     constructor(
-        @InjectDataSource('innovatConnection')
+        @InjectDataSource('mitsuConnection')
         private readonly ds: DataSource,
     ) {
         super(ds);
@@ -49,58 +49,53 @@ export class WireHarnessCuttingRepository extends BaseRepository {
     getAutoPlan(condition: FiltersDto) {
         const allowedFields = ['ITEMNO', 'PACKNO', 'PROCESS', 'PRODNO', 'P'];
         const qb = this.getRepository(WHN_AUTOPLAN).createQueryBuilder('A');
-        return this.applyFilters(
-            qb,
-            'A',
-            condition,
-            allowedFields,
-        ).orderBy('A.PRODNO', 'ASC')
-        .addOrderBy('A.P', 'ASC')
-        .addOrderBy('A.SEQBM', 'ASC')
-        .addOrderBy('A.MFGNO', 'ASC')
-        .addOrderBy('A.RNO', 'DESC')
-        .getMany();
+        return this.applyFilters(qb, 'A', condition, allowedFields)
+            .orderBy('A.PRODNO', 'ASC')
+            .addOrderBy('A.P', 'ASC')
+            .addOrderBy('A.SEQBM', 'ASC')
+            .addOrderBy('A.MFGNO', 'ASC')
+            .addOrderBy('A.RNO', 'DESC')
+            .getMany();
     }
 
     createDrum(dto: CreateDrumDto) {
-        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
-        return this.orepo.execCursor(
-            'WHN_CREATE_DRUM',
-            dto,
-            paramOrder,
-        );
+        const paramOrder = [
+            'empNo',
+            'itemCode',
+            'prodNo',
+            'ctrlNo',
+            'cut',
+            'cutType',
+            'reasonId',
+        ];
+        return this.orepo.execCursor('WHN_CREATE_DRUM', dto, paramOrder);
     }
 
     updateDrum(dto: UpdateDrumDto) {
-        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'drumId', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
-        return this.orepo.execCursor(
-            'WHN_UPDATE_DRUM',
-            dto,
-            paramOrder,
-        );
+        const paramOrder = [
+            'empNo',
+            'itemCode',
+            'prodNo',
+            'drumId',
+            'ctrlNo',
+            'cut',
+            'cutType',
+            'reasonId',
+        ];
+        return this.orepo.execCursor('WHN_UPDATE_DRUM', dto, paramOrder);
     }
 
     drumToStock(dto: DrumToStockDto) {
         const paramOrder = ['empNo', 'itemCode', 'prodNo', 'drumId'];
-        return this.orepo.execProcedure(
-            'WHN_DRUM_TO_STOCK',
-            dto,
-            paramOrder,
-        );
+        return this.orepo.execProcedure('WHN_DRUM_TO_STOCK', dto, paramOrder);
     }
 
     reason(condition: FiltersDto) {
         const allowedFields = ['RS_ID', 'RS_NAME_TH', 'RS_STATUS'];
-        const qb = this.getRepository(WHN_REASON)
-            .createQueryBuilder('A');
+        const qb = this.getRepository(WHN_REASON).createQueryBuilder('A');
 
-        return this.applyFilters(
-            qb,
-            'A',
-            condition,
-            allowedFields,
-        )
-        .orderBy('A.RS_ID', 'ASC')
-        .getMany();
+        return this.applyFilters(qb, 'A', condition, allowedFields)
+            .orderBy('A.RS_ID', 'ASC')
+            .getMany();
     }
 }

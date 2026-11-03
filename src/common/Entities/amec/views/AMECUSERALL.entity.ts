@@ -109,6 +109,6 @@ export class AMECUSERALL {
     @OneToOne(() => USERS, (escsUser) => escsUser.user)
     escsUser: USERS;
 
-    @OneToOne(() => INV_YEARLY_ASSIGN, (a) => a.USER)
-    INV_YEARLY_ASSIGN: INV_YEARLY_ASSIGN;
+    // @OneToOne(() => INV_YEARLY_ASSIGN, (a) => a.USER)
+    // INV_YEARLY_ASSIGN: INV_YEARLY_ASSIGN;
 }

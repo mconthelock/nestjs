@@ -94,9 +94,9 @@ export class IMM_ITEMMST {
     @Column()
     HIDE_SHORTAGE: string;
 
-    @OneToOne(() => INV_HALFYEAR_RESULT, (r) => r.ITEM_DETAIL)
-    RESULT: INV_HALFYEAR_RESULT;
+    // @OneToOne(() => INV_HALFYEAR_RESULT, (r) => r.ITEM_DETAIL)
+    // RESULT: INV_HALFYEAR_RESULT;
 
-    @OneToOne(() => INV_YEARLY_RESULT, (r) => r.ITEM)
-    YEARLY_RESULT: INV_YEARLY_RESULT;
+    // @OneToOne(() => INV_YEARLY_RESULT, (r) => r.ITEM)
+    // YEARLY_RESULT: INV_YEARLY_RESULT;
 }

@@ -3,9 +3,16 @@ import { PurVendorsService } from './pur_vendors.service';
 import { PurVendorsController } from './pur_vendors.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PurVendor } from '../../common/Entities/pursys/table/pur_vendor.entity';
+import { PurVendorsAddress } from 'src/common/Entities/pursys/table/pur_vendors_address.entity';
+import { PurVendorsAttfile } from 'src/common/Entities/pursys/table/pur_vendors_attfile.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([PurVendor], 'mitsuConnection')],
+    imports: [
+        TypeOrmModule.forFeature(
+            [PurVendor, PurVendorsAddress, PurVendorsAttfile],
+            'mitsuConnection',
+        ),
+    ],
     controllers: [PurVendorsController],
     providers: [PurVendorsService],
 })

@@ -23,7 +23,7 @@ if (process.env.HOST == 'AMEC') {
             autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),
-            retryAttempts: 5,
+            retryAttempts: process.env.STATE === 'production' ? 5 : 1,
             retryDelay: 2000,
             options: {
                 instanceName: process.env.FPRINST_INSTANCE, // ใช้ instanceName แทนถ้าเป็น SQL Server ที่มี instance

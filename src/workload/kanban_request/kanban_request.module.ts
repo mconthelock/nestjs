@@ -9,7 +9,7 @@ import { Psection } from 'src/common/Entities/amec/table/PSECTION.entity';
 @Module({
     imports: [
         MailModule,
-        TypeOrmModule.forFeature([Psection], 'amecConnection'),
+        TypeOrmModule.forFeature([Psection], 'mitsuConnection'),
     ],
     controllers: [KanbanRequestController],
     providers: [KanbanRequestService, KanbanRequestRepository],

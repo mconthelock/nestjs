@@ -5,8 +5,8 @@ import { IsMo } from './entities/is-mo.entity';
 
 @Injectable()
 export class IsMoService {
-  constructor(
-    @InjectRepository(IsMo, 'amecConnection')
-    private readonly ismo: Repository<IsMo>,
-  ) {}
+    constructor(
+        @InjectRepository(IsMo, 'mitsuConnection')
+        private readonly ismo: Repository<IsMo>,
+    ) {}
 }

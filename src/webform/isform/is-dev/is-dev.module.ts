@@ -10,6 +10,9 @@ import { ISDEV_REQUEST } from 'src/common/Entities/webform/table/ISDEV_REQUEST.e
 import { IsDevFormRepository } from './is-dev.repositoty';
 import { FormModule } from 'src/webform/form/form.module';
 import { HandleFileFormModule } from 'src/webform/handle-file-form/handle-file-form.module';
+import { ISDEV_STATUS } from 'src/common/Entities/webform/table/ISDEV_STATUS.entity';
+import { ISDEV_TYPE } from 'src/common/Entities/webform/table/ISDEV_TYPE.entity';
+import { ISDEV_CATEGORY } from 'src/common/Entities/webform/table/ISDEV_CATEGORY.entity';
 
 @Module({
     imports: [
@@ -18,6 +21,9 @@ import { HandleFileFormModule } from 'src/webform/handle-file-form/handle-file-f
                 ISDEV_REQUEST,
                 ISDEV_DEVELOPER,
                 ISDEV_OBJECTIVE,
+                ISDEV_CATEGORY,
+                ISDEV_TYPE,
+                ISDEV_STATUS,
                 IS_DEVICEMST,
                 LABORCOST,
             ],

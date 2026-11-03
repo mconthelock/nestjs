@@ -9,7 +9,8 @@ import { PilineCrudRepository } from '../piline/PILINE-CRUD.repository';
 export class PilineSectionMstRepository extends PilineCrudRepository<PILINE_SECTION_MST> {
     constructor(
         @InjectDataSource('mitsuConnection') ds: DataSource,
-        @InjectDataSource('amecConnection') private readonly amecDs: DataSource,
+        @InjectDataSource('datacenterConnection')
+        private readonly amecDs: DataSource,
     ) {
         super(ds, PILINE_SECTION_MST);
     }

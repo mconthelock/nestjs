@@ -11,7 +11,7 @@ export class KanbanRequestService {
     constructor(
         private readonly kanbanRequestRepository: KanbanRequestRepository,
         private readonly mailService: MailService,
-        @InjectRepository(Psection, 'amecConnection')
+        @InjectRepository(Psection, 'mitsuConnection')
         private sectionRepo: Repository<Psection>,
     ) {}
 

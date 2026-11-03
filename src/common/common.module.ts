@@ -15,7 +15,7 @@ import fingerConfig from './databases/fingerdb.config';
 
 //ORACLE
 import mitsuConfig from './databases/mitsu.config';
-import amecConfig from './databases/amec.config';
+// import amecConfig from './databases/amec.config';
 import datacenterConfig from './databases/datacenter.config';
 // import docinvConfig from './databases/docinv.config';
 import elmesConfig from './databases/elmes.config';
@@ -23,7 +23,7 @@ import elmesConfig from './databases/elmes.config';
 // import gpreportConfig from './databases/gpreport.config';
 // import idsConfig from './databases/dailyids.config';
 import pdmConfig from './databases/pdm.config';
-import purConfig from './databases/pursys.config';
+// import purConfig from './databases/pursys.config';
 // import sdsysConfig from './databases/sdsys.config';
 // import spsysConfig from './databases/spsys.config';
 // import webformConfig from './databases/webform.config';
@@ -47,7 +47,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
         ScheduleModule.forRoot(),
         WinstonModule.forRoot(winstonConfig),
         TypeOrmModule.forRootAsync(mitsuConfig),
-        TypeOrmModule.forRootAsync(amecConfig),
+        // TypeOrmModule.forRootAsync(amecConfig),
         TypeOrmModule.forRootAsync(auditConfig),
         TypeOrmModule.forRootAsync(datacenterConfig),
         // TypeOrmModule.forRootAsync(docinvConfig),

@@ -1,8 +1,9 @@
-﻿import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ItemMfgService } from './item-mfg.service';
 import { ItemMfgController } from './item-mfg.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ITEM_MFG } from 'src/common/Entities/escs/table/ITEM_MFG.entity';
+import { ITEM_STATUS } from 'src/common/Entities/escs/table/ITEM_STATUS.entity';
 import { ItemMfgRepository } from './item-mfg.repository';
 import { ItemMfgDeleteModule } from '../item-mfg-delete/item-mfg-delete.module';
 import { ControlDrawingPisModule } from '../control-drawing-pis/control-drawing-pis.module';
@@ -12,7 +13,7 @@ import { ItemMfgHistoryModule } from '../item-mfg-history/item-mfg-history.modul
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ITEM_MFG], 'mitsuConnection'),
+    TypeOrmModule.forFeature([ITEM_MFG, ITEM_STATUS], 'mitsuConnection'),
     ItemSheetMfgModule,
     ItemMfgListModule,
     ItemMfgHistoryModule,

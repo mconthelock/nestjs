@@ -7,13 +7,13 @@ import { AmeccalendarModule } from 'src/amecmfg/ameccalendar/ameccalendar.module
 import { JopMarReqModule } from '../jop-mar-req/jop-mar-req.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([JopPurConf], 'amecConnection'),
-    AmeccalendarModule,
-    JopMarReqModule,
-  ],
-  controllers: [JopPurConfController],
-  providers: [JopPurConfService],
-  exports: [JopPurConfService],
+    imports: [
+        TypeOrmModule.forFeature([JopPurConf], 'mitsuConnection'),
+        AmeccalendarModule,
+        JopMarReqModule,
+    ],
+    controllers: [JopPurConfController],
+    providers: [JopPurConfService],
+    exports: [JopPurConfService],
 })
 export class JopPurConfModule {}

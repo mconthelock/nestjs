@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import { User } from 'src/amec/users/entities/user.entity';
+import { User } from 'src/common/Entities/amec/views/user.entity';
 
 @Entity({ name: 'DWGNOTICEPICMST', schema: 'WEBFORM' })
 export class DWGNOTICEPICMST {

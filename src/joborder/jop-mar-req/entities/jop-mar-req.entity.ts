@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryColumn, JoinColumn, ManyToOne } from 'typeorm';
-import { User } from 'src/amec/users/entities/user.entity';
+import { User } from 'src/common/Entities/amec/views/user.entity';
+
 @Entity({ name: 'JOP_MAR_REQ', schema: 'DAILYIDS' })
 export class JopMarReq {
     JOP_REVISION_TEXT?: string; // Optional, will be set later

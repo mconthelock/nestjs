@@ -16,7 +16,7 @@ import { Attachments } from '../attachments/entities/attachments.entity';
 
 import { Orderpart } from 'src/marketing/orderparts/entities/orderpart.entity';
 import { Spcalsheet } from 'src/marketing/spcalsheet/entities/spcalsheet.entity';
-import { User } from 'src/amec/users/entities/user.entity';
+import { User } from 'src/common/Entities/amec/views/user.entity';
 import { Partcategory } from 'src/spprogram/partcategory/entities/partcategory.entity';
 
 //DTOs

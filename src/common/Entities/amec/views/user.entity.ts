@@ -13,7 +13,7 @@ import { Designer } from 'src/spprogram/designer/entities/designer.entity';
 import { Buspassenger } from 'src/common/Entities/gpreport/table/buspassenger.entity';
 
 import { Accesslog } from 'src/common/Entities/docinv/table/accesslog.entity';
-import { Appsuser } from '../../../common/Entities/docinv/table/appsuser.entity';
+import { Appsuser } from '../../docinv/table/appsuser.entity';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
 @Entity({ name: 'AMECUSERALL', schema: 'AMEC' })

@@ -1,63 +1,63 @@
-import { User } from 'src/amec/users/entities/user.entity';
+import { User } from 'src/common/Entities/amec/views/user.entity';
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 
-@Entity('JOP_REQ')
+@Entity({ name: 'JOP_REQ', schema: 'DAILYIDS' })
 export class SetRequestDate {
-  JOP_REVISION_TEXT?: string; // Optional, will be set later
-  DeadLinePUR?: Number;
+    JOP_REVISION_TEXT?: string; // Optional, will be set later
+    DeadLinePUR?: Number;
 
-  @PrimaryColumn()
-  JOP_REVISION: number;
+    @PrimaryColumn()
+    JOP_REVISION: number;
 
-  @PrimaryColumn()
-  JOP_MFGNO: string;
+    @PrimaryColumn()
+    JOP_MFGNO: string;
 
-  //   @PrimaryColumn()
-  //   JOP_RQS: string;
+    //   @PrimaryColumn()
+    //   JOP_RQS: string;
 
-  @PrimaryColumn()
-  JOP_PONO: number;
+    @PrimaryColumn()
+    JOP_PONO: number;
 
-  @PrimaryColumn()
-  JOP_LINENO: number;
+    @PrimaryColumn()
+    JOP_LINENO: number;
 
-  @Column()
-  JOP_PUR_STATUS: number | 0;
+    @Column()
+    JOP_PUR_STATUS: number | 0;
 
-  //   margeting
+    //   margeting
 
-  @Column()
-  JOP_MAR_REQUEST: string | null;
+    @Column()
+    JOP_MAR_REQUEST: string | null;
 
-  @Column()
-  JOP_MAR_REQUEST_DATE: Date | null;
+    @Column()
+    JOP_MAR_REQUEST_DATE: Date | null;
 
-  @Column()
-  JOP_MAR_INPUT_DATE: Date | null;
+    @Column()
+    JOP_MAR_INPUT_DATE: Date | null;
 
-  @Column()
-  JOP_MAR_REMARK: string | null;
+    @Column()
+    JOP_MAR_REMARK: string | null;
 
-  //   purchase
-  @Column()
-  JOP_PUR_CONFIRM: string | null;
+    //   purchase
+    @Column()
+    JOP_PUR_CONFIRM: string | null;
 
-  @Column()
-  JOP_PUR_CONFIRM_DATE: Date | null;
+    @Column()
+    JOP_PUR_CONFIRM_DATE: Date | null;
 
-  @Column()
-  JOP_PUR_INPUT_DATE: Date | null;
+    @Column()
+    JOP_PUR_INPUT_DATE: Date | null;
 
-  @Column()
-  JOP_PUR_REMARK: string | null;
+    @Column()
+    JOP_PUR_REMARK: string | null;
 
-  @ManyToOne(() => User, (user) => user.SEMPNO)
-  @JoinColumn({ name: 'JOP_MAR_REQUEST', referencedColumnName: 'SEMPNO' })
-  marRequest: User | null;
+    @ManyToOne(() => User, (user) => user.SEMPNO)
+    @JoinColumn({ name: 'JOP_MAR_REQUEST', referencedColumnName: 'SEMPNO' })
+    marRequest: User | null;
 
-  @ManyToOne(() => User, (user) => user.SEMPNO)
-  @JoinColumn({ name: 'JOP_PUR_CONFIRM', referencedColumnName: 'SEMPNO' })
-  purConfirm: User | null;
+    @ManyToOne(() => User, (user) => user.SEMPNO)
+    @JoinColumn({ name: 'JOP_PUR_CONFIRM', referencedColumnName: 'SEMPNO' })
+    purConfirm: User | null;
 }
 //------------------------------------------------------
 //    @PrimaryColumn()

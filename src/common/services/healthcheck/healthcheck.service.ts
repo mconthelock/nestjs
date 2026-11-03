@@ -14,9 +14,6 @@ export class HealthcheckService implements OnModuleInit {
         @InjectDataSource('mitsuConnection')
         private readonly webformDs: DataSource,
 
-        // @InjectDataSource('amecConnection')
-        // private readonly amecDs: DataSource,
-
         // @InjectDataSource('idsConnection')
         // private readonly idsDs: DataSource,
     ) {}

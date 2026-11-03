@@ -5,6 +5,7 @@ import {
     ConflictException,
     Injectable,
     NotFoundException,
+    Optional,
 } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, EntityManager, getMetadataArgsStorage } from 'typeorm';
@@ -58,7 +59,7 @@ export class JigRepository extends BaseRepository {
     constructor(
         @InjectDataSource('mitsuConnection')
         private readonly iedocDs: DataSource,
-        private readonly ngFlow?: JigFlowService,
+        @Optional() private readonly ngFlow?: JigFlowService,
     ) {
         super(iedocDs);
     }

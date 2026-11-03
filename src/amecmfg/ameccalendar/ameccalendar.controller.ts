@@ -1,6 +1,7 @@
-import { Controller, Body, Post, Get } from '@nestjs/common';
+import { Controller, Body, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { AmeccalendarService } from './ameccalendar.service';
+import { GetProdDto } from './dto/GetProd.dto';
 
 interface rangeObj {
     sdate: number;
@@ -70,5 +71,29 @@ export class AmeccalendarController {
             +body.startMonth,
             +body.startId,
         );
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-11-03
+     * @description ดึงข้อมูลจุงการผลิตก่อนหน้า (Previous Production)
+     * @param dto
+     * @returns
+     */
+    @Post('previous-prod')
+    getPreviousProd(@Body() dto: GetProdDto) {
+        return this.calendar.getPreviousProd(dto);
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-11-03
+     * @description ดึงข้อมูลจุงการผลิตถัดไป (Next Production)
+     * @param dto
+     * @returns
+     */
+    @Post('next-prod')
+    getNextProd(@Body() dto: GetProdDto) {
+        return this.calendar.getNextProd(dto);
     }
 }

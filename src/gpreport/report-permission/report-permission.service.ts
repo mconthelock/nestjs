@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 
@@ -10,7 +10,7 @@ import { ReportPermission } from 'src/common/Entities/gpreport/table/REPORT_PERM
 @Injectable()
 export class ReportPermissionService {
     constructor(
-        @InjectRepository(ReportPermission, 'gpreportConnection')
+        @InjectRepository(ReportPermission, 'mitsuConnection')
         private readonly repo: Repository<ReportPermission>,
     ) {}
 

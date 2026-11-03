@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
+﻿import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { ControlDrawingPisService } from './control-drawing-pis.service';
 import { CreateControlDrawingPisDto } from './dto/create-control-drawing-pis.dto';
 import { UpdateControlDrawingPisDto } from './dto/update-control-drawing-pis.dto';
@@ -12,7 +12,7 @@ export class ControlDrawingPisController {
   
     @Post()
     @UseInterceptors(getFileUploadInterceptor())
-    @UseTransaction('escsConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ escsConnection
+    @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
     async create(@Body() dto: CreateControlDrawingPisDto) {
       return await this.controlDrawingPisService.create(dto);
     }
@@ -23,7 +23,7 @@ export class ControlDrawingPisController {
     }
   
     @Post('search')
-    @UseTransaction('escsConnection') 
+    @UseTransaction('mitsuConnection') 
     async search(@Body() dto: FiltersDto) {
       return this.controlDrawingPisService.search(dto);
     }
@@ -35,13 +35,13 @@ export class ControlDrawingPisController {
   
     @Patch(':id')
     @UseInterceptors(getFileUploadInterceptor())
-    @UseTransaction('escsConnection')
+    @UseTransaction('mitsuConnection')
     update(@Param('id') id: string, @Body() dto: UpdateControlDrawingPisDto) {
       return this.controlDrawingPisService.update(+id, dto);
     }
   
     @Delete(':id')
-    @UseTransaction('escsConnection')
+    @UseTransaction('mitsuConnection')
     remove(@Param('id') id: string) {
       return this.controlDrawingPisService.remove(+id);
     }

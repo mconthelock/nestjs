@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+﻿import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from '../../amec/users/users.service';
@@ -20,16 +20,16 @@ import { UpdateUniformRightDto } from './dto/update-right.dto';
 @Injectable()
 export class UniformService {
     constructor(
-        @InjectRepository(UNIFORM, 'gpreportConnection')
+        @InjectRepository(UNIFORM, 'mitsuConnection')
         private readonly uniform: Repository<UNIFORM>,
 
-        @InjectRepository(UNIFORM_CATEGORY, 'gpreportConnection')
+        @InjectRepository(UNIFORM_CATEGORY, 'mitsuConnection')
         private readonly category: Repository<UNIFORM_CATEGORY>,
 
-        @InjectRepository(UniformCalendar, 'gpreportConnection')
+        @InjectRepository(UniformCalendar, 'mitsuConnection')
         private readonly calendar: Repository<UniformCalendar>,
 
-        @InjectRepository(UNIFORM_RIGHT, 'gpreportConnection')
+        @InjectRepository(UNIFORM_RIGHT, 'mitsuConnection')
         private readonly right: Repository<UNIFORM_RIGHT>,
 
         protected readonly repo: AnnualUniformRepository,

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UsersModule } from 'src/amec/users/users.module';
@@ -25,7 +25,7 @@ import { AnnualUniformDetail } from 'src/common/Entities/gpreport/table/UNIFORM_
                 AnnualUniformDetail,
                 UniformCalendar,
             ],
-            'gpreportConnection',
+            'mitsuConnection',
         ),
         UsersModule,
     ],

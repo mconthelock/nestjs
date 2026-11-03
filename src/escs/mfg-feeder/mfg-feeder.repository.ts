@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { GetDrawingBmDto } from './dto/get-drawing-bm.dto';
@@ -10,7 +10,7 @@ import { AMECORDERS_PROCESS } from 'src/common/Entities/escs/table/AMECORDERS_PR
 @Injectable()
 export class MfgFeederRepository {
     constructor(
-        @InjectDataSource('escsConnection')
+        @InjectDataSource('mitsuConnection')
         private readonly ds: DataSource,
     ) {}
 

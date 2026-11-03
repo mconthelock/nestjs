@@ -1,4 +1,4 @@
-import sharp from 'sharp';
+﻿import sharp from 'sharp';
 import * as fs from 'fs';
 import * as path from 'path';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -10,9 +10,9 @@ import { NewsFiles } from 'src/common/Entities/gpreport/table/NEWS_FILES.entity'
 @Injectable()
 export class NewsService {
     constructor(
-        @InjectRepository(News, 'gpreportConnection')
+        @InjectRepository(News, 'mitsuConnection')
         private readonly repo: Repository<News>,
-        @InjectRepository(NewsFiles, 'gpreportConnection')
+        @InjectRepository(NewsFiles, 'mitsuConnection')
         private readonly files: Repository<NewsFiles>,
     ) {}
 

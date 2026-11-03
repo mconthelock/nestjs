@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { DailyDispatchReportDto } from './dto/dispatch-report.dto';
@@ -11,10 +11,10 @@ import { BusDispatchPassenger } from '../../common/Entities/gpreport/table/bus_d
 @Injectable()
 export class DispatchReportService {
     constructor(
-        @InjectDataSource('gpreportConnection')
+        @InjectDataSource('mitsuConnection')
         private readonly dataSource: DataSource,
 
-        @InjectRepository(BusDispatchPassenger, 'gpreportConnection')
+        @InjectRepository(BusDispatchPassenger, 'mitsuConnection')
         private passRepo: Repository<BusDispatchPassenger>,
     ) {}
 

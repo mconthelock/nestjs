@@ -1,4 +1,4 @@
-import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+﻿import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, Repository, In } from 'typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
@@ -13,10 +13,10 @@ import { Busroute } from 'src/common/Entities/gpreport/table/busroute.entity';
 @Injectable()
 export class BuslineService {
   constructor(
-    @InjectRepository(Busline, 'gpreportConnection')
+    @InjectRepository(Busline, 'mitsuConnection')
     private readonly bus: Repository<Busline>,
 
-    @InjectDataSource('gpreportConnection')
+    @InjectDataSource('mitsuConnection')
     private readonly dataSource: DataSource,
   ) {}
 

@@ -1,4 +1,4 @@
-import {
+﻿import {
   Controller,
   Get,
   Post,
@@ -21,7 +21,7 @@ export class ItemMfgListController {
 
   @Post()
   @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('escsConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ escsConnection
+  @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
   create(@Body() dto: CreateItemMfgListDto) {
     return this.itemMfgListService.create(dto);
   }
@@ -37,20 +37,20 @@ export class ItemMfgListController {
   }
 
   @Post('search')
-  @UseTransaction('escsConnection')
+  @UseTransaction('mitsuConnection')
   async search(@Body() dto: FiltersDto) {
     return this.itemMfgListService.search(dto);
   }
 
   @Patch(':id')
   @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('escsConnection')
+  @UseTransaction('mitsuConnection')
   update(@Param('id') id: string, @Body() dto: UpdateItemMfgListDto) {
     return this.itemMfgListService.update(+id, dto);
   }
 
   @Delete(':id')
-  @UseTransaction('escsConnection')
+  @UseTransaction('mitsuConnection')
   remove(@Param('id') id: string) {
     return this.itemMfgListService.remove(+id);
   }

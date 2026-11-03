@@ -9,7 +9,7 @@ import { WMSUploadIssueResponseDto } from './dto/wms-upload-issue-response.dto';
 @Injectable()
 export class WMSService {
     constructor(
-        @InjectDataSource('sdsysConnection')
+        @InjectDataSource('mitsuConnection')
         private readonly db: DataSource,
     ) {}
 

@@ -14,7 +14,10 @@ export function getFileUploadInterceptor(
 ) {
   // กำหนด storage กลาง
   const storage = diskStorage({
-    destination: `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`,
+    destination: (req, file, cb) => {
+      const dest = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
+      cb(null, dest);
+    },
     filename: (req, file, cb) => {
       // ✅ แปลงชื่อก่อนใช้งานทุกครั้ง
       file.originalname = fixName(file.originalname);

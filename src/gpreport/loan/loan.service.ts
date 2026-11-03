@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+﻿import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
@@ -11,7 +11,7 @@ import { LOANFRM } from '../../common/Entities/webform/table/LOANFRM.entity';
 @Injectable()
 export class LoanService {
     constructor(
-        @InjectRepository(LOANFRM, 'gpreportConnection')
+        @InjectRepository(LOANFRM, 'mitsuConnection')
         private readonly loan: Repository<LOANFRM>,
         private readonly mailService: MailService,
     ) {}

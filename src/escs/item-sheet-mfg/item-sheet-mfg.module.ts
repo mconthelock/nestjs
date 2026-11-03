@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { ItemSheetMfgService } from './item-sheet-mfg.service';
 import { ItemSheetMfgController } from './item-sheet-mfg.controller';
 import { ITEM_SHEET_MFG } from 'src/common/Entities/escs/table/ITEM_SHEET_MFG.entity';
@@ -9,7 +9,7 @@ import { ItemMfgHistoryModule } from '../item-mfg-history/item-mfg-history.modul
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ITEM_SHEET_MFG], 'escsConnection'),
+    TypeOrmModule.forFeature([ITEM_SHEET_MFG], 'mitsuConnection'),
     ItemMfgListModule,
     ItemMfgHistoryModule,
   ],

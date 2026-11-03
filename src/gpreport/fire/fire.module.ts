@@ -15,10 +15,30 @@ import { FireCheckDetailService } from './fire-check-detail.service';
 import { FireCheckDetailRepository } from './fire-check-detail.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([FireItemMst, FireCheckHead, FireCheckDetail], 'gpreportConnection')],
-    controllers: [FireCheckHeadController, FireCheckDetailController, FireController],
-    providers: [FireService, FireRepository, FireCheckHeadService, FireCheckHeadRepository, FireCheckDetailService, FireCheckDetailRepository],
-    exports: [FireService, FireRepository, FireCheckHeadService, FireCheckDetailService],
+    imports: [
+        TypeOrmModule.forFeature(
+            [FireItemMst, FireCheckHead, FireCheckDetail],
+            'gpreportConnection',
+        ),
+    ],
+    controllers: [
+        FireCheckHeadController,
+        FireCheckDetailController,
+        FireController,
+    ],
+    providers: [
+        FireService,
+        FireRepository,
+        FireCheckHeadService,
+        FireCheckHeadRepository,
+        FireCheckDetailService,
+        FireCheckDetailRepository,
+    ],
+    exports: [
+        FireService,
+        FireRepository,
+        FireCheckHeadService,
+        FireCheckDetailService,
+    ],
 })
 export class FireModule {}
-

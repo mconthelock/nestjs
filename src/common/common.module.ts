@@ -19,12 +19,12 @@ import amecConfig from './databases/amec.config';
 import datacenterConfig from './databases/datacenter.config';
 // import docinvConfig from './databases/docinv.config';
 import elmesConfig from './databases/elmes.config';
-import escsConfig from './databases/escs.config';
-import gpreportConfig from './databases/gpreport.config';
-import idsConfig from './databases/dailyids.config';
+// import escsConfig from './databases/escs.config';
+// import gpreportConfig from './databases/gpreport.config';
+// import idsConfig from './databases/dailyids.config';
 import pdmConfig from './databases/pdm.config';
 import purConfig from './databases/pursys.config';
-import sdsysConfig from './databases/sdsys.config';
+// import sdsysConfig from './databases/sdsys.config';
 // import spsysConfig from './databases/spsys.config';
 // import webformConfig from './databases/webform.config';
 // import workloadConfig from './databases/workload.config';
@@ -52,13 +52,13 @@ import { SchedulerModule } from './scheduler/scheduler.module';
         TypeOrmModule.forRootAsync(datacenterConfig),
         // TypeOrmModule.forRootAsync(docinvConfig),
         TypeOrmModule.forRootAsync(elmesConfig),
-        TypeOrmModule.forRootAsync(escsConfig),
-        TypeOrmModule.forRootAsync(gpreportConfig),
-        TypeOrmModule.forRootAsync(idsConfig),
+        // TypeOrmModule.forRootAsync(escsConfig),
+        // TypeOrmModule.forRootAsync(gpreportConfig),
+        // TypeOrmModule.forRootAsync(idsConfig),
         TypeOrmModule.forRootAsync(lnConfig),
         TypeOrmModule.forRootAsync(packingConfig),
         TypeOrmModule.forRootAsync(pdmConfig),
-        TypeOrmModule.forRootAsync(sdsysConfig),
+        // TypeOrmModule.forRootAsync(sdsysConfig),
         // TypeOrmModule.forRootAsync(spsysConfig),
         // TypeOrmModule.forRootAsync(webformConfig),
         // TypeOrmModule.forRootAsync(workloadConfig),

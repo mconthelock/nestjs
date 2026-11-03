@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -8,7 +8,7 @@ import { UpdateStinpFormDto } from './dto/update-stinp-form.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 @Injectable()
 export class StinpFormRepository extends BaseRepository {
-    constructor(@InjectDataSource('gpreportConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

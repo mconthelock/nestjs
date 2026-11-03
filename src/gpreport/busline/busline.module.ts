@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BuslineController } from './busline.controller';
 import { BuslineService } from './busline.service';
@@ -6,7 +6,7 @@ import { Busline } from '../../common/Entities/gpreport/table/busline.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Busline], 'gpreportConnection')],
+  imports: [TypeOrmModule.forFeature([Busline], 'mitsuConnection')],
   controllers: [BuslineController],
   providers: [BuslineService],
 })

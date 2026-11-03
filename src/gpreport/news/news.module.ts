@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { NewsService } from './news.service';
@@ -8,7 +8,7 @@ import { NewsFiles } from 'src/common/Entities/gpreport/table/NEWS_FILES.entity'
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([News, NewsFiles], 'gpreportConnection'),
+        TypeOrmModule.forFeature([News, NewsFiles], 'mitsuConnection'),
     ],
     controllers: [NewsController],
     providers: [NewsService],

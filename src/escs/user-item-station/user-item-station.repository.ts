@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -8,7 +8,7 @@ import { CreateUsersItemStationDto } from './dto/create-user-item-station.dto';
 @Injectable()
 export class UsersItemStationRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('escsConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
         ) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

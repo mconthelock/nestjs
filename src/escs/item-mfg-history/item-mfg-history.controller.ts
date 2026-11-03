@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
+﻿import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { ItemMfgHistoryService } from './item-mfg-history.service';
 import { CreateItemMfgHistoryDto } from './dto/create-item-mfg-history.dto';
 import { UpdateItemMfgHistoryDto } from './dto/update-item-mfg-history.dto';
@@ -12,7 +12,7 @@ export class ItemMfgHistoryController {
 
   @Post()
   @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('escsConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ escsConnection
+  @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
   create(@Body() dto: CreateItemMfgHistoryDto) {
     return this.itemMfgHistoryService.create(dto);
   }
@@ -28,20 +28,20 @@ export class ItemMfgHistoryController {
   }
 
   @Post('search')
-  @UseTransaction('escsConnection')
+  @UseTransaction('mitsuConnection')
   async search(@Body() dto: FiltersDto) {
     return this.itemMfgHistoryService.search(dto);
   }
 
   @Patch(':id')
   @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('escsConnection')
+  @UseTransaction('mitsuConnection')
   update(@Param('id') id: string, @Body() dto: UpdateItemMfgHistoryDto) {
     return this.itemMfgHistoryService.update(+id, dto);
   }
 
   @Delete(':id')
-  @UseTransaction('escsConnection')
+  @UseTransaction('mitsuConnection')
   remove(@Param('id') id: string) {
     return this.itemMfgHistoryService.remove(+id);
   }

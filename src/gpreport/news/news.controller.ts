@@ -54,7 +54,7 @@ export class NewsController {
             ],
             {
                 storage: diskStorage({
-                    destination: `${process.env.GP_FILE_PATH}/news/attachments`,
+                    destination: (req, file, cb) => cb(null, `${process.env.GP_FILE_PATH}/news/attachments`),
                     filename: (req, file, cb) => {
                         const uniqueSuffix =
                             Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -102,7 +102,7 @@ export class NewsController {
             ],
             {
                 storage: diskStorage({
-                    destination: `${process.env.GP_FILE_PATH}/news/attachments`,
+                    destination: (req, file, cb) => cb(null, `${process.env.GP_FILE_PATH}/news/attachments`),
                     filename: (req, file, cb) => {
                         const uniqueSuffix =
                             Date.now() + '-' + Math.round(Math.random() * 1e9);

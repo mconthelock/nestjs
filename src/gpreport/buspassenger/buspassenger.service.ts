@@ -1,4 +1,4 @@
-import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+﻿import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBuspassengerDto } from './dto/create-buspassenger.dto';
@@ -9,13 +9,13 @@ import { User } from 'src/amec/users/entities/user.entity';
 @Injectable()
 export class BuspassengerService {
   constructor(
-    @InjectRepository(Buspassenger, 'gpreportConnection')
+    @InjectRepository(Buspassenger, 'mitsuConnection')
     private readonly buspassengerRepository: Repository<Buspassenger>,
 
-    @InjectDataSource('gpreportConnection')
+    @InjectDataSource('mitsuConnection')
     private readonly dataSource: DataSource,
 
-    @InjectRepository(User, 'gpreportConnection')  
+    @InjectRepository(User, 'mitsuConnection')  
     private readonly userRepo: Repository<User>,
   ) {}
 

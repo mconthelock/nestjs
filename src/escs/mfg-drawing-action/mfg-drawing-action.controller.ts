@@ -1,4 +1,4 @@
-import {
+﻿import {
     Controller,
     Get,
     Post,
@@ -30,7 +30,7 @@ export class MfgDrawingActionController {
     }
 
     @Post('search')
-    @UseTransaction('escsConnection')
+    @UseTransaction('mitsuConnection')
     async search(@Body() dto: FiltersDto) {
         return this.mfgDrawingActionService.search(dto);
     }

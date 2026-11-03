@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ReportPermissionService } from './report-permission.service';
@@ -7,7 +7,7 @@ import { ReportPermission } from 'src/common/Entities/gpreport/table/REPORT_PERM
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([ReportPermission], 'gpreportConnection'),
+        TypeOrmModule.forFeature([ReportPermission], 'mitsuConnection'),
     ],
     controllers: [ReportPermissionController],
     providers: [ReportPermissionService],

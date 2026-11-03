@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { LoanService } from './loan.service';
@@ -10,7 +10,7 @@ import { MailModule } from 'src/common/services/mail/mail.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([LOANFRM, LOANDETAIL], 'gpreportConnection'),
+        TypeOrmModule.forFeature([LOANFRM, LOANDETAIL], 'mitsuConnection'),
         MailModule,
     ],
     controllers: [LoanController],

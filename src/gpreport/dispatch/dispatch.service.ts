@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository, In } from 'typeorm';
 import { SaveDispatchDto } from './dto/save-dispatch.dto';
@@ -27,19 +27,19 @@ import { DispatchMailService } from './dispatch-mail.service';
 @Injectable()
 export class DispatchService {
     constructor(
-        @InjectDataSource('gpreportConnection')
+        @InjectDataSource('mitsuConnection')
         private readonly dataSource: DataSource,
 
-        @InjectRepository(BusDispatchHead, 'gpreportConnection')
+        @InjectRepository(BusDispatchHead, 'mitsuConnection')
         private headRepo: Repository<BusDispatchHead>,
 
-        @InjectRepository(BusDispatchLine, 'gpreportConnection')
+        @InjectRepository(BusDispatchLine, 'mitsuConnection')
         private lineRepo: Repository<BusDispatchLine>,
 
-        @InjectRepository(BusDispatchStop, 'gpreportConnection')
+        @InjectRepository(BusDispatchStop, 'mitsuConnection')
         private stopRepo: Repository<BusDispatchStop>,
 
-        @InjectRepository(BusDispatchPassenger, 'gpreportConnection')
+        @InjectRepository(BusDispatchPassenger, 'mitsuConnection')
         private passRepo: Repository<BusDispatchPassenger>,
 
         private readonly dispatchReportService: DispatchReportService,

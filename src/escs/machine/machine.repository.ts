@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -8,7 +8,7 @@ import { MACHINE_NAME } from 'src/common/Entities/escs/table/MACHINE_NAME.entity
 @Injectable()
 export class MachineRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('escsConnection')
+        @InjectDataSource('mitsuConnection')
         ds: DataSource,
     ) {
         super(ds);

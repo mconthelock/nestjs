@@ -1,8 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
+﻿import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
 import { Busline } from './busline.entity';
 import { Busstop } from './busstop.entity';
 
-@Entity('BUS_ROUTE')
+@Entity({ name: 'BUS_ROUTE', schema: 'GPREPORT' })
 export class Busroute {
   @PrimaryColumn()
   BUSLINE: number;

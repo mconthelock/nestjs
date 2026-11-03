@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
+﻿import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { BlockMasterService } from './block-master.service';
 import { CreateBlockMasterDto } from './dto/create-block-master.dto';
 import { UpdateBlockMasterDto } from './dto/update-block-master.dto';
@@ -12,7 +12,7 @@ export class BlockMasterController {
 
   @Post()
   @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('escsConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ escsConnection
+  @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
   async create(@Body() createBlockMasterDto: CreateBlockMasterDto) {
     return await this.blockMasterService.create(createBlockMasterDto);
   }
@@ -23,7 +23,7 @@ export class BlockMasterController {
   }
 
   @Post('search')
-  @UseTransaction('escsConnection') 
+  @UseTransaction('mitsuConnection') 
   async search(@Body() dto: FiltersDto) {
     return this.blockMasterService.search(dto);
   }
@@ -35,13 +35,13 @@ export class BlockMasterController {
 
   @Patch(':id')
   @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('escsConnection')
+  @UseTransaction('mitsuConnection')
   update(@Param('id') id: string, @Body() dto: UpdateBlockMasterDto) {
     return this.blockMasterService.update(+id, dto);
   }
 
   @Delete(':id')
-  @UseTransaction('escsConnection')
+  @UseTransaction('mitsuConnection')
   remove(@Param('id') id: string) {
     return this.blockMasterService.remove(+id);
   }

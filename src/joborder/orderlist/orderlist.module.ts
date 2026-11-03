@@ -9,14 +9,14 @@ import { JopMarReqModule } from '../jop-mar-req/jop-mar-req.module';
 import { JopPurConfModule } from '../jop-pur-conf/jop-pur-conf.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([VOrderList], 'amecConnection'),
-    TypeOrmModule.forFeature([SetRequestDate], 'amecConnection'),
-    SetRequestDateModule,
-    JopMarReqModule,
-    JopPurConfModule
-  ],
-  controllers: [OrderListController],
-  providers: [OrderListService],
+    imports: [
+        TypeOrmModule.forFeature([VOrderList], 'datacenterConnection'),
+        TypeOrmModule.forFeature([SetRequestDate], 'mitsuConnection'),
+        SetRequestDateModule,
+        JopMarReqModule,
+        JopPurConfModule,
+    ],
+    controllers: [OrderListController],
+    providers: [OrderListService],
 })
 export class OrderListModule {}

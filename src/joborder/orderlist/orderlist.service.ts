@@ -11,9 +11,9 @@ import { JopPurConfService } from '../jop-pur-conf/jop-pur-conf.service';
 @Injectable()
 export class OrderListService {
     constructor(
-        @InjectRepository(VOrderList, 'amecConnection')
+        @InjectRepository(VOrderList, 'datacenterConnection')
         private readonly OrderListRepository: Repository<VOrderList>,
-        @InjectDataSource('amecConnection')
+        @InjectDataSource('datacenterConnection')
         private dataSource: DataSource,
         private readonly JopMarReqService: JopMarReqService,
         private readonly JopPurConfService: JopPurConfService,

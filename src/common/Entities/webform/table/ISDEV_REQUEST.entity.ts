@@ -13,7 +13,7 @@ import { ISDEV_CATEGORY } from './ISDEV_CATEGORY.entity';
 import { ISDEV_OBJECTIVE } from './ISDEV_OBJECTIVE.entity';
 import { ISDEV_STATUS } from './ISDEV_STATUS.entity';
 import { ISDEV_TYPE } from './ISDEV_TYPE.entity';
-import { User } from 'src/amec/users/entities/user.entity';
+import { User } from 'src/common/Entities/amec/views/user.entity';
 import { ISDEV_DEVELOPER } from './ISDEV_DEVELOPER.entity';
 import { IS_FILE } from './IS_FILE.entity';
 import { FORM } from './FORM.entity';

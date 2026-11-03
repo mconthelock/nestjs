@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Appsgroup } from './appsgroup.entity';
 import { Application } from './application.entity';
-import { User } from '../../../../amec/users/entities/user.entity';
+import { User } from '../../amec/views/user.entity';
 
 @Entity({ name: 'APP_USERS', schema: 'DOCINV' })
 export class Appsuser {

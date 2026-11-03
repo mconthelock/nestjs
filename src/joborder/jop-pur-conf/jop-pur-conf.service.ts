@@ -18,9 +18,9 @@ import { getSafeFields } from 'src/common/utils/Fields.utils';
 @Injectable()
 export class JopPurConfService {
     constructor(
-        @InjectRepository(JopPurConf, 'amecConnection')
+        @InjectRepository(JopPurConf, 'mitsuConnection')
         private confRepo: Repository<JopPurConf>,
-        @InjectDataSource('amecConnection')
+        @InjectDataSource('mitsuConnection')
         private dataSource: DataSource,
 
         private readonly amecCalendarService: AmeccalendarService,
@@ -181,7 +181,7 @@ export class JopPurConfService {
                 }),
             )
             .andWhere('jop.JOP_REVISION <= PUR.MAX_REV')
-            .andWhere('jop.JOP_REVISION > 0') 
+            .andWhere('jop.JOP_REVISION > 0')
             .getRawMany();
     }
 
@@ -207,7 +207,7 @@ export class JopPurConfService {
                 'jop.JOP_REVISION <= (SELECT MAX(r2.JOP_REVISION) FROM JOP_PUR_CONF r2 WHERE r2.JOP_MFGNO = :mfgno2 AND r2.JOP_PONO = :pono2 AND r2.JOP_LINENO = :lineno2)',
                 { mfgno2: mfgno, pono2: pono, lineno2: lineno },
             )
-            .andWhere('jop.JOP_REVISION > 0') 
+            .andWhere('jop.JOP_REVISION > 0')
             .orderBy('jop.JOP_REVISION', 'ASC')
             //   .leftJoinAndSelect('jop.marRequest', 'marRequest')
             .leftJoinAndSelect('jop.purConfirm', 'purConfirm')
@@ -247,7 +247,11 @@ export class JopPurConfService {
                 'B',
                 'A.JOP_MFGNO = B.JOP_MFGNO AND A.JOP_PONO = B.JOP_PONO AND A.JOP_LINENO = B.JOP_LINENO AND B.LAST_REVISION = A.JOP_REVISION',
             )
-            .innerJoin('(SELECT * FROM AMECUSERALL)', 'U', 'A.JOP_PUR_CONFIRM = U.SEMPNO');
+            .innerJoin(
+                '(SELECT * FROM AMECUSERALL)',
+                'U',
+                'A.JOP_PUR_CONFIRM = U.SEMPNO',
+            );
         query.distinct(dto.distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
 
         let select = [];

@@ -18,10 +18,15 @@ import { UsersModule } from 'src/amec/users/users.module';
 import { PappflowModule } from 'src/amec/pappflow/pappflow.module';
 import { PurnvfLocationModule } from './purnvf_location/purnvf_location.module';
 import { PurnvfLocationService } from './purnvf_location/purnvf_location.service';
+import { PURNVF_LIST } from 'src/common/Entities/webform/table/PURNVF_LIST.entity';
+import { PURNVF_ADDRESS } from 'src/common/Entities/webform/table/PURNVF_ADDRESS.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([PURNVF_FORM], 'mitsuConnection'),
+        TypeOrmModule.forFeature(
+            [PURNVF_FORM, PURNVF_LIST, PURNVF_ADDRESS],
+            'mitsuConnection',
+        ),
         FormmstModule,
         FormModule,
         FlowModule,

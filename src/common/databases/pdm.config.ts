@@ -28,7 +28,7 @@ if (process.env.HOST == 'AMEC') {
             autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),
-            retryAttempts: 5,
+            retryAttempts: process.env.STATE === 'production' ? 5 : 1,
             retryDelay: 2000,
             extra: {
                 keepAlive: true,

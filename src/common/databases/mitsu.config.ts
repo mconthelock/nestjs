@@ -19,14 +19,15 @@ if (process.env.HOST == 'AMEC') {
             schema: process.env.MITSU_SCHEMA,
             connectString: `(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=${process.env.MITSU_HOST})(PORT=${process.env.MITSU_PORT}))(CONNECT_DATA=(SID=${process.env.MITSU_SERVICE})))`,
             autoLoadEntities: true,
-            entities: [
-                __dirname + '/../Entities/**/*.entity{.ts,.js}',
-                __dirname + '/../../spprogram/**/*.entity{.ts,.js}',
-                __dirname + '/../../marketing/spcalsheet/entities/**/*.entity{.ts,.js}',
-            ],
+            // entities: [
+            //     __dirname + '/../Entities/**/*.entity{.ts,.js}',
+            //     __dirname + '/../../spprogram/**/*.entity{.ts,.js}',
+            //     __dirname +
+            //         '/../../marketing/spcalsheet/entities/**/*.entity{.ts,.js}',
+            // ],
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),
-            retryAttempts: 5,
+            retryAttempts: process.env.STATE === 'production' ? 5 : 1,
             retryDelay: 2000,
             extra: {
                 keepAlive: true,

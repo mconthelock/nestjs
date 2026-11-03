@@ -10,6 +10,7 @@ import { StockTransactions } from 'src/common/Entities/pursys/table/STOCK_TRANSA
 import { StockTransactionItems } from 'src/common/Entities/pursys/table/STOCK_TRANSACTION_ITEMS.entity';
 import { StockBalances } from 'src/common/Entities/pursys/table/STOCK_BALANCES.entity';
 import { ProductsLots } from 'src/common/Entities/pursys/table/PRODUCTS_LOTS.entity';
+import { StockTransactionsType } from 'src/common/Entities/pursys/table/STOCK_TRANSACTION_TYPES.entity';
 
 @Module({
     imports: [
@@ -20,6 +21,7 @@ import { ProductsLots } from 'src/common/Entities/pursys/table/PRODUCTS_LOTS.ent
                 StockTransactions,
                 StockTransactionItems,
                 StockBalances,
+                StockTransactionsType,
             ],
             'mitsuConnection',
         ),

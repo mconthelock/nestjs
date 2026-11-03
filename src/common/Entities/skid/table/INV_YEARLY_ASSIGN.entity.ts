@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    OneToMany,
+    OneToOne,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 import { PSYIC_FORM } from '../../webform/table/PSYIC_FORM.entity';
 import { INV_YEARLY_RESULT } from './INV_YEARLY_RESULT.entity';
 import { AMECUSERALL } from '../../amec/views/AMECUSERALL.entity';
@@ -23,7 +30,7 @@ export class INV_YEARLY_ASSIGN {
     @Column()
     CREATE_AT: Date;
 
-    @OneToOne(() => AMECUSERALL, (u) => u.INV_YEARLY_ASSIGN)
+    @OneToOne(() => AMECUSERALL)
     @JoinColumn([{ name: 'CREATE_BY', referencedColumnName: 'SEMPNO' }])
     USER: AMECUSERALL;
 

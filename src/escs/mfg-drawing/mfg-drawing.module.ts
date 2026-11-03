@@ -1,8 +1,9 @@
-﻿import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MfgDrawingService } from './mfg-drawing.service';
 import { MfgDrawingController } from './mfg-drawing.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MFG_DRAWING } from 'src/common/Entities/escs/table/MFG_DRAWING.entity';
+import { SYS_STATUS } from 'src/common/Entities/escs/table/SYS_STATUS.entity';
 import { MfgDrawingRepository } from './mfg-drawing.repository';
 import { MfgDrawingCreateChecksheetService } from './mfg-drawing-checksheet.service';
 import { ItemMfgModule } from '../item-mfg/item-mfg.module';
@@ -21,7 +22,7 @@ import { DrawingFileHelper } from './helpers/drawing-file.helper';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([MFG_DRAWING], 'mitsuConnection'),
+        TypeOrmModule.forFeature([MFG_DRAWING, SYS_STATUS], 'mitsuConnection'),
         ItemMfgModule,
         IdtagEfacLogModule,
         F110kpModule,

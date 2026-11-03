@@ -1,4 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { PurPraService } from './services/pur-pra.service';
 import { PurPraController } from './controller/pur-pra.controller';
 import { CommitteeRepository } from './repository/committe.repository';
@@ -14,9 +15,26 @@ import { FormLinkModule } from 'src/webform/form-link/form-link.module';
 import { PurCpcModule } from '../pur-cpc/pur-cpc.module';
 import { FlowModule } from 'src/webform/flow/flow.module';
 import { KeyLinkRepository } from './repository/keyLink.repository';
+import { PURPRA_FORM } from 'src/common/Entities/webform/table/PURPRA_FORM.entity';
+import { PURPRA_COMMITTEE } from 'src/common/Entities/webform/table/PURPRA_COMMITTEE.entity';
+import { PURPRA_GROUP } from 'src/common/Entities/webform/table/PURPRA_GROUP.entity';
+import { PURPRA_REASONS } from 'src/common/Entities/webform/table/PURPRA_REASONS.entity';
+import { PURPRA_REASON_MASTER } from 'src/common/Entities/webform/table/PURPRA_REASON_MASTER.entity';
+import { PURPRA_LINK_KEY_VIEW } from 'src/common/Entities/webform/views/PURPRA_LINK_KEY_VIEW.entity';
 
 @Module({
     imports: [
+        TypeOrmModule.forFeature(
+            [
+                PURPRA_FORM,
+                PURPRA_COMMITTEE,
+                PURPRA_GROUP,
+                PURPRA_REASONS,
+                PURPRA_REASON_MASTER,
+                PURPRA_LINK_KEY_VIEW,
+            ],
+            'mitsuConnection',
+        ),
         HandleFileFormModule,
         FormModule,
         FormmstModule,

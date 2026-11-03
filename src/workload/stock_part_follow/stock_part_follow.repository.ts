@@ -13,7 +13,7 @@ export class StockPartFollowRepository extends BaseRepository {
     create(data: STOCK_PART_FOLLOW) {
         return this.getRepository(STOCK_PART_FOLLOW).save({
             ...data,
-            PLAN: data.PLAN ? data.PLAN : null,
+            PLAN: data.PLAN != 0 ? data.PLAN : null,
         });
     }
 }

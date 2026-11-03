@@ -60,6 +60,9 @@ export class STOCK_PART_FOLLOW_VIEW {
     IDTAG: string;
 
     @ViewColumn()
+    SEQ: number;
+
+    @ViewColumn()
     QTY: number;
 
     @ViewColumn()

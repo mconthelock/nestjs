@@ -24,6 +24,11 @@ export class CreateStockPartFollowDto {
     @IsString()
     PROCESS: string;
 
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    SEQ: number;
+
     @IsOptional()
     @IsNumber()
     @Type(() => Number)

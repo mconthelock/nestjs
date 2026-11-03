@@ -8,7 +8,7 @@ import { RnfrmPartService } from './rnfrm_part.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([RNFRM_PART], 'webformConnection'),
+    TypeOrmModule.forFeature([RNFRM_PART], 'mitsuConnection'),
   ],
   controllers: [RnfrmPartController],
   providers: [RnfrmPartService, RnfrmPartRepository],

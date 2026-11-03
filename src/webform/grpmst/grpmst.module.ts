@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GrpmstRepository } from './grpmst.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([GRPMST], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([GRPMST], 'mitsuConnection')],
     controllers: [GrpmstController],
     providers: [GrpmstService, GrpmstRepository],
     exports: [GrpmstService],

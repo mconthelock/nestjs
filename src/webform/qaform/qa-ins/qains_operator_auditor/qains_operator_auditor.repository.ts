@@ -11,7 +11,7 @@ import { UpdateQainsOADto } from './dto/update-qains_operator_auditor.dto';
 @Injectable()
 export class QainsOARepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
         ) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

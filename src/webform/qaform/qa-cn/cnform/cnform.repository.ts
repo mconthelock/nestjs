@@ -10,7 +10,7 @@ import { CNITMINCHARGE } from 'src/common/Entities/webform/table/CNITMINCHARGE.e
 
 @Injectable()
 export class CnFormRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

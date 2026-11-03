@@ -44,11 +44,11 @@ const SCHEDULE_GROUPS = [
 @Injectable()
 export class AmeccalendarService {
     constructor(
-        @InjectRepository(Ameccalendar, 'amecConnection')
+        @InjectRepository(Ameccalendar, 'datacenterConnection')
         private readonly calendar: Repository<Ameccalendar>,
         private readonly repo: AmeccalendarRepository,
 
-        @InjectDataSource('amecConnection')
+        @InjectDataSource('datacenterConnection')
         private dataSource: DataSource,
     ) {}
 

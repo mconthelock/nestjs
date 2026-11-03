@@ -9,9 +9,9 @@ import { getSafeFields } from 'src/common/utils/Fields.utils';
 @Injectable()
 export class AvmService {
     constructor(
-        @InjectRepository(Avm, 'amecConnection')
+        @InjectRepository(Avm, 'datacenterConnection')
         private avmRepository: Repository<Avm>,
-        @InjectDataSource('amecConnection')
+        @InjectDataSource('datacenterConnection')
         private dataSource: DataSource,
     ) {}
 

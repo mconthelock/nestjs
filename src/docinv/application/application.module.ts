@@ -8,7 +8,7 @@ import { AppsgroupsModule } from '../appsgroups/appsgroups.module';
 @Module({
     imports: [
         AppsgroupsModule,
-        TypeOrmModule.forFeature([Application], 'docinvConnection'),
+        TypeOrmModule.forFeature([Application], 'mitsuConnection'),
     ],
     controllers: [ApplicationController],
     providers: [ApplicationService],

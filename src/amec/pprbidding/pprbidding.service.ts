@@ -10,9 +10,9 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 @Injectable()
 export class PprbiddingService {
     constructor(
-        @InjectRepository(PPRBIDDING, 'webformConnection')
+        @InjectRepository(PPRBIDDING, 'mitsuConnection')
         private repo: Repository<PPRBIDDING>,
-        @InjectDataSource('webformConnection')
+        @InjectDataSource('mitsuConnection')
         private dataSource: DataSource,
         private readonly pprrepo: PprbiddingRepository,
     ) {}

@@ -30,46 +30,46 @@ type FormKey = Pick<CreateMfgEdrDto, 'NFRMNO' | 'VORGNO' | 'CYEAR' | 'CYEAR2' | 
 @Injectable()
 export class MfgEdrService {
   constructor(
-    @InjectRepository(EdrWorktypeMst, 'webformConnection')
+    @InjectRepository(EdrWorktypeMst, 'mitsuConnection')
     private readonly worktypeRepo: Repository<EdrWorktypeMst>,
 
-    @InjectRepository(EdrCauseMst, 'webformConnection')
+    @InjectRepository(EdrCauseMst, 'mitsuConnection')
     private readonly causeRepo: Repository<EdrCauseMst>,
 
-    @InjectRepository(EdrProcessMst, 'webformConnection')
+    @InjectRepository(EdrProcessMst, 'mitsuConnection')
     private readonly processRepo: Repository<EdrProcessMst>,
 
-    @InjectRepository(EdrLineMst, 'webformConnection')
+    @InjectRepository(EdrLineMst, 'mitsuConnection')
     private readonly lineRepo: Repository<EdrLineMst>,
 
-    @InjectRepository(AmecOrders, 'webformConnection')
+    @InjectRepository(AmecOrders, 'mitsuConnection')
     private readonly amecOrdersRepo: Repository<AmecOrders>,
 
-    @InjectRepository(AmecOrdersSchedule, 'webformConnection')
+    @InjectRepository(AmecOrdersSchedule, 'mitsuConnection')
     private readonly amecOrdersScheduleRepo: Repository<AmecOrdersSchedule>,
 
-    @InjectRepository(MfgEdrFormHead, 'webformConnection')
+    @InjectRepository(MfgEdrFormHead, 'mitsuConnection')
     private readonly formHeadRepo: Repository<MfgEdrFormHead>,
 
-    @InjectRepository(MfgEdrFormList, 'webformConnection')
+    @InjectRepository(MfgEdrFormList, 'mitsuConnection')
     private readonly formListRepo: Repository<MfgEdrFormList>,
 
-    @InjectRepository(MfgEdrFormAtt, 'webformConnection')
+    @InjectRepository(MfgEdrFormAtt, 'mitsuConnection')
     private readonly formAttRepo: Repository<MfgEdrFormAtt>,
 
-    @InjectRepository(MfgEdrFormCause4m, 'webformConnection')
+    @InjectRepository(MfgEdrFormCause4m, 'mitsuConnection')
     private readonly formCause4mRepo: Repository<MfgEdrFormCause4m>,
 
-    @InjectRepository(FORM, 'webformConnection')
+    @InjectRepository(FORM, 'mitsuConnection')
     private readonly formRepo: Repository<FORM>,
 
-    @InjectRepository(FLOW, 'webformConnection')
+    @InjectRepository(FLOW, 'mitsuConnection')
     private readonly flowRepo: Repository<FLOW>,
 
-    @InjectDataSource('webformConnection')
+    @InjectDataSource('mitsuConnection')
     private readonly dataSource: DataSource,
 
-    @InjectRepository(VIEW_MFG_EDR_REPORT, 'webformConnection')
+    @InjectRepository(VIEW_MFG_EDR_REPORT, 'mitsuConnection')
     private readonly reportRepository: Repository<VIEW_MFG_EDR_REPORT>,
   ) {}
 

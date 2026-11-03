@@ -6,7 +6,7 @@ import { PAPPSTEP } from 'src/common/Entities/amec/table/PAPPSTEP.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PAPPFLOW, PAPPSTEP], 'webformConnection')],
+  imports: [TypeOrmModule.forFeature([PAPPFLOW, PAPPSTEP], 'mitsuConnection')],
   controllers: [PappflowController],
   providers: [PappflowService],
   exports: [PappflowService],

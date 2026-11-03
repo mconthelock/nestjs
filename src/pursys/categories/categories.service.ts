@@ -16,9 +16,9 @@ import { CategoryAttributes } from 'src/common/Entities/pursys/table/CATEGORY_AT
 @Injectable()
 export class CategoriesService {
     constructor(
-        @InjectRepository(Categories, 'purConnection')
+        @InjectRepository(Categories, 'mitsuConnection')
         private cate: Repository<Categories>,
-        @InjectRepository(CategoryAttributes, 'purConnection')
+        @InjectRepository(CategoryAttributes, 'mitsuConnection')
         private attr: Repository<CategoryAttributes>,
     ) {}
 

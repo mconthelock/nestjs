@@ -10,7 +10,7 @@ import { CreateRnlistDto } from '../rnlist/dto/create-rnlist.dto';
 @Injectable()
 export class RnlistPpRepository extends BaseRepository {
   constructor(
-    @InjectDataSource('webformConnection') ds: DataSource,
+    @InjectDataSource('mitsuConnection') ds: DataSource,
   ) {
     super(ds);
   }

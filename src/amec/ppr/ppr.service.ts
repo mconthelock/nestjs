@@ -8,9 +8,9 @@ import { DataSource, Repository } from 'typeorm';
 @Injectable()
 export class PprService {
   constructor(
-    @InjectRepository(PPR, 'webformConnection')
+    @InjectRepository(PPR, 'mitsuConnection')
     private repo: Repository<PPR>,
-    @InjectDataSource('webformConnection')
+    @InjectDataSource('mitsuConnection')
     private dataSource: DataSource,
   ) {}
 

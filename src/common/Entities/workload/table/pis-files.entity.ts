@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('PIS_FILES')
+@Entity({ name: 'PIS_FILES', schema: 'WORKLOAD' })
 export class PisFiles {
     @PrimaryGeneratedColumn()
     FILES: number;

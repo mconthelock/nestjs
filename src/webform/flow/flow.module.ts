@@ -20,7 +20,7 @@ import { PerformanceLoggerProvider } from 'src/common/logger/performance-logger.
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([FLOW], 'webformConnection'),
+        TypeOrmModule.forFeature([FLOW], 'mitsuConnection'),
         RepModule,
         MailModule,
         forwardRef(() => FormModule),

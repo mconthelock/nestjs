@@ -98,7 +98,7 @@ export class FinDsController {
     }
 
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseForceTransaction()
     @UseInterceptors(getFileUploadInterceptor('attachfile', true, 20))
@@ -113,7 +113,7 @@ export class FinDsController {
     }
 
     @Post('action')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     action(@Body() dto: ActionFinDDto, @Req() req: Request) {
         const ip = getClientIP(req);

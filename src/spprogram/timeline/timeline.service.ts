@@ -1,4 +1,4 @@
-import { InjectRepository } from '@nestjs/typeorm';
+﻿import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
@@ -9,7 +9,7 @@ import { updateTimelineDto } from './dto/update-dto';
 @Injectable()
 export class TimelineService {
   constructor(
-    @InjectRepository(Timeline, 'spsysConnection')
+    @InjectRepository(Timeline, 'mitsuConnection')
     private readonly times: Repository<Timeline>,
   ) {}
 

@@ -37,11 +37,11 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
             providers: [
                 ProductsService,
                 {
-                    provide: getRepositoryToken(Products, 'purConnection'),
+                    provide: getRepositoryToken(Products, 'mitsuConnection'),
                     useValue: mockProductRepository,
                 },
                 {
-                    provide: getDataSourceToken('purConnection'),
+                    provide: getDataSourceToken('mitsuConnection'),
                     useValue: { query: jest.fn() },
                 },
                 { provide: CategoriesService, useValue: mockCategoriesService },

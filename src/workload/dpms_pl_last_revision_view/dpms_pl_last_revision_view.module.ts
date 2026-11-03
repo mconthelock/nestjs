@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { DpmsPlLastRevisionViewService } from './dpms_pl_last_revision_view.service';
 import { DpmsPlLastRevisionViewController } from './dpms_pl_last_revision_view.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,7 +9,7 @@ import { DpmsPlLastRevisionViewRepository } from './dpms_pl_last_revision_view.r
     imports: [
         TypeOrmModule.forFeature(
             [DPMS_PL_LAST_REVISION_VIEW],
-            'workloadConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [DpmsPlLastRevisionViewController],

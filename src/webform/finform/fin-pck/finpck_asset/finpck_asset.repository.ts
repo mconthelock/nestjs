@@ -9,7 +9,7 @@ import { UpdateFinpckAssetDto } from './dto/update-finpck_asset.dto';
 
 @Injectable()
 export class FinpckAssetRepository extends BaseRepository {
-   constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+   constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

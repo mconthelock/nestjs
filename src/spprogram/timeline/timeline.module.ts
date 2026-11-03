@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TimelineService } from './timeline.service';
 import { Timeline } from './entities/timeline.entity';
 import { TimelineController } from './timeline.controller';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Timeline], 'spsysConnection')],
+    imports: [TypeOrmModule.forFeature([Timeline], 'mitsuConnection')],
     controllers: [TimelineController],
     providers: [TimelineService],
     exports: [TimelineService],

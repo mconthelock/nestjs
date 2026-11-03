@@ -1,7 +1,7 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+﻿import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { User } from 'src/amec/users/entities/user.entity';
 
-@Entity('SP_DESIGNER')
+@Entity({ name: 'SP_DESIGNER', schema: 'SPSYS' })
 export class Designer {
   @PrimaryColumn()
   DES_USER: string;

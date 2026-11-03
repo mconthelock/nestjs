@@ -1,4 +1,4 @@
-import {
+﻿import {
     Entity,
     PrimaryColumn,
     Column,
@@ -13,7 +13,7 @@ import { InquiryGroup } from '../../inquiry-group/entities/inquiry-group.entity'
 import { InquiryLog } from '../../inquiry-log/entities/inquiry-log.entity';
 // import { Spcalsheet } from 'src/marketing/spcalsheet/entities/spcalsheet.entity';
 
-@Entity('SP_INQUIRY_DETAIL')
+@Entity({ name: 'SP_INQUIRY_DETAIL', schema: 'SPSYS' })
 export class InquiryDetail {
     @PrimaryGeneratedColumn()
     INQD_ID: number;

@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('ITGC_SPECIALUSER')
+@Entity({ name: 'ITGC_SPECIALUSER', schema: 'DOCINV' })
 export class Specialuser {
   @PrimaryColumn()
   SERVER_NAME: string;

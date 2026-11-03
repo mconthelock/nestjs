@@ -43,7 +43,7 @@ export class PurevaFormController {
     }
 
     @Patch()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     async update(
         // ใช้สำหรับรับเงื่อนไขในการค้นหา (เช่น id หรือ key) ผ่าน Query Parameters

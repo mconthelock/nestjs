@@ -137,7 +137,7 @@ export class FormController {
     @ApiOperation({
         summary: 'Create Form',
     })
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseInterceptors(AnyFilesInterceptor())
     createForm(@Body() dto: CreateFormDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -163,7 +163,7 @@ export class FormController {
 
     @ApiExcludeEndpoint()
     @Delete('deleteForm')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseInterceptors(AnyFilesInterceptor())
     async deleteForm(
         @Body() dto: UpdateFormDto,

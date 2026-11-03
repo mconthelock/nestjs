@@ -8,7 +8,7 @@ import { PTERMCODE } from 'src/common/Entities/amec/table/PTERMCODE.entity';
 @Injectable()
 export class PtermcodeRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
         ) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

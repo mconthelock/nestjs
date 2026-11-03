@@ -1,5 +1,5 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
-@Entity('SP_INQUIRY_CONTROL')
+﻿import { Entity, PrimaryColumn, Column } from 'typeorm';
+@Entity({ name: 'SP_INQUIRY_CONTROL', schema: 'SPSYS' })
 export class InquiryControl {
   @PrimaryColumn()
   CNT_PREFIX: string;

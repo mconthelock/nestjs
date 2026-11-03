@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, Post, Body, Res } from '@nestjs/common';
+﻿import { Controller, Get, Param, Query, Post, Body, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { ExportExcelDto } from './dto/export-excel.dto';
 import { SendVgmMeltService } from './service/send-vgm-melt.service';
@@ -32,21 +32,21 @@ export class SendVgmMeltController {
 
     // สำหรับ Admin ใช้สรัน job แบบ manual โดยเลือกวัน vanndate ที่ต้องการ
     @Get('manual/:vanndate')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async manual(@Param('vanndate') vanndate: string) {
         return await this.jobService.job(vanndate);
     }
 
     // สำหรับ run job แบบอัตโนมัติ โดยไม่ต้องส่ง vanndate เข้ามา
     @Get('job')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async job(){
         return await this.jobService.job();
     }
 
     // สำหรับ user ส่งมาจากหน้า website
     @Post('send-mail')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async sendMail(@Body() dto: SendMailManualDto) {
         return await this.manualService.sendManualByUser(dto);
     }

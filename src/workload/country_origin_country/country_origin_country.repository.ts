@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource, In } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -7,7 +7,7 @@ import { CreateCountryOriginCountryDto } from './dto/create_country_origin_count
 
 @Injectable()
 export class CountryOriginCountryRepository extends BaseRepository {
-    constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

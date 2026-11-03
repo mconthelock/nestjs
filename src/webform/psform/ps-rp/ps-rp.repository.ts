@@ -12,7 +12,7 @@ import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 
 @Injectable()
 export class PsRPRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

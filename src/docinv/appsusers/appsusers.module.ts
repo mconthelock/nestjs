@@ -11,7 +11,7 @@ import { AccesslogModule } from '../accesslog/accesslog.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Appsuser], 'docinvConnection'),
+        TypeOrmModule.forFeature([Appsuser], 'mitsuConnection'),
         UsersModule,
         ApplicationModule,
         AppsgroupsModule,

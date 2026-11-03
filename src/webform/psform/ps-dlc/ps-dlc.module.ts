@@ -15,7 +15,7 @@ import { MailModule } from 'src/common/services/mail/mail.module';
     imports: [
         TypeOrmModule.forFeature(
             [PSDLC_FORM, PSDLC_DETAIL],
-            'webformConnection',
+            'mitsuConnection',
         ),
         FormmstModule,
         FormModule,

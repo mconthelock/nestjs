@@ -15,9 +15,9 @@ import { getSafeFields } from 'src/common/utils/Fields.utils';
 @Injectable()
 export class JopMarReqService {
     constructor(
-        @InjectRepository(JopMarReq, 'amecConnection')
+        @InjectRepository(JopMarReq, 'mitsuConnection')
         private reqRepo: Repository<JopMarReq>,
-        @InjectDataSource('amecConnection')
+        @InjectDataSource('mitsuConnection')
         private dataSource: DataSource,
 
         private readonly amecCalendarService: AmeccalendarService,
@@ -161,14 +161,20 @@ export class JopMarReqService {
                 AND jop.JOP_PONO = MAR.JOP_PONO
                 AND jop.JOP_LINENO = MAR.JOP_LINENO`,
             )
-            .where(new Brackets(qb => {
-                list.forEach((item, i) => {
-                    qb.orWhere(
-                        `(jop.JOP_MFGNO = :mfg${i} AND jop.JOP_PONO = :pono${i} AND jop.JOP_LINENO = :line${i})`,
-                        { [`mfg${i}`]: item.mfg, [`pono${i}`]: item.pono, [`line${i}`]: item.line },
-                    );
-                });
-            }))
+            .where(
+                new Brackets((qb) => {
+                    list.forEach((item, i) => {
+                        qb.orWhere(
+                            `(jop.JOP_MFGNO = :mfg${i} AND jop.JOP_PONO = :pono${i} AND jop.JOP_LINENO = :line${i})`,
+                            {
+                                [`mfg${i}`]: item.mfg,
+                                [`pono${i}`]: item.pono,
+                                [`line${i}`]: item.line,
+                            },
+                        );
+                    });
+                }),
+            )
             .andWhere('jop.JOP_REVISION <= MAR.MAX_REV')
             .andWhere('jop.JOP_REVISION > 0') // เพิ่มเงื่อนไขนี้เพื่อกรองเฉพาะ Revision ที่มีการบันทึกจริงๆ แล้ว
             .getRawMany();
@@ -263,7 +269,11 @@ export class JopMarReqService {
                 'B',
                 'A.JOP_MFGNO = B.JOP_MFGNO AND A.JOP_PONO = B.JOP_PONO AND A.JOP_LINENO = B.JOP_LINENO AND B.LAST_REVISION = A.JOP_REVISION',
             )
-            .innerJoin('(SELECT * FROM AMECUSERALL)', 'U', 'A.JOP_MAR_REQUEST = U.SEMPNO');
+            .innerJoin(
+                '(SELECT * FROM AMECUSERALL)',
+                'U',
+                'A.JOP_MAR_REQUEST = U.SEMPNO',
+            );
         query.distinct(dto.distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
         let select = [];
         if (fields.length > 0) {

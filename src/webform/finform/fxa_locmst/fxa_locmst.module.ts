@@ -10,7 +10,7 @@ import { PPOSITION } from 'src/common/Entities/amec/table/PPOSITION.entity';
 @Module({
   imports: [
     // อย่าลืมเอา Entity หลักไปใส่ใน TypeOrmModule เพื่อให้ Repository ทำงานได้
-    TypeOrmModule.forFeature([FXA_LOCMST , PPOSITION, VORGMST], 'webformConnection'),
+    TypeOrmModule.forFeature([FXA_LOCMST , PPOSITION, VORGMST], 'mitsuConnection'),
   ],
   controllers: [FxaLocmstController],
   providers: [FxaLocmstService , FXALOCMSTRepository ],

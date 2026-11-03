@@ -9,7 +9,7 @@ import { PPRBIDDING } from 'src/common/Entities/amec/table/PPRBIDDING.entity';
 @Injectable()
 export class PprbiddingRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
         ) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

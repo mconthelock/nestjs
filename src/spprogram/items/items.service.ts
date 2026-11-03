@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+﻿import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -10,7 +10,7 @@ import { updateItemsDto } from './dto/updateItems.dto';
 @Injectable()
 export class ItemsService {
     constructor(
-        @InjectRepository(Items, 'spsysConnection')
+        @InjectRepository(Items, 'mitsuConnection')
         private readonly items: Repository<Items>,
     ) {}
 

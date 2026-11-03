@@ -6,7 +6,7 @@ import { WtypeSecpicRepository } from './wtype_secpic.repository';
 import { WtypeSecpicService } from './wtype_secpic.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([WTYPE_SECPIC], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([WTYPE_SECPIC], 'mitsuConnection')],
     controllers: [WtypeSecpicController],
     providers: [WtypeSecpicService, WtypeSecpicRepository],
     exports: [WtypeSecpicService],

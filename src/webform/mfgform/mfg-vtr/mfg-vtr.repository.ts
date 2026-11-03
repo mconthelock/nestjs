@@ -9,8 +9,8 @@ import { DataSource, In } from 'typeorm';
 @Injectable()
 export class MfgVtrRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        @InjectDataSource('purConnection') private purConnection: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') private purConnection: DataSource,
     ) {
         super(ds);
     }
@@ -45,7 +45,9 @@ export class MfgVtrRepository extends BaseRepository {
         const productIds = [
             ...new Set(
                 forms.flatMap((form) =>
-                    form.DETAILS.map((detail) => detail.PRODUCT_ID).filter(Boolean),
+                    form.DETAILS.map((detail) => detail.PRODUCT_ID).filter(
+                        Boolean,
+                    ),
                 ),
             ),
         ];

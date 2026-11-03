@@ -41,13 +41,13 @@ interface FormContext {
 @Injectable()
 export class FormCreateService extends FormService {
     constructor(
-        @InjectRepository(FORM, 'webformConnection')
+        @InjectRepository(FORM, 'mitsuConnection')
         protected readonly form: Repository<FORM>,
 
-        @InjectRepository(FLOW, 'webformConnection')
+        @InjectRepository(FLOW, 'mitsuConnection')
         protected readonly flow: Repository<FLOW>,
 
-        @InjectRepository(FormCounter, 'webformConnection')
+        @InjectRepository(FormCounter, 'mitsuConnection')
         protected readonly count: Repository<FormCounter>,
         protected readonly formmstService: FormmstService,
         protected readonly flowService: FlowService,

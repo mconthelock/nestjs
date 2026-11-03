@@ -21,7 +21,7 @@ import { PurnvfLocationService } from './purnvf_location/purnvf_location.service
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([PURNVF_FORM], 'webformConnection'),
+        TypeOrmModule.forFeature([PURNVF_FORM], 'mitsuConnection'),
         FormmstModule,
         FormModule,
         FlowModule,

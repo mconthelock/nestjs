@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InquiryDetail } from './entities/inquiry-detail.entity';
@@ -8,7 +8,7 @@ import { updateDetailDto } from './dto/update.dto';
 @Injectable()
 export class InquiryDetailService {
     constructor(
-        @InjectRepository(InquiryDetail, 'spsysConnection')
+        @InjectRepository(InquiryDetail, 'mitsuConnection')
         private readonly detail: Repository<InquiryDetail>,
     ) {}
 

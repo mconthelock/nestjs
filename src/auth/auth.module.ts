@@ -39,7 +39,7 @@ import { DummyCard } from 'src/common/Entities/figerdb/views/DUMMYCARD.entity';
             }),
             inject: [ConfigService],
         }),
-        TypeOrmModule.forFeature([PasswordTokens, SLOGIN], 'webformConnection'),
+        TypeOrmModule.forFeature([PasswordTokens, SLOGIN], 'mitsuConnection'),
         TypeOrmModule.forFeature([DummyCard], 'fingerConnection'),
     ],
     providers: [AuthService, JwtStrategy, LocalStrategy, KeyStrategy],

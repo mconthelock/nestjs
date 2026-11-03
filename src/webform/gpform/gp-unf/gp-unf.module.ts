@@ -12,7 +12,7 @@ import { GPUNF_DETAIL } from 'src/common/Entities/webform/table/GPUNF_DETAIL.ent
     imports: [
         TypeOrmModule.forFeature(
             [GPUNF_FORM, GPUNF_DETAIL],
-            'webformConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [GpUnfController],

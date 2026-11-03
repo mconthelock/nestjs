@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
 import { AttachmentsService } from './attachments.service';
@@ -7,7 +7,7 @@ import { AttachmentsController } from './attachments.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Attachments], 'spsysConnection'),
+    TypeOrmModule.forFeature([Attachments], 'mitsuConnection'),
     MulterModule.register({ dest: './uploads' }),
   ],
   controllers: [AttachmentsController],

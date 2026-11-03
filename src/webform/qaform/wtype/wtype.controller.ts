@@ -18,7 +18,7 @@ export class WtypeController {
   }
 
   @Post('search')
-  @UseTransaction('webformConnection')
+  @UseTransaction('mitsuConnection')
   search(@Body() dto: FiltersDto) {
     return this.wtypeService.search(dto);
   }

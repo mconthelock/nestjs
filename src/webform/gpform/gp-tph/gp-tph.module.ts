@@ -21,7 +21,7 @@ import { UsersModule } from 'src/amec/users/users.module';
   imports: [
     TypeOrmModule.forFeature(
       [GPTPH_AREAS,GPTPH_LOCATION,GPTPH_REQ_HEADER,GPTPH_APPLICANT,GPTPH_AREA_RECORD,FLOW],
-      'webformConnection',),
+      'mitsuConnection',),
               FormmstModule,
               FormModule,
               FlowModule,

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { KITTING_EVENT_LOG } from 'src/common/Entities/workload/views/V_KITTING_EVENT_LOG.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -7,7 +7,7 @@ import { DataSource } from 'typeorm';
 @Injectable()
 export class LabelconfirmRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('workloadConnection') private ds: DataSource,
+        @InjectDataSource('mitsuConnection') private ds: DataSource,
     ) {
         super(ds);
     }

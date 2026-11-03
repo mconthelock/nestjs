@@ -10,10 +10,10 @@ import { WelfareDetailView } from 'src/common/Entities/webform/views/VIEW_WELFAR
 @Injectable()
 export class MedicalService {
     constructor(
-        @InjectRepository(OPDRIGHT, 'webformConnection')
+        @InjectRepository(OPDRIGHT, 'mitsuConnection')
         private readonly opdrightRepository: Repository<OPDRIGHT>,
 
-        @InjectRepository(WelfareDetailView, 'webformConnection')
+        @InjectRepository(WelfareDetailView, 'mitsuConnection')
         private readonly form: Repository<WelfareDetailView>,
     ) {}
 

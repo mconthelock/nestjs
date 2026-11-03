@@ -21,7 +21,7 @@ import { HandleFileFormModule } from 'src/webform/handle-file-form/handle-file-f
                 IS_DEVICEMST,
                 LABORCOST,
             ],
-            'webformConnection',
+            'mitsuConnection',
         ),
         FormModule,
         HandleFileFormModule,

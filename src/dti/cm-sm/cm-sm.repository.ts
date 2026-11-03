@@ -8,7 +8,7 @@ import { UpdateCmSmDto } from './dto/update-cm-sm.dto';
 
 @Injectable()
 export class CmSmRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

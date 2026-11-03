@@ -9,7 +9,7 @@ import { TermTrade } from 'src/common/Entities/pursys/table/TERM_TRADE.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([TermPayment, TermTrade], 'purConnection'),
+        TypeOrmModule.forFeature([TermPayment, TermTrade], 'mitsuConnection'),
     ],
     controllers: [TermcodeController],
     providers: [TermcodeService],

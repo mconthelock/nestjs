@@ -10,7 +10,7 @@ import { Repository , Like } from 'typeorm';
 @Injectable()
 export class PappflowService {
 constructor(
-        @InjectRepository(PAPPFLOW, 'webformConnection')
+        @InjectRepository(PAPPFLOW, 'mitsuConnection')
         private readonly pappFlowRepository: Repository<PAPPFLOW>,
     ) {}
   create(createPappflowDto: CreatePappflowDto) {

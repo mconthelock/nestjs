@@ -9,7 +9,7 @@ import { FormDto } from "src/webform/form/dto/form.dto";
 @Injectable()
 export class GpGarRepository extends BaseRepository{
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
     ){
         super(ds);
     }

@@ -35,9 +35,9 @@ export class AuthService {
         private jwtService: JwtService,
         private readonly mailService: MailService,
         private readonly seqno: SequenceOrgService,
-        @InjectRepository(PasswordTokens, 'webformConnection')
+        @InjectRepository(PasswordTokens, 'mitsuConnection')
         private readonly pwd: Repository<PasswordTokens>,
-        @InjectRepository(SLOGIN, 'webformConnection')
+        @InjectRepository(SLOGIN, 'mitsuConnection')
         private readonly card: Repository<SLOGIN>,
         @InjectRepository(DummyCard, 'fingerConnection')
         private readonly dummy: Repository<DummyCard>,

@@ -45,7 +45,7 @@ export class StInpController {
     private readonly path = `${process.env.AMEC_FILE_PATH}${process.env.STATE}/safety/image/Patrol/`;
 
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(getFileUploadInterceptor('PA_IMAGE[]', true, 30))
     Create(
@@ -63,7 +63,7 @@ export class StInpController {
     }
 
     @Post('saveAndAction')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(getFileUploadInterceptor('PA_IMAGE[]', true, 30))
     saveDraft(
@@ -76,7 +76,7 @@ export class StInpController {
     }
 
     @Post('setCorrective')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     SetCorrective(@Body() dto: CorrectiveStInpDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -84,7 +84,7 @@ export class StInpController {
     }
 
     @Patch('setCorrectiveDetail')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(getFileUploadInterceptor('PA_IMAGE_AFTER[]', true, 30))
     SetCorrectiveDetail(
@@ -102,7 +102,7 @@ export class StInpController {
     }
 
     @Patch('setEvaluate')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     SetEvaluate(@Body() dto: EvaluateStInpDto, @Req() req: Request) {
         const ip = getClientIP(req);

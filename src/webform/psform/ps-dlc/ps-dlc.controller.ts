@@ -28,7 +28,7 @@ export class PSDLCController {
     constructor(private readonly psdlcService: PSDLCService) {}
 
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseInterceptors(getFileUploadInterceptor())
     create(@Body() dto: CreatePsdlcReqFormDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -58,7 +58,7 @@ export class PSDLCController {
     }
 
     @Patch()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     update(@Body() dto: UpdateflowPSDLCDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -66,7 +66,7 @@ export class PSDLCController {
     }
 
     @Patch('/updateForm')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     updateForm(@Body() dto: UpdatedataPSDLCDto, @Req() req: Request) {
         const ip = getClientIP(req);

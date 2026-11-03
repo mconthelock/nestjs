@@ -14,7 +14,7 @@ import { MfgEdrTargetMaster } from '../../../../common/Entities/webform/table/mf
 @Injectable()
 export class MfgEdrTargetMasterService {
   constructor(
-    @InjectRepository(MfgEdrTargetMaster, 'webformConnection')
+    @InjectRepository(MfgEdrTargetMaster, 'mitsuConnection')
     private readonly targetMasterRepository: Repository<MfgEdrTargetMaster>,
   ) {}
 

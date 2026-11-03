@@ -13,13 +13,10 @@ if (process.env.HOST == 'AMEC') {
         imports: [],
         inject: [ConfigService, WINSTON_MODULE_PROVIDER],
         useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
-            // inject: [ConfigService],
-            // useFactory: async (config: ConfigService) => ({
             type: 'oracle',
             username: process.env.IDS_USER,
             password: process.env.IDS_PASSWORD,
             connectString: `${process.env.IDS_HOST}:${process.env.IDS_PORT}/${process.env.IDS_SERVICE}?expire_time=5`,
-            //entities: [__dirname + '/../../ids/**/*.entity{.ts,.js}'],
             autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),

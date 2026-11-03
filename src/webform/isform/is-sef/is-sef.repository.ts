@@ -10,8 +10,8 @@ import { DataSource } from 'typeorm';
 @Injectable()
 export class IsSefRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        @InjectDataSource('docinvConnection') private docinvDs: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') private docinvDs: DataSource,
     ) {
         super(ds);
     }

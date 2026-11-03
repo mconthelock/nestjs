@@ -7,7 +7,7 @@ import { QainsOARepository } from './qains_operator_auditor.repository';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([QAINS_OPERATOR_AUDITOR], 'webformConnection'),
+        TypeOrmModule.forFeature([QAINS_OPERATOR_AUDITOR], 'mitsuConnection'),
     ],
     controllers: [QainsOAController],
     providers: [QainsOAService, QainsOARepository],

@@ -1,8 +1,8 @@
-import { Column, Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+﻿import { Column, Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { SpUser } from 'src/spprogram/spusers/spusers.entity';
 import { Status } from 'src/spprogram/status/entities/status.entity';
 
-@Entity('SP_INQUIRY_HISTORY')
+@Entity({ name: 'SP_INQUIRY_HISTORY', schema: 'SPSYS' })
 export class History {
   @PrimaryColumn()
   INQ_NO: string;

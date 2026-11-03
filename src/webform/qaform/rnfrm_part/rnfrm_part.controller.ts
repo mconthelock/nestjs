@@ -21,7 +21,7 @@ export class RnfrmPartController {
   }
 
   @Post('search')
-  @UseTransaction('webformConnection')
+  @UseTransaction('mitsuConnection')
   search(@Body() dto: FiltersDto) {
     return this.rnfrmPartService.search(dto);
   }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { AmecordersScheduleService } from './amecorders_schedule.service';
 import { AmecordersScheduleController } from './amecorders_schedule.controller';
 import { AmecordersScheduleRepository } from './amecorders_schedule.repository';
@@ -7,7 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([AmecOrdersSchedule], 'workloadConnection'),
+        TypeOrmModule.forFeature([AmecOrdersSchedule], 'mitsuConnection'),
     ],
     controllers: [AmecordersScheduleController],
     providers: [AmecordersScheduleService, AmecordersScheduleRepository],

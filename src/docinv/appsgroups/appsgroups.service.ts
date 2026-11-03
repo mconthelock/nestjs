@@ -7,7 +7,7 @@ import { CreateAppsgroupDto } from './dto/create-appsgroup.dto';
 @Injectable()
 export class AppsgroupsService {
     constructor(
-        @InjectRepository(Appsgroup, 'docinvConnection')
+        @InjectRepository(Appsgroup, 'mitsuConnection')
         private readonly gps: Repository<Appsgroup>,
     ) {}
 

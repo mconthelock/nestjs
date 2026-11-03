@@ -16,7 +16,7 @@ import { Vendors } from 'src/common/Entities/pursys/table/VENDORS.entity';
 @Injectable()
 export class VendorsService {
     constructor(
-        @InjectRepository(Vendors, 'purConnection')
+        @InjectRepository(Vendors, 'mitsuConnection')
         private readonly vnd: Repository<Vendors>,
     ) {}
 

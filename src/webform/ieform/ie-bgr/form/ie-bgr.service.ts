@@ -33,9 +33,9 @@ import { FormCreateService } from 'src/webform/form/create-form.service';
 @Injectable()
 export class IeBgrService {
     constructor(
-        @InjectRepository(IEBGR_REPORT_VIEW, 'webformConnection')
+        @InjectRepository(IEBGR_REPORT_VIEW, 'mitsuConnection')
         private readonly reportRepo: Repository<IEBGR_REPORT_VIEW>,
-        @InjectDataSource('webformConnection')
+        @InjectDataSource('mitsuConnection')
         private dataSource: DataSource,
         private readonly formmstService: FormmstService,
         private readonly ebudgetformService: EbgreqformService,

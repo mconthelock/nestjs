@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { createHistoryDto } from './dto/create.dto';
@@ -8,7 +8,7 @@ import { History } from './entities/history.entity';
 @Injectable()
 export class HistoryService {
   constructor(
-    @InjectRepository(History, 'spsysConnection')
+    @InjectRepository(History, 'mitsuConnection')
     private readonly history: Repository<History>,
   ) {}
 

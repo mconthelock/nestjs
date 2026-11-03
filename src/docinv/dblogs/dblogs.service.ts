@@ -22,7 +22,7 @@ dayjs.extend(timezone);
 @Injectable()
 export class DblogsService {
     constructor(
-        @InjectRepository(Amecdblog, 'docinvConnection')
+        @InjectRepository(Amecdblog, 'mitsuConnection')
         private readonly amec: Repository<Amecdblog>,
 
         @InjectRepository(IsodbLog, 'auditConnection')

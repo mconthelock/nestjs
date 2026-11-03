@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { CountryOriginService } from './service/country_origin.service';
 import { CountryOriginController } from './country_origin.controller';
 import { CountryOriginRepository } from './country_origin.repository';
@@ -9,7 +9,7 @@ import { CountryOriginCountryModule } from '../country_origin_country/country_or
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([COUNTRY_ORIGIN], 'workloadConnection'),
+        TypeOrmModule.forFeature([COUNTRY_ORIGIN], 'mitsuConnection'),
         CountryOriginCountryModule,
     ],
     controllers: [CountryOriginController],

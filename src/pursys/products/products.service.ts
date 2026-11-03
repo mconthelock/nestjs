@@ -17,9 +17,9 @@ import { UpdateProductDto } from './dto/update-product.dto';
 @Injectable()
 export class ProductsService {
     constructor(
-        @InjectRepository(Products, 'purConnection')
+        @InjectRepository(Products, 'mitsuConnection')
         private prod: Repository<Products>,
-        @InjectDataSource('purConnection')
+        @InjectDataSource('mitsuConnection')
         private ds: DataSource,
         private cate: CategoriesService,
         private optionRegistry: OptionRegistryService,

@@ -14,7 +14,7 @@ import { USRAUTH } from 'src/common/Entities/webform/table/USRAUTH.entity';
     imports: [
         TypeOrmModule.forFeature(
             [FORMMST, FORMMST_GROUP, USRAUTH],
-            'webformConnection',
+            'mitsuConnection',
         ),
         UsersModule,
     ],

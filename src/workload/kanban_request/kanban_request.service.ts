@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { KanbanRequestRepository } from './kanban_request.repository';
 import { CreateKanbanRequestDto } from './dto/create-kanban_request.dto';
 import { MailService } from 'src/common/services/mail/mail.service';
-import { Psection } from 'src/amec/psection/entities/psection.entity';
+import { Psection } from 'src/common/Entities/amec/table/PSECTION.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -77,11 +77,14 @@ export class KanbanRequestService {
 
         await this.mailService.sendMail({
             from: `PC Section<${process.env.MAIL_FROM}>`,
-            to: ['chanida@mitsubishielevatorasia.co.th','benjamad@MitsubishiElevatorAsia.co.th'],
+            to: [
+                'chanida@mitsubishielevatorasia.co.th',
+                'benjamad@MitsubishiElevatorAsia.co.th',
+            ],
             subject: `Order carton box issue ${issueDate}`,
             template: 'mfgmonitor/kanban_request/issue-kanban',
             context: mailContext,
-            bcc: 'perapatr@mitsubishielevatorasia.co.th'
+            bcc: 'perapatr@mitsubishielevatorasia.co.th',
         });
 
         return { message: 'Insert Issue Kanban success', IK_ID: head };

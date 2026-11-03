@@ -1,4 +1,4 @@
-import { BadRequestException, Body, ConflictException, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+﻿import { BadRequestException, Body, ConflictException, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
@@ -14,7 +14,7 @@ const MASTERS = {
 // PILINE-only management endpoints. Identifiers come only from this allowlist.
 @Controller('workload/piline_master_management')
 export class PilineMasterManagementController {
-    constructor(@InjectDataSource('workloadConnection') private readonly db: DataSource) {}
+    constructor(@InjectDataSource('mitsuConnection') private readonly db: DataSource) {}
 
     private config(kind: string) {
         if (!Object.prototype.hasOwnProperty.call(MASTERS,kind)) throw new BadRequestException('Unknown master');

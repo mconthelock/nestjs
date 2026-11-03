@@ -6,7 +6,7 @@ import { Ameccalendar } from './entities/ameccalendar.entity';
 import { AmeccalendarRepository } from './ameccalendar.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Ameccalendar], 'amecConnection')],
+    imports: [TypeOrmModule.forFeature([Ameccalendar], 'datacenterConnection')],
     controllers: [AmeccalendarController],
     providers: [AmeccalendarService, AmeccalendarRepository],
     exports: [AmeccalendarService],

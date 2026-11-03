@@ -13,7 +13,7 @@ import { PsAdjController } from './ps-adj.controller';
         FormModule,
         TypeOrmModule.forFeature(
             [ADJREASONMST, ADJORDREQ, ADJODRATTFILE],
-            'webformConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [PsAdjController],

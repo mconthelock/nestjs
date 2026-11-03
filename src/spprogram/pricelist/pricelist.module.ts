@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PricelistService } from './pricelist.service';
 import { PricelistController } from './pricelist.controller';
@@ -7,8 +7,8 @@ import { ItemsCustomer } from '../items-customer/entities/items-customer.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Pricelist], 'spsysConnection'),
-    TypeOrmModule.forFeature([ItemsCustomer], 'spsysConnection'),
+    TypeOrmModule.forFeature([Pricelist], 'mitsuConnection'),
+    TypeOrmModule.forFeature([ItemsCustomer], 'mitsuConnection'),
   ],
   controllers: [PricelistController],
   providers: [PricelistService],

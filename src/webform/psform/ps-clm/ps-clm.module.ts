@@ -19,7 +19,7 @@ import { PsClmService } from './ps-clm.service';
     imports: [
         TypeOrmModule.forFeature(
             [PSCLM_FORM, PSCLM_DETAIL],
-            'webformConnection',
+            'mitsuConnection',
         ),
         FormmstModule,
         FormModule,

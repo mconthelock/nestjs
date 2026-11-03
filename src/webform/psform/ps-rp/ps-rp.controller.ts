@@ -25,7 +25,7 @@ export class PsRPController {
     constructor(private readonly psRpService: PsRPService) {}
 
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseInterceptors(getFileUploadInterceptor())
     create(@Body() dto: CreatePsrpReqFormDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -72,7 +72,7 @@ export class PsRPController {
     }
 
     @Patch()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     update(@Body() dto: UpdateflowPSrpDto, @Req() req: Request) {
         const ip = getClientIP(req);

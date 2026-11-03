@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MaterialStatusInquiryViewService } from './material_status_inquiry_view.service';
 import { MaterialStatusInquiryViewController } from './material_status_inquiry_view.controller';
@@ -9,7 +9,7 @@ import { MaterialStatusInquiryViewRepository } from './material_status_inquiry_v
     imports: [
         TypeOrmModule.forFeature(
             [MATERIAL_STATUS_INQUIRY_VIEW],
-            'workloadConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [MaterialStatusInquiryViewController],

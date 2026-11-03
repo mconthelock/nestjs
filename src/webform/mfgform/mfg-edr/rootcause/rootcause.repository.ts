@@ -9,10 +9,10 @@ import { AmecOrders } from 'src/common/Entities/workload/table/amecorders.entity
 @Injectable()
 export class RootcauseRepository {
   constructor(
-    @InjectRepository(VIEW_MFG_EDR_HEAD_ROOTCAUSE, 'webformConnection')
+    @InjectRepository(VIEW_MFG_EDR_HEAD_ROOTCAUSE, 'mitsuConnection')
     private readonly repository: Repository<VIEW_MFG_EDR_HEAD_ROOTCAUSE>,
 
-    @InjectRepository(AmecOrders, 'webformConnection')
+    @InjectRepository(AmecOrders, 'mitsuConnection')
     private readonly amecOrdersRepository: Repository<AmecOrders>,
   ) {}
 

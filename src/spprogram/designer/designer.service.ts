@@ -1,4 +1,4 @@
-import { Designer } from './entities/designer.entity';
+﻿import { Designer } from './entities/designer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class DesignerService {
   constructor(
-    @InjectRepository(Designer, 'spsysConnection')
+    @InjectRepository(Designer, 'mitsuConnection')
     private readonly des: Repository<Designer>,
   ) {}
 

@@ -6,7 +6,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 @Injectable()
 export class IeBgrRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
         ) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

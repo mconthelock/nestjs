@@ -94,7 +94,7 @@ export class FlowController {
     }
 
     @Delete('deleteFlowStep')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     async deleteFlowStep(
         @Body() dto: DeleteFlowStepDto,
     ): Promise<{ message: string; status: boolean }> {
@@ -131,7 +131,7 @@ export class FlowController {
     }
 
     @Post('doaction')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseInterceptors(AnyFilesInterceptor())
     async doAction(@Body() dto: doactionFlowDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -145,13 +145,13 @@ export class FlowController {
     }
 
     @Post('resetFlow')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     async resetFlow(@Body() form: FormDto) {
         return await this.flowService.resetFlow(form);
     }
 
     @Post('insertFlowStep')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     async insertFlowStep(@Body() dto: insertFlowDto) {
         return await this.insertFlowStepService.insertFlowStep(dto);

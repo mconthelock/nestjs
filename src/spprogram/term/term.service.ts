@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Term } from './entities/term.entity';
@@ -6,7 +6,7 @@ import { Term } from './entities/term.entity';
 @Injectable()
 export class TermService {
   constructor(
-    @InjectRepository(Term, 'spsysConnection')
+    @InjectRepository(Term, 'mitsuConnection')
     private readonly term: Repository<Term>,
   ) {}
 

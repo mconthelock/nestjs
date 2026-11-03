@@ -21,30 +21,34 @@ export class TransactionInterceptor implements NestInterceptor {
     private dataSourceMap: Record<string, DataSource>;
 
     constructor(
+        @InjectDataSource('mitsuConnection')
+        private mitsuDS: DataSource,
         @InjectDataSource('escsConnection')
         private escsDS: DataSource,
-        @InjectDataSource('webformConnection')
-        private webformDS: DataSource,
-        @InjectDataSource('workloadConnection')
-        private workloadDS: DataSource,
+        // @InjectDataSource('mitsuConnection')
+        // private webformDS: DataSource,
+        // @InjectDataSource('mitsuConnection')
+        // private workloadDS: DataSource,
         @InjectDataSource('datacenterConnection')
         private datacenterDS: DataSource,
         @InjectDataSource('elmesConnection')
         private elmesDS: DataSource,
-        @InjectDataSource('purConnection')
-        private purDS: DataSource,
+        // @InjectDataSource('purConnection')
+        // private purDS: DataSource,
         @InjectDataSource('gpreportConnection')
         private gpDS: DataSource,
         private readonly reflector: Reflector,
     ) {
         // เพิ่ม data sources ที่นี่เมื่อมีการเพิ่ม connection ใหม่
         this.dataSourceMap = {
+            mitsuConnection: this.mitsuDS,
             escsConnection: this.escsDS,
-            webformConnection: this.webformDS,
-            workloadConnection: this.workloadDS,
+            webformConnection: this.mitsuDS,
+            workloadConnection: this.mitsuDS,
+            spsysConnection: this.mitsuDS,
             datacenterConnection: this.datacenterDS,
             elmesConnection: this.elmesDS,
-            purConnection: this.purDS,
+            // purConnection: this.purDS,
             gpreportConnection: this.gpDS,
         };
     }

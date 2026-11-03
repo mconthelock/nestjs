@@ -7,7 +7,7 @@ import { ORGANIZATIONS } from 'src/common/Entities/webform/views/ORGANIZATIONS.e
 
 @Injectable()
 export class OrganizationsRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

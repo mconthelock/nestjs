@@ -1,4 +1,4 @@
-import { ItemsCustomer } from './entities/items-customer.entity';
+﻿import { ItemsCustomer } from './entities/items-customer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
@@ -9,7 +9,7 @@ import { updateItemCustomerDto } from './dto/update-item-customer.dto';
 @Injectable()
 export class ItemsCustomerService {
   constructor(
-    @InjectRepository(ItemsCustomer, 'spsysConnection')
+    @InjectRepository(ItemsCustomer, 'mitsuConnection')
     private readonly itemscus: Repository<ItemsCustomer>,
   ) {}
 

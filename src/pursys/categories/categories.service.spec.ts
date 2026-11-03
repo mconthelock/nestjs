@@ -19,7 +19,7 @@ describe('CategoriesService - Nested Creation', () => {
             providers: [
                 CategoriesService,
                 {
-                    provide: getRepositoryToken(Categories, 'purConnection'),
+                    provide: getRepositoryToken(Categories, 'mitsuConnection'),
                     useValue: mockCategoryRepository,
                 },
             ],

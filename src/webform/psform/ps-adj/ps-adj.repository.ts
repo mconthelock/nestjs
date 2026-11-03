@@ -22,7 +22,7 @@ import { ADJODRATTFILE } from 'src/common/Entities/webform/table/ADJODRATTFILE.e
 
 @Injectable()
 export class PsAdjRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
     createReason(dto: CreateReasonDto) {

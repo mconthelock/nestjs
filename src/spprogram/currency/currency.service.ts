@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 
@@ -8,7 +8,7 @@ import { updateDto } from './dto/update.dto';
 @Injectable()
 export class CurrencyService {
   constructor(
-    @InjectRepository(Currency, 'spsysConnection')
+    @InjectRepository(Currency, 'mitsuConnection')
     private readonly curr: Repository<Currency>,
   ) {}
 

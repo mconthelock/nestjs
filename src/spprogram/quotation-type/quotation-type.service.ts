@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 
@@ -8,7 +8,7 @@ import { createDto } from './dto/create.dto';
 @Injectable()
 export class QuotationTypeService {
   constructor(
-    @InjectRepository(QuotationType, 'spsysConnection')
+    @InjectRepository(QuotationType, 'mitsuConnection')
     private readonly quotype: Repository<QuotationType>,
   ) {}
 

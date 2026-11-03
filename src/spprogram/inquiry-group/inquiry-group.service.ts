@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { InquiryGroup } from './entities/inquiry-group.entity';
@@ -9,7 +9,7 @@ import { updateInqGroupDto } from './dto/update.dto';
 @Injectable()
 export class InquiryGroupService {
   constructor(
-    @InjectRepository(InquiryGroup, 'spsysConnection')
+    @InjectRepository(InquiryGroup, 'mitsuConnection')
     private readonly group: Repository<InquiryGroup>,
   ) {}
 

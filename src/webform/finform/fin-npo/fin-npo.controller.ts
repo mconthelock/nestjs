@@ -34,21 +34,21 @@ export class FinnpoController {
     }
 
     @Post('expense')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     createExpense(@Body() dto: Record<string, unknown>) {
         return this.finnpoService.createExpense(dto);
     }
 
     @Patch('expense')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     updateExpense(@Body() dto: Record<string, unknown>) {
         return this.finnpoService.updateExpense(dto);
     }
 
     @Delete('expense')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     deleteExpense(@Body() dto: Record<string, unknown>) {
         return this.finnpoService.deleteExpense(dto);
@@ -60,21 +60,21 @@ export class FinnpoController {
     }
 
     @Post('vendor')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     createVendor(@Body() dto: Record<string, unknown>) {
         return this.finnpoService.createVendor(dto);
     }
 
     @Patch('vendor')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     updateVendor(@Body() dto: Record<string, unknown>) {
         return this.finnpoService.updateVendor(dto);
     }
 
     @Delete('vendor')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     deleteVendor(@Body() dto: Record<string, unknown>) {
         return this.finnpoService.deleteVendor(dto);
@@ -113,7 +113,7 @@ export class FinnpoController {
     }
 
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(getFileUploadInterceptor('attachfile', true, 20))
     create(
@@ -138,14 +138,14 @@ export class FinnpoController {
     }
 
     @Post('action')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     action(@Body() dto: ActionFinnpoDto, @Req() req: Request) {
         return this.finnpoService.action(dto, getClientIP(req));
     }
 
     @Post('update')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(getFileUploadInterceptor('attachfile', true, 20))
     update(

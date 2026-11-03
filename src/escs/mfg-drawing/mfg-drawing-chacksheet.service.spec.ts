@@ -12,7 +12,7 @@ import { GeneralPartListService } from 'src/general-part-list/general-part-list.
 import { DrawingParserHelper } from './helpers/drawing-parser.helper';
 import { DrawingMatcherHelper } from './helpers/drawing-matcher.helper';
 import { DrawingFileHelper } from './helpers/drawing-file.helper';
-import { F001KP } from 'src/as400/shopf/f001kp/entities/f001kp.entity';
+import { F001KP } from 'src/amecmfg/f001kp/entities/f001kp.entity';
 import { DrawingResolverHelper } from './helpers/drawing-resolver.helper';
 
 describe('MfgDrawingCreateChecksheetService', () => {

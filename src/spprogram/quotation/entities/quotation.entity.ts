@@ -1,4 +1,4 @@
-import {
+﻿import {
   Column,
   Entity,
   JoinColumn,
@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 
-@Entity('SP_QUOTATION')
+@Entity({ name: 'SP_QUOTATION', schema: 'SPSYS' })
 export class Quotation {
   @PrimaryGeneratedColumn()
   QUO_ID: number;

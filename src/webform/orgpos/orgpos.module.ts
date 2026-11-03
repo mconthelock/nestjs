@@ -6,7 +6,7 @@ import { OrgposRepository } from './orgpos.repository';
 import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ORGPOS], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([ORGPOS], 'mitsuConnection')],
     controllers: [OrgposController],
     providers: [OrgposService, OrgposRepository],
     exports: [OrgposService, OrgposRepository],

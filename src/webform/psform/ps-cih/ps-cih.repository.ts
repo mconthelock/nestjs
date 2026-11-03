@@ -9,7 +9,7 @@ import { INV_CHECK_LOG } from 'src/common/Entities/skid/table/PSINV_CHECK_LOG.en
 
 @Injectable()
 export class PsCihRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

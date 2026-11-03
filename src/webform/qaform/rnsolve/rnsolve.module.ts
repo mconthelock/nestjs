@@ -8,7 +8,7 @@ import { RnsolveRepository } from './rnsolve.repository';
 import { RnsolveService } from './rnsolve.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RNSOLVE], 'webformConnection')],
+  imports: [TypeOrmModule.forFeature([RNSOLVE], 'mitsuConnection')],
   controllers: [RnsolveController],
   providers: [RnsolveService, RnsolveRepository],
   exports: [RnsolveService],

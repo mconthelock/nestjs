@@ -4,10 +4,13 @@ import { KanbanRequestController } from './kanban_request.controller';
 import { KanbanRequestRepository } from './kanban_request.repository';
 import { MailModule } from 'src/common/services/mail/mail.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Psection } from 'src/amec/psection/entities/psection.entity';
+import { Psection } from 'src/common/Entities/amec/table/PSECTION.entity';
 
 @Module({
-    imports: [MailModule, TypeOrmModule.forFeature([Psection], 'amecConnection')],
+    imports: [
+        MailModule,
+        TypeOrmModule.forFeature([Psection], 'amecConnection'),
+    ],
     controllers: [KanbanRequestController],
     providers: [KanbanRequestService, KanbanRequestRepository],
 })

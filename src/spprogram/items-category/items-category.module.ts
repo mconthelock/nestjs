@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ItemsCategoryService } from './items-category.service';
 import { ItemsCategoryController } from './items-category.controller';
 import { Category } from '../items-category/entities/category.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([Category], 'spsysConnection')],
+  imports: [TypeOrmModule.forFeature([Category], 'mitsuConnection')],
   controllers: [ItemsCategoryController],
   providers: [ItemsCategoryService],
 })

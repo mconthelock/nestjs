@@ -8,7 +8,7 @@ import { SECPIC } from 'src/webform/qaform/secpic/entities/secpic.entity';
 
 @Injectable()
 export class WtypeSecpicRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

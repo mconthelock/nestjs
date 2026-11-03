@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { DpmsPackingListMainService } from './dpms_packing_list_main.service';
 import { DpmsPackingListMainController } from './dpms_packing_list_main.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,7 +11,7 @@ import { S011mpModule } from 'src/datacenter/s011mp/s011mp.module';
     imports: [
         TypeOrmModule.forFeature(
             [DPMS_PACKING_LIST_MAIN],
-            'workloadConnection',
+            'mitsuConnection',
         ),
         // S001kpModule,
         S011mpModule,

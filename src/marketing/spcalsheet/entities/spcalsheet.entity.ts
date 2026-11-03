@@ -1,7 +1,7 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+﻿import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 // import { InquiryDetail } from 'src/spprogram/inquiry-detail/entities/inquiry-detail.entity';
 
-@Entity('SPCALSHEET_DETAIL')
+@Entity({ name: 'SPCALSHEET_DETAIL', schema: 'SPSYS' })
 export class Spcalsheet {
   @PrimaryColumn()
   INQNO: string;

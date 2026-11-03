@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+﻿import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CountryOriginService } from './service/country_origin.service';
 import { MigrateService } from './service/migrate.service';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
@@ -12,7 +12,7 @@ export class CountryOriginController {
     ) {}
 
     @Get('migrate')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     migrate() {
         return this.migrateService.migrateCountryOrigin();
     }
@@ -23,13 +23,13 @@ export class CountryOriginController {
     // }
 
     @Post()
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     create(@Body() dto: CreateCountryOriginDto) {
         return this.service.create(dto);
     }
 
     @Post('upload-excel')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     uploadExcel(@Body() dto: CreateCountryOriginDto[]) {
         return this.service.create(dto);
     }

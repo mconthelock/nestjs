@@ -7,7 +7,7 @@ import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
 
 @Injectable()
 export class OrgposRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

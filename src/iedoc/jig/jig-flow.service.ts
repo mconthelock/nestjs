@@ -11,7 +11,7 @@ import { JigFormKeyDto } from './dto/jig-form.dto';
 @Injectable()
 export class JigFlowService {
     constructor(
-        @InjectDataSource('webformConnection') private readonly webform: DataSource,
+        @InjectDataSource('mitsuConnection') private readonly webform: DataSource,
         private readonly flows: FlowService,
         private readonly insert: InsertFlowStepService,
         private readonly remove: DeleteFlowStepService,

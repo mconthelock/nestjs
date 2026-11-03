@@ -11,7 +11,7 @@ import { WelfareDetailView } from 'src/common/Entities/webform/views/VIEW_WELFAR
     imports: [
         TypeOrmModule.forFeature(
             [OPDRIGHT, WelfareDetailView],
-            'webformConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [MedicalController],

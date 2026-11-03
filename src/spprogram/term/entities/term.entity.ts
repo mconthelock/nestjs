@@ -1,4 +1,4 @@
-import {
+﻿import {
   Entity,
   PrimaryColumn,
   Column,
@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 
-@Entity('SP_DELIVERY_TERM')
+@Entity({ name: 'SP_DELIVERY_TERM', schema: 'SPSYS' })
 export class Term {
   @PrimaryColumn()
   TERM_ID: string;

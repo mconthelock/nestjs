@@ -37,7 +37,7 @@ export class IeBgrController {
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/IE/IEBGR/` as string;
 
     @Post('create')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(
         getFileUploadInterceptor([
@@ -83,7 +83,7 @@ export class IeBgrController {
     }
 
     @Post('draft')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(
         getFileUploadInterceptor([
@@ -129,7 +129,7 @@ export class IeBgrController {
     }
 
     @Post('lastApprove')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     lastApprove(@Body() dto: LastApvIeBgrDto, @Req() req: Request) {
         const ip = getClientIP(req);

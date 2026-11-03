@@ -46,7 +46,7 @@ export class PurVmmService {
         private readonly mailService: MailService,
         private readonly userService: AmecUserAllService,
 
-        @InjectRepository(Vendors, 'purConnection')
+        @InjectRepository(Vendors, 'mitsuConnection')
         private readonly vnd: Repository<Vendors>,
     ) {}
 

@@ -9,7 +9,7 @@ import { CategoriesModule } from '../categories/categories.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Products], 'purConnection'),
+        TypeOrmModule.forFeature([Products], 'mitsuConnection'),
         CategoriesModule,
     ],
     controllers: [ProductsController],

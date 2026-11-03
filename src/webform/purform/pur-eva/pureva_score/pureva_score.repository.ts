@@ -8,7 +8,7 @@ import { CreatePurevaScoreDto } from './dto/create-pureva_score.dto';
 
 @Injectable()
 export class PurevaScoreRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

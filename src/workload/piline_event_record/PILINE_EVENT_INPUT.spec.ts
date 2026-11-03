@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+﻿import 'reflect-metadata';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getDataSourceToken } from '@nestjs/typeorm';
@@ -92,7 +92,7 @@ describe('Production event input API', () => {
                 PilineEventInputService,
                 PilineEventFilesService,
                 {
-                    provide: getDataSourceToken('workloadConnection'),
+                    provide: getDataSourceToken('mitsuConnection'),
                     useValue: ds,
                 },
             ],

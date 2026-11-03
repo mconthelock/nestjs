@@ -9,7 +9,7 @@ import { RNSOLVE } from 'src/common/Entities/webform/table/RNSOLVE.entity';
 @Injectable()
 export class RnsolveRepository extends BaseRepository {
   constructor(
-    @InjectDataSource('webformConnection') ds: DataSource,
+    @InjectDataSource('mitsuConnection') ds: DataSource,
   ) {
     super(ds);
   }

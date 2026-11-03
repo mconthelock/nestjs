@@ -9,7 +9,7 @@ import { ISOFF_VARIEDOFF } from 'src/common/Entities/webform/table/ISOFF_VARIEDO
     imports: [
         TypeOrmModule.forFeature(
             [ISOFF_VARIEDOFF, LOGIN_REASON],
-            'webformConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [IsOffController],

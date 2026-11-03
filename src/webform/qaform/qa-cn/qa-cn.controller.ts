@@ -29,7 +29,7 @@ export class QaCnController {
     private readonly path =
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/QA/CN/` as string;
     @Post('create')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(
         getFileUploadInterceptor([
@@ -63,7 +63,7 @@ export class QaCnController {
     }
 
     @Patch('approve')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(
         getFileUploadInterceptor([

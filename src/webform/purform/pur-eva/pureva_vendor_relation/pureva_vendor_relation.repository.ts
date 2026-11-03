@@ -8,7 +8,7 @@ import { CreatePurevaVendorRelationDto } from './dto/create-pureva_vendor_relati
 
 @Injectable()
 export class PurevaRelationRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

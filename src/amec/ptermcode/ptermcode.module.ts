@@ -6,7 +6,7 @@ import { PTERMCODE } from 'src/common/Entities/amec/table/PTERMCODE.entity';
 import { PtermcodeRepository } from './ptermcode.repository';
 
 @Module({
- imports: [TypeOrmModule.forFeature([PTERMCODE], 'webformConnection')],
+ imports: [TypeOrmModule.forFeature([PTERMCODE], 'mitsuConnection')],
     controllers: [PtermcodeController],
     providers: [PtermcodeService, PtermcodeRepository],
     exports: [PtermcodeService],

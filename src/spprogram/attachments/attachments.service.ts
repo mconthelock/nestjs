@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -8,7 +8,7 @@ import { createAttDto } from './dto/create.dto';
 @Injectable()
 export class AttachmentsService {
   constructor(
-    @InjectRepository(Attachments, 'spsysConnection')
+    @InjectRepository(Attachments, 'mitsuConnection')
     private readonly att: Repository<Attachments>,
   ) {}
 

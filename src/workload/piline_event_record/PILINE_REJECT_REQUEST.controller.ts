@@ -12,7 +12,7 @@ import { PilineRejectRequestDto, SavePilineRejectDto } from './PILINE_REJECT_REQ
 
 @Injectable()
 export class PilineRejectRequestService {
-    constructor(@InjectDataSource('webformConnection') private readonly db: DataSource,
+    constructor(@InjectDataSource('mitsuConnection') private readonly db: DataSource,
         private readonly users: UsersService, private readonly as400: ConectionService,
         private readonly records: PilineEventRecordRepository,
         private readonly details: PilineRejectDetailsService, private readonly flows: PilineRejectFlowService) {}

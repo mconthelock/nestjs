@@ -1,6 +1,6 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+﻿import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('SP_ATTACHED')
+@Entity({ name: 'SP_ATTACHED', schema: 'SPSYS' })
 export class Attachments {
   @PrimaryColumn()
   INQ_NO: string;

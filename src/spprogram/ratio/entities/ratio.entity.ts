@@ -1,4 +1,4 @@
-import {
+﻿import {
   Entity,
   PrimaryColumn,
   Column,
@@ -9,7 +9,7 @@ import {
 import { QuotationType } from '../../quotation-type/entities/quotation-type.entity';
 import { Customer } from 'src/spprogram/customer/entities/customer.entity';
 
-@Entity('SP_PRICE_RATIO')
+@Entity({ name: 'SP_PRICE_RATIO', schema: 'SPSYS' })
 export class Ratio {
   @PrimaryColumn()
   ID: number;

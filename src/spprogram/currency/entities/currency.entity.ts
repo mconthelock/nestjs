@@ -1,4 +1,4 @@
-import {
+﻿import {
   Entity,
   PrimaryColumn,
   Column,
@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 
-@Entity('SP_CURRENCY')
+@Entity({ name: 'SP_CURRENCY', schema: 'SPSYS' })
 export class Currency {
   @PrimaryColumn()
   CURR_YEAR: number;

@@ -15,7 +15,7 @@ import { FlowmstModule } from 'src/webform/flowmst/flowmst.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([PURCPM_FORM], 'webformConnection'),
+        TypeOrmModule.forFeature([PURCPM_FORM], 'mitsuConnection'),
         FormmstModule,
         FormModule,
         FlowModule,

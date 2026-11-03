@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
@@ -14,7 +14,7 @@ import {
 @Injectable()
 export class BlockPackingRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('workloadConnection') private ds: DataSource,
+        @InjectDataSource('mitsuConnection') private ds: DataSource,
         @InjectDataSource('packingConnection')
         private readonly packingDs: DataSource,
         @InjectDataSource('datacenterConnection')

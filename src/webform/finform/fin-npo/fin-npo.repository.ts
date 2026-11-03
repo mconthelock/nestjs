@@ -22,7 +22,7 @@ import { DataSource, In } from 'typeorm';
 
 @Injectable()
 export class FinnpoRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

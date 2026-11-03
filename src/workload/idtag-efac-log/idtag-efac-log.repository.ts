@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -8,7 +8,7 @@ import { IDTAG_EFAC_LOG } from 'src/common/Entities/workload/table/IDTAG_EFAC_LO
 @Injectable()
  export class IdtagEfacLogRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('workloadConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
     ) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

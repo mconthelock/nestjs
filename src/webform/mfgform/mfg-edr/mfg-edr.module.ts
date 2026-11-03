@@ -43,7 +43,7 @@ import { MfgEdrTargetMasterModule } from './mfg_edr_target_master/mfg_edr_target
         AMECUSERALL,
         VIEW_MFG_EDR_REPORT,
       ],
-      'webformConnection',
+      'mitsuConnection',
     ),
     RootcauseModule,
     MfgEdrTargetMasterModule,

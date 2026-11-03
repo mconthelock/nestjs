@@ -8,7 +8,7 @@ import { PCURRENCY } from 'src/common/Entities/amec/table/PCURRENCY.entity';
 @Injectable()
 export class PcurrencyRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
         ) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

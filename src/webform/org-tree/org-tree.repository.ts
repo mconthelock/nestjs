@@ -9,7 +9,7 @@ import { SEQUENCEORG } from 'src/common/Entities/webform/table/SEQUENCEORG.entit
 
 @Injectable()
 export class OrgTreeRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

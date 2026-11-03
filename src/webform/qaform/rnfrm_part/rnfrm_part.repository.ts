@@ -9,7 +9,7 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 @Injectable()
 export class RnfrmPartRepository extends BaseRepository {
   constructor(
-    @InjectDataSource('webformConnection') ds: DataSource,
+    @InjectDataSource('mitsuConnection') ds: DataSource,
   ) {
     super(ds);
   }

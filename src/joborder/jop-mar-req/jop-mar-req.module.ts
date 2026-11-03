@@ -6,12 +6,12 @@ import { JopMarReq } from './entities/jop-mar-req.entity';
 import { AmeccalendarModule } from 'src/amecmfg/ameccalendar/ameccalendar.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([JopMarReq], 'amecConnection'),
-    AmeccalendarModule,
-  ],
-  controllers: [JopMarReqController],
-  providers: [JopMarReqService],
-  exports: [JopMarReqService],
+    imports: [
+        TypeOrmModule.forFeature([JopMarReq], 'mitsuConnection'),
+        AmeccalendarModule,
+    ],
+    controllers: [JopMarReqController],
+    providers: [JopMarReqService],
+    exports: [JopMarReqService],
 })
 export class JopMarReqModule {}

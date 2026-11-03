@@ -6,7 +6,7 @@ import { QA_TYPE } from 'src/common/Entities/webform/table/QA_TYPE.entity';
 import { QaTypeRepository } from './qa_type.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([QA_TYPE], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([QA_TYPE], 'mitsuConnection')],
     controllers: [QaTypeController],
     providers: [QaTypeService, QaTypeRepository],
     exports: [QaTypeService],

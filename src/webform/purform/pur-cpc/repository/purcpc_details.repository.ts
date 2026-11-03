@@ -8,7 +8,7 @@ import type { CreatePcpDetailsDto } from '../dto/create-pcp-details.dto';
 
 @Injectable()
 export class PurCpcDetailRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

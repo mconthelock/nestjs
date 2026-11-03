@@ -1,8 +1,8 @@
-import { Column, Entity, PrimaryColumn, OneToMany, JoinColumn } from 'typeorm';
+﻿import { Column, Entity, PrimaryColumn, OneToMany, JoinColumn } from 'typeorm';
 import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 import { History } from '../../history/entities/history.entity';
 
-@Entity('SP_STATUS')
+@Entity({ name: 'SP_STATUS', schema: 'SPSYS' })
 export class Status {
   @PrimaryColumn()
   STATUS_ID: number;

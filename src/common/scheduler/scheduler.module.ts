@@ -12,7 +12,7 @@ import { ScheduledJob } from 'src/common/Entities/docinv/table/scheduled-job.ent
         HttpModule,
         TypeOrmModule.forFeature(
             [ScheduledJob, JobExecutionLog],
-            'docinvConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [SchedulerController],

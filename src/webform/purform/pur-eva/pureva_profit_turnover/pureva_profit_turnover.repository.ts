@@ -10,7 +10,7 @@ import { UpdatePurevaProfitTurnoverDto } from './dto/update-pureva_profit_turnov
 
 @Injectable()
 export class PurevaProfitTurnoverRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

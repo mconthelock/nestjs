@@ -3,12 +3,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { IsWorkloadService } from './is-workload.service';
 import { IsWorkloadController } from './is-workload.controller';
 
-import { IsWorkLoad } from './entities/allwork.entity';
-import { IsWorkStatus } from './entities/workstatus.entity';
+import { IsWorkLoad } from 'src/common/Entities/docinv/table/allwork.entity';
+import { IsWorkStatus } from 'src/common/Entities/docinv/table/workstatus.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([IsWorkLoad, IsWorkStatus], 'docinvConnection'),
+    TypeOrmModule.forFeature([IsWorkLoad, IsWorkStatus], 'mitsuConnection'),
   ],
   controllers: [IsWorkloadController],
   providers: [IsWorkloadService],

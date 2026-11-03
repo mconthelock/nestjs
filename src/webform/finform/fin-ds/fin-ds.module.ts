@@ -18,7 +18,7 @@ import { HandleFileFormModule } from "src/webform/handle-file-form/handle-file-f
 
 @Module({
   imports:[
-      TypeOrmModule.forFeature([DSDUTYSTAMP], 'webformConnection'),
+      TypeOrmModule.forFeature([DSDUTYSTAMP], 'mitsuConnection'),
       FormModule,
       FlowModule,
       FormmstModule,HandleFileFormModule

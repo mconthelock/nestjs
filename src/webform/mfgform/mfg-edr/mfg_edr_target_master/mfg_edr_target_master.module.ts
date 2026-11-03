@@ -9,7 +9,7 @@ import { MfgEdrTargetMasterService } from './mfg_edr_target_master.service';
   imports: [
     TypeOrmModule.forFeature(
       [MfgEdrTargetMaster],
-      'webformConnection',
+      'mitsuConnection',
     ),
   ],
   controllers: [MfgEdrTargetMasterController],

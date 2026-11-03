@@ -6,7 +6,7 @@ import { EBGREQFORM } from 'src/common/Entities/ebudget/table/EBGREQFORM.entity'
 import { EbgreqformRepository } from './ebgreqform.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([EBGREQFORM], 'ebudgetConnection')],
+    imports: [TypeOrmModule.forFeature([EBGREQFORM], 'mitsuConnection')],
     controllers: [EbgreqformController],
     providers: [EbgreqformService, EbgreqformRepository],
     exports: [EbgreqformService],

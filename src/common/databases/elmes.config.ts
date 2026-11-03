@@ -8,58 +8,58 @@ import { TypeOrmWinstonLogger } from '../logger/typeorm-winston.logger';
 dotenv.config();
 let elmesConfig: TypeOrmModuleAsyncOptions;
 if (process.env.HOST == 'AMEC') {
-  elmesConfig = {
-    name: 'elmesConnection',
-    imports: [],
-    inject: [ConfigService, WINSTON_MODULE_PROVIDER],
-    useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
-      // inject: [ConfigService],
-      // useFactory: async (config: ConfigService) => ({
-      type: 'oracle',
-      username: process.env.ELMES_USER,
-      password: process.env.ELMES_PASSWORD,
-      schema: process.env.ELMES_SCHEMA,
-      connectString: `${process.env.ELMES_HOST}:${process.env.ELMES_PORT}/${process.env.ELMES_SERVICE}?expire_time=5`,
-      entities: [__dirname + '/../../elmes/**/*.entity{.ts,.js}'],
-      synchronize: false,
-      autoLoadEntities: true,
-      logger: new TypeOrmWinstonLogger(winstonLogger),
-      retryAttempts: 5,
-      retryDelay: 2000,
-      extra: {
-        keepAlive: true,
-        poolMax: +process.env.DB_POOL_MAX || 10,
-        poolMin: +process.env.DB_POOL_MIN || 1,
-        poolTimeout: 120,
-        queueTimeout: 60000,
-        queueMax: 1000,
-        enableTCPSKeepAlive: true,
-        poolIncrement: 5,
-        poolPingInterval: 60,
-        stmtCacheSize: 50,
-      },
-    }),
-  };
+    elmesConfig = {
+        name: 'elmesConnection',
+        imports: [],
+        inject: [ConfigService, WINSTON_MODULE_PROVIDER],
+        useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
+            // inject: [ConfigService],
+            // useFactory: async (config: ConfigService) => ({
+            type: 'oracle',
+            username: process.env.ELMES_USER,
+            password: process.env.ELMES_PASSWORD,
+            schema: process.env.ELMES_SCHEMA,
+            connectString: `${process.env.ELMES_HOST}:${process.env.ELMES_PORT}/${process.env.ELMES_SERVICE}?expire_time=5`,
+            //entities: [__dirname + '/../../elmes/**/*.entity{.ts,.js}'],
+            synchronize: false,
+            autoLoadEntities: true,
+            logger: new TypeOrmWinstonLogger(winstonLogger),
+            retryAttempts: 5,
+            retryDelay: 2000,
+            extra: {
+                keepAlive: true,
+                poolMax: +process.env.DB_POOL_MAX || 10,
+                poolMin: +process.env.DB_POOL_MIN || 1,
+                poolTimeout: 120,
+                queueTimeout: 60000,
+                queueMax: 1000,
+                enableTCPSKeepAlive: true,
+                poolIncrement: 5,
+                poolPingInterval: 60,
+                stmtCacheSize: 50,
+            },
+        }),
+    };
 } else {
-  elmesConfig = {
-    name: 'elmesConnection',
-    imports: [],
-    inject: [ConfigService, WINSTON_MODULE_PROVIDER],
-    useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
-      type: 'mysql',
-      host: process.env.HOME_HOST,
-      port: parseInt(process.env.HOME_PORT as string, 10),
-      username: process.env.HOME_USER,
-      password: process.env.HOME_PASSWORD,
-      database: process.env.AMEC_DATABASE,
-      entities: [
-        __dirname + '/../../**/**/*.entity{.ts,.js}',
-        __dirname + '/../../**/**/**/*.entity{.ts,.js}',
-      ],
-      synchronize: false,
-      autoLoadEntities: true,
-      logger: new TypeOrmWinstonLogger(winstonLogger),
-    }),
-  };
+    elmesConfig = {
+        name: 'elmesConnection',
+        imports: [],
+        inject: [ConfigService, WINSTON_MODULE_PROVIDER],
+        useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
+            type: 'mysql',
+            host: process.env.HOME_HOST,
+            port: parseInt(process.env.HOME_PORT as string, 10),
+            username: process.env.HOME_USER,
+            password: process.env.HOME_PASSWORD,
+            database: process.env.AMEC_DATABASE,
+            entities: [
+                __dirname + '/../../**/**/*.entity{.ts,.js}',
+                __dirname + '/../../**/**/**/*.entity{.ts,.js}',
+            ],
+            synchronize: false,
+            autoLoadEntities: true,
+            logger: new TypeOrmWinstonLogger(winstonLogger),
+        }),
+    };
 }
 export default elmesConfig;

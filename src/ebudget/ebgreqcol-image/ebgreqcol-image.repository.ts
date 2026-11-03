@@ -8,9 +8,7 @@ import { CreateEbgreqcolImageDto } from './dto/create-ebgreqcol-image.dto';
 import { UpdateEbgreqcolImageDto } from './dto/update-ebgreqcol-image.dto';
 @Injectable()
 export class EbgreqcolImageRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('ebudgetConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

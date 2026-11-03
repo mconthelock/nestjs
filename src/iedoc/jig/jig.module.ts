@@ -48,7 +48,8 @@ import { ShopCodeMst } from 'src/common/Entities/iedoc/table/shopcodemst.entity'
         JigInspectionService,
         JigNgTagService,
         JigReminderService,
+        JigFlowService,
     ],
-    exports: [JigService, JigRepository],
+    exports: [JigService, JigRepository, JigFlowService],
 })
 export class JigModule {}

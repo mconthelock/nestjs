@@ -17,6 +17,9 @@ export class STOCK_PART_FOLLOW {
     @PrimaryColumn()
     PROCESS: string;
 
+    @PrimaryColumn()
+    SEQ: number;
+
     @Column()
     PLAN?: number;
 

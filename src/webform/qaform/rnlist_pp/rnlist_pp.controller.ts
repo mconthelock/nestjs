@@ -32,7 +32,7 @@ export class RnlistPpController {
   }
 
   @Post('search')
-  @UseTransaction('webformConnection')
+  @UseTransaction('mitsuConnection')
   search(@Body() dto: FiltersDto) {
     return this.rnlistPpService.search(dto);
   }

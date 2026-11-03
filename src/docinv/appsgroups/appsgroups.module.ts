@@ -5,7 +5,7 @@ import { AppsgroupsController } from './appsgroups.controller';
 import { Appsgroup } from '../../common/Entities/docinv/table/appsgroup.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Appsgroup], 'docinvConnection')],
+    imports: [TypeOrmModule.forFeature([Appsgroup], 'mitsuConnection')],
     controllers: [AppsgroupsController],
     providers: [AppsgroupsService],
     exports: [AppsgroupsService],

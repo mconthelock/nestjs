@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -6,7 +6,7 @@ import { STOCK_PART_FOLLOW_VIEW } from 'src/common/Entities/workload/views/STOCK
 
 @Injectable()
 export class StockPartFollowViewRepository extends BaseRepository {
-    constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { DpmsPlIssueTypeService } from './dpms_pl_issue_type.service';
 import { DpmsPlIssueTypeController } from './dpms_pl_issue_type.controller';
 import { DpmsPlIssueTypeRepository } from './dpms_pl_issue_type.repository';
@@ -7,7 +7,7 @@ import { DPMS_PL_ISSUE_TYPE } from 'src/common/Entities/workload/table/DPMS_PL_I
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([DPMS_PL_ISSUE_TYPE], 'workloadConnection'),
+        TypeOrmModule.forFeature([DPMS_PL_ISSUE_TYPE], 'mitsuConnection'),
     ],
     controllers: [DpmsPlIssueTypeController],
     providers: [DpmsPlIssueTypeService, DpmsPlIssueTypeRepository],

@@ -9,26 +9,26 @@ import { searchSchdDto } from './dto/search.dto';
 
 @Injectable()
 export class SchedulerService {
-  constructor(
-    @InjectRepository(Scheduler, 'amecConnection')
-    private readonly schd: Repository<Scheduler>,
-  ) {}
+    constructor(
+        @InjectRepository(Scheduler, 'datacenterConnection')
+        private readonly schd: Repository<Scheduler>,
+    ) {}
 
-  async findAll() {
-    return this.schd.find();
-  }
+    async findAll() {
+        return this.schd.find();
+    }
 
-  async search(data: searchSchdDto) {
-    return this.schd.find({ where: data });
-  }
+    async search(data: searchSchdDto) {
+        return this.schd.find({ where: data });
+    }
 
-  async create(data: createSchdDto) {
-    const newSchd = this.schd.create(data);
-    return this.schd.save(newSchd);
-  }
+    async create(data: createSchdDto) {
+        const newSchd = this.schd.create(data);
+        return this.schd.save(newSchd);
+    }
 
-  async update(data: updateSchdDto) {
-    await this.schd.update(data.TASKID, data);
-    return this.schd.findOneBy({ TASKID: data.TASKID });
-  }
+    async update(data: updateSchdDto) {
+        await this.schd.update(data.TASKID, data);
+        return this.schd.findOneBy({ TASKID: data.TASKID });
+    }
 }

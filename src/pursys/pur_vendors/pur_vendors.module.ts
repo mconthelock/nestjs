@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PurVendor } from '../../common/Entities/pursys/table/pur_vendor.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([PurVendor], 'purConnection')],
+    imports: [TypeOrmModule.forFeature([PurVendor], 'mitsuConnection')],
     controllers: [PurVendorsController],
     providers: [PurVendorsService],
 })

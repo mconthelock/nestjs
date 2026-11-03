@@ -7,7 +7,7 @@ import { ConectionService } from 'src/as400/conection/conection.service';
 @Controller('workload/piline_issue')
 export class PilineIssueController {
     constructor(private readonly as400: ConectionService,
-        @InjectDataSource('webformConnection') private readonly webform: DataSource,
+        @InjectDataSource('mitsuConnection') private readonly webform: DataSource,
     ) {}
 
     @Get('reference')

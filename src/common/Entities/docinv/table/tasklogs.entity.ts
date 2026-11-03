@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-@Entity('RESULT_CONFIRMATION')
+@Entity({ name: 'RESULT_CONFIRMATION', schema: 'DOCINV' })
 export class TaskLogs {
     @PrimaryColumn()
     RC_SECTION: string;

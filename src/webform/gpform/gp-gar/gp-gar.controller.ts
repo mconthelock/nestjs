@@ -17,7 +17,7 @@ export class GpGarController {
   }
 
   @Post()
-  @UseTransaction('webformConnection')
+  @UseTransaction('mitsuConnection')
   @UseInterceptors(getFileUploadInterceptor('FILE'))
   create(
   @Body() dto: CreateGpGarDto, 
@@ -40,7 +40,7 @@ export class GpGarController {
   }
 
   @Patch()
-  @UseTransaction('webformConnection')
+  @UseTransaction('mitsuConnection')
   @UseForceTransaction()
   update(@Body() dto: UpdateGpGarDto, @Req() req: Request) {
         const ip = getClientIP(req);

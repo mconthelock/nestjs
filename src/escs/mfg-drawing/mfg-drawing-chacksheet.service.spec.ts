@@ -12,7 +12,7 @@ import { GeneralPartListService } from 'src/general-part-list/general-part-list.
 import { DrawingParserHelper } from './helpers/drawing-parser.helper';
 import { DrawingMatcherHelper } from './helpers/drawing-matcher.helper';
 import { DrawingFileHelper } from './helpers/drawing-file.helper';
-import { F001KP } from 'src/as400/shopf/f001kp/entities/f001kp.entity';
+import { F001KP } from 'src/amecmfg/f001kp/entities/f001kp.entity';
 import { DrawingResolverHelper } from './helpers/drawing-resolver.helper';
 
 describe('MfgDrawingCreateChecksheetService', () => {
@@ -345,7 +345,10 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 } as F001KP,
             });
 
-            const result = await resove.checkBreakAssyDrawing('C60526001PH', 'BA118A742 G03');
+            const result = await resove.checkBreakAssyDrawing(
+                'C60526001PH',
+                'BA118A742 G03',
+            );
 
             expect(result).toBe('BA118A742(R) G03');
         });
@@ -359,7 +362,10 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 } as F001KP,
             });
 
-            const result = await resove.checkBreakAssyDrawing('C60526001NV', 'BA118A742 G03');
+            const result = await resove.checkBreakAssyDrawing(
+                'C60526001NV',
+                'BA118A742 G03',
+            );
 
             expect(result).toBe('BA118A742(L) G03');
         });
@@ -369,11 +375,14 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 status: true,
                 message: '',
                 data: {
-                    F01R09: 'SHAFT ASS\'Y',
+                    F01R09: "SHAFT ASS'Y",
                 } as F001KP,
             });
 
-            const result = await resove.checkBreakAssyDrawing('S1909110234', 'BS127C197 G01');
+            const result = await resove.checkBreakAssyDrawing(
+                'S1909110234',
+                'BS127C197 G01',
+            );
 
             expect(result).toBe('BS127C197 G01');
         });

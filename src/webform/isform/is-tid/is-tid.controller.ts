@@ -32,13 +32,13 @@ export class IsTidController {
     }
 
     @Post('search')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     async search(@Body() dto: FiltersDto) {
         return this.isTidService.search(dto);
     }
 
     @Post()
-    @UseTransaction('webformConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ webformConnection
+    @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ webformConnection
     @UseForceTransaction()
     create(@Body() dto: CreateIsTidFormDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -46,7 +46,7 @@ export class IsTidController {
     }
 
     @Patch()
-    @UseTransaction('webformConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ webformConnection
+    @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ webformConnection
     @UseForceTransaction()
     update(@Body() dto: ActionIsTidDto, @Req() req: Request) {
         const ip = getClientIP(req);

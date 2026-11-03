@@ -17,7 +17,7 @@ import fingerConfig from './databases/fingerdb.config';
 import mitsuConfig from './databases/mitsu.config';
 import amecConfig from './databases/amec.config';
 import datacenterConfig from './databases/datacenter.config';
-import docinvConfig from './databases/docinv.config';
+// import docinvConfig from './databases/docinv.config';
 import elmesConfig from './databases/elmes.config';
 import escsConfig from './databases/escs.config';
 import gpreportConfig from './databases/gpreport.config';
@@ -25,9 +25,9 @@ import idsConfig from './databases/dailyids.config';
 import pdmConfig from './databases/pdm.config';
 import purConfig from './databases/pursys.config';
 import sdsysConfig from './databases/sdsys.config';
-import spsysConfig from './databases/spsys.config';
-import webformConfig from './databases/webform.config';
-import workloadConfig from './databases/workload.config';
+// import spsysConfig from './databases/spsys.config';
+// import webformConfig from './databases/webform.config';
+// import workloadConfig from './databases/workload.config';
 // import innovatConfig from './databases/innovat.config';
 // import ebudgetConfig from './databases/ebudget.config';
 // import iedocConfig from './databases/iedoc.config';
@@ -50,7 +50,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
         TypeOrmModule.forRootAsync(amecConfig),
         TypeOrmModule.forRootAsync(auditConfig),
         TypeOrmModule.forRootAsync(datacenterConfig),
-        TypeOrmModule.forRootAsync(docinvConfig),
+        // TypeOrmModule.forRootAsync(docinvConfig),
         TypeOrmModule.forRootAsync(elmesConfig),
         TypeOrmModule.forRootAsync(escsConfig),
         TypeOrmModule.forRootAsync(gpreportConfig),
@@ -59,15 +59,15 @@ import { SchedulerModule } from './scheduler/scheduler.module';
         TypeOrmModule.forRootAsync(packingConfig),
         TypeOrmModule.forRootAsync(pdmConfig),
         TypeOrmModule.forRootAsync(sdsysConfig),
-        TypeOrmModule.forRootAsync(spsysConfig),
-        TypeOrmModule.forRootAsync(webformConfig),
-        TypeOrmModule.forRootAsync(workloadConfig),
-        TypeOrmModule.forRootAsync(purConfig),
+        // TypeOrmModule.forRootAsync(spsysConfig),
+        // TypeOrmModule.forRootAsync(webformConfig),
+        // TypeOrmModule.forRootAsync(workloadConfig),
         TypeOrmModule.forRootAsync(fingerConfig),
         // TypeOrmModule.forRootAsync(ebudgetConfig),
         // TypeOrmModule.forRootAsync(iedocConfig),
         // TypeOrmModule.forRootAsync(invoiceConfig),
         // TypeOrmModule.forRootAsync(innovatConfig),
+        // TypeOrmModule.forRootAsync(purConfig),
         RedisModule,
         SchedulerModule,
         LoggerModule,

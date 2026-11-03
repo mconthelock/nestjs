@@ -1,4 +1,4 @@
-import {
+﻿import {
   Body,
   Controller,
   Get,
@@ -29,13 +29,13 @@ export class PilineBendingAttController {
   }
 
   @Post('search')
-  @UseTransaction('workloadConnection')
+  @UseTransaction('mitsuConnection')
   search(@Body() dto: FiltersDto) {
     return this.pilineBendingAttService.search(dto);
   }
 
   @Post()
-  @UseTransaction('workloadConnection')
+  @UseTransaction('mitsuConnection')
   create(@Body() dto: piline_bending_att) {
     return this.pilineBendingAttService.create(dto);
   }

@@ -1,58 +1,62 @@
 import { Injectable } from '@nestjs/common';
 import { Repository, DataSource } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
-import { Pdivision } from '../pdivision/entities/pdivision.entity';
+import { Pdivision } from '../../common/Entities/amec/table/PDIVISION.entity';
 import { SearchDivisionDto } from './dto/search-division.dto';
 import { getSafeFields } from '../../common/utils/Fields.utils';
 
 @Injectable()
 export class PdivisionService {
-  constructor(
-    @InjectRepository(Pdivision, 'amecConnection')
-    private divisionRepo: Repository<Pdivision>,
-    @InjectDataSource('amecConnection')
-    private dataSource: DataSource,
-  ) {}
+    constructor(
+        @InjectRepository(Pdivision, 'mitsuConnection')
+        private divisionRepo: Repository<Pdivision>,
+        @InjectDataSource('mitsuConnection')
+        private dataSource: DataSource,
+    ) {}
 
-  private division = this.dataSource
-    .getMetadata(Pdivision)
-    .columns.map((c) => c.propertyName);
-  private allowFields = [...this.division];
+    private division = this.dataSource
+        .getMetadata(Pdivision)
+        .columns.map((c) => c.propertyName);
+    private allowFields = [...this.division];
 
-  getDivisionAll() {
-    return this.divisionRepo.find({
-      order: {
-        SDIVCODE: 'ASC',
-      },
-    });
-  }
-
-  getDivisionByCode(id: string) {
-    return this.divisionRepo.findOne({
-      where: { SDIVCODE: id },
-      order: {
-        SDIVCODE: 'ASC',
-      },
-    });
-  }
-
-  getDivision(searchDto: SearchDivisionDto) {
-    const { SDIVCODE, fields = [] } = searchDto;
-    const query = this.dataSource.createQueryBuilder().from('PDIVISION', 'A');
-
-    if (SDIVCODE) query.andWhere('A.SDIVCODE = :SDIVCODE', { SDIVCODE });
-
-    let select = [];
-    if (fields.length > 0) {
-      select = getSafeFields(fields, this.allowFields);
-    } else {
-      select = this.allowFields;
+    getDivisionAll() {
+        return this.divisionRepo.find({
+            order: {
+                SDIVCODE: 'ASC',
+            },
+        });
     }
 
-    select.forEach((f) => {
-      query.addSelect(`A.${f}`, f);
-    });
-    query.andWhere('A.SDIVISION NOT LIKE :division', { division: '%Cancel%' });
-    return query.getRawMany();
-  }
+    getDivisionByCode(id: string) {
+        return this.divisionRepo.findOne({
+            where: { SDIVCODE: id },
+            order: {
+                SDIVCODE: 'ASC',
+            },
+        });
+    }
+
+    getDivision(searchDto: SearchDivisionDto) {
+        const { SDIVCODE, fields = [] } = searchDto;
+        const query = this.dataSource
+            .createQueryBuilder()
+            .from('PDIVISION', 'A');
+
+        if (SDIVCODE) query.andWhere('A.SDIVCODE = :SDIVCODE', { SDIVCODE });
+
+        let select = [];
+        if (fields.length > 0) {
+            select = getSafeFields(fields, this.allowFields);
+        } else {
+            select = this.allowFields;
+        }
+
+        select.forEach((f) => {
+            query.addSelect(`A.${f}`, f);
+        });
+        query.andWhere('A.SDIVISION NOT LIKE :division', {
+            division: '%Cancel%',
+        });
+        return query.getRawMany();
+    }
 }

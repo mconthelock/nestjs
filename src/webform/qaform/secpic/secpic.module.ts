@@ -8,7 +8,7 @@ import { SecpicRepository } from './secpic.repository';
 import { SecpicService } from './secpic.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([SECPIC], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([SECPIC], 'mitsuConnection')],
     controllers: [SecpicController],
     providers: [SecpicService, SecpicRepository],
     exports: [SecpicService],

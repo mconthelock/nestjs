@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+﻿import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
 import { Repository, DataSource } from 'typeorm';
@@ -18,7 +18,7 @@ export class AuthService {
         @InjectDataSource('packingConnection')
         private readonly packdb: DataSource,
 
-        @InjectDataSource('workloadConnection')
+        @InjectDataSource('mitsuConnection')
         private readonly workdb: DataSource,
     ) {}
 

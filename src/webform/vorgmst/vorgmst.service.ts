@@ -7,7 +7,7 @@ import { VORGMST } from 'src/common/Entities/webform/views/VORGMST.entity';
 
 @Injectable()
 export class VorgmstService {constructor(
-    @InjectRepository(VORGMST, 'webformConnection') // ระบุชื่อ connection ของคุณเหมือนตัว pposition
+    @InjectRepository(VORGMST, 'mitsuConnection') // ระบุชื่อ connection ของคุณเหมือนตัว pposition
     private readonly vorgmstRepository: Repository<VORGMST>,
   ) {}
   create(createVorgmstDto: CreateVorgmstDto) {

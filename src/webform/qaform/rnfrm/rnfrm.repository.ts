@@ -10,7 +10,7 @@ import { RNFRM } from 'src/common/Entities/webform/table/RNFRM.entity';
 @Injectable()
 export class RnfrmRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
     ) {
         super(ds);
     }

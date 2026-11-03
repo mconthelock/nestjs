@@ -23,7 +23,7 @@ dayjs.extend(timezone);
 @Injectable()
 export class ApplogsService {
     constructor(
-        @InjectRepository(AmecappLog, 'docinvConnection')
+        @InjectRepository(AmecappLog, 'mitsuConnection')
         private readonly amec: Repository<AmecappLog>,
 
         @InjectRepository(ScmappLog, 'auditConnection')

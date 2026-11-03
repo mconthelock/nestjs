@@ -18,7 +18,7 @@ export class SecpicController {
   }
 
   @Post('search')
-  @UseTransaction('webformConnection')
+  @UseTransaction('mitsuConnection')
   search(@Body() dto: FiltersDto) {
     return this.secpicService.search(dto);
   }

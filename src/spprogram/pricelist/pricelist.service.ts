@@ -1,4 +1,4 @@
-import { InjectRepository } from '@nestjs/typeorm';
+﻿import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 
@@ -11,10 +11,10 @@ import { updatePriceListDto } from './dto/update-price.dto';
 @Injectable()
 export class PricelistService {
   constructor(
-    @InjectRepository(Pricelist, 'spsysConnection')
+    @InjectRepository(Pricelist, 'mitsuConnection')
     private readonly price: Repository<Pricelist>,
 
-    @InjectRepository(ItemsCustomer, 'spsysConnection')
+    @InjectRepository(ItemsCustomer, 'mitsuConnection')
     private readonly itemscus: Repository<ItemsCustomer>,
   ) {}
 

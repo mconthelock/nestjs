@@ -13,7 +13,7 @@ export class FinPckController {
 
   
   @Post()
-  @UseTransaction('webformConnection')
+  @UseTransaction('mitsuConnection')
   @UseForceTransaction()
      create(
           @Body() dto: RequestFinpckFormDto,

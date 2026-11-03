@@ -1,6 +1,6 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+﻿import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('MS_PARTS_CATEGORY')
+@Entity({ name: 'MS_PARTS_CATEGORY', schema: 'SPSYS' })
 export class Partcategory {
   @PrimaryColumn()
   PCATE_CODE: string;

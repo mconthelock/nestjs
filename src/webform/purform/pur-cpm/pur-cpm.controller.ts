@@ -45,7 +45,7 @@ export class PurCpmController {
     }
 
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(getFileUploadInterceptor('files', true))
     create(
@@ -59,7 +59,7 @@ export class PurCpmController {
     }
 
     @Patch()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(getFileUploadInterceptor('files', true))
     update(

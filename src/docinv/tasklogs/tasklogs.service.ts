@@ -17,7 +17,7 @@ export class TasklogsService {
         @InjectRepository(WSDTaskLog, 'auditConnection')
         private readonly wsd: Repository<WSDTaskLog>,
 
-        @InjectRepository(AASTaskLog, 'docinvConnection')
+        @InjectRepository(AASTaskLog, 'mitsuConnection')
         private readonly aas: Repository<AASTaskLog>,
     ) {}
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { PSCLM_DETAIL } from 'src/common/Entities/webform/table/PSCLM_DETAIL.entity';
 import { PSCLM_FORM } from 'src/common/Entities/webform/table/PSCLM_FORM.entity';
@@ -10,8 +10,8 @@ import { DataSource } from 'typeorm';
 @Injectable()
 export class PsClmRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        @InjectDataSource('workloadConnection') private readonly wk: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') private readonly wk: DataSource,
     ) {
         super(ds);
     }

@@ -1,4 +1,4 @@
-import {
+﻿import {
   Column,
   Entity,
   PrimaryColumn,
@@ -11,7 +11,7 @@ import { Pricelist } from '../../pricelist/entities/pricelist.entity';
 import { Category } from '../../items-category/entities/category.entity';
 import { ItemsCustomer } from '../../items-customer/entities/items-customer.entity';
 
-@Entity('DS_ITEM')
+@Entity({ name: 'DS_ITEM', schema: 'SPSYS' })
 export class Items {
   @PrimaryGeneratedColumn()
   ITEM_ID: number;

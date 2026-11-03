@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Repository, Raw, DataSource } from 'typeorm';
 import { SearchOrderpartDto } from './dto/search-orderpart.dto';
@@ -10,7 +10,7 @@ export class OrderpartsService {
         @InjectRepository(Orderpart, 'datacenterConnection')
         private readonly ords: Repository<Orderpart>,
 
-        @InjectDataSource('spsysConnection')
+        @InjectDataSource('mitsuConnection')
         private readonly sp: DataSource,
     ) {}
 

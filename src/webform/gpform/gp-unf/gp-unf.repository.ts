@@ -8,7 +8,7 @@ import { UNIFORM } from 'src/common/Entities/gpreport/table/UNIFORM.entity';
 
 @Injectable()
 export class GpUnfRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

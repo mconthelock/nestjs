@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { DpmsPackingListService } from './dpms_packing_list.service';
 import { DpmsPackingListController } from './dpms_packing_list.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,7 +7,7 @@ import { DpmsPackingListRepository } from './dpms_packing_list.repository';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([DPMS_PACKING_LIST], 'workloadConnection'),
+        TypeOrmModule.forFeature([DPMS_PACKING_LIST], 'mitsuConnection'),
     ],
     controllers: [DpmsPackingListController],
     providers: [DpmsPackingListService, DpmsPackingListRepository],

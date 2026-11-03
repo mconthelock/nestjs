@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PILINE_CAUSE_MST } from 'src/common/Entities/workload/table/PILINE_CAUSE_MST.entity';
 import { PilineCauseMstController } from './PILINE_CAUSE_MST.controller';
@@ -7,7 +7,7 @@ import { PilineCauseMstRepository } from './PILINE_CAUSE_MST.repository';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([PILINE_CAUSE_MST], 'workloadConnection'),
+        TypeOrmModule.forFeature([PILINE_CAUSE_MST], 'mitsuConnection'),
     ],
     controllers: [PilineCauseMstController],
     providers: [PilineCauseMstService, PilineCauseMstRepository],

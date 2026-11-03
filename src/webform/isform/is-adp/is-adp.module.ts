@@ -9,7 +9,7 @@ import { ISADP_FORM } from 'src/common/Entities/webform/table/ISADP_FORM.entity'
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([ISADP_FORM], 'webformConnection'),
+        TypeOrmModule.forFeature([ISADP_FORM], 'mitsuConnection'),
         FormModule,
         IsFileModule,
     ],

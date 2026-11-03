@@ -9,7 +9,7 @@ import { WTYPE } from 'src/common/Entities/webform/table/WTYPE.entity';
 @Injectable()
 export class WtypeRepository extends BaseRepository {
   constructor(
-    @InjectDataSource('webformConnection') ds: DataSource,
+    @InjectDataSource('mitsuConnection') ds: DataSource,
   ) {
     super(ds);
   }

@@ -8,7 +8,7 @@ import { WtypeRepository } from './wtype.repository';
 import { WtypeService } from './wtype.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([WTYPE], 'webformConnection')],
+  imports: [TypeOrmModule.forFeature([WTYPE], 'mitsuConnection')],
   controllers: [WtypeController],
   providers: [WtypeService, WtypeRepository],
   exports: [WtypeService],

@@ -1,4 +1,4 @@
-import {
+﻿import {
     Entity,
     PrimaryColumn,
     JoinColumn,
@@ -10,7 +10,7 @@ import {
 import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 import { InquiryDetail } from '../../inquiry-detail/entities/inquiry-detail.entity';
 
-@Entity('SP_INQUIRY_GROUP')
+@Entity({ name: 'SP_INQUIRY_GROUP', schema: 'SPSYS' })
 export class InquiryGroup {
     @PrimaryGeneratedColumn()
     INQG_ID: number;

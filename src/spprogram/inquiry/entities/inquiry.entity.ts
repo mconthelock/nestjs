@@ -1,4 +1,4 @@
-import {
+﻿import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
@@ -19,7 +19,7 @@ import { SpUser } from 'src/spprogram/spusers/spusers.entity';
 import { Quotation } from '../../quotation/entities/quotation.entity';
 import { Weight } from '../../weight/entities/weight.entity';
 
-@Entity('SP_INQUIRY')
+@Entity({ name: 'SP_INQUIRY', schema: 'SPSYS' })
 export class Inquiry {
   @PrimaryGeneratedColumn()
   INQ_ID: number;

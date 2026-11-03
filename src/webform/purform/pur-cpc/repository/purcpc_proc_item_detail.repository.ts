@@ -6,7 +6,7 @@ import { PURCPC_PROC_ITEMDETAIL } from 'src/common/Entities/webform/views/PURCPC
 
 @Injectable()
 export class PurcpcProcItemDetailRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

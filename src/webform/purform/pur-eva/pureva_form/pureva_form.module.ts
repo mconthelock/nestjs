@@ -6,7 +6,7 @@ import { PUREVA_FORM } from 'src/common/Entities/webform/table/PUREVA_FORM.entit
 import { PurevaFormRepository } from './pureva_form.repository';
 
 @Module({
-   imports: [TypeOrmModule.forFeature([PUREVA_FORM], 'webformConnection')],
+   imports: [TypeOrmModule.forFeature([PUREVA_FORM], 'mitsuConnection')],
   controllers: [PurevaFormController],
   providers: [PurevaFormService, PurevaFormRepository],
   exports:[PurevaFormService]

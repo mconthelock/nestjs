@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+﻿import { Injectable } from "@nestjs/common";
 import { InjectDataSource } from "@nestjs/typeorm";
 import { SHORTAGE_ISSUE } from "src/common/Entities/workload/views/SHORTAGE_ISSUE.entity";
 import { VW_SHORTAGE_REPORT } from "src/common/Entities/workload/views/SHORTAGE_REPORT.entity";
@@ -13,7 +13,7 @@ import { ConectionService } from "src/as400/conection/conection.service";
 @Injectable()
 export class ShortageRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('workloadConnection') private ds: DataSource,
+        @InjectDataSource('mitsuConnection') private ds: DataSource,
         private as400: ConectionService,
     ) {
         super(ds);

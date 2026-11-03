@@ -13,16 +13,11 @@ if (process.env.HOST == 'AMEC') {
         imports: [],
         inject: [ConfigService, WINSTON_MODULE_PROVIDER],
         useFactory: async (config: ConfigService, winstonLogger: Logger) => ({
-            // inject: [ConfigService],
-            // useFactory: async (config: ConfigService) => ({
             type: 'oracle',
             username: process.env.DATACENTER_USER,
             password: process.env.DATACENTER_PASSWORD,
             schema: process.env.DATACENTER_SCHEMA,
             connectString: `(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=${process.env.DATACENTER_HOST})(PORT=${process.env.DATACENTER_PORT}))(CONNECT_DATA=(SID=${process.env.DATACENTER_SERVICE})))`,
-            // entities: [
-            //     __dirname + '/../Entities/datacenter/**/*.entity{.ts,.js}',
-            // ],
             autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),

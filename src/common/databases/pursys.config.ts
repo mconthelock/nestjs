@@ -19,11 +19,11 @@ if (process.env.HOST == 'AMEC') {
             username: process.env.PUR_USER,
             password: process.env.PUR_PASSWORD,
             connectString: `${process.env.PUR_HOST}:${process.env.PUR_PORT}/${process.env.PUR_SERVICE}?expire_time=5`,
-            entities: [
-                __dirname + '/../../**/**/*.entity{.ts,.js}',
-                __dirname + '/../../**/**/**/*.entity{.ts,.js}',
-            ],
-            //autoLoadEntities: true,
+            // entities: [
+            //     __dirname + '/../../**/**/*.entity{.ts,.js}',
+            //     __dirname + '/../../**/**/**/*.entity{.ts,.js}',
+            // ],
+            autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),
             retryAttempts: 5,

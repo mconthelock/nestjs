@@ -11,7 +11,7 @@ import { Warehouses } from 'src/common/Entities/pursys/table/WAREHOUSES.entity';
 @Injectable()
 export class WarehousesService {
     constructor(
-        @InjectRepository(Warehouses, 'purConnection')
+        @InjectRepository(Warehouses, 'mitsuConnection')
         private readonly wh: Repository<Warehouses>,
     ) {}
     create(createWarehouseDto: CreateWarehouseDto) {

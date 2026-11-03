@@ -1,11 +1,19 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, ViewColumn, ViewEntity } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    OneToOne,
+    PrimaryColumn,
+    ViewColumn,
+    ViewEntity,
+} from 'typeorm';
 import { ORGPOS } from '../../webform/table/ORGPOS.entity';
 import { QAINS_FORM } from '../../webform/table/QAINS_FORM.entity';
 import { QAINS_OPERATOR_AUDITOR } from '../../webform/table/QAINS_OPERATOR_AUDITOR.entity';
 import { USERS } from '../../escs/table/USERS.entity';
 import { INV_YEARLY_ASSIGN } from '../../skid/table/INV_YEARLY_ASSIGN.entity';
 
-@Entity({ name: 'AMECUSERALL', schema: 'AMEC' })
+@Entity({ name: 'AMECUSERALL', schema: 'WEBFORM' })
 export class AMECUSERALL {
     @PrimaryColumn()
     SEMPNO: string;

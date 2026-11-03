@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -8,7 +8,7 @@ import { UpdateControllerDto } from './dto/update-controller.dto';
 @Injectable()
 export class InquiryControlService {
   constructor(
-    @InjectRepository(InquiryControl, 'spsysConnection')
+    @InjectRepository(InquiryControl, 'mitsuConnection')
     private readonly ctrl: Repository<InquiryControl>,
   ) {}
 

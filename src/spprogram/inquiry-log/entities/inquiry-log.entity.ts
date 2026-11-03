@@ -1,7 +1,7 @@
-import { Column, Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+﻿import { Column, Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { InquiryDetail } from '../../inquiry-detail/entities/inquiry-detail.entity';
 
-@Entity('SP_INQUIRY_LOG')
+@Entity({ name: 'SP_INQUIRY_LOG', schema: 'SPSYS' })
 export class InquiryLog {
   @PrimaryColumn()
   LOG_DATE: Date;

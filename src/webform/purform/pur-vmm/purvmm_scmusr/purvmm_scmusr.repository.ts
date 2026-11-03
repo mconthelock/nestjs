@@ -9,7 +9,7 @@ import { UpdatePurVmmDto } from '../dto/update-pur-vmm.dto';
 
 @Injectable()
 export class PurvmmScmuserRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

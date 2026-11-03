@@ -5,8 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Secretlog } from './entities/doc.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Secretlog], 'amecConnection')],
-  controllers: [SecretlogController],
-  providers: [SecretlogService],
+    imports: [TypeOrmModule.forFeature([Secretlog], 'datacenterConnection')],
+    controllers: [SecretlogController],
+    providers: [SecretlogService],
 })
 export class SecretlogModule {}

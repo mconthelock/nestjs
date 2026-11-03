@@ -32,7 +32,7 @@ export class ApplicationService {
     private readonly docinvDirectory = `${process.env.AMEC_FILE_PATH}${process.env.STATE}/docinv/`;
 
     constructor(
-        @InjectRepository(Application, 'docinvConnection')
+        @InjectRepository(Application, 'mitsuConnection')
         private readonly apps: Repository<Application>,
         private grp: AppsgroupsService,
     ) {}

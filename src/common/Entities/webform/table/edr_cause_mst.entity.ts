@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn, OneToMany, JoinColumn } from 'typeorm';
 import { MfgEdrFormHead } from './mfg_edr_form_head.entity';
 
-@Entity({ name: 'EDR_CAUSE_MST' })
+@Entity({ name: 'EDR_CAUSE_MST', schema: 'WEBFORM' })
 export class EdrCauseMst {
   @PrimaryColumn()
   CID: number;

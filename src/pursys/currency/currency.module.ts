@@ -11,7 +11,7 @@ import { CurrencyExchange } from 'src/common/Entities/pursys/table/CURRENCY_EXCH
     imports: [
         TypeOrmModule.forFeature(
             [CurrencyMaster, CurrencyExchange],
-            'purConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [CurrencyController],

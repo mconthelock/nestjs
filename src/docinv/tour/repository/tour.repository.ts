@@ -6,7 +6,7 @@ import { TOUR } from 'src/common/Entities/docinv/table/TOUR.entity';
 
 @Injectable()
 export class TourRepository extends BaseRepository {
-    constructor(@InjectDataSource('docinvConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

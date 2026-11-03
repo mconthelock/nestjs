@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('JOB_RESULT_CONFIRMATION')
+@Entity({ name: 'JOB_RESULT_CONFIRMATION', schema: 'DOCINV' })
 export class AASTaskLog {
     @PrimaryColumn()
     LOG_DATE: Date;

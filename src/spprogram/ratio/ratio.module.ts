@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RatioService } from './ratio.service';
 import { RatioController } from './ratio.controller';
 import { Ratio } from './entities/ratio.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Ratio], 'spsysConnection')],
+  imports: [TypeOrmModule.forFeature([Ratio], 'mitsuConnection')],
   controllers: [RatioController],
   providers: [RatioService],
 })

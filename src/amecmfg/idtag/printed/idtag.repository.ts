@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+﻿import { DataSource } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -23,7 +23,7 @@ import { UpadateIdtagPagesDto } from './dto/update-idtag-pages.dto';
 
 @Injectable()
 export class IdTagRepository extends BaseRepository {
-    constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

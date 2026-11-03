@@ -1,4 +1,4 @@
-import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+﻿import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner, Raw } from 'typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
@@ -30,10 +30,10 @@ import { createHistoryDto } from '../history/dto/create.dto';
 @Injectable()
 export class InquiryService {
     constructor(
-        @InjectDataSource('spsysConnection')
+        @InjectDataSource('mitsuConnection')
         private ds: DataSource,
 
-        @InjectRepository(Inquiry, 'spsysConnection')
+        @InjectRepository(Inquiry, 'mitsuConnection')
         private readonly inq: Repository<Inquiry>,
     ) {}
 

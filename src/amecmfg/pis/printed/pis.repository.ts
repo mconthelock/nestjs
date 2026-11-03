@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -18,7 +18,7 @@ import { UpadatePisPagesDto } from './dto/update-pis-pages.dto';
 
 @Injectable()
 export class PisRepository extends BaseRepository {
-    constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { ConectionService } from 'src/as400/conection/conection.service';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -9,7 +9,7 @@ import { PKC_CARTON_DETAIL } from 'src/common/Entities/workload/table/PKC_CARTON
 @Injectable()
 export class VpsRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('workloadConnection') private readonly wk: DataSource,
+        @InjectDataSource('mitsuConnection') private readonly wk: DataSource,
         @InjectDataSource('packingConnection')
         private readonly packingDs: DataSource,
         private as400: ConectionService,

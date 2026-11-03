@@ -7,7 +7,7 @@ import { QA_TYPE } from 'src/common/Entities/webform/table/QA_TYPE.entity';
 @Injectable()
 export class QaTypeRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
         ) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

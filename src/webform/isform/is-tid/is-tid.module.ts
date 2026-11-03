@@ -13,7 +13,7 @@ import { IsTidActionService } from './is-tid-updateForm.service';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([ISTID_FORM], 'webformConnection'),
+        TypeOrmModule.forFeature([ISTID_FORM], 'mitsuConnection'),
         FormModule,
         FlowModule,
         IsCfsModule,

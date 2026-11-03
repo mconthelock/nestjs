@@ -12,7 +12,7 @@ import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 @Injectable()
 export class FormRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
         ) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

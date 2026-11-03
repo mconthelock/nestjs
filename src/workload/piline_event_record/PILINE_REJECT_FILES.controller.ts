@@ -15,7 +15,7 @@ class RejectFilesMultipartDto { @IsString() payload: string; }
 @Controller('workload/piline_issue/request')
 export class PilineRejectFilesController {
     private readonly logger = new Logger(PilineRejectFilesController.name);
-    constructor(@InjectDataSource('webformConnection') private readonly db: DataSource) {}
+    constructor(@InjectDataSource('mitsuConnection') private readonly db: DataSource) {}
 
     @Post('files')
     @UseInterceptors(FilesInterceptor('files',10,{storage:memoryStorage(),limits:{files:10,fileSize:5*1024*1024,fields:1,fieldSize:4096}}))

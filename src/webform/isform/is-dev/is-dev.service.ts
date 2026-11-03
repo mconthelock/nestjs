@@ -28,9 +28,9 @@ import { CreateInvestDto } from './dto/create-invest.dto';
 @Injectable()
 export class IsDevService {
     constructor(
-        @InjectRepository(ISDEV_DEVELOPER, 'webformConnection')
+        @InjectRepository(ISDEV_DEVELOPER, 'mitsuConnection')
         private readonly developer: Repository<ISDEV_DEVELOPER>,
-        @InjectRepository(ISDEV_REQUEST, 'webformConnection')
+        @InjectRepository(ISDEV_REQUEST, 'mitsuConnection')
         private readonly req: Repository<ISDEV_REQUEST>,
         protected readonly formcreateservice: FormCreateService,
         private readonly repo: IsDevFormRepository,

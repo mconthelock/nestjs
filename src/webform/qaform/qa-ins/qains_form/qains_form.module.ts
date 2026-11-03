@@ -30,7 +30,7 @@ import { QainsFormSetInchargeService } from './qains_form-setIncharge.sevice';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([QAINS_FORM], 'webformConnection'),
+        TypeOrmModule.forFeature([QAINS_FORM], 'mitsuConnection'),
         FormModule,
         FlowModule,
         QainsOAModule,

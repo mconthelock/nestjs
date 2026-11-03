@@ -8,7 +8,7 @@ import { AMECUSERALL } from 'src/common/Entities/amec/views/AMECUSERALL.entity';
 
 @Injectable()
 export class StInpRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

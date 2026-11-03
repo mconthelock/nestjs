@@ -15,7 +15,7 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 export class OrganizationsController {
     constructor(private readonly organizationsService: OrganizationsService) {}
     @Post('search')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     async search(@Body() dto: FiltersDto) {
         return this.organizationsService.search(dto);
     }

@@ -8,7 +8,7 @@ import { RncauseRepository } from './rncause.repository';
 import { RncauseService } from './rncause.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([RNCAUSE], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([RNCAUSE], 'mitsuConnection')],
     controllers: [RncauseController],
     providers: [RncauseService, RncauseRepository],
     exports: [RncauseService],

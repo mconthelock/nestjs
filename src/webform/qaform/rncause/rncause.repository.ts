@@ -9,7 +9,7 @@ import { RNCAUSE } from 'src/common/Entities/webform/table/RNCAUSE.entity';
 @Injectable()
 export class RncauseRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
     ) {
         super(ds);
     }

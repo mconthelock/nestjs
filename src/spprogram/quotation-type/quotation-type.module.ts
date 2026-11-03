@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { QuotationTypeService } from './quotation-type.service';
 import { QuotationTypeController } from './quotation-type.controller';
 import { QuotationType } from './entities/quotation-type.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([QuotationType], 'spsysConnection')],
+  imports: [TypeOrmModule.forFeature([QuotationType], 'mitsuConnection')],
   controllers: [QuotationTypeController],
   providers: [QuotationTypeService],
 })

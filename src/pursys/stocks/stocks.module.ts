@@ -21,7 +21,7 @@ import { ProductsLots } from 'src/common/Entities/pursys/table/PRODUCTS_LOTS.ent
                 StockTransactionItems,
                 StockBalances,
             ],
-            'purConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [StocksController],

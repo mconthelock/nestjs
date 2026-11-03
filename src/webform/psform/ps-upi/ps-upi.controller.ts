@@ -17,7 +17,7 @@ export class PsUpiController {
     }
 
     @Post('submit')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     submit(@Body() createPsUpiDto: CreatePsUpiDto, @Req() req: any) {
         const ip = getClientIP(req);
         return this.psUpiService.submit(createPsUpiDto, ip);

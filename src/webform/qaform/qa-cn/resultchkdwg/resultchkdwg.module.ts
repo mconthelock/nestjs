@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RESULTCHKDWG } from 'src/common/Entities/webform/table/RESULTCHKDWG.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([RESULTCHKDWG], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([RESULTCHKDWG], 'mitsuConnection')],
     controllers: [ResultchkdwgController],
     providers: [ResultChkDwgService, ResultChkDwgRepository],
     exports: [ResultChkDwgService, ResultChkDwgRepository],

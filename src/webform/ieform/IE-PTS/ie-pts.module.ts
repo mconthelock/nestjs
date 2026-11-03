@@ -12,7 +12,7 @@ import { IePtsService } from './ie-pts.service';
     imports: [
         TypeOrmModule.forFeature(
             [PROC_TSHEADFORM, PROC_TSDETFORM, PROC_TSATTFILE],
-            'webformConnection',
+            'mitsuConnection',
         ),
         FormModule,
     ],

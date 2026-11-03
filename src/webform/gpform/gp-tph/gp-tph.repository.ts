@@ -15,7 +15,7 @@ import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 @Injectable()
 export class GpTphRepository extends BaseRepository {
 
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
     findAllAreas() {

@@ -60,7 +60,7 @@ export class PurCpcController {
      * @description สร้างฟอร์ม PUR-CPC ใหม่หรือแก้ไขฟอร์มที่มีอยู่แล้ว
      */
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     async create(@Body() data: CreateFormDto, @Req() req: Request,) {
         const ip = getClientIP(req);
         return await this.service.create(data, ip);

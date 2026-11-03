@@ -33,7 +33,7 @@ import { UsersModule } from 'src/amec/users/users.module';
               FINNPOCOSTCENTER,
               FINNPOCURRENCY,
           ],
-          'webformConnection',
+          'mitsuConnection',
       ),
       FormModule,
       FlowModule,

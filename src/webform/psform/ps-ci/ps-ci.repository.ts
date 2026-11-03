@@ -8,7 +8,7 @@ import { GetDataFormDto } from './dto/create-ps-ci.dto';
 
 @Injectable()
 export class PsCiRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

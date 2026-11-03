@@ -31,7 +31,7 @@ export class IeTsController {
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/IE/IETS/` as string;
 
     @Post('create')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     create(@Body() dto: RequestIetsDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -54,7 +54,7 @@ export class IeTsController {
     }
 
     @Patch('update')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     update(@Body() dto: UpdateIetsDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -62,7 +62,7 @@ export class IeTsController {
     }
 
     @Patch('approve')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     approve(
         @Body() dto: ApproveIetsDto, // หรือ RequestPurevaFormDto

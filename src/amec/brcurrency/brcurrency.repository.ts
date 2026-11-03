@@ -8,7 +8,7 @@ import { BRCURRENCY } from 'src/common/Entities/amec/table/BRCURRENCY.entity';
 @Injectable()
 export class BrcurrencyRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
         ) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

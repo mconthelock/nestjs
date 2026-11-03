@@ -1,4 +1,4 @@
-import {
+﻿import {
     Body,
     Controller,
     Get,
@@ -93,7 +93,7 @@ export class IdtagController {
     }
 
     @Post('print-list')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async getPrintPfd(
         @Body()
         body: SearchIdtagFilesDto,
@@ -118,7 +118,7 @@ export class IdtagController {
     }
 
     @Get('download/:id')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async downloadFile(@Param('id') id: number) {
         return this.printed.downloadFile(id);
     }
@@ -129,13 +129,13 @@ export class IdtagController {
     }
 
     @Get('delete/:id')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async deletePdf(@Param('id') id: number) {
         return this.printed.deletePdf(id);
     }
 
     @Post('update-files')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async updatePrintedStatus(@Body() body: { files: number; status: number }) {
         return this.printed.updatePrintFileStatus(body.files, body.status);
     }

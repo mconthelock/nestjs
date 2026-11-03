@@ -5,7 +5,7 @@ import { DatacenterController } from './datacenter.controller';
 import { TableCheck } from '../../common/Entities/docinv/table/table-check.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([TableCheck], 'amecConnection')],
+    imports: [TypeOrmModule.forFeature([TableCheck], 'datacenterConnection')],
     controllers: [DatacenterController],
     providers: [DatacenterService],
 })

@@ -11,7 +11,7 @@ import { GpUnfRepository } from './gp-unf.repository';
 export class GpUnfService {
     constructor(
         private readonly repo: GpUnfRepository,
-        @InjectRepository(GPUNF_FORM, 'webformConnection')
+        @InjectRepository(GPUNF_FORM, 'mitsuConnection')
         private readonly form: Repository<GPUNF_FORM>,
     ) {}
 

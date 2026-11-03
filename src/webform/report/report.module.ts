@@ -12,7 +12,7 @@ import { ReportMasterAuth } from 'src/common/Entities/webform/table/REPORT_MASTE
     imports: [
         TypeOrmModule.forFeature(
             [ReportMaster, ReportMasterAuth],
-            'webformConnection',
+            'mitsuConnection',
         ),
         UsersModule,
     ],

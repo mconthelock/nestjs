@@ -7,7 +7,7 @@ import { TourUserSubscriber } from '../subscriber/tour-user.subscriber';
 
 @Injectable()
 export class TourUserRepository extends BaseRepository {
-    constructor(@InjectDataSource('docinvConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
         ds.subscribers.push(new TourUserSubscriber());
     }

@@ -9,7 +9,7 @@ import { UpdateQainsAuditDto } from './dto/update-qains_audit.dto';
 @Injectable()
 export class QainsAuditRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
         ) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

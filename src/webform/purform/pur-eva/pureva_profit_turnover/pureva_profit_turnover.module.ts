@@ -6,7 +6,7 @@ import { PUREVA_PROFIT_TURNOVER } from 'src/common/Entities/webform/table/PUREVA
 import { PurevaProfitTurnoverRepository } from './pureva_profit_turnover.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PUREVA_PROFIT_TURNOVER], 'webformConnection')],
+  imports: [TypeOrmModule.forFeature([PUREVA_PROFIT_TURNOVER], 'mitsuConnection')],
   controllers: [PurevaProfitTurnoverController],
   providers: [PurevaProfitTurnoverService, PurevaProfitTurnoverRepository],
   exports:[PurevaProfitTurnoverService]

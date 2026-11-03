@@ -102,7 +102,7 @@ export class PurPraController {
      * @returns ผลลัพธ์การสร้างแบบฟอร์ม
      */
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseInterceptors(getFileUploadInterceptor())
     create(
         @Body() dto: CreatePurPraFormDto,

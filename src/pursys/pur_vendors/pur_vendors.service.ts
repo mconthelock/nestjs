@@ -9,9 +9,9 @@ import { PurVendor } from '../../common/Entities/pursys/table/pur_vendor.entity'
 @Injectable()
 export class PurVendorsService {
     constructor(
-        @InjectRepository(PurVendor, 'purConnection')
+        @InjectRepository(PurVendor, 'mitsuConnection')
         private purVendorRepo: Repository<PurVendor>,
-        @InjectDataSource('purConnection')
+        @InjectDataSource('mitsuConnection')
         private ds: DataSource,
     ) {}
     async create(dto: CreatePurVendorDto) {

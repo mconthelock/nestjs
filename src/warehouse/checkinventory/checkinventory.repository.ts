@@ -21,7 +21,7 @@ import { ConectionService } from 'src/as400/conection/conection.service';
 @Injectable()
 export class CheckinventoryRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') private readonly ds: DataSource,
+        @InjectDataSource('mitsuConnection') private readonly ds: DataSource,
         private as400: ConectionService,
     ) {
         super(ds);

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Ratio } from './entities/ratio.entity';
@@ -8,7 +8,7 @@ import { findOneDto } from './dto/findone.dto';
 @Injectable()
 export class RatioService {
   constructor(
-    @InjectRepository(Ratio, 'spsysConnection')
+    @InjectRepository(Ratio, 'mitsuConnection')
     private readonly ratio: Repository<Ratio>,
   ) {}
 

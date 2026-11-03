@@ -13,7 +13,7 @@ import { RootcauseService } from './rootcause.service';
   imports: [
     TypeOrmModule.forFeature(
       [VIEW_MFG_EDR_HEAD_ROOTCAUSE, AmecOrders],
-      'webformConnection',
+      'mitsuConnection',
     ),
   ],
   controllers: [RootcauseController],

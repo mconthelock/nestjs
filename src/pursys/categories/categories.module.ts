@@ -10,7 +10,7 @@ import { CategoryAttributes } from 'src/common/Entities/pursys/table/CATEGORY_AT
     imports: [
         TypeOrmModule.forFeature(
             [Categories, CategoryAttributes],
-            'purConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [CategoriesController],

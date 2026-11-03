@@ -14,9 +14,9 @@ import { CreateReportAuthDto } from './dto/create-auth.dto';
 @Injectable()
 export class ReportService {
     constructor(
-        @InjectRepository(ReportMaster, 'webformConnection')
+        @InjectRepository(ReportMaster, 'mitsuConnection')
         private readonly report: Repository<ReportMaster>,
-        @InjectRepository(ReportMasterAuth, 'webformConnection')
+        @InjectRepository(ReportMasterAuth, 'mitsuConnection')
         private readonly reportAuth: Repository<ReportMasterAuth>,
         private readonly usr: UsersService,
     ) {}

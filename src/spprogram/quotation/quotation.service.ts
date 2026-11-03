@@ -1,4 +1,4 @@
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+﻿import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 
@@ -8,7 +8,7 @@ import { createQuotationDto } from './dto/create-quotation.dto';
 @Injectable()
 export class QuotationService {
   constructor(
-    @InjectRepository(Quotation, 'spsysConnection')
+    @InjectRepository(Quotation, 'mitsuConnection')
     private readonly quo: Repository<Quotation>,
   ) {}
 

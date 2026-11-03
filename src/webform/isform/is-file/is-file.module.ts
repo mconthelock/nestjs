@@ -6,7 +6,7 @@ import { IsFileRepository } from './is-file.repository';
 import { IS_FILE } from 'src/common/Entities/webform/table/IS_FILE.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([IS_FILE], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([IS_FILE], 'mitsuConnection')],
     controllers: [IsFileController],
     providers: [IsFileService, IsFileRepository],
     exports: [IsFileService],

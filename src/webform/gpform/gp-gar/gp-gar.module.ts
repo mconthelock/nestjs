@@ -11,7 +11,7 @@ import { FlowModule } from 'src/webform/flow/flow.module';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([GPGAR_CATEGORY], 'webformConnection'),
+  imports: [TypeOrmModule.forFeature([GPGAR_CATEGORY], 'mitsuConnection'),
   FormmstModule,
   FormModule,
   HandleFileFormModule,

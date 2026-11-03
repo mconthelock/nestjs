@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { JobExecutionLog } from './job-log.entity';
 
-@Entity('SCHEDULED_JOBS')
+@Entity({ name: 'SCHEDULED_JOBS', schema: 'DOCINV' })
 export class ScheduledJob {
     @PrimaryGeneratedColumn('uuid')
     ID: string;

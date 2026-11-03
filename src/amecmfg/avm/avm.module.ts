@@ -5,9 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Avm } from './entities/avm.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Avm], 'amecConnection')],
-  controllers: [AvmController],
-  providers: [AvmService],
-  exports: [AvmService],
+    imports: [TypeOrmModule.forFeature([Avm], 'datacenterConnection')],
+    controllers: [AvmController],
+    providers: [AvmService],
+    exports: [AvmService],
 })
 export class AvmModule {}

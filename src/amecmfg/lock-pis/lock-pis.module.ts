@@ -14,7 +14,7 @@ import { RedisModule } from 'src/common/redis/redis.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([LockPis], 'webformConnection'),
+        TypeOrmModule.forFeature([LockPis], 'mitsuConnection'),
         UsersModule,
         RedisModule,
     ],

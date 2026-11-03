@@ -6,7 +6,7 @@ import { ATTCNFRM } from 'src/common/Entities/webform/table/ATTCNFRM.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ATTCNFRM], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([ATTCNFRM], 'mitsuConnection')],
     controllers: [AttcnfrmController],
     providers: [AttcnfrmService, AttCnFrmRepository],
     exports: [AttcnfrmService, AttCnFrmRepository],

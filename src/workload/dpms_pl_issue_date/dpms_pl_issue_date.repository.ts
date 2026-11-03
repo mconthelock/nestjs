@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -7,7 +7,7 @@ import { DPMS_PL_ISSUE_DATE } from 'src/common/Entities/workload/views/DPMS_PL_I
 
 @Injectable()
 export class DpmsPlIssueDateRepository extends BaseRepository {
-    constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
     findOne(dto: DPMS_PL_ISSUE_PK) {

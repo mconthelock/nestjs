@@ -8,7 +8,7 @@ import { CreateFinpckFormDto } from './dto/create-finpck_form.dto';
 @Injectable()
 export class FinpckFormRepository extends BaseRepository {
     
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); 
     }
     async createForm(dto: CreateFinpckFormDto){

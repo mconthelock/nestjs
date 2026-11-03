@@ -7,7 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 
 @Module({
-   imports: [TypeOrmModule.forFeature([PUREVA_SCORE], 'webformConnection')],
+   imports: [TypeOrmModule.forFeature([PUREVA_SCORE], 'mitsuConnection')],
   controllers: [PurevaScoreController],
   providers: [PurevaScoreService , PurevaScoreRepository],
   exports:[PurevaScoreService]

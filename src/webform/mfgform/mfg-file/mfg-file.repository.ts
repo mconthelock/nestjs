@@ -8,7 +8,7 @@ import { MFG_FILE } from 'src/common/Entities/webform/table/MFG_FILE.entity';
 
 @Injectable()
 export class MfgFileRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

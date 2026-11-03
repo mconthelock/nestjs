@@ -16,7 +16,7 @@ export class DatabaseService {
     private readonly iv: Buffer;
 
     constructor(
-        @InjectDataSource('amecConnection')
+        @InjectDataSource('datacenterConnection')
         private ds: DataSource,
         // private keys: MasterkeyService,
     ) {

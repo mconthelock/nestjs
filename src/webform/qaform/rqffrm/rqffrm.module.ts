@@ -9,7 +9,7 @@ import { RqflistModule } from '../rqflist/rqflist.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([RQFFRM], 'webformConnection'),
+        TypeOrmModule.forFeature([RQFFRM], 'mitsuConnection'),
         FormModule,
         RqflistModule,
     ],

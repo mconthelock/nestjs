@@ -6,7 +6,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 @Injectable()
 export class IsCboRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') private readonly ds: DataSource,
+        @InjectDataSource('mitsuConnection') private readonly ds: DataSource,
         @InjectDataSource('gpreportConnection') private readonly gpreportDs: DataSource,
     ) {
         super(ds);

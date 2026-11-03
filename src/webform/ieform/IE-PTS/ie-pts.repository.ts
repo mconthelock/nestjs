@@ -18,7 +18,7 @@ import {
 @Injectable()
 export class IePtsRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') private readonly ds: DataSource,
+        @InjectDataSource('mitsuConnection') private readonly ds: DataSource,
     ) {
         super(ds);
     }

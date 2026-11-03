@@ -7,7 +7,7 @@ import { SearchSequenceOrgDto } from './dto/search-sequence-org.dto';
 
 @Injectable()
 export class SequenceOrgRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

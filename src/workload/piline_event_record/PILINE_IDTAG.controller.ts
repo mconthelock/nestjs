@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Injectable, BadRequestException, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+﻿import { Controller, Get, Param, Injectable, BadRequestException, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { F110KP } from 'src/amecmfg/f110kp/entities/f110kp.entity';
@@ -7,7 +7,7 @@ import { F110KP } from 'src/amecmfg/f110kp/entities/f110kp.entity';
 export class PilineIdtagService {
     constructor(
         @InjectDataSource('amecConnection') private readonly ds: DataSource,
-        @InjectDataSource('workloadConnection') private readonly workload: DataSource,
+        @InjectDataSource('mitsuConnection') private readonly workload: DataSource,
     ) {}
 
     private async materialCodes(order: string): Promise<string[]> {

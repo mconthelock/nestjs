@@ -1,4 +1,4 @@
-import {
+﻿import {
   Controller,
   Get,
   Post,
@@ -29,25 +29,25 @@ export class IdtagEfacLogController {
     }
 
     @Post('search')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async search(@Body() dto: FiltersDto) {
         return this.idtagEfacLogService.search(dto);
     }
 
     @Post('max-runno')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async maxRunno(@Body() dto: GetMaxRunnoDto) {
         return this.idtagEfacLogService.maxRunno(dto);
     }
 
     @Post('insert-log')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async insertLog(@Body() dto: InsertLogDto) {
         return this.idtagEfacLogService.insertLog(dto);
     }
 
     @Post('latest')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async getLatest(@Body() dto: GetLatestControlNoDto) {
         return this.idtagEfacLogService.getLatest(dto.ctrlno);
     }

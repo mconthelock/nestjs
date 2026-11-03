@@ -5,7 +5,7 @@ import { MfgOrService } from './mfg-or.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([], 'webformConnection'),
+    TypeOrmModule.forFeature([], 'mitsuConnection'),
   ],
   controllers: [MfgOrController],
   providers: [MfgOrService],

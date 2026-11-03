@@ -33,7 +33,7 @@ export class JigReminderService {
     constructor(
         @InjectDataSource('mitsuConnection') private readonly db: DataSource,
         private readonly mail: MailService,
-        @InjectDataSource('webformConnection')
+        @InjectDataSource('mitsuConnection')
         private readonly webformDb: DataSource,
     ) {}
 

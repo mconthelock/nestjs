@@ -7,7 +7,7 @@ import { GetProdDto } from './dto/GetProd.dto';
 
 @Injectable()
 export class AmeccalendarRepository extends BaseRepository {
-    constructor(@InjectDataSource('amecConnection') ds: DataSource) {
+    constructor(@InjectDataSource('datacenterConnection') ds: DataSource) {
         super(ds);
     }
 

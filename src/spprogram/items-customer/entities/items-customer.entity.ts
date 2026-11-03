@@ -1,8 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+﻿import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Items } from '../../items/entities/items.entity';
 import { Customer } from '../../customer/entities/customer.entity';
 
-@Entity('DS_CUSTOMER_ITEM')
+@Entity({ name: 'DS_CUSTOMER_ITEM', schema: 'SPSYS' })
 export class ItemsCustomer {
   @PrimaryColumn()
   CUSTOMER_ID: number;

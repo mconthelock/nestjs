@@ -19,7 +19,7 @@ export function inspectionDate(value: string): string {
 @Injectable()
 export class JigInspectionService {
     constructor(
-        @InjectDataSource('webformConnection') private readonly ds: DataSource,
+        @InjectDataSource('mitsuConnection') private readonly ds: DataSource,
         private readonly forms: FormCreateService,
     ) {}
 

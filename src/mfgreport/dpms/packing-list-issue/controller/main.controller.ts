@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Patch, Get, Param } from '@nestjs/common';
+﻿import { Controller, Post, Body, Patch, Get, Param } from '@nestjs/common';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 import { ReviseShippingMarkDto } from '../dto/revise-shipping-mark.dto';
@@ -24,13 +24,13 @@ export class MainController {
     ) {}
 
     @Post()
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     issue(@Body() dto: CreatePackingListIssueDto) {
         return this.createService.issue(dto);
     }
 
     @Patch('problem-reason')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     updateProblemReason(@Body() dto: UpdatePlIssueProblemReasonDto) {
         return this.service.updateProblemReason(dto);
     }
@@ -61,7 +61,7 @@ export class MainController {
     }
 
     @Post('shippingMark-revise')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     reviseShippingMark(@Body() dto: ReviseShippingMarkDto) {
         return this.reviseShippingMarkService.reviseShippingMark(dto);
     }

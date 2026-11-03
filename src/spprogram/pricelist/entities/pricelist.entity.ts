@@ -1,4 +1,4 @@
-import {
+﻿import {
   Column,
   Entity,
   PrimaryColumn,
@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Items } from '../../items/entities/items.entity';
 
-@Entity('PRICELIST')
+@Entity({ name: 'PRICELIST', schema: 'SPSYS' })
 export class Pricelist {
   @PrimaryGeneratedColumn()
   PRICEID: number;

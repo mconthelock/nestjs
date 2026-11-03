@@ -40,13 +40,13 @@ import { FormCounter } from 'src/common/Entities/webform/table/FORM_COUNTER.enti
 @Injectable()
 export class FormService {
     constructor(
-        @InjectRepository(FORM, 'webformConnection')
+        @InjectRepository(FORM, 'mitsuConnection')
         protected readonly form: Repository<FORM>,
 
-        @InjectRepository(FLOW, 'webformConnection')
+        @InjectRepository(FLOW, 'mitsuConnection')
         protected readonly flow: Repository<FLOW>,
 
-        @InjectRepository(FormCounter, 'webformConnection')
+        @InjectRepository(FormCounter, 'mitsuConnection')
         protected readonly count: Repository<FormCounter>,
 
         protected readonly formmstService: FormmstService,

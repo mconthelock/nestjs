@@ -9,7 +9,7 @@ import { SearchIsJdrDto } from './dto/search-is-jdr.dto';
 @Injectable()
 export class IsJdrService {
     constructor(
-        @InjectRepository(ISJDR_RESULT, 'webformConnection')
+        @InjectRepository(ISJDR_RESULT, 'mitsuConnection')
         private readonly jdr: Repository<ISJDR_RESULT>,
     ) {}
 

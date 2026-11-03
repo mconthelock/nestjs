@@ -7,7 +7,7 @@ import { WarehousesController } from './warehouses.controller';
 import { Warehouses } from 'src/common/Entities/pursys/table/WAREHOUSES.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Warehouses], 'purConnection')],
+    imports: [TypeOrmModule.forFeature([Warehouses], 'mitsuConnection')],
     controllers: [WarehousesController],
     providers: [WarehousesService],
 })

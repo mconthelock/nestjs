@@ -16,7 +16,7 @@ import dayjs from 'dayjs';
 @Injectable()
 export class PSDLCRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
         private readonly conn: ConectionService,
     ) {
         super(ds);

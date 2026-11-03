@@ -9,13 +9,13 @@ export class StocksController {
     constructor(private readonly stocks: StocksService) {}
 
     @Post('issue')
-    @UseTransaction('purConnection')
+    @UseTransaction('mitsuConnection')
     issueStock(@Body() trns: CreateTransactionDto) {
         return this.stocks.createStockTransaction(trns, 1);
     }
 
     @Post('receive')
-    @UseTransaction('purConnection')
+    @UseTransaction('mitsuConnection')
     receiveStock(@Body() trns: CreateTransactionDto) {
         return this.stocks.createStockTransaction(trns, 2);
     }

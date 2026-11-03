@@ -5,7 +5,7 @@ import { IsJdrController } from './is-jdr.controller';
 import { ISJDR_RESULT } from 'src/common/Entities/webform/table/ISJDR_RESULT.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ISJDR_RESULT], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([ISJDR_RESULT], 'mitsuConnection')],
     controllers: [IsJdrController],
     providers: [IsJdrService],
 })

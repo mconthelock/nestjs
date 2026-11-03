@@ -9,7 +9,7 @@ import * as fs from 'fs';
 @Injectable()
 export class DatacenterService {
     constructor(
-        @InjectRepository(TableCheck, 'amecConnection')
+        @InjectRepository(TableCheck, 'datacenterConnection')
         private readonly table: Repository<TableCheck>,
     ) {}
 

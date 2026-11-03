@@ -31,10 +31,10 @@ export class SchedulerService implements OnModuleInit {
         private schedulerRegistry: SchedulerRegistry,
         private httpService: HttpService,
 
-        @InjectRepository(ScheduledJob, 'docinvConnection')
+        @InjectRepository(ScheduledJob, 'mitsuConnection')
         private readonly jobRepo: Repository<ScheduledJob>,
 
-        @InjectRepository(JobExecutionLog, 'docinvConnection')
+        @InjectRepository(JobExecutionLog, 'mitsuConnection')
         private logRepo: Repository<JobExecutionLog>,
     ) {
         this.redisClient = new Redis({

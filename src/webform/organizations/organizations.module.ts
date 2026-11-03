@@ -6,7 +6,7 @@ import { ORGANIZATIONS } from 'src/common/Entities/webform/views/ORGANIZATIONS.e
 import { OrganizationsRepository } from './organizations.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ORGANIZATIONS], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([ORGANIZATIONS], 'mitsuConnection')],
     controllers: [OrganizationsController],
     providers: [OrganizationsService, OrganizationsRepository],
     exports: [OrganizationsService],

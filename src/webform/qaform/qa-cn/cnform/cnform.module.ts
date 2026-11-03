@@ -6,7 +6,7 @@ import { CnFormRepository } from './cnform.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([CNFORM], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([CNFORM], 'mitsuConnection')],
     controllers: [CnformController],
     providers: [CnformService, CnFormRepository],
     exports: [CnformService, CnFormRepository],

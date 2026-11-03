@@ -11,7 +11,7 @@ export class FlowmstService {
     constructor(
         private readonly repo: FlowmstRepository,
 
-        @InjectRepository(FLOWMST, 'webformConnection')
+        @InjectRepository(FLOWMST, 'mitsuConnection')
         protected readonly master: Repository<FLOWMST>,
     ) {}
 

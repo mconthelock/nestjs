@@ -18,7 +18,7 @@ export class RnwasteController {
   }
 
   @Post('search')
-  @UseTransaction('webformConnection')
+  @UseTransaction('mitsuConnection')
   search(@Body() dto: FiltersDto) {
     return this.rnwasteService.search(dto);
   }

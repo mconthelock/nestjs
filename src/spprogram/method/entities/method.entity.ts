@@ -1,7 +1,7 @@
-import { Column, Entity, PrimaryColumn, JoinColumn, OneToMany } from 'typeorm';
+﻿import { Column, Entity, PrimaryColumn, JoinColumn, OneToMany } from 'typeorm';
 import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 
-@Entity('SP_METHOD')
+@Entity({ name: 'SP_METHOD', schema: 'SPSYS' })
 export class Method {
   @PrimaryColumn()
   METHOD_ID: number;

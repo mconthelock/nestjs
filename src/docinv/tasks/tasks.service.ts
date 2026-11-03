@@ -14,13 +14,13 @@ import { SearchTaskDto } from './dto/search-task.dto';
 @Injectable()
 export class TasksService {
     constructor(
-        @InjectRepository(Tasks, 'docinvConnection')
+        @InjectRepository(Tasks, 'mitsuConnection')
         private readonly tasks: Repository<Tasks>,
 
-        @InjectRepository(TasksTag, 'docinvConnection')
+        @InjectRepository(TasksTag, 'mitsuConnection')
         private readonly tasksTag: Repository<TasksTag>,
 
-        @InjectRepository(Tags, 'docinvConnection')
+        @InjectRepository(Tags, 'mitsuConnection')
         private readonly tags: Repository<Tags>,
     ) {}
 

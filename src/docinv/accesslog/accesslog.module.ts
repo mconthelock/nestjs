@@ -5,7 +5,7 @@ import { AccesslogController } from './accesslog.controller';
 import { Accesslog } from '../../common/Entities/docinv/table/accesslog.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Accesslog], 'docinvConnection')],
+    imports: [TypeOrmModule.forFeature([Accesslog], 'mitsuConnection')],
     controllers: [AccesslogController],
     providers: [AccesslogService],
     exports: [AccesslogService],

@@ -53,7 +53,7 @@ export class QainsFormController {
 
     @ApiExcludeEndpoint()
     @Post('request')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(getFileUploadInterceptor('files', true, 20))
     async uploadUserFile(
@@ -66,7 +66,7 @@ export class QainsFormController {
     }
 
     @Post('setIncharge')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(AnyFilesInterceptor())
     async setIncharge(
@@ -88,7 +88,7 @@ export class QainsFormController {
     }
 
     @Post('qcConfirm')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(AnyFilesInterceptor())
     async qcConfirm(@Body() dto: QcConfQainsFormDto, @Req() req: Request) {
@@ -97,7 +97,7 @@ export class QainsFormController {
     }
 
     @Post('lastApprove')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(AnyFilesInterceptor())
     async lastApprove(@Body() dto: doactionFlowDto, @Req() req: Request) {
@@ -106,7 +106,7 @@ export class QainsFormController {
     }
 
     @Post('returnApproval')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(getFileUploadInterceptor('files', true, 20))
     async returnApproval(

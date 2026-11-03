@@ -145,14 +145,14 @@ describe('POST /form/is/is-dev/create', () => {
                     {
                         provide: getRepositoryToken(
                             ISDEV_DEVELOPER,
-                            'webformConnection',
+                            'mitsuConnection',
                         ),
                         useValue: {},
                     },
                     {
                         provide: getRepositoryToken(
                             ISDEV_REQUEST,
-                            'webformConnection',
+                            'mitsuConnection',
                         ),
                         useValue: {},
                     },

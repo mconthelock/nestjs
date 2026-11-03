@@ -28,7 +28,7 @@ export class GpTphController {
     constructor(private readonly gpTphService: GpTphService) { }
 
     @Post('doaction')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     doAction(@Body() dto: DoactionGpTphDto, @Req() req: Request) {
         return this.gpTphService.doAction(dto, getClientIP(req));
     }
@@ -79,7 +79,7 @@ export class GpTphController {
     }
 
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseInterceptors(getFileUploadInterceptor())
     create(
         @Body() dto: CreateGpTphReqDto,
@@ -99,7 +99,7 @@ export class GpTphController {
     }
 
     @Patch('/:fno/:orgno/:cyear/:cyear2/:nrunno')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseInterceptors(getFileUploadInterceptor())
     update(
         @Param('fno', ParseIntPipe) fno: number,
@@ -116,7 +116,7 @@ export class GpTphController {
     }
 
     @Delete('/:fno/:orgno/:cyear/:cyear2/:nrunno')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     delete(
         @Param('fno', ParseIntPipe) fno: number,
         @Param('orgno') orgno: string,

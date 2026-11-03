@@ -40,7 +40,7 @@ export class PurNvfController {
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/PUR/PURNVF/` as string;
 
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseForceTransaction()
     @UseInterceptors(
@@ -67,7 +67,7 @@ export class PurNvfController {
     }
 
     @Patch()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(
         getFileUploadInterceptor([

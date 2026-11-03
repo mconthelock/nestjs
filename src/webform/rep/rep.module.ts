@@ -6,7 +6,7 @@ import { REP } from 'src/common/Entities/webform/table/REP.entity';
 import { RepRepository } from './rep.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([REP], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([REP], 'mitsuConnection')],
     controllers: [RepController],
     providers: [RepService, RepRepository],
     exports: [RepService],

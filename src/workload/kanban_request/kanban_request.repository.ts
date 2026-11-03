@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { ISSUE_KANBAN } from 'src/common/Entities/workload/table/ISSUE_KANBAN.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -9,7 +9,7 @@ import { ISSUE_KANBAN_DETAIL } from 'src/common/Entities/workload/table/ISSUE_KA
 @Injectable()
 export class KanbanRequestRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('workloadConnection') private ds: DataSource,
+        @InjectDataSource('mitsuConnection') private ds: DataSource,
     ) {
         super(ds);
     }

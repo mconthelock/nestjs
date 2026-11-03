@@ -11,9 +11,9 @@ import { UpdateCurrencyDto } from './dto/update-currency.dto';
 @Injectable()
 export class CurrencyService {
     constructor(
-        @InjectRepository(CurrencyMaster, 'purConnection')
+        @InjectRepository(CurrencyMaster, 'mitsuConnection')
         private readonly curr: Repository<CurrencyMaster>,
-        @InjectRepository(CurrencyExchange, 'purConnection')
+        @InjectRepository(CurrencyExchange, 'mitsuConnection')
         private readonly exch: Repository<CurrencyExchange>,
     ) {}
 

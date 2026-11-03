@@ -27,7 +27,7 @@ export class PsClmController {
     constructor(private readonly psClmService: PsClmService) {}
 
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseInterceptors(getFileUploadInterceptor())
     create(
         @Body() dto: CreatePsClmReqFormDto,
@@ -43,7 +43,7 @@ export class PsClmController {
     }
 
     @Post('send-as400')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     sendToAs400(@Body() dto: SendPsClmAs400Dto) {
         return this.psClmService.sendToAs400(dto);
@@ -55,7 +55,7 @@ export class PsClmController {
     }
 
     @Patch()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     update(@Body() dto: UpdatePsClmDto, @Req() req: Request) {
         return this.psClmService.update(dto, getClientIP(req));

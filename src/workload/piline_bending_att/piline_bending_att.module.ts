@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { piline_bending_att } from 'src/common/Entities/workload/table/piline_bending_att.entity';
@@ -11,7 +11,7 @@ import { PilineBendingAttService } from './piline_bending_att.service';
   imports: [
     TypeOrmModule.forFeature(
       [piline_bending_att],
-      'workloadConnection',
+      'mitsuConnection',
     ),
   ],
   controllers: [PilineBendingAttController],

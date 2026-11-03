@@ -6,7 +6,7 @@ import { RQFLIST } from 'src/common/Entities/webform/table/RQFLIST.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([RQFLIST], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([RQFLIST], 'mitsuConnection')],
     controllers: [RqflistController],
     providers: [RqflistService, RqflistRepository],
     exports: [RqflistService],

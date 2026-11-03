@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { InquiryService } from './inquiry.service';
 import { InquiryController } from './inquiry.controller';
@@ -18,7 +18,7 @@ import { StatusModule } from '../status/status.module';
     imports: [
         TypeOrmModule.forFeature(
             [Inquiry, Orderpart, Spcalsheet, User, Partcategory],
-            'spsysConnection',
+            'mitsuConnection',
         ),
         InquiryGroupModule,
         InquiryDetailModule,

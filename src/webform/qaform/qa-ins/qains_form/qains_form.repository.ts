@@ -11,7 +11,7 @@ import { CreateQainsFormDto } from './dto/create-qains_form.dto';
 @Injectable()
 export class QainsFormRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
         ) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }

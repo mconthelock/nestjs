@@ -7,7 +7,7 @@ import { FormAttachmentRepository } from './form-attachment-type.repository';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([FORM_ATTACHMENT_TYPE], 'webformConnection'),
+        TypeOrmModule.forFeature([FORM_ATTACHMENT_TYPE], 'mitsuConnection'),
     ],
     controllers: [FormAttachmentTypeController],
     providers: [FormAttachmentTypeService, FormAttachmentRepository],

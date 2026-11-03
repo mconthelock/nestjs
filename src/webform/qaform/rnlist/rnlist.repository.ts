@@ -10,7 +10,7 @@ import { RNLIST } from 'src/common/Entities/webform/table/RNLIST.entity';
 @Injectable()
 export class RnlistRepository extends BaseRepository {
   constructor(
-    @InjectDataSource('webformConnection') ds: DataSource,
+    @InjectDataSource('mitsuConnection') ds: DataSource,
   ) {
     super(ds);
   }

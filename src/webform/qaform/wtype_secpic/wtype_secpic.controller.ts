@@ -30,7 +30,7 @@ export class WtypeSecpicController {
   }
 
   @Post('search')
-  @UseTransaction('webformConnection')
+  @UseTransaction('mitsuConnection')
   search(@Body() dto: FiltersDto) {
     return this.wtypeSecpicService.search(dto);
   }

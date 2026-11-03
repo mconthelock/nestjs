@@ -13,7 +13,7 @@ import { StockBalances } from 'src/common/Entities/pursys/table/STOCK_BALANCES.e
 
 @Injectable()
 export class StocksRepository extends BaseRepository {
-    constructor(@InjectDataSource('purConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

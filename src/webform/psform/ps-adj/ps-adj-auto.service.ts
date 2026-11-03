@@ -31,7 +31,7 @@ export interface AutoAdjustBatchResult {
 @Injectable()
 export class PsAdjAutoService {
     constructor(
-        @InjectDataSource('webformConnection') private readonly ds: DataSource,
+        @InjectDataSource('mitsuConnection') private readonly ds: DataSource,
         private readonly forms: FormCreateService,
         private readonly adjust: PsAdjService,
         private readonly repo: PsAdjRepository,

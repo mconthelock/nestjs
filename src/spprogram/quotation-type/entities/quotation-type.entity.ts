@@ -1,8 +1,8 @@
-import { Entity, PrimaryColumn, Column, JoinColumn, OneToMany } from 'typeorm';
+﻿import { Entity, PrimaryColumn, Column, JoinColumn, OneToMany } from 'typeorm';
 import { Ratio } from '../../ratio/entities/ratio.entity';
 import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 
-@Entity('SP_QUOTATION_TYPE')
+@Entity({ name: 'SP_QUOTATION_TYPE', schema: 'SPSYS' })
 export class QuotationType {
   @PrimaryColumn()
   QUOTYPE_ID: string;

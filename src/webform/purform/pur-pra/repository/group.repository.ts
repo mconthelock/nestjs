@@ -6,7 +6,7 @@ import { PURPRA_GROUP } from 'src/common/Entities/webform/table/PURPRA_GROUP.ent
 
 @Injectable()
 export class GroupRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

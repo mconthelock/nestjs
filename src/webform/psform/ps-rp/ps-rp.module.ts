@@ -14,7 +14,7 @@ import { PSRP_FORM } from "src/common/Entities/webform/table/PSRP_FORM.entity";
     imports: [
         TypeOrmModule.forFeature(
             [PSRP_LIST, PSRP_FORM],
-            'webformConnection',
+            'mitsuConnection',
         ),
         FormmstModule,
         FormModule,

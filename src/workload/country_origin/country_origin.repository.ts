@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -8,7 +8,7 @@ import { CountryOriginSubscriber } from './country_origin.subscriber';
 
 @Injectable()
 export class CountryOriginRepository extends BaseRepository {
-    constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
         ds.subscribers.push(new CountryOriginSubscriber()); // register Subscriber สำหรับ control การอัปเดต CREATEBY และ UPDATEBY
     }

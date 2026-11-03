@@ -1,7 +1,7 @@
-import { Column, Entity, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
+﻿import { Column, Entity, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
 import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 
-@Entity('SP_INQUIRY_TIMELINE')
+@Entity({ name: 'SP_INQUIRY_TIMELINE', schema: 'SPSYS' })
 export class Timeline {
   @PrimaryColumn()
   INQ_NO: string;

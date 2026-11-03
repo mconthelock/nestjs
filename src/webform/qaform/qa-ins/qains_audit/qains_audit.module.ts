@@ -10,7 +10,7 @@ import { QainsAuditRepository } from './qains_audit.repository';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([QAINS_AUDIT], 'webformConnection'),
+        TypeOrmModule.forFeature([QAINS_AUDIT], 'mitsuConnection'),
         QainsOAModule,
         QaFileModule,
         FormModule,

@@ -2,17 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { IsWorkLoad } from './entities/allwork.entity';
-import { IsWorkStatus } from './entities/workstatus.entity';
+import { IsWorkLoad } from 'src/common/Entities/docinv/table/allwork.entity';
+import { IsWorkStatus } from 'src/common/Entities/docinv/table/workstatus.entity';
 import { SearchWorkloadDto } from './dto/search.dto';
 
 @Injectable()
 export class IsWorkloadService {
   constructor(
-    @InjectRepository(IsWorkLoad, 'docinvConnection')
+    @InjectRepository(IsWorkLoad, 'mitsuConnection')
     private readonly works: Repository<IsWorkLoad>,
 
-    @InjectRepository(IsWorkStatus, 'docinvConnection')
+    @InjectRepository(IsWorkStatus, 'mitsuConnection')
     private readonly status: Repository<IsWorkStatus>,
   ) {}
 

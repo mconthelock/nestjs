@@ -7,7 +7,7 @@ import { FINPCK_VWSTATUS } from 'src/common/Entities/webform/views/FINPCK_VWSTAT
 
 @Injectable()
 export class VWStatusRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

@@ -16,7 +16,7 @@ import {
 @Injectable()
 export class MfgOrService {
   constructor(
-    @InjectDataSource('webformConnection')
+    @InjectDataSource('mitsuConnection')
     private readonly dataSource: DataSource,
   ) {}
 

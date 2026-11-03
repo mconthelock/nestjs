@@ -6,20 +6,20 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class MatrixEffectViewService {
-  constructor(
-    @InjectRepository(MatrixEffectView, 'idsConnection')
-    private readonly mtxEftRepo: Repository<MatrixEffectView>,
-    @InjectDataSource('idsConnection')
-    private readonly dataSource: DataSource,
-  ) {}
+    constructor(
+        @InjectRepository(MatrixEffectView, 'mitsuConnection')
+        private readonly mtxEftRepo: Repository<MatrixEffectView>,
+        @InjectDataSource('mitsuConnection')
+        private readonly dataSource: DataSource,
+    ) {}
 
-  async getEffect(dto: SearchMatrixEffectViewDto) {
-    const where: any = {};
+    async getEffect(dto: SearchMatrixEffectViewDto) {
+        const where: any = {};
 
-    if (dto.SECID) where.SECID = dto.SECID;
-    if (dto.ITEMNO) where.ITEMNO = dto.ITEMNO;
-    if (dto.TITLE) where.TITLE = dto.TITLE;
+        if (dto.SECID) where.SECID = dto.SECID;
+        if (dto.ITEMNO) where.ITEMNO = dto.ITEMNO;
+        if (dto.TITLE) where.TITLE = dto.TITLE;
 
-    return await this.mtxEftRepo.find({ where });
-  }
+        return await this.mtxEftRepo.find({ where });
+    }
 }

@@ -6,7 +6,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { PURCPC_PROC_COMPARE_VIEW } from 'src/common/Entities/webform/views/PURCPC_PROC_COMPARE_VIEW.entity';
 @Injectable()
 export class PurcpcProcCompareViewRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

@@ -12,7 +12,7 @@ import { User } from 'src/common/Entities/webform/views/AMECUSERALL.entity';
 
 @Injectable()
 export class PsUpiRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

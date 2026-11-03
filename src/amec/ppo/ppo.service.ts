@@ -9,9 +9,9 @@ import { SearchPpoDto } from './dto/search-ppo.dto';
 @Injectable()
 export class PpoService {
   constructor(
-    @InjectRepository(PPO, 'webformConnection')
+    @InjectRepository(PPO, 'mitsuConnection')
     private repo: Repository<PPO>,
-    @InjectDataSource('webformConnection')
+    @InjectDataSource('mitsuConnection')
     private dataSource: DataSource,
   ) {}
 

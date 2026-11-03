@@ -1,4 +1,4 @@
-import {
+﻿import {
   Entity,
   PrimaryColumn,
   Column,
@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 
-@Entity('SP_INQUIRY_REASON')
+@Entity({ name: 'SP_INQUIRY_REASON', schema: 'SPSYS' })
 export class Reason {
   @PrimaryColumn()
   REASON_ID: string;

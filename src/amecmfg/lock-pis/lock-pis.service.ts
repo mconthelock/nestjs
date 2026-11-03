@@ -9,9 +9,9 @@ import { LockPis } from './entities/lock-pi.entity';
 @Injectable()
 export class LockPisService {
   constructor(
-    @InjectRepository(LockPis, 'webformConnection')
+    @InjectRepository(LockPis, 'mitsuConnection')
     private readonly lockpisRepo: Repository<LockPis>,
-    @InjectDataSource('webformConnection')
+    @InjectDataSource('mitsuConnection')
     private readonly dataSource: DataSource,
   ) {}
 

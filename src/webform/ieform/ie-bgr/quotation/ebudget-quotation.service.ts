@@ -11,7 +11,7 @@ import { RqffrmService } from 'src/webform/qaform/rqffrm/rqffrm.service';
 @Injectable()
 export class QuotationService {
     constructor(
-        @InjectDataSource('webformConnection')
+        @InjectDataSource('mitsuConnection')
         private dataSource: DataSource,
         private formService: FormService,
         private ebudgetQuotationService: EbudgetQuotationService,

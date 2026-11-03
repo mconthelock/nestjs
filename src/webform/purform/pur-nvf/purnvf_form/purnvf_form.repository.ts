@@ -8,7 +8,7 @@ import { CreatePurnvfFormDto } from './dto/create-purnvf_form.dto';
 
 @Injectable()
 export class PurnvfFormRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

@@ -1,4 +1,4 @@
-import {
+﻿import {
   Column,
   Entity,
   JoinColumn,
@@ -9,7 +9,7 @@ import {
 import { ItemsCustomer } from '../../items-customer/entities/items-customer.entity';
 import { Ratio } from '../../ratio/entities/ratio.entity';
 
-@Entity('DS_CUSTOMER')
+@Entity({ name: 'DS_CUSTOMER', schema: 'SPSYS' })
 export class Customer {
   @PrimaryColumn()
   CUS_ID: number;

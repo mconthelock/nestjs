@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
@@ -10,7 +10,7 @@ import { piline_bending_att } from 'src/common/Entities/workload/table/piline_be
 @Injectable()
 export class PilineBendingAttRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('workloadConnection')
+        @InjectDataSource('mitsuConnection')
         ds: DataSource,
     ) {
         super(ds);

@@ -38,7 +38,7 @@ export class PurEvaController {
     private readonly path =
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/PUR/PUREVA/` as string;
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(
         getFileUploadInterceptor([
@@ -65,7 +65,7 @@ export class PurEvaController {
         return this.purEvaService.request(dto, files, ip, this.path);
     }
     @Patch()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(
         getFileUploadInterceptor([
@@ -93,7 +93,7 @@ export class PurEvaController {
     }
 
     @Patch('approve')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     approve(
         @Body() dto: ApprovePurevaFormDto, // หรือ RequestPurevaFormDto

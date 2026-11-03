@@ -17,6 +17,7 @@ export class StockPartFollowViewRepository extends BaseRepository {
                 DRAWING: 'ASC',
                 PROD: 'ASC',
                 IDTAG: 'ASC',
+                SEQ: 'ASC',
                 PROCESS: 'ASC',
             },
         });

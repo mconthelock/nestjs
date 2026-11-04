@@ -11,9 +11,11 @@ import { FlowRepository } from 'src/webform/flow/flow.repository';
 import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 import { FormService } from 'src/webform/form/form.service';
+import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { Request } from 'express';
 import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
 import { IePtsService } from '../IE-PTS/ie-pts.service';
+import { ITEM } from 'src/common/Entities/escs/table/ITEM.entity';
 
 @Injectable()
 export class IeTsApproveService {
@@ -30,6 +32,7 @@ export class IeTsApproveService {
         protected readonly doactionService: DoactionFlowService,
         protected readonly formService: FormService,
         protected readonly ieptsService: IePtsService,
+        protected readonly formmstService: FormmstService,
     ) {}
     async approve(dto: ApproveIetsDto, ip: string) {
         try {
@@ -105,12 +108,69 @@ export class IeTsApproveService {
                 }
             }
             const cst = await this.formService.getFormStatus({ ...form });
+            console.log('>>>cst = ', cst);
+
             if (cst == '2') {
                 const ietsform = await this.repotsf.getData({ ...form });
                 if (ietsform?.LISTS && ietsform.LISTS.length > 0) {
+                    const ptsform =
+                        await this.formmstService.getFormMasterByVaname(
+                            'IE-PTS',
+                        );
+                    const grptslist = ietsform.LISTS.reduce((acc, item) => {
+                        const sempNo = item.PICMST?.SEMPNO;
+                        const baseDwgNo = item.DWGNO.split(' ')[0];
+                        if (!acc[sempNo]) {
+                            acc[sempNo] = {};
+                        }
+                        if (!acc[sempNo][baseDwgNo]) {
+                            acc[sempNo][baseDwgNo] = [];
+                        }
+                        acc[sempNo][baseDwgNo].push(item);
+                        return acc;
+                    }, {});
+                    const ptsformdata = [];
+                    for (const sempNo in grptslist) {
+                        const dwgGroups = grptslist[sempNo];
+                        for (const baseDwgNo in dwgGroups) {
+                            const items = dwgGroups[baseDwgNo];
+                            ptsformdata.push({
+                                NFRMNO: ptsform.NNO,
+                                VORGNO: ptsform.VORGNO,
+                                CYEAR: ptsform.CYEAR,
+                                REQUEST_BY: sempNo,
+                                INPUT_BY: sempNo,
+                                ITEMS: items.map((item) => {
+                                    const dwgParts = item.DWGNO.split(' ');
+                                    return {
+                                        DWG: dwgParts[0] || '',
+                                        GNO: dwgParts[1] || '',
+                                        LNO: dwgParts[2] || '',
+                                        ITEM: String(item.ITMNO),
+                                        PROCID_OLD: item.PROCESS,
+                                        TP_OLD: String(item.CUR_TP),
+                                        TC_OLD: String(item.CUR_TC),
+                                        PROCID: item.PROCESS,
+                                        TP: String(item.IE_TP),
+                                        TC: String(item.IE_TC),
+                                    };
+                                }),
+                            });
+                        }
+                    }
+                    console.log('>>>data = ', ptsformdata);
+                    if (ptsformdata.length > 0) {
+                        console.log('>>>before ptsformdata = ', ptsformdata);
+                        console.log(JSON.stringify(ptsformdata, null, 2));
+                        const res = await this.ieptsService.autoInsert(
+                            ptsformdata,
+                            ip,
+                        );
+                        console.log('>>>after autoInsert ptsformdata = ');
+                        console.log(res);
+                    }
                 }
             }
-
             return {
                 status: true,
                 message: 'Approve successful',

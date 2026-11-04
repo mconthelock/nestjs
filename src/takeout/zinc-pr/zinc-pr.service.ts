@@ -190,6 +190,20 @@ export class ZincPrService {
       todayParts.find((part) => part.type === type)?.value ?? '';
     const date = `${todayPart('year')}-${todayPart('month')}-${todayPart('day')}`;
     const { payload, invalidTakeoutsForEmail } = await this.buildPendingResult(date);
+
+    if (payload.length === 0 && invalidTakeoutsForEmail.length === 0) {
+      return {
+        status: true,
+        message: 'No Zinc PR pending data for today',
+        data: {
+          date,
+          pendingRecords: 0,
+          excludedTakeouts: 0,
+          emailSent: false,
+        },
+      };
+    }
+
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet(`Pending ${date}`);
 

@@ -42,6 +42,7 @@ import { MfgReportModule } from './mfgreport/mfgreport.module';
 import { CountriesModule } from './countries/countries.module';
 import { InnovatModule } from './innovat/innovat.module';
 import { IedocModule } from './iedoc/iedoc.module';
+import { TakeoutModule } from './takeout/takeout.module';
 import { DtiModule } from './dti/dti.module';
 
 @Module({
@@ -80,6 +81,8 @@ import { DtiModule } from './dti/dti.module';
         InnovatModule,
         CountriesModule,
         DtiModule,
+        ,
+        TakeoutModule,
     ],
     providers: [
         HttpLoggingInterceptor,

@@ -26,16 +26,16 @@ export class PROC_TSDETFORM {
     @Column({ type: 'varchar2', length: 6 })
     PROCID_OLD: string;
 
-    @Column({ type: 'varchar2', length: 5, nullable: true })
+    @Column({ type: 'varchar2', length: 8, nullable: true })
     TP_OLD: string | null;
 
-    @Column({ type: 'varchar2', length: 6, nullable: true })
+    @Column({ type: 'varchar2', length: 8, nullable: true })
     TC_OLD: string | null;
 
-    @Column({ type: 'varchar2', length: 5, nullable: true })
+    @Column({ type: 'varchar2', length: 8, nullable: true })
     TP: string | null;
 
-    @Column({ type: 'varchar2', length: 6, nullable: true })
+    @Column({ type: 'varchar2', length: 8, nullable: true })
     TC: string | null;
 
     @Column({ type: 'varchar2', length: 2, nullable: true })

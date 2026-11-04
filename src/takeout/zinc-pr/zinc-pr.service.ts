@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import * as ExcelJS from 'exceljs';
 import { MailService } from 'src/common/services/mail/mail.service';
 import { ZincPrAs400Repository } from './zinc-pr-as400.repository';
 import { ZincPrRepository } from './zinc-pr.repository';
+import { ZincPrPendingPreviewEmailDto } from './dto/zinc-pr-pending-preview-email.dto';
 import {
   ZincPrInvalidTakeoutDto,
   ZincPrPendingResultDto,
@@ -74,11 +76,11 @@ export class ZincPrService {
     }
   }
 
-  private async buildPendingResult(): Promise<{
+  private async buildPendingResult(date?: string): Promise<{
     payload: ZincPrPendingResultDto[];
     invalidTakeoutsForEmail: ZincPrInvalidTakeoutDto[];
   }> {
-    const rows = (await this.zincPrRepository.findPending()) as ZincPrPendingRowDto[];
+    const rows = (await this.zincPrRepository.findPending(date)) as ZincPrPendingRowDto[];
     const processesByTakeoutNo = new Map<string, Set<string>>();
 
     for (const row of rows) {
@@ -175,6 +177,98 @@ export class ZincPrService {
   async findPending(): Promise<ZincPrPendingResultDto[]> {
     const { payload } = await this.buildPendingResult();
     return payload;
+  }
+
+  async sendPendingPreviewEmail(dto: ZincPrPendingPreviewEmailDto) {
+    const todayParts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Bangkok',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(new Date());
+    const todayPart = (type: string) =>
+      todayParts.find((part) => part.type === type)?.value ?? '';
+    const date = `${todayPart('year')}-${todayPart('month')}-${todayPart('day')}`;
+    const { payload, invalidTakeoutsForEmail } = await this.buildPendingResult(date);
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(`Pending ${date}`);
+
+    worksheet.columns = [
+      { header: 'Control No.', key: 'controlNo', width: 18 },
+      { header: 'Item Master', key: 'itemMaster', width: 18 },
+      { header: 'Type', key: 'type', width: 10 },
+      { header: 'Class', key: 'class', width: 10 },
+      { header: 'Drawing No.', key: 'drawingNo', width: 20 },
+      { header: 'Description', key: 'description', width: 36 },
+      { header: 'Vendor', key: 'vendor', width: 12 },
+      { header: 'Required Weight', key: 'requiredWeight', width: 18 },
+      { header: 'Job Item', key: 'jobItem', width: 18 },
+      { header: 'Max Production', key: 'maxProduction', width: 18 },
+      { header: 'Takeout Nos.', key: 'takeoutNos', width: 32 },
+    ];
+    worksheet.getRow(1).font = { bold: true };
+    worksheet.views = [{ state: 'frozen', ySplit: 1 }];
+    worksheet.autoFilter = {
+      from: { row: 1, column: 1 },
+      to: { row: 1, column: worksheet.columns.length },
+    };
+
+    for (const row of payload) {
+      worksheet.addRow({
+        controlNo: row.T02CTL,
+        itemMaster: row.T02ITM,
+        type: row.T02TYP,
+        class: row.T02CLS,
+        drawingNo: row.T02DWG,
+        description: row.T02DES,
+        vendor: row.T02VND,
+        requiredWeight: row.T02REQ,
+        jobItem: row.T02JOB,
+        maxProduction: row.T02SCH,
+        takeoutNos: row.TDETAIL_TAKEOUTNOS.join(', '),
+      });
+    }
+
+    const invalidWorksheet = workbook.addWorksheet('Excluded Takeouts');
+    invalidWorksheet.columns = [
+      { header: 'Takeout No.', key: 'takeoutNo', width: 24 },
+      { header: 'Processes', key: 'processes', width: 36 },
+    ];
+    invalidWorksheet.getRow(1).font = { bold: true };
+    for (const takeout of invalidTakeoutsForEmail) {
+      invalidWorksheet.addRow({
+        takeoutNo: takeout.TDETAIL_TAKEOUTNO,
+        processes: takeout.PROCESSES.join(', '),
+      });
+    }
+
+    const attachment = Buffer.from(
+      (await workbook.xlsx.writeBuffer()) as unknown as Uint8Array,
+    );
+    const filename = `Zinc_PR_Pending_${date}.xlsx`;
+    const result = await this.mailService.sendMail({
+      to: dto.to,
+      subject: `[Zinc PR][TEST] Pending Preview ${date}`,
+      html: `<p>Pending Zinc PR preview for ${this.escapeHtml(date)}.</p>
+        <p>Records: ${payload.length}; excluded takeout numbers: ${invalidTakeoutsForEmail.length}.</p>
+        <p>This is a preview only. No Zinc PR records were inserted and no takeout status was updated.</p>`,
+      attachments: [{ filename, content: attachment }],
+    });
+
+    if (result?.rejected?.length) {
+      throw new Error(`SMTP rejected: ${result.rejected.join(', ')}`);
+    }
+
+    return {
+      status: true,
+      message: 'Zinc PR pending preview email sent',
+      data: {
+        date,
+        pendingRecords: payload.length,
+        excludedTakeouts: invalidTakeoutsForEmail.length,
+        recipients: dto.to,
+      },
+    };
   }
 
   async submitPending() {

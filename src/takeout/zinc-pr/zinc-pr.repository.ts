@@ -6,7 +6,10 @@ import { DataSource } from 'typeorm';
 export class ZincPrRepository {
 	constructor(@InjectDataSource('webformConnection') private readonly dataSource: DataSource) {}
 
-	findPending() {
+	findPending(date?: string) {
+		const dateFilter = date
+			? "AND TO_CHAR(td.TDETAIL_CDATE, 'YYYY-MM-DD') = :1"
+			: '';
 		const sql = `SELECT
 			td.TDETAIL_TAKEOUTNO,
 			mzp.ITEM_MASTER,
@@ -26,6 +29,7 @@ export class ZincPrRepository {
 			AND td.TDETAIL_DEL = 0
 			AND td.TDETAIL_PR_STATUS = '0'
 			AND tt.TAKEOUT_VENDOR = '80035'
+			${dateFilter}
 		GROUP BY
 			SUBSTR(td.TDETAIL_REMARK, 1, 6),
 			td.TDETAIL_TAKEOUTNO,
@@ -35,7 +39,7 @@ export class ZincPrRepository {
 			mzp.DESCRIPTION
 		ORDER BY td.TDETAIL_TAKEOUTNO ASC`;
 
-		return this.dataSource.query(sql);
+		return this.dataSource.query(sql, date ? [date] : []);
 	}
 
 	markSubmitted(takeoutNos: string[]) {

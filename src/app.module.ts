@@ -43,6 +43,7 @@ import { MfgReportModule } from './mfgreport/mfgreport.module';
 import { CountriesModule } from './countries/countries.module';
 import { InnovatModule } from './innovat/innovat.module';
 import { IedocModule } from './iedoc/iedoc.module';
+import { TakeoutModule } from './takeout/takeout.module';
 
 @Module({
     imports: [
@@ -79,7 +80,8 @@ import { IedocModule } from './iedoc/iedoc.module';
         GeneralPartListModule,
         IedocModule,
         InnovatModule,
-        CountriesModule
+        CountriesModule,
+        TakeoutModule
     ],
     providers: [
         HttpLoggingInterceptor,

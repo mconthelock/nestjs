@@ -13,19 +13,14 @@ import { BusDispatchStop } from '../../common/Entities/gpreport/table/bus_dispat
 import { BusDispatchPassenger } from '../../common/Entities/gpreport/table/bus_dispatch_passenger.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature(
-      [BusDispatchHead, BusDispatchLine, BusDispatchStop, BusDispatchPassenger],
-      'mitsuConnection',
-    ),
-  ],
-  controllers: [DispatchController],
-  providers: [
-    DispatchService,
-    DispatchReportService,
-    DispatchExportService,
-    DispatchMailService,
-  ],
-  exports: [DispatchService],
+    imports: [
+        TypeOrmModule.forFeature(
+            [BusDispatchHead, BusDispatchLine, BusDispatchStop, BusDispatchPassenger],
+            'mitsuConnection',
+        ),
+    ],
+    controllers: [DispatchController],
+    providers: [DispatchService, DispatchReportService, DispatchExportService, DispatchMailService],
+    exports: [DispatchService],
 })
 export class DispatchModule {}

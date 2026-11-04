@@ -25,12 +25,7 @@ export class SecpicRepository extends BaseRepository {
     async search(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(SECPIC, 'S');
 
-        this.applyFilters(qb, 'S', dto, [
-            'SECID',
-            'SECCODE',
-            'SEC',
-            'REJECTNO',
-        ]);
+        this.applyFilters(qb, 'S', dto, ['SECID', 'SECCODE', 'SEC', 'REJECTNO']);
 
         return qb.getMany();
     }

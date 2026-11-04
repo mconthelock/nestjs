@@ -3,15 +3,15 @@ import { MatrixItemMaster } from '../../matrix-item-master/entities/matrix-item-
 
 @Entity({ name: 'MATRIX_SECTION', schema: 'DAILYIDS' })
 export class MatrixSection {
-  @PrimaryColumn()
-  ID: number;
+    @PrimaryColumn()
+    ID: number;
 
-  @Column()
-  NAME: string;
+    @Column()
+    NAME: string;
 
-  @Column()
-  STATUS: number;
+    @Column()
+    STATUS: number;
 
-  @OneToOne(() => MatrixItemMaster, (m) => m.SECTION)
-  MASTER: MatrixItemMaster;
+    @OneToOne(() => MatrixItemMaster, (m) => m.SECTION)
+    MASTER: MatrixItemMaster;
 }

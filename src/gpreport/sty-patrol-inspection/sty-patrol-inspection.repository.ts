@@ -108,9 +108,7 @@ export class StyPatrolInspectionRepository extends BaseRepository {
             .leftJoin(`(${sub.getQuery()})`, 'P', 'I.ITEMS_ID = P.ITEMS_ID')
             .setParameters(sub.getParameters())
             .where('I.ITEMS_TYPE = 2')
-            .groupBy(
-                'I.ITEMS_ID, I.ITEMS_NAME, I.ITEMS_ENAME, OWNER_SECTION,   CLASS',
-            )
+            .groupBy('I.ITEMS_ID, I.ITEMS_NAME, I.ITEMS_ENAME, OWNER_SECTION,   CLASS')
             .orderBy('OWNER_SECTION, ITEMS_ID, CLASS', 'ASC');
         return query.getRawMany();
     }

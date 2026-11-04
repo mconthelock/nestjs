@@ -42,13 +42,9 @@ export class PurCpcService extends CreatePurCpcService {
         try {
             switch (data.SYSTEM) {
                 case 'AS400':
-                    return await this.iim400Service.findPlannerCompareSheet(
-                        data.PLANNER,
-                    );
+                    return await this.iim400Service.findPlannerCompareSheet(data.PLANNER);
                 case 'PROCUREMENT':
-                    return await this.purcpcProcPlanViewRepo.findByPlanner(
-                        data.PLANNER,
-                    );
+                    return await this.purcpcProcPlanViewRepo.findByPlanner(data.PLANNER);
                 default:
                     throw new Error(`Unsupported SYSTEM: ${data.SYSTEM}`);
             }
@@ -70,9 +66,7 @@ export class PurCpcService extends CreatePurCpcService {
                 case 'AS400':
                     return await this.iim400Service.priceComparison(data);
                 case 'PROCUREMENT':
-                    return await this.purcpcProcCompareViewRepo.findByItemCode(
-                        data.ITEM,
-                    );
+                    return await this.purcpcProcCompareViewRepo.findByItemCode(data.ITEM);
                 default:
                     throw new Error(`Unsupported SYSTEM: ${data.SYSTEM}`);
             }
@@ -94,9 +88,7 @@ export class PurCpcService extends CreatePurCpcService {
                 case 'AS400':
                     return await this.iim400Service.findItemDetail(data.ITEM);
                 case 'PROCUREMENT':
-                    return await this.purcpcProcItemDetailRepo.findItemDetail(
-                        data.ITEM,
-                    );
+                    return await this.purcpcProcItemDetailRepo.findItemDetail(data.ITEM);
                 default:
                     throw new Error(`Unsupported SYSTEM: ${data.SYSTEM}`);
             }

@@ -14,11 +14,7 @@ import {
 import { Request } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { getClientIP } from 'src/common/utils/ip.utils';
-import {
-    AutoInsertTsProcessDto,
-    InsertTsProcessDto,
-    TsFormKeyDto,
-} from './dto/ts-process.dto';
+import { AutoInsertTsProcessDto, InsertTsProcessDto, TsFormKeyDto } from './dto/ts-process.dto';
 import { IePtsService } from './ie-pts.service';
 
 @ApiTags('IE PTS process')

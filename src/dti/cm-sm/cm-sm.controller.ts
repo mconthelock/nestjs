@@ -5,20 +5,20 @@ import { AlertCmSmEmailDto } from './dto/alert-cm-sm-email.dto';
 
 @Controller('cm-sm')
 export class CmSmController {
-  constructor(private readonly cmSmService: CmSmService) {}
+    constructor(private readonly cmSmService: CmSmService) {}
 
-  @Post('save')
-  save(@Body() payload: UpdateCmSmDto) {
-    return this.cmSmService.save(payload);
-  }
+    @Post('save')
+    save(@Body() payload: UpdateCmSmDto) {
+        return this.cmSmService.save(payload);
+    }
 
-  @Get()
-  findAll() {
-    return this.cmSmService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.cmSmService.findAll();
+    }
 
-  @Post('alert-email')
-  alertEmail(@Body() payload: AlertCmSmEmailDto) {
-    return this.cmSmService.alertEmail(payload);
-  }
+    @Post('alert-email')
+    alertEmail(@Body() payload: AlertCmSmEmailDto) {
+        return this.cmSmService.alertEmail(payload);
+    }
 }

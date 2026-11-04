@@ -8,13 +8,12 @@ import { VORGMST } from 'src/common/Entities/webform/views/VORGMST.entity';
 import { PPOSITION } from 'src/common/Entities/amec/table/PPOSITION.entity';
 
 @Module({
-  imports: [
-    // อย่าลืมเอา Entity หลักไปใส่ใน TypeOrmModule เพื่อให้ Repository ทำงานได้
-    TypeOrmModule.forFeature([FXA_LOCMST , PPOSITION, VORGMST], 'mitsuConnection'),
-  ],
-  controllers: [FxaLocmstController],
-  providers: [FxaLocmstService , FXALOCMSTRepository ],
-  exports: [FXALOCMSTRepository],
-
+    imports: [
+        // อย่าลืมเอา Entity หลักไปใส่ใน TypeOrmModule เพื่อให้ Repository ทำงานได้
+        TypeOrmModule.forFeature([FXA_LOCMST, PPOSITION, VORGMST], 'mitsuConnection'),
+    ],
+    controllers: [FxaLocmstController],
+    providers: [FxaLocmstService, FXALOCMSTRepository],
+    exports: [FXALOCMSTRepository],
 })
 export class FxaLocmstModule {}

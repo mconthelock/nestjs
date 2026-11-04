@@ -51,5 +51,4 @@ export class PSDLC_DETAIL {
 
     @Column()
     REMARK: string;
-
 }

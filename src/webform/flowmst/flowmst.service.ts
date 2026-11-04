@@ -20,8 +20,7 @@ export class FlowmstService {
     }
 
     async getFlowMaster(NFRMNO: number, VORGNO: string, CYEAR: string) {
-        if (process.env.HOST == 'AMEC')
-            return await this.repo.getFlowMaster(NFRMNO, VORGNO, CYEAR);
+        if (process.env.HOST == 'AMEC') return await this.repo.getFlowMaster(NFRMNO, VORGNO, CYEAR);
         return await this.repo.getFlowMasterNoSql(NFRMNO, VORGNO, CYEAR);
     }
 

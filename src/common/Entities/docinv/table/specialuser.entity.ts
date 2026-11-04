@@ -2,58 +2,58 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'ITGC_SPECIALUSER', schema: 'DOCINV' })
 export class Specialuser {
-  @PrimaryColumn()
-  SERVER_NAME: string;
+    @PrimaryColumn()
+    SERVER_NAME: string;
 
-  @Column()
-  USER_DOMAIN: string;
+    @Column()
+    USER_DOMAIN: string;
 
-  @PrimaryColumn()
-  USER_LOGIN: string;
+    @PrimaryColumn()
+    USER_LOGIN: string;
 
-  @Column()
-  USER_OWNER: string;
+    @Column()
+    USER_OWNER: string;
 
-  @Column()
-  DESCRIPT: string;
+    @Column()
+    DESCRIPT: string;
 
-  @Column()
-  AUTH_CLASS: string;
+    @Column()
+    AUTH_CLASS: string;
 
-  @Column()
-  @PrimaryColumn()
-  CATEGORY: string;
+    @Column()
+    @PrimaryColumn()
+    CATEGORY: string;
 
-  @Column()
-  AUTH_OGANIZE: string;
+    @Column()
+    AUTH_OGANIZE: string;
 
-  @Column()
-  USER_TYPE1: string;
+    @Column()
+    USER_TYPE1: string;
 
-  @Column()
-  USER_TYPE2: string;
+    @Column()
+    USER_TYPE2: string;
 
-  @Column()
-  SERVER_TITLE: string;
+    @Column()
+    SERVER_TITLE: string;
 
-  @Column()
-  USER_STATUS: number;
+    @Column()
+    USER_STATUS: number;
 
-  @Column()
-  USER_EMAIL: string;
+    @Column()
+    USER_EMAIL: string;
 
-  @Column()
-  EMPNO: string;
+    @Column()
+    EMPNO: string;
 
-  @Column()
-  ROLE: string;
+    @Column()
+    ROLE: string;
 
-  @Column()
-  START_DATE: Date;
+    @Column()
+    START_DATE: Date;
 
-  @Column()
-  ACTIVE_STATUS: number;
+    @Column()
+    ACTIVE_STATUS: number;
 
-  @Column()
-  GROUP_NAME: string;
+    @Column()
+    GROUP_NAME: string;
 }

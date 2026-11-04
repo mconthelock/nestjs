@@ -8,17 +8,17 @@ export class OriginMasterMarViewService {
     async getOriginMasterMarView(dto: SearchOriginMasterMarViewDto[]) {
         try {
             const result = await this.repo.find(dto);
-            if(result.length === 0) {
+            if (result.length === 0) {
                 return {
                     status: false,
                     message: 'Data not found',
-                }
+                };
             }
             return {
                 status: true,
                 message: `Data found ${result.length} records`,
                 data: result,
-            }
+            };
         } catch (error) {
             throw error;
         }

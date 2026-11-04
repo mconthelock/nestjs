@@ -1,4 +1,4 @@
-import { ViewColumn, ViewEntity , PrimaryColumn } from 'typeorm';
+import { ViewColumn, ViewEntity, PrimaryColumn } from 'typeorm';
 
 @ViewEntity({
     name: 'FINPCK_VWSTATUS',
@@ -18,33 +18,32 @@ export class FINPCK_VWSTATUS {
     CYEAR2: string;
 
     @ViewColumn()
-    NRUNNO: number; 
+    NRUNNO: number;
 
     @ViewColumn()
-    CCCODE: string; 
+    CCCODE: string;
 
     @ViewColumn()
-    CCDESC: string; 
+    CCDESC: string;
 
     @ViewColumn()
-    LOCCODE: string; 
+    LOCCODE: string;
 
     @ViewColumn()
-    LOCNAME: string; 
+    LOCNAME: string;
 
     @ViewColumn()
-    CST: string;  
-    
-    @ViewColumn()
-    PICNOLOC: string; 
+    CST: string;
 
     @ViewColumn()
-    PICNAMELOC: string; 
+    PICNOLOC: string;
 
     @ViewColumn()
-    PICNOWAIT: string; 
+    PICNAMELOC: string;
 
     @ViewColumn()
-    PICNAMEWAIT: string; 
+    PICNOWAIT: string;
+
+    @ViewColumn()
+    PICNAMEWAIT: string;
 }
-

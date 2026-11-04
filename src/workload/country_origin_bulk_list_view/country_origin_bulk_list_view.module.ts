@@ -6,16 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { COUNTRY_ORIGIN_BULK_LIST_VIEW } from 'src/common/Entities/workload/views/COUNTRY_ORIGIN_BULK_LIST_VIEW.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [COUNTRY_ORIGIN_BULK_LIST_VIEW],
-            'mitsuConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([COUNTRY_ORIGIN_BULK_LIST_VIEW], 'mitsuConnection')],
     controllers: [CountryOriginBulkListViewController],
-    providers: [
-        CountryOriginBulkListViewService,
-        CountryOriginBulkListViewRepository,
-    ],
+    providers: [CountryOriginBulkListViewService, CountryOriginBulkListViewRepository],
 })
 export class CountryOriginBulkListViewModule {}

@@ -245,7 +245,7 @@ export class PURCPC_DETAILS {
     @Column()
     VCOMMENT: string;
 
-    @ManyToOne(() => PURCPC_FORM, form => form.DETAILS)
+    @ManyToOne(() => PURCPC_FORM, (form) => form.DETAILS)
     @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
     @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
     PURCPC_FORM: PURCPC_FORM;

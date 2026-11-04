@@ -28,18 +28,13 @@ const RequiredText = (max: number) =>
         IsString(),
         Length(1, max),
         Matches(/\S/),
-        Transform(({ value }) =>
-            typeof value === 'string' ? value.trim() : value,
-        ),
+        Transform(({ value }) => (typeof value === 'string' ? value.trim() : value)),
     );
-const OptionalText = (max: number) =>
-    applyDecorators(IsOptional(), IsString(), MaxLength(max));
+const OptionalText = (max: number) => applyDecorators(IsOptional(), IsString(), MaxLength(max));
 const TrimmedOptionalText = (max: number) =>
     applyDecorators(
         OptionalText(max),
-        Transform(({ value }) =>
-            typeof value === 'string' ? value.trim() || null : value,
-        ),
+        Transform(({ value }) => (typeof value === 'string' ? value.trim() || null : value)),
     );
 
 export class TsFormKeyDto {
@@ -157,22 +152,15 @@ export class AutoTsProcessItemDto extends OmitType(TsDetailDto, [
 ] as const) {
     @RequiredText(9) DWG: string;
     @OptionalText(3)
-    @Transform(({ value }) =>
-        typeof value === 'string' ? value.trim() || null : value,
-    )
+    @Transform(({ value }) => (typeof value === 'string' ? value.trim() || null : value))
     GNO?: string | null;
     @OptionalText(3)
-    @Transform(({ value }) =>
-        typeof value === 'string' ? value.trim() || null : value,
-    )
+    @Transform(({ value }) => (typeof value === 'string' ? value.trim() || null : value))
     LNO?: string | null;
     @RequiredText(3) ITEM: string;
 }
 
-export class AutoInsertTsProcessDto extends OmitType(TsFormKeyDto, [
-    'CYEAR2',
-    'NRUNNO',
-] as const) {
+export class AutoInsertTsProcessDto extends OmitType(TsFormKeyDto, ['CYEAR2', 'NRUNNO'] as const) {
     // Keep these in validation metadata so the application's global whitelist
     // cannot silently discard a client-supplied generated reference.
     @IsEmpty() CYEAR2?: never;

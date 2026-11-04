@@ -8,41 +8,41 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 
 @Controller('escs/item-mfg-history')
 export class ItemMfgHistoryController {
-  constructor(private readonly itemMfgHistoryService: ItemMfgHistoryService) {}
+    constructor(private readonly itemMfgHistoryService: ItemMfgHistoryService) {}
 
-  @Post()
-  @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
-  create(@Body() dto: CreateItemMfgHistoryDto) {
-    return this.itemMfgHistoryService.create(dto);
-  }
+    @Post()
+    @UseInterceptors(getFileUploadInterceptor())
+    @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
+    create(@Body() dto: CreateItemMfgHistoryDto) {
+        return this.itemMfgHistoryService.create(dto);
+    }
 
-  @Get()
-  findAll() {
-    return this.itemMfgHistoryService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.itemMfgHistoryService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.itemMfgHistoryService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.itemMfgHistoryService.findOne(+id);
+    }
 
-  @Post('search')
-  @UseTransaction('mitsuConnection')
-  async search(@Body() dto: FiltersDto) {
-    return this.itemMfgHistoryService.search(dto);
-  }
+    @Post('search')
+    @UseTransaction('mitsuConnection')
+    async search(@Body() dto: FiltersDto) {
+        return this.itemMfgHistoryService.search(dto);
+    }
 
-  @Patch(':id')
-  @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('mitsuConnection')
-  update(@Param('id') id: string, @Body() dto: UpdateItemMfgHistoryDto) {
-    return this.itemMfgHistoryService.update(+id, dto);
-  }
+    @Patch(':id')
+    @UseInterceptors(getFileUploadInterceptor())
+    @UseTransaction('mitsuConnection')
+    update(@Param('id') id: string, @Body() dto: UpdateItemMfgHistoryDto) {
+        return this.itemMfgHistoryService.update(+id, dto);
+    }
 
-  @Delete(':id')
-  @UseTransaction('mitsuConnection')
-  remove(@Param('id') id: string) {
-    return this.itemMfgHistoryService.remove(+id);
-  }
+    @Delete(':id')
+    @UseTransaction('mitsuConnection')
+    remove(@Param('id') id: string) {
+        return this.itemMfgHistoryService.remove(+id);
+    }
 }

@@ -19,11 +19,7 @@ const cases = [
     ['initial_mst', { INITIAL_ID: 1 }, { INITIAL_DETAIL: 'Initial' }],
     ['location_mst', { LOCATION_ID: 1 }, { LOCATION_NAME: 'Location' }],
     ['problem_mst', { PROBLEM_ID: 1 }, { PROBLEM_NAME: 'Problem' }],
-    [
-        'mapping_mst',
-        { MAP_ID: 1 },
-        { LOCATION_ID: 1, CAUSE_ID: 1, PROBLEM_ID: 1, EVENT_ID: 1 },
-    ],
+    ['mapping_mst', { MAP_ID: 1 }, { LOCATION_ID: 1, CAUSE_ID: 1, PROBLEM_ID: 1, EVENT_ID: 1 }],
     ['section_mst', { SSECCODE: '123456' }, {}],
     [
         'event_record',
@@ -42,11 +38,7 @@ const cases = [
         },
     ],
     ['ng_record', { PILINE_NO: 'PI000000001' }, { ID_TAG: 'TAG1', QTY: 1 }],
-    [
-        'att',
-        { PILINE_NO: 'PI000000001', SEQ: 1, TYPEFILE: 'jpg' },
-        { FILENAME: 'image.jpg' },
-    ],
+    ['att', { PILINE_NO: 'PI000000001', SEQ: 1, TYPEFILE: 'jpg' }, { FILENAME: 'image.jpg' }],
 ] as const;
 
 describe.each(cases)('PILINE %s HTTP writes', (suffix, key, fields) => {
@@ -69,9 +61,7 @@ describe.each(cases)('PILINE %s HTTP writes', (suffix, key, fields) => {
         const controller = require(`../${slug}/${slug.toUpperCase()}.controller`)[
             className + 'Controller'
         ];
-        const service = require(`../${slug}/${slug.toUpperCase()}.service`)[
-            className + 'Service'
-        ];
+        const service = require(`../${slug}/${slug.toUpperCase()}.service`)[className + 'Service'];
         const repository = require(`../${slug}/${slug.toUpperCase()}.repository`)[
             className + 'Repository'
         ];
@@ -90,15 +80,10 @@ describe.each(cases)('PILINE %s HTTP writes', (suffix, key, fields) => {
         } as unknown as DataSource;
         const module = await Test.createTestingModule({
             controllers: [controller],
-            providers: [
-                service,
-                { provide: repository, useValue: new repository(ds) },
-            ],
+            providers: [service, { provide: repository, useValue: new repository(ds) }],
         }).compile();
         app = module.createNestApplication();
-        app.useGlobalPipes(
-            new ValidationPipe({ transform: true, whitelist: true }),
-        );
+        app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
         await app.init();
     });
     beforeEach(() => {
@@ -127,24 +112,15 @@ describe.each(cases)('PILINE %s HTTP writes', (suffix, key, fields) => {
     });
     it('updates only mutable fields, using all route key components', async () => {
         if (suffix === 'section_mst') {
-            await request(app.getHttpServer())
-                .patch(recordPath)
-                .send({})
-                .expect(400);
+            await request(app.getHttpServer()).patch(recordPath).send({}).expect(400);
             expect(db.update).not.toHaveBeenCalled();
             return;
         }
-        await request(app.getHttpServer())
-            .patch(recordPath)
-            .send(fields)
-            .expect(200);
+        await request(app.getHttpServer()).patch(recordPath).send(fields).expect(200);
         expect(db.update.mock.calls[0][0]).toEqual(key);
     });
     it('rejects empty patches', async () => {
-        await request(app.getHttpServer())
-            .patch(recordPath)
-            .send({})
-            .expect(400);
+        await request(app.getHttpServer()).patch(recordPath).send({}).expect(400);
         expect(db.update).not.toHaveBeenCalled();
     });
     it('deletes using the exact key and returns 404 if missing', async () => {
@@ -183,15 +159,9 @@ describe.each(cases)('PILINE %s HTTP writes', (suffix, key, fields) => {
                 { START_TIME: 'invalid' },
                 { SHIFT: null },
             ]) {
-                await request(app.getHttpServer())
-                    .patch(recordPath)
-                    .send(invalid)
-                    .expect(400);
+                await request(app.getHttpServer()).patch(recordPath).send(invalid).expect(400);
             }
-            await request(app.getHttpServer())
-                .patch(recordPath)
-                .send({ DETAIL: null })
-                .expect(200);
+            await request(app.getHttpServer()).patch(recordPath).send({ DETAIL: null }).expect(200);
         } else if (suffix === 'att') {
             await request(app.getHttpServer())
                 .delete(path + '/PI000000001/100/jpg')
@@ -204,10 +174,7 @@ describe.each(cases)('PILINE %s HTTP writes', (suffix, key, fields) => {
                 .patch(recordPath)
                 .send({ CAUSE_NAME: 'x'.repeat(301) })
                 .expect(400);
-            await request(app.getHttpServer())
-                .patch(recordPath)
-                .send({ STATUS: null })
-                .expect(400);
+            await request(app.getHttpServer()).patch(recordPath).send({ STATUS: null }).expect(400);
         }
     });
 });
@@ -215,9 +182,9 @@ describe.each(cases)('PILINE %s HTTP writes', (suffix, key, fields) => {
 it('blocks incomplete composite keys before issuing a write', async () => {
     const db = {
         metadata: {
-            primaryColumns: ['PILINE_NO', 'SEQ', 'TYPEFILE'].map(
-                (propertyName) => ({ propertyName }),
-            ),
+            primaryColumns: ['PILINE_NO', 'SEQ', 'TYPEFILE'].map((propertyName) => ({
+                propertyName,
+            })),
         },
         delete: jest.fn(),
     };

@@ -1,11 +1,4 @@
-import {
-    Column,
-    Entity,
-    PrimaryColumn,
-    OneToMany,
-    ManyToOne,
-    JoinColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { ISDEV_REQUEST } from './ISDEV_REQUEST.entity';
 import { User } from 'src/common/Entities/amec/views/user.entity';
 

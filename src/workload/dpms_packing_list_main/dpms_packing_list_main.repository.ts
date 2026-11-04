@@ -19,12 +19,12 @@ export class DpmsPackingListMainRepository extends BaseRepository {
             order: {
                 VCASE: 'ASC',
                 DETAILS: {
-                    VMFGNO: 'ASC', 
+                    VMFGNO: 'ASC',
                     VCASE: 'ASC',
                     VITEM: 'ASC',
                     VDRAWING: 'ASC',
                 },
-            }
+            },
         });
     }
     async findPackingListPoByMfgNo(mfgNo: string): Promise<DPMS_PACKING_LIST_MAIN[]> {
@@ -36,12 +36,12 @@ export class DpmsPackingListMainRepository extends BaseRepository {
             order: {
                 VCASE: 'ASC',
                 DETAILS_PO: {
-                    VMFGNO: 'ASC', 
+                    VMFGNO: 'ASC',
                     VCASE: 'ASC',
                     VITEM: 'ASC',
                     VDRAWING: 'ASC',
                 },
-            }
+            },
         });
     }
 }

@@ -6,9 +6,7 @@ import { AmecOrdersSchedule } from 'src/common/Entities/workload/table/amecorder
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([AmecOrdersSchedule], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([AmecOrdersSchedule], 'mitsuConnection')],
     controllers: [AmecordersScheduleController],
     providers: [AmecordersScheduleService, AmecordersScheduleRepository],
     exports: [AmecordersScheduleService],

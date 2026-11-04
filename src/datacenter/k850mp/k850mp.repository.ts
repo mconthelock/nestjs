@@ -6,9 +6,7 @@ import { K850MP } from 'src/common/Entities/datacenter/table/K850mp.entity';
 
 @Injectable()
 export class K850mpRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('datacenterConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('datacenterConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

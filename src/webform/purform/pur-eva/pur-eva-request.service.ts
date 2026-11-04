@@ -67,16 +67,8 @@ export class PurEvaRequestService {
         ];
 
         try {
-            const {
-                REQBY,
-                INPUTBY,
-                DRAFT,
-                REMARK,
-                SCORES,
-                PROFIT_TURNOVERS,
-                RELATIONS,
-                ...data
-            } = dto;
+            const { REQBY, INPUTBY, DRAFT, REMARK, SCORES, PROFIT_TURNOVERS, RELATIONS, ...data } =
+                dto;
             const createForm = await this.formCreateService.create(
                 {
                     NFRMNO: dto.NFRMNO,
@@ -114,11 +106,10 @@ export class PurEvaRequestService {
                 ...purevadata,
             };
             if (dto.VENDGROUP === '6:Non-Production (6)') {
-                const deleteResult =
-                    await this.deleteFlowStepService.deleteFlowStep({
-                        ...form,
-                        CSTEPNO: '02',
-                    });
+                const deleteResult = await this.deleteFlowStepService.deleteFlowStep({
+                    ...form,
+                    CSTEPNO: '02',
+                });
             }
             await this.repo.create(purevaForm);
             const addr = [];
@@ -154,16 +145,10 @@ export class PurEvaRequestService {
                 await this.reposcore.createMultipleScores(form, SCORES);
             }
             if (PROFIT_TURNOVERS && PROFIT_TURNOVERS.length > 0) {
-                await this.repoprofit.createMultipleProfits(
-                    form,
-                    PROFIT_TURNOVERS,
-                );
+                await this.repoprofit.createMultipleProfits(form, PROFIT_TURNOVERS);
             }
             if (RELATIONS && RELATIONS.length > 0) {
-                await this.reporelation.createMultipleRelations(
-                    form,
-                    RELATIONS,
-                );
+                await this.reporelation.createMultipleRelations(form, RELATIONS);
             }
             if (allFilesWithType && allFilesWithType.length > 0) {
                 movedTargets = await this.moveFiles(

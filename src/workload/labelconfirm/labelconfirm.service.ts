@@ -6,9 +6,7 @@ import { InsertErrLogDto } from './dto/insert-err_log.dto';
 
 @Injectable()
 export class LabelconfirmService {
-    constructor(
-        private readonly labelconfirmRepository: LabelconfirmRepository,
-    ) {}
+    constructor(private readonly labelconfirmRepository: LabelconfirmRepository) {}
 
     async getLabelList(order: string, packing: string) {
         return this.labelconfirmRepository.getLabelList(order, packing);
@@ -19,12 +17,7 @@ export class LabelconfirmService {
     }
 
     async errLog(dto: InsertErrLogDto) {
-        return this.labelconfirmRepository.errLog(
-            dto.order,
-            dto.packing,
-            dto.qrCode,
-            dto.empno,
-        );
+        return this.labelconfirmRepository.errLog(dto.order, dto.packing, dto.qrCode, dto.empno);
     }
 
     async getKittingLabelHistory() {

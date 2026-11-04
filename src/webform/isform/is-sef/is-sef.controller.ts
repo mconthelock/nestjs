@@ -17,10 +17,7 @@ export class IsSefController {
     }
 
     @Post('insertEmptyForm')
-    insertEmptyForm(
-        @Body() createIsSefEmptyDto: CreateIsSefEmptyDto,
-        @Req() req: Request,
-    ) {
+    insertEmptyForm(@Body() createIsSefEmptyDto: CreateIsSefEmptyDto, @Req() req: Request) {
         const ip = getClientIP(req);
         return this.isSefService.insertEmptyForm(createIsSefEmptyDto, ip);
     }

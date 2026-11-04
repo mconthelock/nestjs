@@ -5,8 +5,8 @@ import { Designer } from './entities/designer.entity';
 import { DesignerController } from './designer.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Designer], 'mitsuConnection')],
-  controllers: [DesignerController],
-  providers: [DesignerService],
+    imports: [TypeOrmModule.forFeature([Designer], 'mitsuConnection')],
+    controllers: [DesignerController],
+    providers: [DesignerService],
 })
 export class DesignerModule {}

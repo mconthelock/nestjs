@@ -6,10 +6,8 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 import { IDTAG_EFAC_LOG } from 'src/common/Entities/workload/table/IDTAG_EFAC_LOG.entity';
 
 @Injectable()
- export class IdtagEfacLogRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-    ) {
+export class IdtagEfacLogRepository extends BaseRepository {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -38,15 +36,16 @@ import { IDTAG_EFAC_LOG } from 'src/common/Entities/workload/table/IDTAG_EFAC_LO
             'PRINT_BY',
         ]);
 
-        return qb.orderBy('I.MONTH, I.YEAR, I.RUNNO, I.CONTROL_NO, I.LOT_NO', 'ASC')
-            .getMany();
+        return qb.orderBy('I.MONTH, I.YEAR, I.RUNNO, I.CONTROL_NO, I.LOT_NO', 'ASC').getMany();
     }
 
     async getMaxRunno(processName: string, month: number, year: number): Promise<number> {
         const result = await this.manager
             .createQueryBuilder(IDTAG_EFAC_LOG, 'I')
             .select('MAX(I.RUNNO)', 'MAX_RUNNO')
-            .where('SUBSTR(I.PROCESS_NAME, -4) = :processName', {processName: processName.slice(-4)})
+            .where('SUBSTR(I.PROCESS_NAME, -4) = :processName', {
+                processName: processName.slice(-4),
+            })
             .andWhere('I.MONTH = :month', { month })
             .andWhere('I.YEAR = :year', { year })
             .getRawOne();

@@ -1,10 +1,4 @@
-﻿import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-} from '@nestjs/common';
+﻿import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { FiltersDto } from 'src/common/dto/filter.dto';
@@ -14,29 +8,27 @@ import { piline_bending_att } from 'src/common/Entities/workload/table/piline_be
 
 @Controller('workload/piline_bending_att')
 export class PilineBendingAttController {
-  constructor(
-    private readonly pilineBendingAttService: PilineBendingAttService,
-  ) {}
+    constructor(private readonly pilineBendingAttService: PilineBendingAttService) {}
 
-  @Get()
-  findAll() {
-    return this.pilineBendingAttService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.pilineBendingAttService.findAll();
+    }
 
-  @Get(':idtag')
-  findOne(@Param('idtag') idtag: string) {
-    return this.pilineBendingAttService.findOne(idtag);
-  }
+    @Get(':idtag')
+    findOne(@Param('idtag') idtag: string) {
+        return this.pilineBendingAttService.findOne(idtag);
+    }
 
-  @Post('search')
-  @UseTransaction('mitsuConnection')
-  search(@Body() dto: FiltersDto) {
-    return this.pilineBendingAttService.search(dto);
-  }
+    @Post('search')
+    @UseTransaction('mitsuConnection')
+    search(@Body() dto: FiltersDto) {
+        return this.pilineBendingAttService.search(dto);
+    }
 
-  @Post()
-  @UseTransaction('mitsuConnection')
-  create(@Body() dto: piline_bending_att) {
-    return this.pilineBendingAttService.create(dto);
-  }
+    @Post()
+    @UseTransaction('mitsuConnection')
+    create(@Body() dto: piline_bending_att) {
+        return this.pilineBendingAttService.create(dto);
+    }
 }

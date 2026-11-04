@@ -6,9 +6,7 @@ import { Buspassenger } from 'src/common/Entities/gpreport/table/buspassenger.en
 import { User } from 'src/common/Entities/amec/views/user.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Buspassenger, User], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([Buspassenger, User], 'mitsuConnection')],
     controllers: [BuspassengerController],
     providers: [BuspassengerService],
 })

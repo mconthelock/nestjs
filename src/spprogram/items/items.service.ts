@@ -82,21 +82,13 @@ export class ItemsService {
             { length: 11, checkIndex: 8 },
         ];
         for (const rule of lengthBasedRules) {
-            if (
-                dwg.length === rule.length &&
-                /[G\-]/.test(dwg[rule.checkIndex])
-            ) {
-                return (
-                    dwg.slice(0, rule.checkIndex) +
-                    ' ' +
-                    dwg.slice(rule.checkIndex)
-                );
+            if (dwg.length === rule.length && /[G\-]/.test(dwg[rule.checkIndex])) {
+                return dwg.slice(0, rule.checkIndex) + ' ' + dwg.slice(rule.checkIndex);
             }
         }
 
         dwg = await this.formatDrawingNo(input);
-        const fullPattern =
-            /^([A-Z0-9]{8,9}) ([G\-][0-9]{2})((?: L[0-9]{2,3})*)$/;
+        const fullPattern = /^([A-Z0-9]{8,9}) ([G\-][0-9]{2})((?: L[0-9]{2,3})*)$/;
         if (fullPattern.test(dwg)) {
             const spaceMatch = dwg.match(/ /g);
             const firstSpaceIndex = dwg.indexOf(' ');
@@ -131,7 +123,7 @@ export class ItemsService {
         if (inputString.endsWith(',')) {
             inputString = inputString.slice(0, -1);
         }
-        let cleanedString = inputString.replace(/\s/g, '');
+        const cleanedString = inputString.replace(/\s/g, '');
         const pairRegex = /([^=,]{1,3})=((?:[^,]+|,(?![^=,]{1,3}=))+)/g;
         let isValid = true;
         const errors = [];
@@ -140,9 +132,7 @@ export class ItemsService {
         const matches = [...cleanedString.matchAll(pairRegex)];
         if (matches.length === 0 && cleanedString.length > 0) {
             isValid = false;
-            errors.push(
-                'รูปแบบสตริงไม่ถูกต้อง: ไม่พบรูปแบบ KEY=VALUE ที่ถูกต้อง.',
-            );
+            errors.push('รูปแบบสตริงไม่ถูกต้อง: ไม่พบรูปแบบ KEY=VALUE ที่ถูกต้อง.');
             return { isValid, errors, parsedData };
         }
 
@@ -152,10 +142,7 @@ export class ItemsService {
             const value = match[2];
 
             if (match.index > lastIndex) {
-                const unparsedSegment = cleanedString.substring(
-                    lastIndex,
-                    match.index,
-                );
+                const unparsedSegment = cleanedString.substring(lastIndex, match.index);
                 if (unparsedSegment !== ',') {
                     isValid = false;
                     errors.push(
@@ -167,9 +154,7 @@ export class ItemsService {
             lastIndex = match.index + fullMatch.length;
             if (key.length < 1 || key.length > 3) {
                 isValid = false;
-                errors.push(
-                    `ชื่อตัวแปร '${key}' มีความยาวไม่ถูกต้อง (ต้อง 1-3 ตัวอักษร).`,
-                );
+                errors.push(`ชื่อตัวแปร '${key}' มีความยาวไม่ถูกต้อง (ต้อง 1-3 ตัวอักษร).`);
             }
 
             if (!value) {
@@ -179,9 +164,7 @@ export class ItemsService {
                 if (!value.includes(',')) {
                     if (value.length > 9) {
                         isValid = false;
-                        errors.push(
-                            `ค่าตัวแปรทั่วไป '${key}=${value}' มีความยาวเกิน 9 ตัวอักษร.`,
-                        );
+                        errors.push(`ค่าตัวแปรทั่วไป '${key}=${value}' มีความยาวเกิน 9 ตัวอักษร.`);
                     }
                 }
             }
@@ -199,7 +182,7 @@ export class ItemsService {
     }
 
     async compareVariable(data, obj2) {
-        let obj1 = [];
+        const obj1 = [];
         for (const item of data) {
             const variable = await this.validateVariable(
                 item.ITEM_VARIABLE == null ? '' : item.ITEM_VARIABLE,
@@ -207,11 +190,10 @@ export class ItemsService {
             obj1.push({ item, variable: variable.parsedData });
         }
 
-        let res = [];
+        const res = [];
         let check = true;
         for (const obj of obj1) {
-            if (Object.keys(obj.variable).length !== Object.keys(obj2).length)
-                check = false;
+            if (Object.keys(obj.variable).length !== Object.keys(obj2).length) check = false;
             for (const key in obj.variable) {
                 if (obj.variable[key] !== obj2[key]) check = false;
             }

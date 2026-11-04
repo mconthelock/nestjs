@@ -7,11 +7,9 @@ import { RnfrmPartRepository } from './rnfrm_part.repository';
 import { RnfrmPartService } from './rnfrm_part.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([RNFRM_PART], 'mitsuConnection'),
-  ],
-  controllers: [RnfrmPartController],
-  providers: [RnfrmPartService, RnfrmPartRepository],
-  exports: [RnfrmPartService],
+    imports: [TypeOrmModule.forFeature([RNFRM_PART], 'mitsuConnection')],
+    controllers: [RnfrmPartController],
+    providers: [RnfrmPartService, RnfrmPartRepository],
+    exports: [RnfrmPartService],
 })
 export class RnfrmPartModule {}

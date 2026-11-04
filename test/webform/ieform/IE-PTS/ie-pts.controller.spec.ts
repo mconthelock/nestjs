@@ -20,12 +20,10 @@ describe('IE-PTS HTTP contract', () => {
     let service: any;
     beforeAll(async () => {
         service = Object.fromEntries(
-            ['insert', 'autoInsert', 'find', 'update', 'remove'].map(
-                (method) => [
-                    method,
-                    jest.fn().mockResolvedValue({ status: true, key }),
-                ],
-            ),
+            ['insert', 'autoInsert', 'find', 'update', 'remove'].map((method) => [
+                method,
+                jest.fn().mockResolvedValue({ status: true, key }),
+            ]),
         );
         const module = await Test.createTestingModule({
             controllers: [IePtsController],
@@ -33,9 +31,7 @@ describe('IE-PTS HTTP contract', () => {
         }).compile();
         app = module.createNestApplication();
         // Match the production global transform/whitelist before controller pipes.
-        app.useGlobalPipes(
-            new ValidationPipe({ transform: true, whitelist: true }),
-        );
+        app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
         await app.init();
     });
     afterAll(async () => {
@@ -53,11 +49,7 @@ describe('IE-PTS HTTP contract', () => {
             .expect(201);
         const received = service.autoInsert.mock.calls[0][0];
         expect(received.map((form) => form.ITEMS.length)).toEqual([4, 2]);
-        expect(
-            received
-                .flatMap((form) => form.ITEMS)
-                .every((row) => row.LNO === null),
-        ).toBe(true);
+        expect(received.flatMap((form) => form.ITEMS).every((row) => row.LNO === null)).toBe(true);
     });
 
     it('serves POST insert and PUT replacement at the documented URLs', async () => {
@@ -70,12 +62,8 @@ describe('IE-PTS HTTP contract', () => {
             .put(base + '/update_ts_process')
             .send(dto)
             .expect(200);
-        expect(service.insert).toHaveBeenCalledWith(
-            expect.objectContaining(dto),
-        );
-        expect(service.update).toHaveBeenCalledWith(
-            expect.objectContaining(dto),
-        );
+        expect(service.insert).toHaveBeenCalledWith(expect.objectContaining(dto));
+        expect(service.update).toHaveBeenCalledWith(expect.objectContaining(dto));
     });
     it('parses and validates the full key for GET and DELETE queries', async () => {
         await request(app.getHttpServer())
@@ -87,9 +75,7 @@ describe('IE-PTS HTTP contract', () => {
             .query(key)
             .expect(200);
         expect(service.find).toHaveBeenCalledWith(expect.objectContaining(key));
-        expect(service.remove).toHaveBeenCalledWith(
-            expect.objectContaining(key),
-        );
+        expect(service.remove).toHaveBeenCalledWith(expect.objectContaining(key));
         const { NRUNNO, ...missing } = key;
         await request(app.getHttpServer())
             .delete(base + '/delete_ts_process')

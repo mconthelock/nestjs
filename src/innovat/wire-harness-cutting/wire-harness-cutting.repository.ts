@@ -59,15 +59,7 @@ export class WireHarnessCuttingRepository extends BaseRepository {
     }
 
     createDrum(dto: CreateDrumDto) {
-        const paramOrder = [
-            'empNo',
-            'itemCode',
-            'prodNo',
-            'ctrlNo',
-            'cut',
-            'cutType',
-            'reasonId',
-        ];
+        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
         return this.orepo.execCursor('WHN_CREATE_DRUM', dto, paramOrder);
     }
 

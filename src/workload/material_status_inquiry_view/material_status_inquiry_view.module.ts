@@ -6,16 +6,8 @@ import { MATERIAL_STATUS_INQUIRY_VIEW } from 'src/common/Entities/workload/views
 import { MaterialStatusInquiryViewRepository } from './material_status_inquiry_view.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [MATERIAL_STATUS_INQUIRY_VIEW],
-            'mitsuConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([MATERIAL_STATUS_INQUIRY_VIEW], 'mitsuConnection')],
     controllers: [MaterialStatusInquiryViewController],
-    providers: [
-        MaterialStatusInquiryViewService,
-        MaterialStatusInquiryViewRepository,
-    ],
+    providers: [MaterialStatusInquiryViewService, MaterialStatusInquiryViewRepository],
 })
 export class MaterialStatusInquiryViewModule {}

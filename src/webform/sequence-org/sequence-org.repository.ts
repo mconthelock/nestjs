@@ -20,10 +20,9 @@ export class SequenceOrgRepository extends BaseRepository {
             .createQueryBuilder('seq')
             .select('seq.HEADNO', 'HEADNO')
             .where('seq.EMPNO = :empno', { empno })
-            .andWhere(
-                'seq.SPOSCODE = (select SPOSCODE from AMECUSERALL where SEMPNO = :empno2)',
-                { empno2: empno },
-            )
+            .andWhere('seq.SPOSCODE = (select SPOSCODE from AMECUSERALL where SEMPNO = :empno2)', {
+                empno2: empno,
+            })
             .orderBy('seq.CCO', 'ASC');
         if (selectFields && selectFields.length > 0) {
             const select = selectFields.map((field) => ({

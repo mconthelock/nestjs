@@ -10,9 +10,7 @@ import { CreateQainsFormDto } from './dto/create-qains_form.dto';
 
 @Injectable()
 export class QainsFormRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -25,12 +23,7 @@ export class QainsFormRepository extends BaseRepository {
                 CYEAR2: dto.CYEAR2,
                 NRUNNO: dto.NRUNNO,
             },
-            relations: [
-                'QA_INCHARGE_INFO',
-                'QA_INCHARGE_SECTION_INFO',
-                'QA_REV_INFO',
-                'FORM',
-            ],
+            relations: ['QA_INCHARGE_INFO', 'QA_INCHARGE_SECTION_INFO', 'QA_REV_INFO', 'FORM'],
         });
     }
 

@@ -5,12 +5,12 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CustomerService {
-  constructor(
-    @InjectRepository(Customer, 'mitsuConnection')
-    private readonly cus: Repository<Customer>,
-  ) {}
+    constructor(
+        @InjectRepository(Customer, 'mitsuConnection')
+        private readonly cus: Repository<Customer>,
+    ) {}
 
-  async findAll() {
-    return this.cus.find();
-  }
+    async findAll() {
+        return this.cus.find();
+    }
 }

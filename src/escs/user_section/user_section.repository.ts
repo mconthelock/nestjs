@@ -7,9 +7,7 @@ import { SearchUsersSectionDto } from './dto/search-escs-usersection.dto';
 
 @Injectable()
 export class UsersSectionRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

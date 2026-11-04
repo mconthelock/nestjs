@@ -1,7 +1,6 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateLockPiDto {
-
     @IsNotEmpty()
     @IsString()
     ITEM_NO: string;

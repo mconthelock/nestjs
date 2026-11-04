@@ -57,4 +57,3 @@ export class FireController {
         return this.fireService.remove(fireCode);
     }
 }
-

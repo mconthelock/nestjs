@@ -54,9 +54,7 @@ export class ReportService {
             where: { REPORT: id },
         });
         return users.map((user) => {
-            const userAuth = reportAuths.filter(
-                (a) => a.VEMPNO === user.SEMPNO,
-            );
+            const userAuth = reportAuths.filter((a) => a.VEMPNO === user.SEMPNO);
             return {
                 ...user,
                 auth: userAuth,

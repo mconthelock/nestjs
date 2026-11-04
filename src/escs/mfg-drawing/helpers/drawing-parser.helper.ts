@@ -75,7 +75,7 @@ export class DrawingParserHelper {
         drawing = drawing.replace(/\s+/g, ' ');
 
         const pattern = /[GL-]{1}\d{2,3}~[GL]{1}\d{2,3}/g;
-        const matches = drawing.match(pattern) || [];
+        const matches: string[] = drawing.match(pattern) || [];
         matches.forEach((val) => {
             const GL = val.split('~');
             const min = GL[0].replace(/[GL]{1}/g, '');
@@ -158,9 +158,7 @@ export class DrawingParserHelper {
      */
     extractProcessCode(value: string): string {
         if (!value || value.length !== 6) {
-            throw new Error(
-                `Process No "${value}" ไม่ถูกต้อง กรุณาตรวจสอบข้อมูลใน ID-Tag`,
-            );
+            throw new Error(`Process No "${value}" ไม่ถูกต้อง กรุณาตรวจสอบข้อมูลใน ID-Tag`);
         }
 
         return value.substring(2);

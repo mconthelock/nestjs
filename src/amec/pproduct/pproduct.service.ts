@@ -44,11 +44,7 @@ export class PproductService {
         return product;
     }
 
-    async getProductsPagination(
-        dto: SearchPproductDto,
-        page: number = 1,
-        limit: number = 10,
-    ) {
+    async getProductsPagination(dto: SearchPproductDto, page: number = 1, limit: number = 10) {
         const skip = (page - 1) * limit;
         const [products, total] = await this.productRepo.findAndCount({
             where: { ...dto }, // ค้นหาจาก Product Code ที่ส่งมา

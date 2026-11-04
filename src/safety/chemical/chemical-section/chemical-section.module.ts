@@ -5,9 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChemicalSection } from './entities/chemical-section.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ChemicalSection],'mitsuConnection')],
-  controllers: [ChemicalSectionController],
-  providers: [ChemicalSectionService],
-  exports: [ChemicalSectionService],
+    imports: [TypeOrmModule.forFeature([ChemicalSection], 'mitsuConnection')],
+    controllers: [ChemicalSectionController],
+    providers: [ChemicalSectionService],
+    exports: [ChemicalSectionService],
 })
 export class ChemicalSectionModule {}

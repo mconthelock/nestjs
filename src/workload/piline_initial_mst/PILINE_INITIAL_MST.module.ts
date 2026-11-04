@@ -6,9 +6,7 @@ import { PilineInitialMstService } from './PILINE_INITIAL_MST.service';
 import { PilineInitialMstRepository } from './PILINE_INITIAL_MST.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([PILINE_INITIAL_MST], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([PILINE_INITIAL_MST], 'mitsuConnection')],
     controllers: [PilineInitialMstController],
     providers: [PilineInitialMstService, PilineInitialMstRepository],
     exports: [PilineInitialMstService],

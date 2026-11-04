@@ -8,9 +8,7 @@ import { ISSUE_KANBAN_DETAIL } from 'src/common/Entities/workload/table/ISSUE_KA
 
 @Injectable()
 export class KanbanRequestRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') private ds: DataSource,
-    ) {
+    constructor(@InjectDataSource('mitsuConnection') private ds: DataSource) {
         super(ds);
     }
 

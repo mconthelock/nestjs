@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm'; 
+import { DataSource } from 'typeorm';
 import { BIND_OUT, CURSOR, OUT_FORMAT_OBJECT } from 'oracledb';
 import { WMSTempIssueDto } from './dto/wms-temp-issue.dto';
 import { WMSUploadIssueDto } from './dto/wms-upload-issue.dto';
@@ -29,7 +29,7 @@ export class WMSService {
                 AND STATUS = '-'
              ORDER BY LOCATION ASC, PALLET_ID ASC, EXPIRE_DATE ASC, ISSUE ASC
             `,
-            [empno]
+            [empno],
         );
     }
 
@@ -44,7 +44,7 @@ export class WMSService {
         const runner = this.db.createQueryRunner();
         await runner.connect();
         const connection: any = (runner as any).databaseConnection;
-        
+
         try {
             const res = await connection.execute(
                 `BEGIN WMS_UPLOAD_ISSUE(:location, :palletId, :expireDate, :output); END;`,
@@ -54,7 +54,7 @@ export class WMSService {
                     expireDate: dto.expireDate,
                     output: { dir: BIND_OUT, type: CURSOR },
                 },
-                { outFormat: OUT_FORMAT_OBJECT }
+                { outFormat: OUT_FORMAT_OBJECT },
             );
 
             const cursor = res.outBinds.output;

@@ -7,14 +7,13 @@ import { PCURRENCY } from 'src/common/Entities/amec/table/PCURRENCY.entity';
 
 @Injectable()
 export class PcurrencyRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     async findCurrency() {
-        return this.manager.createQueryBuilder(PCURRENCY, 'C')
+        return this.manager
+            .createQueryBuilder(PCURRENCY, 'C')
             .select(['C.SCURCODE as CURCODE , C.SCURRENCY as CURRENCY'])
             .distinct(true)
             .orderBy('C.SCURRENCY', 'ASC')

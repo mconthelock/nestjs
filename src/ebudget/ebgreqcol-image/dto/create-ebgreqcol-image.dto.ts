@@ -4,26 +4,26 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
 export class CreateEbgreqcolImageDto extends PickType(FormDto, [
-  'NFRMNO',
-  'VORGNO',
-  'CYEAR',
-  'CYEAR2',
-  'NRUNNO',
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'CYEAR2',
+    'NRUNNO',
 ] as const) {
-  @IsNotEmpty()
-  @Type(() => Number)
-  @IsNumber()
-  COLNO: number;
+    @IsNotEmpty()
+    @Type(() => Number)
+    @IsNumber()
+    COLNO: number;
 
-  @IsNotEmpty()
-  @IsString()
-  ID: string;
+    @IsNotEmpty()
+    @IsString()
+    ID: string;
 
-  @IsNotEmpty()
-  @IsString()
-  IMAGE_FILE: string;
+    @IsNotEmpty()
+    @IsString()
+    IMAGE_FILE: string;
 
-  @IsNotEmpty()
-  @IsString()
-  SFILE: string;
+    @IsNotEmpty()
+    @IsString()
+    SFILE: string;
 }

@@ -35,9 +35,10 @@ describe('PTS forms by ITEM', () => {
             form([row({ PROCID_OLD: 'G1PR4' })]),
         ]);
         expect(result).toHaveLength(2);
-        expect(
-            result.map((group) => group.ITEMS.map((item) => item.ITEM)),
-        ).toEqual([['125', '125'], ['127']]);
+        expect(result.map((group) => group.ITEMS.map((item) => item.ITEM))).toEqual([
+            ['125', '125'],
+            ['127'],
+        ]);
     });
     function setup() {
         let runno = 0;
@@ -92,23 +93,12 @@ describe('PTS forms by ITEM', () => {
             [1, 3, ['125', '125']],
             [2, 1, ['127']],
         ]);
-        expect(repo.updateItemFlow).toHaveBeenNthCalledWith(
-            1,
-            { ...key, NRUNNO: 1 },
-            '125',
-        );
-        expect(repo.updateItemFlow).toHaveBeenNthCalledWith(
-            2,
-            { ...key, NRUNNO: 2 },
-            '127',
-        );
+        expect(repo.updateItemFlow).toHaveBeenNthCalledWith(1, { ...key, NRUNNO: 1 }, '125');
+        expect(repo.updateItemFlow).toHaveBeenNthCalledWith(2, { ...key, NRUNNO: 2 }, '127');
         expect(repo.insert.mock.invocationCallOrder[0]).toBeLessThan(
             repo.updateItemFlow.mock.invocationCallOrder[0],
         );
-        expect(result.items.map((item) => (item.form as any).ITEM)).toEqual([
-            '125',
-            '127',
-        ]);
+        expect(result.items.map((item) => (item.form as any).ITEM)).toEqual(['125', '127']);
     });
     it('does not reassign approval when the entire item group is skipped', async () => {
         const { repo, service } = setup();
@@ -119,9 +109,7 @@ describe('PTS forms by ITEM', () => {
     it('propagates flow update errors out of the batch transaction', async () => {
         const { repo, service } = setup();
         repo.updateItemFlow.mockRejectedValue(new Error('flow update failed'));
-        await expect(service.autoInsert([form()], 'ip')).rejects.toThrow(
-            'flow update failed',
-        );
+        await expect(service.autoInsert([form()], 'ip')).rejects.toThrow('flow update failed');
     });
 });
 
@@ -132,10 +120,7 @@ describe('PTS item approval assignment', () => {
     ) {
         const update = jest.fn().mockResolvedValue({ affected: 1 });
         const manager: any = {
-            query: jest
-                .fn()
-                .mockResolvedValueOnce(pic)
-                .mockResolvedValueOnce(heads),
+            query: jest.fn().mockResolvedValueOnce(pic).mockResolvedValueOnce(heads),
             getRepository: jest.fn((entity) => {
                 expect(entity).toBe(FLOW);
                 return { update };
@@ -149,9 +134,7 @@ describe('PTS item approval assignment', () => {
     it('sets step20 from SEMPNO/SEMPNO2 and step10 from HEADNO using all five keys', async () => {
         const { repo, manager, update } = setup();
         await repo.transaction(() => (repo as any).updateItemFlow(key, '125'));
-        expect(manager.query.mock.calls[0][0]).toContain(
-            'WEBFORM.DWGNOTICEPICMST',
-        );
+        expect(manager.query.mock.calls[0][0]).toContain('WEBFORM.DWGNOTICEPICMST');
         expect(manager.query.mock.calls[0][1]).toEqual(['125']);
         expect(manager.query.mock.calls[1][0]).toContain('WEBFORM.SEQUENCEORG');
         expect(manager.query.mock.calls[1][1]).toEqual(['11111']);
@@ -167,19 +150,14 @@ describe('PTS item approval assignment', () => {
         );
         expect(transactionContext.getStore()).toBeUndefined();
     });
-    it.each([null, '', '   '])(
-        'uses SEMPNO if SEMPNO2 is blank: %j',
-        async (SEMPNO2) => {
-            const { repo, update } = setup([{ SEMPNO: ' 11111 ', SEMPNO2 }]);
-            await repo.transaction(() =>
-                (repo as any).updateItemFlow(key, '125'),
-            );
-            expect(update.mock.calls[0][1]).toEqual({
-                VAPVNO: '11111',
-                VREPNO: '11111',
-            });
-        },
-    );
+    it.each([null, '', '   '])('uses SEMPNO if SEMPNO2 is blank: %j', async (SEMPNO2) => {
+        const { repo, update } = setup([{ SEMPNO: ' 11111 ', SEMPNO2 }]);
+        await repo.transaction(() => (repo as any).updateItemFlow(key, '125'));
+        expect(update.mock.calls[0][1]).toEqual({
+            VAPVNO: '11111',
+            VREPNO: '11111',
+        });
+    });
     it('keeps both master approvers when PIC is missing', async () => {
         const { repo, update } = setup([]);
         await repo.transaction(() => (repo as any).updateItemFlow(key, '125'));

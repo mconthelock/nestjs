@@ -1,10 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { DPMS_PL_CASE_LIST } from './DPMS_PL_CASE_LIST.entity';
 import { DPMS_PL_CASE_REVISE_VGM } from '../views/DPMS_PL_CASE_REVISE_VGM.entity';
 
@@ -47,14 +41,10 @@ export class DPMS_PL_CASE_LIST_DETAIL {
     NPOSEQ: number;
 
     @ManyToOne(() => DPMS_PL_CASE_LIST, (main) => main.DETAILS)
-    @JoinColumn([
-        { name: 'NCASELIST_ID', referencedColumnName: 'NID' },
-    ])
+    @JoinColumn([{ name: 'NCASELIST_ID', referencedColumnName: 'NID' }])
     MAIN: DPMS_PL_CASE_LIST;
 
     @ManyToOne(() => DPMS_PL_CASE_REVISE_VGM, (main) => main.DETAILS)
-    @JoinColumn([
-        { name: 'NCASELIST_ID', referencedColumnName: 'NID' },
-    ])
+    @JoinColumn([{ name: 'NCASELIST_ID', referencedColumnName: 'NID' }])
     REVISEVGM: DPMS_PL_CASE_REVISE_VGM;
 }

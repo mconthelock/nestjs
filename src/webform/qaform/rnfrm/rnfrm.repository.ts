@@ -9,9 +9,7 @@ import { RNFRM } from 'src/common/Entities/webform/table/RNFRM.entity';
 
 @Injectable()
 export class RnfrmRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-    ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 
@@ -19,7 +17,7 @@ export class RnfrmRepository extends BaseRepository {
         return this.manager.find(RNFRM);
     }
 
-    findOne(nfrmno: number, vorgno: string, cyear: string, cyear2: string, nrunno: number,) {
+    findOne(nfrmno: number, vorgno: string, cyear: string, cyear2: string, nrunno: number) {
         return this.getRepository(RNFRM).findOneBy({
             NFRMNO: nfrmno,
             VORGNO: vorgno,

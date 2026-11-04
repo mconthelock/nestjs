@@ -1,12 +1,4 @@
-﻿import {
-    UseInterceptors,
-    UploadedFiles,
-    Controller,
-    Post,
-    Body,
-    Get,
-    Param,
-} from '@nestjs/common';
+﻿import { UseInterceptors, UploadedFiles, Controller, Post, Body, Get, Param } from '@nestjs/common';
 
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { PrintedService } from './printed/printed.service';

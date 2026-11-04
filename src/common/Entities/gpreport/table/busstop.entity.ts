@@ -1,33 +1,39 @@
-﻿import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+﻿import {
+    Column,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryColumn,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Buspassenger } from './buspassenger.entity';
 import { Busroute } from './busroute.entity';
 
 @Entity({ name: 'BUS_STOP', schema: 'GPREPORT' })
 export class Busstop {
-  //@PrimaryColumn()
-  @PrimaryGeneratedColumn('increment')
-  STOP_ID: number;
+    //@PrimaryColumn()
+    @PrimaryGeneratedColumn('increment')
+    STOP_ID: number;
 
-  @Column()
-  STOP_NAME: string;
+    @Column()
+    STOP_NAME: string;
 
-  @Column()
-  STOP_STATUS: string;
+    @Column()
+    STOP_STATUS: string;
 
-  @Column()
-  WORKDAY_TIMEIN: string;
+    @Column()
+    WORKDAY_TIMEIN: string;
 
-  @Column()
-  NIGHT_TIMEIN: string;
+    @Column()
+    NIGHT_TIMEIN: string;
 
-  @Column()
-  HOLIDAY_TIMEIN: string;
+    @Column()
+    HOLIDAY_TIMEIN: string;
 
-  @OneToMany(() => Buspassenger, (b) => b.stop)
-  passenger : Buspassenger;
+    @OneToMany(() => Buspassenger, (b) => b.stop)
+    passenger: Buspassenger;
 
-  @OneToMany(() => Busroute, (r) => r.stop)
-  routes: Busroute[];
-
-
+    @OneToMany(() => Busroute, (r) => r.stop)
+    routes: Busroute[];
 }

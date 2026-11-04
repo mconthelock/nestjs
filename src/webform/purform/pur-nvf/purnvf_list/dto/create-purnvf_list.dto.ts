@@ -1,22 +1,15 @@
 import { PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import {
-    IsArray,
-    IsDate,
-    IsNotEmpty,
-    IsNumber,
-    IsOptional,
-    IsString,
-} from 'class-validator';
-import { FormDto }  from "src/webform/form/dto/form.dto";
+import { IsArray, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
-export class CreatePurnvfListDto extends PickType(FormDto,[
-  'NFRMNO',
-  'VORGNO',
-  'CYEAR',
-  'CYEAR2',
-  'NRUNNO',
-] as const) {    
+export class CreatePurnvfListDto extends PickType(FormDto, [
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'CYEAR2',
+    'NRUNNO',
+] as const) {
     @IsString()
     @IsOptional()
     PURPOSE?: string;
@@ -27,11 +20,11 @@ export class CreatePurnvfListDto extends PickType(FormDto,[
 
     @IsString()
     @IsOptional()
-    SERVICE?: string;   
+    SERVICE?: string;
 
     @IsString()
     @IsOptional()
-    REASON?: string;   
+    REASON?: string;
 
     @IsString()
     @IsOptional()
@@ -51,7 +44,7 @@ export class CreatePurnvfListDto extends PickType(FormDto,[
     @IsString()
     @IsOptional()
     EMAIL?: string;
-    
+
     @IsString()
     @IsOptional()
     WEBSITE?: string;

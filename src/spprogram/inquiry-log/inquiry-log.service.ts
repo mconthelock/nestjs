@@ -5,8 +5,8 @@ import { InquiryLog } from './entities/inquiry-log.entity';
 
 @Injectable()
 export class InquiryLogService {
-  constructor(
-    @InjectRepository(InquiryLog, 'mitsuConnection')
-    private readonly logs: Repository<InquiryLog>,
-  ) {}
+    constructor(
+        @InjectRepository(InquiryLog, 'mitsuConnection')
+        private readonly logs: Repository<InquiryLog>,
+    ) {}
 }

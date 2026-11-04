@@ -14,10 +14,13 @@ export class StaticTestService {
         private readonly db: Repository<SYS_FOLDER_PATH>,
     ) {}
 
-    async getStaticTestResult(machine: string, serial: string): Promise<StaticTestResponseDto | null> {
+    async getStaticTestResult(
+        machine: string,
+        serial: string,
+    ): Promise<StaticTestResponseDto | null> {
         machine = machine?.trim();
-        serial  = serial?.trim();
-        const basePath  = await this.getPath('TSTM-001');
+        serial = serial?.trim();
+        const basePath = await this.getPath('TSTM-001');
         const machineNo = this.formatMachine(machine);
 
         // Check last 2 months for the test result
@@ -25,13 +28,13 @@ export class StaticTestService {
             const targetDate = new Date();
             targetDate.setMonth(targetDate.getMonth() - i);
 
-            const year  = targetDate.getFullYear();
+            const year = targetDate.getFullYear();
             const month = targetDate.getMonth() + 1;
             const folderPath = path.join(
                 basePath,
                 `Year ${year}`,
                 this.formatMonth(month, year),
-                'Static no.1,2'
+                'Static no.1,2',
             );
 
             const fileName = `(Static${machineNo})_${year}${this.pad(month)}.csv`;
@@ -41,7 +44,7 @@ export class StaticTestService {
             }
 
             const content = fs.readFileSync(fullPath, 'utf-8');
-            const lines   = content.split(/\r?\n/).reverse();
+            const lines = content.split(/\r?\n/).reverse();
             for (const line of lines) {
                 if (!line.trim()) continue;
 
@@ -73,7 +76,7 @@ export class StaticTestService {
 
     private async getPath(fdpId: string): Promise<string> {
         const data = await this.db.findOne({
-            where: { FDP_ID: fdpId }
+            where: { FDP_ID: fdpId },
         });
 
         if (!data) {
@@ -90,8 +93,18 @@ export class StaticTestService {
     private formatMonth(month: number, year: number): string {
         const yy = year.toString().slice(-2);
         const months = [
-            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec',
         ];
 
         return `${this.pad(month)}.${months[month - 1]} ${yy}`;

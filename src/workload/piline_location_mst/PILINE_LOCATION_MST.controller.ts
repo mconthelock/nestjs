@@ -21,10 +21,7 @@ export class PilineLocationMstController {
     }
     @Patch(':LOCATION_ID')
     @UseTransaction('mitsuConnection')
-    update(
-        @Param() key: KeyPilineLocationMstDto,
-        @Body() dto: UpdatePilineLocationMstDto,
-    ) {
+    update(@Param() key: KeyPilineLocationMstDto, @Body() dto: UpdatePilineLocationMstDto) {
         return this.service.update(key, dto);
     }
     @Delete(':LOCATION_ID')

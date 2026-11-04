@@ -10,14 +10,10 @@ import { CreateUsersDto } from './dto/create-escs-user.dto';
 
 @Injectable()
 export class UsersRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
-    private escs = this.manager
-        .getRepository(USERS)
-        .metadata.columns.map((c) => c.propertyName);
+    private escs = this.manager.getRepository(USERS).metadata.columns.map((c) => c.propertyName);
     private user = this.manager
         .getRepository(AMECUSERALL)
         .metadata.columns.map((c) => c.propertyName);
@@ -41,21 +37,13 @@ export class UsersRepository extends BaseRepository {
     }
 
     getUser(searchDto: SearchUsersDto) {
-        const {
-            USR_ID,
-            USR_NO,
-            GRP_ID,
-            USR_STATUS,
-            SEC_ID,
-            fields = [],
-        } = searchDto;
+        const { USR_ID, USR_NO, GRP_ID, USR_STATUS, SEC_ID, fields = [] } = searchDto;
         const query = this.manager.createQueryBuilder().from('USERS', 'A');
 
         if (USR_ID) query.andWhere('A.USR_ID = :USR_ID', { USR_ID });
         if (USR_NO) query.andWhere('A.USR_NO = :USR_NO', { USR_NO });
         if (GRP_ID) query.andWhere('A.GRP_ID = :GRP_ID', { GRP_ID });
-        if (USR_STATUS)
-            query.andWhere('A.USR_STATUS = :USR_STATUS', { USR_STATUS });
+        if (USR_STATUS) query.andWhere('A.USR_STATUS = :USR_STATUS', { USR_STATUS });
         if (SEC_ID) query.andWhere('A.SEC_ID = :SEC_ID', { SEC_ID });
 
         let select = [];

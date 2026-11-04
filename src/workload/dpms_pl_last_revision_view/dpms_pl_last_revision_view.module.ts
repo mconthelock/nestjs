@@ -6,12 +6,7 @@ import { DPMS_PL_LAST_REVISION_VIEW } from 'src/common/Entities/workload/views/D
 import { DpmsPlLastRevisionViewRepository } from './dpms_pl_last_revision_view.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [DPMS_PL_LAST_REVISION_VIEW],
-            'mitsuConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([DPMS_PL_LAST_REVISION_VIEW], 'mitsuConnection')],
     controllers: [DpmsPlLastRevisionViewController],
     providers: [DpmsPlLastRevisionViewService, DpmsPlLastRevisionViewRepository],
     exports: [DpmsPlLastRevisionViewService],

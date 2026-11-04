@@ -8,9 +8,7 @@ import { PPRBIDDING } from 'src/common/Entities/amec/table/PPRBIDDING.entity';
 
 @Injectable()
 export class PprbiddingRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -35,11 +33,8 @@ export class PprbiddingRepository extends BaseRepository {
             'BIDDINGNO',
             'EBUDGETNO',
             'PR.CAPPROVE',
-            'PR.NSTEP'
+            'PR.NSTEP',
         ]);
-        return qb
-            .innerJoinAndSelect('P.PPR', 'PR')
-            .orderBy('P.SPRNO', 'ASC')
-            .getMany();
+        return qb.innerJoinAndSelect('P.PPR', 'PR').orderBy('P.SPRNO', 'ASC').getMany();
     }
 }

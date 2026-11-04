@@ -3,10 +3,10 @@ import { TmaintaintypeService } from './tmaintaintype.service';
 
 @Controller('mkt/maintain')
 export class TmaintaintypeController {
-  constructor(private readonly msttype: TmaintaintypeService) {}
+    constructor(private readonly msttype: TmaintaintypeService) {}
 
-  @Get()
-  findAll() {
-    return this.msttype.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.msttype.findAll();
+    }
 }

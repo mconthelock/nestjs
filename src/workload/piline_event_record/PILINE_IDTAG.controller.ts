@@ -30,20 +30,15 @@ export class PilineIdtagService {
         // Escape LIKE metacharacters so the order is always a literal prefix.
         const prefix = order.replace(/[!%_]/g, (value) => '!' + value) + '%';
         try {
-            const rows: { MATERIAL_ID: string | number | null }[] =
-                await this.workload.query(
-                    `SELECT DISTINCT MATERIAL_ID
+            const rows: { MATERIAL_ID: string | number | null }[] = await this.workload.query(
+                `SELECT DISTINCT MATERIAL_ID
                  FROM AMEC.F_D011_PROCESS_SCHEDULES@PILINE_PIIS_LINK
                  WHERE SHEAR_NC LIKE :1 ESCAPE '!' AND MATERIAL_ID IS NOT NULL
                  ORDER BY MATERIAL_ID`,
-                    [prefix],
-                );
+                [prefix],
+            );
             return [
-                ...new Set(
-                    rows
-                        .map((row) => String(row.MATERIAL_ID ?? '').trim())
-                        .filter(Boolean),
-                ),
+                ...new Set(rows.map((row) => String(row.MATERIAL_ID ?? '').trim()).filter(Boolean)),
             ];
         } catch {
             throw new ServiceUnavailableException(
@@ -54,8 +49,7 @@ export class PilineIdtagService {
 
     async findByIdTag(idtag: string) {
         const tag = idtag.replace(/\s/g, '').trim();
-        if (tag.length !== 11)
-            throw new BadRequestException('ID Tag must contain 11 characters');
+        if (tag.length !== 11) throw new BadRequestException('ID Tag must contain 11 characters');
         const data = await this.ds.getRepository(F110KP).findOne({
             where: { F11K01: tag },
             select: {

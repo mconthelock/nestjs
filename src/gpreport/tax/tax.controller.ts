@@ -1,13 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Put,
-    Body,
-    Param,
-    Query,
-    Req,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, Query, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 
@@ -27,8 +18,7 @@ export class TaxController {
 
     @Get('items')
     @ApiOperation({
-        summary:
-            'ดึงโครงสร้างเกณฑ์ค่าลดหย่อนภาษีเงินได้ 18 รายการ (Master Items)',
+        summary: 'ดึงโครงสร้างเกณฑ์ค่าลดหย่อนภาษีเงินได้ 18 รายการ (Master Items)',
     })
     getTaxItems() {
         return this.taxService.getTaxItems();
@@ -36,8 +26,7 @@ export class TaxController {
 
     @Get('current/:empno')
     @ApiOperation({
-        summary:
-            'ดึงข้อมูลสิทธิ์และค่าลดหย่อนภาษีปัจจุบันของพนักงาน (จากระบบ AS400)',
+        summary: 'ดึงข้อมูลสิทธิ์และค่าลดหย่อนภาษีปัจจุบันของพนักงาน (จากระบบ AS400)',
     })
     @ApiParam({ name: 'empno', description: 'รหัสพนักงาน' })
     findCurrentTax(@Param('empno') empno: string) {

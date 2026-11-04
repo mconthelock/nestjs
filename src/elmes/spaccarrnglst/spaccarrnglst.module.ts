@@ -6,11 +6,8 @@ import { SpaccarrnglstController } from './spaccarrnglst.controller';
 import { ItemarrnglstModule } from '../itemarrnglst/itemarrnglst.module';
 
 @Module({
-  imports: [
-    ItemarrnglstModule,
-    TypeOrmModule.forFeature([Spaccarrnglst], 'elmesConnection'),
-  ],
-  controllers: [SpaccarrnglstController],
-  providers: [SpaccarrnglstService],
+    imports: [ItemarrnglstModule, TypeOrmModule.forFeature([Spaccarrnglst], 'elmesConnection')],
+    controllers: [SpaccarrnglstController],
+    providers: [SpaccarrnglstService],
 })
 export class SpaccarrnglstModule {}

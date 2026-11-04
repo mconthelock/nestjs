@@ -27,19 +27,21 @@ export class PsCiController {
     createLog(@Body() body: CreateLogDto) {
         return this.psCiService.createLog(body);
     }
-    
 
     // @Post('updateCheckResult')
     // updateCheckResult(@Body() body: { data: any }) {
     //     console.log(body);
-        
+
     //     const data = body.data;
     //     return this.psCiService.updateCheckResult(data);
     // }
 
     @Post('uploadFile')
     @UseInterceptors(getFileUploadInterceptor('file'))
-    uploadFile(@Body() body: InsertAndMoveHandleFileFormDto, @UploadedFile() file: Express.Multer.File[]) {
+    uploadFile(
+        @Body() body: InsertAndMoveHandleFileFormDto,
+        @UploadedFile() file: Express.Multer.File[],
+    ) {
         return this.psCiService.uploadFile(body, file);
     }
 

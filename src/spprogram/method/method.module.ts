@@ -5,8 +5,8 @@ import { Method } from './entities/method.entity';
 import { MethodController } from './method.controller';
 
 @Module({
-  controllers: [MethodController],
-  imports: [TypeOrmModule.forFeature([Method], 'mitsuConnection')],
-  providers: [MethodService],
+    controllers: [MethodController],
+    imports: [TypeOrmModule.forFeature([Method], 'mitsuConnection')],
+    providers: [MethodService],
 })
 export class MethodModule {}

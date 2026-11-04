@@ -18,13 +18,10 @@ export class MfgVtrService {
     ) {}
 
     async create(data: CreateMfgVtrDto, ip: string) {
-        const formmst =
-            await this.formmstService.getFormMasterByVaname('MFG-VTR');
+        const formmst = await this.formmstService.getFormMasterByVaname('MFG-VTR');
 
         if (!formmst) {
-            throw new Error(
-                'Form master not found for MFG-VTR. Check FORMMST table.',
-            );
+            throw new Error('Form master not found for MFG-VTR. Check FORMMST table.');
         }
 
         const createForm = await this.formCreateService.create(

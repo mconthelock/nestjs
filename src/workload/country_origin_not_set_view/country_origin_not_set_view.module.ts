@@ -3,10 +3,7 @@ import { CountryOriginNotSetViewService } from './country_origin_not_set_view.se
 import { CountryOriginNotSetViewRepository } from './country_origin_not_set_view.repository';
 
 @Module({
-    providers: [
-        CountryOriginNotSetViewService,
-        CountryOriginNotSetViewRepository,
-    ],
+    providers: [CountryOriginNotSetViewService, CountryOriginNotSetViewRepository],
     exports: [CountryOriginNotSetViewService],
 })
 export class CountryOriginNotSetViewModule {}

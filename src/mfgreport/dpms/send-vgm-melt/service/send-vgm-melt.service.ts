@@ -32,9 +32,7 @@ export class SendVgmMeltService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to get send VGM melt list: ${error.message}`,
-            );
+            throw new Error(`Failed to get send VGM melt list: ${error.message}`);
         }
     }
 

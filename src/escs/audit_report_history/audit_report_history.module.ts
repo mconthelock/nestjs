@@ -6,9 +6,7 @@ import { AUDIT_REPORT_HISTORY } from 'src/common/Entities/escs/table/AUDIT_REPOR
 import { AuditReportHistoryRepository } from './audit_report_history.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([AUDIT_REPORT_HISTORY], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([AUDIT_REPORT_HISTORY], 'mitsuConnection')],
     controllers: [AuditReportHistoryController],
     providers: [AuditReportHistoryService, AuditReportHistoryRepository],
     exports: [AuditReportHistoryService],

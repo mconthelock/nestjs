@@ -84,15 +84,11 @@ export class FormCreateService extends FormService {
 
             const checkReq = await this.usersService.findEmp(context.empno);
             const checkInput = await this.usersService.findEmp(context.inputempno);
-            if(!checkReq) {
-                throw new NotFoundException(
-                    `Requester ${context.empno} not found`
-                );
+            if (!checkReq) {
+                throw new NotFoundException(`Requester ${context.empno} not found`);
             }
-            if(!checkInput) {
-                throw new NotFoundException(
-                    `Inputer ${context.empno} not found`
-                );
+            if (!checkInput) {
+                throw new NotFoundException(`Inputer ${context.empno} not found`);
             }
 
             this.setQuery(context);
@@ -116,10 +112,7 @@ export class FormCreateService extends FormService {
                             break;
                         case '3':
                             context.VAPVNO = row.VAPVNO;
-                            context.CSTEPST =
-                                context.CSTEPSTDX <= 1
-                                    ? 1
-                                    : context.CSTEPSTDX - 1;
+                            context.CSTEPST = context.CSTEPSTDX <= 1 ? 1 : context.CSTEPSTDX - 1;
                             context.CSTEPSTDX--;
                             await this.getRepresent(row.VAPVNO, context);
                             const flow = this.setFlow(row, context);
@@ -146,8 +139,7 @@ export class FormCreateService extends FormService {
                 context.query.CSTEPST = '0';
                 const notuse = await this.flowService.getFlow(context.query);
                 for (const row of notuse) {
-                    const deleteResult =
-                        await this.deleteFlowStepService.deleteFlowStep(row);
+                    const deleteResult = await this.deleteFlowStepService.deleteFlowStep(row);
                     if (!deleteResult.status) {
                         throw new Error(deleteResult.message);
                     }
@@ -226,8 +218,7 @@ export class FormCreateService extends FormService {
             CYEAR2: context.cyear2,
             NRUNNO: context.nrunno,
             VREQNO: context.empno,
-            VINPUTER:
-                context.inputempno == '' ? context.empno : context.inputempno,
+            VINPUTER: context.inputempno == '' ? context.empno : context.inputempno,
             VREMARK: context.remark,
             DREQDATE: formDateWithZeroTime,
             CREQTIME: new Date().toTimeString().split(' ')[0], // HH:MM:SS
@@ -259,7 +250,7 @@ export class FormCreateService extends FormService {
             context.emppos,
         );
         // * 2026-09-24 เปลี่ยนเป็นแบบ asp ตรวจก่อนว่าเคยมีการตั้งค่า flag หรือไม่
-        if(context.flag == 0){
+        if (context.flag == 0) {
             context.flag = 1; // หากไม่เจอตำแหน่งเช่น ใน ORGPOS ให้ไป set manager step โดยตรวจด้วย VPOSNO ของ FLOWMST ทีละ STEP
         }
         if (orgTree && orgTree.length > 0) {
@@ -267,8 +258,7 @@ export class FormCreateService extends FormService {
             for (const row of orgTree) {
                 await this.getRepresent(row.VEMPNO, context);
                 context.VAPVNO = row.VEMPNO;
-                context.CSTEPST =
-                    context.CSTEPSTDX <= 1 ? 1 : context.CSTEPSTDX - 1;
+                context.CSTEPST = context.CSTEPSTDX <= 1 ? 1 : context.CSTEPSTDX - 1;
                 context.CSTEPSTDX--;
                 const flow = this.setFlow(data, context);
                 await this.flowService.insertFlow(flow);
@@ -291,8 +281,7 @@ export class FormCreateService extends FormService {
             for (const row of val) {
                 await this.getRepresent(row.VEMPNO, context);
                 context.VAPVNO = row.VEMPNO;
-                context.CSTEPST =
-                    context.CSTEPSTDX <= 1 ? 1 : context.CSTEPSTDX - 1;
+                context.CSTEPST = context.CSTEPSTDX <= 1 ? 1 : context.CSTEPSTDX - 1;
                 context.CSTEPSTDX--;
                 const flow = this.setFlow(data, context);
                 await this.flowService.insertFlow(flow);
@@ -404,8 +393,7 @@ export class FormCreateService extends FormService {
                 CYEAR2: context.cyear2,
                 NRUNNO: context.nrunno,
                 CSTEPNO: '-1',
-                CSTEPNEXTNO:
-                    nextstep.length == 0 ? '00' : nextstep[0].CSTEPNEXTNO,
+                CSTEPNEXTNO: nextstep.length == 0 ? '00' : nextstep[0].CSTEPNEXTNO,
                 CSTART: '0',
                 CSTEPST: '4',
                 CTYPE: '0',
@@ -423,11 +411,7 @@ export class FormCreateService extends FormService {
                 VURL: url[0].VFORMPAGE,
                 VREMARK: null,
             };
-            console.log(
-                managerData,
-                managerData?.CEXTDATA,
-                managerData?.CAPPLYALL,
-            );
+            console.log(managerData, managerData?.CEXTDATA, managerData?.CAPPLYALL);
 
             console.log(flow);
 

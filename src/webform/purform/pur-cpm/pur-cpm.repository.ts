@@ -40,7 +40,6 @@ export class PurCpmRepository extends BaseRepository {
     }
 
     async update(condition: FormDto, data: UpdatePurCpmDto) {
-        return await this.getRepository(PURCPM_FORM)
-            .update(condition, data);
+        return await this.getRepository(PURCPM_FORM).update(condition, data);
     }
 }

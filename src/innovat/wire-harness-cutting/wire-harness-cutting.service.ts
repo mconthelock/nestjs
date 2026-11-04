@@ -7,9 +7,7 @@ import { DrumToStockDto } from './dto/drum-to-stock.dto';
 
 @Injectable()
 export class WireHarnessCuttingService {
-    constructor(
-        private readonly repo: WireHarnessCuttingRepository,
-    ) {}
+    constructor(private readonly repo: WireHarnessCuttingRepository) {}
 
     async process() {
         return this.repo.getProcess();

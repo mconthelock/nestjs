@@ -6,10 +6,7 @@ import { SetRequestDate } from './entities/set-request-date.entity';
 import { AmeccalendarModule } from '../../amecmfg/ameccalendar/ameccalendar.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([SetRequestDate], 'mitsuConnection'),
-        AmeccalendarModule,
-    ],
+    imports: [TypeOrmModule.forFeature([SetRequestDate], 'mitsuConnection'), AmeccalendarModule],
     controllers: [SetRequestDateController],
     providers: [SetRequestDateService],
     exports: [SetRequestDateService], // ถ้าต้องการให้ service นี้สามารถใช้ได้ในโมดูลอื่น ๆ

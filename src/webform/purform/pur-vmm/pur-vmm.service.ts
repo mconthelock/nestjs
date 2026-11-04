@@ -16,12 +16,7 @@ import { PurvmmScmusrService } from './purvmm_scmusr/purvmm_scmusr.service';
 import { PurvmmScmuserRepository } from './purvmm_scmusr/purvmm_scmusr.repository';
 import { Vendors } from 'src/common/Entities/pursys/table/VENDORS.entity';
 import { PurFileService } from '../pur-file/pur-file.service';
-import {
-    copyFile,
-    deleteFile,
-    joinPaths,
-    moveFileFromMulter,
-} from 'src/common/utils/files.utils';
+import { copyFile, deleteFile, joinPaths, moveFileFromMulter } from 'src/common/utils/files.utils';
 import { log } from 'console';
 import { RequestPurvmmFormDto } from './dto/request-pur-vmm.dto';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
@@ -130,10 +125,7 @@ export class PurVmmService {
                     console.log('destination', destination);
                     //throw new Error(destination);
                     if (f.FILE_TYPE == 11 || f.FILE_TYPE == 2) {
-                        await copyFile(
-                            await joinPaths(f.FILE_PATH, f.FILE_FNAME),
-                            destination,
-                        );
+                        await copyFile(await joinPaths(f.FILE_PATH, f.FILE_FNAME), destination);
                         await this.purFileService.insert({
                             ...form,
                             FILE_ONAME: f.FILE_ONAME, // ชื่อเดิมฝั่ง client
@@ -286,17 +278,8 @@ export class PurVmmService {
         ];
 
         try {
-            const {
-                REQBY,
-                INPUTBY,
-                DRAFT,
-                REMARK,
-                ACTION,
-                EMPNO,
-                SCMUSER,
-                DELETE_FILES,
-                ...data
-            } = dto;
+            const { REQBY, INPUTBY, DRAFT, REMARK, ACTION, EMPNO, SCMUSER, DELETE_FILES, ...data } =
+                dto;
             const form = {
                 NFRMNO: dto.NFRMNO,
                 VORGNO: dto.VORGNO,
@@ -362,10 +345,7 @@ export class PurVmmService {
                 for (const id of DELETE_FILES) {
                     const file = await this.purFileService.getFileById(+id);
                     await this.purFileService.deleteFileByID(+id);
-                    const destination = await joinPaths(
-                        file.FILE_PATH,
-                        file.FILE_FNAME,
-                    );
+                    const destination = await joinPaths(file.FILE_PATH, file.FILE_FNAME);
                     await deleteFile(destination);
                 }
             }
@@ -383,10 +363,7 @@ export class PurVmmService {
                     condition: { ...form },
                     CST: '1',
                 });
-                await this.doactionService.doAction(
-                    { ...form, ACTION: ACTION, EMPNO, REMARK },
-                    ip,
-                );
+                await this.doactionService.doAction({ ...form, ACTION: ACTION, EMPNO, REMARK }, ip);
             }
 
             return {
@@ -414,18 +391,15 @@ export class PurVmmService {
         };
         const buyinfo = await this.userService.findEmp(data.BUYER);
         let to = '';
-        let cc = [];
+        const cc = [];
         let cc2 = '';
         let subject = '';
         let html = '';
-        let from = 'webflow_admin@MitsubishiElevatorAsia.co.th';
+        const from = 'webflow_admin@MitsubishiElevatorAsia.co.th';
         let status;
 
         try {
-            await this.doactionService.doAction(
-                { ...form, ACTION: ACTION, EMPNO, REMARK },
-                ip,
-            );
+            await this.doactionService.doAction({ ...form, ACTION: ACTION, EMPNO, REMARK }, ip);
             const cst = await this.formService.getFormStatus({ ...form });
             status = cst == '2' ? 'Approved' : 'Rejected';
             const statusColor = cst == '2' ? '#28a745' : '#dc3545';
@@ -441,9 +415,7 @@ export class PurVmmService {
                         cc.push('pimporan@MitsubishiElevatorAsia.co.th');
                         cc.push('kanokrat@MitsubishiElevatorAsia.co.th');
                     } else if (data.REQTYPE == 'Update') {
-                        cc.push(
-                            'SPU_BUYER SPU_BUYER@mitsubishielevatorasia.co.th',
-                        );
+                        cc.push('SPU_BUYER SPU_BUYER@mitsubishielevatorasia.co.th');
                     } else {
                         cc.push('SPU_BUYER@mitsubishielevatorasia.co.th');
                     }
@@ -516,8 +488,7 @@ export class PurVmmService {
                         let frmtype = match[1];
                         let year = '20' + match[2];
                         let runningNo = parseInt(match[3], 10);
-                        const formeva =
-                            await this.repomst.getFormMasterByVaname(frmtype);
+                        const formeva = await this.repomst.getFormMasterByVaname(frmtype);
                         const formdata = await this.repoeva.getData({
                             NFRMNO: formeva.NNO,
                             VORGNO: formeva.VORGNO,
@@ -531,10 +502,7 @@ export class PurVmmService {
                             frmtype = matchnvf[1];
                             year = '20' + matchnvf[2];
                             runningNo = parseInt(matchnvf[3], 10);
-                            const formnvf =
-                                await this.repomst.getFormMasterByVaname(
-                                    frmtype,
-                                );
+                            const formnvf = await this.repomst.getFormMasterByVaname(frmtype);
                             const forminf = await this.formService.getFormData({
                                 NFRMNO: formnvf.NNO,
                                 VORGNO: formnvf.VORGNO,
@@ -542,13 +510,10 @@ export class PurVmmService {
                                 CYEAR2: year,
                                 NRUNNO: runningNo,
                             });
-                            const reqinfo = await this.userService.findEmp(
-                                forminf.VREQNO,
-                            );
+                            const reqinfo = await this.userService.findEmp(forminf.VREQNO);
                             to = reqinfo.data.SRECMAIL;
                             cc2 = buyinfo.data.SRECMAIL;
-                            subject =
-                                'NEW VENDOR REQUISITION : VENDOR MASTER (CODE)';
+                            subject = 'NEW VENDOR REQUISITION : VENDOR MASTER (CODE)';
                             html = `
 <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #333333; max-width: 700px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
 

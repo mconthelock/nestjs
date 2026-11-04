@@ -7,6 +7,6 @@ import { HandleFileFormModule } from 'src/webform/handle-file-form/handle-file-f
 @Module({
     controllers: [PsCiController],
     providers: [PsCiService, PsCiRepository],
-    imports:[HandleFileFormModule]
+    imports: [HandleFileFormModule],
 })
 export class PsCiModule {}

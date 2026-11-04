@@ -4,7 +4,7 @@ import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 @Entity({ name: 'JOP_REQ', schema: 'DAILYIDS' })
 export class SetRequestDate {
     JOP_REVISION_TEXT?: string; // Optional, will be set later
-    DeadLinePUR?: Number;
+    DeadLinePUR?: number;
 
     @PrimaryColumn()
     JOP_REVISION: number;

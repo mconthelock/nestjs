@@ -33,13 +33,7 @@ export class PsCiRepository extends BaseRepository {
             ORDER BY CONTROLLER_ID, ITEM_CODE
         `;
 
-        const data = await this.manager.query(sql, [
-            NFRMNO,
-            VORGNO,
-            CYEAR,
-            CYEAR2,
-            NRUNNO,
-        ]);
+        const data = await this.manager.query(sql, [NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO]);
 
         const assignId = data?.[0]?.ASSIGN_ID;
         if (!assignId) {

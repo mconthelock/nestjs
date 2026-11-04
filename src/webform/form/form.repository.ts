@@ -11,9 +11,7 @@ import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
 @Injectable()
 export class FormRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -32,13 +30,7 @@ export class FormRepository extends BaseRepository {
 
     async search(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(FORM, 'F');
-        this.applyFilters(qb, 'F', dto, [
-            'NFRMNO',
-            'VORGNO',
-            'CYEAR',
-            'CYEAR2',
-            'NRUNNO',
-        ]);
+        this.applyFilters(qb, 'F', dto, ['NFRMNO', 'VORGNO', 'CYEAR', 'CYEAR2', 'NRUNNO']);
         return qb.getMany();
     }
 

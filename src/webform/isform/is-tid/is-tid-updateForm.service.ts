@@ -40,7 +40,7 @@ export class IsTidActionService extends IsTidService {
             return {
                 status: true,
                 message: 'Action Form successfully',
-            }
+            };
         } catch (error) {
             throw new Error('Action Form Failed: ' + error.message);
         }

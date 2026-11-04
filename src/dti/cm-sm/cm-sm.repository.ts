@@ -16,15 +16,11 @@ export class CmSmRepository extends BaseRepository {
         const { TINO, REVNO, columnName, value, empno } = payload;
 
         if (!TINO || !REVNO || !columnName) {
-            throw new BadRequestException(
-                'TINO, REVNO and columnName are required',
-            );
+            throw new BadRequestException('TINO, REVNO and columnName are required');
         }
 
         const repository = this.getRepository(CM_SM_FORM);
-        const allowedColumns = repository.metadata.columns.map(
-            (column) => column.propertyName,
-        );
+        const allowedColumns = repository.metadata.columns.map((column) => column.propertyName);
 
         if (!allowedColumns.includes(columnName)) {
             throw new BadRequestException(`Invalid columnName: ${columnName}`);
@@ -82,9 +78,6 @@ export class CmSmRepository extends BaseRepository {
     }
 
     updateCountAlert(TINO: string, REVNO: string, count: number) {
-        return this.getRepository(CM_SM_FORM).update(
-            { TINO, REVNO },
-            { COUNT_ALERT: count },
-        );
+        return this.getRepository(CM_SM_FORM).update({ TINO, REVNO }, { COUNT_ALERT: count });
     }
 }

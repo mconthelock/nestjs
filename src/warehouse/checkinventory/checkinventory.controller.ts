@@ -1,13 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-    Req,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { CheckinventoryService } from './checkinventory.service';
 import { CreateCheckinventoryDto } from './dto/create-checkinventory.dto';
@@ -51,17 +42,11 @@ export class CheckinventoryController {
             };
         },
     ) {
-        return this.cs.createHalfyearReportWithForm(
-            body.empno,
-            body.periods,
-            body.formData,
-        );
+        return this.cs.createHalfyearReportWithForm(body.empno, body.periods, body.formData);
     }
 
     @Post('createYearlyReport')
-    createYearlyReport(
-        @Body() body: { YEAR: string; PERIOD: string; EMPNO: string },
-    ) {
+    createYearlyReport(@Body() body: { YEAR: string; PERIOD: string; EMPNO: string }) {
         return this.cs.createYearlyReport(body.YEAR, body.PERIOD, body.EMPNO);
     }
 

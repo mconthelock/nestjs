@@ -15,10 +15,7 @@ import { PickType } from '@nestjs/swagger';
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 import { ToBoolean } from 'src/common/utils/transform';
 
-export class CreatePurPraFormDto extends PickType(CreateFormDto, [
-    'REMARK',
-    'DRAFT',
-] as const) {
+export class CreatePurPraFormDto extends PickType(CreateFormDto, ['REMARK', 'DRAFT'] as const) {
     @ValidateIf((o) => o.isReturn !== true && o.isSave !== true)
     @IsNotEmpty()
     @IsString()

@@ -143,10 +143,7 @@ export class VpsRepository extends BaseRepository {
     }
 
     async insPackorddtlByManual(order: string, packing: string): Promise<void> {
-        await this.packingDs.query('EXEC InsPackorddtlByManual @0, @1', [
-            order,
-            packing,
-        ]);
+        await this.packingDs.query('EXEC InsPackorddtlByManual @0, @1', [order, packing]);
     }
 
     async updatePrintStatus(order: string, packing: string): Promise<void> {
@@ -169,39 +166,19 @@ export class VpsRepository extends BaseRepository {
     }
 
     async insertItemMas(data: Record<string, any>): Promise<void> {
-        await this.packingDs
-            .createQueryBuilder()
-            .insert()
-            .into('ItemMas')
-            .values(data)
-            .execute();
+        await this.packingDs.createQueryBuilder().insert().into('ItemMas').values(data).execute();
     }
 
     async insertItemQty(data: Record<string, any>): Promise<void> {
-        await this.packingDs
-            .createQueryBuilder()
-            .insert()
-            .into('ItemQty')
-            .values(data)
-            .execute();
+        await this.packingDs.createQueryBuilder().insert().into('ItemQty').values(data).execute();
     }
 
     async insertPISInfo(data: Record<string, any>): Promise<void> {
-        await this.packingDs
-            .createQueryBuilder()
-            .insert()
-            .into('PISInfo')
-            .values(data)
-            .execute();
+        await this.packingDs.createQueryBuilder().insert().into('PISInfo').values(data).execute();
     }
 
     async insertVPSInfo(data: Record<string, any>): Promise<void> {
-        await this.packingDs
-            .createQueryBuilder()
-            .insert()
-            .into('VPSInfo')
-            .values(data)
-            .execute();
+        await this.packingDs.createQueryBuilder().insert().into('VPSInfo').values(data).execute();
     }
 
     async insertItemQtyHistory(data: Record<string, any>): Promise<void> {
@@ -393,11 +370,7 @@ export class VpsRepository extends BaseRepository {
                 JOIN M008KP mk ON mk.M8K03 = s01.S01M01
                 WHERE (S01M01 = :1 OR S01M01 LIKE :2)
                 AND S01M04 LIKE :3`;
-        return await this.wk.query(sql, [
-            `${order}`,
-            `_${order}_`,
-            `%${packing}%`,
-        ]);
+        return await this.wk.query(sql, [`${order}`, `_${order}_`, `%${packing}%`]);
     }
 
     async getListOrder(packing: string): Promise<any[]> {
@@ -412,7 +385,7 @@ export class VpsRepository extends BaseRepository {
                     sch.max_date,
                     a.AGENT,
                     ao.PRODTYPE as PRODTYPE
-                    ,CASE 
+                    ,CASE
                         WHEN rc.CYEAR2 IS NOT NULL THEN '1'
                         ELSE '0'
                     END AS rev_con
@@ -433,14 +406,14 @@ export class VpsRepository extends BaseRepository {
                     ON a.MFGNO = sm.S01M01
                 LEFT JOIN (
                     SELECT pl.NFRMNO,pl.VORGNO,pl.CYEAR,pl.CYEAR2,pl.NRUNNO,ORDERNO,PACKNO,f.VREALAPV,f.CSTEPST
-					FROM WEBFORM.PKRN_LIST pl 
+					FROM WEBFORM.PKRN_LIST pl
 					LEFT JOIN WEBFORM.FLOW f ON  pl.NFRMNO = f.NFRMNO AND pl.VORGNO = f.VORGNO AND pl.CYEAR = f.CYEAR AND pl.CYEAR2 = f.CYEAR2 AND pl.NRUNNO = f.NRUNNO
 					WHERE CSTEPNO = '10' AND CSTEPST = '5'
 					GROUP BY pl.NFRMNO,pl.VORGNO,pl.CYEAR,pl.CYEAR2,pl.NRUNNO,ORDERNO,PACKNO,f.VREALAPV,f.CSTEPST
                 ) pl
                     ON pl.ORDERNO = sm.S01M01
                     AND pl.PACKNO = sm.S01M04
-                LEFT JOIN REV_CONFIRM rc ON rc.CYEAR2 = pl.CYEAR2 AND rc.NRUNNO = pl.NRUNNO AND rc.\"ORDER\" = sm.S01M01 AND rc.PACKING = sm.S01M04     
+                LEFT JOIN REV_CONFIRM rc ON rc.CYEAR2 = pl.CYEAR2 AND rc.NRUNNO = pl.NRUNNO AND rc.\"ORDER\" = sm.S01M01 AND rc.PACKING = sm.S01M04
                 LEFT JOIN AMECORDERS ao ON ao.MFGNO = sm.S01M01
                 WHERE sm.S01M04 = :packing
                 AND sm.S01M17 IS NULL
@@ -452,30 +425,30 @@ export class VpsRepository extends BaseRepository {
     }
 
     async getListOrder_88_89() {
-        const sql = `SELECT SUBSTR(F_CPROD(M8K01), -3) AS SCHEDULE,mk.*,sm.*,p.*,sch.max_date,a.AGENT,pl.* FROM M008KP mk 
-                JOIN S010MP sm ON mk.M8K03 = sm.S01M01 
+        const sql = `SELECT SUBSTR(F_CPROD(M8K01), -3) AS SCHEDULE,mk.*,sm.*,p.*,sch.max_date,a.AGENT,pl.* FROM M008KP mk
+                JOIN S010MP sm ON mk.M8K03 = sm.S01M01
                 JOIN PACKORDDTL p ON mk.M8K03 = p.ORDERNO AND sm.S01M04 = p.PACKNO
                 LEFT JOIN (SELECT NEXTWORKDAY(max(workid) , 1) AS max_date,schdnumber FROM AMECCALENDAR a group by schdnumber) sch ON sch.schdnumber = sm.S01M09
                 LEFT JOIN AMECORDERS a ON sm.S01M01 = a.MFGNO
-                LEFT JOIN ( 
+                LEFT JOIN (
 	                SELECT pl.NFRMNO,pl.VORGNO,pl.CYEAR,pl.CYEAR2,pl.NRUNNO,ORDERNO,PACKNO,f.VREALAPV,f.CSTEPST,pl.STATUS as FORM_TYPE
-					FROM WEBFORM.PKRN_LIST pl 
+					FROM WEBFORM.PKRN_LIST pl
 					LEFT JOIN WEBFORM.FLOW f ON  pl.NFRMNO = f.NFRMNO AND pl.VORGNO = f.VORGNO AND pl.CYEAR = f.CYEAR AND pl.CYEAR2 = f.CYEAR2 AND pl.NRUNNO = f.NRUNNO
 					WHERE CSTEPNO = '10' AND CSTEPST = '5'
 					GROUP BY pl.NFRMNO,pl.VORGNO,pl.CYEAR,pl.CYEAR2,pl.NRUNNO,ORDERNO,PACKNO,f.VREALAPV,f.CSTEPST,pl.STATUS
-                )  pl ON sm.S01M01 = pl.ORDERNO AND sm.S01M04 = pl.PACKNO AND sm.S01M09 > '2026025'              
+                )  pl ON sm.S01M01 = pl.ORDERNO AND sm.S01M04 = pl.PACKNO AND sm.S01M09 > '2026025'
                 WHERE SUBSTR(sm.S01M04,-2) IN ('88','89')
                 AND mk.M8K01 >= '20250000'
                 AND (
-				      PRINTSTA = 0 
-				      OR 
+				      PRINTSTA = 0
+				      OR
 				      (PRINTSTA = 1 AND (sm.S01M18 IS NULL OR pl.ORDERNO IS NOT NULL))
 				  )
                 AND NOT EXISTS (
-					    SELECT 1 FROM REV_CONFIRM rc 
-					    WHERE rc.\"ORDER\" = sm.S01M01 
-					    AND rc.PACKING = sm.S01M04 
-					    AND rc.CYEAR2 = pl.CYEAR2 
+					    SELECT 1 FROM REV_CONFIRM rc
+					    WHERE rc.\"ORDER\" = sm.S01M01
+					    AND rc.PACKING = sm.S01M04
+					    AND rc.CYEAR2 = pl.CYEAR2
 					    AND rc.NRUNNO = pl.NRUNNO
                         AND rc.CONFIRM_AT IS NOT NULL
 					)
@@ -485,14 +458,14 @@ export class VpsRepository extends BaseRepository {
 
     async getOrderDetail(order: string, packing: string): Promise<any[]> {
         const sql = `
-            SELECT 
-                A.*, 
-                B.LVAL, 
-                S.*, 
+            SELECT
+                A.*,
+                B.LVAL,
+                S.*,
                 ao.PRODTYPE as PRODTYPE,
                 ao.COUNTRY as COUNTRY,
                 SUBSTR(F_CPROD(M8K01), -3) AS SCHEDULE,
-                SUBSTR(F_CPROD(M8K01), -5) AS JUN, 
+                SUBSTR(F_CPROD(M8K01), -5) AS JUN,
                 M8K02,
                 J2INO as PUR_CODE,
                 ap.PACKSHOP,
@@ -500,14 +473,14 @@ export class VpsRepository extends BaseRepository {
                 avo.ORDERNUMBER
             FROM S011MP A
             LEFT JOIN (
-                SELECT S11M01, S11M08, S11M02, S11M03, S11M04, LISTAGG(SUBSTR(S11M06, -3), '') WITHIN GROUP (ORDER BY S11M06) AS LVAL 
-                FROM S011MP 
+                SELECT S11M01, S11M08, S11M02, S11M03, S11M04, LISTAGG(SUBSTR(S11M06, -3), '') WITHIN GROUP (ORDER BY S11M06) AS LVAL
+                FROM S011MP
                 WHERE S11M07 = 1
                 GROUP BY S11M01, S11M08, S11M02, S11M03, S11M04, S11M09
             ) B ON A.S11M01 = B.S11M01 AND A.S11M02 = B.S11M02 AND A.S11M06 = B.S11M04
             JOIN S010MP S ON A.S11M01 = S.S01M01 AND A.S11M02 = S.S01M04
             JOIN M008KP M ON A.S11M01 = M.M8K03
-            LEFT JOIN (SELECT DISTINCT J2CUS, J2DRAW, J2INO, J2DES FROM J002MP WHERE J2CUS = :1 AND J2SEQ != 0) j 
+            LEFT JOIN (SELECT DISTINCT J2CUS, J2DRAW, J2INO, J2DES FROM J002MP WHERE J2CUS = :1 AND J2SEQ != 0) j
                 ON j.J2CUS = A.S11M01 AND (j.J2DRAW = REPLACE(A.S11M06, ' ', '') OR J2DES = REPLACE(A.S11M06, ' ', ''))
             LEFT JOIN AMECORDERS ao ON ao.MFGNO = S.S01M01
             LEFT JOIN AMECORDERS_PACKNO ap ON ap.ORDERNO = S.S01M01 AND ap.PACKNO = S.S01M04
@@ -518,8 +491,8 @@ export class VpsRepository extends BaseRepository {
                 JOIN WEBFORM.FORM B ON A.NFRMNO = B.NFRMNO AND A.VORGNO = B.VORGNO AND A.CYEAR = B.CYEAR AND A.CYEAR2 = B.CYEAR2 AND A.NRUNNO = B.NRUNNO
                 WHERE B.CST != 3
             ) U ON U.MFGNO = S.S01M01
-            WHERE A.S11M01 = :2 
-            AND A.S11M02 = :3 
+            WHERE A.S11M01 = :2
+            AND A.S11M02 = :3
             AND A.S11M07 = 0
             ORDER BY A.S11M03, A.S11M06 ASC
         `;
@@ -529,12 +502,12 @@ export class VpsRepository extends BaseRepository {
 
     async getVPS(order: string, packing: string): Promise<any[]> {
         const sql = `
-            SELECT 
-                S.*, 
+            SELECT
+                S.*,
                 ao.PRODTYPE as PRODTYPE,
                 ao.COUNTRY as COUNTRY,
                 SUBSTR(F_CPROD(M8K01), -3) AS SCHEDULE,
-                SUBSTR(F_CPROD(M8K01), -5) AS JUN, 
+                SUBSTR(F_CPROD(M8K01), -5) AS JUN,
                 M8K02,
                 ap.PACKSHOP,
                 CASE WHEN U.MFGNO IS NOT NULL THEN 1 ELSE NULL END AS URGENT,
@@ -583,10 +556,7 @@ export class VpsRepository extends BaseRepository {
         await qr.startTransaction();
 
         try {
-            const uniqueKeys = new Map<
-                string,
-                { ORDER_NO: string; PACKING_NO: string }
-            >();
+            const uniqueKeys = new Map<string, { ORDER_NO: string; PACKING_NO: string }>();
             for (const item of items) {
                 const key = `${item.ORDER_NO}|${item.PACKING_NO}`;
                 if (!uniqueKeys.has(key)) {
@@ -609,9 +579,7 @@ export class VpsRepository extends BaseRepository {
                     .execute();
             }
 
-            const result = await qr.manager
-                .getRepository(PKC_CARTON_DETAIL)
-                .insert(items);
+            const result = await qr.manager.getRepository(PKC_CARTON_DETAIL).insert(items);
 
             await qr.commitTransaction();
             return result;
@@ -623,11 +591,7 @@ export class VpsRepository extends BaseRepository {
         }
     }
 
-    async getOrderReprint(
-        search: string | undefined,
-        page: number,
-        sect?: string | null,
-    ) {
+    async getOrderReprint(search: string | undefined, page: number, sect?: string | null) {
         const PAGE_SIZE = 20;
         const skip = (page - 1) * PAGE_SIZE;
         const searchVal = search ?? null;
@@ -638,7 +602,7 @@ export class VpsRepository extends BaseRepository {
             ? ''
             : isFixedPacking
               ? 'AND p.PACKNO = :3'
-            : `
+              : `
         AND EXISTS (
             SELECT 1 FROM AMECORDERS_PACKNO a
             WHERE a.PACKNO = p.PACKNO
@@ -685,7 +649,7 @@ export class VpsRepository extends BaseRepository {
             ? ''
             : isFixedPacking
               ? 'AND p.PACKNO = :2'
-            : `
+              : `
         AND EXISTS (
             SELECT 1 FROM AMECORDERS_PACKNO a
             WHERE a.PACKNO = p.PACKNO
@@ -743,8 +707,8 @@ export class VpsRepository extends BaseRepository {
 
     async getSubconItem() {
         return this.packingDs.query(`
-            SELECT si.*,p.partname,p.projectno FROM SubconItem si 
-            JOIN packorddtl p ON si.orderno = p.orderno and si.itemno = p.packno 
+            SELECT si.*,p.partname,p.projectno FROM SubconItem si
+            JOIN packorddtl p ON si.orderno = p.orderno and si.itemno = p.packno
             where printsta = '0' and updatedte > '2026-01-01' order by prod desc,seq asc`);
     }
 
@@ -772,18 +736,18 @@ export class VpsRepository extends BaseRepository {
         );
     }
 
-    async getImageErrors(){
+    async getImageErrors() {
         return this.wk.query(
             `
-            SELECT 
-                REGEXP_REPLACE(IMAGE_NAME, '\\.jpg$', '', 1, 1, 'i') AS PUR_CODE, 
-                IMAGE_NAME, 
+            SELECT
+                REGEXP_REPLACE(IMAGE_NAME, '\\.jpg$', '', 1, 1, 'i') AS PUR_CODE,
+                IMAGE_NAME,
                 CREATED_AT as ERROR_AT
             FROM IMAGE_ERROR_LOG
             WHERE CREATED_AT >= TRUNC(SYSDATE, 'IW') - 7
             AND CREATED_AT <  TRUNC(SYSDATE, 'IW') - 2
             ORDER BY CREATED_AT DESC
-            `
+            `,
         );
     }
 }

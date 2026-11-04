@@ -53,13 +53,12 @@ export class VpsService {
         const now = new Date();
 
         // เช็คข้อมูลซ้ำทั้งหมดก่อน insert
-        const [chkOrder, chkItemMas, chkItemQty, chkPISinfo] =
-            await Promise.all([
-                this.vpsRepository.chkOrder(order, packing),
-                this.vpsRepository.chkItemMas(order, packing),
-                this.vpsRepository.chkItemQty(order, packing),
-                this.vpsRepository.chkPISinfo(order, subPacking),
-            ]);
+        const [chkOrder, chkItemMas, chkItemQty, chkPISinfo] = await Promise.all([
+            this.vpsRepository.chkOrder(order, packing),
+            this.vpsRepository.chkItemMas(order, packing),
+            this.vpsRepository.chkItemQty(order, packing),
+            this.vpsRepository.chkPISinfo(order, subPacking),
+        ]);
 
         console.log('chkOrder:', chkOrder);
         console.log('chkItemMas:', chkItemMas);
@@ -216,9 +215,7 @@ export class VpsService {
         const project = vpsDetail[0].S01M08;
         const sche = String(vpsDetail[0].SCHEDULE ?? '');
         const formattedSche =
-            sche.length >= 8
-                ? `${sche.substr(4, 2)}${sche.substr(6)}${sche.substr(2, 2)}`
-                : sche;
+            sche.length >= 8 ? `${sche.substr(4, 2)}${sche.substr(6)}${sche.substr(2, 2)}` : sche;
         const piscode = `${order.substr(1, order.length - 2)}${packing}`;
         const subPacking = `${packing.substr(0, 3)}-${packing.substr(3, 5)}`;
 
@@ -269,10 +266,7 @@ export class VpsService {
                 orderDetails[0].S01M06,
             );
 
-            orderDetails[0].REMARK = [
-                ...(remark ?? []),
-                ...(originalOrder ?? []),
-            ];
+            orderDetails[0].REMARK = [...(remark ?? []), ...(originalOrder ?? [])];
         } else {
             orderDetails[0].REMARK = remark && remark.length > 0 ? remark : '';
         }
@@ -282,8 +276,7 @@ export class VpsService {
             item: packing,
         });
 
-        const isSpecialPacking =
-            String(packing).endsWith('88') || String(packing).endsWith('89');
+        const isSpecialPacking = String(packing).endsWith('88') || String(packing).endsWith('89');
 
         const data = await Promise.all(
             (detail.data ?? []).map(async (details) => {
@@ -294,18 +287,13 @@ export class VpsService {
 
                 const dwgNo = details.S11M04?.replace(/\s/g, '') ?? '';
 
-                const purCode = await this.vpsRepository.getPURCode(
-                    order,
-                    dwgNo,
-                );
+                const purCode = await this.vpsRepository.getPURCode(order, dwgNo);
 
-                const masterPacking =
-                    await this.vpsRepository.getMasterPacking(dwgNo);
+                const masterPacking = await this.vpsRepository.getMasterPacking(dwgNo);
 
                 return {
                     ...details,
-                    MASTER_PACKING:
-                        masterPacking?.length > 0 ? masterPacking : '',
+                    MASTER_PACKING: masterPacking?.length > 0 ? masterPacking : '',
                     PUR_CODE: purCode?.length > 0 ? purCode[0].J2INO : '',
                 };
             }),
@@ -321,17 +309,9 @@ export class VpsService {
         return this.vpsRepository.insertCartonBox(dto.items);
     }
 
-    async getOrderReprint(
-        search: string | undefined,
-        page: string,
-        sect: string,
-    ) {
+    async getOrderReprint(search: string | undefined, page: string, sect: string) {
         const pageNum = Number(page) || 1;
-        const { rows, hasMore } = await this.vpsRepository.getOrderReprint(
-            search,
-            pageNum,
-            sect,
-        );
+        const { rows, hasMore } = await this.vpsRepository.getOrderReprint(search, pageNum, sect);
 
         // format ให้ตรงกับ Select2 (id/text)
         return {
@@ -423,9 +403,7 @@ export class VpsService {
                     <p>Dear All,</p>
                     <p>Please find attached the weekly summary log of &ldquo;No picture&rdquo; cases from the Maintenance Parts Kitting program.</p>
                 </div>`,
-            attachments: [
-                { filename: `IMAGE_NOT_FOUND_${date}.xlsx`, content: buffer },
-            ],
+            attachments: [{ filename: `IMAGE_NOT_FOUND_${date}.xlsx`, content: buffer }],
         });
         return { success: true, sent: true, count: rows.length };
     }

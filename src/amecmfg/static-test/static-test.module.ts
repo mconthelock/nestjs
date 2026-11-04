@@ -5,8 +5,8 @@ import { StaticTestService } from './static-test.service';
 import { SYS_FOLDER_PATH } from 'src/common/Entities/escs/table/SYS_FOLDER_PATH.entity';
 
 @Module({
-    imports: [ TypeOrmModule.forFeature([SYS_FOLDER_PATH],'mitsuConnection') ],
-    controllers: [ StaticTestController ],
-    providers: [ StaticTestService ]
+    imports: [TypeOrmModule.forFeature([SYS_FOLDER_PATH], 'mitsuConnection')],
+    controllers: [StaticTestController],
+    providers: [StaticTestService],
 })
 export class StaticTestModule {}

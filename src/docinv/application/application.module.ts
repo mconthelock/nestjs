@@ -6,10 +6,7 @@ import { Application } from '../../common/Entities/docinv/table/application.enti
 import { AppsgroupsModule } from '../appsgroups/appsgroups.module';
 
 @Module({
-    imports: [
-        AppsgroupsModule,
-        TypeOrmModule.forFeature([Application], 'mitsuConnection'),
-    ],
+    imports: [AppsgroupsModule, TypeOrmModule.forFeature([Application], 'mitsuConnection')],
     controllers: [ApplicationController],
     providers: [ApplicationService],
     exports: [ApplicationService],

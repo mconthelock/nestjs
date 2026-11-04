@@ -2,51 +2,51 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'RNFRM', schema: 'WEBFORM' })
 export class RNFRM {
-  @PrimaryColumn()
-  NFRMNO: number;
+    @PrimaryColumn()
+    NFRMNO: number;
 
-  @PrimaryColumn()
-  VORGNO: string;
+    @PrimaryColumn()
+    VORGNO: string;
 
-  @PrimaryColumn()
-  CYEAR: string;
+    @PrimaryColumn()
+    CYEAR: string;
 
-  @PrimaryColumn()
-  CYEAR2: string;
+    @PrimaryColumn()
+    CYEAR2: string;
 
-  @PrimaryColumn()
-  NRUNNO: number;
+    @PrimaryColumn()
+    NRUNNO: number;
 
-  @Column()
-  TID: number;
+    @Column()
+    TID: number;
 
-  @Column()
-  SECCODE: string;
+    @Column()
+    SECCODE: string;
 
-  @Column()
-  CID: number;
+    @Column()
+    CID: number;
 
-  @Column()
-  WID: number;
+    @Column()
+    WID: number;
 
-  @Column()
-  PRONG: string;
+    @Column()
+    PRONG: string;
 
-  @Column()
-  EXPLAIN: string;
+    @Column()
+    EXPLAIN: string;
 
-  @Column()
-  REJECTPRE: string;
+    @Column()
+    REJECTPRE: string;
 
-  @Column()
-  REJECTNO: number;
+    @Column()
+    REJECTNO: number;
 
-  @Column()
-  STATUS: string;
+    @Column()
+    STATUS: string;
 
-  @Column()
-  SOLVPROB: string;
+    @Column()
+    SOLVPROB: string;
 
-  @Column()
-  SECOTH: string;
+    @Column()
+    SECOTH: string;
 }

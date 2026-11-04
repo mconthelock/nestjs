@@ -65,9 +65,7 @@ export class MatrixEffectItemService {
         } catch (error) {
             if (localRunner && didStartTx && localRunner.isTransactionActive)
                 await localRunner.rollbackTransaction();
-            throw new Error(
-                'Insert Matrix Effect Item Error: ' + error.message,
-            );
+            throw new Error('Insert Matrix Effect Item Error: ' + error.message);
         } finally {
             if (localRunner && didConnect) await localRunner.release();
         }
@@ -96,9 +94,7 @@ export class MatrixEffectItemService {
         } catch (error) {
             if (localRunner && didStartTx && localRunner.isTransactionActive)
                 await localRunner.rollbackTransaction();
-            throw new Error(
-                'Delete Matrix Effect Item Error: ' + error.message,
-            );
+            throw new Error('Delete Matrix Effect Item Error: ' + error.message);
         } finally {
             if (localRunner && didConnect) await localRunner.release();
         }

@@ -27,9 +27,7 @@ describe('applyDynamicFilters', () => {
             /lvapp\.FRMLVDATE >= :.+_start AND lvapp\.FRMLVDATE <= :.+_end/,
         );
 
-        const paramValues = Object.values(
-            dateRangeCall[1] as Record<string, unknown>,
-        );
+        const paramValues = Object.values(dateRangeCall[1] as Record<string, unknown>);
         expect(paramValues).toHaveLength(2);
         expect(paramValues.every((value) => value instanceof Date)).toBe(true);
         expect((paramValues[0] as Date).getHours()).toBe(0);

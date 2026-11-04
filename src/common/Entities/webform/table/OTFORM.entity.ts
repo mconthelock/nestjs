@@ -16,14 +16,7 @@
 // SPECIAL	CHAR
 // SPECIAL_REASON	VARCHAR2
 
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
 import { FORM } from './FORM.entity';
 import { User } from '../../webform/views/AMECUSERALL.entity';
 import { LR200P } from '../../gpreport/views/LR200P.entity';

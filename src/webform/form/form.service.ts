@@ -88,10 +88,7 @@ export class FormService {
 
         if (Object.keys(form || {}).length > 0) {
             Object.entries(form).forEach(([key, value]) => {
-                if (
-                    typeof value === 'string' &&
-                    /^(>|<|>=|<=|!=)\s*/.test(value)
-                ) {
+                if (typeof value === 'string' && /^(>|<|>=|<=|!=)\s*/.test(value)) {
                     const match = value.match(/^(>|<|>=|<=|!=)\s*(.+)$/);
                     if (match) {
                         const [, operator, actualValue] = match;
@@ -109,33 +106,22 @@ export class FormService {
 
         //return qb.getRawMany();
         const count = await qb.getCount();
-        const minDateResult = await qb
-            .clone()
-            .select('MIN(form.DREQDATE)', 'minDate')
-            .getRawOne();
+        const minDateResult = await qb.clone().select('MIN(form.DREQDATE)', 'minDate').getRawOne();
         return { count: count, minDate: minDateResult?.minDate };
     }
 
     async countFlow({ flow, form }: any) {
-        const qb = this.flow
-            .createQueryBuilder('flow')
-            .leftJoin('flow.form', 'form');
+        const qb = this.flow.createQueryBuilder('flow').leftJoin('flow.form', 'form');
 
         const addConditions = (obj: any, alias: string) => {
             if (!obj || Object.keys(obj).length === 0) return;
 
             Object.entries(obj).forEach(([key, value]) => {
-                if (
-                    typeof value === 'string' &&
-                    /^(>|<|>=|<=|!=)\s*/.test(value)
-                ) {
+                if (typeof value === 'string' && /^(>|<|>=|<=|!=)\s*/.test(value)) {
                     const [operator, actualValue] = value.split(' ');
-                    qb.andWhere(
-                        `${alias}.${key} ${operator} :${alias}_${key}`,
-                        {
-                            [`${alias}_${key}`]: actualValue,
-                        },
-                    );
+                    qb.andWhere(`${alias}.${key} ${operator} :${alias}_${key}`, {
+                        [`${alias}_${key}`]: actualValue,
+                    });
                 } else {
                     qb.andWhere(`${alias}.${key} = :${alias}_${key}`, {
                         [`${alias}_${key}`]: value,
@@ -167,13 +153,10 @@ export class FormService {
             .innerJoinAndSelect('flow.form', 'form')
             .innerJoinAndSelect('form.formmst', 'formmst')
             .innerJoinAndSelect('form.flow', 'form_flow')
-            .where(
-                'form.CST = :cst and form.VREQNO = :empno and flow.VAPVNO = :empno',
-                {
-                    empno,
-                    cst: '0',
-                },
-            )
+            .where('form.CST = :cst and form.VREQNO = :empno and flow.VAPVNO = :empno', {
+                empno,
+                cst: '0',
+            })
             .getMany();
     }
 
@@ -347,9 +330,7 @@ export class FormService {
             return {
                 form: dto,
                 message:
-                    form && flow.status
-                        ? 'Form deleted successfully'
-                        : 'Failed to delete form',
+                    form && flow.status ? 'Form deleted successfully' : 'Failed to delete form',
                 status: form && flow.status,
             };
         } catch (error) {
@@ -436,9 +417,8 @@ export class FormService {
     async crackRequestNo(reqNo: string) {
         const split = reqNo.split('-');
         const vaname = split[0] + '-' + split[1].replace(/[0-9]/g, '');
-        const formMst =
-            await this.formmstService.getFormMasterByVanameAll(vaname);
-        var res = [];
+        const formMst = await this.formmstService.getFormMasterByVanameAll(vaname);
+        const res = [];
         if (formMst) {
             formMst.forEach((f) => {
                 res.push({

@@ -12,10 +12,7 @@ import { USRAUTH } from 'src/common/Entities/webform/table/USRAUTH.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature(
-            [FORMMST, FORMMST_GROUP, USRAUTH],
-            'mitsuConnection',
-        ),
+        TypeOrmModule.forFeature([FORMMST, FORMMST_GROUP, USRAUTH], 'mitsuConnection'),
         UsersModule,
     ],
     controllers: [FormmstController],

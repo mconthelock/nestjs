@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SearchUsersDto } from './dto/search-escs-user.dto';
-import {
-    getSelectNestedFields,
-    getSafeFields,
-} from '../../common/utils/Fields.utils';
+import { getSelectNestedFields, getSafeFields } from '../../common/utils/Fields.utils';
 import { CreateUsersDto } from './dto/create-escs-user.dto';
 import { UsersRepository } from './user.repository';
 

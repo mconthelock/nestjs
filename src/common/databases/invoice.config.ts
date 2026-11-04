@@ -18,8 +18,7 @@ if (process.env.HOST == 'AMEC') {
             port: Number(process.env.INVOICE_PORT) || 1433,
             username: process.env.INVOICE_USER,
             password: process.env.INVOICE_PASSWORD,
-            database:
-                process.env.INVOICE_DATABASE || process.env.INVOICE_SERVICE,
+            database: process.env.INVOICE_DATABASE || process.env.INVOICE_SERVICE,
             //entities: [__dirname + '/../../invoice/**/*.entity{.ts,.js}'],
             autoLoadEntities: true,
             synchronize: false,

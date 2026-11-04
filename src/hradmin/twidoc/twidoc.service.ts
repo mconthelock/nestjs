@@ -1,8 +1,4 @@
-import {
-    Injectable,
-    InternalServerErrorException,
-    UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { PDFDocument } from 'pdf-lib';
 import * as ExcelJS from 'exceljs';
@@ -16,11 +12,7 @@ import {
     digitsNumber,
     intVal,
 } from '../../common/helpers/baht-text.helper';
-import {
-    drawGrid,
-    writeLineBox,
-    protectedFile,
-} from '../../common/helpers/file-pdf.helper';
+import { drawGrid, writeLineBox, protectedFile } from '../../common/helpers/file-pdf.helper';
 import { cloneRows } from '../../common/helpers/file-excel.helper';
 import { DatabaseService } from '../shared/database.service';
 import * as oracledb from 'oracledb';
@@ -49,13 +41,11 @@ export class TwidocService {
         let hrAdminDataSource: DataSource;
         let conn: oracledb.Connection;
         try {
-            const connection =
-                await this.dbService.createConnection(credentials);
+            const connection = await this.dbService.createConnection(credentials);
             hrAdminDataSource = connection.hrAdminDataSource;
             conn = connection.conn;
 
-            const { passcode } =
-                await this.dbService.getHrAdminCredentials(credentials);
+            const { passcode } = await this.dbService.getHrAdminCredentials(credentials);
 
             const result = await conn.execute(
                 `DECLARE v_cursor SYS_REFCURSOR;
@@ -77,14 +67,10 @@ export class TwidocService {
             return rows;
         } catch (error) {
             if (error.message.includes('ORA-01017')) {
-                throw new UnauthorizedException(
-                    'Invalid credentials for sensitive data access.',
-                );
+                throw new UnauthorizedException('Invalid credentials for sensitive data access.');
             }
             console.error('Error fetching Twi 50 data:', error);
-            throw new InternalServerErrorException(
-                'Failed to fetch Twi 50 data.',
-            );
+            throw new InternalServerErrorException('Failed to fetch Twi 50 data.');
         } finally {
             await this.dbService.closeConnection(hrAdminDataSource, conn);
         }
@@ -94,14 +80,12 @@ export class TwidocService {
         let hrAdminDataSource: DataSource;
         let conn: oracledb.Connection;
         try {
-            const connection =
-                await this.dbService.createConnection(credentials);
+            const connection = await this.dbService.createConnection(credentials);
             hrAdminDataSource = connection.hrAdminDataSource;
             conn = connection.conn;
 
             // Add your query logic here
-            const { passcode } =
-                await this.dbService.getHrAdminCredentials(credentials);
+            const { passcode } = await this.dbService.getHrAdminCredentials(credentials);
             const result = await conn.execute(
                 `DECLARE v_cursor SYS_REFCURSOR;
                 BEGIN
@@ -122,9 +106,7 @@ export class TwidocService {
             return rows;
         } catch (error) {
             console.error('Error fetching Twi 50 data:', error);
-            throw new InternalServerErrorException(
-                'Failed to fetch Twi 50 data.',
-            );
+            throw new InternalServerErrorException('Failed to fetch Twi 50 data.');
         } finally {
             await this.dbService.closeConnection(hrAdminDataSource, conn);
         }
@@ -134,14 +116,12 @@ export class TwidocService {
         let hrAdminDataSource: DataSource;
         let conn: oracledb.Connection;
         try {
-            const connection =
-                await this.dbService.createConnection(credentials);
+            const connection = await this.dbService.createConnection(credentials);
             hrAdminDataSource = connection.hrAdminDataSource;
             conn = connection.conn;
 
             // Add your query logic here
-            const { user } =
-                await this.dbService.getHrAdminCredentials(credentials);
+            const { user } = await this.dbService.getHrAdminCredentials(credentials);
             const result = await conn.execute(
                 `UPDATE MHEPAYTWI
                 SET TWIADDINCOME = :income, TWIADDTAX= :tax, TWIADDUSER = :admin, TWIADDUPDATE = SYSDATE
@@ -161,9 +141,7 @@ export class TwidocService {
             //   return null;
         } catch (error) {
             console.error('Error fetching Twi 50 data:', error);
-            throw new InternalServerErrorException(
-                'Failed to fetch Twi 50 data.',
-            );
+            throw new InternalServerErrorException('Failed to fetch Twi 50 data.');
         } finally {
             await this.dbService.closeConnection(hrAdminDataSource, conn);
         }
@@ -179,10 +157,7 @@ export class TwidocService {
             let dir = this.libs.find((e) => e.id == data.TWITYPE).path;
             if (!dir) dir = 'Non-Manager';
             this.output_path = `${process.env.TAX_FILE_PATH}${dir}/Withholding Tax Certificate (50 ทวิ)/${data.TWIYEAR}/`;
-            const fontPath = path.join(
-                process.cwd(),
-                'public/fonts/THSarabun.ttf',
-            );
+            const fontPath = path.join(process.cwd(), 'public/fonts/THSarabun.ttf');
             const [existingPdfBytes, fontBytes] = await Promise.all([
                 fs.readFile(templatePath),
                 fs.readFile(fontPath),
@@ -298,11 +273,7 @@ export class TwidocService {
             for (const [index, row] of data.entries()) {
                 const sourceStyleRow = index % 2 === 0 ? 2 : 3;
                 if (index > 1) {
-                    await cloneRows(
-                        sheet,
-                        sourceStyleRow,
-                        sheet.lastRow.number + 1,
-                    );
+                    await cloneRows(sheet, sourceStyleRow, sheet.lastRow.number + 1);
                 }
                 sheet.getCell(index + 2, 1).value = row.TWIYEAR;
                 sheet.getCell(index + 2, 2).value = row.SEQ_NO;
@@ -314,8 +285,7 @@ export class TwidocService {
                 sheet.getCell(index + 2, 8).value = row.SSEC;
                 sheet.getCell(index + 2, 9).value =
                     intVal(row.TWIINCOME) + intVal(row.TWIADDINCOME);
-                sheet.getCell(index + 2, 10).value =
-                    intVal(row.TWITAX) + intVal(row.TWIADDTAX);
+                sheet.getCell(index + 2, 10).value = intVal(row.TWITAX) + intVal(row.TWIADDTAX);
                 sheet.getCell(index + 2, 11).value = intVal(row.TWIPVF);
                 sheet.getCell(index + 2, 12).value = intVal(row.TWISSO);
             }
@@ -323,9 +293,7 @@ export class TwidocService {
             return buffer;
         } catch (error) {
             console.error('Error reading Excel template:', error);
-            throw new InternalServerErrorException(
-                'Invalid template: Missing "Data" sheet.',
-            );
+            throw new InternalServerErrorException('Invalid template: Missing "Data" sheet.');
         }
     }
 
@@ -333,9 +301,7 @@ export class TwidocService {
         let dir = this.libs.find((e) => e.id == body.TWITYPE).path;
         if (!dir) dir = 'Non-Manager';
         const output_path = `${process.env.TAX_FILE_PATH}${dir}/Withholding Tax Certificate (50 ทวิ)/${body.TWIYEAR}/`;
-        const buffer = await fs.readFile(
-            path.join(output_path, `${body.SEMPNO}.pdf`),
-        );
+        const buffer = await fs.readFile(path.join(output_path, `${body.SEMPNO}.pdf`));
         const isJapanese = body.SEMPNO.substr(0, 1) == 'J' ? true : false;
         await this.mailService.sendMail({
             template: isJapanese ? 'gpreport/twi/en' : 'gpreport/twi/th',

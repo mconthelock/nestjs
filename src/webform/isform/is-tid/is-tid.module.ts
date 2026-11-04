@@ -20,12 +20,7 @@ import { IsTidActionService } from './is-tid-updateForm.service';
         SequenceOrgModule,
     ],
     controllers: [IsTidController],
-    providers: [
-        IsTidService,
-        IsTidCreateFormService,
-        IsTidActionService,
-        IsTidRepository,
-    ],
+    providers: [IsTidService, IsTidCreateFormService, IsTidActionService, IsTidRepository],
     exports: [IsTidService],
 })
 export class IsTidModule {}

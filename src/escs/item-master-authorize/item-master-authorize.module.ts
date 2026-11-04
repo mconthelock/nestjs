@@ -7,14 +7,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ItemMasterAuthorizeRepository } from './item-master-authorize.repository';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature(
-      [ITEM_MASTER_AUTHORIZE, ITEM_MASTER_AUTHORIZE_TYPE],
-      'mitsuConnection',
-    ),
-  ],
-  controllers: [ItemMasterAuthorizeController],
-  providers: [ItemMasterAuthorizeService, ItemMasterAuthorizeRepository],
-  exports: [ItemMasterAuthorizeService],
+    imports: [
+        TypeOrmModule.forFeature(
+            [ITEM_MASTER_AUTHORIZE, ITEM_MASTER_AUTHORIZE_TYPE],
+            'mitsuConnection',
+        ),
+    ],
+    controllers: [ItemMasterAuthorizeController],
+    providers: [ItemMasterAuthorizeService, ItemMasterAuthorizeRepository],
+    exports: [ItemMasterAuthorizeService],
 })
 export class ItemMasterAuthorizeModule {}

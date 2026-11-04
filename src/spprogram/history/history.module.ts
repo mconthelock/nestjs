@@ -5,9 +5,9 @@ import { History } from './entities/history.entity';
 import { HistoryController } from './history.controller';
 
 @Module({
-  controllers: [HistoryController],
-  imports: [TypeOrmModule.forFeature([History], 'mitsuConnection')],
-  providers: [HistoryService],
-  exports: [HistoryService],
+    controllers: [HistoryController],
+    imports: [TypeOrmModule.forFeature([History], 'mitsuConnection')],
+    providers: [HistoryService],
+    exports: [HistoryService],
 })
 export class HistoryModule {}

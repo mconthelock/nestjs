@@ -65,9 +65,7 @@ export class DblogsService {
         );
 
         if (startDate) {
-            const startOfDayBangkok = dayjs(startDate)
-                .tz('Asia/Bangkok')
-                .startOf('day');
+            const startOfDayBangkok = dayjs(startDate).tz('Asia/Bangkok').startOf('day');
             queryBuilder.andWhere('logs.LOG_DATE >= :startDate', {
                 startDate: startOfDayBangkok.toDate(),
             });
@@ -94,9 +92,7 @@ export class DblogsService {
                         user.USER_TYPE2 == 'System',
                 );
                 return results.filter((log) =>
-                    systemLogins.some(
-                        (user) => user.USER_LOGIN === log.LOG_USER,
-                    ),
+                    systemLogins.some((user) => user.USER_LOGIN === log.LOG_USER),
                 );
             //Humnan
             case '3':
@@ -107,9 +103,7 @@ export class DblogsService {
                         user.USER_TYPE2 == 'Human',
                 );
                 return results.filter((log) =>
-                    humanLogins.some(
-                        (user) => user.USER_LOGIN === log.LOG_USER,
-                    ),
+                    humanLogins.some((user) => user.USER_LOGIN === log.LOG_USER),
                 );
             //Special
             case '4':
@@ -121,32 +115,23 @@ export class DblogsService {
                         user.USER_TYPE1 == 'Temporary',
                 );
                 return results.filter((log) =>
-                    specialLogins.some(
-                        (user) => user.USER_LOGIN === log.LOG_USER,
-                    ),
+                    specialLogins.some((user) => user.USER_LOGIN === log.LOG_USER),
                 );
             //Unknown
             case '5':
                 const knownLogins = dbusers.filter(
-                    (user) =>
-                        user.SERVER_NAME == server && user.CATEGORY == 'DB',
+                    (user) => user.SERVER_NAME == server && user.CATEGORY == 'DB',
                 );
                 return results.filter(
-                    (log) =>
-                        !knownLogins.some(
-                            (user) => user.USER_LOGIN === log.LOG_USER,
-                        ),
+                    (log) => !knownLogins.some((user) => user.USER_LOGIN === log.LOG_USER),
                 );
             default:
                 if (server == 'AS400') {
                     const as400Logins = dbusers.filter(
-                        (user) =>
-                            user.SERVER_NAME == server && user.CATEGORY == 'DB',
+                        (user) => user.SERVER_NAME == server && user.CATEGORY == 'DB',
                     );
                     return results.filter((log) =>
-                        as400Logins.some(
-                            (user) => user.USER_LOGIN === log.LOG_USER,
-                        ),
+                        as400Logins.some((user) => user.USER_LOGIN === log.LOG_USER),
                     );
                 }
                 return results;

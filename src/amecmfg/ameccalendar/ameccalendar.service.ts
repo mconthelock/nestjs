@@ -59,10 +59,7 @@ export class AmeccalendarService {
         });
     }
 
-    async addWorkDays(
-        startDate: number | string | Date,
-        days: number,
-    ): Promise<Number> {
+    async addWorkDays(startDate: number | string | Date, days: number): Promise<number> {
         startDate = this.transformDate(startDate);
         // console.log(`Adding ${days} work days to start date: ${startDate}`);
 
@@ -199,17 +196,13 @@ export class AmeccalendarService {
     }
 
     // ฟังก์ชันหาวันทำงานถัดไปเดินหน้า (ใช้สำหรับหา WORKID คิวต่อไป)
-    private getNextWorkingDays(
-        startId: number,
-        count: number,
-        calendar: AmecCalendar[],
-    ): number[] {
+    private getNextWorkingDays(startId: number, count: number, calendar: AmecCalendar[]): number[] {
         const result: number[] = [];
         let currentDate = this.parseDate(startId);
 
         // ตรวจสอบวันแรกก่อน
         let currentId = this.formatDate(currentDate);
-        let startDay = calendar.find((d) => d.WORKID === currentId);
+        const startDay = calendar.find((d) => d.WORKID === currentId);
         if (startDay && startDay.DAYOFF === 0) {
             result.push(currentId);
         }
@@ -217,9 +210,7 @@ export class AmeccalendarService {
         while (result.length < count) {
             currentDate = this.addDays(currentDate, 1);
             currentId = this.formatDate(currentDate);
-            const calendarDay = calendar.find(
-                (day) => day.WORKID === currentId,
-            );
+            const calendarDay = calendar.find((day) => day.WORKID === currentId);
 
             if (calendarDay && calendarDay.DAYOFF === 0) {
                 result.push(currentId);
@@ -256,9 +247,7 @@ export class AmeccalendarService {
         // 2. หาวันทำงานเป้าหมาย (Axis 1: PACKING)
         const workingDaysInMonth = calendar.filter(
             (day) =>
-                day.WORKYEAR === targetYear &&
-                day.WORKMONTH === targetMonth &&
-                day.DAYOFF === 0,
+                day.WORKYEAR === targetYear && day.WORKMONTH === targetMonth && day.DAYOFF === 0,
         );
 
         if (workingDaysInMonth.length === 0) return [];
@@ -285,10 +274,9 @@ export class AmeccalendarService {
 
         let activeGroups = [...SCHEDULE_GROUPS];
         if (isApril) activeGroups = activeGroups.filter((g) => g.code !== 'Y');
-        if (isDecember)
-            activeGroups = activeGroups.filter((g) => g.code !== 'C');
+        if (isDecember) activeGroups = activeGroups.filter((g) => g.code !== 'C');
 
-        let distribution = activeGroups.map((g) => ({
+        const distribution = activeGroups.map((g) => ({
             code: g.code,
             no: g.no,
             pCount: 3,
@@ -332,67 +320,24 @@ export class AmeccalendarService {
                 const currentWorkId = executionWorkingDays[dayIndex];
 
                 // คำนวณวันย้อนหลังอ้างอิงจากแกน 1 (packingDate)
-                const inspectionDate = this.getPreviousWorkingDay(
-                    packingDate,
-                    1,
-                    calendar,
-                );
-                const assyDate = this.getPreviousWorkingDay(
-                    inspectionDate,
-                    1,
-                    calendar,
-                );
-                const paintDate = this.getPreviousWorkingDay(
-                    assyDate,
-                    1,
-                    calendar,
-                );
+                const inspectionDate = this.getPreviousWorkingDay(packingDate, 1, calendar);
+                const assyDate = this.getPreviousWorkingDay(inspectionDate, 1, calendar);
+                const paintDate = this.getPreviousWorkingDay(assyDate, 1, calendar);
 
                 // กระบวนการ 3 วัน (Finish ก่อน แล้ว Start ถอยไปอีก 2 วัน)
-                const subAssyFinishDate = this.getPreviousWorkingDay(
-                    paintDate,
-                    1,
-                    calendar,
-                );
-                const subAssyStartDate = this.getPreviousWorkingDay(
-                    subAssyFinishDate,
-                    2,
-                    calendar,
-                );
+                const subAssyFinishDate = this.getPreviousWorkingDay(paintDate, 1, calendar);
+                const subAssyStartDate = this.getPreviousWorkingDay(subAssyFinishDate, 2, calendar);
 
-                const feeder2FinishDate = this.getPreviousWorkingDay(
-                    subAssyStartDate,
-                    1,
-                    calendar,
-                );
-                const feeder2StartDate = this.getPreviousWorkingDay(
-                    feeder2FinishDate,
-                    2,
-                    calendar,
-                );
+                const feeder2FinishDate = this.getPreviousWorkingDay(subAssyStartDate, 1, calendar);
+                const feeder2StartDate = this.getPreviousWorkingDay(feeder2FinishDate, 2, calendar);
 
-                const feeder1FinishDate = this.getPreviousWorkingDay(
-                    feeder2StartDate,
-                    1,
-                    calendar,
-                );
-                const feeder1StartDate = this.getPreviousWorkingDay(
-                    feeder1FinishDate,
-                    2,
-                    calendar,
-                );
+                const feeder1FinishDate = this.getPreviousWorkingDay(feeder2StartDate, 1, calendar);
+                const feeder1StartDate = this.getPreviousWorkingDay(feeder1FinishDate, 2, calendar);
 
-                const ncProgramDate = this.getPreviousWorkingDay(
-                    feeder1StartDate,
-                    1,
-                    calendar,
-                );
+                const ncProgramDate = this.getPreviousWorkingDay(feeder1StartDate, 1, calendar);
 
                 // Construct Output
-                const yyyyMm = parseInt(
-                    `${targetYear}${String(targetMonth).padStart(2, '0')}`,
-                    10,
-                );
+                const yyyyMm = parseInt(`${targetYear}${String(targetMonth).padStart(2, '0')}`, 10);
 
                 results.push({
                     workId: currentWorkId, // ใช้ Axis 2 เป็นคิวงาน
@@ -633,8 +578,7 @@ export class AmeccalendarService {
                 yearlySchedule.push(...monthSchedule);
 
                 // คิวสุดท้ายของเดือนนี้
-                const lastWorkIdThisMonth =
-                    monthSchedule[monthSchedule.length - 1].workId;
+                const lastWorkIdThisMonth = monthSchedule[monthSchedule.length - 1].workId;
                 const calendar = await this.calendar.find({
                     where: {
                         WORKID: Between(
@@ -648,11 +592,7 @@ export class AmeccalendarService {
                 });
 
                 // ขยับไปหาวันทำงานถัดไปเพื่อใช้เป็น initialWorkId ของเดือนหน้า
-                const nextDays = this.getNextWorkingDays(
-                    lastWorkIdThisMonth,
-                    2,
-                    calendar,
-                );
+                const nextDays = this.getNextWorkingDays(lastWorkIdThisMonth, 2, calendar);
                 currentStartWorkId = nextDays.length > 1 ? nextDays[1] : null;
             }
         }

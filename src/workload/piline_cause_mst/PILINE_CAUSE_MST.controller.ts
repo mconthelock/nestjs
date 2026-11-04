@@ -21,10 +21,7 @@ export class PilineCauseMstController {
     }
     @Patch(':CAUSE_ID')
     @UseTransaction('mitsuConnection')
-    update(
-        @Param() key: KeyPilineCauseMstDto,
-        @Body() dto: UpdatePilineCauseMstDto,
-    ) {
+    update(@Param() key: KeyPilineCauseMstDto, @Body() dto: UpdatePilineCauseMstDto) {
         return this.service.update(key, dto);
     }
     @Delete(':CAUSE_ID')

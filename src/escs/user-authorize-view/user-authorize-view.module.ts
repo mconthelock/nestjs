@@ -6,9 +6,7 @@ import { USERS_AUTHORIZE_VIEW } from 'src/common/Entities/escs/views/USERS_AUTHO
 import { UsersAuthorizeViewRepository } from './user-authorize-view.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([USERS_AUTHORIZE_VIEW], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([USERS_AUTHORIZE_VIEW], 'mitsuConnection')],
     controllers: [UsersAuthorizeViewController],
     providers: [UsersAuthorizeViewService, UsersAuthorizeViewRepository],
     exports: [UsersAuthorizeViewService],

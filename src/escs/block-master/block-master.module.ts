@@ -7,12 +7,9 @@ import { BlockMasterRepository } from './block-master.repository';
 import { ItemMfgModule } from '../item-mfg/item-mfg.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([BLOCK_MASTER], 'mitsuConnection'),
-    ItemMfgModule,
-  ],
-  controllers: [BlockMasterController],
-  providers: [BlockMasterService, BlockMasterRepository],
-  exports: [BlockMasterService],
+    imports: [TypeOrmModule.forFeature([BLOCK_MASTER], 'mitsuConnection'), ItemMfgModule],
+    controllers: [BlockMasterController],
+    providers: [BlockMasterService, BlockMasterRepository],
+    exports: [BlockMasterService],
 })
 export class BlockMasterModule {}

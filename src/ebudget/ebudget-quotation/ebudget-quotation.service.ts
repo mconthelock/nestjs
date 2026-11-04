@@ -35,9 +35,7 @@ export class EbudgetQuotationService {
         try {
             const res = await this.repo.update(dto);
             if (res.affected === 0) {
-                throw new Error(
-                    'Update EBUDGET_QUOTATION Failed: No rows affected',
-                );
+                throw new Error('Update EBUDGET_QUOTATION Failed: No rows affected');
             }
             return {
                 status: true,

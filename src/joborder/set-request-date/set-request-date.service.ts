@@ -49,10 +49,7 @@ export class SetRequestDateService {
                 result = await queryRunner.manager.save(latest); // ไม่ต้องแปลงเพราะ select โดย typeorm จะคืนค่า entity object อยู่แล้ว
             } else {
                 dataToSave.JOP_REVISION = 1; // กำหนด Revision เป็น 1 ถ้าเป็น Record ใหม่
-                const newRecord = queryRunner.manager.create(
-                    SetRequestDate,
-                    dataToSave,
-                ); // ต้องแปลง plain object เป็น entity object ก่อนบันทึกเสมอ
+                const newRecord = queryRunner.manager.create(SetRequestDate, dataToSave); // ต้องแปลง plain object เป็น entity object ก่อนบันทึกเสมอ
                 result = await queryRunner.manager.save(newRecord);
             }
             await queryRunner.commitTransaction();
@@ -61,9 +58,7 @@ export class SetRequestDateService {
                 record: result,
                 status: 200,
                 revision: revision.map((r) => {
-                    r.JOP_REVISION_TEXT = numberToAlphabetRevision(
-                        r.JOP_REVISION,
-                    );
+                    r.JOP_REVISION_TEXT = numberToAlphabetRevision(r.JOP_REVISION);
                     return r;
                 }),
             };
@@ -162,9 +157,7 @@ export class SetRequestDateService {
             } else if (REVISION && !MFGNO) {
                 latest = await this.setRequestDateRepository
                     .createQueryBuilder('A')
-                    .select(
-                        'A.JOP_REVISION, A.JOP_MFGNO, A.JOP_PONO, A.JOP_LINENO',
-                    )
+                    .select('A.JOP_REVISION, A.JOP_MFGNO, A.JOP_PONO, A.JOP_LINENO')
                     .where(
                         'A.JOP_PONO = :pono AND A.JOP_LINENO = :lineno AND A.JOP_REVISION = :revision',
                         {
@@ -212,9 +205,7 @@ export class SetRequestDateService {
                     JOP_REVISION: row.JOP_REVISION,
                     JOP_PUR_STATUS: 1,
                     JOP_PUR_CONFIRM: ACTION_BY,
-                    JOP_PUR_CONFIRM_DATE: CONFIRMDATE
-                        ? new Date(CONFIRMDATE + ' 00:00:00')
-                        : null,
+                    JOP_PUR_CONFIRM_DATE: CONFIRMDATE ? new Date(CONFIRMDATE + ' 00:00:00') : null,
                     JOP_PUR_REMARK: PUR_REMARK || null,
                     JOP_PUR_INPUT_DATE: new Date(), // ใช้เวลาปัจจุบันเป็นวันที่ป้อนข้อมูล
                 }),
@@ -226,9 +217,7 @@ export class SetRequestDateService {
             return { record: result, status: 200 };
         } catch (error) {
             await queryRunner.rollbackTransaction();
-            throw new Error(
-                error.message || 'Error occurred while saving data',
-            );
+            throw new Error(error.message || 'Error occurred while saving data');
         } finally {
             await queryRunner.release();
         }

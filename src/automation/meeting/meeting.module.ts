@@ -3,7 +3,7 @@ import { MeetingService } from './meeting.service';
 import { MeetingController } from './meeting.controller';
 
 @Module({
-  controllers: [MeetingController],
-  providers: [MeetingService],
+    controllers: [MeetingController],
+    providers: [MeetingService],
 })
 export class MeetingModule {}

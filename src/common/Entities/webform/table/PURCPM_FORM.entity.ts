@@ -1,11 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { PUR_FILE } from './PUR_FILE.entity';
 
 @Entity({ name: 'PURCPM_FORM', schema: 'WEBFORM' })

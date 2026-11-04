@@ -26,13 +26,7 @@ export class PurvmmScmuserRepository extends BaseRepository {
         return (result.affected ?? 0) > 0;
     }
 
-    async getMaxId(
-        nfrmno: number,
-        vorgno: string,
-        cyear: string,
-        cyear2: string,
-        nrunno: number,
-    ) {
+    async getMaxId(nfrmno: number, vorgno: string, cyear: string, cyear2: string, nrunno: number) {
         const result = await this.getRepository(PURVMM_SCMUSR)
             .createQueryBuilder('usr')
             .select('MAX(usr.ID)', 'maxId')

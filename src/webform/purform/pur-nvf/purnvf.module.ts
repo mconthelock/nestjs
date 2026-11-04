@@ -23,10 +23,7 @@ import { PURNVF_ADDRESS } from 'src/common/Entities/webform/table/PURNVF_ADDRESS
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature(
-            [PURNVF_FORM, PURNVF_LIST, PURNVF_ADDRESS],
-            'mitsuConnection',
-        ),
+        TypeOrmModule.forFeature([PURNVF_FORM, PURNVF_LIST, PURNVF_ADDRESS], 'mitsuConnection'),
         FormmstModule,
         FormModule,
         FlowModule,
@@ -46,10 +43,6 @@ import { PURNVF_ADDRESS } from 'src/common/Entities/webform/table/PURNVF_ADDRESS
         PurNvfReturnApproveService,
         PurnvfLocationService,
     ],
-    exports: [
-        PurNvfRequestService,
-        PurNvfReturnApproveService,
-        PurnvfLocationService,
-    ],
+    exports: [PurNvfRequestService, PurNvfReturnApproveService, PurnvfLocationService],
 })
 export class PurNvfModule {}

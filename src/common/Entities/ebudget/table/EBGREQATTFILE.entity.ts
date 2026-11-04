@@ -2,30 +2,30 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'EBGREQATTFILE', schema: 'EBUDGET' })
 export class EBGREQATTFILE {
-  @PrimaryColumn()
-  NFRMNO: number;
+    @PrimaryColumn()
+    NFRMNO: number;
 
-  @PrimaryColumn()
-  VORGNO: string;
+    @PrimaryColumn()
+    VORGNO: string;
 
-  @PrimaryColumn()
-  CYEAR: string;
+    @PrimaryColumn()
+    CYEAR: string;
 
-  @PrimaryColumn()
-  CYEAR2: string;
+    @PrimaryColumn()
+    CYEAR2: string;
 
-  @PrimaryColumn()
-  NRUNNO: number;
+    @PrimaryColumn()
+    NRUNNO: number;
 
-  @PrimaryColumn()
-  TYPENO: number;
+    @PrimaryColumn()
+    TYPENO: number;
 
-  @PrimaryColumn()
-  ID: string;
+    @PrimaryColumn()
+    ID: string;
 
-  @Column()
-  SFILE: string;
+    @Column()
+    SFILE: string;
 
-  @Column()
-  OFILE: string;
+    @Column()
+    OFILE: string;
 }

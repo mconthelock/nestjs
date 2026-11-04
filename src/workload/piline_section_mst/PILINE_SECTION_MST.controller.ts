@@ -21,10 +21,7 @@ export class PilineSectionMstController {
     }
     @Patch(':SSECCODE')
     @UseTransaction('mitsuConnection')
-    update(
-        @Param() key: KeyPilineSectionMstDto,
-        @Body() dto: UpdatePilineSectionMstDto,
-    ) {
+    update(@Param() key: KeyPilineSectionMstDto, @Body() dto: UpdatePilineSectionMstDto) {
         return this.service.update(key, dto);
     }
     @Delete(':SSECCODE')

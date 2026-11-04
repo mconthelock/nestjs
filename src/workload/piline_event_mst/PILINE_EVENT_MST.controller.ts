@@ -21,10 +21,7 @@ export class PilineEventMstController {
     }
     @Patch(':EVENT_ID')
     @UseTransaction('mitsuConnection')
-    update(
-        @Param() key: KeyPilineEventMstDto,
-        @Body() dto: UpdatePilineEventMstDto,
-    ) {
+    update(@Param() key: KeyPilineEventMstDto, @Body() dto: UpdatePilineEventMstDto) {
         return this.service.update(key, dto);
     }
     @Delete(':EVENT_ID')

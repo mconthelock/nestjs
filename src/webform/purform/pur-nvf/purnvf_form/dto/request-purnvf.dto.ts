@@ -1,9 +1,4 @@
-import {
-    IntersectionType,
-    OmitType,
-    PartialType,
-    PickType,
-} from '@nestjs/swagger';
+import { IntersectionType, OmitType, PartialType, PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
     IsArray,
@@ -170,9 +165,7 @@ export class PurnvfReturnArppoveDto extends IntersectionType(
         'EMPNO',
         'REMARK',
     ]),
-    PartialType(
-        OmitType(RequestPurnvfFormDto, ['NFRMNO', 'VORGNO', 'CYEAR', 'REMARK']),
-    ),
+    PartialType(OmitType(RequestPurnvfFormDto, ['NFRMNO', 'VORGNO', 'CYEAR', 'REMARK'])),
 ) {
     @IsOptional()
     @IsArray()

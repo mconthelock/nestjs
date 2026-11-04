@@ -37,7 +37,7 @@ export class GpUnfService {
     async getCategory() {
         return this.repo.getCategory();
     }
-    
+
     async getSize(options?: any) {
         return this.repo.getSize(options);
     }

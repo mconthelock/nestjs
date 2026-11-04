@@ -25,22 +25,15 @@ export class TasksService {
     ) {}
 
     async search(q: SearchTaskDto) {
-        const qb = this.tasks
-            .createQueryBuilder('tasks')
-            .leftJoinAndSelect('tasks.tags', 'tags');
+        const qb = this.tasks.createQueryBuilder('tasks').leftJoinAndSelect('tasks.tags', 'tags');
         await applyDynamicFilters(qb, q, 'tasks');
         return qb.getMany();
     }
 
     async create(dto: CreateTaskDto) {
-        const defaultClasses = [
-            'bg-blue-500',
-            'bg-green-500',
-            'bg-purple-500',
-            'bg-pink-500',
-        ];
-        const tags = (dto.TASK_DETAIL?.match(/#[\p{L}\p{N}_-]+/gu) ?? []).map(
-            (tag: string) => tag.slice(1),
+        const defaultClasses = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500'];
+        const tags = (dto.TASK_DETAIL?.match(/#[\p{L}\p{N}_-]+/gu) ?? []).map((tag: string) =>
+            tag.slice(1),
         );
         const task = this.tasks.create(dto);
         const savedTask = await this.tasks.save(task);
@@ -53,9 +46,7 @@ export class TasksService {
 
                 if (!tag) {
                     const randomClass =
-                        defaultClasses[
-                            Math.floor(Math.random() * defaultClasses.length)
-                        ];
+                        defaultClasses[Math.floor(Math.random() * defaultClasses.length)];
                     tag = await this.tags.save(
                         this.tags.create({
                             TAG_NAME: tagName.toLowerCase(),

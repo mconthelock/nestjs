@@ -40,21 +40,15 @@ export class TasklogsService {
         } else if (server === 'AAS') {
             queryBuilder = this.aas.createQueryBuilder('logs');
             if (startDate) {
-                queryBuilder.andWhere(
-                    "logs.LOG_DATE >= TO_DATE(:startDate, 'YYYY-MM-DD')",
-                    {
-                        startDate: formatDate(startDate),
-                    },
-                );
+                queryBuilder.andWhere("logs.LOG_DATE >= TO_DATE(:startDate, 'YYYY-MM-DD')", {
+                    startDate: formatDate(startDate),
+                });
             }
 
             if (endDate) {
-                queryBuilder.andWhere(
-                    "logs.LOG_DATE <= TO_DATE(:endDate, 'YYYY-MM-DD')",
-                    {
-                        endDate: formatDate(endDate),
-                    },
-                );
+                queryBuilder.andWhere("logs.LOG_DATE <= TO_DATE(:endDate, 'YYYY-MM-DD')", {
+                    endDate: formatDate(endDate),
+                });
             }
         }
 

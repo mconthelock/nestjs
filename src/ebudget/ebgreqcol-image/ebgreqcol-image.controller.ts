@@ -5,6 +5,5 @@ import { UpdateEbgreqcolImageDto } from './dto/update-ebgreqcol-image.dto';
 
 @Controller('ebudget/image')
 export class EbgreqcolImageController {
-  constructor(private readonly ebgreqcolImageService: EbgreqcolImageService) {}
-
+    constructor(private readonly ebgreqcolImageService: EbgreqcolImageService) {}
 }

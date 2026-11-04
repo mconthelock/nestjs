@@ -6,9 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DPMS_PL_ISSUE_REV } from 'src/common/Entities/workload/table/DPMS_PL_ISSUE_REV.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([DPMS_PL_ISSUE_REV], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([DPMS_PL_ISSUE_REV], 'mitsuConnection')],
     controllers: [DpmsPlIssueRevController],
     providers: [DpmsPlIssueRevService, DpmsPlIssueRevRepository],
     exports: [DpmsPlIssueRevService],

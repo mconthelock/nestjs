@@ -29,12 +29,7 @@ export class IdTagRepository extends BaseRepository {
 
     async findAllList(dto?: FiltersDto) {
         const qb = this.manager.createQueryBuilder(IdtagList, 'L');
-        if (dto)
-            await this.applyFilters(qb, 'L', dto, [
-                'MST_DIR',
-                'MST_FILE',
-                'MST_STATUS',
-            ]);
+        if (dto) await this.applyFilters(qb, 'L', dto, ['MST_DIR', 'MST_FILE', 'MST_STATUS']);
         return qb.getMany();
     }
 
@@ -65,18 +60,14 @@ export class IdTagRepository extends BaseRepository {
     async findAllNc(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(IdtagNcDetail, 'N');
         this.applyFilters(qb, 'N', dto, ['TASKNAME', 'PAGE_NC']);
-        qb.orderBy('N.FILES_ID', 'ASC')
-            .addOrderBy('SEQNO', 'ASC')
-            .addOrderBy('N.PAGE_NUM', 'ASC');
+        qb.orderBy('N.FILES_ID', 'ASC').addOrderBy('SEQNO', 'ASC').addOrderBy('N.PAGE_NUM', 'ASC');
         return qb.getMany();
     }
 
     async findAllLabel(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(IdtagLabel, 'label');
         this.applyFilters(qb, 'label', dto, ['FILES_ID']);
-        qb.orderBy('FILES_ID', 'ASC')
-            .addOrderBy('FILES_ID', 'ASC')
-            .addOrderBy('PAGE_NUM', 'ASC');
+        qb.orderBy('FILES_ID', 'ASC').addOrderBy('FILES_ID', 'ASC').addOrderBy('PAGE_NUM', 'ASC');
         return qb.getMany();
     }
 
@@ -99,8 +90,7 @@ export class IdTagRepository extends BaseRepository {
             }),
         );
 
-        if (pageEntities.length)
-            await this.manager.insert(IdtagPages, pageEntities);
+        if (pageEntities.length) await this.manager.insert(IdtagPages, pageEntities);
 
         const orderEntities = orderData.map((row) =>
             this.manager.create(IdtagOrders, {
@@ -111,8 +101,7 @@ export class IdTagRepository extends BaseRepository {
             }),
         );
 
-        if (orderEntities.length)
-            await this.manager.insert(IdtagOrders, orderEntities);
+        if (orderEntities.length) await this.manager.insert(IdtagOrders, orderEntities);
 
         return savedFile;
     }
@@ -126,11 +115,7 @@ export class IdTagRepository extends BaseRepository {
     }
 
     async updateFiles(fileData: UpdateIdtagFilesDto) {
-        return await this.manager.update(
-            IdtagFiles,
-            { FILES: fileData.FILES },
-            fileData,
-        );
+        return await this.manager.update(IdtagFiles, { FILES: fileData.FILES }, fileData);
     }
 
     async updatePages(
@@ -142,16 +127,13 @@ export class IdTagRepository extends BaseRepository {
         >,
     ) {
         const updatePromises = pagesData.map((pageData) => {
-            const { FILES_ID, PAGE_NUM, NEXT_FILES_ID, ...updateData } =
-                pageData;
+            const { FILES_ID, PAGE_NUM, NEXT_FILES_ID, ...updateData } = pageData;
             return this.manager.update(
                 IdtagPages,
                 { FILES_ID, PAGE_NUM },
                 {
                     ...updateData,
-                    ...(NEXT_FILES_ID != null
-                        ? { FILES_ID: NEXT_FILES_ID }
-                        : {}),
+                    ...(NEXT_FILES_ID != null ? { FILES_ID: NEXT_FILES_ID } : {}),
                 },
             );
         });

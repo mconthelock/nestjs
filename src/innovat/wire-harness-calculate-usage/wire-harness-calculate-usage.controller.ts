@@ -6,9 +6,7 @@ import { WireHarnessCalculateUsageService } from './wire-harness-calculate-usage
 @ApiTags('Wire Harness Calculate Usage')
 @Controller('innovat/wire-harness/calculate-usage')
 export class WireHarnessCalculateUsageController {
-    constructor(
-        private readonly service: WireHarnessCalculateUsageService,
-    ) {}
+    constructor(private readonly service: WireHarnessCalculateUsageService) {}
 
     @Post('list')
     @HttpCode(HttpStatus.OK)

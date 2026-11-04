@@ -3,12 +3,10 @@ import { TestService } from './redis.service';
 
 @Controller('test')
 export class testcontroller {
-  constructor(private readonly t: TestService) {}
+    constructor(private readonly t: TestService) {}
 
-
-  @Get()
-  test() {
-    return this.t.test();
-  }
-
+    @Get()
+    test() {
+        return this.t.test();
+    }
 }

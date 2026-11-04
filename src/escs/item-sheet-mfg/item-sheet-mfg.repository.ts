@@ -9,67 +9,53 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 
 @Injectable()
 export class ItemSheetMfgRepository extends BaseRepository {
-  constructor(
-    @InjectDataSource('mitsuConnection') ds: DataSource,
-    ) {
-    super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
-  }
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
+    }
 
-  async create(dto: CreateItemSheetMfgDto) {
-    return this.getRepository(ITEM_SHEET_MFG).save(dto);
-  }
+    async create(dto: CreateItemSheetMfgDto) {
+        return this.getRepository(ITEM_SHEET_MFG).save(dto);
+    }
 
-  findAll() {
-    // ใช้ได้ทั้งหมด
-    // return this.manager.query(`select * from ITEM_MFG`);
-    // return this.getRepository(ITEM_MFG).find();
-    return this.manager.find(ITEM_SHEET_MFG);
-  }
+    findAll() {
+        // ใช้ได้ทั้งหมด
+        // return this.manager.query(`select * from ITEM_MFG`);
+        // return this.getRepository(ITEM_MFG).find();
+        return this.manager.find(ITEM_SHEET_MFG);
+    }
 
-  findOne(id: number) {
-    return this.getRepository(ITEM_SHEET_MFG).findOneBy({ NID: id });
-  }
+    findOne(id: number) {
+        return this.getRepository(ITEM_SHEET_MFG).findOneBy({ NID: id });
+    }
 
-  findByItemId(itemId: number) {
-    return this.getRepository(ITEM_SHEET_MFG).find({
-      where: { NITEMID: itemId },
-      relations: ['ITEM_LIST', 'ITEM_LIST.HISTORY', 'ITEM'],
-      order: { NID: 'ASC' },
-    });
-  }
+    findByItemId(itemId: number) {
+        return this.getRepository(ITEM_SHEET_MFG).find({
+            where: { NITEMID: itemId },
+            relations: ['ITEM_LIST', 'ITEM_LIST.HISTORY', 'ITEM'],
+            order: { NID: 'ASC' },
+        });
+    }
 
-  async search(dto: FiltersDto) {
-    const qb = this.manager.createQueryBuilder(ITEM_SHEET_MFG, 'I');
-    this.applyFilters(qb, 'I', dto, [
-      'NID',
-      'NITEMID',
-      'VSHEET_NAME',
-      'NSTATUS',
-      'NSEC_ID',
-    ]);
-    return qb
-      .leftJoinAndSelect('I.ITEM_LIST', 'ITEM_LIST')
-      .leftJoinAndSelect('ITEM_LIST.HISTORY', 'HISTORY')
-      .leftJoinAndSelect('I.ITEM', 'ITEM')
-      .orderBy('I.NID', 'ASC')
-      .getMany();
-  }
+    async search(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(ITEM_SHEET_MFG, 'I');
+        this.applyFilters(qb, 'I', dto, ['NID', 'NITEMID', 'VSHEET_NAME', 'NSTATUS', 'NSEC_ID']);
+        return qb
+            .leftJoinAndSelect('I.ITEM_LIST', 'ITEM_LIST')
+            .leftJoinAndSelect('ITEM_LIST.HISTORY', 'HISTORY')
+            .leftJoinAndSelect('I.ITEM', 'ITEM')
+            .orderBy('I.NID', 'ASC')
+            .getMany();
+    }
 
-  async update(id: number, dto: UpdateItemSheetMfgDto) {
-    return this.getRepository(ITEM_SHEET_MFG).update(
-      { NID: id, NSTATUS: Not(3) },
-      dto,
-    );
-  }
+    async update(id: number, dto: UpdateItemSheetMfgDto) {
+        return this.getRepository(ITEM_SHEET_MFG).update({ NID: id, NSTATUS: Not(3) }, dto);
+    }
 
-  async updateByItemId(ItemId: number, dto: UpdateItemSheetMfgDto) {
-    return this.getRepository(ITEM_SHEET_MFG).update(
-      { NITEMID: ItemId, NSTATUS: Not(3) },
-      dto,
-    );
-  }
+    async updateByItemId(ItemId: number, dto: UpdateItemSheetMfgDto) {
+        return this.getRepository(ITEM_SHEET_MFG).update({ NITEMID: ItemId, NSTATUS: Not(3) }, dto);
+    }
 
-  async remove(id: number) {
-    return this.getRepository(ITEM_SHEET_MFG).delete(id);
-  }
+    async remove(id: number) {
+        return this.getRepository(ITEM_SHEET_MFG).delete(id);
+    }
 }

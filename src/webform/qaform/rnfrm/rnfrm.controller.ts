@@ -14,11 +14,12 @@ export class RnfrmController {
 
     @Get(':nfrmno/:vorgno/:cyear/:cyear2/:nrunno')
     findOne(
-      @Param('nfrmno') nfrmno: number, 
-      @Param('vorgno') vorgno: string, 
-      @Param('cyear') cyear: string, 
-      @Param('cyear2') cyear2: string, 
-      @Param('nrunno') nrunno: number) {
+        @Param('nfrmno') nfrmno: number,
+        @Param('vorgno') vorgno: string,
+        @Param('cyear') cyear: string,
+        @Param('cyear2') cyear2: string,
+        @Param('nrunno') nrunno: number,
+    ) {
         return this.rnfrmService.findOne(nfrmno, vorgno, cyear, cyear2, nrunno);
     }
 

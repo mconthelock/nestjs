@@ -1,6 +1,6 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({name: 'VENDING_USER', schema: 'SKIDCNTRL'})
+@Entity({ name: 'VENDING_USER', schema: 'SKIDCNTRL' })
 export class VENDING_USER {
     @PrimaryColumn()
     EMPNO: string;

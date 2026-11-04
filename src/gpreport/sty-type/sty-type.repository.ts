@@ -17,7 +17,7 @@ export class StyTypeRepository extends BaseRepository {
             },
             order: {
                 TYPE_NO: 'ASC',
-            }
+            },
         });
     }
 }

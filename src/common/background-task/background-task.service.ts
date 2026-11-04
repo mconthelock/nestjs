@@ -5,9 +5,7 @@ import { Queue } from 'bullmq';
 
 @Injectable()
 export class BackgroundTaskService {
-    constructor(
-        @InjectQueue('generic-background-queue') private queue: Queue,
-    ) {}
+    constructor(@InjectQueue('generic-background-queue') private queue: Queue) {}
 
     /**
      * @param taskName ชื่อ Task ที่ลงทะเบียนไว้

@@ -5,9 +5,9 @@ import { AuthModule } from 'src/auth/auth.module';
 import { DatabaseService } from '../shared/database.service';
 
 @Module({
-  imports: [AuthModule],
-  controllers: [MasterkeyController],
-  providers: [MasterkeyService, DatabaseService],
-  exports: [MasterkeyService],
+    imports: [AuthModule],
+    controllers: [MasterkeyController],
+    providers: [MasterkeyService, DatabaseService],
+    exports: [MasterkeyService],
 })
 export class MasterkeyModule {}

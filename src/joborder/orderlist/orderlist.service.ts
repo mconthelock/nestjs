@@ -211,21 +211,16 @@ export class OrderListService {
             if (c.JOP_PUR_REVISION > 0) purConditions.push(key);
         }
 
-        if (marConditions.length === 0 && purConditions.length === 0)
-            return list;
+        if (marConditions.length === 0 && purConditions.length === 0) return list;
 
         const marReqRevision =
             marConditions.length > 0
-                ? await this.JopMarReqService.getRevisionHistoryByKey(
-                      marConditions,
-                  )
+                ? await this.JopMarReqService.getRevisionHistoryByKey(marConditions)
                 : [];
 
         const purConfRevision =
             purConditions.length > 0
-                ? await this.JopPurConfService.getRevisionHistoryByKey(
-                      purConditions,
-                  )
+                ? await this.JopPurConfService.getRevisionHistoryByKey(purConditions)
                 : [];
 
         const revisions = [...marReqRevision, ...purConfRevision];
@@ -254,9 +249,7 @@ export class OrderListService {
                     l.JOP_LINENO,
                 );
                 l.MAR_REVISION = revision.map((r) => {
-                    r.JOP_REVISION_TEXT = numberToAlphabetRevision(
-                        r.JOP_REVISION,
-                    );
+                    r.JOP_REVISION_TEXT = numberToAlphabetRevision(r.JOP_REVISION);
                     return {
                         REVISION: r.JOP_REVISION,
                         REVISION_TEXT: r.JOP_REVISION_TEXT,
@@ -269,16 +262,13 @@ export class OrderListService {
                 });
             }
             if (l.JOP_PUR_REVISION) {
-                const purRevision =
-                    await this.JopPurConfService.getRevisionHistory(
-                        l.JOP_MFGNO,
-                        l.JOP_PONO,
-                        l.JOP_LINENO,
-                    );
+                const purRevision = await this.JopPurConfService.getRevisionHistory(
+                    l.JOP_MFGNO,
+                    l.JOP_PONO,
+                    l.JOP_LINENO,
+                );
                 l.PUR_REVISION = purRevision.map((r) => {
-                    r.JOP_REVISION_TEXT = numberToAlphabetRevision(
-                        r.JOP_REVISION,
-                    );
+                    r.JOP_REVISION_TEXT = numberToAlphabetRevision(r.JOP_REVISION);
                     return {
                         REVISION: r.JOP_REVISION,
                         REVISION_TEXT: r.JOP_REVISION_TEXT,

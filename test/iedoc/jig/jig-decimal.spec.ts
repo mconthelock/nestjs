@@ -5,8 +5,13 @@ import { JigMaster } from 'src/common/Entities/iedoc/table/jig_master.entity';
 import { JigCheckpoint } from 'src/common/Entities/iedoc/table/jig_checkpoint.entity';
 
 describe('Oracle JIG decimal hydration', () => {
-    const ds = new DataSource({ type: 'oracle', entities: [JigForm, JigFormDetail, JigMaster, JigCheckpoint] });
-    beforeAll(async () => { await (ds as any).buildMetadatas(); });
+    const ds = new DataSource({
+        type: 'oracle',
+        entities: [JigForm, JigFormDetail, JigMaster, JigCheckpoint],
+    });
+    beforeAll(async () => {
+        await (ds as any).buildMetadatas();
+    });
     it.each([JigFormDetail, JigCheckpoint])('preserves decimals when reading %p', (entity) => {
         for (const name of ['MIN', 'MAX', 'MEASURED_VALUE']) {
             const column = ds.getMetadata(entity).findColumnWithPropertyName(name)!;

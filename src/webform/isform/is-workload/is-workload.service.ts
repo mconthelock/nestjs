@@ -8,19 +8,19 @@ import { SearchWorkloadDto } from './dto/search.dto';
 
 @Injectable()
 export class IsWorkloadService {
-  constructor(
-    @InjectRepository(IsWorkLoad, 'mitsuConnection')
-    private readonly works: Repository<IsWorkLoad>,
+    constructor(
+        @InjectRepository(IsWorkLoad, 'mitsuConnection')
+        private readonly works: Repository<IsWorkLoad>,
 
-    @InjectRepository(IsWorkStatus, 'mitsuConnection')
-    private readonly status: Repository<IsWorkStatus>,
-  ) {}
+        @InjectRepository(IsWorkStatus, 'mitsuConnection')
+        private readonly status: Repository<IsWorkStatus>,
+    ) {}
 
-  async searchWorkload(searchDto: SearchWorkloadDto) {
-    return this.works.find({ where: { PLANYEAR: searchDto.PLANYEAR } });
-  }
+    async searchWorkload(searchDto: SearchWorkloadDto) {
+        return this.works.find({ where: { PLANYEAR: searchDto.PLANYEAR } });
+    }
 
-  async listStatus() {
-    return this.status.find();
-  }
+    async listStatus() {
+        return this.status.find();
+    }
 }

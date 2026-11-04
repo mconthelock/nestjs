@@ -9,12 +9,7 @@ import { OTFORM } from 'src/common/Entities/webform/table/OTFORM.entity';
 import { LR200P } from 'src/common/Entities/gpreport/views/LR200P.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [Overtime, LR200P, OTFORM],
-            'mitsuConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([Overtime, LR200P, OTFORM], 'mitsuConnection')],
     controllers: [OvertimeController],
     providers: [OvertimeService],
 })

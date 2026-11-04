@@ -34,10 +34,7 @@ export class EbgreqattfileRepository extends BaseRepository {
 
     async update(dto: UpdateEbgreqattfileDto) {
         const { condition, ...updateData } = dto;
-        return await this.getRepository(EBGREQATTFILE).update(
-            condition,
-            updateData,
-        );
+        return await this.getRepository(EBGREQATTFILE).update(condition, updateData);
     }
 
     async delete(dto: UpdateEbgreqattfileDto) {

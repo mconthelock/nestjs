@@ -36,10 +36,7 @@ export class AnnualUniformRepository extends BaseRepository {
             .getMany();
     }
 
-    async create(
-        header: Partial<AnnualUniform>,
-        details: Partial<AnnualUniformDetail>[] = [],
-    ) {
+    async create(header: Partial<AnnualUniform>, details: Partial<AnnualUniformDetail>[] = []) {
         const annual = await this.getRepository(AnnualUniform).save(header);
 
         for (const item of details || []) {

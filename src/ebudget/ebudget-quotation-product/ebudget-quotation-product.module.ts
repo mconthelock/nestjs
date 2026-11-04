@@ -6,17 +6,9 @@ import { EBUDGET_QUOTATION_PRODUCT } from 'src/common/Entities/ebudget/table/EBU
 import { EbudgetQuotationProductRepository } from './ebudget-quotation-product.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [EBUDGET_QUOTATION_PRODUCT],
-            'mitsuConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([EBUDGET_QUOTATION_PRODUCT], 'mitsuConnection')],
     controllers: [EbudgetQuotationProductController],
-    providers: [
-        EbudgetQuotationProductService,
-        EbudgetQuotationProductRepository,
-    ],
+    providers: [EbudgetQuotationProductService, EbudgetQuotationProductRepository],
     exports: [EbudgetQuotationProductService],
 })
 export class EbudgetQuotationProductModule {}

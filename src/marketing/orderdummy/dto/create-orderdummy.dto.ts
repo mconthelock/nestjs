@@ -2,35 +2,35 @@ import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateOrderdummyDto {
-  @IsOptional()
-  @IsString()
-  SERIES?: string;
+    @IsOptional()
+    @IsString()
+    SERIES?: string;
 
-  @IsOptional()
-  @IsString()
-  AGENT?: string;
+    @IsOptional()
+    @IsString()
+    AGENT?: string;
 
-  @IsOptional()
-  @IsString()
-  PRJ_NO?: string;
+    @IsOptional()
+    @IsString()
+    PRJ_NO?: string;
 
-  @IsOptional()
-  @IsString()
-  ORDER_NO?: string;
+    @IsOptional()
+    @IsString()
+    ORDER_NO?: string;
 
-  @IsOptional()
-  @IsString()
-  MFGNO?: string;
+    @IsOptional()
+    @IsString()
+    MFGNO?: string;
 
-  @IsOptional()
-  @IsString()
-  IDS_DATE?: string;
+    @IsOptional()
+    @IsString()
+    IDS_DATE?: string;
 
-  @IsOptional()
-  @IsString()
-  EDIT_DATE?: string;
+    @IsOptional()
+    @IsString()
+    EDIT_DATE?: string;
 
-  @IsOptional()
-  @IsString()
-  CAR_NO?: string;
+    @IsOptional()
+    @IsString()
+    CAR_NO?: string;
 }

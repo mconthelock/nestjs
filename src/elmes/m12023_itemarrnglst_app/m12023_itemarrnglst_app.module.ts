@@ -6,9 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { M12023_ITEMARRNGLST_APP } from 'src/common/Entities/elmes/table/M12023_ITEMARRNGLST_APP.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([M12023_ITEMARRNGLST_APP], 'elmesConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([M12023_ITEMARRNGLST_APP], 'elmesConnection')],
     controllers: [M12023ItemarrnglstAppController],
     providers: [M12023ItemarrnglstAppService, M12023ItemarrnglstAppRepository],
     exports: [M12023ItemarrnglstAppService],

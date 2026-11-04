@@ -9,9 +9,7 @@ import { CreateMfgDrawingActionDto } from './dto/create-mfg-drawing-action.dto';
 
 @Injectable()
 export class MfgDrawingActionRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -43,10 +41,7 @@ export class MfgDrawingActionRepository extends BaseRepository {
             'DACTDATE',
             'NSTATUS',
         ]);
-        return qb
-            .leftJoinAndSelect('M.DRAWING', 'D')
-            .orderBy('M.DACTDATE', 'ASC')
-            .getMany();
+        return qb.leftJoinAndSelect('M.DRAWING', 'D').orderBy('M.DACTDATE', 'ASC').getMany();
     }
 
     async update(id: number, dto: UpdateMfgDrawingActionDto) {

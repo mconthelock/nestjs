@@ -4,9 +4,9 @@ import { FinpckAssetRepository } from './finpck_asset.repository';
 import { FinpckAssetController } from './finpck_asset.controller';
 
 @Module({
-  imports: [],
-  controllers:[FinpckAssetController],
-  providers: [FinpckAssetService, FinpckAssetRepository], 
-  exports: [FinpckAssetService, FinpckAssetRepository]
+    imports: [],
+    controllers: [FinpckAssetController],
+    providers: [FinpckAssetService, FinpckAssetRepository],
+    exports: [FinpckAssetService, FinpckAssetRepository],
 })
 export class FinpckAssetModule {}

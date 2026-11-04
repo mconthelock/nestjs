@@ -6,13 +6,13 @@ import { createWeightDto } from './dto/create-weight.dto';
 
 @Injectable()
 export class WeightService {
-  constructor(
-    @InjectRepository(Weight, 'mitsuConnection')
-    private readonly weight: Repository<Weight>,
-  ) {}
+    constructor(
+        @InjectRepository(Weight, 'mitsuConnection')
+        private readonly weight: Repository<Weight>,
+    ) {}
 
-  async create(data: createWeightDto) {
-    const weight = this.weight.create(data);
-    return this.weight.save(weight);
-  }
+    async create(data: createWeightDto) {
+        const weight = this.weight.create(data);
+        return this.weight.save(weight);
+    }
 }

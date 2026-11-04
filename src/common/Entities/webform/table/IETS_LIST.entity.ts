@@ -1,12 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { IETS_FORM } from './IETS_FORM.entity';
 import { DWGNOTICEPICMST } from './DWGNOTICEPICMST.entity';
 @Entity({ name: 'IETS_LIST', schema: 'WEBFORM' })

@@ -14,9 +14,7 @@ export class PpositionService {
         return this.spos.find();
     }
 
-    findSpecificPositions(
-        sposCodes: string[] = ['10', '11', '20', '21', '30'],
-    ) {
+    findSpecificPositions(sposCodes: string[] = ['10', '11', '20', '21', '30']) {
         return this.spos.find({
             where: {
                 // ค้นหาตำแหน่งที่ sposcode ตรงกับค่าในอาร์เรย์ที่ส่งมา

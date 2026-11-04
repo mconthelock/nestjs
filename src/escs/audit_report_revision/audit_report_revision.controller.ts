@@ -4,9 +4,7 @@ import { SearchAuditReportRevisionDto } from './dto/search-audit_report_revision
 
 @Controller('escs/audit-report-revision')
 export class AuditReportRevisionController {
-    constructor(
-        private readonly AuditReportRevisionService: AuditReportRevisionService,
-    ) {}
+    constructor(private readonly AuditReportRevisionService: AuditReportRevisionService) {}
 
     @Post('getAuditReportRevision')
     async getAuditReportRevision(@Body() dto: SearchAuditReportRevisionDto) {

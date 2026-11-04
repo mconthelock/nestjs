@@ -13,11 +13,9 @@ export class SendVgmMeltRepository extends OracleRepository {
     /**
      * Get list of DPMS PL Melt Report based on the provided vanndate.
      * @param vanndate e.g. 20260804
-     * @returns 
+     * @returns
      */
     async getList(vanndate: string): Promise<DPMS_PL_MELT_REPORT[]> {
-        return this.execCursor('DPMS_PL_MELT_REPORT', { vanndate }, [
-            'vanndate',
-        ]);
+        return this.execCursor('DPMS_PL_MELT_REPORT', { vanndate }, ['vanndate']);
     }
 }

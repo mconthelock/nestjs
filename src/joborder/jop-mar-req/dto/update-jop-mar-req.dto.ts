@@ -4,9 +4,8 @@ import { IsNotEmpty, IsString, IsOptional, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateJopMarReqDto extends PartialType(CreateJopMarReqDto) {
-  @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  JOP_PUR_STATUS: number;
-
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    JOP_PUR_STATUS: number;
 }

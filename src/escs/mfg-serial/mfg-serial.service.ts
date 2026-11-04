@@ -64,9 +64,7 @@ export class MfgSerialService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Search MFG_SERIAL by id ${id} Error: ` + error.message,
-            );
+            throw new Error(`Search MFG_SERIAL by id ${id} Error: ` + error.message);
         }
     }
 
@@ -91,10 +89,7 @@ export class MfgSerialService {
         }
     }
 
-    async update(
-        id: number | { NID: number } | { NDRAWINGID: number },
-        dto: UpdateMfgSerialDto,
-    ) {
+    async update(id: number | { NID: number } | { NDRAWINGID: number }, dto: UpdateMfgSerialDto) {
         try {
             const res = await this.repo.update(id, dto);
             if (res.affected === 0) {
@@ -109,9 +104,7 @@ export class MfgSerialService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Update MFG_SERIAL by id ${id} Error: ` + error.message,
-            );
+            throw new Error(`Update MFG_SERIAL by id ${id} Error: ` + error.message);
         }
     }
 
@@ -130,9 +123,7 @@ export class MfgSerialService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Delete MFG_SERIAL by id ${id} Error: ` + error.message,
-            );
+            throw new Error(`Delete MFG_SERIAL by id ${id} Error: ` + error.message);
         }
     }
 
@@ -151,10 +142,7 @@ export class MfgSerialService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Delete MFG_SERIAL by drawingId ${drawingId} Error: ` +
-                    error.message,
-            );
+            throw new Error(`Delete MFG_SERIAL by drawingId ${drawingId} Error: ` + error.message);
         }
     }
 
@@ -173,9 +161,7 @@ export class MfgSerialService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Delete MFG_SERIAL by condition Error: ` + error.message,
-            );
+            throw new Error(`Delete MFG_SERIAL by condition Error: ` + error.message);
         }
     }
 }

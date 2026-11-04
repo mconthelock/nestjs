@@ -6,9 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BiddingRepository } from './bidding.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([EBUDGET_DATA_BIDDING], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([EBUDGET_DATA_BIDDING], 'mitsuConnection')],
     controllers: [BiddingController],
     providers: [BiddingService, BiddingRepository],
     exports: [BiddingService],

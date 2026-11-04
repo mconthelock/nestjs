@@ -34,21 +34,9 @@ export class DoactionFlowService extends FlowService {
         status: boolean;
         message: string;
     }> {
-        let whatAction: string,
-            stepAction: string,
-            params: any,
-            updateFlow: boolean;
+        let whatAction: string, stepAction: string, params: any, updateFlow: boolean;
         try {
-            const {
-                NFRMNO,
-                VORGNO,
-                CYEAR,
-                CYEAR2,
-                NRUNNO,
-                ACTION,
-                EMPNO,
-                REMARK = '',
-            } = dto;
+            const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, ACTION, EMPNO, REMARK = '' } = dto;
             const form = {
                 NFRMNO: NFRMNO,
                 VORGNO: VORGNO,
@@ -94,8 +82,7 @@ export class DoactionFlowService extends FlowService {
                         CAPVSTNO: this.APV_NONE,
                         CSTEPNO: flow.CSTEPNO,
                     });
-                    const updateNextStep =
-                        checkNextStep.length == 0 ? true : false;
+                    const updateNextStep = checkNextStep.length == 0 ? true : false;
                     if (updateNextStep) {
                         const stepNext:
                             | ''
@@ -105,16 +92,10 @@ export class DoactionFlowService extends FlowService {
                               } = await this.getStepNext(form);
                         if (!stepNext) break;
                         //UPDATE STEP NEXT STATUS
-                        await this.repo.updateStepNextStatus(
-                            form,
-                            stepNext.stepno,
-                        );
+                        await this.repo.updateStepNextStatus(form, stepNext.stepno);
                         //UPDATE NEXT NEXT STEP (WAIT)
                         if (stepNext.stepNextNo != '00') {
-                            await this.repo.updateNextStepWait(
-                                form,
-                                stepNext.stepno,
-                            );
+                            await this.repo.updateNextStepWait(form, stepNext.stepno);
                         }
                         await this.sendMailToApprover(form); // send email to approver
                     }
@@ -160,16 +141,10 @@ export class DoactionFlowService extends FlowService {
                         await this.repo.updateSingleStep(form);
                     } else {
                         //UPDATE STEP NEXT STATUS
-                        await this.repo.updateStepNextStatus(
-                            form,
-                            stepNext.stepno,
-                        );
+                        await this.repo.updateStepNextStatus(form, stepNext.stepno);
                         //UPDATE NEXT NEXT STEP (WAIT)
                         if (stepNext.stepNextNo != '00') {
-                            await this.repo.updateNextStepWait(
-                                form,
-                                stepNext.stepno,
-                            );
+                            await this.repo.updateNextStepWait(form, stepNext.stepno);
                         }
                     }
                     break;
@@ -211,9 +186,7 @@ export class DoactionFlowService extends FlowService {
                     break;
                 case 'returnE':
                     if (!dto.CEXTDATA) {
-                        throw new Error(
-                            'CEXTDATA is required for returnE action',
-                        );
+                        throw new Error('CEXTDATA is required for returnE action');
                     }
                     whatAction = this.APV_NONE;
                     stepAction = this.STEP_READY;
@@ -222,10 +195,7 @@ export class DoactionFlowService extends FlowService {
                         whatAction,
                         stepAction,
                     });
-                    await this.repo.updateStepNextExeToNormal(
-                        form,
-                        dto.CEXTDATA,
-                    ); // step ต่อจาก exe ทั้งหมดเป็น 1
+                    await this.repo.updateStepNextExeToNormal(form, dto.CEXTDATA); // step ต่อจาก exe ทั้งหมดเป็น 1
                     await this.repo.updateStepExeToReady(form, dto.CEXTDATA); // step ที่ exe เป็น 3
                     await this.repo.updateStepNextExeToWait(form, dto.CEXTDATA); // step ต่อจาก exe เป็น 2
                     break;
@@ -249,7 +219,7 @@ export class DoactionFlowService extends FlowService {
         params: any,
         message?: string,
     ): Promise<{ status: boolean; result?: any; message: string }> {
-        let msg = message || 'Update Flow ';
+        const msg = message || 'Update Flow ';
         try {
             const res = await this.repo.execSql(sql, params);
             if (!res) {
@@ -265,10 +235,7 @@ export class DoactionFlowService extends FlowService {
     async getStepNext(form: FormDto) {
         const flowTree = (await this.repo.getFlowTree(form)) ?? [];
         for (const step of flowTree) {
-            if (
-                step.CSTEPST == this.STEP_WAIT ||
-                step.CSTEPST == this.STEP_NORMAL
-            ) {
+            if (step.CSTEPST == this.STEP_WAIT || step.CSTEPST == this.STEP_NORMAL) {
                 return { stepno: step.CSTEPNO, stepNextNo: step.CSTEPNEXTNO };
             }
         }

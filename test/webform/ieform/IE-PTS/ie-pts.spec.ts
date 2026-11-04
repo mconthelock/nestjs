@@ -55,9 +55,7 @@ describe('TS request validation', () => {
             CYEAR: '21',
             REQUEST_BY: '25009',
             INPUT_BY: '25009',
-            ITEMS: [
-                { DWG: 'YA154D379', ITEM: '125', ...detail, SEQ: undefined },
-            ],
+            ITEMS: [{ DWG: 'YA154D379', ITEM: '125', ...detail, SEQ: undefined }],
         });
         expect(auto.ITEMS[0]).toMatchObject({
             PROCID_OLD: 'G1SHE',
@@ -65,29 +63,26 @@ describe('TS request validation', () => {
             TC: '0.0033',
         });
     });
-    it.each(['', '   ', null, undefined])(
-        'accepts blank GNO/LNO: %j',
-        async (value) => {
-            const data = {
-                NFRMNO: 4,
-                VORGNO: '051401',
-                CYEAR: '21',
-                REQUEST_BY: '25009',
-                INPUT_BY: '25009',
-                ITEMS: [
-                    {
-                        DWG: 'YA154D379',
-                        GNO: value,
-                        LNO: value,
-                        ITEM: '125',
-                        PROCID_OLD: 'G1SHE',
-                        PROCID: 'G1SHE',
-                    },
-                ],
-            };
-            expect(await check(AutoInsertTsProcessDto, data)).toHaveLength(0);
-        },
-    );
+    it.each(['', '   ', null, undefined])('accepts blank GNO/LNO: %j', async (value) => {
+        const data = {
+            NFRMNO: 4,
+            VORGNO: '051401',
+            CYEAR: '21',
+            REQUEST_BY: '25009',
+            INPUT_BY: '25009',
+            ITEMS: [
+                {
+                    DWG: 'YA154D379',
+                    GNO: value,
+                    LNO: value,
+                    ITEM: '125',
+                    PROCID_OLD: 'G1SHE',
+                    PROCID: 'G1SHE',
+                },
+            ],
+        };
+        expect(await check(AutoInsertTsProcessDto, data)).toHaveLength(0);
+    });
     it('accepts normal payload and rejects missing/oversized nested fields', async () => {
         expect(await check(InsertTsProcessDto, payload())).toHaveLength(0);
         expect(
@@ -96,12 +91,8 @@ describe('TS request validation', () => {
                 DETAILS: [{ SEQ: '001', PROCID: '1234567' }],
             }),
         ).not.toHaveLength(0);
-        expect(
-            await check(InsertTsProcessDto, { ...payload(), HEADERS: [] }),
-        ).not.toHaveLength(0);
-        expect(
-            await check(InsertTsProcessDto, { ...payload(), NRUNNO: null }),
-        ).not.toHaveLength(0);
+        expect(await check(InsertTsProcessDto, { ...payload(), HEADERS: [] })).not.toHaveLength(0);
+        expect(await check(InsertTsProcessDto, { ...payload(), NRUNNO: null })).not.toHaveLength(0);
     });
     it('validates flat auto items and new requester field names', async () => {
         const data = {
@@ -131,15 +122,11 @@ describe('TS request validation', () => {
             { FILES: [] },
             { REQBY: '12345' },
         ]) {
-            expect(
-                await check(AutoInsertTsProcessDto, { ...data, ...extra }),
-            ).not.toHaveLength(0);
+            expect(await check(AutoInsertTsProcessDto, { ...data, ...extra })).not.toHaveLength(0);
         }
     });
     it('enforces attachment form precision and file IDs', async () => {
-        expect(
-            await check(InsertTsProcessDto, { ...payload(), NFRMNO: 1000 }),
-        ).not.toHaveLength(0);
+        expect(await check(InsertTsProcessDto, { ...payload(), NFRMNO: 1000 })).not.toHaveLength(0);
         expect(
             await check(InsertTsProcessDto, {
                 ...payload(),
@@ -223,9 +210,7 @@ describe('TS orchestration', () => {
         },
         { FILES: [{ ID: 1 }, { ID: 1 }] },
     ])('rejects duplicate composite keys before writes: %j', async (data) => {
-        await expect(
-            service.insert({ ...payload(), ...data } as any),
-        ).rejects.toThrow('Duplicate');
+        await expect(service.insert({ ...payload(), ...data } as any)).rejects.toThrow('Duplicate');
         expect(repo.insert).not.toHaveBeenCalled();
     });
     it('rejects duplicate form insertion rather than overwriting rows', async () => {

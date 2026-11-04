@@ -126,10 +126,7 @@ export class PrintedService {
     }
 
     private runPendingPdfJobs(): void {
-        while (
-            this.activePdfJobs < this.maxParallelPdfJobs &&
-            this.pendingPdfJobs.length > 0
-        ) {
+        while (this.activePdfJobs < this.maxParallelPdfJobs && this.pendingPdfJobs.length > 0) {
             const nextTask = this.pendingPdfJobs.shift();
             if (!nextTask) {
                 return;
@@ -143,10 +140,7 @@ export class PrintedService {
         }
     }
 
-    runWithPdfContext<T>(
-        context: PdfProcessContext,
-        callback: () => Promise<T>,
-    ): Promise<T> {
+    runWithPdfContext<T>(context: PdfProcessContext, callback: () => Promise<T>): Promise<T> {
         return this.pdfContext.run(context, callback);
     }
 
@@ -228,10 +222,7 @@ export class PrintedService {
                         status: 'failed',
                         message: 'Background queue failed',
                         finishedAt: new Date().toISOString(),
-                        error:
-                            error instanceof Error
-                                ? error.message
-                                : String(error),
+                        error: error instanceof Error ? error.message : String(error),
                     });
                     await this.writeLog(
                         `[${jobId}] Background queue error`,
@@ -257,16 +248,12 @@ export class PrintedService {
             async () => {
                 const totalStartTime = Date.now();
                 await this.writeLog(`[${jobId}] Background processing started`);
-                await this.writeLog(
-                    `Start read source PDF in ${body.inputPath}`,
-                );
+                await this.writeLog(`Start read source PDF in ${body.inputPath}`);
 
                 const outputDirectory = body.pdfDirectory;
                 const readStartTime = Date.now();
                 const pdfBytes = await fs.readFile(body.inputPath);
-                await this.writeLog(
-                    `Read source PDF in ${this.formatElapsedTime(readStartTime)}`,
-                );
+                await this.writeLog(`Read source PDF in ${this.formatElapsedTime(readStartTime)}`);
 
                 // ขั้นตอนที่ 1: โหลด PDF ด้วย pdf-lib
                 const loadStartTime = Date.now();
@@ -285,12 +272,7 @@ export class PrintedService {
                 }[] = [];
 
                 // ขั้นตอนที่ 2: แบ่งหน้า, อ่านข้อความ และตั้งชื่อไฟล์
-                await this.splitFiles(
-                    pdfDoc,
-                    outputDirectory,
-                    pageCount,
-                    splitFilesData,
-                );
+                await this.splitFiles(pdfDoc, outputDirectory, pageCount, splitFilesData);
 
                 // ขั้นตอนที่ 3: บันทึกข้อมูลลง Database
                 const saveStartTime = Date.now();
@@ -300,9 +282,7 @@ export class PrintedService {
                 };
                 const fileData = await this.saveTagsData(dbdata);
                 const fileID = fileData.FILES;
-                await this.writeLog(
-                    `Saved PDF data in ${this.formatElapsedTime(saveStartTime)}`,
-                );
+                await this.writeLog(`Saved PDF data in ${this.formatElapsedTime(saveStartTime)}`);
 
                 // ขั้นตอนที่ 4: ใส่ข้อมูล Label ลงในแต่ละหน้า PDF ตามเงื่อนไข
                 await this.processLabelDetail(fileID);
@@ -311,15 +291,10 @@ export class PrintedService {
                 // await this.processLableSpecial(fileID);
 
                 // ขั้นตอนที่ 5: รวมไฟล์ PDF กลับเป็นไฟล์เดียว
-                const outFilePath = path.join(
-                    outputDirectory,
-                    `${dbdata.filename}`,
-                );
+                const outFilePath = path.join(outputDirectory, `${dbdata.filename}`);
                 const mergeStartTime = Date.now();
                 await this.mergePdfsFast(splitFilesData, outFilePath);
-                await this.writeLog(
-                    `Merged PDF in ${this.formatElapsedTime(mergeStartTime)}`,
-                );
+                await this.writeLog(`Merged PDF in ${this.formatElapsedTime(mergeStartTime)}`);
 
                 // ขั้นตอนที่ 6: ลดขนาด PDF ด้วย Ghostscript
                 const compressStartTime = Date.now();
@@ -329,10 +304,7 @@ export class PrintedService {
                 );
 
                 // ขั้นตอนที่ 7: Rename ไฟล์ PDF เป็นชื่อตาม originalfilename
-                const finalPath = path.join(
-                    outputDirectory,
-                    dbdata.originalfilename,
-                );
+                const finalPath = path.join(outputDirectory, dbdata.originalfilename);
                 await fs.rename(outFilePath, finalPath);
 
                 // อัปเดตสถานะงานเป็น 'completed'
@@ -353,9 +325,7 @@ export class PrintedService {
                     totalPages: pageCount - 1,
                     fileId: fileID,
                 });
-                await this.writeLog(
-                    `[${jobId}] Background processing completed`,
-                );
+                await this.writeLog(`[${jobId}] Background processing completed`);
                 return;
             },
         );
@@ -408,10 +378,7 @@ export class PrintedService {
             const sourcePage = pdfDoc.getPage(i);
             const [embeddedPage] = await singlePageDoc.embedPages([sourcePage]);
             const page = singlePageDoc.addPage([a4Width, a4Height]);
-            const scale = Math.min(
-                a4Width / embeddedPage.width,
-                a4Height / embeddedPage.height,
-            );
+            const scale = Math.min(a4Width / embeddedPage.width, a4Height / embeddedPage.height);
             const targetWidth = embeddedPage.width * scale;
             const targetHeight = embeddedPage.height * scale;
 
@@ -433,9 +400,7 @@ export class PrintedService {
                 const pageorder = pisData[3];
                 const pageorderData = pageorder.replaceAll(' ', '');
                 const mfgno = pageorderData.substring(0, 11).replace(/-/g, '');
-                const packno = pageorderData
-                    .substring(11, 17)
-                    .replace(/-/g, '');
+                const packno = pageorderData.substring(11, 17).replace(/-/g, '');
 
                 const newFileName = `${mfgno}-${packno}-${i}.pdf`;
                 const outputPath = path.join(outputDirectory, newFileName);
@@ -617,9 +582,7 @@ export class PrintedService {
         for (let i = 0; i < filesData.length; i += BATCH_SIZE) {
             const batchStartTime = Date.now();
             const batch = filesData.slice(i, i + BATCH_SIZE);
-            const buffers = await Promise.all(
-                batch.map((file) => fs.readFile(file.filePath)),
-            );
+            const buffers = await Promise.all(batch.map((file) => fs.readFile(file.filePath)));
             for (const buffer of buffers) {
                 const tempDoc = await PDFDocument.load(buffer);
                 const [copiedPage] = await mergedPdf.copyPages(tempDoc, [0]);
@@ -721,9 +684,7 @@ export class PrintedService {
                 FILE_PRINTEDPAGE: status == 3 ? file[0].FILE_TOTALPAGE : 0,
             });
         } catch (error) {
-            throw new Error(
-                `Error updating print file status for FILES_ID ${filesId}`,
-            );
+            throw new Error(`Error updating print file status for FILES_ID ${filesId}`);
         }
     }
 
@@ -742,9 +703,7 @@ export class PrintedService {
             });
             return this.repo.deleteFiles(filesId);
         } catch (error) {
-            throw new Error(
-                `Error deleting PDF directory for FILES_ID ${filesId}`,
-            );
+            throw new Error(`Error deleting PDF directory for FILES_ID ${filesId}`);
         }
     }
 }

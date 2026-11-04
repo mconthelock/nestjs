@@ -1,8 +1,4 @@
-import {
-    Controller,
-    Get,
-    Param,
-} from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { StyTypeService } from './sty-type.service';
 import { CreateStyTypeDto } from './dto/create-sty-type.dto';
 import { UpdateStyTypeDto } from './dto/update-sty-type.dto';
@@ -17,7 +13,7 @@ export class StyTypeController {
     }
 
     @Get('class')
-    getClass(){
+    getClass() {
         return this.styTypeService.findByTypeCode('PTC');
     }
 }

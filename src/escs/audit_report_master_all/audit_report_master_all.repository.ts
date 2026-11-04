@@ -7,9 +7,7 @@ import { AUDIT_REPORT_MASTER_ALL } from 'src/common/Entities/escs/views/AUDIT_RE
 
 @Injectable()
 export class AuditReportMasterAllRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

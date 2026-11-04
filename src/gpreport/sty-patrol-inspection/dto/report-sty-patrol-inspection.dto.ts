@@ -1,6 +1,6 @@
-import { Type } from "class-transformer";
-import { IsOptional, IsString } from "class-validator";
-import { StringToDate } from "src/common/utils/transform";
+import { Type } from 'class-transformer';
+import { IsOptional, IsString } from 'class-validator';
+import { StringToDate } from 'src/common/utils/transform';
 
 export class ReportStyPatrolInspectionDto {
     @IsOptional()

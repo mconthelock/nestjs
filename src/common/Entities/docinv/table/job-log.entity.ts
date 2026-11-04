@@ -1,42 +1,42 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
-  ManyToOne,
-  JoinColumn,
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    CreateDateColumn,
+    UpdateDateColumn,
+    OneToMany,
+    ManyToOne,
+    JoinColumn,
 } from 'typeorm';
 import { ScheduledJob } from './scheduled-job.entity';
 
 @Entity({ name: 'JOB_EXECUTION_LOGS', schema: 'DOCINV' })
 export class JobExecutionLog {
-  @PrimaryGeneratedColumn('uuid')
-  ID: string;
+    @PrimaryGeneratedColumn('uuid')
+    ID: string;
 
-  @Column()
-  JOB_ID: string;
+    @Column()
+    JOB_ID: string;
 
-  @Column({ default: () => 'CURRENT_TIMESTAMP' })
-  START_TIME: Date;
+    @Column({ default: () => 'CURRENT_TIMESTAMP' })
+    START_TIME: Date;
 
-  @Column()
-  END_TIME: Date;
+    @Column()
+    END_TIME: Date;
 
-  @Column()
-  DURATION_MS: number;
+    @Column()
+    DURATION_MS: number;
 
-  @Column()
-  STATUS: string;
+    @Column()
+    STATUS: string;
 
-  @Column()
-  RESPONSE_CODE: number;
+    @Column()
+    RESPONSE_CODE: number;
 
-  @Column()
-  OUTPUT_MESSAGE: string;
+    @Column()
+    OUTPUT_MESSAGE: string;
 
-  @ManyToOne(() => ScheduledJob, (job) => job.logs)
-  @JoinColumn({ name: 'JOB_ID', referencedColumnName: 'ID' })
-  job: ScheduledJob;
+    @ManyToOne(() => ScheduledJob, (job) => job.logs)
+    @JoinColumn({ name: 'JOB_ID', referencedColumnName: 'ID' })
+    job: ScheduledJob;
 }

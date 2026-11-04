@@ -10,7 +10,7 @@ export class DpmsPlIssueRevService {
     constructor(private readonly repo: DpmsPlIssueRevRepository) {}
     async create(dto: CreateDpmsPlIssueRevDto) {
         try {
-            let revision = dto.NREV;
+            const revision = dto.NREV;
             const res = await this.repo.create({
                 ...dto,
                 NREV: revision,
@@ -32,9 +32,7 @@ export class DpmsPlIssueRevService {
         }
     }
 
-    async getNextRevision(
-        condition: dpmsPlIssueRevFindLatestRevision,
-    ): Promise<number> {
+    async getNextRevision(condition: dpmsPlIssueRevFindLatestRevision): Promise<number> {
         const lastRevision = await this.repo.findLatestRevision(condition);
         return lastRevision ? lastRevision.NREV + 1 : 0;
     }
@@ -43,10 +41,7 @@ export class DpmsPlIssueRevService {
         condition: dpmsPlIssueRevFindLatestRevision,
         withOutType: number,
     ): Promise<number> {
-        const lastRevision = await this.repo.findLatestRevisionWithoutType(
-            condition,
-            withOutType,
-        );
+        const lastRevision = await this.repo.findLatestRevisionWithoutType(condition, withOutType);
         return lastRevision ? lastRevision.NREV + 1 : 0;
     }
 

@@ -67,10 +67,7 @@ export class PrintedCnService {
         for (const data of cnData) {
             // console.log(pdfPath);
             try {
-                const pdfPath = path.join(
-                    runtimeContext.pdfDirectory,
-                    `${data.PAGE_TAG}.pdf`,
-                );
+                const pdfPath = path.join(runtimeContext.pdfDirectory, `${data.PAGE_TAG}.pdf`);
                 if (data.DOCNO != null) {
                     await this.embedCNToPdf(pdfPath, {
                         cnno: data.DOCNO,
@@ -133,9 +130,7 @@ export class PrintedCnService {
             const pdfPath = path.join(pdfDirectory, `${data.R27M11}.pdf`);
             try {
                 await this.embedFirstToPdf(pdfPath, data.R27M09);
-                await this.printed.writeLog(
-                    `Put First Lot. No. ${data.R27M09} to ${data.R27M11}`,
-                );
+                await this.printed.writeLog(`Put First Lot. No. ${data.R27M09} to ${data.R27M11}`);
                 lotCount++;
             } catch (error) {
                 continue;

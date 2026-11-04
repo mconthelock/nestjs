@@ -32,12 +32,7 @@ export class OrgTreeRepository extends BaseRepository {
         return qb.getMany();
     }
 
-    async getOrgTree(
-        orgno: string,
-        vposno: string,
-        empno: string,
-        emppos: string,
-    ) {
+    async getOrgTree(orgno: string, vposno: string, empno: string, emppos: string) {
         return this.manager.query(
             ` SELECT *
         FROM ORGPOS
@@ -61,12 +56,7 @@ export class OrgTreeRepository extends BaseRepository {
         );
     }
 
-    async getOrgTreeNosql(
-        orgno: string,
-        vposno: string,
-        empno: string,
-        emppos: string,
-    ) {
+    async getOrgTreeNosql(orgno: string, vposno: string, empno: string, emppos: string) {
         // 1. Traverse ancestor org numbers from ORGTREE
         const orgNos: string[] = [orgno];
         let currentOrg = orgno;

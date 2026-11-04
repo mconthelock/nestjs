@@ -5,32 +5,30 @@ import { UpdatePurVendorsCodeDto } from './dto/update-pur_vendors_code.dto';
 
 @Controller('pursys/pur_vendors_code')
 export class PurVendorsCodeController {
-  constructor(private readonly purVendorsCodeService: PurVendorsCodeService) {}
+    constructor(private readonly purVendorsCodeService: PurVendorsCodeService) {}
 
-  @Post('createvendorcode')
-  create(@Body() createPurVendorsCodeDto: CreatePurVendorsCodeDto) {
-    return this.purVendorsCodeService.create(createPurVendorsCodeDto);
-  }
+    @Post('createvendorcode')
+    create(@Body() createPurVendorsCodeDto: CreatePurVendorsCodeDto) {
+        return this.purVendorsCodeService.create(createPurVendorsCodeDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.purVendorsCodeService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.purVendorsCodeService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.purVendorsCodeService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.purVendorsCodeService.findOne(+id);
+    }
 
-  @Post('updatevendorcode')
+    @Post('updatevendorcode')
     update(@Body('id') id: number, @Body() updatePurVendorsCodeDto: UpdatePurVendorsCodeDto) {
-    return this.purVendorsCodeService.update(id , updatePurVendorsCodeDto);
+        return this.purVendorsCodeService.update(id, updatePurVendorsCodeDto);
+    }
 
-  }
-
-  @Post('deletevendorcode')
-  remove(@Body('id') id: number) {
-    return this.purVendorsCodeService.remove(+id);
-  }
-
+    @Post('deletevendorcode')
+    remove(@Body('id') id: number) {
+        return this.purVendorsCodeService.remove(+id);
+    }
 }

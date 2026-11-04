@@ -15,33 +15,32 @@ import { FINNPOCOSTCENTER } from 'src/common/Entities/webform/table/FINNPO_COSTC
 import { FINNPOCURRENCY } from 'src/common/Entities/webform/table/FINNPO_Currency.entity';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
-
 import { FormmstModule } from 'src/webform/formmst/formmst.module';
-import { HandleFileFormModule } from "src/webform/handle-file-form/handle-file-form.module";
+import { HandleFileFormModule } from 'src/webform/handle-file-form/handle-file-form.module';
 import { UsersModule } from 'src/amec/users/users.module';
 
-
 @Module({
-  imports:[
-      TypeOrmModule.forFeature(
-          [
-              FORM,
-              FINNPOFORM,
-              FINNPOINVOICE,
-              FINNPOEXPENSE,
-              FINNPOVENDOR,
-              FINNPOCOSTCENTER,
-              FINNPOCURRENCY,
-          ],
-          'mitsuConnection',
-      ),
-      FormModule,
-      FlowModule,
-      FormmstModule,HandleFileFormModule,UsersModule
-  ],
+    imports: [
+        TypeOrmModule.forFeature(
+            [
+                FORM,
+                FINNPOFORM,
+                FINNPOINVOICE,
+                FINNPOEXPENSE,
+                FINNPOVENDOR,
+                FINNPOCOSTCENTER,
+                FINNPOCURRENCY,
+            ],
+            'mitsuConnection',
+        ),
+        FormModule,
+        FlowModule,
+        FormmstModule,
+        HandleFileFormModule,
+        UsersModule,
+    ],
 
-  controllers: [FinnpoController],
-  providers: [FinnpoService,FinnpoRepository],
-
+    controllers: [FinnpoController],
+    providers: [FinnpoService, FinnpoRepository],
 })
 export class FinNpoModule {}

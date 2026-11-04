@@ -21,24 +21,18 @@ export class DatabaseService {
         // private keys: MasterkeyService,
     ) {
         if (!this.keyHex || !this.ivHex) {
-            throw new Error(
-                'MASTER_DECRYPTION_KEY and MASTER_DECRYPTION_IV must be set in .env',
-            );
+            throw new Error('MASTER_DECRYPTION_KEY and MASTER_DECRYPTION_IV must be set in .env');
         }
 
         this.key = Buffer.from(this.keyHex, 'hex');
         this.iv = Buffer.from(this.ivHex, 'hex');
 
         if (this.key.length !== 32) {
-            throw new Error(
-                'MASTER_DECRYPTION_KEY must be a 64-character hex string (32 bytes)',
-            );
+            throw new Error('MASTER_DECRYPTION_KEY must be a 64-character hex string (32 bytes)');
         }
         if (this.iv.length !== 16) {
             // <-- IV ต้องยาว 16 bytes
-            throw new Error(
-                'MASTER_DECRYPTION_IV must be a 32-character hex string (16 bytes)',
-            );
+            throw new Error('MASTER_DECRYPTION_IV must be a 32-character hex string (16 bytes)');
         }
     }
 
@@ -65,20 +59,14 @@ export class DatabaseService {
                 decryptedCredsMaster.split(':');
             return { user, pinpass, passcode, pdfpass, admin, password };
         } catch (error) {
-            console.error(
-                'Failed to get or decrypt HR admin credentials:',
-                error,
-            );
-            throw new InternalServerErrorException(
-                'Could not retrieve master credentials.',
-            );
+            console.error('Failed to get or decrypt HR admin credentials:', error);
+            throw new InternalServerErrorException('Could not retrieve master credentials.');
         }
     }
 
     //: Promise<{ hrAdminDataSource: DataSource; conn: oracledb.Connection }>
     async createConnection(credentials: any) {
-        const { admin, password, passcode } =
-            await this.getHrAdminCredentials(credentials);
+        const { admin, password, passcode } = await this.getHrAdminCredentials(credentials);
         const cfg = this.ds.options as any;
         const hrAdminDataSource = new DataSource({
             type: cfg.type,

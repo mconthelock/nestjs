@@ -99,11 +99,7 @@ export class EmployeeRepository extends BaseRepository {
             .createQueryBuilder('insurance')
             .where('IEMP = :id', { id })
             .getMany();
-        return this.encrypt(
-            insurance,
-            ['IBEN1', 'IBEN2', 'IBEN3', 'IBEN4', 'IBEN5'],
-            'include',
-        );
+        return this.encrypt(insurance, ['IBEN1', 'IBEN2', 'IBEN3', 'IBEN4', 'IBEN5'], 'include');
     }
 
     async findBeneficiary(id: string) {
@@ -136,8 +132,7 @@ export class EmployeeRepository extends BaseRepository {
         if (typeof data === 'number' || typeof data === 'bigint') return 0;
         if (typeof data === 'boolean') return false;
         if (data instanceof Date) return 'xxx';
-        if (Array.isArray(data))
-            return data.map((item) => this.encrypt(item, keys, mode));
+        if (Array.isArray(data)) return data.map((item) => this.encrypt(item, keys, mode));
 
         if (typeof data === 'object') {
             return Object.fromEntries(
@@ -145,12 +140,8 @@ export class EmployeeRepository extends BaseRepository {
                     const isListed = keys.includes(key);
                     // mode 'exclude' (default): keys ที่ระบุ = ยกเว้นไม่เข้ารหัส (ค่าเดิม), key อื่นเข้ารหัส
                     // mode 'include': keys ที่ระบุ = ต้องเข้ารหัส, key อื่นปล่อยผ่าน (ค่าเดิม)
-                    const shouldEncrypt =
-                        mode === 'exclude' ? !isListed : isListed;
-                    return [
-                        key,
-                        shouldEncrypt ? this.encrypt(value, keys, mode) : value,
-                    ];
+                    const shouldEncrypt = mode === 'exclude' ? !isListed : isListed;
+                    return [key, shouldEncrypt ? this.encrypt(value, keys, mode) : value];
                 }),
             );
         }

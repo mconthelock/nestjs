@@ -5,8 +5,8 @@ import { CurrencyController } from './currency.controller';
 import { Currency } from './entities/currency.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Currency], 'mitsuConnection')],
-  controllers: [CurrencyController],
-  providers: [CurrencyService],
+    imports: [TypeOrmModule.forFeature([Currency], 'mitsuConnection')],
+    controllers: [CurrencyController],
+    providers: [CurrencyService],
 })
 export class CurrencyModule {}

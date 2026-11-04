@@ -5,15 +5,13 @@ import { RootcauseRepository } from './rootcause.repository';
 
 @Injectable()
 export class RootcauseService {
-  constructor(
-    private readonly rootcauseRepository: RootcauseRepository,
-  ) {}
+    constructor(private readonly rootcauseRepository: RootcauseRepository) {}
 
-  search(dto: SearchRootcauseDto) {
-    return this.rootcauseRepository.search(dto);
-  }
+    search(dto: SearchRootcauseDto) {
+        return this.rootcauseRepository.search(dto);
+    }
 
-  getProductionUnit(fyear: number) {
-    return this.rootcauseRepository.findProductionUnit(fyear);
-  }
+    getProductionUnit(fyear: number) {
+        return this.rootcauseRepository.findProductionUnit(fyear);
+    }
 }

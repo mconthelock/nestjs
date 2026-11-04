@@ -18,10 +18,7 @@ import { FormCounter } from 'src/common/Entities/webform/table/FORM_COUNTER.enti
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature(
-            [FORM, FLOW, FormCounter],
-            'mitsuConnection',
-        ),
+        TypeOrmModule.forFeature([FORM, FLOW, FormCounter], 'mitsuConnection'),
         FormmstModule,
         UsersModule,
         FlowmstModule,

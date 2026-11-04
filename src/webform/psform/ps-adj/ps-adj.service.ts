@@ -29,16 +29,11 @@ export class PsAdjService {
             return await action();
         } catch (error) {
             const code = error?.driverError?.errorNum;
-            if (code === 1)
-                throw new ConflictException('Primary key already exists');
+            if (code === 1) throw new ConflictException('Primary key already exists');
             if (code === 2291)
-                throw new UnprocessableEntityException(
-                    'Referenced reason or FORM does not exist',
-                );
+                throw new UnprocessableEntityException('Referenced reason or FORM does not exist');
             if (code === 2292)
-                throw new ConflictException(
-                    'Record is referenced by another record',
-                );
+                throw new ConflictException('Record is referenced by another record');
             throw error;
         }
     }
@@ -56,14 +51,10 @@ export class PsAdjService {
     async updateReason(key: ReasonKeyDto, dto: UpdateReasonDto) {
         if (!Object.keys(dto).length)
             throw new BadRequestException('At least one field is required');
-        return this.changed(
-            await this.write(() => this.repo.updateReason(key, dto)),
-        );
+        return this.changed(await this.write(() => this.repo.updateReason(key, dto)));
     }
     async deleteReason(key: ReasonKeyDto) {
-        return this.changed(
-            await this.write(() => this.repo.deleteReason(key)),
-        );
+        return this.changed(await this.write(() => this.repo.deleteReason(key)));
     }
     async insert_adjust(dto: CreateOrderDto) {
         await this.write(() => this.repo.insert_adjust(dto));
@@ -75,9 +66,7 @@ export class PsAdjService {
     async updateOrder(key: OrderKeyDto, dto: UpdateOrderDto) {
         if (!Object.keys(dto).length)
             throw new BadRequestException('At least one field is required');
-        return this.changed(
-            await this.write(() => this.repo.updateOrder(key, dto)),
-        );
+        return this.changed(await this.write(() => this.repo.updateOrder(key, dto)));
     }
     async deleteOrder(key: OrderKeyDto) {
         return this.changed(await this.write(() => this.repo.deleteOrder(key)));
@@ -92,9 +81,7 @@ export class PsAdjService {
     async updateFile(key: FileKeyDto, dto: UpdateFileDto) {
         if (!Object.keys(dto).length)
             throw new BadRequestException('At least one field is required');
-        return this.changed(
-            await this.write(() => this.repo.updateFile(key, dto)),
-        );
+        return this.changed(await this.write(() => this.repo.updateFile(key, dto)));
     }
     async deleteFile(key: FileKeyDto) {
         return this.changed(await this.write(() => this.repo.deleteFile(key)));

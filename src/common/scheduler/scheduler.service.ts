@@ -81,10 +81,10 @@ export class SchedulerService implements OnModuleInit {
 
         this.schedulerRegistry.addCronJob('log-compression', job);
         job.start();
-        this.logger.info(
-            'Log compression cron job registered (daily at 00:30)',
-            { context: 'SchedulerService', logType: 'Scheduler' },
-        );
+        this.logger.info('Log compression cron job registered (daily at 00:30)', {
+            context: 'SchedulerService',
+            logType: 'Scheduler',
+        });
     }
 
     /*** ตรวจสอบว่า URL endpoint มีอยู่จริงหรือไม่*/
@@ -118,14 +118,11 @@ export class SchedulerService implements OnModuleInit {
             // ลอง OPTIONS method ถ้า HEAD ไม่ได้
             try {
                 const fullUrl = `http://localhost:${process.env.PORT}/${url}`;
-                const response = await this.httpService.axiosRef.options(
-                    fullUrl,
-                    {
-                        timeout: 5000,
-                        validateStatus: (status) => true,
-                        proxy: false, // ปิดการใช้ proxy เพื่อหลีกเลี่ยงปัญหาในบางสภาพแวดล้อม (เช่น Docker) ที่อาจทำให้การตรวจสอบ endpoint ล้มเหลวโดยไม่จำเป็น
-                    },
-                );
+                const response = await this.httpService.axiosRef.options(fullUrl, {
+                    timeout: 5000,
+                    validateStatus: (status) => true,
+                    proxy: false, // ปิดการใช้ proxy เพื่อหลีกเลี่ยงปัญหาในบางสภาพแวดล้อม (เช่น Docker) ที่อาจทำให้การตรวจสอบ endpoint ล้มเหลวโดยไม่จำเป็น
+                });
 
                 // ตรวจสอบ status เหมือนกับ HEAD
                 if (
@@ -139,10 +136,10 @@ export class SchedulerService implements OnModuleInit {
 
                 return false;
             } catch (optionsError) {
-                this.logger.warn(
-                    `Endpoint validation failed for ${url}: ${optionsError.message}`,
-                    { context: 'SchedulerService', logType: 'Scheduler' },
-                );
+                this.logger.warn(`Endpoint validation failed for ${url}: ${optionsError.message}`, {
+                    context: 'SchedulerService',
+                    logType: 'Scheduler',
+                });
                 return false;
             }
         }
@@ -150,9 +147,7 @@ export class SchedulerService implements OnModuleInit {
 
     // --- CRUD & Management ---
     async createJob(dto: CreateJobDto) {
-        const cronExpression = this.normalizeCronExpression(
-            dto.CRON_EXPRESSION,
-        );
+        const cronExpression = this.normalizeCronExpression(dto.CRON_EXPRESSION);
         this.ensureValidCronExpression(cronExpression);
 
         // ตรวจสอบว่า endpoint มีอยู่จริง
@@ -175,9 +170,7 @@ export class SchedulerService implements OnModuleInit {
 
     async updateJob(dto: UpdateSchedulerDto) {
         if (dto.CRON_EXPRESSION !== undefined) {
-            const cronExpression = this.normalizeCronExpression(
-                dto.CRON_EXPRESSION,
-            );
+            const cronExpression = this.normalizeCronExpression(dto.CRON_EXPRESSION);
             this.ensureValidCronExpression(cronExpression);
             dto.CRON_EXPRESSION = cronExpression;
         }
@@ -236,8 +229,7 @@ export class SchedulerService implements OnModuleInit {
             return {
                 name,
                 isActive: cronJob.isActive,
-                cronExpression:
-                    (cronJob as any)?.cronTime?.source ?? 'unknown-expression',
+                cronExpression: (cronJob as any)?.cronTime?.source ?? 'unknown-expression',
                 lastRunAt,
                 nextRunAt,
             };
@@ -250,9 +242,7 @@ export class SchedulerService implements OnModuleInit {
     }
 
     async getLogs(dto: SearchSchedulerDto) {
-        const qb = this.logRepo
-            .createQueryBuilder('logs')
-            .leftJoinAndSelect('logs.job', 'job');
+        const qb = this.logRepo.createQueryBuilder('logs').leftJoinAndSelect('logs.job', 'job');
         await applyDynamicFilters(qb, dto, 'logs');
         return qb.getMany();
     }
@@ -276,9 +266,7 @@ export class SchedulerService implements OnModuleInit {
     }
 
     private addCronJob(job: ScheduledJob) {
-        const cronExpression = this.normalizeCronExpression(
-            job.CRON_EXPRESSION,
-        );
+        const cronExpression = this.normalizeCronExpression(job.CRON_EXPRESSION);
         if (!cronExpression) {
             this.logger.warn(
                 `Skip scheduling job ${job.NAME} (${job.ID}): CRON_EXPRESSION is empty`,
@@ -337,9 +325,7 @@ export class SchedulerService implements OnModuleInit {
         }
 
         if (!this.isValidCronExpression(expression)) {
-            throw new BadRequestException(
-                `Invalid cron expression: ${expression}`,
-            );
+            throw new BadRequestException(`Invalid cron expression: ${expression}`);
         }
     }
 
@@ -359,19 +345,13 @@ export class SchedulerService implements OnModuleInit {
 
         // ถ้าเป็น manual trigger ให้ bypass lock
         if (!bypassLock) {
-            const acquired = await this.redisClient.set(
-                lockKey,
-                'locked',
-                'EX',
-                ttl,
-                'NX',
-            );
+            const acquired = await this.redisClient.set(lockKey, 'locked', 'EX', ttl, 'NX');
 
             if (!acquired) {
-                this.logger.info(
-                    `Job ${job.NAME} skipped - already running in another instance`,
-                    { context: 'SchedulerService', logType: 'Scheduler' },
-                );
+                this.logger.info(`Job ${job.NAME} skipped - already running in another instance`, {
+                    context: 'SchedulerService',
+                    logType: 'Scheduler',
+                });
                 return;
             }
         }
@@ -392,10 +372,10 @@ export class SchedulerService implements OnModuleInit {
                     payload = JSON.parse(job.PARAMETES);
                 }
             } catch (e) {
-                this.logger.warn(
-                    `Invalid JSON parameters for job ${job.NAME}`,
-                    { context: 'SchedulerService', logType: 'Scheduler' },
-                );
+                this.logger.warn(`Invalid JSON parameters for job ${job.NAME}`, {
+                    context: 'SchedulerService',
+                    logType: 'Scheduler',
+                });
             }
 
             const response = await this.httpService.axiosRef.post(

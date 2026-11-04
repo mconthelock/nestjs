@@ -29,9 +29,7 @@ export class DpmsPackingListRepository extends BaseRepository {
     getCurrentTasks() {
         return this.manager
             .createQueryBuilder(DPMS_PACKING_LIST, 'L')
-            .where(
-                '(TRUNC(L.DFINISHALL) >= TRUNC(SYSDATE) OR L.DFINISHALL IS NULL)',
-            )
+            .where('(TRUNC(L.DFINISHALL) >= TRUNC(SYSDATE) OR L.DFINISHALL IS NULL)')
             .orderBy({
                 'L.REVISE': 'DESC',
                 'L.DELAY': 'DESC',
@@ -58,27 +56,21 @@ export class DpmsPackingListRepository extends BaseRepository {
 
     search(condition: searchDpmsPackingListDto) {
         const { TYPE, DFINISHALL, FINISH_DATE, PL_PLAN, ...cond } = condition;
-        const query = this.manager
-            .createQueryBuilder(DPMS_PACKING_LIST, 'L')
-            .where(cond);
+        const query = this.manager.createQueryBuilder(DPMS_PACKING_LIST, 'L').where(cond);
         if (TYPE == 'MAIN') {
             query.andWhere('L.TYPE IN (:...TYPES)', { TYPES: ['ELE', 'ESC'] });
         } else if (TYPE) {
             query.andWhere('L.TYPE = :TYPE', { TYPE });
         }
         if (PL_PLAN) {
-            query.andWhere(
-                "TRUNC(L.PL_PLAN) = TRUNC(TO_DATE(:PL_PLAN, 'YYYY-MM-DD'))",
-                { PL_PLAN },
-            );
+            query.andWhere("TRUNC(L.PL_PLAN) = TRUNC(TO_DATE(:PL_PLAN, 'YYYY-MM-DD'))", {
+                PL_PLAN,
+            });
         }
         if (FINISH_DATE) {
-            query.andWhere(
-                "TRUNC(L.DFINISHALL) = TRUNC(TO_DATE(:FINISH_DATE, 'YYYY-MM-DD'))",
-                {
-                    FINISH_DATE,
-                },
-            );
+            query.andWhere("TRUNC(L.DFINISHALL) = TRUNC(TO_DATE(:FINISH_DATE, 'YYYY-MM-DD'))", {
+                FINISH_DATE,
+            });
         }
         if (DFINISHALL == 'Y') {
             query.andWhere('L.DFINISHALL IS NOT NULL');
@@ -113,8 +105,7 @@ export class DpmsPackingListRepository extends BaseRepository {
             query.andWhere('L.DFINISHALL IS NULL');
         }
         if (type === 'search' && condition) {
-            const { TYPE, DFINISHALL, FINISH_DATE, PL_PLAN, ...cond } =
-                condition;
+            const { TYPE, DFINISHALL, FINISH_DATE, PL_PLAN, ...cond } = condition;
             query.andWhere(cond);
             if (TYPE == 'MAIN') {
                 query.andWhere('L.TYPE IN (:...TYPES)', {
@@ -124,18 +115,14 @@ export class DpmsPackingListRepository extends BaseRepository {
                 query.andWhere('L.TYPE = :TYPE', { TYPE });
             }
             if (PL_PLAN) {
-                query.andWhere(
-                    "TRUNC(L.PL_PLAN) = TRUNC(TO_DATE(:PL_PLAN, 'YYYY-MM-DD'))",
-                    { PL_PLAN },
-                );
+                query.andWhere("TRUNC(L.PL_PLAN) = TRUNC(TO_DATE(:PL_PLAN, 'YYYY-MM-DD'))", {
+                    PL_PLAN,
+                });
             }
             if (FINISH_DATE) {
-                query.andWhere(
-                    "TRUNC(L.DFINISHALL) = TRUNC(TO_DATE(:FINISH_DATE, 'YYYY-MM-DD'))",
-                    {
-                        FINISH_DATE,
-                    },
-                );
+                query.andWhere("TRUNC(L.DFINISHALL) = TRUNC(TO_DATE(:FINISH_DATE, 'YYYY-MM-DD'))", {
+                    FINISH_DATE,
+                });
             }
             if (DFINISHALL == 'Y') {
                 query.andWhere('L.DFINISHALL IS NOT NULL');

@@ -52,7 +52,7 @@ import { BeneficiaryModule } from './beneficiary/beneficiary.module';
         ExpatModule,
         DiligentModule,
         ReportPermissionModule,
-        BeneficiaryModule
+        BeneficiaryModule,
     ],
 })
 export class gpreportModule {}

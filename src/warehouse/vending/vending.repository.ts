@@ -1,13 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-    DataSource,
-    Repository,
-    In,
-    IsNull,
-    Or,
-    Equal,
-    Between,
-} from 'typeorm';
+import { DataSource, Repository, In, IsNull, Or, Equal, Between } from 'typeorm';
 import { AddToolsVendingDto } from './dto/addtools-vending.dto';
 import { CreateImportDto } from './dto/import-vending.dto';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -50,11 +42,7 @@ export class VendingRepository extends BaseRepository {
             const results = [];
 
             for (const item of items) {
-                const result = await manager.update(
-                    Products,
-                    { ID: item.ID },
-                    { IS_VENDING: '1' },
-                );
+                const result = await manager.update(Products, { ID: item.ID }, { IS_VENDING: '1' });
 
                 results.push(result);
             }
@@ -127,8 +115,7 @@ export class VendingRepository extends BaseRepository {
         console.log('importHistory:', importHistory);
         console.log('withdrawals:', withdrawals);
         const insertedRefills = [];
-        const head =
-            await this.getRepository(TOOL_IMPORT_HISTORY).save(importHistory);
+        const head = await this.getRepository(TOOL_IMPORT_HISTORY).save(importHistory);
         const headId = head.IMPORT_ID;
 
         const withdrawalData = withdrawals.map((withdrawal) => ({
@@ -164,11 +151,7 @@ export class VendingRepository extends BaseRepository {
         };
     }
 
-    async updateImportTransactionIds(
-        importId: number,
-        issueId: number,
-        receiveId: number | null,
-    ) {
+    async updateImportTransactionIds(importId: number, issueId: number, receiveId: number | null) {
         return this.getRepository(TOOL_IMPORT_HISTORY).update(
             { IMPORT_ID: importId },
             {
@@ -237,13 +220,7 @@ export class VendingRepository extends BaseRepository {
             .getMany();
     }
 
-    async saveUserVending({
-        EMPNO,
-        CREATED_BY,
-    }: {
-        EMPNO: string[];
-        CREATED_BY: string;
-    }) {
+    async saveUserVending({ EMPNO, CREATED_BY }: { EMPNO: string[]; CREATED_BY: string }) {
         return this.getRepository(VENDING_USER).insert(
             EMPNO.map((empno) => ({ EMPNO: empno, CREATED_BY })),
         );

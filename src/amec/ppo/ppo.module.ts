@@ -5,9 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PPO } from 'src/common/Entities/amec/table/PPO.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PPO], 'mitsuConnection')],
-  controllers: [PpoController],
-  providers: [PpoService],
-  exports: [PpoService],
+    imports: [TypeOrmModule.forFeature([PPO], 'mitsuConnection')],
+    controllers: [PpoController],
+    providers: [PpoService],
+    exports: [PpoService],
 })
 export class PpoModule {}

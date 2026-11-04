@@ -25,30 +25,30 @@ import { RootcauseModule } from './rootcause/rootcause.module';
 import { MfgEdrTargetMasterModule } from './mfg_edr_target_master/mfg_edr_target_master.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature(
-      [
-        EdrWorktypeMst,
-        EdrLineMst,
-        EdrProcessMst,
-        EdrCauseMst,
-        AmecOrders,
-        AmecOrdersSchedule,
-        MfgEdrFormHead,
-        MfgEdrFormList,
-        MfgEdrFormAtt,
-        MfgEdrFormCause4m,
-        FORM,
-        FLOW,
-        AMECUSERALL,
-        VIEW_MFG_EDR_REPORT,
-      ],
-      'mitsuConnection',
-    ),
-    RootcauseModule,
-    MfgEdrTargetMasterModule,
-  ],
-  controllers: [MfgEdrController],
-  providers: [MfgEdrService],
+    imports: [
+        TypeOrmModule.forFeature(
+            [
+                EdrWorktypeMst,
+                EdrLineMst,
+                EdrProcessMst,
+                EdrCauseMst,
+                AmecOrders,
+                AmecOrdersSchedule,
+                MfgEdrFormHead,
+                MfgEdrFormList,
+                MfgEdrFormAtt,
+                MfgEdrFormCause4m,
+                FORM,
+                FLOW,
+                AMECUSERALL,
+                VIEW_MFG_EDR_REPORT,
+            ],
+            'mitsuConnection',
+        ),
+        RootcauseModule,
+        MfgEdrTargetMasterModule,
+    ],
+    controllers: [MfgEdrController],
+    providers: [MfgEdrService],
 })
 export class MfgEdrModule {}

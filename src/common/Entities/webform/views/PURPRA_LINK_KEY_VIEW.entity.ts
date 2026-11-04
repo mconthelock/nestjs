@@ -1,6 +1,6 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({name: 'PURPRA_LINK_KEY_VIEW', schema: 'WEBFORM'})
+@Entity({ name: 'PURPRA_LINK_KEY_VIEW', schema: 'WEBFORM' })
 export class PURPRA_LINK_KEY_VIEW {
     @PrimaryColumn()
     PNO: string;
@@ -28,6 +28,4 @@ export class PURPRA_LINK_KEY_VIEW {
 
     @Column()
     CRUNNO: number;
-
-
 }

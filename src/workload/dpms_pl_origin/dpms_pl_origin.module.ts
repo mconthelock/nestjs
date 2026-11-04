@@ -7,12 +7,7 @@ import { DPMS_PL_ORIGIN_VIEW } from 'src/common/Entities/workload/views/DPMS_PL_
 import { DPMS_PL_ORIGIN } from 'src/common/Entities/workload/table/DPMS_PL_ORIGIN.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [DPMS_PL_ORIGIN_VIEW, DPMS_PL_ORIGIN],
-            'mitsuConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([DPMS_PL_ORIGIN_VIEW, DPMS_PL_ORIGIN], 'mitsuConnection')],
     controllers: [DpmsPlOriginController],
     providers: [DpmsPlOriginService, DpmsPlOriginRepository],
     exports: [DpmsPlOriginService],

@@ -7,9 +7,7 @@ import { WireHarnessDrumStockService } from './wire-harness-drum-stock.service';
 @ApiTags('Wire Harness Drum Stock')
 @Controller('innovat/wire-harness/drum-stock')
 export class WireHarnessDrumStockController {
-    constructor(
-        private readonly service: WireHarnessDrumStockService,
-    ) {}
+    constructor(private readonly service: WireHarnessDrumStockService) {}
 
     @Post('list')
     @HttpCode(HttpStatus.OK)

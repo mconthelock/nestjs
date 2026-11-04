@@ -1,49 +1,37 @@
 import { Type } from 'class-transformer';
-import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  IsDateString,
-  IsNotEmpty,
-  IsDate,
-} from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsDateString, IsNotEmpty, IsDate } from 'class-validator';
 import { FormDto } from './form.dto';
 import { PickType } from '@nestjs/mapped-types';
 
-export class CreateFormDto extends PickType(FormDto, [
-  'NFRMNO',
-  'VORGNO',
-  'CYEAR',
-]) {
-  @IsNotEmpty()
-  @IsString()
-  @Type(() => String)
-  REQBY: string;
+export class CreateFormDto extends PickType(FormDto, ['NFRMNO', 'VORGNO', 'CYEAR']) {
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
+    REQBY: string;
 
-  @IsNotEmpty()
-  @IsString()
-  @Type(() => String)
-  INPUTBY: string;
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
+    INPUTBY: string;
 
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  REMARK?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    REMARK?: string;
 
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  DRAFT?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    DRAFT?: string;
 }
 
 export class FormWebformDto extends PickType(FormDto, [
-  'NFRMNO',
-  'VORGNO',
-  'CYEAR',
-  'CYEAR2',
-  'NRUNNO',
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'CYEAR2',
+    'NRUNNO',
 ] as const) {
-
     @IsNotEmpty()
     @IsString()
     @Type(() => String)

@@ -29,10 +29,7 @@ export class OracleRepository {
     /**
      * Validate & map bind params
      */
-    private mapBindParams(
-        params: Record<string, any>,
-        bindOrder: string[]
-    ): Record<string, any> {
+    private mapBindParams(params: Record<string, any>, bindOrder: string[]): Record<string, any> {
         const bindParams: Record<string, any> = {};
 
         for (const key of bindOrder) {
@@ -48,11 +45,7 @@ export class OracleRepository {
     /**
      * Execute Oracle procedure with REF CURSOR
      */
-    public async execCursor(
-        procName: string,
-        params: Record<string, any>,
-        bindOrder: string[]
-    ) {
+    public async execCursor(procName: string, params: Record<string, any>, bindOrder: string[]) {
         const runner = await this.createRunner();
         const connection = this.getConnection(runner);
 
@@ -62,7 +55,7 @@ export class OracleRepository {
             // Define OUT cursor parameter
             bindParams.RESULT = {
                 dir: oracledb.BIND_OUT,
-                type: oracledb.CURSOR
+                type: oracledb.CURSOR,
             };
 
             const sql = `
@@ -72,9 +65,11 @@ export class OracleRepository {
                 ); END;
             `;
 
-            const result = await connection.execute(sql, bindParams, { outFormat: oracledb.OUT_FORMAT_OBJECT });
+            const result = await connection.execute(sql, bindParams, {
+                outFormat: oracledb.OUT_FORMAT_OBJECT,
+            });
             const cursor = result.outBinds.RESULT;
-            const rows   = await cursor.getRows();
+            const rows = await cursor.getRows();
 
             await cursor.close();
 
@@ -90,11 +85,7 @@ export class OracleRepository {
     /**
      * Execute Oracle procedure (no cursor)
      */
-    public async execProcedure(
-        procName: string,
-        params: Record<string, any>,
-        bindOrder: string[]
-    ) {
+    public async execProcedure(procName: string, params: Record<string, any>, bindOrder: string[]) {
         const runner = await this.createRunner();
         const connection = this.getConnection(runner);
 
@@ -114,7 +105,7 @@ export class OracleRepository {
             try {
                 await connection.rollback();
             } catch (_) {}
-            
+
             throw error;
         } finally {
             // Always release query runner

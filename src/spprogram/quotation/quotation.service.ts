@@ -7,13 +7,13 @@ import { createQuotationDto } from './dto/create-quotation.dto';
 
 @Injectable()
 export class QuotationService {
-  constructor(
-    @InjectRepository(Quotation, 'mitsuConnection')
-    private readonly quo: Repository<Quotation>,
-  ) {}
+    constructor(
+        @InjectRepository(Quotation, 'mitsuConnection')
+        private readonly quo: Repository<Quotation>,
+    ) {}
 
-  async createQuotation(data: createQuotationDto) {
-    const quotation = this.quo.create(data);
-    return this.quo.save(quotation);
-  }
+    async createQuotation(data: createQuotationDto) {
+        const quotation = this.quo.create(data);
+        return this.quo.save(quotation);
+    }
 }

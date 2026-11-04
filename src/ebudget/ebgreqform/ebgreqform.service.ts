@@ -14,7 +14,7 @@ export class EbgreqformService {
     async create(dto: CreateEbgreqformDto) {
         try {
             const res = await this.repo.create(dto);
-            if(!res){
+            if (!res) {
                 throw new Error('Failed to insert EBGREQFORM');
             }
             return {

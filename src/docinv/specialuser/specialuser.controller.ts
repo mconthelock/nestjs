@@ -1,37 +1,29 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { SpecialuserService } from './specialuser.service';
 import { CreateSpecialuserDto } from './dto/create-specialuser.dto';
 import { UpdateSpecialuserDto } from './dto/update-specialuser.dto';
 
 @Controller('itgc/specialuser')
 export class SpecialuserController {
-  constructor(private readonly specialuserService: SpecialuserService) {}
+    constructor(private readonly specialuserService: SpecialuserService) {}
 
-  @Get('getServerName')
-  async getServerName() {
-    return this.specialuserService.getServerName();
-  }
+    @Get('getServerName')
+    async getServerName() {
+        return this.specialuserService.getServerName();
+    }
 
-  @Get('getUserLogin')
-  async getUserLogin() {
-    return this.specialuserService.getUserLogin();
-  }
+    @Get('getUserLogin')
+    async getUserLogin() {
+        return this.specialuserService.getUserLogin();
+    }
 
-  @Get('getController')
-  async getController() {
-    return this.specialuserService.getController();
-  }
+    @Get('getController')
+    async getController() {
+        return this.specialuserService.getController();
+    }
 
-  @Get('all')
-  async getAll() {
-    return this.specialuserService.getAll();
-  }
+    @Get('all')
+    async getAll() {
+        return this.specialuserService.getAll();
+    }
 }

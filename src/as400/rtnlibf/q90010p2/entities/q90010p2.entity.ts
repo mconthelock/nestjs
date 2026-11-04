@@ -58,6 +58,5 @@ export class Q90010P2 {
     Q9GOD: string;
 
     @OneToOne(() => M008KP, (m8) => m8.bmdate)
-
     bmorder: M008KP;
 }

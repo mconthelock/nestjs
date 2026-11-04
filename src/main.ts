@@ -25,9 +25,7 @@ import * as oracledb from 'oracledb';
 async function bootstrap() {
     if (process.env.HOST != 'HOME') {
         oracledb.initOracleClient({
-            libDir:
-                process.env.ORACLE_CLIENT_LIB_DIR ||
-                'C:/oracle/instantclient_23_0', // ปรับ path ตามที่ติดตั้ง Oracle Instant Client
+            libDir: process.env.ORACLE_CLIENT_LIB_DIR || 'C:/oracle/instantclient_23_0', // ปรับ path ตามที่ติดตั้ง Oracle Instant Client
         });
     }
 
@@ -96,10 +94,8 @@ async function bootstrap() {
 
                             const displayName = labelName || currentPath;
 
-                            const constraints = (
-                                Object.values(error.constraints) as string[]
-                            ).map((msg) =>
-                                msg.replace(error.property, displayName),
+                            const constraints = (Object.values(error.constraints) as string[]).map(
+                                (msg) => msg.replace(error.property, displayName),
                             );
 
                             result.push({
@@ -110,9 +106,7 @@ async function bootstrap() {
 
                         // มี nested error
                         if (error.children?.length) {
-                            result.push(
-                                ...formatErrors(error.children, currentPath),
-                            );
+                            result.push(...formatErrors(error.children, currentPath));
                         }
                     });
 
@@ -179,10 +173,7 @@ async function bootstrap() {
     app.useGlobalFilters(new AllExceptionsFilter(logger));
 
     // สร้าง config สำหรับ Swagger
-    if (
-        process.env.NODE_ENV !== 'production' &&
-        process.env.ENABLE_SWAGGER === 'true'
-    ) {
+    if (process.env.NODE_ENV !== 'production' && process.env.ENABLE_SWAGGER === 'true') {
         const swaggerConfig = new DocumentBuilder()
             .setTitle('AMEC API')
             .setDescription('API documentation for AMEC API')

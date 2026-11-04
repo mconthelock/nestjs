@@ -18,7 +18,7 @@ export class MachineRepository extends BaseRepository {
         return this.getRepository(MACHINE_NAME).findOne({
             where: {
                 MC_TYPE: dto.mcType,
-                MC_NO: dto.mcNo
+                MC_NO: dto.mcNo,
             },
         });
     }
@@ -26,7 +26,7 @@ export class MachineRepository extends BaseRepository {
     findByName(name: string) {
         return this.getRepository(MACHINE_NAME).findOne({
             where: {
-                MC_NAME: name
+                MC_NAME: name,
             },
         });
     }

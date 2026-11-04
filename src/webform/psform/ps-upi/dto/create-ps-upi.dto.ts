@@ -1,101 +1,101 @@
 import { Type } from 'class-transformer';
 import {
-	IsArray,
-	IsDateString,
-	IsNotEmpty,
-	IsNumber,
-	IsOptional,
-	IsString,
-	ValidateNested,
+    IsArray,
+    IsDateString,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+    ValidateNested,
 } from 'class-validator';
 
 export class CreatePsUpiListDataDto {
-	@IsString()
-	@IsNotEmpty()
-	PUR_CODE: string;
+    @IsString()
+    @IsNotEmpty()
+    PUR_CODE: string;
 
-	@IsString()
-	@IsNotEmpty()
-	DESC: string;
+    @IsString()
+    @IsNotEmpty()
+    DESC: string;
 
-	@IsString()
-	@IsNotEmpty()
-	DRAWING: string;
+    @IsString()
+    @IsNotEmpty()
+    DRAWING: string;
 
-	@IsString()
-	@IsNotEmpty()
-	ADDR: string;
+    @IsString()
+    @IsNotEmpty()
+    ADDR: string;
 
-	@IsString()
-	@IsNotEmpty()
-	WHI_USER: string;
+    @IsString()
+    @IsNotEmpty()
+    WHI_USER: string;
 
-	@IsString()
-	@IsNotEmpty()
-	REASON: string;
-
-	@IsOptional()
-	@IsString()
-	UNIT?: string;
-
-	@IsOptional()
-	@IsString()
-	REASON_REF_NO?: string;
+    @IsString()
+    @IsNotEmpty()
+    REASON: string;
 
     @IsOptional()
-	@IsString()
-	REASON_DETAIL?: string;
+    @IsString()
+    UNIT?: string;
 
-	@IsNumber()
-	@Type(() => Number)
-	QTY: number;
+    @IsOptional()
+    @IsString()
+    REASON_REF_NO?: string;
 
-	@IsString()
-	@IsNotEmpty()
-	PRODUCTION: string;
+    @IsOptional()
+    @IsString()
+    REASON_DETAIL?: string;
 
-	@IsString()
-	@IsNotEmpty()
-	ISSUE_TO: string;
+    @IsNumber()
+    @Type(() => Number)
+    QTY: number;
 
-	@IsString()
-	@IsDateString()
-	RETURN_DATE: string;
+    @IsString()
+    @IsNotEmpty()
+    PRODUCTION: string;
+
+    @IsString()
+    @IsNotEmpty()
+    ISSUE_TO: string;
+
+    @IsString()
+    @IsDateString()
+    RETURN_DATE: string;
 }
 
 export class CreatePsUpiDto {
-	@IsOptional()
-	@IsNumber()
-	@Type(() => Number)
-	NFRMNO?: number;
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    NFRMNO?: number;
 
-	@IsOptional()
-	@IsString()
-	VORGNO?: string;
+    @IsOptional()
+    @IsString()
+    VORGNO?: string;
 
-	@IsOptional()
-	@IsString()
-	CYEAR?: string;
+    @IsOptional()
+    @IsString()
+    CYEAR?: string;
 
-	@IsOptional()
-	@IsString()
-	CYEAR2?: string;
+    @IsOptional()
+    @IsString()
+    CYEAR2?: string;
 
-	@IsOptional()
-	@IsNumber()
-	@Type(() => Number)
-	NRUNNO?: number;
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    NRUNNO?: number;
 
-	@IsString()
-	@IsNotEmpty()
-	INPUT_BY: string;
+    @IsString()
+    @IsNotEmpty()
+    INPUT_BY: string;
 
-	@IsString()
-	@IsNotEmpty()
-	REQUEST_BY: string;
+    @IsString()
+    @IsNotEmpty()
+    REQUEST_BY: string;
 
-	@IsArray()
-	@ValidateNested({ each: true })
-	@Type(() => CreatePsUpiListDataDto)
-	LIST_DATA: CreatePsUpiListDataDto[];
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => CreatePsUpiListDataDto)
+    LIST_DATA: CreatePsUpiListDataDto[];
 }

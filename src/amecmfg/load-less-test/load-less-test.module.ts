@@ -5,8 +5,8 @@ import { LoadLessTestService } from './load-less-test.service';
 import { SYS_FOLDER_PATH } from 'src/common/Entities/escs/table/SYS_FOLDER_PATH.entity';
 
 @Module({
-    imports: [ TypeOrmModule.forFeature([SYS_FOLDER_PATH],'mitsuConnection') ],
-    controllers: [ LoadLessTestController ],
-    providers: [ LoadLessTestService ]
+    imports: [TypeOrmModule.forFeature([SYS_FOLDER_PATH], 'mitsuConnection')],
+    controllers: [LoadLessTestController],
+    providers: [LoadLessTestService],
 })
 export class LoadLessTestModule {}

@@ -8,41 +8,41 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 
 @Controller('escs/control-drawing-pis')
 export class ControlDrawingPisController {
-  constructor(private readonly controlDrawingPisService: ControlDrawingPisService) {}
-  
+    constructor(private readonly controlDrawingPisService: ControlDrawingPisService) {}
+
     @Post()
     @UseInterceptors(getFileUploadInterceptor())
     @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
     async create(@Body() dto: CreateControlDrawingPisDto) {
-      return await this.controlDrawingPisService.create(dto);
+        return await this.controlDrawingPisService.create(dto);
     }
-  
+
     @Get()
     findAll() {
-      return this.controlDrawingPisService.findAll();
+        return this.controlDrawingPisService.findAll();
     }
-  
+
     @Post('search')
-    @UseTransaction('mitsuConnection') 
+    @UseTransaction('mitsuConnection')
     async search(@Body() dto: FiltersDto) {
-      return this.controlDrawingPisService.search(dto);
+        return this.controlDrawingPisService.search(dto);
     }
-  
+
     @Get(':id')
     findOne(@Param('id') id: string) {
-      return this.controlDrawingPisService.findOne(+id);
+        return this.controlDrawingPisService.findOne(+id);
     }
-  
+
     @Patch(':id')
     @UseInterceptors(getFileUploadInterceptor())
     @UseTransaction('mitsuConnection')
     update(@Param('id') id: string, @Body() dto: UpdateControlDrawingPisDto) {
-      return this.controlDrawingPisService.update(+id, dto);
+        return this.controlDrawingPisService.update(+id, dto);
     }
-  
+
     @Delete(':id')
     @UseTransaction('mitsuConnection')
     remove(@Param('id') id: string) {
-      return this.controlDrawingPisService.remove(+id);
+        return this.controlDrawingPisService.remove(+id);
     }
 }

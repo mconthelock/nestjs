@@ -1,10 +1,4 @@
-import {
-    Controller,
-    Post,
-    Body,
-    UseInterceptors,
-    UploadedFiles,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { QainsAuditService } from './qains_audit.service';
 import { saveQainsAuditDto } from './dto/create-qains_audit.dto';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
@@ -16,10 +10,7 @@ export class QainsAuditController {
 
     @Post('saveAudit')
     @UseInterceptors(getFileUploadInterceptor('files', true, 20))
-    async saveAudit(
-        @UploadedFiles() files: Express.Multer.File[],
-        @Body() dto: saveQainsAuditDto,
-    ) {
+    async saveAudit(@UploadedFiles() files: Express.Multer.File[], @Body() dto: saveQainsAuditDto) {
         return this.qainsAuditService.saveAudit(dto, files, this.path);
     }
 }

@@ -6,14 +6,9 @@ import { MfgEdrTargetMasterController } from './mfg_edr_target_master.controller
 import { MfgEdrTargetMasterService } from './mfg_edr_target_master.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature(
-      [MfgEdrTargetMaster],
-      'mitsuConnection',
-    ),
-  ],
-  controllers: [MfgEdrTargetMasterController],
-  providers: [MfgEdrTargetMasterService],
-  exports: [MfgEdrTargetMasterService],
+    imports: [TypeOrmModule.forFeature([MfgEdrTargetMaster], 'mitsuConnection')],
+    controllers: [MfgEdrTargetMasterController],
+    providers: [MfgEdrTargetMasterService],
+    exports: [MfgEdrTargetMasterService],
 })
 export class MfgEdrTargetMasterModule {}

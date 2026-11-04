@@ -6,9 +6,7 @@ import { DPMS_PL_DOC_REV } from 'src/common/Entities/workload/table/DPMS_PL_DOC_
 import { DpmsPlDocRevRepository } from './dpms_pl_doc_rev.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([DPMS_PL_DOC_REV], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([DPMS_PL_DOC_REV], 'mitsuConnection')],
     controllers: [DpmsPlDocRevController],
     providers: [DpmsPlDocRevService, DpmsPlDocRevRepository],
     exports: [DpmsPlDocRevService],

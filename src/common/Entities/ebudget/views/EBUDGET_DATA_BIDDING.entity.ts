@@ -1,6 +1,6 @@
-import { View, ViewColumn, ViewEntity } from "typeorm";
+import { View, ViewColumn, ViewEntity } from 'typeorm';
 
-@ViewEntity({name: 'EBUDGET_DATA_BIDDING', schema: 'EBUDGET'})
+@ViewEntity({ name: 'EBUDGET_DATA_BIDDING', schema: 'EBUDGET' })
 export class EBUDGET_DATA_BIDDING {
     @ViewColumn()
     NFRMNO: number;

@@ -1,9 +1,4 @@
-import {
-    BadRequestException,
-    Injectable,
-    NotFoundException,
-    StreamableFile,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, StreamableFile } from '@nestjs/common';
 import { Response } from 'express';
 import { createReadStream, promises as fs } from 'fs'; // ฟังก์ชันอ่านไฟล์และ promise API ของ fs
 import * as path from 'path';
@@ -61,9 +56,7 @@ export class FileService {
                     size: s.isFile() ? this.calSize(s.size) : undefined,
                     path: full, // เก็บ relative path เอาไปใช้ตอนเปิดไฟล์
                     mimeType: s.isFile() ? getMimeType(name) : undefined,
-                    extension: s.isFile()
-                        ? path.extname(name).slice(1)
-                        : undefined, // เอา . ออก
+                    extension: s.isFile() ? path.extname(name).slice(1) : undefined, // เอา . ออก
                     dateModified: formatDate(s.mtime, 'DD/MM/YYYY HH:mm A'),
                 };
             }),
@@ -77,9 +70,7 @@ export class FileService {
         });
 
         // กรองตามนามสกุลที่อนุญาต
-        const allowEts = dto.allow
-            ?.filter((e) => e.trim() !== '')
-            .map((e) => e.toLowerCase());
+        const allowEts = dto.allow?.filter((e) => e.trim() !== '').map((e) => e.toLowerCase());
 
         const mode = dto.mode ?? 'all'; // 'all' | 'file' | 'dir'
 
@@ -104,9 +95,7 @@ export class FileService {
 
             if (allowEts && allowEts.length > 0) {
                 return (
-                    (e.isDir ||
-                        (e.extension &&
-                            allowEts.includes(e.extension.toLowerCase()))) &&
+                    (e.isDir || (e.extension && allowEts.includes(e.extension.toLowerCase()))) &&
                     !e.name.startsWith('~$') &&
                     !e.name.startsWith('.') &&
                     !this.skip.includes(e.name.toLowerCase())
@@ -125,24 +114,15 @@ export class FileService {
 
     private calSize(size: number): string {
         if (size < 1024) return size + ' B';
-        else if (size < 1024 * 1024)
-            return (size / 1024).toFixed(2).replace(/\.00$/, '') + ' KB';
+        else if (size < 1024 * 1024) return (size / 1024).toFixed(2).replace(/\.00$/, '') + ' KB';
         else if (size < 1024 * 1024 * 1024)
-            return (
-                (size / (1024 * 1024)).toFixed(2).replace(/\.00$/, '') + ' MB'
-            );
-        else
-            return (
-                (size / (1024 * 1024 * 1024)).toFixed(2).replace(/\.00$/, '') +
-                ' GB'
-            );
+            return (size / (1024 * 1024)).toFixed(2).replace(/\.00$/, '') + ' MB';
+        else return (size / (1024 * 1024 * 1024)).toFixed(2).replace(/\.00$/, '') + ' GB';
     }
 
     async listAllRecursively(dto: ListDto) {
         const root = safeJoin(dto.baseDir, dto.path ?? '');
-        const allowEts = dto.allow
-            ?.filter((e) => e.trim() !== '')
-            .map((e) => e.toLowerCase());
+        const allowEts = dto.allow?.filter((e) => e.trim() !== '').map((e) => e.toLowerCase());
 
         const stat = await fs.stat(root);
         if (!stat.isDirectory()) {
@@ -180,10 +160,7 @@ export class FileService {
                     await walk(fullPath, relPath);
                 } else {
                     if (allowEts && allowEts.length > 0) {
-                        const ext = path
-                            .extname(entry.name)
-                            .slice(1)
-                            .toLowerCase();
+                        const ext = path.extname(entry.name).slice(1).toLowerCase();
                         if (!allowEts.includes(ext)) continue;
                     }
                     // push file
@@ -204,22 +181,17 @@ export class FileService {
     }
 
     async saveFile(files: Express.Multer.File[], dto: SaveFileDto) {
-        let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
+        const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
         try {
             const data = [];
-            const filenames = Array.isArray(dto.filename)
-                ? dto.filename
-                : [dto.filename];
+            const filenames = Array.isArray(dto.filename) ? dto.filename : [dto.filename];
 
             console.log(filenames);
 
             for (const file of files) {
                 const extendtion = path.extname(file.originalname);
                 const shifted = filenames.shift();
-                const filename =
-                    shifted && shifted.includes('.')
-                        ? shifted
-                        : shifted + extendtion; // ถ้า filename ที่ส่งมาไม่มีนามสกุล ให้เติมนามสกุลเดิมของไฟล์ที่อัพโหลดมาให้
+                const filename = shifted && shifted.includes('.') ? shifted : shifted + extendtion; // ถ้า filename ที่ส่งมาไม่มีนามสกุล ให้เติมนามสกุลเดิมของไฟล์ที่อัพโหลดมาให้
                 const moved = dto.isPhp
                     ? await moveFileFromMulter({
                           file,

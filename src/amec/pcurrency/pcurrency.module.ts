@@ -6,9 +6,9 @@ import { PCURRENCY } from 'src/common/Entities/amec/table/PCURRENCY.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PCURRENCY], 'mitsuConnection')],
-  controllers: [PcurrencyController],
-  providers: [PcurrencyService, PcurrencyRepository],
-  exports: [PcurrencyService],
+    imports: [TypeOrmModule.forFeature([PCURRENCY], 'mitsuConnection')],
+    controllers: [PcurrencyController],
+    providers: [PcurrencyService, PcurrencyRepository],
+    exports: [PcurrencyService],
 })
 export class PcurrencyModule {}

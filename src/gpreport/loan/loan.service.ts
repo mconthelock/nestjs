@@ -44,8 +44,7 @@ export class LoanService {
         }
 
         const message =
-            dto.message ||
-            `Loan payment list${dto.sdate ? ` for ${dto.sdate}` : ''} is attached.`;
+            dto.message || `Loan payment list${dto.sdate ? ` for ${dto.sdate}` : ''} is attached.`;
 
         await this.mailService.sendMail({
             template: 'gpreport/loan/loan',
@@ -67,15 +66,9 @@ export class LoanService {
                     'วงเงินกู้',
                 ],
                 tableRows: rows.map((r) =>
-                    [
-                        r.LOANNO,
-                        r.SEMPNO,
-                        r.STNAME,
-                        r.SPOSNAME,
-                        r.SSEC,
-                        r.PAYDATE,
-                        r.AMOUNT,
-                    ].map(escape),
+                    [r.LOANNO, r.SEMPNO, r.STNAME, r.SPOSNAME, r.SSEC, r.PAYDATE, r.AMOUNT].map(
+                        escape,
+                    ),
                 ),
             },
             attachments: [

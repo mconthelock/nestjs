@@ -6,9 +6,7 @@ import { PilineSectionMstService } from './PILINE_SECTION_MST.service';
 import { PilineSectionMstRepository } from './PILINE_SECTION_MST.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([PILINE_SECTION_MST], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([PILINE_SECTION_MST], 'mitsuConnection')],
     controllers: [PilineSectionMstController],
     providers: [PilineSectionMstService, PilineSectionMstRepository],
     exports: [PilineSectionMstService],

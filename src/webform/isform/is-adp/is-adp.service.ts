@@ -20,12 +20,7 @@ export class IsAdpService {
         return this.isAdpRepository.getData(dto);
     }
 
-    async create(
-        dto: CreateIsAdpDto,
-        file: Express.Multer.File,
-        ip: string,
-        path: string,
-    ) {
+    async create(dto: CreateIsAdpDto, file: Express.Multer.File, ip: string, path: string) {
         let movedTargets: string; // เก็บ path ปลายทางที่ย้ายสำเร็จ
         try {
             // 1. สร้าง Form ก่อน

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MeetingModule } from './meeting/meeting.module';
 @Module({
-  imports: [MeetingModule]
+    imports: [MeetingModule],
 })
 export class AutomationModule {}

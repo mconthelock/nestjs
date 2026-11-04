@@ -4,12 +4,7 @@ import { WireHarnessDrumStockService } from './wire-harness-drum-stock.service';
 import { WireHarnessDrumStockRepository } from './wire-harness-drum-stock.repository';
 
 @Module({
-    controllers: [
-        WireHarnessDrumStockController,
-    ],
-    providers: [
-        WireHarnessDrumStockService,
-        WireHarnessDrumStockRepository,
-    ],
+    controllers: [WireHarnessDrumStockController],
+    providers: [WireHarnessDrumStockService, WireHarnessDrumStockRepository],
 })
 export class WireHarnessDrumStockModule {}

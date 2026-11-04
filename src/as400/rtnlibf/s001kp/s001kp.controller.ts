@@ -1,8 +1,4 @@
-import {
-    Controller,
-    Get,
-    Param,
-} from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { S001kpService } from './s001kp.service';
 
 @Controller('as400/s001kp')

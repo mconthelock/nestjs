@@ -6,10 +6,10 @@ import { updateTimelineDto } from './dto/update-dto';
 
 @Controller('sp/timeline')
 export class TimelineController {
-  constructor(private readonly times: TimelineService) {}
+    constructor(private readonly times: TimelineService) {}
 
-  @Patch()
-  async update(@Body() req: updateTimelineDto) {
-    return await this.times.update(req);
-  }
+    @Patch()
+    async update(@Body() req: updateTimelineDto) {
+        return await this.times.update(req);
+    }
 }

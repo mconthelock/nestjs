@@ -24,9 +24,7 @@ export class EbgreqattfileService {
         try {
             const res = await this.repo.insert(dto);
             if (res.identifiers.length === 0) {
-                throw new Error(
-                    'Insert EBGREQATTFILE Error: No identifiers returned',
-                );
+                throw new Error('Insert EBGREQATTFILE Error: No identifiers returned');
             }
             return {
                 status: true,

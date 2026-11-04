@@ -17,10 +17,7 @@ import { PsClmService } from './ps-clm.service';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature(
-            [PSCLM_FORM, PSCLM_DETAIL],
-            'mitsuConnection',
-        ),
+        TypeOrmModule.forFeature([PSCLM_FORM, PSCLM_DETAIL], 'mitsuConnection'),
         FormmstModule,
         FormModule,
         FlowModule,

@@ -4,12 +4,7 @@ import * as path from 'path';
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { PDFDocument } from 'pdf-lib';
 import { IdTagRepository } from './idtag.repository';
-import {
-    OrderInfo,
-    PrintedService,
-    filesData,
-    PdfProcessContext,
-} from './printed.service';
+import { OrderInfo, PrintedService, filesData, PdfProcessContext } from './printed.service';
 import { PrintedImagesService } from './printedImage.service';
 import { PrintedCnService } from './printedCn.service';
 import { PrintedMergeService } from './printedMerge.service';
@@ -58,12 +53,8 @@ export class PrintedQueueService {
                     startedAt: new Date().toISOString(),
                 });
                 try {
-                    await this.printed.writeLog(
-                        `[${jobId}] Background processing started`,
-                    );
-                    await this.printed.writeLog(
-                        `Start read source PDF in ${body.inputPath}`,
-                    );
+                    await this.printed.writeLog(`[${jobId}] Background processing started`);
+                    await this.printed.writeLog(`Start read source PDF in ${body.inputPath}`);
 
                     const outputDirectory = body.pdfDirectory;
                     const readStartTime = Date.now();
@@ -92,12 +83,7 @@ export class PrintedQueueService {
                     }[] = [];
 
                     // ขั้นตอนที่ 2: แบ่งหน้า, อ่านข้อความ และตั้งชื่อไฟล์
-                    await this.merge.splitFiles(
-                        pdfDoc,
-                        outputDirectory,
-                        pageCount,
-                        splitFilesData,
-                    );
+                    await this.merge.splitFiles(pdfDoc, outputDirectory, pageCount, splitFilesData);
 
                     // ขั้นตอนที่ 3: บันทึกข้อมูลลง Database
                     const saveStartTime = Date.now();
@@ -129,10 +115,7 @@ export class PrintedQueueService {
                     );
 
                     // ขั้นตอนที่ 7: รวม PDF กลับมาเป็น 1 ไฟล์
-                    const outFilePath = path.join(
-                        outputDirectory,
-                        `${dbdata.filename}`,
-                    );
+                    const outFilePath = path.join(outputDirectory, `${dbdata.filename}`);
                     const mergeStartTime = Date.now();
                     await this.printed.writeLog(
                         `[${jobId}] Step 7/9: starting merge to ${outFilePath}`,
@@ -142,28 +125,18 @@ export class PrintedQueueService {
                     );
                     try {
                         for (const file of splitFilesData) {
-                            const stat = await fs
-                                .stat(file.filePath)
-                                .catch(() => null);
+                            const stat = await fs.stat(file.filePath).catch(() => null);
                             await this.printed.writeLog(
                                 `[${jobId}] Step 7/9: fragment check path=${file.filePath}, exists=${Boolean(stat)}, size=${stat?.size ?? 0}`,
                             );
                         }
-                        await this.merge.mergePdfsFast(
-                            splitFilesData,
-                            outFilePath,
-                        );
-                        const mergedStat = await fs
-                            .stat(outFilePath)
-                            .catch(() => null);
+                        await this.merge.mergePdfsFast(splitFilesData, outFilePath);
+                        const mergedStat = await fs.stat(outFilePath).catch(() => null);
                         await this.printed.writeLog(
                             `[${jobId}] Step 7/9: merged PDF successfully in ${this.printed.formatElapsedTime(mergeStartTime)} -> ${outFilePath}, exists=${Boolean(mergedStat)}, size=${mergedStat?.size ?? 0}`,
                         );
                     } catch (error) {
-                        const message =
-                            error instanceof Error
-                                ? error.message
-                                : String(error);
+                        const message = error instanceof Error ? error.message : String(error);
                         await this.printed.writeLog(
                             `[${jobId}] Step 7/9 failed during merge: ${outFilePath}`,
                             message,
@@ -176,14 +149,10 @@ export class PrintedQueueService {
                         } catch (dirError) {
                             await this.printed.writeLog(
                                 `[${jobId}] Step 7/9: output dir access failed for ${outputDirectory}`,
-                                dirError instanceof Error
-                                    ? dirError.message
-                                    : String(dirError),
+                                dirError instanceof Error ? dirError.message : String(dirError),
                             );
                         }
-                        throw new Error(
-                            `Merge failed for ${outFilePath}: ${message}`,
-                        );
+                        throw new Error(`Merge failed for ${outFilePath}: ${message}`);
                     }
 
                     // ขั้นตอนที่ 8: ลดขนาด PDF ด้วย Ghostscript
@@ -199,36 +168,25 @@ export class PrintedQueueService {
                     } catch (error) {
                         await this.printed.writeLog(
                             `[${jobId}] Step 8/9: source file before compression not readable: ${outFilePath}`,
-                            error instanceof Error
-                                ? error.message
-                                : String(error),
+                            error instanceof Error ? error.message : String(error),
                         );
                         throw error;
                     }
                     let filnalFilePath: string;
                     try {
-                        filnalFilePath =
-                            await this.merge.compressPdfWithGhostscript(
-                                outFilePath,
-                            );
+                        filnalFilePath = await this.merge.compressPdfWithGhostscript(outFilePath);
                         await this.printed.writeLog(
                             `[${jobId}] Step 8/9: compressed PDF successfully in ${this.printed.formatElapsedTime(compressStartTime)} -> ${filnalFilePath}`,
                         );
                     } catch (error) {
-                        const message =
-                            error instanceof Error
-                                ? error.message
-                                : String(error);
+                        const message = error instanceof Error ? error.message : String(error);
                         await this.printed.writeLog(
                             `[${jobId}] Step 8/9 failed during Ghostscript compression: input=${outFilePath}`,
                             message,
                         );
                         try {
                             const dirCheck = await fs
-                                .access(
-                                    outputDirectory,
-                                    fs.constants.W_OK | fs.constants.X_OK,
-                                )
+                                .access(outputDirectory, fs.constants.W_OK | fs.constants.X_OK)
                                 .then(() => 'OK')
                                 .catch(
                                     (dirError) =>
@@ -251,10 +209,7 @@ export class PrintedQueueService {
                     }
 
                     // ขั้นตอนที่ 9: Rename ไฟล์ PDF เป็นชื่อตาม originalfilename
-                    const finalPath = path.join(
-                        outputDirectory,
-                        dbdata.originalfilename,
-                    );
+                    const finalPath = path.join(outputDirectory, dbdata.originalfilename);
                     try {
                         const sourceStat = await fs.stat(filnalFilePath);
                         await this.printed.writeLog(
@@ -263,25 +218,17 @@ export class PrintedQueueService {
                     } catch (error) {
                         await this.printed.writeLog(
                             `[${jobId}] Step 9/9: source before rename missing or unreadable: ${filnalFilePath}`,
-                            error instanceof Error
-                                ? error.message
-                                : String(error),
+                            error instanceof Error ? error.message : String(error),
                         );
                         throw error;
                     }
                     try {
-                        await fs.access(
-                            outputDirectory,
-                            fs.constants.W_OK | fs.constants.X_OK,
-                        );
+                        await fs.access(outputDirectory, fs.constants.W_OK | fs.constants.X_OK);
                         await this.printed.writeLog(
                             `[${jobId}] Step 9/9: target directory writable: ${outputDirectory}`,
                         );
                     } catch (error) {
-                        const message =
-                            error instanceof Error
-                                ? error.message
-                                : String(error);
+                        const message = error instanceof Error ? error.message : String(error);
                         await this.printed.writeLog(
                             `[${jobId}] Step 9/9: target directory permission denied: ${outputDirectory}`,
                             message,
@@ -299,10 +246,7 @@ export class PrintedQueueService {
                             `[${jobId}] Step 9/9: rename completed successfully -> ${finalPath}`,
                         );
                     } catch (error) {
-                        const message =
-                            error instanceof Error
-                                ? error.message
-                                : String(error);
+                        const message = error instanceof Error ? error.message : String(error);
                         await this.printed.writeLog(
                             `[${jobId}] Step 9/9 failed during rename: from=${filnalFilePath} to=${finalPath}`,
                             message,
@@ -353,9 +297,7 @@ export class PrintedQueueService {
                         totalPages: pageCount - 1,
                         fileId: fileID,
                     });
-                    await this.printed.writeLog(
-                        `[${jobId}] Background processing completed`,
-                    );
+                    await this.printed.writeLog(`[${jobId}] Background processing completed`);
                     return;
                 } catch (error) {
                     try {
@@ -378,10 +320,7 @@ export class PrintedQueueService {
                         status: 'failed',
                         message: 'Background processing failed',
                         finishedAt: new Date().toISOString(),
-                        error:
-                            error instanceof Error
-                                ? error.message
-                                : String(error),
+                        error: error instanceof Error ? error.message : String(error),
                     });
                     await this.markPdfJobFailed(body.fileid);
                     await this.printed.writeLog(
@@ -394,12 +333,7 @@ export class PrintedQueueService {
         );
     }
 
-    private async allowPrint(
-        folder: string,
-        filename: string,
-        filesId: number,
-        pageCount: number,
-    ) {
+    private async allowPrint(folder: string, filename: string, filesId: number, pageCount: number) {
         // 0 => On process
         // 1 => Hold
         // 2 => Pending Print

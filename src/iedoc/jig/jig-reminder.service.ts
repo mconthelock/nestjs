@@ -1,8 +1,4 @@
-import {
-    BadRequestException,
-    ConflictException,
-    Injectable,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { isEmail } from 'class-validator';
 import { DataSource } from 'typeorm';
@@ -77,8 +73,7 @@ export class JigReminderService {
 
     async send(dto: InspectionReminderDto = {}) {
         const asOf = this.runDate(dto.date);
-        if (this.running)
-            throw new ConflictException('JIG reminder job is already running');
+        if (this.running) throw new ConflictException('JIG reminder job is already running');
         this.running = true;
         try {
             // Oracle DATE stays a calendar date; no JS timezone conversion of the due date.
@@ -100,17 +95,12 @@ export class JigReminderService {
             const cache = new Map<string, Recipient[]>();
             const getCc = async (org: string, position: string) => {
                 const key = `${org}:${position}`;
-                if (!cache.has(key))
-                    cache.set(key, await this.cc(org, position));
+                if (!cache.has(key)) cache.set(key, await this.cc(org, position));
                 return cache.get(key)!;
             };
             for (const row of rows) {
                 const days = Number(row.DAYS_UNTIL_DUE);
-                if (
-                    !Number.isFinite(days) ||
-                    !(days < 0 || [30, 14, 7].includes(days))
-                )
-                    continue;
+                if (!Number.isFinite(days) || !(days < 0 || [30, 14, 7].includes(days))) continue;
                 const overdue = days < 0;
                 const item: any = {
                     JIG_NO: row.JIG_NO,
@@ -130,27 +120,16 @@ export class JigReminderService {
                     const cc1 = await getCc(controller.SSECCODE, '30');
                     const cc2 = await getCc(controller.SDEPCODE, '20');
                     item.originalRecipients = { to: controller, cc1, cc2 };
-                    const to = [
-                        ...new Set(
-                            (dto.to ?? [controller.SRECMAIL]).map(clean),
-                        ),
-                    ];
+                    const to = [...new Set((dto.to ?? [controller.SRECMAIL]).map(clean))];
                     const cc = [
                         ...new Set(
                             (
-                                dto.cc ??
-                                [...cc1, ...cc2].map((person) =>
-                                    clean(person.SRECMAIL),
-                                )
+                                dto.cc ?? [...cc1, ...cc2].map((person) => clean(person.SRECMAIL))
                             ).map(clean),
                         ),
                     ].filter(
                         (email) =>
-                            !to.some(
-                                (address) =>
-                                    address.toLowerCase() ===
-                                    email.toLowerCase(),
-                            ),
+                            !to.some((address) => address.toLowerCase() === email.toLowerCase()),
                     );
                     item.to = to;
                     item.cc = cc;
@@ -176,13 +155,9 @@ ${
 <p>Best regards,</p><p>JIG Yearly Inspection System<br>IE Department</p>`;
                     const issues = [];
                     if (!to.length || to.some((email) => !isEmail(email)))
-                        issues.push(
-                            'Controller/test TO email missing or invalid',
-                        );
+                        issues.push('Controller/test TO email missing or invalid');
                     if (dto.cc === undefined && (!cc1.length || !cc2.length))
-                        issues.push(
-                            'CC1 or CC2 organization position not found',
-                        );
+                        issues.push('CC1 or CC2 organization position not found');
                     if (cc.some((email) => !isEmail(email)))
                         issues.push('CC email missing or invalid');
                     item.issues = issues;
@@ -201,17 +176,13 @@ ${
                         html: item.html,
                     });
                     if (result?.rejected?.length)
-                        throw new Error(
-                            `SMTP rejected: ${result.rejected.join(', ')}`,
-                        );
+                        throw new Error(`SMTP rejected: ${result.rejected.join(', ')}`);
                     item.status = 'SENT';
                 } catch (error) {
-                    item.error =
-                        error instanceof Error ? error.message : String(error);
+                    item.error = error instanceof Error ? error.message : String(error);
                 }
             }
-            const count = (status: string) =>
-                items.filter((item) => item.status === status).length;
+            const count = (status: string) => items.filter((item) => item.status === status).length;
             return {
                 asOf,
                 dryRun: dto.dryRun ?? false,

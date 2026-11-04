@@ -98,31 +98,21 @@ export class FormmstRepository extends BaseRepository {
 
     // Form Group section
     async findAllGroup() {
-        return this.manager
-            .createQueryBuilder(FORMMST_GROUP, 'FORMMST_GROUP')
-            .getMany();
+        return this.manager.createQueryBuilder(FORMMST_GROUP, 'FORMMST_GROUP').getMany();
     }
 
     async createGroup(data: CreateFormmstGroupDto) {
         return this.getRepository(FORMMST_GROUP).save(data);
     }
 
-    async updateGroup(
-        name: string,
-        query: { VGROUPORG: string; VGROUP: string },
-    ) {
+    async updateGroup(name: string, query: { VGROUPORG: string; VGROUP: string }) {
         return this.getRepository(FORMMST_GROUP).update(query, {
             VGROUPNAME: name,
         });
     }
 
     // Form Auth section
-    async findAuth(
-        NFRMNO: number,
-        VORGNO: string,
-        CYEAR: string,
-        VEMPNO?: string,
-    ) {
+    async findAuth(NFRMNO: number, VORGNO: string, CYEAR: string, VEMPNO?: string) {
         return this.getRepository(USRAUTH).find({
             where: { NFRMNO, VORGNO, CYEAR, ...(VEMPNO && { VEMPNO }) },
         });

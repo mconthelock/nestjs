@@ -8,19 +8,12 @@ import { RootcauseController } from './rootcause.controller';
 import { RootcauseRepository } from './rootcause.repository';
 import { RootcauseService } from './rootcause.service';
 
-
 @Module({
-  imports: [
-    TypeOrmModule.forFeature(
-      [VIEW_MFG_EDR_HEAD_ROOTCAUSE, AmecOrders],
-      'mitsuConnection',
-    ),
-  ],
-  controllers: [RootcauseController],
-  providers: [
-    RootcauseService,
-    RootcauseRepository,
-  ],
-  exports: [RootcauseService],
+    imports: [
+        TypeOrmModule.forFeature([VIEW_MFG_EDR_HEAD_ROOTCAUSE, AmecOrders], 'mitsuConnection'),
+    ],
+    controllers: [RootcauseController],
+    providers: [RootcauseService, RootcauseRepository],
+    exports: [RootcauseService],
 })
 export class RootcauseModule {}

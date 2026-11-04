@@ -9,9 +9,7 @@ import { USERS_ITEM } from 'src/common/Entities/escs/table/USERS_ITEM.entity';
 
 @Injectable()
 export class UserItemRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -39,10 +37,7 @@ export class UserItemRepository extends BaseRepository {
         return this.getRepository(USERS_ITEM).save(dto);
     }
 
-    async update(
-        condition: { USR_NO: string; IT_NO: string },
-        dto: UpdateUserItemDto,
-    ) {
+    async update(condition: { USR_NO: string; IT_NO: string }, dto: UpdateUserItemDto) {
         return this.getRepository(USERS_ITEM).update(condition, dto);
     }
 

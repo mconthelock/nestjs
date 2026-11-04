@@ -58,9 +58,7 @@ export class ApplogsService {
         }
 
         if (startDate) {
-            const startOfDayBangkok = dayjs(startDate)
-                .tz('Asia/Bangkok')
-                .startOf('day');
+            const startOfDayBangkok = dayjs(startDate).tz('Asia/Bangkok').startOf('day');
             queryBuilder.andWhere('logs.LOG_DATE >= :startDate', {
                 startDate: startOfDayBangkok.toDate(),
             });
@@ -85,9 +83,7 @@ export class ApplogsService {
         const results = await queryBuilder.getRawMany();
         const appusers = await this.users.getAll();
         if (users == '2') {
-            const appname = ['Invoice', 'Marketing'].includes(server)
-                ? 'AMECISODB'
-                : server;
+            const appname = ['Invoice', 'Marketing'].includes(server) ? 'AMECISODB' : server;
             const systemLogins = appusers.filter(
                 (user) => user.SERVER_NAME == appname && user.CATEGORY == 'APP',
             );

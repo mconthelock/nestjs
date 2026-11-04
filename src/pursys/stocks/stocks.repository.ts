@@ -28,9 +28,10 @@ export class StocksRepository extends BaseRepository {
         items: Partial<StockTransactionItems>[],
     ) {
         try {
-            const transaction = await this.getRepository(
-                StockTransactions,
-            ).save({ ...stock, CREATED_AT: new Date() });
+            const transaction = await this.getRepository(StockTransactions).save({
+                ...stock,
+                CREATED_AT: new Date(),
+            });
             for (const item of items) {
                 const itemData: Partial<StockTransactionItems> = {
                     TRANSACTION_ID: transaction.ID,
@@ -44,9 +45,7 @@ export class StocksRepository extends BaseRepository {
 
                 // Update stock balances
                 if (stock.STORAGE_FROM) {
-                    const balance = await this.getRepository(
-                        StockBalances,
-                    ).findOne({
+                    const balance = await this.getRepository(StockBalances).findOne({
                         where: {
                             PRODUCT_ID: item.PRODUCT_ID,
                             STORAGENO: stock.STORAGE_FROM,
@@ -61,9 +60,7 @@ export class StocksRepository extends BaseRepository {
                 }
 
                 if (stock.STORAGE_TO) {
-                    const toBalance = await this.getRepository(
-                        StockBalances,
-                    ).findOne({
+                    const toBalance = await this.getRepository(StockBalances).findOne({
                         where: {
                             PRODUCT_ID: item.PRODUCT_ID,
                             STORAGENO: stock.STORAGE_TO,
@@ -85,9 +82,7 @@ export class StocksRepository extends BaseRepository {
                             UPDATE_AT: new Date(),
                             UPDATE_BY: stock.CREATED_BY,
                         };
-                        await this.getRepository(StockBalances).save(
-                            newBalance,
-                        );
+                        await this.getRepository(StockBalances).save(newBalance);
                     }
                 }
             }

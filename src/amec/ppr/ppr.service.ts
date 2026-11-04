@@ -7,18 +7,18 @@ import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
 export class PprService {
-  constructor(
-    @InjectRepository(PPR, 'mitsuConnection')
-    private repo: Repository<PPR>,
-    @InjectDataSource('mitsuConnection')
-    private dataSource: DataSource,
-  ) {}
+    constructor(
+        @InjectRepository(PPR, 'mitsuConnection')
+        private repo: Repository<PPR>,
+        @InjectDataSource('mitsuConnection')
+        private dataSource: DataSource,
+    ) {}
 
-  findAll() {
-    return this.repo.find();
-  }
+    findAll() {
+        return this.repo.find();
+    }
 
-  findOne(pr: string) {
-    return this.repo.findOneBy({ SPRNO: pr });
-  }
+    findOne(pr: string) {
+        return this.repo.findOneBy({ SPRNO: pr });
+    }
 }

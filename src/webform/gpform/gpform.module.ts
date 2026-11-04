@@ -6,13 +6,6 @@ import { GpTphModule } from './gp-tph/gp-tph.module';
 import { GpOtModule } from './gp-ot/gp-ot.module';
 import { GpUnfModule } from './gp-unf/gp-unf.module';
 @Module({
-    imports: [
-        GpRbModule,
-        GpFileModule,
-        GpGarModule,
-        GpTphModule,
-        GpOtModule,
-        GpUnfModule,
-    ],
+    imports: [GpRbModule, GpFileModule, GpGarModule, GpTphModule, GpOtModule, GpUnfModule],
 })
 export class GpformModule {}

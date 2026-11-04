@@ -1,12 +1,4 @@
-import {
-    IsInt,
-    Min,
-    Max,
-    ValidateIf,
-    IsString,
-    MaxLength,
-    Matches,
-} from 'class-validator';
+import { IsInt, Min, Max, ValidateIf, IsString, MaxLength, Matches } from 'class-validator';
 
 export class CreatePilineMappingMstDto {
     @IsInt()

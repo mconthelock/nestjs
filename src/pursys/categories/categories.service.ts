@@ -1,8 +1,4 @@
-import {
-    BadRequestException,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -121,15 +117,11 @@ export class CategoriesService {
     }
 
     // ➕ 1. เพิ่ม Attribute ใหม่ให้ Category
-    async addAttribute(
-        categoryId: number,
-        dto: CreateAttributeDto,
-    ): Promise<CategoryAttributes> {
+    async addAttribute(categoryId: number, dto: CreateAttributeDto): Promise<CategoryAttributes> {
         const category = await this.cate.findOne({
             where: { CATEGORY_ID: categoryId },
         });
-        if (!category)
-            throw new NotFoundException(`ไม่พบหมวดหมู่รหัส ${categoryId}`);
+        if (!category) throw new NotFoundException(`ไม่พบหมวดหมู่รหัส ${categoryId}`);
 
         // ตรวจสอบว่าชื่อ Attribute ซ้ำในหมวดหมู่นี้หรือไม่
         const existingAttr = await this.attr.findOne({
@@ -139,13 +131,9 @@ export class CategoriesService {
             },
         });
         if (existingAttr)
-            throw new BadRequestException(
-                `หมวดหมู่นี้มี Attribute ชื่อ '${dto.ATTNAME}' อยู่แล้ว`,
-            );
+            throw new BadRequestException(`หมวดหมู่นี้มี Attribute ชื่อ '${dto.ATTNAME}' อยู่แล้ว`);
 
-        const fixedOptions = dto.FIXED_OPTIONS
-            ? JSON.stringify(dto.FIXED_OPTIONS)
-            : undefined;
+        const fixedOptions = dto.FIXED_OPTIONS ? JSON.stringify(dto.FIXED_OPTIONS) : undefined;
 
         const newAttribute = this.attr.create({
             ...dto,
@@ -157,9 +145,7 @@ export class CategoriesService {
     }
 
     // 🔍 2. ดึง Attribute ทั้งหมดของ Category นี้ (ไม่รวมที่สืบทอดมา)
-    async getAttributesByCategory(
-        categoryId: number,
-    ): Promise<CategoryAttributes[]> {
+    async getAttributesByCategory(categoryId: number): Promise<CategoryAttributes[]> {
         return await this.attr.find({
             where: { category: { CATEGORY_ID: categoryId } },
         });
@@ -170,8 +156,7 @@ export class CategoriesService {
         const attribute = await this.attr.findOne({
             where: { ID: attributeId },
         });
-        if (!attribute)
-            throw new NotFoundException('ไม่พบ Attribute ที่ต้องการลบ');
+        if (!attribute) throw new NotFoundException('ไม่พบ Attribute ที่ต้องการลบ');
 
         await this.attr.remove(attribute);
         return { success: true };

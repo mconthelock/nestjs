@@ -1,11 +1,4 @@
-import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    ManyToOne,
-    JoinColumn,
-    OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Appsuser } from './appsuser.entity';
 
 @Entity({ name: 'APP_USERS_GROUP', schema: 'DOCINV' })

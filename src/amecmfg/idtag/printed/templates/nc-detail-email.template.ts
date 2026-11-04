@@ -3,9 +3,7 @@ type NcDetailEmailTemplateParams = {
     recipientName?: string;
 };
 
-export const buildNcDetailEmailTemplate = (
-    params: NcDetailEmailTemplateParams,
-): string => {
+export const buildNcDetailEmailTemplate = (params: NcDetailEmailTemplateParams): string => {
     const { reportDate, recipientName = 'ทีมงานที่เกี่ยวข้อง' } = params;
 
     return `

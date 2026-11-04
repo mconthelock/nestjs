@@ -1,8 +1,4 @@
-import {
-    BadRequestException,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
@@ -38,10 +34,7 @@ export class VendorsService {
     }
 
     async create(dto: CreateVendorDto) {
-        const nextVendorCode = await this.nextVendor(
-            dto.VENDGROUP,
-            dto.VENDPURPOSE,
-        );
+        const nextVendorCode = await this.nextVendor(dto.VENDGROUP, dto.VENDPURPOSE);
         dto = { ...dto, VND_CODE: nextVendorCode, CREATE_AT: new Date() };
         delete dto.VENDGROUP;
         delete dto.VENDPURPOSE;
@@ -52,9 +45,7 @@ export class VendorsService {
     async update(vndCode: string, dto: UpdateVendorDto) {
         const vendor = await this.vnd.findOne({ where: { VND_CODE: vndCode } });
         if (!vendor) {
-            throw new NotFoundException(
-                `Vendor with code ${vndCode} not found`,
-            );
+            throw new NotFoundException(`Vendor with code ${vndCode} not found`);
         }
         Object.assign(vendor, dto);
         return this.vnd.save(vendor);
@@ -72,11 +63,7 @@ export class VendorsService {
         }
         const vendors = await this.vnd.find();
         const nextVendor = vendors
-            .filter(
-                (v) =>
-                    parseInt(v.VND_CODE) >= minCode &&
-                    parseInt(v.VND_CODE) <= maxCode,
-            )
+            .filter((v) => parseInt(v.VND_CODE) >= minCode && parseInt(v.VND_CODE) <= maxCode)
             .sort((a, b) => parseInt(a.VND_CODE) - parseInt(b.VND_CODE))
             .pop();
         const nextVendorCode = nextVendor

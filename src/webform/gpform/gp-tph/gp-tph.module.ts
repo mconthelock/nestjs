@@ -18,20 +18,28 @@ import { RepModule } from 'src/webform/rep/rep.module';
 import { UsersModule } from 'src/amec/users/users.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature(
-      [GPTPH_AREAS,GPTPH_LOCATION,GPTPH_REQ_HEADER,GPTPH_APPLICANT,GPTPH_AREA_RECORD,FLOW],
-      'mitsuConnection',),
-              FormmstModule,
-              FormModule,
-              FlowModule,
-              FlowmstModule,
-              OrgposModule,
-              RepModule,
-              UsersModule,
-  ],
-  controllers: [GpTphController],
-  providers: [GpTphService, GpTphRepository],
-  exports: [GpTphService],
+    imports: [
+        TypeOrmModule.forFeature(
+            [
+                GPTPH_AREAS,
+                GPTPH_LOCATION,
+                GPTPH_REQ_HEADER,
+                GPTPH_APPLICANT,
+                GPTPH_AREA_RECORD,
+                FLOW,
+            ],
+            'mitsuConnection',
+        ),
+        FormmstModule,
+        FormModule,
+        FlowModule,
+        FlowmstModule,
+        OrgposModule,
+        RepModule,
+        UsersModule,
+    ],
+    controllers: [GpTphController],
+    providers: [GpTphService, GpTphRepository],
+    exports: [GpTphService],
 })
 export class GpTphModule {}

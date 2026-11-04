@@ -54,21 +54,14 @@ export class LoggerService {
                 const group = groupedLogs.get(log.requestId);
                 if (log.level === 'info' && log.method && log.url) {
                     group.mainLog = log;
-                } else if (
-                    log.level === 'debug' &&
-                    log.message.includes('[QUERY]')
-                ) {
+                } else if (log.level === 'debug' && log.message.includes('[QUERY]')) {
                     group.debugLogs.push(log);
                 } else if (log.level === 'error') {
                     group.debugLogs.push(log);
                 }
             }
             // logs ที่ไม่มี requestId หรือเป็น info/error แต่ไม่ใช่ HTTP Request
-            else if (
-                log.level === 'info' ||
-                log.level === 'error' ||
-                !log.requestId
-            ) {
+            else if (log.level === 'info' || log.level === 'error' || !log.requestId) {
                 standaloneInfoLogs.push(log);
             }
         }
@@ -80,13 +73,11 @@ export class LoggerService {
                 const mergedLog = {
                     ...group.mainLog,
                     queries:
-                        group.debugLogs.filter((l) => l.level === 'debug')
-                            .length > 0
+                        group.debugLogs.filter((l) => l.level === 'debug').length > 0
                             ? group.debugLogs.filter((l) => l.level === 'debug')
                             : undefined,
                     errors:
-                        group.debugLogs.filter((l) => l.level === 'error')
-                            .length > 0
+                        group.debugLogs.filter((l) => l.level === 'error').length > 0
                             ? group.debugLogs.filter((l) => l.level === 'error')
                             : undefined,
                 };
@@ -97,9 +88,7 @@ export class LoggerService {
         // เพิ่ม standalone logs
         mergedLogs.push(...standaloneInfoLogs);
         mergedLogs.sort(
-            (a, b) =>
-                new Date(a.timestamp).getTime() -
-                new Date(b.timestamp).getTime(),
+            (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
         );
         return mergedLogs;
     }

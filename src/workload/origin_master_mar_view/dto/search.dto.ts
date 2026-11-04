@@ -1,15 +1,14 @@
-import { Type } from "class-transformer";
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { Type } from 'class-transformer';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class SearchOriginMasterMarViewDto {
-    
     @IsOptional()
     @IsString()
     DRAWING?: string;
 
     @IsOptional()
     @IsNumber()
-    @Type(() => Number) 
+    @Type(() => Number)
     ITEMNO?: number;
 
     @IsOptional()

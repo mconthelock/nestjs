@@ -43,10 +43,10 @@ export class MfgDrawingCreateChecksheetService {
             if (!item.status) {
                 throw new Error(`Item Mfg with id ${dto.NITEMID} not found`);
             }
-            
+
             const itemData: ITEM_MFG = item.data;
             const blockName = itemData.BLOCK_MASTER ? itemData.BLOCK_MASTER.VNAME : null;
-            const itemName  = itemData.VITEM_NAME;
+            const itemName = itemData.VITEM_NAME;
             const itemLists: ITEM_MFG_LIST[] = itemData.ITEM_LIST;
             const deleteLists: ITEM_MFG_DELETE[] = itemData.DELETE_LIST;
             const controlLists: CONTROL_DRAWING_PIS[] = itemData.CONTROL_LIST;
@@ -54,9 +54,7 @@ export class MfgDrawingCreateChecksheetService {
             const masterPath: string = itemData.VPATH;
 
             if (!masterPath) {
-                throw new Error(
-                    `Master path not found for item ${itemName}`,
-                );
+                throw new Error(`Master path not found for item ${itemName}`);
             }
 
             let listOfCS: {
@@ -64,13 +62,11 @@ export class MfgDrawingCreateChecksheetService {
                 VNUMBER_FILE: string;
             } = null;
 
-            const deleteList: string[] = deleteLists
-                .filter((d) => d.NSTATUS == 1)
-                .map((d) => d.VDRAWING) || [];
+            const deleteList: string[] =
+                deleteLists.filter((d) => d.NSTATUS == 1).map((d) => d.VDRAWING) || [];
 
-            const controlList: string[] = controlLists
-                .filter((c) => c.NSTATUS == 1)
-                .map((c) => c.VDRAWING) || [];
+            const controlList: string[] =
+                controlLists.filter((c) => c.NSTATUS == 1).map((c) => c.VDRAWING) || [];
 
             const createSerialList = (type: number) =>
                 dto.ASERIALNO.map((sn) => ({
@@ -78,7 +74,7 @@ export class MfgDrawingCreateChecksheetService {
                     NTYPE: type,
                 }));
 
-            let controlNo: string = dto.VCONTROLNO;
+            const controlNo: string = dto.VCONTROLNO;
             let processNo: string = dto.VPROCESSNO;
             let drawing: string;
             let fileName: string;
@@ -88,37 +84,59 @@ export class MfgDrawingCreateChecksheetService {
 
             switch (typeName) {
                 case 'multi':
-                    destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
-                    drawing     = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
-                    fileName    = itemData.VFILE;
-                    newfileName = controlNo; 
-                    serialList  = createSerialList(1);
+                    destination = await this.drawingFileHelper.getDestinationPath(
+                        blockName,
+                        itemName,
+                    );
+                    drawing = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
+                    fileName = itemData.VFILE;
+                    newfileName = controlNo;
+                    serialList = createSerialList(1);
                     break;
                 case 'pisMulti':
-                    destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
-                    drawing     = await this.drawingResolverHelper.getDrawingByPis(dto.VPIS, controlList);
-                    listOfCS    = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawing);
-                    fileName    = listOfCS.VNUMBER_FILE;  
+                    destination = await this.drawingFileHelper.getDestinationPath(
+                        blockName,
+                        itemName,
+                    );
+                    drawing = await this.drawingResolverHelper.getDrawingByPis(
+                        dto.VPIS,
+                        controlList,
+                    );
+                    listOfCS = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawing);
+                    fileName = listOfCS.VNUMBER_FILE;
                     newfileName = dto.VPIS;
-                    serialList  = createSerialList(2);
+                    serialList = createSerialList(2);
                     break;
                 case 'feeder':
-                    const info  = await this.drawingResolverHelper.getFeederInfo(controlNo); 
+                    const info = await this.drawingResolverHelper.getFeederInfo(controlNo);
                     destination = await this.drawingFileHelper.getPathFeeder(info.folderPath);
-                    drawing     = this.drawingParserHelper.extractDrawingNo(info.drawing);
-                    processNo   = this.drawingParserHelper.extractProcessCode(processNo);
-                    fileName    = await this.drawingFileHelper.findFeederFileName(drawing, processNo, masterPath);
-                    const rev   = await this.drawingFileHelper.getRevisionCheckSheetFeeder(masterPath, fileName);
+                    drawing = this.drawingParserHelper.extractDrawingNo(info.drawing);
+                    processNo = this.drawingParserHelper.extractProcessCode(processNo);
+                    fileName = await this.drawingFileHelper.findFeederFileName(
+                        drawing,
+                        processNo,
+                        masterPath,
+                    );
+                    const rev = await this.drawingFileHelper.getRevisionCheckSheetFeeder(
+                        masterPath,
+                        fileName,
+                    );
                     newfileName = `${drawing}-${processNo}-${rev}`;
                     break;
                 default:
-                    destination = await this.drawingFileHelper.getDestinationPath(blockName, itemName);
-                    drawing     = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
-                    const drawingCheck = await this.drawingResolverHelper.checkBreakAssyDrawing(controlNo, drawing);
-                    listOfCS    = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawingCheck);
-                    fileName    = listOfCS.VNUMBER_FILE;
+                    destination = await this.drawingFileHelper.getDestinationPath(
+                        blockName,
+                        itemName,
+                    );
+                    drawing = await this.drawingResolverHelper.getDrawingByControlNo(controlNo);
+                    const drawingCheck = await this.drawingResolverHelper.checkBreakAssyDrawing(
+                        controlNo,
+                        drawing,
+                    );
+                    listOfCS = this.drawingMatcherHelper.getDataListOfCS(itemLists, drawingCheck);
+                    fileName = listOfCS.VNUMBER_FILE;
                     newfileName = controlNo;
-                    serialList  = createSerialList(1);
+                    serialList = createSerialList(1);
                     break;
             }
 
@@ -145,7 +163,7 @@ export class MfgDrawingCreateChecksheetService {
                         userCreate: dto.NUSERCREATE,
                     });
                 }
-            } 
+            }
 
             await this.drawingFileHelper.createFile(
                 insertData,
@@ -156,7 +174,7 @@ export class MfgDrawingCreateChecksheetService {
                 typeName,
             );
 
-            const res = await this.mfgDrawingService.findOne(insertData.NID);    
+            const res = await this.mfgDrawingService.findOne(insertData.NID);
             return {
                 data: res.data,
                 message: dto.REVISE ? 'Revise Checksheet Success' : message,
@@ -200,7 +218,7 @@ export class MfgDrawingCreateChecksheetService {
                 drawing,
                 pis,
                 controlNo,
-                processNo
+                processNo,
             );
 
             // สร้างใหม่ ถ้าไม่มีข้อมูลหรือมีแต่ inspector status = 1 แต่ถ้ามีข้อมูลให้ return ข้อมูลนั้นแทน
@@ -243,10 +261,7 @@ export class MfgDrawingCreateChecksheetService {
                 ) {
                     data.NSTATUS = 3;
                     if (isDataExist.data.VFILE_NAME) {
-                        const filePath = await joinPaths(
-                            path,
-                            isDataExist.data.VFILE_NAME,
-                        );
+                        const filePath = await joinPaths(path, isDataExist.data.VFILE_NAME);
                         await deleteFile(filePath);
                     }
                 }
@@ -260,11 +275,9 @@ export class MfgDrawingCreateChecksheetService {
             ) {
                 const insert = await this.mfgDrawingService.create(data);
                 if (!insert.status) {
-                    throw new Error(
-                        `Insert MFG_DRAWING Failed: ${insert.message}`,
-                    );
+                    throw new Error(`Insert MFG_DRAWING Failed: ${insert.message}`);
                 }
-                
+
                 return insert.data;
             } else {
                 return isDataExist.data;
@@ -296,15 +309,15 @@ export class MfgDrawingCreateChecksheetService {
                 { field: 'VDRAWING', op: 'eq', value: drawing },
             ];
 
-            if(pis){
+            if (pis) {
                 condition.push({ field: 'VPIS', op: 'eq', value: pis });
             }
 
-            if(controlNo){
+            if (controlNo) {
                 condition.push({ field: 'VCONTROLNO', op: 'eq', value: controlNo });
             }
 
-            if(processNo){
+            if (processNo) {
                 condition.push({ field: 'VPROCESSNO', op: 'eq', value: processNo });
             }
 
@@ -316,9 +329,7 @@ export class MfgDrawingCreateChecksheetService {
                 status: drawingData.data.length > 0,
                 data: drawingData.data?.[0] || null,
                 message:
-                    drawingData.data.length > 0
-                        ? 'Data already exists'
-                        : 'Data does not exist',
+                    drawingData.data.length > 0 ? 'Data already exists' : 'Data does not exist',
             };
         } catch (error) {
             throw new Error('Check Data Exist Failed: ' + error.message);

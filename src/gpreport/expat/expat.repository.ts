@@ -59,10 +59,8 @@ export class ExpatRepository extends BaseRepository {
             ])
             .where("U.CSTATUS = '1'")
             .orderBy('E.SEMPNO', 'ASC');
-        if (company?.toUpperCase() === 'RHQ')
-            qb.andWhere(`U.SDIVCODE = '140101'`);
-        if (company?.toUpperCase() === 'AMEC')
-            qb.andWhere(`U.SDIVCODE <> '140101'`);
+        if (company?.toUpperCase() === 'RHQ') qb.andWhere(`U.SDIVCODE = '140101'`);
+        if (company?.toUpperCase() === 'AMEC') qb.andWhere(`U.SDIVCODE <> '140101'`);
         return qb.getRawMany();
     }
 
@@ -109,10 +107,7 @@ export class ExpatRepository extends BaseRepository {
     }
 
     async updateEmployee(sempno: string, data: Partial<ExpatEmployee>) {
-        await this.getRepository(ExpatEmployee).update(
-            { SEMPNO: sempno },
-            data,
-        );
+        await this.getRepository(ExpatEmployee).update({ SEMPNO: sempno }, data);
         return this.findOneEmployee(sempno);
     }
 
@@ -144,15 +139,8 @@ export class ExpatRepository extends BaseRepository {
         return repo.save(repo.create(data));
     }
 
-    async updateFamily(
-        sempno: string,
-        fid: number,
-        data: Partial<ExpatFamily>,
-    ) {
-        await this.getRepository(ExpatFamily).update(
-            { SEMPNO: sempno, FID: fid },
-            data,
-        );
+    async updateFamily(sempno: string, fid: number, data: Partial<ExpatFamily>) {
+        await this.getRepository(ExpatFamily).update({ SEMPNO: sempno, FID: fid }, data);
         return this.findOneFamily(sempno, fid);
     }
 
@@ -251,12 +239,7 @@ export class ExpatRepository extends BaseRepository {
         return repo.save(repo.create(data));
     }
 
-    deleteFamilyFile(
-        sempno: string,
-        fid: number,
-        fileType: string,
-        fileId: number,
-    ) {
+    deleteFamilyFile(sempno: string, fid: number, fileType: string, fileId: number) {
         return this.getRepository(ExpatFamilyFile).delete({
             SEMPNO: sempno,
             FID: fid,
@@ -290,11 +273,7 @@ export class ExpatRepository extends BaseRepository {
         });
     }
 
-    async updateEmployeeFile(
-        sempno: string,
-        fileType: string,
-        data: Partial<ExpatEmployeeFile>,
-    ) {
+    async updateEmployeeFile(sempno: string, fileType: string, data: Partial<ExpatEmployeeFile>) {
         await this.getRepository(ExpatEmployeeFile).update(
             {
                 SEMPNO: sempno,
@@ -337,10 +316,7 @@ export class ExpatRepository extends BaseRepository {
     }
 
     async updateTravel(travelId: number, data: Partial<ExpatTravel>) {
-        await this.getRepository(ExpatTravel).update(
-            { TRAVEL_ID: travelId },
-            data,
-        );
+        await this.getRepository(ExpatTravel).update({ TRAVEL_ID: travelId }, data);
         return this.findOneTravel(travelId);
     }
 

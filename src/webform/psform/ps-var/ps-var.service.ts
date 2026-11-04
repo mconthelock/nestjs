@@ -14,12 +14,9 @@ export class PsVarService {
     ) {}
 
     async CreateForm(data: CreatePsVarDto, ip: string) {
-        const formmst =
-            await this.formmstService.getFormMasterByVaname('PS-VAR');
+        const formmst = await this.formmstService.getFormMasterByVaname('PS-VAR');
         if (!formmst) {
-            throw new Error(
-                'Form master not found for PS-VAR. Check FORMMST table.',
-            );
+            throw new Error('Form master not found for PS-VAR. Check FORMMST table.');
         }
         const createForm = await this.formCreateService.create(
             {

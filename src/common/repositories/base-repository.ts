@@ -123,13 +123,7 @@ export class BaseRepository {
                     node.OR.forEach((n, i) => {
                         qb2[i === 0 ? 'where' : 'orWhere'](
                             new Brackets((qb3) => {
-                                this.applyFilterNode(
-                                    qb3,
-                                    alias,
-                                    n,
-                                    allowedFields,
-                                    idx,
-                                );
+                                this.applyFilterNode(qb3, alias, n, allowedFields, idx);
                             }),
                         );
                     });
@@ -142,9 +136,7 @@ export class BaseRepository {
 
         const param = `val_${idx.value++}`;
 
-        const column = node.field.includes('.')
-            ? node.field
-            : `${alias}.${node.field}`;
+        const column = node.field.includes('.') ? node.field : `${alias}.${node.field}`;
 
         this.applyCondition(qb, column, node.op, node.value, param);
     }

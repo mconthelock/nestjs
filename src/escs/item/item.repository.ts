@@ -7,9 +7,7 @@ import { SearchItemDto } from './dto/search-escs-item.dto';
 
 @Injectable()
 export class ItemRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -31,14 +29,7 @@ export class ItemRepository extends BaseRepository {
     }
 
     getItem(searchDto: SearchItemDto) {
-        const {
-            IT_NO,
-            IT_USERUPDATE,
-            IT_STATUS,
-            SEC_ID,
-            IT_QCDATE,
-            IT_MFGDATE,
-        } = searchDto;
+        const { IT_NO, IT_USERUPDATE, IT_STATUS, SEC_ID, IT_QCDATE, IT_MFGDATE } = searchDto;
         return this.getRepository(ITEM).find({
             where: [
                 {

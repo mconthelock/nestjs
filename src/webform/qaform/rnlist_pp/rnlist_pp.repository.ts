@@ -9,68 +9,65 @@ import { CreateRnlistDto } from '../rnlist/dto/create-rnlist.dto';
 
 @Injectable()
 export class RnlistPpRepository extends BaseRepository {
-  constructor(
-    @InjectDataSource('mitsuConnection') ds: DataSource,
-  ) {
-    super(ds);
-  }
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
+        super(ds);
+    }
 
-  findAll() {
-    return this.manager.find(RNLIST_PP);
-  }
+    findAll() {
+        return this.manager.find(RNLIST_PP);
+    }
 
-  findOne(
-    nfrmno: number,
-    vorgno: string,
-    cyear: string,
-    cyear2: string,
-    nrunno: number,
-    id: number,
-  ) {
-    return this.getRepository(RNLIST_PP).findOneBy({
-      NFRMNO: Number(nfrmno),
-      VORGNO: vorgno,
-      CYEAR: cyear,
-      CYEAR2: cyear2,
-      NRUNNO: Number(nrunno),
-      ID: Number(id),
-    });
-  }
+    findOne(
+        nfrmno: number,
+        vorgno: string,
+        cyear: string,
+        cyear2: string,
+        nrunno: number,
+        id: number,
+    ) {
+        return this.getRepository(RNLIST_PP).findOneBy({
+            NFRMNO: Number(nfrmno),
+            VORGNO: vorgno,
+            CYEAR: cyear,
+            CYEAR2: cyear2,
+            NRUNNO: Number(nrunno),
+            ID: Number(id),
+        });
+    }
 
-  async search(dto: FiltersDto) {
-    const qb = this.manager.createQueryBuilder(RNLIST_PP, 'R');
+    async search(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(RNLIST_PP, 'R');
 
-    this.applyFilters(qb, 'R', dto, [
-      'NFRMNO',
-      'VORGNO',
-      'CYEAR',
-      'CYEAR2',
-      'NRUNNO',
-      'ID',
-      'ORDERNO',
-      'DWGNO',
-      'PROJNO',
-      'PROD',
-      'ITEM',
-      'PART',
-      'MODEL',
-      'QTY',
-      'LOSS',
-      'GENORDNO',
-      'ORIGINORD',
-      'GENDATE',
-      'REFNO',
-    ]);
+        this.applyFilters(qb, 'R', dto, [
+            'NFRMNO',
+            'VORGNO',
+            'CYEAR',
+            'CYEAR2',
+            'NRUNNO',
+            'ID',
+            'ORDERNO',
+            'DWGNO',
+            'PROJNO',
+            'PROD',
+            'ITEM',
+            'PART',
+            'MODEL',
+            'QTY',
+            'LOSS',
+            'GENORDNO',
+            'ORIGINORD',
+            'GENDATE',
+            'REFNO',
+        ]);
 
-    return qb.getMany();
-  }
+        return qb.getMany();
+    }
 
     create(dto: CreateRnlistDto) {
-      return this.manager.save(RNLIST_PP, dto);
+        return this.manager.save(RNLIST_PP, dto);
     }
 
     createMany(dto: CreateRnlistDto[]) {
-      return this.manager.save(RNLIST_PP, dto);
+        return this.manager.save(RNLIST_PP, dto);
     }
-  
 }

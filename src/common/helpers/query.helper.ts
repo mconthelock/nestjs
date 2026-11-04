@@ -61,20 +61,12 @@ export async function applyDynamicFilters(qb, filters: any, alias: string) {
     for (const { key, value } of directFilters) {
         const visual_key = key;
         const paramName = `${alias}_${visual_key}_${Math.random().toString(36).substring(7)}`;
-        const { sql, params } = await parseCondition(
-            alias,
-            visual_key,
-            value,
-            paramName,
-        );
+        const { sql, params } = await parseCondition(alias, visual_key, value, paramName);
 
         if (sql) {
             const processedParams = {};
             for (const [paramKey, paramValue] of Object.entries(params)) {
-                if (
-                    typeof paramValue === 'string' &&
-                    /^\d{4}-\d{2}-\d{2}/.test(paramValue)
-                ) {
+                if (typeof paramValue === 'string' && /^\d{4}-\d{2}-\d{2}/.test(paramValue)) {
                     processedParams[paramKey] = normalizeDateFilter(
                         paramValue,
                         paramKey.includes('_end') || key.startsWith('END_'),
@@ -98,10 +90,7 @@ export async function applyDynamicFilters(qb, filters: any, alias: string) {
         const conditions: string[] = [];
 
         if (hasStart) {
-            params[`${paramName}_start`] = normalizeDateFilter(
-                range.start,
-                false,
-            );
+            params[`${paramName}_start`] = normalizeDateFilter(range.start, false);
             conditions.push(`${alias}.${field} >= :${paramName}_start`);
         }
 
@@ -130,12 +119,7 @@ export async function parseCondition(
         const sqls: string[] = [];
         let params: Record<string, any> = {};
         for (let i = 0; i < val.length; i++) {
-            const r = await parseCondition(
-                alias,
-                field,
-                val[i],
-                `${pName}_a${i}`,
-            );
+            const r = await parseCondition(alias, field, val[i], `${pName}_a${i}`);
             if (r.sql) {
                 sqls.push(r.sql);
                 params = { ...params, ...r.params };
@@ -192,9 +176,7 @@ export async function parseCondition(
     }
 
     // BETWEEN check: "BETWEEN '20260907' AND '20261007'"
-    const between = val.match(
-        /^\s*BETWEEN\s+'?([^']+?)'?\s+AND\s+'?([^']+?)'?\s*$/i,
-    );
+    const between = val.match(/^\s*BETWEEN\s+'?([^']+?)'?\s+AND\s+'?([^']+?)'?\s*$/i);
     if (between) {
         return {
             sql: `${column} BETWEEN :${pName}_1 AND :${pName}_2`,
@@ -204,11 +186,7 @@ export async function parseCondition(
 
     // LIKE check: "LIKE '445'"
     if (val.toUpperCase().includes('LIKE')) {
-        const cleanVal = val
-            .replace(/LIKE/i, '')
-            .replace(/'/g, '')
-            .trim()
-            .toUpperCase();
+        const cleanVal = val.replace(/LIKE/i, '').replace(/'/g, '').trim().toUpperCase();
         return {
             sql: `${column} LIKE :${pName}`,
             params: { [pName]: `%${cleanVal}%` }, // Auto-wrapping in % for convenience
@@ -240,9 +218,7 @@ export async function extractOp(str: string) {
 
 // Parses "BETWEEN '20260907' AND '20261007'" into ['20260907', '20261007']
 function parseBetweenValue(value: string): [string, string] {
-    const match = value.match(
-        /^\s*BETWEEN\s+'?([^']+?)'?\s+AND\s+'?([^']+?)'?\s*$/i,
-    );
+    const match = value.match(/^\s*BETWEEN\s+'?([^']+?)'?\s+AND\s+'?([^']+?)'?\s*$/i);
     if (match) return [match[1], match[2]];
     return ['', ''];
 }
@@ -293,18 +269,14 @@ export async function parseConditionString(condition: FiltersDto) {
             case 'in':
                 let inValues = '';
                 if (Array.isArray(f.value))
-                    inValues = f.value
-                        .map((v) => `${sep}${v}${sep}`)
-                        .join(', ');
+                    inValues = f.value.map((v) => `${sep}${v}${sep}`).join(', ');
                 query += ` ${and} ${f.field} IN (${inValues})`;
                 break;
 
             case 'notIn':
                 let notInValues = '';
                 if (Array.isArray(f.value))
-                    notInValues = f.value
-                        .map((v) => `${sep}${v}${sep}`)
-                        .join(', ');
+                    notInValues = f.value.map((v) => `${sep}${v}${sep}`).join(', ');
                 query += ` ${and} ${f.field} NOT IN (${notInValues})`;
                 break;
 
@@ -350,11 +322,7 @@ export async function parseCreateString(condition: FiltersDto, table: string) {
     return `INSERT INTO ${table} (${column}) VALUES (${values})`;
 }
 
-export async function parseUpdateString(
-    value: FiltersDto,
-    condition: FiltersDto,
-    table: string,
-) {
+export async function parseUpdateString(value: FiltersDto, condition: FiltersDto, table: string) {
     let column = '';
     const conditionString = await parseConditionString(condition);
     value.filters.forEach((f, i) => {

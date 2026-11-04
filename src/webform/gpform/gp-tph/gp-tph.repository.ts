@@ -14,13 +14,12 @@ import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 @Injectable()
 export class GpTphRepository extends BaseRepository {
-
     constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
     findAllAreas() {
         return this.getRepository(GPTPH_AREAS).find({
-            relations: ['LOCATION']
+            relations: ['LOCATION'],
         });
     }
 
@@ -31,7 +30,8 @@ export class GpTphRepository extends BaseRepository {
     }
 
     lockRequest(form: FormDto) {
-        return this.getRepository(GPTPH_REQ_HEADER).createQueryBuilder('request')
+        return this.getRepository(GPTPH_REQ_HEADER)
+            .createQueryBuilder('request')
             .setLock('pessimistic_write')
             .where('request.NFRMNO = :NFRMNO', form)
             .andWhere('request.VORGNO = :VORGNO', form)
@@ -77,9 +77,7 @@ export class GpTphRepository extends BaseRepository {
             });
 
             if (areaOwnerSteps.length !== 1) {
-                throw new Error(
-                    `GP-TPH flow must contain exactly one Area Owner step ${stepNo}`,
-                );
+                throw new Error(`GP-TPH flow must contain exactly one Area Owner step ${stepNo}`);
             }
 
             const [areaOwnerStep] = areaOwnerSteps;
@@ -120,11 +118,21 @@ export class GpTphRepository extends BaseRepository {
                     AND CAPVSTNO = '0' AND CSTEPST IN ('1', '2', '3')
                     AND (VAPVNO = :14 OR VREPNO = :15)`,
                 [
-                    '1', '5',
-                    params.DAPVDATE, params.CAPVTIME, params.VREMARK,
-                    params.VREMOTE, params.VREALAPV,
-                    form.NFRMNO, form.VORGNO, form.CYEAR, form.CYEAR2,
-                    form.NRUNNO, nextStep, params.VREALAPV, params.VREALAPV,
+                    '1',
+                    '5',
+                    params.DAPVDATE,
+                    params.CAPVTIME,
+                    params.VREMARK,
+                    params.VREMOTE,
+                    params.VREALAPV,
+                    form.NFRMNO,
+                    form.VORGNO,
+                    form.CYEAR,
+                    form.CYEAR2,
+                    form.NRUNNO,
+                    nextStep,
+                    params.VREALAPV,
+                    params.VREALAPV,
                 ],
             );
             nextStep = matching[0].CSTEPNEXTNO;
@@ -133,7 +141,7 @@ export class GpTphRepository extends BaseRepository {
 
     findAllLocations() {
         return this.getRepository(GPTPH_LOCATION).find({
-            relations: ['AREAS']
+            relations: ['AREAS'],
         });
     }
     async findOne(dto: FormDto) {
@@ -175,15 +183,15 @@ export class GpTphRepository extends BaseRepository {
         }*/
 
     async CreateGpTphReq(dto: CreateGpTphReqDto) {
-        return this.getRepository(GPTPH_REQ_HEADER).save(dto)
+        return this.getRepository(GPTPH_REQ_HEADER).save(dto);
     }
 
     async CreateGpTphApplicant(dto: CreateGpTphlistApplicantDto) {
-        return this.getRepository(GPTPH_APPLICANT).save(dto)
+        return this.getRepository(GPTPH_APPLICANT).save(dto);
     }
 
     async CreateGpTphArearecord(dto: GPTPH_AREA_RECORD) {
-        return this.getRepository(GPTPH_AREA_RECORD).save(dto)
+        return this.getRepository(GPTPH_AREA_RECORD).save(dto);
     }
 
     async replaceRequest(
@@ -256,5 +264,4 @@ export class GpTphRepository extends BaseRepository {
         await areaRepository.update({ AREA_ID: id }, dto);
         return areaRepository.findOneByOrFail({ AREA_ID: id });
     }
-
 }

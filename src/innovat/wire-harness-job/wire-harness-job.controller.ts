@@ -5,9 +5,7 @@ import { WireHarnessJobService } from './wire-harness-job.service';
 @ApiTags('Wire Harness Job')
 @Controller('innovat/wire-harness-job')
 export class WireHarnessJobController {
-    constructor(
-        private readonly service: WireHarnessJobService,
-    ) {}
+    constructor(private readonly service: WireHarnessJobService) {}
 
     @Post('sync-production-plan')
     @HttpCode(HttpStatus.OK)

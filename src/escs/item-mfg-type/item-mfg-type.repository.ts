@@ -9,40 +9,36 @@ import { ITEM_MFG_TYPE } from 'src/common/Entities/escs/table/ITEM_MFG_TYPE.enti
 
 @Injectable()
 export class ItemMfgTypeRepository extends BaseRepository {
-  constructor(
-    @InjectDataSource('mitsuConnection') ds: DataSource,
-    ) {
-    super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
-  }
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
+    }
 
-  async create(dto: CreateItemMfgTypeDto) {
-    return this.getRepository(ITEM_MFG_TYPE).save(dto);
-  }
+    async create(dto: CreateItemMfgTypeDto) {
+        return this.getRepository(ITEM_MFG_TYPE).save(dto);
+    }
 
-  findAll() {
-    // ใช้ได้ทั้งหมด
-    // return this.manager.query(`select * from ITEM_MFG_TYPE`);
-    // return this.getRepository(ITEM_MFG_TYPE).find();
-    return this.manager.find(ITEM_MFG_TYPE);
-  }
+    findAll() {
+        // ใช้ได้ทั้งหมด
+        // return this.manager.query(`select * from ITEM_MFG_TYPE`);
+        // return this.getRepository(ITEM_MFG_TYPE).find();
+        return this.manager.find(ITEM_MFG_TYPE);
+    }
 
-  findOne(id: number) {
-    return this.getRepository(ITEM_MFG_TYPE).findOneBy({ NTYPE: id });
-  }
+    findOne(id: number) {
+        return this.getRepository(ITEM_MFG_TYPE).findOneBy({ NTYPE: id });
+    }
 
-  async search(dto: FiltersDto) {
-    const qb = this.manager.createQueryBuilder(ITEM_MFG_TYPE, 'I');
-    this.applyFilters(qb, 'I', dto, [
-      'NTYPE',
-    ]);
-    return qb.orderBy('I.NTYPE', 'ASC').getMany();
-  }
+    async search(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(ITEM_MFG_TYPE, 'I');
+        this.applyFilters(qb, 'I', dto, ['NTYPE']);
+        return qb.orderBy('I.NTYPE', 'ASC').getMany();
+    }
 
-  async update(id: number, dto: UpdateItemMfgTypeDto) {
-    return this.getRepository(ITEM_MFG_TYPE).update(id, dto);
-  }
+    async update(id: number, dto: UpdateItemMfgTypeDto) {
+        return this.getRepository(ITEM_MFG_TYPE).update(id, dto);
+    }
 
-  async remove(id: number) {
-    return this.getRepository(ITEM_MFG_TYPE).delete(id);
-  }
+    async remove(id: number) {
+        return this.getRepository(ITEM_MFG_TYPE).delete(id);
+    }
 }

@@ -20,9 +20,7 @@ if (process.env.HOST == 'AMEC') {
             password: process.env.WORKLOAD_PASSWORD,
             schema: process.env.WORKLOAD_SCHEMA,
             connectString: `(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=${process.env.WORKLOAD_HOST})(PORT=${process.env.WORKLOAD_PORT}))(CONNECT_DATA=(SID=${process.env.WORKLOAD_SERVICE})))`,
-            entities: [
-                __dirname + '/../Entities/workload/**/*.entity{.ts,.js}',
-            ],
+            entities: [__dirname + '/../Entities/workload/**/*.entity{.ts,.js}'],
             //autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),
@@ -54,9 +52,7 @@ if (process.env.HOST == 'AMEC') {
             username: process.env.HOME_USER,
             password: process.env.HOME_PASSWORD,
             database: process.env.HOME_DATABASE,
-            entities: [
-                __dirname + '/../Entities/workload/**/*.entity{.ts,.js}',
-            ],
+            entities: [__dirname + '/../Entities/workload/**/*.entity{.ts,.js}'],
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),
         }),

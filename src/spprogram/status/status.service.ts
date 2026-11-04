@@ -5,12 +5,12 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class StatusService {
-  constructor(
-    @InjectRepository(Status, 'mitsuConnection')
-    private readonly status: Repository<Status>,
-  ) {}
+    constructor(
+        @InjectRepository(Status, 'mitsuConnection')
+        private readonly status: Repository<Status>,
+    ) {}
 
-  findAll() {
-    return this.status.find();
-  }
+    findAll() {
+        return this.status.find();
+    }
 }

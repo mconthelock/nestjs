@@ -1,18 +1,6 @@
-﻿import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-    UseInterceptors,
-} from '@nestjs/common';
+﻿import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { MfgDrawingService } from './mfg-drawing.service';
-import {
-    CreateMfgDrawingCheckSheetDto,
-    CreateMfgDrawingDto,
-} from './dto/create-mfg-drawing.dto';
+import { CreateMfgDrawingCheckSheetDto, CreateMfgDrawingDto } from './dto/create-mfg-drawing.dto';
 import { UpdateMfgDrawingDto } from './dto/update-mfg-drawing.dto';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
@@ -50,10 +38,7 @@ export class MfgDrawingController {
     }
 
     @Patch(':id')
-    update(
-        @Param('id') id: string,
-        @Body() updateMfgDrawingDto: UpdateMfgDrawingDto,
-    ) {
+    update(@Param('id') id: string, @Body() updateMfgDrawingDto: UpdateMfgDrawingDto) {
         return this.mfgDrawingService.update(+id, updateMfgDrawingDto);
     }
 

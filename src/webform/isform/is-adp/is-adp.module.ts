@@ -8,11 +8,7 @@ import { IsAdpRepository } from './is-adp.repository';
 import { ISADP_FORM } from 'src/common/Entities/webform/table/ISADP_FORM.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([ISADP_FORM], 'mitsuConnection'),
-        FormModule,
-        IsFileModule,
-    ],
+    imports: [TypeOrmModule.forFeature([ISADP_FORM], 'mitsuConnection'), FormModule, IsFileModule],
     controllers: [IsAdpController],
     providers: [IsAdpService, IsAdpRepository],
     exports: [IsAdpService],

@@ -47,12 +47,17 @@ const deleteFormPath = 'delete-forms/:NFRMNO/:VORGNO/:CYEAR/:CYEAR2/:NRUNNO';
     }),
 )
 export class JigController {
-    constructor(private readonly jigService: JigService, private readonly ngTag: JigNgTagService,
-        private readonly reminders: JigReminderService) {}
+    constructor(
+        private readonly jigService: JigService,
+        private readonly ngTag: JigNgTagService,
+        private readonly reminders: JigReminderService,
+    ) {}
 
     // Allows the existing Scheduler to validate this POST endpoint without sending mail.
     @Head('inspection-reminders')
-    reminderHealth() { return; }
+    reminderHealth() {
+        return;
+    }
 
     @Post('inspection-reminders')
     sendInspectionReminders(@Body() dto: InspectionReminderDto) {
@@ -65,10 +70,14 @@ export class JigController {
     }
 
     @Post('delete-forms')
-    createDeleteForm(@Body() dto: CreateJigDeleteFormDto) { return this.jigService.createDeleteForm(dto); }
+    createDeleteForm(@Body() dto: CreateJigDeleteFormDto) {
+        return this.jigService.createDeleteForm(dto);
+    }
 
     @Get(deleteFormPath)
-    getDeleteForm(@Param() key: JigFormKeyDto) { return this.jigService.getDeleteForm(key); }
+    getDeleteForm(@Param() key: JigFormKeyDto) {
+        return this.jigService.getDeleteForm(key);
+    }
 
     @Patch(deleteFormPath)
     saveDeleteForm(@Param() key: JigFormKeyDto, @Body() dto: SaveJigDeleteFormDto) {
@@ -81,10 +90,14 @@ export class JigController {
     }
 
     @Post(deleteFormPath + '/finish')
-    finishDeleteForm(@Param() key: JigFormKeyDto) { return this.jigService.finishDeleteForm(key); }
+    finishDeleteForm(@Param() key: JigFormKeyDto) {
+        return this.jigService.finishDeleteForm(key);
+    }
 
     @Post(deleteFormPath + '/reject')
-    rejectDeleteForm(@Param() key: JigFormKeyDto) { return this.jigService.rejectDeleteForm(key); }
+    rejectDeleteForm(@Param() key: JigFormKeyDto) {
+        return this.jigService.rejectDeleteForm(key);
+    }
 
     @Get('locations')
     getLocations() {
@@ -119,8 +132,10 @@ export class JigController {
     @Header('Cache-Control', 'no-store')
     async ngTagPdf(@Param() key: JigFormKeyDto) {
         const pdf = await this.ngTag.generate(key);
-        return new StreamableFile(pdf, { type: 'application/pdf',
-            disposition: `inline; filename="NG-TAG-${key.NFRMNO}-${key.VORGNO.replace(/[^a-zA-Z0-9_-]/g, '_')}-${key.CYEAR}-${key.CYEAR2}-${key.NRUNNO}.pdf"` });
+        return new StreamableFile(pdf, {
+            type: 'application/pdf',
+            disposition: `inline; filename="NG-TAG-${key.NFRMNO}-${key.VORGNO.replace(/[^a-zA-Z0-9_-]/g, '_')}-${key.CYEAR}-${key.CYEAR2}-${key.NRUNNO}.pdf"`,
+        });
     }
     @Patch(formPath)
     saveForm(@Param() key: JigFormKeyDto, @Body() dto: SaveJigFormDto) {
@@ -144,7 +159,11 @@ export class JigController {
     }
     @Delete(formPath + '/files/:FILE_SEQ')
     deleteFile(@Param() key: JigFormFileKeyDto, @Req() req: Request) {
-        return this.jigService.deleteFile(key, key.FILE_SEQ, String(req.headers['x-jig-actor'] || ''));
+        return this.jigService.deleteFile(
+            key,
+            key.FILE_SEQ,
+            String(req.headers['x-jig-actor'] || ''),
+        );
     }
 
     @Get(':jigNo/checkpoints')
@@ -156,10 +175,7 @@ export class JigController {
         return this.jigService.getDefectNg(jigNo);
     }
     @Put(':jigNo/checkpoints')
-    replaceCheckpoints(
-        @Param('jigNo') jigNo: string,
-        @Body() dto: ReplaceCheckpointsDto,
-    ) {
+    replaceCheckpoints(@Param('jigNo') jigNo: string, @Body() dto: ReplaceCheckpointsDto) {
         return this.jigService.replaceCheckpoints(jigNo, dto);
     }
     @Get(':jigNo/forms')

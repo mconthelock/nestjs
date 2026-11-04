@@ -4,12 +4,7 @@ import { WireHarnessCalculateUsageService } from './wire-harness-calculate-usage
 import { WireHarnessCalculateUsageRepository } from './wire-harness-calculate-usage.repository';
 
 @Module({
-    controllers: [
-        WireHarnessCalculateUsageController,
-    ],
-    providers: [
-        WireHarnessCalculateUsageService,
-        WireHarnessCalculateUsageRepository,
-    ],
+    controllers: [WireHarnessCalculateUsageController],
+    providers: [WireHarnessCalculateUsageService, WireHarnessCalculateUsageRepository],
 })
 export class WireHarnessCalculateUsageModule {}

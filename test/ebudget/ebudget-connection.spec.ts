@@ -74,8 +74,7 @@ describe('Ebudget Repositories - Database Migration to mitsuConnection', () => {
                         providers: [
                             repoClass,
                             {
-                                provide:
-                                    getDataSourceToken('ebudgetConnection'),
+                                provide: getDataSourceToken('ebudgetConnection'),
                                 useValue: mockDataSource,
                             },
                         ],
@@ -120,42 +119,35 @@ describe('Ebudget Repositories - Database Migration to mitsuConnection', () => {
         });
 
         it('BiddingRepository.findAll() should query through mitsuConnection', async () => {
-            const repo =
-                testingModule.get<BiddingRepository>(BiddingRepository);
+            const repo = testingModule.get<BiddingRepository>(BiddingRepository);
             await repo.findAll();
             expect(mockDataSource.manager.getRepository).toHaveBeenCalled();
             expect(mockFind).toHaveBeenCalled();
         });
 
         it('EbgreqattfileRepository.findAll() should query through mitsuConnection', async () => {
-            const repo = testingModule.get<EbgreqattfileRepository>(
-                EbgreqattfileRepository,
-            );
+            const repo = testingModule.get<EbgreqattfileRepository>(EbgreqattfileRepository);
             await repo.findAll();
             expect(mockDataSource.manager.getRepository).toHaveBeenCalled();
             expect(mockFind).toHaveBeenCalled();
         });
 
         it('EbgreqcaseRepository.findAll() should query through mitsuConnection', async () => {
-            const repo =
-                testingModule.get<EbgreqcaseRepository>(EbgreqcaseRepository);
+            const repo = testingModule.get<EbgreqcaseRepository>(EbgreqcaseRepository);
             await repo.findAll();
             expect(mockDataSource.manager.getRepository).toHaveBeenCalled();
             expect(mockFind).toHaveBeenCalled();
         });
 
         it('EbgreqcolImageRepository.findAll() should query through mitsuConnection', async () => {
-            const repo = testingModule.get<EbgreqcolImageRepository>(
-                EbgreqcolImageRepository,
-            );
+            const repo = testingModule.get<EbgreqcolImageRepository>(EbgreqcolImageRepository);
             await repo.findAll();
             expect(mockDataSource.manager.getRepository).toHaveBeenCalled();
             expect(mockFind).toHaveBeenCalled();
         });
 
         it('EbgreqformRepository.findOne() should query through mitsuConnection', async () => {
-            const repo =
-                testingModule.get<EbgreqformRepository>(EbgreqformRepository);
+            const repo = testingModule.get<EbgreqformRepository>(EbgreqformRepository);
             await repo.findOne({
                 NFRMNO: 1,
                 VORGNO: 'ORG',
@@ -168,9 +160,7 @@ describe('Ebudget Repositories - Database Migration to mitsuConnection', () => {
         });
 
         it('EbudgetQuotationRepository.getData() should query through mitsuConnection', async () => {
-            const repo = testingModule.get<EbudgetQuotationRepository>(
-                EbudgetQuotationRepository,
-            );
+            const repo = testingModule.get<EbudgetQuotationRepository>(EbudgetQuotationRepository);
             await repo.getData({ ID: 1 } as any);
             expect(mockDataSource.manager.getRepository).toHaveBeenCalled();
             expect(mockFind).toHaveBeenCalled();

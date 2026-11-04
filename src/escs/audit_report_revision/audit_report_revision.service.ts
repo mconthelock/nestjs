@@ -14,9 +14,7 @@ export class AuditReportRevisionService {
         return this.repo.getAuditReportRevision(dto);
     }
 
-    async findLatestRevision(
-        secid: number,
-    ): Promise<AUDIT_REPORT_REVISION | null> {
+    async findLatestRevision(secid: number): Promise<AUDIT_REPORT_REVISION | null> {
         return await this.repo.findLatestRevision(secid);
     }
 

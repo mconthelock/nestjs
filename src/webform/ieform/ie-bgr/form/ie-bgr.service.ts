@@ -9,11 +9,7 @@ import { ReportIeBgrDto, UpdateIeBgrDto } from './dto/update-ie-bgr.dto';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Like, QueryRunner, Repository } from 'typeorm';
 import { FormService } from 'src/webform/form/form.service';
-import {
-    deleteFile,
-    joinPaths,
-    moveFileFromMulter,
-} from 'src/common/utils/files.utils';
+import { deleteFile, joinPaths, moveFileFromMulter } from 'src/common/utils/files.utils';
 import { FormmstService } from 'src/webform/formmst/formmst.service';
 import { EbgreqformService } from 'src/ebudget/ebgreqform/ebgreqform.service';
 import { EbgreqattfileService } from 'src/ebudget/ebgreqattfile/ebgreqattfile.service';
@@ -46,10 +42,10 @@ export class IeBgrService {
         private readonly ppoService: PpoService,
         protected readonly flowService: FlowService,
         private readonly formCreateService: FormCreateService,
-        
+
         // create form
         protected readonly doactionFlowService: DoactionFlowService,
-        
+
         // last approve
         protected readonly formService: FormService,
         protected readonly mailService: MailService,
@@ -96,7 +92,7 @@ export class IeBgrService {
                     { field: 'PR.NSTEP', op: 'notIn', value: [0, 99] },
                 ],
             });
-            let list = [];
+            const list = [];
             if (bidding.status) {
                 for (const b of bidding.data) {
                     const po = await this.ppoService.search({
@@ -120,22 +116,18 @@ export class IeBgrService {
         // กรองเฉพาะรายการที่ตรงกับ PRNO หรือ PONO ตามที่ระบุใน dto
         const filter = report.filter((r) => {
             // prpo: Array<{ SPRNO: string, SPONO: string[] }>
-            const matched = r.prpo.filter(
-                (p: { SPRNO: string; SPONO: string[] }) => {
-                    if (dto.PRNO && dto.PONO) {
-                        return (
-                            p.SPRNO === dto.PRNO && p.SPONO.includes(dto.PONO)
-                        );
-                    }
-                    if (dto.PRNO) {
-                        return p.SPRNO === dto.PRNO;
-                    }
-                    if (dto.PONO) {
-                        return p.SPONO.includes(dto.PONO);
-                    }
-                    return true;
-                },
-            );
+            const matched = r.prpo.filter((p: { SPRNO: string; SPONO: string[] }) => {
+                if (dto.PRNO && dto.PONO) {
+                    return p.SPRNO === dto.PRNO && p.SPONO.includes(dto.PONO);
+                }
+                if (dto.PRNO) {
+                    return p.SPRNO === dto.PRNO;
+                }
+                if (dto.PONO) {
+                    return p.SPONO.includes(dto.PONO);
+                }
+                return true;
+            });
             return matched.length > 0;
         });
         return filter;
@@ -199,8 +191,7 @@ export class IeBgrService {
                 }
             } else {
                 // 1.3 กรณี New ให้สร้าง Form ใหม่
-                const formmst =
-                    await this.formmstService.getFormMasterByVaname('IE-BGR');
+                const formmst = await this.formmstService.getFormMasterByVaname('IE-BGR');
                 const createCond: CreateFormDto = {
                     NFRMNO: formmst.NNO,
                     VORGNO: formmst.VORGNO,
@@ -213,10 +204,7 @@ export class IeBgrService {
                 if (isDraft) {
                     createCond.DRAFT = Draft;
                 }
-                const createForm = await this.formCreateService.create(
-                    createCond,
-                    ip,
-                );
+                const createForm = await this.formCreateService.create(createCond, ip);
 
                 if (!createForm.status) {
                     throw new Error(createForm.message.message);
@@ -296,9 +284,7 @@ export class IeBgrService {
         isReturn?: boolean;
         returnData?: BGRReturnDto;
         form: FormDto;
-        files: Partial<
-            Record<keyof typeof this.fileType, Express.Multer.File[]>
-        >;
+        files: Partial<Record<keyof typeof this.fileType, Express.Multer.File[]>>;
         destination: string;
         movedTargets: string[];
         returnDelFiles: string[];
@@ -314,12 +300,9 @@ export class IeBgrService {
                             COLNO: Number(image.colno),
                             ID: image.id,
                         };
-                        const img =
-                            await this.ebudgetcolImageService.findOne(cond);
+                        const img = await this.ebudgetcolImageService.findOne(cond);
                         if (img) {
-                            returnDelFiles.push(
-                                await joinPaths(destination, img.SFILE),
-                            ); // เตรียมลบไฟล์ที่มีอยู่เดิม
+                            returnDelFiles.push(await joinPaths(destination, img.SFILE)); // เตรียมลบไฟล์ที่มีอยู่เดิม
                             await this.ebudgetcolImageService.delete({
                                 condition: cond,
                             }); // ลบข้อมูลรูปภาพใน DB
@@ -360,12 +343,9 @@ export class IeBgrService {
                             TYPENO: Number(f.typeno),
                             ID: f.id,
                         };
-                        const file =
-                            await this.ebudgetattfileService.findOne(cond);
+                        const file = await this.ebudgetattfileService.findOne(cond);
                         if (file) {
-                            returnDelFiles.push(
-                                await joinPaths(destination, file.SFILE),
-                            ); // เตรียมลบไฟล์ที่มีอยู่เดิม
+                            returnDelFiles.push(await joinPaths(destination, file.SFILE)); // เตรียมลบไฟล์ที่มีอยู่เดิม
                             await this.ebudgetattfileService.delete({
                                 condition: cond,
                             }); // ลบข้อมูลรูปภาพใน DB
@@ -401,10 +381,7 @@ export class IeBgrService {
 
             // 5. บันทึกไฟล์ และ รูปภาพ ลงในโฟลเดอร์ปลายทาง
             for (const key in files) {
-                const raw = key.replace(
-                    /\[\]$/,
-                    '',
-                ) as keyof typeof this.fileType; // รองรับกรณีที่ key เป็น array เช่น imageI[]
+                const raw = key.replace(/\[\]$/, '') as keyof typeof this.fileType; // รองรับกรณีที่ key เป็น array เช่น imageI[]
                 const fileList = files[key];
                 const data = key.startsWith('image')
                     ? await this.ebudgetcolImageService.find({
@@ -429,10 +406,7 @@ export class IeBgrService {
                             ...form,
                             COLNO: this.fileType[raw],
                             ID: String(++fileIndex),
-                            IMAGE_FILE: file.originalname.replace(
-                                /[^a-zA-Z0-9.]/g,
-                                '_',
-                            ),
+                            IMAGE_FILE: file.originalname.replace(/[^a-zA-Z0-9.]/g, '_'),
                             SFILE: moved.newName,
                         });
                     } else if (key.startsWith('file') && fileList) {
@@ -441,10 +415,7 @@ export class IeBgrService {
                             TYPENO: this.fileType[raw],
                             ID: String(++fileIndex),
                             SFILE: moved.newName,
-                            OFILE: file.originalname.replace(
-                                /[^a-zA-Z0-9.]/g,
-                                '_',
-                            ),
+                            OFILE: file.originalname.replace(/[^a-zA-Z0-9.]/g, '_'),
                         });
                     }
                 }
@@ -472,11 +443,10 @@ export class IeBgrService {
         try {
             // 1. กรณี Return ให้ทำการยกเลิก Quotation รอบก่อนทั้งหมดเพราะค่าเงินอาจมีการเปลี่ยนแปลง หากอยากได้ revision ให้ order by DATE_UPDATE
             if (isReturn) {
-                const oldQuotations =
-                    await this.ebudgetQuotationService.getData({
-                        ...form,
-                        STATUS: 1,
-                    });
+                const oldQuotations = await this.ebudgetQuotationService.getData({
+                    ...form,
+                    STATUS: 1,
+                });
                 // const rejectQuotation = oldQuotations.filter(o => {
                 //     return !dto.quotation.find(n => n.QTA_FORM === o.QTA_FORM);
                 // })

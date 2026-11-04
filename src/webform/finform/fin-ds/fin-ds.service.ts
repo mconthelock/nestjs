@@ -13,10 +13,7 @@ import { FlowService } from 'src/webform/flow/flow.service';
 
 const JOB_CONTROLLER_CEXTDATA = ['01'];
 
-export function calculateDutyBalances(
-    reportRows: Record<string, unknown>[],
-    dutyValues: number[],
-) {
+export function calculateDutyBalances(reportRows: Record<string, unknown>[], dutyValues: number[]) {
     return dutyValues.map((dutyValue) => {
         const key = String(Number(dutyValue));
         const balance = reportRows.reduce((total, row) => {
@@ -82,13 +79,7 @@ export class FinDsService {
         cyear2: string,
         nrunno: number,
     ) {
-        const data = await this.repo.findOneForShow(
-            nfrmno,
-            vorgno,
-            cyear,
-            cyear2,
-            nrunno,
-        );
+        const data = await this.repo.findOneForShow(nfrmno, vorgno, cyear, cyear2, nrunno);
 
         if (!data.head) {
             return {
@@ -109,7 +100,6 @@ export class FinDsService {
     }
 
     async action(dto: ActionFinDDto, ip: string) {
-
         const form = {
             NFRMNO: Number(dto.NFRMNO),
             VORGNO: dto.VORGNO,
@@ -155,7 +145,6 @@ export class FinDsService {
 
         const isJobController = this.isJobControllerCextData(dto.CEXTDATA);
 
-
         if (dto.ACTION === 'approve' && isJobController) {
             const dateReceive = this.normalizeDateReceive(dto.DATE_RECEIVE);
 
@@ -163,15 +152,10 @@ export class FinDsService {
                 throw new Error('DATE_RECEIVE is required');
             }
 
-            const updateResult = await this.repo.updateDateReceive(
-                form,
-                dateReceive,
-            );
+            const updateResult = await this.repo.updateDateReceive(form, dateReceive);
 
             if (!updateResult.affected) {
-                throw new Error(
-                    'FIN-DS head not found for DATE_RECEIVE update',
-                );
+                throw new Error('FIN-DS head not found for DATE_RECEIVE update');
             }
         }
 
@@ -206,18 +190,11 @@ export class FinDsService {
 
         const date = new Date(text);
 
-        return Number.isNaN(date.getTime())
-            ? null
-            : date.toISOString().substring(0, 10);
+        return Number.isNaN(date.getTime()) ? null : date.toISOString().substring(0, 10);
     }
 
-    async create(
-        createFinDDto: CreateFinDFormdto,
-        files: Express.Multer.File[],
-        ip: string,
-    ) {
+    async create(createFinDDto: CreateFinDFormdto, files: Express.Multer.File[], ip: string) {
         try {
-
             const detailData =
                 typeof createFinDDto.DATA === 'string'
                     ? JSON.parse(createFinDDto.DATA || '[]')
@@ -237,10 +214,7 @@ export class FinDsService {
                     throw new BadRequestException('Invalid duty stamp quantity');
                 }
 
-                requestedByDuty.set(
-                    dutyValue,
-                    (requestedByDuty.get(dutyValue) || 0) + qty,
-                );
+                requestedByDuty.set(dutyValue, (requestedByDuty.get(dutyValue) || 0) + qty);
             }
 
             if (createFinDDto.OPTION_CODE === '0') {
@@ -251,10 +225,7 @@ export class FinDsService {
                 );
 
                 for (const [dutyValue, requested] of requestedByDuty) {
-                    const available = Math.max(
-                        0,
-                        availableByDuty.get(dutyValue) || 0,
-                    );
+                    const available = Math.max(0, availableByDuty.get(dutyValue) || 0);
 
                     if (requested > available) {
                         throw new BadRequestException(
@@ -264,9 +235,7 @@ export class FinDsService {
                 }
             }
 
-            const formmst =
-                await this.FormmstService.getFormMasterByVaname('FIN-DS');
-
+            const formmst = await this.FormmstService.getFormMasterByVaname('FIN-DS');
 
             const createForm = await this.FormCreateService.create(
                 {
@@ -287,20 +256,20 @@ export class FinDsService {
                 CYEAR2: createForm.data.CYEAR2 || createForm.data.CYEAR,
                 NRUNNO: createForm.data.NRUNNO,
             };
-            if (createFinDDto.OPTION_CODE === "1"){
-                for (const step of ['05','04','03','02','06']) {
+            if (createFinDDto.OPTION_CODE === '1') {
+                for (const step of ['05', '04', '03', '02', '06']) {
                     await this.deleteflowservice.deleteFlowStep({
                         ...form,
                         CSTEPNO: step,
-                    })
+                    });
                 }
-                await  this.flowservice.updateFlow({
-                     condition: {
+                await this.flowservice.updateFlow({
+                    condition: {
                         ...form,
                         CEXTDATA: '01',
                     },
                     CSTEPST: '3',
-                    VAPVNO: "92077"
+                    VAPVNO: '92077',
                 });
             }
 
@@ -317,14 +286,11 @@ export class FinDsService {
 
             const head = await this.repo.createHead(headData);
 
-
             for (const DetailDATA of detailData) {
                 const lineId = Number(DetailDATA.LINE_ID ?? DetailDATA.LINEID);
 
                 if (!lineId || Number.isNaN(lineId)) {
-                    throw new Error(
-                        `LINEID is required: ${JSON.stringify(DetailDATA)}`,
-                    );
+                    throw new Error(`LINEID is required: ${JSON.stringify(DetailDATA)}`);
                 }
 
                 await this.repo.createdetail({
@@ -373,18 +339,12 @@ export class FinDsService {
         }
     }
     async findForShowReport(FYEAR: number) {
-    const datareport = await this.repo.findReport(FYEAR);
+        const datareport = await this.repo.findReport(FYEAR);
 
-    return {
-        status: true,
-        message: 'Get FIN-DS report success',
-        datareport,
-    };
-}
-
-
-
-
-
-
+        return {
+            status: true,
+            message: 'Get FIN-DS report success',
+            datareport,
+        };
+    }
 }

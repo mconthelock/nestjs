@@ -1,18 +1,7 @@
-﻿import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+﻿import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ReturnApvListService } from './return-apv-list.service';
 import { CreateReturnApvListDto } from './dto/create-return-apv-list.dto';
-import {
-    ActionReturnApvListDto,
-    UpdateReturnApvListDto,
-} from './dto/update-return-apv-list.dto';
+import { ActionReturnApvListDto, UpdateReturnApvListDto } from './dto/update-return-apv-list.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 @Controller('escs/return-apv-list')

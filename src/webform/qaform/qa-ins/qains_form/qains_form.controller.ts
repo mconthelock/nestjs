@@ -23,19 +23,13 @@ import { getClientIP } from 'src/common/utils/ip.utils';
 import { QcConfQainsFormDto } from './dto/qcConfirm-qains_form.dto';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
-import {
-    ReturnQainsFormDto,
-    setInchargeQainsFormDto,
-} from './dto/return-qains_form.dot';
+import { ReturnQainsFormDto, setInchargeQainsFormDto } from './dto/return-qains_form.dot';
 import { QainsFormCreateService } from './qains_form-create.service';
 import { QainsFormSetInchargeService } from './qains_form-setIncharge.sevice';
 import { QainsFormQcConfirmService } from './qains_form-qcConfirm.service';
 import { QainsFormLastApproveService } from './qains_form-last-approve.service';
 import { QainsFormReturnService } from './qains_form-return.service';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 @ApiTags('QA-INS Form')
 @Controller('qaform/qa-ins')
@@ -69,10 +63,7 @@ export class QainsFormController {
     @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(AnyFilesInterceptor())
-    async setIncharge(
-        @Body() dto: setInchargeQainsFormDto,
-        @Req() req: Request,
-    ) {
+    async setIncharge(@Body() dto: setInchargeQainsFormDto, @Req() req: Request) {
         const ip = getClientIP(req);
         return await this.setInchargeService.setIncharge(dto, ip);
     }
@@ -115,11 +106,6 @@ export class QainsFormController {
         @Req() req: Request,
     ) {
         const ip = getClientIP(req);
-        return await this.returnService.returnApproval(
-            dto,
-            files,
-            ip,
-            this.path,
-        );
+        return await this.returnService.returnApproval(dto, files, ip, this.path);
     }
 }

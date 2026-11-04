@@ -25,8 +25,7 @@ export class SendVgmMeltController {
 
     @Post('export-excel')
     async exportExcel(@Body() dto: ExportExcelDto, @Res() res: Response) {
-        const { buffer, filename } =
-            await this.exportExcelService.exportExcel(dto);
+        const { buffer, filename } = await this.exportExcelService.exportExcel(dto);
         sendExcel(res, buffer, filename);
     }
 
@@ -40,7 +39,7 @@ export class SendVgmMeltController {
     // สำหรับ run job แบบอัตโนมัติ โดยไม่ต้องส่ง vanndate เข้ามา
     @Get('job')
     @UseTransaction('mitsuConnection')
-    async job(){
+    async job() {
         return await this.jobService.job();
     }
 

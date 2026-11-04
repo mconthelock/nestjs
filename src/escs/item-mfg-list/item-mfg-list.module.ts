@@ -7,10 +7,7 @@ import { ItemMfgHistoryModule } from '../item-mfg-history/item-mfg-history.modul
 import { ITEM_MFG_LIST } from 'src/common/Entities/escs/table/ITEM_MFG_LIST.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([ITEM_MFG_LIST], 'mitsuConnection'),
-        ItemMfgHistoryModule,
-    ],
+    imports: [TypeOrmModule.forFeature([ITEM_MFG_LIST], 'mitsuConnection'), ItemMfgHistoryModule],
     controllers: [ItemMfgListController],
     providers: [ItemMfgListService, ItemMfgListRepository],
     exports: [ItemMfgListService],

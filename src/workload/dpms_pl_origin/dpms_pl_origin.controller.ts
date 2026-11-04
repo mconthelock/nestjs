@@ -8,27 +8,27 @@ export class DpmsPlOriginController {
 
     @Get('order/:order')
     order(@Param('order') order: string) {
-        return this.service.find({order, type: 'order'});
+        return this.service.find({ order, type: 'order' });
     }
 
     @Get('case/:order')
     case(@Param('order') order: string) {
-        return this.service.find({order, type: 'case'});
+        return this.service.find({ order, type: 'case' });
     }
 
     @Get('detail/:order')
     detail(@Param('order') order: string) {
-        return this.service.find({order, type: 'detail'});
+        return this.service.find({ order, type: 'detail' });
     }
 
     @Get('pl/:id')
     pl(@Param('id') id: string) {
-        return this.service.find({id: +id, type: 'id'});
+        return this.service.find({ id: +id, type: 'id' });
     }
 
     @Get('id/:id')
     id(@Param('id') id: string) {
-        return this.service.find({id: +id});
+        return this.service.find({ id: +id });
     }
 
     // @Get('editOrigin/:id')

@@ -3,7 +3,7 @@ import { CountriesService } from './countries.service';
 import { CountriesController } from './countries.controller';
 
 @Module({
-  controllers: [CountriesController],
-  providers: [CountriesService],
+    controllers: [CountriesController],
+    providers: [CountriesService],
 })
 export class CountriesModule {}

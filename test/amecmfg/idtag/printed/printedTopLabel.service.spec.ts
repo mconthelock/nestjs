@@ -20,26 +20,19 @@ describe('PrintedTopLabelService', () => {
         };
 
         const printed = {
-            getCurrentPdfDirectory: jest
-                .fn()
-                .mockResolvedValue('C:/pdf/active'),
+            getCurrentPdfDirectory: jest.fn().mockResolvedValue('C:/pdf/active'),
             setPdfPath: jest.fn(),
             writeLog: jest.fn().mockResolvedValue(undefined),
         };
 
         const service = new PrintedTopLabelService(printed as any, repo as any);
 
-        const embedSpy = jest
-            .spyOn(service as any, 'embedLabelToPdf')
-            .mockResolvedValue(undefined);
+        const embedSpy = jest.spyOn(service as any, 'embedLabelToPdf').mockResolvedValue(undefined);
 
         await service.processLabelDetail(123);
 
         expect(printed.getCurrentPdfDirectory).toHaveBeenCalledTimes(1);
         expect(printed.setPdfPath).not.toHaveBeenCalled();
-        expect(embedSpy).toHaveBeenCalledWith(
-            path.join('C:/pdf/active', 'ABC123.pdf'),
-            'JAPAN',
-        );
+        expect(embedSpy).toHaveBeenCalledWith(path.join('C:/pdf/active', 'ABC123.pdf'), 'JAPAN');
     });
 });

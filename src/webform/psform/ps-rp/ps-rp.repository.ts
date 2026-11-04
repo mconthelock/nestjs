@@ -95,25 +95,23 @@ export class PsRPRepository extends BaseRepository {
                     AND list.CYEAR2 = FL.CYEAR2
                     AND list.NRUNNO = FL.NRUNNO
                     AND FL.CEXTDATA = '02'`,
-                    // AND FL.CAPVSTNO = '1'
-                    // AND FL.DAPVDATE IS NOT NULL
+                // AND FL.CAPVSTNO = '1'
+                // AND FL.DAPVDATE IS NOT NULL
             )
             .addSelect('F.VREQNO', 'VREQNO')
             .addSelect('FM.VANAME', 'VANAME')
             .addSelect('FL.DAPVDATE', 'DAPVDATE');
 
         if (dto.fromDate?.trim()) {
-            qb.andWhere(
-                `TRUNC(F.DREQDATE) >= TRUNC(TO_DATE(:fromDate, 'YYYY-MM-DD'))`,
-                { fromDate: dto.fromDate.trim() },
-            );
+            qb.andWhere(`TRUNC(F.DREQDATE) >= TRUNC(TO_DATE(:fromDate, 'YYYY-MM-DD'))`, {
+                fromDate: dto.fromDate.trim(),
+            });
         }
 
         if (dto.toDate?.trim()) {
-            qb.andWhere(
-                `TRUNC(F.DREQDATE) <= TRUNC(TO_DATE(:toDate, 'YYYY-MM-DD'))`,
-                { toDate: dto.toDate.trim() },
-            );
+            qb.andWhere(`TRUNC(F.DREQDATE) <= TRUNC(TO_DATE(:toDate, 'YYYY-MM-DD'))`, {
+                toDate: dto.toDate.trim(),
+            });
         }
 
         if (dto.pItem?.trim()) {

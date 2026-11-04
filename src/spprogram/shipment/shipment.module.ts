@@ -5,8 +5,8 @@ import { ShipmentController } from './shipment.controller';
 import { Shipment } from './entities/shipment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Shipment], 'mitsuConnection')],
-  controllers: [ShipmentController],
-  providers: [ShipmentService],
+    imports: [TypeOrmModule.forFeature([Shipment], 'mitsuConnection')],
+    controllers: [ShipmentController],
+    providers: [ShipmentService],
 })
 export class ShipmentModule {}

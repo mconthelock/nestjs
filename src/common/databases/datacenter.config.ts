@@ -49,9 +49,7 @@ if (process.env.HOST == 'AMEC') {
             username: process.env.HOME_USER,
             password: process.env.HOME_PASSWORD,
             database: process.env.HOME_DATABASE,
-            entities: [
-                __dirname + '/../Entities/workload/**/*.entity{.ts,.js}',
-            ],
+            entities: [__dirname + '/../Entities/workload/**/*.entity{.ts,.js}'],
             autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),

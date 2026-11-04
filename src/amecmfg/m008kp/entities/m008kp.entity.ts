@@ -1,11 +1,4 @@
-import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    OneToOne,
-    JoinColumn,
-    OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Q90010P2 } from '../../../as400/rtnlibf/q90010p2/entities/q90010p2.entity';
 import { F001KP } from '../../f001kp/entities/f001kp.entity';
 

@@ -75,12 +75,9 @@ export class ReviseVgmService extends IssueService {
             if (!vanndate) {
                 vanndate = now();
             }
-            logMessage.push(
-                log_message(`Revising VGM for vanndate ${vanndate}`),
-            );
+            logMessage.push(log_message(`Revising VGM for vanndate ${vanndate}`));
             // ดึงรายการเปลี่ยนแปลงน้ำหนักตามวัน vanning ที่กำหนด
-            const changeLists =
-                await this.changeWeightService.getChangeWeight(vanndate);
+            const changeLists = await this.changeWeightService.getChangeWeight(vanndate);
             if (!changeLists.status) {
                 return {
                     status: false,
@@ -100,9 +97,7 @@ export class ReviseVgmService extends IssueService {
                 const issueRev = await this.revService.findByRevId(issueRevId);
                 if (!issueRev.status) {
                     logMessage.push(
-                        log_message(
-                            `No DPMS PL Issue found for NISSUEREV_ID: ${issueRevId}`,
-                        ),
+                        log_message(`No DPMS PL Issue found for NISSUEREV_ID: ${issueRevId}`),
                     );
                     continue;
                 }
@@ -117,13 +112,12 @@ export class ReviseVgmService extends IssueService {
                 const round: number | null = revData.NROUND;
                 const shippingMark: string = revData.VSHIPPINGMARK;
 
-                const { html, plList, lists, status, message } =
-                    await this.generateHtml({
-                        id: issueRevId,
-                        logMessage: logMessage,
-                        revData: revData,
-                        issueDate: issueDate,
-                    });
+                const { html, plList, lists, status, message } = await this.generateHtml({
+                    id: issueRevId,
+                    logMessage: logMessage,
+                    revData: revData,
+                    issueDate: issueDate,
+                });
                 logMessage.push(log_message(`${message}`));
                 if (!status) {
                     continue;
@@ -152,16 +146,13 @@ export class ReviseVgmService extends IssueService {
                 };
 
                 if (change.NPOID) {
-                    logMessage.push(
-                        log_message(`Revising VGM for POID: ${change.NPOID}`),
-                    );
-                    const { html, plList, lists, status, message } =
-                        await this.generateHtml({
-                            id: change.NPOID,
-                            logMessage: logMessage,
-                            revData: revData,
-                            issueDate: issueDate,
-                        });
+                    logMessage.push(log_message(`Revising VGM for POID: ${change.NPOID}`));
+                    const { html, plList, lists, status, message } = await this.generateHtml({
+                        id: change.NPOID,
+                        logMessage: logMessage,
+                        revData: revData,
+                        issueDate: issueDate,
+                    });
                     logMessage.push(log_message(`${message}`));
                     if (!status) {
                         continue;
@@ -187,15 +178,8 @@ export class ReviseVgmService extends IssueService {
             }
             const attachments = [];
             for (const file of listFilePath) {
-                const filePath: string = await joinPaths(
-                    file.filePath,
-                    file.fileName,
-                );
-                logMessage.push(
-                    log_message(
-                        `File generated: ${file.fileName} at ${filePath}`,
-                    ),
-                );
+                const filePath: string = await joinPaths(file.filePath, file.fileName);
+                logMessage.push(log_message(`File generated: ${file.fileName} at ${filePath}`));
                 attachments.push({
                     filename: file.fileName,
                     path: filePath,
@@ -225,14 +209,9 @@ export class ReviseVgmService extends IssueService {
             };
         } catch (error) {
             subject = 'ERROR: ' + subject;
-            logMessage.push(
-                log_message(`Error revising VGM: ${error.message}`, 'error'),
-            );
+            logMessage.push(log_message(`Error revising VGM: ${error.message}`, 'error'));
             for (const file of listFilePath) {
-                const filePath: string = await joinPaths(
-                    file.filePath,
-                    file.fileName,
-                );
+                const filePath: string = await joinPaths(file.filePath, file.fileName);
                 await deleteFile(filePath);
             }
             throw new Error(`Error revising VGM: ${error.message}`);
@@ -287,9 +266,7 @@ export class ReviseVgmService extends IssueService {
                 lists: listsData,
             };
         } catch (error) {
-            logMessage.push(
-                log_message(`Error revising VGM: ${error.message}`),
-            );
+            logMessage.push(log_message(`Error revising VGM: ${error.message}`));
             return {
                 status: false,
                 message: `Error revising VGM: ${error.message}`,

@@ -3,25 +3,25 @@ import { MfgEdrFormHead } from './mfg_edr_form_head.entity';
 
 @Entity({ name: 'EDR_CAUSE_MST', schema: 'WEBFORM' })
 export class EdrCauseMst {
-  @PrimaryColumn()
-  CID: number;
+    @PrimaryColumn()
+    CID: number;
 
-  @Column()
-  CAUSE: string;
+    @Column()
+    CAUSE: string;
 
-  @Column()
-  CAUSENAME: string;
+    @Column()
+    CAUSENAME: string;
 
-  @Column()
-  CAUSE_GROUP: string | null;
+    @Column()
+    CAUSE_GROUP: string | null;
 
-  @Column()
-  FOR_QA: string | null;
+    @Column()
+    FOR_QA: string | null;
 
-  @Column()
-  FOR_MFG: string | null;
+    @Column()
+    FOR_MFG: string | null;
 
-  @OneToMany(() => MfgEdrFormHead, (head) => head.cause)
-  @JoinColumn({ name: 'CID', referencedColumnName: 'CID' })
-  head: MfgEdrFormHead;
+    @OneToMany(() => MfgEdrFormHead, (head) => head.cause)
+    @JoinColumn({ name: 'CID', referencedColumnName: 'CID' })
+    head: MfgEdrFormHead;
 }

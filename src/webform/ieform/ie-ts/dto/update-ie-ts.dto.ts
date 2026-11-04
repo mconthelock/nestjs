@@ -19,8 +19,6 @@ export class UpdateIetsDto extends PartialType(RequestIetsDto) {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    @Transform(({ value }) =>
-        value !== undefined && value !== null ? Number(value) : value,
-    )
+    @Transform(({ value }) => (value !== undefined && value !== null ? Number(value) : value))
     NRUNNO: number;
 }

@@ -16,10 +16,7 @@ export class TourUserDto extends PickType(TourMasterDto, ['KEY'] as const) {
     EMPNO: string;
 }
 
-export class CreateTourUserDto extends PickType(TourUserDto, [
-    'KEY',
-    'EMPNO',
-] as const) {
+export class CreateTourUserDto extends PickType(TourUserDto, ['KEY', 'EMPNO'] as const) {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)

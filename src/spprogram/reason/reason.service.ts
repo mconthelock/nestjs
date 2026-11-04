@@ -5,14 +5,14 @@ import { Reason } from './entities/reason.entity';
 
 @Injectable()
 export class ReasonService {
-  constructor(
-    @InjectRepository(Reason, 'mitsuConnection')
-    private readonly reason: Repository<Reason>,
-  ) {}
+    constructor(
+        @InjectRepository(Reason, 'mitsuConnection')
+        private readonly reason: Repository<Reason>,
+    ) {}
 
-  findAll() {
-    return this.reason.find({
-      order: { REASON_CODE: 'ASC', REASON_ID: 'ASC' },
-    });
-  }
+    findAll() {
+        return this.reason.find({
+            order: { REASON_CODE: 'ASC', REASON_ID: 'ASC' },
+        });
+    }
 }

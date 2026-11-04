@@ -12,8 +12,7 @@ export class M12023ItemarrnglstAppService {
             if (length === 0) {
                 return {
                     status: false,
-                    message:
-                        'Search M12023ItemarrnglstApp Failed: No data found',
+                    message: 'Search M12023ItemarrnglstApp Failed: No data found',
                     data: [],
                 };
             }
@@ -23,9 +22,7 @@ export class M12023ItemarrnglstAppService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                'Search M12023ItemarrnglstApp Error: ' + error.message,
-            );
+            throw new Error('Search M12023ItemarrnglstApp Error: ' + error.message);
         }
     }
 
@@ -58,8 +55,7 @@ export class M12023ItemarrnglstAppService {
             if (length === 0) {
                 return {
                     status: false,
-                    message:
-                        'Search M12023ItemarrnglstApp Failed: No data found',
+                    message: 'Search M12023ItemarrnglstApp Failed: No data found',
                     data: [],
                 };
             }
@@ -69,17 +65,15 @@ export class M12023ItemarrnglstAppService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                'Search M12023ItemarrnglstApp Error: ' + error.message,
-            );
+            throw new Error('Search M12023ItemarrnglstApp Error: ' + error.message);
         }
     }
 
     async getGPL(order: string, item: string | string[]) {
         try {
-            if(typeof item === 'string' && item.includes(',')){
+            if (typeof item === 'string' && item.includes(',')) {
                 item = item.split(',');
-            }else if(typeof item === 'string'){
+            } else if (typeof item === 'string') {
                 item = [item];
             }
             const res = await this.repo.getGPL(order, item);
@@ -97,9 +91,7 @@ export class M12023ItemarrnglstAppService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Get GPL by ${order}, ${item} Error: ` + error.message,
-            );
+            throw new Error(`Get GPL by ${order}, ${item} Error: ` + error.message);
         }
     }
 }

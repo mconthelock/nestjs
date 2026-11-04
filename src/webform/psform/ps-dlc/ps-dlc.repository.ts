@@ -40,11 +40,7 @@ export class PSDLCRepository extends BaseRepository {
 
         for (const detail of details) {
             // เช็คว่าต้องมี PNZUBA เสมอ และ PNHING ต้องไม่เป็น null/undefined (แต่เป็น "" ได้)
-            if (
-                !detail.PNZUBA ||
-                detail.PNHING === undefined ||
-                detail.PNHING === null
-            ) {
+            if (!detail.PNZUBA || detail.PNHING === undefined || detail.PNHING === null) {
                 continue;
             }
 
@@ -64,17 +60,14 @@ export class PSDLCRepository extends BaseRepository {
             // --------------------------------------------------
             // 2. จัดการ PNRKUB = '2' (SELECT -> UPDATE / INSERT)
             // --------------------------------------------------
-            const q008mpReference =
-                this.buildPndataExpressionForReference(detail);
+            const q008mpReference = this.buildPndataExpressionForReference(detail);
 
             if (q008mpReference) {
                 const checkQuery = `SELECT COUNT(*) AS CNT FROM RTNLIBF.Q008MP WHERE PNZUBA = '${zuba}' AND PNHING = '${hing}' AND PNRKUB = '2'`;
                 const checkResult = await this.conn.runQuery(checkQuery);
 
                 const recordCount =
-                    checkResult && checkResult.length > 0
-                        ? Number(checkResult[0].CNT)
-                        : 0;
+                    checkResult && checkResult.length > 0 ? Number(checkResult[0].CNT) : 0;
 
                 if (recordCount > 0) {
                     // ขั้นที่ 2A: เจอข้อมูล -> UPDATE
@@ -98,20 +91,7 @@ export class PSDLCRepository extends BaseRepository {
     private getFlagPosition(flag: string): number | null {
         const normalized = flag?.trim().toUpperCase();
         const pos23Group = ['Y', 'Z', 'M', 'J', 'P'];
-        const pos24Group = [
-            'I',
-            'C',
-            'B',
-            'E',
-            'S',
-            'A',
-            'W',
-            'O',
-            'H',
-            'K',
-            'N',
-            'Q',
-        ];
+        const pos24Group = ['I', 'C', 'B', 'E', 'S', 'A', 'W', 'O', 'H', 'K', 'N', 'Q'];
 
         if (pos23Group.includes(normalized)) {
             return 23;
@@ -122,9 +102,7 @@ export class PSDLCRepository extends BaseRepository {
         return null; // ถ้าไม่ใช่ค่าที่อนุญาตเลย ให้คืนค่า null
     }
 
-    private buildPndataExpressionForRow0(
-        detail: UpdatePsdlcDetailDto,
-    ): string | null {
+    private buildPndataExpressionForRow0(detail: UpdatePsdlcDetailDto): string | null {
         const flag = detail.NEWFLAG?.trim().toUpperCase();
 
         // ลบ detail.NEWCODE !== null ออก เพื่อให้รับค่า null เข้ามาทำงานต่อได้
@@ -142,9 +120,7 @@ export class PSDLCRepository extends BaseRepository {
         if (flagPos !== null && hasCode) {
             const betweenLength = 45 - flagPos - 1;
             // ถ้า code เป็น '' การใช้ padEnd จะทำให้ได้ช่องว่างยาว 7 ตัวไปอัปเดตทับ ('       ')
-            const codeValue = this.escapeSql(
-                code!.padEnd(7, ' ').substring(0, 7),
-            );
+            const codeValue = this.escapeSql(code!.padEnd(7, ' ').substring(0, 7));
             const flagValue = this.escapeSql(flag);
             return `SUBSTR(PNDATA,1,${flagPos - 1}) || '${flagValue}' || SUBSTR(PNDATA,${flagPos + 1},${betweenLength}) || '${codeValue}' || SUBSTR(PNDATA,52)`;
         }
@@ -157,18 +133,14 @@ export class PSDLCRepository extends BaseRepository {
 
         // กรณีมีแต่ Code หรือมี Flag ที่ส่งค่ามาผิด (เลยทำแค่ Code แทน)
         if (hasCode) {
-            const codeValue = this.escapeSql(
-                code!.padEnd(7, ' ').substring(0, 7),
-            );
+            const codeValue = this.escapeSql(code!.padEnd(7, ' ').substring(0, 7));
             return `SUBSTR(PNDATA,1,44) || '${codeValue}' || SUBSTR(PNDATA,52)`;
         }
 
         return null;
     }
 
-    private buildPndataExpressionForReference(
-        detail: UpdatePsdlcDetailDto,
-    ): string | null {
+    private buildPndataExpressionForReference(detail: UpdatePsdlcDetailDto): string | null {
         const reference = detail.REFERENCE?.trim();
         if (!reference) {
             return null;
@@ -272,12 +244,7 @@ export class PSDLCRepository extends BaseRepository {
         return query.getRawMany();
     }
 
-    async updateDLCform(
-        form: FormDto,
-        status: string,
-        date: Date,
-        updateby: string,
-    ) {
+    async updateDLCform(form: FormDto, status: string, date: Date, updateby: string) {
         return this.getRepository(PSDLC_FORM).update(form, {
             CHANGE_STATUS: status,
             ACTUAL_DATE: date,

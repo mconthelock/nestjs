@@ -49,9 +49,7 @@ export class QainsOAService {
             await this.repo.create(data);
             return { status: true, message: 'Inserted Successfully' };
         } catch (error) {
-            throw new Error(
-                'Insert Qains operator and auditor ' + error.message,
-            );
+            throw new Error('Insert Qains operator and auditor ' + error.message);
         }
     }
 
@@ -66,9 +64,7 @@ export class QainsOAService {
                 message: 'Update Qains operator and auditor Successfully',
             };
         } catch (error) {
-            throw new Error(
-                'Update Qains operator and auditor ' + error.message,
-            );
+            throw new Error('Update Qains operator and auditor ' + error.message);
         }
     }
 
@@ -83,9 +79,7 @@ export class QainsOAService {
                 message: 'Delete Qains operator and auditor Successfully',
             };
         } catch (error) {
-            throw new Error(
-                'Delete Qains operator and auditor ' + error.message,
-            );
+            throw new Error('Delete Qains operator and auditor ' + error.message);
         }
     }
 }

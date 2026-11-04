@@ -12,16 +12,16 @@ import { ItemMfgListModule } from '../item-mfg-list/item-mfg-list.module';
 import { ItemMfgHistoryModule } from '../item-mfg-history/item-mfg-history.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ITEM_MFG, ITEM_STATUS], 'mitsuConnection'),
-    ItemSheetMfgModule,
-    ItemMfgListModule,
-    ItemMfgHistoryModule,
-    ItemMfgDeleteModule,
-    ControlDrawingPisModule,
-  ],
-  controllers: [ItemMfgController],
-  providers: [ItemMfgService, ItemMfgRepository],
-  exports: [ItemMfgService],
+    imports: [
+        TypeOrmModule.forFeature([ITEM_MFG, ITEM_STATUS], 'mitsuConnection'),
+        ItemSheetMfgModule,
+        ItemMfgListModule,
+        ItemMfgHistoryModule,
+        ItemMfgDeleteModule,
+        ControlDrawingPisModule,
+    ],
+    controllers: [ItemMfgController],
+    providers: [ItemMfgService, ItemMfgRepository],
+    exports: [ItemMfgService],
 })
 export class ItemMfgModule {}

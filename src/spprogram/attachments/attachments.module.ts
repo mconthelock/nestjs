@@ -6,11 +6,11 @@ import { Attachments } from './entities/attachments.entity';
 import { AttachmentsController } from './attachments.controller';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Attachments], 'mitsuConnection'),
-    MulterModule.register({ dest: './uploads' }),
-  ],
-  controllers: [AttachmentsController],
-  providers: [AttachmentsService],
+    imports: [
+        TypeOrmModule.forFeature([Attachments], 'mitsuConnection'),
+        MulterModule.register({ dest: './uploads' }),
+    ],
+    controllers: [AttachmentsController],
+    providers: [AttachmentsService],
 })
 export class AttachmentsModule {}

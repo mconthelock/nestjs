@@ -6,10 +6,7 @@ import { JopMarReq } from './entities/jop-mar-req.entity';
 import { AmeccalendarModule } from 'src/amecmfg/ameccalendar/ameccalendar.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([JopMarReq], 'mitsuConnection'),
-        AmeccalendarModule,
-    ],
+    imports: [TypeOrmModule.forFeature([JopMarReq], 'mitsuConnection'), AmeccalendarModule],
     controllers: [JopMarReqController],
     providers: [JopMarReqService],
     exports: [JopMarReqService],

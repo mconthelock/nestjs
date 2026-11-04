@@ -24,9 +24,7 @@ export class F001kpService {
     async findTsAdjustData(month: string, dwgNo: string | string[]) {
         const dwgArray = Array.isArray(dwgNo) ? dwgNo : [dwgNo];
 
-        const dwgConditions = dwgArray
-            .map((dwg) => `TRIM(F01R04) LIKE '${dwg}%'`)
-            .join(' OR ');
+        const dwgConditions = dwgArray.map((dwg) => `TRIM(F01R04) LIKE '${dwg}%'`).join(' OR ');
 
         // 1. ดึงข้อมูลหลัก
         const sql = `

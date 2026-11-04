@@ -67,19 +67,13 @@ export class QainsFormReturnService extends QainsFormService {
                 ...form,
                 CEXTDATA: '00',
             };
-            const secData = await this.usersSectionService.getUserSecByID(
-                dto.QA_INCHARGE_SECTION,
-            );
+            const secData = await this.usersSectionService.getUserSecByID(dto.QA_INCHARGE_SECTION);
             const qcsem = await this.orgposService.getOrgPos({
                 VPOSNO: '30',
                 VORGNO: secData.SSECCODE,
             });
             if (qcsem.length > 0) {
-                await this.setFlow(
-                    condSetFlow,
-                    qcsem[0].VEMPNO,
-                    qcsem[0].VEMPNO,
-                );
+                await this.setFlow(condSetFlow, qcsem[0].VEMPNO, qcsem[0].VEMPNO);
                 await this.setFlow(
                     { ...condSetFlow, CEXTDATA: '06' },
                     qcsem[0].VEMPNO,

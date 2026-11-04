@@ -21,29 +21,18 @@ export class PilineEventRecordRepository extends PilineCrudRepository<PILINE_EVE
     async findAll(issueOnly = false) {
         const query = this.getRepository(PILINE_EVENT_RECORD)
             .createQueryBuilder('event')
-            .leftJoinAndMapOne(
-                'event.NG',
-                PILINE_NG_RECORD,
-                'ng',
-                'ng.PILINE_NO = event.PILINE_NO',
-            )
-            .leftJoinAndMapMany(
-                'event.ATT',
-                PILINE_ATT,
-                'att',
-                'att.PILINE_NO = event.PILINE_NO',
-            )
-            .where(
-                '(event.RECORD_STATUS IS NULL OR event.RECORD_STATUS <> :deleted)',
-                { deleted: 'DELETE' },
-            )
+            .leftJoinAndMapOne('event.NG', PILINE_NG_RECORD, 'ng', 'ng.PILINE_NO = event.PILINE_NO')
+            .leftJoinAndMapMany('event.ATT', PILINE_ATT, 'att', 'att.PILINE_NO = event.PILINE_NO')
+            .where('(event.RECORD_STATUS IS NULL OR event.RECORD_STATUS <> :deleted)', {
+                deleted: 'DELETE',
+            })
             .orderBy('event.EVENT_DATE', 'DESC')
             .addOrderBy('event.RUN_NO', 'DESC');
         if (issueOnly) {
-            query.andWhere(
-                'event.IS_NG = :isNg AND event.RECORD_STATUS = :active',
-                { isNg: '1', active: 'ACTIVE' },
-            );
+            query.andWhere('event.IS_NG = :isNg AND event.RECORD_STATUS = :active', {
+                isNg: '1',
+                active: 'ACTIVE',
+            });
         }
         const records = (await query.getMany()) as (PILINE_EVENT_RECORD & {
             NG?: PILINE_NG_RECORD;
@@ -78,9 +67,7 @@ export class PilineEventRecordRepository extends PilineCrudRepository<PILINE_EVE
                     codes: codes.slice(offset, offset + 500),
                 })
                 .getRawMany<{ SEMPNO: string; SNAME: string }>();
-            users.forEach((user) =>
-                names.set(user.SEMPNO.trim(), user.SNAME?.trim()),
-            );
+            users.forEach((user) => names.set(user.SEMPNO.trim(), user.SNAME?.trim()));
         }
         for (let offset = 0; offset < tags.length; offset += 500) {
             const parts = await this.amec.getRepository(F110KP).find({
@@ -107,8 +94,7 @@ export class PilineEventRecordRepository extends PilineCrudRepository<PILINE_EVE
                 return {
                     ...row,
                     CREATE_BY_NAME: names.get(row.CREATE_BY?.trim()) || null,
-                    UPDATE_BY_NAME:
-                        names.get(row.UPDATE_BY?.trim() || '') || null,
+                    UPDATE_BY_NAME: names.get(row.UPDATE_BY?.trim() || '') || null,
                     JUN: product?.F11K05?.trim(),
                     P: product?.F11K06?.trim(),
                     ORDER_NO: product?.F11K04?.trim().replace(/-/g, ''),

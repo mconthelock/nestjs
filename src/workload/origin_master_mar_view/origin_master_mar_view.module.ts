@@ -6,12 +6,7 @@ import { ORIGIN_MASTER_MAR_VIEW } from 'src/common/Entities/workload/views/ORIGI
 import { OriginMasterMarViewRepository } from './origin_master_mar_view.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [ORIGIN_MASTER_MAR_VIEW],
-            'mitsuConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([ORIGIN_MASTER_MAR_VIEW], 'mitsuConnection')],
     controllers: [OriginMasterMarViewController],
     providers: [OriginMasterMarViewService, OriginMasterMarViewRepository],
 })

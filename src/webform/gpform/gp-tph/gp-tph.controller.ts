@@ -25,7 +25,7 @@ import { DoactionGpTphDto } from './dto/doaction-gp-tph.dto';
 
 @Controller('gpform/gp-tph')
 export class GpTphController {
-    constructor(private readonly gpTphService: GpTphService) { }
+    constructor(private readonly gpTphService: GpTphService) {}
 
     @Post('doaction')
     @UseTransaction('mitsuConnection')
@@ -52,13 +52,16 @@ export class GpTphController {
         @Param('nrunno') nrunno: number,
         @Query('empno') empno?: string,
     ) {
-        return this.gpTphService.findOne({
-            NFRMNO: fno,
-            VORGNO: orgno,
-            CYEAR: cyear,
-            CYEAR2: cyear2,
-            NRUNNO: nrunno,
-        }, empno);
+        return this.gpTphService.findOne(
+            {
+                NFRMNO: fno,
+                VORGNO: orgno,
+                CYEAR: cyear,
+                CYEAR2: cyear2,
+                NRUNNO: nrunno,
+            },
+            empno,
+        );
     }
 
     @Get('/list/:fno/:orgno/:cyear/:cyear2/:nrunno')
@@ -81,19 +84,14 @@ export class GpTphController {
     @Post()
     @UseTransaction('mitsuConnection')
     @UseInterceptors(getFileUploadInterceptor())
-    create(
-        @Body() dto: CreateGpTphReqDto,
-        @Req() req: Request,
-    ) {
+    create(@Body() dto: CreateGpTphReqDto, @Req() req: Request) {
         console.log('CreateGpTphReqDto:', dto);
         const ip = getClientIP(req);
         return this.gpTphService.create(dto, ip);
     }
 
     @Post('areas')
-    createArea(
-        @Body() dto: CreateDataAreaDto,
-    ) {
+    createArea(@Body() dto: CreateDataAreaDto) {
         console.log('CreateDataAreaDto:', dto);
         return this.gpTphService.createArea(dto);
     }
@@ -134,11 +132,7 @@ export class GpTphController {
     }
 
     @Patch('areas/:id')
-    updateArea(
-        @Param('id', ParseIntPipe) id: number,
-        @Body() dto: UpdateAreaDto,
-    ) {
+    updateArea(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateAreaDto) {
         return this.gpTphService.updateArea(id, dto);
     }
-
 }

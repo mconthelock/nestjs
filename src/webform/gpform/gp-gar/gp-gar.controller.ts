@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseInterceptors, UploadedFile,UploadedFiles } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    Req,
+    UseInterceptors,
+    UploadedFile,
+    UploadedFiles,
+} from '@nestjs/common';
 import { GpGarService } from './gp-gar.service';
 import { CreateGpGarDto } from './dto/create-gp-gar.dto';
 import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
@@ -9,51 +21,53 @@ import { UpdateGpGarDto } from './dto/update-gp-gar.dto';
 
 @Controller('gpform/gp-gar')
 export class GpGarController {
-  constructor(private readonly gpGarService: GpGarService) {}
+    constructor(private readonly gpGarService: GpGarService) {}
 
-  @Get()
-  findAll(){
-    return this.gpGarService.findAll();
-  }
-
-  @Post()
-  @UseTransaction('mitsuConnection')
-  @UseInterceptors(getFileUploadInterceptor('FILE'))
-  create(
-  @Body() dto: CreateGpGarDto, 
-  @Req() req: Request,
-  @UploadedFile() file: Express.Multer.File,
-  ){
-    const ip = getClientIP(req)
-    return this.gpGarService.create(dto, ip, file);
-  }
-
-   @Get('/:fno/:orgno/:cyear/:cyear2/:nrunno')
-  findOne(
-    @Param('fno') fno: number,
-    @Param('orgno') orgno: string,  
-    @Param('cyear') cyear: string,
-    @Param('cyear2') cyear2: string,
-    @Param('nrunno') nrunno: number,
-  ){
-    return this.gpGarService.findOne({NFRMNO: fno, VORGNO: orgno, CYEAR: cyear, CYEAR2: cyear2, NRUNNO: nrunno});
-  }
-
-  @Patch()
-  @UseTransaction('mitsuConnection')
-  @UseForceTransaction()
-  update(@Body() dto: UpdateGpGarDto, @Req() req: Request) {
-        const ip = getClientIP(req);
-        
-        return this.gpGarService.doaction(dto, ip);
+    @Get()
+    findAll() {
+        return this.gpGarService.findAll();
     }
 
+    @Post()
+    @UseTransaction('mitsuConnection')
+    @UseInterceptors(getFileUploadInterceptor('FILE'))
+    create(
+        @Body() dto: CreateGpGarDto,
+        @Req() req: Request,
+        @UploadedFile() file: Express.Multer.File,
+    ) {
+        const ip = getClientIP(req);
+        return this.gpGarService.create(dto, ip, file);
+    }
 
+    @Get('/:fno/:orgno/:cyear/:cyear2/:nrunno')
+    findOne(
+        @Param('fno') fno: number,
+        @Param('orgno') orgno: string,
+        @Param('cyear') cyear: string,
+        @Param('cyear2') cyear2: string,
+        @Param('nrunno') nrunno: number,
+    ) {
+        return this.gpGarService.findOne({
+            NFRMNO: fno,
+            VORGNO: orgno,
+            CYEAR: cyear,
+            CYEAR2: cyear2,
+            NRUNNO: nrunno,
+        });
+    }
 
+    @Patch()
+    @UseTransaction('mitsuConnection')
+    @UseForceTransaction()
+    update(@Body() dto: UpdateGpGarDto, @Req() req: Request) {
+        const ip = getClientIP(req);
 
+        return this.gpGarService.doaction(dto, ip);
+    }
 }
 
 @Controller('gpform/gp-gar')
 export class GpGarForm {
-  constructor(private readonly gpGarService: GpGarService) {}
-};
+    constructor(private readonly gpGarService: GpGarService) {}
+}

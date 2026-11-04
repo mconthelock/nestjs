@@ -5,9 +5,9 @@ import { ItemsCustomerController } from './items-customer.controller';
 
 import { ItemsCustomer } from './entities/items-customer.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([ItemsCustomer], 'mitsuConnection')],
-  controllers: [ItemsCustomerController],
-  providers: [ItemsCustomerService],
-  exports: [ItemsCustomerService],
+    imports: [TypeOrmModule.forFeature([ItemsCustomer], 'mitsuConnection')],
+    controllers: [ItemsCustomerController],
+    providers: [ItemsCustomerService],
+    exports: [ItemsCustomerService],
 })
 export class ItemsCustomerModule {}

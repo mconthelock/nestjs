@@ -62,18 +62,10 @@ export class JopPurConfService {
                 result = await queryRunner.manager.save(latest); // ไม่ต้องแปลงเพราะ select โดย typeorm จะคืนค่า entity object อยู่แล้ว
             } else {
                 dataToSave.JOP_REVISION = 1; // กำหนด Revision เป็น 1 ถ้าเป็น Record ใหม่
-                const newRecord = queryRunner.manager.create(
-                    JopPurConf,
-                    dataToSave,
-                ); // ต้องแปลง plain object เป็น entity object ก่อนบันทึกเสมอ
+                const newRecord = queryRunner.manager.create(JopPurConf, dataToSave); // ต้องแปลง plain object เป็น entity object ก่อนบันทึกเสมอ
                 result = await queryRunner.manager.save(newRecord);
             }
-            const revision = await this.getRevisionHistory(
-                MFGNO,
-                PONO,
-                LINENO,
-                queryRunner,
-            ); // ค้นหา Revision History ทั้งหมดหลังจากบันทึกใหม่
+            const revision = await this.getRevisionHistory(MFGNO, PONO, LINENO, queryRunner); // ค้นหา Revision History ทั้งหมดหลังจากบันทึกใหม่
             const updatePurStatus = await this.jopMarReqService.update(
                 {
                     MFGNO,
@@ -89,9 +81,7 @@ export class JopPurConfService {
                 data: result,
                 status: true,
                 rev: revision.map((r) => {
-                    r.JOP_REVISION_TEXT = numberToAlphabetRevision(
-                        r.JOP_REVISION,
-                    );
+                    r.JOP_REVISION_TEXT = numberToAlphabetRevision(r.JOP_REVISION);
                     return {
                         REVISION: r.JOP_REVISION,
                         REVISION_TEXT: r.JOP_REVISION_TEXT,
@@ -132,9 +122,7 @@ export class JopPurConfService {
         list: { mfg: string; pono: number; line: number }[],
         queryRunner?: QueryRunner,
     ) {
-        const repo = queryRunner
-            ? queryRunner.manager.getRepository(JopPurConf)
-            : this.confRepo;
+        const repo = queryRunner ? queryRunner.manager.getRepository(JopPurConf) : this.confRepo;
         return await repo
             .createQueryBuilder('jop')
             .select([
@@ -247,11 +235,7 @@ export class JopPurConfService {
                 'B',
                 'A.JOP_MFGNO = B.JOP_MFGNO AND A.JOP_PONO = B.JOP_PONO AND A.JOP_LINENO = B.JOP_LINENO AND B.LAST_REVISION = A.JOP_REVISION',
             )
-            .innerJoin(
-                '(SELECT * FROM AMECUSERALL)',
-                'U',
-                'A.JOP_PUR_CONFIRM = U.SEMPNO',
-            );
+            .innerJoin('(SELECT * FROM AMECUSERALL)', 'U', 'A.JOP_PUR_CONFIRM = U.SEMPNO');
         query.distinct(dto.distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
 
         let select = [];
@@ -274,10 +258,8 @@ export class JopPurConfService {
             query.andWhere('A.JOP_REVISION = :revision', {
                 revision: dto.JOP_REVISION,
             });
-        if (dto.JOP_MFGNO)
-            query.andWhere('A.JOP_MFGNO = :mfgno', { mfgno: dto.JOP_MFGNO });
-        if (dto.JOP_PONO)
-            query.andWhere('A.JOP_PONO = :pono', { pono: dto.JOP_PONO });
+        if (dto.JOP_MFGNO) query.andWhere('A.JOP_MFGNO = :mfgno', { mfgno: dto.JOP_MFGNO });
+        if (dto.JOP_PONO) query.andWhere('A.JOP_PONO = :pono', { pono: dto.JOP_PONO });
         if (dto.JOP_LINENO)
             query.andWhere('A.JOP_LINENO = :lineno', {
                 lineno: dto.JOP_LINENO,
@@ -299,28 +281,24 @@ export class JopPurConfService {
             );
         }
         if (dto.SCONFDATE) {
-            query.andWhere(
-                `A.JOP_PUR_INPUT_DATE >= TO_DATE(:SCONFDATE, 'YYYY-MM-DD')`,
-                { SCONFDATE: dto.SCONFDATE },
-            );
+            query.andWhere(`A.JOP_PUR_INPUT_DATE >= TO_DATE(:SCONFDATE, 'YYYY-MM-DD')`, {
+                SCONFDATE: dto.SCONFDATE,
+            });
         }
         if (dto.ECONFDATE) {
-            query.andWhere(
-                `A.JOP_PUR_INPUT_DATE <= TO_DATE(:ECONFDATE, 'YYYY-MM-DD')`,
-                { ECONFDATE: dto.ECONFDATE },
-            );
+            query.andWhere(`A.JOP_PUR_INPUT_DATE <= TO_DATE(:ECONFDATE, 'YYYY-MM-DD')`, {
+                ECONFDATE: dto.ECONFDATE,
+            });
         }
         if (dto.SINPUTDATE) {
-            query.andWhere(
-                `A.JOP_PUR_INPUT_DATE >= TO_DATE(:SINPUTDATE, 'YYYY-MM-DD')`,
-                { SINPUTDATE: dto.SINPUTDATE },
-            );
+            query.andWhere(`A.JOP_PUR_INPUT_DATE >= TO_DATE(:SINPUTDATE, 'YYYY-MM-DD')`, {
+                SINPUTDATE: dto.SINPUTDATE,
+            });
         }
         if (dto.EINPUTDATE) {
-            query.andWhere(
-                `A.JOP_PUR_INPUT_DATE <= TO_DATE(:EINPUTDATE, 'YYYY-MM-DD')`,
-                { EINPUTDATE: dto.EINPUTDATE },
-            );
+            query.andWhere(`A.JOP_PUR_INPUT_DATE <= TO_DATE(:EINPUTDATE, 'YYYY-MM-DD')`, {
+                EINPUTDATE: dto.EINPUTDATE,
+            });
         }
         return await query.getRawMany();
     }

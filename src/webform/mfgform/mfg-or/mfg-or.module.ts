@@ -4,10 +4,8 @@ import { MfgOrController } from './mfg-or.controller';
 import { MfgOrService } from './mfg-or.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([], 'mitsuConnection'),
-  ],
-  controllers: [MfgOrController],
-  providers: [MfgOrService],
+    imports: [TypeOrmModule.forFeature([], 'mitsuConnection')],
+    controllers: [MfgOrController],
+    providers: [MfgOrService],
 })
 export class MfgOrModule {}

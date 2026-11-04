@@ -7,16 +7,10 @@ import { PilineBendingMainController } from './piline_bending_main.controller';
 import { PilineBendingMainRepository } from './piline_bending_main.repository';
 import { PilineBendingMainService } from './piline_bending_main.service';
 
-
 @Module({
-  imports: [
-    TypeOrmModule.forFeature(
-      [piline_bending_main],
-      'mitsuConnection',
-    ),
-  ],
-  controllers: [PilineBendingMainController],
-  providers: [PilineBendingMainService, PilineBendingMainRepository,],
-  exports: [PilineBendingMainService],
+    imports: [TypeOrmModule.forFeature([piline_bending_main], 'mitsuConnection')],
+    controllers: [PilineBendingMainController],
+    providers: [PilineBendingMainService, PilineBendingMainRepository],
+    exports: [PilineBendingMainService],
 })
 export class PilineBendingMainModule {}

@@ -20,12 +20,7 @@ export class OrganizationsRepository extends BaseRepository {
 
     async search(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(ORGANIZATIONS, 'O');
-        this.applyFilters(qb, 'O', dto, [
-            'SDEPCODE',
-            'SDIVCODE',
-            'SSEC',
-            'CSTATUS',
-        ]);
+        this.applyFilters(qb, 'O', dto, ['SDEPCODE', 'SDIVCODE', 'SSEC', 'CSTATUS']);
         return qb.getMany();
     }
 }

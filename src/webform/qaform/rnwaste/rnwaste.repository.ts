@@ -8,30 +8,25 @@ import { RNWASTE } from 'src/common/Entities/webform/table/RNWASTE.entity';
 
 @Injectable()
 export class RnwasteRepository extends BaseRepository {
-  constructor(
-    @InjectDataSource('mitsuConnection') ds: DataSource,
-  ) {
-    super(ds);
-  }
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
+        super(ds);
+    }
 
-  findAll() {
-    return this.manager.find(RNWASTE);
-  }
+    findAll() {
+        return this.manager.find(RNWASTE);
+    }
 
-  findOne(wid: number) {
-    return this.getRepository(RNWASTE).findOneBy({
-      WID: Number(wid),
-    });
-  }
+    findOne(wid: number) {
+        return this.getRepository(RNWASTE).findOneBy({
+            WID: Number(wid),
+        });
+    }
 
-  async search(dto: FiltersDto) {
-    const qb = this.manager.createQueryBuilder(RNWASTE, 'R');
+    async search(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(RNWASTE, 'R');
 
-    this.applyFilters(qb, 'R', dto, [
-      'WID',
-      'WASTE',
-    ]);
+        this.applyFilters(qb, 'R', dto, ['WID', 'WASTE']);
 
-    return qb.getMany();
-  }
+        return qb.getMany();
+    }
 }

@@ -1,9 +1,4 @@
-import {
-    IntersectionType,
-    OmitType,
-    PartialType,
-    PickType,
-} from '@nestjs/swagger';
+import { IntersectionType, OmitType, PartialType, PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
     IsArray,
@@ -37,10 +32,8 @@ export class ApproveIetsDto extends PickType(FormDto, [
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    @Transform(({ value }) =>
-        value !== undefined && value !== null ? Number(value) : value,
-    )
-    EXTDATA?: Number;
+    @Transform(({ value }) => (value !== undefined && value !== null ? Number(value) : value))
+    EXTDATA?: number;
 
     @IsOptional()
     @IsString()

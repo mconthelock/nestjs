@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { JopMarReqService } from './jop-mar-req.service';
 import { CreateJopMarReqDto } from './dto/create-jop-mar-req.dto';
 import { UpdateJopMarReqDto } from './dto/update-jop-mar-req.dto';
@@ -14,30 +6,25 @@ import { SearchJopMarReqDto } from './dto/search-jop-mar-req.dto';
 
 @Controller('joborder/request')
 export class JopMarReqController {
-  constructor(
-    private readonly jopMarReqService: JopMarReqService,
-  ) {}
+    constructor(private readonly jopMarReqService: JopMarReqService) {}
 
-  @Post('setRequestDate')
-  async create(@Body() dto: CreateJopMarReqDto) {
-      return await this.jopMarReqService.create(dto);
-  }
+    @Post('setRequestDate')
+    async create(@Body() dto: CreateJopMarReqDto) {
+        return await this.jopMarReqService.create(dto);
+    }
 
-  @Patch('update')
-  async update(
-    @Body() dto: UpdateJopMarReqDto,
-  ) {
-    return await this.jopMarReqService.update(dto);
-  }
+    @Patch('update')
+    async update(@Body() dto: UpdateJopMarReqDto) {
+        return await this.jopMarReqService.update(dto);
+    }
 
-  @Post('search')
-  async search(@Body() dto: SearchJopMarReqDto) {
-      return await this.jopMarReqService.search(dto);
-  }
+    @Post('search')
+    async search(@Body() dto: SearchJopMarReqDto) {
+        return await this.jopMarReqService.search(dto);
+    }
 
-  @Post('getRevisionHistoryByKey')
-  async getRevisionHistoryByKey(@Body() list: { mfg: string; pono: number; line: number }[]) {
-      return await this.jopMarReqService.getRevisionHistoryByKey(list);
-  }
-
+    @Post('getRevisionHistoryByKey')
+    async getRevisionHistoryByKey(@Body() list: { mfg: string; pono: number; line: number }[]) {
+        return await this.jopMarReqService.getRevisionHistoryByKey(list);
+    }
 }

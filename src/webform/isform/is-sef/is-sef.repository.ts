@@ -24,7 +24,7 @@ export class IsSefRepository extends BaseRepository {
         return this.getRepository(ISEVA_SCORES).save(data);
     }
 
-    async updateSession(keys,data) {
+    async updateSession(keys, data) {
         return this.getRepository(ISEVA_SESSIONS).update(keys, data);
     }
 
@@ -47,12 +47,7 @@ export class IsSefRepository extends BaseRepository {
             }),
             this.manager
                 .createQueryBuilder(ISEVA_SCORES, 't')
-                .innerJoinAndMapOne(
-                    't.criteria',
-                    ISEVA_CRITERIA,
-                    'ic',
-                    'ic.EVA_ID = t.EVA_ID',
-                )
+                .innerJoinAndMapOne('t.criteria', ISEVA_CRITERIA, 'ic', 'ic.EVA_ID = t.EVA_ID')
                 .where('t.NFRMNO = :NFRMNO', { NFRMNO })
                 .andWhere('t.VORGNO = :VORGNO', { VORGNO })
                 .andWhere('t.CYEAR = :CYEAR', { CYEAR })
@@ -71,8 +66,6 @@ export class IsSefRepository extends BaseRepository {
     }
 
     async getWorkPlan(filter?: Partial<WorkPlan>) {
-        return this.docinvDs.manager
-            .getRepository(WorkPlan)
-            .find({ where: filter });
+        return this.docinvDs.manager.getRepository(WorkPlan).find({ where: filter });
     }
 }

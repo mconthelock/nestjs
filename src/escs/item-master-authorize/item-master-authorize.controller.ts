@@ -8,41 +8,41 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 
 @Controller('escs/item-master-authorize')
 export class ItemMasterAuthorizeController {
-  constructor(private readonly itemMasterAuthorizeService: ItemMasterAuthorizeService) {}
+    constructor(private readonly itemMasterAuthorizeService: ItemMasterAuthorizeService) {}
 
-  @Post()
-  @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
-  async create(@Body() dto: CreateItemMasterAuthorizeDto) {
-    return await this.itemMasterAuthorizeService.create(dto);
-  }
+    @Post()
+    @UseInterceptors(getFileUploadInterceptor())
+    @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
+    async create(@Body() dto: CreateItemMasterAuthorizeDto) {
+        return await this.itemMasterAuthorizeService.create(dto);
+    }
 
-  @Get()
-  findAll() {
-    return this.itemMasterAuthorizeService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.itemMasterAuthorizeService.findAll();
+    }
 
-  @Post('search')
-  @UseTransaction('mitsuConnection') 
-  async search(@Body() dto: FiltersDto) {
-    return this.itemMasterAuthorizeService.search(dto);
-  }
+    @Post('search')
+    @UseTransaction('mitsuConnection')
+    async search(@Body() dto: FiltersDto) {
+        return this.itemMasterAuthorizeService.search(dto);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.itemMasterAuthorizeService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.itemMasterAuthorizeService.findOne(+id);
+    }
 
-  @Patch(':id')
-  @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('mitsuConnection')
-  update(@Param('id') id: string, @Body() dto: UpdateItemMasterAuthorizeDto) {
-    return this.itemMasterAuthorizeService.update(+id, dto);
-  }
+    @Patch(':id')
+    @UseInterceptors(getFileUploadInterceptor())
+    @UseTransaction('mitsuConnection')
+    update(@Param('id') id: string, @Body() dto: UpdateItemMasterAuthorizeDto) {
+        return this.itemMasterAuthorizeService.update(+id, dto);
+    }
 
-  @Delete(':id')
-  @UseTransaction('mitsuConnection')
-  remove(@Param('id') id: string) {
-    return this.itemMasterAuthorizeService.remove(+id);
-  }
+    @Delete(':id')
+    @UseTransaction('mitsuConnection')
+    remove(@Param('id') id: string) {
+        return this.itemMasterAuthorizeService.remove(+id);
+    }
 }

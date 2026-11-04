@@ -16,17 +16,11 @@ import { CreateStInpDto, DraftStInpDto } from './dto/create-st-inp.dto';
 import { UpdateStInpDto } from './dto/update-st-inp.dto';
 import { Request } from 'express';
 import { getClientIP } from 'src/common/utils/ip.utils';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { StInpCreateService } from './st-inp-create.service';
 import { StInpCorrectiveService } from './st-inp-corrective.service';
-import {
-    CorrectiveStInpDetailDto,
-    CorrectiveStInpDto,
-} from './dto/corrective-st-inp.dto';
+import { CorrectiveStInpDetailDto, CorrectiveStInpDto } from './dto/corrective-st-inp.dto';
 import { StInpEvaluateService } from './st-inp-evaluate.service';
 import { EvaluateStInpDto } from './dto/evaluate-st-inp.dto';
 import { StInpSaveDraftService } from './st-inp-saveDraft.service';
@@ -54,12 +48,7 @@ export class StInpController {
         @UploadedFiles() file: Express.Multer.File[],
     ) {
         const ip = getClientIP(req);
-        return this.stInpCreateService.create(
-            createStInpDto,
-            ip,
-            file,
-            this.path,
-        );
+        return this.stInpCreateService.create(createStInpDto, ip, file, this.path);
     }
 
     @Post('saveAndAction')
@@ -93,12 +82,7 @@ export class StInpController {
         @UploadedFiles() file: Express.Multer.File[],
     ) {
         const ip = getClientIP(req);
-        return this.stInpCorrectiveService.setCorrectiveDetail(
-            dto,
-            ip,
-            file,
-            this.path,
-        );
+        return this.stInpCorrectiveService.setCorrectiveDetail(dto, ip, file, this.path);
     }
 
     @Patch('setEvaluate')
@@ -118,5 +102,4 @@ export class StInpController {
     async mailAlertManual(@Param('date') date: string) {
         return this.stInpJobAlertService.alert(date);
     }
-
 }

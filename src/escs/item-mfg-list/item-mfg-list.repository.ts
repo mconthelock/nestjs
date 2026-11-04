@@ -9,66 +9,58 @@ import { ITEM_MFG_LIST } from 'src/common/Entities/escs/table/ITEM_MFG_LIST.enti
 
 @Injectable()
 export class ItemMfgListRepository extends BaseRepository {
-  constructor(
-    @InjectDataSource('mitsuConnection') ds: DataSource,
-    ) {
-    super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
-  }
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
+    }
 
-  async create(dto: CreateItemMfgListDto) {
-    return this.getRepository(ITEM_MFG_LIST).save(dto);
-  }
+    async create(dto: CreateItemMfgListDto) {
+        return this.getRepository(ITEM_MFG_LIST).save(dto);
+    }
 
-  findAll() {
-    // ใช้ได้ทั้งหมด
-    // return this.manager.query(`select * from ITEM_MFG_LIST`);
-    // return this.getRepository(ITEM_MFG_LIST).find();
-    return this.manager.find(ITEM_MFG_LIST);
-  }
+    findAll() {
+        // ใช้ได้ทั้งหมด
+        // return this.manager.query(`select * from ITEM_MFG_LIST`);
+        // return this.getRepository(ITEM_MFG_LIST).find();
+        return this.manager.find(ITEM_MFG_LIST);
+    }
 
-  findOne(id: number) {
-    return this.getRepository(ITEM_MFG_LIST).findOneBy({ NID: id });
-  }
+    findOne(id: number) {
+        return this.getRepository(ITEM_MFG_LIST).findOneBy({ NID: id });
+    }
 
-  async search(dto: FiltersDto) {
-    const qb = this.manager.createQueryBuilder(ITEM_MFG_LIST, 'I');
-    this.applyFilters(qb, 'I', dto, [
-      'NID',
-      'NITEMID',
-      'VDRAWING',
-      'NSHEETID',
-      'VNUMBER_FILE',
-      'NSTATUS',
-      'NUSERUPDATE',
-    ]);
-    return qb
-      .leftJoinAndSelect('I.HISTORY', 'H')
-      .orderBy('I.NITEMID, I.NSHEETID, I.VDRAWING', 'ASC')
-      .getMany();
-  }
+    async search(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(ITEM_MFG_LIST, 'I');
+        this.applyFilters(qb, 'I', dto, [
+            'NID',
+            'NITEMID',
+            'VDRAWING',
+            'NSHEETID',
+            'VNUMBER_FILE',
+            'NSTATUS',
+            'NUSERUPDATE',
+        ]);
+        return qb
+            .leftJoinAndSelect('I.HISTORY', 'H')
+            .orderBy('I.NITEMID, I.NSHEETID, I.VDRAWING', 'ASC')
+            .getMany();
+    }
 
-  async update(id: number, dto: UpdateItemMfgListDto) {
-    return this.getRepository(ITEM_MFG_LIST).update(
-      { NID: id, NSTATUS: Not(3) },
-      dto,
-    );
-  }
+    async update(id: number, dto: UpdateItemMfgListDto) {
+        return this.getRepository(ITEM_MFG_LIST).update({ NID: id, NSTATUS: Not(3) }, dto);
+    }
 
-  async updateBySheetId(sheetId: number, dto: UpdateItemMfgListDto) {
-    return this.getRepository(ITEM_MFG_LIST).update(
-      { NSHEETID: sheetId, NSTATUS: Not(3) },
-      dto,
-    );
-  }
+    async updateBySheetId(sheetId: number, dto: UpdateItemMfgListDto) {
+        return this.getRepository(ITEM_MFG_LIST).update(
+            { NSHEETID: sheetId, NSTATUS: Not(3) },
+            dto,
+        );
+    }
 
-  async updateByItemId(ItemId: number, dto: UpdateItemMfgListDto) {
-    return this.getRepository(ITEM_MFG_LIST).update(
-      { NITEMID: ItemId, NSTATUS: Not(3) },
-      dto,
-    );
-  }
+    async updateByItemId(ItemId: number, dto: UpdateItemMfgListDto) {
+        return this.getRepository(ITEM_MFG_LIST).update({ NITEMID: ItemId, NSTATUS: Not(3) }, dto);
+    }
 
-  async remove(id: number) {
-    return this.getRepository(ITEM_MFG_LIST).delete(id);
-  }
+    async remove(id: number) {
+        return this.getRepository(ITEM_MFG_LIST).delete(id);
+    }
 }

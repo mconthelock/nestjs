@@ -45,18 +45,20 @@ export interface ActionFinnpoDto {
     VENDOR_CODE?: string | number;
     AIR_SALES_BY?: string[] | string;
     DELETE_FILE_IDS?: number[] | string;
-    DATA?: Array<{
-        ID?: number;
-        LINE_ID?: number;
-        INVOICE_DATE?: string;
-        INVOICE_NO?: string;
-        NET_PRICE?: number;
-        VAT_RATE_ID?: number;
-        TOTAL_AMT?: number;
-        SCURCODE?: string;
-        WHT?: string | null;
-        REFERENCE?: string | null;
-    }> | string;
+    DATA?:
+        | Array<{
+              ID?: number;
+              LINE_ID?: number;
+              INVOICE_DATE?: string;
+              INVOICE_NO?: string;
+              NET_PRICE?: number;
+              VAT_RATE_ID?: number;
+              TOTAL_AMT?: number;
+              SCURCODE?: string;
+              WHT?: string | null;
+              REFERENCE?: string | null;
+          }>
+        | string;
 }
 
 export interface FinnpoReportFilterDto {
@@ -97,9 +99,7 @@ export class FinnpoService {
     async createExpense(dto: Record<string, unknown>) {
         const expense = this.normalizeExpense(dto);
         if (await this.repo.findExpenseByCodeAny(expense.EXPENSE_CODE)) {
-            throw new BadRequestException(
-                `EXPENSE_CODE ${expense.EXPENSE_CODE} already exists`,
-            );
+            throw new BadRequestException(`EXPENSE_CODE ${expense.EXPENSE_CODE} already exists`);
         }
 
         return {
@@ -118,28 +118,15 @@ export class FinnpoService {
             throw new BadRequestException('Original expense key is required');
         }
 
-        const existing = await this.repo.findExpense(
-            originalCode,
-            originalEname,
-            originalTname,
-        );
+        const existing = await this.repo.findExpense(originalCode, originalEname, originalTname);
         if (!existing) throw new BadRequestException('Expense was not found');
 
-        const duplicate = await this.repo.findExpenseByCodeAny(
-            expense.EXPENSE_CODE,
-        );
+        const duplicate = await this.repo.findExpenseByCodeAny(expense.EXPENSE_CODE);
         if (duplicate && duplicate.EXPENSE_CODE !== originalCode) {
-            throw new BadRequestException(
-                `EXPENSE_CODE ${expense.EXPENSE_CODE} already exists`,
-            );
+            throw new BadRequestException(`EXPENSE_CODE ${expense.EXPENSE_CODE} already exists`);
         }
 
-        await this.repo.updateExpense(
-            originalCode,
-            originalEname,
-            originalTname,
-            expense,
-        );
+        await this.repo.updateExpense(originalCode, originalEname, originalTname, expense);
         return { status: true, message: 'Update expense success', data: expense };
     }
 
@@ -192,9 +179,7 @@ export class FinnpoService {
     async createVendor(dto: Record<string, unknown>) {
         const vendor = this.normalizeVendor(dto);
         if (await this.repo.findVendorByCode(vendor.VENDOR_CODE)) {
-            throw new BadRequestException(
-                `VENDOR_CODE ${vendor.VENDOR_CODE} already exists`,
-            );
+            throw new BadRequestException(`VENDOR_CODE ${vendor.VENDOR_CODE} already exists`);
         }
 
         return {
@@ -217,9 +202,7 @@ export class FinnpoService {
 
         const duplicate = await this.repo.findVendorByCode(vendor.VENDOR_CODE);
         if (duplicate && duplicate.VENDOR_CODE !== originalCode) {
-            throw new BadRequestException(
-                `VENDOR_CODE ${vendor.VENDOR_CODE} already exists`,
-            );
+            throw new BadRequestException(`VENDOR_CODE ${vendor.VENDOR_CODE} already exists`);
         }
 
         await this.repo.updateVendor(originalCode, originalName, vendor);
@@ -250,9 +233,7 @@ export class FinnpoService {
         const VENDOR_NAME = String(dto.VENDOR_NAME || '').trim();
         const ACTIVE = String(dto.ACTIVE) === '0' ? '0' : '1';
         if (!VENDOR_CODE || !VENDOR_NAME) {
-            throw new BadRequestException(
-                'VENDOR_CODE and VENDOR_NAME are required',
-            );
+            throw new BadRequestException('VENDOR_CODE and VENDOR_NAME are required');
         }
         return { VENDOR_CODE, VENDOR_NAME, ACTIVE };
     }
@@ -280,13 +261,7 @@ export class FinnpoService {
         cyear2: string,
         nrunno: number,
     ) {
-        const data = await this.repo.findOneForShow(
-            nfrmno,
-            vorgno,
-            cyear,
-            cyear2,
-            nrunno,
-        );
+        const data = await this.repo.findOneForShow(nfrmno, vorgno, cyear, cyear2, nrunno);
 
         if (!data.head) {
             return {
@@ -307,27 +282,19 @@ export class FinnpoService {
         const filters = {
             formDateFrom: this.validateReportDate(dto.formDateFrom, 'formDateFrom'),
             formDateTo: this.validateReportDate(dto.formDateTo, 'formDateTo'),
-            invoiceDateFrom: this.validateReportDate(
-                dto.invoiceDateFrom,
-                'invoiceDateFrom',
-            ),
+            invoiceDateFrom: this.validateReportDate(dto.invoiceDateFrom, 'invoiceDateFrom'),
             invoiceDateTo: this.validateReportDate(dto.invoiceDateTo, 'invoiceDateTo'),
             approveDateFrom: this.validateReportDate(dto.approveDateFrom, 'approveDateFrom'),
             approveDateTo: this.validateReportDate(dto.approveDateTo, 'approveDateTo'),
             expenseCode:
-                dto.expenseCode === undefined ||
-                dto.expenseCode === null ||
-                dto.expenseCode === ''
+                dto.expenseCode === undefined || dto.expenseCode === null || dto.expenseCode === ''
                     ? undefined
                     : Number(dto.expenseCode),
             vendorCode: String(dto.vendorCode || '').trim() || undefined,
             costCenter: String(dto.costCenter || '').trim() || undefined,
         };
 
-        if (
-            filters.expenseCode !== undefined &&
-            !Number.isFinite(filters.expenseCode)
-        ) {
+        if (filters.expenseCode !== undefined && !Number.isFinite(filters.expenseCode)) {
             throw new BadRequestException('expenseCode must be a number');
         }
         if (
@@ -335,18 +302,14 @@ export class FinnpoService {
             filters.formDateTo &&
             filters.formDateFrom > filters.formDateTo
         ) {
-            throw new BadRequestException(
-                'formDateFrom must not be later than formDateTo',
-            );
+            throw new BadRequestException('formDateFrom must not be later than formDateTo');
         }
         if (
             filters.invoiceDateFrom &&
             filters.invoiceDateTo &&
             filters.invoiceDateFrom > filters.invoiceDateTo
         ) {
-            throw new BadRequestException(
-                'invoiceDateFrom must not be later than invoiceDateTo',
-            );
+            throw new BadRequestException('invoiceDateFrom must not be later than invoiceDateTo');
         }
 
         if (
@@ -354,9 +317,7 @@ export class FinnpoService {
             filters.approveDateTo &&
             filters.approveDateFrom > filters.approveDateTo
         ) {
-            throw new BadRequestException(
-                'approveDateFrom must not be later than approveDateTo',
-            );
+            throw new BadRequestException('approveDateFrom must not be later than approveDateTo');
         }
 
         return {
@@ -434,13 +395,9 @@ export class FinnpoService {
         }
 
         if (deletedFiles.length) {
-            await this.repo.deleteFilesByIds(
-                deletedFiles.map((file) => Number(file.FILE_ID)),
-            );
+            await this.repo.deleteFilesByIds(deletedFiles.map((file) => Number(file.FILE_ID)));
             await Promise.allSettled(
-                deletedFiles.map((file) =>
-                    deleteFile(path.join(file.FILE_PATH, file.FILE_FNAME)),
-                ),
+                deletedFiles.map((file) => deleteFile(path.join(file.FILE_PATH, file.FILE_FNAME))),
             );
         }
 
@@ -466,17 +423,10 @@ export class FinnpoService {
         const invoices = this.parseActionInvoices(dto.DATA);
 
         if (invoices.length) {
-            await this.repo.updateInvoices(
-                dto.CYEAR2 || dto.CYEAR,
-                Number(dto.NRUNNO),
-                invoices,
-            );
+            await this.repo.updateInvoices(dto.CYEAR2 || dto.CYEAR, Number(dto.NRUNNO), invoices);
         }
 
-        if (
-            dto.EXPENSE_CODE !== undefined ||
-            dto.VENDOR_CODE !== undefined
-        ) {
+        if (dto.EXPENSE_CODE !== undefined || dto.VENDOR_CODE !== undefined) {
             await this.repo.updateHead(
                 Number(dto.NFRMNO),
                 dto.VORGNO,
@@ -499,11 +449,7 @@ export class FinnpoService {
             const costCenters = await Promise.all(
                 employeeCodes.map(async (reqno) => {
                     const employee = await this.usersService.findEmp(reqno);
-                    const costCode = [
-                        employee?.SSECCODE,
-                        employee?.SDEPCODE,
-                        employee?.SDIVCODE,
-                    ]
+                    const costCode = [employee?.SSECCODE, employee?.SDEPCODE, employee?.SDIVCODE]
                         .map((value) => String(value ?? '').trim())
                         .find(Boolean);
 
@@ -529,11 +475,7 @@ export class FinnpoService {
         }
     }
 
-    async create(
-        dto: CreateFinnpoDto,
-        files: Express.Multer.File[],
-        ip: string,
-    ) {
+    async create(dto: CreateFinnpoDto, files: Express.Multer.File[], ip: string) {
         this.validateCreateDto(dto);
 
         const invoices = this.parseInvoices(dto.DATA);
@@ -544,15 +486,11 @@ export class FinnpoService {
         const expense = await this.repo.findExpenseByCode(expenseCode);
 
         if (!vendor) {
-            throw new BadRequestException(
-                `VENDOR_CODE ${vendorCode} was not found`,
-            );
+            throw new BadRequestException(`VENDOR_CODE ${vendorCode} was not found`);
         }
 
         if (!expense) {
-            throw new BadRequestException(
-                `EXPENSE_CODE ${dto.EXPENSE_CODE} was not found`,
-            );
+            throw new BadRequestException(`EXPENSE_CODE ${dto.EXPENSE_CODE} was not found`);
         }
 
         const formmst = await this.formmstService.getFormMasterByVaname('FIN-NPO');
@@ -593,9 +531,7 @@ export class FinnpoService {
             TOTAL_AMT: Number(invoice.TOTAL_AMT),
             SCURCODE: invoice.SCURCODE,
             ...(invoice.WHT !== undefined && { WHT: invoice.WHT }),
-            REFERENCE: invoice.REFERENCE == null
-                ? null
-                : String(invoice.REFERENCE).trim() || null,
+            REFERENCE: invoice.REFERENCE == null ? null : String(invoice.REFERENCE).trim() || null,
         }));
         const savedInvoices = await this.repo.createInvoices(invoiceEntities);
 
@@ -608,9 +544,7 @@ export class FinnpoService {
                     employee?.SDIVCODE,
                 ].map((value) => String(value ?? '').trim());
                 const costCode =
-                    employeeCostCodes.find(
-                        (value) => value !== '' && !/^0+$/.test(value),
-                    ) || '';
+                    employeeCostCodes.find((value) => value !== '' && !/^0+$/.test(value)) || '';
 
                 if (!employee || !costCode) {
                     throw new BadRequestException(
@@ -679,9 +613,10 @@ export class FinnpoService {
                 ID: id,
                 ...(wht !== undefined && { WHT: wht }),
                 ...(invoice.REFERENCE !== undefined && {
-                    REFERENCE: invoice.REFERENCE === null
-                        ? null
-                        : String(invoice.REFERENCE).trim() || null,
+                    REFERENCE:
+                        invoice.REFERENCE === null
+                            ? null
+                            : String(invoice.REFERENCE).trim() || null,
                 }),
                 ...(invoice.INVOICE_DATE !== undefined && {
                     INVOICE_DATE: new Date(invoice.INVOICE_DATE),
@@ -724,13 +659,7 @@ export class FinnpoService {
             values = [data];
         }
 
-        return [
-            ...new Set(
-                values
-                    .map((value) => String(value || '').trim())
-                    .filter(Boolean),
-            ),
-        ];
+        return [...new Set(values.map((value) => String(value || '').trim()).filter(Boolean))];
     }
 
     private parseInvoices(data: CreateFinnpoDto['DATA']) {
@@ -775,9 +704,7 @@ export class FinnpoService {
 
     private validateCreateDto(dto: CreateFinnpoDto) {
         if (!dto?.INPUTBY || !dto?.REQBY) {
-            throw new BadRequestException(
-                'INPUTBY and REQBY are required',
-            );
+            throw new BadRequestException('INPUTBY and REQBY are required');
         }
 
         if (dto.VENDOR_CODE === undefined || dto.VENDOR_CODE === null) {

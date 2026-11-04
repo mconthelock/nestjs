@@ -64,11 +64,7 @@ export function convertJung(text: string): string | null {
  * @param bool flage the fixed digit, true is fixed and false is not fixed
  * @return string
  */
-export function setRound(
-    d: number | string,
-    digit: number = 2,
-    flage: boolean = true,
-): string {
+export function setRound(d: number | string, digit: number = 2, flage: boolean = true): string {
     if (!d) {
         return flage ? (0).toFixed(digit) : '0';
     }
@@ -142,8 +138,5 @@ export function ordinalIndicator(
         }
     }
     const finalIndicator: string = upperCase ? indicator.toUpperCase() : indicator;
-    return (
-        number +
-        (supperScript ? `<sup>${finalIndicator}</sup>` : finalIndicator)
-    );
+    return number + (supperScript ? `<sup>${finalIndicator}</sup>` : finalIndicator);
 }

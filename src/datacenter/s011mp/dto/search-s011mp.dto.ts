@@ -4,7 +4,7 @@ export class SearchPackingDto {
     @IsNotEmpty()
     @IsString()
     ORDER: string;
-    
+
     @IsOptional()
     @IsString()
     ITEM?: string;

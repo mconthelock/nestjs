@@ -93,9 +93,7 @@ export class MatrixItemMasterService {
         } catch (error) {
             if (localRunner && didStartTx && localRunner.isTransactionActive)
                 await localRunner.rollbackTransaction();
-            throw new Error(
-                'Insert Matrix Item Master Error: ' + error.message,
-            );
+            throw new Error('Insert Matrix Item Master Error: ' + error.message);
         } finally {
             if (localRunner && didConnect) await localRunner.release();
         }
@@ -129,9 +127,7 @@ export class MatrixItemMasterService {
         } catch (error) {
             if (localRunner && didStartTx && localRunner.isTransactionActive)
                 await localRunner.rollbackTransaction();
-            throw new Error(
-                'Update Matrix Item Master Error: ' + error.message,
-            );
+            throw new Error('Update Matrix Item Master Error: ' + error.message);
         } finally {
             if (localRunner && didConnect) await localRunner.release();
         }
@@ -160,9 +156,7 @@ export class MatrixItemMasterService {
         } catch (error) {
             if (localRunner && didStartTx && localRunner.isTransactionActive)
                 await localRunner.rollbackTransaction();
-            throw new Error(
-                'Delete Matrix Item Master Error: ' + error.message,
-            );
+            throw new Error('Delete Matrix Item Master Error: ' + error.message);
         } finally {
             if (localRunner && didConnect) await localRunner.release();
         }

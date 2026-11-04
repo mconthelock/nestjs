@@ -5,56 +5,48 @@ import { FXALOCMSTRepository } from './fxa_locmst.repository';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 
-
 @Injectable()
 export class FxaLocmstService {
-  constructor(
-    private readonly repo: FXALOCMSTRepository
-) {}
+    constructor(private readonly repo: FXALOCMSTRepository) {}
 
-
-  async create(dto: CreateFxaLocmstDto) {
-    
-    const isExist = await this.repo.findOne(dto.LOCCODE);
-    if (isExist) {
-        return {
-                    status: false,
-                    message: 'Location code is conflict',
+    async create(dto: CreateFxaLocmstDto) {
+        const isExist = await this.repo.findOne(dto.LOCCODE);
+        if (isExist) {
+            return {
+                status: false,
+                message: 'Location code is conflict',
             };
-    }
-    try {
+        }
+        try {
             const res = await this.repo.insertLocation(dto);
-            if(!res){
+            if (!res) {
                 throw new Error('Failed to Insert Location Master');
             }
-            return { 
+            return {
                 status: true,
                 message: 'Insert Location Master Successfully',
             };
         } catch (error) {
             throw new Error('Insert Location Master Error: ' + error.message);
         }
-    
+    }
 
-  }
-
-  async import(dtos: CreateFxaLocmstDto[]){
+    async import(dtos: CreateFxaLocmstDto[]) {
         try {
             const res = await this.repo.importLocation(dtos);
-            if(!res){
+            if (!res) {
                 throw new Error('Failed to Import Location Master');
             }
-            return { 
+            return {
                 status: true,
                 message: 'Import Location Master Successfully',
             };
         } catch (error) {
             throw new Error('Import Location Master Error: ' + error.message);
         }
+    }
 
-  }
-
-  async findAll() {
+    async findAll() {
         try {
             const res = await this.repo.findAll();
             const length = res.length;
@@ -65,8 +57,7 @@ export class FxaLocmstService {
                     data: [],
                 };
             }
-            for (const d of res){
-                
+            for (const d of res) {
             }
             return {
                 status: true,
@@ -76,47 +67,45 @@ export class FxaLocmstService {
         } catch (error) {
             throw new Error('Search Location Master Error: ' + error.message);
         }
-  }
-
-
-  findOne(id: number) {
-    return `This action returns a #${id} fxaLocmst`;
-  }
-
-  async update(locCode: string, updateDto: UpdateFxaLocmstDto) {
-    try {
-      // เรียกใช้ Repository ที่เราเพิ่งเขียนไป
-      const isSuccess = await this.repo.updateLocation(locCode, updateDto);
-      
-      if (!isSuccess) {
-        return {
-            status: false,
-            message: `Location Code ${locCode} not found`,
-        };
-      }
-
-      return { 
-          status: true,
-          message: 'Update Location Master Successfully',
-      };
-
-    } catch (error) {
-      return {
-          status: false,
-          message: 'Update Location Master Error: ' + error.message,
-      };
     }
-}
 
-//   update(id: number, updateFxaLocmstDto: UpdateFxaLocmstDto) {
-//     return `This action updates a #${id} fxaLocmst`;
-//   }
+    findOne(id: number) {
+        return `This action returns a #${id} fxaLocmst`;
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} fxaLocmst`;
-  }
+    async update(locCode: string, updateDto: UpdateFxaLocmstDto) {
+        try {
+            // เรียกใช้ Repository ที่เราเพิ่งเขียนไป
+            const isSuccess = await this.repo.updateLocation(locCode, updateDto);
 
-  async search(dto: FiltersDto) {
+            if (!isSuccess) {
+                return {
+                    status: false,
+                    message: `Location Code ${locCode} not found`,
+                };
+            }
+
+            return {
+                status: true,
+                message: 'Update Location Master Successfully',
+            };
+        } catch (error) {
+            return {
+                status: false,
+                message: 'Update Location Master Error: ' + error.message,
+            };
+        }
+    }
+
+    //   update(id: number, updateFxaLocmstDto: UpdateFxaLocmstDto) {
+    //     return `This action updates a #${id} fxaLocmst`;
+    //   }
+
+    remove(id: number) {
+        return `This action removes a #${id} fxaLocmst`;
+    }
+
+    async search(dto: FiltersDto) {
         try {
             const res = await this.repo.search(dto);
             const length = res.length;
@@ -136,7 +125,4 @@ export class FxaLocmstService {
             throw new Error('Search Location Master Error: ' + error.message);
         }
     }
-
-
-
 }

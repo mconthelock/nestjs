@@ -35,9 +35,7 @@ export class PsClmRepository extends BaseRepository {
 
     lockForms() {
         // ponytail: one table lock keeps allocation atomic; replace with a DB unique key/sequence if create throughput matters
-        return this.manager.query(
-            'LOCK TABLE WEBFORM.PSCLM_FORM IN EXCLUSIVE MODE',
-        );
+        return this.manager.query('LOCK TABLE WEBFORM.PSCLM_FORM IN EXCLUSIVE MODE');
     }
 
     async findNewOrders(prefix: string): Promise<string[]> {
@@ -93,10 +91,7 @@ export class PsClmRepository extends BaseRepository {
         return inserted;
     }
 
-    async updateDetailSchedules(
-        form: FormDto,
-        details: Partial<PSCLM_DETAIL>[],
-    ) {
+    async updateDetailSchedules(form: FormDto, details: Partial<PSCLM_DETAIL>[]) {
         const updated = [];
         for (const detail of details) {
             updated.push(
@@ -178,8 +173,7 @@ export class PsClmRepository extends BaseRepository {
     }
 
     findReport(year: string | null, filters: Record<string, string> = {}) {
-        const formNo =
-            "'PS-CLM' || SUBSTR(F.CYEAR2, 3, 2) || '-' || LPAD(F.NRUNNO, 6, '0')";
+        const formNo = "'PS-CLM' || SUBSTR(F.CYEAR2, 3, 2) || '-' || LPAD(F.NRUNNO, 6, '0')";
         const requester =
             "CASE WHEN REQ.SNAME IS NULL THEN F.VREQNO ELSE F.VREQNO || '_' || REQ.SNAME END";
         const query = this.manager
@@ -251,41 +245,24 @@ export class PsClmRepository extends BaseRepository {
                 },
             );
         }
-        this.addLikeFilter(
-            query,
-            'D.DRAWING',
-            'DRAWING_NO',
-            filters.DRAWING_NO,
-        );
+        this.addLikeFilter(query, 'D.DRAWING', 'DRAWING_NO', filters.DRAWING_NO);
         this.addLikeFilter(
             query,
             "TRIM(D.SCHDNUM || ' / ' || D.SCHDP)",
             'PRODUCTION',
             filters.PRODUCTION,
         );
-        this.addRangeFilter(
-            query,
-            'D.SCHDNUM',
-            'SCHEDULE_FROM',
-            'SCHEDULE_TO',
-            filters,
-        );
+        this.addRangeFilter(query, 'D.SCHDNUM', 'SCHEDULE_FROM', 'SCHEDULE_TO', filters);
 
         if (filters.FORM_DATE_FROM) {
-            query.andWhere(
-                "TRUNC(F.DREQDATE) >= TO_DATE(:FORM_DATE_FROM, 'YYYY-MM-DD')",
-                {
-                    FORM_DATE_FROM: filters.FORM_DATE_FROM,
-                },
-            );
+            query.andWhere("TRUNC(F.DREQDATE) >= TO_DATE(:FORM_DATE_FROM, 'YYYY-MM-DD')", {
+                FORM_DATE_FROM: filters.FORM_DATE_FROM,
+            });
         }
         if (filters.FORM_DATE_TO) {
-            query.andWhere(
-                "TRUNC(F.DREQDATE) <= TO_DATE(:FORM_DATE_TO, 'YYYY-MM-DD')",
-                {
-                    FORM_DATE_TO: filters.FORM_DATE_TO,
-                },
-            );
+            query.andWhere("TRUNC(F.DREQDATE) <= TO_DATE(:FORM_DATE_TO, 'YYYY-MM-DD')", {
+                FORM_DATE_TO: filters.FORM_DATE_TO,
+            });
         }
 
         return query.getRawMany();

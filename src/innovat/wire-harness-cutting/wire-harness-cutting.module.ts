@@ -19,7 +19,7 @@ import { WHN_AUTOPLAN } from 'src/common/Entities/innovat/views/WHN_AUTOPLAN.ent
             WHN_REASON,
             WHN_PRODUCTION,
             WHN_AUTOPLAN,
-        ], 'innovatConnection'),
+        ], 'mitsuConnection'),
     ],
     controllers: [
         WireHarnessCuttingController,

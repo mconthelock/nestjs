@@ -28,10 +28,10 @@ export class JopPurConfService {
     ) {}
 
     private readonly JOP_PUR_CONF = this.dataSource
-        .getMetadata('JOP_PUR_CONF')
+        .getMetadata('DAILYIDS.JOP_PUR_CONF')
         .columns.map((c) => c.propertyName);
     private readonly AMECUSERALL = this.dataSource
-        .getMetadata('AMECUSERALL')
+        .getMetadata('AMEC.AMECUSERALL')
         .columns.map((c) => c.propertyName);
     private readonly allowFields = [...this.JOP_PUR_CONF, ...this.AMECUSERALL];
 
@@ -147,7 +147,7 @@ export class JopPurConfService {
                             'JOP_LINENO',
                             'MAX(JOP_REVISION) AS MAX_REV',
                         ])
-                        .from('JOP_PUR_CONF', 'M')
+                        .from('DAILYIDS.JOP_PUR_CONF', 'M')
                         .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
                 'PUR',
                 `jop.JOP_MFGNO = PUR.JOP_MFGNO
@@ -222,7 +222,7 @@ export class JopPurConfService {
         const repo = queryRunner ? queryRunner.manager : this.dataSource;
         const query = repo
             .createQueryBuilder()
-            .from('JOP_PUR_CONF', 'A')
+            .from('DAILYIDS.JOP_PUR_CONF', 'A')
             .innerJoin(
                 (qb) =>
                     qb
@@ -230,12 +230,12 @@ export class JopPurConfService {
                         .select(
                             'JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION',
                         )
-                        .from('JOP_PUR_CONF', 'MAR')
+                        .from('DAILYIDS.JOP_PUR_CONF', 'MAR')
                         .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
                 'B',
                 'A.JOP_MFGNO = B.JOP_MFGNO AND A.JOP_PONO = B.JOP_PONO AND A.JOP_LINENO = B.JOP_LINENO AND B.LAST_REVISION = A.JOP_REVISION',
             )
-            .innerJoin('(SELECT * FROM AMECUSERALL)', 'U', 'A.JOP_PUR_CONFIRM = U.SEMPNO');
+            .innerJoin('(SELECT * FROM AMEC.AMECUSERALL)', 'U', 'A.JOP_PUR_CONFIRM = U.SEMPNO');
         query.distinct(dto.distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
 
         let select = [];

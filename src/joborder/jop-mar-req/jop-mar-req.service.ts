@@ -27,7 +27,7 @@ export class JopMarReqService {
         .getMetadata('DAILYIDS.JOP_MAR_REQ')
         .columns.map((c) => c.propertyName);
     private readonly AMECUSERALL = this.dataSource
-        .getMetadata('AMECUSERALL')
+        .getMetadata('AMEC.AMECUSERALL')
         .columns.map((c) => c.propertyName);
     private readonly allowFields = [...this.JOP_MAR_REQ, ...this.AMECUSERALL];
 
@@ -245,7 +245,7 @@ export class JopMarReqService {
                         .select(
                             'JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION',
                         )
-                        .from('JOP_MAR_REQ', 'MAR')
+                        .from('DAILYIDS.JOP_MAR_REQ', 'MAR')
                         .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
                 'B',
                 'A.JOP_MFGNO = B.JOP_MFGNO AND A.JOP_PONO = B.JOP_PONO AND A.JOP_LINENO = B.JOP_LINENO AND B.LAST_REVISION = A.JOP_REVISION',

@@ -13,7 +13,7 @@ export class OrderListService {
     constructor(
         @InjectRepository(VOrderList, 'datacenterConnection')
         private readonly OrderListRepository: Repository<VOrderList>,
-        @InjectDataSource('datacenterConnection')
+        @InjectDataSource('mitsuConnection')
         private dataSource: DataSource,
         private readonly JopMarReqService: JopMarReqService,
         private readonly JopPurConfService: JopPurConfService,

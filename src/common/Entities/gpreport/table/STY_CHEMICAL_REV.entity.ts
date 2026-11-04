@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { STY_CHEMICAL_CONTROL } from './STY_CHEMICAL_CONTROL.entity';
 
 @Entity({ name: 'STY_CHEMICAL_REV', schema: 'GPREPORT' })
 export class STY_CHEMICAL_REV {
@@ -35,6 +36,6 @@ export class STY_CHEMICAL_REV {
     @Column()
     APPROVE_DATE: Date;
 
-    @Column()
-    USER_CONTROL: string;
+    @OneToMany(() => STY_CHEMICAL_CONTROL, control => control.REV)
+    CONTROLS: STY_CHEMICAL_CONTROL[];
 }

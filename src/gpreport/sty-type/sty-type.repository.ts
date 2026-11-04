@@ -14,6 +14,7 @@ export class StyTypeRepository extends BaseRepository {
         return this.getRepository(STY_TYPE).find({
             where: {
                 TYPE_CODE: typecode,
+                TYPE_STATUS: 1
             },
             order: {
                 TYPE_NO: 'ASC',

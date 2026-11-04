@@ -16,6 +16,11 @@ export class RevRepository extends BaseRepository {
                 STATUS: 1,
                 OWNER: Not('MASTER'),
             },
+            relations: {
+                CONTROLS: {
+                    USER: true,
+                }
+            },
             order: {
                 OWNER: 'ASC',
             },

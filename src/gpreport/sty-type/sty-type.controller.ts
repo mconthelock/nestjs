@@ -4,8 +4,6 @@ import {
     Param,
 } from '@nestjs/common';
 import { StyTypeService } from './sty-type.service';
-import { CreateStyTypeDto } from './dto/create-sty-type.dto';
-import { UpdateStyTypeDto } from './dto/update-sty-type.dto';
 
 @Controller('gpreport/sty-type')
 export class StyTypeController {
@@ -19,5 +17,10 @@ export class StyTypeController {
     @Get('class')
     getClass(){
         return this.styTypeService.findByTypeCode('PTC');
+    }
+
+    @Get('chemical/class')
+    getChemicalClass(){
+        return this.styTypeService.findByTypeCode('CMC');
     }
 }

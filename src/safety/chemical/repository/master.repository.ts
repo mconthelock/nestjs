@@ -87,6 +87,7 @@ export class MasterRepository extends BaseRepository {
                     MAX('Y') FOR OWNER IN (${pivot})
                 ) A
                 WHERE A.STATUS = :1
+                ORDER BY A.AMEC_SDS_ID ASC
             `,
             [status],
         );

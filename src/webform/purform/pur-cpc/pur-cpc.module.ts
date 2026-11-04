@@ -11,9 +11,26 @@ import { PurCpcDetailRepository } from './repository/purcpc_details.repository';
 import { CreatePurCpcService } from './services/purcpc_create.service';
 import { PurcpcProcItemDetailRepository } from './repository/purcpc_proc_item_detail.repository';
 import { PurPraModule } from '../pur-pra/pur-pra.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { COND_COMPARISON_PRICE } from 'src/common/Entities/webform/table/COND_COMPARISON_PRICE.entity';
+import { PURCPC_DETAILS } from 'src/common/Entities/webform/table/PURCPC_DETAILS.entity';
+import { PURCPC_FORM } from 'src/common/Entities/webform/table/PURCPC_FORM.entity';
+import { PURCPC_FORM_LISTS_VIEW } from 'src/common/Entities/webform/views/PURCPC_FORM_LISTS_VIEW.entity';
+import { PURCPC_PROC_COMPARE_VIEW } from 'src/common/Entities/webform/views/PURCPC_PROC_COMPARE_VIEW.entity';
+import { PURCPC_PROC_ITEMDETAIL } from 'src/common/Entities/webform/views/PURCPC_PROC_ITEMDETAIL.entity';
+import { PURCPC_PROC_LIST_VIEW } from 'src/common/Entities/webform/views/PURCPC_PROC_LIST_VIEW.entity';
 
 @Module({
-    imports: [Iim400Module, forwardRef(() => PurPraModule)],
+    imports: [
+        TypeOrmModule.forFeature([
+        COND_COMPARISON_PRICE,
+        PURCPC_DETAILS,
+        PURCPC_FORM,
+        PURCPC_FORM_LISTS_VIEW,
+        PURCPC_PROC_COMPARE_VIEW,
+        PURCPC_PROC_ITEMDETAIL,
+        PURCPC_PROC_LIST_VIEW,
+    ], 'mitsuConnection'),Iim400Module, forwardRef(() => PurPraModule)],
     controllers: [PurCpcController],
     providers: [
         // service

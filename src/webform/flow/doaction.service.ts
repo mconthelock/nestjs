@@ -245,6 +245,7 @@ export class DoactionFlowService extends FlowService {
     async updateFromStatus(form: FormDto) {
         let flowStatus: string = '';
         //FIND UNFINISH STEP
+        // เมื่อ approve เสร็จทั้งหมด จะตรวจสอบว่า reject หรือไม่
         if (!(await this.checkUnfinishedFlow(form))) {
             //FIND REJECT STEP
             const reject = await this.getFlow({
@@ -253,14 +254,18 @@ export class DoactionFlowService extends FlowService {
                 ...form,
                 CAPVSTNO: this.APV_REJECT,
             });
+            // ถ้าไม่มี reject step แสดงว่า flow ถูก approve ทั้งหมด
             if (reject.length == 0) {
                 flowStatus = this.FLOW_APPROVE;
-            } else {
+            } 
+            // ถ้ามี reject step ให้ตรวจสอบว่าเป็น single approve หรือไม่
+            else {
                 for (const step of reject) {
                     if (step.CAPVTYPE == this.APV_TYPE_SINGLE) {
                         flowStatus = this.FLOW_REJECT;
                         break;
                     } else {
+                        // ถ้าไม่ใช่ single approve ให้ตรวจสอบว่า step นี้ถูก approve หรือไม่
                         const stepApv = await this.getFlow({
                             distinct: true,
                             fields: ['CSTEPNO'],
@@ -268,15 +273,32 @@ export class DoactionFlowService extends FlowService {
                             CSTEPNO: step.CSTEPNO,
                             CAPVSTNO: this.APV_APPROVE,
                         });
+                        // ถ้า step นี้ถูก approve แล้ว ให้ถือว่า flow ถูก reject
                         if (stepApv.length > 0) {
                             flowStatus = this.FLOW_REJECT;
                             break;
-                        } else {
+                        } 
+                        // ถ้า step นี้ยังไม่ถูก approve ให้ถือว่า flow ถูก approve
+                        else {
                             flowStatus = this.FLOW_APPROVE;
                         }
                     }
                 }
             }
+            // // UPDATE FLOW STATUS
+            // await this.formService.updateForm({
+            //     condition: form,
+            //     CST: flowStatus,
+            // });
+        } else {
+            //* 2026-11-04 update form status เมื่อ form status = 0 (underprepair)
+            //check form status = 0 underprepair
+            const formDetail = await this.formService.getCst(form);
+            if (formDetail && formDetail.CST == '0') {
+                flowStatus = this.FLOW_RUNNING;
+            }
+        }
+        if (flowStatus != '') {
             // UPDATE FLOW STATUS
             await this.formService.updateForm({
                 condition: form,

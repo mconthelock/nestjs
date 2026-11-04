@@ -2,8 +2,9 @@ import { Module } from '@nestjs/common';
 import { IeBgrModule } from './ie-bgr/ie-bgr.module';
 import { IeFileModule } from './ie-file/ie-file.module';
 import { IeTsModule } from './ie-ts/ie-ts.module';
+import { IePtsModule } from './IE-PTS/ie-pts.module';
 
 @Module({
-  imports: [IeBgrModule, IeFileModule, IeTsModule],
+    imports: [IeBgrModule, IeFileModule, IeTsModule, IePtsModule],
 })
 export class IEFormModule {}

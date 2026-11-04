@@ -13,6 +13,7 @@ import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 import { FormService } from 'src/webform/form/form.service';
 import { Request } from 'express';
 import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
+import { IePtsService } from '../IE-PTS/ie-pts.service';
 
 @Injectable()
 export class IeTsApproveService {
@@ -28,6 +29,7 @@ export class IeTsApproveService {
         protected readonly delService: DeleteFlowStepService,
         protected readonly doactionService: DoactionFlowService,
         protected readonly formService: FormService,
+        protected readonly ieptsService: IePtsService,
     ) {}
     async approve(dto: ApproveIetsDto, ip: string) {
         try {

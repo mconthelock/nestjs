@@ -19,6 +19,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:db": "jest --testPathPattern=real-db-connection",
     "copy": "xcopy D:\\project\\backend\\dist \\\\172.21.255.188\\amecweb\\wwwroot\\development\\backend\\dist /E /I /Y",
     "typeorm": "typeorm --dataSource src/common/databases/data-source.ts",
     "migration:create": "npm run typeorm -- migration:create -n",

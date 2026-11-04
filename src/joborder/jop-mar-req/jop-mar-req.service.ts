@@ -24,7 +24,7 @@ export class JopMarReqService {
     ) {}
 
     private readonly JOP_MAR_REQ = this.dataSource
-        .getMetadata('JOP_MAR_REQ')
+        .getMetadata('DAILYIDS.JOP_MAR_REQ')
         .columns.map((c) => c.propertyName);
     private readonly AMECUSERALL = this.dataSource
         .getMetadata('AMECUSERALL')
@@ -140,7 +140,7 @@ export class JopMarReqService {
                             'JOP_LINENO',
                             'MAX(JOP_REVISION) AS MAX_REV',
                         ])
-                        .from('JOP_MAR_REQ', 'M')
+                        .from('DAILYIDS.JOP_MAR_REQ', 'M')
                         .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
                 'MAR',
                 `jop.JOP_MFGNO = MAR.JOP_MFGNO
@@ -237,7 +237,7 @@ export class JopMarReqService {
         const repo = queryRunner ? queryRunner.manager : this.dataSource;
         const query = repo
             .createQueryBuilder()
-            .from('JOP_MAR_REQ', 'A')
+            .from('DAILYIDS.JOP_MAR_REQ', 'A')
             .innerJoin(
                 (qb) =>
                     qb
@@ -250,7 +250,7 @@ export class JopMarReqService {
                 'B',
                 'A.JOP_MFGNO = B.JOP_MFGNO AND A.JOP_PONO = B.JOP_PONO AND A.JOP_LINENO = B.JOP_LINENO AND B.LAST_REVISION = A.JOP_REVISION',
             )
-            .innerJoin('(SELECT * FROM AMECUSERALL)', 'U', 'A.JOP_MAR_REQUEST = U.SEMPNO');
+            .innerJoin('(SELECT * FROM AMEC.AMECUSERALL)', 'U', 'A.JOP_MAR_REQUEST = U.SEMPNO');
         query.distinct(dto.distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
         let select = [];
         if (fields.length > 0) {

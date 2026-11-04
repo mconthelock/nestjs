@@ -16,9 +16,32 @@ import { StInpJobAlertService } from './job/st-inp-mail-alert.service';
 import { StInpRepository } from './st-inp.repository';
 import { MailModule } from 'src/common/services/mail/mail.module';
 import { SequenceOrgModule } from 'src/webform/sequence-org/sequence-org.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
+import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
+import { AMECUSERALL } from 'src/common/Entities/amec/views/AMECUSERALL.entity';
+import { User } from 'src/common/Entities/amec/views/user.entity';
+import { FORMMST } from '../../../common/Entities/webform/table/FORMMST.entity';
+import { QAINS_FORM } from '../../../common/Entities/webform/table/QAINS_FORM.entity';
+import { ORGPOS } from '../../../common/Entities/webform/table/ORGPOS.entity';
+import { QAINS_OPERATOR_AUDITOR } from '../../../common/Entities/webform/table/QAINS_OPERATOR_AUDITOR.entity';
+import { USERS } from '../../../common/Entities/escs/table/USERS.entity';
+import { INV_YEARLY_ASSIGN } from '../../../common/Entities/skid/table/INV_YEARLY_ASSIGN.entity';
 
 @Module({
     imports: [
+        TypeOrmModule.forFeature([
+        FORM,
+        FLOW,
+        AMECUSERALL,
+        User,
+        FORMMST,
+        QAINS_FORM,
+        ORGPOS,
+        QAINS_OPERATOR_AUDITOR,
+        USERS,
+        INV_YEARLY_ASSIGN,
+    ], 'mitsuConnection'),
         FormModule,
         FormmstModule,
         FlowModule,

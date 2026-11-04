@@ -23,13 +23,7 @@ export class IetsListRepository extends BaseRepository {
         return this.getRepository(IETS_LIST).save(dto);
     }
 
-    async getMaxId(
-        nfrmno: number,
-        vorgno: string,
-        cyear: string,
-        cyear2: string,
-        nrunno: number,
-    ) {
+    async getMaxId(nfrmno: number, vorgno: string, cyear: string, cyear2: string, nrunno: number) {
         const result = await this.getRepository(IETS_LIST)
             .createQueryBuilder('list')
             .select('MAX(list.ID)', 'maxId')
@@ -57,16 +51,11 @@ export class IetsListRepository extends BaseRepository {
     }
 
     // ใน IetsListRepository
-    async getLatestRequestsByDwgNos(
-        dwgNos: string[],
-        requestDate: string | Date,
-    ) {
+    async getLatestRequestsByDwgNos(dwgNos: string[], requestDate: string | Date) {
         if (!dwgNos || dwgNos.length === 0) return [];
 
         const parsedRequestDate =
-            typeof requestDate === 'string'
-                ? new Date(requestDate)
-                : requestDate;
+            typeof requestDate === 'string' ? new Date(requestDate) : requestDate;
 
         const query = await this.getRepository(IETS_LIST)
             .createQueryBuilder('list')
@@ -108,10 +97,7 @@ export class IetsListRepository extends BaseRepository {
             ...con,
             ID: ID,
         };
-        const result = await this.getRepository(IETS_LIST).update(
-            conditions,
-            updateData,
-        );
+        const result = await this.getRepository(IETS_LIST).update(conditions, updateData);
         return (result.affected ?? 0) > 0;
     }
 

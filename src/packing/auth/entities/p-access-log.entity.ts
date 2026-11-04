@@ -2,24 +2,24 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity({ name: 'PAccessLog' })
 export class PAccessLog {
-  @PrimaryGeneratedColumn()
-  alogId: number;
+    @PrimaryGeneratedColumn()
+    alogId: number;
 
-  @Column()
-  usrid: string;
+    @Column()
+    usrid: string;
 
-  @Column()
-  accessid: string;
+    @Column()
+    accessid: string;
 
-  @Column()
-  accessip: string;
+    @Column()
+    accessip: string;
 
-  @Column()
-  accesstime: Date;
+    @Column()
+    accesstime: Date;
 
-  @Column()
-  endtime: Date;
+    @Column()
+    endtime: Date;
 
-  @Column()
-  accesslocal: boolean;
+    @Column()
+    accesslocal: boolean;
 }

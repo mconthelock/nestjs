@@ -2,12 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
-import {
-    copyFile,
-    deleteFile,
-    joinPaths,
-    moveFileFromMulter,
-} from 'src/common/utils/files.utils';
+import { copyFile, deleteFile, joinPaths, moveFileFromMulter } from 'src/common/utils/files.utils';
 
 import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
 import { FormCreateService } from 'src/webform/form/create-form.service';
@@ -51,11 +46,7 @@ export class IsDevService {
         return await qb.getMany();
     }
 
-    async create(
-        ip: string,
-        dto: CreateIsDevDto,
-        files?: Express.Multer.File[],
-    ) {
+    async create(ip: string, dto: CreateIsDevDto, files?: Express.Multer.File[]) {
         try {
             let form: FormDto;
             const { REQBY, INPUTBY, DRAFT, REMARK, ...tmp } = dto;

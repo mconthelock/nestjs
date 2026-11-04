@@ -27,7 +27,13 @@ export class CreateJigDto {
     @IsString()
     @MaxLength(100)
     DWG?: string;
-    @Transform(({ value }) => typeof value === 'number' ? String(value) : typeof value === 'string' ? value.trim() : value)
+    @Transform(({ value }) =>
+        typeof value === 'number'
+            ? String(value)
+            : typeof value === 'string'
+              ? value.trim()
+              : value,
+    )
     @IsDefined()
     @IsNotEmpty()
     @IsString()

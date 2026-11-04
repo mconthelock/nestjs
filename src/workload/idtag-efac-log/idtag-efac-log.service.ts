@@ -44,9 +44,7 @@ export class IdtagEfacLogService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Search IDTAG_EFAC_LOG by id ${id} Error: ` + error.message,
-            );
+            throw new Error(`Search IDTAG_EFAC_LOG by id ${id} Error: ` + error.message);
         }
     }
 
@@ -75,14 +73,14 @@ export class IdtagEfacLogService {
         try {
             const sysdate = await this.repo.getSysdate();
             const month = Number(sysdate.MONTH);
-            const year  = Number(sysdate.YEAR);
+            const year = Number(sysdate.YEAR);
             const runno = await this.repo.getMaxRunno(dto.process, month, year);
             return {
                 status: true,
                 year,
                 year2: sysdate.YEAR2,
-                month,   
-                runno: runno + 1
+                month,
+                runno: runno + 1,
             };
         } catch (error) {
             throw new Error('Get Max Runno Error: ' + error.message);

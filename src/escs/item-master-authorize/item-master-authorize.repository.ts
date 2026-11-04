@@ -9,41 +9,39 @@ import { ITEM_MASTER_AUTHORIZE } from 'src/common/Entities/escs/table/ITEM_MASTE
 
 @Injectable()
 export class ItemMasterAuthorizeRepository extends BaseRepository {
-  constructor(
-    @InjectDataSource('mitsuConnection') ds: DataSource,
-    ) {
-    super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
-  }
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
+    }
 
-  async create(dto: CreateItemMasterAuthorizeDto) {
-    return this.getRepository(ITEM_MASTER_AUTHORIZE).save(dto);
-  }
+    async create(dto: CreateItemMasterAuthorizeDto) {
+        return this.getRepository(ITEM_MASTER_AUTHORIZE).save(dto);
+    }
 
-  findAll() {
-    // ใช้ได้ทั้งหมด
-    // return this.manager.query(`select * from BLOCK_MASTER`);
-    // return this.getRepository(ItemMasterAuthorize).find();
-    return this.manager.find(ITEM_MASTER_AUTHORIZE);
-  }
+    findAll() {
+        // ใช้ได้ทั้งหมด
+        // return this.manager.query(`select * from BLOCK_MASTER`);
+        // return this.getRepository(ItemMasterAuthorize).find();
+        return this.manager.find(ITEM_MASTER_AUTHORIZE);
+    }
 
-  findOne(id: number) {
-    return this.getRepository(ITEM_MASTER_AUTHORIZE).findOneBy({ NID: id });
-  }
+    findOne(id: number) {
+        return this.getRepository(ITEM_MASTER_AUTHORIZE).findOneBy({ NID: id });
+    }
 
-  async search(dto: FiltersDto) {
-    const qb = this.manager.createQueryBuilder(ITEM_MASTER_AUTHORIZE, 'I');
-    this.applyFilters(qb, 'I', dto, ['VAUTH', 'NTYPE', 'NSTATUS']);
-    return qb
-      .leftJoinAndSelect('I.TYPE_DETAIL', 'TYPE_DETAIL')
-      .orderBy('I.NID', 'ASC')
-      .getMany();
-  }
+    async search(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(ITEM_MASTER_AUTHORIZE, 'I');
+        this.applyFilters(qb, 'I', dto, ['VAUTH', 'NTYPE', 'NSTATUS']);
+        return qb
+            .leftJoinAndSelect('I.TYPE_DETAIL', 'TYPE_DETAIL')
+            .orderBy('I.NID', 'ASC')
+            .getMany();
+    }
 
-  async update(id: number, dto: UpdateItemMasterAuthorizeDto) {
-    return this.getRepository(ITEM_MASTER_AUTHORIZE).update(id, dto);
-  }
+    async update(id: number, dto: UpdateItemMasterAuthorizeDto) {
+        return this.getRepository(ITEM_MASTER_AUTHORIZE).update(id, dto);
+    }
 
-  async remove(id: number) {
-    return this.getRepository(ITEM_MASTER_AUTHORIZE).delete(id);
-  }
+    async remove(id: number) {
+        return this.getRepository(ITEM_MASTER_AUTHORIZE).delete(id);
+    }
 }

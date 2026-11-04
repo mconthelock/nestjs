@@ -15,11 +15,7 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
     // 1. Mock TypeORM Repository
     const mockProductRepository = {
         create: jest.fn().mockImplementation((dto) => dto),
-        save: jest
-            .fn()
-            .mockImplementation((product) =>
-                Promise.resolve({ ID: 1, ...product }),
-            ),
+        save: jest.fn().mockImplementation((product) => Promise.resolve({ ID: 1, ...product })),
     };
 
     // 2. Mock Categories Service (เพื่อจำลอง Attribute Schema ที่สืบทอดมา)
@@ -54,9 +50,7 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
 
         service = module.get<ProductsService>(ProductsService);
         categoriesService = module.get<CategoriesService>(CategoriesService);
-        optionRegistry = module.get<OptionRegistryService>(
-            OptionRegistryService,
-        );
+        optionRegistry = module.get<OptionRegistryService>(OptionRegistryService);
 
         // กำหนด Schema จำลองสำหรับ "คอมพิวเตอร์ Desktop" ไว้เป็นค่าเริ่มต้น
         mockCategoriesService.getInheritedAttributes.mockResolvedValue([
@@ -93,9 +87,7 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
         jest.clearAllMocks();
     });
 
-    const buildDto = (
-        overrides: Partial<CreateProductDto> = {},
-    ): CreateProductDto => ({
+    const buildDto = (overrides: Partial<CreateProductDto> = {}): CreateProductDto => ({
         SPRODCODE: 'PC-001',
         SPRODID: 'P-001',
         SEPRODNAME: 'Desktop PC',
@@ -138,10 +130,7 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
         expect(result.SPRODCODE).toBe('PC-001');
         expect(result.EXTRA_ATTRIBUTES.brand).toBe('Dell');
         expect(mockProductRepository.save).toHaveBeenCalled();
-        expect(mockOptionRegistry.execute).toHaveBeenCalledWith(
-            'checkSupplier',
-            'SUP-999',
-        );
+        expect(mockOptionRegistry.execute).toHaveBeenCalledWith('checkSupplier', 'SUP-999');
     });
 
     it('ควรแจ้งเตือน (BadRequest) เมื่อไม่ส่ง Attribute ที่เป็นฟิลด์บังคับ (isRequired)', async () => {
@@ -156,9 +145,7 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
         });
 
         await expect(service.create(dto)).rejects.toThrow(BadRequestException);
-        await expect(service.create(dto)).rejects.toThrow(
-            'จำเป็นต้องระบุ Attribute: ram_gb',
-        );
+        await expect(service.create(dto)).rejects.toThrow('จำเป็นต้องระบุ Attribute: ram_gb');
     });
 
     it('ควรแจ้งเตือน (BadRequest) เมื่อส่งข้อมูลผิดประเภท (เช่น ส่งตัวอักษรเข้าฟิลด์ Number)', async () => {
@@ -175,9 +162,7 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
         });
 
         await expect(service.create(dto)).rejects.toThrow(BadRequestException);
-        await expect(service.create(dto)).rejects.toThrow(
-            'ram_gb ต้องเป็นตัวเลขเท่านั้น',
-        );
+        await expect(service.create(dto)).rejects.toThrow('ram_gb ต้องเป็นตัวเลขเท่านั้น');
     });
 
     it('ควรแจ้งเตือน (BadRequest) เมื่อเลือก Option แบบ Fixed ไม่ตรงกับค่าที่กำหนดไว้', async () => {
@@ -194,9 +179,7 @@ describe('ProductsService - Dynamic Attributes Validation', () => {
         });
 
         await expect(service.create(dto)).rejects.toThrow(BadRequestException);
-        await expect(service.create(dto)).rejects.toThrow(
-            /ต้องเป็นหนึ่งในนี้เท่านั้น/,
-        );
+        await expect(service.create(dto)).rejects.toThrow(/ต้องเป็นหนึ่งในนี้เท่านั้น/);
     });
 
     it('ควรแจ้งเตือน (BadRequest) เมื่อ Option แบบ Function ตรวจสอบแล้วไม่ผ่าน', async () => {

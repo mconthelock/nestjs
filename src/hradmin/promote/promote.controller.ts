@@ -1,11 +1,4 @@
-import {
-    Controller,
-    Post,
-    UseGuards,
-    Request,
-    Body,
-    Res,
-} from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Body, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { PromoteService } from './promote.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -47,8 +40,7 @@ export class PromoteController {
         const key = await this.dbService.decrypt(req.user.user);
         const pdfkey = key.split(':')[3];
         let passkey = pdfkey;
-        if (data.ASETYP !== 'MP')
-            passkey = `${pdfkey.substring(4, 8)}${pdfkey.substring(0, 4)}`;
+        if (data.ASETYP !== 'MP') passkey = `${pdfkey.substring(4, 8)}${pdfkey.substring(0, 4)}`;
         return await this.docs.createFile({ ...data, passkey });
     }
 
@@ -61,10 +53,7 @@ export class PromoteController {
             'Content-Type',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         );
-        res.setHeader(
-            'Content-Disposition',
-            'attachment; filename="report.xlsx"',
-        );
+        res.setHeader('Content-Disposition', 'attachment; filename="report.xlsx"');
         res.send(Buffer.from(buffer));
     }
 

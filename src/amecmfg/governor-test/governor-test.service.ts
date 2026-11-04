@@ -33,10 +33,7 @@ export class GovernorTestService {
 
             const config = this.parseConnectionString(machine.MC_DATASOURCE);
             pool = await new sql.ConnectionPool(config).connect();
-            const result = await pool
-                .request()
-                .input('order', sql.VarChar, dto.order)
-                .query(`
+            const result = await pool.request().input('order', sql.VarChar, dto.order).query(`
                     SELECT DISTINCT TOP 3 *
                     FROM tblInspectionRecord
                     WHERE [Order] = @order
@@ -98,7 +95,8 @@ export class GovernorTestService {
 
     private parseConnectionString(str: string): sql.config {
         const parts = Object.fromEntries(
-            str.split(';')
+            str
+                .split(';')
                 .filter(Boolean)
                 .map((p) => {
                     const [k, v] = p.split('=');
@@ -113,10 +111,10 @@ export class GovernorTestService {
             database: parts['Initial Catalog'],
             user: parts['User ID'],
             password: parts['Password'],
-            connectionTimeout: 5000, 
+            connectionTimeout: 5000,
             requestTimeout: 5000,
             options: {
-                instanceName, 
+                instanceName,
                 encrypt: false,
                 trustServerCertificate: true,
             },

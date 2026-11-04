@@ -1,12 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { PURNVF_FORM } from './PURNVF_FORM.entity';
 import { TermPayment } from '../../pursys/table/TERM_PAYMENT.entity';
 

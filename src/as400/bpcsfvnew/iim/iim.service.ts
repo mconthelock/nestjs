@@ -4,13 +4,7 @@ import { ConectionService } from 'src/as400/conection/conection.service';
 @Injectable()
 export class IimService {
     constructor(private conn: ConectionService) {}
-    async priceComparison({
-        FUNC,
-        ITEM,
-    }: {
-        FUNC: number;
-        ITEM: string | string[];
-    }) {
+    async priceComparison({ FUNC, ITEM }: { FUNC: number; ITEM: string | string[] }) {
         const result = await this.conn.runQuery(
             `
             SELECT 

@@ -10,9 +10,7 @@ import { UpdateQainsOADto } from './dto/update-qains_operator_auditor.dto';
 
 @Injectable()
 export class QainsOARepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -41,10 +39,7 @@ export class QainsOARepository extends BaseRepository {
             QOA_STATION: dto.QOA_STATION,
             QOA_SCORE: dto.QOA_SCORE,
         };
-        return this.getRepository(QAINS_OPERATOR_AUDITOR).update(
-            condition,
-            data,
-        );
+        return this.getRepository(QAINS_OPERATOR_AUDITOR).update(condition, data);
     }
 
     async delete(dto: CreateQainsOADto) {

@@ -1,6 +1,10 @@
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { CreateOrderDto, OrderKeyDto, UpdateOrderDto } from 'src/webform/psform/ps-adj/dto/ps-adj.dto';
+import {
+    CreateOrderDto,
+    OrderKeyDto,
+    UpdateOrderDto,
+} from 'src/webform/psform/ps-adj/dto/ps-adj.dto';
 import { PsAdjService } from 'src/webform/psform/ps-adj/ps-adj.service';
 
 const key = {
@@ -13,12 +17,9 @@ const key = {
 };
 describe('PsAdj validation and safe mutations', () => {
     it('accepts a valid insert and rejects missing composite keys', async () => {
+        expect(await validate(plainToInstance(CreateOrderDto, key))).toHaveLength(0);
         expect(
-            await validate(plainToInstance(CreateOrderDto, key)),
-        ).toHaveLength(0);
-        expect(
-            (await validate(plainToInstance(OrderKeyDto, { NFRMNO: 1 })))
-                .length,
+            (await validate(plainToInstance(OrderKeyDto, { NFRMNO: 1 }))).length,
         ).toBeGreaterThan(0);
     });
     it('rejects oversized strings and fractional NUMBER columns', async () => {
@@ -48,15 +49,15 @@ describe('PsAdj validation and safe mutations', () => {
             updateOrder: jest.fn().mockResolvedValue({ affected: 0 }),
         };
         const service = new PsAdjService(repo as any);
-        await expect(
-            service.updateOrder(key, { QTY: '10' }),
-        ).rejects.toMatchObject({ status: 404 });
+        await expect(service.updateOrder(key, { QTY: '10' })).rejects.toMatchObject({
+            status: 404,
+        });
     });
     it('rejects empty updates before calling the repository', async () => {
         const repo = { updateOrder: jest.fn() };
-        await expect(
-            new PsAdjService(repo as any).updateOrder(key, {}),
-        ).rejects.toMatchObject({ status: 400 });
+        await expect(new PsAdjService(repo as any).updateOrder(key, {})).rejects.toMatchObject({
+            status: 400,
+        });
         expect(repo.updateOrder).not.toHaveBeenCalled();
     });
 });
@@ -104,16 +105,9 @@ describe('auto_insert_adjust', () => {
         };
     }
     it('requires requester and inputter but not generated keys', async () => {
-        expect(
-            await validate(plainToInstance(AutoInsertAdjustDto, dto)),
-        ).toHaveLength(0);
-        const errors = await validate(
-            plainToInstance(AutoInsertAdjustDto, input),
-        );
-        expect(errors.map((e) => e.property).sort()).toEqual([
-            'INPUTBY',
-            'REQBY',
-        ]);
+        expect(await validate(plainToInstance(AutoInsertAdjustDto, dto))).toHaveLength(0);
+        const errors = await validate(plainToInstance(AutoInsertAdjustDto, input));
+        expect(errors.map((e) => e.property).sort()).toEqual(['INPUTBY', 'REQBY']);
     });
     it('uses generated keys and strips form-only fields before insert', async () => {
         const { service, forms, adjust, manager } = setup();
@@ -145,19 +139,15 @@ describe('auto_insert_adjust', () => {
             status: true,
             data: { CYEAR2: '2026' },
         } as any);
-        await expect(
-            service.auto_insert_adjust(dto, '127.0.0.1'),
-        ).rejects.toThrow('incomplete form key');
+        await expect(service.auto_insert_adjust(dto, '127.0.0.1')).rejects.toThrow(
+            'incomplete form key',
+        );
         expect(adjust.insert_adjust).not.toHaveBeenCalled();
     });
     it('propagates insert failures out of the transaction for rollback', async () => {
         const { service, ds, adjust } = setup();
-        adjust.insert_adjust.mockRejectedValue(
-            new Error('insert failed') as never,
-        );
-        await expect(
-            service.auto_insert_adjust(dto, '127.0.0.1'),
-        ).rejects.toThrow('insert failed');
+        adjust.insert_adjust.mockRejectedValue(new Error('insert failed') as never);
+        await expect(service.auto_insert_adjust(dto, '127.0.0.1')).rejects.toThrow('insert failed');
         expect(ds.transaction).toHaveBeenCalledTimes(1);
     });
 });
@@ -183,12 +173,7 @@ describe('auto_insert_adjust batches', () => {
             insert_adjust: jest.fn().mockResolvedValue({ status: true }),
         };
         const repo = { existsByDrawing: jest.fn().mockResolvedValue(false) };
-        const service = new PsAdjAutoService(
-            ds as any,
-            forms as any,
-            adjust as any,
-            repo as any,
-        );
+        const service = new PsAdjAutoService(ds as any, forms as any, adjust as any, repo as any);
         return { service, forms, repo, adjust, ds };
     }
     it('skips an existing DWGNO before creating Form/Flow', async () => {
@@ -205,9 +190,7 @@ describe('auto_insert_adjust batches', () => {
     });
     it('continues after a skip and a failed insert', async () => {
         const { service, forms, repo, adjust } = batchSetup();
-        repo.existsByDrawing
-            .mockResolvedValueOnce(true)
-            .mockResolvedValue(false);
+        repo.existsByDrawing.mockResolvedValueOnce(true).mockResolvedValue(false);
         adjust.insert_adjust
             .mockRejectedValueOnce(new Error('insert failed'))
             .mockResolvedValue({ status: true });
@@ -221,22 +204,13 @@ describe('auto_insert_adjust batches', () => {
             skipped: 1,
             failed: 1,
         });
-        expect(result.items.map((i) => i.status)).toEqual([
-            'skipped',
-            'failed',
-            'created',
-        ]);
+        expect(result.items.map((i) => i.status)).toEqual(['skipped', 'failed', 'created']);
         expect(forms.create).toHaveBeenCalledTimes(2);
     });
     it('skips duplicates within a request after the first insert', async () => {
         const { service, repo, forms } = batchSetup();
-        repo.existsByDrawing
-            .mockResolvedValueOnce(false)
-            .mockResolvedValueOnce(true);
-        const result = await service.auto_insert_adjust(
-            [item, item],
-            '127.0.0.1',
-        );
+        repo.existsByDrawing.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+        const result = await service.auto_insert_adjust([item, item], '127.0.0.1');
         expect(result).toMatchObject({ created: 1, skipped: 1 });
         expect(forms.create).toHaveBeenCalledTimes(1);
     });
@@ -264,12 +238,12 @@ describe('auto adjust request validation', () => {
         await expect(pipe.transform([null])).rejects.toMatchObject({
             status: 400,
         });
-        await expect(
-            pipe.transform([{ ...item, DWGNO: null }]),
-        ).rejects.toMatchObject({ status: 400 });
-        await expect(
-            pipe.transform([{ ...item, DWGNO: '' }]),
-        ).rejects.toMatchObject({ status: 400 });
+        await expect(pipe.transform([{ ...item, DWGNO: null }])).rejects.toMatchObject({
+            status: 400,
+        });
+        await expect(pipe.transform([{ ...item, DWGNO: '' }])).rejects.toMatchObject({
+            status: 400,
+        });
     });
 });
 

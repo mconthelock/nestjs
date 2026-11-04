@@ -4,15 +4,15 @@ import { createDocDto } from './dto/create.dto';
 
 @Controller('hradmin/log')
 export class SecretlogController {
-  constructor(private readonly docs: SecretlogService) {}
+    constructor(private readonly docs: SecretlogService) {}
 
-  @Get()
-  findAll() {
-    return this.docs.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.docs.findAll();
+    }
 
-  @Post('create')
-  create(@Body() data: createDocDto) {
-    return this.docs.create(data);
-  }
+    @Post('create')
+    create(@Body() data: createDocDto) {
+        return this.docs.create(data);
+    }
 }

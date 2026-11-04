@@ -21,10 +21,7 @@ export class PilineMappingMstController {
     }
     @Patch(':MAP_ID')
     @UseTransaction('mitsuConnection')
-    update(
-        @Param() key: KeyPilineMappingMstDto,
-        @Body() dto: UpdatePilineMappingMstDto,
-    ) {
+    update(@Param() key: KeyPilineMappingMstDto, @Body() dto: UpdatePilineMappingMstDto) {
         return this.service.update(key, dto);
     }
     @Delete(':MAP_ID')

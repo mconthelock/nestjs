@@ -1,11 +1,28 @@
 import { ngTagHtml, tagDate } from 'src/iedoc/jig/jig-ng-tag.service';
 
 const data = {
-    form: { JIG_NO: 'J26-017', JIG_NAME: '<script>alert(1)</script>', PROCESS_CODE: 'K4', ITEMNO: '131', LOCATION: 'K4 LINE' },
-    ng: { DEFECT_DETAIL: 'Defect', ACTION: 'MODIFY', CORRECTIVE: 'Adjust', PLAN_DATE: '2026-04-30' },
+    form: {
+        JIG_NO: 'J26-017',
+        JIG_NAME: '<script>alert(1)</script>',
+        PROCESS_CODE: 'K4',
+        ITEMNO: '131',
+        LOCATION: 'K4 LINE',
+    },
+    ng: {
+        DEFECT_DETAIL: 'Defect',
+        ACTION: 'MODIFY',
+        CORRECTIVE: 'Adjust',
+        PLAN_DATE: '2026-04-30',
+    },
     checkDate: '2026-04-18',
     stamps: [
-        { CSTEPNO: '--', CAPVSTNO: '1', DAPVDATE: '2026-04-18', SNAME: 'SAMART SURNAME', SSEC: 'IPE SEC.' },
+        {
+            CSTEPNO: '--',
+            CAPVSTNO: '1',
+            DAPVDATE: '2026-04-18',
+            SNAME: 'SAMART SURNAME',
+            SSEC: 'IPE SEC.',
+        },
         { CSTEPNO: '06', CAPVSTNO: '0', DAPVDATE: null, SNAME: 'UNAPPROVED PERSON' },
     ],
 };
@@ -15,7 +32,8 @@ describe('Jig NG tag template', () => {
         const html = ngTagHtml(data, '', '');
         expect(html).not.toContain('<script>');
         expect(html).toContain('&lt;script&gt;');
-        for (const text of ['J26-017', 'K4', '131', 'ITEM:', '30/04/2026', 'size:A5 portrait']) expect(html).toContain(text);
+        for (const text of ['J26-017', 'K4', '131', 'ITEM:', '30/04/2026', 'size:A5 portrait'])
+            expect(html).toContain(text);
     });
     it('only stamps completed approvals and takes the first name', () => {
         const html = ngTagHtml(data, '', '');
@@ -26,12 +44,28 @@ describe('Jig NG tag template', () => {
         expect(html).toContain('IPE SEC.');
     });
     it('handles names without spaces and keeps action boxes for unknown values', () => {
-        const html = ngTagHtml({ ...data, ng: { ...data.ng, ACTION: 'Repair & check' },
-            stamps: [{ CSTEPNO: '07', CAPVSTNO: '1', DAPVDATE: '2026-04-21', SNAME: 'SOMCHAI', SSEC: 'MFG SEC.' }] }, '', '');
+        const html = ngTagHtml(
+            {
+                ...data,
+                ng: { ...data.ng, ACTION: 'Repair & check' },
+                stamps: [
+                    {
+                        CSTEPNO: '07',
+                        CAPVSTNO: '1',
+                        DAPVDATE: '2026-04-21',
+                        SNAME: 'SOMCHAI',
+                        SSEC: 'MFG SEC.',
+                    },
+                ],
+            },
+            '',
+            '',
+        );
         expect(html).toContain('SOMCHAI');
         expect(html).toContain('MFG SEC.');
         expect(html).not.toContain('K4 LINE');
-        for (const action of ['ADJUST', 'MODIFY', 'REPLACE']) expect(html).toContain(`<i></i>${action}`);
+        for (const action of ['ADJUST', 'MODIFY', 'REPLACE'])
+            expect(html).toContain(`<i></i>${action}`);
     });
     it.each([
         ['Adjust,Modify', ['ADJUST', 'MODIFY']],

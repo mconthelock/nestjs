@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Post,
-    Body,
-    Get,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, Patch, Param, Delete } from '@nestjs/common';
 import { GpUnfService } from './gp-unf.service';
 import { SearchGpUnfDto } from './dto/search-gp-unf.dto';
 

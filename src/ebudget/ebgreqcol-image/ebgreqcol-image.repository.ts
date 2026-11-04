@@ -34,10 +34,7 @@ export class EbgreqcolImageRepository extends BaseRepository {
 
     async update(dto: UpdateEbgreqcolImageDto) {
         const { condition, ...updateData } = dto;
-        return await this.getRepository(EBGREQCOL_IMAGE).update(
-            condition,
-            updateData,
-        );
+        return await this.getRepository(EBGREQCOL_IMAGE).update(condition, updateData);
     }
 
     async delete(dto: UpdateEbgreqcolImageDto) {

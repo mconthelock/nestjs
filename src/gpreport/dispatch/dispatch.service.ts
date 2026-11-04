@@ -97,10 +97,8 @@ export class DispatchService {
     private pickPlanTime(shift: string, r: any): string | null {
         if (shift === 'D' || shift === 'S')
             return r.WORKDAY_TIMEIN ? String(r.WORKDAY_TIMEIN).trim() : null;
-        if (shift === 'N')
-            return r.NIGHT_TIMEIN ? String(r.NIGHT_TIMEIN).trim() : null;
-        if (shift === 'H')
-            return r.HOLIDAY_TIMEIN ? String(r.HOLIDAY_TIMEIN).trim() : null;
+        if (shift === 'N') return r.NIGHT_TIMEIN ? String(r.NIGHT_TIMEIN).trim() : null;
+        if (shift === 'H') return r.HOLIDAY_TIMEIN ? String(r.HOLIDAY_TIMEIN).trim() : null;
         return null;
     }
 
@@ -215,29 +213,24 @@ export class DispatchService {
 
             const dispatch_id = head.DISPATCH_ID;
 
-            const [existingLines, existingStops, existingPassengers] =
-                await Promise.all([
-                    manager.find(BusDispatchLine, {
-                        where: { DISPATCH_ID: dispatch_id },
-                    }),
-                    manager.find(BusDispatchStop, {
-                        where: { DISPATCH_ID: dispatch_id },
-                    }),
-                    manager.find(BusDispatchPassenger, {
-                        where: { DISPATCH_ID: dispatch_id },
-                    }),
-                ]);
+            const [existingLines, existingStops, existingPassengers] = await Promise.all([
+                manager.find(BusDispatchLine, {
+                    where: { DISPATCH_ID: dispatch_id },
+                }),
+                manager.find(BusDispatchStop, {
+                    where: { DISPATCH_ID: dispatch_id },
+                }),
+                manager.find(BusDispatchPassenger, {
+                    where: { DISPATCH_ID: dispatch_id },
+                }),
+            ]);
 
             const lineSet = new Set(existingLines.map((l) => Number(l.BUSID)));
             const stopSet = new Set(
-                existingStops.map(
-                    (s) => `${Number(s.LINE_ID)}|${Number(s.STOP_ID)}`,
-                ),
+                existingStops.map((s) => `${Number(s.LINE_ID)}|${Number(s.STOP_ID)}`),
             );
             const passEmpSet = new Set(
-                existingPassengers
-                    .map((p) => String(p.EMPNO || '').trim())
-                    .filter(Boolean),
+                existingPassengers.map((p) => String(p.EMPNO || '').trim()).filter(Boolean),
             );
 
             const sourceRows = rows.filter((r) => {
@@ -286,10 +279,7 @@ export class DispatchService {
                 }
             >();
 
-            const empSourceMap = new Map<
-                string,
-                { busid: number; stop_id: number }
-            >();
+            const empSourceMap = new Map<string, { busid: number; stop_id: number }>();
 
             for (const r of sourceRows) {
                 const busid = Number(r.BUSID);
@@ -313,8 +303,7 @@ export class DispatchService {
                         stop_id,
                         stop_name: r.STOP_NAME ?? null,
                         plan_time: this.pickPlanTime(shift, r),
-                        route_seq:
-                            r.ROUTE_SEQ != null ? Number(r.ROUTE_SEQ) : 9999,
+                        route_seq: r.ROUTE_SEQ != null ? Number(r.ROUTE_SEQ) : 9999,
                     });
                 }
 
@@ -350,13 +339,10 @@ export class DispatchService {
             const stopsToInsert: BusDispatchStop[] = [];
 
             for (const b of buses) {
-                const stopsSorted = Array.from(b.stops.values()).sort(
-                    (x, y) => {
-                        if (x.route_seq !== y.route_seq)
-                            return x.route_seq - y.route_seq;
-                        return x.stop_id - y.stop_id;
-                    },
-                );
+                const stopsSorted = Array.from(b.stops.values()).sort((x, y) => {
+                    if (x.route_seq !== y.route_seq) return x.route_seq - y.route_seq;
+                    return x.stop_id - y.stop_id;
+                });
 
                 for (const s of stopsSorted) {
                     const key = `${b.busid}|${s.stop_id}`;
@@ -602,11 +588,7 @@ export class DispatchService {
         });
     }
 
-    async disablePassenger(dto: {
-        dispatch_id: number;
-        empno: string;
-        update_by: string;
-    }) {
+    async disablePassenger(dto: { dispatch_id: number; empno: string; update_by: string }) {
         return this.dataSource.transaction(async (manager) => {
             const dispatch_id = Number(dto.dispatch_id);
             const empno = String(dto.empno).trim();
@@ -709,8 +691,7 @@ export class DispatchService {
 
             const lineRepo = queryRunner.manager.getRepository(BusDispatchLine);
             const stopRepo = queryRunner.manager.getRepository(BusDispatchStop);
-            const passengerRepo =
-                queryRunner.manager.getRepository(BusDispatchPassenger);
+            const passengerRepo = queryRunner.manager.getRepository(BusDispatchPassenger);
 
             const line = await lineRepo.findOne({
                 where: {
@@ -759,10 +740,7 @@ export class DispatchService {
 
             return {
                 statusCode: 200,
-                message:
-                    lineStatus === '0'
-                        ? 'ซ่อนสายรถสำเร็จ'
-                        : 'กู้กลับสายรถสำเร็จ',
+                message: lineStatus === '0' ? 'ซ่อนสายรถสำเร็จ' : 'กู้กลับสายรถสำเร็จ',
             };
         } catch (error) {
             await queryRunner.rollbackTransaction();
@@ -1031,43 +1009,32 @@ export class DispatchService {
             dispatch_id: String(dispatchId),
         };
 
-        const reportBusRes =
-            await this.dispatchReportService.getReportBus(reportDto);
+        const reportBusRes = await this.dispatchReportService.getReportBus(reportDto);
         if (!reportBusRes?.status) {
-            throw new Error(
-                reportBusRes?.message || 'ไม่สามารถดึงข้อมูลรายงานจัดรถได้',
-            );
+            throw new Error(reportBusRes?.message || 'ไม่สามารถดึงข้อมูลรายงานจัดรถได้');
         }
 
         const reportDisabledRes =
-            await this.dispatchReportService.getReportDisabledPassenger(
-                reportDto,
-            );
+            await this.dispatchReportService.getReportDisabledPassenger(reportDto);
         if (!reportDisabledRes?.status) {
             throw new Error(
-                reportDisabledRes?.message ||
-                    'ไม่สามารถดึงข้อมูลรายงานผู้ไม่ได้จัดรถได้',
+                reportDisabledRes?.message || 'ไม่สามารถดึงข้อมูลรายงานผู้ไม่ได้จัดรถได้',
             );
         }
 
         const folderRes = await this.dispatchExportService.createShareFolder();
         if (!folderRes?.status || !folderRes?.folderPath) {
-            throw new Error(
-                folderRes?.message || 'ไม่สามารถสร้างโฟลเดอร์กลางได้',
-            );
+            throw new Error(folderRes?.message || 'ไม่สามารถสร้างโฟลเดอร์กลางได้');
         }
 
         const folderPath = folderRes.folderPath;
 
         const workbook1 =
-            await this.dispatchExportService.buildBusDailyLayoutWorkbook(
-                reportBusRes,
-            );
-        const workbook2 =
-            await this.dispatchExportService.buildDisabledPassengerWorkbook(
-                reportDisabledRes,
-                dto,
-            );
+            await this.dispatchExportService.buildBusDailyLayoutWorkbook(reportBusRes);
+        const workbook2 = await this.dispatchExportService.buildDisabledPassengerWorkbook(
+            reportDisabledRes,
+            dto,
+        );
 
         const timeStamp = dayjs().format('YYYYMMDD_HHmmss');
         const fileName1 = `OT_Daily_Transportation_Route_${timeStamp}.xlsx`;
@@ -1079,15 +1046,19 @@ export class DispatchService {
         await workbook2.xlsx.writeFile(filePath2);
 
         await this.dispatchMailService.sendDispatchMail({
-            to: ['warawuts@MitsubishiElevatorAsia.co.th', 'nathawu@MitsubishiElevatorAsia.co.th',],
-            cc: ['rewepong@MitsubishiElevatorAsia.co.th', 'supamid@mitsubishielevatorasia.co.th',],
+            to: ['warawuts@MitsubishiElevatorAsia.co.th', 'nathawu@MitsubishiElevatorAsia.co.th'],
+            cc: ['rewepong@MitsubishiElevatorAsia.co.th', 'supamid@mitsubishielevatorasia.co.th'],
             bcc: ['kallaya@MitsubishiElevatorAsia.co.th'],
             subject: `แจ้งแผนการจัดรถพนักงาน (${dto.workdate})`,
             html: this.dispatchMailService.buildDispatchMailHtml(dto),
             attachments: [filePath1, filePath2],
         });
 
-        const updateDto: SaveDispatchDto = {dispatch_id: dispatchId, status: 'F', update_by: dto.update_by,};
+        const updateDto: SaveDispatchDto = {
+            dispatch_id: dispatchId,
+            status: 'F',
+            update_by: dto.update_by,
+        };
         const updateRes = await this.updateDispatchStatusHead(updateDto);
         return {
             status: true,
@@ -1105,7 +1076,7 @@ export class DispatchService {
         const result = await this.dataSource
             .createQueryBuilder()
             .update(BusDispatchHead)
-            .set({STATUS: 'F', UPDATE_DATE: new Date(),})
+            .set({ STATUS: 'F', UPDATE_DATE: new Date() })
             .where("NVL(STATUS, 'N') <> :finalStatus", { finalStatus: 'F' })
             .andWhere('TRUNC(DISPATCH_DATE) = TRUNC(SYSDATE) - 1')
             .execute();

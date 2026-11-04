@@ -1,12 +1,4 @@
-import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    ManyToOne,
-    JoinColumn,
-    OneToOne,
-    OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, OneToOne, OneToMany } from 'typeorm';
 
 import { QAINS_FORM } from './QAINS_FORM.entity';
 import { AMECUSERALL } from '../../amec/views/AMECUSERALL.entity';

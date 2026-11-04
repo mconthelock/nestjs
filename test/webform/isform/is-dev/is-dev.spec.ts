@@ -23,9 +23,7 @@ describe('POST /form/is/is-dev/create', () => {
         NRUNNO: 1,
     };
 
-    const buildCreateDto = (
-        overrides: Partial<CreateIsDevDto> = {},
-    ): CreateIsDevDto => ({
+    const buildCreateDto = (overrides: Partial<CreateIsDevDto> = {}): CreateIsDevDto => ({
         NFRMNO: 10,
         VORGNO: '050601',
         CYEAR: '26',
@@ -84,11 +82,7 @@ describe('POST /form/is/is-dev/create', () => {
             await controller.create(req, dto, files);
 
             expect(ipUtils.getClientIP).toHaveBeenCalledWith(req);
-            expect(service.create).toHaveBeenCalledWith(
-                '172.21.10.55',
-                dto,
-                files,
-            );
+            expect(service.create).toHaveBeenCalledWith('172.21.10.55', dto, files);
         });
 
         it('should pass undefined files when no files are uploaded', async () => {
@@ -100,11 +94,7 @@ describe('POST /form/is/is-dev/create', () => {
 
             await controller.create(req, dto, undefined);
 
-            expect(service.create).toHaveBeenCalledWith(
-                '127.0.0.1',
-                dto,
-                undefined,
-            );
+            expect(service.create).toHaveBeenCalledWith('127.0.0.1', dto, undefined);
         });
     });
 
@@ -143,17 +133,11 @@ describe('POST /form/is/is-dev/create', () => {
                 providers: [
                     IsDevService,
                     {
-                        provide: getRepositoryToken(
-                            ISDEV_DEVELOPER,
-                            'mitsuConnection',
-                        ),
+                        provide: getRepositoryToken(ISDEV_DEVELOPER, 'mitsuConnection'),
                         useValue: {},
                     },
                     {
-                        provide: getRepositoryToken(
-                            ISDEV_REQUEST,
-                            'mitsuConnection',
-                        ),
+                        provide: getRepositoryToken(ISDEV_REQUEST, 'mitsuConnection'),
                         useValue: {},
                     },
                     {
@@ -287,9 +271,7 @@ describe('POST /form/is/is-dev/create', () => {
                 },
                 '127.0.0.1',
             );
-            expect(
-                formCreateService.create.mock.calls[0][0],
-            ).not.toHaveProperty('DRAFT');
+            expect(formCreateService.create.mock.calls[0][0]).not.toHaveProperty('DRAFT');
 
             expect(repo.create).toHaveBeenCalledTimes(1);
             expect(fileService.insertFiles).not.toHaveBeenCalled();
@@ -373,18 +355,10 @@ describe('POST /form/is/is-dev/create', () => {
             await repo.createManhours(manhoursPayload);
             await repo.createInvest(investPayload);
 
-            expect(saveMocks.get(ISDEV_REQUEST)).toHaveBeenCalledWith(
-                reqPayload,
-            );
-            expect(saveMocks.get(ISDEV_BENEFIT)).toHaveBeenCalledWith(
-                benefitPayload,
-            );
-            expect(saveMocks.get(ISDEV_MANHOURS)).toHaveBeenCalledWith(
-                manhoursPayload,
-            );
-            expect(saveMocks.get(ISDEV_INVESTMENT)).toHaveBeenCalledWith(
-                investPayload,
-            );
+            expect(saveMocks.get(ISDEV_REQUEST)).toHaveBeenCalledWith(reqPayload);
+            expect(saveMocks.get(ISDEV_BENEFIT)).toHaveBeenCalledWith(benefitPayload);
+            expect(saveMocks.get(ISDEV_MANHOURS)).toHaveBeenCalledWith(manhoursPayload);
+            expect(saveMocks.get(ISDEV_INVESTMENT)).toHaveBeenCalledWith(investPayload);
         });
     });
 });

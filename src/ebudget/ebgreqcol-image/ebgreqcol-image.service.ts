@@ -25,9 +25,7 @@ export class EbgreqcolImageService {
         try {
             const res = await this.repo.insert(dto);
             if (res.identifiers.length === 0) {
-                throw new Error(
-                    'Insert EBGREQCOL_IMAGE Error: No identifiers returned',
-                );
+                throw new Error('Insert EBGREQCOL_IMAGE Error: No identifiers returned');
             }
             return {
                 status: true,
@@ -42,9 +40,7 @@ export class EbgreqcolImageService {
         try {
             const res = await this.repo.update(dto);
             if (res.affected === 0) {
-                throw new Error(
-                    'Update EBGREQCOL_IMAGE Error: No rows affected',
-                );
+                throw new Error('Update EBGREQCOL_IMAGE Error: No rows affected');
             }
             return {
                 status: true,
@@ -60,9 +56,7 @@ export class EbgreqcolImageService {
         try {
             const res = await this.repo.delete(dto);
             if (res.affected === 0) {
-                throw new Error(
-                    'Delete EBGREQCOL_IMAGE Error: No rows affected',
-                );
+                throw new Error('Delete EBGREQCOL_IMAGE Error: No rows affected');
             }
             return {
                 status: true,

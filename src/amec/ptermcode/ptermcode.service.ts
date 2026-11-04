@@ -4,8 +4,8 @@ import { UpdatePtermcodeDto } from './dto/update-ptermcode.dto';
 import { PtermcodeRepository } from './ptermcode.repository';
 @Injectable()
 export class PtermcodeService {
-  constructor(private readonly repo : PtermcodeRepository) {}
-  findTermcode() {
-    return this.repo.findTermcode();
-  } 
+    constructor(private readonly repo: PtermcodeRepository) {}
+    findTermcode() {
+        return this.repo.findTermcode();
+    }
 }

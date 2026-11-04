@@ -63,12 +63,7 @@ export class BuspassengerService {
     async findAllWithRelations_bk(busId: number) {
         return this.buspassengerRepository.find({
             //relations: ['Amecuserall', "stop", "stop.routed", "stop.routed.busmaster"]
-            relations: [
-                'stop',
-                'stop.routes',
-                'stop.routes.busmaster',
-                'Amecuserall',
-            ],
+            relations: ['stop', 'stop.routes', 'stop.routes.busmaster', 'Amecuserall'],
         });
     }
 

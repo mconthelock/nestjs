@@ -1,5 +1,5 @@
-import { COUNTRY_ORIGIN } from "src/common/Entities/workload/table/COUNTRY_ORIGIN.entity";
-import { EventSubscriber, EntitySubscriberInterface, UpdateEvent, InsertEvent } from "typeorm";
+import { COUNTRY_ORIGIN } from 'src/common/Entities/workload/table/COUNTRY_ORIGIN.entity';
+import { EventSubscriber, EntitySubscriberInterface, UpdateEvent, InsertEvent } from 'typeorm';
 
 @EventSubscriber()
 export class CountryOriginSubscriber implements EntitySubscriberInterface<COUNTRY_ORIGIN> {

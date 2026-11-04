@@ -1,12 +1,6 @@
 import { PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import {
-    IsArray,
-    IsNotEmpty,
-    IsNumber,
-    IsOptional,
-    IsString,
-} from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class PriceComparisonDto {
     @IsNotEmpty()
@@ -24,9 +18,7 @@ export class PriceComparisonDto {
     SYSTEM: string;
 }
 
-export class PriceComparisonPlannerDto extends PickType(PriceComparisonDto, [
-    'SYSTEM',
-] as const) {
+export class PriceComparisonPlannerDto extends PickType(PriceComparisonDto, ['SYSTEM'] as const) {
     @IsNotEmpty()
     @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
     @IsArray()

@@ -1,17 +1,6 @@
-import {
-    Body,
-    Controller,
-    Get,
-    Post,
-    Req,
-    UseInterceptors,
-    UploadedFiles,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';

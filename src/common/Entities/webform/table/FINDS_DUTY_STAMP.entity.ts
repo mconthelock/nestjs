@@ -6,6 +6,4 @@ export class DSDUTYSTAMP {
 
     @Column()
     ACTIVE: string;
-
 }
-    

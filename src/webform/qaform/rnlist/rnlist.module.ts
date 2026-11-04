@@ -8,9 +8,9 @@ import { RnlistRepository } from './rnlist.repository';
 import { RnlistService } from './rnlist.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RNLIST], 'mitsuConnection')],
-  controllers: [RnlistController],
-  providers: [RnlistService, RnlistRepository],
-  exports: [RnlistService],
+    imports: [TypeOrmModule.forFeature([RNLIST], 'mitsuConnection')],
+    controllers: [RnlistController],
+    providers: [RnlistService, RnlistRepository],
+    exports: [RnlistService],
 })
 export class RnlistModule {}

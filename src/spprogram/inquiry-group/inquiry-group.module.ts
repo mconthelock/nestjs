@@ -5,9 +5,9 @@ import { InquiryGroupController } from './inquiry-group.controller';
 import { InquiryGroup } from './entities/inquiry-group.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([InquiryGroup], 'mitsuConnection')],
-  controllers: [InquiryGroupController],
-  providers: [InquiryGroupService],
-  exports: [InquiryGroupService],
+    imports: [TypeOrmModule.forFeature([InquiryGroup], 'mitsuConnection')],
+    controllers: [InquiryGroupController],
+    providers: [InquiryGroupService],
+    exports: [InquiryGroupService],
 })
 export class InquiryGroupModule {}

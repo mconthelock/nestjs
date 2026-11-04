@@ -12,54 +12,52 @@ import { Busroute } from 'src/common/Entities/gpreport/table/busroute.entity';
 
 @Injectable()
 export class BuslineService {
-  constructor(
-    @InjectRepository(Busline, 'mitsuConnection')
-    private readonly bus: Repository<Busline>,
+    constructor(
+        @InjectRepository(Busline, 'mitsuConnection')
+        private readonly bus: Repository<Busline>,
 
-    @InjectDataSource('mitsuConnection')
-    private readonly dataSource: DataSource,
-  ) {}
+        @InjectDataSource('mitsuConnection')
+        private readonly dataSource: DataSource,
+    ) {}
 
-  async create(dto: CreateBuslineDto) {
-    const data = await this.bus.save(dto);
-    return await this.bus.findOne({
-      where: { BUSID: data.BUSID },
-      //   relations: ['station'],
-    });
-  }
-
-  async update(id: number, dto: UpdateBuslineDto) {
-    const data = await this.bus.findOne({ where: { BUSID: id } });
-    if (data) {
-      Object.assign(data, dto);
-      await this.bus.save(data);
-      return await this.bus.findOne({
-        where: { BUSID: id },
-        // relations: ['station'],
-      });
+    async create(dto: CreateBuslineDto) {
+        const data = await this.bus.save(dto);
+        return await this.bus.findOne({
+            where: { BUSID: data.BUSID },
+            //   relations: ['station'],
+        });
     }
-    throw new NotFoundException(`Bus/Van with your credentials is not found`);
-  }
 
-  findAll(q: SearchBuslineDto) {
-    // return this.bus.find({ relations: ['station'] });
-    return this.bus.find({ where: q });
-  }
+    async update(id: number, dto: UpdateBuslineDto) {
+        const data = await this.bus.findOne({ where: { BUSID: id } });
+        if (data) {
+            Object.assign(data, dto);
+            await this.bus.save(data);
+            return await this.bus.findOne({
+                where: { BUSID: id },
+                // relations: ['station'],
+            });
+        }
+        throw new NotFoundException(`Bus/Van with your credentials is not found`);
+    }
 
-  async deleteLineCascade(busId: number) {
-    return this.dataSource.transaction(async (manager) => {
-      await manager.update(Busline, { BUSID: busId }, { BUSSTATUS: '0' });
-      const routes = await manager.find(Busroute, { where: { BUSLINE: busId } });
-      const stopIds = routes.map(r => r.STOPNO);
-      await manager.delete(Busroute, { BUSLINE: busId });
+    findAll(q: SearchBuslineDto) {
+        // return this.bus.find({ relations: ['station'] });
+        return this.bus.find({ where: q });
+    }
 
-      if (stopIds.length > 0) {
-        await manager.update(Busstop, { STOP_ID: In(stopIds) }, { STOP_STATUS: '0' });
-        await manager.delete(Buspassenger, { BUSSTOP: In(stopIds) });
-      }
-      return { success: true };
-    });
-  }
+    async deleteLineCascade(busId: number) {
+        return this.dataSource.transaction(async (manager) => {
+            await manager.update(Busline, { BUSID: busId }, { BUSSTATUS: '0' });
+            const routes = await manager.find(Busroute, { where: { BUSLINE: busId } });
+            const stopIds = routes.map((r) => r.STOPNO);
+            await manager.delete(Busroute, { BUSLINE: busId });
 
-  
+            if (stopIds.length > 0) {
+                await manager.update(Busstop, { STOP_ID: In(stopIds) }, { STOP_STATUS: '0' });
+                await manager.delete(Buspassenger, { BUSSTOP: In(stopIds) });
+            }
+            return { success: true };
+        });
+    }
 }

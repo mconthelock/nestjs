@@ -3,10 +3,10 @@ import { MscountryService } from './mscountry.service';
 
 @Controller('mkt/country')
 export class MscountryController {
-  constructor(private readonly country: MscountryService) {}
+    constructor(private readonly country: MscountryService) {}
 
-  @Get()
-  findAll() {
-    return this.country.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.country.findAll();
+    }
 }

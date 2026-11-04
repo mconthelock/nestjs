@@ -1,11 +1,4 @@
-import {
-    Entity,
-    Column,
-    PrimaryColumn,
-    OneToOne,
-    JoinColumn,
-    OneToMany,
-} from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 // import { Workplan } from '../../../../docinv/workplan/entities/workplan.entity';
 import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';

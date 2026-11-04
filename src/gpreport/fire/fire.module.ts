@@ -12,4 +12,3 @@ import { FireRepository } from './fire.repository';
     exports: [FireService, FireRepository],
 })
 export class FireModule {}
-

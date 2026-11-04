@@ -7,9 +7,7 @@ import { CreateUsersItemStationDto } from './dto/create-user-item-station.dto';
 
 @Injectable()
 export class UsersItemStationRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

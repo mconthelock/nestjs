@@ -6,6 +6,6 @@ import { SecretlogModule } from './secretlog/secretlog.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 
 @Module({
-  imports: [MasterkeyModule, TwidocModule, PromoteModule, SecretlogModule, SchedulerModule]
+    imports: [MasterkeyModule, TwidocModule, PromoteModule, SecretlogModule, SchedulerModule],
 })
 export class HradminModule {}

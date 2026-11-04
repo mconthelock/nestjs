@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    ConflictException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { FireItemMst } from 'src/common/Entities/gpreport/table/FIRE_ITEM_MST.entity';
 import { FireRepository } from './fire.repository';
 import { CreateFireItemDto } from './dto/create-fire-item.dto';
@@ -58,4 +63,3 @@ export class FireService {
         return data;
     }
 }
-

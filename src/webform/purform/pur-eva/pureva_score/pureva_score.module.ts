@@ -5,13 +5,10 @@ import { PurevaScoreController } from './pureva_score.controller';
 import { PurevaScoreRepository } from './pureva_score.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-
 @Module({
-   imports: [TypeOrmModule.forFeature([PUREVA_SCORE], 'mitsuConnection')],
-  controllers: [PurevaScoreController],
-  providers: [PurevaScoreService , PurevaScoreRepository],
-  exports:[PurevaScoreService]
+    imports: [TypeOrmModule.forFeature([PUREVA_SCORE], 'mitsuConnection')],
+    controllers: [PurevaScoreController],
+    providers: [PurevaScoreService, PurevaScoreRepository],
+    exports: [PurevaScoreService],
 })
 export class PurevaScoreModule {}
-
-

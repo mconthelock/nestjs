@@ -35,14 +35,10 @@ export class JobService extends SendMailManualService {
                 vanndate = new Date(date + ' 00:00:00');
             }
 
-            logMessage.push(
-                log_message(`Processing vanndate: ${formatDate(vanndate)}`),
-            );
+            logMessage.push(log_message(`Processing vanndate: ${formatDate(vanndate)}`));
 
             // เรียกใช้ฟังก์ชัน getList เพื่อดึงข้อมูลรายงานการส่ง VGM melt
-            const lists: ListReport = await this.getList(
-                formatDate(vanndate, 'YYYYMMDD'),
-            );
+            const lists: ListReport = await this.getList(formatDate(vanndate, 'YYYYMMDD'));
             if (!lists.status) {
                 logMessage.push(log_message(`No data found`, 'error'));
                 return {
@@ -72,9 +68,7 @@ export class JobService extends SendMailManualService {
             });
 
             if (!sendMail.status) {
-                logMessage.push(
-                    log_message(`Failed to send mail: ${sendMail.message}`, 'error'),
-                );
+                logMessage.push(log_message(`Failed to send mail: ${sendMail.message}`, 'error'));
                 throw new Error(`Failed to send mail: ${sendMail.message}`);
             }
             logMessage.push(log_message(`Mail sent successfully`));

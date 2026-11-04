@@ -56,10 +56,10 @@ export class HbdService {
         sendReport: boolean = true,
         month: string = now('MM'),
     ) {
-        var status = true;
-        var message = 'Insert user to Google Sheet successfully';
+        let status = true;
+        let message = 'Insert user to Google Sheet successfully';
         const log = [];
-        var data = [];
+        let data = [];
         const year = Number(now('YYYY'));
         try {
             log.push(`Start send QR Code at ${now('DD/MM/YYYY HH:mm:ss')}`);
@@ -69,9 +69,7 @@ export class HbdService {
                 log.push(`No birthdays found for month: ${month}`);
                 throw new Error(`No birthdays found for month: ${month}`);
             }
-            log.push(
-                `Found ${users.length} users with birthdays in month: ${month}`,
-            );
+            log.push(`Found ${users.length} users with birthdays in month: ${month}`);
             data = users;
 
             // backup sheet
@@ -85,9 +83,7 @@ export class HbdService {
                 if (bk && !bk.status) {
                     log.push(`Failed to backup Google Sheet: ${bk.message}`);
                 } else {
-                    log.push(
-                        `Backup Google Sheet for year: ${year - 1} completed successfully`,
-                    );
+                    log.push(`Backup Google Sheet for year: ${year - 1} completed successfully`);
                 }
                 log.push(`================================================`);
             }
@@ -102,17 +98,11 @@ export class HbdService {
                     year: year,
                 });
                 if (res && !res.status) {
-                    log.push(
-                        `Failed to insert user to Google Sheet: ${res.message}`,
-                    );
-                    throw new Error(
-                        `Failed to insert user to Google Sheet: ${res.message}`,
-                    );
+                    log.push(`Failed to insert user to Google Sheet: ${res.message}`);
+                    throw new Error(`Failed to insert user to Google Sheet: ${res.message}`);
                 }
                 data = res.data;
-                log.push(
-                    `Inserted ${res.data.length} users to Google Sheet successfully`,
-                );
+                log.push(`Inserted ${res.data.length} users to Google Sheet successfully`);
                 log.push(`================================================`);
             }
 
@@ -121,9 +111,7 @@ export class HbdService {
                 log.push(`Sending QR Codes to users...`);
                 let count = 0;
                 for (const user of data) {
-                    log.push(
-                        `${++count}. Sent QR Code to EMPNO: ${user.SEMPNO} started`,
-                    );
+                    log.push(`${++count}. Sent QR Code to EMPNO: ${user.SEMPNO} started`);
                     await this.sendMailQR(user, log);
                     log.push(`--------------`);
                 }
@@ -169,8 +157,8 @@ export class HbdService {
 
     async sendQRManual(dto: SendQRManualDto) {
         const { empno, insert } = dto;
-        var status = true;
-        var message = 'Insert user to Google Sheet successfully';
+        let status = true;
+        let message = 'Insert user to Google Sheet successfully';
         try {
             const users = await this.usersService.findEmp(empno);
             if (!users) {
@@ -182,9 +170,7 @@ export class HbdService {
                     data: [users],
                 });
                 if (res && !res.status) {
-                    throw new Error(
-                        `Failed to insert user to Google Sheet: ${res.message}`,
-                    );
+                    throw new Error(`Failed to insert user to Google Sheet: ${res.message}`);
                 }
             }
             await this.sendMailQR(users);
@@ -211,16 +197,12 @@ export class HbdService {
                 year: year,
             });
             if (!res || !res.status) {
-                log?.push(
-                    `Failed to retrieve data: ${res ? res.message : 'No data returned'}`,
-                );
+                log?.push(`Failed to retrieve data: ${res ? res.message : 'No data returned'}`);
                 throw new Error(
                     `Failed to retrieve data: ${res ? res.message : 'No data returned'}`,
                 );
             }
-            log?.push(
-                `Retrieved ${res.data.length} records for month: ${month}, year: ${year}`,
-            );
+            log?.push(`Retrieved ${res.data.length} records for month: ${month}, year: ${year}`);
             const wk = await defaultExcel({
                 data: res.data,
                 column: [
@@ -257,18 +239,9 @@ export class HbdService {
         }
     }
 
-    async sendMailReport(
-        user: any,
-        attachments: any,
-        month: number,
-        year: number,
-        log?: string[],
-    ) {
+    async sendMailReport(user: any, attachments: any, month: number, year: number, log?: string[]) {
         const name = user.STNAME;
-        const email =
-            process.env.NODE_ENV != 'production'
-                ? process.env.MAIL_ADMIN
-                : user.SRECMAIL;
+        const email = process.env.NODE_ENV != 'production' ? process.env.MAIL_ADMIN : user.SRECMAIL;
         try {
             const sendmail = await this.mailService.sendMail({
                 from: `AMECHBD <amechbd@mitsubishielevatorasia.co.th>`,
@@ -287,19 +260,14 @@ export class HbdService {
             log?.push(
                 `Failed to send report to ${user.SEMPNO} ${name} (${email}): ${error.message}`,
             );
-            throw new Error(
-                `Failed to send report to ${user.SEMPNO}: ${error.message}`,
-            );
+            throw new Error(`Failed to send report to ${user.SEMPNO}: ${error.message}`);
         }
     }
 
     async sendMailQR(user: any, log?: string[]) {
         const key = `${user.SEMPENCODE}|${user.SEMPNO}|${Number(String(user.BIRTHDAY).substring(4, 6))}`;
         const name = user.STNAME;
-        const email =
-            process.env.NODE_ENV != 'production'
-                ? process.env.MAIL_ADMIN
-                : user.MEMEML;
+        const email = process.env.NODE_ENV != 'production' ? process.env.MAIL_ADMIN : user.MEMEML;
         try {
             const qrCode = await this.qrcodeService.generateDataURLWithCaption(
                 key,
@@ -347,9 +315,7 @@ export class HbdService {
             log?.push(
                 `Failed to send email to ${user.SEMPNO} ${name} (${email}): ${error.message}`,
             );
-            throw new Error(
-                `Failed to send email to ${user.SEMPNO}: ${error.message}`,
-            );
+            throw new Error(`Failed to send email to ${user.SEMPNO}: ${error.message}`);
         }
     }
 

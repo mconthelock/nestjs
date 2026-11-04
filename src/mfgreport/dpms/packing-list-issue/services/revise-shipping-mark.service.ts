@@ -70,10 +70,9 @@ export class ReviseShippingMarkService {
                     await this.mailService.sendMail({
                         to: process.env.MAIL_ADMIN,
                         from: `MFG REPORT System<${process.env.MAIL_FROM}>`,
-                        subject:  `${now('YYYY-MM-DD HH:mm:ss')} Packing list Auto Revise Shipping Mark for Order: [${revData.VORDERS}] - NISSUEREV_ID: ${issueRevId}`,
+                        subject: `${now('YYYY-MM-DD HH:mm:ss')} Packing list Auto Revise Shipping Mark for Order: [${revData.VORDERS}] - NISSUEREV_ID: ${issueRevId}`,
                         attachments: revise.attachments,
                         html: `<p>Successfully revised shipping mark for Order: [${revData.VORDERS}] - NISSUEREV_ID: ${issueRevId}</p>`,
-
                     });
                 }
             }
@@ -85,10 +84,7 @@ export class ReviseShippingMarkService {
             };
         } catch (error) {
             for (const file of listFilePath) {
-                const filePath: string = await joinPaths(
-                    file.filePath,
-                    file.fileName,
-                );
+                const filePath: string = await joinPaths(file.filePath, file.fileName);
                 await deleteFile(filePath);
             }
             throw new Error(error.message);

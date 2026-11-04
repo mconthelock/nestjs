@@ -7,12 +7,7 @@ import { MfgDrawingActionRepository } from './mfg-drawing-action.repository';
 import { SYS_STATUS } from 'src/common/Entities/escs/table/SYS_STATUS.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [MFG_DRAWING_ACTION, SYS_STATUS],
-            'mitsuConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([MFG_DRAWING_ACTION, SYS_STATUS], 'mitsuConnection')],
     controllers: [MfgDrawingActionController],
     providers: [MfgDrawingActionService, MfgDrawingActionRepository],
     exports: [MfgDrawingActionService],

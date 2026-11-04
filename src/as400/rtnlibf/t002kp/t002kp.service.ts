@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-    parseConditionString,
-    parseCreateString,
-} from 'src/common/helpers/query.helper';
+import { parseConditionString, parseCreateString } from 'src/common/helpers/query.helper';
 import { ConectionService } from 'src/as400/conection/conection.service';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 

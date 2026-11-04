@@ -13,11 +13,7 @@ import { FormLinkService } from 'src/webform/form-link/form-link.service';
 import { joinPaths } from 'src/common/utils/files.utils';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 import { PurCpcService } from '../../pur-cpc/services/purcpc_form.service';
-import {
-    ImanageFlow,
-    IinsertFile,
-    IsetFlow,
-} from '../interface/create.interface';
+import { ImanageFlow, IinsertFile, IsetFlow } from '../interface/create.interface';
 import { InsertFlowStepService } from 'src/webform/flow/insert-flow-step.service';
 import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
 
@@ -41,11 +37,7 @@ export class PurPraCreateService {
     protected readonly path =
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/PUR/PROPRA/` as string;
 
-    async create(
-        dto: CreatePurPraFormDto,
-        files: Express.Multer.File[],
-        ip: string,
-    ) {
+    async create(dto: CreatePurPraFormDto, files: Express.Multer.File[], ip: string) {
         try {
             let form: FormDto;
             let message: string = 'Price approval form created successfully';
@@ -59,8 +51,7 @@ export class PurPraCreateService {
                     NRUNNO: dto.NRUNNO,
                 };
             } else {
-                const formmst =
-                    await this.formMstService.getFormMasterByVaname('PRO-PRA');
+                const formmst = await this.formMstService.getFormMasterByVaname('PRO-PRA');
                 const createForm = await this.createFormService.create(
                     {
                         NFRMNO: formmst.NNO,
@@ -171,10 +162,7 @@ export class PurPraCreateService {
      * @param form The form data for which the reasons are being created
      * @param details The list of reason details to be created
      */
-    private async createReason(
-        form: FormDto,
-        details: CreatePurPraReasonDto[],
-    ) {
+    private async createReason(form: FormDto, details: CreatePurPraReasonDto[]) {
         // ลบทิ้งทั้งหมด
         if (!details || details.length === 0) {
             await this.praReasonRepo.delete(form);
@@ -218,9 +206,7 @@ export class PurPraCreateService {
             VFORM2: priceComparisonNo,
         });
         if (!link) {
-            throw new Error(
-                'Failed to insert link between price approval and price comparison',
-            );
+            throw new Error('Failed to insert link between price approval and price comparison');
         }
         // update status ของ price comparison = 2 (USED)
         if (priceComparisonNo) {
@@ -237,13 +223,7 @@ export class PurPraCreateService {
      * @param files
      * @param deleteLists
      */
-    private async insertFile({
-        form,
-        createBy,
-        files,
-        deleteLists = [],
-        mode,
-    }: IinsertFile) {
+    private async insertFile({ form, createBy, files, deleteLists = [], mode }: IinsertFile) {
         let code: string = '';
         if (mode == 1) {
             const files = await this.fileService.getFile({
@@ -283,9 +263,7 @@ export class PurPraCreateService {
                     code = 'PURPRA_PCP';
                     break;
                 default:
-                    throw new Error(
-                        `Unsupported file fieldname: ${file.fieldname}`,
-                    );
+                    throw new Error(`Unsupported file fieldname: ${file.fieldname}`);
             }
             const createFile = await this.fileService.insertFiles(
                 {
@@ -324,8 +302,7 @@ export class PurPraCreateService {
             await this.setFlow({ hasDim, insertFlow, form });
             return;
         }
-        const priceComparison =
-            await this.purCpcService.getForm(priceComparisonNo);
+        const priceComparison = await this.purCpcService.getForm(priceComparisonNo);
         if (priceComparison.status) {
             const data = priceComparison.data;
             outerLoop: for (const item of data) {
@@ -335,10 +312,7 @@ export class PurPraCreateService {
                 }
 
                 for (const detail of item.DETAILS) {
-                    if (
-                        detail.NPRES_AMOUNT >= 10000 ||
-                        detail.NNEW_AMOUNT >= 10000
-                    ) {
+                    if (detail.NPRES_AMOUNT >= 10000 || detail.NNEW_AMOUNT >= 10000) {
                         insertFlow = true;
                         break outerLoop;
                     }

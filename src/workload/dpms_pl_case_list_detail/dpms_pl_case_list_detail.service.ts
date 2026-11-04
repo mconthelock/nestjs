@@ -21,9 +21,7 @@ export class DpmsPlCaseListDetailService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to create DPMS PL Case List Detail: ${error.message}`,
-            );
+            throw new Error(`Failed to create DPMS PL Case List Detail: ${error.message}`);
         }
     }
 }

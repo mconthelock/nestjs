@@ -4,7 +4,7 @@ import { User } from 'src/common/Entities/amec/views/user.entity';
 @Entity({ name: 'JOP_MAR_REQ', schema: 'DAILYIDS' })
 export class JopMarReq {
     JOP_REVISION_TEXT?: string; // Optional, will be set later
-    DeadLinePUR?: Number;
+    DeadLinePUR?: number;
 
     @PrimaryColumn()
     JOP_REVISION: number;

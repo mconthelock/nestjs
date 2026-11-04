@@ -9,9 +9,7 @@ import { CreateAuditReportMasterDto } from './dto/create-audit_report_master.dto
 
 @Injectable()
 export class AuditReportMasterRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

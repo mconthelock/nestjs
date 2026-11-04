@@ -9,44 +9,36 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 
 @Injectable()
 export class BlockMasterRepository extends BaseRepository {
-  constructor(
-    @InjectDataSource('mitsuConnection') ds: DataSource,
-    ) {
-    super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
-  }
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
+    }
 
-  async create(dto: CreateBlockMasterDto) {
-    return this.getRepository(BLOCK_MASTER).save(dto);
-  }
+    async create(dto: CreateBlockMasterDto) {
+        return this.getRepository(BLOCK_MASTER).save(dto);
+    }
 
-  findAll() {
-    // ใช้ได้ทั้งหมด
-    // return this.manager.query(`select * from BLOCK_MASTER`);
-    // return this.getRepository(BlockMaster).find();
-    return this.manager.find(BLOCK_MASTER);
-  }
+    findAll() {
+        // ใช้ได้ทั้งหมด
+        // return this.manager.query(`select * from BLOCK_MASTER`);
+        // return this.getRepository(BlockMaster).find();
+        return this.manager.find(BLOCK_MASTER);
+    }
 
-  findOne(id: number) {
-    return this.getRepository(BLOCK_MASTER).findOneBy({ NID: id });
-  }
+    findOne(id: number) {
+        return this.getRepository(BLOCK_MASTER).findOneBy({ NID: id });
+    }
 
-  async search(dto: FiltersDto) {
-    const qb = this.manager.createQueryBuilder(BLOCK_MASTER, 'B');
-    this.applyFilters(qb, 'B', dto, [
-      'NID',
-      'VNAME',
-      'VCODE',
-      'NSTATUS',
-      'NUSERUPDATE',
-    ]);
-    return qb.orderBy('B.NID', 'ASC').getMany();
-  }
+    async search(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(BLOCK_MASTER, 'B');
+        this.applyFilters(qb, 'B', dto, ['NID', 'VNAME', 'VCODE', 'NSTATUS', 'NUSERUPDATE']);
+        return qb.orderBy('B.NID', 'ASC').getMany();
+    }
 
-  async update(id: number, dto: UpdateBlockMasterDto) {
-    return this.getRepository(BLOCK_MASTER).update(id, dto);
-  }
+    async update(id: number, dto: UpdateBlockMasterDto) {
+        return this.getRepository(BLOCK_MASTER).update(id, dto);
+    }
 
-  async remove(id: number) {
-    return this.getRepository(BLOCK_MASTER).delete(id);
-  }
+    async remove(id: number) {
+        return this.getRepository(BLOCK_MASTER).delete(id);
+    }
 }

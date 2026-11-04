@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { DpmsCountryConditionRepository } from './dpms_country_condition.repository';
-import { DeleteCountryConditionDto, CreateCountryConditionDto } from './dto/dpms_country_condition.dto';
+import {
+    DeleteCountryConditionDto,
+    CreateCountryConditionDto,
+} from './dto/dpms_country_condition.dto';
 
 @Injectable()
 export class DpmsCountryConditionService {
@@ -46,14 +49,14 @@ export class DpmsCountryConditionService {
         }
     }
 
-    async create(data: CreateCountryConditionDto){
+    async create(data: CreateCountryConditionDto) {
         try {
             const res = await this.repo.save(data);
-            if(!res){
+            if (!res) {
                 return {
                     status: false,
-                    message: 'Failed to add Country'
-                }
+                    message: 'Failed to add Country',
+                };
             }
             return {
                 status: true,
@@ -68,11 +71,11 @@ export class DpmsCountryConditionService {
     async delete(data: DeleteCountryConditionDto) {
         try {
             const res = await this.repo.delete(data.COUNTRY, data.TYPE);
-            if(!res){
+            if (!res) {
                 return {
                     status: false,
-                    message: 'Failed to delete Country'
-                }
+                    message: 'Failed to delete Country',
+                };
             }
             return {
                 status: true,

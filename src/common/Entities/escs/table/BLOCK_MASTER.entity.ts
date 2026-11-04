@@ -1,10 +1,4 @@
-import {
-    Column,
-    Entity,
-    OneToMany,
-    PrimaryColumn,
-    PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { ITEM_MFG } from './ITEM_MFG.entity';
 import { MFG_DRAWING } from './MFG_DRAWING.entity';
 

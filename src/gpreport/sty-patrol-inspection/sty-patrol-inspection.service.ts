@@ -28,9 +28,7 @@ export class StyPatrolInspectionService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                'Error fetching patrol inspections: ' + error.message,
-            );
+            throw new Error('Error fetching patrol inspections: ' + error.message);
         }
     }
 
@@ -50,9 +48,7 @@ export class StyPatrolInspectionService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                'Error fetching draft patrol inspection: ' + error.message,
-            );
+            throw new Error('Error fetching draft patrol inspection: ' + error.message);
         }
     }
 
@@ -82,8 +78,7 @@ export class StyPatrolInspectionService {
             if (res.length === 0) {
                 return {
                     status: false,
-                    message:
-                        'No patrol inspections found for the provided form criteria',
+                    message: 'No patrol inspections found for the provided form criteria',
                     data: [],
                 };
             }
@@ -93,9 +88,7 @@ export class StyPatrolInspectionService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to list patrol inspections by form: ${error.message}`,
-            );
+            throw new Error(`Failed to list patrol inspections by form: ${error.message}`);
         }
     }
 
@@ -116,9 +109,7 @@ export class StyPatrolInspectionService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to get patrol inspection summary classes: ${error.message}`,
-            );
+            throw new Error(`Failed to get patrol inspection summary classes: ${error.message}`);
         }
     }
 
@@ -145,12 +136,7 @@ export class StyPatrolInspectionService {
         }
     }
 
-    async summaryItem(
-        fyear: string,
-        month: number,
-        className: string,
-        sseccode?: string,
-    ) {
+    async summaryItem(fyear: string, month: number, className: string, sseccode?: string) {
         try {
             const res = await this.repo.summaryItem(
                 fyear,
@@ -178,17 +164,9 @@ export class StyPatrolInspectionService {
         }
     }
 
-    async summaryItemBySec(
-        fyear: string,
-        month: number,
-        sseccode?: string,
-    ) {
+    async summaryItemBySec(fyear: string, month: number, sseccode?: string) {
         try {
-            const res = await this.repo.summaryItemBySec(
-                fyear,
-                month,
-                sseccode,
-            );
+            const res = await this.repo.summaryItemBySec(fyear, month, sseccode);
             const length = res.length;
             if (length === 0) {
                 return {
@@ -209,17 +187,9 @@ export class StyPatrolInspectionService {
         }
     }
 
-    async summarySection(
-        fyear: string,
-        month: number,
-        deptcode: string,
-    ){
+    async summarySection(fyear: string, month: number, deptcode: string) {
         try {
-            const res = await this.repo.summarySection(
-                fyear,
-                month,
-                deptcode,
-            );
+            const res = await this.repo.summarySection(fyear, month, deptcode);
             const length = res.length;
             if (length === 0) {
                 return {
@@ -234,9 +204,7 @@ export class StyPatrolInspectionService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to get patrol inspection summary by section: ${error.message}`,
-            );
+            throw new Error(`Failed to get patrol inspection summary by section: ${error.message}`);
         }
     }
 }

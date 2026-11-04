@@ -2,11 +2,9 @@ import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 import { FORM } from './FORM.entity';
 
 @Entity({ name: 'CURRENCY', schema: 'WEBFORM' })
-export class FINNPOCURRENCY  {
-    
+export class FINNPOCURRENCY {
     @PrimaryColumn()
     CURRENCY: string;
-
 }
 
 // NFRMNO

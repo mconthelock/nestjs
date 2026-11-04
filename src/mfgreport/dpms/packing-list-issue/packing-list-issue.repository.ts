@@ -19,11 +19,11 @@ export class ProcedureWorkloadRepository extends OracleRepository {
         return this.execCursor('DPMS_PL_DAY_REPORT', { day }, ['day']);
     }
 
-    async getLastRevDocument(dto: SearchDpmsPlIssueDto){
+    async getLastRevDocument(dto: SearchDpmsPlIssueDto) {
         return this.execCursor('DPMS_PL_DOC_FOR_REVISE', dto, ['VPROD', 'VP', 'VTYPE', 'VORDERS']);
     }
 
-    async getDocforShow(dto: GetDocForShowDto){
+    async getDocforShow(dto: GetDocForShowDto) {
         return this.execCursor('DPMS_PL_DOC', dto, ['VPROD', 'VP', 'VTYPE', 'VORDERS', 'NDRAFT']);
     }
 

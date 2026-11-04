@@ -79,7 +79,7 @@ import { DtiModule } from './dti/dti.module';
         IedocModule,
         InnovatModule,
         CountriesModule,
-        DtiModule
+        DtiModule,
     ],
     providers: [
         HttpLoggingInterceptor,

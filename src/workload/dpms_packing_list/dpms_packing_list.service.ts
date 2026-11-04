@@ -7,7 +7,10 @@ import { searchDpmsPackingListDto } from './dto/search_dpms_packing_list.dto';
 export class DpmsPackingListService {
     constructor(private readonly repo: DpmsPackingListRepository) {}
 
-    async getPackingList(type: 'all' | 'current' | 'finish' | 'search', condition?: searchDpmsPackingListDto) {
+    async getPackingList(
+        type: 'all' | 'current' | 'finish' | 'search',
+        condition?: searchDpmsPackingListDto,
+    ) {
         try {
             let res: DPMS_PACKING_LIST[] = [];
             switch (type) {
@@ -38,13 +41,14 @@ export class DpmsPackingListService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                'Get DPMS packing list data Failed: ' + error.message,
-            );
+            throw new Error('Get DPMS packing list data Failed: ' + error.message);
         }
     }
 
-    async getPackingListMar(type: 'all' | 'current' | 'finish' | 'inprogress' | 'search', condition?: searchDpmsPackingListDto) {
+    async getPackingListMar(
+        type: 'all' | 'current' | 'finish' | 'inprogress' | 'search',
+        condition?: searchDpmsPackingListDto,
+    ) {
         try {
             let res: DPMS_PACKING_LIST[] = [];
             switch (type) {
@@ -78,21 +82,19 @@ export class DpmsPackingListService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                'Get DPMS packing list data Failed: ' + error.message,
-            );
+            throw new Error('Get DPMS packing list data Failed: ' + error.message);
         }
     }
 
     async getForSearch(types: 'mar' | 'default' = 'default') {
         try {
             let data: DPMS_PACKING_LIST[] = [];
-            if(types === 'mar') {
+            if (types === 'mar') {
                 data = await this.repo.getMarketingTasks('all');
             } else {
                 data = await this.repo.findAll();
             }
-            if(data.length === 0) {
+            if (data.length === 0) {
                 return {
                     status: false,
                     message: 'Get data for search Failed: No data found',
@@ -101,10 +103,18 @@ export class DpmsPackingListService {
             const prod = Array.from(new Set(data.map((item) => item.PROD)));
             const p = Array.from(new Set(data.map((item) => item.P)));
             const type = Array.from(new Set(data.map((item) => item.TYPE)));
-            const serie = Array.from(new Set(data.filter((item) => item.SERIES).map((item) => item.SERIES)));
-            const model = Array.from(new Set(data.filter((item) => item.MODEL_SPEC).map((item) => item.MODEL_SPEC)));
-            const proj = Array.from(new Set(data.filter((item) => item.PROJECT).map((item) => item.PROJECT)));
-            const agent = Array.from(new Set(data.filter((item) => item.AGENT).map((item) => item.AGENT))); 
+            const serie = Array.from(
+                new Set(data.filter((item) => item.SERIES).map((item) => item.SERIES)),
+            );
+            const model = Array.from(
+                new Set(data.filter((item) => item.MODEL_SPEC).map((item) => item.MODEL_SPEC)),
+            );
+            const proj = Array.from(
+                new Set(data.filter((item) => item.PROJECT).map((item) => item.PROJECT)),
+            );
+            const agent = Array.from(
+                new Set(data.filter((item) => item.AGENT).map((item) => item.AGENT)),
+            );
             return {
                 status: true,
                 PROD: prod,
@@ -116,9 +126,7 @@ export class DpmsPackingListService {
                 AGENT: agent,
             };
         } catch (error) {
-            throw new Error(
-                'Get data for search data Failed: ' + error.message,
-            );
+            throw new Error('Get data for search data Failed: ' + error.message);
         }
     }
 }

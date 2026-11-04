@@ -5,8 +5,8 @@ import { TermController } from './term.controller';
 import { Term } from './entities/term.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Term], 'mitsuConnection')],
-  controllers: [TermController],
-  providers: [TermService],
+    imports: [TypeOrmModule.forFeature([Term], 'mitsuConnection')],
+    controllers: [TermController],
+    providers: [TermService],
 })
 export class TermModule {}

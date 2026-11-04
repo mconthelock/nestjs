@@ -1,11 +1,11 @@
 import {
-  WebSocketGateway,
-  SubscribeMessage,
-  MessageBody,
-  OnGatewayDisconnect,
-  OnGatewayConnection,
-  ConnectedSocket,
-  WebSocketServer,
+    WebSocketGateway,
+    SubscribeMessage,
+    MessageBody,
+    OnGatewayDisconnect,
+    OnGatewayConnection,
+    ConnectedSocket,
+    WebSocketServer,
 } from '@nestjs/websockets';
 // import { LockPisService } from './lock-pis.service';
 import { Socket, Server } from 'socket.io';

@@ -1,12 +1,5 @@
 import { User } from 'src/common/Entities/amec/views/user.entity';
-import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    OneToMany,
-    OneToOne,
-    JoinColumn,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { FORMMST } from './FORMMST.entity';
 import { FLOW } from './FLOW.entity';
 import { IsForm3 } from 'src/webform/isform/is-form3/entities/is-form3.entity';

@@ -26,12 +26,7 @@ const key = {
 
 function setup() {
     const repositories = new Map<any, any>();
-    for (const entity of [
-        PROC_TSHEADFORM,
-        PROC_TSDETFORM,
-        PROC_TSATTFILE,
-        FORM,
-    ]) {
+    for (const entity of [PROC_TSHEADFORM, PROC_TSDETFORM, PROC_TSATTFILE, FORM]) {
         const qb = {
             where: jest.fn().mockReturnThis(),
             setLock: jest.fn().mockReturnThis(),
@@ -118,36 +113,30 @@ describe('TS repository transaction boundary', () => {
         await (ds as any).buildMetadatas();
         const oracleRepository = ds.getRepository(LockableForm);
         const captured: string[] = [];
-        const original =
-            oracleRepository.createQueryBuilder.bind(oracleRepository);
-        jest.spyOn(oracleRepository, 'findOne').mockImplementation(
-            async (options) => {
-                // Installed EntityManager.findOne adds take: 1 before executing.
-                captured.push(
-                    original()
-                        .setFindOptions({ ...options, take: 1 })
-                        .getSql(),
-                );
+        const original = oracleRepository.createQueryBuilder.bind(oracleRepository);
+        jest.spyOn(oracleRepository, 'findOne').mockImplementation(async (options) => {
+            // Installed EntityManager.findOne adds take: 1 before executing.
+            captured.push(
+                original()
+                    .setFindOptions({ ...options, take: 1 })
+                    .getSql(),
+            );
+            return key;
+        });
+        jest.spyOn(oracleRepository, 'createQueryBuilder').mockImplementation((...args) => {
+            const qb = original(...args);
+            jest.spyOn(qb, 'getOne').mockImplementation(async () => {
+                captured.push(qb.getSql());
                 return key;
-            },
-        );
-        jest.spyOn(oracleRepository, 'createQueryBuilder').mockImplementation(
-            (...args) => {
-                const qb = original(...args);
-                jest.spyOn(qb, 'getOne').mockImplementation(async () => {
-                    captured.push(qb.getSql());
-                    return key;
-                });
-                return qb;
-            },
-        );
+            });
+            return qb;
+        });
         const { repo, manager } = setup();
         manager.getRepository.mockReturnValue(oracleRepository);
         await repo.transaction(() => repo.requireForm(key));
         expect(captured[0]).toContain('FOR UPDATE');
         expect(captured[0]).not.toMatch(/FETCH|OFFSET|ROWNUM/i);
-        for (const field of Object.keys(key))
-            expect(captured[0]).toContain(field);
+        for (const field of Object.keys(key)) expect(captured[0]).toContain(field);
     });
     it('shares transaction manager between Form creation and every TS repository', async () => {
         const { repo, repositories, manager, state } = setup();
@@ -208,11 +197,9 @@ describe('TS repository transaction boundary', () => {
             'LOCK TABLE WEBFORM.FORM IN SHARE ROW EXCLUSIVE MODE',
         );
         expect(manager.query.mock.calls[1][0]).toContain('SELECT COUNT(*)');
-        expect(
-            manager.query.mock.calls.some(([sql]) =>
-                /LOCK TABLE IEDOC\./.test(sql),
-            ),
-        ).toBe(false);
+        expect(manager.query.mock.calls.some(([sql]) => /LOCK TABLE IEDOC\./.test(sql))).toBe(
+            false,
+        );
         expect(state).toEqual({ committed: true, rolledBack: false });
         expect(transactionContext.getStore()).toBeUndefined();
     });
@@ -254,9 +241,7 @@ describe('TS repository transaction boundary', () => {
     });
     it('replaces only the specified TS form, deleting children before headers', async () => {
         const { repo, repositories } = setup();
-        await repo.transaction(() =>
-            repo.replace({ ...key, HEADERS: [{ SEQ: '002' }] }),
-        );
+        await repo.transaction(() => repo.replace({ ...key, HEADERS: [{ SEQ: '002' }] }));
         const details = repositories.get(PROC_TSDETFORM);
         const files = repositories.get(PROC_TSATTFILE);
         const headers = repositories.get(PROC_TSHEADFORM);
@@ -271,9 +256,7 @@ describe('TS repository transaction boundary', () => {
         expect(headers.delete.mock.invocationCallOrder[0]).toBeLessThan(
             headers.insert.mock.invocationCallOrder[0],
         );
-        expect(headers.insert).toHaveBeenCalledWith([
-            { ...key, SEQ: '002', INPUTDATE: undefined },
-        ]);
+        expect(headers.insert).toHaveBeenCalledWith([{ ...key, SEQ: '002', INPUTDATE: undefined }]);
         expect(repositories.get(FORM).delete).not.toHaveBeenCalled();
     });
     it('locks the complete FORM key and refuses nonexistent forms', async () => {
@@ -281,9 +264,9 @@ describe('TS repository transaction boundary', () => {
         const form = repositories.get(FORM);
         const qb = form.createQueryBuilder();
         qb.getOne.mockResolvedValue(null);
-        await expect(
-            repo.transaction(() => repo.requireForm(key)),
-        ).rejects.toThrow('WEBFORM.FORM not found');
+        await expect(repo.transaction(() => repo.requireForm(key))).rejects.toThrow(
+            'WEBFORM.FORM not found',
+        );
         expect(qb.where).toHaveBeenCalledWith(key);
         expect(qb.setLock).toHaveBeenCalledWith('pessimistic_write');
     });

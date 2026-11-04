@@ -1,22 +1,10 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-    UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { PurevaFormService } from './pureva_form.service';
 import { CreatePurevaFormDto } from './dto/create-pureva_form.dto';
 import { SearchPurevaFormDto } from './dto/search-pureva_form.dto';
 import { UpdatePurevaFormDto } from './dto/update-pureva_form.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 @Controller('purform/pureva-form')
 export class PurevaFormController {

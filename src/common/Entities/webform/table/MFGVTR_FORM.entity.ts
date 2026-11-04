@@ -1,10 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    OneToMany,
-    PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { MFGVTR_DETAIL } from './MFGVTR_DETAIL.entity';
 
 @Entity({ name: 'MFGVTR_FORM', schema: 'WEBFORM' })

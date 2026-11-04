@@ -20,7 +20,7 @@ export class ReasonRepository extends BaseRepository {
         return this.getRepository(PURPRA_REASONS).save(data);
     }
 
-    delete(form: FormDto){
+    delete(form: FormDto) {
         return this.getRepository(PURPRA_REASONS).delete({
             NFRMNO: form.NFRMNO,
             VORGNO: form.VORGNO,

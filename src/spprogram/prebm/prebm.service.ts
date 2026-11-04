@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-    parseConditionString,
-    parseCreateString,
-} from 'src/common/helpers/query.helper';
+import { parseConditionString, parseCreateString } from 'src/common/helpers/query.helper';
 import { ConectionService } from 'src/as400/conection/conection.service';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 
@@ -23,9 +20,7 @@ export class PrebmService {
 
     async delete(data: FiltersDto, table: string) {
         const query = await parseConditionString(data);
-        const result = await this.conn.runQuery(
-            `DELETE FROM ${table} ${query}`,
-        );
+        const result = await this.conn.runQuery(`DELETE FROM ${table} ${query}`);
         return result;
     }
 

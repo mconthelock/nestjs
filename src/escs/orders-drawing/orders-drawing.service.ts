@@ -5,9 +5,7 @@ import { OrdersDrawingRepository } from './orders-drawing.repository';
 
 @Injectable()
 export class OrdersDrawingService {
-    constructor(
-        private readonly repo: OrdersDrawingRepository,
-    ) {}
+    constructor(private readonly repo: OrdersDrawingRepository) {}
 
     async update(dto: UpdateOrdersDrawingDto) {
         try {
@@ -30,9 +28,7 @@ export class OrdersDrawingService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Update ORDERS_DRAWING Error: ` + error.message,
-            );
+            throw new Error(`Update ORDERS_DRAWING Error: ` + error.message);
         }
     }
 }

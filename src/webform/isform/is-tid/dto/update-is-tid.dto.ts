@@ -1,13 +1,7 @@
 import { PartialType, PickType } from '@nestjs/swagger';
 import { CreateIsTidDto } from './create-is-tid.dto';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
-import {
-    IsDate,
-    IsNotEmpty,
-    IsOptional,
-    IsString,
-    ValidateNested,
-} from 'class-validator';
+import { IsDate, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateIsTidDto extends PartialType(CreateIsTidDto) {

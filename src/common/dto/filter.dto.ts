@@ -1,12 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-    IsArray,
-    IsIn,
-    IsNotEmpty,
-    IsOptional,
-    IsString,
-    ValidateNested,
-} from 'class-validator';
+import { IsArray, IsIn, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class FiltersDto {
     // format เดิม

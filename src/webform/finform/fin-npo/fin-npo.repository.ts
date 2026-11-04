@@ -50,11 +50,7 @@ export class FinnpoRepository extends BaseRepository {
         });
     }
 
-    findExpense(
-        expenseCode: number,
-        expenseEname: string,
-        expenseTname: string,
-    ) {
+    findExpense(expenseCode: number, expenseEname: string, expenseTname: string) {
         return this.getRepository(FINNPOEXPENSE).findOne({
             where: {
                 EXPENSE_CODE: expenseCode,
@@ -84,11 +80,7 @@ export class FinnpoRepository extends BaseRepository {
         );
     }
 
-    deleteExpense(
-        expenseCode: number,
-        expenseEname: string,
-        expenseTname: string,
-    ) {
+    deleteExpense(expenseCode: number, expenseEname: string, expenseTname: string) {
         return this.getRepository(FINNPOEXPENSE).delete({
             EXPENSE_CODE: expenseCode,
             EXPENSE_ENAME: expenseEname,
@@ -130,11 +122,7 @@ export class FinnpoRepository extends BaseRepository {
         return this.getRepository(FINNPOVENDOR).save(data);
     }
 
-    updateVendor(
-        vendorCode: string,
-        vendorName: string,
-        data: Partial<FINNPOVENDOR>,
-    ) {
+    updateVendor(vendorCode: string, vendorName: string, data: Partial<FINNPOVENDOR>) {
         return this.getRepository(FINNPOVENDOR).update(
             { VENDOR_CODE: vendorCode, VENDOR_NAME: vendorName },
             data,
@@ -194,8 +182,11 @@ export class FinnpoRepository extends BaseRepository {
             } else {
                 // Approval actions send only WHT; they must not create invoices.
                 if (
-                    !data.INVOICE_DATE || !data.INVOICE_NO || !data.SCURCODE ||
-                    data.NET_PRICE == null || data.VAT_RATE_ID == null ||
+                    !data.INVOICE_DATE ||
+                    !data.INVOICE_NO ||
+                    !data.SCURCODE ||
+                    data.NET_PRICE == null ||
+                    data.VAT_RATE_ID == null ||
                     data.TOTAL_AMT == null
                 ) {
                     throw new BadRequestException(`Invoice ID ${ID} was not found`);
@@ -229,11 +220,7 @@ export class FinnpoRepository extends BaseRepository {
         return this.getRepository(FINNPOCOSTCENTER).save(data);
     }
 
-    async replaceCostCenters(
-        cyear2: string,
-        nrunno: number,
-        data: Partial<FINNPOCOSTCENTER>[],
-    ) {
+    async replaceCostCenters(cyear2: string, nrunno: number, data: Partial<FINNPOCOSTCENTER>[]) {
         const repository = this.getRepository(FINNPOCOSTCENTER);
         await repository.delete({ CYEAR2: cyear2, NRUNNO: nrunno });
         return data.length ? repository.save(data) : [];
@@ -325,29 +312,11 @@ export class FinnpoRepository extends BaseRepository {
         cyear2: string,
         nrunno: number,
     ) {
-        const head = await this.findHeadByForm(
-            nfrmno,
-            vorgno,
-            cyear,
-            cyear2,
-            nrunno,
-        );
+        const head = await this.findHeadByForm(nfrmno, vorgno, cyear, cyear2, nrunno);
 
-        const invoices = await this.findDetailByForm(
-            nfrmno,
-            vorgno,
-            cyear,
-            cyear2,
-            nrunno,
-        );
+        const invoices = await this.findDetailByForm(nfrmno, vorgno, cyear, cyear2, nrunno);
 
-        const files = await this.findFilesByForm(
-            nfrmno,
-            vorgno,
-            cyear,
-            cyear2,
-            nrunno,
-        );
+        const files = await this.findFilesByForm(nfrmno, vorgno, cyear, cyear2, nrunno);
 
         const vendor = head?.VENDOR_CODE
             ? await this.findVendorByCode(String(head.VENDOR_CODE))
@@ -405,16 +374,8 @@ export class FinnpoRepository extends BaseRepository {
                 'INVOICE',
                 'INVOICE.CYEAR2 = HEAD.CYEAR2 AND INVOICE.NRUNNO = HEAD.NRUNNO',
             )
-            .leftJoin(
-                FINNPOEXPENSE,
-                'EXPENSE',
-                'EXPENSE.EXPENSE_CODE = HEAD.EXPENSE_CODE',
-            )
-            .leftJoin(
-                FINNPOVENDOR,
-                'VENDOR',
-                'VENDOR.VENDOR_CODE = HEAD.VENDOR_CODE',
-            )
+            .leftJoin(FINNPOEXPENSE, 'EXPENSE', 'EXPENSE.EXPENSE_CODE = HEAD.EXPENSE_CODE')
+            .leftJoin(FINNPOVENDOR, 'VENDOR', 'VENDOR.VENDOR_CODE = HEAD.VENDOR_CODE')
             .select('HEAD.NFRMNO', 'NFRMNO')
             .addSelect('HEAD.VORGNO', 'VORGNO')
             .addSelect('HEAD.CYEAR', 'CYEAR')
@@ -429,10 +390,7 @@ export class FinnpoRepository extends BaseRepository {
             .addSelect('EXPENSE.EXPENSE_ENAME', 'EXPENSE_TYPE')
             .addSelect('HEAD.VENDOR_CODE', 'VENDOR_CODE')
             .addSelect('VENDOR.VENDOR_NAME', 'VENDOR')
-            .addSelect(
-                "TO_CHAR(INVOICE.INVOICE_DATE, 'YYYY-MM-DD')",
-                'INVOICE_DATE',
-            )
+            .addSelect("TO_CHAR(INVOICE.INVOICE_DATE, 'YYYY-MM-DD')", 'INVOICE_DATE')
             .addSelect('INVOICE.INVOICE_NO', 'INVOICE_NO')
             .addSelect('INVOICE.NET_PRICE', 'NET_PRICE')
             .addSelect('INVOICE.TOTAL_AMT', 'TOTAL_AMOUNT')
@@ -447,16 +405,14 @@ export class FinnpoRepository extends BaseRepository {
             );
 
         if (filters.formDateFrom) {
-            query.andWhere(
-                "TRUNC(FORM.DREQDATE) >= TO_DATE(:formDateFrom, 'YYYY-MM-DD')",
-                { formDateFrom: filters.formDateFrom },
-            );
+            query.andWhere("TRUNC(FORM.DREQDATE) >= TO_DATE(:formDateFrom, 'YYYY-MM-DD')", {
+                formDateFrom: filters.formDateFrom,
+            });
         }
         if (filters.formDateTo) {
-            query.andWhere(
-                "TRUNC(FORM.DREQDATE) <= TO_DATE(:formDateTo, 'YYYY-MM-DD')",
-                { formDateTo: filters.formDateTo },
-            );
+            query.andWhere("TRUNC(FORM.DREQDATE) <= TO_DATE(:formDateTo, 'YYYY-MM-DD')", {
+                formDateTo: filters.formDateTo,
+            });
         }
         if (filters.invoiceDateFrom) {
             query.andWhere(
@@ -465,22 +421,19 @@ export class FinnpoRepository extends BaseRepository {
             );
         }
         if (filters.invoiceDateTo) {
-            query.andWhere(
-                "TRUNC(INVOICE.INVOICE_DATE) <= TO_DATE(:invoiceDateTo, 'YYYY-MM-DD')",
-                { invoiceDateTo: filters.invoiceDateTo },
-            );
+            query.andWhere("TRUNC(INVOICE.INVOICE_DATE) <= TO_DATE(:invoiceDateTo, 'YYYY-MM-DD')", {
+                invoiceDateTo: filters.invoiceDateTo,
+            });
         }
         if (filters.approveDateFrom) {
-            query.andWhere(
-                `TRUNC(${approveDate}) >= TO_DATE(:approveDateFrom, 'YYYY-MM-DD')`,
-                { approveDateFrom: filters.approveDateFrom },
-            );
+            query.andWhere(`TRUNC(${approveDate}) >= TO_DATE(:approveDateFrom, 'YYYY-MM-DD')`, {
+                approveDateFrom: filters.approveDateFrom,
+            });
         }
         if (filters.approveDateTo) {
-            query.andWhere(
-                `TRUNC(${approveDate}) <= TO_DATE(:approveDateTo, 'YYYY-MM-DD')`,
-                { approveDateTo: filters.approveDateTo },
-            );
+            query.andWhere(`TRUNC(${approveDate}) <= TO_DATE(:approveDateTo, 'YYYY-MM-DD')`, {
+                approveDateTo: filters.approveDateTo,
+            });
         }
         if (filters.expenseCode !== undefined) {
             query.andWhere('HEAD.EXPENSE_CODE = :expenseCode', {

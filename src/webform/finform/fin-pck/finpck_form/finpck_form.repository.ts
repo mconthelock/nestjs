@@ -2,29 +2,28 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { FINPCK_FORM } from 'src/common/Entities/webform/table/FINPCK_FORM.entity';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { FormDto} from 'src/webform/form/dto/form.dto';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 import { DataSource } from 'typeorm';
 import { CreateFinpckFormDto } from './dto/create-finpck_form.dto';
 @Injectable()
 export class FinpckFormRepository extends BaseRepository {
-    
     constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
-        super(ds); 
+        super(ds);
     }
-    async createForm(dto: CreateFinpckFormDto){
+    async createForm(dto: CreateFinpckFormDto) {
         return await this.getRepository(FINPCK_FORM).save(dto);
     }
 
     async getData(dto: FormDto) {
-                return await this.getRepository(FINPCK_FORM).findOne({
-                    where: {
-                        ...dto,
-                    },
-                    relations: {
-                        ASSETS: {
-                            GRP: true
-                        }
-                    },
-                });
+        return await this.getRepository(FINPCK_FORM).findOne({
+            where: {
+                ...dto,
+            },
+            relations: {
+                ASSETS: {
+                    GRP: true,
+                },
+            },
+        });
     }
 }

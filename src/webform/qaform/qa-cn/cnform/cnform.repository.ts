@@ -77,10 +77,7 @@ export class CnFormRepository extends BaseRepository {
             ])
             // 2. อ้างอิงตัวแปรเป็น CNF ตัวพิมพ์ใหญ่
             .addSelect("REGEXP_SUBSTR(CNF.RSNOTHER, 'F[0-9]+')", 'FIRSTNO')
-            .addSelect(
-                "REGEXP_SUBSTR(CNF.DETTRANS, 'shop at\\s*(.*)', 1, 1, NULL, 1)",
-                'SHOPNO',
-            )
+            .addSelect("REGEXP_SUBSTR(CNF.DETTRANS, 'shop at\\s*(.*)', 1, 1, NULL, 1)", 'SHOPNO')
 
             // 3. เปลี่ยนชื่อย่อตาราง JOIN เป็น CNJ และ CHK ตัวพิมพ์ใหญ่
             .leftJoin('CNJUDGEMENT', 'CNJ', 'CNJ.JDGMNTNO = CNF.JDGMNTNO')
@@ -121,7 +118,8 @@ export class CnFormRepository extends BaseRepository {
             .where("E.CSTATUS = '1'");
 
         if (type === 'PIC') {
-            qb.innerJoin(`(
+            qb.innerJoin(
+                `(
                     SELECT F.VAPVNO  AS EMPNO FROM FLOW F
                     WHERE F.NFRMNO = :nfrmno AND F.VORGNO = :vorgno
                       AND F.CYEAR = :cyear AND F.CYEAR2 = :cyear2 AND F.NRUNNO = :nrunno
@@ -139,16 +137,15 @@ export class CnFormRepository extends BaseRepository {
                           AND F2.CYEAR = :cyear AND F2.CYEAR2 = :cyear2 AND F2.NRUNNO = :nrunno
                           AND F2.CEXTDATA = '06'
                     )
-                )`, 'P', 'P.EMPNO = E.SEMPNO');
+                )`,
+                'P',
+                'P.EMPNO = E.SEMPNO',
+            );
         } else {
             // -------------------------------------------------------------
             // 📍 จุดที่เปลี่ยน: หาอีเมลจาก VAPVNO หรือ VREPNO แทน VREALAPV
             // -------------------------------------------------------------
-            qb.innerJoin(
-                'FLOW',
-                'F',
-                '(F.VAPVNO = E.SEMPNO OR F.VREPNO = E.SEMPNO)',
-            )
+            qb.innerJoin('FLOW', 'F', '(F.VAPVNO = E.SEMPNO OR F.VREPNO = E.SEMPNO)')
                 .andWhere('F.NFRMNO = :nfrmno')
                 .andWhere('F.VORGNO = :vorgno')
                 .andWhere('F.CYEAR = :cyear')

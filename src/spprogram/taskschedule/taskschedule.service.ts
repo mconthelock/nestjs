@@ -23,8 +23,7 @@ export class TaskscheduleService {
                 context: {
                     recipientName: data?.recipientName || 'All Concerned',
                     message:
-                        data?.message ||
-                        ` This is a test email for pending form notification.`,
+                        data?.message || ` This is a test email for pending form notification.`,
                     table: data?.showTable || false,
                     tableHeaders: data?.tableHeaders || [],
                     tableRows: data?.tableRows || [],
@@ -55,9 +54,7 @@ export class TaskscheduleService {
             });
             const filteredInquiries = inquiries.filter(
                 (dt) =>
-                    dt.INQ_STATUS >= 30 &&
-                    dt.INQ_STATUS != 50 &&
-                    dt.timeline.BM_CONFIRM == null,
+                    dt.INQ_STATUS >= 30 && dt.INQ_STATUS != 50 && dt.timeline.BM_CONFIRM == null,
             );
 
             for (const inq of filteredInquiries) {

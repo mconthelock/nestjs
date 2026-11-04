@@ -73,9 +73,7 @@ describe('CategoriesService - Nested Creation', () => {
         });
 
         expect(createdLevel1.CATEGORY_NAME).toBe('คอมพิวเตอร์');
-        expect(createdLevel1.PARENT_ID.CATEGORY_ID).toBe(
-            createdRoot.CATEGORY_ID,
-        );
+        expect(createdLevel1.PARENT_ID.CATEGORY_ID).toBe(createdRoot.CATEGORY_ID);
 
         // ==========================================
         // ขั้นที่ 3: สร้าง Level 2 (คอมพิวเตอร์ desktop) ให้อยู่ใต้ Level 1
@@ -97,9 +95,7 @@ describe('CategoriesService - Nested Creation', () => {
         });
 
         expect(createdLevel2.CATEGORY_NAME).toBe('คอมพิวเตอร์ desktop');
-        expect(createdLevel2.PARENT_ID.CATEGORY_ID).toBe(
-            createdLevel1.CATEGORY_ID,
-        );
+        expect(createdLevel2.PARENT_ID.CATEGORY_ID).toBe(createdLevel1.CATEGORY_ID);
 
         // ==========================================
         // ตรวจสอบความถูกต้องของการเรียกใช้ Repository
@@ -115,8 +111,8 @@ describe('CategoriesService - Nested Creation', () => {
         mockCategoryRepository.findOne.mockResolvedValueOnce(null);
 
         // คาดหวังว่า Service ต้องพ่น Error ออกมา
-        await expect(
-            service.create({ CATEGORY_NAME: 'จอภาพ', PARENT_ID: 999 }),
-        ).rejects.toThrow(NotFoundException);
+        await expect(service.create({ CATEGORY_NAME: 'จอภาพ', PARENT_ID: 999 })).rejects.toThrow(
+            NotFoundException,
+        );
     });
 });

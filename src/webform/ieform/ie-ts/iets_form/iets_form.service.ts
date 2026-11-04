@@ -17,18 +17,17 @@ export class IetsFormService {
             if (data && data.LISTS && data.LISTS.length > 0) {
                 const dwgNos = [
                     ...new Set(
-                        data.LISTS.map((item) =>
-                            item.DWGNO ? item.DWGNO.trim() : null,
-                        ).filter((dwg) => dwg !== null),
+                        data.LISTS.map((item) => (item.DWGNO ? item.DWGNO.trim() : null)).filter(
+                            (dwg) => dwg !== null,
+                        ),
                     ),
                 ];
                 if (dwgNos.length > 0) {
                     const requestDate = data.FORM?.DREQDATE;
-                    const histories =
-                        await this.repolist.getLatestRequestsByDwgNos(
-                            dwgNos,
-                            requestDate,
-                        );
+                    const histories = await this.repolist.getLatestRequestsByDwgNos(
+                        dwgNos,
+                        requestDate,
+                    );
                     // 2.4 นำผลลัพธ์มาสร้าง Map (Object)
                     // เพิ่มการเช็คว่า histories มีค่าและเป็น Array แน่นอน
                     // 2.4 นำผลลัพธ์มาสร้าง Map (Object) แบบปลอดภัยขั้นสุด
@@ -50,8 +49,7 @@ export class IetsFormService {
                         const key = rawDwgNo.trim();
 
                         // 🛡️ 3. ดึงค่าวันที่ และป้องกันกรณีเป็น null ด้วย ??
-                        const maxApvDate =
-                            curr.MAXAPVDATE ?? curr.maxApvDate ?? null;
+                        const maxApvDate = curr.MAXAPVDATE ?? curr.maxApvDate ?? null;
 
                         acc[key] = maxApvDate;
                         return acc;
@@ -59,8 +57,7 @@ export class IetsFormService {
                     data.LISTS = data.LISTS.map((item) => {
                         if (item.DWGNO) {
                             const key = item.DWGNO.trim();
-                            item['HISTORY'] = item['HISTORY'] =
-                                historyMap[key]?.MAXAPVDATE || null;
+                            item['HISTORY'] = item['HISTORY'] = historyMap[key]?.MAXAPVDATE || null;
                         }
                         return item;
                     });

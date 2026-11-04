@@ -5,12 +5,12 @@ import { Shipment } from './entities/shipment.entity';
 
 @Injectable()
 export class ShipmentService {
-  constructor(
-    @InjectRepository(Shipment, 'mitsuConnection')
-    private readonly ship: Repository<Shipment>,
-  ) {}
+    constructor(
+        @InjectRepository(Shipment, 'mitsuConnection')
+        private readonly ship: Repository<Shipment>,
+    ) {}
 
-  findAll() {
-    return this.ship.find({ order: { SHIPMENT_VALUE: 'ASC' } });
-  }
+    findAll() {
+        return this.ship.find({ order: { SHIPMENT_VALUE: 'ASC' } });
+    }
 }

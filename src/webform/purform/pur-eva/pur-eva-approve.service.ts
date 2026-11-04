@@ -91,7 +91,7 @@ export class PurEvaApproveService {
                     if (res.OPERATION == 'N') {
                         const today = new Date();
                         const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-                        let gp = res.VENDGROUP.match(/^\d+/)?.[0];
+                        const gp = res.VENDGROUP.match(/^\d+/)?.[0];
                         let p = '';
                         if (gp != '6') {
                             p = res.VENDPURPOSE.match(/^\d+/)?.[0];
@@ -109,10 +109,7 @@ export class PurEvaApproveService {
                             VENDCODE: vnd.VND_CODE,
                         });
                     }
-                    if (
-                        res.OPERATION == 'N' ||
-                        (res.OPERATION == 'U' && res.UPSTATUS == 'Y')
-                    ) {
+                    if (res.OPERATION == 'N' || (res.OPERATION == 'U' && res.UPSTATUS == 'Y')) {
                         const res = await this.purVmmService.createauto(
                             form,
                             ip,

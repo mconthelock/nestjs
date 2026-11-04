@@ -51,7 +51,7 @@ export class PsCiService {
                 });
             }
 
-            if(row.IS_RECHECK_EDITED){
+            if (row.IS_RECHECK_EDITED) {
                 entries.push({
                     ASSIGN_ID: row.ASSIGN_ID,
                     ITEM_CODE: row.IPROD,

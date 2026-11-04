@@ -4,8 +4,8 @@ import { ItemsCategoryService } from './items-category.service';
 import { ItemsCategoryController } from './items-category.controller';
 import { Category } from '../items-category/entities/category.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([Category], 'mitsuConnection')],
-  controllers: [ItemsCategoryController],
-  providers: [ItemsCategoryService],
+    imports: [TypeOrmModule.forFeature([Category], 'mitsuConnection')],
+    controllers: [ItemsCategoryController],
+    providers: [ItemsCategoryService],
 })
 export class ItemsCategoryModule {}

@@ -1,11 +1,4 @@
-import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    OneToOne,
-    JoinColumn,
-    ManyToOne,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, ManyToOne } from 'typeorm';
 import { FORM } from './FORM.entity';
 import { FORMMST_GROUP } from './FORMMST_GROUP.entity';
 

@@ -1,12 +1,4 @@
-import {
-    IsString,
-    MaxLength,
-    Matches,
-    IsInt,
-    Min,
-    Max,
-    IsOptional,
-} from 'class-validator';
+import { IsString, MaxLength, Matches, IsInt, Min, Max, IsOptional } from 'class-validator';
 
 export class CreatePilineNgRecordDto {
     @IsString()

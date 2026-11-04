@@ -7,9 +7,7 @@ import { ISCFS_FORM } from 'src/common/Entities/webform/table/ISCFS_FORM.entity'
 
 @Injectable()
 export class IsCfsRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

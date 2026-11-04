@@ -11,7 +11,7 @@ export class SearchOrderDto {
     @IsString()
     @ApiProperty({ example: '188-01S' })
     ORD_ITEM?: string;
-    
+
     @IsOptional()
     @IsString()
     @ApiProperty({ example: '2025061' })

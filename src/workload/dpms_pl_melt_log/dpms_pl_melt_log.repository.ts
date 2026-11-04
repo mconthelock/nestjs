@@ -19,7 +19,8 @@ export class DpmsPlMeltLogRepository extends BaseRepository {
     }
 
     async getList(vanndate: string) {
-        return this.getRepository(DPMS_PL_MELT_LOG).createQueryBuilder('log')
+        return this.getRepository(DPMS_PL_MELT_LOG)
+            .createQueryBuilder('log')
             .select('AMECLOAD, PROJECT, COUNT(*) AS TOTALSENT')
             .where("TRUNC(VANNDATE) = TO_DATE(:vanndate, 'YYYY-MM-DD')", { vanndate })
             .groupBy('AMECLOAD, PROJECT')

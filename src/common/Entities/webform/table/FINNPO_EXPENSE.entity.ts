@@ -11,10 +11,9 @@ export class FINNPOEXPENSE {
 
     @PrimaryColumn()
     EXPENSE_TNAME: string;
-    
+
     @Column()
     ACTIVE: number;
-
 }
 
 // NFRMNO

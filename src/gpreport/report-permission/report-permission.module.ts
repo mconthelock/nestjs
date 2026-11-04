@@ -6,9 +6,7 @@ import { ReportPermissionController } from './report-permission.controller';
 import { ReportPermission } from 'src/common/Entities/gpreport/table/REPORT_PERMISSION.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([ReportPermission], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([ReportPermission], 'mitsuConnection')],
     controllers: [ReportPermissionController],
     providers: [ReportPermissionService],
 })

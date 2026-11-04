@@ -1,11 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { FINPCK_ASSET } from './FINPCK_ASSET.entity';
 
 @Entity({ name: 'FINPCK_FORM', schema: 'WEBFORM' })

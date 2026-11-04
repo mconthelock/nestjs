@@ -17,10 +17,7 @@ import {
 } from './gp-rb.service';
 import { CreateStampReqFormDto } from './dto/create-gp-rb.dto';
 import { UpdateNamestampdto } from './dto/update-gp-rb.dto';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
@@ -75,7 +72,7 @@ export class GpRbController {
     @UseForceTransaction()
     update(@Body() dto: UpdateNamestampdto, @Req() req: Request) {
         const ip = getClientIP(req);
-        
+
         return this.gpRbServicee.doaction(dto, ip);
     }
 }

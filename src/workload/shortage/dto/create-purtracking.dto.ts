@@ -1,84 +1,92 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, IsInt } from 'class-validator';
+import {
+    IsDate,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsPositive,
+    IsString,
+    IsInt,
+} from 'class-validator';
 
 export class CreatePurTrackingDto {
-  //หมายเลข PO
-  @IsNumber()
-  @IsPositive({ message: "PORD must be a positive number greater than 0" }) // ป้องกันค่า 0 และค่าติดลบ
-  @IsInt({ message: "PORD must be an integer number" }) // บังคับให้เป็นจำนวนเต็ม และดักจับกรณีที่แปลงค่าแล้วได้ NaN
-  @IsNotEmpty({ message: "PORD is required" })
-  @Type(() => Number)
-  PONO: number;
+    //หมายเลข PO
+    @IsNumber()
+    @IsPositive({ message: 'PORD must be a positive number greater than 0' }) // ป้องกันค่า 0 และค่าติดลบ
+    @IsInt({ message: 'PORD must be an integer number' }) // บังคับให้เป็นจำนวนเต็ม และดักจับกรณีที่แปลงค่าแล้วได้ NaN
+    @IsNotEmpty({ message: 'PORD is required' })
+    @Type(() => Number)
+    PONO: number;
 
-  @IsString({ message: "PPROD must be a string" })
-  @IsNotEmpty({ message: "PPROD is required" })
-  PPROD: string; //item code
+    @IsString({ message: 'PPROD must be a string' })
+    @IsNotEmpty({ message: 'PPROD is required' })
+    PPROD: string; //item code
 
-  @IsNumber()
-  @IsNotEmpty({ message: "PLINE is required" })
-  @IsPositive({ message: "PLINE must be a positive number greater than 0" }) // ป้องกันค่า 0 และค่าติดลบ
-  @IsInt({ message: "PLINE must be an integer number" }) // บังคับให้เป็นจำนวนเต็ม และดักจับกรณีที่แปลงค่าแล้วได้ NaN
-  @Type(() => Number)
-  PLINE: number;  //PLINE
+    @IsNumber()
+    @IsNotEmpty({ message: 'PLINE is required' })
+    @IsPositive({ message: 'PLINE must be a positive number greater than 0' }) // ป้องกันค่า 0 และค่าติดลบ
+    @IsInt({ message: 'PLINE must be an integer number' }) // บังคับให้เป็นจำนวนเต็ม และดักจับกรณีที่แปลงค่าแล้วได้ NaN
+    @Type(() => Number)
+    PLINE: number; //PLINE
 
-  @IsNumber()
-  @IsNotEmpty({ message: "PORD is required" })
-  @IsPositive({ message: "PORD must be a positive number greater than 0" }) // ป้องกันค่า 0 และค่าติดลบ
-  @IsInt({ message: "PORD must be an integer number" }) // บังคับให้เป็นจำนวนเต็ม และดักจับกรณีที่แปลงค่าแล้วได้ NaN
-  @Type(() => Number)
-  PORD: number;  //PORD
+    @IsNumber()
+    @IsNotEmpty({ message: 'PORD is required' })
+    @IsPositive({ message: 'PORD must be a positive number greater than 0' }) // ป้องกันค่า 0 และค่าติดลบ
+    @IsInt({ message: 'PORD must be an integer number' }) // บังคับให้เป็นจำนวนเต็ม และดักจับกรณีที่แปลงค่าแล้วได้ NaN
+    @Type(() => Number)
+    PORD: number; //PORD
 
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  ETD?: Date;  //ETD
-  
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  ETA?: Date; //ETA
+    @IsOptional()
+    @IsDate()
+    @Type(() => Date)
+    ETD?: Date; //ETD
 
-  @IsOptional()
-  @IsString()
-  SHIP_MODE?: string; //ship mode
+    @IsOptional()
+    @IsDate()
+    @Type(() => Date)
+    ETA?: Date; //ETA
 
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  ARV_AMEC?: Date; //ARV_AMEC
+    @IsOptional()
+    @IsString()
+    SHIP_MODE?: string; //ship mode
 
-  @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  ARV_QTY?: number;
+    @IsOptional()
+    @IsDate()
+    @Type(() => Date)
+    ARV_AMEC?: Date; //ARV_AMEC
 
-  @IsOptional()
-  @IsString()
-  INV_NO?: string;
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    ARV_QTY?: number;
 
-  @IsOptional()
-  @IsString()
-  COMMENT_PUR?: string;
-  
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  NEXT_REPLY?: Date; //NEXT_REPLY
+    @IsOptional()
+    @IsString()
+    INV_NO?: string;
 
-  @IsOptional()
-  @IsString()
-  CAUSE_OF?: string; //CAUSE_OF
+    @IsOptional()
+    @IsString()
+    COMMENT_PUR?: string;
 
-  @IsString()
-  @IsOptional()
-  REMARK?: string; //REMARK
+    @IsOptional()
+    @IsDate()
+    @Type(() => Date)
+    NEXT_REPLY?: Date; //NEXT_REPLY
 
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  UPDATE_DATE?: Date; //UPDATE_DATE
+    @IsOptional()
+    @IsString()
+    CAUSE_OF?: string; //CAUSE_OF
 
-  @IsString()
-  @IsOptional()
-  USER_UPDATE?: string; //USER_UPDATE
+    @IsString()
+    @IsOptional()
+    REMARK?: string; //REMARK
+
+    @IsDate()
+    @IsOptional()
+    @Type(() => Date)
+    UPDATE_DATE?: Date; //UPDATE_DATE
+
+    @IsString()
+    @IsOptional()
+    USER_UPDATE?: string; //USER_UPDATE
 }

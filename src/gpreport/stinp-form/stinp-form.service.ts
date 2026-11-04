@@ -55,9 +55,7 @@ export class StinpFormService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to find Safety inspection report : ${error.message}`,
-            );
+            throw new Error(`Failed to find Safety inspection report : ${error.message}`);
         }
     }
 }

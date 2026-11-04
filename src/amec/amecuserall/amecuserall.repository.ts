@@ -43,13 +43,7 @@ export class AmecUserAllRepository extends BaseRepository {
 
     async search(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(AMECUSERALL, 'A');
-        this.applyFilters(qb, 'A', dto, [
-            'SEMPNO',
-            'SPOSCODE',
-            'SSECCODE',
-            'SDEPCODE',
-            'SDIVCODE',
-        ]);
+        this.applyFilters(qb, 'A', dto, ['SEMPNO', 'SPOSCODE', 'SSECCODE', 'SDEPCODE', 'SDIVCODE']);
         return qb.getMany();
     }
 }

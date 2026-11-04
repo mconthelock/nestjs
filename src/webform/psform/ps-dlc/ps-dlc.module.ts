@@ -13,10 +13,7 @@ import { MailModule } from 'src/common/services/mail/mail.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature(
-            [PSDLC_FORM, PSDLC_DETAIL],
-            'mitsuConnection',
-        ),
+        TypeOrmModule.forFeature([PSDLC_FORM, PSDLC_DETAIL], 'mitsuConnection'),
         FormmstModule,
         FormModule,
         FlowModule,

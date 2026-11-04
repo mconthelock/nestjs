@@ -3,10 +3,10 @@ import { CustomerService } from './customer.service';
 
 @Controller('sp/customer')
 export class CustomerController {
-  constructor(private readonly cus: CustomerService) {}
+    constructor(private readonly cus: CustomerService) {}
 
-  @Get()
-  async findAll() {
-    return await this.cus.findAll();
-  }
+    @Get()
+    async findAll() {
+        return await this.cus.findAll();
+    }
 }

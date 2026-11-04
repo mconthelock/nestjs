@@ -8,9 +8,7 @@ import { CreateQaFileDto } from './dto/create-qa_file.dto';
 
 @Injectable()
 export class QaFileRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

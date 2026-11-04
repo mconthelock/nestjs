@@ -8,30 +8,25 @@ import { WTYPE } from 'src/common/Entities/webform/table/WTYPE.entity';
 
 @Injectable()
 export class WtypeRepository extends BaseRepository {
-  constructor(
-    @InjectDataSource('mitsuConnection') ds: DataSource,
-  ) {
-    super(ds);
-  }
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
+        super(ds);
+    }
 
-  findAll() {
-    return this.manager.find(WTYPE);
-  }
+    findAll() {
+        return this.manager.find(WTYPE);
+    }
 
-  findOne(tid: number) {
-    return this.getRepository(WTYPE).findOneBy({
-      TID: Number(tid),
-    });
-  }
+    findOne(tid: number) {
+        return this.getRepository(WTYPE).findOneBy({
+            TID: Number(tid),
+        });
+    }
 
-  async search(dto: FiltersDto) {
-    const qb = this.manager.createQueryBuilder(WTYPE, 'W');
+    async search(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(WTYPE, 'W');
 
-    this.applyFilters(qb, 'W', dto, [
-      'TID',
-      'TYPENAME',
-    ]);
+        this.applyFilters(qb, 'W', dto, ['TID', 'TYPENAME']);
 
-    return qb.getMany();
-  }
+        return qb.getMany();
+    }
 }

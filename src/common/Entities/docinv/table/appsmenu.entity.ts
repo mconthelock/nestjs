@@ -1,11 +1,4 @@
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    OneToMany,
-    JoinColumn,
-    ManyToOne,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 import { Appsmenuuser } from './appsmenuuser.entity';
 
 @Entity({ name: 'APP_MENU', schema: 'DOCINV' })

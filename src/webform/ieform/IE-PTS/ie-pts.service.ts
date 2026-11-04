@@ -13,11 +13,7 @@ import {
     InsertTsProcessDto,
     TsFormKeyDto,
 } from './dto/ts-process.dto';
-import {
-    buildTsRows,
-    groupTsForms,
-    processIdentity,
-} from './ts-process-auto.utils';
+import { buildTsRows, groupTsForms, processIdentity } from './ts-process-auto.utils';
 
 export interface AutoTsResult {
     form: {
@@ -48,10 +44,7 @@ export class IePtsService {
     }
 
     async autoInsert(dtos: AutoInsertTsProcessDto[], ip: string) {
-        if (!dtos.length)
-            throw new BadRequestException(
-                'At least one form group is required',
-            );
+        if (!dtos.length) throw new BadRequestException('At least one form group is required');
         const groups = groupTsForms(dtos);
         return this.write(async () => {
             const seen = new Set<string>();
@@ -62,11 +55,9 @@ export class IePtsService {
                     const identity = processIdentity(row);
                     if (seen.has(identity)) continue;
                     seen.add(identity);
-                    if (!(await this.repo.processExists(row)))
-                        retained.push(row);
+                    if (!(await this.repo.processExists(row))) retained.push(row);
                 }
-                const { NFRMNO, VORGNO, CYEAR, REQUEST_BY, INPUT_BY, ITEM } =
-                    dto;
+                const { NFRMNO, VORGNO, CYEAR, REQUEST_BY, INPUT_BY, ITEM } = dto;
                 const form = {
                     NFRMNO,
                     VORGNO,
@@ -99,11 +90,7 @@ export class IePtsService {
                     ip,
                 );
                 const key = created?.data && this.key(created.data);
-                if (
-                    !created?.status ||
-                    !key ||
-                    Object.values(key).some((value) => value == null)
-                ) {
+                if (!created?.status || !key || Object.values(key).some((value) => value == null)) {
                     throw new InternalServerErrorException(
                         'Form creation returned an incomplete form key',
                     );
@@ -123,10 +110,8 @@ export class IePtsService {
             return {
                 status: true,
                 total: groups.length,
-                created: items.filter((item) => item.status === 'created')
-                    .length,
-                skipped: items.filter((item) => item.status === 'skipped')
-                    .length,
+                created: items.filter((item) => item.status === 'created').length,
+                skipped: items.filter((item) => item.status === 'skipped').length,
                 items,
             };
         });
@@ -134,8 +119,7 @@ export class IePtsService {
 
     async find(key: TsFormKeyDto) {
         const data = await this.repo.read(key);
-        if (!data.HEADERS.length)
-            throw new NotFoundException('TS process not found');
+        if (!data.HEADERS.length) throw new NotFoundException('TS process not found');
         return { status: true, key, data };
     }
 
@@ -171,42 +155,32 @@ export class IePtsService {
         const key = this.key(dto);
         await this.repo.requireForm(key);
         if (await this.repo.exists(key))
-            throw new ConflictException(
-                'TS process already exists; use update_ts_process',
-            );
+            throw new ConflictException('TS process already exists; use update_ts_process');
         await this.repo.insert(dto);
         return { status: true, message: 'Insert TS process successfully', key };
     }
 
     private async requireTs(key: TsFormKeyDto) {
-        if (!(await this.repo.exists(key)))
-            throw new NotFoundException('TS process not found');
+        if (!(await this.repo.exists(key))) throw new NotFoundException('TS process not found');
     }
 
-    private validateRows(
-        dto: Pick<InsertTsProcessDto, 'HEADERS' | 'DETAILS' | 'FILES'>,
-    ) {
+    private validateRows(dto: Pick<InsertTsProcessDto, 'HEADERS' | 'DETAILS' | 'FILES'>) {
         const headers = new Set<string>();
         for (const row of dto.HEADERS) {
-            if (headers.has(row.SEQ))
-                throw new BadRequestException('Duplicate HEADERS.SEQ');
+            if (headers.has(row.SEQ)) throw new BadRequestException('Duplicate HEADERS.SEQ');
             headers.add(row.SEQ);
         }
         const details = new Set<string>();
         for (const row of dto.DETAILS ?? []) {
             if (!headers.has(row.SEQ))
-                throw new BadRequestException(
-                    `DETAILS.SEQ ${row.SEQ} has no matching HEADERS.SEQ`,
-                );
+                throw new BadRequestException(`DETAILS.SEQ ${row.SEQ} has no matching HEADERS.SEQ`);
             const key = JSON.stringify([row.SEQ, row.PROCID]);
-            if (details.has(key))
-                throw new BadRequestException('Duplicate DETAILS.SEQ/PROCID');
+            if (details.has(key)) throw new BadRequestException('Duplicate DETAILS.SEQ/PROCID');
             details.add(key);
         }
         const files = new Set<number>();
         for (const row of dto.FILES ?? []) {
-            if (files.has(row.ID))
-                throw new BadRequestException('Duplicate FILES.ID');
+            if (files.has(row.ID)) throw new BadRequestException('Duplicate FILES.ID');
             files.add(row.ID);
         }
     }
@@ -241,8 +215,7 @@ export class IePtsService {
                     `ORA-01031: webformConnection has insufficient privileges to ${operation}. Check database grants for this connection user.`,
                 );
             }
-            if (code === 1)
-                throw new ConflictException('Duplicate TS process or form key');
+            if (code === 1) throw new ConflictException('Duplicate TS process or form key');
             if (code === 2291)
                 throw new BadRequestException(
                     'Referenced data not found; check TSFLAG in IEDOC.TSFLAGMST',

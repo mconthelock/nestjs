@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { StInpService } from './st-inp.service';
-import {
-    CorrectiveStInpDetailDto,
-    CorrectiveStInpDto,
-} from './dto/corrective-st-inp.dto';
+import { CorrectiveStInpDetailDto, CorrectiveStInpDto } from './dto/corrective-st-inp.dto';
 import { FlowService } from 'src/webform/flow/flow.service';
 import { StyTypeService } from 'src/gpreport/sty-type/sty-type.service';
 import { StyImageService } from 'src/gpreport/sty-image/sty-image.service';
@@ -41,12 +38,7 @@ export class StInpSaveDraftService extends StInpService {
         );
     }
 
-    async saveDraft(
-        dto: DraftStInpDto,
-        ip: string,
-        files: Express.Multer.File[],
-        path: string,
-    ) {
+    async saveDraft(dto: DraftStInpDto, ip: string, files: Express.Multer.File[], path: string) {
         try {
             let flagReset = false;
             const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
@@ -84,10 +76,7 @@ export class StInpSaveDraftService extends StInpService {
             const list = await this.stinpFormListService.find(form);
             if (list.status) {
                 for (const l of list.data) {
-                    const fullPath = await joinPaths(
-                        l.IMAGE.IMAGE_PATH,
-                        l.IMAGE.IMAGE_FNAME,
-                    );
+                    const fullPath = await joinPaths(l.IMAGE.IMAGE_PATH, l.IMAGE.IMAGE_FNAME);
                     listDelImg.push(l.NIMAGE); // เก็บไฟล์เก่าไว้ลบทีหลัง
                     pathDelete.push(fullPath); // เก็บ path ไว้ลบทีหลัง
                 }
@@ -109,14 +98,13 @@ export class StInpSaveDraftService extends StInpService {
                     const index = dto.PA_LIST.indexOf(newlist);
                     const newId = index + 1;
                     // insert and move image
-                    const movedFile =
-                        await this.styImageService.moveAndInsertFiles({
-                            file: files[index],
-                            path,
-                            userCreate: dto.EMPNO,
-                            typeId: styType.data[0].TYPE_ID,
-                            folder: formno,
-                        });
+                    const movedFile = await this.styImageService.moveAndInsertFiles({
+                        file: files[index],
+                        path,
+                        userCreate: dto.EMPNO,
+                        typeId: styType.data[0].TYPE_ID,
+                        folder: formno,
+                    });
                     movedTargets.push(...movedFile.path);
                     await this.stinpFormListService.create({
                         ...form,
@@ -134,10 +122,7 @@ export class StInpSaveDraftService extends StInpService {
                     const lists = await this.stinpFormListService.find(form);
                     // ถ้าเจอรายการที่มี NID เกินกว่า length ของ list ที่ส่งมา แสดงว่ารายการนั้นถูกลบไปแล้ว ให้ทำการลบรายการนั้นทิ้ง
                     if (lists.data.some((l) => l.NID > lengthOfList)) {
-                        await this.stinpFormListService.deleteMoreThanId(
-                            form,
-                            lengthOfList,
-                        ); // ลบรายการที่เกินจากที่ส่งมา (กรณีที่มีการลบรายการบางส่วนในฟอร์ม แต่ไม่ลบจนหมด)
+                        await this.stinpFormListService.deleteMoreThanId(form, lengthOfList); // ลบรายการที่เกินจากที่ส่งมา (กรณีที่มีการลบรายการบางส่วนในฟอร์ม แต่ไม่ลบจนหมด)
                     }
                     for (const imgId of listDelImg) {
                         await this.styImageService.delete(imgId); // ลบไฟล์เก่า
@@ -166,11 +151,7 @@ export class StInpSaveDraftService extends StInpService {
                         ...form,
                         EMPNO: dto.EMPNO,
                         ACTION: dto.ACTION,
-                        REMARK: dto.REMARK
-                            ? dto.REMARK
-                            : flagReset
-                              ? 'เปลี่ยนแผนกรับผิดชอบ'
-                              : '',
+                        REMARK: dto.REMARK ? dto.REMARK : flagReset ? 'เปลี่ยนแผนกรับผิดชอบ' : '',
                     },
                     ip,
                 );

@@ -40,9 +40,7 @@ export class DpmsPlMeltLogService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to get DPMS PL melt log list: ${error.message}`,
-            );
+            throw new Error(`Failed to get DPMS PL melt log list: ${error.message}`);
         }
     }
 }

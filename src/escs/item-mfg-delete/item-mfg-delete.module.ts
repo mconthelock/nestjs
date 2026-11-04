@@ -6,9 +6,9 @@ import { ITEM_MFG_DELETE } from 'src/common/Entities/escs/table/ITEM_MFG_DELETE.
 import { ItemMfgDeleteRepository } from './item-mfg-delete.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ITEM_MFG_DELETE], 'mitsuConnection')],
-  controllers: [ItemMfgDeleteController],
-  providers: [ItemMfgDeleteService, ItemMfgDeleteRepository],
-  exports: [ItemMfgDeleteService],
+    imports: [TypeOrmModule.forFeature([ITEM_MFG_DELETE], 'mitsuConnection')],
+    controllers: [ItemMfgDeleteController],
+    providers: [ItemMfgDeleteService, ItemMfgDeleteRepository],
+    exports: [ItemMfgDeleteService],
 })
 export class ItemMfgDeleteModule {}

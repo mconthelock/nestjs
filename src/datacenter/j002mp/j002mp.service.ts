@@ -4,9 +4,9 @@ import { getData } from './dto/searchJ002.dto';
 
 @Injectable()
 export class J002mpService {
-  constructor(private readonly repo: J002mpRepository){}
+    constructor(private readonly repo: J002mpRepository) {}
 
-  searchData( dto: getData){
-      return this.repo.searchData(dto);
+    searchData(dto: getData) {
+        return this.repo.searchData(dto);
     }
 }

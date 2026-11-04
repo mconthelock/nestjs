@@ -2,12 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import * as oracledb from 'oracledb';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import {
-    DataSource,
-    FindOptionsWhere,
-    IsNull,
-    QueryDeepPartialEntity,
-} from 'typeorm';
+import { DataSource, FindOptionsWhere, IsNull, QueryDeepPartialEntity } from 'typeorm';
 import { UpdateYearlyDto } from './dto/update-yearly.dto';
 import { CreateYearlyFormDto } from './dto/create-yearlyform.dto';
 import { INV_HALFYEAR_REPORT } from 'src/common/Entities/skid/table/INV_HALFYEAR_REPORT.entity';
@@ -50,10 +45,7 @@ export class CheckinventoryRepository extends BaseRepository {
         await this.getRepository(PSCIH_FORM).insert(data);
     }
 
-    async createHalfyearReport(
-        empno: string,
-        periods: string,
-    ): Promise<number> {
+    async createHalfyearReport(empno: string, periods: string): Promise<number> {
         const runner = this.ds.createQueryRunner();
         await runner.connect();
         const connection: any = (runner as any).databaseConnection;
@@ -87,11 +79,7 @@ export class CheckinventoryRepository extends BaseRepository {
             .getMany();
     }
 
-    async createYearlyReport(
-        YEAR: string,
-        PERIOD: string,
-        EMPNO: string,
-    ): Promise<number> {
+    async createYearlyReport(YEAR: string, PERIOD: string, EMPNO: string): Promise<number> {
         const runner = this.ds.createQueryRunner();
         await runner.connect();
         const connection: any = (runner as any).databaseConnection;
@@ -206,9 +194,7 @@ export class CheckinventoryRepository extends BaseRepository {
     }
 
     // function check checked all actual
-    async checkYearlyActualChecked(
-        reportID: number,
-    ): Promise<{ success: boolean }> {
+    async checkYearlyActualChecked(reportID: number): Promise<{ success: boolean }> {
         const result = await this.getRepository(INV_YEARLY_RESULT).count({
             where: {
                 IYA_ID: reportID,
@@ -265,18 +251,8 @@ export class CheckinventoryRepository extends BaseRepository {
         await this.as400.runQuery(`DELETE FROM RTNLIBF.SONINV`);
         await this.as400.runQuery(`DELETE FROM RTNLIBF.D40030P2`);
 
-        await this.bulkInsertAs400(
-            'RTNLIBF.SONINV',
-            ['S01', 'S02'],
-            tagDataBulk,
-            chunkSize,
-        );
-        await this.bulkInsertAs400(
-            'RTNLIBF.D40030P2',
-            ['CDE', 'SRT'],
-            tagDataStock,
-            chunkSize,
-        );
+        await this.bulkInsertAs400('RTNLIBF.SONINV', ['S01', 'S02'], tagDataBulk, chunkSize);
+        await this.bulkInsertAs400('RTNLIBF.D40030P2', ['CDE', 'SRT'], tagDataStock, chunkSize);
     }
 
     async insertActualAs400(reportID: number) {
@@ -320,10 +296,7 @@ export class CheckinventoryRepository extends BaseRepository {
             const chunk = rows.slice(i, i + chunkSize);
 
             const values = chunk
-                .map(
-                    (row) =>
-                        `(${row.map((v) => `'${this.escapeSql(v)}'`).join(', ')})`,
-                )
+                .map((row) => `(${row.map((v) => `'${this.escapeSql(v)}'`).join(', ')})`)
                 .join(',\n');
 
             const sql = `

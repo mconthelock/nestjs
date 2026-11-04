@@ -1,6 +1,6 @@
-import { ViewColumn, ViewEntity } from "typeorm";
+import { ViewColumn, ViewEntity } from 'typeorm';
 
-@ViewEntity({name: 'EBUDGET_DATA_SN', schema: 'EBUDGET'})
+@ViewEntity({ name: 'EBUDGET_DATA_SN', schema: 'EBUDGET' })
 export class EBUDGET_DATA_SN {
     @ViewColumn()
     FYEAR: string;

@@ -26,7 +26,7 @@ describe('S011mpService', () => {
 
     describe('mappingLevel', () => {
         it('should return the quantity differences for the given order', async () => {
-            const data= [
+            const data = [
                 {
                     S11M01: 'EYCC97021',
                     S11M08: '2026071',
@@ -157,7 +157,7 @@ describe('S011mpService', () => {
                     LEVEL: 'L19L21L25L44L51L78L81',
                     DRAWING_GROUP: 'BA129A389G02',
                     MAXQTY: 3,
-                }
+                },
             ]);
         });
     });
@@ -178,5 +178,5 @@ describe('S011mpService', () => {
             const result = service.getLevel(drawing);
             expect(result).toBeNull();
         });
-    })
+    });
 });

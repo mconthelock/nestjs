@@ -32,7 +32,7 @@ export class RnfrmService {
 
     async findOne(nfrmno: number, vorgno: string, cyear: string, cyear2: string, nrunno: number) {
         try {
-            const res = await this.repo.findOne(nfrmno,  vorgno,  cyear, cyear2, nrunno);
+            const res = await this.repo.findOne(nfrmno, vorgno, cyear, cyear2, nrunno);
             if (!res) {
                 return {
                     status: false,

@@ -137,10 +137,7 @@ export class VpsRepository extends BaseRepository {
     }
 
     async insPackorddtlByManual(order: string, packing: string): Promise<void> {
-        await this.packingDs.query('EXEC InsPackorddtlByManual @0, @1', [
-            order,
-            packing,
-        ]);
+        await this.packingDs.query('EXEC InsPackorddtlByManual @0, @1', [order, packing]);
     }
 
     async updatePrintStatus(order: string, packing: string): Promise<void> {
@@ -163,39 +160,19 @@ export class VpsRepository extends BaseRepository {
     }
 
     async insertItemMas(data: Record<string, any>): Promise<void> {
-        await this.packingDs
-            .createQueryBuilder()
-            .insert()
-            .into('ItemMas')
-            .values(data)
-            .execute();
+        await this.packingDs.createQueryBuilder().insert().into('ItemMas').values(data).execute();
     }
 
     async insertItemQty(data: Record<string, any>): Promise<void> {
-        await this.packingDs
-            .createQueryBuilder()
-            .insert()
-            .into('ItemQty')
-            .values(data)
-            .execute();
+        await this.packingDs.createQueryBuilder().insert().into('ItemQty').values(data).execute();
     }
 
     async insertPISInfo(data: Record<string, any>): Promise<void> {
-        await this.packingDs
-            .createQueryBuilder()
-            .insert()
-            .into('PISInfo')
-            .values(data)
-            .execute();
+        await this.packingDs.createQueryBuilder().insert().into('PISInfo').values(data).execute();
     }
 
     async insertVPSInfo(data: Record<string, any>): Promise<void> {
-        await this.packingDs
-            .createQueryBuilder()
-            .insert()
-            .into('VPSInfo')
-            .values(data)
-            .execute();
+        await this.packingDs.createQueryBuilder().insert().into('VPSInfo').values(data).execute();
     }
 
     async insertItemQtyHistory(data: Record<string, any>): Promise<void> {
@@ -387,11 +364,7 @@ export class VpsRepository extends BaseRepository {
                 JOIN M008KP mk ON mk.M8K03 = s01.S01M01
                 WHERE (S01M01 = :1 OR S01M01 LIKE :2)
                 AND S01M04 LIKE :3`;
-        return await this.wk.query(sql, [
-            `${order}`,
-            `_${order}_`,
-            `%${packing}%`,
-        ]);
+        return await this.wk.query(sql, [`${order}`, `_${order}_`, `%${packing}%`]);
     }
 
     async getListOrder(packing: string): Promise<any[]> {
@@ -577,10 +550,7 @@ export class VpsRepository extends BaseRepository {
         await qr.startTransaction();
 
         try {
-            const uniqueKeys = new Map<
-                string,
-                { ORDER_NO: string; PACKING_NO: string }
-            >();
+            const uniqueKeys = new Map<string, { ORDER_NO: string; PACKING_NO: string }>();
             for (const item of items) {
                 const key = `${item.ORDER_NO}|${item.PACKING_NO}`;
                 if (!uniqueKeys.has(key)) {
@@ -603,9 +573,7 @@ export class VpsRepository extends BaseRepository {
                     .execute();
             }
 
-            const result = await qr.manager
-                .getRepository(PKC_CARTON_DETAIL)
-                .insert(items);
+            const result = await qr.manager.getRepository(PKC_CARTON_DETAIL).insert(items);
 
             await qr.commitTransaction();
             return result;
@@ -617,11 +585,7 @@ export class VpsRepository extends BaseRepository {
         }
     }
 
-    async getOrderReprint(
-        search: string | undefined,
-        page: number,
-        sect: string,
-    ) {
+    async getOrderReprint(search: string | undefined, page: number, sect: string) {
         const PAGE_SIZE = 20;
         const skip = (page - 1) * PAGE_SIZE;
         const searchVal = search ?? null;
@@ -754,7 +718,7 @@ export class VpsRepository extends BaseRepository {
         );
     }
 
-    async getImageErrors(){
+    async getImageErrors() {
         return this.wk.query(
             `
             SELECT 
@@ -765,7 +729,7 @@ export class VpsRepository extends BaseRepository {
             WHERE CREATED_AT >= TRUNC(SYSDATE, 'IW') - 7
             AND CREATED_AT <  TRUNC(SYSDATE, 'IW') - 2
             ORDER BY CREATED_AT DESC
-            `
+            `,
         );
     }
 }

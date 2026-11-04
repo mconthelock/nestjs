@@ -1,6 +1,5 @@
-
-import { TOUR_USER } from "src/common/Entities/docinv/table/TOUR_USER.entity";
-import { EventSubscriber, EntitySubscriberInterface, UpdateEvent, InsertEvent } from "typeorm";
+import { TOUR_USER } from 'src/common/Entities/docinv/table/TOUR_USER.entity';
+import { EventSubscriber, EntitySubscriberInterface, UpdateEvent, InsertEvent } from 'typeorm';
 
 @EventSubscriber()
 export class TourUserSubscriber implements EntitySubscriberInterface<TOUR_USER> {

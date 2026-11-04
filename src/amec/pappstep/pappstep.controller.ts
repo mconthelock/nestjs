@@ -5,30 +5,30 @@ import { UpdatePappstepDto } from './dto/update-pappstep.dto';
 
 @Controller('pappstep')
 export class PappstepController {
-  constructor(private readonly pappstepService: PappstepService) {}
+    constructor(private readonly pappstepService: PappstepService) {}
 
-  @Post()
-  create(@Body() createPappstepDto: CreatePappstepDto) {
-    return this.pappstepService.create(createPappstepDto);
-  }
+    @Post()
+    create(@Body() createPappstepDto: CreatePappstepDto) {
+        return this.pappstepService.create(createPappstepDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.pappstepService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.pappstepService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pappstepService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.pappstepService.findOne(+id);
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePappstepDto: UpdatePappstepDto) {
-    return this.pappstepService.update(+id, updatePappstepDto);
-  }
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updatePappstepDto: UpdatePappstepDto) {
+        return this.pappstepService.update(+id, updatePappstepDto);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pappstepService.remove(+id);
-  }
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.pappstepService.remove(+id);
+    }
 }

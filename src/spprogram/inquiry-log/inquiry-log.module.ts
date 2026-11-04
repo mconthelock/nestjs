@@ -5,8 +5,8 @@ import { InquiryLog } from './entities/inquiry-log.entity';
 import { InquiryLogController } from './inquiry-log.controller';
 
 @Module({
-  controllers: [InquiryLogController],
-  imports: [TypeOrmModule.forFeature([InquiryLog], 'mitsuConnection')],
-  providers: [InquiryLogService],
+    controllers: [InquiryLogController],
+    imports: [TypeOrmModule.forFeature([InquiryLog], 'mitsuConnection')],
+    providers: [InquiryLogService],
 })
 export class InquiryLogModule {}

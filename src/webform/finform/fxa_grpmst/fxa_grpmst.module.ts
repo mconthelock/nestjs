@@ -4,7 +4,7 @@ import { FxaGrpmstController } from './fxa_grpmst.controller';
 import { FXAGRPRepository } from './fxa_grpmst.repository';
 
 @Module({
-  controllers: [FxaGrpmstController],
-  providers: [FxaGrpmstService , FXAGRPRepository],
+    controllers: [FxaGrpmstController],
+    providers: [FxaGrpmstService, FXAGRPRepository],
 })
 export class FxaGrpmstModule {}

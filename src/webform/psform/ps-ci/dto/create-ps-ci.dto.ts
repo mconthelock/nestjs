@@ -1,25 +1,25 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsString,IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 export class CreatePsCiDto {}
 
 export class GetDataFormDto {
-	@Type(() => Number)
+    @Type(() => Number)
     @IsNumber()
-	NFRMNO: number;
+    NFRMNO: number;
 
     @IsString()
-	VORGNO: string;
+    VORGNO: string;
 
     @Type(() => String)
-	@IsString()
-	CYEAR: string;
+    @IsString()
+    CYEAR: string;
 
-	@Type(() => String)
-	@IsString()
-	CYEAR2: string;
+    @Type(() => String)
+    @IsString()
+    CYEAR2: string;
 
-	@Type(() => Number)
+    @Type(() => Number)
     @IsNumber()
-	NRUNNO: number;
+    NRUNNO: number;
 }

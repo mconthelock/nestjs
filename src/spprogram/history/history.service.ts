@@ -7,21 +7,21 @@ import { History } from './entities/history.entity';
 
 @Injectable()
 export class HistoryService {
-  constructor(
-    @InjectRepository(History, 'mitsuConnection')
-    private readonly history: Repository<History>,
-  ) {}
+    constructor(
+        @InjectRepository(History, 'mitsuConnection')
+        private readonly history: Repository<History>,
+    ) {}
 
-  async create(createDto: createHistoryDto) {
-    const history = await this.history.create(createDto);
-    return await this.history.save(history);
-  }
+    async create(createDto: createHistoryDto) {
+        const history = await this.history.create(createDto);
+        return await this.history.save(history);
+    }
 
-  async findOne(no: string) {
-    return await this.history.find({
-      where: { INQ_NO: no },
-      relations: ['users', 'status'],
-      order: { INQH_DATE: 'DESC' },
-    });
-  }
+    async findOne(no: string) {
+        return await this.history.find({
+            where: { INQ_NO: no },
+            relations: ['users', 'status'],
+            order: { INQH_DATE: 'DESC' },
+        });
+    }
 }

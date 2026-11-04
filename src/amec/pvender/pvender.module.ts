@@ -5,9 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Pvender } from '../../common/Entities/amec/table/PVENDER.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Pvender], 'mitsuConnection')],
-  controllers: [PvenderController],
-  providers: [PvenderService],
-  exports: [TypeOrmModule],
+    imports: [TypeOrmModule.forFeature([Pvender], 'mitsuConnection')],
+    controllers: [PvenderController],
+    providers: [PvenderService],
+    exports: [TypeOrmModule],
 })
 export class PvenderModule {}

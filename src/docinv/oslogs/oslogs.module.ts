@@ -6,10 +6,7 @@ import { Windows } from 'src/common/Entities/docinv/views/windows.entity';
 import { SpecialuserModule } from '../specialuser/specialuser.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Windows], 'auditConnection'),
-        SpecialuserModule,
-    ],
+    imports: [TypeOrmModule.forFeature([Windows], 'auditConnection'), SpecialuserModule],
     controllers: [OslogsController],
     providers: [OslogsService],
 })

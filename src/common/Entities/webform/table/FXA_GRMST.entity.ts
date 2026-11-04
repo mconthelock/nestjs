@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn , Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity({ name: 'FXA_GRPMST', schema: 'WEBFORM' })
 export class FXA_GRPMST {

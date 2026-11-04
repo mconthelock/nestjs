@@ -10,7 +10,7 @@ import { PDFService } from 'src/common/services/pdf/pdf.service';
 @Injectable()
 export class GenPdfService {
     constructor(private readonly PDFService: PDFService) {}
-    
+
     private readonly tempDir = `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`;
 
     async generatePDF({
@@ -186,22 +186,14 @@ export class GenPdfService {
             },
         });
         // 2. ใช้ pdf-lib เพิ่ม header ในหน้า 2 เป็นต้นไป
-        const newPdf = await this.addHeaderToPDF(
-            tempFilePath,
-            finalFilePath,
-            orderText,
-        );
+        const newPdf = await this.addHeaderToPDF(tempFilePath, finalFilePath, orderText);
 
         // 3. ลบ temp file
         await fs.unlink(tempFilePath);
         return newPdf;
     }
 
-    private async addHeaderToPDF(
-        inputPath: string,
-        outputPath: string,
-        orderText: string,
-    ) {
+    private async addHeaderToPDF(inputPath: string, outputPath: string, orderText: string) {
         try {
             // อ่าน PDF file
             const existingPdfBytes = await fs.readFile(inputPath);
@@ -229,16 +221,13 @@ export class GenPdfService {
                     });
                 }
                 // footer table
-                page.drawText(
-                    i === totalPages - 1 ? '-- END --' : ' - CONTINUE -',
-                    {
-                        x: width / 2 - 30, // ปรับตำแหน่ง
-                        y: 20, // ปรับตำแหน่ง (20px จากล่าง)
-                        size: 9,
-                        font: font,
-                        color: rgb(0, 0, 0),
-                    },
-                );
+                page.drawText(i === totalPages - 1 ? '-- END --' : ' - CONTINUE -', {
+                    x: width / 2 - 30, // ปรับตำแหน่ง
+                    y: 20, // ปรับตำแหน่ง (20px จากล่าง)
+                    size: 9,
+                    font: font,
+                    color: rgb(0, 0, 0),
+                });
             }
 
             // บันทึก PDF

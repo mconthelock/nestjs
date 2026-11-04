@@ -1,23 +1,15 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { SpaccarrnglstService } from './spaccarrnglst.service';
 import { SearchSpaccarrnglstDto } from './dto/search-spaccarrnglst.dto';
 
 @Controller('elmes/secondary')
 export class SpaccarrnglstController {
-  constructor(private readonly item: SpaccarrnglstService) {}
+    constructor(private readonly item: SpaccarrnglstService) {}
 
-  @Post('search')
-  create(@Body() q: SearchSpaccarrnglstDto) {
-    //console.log(q);
-    return this.item.findAll(q);
-    //return true;
-  }
+    @Post('search')
+    create(@Body() q: SearchSpaccarrnglstDto) {
+        //console.log(q);
+        return this.item.findAll(q);
+        //return true;
+    }
 }

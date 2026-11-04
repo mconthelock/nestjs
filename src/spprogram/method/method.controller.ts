@@ -3,10 +3,10 @@ import { MethodService } from './method.service';
 
 @Controller('sp/method')
 export class MethodController {
-  constructor(private readonly methodService: MethodService) {}
+    constructor(private readonly methodService: MethodService) {}
 
-  @Get()
-  findAll() {
-    return this.methodService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.methodService.findAll();
+    }
 }

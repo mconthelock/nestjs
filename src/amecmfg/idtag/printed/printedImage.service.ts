@@ -58,11 +58,9 @@ export class PrintedImagesService {
         if (!chkImgExists) return null;
 
         const imageBytes = await fs.readFile(image);
-        await compressDimension(imageBytes, 'image/jpeg', 500).then(
-            (compressedBuffer) => {
-                return fs.writeFile(thumb, compressedBuffer);
-            },
-        );
+        await compressDimension(imageBytes, 'image/jpeg', 500).then((compressedBuffer) => {
+            return fs.writeFile(thumb, compressedBuffer);
+        });
         return thumb;
     }
 
@@ -91,10 +89,7 @@ export class PrintedImagesService {
                 const imagePath = await this.setImagePath(img.DWG_IMG);
                 if (imagePath == null) continue;
 
-                const pdfPath = path.join(
-                    runtimeContext.pdfDirectory,
-                    `${img.PAGE_TAG}.pdf`,
-                );
+                const pdfPath = path.join(runtimeContext.pdfDirectory, `${img.PAGE_TAG}.pdf`);
                 await this.embedImageToPdf(
                     pdfPath,
                     imagePath,
@@ -128,11 +123,7 @@ export class PrintedImagesService {
         );
     }
 
-    private async embedImageToPdf(
-        pdfPath: string,
-        imagePath: string,
-        text: string,
-    ) {
+    private async embedImageToPdf(pdfPath: string, imagePath: string, text: string) {
         const pdfBytes = await fs.readFile(pdfPath);
         const pdfDoc = await PDFDocument.load(pdfBytes);
         const [page] = pdfDoc.getPages();
@@ -168,9 +159,7 @@ export class PrintedImagesService {
         }
 
         const imgHeight = 100;
-        const imgWidth = Math.ceil(
-            (embeddedImage.width / embeddedImage.height) * imgHeight,
-        );
+        const imgWidth = Math.ceil((embeddedImage.width / embeddedImage.height) * imgHeight);
 
         const imgX = 270 - imgWidth + 283;
         const imgY = 79;

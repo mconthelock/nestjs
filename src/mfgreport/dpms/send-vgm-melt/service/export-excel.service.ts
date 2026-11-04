@@ -21,10 +21,7 @@ export class ExportExcelService {
                     // เปลี่ยนชื่อ
                     sheet.name = `VGM-${monthChar}`;
                     // sheet.getCell('B3').value = `Update: ${formatDate(dto.VANNDATE, 'DD-MMM-YY')}`;
-                    sheet.getCell('A6').value = formatDate(
-                        dto.VANNDATE,
-                        'DD-MMM-YY',
-                    );
+                    sheet.getCell('A6').value = formatDate(dto.VANNDATE, 'DD-MMM-YY');
                     const dateSubmit = now('DD-MMM');
                     const timeSubmit = now('HH:mm');
                     dto.DATA.forEach((item, index) => {
@@ -39,7 +36,7 @@ export class ExportExcelService {
                         sheet.getCell(`O${rowNum}`).value = timeSubmit;
 
                         // กำหนดเส้นขอบและสีตัวอักษร
-                        for(let col = 2; col <= 16; col++) {
+                        for (let col = 2; col <= 16; col++) {
                             const cell = sheet.getCell(rowNum, col);
                             cell.border = {
                                 left: { style: 'thin' },
@@ -53,7 +50,8 @@ export class ExportExcelService {
                             color: { argb: 'FFFF0000' }, // สีแดง
                         };
                         // กำหนดรูปแบบตัวเลขและวันที่
-                        sheet.getCell(`K${rowNum}`).numFmt = '_-* #,##0_-;-* #,##0_-;_-* "-"??_-;_-@_-'; // กำหนดรูปแบบตัวเลข
+                        sheet.getCell(`K${rowNum}`).numFmt =
+                            '_-* #,##0_-;-* #,##0_-;_-* "-"??_-;_-@_-'; // กำหนดรูปแบบตัวเลข
                         sheet.getCell(`N${rowNum}`).numFmt = 'DD-MMM'; // กำหนดรูปแบบตัวเลข
                         sheet.getCell(`O${rowNum}`).numFmt = 'HH:mm'; // กำหนดรูปแบบตัวเลข
 

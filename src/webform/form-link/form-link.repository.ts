@@ -15,9 +15,6 @@ export class FormLinkRepository extends BaseRepository {
     }
 
     delete(formNo: string) {
-        return this.getRepository(FORM_LINK).delete([
-            { VFORM1: formNo },
-            { VFORM2: formNo },
-        ]);
+        return this.getRepository(FORM_LINK).delete([{ VFORM1: formNo }, { VFORM2: formNo }]);
     }
 }

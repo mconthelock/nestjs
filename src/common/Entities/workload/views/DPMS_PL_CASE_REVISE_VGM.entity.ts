@@ -1,5 +1,5 @@
-import { Column, Entity, PrimaryColumn, OneToMany } from "typeorm";
-import { DPMS_PL_CASE_LIST_DETAIL } from "../table/DPMS_PL_CASE_LIST_DETAIL.entity";
+import { Column, Entity, PrimaryColumn, OneToMany } from 'typeorm';
+import { DPMS_PL_CASE_LIST_DETAIL } from '../table/DPMS_PL_CASE_LIST_DETAIL.entity';
 
 @Entity({ name: 'DPMS_PL_CASE_REVISE_VGM', schema: 'WORKLOAD' })
 export class DPMS_PL_CASE_REVISE_VGM {

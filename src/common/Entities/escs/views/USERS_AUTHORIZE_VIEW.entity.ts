@@ -11,7 +11,7 @@ export class USERS_AUTHORIZE_VIEW {
 
     @ViewColumn()
     USR_NO: string;
-    
+
     @ViewColumn()
     USR_NAME: string;
 

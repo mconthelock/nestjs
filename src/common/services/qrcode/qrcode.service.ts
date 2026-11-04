@@ -20,10 +20,7 @@ export class QrcodeService {
      * @param options ตัวเลือกการสร้าง QR Code
      * @returns Promise<string> Data URL ของ QR Code
      */
-    async generateDataURL(
-        text: string,
-        options?: QRCodeOptions,
-    ): Promise<string> {
+    async generateDataURL(text: string, options?: QRCodeOptions): Promise<string> {
         try {
             const qrOptions = {
                 width: options?.width || 256,
@@ -104,9 +101,7 @@ export class QrcodeService {
                 .png()
                 .toBuffer();
         } catch (error) {
-            throw new Error(
-                `Failed to generate QR Code with caption: ${error.message}`,
-            );
+            throw new Error(`Failed to generate QR Code with caption: ${error.message}`);
         }
     }
 
@@ -144,10 +139,7 @@ export class QrcodeService {
      * @param options ตัวเลือกการสร้าง QR Code
      * @returns Promise<Buffer> Buffer ของ QR Code
      */
-    async generateBuffer(
-        text: string,
-        options?: QRCodeOptions,
-    ): Promise<Buffer> {
+    async generateBuffer(text: string, options?: QRCodeOptions): Promise<Buffer> {
         try {
             // แปลง escape sequences เช่น \r, \n, \t ให้เป็นตัวอักษรจริง
             const qrOptions = {
@@ -164,9 +156,7 @@ export class QrcodeService {
             const buffer = await QRCode.toBuffer(processedText, qrOptions);
             return buffer;
         } catch (error) {
-            throw new Error(
-                `Failed to generate QR Code buffer: ${error.message}`,
-            );
+            throw new Error(`Failed to generate QR Code buffer: ${error.message}`);
         }
     }
 
@@ -205,10 +195,7 @@ export class QrcodeService {
      * @param options ตัวเลือกการสร้าง QR Code
      * @returns Promise<string> Data URL ของ QR Code
      */
-    async generateForURL(
-        url: string,
-        options?: QRCodeOptions,
-    ): Promise<string> {
+    async generateForURL(url: string, options?: QRCodeOptions): Promise<string> {
         // ตรวจสอบว่าเป็น URL ที่ถูกต้อง
         try {
             new URL(url);

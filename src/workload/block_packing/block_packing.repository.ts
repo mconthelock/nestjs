@@ -6,10 +6,7 @@ import * as oracledb from 'oracledb';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 import { AmecOrdersPackNo } from 'src/common/Entities/workload/table/AMECORDERS_PACKNO.entity';
 import { SearchPackingDto } from './dto/search-packing.dto';
-import {
-    UpdateBlockPackingDto,
-    UpdateRemarkByOrderDto,
-} from './dto/update-block_packing.dto';
+import { UpdateBlockPackingDto, UpdateRemarkByOrderDto } from './dto/update-block_packing.dto';
 
 @Injectable()
 export class BlockPackingRepository extends BaseRepository {
@@ -38,8 +35,7 @@ export class BlockPackingRepository extends BaseRepository {
         await runner.connect();
 
         try {
-            const connection = (runner as any)
-                .databaseConnection as oracledb.Connection;
+            const connection = (runner as any).databaseConnection as oracledb.Connection;
             const result = await connection.execute(
                 `DECLARE
                     v_cursor SYS_REFCURSOR;

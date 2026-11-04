@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-    CreateQainsAuditDto,
-    saveQainsAuditDto,
-} from './dto/create-qains_audit.dto';
+import { CreateQainsAuditDto, saveQainsAuditDto } from './dto/create-qains_audit.dto';
 import { UpdateQainsAuditDto } from './dto/update-qains_audit.dto';
 import { QainsOAService } from '../qains_operator_auditor/qains_operator_auditor.service';
 import { FormService } from 'src/webform/form/form.service';
@@ -20,11 +17,7 @@ export class QainsAuditService {
         private readonly qafileService: QaFileService,
     ) {}
 
-    async saveAudit(
-        dto: saveQainsAuditDto,
-        files: Express.Multer.File[],
-        path: string,
-    ) {
+    async saveAudit(dto: saveQainsAuditDto, files: Express.Multer.File[], path: string) {
         let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
         try {
             const form: FormDto = {
@@ -68,10 +61,7 @@ export class QainsAuditService {
                         FILE_TYPECODE: 'ESI',
                         FILE_ID: id,
                     });
-                    const path = await joinPaths(
-                        file.FILE_PATH,
-                        file.FILE_FNAME,
-                    );
+                    const path = await joinPaths(file.FILE_PATH, file.FILE_FNAME);
                     await deleteFile(path);
                     await this.qafileService.delete({
                         ...form,

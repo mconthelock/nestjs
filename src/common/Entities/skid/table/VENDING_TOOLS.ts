@@ -22,5 +22,4 @@ export class VENDING_TOOLS {
 
     @Column({ type: 'date', default: () => 'SYSDATE' })
     UPDATE_AT: Date;
-
 }

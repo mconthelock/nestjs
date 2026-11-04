@@ -5,8 +5,8 @@ import { BusrouteController } from './busroute.controller';
 import { Busroute } from 'src/common/Entities/gpreport/table/busroute.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Busroute], 'mitsuConnection')],
-  controllers: [BusrouteController],
-  providers: [BusrouteService],
+    imports: [TypeOrmModule.forFeature([Busroute], 'mitsuConnection')],
+    controllers: [BusrouteController],
+    providers: [BusrouteService],
 })
 export class BusrouteModule {}

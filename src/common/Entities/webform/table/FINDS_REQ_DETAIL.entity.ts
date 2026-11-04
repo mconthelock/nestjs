@@ -11,7 +11,7 @@ export class DSREQDETAIL {
 
     @PrimaryColumn()
     CYEAR: string;
-    
+
     @PrimaryColumn()
     CYEAR2: string;
 
@@ -19,18 +19,16 @@ export class DSREQDETAIL {
     NRUNNO: number;
 
     @PrimaryColumn()
-    LINEID: number;    
+    LINEID: number;
 
     @Column()
     REASON: string;
 
     @PrimaryColumn()
     DUTY_VALUE: number;
-    
+
     @Column()
     QTY: number;
-
-
 }
 
 // NFRMNO

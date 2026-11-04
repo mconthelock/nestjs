@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ResultChkDwgService } from './resultchkdwg.service';
 import { CreateResultchkdwgDto } from './dto/create-resultchkdwg.dto';
 import { UpdateResultchkdwgDto } from './dto/update-resultchkdwg.dto';

@@ -8,9 +8,6 @@ import { PsVarRepository } from './ps-var.repository';
 @Module({
     imports: [FormModule, FormmstModule],
     controllers: [PsVarController],
-    providers: [
-        PsVarService,
-        PsVarRepository,
-    ],
+    providers: [PsVarService, PsVarRepository],
 })
 export class PsVarModule {}

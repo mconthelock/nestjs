@@ -18,10 +18,7 @@ import {
     PilineInputMultipartDto,
     SavePilineEventInputDto,
 } from './dto/SAVE-PILINE_EVENT_INPUT.dto';
-import {
-    PilineEventInputService,
-    PilineInputFiles,
-} from './PILINE_EVENT_INPUT.service';
+import { PilineEventInputService, PilineInputFiles } from './PILINE_EVENT_INPUT.service';
 
 @Controller('workload/piline_event_record')
 export class PilineEventInputController {
@@ -30,10 +27,17 @@ export class PilineEventInputController {
     @Get('input/:number/files/:type/:seq')
     @Header('Cache-Control', 'private, no-store')
     @Header('X-Content-Type-Options', 'nosniff')
-    async preview(@Param('number') number: string, @Param('type') type: string, @Param('seq') seq: string) {
-        const file = await this.inputService.readAttachment(number,type,Number(seq));
-        return new StreamableFile(file.buffer, { type: file.type, length: file.buffer.length,
-            disposition: "inline; filename*=UTF-8''" + encodeURIComponent(file.name) });
+    async preview(
+        @Param('number') number: string,
+        @Param('type') type: string,
+        @Param('seq') seq: string,
+    ) {
+        const file = await this.inputService.readAttachment(number, type, Number(seq));
+        return new StreamableFile(file.buffer, {
+            type: file.type,
+            length: file.buffer.length,
+            disposition: "inline; filename*=UTF-8''" + encodeURIComponent(file.name),
+        });
     }
 
     @Post('input')
@@ -96,8 +100,11 @@ export class PilineEventInputController {
             },
         ),
     )
-    async edit(@Param('number') number: string, @Body() body: PilineInputMultipartDto, @UploadedFiles() files: PilineInputFiles) {
+    async edit(
+        @Param('number') number: string,
+        @Body() body: PilineInputMultipartDto,
+        @UploadedFiles() files: PilineInputFiles,
+    ) {
         return this.save(body, files, number);
     }
-
 }

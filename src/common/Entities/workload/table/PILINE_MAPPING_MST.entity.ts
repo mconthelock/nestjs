@@ -1,11 +1,4 @@
-import {
-    Column,
-    Entity,
-    PrimaryColumn,
-    Unique,
-    JoinColumn,
-    ManyToOne,
-} from 'typeorm';
+import { Column, Entity, PrimaryColumn, Unique, JoinColumn, ManyToOne } from 'typeorm';
 import { PILINE_CAUSE_MST } from './PILINE_CAUSE_MST.entity';
 import { PILINE_EVENT_MST } from './PILINE_EVENT_MST.entity';
 import { PILINE_LOCATION_MST } from './PILINE_LOCATION_MST.entity';

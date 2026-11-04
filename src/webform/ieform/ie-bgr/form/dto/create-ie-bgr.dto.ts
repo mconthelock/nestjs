@@ -102,50 +102,38 @@ export class CreateIeBgrDto {
     SN: string;
 
     @IsNotEmpty()
-    @Transform(({ value }) =>
-        typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
-    )
+    @Transform(({ value }) => (typeof value === 'string' ? Number(value.replace(/,/g, '')) : value))
     //   @Type(() => Number)
     @IsNumber()
     RECBG: number;
 
     @IsNotEmpty()
-    @Transform(({ value }) =>
-        typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
-    )
+    @Transform(({ value }) => (typeof value === 'string' ? Number(value.replace(/,/g, '')) : value))
     //   @Type(() => Number)
     @IsNumber()
     USEDBG: number;
 
     @IsNotEmpty()
-    @Transform(({ value }) =>
-        typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
-    )
+    @Transform(({ value }) => (typeof value === 'string' ? Number(value.replace(/,/g, '')) : value))
     //   @Type(() => Number)
     @IsNumber()
     REMBG: number;
 
     @IsNotEmpty()
-    @Transform(({ value }) =>
-        typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
-    )
+    @Transform(({ value }) => (typeof value === 'string' ? Number(value.replace(/,/g, '')) : value))
     //   @Type(() => Number)
     @IsNumber()
     REQAMT: number;
 
     // @IsNotEmpty()
     @IsOptional()
-    @Transform(({ value }) =>
-        typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
-    )
+    @Transform(({ value }) => (typeof value === 'string' ? Number(value.replace(/,/g, '')) : value))
     //   @Type(() => Number)
     @IsNumber()
     ALLOCBG: number;
 
     @IsOptional()
-    @Transform(({ value }) =>
-        typeof value === 'string' ? Number(value.replace(/,/g, '')) : value,
-    )
+    @Transform(({ value }) => (typeof value === 'string' ? Number(value.replace(/,/g, '')) : value))
     //   @Type(() => Number)
     @IsNumber()
     AVALIABLE_BALANCE?: number;
@@ -163,7 +151,7 @@ export class CreateIeBgrDto {
     @IsDate()
     @Type(() => Date)
     PAYMENT_PLAN?: Date;
-  
+
     @IsNotEmpty()
     @IsDate()
     @Type(() => Date)

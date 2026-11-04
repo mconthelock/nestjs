@@ -7,14 +7,13 @@ import { BRCURRENCY } from 'src/common/Entities/amec/table/BRCURRENCY.entity';
 
 @Injectable()
 export class BrcurrencyRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     async findCurrency() {
-        return this.manager.createQueryBuilder(BRCURRENCY, 'B')
+        return this.manager
+            .createQueryBuilder(BRCURRENCY, 'B')
             .select(['B.CCURNAME as CCURNAME'])
             .distinct(true)
             .orderBy('B.CCURNAME', 'ASC')

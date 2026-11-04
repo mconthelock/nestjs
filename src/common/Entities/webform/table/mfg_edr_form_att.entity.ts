@@ -3,28 +3,28 @@ import { MfgEdrFormHead } from './mfg_edr_form_head.entity';
 
 @Entity({ name: 'MFG_EDR_FORM_ATT' })
 export class MfgEdrFormAtt {
-  @PrimaryColumn()
-  NFRMNO: number;
-  
-  @PrimaryColumn()
-  VORGNO: string;
+    @PrimaryColumn()
+    NFRMNO: number;
 
-  @PrimaryColumn()
-  CYEAR: string;
+    @PrimaryColumn()
+    VORGNO: string;
 
-  @PrimaryColumn()
-  CYEAR2: string;
+    @PrimaryColumn()
+    CYEAR: string;
 
-  @PrimaryColumn()
-  NRUNNO: number;
+    @PrimaryColumn()
+    CYEAR2: string;
 
-  @PrimaryColumn()
-  ID: number;
+    @PrimaryColumn()
+    NRUNNO: number;
 
-  @Column()
-  FILENAME: string | null;
+    @PrimaryColumn()
+    ID: number;
 
-  @ManyToOne(() => MfgEdrFormHead, (head) => head.att)
-  @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
-  head: MfgEdrFormHead;
+    @Column()
+    FILENAME: string | null;
+
+    @ManyToOne(() => MfgEdrFormHead, (head) => head.att)
+    @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+    head: MfgEdrFormHead;
 }

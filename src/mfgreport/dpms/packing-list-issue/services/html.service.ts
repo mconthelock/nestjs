@@ -2,11 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { ordinalIndicator } from 'src/common/utils/format.utils';
 
-import {
-    IsetHeaderParams,
-    IsetTableParams,
-    IgenerateParams,
-} from '../interface/html.interface';
+import { IsetHeaderParams, IsetTableParams, IgenerateParams } from '../interface/html.interface';
 import { IlogMessage, log_message } from 'src/common/utils/transform';
 import { S049kpService } from 'src/datacenter/s049kp/s049kp.service';
 import { S020kpService } from 'src/datacenter/s020kp/s020kp.service';
@@ -61,9 +57,7 @@ export class HtmlService {
                 lists: listsData,
             };
         } catch (error) {
-            logMessage?.push(
-                log_message(`Error revising: ${error.message}`),
-            );
+            logMessage?.push(log_message(`Error revising: ${error.message}`));
             return {
                 status: false,
                 message: `Error revising: ${error.message}`,
@@ -105,9 +99,7 @@ export class HtmlService {
             totalDimention: plList.totalDimention,
             totalPackages: plList.totalPackages.toString(),
             packingDate: issueDate,
-            round: revData.NROUND
-                ? ordinalIndicator(revData.NROUND, true)
-                : null,
+            round: revData.NROUND ? ordinalIndicator(revData.NROUND, true) : null,
         });
 
         const tableHtml = this.setTable({
@@ -122,9 +114,7 @@ export class HtmlService {
         let filterCombine = combine;
         let filterChangeBlock = changeBlock;
         if (['DF', 'PT', 'SP'].includes(issueType.VCODE)) {
-            const items = new Set(
-                lists.flatMap((e) => e.DETAILS.map((d) => d.VITEM)),
-            );
+            const items = new Set(lists.flatMap((e) => e.DETAILS.map((d) => d.VITEM)));
             if (combine && combine.length > 0) {
                 filterCombine = combine.filter((c) => {
                     return c.S20K02 && items.has(c.S20K02.trim());
@@ -308,9 +298,7 @@ export class HtmlService {
         ${
             checkbox &&
             !revise &&
-            (docType.includes('PT') ||
-                docType.includes('SP') ||
-                typeCode === 'DF')
+            (docType.includes('PT') || docType.includes('SP') || typeCode === 'DF')
                 ? `
         <label class="btn btn-primary mt-5" for="select-all">
             <input type="checkbox" id="select-all" class="checkbox bg-white">
@@ -360,8 +348,7 @@ export class HtmlService {
                                 html += `</tr>`;
                             }
                             const seq = j == 0 ? i + 1 : '';
-                            const itemNo =
-                                d.VITEM && item !== d.VITEM ? d.VITEM : '';
+                            const itemNo = d.VITEM && item !== d.VITEM ? d.VITEM : '';
                             const drawing = d.VDRAWING ?? '';
                             const drawingL = d.VDRAWINGL ?? '';
                             const partname = d.VPART ? d.VPART.trim() : '';
@@ -388,9 +375,7 @@ export class HtmlService {
                                     <td>
                                         <div class="grid grid-cols-[100px_250px_180px] gap-2 description">
                                             <span>${
-                                                checkbox &&
-                                                item !== d.VITEM &&
-                                                d.VITEM
+                                                checkbox && item !== d.VITEM && d.VITEM
                                                     ? `<div class="flex gap-2">
                                                         <input type="checkbox" name="checkbox-item" class="checkbox checkbox-primary req" value="${d.VITEM}" d-case="${d.VCASE}" ${d.CHECKED == 'Y' ? 'checked' : ''} />
                                                         <span>${itemNo}</span>

@@ -3,7 +3,6 @@ import { FORM } from './FORM.entity';
 
 @Entity({ name: 'FINNPO_COSTCENTER', schema: 'WEBFORM' })
 export class FINNPOCOSTCENTER {
-    
     @PrimaryColumn()
     CYEAR2: string;
 
@@ -11,7 +10,7 @@ export class FINNPOCOSTCENTER {
     NRUNNO: number;
 
     @PrimaryColumn()
-    REQNO: string;    
+    REQNO: string;
 
     @Column()
     COSTCODE: string;

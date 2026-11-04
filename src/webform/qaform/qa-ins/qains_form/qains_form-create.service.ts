@@ -66,19 +66,13 @@ export class QainsFormCreateService extends QainsFormService {
                 CEXTDATA: '00',
             };
             // update flow qc sem
-            const secData = await this.usersSectionService.getUserSecByID(
-                dto.QA_INCHARGE_SECTION,
-            );
+            const secData = await this.usersSectionService.getUserSecByID(dto.QA_INCHARGE_SECTION);
             const qcsem = await this.orgposService.getOrgPos({
                 VPOSNO: '30',
                 VORGNO: secData.SSECCODE,
             });
             if (qcsem.length > 0) {
-                await this.setFlow(
-                    condSetFlow,
-                    qcsem[0].VEMPNO,
-                    qcsem[0].VEMPNO,
-                );
+                await this.setFlow(condSetFlow, qcsem[0].VEMPNO, qcsem[0].VEMPNO);
                 await this.setFlow(
                     { ...condSetFlow, CEXTDATA: '06' },
                     qcsem[0].VEMPNO,
@@ -87,11 +81,7 @@ export class QainsFormCreateService extends QainsFormService {
             }
 
             // update flow req foreman
-            await this.setFlow(
-                { ...condSetFlow, CEXTDATA: '03' },
-                dto.REQUESTER,
-                dto.REQUESTER,
-            );
+            await this.setFlow({ ...condSetFlow, CEXTDATA: '03' }, dto.REQUESTER, dto.REQUESTER);
 
             await this.create({
                 ...form,

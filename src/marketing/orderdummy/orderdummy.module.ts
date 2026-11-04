@@ -6,9 +6,7 @@ import { TMARKET_TEMP_DUMMY } from 'src/common/Entities/datacenter/table/TMARKET
 import { OrderdummyRepository } from './orderdummy.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([TMARKET_TEMP_DUMMY], 'datacenterConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([TMARKET_TEMP_DUMMY], 'datacenterConnection')],
     controllers: [OrderdummyController],
     providers: [OrderdummyService, OrderdummyRepository],
     exports: [OrderdummyService],

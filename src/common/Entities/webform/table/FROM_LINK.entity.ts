@@ -1,7 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({name: "FORM_LINK", schema: "WEBFORM"})
-export class FORM_LINK{
+@Entity({ name: 'FORM_LINK', schema: 'WEBFORM' })
+export class FORM_LINK {
     @PrimaryGeneratedColumn()
     NID?: number;
 

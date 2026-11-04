@@ -11,10 +11,7 @@ export class S020kpController {
     }
 
     @Get(':order/:type')
-    find(
-        @Param('order') order: string,
-        @Param('type') type: 'from-order' | 'to-order' | 'all',
-    ) {
+    find(@Param('order') order: string, @Param('type') type: 'from-order' | 'to-order' | 'all') {
         return this.s020kpService.find(order, type);
     }
 }

@@ -7,13 +7,13 @@ import { MatrixManualModule } from './matrix/matrix-ads/matrix-manual.module';
 import { ExpLocalPdmModule } from './exp-local-pdm/exp-local-pdm.module';
 
 @Module({
-  imports: [
-    MatrixItemMasterModule,
-    MatrixSectionModule,
-    MatrixEffectItemModule,
-    MatrixEffectViewModule,
-    MatrixManualModule,
-    ExpLocalPdmModule,
-  ],
+    imports: [
+        MatrixItemMasterModule,
+        MatrixSectionModule,
+        MatrixEffectItemModule,
+        MatrixEffectViewModule,
+        MatrixManualModule,
+        ExpLocalPdmModule,
+    ],
 })
 export class IdsModule {}

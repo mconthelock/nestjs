@@ -2,30 +2,30 @@ import { PartialType } from '@nestjs/swagger';
 import { CreateFormDto } from './create-form.dto';
 import { Type } from 'class-transformer';
 import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  IsDateString,
-  IsNotEmpty,
-  isNotEmpty,
+    IsOptional,
+    IsString,
+    IsNumber,
+    IsDateString,
+    IsNotEmpty,
+    isNotEmpty,
 } from 'class-validator';
 
 export class UpdateFormDto extends PartialType(CreateFormDto) {
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  readonly CST?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    readonly CST?: string;
 
-  @IsOptional()
-  condition?: any;
+    @IsOptional()
+    condition?: any;
 
-  @IsOptional()
-  @IsString()
-  @Type(() => String)
-  readonly CYEAR2?: string;
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    readonly CYEAR2?: string;
 
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  readonly NRUNNO?: number;
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber()
+    readonly NRUNNO?: number;
 }

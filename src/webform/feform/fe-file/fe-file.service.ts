@@ -28,7 +28,6 @@ export class FeFileService {
         return this.repo.getFile(dto);
     }
 
-    
     async deleteFileByID(id: number) {
         try {
             const res = await this.repo.deleteById(id);
@@ -42,5 +41,5 @@ export class FeFileService {
         } catch (error) {
             throw new Error('Delete FE File Error: ' + error.message);
         }
-    }   
+    }
 }

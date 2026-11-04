@@ -5,8 +5,8 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class SpcalsheetService {
-  constructor(
-    @InjectRepository(Spcalsheet, 'mitsuConnection')
-    private readonly sp: Repository<Spcalsheet>,
-  ) {}
+    constructor(
+        @InjectRepository(Spcalsheet, 'mitsuConnection')
+        private readonly sp: Repository<Spcalsheet>,
+    ) {}
 }

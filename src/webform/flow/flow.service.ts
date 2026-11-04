@@ -46,7 +46,7 @@ export class FlowService {
     protected readonly FLOW_APPROVE = '2';
     protected readonly FLOW_REJECT = '3';
 
-    async insertFlow(dto: CreateFlowDto) : Promise<boolean> {
+    async insertFlow(dto: CreateFlowDto): Promise<boolean> {
         try {
             const res = await this.repo.create(dto);
             if (!res) {
@@ -113,9 +113,7 @@ export class FlowService {
         }
     }
 
-    async reAlignFlow(
-        dto: UpdateFlowDto,
-    ): Promise<{ message: string; status: boolean }> {
+    async reAlignFlow(dto: UpdateFlowDto): Promise<{ message: string; status: boolean }> {
         try {
             const res = await this.repo.reAlignFlow(dto);
             if (res.affected === 0) {
@@ -137,12 +135,12 @@ export class FlowService {
         return await this.repo.getEmpFlowStepReady(form);
     }
 
-    async checkReturn(form: empnoFormDto) : Promise<boolean> {
+    async checkReturn(form: empnoFormDto): Promise<boolean> {
         const res = await this.repo.checkReturn(form);
         return res.length > 0;
     }
 
-    async checkReturnb(dto: empnoFormDto) : Promise<boolean> {
+    async checkReturnb(dto: empnoFormDto): Promise<boolean> {
         const res = await this.repo.checkReturnb(dto);
         return res.length > 0;
     }

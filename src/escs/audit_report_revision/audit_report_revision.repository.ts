@@ -8,9 +8,7 @@ import { CreateAuditReportRevisionDto } from './dto/create-audit_report_revision
 
 @Injectable()
 export class AuditReportRevisionRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -22,9 +20,7 @@ export class AuditReportRevisionRepository extends BaseRepository {
         });
     }
 
-    async findLatestRevision(
-        secid: number,
-    ): Promise<AUDIT_REPORT_REVISION | null> {
+    async findLatestRevision(secid: number): Promise<AUDIT_REPORT_REVISION | null> {
         return await this.getRepository(AUDIT_REPORT_REVISION).findOne({
             where: {
                 ARR_SECID: secid,
@@ -35,7 +31,7 @@ export class AuditReportRevisionRepository extends BaseRepository {
         });
     }
 
-    async insert(dto: CreateAuditReportRevisionDto){
+    async insert(dto: CreateAuditReportRevisionDto) {
         return await this.getRepository(AUDIT_REPORT_REVISION).insert(dto);
     }
 }

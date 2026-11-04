@@ -1,31 +1,24 @@
-﻿import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  OneToOne,
-  JoinColumn,
-  OneToMany,
-} from 'typeorm';
+﻿import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Inquiry } from '../../inquiry/entities/inquiry.entity';
 
 @Entity({ name: 'SP_SHIPMENT', schema: 'SPSYS' })
 export class Shipment {
-  @PrimaryColumn()
-  SHIPMENT_ID: number;
+    @PrimaryColumn()
+    SHIPMENT_ID: number;
 
-  @Column()
-  SHIPMENT_VALUE: number;
+    @Column()
+    SHIPMENT_VALUE: number;
 
-  @Column()
-  SHIPMENT_DESC: string;
+    @Column()
+    SHIPMENT_DESC: string;
 
-  @Column()
-  SHIPMENT_STATUS: string;
+    @Column()
+    SHIPMENT_STATUS: string;
 
-  @OneToMany(() => Inquiry, (inq) => inq.shipment)
-  @JoinColumn({
-    name: 'SHIPMENT_ID',
-    referencedColumnName: 'INQ_SHIPMENT',
-  })
-  inqs: Inquiry;
+    @OneToMany(() => Inquiry, (inq) => inq.shipment)
+    @JoinColumn({
+        name: 'SHIPMENT_ID',
+        referencedColumnName: 'INQ_SHIPMENT',
+    })
+    inqs: Inquiry;
 }

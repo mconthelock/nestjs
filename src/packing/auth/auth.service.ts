@@ -29,7 +29,10 @@ export class AuthService {
      * @return  {string} Unique log ID: f742a825-0dab-4165-a3e9-27b6ec6b014c-20251126094545
      */
     generateLogId(): string {
-        const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
+        const timestamp = new Date()
+            .toISOString()
+            .replace(/[-:.TZ]/g, '')
+            .slice(0, 14);
         return `${randomUUID()}-${timestamp}`.substring(0, 50);
     }
 
@@ -44,10 +47,11 @@ export class AuthService {
     async validateUser(empno: string, ip: string): Promise<PackLoginResponseDto> {
         try {
             const sessionId = this.generateLogId();
-            const [d] = await this.packdb.query(
-                'EXEC ValidatePackAuth @0,@1,@2',
-                [empno, ip, sessionId],
-            );
+            const [d] = await this.packdb.query('EXEC ValidatePackAuth @0,@1,@2', [
+                empno,
+                ip,
+                sessionId,
+            ]);
 
             if (d.errcode !== AuthErrCode.OK) {
                 return {
@@ -80,7 +84,8 @@ export class AuthService {
      */
     async updateLogout(userId: string, sessionId: string): Promise<void> {
         try {
-            await this.logrepo.createQueryBuilder()
+            await this.logrepo
+                .createQueryBuilder()
                 .update(PAccessLog)
                 .set({ endtime: () => 'GETDATE()' })
                 .where('usrid = :userId AND accessid = :sessionId', { userId, sessionId })
@@ -105,7 +110,7 @@ export class AuthService {
                  FROM VPS_USER_REPRINT 
                  WHERE SEMPNO = '${empno}' 
                     AND STATUS_REPRINT = 1
-                `
+                `,
             );
 
             return result.length > 0;

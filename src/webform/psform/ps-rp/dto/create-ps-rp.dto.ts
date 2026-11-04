@@ -1,8 +1,8 @@
-import { IntersectionType, PartialType, PickType } from "@nestjs/swagger";
-import { Type } from "class-transformer";
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
-import { CreateFormDto } from "src/webform/form/dto/create-form.dto";
-import { FormDto } from "src/webform/form/dto/form.dto";
+import { IntersectionType, PartialType, PickType } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 export class CreatePSrpFormDto extends PickType(CreateFormDto, [
     'NFRMNO',
@@ -11,7 +11,7 @@ export class CreatePSrpFormDto extends PickType(CreateFormDto, [
     'REQBY',
     'INPUTBY',
     'REMARK',
-] as const){
+] as const) {
     @IsNumber()
     @Type(() => Number)
     REQ_TYPE: number;
@@ -23,7 +23,6 @@ export class CreatePSrpFormDto extends PickType(CreateFormDto, [
 
     @IsNotEmpty()
     DETAILS: CreatePsrpListDto[];
-
 }
 
 export class CreatePsrpListDto {
@@ -70,7 +69,7 @@ export class CreatePsrpListDto {
     @IsNumber()
     @Type(() => Number)
     QTY?: number;
-    
+
     @IsOptional()
     @IsString()
     @Type(() => String)
@@ -97,7 +96,7 @@ export class CreatePsrpListDto {
     ISSUETO?: string;
 }
 
-export class PsrReportDto{
+export class PsrReportDto {
     @IsOptional()
     @IsString()
     @Type(() => String)
@@ -133,7 +132,5 @@ export class PsrReportDto{
     @Type(() => String)
     toSch?: string;
 }
-
-
 
 export class CreatePsrpReqFormDto extends PartialType(CreatePSrpFormDto) {}

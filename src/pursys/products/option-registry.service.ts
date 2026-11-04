@@ -13,9 +13,7 @@ export class OptionRegistryService {
     // Dev จะใช้ Method นี้เพื่อลงทะเบียน Function
     register(name: string, fn: ValidatorFunction) {
         if (this.registry.has(name)) {
-            this.logger.warn(
-                `Function [${name}] ถูกลงทะเบียนซ้ำ และจะถูกเขียนทับ`,
-            );
+            this.logger.warn(`Function [${name}] ถูกลงทะเบียนซ้ำ และจะถูกเขียนทับ`);
         }
         this.registry.set(name, fn);
         this.logger.log(`Registered Option Function: ${name}`);
@@ -25,9 +23,7 @@ export class OptionRegistryService {
     async execute(name: string, value: any): Promise<boolean> {
         const fn = this.registry.get(name);
         if (!fn) {
-            throw new NotFoundException(
-                `ไม่พบ Validator Function ชื่อ: ${name} ในระบบ`,
-            );
+            throw new NotFoundException(`ไม่พบ Validator Function ชื่อ: ${name} ในระบบ`);
         }
         return await fn(value);
     }

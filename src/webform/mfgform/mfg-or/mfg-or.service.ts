@@ -6,460 +6,512 @@ import { GetMfgOrDto } from './dto/get-mfg-or.dto';
 import { SearchMfgOrCenterDto } from './dto/search-mfg-or-center.dto';
 import * as path from 'path';
 import {
-  PdfDrawer,
-  PdfDocumentHelper,
-  PdfFontHelper,
-  PdfFileHelper,
-  Optiongetdata
+    PdfDrawer,
+    PdfDocumentHelper,
+    PdfFontHelper,
+    PdfFileHelper,
+    Optiongetdata,
 } from 'src/common/helpers/pdf_stamp';
 
 @Injectable()
 export class MfgOrService {
-  constructor(
-    @InjectDataSource('mitsuConnection')
-    private readonly dataSource: DataSource,
-  ) {}
+    constructor(
+        @InjectDataSource('mitsuConnection')
+        private readonly dataSource: DataSource,
+    ) {}
 
-  private getKey(dto: GetMfgOrDto) {
-    return {
-      NFRMNO: Number(dto.NFRMNO),
-      VORGNO: dto.VORGNO,
-      CYEAR: dto.CYEAR,
-      CYEAR2: dto.CYEAR2,
-      NRUNNO: Number(dto.NRUNNO),
-    };
-  }
-
-  private async getMfgOrFormByKey(manager: any, dto: GetMfgOrDto) {
-    const key = this.getKey(dto);
-    return manager
-      .createQueryBuilder()
-      .select('A.*')
-      .from('MFGOR_FORM', 'A')
-      .where('A.NFRMNO = :NFRMNO', key)
-      .andWhere('A.VORGNO = :VORGNO', key)
-      .andWhere('A.CYEAR = :CYEAR', key)
-      .andWhere('A.CYEAR2 = :CYEAR2', key)
-      .andWhere('A.NRUNNO = :NRUNNO', key)
-      .getRawOne();
-  }
-
-  async createorform(dto: CreateMfgOrDto) {
-    return this.dataSource.transaction(async manager => {
-      await manager
-        .createQueryBuilder()
-        .insert()
-        .into('MFGOR_FORM')
-        .values({
-          NFRMNO: dto.NFRMNO,
-          VORGNO: dto.VORGNO,
-          CYEAR: dto.CYEAR,
-          CYEAR2: dto.CYEAR2,
-          NRUNNO: dto.NRUNNO,
-
-          TYPEFORM: dto.TYPEFORM,
-          CLASS: dto.CLASS,
-          TOPIC: dto.TOPIC,
-          SEQNO: dto.SEQNO,
-          ORNO: dto.ORNO,
-          REV: dto.REV,
-        })
-        .execute();
-
-      if (dto.att?.length) {
-        const attRows = dto.att.map((file, index) => ({
-          NFRMNO: dto.NFRMNO,
-          VORGNO: dto.VORGNO,
-          CYEAR: dto.CYEAR,
-          CYEAR2: dto.CYEAR2,
-          NRUNNO: dto.NRUNNO,
-          ID: index + 1,
-          FILENAME: file.FILENAME,
-        }));
-
-        await manager
-          .createQueryBuilder()
-          .insert()
-          .into('MFGOR_ATT')
-          .values(attRows)
-          .execute();
-      }
-
-      return {
-        status: true,
-        message: 'Create MFG OR success',
-      };
-    });
-  }
-
-  async getMfgOr(dto: GetMfgOrDto) {
-    const key = this.getKey(dto);
-    const form = await this.dataSource
-      .createQueryBuilder()
-      .select([
-        'A.*',
-        'B.SEMPNO AS REQ_EMPNO',
-        'B.SNAME AS REQ_NAME',
-        'B.SSEC AS REQ_SEC',
-        'C.SEMPNO AS INP_EMPNO',
-        'C.SNAME AS INP_NAME',
-      ])
-      .from('FORM', 'A')
-      .leftJoin('AMECUSERALL', 'B', 'A.VREQNO = B.SEMPNO')
-      .leftJoin('AMECUSERALL', 'C', 'A.VINPUTER = C.SEMPNO')
-      .where('A.NFRMNO = :NFRMNO', key)
-      .andWhere('A.VORGNO = :VORGNO', key)
-      .andWhere('A.CYEAR = :CYEAR', key)
-      .andWhere('A.CYEAR2 = :CYEAR2', key)
-      .andWhere('A.NRUNNO = :NRUNNO', key)
-      .getRawOne();
-
-    const flow = await this.dataSource
-      .createQueryBuilder()
-      .select([ 'F.*', 'U.SNAME AS APV_NAME',])
-      .from('FLOW', 'F')
-      .leftJoin('AMECUSERALL', 'U', 'F.VAPVNO = U.SEMPNO')
-      .where('F.NFRMNO = :NFRMNO', key)
-      .andWhere('F.VORGNO = :VORGNO', key)
-      .andWhere('F.CYEAR = :CYEAR', key)
-      .andWhere('F.CYEAR2 = :CYEAR2', key)
-      .andWhere('F.NRUNNO = :NRUNNO', key)
-      .orderBy('F.CSTEPNO', 'ASC')
-      .getRawMany();
-
-    const head = await this.dataSource
-      .createQueryBuilder()
-      .select('H.*')
-      .from('MFGOR_FORM', 'H')
-      .where('H.NFRMNO = :NFRMNO', key)
-      .andWhere('H.VORGNO = :VORGNO', key)
-      .andWhere('H.CYEAR = :CYEAR', key)
-      .andWhere('H.CYEAR2 = :CYEAR2', key)
-      .andWhere('H.NRUNNO = :NRUNNO', key)
-      .getRawOne();
-
-    const att = await this.dataSource
-      .createQueryBuilder()
-      .select('A.*')
-      .from('MFGOR_ATT', 'A')
-      .where('A.NFRMNO = :NFRMNO', key)
-      .andWhere('A.VORGNO = :VORGNO', key)
-      .andWhere('A.CYEAR = :CYEAR', key)
-      .andWhere('A.CYEAR2 = :CYEAR2', key)
-      .andWhere('A.NRUNNO = :NRUNNO', key)
-      .orderBy('A.ID', 'ASC')
-      .getRawMany();
-
-    return {
-      status: true,
-      data: {
-        form,
-        flow,
-        head,
-        att,
-      },
-    };
-  }
-
-  async generateNewOrNo(dto: GetMfgOrDto & { FORMNO?: string }) {
-    return this.dataSource.transaction(async manager => {
-      const form = await this.getMfgOrFormByKey(manager, dto);
-
-      if (!form) { throw new Error('MFGOR_FORM not found');}
-
-      if (String(form.ORNO || '').trim()) {
+    private getKey(dto: GetMfgOrDto) {
         return {
-          status: true,
-          TYPEFORM: 'NEW',
-          skipped: true,
-          message: 'ORNO already generated',
-          SEQNO: form.SEQNO,
-          ORNO: form.ORNO,
+            NFRMNO: Number(dto.NFRMNO),
+            VORGNO: dto.VORGNO,
+            CYEAR: dto.CYEAR,
+            CYEAR2: dto.CYEAR2,
+            NRUNNO: Number(dto.NRUNNO),
         };
-      }
-
-      const key = this.getKey(dto);
-      const year2 = String(new Date().getFullYear()).slice(-2);
-
-      const result = await manager
-        .createQueryBuilder()
-        .select('MAX(A.SEQNO)', 'MAXSEQNO')
-        .from('MFGOR_FORM', 'A')
-        .where('A.CYEAR2 = :cyear2', { cyear2: dto.CYEAR2 })
-        .getRawOne();
-
-      const maxSeqNo = Number(result?.MAXSEQNO || 0);
-      const nextSeqNo = maxSeqNo + 1;
-      const seqText = String(nextSeqNo).padStart(3, '0');
-      const orno = `OR-MFG-${year2}${seqText}`;
-
-      await manager
-        .createQueryBuilder()
-        .update('MFGOR_FORM')
-        .set({
-          SEQNO: nextSeqNo,
-          ORNO: orno,
-        })
-        .where('NFRMNO = :NFRMNO', key)
-        .andWhere('VORGNO = :VORGNO', key)
-        .andWhere('CYEAR = :CYEAR', key)
-        .andWhere('CYEAR2 = :CYEAR2', key)
-        .andWhere('NRUNNO = :NRUNNO', key)
-        .andWhere('(ORNO IS NULL OR TRIM(ORNO) = \'\')')
-        .execute();
-
-      await manager
-        .createQueryBuilder()
-        .insert()
-        .into('MFGOR_CENTER')
-        .values({
-          ORNO: orno,
-          CYEAR: String(dto.CYEAR2).slice(-2),
-          SEQ: nextSeqNo,
-          CLASS: form.CLASS,
-          TOPIC: form.TOPIC,
-          REVNO: form.REV,
-          ISSUE_DATE: () => 'SYSDATE',
-          FORMNO: dto.FORMNO || null,
-        })
-        .execute();
-
-      return {
-        status: true,
-        TYPEFORM: 'NEW',
-        SEQNO: nextSeqNo,
-        ORNO: orno,
-      };
-    });
-  }
-
-  async updateMfgOrCenterForRevise(dto: GetMfgOrDto & { FORMNO?: string }) {
-    return this.dataSource.transaction(async manager => {
-      const form = await this.getMfgOrFormByKey(manager, dto);
-      const orno = form.ORNO;
-
-      if (!orno) {
-        throw new Error('ORNO not found for revise');
-      }
-
-      await manager
-        .createQueryBuilder()
-        .update('MFGOR_CENTER')
-        .set({
-          CLASS: form.CLASS,
-          TOPIC: form.TOPIC,
-          REVISE_DATE: () => 'SYSDATE',
-          REVNO: form.REV,
-          FORMNO: dto.FORMNO || null,
-        })
-        .where('ORNO = :ORNO', { ORNO: orno })
-        .execute();
-
-      return {
-        status: true,
-        TYPEFORM: 'REVISE',
-        ORNO: orno,
-      };
-    });
-  }
-
-
-  async searchMfgOrCenter(dto: SearchMfgOrCenterDto) {
-    const orno = String(dto.ORNO || '').trim().toUpperCase();
-    const topic = String(dto.TOPIC || '').trim().toUpperCase();
-    const classValue = String(dto.CLASS || '').trim().toUpperCase();
-    const cyear = String(dto.CYEAR || '').trim();
-    const query = this.dataSource
-      .createQueryBuilder()
-      .select([
-        'C.ORNO AS ORNO',
-        'C.CYEAR AS CYEAR',
-        'C.SEQ AS SEQ',
-        'C.CLASS AS CLASS',
-        'C.TOPIC AS TOPIC',
-        'C.REVNO AS REVNO',
-        'C.ISSUE_DATE AS ISSUE_DATE',
-        'C.REVISE_DATE AS REVISE_DATE',
-        'C.FORMNO AS FORMNO',
-      ])
-      .from('MFGOR_CENTER', 'C')
-      .where('1 = 1');
-
-    if (cyear) {
-      query.andWhere('C.CYEAR = :CYEAR', {
-        CYEAR: cyear.slice(-2),
-      });
     }
 
-    if (orno) {
-      query.andWhere('UPPER(C.ORNO) LIKE :ORNO', {
-        ORNO: `%${orno}%`,
-      });
+    private async getMfgOrFormByKey(manager: any, dto: GetMfgOrDto) {
+        const key = this.getKey(dto);
+        return manager
+            .createQueryBuilder()
+            .select('A.*')
+            .from('MFGOR_FORM', 'A')
+            .where('A.NFRMNO = :NFRMNO', key)
+            .andWhere('A.VORGNO = :VORGNO', key)
+            .andWhere('A.CYEAR = :CYEAR', key)
+            .andWhere('A.CYEAR2 = :CYEAR2', key)
+            .andWhere('A.NRUNNO = :NRUNNO', key)
+            .getRawOne();
     }
 
-    if (topic) {
-      query.andWhere('UPPER(C.TOPIC) LIKE :TOPIC', {
-        TOPIC: `%${topic}%`,
-      });
+    async createorform(dto: CreateMfgOrDto) {
+        return this.dataSource.transaction(async (manager) => {
+            await manager
+                .createQueryBuilder()
+                .insert()
+                .into('MFGOR_FORM')
+                .values({
+                    NFRMNO: dto.NFRMNO,
+                    VORGNO: dto.VORGNO,
+                    CYEAR: dto.CYEAR,
+                    CYEAR2: dto.CYEAR2,
+                    NRUNNO: dto.NRUNNO,
+
+                    TYPEFORM: dto.TYPEFORM,
+                    CLASS: dto.CLASS,
+                    TOPIC: dto.TOPIC,
+                    SEQNO: dto.SEQNO,
+                    ORNO: dto.ORNO,
+                    REV: dto.REV,
+                })
+                .execute();
+
+            if (dto.att?.length) {
+                const attRows = dto.att.map((file, index) => ({
+                    NFRMNO: dto.NFRMNO,
+                    VORGNO: dto.VORGNO,
+                    CYEAR: dto.CYEAR,
+                    CYEAR2: dto.CYEAR2,
+                    NRUNNO: dto.NRUNNO,
+                    ID: index + 1,
+                    FILENAME: file.FILENAME,
+                }));
+
+                await manager
+                    .createQueryBuilder()
+                    .insert()
+                    .into('MFGOR_ATT')
+                    .values(attRows)
+                    .execute();
+            }
+
+            return {
+                status: true,
+                message: 'Create MFG OR success',
+            };
+        });
     }
 
-    if (classValue) {
-      query.andWhere('UPPER(C.CLASS) LIKE :CLASS', {
-        CLASS: `${classValue}%`,
-      });
+    async getMfgOr(dto: GetMfgOrDto) {
+        const key = this.getKey(dto);
+        const form = await this.dataSource
+            .createQueryBuilder()
+            .select([
+                'A.*',
+                'B.SEMPNO AS REQ_EMPNO',
+                'B.SNAME AS REQ_NAME',
+                'B.SSEC AS REQ_SEC',
+                'C.SEMPNO AS INP_EMPNO',
+                'C.SNAME AS INP_NAME',
+            ])
+            .from('FORM', 'A')
+            .leftJoin('AMECUSERALL', 'B', 'A.VREQNO = B.SEMPNO')
+            .leftJoin('AMECUSERALL', 'C', 'A.VINPUTER = C.SEMPNO')
+            .where('A.NFRMNO = :NFRMNO', key)
+            .andWhere('A.VORGNO = :VORGNO', key)
+            .andWhere('A.CYEAR = :CYEAR', key)
+            .andWhere('A.CYEAR2 = :CYEAR2', key)
+            .andWhere('A.NRUNNO = :NRUNNO', key)
+            .getRawOne();
+
+        const flow = await this.dataSource
+            .createQueryBuilder()
+            .select(['F.*', 'U.SNAME AS APV_NAME'])
+            .from('FLOW', 'F')
+            .leftJoin('AMECUSERALL', 'U', 'F.VAPVNO = U.SEMPNO')
+            .where('F.NFRMNO = :NFRMNO', key)
+            .andWhere('F.VORGNO = :VORGNO', key)
+            .andWhere('F.CYEAR = :CYEAR', key)
+            .andWhere('F.CYEAR2 = :CYEAR2', key)
+            .andWhere('F.NRUNNO = :NRUNNO', key)
+            .orderBy('F.CSTEPNO', 'ASC')
+            .getRawMany();
+
+        const head = await this.dataSource
+            .createQueryBuilder()
+            .select('H.*')
+            .from('MFGOR_FORM', 'H')
+            .where('H.NFRMNO = :NFRMNO', key)
+            .andWhere('H.VORGNO = :VORGNO', key)
+            .andWhere('H.CYEAR = :CYEAR', key)
+            .andWhere('H.CYEAR2 = :CYEAR2', key)
+            .andWhere('H.NRUNNO = :NRUNNO', key)
+            .getRawOne();
+
+        const att = await this.dataSource
+            .createQueryBuilder()
+            .select('A.*')
+            .from('MFGOR_ATT', 'A')
+            .where('A.NFRMNO = :NFRMNO', key)
+            .andWhere('A.VORGNO = :VORGNO', key)
+            .andWhere('A.CYEAR = :CYEAR', key)
+            .andWhere('A.CYEAR2 = :CYEAR2', key)
+            .andWhere('A.NRUNNO = :NRUNNO', key)
+            .orderBy('A.ID', 'ASC')
+            .getRawMany();
+
+        return {
+            status: true,
+            data: {
+                form,
+                flow,
+                head,
+                att,
+            },
+        };
     }
 
-    const data = await query
-      .orderBy('C.CYEAR', 'DESC')
-      .addOrderBy('C.SEQ', 'DESC')
-      .getRawMany();
+    async generateNewOrNo(dto: GetMfgOrDto & { FORMNO?: string }) {
+        return this.dataSource.transaction(async (manager) => {
+            const form = await this.getMfgOrFormByKey(manager, dto);
 
-    return {
-      status: true,
-      count: data.length,
-      data,
-    };
-  }
+            if (!form) {
+                throw new Error('MFGOR_FORM not found');
+            }
 
-  private async updateStampedPdfAtt(
-    dto: GetMfgOrDto & { FORMNO?: string },
-    filename: string,
-  ) {
-    const key = this.getKey(dto);
-    await this.dataSource
-      .createQueryBuilder()
-      .update('MFGOR_ATT')
-      .set({
-        FILENAME: filename,
-      })
-      .where('NFRMNO = :NFRMNO', key)
-      .andWhere('VORGNO = :VORGNO', key)
-      .andWhere('CYEAR = :CYEAR', key)
-      .andWhere('CYEAR2 = :CYEAR2', key)
-      .andWhere('NRUNNO = :NRUNNO', key)
-      .andWhere('ID = :ID', { ID: 2 })
-      .execute();
-  }
+            if (String(form.ORNO || '').trim()) {
+                return {
+                    status: true,
+                    TYPEFORM: 'NEW',
+                    skipped: true,
+                    message: 'ORNO already generated',
+                    SEQNO: form.SEQNO,
+                    ORNO: form.ORNO,
+                };
+            }
 
-  //* ************************************* STAMP PDF *****************************************//
- 
-  async stampPdf(dto: GetMfgOrDto & { FORMNO?: string }) {
-    const formno = String(dto.FORMNO || '').trim();
-    const result = await this.getMfgOr(dto);
-    const flow = result.data.flow;
-    const head = result.data.head;
-    const pdfPath = this.getPdfPath(formno);
-    const outputPath = await this.fillMfgOrPdf({
-      pdfPath,
-      formno,
-      flow,
-      head,
-    });
+            const key = this.getKey(dto);
+            const year2 = String(new Date().getFullYear()).slice(-2);
 
-    await this.updateStampedPdfAtt(dto, `${formno}_stamp.pdf`);
+            const result = await manager
+                .createQueryBuilder()
+                .select('MAX(A.SEQNO)', 'MAXSEQNO')
+                .from('MFGOR_FORM', 'A')
+                .where('A.CYEAR2 = :cyear2', { cyear2: dto.CYEAR2 })
+                .getRawOne();
 
-    return {
-      status: true,
-      formno,
-      filepath: outputPath,
-    };
-  }
+            const maxSeqNo = Number(result?.MAXSEQNO || 0);
+            const nextSeqNo = maxSeqNo + 1;
+            const seqText = String(nextSeqNo).padStart(3, '0');
+            const orno = `OR-MFG-${year2}${seqText}`;
 
-  private async fillMfgOrPdf(params: {
-    pdfPath: string;
-    formno: string;
-    flow: any[];
-    head: any;
-  }): Promise<string> {
-    const { pdfPath, formno, head, flow  } = params;
+            await manager
+                .createQueryBuilder()
+                .update('MFGOR_FORM')
+                .set({
+                    SEQNO: nextSeqNo,
+                    ORNO: orno,
+                })
+                .where('NFRMNO = :NFRMNO', key)
+                .andWhere('VORGNO = :VORGNO', key)
+                .andWhere('CYEAR = :CYEAR', key)
+                .andWhere('CYEAR2 = :CYEAR2', key)
+                .andWhere('NRUNNO = :NRUNNO', key)
+                .andWhere("(ORNO IS NULL OR TRIM(ORNO) = '')")
+                .execute();
 
-    const pdfDoc = await PdfDocumentHelper.load(pdfPath);
-    const font = await PdfFontHelper.loadThaiFont(pdfDoc);
+            await manager
+                .createQueryBuilder()
+                .insert()
+                .into('MFGOR_CENTER')
+                .values({
+                    ORNO: orno,
+                    CYEAR: String(dto.CYEAR2).slice(-2),
+                    SEQ: nextSeqNo,
+                    CLASS: form.CLASS,
+                    TOPIC: form.TOPIC,
+                    REVNO: form.REV,
+                    ISSUE_DATE: () => 'SYSDATE',
+                    FORMNO: dto.FORMNO || null,
+                })
+                .execute();
 
-    const page = pdfDoc.getPages()[0];
-    const { width, height } = page.getSize();
-    const isLandscape = width > height;
-
-    const data = {
-      topic: String(head.TOPIC || '').trim(),
-      orno: String(head.ORNO || '').trim(),
-      rev: String(head.REV || '').trim(),
-    };
-
-    const req = flow.find(f => String(f.CSTEPNO) === '--');
-    const dim = flow.find(f => String(f.CSTEPNO) === '02');
-    const sem = flow.find(f => String(f.CSTEPNO) === '06');
-    const reqName = Optiongetdata.getStampName(req?.VAPVNO,req?.APV_NAME,);
-    const dimName = Optiongetdata.getStampName(dim?.VAPVNO,dim?.APV_NAME,);
-    const semName = Optiongetdata.getStampName(sem?.VAPVNO, sem?.APV_NAME,);
-    const reqDate = Optiongetdata.getStampDate(req?.DAPVDATE);
-    const dimDate = Optiongetdata.getStampDate(dim?.DAPVDATE);
-    const semDate = Optiongetdata.getStampDate(sem?.DAPVDATE);
-
-
-    if (isLandscape) { // แนวนอน
-      //PdfDrawer.drawText(page, font, data.topic, { x: 530, y: height - 90, size: 16, maxWidth: 500, });
-      PdfDrawer.drawText(page, font, data.orno, {x: 530,y: height - 117,size: 16,maxWidth: 500,});
-      PdfDrawer.drawText(page, font, data.rev, {x: 1370,y: height - 90, size: 16, maxWidth: 60,});
-      
-      PdfDrawer.drawText(page, font, reqName, { x: 1000, y: height - 90, size: 16, maxWidth: 500, });
-      PdfDrawer.drawText(page, font, reqDate, {x: 1000,y: height - 117,size: 16,maxWidth: 500,});
-      PdfDrawer.drawText(page, font, dimDate, {x: 1370,y: height - 117, size: 16, maxWidth: 500,});
-      
-    } else { // แนวตั้ง
-      //PdfDrawer.drawText(page, font, data.topic, { x: 540, y: height - 22,size: 14,maxWidth: 400,});
-      PdfDrawer.drawText(page, font, data.orno, { x: 540,y: height - 53,size: 16, maxWidth: 400,});
-      PdfDrawer.drawText(page, font, data.rev, {x: 870, y: height - 53,size: 16, maxWidth: 60,});
-
-      PdfDrawer.drawText(page, font, reqName, { x: 870, y: height - 22, size: 14,maxWidth: 400,});
-      PdfDrawer.drawText(page, font, reqDate, {x: 870,y: height - 85,size: 16,maxWidth: 500,});
-      PdfDrawer.drawText(page, font, dimDate, {x: 870,y: height - 120, size: 16, maxWidth: 500,});
+            return {
+                status: true,
+                TYPEFORM: 'NEW',
+                SEQNO: nextSeqNo,
+                ORNO: orno,
+            };
+        });
     }
 
-    //  DIM
-    PdfDrawer.drawCircleStamp(page, font, {
-      x: isLandscape ? width - 210 : width - 260,
-      y: isLandscape ? 200 : 68,
-      r: 36,
+    async updateMfgOrCenterForRevise(dto: GetMfgOrDto & { FORMNO?: string }) {
+        return this.dataSource.transaction(async (manager) => {
+            const form = await this.getMfgOrFormByKey(manager, dto);
+            const orno = form.ORNO;
 
-      topText: 'AMEC',
-      middleText: dimDate,
-      bottomText: dimName,
-    });
+            if (!orno) {
+                throw new Error('ORNO not found for revise');
+            }
 
-    // SEM
-    PdfDrawer.drawCircleStamp(page, font, {
-      x: isLandscape ? width - 80 : width - 140,
-      y: isLandscape ? 200 : 68,
-      r: 36,
+            await manager
+                .createQueryBuilder()
+                .update('MFGOR_CENTER')
+                .set({
+                    CLASS: form.CLASS,
+                    TOPIC: form.TOPIC,
+                    REVISE_DATE: () => 'SYSDATE',
+                    REVNO: form.REV,
+                    FORMNO: dto.FORMNO || null,
+                })
+                .where('ORNO = :ORNO', { ORNO: orno })
+                .execute();
 
-      topText: 'AMEC',
-      middleText: semDate,
-      bottomText: semName,
+            return {
+                status: true,
+                TYPEFORM: 'REVISE',
+                ORNO: orno,
+            };
+        });
+    }
 
-    });
+    async searchMfgOrCenter(dto: SearchMfgOrCenterDto) {
+        const orno = String(dto.ORNO || '')
+            .trim()
+            .toUpperCase();
+        const topic = String(dto.TOPIC || '')
+            .trim()
+            .toUpperCase();
+        const classValue = String(dto.CLASS || '')
+            .trim()
+            .toUpperCase();
+        const cyear = String(dto.CYEAR || '').trim();
+        const query = this.dataSource
+            .createQueryBuilder()
+            .select([
+                'C.ORNO AS ORNO',
+                'C.CYEAR AS CYEAR',
+                'C.SEQ AS SEQ',
+                'C.CLASS AS CLASS',
+                'C.TOPIC AS TOPIC',
+                'C.REVNO AS REVNO',
+                'C.ISSUE_DATE AS ISSUE_DATE',
+                'C.REVISE_DATE AS REVISE_DATE',
+                'C.FORMNO AS FORMNO',
+            ])
+            .from('MFGOR_CENTER', 'C')
+            .where('1 = 1');
 
-    const outputPath = path.join(path.dirname(pdfPath), `${formno}_stamp.pdf`);
+        if (cyear) {
+            query.andWhere('C.CYEAR = :CYEAR', {
+                CYEAR: cyear.slice(-2),
+            });
+        }
 
-    await PdfFileHelper.save(pdfDoc, outputPath);
-    return outputPath;
-  }
+        if (orno) {
+            query.andWhere('UPPER(C.ORNO) LIKE :ORNO', {
+                ORNO: `%${orno}%`,
+            });
+        }
 
-  private getPdfPath(formno: string): string {
-    const safeFormno = String(formno || '').trim();
-    if (!safeFormno) {throw new Error('FORMNO not found');}
+        if (topic) {
+            query.andWhere('UPPER(C.TOPIC) LIKE :TOPIC', {
+                TOPIC: `%${topic}%`,
+            });
+        }
 
-    //const pdfPath = 'O:\\Public\\golf\\A_TempFile\\MFG\\MFG-OR\\' + safeFormno + '\\' + safeFormno +'.pdf';
-    const pdfPath = `${this.getBasePath()}${safeFormno}/${safeFormno}.pdf`;
-    console.log('PDF Path:', pdfPath);
-    return pdfPath;
-  }
+        if (classValue) {
+            query.andWhere('UPPER(C.CLASS) LIKE :CLASS', {
+                CLASS: `${classValue}%`,
+            });
+        }
 
-  private getBasePath(): string {
-    const env = process.env.HOSTNAME === 'amecweb' ? 'production' : 'development';
-    return `${process.env.AMEC_FILE_PATH}${env}/Form/MFG/MFG-OR/`;
-  }
+        const data = await query
+            .orderBy('C.CYEAR', 'DESC')
+            .addOrderBy('C.SEQ', 'DESC')
+            .getRawMany();
 
+        return {
+            status: true,
+            count: data.length,
+            data,
+        };
+    }
 
+    private async updateStampedPdfAtt(dto: GetMfgOrDto & { FORMNO?: string }, filename: string) {
+        const key = this.getKey(dto);
+        await this.dataSource
+            .createQueryBuilder()
+            .update('MFGOR_ATT')
+            .set({
+                FILENAME: filename,
+            })
+            .where('NFRMNO = :NFRMNO', key)
+            .andWhere('VORGNO = :VORGNO', key)
+            .andWhere('CYEAR = :CYEAR', key)
+            .andWhere('CYEAR2 = :CYEAR2', key)
+            .andWhere('NRUNNO = :NRUNNO', key)
+            .andWhere('ID = :ID', { ID: 2 })
+            .execute();
+    }
 
+    //* ************************************* STAMP PDF *****************************************//
+
+    async stampPdf(dto: GetMfgOrDto & { FORMNO?: string }) {
+        const formno = String(dto.FORMNO || '').trim();
+        const result = await this.getMfgOr(dto);
+        const flow = result.data.flow;
+        const head = result.data.head;
+        const pdfPath = this.getPdfPath(formno);
+        const outputPath = await this.fillMfgOrPdf({
+            pdfPath,
+            formno,
+            flow,
+            head,
+        });
+
+        await this.updateStampedPdfAtt(dto, `${formno}_stamp.pdf`);
+
+        return {
+            status: true,
+            formno,
+            filepath: outputPath,
+        };
+    }
+
+    private async fillMfgOrPdf(params: {
+        pdfPath: string;
+        formno: string;
+        flow: any[];
+        head: any;
+    }): Promise<string> {
+        const { pdfPath, formno, head, flow } = params;
+
+        const pdfDoc = await PdfDocumentHelper.load(pdfPath);
+        const font = await PdfFontHelper.loadThaiFont(pdfDoc);
+
+        const page = pdfDoc.getPages()[0];
+        const { width, height } = page.getSize();
+        const isLandscape = width > height;
+
+        const data = {
+            topic: String(head.TOPIC || '').trim(),
+            orno: String(head.ORNO || '').trim(),
+            rev: String(head.REV || '').trim(),
+        };
+
+        const req = flow.find((f) => String(f.CSTEPNO) === '--');
+        const dim = flow.find((f) => String(f.CSTEPNO) === '02');
+        const sem = flow.find((f) => String(f.CSTEPNO) === '06');
+        const reqName = Optiongetdata.getStampName(req?.VAPVNO, req?.APV_NAME);
+        const dimName = Optiongetdata.getStampName(dim?.VAPVNO, dim?.APV_NAME);
+        const semName = Optiongetdata.getStampName(sem?.VAPVNO, sem?.APV_NAME);
+        const reqDate = Optiongetdata.getStampDate(req?.DAPVDATE);
+        const dimDate = Optiongetdata.getStampDate(dim?.DAPVDATE);
+        const semDate = Optiongetdata.getStampDate(sem?.DAPVDATE);
+
+        if (isLandscape) {
+            // แนวนอน
+            //PdfDrawer.drawText(page, font, data.topic, { x: 530, y: height - 90, size: 16, maxWidth: 500, });
+            PdfDrawer.drawText(page, font, data.orno, {
+                x: 530,
+                y: height - 117,
+                size: 16,
+                maxWidth: 500,
+            });
+            PdfDrawer.drawText(page, font, data.rev, {
+                x: 1370,
+                y: height - 90,
+                size: 16,
+                maxWidth: 60,
+            });
+
+            PdfDrawer.drawText(page, font, reqName, {
+                x: 1000,
+                y: height - 90,
+                size: 16,
+                maxWidth: 500,
+            });
+            PdfDrawer.drawText(page, font, reqDate, {
+                x: 1000,
+                y: height - 117,
+                size: 16,
+                maxWidth: 500,
+            });
+            PdfDrawer.drawText(page, font, dimDate, {
+                x: 1370,
+                y: height - 117,
+                size: 16,
+                maxWidth: 500,
+            });
+        } else {
+            // แนวตั้ง
+            //PdfDrawer.drawText(page, font, data.topic, { x: 540, y: height - 22,size: 14,maxWidth: 400,});
+            PdfDrawer.drawText(page, font, data.orno, {
+                x: 540,
+                y: height - 53,
+                size: 16,
+                maxWidth: 400,
+            });
+            PdfDrawer.drawText(page, font, data.rev, {
+                x: 870,
+                y: height - 53,
+                size: 16,
+                maxWidth: 60,
+            });
+
+            PdfDrawer.drawText(page, font, reqName, {
+                x: 870,
+                y: height - 22,
+                size: 14,
+                maxWidth: 400,
+            });
+            PdfDrawer.drawText(page, font, reqDate, {
+                x: 870,
+                y: height - 85,
+                size: 16,
+                maxWidth: 500,
+            });
+            PdfDrawer.drawText(page, font, dimDate, {
+                x: 870,
+                y: height - 120,
+                size: 16,
+                maxWidth: 500,
+            });
+        }
+
+        //  DIM
+        PdfDrawer.drawCircleStamp(page, font, {
+            x: isLandscape ? width - 210 : width - 260,
+            y: isLandscape ? 200 : 68,
+            r: 36,
+
+            topText: 'AMEC',
+            middleText: dimDate,
+            bottomText: dimName,
+        });
+
+        // SEM
+        PdfDrawer.drawCircleStamp(page, font, {
+            x: isLandscape ? width - 80 : width - 140,
+            y: isLandscape ? 200 : 68,
+            r: 36,
+
+            topText: 'AMEC',
+            middleText: semDate,
+            bottomText: semName,
+        });
+
+        const outputPath = path.join(path.dirname(pdfPath), `${formno}_stamp.pdf`);
+
+        await PdfFileHelper.save(pdfDoc, outputPath);
+        return outputPath;
+    }
+
+    private getPdfPath(formno: string): string {
+        const safeFormno = String(formno || '').trim();
+        if (!safeFormno) {
+            throw new Error('FORMNO not found');
+        }
+
+        //const pdfPath = 'O:\\Public\\golf\\A_TempFile\\MFG\\MFG-OR\\' + safeFormno + '\\' + safeFormno +'.pdf';
+        const pdfPath = `${this.getBasePath()}${safeFormno}/${safeFormno}.pdf`;
+        console.log('PDF Path:', pdfPath);
+        return pdfPath;
+    }
+
+    private getBasePath(): string {
+        const env = process.env.HOSTNAME === 'amecweb' ? 'production' : 'development';
+        return `${process.env.AMEC_FILE_PATH}${env}/Form/MFG/MFG-OR/`;
+    }
 }

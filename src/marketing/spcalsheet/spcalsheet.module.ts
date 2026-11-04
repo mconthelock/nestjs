@@ -5,8 +5,8 @@ import { Spcalsheet } from './entities/spcalsheet.entity';
 import { SpcalsheetController } from './spcalsheet.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Spcalsheet], 'mitsuConnection')],
-  controllers: [SpcalsheetController],
-  providers: [SpcalsheetService],
+    imports: [TypeOrmModule.forFeature([Spcalsheet], 'mitsuConnection')],
+    controllers: [SpcalsheetController],
+    providers: [SpcalsheetService],
 })
 export class SpcalsheetModule {}

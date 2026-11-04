@@ -6,9 +6,9 @@ import { PURNVF_FORM } from 'src/common/Entities/webform/table/PURNVF_FORM.entit
 import { PurnvfFormRepository } from './purnvf_form.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PURNVF_FORM], 'mitsuConnection')],
-  controllers: [PurnvfFormController],
-  providers: [PurnvfFormService, PurnvfFormRepository],
-  exports: [PurnvfFormService],
+    imports: [TypeOrmModule.forFeature([PURNVF_FORM], 'mitsuConnection')],
+    controllers: [PurnvfFormController],
+    providers: [PurnvfFormService, PurnvfFormRepository],
+    exports: [PurnvfFormService],
 })
 export class PurnvfFormModule {}

@@ -11,9 +11,7 @@ export class DpmsPlWeightChangeRepository extends BaseRepository {
     }
 
     getChangeWeight(vanndate?: string) {
-        const query = this.getRepository(
-            DPMS_PL_WEIGHT_CHANGE,
-        ).createQueryBuilder('C');
+        const query = this.getRepository(DPMS_PL_WEIGHT_CHANGE).createQueryBuilder('C');
         if (vanndate) {
             query.where("TRUNC(C.VANNING) = TO_DATE(:vanndate, 'YYYY-MM-DD')", {
                 vanndate,

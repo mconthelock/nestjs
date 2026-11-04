@@ -1,12 +1,11 @@
 import e from 'express';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';   
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { GPTPH_LOCATION } from './GPTPH_LOCATION.entity';
 
 @Entity({
     name: 'GPTPH_AREAS',
     schema: 'WEBFORM',
 })
-
 export class GPTPH_AREAS {
     @PrimaryColumn()
     AREA_ID: number;

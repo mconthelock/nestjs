@@ -20,12 +20,7 @@ export class FlowmstRepository extends BaseRepository {
 
     async search(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(FLOWMST, 'F');
-        this.applyFilters(qb, 'F', dto, [
-            'NFRMNO',
-            'VORGNO',
-            'CYEAR',
-            'CSTEPNO',
-        ]);
+        this.applyFilters(qb, 'F', dto, ['NFRMNO', 'VORGNO', 'CYEAR', 'CSTEPNO']);
         return qb.getMany();
     }
 
@@ -45,11 +40,7 @@ export class FlowmstRepository extends BaseRepository {
         );
     }
 
-    async getFlowMasterNoSql(
-        NFRMNO: number,
-        VORGNO: string,
-        CYEAR: string,
-    ): Promise<FLOWMST[]> {
+    async getFlowMasterNoSql(NFRMNO: number, VORGNO: string, CYEAR: string): Promise<FLOWMST[]> {
         const allSteps = await this.getRepository(FLOWMST).find({
             where: { NFRMNO, VORGNO, CYEAR },
         });
@@ -71,9 +62,7 @@ export class FlowmstRepository extends BaseRepository {
                 result.push(step);
 
                 if (step.CSTEPNEXTNO && step.CSTEPNEXTNO !== '00') {
-                    const nextSteps = allSteps.filter(
-                        (s) => s.CSTEPNO === step.CSTEPNEXTNO,
-                    );
+                    const nextSteps = allSteps.filter((s) => s.CSTEPNO === step.CSTEPNEXTNO);
                     nextBatch.push(...nextSteps);
                 }
             }

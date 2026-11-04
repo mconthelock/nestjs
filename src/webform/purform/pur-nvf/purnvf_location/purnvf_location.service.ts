@@ -35,9 +35,7 @@ export class PurnvfLocationService {
                 nameth: country.name_th,
             }));
         } catch (error) {
-            throw new InternalServerErrorException(
-                'Get Countries Error: ' + error.message,
-            );
+            throw new InternalServerErrorException('Get Countries Error: ' + error.message);
         }
     }
 
@@ -45,18 +43,14 @@ export class PurnvfLocationService {
     async getProvinces() {
         try {
             const provincesData = this.loadJsonFile('provincesData.json'); // เปลี่ยนชื่อไฟล์ให้ตรงกับในเครื่องนะคะ
-            const sorted = [...provincesData].sort((a, b) =>
-                a.name_en.localeCompare(b.name_en),
-            );
+            const sorted = [...provincesData].sort((a, b) => a.name_en.localeCompare(b.name_en));
             return sorted.map((p) => ({
                 id: p.id,
                 nameen: p.name_en,
                 nameth: p.name_th,
             }));
         } catch (error) {
-            throw new InternalServerErrorException(
-                'Get Provinces Error: ' + error.message,
-            );
+            throw new InternalServerErrorException('Get Provinces Error: ' + error.message);
         }
     }
 
@@ -66,13 +60,9 @@ export class PurnvfLocationService {
             const districtsData = this.loadJsonFile('districtsData.json');
             let list = districtsData;
             if (provinceId) {
-                list = districtsData.filter(
-                    (d) => d.province_id === Number(provinceId),
-                );
+                list = districtsData.filter((d) => d.province_id === Number(provinceId));
             }
-            const sorted = [...list].sort((a, b) =>
-                a.name_en.localeCompare(b.name_en),
-            );
+            const sorted = [...list].sort((a, b) => a.name_en.localeCompare(b.name_en));
             return sorted.map((d) => ({
                 id: d.id,
                 nameen: d.name_en,
@@ -80,9 +70,7 @@ export class PurnvfLocationService {
                 province_id: d.province_id,
             }));
         } catch (error) {
-            throw new InternalServerErrorException(
-                'Get Districts Error: ' + error.message,
-            );
+            throw new InternalServerErrorException('Get Districts Error: ' + error.message);
         }
     }
 
@@ -92,13 +80,9 @@ export class PurnvfLocationService {
             const subDistrictsData = this.loadJsonFile('subDistrictsData.json');
             let list = subDistrictsData;
             if (districtId) {
-                list = subDistrictsData.filter(
-                    (sd) => sd.district_id === Number(districtId),
-                );
+                list = subDistrictsData.filter((sd) => sd.district_id === Number(districtId));
             }
-            const sorted = [...list].sort((a, b) =>
-                a.name_en.localeCompare(b.name_en),
-            );
+            const sorted = [...list].sort((a, b) => a.name_en.localeCompare(b.name_en));
             return sorted.map((sd) => ({
                 id: sd.id,
                 nameen: sd.name_en,
@@ -107,9 +91,7 @@ export class PurnvfLocationService {
                 postcode: sd.zip_code,
             }));
         } catch (error) {
-            throw new InternalServerErrorException(
-                'Get SubDistricts Error: ' + error.message,
-            );
+            throw new InternalServerErrorException('Get SubDistricts Error: ' + error.message);
         }
     }
 }

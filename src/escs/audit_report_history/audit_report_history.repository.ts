@@ -7,9 +7,7 @@ import { CreateAuditReportHistoryDto } from './dto/create-audit_report_history.d
 
 @Injectable()
 export class AuditReportHistoryRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

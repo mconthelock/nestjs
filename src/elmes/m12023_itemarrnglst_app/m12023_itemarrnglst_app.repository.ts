@@ -7,9 +7,7 @@ import { M12023_ITEMARRNGLST_APP } from 'src/common/Entities/elmes/table/M12023_
 
 @Injectable()
 export class M12023ItemarrnglstAppRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('elmesConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('elmesConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -28,16 +26,8 @@ export class M12023ItemarrnglstAppRepository extends BaseRepository {
     }
 
     async search(dto: FiltersDto) {
-        const qb = this.manager.createQueryBuilder(
-            M12023_ITEMARRNGLST_APP,
-            'M',
-        );
-        this.applyFilters(qb, 'M', dto, [
-            'ORDERNO',
-            'MELCALACLS',
-            'ITEMNO',
-            'SERIALNO',
-        ]);
+        const qb = this.manager.createQueryBuilder(M12023_ITEMARRNGLST_APP, 'M');
+        this.applyFilters(qb, 'M', dto, ['ORDERNO', 'MELCALACLS', 'ITEMNO', 'SERIALNO']);
         return qb.getMany();
     }
 

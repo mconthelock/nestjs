@@ -42,8 +42,7 @@ export class M001KpbmService {
             };
         } catch (error) {
             throw new Error(
-                `Search M001KPBM by ${order}, ${item}, ${prod} Error: ` +
-                    error.message,
+                `Search M001KPBM by ${order}, ${item}, ${prod} Error: ` + error.message,
             );
         }
     }
@@ -71,9 +70,9 @@ export class M001KpbmService {
 
     async getGPL(order: string, item: string | string[]) {
         try {
-            if(typeof item === 'string' && item.includes(',')){
+            if (typeof item === 'string' && item.includes(',')) {
                 item = item.split(',');
-            }else if(typeof item === 'string'){
+            } else if (typeof item === 'string') {
                 item = [item];
             }
             const res = await this.repo.getGPL(order, item);
@@ -91,9 +90,7 @@ export class M001KpbmService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Get GPL by ${order}, ${item} Error: ` + error.message,
-            );
+            throw new Error(`Get GPL by ${order}, ${item} Error: ` + error.message);
         }
     }
 }

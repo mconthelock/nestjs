@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { UsersService } from './user.service';
 import { SearchUsersDto } from './dto/search-escs-user.dto';
 import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';

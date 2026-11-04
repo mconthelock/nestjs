@@ -1,9 +1,4 @@
-import {
-    IntersectionType,
-    OmitType,
-    PartialType,
-    PickType,
-} from '@nestjs/swagger';
+import { IntersectionType, OmitType, PartialType, PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
     IsArray,

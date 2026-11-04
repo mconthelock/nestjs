@@ -1,12 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { IETS_LIST } from './IETS_LIST.entity';
 import { VORGMST } from '../views/VORGMST.entity';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';

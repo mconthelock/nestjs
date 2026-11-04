@@ -6,9 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DPMS_PL_ISSUE_TYPE } from 'src/common/Entities/workload/table/DPMS_PL_ISSUE_TYPE.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([DPMS_PL_ISSUE_TYPE], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([DPMS_PL_ISSUE_TYPE], 'mitsuConnection')],
     controllers: [DpmsPlIssueTypeController],
     providers: [DpmsPlIssueTypeService, DpmsPlIssueTypeRepository],
     exports: [DpmsPlIssueTypeService],

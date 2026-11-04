@@ -6,9 +6,7 @@ import { USERS_AUTHORIZE } from 'src/common/Entities/escs/table/USERS_AUTHORIZE.
 
 @Injectable()
 export class UsersAuthorizeRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

@@ -21,9 +21,7 @@ export class PrintedTopLabelService {
         });
         try {
             if (!data.length) {
-                await this.printed.writeLog(
-                    `No label data to put in PDF for FILES_ID ${fileID}`,
-                );
+                await this.printed.writeLog(`No label data to put in PDF for FILES_ID ${fileID}`);
                 return;
             }
 

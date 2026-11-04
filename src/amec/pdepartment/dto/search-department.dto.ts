@@ -12,7 +12,10 @@ export class SearchDepartmentDto {
     @IsString()
     readonly SDIVCODE?: string;
 
-    @ApiPropertyOptional({ type: [String], example: ["SDIVCODE", "SDIVISION", "SDIV", "SDEPCODE", "SDEPARTMENT", "SDEPT"] })
+    @ApiPropertyOptional({
+        type: [String],
+        example: ['SDIVCODE', 'SDIVISION', 'SDIV', 'SDEPCODE', 'SDEPARTMENT', 'SDEPT'],
+    })
     @IsOptional()
     @IsArray()
     @IsString({ each: true })

@@ -21,10 +21,7 @@ export class PilineProblemMstController {
     }
     @Patch(':PROBLEM_ID')
     @UseTransaction('mitsuConnection')
-    update(
-        @Param() key: KeyPilineProblemMstDto,
-        @Body() dto: UpdatePilineProblemMstDto,
-    ) {
+    update(@Param() key: KeyPilineProblemMstDto, @Body() dto: UpdatePilineProblemMstDto) {
         return this.service.update(key, dto);
     }
     @Delete(':PROBLEM_ID')

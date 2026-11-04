@@ -11,10 +11,7 @@ import { M002kpService } from 'src/as400/rtnlibf/m002kp/m002kp.service';
 import { PSCLM_DETAIL } from 'src/common/Entities/webform/table/PSCLM_DETAIL.entity';
 import { MailService } from 'src/common/services/mail/mail.service';
 import { HandleFileFormService } from 'src/webform/handle-file-form/handle-file-form.service';
-import {
-    CreatePsClmDetailDto,
-    CreatePsClmReqFormDto,
-} from './dto/create-ps-clm.dto';
+import { CreatePsClmDetailDto, CreatePsClmReqFormDto } from './dto/create-ps-clm.dto';
 import { SendPsClmAs400Dto, UpdatePsClmDto } from './dto/update-ps-clm.dto';
 import { PsClmRepository } from './ps-clm.repository';
 
@@ -46,10 +43,7 @@ export function formatPsClmOrderNo(orderNo: string, sequence: number) {
     return addOrderCheckBit(`${prefix}${suffix}`);
 }
 
-export function nextPsClmOrderNo(
-    orderNo: string,
-    usedOrders: Iterable<string>,
-) {
+export function nextPsClmOrderNo(orderNo: string, usedOrders: Iterable<string>) {
     const type = getOrderType(orderNo);
     if (!ORDER_PREFIXES[type]) return '';
 
@@ -62,10 +56,7 @@ export function nextPsClmOrderNo(
     throw new Error(`New order number range for ${type} is full`);
 }
 
-export function formatPsClmProject(
-    claimSlipNo: string,
-    claimTypes: Iterable<string>,
-) {
+export function formatPsClmProject(claimSlipNo: string, claimTypes: Iterable<string>) {
     const types = [...new Set(claimTypes)];
     if (types.length !== 1 || !['1', '2'].includes(types[0])) {
         throw new Error('All details must use one Claim Type');
@@ -121,28 +112,17 @@ export class PsClmService {
         private readonly handleFileFormService: HandleFileFormService,
     ) {}
 
-    async create(
-        dto: CreatePsClmReqFormDto,
-        files: Express.Multer.File[],
-        ip: string,
-    ) {
-        const formmst =
-            await this.formmstService.getFormMasterByVaname('PS-CLM');
+    async create(dto: CreatePsClmReqFormDto, files: Express.Multer.File[], ip: string) {
+        const formmst = await this.formmstService.getFormMasterByVaname('PS-CLM');
         if (!formmst) {
-            throw new Error(
-                'Form master not found for PS-CLM. Check FORMMST table.',
-            );
+            throw new Error('Form master not found for PS-CLM. Check FORMMST table.');
         }
 
         const details = this.parseDetails(dto.DETAILS);
         const claimSlipNumbers = [
             ...new Set(
                 details.map((detail) =>
-                    String(
-                        (detail as any).SCLNO ??
-                            (detail as any).ISSUECARD ??
-                            '',
-                    )
+                    String((detail as any).SCLNO ?? (detail as any).ISSUECARD ?? '')
                         .trim()
                         .toUpperCase(),
                 ),
@@ -152,17 +132,14 @@ export class PsClmService {
             throw new Error('One request/order must use one Claim Slip No.');
         }
         const originalOrder = String(
-            details.find(
-                (detail) => ORDER_PREFIXES[getOrderType(detail.ORDERNO)],
-            )?.ORDERNO || '',
+            details.find((detail) => ORDER_PREFIXES[getOrderType(detail.ORDERNO)])?.ORDERNO || '',
         );
         if (!originalOrder) {
             throw new Error('Original Order must start with E or S');
         }
 
         await this.repo.lockForms();
-        const { newOrderNo, duplicateOrderNo } =
-            await this.allocateNewOrder(originalOrder);
+        const { newOrderNo, duplicateOrderNo } = await this.allocateNewOrder(originalOrder);
 
         const createForm = await this.formCreateService.create(
             {
@@ -176,10 +153,7 @@ export class PsClmService {
             ip,
         );
         if (!createForm?.status) {
-            const errMsg =
-                createForm?.message?.message ||
-                createForm?.message ||
-                'Unknown error';
+            const errMsg = createForm?.message?.message || createForm?.message || 'Unknown error';
             throw new Error(`Form creation failed: ${errMsg}`);
         }
 
@@ -208,12 +182,7 @@ export class PsClmService {
               )
             : null;
         await this.mailService.sendMail(
-            await this.getRequestMail(
-                form,
-                dto.REQBY,
-                newOrderNo,
-                duplicateOrderNo,
-            ),
+            await this.getRequestMail(form, dto.REQBY, newOrderNo, duplicateOrderNo),
         );
 
         return {
@@ -248,10 +217,7 @@ export class PsClmService {
             this.m001kpService.findOrderNumbersByPrefix(prefix),
         ]);
         const formOrderNo = nextPsClmOrderNo(orderNo, formOrders);
-        const newOrderNo = nextPsClmOrderNo(orderNo, [
-            ...formOrders,
-            ...as400Orders,
-        ]);
+        const newOrderNo = nextPsClmOrderNo(orderNo, [...formOrders, ...as400Orders]);
         return {
             newOrderNo,
             duplicateOrderNo: formOrderNo === newOrderNo ? '' : formOrderNo,
@@ -375,9 +341,7 @@ export class PsClmService {
             ...form,
             EMPNO: dto.EMPNO,
         });
-        if (
-            !ready.some((flow) => String(flow.CEXTDATA || '').trim() === '02')
-        ) {
+        if (!ready.some((flow) => String(flow.CEXTDATA || '').trim() === '02')) {
             throw new Error('Only the assigned controller can check AS400');
         }
 
@@ -412,26 +376,19 @@ export class PsClmService {
         if (
             context.details.some(
                 (detail) =>
-                    !/^[A-Z0-9]{5}$/i.test(
-                        String(detail.SCHDNUM || '').trim(),
-                    ) || !/^P\d+$/i.test(String(detail.SCHDP || '').trim()),
+                    !/^[A-Z0-9]{5}$/i.test(String(detail.SCHDNUM || '').trim()) ||
+                    !/^P\d+$/i.test(String(detail.SCHDP || '').trim()),
             )
         ) {
             throw new Error('Schedule and P are required for every item');
         }
         const schedules = [
             ...new Set(
-                context.details.map((detail) =>
-                    String(detail.SCHDNUM).trim().toUpperCase(),
-                ),
+                context.details.map((detail) => String(detail.SCHDNUM).trim().toUpperCase()),
             ),
         ];
         const priorities = [
-            ...new Set(
-                context.details.map((detail) =>
-                    String(detail.SCHDP).trim().toUpperCase(),
-                ),
-            ),
+            ...new Set(context.details.map((detail) => String(detail.SCHDP).trim().toUpperCase())),
         ];
         if (schedules.length !== 1 || priorities.length !== 1) {
             throw new Error('All details must use one Schedule and P');
@@ -499,8 +456,7 @@ export class PsClmService {
     ) {
         const empno = String(requester || '').trim();
         const user = empno && (await this.usersService.findEmp(empno));
-        if (!user?.SRECMAIL)
-            throw new Error(`PS-CLM email not found for requester: ${empno}`);
+        if (!user?.SRECMAIL) throw new Error(`PS-CLM email not found for requester: ${empno}`);
 
         const cc = await this.getRequestMailCc(user.SRECMAIL);
 
@@ -518,14 +474,10 @@ export class PsClmService {
 
     private async getRequestMailCc(requesterEmail: string) {
         const empnos = [...new Set(REQUEST_MAIL_CC_EMPNOS)];
-        const users = await Promise.all(
-            empnos.map((empno) => this.usersService.findEmp(empno)),
-        );
+        const users = await Promise.all(empnos.map((empno) => this.usersService.findEmp(empno)));
         const missing = empnos.filter((_, index) => !users[index]?.SRECMAIL);
         if (missing.length) {
-            throw new Error(
-                `PS-CLM email not found for CC: ${missing.join(', ')}`,
-            );
+            throw new Error(`PS-CLM email not found for CC: ${missing.join(', ')}`);
         }
         const requester = requesterEmail.trim().toLowerCase();
 
@@ -533,35 +485,23 @@ export class PsClmService {
             ...new Map(
                 users
                     .map((user) => String(user?.SRECMAIL || '').trim())
-                    .filter(
-                        (email) => email && email.toLowerCase() !== requester,
-                    )
+                    .filter((email) => email && email.toLowerCase() !== requester)
                     .map((email) => [email.toLowerCase(), email]),
             ).values(),
         ];
     }
 
-    private saveDetails(
-        form: FormDto,
-        details?: CreatePsClmReqFormDto['DETAILS'],
-    ) {
+    private saveDetails(form: FormDto, details?: CreatePsClmReqFormDto['DETAILS']) {
         return this.repo.replaceDetails(
             form,
-            this.parseDetails(details).map((detail) =>
-                this.toDetailEntity(form, detail),
-            ),
+            this.parseDetails(details).map((detail) => this.toDetailEntity(form, detail)),
         );
     }
 
-    private updateDetailSchedules(
-        form: FormDto,
-        details?: CreatePsClmReqFormDto['DETAILS'],
-    ) {
+    private updateDetailSchedules(form: FormDto, details?: CreatePsClmReqFormDto['DETAILS']) {
         return this.repo.updateDetailSchedules(
             form,
-            this.parseDetails(details).map((detail) =>
-                this.toDetailEntity(form, detail),
-            ),
+            this.parseDetails(details).map((detail) => this.toDetailEntity(form, detail)),
         );
     }
 
@@ -591,14 +531,11 @@ export class PsClmService {
         return ['1', '2'].includes(String(value || '')) ? String(value) : '';
     }
 
-    private parseDetails(
-        details?: CreatePsClmDetailDto[] | string,
-    ): CreatePsClmDetailDto[] {
+    private parseDetails(details?: CreatePsClmDetailDto[] | string): CreatePsClmDetailDto[] {
         if (!details) {
             throw new Error('DETAILS must contain at least one item');
         }
-        const parsed =
-            typeof details === 'string' ? JSON.parse(details) : details;
+        const parsed = typeof details === 'string' ? JSON.parse(details) : details;
         if (!Array.isArray(parsed)) {
             throw new Error('DETAILS must be an array');
         }

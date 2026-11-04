@@ -11,13 +11,13 @@ import {
 } from 'class-validator';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
-export class CreatePurnvfFormDto extends PickType(FormDto,[
-'NFRMNO',
-'VORGNO',
-'CYEAR',
-'CYEAR2',
-'NRUNNO',
-] as const) {    
+export class CreatePurnvfFormDto extends PickType(FormDto, [
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'CYEAR2',
+    'NRUNNO',
+] as const) {
     @IsNotEmpty()
     @IsString()
     REQTYPE: string;
@@ -32,6 +32,4 @@ export class CreatePurnvfFormDto extends PickType(FormDto,[
     @IsOptional()
     @IsString()
     ATTACH_OTHER?: string;
-
-
 }

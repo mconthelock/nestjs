@@ -6,12 +6,7 @@ import { LOGIN_REASON } from 'src/common/Entities/webform/table/LOGIN_REASON.ent
 import { ISOFF_VARIEDOFF } from 'src/common/Entities/webform/table/ISOFF_VARIEDOFF.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [ISOFF_VARIEDOFF, LOGIN_REASON],
-            'mitsuConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([ISOFF_VARIEDOFF, LOGIN_REASON], 'mitsuConnection')],
     controllers: [IsOffController],
     providers: [IsOffService],
 })

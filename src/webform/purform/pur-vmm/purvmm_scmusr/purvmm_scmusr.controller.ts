@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { PurvmmScmusrService } from './purvmm_scmusr.service';
 import { CreatePurVmmScmusrDto } from './dto/create-purvmm_scmusr.dto';
 import { UpdatePurvmmScmusrDto } from './dto/update-purvmm_scmusr.dto';
@@ -31,10 +23,7 @@ export class PurvmmScmusrController {
     }
 
     @Patch(':id')
-    update(
-        @Param('id') id: string,
-        @Body() updatePurvmmScmusrDto: UpdatePurvmmScmusrDto,
-    ) {
+    update(@Param('id') id: string, @Body() updatePurvmmScmusrDto: UpdatePurvmmScmusrDto) {
         return this.purvmmScmusrService.update(+id, updatePurvmmScmusrDto);
     }
 

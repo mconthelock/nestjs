@@ -38,9 +38,7 @@ export class IeTsService {
                 };
             }
 
-            const uniqueItmNos = [
-                ...new Set(DWGLIST.map((item) => item.ITMNO)),
-            ];
+            const uniqueItmNos = [...new Set(DWGLIST.map((item) => item.ITMNO))];
             if (uniqueItmNos.length == 0) {
                 return {
                     status: false,
@@ -48,12 +46,8 @@ export class IeTsService {
                 };
             }
             const pic = await this.repotsf.getPicByItemNos(uniqueItmNos);
-            const uniquePICs = [
-                ...new Set(pic.map((item) => item.PICINFO.SEMPNO)),
-            ];
-            const uniqueSections = [
-                ...new Set(pic.map((item) => item.PICINFO.SSECCODE)),
-            ];
+            const uniquePICs = [...new Set(pic.map((item) => item.PICINFO.SEMPNO))];
+            const uniqueSections = [...new Set(pic.map((item) => item.PICINFO.SSECCODE))];
             if (uniquePICs.length == 0) {
                 return {
                     status: false,
@@ -140,8 +134,7 @@ export class IeTsService {
 
     async update(dto: UpdateIetsDto, ip: string) {
         try {
-            const { ACTION, REQBY, INPUTBY, DRAFT, REMARK, DWGLIST, ...data } =
-                dto;
+            const { ACTION, REQBY, INPUTBY, DRAFT, REMARK, DWGLIST, ...data } = dto;
             if (DWGLIST.length == 0) {
                 return {
                     status: false,
@@ -149,9 +142,7 @@ export class IeTsService {
                 };
             }
 
-            const uniqueItmNos = [
-                ...new Set(DWGLIST.map((item) => item.ITMNO)),
-            ];
+            const uniqueItmNos = [...new Set(DWGLIST.map((item) => item.ITMNO))];
             if (uniqueItmNos.length == 0) {
                 return {
                     status: false,
@@ -159,12 +150,8 @@ export class IeTsService {
                 };
             }
             const pic = await this.repotsf.getPicByItemNos(uniqueItmNos);
-            const uniquePICs = [
-                ...new Set(pic.map((item) => item.PICINFO.SEMPNO)),
-            ];
-            const uniqueSections = [
-                ...new Set(pic.map((item) => item.PICINFO.SSECCODE)),
-            ];
+            const uniquePICs = [...new Set(pic.map((item) => item.PICINFO.SEMPNO))];
+            const uniqueSections = [...new Set(pic.map((item) => item.PICINFO.SSECCODE))];
             if (uniquePICs.length == 0) {
                 return {
                     status: false,

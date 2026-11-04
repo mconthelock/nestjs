@@ -6,9 +6,7 @@ import { randomUUID } from 'crypto';
 import { spawn } from 'child_process';
 
 export async function writeLineBox(opt) {
-    const fontstyle =
-        opt.fontstyle ||
-        (await opt.pdfpage.doc.embedFont(StandardFonts.Helvetica));
+    const fontstyle = opt.fontstyle || (await opt.pdfpage.doc.embedFont(StandardFonts.Helvetica));
     const { height } = opt.pdfpage.getSize();
     const yTop = height - opt.boxY;
     const fontHeight = fontstyle.heightAtSize(opt.fontsize);
@@ -31,8 +29,7 @@ export async function writeLineBox(opt) {
 
     const textWidth = fontstyle.widthOfTextAtSize(opt.text, opt.fontsize);
     let xPos = opt.boxX;
-    if (opt.align === 'center')
-        xPos = opt.boxX + (opt.boxWidth - textWidth) / 2;
+    if (opt.align === 'center') xPos = opt.boxX + (opt.boxWidth - textWidth) / 2;
     else if (opt.align === 'right') xPos = opt.boxX + opt.boxWidth - textWidth;
 
     const yPos = yTop - (opt.boxHeight - fontHeight) / 2 - fontHeight + 4;
@@ -59,14 +56,7 @@ export async function protectedFile(opt) {
     const localInput = path.join(os.tmpdir(), `${randomUUID()}_${opt.input}`);
     const localOutput = path.join(os.tmpdir(), `${randomUUID()}_${opt.output}`);
     await fs.copyFile(networkInput, localInput);
-    const command = path.resolve(
-        process.cwd(),
-        'public',
-        'gs',
-        'gs10.07.1',
-        'bin',
-        'gswin64c.exe',
-    );
+    const command = path.resolve(process.cwd(), 'public', 'gs', 'gs10.07.1', 'bin', 'gswin64c.exe');
     await new Promise<void>((resolve, reject) => {
         const stderrChunks: Buffer[] = [];
         const stdoutChunks: Buffer[] = [];
@@ -99,9 +89,7 @@ export async function protectedFile(opt) {
             const output = Buffer.concat([...stdoutChunks, ...stderrChunks])
                 .toString()
                 .trim();
-            reject(
-                new Error(`Ghostscript exited with code ${code}: ${output}`),
-            );
+            reject(new Error(`Ghostscript exited with code ${code}: ${output}`));
         });
     });
 

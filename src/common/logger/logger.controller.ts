@@ -8,7 +8,7 @@ import { PERFORMANCE_LOGGER } from './performance-logger.provider';
 
 @Controller('logger')
 export class LoggerController {
-    private logDir = process.env.LOGGER_READ_DIR ||process.env.LOGGER_DIR || 'logs/';
+    private logDir = process.env.LOGGER_READ_DIR || process.env.LOGGER_DIR || 'logs/';
     constructor(
         private readonly logger: LoggerService,
         @Inject(PERFORMANCE_LOGGER) private readonly perfLogger: Logger,
@@ -72,9 +72,7 @@ export class LoggerController {
             // หาไฟล์ .log ทั้งหมดใน logs directory
             const logFiles = fs
                 .readdirSync(this.logDir)
-                .filter(
-                    (file) => file.endsWith('.log') && !file.endsWith('.gz'),
-                );
+                .filter((file) => file.endsWith('.log') && !file.endsWith('.gz'));
 
             for (const filename of logFiles) {
                 // ข้ามไฟล์ของวันนี้

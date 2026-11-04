@@ -16,11 +16,7 @@ export class GenerateIdService {
      * @param cond เงื่อนไข where (object) เช่น { status: 1 }
      * @returns number
      */
-    async generateId(
-        table: string,
-        col: string,
-        cond: Record<string, any> = {},
-    ): Promise<number> {
+    async generateId(table: string, col: string, cond: Record<string, any> = {}): Promise<number> {
         // สร้าง WHERE clause และ parameters
         let where = '';
         const params: any = {};

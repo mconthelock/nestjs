@@ -1,32 +1,25 @@
-﻿import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  OneToOne,
-  JoinColumn,
-  OneToMany,
-} from 'typeorm';
+﻿import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 
 @Entity({ name: 'SP_CURRENCY', schema: 'SPSYS' })
 export class Currency {
-  @PrimaryColumn()
-  CURR_YEAR: number;
+    @PrimaryColumn()
+    CURR_YEAR: number;
 
-  @PrimaryColumn()
-  CURR_PERIOD: number;
+    @PrimaryColumn()
+    CURR_PERIOD: number;
 
-  @PrimaryColumn()
-  CURR_CODE: string;
+    @PrimaryColumn()
+    CURR_CODE: string;
 
-  @Column({ type: 'decimal', precision: 7, scale: 3 })
-  CURR_RATE: number;
+    @Column({ type: 'decimal', precision: 7, scale: 3 })
+    CURR_RATE: number;
 
-  @Column()
-  CURR_LATEST: string;
+    @Column()
+    CURR_LATEST: string;
 
-  @Column()
-  CURR_UPDATE_DATE: Date;
+    @Column()
+    CURR_UPDATE_DATE: Date;
 
-  @Column()
-  CURR_UPDATE_BY: string;
+    @Column()
+    CURR_UPDATE_BY: string;
 }

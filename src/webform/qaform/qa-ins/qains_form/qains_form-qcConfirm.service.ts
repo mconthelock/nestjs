@@ -35,8 +35,8 @@ export class QainsFormQcConfirmService extends QainsFormService {
                 CYEAR2: dto.CYEAR2,
                 NRUNNO: dto.NRUNNO,
             };
-            var fr = dto.QCFOREMAN;
-            var ld = dto.QCLEADER;
+            let fr = dto.QCFOREMAN;
+            let ld = dto.QCLEADER;
             if (!fr) {
                 fr = ld;
             } else if (!ld) {
@@ -122,15 +122,13 @@ export class QainsFormQcConfirmService extends QainsFormService {
         });
         const item = data.QA_ITEM;
         let html = `<div style="font-size:14px; color:#000;">`;
-        const seccode = [
-            ...new Set(operator.map((o) => o.QOA_EMPNO_INFO.SSECCODE)),
-        ];
+        const seccode = [...new Set(operator.map((o) => o.QOA_EMPNO_INFO.SSECCODE))];
         // 2026-04-02 cc ไปหา qc auditor ด้วย**
         const auditor = await this.qainsOAService.searchQainsOA({
             ...form,
             QOA_TYPECODE: 'ESA',
         });
-        let auditorMails: string[] = [];
+        const auditorMails: string[] = [];
         for (const a of auditor) {
             const empInfo = await this.amecuserAllService.findEmp(a.QOA_EMPNO);
             if (!empInfo.status) continue;
@@ -142,9 +140,7 @@ export class QainsFormQcConfirmService extends QainsFormService {
                 VPOSNO: '30',
                 VORGNO: sec,
             });
-            const semInfo = await this.amecuserAllService.findEmp(
-                semEmpno[0].VEMPNO,
-            );
+            const semInfo = await this.amecuserAllService.findEmp(semEmpno[0].VEMPNO);
             if (!semInfo.status) {
                 continue;
             }

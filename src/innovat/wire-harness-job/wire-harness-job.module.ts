@@ -5,15 +5,8 @@ import { WireHarnessJobService } from './wire-harness-job.service';
 import { WireHarnessJobRepository } from './wire-harness-job.repository';
 
 @Module({
-    imports: [
-        ConectionModule,
-    ],
-    controllers: [
-        WireHarnessJobController,
-    ],
-    providers: [
-        WireHarnessJobService,
-        WireHarnessJobRepository,
-    ],
+    imports: [ConectionModule],
+    controllers: [WireHarnessJobController],
+    providers: [WireHarnessJobService, WireHarnessJobRepository],
 })
 export class WireHarnessJobModule {}

@@ -2,21 +2,21 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'A_TABLE_SYNC', schema: 'AMECMFG' })
 export class TableSync {
-  @PrimaryColumn()
-  GROUP_NAME: string;
+    @PrimaryColumn()
+    GROUP_NAME: string;
 
-  @Column()
-  SEQNO: string;
+    @Column()
+    SEQNO: string;
 
-  @Column()
-  RBA: string;
+    @Column()
+    RBA: string;
 
-  @Column()
-  AUDIT_TS: string;
+    @Column()
+    AUDIT_TS: string;
 
-  @Column()
-  LAST_UPDATE: string;
+    @Column()
+    LAST_UPDATE: string;
 
-  @Column()
-  ROWNUMS: string;
+    @Column()
+    ROWNUMS: string;
 }

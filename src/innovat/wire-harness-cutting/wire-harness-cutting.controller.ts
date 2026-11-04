@@ -9,9 +9,7 @@ import { DrumToStockDto } from './dto/drum-to-stock.dto';
 @ApiTags('Wire Harness')
 @Controller('innovat/wire-harness')
 export class WireHarnessCuttingController {
-    constructor(
-        private readonly service: WireHarnessCuttingService,
-    ) {}
+    constructor(private readonly service: WireHarnessCuttingService) {}
 
     @Get('process')
     @HttpCode(HttpStatus.OK)

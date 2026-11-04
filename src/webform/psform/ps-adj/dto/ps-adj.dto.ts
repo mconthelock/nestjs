@@ -30,10 +30,7 @@ export class ReasonValuesDto {
     CSTDESC?: string | null;
 }
 
-export class CreateReasonDto extends IntersectionType(
-    ReasonKeyDto,
-    ReasonValuesDto,
-) {}
+export class CreateReasonDto extends IntersectionType(ReasonKeyDto, ReasonValuesDto) {}
 export class UpdateReasonDto extends PartialType(ReasonValuesDto) {}
 export class FindReasonDto extends PartialType(ReasonKeyDto, {
     skipNullProperties: false,
@@ -143,10 +140,7 @@ export class OrderValuesDto {
     DESCRIBE?: string | null;
 }
 
-export class CreateOrderDto extends IntersectionType(
-    OrderKeyDto,
-    OrderValuesDto,
-) {}
+export class CreateOrderDto extends IntersectionType(OrderKeyDto, OrderValuesDto) {}
 export class UpdateOrderDto extends PartialType(OrderValuesDto) {}
 export class FindOrderDto extends PartialType(OrderKeyDto, {
     skipNullProperties: false,
@@ -193,10 +187,7 @@ export class FileValuesDto {
     SFILE?: string | null;
 }
 
-export class CreateFileDto extends IntersectionType(
-    FileKeyDto,
-    FileValuesDto,
-) {}
+export class CreateFileDto extends IntersectionType(FileKeyDto, FileValuesDto) {}
 export class UpdateFileDto extends PartialType(FileValuesDto) {}
 export class FindFileDto extends PartialType(FileKeyDto, {
     skipNullProperties: false,

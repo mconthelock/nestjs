@@ -5,9 +5,7 @@ import { SearchAuditReportMasterDto } from './dto/search-audit_report_master.dto
 
 @Controller('escs/audit-report-master')
 export class AuditReportMasterController {
-    constructor(
-        private readonly AuditReportMasterService: AuditReportMasterService,
-    ) {}
+    constructor(private readonly AuditReportMasterService: AuditReportMasterService) {}
 
     @Post('getAuditReportMaster')
     async getAuditReportMaster(@Body() dto: SearchAuditReportMasterDto) {

@@ -5,5 +5,5 @@ import 'reflect-metadata';
  * @returns CustomLabelDecorator
  */
 export const Label = (name: string) => {
-  return Reflect.metadata('custom:label', name);
+    return Reflect.metadata('custom:label', name);
 };

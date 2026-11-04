@@ -19,10 +19,7 @@ export class StinpFormListRepository extends BaseRepository {
         return this.getRepository(STINP_FORM_LIST).save(dto);
     }
 
-    async update(
-        condition: PrimaryKeyStinpFormListDto,
-        data: UpdateStinpFormListDto,
-    ) {
+    async update(condition: PrimaryKeyStinpFormListDto, data: UpdateStinpFormListDto) {
         return this.getRepository(STINP_FORM_LIST).update(condition, data);
     }
 
@@ -37,7 +34,7 @@ export class StinpFormListRepository extends BaseRepository {
             where: form,
             relations: {
                 IMAGE: true,
-            }
+            },
         });
     }
 

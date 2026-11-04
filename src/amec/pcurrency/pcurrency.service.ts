@@ -5,8 +5,8 @@ import { PcurrencyRepository } from './pcurrency.repository';
 
 @Injectable()
 export class PcurrencyService {
-  constructor(private readonly repo : PcurrencyRepository) {}
-  findCurrency() {
-    return this.repo.findCurrency();
-  } 
+    constructor(private readonly repo: PcurrencyRepository) {}
+    findCurrency() {
+        return this.repo.findCurrency();
+    }
 }

@@ -2,7 +2,7 @@ import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateFireItemDto {
-    @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
+    @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
     @IsString()
     @IsNotEmpty()
     @MaxLength(20)
@@ -32,6 +32,4 @@ export class CreateFireItemDto {
     @IsString()
     @MaxLength(1)
     STATUS?: string | null;
-
 }
-

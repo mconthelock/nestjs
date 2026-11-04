@@ -11,6 +11,17 @@ import { K850mpModule } from './k850mp/k850mp.module';
 import { IimModule } from './iim/iim.module';
 
 @Module({
-  imports: [F110kpModule, S011mpModule, F001kpModule, F002kpModule, M001KpbmModule, S020kpModule, S049kpModule, J002mpModule, K850mpModule, IimModule],
+    imports: [
+        F110kpModule,
+        S011mpModule,
+        F001kpModule,
+        F002kpModule,
+        M001KpbmModule,
+        S020kpModule,
+        S049kpModule,
+        J002mpModule,
+        K850mpModule,
+        IimModule,
+    ],
 })
 export class DatacenterModule {}

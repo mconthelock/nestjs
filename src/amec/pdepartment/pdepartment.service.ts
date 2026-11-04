@@ -18,9 +18,7 @@ export class PdepartmentService {
     private department = this.dataSource
         .getMetadata(Pdepartment)
         .columns.map((c) => c.propertyName);
-    private division = this.dataSource
-        .getMetadata(Pdivision)
-        .columns.map((c) => c.propertyName);
+    private division = this.dataSource.getMetadata(Pdivision).columns.map((c) => c.propertyName);
     private allowFields = [...this.department, ...this.division];
 
     getDepartmentAll() {
@@ -42,9 +40,7 @@ export class PdepartmentService {
 
     getDepartment(searchDto: SearchDepartmentDto) {
         const { SDEPCODE, SDIVCODE, fields = [] } = searchDto;
-        const query = this.dataSource
-            .createQueryBuilder()
-            .from('PDIVISION', 'A');
+        const query = this.dataSource.createQueryBuilder().from('PDIVISION', 'A');
 
         if (SDIVCODE) query.andWhere('A.SDIVCODE = :SDIVCODE', { SDIVCODE });
         if (SDEPCODE) query.andWhere('B.SDEPCODE = :SDEPCODE', { SDEPCODE });
@@ -63,11 +59,7 @@ export class PdepartmentService {
                 query.addSelect(`A.${f}`, f);
             }
         });
-        query.leftJoin(
-            'PDEPARTMENT',
-            'B',
-            'SUBSTR(SDIVCODE, 0, 2) = SUBSTR(SDEPCODE, 0, 2)',
-        );
+        query.leftJoin('PDEPARTMENT', 'B', 'SUBSTR(SDIVCODE, 0, 2) = SUBSTR(SDEPCODE, 0, 2)');
         query
             .andWhere('B.SDEPARTMENT NOT LIKE :department', {
                 department: '%Cancel%',

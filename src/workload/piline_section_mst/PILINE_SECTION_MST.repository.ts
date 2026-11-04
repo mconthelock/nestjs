@@ -23,19 +23,14 @@ export class PilineSectionMstRepository extends PilineCrudRepository<PILINE_SECT
             select: { SSECCODE: true, SSEC: true },
         });
         const names = new Map(
-            sections.map((section) => [
-                section.SSECCODE.trim(),
-                section.SSEC?.trim(),
-            ]),
+            sections.map((section) => [section.SSECCODE.trim(), section.SSEC?.trim()]),
         );
         return {
             status: true,
             data: result.data.map((section) => ({
                 ...section,
                 SSECCODE: section.SSECCODE.trim(),
-                SSEC:
-                    names.get(section.SSECCODE.trim()) ||
-                    section.SSECCODE.trim(),
+                SSEC: names.get(section.SSECCODE.trim()) || section.SSECCODE.trim(),
             })),
         };
     }

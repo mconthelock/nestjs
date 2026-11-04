@@ -5,21 +5,21 @@ import { SecpicService } from './secpic.service';
 
 @Controller('webform/secpic')
 export class SecpicController {
-  constructor(private readonly secpicService: SecpicService) {}
+    constructor(private readonly secpicService: SecpicService) {}
 
-  @Get()
-  findAll() {
-    return this.secpicService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.secpicService.findAll();
+    }
 
-  @Get(':secid')
-  findOne(@Param('secid') secid: number) {
-    return this.secpicService.findOne(secid);
-  }
+    @Get(':secid')
+    findOne(@Param('secid') secid: number) {
+        return this.secpicService.findOne(secid);
+    }
 
-  @Post('search')
-  @UseTransaction('mitsuConnection')
-  search(@Body() dto: FiltersDto) {
-    return this.secpicService.search(dto);
-  }
+    @Post('search')
+    @UseTransaction('mitsuConnection')
+    search(@Body() dto: FiltersDto) {
+        return this.secpicService.search(dto);
+    }
 }

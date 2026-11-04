@@ -6,9 +6,7 @@ import { PilineLocationMstService } from './PILINE_LOCATION_MST.service';
 import { PilineLocationMstRepository } from './PILINE_LOCATION_MST.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([PILINE_LOCATION_MST], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([PILINE_LOCATION_MST], 'mitsuConnection')],
     controllers: [PilineLocationMstController],
     providers: [PilineLocationMstService, PilineLocationMstRepository],
     exports: [PilineLocationMstService],

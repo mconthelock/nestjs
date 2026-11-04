@@ -4,7 +4,7 @@ import { IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateBusstopDto extends PartialType(CreateBusstopDto) {
-  @Type(() => Number)
-  @IsNumber()
-  STOP_ID: number;
+    @Type(() => Number)
+    @IsNumber()
+    STOP_ID: number;
 }

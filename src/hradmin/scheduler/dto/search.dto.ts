@@ -4,8 +4,8 @@ import { createSchdDto } from './create.dto';
 import { IsNumber, IsOptional } from 'class-validator';
 
 export class searchSchdDto extends PartialType(createSchdDto) {
-  @Type(() => Number)
-  @IsNumber()
-  @IsOptional()
-  TASKID: number;
+    @Type(() => Number)
+    @IsNumber()
+    @IsOptional()
+    TASKID: number;
 }

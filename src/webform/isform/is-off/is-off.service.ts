@@ -46,9 +46,7 @@ export class IsOffService {
         // }
 
         if (startDate) {
-            const startOfDayBangkok = dayjs(startDate)
-                .tz('Asia/Bangkok')
-                .startOf('day');
+            const startOfDayBangkok = dayjs(startDate).tz('Asia/Bangkok').startOf('day');
             queryBuilder.andWhere('off.OFF_DATE >= :startDate', {
                 startDate: startOfDayBangkok.toDate(),
             });

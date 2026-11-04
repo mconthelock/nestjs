@@ -8,13 +8,13 @@ import { ItemMfgListModule } from '../item-mfg-list/item-mfg-list.module';
 import { ItemMfgHistoryModule } from '../item-mfg-history/item-mfg-history.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ITEM_SHEET_MFG], 'mitsuConnection'),
-    ItemMfgListModule,
-    ItemMfgHistoryModule,
-  ],
-  controllers: [ItemSheetMfgController],
-  providers: [ItemSheetMfgService, ItemSheetMfgRepository],
-  exports: [ItemSheetMfgService],
+    imports: [
+        TypeOrmModule.forFeature([ITEM_SHEET_MFG], 'mitsuConnection'),
+        ItemMfgListModule,
+        ItemMfgHistoryModule,
+    ],
+    controllers: [ItemSheetMfgController],
+    providers: [ItemSheetMfgService, ItemSheetMfgRepository],
+    exports: [ItemSheetMfgService],
 })
 export class ItemSheetMfgModule {}

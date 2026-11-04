@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { StInpService } from './st-inp.service';
-import {
-    CorrectiveStInpDetailDto,
-    CorrectiveStInpDto,
-} from './dto/corrective-st-inp.dto';
+import { CorrectiveStInpDetailDto, CorrectiveStInpDto } from './dto/corrective-st-inp.dto';
 import { FlowService } from 'src/webform/flow/flow.service';
 import { StyTypeService } from 'src/gpreport/sty-type/sty-type.service';
 import { StyImageService } from 'src/gpreport/sty-image/sty-image.service';
@@ -69,9 +66,7 @@ export class StInpCorrectiveService extends StInpService {
                 message: 'Corrective action set successfully',
             };
         } catch (error) {
-            throw new Error(
-                `Failed to set corrective action: ${error.message}`,
-            );
+            throw new Error(`Failed to set corrective action: ${error.message}`);
         }
     }
 
@@ -100,15 +95,13 @@ export class StInpCorrectiveService extends StInpService {
             for (const list of dto.PA_LIST) {
                 const index = dto.PA_LIST.indexOf(list);
                 // insert and move image
-                const movedFile = await this.styImageService.moveAndInsertFiles(
-                    {
-                        file: files[index],
-                        path,
-                        userCreate: dto.EMPNO,
-                        typeId: styType.data[0].TYPE_ID,
-                        folder: formno,
-                    },
-                );
+                const movedFile = await this.styImageService.moveAndInsertFiles({
+                    file: files[index],
+                    path,
+                    userCreate: dto.EMPNO,
+                    typeId: styType.data[0].TYPE_ID,
+                    folder: formno,
+                });
                 movedTargets.push(...movedFile.path);
 
                 const existing = await this.stinpFormListService.findOne({
@@ -116,9 +109,7 @@ export class StInpCorrectiveService extends StInpService {
                     NID: list.PA_ID,
                 });
                 if (!existing.status) {
-                    throw new Error(
-                        `Form list item not found with ID: ${list.PA_ID}`,
-                    ); // ป้องกันกรณีที่มี PA_ID แต่ไม่เจอใน DB
+                    throw new Error(`Form list item not found with ID: ${list.PA_ID}`); // ป้องกันกรณีที่มี PA_ID แต่ไม่เจอใน DB
                 }
                 await this.stinpFormListService.update(
                     { ...form, NID: list.PA_ID },
@@ -131,11 +122,8 @@ export class StInpCorrectiveService extends StInpService {
                     },
                 );
                 if (existing.data.NIMAGE_AFTER) {
-                    await this.styImageService.delete(
-                        existing.data.NIMAGE_AFTER,
-                    ); // ลบไฟล์เก่า
+                    await this.styImageService.delete(existing.data.NIMAGE_AFTER); // ลบไฟล์เก่า
                 }
-                
             }
 
             if (dto.ACTION !== 'save') {
@@ -155,9 +143,7 @@ export class StInpCorrectiveService extends StInpService {
                 message: 'Corrective action detail set successfully',
             };
         } catch (error) {
-            throw new Error(
-                `Failed to set corrective action detail: ${error.message}`,
-            );
+            throw new Error(`Failed to set corrective action detail: ${error.message}`);
         }
     }
 }

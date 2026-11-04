@@ -1,11 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
 import { QAINS_FORM } from '../../webform/table/QAINS_FORM.entity';
 import { USERS_AUTHORIZE_VIEW } from '../views/USERS_AUTHORIZE_VIEW.entity';
 

@@ -7,14 +7,14 @@ const requestNamespace = createNamespace('request');
 
 @Injectable()
 export class RequestIdMiddleware implements NestMiddleware {
-  use(req: Request & { requestId?: string }, res: Response, next: NextFunction) {
-    const requestId = uuidv4();
-    req.requestId = requestId;
-    requestNamespace.run(() => {
-      requestNamespace.set('requestId', requestId);
-      next();
-    });
-  }
+    use(req: Request & { requestId?: string }, res: Response, next: NextFunction) {
+        const requestId = uuidv4();
+        req.requestId = requestId;
+        requestNamespace.run(() => {
+            requestNamespace.set('requestId', requestId);
+            next();
+        });
+    }
 }
 
 export { requestNamespace };

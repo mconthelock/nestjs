@@ -4,10 +4,10 @@ import { searchOslogs } from './dto/search.dto';
 
 @Controller('itgc/oslogs')
 export class OslogsController {
-  constructor(private readonly os: OslogsService) {}
+    constructor(private readonly os: OslogsService) {}
 
-  @Post('search')
-  async searchOslogs(@Body() data: searchOslogs) {
-    return this.os.searchOslogs(data);
-  }
+    @Post('search')
+    async searchOslogs(@Body() data: searchOslogs) {
+        return this.os.searchOslogs(data);
+    }
 }

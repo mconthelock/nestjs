@@ -56,9 +56,7 @@ export class AttcnfrmService {
         requestedBy: string;
     }) {
         // const path = d.path.endsWith('/') ? d.path : d.path + '/';
-        const destination = d.folder
-            ? await joinPaths(d.path, d.folder)
-            : d.path; // Get the destination path
+        const destination = d.folder ? await joinPaths(d.path, d.folder) : d.path; // Get the destination path
         const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
         for (const file of d.files) {
             file.originalname = file.originalname.replace(/\s+/g, '');

@@ -34,9 +34,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     async validate(req: Request, payload: any) {
         const user = await this.UsersService.findEmp(payload.sub); // 'sub' (subject) มักใช้เก็บ user ID
         if (!user) {
-            throw new UnauthorizedException(
-                'You have no permission to access data.',
-            );
+            throw new UnauthorizedException('You have no permission to access data.');
         }
 
         // Sliding expiration: renew the cookie while the user keeps calling the API

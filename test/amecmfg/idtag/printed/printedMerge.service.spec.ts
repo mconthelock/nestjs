@@ -25,9 +25,7 @@ describe('PrintedMergeService', () => {
             { extract: {} } as any,
         );
 
-        const promise = service.compressPdfWithGhostscript(
-            'C:/temp/input/my-file.pdf',
-        );
+        const promise = service.compressPdfWithGhostscript('C:/temp/input/my-file.pdf');
 
         process.nextTick(() => {
             child.emit('close', 0);
@@ -35,8 +33,8 @@ describe('PrintedMergeService', () => {
 
         await promise;
 
-        const outputArg = (spawn as jest.Mock).mock.calls[0][1].find(
-            (arg: string) => arg.startsWith('-sOutputFile='),
+        const outputArg = (spawn as jest.Mock).mock.calls[0][1].find((arg: string) =>
+            arg.startsWith('-sOutputFile='),
         );
 
         expect(outputArg).toContain('my-file.compressed-');

@@ -4,9 +4,7 @@ import { Type } from 'class-transformer';
 import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
 import { StringToDate } from 'src/common/utils/transform';
 
-export class UpdateStinpFormListDto extends PartialType(
-    CreateStinpFormListDto,
-) {
+export class UpdateStinpFormListDto extends PartialType(CreateStinpFormListDto) {
     @IsOptional()
     @IsString()
     @Type(() => String)

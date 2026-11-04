@@ -12,13 +12,6 @@ import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
 @Module({
     controllers: [IeTsController],
     providers: [IeTsService, IeTsApproveService],
-    imports: [
-        IetsFormModule,
-        IetsListModule,
-        FormModule,
-        VorgmstModule,
-        OrgposModule,
-        FlowModule,
-    ],
+    imports: [IetsFormModule, IetsListModule, FormModule, VorgmstModule, OrgposModule, FlowModule],
 })
 export class IeTsModule {}

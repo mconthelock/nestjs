@@ -5,7 +5,5 @@ import { UpdateAuditReportHistoryDto } from './dto/update-audit_report_history.d
 
 @Controller('audit-report-history')
 export class AuditReportHistoryController {
-  constructor(private readonly AuditReportHistoryService: AuditReportHistoryService) {}
-
- 
+    constructor(private readonly AuditReportHistoryService: AuditReportHistoryService) {}
 }

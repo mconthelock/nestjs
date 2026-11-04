@@ -16,10 +16,7 @@ import { FinDsService } from './fin-ds.service';
 import { CreateFinDFormdto } from './dto/create-fin-d.dto';
 import { ActionFinDDto } from './dto/action-fin-d.dto';
 
-import {
-    UseTransaction,
-    UseForceTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseTransaction, UseForceTransaction } from 'src/common/decorator/transaction.decorator';
 
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { getClientIP } from 'src/common/utils/ip.utils';
@@ -33,9 +30,7 @@ export class FinDsController {
     constructor(private readonly finDsService: FinDsService) {}
 
     @Get('report/:fyear')
-    findForShowReport(
-        @Param('fyear') fyear: string,
-    ) {
+    findForShowReport(@Param('fyear') fyear: string) {
         return this.finDsService.findForShowReport(Number(fyear));
     }
 
@@ -43,8 +38,6 @@ export class FinDsController {
     findBalance(@Param('fyear') fyear: string) {
         return this.finDsService.findBalance(Number(fyear));
     }
-
-
 
     @Get()
     findAll() {
@@ -57,7 +50,6 @@ export class FinDsController {
     findAllHeadForShow() {
         return this.finDsService.findAllHeadForShow();
     }
-
 
     // ดึงรายการเดียว พร้อม head/detail/files
     // ดึงรายการเดียว พร้อม head/detail/files

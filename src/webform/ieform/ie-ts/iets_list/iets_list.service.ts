@@ -15,13 +15,7 @@ export class IetsListService {
     async createMultipleLists(formDto: FormDto, lists: RequestIetsListeDto[]) {
         try {
             const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO } = formDto;
-            const currentMaxId = await this.repo.getMaxId(
-                NFRMNO,
-                VORGNO,
-                CYEAR,
-                CYEAR2,
-                NRUNNO,
-            );
+            const currentMaxId = await this.repo.getMaxId(NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO);
             let runningId = currentMaxId;
             // 3. วนลูปสร้างข้อมูล
             const listsToInsert = lists.map((item) => {

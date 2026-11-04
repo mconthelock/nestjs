@@ -12,11 +12,7 @@ import { S011mpModule } from 'src/datacenter/s011mp/s011mp.module';
 @Module({
     imports: [
         TypeOrmModule.forFeature(
-            [
-                DPMS_PACKING_LIST_MAIN,
-                DPMS_PACKING_LIST_DETAIL,
-                DPMS_PACKING_LIST_DETAIL_PO,
-            ],
+            [DPMS_PACKING_LIST_MAIN, DPMS_PACKING_LIST_DETAIL, DPMS_PACKING_LIST_DETAIL_PO],
             'mitsuConnection',
         ),
         // S001kpModule,

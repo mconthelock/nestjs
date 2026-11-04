@@ -5,21 +5,21 @@ import { WtypeService } from './wtype.service';
 
 @Controller('webform/wtype')
 export class WtypeController {
-  constructor(private readonly wtypeService: WtypeService) {}
+    constructor(private readonly wtypeService: WtypeService) {}
 
-  @Get()
-  findAll() {
-    return this.wtypeService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.wtypeService.findAll();
+    }
 
-  @Get(':tid')
-  findOne(@Param('tid') tid: number) {
-    return this.wtypeService.findOne(tid);
-  }
+    @Get(':tid')
+    findOne(@Param('tid') tid: number) {
+        return this.wtypeService.findOne(tid);
+    }
 
-  @Post('search')
-  @UseTransaction('mitsuConnection')
-  search(@Body() dto: FiltersDto) {
-    return this.wtypeService.search(dto);
-  }
+    @Post('search')
+    @UseTransaction('mitsuConnection')
+    search(@Body() dto: FiltersDto) {
+        return this.wtypeService.search(dto);
+    }
 }

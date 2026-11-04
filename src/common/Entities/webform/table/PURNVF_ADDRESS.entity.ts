@@ -1,12 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { PURNVF_FORM } from './PURNVF_FORM.entity';
 import { PUREVA_FORM } from './PUREVA_FORM.entity';
 import { PURVMM_FORM } from './PURVMM_FORM.entity';

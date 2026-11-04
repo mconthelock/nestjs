@@ -16,12 +16,9 @@ export class IsSefService {
     ) {}
 
     async insertForm(data: CreateIsSefDto, ip) {
-        const formmst =
-            await this.formmstService.getFormMasterByVaname('IS-SEF');
+        const formmst = await this.formmstService.getFormMasterByVaname('IS-SEF');
         if (!formmst) {
-            throw new Error(
-                'Form master not found for IS-SEF. Check FORMMST table.',
-            );
+            throw new Error('Form master not found for IS-SEF. Check FORMMST table.');
         }
         const createForm = await this.formCreateService.create(
             {
@@ -36,10 +33,7 @@ export class IsSefService {
         );
 
         if (!createForm?.status) {
-            const errMsg =
-                createForm?.message?.message ||
-                createForm?.message ||
-                'Unknown error';
+            const errMsg = createForm?.message?.message || createForm?.message || 'Unknown error';
             throw new Error(`Form creation failed: ${errMsg}`);
         }
 
@@ -83,12 +77,9 @@ export class IsSefService {
 
     async insertEmptyForm(data: CreateIsSefEmptyDto, ip) {
         try {
-            const formmst =
-                await this.formmstService.getFormMasterByVaname('IS-SEF');
+            const formmst = await this.formmstService.getFormMasterByVaname('IS-SEF');
             if (!formmst) {
-                throw new Error(
-                    'Form master not found for IS-SEF. Check FORMMST table.',
-                );
+                throw new Error('Form master not found for IS-SEF. Check FORMMST table.');
             }
             const createForm = await this.formCreateService.create(
                 {
@@ -105,9 +96,7 @@ export class IsSefService {
 
             if (!createForm?.status) {
                 const errMsg =
-                    createForm?.message?.message ||
-                    createForm?.message ||
-                    'Unknown error';
+                    createForm?.message?.message || createForm?.message || 'Unknown error';
                 throw new Error(`Form creation failed: ${errMsg}`);
             }
 

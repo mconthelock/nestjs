@@ -46,13 +46,7 @@ describe('TS automatic grouping and sequence allocation', () => {
         ]);
         expect(result.HEADERS).toHaveLength(1);
         expect(result.HEADERS[0]).toMatchObject({ GNO: null, LNO: null });
-        expect(
-            result.DETAILS.map((detail) => [
-                detail.GNO,
-                detail.LNO,
-                detail.SEQ_PROC,
-            ]),
-        ).toEqual([
+        expect(result.DETAILS.map((detail) => [detail.GNO, detail.LNO, detail.SEQ_PROC])).toEqual([
             [null, null, '01'],
             [null, null, '02'],
         ]);
@@ -64,10 +58,7 @@ describe('TS automatic grouping and sequence allocation', () => {
             form({ REQUEST_BY: '99999' }),
         ]);
         expect(groups).toHaveLength(2);
-        expect(groups[0].ITEMS.map((item) => item.PROCID_OLD)).toEqual([
-            'OLD001',
-            'OLD002',
-        ]);
+        expect(groups[0].ITEMS.map((item) => item.PROCID_OLD)).toEqual(['OLD001', 'OLD002']);
         expect(groups[1].REQUEST_BY).toBe('99999');
     });
     it('creates a header per drawing tuple and restarts process sequence per header', () => {
@@ -100,9 +91,7 @@ describe('TS automatic grouping and sequence allocation', () => {
                 ITEMNO: '002',
             },
         ]);
-        expect(
-            result.DETAILS.map(({ SEQ, SEQ_PROC }) => [SEQ, SEQ_PROC]),
-        ).toEqual([
+        expect(result.DETAILS.map(({ SEQ, SEQ_PROC }) => [SEQ, SEQ_PROC])).toEqual([
             ['001', '01'],
             ['001', '02'],
             ['002', '01'],
@@ -118,20 +107,12 @@ describe('TS automatic grouping and sequence allocation', () => {
         expect(result.DETAILS[0]).not.toHaveProperty('ITEM');
     });
     it('ignores ITEM and new process but distinguishes old process in duplicate identity', () => {
-        expect(processIdentity(row())).toEqual(
-            processIdentity(row({ ITEM: '002' })),
-        );
-        expect(processIdentity(row())).not.toEqual(
-            processIdentity(row({ PROCID_OLD: 'OLD002' })),
-        );
-        expect(processIdentity(row())).toEqual(
-            processIdentity(row({ PROCID: 'OTHER' })),
-        );
+        expect(processIdentity(row())).toEqual(processIdentity(row({ ITEM: '002' })));
+        expect(processIdentity(row())).not.toEqual(processIdentity(row({ PROCID_OLD: 'OLD002' })));
+        expect(processIdentity(row())).toEqual(processIdentity(row({ PROCID: 'OTHER' })));
     });
     it('rejects a new PROCID collision before inserting a form', () => {
-        expect(() =>
-            buildTsRows([row(), row({ PROCID_OLD: 'OLD002' })]),
-        ).toThrow('PROCID');
+        expect(() => buildTsRows([row(), row({ PROCID_OLD: 'OLD002' })])).toThrow('PROCID');
     });
     it('rejects sequence overflow rather than truncating values', () => {
         expect(() =>

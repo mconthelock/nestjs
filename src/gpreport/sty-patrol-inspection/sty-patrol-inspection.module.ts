@@ -6,9 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { StyPatrolInspectionRepository } from './sty-patrol-inspection.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([STY_PATROL_INSPECTION], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([STY_PATROL_INSPECTION], 'mitsuConnection')],
     controllers: [StyPatrolInspectionController],
     providers: [StyPatrolInspectionService, StyPatrolInspectionRepository],
     exports: [StyPatrolInspectionService],

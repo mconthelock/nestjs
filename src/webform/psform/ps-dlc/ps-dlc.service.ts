@@ -7,10 +7,7 @@ import { CreatePsdlcReqFormDto } from './dto/create-ps-dlc.dto';
 import { PSDLCRepository } from './ps-dlc.repository';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { PSDLCReportDto } from './dto/report-ps-dlc.dto';
-import {
-    UpdatedataPSDLCDto,
-    UpdateflowPSDLCDto,
-} from './dto/update-ps-dlc.dto';
+import { UpdatedataPSDLCDto, UpdateflowPSDLCDto } from './dto/update-ps-dlc.dto';
 import { MailService } from 'src/common/services/mail/mail.service';
 
 @Injectable()
@@ -29,12 +26,9 @@ export class PSDLCService {
             console.log(dto);
 
             // ดึงข้อมูล Form Master
-            const formmst =
-                await this.formmstService.getFormMasterByVaname('PS-DLC');
+            const formmst = await this.formmstService.getFormMasterByVaname('PS-DLC');
             if (!formmst) {
-                throw new Error(
-                    'Form master not found for PS-RP. Check FORMMST table.',
-                );
+                throw new Error('Form master not found for PS-RP. Check FORMMST table.');
             }
 
             // สร้าง Form
@@ -53,9 +47,7 @@ export class PSDLCService {
             // ตรวจสอบผลการสร้าง Form
             if (!createForm?.status) {
                 const errMsg =
-                    createForm?.message?.message ||
-                    createForm?.message ||
-                    'Unknown error';
+                    createForm?.message?.message || createForm?.message || 'Unknown error';
                 throw new Error(`Form creation failed: ${errMsg}`);
             }
             const form = {
@@ -81,17 +73,13 @@ export class PSDLCService {
             if (dto.DETAILS) {
                 try {
                     details =
-                        typeof dto.DETAILS === 'string'
-                            ? JSON.parse(dto.DETAILS)
-                            : dto.DETAILS;
+                        typeof dto.DETAILS === 'string' ? JSON.parse(dto.DETAILS) : dto.DETAILS;
 
                     if (!Array.isArray(details)) {
                         throw new Error('DETAILS must be an array');
                     }
                 } catch (error) {
-                    throw new Error(
-                        'Invalid DETAILS format. Must be a valid JSON array.',
-                    );
+                    throw new Error('Invalid DETAILS format. Must be a valid JSON array.');
                 }
             }
             // ==========================================
@@ -114,18 +102,16 @@ export class PSDLCService {
                 insertList.push(await this.repo.createDetails(dataTable));
             }
 
-            
-            const formNo = `${formmst.VANAME}${createForm.data.CYEAR2.slice(-2)}-${("000000" + createForm.data.NRUNNO).slice(-6)}`
+            const formNo = `${formmst.VANAME}${createForm.data.CYEAR2.slice(-2)}-${('000000' + createForm.data.NRUNNO).slice(-6)}`;
             await this.mailService.sendMail({
                 to: [
-                    "viyada@MitsubishiElevatorAsia.co.th",
-                    "anucha@MitsubishiElevatorAsia.co.th",
-                    "chatchawarnk@MitsubishiElevatorAsia.co.th",
-                    "chakkritv@MitsubishiElevatorAsia.co.th",
+                    'viyada@MitsubishiElevatorAsia.co.th',
+                    'anucha@MitsubishiElevatorAsia.co.th',
+                    'chatchawarnk@MitsubishiElevatorAsia.co.th',
+                    'chakkritv@MitsubishiElevatorAsia.co.th',
                     // 'punnawichs@mitsubishielevatorasia.co.th',
                 ],
-                subject:
-                    'Form Drawing list for change PN Production create Complete',
+                subject: 'Form Drawing list for change PN Production create Complete',
                 html: `<p>Dear PP Sect.</p>
                         <p style="text-indent: 2em;">Form No: ${formNo} </p>
                         <p style="text-indent: 2em;">New issue Drawing List for change PN production</p>

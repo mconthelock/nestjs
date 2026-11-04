@@ -1,16 +1,7 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 
 import { FINPCK_FORM } from './FINPCK_FORM.entity';
 import { FXA_GRPMST } from './FXA_GRMST.entity';
-
 
 @Entity({ name: 'FINPCK_ASSET', schema: 'WEBFORM' })
 export class FINPCK_ASSET {
@@ -93,13 +84,13 @@ export class FINPCK_ASSET {
     SUPPLIER: string;
 
     @Column()
-    PRNO : string;
+    PRNO: string;
 
     @Column()
-    BUDGETNO : string;
-    
+    BUDGETNO: string;
+
     @Column()
-    REQBY : string;   
+    REQBY: string;
 
     @Column()
     USINGLIFE: number;
@@ -121,22 +112,22 @@ export class FINPCK_ASSET {
 
     @Column()
     OTHCAUSE: number;
- 
-    @Column()
-    REMOTHCAUSE : string;   
 
     @Column()
-    PIC : string;   
+    REMOTHCAUSE: string;
 
-  @ManyToOne(() => FINPCK_FORM, (pckf) => pckf.ASSETS)
-  @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
-  @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
-  @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
-  @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
-  @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
-  MASTER_PCKFORM: FINPCK_FORM;
+    @Column()
+    PIC: string;
 
-  @OneToOne(() => FXA_GRPMST)
-  @JoinColumn({ name: 'GRPCODE', referencedColumnName: 'GRPCODE' })
-  GRP: FXA_GRPMST;  
+    @ManyToOne(() => FINPCK_FORM, (pckf) => pckf.ASSETS)
+    @JoinColumn({ name: 'NFRMNO', referencedColumnName: 'NFRMNO' })
+    @JoinColumn({ name: 'VORGNO', referencedColumnName: 'VORGNO' })
+    @JoinColumn({ name: 'CYEAR', referencedColumnName: 'CYEAR' })
+    @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
+    @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
+    MASTER_PCKFORM: FINPCK_FORM;
+
+    @OneToOne(() => FXA_GRPMST)
+    @JoinColumn({ name: 'GRPCODE', referencedColumnName: 'GRPCODE' })
+    GRP: FXA_GRPMST;
 }

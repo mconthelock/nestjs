@@ -1,12 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-    IsDate,
-    IsEnum,
-    IsNotEmpty,
-    IsNumber,
-    IsOptional,
-    IsString,
-} from 'class-validator';
+import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class PcpDetailsDto {
     @IsNotEmpty()
@@ -312,7 +305,6 @@ export class PcpDetailsDto {
 }
 
 export class CreatePcpDetailsDto extends PcpDetailsDto {
-
     @IsNotEmpty()
     @IsString()
     @Type(() => String)

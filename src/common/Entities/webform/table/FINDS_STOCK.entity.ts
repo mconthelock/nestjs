@@ -4,14 +4,14 @@ import { FORM } from './FORM.entity';
 @Entity({ name: 'FINDS_ATTACH', schema: 'WEBFORM' })
 export class DSSTOCK {
     @PrimaryColumn()
-    FISCAL_YEAR : string;
+    FISCAL_YEAR: string;
 
     @Column()
     DATE_RECEIVE: string;
 
     @Column()
     DUTY_VALUE: number;
-    
+
     @Column()
     OPTION_CODE: string;
 
@@ -32,15 +32,14 @@ export class DSSTOCK {
 
     @Column()
     BAL_AMOUNT: number;
-
 }
-    // FISCAL_YEAR 
-    // DATE_RECEIVE
-    // DUTY_VALUE
-    // OPTION_CODE
-    // IN_QTY
-    // IN_AMOUNT
-    // OUT_QTY
-    // OUT_AMOUNT
-    // BAL_QTY 
-    // BAL_AMOUNT
+// FISCAL_YEAR
+// DATE_RECEIVE
+// DUTY_VALUE
+// OPTION_CODE
+// IN_QTY
+// IN_AMOUNT
+// OUT_QTY
+// OUT_AMOUNT
+// BAL_QTY
+// BAL_AMOUNT

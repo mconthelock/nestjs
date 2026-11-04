@@ -1,4 +1,4 @@
 export interface pkForm {
-    CYEAR2: string,
-    NRUNNO: number
+    CYEAR2: string;
+    NRUNNO: number;
 }

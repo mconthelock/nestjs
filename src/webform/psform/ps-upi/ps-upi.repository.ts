@@ -110,7 +110,11 @@ export class PsUpiRepository extends BaseRepository {
             .createQueryBuilder('REQ')
             .select('REQ.*,WHI_USER.SNAME as WHI_USER_NAME')
             .leftJoin(User, 'WHI_USER', 'WHI_USER.SEMPNO = REQ.WHI_USER')
-            .leftJoin(FORM, 'F', 'F.NFRMNO = REQ.NFRMNO AND F.VORGNO = REQ.VORGNO AND F.CYEAR = REQ.CYEAR AND F.CYEAR2 = REQ.CYEAR2 AND F.NRUNNO = REQ.NRUNNO')
+            .leftJoin(
+                FORM,
+                'F',
+                'F.NFRMNO = REQ.NFRMNO AND F.VORGNO = REQ.VORGNO AND F.CYEAR = REQ.CYEAR AND F.CYEAR2 = REQ.CYEAR2 AND F.NRUNNO = REQ.NRUNNO',
+            )
             .where('REQ.NFRMNO = :NFRMNO', { NFRMNO: formmst.NNO })
             .andWhere('REQ.VORGNO = :VORGNO', { VORGNO: formmst.VORGNO })
             .andWhere('REQ.CYEAR = :CYEAR', { CYEAR: formmst.CYEAR });

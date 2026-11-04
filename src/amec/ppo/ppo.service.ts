@@ -8,24 +8,24 @@ import { SearchPpoDto } from './dto/search-ppo.dto';
 
 @Injectable()
 export class PpoService {
-  constructor(
-    @InjectRepository(PPO, 'mitsuConnection')
-    private repo: Repository<PPO>,
-    @InjectDataSource('mitsuConnection')
-    private dataSource: DataSource,
-  ) {}
+    constructor(
+        @InjectRepository(PPO, 'mitsuConnection')
+        private repo: Repository<PPO>,
+        @InjectDataSource('mitsuConnection')
+        private dataSource: DataSource,
+    ) {}
 
-  findAll() {
-    return this.repo.find();
-  }
+    findAll() {
+        return this.repo.find();
+    }
 
-  findOne(po: string) {
-    return this.repo.findOneBy({ SPONO: po });
-  }
+    findOne(po: string) {
+        return this.repo.findOneBy({ SPONO: po });
+    }
 
-  search(dto: SearchPpoDto) {
-    return this.repo.findBy({
-      ...dto,
-    });
-  }
+    search(dto: SearchPpoDto) {
+        return this.repo.findBy({
+            ...dto,
+        });
+    }
 }

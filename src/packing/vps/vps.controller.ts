@@ -25,9 +25,7 @@ export class VPSController {
     @ApiOperation({ summary: 'Validate VIS and return PIS list' })
     @ApiBody({ type: PackVISDto })
     @ApiResponse({ status: 200, type: PackResultDto })
-    async checkVIS(
-        @Body() body: PackVISDto
-    ): Promise<PackResultDto> {
+    async checkVIS(@Body() body: PackVISDto): Promise<PackResultDto> {
         return this.service.checkVIS(body.vis, body.userId, body.useLocaltb);
     }
 
@@ -41,9 +39,7 @@ export class VPSController {
     @ApiOperation({ summary: 'Validate and save PIS for VIS' })
     @ApiBody({ type: PackPISDto })
     @ApiResponse({ status: 200, type: PackResultDto })
-    async confirmPIS(
-        @Body() body: PackPISDto
-    ): Promise<PackResultDto> {
+    async confirmPIS(@Body() body: PackPISDto): Promise<PackResultDto> {
         return this.service.checkPIS(body.vis, body.pis, body.userId);
     }
 
@@ -56,9 +52,7 @@ export class VPSController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Validate shipping mark and close VIS' })
     @ApiResponse({ status: 200, type: PackResultDto })
-    async checkCloseVIS(
-        @Body() body: PackCloseVISDto
-    ): Promise<PackResultDto> {
+    async checkCloseVIS(@Body() body: PackCloseVISDto): Promise<PackResultDto> {
         return this.service.checkCloseVIS(body.vis, body.shipcode, body.userId);
     }
 
@@ -71,9 +65,7 @@ export class VPSController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get lost items for a VIS' })
     @ApiResponse({ status: 200, type: PackResultDto })
-    async lostItem(
-        @Body() body: PackVISDto
-    ): Promise<PackResultDto> {
+    async lostItem(@Body() body: PackVISDto): Promise<PackResultDto> {
         return this.service.getLostItem(body.vis, body.userId);
     }
 
@@ -86,10 +78,7 @@ export class VPSController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Clear block from order number and block number' })
     @ApiResponse({ status: 200, type: PackResultDto })
-    async clearBlock(
-        @Body() body: ClearBlockDto
-    ): Promise<PackResultDto> {
+    async clearBlock(@Body() body: ClearBlockDto): Promise<PackResultDto> {
         return this.service.clearBlock(body.orderno, body.block);
     }
-
 }

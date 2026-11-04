@@ -48,4 +48,3 @@ export class CreateYearlyFormDto {
     @IsNotEmpty()
     INPUTBY: string;
 }
-

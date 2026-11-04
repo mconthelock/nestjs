@@ -1,11 +1,4 @@
-import {
-    Body,
-    Controller,
-    Post,
-    UseGuards,
-    Request,
-    Res,
-} from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, Request, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { TwidocService } from './twidoc.service';
@@ -49,8 +42,7 @@ export class TwidocController {
         const key = await this.dbService.decrypt(req.user.user);
         const pdfkey = key.split(':')[3];
         let passkey = pdfkey;
-        if (data.TWITYPE !== 'MP')
-            passkey = `${pdfkey.substring(4, 8)}${pdfkey.substring(0, 4)}`;
+        if (data.TWITYPE !== 'MP') passkey = `${pdfkey.substring(4, 8)}${pdfkey.substring(0, 4)}`;
         return this.docs.createFile({ ...data, passkey });
     }
 
@@ -63,10 +55,7 @@ export class TwidocController {
             'Content-Type',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         );
-        res.setHeader(
-            'Content-Disposition',
-            'attachment; filename="report.xlsx"',
-        );
+        res.setHeader('Content-Disposition', 'attachment; filename="report.xlsx"');
         res.send(Buffer.from(buffer));
     }
 

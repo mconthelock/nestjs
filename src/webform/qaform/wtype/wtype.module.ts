@@ -8,9 +8,9 @@ import { WtypeRepository } from './wtype.repository';
 import { WtypeService } from './wtype.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([WTYPE], 'mitsuConnection')],
-  controllers: [WtypeController],
-  providers: [WtypeService, WtypeRepository],
-  exports: [WtypeService],
+    imports: [TypeOrmModule.forFeature([WTYPE], 'mitsuConnection')],
+    controllers: [WtypeController],
+    providers: [WtypeService, WtypeRepository],
+    exports: [WtypeService],
 })
 export class WtypeModule {}

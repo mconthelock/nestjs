@@ -5,6 +5,5 @@ import { UpdateUsersFileDto } from './dto/update-user-file.dto';
 
 @Controller('escs/user-file')
 export class UsersFileController {
-  constructor(private readonly userFileService: UsersFileService) {}
-  
+    constructor(private readonly userFileService: UsersFileService) {}
 }

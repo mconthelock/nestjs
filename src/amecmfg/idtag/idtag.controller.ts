@@ -1,12 +1,4 @@
-﻿import {
-    Body,
-    Controller,
-    Get,
-    Param,
-    Post,
-    UploadedFiles,
-    UseInterceptors,
-} from '@nestjs/common';
+﻿import { Body, Controller, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
@@ -71,9 +63,7 @@ export class IdtagController {
             .map((item) => {
                 const newItem = { ...item };
                 newItem.tags = item.tags.filter((tag) => {
-                    return tag.process.some(
-                        (pc) => pc.F02R03.substring(0, 2) === shop,
-                    );
+                    return tag.process.some((pc) => pc.F02R03.substring(0, 2) === shop);
                 });
                 return newItem;
             })

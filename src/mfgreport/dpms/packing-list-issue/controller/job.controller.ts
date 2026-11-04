@@ -6,9 +6,10 @@ import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 
 @Controller('mfgreport/dpms/packing-list-issue/job')
 export class JobController {
-    constructor(private readonly marService: MarReportService,
+    constructor(
+        private readonly marService: MarReportService,
         private readonly reviseVgmService: ReviseVgmService,
-        private readonly mailAlertPurService: MailAlertPurService
+        private readonly mailAlertPurService: MailAlertPurService,
     ) {}
 
     // สำหรับ run job แบบอัตโนมัติ ช่วงเวลา 15:00-08:00

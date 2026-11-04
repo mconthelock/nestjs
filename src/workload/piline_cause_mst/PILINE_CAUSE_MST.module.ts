@@ -6,9 +6,7 @@ import { PilineCauseMstService } from './PILINE_CAUSE_MST.service';
 import { PilineCauseMstRepository } from './PILINE_CAUSE_MST.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([PILINE_CAUSE_MST], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([PILINE_CAUSE_MST], 'mitsuConnection')],
     controllers: [PilineCauseMstController],
     providers: [PilineCauseMstService, PilineCauseMstRepository],
     exports: [PilineCauseMstService],

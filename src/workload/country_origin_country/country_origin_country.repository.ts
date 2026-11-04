@@ -20,9 +20,7 @@ export class CountryOriginCountryRepository extends BaseRepository {
             .getRawMany();
     }
 
-    async save(
-        data: CreateCountryOriginCountryDto | CreateCountryOriginCountryDto[],
-    ) {
+    async save(data: CreateCountryOriginCountryDto | CreateCountryOriginCountryDto[]) {
         if (Array.isArray(data)) {
             const bulkCodes = [...new Set(data.map((item) => item.BULKCODE))];
             const CHUNK_SIZE = 500;

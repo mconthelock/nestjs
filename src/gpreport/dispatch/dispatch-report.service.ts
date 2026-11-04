@@ -41,11 +41,7 @@ export class DispatchReportService {
         const passengers = await this.dataSource
             .getRepository(BusDispatchPassenger)
             .createQueryBuilder('p')
-            .leftJoin(
-                'AMECUSERALL',
-                'u',
-                'TRIM(TO_CHAR(u.SEMPNO)) = TRIM(TO_CHAR(p.EMPNO))',
-            )
+            .leftJoin('AMECUSERALL', 'u', 'TRIM(TO_CHAR(u.SEMPNO)) = TRIM(TO_CHAR(p.EMPNO))')
             .select('p.EMPNO', 'empno')
             .addSelect('p.STOP_ID', 'stop_id')
             .addSelect('u.STNAME', 'fullname')
@@ -63,9 +59,7 @@ export class DispatchReportService {
                 .filter((s) => Number(s.LINE_ID) === Number(line.BUSID))
                 .map((stop) => {
                     const stopPassengers = passengers
-                        .filter(
-                            (p) => Number(p.stop_id) === Number(stop.STOP_ID),
-                        )
+                        .filter((p) => Number(p.stop_id) === Number(stop.STOP_ID))
                         .map((p, index) => ({
                             no: index + 1,
                             empno: p.empno || '',
@@ -112,11 +106,7 @@ export class DispatchReportService {
                 's',
                 's.DISPATCH_ID = p.DISPATCH_ID AND s.STOP_ID = p.STOP_ID',
             )
-            .leftJoin(
-                'AMECUSERALL',
-                'u',
-                'TRIM(TO_CHAR(u.SEMPNO)) = TRIM(TO_CHAR(p.EMPNO))',
-            )
+            .leftJoin('AMECUSERALL', 'u', 'TRIM(TO_CHAR(u.SEMPNO)) = TRIM(TO_CHAR(p.EMPNO))')
             .select('p.EMPNO', 'empno')
             .addSelect('s.STOP_NAME', 'stop_name')
             .addSelect('s.PLAN_TIME', 'plan_time')

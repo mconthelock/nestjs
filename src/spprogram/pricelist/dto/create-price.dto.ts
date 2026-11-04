@@ -1,62 +1,55 @@
 import { Type } from 'class-transformer';
-import {
-  IsString,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsDateString,
-  IsDate,
-} from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional, IsDateString, IsDate } from 'class-validator';
 
 export class createPriceListDto {
-  @Type(() => Number)
-  @IsNumber()
-  @IsNotEmpty()
-  FYYEAR: number;
+    @Type(() => Number)
+    @IsNumber()
+    @IsNotEmpty()
+    FYYEAR: number;
 
-  @IsString()
-  @IsNotEmpty()
-  PERIOD: string;
+    @IsString()
+    @IsNotEmpty()
+    PERIOD: string;
 
-  @Type(() => Number)
-  @IsNumber()
-  @IsNotEmpty()
-  ITEM: number;
+    @Type(() => Number)
+    @IsNumber()
+    @IsNotEmpty()
+    ITEM: number;
 
-  @IsString()
-  STATUS: string;
+    @IsString()
+    STATUS: string;
 
-  @Type(() => Date)
-  @IsDate()
-  STARTIN: Date;
+    @Type(() => Date)
+    @IsDate()
+    STARTIN: Date;
 
-  @Type(() => Number)
-  @IsNumber()
-  @IsOptional()
-  INQUIRY: number;
+    @Type(() => Number)
+    @IsNumber()
+    @IsOptional()
+    INQUIRY: number;
 
-  @Type(() => Number)
-  @IsNumber()
-  @IsNotEmpty()
-  FCCOST: number;
+    @Type(() => Number)
+    @IsNumber()
+    @IsNotEmpty()
+    FCCOST: number;
 
-  @Type(() => Number)
-  @IsNumber()
-  @IsNotEmpty()
-  FCBASE: number;
+    @Type(() => Number)
+    @IsNumber()
+    @IsNotEmpty()
+    FCBASE: number;
 
-  @Type(() => Number)
-  @IsNumber()
-  @IsNotEmpty()
-  TCCOST: number;
+    @Type(() => Number)
+    @IsNumber()
+    @IsNotEmpty()
+    TCCOST: number;
 
-  @IsString()
-  LATEST: string;
+    @IsString()
+    LATEST: string;
 
-  @Type(() => Date)
-  @IsDate()
-  CREATE_AT: Date;
+    @Type(() => Date)
+    @IsDate()
+    CREATE_AT: Date;
 
-  @IsString()
-  CREATE_BY: string;
+    @IsString()
+    CREATE_BY: string;
 }

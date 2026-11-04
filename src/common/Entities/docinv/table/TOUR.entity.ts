@@ -8,7 +8,7 @@ export class TOUR {
     @Column()
     NAME: string;
 
-    @Column({type: 'decimal'})
+    @Column({ type: 'decimal' })
     VERSION: number;
 
     @Column()

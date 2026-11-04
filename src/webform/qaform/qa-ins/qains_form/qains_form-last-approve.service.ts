@@ -99,22 +99,17 @@ export class QainsFormLastApproveService extends QainsFormService {
                         const station = p.QOA_STATION.split('|');
                         for (const s of station) {
                             const stationNo = parseInt(s);
-                            const stationData =
-                                await this.escsItemStationService.searchItemStation(
-                                    { ITS_NO: stationNo },
-                                );
-                            const stationName =
-                                stationData.length > 0
-                                    ? stationData[0].ITS_STATION_NAME
-                                    : '';
-                            await this.escsUserItemStationService.addUserItemStation(
-                                {
-                                    US_USER: p.QOA_EMPNO,
-                                    US_ITEM: formData.QA_ITEM,
-                                    US_STATION: stationName,
-                                    US_STATION_NO: stationNo,
-                                },
+                            const stationData = await this.escsItemStationService.searchItemStation(
+                                { ITS_NO: stationNo },
                             );
+                            const stationName =
+                                stationData.length > 0 ? stationData[0].ITS_STATION_NAME : '';
+                            await this.escsUserItemStationService.addUserItemStation({
+                                US_USER: p.QOA_EMPNO,
+                                US_ITEM: formData.QA_ITEM,
+                                US_STATION: stationName,
+                                US_STATION_NO: stationNo,
+                            });
                             stationList.push({ stationNo, stationName });
                         }
                     }
@@ -269,7 +264,7 @@ export class QainsFormLastApproveService extends QainsFormService {
             stampMfgSem = '',
             stampMfgFr = '';
         // set list and checked
-        var listItem = `<li>4.1 ${formData.QA_ITEM}</li>`;
+        let listItem = `<li>4.1 ${formData.QA_ITEM}</li>`;
         if (stations && stations.length > 0) {
             for (const [index, s] of stations.entries()) {
                 if (index == 0) {
@@ -526,8 +521,8 @@ export class QainsFormLastApproveService extends QainsFormService {
 
     async sendMailAuthurize(data: QAINS_FORM, pass: any) {
         if (pass.length == 0) return;
-        let to = [];
-        let cc = [];
+        const to = [];
+        const cc = [];
 
         // get flow
         const flow = await this.flowService.getFlow({
@@ -548,8 +543,7 @@ export class QainsFormLastApproveService extends QainsFormService {
                     to.push(semInfo.data.SRECMAIL);
                     break;
                 default:
-                    if (!cc.includes(semInfo.data.SRECMAIL))
-                        cc.push(semInfo.data.SRECMAIL);
+                    if (!cc.includes(semInfo.data.SRECMAIL)) cc.push(semInfo.data.SRECMAIL);
                     break;
             }
         }
@@ -564,7 +558,7 @@ export class QainsFormLastApproveService extends QainsFormService {
         </tr>`;
         }
 
-        let html = `
+        const html = `
         <!DOCTYPE html>
             <html lang="en">
                 <head>

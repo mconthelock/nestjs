@@ -1,13 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-    Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { J736kpService } from './j736kp.service';
 
 @Controller('as400/j736kp')
@@ -15,10 +6,7 @@ export class J736kpController {
     constructor(private readonly j736kpService: J736kpService) {}
 
     @Get('search')
-    async findByInvPuritm(
-        @Query('inv') inv: string,
-        @Query('puritm') puritm: string,
-    ) {
+    async findByInvPuritm(@Query('inv') inv: string, @Query('puritm') puritm: string) {
         if (!inv || !puritm) {
             return {
                 success: true,

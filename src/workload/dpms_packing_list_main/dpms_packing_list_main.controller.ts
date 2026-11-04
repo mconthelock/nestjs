@@ -3,9 +3,7 @@ import { DpmsPackingListMainService } from './dpms_packing_list_main.service';
 
 @Controller('workload/dpms-packing-list-main')
 export class DpmsPackingListMainController {
-    constructor(
-        private readonly service: DpmsPackingListMainService,
-    ) {}
+    constructor(private readonly service: DpmsPackingListMainService) {}
 
     @Get(':mfgNo')
     findPackingListByMfgNo(@Param('mfgNo') mfgNo: string) {

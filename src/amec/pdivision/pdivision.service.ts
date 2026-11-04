@@ -14,9 +14,7 @@ export class PdivisionService {
         private dataSource: DataSource,
     ) {}
 
-    private division = this.dataSource
-        .getMetadata(Pdivision)
-        .columns.map((c) => c.propertyName);
+    private division = this.dataSource.getMetadata(Pdivision).columns.map((c) => c.propertyName);
     private allowFields = [...this.division];
 
     getDivisionAll() {
@@ -38,9 +36,7 @@ export class PdivisionService {
 
     getDivision(searchDto: SearchDivisionDto) {
         const { SDIVCODE, fields = [] } = searchDto;
-        const query = this.dataSource
-            .createQueryBuilder()
-            .from('PDIVISION', 'A');
+        const query = this.dataSource.createQueryBuilder().from('PDIVISION', 'A');
 
         if (SDIVCODE) query.andWhere('A.SDIVCODE = :SDIVCODE', { SDIVCODE });
 

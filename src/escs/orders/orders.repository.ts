@@ -7,16 +7,12 @@ import { ORDERS } from 'src/common/Entities/escs/table/ORDERS.entity';
 
 @Injectable()
 export class OrdersRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     async checkOrderPartSupply(dto: SearchOrderDto) {
-        const query = this.manager
-            .getRepository(ORDERS)
-            .createQueryBuilder('orders');
+        const query = this.manager.getRepository(ORDERS).createQueryBuilder('orders');
         if (dto.ORD_NO)
             query.andWhere('orders.ORD_NO like :ordNo', {
                 ordNo: `%${dto.ORD_NO}%`,
@@ -34,7 +30,5 @@ export class OrdersRepository extends BaseRepository {
             "((orders.ORT_ID = 5 AND NOT(ORD_NO LIKE 'ET9%' AND ORD_MODEL='VPC')) OR (ORT_ID IN (4,6)))",
         );
         return await query.getMany();
-
-       
     }
 }

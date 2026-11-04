@@ -26,10 +26,7 @@ export class PilineEventRecordController {
     }
     @Patch(':PILINE_NO')
     @UseTransaction('mitsuConnection')
-    update(
-        @Param() key: KeyPilineEventRecordDto,
-        @Body() dto: UpdatePilineEventRecordDto,
-    ) {
+    update(@Param() key: KeyPilineEventRecordDto, @Body() dto: UpdatePilineEventRecordDto) {
         return this.service.update(key, dto);
     }
     @Delete(':PILINE_NO')

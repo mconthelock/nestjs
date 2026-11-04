@@ -5,8 +5,8 @@ import { ShortageRepository } from './shortage.repository';
 import { ConectionModule } from 'src/as400/conection/conection.module';
 
 @Module({
-  controllers: [ShortageController],
-  providers: [ShortageService, ShortageRepository],
-  imports: [ConectionModule],
+    controllers: [ShortageController],
+    providers: [ShortageService, ShortageRepository],
+    imports: [ConectionModule],
 })
-export class ShortageModule { }
+export class ShortageModule {}

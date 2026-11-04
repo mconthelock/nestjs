@@ -8,24 +8,24 @@ import { updateItemCustomerDto } from './dto/update-item-customer.dto';
 
 @Injectable()
 export class ItemsCustomerService {
-  constructor(
-    @InjectRepository(ItemsCustomer, 'mitsuConnection')
-    private readonly itemscus: Repository<ItemsCustomer>,
-  ) {}
+    constructor(
+        @InjectRepository(ItemsCustomer, 'mitsuConnection')
+        private readonly itemscus: Repository<ItemsCustomer>,
+    ) {}
 
-  findAll(data: any) {
-    return this.itemscus.find({ relations: ['prices'] });
-  }
+    findAll(data: any) {
+        return this.itemscus.find({ relations: ['prices'] });
+    }
 
-  crete(data: createItemCustomerDto) {
-    return this.itemscus.save(data);
-  }
+    crete(data: createItemCustomerDto) {
+        return this.itemscus.save(data);
+    }
 
-  update(data: updateItemCustomerDto) {
-    return this.itemscus.save(data);
-  }
+    update(data: updateItemCustomerDto) {
+        return this.itemscus.save(data);
+    }
 
-  delete(cusId: number, itemId: number) {
-    return this.itemscus.delete({ CUSTOMER_ID: cusId, ITEMS_ID: itemId });
-  }
+    delete(cusId: number, itemId: number) {
+        return this.itemscus.delete({ CUSTOMER_ID: cusId, ITEMS_ID: itemId });
+    }
 }

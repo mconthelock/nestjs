@@ -1,12 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-    ManyToOne,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn, ManyToOne } from 'typeorm';
 import { PUREVA_FORM } from './PUREVA_FORM.entity';
 
 @Entity({ name: 'PUREVA_PROFIT_TURNOVER', schema: 'WEBFORM' })

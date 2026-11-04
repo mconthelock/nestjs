@@ -1,11 +1,4 @@
-import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    OneToOne,
-    JoinColumn,
-    OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 import { MFG_DRAWING_ACTION } from './MFG_DRAWING_ACTION.entity';
 import { AMECUSERALL } from '../../amec/views/AMECUSERALL.entity';
 import { AUDIT_REPORT_REVISION } from './AUDIT_REPORT_REVISION.entity';

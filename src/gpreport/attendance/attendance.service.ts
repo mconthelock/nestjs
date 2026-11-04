@@ -36,11 +36,7 @@ export class AttendanceService {
         const attendanceOut = await qtimeout.getMany();
 
         const qadjust = this.adjust.createQueryBuilder('adjust');
-        await applyDynamicFilters(
-            qadjust,
-            searchCriteria?.workAdjust,
-            'adjust',
-        );
+        await applyDynamicFilters(qadjust, searchCriteria?.workAdjust, 'adjust');
         const workAdjust = await qadjust.getMany();
         return {
             attendanceIn,

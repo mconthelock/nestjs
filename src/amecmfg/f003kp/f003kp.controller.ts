@@ -5,5 +5,5 @@ import { ApiExcludeController } from '@nestjs/swagger';
 @ApiExcludeController()
 @Controller('f003kp')
 export class F003kpController {
-  constructor(private readonly f003kpService: F003kpService) {}
+    constructor(private readonly f003kpService: F003kpService) {}
 }

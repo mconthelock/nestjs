@@ -1,11 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-    IsString,
-    IsOptional,
-    IsDate,
-    IsNumber,
-    IsNotEmpty,
-} from 'class-validator';
+import { IsString, IsOptional, IsDate, IsNumber, IsNotEmpty } from 'class-validator';
 
 export class CreateAnnualDetailDto {
     @IsNumber()

@@ -3,9 +3,7 @@ import { VendorsService } from 'src/pursys/vendors/vendors.service';
 
 describe('VendorsController', () => {
     let controller: VendorsController;
-    let vendorsService: jest.Mocked<
-        Pick<VendorsService, 'search' | 'create' | 'nextVendor'>
-    >;
+    let vendorsService: jest.Mocked<Pick<VendorsService, 'search' | 'create' | 'nextVendor'>>;
 
     beforeEach(() => {
         vendorsService = {

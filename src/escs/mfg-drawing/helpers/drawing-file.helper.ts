@@ -26,7 +26,7 @@ export class DrawingFileHelper {
             if (!(data && data.NINSPECTOR_STATUS == 1 && data.NSTATUS == 1)) {
                 return;
             }
-            
+
             let shouldCopy = true;
             const file = await this.getExcelFile(masterFilename, masterPath);
             newFilename = `${newFilename}.${file.extension}`;
@@ -37,11 +37,7 @@ export class DrawingFileHelper {
             }
 
             if (shouldCopy) {
-                await copyFile(
-                    file.path,
-                    newPath,
-                    newFilename,
-                );
+                await copyFile(file.path, newPath, newFilename);
             }
 
             await this.mfgDrawingService.update(data.NID, {
@@ -73,11 +69,9 @@ export class DrawingFileHelper {
         });
 
         if (!drawingFile) {
-            throw new Error(
-                `File with name ${fileName} not found in path ${path}`,
-            );
+            throw new Error(`File with name ${fileName} not found in path ${path}`);
         }
-        
+
         return drawingFile;
     }
 
@@ -91,11 +85,7 @@ export class DrawingFileHelper {
     }
 
     async getPathFeeder(folderPath: string): Promise<string> {
-        return await joinPaths(
-            process.env.CHECKSHEET_MFG_FILE_PATH,
-            'feeder',
-            folderPath,
-        );
+        return await joinPaths(process.env.CHECKSHEET_MFG_FILE_PATH, 'feeder', folderPath);
     }
 
     async findFeederFileName(drawing: string, processNo: string, path: string): Promise<string> {
@@ -106,9 +96,7 @@ export class DrawingFileHelper {
             mode: ListMode.FILE,
         });
 
-        const file = files.find(f =>
-            f.name.includes(keyword)
-        );
+        const file = files.find((f) => f.name.includes(keyword));
 
         if (!file) {
             throw new Error(`ไม่พบไฟล์ต้นฉบับของ ${keyword}`);
@@ -117,7 +105,7 @@ export class DrawingFileHelper {
         return basename(file.name, extname(file.name));
     }
 
-    async getRevisionCheckSheetFeeder(path: string,filename: string): Promise<string> {
+    async getRevisionCheckSheetFeeder(path: string, filename: string): Promise<string> {
         const file = await this.getExcelFile(filename, path);
         const workbook = new Workbook();
         await workbook.xlsx.readFile(file.path);
@@ -129,17 +117,24 @@ export class DrawingFileHelper {
 
         const A18 = worksheet.getCell('A18').text.trim().toLowerCase().replace(/\s+/g, '');
         const G18 = worksheet.getCell('G18').text.trim().toLowerCase().replace(/\s+/g, '');
-        const G8  = worksheet.getCell('G8').text.trim().toLowerCase().replace(/\s+/g, '');
+        const G8 = worksheet.getCell('G8').text.trim().toLowerCase().replace(/\s+/g, '');
         const G13 = worksheet.getCell('G13').text.trim().toLowerCase().replace(/\s+/g, '');
-        const I7  = worksheet.getCell('I7').text.trim().toLowerCase().replace(/\s+/g, '');
-        const isFeederTemplate = (A18 === 'no.') && (G18 === 'mcno.') && (G8 === 'x') && (G13 === 'c') && ((I7 === 'inpsectionpoint') || (I7 === 'inspectionpoint'));
+        const I7 = worksheet.getCell('I7').text.trim().toLowerCase().replace(/\s+/g, '');
+        const isFeederTemplate =
+            A18 === 'no.' &&
+            G18 === 'mcno.' &&
+            G8 === 'x' &&
+            G13 === 'c' &&
+            (I7 === 'inpsectionpoint' || I7 === 'inspectionpoint');
         if (!isFeederTemplate) {
             throw new Error(`ไฟล์ ${file.name} ไม่ใช่ Template Checksheet Feeder`);
         }
 
         let revision = worksheet.getCell('E3').text.trim();
         if (!/^(\*|[A-Z]{1,2})$/.test(revision)) {
-            throw new Error(`Revision "${revision}" ไม่ถูกต้องในไฟล์ ${file.name} (อนุญาตเฉพาะ *, A-Z, AA-ZZ)`);
+            throw new Error(
+                `Revision "${revision}" ไม่ถูกต้องในไฟล์ ${file.name} (อนุญาตเฉพาะ *, A-Z, AA-ZZ)`,
+            );
         }
 
         if (revision === '*') {

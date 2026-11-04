@@ -3,83 +3,83 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 @Entity({ name: 'J002MP', schema: 'AMECMFG' })
 export class J002MP {
     @PrimaryColumn()
-    J2ODR: string; 
+    J2ODR: string;
 
     @PrimaryColumn()
-    J2SEQ: number; 
+    J2SEQ: number;
 
     @PrimaryColumn()
-    J2INO: string; 
+    J2INO: string;
 
     @PrimaryColumn()
-    J2IINO: string; 
+    J2IINO: string;
 
     @PrimaryColumn()
-    J2CUS: string; 
+    J2CUS: string;
 
     @Column()
-    J2PART: string; 
+    J2PART: string;
 
     @Column()
-    J2TO: string; 
+    J2TO: string;
 
     @Column()
-    J2MTH: string; 
+    J2MTH: string;
 
     @Column()
-    J2RQTY: number; 
+    J2RQTY: number;
 
     @Column()
-    J2CQTY: number; 
+    J2CQTY: number;
 
     @Column()
-    J2IQTY: number; 
+    J2IQTY: number;
 
     @Column()
-    J2DES: string; 
+    J2DES: string;
 
     @Column()
-    J2LOCC: string; 
+    J2LOCC: string;
 
     @Column()
-    J2LOCN: string; 
+    J2LOCN: string;
 
     @Column()
-    J2LOCA: string; 
+    J2LOCA: string;
 
     @Column()
-    J2STD: string; 
+    J2STD: string;
 
     @Column()
-    J2DIM: string; 
+    J2DIM: string;
 
     @Column()
-    J2RAW: string; 
+    J2RAW: string;
 
     @Column()
-    J2ART: string; 
+    J2ART: string;
 
     @Column()
-    J2UM: string; 
+    J2UM: string;
 
     @Column()
-    J2IDTE: string; 
+    J2IDTE: string;
 
     @Column()
-    J2NDTE: string; 
+    J2NDTE: string;
 
     @Column()
-    J2DRAW: string; 
+    J2DRAW: string;
 
     @Column()
-    J2ITM: string; 
+    J2ITM: string;
 
     @Column()
-    J2CLS: string; 
+    J2CLS: string;
 
     @Column()
-    J2EFF: number; 
+    J2EFF: number;
 
     @Column()
-    J2PAT: string; 
+    J2PAT: string;
 }

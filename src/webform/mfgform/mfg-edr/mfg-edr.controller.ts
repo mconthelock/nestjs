@@ -7,76 +7,70 @@ import { SearchMfgEdrReportDto } from './dto/search-mfg-edr-report.dto';
 
 @Controller('mfg-edr')
 export class MfgEdrController {
-  constructor(private readonly mfgEdrService: MfgEdrService) {}
+    constructor(private readonly mfgEdrService: MfgEdrService) {}
 
-  @Post()
-  create(@Body() createMfgEdrDto: CreateMfgEdrDto) {
-    return this.mfgEdrService.create(createMfgEdrDto);
-  }
+    @Post()
+    create(@Body() createMfgEdrDto: CreateMfgEdrDto) {
+        return this.mfgEdrService.create(createMfgEdrDto);
+    }
 
-  @Post('update-detail')
-  updateDetail(@Body() dto: CreateMfgEdrDto) {
-    return this.mfgEdrService.updateDetail(dto);
-  }
-  
-  @Get()
-  findAll() {
-    return this.mfgEdrService.findAll();
-  }
+    @Post('update-detail')
+    updateDetail(@Body() dto: CreateMfgEdrDto) {
+        return this.mfgEdrService.updateDetail(dto);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.mfgEdrService.findOne(+id);
-  }
+    @Get()
+    findAll() {
+        return this.mfgEdrService.findAll();
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.mfgEdrService.remove(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.mfgEdrService.findOne(+id);
+    }
 
-  @Post('cause')
-  getCause(@Body() dto: SearchCauseDto) {
-    return this.mfgEdrService.getCause(dto);
-  }
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.mfgEdrService.remove(+id);
+    }
 
-  @Post('worktype')
-  getWorktype() {
-    return this.mfgEdrService.getWorktype();
-  }
+    @Post('cause')
+    getCause(@Body() dto: SearchCauseDto) {
+        return this.mfgEdrService.getCause(dto);
+    }
 
-  @Post('process')
-  getProcess() {
-    return this.mfgEdrService.getProcess();
-  }
+    @Post('worktype')
+    getWorktype() {
+        return this.mfgEdrService.getWorktype();
+    }
 
-  @Post('line')
-  getLine() {
-    return this.mfgEdrService.getLine();
-  }
+    @Post('process')
+    getProcess() {
+        return this.mfgEdrService.getProcess();
+    }
 
-  @Post('amec-order-detail')
-  getOrderDetail(@Body() body: any) {
-    return this.mfgEdrService.getOrderDetail(body.MFGNO);
-  }
+    @Post('line')
+    getLine() {
+        return this.mfgEdrService.getLine();
+    }
 
-  @Post('get-mfg-edr')
-  getMfgEdr(@Body() dto: GetMfgEdrDto) {
-    return this.mfgEdrService.getMfgEdr(dto);
-  }
+    @Post('amec-order-detail')
+    getOrderDetail(@Body() body: any) {
+        return this.mfgEdrService.getOrderDetail(body.MFGNO);
+    }
 
-  @Post('update-cause4m')
-  async updateCause4M(@Body() dto: any) {
-    return this.mfgEdrService.updateCause4M(dto);
-  }
+    @Post('get-mfg-edr')
+    getMfgEdr(@Body() dto: GetMfgEdrDto) {
+        return this.mfgEdrService.getMfgEdr(dto);
+    }
 
-  @Post('report/search')
-  searchReport(
-    @Body() dto: SearchMfgEdrReportDto,
-  ) {
-    return this.mfgEdrService.searchReport(dto);
-  }
+    @Post('update-cause4m')
+    async updateCause4M(@Body() dto: any) {
+        return this.mfgEdrService.updateCause4M(dto);
+    }
 
+    @Post('report/search')
+    searchReport(@Body() dto: SearchMfgEdrReportDto) {
+        return this.mfgEdrService.searchReport(dto);
+    }
 }
-
-
-

@@ -1,27 +1,20 @@
 import { PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import {
-    IsArray,
-    IsDate,
-    IsNotEmpty,
-    IsNumber,
-    IsOptional,
-    IsString,
-} from 'class-validator';
-import { FormDto }  from "src/webform/form/dto/form.dto";
+import { IsArray, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
-export class CreateFinpckAssetDto extends PickType(FormDto,[
-  'NFRMNO',
-  'VORGNO',
-  'CYEAR',
-  'CYEAR2',
-  'NRUNNO',
-] as const) {  
+export class CreateFinpckAssetDto extends PickType(FormDto, [
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'CYEAR2',
+    'NRUNNO',
+] as const) {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
     ID: number;
-    
+
     @IsNotEmpty()
     @IsString()
     GRPCODE: string;
@@ -36,15 +29,15 @@ export class CreateFinpckAssetDto extends PickType(FormDto,[
 
     @IsOptional()
     @Transform(({ value }) => {
-    if (!value) return value;
-    // สร้าง Date และบังคับให้ชี้ไปที่เที่ยงวัน (ป้องกันปัญหา Timezone เปลี่ยนวัน)
-    const date = new Date(value);
-    date.setHours(0, 0, 0, 0);
-    return date;
-  })
+        if (!value) return value;
+        // สร้าง Date และบังคับให้ชี้ไปที่เที่ยงวัน (ป้องกันปัญหา Timezone เปลี่ยนวัน)
+        const date = new Date(value);
+        date.setHours(0, 0, 0, 0);
+        return date;
+    })
     @IsDate()
     @Type(() => Date)
-    DOCDATE?: Date; 
+    DOCDATE?: Date;
 
     @IsString()
     @IsOptional()
@@ -54,17 +47,17 @@ export class CreateFinpckAssetDto extends PickType(FormDto,[
     @IsNumber()
     @Type(() => Number)
     INITVAL?: number;
-    
+
     @IsOptional()
     @Transform(({ value }) => {
-    if (!value) return value;
-    const date = new Date(value);
-    date.setHours(0, 0, 0, 0);
-    return date;
-  })
+        if (!value) return value;
+        const date = new Date(value);
+        date.setHours(0, 0, 0, 0);
+        return date;
+    })
     @IsDate()
     @Type(() => Date)
-    STARTDP?: Date; 
+    STARTDP?: Date;
 
     @IsOptional()
     @IsNumber()
@@ -96,19 +89,19 @@ export class CreateFinpckAssetDto extends PickType(FormDto,[
 
     @IsOptional()
     @IsString()
-    SNNO?: string;  
+    SNNO?: string;
 
     @IsOptional()
     @IsString()
-    PONO?: string;    
+    PONO?: string;
 
     @IsOptional()
     @IsString()
-    REFASSET?: string;   
+    REFASSET?: string;
 
     @IsOptional()
     @IsString()
-    VOUCHER?: string;   
+    VOUCHER?: string;
 
     @IsOptional()
     @IsNumber()
@@ -117,27 +110,27 @@ export class CreateFinpckAssetDto extends PickType(FormDto,[
 
     @IsOptional()
     @IsString()
-    UNIT?: string;     
+    UNIT?: string;
 
     @IsOptional()
     @IsString()
-    STATUS?: string;   
+    STATUS?: string;
 
     @IsOptional()
     @IsString()
-    SUPPLIER?: string;   
-    
-    @IsOptional()
-    @IsString()
-    PRNO?: string;   
+    SUPPLIER?: string;
 
     @IsOptional()
     @IsString()
-    BUDGETNO?: string;    
+    PRNO?: string;
 
     @IsOptional()
     @IsString()
-    REQBY?: string;  
+    BUDGETNO?: string;
+
+    @IsOptional()
+    @IsString()
+    REQBY?: string;
 
     @IsOptional()
     @IsNumber()
@@ -152,33 +145,33 @@ export class CreateFinpckAssetDto extends PickType(FormDto,[
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    NOSTICKER?: number; 
+    NOSTICKER?: number;
 
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    LOST?: number;  
+    LOST?: number;
 
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    DAMAGE?: number; 
+    DAMAGE?: number;
 
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    MOVEMENT?: number; 
+    MOVEMENT?: number;
 
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    OTHCAUSE?: number; 
+    OTHCAUSE?: number;
 
     @IsOptional()
     @IsString()
-    REMOTHCAUSE?: string;   
+    REMOTHCAUSE?: string;
 
     @IsOptional()
     @IsString()
-    PIC?: string; 
+    PIC?: string;
 }

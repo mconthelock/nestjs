@@ -10,9 +10,7 @@ import { CreateIsTidDto, CreateIsTidFormDto } from './dto/create-is-tid.dto';
 
 @Injectable()
 export class IsTidRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

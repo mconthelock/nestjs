@@ -1,11 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-    IsArray,
-    IsNotEmpty,
-    IsNumber,
-    IsString,
-    ValidateNested,
-} from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsString, ValidateNested } from 'class-validator';
 import { DataAuditReportMasterDto } from './data-audit_report_master.dto';
 export class SaveAuditReportMasterDto {
     @IsNotEmpty()

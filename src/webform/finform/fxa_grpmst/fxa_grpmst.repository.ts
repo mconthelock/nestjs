@@ -13,6 +13,4 @@ export class FXAGRPRepository extends BaseRepository {
     findAll() {
         return this.manager.find(FXA_GRPMST);
     }
-
-
 }

@@ -6,9 +6,7 @@ import { TmaintaintypeController } from './tmaintaintype.controller';
 
 @Module({
     controllers: [TmaintaintypeController],
-    imports: [
-        TypeOrmModule.forFeature([Tmaintaintype], 'datacenterConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([Tmaintaintype], 'datacenterConnection')],
     providers: [TmaintaintypeService],
 })
 export class TmaintaintypeModule {}

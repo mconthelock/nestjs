@@ -80,8 +80,7 @@ export class AvmService {
         if (!maxCode) {
             newCode = `${prefix}00001`;
         } else {
-            const numericPart =
-                parseInt(maxCode.substring(prefix.length), 10) + 1;
+            const numericPart = parseInt(maxCode.substring(prefix.length), 10) + 1;
             const paddedNum = String(numericPart).padStart(5, '0');
             newCode = `${prefix}${paddedNum}`;
         }

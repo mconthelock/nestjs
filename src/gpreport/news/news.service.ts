@@ -32,12 +32,8 @@ export class NewsService {
         return Promise.all(
             news.map(async (item) => ({
                 ...item,
-                NEWS_HEADER: item.NEWS_HEADER
-                    ? await this.fileNewsImage(item.NEWS_HEADER)
-                    : null,
-                NEWS_IMG: item.NEWS_IMG
-                    ? await this.fileNewsImage(item.NEWS_IMG)
-                    : null,
+                NEWS_HEADER: item.NEWS_HEADER ? await this.fileNewsImage(item.NEWS_HEADER) : null,
+                NEWS_IMG: item.NEWS_IMG ? await this.fileNewsImage(item.NEWS_IMG) : null,
             })),
         );
     }

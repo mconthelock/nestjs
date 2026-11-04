@@ -25,19 +25,19 @@ export class SequenceOrgService {
         return await this.repo.search(dto);
     }
 
-    async getByPosition(dto: SearchSequenceOrgDto){
-        try{
+    async getByPosition(dto: SearchSequenceOrgDto) {
+        try {
             const res = await this.repo.getByPosition(dto.VORGNO, dto.SPOSCODE);
-            if(!res){
+            if (!res) {
                 return {
                     status: false,
                     message: 'User with this position not found',
-                }
+                };
             }
             return {
                 status: true,
                 data: res,
-            }
+            };
         } catch (error) {
             throw new Error(`Error fetching user by position: ${error.message}`);
         }

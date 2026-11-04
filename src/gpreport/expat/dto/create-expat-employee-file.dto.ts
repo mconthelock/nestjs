@@ -1,11 +1,6 @@
-import {
-    IsNotEmpty,
-    IsString,
-    MaxLength,
-} from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreateExpatEmployeeFileDto {
-
     @IsString()
     @IsNotEmpty()
     @MaxLength(30)
@@ -20,5 +15,4 @@ export class CreateExpatEmployeeFileDto {
     @IsNotEmpty()
     @MaxLength(500)
     FILE_PATH: string;
-
 }

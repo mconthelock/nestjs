@@ -63,10 +63,10 @@ export class CmSmService {
             REVNO,
             series: data.DTIH?.MODEL ?? data.DTIH?.PRODTY ?? '',
             reminderLabel,
-            sentBy: empno, 
+            sentBy: empno,
             toDepartment: 'EME, EEL',
             ccDepartment: 'EAS',
-            detailUrl: "http://localhost:8080/dtiprogram/CM_SM/main",
+            detailUrl: 'http://localhost:8080/dtiprogram/CM_SM/main',
         });
         await this.cmSmRepository.updateCountAlert(TINO, REVNO, time_reminder);
 

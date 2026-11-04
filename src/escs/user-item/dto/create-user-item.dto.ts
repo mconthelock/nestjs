@@ -1,23 +1,23 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateUserItemDto {
-  @IsNotEmpty()
-  @IsString()
-  USR_NO: string;
+    @IsNotEmpty()
+    @IsString()
+    USR_NO: string;
 
-  @IsNotEmpty()
-  @IsString()
-  IT_NO: string;
+    @IsNotEmpty()
+    @IsString()
+    IT_NO: string;
 
-  @IsOptional()
-  @IsString()
-  UI_FFILE?: string;
+    @IsOptional()
+    @IsString()
+    UI_FFILE?: string;
 
-  @IsOptional()
-  @IsString()
-  UI_OFILE?: string;
+    @IsOptional()
+    @IsString()
+    UI_OFILE?: string;
 
-  @IsOptional()
-  @IsString()
-  UI_USERUPDATE?: string;
+    @IsOptional()
+    @IsString()
+    UI_USERUPDATE?: string;
 }

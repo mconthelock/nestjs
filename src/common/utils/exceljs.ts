@@ -182,9 +182,7 @@ export async function defaultExcel(
         sheet.eachRow((row) => {
             let maxLines = 1;
             row.eachCell({ includeEmpty: true }, (cell) => {
-                const lines = cell.value
-                    ? cell.value.toString().split('\n').length
-                    : 1;
+                const lines = cell.value ? cell.value.toString().split('\n').length : 1;
                 if (lines > maxLines) {
                     maxLines = lines;
                 }
@@ -196,16 +194,11 @@ export async function defaultExcel(
     return workbook;
 }
 
-export async function saveExcelFile(
-    workbook: ExcelJS.Workbook,
-    filePath: string,
-) {
+export async function saveExcelFile(workbook: ExcelJS.Workbook, filePath: string) {
     await workbook.xlsx.writeFile(filePath);
 }
 
-export async function getBufferFromExcel(
-    workbook: ExcelJS.Workbook,
-): Promise<Buffer> {
+export async function getBufferFromExcel(workbook: ExcelJS.Workbook): Promise<Buffer> {
     const excelBuffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(excelBuffer);
 }
@@ -220,11 +213,7 @@ export async function getBufferFromExcel(
  * @example
  * sendExcel(res, buffer, 'example.xlsx');
  */
-export function sendExcel(
-    res: Response,
-    buffer: Buffer,
-    filename: string,
-): void {
+export function sendExcel(res: Response, buffer: Buffer, filename: string): void {
     res.setHeader(
         'Content-Type',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -366,7 +355,7 @@ export async function readFile({
     readCustom?: boolean;
     customSheet?: (workbook: ExcelJS.Workbook) => any;
 } = {}): Promise<any[]> {
-    var data: any[] = [];
+    let data: any[] = [];
     const workbook: ExcelJS.Workbook = new ExcelJS.Workbook();
     if (!file && !path) throw new Error('Please provide file or path');
     if (path) {
@@ -386,9 +375,7 @@ export async function readFile({
         console.log('read header');
 
         const worksheet: ExcelJS.Worksheet =
-            sheetName == 1
-                ? workbook.worksheets[0]
-                : workbook.getWorksheet(sheetName);
+            sheetName == 1 ? workbook.worksheets[0] : workbook.getWorksheet(sheetName);
         const headerRowData = worksheet.getRow(headerRow);
         let headerType = 'string';
         if (headerName.length > 0 && typeof headerName[0] === 'string') {
@@ -426,20 +413,14 @@ export async function readFile({
                         colIndex = colToNumber(headerItem.column);
                     } else {
                         if (!headerRow)
-                            throw new Error(
-                                'Please provide headerRow when using headerName',
-                            );
-                        const values =
-                            headerRowData.values as ExcelJS.CellValue[];
-                        colIndex = values.findIndex(
-                            (v) => v === headerItem.header,
-                        );
+                            throw new Error('Please provide headerRow when using headerName');
+                        const values = headerRowData.values as ExcelJS.CellValue[];
+                        colIndex = values.findIndex((v) => v === headerItem.header);
                     }
                     if (!data[rowIndex]) {
                         data[rowIndex] = {};
                     }
-                    data[rowIndex][headerItem.key] =
-                        row.values[colIndex] || null;
+                    data[rowIndex][headerItem.key] = row.values[colIndex] || null;
                 }
             }
             rowIndex++;
@@ -449,9 +430,7 @@ export async function readFile({
         console.log('read default');
 
         const worksheet: ExcelJS.Worksheet =
-            sheetName == 1
-                ? workbook.worksheets[0]
-                : workbook.getWorksheet(sheetName);
+            sheetName == 1 ? workbook.worksheets[0] : workbook.getWorksheet(sheetName);
         let rowIndex: number = 0;
         worksheet.eachRow((row, rowNumber) => {
             if (rowNumber < startRow) return;
@@ -465,11 +444,7 @@ export async function readFile({
                 });
             } else {
                 let index = 0;
-                for (
-                    let colIndex = startCol;
-                    colIndex <= endCol;
-                    colIndex++, index++
-                ) {
+                for (let colIndex = startCol; colIndex <= endCol; colIndex++, index++) {
                     data[rowIndex][index] = row.values[colIndex] || '';
                 }
             }

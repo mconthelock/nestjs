@@ -21,10 +21,7 @@ export class PilineInitialMstController {
     }
     @Patch(':INITIAL_ID')
     @UseTransaction('mitsuConnection')
-    update(
-        @Param() key: KeyPilineInitialMstDto,
-        @Body() dto: UpdatePilineInitialMstDto,
-    ) {
+    update(@Param() key: KeyPilineInitialMstDto, @Body() dto: UpdatePilineInitialMstDto) {
         return this.service.update(key, dto);
     }
     @Delete(':INITIAL_ID')

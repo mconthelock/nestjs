@@ -64,7 +64,7 @@ export class VOrderList {
     EXPSHIP: Date | null;
 
     @ViewColumn()
-    TURNOVER_STATUS: Number | null;
+    TURNOVER_STATUS: number | null;
 
     @ViewColumn()
     DUMMYCAR_NO: string | null;
@@ -85,25 +85,25 @@ export class VOrderList {
     BUYERNAME: string | null;
 
     @ViewColumn()
-    PRNO: Number | null;
+    PRNO: number | null;
 
     @ViewColumn()
-    LINENO: Number | null;
+    LINENO: number | null;
 
     @ViewColumn()
-    PRDATE: Number | null;
+    PRDATE: number | null;
 
     @ViewColumn()
-    PONO: Number | null;
+    PONO: number | null;
 
     @ViewColumn()
-    PODATE: Number | null;
+    PODATE: number | null;
 
     @ViewColumn()
-    VENDCODE: Number | null;
+    VENDCODE: number | null;
 
     @ViewColumn()
-    VENDNAME: Number | null;
+    VENDNAME: number | null;
 
     @ViewColumn()
     ITEM: string | null;
@@ -118,22 +118,22 @@ export class VOrderList {
     REMARK: string | null;
 
     @ViewColumn()
-    REQUESTED_QTY: Number | null;
+    REQUESTED_QTY: number | null;
 
     @ViewColumn()
-    ORDERED_QTY: Number | null;
+    ORDERED_QTY: number | null;
 
     @ViewColumn()
-    RECIEVE_QTY: Number | null;
+    RECIEVE_QTY: number | null;
 
     @ViewColumn()
-    DUEDATE: Number | null;
+    DUEDATE: number | null;
 
     @ViewColumn()
-    QTY: Number | null;
+    QTY: number | null;
 
     @ViewColumn()
-    ACTUALETA_AMEC: Number | null;
+    ACTUALETA_AMEC: number | null;
 
     @ViewColumn()
     INVOICE: string | null;

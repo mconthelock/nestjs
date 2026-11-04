@@ -6,17 +6,15 @@ import { QA_TYPE } from 'src/common/Entities/webform/table/QA_TYPE.entity';
 
 @Injectable()
 export class QaTypeRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
-    findAll(){
+    findAll() {
         return this.getRepository(QA_TYPE).find();
     }
 
-    findOneByCode(code: string){
+    findOneByCode(code: string) {
         return this.getRepository(QA_TYPE).findOne({ where: { QAT_CODE: code } });
     }
 }

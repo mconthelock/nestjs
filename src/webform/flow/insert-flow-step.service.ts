@@ -54,8 +54,7 @@ export class InsertFlowStepService extends FlowService {
                 CYEAR2: dto.CYEAR2,
                 NRUNNO: dto.NRUNNO,
             };
-            const { NEWSTEPNO, APVNO, BEFORESTEPNO, POSNO, APVORGNO, CTYPE } =
-                dto;
+            const { NEWSTEPNO, APVNO, BEFORESTEPNO, POSNO, APVORGNO, CTYPE } = dto;
             const flowmst = await this.flowmstService.getFlowMaster(
                 form.NFRMNO,
                 form.VORGNO,
@@ -64,36 +63,28 @@ export class InsertFlowStepService extends FlowService {
             const flows = await this.getFlow(form);
             // ตรวจสอบความถูกต้องของข้อมูลที่ส่งมา
             // 1. ตรวจสอบว่า step ใหม่มีเลขซ้ำกับ step ที่มีอยู่หรือไม่
-            const duplicateStep = flows.find(
-                (f: FLOW) => f.CSTEPNO === NEWSTEPNO,
-            );
+            const duplicateStep = flows.find((f: FLOW) => f.CSTEPNO === NEWSTEPNO);
             if (duplicateStep) {
-                throw new Error(
-                    `Step number ${NEWSTEPNO} already exists in flow`,
-                );
+                throw new Error(`Step number ${NEWSTEPNO} already exists in flow`);
             }
             // 2. ตรวจสอบว่า step แรกมีอยู่จริงหรือไม่
             const startStep = flows.find((f: FLOW) => f.CSTART === '1');
             if (!startStep) {
                 this.logger.warn('Start step not found in flow', {
                     context: 'InsertFlowStepService',
-                    logType: 'debug'
+                    logType: 'debug',
                 });
                 throw new Error('Start step not found in flow');
             }
             // 2.1 หาตำแหน่งและแผนกของ step แรก
-            const { empPosition, empOrg } = await this.setOrganize(
-                startStep.VAPVNO,
-            );
+            const { empPosition, empOrg } = await this.setOrganize(startStep.VAPVNO);
 
             // 3. ตรวจสอบว่ามี step ก่อนหน้าที่ระบุไว้หรือไม่
-            const beforeStep = flows.find(
-                (f: FLOW) => f.CSTEPNO === BEFORESTEPNO,
-            );
+            const beforeStep = flows.find((f: FLOW) => f.CSTEPNO === BEFORESTEPNO);
             if (!beforeStep) {
                 this.logger.info(`Before step ${BEFORESTEPNO} not found in flow`, {
                     context: 'InsertFlowStepService',
-                    logType: 'debug'
+                    logType: 'debug',
                 });
                 return;
                 // throw new Error('Before step not found in flow');
@@ -101,9 +92,7 @@ export class InsertFlowStepService extends FlowService {
             const CSTEPNEXTNO = beforeStep.CSTEPNEXTNO;
 
             // 4. ตรวจสอบว่ามี step ใหม่อยู่ใน flow master หรือไม่
-            const ckNewStep = flowmst.find(
-                (f: FLOWMST) => f.CSTEPNO === NEWSTEPNO,
-            );
+            const ckNewStep = flowmst.find((f: FLOWMST) => f.CSTEPNO === NEWSTEPNO);
             let data: any;
             if (!ckNewStep) {
                 data = {
@@ -123,9 +112,7 @@ export class InsertFlowStepService extends FlowService {
                     throw new Error('POSNO is required for CTYPE 1');
                 }
                 if (CTYPE === '2' && (!data.VPOSNO || !data.VAPVORGNO)) {
-                    throw new Error(
-                        'POSNO and APVORGNO are required for CTYPE 2',
-                    );
+                    throw new Error('POSNO and APVORGNO are required for CTYPE 2');
                 }
                 if (CTYPE === '3') {
                     if (!APVNO) {
@@ -143,13 +130,7 @@ export class InsertFlowStepService extends FlowService {
 
             switch (CTYPE) {
                 case '1':
-                    await this.addFlow1(
-                        form,
-                        data,
-                        empPosition,
-                        empOrg,
-                        startStep.VAPVNO,
-                    );
+                    await this.addFlow1(form, data, empPosition, empOrg, startStep.VAPVNO);
                     break;
                 case '2':
                     await this.addFlow2(form, data);
@@ -176,8 +157,7 @@ export class InsertFlowStepService extends FlowService {
                 CSTEPST: '0',
             });
             for (const row of notuse) {
-                const deleteResult =
-                    await this.deleteFlowStepService.deleteFlowStep(row);
+                const deleteResult = await this.deleteFlowStepService.deleteFlowStep(row);
                 if (!deleteResult.status) {
                     throw new Error(deleteResult.message);
                 }
@@ -226,7 +206,7 @@ export class InsertFlowStepService extends FlowService {
 
     private async setOrganize(empno: string) {
         const user = await this.usersService.findEmp(empno);
-        let emppos = user.SPOSCODE;
+        const emppos = user.SPOSCODE;
         let orgno: string;
         if (user.SSECCODE == '00') {
             if (user.SDEPCODE == '00') {

@@ -9,10 +9,7 @@ import {
     Req,
     UseInterceptors,
 } from '@nestjs/common';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
 import { PsRPService } from './ps-rp.service';

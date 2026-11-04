@@ -1,40 +1,48 @@
 import { SaveJigRecheckDto } from './dto/jig-recheck.dto';
-import {
-    BadRequestException,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { JigRepository } from './jig.repository';
 import { CreateJigDeleteFormDto, SaveJigDeleteFormDto } from './dto/jig-delete-form.dto';
 import { CreateJigRequestDto } from './dto/create-jig-request.dto';
 import { UpdateJigDto } from './dto/update-jig.dto';
 import { ReplaceCheckpointsDto } from './dto/checkpoint.dto';
-import {
-    CreateJigFormDto,
-    JigFormKeyDto,
-    SaveJigFormDto,
-    JigFileDto,
-} from './dto/jig-form.dto';
+import { CreateJigFormDto, JigFormKeyDto, SaveJigFormDto, JigFileDto } from './dto/jig-form.dto';
 import { FinishInspectionDto } from './dto/finish-inspection.dto';
 import { monthStart } from './jig.utils';
 import { JigInspectionService } from './jig-inspection.service';
 
 @Injectable()
 export class JigService {
-    constructor(private readonly jigRepository: JigRepository, private readonly inspection?: JigInspectionService) {}
+    constructor(
+        private readonly jigRepository: JigRepository,
+        private readonly inspection?: JigInspectionService,
+    ) {}
 
     autoCreateInspection(date: string, ip: string) {
         return this.inspection.run(date, ip);
     }
 
-    createDeleteForm(dto: CreateJigDeleteFormDto) { return this.jigRepository.createDeleteForm(dto); }
-    getDeleteForm(key: JigFormKeyDto) { return this.jigRepository.getDeleteForm(key); }
-    saveDeleteForm(key: JigFormKeyDto, dto: SaveJigDeleteFormDto) { return this.jigRepository.saveDeleteForm(key, dto); }
-    deleteDeleteFormFile(key: JigFormKeyDto, seq: number) { return this.jigRepository.deleteDeleteFormFile(key, seq); }
-    finishDeleteForm(key: JigFormKeyDto) { return this.jigRepository.completeDeleteForm(key, 'finish'); }
-    rejectDeleteForm(key: JigFormKeyDto) { return this.jigRepository.completeDeleteForm(key, 'reject'); }
+    createDeleteForm(dto: CreateJigDeleteFormDto) {
+        return this.jigRepository.createDeleteForm(dto);
+    }
+    getDeleteForm(key: JigFormKeyDto) {
+        return this.jigRepository.getDeleteForm(key);
+    }
+    saveDeleteForm(key: JigFormKeyDto, dto: SaveJigDeleteFormDto) {
+        return this.jigRepository.saveDeleteForm(key, dto);
+    }
+    deleteDeleteFormFile(key: JigFormKeyDto, seq: number) {
+        return this.jigRepository.deleteDeleteFormFile(key, seq);
+    }
+    finishDeleteForm(key: JigFormKeyDto) {
+        return this.jigRepository.completeDeleteForm(key, 'finish');
+    }
+    rejectDeleteForm(key: JigFormKeyDto) {
+        return this.jigRepository.completeDeleteForm(key, 'reject');
+    }
 
-    saveRecheck(key: JigFormKeyDto, dto: SaveJigRecheckDto) { return this.jigRepository.saveRecheck(key, dto); }
+    saveRecheck(key: JigFormKeyDto, dto: SaveJigRecheckDto) {
+        return this.jigRepository.saveRecheck(key, dto);
+    }
 
     getMfgProcesses() {
         return this.jigRepository.getMfgProcesses();
@@ -64,17 +72,10 @@ export class JigService {
         );
         const masters = await this.jigRepository.getDashboardMaster();
         const items = masters.map((jig) => {
-            const due = jig.NEXT_INSPEC_DATE
-                ? monthStart(jig.NEXT_INSPEC_DATE)
-                : null;
+            const due = jig.NEXT_INSPEC_DATE ? monthStart(jig.NEXT_INSPEC_DATE) : null;
             const days = due
                 ? Math.round(
-                      (Date.UTC(
-                          due.getFullYear(),
-                          due.getMonth(),
-                          due.getDate(),
-                      ) -
-                          today) /
+                      (Date.UTC(due.getFullYear(), due.getMonth(), due.getDate()) - today) /
                           86400000,
                   )
                 : null;
@@ -101,12 +102,10 @@ export class JigService {
             summary: {
                 total: items.length,
                 dueToday: items.filter((j) => j.DUE_STATUS === 'DUE').length,
-                dueSoon: items.filter((j) => j.DUE_STATUS === 'DUE_SOON')
-                    .length,
+                dueSoon: items.filter((j) => j.DUE_STATUS === 'DUE_SOON').length,
                 overdue: items.filter((j) => j.DUE_STATUS === 'OVERDUE').length,
                 planned: items.filter((j) => j.DUE_STATUS === 'PLANNED').length,
-                unscheduled: items.filter((j) => j.DUE_STATUS === 'UNSCHEDULED')
-                    .length,
+                unscheduled: items.filter((j) => j.DUE_STATUS === 'UNSCHEDULED').length,
             },
             items,
         };
@@ -119,15 +118,15 @@ export class JigService {
     }
 
     createJig(dto: CreateJigRequestDto) {
-        if (dto.FORM_TYPE !== 'CREATE')throw new BadRequestException('New jig registration requires FORM_TYPE CREATE',);
+        if (dto.FORM_TYPE !== 'CREATE')
+            throw new BadRequestException('New jig registration requires FORM_TYPE CREATE');
         return this.jigRepository.createForm(dto.JIG_NO, dto);
     }
 
     async updateJig(jigNo: string, dto: UpdateJigDto) {
         const { FORM_KEY, ...changes } = dto;
         const form = await this.jigRepository.getForm(FORM_KEY);
-        if (form.JIG_NO !== jigNo)
-            throw new BadRequestException('The form belongs to another jig');
+        if (form.JIG_NO !== jigNo) throw new BadRequestException('The form belongs to another jig');
         return this.jigRepository.saveForm(FORM_KEY, changes);
     }
 

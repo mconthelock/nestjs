@@ -22,10 +22,9 @@ export class AuditReportMasterService {
         if (dto.ARM_REV !== undefined) {
             condition.ARM_REV = dto.ARM_REV;
         } else {
-            const lastRevision =
-                await this.auditReportRevisionService.findLatestRevision(
-                    dto.ARM_SECID,
-                );
+            const lastRevision = await this.auditReportRevisionService.findLatestRevision(
+                dto.ARM_SECID,
+            );
             if (lastRevision != null) {
                 condition.ARM_REV = lastRevision.ARR_REV;
             }
@@ -124,18 +123,7 @@ export class AuditReportMasterService {
     }
 
     async setData(dto: DataAuditReportMasterDto, revision: number) {
-        const {
-            rev,
-            detail,
-            type,
-            status,
-            topic,
-            new_topic,
-            seq,
-            new_seq,
-            factor,
-            maxScore,
-        } = dto;
+        const { rev, detail, type, status, topic, new_topic, seq, new_seq, factor, maxScore } = dto;
         if (type == 'new') {
             return {
                 ARM_REV: revision,

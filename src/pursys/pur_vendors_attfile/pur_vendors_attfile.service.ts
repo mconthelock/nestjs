@@ -4,23 +4,23 @@ import { UpdatePurVendorsAttfileDto } from './dto/update-pur_vendors_attfile.dto
 
 @Injectable()
 export class PurVendorsAttfileService {
-  create(createPurVendorsAttfileDto: CreatePurVendorsAttfileDto) {
-    return 'This action adds a new purVendorsAttfile';
-  }
+    create(createPurVendorsAttfileDto: CreatePurVendorsAttfileDto) {
+        return 'This action adds a new purVendorsAttfile';
+    }
 
-  findAll() {
-    return `This action returns all purVendorsAttfile`;
-  }
+    findAll() {
+        return `This action returns all purVendorsAttfile`;
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} purVendorsAttfile`;
-  }
+    findOne(id: number) {
+        return `This action returns a #${id} purVendorsAttfile`;
+    }
 
-  update(id: number, updatePurVendorsAttfileDto: UpdatePurVendorsAttfileDto) {
-    return `This action updates a #${id} purVendorsAttfile`;
-  }
+    update(id: number, updatePurVendorsAttfileDto: UpdatePurVendorsAttfileDto) {
+        return `This action updates a #${id} purVendorsAttfile`;
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} purVendorsAttfile`;
-  }
+    remove(id: number) {
+        return `This action removes a #${id} purVendorsAttfile`;
+    }
 }

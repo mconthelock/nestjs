@@ -1,4 +1,4 @@
-import { ViewColumn, ViewEntity } from "typeorm";
+import { ViewColumn, ViewEntity } from 'typeorm';
 
 @ViewEntity({ name: 'UNIFORM_VIEW', schema: 'GPREPORT' })
 export class UNIFORM_VIEW {
@@ -12,7 +12,7 @@ export class UNIFORM_VIEW {
     CYEAR: string;
 
     @ViewColumn()
-    CYEAR2: string; 
+    CYEAR2: string;
 
     @ViewColumn()
     NRUNNO: number;

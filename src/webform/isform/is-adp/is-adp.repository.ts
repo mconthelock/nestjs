@@ -7,9 +7,7 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Injectable()
 export class IsAdpRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -40,11 +38,7 @@ export class IsAdpRepository extends BaseRepository {
             .andWhere('a.CYEAR = :CYEAR', { CYEAR: dto.CYEAR })
             .andWhere('a.CYEAR2 = :CYEAR2', { CYEAR2: dto.CYEAR2 })
             .andWhere('a.NRUNNO = :NRUNNO', { NRUNNO: dto.NRUNNO })
-            .leftJoin(
-                (qb) => qb.from('AMEC.PDIVISION', 'b'),
-                'b',
-                'a.REQ_DIV ="b"."SDIVCODE"',
-            )
+            .leftJoin((qb) => qb.from('AMEC.PDIVISION', 'b'), 'b', 'a.REQ_DIV ="b"."SDIVCODE"')
             .orderBy('a.REQ_DIV', 'ASC')
             .getRawMany();
     }

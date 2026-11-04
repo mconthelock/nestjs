@@ -1,6 +1,9 @@
 import { Controller, Get, Param, Post, Body, Delete } from '@nestjs/common';
 import { DpmsCountryConditionService } from './dpms_country_condition.service';
-import { CreateCountryConditionDto, DeleteCountryConditionDto } from './dto/dpms_country_condition.dto';
+import {
+    CreateCountryConditionDto,
+    DeleteCountryConditionDto,
+} from './dto/dpms_country_condition.dto';
 
 @Controller('workload/dpms-country-condition')
 export class DpmsCountryConditionController {

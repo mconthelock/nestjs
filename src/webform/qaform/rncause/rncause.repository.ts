@@ -8,9 +8,7 @@ import { RNCAUSE } from 'src/common/Entities/webform/table/RNCAUSE.entity';
 
 @Injectable()
 export class RncauseRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-    ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 
@@ -27,11 +25,7 @@ export class RncauseRepository extends BaseRepository {
     async search(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(RNCAUSE, 'R');
 
-        this.applyFilters(qb, 'R', dto, [
-            'CID',
-            'CAUSE',
-            'CAUSENAME',
-        ]);
+        this.applyFilters(qb, 'R', dto, ['CID', 'CAUSE', 'CAUSENAME']);
 
         return qb.getMany();
     }

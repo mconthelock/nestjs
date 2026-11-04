@@ -17,19 +17,11 @@ export class ChecksheetRepository extends OracleRepository {
 
     async getInCheck(dto: InCheckDto): Promise<any[]> {
         const paramOrder = ['prod', 'order', 'item', 'dwgId', 'reg', 'user'];
-        return this.execCursor(
-            ChecksheetProc.IN_CHECK,
-            dto,
-            paramOrder
-        );
+        return this.execCursor(ChecksheetProc.IN_CHECK, dto, paramOrder);
     }
 
     async saveAction(procName: ChecksheetProc, dto: SaveDto): Promise<void> {
         const paramOrder = ['prod', 'order', 'item', 'dwgId', 'user'];
-        return this.execProcedure(
-            procName,
-            dto,
-            paramOrder
-        );
+        return this.execProcedure(procName, dto, paramOrder);
     }
 }

@@ -35,14 +35,14 @@ export class PURCPC_FORM {
 
     @Column()
     VVENDOR: string;
-    
+
     @Column()
     DREQDATE: Date;
 
     @Column()
     NSTATUS: number;
 
-    @OneToMany(() => PURCPC_DETAILS, detail => detail.PURCPC_FORM)
+    @OneToMany(() => PURCPC_DETAILS, (detail) => detail.PURCPC_FORM)
     @JoinColumn({ name: 'CYEAR2', referencedColumnName: 'CYEAR2' })
     @JoinColumn({ name: 'NRUNNO', referencedColumnName: 'NRUNNO' })
     DETAILS: PURCPC_DETAILS[];

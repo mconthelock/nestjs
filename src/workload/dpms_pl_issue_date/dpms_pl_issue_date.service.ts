@@ -22,9 +22,7 @@ export class DpmsPlIssueDateService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to find DPMS PL Issue Date: ${error.message}`,
-            );
+            throw new Error(`Failed to find DPMS PL Issue Date: ${error.message}`);
         }
     }
 }

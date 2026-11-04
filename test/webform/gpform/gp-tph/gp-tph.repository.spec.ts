@@ -5,8 +5,14 @@ describe('GP-TPH consecutive approvals', () => {
     it('never auto-approves an Area Owner step before areas are selected', async () => {
         const query = jest.fn();
         const findBy = jest.fn().mockResolvedValue([
-            { CEXTDATA: '01', CSTEPNO: '02', CAPVSTNO: '0',
-                CSTEPST: '2', VAPVNO: 'EMP', VREPNO: 'EMP' },
+            {
+                CEXTDATA: '01',
+                CSTEPNO: '02',
+                CAPVSTNO: '0',
+                CSTEPST: '2',
+                VAPVNO: 'EMP',
+                VREPNO: 'EMP',
+            },
         ]);
         const repo: GpTphRepository = Object.assign(Object.create(GpTphRepository.prototype), {
             dataSource: { manager: { getRepository: () => ({ findBy }), query } },

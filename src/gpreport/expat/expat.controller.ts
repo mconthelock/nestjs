@@ -27,7 +27,6 @@ import { CreateExpatFamilyFileDto } from './dto/create-expat-family-file.dto';
 import { CreateExpatTravelDto } from './dto/create-expat-travel.dto';
 import { UpdateExpatTravelDto } from './dto/update-expat-travel.dto';
 
-
 @Controller('expat')
 export class ExpatController {
     constructor(private readonly expatService: ExpatService) {}
@@ -96,10 +95,7 @@ export class ExpatController {
     }
 
     @Get('employee/:sempno/family/:fid/files')
-    findFamilyFiles(
-        @Param('sempno') sempno: string,
-        @Param('fid', ParseIntPipe) fid: number,
-    ) {
+    findFamilyFiles(@Param('sempno') sempno: string, @Param('fid', ParseIntPipe) fid: number) {
         return this.expatService.findFamilyFiles(sempno, fid);
     }
 
@@ -126,7 +122,7 @@ export class ExpatController {
     findAmecEmployee(@Param('sempno') sempno: string) {
         return this.expatService.findAmecEmployee(sempno);
     }
-/*
+    /*
     @Post('uploadfile/:sempno/:fileType')
     @UseInterceptors(FileInterceptor('file'))
     uploadFileExpat(
@@ -146,12 +142,7 @@ export class ExpatController {
         @Body('SEND_EMAIL') sendEmail: string,
         @UploadedFile() file: Express.Multer.File,
     ) {
-        return this.expatService.uploadFileExpat(
-            sempno,
-            fileType,
-            file,
-            sendEmail,
-        );
+        return this.expatService.uploadFileExpat(sempno, fileType, file, sendEmail);
     }
 
     @Get('viewfile/:sempno/:fileType')
@@ -190,7 +181,10 @@ export class ExpatController {
     }
 
     @Patch('travel/:travelId')
-    updateTravel(@Param('travelId', ParseIntPipe) travelId: number, @Body() dto: UpdateExpatTravelDto) {
+    updateTravel(
+        @Param('travelId', ParseIntPipe) travelId: number,
+        @Body() dto: UpdateExpatTravelDto,
+    ) {
         return this.expatService.updateTravel(travelId, dto);
     }
 
@@ -207,12 +201,7 @@ export class ExpatController {
         @Body('fileType') fileType: string,
         @UploadedFile() file: Express.Multer.File,
     ) {
-        return this.expatService.uploadFamilyFileExpat(
-            sempno,
-            fid,
-            fileType,
-            file,
-        );
+        return this.expatService.uploadFamilyFileExpat(sempno, fid, fileType, file);
     }
 
     @Get('family-file/:sempno/:fid/:fileType')
@@ -223,12 +212,6 @@ export class ExpatController {
         @Query('download') download: string,
         @Res() res: Response,
     ) {
-        return this.expatService.viewFamilyFileExpat(
-            sempno,
-            fid,
-            fileType,
-            download === '1',
-            res,
-        );
+        return this.expatService.viewFamilyFileExpat(sempno, fid, fileType, download === '1', res);
     }
 }

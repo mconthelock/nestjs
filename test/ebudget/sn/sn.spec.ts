@@ -85,9 +85,7 @@ describe('SnModule - MitsuConnection Unit Tests', () => {
     });
 
     it('getDataSn should filter by VORGCODE, FYEAR and CSTATUS=1', async () => {
-        const dummyData = [
-            { FYEAR: '2026', SN: 'SN-001', VORGCODE: 'DEPT01', CSTATUS: '1' },
-        ];
+        const dummyData = [{ FYEAR: '2026', SN: 'SN-001', VORGCODE: 'DEPT01', CSTATUS: '1' }];
         mockFind.mockResolvedValueOnce(dummyData);
 
         const queryDto = { VORGCODE: 'DEPT01', FYEAR: '2026' };
@@ -104,4 +102,3 @@ describe('SnModule - MitsuConnection Unit Tests', () => {
         expect(result).toEqual(dummyData);
     });
 });
-

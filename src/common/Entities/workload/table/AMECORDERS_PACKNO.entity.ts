@@ -1,11 +1,4 @@
-import {
-    Entity,
-    Column,
-    PrimaryColumn,
-    ManyToOne,
-    JoinColumn,
-    OneToOne,
-} from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { AmecOrders } from './amecorders.entity';
 import { PisPages } from './pis-pages.entity';
 

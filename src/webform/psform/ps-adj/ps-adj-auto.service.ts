@@ -37,14 +37,8 @@ export class PsAdjAutoService {
         private readonly repo: PsAdjRepository,
     ) {}
 
-    auto_insert_adjust(
-        dto: AutoInsertAdjustDto,
-        ip: string,
-    ): Promise<AutoAdjustResult>;
-    auto_insert_adjust(
-        dto: AutoInsertAdjustDto[],
-        ip: string,
-    ): Promise<AutoAdjustBatchResult>;
+    auto_insert_adjust(dto: AutoInsertAdjustDto, ip: string): Promise<AutoAdjustResult>;
+    auto_insert_adjust(dto: AutoInsertAdjustDto[], ip: string): Promise<AutoAdjustBatchResult>;
     auto_insert_adjust(
         dto: AutoInsertAdjustDto | AutoInsertAdjustDto[],
         ip: string,
@@ -83,20 +77,13 @@ export class PsAdjAutoService {
         };
     }
 
-    private async createOne(
-        dto: AutoInsertAdjustDto,
-        ip: string,
-    ): Promise<AutoAdjustResult> {
+    private async createOne(dto: AutoInsertAdjustDto, ip: string): Promise<AutoAdjustResult> {
         return this.ds.transaction((manager) =>
             transactionContext.run({ manager }, async () => {
                 // FormCreateService allocates MAX(NRUNNO) + 1, as in jig auto-inspection.
-                await manager.query(
-                    'LOCK TABLE WEBFORM.FORM IN SHARE ROW EXCLUSIVE MODE',
-                );
+                await manager.query('LOCK TABLE WEBFORM.FORM IN SHARE ROW EXCLUSIVE MODE');
                 // Serialize check-and-insert with all writers, including insert_adjust.
-                await manager.query(
-                    'LOCK TABLE WEBFORM.ADJORDREQ IN SHARE ROW EXCLUSIVE MODE',
-                );
+                await manager.query('LOCK TABLE WEBFORM.ADJORDREQ IN SHARE ROW EXCLUSIVE MODE');
                 if (await this.repo.existsByDrawing(dto.DWGNO)) {
                     return {
                         status: 'skipped' as const,
@@ -115,17 +102,9 @@ export class PsAdjAutoService {
                     ip,
                 );
                 if (!created?.status || !created.data) {
-                    throw new InternalServerErrorException(
-                        'WEBFORM creation failed',
-                    );
+                    throw new InternalServerErrorException('WEBFORM creation failed');
                 }
-                const fields = [
-                    'NFRMNO',
-                    'VORGNO',
-                    'CYEAR',
-                    'CYEAR2',
-                    'NRUNNO',
-                ] as const;
+                const fields = ['NFRMNO', 'VORGNO', 'CYEAR', 'CYEAR2', 'NRUNNO'] as const;
                 if (fields.some((field) => created.data[field] == null)) {
                     throw new InternalServerErrorException(
                         'WEBFORM returned an incomplete form key',

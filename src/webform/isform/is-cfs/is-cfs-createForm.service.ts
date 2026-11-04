@@ -26,8 +26,7 @@ export class IsCfsCreateFormService extends IsCfsService {
 
     async createForm(dto: CreateIsCfDto, ip: string) {
         try {
-            const formmst =
-                await this.formmstService.getFormMasterByVaname('IS-CFS');
+            const formmst = await this.formmstService.getFormMasterByVaname('IS-CFS');
             if (!formmst) {
                 throw new Error('Form master not found for IS-CFS');
             }
@@ -62,10 +61,7 @@ export class IsCfsCreateFormService extends IsCfsService {
                 };
                 const createCFSForm = await this.create(data);
                 if (!createCFSForm.status) {
-                    throw new Error(
-                        createCFSForm.message ||
-                            'Insert confirm sheet data Failed',
-                    );
+                    throw new Error(createCFSForm.message || 'Insert confirm sheet data Failed');
                 }
                 const { step, stepDelete } = await this.setFlowStep(data);
                 for (const s of step) {
@@ -86,14 +82,12 @@ export class IsCfsCreateFormService extends IsCfsService {
                 }
             }
         } catch (error) {
-            throw new Error(
-                `Failed to create Confirm sheet form: ${error.message}`,
-            );
+            throw new Error(`Failed to create Confirm sheet form: ${error.message}`);
         }
     }
 
     async setFlowStep(form: InsertIsCfDto): Promise<{
-        step: { CSTEPNO: string, apv?: string }[];
+        step: { CSTEPNO: string; apv?: string }[];
         stepDelete: { CSTEPNO: string }[];
     }> {
         const flowStep = [
@@ -118,7 +112,7 @@ export class IsCfsCreateFormService extends IsCfsService {
             const manager = await this.getManager(j === 0 ? requester : empno);
             if (manager && manager.empno) {
                 empno = manager.empno;
-                step =  this.assignToApv(step, manager.position, empno, 0);
+                step = this.assignToApv(step, manager.position, empno, 0);
             }
         }
         return step;
@@ -143,17 +137,10 @@ export class IsCfsCreateFormService extends IsCfsService {
                     step[2]['apv'] = requester;
                     let empno = '';
                     for (let j = 0; j < 3; j++) {
-                        const manager = await this.getManager(
-                            j === 0 ? requester : empno,
-                        );
+                        const manager = await this.getManager(j === 0 ? requester : empno);
                         if (manager && manager.empno) {
                             empno = manager.empno;
-                            step = this.assignToApv(
-                                step,
-                                manager.position,
-                                empno,
-                                1,
-                            );
+                            step = this.assignToApv(step, manager.position, empno, 1);
                         }
                     }
                 }
@@ -175,7 +162,7 @@ export class IsCfsCreateFormService extends IsCfsService {
         for (const [key, s] of step.entries()) {
             if (!s['apv']) {
                 stepDelete.push(s);
-            }else{
+            } else {
                 stepCopy.push(s);
             }
         }
@@ -216,14 +203,14 @@ export class IsCfsCreateFormService extends IsCfsService {
             DDEM: [null, 4],
             DEM: [1, 5],
         };
-        if(!map[position]){
+        if (!map[position]) {
             return step;
         }
         const index = map[position][round] ?? null;
         if (index !== null) {
             step[index]['apv'] = empno;
         }
-        
+
         return step;
     }
 
@@ -234,13 +221,8 @@ export class IsCfsCreateFormService extends IsCfsService {
      * @example
      * getManager('24008') => { empno: '02035', position: 'SEM' }
      */
-    private async getManager(
-        empno: string,
-    ): Promise<{ empno: string; position: string }> {
-        const manager = await this.sequenceOrgService.getManager(empno, [
-            'HEADNO',
-            'SPOSCODE1',
-        ]);
+    private async getManager(empno: string): Promise<{ empno: string; position: string }> {
+        const manager = await this.sequenceOrgService.getManager(empno, ['HEADNO', 'SPOSCODE1']);
         let empnoResult = '';
         let position = '';
         if (manager && manager.length > 0) {

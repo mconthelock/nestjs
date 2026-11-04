@@ -133,9 +133,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
     // =========================
     describe('expandGLRange', () => {
         it('should expand L range correctly', () => {
-            const result = parser.expandGLRange(
-                'BS123A571 G01 L01~L04 L12~L14',
-            );
+            const result = parser.expandGLRange('BS123A571 G01 L01~L04 L12~L14');
             expect(result).toEqual('BS123A571 G01 L01L02L03L04 L12L13L14');
         });
         it('should return single item if no range', () => {
@@ -249,12 +247,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
                     VNUMBER_FILE: 'file3',
                 },
             ];
-            expect(
-                matcher.getDataListOfCS(
-                    mockList as any,
-                    'BA105A280 G01L21L85L92',
-                ),
-            ).toEqual({
+            expect(matcher.getDataListOfCS(mockList as any, 'BA105A280 G01L21L85L92')).toEqual({
                 VDRAWING: {
                     DRAWING: 'BA105A280',
                     G: ['G01'],
@@ -282,10 +275,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 },
             ];
             expect(() => {
-                matcher.getDataListOfCS(
-                    mockList as any,
-                    'BA105A280 G01L21L85L92',
-                );
+                matcher.getDataListOfCS(mockList as any, 'BA105A280 G01L21L85L92');
             }).toThrow(
                 'Multiple matching drawings found in Master for drawing BA105A280 G01L21L85L92',
             );
@@ -305,9 +295,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
             ];
             expect(() => {
                 matcher.getDataListOfCS(mockList as any, 'BA105A280 G03L01');
-            }).toThrow(
-                'No matching drawing found in Master for drawing BA105A280 G03L01',
-            );
+            }).toThrow('No matching drawing found in Master for drawing BA105A280 G03L01');
         });
     });
 
@@ -329,9 +317,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
         });
         it('should return true if drawing is in delete list', () => {
             const deleteList = ['BA212B768 G01 L03~L05'];
-            expect(
-                matcher.checkDeleteDrawing(deleteList, 'BA212B768 G01L03'),
-            ).toBe(true);
+            expect(matcher.checkDeleteDrawing(deleteList, 'BA212B768 G01L03')).toBe(true);
         });
     });
 
@@ -345,10 +331,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 } as F001KP,
             });
 
-            const result = await resove.checkBreakAssyDrawing(
-                'C60526001PH',
-                'BA118A742 G03',
-            );
+            const result = await resove.checkBreakAssyDrawing('C60526001PH', 'BA118A742 G03');
 
             expect(result).toBe('BA118A742(R) G03');
         });
@@ -362,10 +345,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 } as F001KP,
             });
 
-            const result = await resove.checkBreakAssyDrawing(
-                'C60526001NV',
-                'BA118A742 G03',
-            );
+            const result = await resove.checkBreakAssyDrawing('C60526001NV', 'BA118A742 G03');
 
             expect(result).toBe('BA118A742(L) G03');
         });
@@ -379,10 +359,7 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 } as F001KP,
             });
 
-            const result = await resove.checkBreakAssyDrawing(
-                'S1909110234',
-                'BS127C197 G01',
-            );
+            const result = await resove.checkBreakAssyDrawing('S1909110234', 'BS127C197 G01');
 
             expect(result).toBe('BS127C197 G01');
         });
@@ -393,9 +370,9 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 message: 'not found',
             });
 
-            await expect(
-                resove.checkBreakAssyDrawing('123', 'DWG001'),
-            ).rejects.toThrow('F001KP with control no 123 not found');
+            await expect(resove.checkBreakAssyDrawing('123', 'DWG001')).rejects.toThrow(
+                'F001KP with control no 123 not found',
+            );
         });
     });
 });

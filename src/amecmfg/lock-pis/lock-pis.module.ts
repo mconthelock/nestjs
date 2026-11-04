@@ -13,11 +13,7 @@ import { RedisModule } from 'src/common/redis/redis.module';
 // } from 'src/common/redis/redis.provider';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([LockPis], 'mitsuConnection'),
-        UsersModule,
-        RedisModule,
-    ],
+    imports: [TypeOrmModule.forFeature([LockPis], 'mitsuConnection'), UsersModule, RedisModule],
     controllers: [LockPisController],
     providers: [
         LockPisGateway,

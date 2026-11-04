@@ -5,15 +5,15 @@ import { UpdatePprDto } from './dto/update-ppr.dto';
 
 @Controller('amec/ppr')
 export class PprController {
-  constructor(private readonly pprService: PprService) {}
+    constructor(private readonly pprService: PprService) {}
 
-  @Get()
-  findAll() {
-    return this.pprService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.pprService.findAll();
+    }
 
-  @Get(':pr')
-  findOne(@Param('pr') pr: string) {
-    return this.pprService.findOne(pr);
-  }
+    @Get(':pr')
+    findOne(@Param('pr') pr: string) {
+        return this.pprService.findOne(pr);
+    }
 }

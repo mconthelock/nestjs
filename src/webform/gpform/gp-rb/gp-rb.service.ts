@@ -20,7 +20,7 @@ export class GpRbService {
         private readonly formCreateService: FormCreateService,
         private readonly handleFileFormService: HandleFileFormService,
         private readonly doactionService: DoactionFlowService,
-        private readonly deleteFlowStepService:DeleteFlowStepService
+        private readonly deleteFlowStepService: DeleteFlowStepService,
     ) {}
 
     findPurpose() {
@@ -31,19 +31,12 @@ export class GpRbService {
         return this.repo.findConfig();
     }
 
-    async create(
-        dto: CreateStampReqFormDto,
-        ip: string,
-        file: Express.Multer.File,
-    ) {
+    async create(dto: CreateStampReqFormDto, ip: string, file: Express.Multer.File) {
         try {
             // ดึงข้อมูล Form Master
-            const formmst =
-                await this.formmstService.getFormMasterByVaname('GP-RB');
+            const formmst = await this.formmstService.getFormMasterByVaname('GP-RB');
             if (!formmst) {
-                throw new Error(
-                    'Form master not found for GP-RB. Check FORMMST table.',
-                );
+                throw new Error('Form master not found for GP-RB. Check FORMMST table.');
             }
 
             // สร้าง Form
@@ -62,9 +55,7 @@ export class GpRbService {
             // ตรวจสอบผลการสร้าง Form
             if (!createForm?.status) {
                 const errMsg =
-                    createForm?.message?.message ||
-                    createForm?.message ||
-                    'Unknown error';
+                    createForm?.message?.message || createForm?.message || 'Unknown error';
                 throw new Error(`Form creation failed: ${errMsg}`);
             }
             const form = {
@@ -76,19 +67,17 @@ export class GpRbService {
             };
 
             const sposcode = Number(dto.SPOSCODE);
-            if(!Number.isNaN(sposcode) && sposcode < 33){
+            if (!Number.isNaN(sposcode) && sposcode < 33) {
                 await this.deleteFlowStepService.deleteFlowStep({
                     ...form,
-                        CSTEPNO: '14' //SUCHART 
+                    CSTEPNO: '14', //SUCHART
                 });
             }
 
             const data = {
                 ...form,
                 PURPOSE_ID: dto.PURPOSE_ID ? Number(dto.PURPOSE_ID) : null,
-                PURPOSE_OTHER: dto.PURPOSE_OTHER
-                    ? dto.PURPOSE_OTHER.trim()
-                    : null,
+                PURPOSE_OTHER: dto.PURPOSE_OTHER ? dto.PURPOSE_OTHER.trim() : null,
                 SPOSCODE: dto.SPOSCODE ? dto.SPOSCODE.trim() : null,
                 NAME_STAMP: dto.NAME_STAMP ? dto.NAME_STAMP.trim() : null,
                 REMARK: dto.REMARK ? dto.REMARK.trim() : null,
@@ -97,8 +86,7 @@ export class GpRbService {
             };
             const insert = await this.repo.CreateStampReq(data);
 
-
-            if(file){
+            if (file) {
                 const save = await this.handleFileFormService.insertFiles(
                     {
                         ...form,
@@ -108,8 +96,7 @@ export class GpRbService {
                     file,
                 );
             }
-        
-       
+
             // throw new Error('test');
 
             return {
@@ -134,10 +121,7 @@ export class GpRbService {
             // if (!dto.NAME_STAMP) {
             //     throw new BadRequestException('NAME_STAMP is required');
             // }
-            const updateResult = await this.repo.updateNameStamp(
-                form,
-                dto.NAME_STAMP,
-            );
+            const updateResult = await this.repo.updateNameStamp(form, dto.NAME_STAMP);
 
             if (!updateResult.affected) {
                 throw new BadRequestException('GP-RB stamp request not found');
@@ -167,4 +151,3 @@ export class GpRbService {
         return this.repo.findOne(dto);
     }
 }
-

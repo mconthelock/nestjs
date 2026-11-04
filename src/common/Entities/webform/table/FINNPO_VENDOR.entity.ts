@@ -11,7 +11,6 @@ export class FINNPOVENDOR {
 
     @Column()
     ACTIVE: string;
-    
 }
 
 // NFRMNO

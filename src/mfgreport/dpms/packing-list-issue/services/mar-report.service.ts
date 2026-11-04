@@ -72,7 +72,9 @@ export class MarReportService {
                 {} as Record<string, typeof list.data>,
             );
 
-            logMessage.push(log_message(`Total projects: ${Object.keys(projectMap).length} records`));
+            logMessage.push(
+                log_message(`Total projects: ${Object.keys(projectMap).length} records`),
+            );
 
             // ดึงรายชื่ออีเมลจากฐานข้อมูล
             const mails = await this.dpmsPlMailService.findAll();
@@ -83,15 +85,14 @@ export class MarReportService {
 
             for (const [project, projectList] of Object.entries(projectMap)) {
                 const lists = projectList as typeof list.data;
-                logMessage.push(log_message(`Sending report for project: ${project}, records: ${lists.length}`));
-                let attachments = [];
+                logMessage.push(
+                    log_message(`Sending report for project: ${project}, records: ${lists.length}`),
+                );
+                const attachments = [];
                 // สร้าง path สำหรับไฟล์ PDF และ Excel และแนบไฟล์เหล่านั้นไปกับอีเมล
                 for (const item of lists) {
                     const pdfPath = await joinPaths(item.PDFPATH, item.PDFNAME);
-                    const excelPath = await joinPaths(
-                        item.EXCELPATH,
-                        item.EXCELNAME,
-                    );
+                    const excelPath = await joinPaths(item.EXCELPATH, item.EXCELNAME);
                     attachments.push(
                         {
                             filename: item.PDFNAME,
@@ -123,7 +124,7 @@ export class MarReportService {
             return {
                 status: true,
                 message: 'MAR report sent successfully',
-            }
+            };
         } catch (error) {
             throw new Error(`Error sending MAR report: ${error.message}`);
         } finally {

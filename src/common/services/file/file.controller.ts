@@ -48,14 +48,9 @@ export class FilesController {
     }
 
     @Post('template/read')
-    async exportTemplate(
-        @Body() body: { path: string; name: string },
-        @Res() res: Response,
-    ) {
-        console.log(
-            body.path
-        );
-        
+    async exportTemplate(@Body() body: { path: string; name: string }, @Res() res: Response) {
+        console.log(body.path);
+
         if (!fs.existsSync(body.path)) {
             throw new BadRequestException('File not found on disk');
         }
@@ -77,10 +72,7 @@ export class FilesController {
     //         { name: 'test', maxCount: 10 },
     //       ]),
     //     )
-    async saveFile(
-        @UploadedFiles() files: Express.Multer.File[],
-        @Body() dto: SaveFileDto,
-    ) {
+    async saveFile(@UploadedFiles() files: Express.Multer.File[], @Body() dto: SaveFileDto) {
         return await this.fileService.saveFile(files, dto);
     }
 
@@ -89,9 +81,7 @@ export class FilesController {
         if (await deleteFile(dto.path)) {
             return { status: true, message: 'File deleted successfully' };
         } else {
-            throw new Error(
-                'Failed to delete file, check server logs for details',
-            );
+            throw new Error('Failed to delete file, check server logs for details');
         }
     }
 }

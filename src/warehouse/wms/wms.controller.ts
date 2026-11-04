@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Req, HttpCode, HttpStatus, UseGuards, BadRequestException } from '@nestjs/common';
+import {
+    Controller,
+    Post,
+    Body,
+    Req,
+    HttpCode,
+    HttpStatus,
+    UseGuards,
+    BadRequestException,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
@@ -24,9 +33,7 @@ export class WMSController {
     @ApiOperation({ summary: 'Get ship issue' })
     @ApiBody({ type: WMSUserDto })
     @ApiResponse({ status: 200, type: WMSTempIssueDto, isArray: true })
-    async issueList(
-        @Body() body: WMSUserDto
-    ): Promise<WMSTempIssueDto[]> {
+    async issueList(@Body() body: WMSUserDto): Promise<WMSTempIssueDto[]> {
         return this.service.getIssueList(body.empno);
     }
 
@@ -40,9 +47,7 @@ export class WMSController {
     @ApiOperation({ summary: 'Upload issue' })
     @ApiBody({ type: WMSUploadIssueDto })
     @ApiResponse({ status: 200, type: WMSUploadIssueResponseDto })
-    async uploadIssue(
-        @Body() body: WMSUploadIssueDto,
-    ): Promise<WMSUploadIssueResponseDto> {
+    async uploadIssue(@Body() body: WMSUploadIssueDto): Promise<WMSUploadIssueResponseDto> {
         return this.service.uploadIssue(body);
     }
 }

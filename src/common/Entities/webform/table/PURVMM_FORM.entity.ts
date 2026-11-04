@@ -1,12 +1,4 @@
-import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    ManyToOne,
-    JoinColumn,
-    OneToOne,
-    OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, OneToOne, OneToMany } from 'typeorm';
 
 import { Vendors } from 'src/common/Entities/pursys/table/VENDORS.entity';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';

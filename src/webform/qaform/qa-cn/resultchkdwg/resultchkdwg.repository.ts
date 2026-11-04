@@ -29,10 +29,7 @@ export class ResultChkDwgRepository extends BaseRepository {
         });
     }
 
-    async updateMultiple(
-        con: FormDto,
-        dtos: UpdateResultchkdwgDto[],
-    ): Promise<boolean> {
+    async updateMultiple(con: FormDto, dtos: UpdateResultchkdwgDto[]): Promise<boolean> {
         try {
             const updatePromises = dtos.map((dto) => {
                 const condition = {

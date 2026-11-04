@@ -1,21 +1,11 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ReportPermissionService } from './report-permission.service';
 import { CreateReportPermissionDto } from './dto/create-report-permission.dto';
 import { UpdateReportPermissionDto } from './dto/update-report-permission.dto';
 
 @Controller('gpreport/report-permission')
 export class ReportPermissionController {
-    constructor(
-        private readonly reportPermissionService: ReportPermissionService,
-    ) {}
+    constructor(private readonly reportPermissionService: ReportPermissionService) {}
 
     @Get()
     findAll() {
@@ -33,14 +23,8 @@ export class ReportPermissionController {
     }
 
     @Patch(':id')
-    update(
-        @Param('id') id: string,
-        @Body() updateReportPermissionDto: UpdateReportPermissionDto,
-    ) {
-        return this.reportPermissionService.update(
-            id,
-            updateReportPermissionDto,
-        );
+    update(@Param('id') id: string, @Body() updateReportPermissionDto: UpdateReportPermissionDto) {
+        return this.reportPermissionService.update(id, updateReportPermissionDto);
     }
 
     @Delete(':id')

@@ -37,7 +37,10 @@ export class DpmsPlIssueRevRepository extends BaseRepository {
         });
     }
 
-    findLatestRevisionWithoutType(condition: dpmsPlIssueRevFindLatestRevision, withOutType: number) {
+    findLatestRevisionWithoutType(
+        condition: dpmsPlIssueRevFindLatestRevision,
+        withOutType: number,
+    ) {
         return this.getRepository(DPMS_PL_ISSUE_REV).findOne({
             where: { ...condition, NISSUE_TYPE: Not(withOutType) },
             order: {

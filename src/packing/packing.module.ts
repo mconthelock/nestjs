@@ -3,9 +3,6 @@ import { AuthModule } from './auth/auth.module';
 import { VPSModule } from './vps/vps.module';
 
 @Module({
-  imports: [
-    AuthModule,
-    VPSModule
-  ]
+    imports: [AuthModule, VPSModule],
 })
 export class PackingModule {}

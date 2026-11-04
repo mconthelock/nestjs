@@ -111,10 +111,7 @@ export class PrintedNcService {
                     filename: item[0].FILE_ONAME,
                 });
                 for (const row of item) {
-                    const pdfPath = path.join(
-                        pdfContext.pdfDirectory,
-                        `${row.PAGE_TAG}.pdf`,
-                    );
+                    const pdfPath = path.join(pdfContext.pdfDirectory, `${row.PAGE_TAG}.pdf`);
 
                     await this.printed.writeLog(
                         `Processing NC Detail for ${dbData.originalfilename}, PAGE_TAG ${row.PAGE_TAG}`,
@@ -122,9 +119,7 @@ export class PrintedNcService {
 
                     try {
                         await this.embedNCToPdf(pdfPath, row.TAGMARK);
-                        await this.printed.writeLog(
-                            `Put NC No. ${row.TAGMARK} to ${row.PAGE_TAG}`,
-                        );
+                        await this.printed.writeLog(`Put NC No. ${row.TAGMARK} to ${row.PAGE_TAG}`);
 
                         splitFilesData.push({
                             fileName: row.PAGE_TAG,
@@ -134,9 +129,7 @@ export class PrintedNcService {
                     } catch (error) {
                         await this.printed.writeLog(
                             `Error processing CN Data for tag ${row.PAGE_TAG}`,
-                            error instanceof Error
-                                ? error.message
-                                : String(error),
+                            error instanceof Error ? error.message : String(error),
                         );
                     }
                 }
@@ -154,19 +147,11 @@ export class PrintedNcService {
                     FILE_STATUS: 2,
                 });
 
-                const outputPath = path.join(
-                    pdfContext.pdfDirectory,
-                    dbData.filename,
-                );
-                const filnalFilePath = path.join(
-                    pdfContext.pdfDirectory,
-                    dbData.originalfilename,
-                );
+                const outputPath = path.join(pdfContext.pdfDirectory, dbData.filename);
+                const filnalFilePath = path.join(pdfContext.pdfDirectory, dbData.originalfilename);
                 await this.merge.mergePdfsFast(splitFilesData, outputPath);
                 await fs.rename(outputPath, filnalFilePath);
-                await this.printed.writeLog(
-                    `Merged NC Detail PDF for ${dbData.originalfilename}`,
-                );
+                await this.printed.writeLog(`Merged NC Detail PDF for ${dbData.originalfilename}`);
             }
         } catch (error) {
             throw new Error(

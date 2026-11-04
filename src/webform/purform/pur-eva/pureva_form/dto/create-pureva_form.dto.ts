@@ -1,13 +1,6 @@
 import { PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import {
-    IsArray,
-    IsDate,
-    IsNotEmpty,
-    IsNumber,
-    IsOptional,
-    IsString,
-} from 'class-validator';
+import { IsArray, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
 export class CreatePurevaFormDto extends PickType(FormDto, [

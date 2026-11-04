@@ -88,7 +88,7 @@ export class STY_PATROL_INSPECTION {
 
     @ViewColumn()
     PA_CLASS: number;
-    
+
     @ViewColumn()
     TYPE_NO: number;
 

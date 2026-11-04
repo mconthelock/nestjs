@@ -5,16 +5,15 @@ import { UpdateMatrixSectionDto } from './dto/update-matrix-section.dto';
 
 @Controller('matrix/section')
 export class MatrixSectionController {
-  constructor(private readonly matrixSectionService: MatrixSectionService) {}
+    constructor(private readonly matrixSectionService: MatrixSectionService) {}
 
-  @Get()
-  async findAll() {
-    return await this.matrixSectionService.findAll();
-  }
+    @Get()
+    async findAll() {
+        return await this.matrixSectionService.findAll();
+    }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.matrixSectionService.findOne(+id);
-  }
-
+    @Get(':id')
+    async findOne(@Param('id') id: string) {
+        return await this.matrixSectionService.findOne(+id);
+    }
 }

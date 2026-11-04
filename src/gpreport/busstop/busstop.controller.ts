@@ -6,37 +6,35 @@ import { SearchBusstopDto } from './dto/search-busstop.dto';
 
 @Controller('bus/stop')
 export class BusstopController {
-  constructor(private readonly stop: BusstopService) {}
+    constructor(private readonly stop: BusstopService) {}
 
-  @Post('create')
-  create(@Body() dto: CreateBusstopDto) {
-    return this.stop.create(dto);
-  }
+    @Post('create')
+    create(@Body() dto: CreateBusstopDto) {
+        return this.stop.create(dto);
+    }
 
-  @Post('update')
-  update(@Body() dto: UpdateBusstopDto) {
-    return this.stop.update(dto);
-  }
+    @Post('update')
+    update(@Body() dto: UpdateBusstopDto) {
+        return this.stop.update(dto);
+    }
 
-  @Post('delete')
-  delete(@Body() dto: UpdateBusstopDto) {
-    return this.stop.update({ STOP_ID: dto.STOP_ID, STOP_STATUS: '0' });
-  }
+    @Post('delete')
+    delete(@Body() dto: UpdateBusstopDto) {
+        return this.stop.update({ STOP_ID: dto.STOP_ID, STOP_STATUS: '0' });
+    }
 
-  @Post('search')
-  find(@Body() dto: SearchBusstopDto) {
-    return this.stop.findAll(dto);
-  }
+    @Post('search')
+    find(@Body() dto: SearchBusstopDto) {
+        return this.stop.findAll(dto);
+    }
 
-  @Post('deleteStop')
-  deleteStop(@Body() dto: UpdateBusstopDto) {
-    return this.stop.deleteStop(dto.STOP_ID);
-  }
+    @Post('deleteStop')
+    deleteStop(@Body() dto: UpdateBusstopDto) {
+        return this.stop.deleteStop(dto.STOP_ID);
+    }
 
-
-  @Post('getStopRoutes')
-  get() {
-    return this.stop.getStopRoutes();
-  }
-
+    @Post('getStopRoutes')
+    get() {
+        return this.stop.getStopRoutes();
+    }
 }

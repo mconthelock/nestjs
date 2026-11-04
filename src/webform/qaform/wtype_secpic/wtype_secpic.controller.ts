@@ -5,35 +5,26 @@ import { WtypeSecpicService } from './wtype_secpic.service';
 
 @Controller('webform/wtype-secpic')
 export class WtypeSecpicController {
-  constructor(
-    private readonly wtypeSecpicService: WtypeSecpicService,
-  ) {}
+    constructor(private readonly wtypeSecpicService: WtypeSecpicService) {}
 
-  @Get()
-  findAll() {
-    return this.wtypeSecpicService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.wtypeSecpicService.findAll();
+    }
 
-  @Get('sections/:tid')
-  findSectionsByWtype(
-    @Param('tid') tid: number,
-  ) {
-    return this.wtypeSecpicService.findSectionsByWtype(tid);
-  }
+    @Get('sections/:tid')
+    findSectionsByWtype(@Param('tid') tid: number) {
+        return this.wtypeSecpicService.findSectionsByWtype(tid);
+    }
 
-  @Get(':tid/:secid')
-  findOne(
-    @Param('tid') tid: number,
-    @Param('secid') secid: number,
-  ) {
-    return this.wtypeSecpicService.findOne(tid, secid);
-  }
+    @Get(':tid/:secid')
+    findOne(@Param('tid') tid: number, @Param('secid') secid: number) {
+        return this.wtypeSecpicService.findOne(tid, secid);
+    }
 
-  @Post('search')
-  @UseTransaction('mitsuConnection')
-  search(@Body() dto: FiltersDto) {
-    return this.wtypeSecpicService.search(dto);
-  }
-
-
+    @Post('search')
+    @UseTransaction('mitsuConnection')
+    search(@Body() dto: FiltersDto) {
+        return this.wtypeSecpicService.search(dto);
+    }
 }

@@ -10,10 +10,7 @@ import { AMECORDERS_PROCESS } from 'src/common/Entities/escs/table/AMECORDERS_PR
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature(
-            [F001KP, Q90010P2, M008KP, AMECORDERS_PROCESS],
-            'mitsuConnection',
-        ),
+        TypeOrmModule.forFeature([F001KP, Q90010P2, M008KP, AMECORDERS_PROCESS], 'mitsuConnection'),
     ],
     controllers: [MfgFeederController],
     providers: [MfgFeederService, MfgFeederRepository],

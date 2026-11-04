@@ -7,9 +7,7 @@ import { UpdateUsersFileDto } from './dto/update-user-file.dto';
 
 @Injectable()
 export class UsersFileRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

@@ -38,7 +38,6 @@ export class DrawingBMDataDto {
     PROD_6: number;
 }
 
-
 export class DrawingBMResponseDto {
     @ApiProperty({
         example: 'SUCCESS',

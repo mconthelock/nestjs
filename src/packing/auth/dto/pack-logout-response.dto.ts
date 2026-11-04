@@ -1,13 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PackLogoutResponseDto {
-  @ApiProperty({ 
-    example: 'success'
-  })
-  status: 'success';
+    @ApiProperty({
+        example: 'success',
+    })
+    status: 'success';
 
-  @ApiProperty({ 
-    example: 'Logged out successfully' 
-  })
-  message: string;
+    @ApiProperty({
+        example: 'Logged out successfully',
+    })
+    message: string;
 }

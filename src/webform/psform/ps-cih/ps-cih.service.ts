@@ -63,10 +63,7 @@ export class PsCihService {
         return this.psCihRepo.getReportData(dto);
     }
 
-    async uploadFile(
-        body: InsertAndMoveHandleFileFormDto,
-        file: Express.Multer.File[],
-    ) {
+    async uploadFile(body: InsertAndMoveHandleFileFormDto, file: Express.Multer.File[]) {
         return this.handleFileFormService.insertFiles(body, file);
     }
 }

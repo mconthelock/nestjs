@@ -1,12 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { PUR_FILE } from './PUR_FILE.entity';
 import { PUREVA_PROFIT_TURNOVER } from './PUREVA_PROFIT_TURNOVER.entity';
 import { PUREVA_SCORE } from './PUREVA_SCORE.entity';

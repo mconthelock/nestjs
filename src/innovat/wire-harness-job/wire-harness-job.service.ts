@@ -3,13 +3,11 @@ import { WireHarnessJobRepository } from './wire-harness-job.repository';
 
 @Injectable()
 export class WireHarnessJobService {
-    constructor(
-        private readonly repo: WireHarnessJobRepository,
-    ) {}
+    constructor(private readonly repo: WireHarnessJobRepository) {}
 
     async syncProductionPlan() {
         const rows = await this.repo.getProductionPlan();
-        const data = rows.map(row => ({
+        const data = rows.map((row) => ({
             CTRLNO: row.CTRLNO.trim(),
             PROCESS: row.PROCESS.trim(),
             PROD: row.PROD.trim(),

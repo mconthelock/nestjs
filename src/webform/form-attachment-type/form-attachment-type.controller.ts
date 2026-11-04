@@ -5,7 +5,5 @@ import { UpdateFormAttachmentTypeDto } from './dto/update-form-attachment-type.d
 
 @Controller('form-attachment-type')
 export class FormAttachmentTypeController {
-    constructor(
-        private readonly formAttachmentTypeService: FormAttachmentTypeService,
-    ) {}
+    constructor(private readonly formAttachmentTypeService: FormAttachmentTypeService) {}
 }

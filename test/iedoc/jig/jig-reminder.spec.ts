@@ -2,39 +2,79 @@ import { JigReminderService } from 'src/iedoc/jig/jig-reminder.service';
 import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
 
 describe('JIG inspection reminders', () => {
-    const row = { JIG_NO: 'J26-001', JIG_NAME: '<JIG>', PIC_EMPNO: '12345',
-        DUE_DATE: '01/11/2026', DAYS_UNTIL_DUE: 30, SNAME: 'Controller',
-        SRECMAIL: 'controller@example.com', SSECCODE: 'SEC001', SDEPCODE: 'DEP001' };
+    const row = {
+        JIG_NO: 'J26-001',
+        JIG_NAME: '<JIG>',
+        PIC_EMPNO: '12345',
+        DUE_DATE: '01/11/2026',
+        DAYS_UNTIL_DUE: 30,
+        SNAME: 'Controller',
+        SRECMAIL: 'controller@example.com',
+        SSECCODE: 'SEC001',
+        SDEPCODE: 'DEP001',
+    };
     let query: jest.Mock;
     let sendMail: jest.Mock;
     let service: JigReminderService;
     let getRepository: jest.Mock;
     let ccLookups: string[][];
     beforeEach(() => {
-        query = jest.fn(async (sql: string, binds: string[]) => sql.includes('IEDOC.JIG_MASTER') ? [row]
-            : [{ SEMPNO: binds[1], SNAME: `Manager ${binds[1]}`, SRECMAIL: `manager${binds[1]}@example.com` }]);
+        query = jest.fn(async (sql: string, binds: string[]) =>
+            sql.includes('IEDOC.JIG_MASTER')
+                ? [row]
+                : [
+                      {
+                          SEMPNO: binds[1],
+                          SNAME: `Manager ${binds[1]}`,
+                          SRECMAIL: `manager${binds[1]}@example.com`,
+                      },
+                  ],
+        );
         sendMail = jest.fn().mockResolvedValue({ rejected: [] });
         ccLookups = [];
-        getRepository = jest.fn(() => ({ createQueryBuilder: () => {
-            let org: string;
-            let position: string;
-            const builder = {
-                leftJoin: jest.fn().mockReturnThis(), select: jest.fn().mockReturnThis(),
-                addSelect: jest.fn().mockReturnThis(), distinct: jest.fn().mockReturnThis(),
-                where: (_sql: string, params: any) => { org = params.org; return builder; },
-                andWhere: (_sql: string, params: any) => { position = params.position; return builder; },
-                getRawMany: async () => {
-                    ccLookups.push([org, position]);
-                    return [{ SEMPNO: position, SNAME: `Manager ${position}`, SRECMAIL: `manager${position}@example.com` }];
-                },
-            };
-            return builder;
-        } }));
-        service = new JigReminderService({ query } as any, { sendMail } as any, { getRepository } as any);
+        getRepository = jest.fn(() => ({
+            createQueryBuilder: () => {
+                let org: string;
+                let position: string;
+                const builder = {
+                    leftJoin: jest.fn().mockReturnThis(),
+                    select: jest.fn().mockReturnThis(),
+                    addSelect: jest.fn().mockReturnThis(),
+                    distinct: jest.fn().mockReturnThis(),
+                    where: (_sql: string, params: any) => {
+                        org = params.org;
+                        return builder;
+                    },
+                    andWhere: (_sql: string, params: any) => {
+                        position = params.position;
+                        return builder;
+                    },
+                    getRawMany: async () => {
+                        ccLookups.push([org, position]);
+                        return [
+                            {
+                                SEMPNO: position,
+                                SNAME: `Manager ${position}`,
+                                SRECMAIL: `manager${position}@example.com`,
+                            },
+                        ];
+                    },
+                };
+                return builder;
+            },
+        }));
+        service = new JigReminderService(
+            { query } as any,
+            { sendMail } as any,
+            { getRepository } as any,
+        );
     });
     it('resolves CC from the controller section/department and previews without sending', async () => {
         const result = await service.send({ date: '02/10/2026', dryRun: true });
-        expect(ccLookups).toEqual([['SEC001', '30'], ['DEP001', '20']]);
+        expect(ccLookups).toEqual([
+            ['SEC001', '30'],
+            ['DEP001', '20'],
+        ]);
         expect(getRepository).toHaveBeenCalledWith(ORGPOS);
         expect(query).toHaveBeenCalledTimes(1);
         expect(query.mock.calls[0][1]).toEqual(['02/10/2026', '02/10/2026', '02/10/2026']);
@@ -43,13 +83,13 @@ describe('JIG inspection reminders', () => {
         expect(result.items[0].originalRecipients.cc1[0].SNAME).toBe('Manager 30');
         expect(sendMail).not.toHaveBeenCalled();
     });
-    it.each([30, 14, 7, -1, -400])('sends qualifying day %s', async days => {
+    it.each([30, 14, 7, -1, -400])('sends qualifying day %s', async (days) => {
         query.mockResolvedValueOnce([{ ...row, DAYS_UNTIL_DUE: days }]);
         const result = await service.send({});
         expect(result.summary.sent).toBe(1);
         expect(result.items[0].subject).toContain(days < 0 ? 'OVERDUE' : `${days} Days`);
     });
-    it.each([31, 15, 8, 1, 0])('does not send on day %s', async days => {
+    it.each([31, 15, 8, 1, 0])('does not send on day %s', async (days) => {
         query.mockResolvedValueOnce([{ ...row, DAYS_UNTIL_DUE: days }]);
         expect((await service.send({})).summary.total).toBe(0);
         expect(sendMail).not.toHaveBeenCalled();
@@ -75,7 +115,10 @@ describe('JIG inspection reminders', () => {
     });
     it('uses Bangkok calendar date at UTC day boundary', async () => {
         jest.useFakeTimers().setSystemTime(new Date('2026-10-05T18:00:00Z'));
-        try { expect((await service.send({ dryRun: true })).asOf).toBe('06/10/2026'); }
-        finally { jest.useRealTimers(); }
+        try {
+            expect((await service.send({ dryRun: true })).asOf).toBe('06/10/2026');
+        } finally {
+            jest.useRealTimers();
+        }
     });
 });

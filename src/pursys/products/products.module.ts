@@ -8,10 +8,7 @@ import { Products } from 'src/common/Entities/pursys/table/PRODUCTS.entity';
 import { CategoriesModule } from '../categories/categories.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Products], 'mitsuConnection'),
-        CategoriesModule,
-    ],
+    imports: [TypeOrmModule.forFeature([Products], 'mitsuConnection'), CategoriesModule],
     controllers: [ProductsController],
     providers: [ProductsService, OptionRegistryService],
 })

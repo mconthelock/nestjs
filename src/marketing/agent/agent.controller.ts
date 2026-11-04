@@ -3,10 +3,10 @@ import { AgentService } from './agent.service';
 
 @Controller('mkt/agent')
 export class AgentController {
-  constructor(private readonly agent: AgentService) {}
+    constructor(private readonly agent: AgentService) {}
 
-  @Get()
-  findAll() {
-    return this.agent.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.agent.findAll();
+    }
 }

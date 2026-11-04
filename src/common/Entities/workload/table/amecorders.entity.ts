@@ -1,11 +1,4 @@
-import {
-    Entity,
-    Column,
-    PrimaryColumn,
-    OneToMany,
-    JoinColumn,
-    OneToOne,
-} from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToMany, JoinColumn, OneToOne } from 'typeorm';
 import { AmecOrdersPackNo } from './AMECORDERS_PACKNO.entity';
 import { AmecOrdersSchedule } from './amecorders_schedule.entity';
 

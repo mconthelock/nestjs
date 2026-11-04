@@ -1,11 +1,4 @@
-import {
-    Column,
-    Entity,
-    ManyToOne,
-    OneToMany,
-    PrimaryColumn,
-    JoinColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn, JoinColumn } from 'typeorm';
 
 @Entity({ name: 'PURPRA_REASON_MASTER', schema: 'WEBFORM' })
 export class PURPRA_REASON_MASTER {

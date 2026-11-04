@@ -1,10 +1,5 @@
 import { DPMS_COUNTRY_CONDITION } from 'src/common/Entities/workload/table/DPMS_COUNTRY_CONDITION.entity';
-import {
-    EventSubscriber,
-    EntitySubscriberInterface,
-    UpdateEvent,
-    InsertEvent,
-} from 'typeorm';
+import { EventSubscriber, EntitySubscriberInterface, UpdateEvent, InsertEvent } from 'typeorm';
 
 @EventSubscriber()
 export class DpmsCountryConditionSubscriber implements EntitySubscriberInterface<DPMS_COUNTRY_CONDITION> {

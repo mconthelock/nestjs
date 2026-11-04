@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import {
-    CreatePackingListIssueDto,
-    ListPLDto,
-} from '../dto/create-packing-list-issue.dto';
+import { CreatePackingListIssueDto, ListPLDto } from '../dto/create-packing-list-issue.dto';
 
 import { GenerateExcelResult } from '../interface/excel.interface';
 import { DPMS_PL_ISSUE_PK, IdocRevData } from '../packing-list-issue.interface';
@@ -58,22 +55,20 @@ export class IssueService extends PackingListIssueService {
             const issueDate: string = now('DD/MM/YYYY');
             const finishDate: Date = new Date();
 
-            const issueType = await this.dpmsPlIssueTypeService.findById(
-                dto.ISSUETYPE,
-            );
+            const issueType = await this.dpmsPlIssueTypeService.findById(dto.ISSUETYPE);
             const plIssueData: DPMS_PL_ISSUE_PK = {
                 VPROD: dto.VPROD,
                 VP: dto.VP,
                 VORDERS: dto.VORDERS,
                 VTYPE: dto.VTYPE,
             };
-            let round: number = dto.PO ? 2 : 1;
+            const round: number = dto.PO ? 2 : 1;
             const folderPath: string[] = ['AMEC', 'PO'];
             let docRevision: number = 0;
             let docRevData: IdocRevData = plIssueData;
             let revision: number = 0;
             let revisionText: string = '*';
-            let mailObject: {
+            const mailObject: {
                 subject: string;
                 maillist: string[];
                 context: any;
@@ -145,15 +140,14 @@ export class IssueService extends PackingListIssueService {
                     projectName: dto.HEADER.VNAMEOFBLDG,
                     PO: NDOCTYPE === 1,
                 });
-                const pdf: { path: string; data: Buffer } =
-                    await this.pdfService.generatePDF({
-                        order: dto.VORDERS,
-                        html: html,
-                        fileName: fileName,
-                        revision: revisionText,
-                        issueDate,
-                        finalPath: pdfPath,
-                    });
+                const pdf: { path: string; data: Buffer } = await this.pdfService.generatePDF({
+                    order: dto.VORDERS,
+                    html: html,
+                    fileName: fileName,
+                    revision: revisionText,
+                    issueDate,
+                    finalPath: pdfPath,
+                });
 
                 listFilePath.push({
                     fileName: fileName,
@@ -161,16 +155,15 @@ export class IssueService extends PackingListIssueService {
                     type: 'pdf',
                 });
 
-                const excel: GenerateExcelResult =
-                    await this.excelService.generateExcelFile({
-                        list: plList,
-                        shippingMark: dto.SHIPPING_MARK,
-                        path: excelPath,
-                        fileName: fileName,
-                        order: dto.VORDERS,
-                        subject: dto.HEADER.VSUBJECT,
-                        project: dto.HEADER.VNAMEOFBLDG,
-                    });
+                const excel: GenerateExcelResult = await this.excelService.generateExcelFile({
+                    list: plList,
+                    shippingMark: dto.SHIPPING_MARK,
+                    path: excelPath,
+                    fileName: fileName,
+                    order: dto.VORDERS,
+                    subject: dto.HEADER.VSUBJECT,
+                    project: dto.HEADER.VNAMEOFBLDG,
+                });
 
                 listFilePath.push({
                     fileName: excel.fileName,
@@ -190,16 +183,10 @@ export class IssueService extends PackingListIssueService {
                         VFILE_PATH: file.filePath,
                     });
                     if (insertFile.status === false) {
-                        throw new Error(
-                            'Failed to insert packing list file record',
-                        );
+                        throw new Error('Failed to insert packing list file record');
                     }
-                    pdfID =
-                        file.type === 'pdf' ? insertFile.data.NFILE_ID : pdfID;
-                    excelID =
-                        file.type === 'excel'
-                            ? insertFile.data.NFILE_ID
-                            : excelID;
+                    pdfID = file.type === 'pdf' ? insertFile.data.NFILE_ID : pdfID;
+                    excelID = file.type === 'excel' ? insertFile.data.NFILE_ID : excelID;
                 }
 
                 // 6. create PL Issue Revision record
@@ -220,9 +207,7 @@ export class IssueService extends PackingListIssueService {
                     NDOCTYPE: NDOCTYPE,
                 });
                 if (insertIssueRev.status === false) {
-                    throw new Error(
-                        'Failed to insert packing list issue revision record',
-                    );
+                    throw new Error('Failed to insert packing list issue revision record');
                 }
                 console.log('insert Issue rev', insertIssueRev.data);
                 // throw new Error('Test error'); // ลองทดสอบ error handling
@@ -252,12 +237,11 @@ export class IssueService extends PackingListIssueService {
                 // 9. Create PL Issue List record
                 for (const list of plList) {
                     const seq: number = plList.indexOf(list) + 1;
-                    const insertIssueList =
-                        await this.dpmsPlCaseListService.create({
-                            ...list,
-                            NISSUEREV_ID: insertIssueRev.data.NID,
-                            NSEQ: seq,
-                        });
+                    const insertIssueList = await this.dpmsPlCaseListService.create({
+                        ...list,
+                        NISSUEREV_ID: insertIssueRev.data.NID,
+                        NSEQ: seq,
+                    });
                     // 10. Create PL Issue List Detail record
                     for (const detail of list.DETAILS) {
                         await this.dpmsPlCaseListDetailService.create({
@@ -295,12 +279,11 @@ export class IssueService extends PackingListIssueService {
 
             // throw new Error('Test error'); // ลองทดสอบ error handling
             // 12. Get issue date from DPMS_PL_ISSUE_DATE view for update dataTable
-            const issueData =
-                await this.dpmsPlIssueDateService.findOne(plIssueData);
+            const issueData = await this.dpmsPlIssueDateService.findOne(plIssueData);
             if (!issueData.status) {
                 throw new Error('Failed to find DPMS PL Issue Date');
             }
-            if(mailAdmin){
+            if (mailAdmin) {
                 for (const mail of mailObject) {
                     await this.sendMail(mail);
                 }
@@ -313,10 +296,7 @@ export class IssueService extends PackingListIssueService {
             };
         } catch (error) {
             for (const file of listFilePath) {
-                const filePath: string = await joinPaths(
-                    file.filePath,
-                    file.fileName,
-                );
+                const filePath: string = await joinPaths(file.filePath, file.fileName);
                 console.log('Deleting file:', filePath);
                 await deleteFile(filePath);
             }

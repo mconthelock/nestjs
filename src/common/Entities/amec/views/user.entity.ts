@@ -1,11 +1,4 @@
-import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    OneToOne,
-    JoinColumn,
-    OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 import { SetRequestDate } from 'src/joborder/set-request-date/entities/set-request-date.entity';
 import { JopMarReq } from 'src/joborder/jop-mar-req/entities/jop-mar-req.entity';
 import { JopPurConf } from 'src/joborder/jop-pur-conf/entities/jop-pur-conf.entity';
@@ -82,7 +75,7 @@ export class User {
     NTELNO: number;
 
     @Column()
-    BIRTHDAY: Number;
+    BIRTHDAY: number;
 
     //Docinv
     // @OneToOne(() => Workpic, (dev) => dev.developer)

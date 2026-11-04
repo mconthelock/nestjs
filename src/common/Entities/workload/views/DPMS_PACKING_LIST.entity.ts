@@ -1,7 +1,7 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({name: 'DPMS_PACKING_LIST', schema: 'WORKLOAD'})
-export class DPMS_PACKING_LIST{
+@Entity({ name: 'DPMS_PACKING_LIST', schema: 'WORKLOAD' })
+export class DPMS_PACKING_LIST {
     @Column()
     AGENT: string;
 
@@ -127,7 +127,7 @@ export class DPMS_PACKING_LIST{
 
     @Column()
     LASTISSUEDATE: Date;
-    
+
     @Column()
     REVISE: string;
 }

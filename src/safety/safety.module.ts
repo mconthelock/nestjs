@@ -3,8 +3,6 @@ import { ChemicalSectionModule } from './chemical/chemical-section/chemical-sect
 import { SafetyChemicalModule } from './chemical/safety-chemical.module';
 
 @Module({
-  imports: [
-    SafetyChemicalModule
-  ],
+    imports: [SafetyChemicalModule],
 })
 export class SafetyModule {}

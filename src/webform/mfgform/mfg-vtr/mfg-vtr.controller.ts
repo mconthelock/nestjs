@@ -1,13 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-    Req,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { MfgVtrService } from './mfg-vtr.service';
 import { CreateMfgVtrDto } from './dto/create-mfg-vtr.dto';
@@ -20,10 +11,7 @@ export class MfgVtrController {
     constructor(private readonly mfgVtrService: MfgVtrService) {}
 
     @Post('createRequest')
-    async create(
-        @Body() createMfgVtrDto: CreateMfgVtrDto,
-        @Req() req: Request,
-    ) {
+    async create(@Body() createMfgVtrDto: CreateMfgVtrDto, @Req() req: Request) {
         try {
             const ip = getClientIP(req);
             const data = await this.mfgVtrService.create(createMfgVtrDto, ip);
@@ -35,8 +23,7 @@ export class MfgVtrController {
         } catch (error) {
             return {
                 success: false,
-                message:
-                    error instanceof Error ? error.message : 'Request failed',
+                message: error instanceof Error ? error.message : 'Request failed',
             };
         }
     }

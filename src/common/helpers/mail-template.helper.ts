@@ -51,9 +51,7 @@ export async function renderMailTemplate(
     // console.log('MJML ERRORS:', errors);
     // console.log('HTML OUTPUT:', html);
     if (errors?.length) {
-        throw new Error(
-            `MJML render error: ${errors.map((e) => e.formattedMessage).join(' | ')}`,
-        );
+        throw new Error(`MJML render error: ${errors.map((e) => e.formattedMessage).join(' | ')}`);
     }
 
     return html;

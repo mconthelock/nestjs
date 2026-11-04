@@ -5,7 +5,5 @@ import { UpdateUsersItemStationDto } from './dto/update-user-item-station.dto';
 
 @Controller('escs/user-item-station')
 export class UsersItemStationController {
-    constructor(
-        private readonly usersItemStationService: UsersItemStationService,
-    ) {}
+    constructor(private readonly usersItemStationService: UsersItemStationService) {}
 }

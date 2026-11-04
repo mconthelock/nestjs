@@ -31,9 +31,7 @@ export class CountryOriginService {
         }
     }
 
-    async insertCountry(
-        dto: CreateCountryOriginDto | CreateCountryOriginDto[],
-    ) {
+    async insertCountry(dto: CreateCountryOriginDto | CreateCountryOriginDto[]) {
         const country: CreateCountryOriginCountryDto[] = Array.isArray(dto)
             ? dto.flatMap((item) => {
                   if (Array.isArray(item.COUNTRY)) {

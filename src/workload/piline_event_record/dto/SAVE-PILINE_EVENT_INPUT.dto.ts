@@ -44,7 +44,7 @@ export class PilineInputNgDto {
 }
 
 export class PilineDeleteFileDto {
-    @IsIn(['EVT','NG'])
+    @IsIn(['EVT', 'NG'])
     TYPEFILE: string;
     @IsInt()
     @Min(1)

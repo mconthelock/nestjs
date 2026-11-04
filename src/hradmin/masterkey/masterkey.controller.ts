@@ -28,8 +28,7 @@ export class MasterkeyController {
         //   throw new UnauthorizedException('You nave no authorization');
 
         const isValid = await this.keys.verify(users, body.pin);
-        if (!isValid)
-            throw new UnauthorizedException('You nave no authorization [user]');
+        if (!isValid) throw new UnauthorizedException('You nave no authorization [user]');
 
         // console.log(users, group, apps);
         // if (!(group === 1 && apps === 20))
@@ -66,49 +65,27 @@ export class MasterkeyController {
 
     @Post('update')
     @UseGuards(AuthGuard('jwt'))
-    async update(
-        @Request() req,
-        @Body() body: { pin: string; newpin: string },
-    ) {
+    async update(@Request() req, @Body() body: { pin: string; newpin: string }) {
         const { users, group, apps } = req.user.user;
         // if (!(group === 2 && apps === 20))
         //     throw new UnauthorizedException('You nave no authorization');
 
         const isValid = await this.keys.verify(users, body.pin);
-        if (!isValid)
-            throw new UnauthorizedException('You nave no authorization');
+        if (!isValid) throw new UnauthorizedException('You nave no authorization');
 
-        return await this.keys.updateMasterKey(
-            isValid.token,
-            users,
-            body.newpin,
-        );
+        return await this.keys.updateMasterKey(isValid.token, users, body.newpin);
     }
 
     @Post('create')
     @UseGuards(AuthGuard('key'))
-    async create(
-        @Request() req,
-        @Body() body: { empno: string; type: string },
-    ) {
-        return await this.keys.createMasterKey(
-            req.user.user,
-            body.empno,
-            body.type,
-        );
+    async create(@Request() req, @Body() body: { empno: string; type: string }) {
+        return await this.keys.createMasterKey(req.user.user, body.empno, body.type);
     }
 
     @Post('role')
     @UseGuards(AuthGuard('key'))
-    async updateRole(
-        @Request() req,
-        @Body() body: { newRole: string; empno: string },
-    ) {
-        return await this.keys.updateRole(
-            req.user.user,
-            body.newRole,
-            body.empno,
-        );
+    async updateRole(@Request() req, @Body() body: { newRole: string; empno: string }) {
+        return await this.keys.updateRole(req.user.user, body.newRole, body.empno);
     }
 
     @Post('delete')

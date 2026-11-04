@@ -2,10 +2,7 @@
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource, IsNull, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import {
-    CreateDpmsPlDocRevDto,
-    SearchDpmsPlDocRevDto,
-} from './dto/create-dpms_pl_doc_rev.dto';
+import { CreateDpmsPlDocRevDto, SearchDpmsPlDocRevDto } from './dto/create-dpms_pl_doc_rev.dto';
 import { DPMS_PL_DOC_REV } from 'src/common/Entities/workload/table/DPMS_PL_DOC_REV.entity';
 import {
     getPendingRecordParams,

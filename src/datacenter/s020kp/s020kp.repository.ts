@@ -29,7 +29,8 @@ export class S020kpRepository extends BaseRepository {
         //     where: [{ S20K03: order }, { S20K01: order }],
         //     order: { S20K03: 'ASC', S20K02: 'ASC', S20K01: 'ASC' },
         // });
-        return this.getRepository(S020KP).createQueryBuilder('S')
+        return this.getRepository(S020KP)
+            .createQueryBuilder('S')
             .where('S.S20K01 = :order OR S.S20K03 = :order', { order })
             .orderBy('CASE WHEN S.S20K03 = :order THEN 1 ELSE 2 END', 'ASC')
             .addOrderBy('S.S20K02', 'ASC')

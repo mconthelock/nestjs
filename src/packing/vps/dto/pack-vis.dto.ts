@@ -2,19 +2,19 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsString, IsNotEmpty } from 'class-validator';
 
 export enum UseLocalTableFlag {
-  AS400 = '0',
-  LOCAL = '1',
+    AS400 = '0',
+    LOCAL = '1',
 }
 
 export class PackVISDto {
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'VIS Code',
         examples: {
             sample1: { value: '07C118A95807' },
             sample2: { value: '07C1108A95807' },
         },
     })
-    @IsString() 
+    @IsString()
     @IsNotEmpty()
     vis: string;
 

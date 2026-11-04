@@ -51,26 +51,18 @@ export class AmeccalendarController {
             description: 'สามารถใส่เป็น date string, number หรือ Date ได้',
         },
     })
-    addWorkDays(
-        @Body() req: { startDate: number | string | Date; days: number },
-    ) {
+    addWorkDays(@Body() req: { startDate: number | string | Date; days: number }) {
         return this.calendar.addWorkDays(req.startDate, req.days);
     }
 
     @Post('generate')
-    generate(
-        @Body() body: { year: string; startMonth: string; startId: string },
-    ) {
+    generate(@Body() body: { year: string; startMonth: string; startId: string }) {
         if (!body.year || !body.startMonth || !body.startId) {
             return {
                 error: 'Missing required parameters: year, startMonth, startId',
             };
         }
-        return this.calendar.generateYearlySchedule(
-            +body.year,
-            +body.startMonth,
-            +body.startId,
-        );
+        return this.calendar.generateYearlySchedule(+body.year, +body.startMonth, +body.startId);
     }
 
     /**

@@ -11,10 +11,7 @@ import { PsAdjController } from './ps-adj.controller';
 @Module({
     imports: [
         FormModule,
-        TypeOrmModule.forFeature(
-            [ADJREASONMST, ADJORDREQ, ADJODRATTFILE],
-            'mitsuConnection',
-        ),
+        TypeOrmModule.forFeature([ADJREASONMST, ADJORDREQ, ADJODRATTFILE], 'mitsuConnection'),
     ],
     controllers: [PsAdjController],
     providers: [PsAdjRepository, PsAdjService, PsAdjAutoService],

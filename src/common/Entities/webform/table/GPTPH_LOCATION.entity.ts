@@ -3,7 +3,7 @@ import { GPTPH_AREAS } from './GPTPH_AREAS.entity';
 
 @Entity({
     name: 'GPTPH_LOCATION',
-    schema: 'WEBFORM', 
+    schema: 'WEBFORM',
 })
 export class GPTPH_LOCATION {
     @PrimaryColumn()
@@ -14,4 +14,4 @@ export class GPTPH_LOCATION {
     @OneToMany(() => GPTPH_AREAS, (area) => area.LOCATION)
     @JoinColumn({ name: 'LOCATION_ID', referencedColumnName: 'LOCATION_ID' })
     AREAS: GPTPH_AREAS[];
-}    
+}

@@ -1,4 +1,4 @@
-import { ViewColumn, ViewEntity , PrimaryColumn } from 'typeorm';
+import { ViewColumn, ViewEntity, PrimaryColumn } from 'typeorm';
 
 @ViewEntity({
     name: 'FINPCK_VWDETAIL',
@@ -40,7 +40,7 @@ export class FINPCK_VWDETAIL {
 
     @ViewColumn()
     STARTDP: Date;
-    
+
     @ViewColumn()
     MONTHDP: number;
 
@@ -67,12 +67,12 @@ export class FINPCK_VWDETAIL {
 
     @ViewColumn()
     REFASSET: string;
-   
+
     @ViewColumn()
     VOUCHER: string;
 
     @ViewColumn()
-    QTY: number; 
+    QTY: number;
 
     @ViewColumn()
     UNIT: string;
@@ -81,63 +81,62 @@ export class FINPCK_VWDETAIL {
     STATUS: string;
 
     @ViewColumn()
-    SUPPLIER: string; 
+    SUPPLIER: string;
 
     @ViewColumn()
-    PRNO: string; 
+    PRNO: string;
 
     @ViewColumn()
-    BUDGETNO: string; 
+    BUDGETNO: string;
 
     @ViewColumn()
-    REQBY: string; 
+    REQBY: string;
 
     @ViewColumn()
-    USINGLIFE: number; 
+    USINGLIFE: number;
 
     @ViewColumn()
-    CONFIRM: number; 
+    CONFIRM: number;
 
     @ViewColumn()
-    NOSTICKER: number; 
+    NOSTICKER: number;
 
     @ViewColumn()
-    LOST: number;   
+    LOST: number;
 
     @ViewColumn()
-    DAMAGE: number; 
-    
-    @ViewColumn()
-    MOVEMENT: number; 
+    DAMAGE: number;
 
     @ViewColumn()
-    OTHCAUSE: number; 
+    MOVEMENT: number;
 
     @ViewColumn()
-    REMOTHCAUSE: string; 
+    OTHCAUSE: number;
 
     @ViewColumn()
-    PIC: string; 
+    REMOTHCAUSE: string;
 
     @ViewColumn()
-    GRPDESC: string; 
+    PIC: string;
 
     @ViewColumn()
-    CCCODE: string; 
+    GRPDESC: string;
 
     @ViewColumn()
-    CCDESC: string; 
+    CCCODE: string;
 
     @ViewColumn()
-    LOCCODE: string; 
+    CCDESC: string;
 
     @ViewColumn()
-    LOCNAME: string; 
+    LOCCODE: string;
 
     @ViewColumn()
-    CST: string;  
-    
+    LOCNAME: string;
+
     @ViewColumn()
-    DREQDATE: Date; 
+    CST: string;
+
+    @ViewColumn()
+    DREQDATE: Date;
 }
-

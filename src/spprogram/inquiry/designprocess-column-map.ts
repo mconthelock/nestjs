@@ -30,8 +30,7 @@ export const designProcessColumnMap: MapRule[] = [
     },
     {
         out: 'Status',
-        get: (h, _d, _t, statusList) =>
-            getStatusDesc(statusList, h?.status?.STATUS_ID),
+        get: (h, _d, _t, statusList) => getStatusDesc(statusList, h?.status?.STATUS_ID),
     },
     { out: 'Inquiry No.', get: (h) => h.INQ_NO },
     { out: 'Inquiry Revision', get: (h) => h.INQ_REV },
@@ -96,8 +95,7 @@ export const designProcessColumnMap: MapRule[] = [
     },
     {
         out: 'EME Status',
-        get: (h, _d, _t, statusList) =>
-            getStatusDesc(statusList, getGroup(h, 1)?.INQG_STATUS),
+        get: (h, _d, _t, statusList) => getStatusDesc(statusList, getGroup(h, 1)?.INQG_STATUS),
     },
     {
         out: 'EME Design Class',
@@ -111,9 +109,7 @@ export const designProcessColumnMap: MapRule[] = [
         out: 'EME Assign Date',
         get: (h) =>
             getGroup(h, 1)?.INQG_ASG_DATE
-                ? dayjs(getGroup(h, 1)?.INQG_ASG_DATE).format(
-                      'YYYY-MM-DD HH:mm:ss',
-                  )
+                ? dayjs(getGroup(h, 1)?.INQG_ASG_DATE).format('YYYY-MM-DD HH:mm:ss')
                 : null,
     },
     {
@@ -124,9 +120,7 @@ export const designProcessColumnMap: MapRule[] = [
         out: 'EME Finish Design',
         get: (h) =>
             getGroup(h, 1)?.INQG_DES_DATE
-                ? dayjs(getGroup(h, 1)?.INQG_DES_DATE).format(
-                      'YYYY-MM-DD HH:mm:ss',
-                  )
+                ? dayjs(getGroup(h, 1)?.INQG_DES_DATE).format('YYYY-MM-DD HH:mm:ss')
                 : null,
     },
     {
@@ -137,9 +131,7 @@ export const designProcessColumnMap: MapRule[] = [
         out: 'EME Finish Check',
         get: (h) =>
             getGroup(h, 1)?.INQG_CHK_DATE
-                ? dayjs(getGroup(h, 1)?.INQG_CHK_DATE).format(
-                      'YYYY-MM-DD HH:mm:ss',
-                  )
+                ? dayjs(getGroup(h, 1)?.INQG_CHK_DATE).format('YYYY-MM-DD HH:mm:ss')
                 : null,
     },
     {
@@ -156,8 +148,7 @@ export const designProcessColumnMap: MapRule[] = [
     },
     {
         out: 'EEL Status',
-        get: (h, _d, _t, statusList) =>
-            getStatusDesc(statusList, getGroup(h, 2)?.INQG_STATUS),
+        get: (h, _d, _t, statusList) => getStatusDesc(statusList, getGroup(h, 2)?.INQG_STATUS),
     },
     {
         out: 'EEL Design Class',
@@ -168,9 +159,7 @@ export const designProcessColumnMap: MapRule[] = [
         out: 'EEL Assign Date',
         get: (h) =>
             getGroup(h, 2)?.INQG_ASG_DATE
-                ? dayjs(getGroup(h, 2)?.INQG_ASG_DATE).format(
-                      'YYYY-MM-DD HH:mm:ss',
-                  )
+                ? dayjs(getGroup(h, 2)?.INQG_ASG_DATE).format('YYYY-MM-DD HH:mm:ss')
                 : null,
     },
     { out: 'EEL Designer', get: (h) => getGroup(h, 2)?.INQG_DES ?? null },
@@ -178,9 +167,7 @@ export const designProcessColumnMap: MapRule[] = [
         out: 'EEL Finish Design',
         get: (h) =>
             getGroup(h, 2)?.INQG_DES_DATE
-                ? dayjs(getGroup(h, 2)?.INQG_DES_DATE).format(
-                      'YYYY-MM-DD HH:mm:ss',
-                  )
+                ? dayjs(getGroup(h, 2)?.INQG_DES_DATE).format('YYYY-MM-DD HH:mm:ss')
                 : null,
     },
     { out: 'EEL Checker', get: (h) => getGroup(h, 2)?.INQG_CHK ?? null },
@@ -188,9 +175,7 @@ export const designProcessColumnMap: MapRule[] = [
         out: 'EEL Finish Check',
         get: (h) =>
             getGroup(h, 2)?.INQG_CHK_DATE
-                ? dayjs(getGroup(h, 2)?.INQG_CHK_DATE).format(
-                      'YYYY-MM-DD HH:mm:ss',
-                  )
+                ? dayjs(getGroup(h, 2)?.INQG_CHK_DATE).format('YYYY-MM-DD HH:mm:ss')
                 : null,
     },
     {
@@ -207,8 +192,7 @@ export const designProcessColumnMap: MapRule[] = [
     },
     {
         out: 'EAP Status',
-        get: (h, _d, _t, statusList) =>
-            getStatusDesc(statusList, getGroup(h, 3)?.INQG_STATUS),
+        get: (h, _d, _t, statusList) => getStatusDesc(statusList, getGroup(h, 3)?.INQG_STATUS),
     },
     {
         out: 'EAP Design Class',
@@ -219,9 +203,7 @@ export const designProcessColumnMap: MapRule[] = [
         out: 'EAP Assign Date',
         get: (h) =>
             getGroup(h, 3)?.INQG_ASG_DATE
-                ? dayjs(getGroup(h, 3)?.INQG_ASG_DATE).format(
-                      'YYYY-MM-DD HH:mm:ss',
-                  )
+                ? dayjs(getGroup(h, 3)?.INQG_ASG_DATE).format('YYYY-MM-DD HH:mm:ss')
                 : null,
     },
     { out: 'EAP Designer', get: (h) => getGroup(h, 3)?.INQG_DES ?? null },
@@ -229,9 +211,7 @@ export const designProcessColumnMap: MapRule[] = [
         out: 'EAP Finish Design',
         get: (h) =>
             getGroup(h, 3)?.INQG_DES_DATE
-                ? dayjs(getGroup(h, 3)?.INQG_DES_DATE).format(
-                      'YYYY-MM-DD HH:mm:ss',
-                  )
+                ? dayjs(getGroup(h, 3)?.INQG_DES_DATE).format('YYYY-MM-DD HH:mm:ss')
                 : null,
     },
     { out: 'EAP Checker', get: (h) => getGroup(h, 3)?.INQG_CHK ?? null },
@@ -239,9 +219,7 @@ export const designProcessColumnMap: MapRule[] = [
         out: 'EAP Finish Check',
         get: (h) =>
             getGroup(h, 3)?.INQG_CHK_DATE
-                ? dayjs(getGroup(h, 3)?.INQG_CHK_DATE).format(
-                      'YYYY-MM-DD HH:mm:ss',
-                  )
+                ? dayjs(getGroup(h, 3)?.INQG_CHK_DATE).format('YYYY-MM-DD HH:mm:ss')
                 : null,
     },
     {
@@ -258,8 +236,7 @@ export const designProcessColumnMap: MapRule[] = [
     },
     {
         out: 'ESO Status',
-        get: (h, _d, _t, statusList) =>
-            getStatusDesc(statusList, getGroup(h, 6)?.INQG_STATUS),
+        get: (h, _d, _t, statusList) => getStatusDesc(statusList, getGroup(h, 6)?.INQG_STATUS),
     },
     {
         out: 'ESO Design Class',
@@ -270,9 +247,7 @@ export const designProcessColumnMap: MapRule[] = [
         out: 'ESO Assign Date',
         get: (h) =>
             getGroup(h, 6)?.INQG_ASG_DATE
-                ? dayjs(getGroup(h, 6)?.INQG_ASG_DATE).format(
-                      'YYYY-MM-DD HH:mm:ss',
-                  )
+                ? dayjs(getGroup(h, 6)?.INQG_ASG_DATE).format('YYYY-MM-DD HH:mm:ss')
                 : null,
     },
     { out: 'ESO Designer', get: (h) => getGroup(h, 6)?.INQG_DES ?? null },
@@ -280,9 +255,7 @@ export const designProcessColumnMap: MapRule[] = [
         out: 'ESO Finish Design',
         get: (h) =>
             getGroup(h, 6)?.INQG_DES_DATE
-                ? dayjs(getGroup(h, 6)?.INQG_DES_DATE).format(
-                      'YYYY-MM-DD HH:mm:ss',
-                  )
+                ? dayjs(getGroup(h, 6)?.INQG_DES_DATE).format('YYYY-MM-DD HH:mm:ss')
                 : null,
     },
     { out: 'ESO Checker', get: (h) => getGroup(h, 6)?.INQG_CHK ?? null },
@@ -290,9 +263,7 @@ export const designProcessColumnMap: MapRule[] = [
         out: 'ESO Finish Check',
         get: (h) =>
             getGroup(h, 6)?.INQG_CHK_DATE
-                ? dayjs(getGroup(h, 6)?.INQG_CHK_DATE).format(
-                      'YYYY-MM-DD HH:mm:ss',
-                  )
+                ? dayjs(getGroup(h, 6)?.INQG_CHK_DATE).format('YYYY-MM-DD HH:mm:ss')
                 : null,
     },
     {
@@ -306,9 +277,7 @@ export const designProcessColumnMap: MapRule[] = [
     {
         out: 'D/D Finish Date',
         get: (h, d, t) =>
-            t.DE_CONFIRM != null
-                ? dayjs(t.DE_CONFIRM).format('YYYY-MM-DD HH:mm:ss')
-                : null,
+            t.DE_CONFIRM != null ? dayjs(t.DE_CONFIRM).format('YYYY-MM-DD HH:mm:ss') : null,
     },
     {
         out: 'Design Action Time',

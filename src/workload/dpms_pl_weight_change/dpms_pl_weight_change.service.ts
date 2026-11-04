@@ -19,9 +19,7 @@ export class DpmsPlWeightChangeService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Error retrieving change weight data: ${error.message}`,
-            );
+            throw new Error(`Error retrieving change weight data: ${error.message}`);
         }
     }
 }

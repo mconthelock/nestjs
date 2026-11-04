@@ -8,20 +8,20 @@ import { updateTimelineDto } from './dto/update-dto';
 
 @Injectable()
 export class TimelineService {
-  constructor(
-    @InjectRepository(Timeline, 'mitsuConnection')
-    private readonly times: Repository<Timeline>,
-  ) {}
+    constructor(
+        @InjectRepository(Timeline, 'mitsuConnection')
+        private readonly times: Repository<Timeline>,
+    ) {}
 
-  async update(req: updateTimelineDto) {
-    const data = await this.times.findOneBy({
-      INQ_NO: req.INQ_NO,
-      INQ_REV: req.INQ_REV,
-    });
-    if (!data) {
-      throw new NotFoundException(`Inquiry timeline is not found`);
+    async update(req: updateTimelineDto) {
+        const data = await this.times.findOneBy({
+            INQ_NO: req.INQ_NO,
+            INQ_REV: req.INQ_REV,
+        });
+        if (!data) {
+            throw new NotFoundException(`Inquiry timeline is not found`);
+        }
+        Object.assign(data, req);
+        return await this.times.save(data);
     }
-    Object.assign(data, req);
-    return await this.times.save(data);
-  }
 }

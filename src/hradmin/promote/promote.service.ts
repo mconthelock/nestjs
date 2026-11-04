@@ -1,8 +1,4 @@
-import {
-    Injectable,
-    InternalServerErrorException,
-    UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { PDFDocument } from 'pdf-lib';
 import * as ExcelJS from 'exceljs';
@@ -12,11 +8,7 @@ import * as dayjsModule from 'dayjs';
 const dayjs = (dayjsModule as any).default ?? (dayjsModule as any);
 import 'dayjs/locale/th';
 import { digitsNumber, intVal } from '../../common/helpers/baht-text.helper';
-import {
-    drawGrid,
-    writeLineBox,
-    protectedFile,
-} from '../../common/helpers/file-pdf.helper';
+import { drawGrid, writeLineBox, protectedFile } from '../../common/helpers/file-pdf.helper';
 import { cloneRows } from 'src/common/helpers/file-excel.helper';
 import { DatabaseService } from '../shared/database.service';
 const fontkit = require('@pdf-lib/fontkit');
@@ -45,8 +37,7 @@ export class PromoteService {
         let hrAdminDataSource: DataSource;
         let conn: oracledb.Connection;
         try {
-            const connection =
-                await this.dbService.createConnection(credentials);
+            const connection = await this.dbService.createConnection(credentials);
             hrAdminDataSource = connection.hrAdminDataSource;
             conn = connection.conn;
             const result = await conn.execute(
@@ -70,14 +61,10 @@ export class PromoteService {
             return rows;
         } catch (error) {
             if (error.message.includes('ORA-01017')) {
-                throw new UnauthorizedException(
-                    'Invalid credentials for sensitive data access.',
-                );
+                throw new UnauthorizedException('Invalid credentials for sensitive data access.');
             }
             console.error('Error fetching Promotion data:', error);
-            throw new InternalServerErrorException(
-                'Failed to fetch Promotion data.',
-            );
+            throw new InternalServerErrorException('Failed to fetch Promotion data.');
         } finally {
             await this.dbService.closeConnection(hrAdminDataSource, conn);
         }
@@ -87,8 +74,7 @@ export class PromoteService {
         let hrAdminDataSource: DataSource;
         let conn: oracledb.Connection;
         try {
-            const connection =
-                await this.dbService.createConnection(credentials);
+            const connection = await this.dbService.createConnection(credentials);
             hrAdminDataSource = connection.hrAdminDataSource;
             conn = connection.conn;
             const result = await conn.execute(
@@ -111,9 +97,7 @@ export class PromoteService {
             return rows;
         } catch (error) {
             console.error('Error fetching Twi 50 data:', error);
-            throw new InternalServerErrorException(
-                'Failed to fetch Promote data.',
-            );
+            throw new InternalServerErrorException('Failed to fetch Promote data.');
         } finally {
             await this.dbService.closeConnection(hrAdminDataSource, conn);
         }
@@ -126,15 +110,12 @@ export class PromoteService {
                 'Salary Adjustment Letter.pdf',
             );
             let dir = this.libs.find((e) => e.id == data.ASETYP).path;
-            let effdate = dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
+            const effdate = dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
                 .locale('en')
                 .format('YYYY MMMM');
             if (!dir) dir = 'Non-Manager';
             this.output_path = `${process.env.TAX_FILE_PATH}${dir}/Salary Adjustment Letter (หนังสือแจ้งปรับ)/${effdate}/`;
-            const fontPath = path.join(
-                process.cwd(),
-                'public/fonts/THSarabun.ttf',
-            );
+            const fontPath = path.join(process.cwd(), 'public/fonts/THSarabun.ttf');
             const [existingPdfBytes, fontBytes] = await Promise.all([
                 fs.readFile(templatePath),
                 fs.readFile(fontPath),
@@ -230,10 +211,7 @@ export class PromoteService {
     }
 
     async createExcel(data: any[]) {
-        const templatePath = path.resolve(
-            process.cwd(),
-            'public/export/promote.xlsx',
-        );
+        const templatePath = path.resolve(process.cwd(), 'public/export/promote.xlsx');
 
         try {
             const workbook = new ExcelJS.Workbook();
@@ -242,11 +220,7 @@ export class PromoteService {
             for (const [index, row] of data.entries()) {
                 const sourceStyleRow = index % 2 === 0 ? 3 : 4;
                 if (index > 1) {
-                    await cloneRows(
-                        sheet,
-                        sourceStyleRow,
-                        sheet.lastRow.number + 1,
-                    );
+                    await cloneRows(sheet, sourceStyleRow, sheet.lastRow.number + 1);
                 }
                 // prettier-ignore
                 {
@@ -282,35 +256,21 @@ export class PromoteService {
             return buffer;
         } catch (error) {
             console.error('Error reading Excel template:', error);
-            throw new InternalServerErrorException(
-                'Invalid template: Missing "Data" sheet.',
-            );
+            throw new InternalServerErrorException('Invalid template: Missing "Data" sheet.');
         }
     }
 
     async sendMail(body: any) {
         let dir = this.libs.find((e) => e.id == body.ASETYP).path;
-        let effdate = dayjs(body.ASEFDT.toString(), 'YYYYMMDD')
-            .locale('en')
-            .format('YYYY MMMM');
+        const effdate = dayjs(body.ASEFDT.toString(), 'YYYYMMDD').locale('en').format('YYYY MMMM');
         if (!dir) dir = 'Non-Manager';
         const output_path = `${process.env.TAX_FILE_PATH}${dir}/Salary Adjustment Letter (หนังสือแจ้งปรับ)/${effdate}/`;
-        const buffer = await fs.readFile(
-            path.join(output_path, `${body.SEMPNO}.pdf`),
-        );
+        const buffer = await fs.readFile(path.join(output_path, `${body.SEMPNO}.pdf`));
         const isJapanese = body.SEMPNO.substr(0, 1) == 'J' ? true : false;
-        const thperiod =
-            body.ASCYCL == 'O'
-                ? `ตุลาคม ${body.ASYEAR}`
-                : `เมษายน ${body.ASYEAR}`;
-        const enperiod =
-            body.ASCYCL == 'O'
-                ? `October ${body.ASYEAR}`
-                : `April ${body.ASYEAR}`;
+        const thperiod = body.ASCYCL == 'O' ? `ตุลาคม ${body.ASYEAR}` : `เมษายน ${body.ASYEAR}`;
+        const enperiod = body.ASCYCL == 'O' ? `October ${body.ASYEAR}` : `April ${body.ASYEAR}`;
         await this.mailService.sendMail({
-            template: isJapanese
-                ? 'gpreport/promote/en'
-                : 'gpreport/promote/th',
+            template: isJapanese ? 'gpreport/promote/en' : 'gpreport/promote/th',
             from: `ส่วนทรัพยากรมนุษย์ <AMECMS@MitsubishiElevatorAsia.co.th>`,
             // to: `chalorms@MitsubishiElevatorAsia.co.th`,
             to: `s.chalormsak@gmail.com`,

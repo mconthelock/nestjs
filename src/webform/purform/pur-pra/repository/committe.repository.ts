@@ -13,8 +13,8 @@ export class CommitteeRepository extends BaseRepository {
     findAll() {
         return this.getRepository(PURPRA_COMMITTEE).find({
             order: {
-                NSEQ: 'ASC'
-            }
+                NSEQ: 'ASC',
+            },
         });
     }
 }

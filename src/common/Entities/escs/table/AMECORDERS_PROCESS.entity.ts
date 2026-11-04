@@ -5,7 +5,6 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
     schema: 'ESCCHKSHT',
 })
 export class AMECORDERS_PROCESS {
-
     @PrimaryColumn()
     MFGNO: string;
 

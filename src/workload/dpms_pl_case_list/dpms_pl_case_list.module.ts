@@ -6,9 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DPMS_PL_CASE_LIST } from 'src/common/Entities/workload/table/DPMS_PL_CASE_LIST.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([DPMS_PL_CASE_LIST], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([DPMS_PL_CASE_LIST], 'mitsuConnection')],
     controllers: [DpmsPlCaseListController],
     providers: [DpmsPlCaseListService, DpmsPlCaseListRepository],
     exports: [DpmsPlCaseListService],

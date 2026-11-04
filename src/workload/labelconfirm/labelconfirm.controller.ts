@@ -9,18 +9,12 @@ export class LabelconfirmController {
     constructor(private readonly ls: LabelconfirmService) {}
 
     @Post('label-list')
-    async getLabelList(
-        @Body('order') order: string,
-        @Body('packing') packing: string,
-    ) {
+    async getLabelList(@Body('order') order: string, @Body('packing') packing: string) {
         return this.ls.getLabelList(order, packing);
     }
 
     @Post('confirm')
-    async confirm(
-        @Body('qr_code') qrCode: string,
-        @Body('empno') empno: string,
-    ) {
+    async confirm(@Body('qr_code') qrCode: string, @Body('empno') empno: string) {
         return this.ls.confirm(qrCode, empno);
     }
 

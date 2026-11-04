@@ -63,24 +63,20 @@ export class ReviseMainService extends IssueService {
     }: IReviseParams): Promise<IReviseResult> {
         try {
             logMessage?.push(
-                log_message(
-                    `Revising for Order: [${order}] - NISSUEREV_ID: ${revid}`,
-                ),
+                log_message(`Revising for Order: [${order}] - NISSUEREV_ID: ${revid}`),
             );
 
             const issueRev = await this.revService.findByRevId(revid);
             if (!issueRev.status) {
-                logMessage?.push(
-                    log_message(
-                        `No DPMS PL Issue found for NISSUEREV_ID: ${revid}`,
-                    ),
-                );
+                logMessage?.push(log_message(`No DPMS PL Issue found for NISSUEREV_ID: ${revid}`));
                 return {
                     status: false,
                     message: `No DPMS PL Issue found for NISSUEREV_ID: ${revid}`,
                 };
             }
-            const revData = newShippingMark ?  {...issueRev.data[0], VSHIPPINGMARK: newShippingMark} : issueRev.data[0];
+            const revData = newShippingMark
+                ? { ...issueRev.data[0], VSHIPPINGMARK: newShippingMark }
+                : issueRev.data[0];
 
             const plHeader: IplHeader = {
                 VSHOPORDERNO: revData.VSHOPORDERNO,
@@ -89,13 +85,12 @@ export class ReviseMainService extends IssueService {
                 VSOLDTO: revData.VSOLDTO,
             };
 
-            const { html, plList, lists, status, message } =
-                await this.htmlService.main({
-                    id: revid,
-                    logMessage: logMessage,
-                    revData: revData,
-                    issueDate: issueDate,
-                });
+            const { html, plList, lists, status, message } = await this.htmlService.main({
+                id: revid,
+                logMessage: logMessage,
+                revData: revData,
+                issueDate: issueDate,
+            });
             logMessage?.push(log_message(`${message}`));
             if (!status) {
                 return {
@@ -127,13 +122,12 @@ export class ReviseMainService extends IssueService {
 
             if (poid) {
                 logMessage?.push(log_message(`Revising for POID: ${poid}`));
-                const { html, plList, lists, status, message } =
-                    await this.htmlService.main({
-                        id: poid,
-                        logMessage: logMessage,
-                        revData: revData,
-                        issueDate: issueDate,
-                    });
+                const { html, plList, lists, status, message } = await this.htmlService.main({
+                    id: poid,
+                    logMessage: logMessage,
+                    revData: revData,
+                    issueDate: issueDate,
+                });
                 logMessage?.push(log_message(`${message}`));
                 if (!status) {
                     return {
@@ -147,7 +141,7 @@ export class ReviseMainService extends IssueService {
             }
 
             const res = await this.issue(data, false);
-            if(!res.status) {
+            if (!res.status) {
                 return {
                     status: false,
                     message: `Failed to revise for Order: [${order}] - NISSUEREV_ID: ${revid}`,
@@ -157,15 +151,8 @@ export class ReviseMainService extends IssueService {
             const listFilePath: IListFilePath[] = res.listFilePath;
             const attachments: AttachmentDto[] = [];
             for (const file of listFilePath) {
-                const filePath: string = await joinPaths(
-                    file.filePath,
-                    file.fileName,
-                );
-                logMessage?.push(
-                    log_message(
-                        `File generated: ${file.fileName} at ${filePath}`,
-                    ),
-                );
+                const filePath: string = await joinPaths(file.filePath, file.fileName);
+                logMessage?.push(log_message(`File generated: ${file.fileName} at ${filePath}`));
                 attachments.push({
                     filename: file.fileName,
                     path: filePath,

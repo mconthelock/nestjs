@@ -8,9 +8,7 @@ import { ChecksheetProc } from './enums/proc.enum';
 
 @Injectable()
 export class ChecksheetService {
-    constructor(
-        private readonly repo: ChecksheetRepository
-    ) {}
+    constructor(private readonly repo: ChecksheetRepository) {}
 
     async inCheck(dto: InCheckDto): Promise<ChecksheetResponseDto> {
         try {
@@ -18,7 +16,7 @@ export class ChecksheetService {
             return {
                 status: 'SUCCESS',
                 message: res.length ? null : 'No data found',
-                data: res
+                data: res,
             };
         } catch (err) {
             throw new InternalServerErrorException('IN_CHECK failed');
@@ -32,7 +30,7 @@ export class ChecksheetService {
             return {
                 status: 'SUCCESS',
                 message: 'Saved successfully',
-                data: null
+                data: null,
             };
         } catch (err) {
             throw new InternalServerErrorException('SAVE failed');
@@ -43,14 +41,14 @@ export class ChecksheetService {
         return {
             status: 'SUCCESS',
             message: `Deleted ${dto.filename}`,
-            data: null
+            data: null,
         };
     }
 
     private readonly actionProcedureMap: Record<string, ChecksheetProc> = {
         draft: ChecksheetProc.IN_DRAFT,
         submit: ChecksheetProc.IN_SUBMIT,
-        edit: ChecksheetProc.FL_EDIT
+        edit: ChecksheetProc.FL_EDIT,
     };
 
     private mapActionToProcedure(action: string): ChecksheetProc {

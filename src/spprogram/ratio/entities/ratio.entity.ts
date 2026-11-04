@@ -1,65 +1,58 @@
-﻿import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-} from 'typeorm';
+﻿import { Entity, PrimaryColumn, Column, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { QuotationType } from '../../quotation-type/entities/quotation-type.entity';
 import { Customer } from 'src/spprogram/customer/entities/customer.entity';
 
 @Entity({ name: 'SP_PRICE_RATIO', schema: 'SPSYS' })
 export class Ratio {
-  @PrimaryColumn()
-  ID: number;
+    @PrimaryColumn()
+    ID: number;
 
-  @Column()
-  TRADER: string;
+    @Column()
+    TRADER: string;
 
-  @Column()
-  SUPPLIER: string;
+    @Column()
+    SUPPLIER: string;
 
-  @Column()
-  QUOTATION: number;
+    @Column()
+    QUOTATION: number;
 
-  @Column({
-    name: 'FORMULA',
-    type: 'decimal',
-    precision: 7,
-    scale: 3,
-  })
-  FORMULA: number;
+    @Column({
+        name: 'FORMULA',
+        type: 'decimal',
+        precision: 7,
+        scale: 3,
+    })
+    FORMULA: number;
 
-  @Column()
-  FREIGHT_SEA: number;
+    @Column()
+    FREIGHT_SEA: number;
 
-  @Column()
-  FREIGHT_AIR: number;
+    @Column()
+    FREIGHT_AIR: number;
 
-  @Column()
-  FREIGHT_COURIER: number;
+    @Column()
+    FREIGHT_COURIER: number;
 
-  @Column()
-  UPDATE_BY: string;
+    @Column()
+    UPDATE_BY: string;
 
-  @Column()
-  UPDATE_AT: Date;
+    @Column()
+    UPDATE_AT: Date;
 
-  @Column()
-  CURRENCY: string;
+    @Column()
+    CURRENCY: string;
 
-  @Column()
-  SUPPLIER_CUR: string;
+    @Column()
+    SUPPLIER_CUR: string;
 
-  @Column()
-  STATUS: number;
+    @Column()
+    STATUS: number;
 
-  @ManyToOne(() => QuotationType, (q) => q.ratio)
-  @JoinColumn({ name: 'QUOTATION', referencedColumnName: 'QUOTYPE_ID' })
-  quoText: QuotationType;
+    @ManyToOne(() => QuotationType, (q) => q.ratio)
+    @JoinColumn({ name: 'QUOTATION', referencedColumnName: 'QUOTYPE_ID' })
+    quoText: QuotationType;
 
-  @OneToOne(() => Customer, (item) => item.rate)
-  @JoinColumn({ name: 'QUOTATION', referencedColumnName: 'CUS_QUOTATION' })
-  direct: Customer;
+    @OneToOne(() => Customer, (item) => item.rate)
+    @JoinColumn({ name: 'QUOTATION', referencedColumnName: 'CUS_QUOTATION' })
+    direct: Customer;
 }

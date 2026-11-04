@@ -2,17 +2,17 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty } from 'class-validator';
 
 export class ClearBlockDto {
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'Order Number',
-        example: 'E1234567', 
+        example: 'E1234567',
     })
     @IsString()
     @IsNotEmpty()
     orderno: string;
 
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'Block Number',
-        example: 'A1', 
+        example: 'A1',
     })
     @IsString()
     @IsNotEmpty()

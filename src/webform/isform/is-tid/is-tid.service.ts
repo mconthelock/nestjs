@@ -25,8 +25,7 @@ export class IsTidService {
             };
         } catch (error) {
             throw new Error(
-                'Search Production Environment ID temporary use request Error: ' +
-                    error.message,
+                'Search Production Environment ID temporary use request Error: ' + error.message,
             );
         }
     }
@@ -50,8 +49,7 @@ export class IsTidService {
             };
         } catch (error) {
             throw new Error(
-                'Search Production Environment ID temporary use request Error: ' +
-                    error.message,
+                'Search Production Environment ID temporary use request Error: ' + error.message,
             );
         }
     }
@@ -75,8 +73,7 @@ export class IsTidService {
             };
         } catch (error) {
             throw new Error(
-                'Search Production Environment ID temporary use request Error: ' +
-                    error.message,
+                'Search Production Environment ID temporary use request Error: ' + error.message,
             );
         }
     }

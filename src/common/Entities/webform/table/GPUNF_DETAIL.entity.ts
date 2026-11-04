@@ -1,11 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
 import { GPUNF_FORM } from './GPUNF_FORM.entity';
 
 import { UNIFORM } from 'src/common/Entities/gpreport/table/UNIFORM.entity';

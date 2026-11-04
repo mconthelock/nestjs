@@ -1,7 +1,6 @@
-
-import { Column, Entity, PrimaryColumn } from "typeorm";
-@Entity({name:'GPGAR_FORM',schema:'WEBFORM'})
-export class GPGAR_FORM{
+import { Column, Entity, PrimaryColumn } from 'typeorm';
+@Entity({ name: 'GPGAR_FORM', schema: 'WEBFORM' })
+export class GPGAR_FORM {
     @PrimaryColumn()
     NFRMNO: number;
 
@@ -22,7 +21,7 @@ export class GPGAR_FORM{
 
     @Column()
     REMARK: string;
-    
+
     @Column()
     REQDATE: Date;
 }

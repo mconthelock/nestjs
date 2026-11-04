@@ -6,9 +6,9 @@ import { F110KP } from 'src/common/Entities/datacenter/table/F110KP.entity';
 import { F110kpRepository } from './f110kp.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([F110KP], 'datacenterConnection')],
-  controllers: [F110kpController],
-  providers: [F110kpService, F110kpRepository],
-  exports: [F110kpService],
+    imports: [TypeOrmModule.forFeature([F110KP], 'datacenterConnection')],
+    controllers: [F110kpController],
+    providers: [F110kpService, F110kpRepository],
+    exports: [F110kpService],
 })
 export class F110kpModule {}

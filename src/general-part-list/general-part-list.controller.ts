@@ -3,10 +3,10 @@ import { GeneralPartListService } from './general-part-list.service';
 
 @Controller('general-part-list')
 export class GeneralPartListController {
-  constructor(private readonly generalPartListService: GeneralPartListService) {}
+    constructor(private readonly generalPartListService: GeneralPartListService) {}
 
-  @Get(':order/:item')
-  getGPL(@Param('order') order: string, @Param('item') item: string) {
-    return this.generalPartListService.getGPL(order, item);
-  }
+    @Get(':order/:item')
+    getGPL(@Param('order') order: string, @Param('item') item: string) {
+        return this.generalPartListService.getGPL(order, item);
+    }
 }

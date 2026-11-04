@@ -2,110 +2,110 @@ import { View, ViewColumn, ViewEntity } from 'typeorm';
 
 @ViewEntity({ name: 'IEBGR_REPORT_VIEW', schema: 'WEBFORM' })
 export class IEBGR_REPORT_VIEW {
-  @ViewColumn()
-  LINK: string;
-  
-  @ViewColumn()
-  FORMNO: string;
+    @ViewColumn()
+    LINK: string;
 
-  @ViewColumn()
-  NFRMNO: number;
+    @ViewColumn()
+    FORMNO: string;
 
-  @ViewColumn()
-  VORGNO: string;
+    @ViewColumn()
+    NFRMNO: number;
 
-  @ViewColumn()
-  CYEAR: string;
+    @ViewColumn()
+    VORGNO: string;
 
-  @ViewColumn()
-  CYEAR2: string;
+    @ViewColumn()
+    CYEAR: string;
 
-  @ViewColumn()
-  NRUNNO: number;
+    @ViewColumn()
+    CYEAR2: string;
 
-  @ViewColumn()
-  ISSUE_DATE: Date;
+    @ViewColumn()
+    NRUNNO: number;
 
-  @ViewColumn()
-  EMPNO: string;
+    @ViewColumn()
+    ISSUE_DATE: Date;
 
-  @ViewColumn()
-  RESPONSIBLE_PERSON: string;
+    @ViewColumn()
+    EMPNO: string;
 
-  @ViewColumn()
-  DEPT: string;
+    @ViewColumn()
+    RESPONSIBLE_PERSON: string;
 
-  @ViewColumn()
-  BUDGET_YEAR: string;
+    @ViewColumn()
+    DEPT: string;
 
-  @ViewColumn()
-  INVESTMENT_SN: string;
+    @ViewColumn()
+    BUDGET_YEAR: string;
 
-  @ViewColumn()
-  RECIVED_BUDGET: number;
+    @ViewColumn()
+    INVESTMENT_SN: string;
 
-  @ViewColumn()
-  REQUEST_AMOUT: number;
+    @ViewColumn()
+    RECIVED_BUDGET: number;
 
-  @ViewColumn()
-  FINDATE: Date;
+    @ViewColumn()
+    REQUEST_AMOUT: number;
 
-  @ViewColumn()
-  ITMNAME: string;
+    @ViewColumn()
+    FINDATE: Date;
 
-  @ViewColumn()
-  PPRESDATE: Date;
+    @ViewColumn()
+    ITMNAME: string;
 
-  @ViewColumn()
-  GPBID: string;
+    @ViewColumn()
+    PPRESDATE: Date;
 
-  @ViewColumn()
-  FORM_STATUS: string;
+    @ViewColumn()
+    GPBID: string;
 
-  @ViewColumn()
-  REQUESTER: Date;
+    @ViewColumn()
+    FORM_STATUS: string;
 
-  @ViewColumn()
-  REQ_SEM_APPDATE: Date;
+    @ViewColumn()
+    REQUESTER: Date;
 
-  @ViewColumn()
-  REQ_DDEM_APPDATE: Date;
+    @ViewColumn()
+    REQ_SEM_APPDATE: Date;
 
-  @ViewColumn()
-  REQ_DEM_APPDATE: Date;
+    @ViewColumn()
+    REQ_DDEM_APPDATE: Date;
 
-  @ViewColumn()
-  REQ_DDIM_APPDATE: Date;
+    @ViewColumn()
+    REQ_DEM_APPDATE: Date;
 
-  @ViewColumn()
-  REQ_DIM_APPDATE: Date;
+    @ViewColumn()
+    REQ_DDIM_APPDATE: Date;
 
-  @ViewColumn()
-  IE_DEM_APPDATE: Date;
+    @ViewColumn()
+    REQ_DIM_APPDATE: Date;
 
-  @ViewColumn()
-  EP_DDIM_APPDATE: Date;
-  
-  @ViewColumn()
-  EP_DDIM_APPDATE2: Date;
-  
-  @ViewColumn()
-  EP_DIM_APPDATE: Date;
+    @ViewColumn()
+    IE_DEM_APPDATE: Date;
 
-  @ViewColumn()
-  GMFAC_APPDATE: Date;
+    @ViewColumn()
+    EP_DDIM_APPDATE: Date;
 
-  @ViewColumn()
-  CAT_DEM_APPDATE: Date;
+    @ViewColumn()
+    EP_DDIM_APPDATE2: Date;
 
-  @ViewColumn()
-  RAF_DIM_APPDATE: Date;
+    @ViewColumn()
+    EP_DIM_APPDATE: Date;
 
-  @ViewColumn()
-  P_APPDATE: Date;
+    @ViewColumn()
+    GMFAC_APPDATE: Date;
 
-  @ViewColumn()
-  ADMIN_APPDATE: Date;
+    @ViewColumn()
+    CAT_DEM_APPDATE: Date;
 
-  prpo: any;
+    @ViewColumn()
+    RAF_DIM_APPDATE: Date;
+
+    @ViewColumn()
+    P_APPDATE: Date;
+
+    @ViewColumn()
+    ADMIN_APPDATE: Date;
+
+    prpo: any;
 }

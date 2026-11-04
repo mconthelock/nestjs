@@ -40,12 +40,9 @@ import { DrawingFileHelper } from './helpers/drawing-file.helper';
         MfgDrawingCreateChecksheetService,
         DrawingFileHelper,
         DrawingResolverHelper,
-        DrawingMatcherHelper, 
+        DrawingMatcherHelper,
         DrawingParserHelper,
     ],
-    exports: [
-        MfgDrawingService, 
-        MfgDrawingCreateChecksheetService,
-    ],
+    exports: [MfgDrawingService, MfgDrawingCreateChecksheetService],
 })
 export class MfgDrawingModule {}

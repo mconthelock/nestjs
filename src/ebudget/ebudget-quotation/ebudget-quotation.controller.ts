@@ -4,9 +4,7 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Controller('ebudget/quotation')
 export class EbudgetQuotationController {
-    constructor(
-        private readonly ebudgetQuotationService: EbudgetQuotationService,
-    ) {}
+    constructor(private readonly ebudgetQuotationService: EbudgetQuotationService) {}
 
     @Post('data')
     async getData(@Body() formDto: FormDto) {

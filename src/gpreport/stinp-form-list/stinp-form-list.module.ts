@@ -6,9 +6,7 @@ import { STINP_FORM_LIST } from 'src/common/Entities/gpreport/table/STINP_FORM_L
 import { StinpFormListRepository } from './stinp-form-list.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([STINP_FORM_LIST], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([STINP_FORM_LIST], 'mitsuConnection')],
     controllers: [StinpFormListController],
     providers: [StinpFormListService, StinpFormListRepository],
     exports: [StinpFormListService],

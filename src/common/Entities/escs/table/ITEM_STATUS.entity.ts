@@ -1,5 +1,5 @@
-import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
-import { ITEM_MFG } from "./ITEM_MFG.entity";
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { ITEM_MFG } from './ITEM_MFG.entity';
 
 @Entity({ name: 'ITEM_STATUS', schema: 'ESCCHKSHT' })
 export class ITEM_STATUS {

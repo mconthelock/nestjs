@@ -5,30 +5,30 @@ import { UpdatePvenderDto } from './dto/update-pvender.dto';
 
 @Controller('pvender')
 export class PvenderController {
-  constructor(private readonly pvenderService: PvenderService) {}
+    constructor(private readonly pvenderService: PvenderService) {}
 
-  @Post()
-  create(@Body() createPvenderDto: CreatePvenderDto) {
-    return this.pvenderService.create(createPvenderDto);
-  }
+    @Post()
+    create(@Body() createPvenderDto: CreatePvenderDto) {
+        return this.pvenderService.create(createPvenderDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.pvenderService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.pvenderService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pvenderService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.pvenderService.findOne(+id);
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePvenderDto: UpdatePvenderDto) {
-    return this.pvenderService.update(+id, updatePvenderDto);
-  }
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updatePvenderDto: UpdatePvenderDto) {
+        return this.pvenderService.update(+id, updatePvenderDto);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pvenderService.remove(+id);
-  }
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.pvenderService.remove(+id);
+    }
 }

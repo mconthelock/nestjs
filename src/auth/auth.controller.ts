@@ -52,11 +52,7 @@ export class AuthController {
         @Res({ passthrough: true }) response: Response,
     ) {
         const ip = String((req as any).clientIp);
-        const loginResult = await this.authService.directLogin(
-            direct.username,
-            direct.appid,
-            ip,
-        );
+        const loginResult = await this.authService.directLogin(direct.username, direct.appid, ip);
         const res = await this.loginResults(loginResult, response);
         return res;
     }
@@ -70,15 +66,11 @@ export class AuthController {
             const auth = loginResult.info.auth;
 
             //Create Cookie for JWT Guards
-            response.cookie(
-                process.env.JWT_COOKIE_NAME,
-                loginResult.access_token,
-                {
-                    //httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'strict',
-                },
-            );
+            response.cookie(process.env.JWT_COOKIE_NAME, loginResult.access_token, {
+                //httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+            });
 
             //Create Cookie for Signin Page
             const payload = loginResult.info.payload;

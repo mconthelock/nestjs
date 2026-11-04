@@ -9,31 +9,21 @@ import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 import { PROC_TSHEADFORM } from 'src/common/Entities/webform/table/PROC_TSHEADFORM.entity';
 import { PROC_TSDETFORM } from 'src/common/Entities/webform/table/PROC_TSDETFORM.entity';
 import { PROC_TSATTFILE } from 'src/common/Entities/webform/table/PROC_TSATTFILE.entity';
-import {
-    AutoTsProcessItemDto,
-    InsertTsProcessDto,
-    TsFormKeyDto,
-} from './dto/ts-process.dto';
+import { AutoTsProcessItemDto, InsertTsProcessDto, TsFormKeyDto } from './dto/ts-process.dto';
 
 @Injectable()
 export class IePtsRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') private readonly ds: DataSource,
-    ) {
+    constructor(@InjectDataSource('mitsuConnection') private readonly ds: DataSource) {
         super(ds);
     }
 
     transaction<T>(work: () => Promise<T>): Promise<T> {
-        return this.ds.transaction((manager) =>
-            transactionContext.run({ manager }, work),
-        );
+        return this.ds.transaction((manager) => transactionContext.run({ manager }, work));
     }
 
     lockFormNumber() {
         // Same allocation lock as jig/auto-inspection, before FormCreateService reads the next number.
-        return this.manager.query(
-            'LOCK TABLE WEBFORM.FORM IN SHARE ROW EXCLUSIVE MODE',
-        );
+        return this.manager.query('LOCK TABLE WEBFORM.FORM IN SHARE ROW EXCLUSIVE MODE');
     }
 
     async processExists(row: AutoTsProcessItemDto): Promise<boolean> {
@@ -113,10 +103,7 @@ export class IePtsRepository extends BaseRepository {
             dto.HEADERS.map((row) => ({
                 ...row,
                 ...key,
-                INPUTDATE:
-                    row.INPUTDATE == null
-                        ? row.INPUTDATE
-                        : new Date(row.INPUTDATE),
+                INPUTDATE: row.INPUTDATE == null ? row.INPUTDATE : new Date(row.INPUTDATE),
             })),
         );
         if (dto.DETAILS?.length) {

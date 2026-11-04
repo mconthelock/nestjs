@@ -11,10 +11,7 @@ import {
  * @since 2026-07-22
  * @description แปลงข้อมูลจาก ListPLDto เป็น ListForCreateHtml เพื่อใช้ในการสร้าง HTML
  */
-export function setListForHtml(
-    lists: ListPLDto[],
-    type: 'pdf' | 'excel',
-): CreateDataForHTMLResult {
+export function setListForHtml(lists: ListPLDto[], type: 'pdf' | 'excel'): CreateDataForHTMLResult {
     const list = structuredClone(lists);
     const caseNo = countByCase(list);
     let totalNet: number = 0;
@@ -27,26 +24,22 @@ export function setListForHtml(
     for (const l of list) {
         const detailsForHtml: DetailForCreateHtml[] = [];
         const length: number = l.DETAILS.length;
-        const dimension: number = calDimension(
-            +l.VWIDTH,
-            +l.VLENGTH,
-            +l.VHEIGHT,
-        );
+        const dimension: number = calDimension(+l.VWIDTH, +l.VLENGTH, +l.VHEIGHT);
         totalNet += l.NNETWEIGHT ?? 0;
         totalGross += l.NGROSSWEIGHT ?? 0;
         totalDimention += dimension;
         totalPackList[l.VPACKSTYLE] = (totalPackList[l.VPACKSTYLE] || 0) + 1;
         let item = '';
         l.DETAILS.forEach((d, j) => {
-            if( d.VITEM && d.VITEM !== item) {
+            if (d.VITEM && d.VITEM !== item) {
                 if (type === 'pdf') {
-                    item = d.VITEM.replace(/^(.{3})/, '$1-')
+                    item = d.VITEM.replace(/^(.{3})/, '$1-');
                     d.VITEM = item;
-                }else{
+                } else {
                     item = d.VITEM;
                 }
-            }else{
-                if(type === 'excel') {
+            } else {
+                if (type === 'excel') {
                     delete d.VITEM;
                 }
             }
@@ -67,18 +60,14 @@ export function setListForHtml(
                     NET: setRound(l.NNETWEIGHT, 1),
                     GROSS: setRound(l.NGROSSWEIGHT, 1),
                     DIMENSION: `${setRound(l.VWIDTH, 0)} x ${setRound(l.VLENGTH, 0)} x ${setRound(l.VHEIGHT, 0)}`,
-                    ...(type == 'excel'
-                        ? { VOLUME: setRound(dimension, 3) }
-                        : {}),
+                    ...(type == 'excel' ? { VOLUME: setRound(dimension, 3) } : {}),
                     SEQ: seq++,
                 });
             } else if (j === 1) {
                 detailsForHtml.push({
                     ...d,
                     CASE: l.VPACKSTYLE,
-                    ...(type == 'pdf'
-                        ? { DIMENSION: setRound(dimension, 3) }
-                        : {}),
+                    ...(type == 'pdf' ? { DIMENSION: setRound(dimension, 3) } : {}),
                 });
             } else {
                 detailsForHtml.push(d);

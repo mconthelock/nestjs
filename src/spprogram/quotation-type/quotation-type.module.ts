@@ -5,8 +5,8 @@ import { QuotationTypeController } from './quotation-type.controller';
 import { QuotationType } from './entities/quotation-type.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([QuotationType], 'mitsuConnection')],
-  controllers: [QuotationTypeController],
-  providers: [QuotationTypeService],
+    imports: [TypeOrmModule.forFeature([QuotationType], 'mitsuConnection')],
+    controllers: [QuotationTypeController],
+    providers: [QuotationTypeService],
 })
 export class QuotationTypeModule {}

@@ -149,10 +149,7 @@ export class SaveJigDetailDto extends IntersectionType(
     }),
 ) {}
 
-export class CreateJigFormDto extends IntersectionType(
-    JigFormKeyDto,
-    PatchJigSnapshotDto,
-) {
+export class CreateJigFormDto extends IntersectionType(JigFormKeyDto, PatchJigSnapshotDto) {
     // Workflow approver only; not a JIG_FORM or JIG_FORM_NG column.
     @IsOptional()
     @IsString()

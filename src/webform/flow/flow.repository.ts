@@ -95,8 +95,7 @@ export class FlowRepository extends BaseRepository {
                 }
             } else if (key === 'fields') {
                 const select = getSafeFields(dto.fields, this.FLOW_FIELDS);
-                select.length > 0 &&
-                    query.select(select.map((f) => `flow.${f}`));
+                select.length > 0 && query.select(select.map((f) => `flow.${f}`));
             } else {
                 query.andWhere(`flow.${key} = :${key}`, { [key]: dto[key] });
             }
@@ -210,10 +209,7 @@ export class FlowRepository extends BaseRepository {
         // UPDATE APPROVAL STATUS
         let apvClause: string = '';
         params.stepNo = flow.CSTEPNO;
-        if (
-            flow.CAPVTYPE == this.APV_TYPE_SINGLE &&
-            flow.CAPPLYALL == this.APPLY_ALL_NONE
-        ) {
+        if (flow.CAPVTYPE == this.APV_TYPE_SINGLE && flow.CAPPLYALL == this.APPLY_ALL_NONE) {
             apvClause = `and CSTEPNO = :stepNo`;
         } else if (
             flow.CAPVTYPE == this.APV_TYPE_SINGLE &&
@@ -239,8 +235,7 @@ export class FlowRepository extends BaseRepository {
             };
         } else if (
             flow.CAPVTYPE == this.APV_TYPE_MULTIPLE_CO &&
-            (flow.CAPPLYALL == this.APPLY_ALL_APV ||
-                flow.CAPPLYALL == this.APPLY_ALL_BOTH)
+            (flow.CAPPLYALL == this.APPLY_ALL_APV || flow.CAPPLYALL == this.APPLY_ALL_BOTH)
         ) {
             apvClause = `and ((VAPVNO = :apv1 or VREPNO = :rep1) or (CSTEPNO = :stepNo and (VAPVNO = :apv2 or VREPNO = :rep2)))`;
             params = {
@@ -286,11 +281,7 @@ export class FlowRepository extends BaseRepository {
 
     async getStepNextNo(
         form: FormDto,
-        {
-            cextdata,
-            step,
-            start,
-        }: { cextdata?: string; step?: string; start?: string },
+        { cextdata, step, start }: { cextdata?: string; step?: string; start?: string },
     ) {
         const where = {
             NFRMNO: form.NFRMNO,
@@ -400,11 +391,7 @@ export class FlowRepository extends BaseRepository {
                 CYEAR2: form.CYEAR2,
                 NRUNNO: form.NRUNNO,
                 CAPVSTNO: this.APV_NONE,
-                CSTEPST: In([
-                    this.STEP_NORMAL,
-                    this.STEP_WAIT,
-                    this.STEP_READY,
-                ]),
+                CSTEPST: In([this.STEP_NORMAL, this.STEP_WAIT, this.STEP_READY]),
             },
             { CAPVSTNO: this.APV_REJECT, CSTEPST: this.STEP_SKIP },
         );

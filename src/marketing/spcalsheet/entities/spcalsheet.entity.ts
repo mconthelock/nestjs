@@ -3,127 +3,127 @@
 
 @Entity({ name: 'SPCALSHEET_DETAIL', schema: 'SPSYS' })
 export class Spcalsheet {
-  @PrimaryColumn()
-  INQNO: string;
+    @PrimaryColumn()
+    INQNO: string;
 
-  @PrimaryColumn()
-  LINENO: number;
+    @PrimaryColumn()
+    LINENO: number;
 
-  @Column()
-  INQTY: string;
+    @Column()
+    INQTY: string;
 
-  @Column()
-  PRJNO: string;
+    @Column()
+    PRJNO: string;
 
-  @Column()
-  PONO: string;
+    @Column()
+    PONO: string;
 
-  @PrimaryColumn()
-  ORDNO: string;
+    @PrimaryColumn()
+    ORDNO: string;
 
-  @PrimaryColumn()
-  ELVNO: string;
+    @PrimaryColumn()
+    ELVNO: string;
 
-  @Column()
-  PRJORI: string;
+    @Column()
+    PRJORI: string;
 
-  @Column()
-  CARORI: string;
+    @Column()
+    CARORI: string;
 
-  @Column()
-  AGENT: string;
+    @Column()
+    AGENT: string;
 
-  @Column()
-  DSTN: string;
+    @Column()
+    DSTN: string;
 
-  @Column()
-  CURR: string;
+    @Column()
+    CURR: string;
 
-  @Column()
-  CSSEQ: number;
+    @Column()
+    CSSEQ: number;
 
-  @Column()
-  CSCAR: string;
+    @Column()
+    CSCAR: string;
 
-  @Column()
-  CSMFG: string;
+    @Column()
+    CSMFG: string;
 
-  @Column()
-  CSITEM: string;
+    @Column()
+    CSITEM: string;
 
-  @Column()
-  CSPNA: string;
+    @Column()
+    CSPNA: string;
 
-  @Column()
-  CSDWG: string;
+    @Column()
+    CSDWG: string;
 
-  @Column()
-  CSLT: number;
+    @Column()
+    CSLT: number;
 
-  @Column()
-  CSSPPY: string;
+    @Column()
+    CSSPPY: string;
 
-  @Column()
-  CSQTY: number;
+    @Column()
+    CSQTY: number;
 
-  @Column()
-  CSUAMT: number;
+    @Column()
+    CSUAMT: number;
 
-  @Column()
-  CSTAMT: number;
+    @Column()
+    CSTAMT: number;
 
-  @Column()
-  TRADER: string;
+    @Column()
+    TRADER: string;
 
-  @Column()
-  SPEC: string;
+    @Column()
+    SPEC: string;
 
-  @Column()
-  OPERATION: string;
+    @Column()
+    OPERATION: string;
 
-  @Column()
-  JJKK: number;
+    @Column()
+    JJKK: number;
 
-  @Column()
-  HHTT: number;
+    @Column()
+    HHTT: number;
 
-  @Column()
-  PT: number;
+    @Column()
+    PT: number;
 
-  @Column()
-  REQ: string;
+    @Column()
+    REQ: string;
 
-  @Column()
-  CUSTREQ: Date;
+    @Column()
+    CUSTREQ: Date;
 
-  @Column()
-  AMECREQSHIP: Date;
+    @Column()
+    AMECREQSHIP: Date;
 
-  @Column()
-  MARREQPRDN: Date;
+    @Column()
+    MARREQPRDN: Date;
 
-  @Column()
-  PRDNORI: Date;
+    @Column()
+    PRDNORI: Date;
 
-  @Column()
-  INPUTBY: string;
+    @Column()
+    INPUTBY: string;
 
-  @Column()
-  INPUTDT: Date;
+    @Column()
+    INPUTDT: Date;
 
-  @Column()
-  REVISEBY: string;
+    @Column()
+    REVISEBY: string;
 
-  @Column()
-  REVISEDT: Date;
+    @Column()
+    REVISEDT: Date;
 
-  @Column()
-  CS2ND: string;
+    @Column()
+    CS2ND: string;
 
-  //   @ManyToOne(() => InquiryDetail, (inqs) => inqs.spcalsheets)
-  //   @JoinColumn([
-  //     { name: 'INQNO', referencedColumnName: 'INQ_NO' },
-  //     { name: 'LINENO', referencedColumnName: 'INQD_SEQ' },
-  //   ])
-  //   refdetail: InquiryDetail;
+    //   @ManyToOne(() => InquiryDetail, (inqs) => inqs.spcalsheets)
+    //   @JoinColumn([
+    //     { name: 'INQNO', referencedColumnName: 'INQ_NO' },
+    //     { name: 'LINENO', referencedColumnName: 'INQD_SEQ' },
+    //   ])
+    //   refdetail: InquiryDetail;
 }

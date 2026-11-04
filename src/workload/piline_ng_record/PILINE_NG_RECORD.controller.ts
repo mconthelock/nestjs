@@ -15,10 +15,7 @@ export class PilineNgRecordController {
     }
     @Patch(':PILINE_NO')
     @UseTransaction('mitsuConnection')
-    update(
-        @Param() key: KeyPilineNgRecordDto,
-        @Body() dto: UpdatePilineNgRecordDto,
-    ) {
+    update(@Param() key: KeyPilineNgRecordDto, @Body() dto: UpdatePilineNgRecordDto) {
         return this.service.update(key, dto);
     }
     @Delete(':PILINE_NO')

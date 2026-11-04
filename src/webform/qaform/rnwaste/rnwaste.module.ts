@@ -8,9 +8,9 @@ import { RnwasteRepository } from './rnwaste.repository';
 import { RnwasteService } from './rnwaste.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RNWASTE], 'mitsuConnection')],
-  controllers: [RnwasteController],
-  providers: [RnwasteService, RnwasteRepository],
-  exports: [RnwasteService],
+    imports: [TypeOrmModule.forFeature([RNWASTE], 'mitsuConnection')],
+    controllers: [RnwasteController],
+    providers: [RnwasteService, RnwasteRepository],
+    exports: [RnwasteService],
 })
 export class RnwasteModule {}

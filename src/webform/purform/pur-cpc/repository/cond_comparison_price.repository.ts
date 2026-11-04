@@ -16,8 +16,8 @@ export class CondComparisonPriceRepository extends BaseRepository {
                 STATUS: 1,
             },
             order: {
-                NO: 'ASC'
-            }
+                NO: 'ASC',
+            },
         });
     }
 }

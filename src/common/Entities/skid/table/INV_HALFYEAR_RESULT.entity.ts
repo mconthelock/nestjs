@@ -96,7 +96,7 @@ export class INV_HALFYEAR_RESULT {
     FINAL_QTY: number;
 
     @Column({ type: 'float', nullable: true })
-    PRICE : number;
+    PRICE: number;
 
     @ManyToOne(() => PSCIH_FORM, (f) => f.RESULT)
     @JoinColumn([{ name: 'REPORT_ID', referencedColumnName: 'REPORT_ID' }])

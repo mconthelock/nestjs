@@ -106,9 +106,7 @@ describe('Automatic TS batch creation', () => {
         expect(repo.insert).not.toHaveBeenCalled();
     });
     it('filters duplicate input and assigns contiguous sequences after filtering', async () => {
-        repo.processExists.mockImplementation(
-            async (item) => item.PROCID_OLD === 'OLD001',
-        );
+        repo.processExists.mockImplementation(async (item) => item.PROCID_OLD === 'OLD001');
         const result = await service.autoInsert(
             [
                 auto({
@@ -123,16 +121,9 @@ describe('Automatic TS batch creation', () => {
             'ip',
         );
         const inserted = repo.insert.mock.calls[0][0];
-        expect(inserted.HEADERS.map((head) => head.SEQ)).toEqual([
-            '001',
-            '002',
-        ]);
+        expect(inserted.HEADERS.map((head) => head.SEQ)).toEqual(['001', '002']);
         expect(
-            inserted.DETAILS.map((detail) => [
-                detail.PROCID_OLD,
-                detail.SEQ,
-                detail.SEQ_PROC,
-            ]),
+            inserted.DETAILS.map((detail) => [detail.PROCID_OLD, detail.SEQ, detail.SEQ_PROC]),
         ).toEqual([
             ['OLD002', '001', '01'],
             ['OLD003', '002', '01'],
@@ -144,12 +135,10 @@ describe('Automatic TS batch creation', () => {
         });
     });
     it('merges matching form identities but allocates separate numbers for other identities', async () => {
-        forms.create
-            .mockResolvedValueOnce({ status: true, data: key })
-            .mockResolvedValueOnce({
-                status: true,
-                data: { ...key, NRUNNO: 43 },
-            });
+        forms.create.mockResolvedValueOnce({ status: true, data: key }).mockResolvedValueOnce({
+            status: true,
+            data: { ...key, NRUNNO: 43 },
+        });
         const result = await service.autoInsert(
             [
                 auto(),
@@ -183,9 +172,7 @@ describe('Automatic TS batch creation', () => {
         expect(forms.create).toHaveBeenCalledTimes(1);
     });
     it('rejects an empty batch without opening a transaction', async () => {
-        await expect(service.autoInsert([], 'ip')).rejects.toThrow(
-            'At least one',
-        );
+        await expect(service.autoInsert([], 'ip')).rejects.toThrow('At least one');
         expect(repo.transaction).not.toHaveBeenCalled();
     });
     it('propagates later insertion failures out of the batch transaction', async () => {
@@ -210,16 +197,11 @@ describe('Automatic TS batch creation', () => {
             status: true,
             data: { ...key, NRUNNO: undefined },
         });
-        await expect(service.autoInsert([auto()], 'ip')).rejects.toThrow(
-            'form key',
-        );
+        await expect(service.autoInsert([auto()], 'ip')).rejects.toThrow('form key');
         expect(repo.insert).not.toHaveBeenCalled();
         forms.create.mockClear();
         await expect(
-            service.autoInsert(
-                [auto({ ITEMS: [row(), row({ PROCID_OLD: 'OLD002' })] })],
-                'ip',
-            ),
+            service.autoInsert([auto({ ITEMS: [row(), row({ PROCID_OLD: 'OLD002' })] })], 'ip'),
         ).rejects.toThrow('PROCID');
         expect(forms.create).not.toHaveBeenCalled();
     });

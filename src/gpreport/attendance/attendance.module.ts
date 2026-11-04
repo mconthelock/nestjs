@@ -11,10 +11,7 @@ import { WorkAdjust } from 'src/common/Entities/figerdb/table/WorkAdjust.entity'
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature(
-            [AttendanceIn, AttendanceOut, WorkAdjust],
-            'fingerConnection',
-        ),
+        TypeOrmModule.forFeature([AttendanceIn, AttendanceOut, WorkAdjust], 'fingerConnection'),
         UsersModule,
     ],
     controllers: [AttendanceController],

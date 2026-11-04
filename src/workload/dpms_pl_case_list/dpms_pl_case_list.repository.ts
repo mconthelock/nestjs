@@ -33,7 +33,7 @@ export class DpmsPlCaseListRepository extends BaseRepository {
     }
 
     getDataReviseVgmByRevId(revId: number) {
-         return this.getRepository(DPMS_PL_CASE_REVISE_VGM).find({
+        return this.getRepository(DPMS_PL_CASE_REVISE_VGM).find({
             where: { NISSUEREV_ID: revId },
             relations: ['DETAILS'], // ดึงข้อมูลรายละเอียดที่เกี่ยวข้องด้วย
             order: {

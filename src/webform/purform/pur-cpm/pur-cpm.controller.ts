@@ -16,10 +16,7 @@ import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { FormDto } from 'src/webform/form/dto/form.dto';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { PurCpmReturnAprroveService } from './pur-cpm-return-aprrove.service';
 import { PurCpmRequestService } from './pur-cpm-request.service';
 
@@ -69,11 +66,6 @@ export class PurCpmController {
         @Req() req: Request,
     ) {
         const ip = getClientIP(req);
-        return this.purCpmReturnAprroveService.returnApprove(
-            dto,
-            files,
-            this.path,
-            ip,
-        );
+        return this.purCpmReturnAprroveService.returnApprove(dto, files, this.path, ip);
     }
 }

@@ -4,7 +4,7 @@ import { FinpckVwstatusController } from './finpck-vwstatus.controller';
 import { VWStatusRepository } from './finpck-vwstatus.repository';
 
 @Module({
-  controllers: [FinpckVwstatusController],
-  providers: [FinpckVwstatusService,VWStatusRepository],
+    controllers: [FinpckVwstatusController],
+    providers: [FinpckVwstatusService, VWStatusRepository],
 })
 export class FinpckVwstatusModule {}

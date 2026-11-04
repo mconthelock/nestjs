@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 
-import { DS_STAMP_REPORT } from "src/common/Entities/webform/views/FINDS_STAMP_REPORT.entity";
+import { DS_STAMP_REPORT } from 'src/common/Entities/webform/views/FINDS_STAMP_REPORT.entity';
 import { DSDUTYSTAMP } from 'src/common/Entities/webform/table/FINDS_DUTY_STAMP.entity';
 import { DSREQDETAIL } from 'src/common/Entities/webform/table/FINDS_REQ_DETAIL.entity';
 import { DSREQHEAD } from 'src/common/Entities/webform/table/FINDS_REQ_HEAD.entity';
@@ -50,14 +50,8 @@ export class FinDsRepository extends BaseRepository {
             .addSelect('HEAD.CYEAR2', 'CYEAR2')
             .addSelect('HEAD.NRUNNO', 'NRUNNO')
             .addSelect('HEAD.OPTION_CODE', 'OPTION_CODE')
-            .addSelect(
-                "TO_CHAR(HEAD.EFFECTIVE_DATE, 'YYYY-MM-DD')",
-                'EFFECTIVE_DATE',
-            )
-            .addSelect(
-                "TO_CHAR(HEAD.DATE_RECEIVE, 'YYYY-MM-DD')",
-                'DATE_RECEIVE',
-            )
+            .addSelect("TO_CHAR(HEAD.EFFECTIVE_DATE, 'YYYY-MM-DD')", 'EFFECTIVE_DATE')
+            .addSelect("TO_CHAR(HEAD.DATE_RECEIVE, 'YYYY-MM-DD')", 'DATE_RECEIVE')
             .addSelect('HEAD.LOCATION', 'LOCATION')
             .where('HEAD.NFRMNO = :NFRMNO', { NFRMNO: nfrmno })
             .andWhere('HEAD.VORGNO = :VORGNO', { VORGNO: vorgno })
@@ -128,13 +122,7 @@ export class FinDsRepository extends BaseRepository {
     ) {
         const head = await this.findHeadByForm(nfrmno, vorgno, cyear, cyear2, nrunno);
 
-        const detail = await this.findDetailByForm(
-            nfrmno,
-            vorgno,
-            cyear,
-            cyear2,
-            nrunno,
-        );
+        const detail = await this.findDetailByForm(nfrmno, vorgno, cyear, cyear2, nrunno);
 
         const files = await this.findFilesByForm(nfrmno, vorgno, cyear, cyear2, nrunno);
 
@@ -149,13 +137,16 @@ export class FinDsRepository extends BaseRepository {
         return this.getRepository(DSREQHEAD).save(data);
     }
 
-    async updateDateReceive(form: {
-        NFRMNO: number;
-        VORGNO: string;
-        CYEAR: string;
-        CYEAR2: string;
-        NRUNNO: number;
-    }, dateReceive: string) {
+    async updateDateReceive(
+        form: {
+            NFRMNO: number;
+            VORGNO: string;
+            CYEAR: string;
+            CYEAR2: string;
+            NRUNNO: number;
+        },
+        dateReceive: string,
+    ) {
         return this.getRepository(DSREQHEAD)
             .createQueryBuilder()
             .update(DSREQHEAD)
@@ -222,10 +213,4 @@ export class FinDsRepository extends BaseRepository {
             .addOrderBy('REPORT.NRUNNO', 'ASC')
             .getRawMany();
     }
-
-
-
-
-
-
 }

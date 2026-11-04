@@ -1,4 +1,13 @@
-import { IsOptional, IsString, MaxLength, Matches, IsArray, ArrayMaxSize, ArrayUnique, ValidateNested } from 'class-validator';
+import {
+    IsOptional,
+    IsString,
+    MaxLength,
+    Matches,
+    IsArray,
+    ArrayMaxSize,
+    ArrayUnique,
+    ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { IntersectionType } from '@nestjs/mapped-types';
 import { JigFormKeyDto, JigFileDto } from './jig-form.dto';

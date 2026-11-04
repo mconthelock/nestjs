@@ -22,7 +22,7 @@ export class ExpatTravel {
 
     @Column()
     ARRIVAL_DATE: Date;
-    
+
     @Column()
     UPDATE_DATE: Date;
 }

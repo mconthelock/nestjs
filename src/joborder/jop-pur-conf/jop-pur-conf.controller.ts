@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { JopPurConfService } from './jop-pur-conf.service';
 import { CreateJopPurConfDto } from './dto/create-jop-pur-conf.dto';
 import { UpdateJopPurConfDto } from './dto/update-jop-pur-conf.dto';
@@ -27,9 +19,7 @@ export class JopPurConfController {
     }
 
     @Post('getRevisionHistoryByKey')
-    async getRevisionHistoryByKey(
-        @Body() list: { mfg: string; pono: number; line: number }[],
-    ) {
+    async getRevisionHistoryByKey(@Body() list: { mfg: string; pono: number; line: number }[]) {
         return await this.jopPurConfService.getRevisionHistoryByKey(list);
     }
 }

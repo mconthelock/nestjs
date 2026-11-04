@@ -7,9 +7,7 @@ import { WireHarnessDrumMasterService } from './wire-harness-drum-master.service
 @ApiTags('Wire Harness Drum Master')
 @Controller('innovat/wire-harness/drum-master')
 export class WireHarnessDrumMasterController {
-    constructor(
-        private readonly service: WireHarnessDrumMasterService,
-    ) {}
+    constructor(private readonly service: WireHarnessDrumMasterService) {}
 
     @Post('list')
     @HttpCode(HttpStatus.OK)

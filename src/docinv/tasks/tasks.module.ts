@@ -9,9 +9,7 @@ import { TasksTag } from 'src/common/Entities/docinv/table/TASKS_TAG.entity';
 import { Tags } from 'src/common/Entities/docinv/table/TAGS.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Tasks, Tags, TasksTag], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([Tasks, Tags, TasksTag], 'mitsuConnection')],
     controllers: [TasksController],
     providers: [TasksService],
 })

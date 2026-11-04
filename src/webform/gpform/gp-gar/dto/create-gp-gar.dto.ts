@@ -1,34 +1,33 @@
-import { Type } from "class-transformer";
-import { IsDate, IsNotEmpty,IsNumber,IsOptional,IsString } from "class-validator";
+import { Type } from 'class-transformer';
+import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 export class CreateGpGarDto {
     @IsNotEmpty()
     @IsString()
-    @Type(()=> String)
-    INBY : string;
-    
-    @IsNotEmpty()
-    @IsString()
-    @Type(()=> String)
-    REQBY : string;
+    @Type(() => String)
+    INBY: string;
 
     @IsNotEmpty()
-    @Type(()=> Date)
+    @IsString()
+    @Type(() => String)
+    REQBY: string;
+
+    @IsNotEmpty()
+    @Type(() => Date)
     @IsDate()
-    REQDATE : Date;
+    REQDATE: Date;
 
     @IsNotEmpty()
     @IsNumber()
-    @Type(()=> Number)
-    CATEGORY_CODE : number;
+    @Type(() => Number)
+    CATEGORY_CODE: number;
 
     @IsOptional()
     @IsString()
-    @Type(()=> String)
-    REMARK? : string;
+    @Type(() => String)
+    REMARK?: string;
 
- //   @IsNotEmpty()
- //  @IsNumber()
- //   @Type(()=> Number)
- //    NFRMNO : number;
-
+    //   @IsNotEmpty()
+    //  @IsNumber()
+    //   @Type(()=> Number)
+    //    NFRMNO : number;
 }

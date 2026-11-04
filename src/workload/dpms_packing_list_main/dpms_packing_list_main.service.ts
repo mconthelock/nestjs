@@ -87,7 +87,7 @@ export class DpmsPackingListMainService {
                         }
                         return detail;
                     });
-                    if(!po){
+                    if (!po) {
                         item.DETAILS = this.groupDetails(item.DETAILS);
                     }
                     return item;
@@ -115,14 +115,7 @@ export class DpmsPackingListMainService {
     private groupDetails(details: any[]) {
         const map = new Map<string, any>();
         for (const d of details) {
-            const key = [
-                d.VMFGNO,
-                d.VPROD,
-                d.VITEM,
-                d.VPART,
-                d.VDRAWING,
-                d.VDRAWINGL,
-            ].join('|');
+            const key = [d.VMFGNO, d.VPROD, d.VITEM, d.VPART, d.VDRAWING, d.VDRAWINGL].join('|');
 
             if (!map.has(key)) {
                 map.set(key, { ...d, NQTY: Number(d.NQTY) || 0 });

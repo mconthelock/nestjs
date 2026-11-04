@@ -4,12 +4,7 @@ import { WireHarnessDrumMasterService } from './wire-harness-drum-master.service
 import { WireHarnessDrumMasterRepository } from './wire-harness-drum-master.repository';
 
 @Module({
-    controllers: [
-        WireHarnessDrumMasterController,
-    ],
-    providers: [
-        WireHarnessDrumMasterService,
-        WireHarnessDrumMasterRepository,
-    ],
+    controllers: [WireHarnessDrumMasterController],
+    providers: [WireHarnessDrumMasterService, WireHarnessDrumMasterRepository],
 })
 export class WireHarnessDrumMasterModule {}

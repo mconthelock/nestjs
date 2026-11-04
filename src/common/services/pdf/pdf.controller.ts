@@ -4,10 +4,10 @@ import { createPDFDto } from './dto/create.dto';
 
 @Controller('pdf')
 export class PDFController {
-  constructor(private readonly pdfService: PDFService) {}
+    constructor(private readonly pdfService: PDFService) {}
 
-  @Post('generate')
-  async generatePDF(@Body() dto: createPDFDto) {
-    return this.pdfService.generatePDF(dto);
-  }
+    @Post('generate')
+    async generatePDF(@Body() dto: createPDFDto) {
+        return this.pdfService.generatePDF(dto);
+    }
 }

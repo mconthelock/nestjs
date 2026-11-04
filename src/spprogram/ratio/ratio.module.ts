@@ -5,8 +5,8 @@ import { RatioController } from './ratio.controller';
 import { Ratio } from './entities/ratio.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Ratio], 'mitsuConnection')],
-  controllers: [RatioController],
-  providers: [RatioService],
+    imports: [TypeOrmModule.forFeature([Ratio], 'mitsuConnection')],
+    controllers: [RatioController],
+    providers: [RatioService],
 })
 export class RatioModule {}

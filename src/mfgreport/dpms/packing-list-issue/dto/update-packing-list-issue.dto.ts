@@ -3,14 +3,14 @@ import { CreatePackingListIssueDto } from './create-packing-list-issue.dto';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class UpdatePackingListIssueDto extends PartialType(
-    CreatePackingListIssueDto,
-) {}
+export class UpdatePackingListIssueDto extends PartialType(CreatePackingListIssueDto) {}
 
-export class UpdatePlIssueProblemReasonDto extends PickType(
-    CreatePackingListIssueDto,
-    ['VPROD', 'VP', 'VORDERS', 'VTYPE'],
-) {
+export class UpdatePlIssueProblemReasonDto extends PickType(CreatePackingListIssueDto, [
+    'VPROD',
+    'VP',
+    'VORDERS',
+    'VTYPE',
+]) {
     @IsNotEmpty()
     @IsString()
     VPROBLEM: string;

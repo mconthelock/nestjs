@@ -1,11 +1,11 @@
 ﻿import {
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-  JoinColumn,
-  OneToMany,
-  ManyToOne,
-  OneToOne,
+    Column,
+    Entity,
+    PrimaryGeneratedColumn,
+    JoinColumn,
+    OneToMany,
+    ManyToOne,
+    OneToOne,
 } from 'typeorm';
 import { InquiryGroup } from '../../inquiry-group/entities/inquiry-group.entity';
 import { InquiryDetail } from '../../inquiry-detail/entities/inquiry-detail.entity';
@@ -21,202 +21,202 @@ import { Weight } from '../../weight/entities/weight.entity';
 
 @Entity({ name: 'SP_INQUIRY', schema: 'SPSYS' })
 export class Inquiry {
-  @PrimaryGeneratedColumn()
-  INQ_ID: number;
+    @PrimaryGeneratedColumn()
+    INQ_ID: number;
 
-  @Column()
-  INQ_NO: string;
+    @Column()
+    INQ_NO: string;
 
-  @Column()
-  INQ_REV: string;
+    @Column()
+    INQ_REV: string;
 
-  @Column()
-  INQ_STATUS: number;
+    @Column()
+    INQ_STATUS: number;
 
-  @Column()
-  INQ_DATE: Date;
+    @Column()
+    INQ_DATE: Date;
 
-  @Column()
-  INQ_TRADER: string;
+    @Column()
+    INQ_TRADER: string;
 
-  @Column()
-  INQ_AGENT: string;
+    @Column()
+    INQ_AGENT: string;
 
-  @Column()
-  INQ_COUNTRY: string;
+    @Column()
+    INQ_COUNTRY: string;
 
-  @Column()
-  INQ_TYPE: string;
+    @Column()
+    INQ_TYPE: string;
 
-  @Column()
-  INQ_PRJNO: string;
+    @Column()
+    INQ_PRJNO: string;
 
-  @Column()
-  INQ_PRJNAME: string;
+    @Column()
+    INQ_PRJNAME: string;
 
-  @Column()
-  INQ_SHOPORDER: string;
+    @Column()
+    INQ_SHOPORDER: string;
 
-  @Column()
-  INQ_SERIES: string;
+    @Column()
+    INQ_SERIES: string;
 
-  @Column()
-  INQ_OPERATION: string;
+    @Column()
+    INQ_OPERATION: string;
 
-  @Column()
-  INQ_SPEC: string;
+    @Column()
+    INQ_SPEC: string;
 
-  @Column()
-  INQ_PRDSCH: string;
+    @Column()
+    INQ_PRDSCH: string;
 
-  @Column()
-  INQ_QUOTATION_TYPE: number;
+    @Column()
+    INQ_QUOTATION_TYPE: number;
 
-  @Column()
-  INQ_DELIVERY_TERM: number;
+    @Column()
+    INQ_DELIVERY_TERM: number;
 
-  @Column()
-  INQ_DELIVERY_METHOD: number;
+    @Column()
+    INQ_DELIVERY_METHOD: number;
 
-  @Column()
-  INQ_SHIPMENT: number;
+    @Column()
+    INQ_SHIPMENT: number;
 
-  @Column()
-  INQ_MAR_PIC: string;
+    @Column()
+    INQ_MAR_PIC: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  CREATE_AT: Date;
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    CREATE_AT: Date;
 
-  @Column({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
-  UPDATE_AT: Date;
+    @Column({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP',
+        onUpdate: 'CURRENT_TIMESTAMP',
+    })
+    UPDATE_AT: Date;
 
-  @Column()
-  CREATE_BY: string;
+    @Column()
+    CREATE_BY: string;
 
-  @Column()
-  UPDATE_BY: string;
+    @Column()
+    UPDATE_BY: string;
 
-  @Column()
-  INQ_LATEST: number;
+    @Column()
+    INQ_LATEST: number;
 
-  @Column()
-  TOTAL_FC: number;
+    @Column()
+    TOTAL_FC: number;
 
-  @Column()
-  TOTAL_TC: number;
+    @Column()
+    TOTAL_TC: number;
 
-  @Column()
-  GRAND_TOTAL: number;
+    @Column()
+    GRAND_TOTAL: number;
 
-  @Column()
-  TOTAL_UNIT_PRICE: number;
+    @Column()
+    TOTAL_UNIT_PRICE: number;
 
-  @Column()
-  INQ_PKC_REQ: number;
+    @Column()
+    INQ_PKC_REQ: number;
 
-  @Column()
-  INQ_EXTEND: number;
+    @Column()
+    INQ_EXTEND: number;
 
-  @Column()
-  INQ_CUR: string;
+    @Column()
+    INQ_CUR: string;
 
-  @Column()
-  INQ_ACTUAL_PO: string;
+    @Column()
+    INQ_ACTUAL_PO: string;
 
-  @Column()
-  INQ_CUSTRQS: Date;
+    @Column()
+    INQ_CUSTRQS: Date;
 
-  @Column()
-  INQ_CUSTOMER: number;
+    @Column()
+    INQ_CUSTOMER: number;
 
-  @Column()
-  INQ_CONTRACTOR: string;
+    @Column()
+    INQ_CONTRACTOR: string;
 
-  @Column()
-  INQ_ENDUSER: string;
+    @Column()
+    INQ_ENDUSER: string;
 
-  @Column()
-  INQ_PORT: string;
+    @Column()
+    INQ_PORT: string;
 
-  @Column()
-  INQ_USERPART: string;
+    @Column()
+    INQ_USERPART: string;
 
-  @Column()
-  INQ_TCCUR: string;
+    @Column()
+    INQ_TCCUR: string;
 
-  @Column()
-  INQ_MAR_REMARK: string;
+    @Column()
+    INQ_MAR_REMARK: string;
 
-  @Column()
-  INQ_SALE_REMARK: string;
+    @Column()
+    INQ_SALE_REMARK: string;
 
-  @Column()
-  INQ_DE_REMARK: string;
+    @Column()
+    INQ_DE_REMARK: string;
 
-  @Column()
-  INQ_FIN_REMARK: string;
+    @Column()
+    INQ_FIN_REMARK: string;
 
-  @Column()
-  INQ_SALE_FORWARD: number;
+    @Column()
+    INQ_SALE_FORWARD: number;
 
-  sheet?: any[];
-  orders?: any[];
-  pcategory?: any[];
+    sheet?: any[];
+    orders?: any[];
+    pcategory?: any[];
 
-  // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
-  // ตัวอย่าง:
-  @OneToMany(() => InquiryGroup, (group) => group.inqs)
-  @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'INQ_ID' })
-  inqgroup: InquiryGroup;
+    // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
+    // ตัวอย่าง:
+    @OneToMany(() => InquiryGroup, (group) => group.inqs)
+    @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'INQ_ID' })
+    inqgroup: InquiryGroup;
 
-  @OneToMany(() => InquiryDetail, (detail) => detail.inqs)
-  @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'INQID' })
-  details: InquiryDetail;
+    @OneToMany(() => InquiryDetail, (detail) => detail.inqs)
+    @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'INQID' })
+    details: InquiryDetail;
 
-  @ManyToOne(() => Status, (status) => status.inqs)
-  @JoinColumn({ name: 'INQ_STATUS', referencedColumnName: 'STATUS_ID' })
-  status: Status;
+    @ManyToOne(() => Status, (status) => status.inqs)
+    @JoinColumn({ name: 'INQ_STATUS', referencedColumnName: 'STATUS_ID' })
+    status: Status;
 
-  @ManyToOne(() => QuotationType, (type) => type.inqs)
-  @JoinColumn({
-    name: 'INQ_QUOTATION_TYPE',
-    referencedColumnName: 'QUOTYPE_ID',
-  })
-  quotype: QuotationType;
+    @ManyToOne(() => QuotationType, (type) => type.inqs)
+    @JoinColumn({
+        name: 'INQ_QUOTATION_TYPE',
+        referencedColumnName: 'QUOTYPE_ID',
+    })
+    quotype: QuotationType;
 
-  @ManyToOne(() => Method, (md) => md.inqs)
-  @JoinColumn({
-    name: 'INQ_DELIVERY_METHOD',
-    referencedColumnName: 'METHOD_ID',
-  })
-  method: Method;
+    @ManyToOne(() => Method, (md) => md.inqs)
+    @JoinColumn({
+        name: 'INQ_DELIVERY_METHOD',
+        referencedColumnName: 'METHOD_ID',
+    })
+    method: Method;
 
-  @ManyToOne(() => Term, (tm) => tm.inqs)
-  @JoinColumn({ name: 'INQ_DELIVERY_TERM', referencedColumnName: 'TERM_ID' })
-  term: Term;
+    @ManyToOne(() => Term, (tm) => tm.inqs)
+    @JoinColumn({ name: 'INQ_DELIVERY_TERM', referencedColumnName: 'TERM_ID' })
+    term: Term;
 
-  @ManyToOne(() => Shipment, (ship) => ship.inqs)
-  @JoinColumn({ name: 'INQ_SHIPMENT', referencedColumnName: 'SHIPMENT_ID' })
-  shipment: Shipment;
+    @ManyToOne(() => Shipment, (ship) => ship.inqs)
+    @JoinColumn({ name: 'INQ_SHIPMENT', referencedColumnName: 'SHIPMENT_ID' })
+    shipment: Shipment;
 
-  @ManyToOne(() => SpUser, (user) => user.inqs)
-  @JoinColumn({ name: 'INQ_MAR_PIC', referencedColumnName: 'SEMPNO' })
-  maruser: SpUser;
+    @ManyToOne(() => SpUser, (user) => user.inqs)
+    @JoinColumn({ name: 'INQ_MAR_PIC', referencedColumnName: 'SEMPNO' })
+    maruser: SpUser;
 
-  @OneToOne(() => Timeline, (times) => times.inqs)
-  @JoinColumn({ name: 'INQ_NO', referencedColumnName: 'INQ_NO' })
-  @JoinColumn({ name: 'INQ_REV', referencedColumnName: 'INQ_REV' })
-  timeline: Timeline;
+    @OneToOne(() => Timeline, (times) => times.inqs)
+    @JoinColumn({ name: 'INQ_NO', referencedColumnName: 'INQ_NO' })
+    @JoinColumn({ name: 'INQ_REV', referencedColumnName: 'INQ_REV' })
+    timeline: Timeline;
 
-  @OneToOne(() => Quotation, (quo) => quo.inqs)
-  @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'QUO_INQ' })
-  quotation: Quotation;
+    @OneToOne(() => Quotation, (quo) => quo.inqs)
+    @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'QUO_INQ' })
+    quotation: Quotation;
 
-  @OneToMany(() => Weight, (inq) => inq.inqs)
-  @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'INQ_ID' })
-  weight: Weight;
+    @OneToMany(() => Weight, (inq) => inq.inqs)
+    @JoinColumn({ name: 'INQ_ID', referencedColumnName: 'INQ_ID' })
+    weight: Weight;
 }

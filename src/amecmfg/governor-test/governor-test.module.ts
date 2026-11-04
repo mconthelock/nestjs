@@ -5,6 +5,6 @@ import { GovernorTestService } from './governor-test.service';
 
 @Module({
     controllers: [GovernorTestController],
-    providers: [GovernorTestService, MachineRepository]
+    providers: [GovernorTestService, MachineRepository],
 })
 export class GovernorTestModule {}

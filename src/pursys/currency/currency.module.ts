@@ -8,12 +8,7 @@ import { CurrencyMaster } from 'src/common/Entities/pursys/table/CURRENCY_MASTER
 import { CurrencyExchange } from 'src/common/Entities/pursys/table/CURRENCY_EXCHANGE.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [CurrencyMaster, CurrencyExchange],
-            'mitsuConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([CurrencyMaster, CurrencyExchange], 'mitsuConnection')],
     controllers: [CurrencyController],
     providers: [CurrencyService],
 })

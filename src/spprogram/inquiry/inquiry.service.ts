@@ -47,22 +47,16 @@ export class InquiryService {
             .leftJoinAndSelect('inq.method', 'method')
             .leftJoinAndSelect('inq.quotype', 'quotype');
         if (searchDto.IS_GROUP) {
-            qb.leftJoinAndSelect(
-                'inq.inqgroup',
-                'inqgroup',
-                'inqgroup.INQG_LATEST = :latest',
-                { latest: 1 },
-            );
+            qb.leftJoinAndSelect('inq.inqgroup', 'inqgroup', 'inqgroup.INQG_LATEST = :latest', {
+                latest: 1,
+            });
             delete searchDto.IS_GROUP;
         }
 
         if (searchDto.IS_DETAILS) {
-            qb.leftJoinAndSelect(
-                'inq.details',
-                'details',
-                'details.INQD_LATEST = :latest',
-                { latest: 1 },
-            );
+            qb.leftJoinAndSelect('inq.details', 'details', 'details.INQD_LATEST = :latest', {
+                latest: 1,
+            });
             delete searchDto.IS_DETAILS;
 
             if (searchDto.IS_ORDERS) {
@@ -232,9 +226,7 @@ export class InquiryService {
                 let item = Math.floor(el.INQD_ITEM / 100);
                 if (item === 5) item = 2;
                 if (item >= 6) item = 6;
-                const grp_id_obj = savedGroups.find(
-                    (val) => val.INQG_GROUP === item,
-                );
+                const grp_id_obj = savedGroups.find((val) => val.INQG_GROUP === item);
                 const detail = runner.manager.create(InquiryDetail, {
                     ...el,
                     INQG_GROUP: grp_id_obj.INQG_ID,
@@ -311,9 +303,7 @@ export class InquiryService {
 
             const sanitizeDetailPayload = (payload: Record<string, any>) => {
                 return Object.fromEntries(
-                    Object.entries(payload).filter(([key]) =>
-                        inquiryDetailColumns.has(key),
-                    ),
+                    Object.entries(payload).filter(([key]) => inquiryDetailColumns.has(key)),
                 );
             };
 
@@ -346,16 +336,13 @@ export class InquiryService {
                         INQG_STATUS: inquiry.INQ_STATUS,
                         INQG_LATEST: 1,
                     });
-                    const savedGroups = await runner.manager.findOne(
-                        InquiryGroup,
-                        {
-                            where: {
-                                INQ_ID: inquiry.INQ_ID,
-                                INQG_REV: inquiry.INQ_REV,
-                                INQG_GROUP: item,
-                            },
+                    const savedGroups = await runner.manager.findOne(InquiryGroup, {
+                        where: {
+                            INQ_ID: inquiry.INQ_ID,
+                            INQG_REV: inquiry.INQ_REV,
+                            INQG_GROUP: item,
                         },
-                    );
+                    });
                     group_id = savedGroups.INQG_ID;
                 } else {
                     group_id = group.INQG_ID;
@@ -375,10 +362,7 @@ export class InquiryService {
                 else delete dt.INQD_VPC_DATE;
 
                 if (db_detail) {
-                    const dto: createDetailDto = Object.assign(
-                        {} as createDetailDto,
-                        db_detail,
-                    );
+                    const dto: createDetailDto = Object.assign({} as createDetailDto, db_detail);
                     Object.assign(dto, dt);
                     const safeDto = sanitizeDetailPayload(dto);
                     delete safeDto.INQD_ID;
@@ -388,10 +372,7 @@ export class InquiryService {
                     dt.CREATE_AT = new Date();
                     dt.CREATE_BY = header.UPDATE_BY;
                     delete dt.INQD_ID;
-                    const dto: createDetailDto = Object.assign(
-                        {} as createDetailDto,
-                        dt,
-                    );
+                    const dto: createDetailDto = Object.assign({} as createDetailDto, dt);
                     const safeDto = sanitizeDetailPayload(dto);
                     await runner.manager.save(InquiryDetail, safeDto);
                 }
@@ -426,10 +407,7 @@ export class InquiryService {
             }
 
             if (timelinedata !== undefined) {
-                const timelineDto = plainToInstance(
-                    updateTimelineDto,
-                    timelinedata,
-                );
+                const timelineDto = plainToInstance(updateTimelineDto, timelinedata);
                 const timeline = await runner.manager.findOne(Timeline, {
                     where: { INQ_NO: inquiry.INQ_NO, INQ_REV: inquiry.INQ_REV },
                 });
@@ -498,11 +476,7 @@ export class InquiryService {
             const rev = await this.revision_code(inquiry.INQ_REV);
             Object.assign(inquiry, { INQ_REV: rev });
             const newinq = await runner.manager.save(Inquiry, inquiry);
-            await runner.manager.update(
-                Inquiry,
-                { INQ_ID: id },
-                { INQ_LATEST: 0 },
-            ); //Update INQ_LATEST
+            await runner.manager.update(Inquiry, { INQ_ID: id }, { INQ_LATEST: 0 }); //Update INQ_LATEST
             console.log('Inserted Inquiry');
 
             //Inquiry Group
@@ -515,11 +489,7 @@ export class InquiryService {
             }
             await runner.manager.save(InquiryGroup, inquiry_group);
             console.log('Inserted Inquiry Group');
-            await runner.manager.update(
-                InquiryGroup,
-                { INQ_ID: id },
-                { INQG_LATEST: 0 },
-            ); //Update INQG_LATEST
+            await runner.manager.update(InquiryGroup, { INQ_ID: id }, { INQG_LATEST: 0 }); //Update INQG_LATEST
 
             //Inquiry Detail
             const inquiry_detail = await runner.manager.find(InquiryDetail, {
@@ -535,11 +505,7 @@ export class InquiryService {
             await runner.manager.save(InquiryDetail, inquiry_detail);
             // await this.reAlign(newinq.INQ_ID);
             // console.log('Inserted Inquiry Detail');
-            await runner.manager.update(
-                InquiryDetail,
-                { INQID: id },
-                { INQD_LATEST: 0 },
-            );
+            await runner.manager.update(InquiryDetail, { INQID: id }, { INQD_LATEST: 0 });
 
             //Inquiry Timeline
             const timeline = await runner.manager.create(Timeline, {
@@ -572,9 +538,9 @@ export class InquiryService {
             }
             return val;
         };
-        let chars = current.split('');
-        let nb = chars.length - 1;
-        for (var i = nb; i >= 0; i--) {
+        const chars = current.split('');
+        const nb = chars.length - 1;
+        for (let i = nb; i >= 0; i--) {
             chars[i] = recursive(chars[i]);
             if (chars[i] != 'A') break;
         }
@@ -619,9 +585,7 @@ export class InquiryService {
         END;`;
         const result = await this.ds.query(sql, params);
         if (result[0] == null) {
-            throw new NotFoundException(
-                `Inquiry with ID (${searchDto.INQ_ID}) not found.`,
-            );
+            throw new NotFoundException(`Inquiry with ID (${searchDto.INQ_ID}) not found.`);
         }
         return { status: true, title: result[0] };
     }
@@ -631,14 +595,10 @@ export class InquiryService {
         await runner.connect();
         await runner.startTransaction();
         try {
-            let inquiry = await runner.manager.findOne(Inquiry, {
+            const inquiry = await runner.manager.findOne(Inquiry, {
                 where: { INQ_ID: id },
             });
-            await runner.manager.update(
-                Inquiry,
-                { INQ_ID: id },
-                { INQ_STATUS: status },
-            );
+            await runner.manager.update(Inquiry, { INQ_ID: id }, { INQ_STATUS: status });
             if (history) {
                 await runner.manager.insert(History, history);
             }

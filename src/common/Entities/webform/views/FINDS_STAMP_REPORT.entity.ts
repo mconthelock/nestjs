@@ -2,7 +2,6 @@ import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 
 @Entity({ name: 'FINDS_STAMP_REPORT', schema: 'WEBFORM' })
 export class DS_STAMP_REPORT {
-
     @PrimaryColumn()
     FYEAR: number;
 
@@ -23,7 +22,7 @@ export class DS_STAMP_REPORT {
 
     @PrimaryColumn()
     NRUNNO: number;
-    
+
     @PrimaryColumn()
     REASON: string;
 
@@ -76,15 +75,12 @@ export class DS_STAMP_REPORT {
     @PrimaryColumn()
     WD_20_AMT: number;
 
-
-     // ---------------------------------------
+    // ---------------------------------------
     // @Column()
     // OPTION_CODE: string;
 
     // @Column()
     // EFFECTIVE_DATE: Date;
-
-
 
     // @Column()
     // LOCATION: string;

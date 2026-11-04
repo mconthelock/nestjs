@@ -13,7 +13,7 @@ export class PurCpcDetailRepository extends BaseRepository {
     }
 
     create(data: CreatePcpDetailsDto | CreatePcpDetailsDto[]) {
-        if(Array.isArray(data)) {
+        if (Array.isArray(data)) {
             return this.getRepository(PURCPC_DETAILS).save(data, {
                 chunk: 500, // ตัวอย่างการตั้งค่า chunk size
             });

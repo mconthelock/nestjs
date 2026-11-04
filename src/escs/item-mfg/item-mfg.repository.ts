@@ -9,9 +9,7 @@ import { UpdateItemMfgDto } from './dto/update-item-mfg.dto';
 
 @Injectable()
 export class ItemMfgRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -54,10 +52,7 @@ export class ItemMfgRepository extends BaseRepository {
     }
 
     async update(id: number, dto: UpdateItemMfgDto) {
-        return this.getRepository(ITEM_MFG).update(
-            { NID: id, NSTATUS: Not(3) },
-            dto,
-        );
+        return this.getRepository(ITEM_MFG).update({ NID: id, NSTATUS: Not(3) }, dto);
     }
 
     async remove(id: number) {

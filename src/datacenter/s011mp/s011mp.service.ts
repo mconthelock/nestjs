@@ -42,10 +42,7 @@ export class S011mpService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Search S011MP by id ${S11M01}, ${S11M02} Error: ` +
-                    error.message,
-            );
+            throw new Error(`Search S011MP by id ${S11M01}, ${S11M02} Error: ` + error.message);
         }
     }
 

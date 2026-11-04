@@ -5,21 +5,21 @@ import { RnwasteService } from './rnwaste.service';
 
 @Controller('webform/rnwaste')
 export class RnwasteController {
-  constructor(private readonly rnwasteService: RnwasteService) {}
+    constructor(private readonly rnwasteService: RnwasteService) {}
 
-  @Get()
-  findAll() {
-    return this.rnwasteService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.rnwasteService.findAll();
+    }
 
-  @Get(':wid')
-  findOne(@Param('wid') wid: number) {
-    return this.rnwasteService.findOne(wid);
-  }
+    @Get(':wid')
+    findOne(@Param('wid') wid: number) {
+        return this.rnwasteService.findOne(wid);
+    }
 
-  @Post('search')
-  @UseTransaction('mitsuConnection')
-  search(@Body() dto: FiltersDto) {
-    return this.rnwasteService.search(dto);
-  }
+    @Post('search')
+    @UseTransaction('mitsuConnection')
+    search(@Body() dto: FiltersDto) {
+        return this.rnwasteService.search(dto);
+    }
 }

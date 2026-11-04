@@ -1,11 +1,4 @@
-import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    OneToMany,
-    JoinColumn,
-    ManyToOne,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 import { M008KP } from '../../m008kp/entities/m008kp.entity';
 import { F002KP } from '../../f002kp/entities/f002kp.entity';
 import { F003KP } from '../../f003kp/entities/f003kp.entity';

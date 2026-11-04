@@ -6,8 +6,8 @@ import { FormModule } from 'src/webform/form/form.module';
 import { StocksModule } from 'src/pursys/stocks/stocks.module';
 
 @Module({
-  controllers: [VendingController],
-  providers: [VendingService,VendingRepository],
-  imports: [FormModule,StocksModule],
+    controllers: [VendingController],
+    providers: [VendingService, VendingRepository],
+    imports: [FormModule, StocksModule],
 })
 export class VendingModule {}

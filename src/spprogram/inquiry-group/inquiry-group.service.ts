@@ -8,39 +8,33 @@ import { updateInqGroupDto } from './dto/update.dto';
 
 @Injectable()
 export class InquiryGroupService {
-  constructor(
-    @InjectRepository(InquiryGroup, 'mitsuConnection')
-    private readonly group: Repository<InquiryGroup>,
-  ) {}
+    constructor(
+        @InjectRepository(InquiryGroup, 'mitsuConnection')
+        private readonly group: Repository<InquiryGroup>,
+    ) {}
 
-  async search(searchDto: searchGroupDto) {
-    const q = { INQG_LATEST: 1 };
-    return this.group.find({
-      where: {
-        ...searchDto,
-        ...q,
-      },
-    });
-  }
+    async search(searchDto: searchGroupDto) {
+        const q = { INQG_LATEST: 1 };
+        return this.group.find({
+            where: {
+                ...searchDto,
+                ...q,
+            },
+        });
+    }
 
-  async find(id: number) {
-    return await this.group.find({ where: { INQ_ID: id, INQG_LATEST: 1 } });
-  }
+    async find(id: number) {
+        return await this.group.find({ where: { INQ_ID: id, INQG_LATEST: 1 } });
+    }
 
-  async create(createDto: createGroupDto) {
-    const inquiryGroup = await this.group.create(createDto);
-    const res = await this.group.save(inquiryGroup);
-    return await this.group.find({ where: { INQ_ID: createDto.INQ_ID } });
-  }
+    async create(createDto: createGroupDto) {
+        const inquiryGroup = await this.group.create(createDto);
+        const res = await this.group.save(inquiryGroup);
+        return await this.group.find({ where: { INQ_ID: createDto.INQ_ID } });
+    }
 
-  async update({
-    data,
-    condition,
-  }: {
-    data: updateInqGroupDto;
-    condition?: searchGroupDto;
-  }) {
-    await this.group.update({ ...condition, INQG_LATEST: 1 }, data);
-    return await this.group.find({ where: { ...condition, INQG_LATEST: 1 } });
-  }
+    async update({ data, condition }: { data: updateInqGroupDto; condition?: searchGroupDto }) {
+        await this.group.update({ ...condition, INQG_LATEST: 1 }, data);
+        return await this.group.find({ where: { ...condition, INQG_LATEST: 1 } });
+    }
 }

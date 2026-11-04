@@ -6,11 +6,11 @@ import { FormDto } from 'src/webform/form/dto/form.dto';
 
 @Injectable()
 export class FinpckFormService {
-  constructor(private readonly repo: FinpckFormRepository) {}
-  async create(dto: CreateFinpckFormDto) {
-          try {
+    constructor(private readonly repo: FinpckFormRepository) {}
+    async create(dto: CreateFinpckFormDto) {
+        try {
             const res = await this.repo.createForm(dto);
-            if(!res){
+            if (!res) {
                 throw new Error('Failed to insert FINPCK FORM');
             }
             return {
@@ -20,9 +20,9 @@ export class FinpckFormService {
         } catch (error) {
             throw new Error('Insert FINPCK FORM Error: ' + error.message);
         }
-  }
+    }
 
-  async getData(dto: FormDto) {
+    async getData(dto: FormDto) {
         try {
             return await this.repo.getData(dto);
         } catch (error) {
@@ -30,21 +30,19 @@ export class FinpckFormService {
         }
     }
 
-  
+    findAll() {
+        return `This action returns all finpckForm`;
+    }
 
-  findAll() {
-    return `This action returns all finpckForm`;
-  }
+    findOne(id: number) {
+        return `This action returns a #${id} finpckForm`;
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} finpckForm`;
-  }
+    update(id: number, updateFinpckFormDto: UpdateFinpckFormDto) {
+        return `This action updates a #${id} finpckForm`;
+    }
 
-  update(id: number, updateFinpckFormDto: UpdateFinpckFormDto) {
-    return `This action updates a #${id} finpckForm`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} finpckForm`;
-  }
+    remove(id: number) {
+        return `This action removes a #${id} finpckForm`;
+    }
 }

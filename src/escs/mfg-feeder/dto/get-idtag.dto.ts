@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString } from 'class-validator';
 export class GetIdTagDto {
     @ApiProperty({
         example: 'C604270001B',
-        description: 'Control Number'
+        description: 'Control Number',
     })
     @IsString()
     @IsNotEmpty()

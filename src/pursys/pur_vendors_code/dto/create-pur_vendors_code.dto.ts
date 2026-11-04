@@ -1,15 +1,7 @@
-import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  IsArray,
-  IsNotEmpty,
-  IsDateString,
-} from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsArray, IsNotEmpty, IsDateString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class CreatePurVendorsCodeDto {
-
     @IsNotEmpty()
     @IsNumber()
     CODE_NUM: number;
@@ -22,7 +14,7 @@ export class CreatePurVendorsCodeDto {
     @IsNumber()
     CODE_STATUS: number;
 
-    @ApiPropertyOptional({description: 'Code registration date', example: '2024-01-01' })
+    @ApiPropertyOptional({ description: 'Code registration date', example: '2024-01-01' })
     @IsOptional()
     @IsDateString()
     CODE_REGDATE?: string;
@@ -42,5 +34,4 @@ export class CreatePurVendorsCodeDto {
     @IsOptional()
     @IsNumber()
     CODE_TYPE: number;
-
 }

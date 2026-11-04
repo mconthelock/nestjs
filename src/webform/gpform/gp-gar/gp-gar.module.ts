@@ -9,16 +9,16 @@ import { GpGarRepository } from './gp-gar-repository';
 import { HandleFileFormModule } from 'src/webform/handle-file-form/handle-file-form.module';
 import { FlowModule } from 'src/webform/flow/flow.module';
 
-
 @Module({
-  imports: [TypeOrmModule.forFeature([GPGAR_CATEGORY], 'mitsuConnection'),
-  FormmstModule,
-  FormModule,
-  HandleFileFormModule,
-  FlowModule
-],
-  controllers: [GpGarController],
-  providers: [GpGarService, GpGarRepository],
-  exports:[GpGarService],
+    imports: [
+        TypeOrmModule.forFeature([GPGAR_CATEGORY], 'mitsuConnection'),
+        FormmstModule,
+        FormModule,
+        HandleFileFormModule,
+        FlowModule,
+    ],
+    controllers: [GpGarController],
+    providers: [GpGarService, GpGarRepository],
+    exports: [GpGarService],
 })
 export class GpGarModule {}

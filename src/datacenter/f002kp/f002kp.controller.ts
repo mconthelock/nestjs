@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { F002kpService } from './f002kp.service';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';

@@ -47,10 +47,8 @@ export class PrintedMergeService {
                 const tagData = textContent.split('\n');
                 const tagNo = tagData[0].substring(0, 12).replace(/\s/g, '');
                 const mfgno = this.extract.extractOrderEntries(textContent);
-                const itemno =
-                    this.extract.extractItemPackingEntries(textContent);
-                const process =
-                    this.extract.extractProcessListEntries(textContent);
+                const itemno = this.extract.extractItemPackingEntries(textContent);
+                const process = this.extract.extractProcessListEntries(textContent);
                 const dwgno = this.extract.extractDrawingEntries(textContent);
                 const newFileName = `${tagNo}.pdf`;
                 const outputPath = path.join(outputDirectory, newFileName);
@@ -81,9 +79,7 @@ export class PrintedMergeService {
         for (let i = 0; i < filesData.length; i += BATCH_SIZE) {
             const batchStartTime = Date.now();
             const batch = filesData.slice(i, i + BATCH_SIZE);
-            const buffers = await Promise.all(
-                batch.map((file) => fs.readFile(file.filePath)),
-            );
+            const buffers = await Promise.all(batch.map((file) => fs.readFile(file.filePath)));
             for (const buffer of buffers) {
                 const tempDoc = await PDFDocument.load(buffer);
                 const [copiedPage] = await mergedPdf.copyPages(tempDoc, [0]);
@@ -121,28 +117,18 @@ export class PrintedMergeService {
                 `[Ghostscript] input exists: ${inputPath}, size=${inputStat.size} bytes`,
             );
         } catch (error) {
-            const message =
-                error instanceof Error ? error.message : String(error);
-            await this.printed.writeLog(
-                `[Ghostscript] input access failed: ${inputPath}`,
-                message,
-            );
-            throw new Error(
-                `Ghostscript input not readable: ${inputPath} (${message})`,
-            );
+            const message = error instanceof Error ? error.message : String(error);
+            await this.printed.writeLog(`[Ghostscript] input access failed: ${inputPath}`, message);
+            throw new Error(`Ghostscript input not readable: ${inputPath} (${message})`);
         }
 
         try {
-            await fs.access(
-                parsedPath.dir,
-                fs.constants.W_OK | fs.constants.X_OK,
-            );
+            await fs.access(parsedPath.dir, fs.constants.W_OK | fs.constants.X_OK);
             await this.printed.writeLog(
                 `[Ghostscript] output directory writable: ${parsedPath.dir}`,
             );
         } catch (error) {
-            const message =
-                error instanceof Error ? error.message : String(error);
+            const message = error instanceof Error ? error.message : String(error);
             await this.printed.writeLog(
                 `[Ghostscript] output directory permission denied: ${parsedPath.dir}`,
                 message,
@@ -155,8 +141,7 @@ export class PrintedMergeService {
         try {
             await fs.access(command, fs.constants.X_OK);
         } catch (error) {
-            const message =
-                error instanceof Error ? error.message : String(error);
+            const message = error instanceof Error ? error.message : String(error);
             await this.printed.writeLog(
                 `[Ghostscript] executable not accessible: ${command}`,
                 message,
@@ -185,12 +170,8 @@ export class PrintedMergeService {
                 inputPath,
             ]);
 
-            child.stdout?.on('data', (chunk) =>
-                stdoutChunks.push(Buffer.from(chunk)),
-            );
-            child.stderr?.on('data', (chunk) =>
-                stderrChunks.push(Buffer.from(chunk)),
-            );
+            child.stdout?.on('data', (chunk) => stdoutChunks.push(Buffer.from(chunk)));
+            child.stderr?.on('data', (chunk) => stderrChunks.push(Buffer.from(chunk)));
             child.on('error', async (error) => {
                 await this.printed.writeLog(
                     `[Ghostscript] spawn error: ${error.message}`,
@@ -199,22 +180,14 @@ export class PrintedMergeService {
                 reject(error);
             });
             child.on('close', async (code) => {
-                const stdoutText = Buffer.concat(stdoutChunks)
-                    .toString()
-                    .trim();
-                const stderrText = Buffer.concat(stderrChunks)
-                    .toString()
-                    .trim();
+                const stdoutText = Buffer.concat(stdoutChunks).toString().trim();
+                const stderrText = Buffer.concat(stderrChunks).toString().trim();
 
                 if (stdoutText) {
-                    await this.printed.writeLog(
-                        `[Ghostscript] stdout: ${stdoutText}`,
-                    );
+                    await this.printed.writeLog(`[Ghostscript] stdout: ${stdoutText}`);
                 }
                 if (stderrText) {
-                    await this.printed.writeLog(
-                        `[Ghostscript] stderr: ${stderrText}`,
-                    );
+                    await this.printed.writeLog(`[Ghostscript] stderr: ${stderrText}`);
                 }
 
                 if (code === 0) {
@@ -231,10 +204,7 @@ export class PrintedMergeService {
                         resolve();
                         return;
                     } catch (error) {
-                        const message =
-                            error instanceof Error
-                                ? error.message
-                                : String(error);
+                        const message = error instanceof Error ? error.message : String(error);
                         await this.printed.writeLog(
                             `[Ghostscript] output validation failed: ${compressedPath}`,
                             message,
@@ -249,11 +219,7 @@ export class PrintedMergeService {
                     `[Ghostscript] exit code ${code}, failed output=${compressedPath}`,
                     errorText,
                 );
-                reject(
-                    new Error(
-                        `Ghostscript exited with code ${code}: ${errorText}`,
-                    ),
-                );
+                reject(new Error(`Ghostscript exited with code ${code}: ${errorText}`));
             });
         });
 

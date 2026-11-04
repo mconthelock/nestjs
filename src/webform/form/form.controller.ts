@@ -145,15 +145,11 @@ export class FormController {
     }
 
     @Patch('updateForm')
-    async updateForm(
-        @Body() dto: UpdateFormDto,
-    ): Promise<{ message: string; status: boolean }> {
+    async updateForm(@Body() dto: UpdateFormDto): Promise<{ message: string; status: boolean }> {
         try {
             const result = await this.formService.updateForm(dto);
             return {
-                message: result
-                    ? 'Form updated successfully'
-                    : 'Failed to update form',
+                message: result ? 'Form updated successfully' : 'Failed to update form',
                 status: result,
             };
         } catch (error) {

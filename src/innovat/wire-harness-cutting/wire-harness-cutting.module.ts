@@ -4,12 +4,7 @@ import { WireHarnessCuttingService } from './wire-harness-cutting.service';
 import { WireHarnessCuttingRepository } from './wire-harness-cutting.repository';
 
 @Module({
-    controllers: [
-        WireHarnessCuttingController,
-    ],
-    providers: [
-        WireHarnessCuttingService,
-        WireHarnessCuttingRepository,
-    ],
+    controllers: [WireHarnessCuttingController],
+    providers: [WireHarnessCuttingService, WireHarnessCuttingRepository],
 })
 export class WireHarnessCuttingModule {}

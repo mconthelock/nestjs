@@ -52,10 +52,7 @@ export class CheckinventoryService {
         },
     ) {
         try {
-            const REPORT_ID = await this.chkrepo.createHalfyearReport(
-                empno,
-                periods,
-            );
+            const REPORT_ID = await this.chkrepo.createHalfyearReport(empno, periods);
             await this.chkrepo.insertHalfyearForm({ ...formData, REPORT_ID });
             return { REPORT_ID };
         } catch (error) {
@@ -86,12 +83,9 @@ export class CheckinventoryService {
     }
 
     async insertYearlyForm(dto: CreateYearlyFormDto, ip: string) {
-        const formmst =
-            await this.formmstService.getFormMasterByVaname('PS-YIC');
+        const formmst = await this.formmstService.getFormMasterByVaname('PS-YIC');
         if (!formmst) {
-            throw new Error(
-                'Form master not found for PS-YIC. Check FORMMST table.',
-            );
+            throw new Error('Form master not found for PS-YIC. Check FORMMST table.');
         }
         const createForm = await this.formCreateService.create(
             {
@@ -107,10 +101,7 @@ export class CheckinventoryService {
         );
 
         if (!createForm?.status) {
-            const errMsg =
-                createForm?.message?.message ||
-                createForm?.message ||
-                'Unknown error';
+            const errMsg = createForm?.message?.message || createForm?.message || 'Unknown error';
             throw new Error(`Form creation failed: ${errMsg}`);
         }
         const form = {
@@ -121,10 +112,7 @@ export class CheckinventoryService {
             NRUNNO: createForm.data.NRUNNO,
         };
 
-        await this.chkrepo.updateYearlyAssign(
-            { ID: dto.ID, STATUS: 1 },
-            { STATUS: 2 },
-        );
+        await this.chkrepo.updateYearlyAssign({ ID: dto.ID, STATUS: 1 }, { STATUS: 2 });
 
         return this.chkrepo.insertYearlyForm({ ...dto, ...form });
     }

@@ -3,7 +3,7 @@ import { GpOtService } from './gp-ot.service';
 import { GpOtController } from './gp-ot.controller';
 
 @Module({
-  controllers: [GpOtController],
-  providers: [GpOtService],
+    controllers: [GpOtController],
+    providers: [GpOtService],
 })
 export class GpOtModule {}

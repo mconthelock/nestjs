@@ -1,12 +1,6 @@
 import { PartialType, PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-    IsDate,
-    IsNotEmpty,
-    IsNumber,
-    IsOptional,
-    IsString,
-} from 'class-validator';
+import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 import { Timestamp } from 'typeorm';
 

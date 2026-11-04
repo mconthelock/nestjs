@@ -61,7 +61,7 @@ export class PurCpcController {
      */
     @Post()
     @UseTransaction('mitsuConnection')
-    async create(@Body() data: CreateFormDto, @Req() req: Request,) {
+    async create(@Body() data: CreateFormDto, @Req() req: Request) {
         const ip = getClientIP(req);
         return await this.service.create(data, ip);
     }

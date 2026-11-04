@@ -124,10 +124,7 @@ export class PrintedService {
         });
     }
 
-    runWithPdfContext<T>(
-        context: PdfProcessContext,
-        callback: () => Promise<T>,
-    ): Promise<T> {
+    runWithPdfContext<T>(context: PdfProcessContext, callback: () => Promise<T>): Promise<T> {
         return this.pdfContext.run(context, callback);
     }
 
@@ -162,10 +159,7 @@ export class PrintedService {
     }
 
     private runPendingPdfJobs(): void {
-        while (
-            this.activePdfJobs < this.maxParallelPdfJobs &&
-            this.pendingPdfJobs.length > 0
-        ) {
+        while (this.activePdfJobs < this.maxParallelPdfJobs && this.pendingPdfJobs.length > 0) {
             const nextTask = this.pendingPdfJobs.shift();
             if (!nextTask) {
                 return;
@@ -251,10 +245,7 @@ export class PrintedService {
                         status: 'failed',
                         message: 'Background queue failed',
                         finishedAt: new Date().toISOString(),
-                        error:
-                            error instanceof Error
-                                ? error.message
-                                : String(error),
+                        error: error instanceof Error ? error.message : String(error),
                     });
                     if (tagData?.FILES) {
                         await this.repo.updateFiles({
@@ -355,9 +346,7 @@ export class PrintedService {
             schd_p: fileData[0].SCHDP,
             filedir: fileData[0].FILE_FOLDER,
             filename:
-                fileData[0].FILES_PARENT != null
-                    ? fileData[0].FILE_NAME
-                    : fileData[0].FILE_ONAME,
+                fileData[0].FILES_PARENT != null ? fileData[0].FILE_NAME : fileData[0].FILE_ONAME,
         });
         try {
             return {
@@ -403,9 +392,7 @@ export class PrintedService {
             });
             return this.repo.deleteFiles(filesId);
         } catch (error) {
-            throw new Error(
-                `Error deleting PDF directory for FILES_ID ${filesId}`,
-            );
+            throw new Error(`Error deleting PDF directory for FILES_ID ${filesId}`);
         }
     }
 
@@ -426,9 +413,7 @@ export class PrintedService {
                 FILE_PRINTEDPAGE: status == 3 ? file[0].FILE_TOTALPAGE : 0,
             });
         } catch (error) {
-            throw new Error(
-                `Error updating print file status for FILES_ID ${filesId}`,
-            );
+            throw new Error(`Error updating print file status for FILES_ID ${filesId}`);
         }
     }
 
@@ -471,16 +456,11 @@ export class PrintedService {
                     const textContent = parsedData.text;
                     const tagData = textContent.split('\n');
                     // console.log(tagData);
-                    const tagNo = tagData[0]
-                        .substring(0, 12)
-                        .replace(/\s/g, '');
+                    const tagNo = tagData[0].substring(0, 12).replace(/\s/g, '');
                     const mfgno = this.extract.extractOrderEntries(textContent);
-                    const itemno =
-                        this.extract.extractItemPackingEntries(textContent);
-                    const process =
-                        this.extract.extractProcessListEntries(textContent);
-                    const dwgno =
-                        this.extract.extractDrawingEntries(textContent);
+                    const itemno = this.extract.extractItemPackingEntries(textContent);
+                    const process = this.extract.extractProcessListEntries(textContent);
+                    const dwgno = this.extract.extractDrawingEntries(textContent);
                     console.log({ i, process });
 
                     // if (itemno.item == '') {
@@ -514,18 +494,12 @@ export class PrintedService {
         for (const item of data) {
             const values = new FiltersDto();
             const detail = new FiltersDto();
-            values.filters = [
-                { field: 'T02DUE', op: 'eq', value: item.CHANGEDATE },
-            ];
+            values.filters = [{ field: 'T02DUE', op: 'eq', value: item.CHANGEDATE }];
             detail.filters = [
                 { field: 'T02PR', op: 'eq', value: item.T02PR },
                 { field: 'T02LIN', op: 'eq', value: item.T02LIN },
             ];
-            const query = await parseUpdateString(
-                values,
-                detail,
-                'RTNLIBF.T002KP',
-            );
+            const query = await parseUpdateString(values, detail, 'RTNLIBF.T002KP');
             const result = await this.conn.runQuery(query);
             results.push(result);
         }

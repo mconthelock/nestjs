@@ -56,8 +56,7 @@ export class FormmstService {
             VORGNO: data.VORGNO,
             CYEAR: dayjs().format('YY'),
         });
-        const id =
-            forms.length > 0 ? Math.max(...forms.map((f) => f.NNO)) + 1 : 1;
+        const id = forms.length > 0 ? Math.max(...forms.map((f) => f.NNO)) + 1 : 1;
         data = {
             ...data,
             NNO: id,
@@ -76,8 +75,7 @@ export class FormmstService {
             NNO: data.NNO,
         });
 
-        if (forms.length === 0)
-            throw new NotFoundException('Form master not found');
+        if (forms.length === 0) throw new NotFoundException('Form master not found');
         return this.repo.updateFormMaster(data, {
             NNO: data.NNO,
             VORGNO: data.VORGNO,
@@ -97,9 +95,7 @@ export class FormmstService {
             return g.VGROUPORG === data.VGROUPORG;
         });
         const id =
-            maxGroupId.length > 0
-                ? Math.max(...maxGroupId.map((g) => parseInt(g.VGROUP))) + 1
-                : 1;
+            maxGroupId.length > 0 ? Math.max(...maxGroupId.map((g) => parseInt(g.VGROUP))) + 1 : 1;
         data.VGROUP = id.toString();
         const result = await this.repo.createGroup(data);
         return result;
@@ -126,12 +122,7 @@ export class FormmstService {
     }
 
     async getFormAuthByEmpno(EMPNO: string) {
-        const auth = await this.repo.findAuth(
-            undefined,
-            undefined,
-            undefined,
-            EMPNO,
-        );
+        const auth = await this.repo.findAuth(undefined, undefined, undefined, EMPNO);
         return auth;
     }
 
@@ -144,12 +135,7 @@ export class FormmstService {
     }) {
         //console.log('Upsert Form Auth:', authData); // Debugging line
         const { NFRMNO, VORGNO, CYEAR, VEMPNO } = authData;
-        const existingAuth = await this.repo.findAuth(
-            NFRMNO,
-            VORGNO,
-            CYEAR,
-            VEMPNO,
-        );
+        const existingAuth = await this.repo.findAuth(NFRMNO, VORGNO, CYEAR, VEMPNO);
         //console.log(existingAuth);
         if (existingAuth.length > 0) {
             // Update existing auth

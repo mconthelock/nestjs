@@ -3,24 +3,23 @@
 import { IsOptional, IsString } from 'class-validator';
 
 export class SearchMfgOrCenterDto {
+    @IsOptional()
+    @IsString()
+    ORNO?: string;
 
-  @IsOptional()
-  @IsString()
-  ORNO?: string;
+    @IsOptional()
+    @IsString()
+    TOPIC?: string;
 
-  @IsOptional()
-  @IsString()
-  TOPIC?: string;
+    @IsOptional()
+    @IsString()
+    CLASS?: string;
 
-  @IsOptional()
-  @IsString()
-  CLASS?: string;
+    @IsOptional()
+    @IsString()
+    CYEAR?: string;
 
-  @IsOptional()
-  @IsString()
-  CYEAR?: string;
-
-  @IsOptional()
-  @IsString()
-  FORMNO?: string;
+    @IsOptional()
+    @IsString()
+    FORMNO?: string;
 }

@@ -1,7 +1,7 @@
-import { Type } from "class-transformer";
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, ValidateNested } from "class-validator";
-import { ToBoolean } from "src/common/utils/transform";
-import { CreateDpmsPlOriginDto } from "src/workload/dpms_pl_origin/dto/create-dpms_pl_origin.dto";
+import { Type } from 'class-transformer';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, ValidateNested } from 'class-validator';
+import { ToBoolean } from 'src/common/utils/transform';
+import { CreateDpmsPlOriginDto } from 'src/workload/dpms_pl_origin/dto/create-dpms_pl_origin.dto';
 
 export class ReviseShippingMarkDto {
     @IsNotEmpty()

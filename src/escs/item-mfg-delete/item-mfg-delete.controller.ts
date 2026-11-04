@@ -8,41 +8,42 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 
 @Controller('escs/item-mfg-delete')
 export class ItemMfgDeleteController {
-  constructor(private readonly itemMfgDeleteService: ItemMfgDeleteService) {}ฃ
+    constructor(private readonly itemMfgDeleteService: ItemMfgDeleteService) {}
+    ฃ;
 
-  @Post()
-  @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
-  async create(@Body() dto: CreateItemMfgDeleteDto) {
-    return await this.itemMfgDeleteService.create(dto);
-  }
+    @Post()
+    @UseInterceptors(getFileUploadInterceptor())
+    @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
+    async create(@Body() dto: CreateItemMfgDeleteDto) {
+        return await this.itemMfgDeleteService.create(dto);
+    }
 
-  @Get()
-  findAll() {
-    return this.itemMfgDeleteService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.itemMfgDeleteService.findAll();
+    }
 
-  @Post('search')
-  @UseTransaction('mitsuConnection') 
-  async search(@Body() dto: FiltersDto) {
-    return this.itemMfgDeleteService.search(dto);
-  }
+    @Post('search')
+    @UseTransaction('mitsuConnection')
+    async search(@Body() dto: FiltersDto) {
+        return this.itemMfgDeleteService.search(dto);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.itemMfgDeleteService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.itemMfgDeleteService.findOne(+id);
+    }
 
-  @Patch(':id')
-  @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('mitsuConnection')
-  update(@Param('id') id: string, @Body() dto: UpdateItemMfgDeleteDto) {
-    return this.itemMfgDeleteService.update(+id, dto);
-  }
+    @Patch(':id')
+    @UseInterceptors(getFileUploadInterceptor())
+    @UseTransaction('mitsuConnection')
+    update(@Param('id') id: string, @Body() dto: UpdateItemMfgDeleteDto) {
+        return this.itemMfgDeleteService.update(+id, dto);
+    }
 
-  @Delete(':id')
-  @UseTransaction('mitsuConnection')
-  remove(@Param('id') id: string) {
-    return this.itemMfgDeleteService.remove(+id);
-  }
+    @Delete(':id')
+    @UseTransaction('mitsuConnection')
+    remove(@Param('id') id: string) {
+        return this.itemMfgDeleteService.remove(+id);
+    }
 }

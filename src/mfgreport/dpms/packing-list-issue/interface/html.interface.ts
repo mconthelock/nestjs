@@ -1,10 +1,10 @@
-import { CreateDataForHTMLResult, ListForCreateHtml } from "./list-builder.interface";
+import { CreateDataForHTMLResult, ListForCreateHtml } from './list-builder.interface';
 
-import { DPMS_PL_ISSUE_REV } from "src/common/Entities/workload/table/DPMS_PL_ISSUE_REV.entity";
-import { S020KP } from "src/common/Entities/datacenter/table/S020KP.entity";
-import { S049KP } from "src/common/Entities/datacenter/table/S049KP.entity";
-import { DPMS_PL_CASE_REVISE_VGM } from "src/common/Entities/workload/views/DPMS_PL_CASE_REVISE_VGM.entity";
-import { DPMS_PL_CASE_LIST } from "src/common/Entities/workload/table/DPMS_PL_CASE_LIST.entity";
+import { DPMS_PL_ISSUE_REV } from 'src/common/Entities/workload/table/DPMS_PL_ISSUE_REV.entity';
+import { S020KP } from 'src/common/Entities/datacenter/table/S020KP.entity';
+import { S049KP } from 'src/common/Entities/datacenter/table/S049KP.entity';
+import { DPMS_PL_CASE_REVISE_VGM } from 'src/common/Entities/workload/views/DPMS_PL_CASE_REVISE_VGM.entity';
+import { DPMS_PL_CASE_LIST } from 'src/common/Entities/workload/table/DPMS_PL_CASE_LIST.entity';
 
 export interface IplHeader {
     VSHOPORDERNO: string;

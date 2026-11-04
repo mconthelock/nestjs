@@ -7,9 +7,7 @@ import { F001KP } from 'src/common/Entities/datacenter/table/F001KP.entity';
 
 @Injectable()
 export class F001kpRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('datacenterConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('datacenterConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

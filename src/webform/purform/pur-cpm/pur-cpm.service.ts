@@ -56,9 +56,7 @@ export class PurCpmService {
         try {
             const res = await this.repo.update(condition, data);
             if (res.affected === 0) {
-                throw new Error(
-                    'Update PUR-CPM Form Failed: No record updated',
-                );
+                throw new Error('Update PUR-CPM Form Failed: No record updated');
             }
             return {
                 status: true,
@@ -129,12 +127,7 @@ export class PurCpmService {
         }
     }
 
-    async moveFiles(
-        files: Express.Multer.File[],
-        form: FormDto,
-        path: string,
-        userCreate: string,
-    ) {
+    async moveFiles(files: Express.Multer.File[], form: FormDto, path: string, userCreate: string) {
         // 5. ย้ายไฟล์ไปยังปลายทาง
         const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
         const formNo = await this.formService.getFormno(form); // Get the form number

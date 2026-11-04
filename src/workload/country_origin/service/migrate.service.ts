@@ -62,9 +62,7 @@ export class MigrateService extends CountryOriginService {
                     }
                     let country = item.COUNTRY.toUpperCase().trim();
                     if (/,| OR |\/|・/.test(country)) {
-                        country = country
-                            .split(/,| OR |\/|・/)
-                            .map((c) => c.trim())[0];
+                        country = country.split(/,| OR |\/|・/).map((c) => c.trim())[0];
                         console.log('country', item.COUNTRY, country);
                     }
                     if (country === 'USA') {
@@ -89,9 +87,7 @@ export class MigrateService extends CountryOriginService {
                 })
                 .filter(
                     (item) =>
-                        item.ORIGIN_TYPE !== 0 &&
-                        item.COUNTRY &&
-                        item.COUNTRY !== 'STOP BUSINESS',
+                        item.ORIGIN_TYPE !== 0 && item.COUNTRY && item.COUNTRY !== 'STOP BUSINESS',
                 );
             const country = mapData
                 .map((item) => item.COUNTRY)

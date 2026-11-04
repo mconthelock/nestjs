@@ -4,9 +4,7 @@ import { WireHarnessCalculateUsageRepository } from './wire-harness-calculate-us
 
 @Injectable()
 export class WireHarnessCalculateUsageService {
-    constructor(
-        private readonly repo: WireHarnessCalculateUsageRepository,
-    ) {}
+    constructor(private readonly repo: WireHarnessCalculateUsageRepository) {}
 
     list(dto: CalculateUsageDto) {
         return this.repo.list(dto);

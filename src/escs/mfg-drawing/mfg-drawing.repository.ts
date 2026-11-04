@@ -9,9 +9,7 @@ import { MFG_DRAWING } from 'src/common/Entities/escs/table/MFG_DRAWING.entity';
 
 @Injectable()
 export class MfgDrawingRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -30,12 +28,9 @@ export class MfgDrawingRepository extends BaseRepository {
         return this.manager
             .createQueryBuilder(MFG_DRAWING, 'M')
             .where('M.NID = :id', { id })
-            .leftJoinAndSelect(
-                'M.MFG_SERIAL',
-                'MS',
-                'MS.NSTATUS = :serialStatus',
-                { serialStatus: 1 },
-            )
+            .leftJoinAndSelect('M.MFG_SERIAL', 'MS', 'MS.NSTATUS = :serialStatus', {
+                serialStatus: 1,
+            })
             .leftJoinAndSelect('M.INSPECTOR_STATUS', 'IS')
             .leftJoinAndSelect('M.FORELEAD_STATUS', 'FS')
             .leftJoinAndSelect('M.DRAWING_STATUS', 'DS')
@@ -62,15 +57,12 @@ export class MfgDrawingRepository extends BaseRepository {
             'NFORELEAD_STATUS',
             'VFULL_PATH',
             'NSTATUS',
-            'A.NUSERACT'
+            'A.NUSERACT',
         ]);
         return qb
-            .leftJoinAndSelect(
-                'M.MFG_SERIAL',
-                'MS',
-                'MS.NSTATUS = :serialStatus',
-                { serialStatus: 1 },
-            )
+            .leftJoinAndSelect('M.MFG_SERIAL', 'MS', 'MS.NSTATUS = :serialStatus', {
+                serialStatus: 1,
+            })
             .leftJoinAndSelect('M.INSPECTOR_STATUS', 'IS')
             .leftJoinAndSelect('M.FORELEAD_STATUS', 'FS')
             .leftJoinAndSelect('M.DRAWING_STATUS', 'DS')
@@ -79,7 +71,10 @@ export class MfgDrawingRepository extends BaseRepository {
             })
             .leftJoinAndSelect('A.STATUS', 'AS')
             .leftJoinAndSelect('A.USERS', 'AU')
-            .orderBy('M.NID, M.NBLOCKID, M.NITEMID, M.VPIS, M.VDRAWING, MS.VSERIALNO, A.DACTDATE', 'ASC')
+            .orderBy(
+                'M.NID, M.NBLOCKID, M.NITEMID, M.VPIS, M.VDRAWING, MS.VSERIALNO, A.DACTDATE',
+                'ASC',
+            )
             .getMany();
     }
 

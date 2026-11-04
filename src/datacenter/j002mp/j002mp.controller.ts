@@ -4,9 +4,9 @@ import { getData } from './dto/searchJ002.dto';
 
 @Controller('J002mp')
 export class J002mpController {
-  constructor(private readonly J002mpService: J002mpService) {}
-  @Post()
-  searchData(@Body() dto: getData){
-    return this.J002mpService.searchData(dto);
-  }
+    constructor(private readonly J002mpService: J002mpService) {}
+    @Post()
+    searchData(@Body() dto: getData) {
+        return this.J002mpService.searchData(dto);
+    }
 }

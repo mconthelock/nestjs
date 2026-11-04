@@ -4,20 +4,20 @@ import { CreateDpmsPlMailDto } from './dto/create-dpms_pl_mail.dto';
 
 @Controller('workload/dpms-pl-mail')
 export class DpmsPlMailController {
-  constructor(private readonly dpmsPlMailService: DpmsPlMailService) {}
+    constructor(private readonly dpmsPlMailService: DpmsPlMailService) {}
 
-  @Post()
-  create(@Body() createDpmsPlMailDto: CreateDpmsPlMailDto) {
-    return this.dpmsPlMailService.create(createDpmsPlMailDto);
-  }
+    @Post()
+    create(@Body() createDpmsPlMailDto: CreateDpmsPlMailDto) {
+        return this.dpmsPlMailService.create(createDpmsPlMailDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.dpmsPlMailService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.dpmsPlMailService.findAll();
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.dpmsPlMailService.remove(+id);
-  }
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.dpmsPlMailService.remove(+id);
+    }
 }

@@ -5,7 +5,7 @@ import { DPMS_PACKING_LIST_MAIN } from './DPMS_PACKING_LIST_MAIN.entity';
 export class DPMS_PACKING_LIST_DETAIL_PO {
     @PrimaryColumn()
     NPOSEQ: number;
-    
+
     @Column()
     VMFGNO: string;
 

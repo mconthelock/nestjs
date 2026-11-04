@@ -12,19 +12,10 @@ export class PurvmmScmusrService {
         return this.repo.create(dto);
     }
 
-    async createMultipleUsers(
-        formDto: FormDto,
-        users: RequestPurvmmScmuserDto[],
-    ) {
+    async createMultipleUsers(formDto: FormDto, users: RequestPurvmmScmuserDto[]) {
         try {
             const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO } = formDto;
-            const currentMaxId = await this.repo.getMaxId(
-                NFRMNO,
-                VORGNO,
-                CYEAR,
-                CYEAR2,
-                NRUNNO,
-            );
+            const currentMaxId = await this.repo.getMaxId(NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO);
             let runningId = currentMaxId;
             const allUsersToInsert = users.map((item) => {
                 runningId += 1;

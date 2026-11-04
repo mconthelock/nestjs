@@ -6,9 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DPMS_PL_ISSUE_DATE } from 'src/common/Entities/workload/views/DPMS_PL_ISSUE_DATE.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([DPMS_PL_ISSUE_DATE], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([DPMS_PL_ISSUE_DATE], 'mitsuConnection')],
     controllers: [DpmsPlIssueDateController],
     providers: [DpmsPlIssueDateService, DpmsPlIssueDateRepository],
     exports: [DpmsPlIssueDateService],

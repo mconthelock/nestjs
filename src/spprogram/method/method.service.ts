@@ -5,12 +5,12 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class MethodService {
-  constructor(
-    @InjectRepository(Method, 'mitsuConnection')
-    private readonly methodRepository: Repository<Method>,
-  ) {}
+    constructor(
+        @InjectRepository(Method, 'mitsuConnection')
+        private readonly methodRepository: Repository<Method>,
+    ) {}
 
-  findAll() {
-    return this.methodRepository.find({ order: { METHOD_ID: 'ASC' } });
-  }
+    findAll() {
+        return this.methodRepository.find({ order: { METHOD_ID: 'ASC' } });
+    }
 }

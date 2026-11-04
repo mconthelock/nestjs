@@ -1,14 +1,14 @@
 import { Type } from 'class-transformer';
 import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
 export class createDto {
-  @IsString()
-  @IsNotEmpty()
-  QUOTYPE_DESC: string;
+    @IsString()
+    @IsNotEmpty()
+    QUOTYPE_DESC: string;
 
-  @Type(() => Number)
-  @IsNumber()
-  QUOTYPE_STATUS: number;
+    @Type(() => Number)
+    @IsNumber()
+    QUOTYPE_STATUS: number;
 
-  @IsString()
-  QUOTYPE_CUR?: string;
+    @IsString()
+    QUOTYPE_CUR?: string;
 }

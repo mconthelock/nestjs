@@ -2,11 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { setListForHtml } from '../builders/list.builder';
 import { GenerateExcelParam, GenerateExcelResult } from '../interface/excel.interface';
 import { CreateDataForHTMLResult } from '../interface/list-builder.interface';
-import {
-    defaultExcel,
-    getBufferFromExcel,
-    saveExcelFile,
-} from 'src/common/utils/exceljs';
+import { defaultExcel, getBufferFromExcel, saveExcelFile } from 'src/common/utils/exceljs';
 import { joinPaths, makeDirIfNotExists } from 'src/common/utils/files.utils';
 
 @Injectable()
@@ -20,10 +16,7 @@ export class ExcelService {
         subject,
         project,
     }: GenerateExcelParam): Promise<GenerateExcelResult> {
-        const listForHtml: CreateDataForHTMLResult = setListForHtml(
-            list,
-            'excel',
-        );
+        const listForHtml: CreateDataForHTMLResult = setListForHtml(list, 'excel');
         const data = listForHtml.data.flatMap((item) => item.DETAILS);
         let mark: string[] = [];
         if (shippingMark.includes('|')) {

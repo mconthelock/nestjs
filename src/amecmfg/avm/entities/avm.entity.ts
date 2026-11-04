@@ -1,154 +1,105 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('AVM')
 export class Avm {
     @Column()
-    
-    VNSTAT: string; 
+    VNSTAT: string;
     @Column()
-    
-	VMID: string; 
+    VMID: string;
     @PrimaryColumn()
-    
-	VENDOR: number; 
+    VENDOR: number;
     @Column()
-    
-	VNDNAM: string; 
+    VNDNAM: string;
     @Column()
-    
-	VNDAD1: string; 
+    VNDAD1: string;
     @Column()
-    
-	VNDAD2: string; 
+    VNDAD2: string;
     @Column()
-    
-	VCITY: string; 
+    VCITY: string;
     @Column()
-    
-	VSTATE: string; 
+    VSTATE: string;
     @Column()
-    
-	VPOST: string; 
+    VPOST: string;
     @Column()
-    
-	VTERMS: string; 
+    VTERMS: string;
     @Column()
-    
-	VTYPE: string; 
+    VTYPE: string;
     @Column()
-    
-	VPAYTO: number; 
+    VPAYTO: number;
     @Column()
-    
-	VDTLPD: number; 
+    VDTLPD: number;
     @Column()
-    
-	VDAYCL: number; 
+    VDAYCL: number;
     @Column()
-    
-	VGL: string; 
+    VGL: string;
     @Column()
-    
-	V1099: string; 
+    V1099: string;
     @Column()
-    
-	V1099C: string; 
+    V1099C: string;
     @Column()
-    
-	VPHONE: string; 
+    VPHONE: string;
     @Column()
-    
-	VCMPNY: number; 
+    VCMPNY: number;
     @Column()
-    
-	VCURR: string; 
+    VCURR: string;
     @Column()
-    
-	VPAYTY: string; 
+    VPAYTY: string;
     @Column()
-    
-	V1TIME: string; 
+    V1TIME: string;
     @Column()
-    
-	VCORPV: number; 
+    VCORPV: number;
     @Column()
-    
-	VHOLD: string; 
+    VHOLD: string;
     @Column()
-    
-	VHOLDT: number; 
+    VHOLDT: number;
     @Column()
-    
-	VPYTYR: number; 
+    VPYTYR: number;
     @Column()
-    
-	VDSCAV: number; 
+    VDSCAV: number;
     @Column()
-    
-	VDSCTK: number; 
+    VDSCTK: number;
     @Column()
-    
-	VDPURS: number; 
+    VDPURS: number;
     @Column()
-    
-	VNNEXT: number; 
+    VNNEXT: number;
     @Column()
-    
-	VNGEN: string; 
+    VNGEN: string;
     @Column()
-    
-	VNALPH: string; 
+    VNALPH: string;
     @Column()
-    
-	VNUNAL: number; 
+    VNUNAL: number;
     @Column()
-    
-	VCON: string; 
+    VCON: string;
     @Column()
-    
-	VCOUN: string; 
+    VCOUN: string;
     @Column()
-    
-	V1099S: number; 
+    V1099S: number;
     @Column()
-    
-	VPAD2: string; 
+    VPAD2: string;
     @Column()
-    
-	VPAD1: string; 
+    VPAD1: string;
     @Column()
-    
-	VPCTY: string; 
+    VPCTY: string;
     @Column()
-    
-	VPSTE: string; 
+    VPSTE: string;
     @Column()
-    
-	VPPST: string; 
+    VPPST: string;
     @Column()
-    
-	VPCON: string; 
+    VPCON: string;
     @Column()
-    
-	VPCOU: string; 
+    VPCOU: string;
     @Column()
-    
-	VMFRM: number; 
+    VMFRM: number;
     @Column()
-    
-	VMMAT: number; 
+    VMMAT: number;
     @Column()
-    
-	VTAX: string; 
+    VTAX: string;
     @Column()
-    
-	VPPHN: string; 
+    VPPHN: string;
     @Column()
-    
-	VMFSCD: string; 
+    VMFSCD: string;
     @Column()
-    
-	VMIDNM: string; 
+    VMIDNM: string;
     @Column()
-	VTAXCD: string; 
+    VTAXCD: string;
 }

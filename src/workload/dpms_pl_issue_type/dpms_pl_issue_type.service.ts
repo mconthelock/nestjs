@@ -20,9 +20,7 @@ export class DpmsPlIssueTypeService {
                 data: result,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to find all issue types. Error: ${error.message}`,
-            );
+            throw new Error(`Failed to find all issue types. Error: ${error.message}`);
         }
     }
 
@@ -41,9 +39,7 @@ export class DpmsPlIssueTypeService {
                 data: result,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to find issue type by ID ${id}. Error: ${error.message}`,
-            );
+            throw new Error(`Failed to find issue type by ID ${id}. Error: ${error.message}`);
         }
     }
 
@@ -67,5 +63,4 @@ export class DpmsPlIssueTypeService {
             );
         }
     }
-
 }

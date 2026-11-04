@@ -1,8 +1,4 @@
-import {
-    BadRequestException,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StocksRepository } from './stocks.repository';
@@ -29,9 +25,6 @@ export class StocksService {
             CREATED_BY: data.CREATED_BY,
         };
         const transactionItems: Partial<StockTransactionItems>[] = data.ITEMS;
-        return this.repo.createStockTransaction(
-            transactionData,
-            transactionItems,
-        );
+        return this.repo.createStockTransaction(transactionData, transactionItems);
     }
 }

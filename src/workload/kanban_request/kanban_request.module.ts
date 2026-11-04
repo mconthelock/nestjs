@@ -7,10 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Psection } from 'src/common/Entities/amec/table/PSECTION.entity';
 
 @Module({
-    imports: [
-        MailModule,
-        TypeOrmModule.forFeature([Psection], 'mitsuConnection'),
-    ],
+    imports: [MailModule, TypeOrmModule.forFeature([Psection], 'mitsuConnection')],
     controllers: [KanbanRequestController],
     providers: [KanbanRequestService, KanbanRequestRepository],
 })

@@ -1,20 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { IsTidService } from './is-tid.service';
-import {
-    CreateIsTidDto,
-    CreateIsTidFormDto,
-    IsTidUserData,
-} from './dto/create-is-tid.dto';
+import { CreateIsTidDto, CreateIsTidFormDto, IsTidUserData } from './dto/create-is-tid.dto';
 import { FormService } from 'src/webform/form/form.service';
 import { IsTidRepository } from './is-tid.repository';
 import { FormCreateService } from 'src/webform/form/create-form.service';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
 import { FlowService } from 'src/webform/flow/flow.service';
-import {
-    CreateFormDto,
-    FormWebformDto,
-} from 'src/webform/form/dto/create-form.dto';
+import { CreateFormDto, FormWebformDto } from 'src/webform/form/dto/create-form.dto';
 import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 import { formatDate, now } from 'src/common/utils/dayjs.utils';
@@ -52,9 +45,7 @@ export class IsTidCreateFormService extends IsTidService {
             let tidFormNo: string;
             if (formType == 2) {
                 const formUser = await this.createForm(dto, ip, dto.USERDATA);
-                const stepUser = await this.getUpdateFlowStep(
-                    formUser.requester,
-                );
+                const stepUser = await this.getUpdateFlowStep(formUser.requester);
                 stepUser.push(
                     { CSTEPNO: '19', apv: dto.CONTROLLERDATA.TID_REQUESTER },
                     { CSTEPNO: '08', apv: dto.CONTROLLERDATA.TID_REQUESTER },
@@ -67,9 +58,7 @@ export class IsTidCreateFormService extends IsTidService {
                     ...dto.CONTROLLERDATA,
                     TID_REQNO: tidFormNo,
                 });
-                const stepControl = await this.getUpdateFlowStep(
-                    formControl.requester,
-                );
+                const stepControl = await this.getUpdateFlowStep(formControl.requester);
                 await this.deleteFlowStep(formControl.FORM);
                 await this.updateFlowStep(stepControl, formControl.FORM);
                 await this.autoApprove(formControl.FORM, stepControl, ip);
@@ -89,13 +78,11 @@ export class IsTidCreateFormService extends IsTidService {
             // throw new Error('Test error handling in createForm'); // ทดสอบการจับ error
             return {
                 status: true,
-                message:
-                    'Create Production Environment ID temporary use request successfully',
+                message: 'Create Production Environment ID temporary use request successfully',
             };
         } catch (error) {
             throw new Error(
-                'Create Production Environment ID temporary use request Failed: ' +
-                    error.message,
+                'Create Production Environment ID temporary use request Failed: ' + error.message,
             );
         }
     }
@@ -120,10 +107,7 @@ export class IsTidCreateFormService extends IsTidService {
                 INPUTBY: dto.INPUTBY,
                 REMARK: dto.REMARK,
             };
-            const createForm = await this.createFormService.create(
-                dataForCreateForm,
-                ip,
-            );
+            const createForm = await this.createFormService.create(dataForCreateForm, ip);
             if (!createForm.status) {
                 throw new Error('Create form Failed');
             }
@@ -133,9 +117,7 @@ export class IsTidCreateFormService extends IsTidService {
                 ...data,
             });
             if (!createTidForm.status) {
-                throw new Error(
-                    createTidForm.message || 'Insert user data Failed',
-                );
+                throw new Error(createTidForm.message || 'Insert user data Failed');
             }
             return { FORM: form, requester: data.TID_REQUESTER };
         } catch (error) {
@@ -156,10 +138,7 @@ export class IsTidCreateFormService extends IsTidService {
         ];
     }
 
-    async updateFlowStep(
-        step: { CSTEPNO: string; apv: string }[],
-        form: FormDto,
-    ) {
+    async updateFlowStep(step: { CSTEPNO: string; apv: string }[], form: FormDto) {
         try {
             for (const s of step) {
                 const update = await this.flowService.updateFlow({
@@ -185,16 +164,12 @@ export class IsTidCreateFormService extends IsTidService {
         try {
             const deleteStep = ['19', '08', '04'];
             for (const stepNo of deleteStep) {
-                const deleteRes =
-                    await this.deleteFlowStepService.deleteFlowStep({
-                        ...form,
-                        CSTEPNO: stepNo,
-                    });
+                const deleteRes = await this.deleteFlowStepService.deleteFlowStep({
+                    ...form,
+                    CSTEPNO: stepNo,
+                });
                 if (!deleteRes.status) {
-                    throw new Error(
-                        deleteRes.message ||
-                            `Delete flow step ${stepNo} Failed`,
-                    );
+                    throw new Error(deleteRes.message || `Delete flow step ${stepNo} Failed`);
                 }
             }
         } catch (error) {
@@ -202,11 +177,7 @@ export class IsTidCreateFormService extends IsTidService {
         }
     }
 
-    async autoApprove(
-        form: FormDto,
-        step: { CSTEPNO: string; apv: string }[],
-        ip: string,
-    ) {
+    async autoApprove(form: FormDto, step: { CSTEPNO: string; apv: string }[], ip: string) {
         try {
             step = step.filter((s) => s.CSTEPNO === '06' || s.CSTEPNO === '19'); // อนุมัติแค่ step 06
             let ms = 60000;
@@ -225,12 +196,9 @@ export class IsTidCreateFormService extends IsTidService {
                         CSTEPNO: s.CSTEPNO,
                         VREALAPV: s.apv,
                     },
-                    CAPVTIME: formatDate(
-                        new Date(Date.now() + ms),
-                        'HH:mm:ss',
-                    ), // ตั้งเวลาอนุมัติเป็น 1 นาทีข้างหน้าเพื่อหลีกเลี่ยงปัญหาเวลาที่อาจเกิดขึ้น
+                    CAPVTIME: formatDate(new Date(Date.now() + ms), 'HH:mm:ss'), // ตั้งเวลาอนุมัติเป็น 1 นาทีข้างหน้าเพื่อหลีกเลี่ยงปัญหาเวลาที่อาจเกิดขึ้น
                 });
-                ms+= 60000; // เพิ่มเวลาให้แต่ละ step ถัดไปอีก 1 นาทีเพื่อให้แน่ใจว่าเวลาที่ตั้งไว้ไม่ซ้ำกันและเพียงพอสำหรับการประมวลผลแต่ละ step
+                ms += 60000; // เพิ่มเวลาให้แต่ละ step ถัดไปอีก 1 นาทีเพื่อให้แน่ใจว่าเวลาที่ตั้งไว้ไม่ซ้ำกันและเพียงพอสำหรับการประมวลผลแต่ละ step
             }
         } catch (error) {
             throw new Error('Auto approve Failed: ' + error.message);

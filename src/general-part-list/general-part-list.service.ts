@@ -29,17 +29,11 @@ export class GeneralPartListService {
         let gpl: any = [];
 
         let orderMain = order;
-        const checkOrderMain = await this.orderdummyService.getOrderMain(
-            order,
-            item,
-        );
+        const checkOrderMain = await this.orderdummyService.getOrderMain(order, item);
         if (checkOrderMain.status) {
             orderMain = checkOrderMain.data;
         }
-        const getGPLDatacenter = await this.datacenterService.getGPL(
-            orderMain,
-            item,
-        );
+        const getGPLDatacenter = await this.datacenterService.getGPL(orderMain, item);
         const getGPLElmes = await this.elmesService.getGPL(orderMain, item);
 
         if (getGPLElmes.status) {
@@ -64,12 +58,8 @@ export class GeneralPartListService {
         };
     }
 
-    gpl_elmes(
-        item: string,
-        order: string,
-        gpl: M12023_ITEMARRNGLST_APP[],
-    ): GeneralPartList[] | [] {
-        let data: GeneralPartList[] = [];
+    gpl_elmes(item: string, order: string, gpl: M12023_ITEMARRNGLST_APP[]): GeneralPartList[] | [] {
+        const data: GeneralPartList[] = [];
         let i: number = -1;
         gpl.forEach((v) => {
             if (v.BMCLS == 'A') {
@@ -93,15 +83,12 @@ export class GeneralPartListService {
                 if (data[i] != undefined) {
                     const aprm: string = v.APNAMERMRK?.trim() || '';
                     const part: string = v.PARTNO?.trim() || '';
-                    const temp: string =
-                        aprm && part ? `${aprm}::${part}` : aprm + part;
+                    const temp: string = aprm && part ? `${aprm}::${part}` : aprm + part;
 
                     if (temp != '' && v.BMCLS == 'B') {
-                        data[i].VARIABLE +=
-                            data[i].VARIABLE == '' ? temp : ', ' + temp;
+                        data[i].VARIABLE += data[i].VARIABLE == '' ? temp : ', ' + temp;
                     } else if (temp != '' && v.BMCLS == 'C') {
-                        data[i].APREMARK +=
-                            data[i].APREMARK == '' ? temp : ', ' + temp;
+                        data[i].APREMARK += data[i].APREMARK == '' ? temp : ', ' + temp;
                     }
                 }
             }

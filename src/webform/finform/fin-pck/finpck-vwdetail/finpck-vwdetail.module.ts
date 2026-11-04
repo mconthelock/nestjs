@@ -4,7 +4,7 @@ import { FinpckVwdetailController } from './finpck-vwdetail.controller';
 import { VWDetailRepository } from './finpck-vwdetail.repository';
 
 @Module({
-  controllers: [FinpckVwdetailController],
-  providers: [FinpckVwdetailService,VWDetailRepository],
+    controllers: [FinpckVwdetailController],
+    providers: [FinpckVwdetailService, VWDetailRepository],
 })
 export class FinpckVwdetailModule {}

@@ -5,40 +5,39 @@ import { FORM_LINK } from 'src/common/Entities/webform/table/FROM_LINK.entity';
 export class FormLinkService {
     constructor(private readonly repo: FormLinkRepository) {}
 
-    async create(data: FORM_LINK){
+    async create(data: FORM_LINK) {
         try {
             const res = await this.repo.create(data);
-            if(!res) {
+            if (!res) {
                 return {
                     status: false,
-                    message: 'Failed to create form link'
-                }
+                    message: 'Failed to create form link',
+                };
             }
             return {
                 status: true,
                 message: 'Form link created successfully',
-                data: res
-            }
-
+                data: res,
+            };
         } catch (error) {
             throw error;
         }
     }
 
-    async delete(formNo: string){
+    async delete(formNo: string) {
         try {
             const res = await this.repo.delete(formNo);
-            if(!res) {
+            if (!res) {
                 return {
                     status: false,
-                    message: 'Failed to delete form link'
-                }
+                    message: 'Failed to delete form link',
+                };
             }
             return {
                 status: true,
                 message: 'Form link deleted successfully',
-                data: res
-            }
+                data: res,
+            };
         } catch (error) {
             throw error;
         }

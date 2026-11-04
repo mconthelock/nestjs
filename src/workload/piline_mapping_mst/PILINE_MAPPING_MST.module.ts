@@ -7,9 +7,7 @@ import { PilineMappingMstService } from './PILINE_MAPPING_MST.service';
 import { PilineMappingMstRepository } from './PILINE_MAPPING_MST.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([PILINE_MAPPING_MST], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([PILINE_MAPPING_MST], 'mitsuConnection')],
     controllers: [PilineMappingMstController, PilineMasterManagementController],
     providers: [PilineMappingMstService, PilineMappingMstRepository],
     exports: [PilineMappingMstService],

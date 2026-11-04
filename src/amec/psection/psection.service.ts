@@ -16,20 +16,12 @@ export class PsectionService {
         private dataSource: DataSource,
     ) {}
 
-    private section = this.dataSource
-        .getMetadata(Psection)
-        .columns.map((c) => c.propertyName);
+    private section = this.dataSource.getMetadata(Psection).columns.map((c) => c.propertyName);
     private department = this.dataSource
         .getMetadata(Pdepartment)
         .columns.map((c) => c.propertyName);
-    private division = this.dataSource
-        .getMetadata(Pdivision)
-        .columns.map((c) => c.propertyName);
-    private allowFields = [
-        ...this.section,
-        ...this.department,
-        ...this.division,
-    ];
+    private division = this.dataSource.getMetadata(Pdivision).columns.map((c) => c.propertyName);
+    private allowFields = [...this.section, ...this.department, ...this.division];
 
     getSectionAll() {
         return this.sectionRepo.find({
@@ -50,9 +42,7 @@ export class PsectionService {
 
     getSection(searchDto: SearchSectionDto) {
         const { SSECCODE, SDEPCODE, SDIVCODE, fields = [] } = searchDto;
-        const query = this.dataSource
-            .createQueryBuilder()
-            .from('PDIVISION', 'A');
+        const query = this.dataSource.createQueryBuilder().from('PDIVISION', 'A');
 
         if (SDIVCODE) query.andWhere('A.SDIVCODE = :SDIVCODE', { SDIVCODE });
         if (SDEPCODE) query.andWhere('B.SDEPCODE = :SDEPCODE', { SDEPCODE });
@@ -74,16 +64,8 @@ export class PsectionService {
                 query.addSelect(`A.${f}`, f);
             }
         });
-        query.leftJoin(
-            'PDEPARTMENT',
-            'B',
-            'SUBSTR(SDIVCODE, 0, 2) = SUBSTR(SDEPCODE, 0, 2)',
-        );
-        query.leftJoin(
-            'PSECTION',
-            'C',
-            'SUBSTR(SDEPCODE, 0, 4) = SUBSTR(SSECCODE, 0, 4)',
-        );
+        query.leftJoin('PDEPARTMENT', 'B', 'SUBSTR(SDIVCODE, 0, 2) = SUBSTR(SDEPCODE, 0, 2)');
+        query.leftJoin('PSECTION', 'C', 'SUBSTR(SDEPCODE, 0, 4) = SUBSTR(SSECCODE, 0, 4)');
         query
             .andWhere('C.SSECTION NOT LIKE :section', { section: '%Cancel%' })
             .andWhere('C.SSECCODE != :sectionCode', { sectionCode: '00' })

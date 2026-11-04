@@ -1,17 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CreateReturnApvListDto } from './dto/create-return-apv-list.dto';
-import {
-    ActionReturnApvListDto,
-    UpdateReturnApvListDto,
-} from './dto/update-return-apv-list.dto';
+import { ActionReturnApvListDto, UpdateReturnApvListDto } from './dto/update-return-apv-list.dto';
 import { ReturnApvListRepository } from './return-apv-list.repository';
 import { OrdersDrawingService } from '../orders-drawing/orders-drawing.service';
 import { MailService } from 'src/common/services/mail/mail.service';
-import {
-    joinPaths,
-    moveFileFormPath,
-    moveFileFromMulter,
-} from 'src/common/utils/files.utils';
+import { joinPaths, moveFileFormPath, moveFileFromMulter } from 'src/common/utils/files.utils';
 import { GetOrderService } from '../get-order/get-order.service';
 import { UsersSectionService } from '../user_section/user_section.service';
 import { SequenceOrgService } from 'src/webform/sequence-org/sequence-org.service';
@@ -38,9 +31,7 @@ export class ReturnApvListService {
                 ORDDW_FORELEAD_STATUS: 8,
             });
             const list = await this.repo.findById(insert.NID);
-            const section = await this.userSectionService.getUserSecByID(
-                dto.NSECID,
-            );
+            const section = await this.userSectionService.getUserSecByID(dto.NSECID);
             const sem = await this.sequenceOrgService.getByPosition({
                 SPOSCODE: '30',
                 VORGNO: section.SSECCODE,
@@ -83,18 +74,16 @@ export class ReturnApvListService {
     }
 
     async actions(dto: ActionReturnApvListDto) {
-        let filesList: {
+        const filesList: {
             masterPath: string;
             tempPath: string;
             fileName: string;
         }[] = [];
         try {
-            let targetPath: string[] = [];
+            const targetPath: string[] = [];
             const list = dto.LIST;
-            const listsByEmp: Record<
-                string,
-                { EMAIL: string; USER_CREATE: string; rows: any[] }
-            > = {};
+            const listsByEmp: Record<string, { EMAIL: string; USER_CREATE: string; rows: any[] }> =
+                {};
             for (const l of list) {
                 const status = l.NSTATUS === 1 ? 5 : l.NSTATUS === 2 ? 7 : 8;
                 await this.repo.upsert(l);
@@ -109,9 +98,7 @@ export class ReturnApvListService {
                     ORDDW_FORELEAD_STATUS: status,
                 });
                 if (!updateDwg.status) {
-                    throw new Error(
-                        `Failed to update ORDERS_DRAWING with NID: ${l.NID}`,
-                    );
+                    throw new Error(`Failed to update ORDERS_DRAWING with NID: ${l.NID}`);
                 }
 
                 //prettier-ignore

@@ -42,29 +42,29 @@ export class STINP_FORM_LIST {
     @Column()
     VSUGGESTION: string;
 
-	@Column()
-	VEMP_CORRECTIVE: string;
+    @Column()
+    VEMP_CORRECTIVE: string;
 
-	@Column()
-	VCORRECTIVE: string;
+    @Column()
+    VCORRECTIVE: string;
 
-	@Column()
-	DFINISH_DATE: Date;
+    @Column()
+    DFINISH_DATE: Date;
 
-	@Column()
-	DMORNING_TALK: Date;
+    @Column()
+    DMORNING_TALK: Date;
 
-	@Column()
-	NAUDIT_EVALUATE: number;
+    @Column()
+    NAUDIT_EVALUATE: number;
 
-	@Column()
-	NMAT: number;
+    @Column()
+    NMAT: number;
 
-	@Column()
-	VUSERCREATE: string;
+    @Column()
+    VUSERCREATE: string;
 
-	@Column()
-	DDATECREATE: Date;
+    @Column()
+    DDATECREATE: Date;
 
     @OneToOne(() => STY_IMAGE)
     @JoinColumn({ name: 'NIMAGE', referencedColumnName: 'IMAGE_ID' })

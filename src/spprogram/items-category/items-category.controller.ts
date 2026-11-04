@@ -3,10 +3,10 @@ import { ItemsCategoryService } from './items-category.service';
 
 @Controller('sp/items/category')
 export class ItemsCategoryController {
-  constructor(private readonly cate: ItemsCategoryService) {}
+    constructor(private readonly cate: ItemsCategoryService) {}
 
-  @Get('all')
-  findAllCategories() {
-    return this.cate.findAll();
-  }
+    @Get('all')
+    findAllCategories() {
+        return this.cate.findAll();
+    }
 }

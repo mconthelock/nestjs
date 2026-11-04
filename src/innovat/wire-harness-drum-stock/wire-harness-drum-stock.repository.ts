@@ -18,13 +18,7 @@ export class WireHarnessDrumStockRepository extends BaseRepository {
     }
 
     list(condition: FiltersDto) {
-        const allowedFields = [
-            'ITEMCODE',
-            'LENREMAIN',
-            'DRUMTYPE',
-            'RECIVEDATE',
-            'GRPID',
-        ];
+        const allowedFields = ['ITEMCODE', 'LENREMAIN', 'DRUMTYPE', 'RECIVEDATE', 'GRPID'];
         const qb = this.getRepository(WHN_DRUMSTOCK).createQueryBuilder('A');
 
         return this.applyFilters(qb, 'A', condition, allowedFields)

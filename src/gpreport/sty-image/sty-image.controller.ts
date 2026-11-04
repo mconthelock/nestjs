@@ -5,6 +5,5 @@ import { UpdateStyImageDto } from './dto/update-sty-image.dto';
 
 @Controller('sty-image')
 export class StyImageController {
-  constructor(private readonly styImageService: StyImageService) {}
-
+    constructor(private readonly styImageService: StyImageService) {}
 }

@@ -22,13 +22,15 @@ export class FireRepository extends BaseRepository {
         // Escape LIKE metacharacters so user input is treated as literal text.
         const pattern = (value: string) => '%' + value.replace(/[!%_]/g, '!$&').toUpperCase() + '%';
         if (query.search?.trim()) {
-            qb.andWhere(new Brackets(sub => {
-                fields.forEach((field, index) => {
-                    const sql = `UPPER(F.${field}) LIKE :search ESCAPE '!'`;
-                    if (index === 0) sub.where(sql, { search: pattern(query.search.trim()) });
-                    else sub.orWhere(sql);
-                });
-            }));
+            qb.andWhere(
+                new Brackets((sub) => {
+                    fields.forEach((field, index) => {
+                        const sql = `UPPER(F.${field}) LIKE :search ESCAPE '!'`;
+                        if (index === 0) sub.where(sql, { search: pattern(query.search.trim()) });
+                        else sub.orWhere(sql);
+                    });
+                }),
+            );
         }
         for (const field of fields) {
             if (query[field]?.trim()) {
@@ -40,8 +42,11 @@ export class FireRepository extends BaseRepository {
         if (query.STATUS !== undefined) {
             qb.andWhere('F.STATUS = :status', { status: query.STATUS });
         }
-        const [data, total] = await qb.orderBy('F.FIRE_CODE', 'ASC')
-            .skip((page - 1) * limit).take(limit).getManyAndCount();
+        const [data, total] = await qb
+            .orderBy('F.FIRE_CODE', 'ASC')
+            .skip((page - 1) * limit)
+            .take(limit)
+            .getManyAndCount();
         return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
     }
 
@@ -59,4 +64,3 @@ export class FireRepository extends BaseRepository {
         return this.getRepository(FireItemMst).delete({ FIRE_CODE: fireCode });
     }
 }
-

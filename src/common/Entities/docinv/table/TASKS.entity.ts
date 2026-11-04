@@ -1,10 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinTable,
-    ManyToMany,
-    PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Tags } from './TAGS.entity';
 
 @Entity({ name: 'TASKS', schema: 'DOCINV' })

@@ -1,4 +1,12 @@
-import { IsArray, IsBoolean, IsEmail, IsOptional, IsString, Matches, ArrayNotEmpty } from 'class-validator';
+import {
+    IsArray,
+    IsBoolean,
+    IsEmail,
+    IsOptional,
+    IsString,
+    Matches,
+    ArrayNotEmpty,
+} from 'class-validator';
 
 export class InspectionReminderDto {
     @IsOptional()

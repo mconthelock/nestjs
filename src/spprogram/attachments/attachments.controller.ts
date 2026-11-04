@@ -23,10 +23,7 @@ export class AttachmentsController {
 
     private encodeRFC5987ValueChars(value: string): string {
         return encodeURIComponent(value)
-            .replace(
-                /['()]/g,
-                (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`,
-            )
+            .replace(/['()]/g, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`)
             .replace(/\*/g, '%2A');
     }
 
@@ -43,8 +40,7 @@ export class AttachmentsController {
                     cb(null, uploadPath);
                 },
                 filename: (req, file, cb) => {
-                    const uniqueSuffix =
-                        Date.now() + '-' + Math.round(Math.random() * 1e9);
+                    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
                     const ext = extname(file.originalname);
                     cb(null, `${uniqueSuffix}${ext}`);
                 },
@@ -62,19 +58,12 @@ export class AttachmentsController {
                     'application/vnd.ms-powerpoint',
                     'application/vnd.openxmlformats-officedocument.*',
                 ];
-                const isMimeTypeAllowed = allowedMimeTypes.some(
-                    (mimePattern) => {
-                        const regex = new RegExp(
-                            `^${mimePattern.replace('*', '.*')}$`,
-                        );
-                        return regex.test(file.mimetype);
-                    },
-                );
+                const isMimeTypeAllowed = allowedMimeTypes.some((mimePattern) => {
+                    const regex = new RegExp(`^${mimePattern.replace('*', '.*')}$`);
+                    return regex.test(file.mimetype);
+                });
                 if (!isMimeTypeAllowed) {
-                    return cb(
-                        new BadRequestException('File type not supported!'),
-                        false,
-                    );
+                    return cb(new BadRequestException('File type not supported!'), false);
                 }
                 cb(null, true);
             },
@@ -137,13 +126,8 @@ export class AttachmentsController {
         if (!fs.existsSync(filePath)) {
             throw new BadRequestException('File not found on disk');
         }
-        const encodedFilename = this.encodeRFC5987ValueChars(
-            file.FILE_ORIGINAL_NAME,
-        );
-        res.setHeader(
-            'Content-Disposition',
-            `attachment; filename*=UTF-8''${encodedFilename}`,
-        );
+        const encodedFilename = this.encodeRFC5987ValueChars(file.FILE_ORIGINAL_NAME);
+        res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedFilename}`);
         res.setHeader('Content-Type', 'application/octet-stream');
         return res.sendFile(filePath);
     }

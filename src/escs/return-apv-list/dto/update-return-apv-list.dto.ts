@@ -3,9 +3,7 @@ import { CreateReturnApvListDto } from './create-return-apv-list.dto';
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, ValidateNested } from 'class-validator';
 
-export class UpdateReturnApvListDto extends PartialType(
-    CreateReturnApvListDto,
-) {
+export class UpdateReturnApvListDto extends PartialType(CreateReturnApvListDto) {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)

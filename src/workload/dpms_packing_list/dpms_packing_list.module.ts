@@ -6,9 +6,7 @@ import { DPMS_PACKING_LIST } from 'src/common/Entities/workload/views/DPMS_PACKI
 import { DpmsPackingListRepository } from './dpms_packing_list.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([DPMS_PACKING_LIST], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([DPMS_PACKING_LIST], 'mitsuConnection')],
     controllers: [DpmsPackingListController],
     providers: [DpmsPackingListService, DpmsPackingListRepository],
     exports: [DpmsPackingListService],

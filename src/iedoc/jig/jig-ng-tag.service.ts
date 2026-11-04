@@ -5,8 +5,11 @@ import { chromium } from 'playwright';
 import { JigRepository } from './jig.repository';
 import { JigFormKeyDto } from './dto/jig-form.dto';
 
-const escapeHtml = (value: unknown) => String(value ?? '').replace(/[&<>"']/g,
-    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const escapeHtml = (value: unknown) =>
+    String(value ?? '').replace(
+        /[&<>"']/g,
+        (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
+    );
 export function tagDate(value: Date | string | null): string {
     if (!value) return '-';
     if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -15,23 +18,41 @@ export function tagDate(value: Date | string | null): string {
     }
     const date = new Date(value);
     if (!Number.isFinite(date.getTime())) return '-';
-    return new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Bangkok', day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
+    return new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Bangkok',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    }).format(date);
 }
 
 export function ngTagHtml(data: any, regular: string, bold: string): string {
     const { form, ng, stamps, checkDate } = data;
     const e = escapeHtml;
     const stamp = (step: string, label: string, top: string | null) => {
-        const row = stamps.find((s) => String(s.CSTEPNO).trim() === step && String(s.CAPVSTNO).trim() === '1' && s.DAPVDATE);
+        const row = stamps.find(
+            (s) =>
+                String(s.CSTEPNO).trim() === step &&
+                String(s.CAPVSTNO).trim() === '1' &&
+                s.DAPVDATE,
+        );
         const name = row?.SNAME?.trim().split(/\s+/)[0] || '-';
         const heading = step === '--' || step === '07' ? row?.SSEC : top;
-        return `<section class="sign"><div class="circle ${row ? '' : 'pending'}">${row
-            ? `<div class="stamp-line fit">${e(heading || '-')}</div><div class="stamp-date">${e(tagDate(row.DAPVDATE))}</div><div class="stamp-line fit">${e(name)}</div>`
-            : '<div class="pending-text">PENDING</div>'}</div><b>${label}</b></section>`;
+        return `<section class="sign"><div class="circle ${row ? '' : 'pending'}">${
+            row
+                ? `<div class="stamp-line fit">${e(heading || '-')}</div><div class="stamp-date">${e(tagDate(row.DAPVDATE))}</div><div class="stamp-line fit">${e(name)}</div>`
+                : '<div class="pending-text">PENDING</div>'
+        }</div><b>${label}</b></section>`;
     };
-    const actions = new Set(String(ng.ACTION ?? '').split(',').map((value) => value.trim().toUpperCase()));
+    const actions = new Set(
+        String(ng.ACTION ?? '')
+            .split(',')
+            .map((value) => value.trim().toUpperCase()),
+    );
     const known = ['ADJUST', 'MODIFY', 'REPLACE'];
-    const actionLine = known.map((a) => `<span><i>${actions.has(a) ? 'X' : ''}</i>${a}</span>`).join('');
+    const actionLine = known
+        .map((a) => `<span><i>${actions.has(a) ? 'X' : ''}</i>${a}</span>`)
+        .join('');
     return `<!doctype html><html><head><meta charset="utf-8"><style>
     @font-face{font-family:Tag;src:url(data:font/ttf;base64,${regular})} @font-face{font-family:Tag;src:url(data:font/ttf;base64,${bold});font-weight:700}
     @page{size:A5 portrait;margin:0}*{box-sizing:border-box}body{margin:0;font-family:Tag,sans-serif;color:#171717;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -75,25 +96,43 @@ export class JigNgTagService {
         const browser = await chromium.launch({ headless: true });
         try {
             const page = await browser.newPage();
-            await page.setContent(ngTagHtml(data, regular.toString('base64'), bold.toString('base64')), { waitUntil: 'load' });
+            await page.setContent(
+                ngTagHtml(data, regular.toString('base64'), bold.toString('base64')),
+                { waitUntil: 'load' },
+            );
             await page.emulateMedia({ media: 'print' });
             await page.evaluate(async () => {
                 await document.fonts.ready;
                 for (const el of Array.from(document.querySelectorAll<HTMLElement>('.fit'))) {
                     let size = parseFloat(getComputedStyle(el).fontSize);
-                    while ((el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1) && size > 9) {
+                    while (
+                        (el.scrollHeight > el.clientHeight + 1 ||
+                            el.scrollWidth > el.clientWidth + 1) &&
+                        size > 9
+                    ) {
                         size -= 0.25;
                         el.style.fontSize = `${size}px`;
-                        for (const child of Array.from(el.querySelectorAll<HTMLElement>('b'))) child.style.fontSize = 'inherit';
+                        for (const child of Array.from(el.querySelectorAll<HTMLElement>('b')))
+                            child.style.fontSize = 'inherit';
                     }
-                    if (el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1)
+                    if (
+                        el.scrollHeight > el.clientHeight + 1 ||
+                        el.scrollWidth > el.clientWidth + 1
+                    )
                         throw new Error('NG tag content exceeds A5 layout capacity');
                 }
             });
-            return await page.pdf({ format: 'A5', printBackground: true, preferCSSPageSize: true, margin: { top: 0, bottom: 0, left: 0, right: 0 } });
+            return await page.pdf({
+                format: 'A5',
+                printBackground: true,
+                preferCSSPageSize: true,
+                margin: { top: 0, bottom: 0, left: 0, right: 0 },
+            });
         } catch (error) {
             if (String(error.message).includes('NG tag content exceeds A5 layout capacity'))
-                throw new BadRequestException('NG tag text is too long for a readable A5 page; shorten the text or stamp name');
+                throw new BadRequestException(
+                    'NG tag text is too long for a readable A5 page; shorten the text or stamp name',
+                );
             throw error;
         } finally {
             await browser.close();

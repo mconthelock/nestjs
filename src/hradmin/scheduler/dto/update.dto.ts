@@ -4,7 +4,7 @@ import { createSchdDto } from './create.dto';
 import { IsNumber } from 'class-validator';
 
 export class updateSchdDto extends PartialType(createSchdDto) {
-  @Type(() => Number)
-  @IsNumber()
-  TASKID: number;
+    @Type(() => Number)
+    @IsNumber()
+    TASKID: number;
 }

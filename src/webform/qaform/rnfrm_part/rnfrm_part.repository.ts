@@ -8,34 +8,26 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 
 @Injectable()
 export class RnfrmPartRepository extends BaseRepository {
-  constructor(
-    @InjectDataSource('mitsuConnection') ds: DataSource,
-  ) {
-    super(ds);
-  }
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
+        super(ds);
+    }
 
-  findAll() {
-    return this.manager.find(RNFRM_PART);
-  }
+    findAll() {
+        return this.manager.find(RNFRM_PART);
+    }
 
-  findOne(cyear2: string, nrunno: number) {
-    return this.getRepository(RNFRM_PART).findOneBy({
-      CYEAR2: cyear2,
-      NRUNNO: Number(nrunno),
-    });
-  }
+    findOne(cyear2: string, nrunno: number) {
+        return this.getRepository(RNFRM_PART).findOneBy({
+            CYEAR2: cyear2,
+            NRUNNO: Number(nrunno),
+        });
+    }
 
-  async search(dto: FiltersDto) {
-    const qb = this.manager.createQueryBuilder(RNFRM_PART, 'R');
+    async search(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(RNFRM_PART, 'R');
 
-    this.applyFilters(qb, 'R', dto, [
-      'CYEAR2',
-      'NRUNNO',
-      'STATUS',
-      'SENDDATE',
-      'URGENT',
-    ]);
+        this.applyFilters(qb, 'R', dto, ['CYEAR2', 'NRUNNO', 'STATUS', 'SENDDATE', 'URGENT']);
 
-    return qb.getMany();
-  }
+        return qb.getMany();
+    }
 }

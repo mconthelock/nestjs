@@ -16,8 +16,7 @@ export class OrganizationsService {
                     data: [],
                 };
             }
-            for (const d of res){
-                
+            for (const d of res) {
             }
             return {
                 status: true,

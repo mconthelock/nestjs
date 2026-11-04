@@ -19,14 +19,11 @@ export class MasterkeyService {
         const [pinuser, pinpasskey, pincode, pdfkey] = users.split(':');
         if (pinpasskey == pin) {
             const payload = {
-                user: this.dbService.encrypt(
-                    `${pinuser}:${pinpasskey}:${pincode}:${pdfkey}`,
-                ),
+                user: this.dbService.encrypt(`${pinuser}:${pinpasskey}:${pincode}:${pdfkey}`),
                 sub: user,
             };
             const token = this.jwtService.sign(payload);
-            if (decryptedPin.KEY_EXPIRE < new Date())
-                return { status: 'expired', token };
+            if (decryptedPin.KEY_EXPIRE < new Date()) return { status: 'expired', token };
 
             const allkey = await this.findAll();
             const role = allkey.find((k) => k.KEY_OWNER === user)?.KEY_ROLE;
@@ -49,8 +46,7 @@ export class MasterkeyService {
         if (!decryptedPin) return false;
 
         const users = this.dbService.decrypt(decryptedPin.KEY_CODE);
-        const [pinuser, pinpasskey, pincode, pdfkey, admin, pwd] =
-            users.split(':');
+        const [pinuser, pinpasskey, pincode, pdfkey, admin, pwd] = users.split(':');
         const newCredentials = this.dbService.encrypt(
             `${pinuser}:${newpin}:${pincode}:${pdfkey}:${admin}:${pwd}`,
         );
@@ -58,9 +54,7 @@ export class MasterkeyService {
         let hrAdminDataSource: DataSource;
         let conn: oracledb.Connection;
         try {
-            const connection = await this.dbService.createConnection(
-                credentials.user,
-            );
+            const connection = await this.dbService.createConnection(credentials.user);
             hrAdminDataSource = connection.hrAdminDataSource;
             conn = connection.conn;
             const result = await conn.execute(
@@ -76,9 +70,7 @@ export class MasterkeyService {
             return result;
         } catch (error) {
             console.error('Error fetching Master data:', error);
-            throw new InternalServerErrorException(
-                'Failed to fetch Master data.',
-            );
+            throw new InternalServerErrorException('Failed to fetch Master data.');
         } finally {
             await this.dbService.closeConnection(hrAdminDataSource, conn);
         }
@@ -88,20 +80,16 @@ export class MasterkeyService {
         let hrAdminDataSource: DataSource;
         let conn: oracledb.Connection;
         try {
-            const connection =
-                await this.dbService.createConnection(credentials);
+            const connection = await this.dbService.createConnection(credentials);
             hrAdminDataSource = connection.hrAdminDataSource;
             conn = connection.conn;
 
             const code = await this.dbService.getMasterKey();
-            const decryptedPin = await code.find(
-                (k) => k.KEY_OWNER === 'SYSTEM',
-            );
+            const decryptedPin = await code.find((k) => k.KEY_OWNER === 'SYSTEM');
             if (!decryptedPin) return false;
 
             const users = this.dbService.decrypt(decryptedPin.KEY_CODE);
-            const [pinuser, pinpasskey, pincode, pdfkey, admin, pwd] =
-                users.split(':');
+            const [pinuser, pinpasskey, pincode, pdfkey, admin, pwd] = users.split(':');
             const newCredentials = this.dbService.encrypt(
                 `${empno}:000000:${pincode}:${pdfkey}:${admin}:${pwd}`,
             );
@@ -118,9 +106,7 @@ export class MasterkeyService {
             return result;
         } catch (error) {
             console.error('Error fetching Master data:', error);
-            throw new InternalServerErrorException(
-                'Failed to fetch Master data.',
-            );
+            throw new InternalServerErrorException('Failed to fetch Master data.');
         } finally {
             await this.dbService.closeConnection(hrAdminDataSource, conn);
         }
@@ -130,8 +116,7 @@ export class MasterkeyService {
         let hrAdminDataSource: DataSource;
         let conn: oracledb.Connection;
         try {
-            const connection =
-                await this.dbService.createConnection(credentials);
+            const connection = await this.dbService.createConnection(credentials);
             hrAdminDataSource = connection.hrAdminDataSource;
             conn = connection.conn;
             const result = await conn.execute(
@@ -145,9 +130,7 @@ export class MasterkeyService {
             return result;
         } catch (error) {
             console.error('Error fetching Master data:', error);
-            throw new InternalServerErrorException(
-                'Failed to fetch Master data.',
-            );
+            throw new InternalServerErrorException('Failed to fetch Master data.');
         } finally {
             await this.dbService.closeConnection(hrAdminDataSource, conn);
         }
@@ -157,8 +140,7 @@ export class MasterkeyService {
         let hrAdminDataSource: DataSource;
         let conn: oracledb.Connection;
         try {
-            const connection =
-                await this.dbService.createConnection(credentials);
+            const connection = await this.dbService.createConnection(credentials);
             hrAdminDataSource = connection.hrAdminDataSource;
             conn = connection.conn;
 
@@ -172,9 +154,7 @@ export class MasterkeyService {
             return result;
         } catch (error) {
             console.error('Error fetching Master data:', error);
-            throw new InternalServerErrorException(
-                'Failed to fetch Master data.',
-            );
+            throw new InternalServerErrorException('Failed to fetch Master data.');
         } finally {
             await this.dbService.closeConnection(hrAdminDataSource, conn);
         }

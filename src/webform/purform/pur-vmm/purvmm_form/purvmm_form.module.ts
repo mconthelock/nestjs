@@ -8,12 +8,7 @@ import { PURVMM_SCMUSR } from 'src/common/Entities/webform/table/PURVMM_SCMUSR.e
 import { TermTrade } from 'src/common/Entities/pursys/table/TERM_TRADE.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [PURVMM_FORM, PURVMM_SCMUSR, TermTrade],
-            'mitsuConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([PURVMM_FORM, PURVMM_SCMUSR, TermTrade], 'mitsuConnection')],
     controllers: [PurvmmFormController],
     providers: [PurvmmFormService, PurvmmFormRepository],
 })

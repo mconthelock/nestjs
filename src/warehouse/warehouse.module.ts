@@ -4,13 +4,7 @@ import { ItemmasterModule } from './itemmaster/itemmaster.module';
 import { CheckinventoryModule } from './checkinventory/checkinventory.module';
 import { VendingModule } from './vending/vending.module';
 
-
 @Module({
-  imports: [
-    WMSModule,
-    ItemmasterModule,
-    CheckinventoryModule,
-    VendingModule,
-  ]
+    imports: [WMSModule, ItemmasterModule, CheckinventoryModule, VendingModule],
 })
 export class WarehouseModule {}

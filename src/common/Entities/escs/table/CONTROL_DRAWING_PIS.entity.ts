@@ -1,10 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ITEM_MFG } from './ITEM_MFG.entity';
 @Entity({ name: 'CONTROL_DRAWING_PIS', schema: 'ESCCHKSHT' })
 export class CONTROL_DRAWING_PIS {

@@ -49,13 +49,7 @@ export class IeTsApproveService {
                 ip,
             );
             let sql = '';
-            let params = [
-                dto.NFRMNO,
-                dto.VORGNO,
-                dto.CYEAR,
-                dto.CYEAR2,
-                dto.NRUNNO,
-            ];
+            const params = [dto.NFRMNO, dto.VORGNO, dto.CYEAR, dto.CYEAR2, dto.NRUNNO];
             let resflow;
             if (EXTDATA == 1 && ACTION == 'approve') {
                 sql = `SELECT * FROM FLOW WHERE NFRMNO = :1 AND VORGNO = :2 AND CYEAR = :3 AND CYEAR2 = :4 AND NRUNNO = :5 AND CSTEPST IN ('3','2','1') AND CEXTDATA = '01'`;

@@ -1,11 +1,4 @@
-import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  IsArray,
-  IsNotEmpty,
-  IsDateString,
-} from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsArray, IsNotEmpty, IsDateString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class CreatePproductDto {
@@ -17,45 +10,45 @@ export class CreatePproductDto {
     @IsString()
     SEXPTYPE: string;
 
-    @ApiPropertyOptional({description: 'Vendor code', example: '60335' })
+    @ApiPropertyOptional({ description: 'Vendor code', example: '60335' })
     @IsOptional()
     @IsString()
-    SVENDCODE?: string;    
+    SVENDCODE?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SPRODID?: string;  
+    SPRODID?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    STPRODNAME?: string; 
+    STPRODNAME?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SEPRODNAME?: string; 
+    SEPRODNAME?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SMODEL?: string; 
+    SMODEL?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    STDESC?: string; 
+    STDESC?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SEDESC?: string; 
+    SEDESC?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SIMAGE?: string; 
+    SIMAGE?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
@@ -65,17 +58,17 @@ export class CreatePproductDto {
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SEMPNO?: string; 
+    SEMPNO?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SCATID?: string; 
+    SCATID?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SCURCODE?: string; 
+    SCURCODE?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
@@ -110,51 +103,51 @@ export class CreatePproductDto {
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SDRAWNUM?: string; 
+    SDRAWNUM?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SSPEC?: string; 
+    SSPEC?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SCOUNTRY?: string; 
+    SCOUNTRY?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SDIMEN?: string; 
+    SDIMEN?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SBRAND?: string; 
+    SBRAND?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SMARKERN?: string; 
+    SMARKERN?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    SLEVEL?: string; 
+    SLEVEL?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
-    @Type(() => Number)  
+    @Type(() => Number)
     @IsNumber()
-    NPRICE?: number; 
+    NPRICE?: number;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    HAZARDNO?: string; 
+    HAZARDNO?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @IsString()
-    HAZARDSTATUS?: string; 
+    HAZARDSTATUS?: string;
 }

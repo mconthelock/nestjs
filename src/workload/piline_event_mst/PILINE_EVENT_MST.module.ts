@@ -6,9 +6,7 @@ import { PilineEventMstService } from './PILINE_EVENT_MST.service';
 import { PilineEventMstRepository } from './PILINE_EVENT_MST.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([PILINE_EVENT_MST], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([PILINE_EVENT_MST], 'mitsuConnection')],
     controllers: [PilineEventMstController],
     providers: [PilineEventMstService, PilineEventMstRepository],
     exports: [PilineEventMstService],

@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Param,
-    Query,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Delete } from '@nestjs/common';
 import { VendingService } from './vending.service';
 import { CreateVendingDto } from './dto/create-vending.dto';
 import { UpdateVendingDto } from './dto/update-vending.dto';
@@ -63,9 +55,7 @@ export class VendingController {
     }
 
     @Post('addUserVending')
-    saveUserVending(
-        @Body() { EMPNO, CREATED_BY }: { EMPNO: string[]; CREATED_BY: string },
-    ) {
+    saveUserVending(@Body() { EMPNO, CREATED_BY }: { EMPNO: string[]; CREATED_BY: string }) {
         return this.vendingService.saveUserVending(EMPNO, CREATED_BY);
     }
 

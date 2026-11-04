@@ -1,12 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-    IsString,
-    IsNotEmpty,
-    IsNumber,
-    IsOptional,
-    IsDateString,
-    IsDate,
-} from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsOptional, IsDateString, IsDate } from 'class-validator';
 export class CreateApplicationDto {
     //   @Type(() => Number)
     //   @IsNumber()

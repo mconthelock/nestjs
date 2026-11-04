@@ -14,9 +14,12 @@ export class LoadLessTestService {
         private readonly db: Repository<SYS_FOLDER_PATH>,
     ) {}
 
-    async getLoadLessTestResult(serial: string, order: string): Promise<LoadLessTestResponseDto | null> {
+    async getLoadLessTestResult(
+        serial: string,
+        order: string,
+    ): Promise<LoadLessTestResponseDto | null> {
         serial = serial?.trim();
-        order  = order?.trim();
+        order = order?.trim();
         const basePath = await this.getPath('TSTM-001');
 
         // Check last 7 days for the test result
@@ -24,14 +27,14 @@ export class LoadLessTestService {
             const targetDate = new Date();
             targetDate.setDate(targetDate.getDate() - i);
 
-            const year  = targetDate.getFullYear();
+            const year = targetDate.getFullYear();
             const month = targetDate.getMonth() + 1;
-            const day   = targetDate.getDate();
+            const day = targetDate.getDate();
             const folderPath = path.join(
                 basePath,
                 `Year ${year}`,
                 this.formatMonth(month, year),
-                'Load less'
+                'Load less',
             );
 
             const fileName = `${year}_${this.pad(month)}${this.pad(day)}.csv`;
@@ -41,11 +44,11 @@ export class LoadLessTestService {
             }
 
             const content = fs.readFileSync(fullPath, 'utf-8');
-            const lines   = content.split(/\r?\n/).reverse();
+            const lines = content.split(/\r?\n/).reverse();
             for (const line of lines) {
                 if (!line.trim()) continue;
 
-                const cols   = line.split(',');
+                const cols = line.split(',');
                 const header = cols[0]?.trim();
                 if (!header) continue;
 
@@ -53,9 +56,9 @@ export class LoadLessTestService {
                 if (parts.length < 3) continue;
 
                 const serialCol = parts[1]?.trim();
-                const orderCol  = parts[2]?.trim();
+                const orderCol = parts[2]?.trim();
                 const statusCol = cols[cols.length - 1]?.trim();
-                if (serialCol === serial && orderCol === order &&statusCol === 'OK') {
+                if (serialCol === serial && orderCol === order && statusCol === 'OK') {
                     return {
                         status: 'SUCCESS',
                         message: null,
@@ -80,7 +83,7 @@ export class LoadLessTestService {
 
     private async getPath(fdpId: string): Promise<string> {
         const data = await this.db.findOne({
-            where: { FDP_ID: fdpId }
+            where: { FDP_ID: fdpId },
         });
 
         if (!data) {
@@ -97,8 +100,18 @@ export class LoadLessTestService {
     private formatMonth(month: number, year: number): string {
         const yy = year.toString().slice(-2);
         const months = [
-            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec',
         ];
 
         return `${this.pad(month)}.${months[month - 1]} ${yy}`;

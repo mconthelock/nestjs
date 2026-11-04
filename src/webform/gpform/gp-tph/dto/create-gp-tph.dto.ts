@@ -1,5 +1,5 @@
-import { PartialType, PickType } from "@nestjs/swagger";
-import { Transform, Type } from "class-transformer";
+import { PartialType, PickType } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
 import {
     IsArray,
     IsDate,
@@ -8,12 +8,12 @@ import {
     IsOptional,
     IsString,
     ValidateNested,
-} from "class-validator";
-import { FormDto } from "src/webform/form/dto/form.dto";
+} from 'class-validator';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 function ParseJsonArray() {
     return Transform(({ value }) => {
-        if (typeof value === "string") {
+        if (typeof value === 'string') {
             try {
                 return JSON.parse(value);
             } catch {
@@ -79,10 +79,8 @@ export class CreateGpTphReqFormDto extends PickType(FormDto, [
     @IsArray()
     @IsNumber({}, { each: true })
     AREA_ID: number[];
-
 }
 export class CreateGpTphlistApplicantDto {
-
     @IsOptional()
     @IsString()
     CYEAR2?: string;
@@ -112,7 +110,6 @@ export class CreateGpTphlistApplicantDto {
     @IsOptional()
     @IsString()
     COMPANY_NAME?: string;
-
 }
 
-export class CreateGpTphReqDto extends PartialType(CreateGpTphReqFormDto) { }
+export class CreateGpTphReqDto extends PartialType(CreateGpTphReqFormDto) {}

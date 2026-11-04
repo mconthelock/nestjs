@@ -142,25 +142,16 @@ export class PurEvaUpdateService {
                 await this.reposcore.createMultipleScores(form, SCORES);
             }
             if (PROFIT_TURNOVERS && PROFIT_TURNOVERS.length > 0) {
-                await this.repoprofit.createMultipleProfits(
-                    form,
-                    PROFIT_TURNOVERS,
-                );
+                await this.repoprofit.createMultipleProfits(form, PROFIT_TURNOVERS);
             }
             if (RELATIONS && RELATIONS.length > 0) {
-                await this.reporelation.createMultipleRelations(
-                    form,
-                    RELATIONS,
-                );
+                await this.reporelation.createMultipleRelations(form, RELATIONS);
             }
             if (DELETE_FILES && DELETE_FILES.length > 0) {
                 for (const id of DELETE_FILES) {
                     const file = await this.purFileService.getFileById(+id);
                     await this.purFileService.deleteFileByID(+id);
-                    const destination = await joinPaths(
-                        file.FILE_PATH,
-                        file.FILE_FNAME,
-                    );
+                    const destination = await joinPaths(file.FILE_PATH, file.FILE_FNAME);
                     await deleteFile(destination);
                 }
             }
@@ -178,10 +169,7 @@ export class PurEvaUpdateService {
                     condition: { ...form },
                     CST: '1',
                 });
-                await this.doactionService.doAction(
-                    { ...form, ACTION: ACTION, EMPNO, REMARK },
-                    ip,
-                );
+                await this.doactionService.doAction({ ...form, ACTION: ACTION, EMPNO, REMARK }, ip);
             }
 
             return {

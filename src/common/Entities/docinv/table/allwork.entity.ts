@@ -2,61 +2,60 @@ import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity({ name: 'WORK_PLAN_ALL', schema: 'DOCINV' })
 export class IsWorkLoad {
-  @PrimaryColumn()
-  NFRMNO: string;
+    @PrimaryColumn()
+    NFRMNO: string;
 
-  @PrimaryColumn()
-  VORGNO: string;
+    @PrimaryColumn()
+    VORGNO: string;
 
-  @PrimaryColumn()
-  CYEAR: string;
+    @PrimaryColumn()
+    CYEAR: string;
 
-  @PrimaryColumn()
-  CYEAR2: number;
+    @PrimaryColumn()
+    CYEAR2: number;
 
-  @PrimaryColumn()
-  NRUNNO: number;
+    @PrimaryColumn()
+    NRUNNO: number;
 
-  @Column()
-  WORKTYPE: number;
+    @Column()
+    WORKTYPE: number;
 
-  @Column()
-  WORKCATEGORY: string;
+    @Column()
+    WORKCATEGORY: string;
 
-  @Column()
-  PLANYEAR: number;
+    @Column()
+    PLANYEAR: number;
 
-  @Column()
-  REQNO: string;
+    @Column()
+    REQNO: string;
 
-  @Column()
-  TITLE: string;
+    @Column()
+    TITLE: string;
 
-  @Column()
-  DETAIL: string;
+    @Column()
+    DETAIL: string;
 
-  @Column()
-  VSYSNAME: string;
+    @Column()
+    VSYSNAME: string;
 
-  @Column()
-  DPDATE: Date;
+    @Column()
+    DPDATE: Date;
 
-  @Column()
-  DPEDATE: Date;
+    @Column()
+    DPEDATE: Date;
 
-  @Column()
-  NTYPEID: string;
+    @Column()
+    NTYPEID: string;
 
-  @Column()
-  VTYPEDESC: string;
+    @Column()
+    VTYPEDESC: string;
 
-  @Column()
-  STATUS: string;
+    @Column()
+    STATUS: string;
 
-  @Column()
-  REQUESTER: string;
+    @Column()
+    REQUESTER: string;
 
-  @Column()
-  DEVELOPER: string;
+    @Column()
+    DEVELOPER: string;
 }
-

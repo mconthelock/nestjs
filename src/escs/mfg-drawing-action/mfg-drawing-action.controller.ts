@@ -1,12 +1,4 @@
-﻿import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+﻿import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { MfgDrawingActionService } from './mfg-drawing-action.service';
 import { CreateMfgDrawingActionDto } from './dto/create-mfg-drawing-action.dto';
 import { UpdateMfgDrawingActionDto } from './dto/update-mfg-drawing-action.dto';
@@ -15,9 +7,7 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 
 @Controller('escs/mfg-drawing-action')
 export class MfgDrawingActionController {
-    constructor(
-        private readonly mfgDrawingActionService: MfgDrawingActionService,
-    ) {}
+    constructor(private readonly mfgDrawingActionService: MfgDrawingActionService) {}
 
     @Get()
     findAll() {

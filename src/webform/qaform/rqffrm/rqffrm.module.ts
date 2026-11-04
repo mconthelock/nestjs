@@ -8,11 +8,7 @@ import { RqffrmRepository } from './rqffrm.repository';
 import { RqflistModule } from '../rqflist/rqflist.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([RQFFRM], 'mitsuConnection'),
-        FormModule,
-        RqflistModule,
-    ],
+    imports: [TypeOrmModule.forFeature([RQFFRM], 'mitsuConnection'), FormModule, RqflistModule],
     controllers: [RqffrmController],
     providers: [RqffrmService, RqffrmRepository],
     exports: [RqffrmService],

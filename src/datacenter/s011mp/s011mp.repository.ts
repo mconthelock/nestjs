@@ -27,12 +27,7 @@ export class S011mpRepository extends BaseRepository {
 
     async search(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(S011MP, 'S');
-        this.applyFilters(qb, 'S', dto, [
-            'S11M01',
-            'S11M02',
-            'S11M03',
-            'S11M04',
-        ]);
+        this.applyFilters(qb, 'S', dto, ['S11M01', 'S11M02', 'S11M03', 'S11M04']);
         return qb.getMany();
     }
 

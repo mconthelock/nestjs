@@ -23,20 +23,16 @@ export class OrderpartsService {
         if (req.MFGNO) where['MFGNO'] = req.MFGNO;
         if (req.CAR_NO) {
             const trimmedCarNo = req.CAR_NO.trim(); // Trim ค่าจาก input ด้วย
-            where['CAR_NO'] = Raw(
-                (columnAlias) => `TRIM(${columnAlias}) = :trimmedCarNo`,
-                { trimmedCarNo },
-            );
+            where['CAR_NO'] = Raw((columnAlias) => `TRIM(${columnAlias}) = :trimmedCarNo`, {
+                trimmedCarNo,
+            });
         }
 
         if (req.SMFGNO) {
             const trimmedMfgNo = req.SMFGNO.trim();
-            where['MFGNO'] = Raw(
-                (columnAlias) => `MFGNO LIKE '%${trimmedMfgNo}%'`,
-                {
-                    trimmedMfgNo,
-                },
-            );
+            where['MFGNO'] = Raw((columnAlias) => `MFGNO LIKE '%${trimmedMfgNo}%'`, {
+                trimmedMfgNo,
+            });
         }
         return await this.ords.find({ where: where });
     }

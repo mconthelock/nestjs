@@ -10,9 +10,7 @@ export class IeBgrDraftService extends IeBgrService {
      */
     async draft(
         dto: DraftIeBgrDto,
-        files: Partial<
-            Record<keyof typeof this.fileType, Express.Multer.File[]>
-        >,
+        files: Partial<Record<keyof typeof this.fileType, Express.Multer.File[]>>,
         ip: string,
         path: string,
     ) {

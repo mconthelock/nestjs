@@ -33,5 +33,4 @@ export class CountryOriginController {
     uploadExcel(@Body() dto: CreateCountryOriginDto[]) {
         return this.service.create(dto);
     }
-
 }

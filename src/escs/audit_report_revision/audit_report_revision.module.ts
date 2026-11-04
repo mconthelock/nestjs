@@ -6,9 +6,7 @@ import { AuditReportRevisionRepository } from './audit_report_revision.repositor
 import { AUDIT_REPORT_REVISION } from 'src/common/Entities/escs/table/AUDIT_REPORT_REVISION.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([AUDIT_REPORT_REVISION], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([AUDIT_REPORT_REVISION], 'mitsuConnection')],
     controllers: [AuditReportRevisionController],
     providers: [AuditReportRevisionService, AuditReportRevisionRepository],
     exports: [AuditReportRevisionService],

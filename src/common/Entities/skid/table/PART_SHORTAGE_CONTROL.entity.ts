@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'PART_SHORTAGE_CONTROL', schema: 'SKIDCNTRL' })
 export class PART_SHORTAGE_CONTROL {

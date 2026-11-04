@@ -5,10 +5,10 @@ import { searchQuotationDto } from './dto/search-quotation.dto';
 
 @Controller('sp/quotation')
 export class QuotationController {
-  constructor(private readonly quo: QuotationService) {}
+    constructor(private readonly quo: QuotationService) {}
 
-  @Post('create')
-  createQuotation(@Body() data: createQuotationDto) {
-    return this.quo.createQuotation(data);
-  }
+    @Post('create')
+    createQuotation(@Body() data: createQuotationDto) {
+        return this.quo.createQuotation(data);
+    }
 }

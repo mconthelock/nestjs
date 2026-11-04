@@ -83,9 +83,7 @@ export class QuotationService {
         const quotations = [];
         for (const q of quotationList) {
             const detail = await this.formService.getPkByFormno(q.QTA_FORM);
-            const product = await this.ebudgetQuotationProductService.getData(
-                q.ID,
-            );
+            const product = await this.ebudgetQuotationProductService.getData(q.ID);
             const data = await this.rqffrmService.getData({
                 NFRMNO: detail.NFRMNO,
                 VORGNO: detail.VORGNO,

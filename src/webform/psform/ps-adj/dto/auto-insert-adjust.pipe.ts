@@ -1,9 +1,4 @@
-import {
-    BadRequestException,
-    Injectable,
-    PipeTransform,
-    ValidationPipe,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, PipeTransform, ValidationPipe } from '@nestjs/common';
 import { AutoInsertAdjustDto } from './auto-insert-adjust.dto';
 
 @Injectable()
@@ -13,13 +8,10 @@ export class AutoInsertAdjustPipe implements PipeTransform {
         whitelist: true,
     });
 
-    async transform(
-        value: unknown,
-    ): Promise<AutoInsertAdjustDto | AutoInsertAdjustDto[]> {
+    async transform(value: unknown): Promise<AutoInsertAdjustDto | AutoInsertAdjustDto[]> {
         const batch = Array.isArray(value);
         const items = batch ? value : [value];
-        if (!items.length)
-            throw new BadRequestException('Request array must not be empty');
+        if (!items.length) throw new BadRequestException('Request array must not be empty');
         const result: AutoInsertAdjustDto[] = [];
         for (let index = 0; index < items.length; index++) {
             const item = items[index];

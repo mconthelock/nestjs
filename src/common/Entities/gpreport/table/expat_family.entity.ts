@@ -2,7 +2,6 @@
 
 @Entity({ name: 'EXPAT_FAMILY', schema: 'GPREPORT' })
 export class ExpatFamily {
-
     @PrimaryColumn()
     SEMPNO: string;
 
@@ -29,5 +28,4 @@ export class ExpatFamily {
 
     @Column()
     LAST_ARRIVAL_DATE: Date;
-
 }

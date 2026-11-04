@@ -6,9 +6,7 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class LabelconfirmRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('mitsuConnection') private ds: DataSource,
-    ) {
+    constructor(@InjectDataSource('mitsuConnection') private ds: DataSource) {
         super(ds);
     }
 
@@ -35,12 +33,7 @@ export class LabelconfirmRepository extends BaseRepository {
         return await this.ds.query(sql, [empno, qrCode]);
     }
 
-    async errLog(
-        order: string,
-        packing: string,
-        qrCode: string,
-        empno: string,
-    ) {
+    async errLog(order: string, packing: string, qrCode: string, empno: string) {
         const sql = `
             INSERT INTO KIT_ERR_LOG (ORDER_NO, PACKING_NO, QR_ERR, CREATE_BY, CREATE_AT)
             VALUES (:1, :2, :3, :4, SYSDATE)

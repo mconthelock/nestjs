@@ -21,9 +21,7 @@ export class DpmsPlCaseListService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to create DPMS PL Case List: ${error.message}`,
-            );
+            throw new Error(`Failed to create DPMS PL Case List: ${error.message}`);
         }
     }
     async findByRevId(revId: number, revise: boolean = false) {
@@ -43,9 +41,7 @@ export class DpmsPlCaseListService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to find DPMS PL Case List: ${error.message}`,
-            );
+            throw new Error(`Failed to find DPMS PL Case List: ${error.message}`);
         }
     }
 
@@ -64,9 +60,7 @@ export class DpmsPlCaseListService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to find DPMS PL Case List: ${error.message}`,
-            );
+            throw new Error(`Failed to find DPMS PL Case List: ${error.message}`);
         }
     }
 }

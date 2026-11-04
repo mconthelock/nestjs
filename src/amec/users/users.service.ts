@@ -4,9 +4,7 @@ import { searchDto } from './dto/search-user.dto';
 
 @Injectable()
 export class UsersService {
-    constructor(
-        private readonly repo: UsersRepository,
-    ) {}
+    constructor(private readonly repo: UsersRepository) {}
 
     findEmp(empno: string) {
         return this.repo.findOne(empno);
@@ -39,9 +37,7 @@ export class UsersService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Error finding employee with empno ${empno}: ` + error.message,
-            );
+            throw new Error(`Error finding employee with empno ${empno}: ` + error.message);
         }
     }
 }

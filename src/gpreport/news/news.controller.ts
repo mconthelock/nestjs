@@ -37,9 +37,7 @@ export class NewsController {
         const data = await this.news.findOne(+id);
         if (!data) throw new BadRequestException('News not found');
 
-        const image = await this.news.fileNewsImage(
-            type == '1' ? data.NEWS_IMG : data.NEWS_HEADER,
-        );
+        const image = await this.news.fileNewsImage(type == '1' ? data.NEWS_IMG : data.NEWS_HEADER);
         if (!image) throw new BadRequestException('Image not found');
         return image;
     }
@@ -54,10 +52,10 @@ export class NewsController {
             ],
             {
                 storage: diskStorage({
-                    destination: (req, file, cb) => cb(null, `${process.env.GP_FILE_PATH}/news/attachments`),
+                    destination: (req, file, cb) =>
+                        cb(null, `${process.env.GP_FILE_PATH}/news/attachments`),
                     filename: (req, file, cb) => {
-                        const uniqueSuffix =
-                            Date.now() + '-' + Math.round(Math.random() * 1e9);
+                        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
                         const ext = extname(file.originalname);
                         const newFilename = `${uniqueSuffix}${ext}`;
                         cb(null, newFilename);
@@ -102,10 +100,10 @@ export class NewsController {
             ],
             {
                 storage: diskStorage({
-                    destination: (req, file, cb) => cb(null, `${process.env.GP_FILE_PATH}/news/attachments`),
+                    destination: (req, file, cb) =>
+                        cb(null, `${process.env.GP_FILE_PATH}/news/attachments`),
                     filename: (req, file, cb) => {
-                        const uniqueSuffix =
-                            Date.now() + '-' + Math.round(Math.random() * 1e9);
+                        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
                         const ext = extname(file.originalname);
                         const newFilename = `${uniqueSuffix}${ext}`;
                         cb(null, newFilename);

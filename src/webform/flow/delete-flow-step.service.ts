@@ -4,9 +4,7 @@ import { DeleteFlowStepDto } from './dto/update-flow.dto';
 
 @Injectable()
 export class DeleteFlowStepService extends FlowService {
-    async deleteFlowStep(
-        dto: DeleteFlowStepDto,
-    ): Promise<{ status: boolean; message: string }> {
+    async deleteFlowStep(dto: DeleteFlowStepDto): Promise<{ status: boolean; message: string }> {
         try {
             const form = {
                 NFRMNO: dto.NFRMNO,
@@ -16,7 +14,7 @@ export class DeleteFlowStepService extends FlowService {
                 NRUNNO: dto.NRUNNO,
             };
 
-            var flowStart = false;
+            let flowStart = false;
 
             const flow = await this.getFlow({ ...form, CSTEPNO: dto.CSTEPNO });
             if (flow.length === 0) {

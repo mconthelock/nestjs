@@ -2,9 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class PackLogoutDto {
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'Employee ID',
-        example: '15234', 
+        example: '15234',
     })
     @IsString()
     @Matches(/^\d+$/, { message: 'UID must be numeric' })

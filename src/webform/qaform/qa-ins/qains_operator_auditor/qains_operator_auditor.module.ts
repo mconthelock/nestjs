@@ -6,9 +6,7 @@ import { QAINS_OPERATOR_AUDITOR } from 'src/common/Entities/webform/table/QAINS_
 import { QainsOARepository } from './qains_operator_auditor.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([QAINS_OPERATOR_AUDITOR], 'mitsuConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([QAINS_OPERATOR_AUDITOR], 'mitsuConnection')],
     controllers: [QainsOAController],
     providers: [QainsOAService, QainsOARepository],
     exports: [QainsOAService],

@@ -42,7 +42,13 @@ export class PsVarRepository extends BaseRepository {
         JOIN SKIDCNTRL.INV_HALFYEAR_RESULT ihr ON pf.REPORT_ID = ihr.REPORT_ID 
         JOIN SKIDCNTRL.INV_CHECK_ASSIGN ica ON ihr.SOURCE_ASSIGN_ID = ica.ID
         WHERE pf.NFRMNO = :1 AND pf.VORGNO = :2 AND pf.CYEAR = :3 AND pf.CYEAR2 = :4 AND pf.NRUNNO = :5`;
-        return await this.manager.query(sql, [dto.NFRMNO, dto.VORGNO, dto.CYEAR, dto.CYEAR2, dto.NRUNNO]);
+        return await this.manager.query(sql, [
+            dto.NFRMNO,
+            dto.VORGNO,
+            dto.CYEAR,
+            dto.CYEAR2,
+            dto.NRUNNO,
+        ]);
     }
 
     async insert_psvar_form(data: any) {

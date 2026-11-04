@@ -1,11 +1,4 @@
-﻿import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    OneToMany,
-    PrimaryColumn,
-} from 'typeorm';
+﻿import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
 import { BusDispatchLine } from './bus_dispatch_line.entity';
 import { BusDispatchPassenger } from './bus_dispatch_passenger.entity';
 

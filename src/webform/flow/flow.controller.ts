@@ -9,12 +9,7 @@ import {
     Req,
     UseInterceptors,
 } from '@nestjs/common';
-import {
-    ApiTags,
-    ApiOperation,
-    ApiParam,
-    ApiExcludeEndpoint,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { Request } from 'express';
 
 import { FlowService } from './flow.service';
@@ -30,10 +25,7 @@ import { showFlowDto } from './dto/show-flow.dto';
 import { ShowFlowService } from './show-flow.service';
 import { DeleteFlowStepService } from './delete-flow-step.service';
 import { DoactionFlowService } from './doaction.service';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { InsertFlowStepService } from './insert-flow-step.service';
 import { insertFlowDto } from './dto/insert-flow-step.dto';
 
@@ -61,9 +53,7 @@ export class FlowController {
     }
 
     @Patch('updateFlow')
-    async updateFlow(
-        @Body() dto: UpdateFlowDto,
-    ): Promise<{ message: string; status: boolean }> {
+    async updateFlow(@Body() dto: UpdateFlowDto): Promise<{ message: string; status: boolean }> {
         try {
             return await this.flowService.updateFlow(dto);
         } catch (error) {
@@ -72,9 +62,7 @@ export class FlowController {
     }
 
     @Patch('realignFlow')
-    async realignFlow(
-        @Body() dto: UpdateFlowDto,
-    ): Promise<{ message: string; status: boolean }> {
+    async realignFlow(@Body() dto: UpdateFlowDto): Promise<{ message: string; status: boolean }> {
         try {
             return await this.flowService.reAlignFlow(dto);
         } catch (error) {
@@ -83,9 +71,7 @@ export class FlowController {
     }
 
     @Delete('deleteFlow')
-    async deleteFlow(
-        @Body() dto: UpdateFlowDto,
-    ): Promise<{ message: string; status: boolean }> {
+    async deleteFlow(@Body() dto: UpdateFlowDto): Promise<{ message: string; status: boolean }> {
         try {
             return await this.flowService.deleteFlow(dto);
         } catch (error) {

@@ -160,9 +160,7 @@ export class QaCnService {
                 }
             } else {
                 //ไม่เจาะจงแผนก
-                let inc = await this.repoCnform.findInc(
-                    Number(cndata.ITEMNO.charAt(0)),
-                );
+                let inc = await this.repoCnform.findInc(Number(cndata.ITEMNO.charAt(0)));
                 // console.log('>>>>>INC<<<<<');
                 // console.log(inc);
                 // console.log('>>>>>INC<<<<<');
@@ -391,64 +389,41 @@ export class QaCnService {
                         context: 'approve',
                         logType: 'debug',
                     });
-                    await this.processApprovalActions(
-                        dto,
-                        currentForm,
-                        files,
-                        path,
-                        fileMappings,
-                    );
+                    await this.processApprovalActions(dto, currentForm, files, path, fileMappings);
                     this.logger.debug(` process success`, {
                         context: 'approve',
                         logType: 'debug',
                     });
-                    const formStatus =
-                        await this.formCreateService.getFormStatus({
-                            ...currentForm,
-                        });
+                    const formStatus = await this.formCreateService.getFormStatus({
+                        ...currentForm,
+                    });
                     if (formStatus == '2' || formStatus == '3') {
                         if (formStatus == '3' && MSTATUS == '1') {
                             await this.createcnng(currentForm, ip);
                         }
 
-                        let mstatus = MSTATUS == '1' ? 'PIC' : 'ALL';
+                        const mstatus = MSTATUS == '1' ? 'PIC' : 'ALL';
                         this.logger.debug(`Before sendmail`, {
                             context: 'approve',
                             logType: 'debug',
                         });
                         const toEmail = (
-                            await this.repoCnform.getApvEmail(
-                                currentForm,
-                                mstatus,
-                            )
+                            await this.repoCnform.getApvEmail(currentForm, mstatus)
                         ).map((item) => item.EMAIL);
                         this.logger.debug(`Before To sendmail`, {
                             context: 'approve',
                             logType: 'debug',
                         });
-                        await this.buildmail(
-                            currentForm,
-                            mstatus,
-                            formStatus,
-                            toEmail,
-                        );
+                        await this.buildmail(currentForm, mstatus, formStatus, toEmail);
                         this.logger.debug(`After  sendmail`, {
                             context: 'approve',
                             logType: 'debug',
                         });
                     } else if (STEPREADY == '06' && MSTATUS == '1') {
                         const toEmail = (
-                            await this.repoCnform.getApvEmail(
-                                currentForm,
-                                'FOREMAN',
-                            )
+                            await this.repoCnform.getApvEmail(currentForm, 'FOREMAN')
                         ).map((item) => item.EMAIL);
-                        await this.buildmail(
-                            currentForm,
-                            'FOREMAN',
-                            formStatus,
-                            toEmail,
-                        );
+                        await this.buildmail(currentForm, 'FOREMAN', formStatus, toEmail);
                     }
                 }
             } else if (ACTION == 'sendApv') {
@@ -463,13 +438,7 @@ export class QaCnService {
                         ip,
                     );
                 }
-                await this.processApprovalActions(
-                    dto,
-                    currentForm,
-                    files,
-                    path,
-                    fileMappings,
-                );
+                await this.processApprovalActions(dto, currentForm, files, path, fileMappings);
             } else if (ACTION == 'returnb') {
                 const confirm = await this.doactionService.doAction(
                     {
@@ -481,13 +450,7 @@ export class QaCnService {
                     ip,
                 );
             } else {
-                await this.processApprovalActions(
-                    dto,
-                    currentForm,
-                    files,
-                    path,
-                    fileMappings,
-                );
+                await this.processApprovalActions(dto, currentForm, files, path, fileMappings);
                 if (ACTION == 'return') {
                     const confirm = await this.doactionService.doAction(
                         {
@@ -500,18 +463,10 @@ export class QaCnService {
                     );
                     if (confirm.status) {
                         const toEmail = (
-                            await this.repoCnform.getApvEmail(
-                                currentForm,
-                                'REQUESTER',
-                            )
+                            await this.repoCnform.getApvEmail(currentForm, 'REQUESTER')
                         ).map((item) => item.EMAIL);
 
-                        await this.buildmail(
-                            currentForm,
-                            'REQUESTER',
-                            '1',
-                            toEmail,
-                        );
+                        await this.buildmail(currentForm, 'REQUESTER', '1', toEmail);
                     }
                 } else if (ACTION == 'returnqastaff') {
                     await this.flowService.updateFlow({
@@ -620,10 +575,7 @@ export class QaCnService {
                 //  console.log(newcnng);
                 //  console.log('AAAAAAAAAAAAAAAAAAAAAAAAAA');
                 if (newcnng && newcnng[0].R27M09) {
-                    await this.r027Mp1Service.insertNewCn(
-                        newcnng[0].R27M09,
-                        res.FIRSTNO,
-                    );
+                    await this.r027Mp1Service.insertNewCn(newcnng[0].R27M09, res.FIRSTNO);
                 }
             }
             const cnform = await this.formService.getFormData(dto);
@@ -639,12 +591,9 @@ export class QaCnService {
                 INPUTBY: cnform.VINPUTER,
                 REMARK: '',
             };
-            const rsf = await this.formCreateService.create(
-                { ...cnformnew },
-                ip,
-            );
+            const rsf = await this.formCreateService.create({ ...cnformnew }, ip);
             if (rsf.status) {
-                let condition: any = {
+                const condition: any = {
                     NFRMNO: dto.NFRMNO,
                     VORGNO: dto.VORGNO,
                     CYEAR: dto.CYEAR,
@@ -736,14 +685,9 @@ export class QaCnService {
         }
     }
 
-    private async buildmail(
-        dto: FormDto,
-        mtype: string,
-        fstatus: string,
-        to: string[],
-    ) {
+    private async buildmail(dto: FormDto, mtype: string, fstatus: string, to: string[]) {
         const formno = await this.formCreateService.getFormno(dto);
-        let type =
+        const type =
             mtype === 'FORMAN'
                 ? 'FOREMAN'
                 : mtype === 'PIC'
@@ -759,7 +703,7 @@ export class QaCnService {
             logType: 'debug',
         });
 
-        let rs = await this.repoCnform.getQueryBuilderResult(dto);
+        const rs = await this.repoCnform.getQueryBuilderResult(dto);
         this.logger.debug(`in builmail after getapv`, {
             context: 'approve',
             logType: 'debug',
@@ -850,7 +794,7 @@ export class QaCnService {
         if (!to || !subject || !html) {
             throw new Error('Mail data is incomplete');
         }
-        let objmail = {
+        const objmail = {
             from: 'noreplay@MitsubishiElevatorAsia.co.th',
             to: to,
             subject: subject,
@@ -968,27 +912,19 @@ export class QaCnService {
                     const isNumber = pono.trim() !== '' && !isNaN(Number(pono));
                     if (isNumber) {
                         const pord =
-                            pono.toString().substring(0, 2) +
-                            pono.toString().substring(4, 4);
+                            pono.toString().substring(0, 2) + pono.toString().substring(4, 4);
                         const pprod = cndata.PURITEM;
-                        const formno =
-                            await this.formCreateService.getFormno(currentForm);
-                        await this.hpoService.updateByOrderProd(
-                            pord,
-                            pprod,
-                            formno,
-                        );
+                        const formno = await this.formCreateService.getFormno(currentForm);
+                        await this.hpoService.updateByOrderProd(pord, pprod, formno);
                     }
                 }
             } else if (CEXTDATA == 7) {
-                const formno =
-                    await this.formCreateService.getFormno(currentForm);
+                const formno = await this.formCreateService.getFormno(currentForm);
                 await this.j736kpService.updateByFormno(formno);
             }
         } else if (ACTION == 'reject') {
             if (CEXTDATA == 7) {
-                const formno =
-                    await this.formCreateService.getFormno(currentForm);
+                const formno = await this.formCreateService.getFormno(currentForm);
                 await this.j736kpService.updateByFormno(formno);
             }
             if (CEXTDATA > 1 && CEXTDATA != 5) {

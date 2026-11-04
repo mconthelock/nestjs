@@ -13,6 +13,7 @@ import { DoactionFlowService } from 'src/webform/flow/doaction.service';
 import { FormService } from 'src/webform/form/form.service';
 import { Request } from 'express';
 import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
+
 @Injectable()
 export class IeTsApproveService {
     constructor(
@@ -39,15 +40,18 @@ export class IeTsApproveService {
                 NRUNNO: dto.NRUNNO,
             };
             // if (EXTDATA != 2) {
-            const resact = await this.doactionService.doAction(
-                {
-                    ...form,
-                    ACTION: ACTION,
-                    EMPNO: EMPNO,
-                    REMARK: REMARK,
-                },
-                ip,
-            );
+            if (ACTION != 'save') {
+                const resact = await this.doactionService.doAction(
+                    {
+                        ...form,
+                        ACTION: ACTION,
+                        EMPNO: EMPNO,
+                        REMARK: REMARK,
+                    },
+                    ip,
+                );
+            }
+
             let sql = '';
             let params = [
                 dto.NFRMNO,
@@ -99,6 +103,11 @@ export class IeTsApproveService {
                 }
             }
             const cst = await this.formService.getFormStatus({ ...form });
+            if (cst == '2') {
+                const ietsform = await this.repotsf.getData({ ...form });
+                if (ietsform?.LISTS && ietsform.LISTS.length > 0) {
+                }
+            }
 
             return {
                 status: true,

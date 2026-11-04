@@ -305,17 +305,16 @@ export class PurPraCreateService {
         const priceComparison = await this.purCpcService.getForm(priceComparisonNo);
         if (priceComparison.status) {
             const data = priceComparison.data;
-            outerLoop: for (const item of data) {
-                if (item.NTOTAL_PRES >= 1000000 || item.NTOTAL_NEW >= 1000000) {
+            if (data.NTOTAL_PRES >= 1000000 || data.NTOTAL_NEW >= 1000000) {
+                insertFlow = true;
+                await this.setFlow({ hasDim, insertFlow, form });
+                return;
+            }
+
+            for (const detail of data.DETAILS) {
+                if (detail.NPRES_AMOUNT >= 10000 || detail.NNEW_AMOUNT >= 10000) {
                     insertFlow = true;
                     break;
-                }
-
-                for (const detail of item.DETAILS) {
-                    if (detail.NPRES_AMOUNT >= 10000 || detail.NNEW_AMOUNT >= 10000) {
-                        insertFlow = true;
-                        break outerLoop;
-                    }
                 }
             }
             await this.setFlow({ hasDim, insertFlow, form });

@@ -159,7 +159,7 @@ export class PurCpcService extends CreatePurCpcService {
         try {
             const pk = this.crackPrimaryKey(form);
             const res = await this.repo.getForm(pk);
-            if (res.length == 0) {
+            if (!res) {
                 return {
                     status: false,
                     message: 'No records found',
@@ -167,7 +167,7 @@ export class PurCpcService extends CreatePurCpcService {
             }
             return {
                 status: true,
-                message: `found ${res.length} records`,
+                message: `found 1 record`,
                 data: res,
             };
         } catch (error) {

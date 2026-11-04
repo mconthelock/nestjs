@@ -82,6 +82,8 @@ import { DtiModule } from './dti/dti.module';
         CountriesModule,
         TakeoutModule,
         DtiModule,
+        ,
+        TakeoutModule,
     ],
     providers: [
         HttpLoggingInterceptor,

@@ -117,18 +117,46 @@ export class IeTsApproveService {
                         await this.formmstService.getFormMasterByVaname(
                             'IE-PTS',
                         );
-                    const grptslist = ietsform.LISTS.reduce((acc, item) => {
-                        const sempNo = item.PICMST?.SEMPNO;
-                        const baseDwgNo = item.DWGNO.split(' ')[0];
-                        if (!acc[sempNo]) {
-                            acc[sempNo] = {};
+                    const exactDwgGroups = {};
+                    ietsform.LISTS.forEach((item) => {
+                        const exactDwg = item.DWGNO;
+                        if (!exactDwgGroups[exactDwg])
+                            exactDwgGroups[exactDwg] = [];
+                        exactDwgGroups[exactDwg].push(item);
+                    });
+                    const grptslist = {};
+                    for (const exactDwg in exactDwgGroups) {
+                        const processes = exactDwgGroups[exactDwg];
+                        const hasChange = processes.some(
+                            (p) => p.CUR_TP !== p.IE_TP || p.CUR_TC !== p.IE_TC,
+                        );
+                        if (hasChange) {
+                            processes.forEach((p) => {
+                                const sempNo = p.PICMST?.SEMPNO;
+                                const dwgPrefix = p.DWGNO.split(' ')[0];
+
+                                if (!grptslist[sempNo]) grptslist[sempNo] = {};
+                                if (!grptslist[sempNo][dwgPrefix])
+                                    grptslist[sempNo][dwgPrefix] = [];
+                                grptslist[sempNo][dwgPrefix].push(p);
+                            });
                         }
-                        if (!acc[sempNo][baseDwgNo]) {
-                            acc[sempNo][baseDwgNo] = [];
-                        }
-                        acc[sempNo][baseDwgNo].push(item);
-                        return acc;
-                    }, {});
+                    }
+                    // console.log(JSON.stringify(grptslist, null, 2));
+                    // return false;
+
+                    // const grptslist = ietsform.LISTS.reduce((acc, item) => {
+                    //     const sempNo = item.PICMST?.SEMPNO;
+                    //     const baseDwgNo = item.DWGNO.split(' ')[0];
+                    //     if (!acc[sempNo]) {
+                    //         acc[sempNo] = {};
+                    //     }
+                    //     if (!acc[sempNo][baseDwgNo]) {
+                    //         acc[sempNo][baseDwgNo] = [];
+                    //     }
+                    //     acc[sempNo][baseDwgNo].push(item);
+                    //     return acc;
+                    // }, {});
                     const ptsformdata = [];
                     for (const sempNo in grptslist) {
                         const dwgGroups = grptslist[sempNo];
@@ -158,16 +186,17 @@ export class IeTsApproveService {
                             });
                         }
                     }
-                    console.log('>>>data = ', ptsformdata);
+                    // console.log(JSON.stringify(ptsformdata, null, 2));
                     if (ptsformdata.length > 0) {
-                        console.log('>>>before ptsformdata = ', ptsformdata);
-                        console.log(JSON.stringify(ptsformdata, null, 2));
+                        // console.log('>>>before ptsformdata = ', ptsformdata);
+                        // console.log(JSON.stringify(ptsformdata, null, 2));
+                        // return false;
                         const res = await this.ieptsService.autoInsert(
                             ptsformdata,
                             ip,
                         );
-                        console.log('>>>after autoInsert ptsformdata = ');
-                        console.log(res);
+                        // console.log('>>>after autoInsert ptsformdata = ');
+                        // console.log(res);
                     }
                 }
             }

@@ -42,7 +42,7 @@ export class PurCpcRepository extends BaseRepository {
     }
 
     getForm(data: pkForm) {
-        return this.getRepository(PURCPC_FORM).find({
+        return this.getRepository(PURCPC_FORM).findOne({
             where: data,
             relations: ['DETAILS'],
         });

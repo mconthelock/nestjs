@@ -11,19 +11,16 @@ import { WHN_PRODUCTION } from 'src/common/Entities/innovat/views/WHN_PRODUCTION
 import { WHN_AUTOPLAN } from 'src/common/Entities/innovat/views/WHN_AUTOPLAN.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [
-                WHN_PRODUCTION_PLAN,
-                WHN_PROCESS,
-                WHN_DRUM_STOCK,
-                WHN_REASON,
-                WHN_PRODUCTION,
-                WHN_AUTOPLAN,
-            ],
-            'innovatConnection',
-        ),
-    ],
+    // imports: [
+    //     TypeOrmModule.forFeature([
+    //         WHN_PRODUCTION_PLAN,
+    //         WHN_PROCESS,
+    //         WHN_DRUM_STOCK,
+    //         WHN_REASON,
+    //         WHN_PRODUCTION,
+    //         WHN_AUTOPLAN,
+    //     ], 'mitsuConnection'),
+    // ],
     controllers: [WireHarnessCuttingController],
     providers: [WireHarnessCuttingService, WireHarnessCuttingRepository],
 })

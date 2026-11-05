@@ -13,6 +13,8 @@ export class GPTPH_AREA_RECORD {
     NRUNNO: number;
     @PrimaryColumn()
     AREA_ID: number;
+    @Column({ type: 'varchar2', length: 1, nullable: true })
+    AREA_APPROVED: string | null;
 
     @ManyToOne(() => GPTPH_REQ_HEADER)
     @JoinColumn([

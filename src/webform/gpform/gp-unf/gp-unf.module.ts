@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GpUnfRepository } from './gp-unf.repository';
 
 import { GpUnfService } from './gp-unf.service';
 import { GpUnfController } from './gp-unf.controller';
@@ -15,6 +16,6 @@ import { GPUNF_DETAIL } from 'src/common/Entities/webform/table/GPUNF_DETAIL.ent
         ),
     ],
     controllers: [GpUnfController],
-    providers: [GpUnfService],
+    providers: [GpUnfService, GpUnfRepository],
 })
 export class GpUnfModule {}

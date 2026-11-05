@@ -20,6 +20,33 @@ cp \\amecnas\amecweb\file\orcle\instantclient_23_0 C:/oracle/instantclient_23_0
 npm run start:dev
 ```
 
+## GP-TPH area approvals
+
+Area decisions use `GPTPH_AREA_RECORD.AREA_APPROVED`: `1` for approved, `0`
+for no approval recorded so far, and `NULL` for no recorded decision. A `0`
+is not final while another owner of that area is still pending. An area is
+approved if any assigned owner approves it; the request is rejected if every
+owner approves no areas. For older requests without area decisions, a completed
+owner approval is treated as approval of all areas currently assigned to that
+owner.
+
+For databases containing the previous `Y`/`N` values, run
+[`sql/GPTPH_AREA_APPROVED_01.sql`](sql/GPTPH_AREA_APPROVED_01.sql) after
+reviewing the target environment. The API can read the previous values during
+the transition but writes only `1` and `0`.
+
+When an Area Owner has a ready approval step, the form displays only that
+owner's assigned areas. The owner must explicitly select Allow or Not Allow for
+each displayed area before submitting an approval; neither choice is
+preselected.
+
+Owners are resolved from the current area assignment and ORGPOS; changes to
+those assignments after a request is created may require administrator
+intervention. The existing workflow identifies the actor using the supplied
+employee number; it does not authenticate that identity. Area changes on an
+existing request are accepted only before owner decisions and when they
+preserve the assigned owners and routing level.
+
 # Prect Updated
 
 ## GB-RB

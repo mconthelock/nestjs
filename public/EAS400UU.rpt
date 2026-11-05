@@ -1,0 +1,98 @@
+
+Opened new report file at 2026-10-11 00:02:00.
+
+
+***********************************************************************
+**                     Run Time Messages                             **
+***********************************************************************
+
+
+***********************************************************************
+*                   ** Run Time Statistics **                         *
+***********************************************************************
+
+
+Report at 2026-10-12 00:00:00 (activity since 2026-10-11 00:00:00)
+
+Output to ./dirdat/uu:
+
+No records extracted.
+
+
+***********************************************************************
+**                     Run Time Warnings                             **
+***********************************************************************
+
+              340990 records processed as of 2026-10-12 08:39:19 (rate 0,delta 0)
+              367068 records processed as of 2026-10-12 09:18:59 (rate 0,delta 10)
+              379003 records processed as of 2026-10-12 11:47:35 (rate 0,delta 1)
+              379035 records processed as of 2026-10-12 13:09:18 (rate 0,delta 0)
+              379429 records processed as of 2026-10-12 14:36:10 (rate 0,delta 0)
+              380327 records processed as of 2026-10-12 15:38:29 (rate 0,delta 0)
+
+***********************************************************************
+*                   ** Run Time Statistics **                         *
+***********************************************************************
+
+
+Report at 2026-10-13 00:00:00 (activity since 2026-10-12 00:00:00)
+
+Output to ./dirdat/uu:
+
+From Table RTNLIBF.PIDVPS:
+       #                   inserts:     25526
+       #                   updates:         0
+       #                   deletes:     12961
+       #                  discards:         0
+From Table DATALIBI.S060KP:
+       #                   inserts:       898
+       #                   updates:         0
+       #                   deletes:         0
+       #                  discards:         0
+
+
+***********************************************************************
+**                     Run Time Warnings                             **
+***********************************************************************
+
+              380375 records processed as of 2026-10-13 08:33:22 (rate 0,delta 0)
+              380621 records processed as of 2026-10-13 09:49:03 (rate 0,delta 0)
+              380730 records processed as of 2026-10-13 10:23:01 (rate 0,delta 0)
+              394484 records processed as of 2026-10-13 11:24:25 (rate 0,delta 3)
+              394575 records processed as of 2026-10-13 12:53:43 (rate 0,delta 0)
+              394651 records processed as of 2026-10-13 13:58:36 (rate 0,delta 0)
+              394668 records processed as of 2026-10-13 14:35:45 (rate 0,delta 0)
+              395627 records processed as of 2026-10-13 16:10:16 (rate 0,delta 0)
+              395887 records processed as of 2026-10-13 16:43:29 (rate 0,delta 0)
+
+***********************************************************************
+*                   ** Run Time Statistics **                         *
+***********************************************************************
+
+
+Report at 2026-10-14 00:00:00 (activity since 2026-10-13 00:00:00)
+
+Output to ./dirdat/uu:
+
+From Table RTNLIBF.PIDVPS:
+       #                   inserts:     14171
+       #                   updates:         0
+       #                   deletes:       762
+       #                  discards:         0
+From Table DATALIBI.S060KP:
+       #                   inserts:       871
+       #                   updates:         0
+       #                   deletes:         0
+       #                  discards:         0
+
+
+***********************************************************************
+**                     Run Time Warnings                             **
+***********************************************************************
+
+              396179 records processed as of 2026-10-14 08:26:37 (rate 0,delta 0)
+              396395 records processed as of 2026-10-14 09:33:09 (rate 0,delta 0)
+              396546 records processed as of 2026-10-14 10:10:33 (rate 0,delta 0)
+              396555 records processed as of 2026-10-14 10:54:50 (rate 0,delta 0)
+              396582 records processed as of 2026-10-14 11:46:40 (rate 0,delta 0)
+              396634 records processed as of 2026-10-14 14:34:29 (rate 0,delta 0)

@@ -18,4 +18,12 @@ export class K850mpRepository extends BaseRepository {
         // return this.getRepository(F001KP).find();
         return this.manager.find(K850MP);
     }
+
+    findByPlannerCode(plannerCode: string) {
+        return this.manager.find(K850MP, {
+            where: {
+                K85M02: plannerCode,
+            },
+        });
+    }
 }

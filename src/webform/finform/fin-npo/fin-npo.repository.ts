@@ -370,10 +370,23 @@ export class FinnpoRepository extends BaseRepository {
         formDateTo?: string;
         invoiceDateFrom?: string;
         invoiceDateTo?: string;
+        approveDateFrom?: string;
+        approveDateTo?: string;
         expenseCode?: number;
         vendorCode?: string;
         costCenter?: string;
     }) {
+        // Only completed forms have a final approval date; ignore rejected/skipped actions.
+        const approveDate = `(SELECT MAX(APV.DAPVDATE)
+            FROM WEBFORM.FLOW APV
+            WHERE APV.NFRMNO = HEAD.NFRMNO
+              AND APV.VORGNO = HEAD.VORGNO
+              AND APV.CYEAR = HEAD.CYEAR
+              AND APV.CYEAR2 = HEAD.CYEAR2
+              AND APV.NRUNNO = HEAD.NRUNNO
+              AND APV.CAPVSTNO = '1'
+              AND APV.CSTEPST = '5'
+              AND FORM.CST = '2')`;
         const query = this.getRepository(FINNPOFORM)
             .createQueryBuilder('HEAD')
             .innerJoin(
@@ -408,6 +421,7 @@ export class FinnpoRepository extends BaseRepository {
             .addSelect('HEAD.CYEAR2', 'CYEAR2')
             .addSelect('HEAD.NRUNNO', 'NRUNNO')
             .addSelect("TO_CHAR(FORM.DREQDATE, 'YYYY-MM-DD')", 'FORM_DATE')
+            .addSelect(`TO_CHAR(${approveDate}, 'YYYY-MM-DD')`, 'APPROVE_DATE')
             .addSelect('FORM.VREQNO', 'REQUEST_BY')
             .addSelect('FORM.CST', 'STATUS')
             .addSelect('INVOICE.REFERENCE', 'REMARK')
@@ -454,6 +468,18 @@ export class FinnpoRepository extends BaseRepository {
             query.andWhere(
                 "TRUNC(INVOICE.INVOICE_DATE) <= TO_DATE(:invoiceDateTo, 'YYYY-MM-DD')",
                 { invoiceDateTo: filters.invoiceDateTo },
+            );
+        }
+        if (filters.approveDateFrom) {
+            query.andWhere(
+                `TRUNC(${approveDate}) >= TO_DATE(:approveDateFrom, 'YYYY-MM-DD')`,
+                { approveDateFrom: filters.approveDateFrom },
+            );
+        }
+        if (filters.approveDateTo) {
+            query.andWhere(
+                `TRUNC(${approveDate}) <= TO_DATE(:approveDateTo, 'YYYY-MM-DD')`,
+                { approveDateTo: filters.approveDateTo },
             );
         }
         if (filters.expenseCode !== undefined) {

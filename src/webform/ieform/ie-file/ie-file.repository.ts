@@ -24,4 +24,8 @@ export class IeFileRepository extends BaseRepository {
     async create(dto: CreateHandleFileFormDto) {
         return await this.getRepository(IE_FILE).save(dto);
     }
+
+    async deleteById(id: number) {
+        return this.getRepository(IE_FILE).delete({ FILE_ID: id });
+    }
 }

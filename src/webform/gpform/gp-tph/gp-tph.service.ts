@@ -17,7 +17,9 @@ import { RepService } from 'src/webform/rep/rep.service';
 import { UsersService } from 'src/amec/users/users.service';
 import { DeleteFlowStepService } from 'src/webform/flow/delete-flow-step.service';
 import { DoactionFlowService } from 'src/webform/flow/doaction.service';
-import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+import { DoactionGpTphDto } from './dto/doaction-gp-tph.dto';
+import { GPTPH_AREA_RECORD } from 'src/common/Entities/webform/table/GPTPH_AREA_RECORD.entity';
+import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 import { now } from 'src/common/utils/dayjs.utils';
 
 @Injectable()
@@ -34,32 +36,151 @@ export class GpTphService {
         private readonly doactionFlowService: DoactionFlowService,
     ) { }
 
-    findAllAreas() {
-        return this.repo.findAllAreas();
+    async findAllAreas() {
+        const areas = await this.repo.findAllAreas();
+        const ownerAvailability = new Map<string, boolean>();
+        const result = [];
+        for (const area of areas) {
+            const positionCode = area.AREA_OWNER_POSCODE?.trim();
+            const organizationCode = area.AREA_OWNER?.trim();
+            const ownerKey = `${positionCode}+${organizationCode}`;
+            if (!ownerAvailability.has(ownerKey)) {
+                const employees = positionCode && organizationCode
+                    ? await this.orgposService.getOrgPos({
+                        VPOSNO: positionCode,
+                        VORGNO: organizationCode,
+                    })
+                    : [];
+                ownerAvailability.set(ownerKey, employees.length > 0);
+            }
+            result.push({
+                ...area,
+                HAS_ACTIVE_AREA_OWNER: ownerAvailability.get(ownerKey),
+            });
+        }
+        return result;
     }
 
-    async doAction(dto: doactionFlowDto, ip: string) {
+    async doAction(dto: DoactionGpTphDto, ip: string) {
         const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO } = dto;
         const form = { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO };
-        if (!(await this.repo.findOne(form))) {
+        if (!(await this.repo.lockRequest(form))) {
             throw new NotFoundException('GP-TPH request not found');
         }
-        if (dto.ACTION === 'approve') {
-            const readySteps = await this.doactionFlowService.getFlow({
-                ...form, CSTEPST: '3',
-            });
-            const flow = readySteps.find((step) =>
-                step.VAPVNO?.trim() === dto.EMPNO.trim() ||
-                step.VREPNO?.trim() === dto.EMPNO.trim(),
-            );
+        const readySteps = await this.doactionFlowService.getEmpFlowStepReady(dto);
+        const flow = readySteps[0];
+        const isAreaOwnerStep = flow?.CEXTDATA?.trim() === '01';
+        let action = dto.ACTION;
+        const ownersBeforeReturn = action.startsWith('return')
+            ? (await this.doactionFlowService.getFlow({ ...form, CEXTDATA: '01' }))
+                .filter((owner) => owner.CAPVSTNO !== '0')
+                .map((owner) => JSON.stringify([owner.CSTEPNO, owner.VAPVNO, owner.VREPNO]))
+            : [];
+        if (isAreaOwnerStep && (action === 'approve' || action === 'reject')) {
+            if (action === 'approve' && !Array.isArray(dto.AREA_IDS)) {
+                throw new BadRequestException('AREA_IDS is required for Area Owner approval');
+            }
+            const [areaRecords, owners] = await Promise.all([
+                this.repo.findAreaRecords(form),
+                this.doactionFlowService.getFlow({ ...form, CSTEPNO: flow.CSTEPNO }),
+            ]);
+            const areas = await this.resolveAreaOwners(areaRecords, owners);
+            if (!areas.length || areas.some((area) => !area.owners.length) ||
+                owners.some((owner) => !areas.some((area) => area.owners.includes(owner)))) {
+                throw new BadRequestException('Area Owner assignments are incomplete. Please contact the administrator.');
+            }
+            const ownerCodes = new Set(readySteps
+                .filter((step) => step.CSTEPNO === flow.CSTEPNO && step.CEXTDATA?.trim() === '01')
+                .map((step) => step.VAPVNO.trim()));
+            const ownAreas = areas.filter((area) => area.owners.some((owner) => ownerCodes.has(owner.VAPVNO.trim())));
+            if (!ownAreas.length) {
+                throw new BadRequestException('No assigned areas found for this Area Owner');
+            }
+            const ownedIds = new Set(ownAreas.map(({ record }) => Number(record.AREA_ID)));
+            const selectedIds = new Set(action === 'approve' ? dto.AREA_IDS : []);
+            if ([...selectedIds].some((id) => !ownedIds.has(id))) {
+                throw new BadRequestException('You can only approve your own assigned areas');
+            }
+            for (const area of ownAreas) {
+                const approved = selectedIds.has(Number(area.record.AREA_ID)) || this.isAreaApproved(area)
+                    ? '1' : '0';
+                const update = await this.repo.updateAreaApproval(form, Number(area.record.AREA_ID), approved);
+                if (update.affected !== 1) throw new Error('Unable to update area approval');
+            }
+            if (selectedIds.size === 0) action = 'reject';
+        }
+        if (action === 'approve') {
             if (!flow) throw new BadRequestException('Ready step not found!');
             await this.repo.approveGpTphConsecutiveSteps(form, flow, {
                 DAPVDATE: now(), CAPVTIME: now('HH:mm:ss'),
                 VREMARK: dto.REMARK ?? '', VREMOTE: ip, VREALAPV: dto.EMPNO,
             });
         }
-        return this.doactionFlowService.doAction(dto, ip);
+        const result = await this.doactionFlowService.doAction({ ...dto, ACTION: action }, ip, {
+            holdUntilStepDone: action === 'reject' && isAreaOwnerStep,
+        });
+        if (!result.status) throw new BadRequestException(result.message);
+        if (action === 'reject') {
+            if (!isAreaOwnerStep) {
+                await this.repo.finalizeRejectedRequest(form);
+            } else {
+                // Reject the form only when every Area Owner has rejected.
+                const owners = await this.doactionFlowService.getFlow({
+                    ...form, CSTEPNO: flow.CSTEPNO,
+                });
+                if (owners.length && owners.every((owner) => owner.CAPVSTNO === '2')) {
+                    await this.repo.finalizeRejectedRequest(form);
+                } else if (owners.some((owner) => owner.CAPVSTNO === '1') &&
+                    owners.every((owner) => owner.CAPVSTNO !== '0')) {
+                    await this.repo.restoreStatusAfterPartialAreaOwnerReject(form);
+                    await this.doactionFlowService.sendMailToApprover(form);
+                }
+            }
+        } else if (action === 'approve') {
+            await this.repo.restoreStatusAfterPartialAreaOwnerReject(form);
+        } else if (action.startsWith('return')) {
+            const owners = await this.doactionFlowService.getFlow({ ...form, CEXTDATA: '01' });
+            const reset = owners.some((owner) => owner.CAPVSTNO === '0' &&
+                ownersBeforeReturn.includes(JSON.stringify([owner.CSTEPNO, owner.VAPVNO, owner.VREPNO])));
+            if (reset) {
+                if (owners.some((owner) => owner.CAPVSTNO !== '0')) {
+                    throw new BadRequestException('Cannot partially reset Area Owner decisions. Return to the requester instead.');
+                }
+                for (const record of await this.repo.findAreaRecords(form)) {
+                    const update = await this.repo.updateAreaApproval(form, Number(record.AREA_ID), null);
+                    if (update.affected !== 1) throw new Error('Unable to reset area approval');
+                }
+            }
+        }
+        return result;
     }
+
+    private async resolveAreaOwners(records: GPTPH_AREA_RECORD[], owners: FLOW[]) {
+        const assignments = new Map<string, Promise<string[]>>();
+        return Promise.all(records.map(async (record) => {
+            if (record.AREA_APPROVED != null && !['1', '0', 'Y', 'N'].includes(record.AREA_APPROVED)) {
+                throw new BadRequestException(`Invalid area approval value for area ${record.AREA_ID}`);
+            }
+            const position = record.area?.AREA_OWNER_POSCODE?.trim();
+            const organization = record.area?.AREA_OWNER?.trim();
+            if (!position || !organization) return { record, owners: [] };
+            const key = `${position}+${organization}`;
+            if (!assignments.has(key)) {
+                assignments.set(key, this.orgposService.getOrgPos({
+                    VPOSNO: position, VORGNO: organization,
+                }).then((employees) => employees.map((employee) => employee.VEMPNO.trim())));
+            }
+            const employees = new Set(await assignments.get(key));
+            return { record, owners: owners.filter((owner) => employees.has(owner.VAPVNO.trim())) };
+        }));
+    }
+
+    private isAreaApproved(area: { record: GPTPH_AREA_RECORD; owners: FLOW[] }) {
+        return area.record.AREA_APPROVED === '1' || area.record.AREA_APPROVED === 'Y' ||
+            (area.record.AREA_APPROVED == null &&
+                area.owners.some((owner) => owner.CAPVSTNO === '1'));
+    }
+
 
     findAllLocations() {
         return this.repo.findAllLocations();
@@ -252,6 +373,7 @@ export class GpTphService {
                     CYEAR2: form.CYEAR2,
                     NRUNNO: form.NRUNNO,
                     AREA_ID: id,
+                    AREA_APPROVED: null,
                 };
                 const insertedAreaRecord = await this.repo.CreateGpTphArearecord(areaRecordData);
                 insertAreaRecordList.push(insertedAreaRecord);
@@ -326,7 +448,7 @@ export class GpTphService {
     }
 
     async update(form: FormDto, dto: UpdateGpTphDto) {
-        const existing = await this.repo.findOne(form);
+        const existing = await this.repo.lockRequest(form);
         if (!existing) {
             throw new NotFoundException('GP-TPH request was not found');
         }
@@ -340,6 +462,35 @@ export class GpTphService {
         }
         if (!Array.isArray(dto.DETAILS) || !dto.DETAILS.length) {
             throw new BadRequestException('DETAILS must contain at least one applicant');
+        }
+        const existingAreas = await this.repo.findAreaRecords(form);
+        const existingIds = new Set(existingAreas.map((record) => Number(record.AREA_ID)));
+        const areasChanged = existingIds.size !== new Set(areaIds).size ||
+            areaIds.some((id) => !existingIds.has(id));
+        if (areasChanged) {
+            const [ownerSteps, newAreas, approvers] = await Promise.all([
+                this.doactionFlowService.getFlow({ ...form, CEXTDATA: '01' }),
+                this.repo.findAreasByIds(areaIds),
+                this.getAreaOwnerApprovers(areaIds, {
+                    NNO: form.NFRMNO, VORGNO: form.VORGNO, CYEAR: form.CYEAR,
+                }),
+            ]);
+            const previousOwners = new Set(ownerSteps.map((step) => step.VAPVNO.trim()));
+            const nextOwners = new Set(approvers.map((approver) => approver.VAPVNO.trim()));
+            const routingBand = (level: number) => level <= 2 ? 0 : level <= 4 ? 1 : 2;
+            const oldLevels = existingAreas.map((record) => Number(record.area?.AREA_LEVEL));
+            const newLevels = newAreas.map((area) => Number(area.AREA_LEVEL));
+            if (!existingAreas.length || existingAreas.some((area) => area.AREA_APPROVED != null) ||
+                ownerSteps.some((step) => step.CAPVSTNO !== '0') ||
+                previousOwners.size !== nextOwners.size ||
+                [...previousOwners].some((owner) => !nextOwners.has(owner)) ||
+                oldLevels.some((level) => !Number.isFinite(level)) ||
+                newLevels.some((level) => !Number.isFinite(level)) ||
+                routingBand(Math.max(...oldLevels)) !== routingBand(Math.max(...newLevels))) {
+                throw new BadRequestException(
+                    'Changing areas would alter an existing approval flow. Please create a new request.',
+                );
+            }
         }
 
         const header = {
@@ -371,12 +522,12 @@ export class GpTphService {
             REQBY: dto.REQBY,
             INPUTBY: dto.INPUTBY,
             REMARK: dto.REMARK,
-        });
+        }, areasChanged);
         return { status: true, message: 'GP-TPH Form updated successfully' };
     }
 
     async delete(form: FormDto) {
-        const existing = await this.repo.findOne(form);
+        const existing = await this.repo.lockRequest(form);
         if (!existing) {
             throw new NotFoundException('GP-TPH request was not found');
         }
@@ -449,31 +600,41 @@ export class GpTphService {
         data.AREA_OWNER_POSCODE = posCode;
         return data;
     }
-    async findOne(dto: FormDto) {
+    async findOne(dto: FormDto, empno?: string) {
         const request = await this.repo.findOne(dto);
         if (!request) {
             return null;
         }
-        const [details, areaRecords] = await Promise.all([
+        const [details, areaRecords, owners, readySteps] = await Promise.all([
             this.repo.findList(dto),
             this.repo.findAreaRecords(dto),
+            this.doactionFlowService.getFlow({ ...dto, CEXTDATA: '01' }),
+            empno ? this.doactionFlowService.getEmpFlowStepReady({ ...dto, EMPNO: empno }) : Promise.resolve([]),
         ]);
-        const ownersByArea = await Promise.all(
-            [...areaRecords]
-                .sort((a, b) => Number(a.AREA_ID) - Number(b.AREA_ID))
-                .map((record) => record.area?.AREA_OWNER_POSCODE && record.area?.AREA_OWNER
-                    ? this.orgposService.getOrgPos({
-                        VPOSNO: record.area.AREA_OWNER_POSCODE.trim(),
-                        VORGNO: record.area.AREA_OWNER.trim(),
-                    })
-                    : []),
-        );
+        const areas = await this.resolveAreaOwners(areaRecords, owners);
         const areaOwnerOrder = [...new Set(
-            ownersByArea.flatMap((employees) => employees.map((employee) => employee.VEMPNO.trim())),
+            [...areas].sort((a, b) => Number(a.record.AREA_ID) - Number(b.record.AREA_ID))
+                .flatMap((area) => area.owners.map((owner) => owner.VAPVNO.trim())),
         )];
+        const ready = readySteps[0];
+        const ownerCodes = new Set(ready?.CEXTDATA?.trim() === '01'
+            ? readySteps.filter((step) => step.CSTEPNO === ready.CSTEPNO).map((step) => step.VAPVNO.trim())
+            : []);
+        const areaRecordsWithApproval = areas.map((area) => {
+            const status = this.isAreaApproved(area)
+                ? 'approved'
+                : area.owners.length && area.owners.every((owner) => owner.CAPVSTNO !== '0')
+                    ? 'rejected' : 'pending';
+            return {
+                ...area.record,
+                APPROVAL_STATUS: status,
+                CAN_APPROVE: area.owners.some((owner) => ownerCodes.has(owner.VAPVNO.trim())),
+            };
+        });
         return {
-            ...request, DETAILS: details, AREA_RECORDS: areaRecords,
+            ...request, DETAILS: details, AREA_RECORDS: areaRecordsWithApproval,
             AREA_OWNER_ORDER: areaOwnerOrder,
+            IS_AREA_OWNER_ACTION: ownerCodes.size > 0,
         };
     }
     async findList(dto: FormDto) {

@@ -21,6 +21,7 @@ import { cloneRows } from 'src/common/helpers/file-excel.helper';
 import { DatabaseService } from '../shared/database.service';
 const fontkit = require('@pdf-lib/fontkit');
 import * as oracledb from 'oracledb';
+import { MailService } from 'src/common/services/mail/mail.service';
 
 @Injectable()
 export class PromoteService {
@@ -29,8 +30,16 @@ export class PromoteService {
     protected fontstyle: any;
     protected fontsize: number;
     protected output_path: string;
+    protected libs = [
+        { id: 'MP', path: 'Non-Manager' },
+        { id: 'MG', path: 'Manager' },
+        { id: 'JP', path: 'Japanese' },
+    ];
 
-    constructor(private dbService: DatabaseService) {}
+    constructor(
+        private dbService: DatabaseService,
+        private readonly mailService: MailService,
+    ) {}
 
     async findAll(credentials: any, body: any) {
         let hrAdminDataSource: DataSource;
@@ -111,22 +120,17 @@ export class PromoteService {
     }
 
     async createFile(data: any) {
-        const libs = [
-            { id: 'MP', path: 'Non-Manager' },
-            { id: 'MG', path: 'Manager' },
-            { id: 'JP', path: 'Japanese' },
-        ];
         try {
             const templatePath = path.join(
                 `${process.env.TAX_FILE_PATH}/Template/`,
                 'Salary Adjustment Letter.pdf',
             );
-            let dir = libs.find((e) => e.id == data.ASETYP).path;
+            let dir = this.libs.find((e) => e.id == data.ASETYP).path;
             let effdate = dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
                 .locale('en')
                 .format('YYYY MMMM');
             if (!dir) dir = 'Non-Manager';
-            this.output_path = `${process.env.TAX_FILE_PATH}/${dir}/Salary Adjustment Letter (หนังสือแจ้งปรับ)/${effdate}/`;
+            this.output_path = `${process.env.TAX_FILE_PATH}${dir}/Salary Adjustment Letter (หนังสือแจ้งปรับ)/${effdate}/`;
             const fontPath = path.join(
                 process.cwd(),
                 'public/fonts/THSarabun.ttf',
@@ -148,7 +152,6 @@ export class PromoteService {
             await fs.mkdir(this.output_path, { recursive: true });
             const output = path.join(this.output_path, `_${data.ASECOD}.pdf`);
             await fs.writeFile(output, pdfBytes);
-
             // ป้องกันไฟล์ด้วยรหัสผ่าน
             await protectedFile({
                 output_path: this.output_path,
@@ -163,21 +166,12 @@ export class PromoteService {
             await fs.unlink(path.join(this.output_path, `_${data.ASECOD}.pdf`));
             return {
                 dir,
-                empno: data.ASECOD,
-                mail: data.MEMEML,
-                th_name: data.SEMPPRT + data.STNAME,
-                th_period: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
-                    .locale('th')
-                    .format('MMMM YYYY'),
-                en_name: data.SEMPPRE + data.SNAME,
-                en_period: dayjs(data.ASEFDT.toString(), 'YYYYMMDD')
-                    .locale('en')
-                    .format('MMMM YYYY'),
-                file: path.join(this.output_path, `${data.ASECOD}.pdf`),
+                folder: this.output_path,
+                filename: `${data.ASECOD}.pdf`,
             };
         } catch (error) {
             console.error('Error filling PDF template:', error);
-            throw new Error('Failed to fill PDF template');
+            throw new Error(`Failed to fill PDF template ${error}`);
         }
     }
 
@@ -292,5 +286,41 @@ export class PromoteService {
                 'Invalid template: Missing "Data" sheet.',
             );
         }
+    }
+
+    async sendMail(body: any) {
+        let dir = this.libs.find((e) => e.id == body.ASETYP).path;
+        let effdate = dayjs(body.ASEFDT.toString(), 'YYYYMMDD')
+            .locale('en')
+            .format('YYYY MMMM');
+        if (!dir) dir = 'Non-Manager';
+        const output_path = `${process.env.TAX_FILE_PATH}${dir}/Salary Adjustment Letter (หนังสือแจ้งปรับ)/${effdate}/`;
+        const buffer = await fs.readFile(
+            path.join(output_path, `${body.SEMPNO}.pdf`),
+        );
+        const isJapanese = body.SEMPNO.substr(0, 1) == 'J' ? true : false;
+        const thperiod =
+            body.ASCYCL == 'O'
+                ? `ตุลาคม ${body.ASYEAR}`
+                : `เมษายน ${body.ASYEAR}`;
+        const enperiod =
+            body.ASCYCL == 'O'
+                ? `October ${body.ASYEAR}`
+                : `April ${body.ASYEAR}`;
+        await this.mailService.sendMail({
+            template: isJapanese
+                ? 'gpreport/promote/en'
+                : 'gpreport/promote/th',
+            from: `ส่วนทรัพยากรมนุษย์ <AMECMS@MitsubishiElevatorAsia.co.th>`,
+            // to: `chalorms@MitsubishiElevatorAsia.co.th`,
+            to: `s.chalormsak@gmail.com`,
+            subject: `[SECRET] AMEC Electronic Letter of Annual Salary Increment / Position Promotion / Job Level Period ${!isJapanese ? thperiod : enperiod}`,
+            context: {
+                name: !isJapanese ? body.STNAME : body.SNAME,
+                period: !isJapanese ? thperiod : enperiod,
+            },
+            attachments: [{ filename: `${body.SEMPNO}.pdf`, content: buffer }],
+        });
+        return true;
     }
 }

@@ -24,4 +24,8 @@ export class MarFileRepository extends BaseRepository {
     async create(dto: CreateHandleFileFormDto) {
         return await this.getRepository(MAR_FILE).save(dto);
     }
+
+    async deleteById(id: number) {
+        return this.getRepository(MAR_FILE).delete({ FILE_ID: id });
+    }
 }

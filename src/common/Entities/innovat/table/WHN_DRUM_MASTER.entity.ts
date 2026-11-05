@@ -24,5 +24,5 @@ export class WHN_DRUM_MASTER {
     MT_USERUPDATE: string;
 
     @Column()
-    MT_CREATEDATE: Date;
+    MT_DATEUPDATE: Date;
 }

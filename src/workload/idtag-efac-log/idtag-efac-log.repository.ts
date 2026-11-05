@@ -6,39 +6,76 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 import { IDTAG_EFAC_LOG } from 'src/common/Entities/workload/table/IDTAG_EFAC_LOG.entity';
 
 @Injectable()
-export class IdtagEfacLogRepository extends BaseRepository {
-  constructor(
-    @InjectDataSource('workloadConnection') ds: DataSource,
+ export class IdtagEfacLogRepository extends BaseRepository {
+    constructor(
+        @InjectDataSource('workloadConnection') ds: DataSource,
     ) {
-    super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
-  }
+        super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
+    }
 
-  findAll() {
-    // ใช้ได้ทั้งหมด
-    // return this.manager.query(`select * from IDTAG_EFAC_LOG`);
-    // return this.getRepository(IDTAG_EFAC_LOG).find();
-    return this.manager.find(IDTAG_EFAC_LOG);
-  }
+    findAll() {
+        // ใช้ได้ทั้งหมด
+        // return this.manager.query(`select * from IDTAG_EFAC_LOG`);
+        // return this.getRepository(IDTAG_EFAC_LOG).find();
+        return this.manager.find(IDTAG_EFAC_LOG);
+    }
 
-  findOne(id: number) {
-    return this.getRepository(IDTAG_EFAC_LOG).findOneBy({ ID: id });
-  }
+    findOne(id: number) {
+        return this.getRepository(IDTAG_EFAC_LOG).findOneBy({ ID: id });
+    }
 
-  async search(dto: FiltersDto) {
-    const qb = this.manager.createQueryBuilder(IDTAG_EFAC_LOG, 'I');
-    this.applyFilters(qb, 'I', dto, [
-      'ID',
-      'CONTROL_NO',
-      'PROCESS_NAME',
-      'MONTH',
-      'YEAR',
-      'RUNNO',
-      'PRINT_DATETIME',
-      'LOT_NO',
-      'PRINT_BY',
-    ]);
-    return qb
-      .orderBy('I.MONTH, I.YEAR, I.RUNNO, I.CONTROL_NO, I.LOT_NO', 'ASC')
-      .getMany();
-  }
+    async search(dto: FiltersDto) {
+        const qb = this.manager.createQueryBuilder(IDTAG_EFAC_LOG, 'I');
+        this.applyFilters(qb, 'I', dto, [
+            'ID',
+            'CONTROL_NO',
+            'PROCESS_NAME',
+            'MONTH',
+            'YEAR',
+            'RUNNO',
+            'PRINT_DATETIME',
+            'LOT_NO',
+            'PRINT_BY',
+        ]);
+
+        return qb.orderBy('I.MONTH, I.YEAR, I.RUNNO, I.CONTROL_NO, I.LOT_NO', 'ASC')
+            .getMany();
+    }
+
+    async getMaxRunno(processName: string, month: number, year: number): Promise<number> {
+        const result = await this.manager
+            .createQueryBuilder(IDTAG_EFAC_LOG, 'I')
+            .select('MAX(I.RUNNO)', 'MAX_RUNNO')
+            .where('SUBSTR(I.PROCESS_NAME, -4) = :processName', {processName: processName.slice(-4)})
+            .andWhere('I.MONTH = :month', { month })
+            .andWhere('I.YEAR = :year', { year })
+            .getRawOne();
+
+        return Number(result?.MAX_RUNNO ?? 0);
+    }
+
+    async create(data: Partial<IDTAG_EFAC_LOG>) {
+        return this.getRepository(IDTAG_EFAC_LOG).insert(data);
+    }
+
+    async getSysdate() {
+        const [row] = await this.manager.query(`
+            SELECT
+                TO_CHAR(SYSDATE, 'MM') MONTH,
+                TO_CHAR(SYSDATE, 'YYYY') YEAR,
+                TO_CHAR(SYSDATE, 'YY') YEAR2
+            FROM DUAL
+        `);
+
+        return row;
+    }
+
+    async findLatestByControlNo(ctrlno: string) {
+        return this.getRepository(IDTAG_EFAC_LOG)
+            .createQueryBuilder('I')
+            .where('I.CONTROL_NO = :ctrlno', { ctrlno })
+            .orderBy('I.PRINT_DATETIME', 'DESC')
+            .addOrderBy('I.RUNNO', 'DESC')
+            .getOne();
+    }
 }

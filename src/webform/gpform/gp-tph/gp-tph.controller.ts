@@ -9,6 +9,7 @@ import {
     UseInterceptors,
     Req,
     ParseIntPipe,
+    Query,
 } from '@nestjs/common';
 import { GpTphService } from './gp-tph.service';
 import { CreateGpTphReqDto } from './dto/create-gp-tph.dto';
@@ -20,7 +21,7 @@ import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper'
 import { CreateDataAreaDto } from './dto/create-data-area.dto';
 import { updateDetailDto } from 'src/spprogram/inquiry-detail/dto/update.dto';
 import { UpdateAreaDto } from './dto/update-data-area.dto';
-import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
+import { DoactionGpTphDto } from './dto/doaction-gp-tph.dto';
 
 @Controller('gpform/gp-tph')
 export class GpTphController {
@@ -28,7 +29,7 @@ export class GpTphController {
 
     @Post('doaction')
     @UseTransaction('webformConnection')
-    doAction(@Body() dto: doactionFlowDto, @Req() req: Request) {
+    doAction(@Body() dto: DoactionGpTphDto, @Req() req: Request) {
         return this.gpTphService.doAction(dto, getClientIP(req));
     }
 
@@ -49,6 +50,7 @@ export class GpTphController {
         @Param('cyear') cyear: string,
         @Param('cyear2') cyear2: string,
         @Param('nrunno') nrunno: number,
+        @Query('empno') empno?: string,
     ) {
         return this.gpTphService.findOne({
             NFRMNO: fno,
@@ -56,7 +58,7 @@ export class GpTphController {
             CYEAR: cyear,
             CYEAR2: cyear2,
             NRUNNO: nrunno,
-        });
+        }, empno);
     }
 
     @Get('/list/:fno/:orgno/:cyear/:cyear2/:nrunno')
@@ -140,4 +142,3 @@ export class GpTphController {
     }
 
 }
-

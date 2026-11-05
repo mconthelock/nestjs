@@ -23,6 +23,10 @@ export class NewsService {
                 NEWS_END: MoreThanOrEqual(today),
                 NEWS_START: LessThanOrEqual(today),
             },
+            relations: ['attachments'],
+            order: {
+                NEWS_ID: 'DESC',
+            },
         });
 
         return Promise.all(

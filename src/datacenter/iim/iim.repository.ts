@@ -23,6 +23,12 @@ export class IimRepository extends BaseRepository {
         });
     }
 
+    findByProd(prod: string | string[]) {
+        return this.getRepository(IIM).findBy({
+            IPROD: Array.isArray(prod) ? In(prod) : prod,
+        });
+    }
+
     // findPlannerCompareSheet(planner: string| string[]) {
     //     return this.getRepository(IIM).find({
     //         select: ['IBUYC', 'IPROD', 'IDRAW', 'IVEND'],

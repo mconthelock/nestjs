@@ -20,10 +20,10 @@ export class InsertAndMoveHandleFileFormDto extends PickType(FormDto, [
     @IsNotEmpty()
     @IsString()
     @IsEnum(
-        ['DD', 'FE', 'FIN', 'GP', 'IE', 'IS', 'MAR', 'MFG', 'PS', 'PUR', 'QA'],
+        ['DD', 'FE', 'FIN', 'GP', 'IE', 'IS', 'MAR', 'MFG', 'PS', 'PUR', 'PRO', 'QA'],
         {
             message:
-                'FORM_TYPE must be one of the following values: DD, FE, FIN, GP, IE, IS, MAR, MFG, PS, PUR, QA',
+                'FORM_TYPE must be one of the following values: DD, FE, FIN, GP, IE, IS, MAR, MFG, PS, PUR, PRO, QA',
         },
     )
     FORM_TYPE: string;

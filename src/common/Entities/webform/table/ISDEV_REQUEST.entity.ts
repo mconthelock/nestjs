@@ -30,7 +30,7 @@ export class ISDEV_REQUEST {
     CYEAR: string;
 
     @PrimaryColumn()
-    CYEAR2: string;
+    CYEAR2: number;
 
     @PrimaryColumn()
     NRUNNO: number;

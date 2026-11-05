@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InsertAndMoveHandleFileFormDto } from './dto/create-handle-file-form.dto';
-import { joinPaths, moveFileFromMulter } from 'src/common/utils/files.utils';
+import {
+    deleteFile,
+    joinPaths,
+    moveFileFromMulter,
+} from 'src/common/utils/files.utils';
 import { FormmstService } from '../formmst/formmst.service';
 import { FormService } from '../form/form.service';
 import { IsFileService } from '../isform/is-file/is-file.service';
@@ -172,38 +176,9 @@ export class HandleFileFormService {
 
     private async handelInsertFileRecord(data: any, formType: string) {
         try {
-            let res: { status: boolean; message: string; data?: any };
-            switch (formType) {
-                case 'FE':
-                    res = await this.feFileService.create(data);
-                    break;
-                case 'FIN':
-                    res = await this.finFileService.create(data);
-                    break;
-                case 'GP':
-                    res = await this.gpFileService.create(data);
-                    break;
-                case 'IE':
-                    res = await this.ieFileService.create(data);
-                    break;
-                case 'IS':
-                    res = await this.isFileService.create(data);
-                    break;
-                case 'MAR':
-                    res = await this.marFileService.create(data);
-                    break;
-                case 'MFG':
-                    res = await this.mfgFileService.create(data);
-                    break;
-                case 'PS':
-                    res = await this.psFileService.create(data);
-                    break;
-                case 'PUR':
-                    res = await this.purFileService.create(data);
-                    break;
-                default:
-                    throw new Error(`Unsupported form type: ${formType}`);
-            }
+            const service = this.setService(formType);
+            const res: { status: boolean; message: string; data?: any } =
+                await service.create(data);
             if (!res.status) {
                 throw new Error(res.message);
             }
@@ -216,11 +191,9 @@ export class HandleFileFormService {
     }
 
     async getFile(dto: SearchHandleFileFormDto) {
-        const { FORM_TYPE, FILE_CODE, ...d} = dto;
-        console.log(dto);
-        
+        const { FORM_TYPE, FILE_CODE, ...d } = dto;
+
         try {
-            let res: any;
             let fileType: number | undefined;
             if (FILE_CODE) {
                 const fileTypeRes =
@@ -237,43 +210,14 @@ export class HandleFileFormService {
             const data = {
                 ...d,
                 FILE_TYPE: fileType, // ส่งค่า NID ของประเภทไฟล์ถ้ามี FILE_CODE และพบข้อมูลในฐานข้อมูล
-            }
-            switch (FORM_TYPE) {
-                case 'FE':
-                    res = await this.feFileService.getFile(data);
-                    break;
-                case 'FIN':
-                    res = await this.finFileService.getFile(data);
-                    break;
-                case 'GP':
-                    res = await this.gpFileService.getFile(data);
-                    break;
-                case 'IE':
-                    res = await this.ieFileService.getFile(data);
-                    break;
-                case 'IS':
-                    res = await this.isFileService.getFile(data);
-                    break;
-                case 'MAR':
-                    res = await this.marFileService.getFile(data);
-                    break;
-                case 'MFG':
-                    res = await this.mfgFileService.getFile(data);
-                    break;
-                case 'PS':
-                    res = await this.psFileService.getFile(data);
-                    break;
-                case 'PUR':
-                    res = await this.purFileService.getFile(data);
-                    break;
-                default:
-                    throw new Error(`Unsupported form type: ${FORM_TYPE}`);
-            }
-            if(res.length === 0) {
+            };
+            const service = this.setService(FORM_TYPE);
+            const res = await service.getFile(data);
+            if (res.length === 0) {
                 return {
                     status: false,
                     message: 'File not found with given criteria',
-                }
+                };
             }
             return {
                 status: true,
@@ -281,9 +225,68 @@ export class HandleFileFormService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Get File Record ${FORM_TYPE} : ${error.message}`,
-            );
+            throw new Error(`Get File Record ${FORM_TYPE} : ${error.message}`);
+        }
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-12
+     * @description Delete files by their IDs based on the given condition
+     * @param condition The condition to filter the files to be deleted
+     * @param ids The IDs of the files to be deleted
+     */
+    async deleteFileByIds(condition: SearchHandleFileFormDto, ids: number[]) {
+        try {
+            const files = await this.getFile(condition);
+            const service = this.setService(condition.FORM_TYPE);
+            for (const id of ids) {
+                const file = files.data.find((f) => f.FILE_ID === id);
+                if (file) {
+                    await service.deleteFileByID(id);
+                    const destination = await joinPaths(
+                        file.FILE_PATH,
+                        file.FILE_FNAME,
+                    );
+                    await deleteFile(destination);
+                }
+            }
+        } catch (error) {
+            throw new Error(`Delete File By IDs: ${error.message}`);
+        }
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen(24008)
+     * @since 2026-10-12
+     * @description Set the appropriate file service based on the form type code
+     * @param code 
+     * @returns 
+     */
+    private setService(code: string) {
+        switch (code) {
+            case 'FE':
+                return this.feFileService;
+            case 'FIN':
+                return this.finFileService;
+            case 'GP':
+                return this.gpFileService;
+            case 'IE':
+                return this.ieFileService;
+            case 'IS':
+                return this.isFileService;
+            case 'MAR':
+                return this.marFileService;
+            case 'MFG':
+                return this.mfgFileService;
+            case 'PS':
+                return this.psFileService;
+            case 'PUR':
+                return this.purFileService;
+            case 'PRO':
+                return this.purFileService;
+            default:
+                throw new Error(`Unsupported form type: ${code}`);
         }
     }
 }

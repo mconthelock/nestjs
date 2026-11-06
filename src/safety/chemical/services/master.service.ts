@@ -18,12 +18,12 @@ export class MasterService {
 
     async getActive() {
         const section = await this.revRepo.getSectionActive();
-        return { data: await this.masterRepo.getMaster(section, 1), section };
+        return { section, data: await this.masterRepo.getMaster(section, 1) };
     }
 
     async getInactive() {
         const section = await this.revRepo.getSectionActive();
-        return { data: await this.masterRepo.getMaster(section, 0), section };
+        return { section, data: await this.masterRepo.getMaster(section, 0) };
     }
 
     async getOwnOrg(dto: OwnOrgDto) {
@@ -32,8 +32,10 @@ export class MasterService {
 
             if (['ADM', 'DEV'].includes(GROUP)) {
                 const master = await this.getActive();
+                const masterData = await this.revRepo.getMaster();
                 return {
                     status: true,
+                    master: masterData,
                     ...master,
                 };
             }

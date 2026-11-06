@@ -11,7 +11,7 @@ export class STY_TYPE {
     @Column()
     TYPE_CODE: string;
 
-    @Column()
+    @Column({ type: 'decimal' })
     TYPE_NO: number;
 
     @Column()

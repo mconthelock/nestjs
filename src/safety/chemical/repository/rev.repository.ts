@@ -19,10 +19,23 @@ export class RevRepository extends BaseRepository {
             relations: {
                 CONTROLS: {
                     USER: true,
-                }
+                },
             },
             order: {
                 OWNER: 'ASC',
+            },
+        });
+    }
+
+    getMaster() {
+        return this.getRepository(STY_CHEMICAL_REV).findOne({
+            where: {
+                OWNER: 'MASTER',
+            },
+            relations: {
+                CONTROLS: {
+                    USER: true,
+                },
             },
         });
     }

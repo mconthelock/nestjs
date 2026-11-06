@@ -27,8 +27,6 @@ import { DpmsPlLastRevisionViewModule } from './dpms_pl_last_revision_view/dpms_
 import { DpmsPlDocRevModule } from './dpms_pl_doc_rev/dpms_pl_doc_rev.module';
 import { LabelconfirmModule } from './labelconfirm/labelconfirm.module';
 import { ShortageModule } from './shortage/shortage.module';
-import { PilineBendingMainModule } from './piline_bending_main/piline_bending_main.module';
-import { PilineBendingAttModule } from './piline_bending_att/piline_bending_att.module';
 import { DpmsPlMeltLogModule } from './dpms_pl_melt_log/dpms_pl_melt_log.module';
 import { DpmsPlWeightChangeModule } from './dpms_pl_weight_change/dpms_pl_weight_change.module';
 import { CountryOriginModule } from './country_origin/country_origin.module';
@@ -75,8 +73,6 @@ import { ReportProdModule } from './report_prod/report_prod.module';
         DpmsPlDocRevModule,
         LabelconfirmModule,
         ShortageModule,
-        PilineBendingMainModule,
-        PilineBendingAttModule,
         DpmsPlMeltLogModule,
         DpmsPlWeightChangeModule,
         CountryOriginModule,

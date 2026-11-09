@@ -5,8 +5,8 @@ import { JigMaster } from './jig_master.entity';
 export class JigDefectNg {
     @PrimaryColumn()
     JIG_NO: string;
-    
-    @Column({ type: 'varchar2', length: 2000 })
+
+    @Column({ length: 2000 })
     DEFECT_DETAIL: string;
 
     @Column()
@@ -21,7 +21,7 @@ export class JigDefectNg {
     @Column({ type: 'date', nullable: true })
     ACTUAL_FINNISH_DATE: Date | null;
 
-    @Column({ type: 'varchar2', length: 2000, nullable: true })
+    @Column({ length: 2000, nullable: true })
     SUMMARY_DETAIL: string | null;
 
     @ManyToOne(() => JigMaster)

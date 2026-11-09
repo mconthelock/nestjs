@@ -42,7 +42,7 @@ export class JigFormDetail {
     @Column()
     RESULT: string | null;
 
-    @Column({ type: 'number', precision: 12, scale: 4, nullable: true })
+    @Column({ precision: 12, scale: 4, nullable: true })
     CONFIRM_VALUE: number | null;
 
     @Column()

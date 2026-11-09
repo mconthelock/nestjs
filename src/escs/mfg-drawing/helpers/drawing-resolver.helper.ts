@@ -19,7 +19,8 @@ export class DrawingResolverHelper {
     ) {}
 
     async getDrawingByControlNo(controlNo: string): Promise<string> {
-        const f001kp: { status: boolean; data?: F001KP; message: string } = await this.f001kpService.findOne(controlNo);
+        const f001kp: { status: boolean; data?: F001KP; message: string } =
+            await this.f001kpService.findOne(controlNo);
         if (!f001kp.status) {
             throw new Error(`F001KP with control no ${controlNo} not found`);
         }
@@ -36,9 +37,12 @@ export class DrawingResolverHelper {
             drawing = data.F01R06;
         }
 
+        // ตรวจสอบว่ามี O ต่อท้ายไหม มีเอาออก
+        drawing = this.replaceO(drawing);
+
         // หาจาก General part list ด้วย order และ item ที่ได้จาก F001KP
-        const order  = data.F01R07?.trim();
-        const item   = data.F01R03?.trim();
+        const order = data.F01R07?.trim();
+        const item = data.F01R03?.trim();
         const getGpl = await this.generalPartListService.getGPL(order, item);
         if (!getGpl.status) {
             throw new Error(
@@ -51,7 +55,7 @@ export class DrawingResolverHelper {
             if (!d.DRAWING || d.DRAWING.trim() === '') {
                 return false;
             }
-            
+
             const gplDrawing = d.DRAWING.replace(/\s/g, '');
             const targetDrawing = drawing.replace(/\s/g, '');
             return (
@@ -71,6 +75,21 @@ export class DrawingResolverHelper {
 
     /**
      * @author Sutthipong Tangmongkhoncharoen (24008)
+     * @since 2026-11-09
+     * @description ตรวจสอบและลบ O ที่ต่อท้าย drawing หากมี
+     * @param drawing 
+     * @returns 
+     */
+    replaceO(drawing: string): string {
+        const matchO = drawing.match(/\s(O)$/i);
+        if (matchO) {
+            drawing = drawing.replace(/\s(O)$/i, '');
+        }
+        return drawing;
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen (24008)
      * @since 2026-07-10
      * @description ตรวจสอบและเพิ่มข้อมูลด้านข้างให้กับ drawing ของ break assembly
      * หากพบว่าเป็น break assembly จะทำการตรวจสอบ description ของ F001KP ว่ามี (L) หรือ (R) อยู่ใน description หรือไม่ หากพบจะทำการเพิ่ม (L) หรือ (R) เข้าไปใน drawing
@@ -82,21 +101,41 @@ export class DrawingResolverHelper {
      * checkBreakAssyDrawing('C60526001NV', 'BA118A742 G03') => 'BA118A742(L) G03'
      * checkBreakAssyDrawing('S1909110234', 'BS127C197 G01') => 'BS127C197 G01'
      */
-    async checkBreakAssyDrawing(controlNo: string, drawing: string): Promise<string> {
-        const f001kp: { status: boolean; data?: F001KP; message: string } = await this.f001kpService.findOne(controlNo);
+    async checkBreakAssyDrawing(
+        controlNo: string,
+        drawing: string,
+    ): Promise<string> {
+        const f001kp: { status: boolean; data?: F001KP; message: string } =
+            await this.f001kpService.findOne(controlNo);
         if (!f001kp.status) {
             throw new Error(`F001KP with control no ${controlNo} not found`);
         }
         const description = f001kp.data.F01R09?.trim();
-        if (description && description.toUpperCase().replace(/\s/g, '').includes('BRAKEASSY')) {
+        if (
+            description &&
+            description.toUpperCase().replace(/\s/g, '').includes('BRAKEASSY')
+        ) {
             const side = description.match(/\(([LR])\)/i);
             if (side) {
                 const explode = this.parser.explodeGL(drawing);
-                drawing = drawing.replace(explode.DRAWING, explode.DRAWING + side[0].toUpperCase());
+                drawing = drawing.replace(
+                    explode.DRAWING,
+                    explode.DRAWING + side[0].toUpperCase(),
+                );
+            } else {
+                // ดึงตัวท้าย กรณีที่ไม่มีวงเล็บ ให้ตรวจสอบว่ามี L หรือ R อยู่ใน description หรือไม่
+                const sideChar = description.match(/\s([LR])$/i);
+                console.log('Side character found in description:', sideChar);
+                if (sideChar) {
+                    const explode = this.parser.explodeGL(drawing);
+                    drawing = drawing.replace(
+                        explode.DRAWING,
+                        explode.DRAWING + `(${sideChar[1].toUpperCase()})`,
+                    );
+                }
             }
         }
         return drawing;
-
     }
 
     async getDrawingByIdTag(
@@ -137,7 +176,9 @@ export class DrawingResolverHelper {
             throw new Error('ไม่พบข้อมูล ID-Tag');
         }
 
-        const drawing = this.parser.normalizeDrawing(result.data.F01R04?.trim());
+        const drawing = this.parser.normalizeDrawing(
+            result.data.F01R04?.trim(),
+        );
         if (!drawing) {
             throw new Error('ไม่พบ Drawing ใน ID-Tag');
         }

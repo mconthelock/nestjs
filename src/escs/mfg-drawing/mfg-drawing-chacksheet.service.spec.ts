@@ -335,6 +335,22 @@ describe('MfgDrawingCreateChecksheetService', () => {
         });
     });
 
+    // =========================
+    // replaceO
+    // =========================
+    describe('replaceO', () => {
+        it('should remove trailing O', () => {
+            expect(resove.replaceO('BA105A280 G01 O')).toBe('BA105A280 G01');
+        });
+
+        it('should not change drawing without trailing O', () => {
+            expect(resove.replaceO('BA105A280 G01')).toBe('BA105A280 G01');
+        });
+    });
+
+    // =========================
+    // checkBreakAssyDrawing
+    // =========================
     describe('checkBreakAssyDrawing', () => {
         it('should append R', async () => {
             jest.spyOn(resove['f001kpService'], 'findOne').mockResolvedValue({
@@ -345,7 +361,10 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 } as F001KP,
             });
 
-            const result = await resove.checkBreakAssyDrawing('C60526001PH', 'BA118A742 G03');
+            const result = await resove.checkBreakAssyDrawing(
+                'C60526001PH',
+                'BA118A742 G03',
+            );
 
             expect(result).toBe('BA118A742(R) G03');
         });
@@ -359,7 +378,44 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 } as F001KP,
             });
 
-            const result = await resove.checkBreakAssyDrawing('C60526001NV', 'BA118A742 G03');
+            const result = await resove.checkBreakAssyDrawing(
+                'C60526001NV',
+                'BA118A742 G03',
+            );
+
+            expect(result).toBe('BA118A742(L) G03');
+        });
+
+        it('should append R not ()', async () => {
+            jest.spyOn(resove['f001kpService'], 'findOne').mockResolvedValue({
+                status: true,
+                message: '',
+                data: {
+                    F01R09: 'BRAKE ASSY R',
+                } as F001KP,
+            });
+
+            const result = await resove.checkBreakAssyDrawing(
+                'C60526001NV',
+                'BA118A742 G03',
+            );
+
+            expect(result).toBe('BA118A742(R) G03');
+        });
+
+        it('should append L not ()', async () => {
+            jest.spyOn(resove['f001kpService'], 'findOne').mockResolvedValue({
+                status: true,
+                message: '',
+                data: {
+                    F01R09: 'BRAKE ASSY L',
+                } as F001KP,
+            });
+
+            const result = await resove.checkBreakAssyDrawing(
+                'C60526001NV',
+                'BA118A742 G03',
+            );
 
             expect(result).toBe('BA118A742(L) G03');
         });
@@ -369,11 +425,14 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 status: true,
                 message: '',
                 data: {
-                    F01R09: 'SHAFT ASS\'Y',
+                    F01R09: "SHAFT ASS'Y",
                 } as F001KP,
             });
 
-            const result = await resove.checkBreakAssyDrawing('S1909110234', 'BS127C197 G01');
+            const result = await resove.checkBreakAssyDrawing(
+                'S1909110234',
+                'BS127C197 G01',
+            );
 
             expect(result).toBe('BS127C197 G01');
         });

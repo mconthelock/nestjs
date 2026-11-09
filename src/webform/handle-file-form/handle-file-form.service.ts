@@ -66,11 +66,8 @@ export class HandleFileFormService {
                 CYEAR2: dto.CYEAR2,
                 NRUNNO: dto.NRUNNO,
             };
-            const destination = await this.createDestinationPath(
-                form,
-                PATH,
-                FORM_TYPE,
-            );
+            const destination =
+                PATH ?? (await this.createDestinationPath(form, FORM_TYPE));
             const moved = await this.moveAndInsertFile({
                 files: Array.isArray(file) ? file : [file],
                 destination,
@@ -91,11 +88,7 @@ export class HandleFileFormService {
         }
     }
 
-    private async createDestinationPath(
-        form: any,
-        path: string,
-        formType: string,
-    ) {
+    private async createDestinationPath(form: any, formType: string) {
         try {
             const formmst = await this.formmstService.getFormmstById(
                 form.NFRMNO,
@@ -112,16 +105,14 @@ export class HandleFileFormService {
                     `Form ${nameOfForm} does not match expected form type ${formType}`,
                 );
             }
-            const destination =
-                path ??
-                (await joinPaths(
-                    process.env.AMEC_FILE_PATH,
-                    process.env.STATE,
-                    'Form',
-                    formType,
-                    nameOfForm,
-                    formNo,
-                ));
+            const destination = await joinPaths(
+                process.env.AMEC_FILE_PATH,
+                process.env.STATE,
+                'Form',
+                formType,
+                nameOfForm,
+                formNo,
+            );
             return destination;
         } catch (error) {
             throw new Error(`Create destination path => ${error.message}`);
@@ -260,8 +251,8 @@ export class HandleFileFormService {
      * @author Sutthipong Tangmongkhoncharoen(24008)
      * @since 2026-10-12
      * @description Set the appropriate file service based on the form type code
-     * @param code 
-     * @returns 
+     * @param code
+     * @returns
      */
     private setService(code: string) {
         switch (code) {
@@ -282,7 +273,6 @@ export class HandleFileFormService {
             case 'PS':
                 return this.psFileService;
             case 'PUR':
-                return this.purFileService;
             case 'PRO':
                 return this.purFileService;
             default:

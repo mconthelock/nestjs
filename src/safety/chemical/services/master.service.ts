@@ -18,7 +18,8 @@ export class MasterService {
 
     async getActive() {
         const section = await this.revRepo.getSectionActive();
-        const data = await this.masterRepo.getMaster(section, 1);
+        // const data = await this.masterRepo.getMaster(section, 1);
+        const data = await this.masterRepo.getMasters(1);
         return data.length > 0
             ? {
                   status: true,
@@ -34,7 +35,8 @@ export class MasterService {
 
     async getInactive() {
         const section = await this.revRepo.getSectionActive();
-        const data = await this.masterRepo.getMaster(section, 0);
+        // const data = await this.masterRepo.getMaster(section, 0);
+        const data = await this.masterRepo.getMasters(0);
         return data.length > 0
             ? {
                   status: true,

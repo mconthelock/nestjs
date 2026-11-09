@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
+import { STY_CHEMICAL } from 'src/common/Entities/gpreport/table/STY_CHEMICAL.entity';
 
 @Injectable()
 export class MasterRepository extends BaseRepository {
@@ -91,5 +92,45 @@ export class MasterRepository extends BaseRepository {
             `,
             [status],
         );
+    }
+
+    getMasters(status: number) {
+        const where = status === 1 ? {
+            STATUS: status,
+            SECTIONS:{
+                STATUS: status
+            }
+        } : {
+            STATUS: status
+        }
+        return this.getRepository(STY_CHEMICAL).find({
+            select: {
+                AMEC_SDS_ID: true,
+                CHEMICAL_NAME: true,
+                UN_CLASS: true,
+                STATUS: true,
+                EFFECTIVE_DATE: true,
+                RECEIVED_SDS_DATE: true,
+                PRODUCT_CODE: true,
+                PUR_INCHARGE: true,
+                REV: true,
+                VENDOR: true,
+                SECTIONS: {
+                    OWNER: true,
+                    OWNERCODE: true,
+                    AMEC_SDS_ID: true,
+                    USED_FOR: true,
+                    KEEPING_POINT: true,
+                    USED_AREA: true,
+                    RECEIVED_SDS_DATE: true,
+                    QTY: true,
+                    REC4052: true,
+                    REC4054: true,
+                },
+            },
+            where: where,
+            relations: ['SECTIONS'],
+            order: { AMEC_SDS_ID: 'ASC' },
+        });
     }
 }

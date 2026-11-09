@@ -18,12 +18,34 @@ export class MasterService {
 
     async getActive() {
         const section = await this.revRepo.getSectionActive();
-        return { section, data: await this.masterRepo.getMaster(section, 1) };
+        const data = await this.masterRepo.getMaster(section, 1);
+        return data.length > 0
+            ? {
+                  status: true,
+                  message: `Data master found ${data.length} record`,
+                  section,
+                  data,
+              }
+            : {
+                  status: false,
+                  message: 'No active data found.',
+              };
     }
 
     async getInactive() {
         const section = await this.revRepo.getSectionActive();
-        return { section, data: await this.masterRepo.getMaster(section, 0) };
+        const data = await this.masterRepo.getMaster(section, 0);
+        return data.length > 0
+            ? {
+                  status: true,
+                  message: `Data master found ${data.length} record`,
+                  section,
+                  data,
+              }
+            : {
+                  status: false,
+                  message: 'No inactive data found.',
+              };
     }
 
     async getOwnOrg(dto: OwnOrgDto) {
@@ -32,11 +54,15 @@ export class MasterService {
 
             if (['ADM', 'DEV'].includes(GROUP)) {
                 const master = await this.getActive();
+                if (!master.status) {
+                    throw new Error(master.message);
+                }
                 const masterData = await this.revRepo.getMaster();
                 return {
                     status: true,
                     master: masterData,
-                    ...master,
+                    section: master.section,
+                    data: master.data,
                 };
             }
 

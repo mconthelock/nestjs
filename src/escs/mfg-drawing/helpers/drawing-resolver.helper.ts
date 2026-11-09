@@ -21,6 +21,8 @@ export class DrawingResolverHelper {
     async getDrawingByControlNo(controlNo: string): Promise<string> {
         const f001kp: { status: boolean; data?: F001KP; message: string } =
             await this.f001kpService.findOne(controlNo);
+        const f001kp: { status: boolean; data?: F001KP; message: string } =
+            await this.f001kpService.findOne(controlNo);
         if (!f001kp.status) {
             throw new Error(`F001KP with control no ${controlNo} not found`);
         }
@@ -38,12 +40,14 @@ export class DrawingResolverHelper {
         }
 
         // ตรวจสอบว่ามี O ต่อท้ายไหม มีเอาออก
-        const matchO =  drawing.match(/\s(O)$/i)
-        if(matchO){
+        const matchO = drawing.match(/\s(O)$/i);
+        if (matchO) {
             drawing = drawing.replace(/\s(O)$/i, '');
         }
 
         // หาจาก General part list ด้วย order และ item ที่ได้จาก F001KP
+        const order = data.F01R07?.trim();
+        const item = data.F01R03?.trim();
         const order = data.F01R07?.trim();
         const item = data.F01R03?.trim();
         const getGpl = await this.generalPartListService.getGPL(order, item);
@@ -96,13 +100,16 @@ export class DrawingResolverHelper {
             if (side) {
                 const explode = this.parser.explodeGL(drawing);
                 drawing = drawing.replace(explode.DRAWING, explode.DRAWING + side[0].toUpperCase());
-            }else{
+            } else {
                 // ดึงตัวท้าย กรณีที่ไม่มีวงเล็บ ให้ตรวจสอบว่ามี L หรือ R อยู่ใน description หรือไม่
                 const sideChar = description.match(/\s([LR])$/i);
                 console.log('Side character found in description:', sideChar);
                 if (sideChar) {
                     const explode = this.parser.explodeGL(drawing);
-                    drawing = drawing.replace(explode.DRAWING, explode.DRAWING + `(${sideChar[1].toUpperCase()})`);
+                    drawing = drawing.replace(
+                        explode.DRAWING,
+                        explode.DRAWING + `(${sideChar[1].toUpperCase()})`,
+                    );
                 }
             }
         }

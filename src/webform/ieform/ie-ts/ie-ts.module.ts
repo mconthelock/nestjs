@@ -10,10 +10,11 @@ import { FlowModule } from 'src/webform/flow/flow.module';
 import { VorgmstModule } from 'src/webform/vorgmst/vorgmst.module';
 import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
 import { IePtsModule } from '../IE-PTS/ie-pts.module';
+import { IeTsJobService } from './ie-ts-job.service';
 
 @Module({
     controllers: [IeTsController],
-    providers: [IeTsService, IeTsApproveService],
+    providers: [IeTsService, IeTsApproveService, IeTsJobService],
     imports: [
         IetsFormModule,
         IetsListModule,

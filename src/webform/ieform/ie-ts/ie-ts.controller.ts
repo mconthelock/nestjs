@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { IeTsService } from './ie-ts.service';
 import { IeTsApproveService } from './ie-ts-approve.service';
+import { IeTsJobService } from './ie-ts-job.service';
 import { CreateIetsDto } from './dto/create-ie-ts.dto';
 import { UpdateIetsDto } from './dto/update-ie-ts.dto';
 import { ApproveIetsDto } from './dto/approve-ie-ts.dto';
@@ -25,6 +26,7 @@ export class IeTsController {
     constructor(
         private readonly ieTsservice: IeTsService,
         private readonly ieTsApproveservice: IeTsApproveService,
+        private readonly ieTsJob: IeTsJobService,
     ) {}
 
     private readonly path =
@@ -48,11 +50,6 @@ export class IeTsController {
         return this.ieTsservice.findAll();
     }
 
-    @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.ieTsservice.findOne(+id);
-    }
-
     @Patch('update')
     @UseTransaction('webformConnection')
     @UseForceTransaction()
@@ -72,8 +69,18 @@ export class IeTsController {
         return this.ieTsApproveservice.approve(dto, ip);
     }
 
+    @Get('alert-approve')
+    async testAlert() {
+        // เรียกใช้งาน method ที่เราสร้างไว้
+        return await this.ieTsJob.alertaprove();
+    }
+
     @Delete(':id')
     remove(@Param('id') id: string) {
         return this.ieTsservice.remove(+id);
+    }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.ieTsservice.findOne(+id);
     }
 }

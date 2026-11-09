@@ -37,6 +37,12 @@ export class DrawingResolverHelper {
             drawing = data.F01R06;
         }
 
+        // ตรวจสอบว่ามี O ต่อท้ายไหม มีเอาออก
+        const matchO =  drawing.match(/\s(O)$/i)
+        if(matchO){
+            drawing = drawing.replace(/\s(O)$/i, '');
+        }
+
         // หาจาก General part list ด้วย order และ item ที่ได้จาก F001KP
         const order = data.F01R07?.trim();
         const item = data.F01R03?.trim();

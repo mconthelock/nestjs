@@ -38,10 +38,7 @@ export class DrawingResolverHelper {
         }
 
         // ตรวจสอบว่ามี O ต่อท้ายไหม มีเอาออก
-        const matchO = drawing.match(/\s(O)$/i);
-        if (matchO) {
-            drawing = drawing.replace(/\s(O)$/i, '');
-        }
+        drawing = this.replaceO(drawing);
 
         // หาจาก General part list ด้วย order และ item ที่ได้จาก F001KP
         const order = data.F01R07?.trim();
@@ -74,6 +71,21 @@ export class DrawingResolverHelper {
         }
 
         return match.DRAWING;
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen (24008)
+     * @since 2026-11-09
+     * @description ตรวจสอบและลบ O ที่ต่อท้าย drawing หากมี
+     * @param drawing 
+     * @returns 
+     */
+    replaceO(drawing: string): string {
+        const matchO = drawing.match(/\s(O)$/i);
+        if (matchO) {
+            drawing = drawing.replace(/\s(O)$/i, '');
+        }
+        return drawing;
     }
 
     /**

@@ -375,10 +375,14 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 } as F001KP,
             });
 
+<<<<<<< HEAD
             const result = await resove.checkBreakAssyDrawing(
                 'C60526001NV',
                 'BA118A742 G03',
             );
+=======
+            const result = await resove.checkBreakAssyDrawing('C60526001NV', 'BA118A742 G03');
+>>>>>>> 7d9f613c (feat(mfg-drawing): enhance drawing resolution by appending side characters based on description)
 
             expect(result).toBe('BA118A742(R) G03');
         });
@@ -392,10 +396,14 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 } as F001KP,
             });
 
+<<<<<<< HEAD
             const result = await resove.checkBreakAssyDrawing(
                 'C60526001NV',
                 'BA118A742 G03',
             );
+=======
+            const result = await resove.checkBreakAssyDrawing('C60526001NV', 'BA118A742 G03');
+>>>>>>> 7d9f613c (feat(mfg-drawing): enhance drawing resolution by appending side characters based on description)
 
             expect(result).toBe('BA118A742(L) G03');
         });

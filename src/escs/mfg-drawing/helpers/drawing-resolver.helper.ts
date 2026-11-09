@@ -21,6 +21,8 @@ export class DrawingResolverHelper {
     async getDrawingByControlNo(controlNo: string): Promise<string> {
         const f001kp: { status: boolean; data?: F001KP; message: string } =
             await this.f001kpService.findOne(controlNo);
+        const f001kp: { status: boolean; data?: F001KP; message: string } =
+            await this.f001kpService.findOne(controlNo);
         if (!f001kp.status) {
             throw new Error(`F001KP with control no ${controlNo} not found`);
         }
@@ -41,6 +43,8 @@ export class DrawingResolverHelper {
         drawing = this.replaceO(drawing);
 
         // หาจาก General part list ด้วย order และ item ที่ได้จาก F001KP
+        const order = data.F01R07?.trim();
+        const item = data.F01R03?.trim();
         const order = data.F01R07?.trim();
         const item = data.F01R03?.trim();
         const getGpl = await this.generalPartListService.getGPL(order, item);

@@ -61,14 +61,6 @@ export class PurVendorsService {
         return await qb.getMany();
     }
 
-    findAll() {
-        return `This action returns all purVendors`;
-    }
-
-    findOne(id: number) {
-        return `This action returns a #${id} purVendor`;
-    }
-
     async update(id: number, updatePurVendorDto: UpdatePurVendorDto) {
         const result = await this.purVendorRepo.update(id, updatePurVendorDto);
         if (result.affected === 0) {

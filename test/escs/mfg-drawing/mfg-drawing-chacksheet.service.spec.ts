@@ -347,7 +347,10 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 } as F001KP,
             });
 
-            const result = await resove.checkBreakAssyDrawing('C60526001PH', 'BA118A742 G03');
+            const result = await resove.checkBreakAssyDrawing(
+                'C60526001PH',
+                'BA118A742 G03',
+            );
 
             expect(result).toBe('BA118A742(R) G03');
         });
@@ -361,7 +364,10 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 } as F001KP,
             });
 
-            const result = await resove.checkBreakAssyDrawing('C60526001NV', 'BA118A742 G03');
+            const result = await resove.checkBreakAssyDrawing(
+                'C60526001NV',
+                'BA118A742 G03',
+            );
 
             expect(result).toBe('BA118A742(L) G03');
         });
@@ -376,13 +382,19 @@ describe('MfgDrawingCreateChecksheetService', () => {
             });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 57c7494a (refactor(mfg-drawing): extract replaceO method to handle trailing 'O' removal)
             const result = await resove.checkBreakAssyDrawing(
                 'C60526001NV',
                 'BA118A742 G03',
             );
+<<<<<<< HEAD
 =======
             const result = await resove.checkBreakAssyDrawing('C60526001NV', 'BA118A742 G03');
 >>>>>>> 7d9f613c (feat(mfg-drawing): enhance drawing resolution by appending side characters based on description)
+=======
+>>>>>>> 57c7494a (refactor(mfg-drawing): extract replaceO method to handle trailing 'O' removal)
 
             expect(result).toBe('BA118A742(R) G03');
         });
@@ -397,13 +409,19 @@ describe('MfgDrawingCreateChecksheetService', () => {
             });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 57c7494a (refactor(mfg-drawing): extract replaceO method to handle trailing 'O' removal)
             const result = await resove.checkBreakAssyDrawing(
                 'C60526001NV',
                 'BA118A742 G03',
             );
+<<<<<<< HEAD
 =======
             const result = await resove.checkBreakAssyDrawing('C60526001NV', 'BA118A742 G03');
 >>>>>>> 7d9f613c (feat(mfg-drawing): enhance drawing resolution by appending side characters based on description)
+=======
+>>>>>>> 57c7494a (refactor(mfg-drawing): extract replaceO method to handle trailing 'O' removal)
 
             expect(result).toBe('BA118A742(L) G03');
         });
@@ -417,7 +435,10 @@ describe('MfgDrawingCreateChecksheetService', () => {
                 } as F001KP,
             });
 
-            const result = await resove.checkBreakAssyDrawing('S1909110234', 'BS127C197 G01');
+            const result = await resove.checkBreakAssyDrawing(
+                'S1909110234',
+                'BS127C197 G01',
+            );
 
             expect(result).toBe('BS127C197 G01');
         });

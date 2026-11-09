@@ -364,6 +364,34 @@ describe('MfgDrawingCreateChecksheetService', () => {
             expect(result).toBe('BA118A742(L) G03');
         });
 
+        it('should append R not ()', async () => {
+            jest.spyOn(resove['f001kpService'], 'findOne').mockResolvedValue({
+                status: true,
+                message: '',
+                data: {
+                    F01R09: 'BRAKE ASSY R',
+                } as F001KP,
+            });
+
+            const result = await resove.checkBreakAssyDrawing('C60526001NV', 'BA118A742 G03');
+
+            expect(result).toBe('BA118A742(R) G03');
+        });
+
+        it('should append L not ()', async () => {
+            jest.spyOn(resove['f001kpService'], 'findOne').mockResolvedValue({
+                status: true,
+                message: '',
+                data: {
+                    F01R09: 'BRAKE ASSY L',
+                } as F001KP,
+            });
+
+            const result = await resove.checkBreakAssyDrawing('C60526001NV', 'BA118A742 G03');
+
+            expect(result).toBe('BA118A742(L) G03');
+        });
+
         it('should not append side', async () => {
             jest.spyOn(resove['f001kpService'], 'findOne').mockResolvedValue({
                 status: true,

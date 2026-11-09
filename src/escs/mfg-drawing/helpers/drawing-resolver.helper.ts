@@ -93,6 +93,14 @@ export class DrawingResolverHelper {
             if (side) {
                 const explode = this.parser.explodeGL(drawing);
                 drawing = drawing.replace(explode.DRAWING, explode.DRAWING + side[0].toUpperCase());
+            }else{
+                // ดึงตัวท้าย กรณีที่ไม่มีวงเล็บ ให้ตรวจสอบว่ามี L หรือ R อยู่ใน description หรือไม่
+                const sideChar = description.match(/\s([LR])$/i);
+                console.log('Side character found in description:', sideChar);
+                if (sideChar) {
+                    const explode = this.parser.explodeGL(drawing);
+                    drawing = drawing.replace(explode.DRAWING, explode.DRAWING + `(${sideChar[1].toUpperCase()})`);
+                }
             }
         }
         return drawing;

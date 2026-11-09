@@ -71,3 +71,6 @@ package-lock.json
 
 oracle
 
+outputs/
+/test/
+/docs/

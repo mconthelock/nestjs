@@ -100,6 +100,7 @@ export class JigInspectionService {
         }
         // No files, results or master due-date updates. Preserve the workflow
         // when no old NG exists: a not-yet-inspected form is not an OK result.
+        await manager.query("UPDATE IEDOC.JIG_MASTER SET JIG_STATUS = 'PENDING' WHERE JIG_NO = :1", [jigNo]);
         return { status: 'created', key };
     }
 

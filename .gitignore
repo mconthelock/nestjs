@@ -72,3 +72,8 @@ package-lock.json
 
 oracle
 
+artifacts/
+outputs/
+
+# Local JIG tests (not deployed)
+/test/

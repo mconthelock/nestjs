@@ -71,7 +71,6 @@ package-lock.json
 
 oracle
 
-artifacts/
 outputs/
 /test/
 /docs/

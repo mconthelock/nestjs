@@ -11,6 +11,8 @@ import { VorgmstModule } from 'src/webform/vorgmst/vorgmst.module';
 import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
 import { IePtsModule } from '../IE-PTS/ie-pts.module';
 import { IeTsJobService } from './ie-ts-job.service';
+import { UsersModule } from 'src/amec/users/users.module';
+import { MailModule } from 'src/common/services/mail/mail.module';
 
 @Module({
     controllers: [IeTsController],
@@ -24,6 +26,8 @@ import { IeTsJobService } from './ie-ts-job.service';
         FlowModule,
         IePtsModule,
         FormmstModule,
+        UsersModule,
+        MailModule,
     ],
 })
 export class IeTsModule {}

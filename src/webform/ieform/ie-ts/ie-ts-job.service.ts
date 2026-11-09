@@ -82,6 +82,7 @@ export class IeTsJobService {
                 });
 
                 let listfrm = '';
+                let chksendmail = false;
 
                 // ลูปดึง [ รหัสพนักงาน, Array ข้อมูลฟอร์ม ] ออกมาจาก Object
                 for (const [sempno, items] of Object.entries(sempnoGroup)) {
@@ -90,6 +91,7 @@ export class IeTsJobService {
                         const apvDateLast = new Date(frm.APVDATELAST);
                         apvDateLast.setHours(0, 0, 0, 0); // รีเซ็ตเวลาเป็น 00:00:00 เพื่อเทียบแค่วันที่
                         if (apvDateLast < today) {
+                            chksendmail = true;
                             const frmname = await this.formService.getFormno({
                                 NFRMNO: frm.NFRMNO,
                                 VORGNO: frm.VORGNO,
@@ -104,30 +106,62 @@ export class IeTsJobService {
 
                         // นำ frmname ไปต่อ string หรือทำ logic อื่นๆ ต่อตรงนี้...
                     }
-                    const emp = await this.usersService.findEmp(sempno);
-                    if (emp) {
-                        to = emp.SRECMAIL;
-                        subject =
-                            '[Approval Request] ' +
-                            listfrm +
-                            ' Pending Approval';
-                        html = `<div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #333333; max-width: 700px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-       <div style="padding: 0 20px 20px 20px; background-color: #ffffff;">
-<p style="margin-top: 0; font-size: 15px;"><strong>Dear Sir,</strong></p><br/>
-        <p style="font-size: 14px; line-height: 1.6;">This is an automated notification from the Web Flow System.</p>
-        <p style="font-size: 14px; line-height: 1.6;">The following TS Adjustment request is currently awaiting your approval:
+                    if (chksendmail) {
+                        const emp = await this.usersService.findEmp(sempno);
+                        if (emp) {
+                            to = emp.SRECMAIL;
+                            subject =
+                                'TEST [Approval Request] ' +
+                                listfrm +
+                                ' Pending Approval';
+                            html = `
+<div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaec; border-radius: 8px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+
+    <!-- Header -->
+    <div style="background-color: #00467f; padding: 20px; text-align: center;">
+        <h2 style="margin: 0; color: #ffffff; font-size: 18px; letter-spacing: 0.5px;">TS Adjustment Approval</h2>
+    </div>
+
+    <!-- Body -->
+    <div style="padding: 30px;">
+        <p style="margin-top: 0; font-size: 15px; color: #333333;"><strong>Dear Sir/Madam,</strong></p>
+        <p style="font-size: 14px; line-height: 1.6; color: #555555;">
+            This is an automated notification from the Web Flow System. The following <strong>TS Adjustment</strong> request is currently awaiting your approval:
         </p>
-        <p><br/><br/>${listfrm}<br/><br/></p>
-          <p style="font-size: 14px; line-height: 1.6;">Please review and approve the request through the Web Flow System.</p>
-          <p> <a href="http://webflow.mitsubishielevatorasia.co.th/form" style="color: #0056b3; text-decoration: underline; word-break: break-all;">[Open Web Flow System]</a></p>
-       </div></div>`;
-                        this.mailService.sendMail({
-                            from: from,
-                            to: to,
-                            subject,
-                            html,
-                            cc: cc,
-                        });
+
+        <!-- Dynamic Content Box -->
+        <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-left: 4px solid #00467f; padding: 15px; margin: 20px 0; border-radius: 4px; color: #333333; font-size: 14px; line-height: 1.5;">
+            ${listfrm}
+        </div>
+
+        <p style="font-size: 14px; line-height: 1.6; color: #555555; margin-bottom: 25px;">
+            Please review and approve the request through the Web Flow System.
+        </p>
+
+        <!-- Text Link -->
+<div style="text-align: center; margin-top: 30px; margin-bottom: 10px;">
+            <a href="http://webflow.mitsubishielevatorasia.co.th/form" style="color: #0056b3 !important; text-decoration: underline; font-size: 14px; font-weight: bold; word-break: break-all;">
+                <span style="color: #0056b3;">[Open Web Flow System]</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="background-color: #f4f6f8; padding: 15px; text-align: center; border-top: 1px solid #eaeaec;">
+        <p style="margin: 0; font-size: 12px; color: #888888;">This is an automatically generated email, please do not reply.</p>
+        <p style="margin: 5px 0 0 0; font-size: 12px; color: #888888;">Web Flow System &copy; Mitsubishi Elevator Asia</p>
+    </div>
+
+</div>
+`;
+                            this.mailService.sendMail({
+                                from: from,
+                                to: to,
+                                subject,
+                                html,
+                                cc: cc,
+                            });
+                        }
                     }
                 }
             }

@@ -1,4 +1,8 @@
 import { Controller, Post, Body } from '@nestjs/common';
+import {
+    UseForceTransaction,
+    UseTransaction,
+} from 'src/common/decorator/transaction.decorator';
 import { VendorsService } from './vendors.service';
 
 import { CreateVendorDto } from './dto/create-vendor.dto';
@@ -11,12 +15,12 @@ export class VendorsController {
 
     @Post('search')
     async findAll(@Body() dto: SearchVendorDto) {
-        console.log(dto);
-
         return await this.vnd.search(dto);
     }
 
     @Post('create')
+    @UseTransaction('webformConnection')
+    @UseForceTransaction()
     create(@Body() dto: CreateVendorDto) {
         return this.vnd.create(dto);
     }

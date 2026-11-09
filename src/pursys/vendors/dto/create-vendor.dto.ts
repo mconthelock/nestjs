@@ -1,104 +1,57 @@
 import { IsOptional, IsString, IsDate, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 
+import { CreateVendorAddressDto } from './create-address.dto';
 export class CreateVendorDto {
     @IsString()
-    @IsOptional()
-    VND_CODE?: string;
+    VND_ID: string;
 
     @IsString()
     VND_NAME: string;
 
-    @IsDate()
-    @Type(() => Date)
-    VND_REGISTED: Date;
+    @IsString()
+    VND_TNAME: string;
+
+    @IsString()
+    VND_SALE: string;
+
+    @IsString()
+    VND_TYPE: string;
+
+    @IsString()
+    VND_REGDATE: string;
+
+    @IsString()
+    VND_LASTUPDATE: string;
 
     @IsString()
     VND_STATUS: string;
 
     @IsString()
-    @IsOptional()
-    VND_TERM: string;
+    VND_USERUPDATE: string;
 
     @IsString()
-    @IsOptional()
-    VND_TYPE1?: string;
+    ADDR_PHONE: string;
 
     @IsString()
-    @IsOptional()
-    VND_TYPE2?: string;
+    ADDR_WEB: string;
 
     @IsString()
-    @IsOptional()
-    VND_CURRENCY?: string;
+    EMAIL: string;
 
     @IsString()
-    @IsOptional()
-    VND_PAYMENT?: string;
+    FAX: string;
 
     @IsString()
-    @IsOptional()
-    VND_ADDRESS1?: string;
+    BANKNAME: string;
 
     @IsString()
-    @IsOptional()
-    VND_ADDRESS2?: string;
+    BRANCH: string;
 
     @IsString()
-    @IsOptional()
-    VND_CITY?: string;
+    ACCNUMBER: string;
 
-    @IsString()
     @IsOptional()
-    VND_STATE?: string;
-
-    @IsString()
-    @IsOptional()
-    VND_COUNTRY?: string;
-
-    @IsString()
-    @IsOptional()
-    VND_PHONE?: string;
-
-    @IsString()
-    @IsOptional()
-    VND_FAX?: string;
-
-    @IsString()
-    @IsOptional()
-    VND_CONTACTNAME?: string;
-
-    @IsString()
-    @IsOptional()
-    VND_CATEGORY?: string;
-
-    @IsString()
-    @IsOptional()
-    VND_BANO?: string;
-
-    @IsString()
-    @IsOptional()
-    VND_CANO?: string;
-
-    @IsString()
-    @IsOptional()
-    VND_TAXNO?: string;
-
-    @IsDate()
-    @Type(() => Date)
-    @IsOptional()
-    CREATE_AT?: Date;
-
-    @IsString()
-    @IsOptional()
-    CREATE_BY: string;
-
-    @IsNumber()
-    @Type(() => Number)
-    VENDGROUP: number;
-
-    @IsNumber()
-    @IsOptional()
-    @Type(() => Number)
-    VENDPURPOSE?: number;
+    @Type(() => CreateVendorAddressDto)
+    ADDRESSES?: CreateVendorAddressDto[];
 }

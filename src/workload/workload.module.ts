@@ -42,6 +42,7 @@ import { DpmsPackingListDetailModule } from './dpms_packing_list_detail/dpms_pac
 import { StockPartFollowViewModule } from './stock_part_follow_view/stock_part_follow_view.module';
 import { StockPartFollowModule } from './stock_part_follow/stock_part_follow.module';
 import { ReportProdModule } from './report_prod/report_prod.module';
+import { EKittingModule } from './e_kitting/e_kitting.module';
 
 @Module({
     imports: [
@@ -88,6 +89,7 @@ import { ReportProdModule } from './report_prod/report_prod.module';
         StockPartFollowViewModule,
         StockPartFollowModule,
         ReportProdModule,
+        EKittingModule,
     ],
 })
 export class WorkloadModule {}

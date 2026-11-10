@@ -43,6 +43,7 @@ import { DpmsCountryConditionModule } from './dpms_country_condition/dpms_countr
 import { DpmsPackingListDetailModule } from './dpms_packing_list_detail/dpms_packing_list_detail.module';
 import { StockPartFollowViewModule } from './stock_part_follow_view/stock_part_follow_view.module';
 import { StockPartFollowModule } from './stock_part_follow/stock_part_follow.module';
+import { EKittingModule } from './e_kitting/e_kitting.module';
 
 @Module({
     imports: [
@@ -90,6 +91,7 @@ import { StockPartFollowModule } from './stock_part_follow/stock_part_follow.mod
         DpmsPackingListDetailModule,
         StockPartFollowViewModule,
         StockPartFollowModule,
+        EKittingModule,
     ],
 })
 export class WorkloadModule {}

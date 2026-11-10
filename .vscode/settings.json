@@ -17,5 +17,6 @@
             "group": "Default"
         }
     ],
-    "favorites.sortOrder": "MANUAL"
+    "favorites.sortOrder": "MANUAL",
+    "python.terminal.useEnvFile": true
 }

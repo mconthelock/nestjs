@@ -102,14 +102,14 @@ export class StyPatrolInspectionService {
     async summaryClass(fyear: string, seccode?: string) {
         try {
             const res = await this.repo.summaryClass(fyear, seccode);
-            const checked = res.some((item) => item.TOTAL >= 1);
-            if (!checked) {
-                return {
-                    status: false,
-                    message: `No patrol inspection summary classes found for fiscal year ${fyear}`,
-                    data: [],
-                };
-            }
+            // const checked = res.some((item) => item.TOTAL >= 1);
+            // if (!checked) {
+            //     return {
+            //         status: false,
+            //         message: `No patrol inspection summary classes found for fiscal year ${fyear}`,
+            //         data: [],
+            //     };
+            // }
             return {
                 status: true,
                 message: `Patrol inspection summary classes found for fiscal year ${fyear} (${res.length} record(s))`,

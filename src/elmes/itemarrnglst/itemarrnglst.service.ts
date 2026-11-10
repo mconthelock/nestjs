@@ -23,36 +23,42 @@ export class ItemarrnglstService {
         let x = 0;
         for (const row of data) {
             if (rows[i] === undefined && row.BMCLS !== 'A') continue;
-            if (row.BMCLS === 'A' && row.PARTNO[0] !== ' ') {
-                if (x > 0) {
-                    rows[i].variable = rows[i].variable.replaceAll(',,', ',');
+            const isContinuation = Boolean(rows[i] && row.PARTNO && row.PARTNO.startsWith(' '));
+            if (row.BMCLS === 'A' && !isContinuation) {
+                if (x > 0 && rows[i]) {
+                    rows[i].variable = rows[i].variable ? rows[i].variable.replaceAll(',,', ',') : '';
                     i++;
                 }
                 rows[i] = {
                     seq: row.SERIALNO,
                     orderno: row.ORDERNO,
-                    carno: row.ORDERNO.substring(6, 8),
+                    carno: row.ORDERNO ? row.ORDERNO.substring(6, 8) : '',
                     itemno: row.ITEMNO,
                     partname: row.APNAMERMRK?.trimStart() || '',
-                    drawing: row.PARTNO,
+                    drawing: row.PARTNO || '',
                     variable: '',
                     qty: row.TOTALQTY,
                     scndpart: row.SCNDPRTCLS,
                     supply: row.SUPPLYCLS,
                 };
             } else if (row.BMCLS === 'B') {
-                if (rows[i].variable !== '') {
-                    rows[i].variable += ',' + (row.PARTNO?.trimStart() || '');
-                } else {
-                    rows[i].variable += row.PARTNO?.trimStart() || '';
+                if (rows[i]) {
+                    const partVal = row.PARTNO?.trimStart() || '';
+                    if (rows[i].variable !== '') {
+                        rows[i].variable += ',' + partVal;
+                    } else {
+                        rows[i].variable += partVal;
+                    }
                 }
             } else {
-                rows[i].drawing += row.PARTNO?.trimStart() || '';
+                if (rows[i]) {
+                    rows[i].drawing += row.PARTNO?.trimStart() || '';
+                }
             }
             x++;
         }
-        rows.map((item) => {
-            if (item.variable !== '') {
+        rows.forEach((item) => {
+            if (item && item.variable !== '') {
                 item.variable = item.variable.replaceAll(',', ', ');
             }
         });

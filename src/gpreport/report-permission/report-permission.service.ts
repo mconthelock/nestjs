@@ -19,7 +19,7 @@ export class ReportPermissionService {
     }
 
     findOne(id: string) {
-        return this.repo.findOne({ where: { USERS: id } });
+        return this.repo.find({ where: { USERS: id } });
     }
 
     create(createReportPermissionDto: CreateReportPermissionDto) {

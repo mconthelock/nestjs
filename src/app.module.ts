@@ -44,6 +44,7 @@ import { CountriesModule } from './countries/countries.module';
 import { InnovatModule } from './innovat/innovat.module';
 import { IedocModule } from './iedoc/iedoc.module';
 import { TakeoutModule } from './takeout/takeout.module';
+import { DtiModule } from './dti/dti.module';
 
 @Module({
     imports: [
@@ -81,7 +82,8 @@ import { TakeoutModule } from './takeout/takeout.module';
         IedocModule,
         InnovatModule,
         CountriesModule,
-        TakeoutModule
+        TakeoutModule,
+        DtiModule
     ],
     providers: [
         HttpLoggingInterceptor,

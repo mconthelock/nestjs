@@ -6,6 +6,12 @@ import { DataSource } from 'typeorm';
 import { InsertCartonDto, InsertListCartonDto } from './dto/insertCarton.dto';
 import { PKC_CARTON_DETAIL } from 'src/common/Entities/workload/table/PKC_CARTON_DETAIL.entity';
 
+const REPRINT_PACKING_NO = '18201';
+
+function isReprintPackingFallback(sect?: string | null) {
+    return sect?.trim().toUpperCase() === 'CHK';
+}
+
 @Injectable()
 export class VpsRepository extends BaseRepository {
     constructor(
@@ -620,15 +626,18 @@ export class VpsRepository extends BaseRepository {
     async getOrderReprint(
         search: string | undefined,
         page: number,
-        sect: string,
+        sect?: string | null,
     ) {
         const PAGE_SIZE = 20;
         const skip = (page - 1) * PAGE_SIZE;
         const searchVal = search ?? null;
-        const isAllSect = sect?.toUpperCase() === 'ALL';
+        const isFixedPacking = isReprintPackingFallback(sect);
+        const isAllSect = !isFixedPacking && sect?.toUpperCase() === 'ALL';
 
         const sectFilter = isAllSect
             ? ''
+            : isFixedPacking
+              ? 'AND p.PACKNO = :3'
             : `
         AND EXISTS (
             SELECT 1 FROM AMECORDERS_PACKNO a
@@ -638,11 +647,13 @@ export class VpsRepository extends BaseRepository {
 
         const params = isAllSect
             ? [searchVal, searchVal, skip, PAGE_SIZE + 1]
-            : [searchVal, searchVal, sect, sect, skip, PAGE_SIZE + 1];
+            : isFixedPacking
+              ? [searchVal, searchVal, REPRINT_PACKING_NO, skip, PAGE_SIZE + 1]
+              : [searchVal, searchVal, sect, sect, skip, PAGE_SIZE + 1];
 
         // ต้องปรับเลข placeholder ของ OFFSET/FETCH ให้ตรงกับจำนวนพารามิเตอร์ที่ใช้จริง
-        const offsetIdx = isAllSect ? 3 : 5;
-        const fetchIdx = isAllSect ? 4 : 6;
+        const offsetIdx = isAllSect ? 3 : isFixedPacking ? 4 : 5;
+        const fetchIdx = isAllSect ? 4 : isFixedPacking ? 5 : 6;
 
         const rows = await this.wk.query(
             `
@@ -666,11 +677,14 @@ export class VpsRepository extends BaseRepository {
         return { rows: items, hasMore };
     }
 
-    async getPackNoReprint(orderno: string, sect: string) {
-        const isAllSect = sect?.toUpperCase() === 'ALL';
+    async getPackNoReprint(orderno: string, sect?: string | null) {
+        const isFixedPacking = isReprintPackingFallback(sect);
+        const isAllSect = !isFixedPacking && sect?.toUpperCase() === 'ALL';
 
         const sectFilter = isAllSect
             ? ''
+            : isFixedPacking
+              ? 'AND p.PACKNO = :2'
             : `
         AND EXISTS (
             SELECT 1 FROM AMECORDERS_PACKNO a
@@ -678,7 +692,11 @@ export class VpsRepository extends BaseRepository {
             AND (a.SECT = :2 OR a.SECT_PACKING = :3)
         )`;
 
-        const params = isAllSect ? [orderno] : [orderno, sect, sect];
+        const params = isAllSect
+            ? [orderno]
+            : isFixedPacking
+              ? [orderno, REPRINT_PACKING_NO]
+              : [orderno, sect, sect];
 
         return this.wk.query(
             `

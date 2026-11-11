@@ -68,7 +68,7 @@ export class JigInspectionService {
         points.forEach(validateRange);
         const defects = await manager.query('SELECT * FROM IEDOC.JIG_DEFECT_NG WHERE JIG_NO = :1', [jigNo]);
         const created = await this.forms.create({ 
-            NFRMNO: 26, 
+            NFRMNO: 31, 
             VORGNO: '051401', 
             CYEAR: '26',
             REQBY: pic, 

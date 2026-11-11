@@ -1,11 +1,4 @@
-import {
-    IsNotEmpty,
-    IsNumber,
-    IsOptional,
-    IsString,
-    Min,
-    Max,
-} from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PickType } from '@nestjs/swagger';
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';

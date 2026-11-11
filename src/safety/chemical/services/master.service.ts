@@ -10,16 +10,22 @@ import { OrganizationsService } from 'src/webform/organizations/organizations.se
 @Injectable()
 export class MasterService {
     constructor(
-        private readonly orgService: OrganizationsService,
-        private readonly masterRepo: MasterRepository,
-        private readonly revRepo: RevRepository,
-        private readonly sectionRepo: SectionRepository,
+        protected readonly orgService: OrganizationsService,
+        protected readonly masterRepo: MasterRepository,
+        protected readonly revRepo: RevRepository,
+        protected readonly sectionRepo: SectionRepository,
     ) {}
 
+    /**
+     * @author Sutthipong tangmongkhoncharoen(24008)
+     * @since 2026-11-09
+     * @description ดึงข้อมูล master ที่ active ทั้งหมด
+     * @returns ข้อมูล master ที่ active ทั้งหมด
+     */
     async getActive() {
         const section = await this.revRepo.getSectionActive();
         // const data = await this.masterRepo.getMaster(section, 1);
-        const data = await this.masterRepo.getMasters(1);
+        const data = await this.masterRepo.getMasters({ status: 1 });
         return data.length > 0
             ? {
                   status: true,
@@ -33,10 +39,16 @@ export class MasterService {
               };
     }
 
+    /**
+     * @author Sutthipong tangmongkhoncharoen(24008)
+     * @since 2026-11-09
+     * @description ดึงข้อมูล master ที่ inactive ทั้งหมด
+     * @returns ข้อมูล master ที่ inactive ทั้งหมด
+     */
     async getInactive() {
         const section = await this.revRepo.getSectionActive();
         // const data = await this.masterRepo.getMaster(section, 0);
-        const data = await this.masterRepo.getMasters(0);
+        const data = await this.masterRepo.getMasters({ status: 0 });
         return data.length > 0
             ? {
                   status: true,
@@ -50,6 +62,12 @@ export class MasterService {
               };
     }
 
+    /**
+     * @author Sutthipong tangmongkhoncharoen(24008)
+     * @since 2026-11-09
+     * @description ดึงข้อมูล master แต่ละแผนกของผู้ใช้งาน
+     * @returns ข้อมูล master แต่ละแผนกของผู้ใช้งาน
+     */
     async getOwnOrg(dto: OwnOrgDto) {
         try {
             const { EMPNO, GROUP } = dto;

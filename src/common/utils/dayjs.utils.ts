@@ -29,18 +29,29 @@ export function getFYear({
 
 /**
  * Format a date string.
- * @param {string} date
- * @param {string} format
+ * @param {string} date 
+ * @param {string} format // รูปแบบผลลัพธ์ที่ต้องการ เช่น 'YYYY-MM-DD'
+ * @param {string} formatInput  // รูปแบบวันที่ที่รับเข้ามา เช่น 'YYYYMMDD'
+ * @param {string} locale  // ภาษาที่ใช้ในการแสดงผล เช่น 'en' หรือ 'th'
  * @returns {string}
+ * @example
+ * formatDate('20230923', 'DD/MM/YYYY'); // returns '23/09/2023'
+ * formatDate('28/Dec/22', "YYYY-MM-DD", 'DD/MMM/YY') // returns '2022-12-28'
+ * @history
+ * - 2026-11-11 add formatInput parameter to formatDate function
  */
 export function formatDate(
     date: string | Date | number,
     format: string = 'YYYY-MM-DD',
+    formatInput: string = 'YYYY-MM-DD',
     locale: string = 'en',
 ): string {
     if (!date) return '';
     if (typeof date === 'number') {
         return dayjs(String(date), 'YYYYMMDD').format(format);
+    }
+    if (formatInput !== 'YYYY-MM-DD') {
+        return dayjs(date, formatInput).locale(locale).format(format);
     }
     return dayjs(date).locale(locale).format(format);
 }

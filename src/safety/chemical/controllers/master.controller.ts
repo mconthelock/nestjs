@@ -1,10 +1,15 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { MasterService } from '../services/master.service';
-import { OwnOrgDto } from '../dto/master.dto';
+import { OwnOrgDto, RebuildSectionDto } from '../dto/master.dto';
+import { RebuildService } from '../services/rebuild.service';
 
 @Controller('safety/chemical/master')
 export class MasterController {
-    constructor(private readonly service: MasterService) {}
+    constructor(
+        private readonly service: MasterService,
+        private readonly rebuildService: RebuildService,
+    ) {}
+
 
     @Get('active')
     getActive() {
@@ -19,5 +24,10 @@ export class MasterController {
     @Post('OwnOrg')
     getOwnOrg(@Body() data: OwnOrgDto) {
         return this.service.getOwnOrg(data);
+    }
+
+    @Post('rebuild')
+    getRebuildSection(@Body() data: RebuildSectionDto) {
+        return this.rebuildService.getRebuildSection(data.ID);
     }
 }

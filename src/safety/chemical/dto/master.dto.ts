@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class OwnOrgDto {
     @IsNotEmpty()
@@ -11,4 +11,11 @@ export class OwnOrgDto {
     @IsString()
     @Type(() => String)
     GROUP?: string;
+}
+
+export class RebuildSectionDto {
+    @IsNotEmpty()
+    @IsNumber({}, { each: true })
+    @Type(() => Number)
+    ID: number[];
 }

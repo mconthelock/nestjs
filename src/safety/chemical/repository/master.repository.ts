@@ -95,7 +95,7 @@ export class MasterRepository extends BaseRepository {
         );
     }
 
-    getMasters(status: number) {
+    async getMasters({ status, id }: { status: number; id?: number[] }) {
         const query = this.getRepository(STY_CHEMICAL)
             .createQueryBuilder('C')
             .select([
@@ -136,7 +136,21 @@ export class MasterRepository extends BaseRepository {
         } else {
             query.andWhere('C.STATUS = :status', { status });
         }
+        if (id && id.length > 0) {
+            query.andWhere('C.AMEC_SDS_ID IN (:...id)', { id });
+        }
         return query.getMany();
+        // const { raw, entities } = await query.getRawAndEntities();
+
+        // // นำข้อมูล raw มายัดใส่ entity เพื่อให้ได้ผลลัพธ์ที่มีคอลัมน์เพิ่มเข้ามา
+        // const result = entities.map((entity, index) => {
+        //     return {
+        //         ...entity,
+        //         EFF_DATE: raw[index].EFF_DATE,
+        //         SDS_DATE: raw[index].SDS_DATE,
+        //     };
+        // });
+        // return result;
         // const where =
         //     status === 1
         //         ? {

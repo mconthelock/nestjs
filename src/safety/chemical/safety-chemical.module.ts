@@ -14,6 +14,7 @@ import { OrganizationsModule } from 'src/webform/organizations/organizations.mod
 import { SectionRepository } from './repository/section.repository';
 import { RevService } from './services/rev.service';
 import { RevController } from './controllers/rev.controller';
+import { RebuildService } from './services/rebuild.service';
 
 @Module({
     imports: [ChemicalSectionModule, FormModule, OrganizationsModule],
@@ -23,6 +24,7 @@ import { RevController } from './controllers/rev.controller';
         FollowService,
         MasterService,
         RevService,
+        RebuildService,
 
         // Repository
         FollowRepository,

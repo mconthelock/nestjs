@@ -3,10 +3,11 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
-    OneToMany,
     PrimaryColumn,
+    AfterLoad,
 } from 'typeorm';
 import { STY_CHEMICAL } from './STY_CHEMICAL.entity';
+import { formatDate } from 'src/common/utils/dayjs.utils';
 
 @Entity({ name: 'STY_CHEMICAL_SECTION', schema: 'GPREPORT' })
 export class STY_CHEMICAL_SECTION {
@@ -54,6 +55,15 @@ export class STY_CHEMICAL_SECTION {
 
     @Column()
     UPDATE_DATE: Date;
+
+    SDS_DATE?: string;
+
+    @AfterLoad()
+    formatDates() {
+        if (this.RECEIVED_SDS_DATE) {
+            this.SDS_DATE = formatDate(this.RECEIVED_SDS_DATE, 'DD-MMM-YY');
+        }
+    }
 
     @ManyToOne(() => STY_CHEMICAL, (c) => c.SECTIONS)
     @JoinColumn({ name: 'AMEC_SDS_ID', referencedColumnName: 'AMEC_SDS_ID' })

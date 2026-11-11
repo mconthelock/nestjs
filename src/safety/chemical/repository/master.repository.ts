@@ -3,6 +3,7 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { STY_CHEMICAL } from 'src/common/Entities/gpreport/table/STY_CHEMICAL.entity';
+import { STY_TYPE } from 'src/common/Entities/gpreport/table/STY_TYPE.entity';
 
 @Injectable()
 export class MasterRepository extends BaseRepository {
@@ -95,42 +96,86 @@ export class MasterRepository extends BaseRepository {
     }
 
     getMasters(status: number) {
-        const where = status === 1 ? {
-            STATUS: status,
-            SECTIONS:{
-                STATUS: status
-            }
-        } : {
-            STATUS: status
+        const query = this.getRepository(STY_CHEMICAL)
+            .createQueryBuilder('C')
+            .select([
+                'C.AMEC_SDS_ID',
+                'C.CHEMICAL_NAME',
+                'C.UN_CLASS',
+                'C.STATUS',
+                'C.EFFECTIVE_DATE',
+                'C.RECEIVED_SDS_DATE',
+                'C.PRODUCT_CODE',
+                'C.PUR_INCHARGE',
+                'C.REV',
+                'C.VENDOR',
+                'S.OWNER',
+                'S.OWNERCODE',
+                'S.AMEC_SDS_ID',
+                'S.USED_FOR',
+                'S.KEEPING_POINT',
+                'S.USED_AREA',
+                'S.RECEIVED_SDS_DATE',
+                'S.QTY',
+                'S.REC4052',
+                'S.REC4054',
+                'T.TYPE_NAME',
+            ])
+            .leftJoin('C.SECTIONS', 'S')
+            .leftJoinAndMapOne(
+                'C.CLASS',
+                STY_TYPE,
+                'T',
+                'T.TYPE_NO = C.UN_CLASS AND T.TYPE_CODE = :typeCode',
+                { typeCode: 'CMC' },
+            )
+            .orderBy('C.AMEC_SDS_ID', 'ASC');
+        if (status === 1) {
+            query.andWhere('C.STATUS = :status', { status });
+            query.andWhere('S.STATUS = :status', { status });
+        } else {
+            query.andWhere('C.STATUS = :status', { status });
         }
-        return this.getRepository(STY_CHEMICAL).find({
-            select: {
-                AMEC_SDS_ID: true,
-                CHEMICAL_NAME: true,
-                UN_CLASS: true,
-                STATUS: true,
-                EFFECTIVE_DATE: true,
-                RECEIVED_SDS_DATE: true,
-                PRODUCT_CODE: true,
-                PUR_INCHARGE: true,
-                REV: true,
-                VENDOR: true,
-                SECTIONS: {
-                    OWNER: true,
-                    OWNERCODE: true,
-                    AMEC_SDS_ID: true,
-                    USED_FOR: true,
-                    KEEPING_POINT: true,
-                    USED_AREA: true,
-                    RECEIVED_SDS_DATE: true,
-                    QTY: true,
-                    REC4052: true,
-                    REC4054: true,
-                },
-            },
-            where: where,
-            relations: ['SECTIONS'],
-            order: { AMEC_SDS_ID: 'ASC' },
-        });
+        return query.getMany();
+        // const where =
+        //     status === 1
+        //         ? {
+        //               STATUS: status,
+        //               SECTIONS: {
+        //                   STATUS: status,
+        //               },
+        //           }
+        //         : {
+        //               STATUS: status,
+        //           };
+        // return this.getRepository(STY_CHEMICAL).find({
+        //     select: {
+        //         AMEC_SDS_ID: true,
+        //         CHEMICAL_NAME: true,
+        //         UN_CLASS: true,
+        //         STATUS: true,
+        //         EFFECTIVE_DATE: true,
+        //         RECEIVED_SDS_DATE: true,
+        //         PRODUCT_CODE: true,
+        //         PUR_INCHARGE: true,
+        //         REV: true,
+        //         VENDOR: true,
+        //         SECTIONS: {
+        //             OWNER: true,
+        //             OWNERCODE: true,
+        //             AMEC_SDS_ID: true,
+        //             USED_FOR: true,
+        //             KEEPING_POINT: true,
+        //             USED_AREA: true,
+        //             RECEIVED_SDS_DATE: true,
+        //             QTY: true,
+        //             REC4052: true,
+        //             REC4054: true,
+        //         },
+        //     },
+        //     where: where,
+        //     relations: ['SECTIONS'],
+        //     order: { AMEC_SDS_ID: 'ASC' },
+        // });
     }
 }

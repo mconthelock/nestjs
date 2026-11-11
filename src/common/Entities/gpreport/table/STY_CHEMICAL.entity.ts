@@ -1,6 +1,5 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn, VirtualColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { STY_CHEMICAL_SECTION } from './STY_CHEMICAL_SECTION.entity';
-import { STY_TYPE } from './STY_TYPE.entity';
 
 @Entity({ name: 'STY_CHEMICAL', schema: 'GPREPORT' })
 export class STY_CHEMICAL {

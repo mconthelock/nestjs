@@ -1,6 +1,15 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    JoinColumn,
+    OneToMany,
+    OneToOne,
+    PrimaryColumn,
+} from 'typeorm';
+import { GPLY01_TAXAS400 } from './GPLY01_TAXAS400.entity';
+import { FORM } from './FORM.entity';
 
-@Entity({ name: 'GPLY01_TAX', schema: 'AMECMFG' })
+@Entity({ name: 'GPLY01_TAX', schema: 'WEBFORM' })
 export class GPLY01_TAX {
     @PrimaryColumn()
     NFRMNO: number;
@@ -106,4 +115,14 @@ export class GPLY01_TAX {
 
     @Column()
     FAMNED1: number;
+
+    @OneToOne(() => FORM)
+    @JoinColumn([
+        { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+        { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+        { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+    ])
+    form: FORM;
 }

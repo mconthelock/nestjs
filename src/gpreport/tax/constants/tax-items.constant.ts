@@ -32,7 +32,7 @@ export interface TaxItemConfig {
 
 export const TAX_MASTER_ITEMS: TaxItemConfig[] = [
     {
-        id: 'tax1',
+        id: 'TAX1',
         title: '1. ค่าลดหย่อนส่วนตัว',
         rate: '60,000 บาท',
         group: 'รายการลดหย่อนภาษีเงินได้',
@@ -40,7 +40,7 @@ export const TAX_MASTER_ITEMS: TaxItemConfig[] = [
         fixed_value: '60,000.00',
     },
     {
-        id: 'tax2',
+        id: 'TAX2',
         title: '2. ค่าลดหย่อนคู่สมรส',
         rate: '60,000 บาท (กรณี จดทะเบียนและคู่สมรสไม่มีเงินได้)',
         group: 'รายการลดหย่อนภาษีเงินได้',

@@ -108,7 +108,7 @@ export class JigInspectionService {
         ]);
         const created = await this.forms.create(
             {
-                NFRMNO: 31,
+                NFRMNO: 26,
                 VORGNO: '051401',
                 CYEAR: '26',
                 REQBY: pic,

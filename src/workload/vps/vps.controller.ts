@@ -1,4 +1,16 @@
-import { Controller, Post, Body, Req, Get, Query } from '@nestjs/common';
+import {
+    Controller,
+    Post,
+    Body,
+    Req,
+    Get,
+    Query,
+    UploadedFiles,
+    UseInterceptors,
+} from '@nestjs/common';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { MailService } from 'src/common/services/mail/mail.service';
+import { SendMailDto } from 'src/common/services/mail/dto/send-mail.dto';
 import { VpsService } from './vps.service';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
@@ -10,7 +22,56 @@ import { ReprintPackingOrderDto } from './dto/reprintPackingOrder.dto';
 
 @Controller('vps')
 export class VpsController {
-    constructor(private readonly vpsService: VpsService) {}
+    constructor(
+        private readonly vpsService: VpsService,
+        private readonly mailService: MailService,
+    ) {}
+
+    // multipart/form-data: to, cc, bcc, subject, html; every file field becomes an attachment
+    @Post('send-mail')
+    @UseInterceptors(
+        AnyFilesInterceptor({ limits: { fileSize: 20 * 1024 * 1024 } }),
+    )
+    async sendMail(
+        @Body() body: SendMailDto,
+        @UploadedFiles() files: Express.Multer.File[],
+    ) {
+        const toList = (v?: string | string[]) =>
+            typeof v === 'string'
+                ? v
+                      .split(/[,;]/)
+                      .map((s) => s.trim())
+                      .filter(Boolean)
+                : v;
+        const attachments = (files ?? []).map((f) => ({
+            filename: Buffer.from(f.originalname, 'latin1').toString('utf8'),
+            content: f.buffer,
+        }));
+        await this.mailService.sendMail({
+            ...body,
+            to: toList(body.to),
+            cc: toList(body.cc),
+            bcc: toList(body.bcc),
+            attachments,
+        });
+        return { success: true };
+    }
+
+    @Post('send-image-error-report')
+    async sendImageErrorReport(
+        @Body('to') to: string,
+        @Body('cc') cc?: string,
+    ) {
+        const toList = (v?: string) =>
+            v
+                ?.split(/[,;]/)
+                .map((s) => s.trim())
+                .filter(Boolean);
+        return this.vpsService.sendImageErrorReport(
+            toList(to) ?? [],
+            toList(cc),
+        );
+    }
 
     @Post('chk-print')
     async chkPrint(

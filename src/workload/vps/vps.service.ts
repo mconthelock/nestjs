@@ -5,12 +5,16 @@ import { VpsRepository } from './vps.repository';
 import { InsertCartonDto, InsertListCartonDto } from './dto/insertCarton.dto';
 import { PKC_CARTON_DETAIL } from 'src/common/Entities/workload/table/PKC_CARTON_DETAIL.entity';
 import { S011mpService } from 'src/datacenter/s011mp/s011mp.service';
+import * as ExcelJS from 'exceljs';
+import { MailService } from 'src/common/services/mail/mail.service';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class VpsService {
     constructor(
         private readonly vpsRepository: VpsRepository,
         private readonly s011mpService: S011mpService,
+        private readonly mailService: MailService,
     ) {}
 
     async chkPrint(order: string, packing: string): Promise<boolean> {
@@ -369,11 +373,60 @@ export class VpsService {
             }),
         );
 
-        return {data : data};
+        return { data: data };
     }
 
     async checkQtyPrintBlock(order: string, block: string) {
         const data = await this.vpsRepository.checkQtyPrintBlock(order, block);
         return data;
+    }
+
+    private async buildImageErrorExcel(
+        rows: { PUR_CODE: string; IMAGE_NAME: string; ERROR_AT: Date }[],
+    ): Promise<Buffer> {
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet('Sheet1');
+        ws.columns = [
+            { header: 'PUR CODE', key: 'PUR_CODE', width: 14 },
+            { header: 'IMAGE_NAME', key: 'IMAGE_NAME', width: 24 },
+            { header: 'ERROR AT', key: 'ERROR_AT', width: 22 },
+        ];
+        ws.getRow(1).font = { bold: true };
+        ws.views = [{ state: 'frozen', ySplit: 1 }];
+        const thaiRows = rows.map((row) => ({
+            PUR_CODE: row.PUR_CODE,
+            IMAGE_NAME: row.IMAGE_NAME,
+            ERROR_AT: row.ERROR_AT
+                ? DateTime.fromJSDate(row.ERROR_AT)
+                      .setZone('Asia/Bangkok')
+                      .toFormat('yyyy-MM-dd HH:mm:ss')
+                : '',
+        }));
+        ws.addRows(thaiRows);
+        return Buffer.from(await wb.xlsx.writeBuffer());
+    }
+
+    async sendImageErrorReport(to: string[], cc?: string[], days = 7) {
+        const rows = await this.vpsRepository.getImageErrors();
+        if (!rows?.length) {
+            return { success: true, sent: false, count: 0 };
+        }
+
+        const buffer = await this.buildImageErrorExcel(rows);
+        const date = new Date().toISOString().slice(0, 10);
+
+        await this.mailService.sendMail({
+            to,
+            cc,
+            subject: `Maintenance parts “No picture” ${date}`,
+            html: `<div style="font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #000000;">
+                    <p>Dear All,</p>
+                    <p>Please find attached the weekly summary log of &ldquo;No picture&rdquo; cases from the Maintenance Parts Kitting program.</p>
+                </div>`,
+            attachments: [
+                { filename: `IMAGE_NOT_FOUND_${date}.xlsx`, content: buffer },
+            ],
+        });
+        return { success: true, sent: true, count: rows.length };
     }
 }

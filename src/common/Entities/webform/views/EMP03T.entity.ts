@@ -1,94 +1,94 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { ViewEntity, PrimaryColumn, ViewColumn } from 'typeorm';
 
-@Entity({ name: 'EMP03T', schema: 'AMECMFG' })
+@ViewEntity({ name: 'EMP03T', schema: 'WEBFORM' })
 export class EMP03T {
     @PrimaryColumn()
     EMPCOD: string;
 
-    @Column()
+    @ViewColumn()
     MARSTT: string;
 
-    @Column()
+    @ViewColumn()
     MARSTE: string;
 
-    @Column()
+    @ViewColumn()
     FAMMRN: string;
 
-    @Column()
+    @ViewColumn()
     FAMMRD: number;
 
-    @Column()
+    @ViewColumn()
     FAMSNA: string;
 
-    @Column()
+    @ViewColumn()
     FAMSTX: string;
 
-    @Column()
+    @ViewColumn()
     FAMCHI: number;
 
-    @Column()
+    @ViewColumn()
     C1NED: number;
 
-    @Column()
+    @ViewColumn()
     C1IED: number;
 
-    @Column()
+    @ViewColumn()
     C2NED: number;
 
-    @Column()
+    @ViewColumn()
     C2IED: number;
 
-    @Column()
+    @ViewColumn()
     TAXEMF: string;
 
-    @Column()
+    @ViewColumn()
     TAXEMM: string;
 
-    @Column()
+    @ViewColumn()
     TAXSFT: string;
 
-    @Column()
+    @ViewColumn()
     TAXSPM: string;
 
-    @Column()
+    @ViewColumn()
     TAXINS: number;
 
-    @Column()
+    @ViewColumn()
     TAXSIN: number;
 
-    @Column()
+    @ViewColumn()
     TAXRMF: number;
 
-    @Column()
+    @ViewColumn()
     TAXLTF: number;
 
-    @Column()
+    @ViewColumn()
     TAXINL: number;
 
-    @Column()
+    @ViewColumn()
     TAXEDU: number;
 
-    @Column()
+    @ViewColumn()
     TAXDON: number;
 
-    @Column()
+    @ViewColumn()
     TAXINH: number;
 
-    @Column()
+    @ViewColumn()
     TAXINP: number;
 
-    @Column()
+    @ViewColumn()
     TAXANU: number;
 
-    @Column()
+    @ViewColumn()
     TAXDIS: number;
 
-    @Column()
+    @ViewColumn()
     TAXPRG: number;
 
-    @Column()
+    @ViewColumn()
     TAXOT1: number;
 
-    @Column()
+    @ViewColumn()
     TAXOT2: number;
 }

@@ -62,7 +62,8 @@ export class RebuildService extends MasterService {
             .filter(
                 (v, i, a) =>
                     a.findIndex((t) => t.OWNERCODE === v.OWNERCODE) === i,
-            );
+            )
+            .sort((a, b) => a.OWNER.localeCompare(b.OWNER));
         const newData = data.flatMap((item) => {
             if (item.SECTIONS.length === 0) {
                 const sectionData = sections.map((section) => {

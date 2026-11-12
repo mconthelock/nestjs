@@ -129,7 +129,7 @@ export class MasterRepository extends BaseRepository {
                 'T.TYPE_NO = C.UN_CLASS AND T.TYPE_CODE = :typeCode',
                 { typeCode: 'CMC' },
             )
-            .orderBy('C.AMEC_SDS_ID', 'ASC');
+            .orderBy('C.AMEC_SDS_ID, S.OWNER', 'ASC');
         if (status === 1) {
             query.andWhere('C.STATUS = :status', { status });
             query.andWhere('S.STATUS = :status', { status });

@@ -37,6 +37,9 @@ export class RevRepository extends BaseRepository {
                     USER: true,
                 },
             },
+            order: {
+                OWNER: 'ASC',
+            },
         });
     }
 
@@ -47,6 +50,9 @@ export class RevRepository extends BaseRepository {
         } else if (type === 'inactive') {
             where.STATUS = 0;
         }
-        return this.getRepository(STY_CHEMICAL_REV).find({ where });
+        return this.getRepository(STY_CHEMICAL_REV).find({
+            where,
+            order: { OWNER: 'ASC' },
+        });
     }
 }

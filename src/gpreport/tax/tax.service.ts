@@ -26,29 +26,6 @@ import { TaxRepository } from './tax.repository';
 
 @Injectable()
 export class TaxService {
-    // Form Constants (GP-LY01)
-    private readonly NFRMNO = 3;
-    private readonly VORGNO = '030101';
-    private readonly CYEAR = '19';
-    private readonly HR_APPROVER = '16007';
-
-    // Status Mapping for Marital Status
-    private readonly MARITAL_STATUS: Record<
-        number,
-        { tname: string; ename: string }
-    > = {
-        1: { tname: 'โสด', ename: 'SINGLE' },
-        2: { tname: 'หย่าร้าง/หม้าย', ename: 'DIVORCE/WIDOW' },
-        3: {
-            tname: 'จดทะเบียนและคู่สมรสมีเงินได้',
-            ename: 'MARRIED & SPOUSE DOES WORK',
-        },
-        4: {
-            tname: 'จดทะเบียนและคู่สมรสไม่มีเงินได้',
-            ename: 'MARRIED & SPOUSE DOES NOT WORK',
-        },
-    };
-
     constructor(
         @InjectRepository(GPLY01_TAX, 'webformConnection')
         private readonly taxRepo: Repository<GPLY01_TAX>,
@@ -62,16 +39,25 @@ export class TaxService {
 
     async findCurrentTax(empno: string) {
         const cleanEmpno = (empno || '').trim();
-        const emp03tResult = await this.repo.findEmp03(cleanEmpno);
-
-        // รองรับทั้งกรณีคืนค่าเป็น Array หรือ Object
-        const emp03t = Array.isArray(emp03tResult)
-            ? emp03tResult[0]
-            : emp03tResult;
-        if (!emp03t) {
-            return this.buildDefaultTaxResponse(cleanEmpno);
-        }
-        return this.formatTax(emp03t, 1);
+        const data = await this.repo.findEmp03(cleanEmpno);
+        return {
+            ...data,
+            TAX1: 60000,
+            TAX2:
+                data.FAMSNA.trim() != null && data.FAMSNA.trim() !== ''
+                    ? 60000
+                    : 0,
+            TAX3:
+                data.C1IED * 30000 +
+                data.C1NED * 30000 +
+                (data.C2IED * 60000 + data.C2NED * 60000),
+            TAX4:
+                (data.TAXEMF.replaceAll(' ', '') !== '' ? 30000 : 0) +
+                (data.TAXEMM.replaceAll(' ', '') !== '' ? 30000 : 0) +
+                (data.TAXSFT.replaceAll(' ', '') !== '' ? 30000 : 0) +
+                (data.TAXSPM.replaceAll(' ', '') !== '' ? 30000 : 0),
+            FAMMRD: data.FAMMRD == 0 ? '' : data.FAMMRD,
+        };
     }
 
     async findHistory(q: SearchTaxDto) {

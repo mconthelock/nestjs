@@ -64,15 +64,15 @@ export class RebuildService extends MasterService {
                     a.findIndex((t) => t.OWNERCODE === v.OWNERCODE) === i,
             );
         const newData = data.flatMap((item) => {
-            const sectionData = sections.map((section) => {
-                const hasSection = item.SECTIONS.some(
-                    (s) => s.OWNERCODE === section.OWNERCODE,
-                );
-                return {
-                    [section.OWNER]: hasSection ? 'Y' : 'N',
-                };
-            });
             if (item.SECTIONS.length === 0) {
+                const sectionData = sections.map((section) => {
+                    const hasSection = item.SECTIONS.some(
+                        (s) => s.OWNERCODE === section.OWNERCODE,
+                    );
+                    return {
+                        [section.OWNER]: hasSection ? 'Y' : 'N',
+                    };
+                });
                 return {
                     AMEC_SDS_ID: item.AMEC_SDS_ID,
                     CHEMICAL_NAME: item.CHEMICAL_NAME,
@@ -98,6 +98,12 @@ export class RebuildService extends MasterService {
                 };
             }
             return item.SECTIONS.map((s) => {
+                const sectionData = sections.map((section) => {
+                    const hasSection = s.OWNERCODE === section.OWNERCODE;
+                    return {
+                        [section.OWNER]: hasSection ? 'Y' : 'N',
+                    };
+                });
                 return {
                     AMEC_SDS_ID: item.AMEC_SDS_ID,
                     CHEMICAL_NAME: item.CHEMICAL_NAME,

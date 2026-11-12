@@ -26,7 +26,7 @@ export class FEOT_DETAILS{
     @Column()
     WORKHOURS: number;
 
-    @Column()
+    @Column('float')
     WORKTYPE: number;
 
     @Column()

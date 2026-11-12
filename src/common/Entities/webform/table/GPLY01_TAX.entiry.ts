@@ -27,7 +27,7 @@ export class GPLY01_TAX {
     NRUNNO: number;
 
     @Column()
-    SEMPNO: string;
+    EMPCOD: string;
 
     @Column()
     MARSTT: string;
@@ -36,19 +36,31 @@ export class GPLY01_TAX {
     MARSTE: string;
 
     @Column()
-    FAMMRD: string;
+    FAMMRN: string;
+
+    @Column()
+    FAMMRD: Date;
 
     @Column()
     FAMSNA: string;
 
     @Column()
-    FAMIED: number;
-
-    @Column()
-    FAMNED: number;
+    FAMSTX: string;
 
     @Column()
     FAMCHI: number;
+
+    @Column()
+    C1NED: number;
+
+    @Column()
+    C1IED: number;
+
+    @Column()
+    C2NED: number;
+
+    @Column()
+    C2IED: number;
 
     @Column()
     TAXEMF: string;
@@ -63,31 +75,31 @@ export class GPLY01_TAX {
     TAXSPM: string;
 
     @Column()
-    TAXDIS: string;
+    TAXPRG: number;
 
     @Column()
-    TAXPREG: number;
+    TAXDIS: number;
 
     @Column()
     TAXINS: number;
 
     @Column()
-    TAXSIN: number;
-
-    @Column()
     TAXINH: number;
 
     @Column()
-    TAXLTF: number;
+    TAXINP: number;
 
     @Column()
     TAXRMF: number;
 
     @Column()
-    TAXPENS: number;
+    TAXANU: number;
 
     @Column()
-    TAXFUND: number;
+    TAXINL: number;
+
+    @Column()
+    TAXLTF: number;
 
     @Column()
     TAXEDU: number;
@@ -96,25 +108,10 @@ export class GPLY01_TAX {
     TAXDON: number;
 
     @Column()
-    TAXINL: number;
-
-    @Column()
-    TAXINP: number;
-
-    @Column()
-    TAXISM: number;
-
-    @Column()
     TAXOT1: number;
 
     @Column()
     TAXOT2: number;
-
-    @Column()
-    FAMIED1: number;
-
-    @Column()
-    FAMNED1: number;
 
     @OneToOne(() => FORM)
     @JoinColumn([

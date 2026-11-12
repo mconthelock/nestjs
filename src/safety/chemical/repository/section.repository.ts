@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource, Raw } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { STY_CHM_SEC } from 'src/common/Entities/gpreport/views/STY_CHM_SEC.entity';
+import { STY_CHEMICAL_SECTION } from 'src/common/Entities/gpreport/table/STY_CHEMICAL_SECTION.entity';
 
 @Injectable()
 export class SectionRepository extends BaseRepository {
@@ -37,8 +38,17 @@ export class SectionRepository extends BaseRepository {
         });
     }
 
-    getMasterSectionRebuild(
-        id: number[],
-        section: readonly { OWNER: string }[],
-    ) {}
+    enable(id: number, ownerCode: string) {
+        return this.getRepository(STY_CHEMICAL_SECTION).update(
+            { AMEC_SDS_ID: id, OWNERCODE: ownerCode },
+            { STATUS: 1 },
+        );
+    }
+
+    disable(id: number, ownerCode: string) {
+        return this.getRepository(STY_CHEMICAL_SECTION).update(
+            { AMEC_SDS_ID: id, OWNERCODE: ownerCode },
+            { STATUS: 0 },
+        );
+    }
 }

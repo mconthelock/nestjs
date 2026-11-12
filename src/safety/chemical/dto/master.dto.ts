@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+    ValidateNested,
+} from 'class-validator';
 
 export class OwnOrgDto {
     @IsNotEmpty()
@@ -18,4 +24,28 @@ export class RebuildSectionDto {
     @IsNumber({}, { each: true })
     @Type(() => Number)
     ID: number[];
+}
+
+class RebuildSecConfDto {
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
+    OWNER: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
+    OWNERCODE: string;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    AMEC_SDS_ID: number;
+}
+
+export class ConfirmRebuildSectionDto extends RebuildSectionDto {
+    @IsNotEmpty()
+    @ValidateNested({ each: true })
+    @Type(() => RebuildSecConfDto)
+    SECTIONS: RebuildSecConfDto[];
 }

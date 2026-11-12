@@ -8,6 +8,7 @@ import { OrganizationsService } from 'src/webform/organizations/organizations.se
 import { MasterService } from './master.service';
 
 import { formatDate } from 'src/common/utils/dayjs.utils';
+import { ConfirmRebuildSectionDto } from '../dto/master.dto';
 
 @Injectable()
 export class RebuildService extends MasterService {
@@ -48,8 +49,8 @@ export class RebuildService extends MasterService {
      * @author Sutthipong tangmongkhoncharoen(24008)
      * @since 2026-11-11
      * @description จัดรูปแบบข้อมูล master และ sections ใหม่
-     * @param data 
-     * @returns 
+     * @param data
+     * @returns
      */
     private setData(data: any[]): { data: any[]; sections: any[] } {
         const sections = data
@@ -134,5 +135,26 @@ export class RebuildService extends MasterService {
             data: newData,
             sections,
         };
+    }
+
+    /**
+     * @author Sutthipong tangmongkhoncharoen(24008)
+     * @since 2026-11-12
+     * @description เปิดใช้งานรายการสารเคมีที่มีการเลิกใช้โดย admin
+     * @param dto
+     */
+    async confirmRebuildSection(dto: ConfirmRebuildSectionDto) {
+        try {
+            await this.masterRepo.enable(dto.ID);
+            for (const data of dto.SECTIONS) {
+                await this.sectionRepo.enable(data.AMEC_SDS_ID, data.OWNERCODE);
+            }
+            return {
+                status: true,
+                message: 'Rebuild successfully',
+            };
+        } catch (error) {
+            throw error;
+        }
     }
 }

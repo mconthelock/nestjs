@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { STY_CHEMICAL } from 'src/common/Entities/gpreport/table/STY_CHEMICAL.entity';
 import { STY_TYPE } from 'src/common/Entities/gpreport/table/STY_TYPE.entity';
@@ -10,7 +10,7 @@ export class MasterRepository extends BaseRepository {
     constructor(@InjectDataSource('gpreportConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
-
+    // ไม่ได้ใช้ในตอนนี้ แต่สามารถใช้สำหรับดึงข้อมูล master ของแต่ละ section ได้ แบบไม่ nested
     async getMaster(
         section: readonly { OWNER: string }[],
         status: number = 1,
@@ -140,56 +140,19 @@ export class MasterRepository extends BaseRepository {
             query.andWhere('C.AMEC_SDS_ID IN (:...id)', { id });
         }
         return query.getMany();
-        // const { raw, entities } = await query.getRawAndEntities();
+    }
 
-        // // นำข้อมูล raw มายัดใส่ entity เพื่อให้ได้ผลลัพธ์ที่มีคอลัมน์เพิ่มเข้ามา
-        // const result = entities.map((entity, index) => {
-        //     return {
-        //         ...entity,
-        //         EFF_DATE: raw[index].EFF_DATE,
-        //         SDS_DATE: raw[index].SDS_DATE,
-        //     };
-        // });
-        // return result;
-        // const where =
-        //     status === 1
-        //         ? {
-        //               STATUS: status,
-        //               SECTIONS: {
-        //                   STATUS: status,
-        //               },
-        //           }
-        //         : {
-        //               STATUS: status,
-        //           };
-        // return this.getRepository(STY_CHEMICAL).find({
-        //     select: {
-        //         AMEC_SDS_ID: true,
-        //         CHEMICAL_NAME: true,
-        //         UN_CLASS: true,
-        //         STATUS: true,
-        //         EFFECTIVE_DATE: true,
-        //         RECEIVED_SDS_DATE: true,
-        //         PRODUCT_CODE: true,
-        //         PUR_INCHARGE: true,
-        //         REV: true,
-        //         VENDOR: true,
-        //         SECTIONS: {
-        //             OWNER: true,
-        //             OWNERCODE: true,
-        //             AMEC_SDS_ID: true,
-        //             USED_FOR: true,
-        //             KEEPING_POINT: true,
-        //             USED_AREA: true,
-        //             RECEIVED_SDS_DATE: true,
-        //             QTY: true,
-        //             REC4052: true,
-        //             REC4054: true,
-        //         },
-        //     },
-        //     where: where,
-        //     relations: ['SECTIONS'],
-        //     order: { AMEC_SDS_ID: 'ASC' },
-        // });
+    enable(id: number | number[]) {
+        return this.getRepository(STY_CHEMICAL).update(
+            Array.isArray(id) ? { AMEC_SDS_ID: In(id) } : { AMEC_SDS_ID: id },
+            { STATUS: 1 },
+        );
+    }
+
+    disable(id: number) {
+        return this.getRepository(STY_CHEMICAL).update(
+            Array.isArray(id) ? { AMEC_SDS_ID: In(id) } : { AMEC_SDS_ID: id },
+            { STATUS: 0 },
+        );
     }
 }

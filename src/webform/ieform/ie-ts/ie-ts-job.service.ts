@@ -124,7 +124,7 @@ export class IeTsJobService {
 
     <!-- Body -->
     <div style="padding: 30px;">
-        <p style="margin-top: 0; font-size: 15px; color: #333333;"><strong>Dear Sir/Madam,</strong></p>
+        <p style="margin-top: 0; font-size: 15px; color: #333333;"><strong>Dear Sir,</strong></p>
         <p style="font-size: 14px; line-height: 1.6; color: #555555;">
             This is an automated notification from the Web Flow System. The following <strong>TS Adjustment</strong> request is currently awaiting your approval:
         </p>

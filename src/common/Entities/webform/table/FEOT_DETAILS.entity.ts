@@ -23,7 +23,7 @@ export class FEOT_DETAILS{
     @Column()
     WORKTIMEOUT: string;
 
-    @Column()
+    @Column('float')
     WORKHOURS: number;
 
     @Column('float')

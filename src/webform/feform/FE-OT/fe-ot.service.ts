@@ -33,6 +33,10 @@ export class FEOTService {
         return this.repo.getDataOT(dto);
     }
 
+    async getDataOTall(){
+        return this.repo.getDataOTall();
+    }
+
     async remove(dto: {
         PLANYEAR: number;
         PLANMONTH: number;

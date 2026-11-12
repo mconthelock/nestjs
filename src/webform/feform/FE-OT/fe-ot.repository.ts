@@ -31,6 +31,10 @@ export class FEOTRepository extends BaseRepository {
         });
     }
 
+    async getDataOTall(){
+        return this.getRepository(FEOT_DETAILS).find();
+    }
+
     async remove(dto: {
         PLANYEAR: number;
         PLANMONTH: number;

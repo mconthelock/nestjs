@@ -32,12 +32,13 @@ export class CreateTaxDto extends PickType(CreateFormDto, [
     @IsString()
     CYEAR2: string;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
     NRUNNO: number;
 
     @IsString()
-    SEMPNO: string;
+    EMPCOD: string;
 
     @IsString()
     MARSTT: string;
@@ -46,22 +47,37 @@ export class CreateTaxDto extends PickType(CreateFormDto, [
     MARSTE: string;
 
     @IsString()
-    FAMMRD: string;
+    FAMMRN: string;
+
+    @IsNumber()
+    @Type(() => Date)
+    FAMMRD: Date;
 
     @IsString()
     FAMSNA: string;
 
-    @IsNumber()
-    @Type(() => Number)
-    FAMIED: number;
-
-    @IsNumber()
-    @Type(() => Number)
-    FAMNED: number;
+    @IsString()
+    FAMSTX: string;
 
     @IsNumber()
     @Type(() => Number)
     FAMCHI: number;
+
+    @IsNumber()
+    @Type(() => Number)
+    C1NED: number;
+
+    @IsNumber()
+    @Type(() => Number)
+    C1IED: number;
+
+    @IsNumber()
+    @Type(() => Number)
+    C2NED: number;
+
+    @IsNumber()
+    @Type(() => Number)
+    C2IED: number;
 
     @IsString()
     TAXEMF: string;
@@ -77,11 +93,11 @@ export class CreateTaxDto extends PickType(CreateFormDto, [
 
     @IsNumber()
     @Type(() => Number)
-    TAXDIS: number;
+    TAXPRG: number;
 
     @IsNumber()
     @Type(() => Number)
-    TAXPREG: number;
+    TAXDIS: number;
 
     @IsNumber()
     @Type(() => Number)
@@ -89,15 +105,11 @@ export class CreateTaxDto extends PickType(CreateFormDto, [
 
     @IsNumber()
     @Type(() => Number)
-    TAXSIN: number;
-
-    @IsNumber()
-    @Type(() => Number)
     TAXINH: number;
 
     @IsNumber()
     @Type(() => Number)
-    TAXLTF: number;
+    TAXINP: number;
 
     @IsNumber()
     @Type(() => Number)
@@ -105,11 +117,15 @@ export class CreateTaxDto extends PickType(CreateFormDto, [
 
     @IsNumber()
     @Type(() => Number)
-    TAXPENS: number;
+    TAXANU: number;
 
     @IsNumber()
     @Type(() => Number)
-    TAXFUND: number;
+    TAXINL: number;
+
+    @IsNumber()
+    @Type(() => Number)
+    TAXLTF: number;
 
     @IsNumber()
     @Type(() => Number)
@@ -121,29 +137,9 @@ export class CreateTaxDto extends PickType(CreateFormDto, [
 
     @IsNumber()
     @Type(() => Number)
-    TAXINL: number;
-
-    @IsNumber()
-    @Type(() => Number)
-    TAXINP: number;
-
-    @IsNumber()
-    @Type(() => Number)
-    TAXISM: number;
-
-    @IsNumber()
-    @Type(() => Number)
     TAXOT1: number;
 
     @IsNumber()
     @Type(() => Number)
     TAXOT2: number;
-
-    @IsNumber()
-    @Type(() => Number)
-    FAMIED1: number;
-
-    @IsNumber()
-    @Type(() => Number)
-    FAMNED1: number;
 }

@@ -33,7 +33,7 @@ export class TaxController {
         return this.taxService.findCurrentTax(empno);
     }
 
-    @Post('history/:empno')
+    @Post('history')
     @ApiOperation({
         summary: 'ดึงประวัติการยื่นแบบคำขอลดหย่อนภาษีทั้งหมดของพนักงาน',
     })

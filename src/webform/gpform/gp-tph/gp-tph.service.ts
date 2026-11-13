@@ -135,7 +135,7 @@ export class GpTphService {
         }
         const result = await this.doactionFlowService.doAction({ ...dto, ACTION: action }, ip, {
             holdUntilStepDone: action === 'reject' && isAreaOwnerStep,
-            currentStepOnly: true,
+            ...(action === 'approve' ? { excludeOtherStepsWithTag: '01' } : {}),
         });
         if (!result.status) throw new BadRequestException(result.message);
         if (action === 'reject') {

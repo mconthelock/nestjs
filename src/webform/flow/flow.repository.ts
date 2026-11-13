@@ -121,7 +121,7 @@ export class FlowRepository extends BaseRepository {
         // );
         return this.manager.getRepository(FLOW).query(
             `
-            SELECT  F.LV AS "LEVEL", F.CSTEPNO, F.CSTEPNEXTNO, F.CSTEPST, F.CEXTDATA, F.VAPVNO, E.SRECMAIL,
+            SELECT  F.LV AS "LEVEL", F.CSTEPNO, F.CSTEPNEXTNO, F.CSTEPST, F.CEXTDATA, F.CTYPE, F.VAPVNO, E.SRECMAIL,
                     F.NFRMNO, F.VORGNO, F.CYEAR, F.CYEAR2, F.NRUNNO, E.SNAME, S.VNAME,
                     F.DAPVDATE, F.CAPVTIME, F.VREMARK, F.VREPNO, F.VREALAPV
             FROM (
@@ -205,21 +205,11 @@ export class FlowRepository extends BaseRepository {
             .getMany();
     }
 
-    async doactionUpdateFlow(flow: any, params: any, currentStepOnly = false) {
+    async doactionUpdateFlow(flow: any, params: any, excludeOtherStepsWithTag?: string) {
         // UPDATE APPROVAL STATUS
         let apvClause: string = '';
         params.stepNo = flow.CSTEPNO;
-        if (currentStepOnly) {
-            apvClause = `and CSTEPNO = :stepNo`;
-            if (flow.CAPVTYPE == this.APV_TYPE_MULTIPLE_CO) {
-                apvClause += ` and (VAPVNO = :apv1 or VREPNO = :rep1)`;
-                params = {
-                    ...params,
-                    apv1: params.VREALAPV,
-                    rep1: params.VREALAPV,
-                };
-            }
-        } else if (flow.CAPVTYPE == this.APV_TYPE_SINGLE && flow.CAPPLYALL == this.APPLY_ALL_NONE) {
+        if (flow.CAPVTYPE == this.APV_TYPE_SINGLE && flow.CAPPLYALL == this.APPLY_ALL_NONE) {
             apvClause = `and CSTEPNO = :stepNo`;
         } else if (
             flow.CAPVTYPE == this.APV_TYPE_SINGLE &&
@@ -255,6 +245,10 @@ export class FlowRepository extends BaseRepository {
                 apv2: params.VREALAPV,
                 rep2: params.VREALAPV,
             };
+        }
+        if (excludeOtherStepsWithTag) {
+            apvClause += ` and (CSTEPNO = :stepNo or NVL(TRIM(CEXTDATA), ' ') <> :excludedStepTag)`;
+            params = { ...params, excludedStepTag: excludeOtherStepsWithTag };
         }
         const sql = `UPDATE FLOW SET CAPVSTNO = :whatAction, CSTEPST = :stepAction, DAPVDATE = TO_DATE(:DAPVDATE, 'YYYY-MM-DD'), CAPVTIME = :CAPVTIME, VREMARK = :VREMARK, VREMOTE = :VREMOTE, VREALAPV = :VREALAPV WHERE NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO AND CAPVSTNO = :CAPVSTNO ${apvClause}`;
         return this.manager.query(sql, params);

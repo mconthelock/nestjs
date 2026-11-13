@@ -132,7 +132,9 @@ describe('GP-TPH area approvals', () => {
         const fixture = createFixture();
         await fixture.act('IS', []);
         expect(fixture.repo.finalizeRejectedRequest).not.toHaveBeenCalled();
-        expect(fixture.flow.doAction.mock.calls[0][2]).toEqual({ holdUntilStepDone: true });
+        expect(fixture.flow.doAction.mock.calls[0][2]).toEqual({
+            holdUntilStepDone: true, currentStepOnly: true,
+        });
         await fixture.act('GS', []);
         expect(fixture.records.every((row) => row.AREA_APPROVED === '0')).toBe(true);
         expect(fixture.repo.finalizeRejectedRequest).toHaveBeenCalledTimes(1);

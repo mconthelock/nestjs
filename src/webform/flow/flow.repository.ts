@@ -121,25 +121,25 @@ export class FlowRepository extends BaseRepository {
         // );
         return this.manager.getRepository(FLOW).query(
             `
-            SELECT  F.LV AS "LEVEL", F.CSTEPNO, F.CSTEPNEXTNO, F.CSTEPST, F.CEXTDATA, F.VAPVNO, E.SRECMAIL, 
-                    F.NFRMNO, F.VORGNO, F.CYEAR, F.CYEAR2, F.NRUNNO, E.SNAME, S.VNAME, 
+            SELECT  F.LV AS "LEVEL", F.CSTEPNO, F.CSTEPNEXTNO, F.CSTEPST, F.CEXTDATA, F.VAPVNO, E.SRECMAIL,
+                    F.NFRMNO, F.VORGNO, F.CYEAR, F.CYEAR2, F.NRUNNO, E.SNAME, S.VNAME,
                     F.DAPVDATE, F.CAPVTIME, F.VREMARK, F.VREPNO, F.VREALAPV
             FROM (
                 SELECT LEVEL AS LV, FLOW.*
                 FROM FLOW
                 START WITH
-                    NFRMNO = :1 
-                    AND VORGNO = :2 
-                    AND CYEAR = :3 
-                    AND CYEAR2 = :4 
-                    AND NRUNNO = :5 
+                    NFRMNO = :1
+                    AND VORGNO = :2
+                    AND CYEAR = :3
+                    AND CYEAR2 = :4
+                    AND NRUNNO = :5
                     AND CSTART = '1'
                 CONNECT BY
-                    NFRMNO = prior NFRMNO 
-                    AND VORGNO = prior VORGNO 
-                    AND CYEAR = prior CYEAR 
-                    AND CYEAR2 = prior CYEAR2 
-                    AND NRUNNO = prior NRUNNO  
+                    NFRMNO = prior NFRMNO
+                    AND VORGNO = prior VORGNO
+                    AND CYEAR = prior CYEAR
+                    AND CYEAR2 = prior CYEAR2
+                    AND NRUNNO = prior NRUNNO
                     AND CSTEPNO = PRIOR CSTEPNEXTNO
             ) F
             JOIN AMEC.AEMPLOYEE E ON E.SEMPNO = F.VAPVNO
@@ -205,11 +205,21 @@ export class FlowRepository extends BaseRepository {
             .getMany();
     }
 
-    async doactionUpdateFlow(flow: any, params: any) {
+    async doactionUpdateFlow(flow: any, params: any, currentStepOnly = false) {
         // UPDATE APPROVAL STATUS
         let apvClause: string = '';
         params.stepNo = flow.CSTEPNO;
-        if (flow.CAPVTYPE == this.APV_TYPE_SINGLE && flow.CAPPLYALL == this.APPLY_ALL_NONE) {
+        if (currentStepOnly) {
+            apvClause = `and CSTEPNO = :stepNo`;
+            if (flow.CAPVTYPE == this.APV_TYPE_MULTIPLE_CO) {
+                apvClause += ` and (VAPVNO = :apv1 or VREPNO = :rep1)`;
+                params = {
+                    ...params,
+                    apv1: params.VREALAPV,
+                    rep1: params.VREALAPV,
+                };
+            }
+        } else if (flow.CAPVTYPE == this.APV_TYPE_SINGLE && flow.CAPPLYALL == this.APPLY_ALL_NONE) {
             apvClause = `and CSTEPNO = :stepNo`;
         } else if (
             flow.CAPVTYPE == this.APV_TYPE_SINGLE &&
@@ -646,22 +656,22 @@ export class FlowRepository extends BaseRepository {
 
     async updateStepNextExeToNormal(form: FormDto, cextdata: string) {
         const sql = `
-            UPDATE FLOW f 
-            SET f.CSTEPST = :stepNormal, f.VREALAPV = '', f.CAPVSTNO = :apvNone, f.DAPVDATE = '', f.CAPVTIME = '' 
-            WHERE (f.NFRMNO, f.VORGNO, f.CYEAR, f.CYEAR2, f.NRUNNO, f.CSTEPNO, f.CEXTDATA) 
+            UPDATE FLOW f
+            SET f.CSTEPST = :stepNormal, f.VREALAPV = '', f.CAPVSTNO = :apvNone, f.DAPVDATE = '', f.CAPVTIME = ''
+            WHERE (f.NFRMNO, f.VORGNO, f.CYEAR, f.CYEAR2, f.NRUNNO, f.CSTEPNO, f.CEXTDATA)
             IN (
-                SELECT NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, CSTEPNO, CEXTDATA 
-                FROM FLOW 
-                START WITH  
-                    CEXTDATA = :cextdata AND NFRMNO = :NFRMNO 
-                    AND VORGNO = :VORGNO AND CYEAR = :CYEAR 
-                    AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO 
-                CONNECT BY 
-                    NFRMNO = PRIOR NFRMNO 
-                    AND VORGNO = PRIOR VORGNO 
-                    AND CYEAR = PRIOR CYEAR 
-                    AND CYEAR2 = PRIOR CYEAR2 
-                    AND NRUNNO = PRIOR NRUNNO 
+                SELECT NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, CSTEPNO, CEXTDATA
+                FROM FLOW
+                START WITH
+                    CEXTDATA = :cextdata AND NFRMNO = :NFRMNO
+                    AND VORGNO = :VORGNO AND CYEAR = :CYEAR
+                    AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO
+                CONNECT BY
+                    NFRMNO = PRIOR NFRMNO
+                    AND VORGNO = PRIOR VORGNO
+                    AND CYEAR = PRIOR CYEAR
+                    AND CYEAR2 = PRIOR CYEAR2
+                    AND NRUNNO = PRIOR NRUNNO
                     AND CSTEPNO = PRIOR CSTEPNEXTNO
             )`;
         const params = {

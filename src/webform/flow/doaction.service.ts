@@ -29,7 +29,7 @@ export class DoactionFlowService extends FlowService {
     async doAction(
         dto: doactionFlowDto,
         ip: string,
-        options: { holdUntilStepDone?: boolean } = {},
+        options: { holdUntilStepDone?: boolean; currentStepOnly?: boolean } = {},
     ): Promise<{
         status: boolean;
         message: string;
@@ -72,11 +72,15 @@ export class DoactionFlowService extends FlowService {
                 case 'approve':
                     whatAction = this.APV_APPROVE;
                     stepAction = this.STEP_APPROVE;
-                    await this.repo.doactionUpdateFlow(flow, {
-                        ...params,
-                        whatAction,
-                        stepAction,
-                    });
+                    await this.repo.doactionUpdateFlow(
+                        flow,
+                        {
+                            ...params,
+                            whatAction,
+                            stepAction,
+                        },
+                        options.currentStepOnly,
+                    );
                     const checkNextStep = await this.repo.getFlow({
                         ...form,
                         CAPVSTNO: this.APV_NONE,
@@ -103,11 +107,15 @@ export class DoactionFlowService extends FlowService {
                 case 'reject':
                     whatAction = this.APV_REJECT;
                     stepAction = this.STEP_REJECT;
-                    await this.repo.doactionUpdateFlow(flow, {
-                        ...params,
-                        whatAction,
-                        stepAction,
-                    });
+                    await this.repo.doactionUpdateFlow(
+                        flow,
+                        {
+                            ...params,
+                            whatAction,
+                            stepAction,
+                        },
+                        options.currentStepOnly,
+                    );
                     //Check for updating flow status
                     if (flow.CAPVTYPE == this.APV_TYPE_MULTIPLE_CO) {
                         const checkUpdate = await this.repo.getFlow({
@@ -151,11 +159,15 @@ export class DoactionFlowService extends FlowService {
                 case 'return':
                     whatAction = this.APV_NONE;
                     stepAction = this.STEP_READY;
-                    await this.repo.doactionUpdateFlow(flow, {
-                        ...params,
-                        whatAction,
-                        stepAction,
-                    });
+                    await this.repo.doactionUpdateFlow(
+                        flow,
+                        {
+                            ...params,
+                            whatAction,
+                            stepAction,
+                        },
+                        options.currentStepOnly,
+                    );
                     await this.repo.updateStepWaitToNormal(form);
                     await this.repo.updateStepReadyToWait(form);
                     await this.repo.updateStepReqToReady(form);
@@ -163,11 +175,15 @@ export class DoactionFlowService extends FlowService {
                 case 'returnp':
                     whatAction = this.APV_NONE;
                     stepAction = this.STEP_READY;
-                    await this.repo.doactionUpdateFlow(flow, {
-                        ...params,
-                        whatAction,
-                        stepAction,
-                    });
+                    await this.repo.doactionUpdateFlow(
+                        flow,
+                        {
+                            ...params,
+                            whatAction,
+                            stepAction,
+                        },
+                        options.currentStepOnly,
+                    );
                     await this.repo.updateAllStepToNormal(form);
                     await this.repo.updateStepReqToReady(form);
                     await this.repo.updateStepReqNextToWait(form);
@@ -175,11 +191,15 @@ export class DoactionFlowService extends FlowService {
                 case 'returnb':
                     whatAction = this.APV_NONE;
                     stepAction = this.STEP_READY;
-                    await this.repo.doactionUpdateFlow(flow, {
-                        ...params,
-                        whatAction,
-                        stepAction,
-                    });
+                    await this.repo.doactionUpdateFlow(
+                        flow,
+                        {
+                            ...params,
+                            whatAction,
+                            stepAction,
+                        },
+                        options.currentStepOnly,
+                    );
                     await this.repo.updateStepWaitToNormal(form);
                     await this.repo.updateStepReadyToWait(form);
                     await this.repo.updateStepReqToReadyB(form);
@@ -190,11 +210,15 @@ export class DoactionFlowService extends FlowService {
                     }
                     whatAction = this.APV_NONE;
                     stepAction = this.STEP_READY;
-                    await this.repo.doactionUpdateFlow(flow, {
-                        ...params,
-                        whatAction,
-                        stepAction,
-                    });
+                    await this.repo.doactionUpdateFlow(
+                        flow,
+                        {
+                            ...params,
+                            whatAction,
+                            stepAction,
+                        },
+                        options.currentStepOnly,
+                    );
                     await this.repo.updateStepNextExeToNormal(form, dto.CEXTDATA); // step ต่อจาก exe ทั้งหมดเป็น 1
                     await this.repo.updateStepExeToReady(form, dto.CEXTDATA); // step ที่ exe เป็น 3
                     await this.repo.updateStepNextExeToWait(form, dto.CEXTDATA); // step ต่อจาก exe เป็น 2
@@ -257,7 +281,7 @@ export class DoactionFlowService extends FlowService {
             // ถ้าไม่มี reject step แสดงว่า flow ถูก approve ทั้งหมด
             if (reject.length == 0) {
                 flowStatus = this.FLOW_APPROVE;
-            } 
+            }
             // ถ้ามี reject step ให้ตรวจสอบว่าเป็น single approve หรือไม่
             else {
                 for (const step of reject) {
@@ -277,7 +301,7 @@ export class DoactionFlowService extends FlowService {
                         if (stepApv.length > 0) {
                             flowStatus = this.FLOW_REJECT;
                             break;
-                        } 
+                        }
                         // ถ้า step นี้ยังไม่ถูก approve ให้ถือว่า flow ถูก approve
                         else {
                             flowStatus = this.FLOW_APPROVE;

@@ -380,3 +380,85 @@ updateCheckDetail(key, dto), removeCheckDetail(key)
 การทำงานของ Repository ใช้ transaction context เดิมของ BaseRepository
 หากต้องการให้การทำงานทั้งหมดของผู้เรียก rollback
 อย่าจับข้อผิดพลาดภายใน transaction ภายนอกแล้วปล่อยให้ทำงานต่อจน commit
+
+
+## Phase 3: create ST-FIRE per complete AREA
+
+Safety loads FORMMST by VANAME `ST-FIRE`. After review, its save button processes complete
+AREAs sequentially. Before each `createForm` call it searches HEAD by AREA/FMONTH/FYEAR.
+Existing HEADs are SKIP, without creating another form. Month searches recognize both
+`01` and `1`; new records use zero-padded `01`..`12` and a four digit calendar FYEAR.
+The frontend calls the existing Webasset `createForm` with NFRMNO/VORGNO/CYEAR and
+REQBY/INPUTBY set to the same unambiguous five digit employee from the AREA's first row.
+**DRAFT is omitted entirely.** Existing Webasset Form/Flow implementation is unchanged.
+It uses returned CYEAR2/NRUNNO, never invents form keys or run numbers.
+
+### Aggregate persistence endpoint
+
+`POST {{BASE_URL}}/fire/check-heads/inspection`
+
+Headers: `Content-Type: application/json`. Uses the same global authentication/access
+configuration as the existing FIRE CRUD routes; no separate authentication is added.
+
+Body uses the existing HEAD fields NFRMNO (integer), VORGNO (string, 6 bytes), CYEAR
+(string, 2 bytes), CYEAR2 (string, 4 bytes), NRUNNO (integer), AREA (string, 100 bytes),
+FMONTH (string, 01..12), FYEAR (string, four digits), plus required `items` (1..999).
+HEAD fields retain the existing key/DDL limits documented above. Each item accepts
+FIRE_CODE (required) and GAGE/WEIGHT/PIN/HOSE/CLEAN/DETAIL/CHECK_DATE using the existing
+DETAIL limits. ID and the five form key fields are assigned by the server, not supplied
+per item. CHECK_DATE is required for this operation and must be in FMONTH/FYEAR.
+
+```json
+{
+  "NFRMNO": 12,
+  "VORGNO": "000101",
+  "CYEAR": "26",
+  "CYEAR2": "2026",
+  "NRUNNO": 1,
+  "AREA": "Factory",
+  "FMONTH": "11",
+  "FYEAR": "2026",
+  "items": [
+    {"FIRE_CODE":"F001","GAGE":null,"WEIGHT":10,"PIN":"OK","HOSE":"OK","CLEAN":"OK","DETAIL":null,"CHECK_DATE":"2026-11-10"}
+  ]
+}
+```
+
+The example key is illustrative; use the actual key returned by `createForm`.
+The server validates nested fields and UTF-8 byte limits, then rechecks the complete
+set of active master codes for that AREA: missing, extra or duplicate codes are rejected.
+Unknown AREA/type is rejected. CO2 GAGE and other types' WEIGHT must remain null/omitted.
+It rechecks existing HEAD inside the transaction. HEAD and all DETAIL rows are inserted
+using gpreportConnection and the existing BaseRepository transaction context, with ID
+1..N restarting per form/AREA. A failure rolls back this AREA, not preceding successful
+AREAs. The existing AREA/month unique constraint handles simultaneous inserts; a winning
+HEAD is returned as SKIP. No schema, lock or numbering mechanism is added.
+
+Success: `{"status":true,"data":{"status":"CREATED","head":{},"detail_count":1}}`.
+Existing: `{"status":true,"data":{"status":"SKIP","head":{}}}`.
+400: FIRE_INSPECTION_INVALID_DATA or FIRE_INSPECTION_MASTER_CHANGED.
+500 after work fails in an owned transaction: FIRE_INSPECTION_SAVE_ROLLED_BACK.
+500 when the commit response is uncertain: FIRE_INSPECTION_SAVE_UNCONFIRMED; do not delete
+the form until persistence is reconciled.
+Existing CRUD endpoints and the Phase 1 upload/compare contract are unchanged.
+
+### Failure handling and direct Service use
+
+Form/Flow and FIRE persistence are separate requests and connections, not a distributed
+transaction. Safety reconciles a lost save response against the returned form key.
+After a confirmed save rollback or a competing HEAD, it deletes only the newly created
+form using existing Webasset deleteFlowandForm. An ambiguous network/create result or
+failed cleanup is UNKNOWN: preserve its key in results/export, block resubmission and
+require reconciliation before retrying. Upload/check never creates a form automatically.
+
+Other services import FireModule and inject FireCheckHeadService, then call
+`await service.createInspection(dto)` with the same body. Validation also runs for direct
+calls. The method reuses an existing active transaction; its owner must roll back on
+errors. Only a transaction owned by this method emits the rollback-specific error code.
+Form creation is the caller's responsibility. Existing full Primary Keys and CRUD
+semantics are preserved.
+
+Verification: existing FIRE Jest specs exercise aggregate creation, IDs, skip, validation,
+rollback orchestration and the HTTP route with in-memory repositories. Safety's existing
+preview test covers the frontend workflow and omission of DRAFT. These checks do not
+create real Form/Flow or write to Oracle; live acceptance remains separate.

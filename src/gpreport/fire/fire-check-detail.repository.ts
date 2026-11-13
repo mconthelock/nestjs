@@ -31,6 +31,10 @@ export class FireCheckDetailRepository extends BaseRepository {
         return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
     }
 
+    createCheckDetails(data: (Partial<FireCheckDetail> & FireCheckDetailKeyDto)[]) {
+        return this.getRepository(FireCheckDetail).insert(data);
+    }
+
     async createCheckDetail(data: Partial<FireCheckDetail> & FireCheckDetailKeyDto) {
         await this.getRepository(FireCheckDetail).insert(data);
         const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, ID, FIRE_CODE } = data;

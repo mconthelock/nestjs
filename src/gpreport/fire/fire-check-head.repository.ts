@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { FireCheckHead } from 'src/common/Entities/gpreport/table/FIRE_CHECK_HEAD.entity';
 import { transactionContext } from 'src/common/interceptors/transaction-context';
@@ -21,6 +21,16 @@ export class FireCheckHeadRepository extends BaseRepository {
         return manager.transaction(txManager => transactionContext.run(
             { ...transactionContext.getStore(), manager: txManager }, work,
         ));
+    }
+
+    checkTransactionActive() {
+        return !!this.manager.queryRunner?.isTransactionActive;
+    }
+
+    findInspectionHead(AREA: string, FMONTH: string, FYEAR: string) {
+        return this.getRepository(FireCheckHead).findOne({where: {
+            AREA, FYEAR, FMONTH: In([...new Set([FMONTH, String(Number(FMONTH))])]),
+        }});
     }
 
     findCheckHead(key: FireCheckHeadKeyDto, lock = false) {

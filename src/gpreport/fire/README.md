@@ -58,7 +58,7 @@ STATUS รับข้อความยาวไม่เกินหนึ่�
 | GET | /fire/items | อ่าน master ทั้งรายการที่ใช้งานและไม่ใช้งาน เรียงตาม FIRE_CODE และคืนค่า `{items: [...]}` |
 | POST | /fire/save | เพิ่มหรือแก้ไขด้วยฟิลด์ของหน้าจอเดิม โดยส่ง `original_code` เพิ่มได้เมื่อแก้ไข |
 | POST | /fire/deactivate | เปลี่ยน STATUS เป็น `0` โดยไม่ลบข้อมูลถาวรจากหน้าจอ |
-| POST | /fire/inspection/check | รับ multipart ฟิลด์ `month` รูปแบบ YYYY-MM และไฟล์ `excel` ชนิด .xlsx หรือ .xls |
+| POST | /fire/inspection/check | รับ multipart ฟิลด์ `month` รูปแบบ YYYY-MM และไฟล์ `excel` ชนิด .xlsx เท่านั้น |
 
 การบันทึกรับได้ทั้ง multipart form data และ JSON
 ข้อความจะถูกตัดช่องว่างหัวท้าย โดยต้องระบุ FIRE_CODE และห้ามเปลี่ยนรหัสขณะแก้ไข
@@ -75,6 +75,12 @@ STATUS รับข้อความยาวไม่เกินหนึ่�
 ผลลัพธ์คงชื่อฟิลด์รายงานเดิมดังนี้:
 `month`, `filename`, `master_count`, `matched_rows`, `found_count`, `matched_count`,
 `missing`, `unexpected`, `invalid_cells`, `invalid_dates`, `complete`
+
+การอ่านไฟล์ใช้แพ็กเกจ `exceljs` ที่มีอยู่ในโปรเจกต์ โดย Fire ไม่มีการ import แพ็กเกจ `xlsx`
+รับเฉพาะไฟล์ `.xlsx` และอ่านข้อมูลแบบ asynchronous โดย Service รออ่านไฟล์เสร็จก่อนเปรียบเทียบ
+ไม่รองรับ `.xls` หากส่งนามสกุลนี้หรือเนื้อหาไฟล์ไม่ใช่ XLSX ที่อ่านได้จะคืน HTTP 422
+การตรวจจำนวนชีต จำนวนแถว ตำแหน่งคอลัมน์ และรูปแบบผลลัพธ์ยังคงเดิม
+เครื่องที่อ่าน Excel ต้องติดตั้ง dependencies ตาม `package.json` และ `package-lock.json` ของ API
 
 ไม่ต้องเปลี่ยนโครงสร้างฐานข้อมูล ให้ deploy API ก่อน bundle ของหน้า Safety
 เบราว์เซอร์ใช้ APP_API และไม่ส่งคำขอ CRUD/ตรวจสอบไปยัง PHP controller แล้ว

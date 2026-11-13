@@ -51,12 +51,12 @@ export class FireService {
         if (typeof month !== 'string' || !/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) {
             throw new UnprocessableEntityException('กรุณาเลือกเดือนและปีให้ถูกต้อง');
         }
-        if (!file?.buffer || !/\.(xlsx|xls)$/i.test(file.originalname)) {
-            throw new UnprocessableEntityException('กรุณาเลือกไฟล์ Excel อีกครั้ง (ขนาดสูงสุด 10 MB)');
+        if (!file?.buffer || !/\.xlsx$/i.test(file.originalname)) {
+            throw new UnprocessableEntityException('กรุณาเลือกไฟล์ Excel .xlsx อีกครั้ง (ขนาดสูงสุด 10 MB)');
         }
         if (file.size > 10 * 1024 * 1024) throw new UnprocessableEntityException('ไฟล์ต้องมีขนาดไม่เกิน 10 MB');
         const inspection = new FireInspection();
-        const rows = inspection.readExcel(file.buffer);
+        const rows = await inspection.readExcel(file.buffer);
         const master = await this.fireRepository.allItems(true);
         if (!master.length) throw new UnprocessableEntityException('ไม่พบข้อมูล Master ที่มี STATUS = 1 กรุณาตรวจสอบ Master ก่อน');
         // Multipart headers from browsers encode UTF-8 names as Latin-1 in Multer.

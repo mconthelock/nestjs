@@ -43,6 +43,11 @@ export class FEOTController {
         });
     }
 
+    @Get()
+    getDataOTall(){
+        return this.feotService.getDataOTall();
+    }
+
     @Delete('/:planyear/:planmonth/:sempno/:wdate')
     remove(
         @Param('planyear', ParseIntPipe) planyear: number,

@@ -31,21 +31,21 @@ export class FEOT_REQUESTS {
     @Column()
     PLANREMARK: string;
 
-    @ManyToOne(() => FORMMST)
-    @JoinColumn([
-        { name: 'NFRMNO', referencedColumnName: 'NNO' },
-        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
-        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
-    ])
-    formmaster: FORMMST;
+    // @ManyToOne(() => FORMMST)
+    // @JoinColumn([
+    //     { name: 'NFRMNO', referencedColumnName: 'NNO' },
+    //     { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+    //     { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+    // ])
+    // formmaster: FORMMST;
 
-    @ManyToOne(() => FORM)
-    @JoinColumn([
-        { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
-        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
-        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
-        { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
-        { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
-    ])
-    form: FORM;
+    // @ManyToOne(() => FORM)
+    // @JoinColumn([
+    //     { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+    //     { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+    //     { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+    //     { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+    //     { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+    // ])
+    // form: FORM;
 }

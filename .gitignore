@@ -5,8 +5,10 @@
 /dist
 /sql
 /artifacts
+/docs
 /output
 /tmp
+/test
 /src/workload/piline/PILINE.md
 # Logs
 logs

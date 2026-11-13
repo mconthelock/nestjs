@@ -40,12 +40,9 @@ owner's assigned areas. The owner must explicitly select Allow or Not Allow for
 each displayed area before submitting an approval; neither choice is
 preselected.
 
-For GP-TPH, approval results do not carry across the Area Owner step. An
-Area Owner must decide their assigned areas explicitly, and later workflow
-steps remain pending until reached. Consecutive steps for the same actor can
-still share an approval within a segment when no other co-approver is pending.
-Existing decisions are not automatically reset by this change; an affected
-request must be reviewed before its workflow data is corrected.
+For GP-TPH, approval of another step does not automatically approve an Area
+Owner step, even when the approver or representative is the same person. The
+Area Owner must still submit their area decisions separately.
 
 Owners are resolved from the current area assignment and ORGPOS; changes to
 those assignments after a request is created may require administrator

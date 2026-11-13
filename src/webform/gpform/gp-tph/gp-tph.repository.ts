@@ -94,27 +94,7 @@ export class GpTphRepository extends BaseRepository {
             );
         });
     }
-    async approveGpTphConsecutiveSteps(
-        form: FormDto,
-        flow: FLOW,
-        params: {
-            DAPVDATE: string;
-            CAPVTIME: string;
-            VREMARK: string;
-            VREMOTE: string;
-            VREALAPV: string;
-        },
-    ) {
-        if (flow.CEXTDATA?.trim() === '01') return;
-        const actor = params.VREALAPV.trim();
-        const matchesActor = (step: FLOW) =>
-            step.VAPVNO?.trim() === actor || step.VREPNO?.trim() === actor;
-        if (flow.CAPVTYPE === '3') {
-            const currentSteps = await this.getRepository(FLOW).findBy({
-                ...form, CSTEPNO: flow.CSTEPNO,
-            });
-            if (currentSteps.some((step) => step.CAPVSTNO === '0' && !matchesActor(step))) return;
-        }
+    async approveGpTphConsecutiveSteps(form: FormDto, flow: FLOW, params: any) {
         const visited = new Set([flow.CSTEPNO]);
         let nextStep = flow.CSTEPNEXTNO;
         while (nextStep && nextStep !== '00' && !visited.has(nextStep)) {
@@ -125,7 +105,8 @@ export class GpTphRepository extends BaseRepository {
                 (step) =>
                     step.CAPVSTNO === '0' &&
                     ['1', '2', '3'].includes(step.CSTEPST) &&
-                    matchesActor(step),
+                    (step.VAPVNO?.trim() === params.VREALAPV.trim() ||
+                        step.VREPNO?.trim() === params.VREALAPV.trim()),
             );
             if (!matching.length) break;
 
@@ -146,7 +127,6 @@ export class GpTphRepository extends BaseRepository {
                     form.NRUNNO, nextStep, params.VREALAPV, params.VREALAPV,
                 ],
             );
-            if (steps.some((step) => step.CAPVSTNO === '0' && !matchesActor(step))) break;
             nextStep = matching[0].CSTEPNEXTNO;
         }
     }

@@ -49,10 +49,7 @@ export class TaxController {
     @UseTransaction('webformConnection')
     saveTaxRequest(@Body() createTaxDto: CreateTaxDto, @Req() req: Request) {
         const ip = getClientIP(req);
-        console.log(createTaxDto);
-
-        //return this.taxService.create(createTaxDto, ip);
-        return null;
+        return this.taxService.create(createTaxDto, ip);
     }
 
     // @Put('request/:year/:runno')

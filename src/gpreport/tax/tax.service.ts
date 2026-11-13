@@ -91,8 +91,12 @@ export class TaxService {
                 CYEAR2: createForm.data.CYEAR2,
                 NRUNNO: createForm.data.NRUNNO,
             };
+            return await this.repo.create({
+                ...data,
+                ...form,
+            });
         } catch (error) {
-            throw new Error('Request PRO-VMM Form Error: ' + error.message);
+            throw new Error('Request GPLY01 Form Error: ' + error.message);
         }
     }
 

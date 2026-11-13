@@ -63,7 +63,24 @@ export class TaxService {
             .leftJoinAndSelect('form.formmst', 'formmst')
             .leftJoinAndSelect('form.flow', 'flow');
         await applyDynamicFilters(qb, q, 'req');
-        return await qb.getMany();
+        const data = await qb.getMany();
+        const result = data.map((res) => {
+            return {
+                ...res,
+                TAX1: 60000,
+                TAX2: res.FAMSNA?.trim() ? 60000 : 0,
+                TAX3:
+                    res.C1IED * 30000 +
+                    res.C1NED * 30000 +
+                    (res.C2IED * 60000 + res.C2NED * 60000),
+                TAX4:
+                    (res.TAXEMF?.replaceAll(' ', '') ? 30000 : 0) +
+                    (res.TAXEMM?.replaceAll(' ', '') ? 30000 : 0) +
+                    (res.TAXSFT?.replaceAll(' ', '') ? 30000 : 0) +
+                    (res.TAXSPM?.replaceAll(' ', '') ? 30000 : 0),
+            };
+        });
+        return result;
     }
 
     async create(dto: CreateTaxDto, ip?: string) {

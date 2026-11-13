@@ -1,5 +1,5 @@
 import { UnprocessableEntityException } from '@nestjs/common';
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
 import { FireItemMst } from 'src/common/Entities/gpreport/table/FIRE_ITEM_MST.entity';
 
 interface InspectionRow {
@@ -66,44 +66,52 @@ export class FireInspection {
         };
     }
 
-    readExcel(buffer: Buffer): InspectionRow[] {
+    async readExcel(buffer: Buffer): Promise<InspectionRow[]> {
         const zip = buffer.subarray(0, 4).equals(Buffer.from([0x50, 0x4b, 0x03, 0x04]));
-        const ole = buffer.subarray(0, 8).equals(Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]));
-        if (!zip && !ole) throw new UnprocessableEntityException('รองรับเฉพาะไฟล์ Excel .xlsx และ .xls เท่านั้น');
-        let book: XLSX.WorkBook;
+        if (!zip) throw new UnprocessableEntityException('รองรับเฉพาะไฟล์ Excel .xlsx เท่านั้น');
+        const book = new ExcelJS.Workbook();
         try {
-            book = XLSX.read(buffer, {type: 'buffer', cellNF: true, cellText: false});
+            await book.xlsx.load(Uint8Array.from(buffer).buffer);
         } catch {
-            throw new UnprocessableEntityException('ไม่สามารถอ่านไฟล์ Excel นี้ได้ กรุณาบันทึกไฟล์เป็น .xlsx หรือ .xls ใหม่แล้วลองอีกครั้ง');
+            throw new UnprocessableEntityException('ไม่สามารถอ่านไฟล์ Excel นี้ได้ กรุณาบันทึกไฟล์เป็น .xlsx ใหม่แล้วลองอีกครั้ง');
         }
-        if (book.SheetNames.length > 20) throw new UnprocessableEntityException('ไฟล์ต้องมีไม่เกิน 20 worksheets');
+        if (book.worksheets.length > 20) throw new UnprocessableEntityException('ไฟล์ต้องมีไม่เกิน 20 worksheets');
         const rows: InspectionRow[] = [];
-        const date1904 = !!book.Workbook?.WBProps?.date1904;
-        const cellText = (cell: XLSX.CellObject, date = false) => {
-            if (!cell || cell.v == null) return '';
-            if (cell.t === 'e') return String(XLSX.utils.format_cell(cell));
-            const numericDate = date && /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(String(cell.v).trim());
-            if (numericDate || (cell.t === 'n' && cell.z && XLSX.SSF.is_date(cell.z))) {
-                const parsed = XLSX.SSF.parse_date_code(Number(cell.v), {date1904});
-                if (!parsed) return String(cell.v);
-                return `${String(parsed.m).padStart(2, '0')}/${String(parsed.d).padStart(2, '0')}/${String(parsed.y).padStart(4, '0')}`;
-            }
-            if (cell.t === 'b') return cell.v ? '1' : '';
-            return String(cell.v);
+        const date1904 = !!book.properties.date1904;
+        const formatDate = (value: Date) => {
+            if (Number.isNaN(value.getTime())) return '';
+            return `${String(value.getUTCMonth() + 1).padStart(2, '0')}/${String(value.getUTCDate()).padStart(2, '0')}/${String(value.getUTCFullYear()).padStart(4, '0')}`;
         };
-        for (const name of book.SheetNames) {
-            const sheet = book.Sheets[name];
-            if (!sheet['!ref']) continue;
-            const range = XLSX.utils.decode_range(sheet['!ref']);
-            if (range.e.r >= 50000) throw new UnprocessableEntityException('แต่ละ worksheet ต้องมีไม่เกิน 50,000 แถว');
-            for (let row = 1; row <= range.e.r; row++) {
-                const date = cellText(sheet[XLSX.utils.encode_cell({r: row, c: 6})], true);
+        const cellText = (value: ExcelJS.CellValue, date = false): string => {
+            if (value == null) return '';
+            if (value instanceof Date) return formatDate(value);
+            if (typeof value === 'object') {
+                if ('error' in value) return value.error;
+                if ('result' in value) return cellText(value.result, date);
+                if ('richText' in value) return value.richText.map(part => part.text).join('');
+                if ('text' in value) return value.text;
+                return '';
+            }
+            const numericDate = date && /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(String(value).trim());
+            if (numericDate) {
+                const serial = Number(value);
+                const parsed = new Date(Math.round((serial - 25569 + (date1904 ? 1462 : 0)) * 86400000));
+                return formatDate(parsed) || String(value);
+            }
+            if (typeof value === 'boolean') return value ? '1' : '';
+            return String(value);
+        };
+        for (const sheet of book.worksheets) {
+            if (sheet.rowCount > 50000) throw new UnprocessableEntityException('แต่ละ worksheet ต้องมีไม่เกิน 50,000 แถว');
+            for (let row = 2; row <= sheet.rowCount; row++) {
+                const date = cellText(sheet.getCell(row, 7).value, true);
                 const cells: Record<string, string> = {};
-                for (let column = 9; column <= 56; column++) {
-                    const value = cellText(sheet[XLSX.utils.encode_cell({r: row, c: column})]);
-                    if (value.trim()) cells[XLSX.utils.encode_col(column)] = value;
+                for (let column = 10; column <= 57; column++) {
+                    const cell = sheet.getCell(row, column);
+                    const value = cellText(cell.value);
+                    if (value.trim()) cells[cell.address.replace(/\d+$/, '')] = value;
                 }
-                if (date.trim() || Object.keys(cells).length) rows.push({sheet: name, row: row + 1, date, cells});
+                if (date.trim() || Object.keys(cells).length) rows.push({sheet: sheet.name, row, date, cells});
             }
         }
         return rows;

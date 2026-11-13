@@ -19,4 +19,14 @@ export class EKittingController {
     search(@Body('order') order: string, @Body('packing') packing: string) {
         return this.eKittingService.search(order, packing);
     }
+
+    @Get('getMaster')
+    master() {
+        return this.eKittingService.getMaster();
+    }
+
+    @Post('saveMaster')
+    saveMaster(@Body() body: any) {
+        return this.eKittingService.saveMaster(body);
+    }
 }

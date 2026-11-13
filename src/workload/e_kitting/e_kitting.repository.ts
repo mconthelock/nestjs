@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
+import { EKittingMasterDwg } from 'src/common/Entities/workload/table/EKITTING_MASTER_DWG.entity';
 
 @Injectable()
 export class EKittingRepository extends BaseRepository {
@@ -11,7 +12,7 @@ export class EKittingRepository extends BaseRepository {
         super(wk);
     }
 
-    search(order,packing) {
+    search(order, packing) {
         const result = this.manager.query(
             `WITH BASE AS (
                 SELECT B.S11M06,
@@ -64,9 +65,33 @@ export class EKittingRepository extends BaseRepository {
             SELECT A.*
             FROM ALL_ROWS A
             WHERE A.RN = 1
-            ORDER BY A.Q41K01, A.Q41K03, A.Q41K04, A.Q41K07, TO_NUMBER(A.Q41K05)`
-            , [`_${order}_`, packing]
+            ORDER BY A.Q41K01, A.Q41K03, A.Q41K04, A.Q41K07, TO_NUMBER(A.Q41K05)`,
+            [`_${order}_`, packing],
         );
         return result;
     }
+
+    async getMaster() {
+        const rows = await this.getRepository(EKittingMasterDwg).find({
+            order: { ITEM: 'ASC', DWG: 'ASC' },
+        });
+        const grouped = new Map<string, { ITEM: string; DWG: string[] }>();
+
+        for (const { ITEM, DWG } of rows) {
+            let item = grouped.get(ITEM);
+            if (!item) {
+                item = { ITEM, DWG: [] };
+                grouped.set(ITEM, item);
+            }
+            item.DWG.push(DWG);
+        }
+
+        return Array.from(grouped.values());
+    }
+    
+    async saveMaster(body: any) {
+        const result = this.getRepository(EKittingMasterDwg).save(body);
+        return result;
+    }
+    
 }

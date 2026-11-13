@@ -10,4 +10,12 @@ export class EKittingService {
     search(order: string, packing: string) {
         return this.eKittingRepository.search(order, packing);
     }
+
+    getMaster(){
+        return this.eKittingRepository.getMaster();
+    }
+
+    saveMaster(body: any) {
+        return this.eKittingRepository.saveMaster(body);
+    }
 }

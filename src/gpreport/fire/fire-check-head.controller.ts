@@ -1,3 +1,4 @@
+import { CreateFireInspectionDto } from './dto/create-fire-inspection.dto';
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { FireCheckHeadService } from './fire-check-head.service';
 import { CreateFireCheckHeadDto } from './dto/create-fire-check-head.dto';
@@ -17,6 +18,11 @@ export class FireCheckHeadController {
     @Get(':NFRMNO/:VORGNO/:CYEAR/:CYEAR2/:NRUNNO')
     findCheckHead(@Param() key: FireCheckHeadKeyDto) {
         return this.headService.findCheckHead(key);
+    }
+
+    @Post('inspection')
+    createInspection(@Body() dto: CreateFireInspectionDto) {
+        return this.headService.createInspection(dto);
     }
 
     @Post('')

@@ -257,7 +257,7 @@ export const TAX_MASTER_ITEMS: TaxItemConfig[] = [
         id: 'TAXINS',
         title: 'ค่าเบี้ยประกันชีวิต',
         rate: [
-            'หักตามจริงไม่เกิน 10,000 บาท',
+            'หักตามจริงไม่เกิน 100,000 บาท',
             'กรมธรรม์อายุ 10 ปีขึ้นไป',
             'ครอบคลุมเบี้ยประกันของคู่สมรสที่ไม่มีเงินได้',
         ],
@@ -362,7 +362,7 @@ export const TAX_MASTER_ITEMS: TaxItemConfig[] = [
     },
     {
         id: 'TAXOT1',
-        title: '17. อื่นๆ',
+        title: 'อื่นๆ',
         rate: '',
         group: 'รายการลดหย่อนภาษีเงินได้ (เฉพาะปี)',
         input_type: 'amount',
@@ -370,7 +370,7 @@ export const TAX_MASTER_ITEMS: TaxItemConfig[] = [
     },
     {
         id: 'TAXOT2',
-        title: '18. อื่นๆ',
+        title: 'อื่นๆ (2)',
         rate: '',
         group: 'รายการลดหย่อนภาษีเงินได้ (เฉพาะปี)',
         input_type: 'amount',

@@ -51,4 +51,11 @@ export class SectionRepository extends BaseRepository {
             { STATUS: 0 },
         );
     }
+
+    disableById(id: number) {
+        return this.getRepository(STY_CHEMICAL_SECTION).update(
+            { AMEC_SDS_ID: id },
+            { STATUS: 0 },
+        );
+    }
 }

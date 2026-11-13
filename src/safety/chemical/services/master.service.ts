@@ -106,4 +106,17 @@ export class MasterService {
             throw error;
         }
     }
+
+    async disableMaster(id: number) {
+         try {
+            await this.masterRepo.disable(id);
+            await this.sectionRepo.disableById(id);
+            return {
+                status: true,
+                message: 'Disable successfully',
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
 }

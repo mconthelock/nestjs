@@ -209,17 +209,7 @@ export class FlowRepository extends BaseRepository {
         // UPDATE APPROVAL STATUS
         let apvClause: string = '';
         params.stepNo = flow.CSTEPNO;
-        if (currentStepOnly) {
-            apvClause = `and CSTEPNO = :stepNo`;
-            if (flow.CAPVTYPE == this.APV_TYPE_MULTIPLE_CO) {
-                apvClause += ` and (VAPVNO = :apv1 or VREPNO = :rep1)`;
-                params = {
-                    ...params,
-                    apv1: params.VREALAPV,
-                    rep1: params.VREALAPV,
-                };
-            }
-        } else if (flow.CAPVTYPE == this.APV_TYPE_SINGLE && flow.CAPPLYALL == this.APPLY_ALL_NONE) {
+        if (flow.CAPVTYPE == this.APV_TYPE_SINGLE && flow.CAPPLYALL == this.APPLY_ALL_NONE) {
             apvClause = `and CSTEPNO = :stepNo`;
         } else if (
             flow.CAPVTYPE == this.APV_TYPE_SINGLE &&

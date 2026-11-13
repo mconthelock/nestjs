@@ -8,6 +8,7 @@ enum VisErrCode {
     OK = '0',
     HAS_PIS = '1',
     FINISHED = '99',
+    EU_INCOMPLETE = '100',
     INFO = '-2',
 }
 
@@ -49,12 +50,18 @@ export class VPSService {
                     response = await this.listPIS(vis, userId, false);
                     break;
 
+                case VisErrCode.EU_INCOMPLETE:
+                    response = await this.listPIS(vis, userId, true);
+                    response.message = response.message || d.errmsg;
+                    break;
+
                 case VisErrCode.FINISHED:
                     response = await this.listPIS(vis, userId, true);
+                    response.eucomplete = true;
                     break;
 
                 default:
-                    response = await {
+                    response = {
                         status: d.errcode === VisErrCode.INFO ? PackStatus.INFO : PackStatus.ERROR,
                         message: d.errmsg,
                     };
@@ -204,15 +211,24 @@ export class VPSService {
                     return {
                         status: PackStatus.SUCCESS,
                         message: d.errmsg,
-                        chkcompte: false,
+                        chkcompte: false
                     };
                     break;
+
+                case VisErrCode.EU_INCOMPLETE:
+                    return {
+                        status: PackStatus.SUCCESS,
+                        message: d.errmsg,
+                        chkcompte: true,
+                        eucomplete: false
+                    };
 
                 case VisErrCode.FINISHED:
                     return {
                         status: PackStatus.SUCCESS,
                         message: d.errmsg,
                         chkcompte: true,
+                        eucomplete: true
                     };
                     break;
 
@@ -328,6 +344,35 @@ export class VPSService {
             return {
                 status: PackStatus.ERROR,
                 message: error.message,
+            };
+        }
+    }
+
+    /**
+     * Validate Package ID
+     * @author  Mr.Pathanapong Sokpukeaw
+     * @since   2026-11-12
+     * @param   {string} vis VIS code
+     * @param   {string} packageId Package ID
+     * @param   {string} userId User ID
+     * @return  {Promise<PackResultDto>}
+     */
+    async confirmPackageID(vis: string, packageId: string, userId: string): Promise<PackResultDto> {
+        try {
+            const [d] = await this.db.query(
+                'EXEC SP_EU_CONFIRM_PACKAGE @0,@1,@2',
+                [vis, packageId, userId]
+            );
+
+            return {
+                status: d.STATUS === 'PASS' ? PackStatus.SUCCESS : PackStatus.INFO,
+                message: d.MESSAGE,
+                eucomplete: d.STATUS === 'PASS'
+            };
+        } catch (error) {
+            return {
+                status: PackStatus.ERROR,
+                message: error.message
             };
         }
     }

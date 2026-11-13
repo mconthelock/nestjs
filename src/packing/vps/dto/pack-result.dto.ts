@@ -52,8 +52,15 @@ export class PackResultDto {
     message: string;
 
     @ApiProperty({
+        description: 'EU package completion',
+        example: false,
+        required: false,
+    })
+    eucomplete?: boolean;
+
+    @ApiProperty({
         description: 'Flag indicating VIS check completion (true = completed)',
-        example: true,
+        example: false,
         required: false,
     })
     chkcompte?: boolean;

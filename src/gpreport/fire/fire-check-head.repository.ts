@@ -37,6 +37,16 @@ export class FireCheckHeadRepository extends BaseRepository {
         });
     }
 
+    checkTransactionActive() {
+        return !!this.manager.queryRunner?.isTransactionActive;
+    }
+
+    findInspectionHead(AREA: string, FMONTH: string, FYEAR: string) {
+        return this.getRepository(FireCheckHead).findOne({where: {
+            AREA, FYEAR, FMONTH: In([...new Set([FMONTH, String(Number(FMONTH))])]),
+        }});
+    }
+
     findCheckHead(key: FireCheckHeadKeyDto, lock = false) {
         const repo = this.getRepository(FireCheckHead);
         if (lock) {

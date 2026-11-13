@@ -206,11 +206,21 @@ export class FlowRepository extends BaseRepository {
             .getMany();
     }
 
-    async doactionUpdateFlow(flow: any, params: any) {
+    async doactionUpdateFlow(flow: any, params: any, currentStepOnly = false) {
         // UPDATE APPROVAL STATUS
         let apvClause: string = '';
         params.stepNo = flow.CSTEPNO;
-        if (
+        if (currentStepOnly) {
+            apvClause = `and CSTEPNO = :stepNo`;
+            if (flow.CAPVTYPE == this.APV_TYPE_MULTIPLE_CO) {
+                apvClause += ` and (VAPVNO = :apv1 or VREPNO = :rep1)`;
+                params = {
+                    ...params,
+                    apv1: params.VREALAPV,
+                    rep1: params.VREALAPV,
+                };
+            }
+        } else if (
             flow.CAPVTYPE == this.APV_TYPE_SINGLE &&
             flow.CAPPLYALL == this.APPLY_ALL_NONE
         ) {

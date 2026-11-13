@@ -29,7 +29,7 @@ export class DoactionFlowService extends FlowService {
     async doAction(
         dto: doactionFlowDto,
         ip: string,
-        options: { holdUntilStepDone?: boolean } = {},
+        options: { holdUntilStepDone?: boolean; currentStepOnly?: boolean } = {},
     ): Promise<{
         status: boolean;
         message: string;
@@ -88,7 +88,7 @@ export class DoactionFlowService extends FlowService {
                         ...params,
                         whatAction,
                         stepAction,
-                    });
+                    }, options.currentStepOnly);
                     const checkNextStep = await this.repo.getFlow({
                         ...form,
                         CAPVSTNO: this.APV_NONE,
@@ -126,7 +126,7 @@ export class DoactionFlowService extends FlowService {
                         ...params,
                         whatAction,
                         stepAction,
-                    });
+                    }, options.currentStepOnly);
                     //Check for updating flow status
                     if (flow.CAPVTYPE == this.APV_TYPE_MULTIPLE_CO) {
                         const checkUpdate = await this.repo.getFlow({
@@ -180,7 +180,7 @@ export class DoactionFlowService extends FlowService {
                         ...params,
                         whatAction,
                         stepAction,
-                    });
+                    }, options.currentStepOnly);
                     await this.repo.updateStepWaitToNormal(form);
                     await this.repo.updateStepReadyToWait(form);
                     await this.repo.updateStepReqToReady(form);
@@ -192,7 +192,7 @@ export class DoactionFlowService extends FlowService {
                         ...params,
                         whatAction,
                         stepAction,
-                    });
+                    }, options.currentStepOnly);
                     await this.repo.updateAllStepToNormal(form);
                     await this.repo.updateStepReqToReady(form);
                     await this.repo.updateStepReqNextToWait(form);
@@ -204,7 +204,7 @@ export class DoactionFlowService extends FlowService {
                         ...params,
                         whatAction,
                         stepAction,
-                    });
+                    }, options.currentStepOnly);
                     await this.repo.updateStepWaitToNormal(form);
                     await this.repo.updateStepReadyToWait(form);
                     await this.repo.updateStepReqToReadyB(form);
@@ -221,7 +221,7 @@ export class DoactionFlowService extends FlowService {
                         ...params,
                         whatAction,
                         stepAction,
-                    });
+                    }, options.currentStepOnly);
                     await this.repo.updateStepNextExeToNormal(
                         form,
                         dto.CEXTDATA,

@@ -24,7 +24,15 @@ export class FireCheckDetailRepository extends BaseRepository {
         const { page = 1, limit = 20, ...where } = query;
         const [data, total] = await this.getRepository(FireCheckDetail).findAndCount({
             where,
-            order: { NFRMNO: 'ASC', VORGNO: 'ASC', CYEAR: 'ASC', CYEAR2: 'ASC', NRUNNO: 'ASC', ID: 'ASC', FIRE_CODE: 'ASC' },
+            order: {
+                NFRMNO: 'ASC',
+                VORGNO: 'ASC',
+                CYEAR: 'ASC',
+                CYEAR2: 'ASC',
+                NRUNNO: 'ASC',
+                ID: 'ASC',
+                FIRE_CODE: 'ASC',
+            },
             skip: (page - 1) * limit,
             take: limit,
         });

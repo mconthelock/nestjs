@@ -21,11 +21,7 @@ import { FireCheckDetailRepository } from './fire-check-detail.repository';
             'gpreportConnection',
         ),
     ],
-    controllers: [
-        FireCheckHeadController,
-        FireCheckDetailController,
-        FireController,
-    ],
+    controllers: [FireCheckHeadController, FireCheckDetailController, FireController],
     providers: [
         FireService,
         FireRepository,
@@ -34,11 +30,6 @@ import { FireCheckDetailRepository } from './fire-check-detail.repository';
         FireCheckDetailService,
         FireCheckDetailRepository,
     ],
-    exports: [
-        FireService,
-        FireRepository,
-        FireCheckHeadService,
-        FireCheckDetailService,
-    ],
+    exports: [FireService, FireRepository, FireCheckHeadService, FireCheckDetailService],
 })
 export class FireModule {}

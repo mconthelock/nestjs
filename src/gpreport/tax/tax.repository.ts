@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, DeepPartial } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 
 import { GPLY01_TAX } from 'src/common/Entities/webform/table/GPLY01_TAX.entiry';
@@ -37,40 +37,14 @@ export class TaxRepository extends BaseRepository {
 
     async findHistory(empno: string) {
         const cleanEmpno = (empno || '').trim();
-
         const qb = this.getRepository(GPLY01_TAX)
             .createQueryBuilder('A')
             .leftJoin('A.FORM', 'form')
-
-            // .leftJoin(
-            //     FLOW,
-            //     'A',
-            //     'F.NFRMNO = A.NFRMNO AND F.VORGNO = A.VORGNO AND F.CYEAR = A.CYEAR AND F.CYEAR2 = A.CYEAR2 AND F.NRUNNO = A.NRUNNO AND A.CSTEPNO != :reqStepNon',
-            //     { reqStepNon: '--' },
-            // )
-            // .select([
-            //     'F.NFRMNO AS NFRMNO',
-            //     'F.VORGNO AS VORGNO',
-            //     'F.CYEAR AS CYEAR',
-            //     'F.CYEAR2 AS CYEAR2',
-            //     'F.NRUNNO AS NRUNNO',
-            //     'F.VREQNO AS VREQNO',
-            //     'F.VINPUTER AS VINPUTER',
-            //     'F.DREQDATE AS DREQDATE',
-            //     'F.CREQTIME AS CREQTIME',
-            //     'F.CST AS CST',
-            //     'A.DAPVDATE AS APVDATE',
-            //     'A.CAPVTIME AS APVTIME',
-            //     'A.VREMARK AS REMARK',
-            //     'A.VREALAPV AS REALAPV',
-            // ])
-            // .where('F.NFRMNO = :nfrmno', { nfrmno: this.NFRMNO })
-            // .andWhere('F.VORGNO = :vorgno', { vorgno: this.VORGNO })
-            // .andWhere('F.CYEAR = :cyear', { cyear: this.CYEAR })
-            // .andWhere('(TRIM(F.VREQNO) = :empno OR TRIM(F.VINPUTER) = :empno)', { empno: cleanEmpno })
-            // .orderBy('F.CYEAR2', 'DESC')
-            // .addOrderBy('F.NRUNNO', 'DESC');
             .where('TRIM(A.SEMPNO) = :empno', { empno: cleanEmpno });
         return await qb.getRawMany();
+    }
+
+    async create(data: DeepPartial<GPLY01_TAX>) {
+        return this.getRepository(GPLY01_TAX).save(data);
     }
 }

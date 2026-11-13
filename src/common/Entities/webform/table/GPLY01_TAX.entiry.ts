@@ -48,9 +48,6 @@ export class GPLY01_TAX {
     FAMSTX: string;
 
     @Column()
-    FAMCHI: number;
-
-    @Column()
     C1NED: number;
 
     @Column()

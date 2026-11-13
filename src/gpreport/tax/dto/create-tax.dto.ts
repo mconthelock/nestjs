@@ -35,7 +35,7 @@ export class CreateTaxDto extends PickType(CreateFormDto, [
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    NRUNNO: number;
+    NRUNNO?: number;
 
     @IsString()
     EMPCOD: string;
@@ -46,100 +46,121 @@ export class CreateTaxDto extends PickType(CreateFormDto, [
     @IsString()
     MARSTE: string;
 
+    @IsOptional()
     @IsString()
-    FAMMRN: string;
+    FAMMRN?: string;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Date)
-    FAMMRD: Date;
+    FAMMRD?: Date;
 
+    @IsOptional()
     @IsString()
-    FAMSNA: string;
+    FAMSNA?: string;
 
+    @IsOptional()
     @IsString()
-    FAMSTX: string;
+    FAMSTX?: string;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    FAMCHI: number;
+    C1NED?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    C1NED: number;
+    C1IED?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    C1IED: number;
+    C2NED?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    C2NED: number;
+    C2IED?: number;
 
-    @IsNumber()
-    @Type(() => Number)
-    C2IED: number;
-
+    @IsOptional()
     @IsString()
-    TAXEMF: string;
+    TAXEMF?: string;
 
+    @IsOptional()
     @IsString()
-    TAXEMM: string;
+    TAXEMM?: string;
 
+    @IsOptional()
     @IsString()
-    TAXSFT: string;
+    TAXSFT?: string;
 
+    @IsOptional()
     @IsString()
-    TAXSPM: string;
+    TAXSPM?: string;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    TAXPRG: number;
+    TAXPRG?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    TAXDIS: number;
+    TAXDIS?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    TAXINS: number;
+    TAXINS?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    TAXINH: number;
+    TAXINH?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    TAXINP: number;
+    TAXINP?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    TAXRMF: number;
+    TAXRMF?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    TAXANU: number;
+    TAXANU?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    TAXINL: number;
+    TAXINL?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    TAXLTF: number;
+    TAXLTF?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    TAXEDU: number;
+    TAXEDU?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    TAXDON: number;
+    TAXDON?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    TAXOT1: number;
+    TAXOT1?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    TAXOT2: number;
+    TAXOT2?: number;
 }

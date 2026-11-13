@@ -24,4 +24,23 @@ export class RevService {
             throw error;
         }
     }
+
+    async updateRevisionMaster(revision: string) {
+        try {
+            const res = await this.revRepo.updateRevisionMaster(revision);
+            return res
+                ? {
+                      status: true,
+                      message: `Revision ${revision} updated successfully`,
+                      data: res,
+                  }
+                : {
+                      status: false,
+                      message: `Revision ${revision} not found`,
+                      data: null,
+                  };
+        } catch (error) {
+            throw error;
+        }
+    }
 }

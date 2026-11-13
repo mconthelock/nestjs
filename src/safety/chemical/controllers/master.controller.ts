@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import { MasterService } from '../services/master.service';
 import {
     OwnOrgDto,
@@ -35,7 +35,7 @@ export class MasterController {
         return this.rebuildService.getRebuildSection(data.ID);
     }
 
-    @Post('rebuild/confirm')
+    @Patch('rebuild/confirm')
     @UseTransaction('gpreportConnection')
     confirmRebuildSection(@Body() data: ConfirmRebuildSectionDto) {
         return this.rebuildService.confirmRebuildSection(data);

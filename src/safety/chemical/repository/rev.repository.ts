@@ -55,4 +55,11 @@ export class RevRepository extends BaseRepository {
             order: { OWNER: 'ASC' },
         });
     }
+
+    updateRevisionMaster(revision: string) {
+        return this.getRepository(STY_CHEMICAL_REV).update(
+            { OWNERCODE: '999999' },
+            { REV: revision },
+        );
+    }
 }

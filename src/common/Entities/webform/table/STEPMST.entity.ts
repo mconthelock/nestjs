@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn } from 'typeorm';
+import { FLOW } from './FLOW.entity';
 
 @Entity({ name: 'STEPMST', schema: 'WEBFORM' })
 export class STEPMST {
@@ -10,4 +11,8 @@ export class STEPMST {
 
     @Column()
     VDESC: string;
+
+    @OneToMany(() => FLOW, (flow) => flow.steps)
+    @JoinColumn([{ name: 'CNO', referencedColumnName: 'CSTEPNO' }])
+    step: FLOW[];
 }

@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('STY_CHEMICAL_SECTION')
+@Entity({ name: 'STY_CHEMICAL_SECTION', schema: 'GPREPORT' })
 export class ChemicalSection {
     @PrimaryColumn()
     OWNER: string;

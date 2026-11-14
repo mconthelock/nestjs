@@ -50,6 +50,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
         // ✅ Response กลับไปหา client
         response.status(status).json({
+            status: false,
             statusCode: status,
             timestamp: new Date(),
             path: request.url,

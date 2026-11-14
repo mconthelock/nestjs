@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { MfgEdrFormHead } from './mfg_edr_form_head.entity';
 
-@Entity({ name: 'MFG_EDR_FORM_CAUSE4M' })
+@Entity({ name: 'MFG_EDR_FORM_CAUSE4M', schema: 'WEBFORM' })
 export class MfgEdrFormCause4m {
     @PrimaryColumn()
     NFRMNO: number;

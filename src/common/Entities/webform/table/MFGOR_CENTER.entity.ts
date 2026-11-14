@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: 'MFGOR_CENTER' })
+@Entity({ name: 'MFGOR_CENTER', schema: 'WEBFORM' })
 export class Mfgor_center {
     @PrimaryColumn()
     ORNO: string;

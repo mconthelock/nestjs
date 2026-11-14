@@ -196,7 +196,10 @@ export class AuthService {
         } catch (error) {}
         return {
             SEMPNO: user.SEMPNO,
+            SEMPPRE: user.SEMPPRE,
             SNAME: user.SNAME,
+            SEMPPRT: user.SEMPPRT,
+            STNAME: user.STNAME,
             SRECMAIL: user.SRECMAIL,
             SSECCODE: user.SSECCODE,
             SSEC: user.SSEC,
@@ -206,7 +209,7 @@ export class AuthService {
             SDIV: user.SDIV,
             SPOSCODE: user.SPOSCODE,
             SPOSNAME: user.SPOSNAME,
-            STNAME: user.STNAME,
+            SPOSITION: user.SPOSITION,
             MEMEML: user.MEMEML,
             image: imageUrl,
         };

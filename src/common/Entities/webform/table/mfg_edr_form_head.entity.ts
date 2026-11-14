@@ -5,7 +5,7 @@ import { EdrCauseMst } from './edr_cause_mst.entity';
 import { EdrWorktypeMst } from './edr_worktype_mst.entity';
 import { MfgEdrFormCause4m } from './mfg_edr_form_cause4m.entity';
 
-@Entity({ name: 'MFG_EDR_FORM_HEAD' })
+@Entity({ name: 'MFG_EDR_FORM_HEAD', schema: 'WEBFORM' })
 export class MfgEdrFormHead {
     @PrimaryColumn()
     NFRMNO: number;

@@ -23,20 +23,19 @@ export class MasterService {
      * @returns ข้อมูล master ที่ active ทั้งหมด
      */
     async getActive() {
-        const section = await this.revRepo.getSectionActive();
-        // const data = await this.masterRepo.getMaster(section, 1);
-        const data = await this.masterRepo.getMasters({ status: 1 });
-        return data.length > 0
-            ? {
-                  status: true,
-                  message: `Data master found ${data.length} record`,
-                  section,
-                  data,
-              }
-            : {
-                  status: false,
-                  message: 'No active data found.',
-              };
+        try {
+            const section = await this.revRepo.getSectionActive();
+            // const data = await this.masterRepo.getMaster(section, 1);
+            const data = await this.masterRepo.getMasters({ status: 1 });
+            return {
+                status: true,
+                message: `Data master found ${data.length} record`,
+                section,
+                data,
+            };
+        } catch (error) {
+            throw error;
+        }
     }
 
     /**
@@ -46,20 +45,20 @@ export class MasterService {
      * @returns ข้อมูล master ที่ inactive ทั้งหมด
      */
     async getInactive() {
-        const section = await this.revRepo.getSectionActive();
-        // const data = await this.masterRepo.getMaster(section, 0);
-        const data = await this.masterRepo.getMasters({ status: 0 });
-        return data.length > 0
-            ? {
-                  status: true,
-                  message: `Data master found ${data.length} record`,
-                  section,
-                  data,
-              }
-            : {
-                  status: false,
-                  message: 'No inactive data found.',
-              };
+        try {
+            const section = await this.revRepo.getSectionActive();
+            // const data = await this.masterRepo.getMaster(section, 0);
+            const data = await this.masterRepo.getMasters({ status: 0 });
+
+            return {
+                status: true,
+                message: `Data master found ${data.length} record`,
+                section,
+                data,
+            };
+        } catch (error) {
+            throw error;
+        }
     }
 
     /**

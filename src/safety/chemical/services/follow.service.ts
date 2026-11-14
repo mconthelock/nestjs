@@ -19,8 +19,8 @@ export class FollowService {
     async getByFyear(fyear: string) {
         try {
             const forms = await this.repository.getByFyear(fyear);
+            const res = [];
             if (forms.length > 0) {
-                const res = [];
                 for (const form of forms) {
                     const formDetails = await this.formService.getFormno({
                         NFRMNO: form.NFRMNO,
@@ -37,15 +37,11 @@ export class FollowService {
                         FORM_TYPE: form.FORM_TYPE,
                     });
                 }
-                return {
-                    status: true,
-                    message: `Data found ${forms.length} records`,
-                    data: res,
-                };
             }
             return {
-                status: false,
-                message: 'No records found',
+                status: true,
+                message: `Data found ${forms.length} records`,
+                data: res,
             };
         } catch (error) {
             throw error;

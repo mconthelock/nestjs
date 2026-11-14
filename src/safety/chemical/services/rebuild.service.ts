@@ -29,8 +29,8 @@ export class RebuildService extends MasterService {
      * @returns ข้อมูล master และ sections ที่จัดรูปแบบใหม่สำหรับการ rebuild
      */
     async getRebuildSection(id: number[]) {
-        const data = await this.masterRepo.getMasters({ status: 0, id });
-        if (data.length > 0) {
+        try {
+            const data = await this.masterRepo.getMasters({ status: 0, id });
             const newData = this.setData(data);
             return {
                 status: true,
@@ -38,11 +38,9 @@ export class RebuildService extends MasterService {
                 section: newData.sections,
                 data: newData.data,
             };
+        } catch (error) {
+            throw error;
         }
-        return {
-            status: false,
-            message: 'No data found to rebuild sections.',
-        };
     }
 
     /**
@@ -147,7 +145,11 @@ export class RebuildService extends MasterService {
         try {
             await this.masterRepo.enable(dto.ID, dto.USER_UPDATE);
             for (const data of dto.SECTIONS) {
-                await this.sectionRepo.enable(data.AMEC_SDS_ID, data.OWNERCODE, dto.USER_UPDATE);
+                await this.sectionRepo.enable(
+                    data.AMEC_SDS_ID,
+                    data.OWNERCODE,
+                    dto.USER_UPDATE,
+                );
             }
             return {
                 status: true,

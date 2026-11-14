@@ -4,11 +4,13 @@ import { DataSource, In } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { STY_CHEMICAL } from 'src/common/Entities/gpreport/table/STY_CHEMICAL.entity';
 import { STY_TYPE } from 'src/common/Entities/gpreport/table/STY_TYPE.entity';
+import { MasterSubscriber } from '../subscriber/master.subscriber';
 
 @Injectable()
 export class MasterRepository extends BaseRepository {
     constructor(@InjectDataSource('gpreportConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
+        ds.subscribers.push(new MasterSubscriber());
     }
     // ไม่ได้ใช้ในตอนนี้ แต่สามารถใช้สำหรับดึงข้อมูล master ของแต่ละ section ได้ แบบไม่ nested
     async getMaster(
@@ -142,17 +144,17 @@ export class MasterRepository extends BaseRepository {
         return query.getMany();
     }
 
-    enable(id: number | number[]) {
+    enable(id: number | number[], userUpdate: string) {
         return this.getRepository(STY_CHEMICAL).update(
             Array.isArray(id) ? { AMEC_SDS_ID: In(id) } : { AMEC_SDS_ID: id },
-            { STATUS: 1 },
+            { STATUS: 1, USER_UPDATE: userUpdate },
         );
     }
 
-    disable(id: number) {
+    disable(id: number | number[], userUpdate: string) {
         return this.getRepository(STY_CHEMICAL).update(
             Array.isArray(id) ? { AMEC_SDS_ID: In(id) } : { AMEC_SDS_ID: id },
-            { STATUS: 0 },
+            { STATUS: 0, USER_UPDATE: userUpdate },
         );
     }
 }

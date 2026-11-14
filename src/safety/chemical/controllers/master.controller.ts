@@ -4,6 +4,7 @@ import {
     OwnOrgDto,
     RebuildSectionDto,
     ConfirmRebuildSectionDto,
+    DisableByIdDto,
 } from '../dto/master.dto';
 import { RebuildService } from '../services/rebuild.service';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
@@ -41,8 +42,8 @@ export class MasterController {
         return this.rebuildService.confirmRebuildSection(data);
     }
 
-    @Patch('disable/:id')
-    disableMaster(@Param('id') id: string) {
-        return this.service.disableMaster(+id);
+    @Patch('disable')
+    disableMaster(@Body() data: DisableByIdDto) {
+        return this.service.disableMaster(data.ID, data.USER_UPDATE);
     }
 }

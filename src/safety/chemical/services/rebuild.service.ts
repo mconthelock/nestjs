@@ -145,9 +145,9 @@ export class RebuildService extends MasterService {
      */
     async confirmRebuildSection(dto: ConfirmRebuildSectionDto) {
         try {
-            await this.masterRepo.enable(dto.ID);
+            await this.masterRepo.enable(dto.ID, dto.USER_UPDATE);
             for (const data of dto.SECTIONS) {
-                await this.sectionRepo.enable(data.AMEC_SDS_ID, data.OWNERCODE);
+                await this.sectionRepo.enable(data.AMEC_SDS_ID, data.OWNERCODE, dto.USER_UPDATE);
             }
             return {
                 status: true,

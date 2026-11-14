@@ -1,3 +1,4 @@
+import { PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
     IsNotEmpty,
@@ -48,4 +49,18 @@ export class ConfirmRebuildSectionDto extends RebuildSectionDto {
     @ValidateNested({ each: true })
     @Type(() => RebuildSecConfDto)
     SECTIONS: RebuildSecConfDto[];
+
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
+    USER_UPDATE: string;
+}
+
+export class DisableByIdDto extends PickType(ConfirmRebuildSectionDto, [
+    'USER_UPDATE',
+] as const) {
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
+    ID: number;
 }

@@ -25,6 +25,12 @@ export class RevService {
         }
     }
 
+    /**
+     * @author Sutthipong tangmongkhoncharoen(24008)
+     * @since 2026-11-13
+     * @description อัปเดต revision ของ master
+     * @returns ผลลัพธ์การอัปเดต revision
+     */
     async updateRevisionMaster(revision: string) {
         try {
             const res = await this.revRepo.updateRevisionMaster(revision);

@@ -107,10 +107,16 @@ export class MasterService {
         }
     }
 
-    async disableMaster(id: number) {
-         try {
-            await this.masterRepo.disable(id);
-            await this.sectionRepo.disableById(id);
+    /**
+     * @author Sutthipong tangmongkhoncharoen(24008)
+     * @since 2026-11-13
+     * @description ปิดการใช้งาน master และ section ที่เกี่ยวข้องตาม ID
+     * @returns ผลลัพธ์การปิดการใช้งาน master และ section
+     */
+    async disableMaster(id: number, userUpdate: string) {
+        try {
+            await this.masterRepo.disable(id, userUpdate);
+            await this.sectionRepo.disableById(id, userUpdate);
             return {
                 status: true,
                 message: 'Disable successfully',

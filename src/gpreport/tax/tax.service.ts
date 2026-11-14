@@ -61,7 +61,8 @@ export class TaxService {
             .createQueryBuilder('req')
             .leftJoinAndSelect('req.form', 'form')
             .leftJoinAndSelect('form.formmst', 'formmst')
-            .leftJoinAndSelect('form.flow', 'flow');
+            .leftJoinAndSelect('form.flow', 'flow')
+            .leftJoinAndSelect('flow.steps', 'steps');
         await applyDynamicFilters(qb, q, 'req');
         const data = await qb.getMany();
         const result = data.map((res) => {

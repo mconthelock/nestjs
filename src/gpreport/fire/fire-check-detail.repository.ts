@@ -8,7 +8,7 @@ import { SearchFireCheckDetailDto } from './dto/search-fire-check-detail.dto';
 
 @Injectable()
 export class FireCheckDetailRepository extends BaseRepository {
-    constructor(@InjectDataSource('gpreportConnection') dataSource: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') dataSource: DataSource) {
         super(dataSource);
     }
 

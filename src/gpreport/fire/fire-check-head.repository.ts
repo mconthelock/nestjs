@@ -9,7 +9,7 @@ import { SearchFireCheckHeadDto } from './dto/search-fire-check-head.dto';
 
 @Injectable()
 export class FireCheckHeadRepository extends BaseRepository {
-    constructor(@InjectDataSource('gpreportConnection') dataSource: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') dataSource: DataSource) {
         super(dataSource);
     }
 
@@ -42,9 +42,13 @@ export class FireCheckHeadRepository extends BaseRepository {
     }
 
     findInspectionHead(AREA: string, FMONTH: string, FYEAR: string) {
-        return this.getRepository(FireCheckHead).findOne({where: {
-            AREA, FYEAR, FMONTH: In([...new Set([FMONTH, String(Number(FMONTH))])]),
-        }});
+        return this.getRepository(FireCheckHead).findOne({
+            where: {
+                AREA,
+                FYEAR,
+                FMONTH: In([...new Set([FMONTH, String(Number(FMONTH))])]),
+            },
+        });
     }
 
     findCheckHead(key: FireCheckHeadKeyDto, lock = false) {

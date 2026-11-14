@@ -23,7 +23,7 @@ export class FEOTController {
     constructor(private readonly feotService: FEOTService) {}
 
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseInterceptors(getFileUploadInterceptor())
     create(@Body() dto: CreatefeotDetails, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -64,7 +64,7 @@ export class FEOTController {
     }
 
     @Patch('/update')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     update(@Body() dto: UpdatefeotDto, @Req() req: Request) {
         return this.feotService.update(dto, getClientIP(req));

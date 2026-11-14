@@ -9,7 +9,7 @@ import { UpdatefeotDto } from './dto/update-fe-ot.dto';
 
 @Injectable()
 export class FEOTRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

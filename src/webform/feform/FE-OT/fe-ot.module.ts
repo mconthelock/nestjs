@@ -7,12 +7,7 @@ import { FEOTRepository } from './fe-ot.repository';
 import { FEOT_REQUESTS } from 'src/common/Entities/webform/table/FEOT_REQUESTS.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [FEOT_DETAILS],
-            'webformConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([FEOT_DETAILS], 'mitsuConnection')],
     controllers: [FEOTController],
     providers: [FEOTService, FEOTRepository],
     exports: [FEOTService],

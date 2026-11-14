@@ -14,7 +14,7 @@ import { TaxRepository } from './tax.repository';
 @Injectable()
 export class TaxService {
     constructor(
-        @InjectRepository(GPLY01_TAX, 'webformConnection')
+        @InjectRepository(GPLY01_TAX, 'mitsuConnection')
         private readonly taxRepo: Repository<GPLY01_TAX>,
         private readonly repo: TaxRepository,
         protected readonly formcreateservice: FormCreateService,

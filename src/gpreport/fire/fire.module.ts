@@ -16,10 +16,7 @@ import { FireCheckDetailRepository } from './fire-check-detail.repository';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature(
-            [FireItemMst, FireCheckHead, FireCheckDetail],
-            'gpreportConnection',
-        ),
+        TypeOrmModule.forFeature([FireItemMst, FireCheckHead, FireCheckDetail], 'mitsuConnection'),
     ],
     controllers: [FireCheckHeadController, FireCheckDetailController, FireController],
     providers: [

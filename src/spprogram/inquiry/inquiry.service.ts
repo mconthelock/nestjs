@@ -575,8 +575,7 @@ export class InquiryService {
             { dir: oracledb.BIND_OUT, type: oracledb.STRING },
         ];
         const sql = `
-        BEGIN
-          INQUIRY_DELETE(
+        BEGIN SPSYS.INQUIRY_DELETE(
               P_ID => :1,
               P_USER => :2,
               P_REMARK=> :3,

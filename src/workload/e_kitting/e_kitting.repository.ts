@@ -5,13 +5,11 @@ import { InjectDataSource } from '@nestjs/typeorm';
 
 @Injectable()
 export class EKittingRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('workloadConnection') private readonly wk: DataSource,
-    ) {
+    constructor(@InjectDataSource('mitsuConnection') private readonly wk: DataSource) {
         super(wk);
     }
 
-    search(order,packing) {
+    search(order, packing) {
         const result = this.manager.query(
             `WITH BASE AS (
                 SELECT B.S11M06,
@@ -64,8 +62,8 @@ export class EKittingRepository extends BaseRepository {
             SELECT A.*
             FROM ALL_ROWS A
             WHERE A.RN = 1
-            ORDER BY A.Q41K01, A.Q41K03, A.Q41K04, A.Q41K07, TO_NUMBER(A.Q41K05)`
-            , [`_${order}_`, packing]
+            ORDER BY A.Q41K01, A.Q41K03, A.Q41K04, A.Q41K07, TO_NUMBER(A.Q41K05)`,
+            [`_${order}_`, packing],
         );
         return result;
     }

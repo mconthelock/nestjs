@@ -9,7 +9,7 @@ import { UpdatefeotDto } from './dto/update-fe-ot.dto';
 
 @Injectable()
 export class FEOTRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 
@@ -17,11 +17,7 @@ export class FEOTRepository extends BaseRepository {
         return this.getRepository(FEOT_DETAILS).save(dto);
     }
 
-    async getDataOT(dto: {
-        PLANYEAR: number;
-        PLANMONTH: number;
-        SEMPNO: string;
-    }) {
+    async getDataOT(dto: { PLANYEAR: number; PLANMONTH: number; SEMPNO: string }) {
         return this.getRepository(FEOT_DETAILS).find({
             where: {
                 PLANYEAR: dto.PLANYEAR,
@@ -31,16 +27,11 @@ export class FEOTRepository extends BaseRepository {
         });
     }
 
-    async getDataOTall(){
+    async getDataOTall() {
         return this.getRepository(FEOT_DETAILS).find();
     }
 
-    async remove(dto: {
-        PLANYEAR: number;
-        PLANMONTH: number;
-        SEMPNO: string;
-        WORKDATE: string;
-    }) {
+    async remove(dto: { PLANYEAR: number; PLANMONTH: number; SEMPNO: string; WORKDATE: string }) {
         return this.getRepository(FEOT_DETAILS)
             .createQueryBuilder()
             .delete()
@@ -64,8 +55,7 @@ export class FEOTRepository extends BaseRepository {
     }
 
     async update(dto: UpdatefeotDto) {
-        const { PLANYEAR, PLANMONTH, SEMPNO, OLD_WORKDATE, ...updateData } =
-            dto;
+        const { PLANYEAR, PLANMONTH, SEMPNO, OLD_WORKDATE, ...updateData } = dto;
 
         return this.getRepository(FEOT_DETAILS)
             .createQueryBuilder()

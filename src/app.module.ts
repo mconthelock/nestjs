@@ -21,7 +21,6 @@ import { SpModule } from './spprogram/sp.module';
 import { MktModule } from './marketing/mkt.module';
 import { JobOrderModule } from './joborder/joborder.module';
 import { ESCSModule } from './escs/escs.module';
-import { AutomationModule } from './automation/automation.module';
 import { HradminModule } from './hradmin/hradmin.module';
 import { IdsModule } from './ids/ids.module';
 import { ElmesModule } from './elmes/elmes.module';
@@ -61,7 +60,6 @@ import { DtiModule } from './dti/dti.module';
         MktModule,
         ElmesModule,
         AS400Module,
-        AutomationModule,
         HradminModule,
         //JB 🤴
         JobOrderModule,
@@ -81,7 +79,6 @@ import { DtiModule } from './dti/dti.module';
         InnovatModule,
         CountriesModule,
         DtiModule,
-        ,
         TakeoutModule,
     ],
     providers: [

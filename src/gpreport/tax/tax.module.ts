@@ -16,7 +16,7 @@ import { FormModule } from 'src/webform/form/form.module';
     imports: [
         TypeOrmModule.forFeature(
             [GPLY01_TAX, GPLY01_TAXAS400, EMP03T, FORM, FLOW],
-            'webformConnection',
+            'mitsuConnection',
         ),
         FormModule,
     ],

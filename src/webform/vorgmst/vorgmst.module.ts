@@ -6,7 +6,7 @@ import { VORGMST } from 'src/common/Entities/webform/views/VORGMST.entity';
 
 @Module({
     imports: [
-        // 3. 🛠️ เพิ่มบรรทัดนี้ เพื่อบอก Module ว่าเราจะใช้งานเอนทิตีนี้ผ่าน webformConnection
+        // 3. 🛠️ เพิ่มบรรทัดนี้ เพื่อบอก Module ว่าเราจะใช้งานเอนทิตีนี้ผ่าน mitsuConnection
         TypeOrmModule.forFeature([VORGMST], 'mitsuConnection'),
     ],
     controllers: [VorgmstController],

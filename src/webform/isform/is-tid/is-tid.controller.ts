@@ -35,7 +35,7 @@ export class IsTidController {
     }
 
     @Post()
-    @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ webformConnection
+    @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
     @UseForceTransaction()
     create(@Body() dto: CreateIsTidFormDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -43,7 +43,7 @@ export class IsTidController {
     }
 
     @Patch()
-    @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ webformConnection
+    @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
     @UseForceTransaction()
     update(@Body() dto: ActionIsTidDto, @Req() req: Request) {
         const ip = getClientIP(req);

@@ -8,21 +8,24 @@ import { winstonConfig } from './logger/winston.config';
 
 //MSSQL
 import auditConfig from './databases/auditDB.config';
-// import invoiceConfig from './databases/invoice.config';
 import lnConfig from './databases/ln.config';
 import packingConfig from './databases/packingsys.config';
 import fingerConfig from './databases/fingerdb.config';
 
 //ORACLE
 import mitsuConfig from './databases/mitsu.config';
-// import amecConfig from './databases/amec.config';
 import datacenterConfig from './databases/datacenter.config';
-// import docinvConfig from './databases/docinv.config';
 import elmesConfig from './databases/elmes.config';
+
+//postgres
+import pdmConfig from './databases/pdm.config';
+
+// import invoiceConfig from './databases/invoice.config';
+// import docinvConfig from './databases/docinv.config';
 // import escsConfig from './databases/escs.config';
 // import gpreportConfig from './databases/gpreport.config';
 // import idsConfig from './databases/dailyids.config';
-import pdmConfig from './databases/pdm.config';
+// import amecConfig from './databases/amec.config';
 // import purConfig from './databases/pursys.config';
 // import sdsysConfig from './databases/sdsys.config';
 // import spsysConfig from './databases/spsys.config';
@@ -46,23 +49,26 @@ import { SchedulerModule } from './scheduler/scheduler.module';
     imports: [
         ScheduleModule.forRoot(),
         WinstonModule.forRoot(winstonConfig),
-        TypeOrmModule.forRootAsync(mitsuConfig),
-        // TypeOrmModule.forRootAsync(amecConfig),
+
         TypeOrmModule.forRootAsync(auditConfig),
+        TypeOrmModule.forRootAsync(lnConfig),
+        TypeOrmModule.forRootAsync(packingConfig),
+        TypeOrmModule.forRootAsync(fingerConfig),
+
+        TypeOrmModule.forRootAsync(mitsuConfig),
         TypeOrmModule.forRootAsync(datacenterConfig),
-        // TypeOrmModule.forRootAsync(docinvConfig),
         TypeOrmModule.forRootAsync(elmesConfig),
+
+        TypeOrmModule.forRootAsync(pdmConfig),
+        // TypeOrmModule.forRootAsync(docinvConfig),
         // TypeOrmModule.forRootAsync(escsConfig),
         // TypeOrmModule.forRootAsync(gpreportConfig),
         // TypeOrmModule.forRootAsync(idsConfig),
-        TypeOrmModule.forRootAsync(lnConfig),
-        TypeOrmModule.forRootAsync(packingConfig),
-        TypeOrmModule.forRootAsync(pdmConfig),
         // TypeOrmModule.forRootAsync(sdsysConfig),
         // TypeOrmModule.forRootAsync(spsysConfig),
         // TypeOrmModule.forRootAsync(webformConfig),
         // TypeOrmModule.forRootAsync(workloadConfig),
-        TypeOrmModule.forRootAsync(fingerConfig),
+        // TypeOrmModule.forRootAsync(amecConfig),
         // TypeOrmModule.forRootAsync(ebudgetConfig),
         // TypeOrmModule.forRootAsync(iedocConfig),
         // TypeOrmModule.forRootAsync(invoiceConfig),

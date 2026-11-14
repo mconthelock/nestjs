@@ -4,13 +4,11 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ZincPrRepository {
-	constructor(@InjectDataSource('webformConnection') private readonly dataSource: DataSource) {}
+    constructor(@InjectDataSource('mitsuConnection') private readonly dataSource: DataSource) {}
 
-	findPending(date?: string) {
-		const dateFilter = date
-			? "AND TO_CHAR(td.TDETAIL_CDATE, 'YYYY-MM-DD') = :1"
-			: '';
-		const sql = `SELECT
+    findPending(date?: string) {
+        const dateFilter = date ? "AND TO_CHAR(td.TDETAIL_CDATE, 'YYYY-MM-DD') = :1" : '';
+        const sql = `SELECT
 			td.TDETAIL_TAKEOUTNO,
 			mzp.ITEM_MASTER,
 			SUM(td.TDETAIL_WEIGHT_ADJUST) AS TOTAL_WEIGHT_ADJUST,
@@ -39,16 +37,16 @@ export class ZincPrRepository {
 			mzp.DESCRIPTION
 		ORDER BY td.TDETAIL_TAKEOUTNO ASC`;
 
-		return this.dataSource.query(sql, date ? [date] : []);
-	}
+        return this.dataSource.query(sql, date ? [date] : []);
+    }
 
-	markSubmitted(takeoutNos: string[]) {
-		if (takeoutNos.length === 0) {
-			return Promise.resolve([]);
-		}
+    markSubmitted(takeoutNos: string[]) {
+        if (takeoutNos.length === 0) {
+            return Promise.resolve([]);
+        }
 
-		const placeholders = takeoutNos.map((_, index) => `:${index + 1}`).join(', ');
-		const sql = `UPDATE SKIDCNTRL.TKO_TAKEOUTDETAIL
+        const placeholders = takeoutNos.map((_, index) => `:${index + 1}`).join(', ');
+        const sql = `UPDATE SKIDCNTRL.TKO_TAKEOUTDETAIL
 			SET TDETAIL_PR_STATUS = '1'
 			WHERE TDETAIL_TAKEOUTNO IN (${placeholders})
 				AND TDETAIL_INPUTTYPE = '1'
@@ -56,6 +54,6 @@ export class ZincPrRepository {
 				AND TDETAIL_DEL = 0
 				AND TDETAIL_PR_STATUS = '0'`;
 
-		return this.dataSource.query(sql, takeoutNos);
-	}
+        return this.dataSource.query(sql, takeoutNos);
+    }
 }

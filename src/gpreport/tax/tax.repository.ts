@@ -15,7 +15,7 @@ export class TaxRepository extends BaseRepository {
     private readonly VORGNO = '030101';
     private readonly CYEAR = '19';
 
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

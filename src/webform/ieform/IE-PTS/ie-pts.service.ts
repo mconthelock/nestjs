@@ -212,7 +212,7 @@ export class IePtsService {
                           ? 'access IEDOC.PROC_TSATTFILE'
                           : 'create Form/Flow or access TS data';
                 throw new InternalServerErrorException(
-                    `ORA-01031: webformConnection has insufficient privileges to ${operation}. Check database grants for this connection user.`,
+                    `ORA-01031: mitsuConnection has insufficient privileges to ${operation}. Check database grants for this connection user.`,
                 );
             }
             if (code === 1) throw new ConflictException('Duplicate TS process or form key');

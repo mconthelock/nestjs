@@ -1,8 +1,4 @@
-import {
-    Injectable,
-    NotFoundException,
-    BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
@@ -12,16 +8,13 @@ import { GPLY01_TAX } from 'src/common/Entities/webform/table/GPLY01_TAX.entiry'
 
 import { CreateTaxDto } from './dto/create-tax.dto';
 import { SearchTaxDto } from './dto/search-tax.dto';
-import {
-    TAX_MASTER_ITEMS,
-    TaxItemConfig,
-} from './constants/tax-items.constant';
+import { TAX_MASTER_ITEMS, TaxItemConfig } from './constants/tax-items.constant';
 import { TaxRepository } from './tax.repository';
 
 @Injectable()
 export class TaxService {
     constructor(
-        @InjectRepository(GPLY01_TAX, 'webformConnection')
+        @InjectRepository(GPLY01_TAX, 'mitsuConnection')
         private readonly taxRepo: Repository<GPLY01_TAX>,
         private readonly repo: TaxRepository,
         protected readonly formcreateservice: FormCreateService,
@@ -37,14 +30,9 @@ export class TaxService {
         return {
             ...data,
             TAX1: 60000,
-            TAX2:
-                data.FAMSNA.trim() != null && data.FAMSNA.trim() !== ''
-                    ? 60000
-                    : 0,
+            TAX2: data.FAMSNA.trim() != null && data.FAMSNA.trim() !== '' ? 60000 : 0,
             TAX3:
-                data.C1IED * 30000 +
-                data.C1NED * 30000 +
-                (data.C2IED * 60000 + data.C2NED * 60000),
+                data.C1IED * 30000 + data.C1NED * 30000 + (data.C2IED * 60000 + data.C2NED * 60000),
             TAX4:
                 (data.TAXEMF.replaceAll(' ', '') !== '' ? 30000 : 0) +
                 (data.TAXEMM.replaceAll(' ', '') !== '' ? 30000 : 0) +
@@ -69,9 +57,7 @@ export class TaxService {
                 TAX1: 60000,
                 TAX2: res.FAMSNA?.trim() ? 60000 : 0,
                 TAX3:
-                    res.C1IED * 30000 +
-                    res.C1NED * 30000 +
-                    (res.C2IED * 60000 + res.C2NED * 60000),
+                    res.C1IED * 30000 + res.C1NED * 30000 + (res.C2IED * 60000 + res.C2NED * 60000),
                 TAX4:
                     (res.TAXEMF?.replaceAll(' ', '') ? 30000 : 0) +
                     (res.TAXEMM?.replaceAll(' ', '') ? 30000 : 0) +
@@ -453,9 +439,7 @@ export class TaxService {
         if (wmom !== '') tax4 += 30000;
 
         // คำนวณคู่สมรส
-        const cleanStatus = (row.MARSTE || '')
-            .replace(/\s+/g, '')
-            .toUpperCase();
+        const cleanStatus = (row.MARSTE || '').replace(/\s+/g, '').toUpperCase();
         const isSpouseNotWork = cleanStatus === 'MARRIED&SPOUSEDOESNOTWORK';
         const tax2 = isSpouseNotWork ? 60000 : 0;
 
@@ -546,8 +530,7 @@ export class TaxService {
               : row.CYEAR2;
 
         const detailData = {
-            fyear:
-                type === 1 ? new Date().getFullYear().toString() : row.CYEAR2,
+            fyear: type === 1 ? new Date().getFullYear().toString() : row.CYEAR2,
             eng_status: (row.MARSTE || '').trim(),
             thai_status: (row.MARSTT || '').trim(),
             wife_name: row.FAMSNA || '',

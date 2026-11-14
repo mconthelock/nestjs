@@ -46,7 +46,7 @@ export class TaxController {
     @ApiOperation({
         summary: 'บันทึกแบบร่าง (action=0) หรือยื่นคำขอลดหย่อนภาษี (action=1)',
     })
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     saveTaxRequest(@Body() createTaxDto: CreateTaxDto, @Req() req: Request) {
         const ip = getClientIP(req);
         return this.taxService.create(createTaxDto, ip);
@@ -54,7 +54,7 @@ export class TaxController {
 
     // @Put('request/:year/:runno')
     // @ApiOperation({ summary: 'แก้ไขแบบคำขอลดหย่อนภาษีเดิม' })
-    // @UseTransaction('webformConnection')
+    // @UseTransaction('mitsuConnection')
     // updateTaxRequest(
     //     @Param('year') year: string,
     //     @Param('runno') runno: number,
@@ -74,7 +74,7 @@ export class TaxController {
     // @ApiOperation({
     //     summary: 'อนุมัติหรือส่งกลับแก้ไขใบคำขอลดหย่อนภาษี (HR Approval)',
     // })
-    // @UseTransaction('webformConnection')
+    // @UseTransaction('mitsuConnection')
     // approveTax(@Body() approveTaxDto: ApproveTaxDto, @Req() req: Request) {
     //     const approverEmpno = approveTaxDto.approverEmpno || '';
     //     return this.taxService.approveTax(approveTaxDto, approverEmpno);

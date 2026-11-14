@@ -5,9 +5,7 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ReportProdRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('workloadConnection') private readonly wk: DataSource,
-    ) {
+    constructor(@InjectDataSource('mitsuConnection') private readonly wk: DataSource) {
         super(wk);
     }
 

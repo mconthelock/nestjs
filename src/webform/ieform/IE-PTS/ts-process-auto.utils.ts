@@ -1,0 +1,101 @@
+import { BadRequestException } from '@nestjs/common';
+import {
+    AutoInsertTsProcessDto,
+    AutoTsProcessItemDto,
+    TsDetailDto,
+    TsHeaderDto,
+} from './dto/ts-process.dto';
+
+export const nullableTsCode = (
+    value: string | null | undefined,
+): string | null => value?.trim() || null;
+
+const drawingIdentity = (row: AutoTsProcessItemDto) =>
+    JSON.stringify([
+        row.DWG,
+        nullableTsCode(row.GNO),
+        nullableTsCode(row.LNO),
+        row.ITEM,
+    ]);
+
+export const processIdentity = (row: AutoTsProcessItemDto) =>
+    JSON.stringify([
+        row.DWG,
+        nullableTsCode(row.GNO),
+        nullableTsCode(row.LNO),
+        row.PROCID_OLD,
+    ]);
+
+export type AutoTsFormGroup = AutoInsertTsProcessDto & { ITEM: string };
+
+export function groupTsForms(
+    forms: AutoInsertTsProcessDto[],
+): AutoTsFormGroup[] {
+    const groups = new Map<string, AutoTsFormGroup>();
+    for (const form of forms) {
+        for (const row of form.ITEMS) {
+            const key = JSON.stringify([
+                form.NFRMNO,
+                form.VORGNO,
+                form.CYEAR,
+                form.REQUEST_BY,
+                form.INPUT_BY,
+                row.ITEM,
+            ]);
+            const previous = groups.get(key);
+            if (previous) previous.ITEMS.push(row);
+            else groups.set(key, { ...form, ITEM: row.ITEM, ITEMS: [row] });
+        }
+    }
+    return [...groups.values()];
+}
+
+export function buildTsRows(items: AutoTsProcessItemDto[]): {
+    HEADERS: TsHeaderDto[];
+    DETAILS: TsDetailDto[];
+} {
+    const HEADERS: TsHeaderDto[] = [];
+    const DETAILS: TsDetailDto[] = [];
+    const drawings = new Map<string, { SEQ: string; processes: Set<string> }>();
+    for (const row of items) {
+        const drawingKey = drawingIdentity(row);
+        let drawing = drawings.get(drawingKey);
+        if (!drawing) {
+            if (HEADERS.length >= 999)
+                throw new BadRequestException(
+                    'A TS form supports at most 999 drawing groups',
+                );
+            drawing = {
+                SEQ: String(HEADERS.length + 1).padStart(3, '0'),
+                processes: new Set(),
+            };
+            drawings.set(drawingKey, drawing);
+            HEADERS.push({
+                SEQ: drawing.SEQ,
+                DWGNO: row.DWG,
+                GNO: nullableTsCode(row.GNO),
+                LNO: nullableTsCode(row.LNO),
+                ITEMNO: row.ITEM,
+            });
+        }
+        if (drawing.processes.has(row.PROCID)) {
+            throw new BadRequestException(
+                `Duplicate new PROCID ${row.PROCID} within drawing group ${drawing.SEQ}`,
+            );
+        }
+        if (drawing.processes.size >= 99)
+            throw new BadRequestException(
+                'A drawing group supports at most 99 processes',
+            );
+        drawing.processes.add(row.PROCID);
+        const { ITEM, ...detail } = row;
+        DETAILS.push({
+            ...detail,
+            GNO: nullableTsCode(row.GNO),
+            LNO: nullableTsCode(row.LNO),
+            SEQ: drawing.SEQ,
+            SEQ_PROC: String(drawing.processes.size).padStart(2, '0'),
+        });
+    }
+    return { HEADERS, DETAILS };
+}

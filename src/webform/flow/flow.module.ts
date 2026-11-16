@@ -42,6 +42,7 @@ import { PerformanceLoggerProvider } from 'src/common/logger/performance-logger.
     ],
     exports: [
         FlowService,
+        FlowRepository,
         ShowFlowService,
         DoactionFlowService,
         DeleteFlowStepService,

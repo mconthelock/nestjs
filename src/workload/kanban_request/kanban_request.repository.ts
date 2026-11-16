@@ -15,8 +15,8 @@ export class KanbanRequestRepository extends BaseRepository {
     async getPKC_Product() {
         const result = await this.ds.query(`
             SELECT * 
-            FROM PKC_PRODUCTS pp
-            JOIN PKC_PRODUCT_SECTION pps ON pp.ITEM_CODE = pps.ITS_ITEM
+            FROM WORKLOAD.PKC_PRODUCTS pp
+            JOIN WORKLOAD.PKC_PRODUCT_SECTION pps ON pp.ITEM_CODE = pps.ITS_ITEM
         `);
         return result;
     }
@@ -25,7 +25,7 @@ export class KanbanRequestRepository extends BaseRepository {
         const result = await this.ds.query(
             `
             SELECT * 
-            FROM PKC_PRODUCT_GROUP
+            FROM WORKLOAD.PKC_PRODUCT_GROUP
             WHERE PKITEM = :1
             `,
             [itemcode],
@@ -37,7 +37,7 @@ export class KanbanRequestRepository extends BaseRepository {
         const result = await this.ds.query(
             `
             SELECT * 
-            FROM PKC_PRODUCTS
+            FROM WORKLOAD.PKC_PRODUCTS
             WHERE ITEM_CODE = :1
             `,
             [itemcode],
@@ -47,7 +47,7 @@ export class KanbanRequestRepository extends BaseRepository {
 
     async insertIssueKanban(data: Partial<ISSUE_KANBAN>[]) {
         const result = await this.ds.query(`
-            SELECT SEQ_ISSUE_KANBAN.NEXTVAL AS ID
+            SELECT WORKLOAD.SEQ_ISSUE_KANBAN.NEXTVAL AS ID
             FROM DUAL
         `);
 
@@ -68,7 +68,7 @@ export class KanbanRequestRepository extends BaseRepository {
     async insertIssueKanbanDetail(data: Partial<ISSUE_KANBAN_DETAIL>[]) {
         const seqResult = await this.ds.query(
             `
-                SELECT SEQ_ISSUE_KANBAN_DETAIL.NEXTVAL AS ID
+                SELECT WORKLOAD.SEQ_ISSUE_KANBAN_DETAIL.NEXTVAL AS ID
                 FROM DUAL
                 CONNECT BY LEVEL <= :1
             `,

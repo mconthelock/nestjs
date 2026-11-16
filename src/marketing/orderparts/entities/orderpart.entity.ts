@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
-@Entity({ name: 'TMARKET_TEMP_PARTS', schema: 'AMECMFG' })
+@Entity({ name: 'TMARKET_TEMP_PARTS', schema: 'SPSYS' })
 export class Orderpart {
     @Column()
     SERIES: string;

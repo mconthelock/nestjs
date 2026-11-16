@@ -8,10 +8,11 @@ import { FormModule } from 'src/webform/form/form.module';
 import { GpGarRepository } from './gp-gar-repository';
 import { HandleFileFormModule } from 'src/webform/handle-file-form/handle-file-form.module';
 import { FlowModule } from 'src/webform/flow/flow.module';
+import { GPGAR_FORM } from 'src/common/Entities/webform/table/GPGAR_FORM.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([GPGAR_CATEGORY], 'mitsuConnection'),
+        TypeOrmModule.forFeature([GPGAR_CATEGORY, GPGAR_FORM], 'mitsuConnection'),
         FormmstModule,
         FormModule,
         HandleFileFormModule,

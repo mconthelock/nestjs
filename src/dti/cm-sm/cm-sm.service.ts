@@ -49,25 +49,39 @@ export class CmSmService {
 
         const time_reminder = (data.COUNT_ALERT ?? 0) + 1;
         const reminderLabel = this.ordinal(time_reminder);
-        const recipients = [
-            'perapatr@Mitsubishielevatorasia.co.th',
-            'parichrt@MitsubishiElevatorAsia.co.th',
+        const departmentEmails: Record<string, string> = {
+            EME: 'MOD_TI_EME@MitsubishiElevatorAsia.co.th',
+            EEL: 'MOD_TI_EEL@MitsubishiElevatorAsia.co.th',
+            EAS: 'MOD_TI_EAS@MitsubishiElevatorAsia.co.th',
+        };
+        const toDepartments = to
+            .map((department) => department.trim().toUpperCase())
+            .filter((department) => departmentEmails[department]);
+        const ccDepartments = cc
+            .map((department) => department.trim().toUpperCase())
+            .filter((department) => departmentEmails[department]);
+        const recipients = [...new Set(toDepartments.map((department) => departmentEmails[department]))];
+        const ccRecipients = [
+            ...new Set([
+                'MOD_TI_SE@MitsubishiElevatorAsia.co.th',
+                ...ccDepartments.map((department) => departmentEmails[department]),
+            ]),
         ];
         if (!recipients.length) {
-            throw new BadRequestException('CM_SM_ALERT_TO is not configured');
+            throw new BadRequestException('At least one valid department is required in to');
         }
 
         await this.sendMail({
             to: recipients,
-            // cc: process.env.CM_SM_ALERT_CC,
+            cc: ccRecipients,
             TINO,
             REVNO,
             series: data.DTIH?.MODEL ?? data.DTIH?.PRODTY ?? '',
             reminderLabel,
-            sentBy: empno,
+            sentBy: empno, 
             toDepartment: to.join(', '),
             ccDepartment: cc.join(', '),
-            detailUrl: 'http://localhost:8080/dtiprogram/CM_SM/main',
+            detailUrl: "https://amecweb.mitsubishielevatorasia.co.th/dtiprogram/CM_SM/main",
         });
         await this.cmSmRepository.updateCountAlert(TINO, REVNO, time_reminder);
 
@@ -80,7 +94,7 @@ export class CmSmService {
         return this.mailService.sendMail({
             from: 'perapatr@MitsubishiElevatorAsia.co.th',
             to: options.to,
-            // cc: options.cc,
+            cc: options.cc,
             subject: `DAILY IDS FOR CM TI - CM TI NO. ${options.TINO}`,
             template: 'dti/cm-sm/daily-ids-follow-up',
             context: {

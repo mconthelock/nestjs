@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Param,
+    Patch,
+    Post,
+    UploadedFiles,
+    UseInterceptors,
+} from '@nestjs/common';
 import { MasterService } from '../services/master.service';
 import {
     OwnOrgDto,
@@ -8,12 +17,15 @@ import {
 } from '../dto/master.dto';
 import { RebuildService } from '../services/rebuild.service';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
+import { CreateService } from '../services/create.service';
+import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 
 @Controller('safety/chemical/master')
 export class MasterController {
     constructor(
         private readonly service: MasterService,
         private readonly rebuildService: RebuildService,
+        private readonly createService: CreateService,
     ) {}
 
     @Get('active')
@@ -45,5 +57,12 @@ export class MasterController {
     @Patch('disable')
     disableMaster(@Body() data: DisableByIdDto) {
         return this.service.disableMaster(data.ID, data.USER_UPDATE);
+    }
+
+    @Post()
+    @UseTransaction('gpreportConnection')
+    @UseInterceptors(getFileUploadInterceptor())
+    create(@Body() dto: any, @UploadedFiles() files: Express.Multer.File[]) {
+        return this.createService.main(dto, files);
     }
 }

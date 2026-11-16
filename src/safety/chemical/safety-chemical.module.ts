@@ -15,6 +15,7 @@ import { SectionRepository } from './repository/section.repository';
 import { RevService } from './services/rev.service';
 import { RevController } from './controllers/rev.controller';
 import { RebuildService } from './services/rebuild.service';
+import { CreateService } from './services/create.service';
 
 @Module({
     imports: [ChemicalSectionModule, FormModule, OrganizationsModule],
@@ -25,6 +26,7 @@ import { RebuildService } from './services/rebuild.service';
         MasterService,
         RevService,
         RebuildService,
+        CreateService,
 
         // Repository
         FollowRepository,

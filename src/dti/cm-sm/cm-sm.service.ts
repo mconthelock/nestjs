@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateCmSmDto } from './dto/update-cm-sm.dto';
+import { AlertCmSmEmailDto } from './dto/alert-cm-sm-email.dto';
 import { CmSmRepository } from './cm-sm.repository';
 import { MailService } from 'src/common/services/mail/mail.service';
 
@@ -32,7 +33,7 @@ export class CmSmService {
         return this.cmSmRepository.findAll();
     }
 
-    async alertEmail(TINO: string, REVNO: string, empno: string) {
+    async alertEmail({ TINO, REVNO, empno, to, cc }: AlertCmSmEmailDto) {
         if (!TINO || !REVNO) {
             throw new BadRequestException('TINO and REVNO are required');
         }
@@ -48,24 +49,24 @@ export class CmSmService {
 
         const time_reminder = (data.COUNT_ALERT ?? 0) + 1;
         const reminderLabel = this.ordinal(time_reminder);
-        const to = [
+        const recipients = [
             'perapatr@Mitsubishielevatorasia.co.th',
             'parichrt@MitsubishiElevatorAsia.co.th',
         ];
-        if (!to) {
+        if (!recipients.length) {
             throw new BadRequestException('CM_SM_ALERT_TO is not configured');
         }
 
         await this.sendMail({
-            to,
+            to: recipients,
             // cc: process.env.CM_SM_ALERT_CC,
             TINO,
             REVNO,
             series: data.DTIH?.MODEL ?? data.DTIH?.PRODTY ?? '',
             reminderLabel,
             sentBy: empno, 
-            toDepartment: 'EME, EEL',
-            ccDepartment: 'EAS',
+            toDepartment: to.join(', '),
+            ccDepartment: cc.join(', '),
             detailUrl: "http://localhost:8080/dtiprogram/CM_SM/main",
         });
         await this.cmSmRepository.updateCountAlert(TINO, REVNO, time_reminder);

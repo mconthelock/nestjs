@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { CmSmService } from './cm-sm.service';
 import { UpdateCmSmDto } from './dto/update-cm-sm.dto';
+import { AlertCmSmEmailDto } from './dto/alert-cm-sm-email.dto';
 
 @Controller('cm-sm')
 export class CmSmController {
@@ -17,11 +18,7 @@ export class CmSmController {
   }
 
   @Post('alert-email')
-  alertEmail(
-    @Body('TINO') TINO: string,
-    @Body('REVNO') REVNO: string,
-    @Body('empno') empno: string,
-  ) {
-    return this.cmSmService.alertEmail(TINO, REVNO, empno);
+  alertEmail(@Body() payload: AlertCmSmEmailDto) {
+    return this.cmSmService.alertEmail(payload);
   }
 }

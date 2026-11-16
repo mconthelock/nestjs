@@ -4,7 +4,7 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ZincPrRepository {
-    constructor(@InjectDataSource('webformConnection') private readonly dataSource: DataSource) {}
+    constructor(@InjectDataSource('mitsuConnection') private readonly dataSource: DataSource) {}
 
     findPending(date?: string) {
         const dateFilter = date ? "AND TO_CHAR(td.TDETAIL_CDATE, 'YYYY-MM-DD') = :1" : '';

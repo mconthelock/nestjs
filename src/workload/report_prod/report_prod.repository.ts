@@ -54,7 +54,7 @@ export class ReportProdRepository extends BaseRepository {
                                     ELSE 1
                                 END
                             ) AS ACC
-                        FROM DPMS_ORDERS_VIEW
+                        FROM WORKLOAD.DPMS_ORDERS_VIEW
                         WHERE PRODTYPE IN ('ELE', 'ESC', 'DUM', 'SUP', 'REC', 'TR')
                         AND REVISION != 'D'
                         AND SUBSTR(PROD, 1, 6) >= :1
@@ -102,7 +102,7 @@ export class ReportProdRepository extends BaseRepository {
                         ORDER BY WORKYEAR, WORKMONTH
                     ) - 1 AS LAST_WORKDAY
 
-                FROM MONTH_BOUNDARY
+                FROM WORKLOAD.MONTH_BOUNDARY
             )
             SELECT
                 mr.PROD_MONTH,
@@ -110,8 +110,8 @@ export class ReportProdRepository extends BaseRepository {
                 mr.LAST_WORKDAY,
                 COUNT(dov.MFG_WORKDAY) AS CNT
             FROM MONTH_RANGE mr
-            LEFT JOIN DPMS_ORDERS_VIEW dov
-                ON dov.MFG_WORKDAY BETWEEN mr.FIRST_WORKDAY AND mr.LAST_WORKDAY
+            FROM WORKLOAD.MONTH_RANGE mr
+            LEFT JOIN WORKLOAD.DPMS_ORDERS_VIEW dov
                 AND dov.PRODTYPE IN ('ELE', 'ESC')
             WHERE mr.PROD_MONTH BETWEEN :3 AND :4
             GROUP BY

@@ -88,7 +88,7 @@ export class VPSService {
             const result = await this.db.query(
                 `
                     SELECT orderno, SUBSTRING(caseno, 3, 2) AS block
-                    FROM PackingMas 
+                    FROM PackingMas
                     WHERE vis = @0
                 `,
                 [vis],
@@ -211,7 +211,7 @@ export class VPSService {
                     return {
                         status: PackStatus.SUCCESS,
                         message: d.errmsg,
-                        chkcompte: false
+                        chkcompte: false,
                     };
                     break;
 
@@ -220,7 +220,7 @@ export class VPSService {
                         status: PackStatus.SUCCESS,
                         message: d.errmsg,
                         chkcompte: true,
-                        eucomplete: false
+                        eucomplete: false,
                     };
 
                 case VisErrCode.FINISHED:
@@ -228,7 +228,7 @@ export class VPSService {
                         status: PackStatus.SUCCESS,
                         message: d.errmsg,
                         chkcompte: true,
-                        eucomplete: true
+                        eucomplete: true,
                     };
                     break;
 
@@ -359,20 +359,21 @@ export class VPSService {
      */
     async confirmPackageID(vis: string, packageId: string, userId: string): Promise<PackResultDto> {
         try {
-            const [d] = await this.db.query(
-                'EXEC SP_EU_CONFIRM_PACKAGE @0,@1,@2',
-                [vis, packageId, userId]
-            );
+            const [d] = await this.db.query('EXEC SP_EU_CONFIRM_PACKAGE @0,@1,@2', [
+                vis,
+                packageId,
+                userId,
+            ]);
 
             return {
                 status: d.STATUS === 'PASS' ? PackStatus.SUCCESS : PackStatus.INFO,
                 message: d.MESSAGE,
-                eucomplete: d.STATUS === 'PASS'
+                eucomplete: d.STATUS === 'PASS',
             };
         } catch (error) {
             return {
                 status: PackStatus.ERROR,
-                message: error.message
+                message: error.message,
             };
         }
     }

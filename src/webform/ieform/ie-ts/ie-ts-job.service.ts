@@ -7,7 +7,7 @@ import { MailService } from 'src/common/services/mail/mail.service';
 @Injectable()
 export class IeTsJobService {
     constructor(
-        @InjectDataSource('webformConnection')
+        @InjectDataSource('mitsuConnection')
         private readonly dataSource: DataSource,
         protected readonly formService: FormService,
         protected readonly usersService: UsersService,
@@ -99,9 +99,7 @@ export class IeTsJobService {
                                 CYEAR2: frm.CYEAR2,
                                 NRUNNO: frm.NRUNNO,
                             });
-                            listfrm !== ''
-                                ? (listfrm += `, ${frmname}`)
-                                : (listfrm = `${frmname}`);
+                            listfrm !== '' ? (listfrm += `, ${frmname}`) : (listfrm = `${frmname}`);
                         }
 
                         // นำ frmname ไปต่อ string หรือทำ logic อื่นๆ ต่อตรงนี้...
@@ -110,10 +108,7 @@ export class IeTsJobService {
                         const emp = await this.usersService.findEmp(sempno);
                         if (emp) {
                             to = emp.SRECMAIL;
-                            subject =
-                                'TEST [Approval Request] ' +
-                                listfrm +
-                                ' Pending Approval';
+                            subject = 'TEST [Approval Request] ' + listfrm + ' Pending Approval';
                             html = `
 <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaec; border-radius: 8px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
 

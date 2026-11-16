@@ -20,21 +20,6 @@ import elmesConfig from './databases/elmes.config';
 //postgres
 import pdmConfig from './databases/pdm.config';
 
-// import invoiceConfig from './databases/invoice.config';
-// import docinvConfig from './databases/docinv.config';
-// import escsConfig from './databases/escs.config';
-// import gpreportConfig from './databases/gpreport.config';
-// import idsConfig from './databases/dailyids.config';
-// import amecConfig from './databases/amec.config';
-// import purConfig from './databases/pursys.config';
-// import sdsysConfig from './databases/sdsys.config';
-// import spsysConfig from './databases/spsys.config';
-// import webformConfig from './databases/webform.config';
-// import workloadConfig from './databases/workload.config';
-// import innovatConfig from './databases/innovat.config';
-// import ebudgetConfig from './databases/ebudget.config';
-// import iedocConfig from './databases/iedoc.config';
-
 //Other Services
 import { FilesModule } from './services/file/file.module';
 import { HealthcheckService } from './services/healthcheck/healthcheck.service';
@@ -60,20 +45,6 @@ import { SchedulerModule } from './scheduler/scheduler.module';
         TypeOrmModule.forRootAsync(elmesConfig),
 
         TypeOrmModule.forRootAsync(pdmConfig),
-        // TypeOrmModule.forRootAsync(docinvConfig),
-        // TypeOrmModule.forRootAsync(escsConfig),
-        // TypeOrmModule.forRootAsync(gpreportConfig),
-        // TypeOrmModule.forRootAsync(idsConfig),
-        // TypeOrmModule.forRootAsync(sdsysConfig),
-        // TypeOrmModule.forRootAsync(spsysConfig),
-        // TypeOrmModule.forRootAsync(webformConfig),
-        // TypeOrmModule.forRootAsync(workloadConfig),
-        // TypeOrmModule.forRootAsync(amecConfig),
-        // TypeOrmModule.forRootAsync(ebudgetConfig),
-        // TypeOrmModule.forRootAsync(iedocConfig),
-        // TypeOrmModule.forRootAsync(invoiceConfig),
-        // TypeOrmModule.forRootAsync(innovatConfig),
-        // TypeOrmModule.forRootAsync(purConfig),
         RedisModule,
         SchedulerModule,
         LoggerModule,

@@ -1,6 +1,6 @@
 export enum ChecksheetProc {
-    IN_CHECK = 'IN_CHECK',
-    IN_DRAFT = 'IN_DRAFT',
-    IN_SUBMIT = 'IN_SUBMIT',
-    FL_EDIT = 'FL_EDIT',
+    IN_CHECK = 'ESCCHKSHT.IN_CHECK',
+    IN_DRAFT = 'ESCCHKSHT.IN_DRAFT',
+    IN_SUBMIT = 'ESCCHKSHT.IN_SUBMIT',
+    FL_EDIT = 'ESCCHKSHT.FL_EDIT',
 }

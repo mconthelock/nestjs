@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { PAccessLog } from './entities/p-access-log.entity';
+import { VPS_USER_REPRINT } from 'src/common/Entities/workload/views/VPS_USER_REPRINT.entity';
 
 /**
  * Auth Module
@@ -11,7 +12,10 @@ import { PAccessLog } from './entities/p-access-log.entity';
  * @since   2025-11-12
  */
 @Module({
-    imports: [TypeOrmModule.forFeature([PAccessLog], 'packingConnection')],
+    imports: [
+        TypeOrmModule.forFeature([PAccessLog], 'packingConnection'),
+        TypeOrmModule.forFeature([VPS_USER_REPRINT], 'mitsuConnection'),
+    ],
     controllers: [AuthController],
     providers: [AuthService],
 })

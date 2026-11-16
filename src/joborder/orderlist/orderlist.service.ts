@@ -61,7 +61,7 @@ export class OrderListService {
     private setQueryNew(dto: SearchOrderListDto, type: string = 'data') {
         const { fields = [], ORDTYPE, PRJ_NO, MFGNO, BUYEREMPNO, BUYERNAME, PRNO, PRDATE, PONO, PODATE, LINENO, VENDCODE, ITEM, DRAWING, PARTNAME, INVOICE, DUEDATE, TURNOVER_STATUS, AGENT, SERIES, SDESSCH, SPRODSCH, SDESBMDATE, SMFGBMDATE, EDESSCH, EPRODSCH, EDESBMDATE, EMFGBMDATE, distinct, orderby, orderbyDirection, JOP_PUR_STATUS, JOP_PUR_INPUT_DATE, JOP_MAR_REQUEST, JOP_PUR_CONFIRM, SREGISDATE, EREGISDATE, C_DBP } = dto;
 
-        const query = this.dataSource.createQueryBuilder().from('MV_JOB_ORDER','O');
+        const query = this.dataSource.createQueryBuilder().from('DAILYIDS.MV_JOB_ORDER','O');
         query.distinct(distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
 
         if(orderby){
@@ -158,12 +158,12 @@ export class OrderListService {
                         qb => qb
                             .subQuery()
                             .select('A.JOP_MFGNO, A.JOP_PONO, A.JOP_LINENO, LAST_REVISION, JOP_PUR_STATUS, JOP_MAR_REQUEST, JOP_MAR_REQUEST_DATE, JOP_MAR_INPUT_DATE, JOP_MAR_REMARK')
-                            .from('JOP_MAR_REQ', 'A')
+                            .from('DAILYIDS.JOP_MAR_REQ', 'A')
                             .innerJoin(
                                 qb => qb
                                     .subQuery()
                                     .select('JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION')
-                                    .from('JOP_MAR_REQ', 'MAR')
+                                    .from('DAILYIDS.JOP_MAR_REQ', 'MAR')
                                     .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
                                     'B',
                                     'A.JOP_MFGNO = B.JOP_MFGNO AND A.JOP_PONO = B.JOP_PONO AND A.JOP_LINENO = B.JOP_LINENO AND B.LAST_REVISION = A.JOP_REVISION'
@@ -174,12 +174,12 @@ export class OrderListService {
                         qb => qb
                             .subQuery()
                             .select('C.JOP_MFGNO, C.JOP_PONO, C.JOP_LINENO, LAST_REVISION, JOP_PUR_CONFIRM, JOP_PUR_CONFIRM_DATE, JOP_PUR_INPUT_DATE, JOP_PUR_REMARK')
-                            .from('JOP_PUR_CONF', 'C')
+                            .from('DAILYIDS.JOP_PUR_CONF', 'C')
                             .innerJoin(
                                 qb => qb
                                     .subQuery()
                                     .select('JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION')
-                                    .from('JOP_PUR_CONF', 'PUR')
+                                    .from('DAILYIDS.JOP_PUR_CONF', 'PUR')
                                     .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
                                     'D',
                                     'C.JOP_MFGNO = D.JOP_MFGNO AND C.JOP_PONO = D.JOP_PONO AND C.JOP_LINENO = D.JOP_LINENO AND D.LAST_REVISION = C.JOP_REVISION'
@@ -190,8 +190,8 @@ export class OrderListService {
                     ,'J',
                     'O.PRNO = J.JOP_PONO and O.LINENO = J.JOP_LINENO and O.MFGNO = J.JOP_MFGNO'
             );
-            query.leftJoin('(SELECT * FROM AMECUSERALL)', 'U', 'J.JOP_MAR_REQUEST = U.SEMPNO');
-            query.leftJoin('(SELECT * FROM AMECUSERALL)', 'I', 'J.JOP_PUR_CONFIRM = I.SEMPNO');
+            query.leftJoin('(SELECT * FROM WEBFORM.AMECUSERALL)', 'U', 'J.JOP_MAR_REQUEST = U.SEMPNO');
+            query.leftJoin('(SELECT * FROM WEBFORM.AMECUSERALL)', 'I', 'J.JOP_PUR_CONFIRM = I.SEMPNO');
             return query;
         }
     }

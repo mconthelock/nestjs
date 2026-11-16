@@ -190,8 +190,8 @@ export class OrderListService {
                     ,'J',
                     'O.PRNO = J.JOP_PONO and O.LINENO = J.JOP_LINENO and O.MFGNO = J.JOP_MFGNO'
             );
-            query.leftJoin('(SELECT * FROM WEBFORM.AMECUSERALL)', 'U', 'J.JOP_MAR_REQUEST = U.SEMPNO');
-            query.leftJoin('(SELECT * FROM WEBFORM.AMECUSERALL)', 'I', 'J.JOP_PUR_CONFIRM = I.SEMPNO');
+            query.leftJoin('(SELECT * FROM AMEC.AMECUSERALL)', 'U', 'J.JOP_MAR_REQUEST = U.SEMPNO');
+            query.leftJoin('(SELECT * FROM AMEC.AMECUSERALL)', 'I', 'J.JOP_PUR_CONFIRM = I.SEMPNO');
             return query;
         }
     }

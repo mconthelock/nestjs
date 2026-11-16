@@ -7,7 +7,7 @@ import { Orderpart } from './entities/orderpart.entity';
 @Injectable()
 export class OrderpartsService {
     constructor(
-        @InjectRepository(Orderpart, 'datacenterConnection')
+        @InjectRepository(Orderpart, 'mitsuConnection')
         private readonly ords: Repository<Orderpart>,
 
         @InjectDataSource('mitsuConnection')

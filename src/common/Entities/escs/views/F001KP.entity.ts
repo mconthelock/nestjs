@@ -1,28 +1,28 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { ViewColumn, ViewEntity } from 'typeorm';
 
-@Entity({
+@ViewEntity({
     name: 'F001KP',
     schema: 'ESCCHKSHT',
 })
 export class F001KP {
-    @PrimaryColumn()
+    @ViewColumn()
     F01R01: string;
 
-    @Column()
+    @ViewColumn()
     F01R02: string;
 
-    @Column()
+    @ViewColumn()
     F01R03: string;
 
-    @Column()
+    @ViewColumn()
     F01R04: string;
 
-    @Column()
+    @ViewColumn()
     F01R05: string;
 
-    @Column()
+    @ViewColumn()
     F01R06: string;
 
-    @Column()
+    @ViewColumn()
     F01R07: string;
 }

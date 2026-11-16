@@ -35,17 +35,17 @@ export class OrgTreeRepository extends BaseRepository {
     async getOrgTree(orgno: string, vposno: string, empno: string, emppos: string) {
         return this.manager.query(
             ` SELECT *
-        FROM ORGPOS
+        FROM WEBFORM.ORGPOS
         WHERE VORGNO IN (
         SELECT DISTINCT VORGNO
-        FROM ORGTREE
+        FROM WEBFORM.ORGTREE
         START WITH VORGNO = :1
         CONNECT BY VORGNO = PRIOR vParent
         )
         AND VPOSNO = :2
         AND VEMPNO IN (
         SELECT headNo
-        FROM sequenceOrg
+        FROM WEBFORM.SEQUENCEORG
         START WITH empNo = :3
             AND sPosCode = :4
             AND cCo = '0'

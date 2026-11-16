@@ -12,23 +12,23 @@ export class ProcedureWorkloadRepository extends OracleRepository {
     }
 
     async getReportProdList(prod: string) {
-        return this.execCursor('DPMS_PL_PROD_REPORT', { prod }, ['prod']);
+        return this.execCursor('WORKLOAD.DPMS_PL_PROD_REPORT', { prod }, ['prod']);
     }
 
     async getReportDayList(day: string) {
-        return this.execCursor('DPMS_PL_DAY_REPORT', { day }, ['day']);
+        return this.execCursor('WORKLOAD.DPMS_PL_DAY_REPORT', { day }, ['day']);
     }
 
     async getLastRevDocument(dto: SearchDpmsPlIssueDto) {
-        return this.execCursor('DPMS_PL_DOC_FOR_REVISE', dto, ['VPROD', 'VP', 'VTYPE', 'VORDERS']);
+        return this.execCursor('WORKLOAD.DPMS_PL_DOC_FOR_REVISE', dto, ['VPROD', 'VP', 'VTYPE', 'VORDERS']);
     }
 
     async getDocforShow(dto: GetDocForShowDto) {
-        return this.execCursor('DPMS_PL_DOC', dto, ['VPROD', 'VP', 'VTYPE', 'VORDERS', 'NDRAFT']);
+        return this.execCursor('WORKLOAD.DPMS_PL_DOC', dto, ['VPROD', 'VP', 'VTYPE', 'VORDERS', 'NDRAFT']);
     }
 
     async getMarReport(date: string, round: number) {
-        return this.execCursor('DPMS_PL_MAR_REPORT', { date, round }, ['date', 'round']);
+        return this.execCursor('WORKLOAD.DPMS_PL_MAR_REPORT', { date, round }, ['date', 'round']);
     }
 }
 
@@ -38,6 +38,6 @@ export class ProcedureDataCenterRepository extends OracleRepository {
     }
 
     async getShopOrder(ordermain: string) {
-        return this.execCursor('DPMS_PL_SHOP_ORDER', { ordermain }, ['ordermain']);
+        return this.execCursor('AMECMFG.DPMS_PL_SHOP_ORDER', { ordermain }, ['ordermain']);
     }
 }

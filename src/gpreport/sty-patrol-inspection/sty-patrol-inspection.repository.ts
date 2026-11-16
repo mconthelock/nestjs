@@ -131,7 +131,8 @@ export class StyPatrolInspectionRepository extends BaseRepository {
     async summaryClass(fyear: string, seccode?: string) {
         return this.manager.query(
             `WITH CLASS_LIST AS (
-                SELECT TYPE_NAME AS CLASS, TYPE_NO  FROM STY_TYPE
+                SELECT TYPE_NAME AS CLASS, TYPE_NO  
+                FROM GPREPORT.STY_TYPE
                 WHERE TYPE_CODE = 'PTC' AND TYPE_NO IN (1,2)
             )
             SELECT 
@@ -151,7 +152,7 @@ export class StyPatrolInspectionRepository extends BaseRepository {
                 NVL(COUNT(S.TYPE_NO), 0) TOTAL
             FROM CLASS_LIST C 
             LEFT JOIN (
-                SELECT * FROM STY_PATROL_INSPECTION
+                SELECT * FROM GPREPORT.STY_PATROL_INSPECTION
                 ${seccode ? 'WHERE PA_SECTION = :1' : ''}
             )S
             ON S.TYPE_NO = C.TYPE_NO
@@ -170,7 +171,8 @@ export class StyPatrolInspectionRepository extends BaseRepository {
     async summaryDepartment(fyear: string, month: number) {
         return this.manager.query(
             `WITH CLASS_LIST AS (
-                SELECT TYPE_NAME AS CLASS, TYPE_NO  FROM STY_TYPE
+                SELECT TYPE_NAME AS CLASS, TYPE_NO  
+                FROM GPREPORT.STY_TYPE
                 WHERE TYPE_CODE = 'PTC' AND TYPE_NO IN (1,2)
             )
             SELECT D.SDEPCODE, D.SDEPT, C.CLASS,  NVL(P.AMOUNT, 0) AS AMOUNT
@@ -178,7 +180,7 @@ export class StyPatrolInspectionRepository extends BaseRepository {
             CROSS JOIN CLASS_LIST C
             LEFT JOIN (
                 SELECT SDEPCODE, SDEPT, CLASS, COUNT(CLASS) AS AMOUNT
-                FROM STY_PATROL_INSPECTION	
+                FROM GPREPORT.STY_PATROL_INSPECTION	
                 WHERE CST = '2'
                 AND PA_DATE >= TO_DATE(:1 || '-04-01', 'YYYY-MM-DD')
                 AND PA_DATE < ADD_MONTHS(
@@ -239,16 +241,17 @@ export class StyPatrolInspectionRepository extends BaseRepository {
     async summarySection(fyear: string, month: number, deptcode: string) {
         return this.manager.query(
             `WITH CLASS_LIST AS (
-                SELECT TYPE_NAME AS CLASS, TYPE_NO  FROM STY_TYPE
+                SELECT TYPE_NAME AS CLASS, TYPE_NO  
+                FROM GPREPORT.STY_TYPE
                 WHERE TYPE_CODE = 'PTC' AND TYPE_NO IN (1,2)
             )
             SELECT O.SSECCODE, O.SSEC, C.CLASS, NVL(P.AMOUNT,0) AS AMOUNT
-            FROM ORGANIZATIONS O
+            FROM WEBFORM.ORGANIZATIONS O
             CROSS JOIN CLASS_LIST C
             LEFT JOIN 
             (
                 SELECT SSECCODE, CLASS, COUNT(CLASS) AS AMOUNT
-                FROM STY_PATROL_INSPECTION	
+                FROM GPREPORT.STY_PATROL_INSPECTION	
                 WHERE CST = '2'
                 AND PA_DATE >= TO_DATE(:1 || '-04-01', 'YYYY-MM-DD')
                 AND PA_DATE < ADD_MONTHS(

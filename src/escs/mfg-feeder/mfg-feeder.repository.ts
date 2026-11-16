@@ -2,10 +2,10 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { GetDrawingBmDto } from './dto/get-drawing-bm.dto';
-import { F001KP } from 'src/common/Entities/escs/table/F001KP.entity';
-import { Q90010P2 } from 'src/common/Entities/escs/table/Q90010P2.entity';
-import { M008KP } from 'src/common/Entities/escs/table/M008KP.entity';
-import { AMECORDERS_PROCESS } from 'src/common/Entities/escs/table/AMECORDERS_PROCESS.entity';
+import { F001KP } from 'src/common/Entities/escs/views/F001KP.entity';
+import { Q90010P2 } from 'src/common/Entities/escs/views/Q90010P2.entity';
+import { M008KP } from 'src/common/Entities/escs/views/M008KP.entity';
+import { AMECORDERS_PROCESS } from 'src/common/Entities/escs/views/AMECORDERS_PROCESS.entity';
 
 @Injectable()
 export class MfgFeederRepository {
@@ -18,7 +18,7 @@ export class MfgFeederRepository {
         return this.ds
             .createQueryBuilder()
             .select(`TO_CHAR(SYSDATE, 'DD-Mon-RR')`, 'INSDATE')
-            .addSelect(`CONVERT_PROD(F.F01R02)`, 'PROD')
+            .addSelect(`ESCCHKSHT.CONVERT_PROD(F.F01R02)`, 'PROD')
             .addSelect(`Q.Q9TYP`, 'MODEL')
             .from(F001KP, 'F')
             .innerJoin(Q90010P2, 'Q', 'F.F01R07 = Q.Q9ORD')

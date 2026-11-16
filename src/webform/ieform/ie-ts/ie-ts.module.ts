@@ -8,10 +8,21 @@ import { FormModule } from 'src/webform/form/form.module';
 import { FlowModule } from 'src/webform/flow/flow.module';
 import { VorgmstModule } from 'src/webform/vorgmst/vorgmst.module';
 import { OrgposModule } from 'src/webform/orgpos/orgpos.module';
+import { IePtsModule } from 'src/webform/ieform/IE-PTS/ie-pts.module';
+import { FormmstModule } from 'src/webform/formmst/formmst.module';
 
 @Module({
     controllers: [IeTsController],
     providers: [IeTsService, IeTsApproveService],
-    imports: [IetsFormModule, IetsListModule, FormModule, VorgmstModule, OrgposModule, FlowModule],
+    imports: [
+        IetsFormModule,
+        IetsListModule,
+        FormModule,
+        VorgmstModule,
+        OrgposModule,
+        FlowModule,
+        IePtsModule,
+        FormmstModule,
+    ],
 })
 export class IeTsModule {}

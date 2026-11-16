@@ -466,8 +466,8 @@ export class VpsRepository extends BaseRepository {
                 S.*,
                 ao.PRODTYPE as PRODTYPE,
                 ao.COUNTRY as COUNTRY,
-                SUBSTR(F_CPROD(M8K01), -3) AS SCHEDULE,
-                SUBSTR(F_CPROD(M8K01), -5) AS JUN,
+                SUBSTR(WORKLOAD.F_CPROD(M8K01), -3) AS SCHEDULE,
+                SUBSTR(WORKLOAD.F_CPROD(M8K01), -5) AS JUN,
                 M8K02,
                 J2INO as PUR_CODE,
                 ap.PACKSHOP,
@@ -484,9 +484,9 @@ export class VpsRepository extends BaseRepository {
             JOIN WORKLOAD.M008KP M ON A.S11M01 = M.M8K03
             LEFT JOIN WORKLOAD.J002MP j ON j.J2CUS = A.S11M01 AND (j.J2DRAW = REPLACE(A.S11M06, ' ', '') OR J2DES = REPLACE(A.S11M06, ' ', ''))
                 ON j.J2CUS = A.S11M01 AND (j.J2DRAW = REPLACE(A.S11M06, ' ', '') OR J2DES = REPLACE(A.S11M06, ' ', ''))
-            LEFT JOIN AMECORDERS ao ON ao.MFGNO = S.S01M01
-            LEFT JOIN AMECORDERS_PACKNO ap ON ap.ORDERNO = S.S01M01 AND ap.PACKNO = S.S01M04
-            LEFT JOIN AMECVPCORDER avo ON avo.MFGNO = S.S01M01
+            LEFT JOIN WORKLOAD.AMECORDERS ao ON ao.MFGNO = S.S01M01
+            LEFT JOIN WORKLOAD.AMECORDERS_PACKNO ap ON ap.ORDERNO = S.S01M01 AND ap.PACKNO = S.S01M04
+            LEFT JOIN WORKLOAD.AMECVPCORDER avo ON avo.MFGNO = S.S01M01
             LEFT JOIN (
                 SELECT MFGNO
                 FROM WEBFORM.URGENT_ORDER_LIST A
@@ -607,7 +607,7 @@ export class VpsRepository extends BaseRepository {
               ? 'AND p.PACKNO = :3'
               : `
         AND EXISTS (
-            SELECT 1 FROM AMECORDERS_PACKNO a
+            SELECT 1 FROM WORKLOAD.AMECORDERS_PACKNO a
             WHERE a.PACKNO = p.PACKNO
             AND (a.SECT = :3 OR a.SECT_PACKING = :4)
         )`;
@@ -627,7 +627,7 @@ export class VpsRepository extends BaseRepository {
             SELECT ORDERNO
             FROM (
                 SELECT DISTINCT p.ORDERNO
-                FROM PACKORDDTL p
+                FROM WORKLOAD.PACKORDDTL p
                 WHERE p.PRINTSTA = '1'
                 AND (:1 IS NULL OR UPPER(p.ORDERNO) LIKE UPPER('%' || :2 || '%'))
                 ${sectFilter}
@@ -654,7 +654,7 @@ export class VpsRepository extends BaseRepository {
               ? 'AND p.PACKNO = :2'
               : `
         AND EXISTS (
-            SELECT 1 FROM AMECORDERS_PACKNO a
+            SELECT 1 FROM WORKLOAD.AMECORDERS_PACKNO a
             WHERE a.PACKNO = p.PACKNO
             AND (a.SECT = :2 OR a.SECT_PACKING = :3)
         )`;
@@ -668,7 +668,7 @@ export class VpsRepository extends BaseRepository {
         return this.wk.query(
             `
             SELECT DISTINCT p.PACKNO, p.ITEMNO, p.PARTNAME
-            FROM PACKORDDTL p
+            FROM WORKLOAD.PACKORDDTL p
             WHERE p.PRINTSTA = '1'
             AND p.ORDERNO = :1
             ${sectFilter}

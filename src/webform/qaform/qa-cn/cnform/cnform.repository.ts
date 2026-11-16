@@ -132,7 +132,7 @@ export class CnFormRepository extends BaseRepository {
                     UNION
                     SELECT C.ENG FROM WEBFORM.CNSHOPPIC C
                     WHERE C.FM IN (
-                        SELECT F2.VAPVNO FROM FLOW F2
+                        SELECT F2.VAPVNO FROM WEBFORM.FLOW F2
                         WHERE F2.NFRMNO = :nfrmno AND F2.VORGNO = :vorgno
                           AND F2.CYEAR = :cyear AND F2.CYEAR2 = :cyear2 AND F2.NRUNNO = :nrunno
                           AND F2.CEXTDATA = '06'
@@ -145,7 +145,7 @@ export class CnFormRepository extends BaseRepository {
             // -------------------------------------------------------------
             // 📍 จุดที่เปลี่ยน: หาอีเมลจาก VAPVNO หรือ VREPNO แทน VREALAPV
             // -------------------------------------------------------------
-            qb.innerJoin('FLOW', 'F', '(F.VAPVNO = E.SEMPNO OR F.VREPNO = E.SEMPNO)')
+            qb.innerJoin('WEBFORM.FLOW', 'F', '(F.VAPVNO = E.SEMPNO OR F.VREPNO = E.SEMPNO)')
                 .andWhere('F.NFRMNO = :nfrmno')
                 .andWhere('F.VORGNO = :vorgno')
                 .andWhere('F.CYEAR = :cyear')

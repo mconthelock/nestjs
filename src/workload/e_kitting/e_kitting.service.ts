@@ -11,11 +11,15 @@ export class EKittingService {
         return this.eKittingRepository.search(order, packing);
     }
 
-    getMaster(){
-        return this.eKittingRepository.getMaster();
+    getMaster(item?: string){
+        return this.eKittingRepository.getMaster(item);
     }
 
-    saveMaster(body: any) {
-        return this.eKittingRepository.saveMaster(body);
+    saveMaster(dto: CreateEKittingDto) {
+        return this.eKittingRepository.saveMaster(dto);
+    }
+    
+    deleteMaster(item: string, DWG: string) {
+        return this.eKittingRepository.deleteMaster(item, DWG);
     }
 }

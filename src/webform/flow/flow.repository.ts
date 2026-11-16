@@ -126,7 +126,7 @@ export class FlowRepository extends BaseRepository {
                     F.DAPVDATE, F.CAPVTIME, F.VREMARK, F.VREPNO, F.VREALAPV
             FROM (
                 SELECT LEVEL AS LV, FLOW.*
-                FROM FLOW
+                FROM WEBFORM.FLOW
                 START WITH
                     NFRMNO = :1
                     AND VORGNO = :2
@@ -144,7 +144,7 @@ export class FlowRepository extends BaseRepository {
             ) F
             JOIN AMEC.AEMPLOYEE E ON E.SEMPNO = F.VAPVNO
             JOIN AMEC.PPOSITION P ON P.SPOSCODE = E.SPOSCODE
-            JOIN STEPMST S ON F.CSTEPNO = S.CNO
+            JOIN WEBFORM.STEPMST S ON F.CSTEPNO = S.CNO
             ORDER BY F.LV
         `,
             [form.NFRMNO, form.VORGNO, form.CYEAR, form.CYEAR2, form.NRUNNO],
@@ -250,7 +250,7 @@ export class FlowRepository extends BaseRepository {
             apvClause += ` and (CSTEPNO = :stepNo or NVL(TRIM(CEXTDATA), ' ') <> :excludedStepTag)`;
             params = { ...params, excludedStepTag: excludeOtherStepsWithTag };
         }
-        const sql = `UPDATE FLOW SET CAPVSTNO = :whatAction, CSTEPST = :stepAction, DAPVDATE = TO_DATE(:DAPVDATE, 'YYYY-MM-DD'), CAPVTIME = :CAPVTIME, VREMARK = :VREMARK, VREMOTE = :VREMOTE, VREALAPV = :VREALAPV WHERE NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO AND CAPVSTNO = :CAPVSTNO ${apvClause}`;
+        const sql = `UPDATE WEBFORM.FLOW SET CAPVSTNO = :whatAction, CSTEPST = :stepAction, DAPVDATE = TO_DATE(:DAPVDATE, 'YYYY-MM-DD'), CAPVTIME = :CAPVTIME, VREMARK = :VREMARK, VREMOTE = :VREMOTE, VREALAPV = :VREALAPV WHERE NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO AND CAPVSTNO = :CAPVSTNO ${apvClause}`;
         return this.manager.query(sql, params);
     }
 
@@ -650,12 +650,12 @@ export class FlowRepository extends BaseRepository {
 
     async updateStepNextExeToNormal(form: FormDto, cextdata: string) {
         const sql = `
-            UPDATE FLOW f
+            UPDATE WEBFORM.FLOW f
             SET f.CSTEPST = :stepNormal, f.VREALAPV = '', f.CAPVSTNO = :apvNone, f.DAPVDATE = '', f.CAPVTIME = ''
             WHERE (f.NFRMNO, f.VORGNO, f.CYEAR, f.CYEAR2, f.NRUNNO, f.CSTEPNO, f.CEXTDATA)
             IN (
                 SELECT NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, CSTEPNO, CEXTDATA
-                FROM FLOW
+                FROM WEBFORM.FLOW
                 START WITH
                     CEXTDATA = :cextdata AND NFRMNO = :NFRMNO
                     AND VORGNO = :VORGNO AND CYEAR = :CYEAR

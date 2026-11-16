@@ -27,7 +27,7 @@ export class FlowmstRepository extends BaseRepository {
     getFlowMaster(NFRMNO: number, VORGNO: string, CYEAR: string) {
         return this.getRepository(FLOWMST).query(
             `SELECT TO_CHAR(NFRMNO) AS NFRMNO, A.*
-            FROM FLOWMST A
+            FROM WEBFORM.FLOWMST A
             START WITH NFRMNO = :1
                 AND vOrgNo = :2
                 AND cYear = :3

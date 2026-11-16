@@ -120,17 +120,17 @@ export class CnFormRepository extends BaseRepository {
         if (type === 'PIC') {
             qb.innerJoin(
                 `(
-                    SELECT F.VAPVNO  AS EMPNO FROM FLOW F
+                    SELECT F.VAPVNO  AS EMPNO FROM WEBFORM.FLOW F
                     WHERE F.NFRMNO = :nfrmno AND F.VORGNO = :vorgno
                       AND F.CYEAR = :cyear AND F.CYEAR2 = :cyear2 AND F.NRUNNO = :nrunno
                       AND F.CSTEPNO = '--'
                     UNION
-                    SELECT F.VREPNO FROM FLOW F
+                    SELECT F.VREPNO FROM WEBFORM.FLOW F
                     WHERE F.NFRMNO = :nfrmno AND F.VORGNO = :vorgno
                       AND F.CYEAR = :cyear AND F.CYEAR2 = :cyear2 AND F.NRUNNO = :nrunno
                       AND F.CSTEPNO = '--'
                     UNION
-                    SELECT C.ENG FROM CNSHOPPIC C
+                    SELECT C.ENG FROM WEBFORM.CNSHOPPIC C
                     WHERE C.FM IN (
                         SELECT F2.VAPVNO FROM FLOW F2
                         WHERE F2.NFRMNO = :nfrmno AND F2.VORGNO = :vorgno

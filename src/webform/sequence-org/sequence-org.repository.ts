@@ -20,9 +20,12 @@ export class SequenceOrgRepository extends BaseRepository {
             .createQueryBuilder('seq')
             .select('seq.HEADNO', 'HEADNO')
             .where('seq.EMPNO = :empno', { empno })
-            .andWhere('seq.SPOSCODE = (select SPOSCODE from AMECUSERALL where SEMPNO = :empno2)', {
-                empno2: empno,
-            })
+            .andWhere(
+                'seq.SPOSCODE = (select SPOSCODE from WEBFORM.AMECUSERALL where SEMPNO = :empno2)',
+                {
+                    empno2: empno,
+                },
+            )
             .orderBy('seq.CCO', 'ASC');
         if (selectFields && selectFields.length > 0) {
             const select = selectFields.map((field) => ({
@@ -51,10 +54,10 @@ export class SequenceOrgRepository extends BaseRepository {
         const sql = `
                  SELECT DISTINCT B.* FROM
                     (
-                        SELECT * FROM SEQUENCEORG
+                        SELECT * FROM WEBFORM.SEQUENCEORG
                         START WITH HEADNO = :1 AND EMPNO != :2 CONNECT BY PRIOR EMPNO = HEADNO AND PRIOR CCO = CCO1
                     ) A
-                    JOIN AMECUSERALL B ON A.EMPNO = B.SEMPNO
+                    JOIN WEBFORM.AMECUSERALL B ON A.EMPNO = B.SEMPNO
                     WHERE B.SEMPNO != :3  AND B.CSTATUS = 1
                 `;
         return await this.manager.query(sql, [empno, empno, empno]);

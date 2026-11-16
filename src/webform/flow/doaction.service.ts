@@ -351,12 +351,12 @@ export class DoactionFlowService extends FlowService {
 
     async getNameReq(form: FormDto) {
         const sql =
-            'select a.SNAME as SNAME , a.SRECMAIL as SRECMAIL from form f , amecuserall a where a.SEMPNO = f.VREQNO and NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO';
+            'select a.SNAME as SNAME , a.SRECMAIL as SRECMAIL from WEBFORM.form f , WEBFORM.amecuserall a where a.SEMPNO = f.VREQNO and NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO';
         return await this.execSql(sql, form);
     }
 
     async getEmailApvNext(form: FormDto) {
-        const sql = `select distinct VEMAIL from emailAck where NFRMNO = :NFRMNO and VORGNO = :VORGNO and CYEAR = :CYEAR and VEMPNO in (select VAPVNO as APPROVER from flow where NFRMNO = :frmno and VORGNO = :orgno and CYEAR = :y and CYEAR2 = :y2 and NRUNNO = :runno and CSTEPST = '3' union select VREPNO from flow where NFRMNO = :frmno2 and VORGNO = :orgno2 and CYEAR = :cy and CYEAR2 = :cy2 and NRUNNO = :runno2 and CSTEPST = '3') and CSTNO = '1'`;
+        const sql = `select distinct VEMAIL from WEBFORM.emailAck where NFRMNO = :NFRMNO and VORGNO = :VORGNO and CYEAR = :CYEAR and VEMPNO in (select VAPVNO as APPROVER from WEBFORM.flow where NFRMNO = :frmno and VORGNO = :orgno and CYEAR = :y and CYEAR2 = :y2 and NRUNNO = :runno and CSTEPST = '3' union select VREPNO from WEBFORM.flow where NFRMNO = :frmno2 and VORGNO = :orgno2 and CYEAR = :cy and CYEAR2 = :cy2 and NRUNNO = :runno2 and CSTEPST = '3') and CSTNO = '1'`;
         const params = {
             NFRMNO: form.NFRMNO,
             VORGNO: form.VORGNO,

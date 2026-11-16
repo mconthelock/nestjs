@@ -1,13 +1,13 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { ViewColumn, ViewEntity } from 'typeorm';
 
-@Entity({
+@ViewEntity({
     name: 'Q90010P2',
     schema: 'ESCCHKSHT',
 })
 export class Q90010P2 {
-    @PrimaryColumn()
+    @ViewColumn()
     Q9ORD: string;
 
-    @Column()
+    @ViewColumn()
     Q9TYP: string;
 }

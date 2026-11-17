@@ -23,6 +23,7 @@ import { ExpatModule } from './expat/expat.module';
 import { DiligentModule } from './diligent/diligent.module';
 import { ReportPermissionModule } from './report-permission/report-permission.module';
 import { BeneficiaryModule } from './beneficiary/beneficiary.module';
+import { StyFilesModule } from './sty-files/sty-files.module';
 
 @Module({
     imports: [
@@ -50,7 +51,8 @@ import { BeneficiaryModule } from './beneficiary/beneficiary.module';
         ExpatModule,
         DiligentModule,
         ReportPermissionModule,
-        BeneficiaryModule
+        BeneficiaryModule,
+        StyFilesModule
     ],
 })
 export class gpreportModule {}

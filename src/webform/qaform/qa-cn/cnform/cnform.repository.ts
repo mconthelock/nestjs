@@ -100,82 +100,64 @@ export class CnFormRepository extends BaseRepository {
 
             .getRawMany();
     }
-
     async getApvEmail(dto: FormDto, type: string): Promise<any[]> {
-        const baseConditions = {
-            nfrmno: dto.NFRMNO,
-            vorgno: dto.VORGNO,
-            cyear: dto.CYEAR,
-            cyear2: dto.CYEAR2,
-            nrunno: dto.NRUNNO,
-        };
-
-        const qb = this.manager
-            .createQueryBuilder()
-            .select('E.SRECMAIL', 'EMAIL')
-            .from('AMEC.AMECUSERALL', 'E')
-            .distinct(true)
-            .where("E.CSTATUS = '1'");
+        const baseConditions = [dto.NFRMNO, dto.VORGNO, dto.CYEAR, dto.CYEAR2, dto.NRUNNO];
+        let sql = '';
 
         if (type === 'PIC') {
-            qb.innerJoin(
-                `(
-                    SELECT F.VAPVNO  AS EMPNO FROM WEBFORM.FLOW F
-                    WHERE F.NFRMNO = :nfrmno AND F.VORGNO = :vorgno
-                      AND F.CYEAR = :cyear AND F.CYEAR2 = :cyear2 AND F.NRUNNO = :nrunno
+            sql = `
+                SELECT DISTINCT E.SRECMAIL AS "EMAIL"
+                FROM AMEC.AMECUSERALL E
+                INNER JOIN (
+                    SELECT F.VAPVNO AS EMPNO FROM WEBFORM.FLOW F
+                    WHERE F.NFRMNO = $1 AND F.VORGNO = $2
+                      AND F.CYEAR = $3 AND F.CYEAR2 = $4 AND F.NRUNNO = $5
                       AND F.CSTEPNO = '--'
                     UNION
                     SELECT F.VREPNO FROM WEBFORM.FLOW F
-                    WHERE F.NFRMNO = :nfrmno AND F.VORGNO = :vorgno
-                      AND F.CYEAR = :cyear AND F.CYEAR2 = :cyear2 AND F.NRUNNO = :nrunno
+                    WHERE F.NFRMNO = $1 AND F.VORGNO = $2
+                      AND F.CYEAR = $3 AND F.CYEAR2 = $4 AND F.NRUNNO = $5
                       AND F.CSTEPNO = '--'
                     UNION
                     SELECT C.ENG FROM WEBFORM.CNSHOPPIC C
                     WHERE C.FM IN (
                         SELECT F2.VAPVNO FROM WEBFORM.FLOW F2
-                        WHERE F2.NFRMNO = :nfrmno AND F2.VORGNO = :vorgno
-                          AND F2.CYEAR = :cyear AND F2.CYEAR2 = :cyear2 AND F2.NRUNNO = :nrunno
+                        WHERE F2.NFRMNO = $1 AND F2.VORGNO = $2
+                          AND F2.CYEAR = $3 AND F2.CYEAR2 = $4 AND F2.NRUNNO = $5
                           AND F2.CEXTDATA = '06'
                     )
-                )`,
-                'P',
-                'P.EMPNO = E.SEMPNO',
-            );
+                ) P ON P.EMPNO = E.SEMPNO
+                WHERE E.CSTATUS = '1'
+            `;
         } else {
-            // -------------------------------------------------------------
-            // 📍 จุดที่เปลี่ยน: หาอีเมลจาก VAPVNO หรือ VREPNO แทน VREALAPV
-            // -------------------------------------------------------------
-            qb.innerJoin(
-                '(SELECT * FROM WEBFORM.FLOW)',
-                'F',
-                '(F.VAPVNO = E.SEMPNO OR F.VREPNO = E.SEMPNO)',
-            )
-                .andWhere('F.NFRMNO = :nfrmno')
-                .andWhere('F.VORGNO = :vorgno')
-                .andWhere('F.CYEAR = :cyear')
-                .andWhere('F.CYEAR2 = :cyear2')
-                .andWhere('F.NRUNNO = :nrunno');
-
+            let typeCondition = '';
             if (type === 'REQUESTER') {
-                qb.andWhere("F.CSTEPNO = '--'");
+                typeCondition = "AND F.CSTEPNO = '--'";
             } else if (type === 'FOREMAN') {
-                qb.andWhere("F.CEXTDATA = '06'");
+                typeCondition = "AND F.CEXTDATA = '06'";
             } else if (type === 'ALL') {
-                qb.andWhere("F.CSTEPNO NOT IN ('05','04','11')");
+                typeCondition = "AND F.CSTEPNO NOT IN ('05','04','11')";
             }
+
+            sql = `
+                SELECT DISTINCT E.SRECMAIL AS "EMAIL"
+                FROM AMEC.AMECUSERALL E
+                INNER JOIN WEBFORM.FLOW F ON (F.VAPVNO = E.SEMPNO OR F.VREPNO = E.SEMPNO)
+                WHERE E.CSTATUS = '1'
+                  AND F.NFRMNO = $1
+                  AND F.VORGNO = $2
+                  AND F.CYEAR = $3
+                  AND F.CYEAR2 = $4
+                  AND F.NRUNNO = $5
+                  ${typeCondition}
+            `;
         }
 
-        qb.setParameters(baseConditions);
-
-        // --- ลบ Debug ทิ้งได้เลยถ้าทำงานปกติแล้ว ---
-        // console.log('--- GENERATED SQL ---');
-        // console.log(qb.getSql());
-        // console.log('--- PARAMETERS ---');
-        // console.log(qb.getParameters());
-        // --------------------------------
-
-        return await qb.getRawMany();
+        // ข้อควรระวัง: TypeORM กับ Oracle มักใช้ ? แทน $1, $2 (ขึ้นอยู่กับ Driver)
+        // ถ้าใช้ oracledb อาจจะต้องใช้ :1, :2, :3 หรือใช้ Array พารามิเตอร์ปกติ
+        return await this.manager.query(sql, baseConditions);
     }
+
     async executeRawSql(sql: string, params: any[]): Promise<any[]> {
         // console.log('DATABASE:', this.manager.connection.options);
         // const res = await this.manager.query(

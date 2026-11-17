@@ -124,13 +124,14 @@ export class MasterRepository extends BaseRepository {
                 'T.TYPE_NAME',
             ])
             .leftJoin('C.SECTIONS', 'S')
-            .leftJoinAndMapOne(
-                'C.CLASS',
-                STY_TYPE,
-                'T',
-                'T.TYPE_NO = C.UN_CLASS AND T.TYPE_CODE = :typeCode',
-                { typeCode: 'CMC' },
-            )
+            .leftJoin('C.CLASS', 'T')
+            // .leftJoinAndMapOne(
+            //     'C.CLASS',
+            //     STY_TYPE,
+            //     'T',
+            //     'T.TYPE_NO = C.UN_CLASS AND T.TYPE_CODE = :typeCode',
+            //     { typeCode: 'CMC' },
+            // )
             .andWhere('C.STATUS = :status', { status })
             .orderBy('C.AMEC_SDS_ID, S.OWNER', 'ASC');
         if (id && id.length > 0) {

@@ -80,9 +80,9 @@ export class CnFormRepository extends BaseRepository {
             .addSelect("REGEXP_SUBSTR(CNF.DETTRANS, 'shop at\\s*(.*)', 1, 1, NULL, 1)", 'SHOPNO')
 
             // 3. เปลี่ยนชื่อย่อตาราง JOIN เป็น CNJ และ CHK ตัวพิมพ์ใหญ่
-            .leftJoin('CNJUDGEMENT', 'CNJ', 'CNJ.JDGMNTNO = CNF.JDGMNTNO')
+            .leftJoin('(SELECT * FROM WEBFORM.CNJUDGEMENT)', 'CNJ', 'CNJ.JDGMNTNO = CNF.JDGMNTNO')
             .innerJoin(
-                'RESULTCHKDWG',
+                '(SELECT * FROM WEBFORM.RESULTCHKDWG)',
                 'CHK',
                 `CHK.NFRMNO = CNF.NFRMNO
             AND CHK.VORGNO = CNF.VORGNO
@@ -101,8 +101,11 @@ export class CnFormRepository extends BaseRepository {
             .getRawMany();
     }
     async getApvEmail(dto: FormDto, type: string): Promise<any[]> {
-        const baseConditions = [dto.NFRMNO, dto.VORGNO, dto.CYEAR, dto.CYEAR2, dto.NRUNNO];
         let sql = '';
+        let parameters: any[] = [];
+
+        // ชุดเงื่อนไขพื้นฐาน 5 ตัว
+        const baseConditions = [dto.NFRMNO, dto.VORGNO, dto.CYEAR, dto.CYEAR2, dto.NRUNNO];
 
         if (type === 'PIC') {
             sql = `
@@ -110,25 +113,27 @@ export class CnFormRepository extends BaseRepository {
                 FROM AMEC.AMECUSERALL E
                 INNER JOIN (
                     SELECT F.VAPVNO AS EMPNO FROM WEBFORM.FLOW F
-                    WHERE F.NFRMNO = $1 AND F.VORGNO = $2
-                      AND F.CYEAR = $3 AND F.CYEAR2 = $4 AND F.NRUNNO = $5
+                    WHERE F.NFRMNO = ? AND F.VORGNO = ?
+                      AND F.CYEAR = ? AND F.CYEAR2 = ? AND F.NRUNNO = ?
                       AND F.CSTEPNO = '--'
                     UNION
                     SELECT F.VREPNO FROM WEBFORM.FLOW F
-                    WHERE F.NFRMNO = $1 AND F.VORGNO = $2
-                      AND F.CYEAR = $3 AND F.CYEAR2 = $4 AND F.NRUNNO = $5
+                    WHERE F.NFRMNO = ? AND F.VORGNO = ?
+                      AND F.CYEAR = ? AND F.CYEAR2 = ? AND F.NRUNNO = ?
                       AND F.CSTEPNO = '--'
                     UNION
                     SELECT C.ENG FROM WEBFORM.CNSHOPPIC C
                     WHERE C.FM IN (
                         SELECT F2.VAPVNO FROM WEBFORM.FLOW F2
-                        WHERE F2.NFRMNO = $1 AND F2.VORGNO = $2
-                          AND F2.CYEAR = $3 AND F2.CYEAR2 = $4 AND F2.NRUNNO = $5
+                        WHERE F2.NFRMNO = ? AND F2.VORGNO = ?
+                          AND F2.CYEAR = ? AND F2.CYEAR2 = ? AND F2.NRUNNO = ?
                           AND F2.CEXTDATA = '06'
                     )
                 ) P ON P.EMPNO = E.SEMPNO
                 WHERE E.CSTATUS = '1'
             `;
+            // ใช้ ? 15 จุด (3 ชุด) ต้องกระจายตัวแปรเข้าไป 3 รอบให้ครบตามจำนวน ?
+            parameters = [...baseConditions, ...baseConditions, ...baseConditions];
         } else {
             let typeCondition = '';
             if (type === 'REQUESTER') {
@@ -144,18 +149,18 @@ export class CnFormRepository extends BaseRepository {
                 FROM AMEC.AMECUSERALL E
                 INNER JOIN WEBFORM.FLOW F ON (F.VAPVNO = E.SEMPNO OR F.VREPNO = E.SEMPNO)
                 WHERE E.CSTATUS = '1'
-                  AND F.NFRMNO = $1
-                  AND F.VORGNO = $2
-                  AND F.CYEAR = $3
-                  AND F.CYEAR2 = $4
-                  AND F.NRUNNO = $5
+                  AND F.NFRMNO = ?
+                  AND F.VORGNO = ?
+                  AND F.CYEAR = ?
+                  AND F.CYEAR2 = ?
+                  AND F.NRUNNO = ?
                   ${typeCondition}
             `;
+            // ใช้ ? 5 จุด ส่งแค่ 1 ชุด
+            parameters = [...baseConditions];
         }
 
-        // ข้อควรระวัง: TypeORM กับ Oracle มักใช้ ? แทน $1, $2 (ขึ้นอยู่กับ Driver)
-        // ถ้าใช้ oracledb อาจจะต้องใช้ :1, :2, :3 หรือใช้ Array พารามิเตอร์ปกติ
-        return await this.manager.query(sql, baseConditions);
+        return await this.manager.query(sql, parameters);
     }
 
     async executeRawSql(sql: string, params: any[]): Promise<any[]> {

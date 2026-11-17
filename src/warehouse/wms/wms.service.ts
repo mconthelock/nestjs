@@ -1,17 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
-import { BIND_OUT, CURSOR, OUT_FORMAT_OBJECT } from 'oracledb';
+import { WMSRepository } from './wms.repository';
 import { WMSTempIssueDto } from './dto/wms-temp-issue.dto';
 import { WMSUploadIssueDto } from './dto/wms-upload-issue.dto';
 import { WMSUploadIssueResponseDto } from './dto/wms-upload-issue-response.dto';
 
 @Injectable()
 export class WMSService {
-    constructor(
-        @InjectDataSource('mitsuConnection')
-        private readonly db: DataSource,
-    ) {}
+    constructor(private readonly repo: WMSRepository) {}
 
     /**
      * Get issue list
@@ -21,16 +16,7 @@ export class WMSService {
      * @return  {Promise<WMSTempIssueDto[]>}
      */
     async getIssueList(empno: string): Promise<WMSTempIssueDto[]> {
-        return this.db.query(
-            `
-             SELECT USERID, STATUS, ISSUE, ITEMCODE, ONHAND, DESCRIPTION, PROD, LOCATION, QTY, ISSUETO, PO, LINE, INV, PALLET_ID, EXPIRE_DATE
-             FROM WMS_TEMPISSUE
-             WHERE USERID = :empno
-                AND STATUS = '-'
-             ORDER BY LOCATION ASC, PALLET_ID ASC, EXPIRE_DATE ASC, ISSUE ASC
-            `,
-            [empno],
-        );
+        return this.repo.getIssueList(empno);
     }
 
     /**
@@ -41,30 +27,6 @@ export class WMSService {
      * @return  {Promise<WMSUploadIssueResponseDto>}
      */
     async uploadIssue(dto: WMSUploadIssueDto): Promise<WMSUploadIssueResponseDto> {
-        const runner = this.db.createQueryRunner();
-        await runner.connect();
-        const connection: any = (runner as any).databaseConnection;
-
-        try {
-            const res = await connection.execute(
-                `BEGIN WMS_UPLOAD_ISSUE(:location, :palletId, :expireDate, :output); END;`,
-                {
-                    location: dto.location,
-                    palletId: dto.palletId,
-                    expireDate: dto.expireDate,
-                    output: { dir: BIND_OUT, type: CURSOR },
-                },
-                { outFormat: OUT_FORMAT_OBJECT },
-            );
-
-            const cursor = res.outBinds.output;
-            const rows = await cursor.getRows();
-            await cursor.close();
-            return rows[0];
-        } catch (error) {
-            return { STATUS: 'ERROR', MESSAGE: error.message };
-        } finally {
-            await runner.release();
-        }
+        return this.repo.uploadIssue(dto);
     }
 }

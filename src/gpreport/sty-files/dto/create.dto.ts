@@ -11,7 +11,7 @@ export class InsertAndMoveStyFilesDto {
     @IsString()
     FILE_FNAME: string;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     FILE_CODE: string;
 
@@ -19,9 +19,9 @@ export class InsertAndMoveStyFilesDto {
     @IsString()
     FILE_USERCREATE: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    FILE_PATH: string;
+    FILE_PATH?: string;
 
     @IsOptional()
     @Type(() => Number)

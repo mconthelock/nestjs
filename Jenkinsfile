@@ -1,12 +1,15 @@
 pipeline {
     agent any
 
-    environment {
-        GIT_SSL_NO_VERIFY = 'true'
-    }
-
     tools {
         nodejs 'node'
+    }
+
+    environment {
+        GIT_SSL_NO_VERIFY = 'true'
+        BASE_APP_NAME = 'amecapi'
+        STACK_NAME    = 'apps'
+        ENV_BASE_PATH = '/var/amecweb/file/env/api'
     }
 
     stages {
@@ -28,6 +31,15 @@ pipeline {
 
                         echo ">>> MR merged → main → DEPLOY PRODUCTION"
 
+                    }  else if (env.BRANCH_NAME == 'swarm') {
+                        env.DEPLOY_ENV = 'swarm'
+                        env.SERVICE_NAME = "${BASE_APP_NAME}"
+                        env.APP_ENV     = "production"
+                        env.REPLICAS     = "2"
+                        env.ENV_DIR = "${ENV_BASE_PATH}/.env.api.production"
+                        env.IMAGE_NAME = "${env.SERVICE_NAME}"
+                        env.IMAGE_TAG  = "build-${env.BUILD_NUMBER}"
+                        echo ">>> MR merged → swarm → DEPLOY PRODUCTION"
                     } else {
                         error "❌ Branch ${env.BRANCH_NAME} is not deployable"
                     }
@@ -54,6 +66,7 @@ pipeline {
         }
 
         stage('Check package.json Changes') {
+            when { expression { env.DEPLOY_ENV != 'swarm' }}
             steps {
                 script {
                     env.START_TIME_CHANGE = System.currentTimeMillis()
@@ -111,6 +124,7 @@ pipeline {
         }
 
         stage('Install & Build') {
+            when { expression { env.DEPLOY_ENV != 'swarm' }}
             steps {
                 script {
                     env.START_TIME_BUILD = System.currentTimeMillis()
@@ -308,6 +322,34 @@ pipeline {
                     def duration = (System.currentTimeMillis() - env.START_TIME_RESTART.toLong()) / 1000
                     echo "✅ [END] Restart Application ใช้เวลาทั้งหมด: ${duration} วินาที"
                 }
+            }
+        }
+
+        stage('Build Docker Image') {
+            when { expression { env.DEPLOY_ENV == 'swarm' }}
+            steps {
+                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -t ${IMAGE_NAME}:latest ."
+            }
+        }
+
+        stage('Deploy to Docker Swarm') {
+            when { expression { env.DEPLOY_ENV == 'swarm' }}
+            steps {
+                // แปลงชื่อ Service แล้วสั่ง Deploy (Docker Swarm จะอ่านค่าจากไฟล์ .env ใน Workspace เข้าไปใน Service ด้วย)
+                sh """
+                    cp ${ENV_DIR} .env
+                    sed "s/SERVICE_NAME_PLACEHOLDER/${SERVICE_NAME}/g" docker-compose.yml > docker-compose.deploy.yml
+                    docker stack deploy -c docker-compose.deploy.yml ${STACK_NAME} --with-registry-auth
+                """
+            }
+        }
+
+        stage('Verify Rollout & Cleanup') {
+            when { expression { env.DEPLOY_ENV == 'swarm' }}
+            steps {
+                sh "docker service ps ${STACK_NAME}_${SERVICE_NAME} --no-trunc"
+                sh "docker image prune -f"
+                sh "rm -f .env docker-compose.deploy.yml"
             }
         }
     }

@@ -20,14 +20,14 @@ pipeline {
                         env.REMOTE_HOST = 'amecwebtest'
                         env.NODE_ENV = 'development'
                         env.DEPLOY_ENV = 'development'
-                        env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.development'
+                        env.ENV_DIR = "${ENV_BASE_PATH}/development.env"
 
                         echo ">>> MR merged → develop → DEPLOY DEVELOPMENT"
                     } else if (env.BRANCH_NAME == 'main') {
                         env.REMOTE_HOST = 'amecweb1, amecweb2'
                         env.NODE_ENV = 'development'
                         env.DEPLOY_ENV = 'production'
-                        env.ENV_DIR = '/var/amecweb/file/env/api/.env.api.production'
+                        env.ENV_DIR = "${ENV_BASE_PATH}/production.env"
 
                         echo ">>> MR merged → main → DEPLOY PRODUCTION"
 
@@ -36,7 +36,7 @@ pipeline {
                         env.SERVICE_NAME = "${BASE_APP_NAME}"
                         env.APP_ENV     = "production"
                         env.REPLICAS     = "2"
-                        env.ENV_DIR = "${ENV_BASE_PATH}/.env.api.production"
+                        env.ENV_DIR = "${ENV_BASE_PATH}/swarm.env"
                         env.IMAGE_NAME = "${env.SERVICE_NAME}"
                         env.IMAGE_TAG  = "build-${env.BUILD_NUMBER}"
                         echo ">>> MR merged → swarm → DEPLOY PRODUCTION"

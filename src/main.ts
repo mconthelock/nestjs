@@ -173,14 +173,14 @@ async function bootstrap() {
     app.useGlobalFilters(new AllExceptionsFilter(logger));
 
     // สร้าง config สำหรับ Swagger
-    if (process.env.NODE_ENV !== 'production' && process.env.ENABLE_SWAGGER === 'true') {
+    if (process.env.ENABLE_SWAGGER === 'true') {
         const swaggerConfig = new DocumentBuilder()
             .setTitle('AMEC API')
             .setDescription('API documentation for AMEC API')
             .setVersion(process.env.VERSION)
             .addServer(process.env.APP_ENV)
             //.addTag('Auth', 'ใช้สำหรับจัดการการเข้าสู่ระบบและระบบยืนยันตัวตน')
-            .addTag('IS-DEV', 'Manage a IS-DEV Request')
+            //.addTag('IS-DEV', 'Manage a IS-DEV Request')
             .build();
         const document = SwaggerModule.createDocument(app, swaggerConfig);
         //SwaggerModule.setup('apidocs', app, document);
@@ -191,6 +191,7 @@ async function bootstrap() {
                 theme: 'bluePlanet',
             }),
         );
+        console.log(`Swagger is enabled`);
     }
 
     // 🔗 ตั้ง WS adapter กลาง—ครอบทุก @WebSocketGateway

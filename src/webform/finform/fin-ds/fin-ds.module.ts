@@ -14,10 +14,12 @@ import { DSREQHEAD } from 'src/common/Entities/webform/table/FINDS_REQ_HEAD.enti
 import { FinDsRepository } from './fin-ds.repository';
 import { FormmstModule } from 'src/webform/formmst/formmst.module';
 import { HandleFileFormModule } from 'src/webform/handle-file-form/handle-file-form.module';
+import { DS_STAMP_REPORT } from 'src/common/Entities/webform/views/FINDS_STAMP_REPORT.entity';
+import { FIN_FILE } from 'src/common/Entities/webform/table/FIN_FILE.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([DSDUTYSTAMP], 'mitsuConnection'),
+        TypeOrmModule.forFeature([DSDUTYSTAMP,DS_STAMP_REPORT,DSREQDETAIL,DSREQHEAD,FIN_FILE], 'mitsuConnection'),
         FormModule,
         FlowModule,
         FormmstModule,

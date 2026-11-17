@@ -14,11 +14,20 @@ export class StyTypeRepository extends BaseRepository {
         return this.getRepository(STY_TYPE).find({
             where: {
                 TYPE_CODE: typecode,
-                TYPE_STATUS: 1
+                TYPE_STATUS: 1,
             },
             order: {
                 TYPE_NO: 'ASC',
-            }
+            },
+        });
+    }
+
+    findOneByCode(code: string) {
+        return this.getRepository(STY_TYPE).findOne({
+            where: {
+                TYPE_CODE: code,
+                TYPE_STATUS: 1,
+            },
         });
     }
 }

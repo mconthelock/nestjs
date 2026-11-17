@@ -1,115 +1,115 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { ViewColumn, ViewEntity } from 'typeorm';
 
-@Entity({
+@ViewEntity({
     name: 'AMECORDERS_PROCESS',
     schema: 'ESCCHKSHT',
 })
 export class AMECORDERS_PROCESS {
-    @PrimaryColumn()
+    @ViewColumn()
     MFGNO: string;
 
-    @PrimaryColumn()
+    @ViewColumn()
     TAGNO: string;
 
-    @PrimaryColumn()
+    @ViewColumn()
     PROCSEQ: number;
 
-    @Column()
+    @ViewColumn()
     REFMFGNO: string;
 
-    @Column()
+    @ViewColumn()
     ITEM: string;
 
-    @Column()
+    @ViewColumn()
     PARTNAME: string;
 
-    @Column()
+    @ViewColumn()
     DWG: string;
 
-    @Column()
+    @ViewColumn()
     UPDWG: string;
 
-    @Column()
+    @ViewColumn()
     MAINDWG: string;
 
-    @Column()
+    @ViewColumn()
     QTY: number;
 
-    @Column()
+    @ViewColumn()
     CURRSTATE: number;
 
-    @Column()
+    @ViewColumn()
     PROCNO: string;
 
-    @Column()
+    @ViewColumn()
     PROCTP: number;
 
-    @Column()
+    @ViewColumn()
     PROCTC: number;
 
-    @Column()
+    @ViewColumn()
     PROCDATE: number;
 
-    @Column()
+    @ViewColumn()
     PROCTYPE: string;
 
-    @Column()
+    @ViewColumn()
     PROCSEC: string;
 
-    @Column()
+    @ViewColumn()
     PROCSHOP: string;
 
-    @Column()
+    @ViewColumn()
     PROCSTATUS: string;
 
-    @Column()
+    @ViewColumn()
     PREVPROC: string;
 
-    @Column()
+    @ViewColumn()
     PREVSEQ: number;
 
-    @Column()
+    @ViewColumn()
     PREVDATE: number;
 
-    @Column()
+    @ViewColumn()
     PREVTYPE: string;
 
-    @Column()
+    @ViewColumn()
     PREVSEC: string;
 
-    @Column()
+    @ViewColumn()
     PREVSHOP: string;
 
-    @Column()
+    @ViewColumn()
     PREVSTATUS: string;
 
-    @Column()
+    @ViewColumn()
     PRC: string;
 
-    @Column()
+    @ViewColumn()
     NEXTPROC: string;
 
-    @Column()
+    @ViewColumn()
     SDATE: Date;
 
-    @Column()
+    @ViewColumn()
     EDATE: Date;
 
-    @Column()
+    @ViewColumn()
     DOCNO: string;
 
-    @Column()
+    @ViewColumn()
     DOCSTATUS: string;
 
-    @Column()
+    @ViewColumn()
     NGFORM: string;
 
-    @Column()
+    @ViewColumn()
     NGREMARK: string;
 
-    @Column()
+    @ViewColumn()
     IS_COMMENT: string;
 
-    @Column()
+    @ViewColumn()
     LASTUPDATE: Date;
 }

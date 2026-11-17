@@ -12,9 +12,9 @@ export class GrpmstRepository extends BaseRepository {
     findAll() {
         return this.manager.query(`
             SELECT REPLACE(GRPNAME, '@MitsubishiElevatorAsia.co.th', '') AS VDISPLAY_NAME, GRPNAME AS VEMAIL_ADDRESS 
-            FROM GRPMST
+            FROM WEBFORM.GRPMST
             UNION
-            SELECT SNAME || ' (' ||SEMPNO|| ')', SRECMAIL FROM AMECUSERALL
+            SELECT SNAME || ' (' ||SEMPNO|| ')', SRECMAIL FROM WEBFORM.AMECUSERALL
             WHERE CSTATUS = '1'
             AND SRECMAIL IS NOT NULL`);
     }

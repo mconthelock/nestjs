@@ -14,7 +14,7 @@ export class AmecordersScheduleRepository extends BaseRepository {
         return this.getRepository(AmecOrdersSchedule)
             .createQueryBuilder('A')
             .select(
-                'MIN(MFGBM_NO) AS NSTART, MAX(MFGBM_NO) AS NEND, F_CPROD(MIN(MFGBM_NO)) AS VSTART, F_CPROD(MAX(MFGBM_NO)) AS VEND ',
+                'MIN(MFGBM_NO) AS NSTART, MAX(MFGBM_NO) AS NEND, WORKLOAD.F_CPROD(MIN(MFGBM_NO)) AS VSTART, WORKLOAD.F_CPROD(MAX(MFGBM_NO)) AS VEND ',
             )
             .where('MFGBM LIKE :jung AND MFGBM_ACTUAL IS NOT NULL', {
                 jung: `${jung}%`,

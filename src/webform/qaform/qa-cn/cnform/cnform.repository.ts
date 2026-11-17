@@ -145,7 +145,11 @@ export class CnFormRepository extends BaseRepository {
             // -------------------------------------------------------------
             // 📍 จุดที่เปลี่ยน: หาอีเมลจาก VAPVNO หรือ VREPNO แทน VREALAPV
             // -------------------------------------------------------------
-            qb.innerJoin('WEBFORM.FLOW', 'F', '(F.VAPVNO = E.SEMPNO OR F.VREPNO = E.SEMPNO)')
+            qb.innerJoin(
+                '(SELECT * FROM WEBFORM.FLOW)',
+                'F',
+                '(F.VAPVNO = E.SEMPNO OR F.VREPNO = E.SEMPNO)',
+            )
                 .andWhere('F.NFRMNO = :nfrmno')
                 .andWhere('F.VORGNO = :vorgno')
                 .andWhere('F.CYEAR = :cyear')

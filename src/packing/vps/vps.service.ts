@@ -3,6 +3,7 @@ import { Repository, DataSource } from 'typeorm';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { PackResultDto, PackStatus, OrderDto } from './dto/pack-result.dto';
 import { LogMethodErr } from './entities/log-method-err.entity';
+import { PackingMas } from './entities/packing-mas.entity';
 
 enum VisErrCode {
     OK = '0',
@@ -16,6 +17,9 @@ export class VPSService {
     constructor(
         @InjectRepository(LogMethodErr, 'packingConnection')
         private readonly logdb: Repository<LogMethodErr>,
+
+        @InjectRepository(PackingMas, 'packingConnection')
+        private readonly pmdb: Repository<PackingMas>,
 
         @InjectDataSource('packingConnection')
         private readonly db: DataSource,
@@ -62,16 +66,18 @@ export class VPSService {
 
     async getOrder(vis: string): Promise<OrderDto[]> {
         try {
-            const result = await this.db.query(
-                `
-                    SELECT orderno, SUBSTRING(caseno, 3, 2) AS block
-                    FROM PackingMas
-                    WHERE vis = @0
-                `,
-                [vis],
-            );
+            const rows = await this.pmdb.find({
+                select: {
+                    orderno: true,
+                    caseno: true,
+                },
+                where: { vis },
+            });
 
-            return result;
+            return rows.map(row => ({
+                orderno: row.orderno,
+                block: row.caseno.substring(2, 4),
+            }));
         } catch (error) {
             throw new InternalServerErrorException(error.message);
         }

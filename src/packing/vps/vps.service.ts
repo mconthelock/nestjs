@@ -68,6 +68,7 @@ export class VPSService {
                     break;
             }
 
+            response.eucomplete = true;
             const orders = await this.getOrder(vis);
             return { ...response, orders };
         } catch (error) {

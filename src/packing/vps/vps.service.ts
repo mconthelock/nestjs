@@ -53,6 +53,7 @@ export class VPSService {
                 case VisErrCode.EU_INCOMPLETE:
                     response = await this.listPIS(vis, userId, true);
                     response.message = response.message || d.errmsg;
+                    response.eucomplete = false;
                     break;
 
                 case VisErrCode.FINISHED:

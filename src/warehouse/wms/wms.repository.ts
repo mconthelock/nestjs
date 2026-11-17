@@ -52,7 +52,7 @@ export class WMSRepository extends BaseRepository {
         dto: WMSUploadIssueDto,
     ): Promise<WMSUploadIssueResponseDto> {
         const paramOrder = ['location', 'palletId', 'expireDate',];
-        const result = await this.orepo.execCursor('WMS_UPLOAD_ISSUE', dto, paramOrder);
+        const result = await this.orepo.execCursor('SDSYS.WMS_UPLOAD_ISSUE', dto, paramOrder);
         return result?.[0];
     }
 }

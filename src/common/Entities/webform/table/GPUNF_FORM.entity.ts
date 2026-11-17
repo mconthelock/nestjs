@@ -1,12 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { FORM } from './FORM.entity';
 import { GPUNF_DETAIL } from './GPUNF_DETAIL.entity';
 import { GPUNF_TYPE } from './GPUNF_TYPE.entity';

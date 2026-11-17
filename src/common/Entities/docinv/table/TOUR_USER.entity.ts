@@ -8,7 +8,7 @@ export class TOUR_USER {
     @PrimaryColumn()
     TOUR_KEY: string;
 
-    @Column({type: 'decimal'})
+    @Column({ type: 'decimal' })
     TOUR_VERSION?: number;
 
     @Column()

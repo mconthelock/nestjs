@@ -18,7 +18,7 @@ export class ItemarrnglstService {
             order: { SERIALNO: 'ASC' },
         });
 
-        let rows = [];
+        const rows = [];
         let i = 0;
         let x = 0;
         for (const row of data) {

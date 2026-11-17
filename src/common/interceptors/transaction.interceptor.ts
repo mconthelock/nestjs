@@ -1,17 +1,9 @@
-import {
-    CallHandler,
-    ExecutionContext,
-    Injectable,
-    NestInterceptor,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Observable, catchError, concatMap, finalize } from 'rxjs';
 import { DataSource } from 'typeorm';
-import {
-    FORCE_TX_KEY,
-    TX_CONNECTION_KEY,
-} from '../decorator/transaction.decorator';
+import { FORCE_TX_KEY, TX_CONNECTION_KEY } from '../decorator/transaction.decorator';
 import { transactionContext } from './transaction-context';
 
 export const ENTITY_MANAGER_KEY = 'ENTITY_MANAGER';
@@ -21,44 +13,32 @@ export class TransactionInterceptor implements NestInterceptor {
     private dataSourceMap: Record<string, DataSource>;
 
     constructor(
-        @InjectDataSource('escsConnection')
-        private escsDS: DataSource,
-        @InjectDataSource('webformConnection')
-        private webformDS: DataSource,
-        @InjectDataSource('workloadConnection')
-        private workloadDS: DataSource,
+        @InjectDataSource('mitsuConnection')
+        private mitsuDS: DataSource,
         @InjectDataSource('datacenterConnection')
         private datacenterDS: DataSource,
         @InjectDataSource('elmesConnection')
         private elmesDS: DataSource,
-        @InjectDataSource('purConnection')
-        private purDS: DataSource,
-        @InjectDataSource('gpreportConnection')
-        private gpDS: DataSource,
         private readonly reflector: Reflector,
     ) {
         // เพิ่ม data sources ที่นี่เมื่อมีการเพิ่ม connection ใหม่
         this.dataSourceMap = {
-            escsConnection: this.escsDS,
-            webformConnection: this.webformDS,
-            workloadConnection: this.workloadDS,
+            mitsuConnection: this.mitsuDS,
             datacenterConnection: this.datacenterDS,
             elmesConnection: this.elmesDS,
-            purConnection: this.purDS,
-            gpreportConnection: this.gpDS,
         };
     }
 
     async intercept(context: ExecutionContext, next: CallHandler) {
         // ดึงค่า connectionName จาก metadata
-        const connectionName = this.reflector.getAllAndOverride<string>(
-            TX_CONNECTION_KEY,
-            [context.getHandler(), context.getClass()],
-        );
-        const forceTx = this.reflector.getAllAndOverride<boolean>(
-            FORCE_TX_KEY,
-            [context.getHandler(), context.getClass()],
-        );
+        const connectionName = this.reflector.getAllAndOverride<string>(TX_CONNECTION_KEY, [
+            context.getHandler(),
+            context.getClass(),
+        ]);
+        const forceTx = this.reflector.getAllAndOverride<boolean>(FORCE_TX_KEY, [
+            context.getHandler(),
+            context.getClass(),
+        ]);
 
         // ถ้าไม่มีการระบุ connectionName ให้ข้ามการทำงานของ interceptor นี้
         if (!connectionName) {
@@ -76,26 +56,23 @@ export class TransactionInterceptor implements NestInterceptor {
         await queryRunner.startTransaction();
 
         return new Observable((subscriber) => {
-            transactionContext.run(
-                { manager: queryRunner.manager, forceTx },
-                () => {
-                    next.handle()
-                        .pipe(
-                            concatMap(async (data) => {
-                                await queryRunner.commitTransaction();
-                                return data;
-                            }),
-                            catchError(async (err) => {
-                                await queryRunner.rollbackTransaction();
-                                throw err;
-                            }),
-                            finalize(async () => {
-                                await queryRunner.release();
-                            }),
-                        )
-                        .subscribe(subscriber);
-                },
-            );
+            transactionContext.run({ manager: queryRunner.manager, forceTx }, () => {
+                next.handle()
+                    .pipe(
+                        concatMap(async (data) => {
+                            await queryRunner.commitTransaction();
+                            return data;
+                        }),
+                        catchError(async (err) => {
+                            await queryRunner.rollbackTransaction();
+                            throw err;
+                        }),
+                        finalize(async () => {
+                            await queryRunner.release();
+                        }),
+                    )
+                    .subscribe(subscriber);
+            });
         });
     }
 }

@@ -34,7 +34,7 @@ export class WHN_PRODUCTION_PLAN {
 
     @Column()
     MODEL: string;
-    
+
     @Column()
     PARENT_DRAWING: string;
 

@@ -6,8 +6,8 @@ import { UsersModule } from 'src/amec/users/users.module';
 import { MailModule } from 'src/common/services/mail/mail.module';
 
 @Module({
-  imports: [QrcodeModule, UsersModule, MailModule],
-  controllers: [HbdController],
-  providers: [HbdService],
+    imports: [QrcodeModule, UsersModule, MailModule],
+    controllers: [HbdController],
+    providers: [HbdService],
 })
 export class HbdModule {}

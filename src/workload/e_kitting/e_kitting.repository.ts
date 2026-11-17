@@ -7,9 +7,7 @@ import { CreateEKittingDto } from './dto/create-e_kitting.dto';
 
 @Injectable()
 export class EKittingRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('workloadConnection') private readonly wk: DataSource,
-    ) {
+    constructor(@InjectDataSource('mitsuConnection') private readonly wk: DataSource) {
         super(wk);
     }
 

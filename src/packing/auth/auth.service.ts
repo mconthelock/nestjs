@@ -1,7 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+﻿import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
 import { Repository, DataSource } from 'typeorm';
+import { VPS_USER_REPRINT } from 'src/common/Entities/workload/views/VPS_USER_REPRINT.entity';
 import { PAccessLog } from './entities/p-access-log.entity';
 import { PackLoginUserDto, PackLoginResponseDto, LoginStatus } from './dto/pack-login-response.dto';
 
@@ -15,11 +16,11 @@ export class AuthService {
         @InjectRepository(PAccessLog, 'packingConnection')
         private readonly logrepo: Repository<PAccessLog>,
 
+        @InjectRepository(VPS_USER_REPRINT, 'mitsuConnection')
+        private readonly workdb: Repository<VPS_USER_REPRINT>,
+
         @InjectDataSource('packingConnection')
         private readonly packdb: DataSource,
-
-        @InjectDataSource('workloadConnection')
-        private readonly workdb: DataSource,
     ) {}
 
     /**
@@ -29,7 +30,10 @@ export class AuthService {
      * @return  {string} Unique log ID: f742a825-0dab-4165-a3e9-27b6ec6b014c-20251126094545
      */
     generateLogId(): string {
-        const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
+        const timestamp = new Date()
+            .toISOString()
+            .replace(/[-:.TZ]/g, '')
+            .slice(0, 14);
         return `${randomUUID()}-${timestamp}`.substring(0, 50);
     }
 
@@ -44,10 +48,11 @@ export class AuthService {
     async validateUser(empno: string, ip: string): Promise<PackLoginResponseDto> {
         try {
             const sessionId = this.generateLogId();
-            const [d] = await this.packdb.query(
-                'EXEC ValidatePackAuth @0,@1,@2',
-                [empno, ip, sessionId],
-            );
+            const [d] = await this.packdb.query('EXEC ValidatePackAuth @0,@1,@2', [
+                empno,
+                ip,
+                sessionId,
+            ]);
 
             if (d.errcode !== AuthErrCode.OK) {
                 return {
@@ -80,7 +85,8 @@ export class AuthService {
      */
     async updateLogout(userId: string, sessionId: string): Promise<void> {
         try {
-            await this.logrepo.createQueryBuilder()
+            await this.logrepo
+                .createQueryBuilder()
                 .update(PAccessLog)
                 .set({ endtime: () => 'GETDATE()' })
                 .where('usrid = :userId AND accessid = :sessionId', { userId, sessionId })
@@ -99,18 +105,18 @@ export class AuthService {
      */
     async checkReprintPermission(empno: string): Promise<boolean> {
         try {
-            const result = await this.workdb.query(
-                `
-                 SELECT *
-                 FROM VPS_USER_REPRINT 
-                 WHERE SEMPNO = '${empno}' 
-                    AND STATUS_REPRINT = 1
-                `
-            );
+            const data = await this.workdb.findOne({
+                where: {
+                    SEMPNO: empno,
+                    STATUS_REPRINT: 1,
+                },
+            });
 
-            return result.length > 0;
+            return data !== null;
         } catch (error) {
-            throw new InternalServerErrorException('Error checking reprint permission');
+            throw new InternalServerErrorException(
+                'Error checking reprint permission',
+            );
         }
     }
 }

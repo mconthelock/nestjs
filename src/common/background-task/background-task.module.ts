@@ -18,11 +18,7 @@ import { BackgroundTaskRegistry } from './background-task.registry';
         }),
     ],
     controllers: [BackgroundTaskController],
-    providers: [
-        BackgroundTaskService,
-        BackgroundTaskRegistry,
-        BackgroundTaskProcessor,
-    ],
+    providers: [BackgroundTaskService, BackgroundTaskRegistry, BackgroundTaskProcessor],
     exports: [BackgroundTaskService, BackgroundTaskRegistry],
 })
 export class BackgroundTaskModule {}

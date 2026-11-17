@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, Like, Not } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -11,7 +11,7 @@ import { AnnualUniformDetail } from 'src/common/Entities/gpreport/table/UNIFORM_
 
 @Injectable()
 export class AnnualUniformRepository extends BaseRepository {
-    constructor(@InjectDataSource('gpreportConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 
@@ -36,10 +36,7 @@ export class AnnualUniformRepository extends BaseRepository {
             .getMany();
     }
 
-    async create(
-        header: Partial<AnnualUniform>,
-        details: Partial<AnnualUniformDetail>[] = [],
-    ) {
+    async create(header: Partial<AnnualUniform>, details: Partial<AnnualUniformDetail>[] = []) {
         const annual = await this.getRepository(AnnualUniform).save(header);
 
         for (const item of details || []) {

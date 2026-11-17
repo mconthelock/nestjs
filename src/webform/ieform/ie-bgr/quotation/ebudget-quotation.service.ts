@@ -11,7 +11,7 @@ import { RqffrmService } from 'src/webform/qaform/rqffrm/rqffrm.service';
 @Injectable()
 export class QuotationService {
     constructor(
-        @InjectDataSource('webformConnection')
+        @InjectDataSource('mitsuConnection')
         private dataSource: DataSource,
         private formService: FormService,
         private ebudgetQuotationService: EbudgetQuotationService,
@@ -83,9 +83,7 @@ export class QuotationService {
         const quotations = [];
         for (const q of quotationList) {
             const detail = await this.formService.getPkByFormno(q.QTA_FORM);
-            const product = await this.ebudgetQuotationProductService.getData(
-                q.ID,
-            );
+            const product = await this.ebudgetQuotationProductService.getData(q.ID);
             const data = await this.rqffrmService.getData({
                 NFRMNO: detail.NFRMNO,
                 VORGNO: detail.VORGNO,

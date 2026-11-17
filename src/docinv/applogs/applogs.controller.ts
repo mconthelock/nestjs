@@ -4,10 +4,10 @@ import { searchApplogs } from './dto/search.dto';
 
 @Controller('itgc/applogs')
 export class ApplogsController {
-  constructor(private readonly apps: ApplogsService) {}
+    constructor(private readonly apps: ApplogsService) {}
 
-  @Post('search')
-  async search(@Body() data: searchApplogs) {
-    return this.apps.search(data);
-  }
+    @Post('search')
+    async search(@Body() data: searchApplogs) {
+        return this.apps.search(data);
+    }
 }

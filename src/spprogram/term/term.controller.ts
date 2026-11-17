@@ -3,10 +3,10 @@ import { TermService } from './term.service';
 
 @Controller('sp/term')
 export class TermController {
-  constructor(private readonly term: TermService) {}
+    constructor(private readonly term: TermService) {}
 
-  @Get()
-  findAll() {
-    return this.term.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.term.findAll();
+    }
 }

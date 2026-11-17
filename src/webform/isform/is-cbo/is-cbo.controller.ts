@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { IsCboService } from './is-cbo.service';
 import { CreateIsCboDto } from './dto/create-is-cbo.dto';
 import { UpdateIsCboDto } from './dto/update-is-cbo.dto';
@@ -26,10 +18,7 @@ export class IsCboController {
     }
 
     @Post('save-log')
-    saveLog(
-        @Body('comname') comname: string,
-        @Body('empno') empno: string
-    ) {
+    saveLog(@Body('comname') comname: string, @Body('empno') empno: string) {
         return this.isCboService.saveLog(comname, empno);
     }
 }

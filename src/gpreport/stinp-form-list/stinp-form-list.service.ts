@@ -26,9 +26,7 @@ export class StinpFormListService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to find Safety inspection report list: ${error.message}`,
-            );
+            throw new Error(`Failed to find Safety inspection report list: ${error.message}`);
         }
     }
 
@@ -47,9 +45,7 @@ export class StinpFormListService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to find Safety inspection report list: ${error.message}`,
-            );
+            throw new Error(`Failed to find Safety inspection report list: ${error.message}`);
         }
     }
 
@@ -68,16 +64,11 @@ export class StinpFormListService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to create Safety inspection report list: ${error.message}`,
-            );
+            throw new Error(`Failed to create Safety inspection report list: ${error.message}`);
         }
     }
 
-    async update(
-        condition: PrimaryKeyStinpFormListDto,
-        data: UpdateStinpFormListDto,
-    ) {
+    async update(condition: PrimaryKeyStinpFormListDto, data: UpdateStinpFormListDto) {
         try {
             const res = await this.repo.update(condition, data);
             if (res.affected === 0) {
@@ -92,9 +83,7 @@ export class StinpFormListService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to update Safety inspection report list: ${error.message}`,
-            );
+            throw new Error(`Failed to update Safety inspection report list: ${error.message}`);
         }
     }
 
@@ -113,9 +102,7 @@ export class StinpFormListService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to delete Safety inspection report list: ${error.message}`,
-            );
+            throw new Error(`Failed to delete Safety inspection report list: ${error.message}`);
         }
     }
 
@@ -134,9 +121,7 @@ export class StinpFormListService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to delete Safety inspection report list: ${error.message}`,
-            );
+            throw new Error(`Failed to delete Safety inspection report list: ${error.message}`);
         }
     }
 }

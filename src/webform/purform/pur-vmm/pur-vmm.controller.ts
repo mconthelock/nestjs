@@ -16,10 +16,7 @@ import { UpdatePurVmmDto } from './dto/update-pur-vmm.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { RequestPurvmmFormDto } from './dto/request-pur-vmm.dto';
 import { ApprovePurVmmDto } from './dto/update-pur-vmm.dto';
@@ -31,7 +28,7 @@ export class PurVmmController {
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/PUR/PURVMM/` as string;
 
     @Post('create')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(
         getFileUploadInterceptor([
@@ -53,7 +50,7 @@ export class PurVmmController {
     }
 
     @Patch('update')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(
         getFileUploadInterceptor([
@@ -75,7 +72,7 @@ export class PurVmmController {
     }
 
     @Patch('approve')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     approve(
         @Body() dto: ApprovePurVmmDto, // หรือ RequestPurevaFormDto
@@ -86,7 +83,7 @@ export class PurVmmController {
     }
 
     @Post('createauto')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     async createauto(@Body() formEva: FormDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -95,7 +92,7 @@ export class PurVmmController {
 
     // Temporary endpoint for starting purposes
     @Get('initial')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     initForm() {
         return this.purVmmService.initForm();
     }

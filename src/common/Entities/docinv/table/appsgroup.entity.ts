@@ -1,14 +1,7 @@
-import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    ManyToOne,
-    JoinColumn,
-    OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Appsuser } from './appsuser.entity';
 
-@Entity('APP_USERS_GROUP')
+@Entity({ name: 'APP_USERS_GROUP', schema: 'DOCINV' })
 export class Appsgroup {
     @PrimaryColumn()
     GROUP_ID: number;

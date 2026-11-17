@@ -6,7 +6,7 @@ import { SEQUENCEORG } from 'src/common/Entities/webform/table/SEQUENCEORG.entit
 import { SequenceOrgRepository } from './sequence-org.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([SEQUENCEORG], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([SEQUENCEORG], 'mitsuConnection')],
     controllers: [SequenceOrgController],
     providers: [SequenceOrgService, SequenceOrgRepository],
     exports: [SequenceOrgService],

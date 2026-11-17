@@ -2,29 +2,29 @@ import { Type } from 'class-transformer';
 import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
 
 export class createHistoryDto {
-  @IsString()
-  INQ_NO: string;
+    @IsString()
+    INQ_NO: string;
 
-  @IsString()
-  INQ_REV: string;
+    @IsString()
+    INQ_REV: string;
 
-  @IsString()
-  INQH_USER: string;
+    @IsString()
+    INQH_USER: string;
 
-  @IsNumber()
-  @Type(() => Number)
-  INQH_ACTION: number;
+    @IsNumber()
+    @Type(() => Number)
+    INQH_ACTION: number;
 
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  INQH_DATE: Date;
+    @IsOptional()
+    @IsDate()
+    @Type(() => Date)
+    INQH_DATE: Date;
 
-  @IsNumber()
-  @Type(() => Number)
-  INQH_LATEST: number;
+    @IsNumber()
+    @Type(() => Number)
+    INQH_LATEST: number;
 
-  @IsString()
-  @IsOptional()
-  INQH_REMARK: string;
+    @IsString()
+    @IsOptional()
+    INQH_REMARK: string;
 }

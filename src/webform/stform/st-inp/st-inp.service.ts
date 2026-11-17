@@ -94,14 +94,13 @@ export class StInpService {
                 for (const list of dto.PA_LIST) {
                     const index = dto.PA_LIST.indexOf(list) + 1;
                     // insert and move image
-                    const movedFile =
-                        await this.styImageService.moveAndInsertFiles({
-                            file: files[index - 1],
-                            path,
-                            userCreate: dto.PA_USERCREATE,
-                            typeId: styType.data[0].TYPE_ID,
-                            folder: formno,
-                        });
+                    const movedFile = await this.styImageService.moveAndInsertFiles({
+                        file: files[index - 1],
+                        path,
+                        userCreate: dto.PA_USERCREATE,
+                        typeId: styType.data[0].TYPE_ID,
+                        folder: formno,
+                    });
                     movedTargets.push(...movedFile.path);
                     await this.stinpFormListService.create({
                         ...form,

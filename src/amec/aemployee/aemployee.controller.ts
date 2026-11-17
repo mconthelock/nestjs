@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Param,
-    UseGuards,
-    Patch,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Patch } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AemployeeService } from './aemployee.service';
 import { CreateAemployeeDto } from './dto/create-aemployee.dto';

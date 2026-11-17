@@ -13,19 +13,14 @@ import { IsTidActionService } from './is-tid-updateForm.service';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([ISTID_FORM], 'webformConnection'),
+        TypeOrmModule.forFeature([ISTID_FORM], 'mitsuConnection'),
         FormModule,
         FlowModule,
         IsCfsModule,
         SequenceOrgModule,
     ],
     controllers: [IsTidController],
-    providers: [
-        IsTidService,
-        IsTidCreateFormService,
-        IsTidActionService,
-        IsTidRepository,
-    ],
+    providers: [IsTidService, IsTidCreateFormService, IsTidActionService, IsTidRepository],
     exports: [IsTidService],
 })
 export class IsTidModule {}

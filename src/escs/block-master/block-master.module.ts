@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { BlockMasterService } from './block-master.service';
 import { BlockMasterController } from './block-master.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,12 +7,9 @@ import { BlockMasterRepository } from './block-master.repository';
 import { ItemMfgModule } from '../item-mfg/item-mfg.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([BLOCK_MASTER], 'escsConnection'),
-    ItemMfgModule,
-  ],
-  controllers: [BlockMasterController],
-  providers: [BlockMasterService, BlockMasterRepository],
-  exports: [BlockMasterService],
+    imports: [TypeOrmModule.forFeature([BLOCK_MASTER], 'mitsuConnection'), ItemMfgModule],
+    controllers: [BlockMasterController],
+    providers: [BlockMasterService, BlockMasterRepository],
+    exports: [BlockMasterService],
 })
 export class BlockMasterModule {}

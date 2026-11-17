@@ -3,99 +3,99 @@ import { RQFLIST } from './RQFLIST.entity';
 
 @Entity({ name: 'RQFFRM', schema: 'WEBFORM' })
 export class RQFFRM {
-  @PrimaryColumn()
-  NFRMNO: number;
+    @PrimaryColumn()
+    NFRMNO: number;
 
-  @PrimaryColumn()
-  VORGNO: string;
+    @PrimaryColumn()
+    VORGNO: string;
 
-  @PrimaryColumn()
-  CYEAR: string;
+    @PrimaryColumn()
+    CYEAR: string;
 
-  @PrimaryColumn()
-  CYEAR2: string;
+    @PrimaryColumn()
+    CYEAR2: string;
 
-  @PrimaryColumn()
-  NRUNNO: number;
+    @PrimaryColumn()
+    NRUNNO: number;
 
-  @Column()
-  REASON: string;
+    @Column()
+    REASON: string;
 
-  @Column()
-  REQ: string;
+    @Column()
+    REQ: string;
 
-  @Column()
-  URGENT: string;
+    @Column()
+    URGENT: string;
 
-  @Column()
-  PRICE: string;
+    @Column()
+    PRICE: string;
 
-  @Column()
-  TERM: string;
+    @Column()
+    TERM: string;
 
-  @Column()
-  OTHER: string;
+    @Column()
+    OTHER: string;
 
-  @Column()
-  NOTEOTH: string;
+    @Column()
+    NOTEOTH: string;
 
-  @Column()
-  REQDATE: Date;
+    @Column()
+    REQDATE: Date;
 
-  @Column()
-  PURINC: string;
+    @Column()
+    PURINC: string;
 
-  @Column()
-  PURID: string;
+    @Column()
+    PURID: string;
 
-  @Column()
-  TYPEQUO: string;
+    @Column()
+    TYPEQUO: string;
 
-  @Column()
-  TYPEPUR: string;
+    @Column()
+    TYPEPUR: string;
 
-  @Column()
-  JOPITM: string;
+    @Column()
+    JOPITM: string;
 
-  @Column()
-  OWNBUY: string;
+    @Column()
+    OWNBUY: string;
 
-  @Column()
-  TYPEPRO: string;
+    @Column()
+    TYPEPRO: string;
 
-  @Column()
-  BCOMMENT: string;
+    @Column()
+    BCOMMENT: string;
 
-  @Column()
-  TYPEPRO1: string;
+    @Column()
+    TYPEPRO1: string;
 
-  @Column()
-  ID: string;
+    @Column()
+    ID: string;
 
-  @Column()
-  SEXPTYPE: number;
+    @Column()
+    SEXPTYPE: number;
 
-  @Column()
-  GEN_PR: string;
+    @Column()
+    GEN_PR: string;
 
-  @Column()
-  OVER_10K: string;
+    @Column()
+    OVER_10K: string;
 
-  @Column()
-  BIDDING_NO: string;
+    @Column()
+    BIDDING_NO: string;
 
-  @Column()
-  SPRNO: string;
+    @Column()
+    SPRNO: string;
 
-  @Column()
-  FYEAR: string;
+    @Column()
+    FYEAR: string;
 
-  @Column()
-  SDELIVERY: string;
+    @Column()
+    SDELIVERY: string;
 
-  @Column()
-  DDELIVERY: Date;
+    @Column()
+    DDELIVERY: Date;
 
-  @OneToMany(() => RQFLIST, (item) => item.RQFFRM)
-  RQFLIST: RQFLIST[];
+    @OneToMany(() => RQFLIST, (item) => item.RQFFRM)
+    RQFLIST: RQFLIST[];
 }

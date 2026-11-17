@@ -166,4 +166,10 @@ export class CM_SM_FORM {
 
     @Column()
     COUNT_ALERT: number;
+
+    @Column()
+    REMARK: string;
+
+    @Column()
+    REPLY_NMETIS_DATE: Date;
 }

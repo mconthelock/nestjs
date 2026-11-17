@@ -40,9 +40,7 @@ export class QaFileService {
         ext2?: string;
     }) {
         // const path = d.path.endsWith('/') ? d.path : d.path + '/';
-        const destination = d.folder
-            ? await joinPaths(d.path, d.folder)
-            : d.path; // Get the destination path
+        const destination = d.folder ? await joinPaths(d.path, d.folder) : d.path; // Get the destination path
         const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
         for (const file of d.files) {
             const moved = await moveFileFromMulter({ file, destination });

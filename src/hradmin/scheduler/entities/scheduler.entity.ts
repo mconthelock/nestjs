@@ -2,33 +2,33 @@ import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('TASKSCHEDULER')
 export class Scheduler {
-  @PrimaryGeneratedColumn()
-  TASKID: number;
+    @PrimaryGeneratedColumn()
+    TASKID: number;
 
-  @Column()
-  TASKNAME: string;
+    @Column()
+    TASKNAME: string;
 
-  @Column()
-  PLANDATE: Date;
+    @Column()
+    PLANDATE: Date;
 
-  @Column()
-  STARTDATE: Date;
+    @Column()
+    STARTDATE: Date;
 
-  @Column()
-  FINISHDATE: Date;
+    @Column()
+    FINISHDATE: Date;
 
-  @Column()
-  STATUS: number;
+    @Column()
+    STATUS: number;
 
-  @Column()
-  CREATEAT: Date;
+    @Column()
+    CREATEAT: Date;
 
-  @Column()
-  CREATEBY: string;
+    @Column()
+    CREATEBY: string;
 
-  @Column()
-  UPDATEAT: Date;
+    @Column()
+    UPDATEAT: Date;
 
-  @Column()
-  UPDATEBY: string;
+    @Column()
+    UPDATEBY: string;
 }

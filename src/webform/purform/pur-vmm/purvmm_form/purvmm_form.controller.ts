@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { PurvmmFormService } from './purvmm_form.service';
 import { CreatePurvmmFormDto } from './dto/create-purvmm_form.dto';
 import { UpdatePurvmmFormDto } from './dto/update-purvmm_form.dto';
@@ -43,10 +35,7 @@ export class PurvmmFormController {
     }
 
     @Patch(':id')
-    update(
-        @Param('id') id: string,
-        @Body() updatePurvmmFormDto: UpdatePurvmmFormDto,
-    ) {
+    update(@Param('id') id: string, @Body() updatePurvmmFormDto: UpdatePurvmmFormDto) {
         return this.purvmmFormService.update(+id, updatePurvmmFormDto);
     }
 

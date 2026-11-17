@@ -1,11 +1,4 @@
-import {
-    Entity,
-    Column,
-    PrimaryColumn,
-    OneToMany,
-    ManyToOne,
-    JoinColumn,
-} from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { CurrencyMaster } from './CURRENCY_MASTER.entity';
 
 @Entity({ name: 'CURRENCY_EXCHANGE', schema: 'PURSYS' })

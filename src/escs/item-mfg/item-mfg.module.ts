@@ -3,6 +3,7 @@ import { ItemMfgService } from './item-mfg.service';
 import { ItemMfgController } from './item-mfg.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ITEM_MFG } from 'src/common/Entities/escs/table/ITEM_MFG.entity';
+import { ITEM_STATUS } from 'src/common/Entities/escs/table/ITEM_STATUS.entity';
 import { ItemMfgRepository } from './item-mfg.repository';
 import { ItemMfgDeleteModule } from '../item-mfg-delete/item-mfg-delete.module';
 import { ControlDrawingPisModule } from '../control-drawing-pis/control-drawing-pis.module';
@@ -11,16 +12,16 @@ import { ItemMfgListModule } from '../item-mfg-list/item-mfg-list.module';
 import { ItemMfgHistoryModule } from '../item-mfg-history/item-mfg-history.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ITEM_MFG], 'escsConnection'),
-    ItemSheetMfgModule,
-    ItemMfgListModule,
-    ItemMfgHistoryModule,
-    ItemMfgDeleteModule,
-    ControlDrawingPisModule,
-  ],
-  controllers: [ItemMfgController],
-  providers: [ItemMfgService, ItemMfgRepository],
-  exports: [ItemMfgService],
+    imports: [
+        TypeOrmModule.forFeature([ITEM_MFG, ITEM_STATUS], 'mitsuConnection'),
+        ItemSheetMfgModule,
+        ItemMfgListModule,
+        ItemMfgHistoryModule,
+        ItemMfgDeleteModule,
+        ControlDrawingPisModule,
+    ],
+    controllers: [ItemMfgController],
+    providers: [ItemMfgService, ItemMfgRepository],
+    exports: [ItemMfgService],
 })
 export class ItemMfgModule {}

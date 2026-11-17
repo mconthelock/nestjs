@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -6,20 +6,24 @@ import { ExpatEmployee } from 'src/common/Entities/gpreport/table/expat_employee
 import { ExpatFamily } from 'src/common/Entities/gpreport/table/expat_family.entity';
 import { ExpatEmployeeFile } from 'src/common/Entities/gpreport/table/expat_employee_file.entity';
 import { ExpatFamilyFile } from 'src/common/Entities/gpreport/table/expat_family_file.entity';
-import { User } from 'src/amec/users/entities/user.entity';
+import { User } from 'src/common/Entities/amec/views/user.entity';
 import { ExpatTravel } from 'src/common/Entities/gpreport/table/expat_travel.entity';
 
 @Injectable()
 export class ExpatRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('gpreportConnection') private readonly gpreportDs: DataSource,
-        @InjectRepository(User, 'gpreportConnection') private readonly userRepo: Repository<User>,
+        @InjectDataSource('mitsuConnection')
+        private readonly gpreportDs: DataSource,
+        @InjectRepository(User, 'mitsuConnection')
+        private readonly userRepo: Repository<User>,
     ) {
         super(gpreportDs);
     }
 
     findOneEmployee(sempno: string) {
-        return this.getRepository(ExpatEmployee).findOne({ where: { SEMPNO: sempno } });
+        return this.getRepository(ExpatEmployee).findOne({
+            where: { SEMPNO: sempno },
+        });
     }
 
     async findAllEmployees(company?: string) {
@@ -109,15 +113,21 @@ export class ExpatRepository extends BaseRepository {
 
     // FAMILY
     findFamily(sempno: string) {
-        return this.getRepository(ExpatFamily).find({ where: { SEMPNO: sempno }, order: { FID: 'ASC' } });
+        return this.getRepository(ExpatFamily).find({
+            where: { SEMPNO: sempno },
+            order: { FID: 'ASC' },
+        });
     }
 
     findOneFamily(sempno: string, fid: number) {
-        return this.getRepository(ExpatFamily).findOne({ where: { SEMPNO: sempno, FID: fid } });
+        return this.getRepository(ExpatFamily).findOne({
+            where: { SEMPNO: sempno, FID: fid },
+        });
     }
 
     async getNextFamilyId(sempno: string) {
-        const result = await this.getRepository(ExpatFamily).createQueryBuilder('F')
+        const result = await this.getRepository(ExpatFamily)
+            .createQueryBuilder('F')
             .select('NVL(MAX(F.FID), 0) + 1', 'FID')
             .where('F.SEMPNO = :sempno', { sempno })
             .getRawOne();
@@ -135,7 +145,10 @@ export class ExpatRepository extends BaseRepository {
     }
 
     deleteFamily(sempno: string, fid: number) {
-        return this.getRepository(ExpatFamily).delete({ SEMPNO: sempno, FID: fid });
+        return this.getRepository(ExpatFamily).delete({
+            SEMPNO: sempno,
+            FID: fid,
+        });
     }
 
     // EMPLOYEE FILE
@@ -147,7 +160,8 @@ export class ExpatRepository extends BaseRepository {
     }
 
     async getNextEmployeeFileId(sempno: string, fileType: string) {
-        const result = await this.getRepository(ExpatEmployeeFile).createQueryBuilder('F')
+        const result = await this.getRepository(ExpatEmployeeFile)
+            .createQueryBuilder('F')
             .select('NVL(MAX(F.FILE_ID), 0) + 1', 'FILE_ID')
             .where('F.SEMPNO = :sempno', { sempno })
             .andWhere('F.FILE_TYPE = :fileType', { fileType })
@@ -210,7 +224,8 @@ export class ExpatRepository extends BaseRepository {
     }
 
     async getNextFamilyFileId(sempno: string, fid: number, fileType: string) {
-        const result = await this.getRepository(ExpatFamilyFile).createQueryBuilder('F')
+        const result = await this.getRepository(ExpatFamilyFile)
+            .createQueryBuilder('F')
             .select('NVL(MAX(F.FILE_ID), 0) + 1', 'FILE_ID')
             .where('F.SEMPNO = :sempno', { sempno })
             .andWhere('F.FID = :fid', { fid })
@@ -258,7 +273,7 @@ export class ExpatRepository extends BaseRepository {
         });
     }
 
-    async updateEmployeeFile(sempno: string, fileType: string, data: Partial<ExpatEmployeeFile>,) {
+    async updateEmployeeFile(sempno: string, fileType: string, data: Partial<ExpatEmployeeFile>) {
         await this.getRepository(ExpatEmployeeFile).update(
             {
                 SEMPNO: sempno,
@@ -282,7 +297,9 @@ export class ExpatRepository extends BaseRepository {
     }
 
     findOneTravel(travelId: number) {
-        return this.getRepository(ExpatTravel).findOne({ where: { TRAVEL_ID: travelId } });
+        return this.getRepository(ExpatTravel).findOne({
+            where: { TRAVEL_ID: travelId },
+        });
     }
 
     async getNextTravelId() {
@@ -332,5 +349,4 @@ export class ExpatRepository extends BaseRepository {
             FID: fid,
         });
     }
-
 }

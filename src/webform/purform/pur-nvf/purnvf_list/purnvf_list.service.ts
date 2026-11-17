@@ -6,12 +6,12 @@ import { PurnvfListRepository } from './purnvf_list.repository';
 
 @Injectable()
 export class PurnvfListService {
-  constructor(private readonly repo: PurnvfListRepository) {}
+    constructor(private readonly repo: PurnvfListRepository) {}
 
-  async create(dto: CreatePurnvfListDto) {
-          try {
+    async create(dto: CreatePurnvfListDto) {
+        try {
             const res = await this.repo.create(dto);
-            if(!res){
+            if (!res) {
                 throw new Error('Failed to insert PURVNFLIST');
             }
             return {
@@ -21,22 +21,21 @@ export class PurnvfListService {
         } catch (error) {
             throw new Error('Insert PURVNFLIST Error: ' + error.message);
         }
+    }
 
-  }
+    findAll() {
+        return `This action returns all purnvfList`;
+    }
 
-  findAll() {
-    return `This action returns all purnvfList`;
-  }
+    findOne(id: number) {
+        return `This action returns a #${id} purnvfList`;
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} purnvfList`;
-  }
+    update(id: number, updatePurnvfListDto: UpdatePurnvfListDto) {
+        return `This action updates a #${id} purnvfList`;
+    }
 
-  update(id: number, updatePurnvfListDto: UpdatePurnvfListDto) {
-    return `This action updates a #${id} purnvfList`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} purnvfList`;
-  }
+    remove(id: number) {
+        return `This action removes a #${id} purnvfList`;
+    }
 }

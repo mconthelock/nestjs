@@ -26,6 +26,4 @@ export class INV_HALFYEAR_REPORT {
     @OneToOne(() => PSCIH_FORM, (f3) => f3.REPORT)
     @JoinColumn([{ name: 'ID', referencedColumnName: 'REPORT_ID' }])
     PSCIH_FORM: PSCIH_FORM;
-
-    
 }

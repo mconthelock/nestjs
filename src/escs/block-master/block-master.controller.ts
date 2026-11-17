@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
+﻿import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { BlockMasterService } from './block-master.service';
 import { CreateBlockMasterDto } from './dto/create-block-master.dto';
 import { UpdateBlockMasterDto } from './dto/update-block-master.dto';
@@ -8,41 +8,41 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 
 @Controller('escs/block-master')
 export class BlockMasterController {
-  constructor(private readonly blockMasterService: BlockMasterService) {}
+    constructor(private readonly blockMasterService: BlockMasterService) {}
 
-  @Post()
-  @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('escsConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ escsConnection
-  async create(@Body() createBlockMasterDto: CreateBlockMasterDto) {
-    return await this.blockMasterService.create(createBlockMasterDto);
-  }
+    @Post()
+    @UseInterceptors(getFileUploadInterceptor())
+    @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
+    async create(@Body() createBlockMasterDto: CreateBlockMasterDto) {
+        return await this.blockMasterService.create(createBlockMasterDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.blockMasterService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.blockMasterService.findAll();
+    }
 
-  @Post('search')
-  @UseTransaction('escsConnection') 
-  async search(@Body() dto: FiltersDto) {
-    return this.blockMasterService.search(dto);
-  }
+    @Post('search')
+    @UseTransaction('mitsuConnection')
+    async search(@Body() dto: FiltersDto) {
+        return this.blockMasterService.search(dto);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.blockMasterService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.blockMasterService.findOne(+id);
+    }
 
-  @Patch(':id')
-  @UseInterceptors(getFileUploadInterceptor())
-  @UseTransaction('escsConnection')
-  update(@Param('id') id: string, @Body() dto: UpdateBlockMasterDto) {
-    return this.blockMasterService.update(+id, dto);
-  }
+    @Patch(':id')
+    @UseInterceptors(getFileUploadInterceptor())
+    @UseTransaction('mitsuConnection')
+    update(@Param('id') id: string, @Body() dto: UpdateBlockMasterDto) {
+        return this.blockMasterService.update(+id, dto);
+    }
 
-  @Delete(':id')
-  @UseTransaction('escsConnection')
-  remove(@Param('id') id: string) {
-    return this.blockMasterService.remove(+id);
-  }
+    @Delete(':id')
+    @UseTransaction('mitsuConnection')
+    remove(@Param('id') id: string) {
+        return this.blockMasterService.remove(+id);
+    }
 }

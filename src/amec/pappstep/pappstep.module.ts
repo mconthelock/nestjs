@@ -4,7 +4,7 @@ import { PappstepController } from './pappstep.controller';
 import { PappflowModule } from '../pappflow/pappflow.module';
 
 @Module({
-  controllers: [PappstepController],
-  providers: [PappstepService],
+    controllers: [PappstepController],
+    providers: [PappstepService],
 })
 export class PappstepModule {}

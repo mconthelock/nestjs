@@ -30,8 +30,8 @@ export class STINP_FORM {
     VAUDIT: string;
 
     @Column()
-	VUSERCREATE: string;
+    VUSERCREATE: string;
 
-	@Column()
-	DDATECREATE: Date;
+    @Column()
+    DDATECREATE: Date;
 }

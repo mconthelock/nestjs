@@ -5,5 +5,5 @@ import { UpdateIsCfDto } from './dto/update-is-cf.dto';
 
 @Controller('is-cfs')
 export class IsCfsController {
-  constructor(private readonly isCfsService: IsCfsService) {}
+    constructor(private readonly isCfsService: IsCfsService) {}
 }

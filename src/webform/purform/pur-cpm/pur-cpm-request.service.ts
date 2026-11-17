@@ -36,12 +36,7 @@ export class PurCpmRequestService extends PurCpmService {
             insertFlowStepService,
         );
     }
-    async request(
-        dto: CreatePurCpmDto,
-        files: Express.Multer.File[],
-        ip: string,
-        path: string,
-    ) {
+    async request(dto: CreatePurCpmDto, files: Express.Multer.File[], ip: string, path: string) {
         let movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
         try {
             const { REQBY, INPUTBY, REMARK, ...data } = dto;
@@ -85,12 +80,7 @@ export class PurCpmRequestService extends PurCpmService {
             });
             // 5. ย้ายไฟล์ไปยังปลายทางและ Insert ข้อมูลไฟล์ใหม่ (ถ้ามี)
             if (files && files.length > 0) {
-                movedTargets = await this.moveFiles(
-                    files,
-                    form,
-                    path,
-                    dto.REQBY,
-                );
+                movedTargets = await this.moveFiles(files, form, path, dto.REQBY);
             }
             return {
                 status: true,

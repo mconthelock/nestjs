@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
@@ -10,7 +10,7 @@ import { SearchDiligentDto } from './dto/search-diligent.dto';
 @Injectable()
 export class DiligentService {
     constructor(
-        @InjectRepository(Diligent, 'gpreportConnection')
+        @InjectRepository(Diligent, 'mitsuConnection')
         private readonly diligent: Repository<Diligent>,
     ) {}
     async search(dto: SearchDiligentDto) {

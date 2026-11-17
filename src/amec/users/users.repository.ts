@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
-import { User } from './entities/user.entity';
+import { User } from '../../common/Entities/amec/views/user.entity';
 import { searchDto } from './dto/search-user.dto';
 import { applyDynamicFilters } from 'src/common/helpers/query.helper';
 
 @Injectable()
 export class UsersRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

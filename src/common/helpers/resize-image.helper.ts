@@ -13,11 +13,7 @@ const RESIZABLE_MIME_TYPES = new Set([
     'image/tiff',
 ]);
 
-const applySharpOutput = (
-    transformer: sharp.Sharp,
-    mimetype: string,
-    quality: number,
-) => {
+const applySharpOutput = (transformer: sharp.Sharp, mimetype: string, quality: number) => {
     switch (mimetype) {
         case 'image/png':
             return transformer.png({
@@ -60,11 +56,7 @@ const getPreserveRatioResizeOptions = (
     };
 };
 
-export const compressSize = async (
-    buffer: Buffer,
-    mimetype: string,
-    maxSize?: number,
-) => {
+export const compressSize = async (buffer: Buffer, mimetype: string, maxSize?: number) => {
     maxSize = maxSize || MAX_IMAGE_SIZE_BYTES;
     if (buffer.length <= maxSize) {
         return buffer;
@@ -88,11 +80,7 @@ export const compressSize = async (
             transformer = transformer.resize(resizeOptions);
         }
 
-        const candidate = await applySharpOutput(
-            transformer,
-            mimetype,
-            quality,
-        ).toBuffer();
+        const candidate = await applySharpOutput(transformer, mimetype, quality).toBuffer();
 
         if (candidate.length < bestBuffer.length) {
             bestBuffer = candidate;
@@ -133,9 +121,5 @@ export const compressDimension = async (
         transformer = transformer.resize(resizeOptions);
     }
 
-    return applySharpOutput(
-        transformer,
-        mimetype,
-        mimetype === 'image/png' ? 90 : 82,
-    ).toBuffer();
+    return applySharpOutput(transformer, mimetype, mimetype === 'image/png' ? 90 : 82).toBuffer();
 };

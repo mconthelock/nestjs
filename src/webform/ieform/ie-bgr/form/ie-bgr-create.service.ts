@@ -10,9 +10,7 @@ export class IeBgrCreateService extends IeBgrService {
      */
     async create(
         dto: CreateIeBgrDto,
-        files: Partial<
-            Record<keyof typeof this.fileType, Express.Multer.File[]>
-        >,
+        files: Partial<Record<keyof typeof this.fileType, Express.Multer.File[]>>,
         // {
         //   imageI?: Express.Multer.File[];
         //   imageP?: Express.Multer.File[];

@@ -1,10 +1,5 @@
 import { PartialType } from '@nestjs/swagger';
-import {
-    IsString,
-    IsNumber,
-    IsOptional,
-    ValidateNested,
-} from 'class-validator';
+import { IsString, IsNumber, IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateLoanFormDto } from './create-loan.dto';
 import { SearchFormDto } from 'src/webform/form/dto/search-form.dto';

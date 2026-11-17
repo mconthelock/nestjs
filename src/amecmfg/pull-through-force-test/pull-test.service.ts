@@ -20,8 +20,7 @@ export class PullTestService {
             const result = await pool
                 .request()
                 .input('order', sql.VarChar, dto.order)
-                .input('typeModel', sql.VarChar, dto.typeModel)
-                .query(`
+                .input('typeModel', sql.VarChar, dto.typeModel).query(`
                     SELECT TOP 3 
                         A.ORDERNO,
                         B.RepeatNo,
@@ -47,7 +46,7 @@ export class PullTestService {
             return {
                 status: 'SUCCESS',
                 message: null,
-                data: result.recordset.map(r => ({
+                data: result.recordset.map((r) => ({
                     orderNo: r.ORDERNO,
                     repeatNo: String(r.RepeatNo),
                     pullValue: String(r.PullValue),
@@ -65,16 +64,19 @@ export class PullTestService {
             });
         } finally {
             if (pool) {
-                try { await pool.close(); } catch {}
+                try {
+                    await pool.close();
+                } catch {}
             }
         }
     }
 
     private parseConnectionString(str: string): sql.config {
         const parts = Object.fromEntries(
-            str.split(';')
+            str
+                .split(';')
                 .filter(Boolean)
-                .map(p => {
+                .map((p) => {
                     const [k, v] = p.split('=');
                     return [k.trim(), v];
                 }),
@@ -87,10 +89,10 @@ export class PullTestService {
             database: parts['Initial Catalog'],
             user: parts['User ID'],
             password: parts['Password'],
-            connectionTimeout: 5000, 
+            connectionTimeout: 5000,
             requestTimeout: 5000,
             options: {
-                instanceName, 
+                instanceName,
                 encrypt: false,
                 trustServerCertificate: true,
             },

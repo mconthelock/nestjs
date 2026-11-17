@@ -1,11 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { PURPRA_REASONS } from './PURPRA_REASONS.entity';
 import { PURPRA_GROUP } from './PURPRA_GROUP.entity';
 import { PURPRA_COMMITTEE } from './PURPRA_COMMITTEE.entity';
@@ -60,16 +53,16 @@ export class PURPRA_FORM {
     @Column()
     NGROUP: number;
 
-    @Column({type: 'decimal'})
+    @Column({ type: 'decimal' })
     NTOTAL_PRES: number;
 
-    @Column({type: 'decimal'})
+    @Column({ type: 'decimal' })
     NTOTAL_NEW: number;
 
-    @Column({type: 'decimal'})
+    @Column({ type: 'decimal' })
     NTOTAL_COST: number;
 
-    @Column({type: 'decimal'})
+    @Column({ type: 'decimal' })
     NTOTAL_RATIO: number;
 
     @Column()

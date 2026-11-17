@@ -11,9 +11,9 @@ import { JopPurConfService } from '../jop-pur-conf/jop-pur-conf.service';
 @Injectable()
 export class OrderListService {
     constructor(
-        @InjectRepository(VOrderList, 'amecConnection')
+        @InjectRepository(VOrderList, 'datacenterConnection')
         private readonly OrderListRepository: Repository<VOrderList>,
-        @InjectDataSource('amecConnection')
+        @InjectDataSource('mitsuConnection')
         private dataSource: DataSource,
         private readonly JopMarReqService: JopMarReqService,
         private readonly JopPurConfService: JopPurConfService,
@@ -61,7 +61,7 @@ export class OrderListService {
     private setQueryNew(dto: SearchOrderListDto, type: string = 'data') {
         const { fields = [], ORDTYPE, PRJ_NO, MFGNO, BUYEREMPNO, BUYERNAME, PRNO, PRDATE, PONO, PODATE, LINENO, VENDCODE, ITEM, DRAWING, PARTNAME, INVOICE, DUEDATE, TURNOVER_STATUS, AGENT, SERIES, SDESSCH, SPRODSCH, SDESBMDATE, SMFGBMDATE, EDESSCH, EPRODSCH, EDESBMDATE, EMFGBMDATE, distinct, orderby, orderbyDirection, JOP_PUR_STATUS, JOP_PUR_INPUT_DATE, JOP_MAR_REQUEST, JOP_PUR_CONFIRM, SREGISDATE, EREGISDATE, C_DBP } = dto;
 
-        const query = this.dataSource.createQueryBuilder().from('MV_JOB_ORDER','O');
+        const query = this.dataSource.createQueryBuilder().from('DAILYIDS.MV_JOB_ORDER','O');
         query.distinct(distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
 
         if(orderby){
@@ -141,7 +141,7 @@ export class OrderListService {
                 } else if ('PUR_INPUTNAME' === f) {
                     query.addSelect('I.SNAME', 'PUR_INPUTNAME');
                 } else if ('DeadLinePUR' === f) {
-                    query.addSelect("ADD_WORK_DAYS(TO_NUMBER(TO_CHAR(J.JOP_MAR_INPUT_DATE, 'YYYYMMDD')),7)", 'DeadLinePUR'); // เพื่อให้ได้ DeadLinePUR
+                    query.addSelect("DAILYIDS.ADD_WORK_DAYS(TO_NUMBER(TO_CHAR(J.JOP_MAR_INPUT_DATE, 'YYYYMMDD')),7)", 'DeadLinePUR'); // เพื่อให้ได้ DeadLinePUR
                 } else if ('PRJ_NO' === f) {
                     query.addSelect('O.PRJ_NO', 'PRJ_NO');
                 } else {
@@ -158,12 +158,12 @@ export class OrderListService {
                         qb => qb
                             .subQuery()
                             .select('A.JOP_MFGNO, A.JOP_PONO, A.JOP_LINENO, LAST_REVISION, JOP_PUR_STATUS, JOP_MAR_REQUEST, JOP_MAR_REQUEST_DATE, JOP_MAR_INPUT_DATE, JOP_MAR_REMARK')
-                            .from('JOP_MAR_REQ', 'A')
+                            .from('DAILYIDS.JOP_MAR_REQ', 'A')
                             .innerJoin(
                                 qb => qb
                                     .subQuery()
                                     .select('JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION')
-                                    .from('JOP_MAR_REQ', 'MAR')
+                                    .from('DAILYIDS.JOP_MAR_REQ', 'MAR')
                                     .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
                                     'B',
                                     'A.JOP_MFGNO = B.JOP_MFGNO AND A.JOP_PONO = B.JOP_PONO AND A.JOP_LINENO = B.JOP_LINENO AND B.LAST_REVISION = A.JOP_REVISION'
@@ -174,12 +174,12 @@ export class OrderListService {
                         qb => qb
                             .subQuery()
                             .select('C.JOP_MFGNO, C.JOP_PONO, C.JOP_LINENO, LAST_REVISION, JOP_PUR_CONFIRM, JOP_PUR_CONFIRM_DATE, JOP_PUR_INPUT_DATE, JOP_PUR_REMARK')
-                            .from('JOP_PUR_CONF', 'C')
+                            .from('DAILYIDS.JOP_PUR_CONF', 'C')
                             .innerJoin(
                                 qb => qb
                                     .subQuery()
                                     .select('JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION')
-                                    .from('JOP_PUR_CONF', 'PUR')
+                                    .from('DAILYIDS.JOP_PUR_CONF', 'PUR')
                                     .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
                                     'D',
                                     'C.JOP_MFGNO = D.JOP_MFGNO AND C.JOP_PONO = D.JOP_PONO AND C.JOP_LINENO = D.JOP_LINENO AND D.LAST_REVISION = C.JOP_REVISION'
@@ -190,8 +190,8 @@ export class OrderListService {
                     ,'J',
                     'O.PRNO = J.JOP_PONO and O.LINENO = J.JOP_LINENO and O.MFGNO = J.JOP_MFGNO'
             );
-            query.leftJoin('(SELECT * FROM AMECUSERALL)', 'U', 'J.JOP_MAR_REQUEST = U.SEMPNO');
-            query.leftJoin('(SELECT * FROM AMECUSERALL)', 'I', 'J.JOP_PUR_CONFIRM = I.SEMPNO');
+            query.leftJoin('(SELECT * FROM AMEC.AMECUSERALL)', 'U', 'J.JOP_MAR_REQUEST = U.SEMPNO');
+            query.leftJoin('(SELECT * FROM AMEC.AMECUSERALL)', 'I', 'J.JOP_PUR_CONFIRM = I.SEMPNO');
             return query;
         }
     }
@@ -211,21 +211,16 @@ export class OrderListService {
             if (c.JOP_PUR_REVISION > 0) purConditions.push(key);
         }
 
-        if (marConditions.length === 0 && purConditions.length === 0)
-            return list;
+        if (marConditions.length === 0 && purConditions.length === 0) return list;
 
         const marReqRevision =
             marConditions.length > 0
-                ? await this.JopMarReqService.getRevisionHistoryByKey(
-                      marConditions,
-                  )
+                ? await this.JopMarReqService.getRevisionHistoryByKey(marConditions)
                 : [];
 
         const purConfRevision =
             purConditions.length > 0
-                ? await this.JopPurConfService.getRevisionHistoryByKey(
-                      purConditions,
-                  )
+                ? await this.JopPurConfService.getRevisionHistoryByKey(purConditions)
                 : [];
 
         const revisions = [...marReqRevision, ...purConfRevision];
@@ -254,9 +249,7 @@ export class OrderListService {
                     l.JOP_LINENO,
                 );
                 l.MAR_REVISION = revision.map((r) => {
-                    r.JOP_REVISION_TEXT = numberToAlphabetRevision(
-                        r.JOP_REVISION,
-                    );
+                    r.JOP_REVISION_TEXT = numberToAlphabetRevision(r.JOP_REVISION);
                     return {
                         REVISION: r.JOP_REVISION,
                         REVISION_TEXT: r.JOP_REVISION_TEXT,
@@ -269,16 +262,13 @@ export class OrderListService {
                 });
             }
             if (l.JOP_PUR_REVISION) {
-                const purRevision =
-                    await this.JopPurConfService.getRevisionHistory(
-                        l.JOP_MFGNO,
-                        l.JOP_PONO,
-                        l.JOP_LINENO,
-                    );
+                const purRevision = await this.JopPurConfService.getRevisionHistory(
+                    l.JOP_MFGNO,
+                    l.JOP_PONO,
+                    l.JOP_LINENO,
+                );
                 l.PUR_REVISION = purRevision.map((r) => {
-                    r.JOP_REVISION_TEXT = numberToAlphabetRevision(
-                        r.JOP_REVISION,
-                    );
+                    r.JOP_REVISION_TEXT = numberToAlphabetRevision(r.JOP_REVISION);
                     return {
                         REVISION: r.JOP_REVISION,
                         REVISION_TEXT: r.JOP_REVISION_TEXT,

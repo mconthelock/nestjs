@@ -46,11 +46,7 @@ const ensureUploadPath = (destination: string) => {
     return uploadPath;
 };
 
-const applySharpOutput = (
-    transformer: sharp.Sharp,
-    mimetype: string,
-    quality: number,
-) => {
+const applySharpOutput = (transformer: sharp.Sharp, mimetype: string, quality: number) => {
     switch (mimetype) {
         case 'image/png':
             return transformer.png({
@@ -104,11 +100,7 @@ const compressImageToTargetSize = async (buffer: Buffer, mimetype: string) => {
             });
         }
 
-        const candidate = await applySharpOutput(
-            transformer,
-            mimetype,
-            quality,
-        ).toBuffer();
+        const candidate = await applySharpOutput(transformer, mimetype, quality).toBuffer();
 
         if (candidate.length < bestBuffer.length) {
             bestBuffer = candidate;
@@ -149,16 +141,12 @@ const imageStorage: StorageEngine = {
                 }
 
                 const uploadPath = ensureUploadPath(req.body.destination);
-                const uniqueSuffix =
-                    Date.now() + '-' + Math.round(Math.random() * 1e9);
+                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
                 const ext = getFileExtension(file);
                 const filename = `${uniqueSuffix}${ext}`;
                 const filePath = path.join(uploadPath, filename);
                 const originalBuffer = Buffer.concat(chunks);
-                const outputBuffer = await compressImageToTargetSize(
-                    originalBuffer,
-                    file.mimetype,
-                );
+                const outputBuffer = await compressImageToTargetSize(originalBuffer, file.mimetype);
 
                 await fs.promises.writeFile(filePath, outputBuffer);
 

@@ -45,9 +45,7 @@ export class DrawingResolverHelper {
         const item = data.F01R03?.trim();
         const getGpl = await this.generalPartListService.getGPL(order, item);
         if (!getGpl.status) {
-            throw new Error(
-                `General Part List with order ${order} and item ${item} not found`,
-            );
+            throw new Error(`General Part List with order ${order} and item ${item} not found`);
         }
 
         const gpl = getGpl.data;
@@ -58,10 +56,7 @@ export class DrawingResolverHelper {
 
             const gplDrawing = d.DRAWING.replace(/\s/g, '');
             const targetDrawing = drawing.replace(/\s/g, '');
-            return (
-                gplDrawing === targetDrawing ||
-                gplDrawing.startsWith(targetDrawing)
-            );
+            return gplDrawing === targetDrawing || gplDrawing.startsWith(targetDrawing);
         });
 
         if (!match) {
@@ -77,8 +72,8 @@ export class DrawingResolverHelper {
      * @author Sutthipong Tangmongkhoncharoen (24008)
      * @since 2026-11-09
      * @description ตรวจสอบและลบ O ที่ต่อท้าย drawing หากมี
-     * @param drawing 
-     * @returns 
+     * @param drawing
+     * @returns
      */
     replaceO(drawing: string): string {
         const matchO = drawing.match(/\s(O)$/i);
@@ -101,27 +96,18 @@ export class DrawingResolverHelper {
      * checkBreakAssyDrawing('C60526001NV', 'BA118A742 G03') => 'BA118A742(L) G03'
      * checkBreakAssyDrawing('S1909110234', 'BS127C197 G01') => 'BS127C197 G01'
      */
-    async checkBreakAssyDrawing(
-        controlNo: string,
-        drawing: string,
-    ): Promise<string> {
+    async checkBreakAssyDrawing(controlNo: string, drawing: string): Promise<string> {
         const f001kp: { status: boolean; data?: F001KP; message: string } =
             await this.f001kpService.findOne(controlNo);
         if (!f001kp.status) {
             throw new Error(`F001KP with control no ${controlNo} not found`);
         }
         const description = f001kp.data.F01R09?.trim();
-        if (
-            description &&
-            description.toUpperCase().replace(/\s/g, '').includes('BRAKEASSY')
-        ) {
+        if (description && description.toUpperCase().replace(/\s/g, '').includes('BRAKEASSY')) {
             const side = description.match(/\(([LR])\)/i);
             if (side) {
                 const explode = this.parser.explodeGL(drawing);
-                drawing = drawing.replace(
-                    explode.DRAWING,
-                    explode.DRAWING + side[0].toUpperCase(),
-                );
+                drawing = drawing.replace(explode.DRAWING, explode.DRAWING + side[0].toUpperCase());
             } else {
                 // ดึงตัวท้าย กรณีที่ไม่มีวงเล็บ ให้ตรวจสอบว่ามี L หรือ R อยู่ใน description หรือไม่
                 const sideChar = description.match(/\s([LR])$/i);
@@ -138,9 +124,7 @@ export class DrawingResolverHelper {
         return drawing;
     }
 
-    async getDrawingByIdTag(
-        serialNo: string,
-    ): Promise<{ controlNo: string; drawing: string }> {
+    async getDrawingByIdTag(serialNo: string): Promise<{ controlNo: string; drawing: string }> {
         let controlNo: string = null;
         const idtagLog: {
             status: boolean;
@@ -151,15 +135,11 @@ export class DrawingResolverHelper {
         });
 
         if (!idtagLog.status) {
-            throw new Error(
-                `IDTAG_EFAC_LOG with serial no ${serialNo} not found`,
-            );
+            throw new Error(`IDTAG_EFAC_LOG with serial no ${serialNo} not found`);
         }
 
         if (idtagLog.data.length > 1) {
-            throw new Error(
-                `Multiple IDTAG_EFAC_LOG entries found for serial no ${serialNo}`,
-            );
+            throw new Error(`Multiple IDTAG_EFAC_LOG entries found for serial no ${serialNo}`);
         }
 
         controlNo = idtagLog.data[0].CONTROL_NO;
@@ -176,9 +156,7 @@ export class DrawingResolverHelper {
             throw new Error('ไม่พบข้อมูล ID-Tag');
         }
 
-        const drawing = this.parser.normalizeDrawing(
-            result.data.F01R04?.trim(),
-        );
+        const drawing = this.parser.normalizeDrawing(result.data.F01R04?.trim());
         if (!drawing) {
             throw new Error('ไม่พบ Drawing ใน ID-Tag');
         }
@@ -215,9 +193,7 @@ export class DrawingResolverHelper {
                 ],
             });
         if (!s011mp.status) {
-            throw new Error(
-                `S011MP with order ${order} and item ${item} not found`,
-            );
+            throw new Error(`S011MP with order ${order} and item ${item} not found`);
         }
         // หา drawing ที่ตรงกับ control และไม่อยู่ใน delete list
         const matchdrawing: { drawing: string | null; order: string | null } =

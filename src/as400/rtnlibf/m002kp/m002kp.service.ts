@@ -3,11 +3,7 @@ import { ConectionService } from 'src/as400/conection/conection.service';
 import { convertJung } from 'src/common/utils/format.utils';
 import { Connection } from 'odbc';
 
-export function buildScheduleRows(
-    newOrder: string,
-    schedule: string,
-    priority: string,
-) {
+export function buildScheduleRows(newOrder: string, schedule: string, priority: string) {
     const mfgSchedule = convertJung(`20${schedule}`);
     if (!mfgSchedule) throw new Error(`Invalid Schedule: ${schedule}`);
 
@@ -31,11 +27,7 @@ export function buildScheduleRows(
     };
 }
 
-export function buildM002Row(
-    newOrder: string,
-    schedule: string,
-    claimSlipNo: string,
-) {
+export function buildM002Row(newOrder: string, schedule: string, claimSlipNo: string) {
     return {
         M2K02: newOrder,
         M2K03: String(newOrder).slice(6, 8),
@@ -92,9 +84,7 @@ export class M002kpService {
                 [newOrder],
             )) as any[];
             if (Number(existing[0]?.CNT || 0)) {
-                throw new Error(
-                    `${newOrder} already exists in ${library}.${table}`,
-                );
+                throw new Error(`${newOrder} already exists in ${library}.${table}`);
             }
             for (const [table, field, rows] of [
                 ['M008KP', 'M8K03', schedules.m008],
@@ -108,9 +98,7 @@ export class M002kpService {
                     [newOrder],
                 )) as any[];
                 if (Number(found[0]?.CNT || 0)) {
-                    throw new Error(
-                        `${newOrder} already exists in ${library}.${table}`,
-                    );
+                    throw new Error(`${newOrder} already exists in ${library}.${table}`);
                 }
             }
         }
@@ -144,12 +132,7 @@ export class M002kpService {
         };
     }
 
-    async previewInsert(
-        newOrder: string,
-        schedule: string,
-        priority: string,
-        claimSlipNo: string,
-    ) {
+    async previewInsert(newOrder: string, schedule: string, priority: string, claimSlipNo: string) {
         claimSlipNo = this.claimSlipNo(claimSlipNo);
         const schedules = buildScheduleRows(newOrder, schedule, priority);
         const m002 = [buildM002Row(newOrder, schedule, claimSlipNo)];
@@ -167,9 +150,7 @@ export class M002kpService {
             .trim()
             .toUpperCase();
         if (!claimSlipNo || claimSlipNo.length > 25) {
-            throw new Error(
-                'Claim Slip No. is required and must not exceed 25 characters',
-            );
+            throw new Error('Claim Slip No. is required and must not exceed 25 characters');
         }
         return claimSlipNo;
     }

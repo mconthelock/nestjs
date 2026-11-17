@@ -7,7 +7,7 @@ import { SearchSequenceOrgDto } from './dto/search-sequence-org.dto';
 
 @Injectable()
 export class SequenceOrgRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -21,8 +21,10 @@ export class SequenceOrgRepository extends BaseRepository {
             .select('seq.HEADNO', 'HEADNO')
             .where('seq.EMPNO = :empno', { empno })
             .andWhere(
-                'seq.SPOSCODE = (select SPOSCODE from AMECUSERALL where sEmpNo = :empno2)',
-                { empno2: empno },
+                'seq.SPOSCODE = (select SPOSCODE from WEBFORM.AMECUSERALL where SEMPNO = :empno2)',
+                {
+                    empno2: empno,
+                },
             )
             .orderBy('seq.CCO', 'ASC');
         if (selectFields && selectFields.length > 0) {
@@ -50,12 +52,12 @@ export class SequenceOrgRepository extends BaseRepository {
 
     async getSubordinates(empno: string) {
         const sql = `
-                 SELECT DISTINCT B.* FROM 
+                 SELECT DISTINCT B.* FROM
                     (
-                        SELECT * FROM SEQUENCEORG
+                        SELECT * FROM WEBFORM.SEQUENCEORG
                         START WITH HEADNO = :1 AND EMPNO != :2 CONNECT BY PRIOR EMPNO = HEADNO AND PRIOR CCO = CCO1
                     ) A
-                    JOIN AMECUSERALL B ON A.EMPNO = B.SEMPNO
+                    JOIN WEBFORM.AMECUSERALL B ON A.EMPNO = B.SEMPNO
                     WHERE B.SEMPNO != :3  AND B.CSTATUS = 1
                 `;
         return await this.manager.query(sql, [empno, empno, empno]);
@@ -65,7 +67,7 @@ export class SequenceOrgRepository extends BaseRepository {
         return await this.getRepository(SEQUENCEORG).find({ where: dto });
     }
 
-     async getByPosition(VORGNO: string, SPOSCODE: string) {
+    async getByPosition(VORGNO: string, SPOSCODE: string) {
         return await this.getRepository(SEQUENCEORG).findOne({
             where: {
                 VORGNO: VORGNO,
@@ -74,5 +76,4 @@ export class SequenceOrgRepository extends BaseRepository {
             relations: ['EMPINFO'],
         });
     }
-
 }

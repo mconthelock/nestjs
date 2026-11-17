@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PisService } from './pis.service';
 import { PisController } from './pis.controller';
@@ -13,7 +13,7 @@ import { M008KP } from 'src/common/Entities/datacenter/table/M008KP.entity';
 @Module({
     imports: [
         FileLoggerModule,
-        TypeOrmModule.forFeature([PisFiles, PisPages], 'workloadConnection'),
+        TypeOrmModule.forFeature([PisFiles, PisPages], 'mitsuConnection'),
         TypeOrmModule.forFeature([M008KP], 'datacenterConnection'),
     ],
     controllers: [PisController],

@@ -49,9 +49,7 @@ export class OslogsService {
                         user.USER_TYPE2 == 'System',
                 );
                 return results.filter((log) =>
-                    systemLogins.some(
-                        (user) => user.USER_LOGIN === log.LOG_USER,
-                    ),
+                    systemLogins.some((user) => user.USER_LOGIN === log.LOG_USER),
                 );
             case '3':
                 //Humnan
@@ -62,9 +60,7 @@ export class OslogsService {
                         user.USER_TYPE2 == 'Human',
                 );
                 return results.filter((log) =>
-                    humanLogins.some(
-                        (user) => user.USER_LOGIN === log.LOG_USER,
-                    ),
+                    humanLogins.some((user) => user.USER_LOGIN === log.LOG_USER),
                 );
             case '4':
                 //Special
@@ -76,32 +72,23 @@ export class OslogsService {
                         user.USER_TYPE1 == 'Temporary',
                 );
                 return results.filter((log) =>
-                    specialLogins.some(
-                        (user) => user.USER_LOGIN === log.LOG_USER,
-                    ),
+                    specialLogins.some((user) => user.USER_LOGIN === log.LOG_USER),
                 );
             case '5':
                 //Unknown
                 const knownLogins = osusers.filter(
-                    (user) =>
-                        user.SERVER_NAME == server && user.CATEGORY == 'OS',
+                    (user) => user.SERVER_NAME == server && user.CATEGORY == 'OS',
                 );
                 return results.filter(
-                    (log) =>
-                        !knownLogins.some(
-                            (user) => user.USER_LOGIN === log.LOG_USER,
-                        ),
+                    (log) => !knownLogins.some((user) => user.USER_LOGIN === log.LOG_USER),
                 );
             default:
                 if (server == 'AS400') {
                     const as400Logins = osusers.filter(
-                        (user) =>
-                            user.SERVER_NAME == server && user.CATEGORY == 'OS',
+                        (user) => user.SERVER_NAME == server && user.CATEGORY == 'OS',
                     );
                     return results.filter((log) =>
-                        as400Logins.some(
-                            (user) => user.USER_LOGIN === log.LOG_USER,
-                        ),
+                        as400Logins.some((user) => user.USER_LOGIN === log.LOG_USER),
                     );
                 }
                 return results;

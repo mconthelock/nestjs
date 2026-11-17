@@ -8,10 +8,10 @@ import { TermTrade } from 'src/common/Entities/pursys/table/TERM_TRADE.entity';
 @Injectable()
 export class TermcodeService {
     constructor(
-        @InjectRepository(TermPayment, 'purConnection')
+        @InjectRepository(TermPayment, 'mitsuConnection')
         private readonly payment: Repository<TermPayment>,
 
-        @InjectRepository(TermTrade, 'purConnection')
+        @InjectRepository(TermTrade, 'mitsuConnection')
         private readonly trade: Repository<TermTrade>,
     ) {}
 

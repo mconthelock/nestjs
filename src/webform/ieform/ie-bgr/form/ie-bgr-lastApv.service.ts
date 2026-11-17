@@ -37,10 +37,7 @@ export class IeBgrLastApvService extends IeBgrService {
             const flowtree = await this.flowService.getFlowTree(form);
             const emails: Array<string> = [];
             for (const f of flowtree) {
-                if (
-                    ['--', '04', '05', '06'].includes(f.CSTEPNO) &&
-                    !emails.includes(f.SRECMAIL)
-                ) {
+                if (['--', '04', '05', '06'].includes(f.CSTEPNO) && !emails.includes(f.SRECMAIL)) {
                     emails.push(f.SRECMAIL);
                 }
             }

@@ -1,10 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-    getBase64Image,
-    moveFileFromMulter,
-} from 'src/common/utils/files.utils';
+import { getBase64Image, moveFileFromMulter } from 'src/common/utils/files.utils';
 
 import { Application } from '../../common/Entities/docinv/table/application.entity';
 import { CreateApplicationDto } from './dto/create-application.dto';
@@ -32,7 +29,7 @@ export class ApplicationService {
     private readonly docinvDirectory = `${process.env.AMEC_FILE_PATH}${process.env.STATE}/docinv/`;
 
     constructor(
-        @InjectRepository(Application, 'docinvConnection')
+        @InjectRepository(Application, 'mitsuConnection')
         private readonly apps: Repository<Application>,
         private grp: AppsgroupsService,
     ) {}
@@ -54,9 +51,7 @@ export class ApplicationService {
 
     async create(
         data: CreateApplicationDto,
-        files: Partial<
-            Record<keyof typeof this.fileType, Express.Multer.File[]>
-        >,
+        files: Partial<Record<keyof typeof this.fileType, Express.Multer.File[]>>,
     ) {
         for (const key in files) {
             const file = files[key as keyof typeof this.fileType]?.[0];
@@ -88,9 +83,7 @@ export class ApplicationService {
     async update(
         id: number,
         data: UpdateApplicationDto,
-        files: Partial<
-            Record<keyof typeof this.fileType, Express.Multer.File[]>
-        >,
+        files: Partial<Record<keyof typeof this.fileType, Express.Multer.File[]>>,
     ) {
         const app = await this.apps.findOneBy({ APP_ID: id });
         if (!app) {

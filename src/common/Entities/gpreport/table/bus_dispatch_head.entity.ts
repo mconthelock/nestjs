@@ -1,7 +1,7 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+﻿import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BusDispatchLine } from './bus_dispatch_line.entity';
 
-@Entity({ name: 'BUS_DISPATCH_HEAD' })
+@Entity({ name: 'BUS_DISPATCH_HEAD', schema: 'GPREPORT' })
 export class BusDispatchHead {
     @PrimaryGeneratedColumn()
     DISPATCH_ID: number;

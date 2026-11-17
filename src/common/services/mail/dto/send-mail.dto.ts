@@ -1,10 +1,4 @@
-import {
-    IsString,
-    IsOptional,
-    IsArray,
-    ValidateNested,
-    IsNotEmpty,
-} from 'class-validator';
+import { IsString, IsOptional, IsArray, ValidateNested, IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 import { AttachmentDto } from './attachment.dto';
 

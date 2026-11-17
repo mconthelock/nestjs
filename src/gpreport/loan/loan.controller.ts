@@ -32,10 +32,7 @@ export class LoanController {
             limits: { fileSize: 20 * 1024 * 1024 },
         }),
     )
-    send(
-        @Body() dto: SendLoanMailDto,
-        @UploadedFile() file: Express.Multer.File,
-    ) {
+    send(@Body() dto: SendLoanMailDto, @UploadedFile() file: Express.Multer.File) {
         if (!file) throw new BadRequestException('Zip file is required');
         const isZip =
             file.originalname.toLowerCase().endsWith('.zip') &&

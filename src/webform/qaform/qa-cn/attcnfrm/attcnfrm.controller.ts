@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { AttcnfrmService } from './attcnfrm.service';
 import { CreateAttcnfrmDto } from './dto/create-attcnfrm.dto';
 import { UpdateAttcnfrmDto } from './dto/update-attcnfrm.dto';
@@ -31,10 +23,7 @@ export class AttcnfrmController {
     }
 
     @Patch(':id')
-    update(
-        @Param('id') id: string,
-        @Body() updateAttcnfrmDto: UpdateAttcnfrmDto,
-    ) {
+    update(@Param('id') id: string, @Body() updateAttcnfrmDto: UpdateAttcnfrmDto) {
         return this.attcnfrmService.update(+id, updateAttcnfrmDto);
     }
 

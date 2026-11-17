@@ -1,5 +1,6 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { FORM } from './FORM.entity';
+import { STEPMST } from './STEPMST.entity';
 
 @Entity({ name: 'FLOW', schema: 'WEBFORM' })
 export class FLOW {
@@ -84,4 +85,8 @@ export class FLOW {
         { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
     ])
     form: FORM;
+
+    @ManyToOne(() => STEPMST, (st) => st.step)
+    @JoinColumn([{ name: 'CSTEPNO', referencedColumnName: 'CNO' }])
+    steps: STEPMST[];
 }

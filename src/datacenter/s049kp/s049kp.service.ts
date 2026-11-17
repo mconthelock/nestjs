@@ -19,9 +19,7 @@ export class S049kpService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to find S049KP with order ${order}: ${error.message}`,
-            );
+            throw new Error(`Failed to find S049KP with order ${order}: ${error.message}`);
         }
     }
 }

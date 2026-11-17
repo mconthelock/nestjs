@@ -8,9 +8,7 @@ import { UpdateEbgreqattfileDto } from './dto/update-ebgreqattfile.dto';
 import { CreateEbgreqattfileDto } from './dto/create-ebgreqattfile.dto';
 @Injectable()
 export class EbgreqattfileRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('ebudgetConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -36,10 +34,7 @@ export class EbgreqattfileRepository extends BaseRepository {
 
     async update(dto: UpdateEbgreqattfileDto) {
         const { condition, ...updateData } = dto;
-        return await this.getRepository(EBGREQATTFILE).update(
-            condition,
-            updateData,
-        );
+        return await this.getRepository(EBGREQATTFILE).update(condition, updateData);
     }
 
     async delete(dto: UpdateEbgreqattfileDto) {

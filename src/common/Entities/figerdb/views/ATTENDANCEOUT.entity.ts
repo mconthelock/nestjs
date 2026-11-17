@@ -1,11 +1,4 @@
-import {
-    ViewEntity,
-    PrimaryColumn,
-    ViewColumn,
-    OneToOne,
-    JoinColumn,
-    OneToMany,
-} from 'typeorm';
+import { ViewEntity, PrimaryColumn, ViewColumn, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 
 @ViewEntity({
     name: 'HRSYSTEM_ATTENDANCE_OUT',

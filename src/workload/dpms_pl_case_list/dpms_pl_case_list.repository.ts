@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -8,7 +8,7 @@ import { DPMS_PL_CASE_REVISE_VGM } from 'src/common/Entities/workload/views/DPMS
 
 @Injectable()
 export class DpmsPlCaseListRepository extends BaseRepository {
-    constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -33,7 +33,7 @@ export class DpmsPlCaseListRepository extends BaseRepository {
     }
 
     getDataReviseVgmByRevId(revId: number) {
-         return this.getRepository(DPMS_PL_CASE_REVISE_VGM).find({
+        return this.getRepository(DPMS_PL_CASE_REVISE_VGM).find({
             where: { NISSUEREV_ID: revId },
             relations: ['DETAILS'], // ดึงข้อมูลรายละเอียดที่เกี่ยวข้องด้วย
             order: {
@@ -51,9 +51,9 @@ export class DpmsPlCaseListRepository extends BaseRepository {
     findPartialSelectionByRevId(revId: number) {
         return this.manager.query(
             `SELECT D.VCASE, D.VITEM, D.VDRAWING
-            FROM DPMS_PL_ISSUE_REV R
-            JOIN DPMS_PL_CASE_LIST L ON R.NID = L.NISSUEREV_ID 
-            JOIN DPMS_PL_CASE_LIST_DETAIL D ON L.NID = D.NCASELIST_ID 
+            FROM WORKLOAD.DPMS_PL_ISSUE_REV R
+            JOIN WORKLOAD.DPMS_PL_CASE_LIST L ON R.NID = L.NISSUEREV_ID 
+            JOIN WORKLOAD.DPMS_PL_CASE_LIST_DETAIL D ON L.NID = D.NCASELIST_ID 
             WHERE R.NID = :1`,
             [revId],
         );

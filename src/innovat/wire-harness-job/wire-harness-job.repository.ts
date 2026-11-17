@@ -7,9 +7,8 @@ import { WHN_PRODUCTION_PLAN } from 'src/common/Entities/innovat/table/WHN_PRODU
 
 @Injectable()
 export class WireHarnessJobRepository extends BaseRepository {
-   
     constructor(
-        @InjectDataSource('innovatConnection')
+        @InjectDataSource('mitsuConnection')
         private readonly ds: DataSource,
 
         private readonly as400: ConectionService,
@@ -19,8 +18,8 @@ export class WireHarnessJobRepository extends BaseRepository {
 
     getProductionPlan() {
         return this.as400.runQuery(`
-            SELECT * 
-            FROM 
+            SELECT *
+            FROM
             (
                 SELECT
                     F1.F01R01 AS CTRLNO,

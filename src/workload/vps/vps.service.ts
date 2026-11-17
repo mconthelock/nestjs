@@ -5,12 +5,16 @@ import { VpsRepository } from './vps.repository';
 import { InsertCartonDto, InsertListCartonDto } from './dto/insertCarton.dto';
 import { PKC_CARTON_DETAIL } from 'src/common/Entities/workload/table/PKC_CARTON_DETAIL.entity';
 import { S011mpService } from 'src/datacenter/s011mp/s011mp.service';
+import * as ExcelJS from 'exceljs';
+import { MailService } from 'src/common/services/mail/mail.service';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class VpsService {
     constructor(
         private readonly vpsRepository: VpsRepository,
         private readonly s011mpService: S011mpService,
+        private readonly mailService: MailService,
     ) {}
 
     async chkPrint(order: string, packing: string): Promise<boolean> {
@@ -49,13 +53,12 @@ export class VpsService {
         const now = new Date();
 
         // เช็คข้อมูลซ้ำทั้งหมดก่อน insert
-        const [chkOrder, chkItemMas, chkItemQty, chkPISinfo] =
-            await Promise.all([
-                this.vpsRepository.chkOrder(order, packing),
-                this.vpsRepository.chkItemMas(order, packing),
-                this.vpsRepository.chkItemQty(order, packing),
-                this.vpsRepository.chkPISinfo(order, subPacking),
-            ]);
+        const [chkOrder, chkItemMas, chkItemQty, chkPISinfo] = await Promise.all([
+            this.vpsRepository.chkOrder(order, packing),
+            this.vpsRepository.chkItemMas(order, packing),
+            this.vpsRepository.chkItemQty(order, packing),
+            this.vpsRepository.chkPISinfo(order, subPacking),
+        ]);
 
         console.log('chkOrder:', chkOrder);
         console.log('chkItemMas:', chkItemMas);
@@ -212,9 +215,7 @@ export class VpsService {
         const project = vpsDetail[0].S01M08;
         const sche = String(vpsDetail[0].SCHEDULE ?? '');
         const formattedSche =
-            sche.length >= 8
-                ? `${sche.substr(4, 2)}${sche.substr(6)}${sche.substr(2, 2)}`
-                : sche;
+            sche.length >= 8 ? `${sche.substr(4, 2)}${sche.substr(6)}${sche.substr(2, 2)}` : sche;
         const piscode = `${order.substr(1, order.length - 2)}${packing}`;
         const subPacking = `${packing.substr(0, 3)}-${packing.substr(3, 5)}`;
 
@@ -265,10 +266,7 @@ export class VpsService {
                 orderDetails[0].S01M06,
             );
 
-            orderDetails[0].REMARK = [
-                ...(remark ?? []),
-                ...(originalOrder ?? []),
-            ];
+            orderDetails[0].REMARK = [...(remark ?? []), ...(originalOrder ?? [])];
         } else {
             orderDetails[0].REMARK = remark && remark.length > 0 ? remark : '';
         }
@@ -278,8 +276,7 @@ export class VpsService {
             item: packing,
         });
 
-        const isSpecialPacking =
-            String(packing).endsWith('88') || String(packing).endsWith('89');
+        const isSpecialPacking = String(packing).endsWith('88') || String(packing).endsWith('89');
 
         const data = await Promise.all(
             (detail.data ?? []).map(async (details) => {
@@ -290,18 +287,13 @@ export class VpsService {
 
                 const dwgNo = details.S11M04?.replace(/\s/g, '') ?? '';
 
-                const purCode = await this.vpsRepository.getPURCode(
-                    order,
-                    dwgNo,
-                );
+                const purCode = await this.vpsRepository.getPURCode(order, dwgNo);
 
-                const masterPacking =
-                    await this.vpsRepository.getMasterPacking(dwgNo);
+                const masterPacking = await this.vpsRepository.getMasterPacking(dwgNo);
 
                 return {
                     ...details,
-                    MASTER_PACKING:
-                        masterPacking?.length > 0 ? masterPacking : '',
+                    MASTER_PACKING: masterPacking?.length > 0 ? masterPacking : '',
                     PUR_CODE: purCode?.length > 0 ? purCode[0].J2INO : '',
                 };
             }),
@@ -317,17 +309,9 @@ export class VpsService {
         return this.vpsRepository.insertCartonBox(dto.items);
     }
 
-    async getOrderReprint(
-        search: string | undefined,
-        page: string,
-        sect: string,
-    ) {
+    async getOrderReprint(search: string | undefined, page: string, sect: string) {
         const pageNum = Number(page) || 1;
-        const { rows, hasMore } = await this.vpsRepository.getOrderReprint(
-            search,
-            pageNum,
-            sect,
-        );
+        const { rows, hasMore } = await this.vpsRepository.getOrderReprint(search, pageNum, sect);
 
         // format ให้ตรงกับ Select2 (id/text)
         return {
@@ -369,11 +353,58 @@ export class VpsService {
             }),
         );
 
-        return {data : data};
+        return { data: data };
     }
 
     async checkQtyPrintBlock(order: string, block: string) {
         const data = await this.vpsRepository.checkQtyPrintBlock(order, block);
         return data;
+    }
+
+    private async buildImageErrorExcel(
+        rows: { PUR_CODE: string; IMAGE_NAME: string; ERROR_AT: Date }[],
+    ): Promise<Buffer> {
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet('Sheet1');
+        ws.columns = [
+            { header: 'PUR CODE', key: 'PUR_CODE', width: 14 },
+            { header: 'IMAGE_NAME', key: 'IMAGE_NAME', width: 24 },
+            { header: 'ERROR AT', key: 'ERROR_AT', width: 22 },
+        ];
+        ws.getRow(1).font = { bold: true };
+        ws.views = [{ state: 'frozen', ySplit: 1 }];
+        const thaiRows = rows.map((row) => ({
+            PUR_CODE: row.PUR_CODE,
+            IMAGE_NAME: row.IMAGE_NAME,
+            ERROR_AT: row.ERROR_AT
+                ? DateTime.fromJSDate(row.ERROR_AT)
+                      .setZone('Asia/Bangkok')
+                      .toFormat('yyyy-MM-dd HH:mm:ss')
+                : '',
+        }));
+        ws.addRows(thaiRows);
+        return Buffer.from(await wb.xlsx.writeBuffer());
+    }
+
+    async sendImageErrorReport(to: string[], cc?: string[], days = 7) {
+        const rows = await this.vpsRepository.getImageErrors();
+        if (!rows?.length) {
+            return { success: true, sent: false, count: 0 };
+        }
+
+        const buffer = await this.buildImageErrorExcel(rows);
+        const date = new Date().toISOString().slice(0, 10);
+
+        await this.mailService.sendMail({
+            to,
+            cc,
+            subject: `Maintenance parts “No picture” ${date}`,
+            html: `<div style="font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #000000;">
+                    <p>Dear All,</p>
+                    <p>Please find attached the weekly summary log of &ldquo;No picture&rdquo; cases from the Maintenance Parts Kitting program.</p>
+                </div>`,
+            attachments: [{ filename: `IMAGE_NOT_FOUND_${date}.xlsx`, content: buffer }],
+        });
+        return { success: true, sent: true, count: rows.length };
     }
 }

@@ -9,7 +9,7 @@ import { PURNVF_ADDRESS } from 'src/common/Entities/webform/table/PURNVF_ADDRESS
 
 @Injectable()
 export class PurnvfAddressRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

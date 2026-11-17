@@ -1,6 +1,6 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+﻿import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('EXPAT_TRAVEL')
+@Entity({ name: 'EXPAT_TRAVEL', schema: 'GPREPORT' })
 export class ExpatTravel {
     @PrimaryColumn()
     TRAVEL_ID: number;
@@ -22,7 +22,7 @@ export class ExpatTravel {
 
     @Column()
     ARRIVAL_DATE: Date;
-    
+
     @Column()
     UPDATE_DATE: Date;
 }

@@ -1,4 +1,4 @@
-import { ListPLDto } from "../dto/create-packing-list-issue.dto";
+import { ListPLDto } from '../dto/create-packing-list-issue.dto';
 
 export interface GenerateExcelParam {
     list: ListPLDto[];

@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InsertAndMoveHandleFileFormDto } from './dto/create-handle-file-form.dto';
-import {
-    deleteFile,
-    joinPaths,
-    moveFileFromMulter,
-} from 'src/common/utils/files.utils';
+import { deleteFile, joinPaths, moveFileFromMulter } from 'src/common/utils/files.utils';
 import { FormmstService } from '../formmst/formmst.service';
 import { FormService } from '../form/form.service';
 import { IsFileService } from '../isform/is-file/is-file.service';
@@ -48,14 +44,9 @@ export class HandleFileFormService {
             }
             let fileType: number | undefined;
             if (FILE_CODE) {
-                const fileTypeRes =
-                    await this.formAttachmentTypeService.findOneByCode(
-                        FILE_CODE,
-                    );
+                const fileTypeRes = await this.formAttachmentTypeService.findOneByCode(FILE_CODE);
                 if (!fileTypeRes.status) {
-                    throw new Error(
-                        `File type with code ${FILE_CODE} not found`,
-                    );
+                    throw new Error(`File type with code ${FILE_CODE} not found`);
                 }
                 fileType = fileTypeRes.data.NID;
             }
@@ -66,8 +57,7 @@ export class HandleFileFormService {
                 CYEAR2: dto.CYEAR2,
                 NRUNNO: dto.NRUNNO,
             };
-            const destination =
-                PATH ?? (await this.createDestinationPath(form, FORM_TYPE));
+            const destination = PATH ?? (await this.createDestinationPath(form, FORM_TYPE));
             const moved = await this.moveAndInsertFile({
                 files: Array.isArray(file) ? file : [file],
                 destination,
@@ -82,9 +72,7 @@ export class HandleFileFormService {
                 moved,
             };
         } catch (error) {
-            throw new Error(
-                `Insert File ${FORM_TYPE} Form Error => ${error.message}`,
-            );
+            throw new Error(`Insert File ${FORM_TYPE} Form Error => ${error.message}`);
         }
     }
 
@@ -101,9 +89,7 @@ export class HandleFileFormService {
             const nameOfForm = formmst.data.VANAME;
             const formNo = await this.formService.getFormno(form);
             if (!nameOfForm.startsWith(formType)) {
-                throw new Error(
-                    `Form ${nameOfForm} does not match expected form type ${formType}`,
-                );
+                throw new Error(`Form ${nameOfForm} does not match expected form type ${formType}`);
             }
             const destination = await joinPaths(
                 process.env.AMEC_FILE_PATH,
@@ -159,9 +145,7 @@ export class HandleFileFormService {
                 data: insertedFiles,
             };
         } catch (error) {
-            throw new Error(
-                `Move and Insert File ${formType} => ${error.message}`,
-            );
+            throw new Error(`Move and Insert File ${formType} => ${error.message}`);
         }
     }
 
@@ -175,9 +159,7 @@ export class HandleFileFormService {
             }
             return res.data;
         } catch (error) {
-            throw new Error(
-                `Insert File Record ${formType} : ${error.message}`,
-            );
+            throw new Error(`Insert File Record ${formType} : ${error.message}`);
         }
     }
 
@@ -187,14 +169,9 @@ export class HandleFileFormService {
         try {
             let fileType: number | undefined;
             if (FILE_CODE) {
-                const fileTypeRes =
-                    await this.formAttachmentTypeService.findOneByCode(
-                        FILE_CODE,
-                    );
+                const fileTypeRes = await this.formAttachmentTypeService.findOneByCode(FILE_CODE);
                 if (!fileTypeRes.status) {
-                    throw new Error(
-                        `File type with code ${FILE_CODE} not found`,
-                    );
+                    throw new Error(`File type with code ${FILE_CODE} not found`);
                 }
                 fileType = fileTypeRes.data.NID;
             }
@@ -235,10 +212,7 @@ export class HandleFileFormService {
                 const file = files.data.find((f) => f.FILE_ID === id);
                 if (file) {
                     await service.deleteFileByID(id);
-                    const destination = await joinPaths(
-                        file.FILE_PATH,
-                        file.FILE_FNAME,
-                    );
+                    const destination = await joinPaths(file.FILE_PATH, file.FILE_FNAME);
                     await deleteFile(destination);
                 }
             }
@@ -251,6 +225,8 @@ export class HandleFileFormService {
      * @author Sutthipong Tangmongkhoncharoen(24008)
      * @since 2026-10-12
      * @description Set the appropriate file service based on the form type code
+     * @param code
+     * @returns
      * @param code
      * @returns
      */

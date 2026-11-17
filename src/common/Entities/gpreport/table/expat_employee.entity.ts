@@ -1,8 +1,7 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+﻿import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('EXPAT_EMPLOYEE')
+@Entity({ name: 'EXPAT_EMPLOYEE', schema: 'GPREPORT' })
 export class ExpatEmployee {
-
     @PrimaryColumn()
     SEMPNO: string;
 
@@ -41,5 +40,4 @@ export class ExpatEmployee {
 
     @Column()
     LAST_90DAY_UPD_DATE: Date;
-
 }

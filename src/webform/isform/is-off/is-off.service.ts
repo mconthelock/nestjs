@@ -19,10 +19,10 @@ dayjs.extend(timezone);
 @Injectable()
 export class IsOffService {
     constructor(
-        @InjectRepository(LOGIN_REASON, 'webformConnection')
+        @InjectRepository(LOGIN_REASON, 'mitsuConnection')
         private readonly reason: Repository<LOGIN_REASON>,
 
-        @InjectRepository(ISOFF_VARIEDOFF, 'webformConnection')
+        @InjectRepository(ISOFF_VARIEDOFF, 'mitsuConnection')
         private readonly off: Repository<ISOFF_VARIEDOFF>,
     ) {}
 
@@ -46,9 +46,7 @@ export class IsOffService {
         // }
 
         if (startDate) {
-            const startOfDayBangkok = dayjs(startDate)
-                .tz('Asia/Bangkok')
-                .startOf('day');
+            const startOfDayBangkok = dayjs(startDate).tz('Asia/Bangkok').startOf('day');
             queryBuilder.andWhere('off.OFF_DATE >= :startDate', {
                 startDate: startOfDayBangkok.toDate(),
             });

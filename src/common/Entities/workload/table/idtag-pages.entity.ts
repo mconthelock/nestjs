@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
-@Entity('IDTAGS_PAGES')
+@Entity({ name: 'IDTAGS_PAGES', schema: 'WORKLOAD' })
 export class IdtagPages {
     @PrimaryColumn()
     FILES_ID: number;

@@ -21,7 +21,7 @@ import { ISDEV_INVESTMENT } from 'src/common/Entities/webform/table/ISDEV_INVEST
 
 @Injectable()
 export class IsDevFormRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

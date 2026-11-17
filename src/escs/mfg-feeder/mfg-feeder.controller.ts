@@ -9,29 +9,21 @@ import { DrawingBMResponseDto } from './dto/drawing-bm-response.dto';
 @ApiTags('ESCS MFG Feeder')
 @Controller('escs/mfg-feeder')
 export class MfgFeederController {
-    constructor(
-        private readonly service: MfgFeederService,
-    ) {}
+    constructor(private readonly service: MfgFeederService) {}
 
     @Get('info/:controlNo')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get feeder ID-Tag information by Control No.' })
     @ApiResponse({ status: 200, type: MfgFeederResponseDto })
-    async getInfo(
-        @Param() dto: GetIdTagDto,
-    ): Promise<MfgFeederResponseDto> {
-        return this.service.getInfo(
-            dto.controlNo,
-        );
+    async getInfo(@Param() dto: GetIdTagDto): Promise<MfgFeederResponseDto> {
+        return this.service.getInfo(dto.controlNo);
     }
 
     @Get('drawing-bm')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get BM drawing count' })
     @ApiResponse({ status: 200, type: DrawingBMResponseDto })
-    async getDrawingBM(
-        @Query() dto: GetDrawingBmDto,
-    ): Promise<DrawingBMResponseDto> {
+    async getDrawingBM(@Query() dto: GetDrawingBmDto): Promise<DrawingBMResponseDto> {
         return this.service.getDrawingBMCount(dto);
     }
 }

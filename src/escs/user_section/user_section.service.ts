@@ -4,9 +4,7 @@ import { UsersSectionRepository } from './user_section.repository';
 
 @Injectable()
 export class UsersSectionService {
-    constructor(
-        private readonly repo: UsersSectionRepository
-    ) {}
+    constructor(private readonly repo: UsersSectionRepository) {}
 
     getUserSecAll() {
         return this.repo.getUserSecAll();

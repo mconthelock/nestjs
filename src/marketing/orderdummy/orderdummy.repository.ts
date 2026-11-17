@@ -8,9 +8,7 @@ import { TMARKET_TEMP } from 'src/common/Entities/datacenter/table/TMARKET_TEMP.
 
 @Injectable()
 export class OrderdummyRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('datacenterConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('datacenterConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

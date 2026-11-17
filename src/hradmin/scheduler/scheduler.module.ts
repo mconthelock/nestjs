@@ -5,8 +5,8 @@ import { SchedulerController } from './scheduler.controller';
 import { Scheduler } from './entities/scheduler.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Scheduler], 'amecConnection')],
-  controllers: [SchedulerController],
-  providers: [SchedulerService],
+    imports: [TypeOrmModule.forFeature([Scheduler], 'datacenterConnection')],
+    controllers: [SchedulerController],
+    providers: [SchedulerService],
 })
 export class SchedulerModule {}

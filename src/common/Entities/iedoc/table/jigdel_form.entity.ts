@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 // The five-key foreign key to WEBFORM.FORM is managed by the database.
-@Entity({ name: 'JIGDEL_FORM' })
+@Entity({ name: 'JIGDEL_FORM', schema: 'IEDOC' })
 export class JigDelForm {
     @PrimaryColumn()
     NFRMNO: number;

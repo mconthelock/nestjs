@@ -9,7 +9,7 @@ import { UpdatePurVmmDto } from '../dto/update-pur-vmm.dto';
 
 @Injectable()
 export class PurvmmScmuserRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -26,13 +26,7 @@ export class PurvmmScmuserRepository extends BaseRepository {
         return (result.affected ?? 0) > 0;
     }
 
-    async getMaxId(
-        nfrmno: number,
-        vorgno: string,
-        cyear: string,
-        cyear2: string,
-        nrunno: number,
-    ) {
+    async getMaxId(nfrmno: number, vorgno: string, cyear: string, cyear2: string, nrunno: number) {
         const result = await this.getRepository(PURVMM_SCMUSR)
             .createQueryBuilder('usr')
             .select('MAX(usr.ID)', 'maxId')

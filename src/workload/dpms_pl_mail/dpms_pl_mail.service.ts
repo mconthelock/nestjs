@@ -8,10 +8,7 @@ export class DpmsPlMailService {
     constructor(private readonly repo: DpmsPlMailRepository) {}
     async create(dto: CreateDpmsPlMailDto) {
         try {
-            const res = await this.repo.create(
-                dto.VDISPLAY_NAME,
-                dto.VEMAIL_ADDRESS,
-            );
+            const res = await this.repo.create(dto.VDISPLAY_NAME, dto.VEMAIL_ADDRESS);
             if (!res) {
                 return {
                     status: false,
@@ -43,9 +40,7 @@ export class DpmsPlMailService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to retrieve email addresses: ${error.message}`,
-            );
+            throw new Error(`Failed to retrieve email addresses: ${error.message}`);
         }
     }
 

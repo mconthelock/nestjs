@@ -1,4 +1,4 @@
-import { TypeOrmModule } from '@nestjs/typeorm';
+﻿import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 
 import { OvertimeService } from './overtime.service';
@@ -9,12 +9,7 @@ import { OTFORM } from 'src/common/Entities/webform/table/OTFORM.entity';
 import { LR200P } from 'src/common/Entities/gpreport/views/LR200P.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [Overtime, LR200P, OTFORM],
-            'gpreportConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([Overtime, LR200P, OTFORM], 'mitsuConnection')],
     controllers: [OvertimeController],
     providers: [OvertimeService],
 })

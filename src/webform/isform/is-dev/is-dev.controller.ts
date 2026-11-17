@@ -1,33 +1,21 @@
-import {
-    Body,
-    Controller,
-    Get,
-    Post,
-    Req,
-    UseInterceptors,
-    UploadedFiles,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
 
 import { IsDevService } from './is-dev.service';
 import { CreateDeveloperDto } from './dto/create-developer.dto';
-import { UpdateDeveloperDto } from './dto/update-developer';
+import { UpdateDeveloperDto } from './dto/update-developer.dto';
 import { SearchIsDevDto } from './dto/search-is-dev.dto';
 import { CreateIsDevDto } from './dto/create-is-dev.dto';
 
 @ApiTags('IS-DEV')
 @Controller('form/is/is-dev')
 export class IsDevController {
-    private readonly path =
-        `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/PUR/PURVMM/` as string;
-
+    // private readonly path =
+    //     `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/PUR/PURVMM/` as string;
     constructor(private readonly dev: IsDevService) {}
 
     // ISDEV_REQUEST
@@ -37,26 +25,16 @@ export class IsDevController {
     }
 
     @Post('create')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
-    @UseInterceptors(
-        getFileUploadInterceptor([
-            { name: 'fileCer[]', maxCount: 10 },
-            { name: 'fileOther[]', maxCount: 10 },
-        ]),
-    )
+    @UseInterceptors(getFileUploadInterceptor())
     create(
-        @Body() dto: CreateIsDevDto,
-        @UploadedFiles()
-        files: {
-            'additional[]'?: Express.Multer.File[];
-        },
         @Req() req: Request,
+        @Body() dto: CreateIsDevDto,
+        @UploadedFiles() files?: Express.Multer.File[],
     ) {
-        // const ip = getClientIP(req);
-        // return this.dev.create(dto, files, ip, this.path);
-        console.log(dto);
-        return null;
+        const ip = getClientIP(req);
+        return this.dev.create(ip, dto, files);
     }
 
     // ISDEV_DEVELOPER: Set Developer

@@ -6,21 +6,21 @@ export class CountryOriginBulkListViewService {
     constructor(private readonly repo: CountryOriginBulkListViewRepository) {}
 
     async findAll() {
-        try{
+        try {
             const res = await this.repo.findAll();
-            if(res.length > 0){
+            if (res.length > 0) {
                 return {
                     status: true,
                     message: `Data found ${res.length} records`,
-                    data: res
-                }
+                    data: res,
+                };
             }
             return {
                 status: false,
                 message: 'No data found',
-            }
+            };
         } catch (error) {
-            throw new Error(error.message)
+            throw new Error(error.message);
         }
     }
 }

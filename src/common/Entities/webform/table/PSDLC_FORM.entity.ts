@@ -31,7 +31,7 @@ export class PSDLC_FORM {
     @Column()
     CHANGE_STATUS: string;
 
-    @Column({type: 'timestamp', nullable: true})
+    @Column({ type: 'timestamp', nullable: true })
     ACTUAL_DATE: Date;
 
     @Column()

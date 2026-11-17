@@ -1,4 +1,16 @@
-import { Controller, Post, Body, Req, Get, Query } from '@nestjs/common';
+import {
+    Controller,
+    Post,
+    Body,
+    Req,
+    Get,
+    Query,
+    UploadedFiles,
+    UseInterceptors,
+} from '@nestjs/common';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { MailService } from 'src/common/services/mail/mail.service';
+import { SendMailDto } from 'src/common/services/mail/dto/send-mail.dto';
 import { VpsService } from './vps.service';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
@@ -10,13 +22,48 @@ import { ReprintPackingOrderDto } from './dto/reprintPackingOrder.dto';
 
 @Controller('vps')
 export class VpsController {
-    constructor(private readonly vpsService: VpsService) {}
+    constructor(
+        private readonly vpsService: VpsService,
+        private readonly mailService: MailService,
+    ) {}
+
+    // multipart/form-data: to, cc, bcc, subject, html; every file field becomes an attachment
+    @Post('send-mail')
+    @UseInterceptors(AnyFilesInterceptor({ limits: { fileSize: 20 * 1024 * 1024 } }))
+    async sendMail(@Body() body: SendMailDto, @UploadedFiles() files: Express.Multer.File[]) {
+        const toList = (v?: string | string[]) =>
+            typeof v === 'string'
+                ? v
+                      .split(/[,;]/)
+                      .map((s) => s.trim())
+                      .filter(Boolean)
+                : v;
+        const attachments = (files ?? []).map((f) => ({
+            filename: Buffer.from(f.originalname, 'latin1').toString('utf8'),
+            content: f.buffer,
+        }));
+        await this.mailService.sendMail({
+            ...body,
+            to: toList(body.to),
+            cc: toList(body.cc),
+            bcc: toList(body.bcc),
+            attachments,
+        });
+        return { success: true };
+    }
+
+    @Post('send-image-error-report')
+    async sendImageErrorReport(@Body('to') to: string, @Body('cc') cc?: string) {
+        const toList = (v?: string) =>
+            v
+                ?.split(/[,;]/)
+                .map((s) => s.trim())
+                .filter(Boolean);
+        return this.vpsService.sendImageErrorReport(toList(to) ?? [], toList(cc));
+    }
 
     @Post('chk-print')
-    async chkPrint(
-        @Body('order') order: string,
-        @Body('packing') packing: string,
-    ) {
+    async chkPrint(@Body('order') order: string, @Body('packing') packing: string) {
         const found = await this.vpsService.chkPrint(order, packing);
 
         return {
@@ -25,10 +72,7 @@ export class VpsController {
     }
 
     @Post('last-print-history')
-    async lastPrintHistory(
-        @Body('order') order: string,
-        @Body('packing') packing: string,
-    ) {
+    async lastPrintHistory(@Body('order') order: string, @Body('packing') packing: string) {
         const data = await this.vpsService.lastPrintHistory(order, packing);
         return {
             data,
@@ -60,10 +104,7 @@ export class VpsController {
     }
 
     @Post('get-vps-detail')
-    async getVPSDetail(
-        @Body('order') order: string,
-        @Body('packing') packing: string,
-    ) {
+    async getVPSDetail(@Body('order') order: string, @Body('packing') packing: string) {
         const data = await this.vpsService.getVPSDetail(order, packing);
         return {
             success: true,
@@ -80,13 +121,7 @@ export class VpsController {
         @Req() req: Request,
     ) {
         const ip = getClientIP(req);
-        await this.vpsService.insertPrintVPS(
-            order,
-            packing,
-            qtyPrint,
-            empno,
-            ip,
-        );
+        await this.vpsService.insertPrintVPS(order, packing, qtyPrint, empno, ip);
         return {
             success: true,
         };
@@ -116,10 +151,7 @@ export class VpsController {
     }
 
     @Post('get-order-detail')
-    async getOrderDetail(
-        @Body('order') order: string,
-        @Body('packing') packing: string,
-    ) {
+    async getOrderDetail(@Body('order') order: string, @Body('packing') packing: string) {
         const data = await this.vpsService.getOrderDetail(order, packing);
 
         return {
@@ -138,11 +170,7 @@ export class VpsController {
 
     @Get('get-order-reprint')
     getOrderReprint(@Query() query: ReprintSearchDto) {
-        return this.vpsService.getOrderReprint(
-            query.search,
-            query.page,
-            query.sect,
-        );
+        return this.vpsService.getOrderReprint(query.search, query.page, query.sect);
     }
 
     @Get('get-packno-reprint')
@@ -161,10 +189,7 @@ export class VpsController {
     }
 
     @Post('check-qty-print-block')
-    async checkQtyPrintBlock(
-        @Body('order') order: string,
-        @Body('block') block: string,
-    ) {
+    async checkQtyPrintBlock(@Body('order') order: string, @Body('block') block: string) {
         const data = await this.vpsService.checkQtyPrintBlock(order, block);
         return {
             success: true,

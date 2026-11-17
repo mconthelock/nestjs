@@ -152,14 +152,14 @@ export class CreatePackingListIssueDto {
     @ValidateNested({ each: true, message: 'Each item in LIST must be a valid ListPLDto' })
     @Type(() => ListPLDto)
     LIST: ListPLDto[];
-    
+
     @IsNotEmpty()
     @ValidateNested({ each: true, message: 'Each item in PO LIST must be a valid ListPLDto' })
     @Type(() => ListPLDto)
     POLIST: ListPLDto[];
 
     @IsNotEmpty()
-    @IsBoolean()    
+    @IsBoolean()
     @ToBoolean()
     PO: boolean;
 
@@ -181,27 +181,27 @@ export class CreatePackingListIssueDto {
     VISSUEBY: string;
 
     @IsNotEmpty()
-    @IsBoolean()    
+    @IsBoolean()
     @ToBoolean()
     CHANGETYPE: boolean;
 
     @IsNotEmpty()
-    @IsBoolean()    
+    @IsBoolean()
     @ToBoolean()
     REVISE: boolean;
 
     @IsOptional()
-    @IsNumber()    
+    @IsNumber()
     @Type(() => Number)
     REVISEID: number;
 
     @IsNotEmpty()
-    @IsBoolean()    
+    @IsBoolean()
     @ToBoolean()
     CHANGELIST: boolean;
 
     @IsNotEmpty()
-    @IsBoolean()    
+    @IsBoolean()
     @ToBoolean()
     NEWLIST: boolean;
 }

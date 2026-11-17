@@ -5,9 +5,7 @@ import { WireHarnessDrumStockRepository } from './wire-harness-drum-stock.reposi
 
 @Injectable()
 export class WireHarnessDrumStockService {
-    constructor(
-        private readonly repo: WireHarnessDrumStockRepository,
-    ) {}
+    constructor(private readonly repo: WireHarnessDrumStockRepository) {}
 
     list(condition: FiltersDto) {
         return this.repo.list(condition);

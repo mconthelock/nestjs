@@ -12,8 +12,7 @@ export class ConectionService {
             return `DSN=${dsn};UID=${process.env.AS400_USER || ''};PWD=${process.env.AS400_PASSWORD || ''}`;
         }
 
-        const driver =
-            process.env.AS400_ODBC_DRIVER || 'iSeries Access ODBC Driver';
+        const driver = process.env.AS400_ODBC_DRIVER || 'iSeries Access ODBC Driver';
         const system = process.env.AS400_HOST || 'AMEC400';
         const uid = process.env.AS400_USER || 'OGGUSER';
         const pwd = process.env.AS400_PASSWORD || 'OGGUSER';
@@ -76,10 +75,7 @@ export class ConectionService {
         }
     }
 
-    async runQuery(
-        sql: string,
-        parameters: (string | number)[] = [],
-    ): Promise<any[]> {
+    async runQuery(sql: string, parameters: (string | number)[] = []): Promise<any[]> {
         const maxRetries = 2;
         let lastError: any;
 
@@ -92,22 +88,17 @@ export class ConectionService {
                 lastError = err;
 
                 // Log error details เพื่อ debug
-                console.error(
-                    `❌ Query error (attempt ${attempt}/${maxRetries}):`,
-                    {
-                        message: err?.message,
-                        name: err?.name,
-                        stack: err?.stack,
-                        odbcErrors: err?.odbcErrors,
-                        allKeys: Object.keys(err || {}),
-                    },
-                );
+                console.error(`❌ Query error (attempt ${attempt}/${maxRetries}):`, {
+                    message: err?.message,
+                    name: err?.name,
+                    stack: err?.stack,
+                    odbcErrors: err?.odbcErrors,
+                    allKeys: Object.keys(err || {}),
+                });
 
                 // ลอง reconnect ทุกครั้งที่ query error และยังมี retry เหลือ
                 if (attempt < maxRetries) {
-                    console.log(
-                        `🔄 Reconnecting and retrying (${attempt + 1}/${maxRetries})...`,
-                    );
+                    console.log(`🔄 Reconnecting and retrying (${attempt + 1}/${maxRetries})...`);
                     this.connection = null;
                     await new Promise((resolve) => setTimeout(resolve, 1000)); // รอ 1 วินาที
                     continue;
@@ -120,9 +111,7 @@ export class ConectionService {
         throw lastError;
     }
 
-    async withTransaction<T>(
-        work: (connection: odbc.Connection) => Promise<T>,
-    ): Promise<T> {
+    async withTransaction<T>(work: (connection: odbc.Connection) => Promise<T>): Promise<T> {
         const connection = await odbc.connect(this.getConnectionConfig());
         try {
             await connection.beginTransaction();

@@ -5,30 +5,33 @@ import { UpdatePurevaVendorRelationDto } from './dto/update-pureva_vendor_relati
 
 @Controller('pureva-vendor-relation')
 export class PurevaVendorRelationController {
-  constructor(private readonly purevaVendorRelationService: PurevaVendorRelationService) {}
+    constructor(private readonly purevaVendorRelationService: PurevaVendorRelationService) {}
 
-  @Post()
-  create(@Body() createPurevaVendorRelationDto: CreatePurevaVendorRelationDto) {
-    return this.purevaVendorRelationService.create(createPurevaVendorRelationDto);
-  }
+    @Post()
+    create(@Body() createPurevaVendorRelationDto: CreatePurevaVendorRelationDto) {
+        return this.purevaVendorRelationService.create(createPurevaVendorRelationDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.purevaVendorRelationService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.purevaVendorRelationService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.purevaVendorRelationService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.purevaVendorRelationService.findOne(+id);
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePurevaVendorRelationDto: UpdatePurevaVendorRelationDto) {
-    return this.purevaVendorRelationService.update(+id, updatePurevaVendorRelationDto);
-  }
+    @Patch(':id')
+    update(
+        @Param('id') id: string,
+        @Body() updatePurevaVendorRelationDto: UpdatePurevaVendorRelationDto,
+    ) {
+        return this.purevaVendorRelationService.update(+id, updatePurevaVendorRelationDto);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.purevaVendorRelationService.remove(+id);
-  }
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.purevaVendorRelationService.remove(+id);
+    }
 }

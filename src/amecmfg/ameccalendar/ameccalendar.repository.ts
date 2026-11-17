@@ -7,7 +7,7 @@ import { GetProdDto } from './dto/GetProd.dto';
 
 @Injectable()
 export class AmeccalendarRepository extends BaseRepository {
-    constructor(@InjectDataSource('amecConnection') ds: DataSource) {
+    constructor(@InjectDataSource('datacenterConnection') ds: DataSource) {
         super(ds);
     }
 
@@ -18,17 +18,12 @@ export class AmeccalendarRepository extends BaseRepository {
                 (subQuery) =>
                     subQuery
                         .select('calendar.SCHDNUMBER', 'SCHDNUMBER')
-                        .addSelect(
-                            'DENSE_RANK() OVER (ORDER BY calendar.WORKID DESC)',
-                            'MTHRANK',
-                        )
+                        .addSelect('DENSE_RANK() OVER (ORDER BY calendar.WORKID DESC)', 'MTHRANK')
                         .from(Ameccalendar, 'calendar')
                         .where('calendar.PRIORITY = :priority', {
                             priority: 'P1',
                         })
-                        .andWhere(
-                            `calendar.WORKID <= TO_NUMBER(TO_CHAR(SYSDATE, 'YYYYMMDD'))`,
-                        ),
+                        .andWhere(`calendar.WORKID <= TO_NUMBER(TO_CHAR(SYSDATE, 'YYYYMMDD'))`),
                 'ranked',
             )
             .where('"ranked"."MTHRANK" <= :num', { num: dto.num })
@@ -43,17 +38,12 @@ export class AmeccalendarRepository extends BaseRepository {
                 (subQuery) =>
                     subQuery
                         .select('calendar.SCHDNUMBER', 'SCHDNUMBER')
-                        .addSelect(
-                            'DENSE_RANK() OVER (ORDER BY calendar.WORKID ASC)',
-                            'MTHRANK',
-                        )
+                        .addSelect('DENSE_RANK() OVER (ORDER BY calendar.WORKID ASC)', 'MTHRANK')
                         .from(Ameccalendar, 'calendar')
                         .where('calendar.PRIORITY = :priority', {
                             priority: 'P1',
                         })
-                        .andWhere(
-                            `calendar.WORKID >= TO_NUMBER(TO_CHAR(SYSDATE, 'YYYYMMDD'))`,
-                        ),
+                        .andWhere(`calendar.WORKID >= TO_NUMBER(TO_CHAR(SYSDATE, 'YYYYMMDD'))`),
                 'ranked',
             )
             .where('"ranked"."MTHRANK" <= :num', { num: dto.num })

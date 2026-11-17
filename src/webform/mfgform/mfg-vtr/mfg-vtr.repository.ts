@@ -9,16 +9,13 @@ import { DataSource, In } from 'typeorm';
 @Injectable()
 export class MfgVtrRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        @InjectDataSource('purConnection') private purConnection: DataSource,
+        @InjectDataSource('mitsuConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') private purConnection: DataSource,
     ) {
         super(ds);
     }
 
-    async createRequest(
-        headData: Partial<MFGVTR_FORM>,
-        details: Array<Partial<MFGVTR_DETAIL>>,
-    ) {
+    async createRequest(headData: Partial<MFGVTR_FORM>, details: Array<Partial<MFGVTR_DETAIL>>) {
         console.log(headData, details);
         const head = await this.getRepository(MFGVTR_FORM).save(headData);
 
@@ -52,9 +49,7 @@ export class MfgVtrRepository extends BaseRepository {
         const products = await this.purConnection.getRepository(Products).find({
             where: { SPRODID: In(productIds) },
         });
-        const productMap = new Map(
-            products.map((product) => [product.SPRODID, product]),
-        );
+        const productMap = new Map(products.map((product) => [product.SPRODID, product]));
 
         return forms.map((form) => ({
             ...form,
@@ -88,16 +83,12 @@ export class MfgVtrRepository extends BaseRepository {
         }
 
         const productIds = [
-            ...new Set(
-                form.DETAILS.map((detail) => detail.PRODUCT_ID).filter(Boolean),
-            ),
+            ...new Set(form.DETAILS.map((detail) => detail.PRODUCT_ID).filter(Boolean)),
         ];
         const products = await this.purConnection.getRepository(Products).find({
             where: { SPRODID: In(productIds) },
         });
-        const productMap = new Map(
-            products.map((product) => [product.SPRODID, product]),
-        );
+        const productMap = new Map(products.map((product) => [product.SPRODID, product]));
 
         return {
             ...form,

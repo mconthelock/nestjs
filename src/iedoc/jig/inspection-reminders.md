@@ -4,32 +4,32 @@
 
 API ส่งอีเมลแยก 1 ฉบับต่อ 1 JIG โดยอ่าน `JIG_MASTER` เฉพาะ `JIG_STATUS = 'ACTIVE'` และ `NEXT_INSPEC_DATE` ไม่เป็น NULL เปรียบเทียบเฉพาะวันที่ ไม่รวมเวลา
 
-| ประเภท | เงื่อนไข |
-|---|---|
+| ประเภท   | เงื่อนไข                                                    |
+| -------- | ----------------------------------------------------------- |
 | Reminder | NEXT_INSPEC_DATE − วันที่ประมวลผล เท่ากับ 30, 14 หรือ 7 วัน |
-| Overdue | วันที่ประมวลผล > NEXT_INSPEC_DATE ส่งทุกวัน |
+| Overdue  | วันที่ประมวลผล > NEXT_INSPEC_DATE ส่งทุกวัน                 |
 
 วันครบกำหนดพอดีจะไม่ส่ง เมื่อการอนุมัติครบทำให้ระบบเดิมเปลี่ยน NEXT_INSPEC_DATE เป็นรอบใหม่ รายการจะไม่เข้าเงื่อนไข overdue เดิมอีก API นี้ไม่สร้างฟอร์ม และไม่แก้ไข master
 
 ตัวอย่าง NEXT_INSPEC_DATE = `01/11/2026`:
 
-| วันที่รัน | ผล |
-|---|---|
+| วันที่รัน  | ผล              |
+| ---------- | --------------- |
 | 02/10/2026 | Reminder 30 วัน |
 | 18/10/2026 | Reminder 14 วัน |
-| 25/10/2026 | Reminder 7 วัน |
-| 01/11/2026 | ไม่ส่ง |
-| 02/11/2026 | Overdue 1 วัน |
+| 25/10/2026 | Reminder 7 วัน  |
+| 01/11/2026 | ไม่ส่ง          |
+| 02/11/2026 | Overdue 1 วัน   |
 
 ## ผู้รับ TO / CC
 
 นำ `JIG_MASTER.PIC_EMPNO` เชื่อม `AMEC.AMECUSERALL.SEMPNO` เพื่ออ่าน Controller: `SNAME`, `SRECMAIL`, `SSECCODE`, `SDEPCODE`
 
-| ผู้รับ | วิธีค้น |
-|---|---|
-| TO | Controller.SRECMAIL |
-| CC1 | WEBFORM.ORGPOS ที่ VORGNO = Controller.SSECCODE และ VPOSNO = '30' |
-| CC2 | WEBFORM.ORGPOS ที่ VORGNO = Controller.SDEPCODE และ VPOSNO = '20' |
+| ผู้รับ | วิธีค้น                                                           |
+| ------ | ----------------------------------------------------------------- |
+| TO     | Controller.SRECMAIL                                               |
+| CC1    | WEBFORM.ORGPOS ที่ VORGNO = Controller.SSECCODE และ VPOSNO = '30' |
+| CC2    | WEBFORM.ORGPOS ที่ VORGNO = Controller.SDEPCODE และ VPOSNO = '20' |
 
 สำหรับ CC ใช้ `ORGPOS.VEMPNO` เชื่อม `AMECUSERALL.SEMPNO` เพื่ออ่าน `SRECMAIL` และ `SNAME` หากพบหลายคนในตำแหน่งนั้น จะรวมผู้รับที่พบทั้งหมด
 
@@ -42,12 +42,12 @@ Content-Type: application/json
 
 ใช้ base URL และข้อมูลยืนยันตัวตนตามระบบ API ที่ใช้งานอยู่
 
-| Property | Type | Required | รายละเอียด |
-|---|---|---|---|
-| date | string | ไม่บังคับ | DD/MM/YYYY ต้องเป็นวันที่มีจริง ไม่ส่ง = วันนี้ตาม Asia/Bangkok |
-| dryRun | boolean | ไม่บังคับ | true = ดูตัวอย่าง ไม่ส่งอีเมล ค่าเริ่มต้น false |
-| to | string[] | ไม่บังคับ | แทนที่ TO จากฐานข้อมูล ต้องมีอย่างน้อย 1 อีเมล |
-| cc | string[] | ไม่บังคับ | แทนที่ CC ทั้งหมด ใช้ [] เพื่อไม่ส่ง CC |
+| Property | Type     | Required  | รายละเอียด                                                      |
+| -------- | -------- | --------- | --------------------------------------------------------------- |
+| date     | string   | ไม่บังคับ | DD/MM/YYYY ต้องเป็นวันที่มีจริง ไม่ส่ง = วันนี้ตาม Asia/Bangkok |
+| dryRun   | boolean  | ไม่บังคับ | true = ดูตัวอย่าง ไม่ส่งอีเมล ค่าเริ่มต้น false                 |
+| to       | string[] | ไม่บังคับ | แทนที่ TO จากฐานข้อมูล ต้องมีอย่างน้อย 1 อีเมล                  |
+| cc       | string[] | ไม่บังคับ | แทนที่ CC ทั้งหมด ใช้ [] เพื่อไม่ส่ง CC                         |
 
 endpoint นี้รับ `to` / `cc` เป็น **Array เท่านั้น** แม้ MailService กลางรองรับ String ด้วย
 
@@ -69,9 +69,9 @@ endpoint นี้รับ `to` / `cc` เป็น **Array เท่านั�
 
 ```json
 {
-  "date": "02/10/2026",
-  "to": ["tester@example.com"],
-  "cc": []
+    "date": "02/10/2026",
+    "to": ["tester@example.com"],
+    "cc": []
 }
 ```
 
@@ -124,38 +124,54 @@ Overdue ใช้ Subject:
 
 ```json
 {
-  "asOf": "02/10/2026",
-  "dryRun": true,
-  "summary": { "total": 1, "sent": 0, "preview": 1, "skipped": 0, "failed": 0 },
-  "items": [{
-    "JIG_NO": "J26-001",
-    "daysUntilDue": 30,
-    "type": "REMINDER",
-    "status": "PREVIEW",
-    "originalRecipients": {
-      "to": {
-        "SEMPNO": "12345", "SNAME": "Controller Name",
-        "SRECMAIL": "controller@example.com",
-        "SSECCODE": "051403", "SDEPCODE": "051401"
-      },
-      "cc1": [{ "SEMPNO": "11111", "SNAME": "Section Manager", "SRECMAIL": "section@example.com" }],
-      "cc2": [{ "SEMPNO": "22222", "SNAME": "Department Manager", "SRECMAIL": "department@example.com" }]
-    },
-    "to": ["controller@example.com"],
-    "cc": ["section@example.com", "department@example.com"],
-    "subject": "[JIG Inspection] Reminder – Annual JIG Inspection Due Soon – 30 Days",
-    "html": "<p>Dear Controller,</p>...",
-    "issues": []
-  }]
+    "asOf": "02/10/2026",
+    "dryRun": true,
+    "summary": { "total": 1, "sent": 0, "preview": 1, "skipped": 0, "failed": 0 },
+    "items": [
+        {
+            "JIG_NO": "J26-001",
+            "daysUntilDue": 30,
+            "type": "REMINDER",
+            "status": "PREVIEW",
+            "originalRecipients": {
+                "to": {
+                    "SEMPNO": "12345",
+                    "SNAME": "Controller Name",
+                    "SRECMAIL": "controller@example.com",
+                    "SSECCODE": "051403",
+                    "SDEPCODE": "051401"
+                },
+                "cc1": [
+                    {
+                        "SEMPNO": "11111",
+                        "SNAME": "Section Manager",
+                        "SRECMAIL": "section@example.com"
+                    }
+                ],
+                "cc2": [
+                    {
+                        "SEMPNO": "22222",
+                        "SNAME": "Department Manager",
+                        "SRECMAIL": "department@example.com"
+                    }
+                ]
+            },
+            "to": ["controller@example.com"],
+            "cc": ["section@example.com", "department@example.com"],
+            "subject": "[JIG Inspection] Reminder – Annual JIG Inspection Due Soon – 30 Days",
+            "html": "<p>Dear Controller,</p>...",
+            "issues": []
+        }
+    ]
 }
 ```
 
-| Status | ความหมาย |
-|---|---|
-| PREVIEW | ตรวจผู้รับผ่าน แต่ไม่ส่งเพราะ dryRun |
-| SENT | MailService ส่งสำเร็จ ไม่มีผู้รับถูก SMTP ปฏิเสธ ไม่ใช่ยืนยันว่าเข้า Inbox แล้ว |
-| SKIPPED | ผู้รับไม่ครบหรืออีเมลไม่ถูกต้อง ดู issues |
-| FAILED | เกิดข้อผิดพลาด ดู error |
+| Status  | ความหมาย                                                                        |
+| ------- | ------------------------------------------------------------------------------- |
+| PREVIEW | ตรวจผู้รับผ่าน แต่ไม่ส่งเพราะ dryRun                                            |
+| SENT    | MailService ส่งสำเร็จ ไม่มีผู้รับถูก SMTP ปฏิเสธ ไม่ใช่ยืนยันว่าเข้า Inbox แล้ว |
+| SKIPPED | ผู้รับไม่ครบหรืออีเมลไม่ถูกต้อง ดู issues                                       |
+| FAILED  | เกิดข้อผิดพลาด ดู error                                                         |
 
 `originalRecipients` เก็บชื่อและอีเมลตามฐานข้อมูล ส่วน `to` / `cc` คือผู้รับหลัง override บางฟิลด์อาจไม่มีหากเกิดข้อผิดพลาดก่อนสร้างอีเมล
 
@@ -178,16 +194,16 @@ Overdue ใช้ Subject:
 
 ## การตั้งค่าและแก้ปัญหา
 
-ใช้ `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM` ของ MailService เดิม บัญชี `iedocConnection` อ่าน IEDOC.JIG_MASTER และ AMEC.AMECUSERALL ส่วนการค้น CC ใช้ entity ORGPOS ผ่าน `webformConnection` อ่าน WEBFORM.ORGPOS และ AMEC.AMECUSERALL ตามโมดูล ORGPOS เดิม
+ใช้ `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM` ของ MailService เดิม บัญชี `iedocConnection` อ่าน IEDOC.JIG_MASTER และ AMEC.AMECUSERALL ส่วนการค้น CC ใช้ entity ORGPOS ผ่าน `mitsuConnection` อ่าน WEBFORM.ORGPOS และ AMEC.AMECUSERALL ตามโมดูล ORGPOS เดิม
 
-| อาการ | ตรวจสอบ |
-|---|---|
-| total = 0 | ACTIVE, NEXT_INSPEC_DATE และวันที่รันเข้าเงื่อนไขหรือไม่ |
-| SKIPPED | issues, PIC_EMPNO, SRECMAIL, Section/Department และ ORGPOS |
-| FAILED | error, สิทธิ์ query, SMTP และการเชื่อมต่อ |
-| 400 | วันที่ อีเมล ชนิดข้อมูล หรือ property ที่ไม่รองรับ |
-| 409 | มี reminder run ทำงานอยู่ใน service instance เดียวกัน |
-| Job รันผิดเวลา | timezone ของ server/process และ runtime-jobs |
+| อาการ          | ตรวจสอบ                                                    |
+| -------------- | ---------------------------------------------------------- |
+| total = 0      | ACTIVE, NEXT_INSPEC_DATE และวันที่รันเข้าเงื่อนไขหรือไม่   |
+| SKIPPED        | issues, PIC_EMPNO, SRECMAIL, Section/Department และ ORGPOS |
+| FAILED         | error, สิทธิ์ query, SMTP และการเชื่อมต่อ                  |
+| 400            | วันที่ อีเมล ชนิดข้อมูล หรือ property ที่ไม่รองรับ         |
+| 409            | มี reminder run ทำงานอยู่ใน service instance เดียวกัน      |
+| Job รันผิดเวลา | timezone ของ server/process และ runtime-jobs               |
 
 ระบบไม่ได้เปลี่ยนผู้รับไป MAIL_ADMIN อัตโนมัติใน development ให้ใช้ dryRun หรือ override to และ cc สำหรับทดสอบ
 
@@ -240,14 +256,14 @@ Register ONE daily job through `POST /scheduler/create` (replace employee placeh
 
 ```json
 {
-  "NAME": "JIG inspection daily reminder",
-  "URL": "iedoc/jig/inspection-reminders",
-  "PARAMETES": "{}",
-  "CRON_EXPRESSION": "0 8 * * *",
-  "DESCRIPTION": "JIG reminder 30/14/7 days and daily overdue at 08:00",
-  "IS_ACTIVE": 1,
-  "INCHARGE": "<employee number>",
-  "CREATE_BY": "<employee number>"
+    "NAME": "JIG inspection daily reminder",
+    "URL": "iedoc/jig/inspection-reminders",
+    "PARAMETES": "{}",
+    "CRON_EXPRESSION": "0 8 * * *",
+    "DESCRIPTION": "JIG reminder 30/14/7 days and daily overdue at 08:00",
+    "IS_ACTIVE": 1,
+    "INCHARGE": "<employee number>",
+    "CREATE_BY": "<employee number>"
 }
 ```
 

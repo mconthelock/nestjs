@@ -8,9 +8,7 @@ import { CreateEbudgetQuotationDto } from './dto/create-ebudget-quotation.dto';
 
 @Injectable()
 export class EbudgetQuotationRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('ebudgetConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

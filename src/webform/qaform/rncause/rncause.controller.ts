@@ -18,7 +18,7 @@ export class RncauseController {
     }
 
     @Post('search')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     search(@Body() dto: FiltersDto) {
         return this.rncauseService.search(dto);
     }

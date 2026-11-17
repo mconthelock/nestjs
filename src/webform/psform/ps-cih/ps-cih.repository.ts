@@ -9,7 +9,7 @@ import { INV_CHECK_LOG } from 'src/common/Entities/skid/table/PSINV_CHECK_LOG.en
 
 @Injectable()
 export class PsCihRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 
@@ -29,13 +29,7 @@ export class PsCihRepository extends BaseRepository {
             ORDER BY ihr.GROUP_CODE,ihr.CONTROLLER_ID,ii.IABBT
         `;
 
-        const data = await this.manager.query(sql, [
-            NFRMNO,
-            VORGNO,
-            CYEAR,
-            CYEAR2,
-            NRUNNO,
-        ]);
+        const data = await this.manager.query(sql, [NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO]);
 
         const report_id = data?.[0]?.REPORT_ID;
 
@@ -86,10 +80,7 @@ export class PsCihRepository extends BaseRepository {
                     LAST_UPDATED: empno,
                     UPDATED_AT: () => 'SYSDATE',
                 };
-                return this.getRepository(INV_HALFYEAR_RESULT).update(
-                    keys,
-                    result,
-                );
+                return this.getRepository(INV_HALFYEAR_RESULT).update(keys, result);
             }),
         );
     }

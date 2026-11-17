@@ -14,9 +14,9 @@ import { CreateReportAuthDto } from './dto/create-auth.dto';
 @Injectable()
 export class ReportService {
     constructor(
-        @InjectRepository(ReportMaster, 'webformConnection')
+        @InjectRepository(ReportMaster, 'mitsuConnection')
         private readonly report: Repository<ReportMaster>,
-        @InjectRepository(ReportMasterAuth, 'webformConnection')
+        @InjectRepository(ReportMasterAuth, 'mitsuConnection')
         private readonly reportAuth: Repository<ReportMasterAuth>,
         private readonly usr: UsersService,
     ) {}
@@ -54,9 +54,7 @@ export class ReportService {
             where: { REPORT: id },
         });
         return users.map((user) => {
-            const userAuth = reportAuths.filter(
-                (a) => a.VEMPNO === user.SEMPNO,
-            );
+            const userAuth = reportAuths.filter((a) => a.VEMPNO === user.SEMPNO);
             return {
                 ...user,
                 auth: userAuth,

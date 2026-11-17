@@ -4,8 +4,6 @@ import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 import { IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
-
-
 export class UpdateGpGarDto extends PickType(doactionFlowDto, [
     'NFRMNO',
     'VORGNO',
@@ -18,7 +16,6 @@ export class UpdateGpGarDto extends PickType(doactionFlowDto, [
 ] as const) {
     @IsOptional()
     @IsString()
-    @Type(()=> String)
-    CONTROLLER? : string;
+    @Type(() => String)
+    CONTROLLER?: string;
 }
-

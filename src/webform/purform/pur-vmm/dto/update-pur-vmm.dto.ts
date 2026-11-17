@@ -1,12 +1,6 @@
 import { PartialType } from '@nestjs/swagger';
 import { RequestPurvmmFormDto } from './request-pur-vmm.dto';
-import {
-    IsArray,
-    IsNotEmpty,
-    IsNumber,
-    IsOptional,
-    IsString,
-} from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 
 export class UpdatePurVmmDto extends PartialType(RequestPurvmmFormDto) {
@@ -22,9 +16,7 @@ export class UpdatePurVmmDto extends PartialType(RequestPurvmmFormDto) {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    @Transform(({ value }) =>
-        value !== undefined && value !== null ? Number(value) : value,
-    )
+    @Transform(({ value }) => (value !== undefined && value !== null ? Number(value) : value))
     NFRMNO: number;
 
     @IsNotEmpty()
@@ -42,9 +34,7 @@ export class UpdatePurVmmDto extends PartialType(RequestPurvmmFormDto) {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)
-    @Transform(({ value }) =>
-        value !== undefined && value !== null ? Number(value) : value,
-    )
+    @Transform(({ value }) => (value !== undefined && value !== null ? Number(value) : value))
     NRUNNO: number;
 
     @IsArray()

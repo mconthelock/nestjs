@@ -89,10 +89,7 @@ export class PurNvfRequestService {
                         : user.SDEPCODE && user.SDEPCODE !== '00'
                           ? user.SDEPCODE
                           : user.SDIVCODE;
-                const pappflow = await this.pappFlowService.findFlowWithSteps(
-                    slevel,
-                    35,
-                );
+                const pappflow = await this.pappFlowService.findFlowWithSteps(slevel, 35);
                 if (
                     pappflow &&
                     pappflow.length > 0 &&
@@ -129,10 +126,7 @@ export class PurNvfRequestService {
                 PURPOSE: data.PURPOSE,
                 TYPEJOB: data.TYPEJOB,
                 SERVICE: data.SERVICE,
-                VENDCODE:
-                    data.REQTYPE === 'U' || data.REQTYPE === 'D'
-                        ? data.VENDORCODE
-                        : '',
+                VENDCODE: data.REQTYPE === 'U' || data.REQTYPE === 'D' ? data.VENDORCODE : '',
                 REASON: data.REQTYPE === 'D' ? data.REASON : '',
                 VENDTYPE: data.VENDOR_LOCATION,
                 COMNAME: data.COMPANY_NAME,

@@ -96,10 +96,8 @@ export const digitsNumber = function (n, digit) {
     if (!digit) digit = 0;
     n = intVal(n);
     n = n.toFixed(digit);
-    var str = n.toString().split('.');
-    var num1 = isNaN(str[0])
-        ? 0
-        : str[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
-    var num2 = str[1] === undefined ? '00' : str[1];
+    const str = n.toString().split('.');
+    const num1 = isNaN(str[0]) ? 0 : str[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+    const num2 = str[1] === undefined ? '00' : str[1];
     return digit == 0 ? num1 : num1 + '.' + num2;
 };

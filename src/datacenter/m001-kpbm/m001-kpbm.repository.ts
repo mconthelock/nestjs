@@ -7,9 +7,7 @@ import { M001KPBM } from 'src/common/Entities/datacenter/table/M001KPBM.entity';
 
 @Injectable()
 export class M001KpbmRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('datacenterConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('datacenterConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

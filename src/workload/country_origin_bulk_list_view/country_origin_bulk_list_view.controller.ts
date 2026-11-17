@@ -3,10 +3,10 @@ import { CountryOriginBulkListViewService } from './country_origin_bulk_list_vie
 
 @Controller('workload/country-origin/bulk-list')
 export class CountryOriginBulkListViewController {
-  constructor(private readonly service: CountryOriginBulkListViewService) {}
+    constructor(private readonly service: CountryOriginBulkListViewService) {}
 
-  @Get()
-  findAll() {
-    return this.service.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.service.findAll();
+    }
 }

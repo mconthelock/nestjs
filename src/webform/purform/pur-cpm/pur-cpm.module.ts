@@ -15,7 +15,7 @@ import { FlowmstModule } from 'src/webform/flowmst/flowmst.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([PURCPM_FORM], 'webformConnection'),
+        TypeOrmModule.forFeature([PURCPM_FORM], 'mitsuConnection'),
         FormmstModule,
         FormModule,
         FlowModule,
@@ -24,12 +24,7 @@ import { FlowmstModule } from 'src/webform/flowmst/flowmst.module';
         RepModule,
     ],
     controllers: [PurCpmController],
-    providers: [
-        PurCpmService,
-        PurCpmRequestService,
-        PurCpmReturnAprroveService,
-        PurCpmRepository,
-    ],
+    providers: [PurCpmService, PurCpmRequestService, PurCpmReturnAprroveService, PurCpmRepository],
     exports: [PurCpmService],
 })
 export class PurCpmModule {}

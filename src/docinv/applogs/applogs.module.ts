@@ -11,11 +11,8 @@ import { ScmappLog } from 'src/common/Entities/docinv/views/scmapp.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([AmecappLog], 'docinvConnection'),
-        TypeOrmModule.forFeature(
-            [IsoAppLog, ScmappLog, As400appLog],
-            'auditConnection',
-        ),
+        TypeOrmModule.forFeature([AmecappLog], 'mitsuConnection'),
+        TypeOrmModule.forFeature([IsoAppLog, ScmappLog, As400appLog], 'auditConnection'),
         SpecialuserModule,
     ],
     controllers: [ApplogsController],

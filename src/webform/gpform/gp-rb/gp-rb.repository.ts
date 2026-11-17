@@ -15,7 +15,7 @@ import { CreateStampReqDto } from './dto/create-gp-rb.dto';
 
 @Injectable()
 export class GpRbRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 
@@ -61,7 +61,7 @@ export class GpRbRepository extends BaseRepository {
 // สำหรับดึงข้อมูลแสดงในหน้า show-gp-rb by Plankton
 // @Injectable()
 // export class ShowstampGpRbRepository extends BaseRepository {
-//     constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+//     constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
 //         super(ds);
 //     }
 //     findAll() {
@@ -78,7 +78,7 @@ export class GpRbRepository extends BaseRepository {
 // สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton
 // @Injectable()
 // export class ShowCusStampGpRbRepository extends BaseRepository {
-//     constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+//     constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
 //         super(ds);
 //     }
 //     findAll() {

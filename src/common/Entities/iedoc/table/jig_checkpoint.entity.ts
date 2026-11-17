@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { JigMaster } from './jig_master.entity';
 
-@Entity({ name: 'JIG_CHECKPOINT' })
+@Entity({ name: 'JIG_CHECKPOINT', schema: 'IEDOC' })
 export class JigCheckpoint {
     @PrimaryColumn({ length: 20 })
     JIG_NO: string;

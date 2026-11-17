@@ -25,9 +25,7 @@ import * as oracledb from 'oracledb';
 async function bootstrap() {
     if (process.env.HOST != 'HOME') {
         oracledb.initOracleClient({
-            libDir:
-                process.env.ORACLE_CLIENT_LIB_DIR ||
-                'C:/oracle/instantclient_23_0', // ปรับ path ตามที่ติดตั้ง Oracle Instant Client
+            libDir: process.env.ORACLE_CLIENT_LIB_DIR || 'C:/oracle/instantclient_23_0', // ปรับ path ตามที่ติดตั้ง Oracle Instant Client
         });
     }
 
@@ -35,7 +33,11 @@ async function bootstrap() {
     const uploadPath = process.env.AMEC_FILE_PATH
         ? `${process.env.AMEC_FILE_PATH}/${process.env.STATE}/tmp/`
         : `./public/tmp/`;
-    await fs.mkdir(uploadPath, { recursive: true });
+    try {
+        await fs.mkdir(uploadPath, { recursive: true });
+    } catch (e) {
+        console.warn('Could not create upload directory:', uploadPath, e.message);
+    }
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
         // logger: false, // ปิด logger ของ NestJS เพื่อใช้ winston แทน
         logger: ['error', 'warn'], // เปิดเฉพาะ log ระดับ error และ warn ของ NestJS เพื่อให้ winston จัดการ log ทั้งหมด
@@ -92,10 +94,8 @@ async function bootstrap() {
 
                             const displayName = labelName || currentPath;
 
-                            const constraints = (
-                                Object.values(error.constraints) as string[]
-                            ).map((msg) =>
-                                msg.replace(error.property, displayName),
+                            const constraints = (Object.values(error.constraints) as string[]).map(
+                                (msg) => msg.replace(error.property, displayName),
                             );
 
                             result.push({
@@ -106,9 +106,7 @@ async function bootstrap() {
 
                         // มี nested error
                         if (error.children?.length) {
-                            result.push(
-                                ...formatErrors(error.children, currentPath),
-                            );
+                            result.push(...formatErrors(error.children, currentPath));
                         }
                     });
 
@@ -175,23 +173,25 @@ async function bootstrap() {
     app.useGlobalFilters(new AllExceptionsFilter(logger));
 
     // สร้าง config สำหรับ Swagger
-    const swaggerConfig = new DocumentBuilder()
-        .setTitle('AMEC API')
-        .setDescription('API documentation for AMEC API')
-        .setVersion(process.env.VERSION)
-        .addServer(process.env.APP_ENV)
-        //.addTag('Auth', 'ใช้สำหรับจัดการการเข้าสู่ระบบและระบบยืนยันตัวตน')
-        .addTag('IS-DEV', 'Manage a IS-DEV Request')
-        .build();
-    const document = SwaggerModule.createDocument(app, swaggerConfig);
-    //SwaggerModule.setup('apidocs', app, document);
-    app.use(
-        '/apidocs',
-        apiReference({
-            content: document,
-            theme: 'bluePlanet',
-        }),
-    );
+    if (process.env.NODE_ENV !== 'production' && process.env.ENABLE_SWAGGER === 'true') {
+        const swaggerConfig = new DocumentBuilder()
+            .setTitle('AMEC API')
+            .setDescription('API documentation for AMEC API')
+            .setVersion(process.env.VERSION)
+            .addServer(process.env.APP_ENV)
+            //.addTag('Auth', 'ใช้สำหรับจัดการการเข้าสู่ระบบและระบบยืนยันตัวตน')
+            .addTag('IS-DEV', 'Manage a IS-DEV Request')
+            .build();
+        const document = SwaggerModule.createDocument(app, swaggerConfig);
+        //SwaggerModule.setup('apidocs', app, document);
+        app.use(
+            '/apidocs',
+            apiReference({
+                content: document,
+                theme: 'bluePlanet',
+            }),
+        );
+    }
 
     // 🔗 ตั้ง WS adapter กลาง—ครอบทุก @WebSocketGateway
     const wsAdapter = new SocketIoAdapter(app);

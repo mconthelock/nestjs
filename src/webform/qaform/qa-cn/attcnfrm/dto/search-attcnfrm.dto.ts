@@ -1,11 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-    IsOptional,
-    IsString,
-    IsNumber,
-    IsArray,
-    IsDateString,
-} from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsArray, IsDateString } from 'class-validator';
 export class SearchAttCNFileDto {
     @Type(() => Number)
     @IsNumber()

@@ -1,12 +1,4 @@
-import {
-    ValidateIf,
-    IsInt,
-    Min,
-    Max,
-    IsString,
-    MaxLength,
-    Matches,
-} from 'class-validator';
+import { ValidateIf, IsInt, Min, Max, IsString, MaxLength, Matches } from 'class-validator';
 
 export class UpdatePilineMappingMstDto {
     @ValidateIf((_, value) => value !== undefined)

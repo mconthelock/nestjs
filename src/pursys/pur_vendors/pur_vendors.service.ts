@@ -9,9 +9,9 @@ import { PurVendor } from '../../common/Entities/pursys/table/pur_vendor.entity'
 @Injectable()
 export class PurVendorsService {
     constructor(
-        @InjectRepository(PurVendor, 'purConnection')
+        @InjectRepository(PurVendor, 'mitsuConnection')
         private purVendorRepo: Repository<PurVendor>,
-        @InjectDataSource('purConnection')
+        @InjectDataSource('mitsuConnection')
         private ds: DataSource,
     ) {}
     async create(dto: CreatePurVendorDto) {
@@ -36,10 +36,9 @@ export class PurVendorsService {
                         .where('LOWER(vendor.VND_NAME) LIKE LOWER(:KEYWORD)', {
                             KEYWORD: `%${KEYWORD}%`,
                         })
-                        .orWhere(
-                            'LOWER(vendor.VND_TNAME) LIKE LOWER(:KEYWORD)',
-                            { KEYWORD: `%${KEYWORD}%` },
-                        )
+                        .orWhere('LOWER(vendor.VND_TNAME) LIKE LOWER(:KEYWORD)', {
+                            KEYWORD: `%${KEYWORD}%`,
+                        })
                         .orWhere('LOWER(code.CODE_NUM) LIKE LOWER(:KEYWORD)', {
                             KEYWORD: `%${KEYWORD}%`,
                         });

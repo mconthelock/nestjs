@@ -17,7 +17,7 @@ export class CreateCountryConditionDto {
     CREATEBY: string;
 }
 
-export class DeleteCountryConditionDto extends PickType(
-    CreateCountryConditionDto,
-    ['COUNTRY', 'TYPE'] as const,
-) {}
+export class DeleteCountryConditionDto extends PickType(CreateCountryConditionDto, [
+    'COUNTRY',
+    'TYPE',
+] as const) {}

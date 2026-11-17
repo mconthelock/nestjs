@@ -1,4 +1,4 @@
-import { Get } from '@nestjs/common';
+﻿import { Get } from '@nestjs/common';
 import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { PilineMappingMstService } from './PILINE_MAPPING_MST.service';
@@ -15,20 +15,17 @@ export class PilineMappingMstController {
     }
 
     @Post()
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     create(@Body() dto: CreatePilineMappingMstDto) {
         return this.service.create(dto);
     }
     @Patch(':MAP_ID')
-    @UseTransaction('workloadConnection')
-    update(
-        @Param() key: KeyPilineMappingMstDto,
-        @Body() dto: UpdatePilineMappingMstDto,
-    ) {
+    @UseTransaction('mitsuConnection')
+    update(@Param() key: KeyPilineMappingMstDto, @Body() dto: UpdatePilineMappingMstDto) {
         return this.service.update(key, dto);
     }
     @Delete(':MAP_ID')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     remove(@Param() key: KeyPilineMappingMstDto) {
         return this.service.remove(key);
     }

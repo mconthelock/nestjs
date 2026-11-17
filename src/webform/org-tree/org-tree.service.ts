@@ -5,12 +5,10 @@ import { OrgTreeRepository } from './org-tree.repository';
 export class OrgTreeService {
     constructor(private readonly repo: OrgTreeRepository) {}
 
-    async getOrgTree(
-        orgno: string,
-        vposno: string,
-        empno: string,
-        emppos: string,
-    ) {
-        return await this.repo.getOrgTree(orgno, vposno, empno, emppos);
+    async getOrgTree(orgno: string, vposno: string, empno: string, emppos: string) {
+        if (process.env.HOST == 'AMEC') {
+            return await this.repo.getOrgTree(orgno, vposno, empno, emppos);
+        }
+        return await this.repo.getOrgTreeNosql(orgno, vposno, empno, emppos);
     }
 }

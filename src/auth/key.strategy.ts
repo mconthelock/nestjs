@@ -31,9 +31,7 @@ export class KeyStrategy extends PassportStrategy(Strategy, 'key') {
     async validate(req: Request, payload: any) {
         const user = await this.UsersService.findEmp(payload.sub);
         if (!user) {
-            throw new UnauthorizedException(
-                'You have no permission to access data.',
-            );
+            throw new UnauthorizedException('You have no permission to access data.');
         }
 
         // Sliding expiration: renew the cookie while the user keeps calling the API

@@ -9,7 +9,7 @@ import { QueryHandleFileFormDto } from 'src/webform/handle-file-form/dto/search-
 
 @Injectable()
 export class IsFileRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

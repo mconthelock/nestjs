@@ -18,9 +18,7 @@ export class EbudgetQuotationProductService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                'Insert EBUDGET_QUOTATION_PRODUCT Error: ' + error.message,
-            );
+            throw new Error('Insert EBUDGET_QUOTATION_PRODUCT Error: ' + error.message);
         }
     }
 

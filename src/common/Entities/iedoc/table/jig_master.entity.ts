@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: 'JIG_MASTER' })
+@Entity({ name: 'JIG_MASTER', schema: 'IEDOC' })
 export class JigMaster {
     @PrimaryColumn()
     JIG_NO: string;

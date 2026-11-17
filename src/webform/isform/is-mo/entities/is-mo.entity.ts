@@ -1,7 +1,7 @@
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 
-@Entity('OPRFORM')
+@Entity({ name: 'OPRFORM', schema: 'WEBFORM' })
 export class IsMo {
     @PrimaryColumn()
     NFRMNO: string;

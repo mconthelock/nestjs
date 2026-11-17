@@ -1,9 +1,4 @@
-import {
-    IsNotEmpty,
-    IsOptional,
-    IsString,
-    IsNumberString,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsNumberString } from 'class-validator';
 
 export class ReprintSearchDto {
     @IsOptional()

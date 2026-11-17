@@ -6,7 +6,7 @@ import { ORGTREE } from 'src/common/Entities/webform/table/ORGTREE.entity';
 import { OrgTreeRepository } from './org-tree.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ORGTREE], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([ORGTREE], 'mitsuConnection')],
     controllers: [OrgTreeController],
     providers: [OrgTreeService, OrgTreeRepository],
     exports: [OrgTreeService],

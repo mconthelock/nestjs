@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource, Like, Not } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { ORGTREE } from 'src/common/Entities/webform/table/ORGTREE.entity';
+import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
+import { SEQUENCEORG } from 'src/common/Entities/webform/table/SEQUENCEORG.entity';
 
 @Injectable()
 export class OrgTreeRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('webformConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -32,25 +32,20 @@ export class OrgTreeRepository extends BaseRepository {
         return qb.getMany();
     }
 
-    async getOrgTree(
-        orgno: string,
-        vposno: string,
-        empno: string,
-        emppos: string,
-    ) {
+    async getOrgTree(orgno: string, vposno: string, empno: string, emppos: string) {
         return this.manager.query(
             ` SELECT *
-        FROM ORGPOS
+        FROM WEBFORM.ORGPOS
         WHERE VORGNO IN (
         SELECT DISTINCT VORGNO
-        FROM ORGTREE
+        FROM WEBFORM.ORGTREE
         START WITH VORGNO = :1
         CONNECT BY VORGNO = PRIOR vParent
         )
         AND VPOSNO = :2
         AND VEMPNO IN (
         SELECT headNo
-        FROM sequenceOrg
+        FROM WEBFORM.SEQUENCEORG
         START WITH empNo = :3
             AND sPosCode = :4
             AND cCo = '0'
@@ -59,5 +54,61 @@ export class OrgTreeRepository extends BaseRepository {
         )`,
             [orgno, vposno, empno, emppos],
         );
+    }
+
+    async getOrgTreeNosql(orgno: string, vposno: string, empno: string, emppos: string) {
+        // 1. Traverse ancestor org numbers from ORGTREE
+        const orgNos: string[] = [orgno];
+        let currentOrg = orgno;
+        const visitedOrgs = new Set<string>([orgno]);
+
+        while (currentOrg && currentOrg !== '00000') {
+            const parent = await this.getRepository(ORGTREE).findOne({
+                where: { VORGNO: currentOrg },
+            });
+            if (
+                !parent ||
+                !parent.VPARENT ||
+                parent.VPARENT === '00000' ||
+                visitedOrgs.has(parent.VPARENT)
+            ) {
+                break;
+            }
+            visitedOrgs.add(parent.VPARENT);
+            orgNos.push(parent.VPARENT);
+            currentOrg = parent.VPARENT;
+        }
+
+        // 2. Traverse management chain from SEQUENCEORG
+        const headNos: string[] = [];
+        let currentEmp = empno;
+        let currentPos = emppos;
+        const visitedHeads = new Set<string>();
+
+        while (currentEmp) {
+            const seq = await this.manager.getRepository(SEQUENCEORG).findOne({
+                where: { EMPNO: currentEmp, SPOSCODE: currentPos, CCO: '0' },
+            });
+            if (!seq || !seq.HEADNO || visitedHeads.has(seq.HEADNO)) {
+                break;
+            }
+            visitedHeads.add(seq.HEADNO);
+            headNos.push(seq.HEADNO);
+            currentEmp = seq.HEADNO;
+            currentPos = seq.SPOSCODE1;
+        }
+
+        if (orgNos.length === 0 || headNos.length === 0) {
+            return [];
+        }
+
+        // 3. Find matching ORGPOS
+        return await this.manager.getRepository(ORGPOS).find({
+            where: {
+                VORGNO: In(orgNos),
+                VPOSNO: vposno,
+                VEMPNO: In(headNos),
+            },
+        });
     }
 }

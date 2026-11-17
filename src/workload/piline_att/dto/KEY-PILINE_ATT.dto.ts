@@ -11,9 +11,7 @@ export class KeyPilineAttDto {
     @Min(-99)
     @Max(99)
     @Transform(({ value }) =>
-        typeof value === 'string' && /^-?\d+$/.test(value)
-            ? Number(value)
-            : value,
+        typeof value === 'string' && /^-?\d+$/.test(value) ? Number(value) : value,
     )
     SEQ: number;
 

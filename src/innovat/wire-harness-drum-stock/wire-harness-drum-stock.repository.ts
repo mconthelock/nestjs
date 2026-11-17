@@ -11,7 +11,7 @@ import { ScrapDrumDto } from './dto/scrap-drum.dto';
 @Injectable()
 export class WireHarnessDrumStockRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('innovatConnection')
+        @InjectDataSource('mitsuConnection')
         private readonly ds: DataSource,
     ) {
         super(ds);
@@ -19,19 +19,13 @@ export class WireHarnessDrumStockRepository extends BaseRepository {
 
     list(condition: FiltersDto) {
         const allowedFields = ['ITEMCODE', 'LENREMAIN', 'DRUMTYPE', 'RECIVEDATE', 'GRPID'];
-        const qb = this.getRepository(WHN_DRUMSTOCK)
-            .createQueryBuilder('A');
+        const qb = this.getRepository(WHN_DRUMSTOCK).createQueryBuilder('A');
 
-        return this.applyFilters(
-            qb,
-            'A',
-            condition,
-            allowedFields,
-        )
-        .orderBy('A.LENREMAIN', 'ASC')
-        .addOrderBy('A.PRODNO', 'ASC')
-        .addOrderBy('A.DRUMID', 'ASC')
-        .getMany();
+        return this.applyFilters(qb, 'A', condition, allowedFields)
+            .orderBy('A.LENREMAIN', 'ASC')
+            .addOrderBy('A.PRODNO', 'ASC')
+            .addOrderBy('A.DRUMID', 'ASC')
+            .getMany();
     }
 
     scrapDrum(dto: ScrapDrumDto) {
@@ -51,15 +45,8 @@ export class WireHarnessDrumStockRepository extends BaseRepository {
 
     selectDrum(condition: FiltersDto) {
         const allowedFields = ['CTRLNO', 'RN'];
-        const qb = this.getRepository(WHN_DRUMORDER)
-            .createQueryBuilder('A');
+        const qb = this.getRepository(WHN_DRUMORDER).createQueryBuilder('A');
 
-        return this.applyFilters(
-            qb,
-            'A',
-            condition,
-            allowedFields,
-        )
-        .getOne();
+        return this.applyFilters(qb, 'A', condition, allowedFields).getOne();
     }
 }

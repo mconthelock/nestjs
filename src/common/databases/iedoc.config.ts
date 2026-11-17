@@ -8,7 +8,6 @@ import { TypeOrmWinstonLogger } from '../logger/typeorm-winston.logger';
 dotenv.config();
 
 let iedocConfig: TypeOrmModuleAsyncOptions;
-
 if (process.env.HOST == 'AMEC') {
     iedocConfig = {
         name: 'iedocConnection',
@@ -19,7 +18,8 @@ if (process.env.HOST == 'AMEC') {
             username: process.env.IEDOC_USER,
             password: process.env.IEDOC_PASSWORD,
             connectString: `${process.env.IEDOC_HOST}:${process.env.IEDOC_PORT}/${process.env.IEDOC_SERVICE}?expire_time=5`,
-            entities: [__dirname + '/../Entities/iedoc/**/*.entity{.ts,.js}'],
+            //entities: [__dirname + '/../Entities/iedoc/**/*.entity{.ts,.js}'],
+            autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),
             retryAttempts: 5,

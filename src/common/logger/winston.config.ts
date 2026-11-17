@@ -70,11 +70,7 @@ const skipSelectQuery = winston.format((info) => {
 });
 
 const skipBlankReqID = winston.format((info) => {
-    if (
-        info.requestId === undefined ||
-        info.requestId === null ||
-        info.requestId === ''
-    ) {
+    if (info.requestId === undefined || info.requestId === null || info.requestId === '') {
         return false;
     }
     return info;
@@ -102,8 +98,7 @@ const onlyError = winston.format((info) => {
 });
 
 const onlyDebug = winston.format((info) => {
-    if (info.level === 'debug' && info.logType && info.logType === 'debug')
-        return info;
+    if (info.level === 'debug' && info.logType && info.logType === 'debug') return info;
     return false;
 });
 
@@ -141,25 +136,19 @@ export const winstonConfig = {
                 addRequestId(),
                 ignoreTypeOrmEntities(),
                 skipBlankReqID(),
-                winston.format.printf(
-                    ({ level, message, timestamp, requestId, ...meta }) => {
-                        if (level !== 'error')
-                            return `[${chalk.gray(timestamp)}] [${level}][req:${chalk.yellow(requestId || '-')}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
-                        else {
-                            let output = `[${chalk.gray(timestamp)}] [${level}][req:${chalk.yellow(requestId || '-')}]`;
-                            output += `\n${message}`.replace(
-                                '[object Object]',
-                                '',
-                            );
-                            for (const [key, value] of Object.entries(meta)) {
-                                const colorFn =
-                                    keyColors[key] || ((txt) => txt);
-                                output += `\n${chalk.yellow(key + ':')} ${colorFn(value)}`;
-                            }
-                            return `${output}`;
+                winston.format.printf(({ level, message, timestamp, requestId, ...meta }) => {
+                    if (level !== 'error')
+                        return `[${chalk.gray(timestamp)}] [${level}][req:${chalk.yellow(requestId || '-')}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
+                    else {
+                        let output = `[${chalk.gray(timestamp)}] [${level}][req:${chalk.yellow(requestId || '-')}]`;
+                        output += `\n${message}`.replace('[object Object]', '');
+                        for (const [key, value] of Object.entries(meta)) {
+                            const colorFn = keyColors[key] || ((txt) => txt);
+                            output += `\n${chalk.yellow(key + ':')} ${colorFn(value)}`;
                         }
-                    },
-                ),
+                        return `${output}`;
+                    }
+                }),
                 winston.format.colorize({ all: true }),
             ),
         }),

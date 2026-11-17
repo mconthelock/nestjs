@@ -5,11 +5,8 @@ import { BeneficiaryRepository } from './beneficiary.repository';
 
 @Injectable()
 export class BeneficiaryService {
-    constructor(
-        private readonly beneficiaryRepository: BeneficiaryRepository,
-    ) {}
+    constructor(private readonly beneficiaryRepository: BeneficiaryRepository) {}
     getDetail(id: string) {
-        
         return this.beneficiaryRepository.getDetail(id);
     }
 }

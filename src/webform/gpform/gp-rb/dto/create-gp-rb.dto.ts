@@ -1,12 +1,6 @@
 import { IntersectionType, PickType, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-    IsEnum,
-    IsNotEmpty,
-    IsNumber,
-    IsOptional,
-    IsString,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 

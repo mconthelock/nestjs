@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -7,42 +7,42 @@ import { ORIGIN_MASTER_MAR_VIEW } from 'src/common/Entities/workload/views/ORIGI
 
 @Injectable()
 export class OriginMasterMarViewRepository extends BaseRepository {
-    constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     find(data: SearchOriginMasterMarViewDto[]) {
         const qb = this.getRepository(ORIGIN_MASTER_MAR_VIEW).createQueryBuilder('O');
-        if(data.length > 0) {
+        if (data.length > 0) {
             const condition = {
-                OR: []
+                OR: [],
             };
-            for(const d of data) {
+            for (const d of data) {
                 const and = [];
-                if(d.DRAWING) {
+                if (d.DRAWING) {
                     and.push({
                         field: 'DRAWING',
                         op: 'like',
-                        value: d.DRAWING
+                        value: d.DRAWING,
                     });
                 }
-                if(d.ITEMNO) {
+                if (d.ITEMNO) {
                     and.push({
                         field: 'ITEMNO',
                         op: 'eq',
-                        value: d.ITEMNO
+                        value: d.ITEMNO,
                     });
                 }
-                if(d.PARTNAME) {
+                if (d.PARTNAME) {
                     and.push({
                         field: 'PARTNAME',
                         op: 'like',
-                        value: d.PARTNAME
+                        value: d.PARTNAME,
                     });
                 }
-                if(and.length > 0) {
+                if (and.length > 0) {
                     condition.OR.push({
-                        AND: and
+                        AND: and,
                     });
                 }
             }
@@ -54,5 +54,4 @@ export class OriginMasterMarViewRepository extends BaseRepository {
             .addOrderBy('O.PURCODE', 'ASC');
         return qb.getMany();
     }
-    
 }

@@ -10,7 +10,7 @@ import { CNITMINCHARGE } from 'src/common/Entities/webform/table/CNITMINCHARGE.e
 
 @Injectable()
 export class CnFormRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -77,15 +77,12 @@ export class CnFormRepository extends BaseRepository {
             ])
             // 2. อ้างอิงตัวแปรเป็น CNF ตัวพิมพ์ใหญ่
             .addSelect("REGEXP_SUBSTR(CNF.RSNOTHER, 'F[0-9]+')", 'FIRSTNO')
-            .addSelect(
-                "REGEXP_SUBSTR(CNF.DETTRANS, 'shop at\\s*(.*)', 1, 1, NULL, 1)",
-                'SHOPNO',
-            )
+            .addSelect("REGEXP_SUBSTR(CNF.DETTRANS, 'shop at\\s*(.*)', 1, 1, NULL, 1)", 'SHOPNO')
 
             // 3. เปลี่ยนชื่อย่อตาราง JOIN เป็น CNJ และ CHK ตัวพิมพ์ใหญ่
-            .leftJoin('CNJUDGEMENT', 'CNJ', 'CNJ.JDGMNTNO = CNF.JDGMNTNO')
+            .leftJoin('(SELECT * FROM WEBFORM.CNJUDGEMENT)', 'CNJ', 'CNJ.JDGMNTNO = CNF.JDGMNTNO')
             .innerJoin(
-                'RESULTCHKDWG',
+                '(SELECT * FROM WEBFORM.RESULTCHKDWG)',
                 'CHK',
                 `CHK.NFRMNO = CNF.NFRMNO
             AND CHK.VORGNO = CNF.VORGNO
@@ -103,8 +100,8 @@ export class CnFormRepository extends BaseRepository {
 
             .getRawMany();
     }
-
     async getApvEmail(dto: FormDto, type: string): Promise<any[]> {
+        // ใช้ Object ส่ง Parameter แบบ QueryBuilder สบายๆ ไม่ต้องสนลำดับ
         const baseConditions = {
             nfrmno: dto.NFRMNO,
             vorgno: dto.VORGNO,
@@ -121,31 +118,33 @@ export class CnFormRepository extends BaseRepository {
             .where("E.CSTATUS = '1'");
 
         if (type === 'PIC') {
-            qb.innerJoin(`(
-                    SELECT F.VAPVNO  AS EMPNO FROM FLOW F
+            qb.innerJoin(
+                `(
+                    SELECT F.VAPVNO  AS EMPNO FROM WEBFORM.FLOW F
                     WHERE F.NFRMNO = :nfrmno AND F.VORGNO = :vorgno
                       AND F.CYEAR = :cyear AND F.CYEAR2 = :cyear2 AND F.NRUNNO = :nrunno
                       AND F.CSTEPNO = '--'
                     UNION
-                    SELECT F.VREPNO FROM FLOW F
+                    SELECT F.VREPNO FROM WEBFORM.FLOW F
                     WHERE F.NFRMNO = :nfrmno AND F.VORGNO = :vorgno
                       AND F.CYEAR = :cyear AND F.CYEAR2 = :cyear2 AND F.NRUNNO = :nrunno
                       AND F.CSTEPNO = '--'
                     UNION
-                    SELECT C.ENG FROM CNSHOPPIC C
+                    SELECT C.ENG FROM WEBFORM.CNSHOPPIC C
                     WHERE C.FM IN (
-                        SELECT F2.VAPVNO FROM FLOW F2
+                        SELECT F2.VAPVNO FROM WEBFORM.FLOW F2
                         WHERE F2.NFRMNO = :nfrmno AND F2.VORGNO = :vorgno
                           AND F2.CYEAR = :cyear AND F2.CYEAR2 = :cyear2 AND F2.NRUNNO = :nrunno
                           AND F2.CEXTDATA = '06'
                     )
-                )`, 'P', 'P.EMPNO = E.SEMPNO');
+                )`,
+                'P',
+                'P.EMPNO = E.SEMPNO',
+            );
         } else {
-            // -------------------------------------------------------------
-            // 📍 จุดที่เปลี่ยน: หาอีเมลจาก VAPVNO หรือ VREPNO แทน VREALAPV
-            // -------------------------------------------------------------
+            // 👇 ใช้ Sub-query เพื่อแก้ปัญหา Alias โดยไม่ต้องหนีไปเขียน Raw SQL
             qb.innerJoin(
-                'FLOW',
+                '(SELECT * FROM WEBFORM.FLOW)',
                 'F',
                 '(F.VAPVNO = E.SEMPNO OR F.VREPNO = E.SEMPNO)',
             )
@@ -164,17 +163,12 @@ export class CnFormRepository extends BaseRepository {
             }
         }
 
+        // โยน Parameter เข้าไปตูมเดียวจบ TypeORM จะ Map เข้ากับเงื่อนไขทั้งหมดให้เอง
         qb.setParameters(baseConditions);
-
-        // --- ลบ Debug ทิ้งได้เลยถ้าทำงานปกติแล้ว ---
-        // console.log('--- GENERATED SQL ---');
-        // console.log(qb.getSql());
-        // console.log('--- PARAMETERS ---');
-        // console.log(qb.getParameters());
-        // --------------------------------
 
         return await qb.getRawMany();
     }
+
     async executeRawSql(sql: string, params: any[]): Promise<any[]> {
         // console.log('DATABASE:', this.manager.connection.options);
         // const res = await this.manager.query(

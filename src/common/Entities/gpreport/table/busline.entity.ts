@@ -1,28 +1,26 @@
-import { Column, Entity, OneToMany, PrimaryColumn, JoinColumn } from 'typeorm';
+﻿import { Column, Entity, OneToMany, PrimaryColumn, JoinColumn } from 'typeorm';
 import { Busroute } from './busroute.entity';
 
-@Entity('BUS_LINE')
+@Entity({ name: 'BUS_LINE', schema: 'GPREPORT' })
 export class Busline {
-  @PrimaryColumn()
-  BUSID: number;
+    @PrimaryColumn()
+    BUSID: number;
 
-  @Column()
-  BUSNAME: string;
+    @Column()
+    BUSNAME: string;
 
-  @Column()
-  BUSTYPE: string;
+    @Column()
+    BUSTYPE: string;
 
-  @Column()
-  BUSSTATUS: string;
+    @Column()
+    BUSSTATUS: string;
 
-  @Column()
-  BUSSEAT: number;
+    @Column()
+    BUSSEAT: number;
 
-  @Column()
-  IS_CHONBURI: string;
+    @Column()
+    IS_CHONBURI: string;
 
-  @OneToMany(()=> Busroute ,(b) => b.busmaster)
-  busmst : Busroute[];
-
-
+    @OneToMany(() => Busroute, (b) => b.busmaster)
+    busmst: Busroute[];
 }

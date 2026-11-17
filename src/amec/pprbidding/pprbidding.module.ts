@@ -6,7 +6,7 @@ import { PPRBIDDING } from 'src/common/Entities/amec/table/PPRBIDDING.entity';
 import { PprbiddingRepository } from './pprbidding.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([PPRBIDDING], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([PPRBIDDING], 'mitsuConnection')],
     controllers: [PprbiddingController],
     providers: [PprbiddingService, PprbiddingRepository],
     exports: [PprbiddingService],

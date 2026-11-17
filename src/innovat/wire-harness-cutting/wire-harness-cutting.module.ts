@@ -21,12 +21,7 @@ import { WHN_AUTOPLAN } from 'src/common/Entities/innovat/views/WHN_AUTOPLAN.ent
     //         WHN_AUTOPLAN,
     //     ], 'mitsuConnection'),
     // ],
-    controllers: [
-        WireHarnessCuttingController,
-    ],
-    providers: [
-        WireHarnessCuttingService,
-        WireHarnessCuttingRepository,
-    ],
+    controllers: [WireHarnessCuttingController],
+    providers: [WireHarnessCuttingService, WireHarnessCuttingRepository],
 })
 export class WireHarnessCuttingModule {}

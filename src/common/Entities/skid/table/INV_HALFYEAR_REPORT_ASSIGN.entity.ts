@@ -21,4 +21,3 @@ export class INV_HALFYEAR_REPORT_ASSIGN {
     @JoinColumn([{ name: 'ASSIGN_ID', referencedColumnName: 'ASSIGN_ID' }])
     PSCI_FORM: PSCI_FORM;
 }
-

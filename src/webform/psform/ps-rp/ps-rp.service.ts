@@ -24,12 +24,9 @@ export class PsRPService {
             console.log(dto);
 
             // ดึงข้อมูล Form Master
-            const formmst =
-                await this.formmstService.getFormMasterByVaname('PS-CRP');
+            const formmst = await this.formmstService.getFormMasterByVaname('PS-CRP');
             if (!formmst) {
-                throw new Error(
-                    'Form master not found for PS-RP. Check FORMMST table.',
-                );
+                throw new Error('Form master not found for PS-RP. Check FORMMST table.');
             }
 
             // สร้าง Form
@@ -48,9 +45,7 @@ export class PsRPService {
             // ตรวจสอบผลการสร้าง Form
             if (!createForm?.status) {
                 const errMsg =
-                    createForm?.message?.message ||
-                    createForm?.message ||
-                    'Unknown error';
+                    createForm?.message?.message || createForm?.message || 'Unknown error';
                 throw new Error(`Form creation failed: ${errMsg}`);
             }
             const form = {

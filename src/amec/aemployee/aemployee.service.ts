@@ -1,45 +1,45 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AEmployee } from './entities/aemployee.entity';
+import { AEmployee } from '../../common/Entities/amec/table/AEMPLOYEE.entity';
 import { CreateAemployeeDto } from './dto/create-aemployee.dto';
 import { UpdateAemployeeDto } from './dto/update-aemployee.dto';
 
 @Injectable()
 export class AemployeeService {
     constructor(
-        @InjectRepository(AEmployee, 'amecConnection')
-        private readonly aemployeeRepository: Repository<AEmployee>,
+        @InjectRepository(AEmployee, 'mitsuConnection')
+        private readonly emp: Repository<AEmployee>,
     ) {}
 
     async create(createAemployeeDto: CreateAemployeeDto) {
-        const aemployee = this.aemployeeRepository.create(createAemployeeDto);
-        const result = await this.aemployeeRepository.save(aemployee);
+        const aemployee = this.emp.create(createAemployeeDto);
+        const result = await this.emp.save(aemployee);
         return result;
     }
 
     findAll() {
-        return this.aemployeeRepository.find();
+        return this.emp.find();
     }
 
     async findOne(id: string) {
-        const user = await this.aemployeeRepository.findOne({
-            where: { sempno: id },
+        const user = await this.emp.findOne({
+            where: { SEMPNO: id },
         });
         return user;
     }
 
     async findOneBySLogin(id: string) {
-        const user = await this.aemployeeRepository.findOne({
-            where: { sempno: id },
+        const user = await this.emp.findOne({
+            where: { SLOGIN: id },
             select: [
-                'sempno',
-                'sname',
-                'sdivcode',
-                'sdepcode',
-                'sseccode',
-                'sposcode',
-                'spassword1',
+                'SEMPNO',
+                'SNAME',
+                'SDIVCODE',
+                'SDEPCODE',
+                'SSECCODE',
+                'SPOSCODE',
+                'SPASSWORD1',
             ],
         });
         return user;

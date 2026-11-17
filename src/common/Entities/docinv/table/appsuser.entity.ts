@@ -1,9 +1,9 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Appsgroup } from './appsgroup.entity';
 import { Application } from './application.entity';
-import { User } from '../../../../amec/users/entities/user.entity';
+import { User } from '../../amec/views/user.entity';
 
-@Entity('APP_USERS')
+@Entity({ name: 'APP_USERS', schema: 'DOCINV' })
 export class Appsuser {
     @PrimaryColumn()
     USERS_ID: string;

@@ -1,85 +1,85 @@
-import {
-  Column,
-  Entity,
-  PrimaryColumn,
-  JoinColumn,
-  OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
+﻿import {
+    Column,
+    Entity,
+    PrimaryColumn,
+    JoinColumn,
+    OneToMany,
+    OneToOne,
+    PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Pricelist } from '../../pricelist/entities/pricelist.entity';
 import { Category } from '../../items-category/entities/category.entity';
 import { ItemsCustomer } from '../../items-customer/entities/items-customer.entity';
 
-@Entity('DS_ITEM')
+@Entity({ name: 'DS_ITEM', schema: 'SPSYS' })
 export class Items {
-  @PrimaryGeneratedColumn()
-  ITEM_ID: number;
+    @PrimaryGeneratedColumn()
+    ITEM_ID: number;
 
-  @Column()
-  ITEM_NO: string;
+    @Column()
+    ITEM_NO: string;
 
-  @Column()
-  ITEM_NAME: string;
+    @Column()
+    ITEM_NAME: string;
 
-  @Column()
-  ITEM_DWG: string;
+    @Column()
+    ITEM_DWG: string;
 
-  @Column()
-  ITEM_VARIABLE: string;
+    @Column()
+    ITEM_VARIABLE: string;
 
-  @Column()
-  ITEM_TYPE: number;
+    @Column()
+    ITEM_TYPE: number;
 
-  @Column()
-  ITEM_CLASS: string;
+    @Column()
+    ITEM_CLASS: string;
 
-  @Column()
-  ITEM_UNIT: string;
+    @Column()
+    ITEM_UNIT: string;
 
-  @Column()
-  ITEM_SUPPLIER: string;
+    @Column()
+    ITEM_SUPPLIER: string;
 
-  @Column()
-  CATEGORY: number;
+    @Column()
+    CATEGORY: number;
 
-  @Column()
-  ITEM_REMARK: string;
+    @Column()
+    ITEM_REMARK: string;
 
-  @Column()
-  ITEM_CUS_PUR: string;
+    @Column()
+    ITEM_CUS_PUR: string;
 
-  @Column()
-  ITEM_AMEC_PUR: string;
+    @Column()
+    ITEM_AMEC_PUR: string;
 
-  @Column()
-  ITEM_MODEL: string;
+    @Column()
+    ITEM_MODEL: string;
 
-  @Column()
-  ITEM_STATUS: number;
+    @Column()
+    ITEM_STATUS: number;
 
-  @Column()
-  ITEM_THUMB: string;
+    @Column()
+    ITEM_THUMB: string;
 
-  @Column()
-  CREATE_AT: Date;
+    @Column()
+    CREATE_AT: Date;
 
-  @Column()
-  CREATE_BY: string;
+    @Column()
+    CREATE_BY: string;
 
-  @Column()
-  UPDATE_AT: Date;
+    @Column()
+    UPDATE_AT: Date;
 
-  @Column()
-  UPDATE_BY: string;
+    @Column()
+    UPDATE_BY: string;
 
-  @OneToMany(() => Pricelist, (prs) => prs.itemdesc)
-  prices: Pricelist[];
+    @OneToMany(() => Pricelist, (prs) => prs.itemdesc)
+    prices: Pricelist[];
 
-  @OneToMany(() => ItemsCustomer, (prs) => prs.itemdesc)
-  itemscustomer: ItemsCustomer[];
+    @OneToMany(() => ItemsCustomer, (prs) => prs.itemdesc)
+    itemscustomer: ItemsCustomer[];
 
-  @OneToOne(() => Category, (category) => category.CATE_ID)
-  @JoinColumn({ name: 'CATEGORY', referencedColumnName: 'CATE_ID' })
-  category: Category;
+    @OneToOne(() => Category, (category) => category.CATE_ID)
+    @JoinColumn({ name: 'CATEGORY', referencedColumnName: 'CATE_ID' })
+    category: Category;
 }

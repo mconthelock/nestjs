@@ -5,9 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MatrixItemMaster } from './entities/matrix-item-master.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MatrixItemMaster], 'idsConnection')],
-  controllers: [MatrixItemMasterController],
-  providers: [MatrixItemMasterService],
-  exports: [MatrixItemMasterService],
+    imports: [TypeOrmModule.forFeature([MatrixItemMaster], 'mitsuConnection')],
+    controllers: [MatrixItemMasterController],
+    providers: [MatrixItemMasterService],
+    exports: [MatrixItemMasterService],
 })
 export class MatrixItemMasterModule {}

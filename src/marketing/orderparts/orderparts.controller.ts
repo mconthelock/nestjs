@@ -4,10 +4,10 @@ import { SearchOrderpartDto } from './dto/search-orderpart.dto';
 
 @Controller('mkt/part')
 export class OrderpartsController {
-  constructor(private readonly ords: OrderpartsService) {}
+    constructor(private readonly ords: OrderpartsService) {}
 
-  @Post('search')
-  search(@Body() req: SearchOrderpartDto) {
-    return this.ords.search(req);
-  }
+    @Post('search')
+    search(@Body() req: SearchOrderpartDto) {
+        return this.ords.search(req);
+    }
 }

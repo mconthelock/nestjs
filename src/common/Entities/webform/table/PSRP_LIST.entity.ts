@@ -62,6 +62,4 @@ export class PSRP_LIST {
 
     @Column()
     ISSUETO: string;
-
-    
 }

@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn , OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { PAPPFLOW } from './PAPPFLOW.entity';
 
 @Entity({ name: 'PAPPSTEP', schema: 'AMEC' })
@@ -14,7 +14,7 @@ export class PAPPSTEP {
 
     @Column()
     SEMPNO: string;
-  
+
     @Column()
     SDESC: string;
 
@@ -25,6 +25,3 @@ export class PAPPSTEP {
     @JoinColumn({ name: 'SFLOW', referencedColumnName: 'SFLOW' })
     FLOW: PAPPFLOW;
 }
-
-
-

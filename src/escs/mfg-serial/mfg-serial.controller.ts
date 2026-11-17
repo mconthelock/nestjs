@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+﻿import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { MfgSerialService } from './mfg-serial.service';
 import { CreateMfgSerialDto } from './dto/create-mfg-serial.dto';
 import { UpdateMfgSerialDto } from './dto/update-mfg-serial.dto';
@@ -18,7 +10,7 @@ export class MfgSerialController {
     constructor(private readonly mfgSerialService: MfgSerialService) {}
 
     @Post('search')
-    @UseTransaction('escsConnection')
+    @UseTransaction('mitsuConnection')
     async search(@Body() dto: FiltersDto) {
         return this.mfgSerialService.search(dto);
     }

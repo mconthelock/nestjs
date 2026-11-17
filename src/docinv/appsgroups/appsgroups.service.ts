@@ -7,7 +7,7 @@ import { CreateAppsgroupDto } from './dto/create-appsgroup.dto';
 @Injectable()
 export class AppsgroupsService {
     constructor(
-        @InjectRepository(Appsgroup, 'docinvConnection')
+        @InjectRepository(Appsgroup, 'mitsuConnection')
         private readonly gps: Repository<Appsgroup>,
     ) {}
 
@@ -35,9 +35,7 @@ export class AppsgroupsService {
             PROGRAM: program,
         });
         if (!groups) {
-            throw new NotFoundException(
-                `Group with id ${id} on program id ${program} not found`,
-            );
+            throw new NotFoundException(`Group with id ${id} on program id ${program} not found`);
         }
         Object.assign(groups, data);
         return await this.gps.save(groups);

@@ -8,6 +8,7 @@ enum VisErrCode {
     OK = '0',
     HAS_PIS = '1',
     FINISHED = '99',
+    EU_INCOMPLETE = '100',
     INFO = '-2',
 }
 
@@ -34,10 +35,11 @@ export class VPSService {
         let response: PackResultDto;
 
         try {
-            const [d] = await this.db.query(
-                'EXEC GetItemfromVIS @0,@1,@2', 
-                [vis, useLocal, userId]
-            );
+            const [d] = await this.db.query('EXEC GetItemfromVIS @0,@1,@2', [
+                vis,
+                useLocal,
+                userId,
+            ]);
 
             switch (d.errcode) {
                 case VisErrCode.OK:
@@ -48,20 +50,28 @@ export class VPSService {
                     response = await this.listPIS(vis, userId, false);
                     break;
 
+                case VisErrCode.EU_INCOMPLETE:
+                    response = await this.listPIS(vis, userId, true);
+                    response.message = response.message || d.errmsg;
+                    response.eucomplete = false;
+                    break;
+
                 case VisErrCode.FINISHED:
                     response = await this.listPIS(vis, userId, true);
+                    response.eucomplete = true;
                     break;
 
                 default:
-                    response = await {
+                    response = {
                         status: d.errcode === VisErrCode.INFO ? PackStatus.INFO : PackStatus.ERROR,
-                        message: d.errmsg
+                        message: d.errmsg,
                     };
                     break;
             }
 
+            response.eucomplete = true;
             const orders = await this.getOrder(vis);
-            return {...response, orders};
+            return { ...response, orders };
         } catch (error) {
             await this.keepSqlErr('CheckVISinfo', error.message, 1, userId);
             return { status: PackStatus.ERROR, message: error.message };
@@ -80,10 +90,10 @@ export class VPSService {
             const result = await this.db.query(
                 `
                     SELECT orderno, SUBSTRING(caseno, 3, 2) AS block
-                    FROM PackingMas 
+                    FROM PackingMas
                     WHERE vis = @0
                 `,
-                [vis]
+                [vis],
             );
 
             return result;
@@ -103,10 +113,11 @@ export class VPSService {
      */
     async getPISfromVIS(vis: string, userId: string, useLocal: string): Promise<PackResultDto> {
         try {
-            const [d] = await this.db.query(
-                'EXEC InsertPackingDetail @0,@1,@2',
-                [vis, useLocal, userId]
-            );
+            const [d] = await this.db.query('EXEC InsertPackingDetail @0,@1,@2', [
+                vis,
+                useLocal,
+                userId,
+            ]);
 
             if (d.errstate === '0') {
                 return this.listPIS(vis, userId, false);
@@ -132,15 +143,12 @@ export class VPSService {
      */
     async listPIS(vis: string, userId: string, finState: boolean): Promise<PackResultDto> {
         try {
-            const rows = await this.db.query(
-                'EXEC GetListPIS @0,@1', 
-                [vis, userId]
-            );
+            const rows = await this.db.query('EXEC GetListPIS @0,@1', [vis, userId]);
 
             if (!rows || rows.length === 0) {
                 return {
                     status: PackStatus.INFO,
-                    message: 'ไม่พบรายการ VPS กรุณาสแกน VIS ใหม่อีกครั้ง'
+                    message: 'ไม่พบรายการ VPS กรุณาสแกน VIS ใหม่อีกครั้ง',
                 };
             }
 
@@ -148,7 +156,7 @@ export class VPSService {
                 ordernoref: r.ordernoref,
                 iteminfo: r.iteminfo,
                 checksta: r.checksta === '1',
-                vpscode: r.ordernoref.substring(1, 8) + r.iteminfo.replace(' #', '')
+                vpscode: r.ordernoref.substring(1, 8) + r.iteminfo.replace(' #', ''),
             }));
 
             return {
@@ -198,10 +206,7 @@ export class VPSService {
      */
     async checkPIS(vis: string, pis: string, userId: string): Promise<PackResultDto> {
         try {
-            const [d] = await this.db.query(
-                'EXEC SavePISinPacking @0,@1,@2', 
-                [vis, pis, userId]
-            );
+            const [d] = await this.db.query('EXEC SavePISinPacking @0,@1,@2', [vis, pis, userId]);
 
             switch (d.errcode) {
                 case VisErrCode.OK:
@@ -212,11 +217,20 @@ export class VPSService {
                     };
                     break;
 
+                case VisErrCode.EU_INCOMPLETE:
+                    return {
+                        status: PackStatus.SUCCESS,
+                        message: d.errmsg,
+                        chkcompte: true,
+                        eucomplete: false,
+                    };
+
                 case VisErrCode.FINISHED:
                     return {
                         status: PackStatus.SUCCESS,
                         message: d.errmsg,
                         chkcompte: true,
+                        eucomplete: true,
                     };
                     break;
 
@@ -241,10 +255,11 @@ export class VPSService {
      */
     async checkCloseVIS(vis: string, shipcode: string, userId: string): Promise<PackResultDto> {
         try {
-            const [d] = await this.db.query(
-                'EXEC CheckBcForCloseVIS @0,@1,@2',
-                [vis, shipcode, userId]
-            );
+            const [d] = await this.db.query('EXEC CheckBcForCloseVIS @0,@1,@2', [
+                vis,
+                shipcode,
+                userId,
+            ]);
 
             if (d.code === '1') {
                 return this.visCheckComplate(vis, userId);
@@ -272,20 +287,17 @@ export class VPSService {
      */
     async visCheckComplate(vis: string, userId: string): Promise<PackResultDto> {
         try {
-            const [d] = await this.db.query(
-                'EXEC CheckVIScompte @0,@1', 
-                [vis, userId]
-            );
+            const [d] = await this.db.query('EXEC CheckVIScompte @0,@1', [vis, userId]);
 
             return {
                 status: d.errcode === '0' ? PackStatus.SUCCESS : PackStatus.INFO,
-                message: d.errmsg
+                message: d.errmsg,
             };
         } catch (error) {
             await this.keepSqlErr('VISCheckCompte', error.message, 1, userId);
-            return { 
-                status: PackStatus.ERROR, 
-                message: error.message 
+            return {
+                status: PackStatus.ERROR,
+                message: error.message,
             };
         }
     }
@@ -300,19 +312,16 @@ export class VPSService {
      */
     async getLostItem(vis: string, userId: string): Promise<PackResultDto> {
         try {
-            const [d] = await this.db.query(
-                'EXEC CheckLostItem @0,@1', 
-                [vis, userId]
-            );
+            const [d] = await this.db.query('EXEC CheckLostItem @0,@1', [vis, userId]);
 
             return {
                 status: d.resultcode === '1' ? PackStatus.SUCCESS : PackStatus.INFO,
-                message: d.resultmsg
+                message: d.resultmsg,
             };
         } catch (error) {
             return {
                 status: PackStatus.ERROR,
-                message: 'GetLostItem failed: ' + error.message
+                message: 'GetLostItem failed: ' + error.message,
             };
         }
     }
@@ -327,19 +336,46 @@ export class VPSService {
      */
     async clearBlock(orderno: string, block: string): Promise<PackResultDto> {
         try {
-            await this.db.query(
-                'EXEC Clear_designcase_validate @0,@1',
-                [orderno, block]
-            );
+            await this.db.query('EXEC Clear_designcase_validate @0,@1', [orderno, block]);
 
             return {
                 status: PackStatus.SUCCESS,
-                message: 'Clear block success'
+                message: 'Clear block success',
             };
         } catch (error) {
             return {
                 status: PackStatus.ERROR,
-                message: error.message
+                message: error.message,
+            };
+        }
+    }
+
+    /**
+     * Validate Package ID
+     * @author  Mr.Pathanapong Sokpukeaw
+     * @since   2026-11-12
+     * @param   {string} vis VIS code
+     * @param   {string} packageId Package ID
+     * @param   {string} userId User ID
+     * @return  {Promise<PackResultDto>}
+     */
+    async confirmPackageID(vis: string, packageId: string, userId: string): Promise<PackResultDto> {
+        try {
+            const [d] = await this.db.query('EXEC SP_EU_CONFIRM_PACKAGE @0,@1,@2', [
+                vis,
+                packageId,
+                userId,
+            ]);
+
+            return {
+                status: d.STATUS === 'PASS' ? PackStatus.SUCCESS : PackStatus.INFO,
+                message: d.MESSAGE,
+                eucomplete: d.STATUS === 'PASS',
+            };
+        } catch (error) {
+            return {
+                status: PackStatus.ERROR,
+                message: error.message,
             };
         }
     }

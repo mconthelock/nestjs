@@ -5,8 +5,8 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PartcategoryService {
-  constructor(
-    @InjectRepository(Partcategory, 'amecConnection')
-    private readonly partcategoryRepository: Repository<Partcategory>,
-  ) {}
+    constructor(
+        @InjectRepository(Partcategory, 'mitsuConnection')
+        private readonly partcategoryRepository: Repository<Partcategory>,
+    ) {}
 }

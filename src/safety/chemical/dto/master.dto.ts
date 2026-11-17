@@ -64,3 +64,19 @@ export class DisableByIdDto extends PickType(ConfirmRebuildSectionDto, [
     @Type(() => Number)
     ID: number;
 }
+
+export class CreateMasterDto {
+    RECEIVED_SDS_DATE: Date;
+    EFFECTIVE_DATE: Date;
+    PRODUCT_CODE: string;
+    CHEMICAL_NAME: string;
+    VENDOR: string;
+    PUR_INCHARGE: string;
+    UN_CLASS: number;
+    REV: string;
+    STATUS: number;
+    USER_CREATE: string;
+    CREATE_DATE: Date;
+    USER_UPDATE: string;
+    UPDATE_DATE: Date;
+}

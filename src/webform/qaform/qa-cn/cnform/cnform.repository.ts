@@ -101,66 +101,72 @@ export class CnFormRepository extends BaseRepository {
             .getRawMany();
     }
     async getApvEmail(dto: FormDto, type: string): Promise<any[]> {
-        let sql = '';
-        let parameters: any[] = [];
+        // ใช้ Object ส่ง Parameter แบบ QueryBuilder สบายๆ ไม่ต้องสนลำดับ
+        const baseConditions = {
+            nfrmno: dto.NFRMNO,
+            vorgno: dto.VORGNO,
+            cyear: dto.CYEAR,
+            cyear2: dto.CYEAR2,
+            nrunno: dto.NRUNNO,
+        };
 
-        // ชุดเงื่อนไขพื้นฐาน 5 ตัว
-        const baseConditions = [dto.NFRMNO, dto.VORGNO, dto.CYEAR, dto.CYEAR2, dto.NRUNNO];
+        const qb = this.manager
+            .createQueryBuilder()
+            .select('E.SRECMAIL', 'EMAIL')
+            .from('AMEC.AMECUSERALL', 'E')
+            .distinct(true)
+            .where("E.CSTATUS = '1'");
 
         if (type === 'PIC') {
-            sql = `
-                SELECT DISTINCT E.SRECMAIL AS "EMAIL"
-                FROM AMEC.AMECUSERALL E
-                INNER JOIN (
-                    SELECT F.VAPVNO AS EMPNO FROM WEBFORM.FLOW F
-                    WHERE F.NFRMNO = ? AND F.VORGNO = ?
-                      AND F.CYEAR = ? AND F.CYEAR2 = ? AND F.NRUNNO = ?
+            qb.innerJoin(
+                `(
+                    SELECT F.VAPVNO  AS EMPNO FROM WEBFORM.FLOW F
+                    WHERE F.NFRMNO = :nfrmno AND F.VORGNO = :vorgno
+                      AND F.CYEAR = :cyear AND F.CYEAR2 = :cyear2 AND F.NRUNNO = :nrunno
                       AND F.CSTEPNO = '--'
                     UNION
                     SELECT F.VREPNO FROM WEBFORM.FLOW F
-                    WHERE F.NFRMNO = ? AND F.VORGNO = ?
-                      AND F.CYEAR = ? AND F.CYEAR2 = ? AND F.NRUNNO = ?
+                    WHERE F.NFRMNO = :nfrmno AND F.VORGNO = :vorgno
+                      AND F.CYEAR = :cyear AND F.CYEAR2 = :cyear2 AND F.NRUNNO = :nrunno
                       AND F.CSTEPNO = '--'
                     UNION
                     SELECT C.ENG FROM WEBFORM.CNSHOPPIC C
                     WHERE C.FM IN (
                         SELECT F2.VAPVNO FROM WEBFORM.FLOW F2
-                        WHERE F2.NFRMNO = ? AND F2.VORGNO = ?
-                          AND F2.CYEAR = ? AND F2.CYEAR2 = ? AND F2.NRUNNO = ?
+                        WHERE F2.NFRMNO = :nfrmno AND F2.VORGNO = :vorgno
+                          AND F2.CYEAR = :cyear AND F2.CYEAR2 = :cyear2 AND F2.NRUNNO = :nrunno
                           AND F2.CEXTDATA = '06'
                     )
-                ) P ON P.EMPNO = E.SEMPNO
-                WHERE E.CSTATUS = '1'
-            `;
-            // ใช้ ? 15 จุด (3 ชุด) ต้องกระจายตัวแปรเข้าไป 3 รอบให้ครบตามจำนวน ?
-            parameters = [...baseConditions, ...baseConditions, ...baseConditions];
+                )`,
+                'P',
+                'P.EMPNO = E.SEMPNO',
+            );
         } else {
-            let typeCondition = '';
-            if (type === 'REQUESTER') {
-                typeCondition = "AND F.CSTEPNO = '--'";
-            } else if (type === 'FOREMAN') {
-                typeCondition = "AND F.CEXTDATA = '06'";
-            } else if (type === 'ALL') {
-                typeCondition = "AND F.CSTEPNO NOT IN ('05','04','11')";
-            }
+            // 👇 ใช้ Sub-query เพื่อแก้ปัญหา Alias โดยไม่ต้องหนีไปเขียน Raw SQL
+            qb.innerJoin(
+                '(SELECT * FROM WEBFORM.FLOW)',
+                'F',
+                '(F.VAPVNO = E.SEMPNO OR F.VREPNO = E.SEMPNO)',
+            )
+                .andWhere('F.NFRMNO = :nfrmno')
+                .andWhere('F.VORGNO = :vorgno')
+                .andWhere('F.CYEAR = :cyear')
+                .andWhere('F.CYEAR2 = :cyear2')
+                .andWhere('F.NRUNNO = :nrunno');
 
-            sql = `
-                SELECT DISTINCT E.SRECMAIL AS "EMAIL"
-                FROM AMEC.AMECUSERALL E
-                INNER JOIN WEBFORM.FLOW F ON (F.VAPVNO = E.SEMPNO OR F.VREPNO = E.SEMPNO)
-                WHERE E.CSTATUS = '1'
-                  AND F.NFRMNO = ?
-                  AND F.VORGNO = ?
-                  AND F.CYEAR = ?
-                  AND F.CYEAR2 = ?
-                  AND F.NRUNNO = ?
-                  ${typeCondition}
-            `;
-            // ใช้ ? 5 จุด ส่งแค่ 1 ชุด
-            parameters = [...baseConditions];
+            if (type === 'REQUESTER') {
+                qb.andWhere("F.CSTEPNO = '--'");
+            } else if (type === 'FOREMAN') {
+                qb.andWhere("F.CEXTDATA = '06'");
+            } else if (type === 'ALL') {
+                qb.andWhere("F.CSTEPNO NOT IN ('05','04','11')");
+            }
         }
 
-        return await this.manager.query(sql, parameters);
+        // โยน Parameter เข้าไปตูมเดียวจบ TypeORM จะ Map เข้ากับเงื่อนไขทั้งหมดให้เอง
+        qb.setParameters(baseConditions);
+
+        return await qb.getRawMany();
     }
 
     async executeRawSql(sql: string, params: any[]): Promise<any[]> {

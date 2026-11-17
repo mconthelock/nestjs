@@ -53,6 +53,7 @@ export class VPSService {
                 case VisErrCode.EU_INCOMPLETE:
                     response = await this.listPIS(vis, userId, true);
                     response.message = response.message || d.errmsg;
+                    response.eucomplete = false;
                     break;
 
                 case VisErrCode.FINISHED:
@@ -68,6 +69,7 @@ export class VPSService {
                     break;
             }
 
+            response.eucomplete = true;
             const orders = await this.getOrder(vis);
             return { ...response, orders };
         } catch (error) {

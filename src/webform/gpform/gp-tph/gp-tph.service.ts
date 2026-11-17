@@ -268,7 +268,12 @@ export class GpTphService {
         }
     }
 
-    async create(dto: CreateGpTphReqDto, ip: string) {
+    async create(
+        dto: CreateGpTphReqDto,
+        ip: string,
+        
+
+    ) {
         try {
             console.log('CreateGpTphReqDto:', dto);
             await this.validateGroupApplicants(dto);
@@ -322,6 +327,7 @@ export class GpTphService {
             }
             //สร้าง Form
             const createForm = await this.formCreateService.create(
+
                 {
                     NFRMNO: formmst.NNO,
                     VORGNO: formmst.VORGNO,
@@ -331,7 +337,9 @@ export class GpTphService {
                     REMARK: dto.REMARK,
                 },
                 ip,
+                {CEXTDATA: 'MG', CAPPLYALL:'0'},
             );
+            
             //ตรวจสอบผลสร้าง form
             if (!createForm?.status) {
                 const errMsg =

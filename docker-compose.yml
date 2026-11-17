@@ -1,18 +1,31 @@
-version: '3.9'
-
 services:
-  api:
-    container_name: nest-api
-
-    build: .
-
-    restart: unless-stopped
-
-    ports:
-      - "3010:3010"
-
+  SERVICE_NAME_PLACEHOLDER:
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
     env_file:
       - .env
-    
+    environment:
+      - NODE_ENV=${APP_ENV}
+      - PORT=3000
     extra_hosts:
-      - "pdmapp4:172.21.255.5"
+      - "AMECVANDB:172.21.255.36"
+      - "amecspdb:172.21.255.25"
+      - "AMECFPRDB:172.21.255.38"
+      - "AMECTESTDB:172.21.255.37"
+      - "AMEC400:172.21.255.252"
+    volumes:
+      - /mnt/amecweb:/var/amecweb
+    networks:
+      - swarm_network
+    deploy:
+      replicas: ${REPLICAS}
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first       # รันตัวใหม่ให้พร้อมก่อนปิดตัวเก่า (Zero Downtime)
+        failure_action: rollback # หากตัวใหม่บูตไม่ขึ้น ให้ถอยกลับไปใช้ตัวเก่าอัตโนมัติ
+      restart_policy:
+        condition: on-failure
+
+networks:
+  swarm_network:
+    external: true

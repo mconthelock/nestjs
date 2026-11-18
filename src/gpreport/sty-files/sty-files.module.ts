@@ -8,5 +8,6 @@ import { StyTypeModule } from '../sty-type/sty-type.module';
     imports: [StyTypeModule],
     controllers: [StyFilesController],
     providers: [StyFilesService, StyFilesRepository],
+    exports: [StyFilesService],
 })
 export class StyFilesModule {}

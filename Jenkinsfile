@@ -158,7 +158,7 @@ pipeline {
                     echo "⏱️ [START] Restart Application : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
 
                     sshagent(credentials: ['ssh-amecwebtest1']) {
-                        sh "scp -o StrictHostKeyChecking=no dist.tar package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecwebtest1:D:/wwwroot/api/"
+                        sh "scp -o StrictHostKeyChecking=no dist.tar package.json package-lock.json ignored-endpoints.txt ecosystem.config.js oxfile.toml .env Administrator@amecwebtest1:D:/wwwroot/api/"
 
                         if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
                             sh """

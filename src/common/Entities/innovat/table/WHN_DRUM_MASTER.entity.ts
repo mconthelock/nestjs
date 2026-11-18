@@ -6,10 +6,10 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 })
 export class WHN_DRUM_MASTER {
     @PrimaryColumn()
-    MT_ITEMCODE: string;
-
-    @Column()
     GRP_ID: number;
+
+    @PrimaryColumn()
+    MT_ITEMCODE: string;
 
     @Column()
     MT_CABLECODE: string;
@@ -23,6 +23,8 @@ export class WHN_DRUM_MASTER {
     @Column()
     MT_USERUPDATE: string;
 
-    @Column()
+    @Column({
+        insert: false,
+    })
     MT_DATEUPDATE: Date;
 }

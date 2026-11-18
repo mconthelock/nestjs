@@ -6,7 +6,7 @@ import { ViewColumn, ViewEntity } from 'typeorm';
 })
 export class WHN_AUTOPLAN {
     @ViewColumn()
-    GRPID: string;
+    GROUPID: string;
 
     @ViewColumn()
     ITEMNO: string;

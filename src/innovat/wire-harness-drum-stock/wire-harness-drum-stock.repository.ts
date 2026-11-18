@@ -18,19 +18,26 @@ export class WireHarnessDrumStockRepository extends BaseRepository {
     }
 
     list(condition: FiltersDto) {
-        const allowedFields = ['ITEMCODE', 'LENREMAIN', 'DRUMTYPE', 'RECIVEDATE', 'GRPID'];
-        const qb = this.getRepository(WHN_DRUMSTOCK).createQueryBuilder('A');
+        const allowedFields = ['ITEMCODE', 'LENREMAIN', 'DRUMTYPE', 'RECIVEDATE', 'GROUPID'];
+        const qb = this.getRepository(WHN_DRUMSTOCK)
+            .createQueryBuilder('A');
 
-        return this.applyFilters(qb, 'A', condition, allowedFields)
-            .orderBy('A.LENREMAIN', 'ASC')
-            .addOrderBy('A.PRODNO', 'ASC')
-            .addOrderBy('A.DRUMID', 'ASC')
-            .getMany();
+        return this.applyFilters(
+            qb,
+            'A',
+            condition,
+            allowedFields,
+        )
+        .orderBy('A.LENREMAIN', 'ASC')
+        .addOrderBy('A.PRODNO', 'ASC')
+        .addOrderBy('A.DRUMID', 'ASC')
+        .getMany();
     }
 
     scrapDrum(dto: ScrapDrumDto) {
         return this.getRepository(WHN_DRUM_STOCK).update(
             {
+                GRP_ID: dto.groupId,
                 ST_ITEMCODE: dto.itemCode,
                 ST_PROD: dto.prodNo,
                 ST_ID: dto.drumId,
@@ -45,8 +52,15 @@ export class WireHarnessDrumStockRepository extends BaseRepository {
 
     selectDrum(condition: FiltersDto) {
         const allowedFields = ['CTRLNO', 'RN'];
-        const qb = this.getRepository(WHN_DRUMORDER).createQueryBuilder('A');
+        const qb = this.getRepository(WHN_DRUMORDER)
+            .createQueryBuilder('A');
 
-        return this.applyFilters(qb, 'A', condition, allowedFields).getOne();
+        return this.applyFilters(
+            qb,
+            'A',
+            condition,
+            allowedFields,
+        )
+        .getOne();
     }
 }

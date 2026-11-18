@@ -9,14 +9,16 @@ import { DrumToStockDto } from './dto/drum-to-stock.dto';
 @ApiTags('Wire Harness')
 @Controller('innovat/wire-harness')
 export class WireHarnessCuttingController {
-    constructor(private readonly service: WireHarnessCuttingService) {}
+    constructor(
+        private readonly service: WireHarnessCuttingService,
+    ) {}
 
-    @Get('process')
+    @Get('process-group')
     @HttpCode(HttpStatus.OK)
-    @ApiOperation({ summary: 'Get process list' })
-    @ApiResponse({ status: 200, description: 'Process list' })
-    async process() {
-        return this.service.process();
+    @ApiOperation({ summary: 'Get process group list' })
+    @ApiResponse({ status: 200, description: 'Process group list' })
+    async processGroup() {
+        return this.service.processGroup();
     }
 
     @Post('reason')

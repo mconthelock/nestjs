@@ -24,7 +24,7 @@ export class WireHarnessCalculateUsageRepository extends BaseRepository {
                 'SUM(A.CUT) AS QTYL',
                 'ROUND(SUM(A.CUT) / A.LMASTER, 1) AS QTYDRUM',
             ])
-            .where('A.GRPID = :groupId', {
+            .where('A.GROUPID = :groupId', {
                 groupId: dto.groupId,
             })
             .andWhere('A.PRODNO BETWEEN :prodNoFrom AND :prodNoTo', {

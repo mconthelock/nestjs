@@ -12,6 +12,14 @@ export class CreateDrumDto {
     empNo: string;
 
     @ApiProperty({
+        example: 1,
+        description: 'Group ID',
+    })
+    @Type(() => Number)
+    @IsNumber()
+    groupId: number;
+
+    @ApiProperty({
         example: 'F9999',
         description: 'Item code',
     })
@@ -39,6 +47,7 @@ export class CreateDrumDto {
         example: 100.9,
         description: 'Cut length',
     })
+    @Type(() => Number)
     @IsNumber()
     cut: number;
 
@@ -46,6 +55,7 @@ export class CreateDrumDto {
         example: 1,
         description: 'Cut type (1 = First Cut, 2 = Rework)',
     })
+    @Type(() => Number)
     @IsNumber()
     cutType: number;
 

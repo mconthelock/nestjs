@@ -1,11 +1,11 @@
-import { AfterLoad, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
+import { AfterLoad, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { STY_CHEMICAL_SECTION } from './STY_CHEMICAL_SECTION.entity';
 import { formatDate } from 'src/common/utils/dayjs.utils';
 import { STY_TYPE } from './STY_TYPE.entity';
 
 @Entity({ name: 'STY_CHEMICAL', schema: 'GPREPORT' })
 export class STY_CHEMICAL {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     AMEC_SDS_ID: number;
 
     @Column()

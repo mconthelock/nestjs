@@ -138,22 +138,6 @@ export class JopPurConfService {
                 "'PUR' AS REVTYPE",
             ])
             .leftJoin('jop.purConfirm', 'U')
-            .innerJoin(
-                (qb) =>
-                    qb
-                        .select([
-                            'JOP_MFGNO',
-                            'JOP_PONO',
-                            'JOP_LINENO',
-                            'MAX(JOP_REVISION) AS MAX_REV',
-                        ])
-                        .from('DAILYIDS.JOP_PUR_CONF', 'M')
-                        .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
-                'PUR',
-                `jop.JOP_MFGNO = PUR.JOP_MFGNO
-                  AND jop.JOP_PONO = PUR.JOP_PONO
-                  AND jop.JOP_LINENO = PUR.JOP_LINENO`,
-            )
             .where(
                 new Brackets((qb) => {
                     list.forEach((item, i) => {
@@ -168,7 +152,6 @@ export class JopPurConfService {
                     });
                 }),
             )
-            .andWhere('jop.JOP_REVISION <= PUR.MAX_REV')
             .andWhere('jop.JOP_REVISION > 0')
             .getRawMany();
     }

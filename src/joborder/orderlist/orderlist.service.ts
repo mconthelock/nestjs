@@ -198,8 +198,14 @@ export class OrderListService {
 
     async getRevisionHistoryByKey(list: any[]) {
         const map = new Map();
-        const marConditions: { mfg: string; pono: number; line: number }[] = [];
-        const purConditions: { mfg: string; pono: number; line: number }[] = [];
+        const marConditions = new Map<
+            string,
+            { mfg: string; pono: number; line: number }
+        >();
+        const purConditions = new Map<
+            string,
+            { mfg: string; pono: number; line: number }
+        >();
         for (const c of list) {
             if (!c.JOP_MFGNO || !c.JOP_PONO || !c.JOP_LINENO) continue;
             const key = {
@@ -207,20 +213,25 @@ export class OrderListService {
                 pono: c.JOP_PONO,
                 line: c.JOP_LINENO,
             };
-            if (c.JOP_MAR_REVISION > 0) marConditions.push(key);
-            if (c.JOP_PUR_REVISION > 0) purConditions.push(key);
+            const keyId = JSON.stringify([key.mfg, key.pono, key.line]);
+            if (c.JOP_MAR_REVISION > 0) marConditions.set(keyId, key);
+            if (c.JOP_PUR_REVISION > 0) purConditions.set(keyId, key);
         }
 
-        if (marConditions.length === 0 && purConditions.length === 0) return list;
+        if (marConditions.size === 0 && purConditions.size === 0) return list;
 
         const marReqRevision =
-            marConditions.length > 0
-                ? await this.JopMarReqService.getRevisionHistoryByKey(marConditions)
+            marConditions.size > 0
+                ? await this.JopMarReqService.getRevisionHistoryByKey([
+                      ...marConditions.values(),
+                  ])
                 : [];
 
         const purConfRevision =
-            purConditions.length > 0
-                ? await this.JopPurConfService.getRevisionHistoryByKey(purConditions)
+            purConditions.size > 0
+                ? await this.JopPurConfService.getRevisionHistoryByKey([
+                      ...purConditions.values(),
+                  ])
                 : [];
 
         const revisions = [...marReqRevision, ...purConfRevision];

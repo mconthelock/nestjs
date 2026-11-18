@@ -131,22 +131,6 @@ export class JopMarReqService {
                 "'MAR' AS REVTYPE",
             ])
             .leftJoin('jop.marRequest', 'U')
-            .innerJoin(
-                (qb) =>
-                    qb
-                        .select([
-                            'JOP_MFGNO',
-                            'JOP_PONO',
-                            'JOP_LINENO',
-                            'MAX(JOP_REVISION) AS MAX_REV',
-                        ])
-                        .from('DAILYIDS.JOP_MAR_REQ', 'M')
-                        .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
-                'MAR',
-                `jop.JOP_MFGNO = MAR.JOP_MFGNO
-                AND jop.JOP_PONO = MAR.JOP_PONO
-                AND jop.JOP_LINENO = MAR.JOP_LINENO`,
-            )
             .where(
                 new Brackets((qb) => {
                     list.forEach((item, i) => {
@@ -161,7 +145,6 @@ export class JopMarReqService {
                     });
                 }),
             )
-            .andWhere('jop.JOP_REVISION <= MAR.MAX_REV')
             .andWhere('jop.JOP_REVISION > 0') // เพิ่มเงื่อนไขนี้เพื่อกรองเฉพาะ Revision ที่มีการบันทึกจริงๆ แล้ว
             .getRawMany();
     }

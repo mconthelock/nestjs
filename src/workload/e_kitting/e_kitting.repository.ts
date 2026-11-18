@@ -3,6 +3,7 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { EKittingMasterDwg } from 'src/common/Entities/workload/table/EKITTING_MASTER_DWG.entity';
+import { V_Q141KP_KITTING_LIST } from 'src/common/Entities/workload/views/V_Q141KP_KITTING_LIST.entity';
 import { CreateEKittingDto } from './dto/create-e_kitting.dto';
 
 @Injectable()
@@ -15,7 +16,7 @@ export class EKittingRepository extends BaseRepository {
         const result = this.wk
             .createQueryBuilder()
             .select('*')
-            .from('V_Q141KP_KITTING_LIST', 'Q')
+            .from(V_Q141KP_KITTING_LIST, 'Q')
             .where('Q.S11M01 LIKE :order', { order: `_${order}_` })
             .andWhere('Q.S11M02 = :packing', { packing })
             .orderBy('Q.Q41K01,Q.Q41K03,Q.Q41K04,Q.Q41K07,TO_NUMBER(Q.Q41K05)');

@@ -1,4 +1,4 @@
-﻿pipeline {
+pipeline {
     agent any
 
     tools {
@@ -178,7 +178,7 @@
 
                             echo "================================================"
                             echo "⚠️  WARNING: package.json has changed!, Please install dependencies manually on ${REMOTE_HOST}"
-                            echo "Skipping automatic oxmgr reload..."
+                            echo "Skipping automatic PM2 reload..."
                             echo "================================================"
                         } else {
                             sh """
@@ -194,11 +194,11 @@
                                 Write-Host '🎉 [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
 
 
-                                \$startTimeOxmgr = Get-Date
+                                \$startTimePm2 = Get-Date
                                 oxmgr reload api
-                                \$endTimeOxmgr = Get-Date
-                                \$durationOxmgr = (\$endTimeOxmgr - \$startTimeOxmgr).TotalSeconds
-                                Write-Host '🎯 [END] oxmgr reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationOxmgr 'วินาที'
+                                \$endTimePm2 = Get-Date
+                                \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds
+                                Write-Host '🎯 [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'
                                 "
                                 EOF
                             """

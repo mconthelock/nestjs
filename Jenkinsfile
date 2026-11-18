@@ -195,6 +195,7 @@ pipeline {
 
 
                                 \$startTimePm2 = Get-Date
+                                oxmgr apply oxfile.toml
                                 oxmgr reload api
                                 \$endTimePm2 = Get-Date
                                 \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds

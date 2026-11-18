@@ -1,6 +1,5 @@
 ﻿import { Get } from '@nestjs/common';
 import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
-import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { PilineProblemMstService } from './PILINE_PROBLEM_MST.service';
 import { CreatePilineProblemMstDto } from './dto/CREATE-PILINE_PROBLEM_MST.dto';
 import { UpdatePilineProblemMstDto } from './dto/UPDATE-PILINE_PROBLEM_MST.dto';
@@ -15,17 +14,14 @@ export class PilineProblemMstController {
     }
 
     @Post()
-    @UseTransaction('mitsuConnection')
     create(@Body() dto: CreatePilineProblemMstDto) {
         return this.service.create(dto);
     }
     @Patch(':PROBLEM_ID')
-    @UseTransaction('mitsuConnection')
     update(@Param() key: KeyPilineProblemMstDto, @Body() dto: UpdatePilineProblemMstDto) {
         return this.service.update(key, dto);
     }
     @Delete(':PROBLEM_ID')
-    @UseTransaction('mitsuConnection')
     remove(@Param() key: KeyPilineProblemMstDto) {
         return this.service.remove(key);
     }

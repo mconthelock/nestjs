@@ -6,7 +6,7 @@ import { PilineProblemMstService } from './PILINE_PROBLEM_MST.service';
 import { PilineProblemMstRepository } from './PILINE_PROBLEM_MST.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([PILINE_PROBLEM_MST], 'mitsuConnection')],
+    imports: [TypeOrmModule.forFeature([PILINE_PROBLEM_MST], 'workloadConnection')],
     controllers: [PilineProblemMstController],
     providers: [PilineProblemMstService, PilineProblemMstRepository],
     exports: [PilineProblemMstService],

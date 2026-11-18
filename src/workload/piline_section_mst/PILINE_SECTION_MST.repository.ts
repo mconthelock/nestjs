@@ -7,14 +7,17 @@ import { PilineCrudRepository } from '../piline/PILINE-CRUD.repository';
 
 @Injectable()
 export class PilineSectionMstRepository extends PilineCrudRepository<PILINE_SECTION_MST> {
-    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
+    constructor(
+        @InjectDataSource('workloadConnection') ds: DataSource,
+        @InjectDataSource('mitsuConnection') private readonly sectionDataSource: DataSource,
+    ) {
         super(ds, PILINE_SECTION_MST);
     }
 
     async findAll() {
         const result = await super.findAll();
         if (!result.data.length) return result;
-        const sections = await this.getRepository(Psection).find({
+        const sections = await this.sectionDataSource.getRepository(Psection).find({
             select: { SSECCODE: true, SSEC: true },
         });
         const names = new Map(

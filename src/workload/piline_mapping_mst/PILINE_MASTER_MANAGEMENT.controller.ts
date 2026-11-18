@@ -56,7 +56,7 @@ const MASTERS = {
 // PILINE-only management endpoints. Identifiers come only from this allowlist.
 @Controller('workload/piline_master_management')
 export class PilineMasterManagementController {
-    constructor(@InjectDataSource('mitsuConnection') private readonly db: DataSource) {}
+    constructor(@InjectDataSource('workloadConnection') private readonly db: DataSource) {}
 
     private config(kind: string) {
         if (!Object.prototype.hasOwnProperty.call(MASTERS, kind))

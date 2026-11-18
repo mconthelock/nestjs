@@ -6,7 +6,7 @@ import { PilineNgRecordService } from './PILINE_NG_RECORD.service';
 import { PilineNgRecordRepository } from './PILINE_NG_RECORD.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([PILINE_NG_RECORD], 'mitsuConnection')],
+    imports: [TypeOrmModule.forFeature([PILINE_NG_RECORD], 'workloadConnection')],
     controllers: [PilineNgRecordController],
     providers: [PilineNgRecordService, PilineNgRecordRepository],
     exports: [PilineNgRecordService],

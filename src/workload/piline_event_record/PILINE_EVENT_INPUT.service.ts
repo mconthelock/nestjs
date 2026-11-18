@@ -30,7 +30,7 @@ export interface PilineInputFiles {
 export class PilineEventInputService {
     private readonly logger = new Logger(PilineEventInputService.name);
     constructor(
-        @InjectDataSource('mitsuConnection') private readonly ds: DataSource,
+        @InjectDataSource('workloadConnection') private readonly ds: DataSource,
         private readonly files: PilineEventFilesService,
     ) {}
 

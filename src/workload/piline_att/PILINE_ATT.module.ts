@@ -6,7 +6,7 @@ import { PilineAttService } from './PILINE_ATT.service';
 import { PilineAttRepository } from './PILINE_ATT.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([PILINE_ATT], 'mitsuConnection')],
+    imports: [TypeOrmModule.forFeature([PILINE_ATT], 'workloadConnection')],
     controllers: [PilineAttController],
     providers: [PilineAttService, PilineAttRepository],
     exports: [PilineAttService],

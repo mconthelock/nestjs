@@ -11,7 +11,7 @@ import { PilineCrudRepository } from '../piline/PILINE-CRUD.repository';
 @Injectable()
 export class PilineEventRecordRepository extends PilineCrudRepository<PILINE_EVENT_RECORD> {
     constructor(
-        @InjectDataSource('mitsuConnection') ds: DataSource,
+        @InjectDataSource('workloadConnection') ds: DataSource,
         @InjectDataSource('datacenterConnection')
         private readonly amec: DataSource,
     ) {

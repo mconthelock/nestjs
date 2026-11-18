@@ -8,7 +8,8 @@ import { PilineSectionMstRepository } from './PILINE_SECTION_MST.repository';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([PILINE_SECTION_MST, Psection], 'mitsuConnection'),
+        TypeOrmModule.forFeature([PILINE_SECTION_MST], 'workloadConnection'),
+        TypeOrmModule.forFeature([Psection], 'mitsuConnection'),
     ],
     controllers: [PilineSectionMstController],
     providers: [PilineSectionMstService, PilineSectionMstRepository],

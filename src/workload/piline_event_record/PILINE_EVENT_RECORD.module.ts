@@ -30,7 +30,7 @@ import { PilineEventFilesService } from './PILINE_EVENT_FILES.service';
         RepModule,
         UsersModule,
         ConectionModule,
-        TypeOrmModule.forFeature([PILINE_EVENT_RECORD], 'mitsuConnection'),
+        TypeOrmModule.forFeature([PILINE_EVENT_RECORD], 'workloadConnection'),
         TypeOrmModule.forFeature([F110KP], 'datacenterConnection'),
     ],
     controllers: [

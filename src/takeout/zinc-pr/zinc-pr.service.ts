@@ -189,7 +189,8 @@ export class ZincPrService {
     }).formatToParts(new Date());
     const todayPart = (type: string) =>
       todayParts.find((part) => part.type === type)?.value ?? '';
-    const date = `${todayPart('year')}-${todayPart('month')}-${todayPart('day')}`;
+    const today = `${todayPart('year')}-${todayPart('month')}-${todayPart('day')}`;
+    const date = dto.date ?? today;
     const { payload, invalidTakeoutsForEmail } = await this.buildPendingResult(date);
 
     if (payload.length === 0 && invalidTakeoutsForEmail.length === 0) {

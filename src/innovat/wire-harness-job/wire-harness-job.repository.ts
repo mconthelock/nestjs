@@ -7,6 +7,7 @@ import { WHN_PRODUCTION_PLAN } from 'src/common/Entities/innovat/table/WHN_PRODU
 
 @Injectable()
 export class WireHarnessJobRepository extends BaseRepository {
+   
     constructor(
         @InjectDataSource('mitsuConnection')
         private readonly ds: DataSource,
@@ -18,8 +19,8 @@ export class WireHarnessJobRepository extends BaseRepository {
 
     getProductionPlan() {
         return this.as400.runQuery(`
-            SELECT *
-            FROM
+            SELECT * 
+            FROM 
             (
                 SELECT
                     F1.F01R01 AS CTRLNO,
@@ -43,35 +44,47 @@ export class WireHarnessJobRepository extends BaseRepository {
                     DECIMAL(CB.Q41K16, 8, 0) / 1000 AS CUT,
                     REPLACE(Q3.Q43K06, X'00', '') AS REMARK,
                     ROW_NUMBER() OVER (PARTITION BY F1.F01R01 ORDER BY CB.Q41K05) AS RN
-                FROM RTNLIBF.M008KP S
-                JOIN RTNLIBF.Q90010P2 Q9
-                    ON S.M8K03 = Q9.Q9ORD
-                JOIN SHOPF.F001KP F1
-                    ON S.M8K03 = F1.F01R07
-                JOIN SHOPF.F002KP F2
-                    ON F1.F01R01 = F2.F02R01
-                JOIN RTNLIBF.Q141KP Q1
-                    ON F1.F01R07 = Q1.Q41K01
-                    AND F1.F01R04 = Q1.Q41K08
-                LEFT JOIN RTNLIBF.Q141KP CB
-                    ON Q1.Q41K01 = CB.Q41K01
-                    AND Q1.Q41K02 = CB.Q41K02
-                    AND Q1.Q41K03 = CB.Q41K03
-                    AND Q1.Q41K04 = CB.Q41K04
-                    AND CB.Q41K05 > Q1.Q41K05
-                    AND CB.Q41K10 LIKE 'CABLE%'
-                    AND SUBSTR(Q1.Q41K08, 1, LOCATE(' ', Q1.Q41K08 || ' ') - 1) = SUBSTR(CB.Q41K08, 1, LOCATE(' ', CB.Q41K08 || ' ') - 1)
-                LEFT JOIN RTNLIBF.Q143KP Q3
-                    ON Q1.Q41K01 = Q3.Q43K01
-                    AND Q1.Q41K02 = Q3.Q43K02
-                    AND Q1.Q41K03 = Q3.Q43K03
-                    AND Q1.Q41K04 = Q3.Q43K04
-                    AND Q1.Q41K05 = Q3.Q43K05
-                LEFT JOIN RTNLIBF.S011MP S11
-                    ON F1.F01R07 = S11.S11M01
-                    AND COALESCE(NULLIF(TRIM(F1.F01R05), ''), Q1.Q41K07) = S11.S11M06
-                WHERE F2.F02R03 = 'B4CC06'
-                    AND S.M8K01 >= VARCHAR_FORMAT(CURRENT DATE - 3 MONTH, 'YYYYMM')||'1'
+                    FROM RTNLIBF.M008KP S
+                    JOIN RTNLIBF.Q90010P2 Q9
+                        ON S.M8K03 = Q9.Q9ORD
+                    JOIN SHOPF.F001KP F1
+                        ON S.M8K03 = F1.F01R07
+                    JOIN SHOPF.F002KP F2
+                        ON F1.F01R01 = F2.F02R01
+                    JOIN RTNLIBF.Q141KP Q1
+                        ON F1.F01R07 = Q1.Q41K01
+                        AND F1.F01R04 = Q1.Q41K08 
+                    LEFT JOIN RTNLIBF.Q141KP CB
+                        ON Q1.Q41K01 = CB.Q41K01
+                        AND Q1.Q41K02 = CB.Q41K02
+                        AND Q1.Q41K03 = CB.Q41K03
+                        AND Q1.Q41K04 = CB.Q41K04
+                        AND CB.Q41K05 >= Q1.Q41K05
+                        AND CB.Q41K05 < COALESCE(
+                            (
+                                SELECT MIN(NX.Q41K05)
+                                FROM RTNLIBF.Q141KP NX
+                                WHERE NX.Q41K01 = Q1.Q41K01
+                                AND NX.Q41K02 = Q1.Q41K02
+                                AND NX.Q41K03 = Q1.Q41K03
+                                AND NX.Q41K04 = Q1.Q41K04
+                                AND NX.Q41K05 > Q1.Q41K05
+                                AND NX.Q41K06 <= Q1.Q41K06
+                            ),
+                            999999
+                        )
+                        AND CB.Q41K10 LIKE 'CABLE%'
+                        AND SUBSTR(Q1.Q41K08, 1, LOCATE(' ', Q1.Q41K08 || ' ') - 1) = SUBSTR(CB.Q41K08, 1, LOCATE('-', CB.Q41K08 || '-') - 1)
+                    LEFT JOIN RTNLIBF.Q143KP Q3
+                        ON Q1.Q41K01 = Q3.Q43K01
+                        AND Q1.Q41K02 = Q3.Q43K02
+                        AND Q1.Q41K03 = Q3.Q43K03
+                        AND Q1.Q41K04 = Q3.Q43K04
+                        AND Q1.Q41K05 = Q3.Q43K05
+                    LEFT JOIN RTNLIBF.S011MP S11
+                        ON F1.F01R07 = S11.S11M01
+                        AND Q1.Q41K07 = S11.S11M06
+                    WHERE F2.F02R03 IN ('B4CC02','B4CC06') AND S.M8K01 >= VARCHAR_FORMAT(CURRENT DATE - 3 MONTH, 'YYYYMM')||'1'
             ) X
             WHERE X.RN = 1
         `);

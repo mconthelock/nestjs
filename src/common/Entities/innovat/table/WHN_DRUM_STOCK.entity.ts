@@ -6,6 +6,9 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 })
 export class WHN_DRUM_STOCK {
     @PrimaryColumn()
+    GRP_ID: number;
+
+    @PrimaryColumn()
     ST_ITEMCODE: string;
 
     @PrimaryColumn()
@@ -29,7 +32,10 @@ export class WHN_DRUM_STOCK {
     @Column()
     ST_USERUPDATE: string;
 
-    @Column()
+    @Column({
+        insert: false,
+        nullable: true,
+    })
     ST_DATEUPDATE: Date;
 
     @Column()

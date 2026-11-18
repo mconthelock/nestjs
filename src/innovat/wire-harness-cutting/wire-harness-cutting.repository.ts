@@ -4,7 +4,7 @@ import { DataSource } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { OracleRepository } from 'src/common/repositories/oracle-repository';
 import { WHN_PRODUCTION_PLAN } from 'src/common/Entities/innovat/table/WHN_PRODUCTION_PLAN.entity';
-import { WHN_PROCESS } from 'src/common/Entities/innovat/table/WHN_PROCESS.entity';
+import { WHN_GROUP } from 'src/common/Entities/innovat/table/WHN_GROUP.entity';
 import { WHN_DRUM_STOCK } from 'src/common/Entities/innovat/table/WHN_DRUM_STOCK.entity';
 import { WHN_PRODUCTION } from 'src/common/Entities/innovat/views/WHN_PRODUCTION.entity';
 import { WHN_AUTOPLAN } from 'src/common/Entities/innovat/views/WHN_AUTOPLAN.entity';
@@ -17,7 +17,7 @@ import { DrumToStockDto } from './dto/drum-to-stock.dto';
 @Injectable()
 export class WireHarnessCuttingRepository extends BaseRepository {
     private readonly orepo: OracleRepository;
-
+    
     constructor(
         @InjectDataSource('mitsuConnection')
         private readonly ds: DataSource,
@@ -30,10 +30,10 @@ export class WireHarnessCuttingRepository extends BaseRepository {
         return this.getRepository(WHN_PRODUCTION_PLAN).save(data);
     }
 
-    getProcess() {
-        return this.getRepository(WHN_PROCESS).find({
+    getGroup() {
+        return this.getRepository(WHN_GROUP).find({
             order: {
-                PRC_CODE: 'ASC',
+                GRP_PRIORITY: 'ASC',
             },
         });
     }
@@ -47,47 +47,60 @@ export class WireHarnessCuttingRepository extends BaseRepository {
     }
 
     getAutoPlan(condition: FiltersDto) {
-        const allowedFields = ['ITEMNO', 'PACKNO', 'PROCESS', 'PRODNO', 'P'];
+        const allowedFields = ['GROUPID', 'PACKNO', 'PRODNO', 'P'];
         const qb = this.getRepository(WHN_AUTOPLAN).createQueryBuilder('A');
-        return this.applyFilters(qb, 'A', condition, allowedFields)
-            .orderBy('A.PRODNO', 'ASC')
-            .addOrderBy('A.P', 'ASC')
-            .addOrderBy('A.SEQBM', 'ASC')
-            .addOrderBy('A.MFGNO', 'ASC')
-            .addOrderBy('A.RNO', 'DESC')
-            .getMany();
+        return this.applyFilters(
+            qb,
+            'A',
+            condition,
+            allowedFields,
+        ).orderBy('A.PRODNO', 'ASC')
+        .addOrderBy('A.P', 'ASC')
+        .addOrderBy('A.SEQBM', 'ASC')
+        .addOrderBy('A.MFGNO', 'ASC')
+        .addOrderBy('A.RNO', 'DESC')
+        .getMany();
     }
 
     createDrum(dto: CreateDrumDto) {
-        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
-        return this.orepo.execCursor('WHN_CREATE_DRUM', dto, paramOrder);
+        const paramOrder = ['empNo', 'groupId', 'itemCode', 'prodNo', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
+        return this.orepo.execCursor(
+            'INNOVAT.WHN_CREATE_DRUM',
+            dto,
+            paramOrder,
+        );
     }
 
     updateDrum(dto: UpdateDrumDto) {
-        const paramOrder = [
-            'empNo',
-            'itemCode',
-            'prodNo',
-            'drumId',
-            'ctrlNo',
-            'cut',
-            'cutType',
-            'reasonId',
-        ];
-        return this.orepo.execCursor('WHN_UPDATE_DRUM', dto, paramOrder);
+        const paramOrder = ['empNo', 'groupId', 'itemCode', 'prodNo', 'drumId', 'ctrlNo', 'cut', 'cutType', 'reasonId'];
+        return this.orepo.execCursor(
+            'INNOVAT.WHN_UPDATE_DRUM',
+            dto,
+            paramOrder,
+        );
     }
 
     drumToStock(dto: DrumToStockDto) {
-        const paramOrder = ['empNo', 'itemCode', 'prodNo', 'drumId'];
-        return this.orepo.execProcedure('WHN_DRUM_TO_STOCK', dto, paramOrder);
+        const paramOrder = ['empNo', 'groupId', 'itemCode', 'prodNo', 'drumId'];
+        return this.orepo.execProcedure(
+            'INNOVAT.WHN_DRUM_TO_STOCK',
+            dto,
+            paramOrder,
+        );
     }
 
     reason(condition: FiltersDto) {
         const allowedFields = ['RS_ID', 'RS_NAME_TH', 'RS_STATUS'];
-        const qb = this.getRepository(WHN_REASON).createQueryBuilder('A');
+        const qb = this.getRepository(WHN_REASON)
+            .createQueryBuilder('A');
 
-        return this.applyFilters(qb, 'A', condition, allowedFields)
-            .orderBy('A.RS_ID', 'ASC')
-            .getMany();
+        return this.applyFilters(
+            qb,
+            'A',
+            condition,
+            allowedFields,
+        )
+        .orderBy('A.RS_ID', 'ASC')
+        .getMany();
     }
 }

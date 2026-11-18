@@ -12,6 +12,14 @@ export class UpdateDrumDto {
     empNo: string;
 
     @ApiProperty({
+        example: 1,
+        description: 'Group ID',
+    })
+    @Type(() => Number)
+    @IsNumber()
+    groupId: number;
+
+    @ApiProperty({
         example: 'F9999',
         description: 'Item code',
     })

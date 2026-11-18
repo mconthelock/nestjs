@@ -6,6 +6,9 @@ import { ViewColumn, ViewEntity } from 'typeorm';
 })
 export class WHN_DRUMSTOCK {
     @ViewColumn()
+    GROUPID: number;
+
+    @ViewColumn()
     ITEMCODE: string;
 
     @ViewColumn()
@@ -34,9 +37,6 @@ export class WHN_DRUMSTOCK {
 
     @ViewColumn()
     DRUMTYPE: number;
-
-    @ViewColumn()
-    GRPID: number;
 
     @ViewColumn()
     PROD: string;

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class ScrapDrumDto {
     @ApiProperty({
@@ -9,6 +10,14 @@ export class ScrapDrumDto {
     @IsString()
     @IsNotEmpty()
     empNo: string;
+
+    @ApiProperty({
+        example: 1,
+        description: 'Group ID',
+    })
+    @Type(() => Number)
+    @IsNumber()
+    groupId: number;
 
     @ApiProperty({
         example: 'F73175',

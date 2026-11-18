@@ -7,10 +7,16 @@ import { DrumToStockDto } from './dto/drum-to-stock.dto';
 
 @Injectable()
 export class WireHarnessCuttingService {
-    constructor(private readonly repo: WireHarnessCuttingRepository) {}
+    constructor(
+        private readonly repo: WireHarnessCuttingRepository,
+    ) {}
 
-    async process() {
-        return this.repo.getProcess();
+    private getErrorMessage(error: Error) {
+        return error.message.match(/ORA-20\d{3}:\s*(.*)/)?.[1] || error.message;
+    }
+
+    async processGroup() {
+        return this.repo.getGroup();
     }
 
     async production() {
@@ -25,8 +31,7 @@ export class WireHarnessCuttingService {
         try {
             return await this.repo.createDrum(dto);
         } catch (error) {
-            const message = error.message.split('\n')[0].replace(/^ORA-\d+:\s*/, '');
-            throw new BadRequestException(message);
+            throw new BadRequestException(this.getErrorMessage(error));
         }
     }
 
@@ -34,13 +39,16 @@ export class WireHarnessCuttingService {
         try {
             return await this.repo.updateDrum(dto);
         } catch (error) {
-            const message = error.message.split('\n')[0].replace(/^ORA-\d+:\s*/, '');
-            throw new BadRequestException(message);
+            throw new BadRequestException(this.getErrorMessage(error));
         }
     }
 
     async drumToStock(dto: DrumToStockDto) {
-        return this.repo.drumToStock(dto);
+        try {
+            return await this.repo.drumToStock(dto);
+        } catch (error) {
+            throw new BadRequestException(this.getErrorMessage(error));
+        }
     }
 
     async reason(condition: FiltersDto) {

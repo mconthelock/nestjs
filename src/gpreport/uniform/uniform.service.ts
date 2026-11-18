@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+﻿import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from '../../amec/users/users.service';
@@ -20,16 +20,16 @@ import { UpdateUniformRightDto } from './dto/update-right.dto';
 @Injectable()
 export class UniformService {
     constructor(
-        @InjectRepository(UNIFORM, 'gpreportConnection')
+        @InjectRepository(UNIFORM, 'mitsuConnection')
         private readonly uniform: Repository<UNIFORM>,
 
-        @InjectRepository(UNIFORM_CATEGORY, 'gpreportConnection')
+        @InjectRepository(UNIFORM_CATEGORY, 'mitsuConnection')
         private readonly category: Repository<UNIFORM_CATEGORY>,
 
-        @InjectRepository(UniformCalendar, 'gpreportConnection')
+        @InjectRepository(UniformCalendar, 'mitsuConnection')
         private readonly calendar: Repository<UniformCalendar>,
 
-        @InjectRepository(UNIFORM_RIGHT, 'gpreportConnection')
+        @InjectRepository(UNIFORM_RIGHT, 'mitsuConnection')
         private readonly right: Repository<UNIFORM_RIGHT>,
 
         protected readonly repo: AnnualUniformRepository,
@@ -108,15 +108,10 @@ export class UniformService {
         const rights = await this.right.find();
         const users = await this.UsersService.search();
         const userFiltered = users.filter(
-            (u) =>
-                u.CSTATUS === '1' &&
-                parseInt(u.SPOSCODE) < 97 &&
-                parseInt(u.SPOSCODE) != 80,
+            (u) => u.CSTATUS === '1' && parseInt(u.SPOSCODE) < 97 && parseInt(u.SPOSCODE) != 80,
         );
         const data = userFiltered.map((user) => {
-            const userRights = rights.filter(
-                (right) => right.EMPCOD === user.SEMPNO,
-            );
+            const userRights = rights.filter((right) => right.EMPCOD === user.SEMPNO);
             return {
                 ...user,
                 rights: userRights,
@@ -140,14 +135,10 @@ export class UniformService {
     //Annual Request
     async findAnnualRequestYear(year: number) {
         const users = await this.UsersService.search();
-        const userFiltered = users.filter(
-            (u) => u.CSTATUS === '1' && parseInt(u.SPOSCODE) < 80,
-        );
+        const userFiltered = users.filter((u) => u.CSTATUS === '1' && parseInt(u.SPOSCODE) < 80);
         const request = await this.repo.findYear(year);
         const data = userFiltered.map((user) => {
-            const userRreq = request.filter(
-                (req) => req.REQ_USER === user.SEMPNO,
-            );
+            const userRreq = request.filter((req) => req.REQ_USER === user.SEMPNO);
             return {
                 ...user,
                 result: userRreq,
@@ -168,10 +159,7 @@ export class UniformService {
         }
 
         const detail: Partial<AnnualUniformDetail>[] = DETAILS;
-        const result = await this.repo.create(
-            header as Partial<AnnualUniform>,
-            detail,
-        );
+        const result = await this.repo.create(header as Partial<AnnualUniform>, detail);
         return { status: 'success', result };
     }
 

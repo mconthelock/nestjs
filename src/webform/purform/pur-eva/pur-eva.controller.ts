@@ -16,10 +16,7 @@ import { CreatePurEvaDto } from './dto/create-pur-eva.dto';
 import { UpdatePurEvaDto } from './dto/update-pur-eva.dto';
 import { PurEvaRequestService } from './pur-eva-request.service';
 import { RequestPurevaFormDto } from './dto/request-pur-eva.dto';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
@@ -38,7 +35,7 @@ export class PurEvaController {
     private readonly path =
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/PUR/PUREVA/` as string;
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(
         getFileUploadInterceptor([
@@ -65,7 +62,7 @@ export class PurEvaController {
         return this.purEvaService.request(dto, files, ip, this.path);
     }
     @Patch()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(
         getFileUploadInterceptor([
@@ -93,7 +90,7 @@ export class PurEvaController {
     }
 
     @Patch('approve')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     approve(
         @Body() dto: ApprovePurevaFormDto, // หรือ RequestPurevaFormDto

@@ -58,7 +58,7 @@ export class WMSTempIssueDto {
     @IsString()
     PALLET_ID: string;
 
-    @ApiProperty({ example: '-'})
+    @ApiProperty({ example: '-' })
     @IsString()
     EXPIRE_DATE?: string;
 }

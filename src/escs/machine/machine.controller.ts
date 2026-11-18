@@ -2,7 +2,7 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { MachineService } from './machine.service';
 import { SearchMachineDto } from './dto/search-machine.dto';
-import { MachineResponseDto } from './dto/machine-response.dto';   
+import { MachineResponseDto } from './dto/machine-response.dto';
 
 @ApiTags('ESCS Machine')
 @Controller('escs/machine')

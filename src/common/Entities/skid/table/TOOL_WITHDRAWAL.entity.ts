@@ -1,5 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
-import { TOOL_IMPORT_HISTORY } from "./TOOL_IMPORT_HISTORY.entity";
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { TOOL_IMPORT_HISTORY } from './TOOL_IMPORT_HISTORY.entity';
 
 @Entity({ name: 'TOOL_WITHDRAWAL', schema: 'SKIDCNTRL' })
 export class TOOL_WITHDRAWAL {

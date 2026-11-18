@@ -76,9 +76,7 @@ export class ItemMfgService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Search ITEM_MFG by id ${id} Error: ` + error.message,
-            );
+            throw new Error(`Search ITEM_MFG by id ${id} Error: ` + error.message);
         }
     }
 
@@ -120,18 +118,14 @@ export class ItemMfgService {
                     DDATEUPDATE: dto.DDATEUPDATE,
                 };
                 // update item sheet
-                const sheetRes = await this.itemSheetMfgService.updateByItemId(
-                    itemId,
-                    data,
-                );
+                const sheetRes = await this.itemSheetMfgService.updateByItemId(itemId, data);
 
                 const itemList = await this.itemMfgListService.search({
                     filters: [{ field: 'NITEMID', op: 'eq', value: itemId }],
                 });
 
                 // update item mfg list
-                const itemListRes =
-                    await this.itemMfgListService.updateByItemId(itemId, data);
+                const itemListRes = await this.itemMfgListService.updateByItemId(itemId, data);
 
                 if (itemList.status) {
                     for (const item of itemList.data) {
@@ -140,26 +134,17 @@ export class ItemMfgService {
                             console.log(item);
 
                             // update item history
-                            const hisRes =
-                                await this.itemMfgHistoryService.updateByItemListId(
-                                    itemListId,
-                                    data,
-                                );
+                            const hisRes = await this.itemMfgHistoryService.updateByItemListId(
+                                itemListId,
+                                data,
+                            );
                         }
                     }
                 }
                 // update item mfg delete
-                const deleteRes =
-                    await this.itemMfgDeleteService.updateByItemId(
-                        itemId,
-                        data,
-                    );
+                const deleteRes = await this.itemMfgDeleteService.updateByItemId(itemId, data);
                 // update control drawing pis
-                const controlRes =
-                    await this.controlDrawingPisService.updateByItemId(
-                        itemId,
-                        data,
-                    );
+                const controlRes = await this.controlDrawingPisService.updateByItemId(itemId, data);
             }
 
             return {
@@ -168,9 +153,7 @@ export class ItemMfgService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Update ITEM_MFG by id ${itemId} Error: ` + error.message,
-            );
+            throw new Error(`Update ITEM_MFG by id ${itemId} Error: ` + error.message);
         }
     }
 
@@ -189,9 +172,7 @@ export class ItemMfgService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Delete ITEM_MFG by id ${id} Error: ` + error.message,
-            );
+            throw new Error(`Delete ITEM_MFG by id ${id} Error: ` + error.message);
         }
     }
 }

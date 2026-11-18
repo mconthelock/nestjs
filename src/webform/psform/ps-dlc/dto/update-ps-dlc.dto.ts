@@ -1,13 +1,6 @@
 import { PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-    IsArray,
-    IsDate,
-    IsNotEmpty,
-    IsOptional,
-    IsString,
-    ValidateNested,
-} from 'class-validator';
+import { IsArray, IsDate, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { doactionFlowDto } from 'src/webform/flow/dto/doaction-flow.dto';
 
 export class UpdatePsdlcDetailDto {

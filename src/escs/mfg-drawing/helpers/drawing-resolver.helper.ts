@@ -19,7 +19,8 @@ export class DrawingResolverHelper {
     ) {}
 
     async getDrawingByControlNo(controlNo: string): Promise<string> {
-        const f001kp: { status: boolean; data?: F001KP; message: string } = await this.f001kpService.findOne(controlNo);
+        const f001kp: { status: boolean; data?: F001KP; message: string } =
+            await this.f001kpService.findOne(controlNo);
         if (!f001kp.status) {
             throw new Error(`F001KP with control no ${controlNo} not found`);
         }
@@ -36,14 +37,15 @@ export class DrawingResolverHelper {
             drawing = data.F01R06;
         }
 
+        // ตรวจสอบว่ามี O ต่อท้ายไหม มีเอาออก
+        drawing = this.replaceO(drawing);
+
         // หาจาก General part list ด้วย order และ item ที่ได้จาก F001KP
-        const order  = data.F01R07?.trim();
-        const item   = data.F01R03?.trim();
+        const order = data.F01R07?.trim();
+        const item = data.F01R03?.trim();
         const getGpl = await this.generalPartListService.getGPL(order, item);
         if (!getGpl.status) {
-            throw new Error(
-                `General Part List with order ${order} and item ${item} not found`,
-            );
+            throw new Error(`General Part List with order ${order} and item ${item} not found`);
         }
 
         const gpl = getGpl.data;
@@ -51,13 +53,10 @@ export class DrawingResolverHelper {
             if (!d.DRAWING || d.DRAWING.trim() === '') {
                 return false;
             }
-            
+
             const gplDrawing = d.DRAWING.replace(/\s/g, '');
             const targetDrawing = drawing.replace(/\s/g, '');
-            return (
-                gplDrawing === targetDrawing ||
-                gplDrawing.startsWith(targetDrawing)
-            );
+            return gplDrawing === targetDrawing || gplDrawing.startsWith(targetDrawing);
         });
 
         if (!match) {
@@ -67,6 +66,21 @@ export class DrawingResolverHelper {
         }
 
         return match.DRAWING;
+    }
+
+    /**
+     * @author Sutthipong Tangmongkhoncharoen (24008)
+     * @since 2026-11-09
+     * @description ตรวจสอบและลบ O ที่ต่อท้าย drawing หากมี
+     * @param drawing
+     * @returns
+     */
+    replaceO(drawing: string): string {
+        const matchO = drawing.match(/\s(O)$/i);
+        if (matchO) {
+            drawing = drawing.replace(/\s(O)$/i, '');
+        }
+        return drawing;
     }
 
     /**
@@ -83,7 +97,8 @@ export class DrawingResolverHelper {
      * checkBreakAssyDrawing('S1909110234', 'BS127C197 G01') => 'BS127C197 G01'
      */
     async checkBreakAssyDrawing(controlNo: string, drawing: string): Promise<string> {
-        const f001kp: { status: boolean; data?: F001KP; message: string } = await this.f001kpService.findOne(controlNo);
+        const f001kp: { status: boolean; data?: F001KP; message: string } =
+            await this.f001kpService.findOne(controlNo);
         if (!f001kp.status) {
             throw new Error(`F001KP with control no ${controlNo} not found`);
         }
@@ -93,15 +108,23 @@ export class DrawingResolverHelper {
             if (side) {
                 const explode = this.parser.explodeGL(drawing);
                 drawing = drawing.replace(explode.DRAWING, explode.DRAWING + side[0].toUpperCase());
+            } else {
+                // ดึงตัวท้าย กรณีที่ไม่มีวงเล็บ ให้ตรวจสอบว่ามี L หรือ R อยู่ใน description หรือไม่
+                const sideChar = description.match(/\s([LR])$/i);
+                console.log('Side character found in description:', sideChar);
+                if (sideChar) {
+                    const explode = this.parser.explodeGL(drawing);
+                    drawing = drawing.replace(
+                        explode.DRAWING,
+                        explode.DRAWING + `(${sideChar[1].toUpperCase()})`,
+                    );
+                }
             }
         }
         return drawing;
-
     }
 
-    async getDrawingByIdTag(
-        serialNo: string,
-    ): Promise<{ controlNo: string; drawing: string }> {
+    async getDrawingByIdTag(serialNo: string): Promise<{ controlNo: string; drawing: string }> {
         let controlNo: string = null;
         const idtagLog: {
             status: boolean;
@@ -112,15 +135,11 @@ export class DrawingResolverHelper {
         });
 
         if (!idtagLog.status) {
-            throw new Error(
-                `IDTAG_EFAC_LOG with serial no ${serialNo} not found`,
-            );
+            throw new Error(`IDTAG_EFAC_LOG with serial no ${serialNo} not found`);
         }
 
         if (idtagLog.data.length > 1) {
-            throw new Error(
-                `Multiple IDTAG_EFAC_LOG entries found for serial no ${serialNo}`,
-            );
+            throw new Error(`Multiple IDTAG_EFAC_LOG entries found for serial no ${serialNo}`);
         }
 
         controlNo = idtagLog.data[0].CONTROL_NO;
@@ -174,9 +193,7 @@ export class DrawingResolverHelper {
                 ],
             });
         if (!s011mp.status) {
-            throw new Error(
-                `S011MP with order ${order} and item ${item} not found`,
-            );
+            throw new Error(`S011MP with order ${order} and item ${item} not found`);
         }
         // หา drawing ที่ตรงกับ control และไม่อยู่ใน delete list
         const matchdrawing: { drawing: string | null; order: string | null } =

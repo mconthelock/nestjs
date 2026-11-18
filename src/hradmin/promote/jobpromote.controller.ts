@@ -17,14 +17,11 @@ export class JobpromoteController {
     @Post('run-promotedoc-file')
     async runTwiReport(@Body() body: any) {
         const keys = await this.keys.findAll();
-        const key = keys.find(
-            (k: Masterkey) => k.KEY_OWNER === 'DUMMY',
-        )?.KEY_CODE;
+        const key = keys.find((k: Masterkey) => k.KEY_OWNER === 'DUMMY')?.KEY_CODE;
         const apskey = await this.dbService.decrypt(key);
         const pdfkey = apskey.split(':')[5];
         let passkey = pdfkey;
-        if (body.type !== 'MP')
-            passkey = `${pdfkey.substring(4, 8)}${pdfkey.substring(0, 4)}`;
+        if (body.type !== 'MP') passkey = `${pdfkey.substring(4, 8)}${pdfkey.substring(0, 4)}`;
 
         const data = await this.docs.findAll(key, {
             year: body.year,

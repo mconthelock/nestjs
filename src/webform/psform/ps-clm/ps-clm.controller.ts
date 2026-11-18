@@ -12,10 +12,7 @@ import {
     UseInterceptors,
 } from '@nestjs/common';
 import { Request } from 'express';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { CreatePsClmReqFormDto } from './dto/create-ps-clm.dto';
@@ -27,7 +24,7 @@ export class PsClmController {
     constructor(private readonly psClmService: PsClmService) {}
 
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseInterceptors(getFileUploadInterceptor())
     create(
         @Body() dto: CreatePsClmReqFormDto,
@@ -43,7 +40,7 @@ export class PsClmController {
     }
 
     @Post('send-as400')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     sendToAs400(@Body() dto: SendPsClmAs400Dto) {
         return this.psClmService.sendToAs400(dto);
@@ -55,7 +52,7 @@ export class PsClmController {
     }
 
     @Patch()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     update(@Body() dto: UpdatePsClmDto, @Req() req: Request) {
         return this.psClmService.update(dto, getClientIP(req));
@@ -67,10 +64,7 @@ export class PsClmController {
     }
 
     @Get('report/:year')
-    findReportByYear(
-        @Param('year') year: string,
-        @Query() filters: Record<string, string>,
-    ) {
+    findReportByYear(@Param('year') year: string, @Query() filters: Record<string, string>) {
         return this.psClmService.findReport(year, filters);
     }
 

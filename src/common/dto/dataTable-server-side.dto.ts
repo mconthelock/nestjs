@@ -1,6 +1,13 @@
-import { Type } from "class-transformer";
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
-import { ToBoolean } from "../utils/transform";
+import { Type } from 'class-transformer';
+import {
+    IsEnum,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+    ValidateNested,
+} from 'class-validator';
+import { ToBoolean } from '../utils/transform';
 
 class DataTableOrderingDto {
     @IsNotEmpty()
@@ -14,7 +21,7 @@ class DataTableOrderingDto {
     dir: 'asc' | 'desc';
 
     @IsNotEmpty()
-    @IsString() 
+    @IsString()
     @Type(() => String)
     name: string;
 }

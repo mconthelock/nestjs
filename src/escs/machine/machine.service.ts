@@ -5,9 +5,7 @@ import { MachineResponseDto } from './dto/machine-response.dto';
 
 @Injectable()
 export class MachineService {
-    constructor(
-        private readonly repo: MachineRepository,
-    ) {}
+    constructor(private readonly repo: MachineRepository) {}
 
     async search(dto: SearchMachineDto): Promise<MachineResponseDto> {
         try {
@@ -30,7 +28,6 @@ export class MachineService {
                     mcName: res.MC_NAME,
                 },
             };
-
         } catch (err) {
             return {
                 status: 'ERROR',

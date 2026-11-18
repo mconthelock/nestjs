@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { FiltersDto } from 'src/common/dto/filter.dto';
@@ -15,7 +7,7 @@ import { FiltersDto } from 'src/common/dto/filter.dto';
 export class OrganizationsController {
     constructor(private readonly organizationsService: OrganizationsService) {}
     @Post('search')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     async search(@Body() dto: FiltersDto) {
         return this.organizationsService.search(dto);
     }
@@ -24,5 +16,4 @@ export class OrganizationsController {
     findAll() {
         return this.organizationsService.findAll();
     }
-
 }

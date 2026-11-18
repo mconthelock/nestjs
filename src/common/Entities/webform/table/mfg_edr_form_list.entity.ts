@@ -3,7 +3,7 @@ import { MfgEdrFormHead } from './mfg_edr_form_head.entity';
 import { EdrProcessMst } from './edr_process_mst.entity';
 import { EdrLineMst } from './edr_line_mst.entity';
 
-@Entity({ name: 'MFG_EDR_FORM_LIST' })
+@Entity({ name: 'MFG_EDR_FORM_LIST', schema: 'WEBFORM' })
 export class MfgEdrFormList {
     @PrimaryColumn()
     NFRMNO: number;

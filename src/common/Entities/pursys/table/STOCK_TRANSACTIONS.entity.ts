@@ -1,10 +1,4 @@
-import {
-    Column,
-    Entity,
-    OneToMany,
-    OneToOne,
-    PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { StockTransactionItems } from './STOCK_TRANSACTION_ITEMS.entity';
 import { StockTransactionsType } from './STOCK_TRANSACTION_TYPES.entity';
 

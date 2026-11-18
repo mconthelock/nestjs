@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { RQFFRM } from './RQFFRM.entity';
-import { Pvender } from 'src/amec/pvender/entities/pvender.entity';
+import { Pvender } from 'src/common/Entities/amec/table/PVENDER.entity';
 
 @Entity({ name: 'RQFLIST', schema: 'WEBFORM' })
 export class RQFLIST {

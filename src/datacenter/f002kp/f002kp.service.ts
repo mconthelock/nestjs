@@ -41,10 +41,7 @@ export class F002kpService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Search F002KP by control number ${controlNo} Error: ` +
-                    error.message,
-            );
+            throw new Error(`Search F002KP by control number ${controlNo} Error: ` + error.message);
         }
     }
 

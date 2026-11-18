@@ -8,7 +8,7 @@ import { CreateHandleFileFormDto } from 'src/webform/handle-file-form/dto/create
 
 @Injectable()
 export class GpFileRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

@@ -10,9 +10,7 @@ export class PrintedExtractService {
     extractOrderEntries(text: string): Array<{ orderNo: string; qty: number }> {
         const normalizedText = text.replace(/\r/g, '').replace(/\u00a0/g, ' ');
         const matches = [
-            ...normalizedText.matchAll(
-                /(?<![A-Z0-9])([A-Z0-9]{9})\s+(\d+)(?![A-Z0-9])/g,
-            ),
+            ...normalizedText.matchAll(/(?<![A-Z0-9])([A-Z0-9]{9})\s+(\d+)(?![A-Z0-9])/g),
         ];
 
         return matches.map(([, orderNo, qty]) => ({
@@ -83,8 +81,7 @@ export class PrintedExtractService {
             return '';
         }
 
-        const regex =
-            /\b(?![A-Z]+\b)[A-Z0-9]{5,9}(?:\s?[G\-]\d+)?(?:\sL\d+)?\b/i;
+        const regex = /\b(?![A-Z]+\b)[A-Z0-9]{5,9}(?:\s?[G\-]\d+)?(?:\sL\d+)?\b/i;
         const match = line.match(regex);
         const extractedDrawing = match ? match[0] : null;
         return extractedDrawing;

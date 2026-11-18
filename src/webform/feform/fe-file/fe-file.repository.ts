@@ -8,7 +8,7 @@ import { FE_FILE } from 'src/common/Entities/webform/table/FE_FILE.entity';
 
 @Injectable()
 export class FeFileRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 

@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
-@Entity('OTFORM')
+@Entity({ name: 'OTFORM', schema: 'WEBFORM' })
 export class GpOt {
     @PrimaryColumn()
     NFRMNO: string;

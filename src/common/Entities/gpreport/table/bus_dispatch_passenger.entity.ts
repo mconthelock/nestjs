@@ -1,7 +1,7 @@
-import { Column, Entity, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
+﻿import { Column, Entity, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
 import { BusDispatchStop } from './bus_dispatch_stop.entity';
 
-@Entity({ name: 'BUS_DISPATCH_PASSENGER' })
+@Entity({ name: 'BUS_DISPATCH_PASSENGER', schema: 'GPREPORT' })
 export class BusDispatchPassenger {
     @PrimaryColumn()
     DISPATCH_ID: number;

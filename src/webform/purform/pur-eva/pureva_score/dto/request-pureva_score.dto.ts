@@ -1,9 +1,7 @@
-import { Type } from "class-transformer";
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class RequestPurevaScoreDto {
-
-    
     @IsOptional()
     @IsString()
     TOPIC?: string;
@@ -20,5 +18,4 @@ export class RequestPurevaScoreDto {
     @IsOptional()
     @IsString()
     SLEVEL?: string;
-
 }

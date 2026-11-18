@@ -11,11 +11,11 @@ import { SearchItemmasterDto } from './dto/search-itemmaster.dto';
 @Injectable()
 export class ItemmasterService {
     constructor(
-        @InjectRepository(IMM_ITEMMST, 'webformConnection')
+        @InjectRepository(IMM_ITEMMST, 'mitsuConnection')
         private readonly itm: Repository<IMM_ITEMMST>,
-        @InjectRepository(PART_SHORTAGE_CONTROL, 'webformConnection')
+        @InjectRepository(PART_SHORTAGE_CONTROL, 'mitsuConnection')
         private readonly psc: Repository<PART_SHORTAGE_CONTROL>,
-        @InjectDataSource('webformConnection') private readonly ds: DataSource,
+        @InjectDataSource('mitsuConnection') private readonly ds: DataSource,
     ) {}
 
     async findAll(dto: SearchItemmasterDto) {

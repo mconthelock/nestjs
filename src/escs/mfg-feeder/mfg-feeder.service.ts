@@ -6,20 +6,16 @@ import { DrawingBMResponseDto } from './dto/drawing-bm-response.dto';
 
 @Injectable()
 export class MfgFeederService {
-    constructor(
-        private readonly repo: MfgFeederRepository,
-    ) {}
+    constructor(private readonly repo: MfgFeederRepository) {}
 
-    async getInfo(
-        controlNo: string
-    ): Promise<MfgFeederResponseDto> {
+    async getInfo(controlNo: string): Promise<MfgFeederResponseDto> {
         try {
             const res = await this.repo.getInfo(controlNo);
             if (!res) {
                 return {
                     status: 'ERROR',
                     message: 'ID-Tag not found',
-                    data: null
+                    data: null,
                 };
             }
 
@@ -29,22 +25,19 @@ export class MfgFeederService {
                 data: {
                     INSDATE: res.INSDATE,
                     PROD: res.PROD,
-                    MODEL: res.MODEL
-                }
+                    MODEL: res.MODEL,
+                },
             };
-
         } catch (error) {
             return {
                 status: 'ERROR',
                 message: error.message || 'Get ID-Tag Failed',
-                data: null
+                data: null,
             };
         }
     }
 
-    async getDrawingBMCount(
-        dto: GetDrawingBmDto
-    ): Promise<DrawingBMResponseDto> {
+    async getDrawingBMCount(dto: GetDrawingBmDto): Promise<DrawingBMResponseDto> {
         try {
             const res = await this.repo.getDrawingBMCount(dto);
             return {
@@ -56,15 +49,14 @@ export class MfgFeederService {
                     PROD_3: Number(res.PROD_3 ?? 0),
                     PROD_4: Number(res.PROD_4 ?? 0),
                     PROD_5: Number(res.PROD_5 ?? 0),
-                    PROD_6: Number(res.PROD_6 ?? 0)
-                }
+                    PROD_6: Number(res.PROD_6 ?? 0),
+                },
             };
-
         } catch (error) {
             return {
                 status: 'ERROR',
                 message: error.message || 'Get Drawing BM Failed',
-                data: null
+                data: null,
             };
         }
     }

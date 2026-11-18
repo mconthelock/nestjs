@@ -13,7 +13,7 @@ export class VendingService {
     constructor(
         private readonly vendingrepo: VendingRepository,
         private readonly formService: FormService,
-        private readonly stocksService: StocksService
+        private readonly stocksService: StocksService,
     ) {}
 
     async getProduct() {
@@ -58,10 +58,7 @@ export class VendingService {
                 ITEMS: stockWithdrawalData,
             };
 
-            const issue = await this.stocksService.createStockTransaction(
-                stock_withdrawal,
-                1,
-            );
+            const issue = await this.stocksService.createStockTransaction(stock_withdrawal, 1);
             console.log('stock_withdrawal:', stock_withdrawal);
 
             const importResult = await this.vendingrepo.importVending(dto);
@@ -81,10 +78,7 @@ export class VendingService {
                     ITEMS: stockReceiveData,
                 };
 
-                const receive = await this.stocksService.createStockTransaction(
-                    stock_receive,
-                    2,
-                );
+                const receive = await this.stocksService.createStockTransaction(stock_receive, 2);
                 receiveId = receive.ID;
             }
 
@@ -204,8 +198,7 @@ export class VendingService {
     async getToolWithdrawalWithRequest() {
         try {
             // return await this.vendingrepo.getToolWithdrawalWithRequest();
-            const request =
-                await this.vendingrepo.getToolWithdrawalWithRequest();
+            const request = await this.vendingrepo.getToolWithdrawalWithRequest();
             return request;
             // return await Promise.all(
             //     request.map(async (item) => {
@@ -241,39 +234,34 @@ export class VendingService {
         const data = await this.vendingrepo.getRequestWithdrawal();
 
         // Step 1: Group และ sum QTY พร้อมเก็บ form header ที่ไม่ซ้ำไว้เป็น array
-        const grouped = (data as any[]).reduce<Record<string, any>>(
-            (acc, item) => {
-                const key = `${item.EMPNO}|${item.REQUEST_DATE}|${item.PRODUCT_ID}`;
+        const grouped = (data as any[]).reduce<Record<string, any>>((acc, item) => {
+            const key = `${item.EMPNO}|${item.REQUEST_DATE}|${item.PRODUCT_ID}`;
 
-                if (!acc[key]) {
-                    acc[key] = {
-                        ...item,
-                        QTY: 0,
-                        formHeaders: [], // เก็บ combo ของ NFRMNO/VORGNO/CYEAR/CYEAR2/NRUNNO ที่ไม่ซ้ำ
-                    };
-                }
+            if (!acc[key]) {
+                acc[key] = {
+                    ...item,
+                    QTY: 0,
+                    formHeaders: [], // เก็บ combo ของ NFRMNO/VORGNO/CYEAR/CYEAR2/NRUNNO ที่ไม่ซ้ำ
+                };
+            }
 
-                acc[key].QTY += item.QTY;
+            acc[key].QTY += item.QTY;
 
-                const formKey = `${item.NFRMNO}|${item.VORGNO}|${item.CYEAR}|${item.CYEAR2}|${item.NRUNNO}`;
-                const exists = acc[key].formHeaders.some(
-                    (f: any) => f.key === formKey,
-                );
-                if (!exists) {
-                    acc[key].formHeaders.push({
-                        key: formKey,
-                        NFRMNO: item.NFRMNO,
-                        VORGNO: item.VORGNO,
-                        CYEAR: item.CYEAR,
-                        CYEAR2: item.CYEAR2,
-                        NRUNNO: item.NRUNNO,
-                    });
-                }
+            const formKey = `${item.NFRMNO}|${item.VORGNO}|${item.CYEAR}|${item.CYEAR2}|${item.NRUNNO}`;
+            const exists = acc[key].formHeaders.some((f: any) => f.key === formKey);
+            if (!exists) {
+                acc[key].formHeaders.push({
+                    key: formKey,
+                    NFRMNO: item.NFRMNO,
+                    VORGNO: item.VORGNO,
+                    CYEAR: item.CYEAR,
+                    CYEAR2: item.CYEAR2,
+                    NRUNNO: item.NRUNNO,
+                });
+            }
 
-                return acc;
-            },
-            {},
-        );
+            return acc;
+        }, {});
 
         const resultArray = Object.values(grouped);
 

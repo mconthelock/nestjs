@@ -17,10 +17,7 @@ import {
 } from './gp-rb.service';
 import { CreateStampReqFormDto } from './dto/create-gp-rb.dto';
 import { UpdateNamestampdto } from './dto/update-gp-rb.dto';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
@@ -58,7 +55,7 @@ export class GpRbController {
 
     /*stampFormatGroup ถูกแก้ไขเข้ามาเพื่อจะเลือกข้อมูลไป insert เข้าตาราง */
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseInterceptors(getFileUploadInterceptor('otherAttachment'))
     create(
         @Body() dto: CreateStampReqFormDto,
@@ -71,11 +68,11 @@ export class GpRbController {
     /*stampFormatGroup ถูกแก้ไขเข้ามาเพื่อจะเลือกข้อมูลไป insert เข้าตาราง */
 
     @Patch()
-    @UseTransaction('webformConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ webformConnection
+    @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
     @UseForceTransaction()
     update(@Body() dto: UpdateNamestampdto, @Req() req: Request) {
         const ip = getClientIP(req);
-        
+
         return this.gpRbServicee.doaction(dto, ip);
     }
 }

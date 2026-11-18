@@ -1,12 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-    IsOptional,
-    IsString,
-    IsNumber,
-    IsArray,
-    IsDateString,
-    IsNotEmpty,
-} from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsArray, IsDateString, IsNotEmpty } from 'class-validator';
 export class CreateAttcnfrmDto {
     @IsNotEmpty()
     @Type(() => Number)

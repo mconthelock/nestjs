@@ -1,9 +1,4 @@
-import {
-    IntersectionType,
-    OmitType,
-    PartialType,
-    PickType,
-} from '@nestjs/swagger';
+import { IntersectionType, OmitType, PartialType, PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
     IsArray,
@@ -137,9 +132,7 @@ export class RequestPurevaFormDto extends PickType(CreateFormDto, [
     CORPORATE_ID?: string;
 
     @IsOptional()
-    @Transform(({ value }) =>
-        value !== undefined && value !== null ? String(value) : value,
-    )
+    @Transform(({ value }) => (value !== undefined && value !== null ? String(value) : value))
     @IsString()
     TAX_ID?: string;
 

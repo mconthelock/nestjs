@@ -8,23 +8,18 @@ import { PurVendorsCode } from '../../common/Entities/pursys/table/pur_vendors_c
 @Injectable()
 export class PurVendorsCodeService {
     constructor(
-        @InjectRepository(PurVendorsCode, 'purConnection')
+        @InjectRepository(PurVendorsCode, 'mitsuConnection')
         private purVendorCodeRepo: Repository<PurVendorsCode>,
-        @InjectDataSource('purConnection')
+        @InjectDataSource('mitsuConnection')
         private ds: DataSource,
     ) {}
     async create(createPurVendorsCodeDto: CreatePurVendorsCodeDto) {
-        const newVendorCode = this.purVendorCodeRepo.create(
-            createPurVendorsCodeDto,
-        );
+        const newVendorCode = this.purVendorCodeRepo.create(createPurVendorsCodeDto);
         return await this.purVendorCodeRepo.save(newVendorCode);
     }
 
     async update(id: number, updatePurVendorsCodeDto: UpdatePurVendorsCodeDto) {
-        const result = await this.purVendorCodeRepo.update(
-            id,
-            updatePurVendorsCodeDto,
-        );
+        const result = await this.purVendorCodeRepo.update(id, updatePurVendorsCodeDto);
         if (result.affected === 0) {
             throw new Error(`ไม่พบ Vendor code ID: ${id}`);
         }

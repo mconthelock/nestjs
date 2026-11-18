@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { Between, DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -10,7 +10,7 @@ import { STY_TYPE } from 'src/common/Entities/gpreport/table/STY_TYPE.entity';
 
 @Injectable()
 export class StyPatrolInspectionRepository extends BaseRepository {
-    constructor(@InjectDataSource('gpreportConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -108,9 +108,7 @@ export class StyPatrolInspectionRepository extends BaseRepository {
             .leftJoin(`(${sub.getQuery()})`, 'P', 'I.ITEMS_ID = P.ITEMS_ID')
             .setParameters(sub.getParameters())
             .where('I.ITEMS_TYPE = 2')
-            .groupBy(
-                'I.ITEMS_ID, I.ITEMS_NAME, I.ITEMS_ENAME, OWNER_SECTION,   CLASS',
-            )
+            .groupBy('I.ITEMS_ID, I.ITEMS_NAME, I.ITEMS_ENAME, OWNER_SECTION,   CLASS')
             .orderBy('OWNER_SECTION, ITEMS_ID, CLASS', 'ASC');
         return query.getRawMany();
     }
@@ -133,7 +131,8 @@ export class StyPatrolInspectionRepository extends BaseRepository {
     async summaryClass(fyear: string, seccode?: string) {
         return this.manager.query(
             `WITH CLASS_LIST AS (
-                SELECT TYPE_NAME AS CLASS, TYPE_NO  FROM STY_TYPE
+                SELECT TYPE_NAME AS CLASS, TYPE_NO  
+                FROM GPREPORT.STY_TYPE
                 WHERE TYPE_CODE = 'PTC' AND TYPE_NO IN (1,2)
             )
             SELECT 
@@ -153,7 +152,7 @@ export class StyPatrolInspectionRepository extends BaseRepository {
                 NVL(COUNT(S.TYPE_NO), 0) TOTAL
             FROM CLASS_LIST C 
             LEFT JOIN (
-                SELECT * FROM STY_PATROL_INSPECTION
+                SELECT * FROM GPREPORT.STY_PATROL_INSPECTION
                 ${seccode ? 'WHERE PA_SECTION = :1' : ''}
             )S
             ON S.TYPE_NO = C.TYPE_NO
@@ -172,7 +171,8 @@ export class StyPatrolInspectionRepository extends BaseRepository {
     async summaryDepartment(fyear: string, month: number) {
         return this.manager.query(
             `WITH CLASS_LIST AS (
-                SELECT TYPE_NAME AS CLASS, TYPE_NO  FROM STY_TYPE
+                SELECT TYPE_NAME AS CLASS, TYPE_NO  
+                FROM GPREPORT.STY_TYPE
                 WHERE TYPE_CODE = 'PTC' AND TYPE_NO IN (1,2)
             )
             SELECT D.SDEPCODE, D.SDEPT, C.CLASS,  NVL(P.AMOUNT, 0) AS AMOUNT
@@ -180,7 +180,7 @@ export class StyPatrolInspectionRepository extends BaseRepository {
             CROSS JOIN CLASS_LIST C
             LEFT JOIN (
                 SELECT SDEPCODE, SDEPT, CLASS, COUNT(CLASS) AS AMOUNT
-                FROM STY_PATROL_INSPECTION	
+                FROM GPREPORT.STY_PATROL_INSPECTION	
                 WHERE CST = '2'
                 AND PA_DATE >= TO_DATE(:1 || '-04-01', 'YYYY-MM-DD')
                 AND PA_DATE < ADD_MONTHS(
@@ -241,16 +241,17 @@ export class StyPatrolInspectionRepository extends BaseRepository {
     async summarySection(fyear: string, month: number, deptcode: string) {
         return this.manager.query(
             `WITH CLASS_LIST AS (
-                SELECT TYPE_NAME AS CLASS, TYPE_NO  FROM STY_TYPE
+                SELECT TYPE_NAME AS CLASS, TYPE_NO  
+                FROM GPREPORT.STY_TYPE
                 WHERE TYPE_CODE = 'PTC' AND TYPE_NO IN (1,2)
             )
             SELECT O.SSECCODE, O.SSEC, C.CLASS, NVL(P.AMOUNT,0) AS AMOUNT
-            FROM ORGANIZATIONS O
+            FROM WEBFORM.ORGANIZATIONS O
             CROSS JOIN CLASS_LIST C
             LEFT JOIN 
             (
                 SELECT SSECCODE, CLASS, COUNT(CLASS) AS AMOUNT
-                FROM STY_PATROL_INSPECTION	
+                FROM GPREPORT.STY_PATROL_INSPECTION	
                 WHERE CST = '2'
                 AND PA_DATE >= TO_DATE(:1 || '-04-01', 'YYYY-MM-DD')
                 AND PA_DATE < ADD_MONTHS(

@@ -8,7 +8,7 @@ import { RnfrmRepository } from './rnfrm.repository';
 import { RnfrmService } from './rnfrm.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([RNFRM], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([RNFRM], 'mitsuConnection')],
     controllers: [RnfrmController],
     providers: [RnfrmService, RnfrmRepository],
     exports: [RnfrmService],

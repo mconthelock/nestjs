@@ -8,7 +8,7 @@ import { CreateAppsmenuDto } from './dto/create-appsmenu.dto';
 @Injectable()
 export class AppsmenuService {
     constructor(
-        @InjectRepository(Appsmenu, 'docinvConnection')
+        @InjectRepository(Appsmenu, 'mitsuConnection')
         private readonly menu: Repository<Appsmenu>,
     ) {}
 
@@ -32,10 +32,7 @@ export class AppsmenuService {
         const list = this.menu.create(data);
         const result = await this.menu.save(list);
         if (data.MENU_TYPE === 1) {
-            await this.menu.update(
-                { MENU_ID: result.MENU_ID },
-                { MENU_TOP: result.MENU_ID },
-            );
+            await this.menu.update({ MENU_ID: result.MENU_ID }, { MENU_TOP: result.MENU_ID });
         }
         // return result;
         return this.findOneMenu(result.MENU_ID);

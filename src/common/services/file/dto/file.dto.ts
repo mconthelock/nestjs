@@ -1,67 +1,59 @@
 import { Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsEnum,
-  IsIn,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsBoolean, IsEnum, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export enum ListMode {
-  ALL = 'all',
-  FILE = 'file',
-  DIR = 'dir',
+    ALL = 'all',
+    FILE = 'file',
+    DIR = 'dir',
 }
 
 export class FileDto {
-  @IsNotEmpty()
-  @IsString()
-  baseDir: string; // FILE_PATH
+    @IsNotEmpty()
+    @IsString()
+    baseDir: string; // FILE_PATH
 
-  @IsNotEmpty()
-  @IsString()
-  storedName: string; // FILE_FNAME (ชื่อที่เก็บจริง)
+    @IsNotEmpty()
+    @IsString()
+    storedName: string; // FILE_FNAME (ชื่อที่เก็บจริง)
 
-  @IsOptional()
-  @IsString()
-  originalName?: string; // FILE_ONAME (ถ้ามีจะใช้ตั้งชื่อเวลา download/open)
+    @IsOptional()
+    @IsString()
+    originalName?: string; // FILE_ONAME (ถ้ามีจะใช้ตั้งชื่อเวลา download/open)
 
-  @IsNotEmpty()
-  @IsString()
-  @IsIn(['open', 'download'])
-  mode: string; // โหมดเปิดไฟล์หรือดาวน์โหลด
+    @IsNotEmpty()
+    @IsString()
+    @IsIn(['open', 'download'])
+    mode: string; // โหมดเปิดไฟล์หรือดาวน์โหลด
 }
 
 export class ListDto {
-  @IsNotEmpty()
-  @IsString()
-  baseDir: string;
+    @IsNotEmpty()
+    @IsString()
+    baseDir: string;
 
-  @IsOptional()
-  @IsString()
-  path?: string;
+    @IsOptional()
+    @IsString()
+    path?: string;
 
-  @IsOptional()
-  @IsString({ each: true })
-  allow?: string[];
+    @IsOptional()
+    @IsString({ each: true })
+    allow?: string[];
 
-  @IsOptional()
-  @IsEnum(ListMode)
-  mode?: ListMode; // all | file | dir
+    @IsOptional()
+    @IsEnum(ListMode)
+    mode?: ListMode; // all | file | dir
 }
 
 export class SaveFileDto {
-  @IsNotEmpty()
-  @IsString()
-  path: string;
+    @IsNotEmpty()
+    @IsString()
+    path: string;
 
-  @IsOptional()
-  @IsBoolean()
-  @Type(() => Boolean)
-  isPhp: boolean;
+    @IsOptional()
+    @IsBoolean()
+    @Type(() => Boolean)
+    isPhp: boolean;
 
-  @IsOptional()
-  filename?: string[] | string; // ถ้าเป็น string แปลว่าใช้ชื่อเดียวกันสำหรับทุกไฟล์ ถ้าเป็น array แปลว่าใช้ชื่อแยกตาม index ของไฟล์
-
+    @IsOptional()
+    filename?: string[] | string; // ถ้าเป็น string แปลว่าใช้ชื่อเดียวกันสำหรับทุกไฟล์ ถ้าเป็น array แปลว่าใช้ชื่อแยกตาม index ของไฟล์
 }

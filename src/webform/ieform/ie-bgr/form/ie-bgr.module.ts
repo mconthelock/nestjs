@@ -32,7 +32,7 @@ import { IeBgrLastApvService } from './ie-bgr-lastApv.service';
         PprbiddingModule,
         MailModule,
         PpoModule,
-        TypeOrmModule.forFeature([IEBGR_REPORT_VIEW], 'webformConnection'),
+        TypeOrmModule.forFeature([IEBGR_REPORT_VIEW], 'mitsuConnection'),
     ],
     controllers: [IeBgrController],
     providers: [

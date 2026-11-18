@@ -4,7 +4,7 @@ import { IsCboController } from './is-cbo.controller';
 import { IsCboRepository } from './is-cbo.reportsitory';
 
 @Module({
-  controllers: [IsCboController],
-  providers: [IsCboService, IsCboRepository],
+    controllers: [IsCboController],
+    providers: [IsCboService, IsCboRepository],
 })
 export class IsCboModule {}

@@ -1,7 +1,4 @@
-import {
-    Controller,
-    Get,
-} from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { StyItemsService } from './sty-items.service';
 import { CreateStyItemDto } from './dto/create-sty-item.dto';
 import { UpdateStyItemDto } from './dto/update-sty-item.dto';

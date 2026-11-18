@@ -13,10 +13,7 @@ import {
 import { UpdatePlIssueProblemReasonDto } from './dto/update-packing-list-issue.dto';
 
 import { joinPaths } from 'src/common/utils/files.utils';
-import {
-    convertJung,
-    numberToAlphabetRevision,
-} from 'src/common/utils/format.utils';
+import { convertJung, numberToAlphabetRevision } from 'src/common/utils/format.utils';
 
 import { MailService } from 'src/common/services/mail/mail.service';
 import { DpmsPlDocRevService } from 'src/workload/dpms_pl_doc_rev/dpms_pl_doc_rev.service';
@@ -45,8 +42,7 @@ export class PackingListIssueService {
                 VORDERS,
                 VTYPE,
             };
-            const checkPlIssue =
-                await this.dpmsPlIssueService.findOne(condition);
+            const checkPlIssue = await this.dpmsPlIssueService.findOne(condition);
             if (!checkPlIssue.status) {
                 return await this.dpmsPlIssueService.create({
                     ...condition,
@@ -56,9 +52,7 @@ export class PackingListIssueService {
                 return await this.dpmsPlIssueService.update(condition, data);
             }
         } catch (error) {
-            throw new Error(
-                `Failed to update problem reason: ${error.message}`,
-            );
+            throw new Error(`Failed to update problem reason: ${error.message}`);
         }
     }
 
@@ -256,19 +250,13 @@ export class PackingListIssueService {
             console.log('revise:', revise);
             console.log('typeCode:', typeCode);
             console.log('recreatedIssue:', recreatedIssue);
-            if (
-                revise &&
-                ['PT', 'SP', 'BL'].includes(typeCode) &&
-                !recreatedIssue
-            ) {
+            if (revise && ['PT', 'SP', 'BL'].includes(typeCode) && !recreatedIssue) {
                 const previousRevision =
-                    await this.dpmsPlDocRevService.findPreviousRevisionExcludingIssueRev(
-                        {
-                            ...plIssueData,
-                            NREV: docRevData.NREV,
-                            NISSUEREV_ID: reviseID,
-                        },
-                    );
+                    await this.dpmsPlDocRevService.findPreviousRevisionExcludingIssueRev({
+                        ...plIssueData,
+                        NREV: docRevData.NREV,
+                        NISSUEREV_ID: reviseID,
+                    });
                 console.log('previousRevision:', previousRevision);
                 for (const record of previousRevision.data) {
                     console.log('record:', record);
@@ -290,11 +278,10 @@ export class PackingListIssueService {
             // update DFINISHALL for pending records if any
             if (['CP', 'CB', 'BL'].includes(typeCode)) {
                 // ดึงรายการ ที่ยังไม่ finish ของเอกสารนี้ เพื่อ update DFINISHALL เป็นวันที่ issue
-                const pendingRecord =
-                    await this.dpmsPlDocRevService.getPendingRecord({
-                        ...plIssueData,
-                        NREV: docRevData.NREV,
-                    });
+                const pendingRecord = await this.dpmsPlDocRevService.getPendingRecord({
+                    ...plIssueData,
+                    NREV: docRevData.NREV,
+                });
 
                 if (pendingRecord.status) {
                     for (const record of pendingRecord.data) {
@@ -330,8 +317,7 @@ export class PackingListIssueService {
     }): Promise<{ revision: number; revisionText: string }> {
         // 2026-06-27 เปลี่ยนเอา type และ round ออกจาก condition เพราะ revision จะไม่ขึ้นกับ type และ round แล้ว รันต่อเนื่องได้เลย
         // 2026-07-09 เพิ่ม typeId เพื่อใช้ในการหา revision ของ typeCode เป็น 'DF' (Draft) เพราะ Draft จะมี revision ต่อเนื่องแยกตาม typeId
-        const draftTypeId =
-            await this.dpmsPlIssueTypeService.findByTypeCode('DF');
+        const draftTypeId = await this.dpmsPlIssueTypeService.findByTypeCode('DF');
         const revision: number =
             typeCode === 'DF'
                 ? await this.dpmsPlIssueRevService.getNextRevision({
@@ -408,10 +394,7 @@ export class PackingListIssueService {
         attachments,
         subject = `Packing list issue notification`,
     }: sendMailParams) {
-        const email =
-            process.env.NODE_ENV != 'production'
-                ? process.env.MAIL_ADMIN
-                : maillist; //mails.data.map((mail) => mail.VEMAIL_ADDRESS);
+        const email = process.env.NODE_ENV != 'production' ? process.env.MAIL_ADMIN : maillist; //mails.data.map((mail) => mail.VEMAIL_ADDRESS);
         const state = process.env.STATE != 'production' ? '(TEST)' : '';
         await this.mailService.sendMail({
             from: `MFG REPORT System<${process.env.MAIL_FROM}>`,

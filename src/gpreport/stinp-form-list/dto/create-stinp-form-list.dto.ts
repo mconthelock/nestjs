@@ -34,10 +34,14 @@ export class PrimaryKeyStinpFormListDto {
     NID: number;
 }
 
-export class CreateStinpFormListDto extends PickType(
-    PrimaryKeyStinpFormListDto,
-    ['NFRMNO', 'VORGNO', 'CYEAR', 'CYEAR2', 'NRUNNO', 'NID'],
-) {
+export class CreateStinpFormListDto extends PickType(PrimaryKeyStinpFormListDto, [
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'CYEAR2',
+    'NRUNNO',
+    'NID',
+]) {
     @IsNotEmpty()
     @IsNumber()
     @Type(() => Number)

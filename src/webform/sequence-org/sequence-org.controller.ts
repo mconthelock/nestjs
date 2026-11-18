@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { SequenceOrgService } from './sequence-org.service';
 import { CreateSequenceOrgDto } from './dto/create-sequence-org.dto';
 import { UpdateSequenceOrgDto } from './dto/update-sequence-org.dto';

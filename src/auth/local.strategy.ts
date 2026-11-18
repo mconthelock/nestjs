@@ -6,22 +6,22 @@ import { AuthService } from './auth.service';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
-  constructor(private authService: AuthService) {
-    super({
-      usernameField: 'username',
-      passwordField: 'password',
-      passReqToCallback: true, // enables access to req in validate
-    });
-  }
-
-  async validate(req: Request, username: string, pass: string): Promise<any> {
-    const appid = (req.body as any).appid;
-    const ip = String((req as any).clientIp);
-    
-    const user = await this.authService.validateUser(username, pass, appid, ip);
-    if (!user) {
-      throw new UnauthorizedException('You have no authorization');
+    constructor(private authService: AuthService) {
+        super({
+            usernameField: 'username',
+            passwordField: 'password',
+            passReqToCallback: true, // enables access to req in validate
+        });
     }
-    return user;
-  }
+
+    async validate(req: Request, username: string, pass: string): Promise<any> {
+        const appid = (req.body as any).appid;
+        const ip = String((req as any).clientIp);
+
+        const user = await this.authService.validateUser(username, pass, appid, ip);
+        if (!user) {
+            throw new UnauthorizedException('You have no authorization');
+        }
+        return user;
+    }
 }

@@ -1,11 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { PUR_FILE } from './PUR_FILE.entity';
 import { PURNVF_LIST } from './PURNVF_LIST.entity';
 import { PURNVF_ADDRESS } from './PURNVF_ADDRESS.entity';

@@ -1,6 +1,6 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { GPTPH_REQ_HEADER } from "./GPTPH_REQ_HEADER.entity";
-import { GPTPH_AREAS } from "./GPTPH_AREAS.entity";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { GPTPH_REQ_HEADER } from './GPTPH_REQ_HEADER.entity';
+import { GPTPH_AREAS } from './GPTPH_AREAS.entity';
 
 @Entity({
     name: 'GPTPH_AREA_RECORD',
@@ -13,7 +13,7 @@ export class GPTPH_AREA_RECORD {
     NRUNNO: number;
     @PrimaryColumn()
     AREA_ID: number;
-    @Column({ type: 'varchar2', length: 1, nullable: true })
+    @Column({ length: 1, nullable: true })
     AREA_APPROVED: string | null;
 
     @ManyToOne(() => GPTPH_REQ_HEADER)
@@ -24,8 +24,6 @@ export class GPTPH_AREA_RECORD {
     form?: GPTPH_REQ_HEADER;
 
     @ManyToOne(() => GPTPH_AREAS)
-    @JoinColumn([
-        { name: 'AREA_ID', referencedColumnName: 'AREA_ID' },
-    ])
+    @JoinColumn([{ name: 'AREA_ID', referencedColumnName: 'AREA_ID' }])
     area?: GPTPH_AREAS;
 }

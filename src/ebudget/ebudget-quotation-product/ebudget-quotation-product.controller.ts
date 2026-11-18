@@ -3,9 +3,7 @@ import { EbudgetQuotationProductService } from './ebudget-quotation-product.serv
 
 @Controller('ebudget/quotation/product')
 export class EbudgetQuotationProductController {
-    constructor(
-        private readonly ebudgetQuotationProductService: EbudgetQuotationProductService,
-    ) {}
+    constructor(private readonly ebudgetQuotationProductService: EbudgetQuotationProductService) {}
 
     @Get(':id')
     async getData(@Param('id') id: number) {

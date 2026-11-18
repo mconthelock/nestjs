@@ -17,10 +17,7 @@ import { RequestCNFormDto } from './dto/request-qa-cn.dto';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { Request } from 'express';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { ApproveQaCnDto } from './dto/approve-qa-cn.dto';
 
 @Controller('qaform/qa-cn')
@@ -29,7 +26,7 @@ export class QaCnController {
     private readonly path =
         `${process.env.AMEC_FILE_PATH}${process.env.STATE}/Form/QA/CN/` as string;
     @Post('create')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(
         getFileUploadInterceptor([
@@ -63,7 +60,7 @@ export class QaCnController {
     }
 
     @Patch('approve')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(
         getFileUploadInterceptor([

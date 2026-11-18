@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { UsersAuthorizeViewService } from './user-authorize-view.service';
 import { UsersAuthorizeViewController } from './user-authorize-view.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -6,9 +6,7 @@ import { USERS_AUTHORIZE_VIEW } from 'src/common/Entities/escs/views/USERS_AUTHO
 import { UsersAuthorizeViewRepository } from './user-authorize-view.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([USERS_AUTHORIZE_VIEW], 'escsConnection'),
-    ],
+    imports: [TypeOrmModule.forFeature([USERS_AUTHORIZE_VIEW], 'mitsuConnection')],
     controllers: [UsersAuthorizeViewController],
     providers: [UsersAuthorizeViewService, UsersAuthorizeViewRepository],
     exports: [UsersAuthorizeViewService],

@@ -17,9 +17,9 @@ import { SpecialuserModule } from './specialuser/specialuser.module';
 //ITAdmin[Datacenter]
 import { DatacenterModule } from './datacenter/datacenter.module';
 //Not use (Now)
-import { ProgramModule } from './program/program.module';
-import { RevisionModule } from './revision/revision.module';
-import { SourceModule } from './source/source.module';
+// import { ProgramModule } from './program/program.module';
+// import { RevisionModule } from './revision/revision.module';
+// import { SourceModule } from './source/source.module';
 import { TasksModule } from './tasks/tasks.module';
 import { TourModule } from './tour/tour.module';
 @Module({
@@ -37,9 +37,9 @@ import { TourModule } from './tour/tour.module';
         SpecialuserModule,
         DatacenterModule,
         //Not use (Now)
-        ProgramModule,
-        RevisionModule,
-        SourceModule,
+        // ProgramModule,
+        // RevisionModule,
+        // SourceModule,
         TasksModule,
         TourModule,
     ],

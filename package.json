@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "prebuild": "node -e \"fs.rmSync('dist', { recursive: true, force: true }); fs.rmSync('tsconfig.build.tsbuildinfo', { force: true });\"",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -18,12 +19,16 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:db": "jest --testPathPattern=real-db-connection",
     "copy": "xcopy D:\\project\\backend\\dist \\\\172.21.255.188\\amecweb\\wwwroot\\development\\backend\\dist /E /I /Y",
     "typeorm": "typeorm --dataSource src/common/databases/data-source.ts",
     "migration:create": "npm run typeorm -- migration:create -n",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert",
-    "postinstall": "playwright install chromium"
+    "postinstall": "playwright install chromium",
+    "benchmark": "node scripts/benchmark/benchmark-dev.js",
+    "benchmark:dev": "node scripts/benchmark/benchmark-dev.js",
+    "benchmark:prod": "node scripts/benchmark/index.js"
   },
   "dependencies": {
     "@nestjs/apollo": "^13.1.0",
@@ -34,7 +39,7 @@
     "@nestjs/core": "^11.1.3",
     "@nestjs/graphql": "^13.1.0",
     "@nestjs/jwt": "^11.0.0",
-    "@nestjs/mapped-types": "*",
+    "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.6",
     "@nestjs/platform-socket.io": "^11.1.3",
@@ -68,6 +73,7 @@
     "ibm_db": "^3.3.2",
     "ioredis": "^5.8.2",
     "jszip": "^3.10.1",
+    "luxon": "^3.7.2",
     "mjml": "^5.1.0",
     "mssql": "^11.0.1",
     "multer": "^2.0.2",

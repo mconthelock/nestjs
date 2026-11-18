@@ -8,9 +8,7 @@ import { UsersAuthorizeViewRepository } from './user-authorize-view.repository';
 export class UsersAuthorizeViewService {
     constructor(private readonly repo: UsersAuthorizeViewRepository) {}
 
-    async getUserAuthorizeView(
-        dto: SearchUserAuthorizeViewDto,
-    ) {
+    async getUserAuthorizeView(dto: SearchUserAuthorizeViewDto) {
         return this.repo.getUserAuthorizeView(dto);
     }
 }

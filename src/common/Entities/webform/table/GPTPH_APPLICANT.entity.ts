@@ -1,5 +1,5 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { GPTPH_REQ_HEADER } from "./GPTPH_REQ_HEADER.entity";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { GPTPH_REQ_HEADER } from './GPTPH_REQ_HEADER.entity';
 
 @Entity({
     name: 'GPTPH_APPLICANT',
@@ -19,8 +19,7 @@ export class GPTPH_APPLICANT {
     @Column()
     APPLICANT_NAME: string;
     @Column()
-    COMPANY_NAME: string; 
-
+    COMPANY_NAME: string;
 
     @ManyToOne(() => GPTPH_REQ_HEADER)
     @JoinColumn([

@@ -1,11 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { INV_YEARLY_RESULT } from '../../skid/table/INV_YEARLY_RESULT.entity';
 import { INV_YEARLY_ASSIGN } from '../../skid/table/INV_YEARLY_ASSIGN.entity';
 

@@ -5,9 +5,7 @@ import { WireHarnessDrumMasterRepository } from './wire-harness-drum-master.repo
 
 @Injectable()
 export class WireHarnessDrumMasterService {
-    constructor(
-        private readonly repo: WireHarnessDrumMasterRepository,
-    ) {}
+    constructor(private readonly repo: WireHarnessDrumMasterRepository) {}
 
     list(condition: FiltersDto) {
         return this.repo.list(condition);

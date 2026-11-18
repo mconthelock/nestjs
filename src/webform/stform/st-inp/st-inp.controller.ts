@@ -16,17 +16,11 @@ import { CreateStInpDto, DraftStInpDto } from './dto/create-st-inp.dto';
 import { UpdateStInpDto } from './dto/update-st-inp.dto';
 import { Request } from 'express';
 import { getClientIP } from 'src/common/utils/ip.utils';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { StInpCreateService } from './st-inp-create.service';
 import { StInpCorrectiveService } from './st-inp-corrective.service';
-import {
-    CorrectiveStInpDetailDto,
-    CorrectiveStInpDto,
-} from './dto/corrective-st-inp.dto';
+import { CorrectiveStInpDetailDto, CorrectiveStInpDto } from './dto/corrective-st-inp.dto';
 import { StInpEvaluateService } from './st-inp-evaluate.service';
 import { EvaluateStInpDto } from './dto/evaluate-st-inp.dto';
 import { StInpSaveDraftService } from './st-inp-saveDraft.service';
@@ -45,7 +39,7 @@ export class StInpController {
     private readonly path = `${process.env.AMEC_FILE_PATH}${process.env.STATE}/safety/image/Patrol/`;
 
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(getFileUploadInterceptor('PA_IMAGE[]', true, 30))
     Create(
@@ -54,16 +48,11 @@ export class StInpController {
         @UploadedFiles() file: Express.Multer.File[],
     ) {
         const ip = getClientIP(req);
-        return this.stInpCreateService.create(
-            createStInpDto,
-            ip,
-            file,
-            this.path,
-        );
+        return this.stInpCreateService.create(createStInpDto, ip, file, this.path);
     }
 
     @Post('saveAndAction')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(getFileUploadInterceptor('PA_IMAGE[]', true, 30))
     saveDraft(
@@ -76,7 +65,7 @@ export class StInpController {
     }
 
     @Post('setCorrective')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     SetCorrective(@Body() dto: CorrectiveStInpDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -84,7 +73,7 @@ export class StInpController {
     }
 
     @Patch('setCorrectiveDetail')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     @UseInterceptors(getFileUploadInterceptor('PA_IMAGE_AFTER[]', true, 30))
     SetCorrectiveDetail(
@@ -93,16 +82,11 @@ export class StInpController {
         @UploadedFiles() file: Express.Multer.File[],
     ) {
         const ip = getClientIP(req);
-        return this.stInpCorrectiveService.setCorrectiveDetail(
-            dto,
-            ip,
-            file,
-            this.path,
-        );
+        return this.stInpCorrectiveService.setCorrectiveDetail(dto, ip, file, this.path);
     }
 
     @Patch('setEvaluate')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     SetEvaluate(@Body() dto: EvaluateStInpDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -118,5 +102,4 @@ export class StInpController {
     async mailAlertManual(@Param('date') date: string) {
         return this.stInpJobAlertService.alert(date);
     }
-
 }

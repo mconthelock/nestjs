@@ -7,7 +7,7 @@ export class SearchDivisionDto {
     @IsString()
     readonly SDIVCODE?: string;
 
-    @ApiPropertyOptional({ type: [String], example: ["SDIV", "SDIVISION", "SDIV"] })
+    @ApiPropertyOptional({ type: [String], example: ['SDIV', 'SDIVISION', 'SDIV'] })
     @IsOptional()
     @IsArray()
     @IsString({ each: true })

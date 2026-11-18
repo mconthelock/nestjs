@@ -1,16 +1,16 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Shipment } from './entities/shipment.entity';
 
 @Injectable()
 export class ShipmentService {
-  constructor(
-    @InjectRepository(Shipment, 'spsysConnection')
-    private readonly ship: Repository<Shipment>,
-  ) {}
+    constructor(
+        @InjectRepository(Shipment, 'mitsuConnection')
+        private readonly ship: Repository<Shipment>,
+    ) {}
 
-  findAll() {
-    return this.ship.find({ order: { SHIPMENT_VALUE: 'ASC' } });
-  }
+    findAll() {
+        return this.ship.find({ order: { SHIPMENT_VALUE: 'ASC' } });
+    }
 }

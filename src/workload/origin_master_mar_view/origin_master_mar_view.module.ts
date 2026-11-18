@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { OriginMasterMarViewService } from './origin_master_mar_view.service';
 import { OriginMasterMarViewController } from './origin_master_mar_view.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -6,12 +6,7 @@ import { ORIGIN_MASTER_MAR_VIEW } from 'src/common/Entities/workload/views/ORIGI
 import { OriginMasterMarViewRepository } from './origin_master_mar_view.repository';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [ORIGIN_MASTER_MAR_VIEW],
-            'workloadConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([ORIGIN_MASTER_MAR_VIEW], 'mitsuConnection')],
     controllers: [OriginMasterMarViewController],
     providers: [OriginMasterMarViewService, OriginMasterMarViewRepository],
 })

@@ -8,9 +8,7 @@ import { CreateEbgreqcolImageDto } from './dto/create-ebgreqcol-image.dto';
 import { UpdateEbgreqcolImageDto } from './dto/update-ebgreqcol-image.dto';
 @Injectable()
 export class EbgreqcolImageRepository extends BaseRepository {
-    constructor(
-        @InjectDataSource('ebudgetConnection') ds: DataSource,
-        ) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -36,10 +34,7 @@ export class EbgreqcolImageRepository extends BaseRepository {
 
     async update(dto: UpdateEbgreqcolImageDto) {
         const { condition, ...updateData } = dto;
-        return await this.getRepository(EBGREQCOL_IMAGE).update(
-            condition,
-            updateData,
-        );
+        return await this.getRepository(EBGREQCOL_IMAGE).update(condition, updateData);
     }
 
     async delete(dto: UpdateEbgreqcolImageDto) {

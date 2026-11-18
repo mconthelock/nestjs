@@ -6,7 +6,7 @@ import { EBGREQCASE } from 'src/common/Entities/ebudget/table/EBGREQCASE.entity'
 import { EbgreqcaseRepository } from './ebgreqcase.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([EBGREQCASE], 'ebudgetConnection')],
+    imports: [TypeOrmModule.forFeature([EBGREQCASE], 'mitsuConnection')],
     controllers: [EbgreqcaseController],
     providers: [EbgreqcaseService, EbgreqcaseRepository],
     exports: [EbgreqcaseService],

@@ -4,15 +4,15 @@ import { SearchWorkloadDto } from './dto/search.dto';
 
 @Controller('form/is/workload')
 export class IsWorkloadController {
-  constructor(private readonly works: IsWorkloadService) {}
+    constructor(private readonly works: IsWorkloadService) {}
 
-  @Post('/search')
-  async searchWorkload(@Body() searchDto: SearchWorkloadDto) {
-    return this.works.searchWorkload(searchDto);
-  }
+    @Post('/search')
+    async searchWorkload(@Body() searchDto: SearchWorkloadDto) {
+        return this.works.searchWorkload(searchDto);
+    }
 
-  @Get('/liststatus')
-  async listStatus() {
-    return this.works.listStatus();
-  }
+    @Get('/liststatus')
+    async listStatus() {
+        return this.works.listStatus();
+    }
 }

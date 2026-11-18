@@ -40,6 +40,10 @@ owner's assigned areas. The owner must explicitly select Allow or Not Allow for
 each displayed area before submitting an approval; neither choice is
 preselected.
 
+For GP-TPH, approval of another step does not automatically approve an Area
+Owner step, even when the approver or representative is the same person. The
+Area Owner must still submit their area decisions separately.
+
 Owners are resolved from the current area assignment and ORGPOS; changes to
 those assignments after a request is created may require administrator
 intervention. The existing workflow identifies the actor using the supplied

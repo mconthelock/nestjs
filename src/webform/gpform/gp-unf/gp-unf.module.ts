@@ -7,14 +7,10 @@ import { GpUnfController } from './gp-unf.controller';
 
 import { GPUNF_FORM } from 'src/common/Entities/webform/table/GPUNF_FORM.entity';
 import { GPUNF_DETAIL } from 'src/common/Entities/webform/table/GPUNF_DETAIL.entity';
+import { GPUNF_TYPE } from 'src/common/Entities/webform/table/GPUNF_TYPE.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [GPUNF_FORM, GPUNF_DETAIL],
-            'webformConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([GPUNF_FORM, GPUNF_DETAIL, GPUNF_TYPE], 'mitsuConnection')],
     controllers: [GpUnfController],
     providers: [GpUnfService, GpUnfRepository],
 })

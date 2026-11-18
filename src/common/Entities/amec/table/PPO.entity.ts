@@ -2,90 +2,90 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'PPO', schema: 'AMEC' })
 export class PPO {
-  @PrimaryColumn()
-  SPONO: String;
+    @PrimaryColumn()
+    SPONO: string;
 
-  @Column()
-  DPODATE: Date;
+    @Column()
+    DPODATE: Date;
 
-  @Column()
-  SREFNO: String;
+    @Column()
+    SREFNO: string;
 
-  @Column()
-  SREQUESTER: String;
+    @Column()
+    SREQUESTER: string;
 
-  @Column()
-  SKEY: String;
+    @Column()
+    SKEY: string;
 
-  @Column()
-  SVENDCODE: String;
+    @Column()
+    SVENDCODE: string;
 
-  @Column()
-  SSHIPTO: String;
+    @Column()
+    SSHIPTO: string;
 
-  @Column()
-  SSHIPBY: String;
+    @Column()
+    SSHIPBY: string;
 
-  @Column()
-  SPAYTERM: String;
+    @Column()
+    SPAYTERM: string;
 
-  @Column()
-  STRADETERM: string;
+    @Column()
+    STRADETERM: string;
 
-  @Column()
-  SDELIVERY: string;
+    @Column()
+    SDELIVERY: string;
 
-  @Column()
-  SBYER: string;
+    @Column()
+    SBYER: string;
 
-  @Column()
-  SACCEPTBY: string;
+    @Column()
+    SACCEPTBY: string;
 
-  @Column()
-  DACCEPTDATE: Date;
+    @Column()
+    DACCEPTDATE: Date;
 
-  @Column()
-  CSTATUS: string;
+    @Column()
+    CSTATUS: string;
 
-  @Column()
-  SCURRENCY: string;
+    @Column()
+    SCURRENCY: string;
 
-  @Column()
-  CINVOICE: string;
+    @Column()
+    CINVOICE: string;
 
-  @Column()
-  CTAX: string;
+    @Column()
+    CTAX: string;
 
-  @Column()
-  SENAME: string;
+    @Column()
+    SENAME: string;
 
-  @Column()
-  SEADDRESS: string;
+    @Column()
+    SEADDRESS: string;
 
-  @Column()
-  SREF: string;
+    @Column()
+    SREF: string;
 
-  @Column()
-  CRECEIVE: string;
+    @Column()
+    CRECEIVE: string;
 
-  @Column()
-  CSENTSCM: string;
+    @Column()
+    CSENTSCM: string;
 
-  @Column()
-  DDELIVERY: Date;
+    @Column()
+    DDELIVERY: Date;
 
-  @Column()
-  DIMPSCM: Date;
+    @Column()
+    DIMPSCM: Date;
 
-  @Column()
-  DSENTSCM: Date;
+    @Column()
+    DSENTSCM: Date;
 
-  @Column()
-  CIMPSCMTIME: string;
+    @Column()
+    CIMPSCMTIME: string;
 
-  @Column()
-  CSENTSCMTIME: string;
+    @Column()
+    CSENTSCMTIME: string;
 
-  @Column()
-  SREQUESTDEPT: string;
+    @Column()
+    SREQUESTDEPT: string;
 }

@@ -11,7 +11,7 @@ import { GpUnfRepository } from './gp-unf.repository';
 export class GpUnfService {
     constructor(
         private readonly repo: GpUnfRepository,
-        @InjectRepository(GPUNF_FORM, 'webformConnection')
+        @InjectRepository(GPUNF_FORM, 'mitsuConnection')
         private readonly form: Repository<GPUNF_FORM>,
     ) {}
 
@@ -37,7 +37,7 @@ export class GpUnfService {
     async getCategory() {
         return this.repo.getCategory();
     }
-    
+
     async getSize(options?: any) {
         return this.repo.getSize(options);
     }

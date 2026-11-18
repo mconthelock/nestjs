@@ -8,7 +8,7 @@ import { SECPIC } from 'src/webform/qaform/secpic/entities/secpic.entity';
 
 @Injectable()
 export class SecpicRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 
@@ -25,12 +25,7 @@ export class SecpicRepository extends BaseRepository {
     async search(dto: FiltersDto) {
         const qb = this.manager.createQueryBuilder(SECPIC, 'S');
 
-        this.applyFilters(qb, 'S', dto, [
-            'SECID',
-            'SECCODE',
-            'SEC',
-            'REJECTNO',
-        ]);
+        this.applyFilters(qb, 'S', dto, ['SECID', 'SECCODE', 'SEC', 'REJECTNO']);
 
         return qb.getMany();
     }

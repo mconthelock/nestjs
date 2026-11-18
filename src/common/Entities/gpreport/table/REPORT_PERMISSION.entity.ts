@@ -5,7 +5,7 @@ export class ReportPermission {
     @PrimaryColumn()
     USERS: string;
 
-    @Column()
+    @PrimaryColumn()
     REPORTTYPE: string;
 
     @Column()

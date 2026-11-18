@@ -6,17 +6,17 @@ import { createDocDto } from './dto/create.dto';
 
 @Injectable()
 export class SecretlogService {
-  constructor(
-    @InjectRepository(Secretlog, 'amecConnection')
-    private readonly docs: Repository<Secretlog>,
-  ) {}
+    constructor(
+        @InjectRepository(Secretlog, 'datacenterConnection')
+        private readonly docs: Repository<Secretlog>,
+    ) {}
 
-  async findAll(): Promise<Secretlog[]> {
-    return this.docs.find();
-  }
+    async findAll(): Promise<Secretlog[]> {
+        return this.docs.find();
+    }
 
-  async create(data: createDocDto): Promise<Secretlog> {
-    const newDoc = this.docs.create(data);
-    return this.docs.save(newDoc);
-  }
+    async create(data: createDocDto): Promise<Secretlog> {
+        const newDoc = this.docs.create(data);
+        return this.docs.save(newDoc);
+    }
 }

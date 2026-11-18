@@ -8,12 +8,12 @@ import type { CreatePcpDetailsDto } from '../dto/create-pcp-details.dto';
 
 @Injectable()
 export class PurCpcDetailRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     create(data: CreatePcpDetailsDto | CreatePcpDetailsDto[]) {
-        if(Array.isArray(data)) {
+        if (Array.isArray(data)) {
             return this.getRepository(PURCPC_DETAILS).save(data, {
                 chunk: 500, // ตัวอย่างการตั้งค่า chunk size
             });

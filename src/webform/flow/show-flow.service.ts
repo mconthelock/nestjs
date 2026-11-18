@@ -15,7 +15,7 @@ export class ShowFlowService extends FlowService {
         protected readonly repService: RepService,
         protected readonly repo: FlowRepository,
         private readonly formService: FormService,
-    ){
+    ) {
         super(repService, repo);
     }
 
@@ -44,24 +44,16 @@ export class ShowFlowService extends FlowService {
             ? 'http://webflow.mitsubishielevatorasia.co.th/formtest/'
             : 'http://webflow.mitsubishielevatorasia.co.th/form/';
         const status = [
-            await getBase64ImageFromUrl(
-                webflow + 'imgs/stepstatus/stepdie.gif',
-            ),
+            await getBase64ImageFromUrl(webflow + 'imgs/stepstatus/stepdie.gif'),
             '',
             await getBase64ImageFromUrl(webflow + 'imgs/stepstatus/wait.gif'),
             await getBase64ImageFromUrl(webflow + 'imgs/stepstatus/ready.gif'),
-            await getBase64ImageFromUrl(
-                webflow + 'imgs/stepstatus/approver.gif',
-            ),
-            await getBase64ImageFromUrl(
-                webflow + 'imgs/stepstatus/approve.gif',
-            ),
+            await getBase64ImageFromUrl(webflow + 'imgs/stepstatus/approver.gif'),
+            await getBase64ImageFromUrl(webflow + 'imgs/stepstatus/approve.gif'),
             await getBase64ImageFromUrl(webflow + 'imgs/stepstatus/reject.gif'),
             await getBase64ImageFromUrl(webflow + 'imgs/stepstatus/reject.gif'),
             '',
-            await getBase64ImageFromUrl(
-                webflow + 'imgs/stepstatus/stepdie.gif',
-            ),
+            await getBase64ImageFromUrl(webflow + 'imgs/stepstatus/stepdie.gif'),
             '',
         ];
         const showStep = form.showStep ? '' : 'display:none;';
@@ -164,10 +156,7 @@ export class ShowFlowService extends FlowService {
                 break;
             case this.FLOW_REJECT:
                 html =
-                    msg +
-                    '&nbsp;<font color="#' +
-                    this.flowStatusColor(status) +
-                    '">Reject</font>';
+                    msg + '&nbsp;<font color="#' + this.flowStatusColor(status) + '">Reject</font>';
                 break;
             default:
                 html =

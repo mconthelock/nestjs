@@ -14,10 +14,7 @@ const dayjs = (dayjsModule as any).default ?? (dayjsModule as any);
  * getFYear(3, 2024) // returns 2023
  * getFYear(5, 2024) // returns 2024
  */
-export function getFYear({
-    month,
-    year,
-}: { month?: number; year?: number } = {}): number {
+export function getFYear({ month, year }: { month?: number; year?: number } = {}): number {
     month = month ?? new Date().getMonth() + 1;
     year = year ?? new Date().getFullYear();
     if (month < 4) {
@@ -45,10 +42,7 @@ export function formatDate(
     return dayjs(date).locale(locale).format(format);
 }
 
-export function now(
-    format: string = 'YYYY-MM-DD',
-    locale: string = 'en',
-): string {
+export function now(format: string = 'YYYY-MM-DD', locale: string = 'en'): string {
     return dayjs().locale(locale).format(format);
 }
 
@@ -101,14 +95,7 @@ export function toExcelDate(
                     numFmt.toLowerCase().includes('s')
                 ) {
                     return new Date(
-                        Date.UTC(
-                            d.year(),
-                            d.month(),
-                            d.date(),
-                            d.hour(),
-                            d.minute(),
-                            d.second(),
-                        ),
+                        Date.UTC(d.year(), d.month(), d.date(), d.hour(), d.minute(), d.second()),
                     );
                 } else {
                     return new Date(Date.UTC(d.year(), d.month(), d.date()));

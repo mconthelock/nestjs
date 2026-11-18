@@ -1,13 +1,6 @@
-import {
-    IsDateString,
-    IsNotEmpty,
-    IsOptional,
-    IsString,
-    MaxLength,
-} from 'class-validator';
+import { IsDateString, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateExpatFamilyDto {
-
     @IsString()
     @IsNotEmpty()
     @MaxLength(20)
@@ -38,5 +31,4 @@ export class CreateExpatFamilyDto {
     @IsOptional()
     @IsDateString()
     LAST_ARRIVAL_DATE?: string;
-
 }

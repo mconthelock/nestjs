@@ -11,7 +11,7 @@ export class FlowmstService {
     constructor(
         private readonly repo: FlowmstRepository,
 
-        @InjectRepository(FLOWMST, 'webformConnection')
+        @InjectRepository(FLOWMST, 'mitsuConnection')
         protected readonly master: Repository<FLOWMST>,
     ) {}
 
@@ -20,7 +20,8 @@ export class FlowmstService {
     }
 
     async getFlowMaster(NFRMNO: number, VORGNO: string, CYEAR: string) {
-        return await this.repo.getFlowMaster(NFRMNO, VORGNO, CYEAR);
+        if (process.env.HOST == 'AMEC') return await this.repo.getFlowMaster(NFRMNO, VORGNO, CYEAR);
+        return await this.repo.getFlowMasterNoSql(NFRMNO, VORGNO, CYEAR);
     }
 
     async findFlowMaster(NFRMNO: number, VORGNO: string, CYEAR: string) {

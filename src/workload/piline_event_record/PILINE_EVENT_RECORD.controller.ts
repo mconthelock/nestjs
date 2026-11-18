@@ -1,4 +1,4 @@
-import { Get } from '@nestjs/common';
+﻿import { Get } from '@nestjs/common';
 import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { PilineEventRecordService } from './PILINE_EVENT_RECORD.service';
@@ -20,20 +20,17 @@ export class PilineEventRecordController {
     }
 
     @Post()
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     create(@Body() dto: CreatePilineEventRecordDto) {
         return this.service.create(dto);
     }
     @Patch(':PILINE_NO')
-    @UseTransaction('workloadConnection')
-    update(
-        @Param() key: KeyPilineEventRecordDto,
-        @Body() dto: UpdatePilineEventRecordDto,
-    ) {
+    @UseTransaction('mitsuConnection')
+    update(@Param() key: KeyPilineEventRecordDto, @Body() dto: UpdatePilineEventRecordDto) {
         return this.service.update(key, dto);
     }
     @Delete(':PILINE_NO')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     remove(@Param() key: KeyPilineEventRecordDto) {
         return this.service.remove(key);
     }

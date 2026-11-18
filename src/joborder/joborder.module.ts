@@ -5,11 +5,6 @@ import { JopMarReqModule } from './jop-mar-req/jop-mar-req.module';
 import { JopPurConfModule } from './jop-pur-conf/jop-pur-conf.module';
 
 @Module({
-  imports: [
-    OrderListModule,
-    SetRequestDateModule,
-    JopMarReqModule,
-    JopPurConfModule,
-  ],
+    imports: [OrderListModule, SetRequestDateModule, JopMarReqModule, JopPurConfModule],
 })
 export class JobOrderModule {}

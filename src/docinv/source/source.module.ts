@@ -5,8 +5,8 @@ import { SourceController } from './source.controller';
 import { ApplicationModule } from '../application/application.module';
 
 @Module({
-  controllers: [SourceController],
-  providers: [SourceService],
-  imports: [ApplicationModule],
+    controllers: [SourceController],
+    providers: [SourceService],
+    imports: [ApplicationModule],
 })
 export class SourceModule {}

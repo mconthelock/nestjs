@@ -6,7 +6,7 @@ import { BRCURRENCY } from 'src/common/Entities/amec/table/BRCURRENCY.entity';
 import { BrcurrencyRepository } from './brcurrency.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([BRCURRENCY], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([BRCURRENCY], 'mitsuConnection')],
     controllers: [BrcurrencyController],
     providers: [BrcurrencyService, BrcurrencyRepository],
     exports: [BrcurrencyService],

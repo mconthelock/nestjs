@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Post,
-    Body,
-    Get,
-    Query,
-    Res,
-    HttpStatus,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Res, HttpStatus } from '@nestjs/common';
 import { QrcodeService, QRCodeOptions } from './qrcode.service';
 import { Response } from 'express';
 
@@ -47,10 +39,7 @@ export class QrcodeController {
     @Post('generate')
     async generateQRCode(@Body() data: GenerateQRCodeDto) {
         try {
-            const qrCode = await this.qrcodeService.generateDataURL(
-                data.text,
-                data.options,
-            );
+            const qrCode = await this.qrcodeService.generateDataURL(data.text, data.options);
             return {
                 success: true,
                 data: {
@@ -100,10 +89,7 @@ export class QrcodeController {
     @Post('url')
     async generateURLQRCode(@Body() data: GenerateURLQRCodeDto) {
         try {
-            const qrCode = await this.qrcodeService.generateForURL(
-                data.url,
-                data.options,
-            );
+            const qrCode = await this.qrcodeService.generateForURL(data.url, data.options);
             return {
                 success: true,
                 data: {
@@ -187,10 +173,7 @@ export class QrcodeController {
     @Post('svg')
     async generateSVGQRCode(@Body() data: GenerateQRCodeDto) {
         try {
-            const svgString = await this.qrcodeService.generateSVG(
-                data.text,
-                data.options,
-            );
+            const svgString = await this.qrcodeService.generateSVG(data.text, data.options);
             return {
                 success: true,
                 data: {
@@ -237,16 +220,10 @@ export class QrcodeController {
                 },
             };
 
-            const buffer = await this.qrcodeService.generateBuffer(
-                text,
-                options,
-            );
+            const buffer = await this.qrcodeService.generateBuffer(text, options);
 
             res.setHeader('Content-Type', 'image/png');
-            res.setHeader(
-                'Content-Disposition',
-                `inline; filename="${comname || 'qrcode'}.png"`,
-            );
+            res.setHeader('Content-Disposition', `inline; filename="${comname || 'qrcode'}.png"`);
             res.send(buffer);
         } catch (error) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -287,16 +264,10 @@ export class QrcodeController {
                 },
             };
 
-            const svgString = await this.qrcodeService.generateSVG(
-                text,
-                options,
-            );
+            const svgString = await this.qrcodeService.generateSVG(text, options);
 
             res.setHeader('Content-Type', 'image/svg+xml');
-            res.setHeader(
-                'Content-Disposition',
-                `inline; filename="${comname || 'qrcode'}.svg"`,
-            );
+            res.setHeader('Content-Disposition', `inline; filename="${comname || 'qrcode'}.svg"`);
             res.send(svgString);
         } catch (error) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

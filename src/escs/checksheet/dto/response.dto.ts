@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ChecksheetResponseDto {
-    @ApiProperty({ 
-        example: 'SUCCESS', 
-        description: 'Response status' 
+    @ApiProperty({
+        example: 'SUCCESS',
+        description: 'Response status',
     })
     status: 'SUCCESS' | 'ERROR';
 

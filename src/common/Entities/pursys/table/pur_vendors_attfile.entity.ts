@@ -1,11 +1,4 @@
-import {
-    Column,
-    Entity,
-    PrimaryGeneratedColumn,
-    ManyToOne,
-    JoinColumn,
-    Code,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Code } from 'typeorm';
 import { PurVendor } from './pur_vendor.entity';
 @Entity({
     schema: 'PURSYS',

@@ -28,7 +28,6 @@ export class MarFileService {
         return this.repo.getFile(dto);
     }
 
-    
     async deleteFileByID(id: number) {
         try {
             const res = await this.repo.deleteById(id);

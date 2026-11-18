@@ -8,7 +8,7 @@ import { GetOrderResponseDto } from './dto/get-order-response.dto';
 @ApiTags('ESCS Get Order')
 @Controller('escs/get-order')
 export class GetOrderController {
-    constructor(private readonly service : GetOrderService) {}
+    constructor(private readonly service: GetOrderService) {}
 
     @Post('order')
     @HttpCode(HttpStatus.OK)
@@ -18,4 +18,3 @@ export class GetOrderController {
         return this.service.getOrder(dto);
     }
 }
-

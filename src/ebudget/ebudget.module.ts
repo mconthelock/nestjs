@@ -9,15 +9,15 @@ import { EbudgetQuotationProductModule } from './ebudget-quotation-product/ebudg
 import { EbgreqcaseModule } from './ebgreqcase/ebgreqcase.module';
 
 @Module({
-  imports: [
-    SnModule,
-    BiddingModule,
-    EbgreqformModule,
-    EbgreqcolImageModule,
-    EbgreqattfileModule,
-    EbudgetQuotationModule,
-    EbudgetQuotationProductModule,
-    EbgreqcaseModule
-  ],
+    imports: [
+        SnModule,
+        BiddingModule,
+        EbgreqformModule,
+        EbgreqcolImageModule,
+        EbgreqattfileModule,
+        EbudgetQuotationModule,
+        EbudgetQuotationProductModule,
+        EbgreqcaseModule,
+    ],
 })
 export class EbudgetModule {}

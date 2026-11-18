@@ -4,10 +4,10 @@ import { updateInqGroupDto } from './update.dto';
 import { searchGroupDto } from './search.dto';
 
 export class inqGroupDataDto {
-  @ValidateNested()
-  @Type(() => updateInqGroupDto)
-  data?: updateInqGroupDto;
+    @ValidateNested()
+    @Type(() => updateInqGroupDto)
+    data?: updateInqGroupDto;
 
-  @IsOptional()
-  condition?: searchGroupDto;
+    @IsOptional()
+    condition?: searchGroupDto;
 }

@@ -59,14 +59,13 @@ export class PurCpmReturnAprroveService extends PurCpmService {
             const flowtree = await this.flowService.getFlowTree(form);
             let flagReset = false;
 
-            // 2. หากมี THIRD_PARTY ให้ตรวจสอบว่ามี step 40 หรือไม่ 
+            // 2. หากมี THIRD_PARTY ให้ตรวจสอบว่ามี step 40 หรือไม่
             const hasStep40 = flowtree.some((f: FLOWMST) => f.CSTEPNO === '40');
             //  หากมี THIRD_PARTY และมี step 40 แต่ค่า VAPVNO ไม่ตรงกับ THIRD_PARTY ให้ปรับปรุงค่า VAPVNO ของ step 40
             if (
                 THIRD_PARTY &&
                 hasStep40 &&
-                THIRD_PARTY !==
-                    flowtree.find((f: FLOWMST) => f.CSTEPNO === '40')?.VAPVNO
+                THIRD_PARTY !== flowtree.find((f: FLOWMST) => f.CSTEPNO === '40')?.VAPVNO
             ) {
                 await this.flowService.updateFlow({
                     condition: { ...form, CSTEPNO: '40' },
@@ -122,10 +121,7 @@ export class PurCpmReturnAprroveService extends PurCpmService {
 
             // 5. หากมีการเปลี่ยนแปลง flow ให้ทำการ reset flow โดยการส่ง action 'returnp' ก่อน แล้วค่อยส่ง action 'approve' อีกครั้ง (ถ้าไม่มีการเปลี่ยนแปลง flow จะข้ามขั้นตอนนี้ไปเลย)
             if (flagReset) {
-                await this.doactionService.doAction(
-                    { ...form, ACTION: 'returnp', EMPNO },
-                    ip,
-                );
+                await this.doactionService.doAction({ ...form, ACTION: 'returnp', EMPNO }, ip);
             }
 
             // 6. update ข้อมูล PUR-CPM
@@ -139,10 +135,7 @@ export class PurCpmReturnAprroveService extends PurCpmService {
                 for (const id of DELETE_FILES) {
                     const file = await this.purFileService.getFileById(+id);
                     await this.purFileService.deleteFileByID(+id);
-                    const destination = await joinPaths(
-                        file.FILE_PATH,
-                        file.FILE_FNAME,
-                    );
+                    const destination = await joinPaths(file.FILE_PATH, file.FILE_FNAME);
                     await deleteFile(destination);
                 }
             }
@@ -153,10 +146,7 @@ export class PurCpmReturnAprroveService extends PurCpmService {
             }
 
             // 9. ส่ง action 'approve' เพื่ออนุมัติคำขอกลับไปยังหัวหน้า (หรือผู้อนุมัติคนถัดไป) โดยไม่ต้องเช็คเงื่อนไขใดๆ เพิ่มเติม เพราะถือว่าการเปลี่ยนแปลง flow และการอัพเดตข้อมูลเสร็จสมบูรณ์แล้ว
-            await this.doactionService.doAction(
-                { ...form, ACTION: 'approve', EMPNO, REMARK },
-                ip,
-            );
+            await this.doactionService.doAction({ ...form, ACTION: 'approve', EMPNO, REMARK }, ip);
             return {
                 status: true,
                 message: 'Request successful',
@@ -166,9 +156,7 @@ export class PurCpmReturnAprroveService extends PurCpmService {
                 ...movedTargets.map((p) => deleteFile(p)), // - ลบไฟล์ที่ "ปลายทาง" ทั้งหมดที่ย้ายสำเร็จไปแล้ว (กัน orphan file)
                 ...files.map((f) => deleteFile(f.path)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
             ]);
-            throw new Error(
-                'Return Approve PUR-CPM Form Error: ' + error.message,
-            );
+            throw new Error('Return Approve PUR-CPM Form Error: ' + error.message);
         }
     }
 }

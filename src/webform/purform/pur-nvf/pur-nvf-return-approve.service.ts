@@ -92,10 +92,7 @@ export class PurNvfReturnApproveService {
                 TYPEJOB: data.TYPEJOB,
                 SERVICE: data.SERVICE,
                 VENDTYPE: data.VENDOR_LOCATION,
-                VENDCODE:
-                    data.REQTYPE === 'U' || data.REQTYPE === 'D'
-                        ? data.VENDORCODE
-                        : '',
+                VENDCODE: data.REQTYPE === 'U' || data.REQTYPE === 'D' ? data.VENDORCODE : '',
                 REASON: data.REQTYPE === 'D' ? data.REASON : '',
                 COMNAME: data.COMPANY_NAME,
                 CONTACT: data.CONTACT,
@@ -157,10 +154,7 @@ export class PurNvfReturnApproveService {
                 for (const id of DELETE_FILES) {
                     const file = await this.purFileService.getFileById(+id);
                     await this.purFileService.deleteFileByID(+id);
-                    const destination = await joinPaths(
-                        file.FILE_PATH,
-                        file.FILE_FNAME,
-                    );
+                    const destination = await joinPaths(file.FILE_PATH, file.FILE_FNAME);
                     await deleteFile(destination);
                 }
             }
@@ -176,10 +170,7 @@ export class PurNvfReturnApproveService {
             }
 
             // 9. ส่ง action 'approve' เพื่ออนุมัติคำขอกลับไปยังหัวหน้า (หรือผู้อนุมัติคนถัดไป) โดยไม่ต้องเช็คเงื่อนไขใดๆ เพิ่มเติม เพราะถือว่าการเปลี่ยนแปลง flow และการอัพเดตข้อมูลเสร็จสมบูรณ์แล้ว
-            await this.doactionService.doAction(
-                { ...form, ACTION: 'approve', EMPNO, REMARK },
-                ip,
-            );
+            await this.doactionService.doAction({ ...form, ACTION: 'approve', EMPNO, REMARK }, ip);
             return {
                 status: true,
                 message: 'Request successful',

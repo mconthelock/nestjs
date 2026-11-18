@@ -18,7 +18,7 @@ export class IimService {
             return {
                 status: true,
                 message: `Found ${res.length} records`,
-                data: res,      
+                data: res,
             };
         } catch (error) {
             throw error;

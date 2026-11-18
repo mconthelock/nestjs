@@ -1,5 +1,5 @@
-import { Column, Entity, PrimaryColumn , OneToMany } from 'typeorm';
-import { PURNVF_LIST } from '../../webform/table/PURNVF_LIST.entity'; 
+import { Column, Entity, PrimaryColumn, OneToMany } from 'typeorm';
+import { PURNVF_LIST } from '../../webform/table/PURNVF_LIST.entity';
 import { PurVendorsCode } from '../../pursys/table/pur_vendors_code.entity';
 import { PUREVA_FORM } from '../../webform/table/PUREVA_FORM.entity';
 
@@ -19,9 +19,4 @@ export class PTERMCODE {
 
     @OneToMany(() => PUREVA_FORM, (l) => l.TERM)
     LISTSPUREVA: PUREVA_FORM[];
-
 }
-
-
-
-

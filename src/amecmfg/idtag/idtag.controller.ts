@@ -1,12 +1,4 @@
-import {
-    Body,
-    Controller,
-    Get,
-    Param,
-    Post,
-    UploadedFiles,
-    UseInterceptors,
-} from '@nestjs/common';
+﻿import { Body, Controller, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
@@ -71,9 +63,7 @@ export class IdtagController {
             .map((item) => {
                 const newItem = { ...item };
                 newItem.tags = item.tags.filter((tag) => {
-                    return tag.process.some(
-                        (pc) => pc.F02R03.substring(0, 2) === shop,
-                    );
+                    return tag.process.some((pc) => pc.F02R03.substring(0, 2) === shop);
                 });
                 return newItem;
             })
@@ -93,7 +83,7 @@ export class IdtagController {
     }
 
     @Post('print-list')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async getPrintPfd(
         @Body()
         body: SearchIdtagFilesDto,
@@ -118,7 +108,7 @@ export class IdtagController {
     }
 
     @Get('download/:id')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async downloadFile(@Param('id') id: number) {
         return this.printed.downloadFile(id);
     }
@@ -129,13 +119,13 @@ export class IdtagController {
     }
 
     @Get('delete/:id')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async deletePdf(@Param('id') id: number) {
         return this.printed.deletePdf(id);
     }
 
     @Post('update-files')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async updatePrintedStatus(@Body() body: { files: number; status: number }) {
         return this.printed.updatePrintFileStatus(body.files, body.status);
     }

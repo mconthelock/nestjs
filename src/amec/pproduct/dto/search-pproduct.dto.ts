@@ -1,11 +1,4 @@
-import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  IsArray,
-  IsNotEmpty,
-  IsDateString,
-} from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsArray, IsNotEmpty, IsDateString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class SearchPproductDto {
@@ -15,9 +8,9 @@ export class SearchPproductDto {
 
     @IsOptional()
     @IsString()
-    SEXPTYPE?: string; 
+    SEXPTYPE?: string;
 
     @IsOptional()
     @IsString()
-    SEPRODNAME?: string;  
+    SEPRODNAME?: string;
 }

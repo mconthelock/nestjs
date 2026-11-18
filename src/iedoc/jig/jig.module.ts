@@ -1,3 +1,5 @@
+import { FlowModule } from 'src/webform/flow/flow.module';
+import { JigFlowService } from './jig-flow.service';
 import { Module } from '@nestjs/common';
 import { MailModule } from 'src/common/services/mail/mail.module';
 import { JigReminderService } from './jig-reminder.service';
@@ -20,6 +22,7 @@ import { MachineAbilityProcess } from 'src/common/Entities/iedoc/table/machine_a
 import { ShopCodeMst } from 'src/common/Entities/iedoc/table/shopcodemst.entity';
 @Module({
     imports: [
+        FlowModule,
         MailModule,
         FormModule,
         TypeOrmModule.forFeature(
@@ -35,11 +38,19 @@ import { ShopCodeMst } from 'src/common/Entities/iedoc/table/shopcodemst.entity'
                 MachineAbilityProcess,
                 ShopCodeMst,
             ],
-            'iedocConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [JigController],
-    providers: [JigService, JigRepository, JigInspectionService, JigNgTagService, JigReminderService],
-    exports: [JigService, JigRepository],
+    providers: [
+        JigFlowService,
+        JigService,
+        JigRepository,
+        JigInspectionService,
+        JigNgTagService,
+        JigReminderService,
+        JigFlowService,
+    ],
+    exports: [JigService, JigRepository, JigFlowService],
 })
 export class JigModule {}

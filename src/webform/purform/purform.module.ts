@@ -19,7 +19,7 @@ import { PurPraModule } from './pur-pra/pur-pra.module';
         PurEvaModule,
         PurVmmModule,
         PurCpcModule,
-        PurPraModule
+        PurPraModule,
     ],
 })
 export class PurFormModule {}

@@ -7,6 +7,7 @@
 /artifacts
 /output
 /tmp
+/test
 /src/workload/piline/PILINE.md
 # Logs
 logs
@@ -66,8 +67,12 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 public/outlook/
 public/u02_gg/
 public/gs/
+public/development/
 
 package-lock.json
 
 oracle
 
+outputs/
+/test/
+/docs/

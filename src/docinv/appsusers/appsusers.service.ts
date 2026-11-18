@@ -20,7 +20,7 @@ interface logData {
 @Injectable()
 export class AppsusersService {
     constructor(
-        @InjectRepository(Appsuser, 'docinvConnection')
+        @InjectRepository(Appsuser, 'mitsuConnection')
         private readonly appuser: Repository<Appsuser>,
         private readonly emps: UsersService,
         private readonly apps: ApplicationService,
@@ -53,9 +53,7 @@ export class AppsusersService {
         const noneAuthenapps = allapp.filter(
             (app) =>
                 app.APP_LOGIN == '0' &&
-                !authenapps.some(
-                    (authApp) => authApp.application.APP_ID === app.APP_ID,
-                ),
+                !authenapps.some((authApp) => authApp.application.APP_ID === app.APP_ID),
         );
 
         const noneAuthenWithGroups = await Promise.all(

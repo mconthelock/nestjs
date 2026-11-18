@@ -5,10 +5,8 @@ import { Partcategory } from './entities/partcategory.entity';
 import { PartcategoryController } from './partcategory.controller';
 
 @Module({
-  controllers: [PartcategoryController],
-  imports: [
-    TypeOrmModule.forFeature([Partcategory], 'amecConnection')
-  ],
-  providers: [PartcategoryService],
+    controllers: [PartcategoryController],
+    imports: [TypeOrmModule.forFeature([Partcategory], 'mitsuConnection')],
+    providers: [PartcategoryService],
 })
 export class PartcategoryModule {}

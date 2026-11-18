@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PurFileRepository } from './pur-file.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([PUR_FILE], 'webformConnection')],
+    imports: [TypeOrmModule.forFeature([PUR_FILE], 'mitsuConnection')],
     controllers: [PurFileController],
     providers: [PurFileService, PurFileRepository],
     exports: [PurFileService],

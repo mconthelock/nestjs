@@ -6,7 +6,7 @@ import { EBUDGET_DATA_SN } from 'src/common/Entities/ebudget/views/EBUDGET_DATA_
 import { SnRepository } from './sn.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([EBUDGET_DATA_SN], 'ebudgetConnection')],
+    imports: [TypeOrmModule.forFeature([EBUDGET_DATA_SN], 'mitsuConnection')],
     controllers: [SnController],
     providers: [SnService, SnRepository],
     exports: [SnService],

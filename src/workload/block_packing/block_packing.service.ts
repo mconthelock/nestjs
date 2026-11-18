@@ -1,17 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CreateBlockPackingDto } from './dto/create-block_packing.dto';
-import {
-    UpdateBlockPackingDto,
-    UpdateRemarkByOrderDto,
-} from './dto/update-block_packing.dto';
+import { UpdateBlockPackingDto, UpdateRemarkByOrderDto } from './dto/update-block_packing.dto';
 import { SearchPackingDto } from './dto/search-packing.dto';
 import { BlockPackingRepository } from './block_packing.repository';
 
 @Injectable()
 export class BlockPackingService {
-    constructor(
-        private readonly blockPackingRepository: BlockPackingRepository,
-    ) {}
+    constructor(private readonly blockPackingRepository: BlockPackingRepository) {}
 
     async getTRNBarcode() {
         return this.blockPackingRepository.getTRNBarcode();
@@ -19,15 +14,15 @@ export class BlockPackingService {
 
     async getOrderMainCombine(order: string, block: string) {
         const carton = await this.blockPackingRepository.getDataCartonBox();
-        const orderMainCombine =
-            await this.blockPackingRepository.getOrderMainCombine(order, block);
+        const orderMainCombine = await this.blockPackingRepository.getOrderMainCombine(
+            order,
+            block,
+        );
 
         const result = orderMainCombine.map((main) => {
             const matchedCartons = carton.filter((c) => {
-                const orderMatch =
-                    String(main.S03K01).trim() === String(c.ORDER_NO).trim();
-                const packingMatch =
-                    String(main.S03K04).trim() === String(c.PACKING_NO).trim();
+                const orderMatch = String(main.S03K01).trim() === String(c.ORDER_NO).trim();
+                const packingMatch = String(main.S03K04).trim() === String(c.PACKING_NO).trim();
                 return orderMatch && packingMatch;
             });
 
@@ -46,13 +41,11 @@ export class BlockPackingService {
     }
 
     async updateRemarkPacking(dto: UpdateBlockPackingDto) {
-        const result =
-            await this.blockPackingRepository.updateRemarkPacking(dto);
+        const result = await this.blockPackingRepository.updateRemarkPacking(dto);
         return result;
     }
     async updateRemarkOrders(dto: UpdateRemarkByOrderDto) {
-        const result =
-            await this.blockPackingRepository.updateRemarkByOrder(dto);
+        const result = await this.blockPackingRepository.updateRemarkByOrder(dto);
         return result;
     }
 }

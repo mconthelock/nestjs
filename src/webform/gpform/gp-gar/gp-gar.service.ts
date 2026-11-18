@@ -29,8 +29,7 @@ export class GpGarService {
     async create(dto: CreateGpGarDto, ip: string, file: Express.Multer.File) {
         try {
             // สร้าง Form
-            const formmst =
-                await this.formmstService.getFormMasterByVaname('GP-GAR');
+            const formmst = await this.formmstService.getFormMasterByVaname('GP-GAR');
             const createForm = await this.formCreateService.create(
                 {
                     NFRMNO: formmst.NNO,
@@ -45,9 +44,7 @@ export class GpGarService {
             // ตรวจสอบผลการสร้าง Form
             if (!createForm?.status) {
                 const errMsg =
-                    createForm?.message?.message ||
-                    createForm?.message ||
-                    'Unknown error';
+                    createForm?.message?.message || createForm?.message || 'Unknown error';
                 throw new Error(`Form creation failed: ${errMsg}`);
             }
             const form = {
@@ -73,10 +70,10 @@ export class GpGarService {
             //     ...form,
             // });
             const insert01 = await this.repo.CreateGpGarDto(form);
-            
+
             console.log(insert01);
             if (file) {
-            const insert02 = await this.handleFileFormService.insertFiles(
+                const insert02 = await this.handleFileFormService.insertFiles(
                     {
                         ...form01,
                         FORM_TYPE: 'GP',
@@ -110,10 +107,10 @@ export class GpGarService {
             await this.flowService.updateFlow({
                 condition: {
                     ...form,
-                    CEXTDATA: '02'
+                    CEXTDATA: '02',
                 },
-                VAPVNO: dto.CONTROLLER
-            })
+                VAPVNO: dto.CONTROLLER,
+            });
 
             const doAction = await this.doactionService.doAction(
                 {
@@ -151,12 +148,9 @@ export class GpService {
     async create(dto: CreateGpGarDto, ip: string) {
         try {
             // ดึงข้อมูล Form Master
-            const formmst =
-                await this.formmstService.getFormMasterByVaname('GP-GAR');
+            const formmst = await this.formmstService.getFormMasterByVaname('GP-GAR');
             if (!formmst) {
-                throw new Error(
-                    'Form master not found for GP-GAR. Check FORMMST table.',
-                );
+                throw new Error('Form master not found for GP-GAR. Check FORMMST table.');
             }
             // สร้าง Form
             const createForm = await this.formCreateService.create(
@@ -174,9 +168,7 @@ export class GpService {
             // ตรวจสอบผลการสร้าง Form
             if (!createForm?.status) {
                 const errMsg =
-                    createForm?.message?.message ||
-                    createForm?.message ||
-                    'Unknown error';
+                    createForm?.message?.message || createForm?.message || 'Unknown error';
                 throw new Error(`Form creation failed: ${errMsg}`);
             }
 

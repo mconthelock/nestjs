@@ -3,9 +3,7 @@ import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 import { CreateAuditReportRevisionDto } from './create-audit_report_revision.dto';
 import { Type } from 'class-transformer';
 
-export class SearchAuditReportRevisionDto extends PartialType(
-    CreateAuditReportRevisionDto,
-) {
+export class SearchAuditReportRevisionDto extends PartialType(CreateAuditReportRevisionDto) {
     @IsOptional()
     @Type(() => Number)
     @IsNumber()

@@ -23,7 +23,7 @@ export class INV_YEARLY_ASSIGN {
     @Column()
     CREATE_AT: Date;
 
-    @OneToOne(() => AMECUSERALL, (u) => u.INV_YEARLY_ASSIGN)
+    @OneToOne(() => AMECUSERALL)
     @JoinColumn([{ name: 'CREATE_BY', referencedColumnName: 'SEMPNO' }])
     USER: AMECUSERALL;
 

@@ -8,7 +8,7 @@ import { WHN_AUTOPLAN } from 'src/common/Entities/innovat/views/WHN_AUTOPLAN.ent
 @Injectable()
 export class WireHarnessCalculateUsageRepository extends BaseRepository {
     constructor(
-        @InjectDataSource('innovatConnection')
+        @InjectDataSource('mitsuConnection')
         private readonly ds: DataSource,
     ) {
         super(ds);

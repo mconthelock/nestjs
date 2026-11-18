@@ -25,13 +25,7 @@ export class PsUpiService {
     }
 
     async submit(dto: CreatePsUpiDto, ip: string) {
-        const formFields = [
-            dto.NFRMNO,
-            dto.VORGNO,
-            dto.CYEAR,
-            dto.CYEAR2,
-            dto.NRUNNO,
-        ];
+        const formFields = [dto.NFRMNO, dto.VORGNO, dto.CYEAR, dto.CYEAR2, dto.NRUNNO];
         const hasFormKey = formFields.some(
             (value) => value !== undefined && value !== null && value !== '',
         );
@@ -53,10 +47,7 @@ export class PsUpiService {
                 CYEAR2: dto.CYEAR2,
                 NRUNNO: dto.NRUNNO,
             };
-            const list = await this.repo.replaceList(
-                form,
-                this.mapListRows(dto, form),
-            );
+            const list = await this.repo.replaceList(form, this.mapListRows(dto, form));
 
             const doAction = await this.doactionService.doAction(
                 {
@@ -77,12 +68,9 @@ export class PsUpiService {
             };
         }
 
-        const formmst =
-            await this.formmstService.getFormMasterByVaname('PS-UPI');
+        const formmst = await this.formmstService.getFormMasterByVaname('PS-UPI');
         if (!formmst) {
-            throw new Error(
-                'Form master not found for PS-UPI. Check FORMMST table.',
-            );
+            throw new Error('Form master not found for PS-UPI. Check FORMMST table.');
         }
         const createForm = await this.formCreateService.create(
             {

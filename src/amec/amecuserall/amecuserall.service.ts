@@ -21,9 +21,7 @@ export class AmecUserAllService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Error finding employee with empno ${empno}: ` + error.message,
-            );
+            throw new Error(`Error finding employee with empno ${empno}: ` + error.message);
         }
     }
 
@@ -42,9 +40,7 @@ export class AmecUserAllService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Error finding employee with empno ${empno}: ` + error.message,
-            );
+            throw new Error(`Error finding employee with empno ${empno}: ` + error.message);
         }
     }
 

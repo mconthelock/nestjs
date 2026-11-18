@@ -5,11 +5,10 @@ import { UpdatePtermcodeDto } from './dto/update-ptermcode.dto';
 
 @Controller('amec/ptermcode')
 export class PtermcodeController {
-  constructor(private readonly ptermcodeService: PtermcodeService) {}
+    constructor(private readonly ptermcodeService: PtermcodeService) {}
 
-  @Get('termcode')
-  findTermcode() {
-    return this.ptermcodeService.findTermcode();
-  }
-
+    @Get('termcode')
+    findTermcode() {
+        return this.ptermcodeService.findTermcode();
+    }
 }

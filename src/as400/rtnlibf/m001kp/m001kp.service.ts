@@ -7,9 +7,7 @@ export function scheduleToDate(schedule: string) {
     const value = String(schedule || '')
         .trim()
         .toUpperCase();
-    const day = { X: '05', A: '10', Y: '15', B: '20', Z: '25', C: '30' }[
-        value.slice(-1)
-    ];
+    const day = { X: '05', A: '10', Y: '15', B: '20', Z: '25', C: '30' }[value.slice(-1)];
     if (!/^\d{4}[XAYBZC]$/.test(value) || !day) {
         throw new Error(`Invalid Schedule: ${value || 'blank'}`);
     }
@@ -39,16 +37,10 @@ export class M001kpService {
              WHERE M1K02 LIKE ?`,
             [`${prefix}%`],
         );
-        return rows
-            .map((row) => String(row.ORDERNO || '').trim())
-            .filter(Boolean);
+        return rows.map((row) => String(row.ORDERNO || '').trim()).filter(Boolean);
     }
 
-    findOrdersByDrawing(
-        drawing: string,
-        qty: string | number,
-        variable?: string,
-    ) {
+    findOrdersByDrawing(drawing: string, qty: string | number, variable?: string) {
         const [number = '', gno = '', ...levels] = String(drawing || '')
             .trim()
             .toUpperCase()
@@ -67,9 +59,7 @@ export class M001kpService {
             !Number.isInteger(quantity) ||
             quantity <= 0 ||
             variables.length > 15 ||
-            variables.some(
-                (entry) => !/^[^=,\s]{1,3}=[^=,\s]{1,9}$/.test(entry),
-            )
+            variables.some((entry) => !/^[^=,\s]{1,3}=[^=,\s]{1,9}$/.test(entry))
         ) {
             throw new Error('Invalid Drawing, QTY or Variable');
         }
@@ -115,9 +105,7 @@ export class M001kpService {
                 [newOrder],
             )) as any[];
             if (Number(existing[0]?.CNT || 0)) {
-                throw new Error(
-                    `${newOrder} already exists in ${library}.${table}`,
-                );
+                throw new Error(`${newOrder} already exists in ${library}.${table}`);
             }
         }
 
@@ -146,11 +134,7 @@ export class M001kpService {
 
     private buildRows(newOrder: string, details: PSCLM_DETAIL[]) {
         newOrder = this.fit(newOrder, 9, 'New Order');
-        const control = newOrder.startsWith('E')
-            ? 'L'
-            : newOrder.startsWith('S')
-              ? 'W'
-              : '';
+        const control = newOrder.startsWith('E') ? 'L' : newOrder.startsWith('S') ? 'W' : '';
         if (!control) throw new Error('New Order must start with E or S');
 
         const sequence = new Map<string, number>();
@@ -196,11 +180,7 @@ export class M001kpService {
                     M1K37: 'E',
                     M1K38: '1',
                     M1K39: 'A',
-                    M1K41: this.fit(
-                        detail.PARTNAME || 'NOTFO',
-                        16,
-                        'Part name',
-                    ),
+                    M1K41: this.fit(detail.PARTNAME || 'NOTFO', 16, 'Part name'),
                     ...drawing,
                     ...variables,
                 });
@@ -246,29 +226,13 @@ export class M001kpService {
             .map((entry) => entry.trim().toUpperCase())
             .filter(Boolean);
         if (variables.length > 15) throw new Error('Variable limit is 15');
-        if (
-            variables.some(
-                (entry) => !/^[^=,\s]{1,3}=[^=,\s]{1,9}$/.test(entry),
-            )
-        ) {
+        if (variables.some((entry) => !/^[^=,\s]{1,3}=[^=,\s]{1,9}$/.test(entry))) {
             throw new Error('Invalid Variable format');
         }
         for (let index = 0; index < 15; index++) {
-            const [code = '', variable = ''] = String(
-                variables[index] || '',
-            ).split('=');
-            fields[`M1K${43 + index * 2}`] = this.fit(
-                code,
-                3,
-                `Variable code ${index + 1}`,
-                false,
-            );
-            fields[`M1K${44 + index * 2}`] = this.fit(
-                variable,
-                9,
-                `Variable ${index + 1}`,
-                false,
-            );
+            const [code = '', variable = ''] = String(variables[index] || '').split('=');
+            fields[`M1K${43 + index * 2}`] = this.fit(code, 3, `Variable code ${index + 1}`, false);
+            fields[`M1K${44 + index * 2}`] = this.fit(variable, 9, `Variable ${index + 1}`, false);
         }
         return fields;
     }
@@ -280,12 +244,7 @@ export class M001kpService {
         return '';
     }
 
-    private fit(
-        value: unknown,
-        length: number,
-        field: string,
-        required = true,
-    ) {
+    private fit(value: unknown, length: number, field: string, required = true) {
         const text = String(value ?? '')
             .trim()
             .toUpperCase();

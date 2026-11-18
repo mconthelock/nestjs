@@ -17,7 +17,7 @@ import { GPRB_STAMP_REQ } from 'src/common/Entities/webform/table/GPRB_STAMP_REQ
     imports: [
         TypeOrmModule.forFeature(
             [GPRB_PURPOSE, GPRB_STAMP_CONFIG, GPRB_STAMP_REQ],
-            'webformConnection',
+            'mitsuConnection',
         ),
         FormmstModule,
         FormModule,
@@ -33,7 +33,7 @@ export class GpRbModule {}
 // สำหรับดึงข้อมูลแสดงในหน้า show-gp-rb by Plankton
 // @Module({
 //     imports: [
-//         TypeOrmModule.forFeature([RB_STAMP_REQ], 'webformConnection'),
+//         TypeOrmModule.forFeature([RB_STAMP_REQ], 'mitsuConnection'),
 //         FlowModule,
 //     ],
 //     controllers: [ShowstampGpRbController],
@@ -45,7 +45,7 @@ export class GpRbModule {}
 // สำหรับดึงข้อมูลแสดงในหน้า show-cus-stamp-gp-rb by Plankton
 // @Module({
 //     imports: [
-//         TypeOrmModule.forFeature([RB_CUS_STAMP_REQ], 'webformConnection'),
+//         TypeOrmModule.forFeature([RB_CUS_STAMP_REQ], 'mitsuConnection'),
 //     ],
 //     controllers: [ShowCusStampGpRbController],
 //     providers: [ShowCusstampGpRbService, ShowCusStampGpRbRepository],

@@ -29,15 +29,9 @@ export class FileLoggerService {
         }
 
         const parsedPath = path.parse(normalizedFileName);
-        const resolvedFileName = parsedPath.ext
-            ? parsedPath.base
-            : `${parsedPath.base}.log`;
+        const resolvedFileName = parsedPath.ext ? parsedPath.base : `${parsedPath.base}.log`;
 
-        return path.join(
-            directory ?? this.defaultDirectory,
-            parsedPath.dir,
-            resolvedFileName,
-        );
+        return path.join(directory ?? this.defaultDirectory, parsedPath.dir, resolvedFileName);
     }
 
     async log(
@@ -49,14 +43,9 @@ export class FileLoggerService {
         },
     ) {
         try {
-            const logFilePath = this.resolveLogFilePath(
-                options.fileName,
-                options.directory,
-            );
+            const logFilePath = this.resolveLogFilePath(options.fileName, options.directory);
             await fs.mkdir(path.dirname(logFilePath), { recursive: true });
-            const errorText = options.error
-                ? `\n${this.formatError(options.error)}`
-                : '';
+            const errorText = options.error ? `\n${this.formatError(options.error)}` : '';
 
             await fs.appendFile(
                 logFilePath,
@@ -68,16 +57,9 @@ export class FileLoggerService {
         }
     }
 
-    async readLog(options: {
-        fileName: string;
-        directory?: string;
-        error?: unknown;
-    }) {
+    async readLog(options: { fileName: string; directory?: string; error?: unknown }) {
         try {
-            const logFilePath = this.resolveLogFilePath(
-                options.fileName,
-                options.directory,
-            );
+            const logFilePath = this.resolveLogFilePath(options.fileName, options.directory);
             return await fs.readFile(logFilePath, 'utf8');
         } catch {
             throw new Error('Log file not found');

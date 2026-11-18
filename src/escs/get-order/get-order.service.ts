@@ -5,9 +5,7 @@ import { GetOrderResponseDto } from './dto/get-order-response.dto';
 
 @Injectable()
 export class GetOrderService {
-    constructor(
-        private readonly repo: GetOrderRepository
-    ) {}
+    constructor(private readonly repo: GetOrderRepository) {}
 
     async findOne(prod: string, ordNo: string, item: string, id: number) {
         try {
@@ -38,14 +36,14 @@ export class GetOrderService {
             const { ORDERNO, TYPE_MODEL } = res[0];
             return {
                 orderNo: ORDERNO,
-                typeModel: TYPE_MODEL
+                typeModel: TYPE_MODEL,
             };
         } catch (err) {
             if (err instanceof NotFoundException) throw err;
 
             throw new InternalServerErrorException({
                 message: 'GET_ORDER failed',
-                error: err?.message
+                error: err?.message,
             });
         }
     }

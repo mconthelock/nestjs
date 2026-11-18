@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -7,7 +7,7 @@ import { CreateDpmsPlMeltLogDto } from './dto/create-dpms_pl_melt_log.dto';
 
 @Injectable()
 export class DpmsPlMeltLogRepository extends BaseRepository {
-    constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -19,7 +19,8 @@ export class DpmsPlMeltLogRepository extends BaseRepository {
     }
 
     async getList(vanndate: string) {
-        return this.getRepository(DPMS_PL_MELT_LOG).createQueryBuilder('log')
+        return this.getRepository(DPMS_PL_MELT_LOG)
+            .createQueryBuilder('log')
             .select('AMECLOAD, PROJECT, COUNT(*) AS TOTALSENT')
             .where("TRUNC(VANNDATE) = TO_DATE(:vanndate, 'YYYY-MM-DD')", { vanndate })
             .groupBy('AMECLOAD, PROJECT')

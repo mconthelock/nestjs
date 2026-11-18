@@ -7,18 +7,18 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class MatrixSectionService {
-  constructor(
-    @InjectRepository(MatrixSection, 'idsConnection')
-    private readonly mtxSecRepo: Repository<MatrixSection>,
-    @InjectDataSource('idsConnection')
-    private readonly dataSource: DataSource,
-  ) {}
+    constructor(
+        @InjectRepository(MatrixSection, 'mitsuConnection')
+        private readonly mtxSecRepo: Repository<MatrixSection>,
+        @InjectDataSource('mitsuConnection')
+        private readonly dataSource: DataSource,
+    ) {}
 
-  async findAll() {
-    return await this.mtxSecRepo.find();
-  }
+    async findAll() {
+        return await this.mtxSecRepo.find();
+    }
 
-  async findOne(id: number) {
-    return await this.mtxSecRepo.findOneBy({ ID: id });
-  }
+    async findOne(id: number) {
+        return await this.mtxSecRepo.findOneBy({ ID: id });
+    }
 }

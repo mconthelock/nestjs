@@ -6,7 +6,7 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class BeneficiaryRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 

@@ -15,19 +15,19 @@ import { getSafeFields } from 'src/common/utils/Fields.utils';
 @Injectable()
 export class JopMarReqService {
     constructor(
-        @InjectRepository(JopMarReq, 'amecConnection')
+        @InjectRepository(JopMarReq, 'mitsuConnection')
         private reqRepo: Repository<JopMarReq>,
-        @InjectDataSource('amecConnection')
+        @InjectDataSource('mitsuConnection')
         private dataSource: DataSource,
 
         private readonly amecCalendarService: AmeccalendarService,
     ) {}
 
     private readonly JOP_MAR_REQ = this.dataSource
-        .getMetadata('JOP_MAR_REQ')
+        .getMetadata('DAILYIDS.JOP_MAR_REQ')
         .columns.map((c) => c.propertyName);
     private readonly AMECUSERALL = this.dataSource
-        .getMetadata('AMECUSERALL')
+        .getMetadata('AMEC.AMECUSERALL')
         .columns.map((c) => c.propertyName);
     private readonly allowFields = [...this.JOP_MAR_REQ, ...this.AMECUSERALL];
 
@@ -58,31 +58,21 @@ export class JopMarReqService {
                 result = await queryRunner.manager.save(latest); // ไม่ต้องแปลงเพราะ select โดย typeorm จะคืนค่า entity object อยู่แล้ว
             } else {
                 dataToSave.JOP_REVISION = 1; // กำหนด Revision เป็น 1 ถ้าเป็น Record ใหม่
-                const newRecord = queryRunner.manager.create(
-                    JopMarReq,
-                    dataToSave,
-                ); // ต้องแปลง plain object เป็น entity object ก่อนบันทึกเสมอ
+                const newRecord = queryRunner.manager.create(JopMarReq, dataToSave); // ต้องแปลง plain object เป็น entity object ก่อนบันทึกเสมอ
                 result = await queryRunner.manager.save(newRecord);
             }
             result.DeadLinePUR = await this.amecCalendarService.addWorkDays(
                 result.JOP_MAR_INPUT_DATE,
                 7,
             );
-            const revision = await this.getRevisionHistory(
-                MFGNO,
-                PONO,
-                LINENO,
-                queryRunner,
-            ); // ค้นหา Revision History ทั้งหมดหลังจากบันทึกใหม่
+            const revision = await this.getRevisionHistory(MFGNO, PONO, LINENO, queryRunner); // ค้นหา Revision History ทั้งหมดหลังจากบันทึกใหม่
             await queryRunner.commitTransaction();
             return {
                 message: 'Request date set successfully',
                 data: result,
                 status: true,
                 rev: revision.map((r) => {
-                    r.JOP_REVISION_TEXT = numberToAlphabetRevision(
-                        r.JOP_REVISION,
-                    );
+                    r.JOP_REVISION_TEXT = numberToAlphabetRevision(r.JOP_REVISION);
                     return {
                         REVISION: r.JOP_REVISION,
                         REVISION_TEXT: r.JOP_REVISION_TEXT,
@@ -108,9 +98,7 @@ export class JopMarReqService {
         lineno: number,
         queryRunner?: QueryRunner,
     ): Promise<JopMarReq | null> {
-        const repo = queryRunner
-            ? queryRunner.manager.getRepository(JopMarReq)
-            : this.reqRepo;
+        const repo = queryRunner ? queryRunner.manager.getRepository(JopMarReq) : this.reqRepo;
         return await repo.findOne({
             where: {
                 JOP_MFGNO: mfgno,
@@ -127,9 +115,7 @@ export class JopMarReqService {
         list: { mfg: string; pono: number; line: number }[],
         queryRunner?: QueryRunner,
     ) {
-        const repo = queryRunner
-            ? queryRunner.manager.getRepository(JopMarReq)
-            : this.reqRepo;
+        const repo = queryRunner ? queryRunner.manager.getRepository(JopMarReq) : this.reqRepo;
         return await repo
             .createQueryBuilder('jop')
             .select([
@@ -154,21 +140,27 @@ export class JopMarReqService {
                             'JOP_LINENO',
                             'MAX(JOP_REVISION) AS MAX_REV',
                         ])
-                        .from('JOP_MAR_REQ', 'M')
+                        .from('DAILYIDS.JOP_MAR_REQ', 'M')
                         .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
                 'MAR',
                 `jop.JOP_MFGNO = MAR.JOP_MFGNO
                 AND jop.JOP_PONO = MAR.JOP_PONO
                 AND jop.JOP_LINENO = MAR.JOP_LINENO`,
             )
-            .where(new Brackets(qb => {
-                list.forEach((item, i) => {
-                    qb.orWhere(
-                        `(jop.JOP_MFGNO = :mfg${i} AND jop.JOP_PONO = :pono${i} AND jop.JOP_LINENO = :line${i})`,
-                        { [`mfg${i}`]: item.mfg, [`pono${i}`]: item.pono, [`line${i}`]: item.line },
-                    );
-                });
-            }))
+            .where(
+                new Brackets((qb) => {
+                    list.forEach((item, i) => {
+                        qb.orWhere(
+                            `(jop.JOP_MFGNO = :mfg${i} AND jop.JOP_PONO = :pono${i} AND jop.JOP_LINENO = :line${i})`,
+                            {
+                                [`mfg${i}`]: item.mfg,
+                                [`pono${i}`]: item.pono,
+                                [`line${i}`]: item.line,
+                            },
+                        );
+                    });
+                }),
+            )
             .andWhere('jop.JOP_REVISION <= MAR.MAX_REV')
             .andWhere('jop.JOP_REVISION > 0') // เพิ่มเงื่อนไขนี้เพื่อกรองเฉพาะ Revision ที่มีการบันทึกจริงๆ แล้ว
             .getRawMany();
@@ -192,7 +184,7 @@ export class JopMarReqService {
             .andWhere('jop.JOP_PONO = :pono', { pono })
             .andWhere('jop.JOP_LINENO = :lineno', { lineno })
             .andWhere(
-                'jop.JOP_REVISION <= (SELECT MAX(r2.JOP_REVISION) FROM JOP_MAR_REQ r2 WHERE r2.JOP_MFGNO = :mfgno2 AND r2.JOP_PONO = :pono2 AND r2.JOP_LINENO = :lineno2)',
+                'jop.JOP_REVISION <= (SELECT MAX(r2.JOP_REVISION) FROM DAILYIDS.JOP_MAR_REQ r2 WHERE r2.JOP_MFGNO = :mfgno2 AND r2.JOP_PONO = :pono2 AND r2.JOP_LINENO = :lineno2)',
                 { mfgno2: mfgno, pono2: pono, lineno2: lineno },
             )
             .andWhere('jop.JOP_REVISION > 0') // เพิ่มเงื่อนไขนี้เพื่อกรองเฉพาะ Revision ที่มีการบันทึกจริงๆ แล้ว
@@ -220,12 +212,7 @@ export class JopMarReqService {
                 await localRunner.startTransaction();
             }
             const runner = queryRunner || localRunner!;
-            const record = await this.findLatestRevision(
-                MFGNO,
-                PONO,
-                LINENO,
-                runner,
-            );
+            const record = await this.findLatestRevision(MFGNO, PONO, LINENO, runner);
             if (!record) {
                 throw new Error('Record not found');
             }
@@ -250,7 +237,7 @@ export class JopMarReqService {
         const repo = queryRunner ? queryRunner.manager : this.dataSource;
         const query = repo
             .createQueryBuilder()
-            .from('JOP_MAR_REQ', 'A')
+            .from('DAILYIDS.JOP_MAR_REQ', 'A')
             .innerJoin(
                 (qb) =>
                     qb
@@ -258,12 +245,12 @@ export class JopMarReqService {
                         .select(
                             'JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION',
                         )
-                        .from('JOP_MAR_REQ', 'MAR')
+                        .from('DAILYIDS.JOP_MAR_REQ', 'MAR')
                         .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
                 'B',
                 'A.JOP_MFGNO = B.JOP_MFGNO AND A.JOP_PONO = B.JOP_PONO AND A.JOP_LINENO = B.JOP_LINENO AND B.LAST_REVISION = A.JOP_REVISION',
             )
-            .innerJoin('(SELECT * FROM AMECUSERALL)', 'U', 'A.JOP_MAR_REQUEST = U.SEMPNO');
+            .innerJoin('(SELECT * FROM AMEC.AMECUSERALL)', 'U', 'A.JOP_MAR_REQUEST = U.SEMPNO');
         query.distinct(dto.distinct == true); // เพื่อไม่ให้มีข้อมูลซ้ำ
         let select = [];
         if (fields.length > 0) {
@@ -285,10 +272,8 @@ export class JopMarReqService {
             query.andWhere('A.JOP_REVISION = :revision', {
                 revision: dto.JOP_REVISION,
             });
-        if (dto.JOP_MFGNO)
-            query.andWhere('A.JOP_MFGNO = :mfgno', { mfgno: dto.JOP_MFGNO });
-        if (dto.JOP_PONO)
-            query.andWhere('A.JOP_PONO = :pono', { pono: dto.JOP_PONO });
+        if (dto.JOP_MFGNO) query.andWhere('A.JOP_MFGNO = :mfgno', { mfgno: dto.JOP_MFGNO });
+        if (dto.JOP_PONO) query.andWhere('A.JOP_PONO = :pono', { pono: dto.JOP_PONO });
         if (dto.JOP_LINENO)
             query.andWhere('A.JOP_LINENO = :lineno', {
                 lineno: dto.JOP_LINENO,
@@ -314,28 +299,24 @@ export class JopMarReqService {
             );
         }
         if (dto.SREQDATE) {
-            query.andWhere(
-                `A.JOP_MAR_INPUT_DATE >= TO_DATE(:SREQDATE, 'YYYY-MM-DD')`,
-                { SREQDATE: dto.SREQDATE },
-            );
+            query.andWhere(`A.JOP_MAR_INPUT_DATE >= TO_DATE(:SREQDATE, 'YYYY-MM-DD')`, {
+                SREQDATE: dto.SREQDATE,
+            });
         }
         if (dto.EREQDATE) {
-            query.andWhere(
-                `A.JOP_MAR_INPUT_DATE <= TO_DATE(:EREQDATE, 'YYYY-MM-DD')`,
-                { EREQDATE: dto.EREQDATE },
-            );
+            query.andWhere(`A.JOP_MAR_INPUT_DATE <= TO_DATE(:EREQDATE, 'YYYY-MM-DD')`, {
+                EREQDATE: dto.EREQDATE,
+            });
         }
         if (dto.SINPUTDATE) {
-            query.andWhere(
-                `A.JOP_MAR_INPUT_DATE >= TO_DATE(:SINPUTDATE, 'YYYY-MM-DD')`,
-                { SINPUTDATE: dto.SINPUTDATE },
-            );
+            query.andWhere(`A.JOP_MAR_INPUT_DATE >= TO_DATE(:SINPUTDATE, 'YYYY-MM-DD')`, {
+                SINPUTDATE: dto.SINPUTDATE,
+            });
         }
         if (dto.EINPUTDATE) {
-            query.andWhere(
-                `A.JOP_MAR_INPUT_DATE <= TO_DATE(:EINPUTDATE, 'YYYY-MM-DD')`,
-                { EINPUTDATE: dto.EINPUTDATE },
-            );
+            query.andWhere(`A.JOP_MAR_INPUT_DATE <= TO_DATE(:EINPUTDATE, 'YYYY-MM-DD')`, {
+                EINPUTDATE: dto.EINPUTDATE,
+            });
         }
         return await query.getRawMany();
     }

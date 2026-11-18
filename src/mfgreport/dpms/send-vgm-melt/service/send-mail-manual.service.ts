@@ -21,8 +21,7 @@ export class SendMailManualService extends SendVgmMeltService {
     async sendManualByUser(dto: SendMailManualDto) {
         try {
             // 1. สร้าง Excel file จากข้อมูลที่ส่งมาใน dto
-            const { buffer, filename } =
-                await this.excelService.exportExcel(dto);
+            const { buffer, filename } = await this.excelService.exportExcel(dto);
 
             // 2. บันทึก Log รายการส่งเมลลงในฐานข้อมูล
             const data = dto.DATA.map((item) => ({
@@ -37,13 +36,9 @@ export class SendMailManualService extends SendVgmMeltService {
             }
 
             // 3. ตรวจสอบจำนวน Log ที่ถูกบันทึกลงในฐานข้อมูล
-            const totalSent = await this.logService.getList(
-                formatDate(dto.VANNDATE),
-            );
+            const totalSent = await this.logService.getList(formatDate(dto.VANNDATE));
             if (!totalSent.status) {
-                throw new Error(
-                    `Failed to retrieve total sent logs: ${totalSent.message}`,
-                );
+                throw new Error(`Failed to retrieve total sent logs: ${totalSent.message}`);
             }
 
             // 4. ส่งเมลพร้อมไฟล์แนบ

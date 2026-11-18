@@ -32,11 +32,7 @@ export class QainsFormSetInchargeService extends QainsFormService {
                 ...form,
                 CEXTDATA: '01',
             };
-            await this.setFlow(
-                condSetFlow,
-                dto.QA_INCHARGE_EMPNO,
-                dto.QA_INCHARGE_EMPNO,
-            );
+            await this.setFlow(condSetFlow, dto.QA_INCHARGE_EMPNO, dto.QA_INCHARGE_EMPNO);
             // update flow incharge2
             await this.setFlow(
                 { ...condSetFlow, CEXTDATA: '02' },
@@ -45,13 +41,10 @@ export class QainsFormSetInchargeService extends QainsFormService {
             );
 
             // update ojt date and training date
-            await this.update(
-                {
-                    ...form,
-                    QA_INCHARGE_EMPNO: dto.QA_INCHARGE_EMPNO,
-                },
-            );
-
+            await this.update({
+                ...form,
+                QA_INCHARGE_EMPNO: dto.QA_INCHARGE_EMPNO,
+            });
 
             // do action
             await this.doactionFlowService.doAction(

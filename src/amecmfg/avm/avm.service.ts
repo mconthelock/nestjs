@@ -9,9 +9,9 @@ import { getSafeFields } from 'src/common/utils/Fields.utils';
 @Injectable()
 export class AvmService {
     constructor(
-        @InjectRepository(Avm, 'amecConnection')
+        @InjectRepository(Avm, 'datacenterConnection')
         private avmRepository: Repository<Avm>,
-        @InjectDataSource('amecConnection')
+        @InjectDataSource('datacenterConnection')
         private dataSource: DataSource,
     ) {}
 
@@ -80,8 +80,7 @@ export class AvmService {
         if (!maxCode) {
             newCode = `${prefix}00001`;
         } else {
-            const numericPart =
-                parseInt(maxCode.substring(prefix.length), 10) + 1;
+            const numericPart = parseInt(maxCode.substring(prefix.length), 10) + 1;
             const paddedNum = String(numericPart).padStart(5, '0');
             newCode = `${prefix}${paddedNum}`;
         }

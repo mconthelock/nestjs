@@ -10,7 +10,7 @@ import { pkForm } from '../interface/create.interface';
 
 @Injectable()
 export class PurCpcRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -42,7 +42,7 @@ export class PurCpcRepository extends BaseRepository {
     }
 
     getForm(data: pkForm) {
-        return this.getRepository(PURCPC_FORM).find({
+        return this.getRepository(PURCPC_FORM).findOne({
             where: data,
             relations: ['DETAILS'],
         });

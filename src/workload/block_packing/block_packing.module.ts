@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { BlockPackingService } from './block_packing.service';
@@ -14,7 +14,7 @@ import { PisPages } from 'src/common/Entities/workload/table/pis-pages.entity';
     imports: [
         TypeOrmModule.forFeature(
             [AmecOrders, AmecOrdersSchedule, AmecOrdersPackNo, PisPages],
-            'workloadConnection',
+            'mitsuConnection',
         ),
     ],
     controllers: [BlockPackingController],

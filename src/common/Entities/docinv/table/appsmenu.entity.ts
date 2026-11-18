@@ -1,14 +1,7 @@
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    OneToMany,
-    JoinColumn,
-    ManyToOne,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 import { Appsmenuuser } from './appsmenuuser.entity';
 
-@Entity('APP_MENU')
+@Entity({ name: 'APP_MENU', schema: 'DOCINV' })
 export class Appsmenu {
     @PrimaryGeneratedColumn()
     MENU_ID: number;

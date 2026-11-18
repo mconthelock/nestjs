@@ -1,16 +1,9 @@
-import {
-    Entity,
-    Column,
-    PrimaryColumn,
-    OneToOne,
-    JoinColumn,
-    OneToMany,
-} from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 // import { Workplan } from '../../../../docinv/workplan/entities/workplan.entity';
 import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 import { FORM } from 'src/common/Entities/webform/table/FORM.entity';
 
-@Entity('FORM4')
+@Entity({ name: 'FORM4', schema: 'WEBFORM' })
 export class IsForm4 {
     @PrimaryColumn()
     NFRMNO: string;

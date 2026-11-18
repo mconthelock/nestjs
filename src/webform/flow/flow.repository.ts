@@ -12,7 +12,7 @@ import { FLOW } from 'src/common/Entities/webform/table/FLOW.entity';
 
 @Injectable()
 export class FlowRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
@@ -95,8 +95,7 @@ export class FlowRepository extends BaseRepository {
                 }
             } else if (key === 'fields') {
                 const select = getSafeFields(dto.fields, this.FLOW_FIELDS);
-                select.length > 0 &&
-                    query.select(select.map((f) => `flow.${f}`));
+                select.length > 0 && query.select(select.map((f) => `flow.${f}`));
             } else {
                 query.andWhere(`flow.${key} = :${key}`, { [key]: dto[key] });
             }
@@ -122,30 +121,30 @@ export class FlowRepository extends BaseRepository {
         // );
         return this.manager.getRepository(FLOW).query(
             `
-            SELECT  F.LV AS "LEVEL", F.CSTEPNO, F.CSTEPNEXTNO, F.CSTEPST, F.CEXTDATA, F.VAPVNO, E.SRECMAIL, 
-                    F.NFRMNO, F.VORGNO, F.CYEAR, F.CYEAR2, F.NRUNNO, E.SNAME, S.VNAME, 
+            SELECT  F.LV AS "LEVEL", F.CSTEPNO, F.CSTEPNEXTNO, F.CSTEPST, F.CEXTDATA, F.CTYPE, F.VAPVNO, E.SRECMAIL,
+                    F.NFRMNO, F.VORGNO, F.CYEAR, F.CYEAR2, F.NRUNNO, E.SNAME, S.VNAME,
                     F.DAPVDATE, F.CAPVTIME, F.VREMARK, F.VREPNO, F.VREALAPV
             FROM (
                 SELECT LEVEL AS LV, FLOW.*
-                FROM FLOW
+                FROM WEBFORM.FLOW
                 START WITH
-                    NFRMNO = :1 
-                    AND VORGNO = :2 
-                    AND CYEAR = :3 
-                    AND CYEAR2 = :4 
-                    AND NRUNNO = :5 
+                    NFRMNO = :1
+                    AND VORGNO = :2
+                    AND CYEAR = :3
+                    AND CYEAR2 = :4
+                    AND NRUNNO = :5
                     AND CSTART = '1'
                 CONNECT BY
-                    NFRMNO = prior NFRMNO 
-                    AND VORGNO = prior VORGNO 
-                    AND CYEAR = prior CYEAR 
-                    AND CYEAR2 = prior CYEAR2 
-                    AND NRUNNO = prior NRUNNO  
+                    NFRMNO = prior NFRMNO
+                    AND VORGNO = prior VORGNO
+                    AND CYEAR = prior CYEAR
+                    AND CYEAR2 = prior CYEAR2
+                    AND NRUNNO = prior NRUNNO
                     AND CSTEPNO = PRIOR CSTEPNEXTNO
             ) F
             JOIN AMEC.AEMPLOYEE E ON E.SEMPNO = F.VAPVNO
             JOIN AMEC.PPOSITION P ON P.SPOSCODE = E.SPOSCODE
-            JOIN STEPMST S ON F.CSTEPNO = S.CNO
+            JOIN WEBFORM.STEPMST S ON F.CSTEPNO = S.CNO
             ORDER BY F.LV
         `,
             [form.NFRMNO, form.VORGNO, form.CYEAR, form.CYEAR2, form.NRUNNO],
@@ -206,14 +205,11 @@ export class FlowRepository extends BaseRepository {
             .getMany();
     }
 
-    async doactionUpdateFlow(flow: any, params: any) {
+    async doactionUpdateFlow(flow: any, params: any, excludeOtherStepsWithTag?: string) {
         // UPDATE APPROVAL STATUS
         let apvClause: string = '';
         params.stepNo = flow.CSTEPNO;
-        if (
-            flow.CAPVTYPE == this.APV_TYPE_SINGLE &&
-            flow.CAPPLYALL == this.APPLY_ALL_NONE
-        ) {
+        if (flow.CAPVTYPE == this.APV_TYPE_SINGLE && flow.CAPPLYALL == this.APPLY_ALL_NONE) {
             apvClause = `and CSTEPNO = :stepNo`;
         } else if (
             flow.CAPVTYPE == this.APV_TYPE_SINGLE &&
@@ -239,8 +235,7 @@ export class FlowRepository extends BaseRepository {
             };
         } else if (
             flow.CAPVTYPE == this.APV_TYPE_MULTIPLE_CO &&
-            (flow.CAPPLYALL == this.APPLY_ALL_APV ||
-                flow.CAPPLYALL == this.APPLY_ALL_BOTH)
+            (flow.CAPPLYALL == this.APPLY_ALL_APV || flow.CAPPLYALL == this.APPLY_ALL_BOTH)
         ) {
             apvClause = `and ((VAPVNO = :apv1 or VREPNO = :rep1) or (CSTEPNO = :stepNo and (VAPVNO = :apv2 or VREPNO = :rep2)))`;
             params = {
@@ -251,7 +246,11 @@ export class FlowRepository extends BaseRepository {
                 rep2: params.VREALAPV,
             };
         }
-        const sql = `UPDATE FLOW SET CAPVSTNO = :whatAction, CSTEPST = :stepAction, DAPVDATE = TO_DATE(:DAPVDATE, 'YYYY-MM-DD'), CAPVTIME = :CAPVTIME, VREMARK = :VREMARK, VREMOTE = :VREMOTE, VREALAPV = :VREALAPV WHERE NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO AND CAPVSTNO = :CAPVSTNO ${apvClause}`;
+        if (excludeOtherStepsWithTag) {
+            apvClause += ` and (CSTEPNO = :stepNo or NVL(TRIM(CEXTDATA), ' ') <> :excludedStepTag)`;
+            params = { ...params, excludedStepTag: excludeOtherStepsWithTag };
+        }
+        const sql = `UPDATE WEBFORM.FLOW SET CAPVSTNO = :whatAction, CSTEPST = :stepAction, DAPVDATE = TO_DATE(:DAPVDATE, 'YYYY-MM-DD'), CAPVTIME = :CAPVTIME, VREMARK = :VREMARK, VREMOTE = :VREMOTE, VREALAPV = :VREALAPV WHERE NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO AND CAPVSTNO = :CAPVSTNO ${apvClause}`;
         return this.manager.query(sql, params);
     }
 
@@ -286,11 +285,7 @@ export class FlowRepository extends BaseRepository {
 
     async getStepNextNo(
         form: FormDto,
-        {
-            cextdata,
-            step,
-            start,
-        }: { cextdata?: string; step?: string; start?: string },
+        { cextdata, step, start }: { cextdata?: string; step?: string; start?: string },
     ) {
         const where = {
             NFRMNO: form.NFRMNO,
@@ -400,11 +395,7 @@ export class FlowRepository extends BaseRepository {
                 CYEAR2: form.CYEAR2,
                 NRUNNO: form.NRUNNO,
                 CAPVSTNO: this.APV_NONE,
-                CSTEPST: In([
-                    this.STEP_NORMAL,
-                    this.STEP_WAIT,
-                    this.STEP_READY,
-                ]),
+                CSTEPST: In([this.STEP_NORMAL, this.STEP_WAIT, this.STEP_READY]),
             },
             { CAPVSTNO: this.APV_REJECT, CSTEPST: this.STEP_SKIP },
         );
@@ -659,22 +650,22 @@ export class FlowRepository extends BaseRepository {
 
     async updateStepNextExeToNormal(form: FormDto, cextdata: string) {
         const sql = `
-            UPDATE FLOW f 
-            SET f.CSTEPST = :stepNormal, f.VREALAPV = '', f.CAPVSTNO = :apvNone, f.DAPVDATE = '', f.CAPVTIME = '' 
-            WHERE (f.NFRMNO, f.VORGNO, f.CYEAR, f.CYEAR2, f.NRUNNO, f.CSTEPNO, f.CEXTDATA) 
+            UPDATE WEBFORM.FLOW f
+            SET f.CSTEPST = :stepNormal, f.VREALAPV = '', f.CAPVSTNO = :apvNone, f.DAPVDATE = '', f.CAPVTIME = ''
+            WHERE (f.NFRMNO, f.VORGNO, f.CYEAR, f.CYEAR2, f.NRUNNO, f.CSTEPNO, f.CEXTDATA)
             IN (
-                SELECT NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, CSTEPNO, CEXTDATA 
-                FROM FLOW 
-                START WITH  
-                    CEXTDATA = :cextdata AND NFRMNO = :NFRMNO 
-                    AND VORGNO = :VORGNO AND CYEAR = :CYEAR 
-                    AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO 
-                CONNECT BY 
-                    NFRMNO = PRIOR NFRMNO 
-                    AND VORGNO = PRIOR VORGNO 
-                    AND CYEAR = PRIOR CYEAR 
-                    AND CYEAR2 = PRIOR CYEAR2 
-                    AND NRUNNO = PRIOR NRUNNO 
+                SELECT NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, CSTEPNO, CEXTDATA
+                FROM WEBFORM.FLOW
+                START WITH
+                    CEXTDATA = :cextdata AND NFRMNO = :NFRMNO
+                    AND VORGNO = :VORGNO AND CYEAR = :CYEAR
+                    AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO
+                CONNECT BY
+                    NFRMNO = PRIOR NFRMNO
+                    AND VORGNO = PRIOR VORGNO
+                    AND CYEAR = PRIOR CYEAR
+                    AND CYEAR2 = PRIOR CYEAR2
+                    AND NRUNNO = PRIOR NRUNNO
                     AND CSTEPNO = PRIOR CSTEPNEXTNO
             )`;
         const params = {

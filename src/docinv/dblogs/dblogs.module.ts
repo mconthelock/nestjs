@@ -13,12 +13,9 @@ import { DblogsController } from './dblogs.controller';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Amecdblog], 'docinvConnection'),
+        TypeOrmModule.forFeature([Amecdblog], 'mitsuConnection'),
         TypeOrmModule.forFeature([LndbLog], 'lnConnection'),
-        TypeOrmModule.forFeature(
-            [IsodbLog, scmdbLog, AS400dbLog],
-            'auditConnection',
-        ),
+        TypeOrmModule.forFeature([IsodbLog, scmdbLog, AS400dbLog], 'auditConnection'),
         SpecialuserModule,
     ],
     controllers: [DblogsController],

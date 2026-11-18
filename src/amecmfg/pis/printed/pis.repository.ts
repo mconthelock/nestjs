@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
@@ -18,7 +18,7 @@ import { UpadatePisPagesDto } from './dto/update-pis-pages.dto';
 
 @Injectable()
 export class PisRepository extends BaseRepository {
-    constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds);
     }
 
@@ -54,17 +54,12 @@ export class PisRepository extends BaseRepository {
             }),
         );
 
-        if (pageEntities.length)
-            await this.manager.insert(PisPages, pageEntities);
+        if (pageEntities.length) await this.manager.insert(PisPages, pageEntities);
         return savedFile;
     }
 
     async updateFiles(fileData: UpdatePisFilesDto) {
-        return await this.manager.update(
-            PisFiles,
-            { FILES: fileData.FILES },
-            fileData,
-        );
+        return await this.manager.update(PisFiles, { FILES: fileData.FILES }, fileData);
     }
 
     async updatePages(
@@ -75,11 +70,7 @@ export class PisRepository extends BaseRepository {
     ) {
         const updatePromises = pagesData.map((pageData) => {
             const { FILES_ID, PAGE_NUM, ...updateData } = pageData;
-            return this.manager.update(
-                PisPages,
-                { FILES_ID, PAGE_NUM },
-                updateData,
-            );
+            return this.manager.update(PisPages, { FILES_ID, PAGE_NUM }, updateData);
         });
         await Promise.all(updatePromises);
         return { updated: updatePromises.length };

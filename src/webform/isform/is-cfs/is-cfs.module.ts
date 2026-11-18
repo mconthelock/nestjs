@@ -12,7 +12,7 @@ import { FlowModule } from 'src/webform/flow/flow.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([ISCFS_FORM], 'webformConnection'),
+        TypeOrmModule.forFeature([ISCFS_FORM], 'mitsuConnection'),
         FormModule,
         FlowModule,
         FormmstModule,

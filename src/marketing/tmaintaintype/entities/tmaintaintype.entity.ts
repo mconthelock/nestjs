@@ -1,66 +1,63 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import
-{
-  Ordermain
-} from '../../ordermain/entities/ordermain.entity'; 
+import { Ordermain } from '../../ordermain/entities/ordermain.entity';
 @Entity('TMAINTAINTYPE')
 export class Tmaintaintype {
-  @PrimaryColumn()
-  ID: number;
+    @PrimaryColumn()
+    ID: number;
 
-  @Column()
-  ABBREVIATION: string;
+    @Column()
+    ABBREVIATION: string;
 
-  @Column()
-  DETAIL: string;
+    @Column()
+    DETAIL: string;
 
-  @Column()
-  EDI_PART_NUMBER: string;
+    @Column()
+    EDI_PART_NUMBER: string;
 
-  @Column()
-  PC_FORM: string;
+    @Column()
+    PC_FORM: string;
 
-  @Column()
-  SERIESNAME: string;
+    @Column()
+    SERIESNAME: string;
 
-  @Column()
-  DESCRIPTION_INVOICE: string;
+    @Column()
+    DESCRIPTION_INVOICE: string;
 
-  @Column()
-  PREASSY: string;
+    @Column()
+    PREASSY: string;
 
-  @Column()
-  CAPAMIN: number;
+    @Column()
+    CAPAMIN: number;
 
-  @Column()
-  CAPAMAX: number;
+    @Column()
+    CAPAMAX: number;
 
-  @Column()
-  SPEDVALUE: string;
+    @Column()
+    SPEDVALUE: string;
 
-  @Column()
-  REFERXML: string;
+    @Column()
+    REFERXML: string;
 
-  @Column()
-  STATUSACTIVE: string;
+    @Column()
+    STATUSACTIVE: string;
 
-  @Column()
-  TYPEOFMODEL: string;
+    @Column()
+    TYPEOFMODEL: string;
 
-  @Column()
-  GROUPMAIL: string;
+    @Column()
+    GROUPMAIL: string;
 
-  @Column()
-  BYPASSMODEL: number;
+    @Column()
+    BYPASSMODEL: number;
 
-  @Column()
-  MODERNIZE: number;
+    @Column()
+    MODERNIZE: number;
 
-  // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
-  // ตัวอย่าง:
-  // @ManyToOne(() => User, user => user.posts)
-  // user: User;
-  @OneToOne(() => Ordermain, (ord) => ord.orderseries)
-  @JoinColumn({ name: 'ABBREVIATION', referencedColumnName: 'SERIES' })
-  seriestype: Ordermain;
+    // สามารถเพิ่มความสัมพันธ์ของข้อมูลได้ที่นี่
+    // ตัวอย่าง:
+    // @ManyToOne(() => User, user => user.posts)
+    // user: User;
+    @OneToOne(() => Ordermain, (ord) => ord.orderseries)
+    @JoinColumn({ name: 'ABBREVIATION', referencedColumnName: 'SERIES' })
+    seriestype: Ordermain;
 }

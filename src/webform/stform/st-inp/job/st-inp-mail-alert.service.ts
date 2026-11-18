@@ -25,7 +25,7 @@ export class StInpJobAlertService {
                 formmst.CYEAR,
                 date,
             );
-            if(list.length === 0){
+            if (list.length === 0) {
                 throw new Error(`No pending items found for alert.`);
             }
             const ddem = await this.sequenceOrgService.getByPosition({
@@ -33,9 +33,7 @@ export class StInpJobAlertService {
                 VORGNO: '020601',
             });
             if (!ddem.status) {
-                throw new Error(
-                    `Manager with position code 21 and org code 020601 not found`,
-                );
+                throw new Error(`Manager with position code 21 and org code 020601 not found`);
             }
 
             const semList: Record<string, MailList> = {};
@@ -53,19 +51,19 @@ export class StInpJobAlertService {
                     NRUNNO: l.NRUNNO,
                 });
                 if (!semList[l.SEM]) {
-                    semList[l.SEM] = {  
+                    semList[l.SEM] = {
                         mail: l.SEM_MAIL,
                         name: l.NAME,
                         list: [
                             {
                                 formno: formDetail.FORMNO,
-                                link: formDetail.link,// + l.SEM,
+                                link: formDetail.link, // + l.SEM,
                                 diffDay: l.DIFF_DAY,
                                 diffWeek: l.DIFF_WEEK,
                             },
                         ],
                     };
-                }else{
+                } else {
                     semList[l.SEM].list.push({
                         formno: formDetail.FORMNO,
                         link: formDetail.link + l.SEM,
@@ -75,17 +73,15 @@ export class StInpJobAlertService {
                 }
                 demList.list.push({
                     formno: formDetail.FORMNO,
-                    link: formDetail.link,// + ddem.data.EMPINFO.SEMPNO,
+                    link: formDetail.link, // + ddem.data.EMPINFO.SEMPNO,
                     diffDay: l.DIFF_DAY,
                     diffWeek: l.DIFF_WEEK,
                 });
             }
-            for(const sem of Object.values(semList)){
+            for (const sem of Object.values(semList)) {
                 await this.mailService.sendMail({
                     from: `Safety System<${process.env.MAIL_FROM}>`,
-                    to:process.env.NODE_ENV != 'production'
-                        ? process.env.MAIL_ADMIN
-                        : sem.mail,
+                    to: process.env.NODE_ENV != 'production' ? process.env.MAIL_ADMIN : sem.mail,
                     subject: 'Pending Form SAFETY INSPECTION REPORT Notification',
                     template: 'safety/patrol/pending-form',
                     context: sem,
@@ -95,10 +91,7 @@ export class StInpJobAlertService {
 
             await this.mailService.sendMail({
                 from: `Safety System<${process.env.MAIL_FROM}>`,
-                to:
-                    process.env.NODE_ENV != 'production'
-                        ? process.env.MAIL_ADMIN
-                        : demList.mail,
+                to: process.env.NODE_ENV != 'production' ? process.env.MAIL_ADMIN : demList.mail,
                 subject: 'Pending Form SAFETY INSPECTION REPORT Notification',
                 template: 'safety/patrol/pending-form',
                 context: demList,

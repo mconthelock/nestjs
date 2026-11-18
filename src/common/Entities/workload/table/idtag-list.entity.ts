@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
-@Entity('IDTAGS_LIST')
+@Entity({ name: 'IDTAGS_LIST', schema: 'WORKLOAD' })
 export class IdtagList {
     @PrimaryColumn()
     MST_DIR: string;

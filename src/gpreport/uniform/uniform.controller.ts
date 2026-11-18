@@ -1,12 +1,4 @@
-import {
-    Controller,
-    Get,
-    Param,
-    Post,
-    Body,
-    Delete,
-    Req,
-} from '@nestjs/common';
+﻿import { Controller, Get, Param, Post, Body, Delete, Req } from '@nestjs/common';
 import { UniformService } from './uniform.service';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getClientIP } from 'src/common/utils/ip.utils';
@@ -70,35 +62,26 @@ export class UniformController {
     }
 
     @Get('annual/request/:userId/:year')
-    findRightsByUserId(
-        @Param('userId') userId: string,
-        @Param('year') year: number,
-    ) {
+    findRightsByUserId(@Param('userId') userId: string, @Param('year') year: number) {
         return this.uniform.findAnnualRequest(userId, +year);
     }
 
     @Post('annual/request/')
-    @UseTransaction('gpreportConnection')
+    @UseTransaction('mitsuConnection')
     createRequest(@Body() data: CreateAnnualDto, @Req() req: Request) {
         const ip = getClientIP(req);
         return this.uniform.createAnnualRequest(data, ip);
     }
 
     @Delete('annual/request/:userId/:year')
-    @UseTransaction('gpreportConnection')
-    deleteRequest(
-        @Param('userId') userId: string,
-        @Param('year') year: number,
-    ) {
+    @UseTransaction('mitsuConnection')
+    deleteRequest(@Param('userId') userId: string, @Param('year') year: number) {
         return this.uniform.deleteRequest(userId, +year);
     }
 
     @Delete('annual/request/:userId/:year/paid')
-    @UseTransaction('gpreportConnection')
-    deletePaidRequest(
-        @Param('userId') userId: string,
-        @Param('year') year: number,
-    ) {
+    @UseTransaction('mitsuConnection')
+    deletePaidRequest(@Param('userId') userId: string, @Param('year') year: number) {
         return this.uniform.deleteRequestDetail(userId, +year);
     }
 }

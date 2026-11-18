@@ -1,0 +1,26 @@
+[
+  {
+    "NFRMNO": 4,
+    "VORGNO": "051401",
+    "CYEAR": "21",
+    "REQUEST_BY": "25009",
+    "INPUT_BY": "25009",
+    "ITEMS": [
+      { "DWG": "YA154D379", "GNO": "-01", "LNO": "", "ITEM": "125", "PROCID_OLD": "G1SHE", "TP_OLD": "0.05", "TC_OLD": "0.0062", "PROCID": "G1SHE", "TP": "0.04", "TC": "0.0062" },
+      { "DWG": "YA154D379", "GNO": "-01", "LNO": "", "ITEM": "125", "PROCID_OLD": "G1PR4", "TP_OLD": "0.12", "TC_OLD": "0.0013", "PROCID": "G1PR4", "TP": "0.12", "TC": "0.0033" },
+      { "DWG": "YA188D858", "GNO": "-01", "LNO": "", "ITEM": "125", "PROCID_OLD": "G1LZ3", "TP_OLD": "11", "TC_OLD": "21", "PROCID": "G1LZ3", "TP": "13", "TC": "23" },
+      { "DWG": "YA154D379", "GNO": "-02", "LNO": "", "ITEM": "125", "PROCID_OLD": "G1LZ3", "TP_OLD": "0.01", "TC_OLD": "0.0039", "PROCID": "G1LZ3", "TP": "0.1", "TC": "0.0003" }
+    ]
+  },
+  {
+    "NFRMNO": 4,
+    "VORGNO": "051401",
+    "CYEAR": "21",
+    "REQUEST_BY": "24013",
+    "INPUT_BY": "24013",
+    "ITEMS": [
+      { "DWG": "BS011D184", "GNO": "-01", "LNO": "", "ITEM": "620", "PROCID_OLD": "H8BSA", "TP_OLD": "0.1", "TC_OLD": "0.0038", "PROCID": "H8BSA", "TP": "0.1", "TC": "0.0038" },
+      { "DWG": "BS011D184", "GNO": "-01", "LNO": "", "ITEM": "620", "PROCID_OLD": "H8MK", "TP_OLD": "0.04", "TC_OLD": "0.0071", "PROCID": "H8MK", "TP": "0", "TC": "0" }
+    ]
+  }
+]

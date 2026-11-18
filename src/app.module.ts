@@ -21,9 +21,7 @@ import { SpModule } from './spprogram/sp.module';
 import { MktModule } from './marketing/mkt.module';
 import { JobOrderModule } from './joborder/joborder.module';
 import { ESCSModule } from './escs/escs.module';
-import { AutomationModule } from './automation/automation.module';
 import { HradminModule } from './hradmin/hradmin.module';
-import { InvoiceModule } from './invoice/invoice.module';
 import { IdsModule } from './ids/ids.module';
 import { ElmesModule } from './elmes/elmes.module';
 // import { ItgcModule } from './itgc/itgc.module';
@@ -44,6 +42,7 @@ import { CountriesModule } from './countries/countries.module';
 import { InnovatModule } from './innovat/innovat.module';
 import { IedocModule } from './iedoc/iedoc.module';
 import { TakeoutModule } from './takeout/takeout.module';
+import { DtiModule } from './dti/dti.module';
 
 @Module({
     imports: [
@@ -61,13 +60,11 @@ import { TakeoutModule } from './takeout/takeout.module';
         MktModule,
         ElmesModule,
         AS400Module,
-        AutomationModule,
         HradminModule,
         //JB 🤴
         JobOrderModule,
         ESCSModule,
         PackingModule,
-        InvoiceModule,
         IdsModule,
         MfgReportModule,
         SafetyModule,
@@ -81,7 +78,9 @@ import { TakeoutModule } from './takeout/takeout.module';
         IedocModule,
         InnovatModule,
         CountriesModule,
-        TakeoutModule
+        TakeoutModule,
+        DtiModule,
+        TakeoutModule,
     ],
     providers: [
         HttpLoggingInterceptor,

@@ -43,10 +43,7 @@ export function compareReference(
     a: { CYEAR2: string; NRUNNO: number },
     b: { CYEAR2: string; NRUNNO: number },
 ): number {
-    return (
-        Number(a.CYEAR2) - Number(b.CYEAR2) ||
-        Number(a.NRUNNO) - Number(b.NRUNNO)
-    );
+    return Number(a.CYEAR2) - Number(b.CYEAR2) || Number(a.NRUNNO) - Number(b.NRUNNO);
 }
 
 export function masterReference(
@@ -60,20 +57,13 @@ export function masterReference(
 export function snapshotChanges(value: object): Partial<JigSnapshot> {
     const changes: Partial<JigSnapshot> = {};
     for (const field of SNAPSHOT_FIELDS) {
-        if (value[field] !== undefined)
-            Object.assign(changes, { [field]: value[field] });
+        if (value[field] !== undefined) Object.assign(changes, { [field]: value[field] });
     }
     if (changes.START_USE_DATE != null) {
         const value = changes.START_USE_DATE;
-        const dateOnly =
-            typeof value === 'string' &&
-            /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+        const dateOnly = typeof value === 'string' && /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
         changes.START_USE_DATE = dateOnly
-            ? new Date(
-                  Number(dateOnly[1]),
-                  Number(dateOnly[2]) - 1,
-                  Number(dateOnly[3]),
-              )
+            ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]))
             : new Date(value);
     }
     return changes;
@@ -82,31 +72,20 @@ export function snapshotChanges(value: object): Partial<JigSnapshot> {
 export function jigSnapshot(base: object, changes: object = {}): JigSnapshot {
     const snapshot = { ...snapshotChanges(base), ...snapshotChanges(changes) };
     if (typeof snapshot.JIG_NAME !== 'string' || !snapshot.JIG_NAME.trim())
-        throw new BadRequestException(
-            'JIG_NAME is required in the form snapshot',
-        );
+        throw new BadRequestException('JIG_NAME is required in the form snapshot');
     if (
         !Number.isInteger(snapshot.INSPEC_PERIOD) ||
         snapshot.INSPEC_PERIOD < 1 ||
         snapshot.INSPEC_PERIOD > 999
     )
-        throw new BadRequestException(
-            'INSPEC_PERIOD must be an integer from 1 to 999 months',
-        );
+        throw new BadRequestException('INSPEC_PERIOD must be an integer from 1 to 999 months');
     for (const field of SNAPSHOT_FIELDS) {
-        if (snapshot[field] === undefined)
-            Object.assign(snapshot, { [field]: null });
+        if (snapshot[field] === undefined) Object.assign(snapshot, { [field]: null });
     }
     return snapshot as JigSnapshot;
 }
 
-export const FORM_KEYS = [
-    'NFRMNO',
-    'VORGNO',
-    'CYEAR',
-    'CYEAR2',
-    'NRUNNO',
-] as const;
+export const FORM_KEYS = ['NFRMNO', 'VORGNO', 'CYEAR', 'CYEAR2', 'NRUNNO'] as const;
 export const formKey = (value: JigFormKeyDto): JigFormKeyDto => ({
     NFRMNO: value.NFRMNO,
     VORGNO: value.VORGNO,
@@ -132,8 +111,7 @@ export function monthStart(value: string | Date): Date {
         }
         return new Date(Number(match[1]), Number(match[2]) - 1, 1);
     }
-    if (!value || !Number.isFinite(value.getTime()))
-        throw new BadRequestException('Invalid date');
+    if (!value || !Number.isFinite(value.getTime())) throw new BadRequestException('Invalid date');
     return new Date(value.getFullYear(), value.getMonth(), 1);
 }
 
@@ -143,33 +121,22 @@ export function monthKey(value: Date): string {
 
 export function nextRound(schedule: Date, period: number): Date {
     if (!Number.isInteger(Number(period)) || period < 1 || period > 999) {
-        throw new ConflictException(
-            'INSPEC_PERIOD must be an integer from 1 to 999 months',
-        );
+        throw new ConflictException('INSPEC_PERIOD must be an integer from 1 to 999 months');
     }
     const date = monthStart(schedule);
     date.setMonth(date.getMonth() + Number(period));
     if (date.getFullYear() > 9999)
-        throw new ConflictException(
-            'Next inspection date exceeds the supported year',
-        );
+        throw new ConflictException('Next inspection date exceeds the supported year');
     return date;
 }
 
-export function validateRange(point: {
-    MIN?: number | null;
-    MAX?: number | null;
-}) {
+export function validateRange(point: { MIN?: number | null; MAX?: number | null }) {
     if (point.MIN != null && point.MAX != null && point.MIN > point.MAX) {
         throw new BadRequestException('MIN must not exceed MAX');
     }
 }
 
-export function overallResult(
-    details: { RESULT: string | null }[],
-): 'OK' | 'NG' | null {
+export function overallResult(details: { RESULT: string | null }[]): 'OK' | 'NG' | null {
     if (details.some((row) => row.RESULT === 'NG')) return 'NG';
-    return details.length && details.every((row) => row.RESULT === 'OK')
-        ? 'OK'
-        : null;
+    return details.length && details.every((row) => row.RESULT === 'OK') ? 'OK' : null;
 }

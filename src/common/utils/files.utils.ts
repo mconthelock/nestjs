@@ -112,11 +112,7 @@ export async function moveFileFormPath({
  * await copyFile('/path/to/source/file.txt', '/path/to/destination', 'newFileName.txt');
  * จะคัดลอก file.txt ไปยัง /path/to/destination/newFileName.txt และคืนค่า '/path/to/destination/newFileName.txt'
  */
-export async function copyFile(
-    source: string,
-    destination: string,
-    newFileName?: string,
-) {
+export async function copyFile(source: string, destination: string, newFileName?: string) {
     await fs.mkdir(destination, { recursive: true });
     const fileName = newFileName ?? basename(source);
     const targetPath = join(destination, fileName);
@@ -203,8 +199,7 @@ export async function getBase64ImageFromUrl(url: string): Promise<string> {
         const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
 
-        const contentType =
-            res.headers.get('content-type') || 'application/octet-stream';
+        const contentType = res.headers.get('content-type') || 'application/octet-stream';
         const buffer = Buffer.from(await res.arrayBuffer());
         return `data:${contentType};base64,${buffer.toString('base64')}`;
     } catch (err) {

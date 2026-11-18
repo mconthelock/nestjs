@@ -9,7 +9,7 @@ import { AASTaskLog } from '../../common/Entities/docinv/views/aastasklog.entity
 @Module({
     imports: [
         TypeOrmModule.forFeature([WSDTaskLog], 'auditConnection'),
-        TypeOrmModule.forFeature([AASTaskLog], 'docinvConnection'),
+        TypeOrmModule.forFeature([AASTaskLog], 'mitsuConnection'),
     ],
     controllers: [TasklogsController],
     providers: [TasklogsService],

@@ -70,7 +70,7 @@ export class JigNgDto {
     @IsDefined()
     @IsNotEmpty()
     @IsString()
-    @MaxLength(500)
+    @MaxLength(2000)
     DEFECT_DETAIL: string;
     @IsDefined()
     @IsNotEmpty()
@@ -88,6 +88,9 @@ export class JigNgDto {
 }
 
 export class JigFileDto {
+    @IsOptional()
+    @IsIn(['REFERENCE', 'BEFORE', 'AFTER'])
+    FILE_GROUP?: 'REFERENCE' | 'BEFORE' | 'AFTER';
     @IsDefined()
     @IsInt()
     @Min(1)
@@ -146,10 +149,7 @@ export class SaveJigDetailDto extends IntersectionType(
     }),
 ) {}
 
-export class CreateJigFormDto extends IntersectionType(
-    JigFormKeyDto,
-    PatchJigSnapshotDto,
-) {
+export class CreateJigFormDto extends IntersectionType(JigFormKeyDto, PatchJigSnapshotDto) {
     // Workflow approver only; not a JIG_FORM or JIG_FORM_NG column.
     @IsOptional()
     @IsString()

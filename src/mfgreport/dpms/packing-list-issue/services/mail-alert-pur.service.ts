@@ -21,11 +21,7 @@ export class MailAlertPurService {
         try {
             const notSetOrigins = await this.originNotSetService.findAll();
             if (notSetOrigins.status) {
-                logMessage.push(
-                    log_message(
-                        `Found ${notSetOrigins.data.length} origins not set`,
-                    ),
-                );
+                logMessage.push(log_message(`Found ${notSetOrigins.data.length} origins not set`));
                 // group by planner
                 const data = notSetOrigins.data;
                 const groupedByPlanner = data.reduce((acc, item) => {
@@ -42,33 +38,20 @@ export class MailAlertPurService {
                     'template',
                     'country-origin-template.xlsx',
                 );
-                logMessage.push(
-                    log_message(`Using template path: ${templatePath}`),
-                );
+                logMessage.push(log_message(`Using template path: ${templatePath}`));
                 for (const planner in groupedByPlanner) {
-                    const lists: COUNTRY_ORIGIN_NOT_SET_VIEW[] =
-                        groupedByPlanner[planner];
-                    const purcode: string[][] = lists.map((item) => [
-                        item.PURCODE,
-                    ]);
+                    const lists: COUNTRY_ORIGIN_NOT_SET_VIEW[] = groupedByPlanner[planner];
+                    const purcode: string[][] = lists.map((item) => [item.PURCODE]);
                     const purNames: string = [
                         ...new Set(lists.map((item) => item.PLANNERNAME)),
                     ].join(', ');
                     const purEmails: string =
                         process.env.STATE == 'production'
-                            ? [
-                                  ...new Set(
-                                      lists.map((item) => item.SRECMAIL),
-                                  ),
-                              ].join(',')
+                            ? [...new Set(lists.map((item) => item.SRECMAIL))].join(',')
                             : process.env.MAIL_ADMIN;
                     logMessage.push(
-                        log_message(
-                            `Emails for planner ${planner}: ${purEmails}`,
-                        ),
-                        log_message(
-                            `planner ${planner}: ${lists.length} origins not set`,
-                        ),
+                        log_message(`Emails for planner ${planner}: ${purEmails}`),
+                        log_message(`planner ${planner}: ${lists.length} origins not set`),
                     );
                     const workbook: XlsxPopulate.Workbook =
                         await XlsxPopulate.fromFileAsync(templatePath);
@@ -90,11 +73,7 @@ export class MailAlertPurService {
                             },
                         ],
                     });
-                    logMessage.push(
-                        log_message(
-                            `----------------------------------------------`,
-                        ),
-                    );
+                    logMessage.push(log_message(`----------------------------------------------`));
                 }
                 return {
                     status: true,

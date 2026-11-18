@@ -2,119 +2,119 @@ import { Type } from 'class-transformer';
 import { IsString, IsOptional, IsDate, IsNumber } from 'class-validator';
 
 export class createInqDto {
-  @IsNumber()
-  @IsOptional()
-  @Type(() => Number)
-  INQ_ID: number;
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    INQ_ID: number;
 
-  @IsString()
-  INQ_NO: string;
+    @IsString()
+    INQ_NO: string;
 
-  @IsString()
-  INQ_REV: string;
+    @IsString()
+    INQ_REV: string;
 
-  @IsNumber()
-  @Type(() => Number)
-  INQ_STATUS: number;
+    @IsNumber()
+    @Type(() => Number)
+    INQ_STATUS: number;
 
-  @Type(() => Date)
-  @IsDate()
-  INQ_DATE: Date;
+    @Type(() => Date)
+    @IsDate()
+    INQ_DATE: Date;
 
-  @IsString()
-  @IsOptional()
-  INQ_TRADER: string;
+    @IsString()
+    @IsOptional()
+    INQ_TRADER: string;
 
-  @IsString()
-  @IsOptional()
-  INQ_AGENT: string;
+    @IsString()
+    @IsOptional()
+    INQ_AGENT: string;
 
-  @IsString()
-  @IsOptional()
-  INQ_COUNTRY: string;
+    @IsString()
+    @IsOptional()
+    INQ_COUNTRY: string;
 
-  @IsString()
-  INQ_TYPE: string;
+    @IsString()
+    INQ_TYPE: string;
 
-  @IsString()
-  @IsOptional()
-  INQ_PRJNO: string;
+    @IsString()
+    @IsOptional()
+    INQ_PRJNO: string;
 
-  @IsString()
-  @IsOptional()
-  INQ_PRJNAME: string;
+    @IsString()
+    @IsOptional()
+    INQ_PRJNAME: string;
 
-  @IsString()
-  @IsOptional()
-  INQ_SHOPORDER: string;
+    @IsString()
+    @IsOptional()
+    INQ_SHOPORDER: string;
 
-  @IsString()
-  @IsOptional()
-  INQ_SERIES: string;
+    @IsString()
+    @IsOptional()
+    INQ_SERIES: string;
 
-  @IsString()
-  @IsOptional()
-  INQ_OPERATION: string;
+    @IsString()
+    @IsOptional()
+    INQ_OPERATION: string;
 
-  @IsString()
-  @IsOptional()
-  INQ_SPEC: string;
+    @IsString()
+    @IsOptional()
+    INQ_SPEC: string;
 
-  @IsString()
-  @IsOptional()
-  INQ_PRDSCH: string;
+    @IsString()
+    @IsOptional()
+    INQ_PRDSCH: string;
 
-  @IsNumber()
-  @IsOptional()
-  @Type(() => Number)
-  INQ_QUOTATION_TYPE: number;
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    INQ_QUOTATION_TYPE: number;
 
-  @IsNumber()
-  @IsOptional()
-  @Type(() => Number)
-  INQ_DELIVERY_TERM: number;
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    INQ_DELIVERY_TERM: number;
 
-  @IsNumber()
-  @IsOptional()
-  @Type(() => Number)
-  INQ_DELIVERY_METHOD: number;
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    INQ_DELIVERY_METHOD: number;
 
-  @IsNumber()
-  @IsOptional()
-  @Type(() => Number)
-  INQ_SHIPMENT: number;
+    @IsNumber()
+    @IsOptional()
+    @Type(() => Number)
+    INQ_SHIPMENT: number;
 
-  @IsString()
-  @IsOptional()
-  INQ_MAR_PIC: string;
+    @IsString()
+    @IsOptional()
+    INQ_MAR_PIC: string;
 
-  @IsString()
-  @IsOptional()
-  INQ_PKC: string;
+    @IsString()
+    @IsOptional()
+    INQ_PKC: string;
 
-  @IsString()
-  @IsOptional()
-  INQ_REMARK: string;
+    @IsString()
+    @IsOptional()
+    INQ_REMARK: string;
 
-  @IsString()
-  @IsOptional()
-  INQ_MAR_REMARK?: string;
+    @IsString()
+    @IsOptional()
+    INQ_MAR_REMARK?: string;
 
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  CREATE_AT?: Date;
+    @IsDate()
+    @IsOptional()
+    @Type(() => Date)
+    CREATE_AT?: Date;
 
-  @IsString()
-  @IsOptional()
-  CREATE_BY?: string;
+    @IsString()
+    @IsOptional()
+    CREATE_BY?: string;
 
-  @IsDate()
-  @IsOptional()
-  @Type(() => Date)
-  UPDATE_AT?: Date;
+    @IsDate()
+    @IsOptional()
+    @Type(() => Date)
+    UPDATE_AT?: Date;
 
-  @IsString()
-  @IsOptional()
-  UPDATE_BY?: string;
+    @IsString()
+    @IsOptional()
+    UPDATE_BY?: string;
 }

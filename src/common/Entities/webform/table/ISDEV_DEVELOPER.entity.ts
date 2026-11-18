@@ -1,13 +1,6 @@
-import {
-    Column,
-    Entity,
-    PrimaryColumn,
-    OneToMany,
-    ManyToOne,
-    JoinColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { ISDEV_REQUEST } from './ISDEV_REQUEST.entity';
-import { User } from 'src/amec/users/entities/user.entity';
+import { User } from 'src/common/Entities/amec/views/user.entity';
 
 @Entity({ name: 'ISDEV_DEVELOPER', schema: 'WEBFORM' })
 export class ISDEV_DEVELOPER {

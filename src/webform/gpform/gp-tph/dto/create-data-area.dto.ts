@@ -1,14 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
-import {
-    IsInt,
-    IsNotEmpty,
-    IsNumber,
-    IsString,
-    Max,
-    MaxLength,
-    Min,
-} from 'class-validator';
+import { IsInt, IsNotEmpty, IsNumber, IsString, Max, MaxLength, Min } from 'class-validator';
 
 export class CreateGpTphArearecordDto {
     @IsNumber()
@@ -39,4 +31,4 @@ export class CreateGpTphArearecordDto {
     AREA_OWNER_POSCODE: string;
 }
 
-export class CreateDataAreaDto extends PartialType(CreateGpTphArearecordDto) { }
+export class CreateDataAreaDto extends PartialType(CreateGpTphArearecordDto) {}

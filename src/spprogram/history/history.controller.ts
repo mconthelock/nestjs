@@ -4,15 +4,15 @@ import { createHistoryDto } from './dto/create.dto';
 
 @Controller('sp/history')
 export class HistoryController {
-  constructor(private readonly history: HistoryService) {}
+    constructor(private readonly history: HistoryService) {}
 
-  @Post('create')
-  create(@Body() createDto: createHistoryDto) {
-    return this.history.create(createDto);
-  }
+    @Post('create')
+    create(@Body() createDto: createHistoryDto) {
+        return this.history.create(createDto);
+    }
 
-  @Get(':no')
-  findOne(@Param('no') no: string) {
-    return this.history.findOne(no);
-  }
+    @Get(':no')
+    findOne(@Param('no') no: string) {
+        return this.history.findOne(no);
+    }
 }

@@ -8,8 +8,8 @@ import { PART_SHORTAGE_CONTROL } from 'src/common/Entities/skid/table/PART_SHORT
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([IMM_ITEMMST], 'webformConnection'),
-        TypeOrmModule.forFeature([PART_SHORTAGE_CONTROL], 'webformConnection'),
+        TypeOrmModule.forFeature([IMM_ITEMMST], 'mitsuConnection'),
+        TypeOrmModule.forFeature([PART_SHORTAGE_CONTROL], 'mitsuConnection'),
     ],
     controllers: [ItemmasterController],
     providers: [ItemmasterService],

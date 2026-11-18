@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { KanbanRequestRepository } from './kanban_request.repository';
 import { CreateKanbanRequestDto } from './dto/create-kanban_request.dto';
 import { MailService } from 'src/common/services/mail/mail.service';
-import { Psection } from 'src/amec/psection/entities/psection.entity';
+import { Psection } from 'src/common/Entities/amec/table/PSECTION.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -11,7 +11,7 @@ export class KanbanRequestService {
     constructor(
         private readonly kanbanRequestRepository: KanbanRequestRepository,
         private readonly mailService: MailService,
-        @InjectRepository(Psection, 'amecConnection')
+        @InjectRepository(Psection, 'mitsuConnection')
         private sectionRepo: Repository<Psection>,
     ) {}
 
@@ -41,9 +41,7 @@ export class KanbanRequestService {
             QTY_PR: item.QTY_REQ,
             REMARK: item.REMARK,
         }));
-        await this.kanbanRequestRepository.insertIssueKanbanDetail(
-            detailRecords,
-        );
+        await this.kanbanRequestRepository.insertIssueKanbanDetail(detailRecords);
 
         const date = new Date();
         const issueDate = this.formatDate(date);
@@ -51,9 +49,7 @@ export class KanbanRequestService {
         // ✅ ใช้ Promise.all เพื่อ resolve array ของ promise ก่อนส่งเข้า mailContext
         const items = await Promise.all(
             DETAIL.map(async (item) => {
-                const productDetail = await this.getProductDetail(
-                    item.ITEM_CODE,
-                );
+                const productDetail = await this.getProductDetail(item.ITEM_CODE);
                 return {
                     itemCode: item.ITEM_CODE,
                     itemName: productDetail[0]?.SEPRODNAME ?? '',
@@ -77,11 +73,11 @@ export class KanbanRequestService {
 
         await this.mailService.sendMail({
             from: `PC Section<${process.env.MAIL_FROM}>`,
-            to: ['chanida@mitsubishielevatorasia.co.th','benjamad@MitsubishiElevatorAsia.co.th'],
+            to: ['chanida@mitsubishielevatorasia.co.th', 'benjamad@MitsubishiElevatorAsia.co.th'],
             subject: `Order carton box issue ${issueDate}`,
             template: 'mfgmonitor/kanban_request/issue-kanban',
             context: mailContext,
-            bcc: 'perapatr@mitsubishielevatorasia.co.th'
+            bcc: 'perapatr@mitsubishielevatorasia.co.th',
         });
 
         return { message: 'Insert Issue Kanban success', IK_ID: head };

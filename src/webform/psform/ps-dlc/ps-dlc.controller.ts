@@ -1,34 +1,19 @@
-import {
-    Body,
-    Controller,
-    Get,
-    Param,
-    Patch,
-    Post,
-    Req,
-    UseInterceptors,
-} from '@nestjs/common';
-import {
-    UseForceTransaction,
-    UseTransaction,
-} from 'src/common/decorator/transaction.decorator';
+import { Body, Controller, Get, Param, Patch, Post, Req, UseInterceptors } from '@nestjs/common';
+import { UseForceTransaction, UseTransaction } from 'src/common/decorator/transaction.decorator';
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { CreatePsdlcReqFormDto } from './dto/create-ps-dlc.dto';
 import { getClientIP } from 'src/common/utils/ip.utils';
 import { PSDLCService } from './ps-dlc.service';
 import { Request } from 'express';
 import { PSDLCReportDto } from './dto/report-ps-dlc.dto';
-import {
-    UpdatedataPSDLCDto,
-    UpdateflowPSDLCDto,
-} from './dto/update-ps-dlc.dto';
+import { UpdatedataPSDLCDto, UpdateflowPSDLCDto } from './dto/update-ps-dlc.dto';
 
 @Controller('psform/ps-dlc')
 export class PSDLCController {
     constructor(private readonly psdlcService: PSDLCService) {}
 
     @Post()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseInterceptors(getFileUploadInterceptor())
     create(@Body() dto: CreatePsdlcReqFormDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -58,7 +43,7 @@ export class PSDLCController {
     }
 
     @Patch()
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     update(@Body() dto: UpdateflowPSDLCDto, @Req() req: Request) {
         const ip = getClientIP(req);
@@ -66,7 +51,7 @@ export class PSDLCController {
     }
 
     @Patch('/updateForm')
-    @UseTransaction('webformConnection')
+    @UseTransaction('mitsuConnection')
     @UseForceTransaction()
     updateForm(@Body() dto: UpdatedataPSDLCDto, @Req() req: Request) {
         const ip = getClientIP(req);

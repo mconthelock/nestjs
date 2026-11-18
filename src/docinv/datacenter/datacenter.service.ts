@@ -9,7 +9,7 @@ import * as fs from 'fs';
 @Injectable()
 export class DatacenterService {
     constructor(
-        @InjectRepository(TableCheck, 'amecConnection')
+        @InjectRepository(TableCheck, 'datacenterConnection')
         private readonly table: Repository<TableCheck>,
     ) {}
 
@@ -17,10 +17,7 @@ export class DatacenterService {
         return this.table.find();
     }
 
-    async loadReport(
-        repType: string,
-        repId: string,
-    ): Promise<string | undefined> {
+    async loadReport(repType: string, repId: string): Promise<string | undefined> {
         if (repType === 'source') {
             return this.ftpDownloadAs400(repId);
         } else if (repType === 'target') {
@@ -56,10 +53,7 @@ export class DatacenterService {
         return localPath;
     }
 
-    private async ftpDownloadAmecDc(
-        fileName: string,
-        dir: string,
-    ): Promise<string> {
+    private async ftpDownloadAmecDc(fileName: string, dir: string): Promise<string> {
         const client = new ftp.Client();
         client.ftp.verbose = false;
         const remotePath = `${dir}${fileName}`;

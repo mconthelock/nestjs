@@ -9,6 +9,10 @@ export class UpdateFlowDto extends PartialType(CreateFlowDto) {
 }
 
 export class DeleteFlowStepDto extends PickType(CreateFlowDto, [
-    'NFRMNO', 'VORGNO', 'CYEAR', 'CYEAR2', 'NRUNNO', 'CSTEPNO'
-  ]  as const ) {
-}
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'CYEAR2',
+    'NRUNNO',
+    'CSTEPNO',
+] as const) {}

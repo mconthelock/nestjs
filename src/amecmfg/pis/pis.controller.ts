@@ -1,12 +1,4 @@
-import {
-    UseInterceptors,
-    UploadedFiles,
-    Controller,
-    Post,
-    Body,
-    Get,
-    Param,
-} from '@nestjs/common';
+﻿import { UseInterceptors, UploadedFiles, Controller, Post, Body, Get, Param } from '@nestjs/common';
 
 import { getFileUploadInterceptor } from 'src/common/helpers/file-upload.helper';
 import { PrintedService } from './printed/printed.service';
@@ -18,7 +10,7 @@ export class PisController {
     constructor(private readonly printed: PrintedService) {}
 
     @Post('print-list')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async getPrintPfd(
         @Body()
         body: SearchPisFilesDto,
@@ -42,19 +34,19 @@ export class PisController {
     }
 
     @Get('download/:id')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async downloadFile(@Param('id') id: number) {
         return this.printed.downloadFile(id);
     }
 
     @Post('update-files')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async updatePrinted(@Body() body: { files: number; status: number }) {
         return this.printed.updatePrint(body.files, body.status);
     }
 
     @Get('delete/:id')
-    @UseTransaction('workloadConnection')
+    @UseTransaction('mitsuConnection')
     async deletePdf(@Param('id') id: number) {
         return this.printed.deletePdf(id);
     }

@@ -3,19 +3,19 @@ import { MatrixItemMaster } from '../../matrix-item-master/entities/matrix-item-
 
 @Entity({ name: 'MATRIX_EFFECT_ITEM', schema: 'DAILYIDS' })
 export class MatrixEffectItem {
-  @PrimaryColumn()
-  ITEM_ID: number;
+    @PrimaryColumn()
+    ITEM_ID: number;
 
-  @PrimaryColumn()
-  EFFECT_ID: number;
+    @PrimaryColumn()
+    EFFECT_ID: number;
 
-  @Column()
-  DATECREATE: Date;
+    @Column()
+    DATECREATE: Date;
 
-  @Column()
-  USERCREATE: string;
+    @Column()
+    USERCREATE: string;
 
-  @ManyToOne(() => MatrixItemMaster, (m) => m.EFFECT)
-  @JoinColumn({ name: 'ITEM_ID', referencedColumnName: 'ID' })
-  MASTER: MatrixItemMaster;
+    @ManyToOne(() => MatrixItemMaster, (m) => m.EFFECT)
+    @JoinColumn({ name: 'ITEM_ID', referencedColumnName: 'ID' })
+    MASTER: MatrixItemMaster;
 }

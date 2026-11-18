@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ProcedureWorkloadRepository, ProcedureDataCenterRepository } from '../packing-list-issue.repository';
+import {
+    ProcedureWorkloadRepository,
+    ProcedureDataCenterRepository,
+} from '../packing-list-issue.repository';
 import { SearchDpmsPlIssueDto } from 'src/workload/dpms_pl_issue/dto/search-dpms_pl_issue.dto';
 import { GetDocForShowDto } from '../dto/update-packing-list-issue.dto';
 
@@ -24,9 +27,7 @@ export class ProcedureService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to get report production list: ${error.message}`,
-            );
+            throw new Error(`Failed to get report production list: ${error.message}`);
         }
     }
 
@@ -80,8 +81,7 @@ export class ProcedureService {
                 message: `Get revise list ${res.length} records`,
                 data: res,
             };
-        }
-        catch (error) {
+        } catch (error) {
             throw new Error(`Failed to get revise list: ${error.message}`);
         }
     }
@@ -110,7 +110,7 @@ export class ProcedureService {
      * @description รายการ packing list issue ตามวันและรอบที่กำหนด สำหรับส่งให้ marketing
      * @param date e.g. 2026-08-07
      * @param round e.g. 1
-     * @returns 
+     * @returns
      */
     async getMarReport(date: string, round: number) {
         try {
@@ -129,5 +129,4 @@ export class ProcedureService {
             throw new Error(`Failed to get MAR report: ${error.message}`);
         }
     }
-
 }

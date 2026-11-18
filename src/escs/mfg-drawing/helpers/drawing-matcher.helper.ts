@@ -5,9 +5,7 @@ import { DrawingParserHelper } from './drawing-parser.helper';
 
 @Injectable()
 export class DrawingMatcherHelper {
-    constructor(
-        private readonly parser: DrawingParserHelper,
-    ) {}
+    constructor(private readonly parser: DrawingParserHelper) {}
 
     /**
      * Match drawing with master data.
@@ -124,9 +122,7 @@ export class DrawingMatcherHelper {
         }
 
         if (!res || res.length === 0) {
-            throw new Error(
-                `No matching drawing found in Master for drawing ${drawing}`,
-            );
+            throw new Error(`No matching drawing found in Master for drawing ${drawing}`);
         }
 
         return res;
@@ -156,8 +152,7 @@ export class DrawingMatcherHelper {
 
             const match = this.matchDrawing(dwg, masterDwg);
 
-            const totalStep =
-                1 + (masterDwg.G.length > 0 ? 1 : 0) + masterDwg.L.length;
+            const totalStep = 1 + (masterDwg.G.length > 0 ? 1 : 0) + masterDwg.L.length;
 
             if (match === totalStep) {
                 return true;

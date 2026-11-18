@@ -29,26 +29,14 @@ export class DoactionFlowService extends FlowService {
     async doAction(
         dto: doactionFlowDto,
         ip: string,
-        options: { holdUntilStepDone?: boolean } = {},
+        options: { holdUntilStepDone?: boolean; excludeOtherStepsWithTag?: string } = {},
     ): Promise<{
         status: boolean;
         message: string;
     }> {
-        let whatAction: string,
-            stepAction: string,
-            params: any,
-            updateFlow: boolean;
+        let whatAction: string, stepAction: string, params: any, updateFlow: boolean;
         try {
-            const {
-                NFRMNO,
-                VORGNO,
-                CYEAR,
-                CYEAR2,
-                NRUNNO,
-                ACTION,
-                EMPNO,
-                REMARK = '',
-            } = dto;
+            const { NFRMNO, VORGNO, CYEAR, CYEAR2, NRUNNO, ACTION, EMPNO, REMARK = '' } = dto;
             const form = {
                 NFRMNO: NFRMNO,
                 VORGNO: VORGNO,
@@ -84,18 +72,21 @@ export class DoactionFlowService extends FlowService {
                 case 'approve':
                     whatAction = this.APV_APPROVE;
                     stepAction = this.STEP_APPROVE;
-                    await this.repo.doactionUpdateFlow(flow, {
-                        ...params,
-                        whatAction,
-                        stepAction,
-                    });
+                    await this.repo.doactionUpdateFlow(
+                        flow,
+                        {
+                            ...params,
+                            whatAction,
+                            stepAction,
+                        },
+                        options.excludeOtherStepsWithTag,
+                    );
                     const checkNextStep = await this.repo.getFlow({
                         ...form,
                         CAPVSTNO: this.APV_NONE,
                         CSTEPNO: flow.CSTEPNO,
                     });
-                    const updateNextStep =
-                        checkNextStep.length == 0 ? true : false;
+                    const updateNextStep = checkNextStep.length == 0 ? true : false;
                     if (updateNextStep) {
                         const stepNext:
                             | ''
@@ -105,16 +96,10 @@ export class DoactionFlowService extends FlowService {
                               } = await this.getStepNext(form);
                         if (!stepNext) break;
                         //UPDATE STEP NEXT STATUS
-                        await this.repo.updateStepNextStatus(
-                            form,
-                            stepNext.stepno,
-                        );
+                        await this.repo.updateStepNextStatus(form, stepNext.stepno);
                         //UPDATE NEXT NEXT STEP (WAIT)
                         if (stepNext.stepNextNo != '00') {
-                            await this.repo.updateNextStepWait(
-                                form,
-                                stepNext.stepno,
-                            );
+                            await this.repo.updateNextStepWait(form, stepNext.stepno);
                         }
                         await this.sendMailToApprover(form); // send email to approver
                     }
@@ -160,16 +145,10 @@ export class DoactionFlowService extends FlowService {
                         await this.repo.updateSingleStep(form);
                     } else {
                         //UPDATE STEP NEXT STATUS
-                        await this.repo.updateStepNextStatus(
-                            form,
-                            stepNext.stepno,
-                        );
+                        await this.repo.updateStepNextStatus(form, stepNext.stepno);
                         //UPDATE NEXT NEXT STEP (WAIT)
                         if (stepNext.stepNextNo != '00') {
-                            await this.repo.updateNextStepWait(
-                                form,
-                                stepNext.stepno,
-                            );
+                            await this.repo.updateNextStepWait(form, stepNext.stepno);
                         }
                     }
                     break;
@@ -211,9 +190,7 @@ export class DoactionFlowService extends FlowService {
                     break;
                 case 'returnE':
                     if (!dto.CEXTDATA) {
-                        throw new Error(
-                            'CEXTDATA is required for returnE action',
-                        );
+                        throw new Error('CEXTDATA is required for returnE action');
                     }
                     whatAction = this.APV_NONE;
                     stepAction = this.STEP_READY;
@@ -222,10 +199,7 @@ export class DoactionFlowService extends FlowService {
                         whatAction,
                         stepAction,
                     });
-                    await this.repo.updateStepNextExeToNormal(
-                        form,
-                        dto.CEXTDATA,
-                    ); // step ต่อจาก exe ทั้งหมดเป็น 1
+                    await this.repo.updateStepNextExeToNormal(form, dto.CEXTDATA); // step ต่อจาก exe ทั้งหมดเป็น 1
                     await this.repo.updateStepExeToReady(form, dto.CEXTDATA); // step ที่ exe เป็น 3
                     await this.repo.updateStepNextExeToWait(form, dto.CEXTDATA); // step ต่อจาก exe เป็น 2
                     break;
@@ -249,7 +223,7 @@ export class DoactionFlowService extends FlowService {
         params: any,
         message?: string,
     ): Promise<{ status: boolean; result?: any; message: string }> {
-        let msg = message || 'Update Flow ';
+        const msg = message || 'Update Flow ';
         try {
             const res = await this.repo.execSql(sql, params);
             if (!res) {
@@ -265,10 +239,7 @@ export class DoactionFlowService extends FlowService {
     async getStepNext(form: FormDto) {
         const flowTree = (await this.repo.getFlowTree(form)) ?? [];
         for (const step of flowTree) {
-            if (
-                step.CSTEPST == this.STEP_WAIT ||
-                step.CSTEPST == this.STEP_NORMAL
-            ) {
+            if (step.CSTEPST == this.STEP_WAIT || step.CSTEPST == this.STEP_NORMAL) {
                 return { stepno: step.CSTEPNO, stepNextNo: step.CSTEPNEXTNO };
             }
         }
@@ -278,6 +249,7 @@ export class DoactionFlowService extends FlowService {
     async updateFromStatus(form: FormDto) {
         let flowStatus: string = '';
         //FIND UNFINISH STEP
+        // เมื่อ approve เสร็จทั้งหมด จะตรวจสอบว่า reject หรือไม่
         if (!(await this.checkUnfinishedFlow(form))) {
             //FIND REJECT STEP
             const reject = await this.getFlow({
@@ -286,14 +258,18 @@ export class DoactionFlowService extends FlowService {
                 ...form,
                 CAPVSTNO: this.APV_REJECT,
             });
+            // ถ้าไม่มี reject step แสดงว่า flow ถูก approve ทั้งหมด
             if (reject.length == 0) {
                 flowStatus = this.FLOW_APPROVE;
-            } else {
+            }
+            // ถ้ามี reject step ให้ตรวจสอบว่าเป็น single approve หรือไม่
+            else {
                 for (const step of reject) {
                     if (step.CAPVTYPE == this.APV_TYPE_SINGLE) {
                         flowStatus = this.FLOW_REJECT;
                         break;
                     } else {
+                        // ถ้าไม่ใช่ single approve ให้ตรวจสอบว่า step นี้ถูก approve หรือไม่
                         const stepApv = await this.getFlow({
                             distinct: true,
                             fields: ['CSTEPNO'],
@@ -301,15 +277,32 @@ export class DoactionFlowService extends FlowService {
                             CSTEPNO: step.CSTEPNO,
                             CAPVSTNO: this.APV_APPROVE,
                         });
+                        // ถ้า step นี้ถูก approve แล้ว ให้ถือว่า flow ถูก reject
                         if (stepApv.length > 0) {
                             flowStatus = this.FLOW_REJECT;
                             break;
-                        } else {
+                        }
+                        // ถ้า step นี้ยังไม่ถูก approve ให้ถือว่า flow ถูก approve
+                        else {
                             flowStatus = this.FLOW_APPROVE;
                         }
                     }
                 }
             }
+            // // UPDATE FLOW STATUS
+            // await this.formService.updateForm({
+            //     condition: form,
+            //     CST: flowStatus,
+            // });
+        } else {
+            //* 2026-11-04 update form status เมื่อ form status = 0 (underprepair)
+            //check form status = 0 underprepair
+            const formDetail = await this.formService.getCst(form);
+            if (formDetail && formDetail.CST == '0') {
+                flowStatus = this.FLOW_RUNNING;
+            }
+        }
+        if (flowStatus != '') {
             // UPDATE FLOW STATUS
             await this.formService.updateForm({
                 condition: form,
@@ -358,12 +351,12 @@ export class DoactionFlowService extends FlowService {
 
     async getNameReq(form: FormDto) {
         const sql =
-            'select a.SNAME as SNAME , a.SRECMAIL as SRECMAIL from form f , amecuserall a where a.SEMPNO = f.VREQNO and NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO';
+            'select a.SNAME as SNAME , a.SRECMAIL as SRECMAIL from WEBFORM.form f , WEBFORM.amecuserall a where a.SEMPNO = f.VREQNO and NFRMNO = :NFRMNO AND VORGNO = :VORGNO AND CYEAR = :CYEAR AND CYEAR2 = :CYEAR2 AND NRUNNO = :NRUNNO';
         return await this.execSql(sql, form);
     }
 
     async getEmailApvNext(form: FormDto) {
-        const sql = `select distinct VEMAIL from emailAck where NFRMNO = :NFRMNO and VORGNO = :VORGNO and CYEAR = :CYEAR and VEMPNO in (select VAPVNO as APPROVER from flow where NFRMNO = :frmno and VORGNO = :orgno and CYEAR = :y and CYEAR2 = :y2 and NRUNNO = :runno and CSTEPST = '3' union select VREPNO from flow where NFRMNO = :frmno2 and VORGNO = :orgno2 and CYEAR = :cy and CYEAR2 = :cy2 and NRUNNO = :runno2 and CSTEPST = '3') and CSTNO = '1'`;
+        const sql = `select distinct VEMAIL from WEBFORM.emailAck where NFRMNO = :NFRMNO and VORGNO = :VORGNO and CYEAR = :CYEAR and VEMPNO in (select VAPVNO as APPROVER from WEBFORM.flow where NFRMNO = :frmno and VORGNO = :orgno and CYEAR = :y and CYEAR2 = :y2 and NRUNNO = :runno and CSTEPST = '3' union select VREPNO from WEBFORM.flow where NFRMNO = :frmno2 and VORGNO = :orgno2 and CYEAR = :cy and CYEAR2 = :cy2 and NRUNNO = :runno2 and CSTEPST = '3') and CSTNO = '1'`;
         const params = {
             NFRMNO: form.NFRMNO,
             VORGNO: form.VORGNO,

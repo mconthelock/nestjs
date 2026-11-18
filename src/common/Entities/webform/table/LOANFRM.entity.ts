@@ -1,11 +1,4 @@
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    OneToMany,
-    OneToOne,
-    PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 
 import { FORM } from './FORM.entity';
 import { LOANDETAIL } from './LOANDETAIL.entity';

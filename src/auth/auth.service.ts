@@ -35,9 +35,9 @@ export class AuthService {
         private jwtService: JwtService,
         private readonly mailService: MailService,
         private readonly seqno: SequenceOrgService,
-        @InjectRepository(PasswordTokens, 'webformConnection')
+        @InjectRepository(PasswordTokens, 'mitsuConnection')
         private readonly pwd: Repository<PasswordTokens>,
-        @InjectRepository(SLOGIN, 'webformConnection')
+        @InjectRepository(SLOGIN, 'mitsuConnection')
         private readonly card: Repository<SLOGIN>,
         @InjectRepository(DummyCard, 'fingerConnection')
         private readonly dummy: Repository<DummyCard>,
@@ -54,12 +54,7 @@ export class AuthService {
         };
     }
 
-    async validateUser(
-        username: string,
-        pass: string,
-        apps: number,
-        ip: string,
-    ) {
+    async validateUser(username: string, pass: string, apps: number, ip: string) {
         const log: logData = {
             loguser: username,
             logip: ip,
@@ -108,7 +103,7 @@ export class AuthService {
 
     async getAuthenlist(program: number, group: number) {
         const menulist = await this.Appsmenu.getUserMenu(program, group);
-        let mainmenu = [];
+        const mainmenu = [];
         menulist.find((val) => {
             if (val.Appsmenu != null && val.Appsmenu.MENU_TYPE == 1) {
                 mainmenu.push({
@@ -124,10 +119,7 @@ export class AuthService {
         });
         mainmenu.find((val) => {
             menulist.map((mn) => {
-                if (
-                    mn.Appsmenu.MENU_TOP == val.menu_id &&
-                    mn.Appsmenu.MENU_TYPE == 2
-                ) {
+                if (mn.Appsmenu.MENU_TOP == val.menu_id && mn.Appsmenu.MENU_TYPE == 2) {
                     if (!val.submenu) {
                         val.submenu = [];
                     }
@@ -197,16 +189,17 @@ export class AuthService {
     async setUser(user) {
         let imageUrl = ``;
         try {
-            const response = await fetch(
-                `http://webflow/images/emp/${user.SEMPNO}.jpg`,
-            );
+            const response = await fetch(`http://webflow/images/emp/${user.SEMPNO}.jpg`);
             const arrayBuffer = await response.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
             imageUrl = `data:image/jpeg;base64,${buffer.toString('base64')}`;
         } catch (error) {}
         return {
             SEMPNO: user.SEMPNO,
+            SEMPPRE: user.SEMPPRE,
             SNAME: user.SNAME,
+            SEMPPRT: user.SEMPPRT,
+            STNAME: user.STNAME,
             SRECMAIL: user.SRECMAIL,
             SSECCODE: user.SSECCODE,
             SSEC: user.SSEC,
@@ -216,7 +209,7 @@ export class AuthService {
             SDIV: user.SDIV,
             SPOSCODE: user.SPOSCODE,
             SPOSNAME: user.SPOSNAME,
-            STNAME: user.STNAME,
+            SPOSITION: user.SPOSITION,
             MEMEML: user.MEMEML,
             image: imageUrl,
         };
@@ -233,9 +226,7 @@ export class AuthService {
             let currentEmpNo = user.SEMPNO;
             while (!sendAddress) {
                 const managers = await this.seqno.getManager(currentEmpNo);
-                const currentUser = await this.UsersService.findEmp(
-                    managers?.[0]?.HEADNO,
-                );
+                const currentUser = await this.UsersService.findEmp(managers?.[0]?.HEADNO);
                 if (currentUser?.SRECMAIL?.trim()) {
                     sendAddress = currentUser.SRECMAIL.trim();
                     break;
@@ -315,12 +306,10 @@ export class AuthService {
                 subject: data?.subject || 'Password Reset Request',
                 context: {
                     recipientName: data?.recipientName || 'All Concerned',
-                    recipientThaiName:
-                        data?.recipientThaiName || 'ผู้เกี่ยวข้องทุกท่าน',
+                    recipientThaiName: data?.recipientThaiName || 'ผู้เกี่ยวข้องทุกท่าน',
                     resetLink,
                     expiresAt:
-                        data?.expiresAt ||
-                        new Date(Date.now() + 60 * 60 * 1000).toLocaleString(),
+                        data?.expiresAt || new Date(Date.now() + 60 * 60 * 1000).toLocaleString(),
                     companyName: 'AMEC Webflow System',
                 },
             });
@@ -362,9 +351,7 @@ export class AuthService {
             });
             if (cardDummyOwner) {
                 username = cardDummyOwner.EmpCode;
-                console.log(
-                    `Card dummy owner found: ${cardDummyOwner.EmpCode}`,
-                );
+                console.log(`Card dummy owner found: ${cardDummyOwner.EmpCode}`);
             } else {
                 this.logs.create(log);
                 throw new Error('Cannot login with the provided card number');

@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('IDTAGS_FILES')
+@Entity({ name: 'IDTAGS_FILES', schema: 'WORKLOAD' })
 export class IdtagFiles {
     @PrimaryGeneratedColumn()
     FILES: number;

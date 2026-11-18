@@ -17,9 +17,8 @@ export class CreateInvestDto {
     CYEAR?: string;
 
     @IsOptional()
-    @IsNumber()
-    @Type(() => Number)
-    CYEAR2?: number;
+    @IsString()
+    CYEAR2?: string;
 
     @IsOptional()
     @IsNumber()

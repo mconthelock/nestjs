@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { DpmsPlMailService } from './dpms_pl_mail.service';
 import { DpmsPlMailController } from './dpms_pl_mail.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -6,7 +6,7 @@ import { DPMS_PL_MAIL } from 'src/common/Entities/workload/table/DPMS_PL_MAIL.en
 import { DpmsPlMailRepository } from './dpms_pl_mail.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([DPMS_PL_MAIL], 'workloadConnection')],
+    imports: [TypeOrmModule.forFeature([DPMS_PL_MAIL], 'mitsuConnection')],
     controllers: [DpmsPlMailController],
     providers: [DpmsPlMailService, DpmsPlMailRepository],
     exports: [DpmsPlMailService],

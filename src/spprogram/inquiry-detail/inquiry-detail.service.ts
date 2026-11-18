@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InquiryDetail } from './entities/inquiry-detail.entity';
@@ -8,7 +8,7 @@ import { updateDetailDto } from './dto/update.dto';
 @Injectable()
 export class InquiryDetailService {
     constructor(
-        @InjectRepository(InquiryDetail, 'spsysConnection')
+        @InjectRepository(InquiryDetail, 'mitsuConnection')
         private readonly detail: Repository<InquiryDetail>,
     ) {}
 
@@ -20,9 +20,7 @@ export class InquiryDetailService {
     async update(updateDto: updateDetailDto) {
         const { INQD_ID, ...updateData } = updateDto;
         if (!INQD_ID || Object.keys(updateData).length === 0) {
-            throw new Error(
-                'Empty criteria(s) are not allowed for the update method',
-            );
+            throw new Error('Empty criteria(s) are not allowed for the update method');
         }
         await this.detail.update(INQD_ID, updateData);
         return await this.detail.findOneBy({ INQD_ID });

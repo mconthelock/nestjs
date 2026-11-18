@@ -11,13 +11,13 @@ import {
 } from 'class-validator';
 import { FormDto } from 'src/webform/form/dto/form.dto';
 
-export class CreateFinpckFormDto extends PickType(FormDto,[
-'NFRMNO',
-'VORGNO',
-'CYEAR',
-'CYEAR2',
-'NRUNNO',
-] as const) {    
+export class CreateFinpckFormDto extends PickType(FormDto, [
+    'NFRMNO',
+    'VORGNO',
+    'CYEAR',
+    'CYEAR2',
+    'NRUNNO',
+] as const) {
     @IsNotEmpty()
     @IsString()
     CCCODE: string;
@@ -28,10 +28,9 @@ export class CreateFinpckFormDto extends PickType(FormDto,[
 
     @IsNotEmpty()
     @IsString()
-    LOCCODE: string; 
+    LOCCODE: string;
 
     @IsNotEmpty()
     @IsString()
-    LOCNAME: string; 
-
+    LOCNAME: string;
 }

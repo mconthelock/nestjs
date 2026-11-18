@@ -6,20 +6,20 @@ import { updatePriceListDto } from './dto/update-price.dto';
 
 @Controller('sp/pricelist')
 export class PricelistController {
-  constructor(private readonly price: PricelistService) {}
+    constructor(private readonly price: PricelistService) {}
 
-  @Post('search')
-  search(@Body() data: updatePriceListDto) {
-    return this.price.findAll(data);
-  }
+    @Post('search')
+    search(@Body() data: updatePriceListDto) {
+        return this.price.findAll(data);
+    }
 
-  @Post('customer')
-  findCustomer(@Body() data: any[]) {
-    return this.price.findCustomer(data);
-  }
+    @Post('customer')
+    findCustomer(@Body() data: any[]) {
+        return this.price.findCustomer(data);
+    }
 
-  @Post('update')
-  updatePrice(@Body() data: updatePriceListDto) {
-    return this.price.updatePrice(data);
-  }
+    @Post('update')
+    updatePrice(@Body() data: updatePriceListDto) {
+        return this.price.updatePrice(data);
+    }
 }

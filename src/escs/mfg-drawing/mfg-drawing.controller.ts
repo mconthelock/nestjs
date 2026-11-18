@@ -1,18 +1,6 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Patch,
-    Param,
-    Delete,
-    UseInterceptors,
-} from '@nestjs/common';
+﻿import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { MfgDrawingService } from './mfg-drawing.service';
-import {
-    CreateMfgDrawingCheckSheetDto,
-    CreateMfgDrawingDto,
-} from './dto/create-mfg-drawing.dto';
+import { CreateMfgDrawingCheckSheetDto, CreateMfgDrawingDto } from './dto/create-mfg-drawing.dto';
 import { UpdateMfgDrawingDto } from './dto/update-mfg-drawing.dto';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
@@ -28,7 +16,7 @@ export class MfgDrawingController {
 
     @Post()
     @UseInterceptors(getFileUploadInterceptor())
-    @UseTransaction('escsConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ escsConnection
+    @UseTransaction('mitsuConnection') // ใส่เพื่อบอกว่าเปิด transaction กับการเชื่อมต่อ mitsuConnection
     create(@Body() dto: CreateMfgDrawingCheckSheetDto): Promise<any> {
         return this.mfgDrawingCheckSheetService.create(dto);
     }
@@ -44,16 +32,13 @@ export class MfgDrawingController {
     }
 
     @Post('search')
-    @UseTransaction('escsConnection')
+    @UseTransaction('mitsuConnection')
     async search(@Body() dto: FiltersDto) {
         return this.mfgDrawingService.search(dto);
     }
 
     @Patch(':id')
-    update(
-        @Param('id') id: string,
-        @Body() updateMfgDrawingDto: UpdateMfgDrawingDto,
-    ) {
+    update(@Param('id') id: string, @Body() updateMfgDrawingDto: UpdateMfgDrawingDto) {
         return this.mfgDrawingService.update(+id, updateMfgDrawingDto);
     }
 

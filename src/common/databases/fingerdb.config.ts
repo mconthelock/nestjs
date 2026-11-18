@@ -18,12 +18,11 @@ if (process.env.HOST == 'AMEC') {
             port: Number(process.env.FPRINST_PORT) || 1433,
             username: process.env.FPRINST_USER,
             password: process.env.FPRINST_PASSWORD,
-            database:
-                process.env.FPRINST_DATABASE || process.env.FPRINST_SERVICE,
+            database: process.env.FPRINST_DATABASE || process.env.FPRINST_SERVICE,
             autoLoadEntities: true,
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),
-            retryAttempts: 5,
+            retryAttempts: process.env.STATE === 'production' ? 5 : 1,
             retryDelay: 2000,
             options: {
                 instanceName: process.env.FPRINST_INSTANCE, // ใช้ instanceName แทนถ้าเป็น SQL Server ที่มี instance

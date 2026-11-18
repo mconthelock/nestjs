@@ -7,20 +7,19 @@ import { FINPCK_VWSTATUS } from 'src/common/Entities/webform/views/FINPCK_VWSTAT
 
 @Injectable()
 export class VWStatusRepository extends BaseRepository {
-    constructor(@InjectDataSource('webformConnection') ds: DataSource) {
+    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
         super(ds); // นำค่าไปเก็บและใช้ใน BaseRepository
     }
 
     async searchData(filters: any) {
         console.log(filters);
-        
+
         const { reportType, ...dbFilters } = filters;
         const whereCondition = Object.fromEntries(
-            Object.entries(dbFilters).filter(([_, value]) => value != null && value !== '')
+            Object.entries(dbFilters).filter(([_, value]) => value != null && value !== ''),
         );
         return await this.getRepository(FINPCK_VWSTATUS).find({
             where: whereCondition,
         });
     }
-
 }

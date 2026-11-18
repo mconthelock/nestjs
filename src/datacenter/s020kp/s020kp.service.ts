@@ -30,9 +30,7 @@ export class S020kpService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(
-                `Failed to find S020KP with order ${order}: ${error.message}`,
-            );
+            throw new Error(`Failed to find S020KP with order ${order}: ${error.message}`);
         }
     }
 }

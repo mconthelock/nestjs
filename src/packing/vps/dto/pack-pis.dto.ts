@@ -2,19 +2,19 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty } from 'class-validator';
 
 export class PackPISDto {
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'VIS Code',
-        example: '07C118A95807', 
+        example: '07C118A95807',
     })
-    @IsString() 
+    @IsString()
     @IsNotEmpty()
     vis: string;
 
-    @ApiProperty({ 
+    @ApiProperty({
         description: 'PIS Code',
-        example: '8A9580711501-0001', 
+        example: '8A9580711501-0001',
     })
-    @IsString() 
+    @IsString()
     @IsNotEmpty()
     pis: string;
 

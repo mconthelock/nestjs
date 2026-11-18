@@ -42,13 +42,9 @@ export class PurCpcService extends CreatePurCpcService {
         try {
             switch (data.SYSTEM) {
                 case 'AS400':
-                    return await this.iim400Service.findPlannerCompareSheet(
-                        data.PLANNER,
-                    );
+                    return await this.iim400Service.findPlannerCompareSheet(data.PLANNER);
                 case 'PROCUREMENT':
-                    return await this.purcpcProcPlanViewRepo.findByPlanner(
-                        data.PLANNER,
-                    );
+                    return await this.purcpcProcPlanViewRepo.findByPlanner(data.PLANNER);
                 default:
                     throw new Error(`Unsupported SYSTEM: ${data.SYSTEM}`);
             }
@@ -70,9 +66,7 @@ export class PurCpcService extends CreatePurCpcService {
                 case 'AS400':
                     return await this.iim400Service.priceComparison(data);
                 case 'PROCUREMENT':
-                    return await this.purcpcProcCompareViewRepo.findByItemCode(
-                        data.ITEM,
-                    );
+                    return await this.purcpcProcCompareViewRepo.findByItemCode(data.ITEM);
                 default:
                     throw new Error(`Unsupported SYSTEM: ${data.SYSTEM}`);
             }
@@ -94,9 +88,7 @@ export class PurCpcService extends CreatePurCpcService {
                 case 'AS400':
                     return await this.iim400Service.findItemDetail(data.ITEM);
                 case 'PROCUREMENT':
-                    return await this.purcpcProcItemDetailRepo.findItemDetail(
-                        data.ITEM,
-                    );
+                    return await this.purcpcProcItemDetailRepo.findItemDetail(data.ITEM);
                 default:
                     throw new Error(`Unsupported SYSTEM: ${data.SYSTEM}`);
             }
@@ -167,7 +159,7 @@ export class PurCpcService extends CreatePurCpcService {
         try {
             const pk = this.crackPrimaryKey(form);
             const res = await this.repo.getForm(pk);
-            if (res.length == 0) {
+            if (!res) {
                 return {
                     status: false,
                     message: 'No records found',
@@ -175,7 +167,7 @@ export class PurCpcService extends CreatePurCpcService {
             }
             return {
                 status: true,
-                message: `found ${res.length} records`,
+                message: `found 1 record`,
                 data: res,
             };
         } catch (error) {

@@ -16,9 +16,7 @@ export class StyImageService {
         typeId: number;
     }) {
         try {
-            const destination = d.folder
-                ? await joinPaths(d.path, d.folder)
-                : d.path; // Get the destination path
+            const destination = d.folder ? await joinPaths(d.path, d.folder) : d.path; // Get the destination path
             const movedTargets: string[] = []; // เก็บ path ปลายทางที่ย้ายสำเร็จ
             const moved = await moveFileFromMulter({
                 file: d.file,

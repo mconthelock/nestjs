@@ -16,10 +16,10 @@ export class CreateBenefitDto {
     @Type(() => String)
     CYEAR?: string;
 
+    @IsString()
     @IsOptional()
-    @IsNumber()
-    @Type(() => Number)
-    CYEAR2?: number;
+    @Type(() => String)
+    CYEAR2?: string;
 
     @IsOptional()
     @IsNumber()
@@ -28,7 +28,7 @@ export class CreateBenefitDto {
 
     @IsNumber()
     @Type(() => Number)
-    BENEFIT_TYPE: number;
+    BENEFIT: number;
 
     @IsNumber()
     @Type(() => Number)

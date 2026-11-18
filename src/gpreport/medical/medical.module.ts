@@ -8,12 +8,7 @@ import { OPDRIGHT } from 'src/common/Entities/webform/table/OPDRIGHT.entity';
 import { WelfareDetailView } from 'src/common/Entities/webform/views/VIEW_WELFARE_DETAIL.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature(
-            [OPDRIGHT, WelfareDetailView],
-            'webformConnection',
-        ),
-    ],
+    imports: [TypeOrmModule.forFeature([OPDRIGHT, WelfareDetailView], 'mitsuConnection')],
     controllers: [MedicalController],
     providers: [MedicalService],
 })

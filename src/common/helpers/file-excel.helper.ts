@@ -10,10 +10,7 @@ interface excelExportOptions {
     rowstart?: number;
     data: any[];
     staticText?: { cols: string; text: string }[];
-    execute?: (
-        workbook: ExcelJS.Workbook,
-        sheet: ExcelJS.Worksheet,
-    ) => Promise<void>;
+    execute?: (workbook: ExcelJS.Workbook, sheet: ExcelJS.Worksheet) => Promise<void>;
     saveas?: string;
 }
 
@@ -30,10 +27,7 @@ export class MapOptions implements excelExportOptions {
     rowstart = 2;
     data: any[] = [];
     staticText?: { cols: string; text: string }[] = [];
-    execute?: (
-        workbook: ExcelJS.Workbook,
-        sheet: ExcelJS.Worksheet,
-    ) => Promise<void>;
+    execute?: (workbook: ExcelJS.Workbook, sheet: ExcelJS.Worksheet) => Promise<void>;
     saveas?: string;
 
     // Constructor can be used to override defaults
@@ -54,14 +48,7 @@ export const cloneRows = async (worksheet, sourceRowNum, targetRowNum) => {
     newRow.height = sourceRow.height;
 };
 
-const EXPORT_FORMAT_TYPES = new Set([
-    'text',
-    'date',
-    'datetime',
-    'account',
-    'formula',
-    'func',
-]);
+const EXPORT_FORMAT_TYPES = new Set(['text', 'date', 'datetime', 'account', 'formula', 'func']);
 
 const normalizeCellValue = (value: ExcelJS.CellValue): string => {
     if (value == null) return '';
@@ -69,8 +56,7 @@ const normalizeCellValue = (value: ExcelJS.CellValue): string => {
     if (typeof value === 'number' || typeof value === 'boolean') {
         return String(value).trim();
     }
-    if (value instanceof Date)
-        return dayjs(value).format('YYYY-MM-DD HH:mm:ss');
+    if (value instanceof Date) return dayjs(value).format('YYYY-MM-DD HH:mm:ss');
     if (typeof value === 'object') {
         if ('text' in value && typeof value.text === 'string') {
             return value.text.trim();
@@ -106,14 +92,10 @@ const resolveValueByPath = (source: any, rawPath: string) => {
 
         if (current == null || typeof current !== 'object') return '';
 
-        const exactKey = Object.prototype.hasOwnProperty.call(current, part)
-            ? part
-            : undefined;
+        const exactKey = Object.prototype.hasOwnProperty.call(current, part) ? part : undefined;
         const normalizedKey =
             exactKey ||
-            Object.keys(current).find(
-                (key) => key.trim().toLowerCase() === part.toLowerCase(),
-            );
+            Object.keys(current).find((key) => key.trim().toLowerCase() === part.toLowerCase());
 
         if (!normalizedKey) return '';
         current = current[normalizedKey];
@@ -132,9 +114,7 @@ const getWorksheetRoles = (workbook: ExcelJS.Workbook) => {
         let matchedRows = 0;
         worksheet.eachRow({ includeEmpty: false }, (row) => {
             const excelColumn = normalizeCellValue(row.getCell(2).value);
-            const formatType = normalizeCellValue(
-                row.getCell(3).value,
-            ).toLowerCase();
+            const formatType = normalizeCellValue(row.getCell(3).value).toLowerCase();
             const dataKey = normalizeCellValue(row.getCell(4).value);
 
             if (
@@ -149,9 +129,7 @@ const getWorksheetRoles = (workbook: ExcelJS.Workbook) => {
         return matchedRows > 0;
     });
 
-    const dataSheet = worksheets.find(
-        (worksheet) => worksheet !== mappingSheet,
-    );
+    const dataSheet = worksheets.find((worksheet) => worksheet !== mappingSheet);
 
     return {
         dataSheet,
@@ -159,20 +137,15 @@ const getWorksheetRoles = (workbook: ExcelJS.Workbook) => {
     };
 };
 
-export const exportExcel = async (
-    option: excelExportOptions = {} as excelExportOptions,
-) => {
+export const exportExcel = async (option: excelExportOptions = {} as excelExportOptions) => {
     try {
         const opt = new MapOptions(option);
         const workbook = new ExcelJS.Workbook();
         await workbook.xlsx.readFile(opt.templatePath);
-        const { dataSheet: sheet, mappingSheet: sheet_data } =
-            getWorksheetRoles(workbook);
+        const { dataSheet: sheet, mappingSheet: sheet_data } = getWorksheetRoles(workbook);
 
         if (!sheet || !sheet_data) {
-            throw new Error(
-                'Invalid Excel template: expected at least 2 worksheets.',
-            );
+            throw new Error('Invalid Excel template: expected at least 2 worksheets.');
         }
 
         const columns = await exportFormat(sheet_data);
@@ -198,10 +171,7 @@ export const exportExcel = async (
                     sheet.getCell(target, format.excelColumn).value = value;
                 } else if (formatType == 'formula') {
                     value = {
-                        formula: formatKey.replaceAll(
-                            '{x}',
-                            String(target - 2),
-                        ),
+                        formula: formatKey.replaceAll('{x}', String(target - 2)),
                     };
                     sheet.getCell(target, format.excelColumn).value = value;
                 } else {
@@ -210,13 +180,15 @@ export const exportExcel = async (
                     if (formatType === 'date' && value) {
                         // prettier-ignore
                         sheet.getCell(target, format.excelColumn).value = dayjs(value).add(7, 'hour').toDate();
-                        sheet.getCell(target, format.excelColumn).numFmt =
-                            formatOption ? formatOption : 'yyyy-mm-dd';
+                        sheet.getCell(target, format.excelColumn).numFmt = formatOption
+                            ? formatOption
+                            : 'yyyy-mm-dd';
                     } else if (formatType === 'datetime' && value) {
                         // prettier-ignore
                         sheet.getCell(target, format.excelColumn).value = dayjs(value).add(7, 'hour').toDate();
-                        sheet.getCell(target, format.excelColumn).numFmt =
-                            formatOption ? formatOption : 'yyyy-mm-dd hh:mm:ss';
+                        sheet.getCell(target, format.excelColumn).numFmt = formatOption
+                            ? formatOption
+                            : 'yyyy-mm-dd hh:mm:ss';
                     } else if (formatType === 'account') {
                         const digit = formatOption ? parseInt(formatOption) : 0;
                         // prettier-ignore
@@ -225,8 +197,7 @@ export const exportExcel = async (
                             `_(* #,##0${digit > 0 ? '.' + '0'.repeat(digit) : ''}_);_(* (#,##0${digit > 0 ? '.' + '0'.repeat(digit) : ''})_);_(* "-"??_);_(@_)`;
                     } else {
                         sheet.getCell(target, format.excelColumn).value = value;
-                        sheet.getCell(target, format.excelColumn).numFmt =
-                            'General';
+                        sheet.getCell(target, format.excelColumn).numFmt = 'General';
                     }
                 }
             }
@@ -234,7 +205,7 @@ export const exportExcel = async (
             color = color == opt.rowstart ? color + 1 : opt.rowstart;
         }
         if (opt.staticText) {
-            for (let rw of opt.staticText) {
+            for (const rw of opt.staticText) {
                 sheet.getCell(rw.cols).value = rw.text;
             }
         }
@@ -246,21 +217,16 @@ export const exportExcel = async (
 
         sheet.spliceRows(opt.rowstart, 2);
         // Remove all sheets except the first one
-        while (workbook.worksheets.length > 1)
-            workbook.removeWorksheet(workbook.worksheets[1].id);
+        while (workbook.worksheets.length > 1) workbook.removeWorksheet(workbook.worksheets[1].id);
 
         const buffer = await workbook.xlsx.writeBuffer();
-        const outputBuffer = Buffer.isBuffer(buffer)
-            ? buffer
-            : Buffer.from(buffer as ArrayBuffer);
+        const outputBuffer = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer as ArrayBuffer);
 
         if (opt.saveas && typeof opt.saveas === 'string') {
             const saveAs = opt.saveas.trim();
             if (saveAs) {
                 const isDirectory = !path.extname(saveAs);
-                const outputPath = isDirectory
-                    ? path.join(saveAs, opt.filename)
-                    : saveAs;
+                const outputPath = isDirectory ? path.join(saveAs, opt.filename) : saveAs;
                 await fs.mkdir(path.dirname(outputPath), { recursive: true });
                 await fs.writeFile(outputPath, outputBuffer);
             }

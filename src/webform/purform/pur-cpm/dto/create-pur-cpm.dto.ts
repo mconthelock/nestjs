@@ -1,13 +1,6 @@
 import { PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import {
-    IsArray,
-    IsDate,
-    IsNotEmpty,
-    IsNumber,
-    IsOptional,
-    IsString,
-} from 'class-validator';
+import { IsArray, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
 
 export class CreatePurCpmDto extends PickType(CreateFormDto, [
@@ -167,7 +160,6 @@ export class InsertPurCpmDto extends PickType(CreatePurCpmDto, [
     'THIRD_PARTY',
     'CURRENCY',
 ] as const) {
-
     @IsNotEmpty()
     @IsString()
     CYEAR2: string;

@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    Logger,
+    NotFoundException,
+    ServiceUnavailableException,
+} from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { mkdir, rm, writeFile, readFile } from 'fs/promises';
 import { join, resolve, relative, isAbsolute, basename } from 'path';
@@ -15,16 +21,10 @@ export class PilineEventFilesService {
 
     private extension(buffer: Buffer): string {
         if (buffer.subarray(0, 5).toString() === '%PDF-') return '.pdf';
-        if (
-            buffer
-                .subarray(0, 8)
-                .equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
-        )
+        if (buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])))
             return '.png';
-        if (buffer[0] === 255 && buffer[1] === 216 && buffer[2] === 255)
-            return '.jpg';
-        if (['GIF87a', 'GIF89a'].includes(buffer.subarray(0, 6).toString()))
-            return '.gif';
+        if (buffer[0] === 255 && buffer[1] === 216 && buffer[2] === 255) return '.jpg';
+        if (['GIF87a', 'GIF89a'].includes(buffer.subarray(0, 6).toString())) return '.gif';
         if (
             buffer.subarray(0, 4).toString() === 'RIFF' &&
             buffer.subarray(8, 12).toString() === 'WEBP'
@@ -32,42 +32,34 @@ export class PilineEventFilesService {
             return '.webp';
         if (
             buffer.subarray(4, 8).toString() === 'ftyp' &&
-            ['heic', 'heix', 'hevc', 'hevx', 'mif1'].includes(
-                buffer.subarray(8, 12).toString(),
-            )
+            ['heic', 'heix', 'hevc', 'hevx', 'mif1'].includes(buffer.subarray(8, 12).toString())
         )
             return '.heic';
-        throw new BadRequestException(
-            'Attachments must be PDF, JPEG, PNG, GIF, WEBP or HEIC',
-        );
+        throw new BadRequestException('Attachments must be PDF, JPEG, PNG, GIF, WEBP or HEIC');
     }
 
-    validate(files: {
-        eventFiles?: Express.Multer.File[];
-        ngFiles?: Express.Multer.File[];
-    }) {
+    validate(files: { eventFiles?: Express.Multer.File[]; ngFiles?: Express.Multer.File[] }) {
         const entries = [
             ...(files.eventFiles || []).map((file) => ({ file, type: 'EVT' })),
             ...(files.ngFiles || []).map((file) => ({ file, type: 'NG' })),
         ];
-        if (entries.length > 10)
-            throw new BadRequestException('Maximum 10 attachments per record');
+        if (entries.length > 10) throw new BadRequestException('Maximum 10 attachments per record');
         const checked = entries.map((entry) => {
-            if (
-                !entry.file.buffer?.length ||
-                entry.file.buffer.length > 5 * 1024 * 1024
-            )
-                throw new BadRequestException(
-                    'Each attachment must be between 1 byte and 5 MB',
-                );
+            if (!entry.file.buffer?.length || entry.file.buffer.length > 5 * 1024 * 1024)
+                throw new BadRequestException('Each attachment must be between 1 byte and 5 MB');
             return { ...entry, extension: this.extension(entry.file.buffer) };
         });
         return checked;
     }
 
-    async stage(files: { eventFiles?: Express.Multer.File[]; ngFiles?: Express.Multer.File[] }, pilineNo: string, startSeq: Record<string, number> = {}): Promise<PilineStagedFiles> {
+    async stage(
+        files: { eventFiles?: Express.Multer.File[]; ngFiles?: Express.Multer.File[] },
+        pilineNo: string,
+        startSeq: Record<string, number> = {},
+    ): Promise<PilineStagedFiles> {
         const checked = this.validate(files);
-        if (!/^PI(?:\d{7}|\d{9})$/.test(pilineNo)) throw new BadRequestException('Invalid PI Line number for upload folder');
+        if (!/^PI(?:\d{7}|\d{9})$/.test(pilineNo))
+            throw new BadRequestException('Invalid PI Line number for upload folder');
         if (!checked.length) return { attachments: [] };
 
         const root = this.root();
@@ -112,30 +104,53 @@ export class PilineEventFilesService {
     }
 
     private root(): string {
-        return process.env.PILINE_FILE_PATH ||
+        return (
+            process.env.PILINE_FILE_PATH ||
             process.env.PILINE_UPLOAD_DIR ||
             (process.env.AMEC_FILE_PATH
-                ? join(
-                      process.env.AMEC_FILE_PATH,
-                      process.env.STATE || 'development',
-                      'piline',
-                  )
-                : resolve('public', 'uploads', 'piline'));
+                ? join(process.env.AMEC_FILE_PATH, process.env.STATE || 'development', 'piline')
+                : resolve('public', 'uploads', 'piline'))
+        );
     }
 
     async readStored(filename: string) {
-        const root = resolve(this.root()), target = resolve(root, filename), rel = relative(root,target);
-        if (!rel || rel === '..' || rel.startsWith('../') || rel.startsWith('..' + String.fromCharCode(92)) || isAbsolute(rel)) throw new BadRequestException('Invalid attachment path');
+        const root = resolve(this.root()),
+            target = resolve(root, filename),
+            rel = relative(root, target);
+        if (
+            !rel ||
+            rel === '..' ||
+            rel.startsWith('../') ||
+            rel.startsWith('..' + String.fromCharCode(92)) ||
+            isAbsolute(rel)
+        )
+            throw new BadRequestException('Invalid attachment path');
         try {
             const buffer = await readFile(target);
             const extension = this.extension(buffer);
-            const types = {'.pdf':'application/pdf','.png':'image/png','.jpg':'image/jpeg','.gif':'image/gif','.webp':'image/webp','.heic':'image/heic'};
-            return { buffer, type: types[extension] || 'application/octet-stream', name: basename(target) };
+            const types = {
+                '.pdf': 'application/pdf',
+                '.png': 'image/png',
+                '.jpg': 'image/jpeg',
+                '.gif': 'image/gif',
+                '.webp': 'image/webp',
+                '.heic': 'image/heic',
+            };
+            return {
+                buffer,
+                type: types[extension] || 'application/octet-stream',
+                name: basename(target),
+            };
         } catch (error) {
-            if (error.code === 'ENOENT') throw new NotFoundException('ไม่พบไฟล์ในพื้นที่จัดเก็บ กรุณาตรวจสอบ path ของไฟล์เดิม');
+            if (error.code === 'ENOENT')
+                throw new NotFoundException(
+                    'ไม่พบไฟล์ในพื้นที่จัดเก็บ กรุณาตรวจสอบ path ของไฟล์เดิม',
+                );
             if (error instanceof BadRequestException) throw error;
-            this.logger.error('Cannot read PILINE attachment',error.stack);
-            throw new ServiceUnavailableException('ไม่สามารถอ่านไฟล์แนบ กรุณาตรวจสอบพื้นที่จัดเก็บ');
+            this.logger.error('Cannot read PILINE attachment', error.stack);
+            throw new ServiceUnavailableException(
+                'ไม่สามารถอ่านไฟล์แนบ กรุณาตรวจสอบพื้นที่จัดเก็บ',
+            );
         }
     }
 
@@ -146,11 +161,21 @@ export class PilineEventFilesService {
             try {
                 const target = resolve(root, filename);
                 const rel = relative(root, target);
-                if (!rel || rel === '..' || rel.startsWith('..' + '/') || rel.startsWith('..' + String.fromCharCode(92)) || isAbsolute(rel)) throw new Error('Invalid attachment path');
+                if (
+                    !rel ||
+                    rel === '..' ||
+                    rel.startsWith('..' + '/') ||
+                    rel.startsWith('..' + String.fromCharCode(92)) ||
+                    isAbsolute(rel)
+                )
+                    throw new Error('Invalid attachment path');
                 await rm(target, { force: true });
             } catch (error) {
                 failed++;
-                this.logger.error('Failed to remove deleted PILINE attachment: ' + filename, error.stack);
+                this.logger.error(
+                    'Failed to remove deleted PILINE attachment: ' + filename,
+                    error.stack,
+                );
             }
         }
         return failed;
@@ -159,8 +184,11 @@ export class PilineEventFilesService {
     async cleanup(files: PilineStagedFiles) {
         // The folder is shared by all uploads for this record. Remove only this attempt's files.
         for (const path of files.writtenPaths || []) {
-            try { await rm(path, { force: true }); }
-            catch (error) { this.logger.error('Failed to clean uncommitted PILINE file: ' + path, error.stack); }
+            try {
+                await rm(path, { force: true });
+            } catch (error) {
+                this.logger.error('Failed to clean uncommitted PILINE file: ' + path, error.stack);
+            }
         }
     }
 }

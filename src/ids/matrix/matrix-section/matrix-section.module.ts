@@ -6,9 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MatrixSection } from './entities/matrix-section.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MatrixSection], 'idsConnection')],
-  controllers: [MatrixSectionController],
-  providers: [MatrixSectionService],
-  exports: [MatrixSectionService],
+    imports: [TypeOrmModule.forFeature([MatrixSection], 'mitsuConnection')],
+    controllers: [MatrixSectionController],
+    providers: [MatrixSectionService],
+    exports: [MatrixSectionService],
 })
 export class MatrixSectionModule {}

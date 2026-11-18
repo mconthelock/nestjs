@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { M008KP } from 'src/as400/rtnlibf/m008kp/entities/m008kp.entity';
+import { M008KP } from 'src/amecmfg/m008kp/entities/m008kp.entity';
 import { F110KP } from 'src/amecmfg/f110kp/entities/f110kp.entity';
-import { F001KP } from 'src/as400/shopf/f001kp/entities/f001kp.entity';
+import { F001KP } from 'src/amecmfg/f001kp/entities/f001kp.entity';
 @Injectable()
 export class IdtagService {
     constructor(
-        @InjectRepository(M008KP, 'amecConnection')
+        @InjectRepository(M008KP, 'datacenterConnection')
         private readonly m08: Repository<M008KP>,
-        @InjectRepository(F110KP, 'amecConnection')
+        @InjectRepository(F110KP, 'datacenterConnection')
         private readonly f11: Repository<F110KP>,
-        @InjectRepository(F001KP, 'amecConnection')
+        @InjectRepository(F001KP, 'datacenterConnection')
         private readonly f01: Repository<F001KP>,
     ) {}
 

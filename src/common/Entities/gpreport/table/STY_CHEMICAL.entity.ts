@@ -1,7 +1,18 @@
-import { AfterLoad, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    AfterLoad,
+    Column,
+    Entity,
+    JoinColumn,
+    JoinTable,
+    ManyToMany,
+    OneToMany,
+    OneToOne,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 import { STY_CHEMICAL_SECTION } from './STY_CHEMICAL_SECTION.entity';
 import { formatDate } from 'src/common/utils/dayjs.utils';
 import { STY_TYPE } from './STY_TYPE.entity';
+import { STY_FILES } from './STY_FILES.entity';
 
 @Entity({ name: 'STY_CHEMICAL', schema: 'GPREPORT' })
 export class STY_CHEMICAL {
@@ -66,4 +77,47 @@ export class STY_CHEMICAL {
     @OneToOne(() => STY_TYPE)
     @JoinColumn({ name: 'UN_CLASS', referencedColumnName: 'TYPE_ID' })
     CLASS: STY_TYPE;
+
+    // ความสัมพันธ์กับไฟล์ที่เกี่ยวข้องกับสารเคมี
+    @ManyToMany(() => STY_FILES)
+    @JoinTable({
+        name: 'STY_CHEMICAL_FILES',
+        joinColumn: {
+            name: 'AMEC_SDS_ID',
+            referencedColumnName: 'AMEC_SDS_ID',
+        },
+        inverseJoinColumn: {
+            name: 'FILE_ID',
+            referencedColumnName: 'FILE_ID',
+        },
+    })
+    FILES?: STY_FILES[];
+
+    // Property แยกตามประเภทที่ต้องการส่งให้ Frontend
+    ORIGINAL_SDS?: STY_FILES[]; // หรือ STY_FILES | null ถ้ามีไฟล์เดียว
+    TRANSLATE_SDS?: STY_FILES[]; // หรือ STY_FILES | null ถ้ามีไฟล์เดียว
+    STICKER_SDS?: STY_FILES[];
+    IMAGES?: STY_FILES[];
+
+    @AfterLoad()
+    groupFilesByType() {
+        if (!this.FILES) return;
+
+        // กรองเฉพาะไฟล์ที่ STATUS = 1 (Enable) และแยกตาม TYPE_CODE
+        const activeFiles = this.FILES.filter((f) => f.STATUS === 1);
+
+        this.ORIGINAL_SDS = activeFiles.filter(
+            (f) => f.TYPE_CODE === 'CHM_F_ORI',
+        );
+        this.TRANSLATE_SDS = activeFiles.filter(
+            (f) => f.TYPE_CODE === 'CHM_F_TRANS',
+        );
+        this.STICKER_SDS = activeFiles.filter(
+            (f) => f.TYPE_CODE === 'CHM_F_STICKER',
+        );
+        this.IMAGES = activeFiles.filter((f) => f.TYPE_CODE === 'CHM_IMAGE');
+
+        // ลบตัวรวมทิ้งเพื่อไม่ให้ JSON ซ้ำซ้อน
+        delete this.FILES;
+    }
 }

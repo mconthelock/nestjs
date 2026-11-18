@@ -26,6 +26,7 @@ import { STY_CHEMICAL } from 'src/common/Entities/gpreport/table/STY_CHEMICAL.en
 import { STY_CHEMICAL_REV } from 'src/common/Entities/gpreport/table/STY_CHEMICAL_REV.entity';
 import { STY_CHM_SEC } from 'src/common/Entities/gpreport/views/STY_CHM_SEC.entity';
 import { STY_CHEMICAL_SECTION } from 'src/common/Entities/gpreport/table/STY_CHEMICAL_SECTION.entity';
+import { FileRepository } from './repository/file.repository';
 
 @Module({
     imports: [
@@ -58,6 +59,7 @@ import { STY_CHEMICAL_SECTION } from 'src/common/Entities/gpreport/table/STY_CHE
         MasterRepository,
         RevRepository,
         SectionRepository,
+        FileRepository,
     ],
 })
 export class SafetyChemicalModule {}

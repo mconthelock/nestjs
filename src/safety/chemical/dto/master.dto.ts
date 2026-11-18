@@ -1,6 +1,7 @@
 import { PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+    IsDate,
     IsNotEmpty,
     IsNumber,
     IsOptional,
@@ -66,17 +67,58 @@ export class DisableByIdDto extends PickType(ConfirmRebuildSectionDto, [
 }
 
 export class CreateMasterDto {
+    @IsNotEmpty()
+    @IsDate()
+    @Type(() => Date)
     RECEIVED_SDS_DATE: Date;
+
+    @IsNotEmpty()
+    @IsDate()
+    @Type(() => Date)
     EFFECTIVE_DATE: Date;
+
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
     PRODUCT_CODE: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
     CHEMICAL_NAME: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
     VENDOR: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
     PUR_INCHARGE: string;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @Type(() => Number)
     UN_CLASS: number;
+
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
     REV: string;
-    STATUS: number;
+
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
     USER_CREATE: string;
-    CREATE_DATE: Date;
-    USER_UPDATE: string;
-    UPDATE_DATE: Date;
+
+    @IsOptional()
+    @IsString()
+    @Type(() => String)
+    USER_UPDATE?: string;
+
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    STATUS?: number;
 }

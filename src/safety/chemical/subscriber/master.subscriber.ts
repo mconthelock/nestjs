@@ -30,6 +30,8 @@ export class MasterSubscriber implements EntitySubscriberInterface<STY_CHEMICAL>
         if (event.entity) {
             event.entity.USER_UPDATE =
                 event.entity.USER_UPDATE || event.entity.USER_CREATE;
+            event.entity.USER_CREATE =
+                event.entity.USER_CREATE || event.entity.USER_UPDATE;
             event.entity.UPDATE_DATE = new Date();
         }
     }

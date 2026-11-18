@@ -1,17 +1,61 @@
 import { Injectable } from '@nestjs/common';
+import { deleteFile } from 'src/common/utils/files.utils';
+import { StyFilesService } from 'src/gpreport/sty-files/sty-files.service';
+import { MasterRepository } from '../repository/master.repository';
+import { CreateMasterDto } from '../dto/master.dto';
+import type { STY_FILES } from 'src/common/Entities/gpreport/table/STY_FILES.entity';
 
 @Injectable()
 export class CreateService {
-    constructor() {}
+    constructor(
+        private readonly styFilesService: StyFilesService,
+        private readonly masterRepo: MasterRepository,
+    ) {}
 
-    async main(dto: any, files: Express.Multer.File[]) {
+    async main(dto: CreateMasterDto, files: Express.Multer.File[]) {
+        const movedTargets: string[] = [];
         try {
             // todo: บันทึกข้อมูล
-            
+            const result = await this.masterRepo.create(dto);
+            if (!result) {
+                throw new Error('Create failed');
+            }
+            const fileData: { fullPath: string[]; data: STY_FILES[] }[] = [];
 
             // todo: บันทึกไฟล์
-            return { dto, files };
+            for (const file of files) {
+                const fieldname = {
+                    SDS_FILE_ORIGIN: 'CHM_F_ORI',
+                    CHEMICAL_IMAGE: 'CHM_IMAGE',
+                    SDS_FILE_TRANS: 'CHM_F_TRANS',
+                    SDS_STICKER: 'CHM_F_STICKER',
+                };
+                movedTargets.push(file.path);
+                const insertFile = await this.styFilesService.insertFiles(
+                    {
+                        ...dto,
+                        FILE_CODE: fieldname[file.fieldname],
+                        FILE_USERCREATE: dto.USER_CREATE,
+                    },
+                    file,
+                );
+                movedTargets.push(...insertFile.moved.fullPath);
+                fileData.push(insertFile.moved);
+            }
+            // TODO: insert ลงตารางเชื่อมข้อมูล STY_CHEMICAL_FILES
+
+            const newData = await this.masterRepo.getMaster({ status: 1, id: result.AMEC_SDS_ID });
+            return {
+                status: true,
+                message: 'Create successfully',
+                data: newData,
+                files: fileData,
+            };
         } catch (error) {
+            await Promise.allSettled([
+                ...movedTargets.map((p) => deleteFile(p)), // - ลบไฟล์ที่ "ปลายทาง" ทั้งหมดที่ย้ายสำเร็จไปแล้ว (กัน orphan file)
+                ...files.map((f) => deleteFile(f.path)), // - ลบไฟล์ใน tmp ที่ยังไม่ได้ย้าย (กันค้าง)
+            ]);
             throw error;
         }
     }

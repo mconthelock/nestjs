@@ -5,14 +5,6 @@ import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 export class InsertAndMoveStyFilesDto {
     @IsNotEmpty()
     @IsString()
-    FILE_ONAME: string;
-
-    @IsNotEmpty()
-    @IsString()
-    FILE_FNAME: string;
-
-    @IsNotEmpty()
-    @IsString()
     FILE_CODE: string;
 
     @IsNotEmpty()
@@ -29,17 +21,23 @@ export class InsertAndMoveStyFilesDto {
 }
 
 export class CreateStyFilesDto extends PickType(InsertAndMoveStyFilesDto, [
-    'FILE_ONAME',
-    'FILE_FNAME',
     'FILE_USERCREATE',
     'FILE_PATH',
     'STATUS',
 ] as const) {
+    @IsNotEmpty()
+    @IsString()
+    FILE_ONAME: string;
+
+    @IsNotEmpty()
+    @IsString()
+    FILE_FNAME: string;
+
     @IsOptional()
     @Type(() => Number)
     TYPE_ID?: number;
 
     @IsOptional()
-    @Type(() => Number)
-    FILE_USERUPDATE?: number;
+    @IsString()
+    FILE_USERUPDATE?: string;
 }

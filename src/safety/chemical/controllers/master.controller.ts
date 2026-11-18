@@ -2,7 +2,6 @@ import {
     Body,
     Controller,
     Get,
-    Param,
     Patch,
     Post,
     UploadedFiles,
@@ -14,6 +13,7 @@ import {
     RebuildSectionDto,
     ConfirmRebuildSectionDto,
     DisableByIdDto,
+    CreateMasterDto,
 } from '../dto/master.dto';
 import { RebuildService } from '../services/rebuild.service';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
@@ -62,7 +62,10 @@ export class MasterController {
     @Post()
     @UseTransaction('gpreportConnection')
     @UseInterceptors(getFileUploadInterceptor())
-    create(@Body() dto: any, @UploadedFiles() files: Express.Multer.File[]) {
+    create(
+        @Body() dto: CreateMasterDto,
+        @UploadedFiles() files: Express.Multer.File[],
+    ) {
         return this.createService.main(dto, files);
     }
 }

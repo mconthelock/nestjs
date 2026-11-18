@@ -177,17 +177,18 @@ export class ZincPrService {
         return payload;
     }
 
-    async sendPendingPreviewEmail(dto: ZincPrPendingPreviewEmailDto) {
-        const todayParts = new Intl.DateTimeFormat('en-US', {
-            timeZone: 'Asia/Bangkok',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-        }).formatToParts(new Date());
-        const todayPart = (type: string) =>
-            todayParts.find((part) => part.type === type)?.value ?? '';
-        const date = `${todayPart('year')}-${todayPart('month')}-${todayPart('day')}`;
-        const { payload, invalidTakeoutsForEmail } = await this.buildPendingResult(date);
+  async sendPendingPreviewEmail(dto: ZincPrPendingPreviewEmailDto) {
+    const todayParts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Bangkok',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(new Date());
+    const todayPart = (type: string) =>
+      todayParts.find((part) => part.type === type)?.value ?? '';
+    const today = `${todayPart('year')}-${todayPart('month')}-${todayPart('day')}`;
+    const date = dto.date ?? today;
+    const { payload, invalidTakeoutsForEmail } = await this.buildPendingResult(date);
 
         if (payload.length === 0 && invalidTakeoutsForEmail.length === 0) {
             return {

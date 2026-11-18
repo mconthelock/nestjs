@@ -11,6 +11,13 @@ export class FireRepository extends BaseRepository {
         super(dataSource);
     }
 
+    allItems(activeOnly = false) {
+        return this.getRepository(FireItemMst).find({
+            where: activeOnly ? { STATUS: '1' } : {},
+            order: { FIRE_CODE: 'ASC' },
+        });
+    }
+
     findOne(fireCode: string) {
         return this.getRepository(FireItemMst).findOne({ where: { FIRE_CODE: fireCode } });
     }

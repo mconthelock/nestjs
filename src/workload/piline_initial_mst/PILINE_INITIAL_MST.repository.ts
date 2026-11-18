@@ -6,7 +6,7 @@ import { PilineCrudRepository } from '../piline/PILINE-CRUD.repository';
 
 @Injectable()
 export class PilineInitialMstRepository extends PilineCrudRepository<PILINE_INITIAL_MST> {
-    constructor(@InjectDataSource('mitsuConnection') ds: DataSource) {
+    constructor(@InjectDataSource('workloadConnection') ds: DataSource) {
         super(ds, PILINE_INITIAL_MST);
     }
 }

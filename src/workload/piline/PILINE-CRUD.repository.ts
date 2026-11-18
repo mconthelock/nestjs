@@ -1,15 +1,26 @@
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { DataSource, FindOptionsWhere, ObjectLiteral, QueryFailedError } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { transactionContext } from 'src/common/interceptors/transaction-context';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 
 /** Shared write behavior for PILINE tables; uses the request transaction manager. */
 export class PilineCrudRepository<T extends ObjectLiteral> extends BaseRepository {
     constructor(
-        ds: DataSource,
+        private readonly ds: DataSource,
         private readonly entity: new () => T,
     ) {
         super(ds);
+    }
+
+    private inTransaction<R>(operation: () => Promise<R>): Promise<R> {
+        const manager = this.manager;
+        if (manager.connection === this.ds && manager.queryRunner?.isTransactionActive) {
+            return operation();
+        }
+        return this.ds.transaction((transactionManager) =>
+            transactionContext.run({ manager: transactionManager }, operation),
+        );
     }
 
     private key(where: FindOptionsWhere<T>) {
@@ -59,7 +70,11 @@ export class PilineCrudRepository<T extends ObjectLiteral> extends BaseRepositor
         return { status: true, data };
     }
 
-    async create(dto: Partial<T>) {
+    create(dto: Partial<T>) {
+        return this.inTransaction(() => this.insertRecord(dto));
+    }
+
+    private async insertRecord(dto: Partial<T>) {
         const key = this.key(dto as FindOptionsWhere<T>);
         try {
             // insert must reject duplicate keys; save would silently update them.
@@ -70,7 +85,11 @@ export class PilineCrudRepository<T extends ObjectLiteral> extends BaseRepositor
         }
     }
 
-    async update(where: FindOptionsWhere<T>, dto: Partial<T>) {
+    update(where: FindOptionsWhere<T>, dto: Partial<T>) {
+        return this.inTransaction(() => this.updateRecord(where, dto));
+    }
+
+    private async updateRecord(where: FindOptionsWhere<T>, dto: Partial<T>) {
         const key = this.key(where);
         const fields = Object.fromEntries(
             Object.entries(dto).filter(([, value]) => value !== undefined),
@@ -91,7 +110,11 @@ export class PilineCrudRepository<T extends ObjectLiteral> extends BaseRepositor
         }
     }
 
-    async remove(where: FindOptionsWhere<T>) {
+    remove(where: FindOptionsWhere<T>) {
+        return this.inTransaction(() => this.deleteRecord(where));
+    }
+
+    private async deleteRecord(where: FindOptionsWhere<T>) {
         const key = this.key(where);
         try {
             const result = await this.getRepository(this.entity).delete(key);

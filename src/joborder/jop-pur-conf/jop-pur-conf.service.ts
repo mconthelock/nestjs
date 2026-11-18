@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import * as oracledb from 'oracledb';
 import { Repository, DataSource, QueryRunner, Brackets } from 'typeorm';
 
 import { CreateJopPurConfDto } from './dto/create-jop-pur-conf.dto';
@@ -122,38 +123,88 @@ export class JopPurConfService {
         list: { mfg: string; pono: number; line: number }[],
         queryRunner?: QueryRunner,
     ) {
-        const repo = queryRunner ? queryRunner.manager.getRepository(JopPurConf) : this.confRepo;
-        return await repo
-            .createQueryBuilder('jop')
-            .select([
-                'jop.JOP_MFGNO AS MFGNO',
-                'jop.JOP_PONO AS PONO',
-                'jop.JOP_LINENO AS LINENO',
-                'jop.JOP_REVISION AS REVISION',
-                'jop.JOP_PUR_CONFIRM AS ACTION_BY',
-                'jop.JOP_PUR_CONFIRM_DATE AS DDATE',
-                'jop.JOP_PUR_REMARK AS REMARK',
-                'jop.JOP_PUR_INPUT_DATE AS INPUT_DATE',
-                'U.SNAME AS NAME',
-                "'PUR' AS REVTYPE",
-            ])
-            .leftJoin('jop.purConfirm', 'U')
-            .where(
-                new Brackets((qb) => {
-                    list.forEach((item, i) => {
-                        qb.orWhere(
-                            `(jop.JOP_MFGNO = :mfg${i} AND jop.JOP_PONO = :pono${i} AND jop.JOP_LINENO = :line${i})`,
-                            {
-                                [`mfg${i}`]: item.mfg,
-                                [`pono${i}`]: item.pono,
-                                [`line${i}`]: item.line,
-                            },
-                        );
-                    });
-                }),
-            )
-            .andWhere('jop.JOP_REVISION > 0')
-            .getRawMany();
+        const keys = [
+            ...new Map(
+                list.map((item) => [
+                    JSON.stringify([item.mfg, item.pono, item.line]),
+                    item,
+                ]),
+            ).values(),
+        ];
+        if (keys.length === 0) return [];
+
+        if (this.dataSource.options.type !== 'oracle') {
+            const repo = queryRunner
+                ? queryRunner.manager.getRepository(JopPurConf)
+                : this.confRepo;
+            return repo
+                .createQueryBuilder('jop')
+                .select([
+                    'jop.JOP_MFGNO AS MFGNO',
+                    'jop.JOP_PONO AS PONO',
+                    'jop.JOP_LINENO AS LINENO',
+                    'jop.JOP_REVISION AS REVISION',
+                    'jop.JOP_PUR_CONFIRM AS ACTION_BY',
+                    'jop.JOP_PUR_CONFIRM_DATE AS DDATE',
+                    'jop.JOP_PUR_REMARK AS REMARK',
+                    'jop.JOP_PUR_INPUT_DATE AS INPUT_DATE',
+                    'U.SNAME AS NAME',
+                    "'PUR' AS REVTYPE",
+                ])
+                .leftJoin('jop.purConfirm', 'U')
+                .where(
+                    new Brackets((qb) => {
+                        keys.forEach((item, i) => {
+                            qb.orWhere(
+                                `(jop.JOP_MFGNO = :mfg${i} AND jop.JOP_PONO = :pono${i} AND jop.JOP_LINENO = :line${i})`,
+                                {
+                                    [`mfg${i}`]: item.mfg,
+                                    [`pono${i}`]: item.pono,
+                                    [`line${i}`]: item.line,
+                                },
+                            );
+                        });
+                    }),
+                )
+                .andWhere('jop.JOP_REVISION > 0')
+                .getRawMany();
+        }
+
+        const payload = JSON.stringify(keys);
+        const sql = `
+            SELECT
+                jop.JOP_MFGNO AS MFGNO,
+                jop.JOP_PONO AS PONO,
+                jop.JOP_LINENO AS LINENO,
+                jop.JOP_REVISION AS REVISION,
+                jop.JOP_PUR_CONFIRM AS ACTION_BY,
+                jop.JOP_PUR_CONFIRM_DATE AS DDATE,
+                jop.JOP_PUR_REMARK AS REMARK,
+                jop.JOP_PUR_INPUT_DATE AS INPUT_DATE,
+                U.SNAME AS NAME,
+                'PUR' AS REVTYPE
+            FROM DAILYIDS.JOP_PUR_CONF jop
+            INNER JOIN JSON_TABLE(
+                :payload,
+                '$[*]'
+                COLUMNS (
+                    MFGNO VARCHAR2(4000) PATH '$.mfg',
+                    PONO NUMBER PATH '$.pono',
+                    LINENO NUMBER PATH '$.line'
+                )
+            ) key_list
+                ON jop.JOP_MFGNO = key_list.MFGNO
+                AND jop.JOP_PONO = key_list.PONO
+                AND jop.JOP_LINENO = key_list.LINENO
+            LEFT JOIN AMEC.AMECUSERALL U
+                ON U.SEMPNO = jop.JOP_PUR_CONFIRM
+            WHERE jop.JOP_REVISION > 0
+        `;
+        const parameters = [{ type: oracledb.CLOB, val: payload }];
+
+        return queryRunner
+            ? queryRunner.query(sql, parameters)
+            : this.dataSource.query(sql, parameters);
     }
 
     async getRevisionHistory(

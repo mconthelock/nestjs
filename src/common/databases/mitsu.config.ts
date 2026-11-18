@@ -27,6 +27,7 @@ if (process.env.HOST == 'AMEC') {
             // ],
             synchronize: false,
             logger: new TypeOrmWinstonLogger(winstonLogger),
+            maxQueryExecutionTime: 5000,
             retryAttempts: process.env.STATE === 'production' ? 5 : 1,
             retryDelay: 2000,
             extra: {

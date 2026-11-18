@@ -27,7 +27,7 @@ export class OrderListService {
         ...this.JOBORDER,
         'MAR_INPUTNAME',
         'PUR_INPUTNAME',
-        'DeadLinePUR',
+        // 'DeadLinePUR',
     ];
 
     //  --------------------- new version 2025-07-04 ---------------------
@@ -151,44 +151,98 @@ export class OrderListService {
 
             // หลังแยกตาราง
             query.leftJoin(
-                qb => qb
-                    .subQuery()
-                    .select("X.JOP_MFGNO, X.JOP_PONO, X.JOP_LINENO, X.LAST_REVISION AS JOP_MAR_REVISION, JOP_PUR_STATUS, JOP_MAR_REQUEST, JOP_MAR_REQUEST_DATE, JOP_MAR_INPUT_DATE, JOP_MAR_REMARK, Y.LAST_REVISION AS JOP_PUR_REVISION, JOP_PUR_CONFIRM, JOP_PUR_CONFIRM_DATE, JOP_PUR_INPUT_DATE, JOP_PUR_REMARK")
-                    .from(
-                        qb => qb
-                            .subQuery()
-                            .select('A.JOP_MFGNO, A.JOP_PONO, A.JOP_LINENO, LAST_REVISION, JOP_PUR_STATUS, JOP_MAR_REQUEST, JOP_MAR_REQUEST_DATE, JOP_MAR_INPUT_DATE, JOP_MAR_REMARK')
-                            .from('DAILYIDS.JOP_MAR_REQ', 'A')
-                            .innerJoin(
-                                qb => qb
+                (qb) =>
+                    qb
+                        .subQuery()
+                        .select([
+                            'MAR.JOP_MFGNO AS JOP_MFGNO',
+                            'MAR.JOP_PONO AS JOP_PONO',
+                            'MAR.JOP_LINENO AS JOP_LINENO',
+                            'MAR.LAST_REVISION AS JOP_MAR_REVISION',
+                            'MAR.JOP_PUR_STATUS AS JOP_PUR_STATUS',
+                            'MAR.JOP_MAR_REQUEST AS JOP_MAR_REQUEST',
+                            'MAR.JOP_MAR_REQUEST_DATE AS JOP_MAR_REQUEST_DATE',
+                            'MAR.JOP_MAR_INPUT_DATE AS JOP_MAR_INPUT_DATE',
+                            'MAR.JOP_MAR_REMARK AS JOP_MAR_REMARK',
+                            'PUR.LAST_REVISION AS JOP_PUR_REVISION',
+                            'PUR.JOP_PUR_CONFIRM AS JOP_PUR_CONFIRM',
+                            'PUR.JOP_PUR_CONFIRM_DATE AS JOP_PUR_CONFIRM_DATE',
+                            'PUR.JOP_PUR_INPUT_DATE AS JOP_PUR_INPUT_DATE',
+                            'PUR.JOP_PUR_REMARK AS JOP_PUR_REMARK',
+                        ])
+                        .from(
+                            (qb) =>
+                                qb
                                     .subQuery()
-                                    .select('JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION')
-                                    .from('DAILYIDS.JOP_MAR_REQ', 'MAR')
-                                    .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
-                                    'B',
-                                    'A.JOP_MFGNO = B.JOP_MFGNO AND A.JOP_PONO = B.JOP_PONO AND A.JOP_LINENO = B.JOP_LINENO AND B.LAST_REVISION = A.JOP_REVISION'
-                            ),
-                            'X',
-                    )
-                    .leftJoin(
-                        qb => qb
-                            .subQuery()
-                            .select('C.JOP_MFGNO, C.JOP_PONO, C.JOP_LINENO, LAST_REVISION, JOP_PUR_CONFIRM, JOP_PUR_CONFIRM_DATE, JOP_PUR_INPUT_DATE, JOP_PUR_REMARK')
-                            .from('DAILYIDS.JOP_PUR_CONF', 'C')
-                            .innerJoin(
-                                qb => qb
+                                    .select('M.JOP_MFGNO', 'JOP_MFGNO')
+                                    .addSelect('M.JOP_PONO', 'JOP_PONO')
+                                    .addSelect('M.JOP_LINENO', 'JOP_LINENO')
+                                    .addSelect(
+                                        'MAX(M.JOP_REVISION)',
+                                        'LAST_REVISION',
+                                    )
+                                    .addSelect(
+                                        'MAX(M.JOP_PUR_STATUS) KEEP (DENSE_RANK LAST ORDER BY M.JOP_REVISION)',
+                                        'JOP_PUR_STATUS',
+                                    )
+                                    .addSelect(
+                                        'MAX(M.JOP_MAR_REQUEST) KEEP (DENSE_RANK LAST ORDER BY M.JOP_REVISION)',
+                                        'JOP_MAR_REQUEST',
+                                    )
+                                    .addSelect(
+                                        'MAX(M.JOP_MAR_REQUEST_DATE) KEEP (DENSE_RANK LAST ORDER BY M.JOP_REVISION)',
+                                        'JOP_MAR_REQUEST_DATE',
+                                    )
+                                    .addSelect(
+                                        'MAX(M.JOP_MAR_INPUT_DATE) KEEP (DENSE_RANK LAST ORDER BY M.JOP_REVISION)',
+                                        'JOP_MAR_INPUT_DATE',
+                                    )
+                                    .addSelect(
+                                        'MAX(M.JOP_MAR_REMARK) KEEP (DENSE_RANK LAST ORDER BY M.JOP_REVISION)',
+                                        'JOP_MAR_REMARK',
+                                    )
+                                    .from('DAILYIDS.JOP_MAR_REQ', 'M')
+                                    .groupBy(
+                                        'M.JOP_MFGNO, M.JOP_PONO, M.JOP_LINENO',
+                                    ),
+                            'MAR',
+                        )
+                        .leftJoin(
+                            (qb) =>
+                                qb
                                     .subQuery()
-                                    .select('JOP_MFGNO, JOP_PONO, JOP_LINENO, MAX(JOP_REVISION) AS LAST_REVISION')
-                                    .from('DAILYIDS.JOP_PUR_CONF', 'PUR')
-                                    .groupBy('JOP_MFGNO, JOP_PONO, JOP_LINENO'),
-                                    'D',
-                                    'C.JOP_MFGNO = D.JOP_MFGNO AND C.JOP_PONO = D.JOP_PONO AND C.JOP_LINENO = D.JOP_LINENO AND D.LAST_REVISION = C.JOP_REVISION'
-                            ),
-                            'Y',
-                            'X.JOP_MFGNO = Y.JOP_MFGNO AND X.JOP_PONO = Y.JOP_PONO AND X.JOP_LINENO = Y.JOP_LINENO'
-                    )
-                    ,'J',
-                    'O.PRNO = J.JOP_PONO and O.LINENO = J.JOP_LINENO and O.MFGNO = J.JOP_MFGNO'
+                                    .select('P.JOP_MFGNO', 'JOP_MFGNO')
+                                    .addSelect('P.JOP_PONO', 'JOP_PONO')
+                                    .addSelect('P.JOP_LINENO', 'JOP_LINENO')
+                                    .addSelect(
+                                        'MAX(P.JOP_REVISION)',
+                                        'LAST_REVISION',
+                                    )
+                                    .addSelect(
+                                        'MAX(P.JOP_PUR_CONFIRM) KEEP (DENSE_RANK LAST ORDER BY P.JOP_REVISION)',
+                                        'JOP_PUR_CONFIRM',
+                                    )
+                                    .addSelect(
+                                        'MAX(P.JOP_PUR_CONFIRM_DATE) KEEP (DENSE_RANK LAST ORDER BY P.JOP_REVISION)',
+                                        'JOP_PUR_CONFIRM_DATE',
+                                    )
+                                    .addSelect(
+                                        'MAX(P.JOP_PUR_INPUT_DATE) KEEP (DENSE_RANK LAST ORDER BY P.JOP_REVISION)',
+                                        'JOP_PUR_INPUT_DATE',
+                                    )
+                                    .addSelect(
+                                        'MAX(P.JOP_PUR_REMARK) KEEP (DENSE_RANK LAST ORDER BY P.JOP_REVISION)',
+                                        'JOP_PUR_REMARK',
+                                    )
+                                    .from('DAILYIDS.JOP_PUR_CONF', 'P')
+                                    .groupBy(
+                                        'P.JOP_MFGNO, P.JOP_PONO, P.JOP_LINENO',
+                                    ),
+                            'PUR',
+                            'MAR.JOP_MFGNO = PUR.JOP_MFGNO AND MAR.JOP_PONO = PUR.JOP_PONO AND MAR.JOP_LINENO = PUR.JOP_LINENO',
+                        ),
+                'J',
+                'O.PRNO = J.JOP_PONO AND O.LINENO = J.JOP_LINENO AND O.MFGNO = J.JOP_MFGNO',
             );
             query.leftJoin('(SELECT * FROM AMEC.AMECUSERALL)', 'U', 'J.JOP_MAR_REQUEST = U.SEMPNO');
             query.leftJoin('(SELECT * FROM AMEC.AMECUSERALL)', 'I', 'J.JOP_PUR_CONFIRM = I.SEMPNO');

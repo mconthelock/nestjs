@@ -27,7 +27,7 @@ export class OrderListService {
         ...this.JOBORDER,
         'MAR_INPUTNAME',
         'PUR_INPUTNAME',
-        'DeadLinePUR',
+        // 'DeadLinePUR',
     ];
 
     //  --------------------- new version 2025-07-04 ---------------------

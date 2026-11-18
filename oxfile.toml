@@ -8,6 +8,12 @@ max_memory_restart = "1G"
 stdout = "./logs/oxmgr-out.log"
 stderr = "./logs/oxmgr-err.log"
 
+# Health Check
+health_cmd = "curl.exe -fsS http://127.0.0.1:3000/health"
+health_interval_secs = 30
+health_timeout_secs = 5
+health_max_failures = 3
+
 [apps.env]
 NODE_ENV = "production"
 NEST_DEBUG = "true"

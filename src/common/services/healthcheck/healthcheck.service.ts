@@ -3,7 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 @Injectable()
-export class HealthcheckService implements OnModuleInit {
+export class HealthcheckService {
     constructor(
         @InjectDataSource('mitsuConnection')
         private readonly mitsuDs: DataSource,
@@ -21,12 +21,12 @@ export class HealthcheckService implements OnModuleInit {
         }
     }
 
-    onModuleInit() {
+    /*onModuleInit() {
         setInterval(() => {
             if (process.env.HOST == 'AMEC') {
                 console.log('Running check connection.');
                 this.checkMitsu();
             }
         }, 600_000);
-    }
+    }*/
 }

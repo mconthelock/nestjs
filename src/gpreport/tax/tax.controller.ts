@@ -51,47 +51,4 @@ export class TaxController {
         const ip = getClientIP(req);
         return this.taxService.create(createTaxDto, ip);
     }
-
-    // @Put('request/:year/:runno')
-    // @ApiOperation({ summary: 'แก้ไขแบบคำขอลดหย่อนภาษีเดิม' })
-    // @UseTransaction('mitsuConnection')
-    // updateTaxRequest(
-    //     @Param('year') year: string,
-    //     @Param('runno') runno: number,
-    //     @Body() updateTaxDto: UpdateTaxDto,
-    //     @Req() req: Request,
-    // ) {
-    //     const ip = getClientIP(req);
-    //     const mergedDto: CreateTaxDto = {
-    //         ...updateTaxDto,
-    //         year,
-    //         runno: +runno,
-    //     } as CreateTaxDto;
-    //     return this.taxService.saveTaxRequest(mergedDto, ip);
-    // }
-
-    // @Post('approve')
-    // @ApiOperation({
-    //     summary: 'อนุมัติหรือส่งกลับแก้ไขใบคำขอลดหย่อนภาษี (HR Approval)',
-    // })
-    // @UseTransaction('mitsuConnection')
-    // approveTax(@Body() approveTaxDto: ApproveTaxDto, @Req() req: Request) {
-    //     const approverEmpno = approveTaxDto.approverEmpno || '';
-    //     return this.taxService.approveTax(approveTaxDto, approverEmpno);
-    // }
-
-    // @Get('print/:type/:year/:runno/:empno')
-    // @ApiOperation({ summary: 'ดึงข้อมูลสำหรับจัดพิมพ์แบบ ล.ย.01 PDF' })
-    // @ApiParam({
-    //     name: 'type',
-    //     description: '1: ข้อมูลปัจจุบันจาก EMP03T, 2: ข้อมูลจากใบคำขอ',
-    // })
-    // getPrintData(
-    //     @Param('type') type: number,
-    //     @Param('year') year: string,
-    //     @Param('runno') runno: number,
-    //     @Param('empno') empno: string,
-    // ) {
-    //     return this.taxService.getPrintData(+type, year, +runno, empno);
-    // }
 }

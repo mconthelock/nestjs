@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, Min, Max } from 'class-validator';
+import { IsDate, IsNumber, IsOptional, IsString, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PickType } from '@nestjs/swagger';
 import { CreateFormDto } from 'src/webform/form/dto/create-form.dto';
@@ -44,7 +44,7 @@ export class CreateTaxDto extends PickType(CreateFormDto, [
     FAMMRN?: string;
 
     @IsOptional()
-    @IsNumber()
+    @IsDate()
     @Type(() => Date)
     FAMMRD?: Date;
 

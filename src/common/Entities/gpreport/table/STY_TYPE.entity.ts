@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
+import { STY_FILES } from './STY_FILES.entity';
 
 @Entity({ name: 'STY_TYPE', schema: 'GPREPORT' })
 export class STY_TYPE {
@@ -22,4 +28,7 @@ export class STY_TYPE {
 
     @Column()
     TYPE_STATUS: number;
+
+    @OneToMany(() => STY_FILES, (file) => file.TYPE)
+    FILES?: STY_FILES[];
 }

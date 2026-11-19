@@ -98,6 +98,7 @@ export class STY_CHEMICAL {
     TRANSLATE_SDS?: STY_FILES[]; // หรือ STY_FILES | null ถ้ามีไฟล์เดียว
     STICKER_SDS?: STY_FILES[];
     IMAGES?: STY_FILES[];
+    LAYOUT?: STY_FILES[];
 
     @AfterLoad()
     groupFilesByType() {
@@ -116,6 +117,7 @@ export class STY_CHEMICAL {
             (f) => f.TYPE_CODE === 'CHM_F_STICKER',
         );
         this.IMAGES = activeFiles.filter((f) => f.TYPE_CODE === 'CHM_IMAGE');
+        this.LAYOUT = activeFiles.filter((f) => f.TYPE_CODE === 'CHM_F_LAYOUT');
 
         // ลบตัวรวมทิ้งเพื่อไม่ให้ JSON ซ้ำซ้อน
         delete this.FILES;

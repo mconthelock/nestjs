@@ -41,9 +41,9 @@ export class STY_FILES {
     @Column()
     STATUS?: number;
 
-    @ManyToOne(() => STY_TYPE, { eager: true }) // ใส่ eager: true ถ้าอยากให้ดึง type มาด้วยทุกครั้งอัตโนมัติ
+    @ManyToOne(() => STY_TYPE, { eager: true }) // ใส่ eager: true ถ้าอยากให้ดึง type มาด้วยทุกครั้งอัตโนมัติ เฉพาะ .find, .findOne queryBuilder ต้องเรียก join เอง
     @JoinColumn({ name: 'TYPE_ID' })
-    type?: STY_TYPE;
+    TYPE?: STY_TYPE;
 
     // Property สำหรับส่งออก JSON แบบแบนๆ
     TYPE_CODE?: string;
@@ -51,10 +51,11 @@ export class STY_FILES {
 
     @AfterLoad()
     flattenType() {
-        if (this.type) {
-            this.TYPE_CODE = this.type.TYPE_CODE;
-            this.TYPE_NAME = this.type.TYPE_NAME;
-            delete this.type; // ลบ nested object ทิ้งก่อนส่งออกไปเป็น JSON
+        console.log('Flattening type for STY_FILES:', this.TYPE);
+        if (this.TYPE) {
+            this.TYPE_CODE = this.TYPE.TYPE_CODE;
+            this.TYPE_NAME = this.TYPE.TYPE_NAME;
+            delete this.TYPE; // ลบ nested object ทิ้งก่อนส่งออกไปเป็น JSON
         }
     }
 }

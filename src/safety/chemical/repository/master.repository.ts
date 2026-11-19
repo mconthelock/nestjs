@@ -133,6 +133,7 @@ export class MasterRepository extends BaseRepository {
             .leftJoin('C.SECTIONS', 'S', 'S.STATUS = :status', { status })
             .leftJoin('C.CLASS', 'T', 'T.TYPE_STATUS = :status', { status: 1 })
             .leftJoinAndSelect('C.FILES', 'F', 'F.STATUS = :status', { status: 1 })
+            .leftJoinAndSelect('F.TYPE', 'FT')
             // .leftJoinAndMapOne(
             //     'C.CLASS',
             //     STY_TYPE,

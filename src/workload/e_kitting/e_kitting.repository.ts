@@ -5,11 +5,26 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { EKittingMasterDwg } from 'src/common/Entities/workload/table/EKITTING_MASTER_DWG.entity';
 import { V_Q141KP_KITTING_LIST } from 'src/common/Entities/workload/views/V_Q141KP_KITTING_LIST.entity';
 import { CreateEKittingDto } from './dto/create-e_kitting.dto';
+import { CheckResultDto } from './dto/checkResult.dto';
+import { EKITTING_CHECK_RESULT } from 'src/common/Entities/workload/table/EKITTING_CHECK_RESULT';
 
 @Injectable()
 export class EKittingRepository extends BaseRepository {
-    constructor(@InjectDataSource('mitsuConnection') private readonly wk: DataSource) {
+    constructor(
+        @InjectDataSource('mitsuConnection') private readonly wk: DataSource,
+        @InjectDataSource('datacenterConnection') private readonly datacenter: DataSource,
+    ) {
         super(wk);
+    }
+
+    findQ141KP(order: string, item: string){
+        return this.datacenter.createQueryBuilder()
+            .select('*')
+            .from('Q141KP', 'Q')
+            .where('Q.Q41K01 = :order', { order })
+            .andWhere('Q.Q41K03 = :item', { item })
+            .orderBy('Q.Q41K05', 'ASC')
+            .getRawMany();
     }
 
     search(order, packing) {
@@ -53,5 +68,9 @@ export class EKittingRepository extends BaseRepository {
 
     async deleteMaster(ITEM: string, DWG: string) {
         return this.getRepository(EKittingMasterDwg).delete({ ITEM, DWG });
+    }
+
+    async saveResult(dto: CheckResultDto) {
+        return this.getRepository(EKITTING_CHECK_RESULT).save(dto);
     }
 }

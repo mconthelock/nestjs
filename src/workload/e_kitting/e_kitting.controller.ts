@@ -21,6 +21,11 @@ export class EKittingController {
         return this.eKittingService.search(order, packing);
     }
 
+    @Post('findQ141KP')
+    findAll(@Body('order') order: string, @Body('item') item: string) {
+        return this.eKittingService.findQ141KP(order, item);
+    }
+
     @Get(['getMaster', 'getMaster/:item'])
     master(@Param('item') item?: string) {
         return this.eKittingService.getMaster(item);

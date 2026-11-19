@@ -15,7 +15,7 @@ export class EKITTING_CHECK_RESULT {
     DWG: string;
 
     @Column()
-    CHECK_STATUS: string;
+    RESULT: string;
 
     @Column()
     REMARK: string;

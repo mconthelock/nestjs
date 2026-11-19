@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateEKittingDto } from './dto/create-e_kitting.dto';
 import { UpdateEKittingDto } from './dto/update-e_kitting.dto';
 import { EKittingRepository } from './e_kitting.repository';
+import { CheckResultDto } from './dto/checkResult.dto';
 
 @Injectable()
 export class EKittingService {
@@ -9,5 +10,25 @@ export class EKittingService {
 
     search(order: string, packing: string) {
         return this.eKittingRepository.search(order, packing);
+    }
+
+    getMaster(item?: string){
+        return this.eKittingRepository.getMaster(item);
+    }
+
+    saveMaster(dto: CreateEKittingDto) {
+        return this.eKittingRepository.saveMaster(dto);
+    }
+    
+    deleteMaster(item: string, DWG: string) {
+        return this.eKittingRepository.deleteMaster(item, DWG);
+    }
+
+    saveResult(dto: CheckResultDto){
+        return this.eKittingRepository.saveResult(dto);
+    }
+
+    findQ141KP(order: string, item: string) {
+        return this.eKittingRepository.findQ141KP(order, item);
     }
 }

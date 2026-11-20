@@ -94,11 +94,11 @@ export class STY_CHEMICAL {
     FILES?: STY_FILES[];
 
     // Property แยกตามประเภทที่ต้องการส่งให้ Frontend
-    ORIGINAL_SDS?: STY_FILES[]; // หรือ STY_FILES | null ถ้ามีไฟล์เดียว
-    TRANSLATE_SDS?: STY_FILES[]; // หรือ STY_FILES | null ถ้ามีไฟล์เดียว
-    STICKER_SDS?: STY_FILES[];
+    ORIGINAL_SDS?: STY_FILES; // หรือ STY_FILES | null ถ้ามีไฟล์เดียว
+    TRANSLATE_SDS?: STY_FILES; // หรือ STY_FILES | null ถ้ามีไฟล์เดียว
+    STICKER_SDS?: STY_FILES;
     IMAGES?: STY_FILES[];
-    LAYOUT?: STY_FILES[];
+    LAYOUT?: STY_FILES;
 
     @AfterLoad()
     groupFilesByType() {
@@ -107,17 +107,17 @@ export class STY_CHEMICAL {
         // กรองเฉพาะไฟล์ที่ STATUS = 1 (Enable) และแยกตาม TYPE_CODE
         const activeFiles = this.FILES.filter((f) => f.STATUS === 1);
 
-        this.ORIGINAL_SDS = activeFiles.filter(
+        this.ORIGINAL_SDS = activeFiles.find(
             (f) => f.TYPE_CODE === 'CHM_F_ORI',
-        );
-        this.TRANSLATE_SDS = activeFiles.filter(
+        ) ?? null;
+        this.TRANSLATE_SDS = activeFiles.find(
             (f) => f.TYPE_CODE === 'CHM_F_TRANS',
-        );
-        this.STICKER_SDS = activeFiles.filter(
+        ) ?? null;
+        this.STICKER_SDS = activeFiles.find(
             (f) => f.TYPE_CODE === 'CHM_F_STICKER',
-        );
+        ) ?? null;
         this.IMAGES = activeFiles.filter((f) => f.TYPE_CODE === 'CHM_IMAGE');
-        this.LAYOUT = activeFiles.filter((f) => f.TYPE_CODE === 'CHM_F_LAYOUT');
+        this.LAYOUT = activeFiles.find((f) => f.TYPE_CODE === 'CHM_F_LAYOUT') ?? null;
 
         // ลบตัวรวมทิ้งเพื่อไม่ให้ JSON ซ้ำซ้อน
         delete this.FILES;

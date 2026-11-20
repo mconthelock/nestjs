@@ -73,7 +73,7 @@ export class WireHarnessJobRepository extends BaseRepository {
                             ),
                             999999
                         )
-                        AND CB.Q41K10 LIKE 'CABLE%'
+                        AND (CB.Q41K10 LIKE 'CABLE%' OR CB.Q41K10 LIKE 'CABEL%')
                         AND SUBSTR(Q1.Q41K08, 1, LOCATE(' ', Q1.Q41K08 || ' ') - 1) = SUBSTR(CB.Q41K08, 1, LOCATE('-', CB.Q41K08 || '-') - 1)
                     LEFT JOIN RTNLIBF.Q143KP Q3
                         ON Q1.Q41K01 = Q3.Q43K01

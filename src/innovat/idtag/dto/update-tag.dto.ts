@@ -1,7 +1,15 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 
 export class UpdateTagDto {
+    @ApiProperty({
+        example: '15234',
+        description: 'Employee No.',
+    })
+    @IsString()
+    @IsNotEmpty()
+    empno: string;
+
     @ApiProperty({
         example: 'CYYYYXXXXXX',
         description: 'Control No.',
@@ -18,19 +26,11 @@ export class UpdateTagDto {
     @IsNotEmpty()
     process: string;
 
-    @ApiProperty({
+    @ApiPropertyOptional({
         example: '20/11/2026',
         description: 'Finish Date (dd/MM/yyyy)',
     })
     @IsString()
-    @IsNotEmpty()
-    findate: string;
-
-    @ApiProperty({
-        example: '15234',
-        description: 'Employee No.',
-    })
-    @IsString()
-    @IsNotEmpty()
-    empno: string;
+    @IsOptional()
+    findate?: string;
 }

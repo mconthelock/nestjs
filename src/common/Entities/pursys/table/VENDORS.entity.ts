@@ -4,7 +4,7 @@ import { PURVMM_FORM } from 'src/common/Entities/webform/table/PURVMM_FORM.entit
 import { PUREVA_FORM } from 'src/common/Entities/webform/table/PUREVA_FORM.entity';
 import { CurrencyMaster } from './CURRENCY_MASTER.entity';
 
-@Entity({ name: 'VENDORS', schema: 'PURSYS' })
+@Entity({ name: 'VENDORS', schema: 'PURSYS', database: 'pursys' })
 export class Vendors {
     @PrimaryColumn()
     VND_CODE: string;

@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { News } from './NEWS.entity';
 
-@Entity({ name: 'NEWS_FILES', schema: 'GPREPORT' })
+@Entity({ name: 'NEWS_FILES', schema: 'GPREPORT', database: 'gpreport' })
 export class NewsFiles {
     @PrimaryGeneratedColumn()
     FILE_ID: number;

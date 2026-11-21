@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Appsuser } from './appsuser.entity';
 
-@Entity({ name: 'APPLICATION', schema: 'DOCINV' })
+@Entity({ name: 'APPLICATION', schema: 'DOCINV', database: 'docinv' })
 export class Application {
     @PrimaryGeneratedColumn()
     APP_ID: number;

@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 // import { User } from 'src/amec/users/entities/user.entity';
 
-@Entity({ name: 'APPLICATION_LOG', schema: 'DOCINV' })
+@Entity({ name: 'APPLICATION_LOG', schema: 'DOCINV', database: 'docinv' })
 export class Accesslog {
     @PrimaryColumn()
     LOG_ID: number;

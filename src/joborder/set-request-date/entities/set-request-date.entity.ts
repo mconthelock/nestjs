@@ -90,7 +90,7 @@ export class SetRequestDate {
 // import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 // @Entity('JOP_REQ')
 // export class SetRequestDate {
-//   @PrimaryColumn({ type: 'number' })
+//   @PrimaryColumn({ })
 //   JOP_REVISION: number;
 
 //   JOP_REVISION_TEXT?: string; // Optional, will be set later
@@ -102,13 +102,13 @@ export class SetRequestDate {
 //   //   @PrimaryColumn()
 //   //   JOP_RQS: string;
 
-//   @PrimaryColumn({ type: 'number' })
+//   @PrimaryColumn({ })
 //   JOP_PONO: number;
 
-//   @PrimaryColumn({ type: 'number' })
+//   @PrimaryColumn({ })
 //   JOP_LINENO: number;
 
-//   @Column({ type: 'number', default: 0 })
+//   @Column({default: 0 })
 //   JOP_PUR_STATUS: number;
 
 //   //   margeting

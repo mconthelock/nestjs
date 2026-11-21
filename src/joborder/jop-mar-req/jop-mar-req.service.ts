@@ -8,6 +8,7 @@ import { UpdateJopMarReqDto } from './dto/update-jop-mar-req.dto';
 import { SearchJopMarReqDto } from './dto/search-jop-mar-req.dto';
 
 import { JopMarReq } from './entities/jop-mar-req.entity';
+import { User } from 'src/common/Entities/amec/views/user.entity';
 import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
 
 import { AmeccalendarService } from 'src/amecmfg/ameccalendar/ameccalendar.service';
@@ -25,10 +26,10 @@ export class JopMarReqService {
     ) {}
 
     private readonly JOP_MAR_REQ = this.dataSource
-        .getMetadata('DAILYIDS.JOP_MAR_REQ')
+        .getMetadata(JopMarReq)
         .columns.map((c) => c.propertyName);
     private readonly AMECUSERALL = this.dataSource
-        .getMetadata('AMEC.AMECUSERALL')
+        .getMetadata(User)
         .columns.map((c) => c.propertyName);
     private readonly allowFields = [...this.JOP_MAR_REQ, ...this.AMECUSERALL];
 

@@ -11,8 +11,9 @@ export class IdtagService {
 
     async updateTag(dto: UpdateTagDto) {
         try {
-            const [{ HHMMSS, YYMMDD, HHMM }] = await this.repo.getCurrentDateTime();
-            const [dd, mm, yyyy] = dto.findate.split('/');
+            const [{ HHMMSS, YYMMDD, HHMM, FINDATE }] = await this.repo.getCurrentDateTime();
+            const findate = dto.findate || FINDATE;
+            const [dd, mm, yyyy] = findate.split('/');
             const period = this.getPeriod(HHMM);
             const finish = Number(`${yyyy}${mm}${dd}`);
             const remark = `${HHMMSS}/${YYMMDD}/${dto.empno}`;

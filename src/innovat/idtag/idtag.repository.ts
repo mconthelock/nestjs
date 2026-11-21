@@ -21,7 +21,8 @@ export class IdtagRepository extends BaseRepository {
             SELECT
                 TO_CHAR(SYSDATE, 'HH24MISS') AS HHMMSS,
                 TO_CHAR(SYSDATE, 'YYMMDD') AS YYMMDD,
-                TO_CHAR(SYSDATE, 'HH24MI') AS HHMM
+                TO_CHAR(SYSDATE, 'HH24MI') AS HHMM,
+                TO_CHAR(SYSDATE, 'DD/MM/YYYY') AS FINDATE
             FROM DUAL
         `);
     }

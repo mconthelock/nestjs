@@ -60,6 +60,12 @@ export class Vendors {
     @Column()
     VND_CATEGORY: string;
 
+    @Column({ nullable: true })
+    VND_CLASS: string;
+
+    @Column({ nullable: true })
+    VND_ORIGIN: string;
+
     @Column()
     VND_BANO: string;
 

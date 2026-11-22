@@ -74,6 +74,14 @@ export class CreateVendorDto {
 
     @IsString()
     @IsOptional()
+    VND_CLASS?: string;
+
+    @IsString()
+    @IsOptional()
+    VND_ORIGIN?: string;
+
+    @IsString()
+    @IsOptional()
     VND_BANO?: string;
 
     @IsString()

@@ -3,8 +3,6 @@ import {
     Injectable,
     Logger,
     NotFoundException,
-    OnModuleDestroy,
-    OnModuleInit,
 } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
@@ -22,9 +20,8 @@ import { BatchActionPurPoDto, PurPoFormKeyDto } from './dto/batch-action-purpo.d
 import { RecreatePurPoDto } from './dto/recreate-purpo.dto';
 
 @Injectable()
-export class PurPoService implements OnModuleInit, OnModuleDestroy {
+export class PurPoService {
     private readonly logger = new Logger(PurPoService.name);
-    private retryTimer: NodeJS.Timeout | null = null;
 
     constructor(
         @InjectDataSource('mitsuConnection')
@@ -42,23 +39,6 @@ export class PurPoService implements OnModuleInit, OnModuleDestroy {
         private readonly formCreateService: FormCreateService,
         private readonly doactionFlowService: DoactionFlowService,
     ) {}
-
-    onModuleInit() {
-        if (process.env.NODE_ENV === 'test') return;
-        const intervalMs = Number(process.env.OUTBOX_RETRY_INTERVAL_MS || 60000);
-        this.retryTimer = setInterval(() => {
-            this.processPendingOutbox().catch((err) =>
-                this.logger.warn(`PURPO outbox retry tick failed: ${err.message}`),
-            );
-        }, intervalMs);
-    }
-
-    onModuleDestroy() {
-        if (this.retryTimer) {
-            clearInterval(this.retryTimer);
-            this.retryTimer = null;
-        }
-    }
 
     private formatFormKey(k: PurPoFormKeyDto): string {
         return `${k.NFRMNO}-${k.VORGNO}-${k.CYEAR}-${k.CYEAR2}-${k.NRUNNO}`;

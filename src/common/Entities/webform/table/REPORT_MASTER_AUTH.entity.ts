@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { ReportMaster } from './REPORT_MASTER.entity';
 
-@Entity({ name: 'REPORT_MASTER_AUTH', schema: 'WEBFORM' })
+@Entity({ name: 'REPORT_MASTER_AUTH', schema: 'WEBFORM', database: 'webform' })
 export class ReportMasterAuth {
     @PrimaryColumn()
     VEMPNO: string;

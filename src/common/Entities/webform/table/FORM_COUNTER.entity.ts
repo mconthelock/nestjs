@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
-@Entity({ name: 'FORM_COUNTER', schema: 'WEBFORM' })
+@Entity({ name: 'FORM_COUNTER', schema: 'WEBFORM', database: 'webform' })
 export class FormCounter {
     @PrimaryColumn()
     EMPNO: string;

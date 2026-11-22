@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'REPORT_MASTER', schema: 'WEBFORM' })
+@Entity({ name: 'REPORT_MASTER', schema: 'WEBFORM', database: 'webform' })
 export class ReportMaster {
     @PrimaryGeneratedColumn()
     ID: number;

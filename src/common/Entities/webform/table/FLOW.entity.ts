@@ -2,7 +2,7 @@ import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { FORM } from './FORM.entity';
 import { STEPMST } from './STEPMST.entity';
 
-@Entity({ name: 'FLOW', schema: 'WEBFORM' })
+@Entity({ name: 'FLOW', schema: 'WEBFORM', database: 'webform' })
 export class FLOW {
     @PrimaryColumn()
     NFRMNO: number;

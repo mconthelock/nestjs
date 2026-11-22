@@ -3,6 +3,7 @@ import { ViewColumn, ViewEntity } from 'typeorm';
 @ViewEntity({
     name: 'ORGANIZATIONS',
     schema: 'WEBFORM',
+    database: 'webform',
 })
 export class ORGANIZATIONS {
     @ViewColumn()

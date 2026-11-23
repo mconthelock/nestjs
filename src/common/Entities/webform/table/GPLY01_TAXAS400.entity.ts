@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
+import { FORM } from './FORM.entity';
 
-@Entity({ name: 'GPLY01_TAXAS400', schema: 'AMECMFG' })
+@Entity({ name: 'GPLY01_TAXAS400', schema: 'WEBFORM' })
 export class GPLY01_TAXAS400 {
     @PrimaryColumn()
     NFRMNO: number;
@@ -18,7 +19,7 @@ export class GPLY01_TAXAS400 {
     NRUNNO: number;
 
     @Column()
-    SEMPNO: string;
+    EMPCOD: string;
 
     @Column()
     MARSTT: string;
@@ -27,19 +28,28 @@ export class GPLY01_TAXAS400 {
     MARSTE: string;
 
     @Column()
-    FAMMRD: string;
+    FAMMRN: string;
+
+    @Column()
+    FAMMRD: Date;
 
     @Column()
     FAMSNA: string;
 
     @Column()
-    FAMIED: number;
+    FAMSTX: string;
 
     @Column()
-    FAMNED: number;
+    C1NED: number;
 
     @Column()
-    FAMCHI: number;
+    C1IED: number;
+
+    @Column()
+    C2NED: number;
+
+    @Column()
+    C2IED: number;
 
     @Column()
     TAXEMF: string;
@@ -54,31 +64,31 @@ export class GPLY01_TAXAS400 {
     TAXSPM: string;
 
     @Column()
-    TAXDIS: string;
+    TAXPRG: number;
 
     @Column()
-    TAXPREG: number;
+    TAXDIS: number;
 
     @Column()
     TAXINS: number;
 
     @Column()
-    TAXSIN: number;
-
-    @Column()
     TAXINH: number;
 
     @Column()
-    TAXLTF: number;
+    TAXINP: number;
 
     @Column()
     TAXRMF: number;
 
     @Column()
-    TAXPENS: number;
+    TAXANU: number;
 
     @Column()
-    TAXFUND: number;
+    TAXINL: number;
+
+    @Column()
+    TAXLTF: number;
 
     @Column()
     TAXEDU: number;
@@ -87,23 +97,18 @@ export class GPLY01_TAXAS400 {
     TAXDON: number;
 
     @Column()
-    TAXINL: number;
-
-    @Column()
-    TAXINP: number;
-
-    @Column()
-    TAXISM: number;
-
-    @Column()
     TAXOT1: number;
 
     @Column()
     TAXOT2: number;
 
-    @Column()
-    FAMIED1: number;
-
-    @Column()
-    FAMNED1: number;
+    @OneToOne(() => FORM)
+    @JoinColumn([
+        { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+        { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+        { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+    ])
+    form: FORM;
 }

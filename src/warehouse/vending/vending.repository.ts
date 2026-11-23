@@ -77,6 +77,37 @@ export class VendingRepository extends BaseRepository {
     }
 
     async getToolWithdrawalWithRequest() {
+        console.log(`
+            SELECT
+                u.SSEC,
+                u.SEMPNO,
+                u.STNAME,
+                NVL(tw.RECORD_DATE,a.REQUEST_DATE) AS RECORD_DATE,
+                NVL(tw.PRODUCT_ID,a.PRODUCT_ID) AS PRODUCT_ID,
+                p.SEPRODNAME,
+                a.QTY,
+                tw.QUANTITY,
+                tw.UNIT_PRICE
+            FROM SKIDCNTRL.TOOL_WITHDRAWAL tw
+            FULL JOIN (
+                SELECT
+                    mf.EMPNO,
+                    mf.REQUEST_DATE,
+                    md.PRODUCT_ID,
+                    SUM(md.QTY) AS QTY
+                FROM WEBFORM.MFGVTR_FORM mf
+                JOIN WEBFORM.MFGVTR_DETAIL md ON mf.ID = md.FORM_ID
+                WHERE mf.STATUS = '2'
+                GROUP BY
+                    mf.EMPNO,
+                    mf.REQUEST_DATE,
+                    md.PRODUCT_ID
+            ) a
+                ON TRUNC(a.REQUEST_DATE) = TRUNC(tw.RECORD_DATE)
+                AND a.PRODUCT_ID = tw.PRODUCT_ID
+            LEFT JOIN AMEC.AMECUSERALL u ON u.SEMPNO = NVL(tw.EMPLOYEE_CODE, a.EMPNO)
+            LEFT JOIN PURSYS.PRODUCTS p ON p.SPRODID = tw.PRODUCT_ID OR p.SPRODID = a.PRODUCT_ID
+        `)
         return this.manager.query(`
             SELECT
                 u.SSEC,

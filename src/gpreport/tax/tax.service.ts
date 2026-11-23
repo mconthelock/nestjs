@@ -48,24 +48,49 @@ export class TaxService {
             .leftJoinAndSelect('req.form', 'form')
             .leftJoinAndSelect('form.formmst', 'formmst')
             .leftJoinAndSelect('form.flow', 'flow')
-            .leftJoinAndSelect('flow.steps', 'steps');
+            .leftJoinAndSelect('flow.steps', 'steps')
+            .leftJoinAndSelect('req.current', 'current');
         await applyDynamicFilters(qb, q, 'req');
         const data = await qb.getMany();
         const result = data.map((res) => {
             return {
                 ...res,
-                TAX1: 60000,
-                TAX2: res.FAMSNA?.trim() ? 60000 : 0,
-                TAX3:
-                    res.C1IED * 30000 + res.C1NED * 30000 + (res.C2IED * 60000 + res.C2NED * 60000),
-                TAX4:
-                    (res.TAXEMF?.replaceAll(' ', '') ? 30000 : 0) +
-                    (res.TAXEMM?.replaceAll(' ', '') ? 30000 : 0) +
-                    (res.TAXSFT?.replaceAll(' ', '') ? 30000 : 0) +
-                    (res.TAXSPM?.replaceAll(' ', '') ? 30000 : 0),
+                ...this.calcTax1To4(res),
+                current: res.current
+                    ? {
+                          ...res.current,
+                          ...this.calcTax1To4(res.current),
+                      }
+                    : null,
             };
         });
         return result;
+    }
+
+    private calcTax1To4(row: {
+        FAMSNA?: string;
+        C1IED?: number;
+        C1NED?: number;
+        C2IED?: number;
+        C2NED?: number;
+        TAXEMF?: string;
+        TAXEMM?: string;
+        TAXSFT?: string;
+        TAXSPM?: string;
+    }) {
+        return {
+            TAX1: 60000,
+            TAX2: row.FAMSNA?.trim() ? 60000 : 0,
+            TAX3:
+                (row.C1IED || 0) * 30000 +
+                (row.C1NED || 0) * 30000 +
+                ((row.C2IED || 0) * 60000 + (row.C2NED || 0) * 60000),
+            TAX4:
+                (row.TAXEMF?.replaceAll(' ', '') ? 30000 : 0) +
+                (row.TAXEMM?.replaceAll(' ', '') ? 30000 : 0) +
+                (row.TAXSFT?.replaceAll(' ', '') ? 30000 : 0) +
+                (row.TAXSPM?.replaceAll(' ', '') ? 30000 : 0),
+        };
     }
 
     async create(dto: CreateTaxDto, ip?: string) {
@@ -93,13 +118,80 @@ export class TaxService {
                 CYEAR2: createForm.data.CYEAR2,
                 NRUNNO: createForm.data.NRUNNO,
             };
-            return await this.repo.create({
+            const created = await this.repo.create({
                 ...data,
                 ...form,
             });
+            await this.snapshotEmp03ToTaxAs400(form, dto.EMPCOD);
+            return created;
         } catch (error) {
             throw new Error('Request GPLY01 Form Error: ' + error.message);
         }
+    }
+
+    private async snapshotEmp03ToTaxAs400(
+        form: {
+            NFRMNO: number;
+            VORGNO: string;
+            CYEAR: string;
+            CYEAR2: string;
+            NRUNNO: number;
+        },
+        empno: string,
+    ) {
+        const emp03t = await this.repo.findEmp03(empno);
+        if (!emp03t) {
+            return;
+        }
+
+        await this.repo.saveTaxAs400({
+            ...form,
+            EMPCOD: emp03t.EMPCOD?.trim() ?? (empno || '').trim(),
+            MARSTT: emp03t.MARSTT,
+            MARSTE: emp03t.MARSTE,
+            FAMMRN: emp03t.FAMMRN,
+            FAMMRD: this.parseEmp03Date(emp03t.FAMMRD),
+            FAMSNA: emp03t.FAMSNA,
+            FAMSTX: emp03t.FAMSTX,
+            C1NED: emp03t.C1NED,
+            C1IED: emp03t.C1IED,
+            C2NED: emp03t.C2NED,
+            C2IED: emp03t.C2IED,
+            TAXEMF: emp03t.TAXEMF,
+            TAXEMM: emp03t.TAXEMM,
+            TAXSFT: emp03t.TAXSFT,
+            TAXSPM: emp03t.TAXSPM,
+            TAXPRG: emp03t.TAXPRG,
+            TAXDIS: emp03t.TAXDIS,
+            TAXINS: emp03t.TAXINS,
+            TAXINH: emp03t.TAXINH,
+            TAXINP: emp03t.TAXINP,
+            TAXRMF: emp03t.TAXRMF,
+            TAXANU: emp03t.TAXANU,
+            TAXINL: emp03t.TAXINL,
+            TAXLTF: emp03t.TAXLTF,
+            TAXEDU: emp03t.TAXEDU,
+            TAXDON: emp03t.TAXDON,
+            TAXOT1: emp03t.TAXOT1,
+            TAXOT2: emp03t.TAXOT2,
+        });
+    }
+
+    private parseEmp03Date(value?: number | string | Date | null): Date | null {
+        if (!value || value === 0 || value === '0') return null;
+        if (value instanceof Date) {
+            return Number.isNaN(value.getTime()) ? null : value;
+        }
+        const digits = String(value).replace(/\D/g, '');
+        if (digits.length === 8) {
+            const yyyy = Number(digits.slice(0, 4));
+            const mm = Number(digits.slice(4, 6));
+            const dd = Number(digits.slice(6, 8));
+            const d = new Date(yyyy, mm - 1, dd);
+            return Number.isNaN(d.getTime()) ? null : d;
+        }
+        const d = new Date(value);
+        return Number.isNaN(d.getTime()) ? null : d;
     }
 
     /**

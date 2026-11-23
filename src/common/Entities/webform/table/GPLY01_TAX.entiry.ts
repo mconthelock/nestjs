@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { FORM } from './FORM.entity';
+import { GPLY01_TAXAS400 } from './GPLY01_TAXAS400.entity';
 
 @Entity({ name: 'GPLY01_TAX', schema: 'WEBFORM' })
 export class GPLY01_TAX {
@@ -111,4 +112,14 @@ export class GPLY01_TAX {
         { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
     ])
     form: FORM;
+
+    @OneToOne(() => GPLY01_TAXAS400)
+    @JoinColumn([
+        { name: 'NFRMNO', referencedColumnName: 'NFRMNO' },
+        { name: 'VORGNO', referencedColumnName: 'VORGNO' },
+        { name: 'CYEAR', referencedColumnName: 'CYEAR' },
+        { name: 'CYEAR2', referencedColumnName: 'CYEAR2' },
+        { name: 'NRUNNO', referencedColumnName: 'NRUNNO' },
+    ])
+    current: GPLY01_TAXAS400;
 }

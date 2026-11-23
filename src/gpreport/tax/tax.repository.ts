@@ -47,4 +47,8 @@ export class TaxRepository extends BaseRepository {
     async create(data: DeepPartial<GPLY01_TAX>) {
         return this.getRepository(GPLY01_TAX).save(data);
     }
+
+    async saveTaxAs400(data: DeepPartial<GPLY01_TAXAS400>): Promise<GPLY01_TAXAS400> {
+        return this.getRepository(GPLY01_TAXAS400).save(data);
+    }
 }

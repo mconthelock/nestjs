@@ -47,7 +47,6 @@ export class GpLy01Service {
                     throw new Error('GP-LY01 tax form not found');
                 }
 
-                await this.snapshotEmp03ToTaxAs400(form, taxForm);
                 await this.insertAs400Emptax(taxForm);
             }
 
@@ -55,60 +54,6 @@ export class GpLy01Service {
         } catch (error) {
             throw new Error(`Failed to approve GP-LY01: ${error.message}`);
         }
-    }
-
-    private async snapshotEmp03ToTaxAs400(form: FormDto, taxForm: GPLY01_TAX) {
-        const emp03t = await this.repo.findEmp03(taxForm.EMPCOD);
-        if (!emp03t) {
-            return;
-        }
-
-        await this.repo.saveTaxAs400({
-            ...form,
-            EMPCOD: emp03t.EMPCOD?.trim() ?? taxForm.EMPCOD.trim(),
-            MARSTT: emp03t.MARSTT,
-            MARSTE: emp03t.MARSTE,
-            FAMMRN: emp03t.FAMMRN,
-            FAMMRD: this.parseAs400Date(emp03t.FAMMRD),
-            FAMSNA: emp03t.FAMSNA,
-            FAMSTX: emp03t.FAMSTX,
-            C1NED: emp03t.C1NED,
-            C1IED: emp03t.C1IED,
-            C2NED: emp03t.C2NED,
-            C2IED: emp03t.C2IED,
-            TAXEMF: emp03t.TAXEMF,
-            TAXEMM: emp03t.TAXEMM,
-            TAXSFT: emp03t.TAXSFT,
-            TAXSPM: emp03t.TAXSPM,
-            TAXPRG: emp03t.TAXPRG,
-            TAXDIS: emp03t.TAXDIS,
-            TAXINS: emp03t.TAXINS,
-            TAXINH: emp03t.TAXINH,
-            TAXINP: emp03t.TAXINP,
-            TAXRMF: emp03t.TAXRMF,
-            TAXANU: emp03t.TAXANU,
-            TAXINL: emp03t.TAXINL,
-            TAXLTF: emp03t.TAXLTF,
-            TAXEDU: emp03t.TAXEDU,
-            TAXDON: emp03t.TAXDON,
-            TAXOT1: emp03t.TAXOT1,
-            TAXOT2: emp03t.TAXOT2,
-        });
-    }
-
-    private parseAs400Date(val?: number | string | Date | null): Date | null {
-        if (!val) return null;
-        if (val instanceof Date) return Number.isNaN(val.getTime()) ? null : val;
-        const digits = String(val).replace(/\D/g, '');
-        if (digits.length === 8) {
-            const yyyy = Number(digits.slice(0, 4));
-            const mm = Number(digits.slice(4, 6)) - 1;
-            const dd = Number(digits.slice(6, 8));
-            const d = new Date(yyyy, mm, dd);
-            return Number.isNaN(d.getTime()) ? null : d;
-        }
-        const d = new Date(val);
-        return Number.isNaN(d.getTime()) ? null : d;
     }
 
     private async insertAs400Emptax(taxForm: GPLY01_TAX) {

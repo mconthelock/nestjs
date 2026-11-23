@@ -45,7 +45,7 @@ export class WireHarnessDrumStockRepository extends BaseRepository {
             {
                 ST_DRUMTYPE: 3,
                 ST_USERUPDATE: dto.empNo,
-                ST_DATEUPDATE: new Date(),
+                ST_DATEUPDATE: () => 'SYSDATE',
             },
         );
     }

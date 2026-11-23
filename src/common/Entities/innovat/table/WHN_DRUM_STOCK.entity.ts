@@ -34,7 +34,6 @@ export class WHN_DRUM_STOCK {
 
     @Column({
         insert: false,
-        nullable: true,
     })
     ST_DATEUPDATE: Date;
 

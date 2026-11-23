@@ -8,13 +8,13 @@ export class IDTAG_LOG {
     @PrimaryColumn()
     PROCESS: string;
 
-    @Column({ nullable: true })
+    @Column()
     PERIOD: string;
 
-    @Column({ nullable: true })
+    @Column()
     FINISH_DATE: number;
 
-    @Column({ nullable: true })
+    @Column()
     REMARK: string;
 
     @Column()
@@ -26,6 +26,9 @@ export class IDTAG_LOG {
     @Column()
     CREATE_DATE: Date;
 
-    @Column({ nullable: true })
+    @Column()
     UPDATE_DATE: Date;
+
+    @Column()
+    IP_ADDRESS: string;
 }

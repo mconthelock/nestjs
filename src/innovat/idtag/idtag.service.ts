@@ -9,7 +9,7 @@ export class IdtagService {
         private readonly repo: IdtagRepository,
     ) {}
 
-    async updateTag(dto: UpdateTagDto) {
+    async updateTag(dto: UpdateTagDto, ip: string) {
         try {
             const [{ HHMMSS, YYMMDD, HHMM, FINDATE }] = await this.repo.getCurrentDateTime();
             const findate = dto.findate || FINDATE;
@@ -25,6 +25,7 @@ export class IdtagService {
                 FINISH_DATE: finish,
                 REMARK: remark,
                 EMPNO: dto.empno,
+                IP_ADDRESS: ip,
             });
 
             await this.repo.updateTag(
@@ -49,7 +50,7 @@ export class IdtagService {
         }
     }
 
-    async cancelTag(dto: CancelTagDto) {
+    async cancelTag(dto: CancelTagDto, ip: string) {
         try {
             await this.repo.cancelTag(
                 dto.controlno,
@@ -60,6 +61,15 @@ export class IdtagService {
                 dto.controlno,
                 dto.process,
             );
+
+            await this.repo.createLog({
+                CONTROL: dto.controlno,
+                PROCESS: dto.process,
+                REMARK: 'CANCEL',
+                EMPNO: dto.empno,
+                STATUS: 1,
+                IP_ADDRESS: ip,
+            });
 
             return {
                 success: true,

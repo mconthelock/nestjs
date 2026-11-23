@@ -1,5 +1,4 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
-import { GPLY01_TAXAS400 } from './GPLY01_TAXAS400.entity';
 import { FORM } from './FORM.entity';
 
 @Entity({ name: 'GPLY01_TAX', schema: 'WEBFORM' })

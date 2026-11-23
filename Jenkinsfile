@@ -196,7 +196,7 @@ pipeline {
 
                                 \$startTimePm2 = Get-Date
                                 oxmgr apply oxfile.toml
-                                oxmgr reload api
+                                oxmgr restart api
                                 \$endTimePm2 = Get-Date
                                 \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds
                                 Write-Host '🎯 [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'

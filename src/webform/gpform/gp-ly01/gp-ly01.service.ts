@@ -52,24 +52,31 @@ export class GpLy01Service {
 
             return doAction;
         } catch (error) {
-            throw new Error(`Failed to approve GP-LY01: ${error.message}`);
+            const odbcDetail = Array.isArray(error?.odbcErrors)
+                ? error.odbcErrors
+                      .map((e: any) => `[${e.state}/${e.code}] ${e.message}`)
+                      .join(' | ')
+                : '';
+            throw new Error(
+                `Failed to approve GP-LY01: ${error.message}${odbcDetail ? ` (${odbcDetail})` : ''}`,
+            );
         }
     }
 
     private async insertAs400Emptax(taxForm: GPLY01_TAX) {
         await this.emptaxService.insert({
-            XAMCOD: (taxForm.EMPCOD ?? '').trim(),
+            XAMCOD: (taxForm.EMPCOD ?? '').trim().slice(0, 5),
             XAMRST: this.mapMaritalStatusCode(taxForm.MARSTE),
             XAMMRD: this.formatAs400Date(taxForm.FAMMRD),
-            XAMSNA: (taxForm.FAMSNA ?? '').trim(),
+            XAMSNA: (taxForm.FAMSNA ?? '').trim().slice(0, 40),
             XABNED: Number(taxForm.C1NED ?? 0) || 0,
             XAANED: Number(taxForm.C2NED ?? 0) || 0,
             XABIED: Number(taxForm.C1IED ?? 0) || 0,
             XAAIED: Number(taxForm.C2IED ?? 0) || 0,
-            XAXEMF: (taxForm.TAXEMF ?? '').trim(),
-            XAXEMM: (taxForm.TAXEMM ?? '').trim(),
-            XAXSFT: (taxForm.TAXSFT ?? '').trim(),
-            XAXSPM: (taxForm.TAXSPM ?? '').trim(),
+            XAXEMF: (taxForm.TAXEMF ?? '').replace(/[\s-]/g, '').slice(0, 13),
+            XAXEMM: (taxForm.TAXEMM ?? '').replace(/[\s-]/g, '').slice(0, 13),
+            XAXSFT: (taxForm.TAXSFT ?? '').replace(/[\s-]/g, '').slice(0, 13),
+            XAXSPM: (taxForm.TAXSPM ?? '').replace(/[\s-]/g, '').slice(0, 13),
             XAXINS: Number(taxForm.TAXINS ?? 0) || 0,
             XAXSIN: 0,
             XAXRMF: Number(taxForm.TAXRMF ?? 0) || 0,

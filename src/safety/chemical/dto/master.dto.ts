@@ -67,6 +67,11 @@ export class DisableByIdDto extends PickType(ConfirmRebuildSectionDto, [
 }
 
 export class CreateMasterDto {
+    @IsOptional()
+    @IsNumber()
+    @Type(() => Number)
+    AMEC_SDS_ID?: number;
+
     @IsNotEmpty()
     @IsDate()
     @Type(() => Date)

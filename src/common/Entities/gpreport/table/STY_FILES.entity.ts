@@ -51,7 +51,6 @@ export class STY_FILES {
 
     @AfterLoad()
     flattenType() {
-        console.log('Flattening type for STY_FILES:', this.TYPE);
         if (this.TYPE) {
             this.TYPE_CODE = this.TYPE.TYPE_CODE;
             this.TYPE_NAME = this.TYPE.TYPE_NAME;

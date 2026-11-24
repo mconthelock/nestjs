@@ -63,8 +63,6 @@ export class CreateService {
                 }
             }
 
-            // todo : edit กลายเป็น insert เฉยเลย
-
             const newData = await this.masterRepo.getMaster({
                 status: 1,
                 id: result.AMEC_SDS_ID,

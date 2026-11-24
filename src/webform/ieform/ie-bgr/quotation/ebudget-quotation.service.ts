@@ -32,7 +32,7 @@ export class QuotationService {
             const result = await raw.execute(
                 `
                 BEGIN
-                    EBG_QUOTATION(
+                    WEBFORM.EBG_QUOTATION(
                     :p_nfrmno,
                     :p_vorgno,
                     :p_cyear,

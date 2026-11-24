@@ -2,45 +2,45 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'PURPO_SYNC_OUTBOX', schema: 'WEBFORM' })
 export class PURPO_SYNC_OUTBOX {
-    @PrimaryColumn({ name: 'EVENT_ID', type: 'varchar', length: 64 })
-    EVENT_ID: string;
-
-    @Column({ name: 'NFRMNO', type: 'int' })
+    @Column()
     NFRMNO: number;
 
-    @Column({ name: 'VORGNO', type: 'varchar', length: 20 })
+    @Column()
     VORGNO: string;
 
-    @Column({ name: 'CYEAR', type: 'varchar', length: 4 })
+    @Column()
     CYEAR: string;
 
-    @Column({ name: 'CYEAR2', type: 'varchar', length: 4 })
+    @Column()
     CYEAR2: string;
 
-    @Column({ name: 'NRUNNO', type: 'int' })
+    @Column()
     NRUNNO: number;
 
-    @Column({ name: 'ORD_ID', type: 'int' })
+    @PrimaryColumn()
+    EVENT_ID: string;
+
+    @Column()
     ORD_ID: number;
 
-    @Column({ name: 'EVENT_TYPE', type: 'varchar', length: 30 })
+    @Column()
     EVENT_TYPE: string;
 
-    @Column({ name: 'PAYLOAD_JSON', type: 'text' })
+    @Column()
     PAYLOAD_JSON: string;
 
-    @Column({ name: 'STATUS', type: 'varchar', length: 20, default: 'PENDING' })
+    @Column()
     STATUS: string;
 
-    @Column({ name: 'RETRY_COUNT', type: 'int', default: 0 })
+    @Column()
     RETRY_COUNT: number;
 
-    @Column({ name: 'LAST_ERROR', type: 'varchar', length: 1000, nullable: true })
+    @Column()
     LAST_ERROR: string | null;
 
-    @Column({ name: 'CREATED_AT', type: 'datetime', nullable: true })
+    @Column()
     CREATED_AT: Date | null;
 
-    @Column({ name: 'SYNCED_AT', type: 'datetime', nullable: true })
+    @Column()
     SYNCED_AT: Date | null;
 }

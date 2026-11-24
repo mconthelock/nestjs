@@ -2,30 +2,30 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'VENDORS_CODE', schema: 'PURSYS', database: 'pursys' })
 export class VendorsCode {
-    @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
+    @PrimaryGeneratedColumn()
     CODE_ID: number;
 
-    @Column({ type: 'decimal', precision: 38, scale: 0 })
+    @Column()
     CODE_NUM: number;
 
-    @Column({ type: 'decimal', precision: 38, scale: 0, nullable: true })
+    @Column()
     VENDOR_ID: number;
 
-    @Column({ type: 'decimal', precision: 38, scale: 0, default: 1 })
+    @Column()
     CODE_STATUS: number;
 
-    @Column({ type: 'datetime', nullable: true })
+    @Column()
     CODE_REGDATE: Date;
 
-    @Column({ type: 'char', length: 3, nullable: true })
+    @Column()
     CODE_CURRENCY: string;
 
-    @Column({ type: 'decimal', precision: 38, scale: 0, nullable: true })
+    @Column()
     CODE_SHIP: number;
 
-    @Column({ type: 'varchar', length: 8, nullable: true })
+    @Column()
     CODE_PAY: string;
 
-    @Column({ type: 'decimal', precision: 38, scale: 0, nullable: true })
+    @Column()
     CODE_TYPE: number;
 }

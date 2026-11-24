@@ -19,4 +19,7 @@ export class ReportMaster {
 
     @Column()
     NSEQ: number;
+
+    @Column()
+    VDESC: string;
 }

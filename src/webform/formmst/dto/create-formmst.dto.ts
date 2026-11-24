@@ -59,4 +59,8 @@ export class CreateFormmstDto {
     @IsString()
     @IsOptional()
     VDEVELOPER?: string;
+
+    @IsString()
+    @IsOptional()
+    CCREATED?: string;
 }

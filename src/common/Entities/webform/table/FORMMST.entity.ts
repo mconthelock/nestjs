@@ -49,6 +49,9 @@ export class FORMMST {
     @Column()
     VDEVELOPER: string;
 
+    @Column()
+    CCREATED: string;
+
     @ManyToOne(() => FORMMST_GROUP)
     @JoinColumn([
         { name: 'VORGNO', referencedColumnName: 'VGROUPORG' },

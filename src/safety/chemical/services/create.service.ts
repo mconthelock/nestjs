@@ -17,6 +17,15 @@ export class CreateService {
     async main(dto: CreateMasterDto, files: Express.Multer.File[]) {
         const movedTargets: string[] = [];
         try {
+            // TODO: ลบไฟล์ที่ถูกระบุใน DELETE_FILES
+            if (dto.DELETE_FILES && dto.DELETE_FILES.length > 0) {
+                await this.styFilesService.disable(
+                    dto.DELETE_FILES,
+                    dto.USER_UPDATE,
+                );
+                await this.fileRepo.deleteByFileId(dto.DELETE_FILES);
+            }
+
             // todo: บันทึกข้อมูล
             const result = await this.masterRepo.create(dto);
             if (!result) {
@@ -53,6 +62,9 @@ export class CreateService {
                     });
                 }
             }
+
+            // todo : edit กลายเป็น insert เฉยเลย
+
             const newData = await this.masterRepo.getMaster({
                 status: 1,
                 id: result.AMEC_SDS_ID,

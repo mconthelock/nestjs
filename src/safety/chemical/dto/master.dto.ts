@@ -121,4 +121,9 @@ export class CreateMasterDto {
     @IsNumber()
     @Type(() => Number)
     STATUS?: number;
+
+    @IsOptional()
+    @IsNumber({}, { each: true })
+    @Type(() => Number)
+    DELETE_FILES?: number[];
 }

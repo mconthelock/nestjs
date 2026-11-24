@@ -9,6 +9,8 @@ import { MasterService } from './master.service';
 
 import { formatDate } from 'src/common/utils/dayjs.utils';
 import { ConfirmRebuildSectionDto } from '../dto/master.dto';
+import { StyFilesService } from 'src/gpreport/sty-files/sty-files.service';
+import { FileRepository } from '../repository/file.repository';
 
 @Injectable()
 export class RebuildService extends MasterService {
@@ -17,8 +19,17 @@ export class RebuildService extends MasterService {
         protected readonly masterRepo: MasterRepository,
         protected readonly revRepo: RevRepository,
         protected readonly sectionRepo: SectionRepository,
+        protected readonly fileRepo: FileRepository,
+        protected readonly styFilesService: StyFilesService,
     ) {
-        super(orgService, masterRepo, revRepo, sectionRepo);
+        super(
+            orgService,
+            masterRepo,
+            revRepo,
+            sectionRepo,
+            fileRepo,
+            styFilesService,
+        );
     }
 
     /**
@@ -145,6 +156,12 @@ export class RebuildService extends MasterService {
         try {
             await this.masterRepo.enable(dto.ID, dto.USER_UPDATE);
             for (const data of dto.SECTIONS) {
+                const files = await this.fileRepo.getByChemicalId(data.AMEC_SDS_ID);
+                if (files && files.length > 0) {
+                    for (const file of files) {
+                        await this.styFilesService.enable(file.FILE_ID, dto.USER_UPDATE);
+                    }
+                }
                 await this.sectionRepo.enable(
                     data.AMEC_SDS_ID,
                     data.OWNERCODE,

@@ -102,4 +102,34 @@ export class StyFilesService {
             throw new Error(error);
         }
     }
+
+    async disable(fileId: number | number[], userUpdate: string) {
+        try{
+            const res = await this.repo.disable(fileId, userUpdate);
+            if (res.affected === 0) {
+                throw new Error('No files were disabled');
+            }
+            return {
+                status: true,
+                message: 'Files disabled successfully',
+            }
+        }catch (error) {
+            throw new Error(error);
+        }
+    }
+
+    async enable(fileId: number | number[], userUpdate: string) {
+        try {
+            const res = await this.repo.enable(fileId, userUpdate);
+            if (res.affected === 0) {
+                throw new Error('No files were enabled');
+            }
+            return {
+                status: true,
+                message: 'Files enabled successfully',
+            }
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
 }

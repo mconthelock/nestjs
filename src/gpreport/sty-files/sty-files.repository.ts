@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { CreateStyFilesDto } from './dto/create.dto';
 import { STY_FILES } from 'src/common/Entities/gpreport/table/STY_FILES.entity';
@@ -20,5 +20,31 @@ export class StyFilesRepository extends BaseRepository {
             return this.getRepository(STY_FILES).save(data);
         }
         return this.getRepository(STY_FILES).save(data);
+    }
+
+    disable(fileId: number | number[], userUpdate: string) {
+        if (Array.isArray(fileId)) {
+            return this.getRepository(STY_FILES).update(
+                { FILE_ID: In(fileId) },
+                { STATUS: 0, FILE_USERUPDATE: userUpdate },
+            );
+        }
+        return this.getRepository(STY_FILES).update(
+            { FILE_ID: fileId },
+            { STATUS: 0, FILE_USERUPDATE: userUpdate },
+        );
+    }
+
+    enable(fileId: number | number[], userUpdate: string) {
+        if (Array.isArray(fileId)) {
+            return this.getRepository(STY_FILES).update(
+                { FILE_ID: In(fileId) },
+                { STATUS: 1, FILE_USERUPDATE: userUpdate },
+            );
+        }
+        return this.getRepository(STY_FILES).update(
+            { FILE_ID: fileId },
+            { STATUS: 1, FILE_USERUPDATE: userUpdate },
+        );
     }
 }

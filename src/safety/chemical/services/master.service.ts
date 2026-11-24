@@ -6,6 +6,8 @@ import { RevRepository } from '../repository/rev.repository';
 import { SectionRepository } from '../repository/section.repository';
 
 import { OrganizationsService } from 'src/webform/organizations/organizations.service';
+import { FileRepository } from '../repository/file.repository';
+import { StyFilesService } from 'src/gpreport/sty-files/sty-files.service';
 
 @Injectable()
 export class MasterService {
@@ -14,6 +16,8 @@ export class MasterService {
         protected readonly masterRepo: MasterRepository,
         protected readonly revRepo: RevRepository,
         protected readonly sectionRepo: SectionRepository,
+        protected readonly fileRepo: FileRepository,
+        protected readonly styFilesService: StyFilesService,
     ) {}
 
     /**
@@ -116,6 +120,12 @@ export class MasterService {
         try {
             await this.masterRepo.disable(id, userUpdate);
             await this.sectionRepo.disableById(id, userUpdate);
+            const files = await this.fileRepo.getByChemicalId(id);
+            if (files && files.length > 0) {
+                for(const file of files) {
+                    await this.styFilesService.disable(file.FILE_ID, userUpdate);
+                }
+            }
             return {
                 status: true,
                 message: 'Disable successfully',

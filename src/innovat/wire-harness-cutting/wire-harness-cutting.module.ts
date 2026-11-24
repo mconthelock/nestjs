@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WireHarnessCuttingController } from './wire-harness-cutting.controller';
 import { WireHarnessCuttingService } from './wire-harness-cutting.service';
 import { WireHarnessCuttingRepository } from './wire-harness-cutting.repository';
+import { WHN_GROUP_IP } from 'src/common/Entities/innovat/table/WHN_GROUP_IP.entity';
 import { WHN_PRODUCTION_PLAN } from 'src/common/Entities/innovat/table/WHN_PRODUCTION_PLAN.entity';
 import { WHN_GROUP } from 'src/common/Entities/innovat/table/WHN_GROUP.entity';
 import { WHN_DRUM_STOCK } from 'src/common/Entities/innovat/table/WHN_DRUM_STOCK.entity';
@@ -13,6 +14,7 @@ import { WHN_AUTOPLAN } from 'src/common/Entities/innovat/views/WHN_AUTOPLAN.ent
 @Module({
     imports: [
         TypeOrmModule.forFeature([
+            WHN_GROUP_IP,
             WHN_PRODUCTION_PLAN,
             WHN_GROUP,
             WHN_DRUM_STOCK,

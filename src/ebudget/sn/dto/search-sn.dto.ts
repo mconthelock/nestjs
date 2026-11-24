@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { FormDto } from 'src/webform/form/dto/form.dto';
 
 export class SearchEbudgetSnDto {
     @IsNotEmpty()
@@ -11,4 +12,9 @@ export class SearchEbudgetSnDto {
     @IsString()
     @Type(() => String)
     VORGCODE?: string;
+
+    @IsOptional()
+    @Type(() => FormDto)
+    @ValidateNested()
+    FORM?: FormDto;
 }

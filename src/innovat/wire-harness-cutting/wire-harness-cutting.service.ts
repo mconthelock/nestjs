@@ -15,8 +15,8 @@ export class WireHarnessCuttingService {
         return error.message.match(/ORA-20\d{3}:\s*(.*)/)?.[1] || error.message;
     }
 
-    async processGroup() {
-        return this.repo.getGroup();
+    async processGroup(ip: string) {
+        return this.repo.getGroup(ip);
     }
 
     async production() {

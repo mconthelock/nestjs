@@ -13,4 +13,7 @@ export class WHN_GROUP {
 
     @Column()
     GRP_PRIORITY: number;
+
+    @Column()
+    GRP_STATUS: number;
 }

@@ -3,6 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { BaseRepository } from 'src/common/repositories/base-repository';
 import { OracleRepository } from 'src/common/repositories/oracle-repository';
+import { WHN_GROUP_IP } from 'src/common/Entities/innovat/table/WHN_GROUP_IP.entity';
 import { WHN_PRODUCTION_PLAN } from 'src/common/Entities/innovat/table/WHN_PRODUCTION_PLAN.entity';
 import { WHN_GROUP } from 'src/common/Entities/innovat/table/WHN_GROUP.entity';
 import { WHN_DRUM_STOCK } from 'src/common/Entities/innovat/table/WHN_DRUM_STOCK.entity';
@@ -30,8 +31,29 @@ export class WireHarnessCuttingRepository extends BaseRepository {
         return this.getRepository(WHN_PRODUCTION_PLAN).save(data);
     }
 
-    getGroup() {
+    async getGroup(ip: string) {
+        const groupIp = await this.getRepository(WHN_GROUP_IP).find({
+            where: {
+                GIP_IP: ip,
+            },
+        });
+
+        if (!groupIp.length) {
+            return this.getRepository(WHN_GROUP).find({
+                where: {
+                    GRP_STATUS: 1,
+                },
+                order: {
+                    GRP_PRIORITY: 'ASC',
+                },
+            });
+        }
+
         return this.getRepository(WHN_GROUP).find({
+            where: groupIp.map(row => ({
+                GRP_ID: row.GRP_ID,
+                GRP_STATUS: 1,
+            })),
             order: {
                 GRP_PRIORITY: 'ASC',
             },

@@ -1,4 +1,4 @@
-import { Controller, HttpCode, HttpStatus, Body, Get, Post } from '@nestjs/common';
+import { Controller, HttpCode, HttpStatus, Body, Get, Post, Ip } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FiltersDto } from 'src/common/dto/filter.dto';
 import { WireHarnessCuttingService } from './wire-harness-cutting.service';
@@ -17,8 +17,8 @@ export class WireHarnessCuttingController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Get process group list' })
     @ApiResponse({ status: 200, description: 'Process group list' })
-    async processGroup() {
-        return this.service.processGroup();
+    async processGroup(@Ip() ip: string) {
+        return this.service.processGroup(ip);
     }
 
     @Post('reason')

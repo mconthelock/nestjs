@@ -5,9 +5,9 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
     schema: 'INNOVAT',
 })
 export class WHN_PROCESS {
-    @PrimaryColumn()
-    PRC_CODE: string;
-
     @Column()
     GRP_ID: string;
+
+    @PrimaryColumn()
+    PRC_CODE: string;
 }

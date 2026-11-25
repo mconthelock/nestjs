@@ -1,9 +1,4 @@
-import {
-    BadRequestException,
-    Injectable,
-    Logger,
-    NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import * as crypto from 'crypto';
@@ -45,8 +40,7 @@ export class PurPoService {
     }
 
     private buildFormUrl(baseUrl: string | null, k: PurPoFormKeyDto): string {
-        const page =
-            baseUrl || 'http://localhost/form/purform/PUR-PO/form/main';
+        const page = baseUrl || 'http://localhost/form/purform/PUR-PO/form/main';
         const sep = page.includes('?') ? '&' : '?';
         return `${page}${sep}no=${k.NFRMNO}&orgNo=${k.VORGNO}&y=${k.CYEAR}&y2=${k.CYEAR2}&runNo=${k.NRUNNO}`;
     }
@@ -56,9 +50,7 @@ export class PurPoService {
             where: { VANAME: 'PUR-PO', CSTATUS: '1' },
         });
         if (!mst) {
-            throw new NotFoundException(
-                "Form master 'PUR-PO' not found in WEBFORM.FORMMST",
-            );
+            throw new NotFoundException("Form master 'PUR-PO' not found in WEBFORM.FORMMST");
         }
         return mst;
     }
@@ -178,9 +170,7 @@ export class PurPoService {
     async getFormDetail(key: PurPoFormKeyDto) {
         const purpo = await this.purpoRepo.findOne({ where: key });
         if (!purpo) {
-            throw new NotFoundException(
-                `PUR-PO form ${this.formatFormKey(key)} not found`,
-            );
+            throw new NotFoundException(`PUR-PO form ${this.formatFormKey(key)} not found`);
         }
 
         const [form, flows] = await Promise.all([
@@ -273,9 +263,7 @@ export class PurPoService {
 
         const purpo = await this.purpoRepo.findOne({ where: key });
         if (!purpo) {
-            throw new NotFoundException(
-                `PUR-PO form ${this.formatFormKey(key)} not found`,
-            );
+            throw new NotFoundException(`PUR-PO form ${this.formatFormKey(key)} not found`);
         }
 
         const form = await this.formRepo.findOne({ where: key });
@@ -301,8 +289,7 @@ export class PurPoService {
             });
             const flows = await this.flowRepo.find({ where: key });
             const startFlow =
-                flows.find((f) => f.CSTEPST === '2') ||
-                flows.find((f) => f.CSTART === '1');
+                flows.find((f) => f.CSTEPST === '2') || flows.find((f) => f.CSTART === '1');
             if (startFlow) {
                 await this.flowRepo.update(
                     { ...key, CSTEPNO: startFlow.CSTEPNO },
@@ -562,24 +549,18 @@ export class PurPoService {
             return { synced: true, eventId };
         }
 
-        const scmApiUrl = (
-            process.env.SCM_API_URL || 'http://localhost:3002'
-        ).replace(/\/$/, '');
-        const internalKey =
-            process.env.INTERNAL_API_KEY || 'amec-scm-internal-dev-key';
+        const scmApiUrl = (process.env.SCM_API_URL || 'http://localhost:3002').replace(/\/$/, '');
+        const internalKey = process.env.INTERNAL_API_KEY || 'amec-scm-internal-dev-key';
 
         try {
-            const res = await fetch(
-                `${scmApiUrl}/api/v1/internal/orders/approval-callback`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-internal-api-key': internalKey,
-                    },
-                    body: record.PAYLOAD_JSON,
+            const res = await fetch(`${scmApiUrl}/api/v1/internal/orders/approval-callback`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-internal-api-key': internalKey,
                 },
-            );
+                body: record.PAYLOAD_JSON,
+            });
 
             if (!res.ok) {
                 const errText = await res.text();
@@ -613,8 +594,7 @@ export class PurPoService {
             take: limit,
         });
 
-        const results: Array<{ eventId: string; synced: boolean; error?: string }> =
-            [];
+        const results: Array<{ eventId: string; synced: boolean; error?: string }> = [];
         for (const item of pending) {
             const res = await this.dispatchOutboxEvent(item.EVENT_ID);
             results.push({

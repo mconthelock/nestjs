@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { IdtagModule } from './idtag/idtag.module';
+import { IdtagJobModule } from './idtag-job/idtag-job.module';
 import { WireHarnessJobModule } from './wire-harness-job/wire-harness-job.module';
 import { WireHarnessCuttingModule } from './wire-harness-cutting/wire-harness-cutting.module';
 import { WireHarnessDrumMasterModule } from './wire-harness-drum-master/wire-harness-drum-master.module';
@@ -9,6 +10,7 @@ import { WireHarnessCalculateUsageModule } from './wire-harness-calculate-usage/
 @Module({
     imports: [
         IdtagModule,
+        IdtagJobModule,
         WireHarnessJobModule,
         WireHarnessCuttingModule,
         WireHarnessDrumMasterModule,

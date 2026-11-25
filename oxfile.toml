@@ -1,0 +1,15 @@
+[[apps]]
+name = "api"
+command = "node --inspect ./dist/src/main.js"
+cwd = "D:/wwwroot/api"
+restart_policy = "always"
+kill_timeout = 5000
+max_memory_restart = "1G"
+stdout = "./logs/oxmgr-out.log"
+stderr = "./logs/oxmgr-err.log"
+
+# Health Check
+
+[apps.env]
+NODE_ENV = "production"
+NEST_DEBUG = "true"

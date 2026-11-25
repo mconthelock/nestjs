@@ -1,9 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
-import { Repository, Between, DataSource } from 'typeorm';
+import { Repository, Between, DataSource, EntityManager, In } from 'typeorm';
 import { Ameccalendar } from './entities/ameccalendar.entity';
+import { AmeccalendarActivity } from 'src/common/Entities/datacenter/table/AMECCALENDAR_ACTIVITY.entity';
 import { AmeccalendarRepository } from './ameccalendar.repository';
 import { GetProdDto } from './dto/GetProd.dto';
+import { UpdateCalendarDayDto } from './dto/update-calendar-day.dto';
+import { BulkUpdateCalendarDto } from './dto/bulk-update-calendar.dto';
+import { CreateCalendarActivityDto } from './dto/create-calendar-activity.dto';
+import { UpdateCalendarActivityDto } from './dto/update-calendar-activity.dto';
 
 export interface AmecCalendar {
     WORKID: number; // Format: YYYYMMDD (e.g., 20260401)
@@ -46,6 +51,8 @@ export class AmeccalendarService {
     constructor(
         @InjectRepository(Ameccalendar, 'datacenterConnection')
         private readonly calendar: Repository<Ameccalendar>,
+        @InjectRepository(AmeccalendarActivity, 'datacenterConnection')
+        private readonly activityRepo: Repository<AmeccalendarActivity>,
         private readonly repo: AmeccalendarRepository,
 
         @InjectDataSource('datacenterConnection')
@@ -598,5 +605,340 @@ export class AmeccalendarService {
         }
 
         return yearlySchedule;
+    }
+
+    /*****************************************************
+     * Calendar Admin & Company Activities
+     *****************************************************/
+    private validateWorkId(workId: number): {
+        year: number;
+        month: number;
+        day: number;
+        fyear: number;
+        workNum: number;
+    } {
+        if (!Number.isInteger(workId) || workId < 19000101 || workId > 29991231) {
+            throw new BadRequestException(`Invalid WORKID format (expected YYYYMMDD): ${workId}`);
+        }
+        const year = Math.floor(workId / 10000);
+        const month = Math.floor((workId % 10000) / 100);
+        const day = workId % 100;
+        const date = new Date(year, month - 1, day);
+        if (
+            date.getFullYear() !== year ||
+            date.getMonth() !== month - 1 ||
+            date.getDate() !== day
+        ) {
+            throw new BadRequestException(`Invalid calendar date for WORKID: ${workId}`);
+        }
+        const dow = date.getDay(); // 0=Sun..6=Sat
+        return {
+            year,
+            month,
+            day,
+            fyear: month >= 4 ? year : year - 1,
+            workNum: dow === 0 ? 7 : dow,
+        };
+    }
+
+    private formatActivityResponse(row: AmeccalendarActivity) {
+        return {
+            ...row,
+            TYPE: row.CATEGORY,
+        };
+    }
+
+    private async upsertCalendarDayWithManager(
+        manager: EntityManager,
+        workId: number,
+        params: {
+            dayOff: number;
+            workHour: number;
+            workHourOt: number;
+            dayType: 'WORKDAY' | 'HOLIDAY' | 'WORKING_SATURDAY' | 'WEEKEND';
+            title?: string;
+            description?: string;
+            updateBy?: string;
+        },
+    ) {
+        const meta = this.validateWorkId(workId);
+        const now = new Date();
+        const updateBy = params.updateBy?.trim() || null;
+
+        const existingDay = await manager.findOne(Ameccalendar, {
+            where: { WORKID: workId },
+        });
+
+        if (existingDay) {
+            await manager.update(
+                Ameccalendar,
+                { WORKID: workId },
+                {
+                    DAYOFF: params.dayOff,
+                    WORKHOUR: params.workHour,
+                    WORKHOUROT: params.workHourOt,
+                },
+            );
+        } else {
+            const newDay = manager.create(Ameccalendar, {
+                WORKID: workId,
+                FYEAR: meta.fyear,
+                WORKYEAR: meta.year,
+                WORKMONTH: meta.month,
+                WORKDAY: meta.day,
+                WORKNUM: meta.workNum,
+                DAYOFF: params.dayOff,
+                WORKHOUR: params.workHour,
+                WORKHOUROT: params.workHourOt,
+            });
+            await manager.save(Ameccalendar, newDay);
+        }
+
+        const existingMeta = await manager.findOne(AmeccalendarActivity, {
+            where: {
+                WORKID: workId,
+                CATEGORY: In(['HOLIDAY', 'WORKING_SATURDAY']),
+            },
+        });
+
+        if (params.dayType === 'HOLIDAY' || params.dayType === 'WORKING_SATURDAY') {
+            const title =
+                params.title?.trim() ||
+                (params.dayType === 'WORKING_SATURDAY' ? 'วันเสาร์ทำงาน' : '');
+            const description = params.description?.trim() || null;
+
+            if (existingMeta) {
+                await manager.update(
+                    AmeccalendarActivity,
+                    { ID: existingMeta.ID },
+                    {
+                        CATEGORY: params.dayType,
+                        TITLE: title,
+                        DESCRIPTION: description,
+                        UPDATE_BY: updateBy,
+                        UPDATE_DATE: now,
+                    },
+                );
+            } else {
+                const newMeta = manager.create(AmeccalendarActivity, {
+                    WORKID: workId,
+                    WORKYEAR: meta.year,
+                    CATEGORY: params.dayType,
+                    TITLE: title,
+                    DESCRIPTION: description,
+                    CREATE_BY: updateBy,
+                    CREATE_DATE: now,
+                    UPDATE_BY: updateBy,
+                    UPDATE_DATE: now,
+                });
+                await manager.save(AmeccalendarActivity, newMeta);
+            }
+        } else if (existingMeta) {
+            await manager.delete(AmeccalendarActivity, { ID: existingMeta.ID });
+        }
+    }
+
+    async getActivitiesByYear(year: number) {
+        if (!Number.isInteger(year) || year < 1900 || year > 2999) {
+            throw new BadRequestException(`Invalid year: ${year}`);
+        }
+
+        const rows = await this.activityRepo.find({
+            where: { WORKYEAR: year },
+            order: { WORKID: 'ASC', ID: 'ASC' },
+        });
+
+        return rows.map((row) => this.formatActivityResponse(row));
+    }
+
+    async updateCalendarDay(workId: number, dto: UpdateCalendarDayDto) {
+        this.validateWorkId(workId);
+
+        const trimmedTitle = dto.TITLE?.trim() || '';
+        if (dto.DAY_TYPE === 'HOLIDAY' && !trimmedTitle) {
+            throw new BadRequestException('TITLE is required when DAY_TYPE is HOLIDAY');
+        }
+
+        await this.dataSource.transaction(async (manager) => {
+            await this.upsertCalendarDayWithManager(manager, workId, {
+                dayOff: dto.DAYOFF,
+                workHour: dto.WORKHOUR,
+                workHourOt: dto.WORKHOUROT,
+                dayType: dto.DAY_TYPE,
+                title: trimmedTitle,
+                description: dto.DESCRIPTION,
+                updateBy: dto.UPDATE_BY,
+            });
+        });
+
+        return {
+            status: true,
+            message: 'Updated calendar day successfully',
+            data: {
+                WORKID: workId,
+                DAYOFF: dto.DAYOFF,
+                WORKHOUR: dto.WORKHOUR,
+                WORKHOUROT: dto.WORKHOUROT,
+                DAY_TYPE: dto.DAY_TYPE,
+                TITLE:
+                    dto.DAY_TYPE === 'HOLIDAY' || dto.DAY_TYPE === 'WORKING_SATURDAY'
+                        ? trimmedTitle
+                        : '',
+                DESCRIPTION:
+                    dto.DAY_TYPE === 'HOLIDAY' || dto.DAY_TYPE === 'WORKING_SATURDAY'
+                        ? dto.DESCRIPTION?.trim() || ''
+                        : '',
+            },
+        };
+    }
+
+    async bulkUpdateCalendar(dto: BulkUpdateCalendarDto) {
+        const uniqueWorkIds = Array.from(new Set(dto.WORKIDS));
+        for (const workId of uniqueWorkIds) {
+            this.validateWorkId(workId);
+        }
+
+        const trimmedTitle = dto.TITLE?.trim() || '';
+        if ((dto.DAY_TYPE === 'HOLIDAY' || dto.DAY_TYPE === 'EVENT') && !trimmedTitle) {
+            throw new BadRequestException(
+                `TITLE is required when DAY_TYPE is ${dto.DAY_TYPE}`,
+            );
+        }
+
+        const now = new Date();
+        const updateBy = dto.UPDATE_BY?.trim() || null;
+        const description = dto.DESCRIPTION?.trim() || null;
+
+        await this.dataSource.transaction(async (manager) => {
+            if (dto.DAY_TYPE === 'EVENT') {
+                const entities = uniqueWorkIds.map((workId) =>
+                    manager.create(AmeccalendarActivity, {
+                        WORKID: workId,
+                        WORKYEAR: Math.floor(workId / 10000),
+                        CATEGORY: 'EVENT',
+                        TITLE: trimmedTitle,
+                        DESCRIPTION: description,
+                        CREATE_BY: updateBy,
+                        CREATE_DATE: now,
+                        UPDATE_BY: updateBy,
+                        UPDATE_DATE: now,
+                    }),
+                );
+                await manager.save(AmeccalendarActivity, entities);
+                return;
+            }
+
+            const isOff = dto.DAY_TYPE === 'HOLIDAY';
+            const dayOff = dto.DAYOFF ?? (isOff ? 1 : 0);
+            const workHour = dto.WORKHOUR ?? (isOff ? 0 : 8);
+            const workHourOt = dto.WORKHOUROT ?? (isOff ? 8 : 2);
+
+            for (const workId of uniqueWorkIds) {
+                await this.upsertCalendarDayWithManager(manager, workId, {
+                    dayOff,
+                    workHour,
+                    workHourOt,
+                    dayType: dto.DAY_TYPE,
+                    title: trimmedTitle,
+                    description: dto.DESCRIPTION,
+                    updateBy: dto.UPDATE_BY,
+                });
+            }
+        });
+
+        return {
+            status: true,
+            message: `Bulk updated ${uniqueWorkIds.length} day(s) successfully`,
+            affectedCount: uniqueWorkIds.length,
+        };
+    }
+
+    async createActivity(dto: CreateCalendarActivityDto) {
+        const meta = this.validateWorkId(dto.WORKID);
+        const title = dto.TITLE?.trim();
+        if (!title) {
+            throw new BadRequestException('TITLE is required');
+        }
+
+        const category = (dto.CATEGORY || dto.TYPE || 'EVENT').toUpperCase();
+        const now = new Date();
+        const updateBy = dto.UPDATE_BY?.trim() || null;
+
+        const entity = this.activityRepo.create({
+            WORKID: dto.WORKID,
+            WORKYEAR: meta.year,
+            CATEGORY: category,
+            TITLE: title,
+            DESCRIPTION: dto.DESCRIPTION?.trim() || null,
+            CREATE_BY: updateBy,
+            CREATE_DATE: now,
+            UPDATE_BY: updateBy,
+            UPDATE_DATE: now,
+        });
+
+        const saved = await this.activityRepo.save(entity);
+        const formatted = this.formatActivityResponse(saved);
+
+        return {
+            status: true,
+            message: 'Created activity successfully',
+            ID: saved.ID,
+            data: formatted,
+        };
+    }
+
+    async updateActivity(id: number, dto: UpdateCalendarActivityDto) {
+        const existing = await this.activityRepo.findOne({ where: { ID: id } });
+        if (!existing) {
+            throw new NotFoundException(`Activity ID ${id} not found`);
+        }
+
+        if (dto.WORKID !== undefined) {
+            const meta = this.validateWorkId(dto.WORKID);
+            existing.WORKID = dto.WORKID;
+            existing.WORKYEAR = meta.year;
+        }
+
+        if (dto.CATEGORY || dto.TYPE) {
+            existing.CATEGORY = (dto.CATEGORY || dto.TYPE).toUpperCase();
+        }
+
+        if (dto.TITLE !== undefined) {
+            const title = dto.TITLE.trim();
+            if (!title) {
+                throw new BadRequestException('TITLE cannot be empty');
+            }
+            existing.TITLE = title;
+        }
+
+        if (dto.DESCRIPTION !== undefined) {
+            existing.DESCRIPTION = dto.DESCRIPTION.trim() || null;
+        }
+
+        existing.UPDATE_BY = dto.UPDATE_BY?.trim() || existing.UPDATE_BY;
+        existing.UPDATE_DATE = new Date();
+
+        const updated = await this.activityRepo.save(existing);
+
+        return {
+            status: true,
+            message: 'Updated activity successfully',
+            data: this.formatActivityResponse(updated),
+        };
+    }
+
+    async deleteActivity(id: number) {
+        const existing = await this.activityRepo.findOne({ where: { ID: id } });
+        if (!existing) {
+            throw new NotFoundException(`Activity ID ${id} not found`);
+        }
+
+        await this.activityRepo.delete({ ID: id });
+
+        return {
+            status: true,
+            message: 'Deleted activity successfully',
+            deletedId: id,
+        };
     }
 }

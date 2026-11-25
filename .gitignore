@@ -9,6 +9,7 @@
 /tmp
 /test
 /src/workload/piline/PILINE.md
+/.postman
 # Logs
 logs
 *.log

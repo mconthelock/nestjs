@@ -5,6 +5,7 @@ import {
     Patch,
     Post,
     UploadedFiles,
+    Param,
     UseInterceptors,
 } from '@nestjs/common';
 import { MasterService } from '../services/master.service';
@@ -27,6 +28,14 @@ export class MasterController {
         private readonly rebuildService: RebuildService,
         private readonly createService: CreateService,
     ) {}
+
+    /**
+     * @description Get mail manager by chemical ID (เอาไว้ตรวจสอบเองเฉย ๆ)
+     */
+    @Get('mail-manager/:id')
+    getMailManager(@Param('id') id: number) {
+        return this.service.getMailManagerbyId(id);
+    }
 
     @Get('active')
     getActive() {

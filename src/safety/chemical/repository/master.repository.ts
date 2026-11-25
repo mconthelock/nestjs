@@ -163,6 +163,12 @@ export class MasterRepository extends BaseRepository {
         return query.getOne();
     }
 
+    getById(id: number) {
+        return this.getRepository(STY_CHEMICAL).findOneBy({
+            AMEC_SDS_ID: id,
+        });
+    }
+
     enable(id: number | number[], userUpdate: string) {
         return this.getRepository(STY_CHEMICAL).update(
             Array.isArray(id) ? { AMEC_SDS_ID: In(id) } : { AMEC_SDS_ID: id },

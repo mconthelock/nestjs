@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { OwnOrgDto } from '../dto/master.dto';
 
 import { MasterRepository } from '../repository/master.repository';
@@ -129,6 +129,28 @@ export class MasterService {
             return {
                 status: true,
                 message: 'Disable successfully',
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * @author Sutthipong tangmongkhoncharoen(24008)
+     * @since 2026-11-25
+     * @description ดึงรายชื่อผู้จัดการที่รับอีเมลของสารเคมีตาม ID
+     * @param id รหัสสารเคมี
+     * @returns รายชื่อผู้จัดการที่รับอีเมลของสารเคมี
+     */
+    async getMailManagerbyId(id: number) {
+        try {
+            const res = await this.sectionRepo.getMailManagerbyId(id);
+            if(!res || res.length === 0) {
+                throw new NotFoundException(`Mail manager not found form id ${id}`);
+            }
+            return {
+                status: true,
+                data: res,
             };
         } catch (error) {
             throw error;

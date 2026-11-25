@@ -1,0 +1,83 @@
+<mjml>
+    <mj-head>
+        <mj-title>แจ้งการอัพเดทข้อมูลสารเคมี</mj-title>
+        <mj-preview>มีการอัพเดทข้อมูลสารเคมีในระบบ</mj-preview>
+        <mj-attributes>
+            <mj-all font-family="Tahoma, Arial, sans-serif" />
+            <mj-text font-size="16px" line-height="1.6" color="#334155" />
+        </mj-attributes>
+    </mj-head>
+
+    <mj-body background-color="#f1f5f9" width="600px">
+        <mj-section background-color="#e38300" padding="20px">
+            <mj-column>
+                <mj-text color="#ffffff" font-size="20px" font-weight="bold" padding="0">
+                    ระบบจัดการข้อมูลสารเคมี
+                </mj-text>
+                <mj-text color="#ffffff" font-size="14px" padding="4px 0 0">
+                    แจ้งการอัพเดทข้อมูลสารเคมี
+                </mj-text>
+            </mj-column>
+        </mj-section>
+
+        <mj-section padding="0 16px">
+            <mj-column background-color="#ffffff" padding="24px" border-radius="8px">
+                <mj-text padding="0 0 12px">
+                    เรียน แผนกผู้ใช้งานและจัดเก็บสารเคมี
+                </mj-text>
+                <mj-text padding="0 0 16px">
+                    ระบบจัดการข้อมูลสารเคมีขอแจ้งให้ทราบว่า มีการอัพเดทข้อมูลสารเคมีในระบบ
+                    โดยมีรายละเอียดดังนี้
+                </mj-text>
+
+                <mj-table width="100%" table-layout="fixed">
+                    <tr style="background-color:#f1f5f9;">
+                        <th align="left" width="38%" style="padding:10px 12px; color:#334155;">รายการ</th>
+                        <th align="left" style="padding:10px 12px; color:#334155;">รายละเอียด</th>
+                    </tr>
+                    <tr style="border-bottom:1px solid #e2e8f0;">
+                        <td style="padding:10px 12px; vertical-align:top;">AMEC SDS ID</td>
+                        <td style="padding:10px 12px; vertical-align:top;">{{id}}</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #e2e8f0;">
+                        <td style="padding:10px 12px; vertical-align:top;">Product Code / Item No.</td>
+                        <td style="padding:10px 12px; vertical-align:top;">{{itemCode}}</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #e2e8f0;">
+                        <td style="padding:10px 12px; vertical-align:top;">Chemical Name</td>
+                        <td style="padding:10px 12px; vertical-align:top;">{{chemicalName}}</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #e2e8f0;">
+                        <td style="padding:10px 12px; vertical-align:top;">รายละเอียดที่เปลี่ยนแปลง</td>
+                        <td style="padding:10px 12px; vertical-align:top; white-space:pre-wrap;">{{detail}}</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #e2e8f0;">
+                        <td style="padding:10px 12px; vertical-align:top;">ผู้ดำเนินการ</td>
+                        <td style="padding:10px 12px; vertical-align:top;">{{operator}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px 12px; vertical-align:top;">วันและเวลาที่แก้ไข</td>
+                        <td style="padding:10px 12px; vertical-align:top;">{{dateUpdate}}</td>
+                    </tr>
+                </mj-table>
+
+                <mj-text padding="20px 0 8px">
+                    กรุณา Print Out และอัพเดทเอกสาร SDS ฉบับใหม่ เพื่อนำไปติดอัพเดทที่หน้างาน ณ จุดจัดเก็บ
+                    หรือจัดเตรียม SDS ฉบับย่อ ณ จุดใช้งาน
+                </mj-text>
+                <mj-text padding="8px 0">
+                    ดูข้อมูลฉบับเต็มได้ที่: <a href="https://amecweb.mitsubishielevatorasia.co.th/safety/chemical/chemicalList/section">คลิก</a>
+                </mj-text>
+
+            </mj-column>
+        </mj-section>
+
+        <mj-section padding="0 16px 16px">
+            <mj-column>
+                <mj-text align="center" font-size="12px" color="#64748b">
+                    Email ฉบับนี้เป็นการแจ้งเตือนอัตโนมัติจากระบบ กรุณาอย่าตอบกลับ
+                </mj-text>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>

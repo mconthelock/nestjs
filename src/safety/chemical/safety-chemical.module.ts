@@ -28,6 +28,7 @@ import { STY_CHM_SEC } from 'src/common/Entities/gpreport/views/STY_CHM_SEC.enti
 import { STY_CHEMICAL_SECTION } from 'src/common/Entities/gpreport/table/STY_CHEMICAL_SECTION.entity';
 import { FileRepository } from './repository/file.repository';
 import { MailModule } from 'src/common/services/mail/mail.module';
+import { AmecUserAllModule } from 'src/amec/amecuserall/amecuserall.module';
 
 @Module({
     imports: [
@@ -46,6 +47,7 @@ import { MailModule } from 'src/common/services/mail/mail.module';
         OrganizationsModule,
         StyFilesModule,
         MailModule,
+        AmecUserAllModule,
     ],
     controllers: [FollowController, MasterController, RevController],
     providers: [

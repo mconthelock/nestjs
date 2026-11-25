@@ -4,6 +4,8 @@ import { DataSource } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { STY_CHM_SEC } from 'src/common/Entities/gpreport/views/STY_CHM_SEC.entity';
 import { STY_CHEMICAL_SECTION } from 'src/common/Entities/gpreport/table/STY_CHEMICAL_SECTION.entity';
+import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
+import { User as WebformUser } from 'src/common/Entities/webform/views/AMECUSERALL.entity';
 import { SectionSubscriber } from '../subscriber/section.subscriber';
 
 @Injectable()
@@ -59,5 +61,29 @@ export class SectionRepository extends BaseRepository {
             { AMEC_SDS_ID: id },
             { STATUS: 0, USER_UPDATE: userUpdate },
         );
+    }
+
+    getMailManagerbyId(id: number) {
+        // SELECT C.OWNER, c.OWNERCODE , C.AMEC_SDS_ID, O.VPOSNO, O.VEMPNO, A.SNAME, A.SRECMAIL
+        // FROM STY_CHEMICAL_SECTION C
+        // JOIN WEBFORM.ORGPOS O ON C.OWNERCODE = O.VORGNO AND VPOSNO IN ('30','20')
+        // JOIN WEBFORM.AMECUSERALL A ON O.VEMPNO = A.SEMPNO
+        // WHERE C.AMEC_SDS_ID = 6
+        return this.getRepository(STY_CHEMICAL_SECTION).createQueryBuilder('S')
+            .innerJoin(ORGPOS, 'O', 'S.OWNERCODE = O.VORGNO AND O.VPOSNO IN (:...posNos)', {
+                posNos: ['30', '20'],
+            })
+            .innerJoin(WebformUser, 'A', 'O.VEMPNO = A.SEMPNO')
+            .select([
+                'S.OWNER',
+                'S.OWNERCODE',
+                'S.AMEC_SDS_ID',
+                'O.VPOSNO',
+                'O.VEMPNO',
+                'A.SNAME',
+                'A.SRECMAIL',
+            ])
+            .where('S.AMEC_SDS_ID = :id', { id })
+            .getRawMany();
     }
 }

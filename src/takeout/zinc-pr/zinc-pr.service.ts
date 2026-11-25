@@ -304,14 +304,14 @@ export class ZincPrService {
         }
 
         const takeoutNos = Array.from(new Set(payload.flatMap((row) => row.TDETAIL_TAKEOUTNOS)));
-        const inserted = await this.zincPrAs400Repository.insertPending(payload);
+        // const inserted = await this.zincPrAs400Repository.insertPending(payload);
         await this.zincPrRepository.markSubmitted(takeoutNos);
 
         return {
             status: true,
             message: 'Zinc PR records submitted successfully',
             data: {
-                ...inserted,
+                // ...inserted,
                 updatedTakeoutNos: takeoutNos,
                 invalidTakeoutsForEmail,
                 invalidTakeoutsEmailStatus,

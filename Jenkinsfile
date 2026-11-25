@@ -158,23 +158,42 @@ pipeline {
                     echo "⏱️ [START] Restart Application : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
 
                     sshagent(credentials: ['ssh-amecwebtest1']) {
-                        sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecwebtest1:D:/wwwroot/api/"
+                        sh "scp -o StrictHostKeyChecking=no dist.tar package.json package-lock.json ignored-endpoints.txt oxfile.toml .env Administrator@amecwebtest1:D:/wwwroot/api/"
 
                         if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
                             sh """
                                 ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
-                                powershell "
-                                \$startTime = Get-Date
-                                \$env:NODE_ENV='development'
+                                powershell -Command "
+                                \$ErrorActionPreference = 'Stop'
+
+                                # 2. เพิ่ม PATH ให้ครอบคลุมตำแหน่งที่ติดตั้ง oxmgr (เช่น .cargo/bin, npm)
+                                \$env:PATH += ';C:\\Users\\Administrator\\.cargo\\bin;C:\\Program Files\\oxmgr;C:\\ProgramData\\chocolatey\\bin;' + [System.Environment]::GetEnvironmentVariable('PATH', 'User')
+
                                 cd D:\\wwwroot\\api
-                                tar -xzf dist.tar.gz
-                                Remove-Item -Path dist.tar.gz -Force
-                                \$endTime = Get-Date
-                                \$duration = (\$endTime - \$startTime).TotalSeconds
-                                Write-Host '✅ [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
+                                # 3. แตกไฟล์
+                                tar -xf dist.tar
+                                Remove-Item -Path dist.tar -Force
+                                Write-Host '🎉 [1/3] Extracting files สำเร็จ!'
+
+                                # 4. ตรวจสอบว่า oxmgr ใช้งานได้หรือไม่
+                                if (-not (Get-Command oxmgr -ErrorAction SilentlyContinue)) {
+                                    Write-Error '❌ ไม่พบคำสั่ง oxmgr ใน PATH กรุณาตรวจสอบตำแหน่งติดตั้งบนเซิร์ฟเวอร์'
+                                    exit 1
+                                }
+
+                                # 5. Apply config และ Restart
+                                Write-Host '🔄 [2/3] กำลัง Restart oxmgr...'
+                                oxmgr apply oxfile.toml
+                                oxmgr restart api
+
+                                # 6. ตรวจสอบสถานะหลัง Restart
+                                Write-Host '📋 [3/3] สถานะ Service ปัจจุบัน:'
+                                oxmgr list
+                                Write-Host '🎯 สำเร็จเรียบร้อย!'
                                 "
                                 EOF
                             """
+                            sh "rm -f dist.tar"
 
                             echo "================================================"
                             echo "⚠️  WARNING: package.json has changed!, Please install dependencies manually on ${REMOTE_HOST}"

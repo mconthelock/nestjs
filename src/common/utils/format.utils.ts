@@ -1,3 +1,14 @@
+/**
+ * Convert a revision number to an alphabetic representation (e.g., 1 = A, 2 = B, ..., 26 = Z, 27 = AA, ...)
+ * @author Sutthipong Tangmongkhoncharoen (24008)
+ * @since 2026-02-21
+ * @param {number} revision
+ * @returns {string} แปลงเลข revision เป็นตัวอักษร โดย 1 = A, 2 = B, ..., 26 = Z, 27 = AA, ...
+ * @example
+ * numberToAlphabetRevision(1); // returns "A"
+ * numberToAlphabetRevision(26); // returns "Z"
+ * numberToAlphabetRevision(27); // returns "AA"
+ */
 export function numberToAlphabetRevision(revision: number): string {
     if (revision <= 0) return '*';
     let result = '';
@@ -6,6 +17,27 @@ export function numberToAlphabetRevision(revision: number): string {
         num--; // Adjust for 0-indexing
         result = String.fromCharCode(65 + (num % 26)) + result;
         num = Math.floor(num / 26);
+    }
+    return result;
+}
+
+/**
+ * @author Sutthipong Tangmongkhoncharoen (24008)
+ * @since 2026-11-13
+ * @description Convert an alphabetic revision to a numeric revision.
+ * @param {string} revision
+ * @returns {number} แปลงตัวอักษร revision เป็นเลข โดย A = 1, B = 2, ..., Z = 26, AA = 27, ...
+ * @example
+ * alphabetToNumberRevision("A"); // returns 1
+ * alphabetToNumberRevision("Z"); // returns 26
+ * alphabetToNumberRevision("AA"); // returns 27
+ * alphabetToNumberRevision("*"); // returns 0
+ */
+export function alphabetToNumberRevision(revision: string): number {
+    if (revision === '*') return 0;
+    let result = 0;
+    for (let i = 0; i < revision.length; i++) {
+        result = result * 26 + (revision.charCodeAt(i) - 64);
     }
     return result;
 }

@@ -23,8 +23,8 @@ export class ReportProdRepository extends BaseRepository {
         return this.manager.query(
             `SELECT
                     PROD_MONTH,
-                    F_TYPE_NAME(ORDTYPE) AS TYP,
-                    F_TYPE_PRIORITY(ORDTYPE) AS PRIORITY,
+                    WORKLOAD.F_TYPE_NAME(ORDTYPE) AS TYP,
+                    WORKLOAD.F_TYPE_PRIORITY(ORDTYPE) AS PRIORITY,
                     E_BM,
                     E_ACC,
                     E_BM - E_ACC AS E_REM,
@@ -69,7 +69,7 @@ export class ReportProdRepository extends BaseRepository {
                     )
                     GROUP BY PROD_MONTH, ORDTYPE
                 )
-                ORDER BY PROD_MONTH, F_TYPE_PRIORITY(ORDTYPE)`,
+                ORDER BY PROD_MONTH, WORKLOAD.F_TYPE_PRIORITY(ORDTYPE)`,
             [startMonth, endMonth],
         );
     }
@@ -86,7 +86,7 @@ export class ReportProdRepository extends BaseRepository {
                     MIN(CASE
                         WHEN DAYOFF = 0 THEN WORKID
                     END) AS FIRST_WORKDAY
-                FROM AMECCALENDAR
+                FROM WORKLOAD.AMECCALENDAR
                 WHERE WORKYEAR || LPAD(WORKMONTH, 2, '0')
                     BETWEEN :1 AND :2
                 GROUP BY
@@ -109,9 +109,9 @@ export class ReportProdRepository extends BaseRepository {
                 mr.FIRST_WORKDAY,
                 mr.LAST_WORKDAY,
                 COUNT(dov.MFG_WORKDAY) AS CNT
-            FROM MONTH_RANGE mr
             FROM WORKLOAD.MONTH_RANGE mr
             LEFT JOIN WORKLOAD.DPMS_ORDERS_VIEW dov
+                ON dov.MFG_WORKDAY BETWEEN mr.FIRST_WORKDAY AND mr.LAST_WORKDAY
                 AND dov.PRODTYPE IN ('ELE', 'ESC')
             WHERE mr.PROD_MONTH BETWEEN :3 AND :4
             GROUP BY
@@ -135,7 +135,7 @@ export class ReportProdRepository extends BaseRepository {
                     MIN(CASE
                         WHEN DAYOFF = 0 THEN WORKID
                     END) AS FIRST_WORKDAY
-                FROM AMECCALENDAR
+                FROM WORKLOAD.AMECCALENDAR
                 WHERE WORKYEAR || LPAD(WORKMONTH, 2, '0')
                     BETWEEN :1 AND :2
                 GROUP BY
@@ -153,8 +153,8 @@ export class ReportProdRepository extends BaseRepository {
             SELECT
                 mr.PROD_MONTH,
                 COUNT(dov.MFGBM_NO) AS CNT
-            FROM MONTH_RANGE mr
-            LEFT JOIN DPMS_ORDERS_VIEW dov
+            FROM WORKLOAD.MONTH_RANGE mr
+            LEFT JOIN WORKLOAD.DPMS_ORDERS_VIEW dov
                 ON dov.PRODTYPE IN ('ELE', 'ESC')
                 AND dov.REVISION != 'D'
                 AND dov.MFGBM_NO <= mr.PROD_MONTH || '6'

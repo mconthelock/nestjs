@@ -27,6 +27,7 @@ import { STY_CHEMICAL_REV } from 'src/common/Entities/gpreport/table/STY_CHEMICA
 import { STY_CHM_SEC } from 'src/common/Entities/gpreport/views/STY_CHM_SEC.entity';
 import { STY_CHEMICAL_SECTION } from 'src/common/Entities/gpreport/table/STY_CHEMICAL_SECTION.entity';
 import { FileRepository } from './repository/file.repository';
+import { MailModule } from 'src/common/services/mail/mail.module';
 
 @Module({
     imports: [
@@ -44,6 +45,7 @@ import { FileRepository } from './repository/file.repository';
         FormModule,
         OrganizationsModule,
         StyFilesModule,
+        MailModule,
     ],
     controllers: [FollowController, MasterController, RevController],
     providers: [

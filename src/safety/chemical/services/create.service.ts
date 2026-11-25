@@ -5,6 +5,7 @@ import { MasterRepository } from '../repository/master.repository';
 import { FileRepository } from '../repository/file.repository';
 import { CreateMasterDto } from '../dto/master.dto';
 import { STY_FILES } from 'src/common/Entities/gpreport/table/STY_FILES.entity';
+import { MailService } from 'src/common/services/mail/mail.service';
 
 @Injectable()
 export class CreateService {
@@ -12,12 +13,13 @@ export class CreateService {
         private readonly styFilesService: StyFilesService,
         private readonly masterRepo: MasterRepository,
         private readonly fileRepo: FileRepository,
+        private readonly mailService: MailService,
     ) {}
 
     async main(dto: CreateMasterDto, files: Express.Multer.File[]) {
         const movedTargets: string[] = [];
         try {
-            // TODO: ลบไฟล์ที่ถูกระบุใน DELETE_FILES
+            // ลบไฟล์ที่ถูกระบุใน DELETE_FILES
             if (dto.DELETE_FILES && dto.DELETE_FILES.length > 0) {
                 await this.styFilesService.disable(
                     dto.DELETE_FILES,
@@ -26,14 +28,14 @@ export class CreateService {
                 await this.fileRepo.deleteByFileId(dto.DELETE_FILES);
             }
 
-            // todo: บันทึกข้อมูล
+            // บันทึกข้อมูล
             const result = await this.masterRepo.create(dto);
             if (!result) {
                 throw new Error('Create failed');
             }
             const fileData: { fullPath: string[]; data: STY_FILES[] }[] = [];
 
-            // todo: บันทึกไฟล์
+            // บันทึกไฟล์
             for (const file of files) {
                 const fieldname = {
                     SDS_FILE_ORIGIN: 'CHM_F_ORI',
@@ -53,7 +55,7 @@ export class CreateService {
                 movedTargets.push(...insertFile.moved.fullPath);
                 fileData.push(insertFile.moved);
             }
-            // TODO: insert ลงตารางเชื่อมข้อมูล STY_CHEMICAL_FILES
+            // insert ลงตารางเชื่อมข้อมูล STY_CHEMICAL_FILES
             for (const file of fileData) {
                 for (const data of file.data) {
                     await this.fileRepo.create({
@@ -67,6 +69,22 @@ export class CreateService {
                 status: 1,
                 id: result.AMEC_SDS_ID,
             });
+
+            // TODO: notify manager via email when chemical info changes
+            if(dto.USER_UPDATE){
+                // ดึงข้อมูลหัวหน้าแต่ละแผนกที่ใช้สารเคมี
+                await this.mailService.sendMail({
+                    from: `Safety System<${process.env.MAIL_FROM}>`,
+                    to: ''//email,
+                    // subject: `Packing list issue notification [${project}]: ${period}  ${state}`,
+                    // template: 'mfgreport/dpms/packing-list',
+                    // context: {
+                    //     list: lists,
+                    // },
+                    // bcc: process.env.MAIL_ADMIN,
+                    // attachments: attachments,
+                })
+            }
             return {
                 status: true,
                 message: 'Create successfully',

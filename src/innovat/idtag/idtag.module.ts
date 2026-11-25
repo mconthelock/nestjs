@@ -21,5 +21,8 @@ import { IdtagService } from './idtag.service';
         IdtagService,
         IdtagRepository,
     ],
+    exports: [
+        IdtagRepository,
+    ],
 })
 export class IdtagModule {}

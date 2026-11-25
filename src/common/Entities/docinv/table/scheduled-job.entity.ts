@@ -41,6 +41,9 @@ export class ScheduledJob {
     @Column()
     CREATE_BY: string;
 
+    @Column()
+    HTTP_METHOD: string;
+
     @CreateDateColumn({
         type: 'timestamp',
         default: () => 'CURRENT_TIMESTAMP',

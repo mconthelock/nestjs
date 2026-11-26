@@ -8,6 +8,7 @@ import { SectionRepository } from '../repository/section.repository';
 import { OrganizationsService } from 'src/webform/organizations/organizations.service';
 import { FileRepository } from '../repository/file.repository';
 import { StyFilesService } from 'src/gpreport/sty-files/sty-files.service';
+import { STY_CHEMICAL_REV } from 'src/common/Entities/gpreport/table/STY_CHEMICAL_REV.entity';
 
 @Injectable()
 export class MasterService {
@@ -93,13 +94,19 @@ export class MasterService {
             if (!org.status) {
                 throw new Error(org.message);
             }
-            const ownerCode = org.data.map((o) => o.CODE);
-            const organization = await this.revRepo.getByCode(ownerCode);
+            const ownerCode: string[] = org.data.map((o) => o.CODE);
+            const organization: STY_CHEMICAL_REV[] = await this.revRepo.getByCode(ownerCode);
+            // * เก็บไว้เผื่ออนาคตเปลี่ยนมาใส่ชื่อหัวหน้าแผนก safety ตอน stamp
+            // for (const o of organization) {
+            //     o.MANAGER_APPROVE = await this.revRepo.getManagerApprove(
+            //         o.OWNERCODE,
+            //     );
+            // }
             let data = {};
             for (const o of org.data) {
                 const masters = await this.sectionRepo.getMasterSection(o.CODE);
                 if (masters && masters.length > 0) {
-                    data[o.NAME] = masters;
+                    data[o.CODE] = masters;
                 }
             }
             return {
@@ -124,8 +131,11 @@ export class MasterService {
             await this.sectionRepo.disableById(id, userUpdate);
             const files = await this.fileRepo.getByChemicalId(id);
             if (files && files.length > 0) {
-                for(const file of files) {
-                    await this.styFilesService.disable(file.FILE_ID, userUpdate);
+                for (const file of files) {
+                    await this.styFilesService.disable(
+                        file.FILE_ID,
+                        userUpdate,
+                    );
                 }
             }
             return {
@@ -147,8 +157,10 @@ export class MasterService {
     async getMailManagerbyId(id: number) {
         try {
             const res = await this.sectionRepo.getMailManagerbyId(id);
-            if(!res || res.length === 0) {
-                throw new NotFoundException(`Mail manager not found form id ${id}`);
+            if (!res || res.length === 0) {
+                throw new NotFoundException(
+                    `Mail manager not found form id ${id}`,
+                );
             }
             return {
                 status: true,

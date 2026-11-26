@@ -49,13 +49,13 @@ export class ZincPrService {
 
         try {
             const result = await this.mailService.sendMail({
-                // to: [
-                //   'sangjan@MitsubishiElevatorAsia.co.th',
-                //   'tepnimit@MitsubishiElevatorAsia.co.th',
-                //   'patcharee@MitsubishiElevatorAsia.co.th',
-                // ],
-                // bcc: 'perapatr@MitsubishiElevatorAsia.co.th',
-                to: ['perapatr@MitsubishiElevatorAsia.co.th'],
+                to: [
+                  'sangjan@MitsubishiElevatorAsia.co.th',
+                  'tepnimit@MitsubishiElevatorAsia.co.th',
+                  'patcharee@MitsubishiElevatorAsia.co.th',
+                ],
+                bcc: 'perapatr@MitsubishiElevatorAsia.co.th',
+                // to: ['perapatr@MitsubishiElevatorAsia.co.th'],
                 subject: '[Zinc PR] Takeout numbers with multiple processes',
                 html: `<p>The following takeout numbers were excluded from Zinc PR submission because each contains multiple processes.</p>
           <table border="1" cellpadding="6" cellspacing="0">
@@ -304,14 +304,14 @@ export class ZincPrService {
         }
 
         const takeoutNos = Array.from(new Set(payload.flatMap((row) => row.TDETAIL_TAKEOUTNOS)));
-        // const inserted = await this.zincPrAs400Repository.insertPending(payload);
+        const inserted = await this.zincPrAs400Repository.insertPending(payload);
         await this.zincPrRepository.markSubmitted(takeoutNos);
 
         return {
             status: true,
             message: 'Zinc PR records submitted successfully',
             data: {
-                // ...inserted,
+                ...inserted,
                 updatedTakeoutNos: takeoutNos,
                 invalidTakeoutsForEmail,
                 invalidTakeoutsEmailStatus,

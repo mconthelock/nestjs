@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryColumn, OneToMany, ManyToOne, JoinColumn } from 
 import { ISDEV_REQUEST } from './ISDEV_REQUEST.entity';
 import { User } from 'src/common/Entities/amec/views/user.entity';
 
-@Entity({ name: 'ISDEV_DEVELOPER', schema: 'WEBFORM' })
+@Entity({ name: 'ISDEV_DEVELOPER', schema: 'WEBFORM', database: 'webform' })
 export class ISDEV_DEVELOPER {
     @PrimaryColumn()
     NFRMNO: number;

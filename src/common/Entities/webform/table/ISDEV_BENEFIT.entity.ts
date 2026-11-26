@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: 'ISDEV_BENEFIT', schema: 'WEBFORM' })
+@Entity({ name: 'ISDEV_BENEFIT', schema: 'WEBFORM', database: 'webform' })
 export class ISDEV_BENEFIT {
     @PrimaryColumn()
     NFRMNO: number;

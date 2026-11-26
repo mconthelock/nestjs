@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 
-@Entity({ name: 'ORGTREE', schema: 'WEBFORM' })
+@Entity({ name: 'ORGTREE', schema: 'WEBFORM', database: 'webform' })
 export class ORGTREE {
     @PrimaryColumn()
     VORGNO: string;

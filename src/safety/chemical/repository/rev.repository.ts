@@ -3,6 +3,8 @@ import { BaseRepository } from 'src/common/repositories/base-repository';
 import { DataSource, In, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { STY_CHEMICAL_REV } from 'src/common/Entities/gpreport/table/STY_CHEMICAL_REV.entity';
+import { AMECUSERALL } from 'src/common/Entities/amec/views/AMECUSERALL.entity';
+import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
 
 @Injectable()
 export class RevRepository extends BaseRepository {
@@ -77,5 +79,24 @@ export class RevRepository extends BaseRepository {
             { OWNERCODE: '999999' },
             { REV: revision },
         );
+    }
+
+    getManagerApprove(ownerCode: string) {
+        return this.getRepository(STY_CHEMICAL_REV)
+            .createQueryBuilder('R')
+            .select(`R.OWNER,
+                    R.OWNERCODE, 
+                    NVL(R.USER_APPROVE, O.VEMPNO) AS EMPNO, 
+                    NVL(A.SPOSCODE, O.VPOSNO) AS SPOSCODE, 
+                    NVL(A.SNAME, B.SNAME) AS SNAME, 
+                    NVL(A.SDEPT, B.SDEPT) AS SDEPT, 
+                    NVL(A.SPOSNAME, B.SPOSNAME) AS SPOSNAME, 
+                    NVL(TO_CHAR(R.APPROVE_DATE, 'DD MON YYYY'), TO_CHAR(SYSDATE, 'DD MON YYYY')) AS APPROVE_DATE,
+                    CASE WHEN R.APPROVE_DATE IS NULL THEN 'NO' ELSE 'YES' END AS APPROVE_STATUS `)
+            .leftJoin(AMECUSERALL, 'A', 'R.USER_APPROVE = A.SEMPNO')
+            .leftJoin(ORGPOS, 'O', "O.VORGNO = '020601' AND O.VPOSNO = '20'")
+            .leftJoin(AMECUSERALL, 'B', 'O.VEMPNO = B.SEMPNO')
+            .where('R.OWNERCODE = :ownerCode', { ownerCode })
+            .getRawOne();
     }
 }

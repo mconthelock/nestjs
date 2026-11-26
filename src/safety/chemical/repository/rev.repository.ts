@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/common/repositories/base-repository';
-import { DataSource, Not } from 'typeorm';
+import { DataSource, In, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { STY_CHEMICAL_REV } from 'src/common/Entities/gpreport/table/STY_CHEMICAL_REV.entity';
 
@@ -15,6 +15,22 @@ export class RevRepository extends BaseRepository {
             where: {
                 STATUS: 1,
                 OWNER: Not('MASTER'),
+            },
+            relations: {
+                CONTROLS: {
+                    USER: true,
+                },
+            },
+            order: {
+                OWNER: 'ASC',
+            },
+        });
+    }
+
+    getByCode(ownerCode: string[] | string) {
+        return this.getRepository(STY_CHEMICAL_REV).find({
+            where: {
+                OWNERCODE: Array.isArray(ownerCode) ? In(ownerCode) : ownerCode,
             },
             relations: {
                 CONTROLS: {

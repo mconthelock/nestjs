@@ -16,30 +16,55 @@ export class SectionRepository extends BaseRepository {
     }
 
     getMasterSection(ownerCode: string) {
-        return this.getRepository(STY_CHM_SEC).find({
-            select: [
-                'AMEC_SDS_ID',
-                'CHEMICAL_NAME',
-                'REV',
-                'EFFECTIVE_DATE',
-                'RECEIVED_SDS_DATE',
-                'USED_FOR',
-                'USED_AREA',
-                'KEEPING_POINT',
-                'QTY',
-                'REC4052',
-                'REC4054',
-                'CLASS',
-                'CLASSNAME',
-            ],
-            where: {
-                OWNERCODE: ownerCode,
-                STATUS: 1,
-            },
-            order: {
-                AMEC_SDS_ID: 'ASC',
-            },
-        });
+        return this.getRepository(STY_CHEMICAL_SECTION).createQueryBuilder('S')
+            .select([
+                'S.AMEC_SDS_ID',
+                'M.CHEMICAL_NAME',
+                'M.REV',
+                'M.EFFECTIVE_DATE',
+                'S.RECEIVED_SDS_DATE',
+                'M.PRODUCT_CODE',
+                'S.USED_FOR',
+                'S.USED_AREA',
+                'S.KEEPING_POINT',
+                'S.QTY',
+                'S.REC4052',
+                'S.REC4054',
+                'M.UN_CLASS',
+                'T.TYPE_NAME',
+            ])
+            .innerJoinAndSelect('S.MASTER', 'M')
+            .leftJoin('M.CLASS', 'T', 'T.TYPE_STATUS = 1')
+            .leftJoinAndSelect('M.FILES', 'F', 'F.STATUS = 1')
+            .leftJoinAndSelect('F.TYPE', 'FT')
+            .where('S.OWNERCODE = :ownerCode', { ownerCode })
+            .andWhere('S.STATUS = :status', { status: 1 })
+            .orderBy('S.AMEC_SDS_ID', 'ASC')
+            .getMany();
+        // return this.getRepository(STY_CHM_SEC).find({
+        //     select: [
+        //         'AMEC_SDS_ID',
+        //         'CHEMICAL_NAME',
+        //         'REV',
+        //         'EFFECTIVE_DATE',
+        //         'RECEIVED_SDS_DATE',
+        //         'USED_FOR',
+        //         'USED_AREA',
+        //         'KEEPING_POINT',
+        //         'QTY',
+        //         'REC4052',
+        //         'REC4054',
+        //         'CLASS',
+        //         'CLASSNAME',
+        //     ],
+        //     where: {
+        //         OWNERCODE: ownerCode,
+        //         STATUS: 1,
+        //     },
+        //     order: {
+        //         AMEC_SDS_ID: 'ASC',
+        //     },
+        // });
     }
 
     enable(id: number, ownerCode: string, userUpdate: string) {

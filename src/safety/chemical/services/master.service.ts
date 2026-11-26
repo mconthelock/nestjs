@@ -93,6 +93,8 @@ export class MasterService {
             if (!org.status) {
                 throw new Error(org.message);
             }
+            const ownerCode = org.data.map((o) => o.CODE);
+            const organization = await this.revRepo.getByCode(ownerCode);
             let data = {};
             for (const o of org.data) {
                 const masters = await this.sectionRepo.getMasterSection(o.CODE);
@@ -102,7 +104,7 @@ export class MasterService {
             }
             return {
                 status: true,
-                organizations: org.data,
+                organizations: organization,
                 data,
             };
         } catch (error) {

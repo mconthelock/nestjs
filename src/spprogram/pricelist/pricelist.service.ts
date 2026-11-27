@@ -1,11 +1,10 @@
-﻿import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 
 import { Pricelist } from './entities/pricelist.entity';
 import { ItemsCustomer } from '../items-customer/entities/items-customer.entity';
 
-import { createPriceListDto } from './dto/create-price.dto';
 import { updatePriceListDto } from './dto/update-price.dto';
 
 @Injectable()
@@ -16,10 +15,23 @@ export class PricelistService {
 
         @InjectRepository(ItemsCustomer, 'mitsuConnection')
         private readonly itemscus: Repository<ItemsCustomer>,
+
+        @InjectDataSource('mitsuConnection')
+        private readonly dataSource: DataSource,
     ) {}
 
     async findAll(data: updatePriceListDto) {
-        return this.price.find({ relations: ['itemdesc'], where: { ...data } });
+        const where: Record<string, any> = {};
+        for (const [key, value] of Object.entries(data ?? {})) {
+            if (value !== undefined) {
+                where[key] = value;
+            }
+        }
+        return this.price.find({
+            relations: ['itemdesc'],
+            where,
+            order: { STARTIN: 'DESC', PRICE_ID: 'DESC' },
+        });
     }
 
     async findCustomer(data: any) {
@@ -38,26 +50,52 @@ export class PricelistService {
     }
 
     async updatePrice(data: updatePriceListDto) {
-        const item = this.price.find({
-            where: {
-                FYYEAR: data.FYYEAR,
-                PERIOD: data.PERIOD,
-                ITEM: data.ITEM,
-                LATEST: '1',
-            },
-        });
-        if (item) {
-            await this.price.update(
-                {
+        return this.dataSource.transaction(async (manager) => {
+            const currentLatest = await manager.findOne(Pricelist, {
+                where: {
                     FYYEAR: data.FYYEAR,
                     PERIOD: data.PERIOD,
                     ITEM: data.ITEM,
-                    LATEST: '1',
+                    LATEST: 1,
                 },
-                { LATEST: '0' },
-            );
-        }
-        const newPrice = this.price.create(data);
-        return this.price.save(newPrice);
+                order: { PRICE_ID: 'DESC' },
+            });
+
+            if (
+                currentLatest &&
+                Number(currentLatest.FCCOST) === Number(data.FCCOST) &&
+                Number(currentLatest.FCBASE) === Number(data.FCBASE) &&
+                Number(currentLatest.TCCOST) === Number(data.TCCOST)
+            ) {
+                return currentLatest;
+            }
+
+            if (currentLatest) {
+                await manager
+                    .createQueryBuilder()
+                    .update(Pricelist)
+                    .set({
+                        LATEST: 0,
+                        ENDIN: () => 'SYSDATE',
+                    })
+                    .where('ITEM = :item', { item: data.ITEM })
+                    .andWhere('FYYEAR = :fyyear', { fyyear: data.FYYEAR })
+                    .andWhere('PERIOD = :period', { period: data.PERIOD })
+                    .andWhere('LATEST = :latest', { latest: 1 })
+                    .execute();
+            }
+
+            const { PRICE_ID: _ignoredPriceId, ENDIN: _ignoredEndin, ...payload } = data;
+            const newPrice = manager.create(Pricelist, {
+                ...payload,
+                STATUS: 1,
+                LATEST: 1,
+                STARTIN: data.STARTIN ?? new Date(),
+                ENDIN: null,
+                CREATE_AT: data.CREATE_AT ?? new Date(),
+            });
+
+            return manager.save(Pricelist, newPrice);
+        });
     }
 }

@@ -1,4 +1,4 @@
-﻿import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -20,7 +20,9 @@ export class ItemsService {
             .leftJoinAndSelect('item.category', 'category')
             .leftJoinAndSelect('item.prices', 'price')
             .leftJoinAndSelect('item.itemscustomer', 'itemcus')
-            .leftJoinAndSelect('itemcus.customer', 'customer');
+            .leftJoinAndSelect('itemcus.customer', 'customer')
+            .addOrderBy('price.STARTIN', 'DESC')
+            .addOrderBy('price.PRICE_ID', 'DESC');
         //.where('customer.CUS_STATUS = :status', { status: '1' });
 
         let drawing = undefined;

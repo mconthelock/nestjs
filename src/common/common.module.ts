@@ -29,6 +29,7 @@ import { PDFModule } from './services/pdf/pdf.module';
 import { QrcodeModule } from './services/qrcode/qrcode.module';
 import { RedisModule } from './redis/redis.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
+import { HealthcheckController } from './services/healthcheck/healthcheck.controller';
 
 @Module({
     imports: [
@@ -54,6 +55,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
         FilesModule,
         // BackgroundTaskModule,
     ],
+    controllers: [HealthcheckController],
     providers: [GenerateIdService, HealthcheckService],
     exports: [GenerateIdService],
 })

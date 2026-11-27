@@ -142,7 +142,7 @@ pipeline {
                     fi
                     npm run build
                 '''
-                sh "tar -czf dist.tar.gz dist/"
+                sh "tar --exclude='*.d.ts' --exclude='*.js.map' -cf dist.tar dist/"
                 script {
                     def duration = (System.currentTimeMillis() - env.START_TIME_BUILD.toLong()) / 1000
                     echo "✅ [END] Install & Build ใช้เวลาทั้งหมด: ${duration} วินาที"
@@ -158,42 +158,23 @@ pipeline {
                     echo "⏱️ [START] Restart Application : ${new Date().format('yyyy-MM-dd HH:mm:ss')}"
 
                     sshagent(credentials: ['ssh-amecwebtest1']) {
-                        sh "scp -o StrictHostKeyChecking=no dist.tar package.json package-lock.json ignored-endpoints.txt oxfile.toml .env Administrator@amecwebtest1:D:/wwwroot/api/"
+                        sh "scp -o StrictHostKeyChecking=no dist.tar package.json package-lock.json ignored-endpoints.txt ecosystem.config.js oxfile.toml .env Administrator@amecwebtest1:D:/wwwroot/api/"
 
                         if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
                             sh """
                                 ssh -o StrictHostKeyChecking=no Administrator@amecwebtest1 << 'EOF'
-                                powershell -Command "
-                                \$ErrorActionPreference = 'Stop'
-
-                                # 2. เพิ่ม PATH ให้ครอบคลุมตำแหน่งที่ติดตั้ง oxmgr (เช่น .cargo/bin, npm)
-                                \$env:PATH += ';C:\\Users\\Administrator\\.cargo\\bin;C:\\Program Files\\oxmgr;C:\\ProgramData\\chocolatey\\bin;' + [System.Environment]::GetEnvironmentVariable('PATH', 'User')
-
+                                powershell "
+                                \$startTime = Get-Date
+                                \$env:NODE_ENV='development'
                                 cd D:\\wwwroot\\api
-                                # 3. แตกไฟล์
                                 tar -xf dist.tar
                                 Remove-Item -Path dist.tar -Force
-                                Write-Host '🎉 [1/3] Extracting files สำเร็จ!'
-
-                                # 4. ตรวจสอบว่า oxmgr ใช้งานได้หรือไม่
-                                if (-not (Get-Command oxmgr -ErrorAction SilentlyContinue)) {
-                                    Write-Error '❌ ไม่พบคำสั่ง oxmgr ใน PATH กรุณาตรวจสอบตำแหน่งติดตั้งบนเซิร์ฟเวอร์'
-                                    exit 1
-                                }
-
-                                # 5. Apply config และ Restart
-                                Write-Host '🔄 [2/3] กำลัง Restart oxmgr...'
-                                oxmgr apply oxfile.toml
-                                oxmgr restart api
-
-                                # 6. ตรวจสอบสถานะหลัง Restart
-                                Write-Host '📋 [3/3] สถานะ Service ปัจจุบัน:'
-                                oxmgr list
-                                Write-Host '🎯 สำเร็จเรียบร้อย!'
+                                \$endTime = Get-Date
+                                \$duration = (\$endTime - \$startTime).TotalSeconds
+                                Write-Host '✅ [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
                                 "
                                 EOF
                             """
-                            sh "rm -f dist.tar"
 
                             echo "================================================"
                             echo "⚠️  WARNING: package.json has changed!, Please install dependencies manually on ${REMOTE_HOST}"
@@ -206,15 +187,16 @@ pipeline {
                                 \$startTime = Get-Date
                                 \$env:NODE_ENV='development'
                                 cd D:\\wwwroot\\api
-                                tar -xzf dist.tar.gz
-                                Remove-Item -Path dist.tar.gz -Force
+                                tar -xf dist.tar
+                                Remove-Item -Path dist.tar -Force
                                 \$endTime = Get-Date
                                 \$duration = (\$endTime - \$startTime).TotalSeconds
                                 Write-Host '🎉 [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
 
 
                                 \$startTimePm2 = Get-Date
-                                pm2 reload api
+                                oxmgr apply oxfile.toml
+                                oxmgr restart api
                                 \$endTimePm2 = Get-Date
                                 \$durationPm2 = (\$endTimePm2 - \$startTimePm2).TotalSeconds
                                 Write-Host '🎯 [END] PM2 reload สำเร็จ! ใช้เวลาทั้งหมด:' \$durationPm2 'วินาที'
@@ -222,7 +204,7 @@ pipeline {
                                 EOF
                             """
                         }
-                        sh "rm -f dist.tar.gz"
+                        sh "rm -f dist.tar"
                     }
 
 
@@ -241,7 +223,7 @@ pipeline {
 
                     // ==================== Restart Application on AMECWEB1 ==================== //
                     sshagent(credentials: ['ssh-amecweb1']) {
-                        sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecweb1:D:/wwwroot/api/"
+                        sh "scp -o StrictHostKeyChecking=no dist.tar package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecweb1:D:/wwwroot/api/"
 
                         if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
                             sh """
@@ -250,8 +232,8 @@ pipeline {
                                 \$startTime = Get-Date
                                 \$env:NODE_ENV='development'
                                 cd D:\\wwwroot\\api
-                                tar -xzf dist.tar.gz
-                                Remove-Item -Path dist.tar.gz -Force
+                                tar -xf dist.tar
+                                Remove-Item -Path dist.tar -Force
                                 \$endTime = Get-Date
                                 \$duration = (\$endTime - \$startTime).TotalSeconds
                                 Write-Host '✅ [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
@@ -270,8 +252,8 @@ pipeline {
                                 \$startTime = Get-Date
                                 \$env:NODE_ENV='development'
                                 cd D:\\wwwroot\\api
-                                tar -xzf dist.tar.gz
-                                Remove-Item -Path dist.tar.gz -Force
+                                tar -xf dist.tar
+                                Remove-Item -Path dist.tar -Force
                                 \$endTime = Get-Date
                                 \$duration = (\$endTime - \$startTime).TotalSeconds
                                 Write-Host '🎉 [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
@@ -290,7 +272,7 @@ pipeline {
 
                     // ==================== Restart Application on AMECWEB2 ==================== //
                     sshagent(credentials: ['ssh-amecweb2']) {
-                        sh "scp -o StrictHostKeyChecking=no dist.tar.gz package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecweb2:D:/wwwroot/api/"
+                        sh "scp -o StrictHostKeyChecking=no dist.tar package.json package-lock.json ignored-endpoints.txt ecosystem.config.js .env Administrator@amecweb2:D:/wwwroot/api/"
 
                         if (env.PACKAGE_STATUS == "CHANGED" || env.PACKAGE_STATUS == "NEW") {
                             sh """
@@ -299,8 +281,8 @@ pipeline {
                                 \$startTime = Get-Date
                                 \$env:NODE_ENV='development'
                                 cd D:\\wwwroot\\api
-                                tar -xzf dist.tar.gz
-                                Remove-Item -Path dist.tar.gz -Force
+                                tar -xf dist.tar
+                                Remove-Item -Path dist.tar -Force
                                 \$endTime = Get-Date
                                 \$duration = (\$endTime - \$startTime).TotalSeconds
                                 Write-Host '✅ [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
@@ -319,8 +301,8 @@ pipeline {
                                 \$startTime = Get-Date
                                 \$env:NODE_ENV='development'
                                 cd D:\\wwwroot\\api
-                                tar -xzf dist.tar.gz
-                                Remove-Item -Path dist.tar.gz -Force
+                                tar -xf dist.tar
+                                Remove-Item -Path dist.tar -Force
                                 \$endTime = Get-Date
                                 \$duration = (\$endTime - \$startTime).TotalSeconds
                                 Write-Host '🎉 [END] Extracting files สำเร็จ! ใช้เวลาทั้งหมด:' \$duration 'วินาที'
@@ -335,7 +317,7 @@ pipeline {
                                 EOF
                             """
                         }
-                        sh "tar -czf dist.tar.gz dist/"
+                        sh "rm -f dist.tar"
                     }
 
                     def duration = (System.currentTimeMillis() - env.START_TIME_RESTART.toLong()) / 1000

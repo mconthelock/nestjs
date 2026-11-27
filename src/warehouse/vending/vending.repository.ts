@@ -69,9 +69,9 @@ export class VendingRepository extends BaseRepository {
 
     async getTransactionHistory() {
         return this.pur.query(`
-            SELECT sti.*,st.TRNTYPE
-            FROM STOCK_TRANSACTIONS st
-            JOIN STOCK_TRANSACTION_ITEMS sti ON st.ID = sti.TRANSACTION_ID
+            SELECT *
+            FROM PURSYS.STOCK_TRANSACTIONS st
+            JOIN PURSYS.STOCK_TRANSACTION_ITEMS sti ON st.ID = sti.TRANSACTION_ID
             WHERE (STORAGE_FROM = '21' OR STORAGE_TO = '21')
         `);
     }
@@ -95,8 +95,8 @@ export class VendingRepository extends BaseRepository {
                     mf.REQUEST_DATE,
                     md.PRODUCT_ID,
                     SUM(md.QTY) AS QTY
-                FROM MFGVTR_FORM mf
-                JOIN MFGVTR_DETAIL md ON mf.ID = md.FORM_ID
+                FROM WEBFORM.MFGVTR_FORM mf
+                JOIN WEBFORM.MFGVTR_DETAIL md ON mf.ID = md.FORM_ID
                 WHERE mf.STATUS = '2'
                 GROUP BY
                     mf.EMPNO,
@@ -235,9 +235,9 @@ export class VendingRepository extends BaseRepository {
 
     async getRequestWithdrawal() {
         return this.manager.query(`
-            SELECT * FROM  MFGVTR_FORM mf
-            JOIN MFGVTR_DETAIL md ON mf.ID = md.FORM_ID
-            LEFT JOIN AMECUSERALL a ON mf.EMPNO = a.SEMPNO
+            SELECT * FROM  WEBFORM.MFGVTR_FORM mf
+            JOIN WEBFORM.MFGVTR_DETAIL md ON mf.ID = md.FORM_ID
+            LEFT JOIN AMEC.AMECUSERALL a ON mf.EMPNO = a.SEMPNO
             WHERE mf.STATUS = '2'
         `);
     }

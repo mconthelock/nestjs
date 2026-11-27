@@ -13,7 +13,7 @@ export class WireHarnessJobController {
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Sync production plan data from AS400 to Oracle' })
     @ApiResponse({ status: 200, description: 'Sync production plan success' })
-    async syncProductionPlan() {
+    syncProductionPlan() {
         return this.service.syncProductionPlan();
     }
 }

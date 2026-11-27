@@ -3,6 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { ConectionService } from 'src/as400/conection/conection.service';
 import { BaseRepository } from 'src/common/repositories/base-repository';
+import { WHN_PROCESS } from 'src/common/Entities/innovat/table/WHN_PROCESS.entity';
 import { WHN_PRODUCTION_PLAN } from 'src/common/Entities/innovat/table/WHN_PRODUCTION_PLAN.entity';
 
 @Injectable()
@@ -17,7 +18,17 @@ export class WireHarnessJobRepository extends BaseRepository {
         super(ds);
     }
 
-    getProductionPlan() {
+    getProcess() {
+        return this.getRepository(WHN_PROCESS)
+            .createQueryBuilder('A')
+            .select('A.PRC_CODE', 'PRC_CODE')
+            .distinct(true)
+            .getRawMany();
+    }
+
+    async getProductionPlan() {
+        const data = await this.getProcess();
+        const process = data.map(row => `'${row.PRC_CODE}'`).join(',');
         return this.as400.runQuery(`
             SELECT * 
             FROM 
@@ -73,7 +84,7 @@ export class WireHarnessJobRepository extends BaseRepository {
                             ),
                             999999
                         )
-                        AND CB.Q41K10 LIKE 'CABLE%'
+                        AND (CB.Q41K10 LIKE 'CABLE%' OR CB.Q41K10 LIKE 'CABEL%')
                         AND SUBSTR(Q1.Q41K08, 1, LOCATE(' ', Q1.Q41K08 || ' ') - 1) = SUBSTR(CB.Q41K08, 1, LOCATE('-', CB.Q41K08 || '-') - 1)
                     LEFT JOIN RTNLIBF.Q143KP Q3
                         ON Q1.Q41K01 = Q3.Q43K01
@@ -84,7 +95,8 @@ export class WireHarnessJobRepository extends BaseRepository {
                     LEFT JOIN RTNLIBF.S011MP S11
                         ON F1.F01R07 = S11.S11M01
                         AND Q1.Q41K07 = S11.S11M06
-                    WHERE F2.F02R03 IN ('B4CC02','B4CC06') AND S.M8K01 >= VARCHAR_FORMAT(CURRENT DATE - 3 MONTH, 'YYYYMM')||'1'
+                    WHERE F2.F02R03 IN (${process})
+                        AND S.M8K01 >= VARCHAR_FORMAT(CURRENT DATE - 1 MONTH, 'YYYYMM')||'1'
             ) X
             WHERE X.RN = 1
         `);

@@ -32,8 +32,8 @@ if (process.env.HOST == 'AMEC') {
             },
             extra: {
                 pool: {
-                    max: 100,
-                    min: 5,
+                    max: 20,
+                    min: 2,
                     idleTimeoutMillis: 30000,
                 },
                 requestTimeout: 60000,

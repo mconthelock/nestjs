@@ -26,7 +26,17 @@ export class StInpJobAlertService {
                 date,
             );
             if (list.length === 0) {
-                throw new Error(`No pending items found for alert.`);
+                await this.mailService.sendMail({
+                    from: `Safety System<${process.env.MAIL_FROM}>`,
+                    to: process.env.MAIL_ADMIN,
+                    subject: `ST-INP Mail Alert Job - No Pending Items ${date ?? new Date().toISOString().split('T')[0]}`,
+                    html: `<b>No pending items found for alert.</b>`,
+                });
+                return {
+                    status: false,
+                    message: 'No pending items found for alert.',
+                    data: [],
+                };
             }
             const ddem = await this.sequenceOrgService.getByPosition({
                 SPOSCODE: '21',

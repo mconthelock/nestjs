@@ -21,6 +21,7 @@ import { ScheduledJob } from 'src/common/Entities/docinv/table/scheduled-job.ent
 import { CreateJobDto } from './dto/create-scheduler.dto';
 import { UpdateSchedulerDto } from './dto/update-scheduler.dto';
 import { SearchSchedulerDto } from './dto/search-scheduler.dto';
+import { AxiosResponse } from 'axios';
 
 @Injectable()
 export class SchedulerService implements OnModuleInit {
@@ -377,12 +378,24 @@ export class SchedulerService implements OnModuleInit {
                     logType: 'Scheduler',
                 });
             }
-
-            const response = await this.httpService.axiosRef.post(
-                `http://localhost:${process.env.PORT}/${job.URL}`,
-                payload,
-                { proxy: false },
-            );
+            let response: AxiosResponse;
+            switch (job.HTTP_METHOD) {
+                case 'GET':
+                    response = await this.httpService.axiosRef.get(
+                        `http://localhost:${process.env.PORT}/${job.URL}`,
+                        { params: payload, proxy: false },
+                    );
+                    break;
+                case 'POST':
+                    response = await this.httpService.axiosRef.post(
+                        `http://localhost:${process.env.PORT}/${job.URL}`,
+                        payload,
+                        { proxy: false },
+                    );
+                    break;
+                default:
+                    throw new Error(`Unsupported HTTP method: ${job.HTTP_METHOD}`);
+            }
             message = JSON.stringify(response.data);
             responseCode = response.status;
             this.logger.info(`Job ${job.NAME} ${response.status}`, {

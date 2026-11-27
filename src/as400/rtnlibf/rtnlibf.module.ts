@@ -27,4 +27,4 @@ import { T002kpModule } from './t002kp/t002kp.module';
         T016kpModule,
     ],
 })
-export class rtnlibfModule {}
+export class RtnlibfModule {}

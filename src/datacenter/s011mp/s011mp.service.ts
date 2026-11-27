@@ -42,7 +42,10 @@ export class S011mpService {
                 data: res,
             };
         } catch (error) {
-            throw new Error(`Search S011MP by id ${S11M01}, ${S11M02} Error: ` + error.message);
+            throw new Error(
+                `Search S011MP by id ${S11M01}, ${S11M02} Error: ` +
+                    error.message,
+            );
         }
     }
 
@@ -170,6 +173,9 @@ export class S011mpService {
                 //     console.log('---------------------------');
                 // }
                 if (max - min == 0) {
+                    // console.log('no diff')
+                    // console.log('drawingGroup:', drawingGroup);
+
                     return [
                         {
                             ...main,
@@ -184,10 +190,34 @@ export class S011mpService {
                     ];
                 }
 
-                // กรณี min-level มี 2 ตัว: แยกเป็น 2 rows โดยแต่ละ row เก็บ min-level คนละตัว
-                if (minLevels.length == 2 && max == 2) {
+                //* กรณี min-level มี 2 ตัว: แยกเป็น 2 rows โดยแต่ละ row เก็บ min-level คนละตัว
+                // if (minLevels.length == 2 && max == 2) {
+                //     return values.map((value, index) => {
+                //         const rowLevels = [...maxLevels, minLevels[index]];
+                //         return {
+                //             ...main,
+                //             S11M09: value,
+                //             LEVEL: rowLevels
+                //                 .sort((a, b) => a.S11M06.localeCompare(b.S11M06))
+                //                 .map((l) => this.getLevel(l.S11M06))
+                //                 .join(''),
+                //             DRAWING_GROUP: drawingGroup,
+                //             MAXQTY: max,
+                //         };
+                //     });
+                // }
+
+                if (max == 2 && minLevels.length > 0) {
+                    // console.log('max = 2')
+                    // console.log('drawingGroup:', drawingGroup);
+
+                    const minLevelsPerRow = Math.ceil(minLevels.length / values.length);
                     return values.map((value, index) => {
-                        const rowLevels = [...maxLevels, minLevels[index]];
+                        const start = index * minLevelsPerRow;
+                        const rowLevels = [
+                            ...maxLevels,
+                            ...minLevels.slice(start, start + minLevelsPerRow),
+                        ];
                         return {
                             ...main,
                             S11M09: value,
@@ -200,6 +230,56 @@ export class S011mpService {
                         };
                     });
                 }
+                // console.log('drawingGroup:', drawingGroup);
+
+                /** หักตามจำนวนแบบพี่ต้นบอกยังไงก็ผิดอยู่ดีเพราะไม่รู้ว่ามันเป็นของใคร มันจะยาวอัน ส้นอัน
+                    ตัวอย่าง
+                    "ORDER": "ETA048243",
+                    "ITEM": "26201",
+                    
+                    ได้      L26L42L45L61L62L78L81L85
+                            L26L78L81L85
+                            S11M06              S11M07  S11M09
+                    โดย     BE501A752 G03 L21	0	    2
+                            BE501A752 G03 L26	1	    2
+                            BE501A752 G03 L45	1	    1
+                            BE501A752 G03 L62	1	    1
+                            BE501A752 G03 L78	1	    2
+                            BE501A752 G03 L81	1	    2
+                            BE501A752 G03 L85	1	    2
+                            BE501A752 G03 L42	1	    1
+                            BE501A752 G03 L61	1	    1
+                    ต้องได้
+                        L26L45L62L78L81L85
+                        L26L42L61L78L81L85
+                */
+                // const remainingLevels = groupLevels
+                //     .map((level) => ({ ...level }))
+                //     .sort((a, b) => a.S11M06.localeCompare(b.S11M06));
+
+                // return values.map((value) => {
+                //     const selectedLevels = remainingLevels.filter(
+                //         (level) => level.S11M09 == max || level.S11M09 == value,
+                //     );
+                    
+
+                //     const result = {
+                //         ...main,
+                //         S11M09: value,
+                //         // ตัด 3 ตัวท้ายของ S11M06 (เฉพาะที่ S11M09 เท่ากับ max หรือ value) มาต่อกัน
+                //         LEVEL: selectedLevels
+                //             .map((level) =>
+                //                 level.S11M09 == 0 ? '' : this.getLevel(level.S11M06),
+                //             )
+                //             .join(''),
+                //         DRAWING_GROUP: drawingGroup,
+                //         MAXQTY: max,
+                //     };
+                //     selectedLevels.forEach((level) => {
+                //         level.S11M09 -= value;
+                //     });
+                //     return result;
+                // });
 
                 // สร้าง 2 รายการ: ส่วนต่าง (diff) และค่าต่ำสุด (min)
                 return values.map((value) => ({

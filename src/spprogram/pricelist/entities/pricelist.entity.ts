@@ -1,7 +1,6 @@
-﻿import {
+import {
     Column,
     Entity,
-    PrimaryColumn,
     ManyToOne,
     JoinColumn,
     PrimaryGeneratedColumn,
@@ -10,26 +9,29 @@ import { Items } from '../../items/entities/items.entity';
 
 @Entity({ name: 'PRICELIST', schema: 'SPSYS' })
 export class Pricelist {
-    @PrimaryGeneratedColumn()
-    PRICEID: number;
+    @PrimaryGeneratedColumn({ name: 'PRICE_ID' })
+    PRICE_ID: number;
 
-    @PrimaryColumn()
+    @Column()
     FYYEAR: number;
 
-    @PrimaryColumn()
-    PERIOD: string;
+    @Column()
+    PERIOD: number;
 
-    @PrimaryColumn()
+    @Column()
     ITEM: number;
 
     @Column()
-    STATUS: string;
+    STATUS: number;
 
-    @Column()
+    @Column({ type: 'date', nullable: true })
     STARTIN: Date;
 
-    @Column()
-    INQUIRY: number;
+    @Column({ name: 'ENDIN', type: 'date', nullable: true })
+    ENDIN: Date | null;
+
+    @Column({ nullable: true })
+    INQUIRY: string;
 
     @Column('decimal', { precision: 10, scale: 2 })
     FCCOST: number;
@@ -41,12 +43,12 @@ export class Pricelist {
     TCCOST: number;
 
     @Column()
-    LATEST: string;
+    LATEST: number;
 
-    @Column()
+    @Column({ nullable: true })
     CREATE_BY: string;
 
-    @Column()
+    @Column({ type: 'date', nullable: true })
     CREATE_AT: Date;
 
     @ManyToOne(() => Items, (item) => item.prices)

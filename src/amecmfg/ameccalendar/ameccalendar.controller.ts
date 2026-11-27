@@ -1,7 +1,20 @@
-import { Controller, Body, Post } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
+import {
+    Controller,
+    Body,
+    Post,
+    Get,
+    Put,
+    Delete,
+    Param,
+    ParseIntPipe,
+} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBody, ApiParam } from '@nestjs/swagger';
 import { AmeccalendarService } from './ameccalendar.service';
 import { GetProdDto } from './dto/GetProd.dto';
+import { UpdateCalendarDayDto } from './dto/update-calendar-day.dto';
+import { BulkUpdateCalendarDto } from './dto/bulk-update-calendar.dto';
+import { CreateCalendarActivityDto } from './dto/create-calendar-activity.dto';
+import { UpdateCalendarActivityDto } from './dto/update-calendar-activity.dto';
 
 interface rangeObj {
     sdate: number;
@@ -87,5 +100,63 @@ export class AmeccalendarController {
     @Post('next-prod')
     getNextProd(@Body() dto: GetProdDto) {
         return this.calendar.getNextProd(dto);
+    }
+
+    @Get('activities/:year')
+    @ApiOperation({
+        summary: 'Get company activities and holiday/working-saturday metadata by year',
+    })
+    @ApiParam({ name: 'year', example: 2026, description: '4-digit calendar year (AD)' })
+    getActivitiesByYear(@Param('year', ParseIntPipe) year: number) {
+        return this.calendar.getActivitiesByYear(year);
+    }
+
+    @Post('activities')
+    @ApiOperation({
+        summary: 'Create a company activity on a calendar date',
+    })
+    createActivity(@Body() dto: CreateCalendarActivityDto) {
+        return this.calendar.createActivity(dto);
+    }
+
+    @Put('activities/:id')
+    @ApiOperation({
+        summary: 'Update an existing company activity by ID',
+    })
+    @ApiParam({ name: 'id', example: 1 })
+    updateActivity(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() dto: UpdateCalendarActivityDto,
+    ) {
+        return this.calendar.updateActivity(id, dto);
+    }
+
+    @Delete('activities/:id')
+    @ApiOperation({
+        summary: 'Delete a company activity by ID',
+    })
+    @ApiParam({ name: 'id', example: 1 })
+    deleteActivity(@Param('id', ParseIntPipe) id: number) {
+        return this.calendar.deleteActivity(id);
+    }
+
+    @Post('bulk')
+    @ApiOperation({
+        summary: 'Bulk update calendar days or add company activities across multiple dates',
+    })
+    bulkUpdateCalendar(@Body() dto: BulkUpdateCalendarDto) {
+        return this.calendar.bulkUpdateCalendar(dto);
+    }
+
+    @Put(':workId')
+    @ApiOperation({
+        summary: 'Update a single calendar day status (WORKDAY, HOLIDAY, WORKING_SATURDAY, WEEKEND)',
+    })
+    @ApiParam({ name: 'workId', example: 20260413, description: 'YYYYMMDD' })
+    updateCalendarDay(
+        @Param('workId', ParseIntPipe) workId: number,
+        @Body() dto: UpdateCalendarDayDto,
+    ) {
+        return this.calendar.updateCalendarDay(workId, dto);
     }
 }

@@ -3,6 +3,7 @@ import { AMECUSERALL } from '../../amec/views/AMECUSERALL.entity';
 @Entity({
     name: 'SEQUENCEORG',
     schema: 'WEBFORM',
+    database: 'webform',
 })
 export class SEQUENCEORG {
     @PrimaryColumn()

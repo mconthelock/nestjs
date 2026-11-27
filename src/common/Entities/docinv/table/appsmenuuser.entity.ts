@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Appsmenu } from './appsmenu.entity';
 
-@Entity({ name: 'APP_MENU_USERS', schema: 'DOCINV' })
+@Entity({ name: 'APP_MENU_USERS', schema: 'DOCINV', database: 'docinv' })
 export class Appsmenuuser {
     @PrimaryColumn()
     MENU_ID: number;

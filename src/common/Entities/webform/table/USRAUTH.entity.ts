@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: 'USRAUTH', schema: 'WEBFORM' })
+@Entity({ name: 'USRAUTH', schema: 'WEBFORM', database: 'webform' })
 export class USRAUTH {
     @PrimaryColumn()
     VEMPNO: string;

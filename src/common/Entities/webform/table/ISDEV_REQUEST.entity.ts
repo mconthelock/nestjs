@@ -18,7 +18,7 @@ import { ISDEV_DEVELOPER } from './ISDEV_DEVELOPER.entity';
 import { IS_FILE } from './IS_FILE.entity';
 import { FORM } from './FORM.entity';
 
-@Entity({ name: 'ISDEV_REQUEST', schema: 'WEBFORM' })
+@Entity({ name: 'ISDEV_REQUEST', schema: 'WEBFORM', database: 'webform' })
 export class ISDEV_REQUEST {
     @PrimaryColumn()
     NFRMNO: number;

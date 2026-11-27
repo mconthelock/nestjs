@@ -12,7 +12,7 @@ import { QAINS_FORM } from './QAINS_FORM.entity';
 
 //GP Form
 
-@Entity({ name: 'FORM', schema: 'WEBFORM' })
+@Entity({ name: 'FORM', schema: 'WEBFORM', database: 'webform' })
 export class FORM {
     @PrimaryColumn()
     NFRMNO: number;

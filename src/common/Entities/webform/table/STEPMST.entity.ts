@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, OneToMany, PrimaryColumn } from 'typeorm';
 import { FLOW } from './FLOW.entity';
 
-@Entity({ name: 'STEPMST', schema: 'WEBFORM' })
+@Entity({ name: 'STEPMST', schema: 'WEBFORM', database: 'webform' })
 export class STEPMST {
     @PrimaryColumn()
     CNO: string;

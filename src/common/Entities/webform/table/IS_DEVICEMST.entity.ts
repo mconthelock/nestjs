@@ -3,6 +3,7 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 @Entity({
     name: 'IS_DEVICEMST',
     schema: 'WEBFORM',
+    database: 'webform',
 })
 export class IS_DEVICEMST {
     @PrimaryColumn()

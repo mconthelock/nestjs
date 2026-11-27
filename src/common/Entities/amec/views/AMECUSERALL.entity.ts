@@ -13,7 +13,7 @@ import { QAINS_OPERATOR_AUDITOR } from '../../webform/table/QAINS_OPERATOR_AUDIT
 import { USERS } from '../../escs/table/USERS.entity';
 import { INV_YEARLY_ASSIGN } from '../../skid/table/INV_YEARLY_ASSIGN.entity';
 
-@Entity({ name: 'AMECUSERALL', schema: 'WEBFORM' })
+@Entity({ name: 'AMECUSERALL', schema: 'WEBFORM', database: 'webform' })
 export class AMECUSERALL {
     @PrimaryColumn()
     SEMPNO: string;

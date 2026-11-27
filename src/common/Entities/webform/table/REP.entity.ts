@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
-@Entity({ name: 'REP', schema: 'WEBFORM' })
+@Entity({ name: 'REP', schema: 'WEBFORM', database: 'webform' })
 export class REP {
     @PrimaryColumn()
     VEMPNO: string;

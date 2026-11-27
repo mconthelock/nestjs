@@ -3,10 +3,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AmeccalendarService } from './ameccalendar.service';
 import { AmeccalendarController } from './ameccalendar.controller';
 import { Ameccalendar } from './entities/ameccalendar.entity';
+import { AmeccalendarActivity } from 'src/common/Entities/datacenter/table/AMECCALENDAR_ACTIVITY.entity';
 import { AmeccalendarRepository } from './ameccalendar.repository';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Ameccalendar], 'datacenterConnection')],
+    imports: [
+        TypeOrmModule.forFeature([Ameccalendar, AmeccalendarActivity], 'datacenterConnection'),
+    ],
     controllers: [AmeccalendarController],
     providers: [AmeccalendarService, AmeccalendarRepository],
     exports: [AmeccalendarService],

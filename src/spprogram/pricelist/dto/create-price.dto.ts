@@ -1,5 +1,5 @@
-import { Type } from 'class-transformer';
-import { IsString, IsNotEmpty, IsNumber, IsOptional, IsDateString, IsDate } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsString, IsNotEmpty, IsNumber, IsOptional, IsDate } from 'class-validator';
 
 export class createPriceListDto {
     @Type(() => Number)
@@ -7,26 +7,35 @@ export class createPriceListDto {
     @IsNotEmpty()
     FYYEAR: number;
 
-    @IsString()
+    @Type(() => Number)
+    @IsNumber()
     @IsNotEmpty()
-    PERIOD: string;
+    PERIOD: number;
 
     @Type(() => Number)
     @IsNumber()
     @IsNotEmpty()
     ITEM: number;
 
-    @IsString()
-    STATUS: string;
-
-    @Type(() => Date)
-    @IsDate()
-    STARTIN: Date;
-
     @Type(() => Number)
     @IsNumber()
     @IsOptional()
-    INQUIRY: number;
+    STATUS?: number;
+
+    @Type(() => Date)
+    @IsDate()
+    @IsOptional()
+    STARTIN?: Date;
+
+    @Type(() => Date)
+    @IsDate()
+    @IsOptional()
+    ENDIN?: Date | null;
+
+    @Transform(({ value }) => (value !== undefined && value !== null ? String(value) : value))
+    @IsString()
+    @IsOptional()
+    INQUIRY?: string;
 
     @Type(() => Number)
     @IsNumber()
@@ -43,13 +52,17 @@ export class createPriceListDto {
     @IsNotEmpty()
     TCCOST: number;
 
-    @IsString()
-    LATEST: string;
+    @Type(() => Number)
+    @IsNumber()
+    @IsOptional()
+    LATEST?: number;
 
     @Type(() => Date)
     @IsDate()
-    CREATE_AT: Date;
+    @IsOptional()
+    CREATE_AT?: Date;
 
     @IsString()
-    CREATE_BY: string;
+    @IsOptional()
+    CREATE_BY?: string;
 }

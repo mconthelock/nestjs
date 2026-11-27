@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, OneToOne } from 'typeorm';
 import { AMECUSERALL } from '../../amec/views/AMECUSERALL.entity';
 
-@Entity({ name: 'ORGPOS', schema: 'WEBFORM' })
+@Entity({ name: 'ORGPOS', schema: 'WEBFORM', database: 'webform' })
 export class ORGPOS {
     @PrimaryColumn()
     VPOSNO: string;

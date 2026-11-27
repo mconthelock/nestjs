@@ -2,7 +2,7 @@ import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn, ManyToOne } from '
 import { FORM } from './FORM.entity';
 import { FORMMST_GROUP } from './FORMMST_GROUP.entity';
 
-@Entity({ name: 'FORMMST', schema: 'WEBFORM' })
+@Entity({ name: 'FORMMST', schema: 'WEBFORM', database: 'webform' })
 export class FORMMST {
     @PrimaryColumn()
     NNO: number;
@@ -48,6 +48,9 @@ export class FORMMST {
 
     @Column()
     VDEVELOPER: string;
+
+    @Column()
+    CCREATED: string;
 
     @ManyToOne(() => FORMMST_GROUP)
     @JoinColumn([

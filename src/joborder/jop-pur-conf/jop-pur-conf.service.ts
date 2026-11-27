@@ -7,6 +7,7 @@ import { CreateJopPurConfDto } from './dto/create-jop-pur-conf.dto';
 import { UpdateJopPurConfDto } from './dto/update-jop-pur-conf.dto';
 
 import { JopPurConf } from './entities/jop-pur-conf.entity';
+import { User } from 'src/common/Entities/amec/views/user.entity';
 import { numberToAlphabetRevision } from 'src/common/utils/format.utils';
 
 import { AmeccalendarService } from 'src/amecmfg/ameccalendar/ameccalendar.service';
@@ -29,10 +30,10 @@ export class JopPurConfService {
     ) {}
 
     private readonly JOP_PUR_CONF = this.dataSource
-        .getMetadata('DAILYIDS.JOP_PUR_CONF')
+        .getMetadata(JopPurConf)
         .columns.map((c) => c.propertyName);
     private readonly AMECUSERALL = this.dataSource
-        .getMetadata('AMEC.AMECUSERALL')
+        .getMetadata(User)
         .columns.map((c) => c.propertyName);
     private readonly allowFields = [...this.JOP_PUR_CONF, ...this.AMECUSERALL];
 

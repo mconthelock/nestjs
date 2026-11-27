@@ -36,12 +36,14 @@ export class CreateIsDevDto extends PickType(CreateFormDto, [
     @Type(() => Number)
     NRUNNO?: number;
 
+    @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    OBJECTIVE: number;
+    OBJECTIVE?: number;
 
+    @IsOptional()
     @IsString()
-    OBJECTIVE_OTHER: string;
+    OBJECTIVE_OTHER?: string;
 
     @IsNumber()
     @Type(() => Number)
@@ -75,9 +77,10 @@ export class CreateIsDevDto extends PickType(CreateFormDto, [
     @Type(() => Date)
     REQ_DATE: Date;
 
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
-    SPEC_CONFIRM_PLAN: Date;
+    SPEC_CONFIRM_PLAN?: Date;
 
     @IsOptional()
     @IsDate()

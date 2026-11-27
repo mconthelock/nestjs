@@ -7,6 +7,7 @@ import { STY_CHEMICAL_SECTION } from 'src/common/Entities/gpreport/table/STY_CHE
 import { ORGPOS } from 'src/common/Entities/webform/table/ORGPOS.entity';
 import { User as WebformUser } from 'src/common/Entities/webform/views/AMECUSERALL.entity';
 import { SectionSubscriber } from '../subscriber/section.subscriber';
+import type { UpdateChemicalSectionDto } from '../dto/update-chemical-section.dto';
 
 @Injectable()
 export class SectionRepository extends BaseRepository {
@@ -16,7 +17,8 @@ export class SectionRepository extends BaseRepository {
     }
 
     getMasterSection(ownerCode: string) {
-        return this.getRepository(STY_CHEMICAL_SECTION).createQueryBuilder('S')
+        return this.getRepository(STY_CHEMICAL_SECTION)
+            .createQueryBuilder('S')
             .select([
                 'S.AMEC_SDS_ID',
                 'M.CHEMICAL_NAME',
@@ -94,10 +96,16 @@ export class SectionRepository extends BaseRepository {
         // JOIN WEBFORM.ORGPOS O ON C.OWNERCODE = O.VORGNO AND VPOSNO IN ('30','20')
         // JOIN WEBFORM.AMECUSERALL A ON O.VEMPNO = A.SEMPNO
         // WHERE C.AMEC_SDS_ID = 6
-        return this.getRepository(STY_CHEMICAL_SECTION).createQueryBuilder('S')
-            .innerJoin(ORGPOS, 'O', 'S.OWNERCODE = O.VORGNO AND O.VPOSNO IN (:...posNos)', {
-                posNos: ['30', '20'],
-            })
+        return this.getRepository(STY_CHEMICAL_SECTION)
+            .createQueryBuilder('S')
+            .innerJoin(
+                ORGPOS,
+                'O',
+                'S.OWNERCODE = O.VORGNO AND O.VPOSNO IN (:...posNos)',
+                {
+                    posNos: ['30', '20'],
+                },
+            )
             .innerJoin(WebformUser, 'A', 'O.VEMPNO = A.SEMPNO')
             .select([
                 'S.OWNER',
@@ -110,5 +118,15 @@ export class SectionRepository extends BaseRepository {
             ])
             .where('S.AMEC_SDS_ID = :id', { id })
             .getRawMany();
+    }
+
+    update(
+        condition: Pick<
+            UpdateChemicalSectionDto,
+            'AMEC_SDS_ID' | 'OWNERCODE'
+        >,
+        data: Omit<UpdateChemicalSectionDto, 'AMEC_SDS_ID' | 'OWNERCODE'>,
+    ) {
+        return this.getRepository(STY_CHEMICAL_SECTION).update(condition, data);
     }
 }

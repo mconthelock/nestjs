@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { ChemicalSectionModule } from './chemical-section/chemical-section.module';
 import { FormModule } from 'src/webform/form/form.module';
 import { StyFilesModule } from 'src/gpreport/sty-files/sty-files.module';
 import { OrganizationsModule } from 'src/webform/organizations/organizations.module';
@@ -29,6 +28,8 @@ import { STY_CHEMICAL_SECTION } from 'src/common/Entities/gpreport/table/STY_CHE
 import { FileRepository } from './repository/file.repository';
 import { MailModule } from 'src/common/services/mail/mail.module';
 import { AmecUserAllModule } from 'src/amec/amecuserall/amecuserall.module';
+import { SectionService } from './services/section.service';
+import { SectionController } from './controllers/section.controller';
 
 @Module({
     imports: [
@@ -42,14 +43,18 @@ import { AmecUserAllModule } from 'src/amec/amecuserall/amecuserall.module';
             ],
             'gpreportConnection',
         ),
-        ChemicalSectionModule,
         FormModule,
         OrganizationsModule,
         StyFilesModule,
         MailModule,
         AmecUserAllModule,
     ],
-    controllers: [FollowController, MasterController, RevController],
+    controllers: [
+        FollowController,
+        MasterController,
+        RevController,
+        SectionController,
+    ],
     providers: [
         // Services
         FollowService,
@@ -57,6 +62,7 @@ import { AmecUserAllModule } from 'src/amec/amecuserall/amecuserall.module';
         RevService,
         RebuildService,
         CreateService,
+        SectionService,
 
         // Repository
         FollowRepository,

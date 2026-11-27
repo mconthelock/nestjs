@@ -78,6 +78,12 @@ export class RevRepository extends BaseRepository {
         });
     }
 
+    findOneByCode(ownerCode: string) {
+        return this.getRepository(STY_CHEMICAL_REV).findOne({
+            where: { OWNERCODE: ownerCode },
+        });
+    }
+
     updateRevisionMaster(revision: string) {
         return this.getRepository(STY_CHEMICAL_REV).update(
             { OWNERCODE: '999999' },
@@ -85,10 +91,18 @@ export class RevRepository extends BaseRepository {
         );
     }
 
+    updateRevision(ownerCode: string, revision: string) {
+        return this.getRepository(STY_CHEMICAL_REV).update(
+            { OWNERCODE: ownerCode },
+            { REV: revision },
+        );
+    }
+
     getManagerApprove(ownerCode: string) {
         return this.getRepository(STY_CHEMICAL_REV)
             .createQueryBuilder('R')
-            .select(`R.OWNER,
+            .select(
+                `R.OWNER,
                     R.OWNERCODE, 
                     NVL(R.USER_APPROVE, O.VEMPNO) AS EMPNO, 
                     NVL(A.SPOSCODE, O.VPOSNO) AS SPOSCODE, 
@@ -96,7 +110,8 @@ export class RevRepository extends BaseRepository {
                     NVL(A.SDEPT, B.SDEPT) AS SDEPT, 
                     NVL(A.SPOSNAME, B.SPOSNAME) AS SPOSNAME, 
                     NVL(TO_CHAR(R.APPROVE_DATE, 'DD MON YYYY'), TO_CHAR(SYSDATE, 'DD MON YYYY')) AS APPROVE_DATE,
-                    CASE WHEN R.APPROVE_DATE IS NULL THEN 'NO' ELSE 'YES' END AS APPROVE_STATUS `)
+                    CASE WHEN R.APPROVE_DATE IS NULL THEN 'NO' ELSE 'YES' END AS APPROVE_STATUS `,
+            )
             .leftJoin(AMECUSERALL, 'A', 'R.USER_APPROVE = A.SEMPNO')
             .leftJoin(ORGPOS, 'O', "O.VORGNO = '020601' AND O.VPOSNO = '20'")
             .leftJoin(AMECUSERALL, 'B', 'O.VEMPNO = B.SEMPNO')

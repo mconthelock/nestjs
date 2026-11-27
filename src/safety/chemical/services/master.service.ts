@@ -95,7 +95,8 @@ export class MasterService {
                 throw new Error(org.message);
             }
             const ownerCode: string[] = org.data.map((o) => o.CODE);
-            const organization: STY_CHEMICAL_REV[] = await this.revRepo.getByCode(ownerCode);
+            const organization: STY_CHEMICAL_REV[] =
+                await this.revRepo.getByCode(ownerCode);
             // * เก็บไว้เผื่ออนาคตเปลี่ยนมาใส่ชื่อหัวหน้าแผนก safety ตอน stamp
             // for (const o of organization) {
             //     o.MANAGER_APPROVE = await this.revRepo.getManagerApprove(
@@ -113,6 +114,39 @@ export class MasterService {
                 status: true,
                 organizations: organization,
                 data,
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * @author Sutthipong tangmongkhoncharoen(24008)
+     * @since 2026-11-27
+     * @description ดึงข้อมูล master ตามรหัสเจ้าของ
+     * @param ownerCode 
+     * @returns 
+     */
+    async getMasterByCode(ownerCode: string) {
+        try {
+            const masters = await this.sectionRepo.getMasterSection(ownerCode);
+            if (!masters || masters.length === 0) {
+                throw new NotFoundException(
+                    `Master not found for code ${ownerCode}`,
+                );
+            }
+            const organization: STY_CHEMICAL_REV[] =
+                await this.revRepo.getByCode(ownerCode);
+            if (organization.length === 0) {
+                throw new NotFoundException(
+                    `Organization not found for code ${ownerCode}`,
+                );
+            }
+            return {
+                status: true,
+                length: masters.length,
+                organization: organization[0],
+                data: masters,
             };
         } catch (error) {
             throw error;

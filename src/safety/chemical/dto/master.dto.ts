@@ -21,6 +21,13 @@ export class OwnOrgDto {
     GROUP?: string;
 }
 
+export class MasterByCodeDto {
+    @IsNotEmpty()
+    @IsString()
+    @Type(() => String)
+    OWNERCODE: string;
+}
+
 export class RebuildSectionDto {
     @IsNotEmpty()
     @IsNumber({}, { each: true })

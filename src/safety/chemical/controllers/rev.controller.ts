@@ -20,6 +20,11 @@ export class RevController {
         return this.service.find('inactive');
     }
 
+    @Get('sec/active')
+    findSecActive() {
+        return this.service.find('sec-active');
+    }
+
     @Patch('master/:revision')
     update(@Param('revision') revision: string) {
         return this.service.updateRevisionMaster(revision);

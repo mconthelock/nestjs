@@ -15,6 +15,7 @@ import {
     ConfirmRebuildSectionDto,
     DisableByIdDto,
     CreateMasterDto,
+    MasterByCodeDto,
 } from '../dto/master.dto';
 import { RebuildService } from '../services/rebuild.service';
 import { UseTransaction } from 'src/common/decorator/transaction.decorator';
@@ -50,6 +51,11 @@ export class MasterController {
     @Post('OwnOrg')
     getOwnOrg(@Body() data: OwnOrgDto) {
         return this.service.getOwnOrg(data);
+    }
+
+    @Post('code')
+    getMasterByCode(@Body() data: MasterByCodeDto) {
+        return this.service.getMasterByCode(data.OWNERCODE);
     }
 
     @Post('rebuild')

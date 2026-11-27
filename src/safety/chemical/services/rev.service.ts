@@ -6,7 +6,7 @@ import { RevRepository } from '../repository/rev.repository';
 export class RevService {
     constructor(private readonly revRepo: RevRepository) {}
 
-    async find(type: 'all' | 'active' | 'inactive') {
+    async find(type: 'all' | 'active' | 'inactive' | 'sec-active') {
         try {
             const res = await this.revRepo.find(type);
             return res.length > 0

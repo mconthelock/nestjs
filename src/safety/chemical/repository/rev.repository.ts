@@ -61,12 +61,16 @@ export class RevRepository extends BaseRepository {
         });
     }
 
-    find(type: 'all' | 'active' | 'inactive') {
+    find(type: 'all' | 'active' | 'inactive' | 'sec-active') {
         const where: any = {};
         if (type === 'active') {
             where.STATUS = 1;
         } else if (type === 'inactive') {
             where.STATUS = 0;
+        }
+        if (type === 'sec-active') {
+            where.STATUS = 1;
+            where.OWNERCODE = Not('999999');
         }
         return this.getRepository(STY_CHEMICAL_REV).find({
             where,

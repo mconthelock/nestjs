@@ -39,6 +39,8 @@ export class SectionRepository extends BaseRepository {
             .leftJoin('M.CLASS', 'T', 'T.TYPE_STATUS = 1')
             .leftJoinAndSelect('M.FILES', 'F', 'F.STATUS = 1')
             .leftJoinAndSelect('F.TYPE', 'FT')
+            .leftJoinAndSelect('S.DETAIL', 'D')
+            .leftJoinAndSelect('D.SWCARCINOGENS_TYPE', 'CT')
             .where('S.OWNERCODE = :ownerCode', { ownerCode })
             .andWhere('S.STATUS = :status', { status: 1 })
             .orderBy('S.AMEC_SDS_ID', 'ASC')

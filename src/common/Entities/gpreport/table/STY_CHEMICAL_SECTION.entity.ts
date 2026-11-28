@@ -5,9 +5,11 @@ import {
     ManyToOne,
     PrimaryColumn,
     AfterLoad,
+    OneToOne,
 } from 'typeorm';
 import { STY_CHEMICAL } from './STY_CHEMICAL.entity';
 import { formatDate } from 'src/common/utils/dayjs.utils';
+import { STY_CHEMICAL_SECDETAIL } from './STY_CHEMICAL_SECDETAIL.entity';
 
 @Entity({ name: 'STY_CHEMICAL_SECTION', schema: 'GPREPORT' })
 export class STY_CHEMICAL_SECTION {
@@ -68,4 +70,12 @@ export class STY_CHEMICAL_SECTION {
     @ManyToOne(() => STY_CHEMICAL, (c) => c.SECTIONS)
     @JoinColumn({ name: 'AMEC_SDS_ID', referencedColumnName: 'AMEC_SDS_ID' })
     MASTER: STY_CHEMICAL;
+
+    @OneToOne(() => STY_CHEMICAL_SECDETAIL)
+    @JoinColumn([
+        { name: 'AMEC_SDS_ID', referencedColumnName: 'AMEC_SDS_ID' },
+        { name: 'OWNER', referencedColumnName: 'OWNER' },
+        { name: 'OWNERCODE', referencedColumnName: 'OWNERCODE' },
+    ])
+    DETAIL: STY_CHEMICAL_SECDETAIL;
 }
